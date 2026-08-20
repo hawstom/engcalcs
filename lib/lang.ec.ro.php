@@ -56,9 +56,6 @@ $ec_lang['u_hp']='hp';
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
 
-// Page text
-// In page order for easiest maintenance.
-// Menu and General
 $ec_lang['menu_brand']='Calculatoare HawsEDC';
 $ec_lang['menu_main_list']='Listă de calculatoare';
 $ec_lang['menu_main_hydraulics']='Hidraulică';
@@ -69,10 +66,6 @@ $ec_lang['template_welcome']='Lasă temerile la ușă; dragostea se vorbește ai
 $ec_lang['template_feedback']='Puteți sugera o formulare mai bună pentru acest text, sau altceva? Doriți să ajutați, sau să învățați să creați instrumente ca acestea? Vă rog, contactați-mă.';
 $ec_lang['template_printable_title']='Titlu tipărit';
 $ec_lang['template_printable_subtitle']='Subtitlu tipărit';
-// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
-// prose, and they are translated into all 26 languages for one reason: consent that the visitor
-// cannot read is not consent. The long-form privacy notice and terms are a separate question --
-// English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_body']='Ne permiteți să păstrăm o singură cifră per pagină în stocarea acestui profil de browser, pentru a evita înregistrarea repetată a vizitelor?';
 $ec_lang['consent_accept']='Permit acum';
 $ec_lang['consent_accept_all']='Permit mereu';
@@ -104,7 +97,6 @@ $ec_lang['ec_name_tip']='Salvează valorile introduse în URL pentru marcaj, rec
 $ec_lang['calc_copy_link']='Copiați linkul';
 $ec_lang['ec_related_calcs']='Calculatoare conexe:';
 $ec_lang['calc_copy_link_done']='Copiat!';
-// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Pierdere de Sarcină Conductă Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculator Gratuit Online Pierdere de Sarcină Conductă Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Pierdere de Sarcină Conductă Darcy-Weisbach la Diametru, Rugozitate și Debit Date';
@@ -120,7 +112,6 @@ $ec_lang['dw_regime_transitional']='tranzitoriu';
 $ec_lang['dw_regime_turbulent']='turbulent';
 $ec_lang['dw_friction_factor_method']='Metoda factorului de frecare';
 $ec_lang['dw_friction_factor']='Factorul de frecare, f';
-// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Pierdere de Sarcină Conductă Hazen-Williams';
 $ec_lang['hw_main_title']='Calculator Gratuit Online Pierdere de Sarcină Conductă Hazen-Williams';
 $ec_lang['hw_main_desc']='Pierdere de Sarcină Conductă Hazen-Williams la Diametru, Rugozitate și Debit Date';
@@ -138,7 +129,6 @@ $ec_lang['hw_roughness']='Coeficientul Hazen-Williams, C';
 $ec_lang['hw_note_1']='<dl><dt>Acest calculator nu modelează profilul conductei între cele două capete.</dt><dd>Utilizează doar cotele amonte și aval introduse de dumneavoastră. Dacă terenul se ridică mai sus decât oricare dintre capete undeva între ele, presiunea în acel punct înalt este mai mică decât orice presiune raportată aici. Rulați din nou calculatorul pentru lungimea de la capătul amonte până la punctul înalt pentru a-l verifica.</dd><dd>Acolo unde HGL coboară sub conductă, apa este sub presiune negativă. Aerul iese din soluție, o conductă cu pereți subțiri se poate prăbuși, iar apă subterană murdară poate fi atrasă prin îmbinări. Mențineți linia sub presiune pozitivă peste tot și luați în considerare o supapă de aer la fiecare punct înalt.</dd><dt>Presiunea amonte este o condiție la limită pe care o furnizați dumneavoastră.</dt><dd>Citiți-o de pe un manometru, de la nivelul apei dintr-un rezervor (înălțimea apei deasupra conductei) sau de pe curba pompei. O pompă furnizează o presiune mai mică pe măsură ce debitul crește, așa că folosiți punctul de pe curbă care corespunde debitului introdus mai sus.</dd><dt>Adunați dumneavoastră coeficienții de pierdere minoră (locală).</dt><dd>Însumați valorile K pentru fiecare vană, cot, teu, contor și intrare de pe linie și introduceți acel total. Urmați linkul de la acel câmp pentru valori tipice. Pe o magistrală de transport lungă, aceste pierderi sunt mici în comparație cu frecarea, dar în conductele scurte dintr-o stație ele pot reprezenta cea mai mare parte a pierderii.</dd></dl>';
 
 
-// Manning Irregular
 $ec_lang['mi_menu']='Manning Canal cu Secțiune Neregulată';
 $ec_lang['mi_main_title']='Calculator Gratuit Online Manning pentru Canal cu Secțiune Neregulată';
 $ec_lang['mi_main_desc']='Calculator Manning de Curgere Uniformă în Canal cu Secțiune Neregulată';
@@ -166,7 +156,6 @@ $ec_lang['mi_notes_1_term']='n compozit';
 $ec_lang['mi_notes_1_def']='Acest calculator urmează Manualul de Referință HEC-RAS în calculul n compozit de regiune folosind Chow 1959, pagina 136, ecuația 6-17 (nu 6-18).';
 $ec_lang['mi_notes_2_term']='Placare cu rocă';
 $ec_lang['mi_notes_2_def']='Folosiți Calculatorul Manning pentru Canal Trapezoidal pentru a proiecta placarea cu rocă. Acest calculator este mai potrivit pentru secțiuni naturale.';
-// Manning Pipe Flow
 $ec_lang['mpf_main_menu']='Manning Curgere Conductă';
 $ec_lang['mpf_main_title']='Calculator Gratuit Online Manning Curgere Conductă';
 $ec_lang['mpf_main_desc']='Formula Manning Curgere Uniformă în Conductă la Pantă și Adâncime Date';
@@ -195,7 +184,6 @@ $ec_lang['mpf_solver_enter_positive_q']='Introduceți un Q țintă pozitiv.';
 $ec_lang['mpf_solver_no_solution']='Fără soluție: Q depășește capacitatea conductei la y/d0 = 93.8% (Qmax = {qmax} în unitățile selectate).';
 $ec_lang['mpf_solve_btn']='Calculează';
 $ec_lang['mpf_solve_for_flow']='pentru debit, Q =';
-// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Pierdere de Sarcină Conductă';
 $ec_lang['mphl_main_title']='Calculator Gratuit Online Manning Pierdere de Sarcină Conductă';
 $ec_lang['mphl_main_desc']='Formula Manning Pierdere de Sarcină la Curgere Plină Dată';
@@ -212,7 +200,6 @@ $ec_lang['mphl_egl_1']='EGL aval';
 $ec_lang['mphl_egl_2']='EGL amonte';
 $ec_lang['mphl_hgl_egl_tip']='Poate să nu fie valid dacă conducta este ridicată. Vedeți notele.';
 $ec_lang['mphl_note_1']='<dl><dt>Acest calculator nu modelează profilul conductei între cele două capete.</dt><dd>Dacă HGL coboară sub partea superioară a conductei în orice punct, acest calcul poate să nu fie valid.</dd><dt>Pentru o condiție de intrare deschisă (podeț), este necesar să se verifice condițiile de control la intrare.</dt><dd>1. HGL amonte trebuie să fie deasupra cotei de adâncime normală amonte a curgerii (și mai sus decât conducta!).</dd><dd>2. Nivelul apei din amonte al unui podeț este mai bine reprezentat de EGL amonte decât de HGL amonte.</dd><dd>3. Consultați <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">tutorialul meu de 2 minute</a> pentru calculele simple standard ale nivelului din amonte ale podețelor folosind <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, programul gratuit pentru podețe al Administrației Federale a Autostrăzilor din S.U.A.</dd><dd>4. Această pagină rezolvă doar cazul de control la ieșire: o conductă care curge plină, unde condițiile din aval determină sarcina. Proiectarea podețelor înseamnă a decide dacă predomină controlul la intrare sau la ieșire, așa că folosiți HY-8 ori de câte ori oricare dintre cele două ar putea predomina.</dd></dl>';
-// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Canal Trapezoidal';
 $ec_lang['mtc_main_title']='Calculator Gratuit Online Formula Manning Canal Trapezoidal';
 $ec_lang['mtc_main_desc']='Formula Manning Curgere Uniformă în Canal Trapezoidal la Pantă și Adâncime Date';
@@ -247,7 +234,6 @@ $ec_lang['mtc_note_1']='<dl><dt>Iterație automată de dimensionare a rocii și 
 $ec_lang['mtc_note_2_term']='Verificare viteză';
 $ec_lang['mtc_note_2_def']='Viteza mare indică faptul că a existat o cădere de nivel mare, care a generat o energie specifică atât de ridicată. Acea energie se poate pierde rapid la lărgiri, curbe sau obstacole. Verificați dacă acest lucru este rezonabil pentru amplasament.';
 $ec_lang['mtc_solver_no_solution']='Nu s-a găsit nicio soluție pentru Q dat cu aceste date de intrare ale canalului.';
-// Weir Flow Simple
 $ec_lang['ws_main_menu']='Deversor Simplu';
 $ec_lang['ws_main_title']='Calculator Gratuit Online pentru Deversor Simplu cu Creastă Lată';
 $ec_lang['ws_main_desc']='Calculator pentru Deversor Simplu cu Creastă Lată';
@@ -256,7 +242,6 @@ $ec_lang['ws_headWaterHeight']='<span class="ec-help" title="Energie pe unitatea
 $ec_lang['ws_weirCoefficient']='Coeficientul deversorului, C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='Note';
 $ec_lang['ws_notes_we_term']='Ecuația deversorului';
-// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='Deversor Neregulat';
 $ec_lang['wi_main_title']='Calculator Gratuit Online pentru Deversor Neregulat, Segmentat, cu Adâncime Variabilă';
 $ec_lang['wi_main_desc']='Calculator pentru Deversor Neregulat';
@@ -266,7 +251,6 @@ $ec_lang['wi_incrementalFlow']='Debit incremental';
 $ec_lang['wi_cumulativeFlow']='Debit cumulat';
 $ec_lang['wi_save_and_calculate']='Salvați și Calculați';
 $ec_lang['wi_notes_we_def']='q = dacă (length = 0) atunci 0 altfel dacă (slope=0) atunci cw*length*d<sub>0</sub><sup>1.5</sup> altfel cw/(2.5*slope) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) unde d<sub>1</sub> și d<sub>0</sub> sunt întotdeauna pozitive sau zero';
-// Orifice Flow
 $ec_lang['or_main_menu']='Debit prin Orificiu';
 $ec_lang['or_main_title']='Calculator Gratuit Online pentru Debitul prin Orificiu';
 $ec_lang['or_main_desc']='Debit prin Orificiu — Liber sau Înecat';
@@ -298,7 +282,6 @@ $ec_lang['or_notes_3_term']='Coeficient de debit';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> variază de la aproximativ 0,60–0,65 pentru orificii cu muchii ascuțite. Intrările rotunjite sau reintrante folosesc valori diferite. Consultați <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> sau Manualul de Referință Hidraulică HEC-RAS pentru îndrumări.';
 $ec_lang['or_notes_4_term']='Înecare';
 $ec_lang['or_notes_4_def']='Când TWE este deasupra radierului deschiderii, acest calculator aplică automat ecuația orificiului înecat folosind h = HWE − TWE. Când TWE este la nivelul radierului sau sub acesta, se presupune curgere liberă și h = HWE − centroid.';
-// Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Micro-Hidroenergie';
 $ec_lang['mhp_main_title']='Calculator gratuit online de micro-hidroenergie';
 $ec_lang['mhp_main_desc']='Calculator de putere pentru micro-hidrocentrale la cursul apei (fără baraj)';
@@ -331,7 +314,6 @@ $ec_lang['mhp_notes_6_def']='Randamentul tipic al centralei η variază între 0
 $ec_lang['mhp_notes_7_term']='Energie anuală';
 $ec_lang['mhp_notes_7_def']='Energia anuală presupune funcționare continuă la debit maxim (8.760 de ore/an). Producția reală va fi mai mică din cauza variației sezoniere a debitului, întreruperii pentru întreținere și factorului de sarcină.';
 
-// Orifice Drain Time
 $ec_lang['odt_main_menu']='Timp de Golire a Iazului și Rezervorului';
 $ec_lang['odt_main_title']='Calculator Gratuit Online Timp de Golire a Iazului, Bazinului și Rezervorului (Orificiu)';
 $ec_lang['odt_main_desc']='Timp de Golire a Iazului, Bazinului sau Rezervorului — Evacuare prin Orificiu, Metoda Volumului Conic';
@@ -359,10 +341,7 @@ $ec_lang['odt_q_max']='Debit maxim, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volum golit';
 $ec_lang['odt_sketch_start']='Început';
 $ec_lang['odt_sketch_end']='Sfârșit';
-// Contact us.
 
-// Irrigation
-// Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Distanța dintre emițătoare, S<sub>e</sub>';
 $ec_lang['ip_sl']='Distanța dintre laterale, S<sub>l</sub>';
 $ec_lang['ip_n_e']='Emițătoare per lateral, n<sub>e</sub>';
@@ -373,7 +352,6 @@ $ec_lang['ip_pr']='Rata de aplicare, PR';
 $ec_lang['ip_q_lat']='Debit pe lateral, Q<sub>lat</sub>';
 $ec_lang['ip_q_sys']='Debitul zonei, Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='Timp de funcționare (ore)';
-// Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Infiltrația Canalului';
 $ec_lang['cs_main_title']='Calculator Online Gratuit pentru Pierderi prin Infiltrație și Eficiența de Transport a Canalului';
 $ec_lang['cs_main_desc']='Pierderi prin Infiltrație & Eficiența de Transport a Canalului — Metoda Influx-Eflux';
@@ -408,7 +386,6 @@ $ec_lang['cs_notes_2_def']='Canale de pământ necăptușite tipice: E<sub>c</su
 $ec_lang['cs_notes_3_term']='Amortizarea Căptușelii';
 $ec_lang['cs_notes_3_def']='Introduceți valoarea apei și costul căptușelii în orice monedă consistentă. Suprafață căptușeală = lungimea tronsonului × perimetrul udat — perimetrul udat al secțiunii transversale a canalului la adâncimea de curgere măsurată (lățimea fundului plus ambii taluzi udați). Valoarea anuală recuperată presupune că canalul căptușit atinge în mod continuu E<sub>c</sub> țintă. Amortizarea reală va fi mai lungă pentru canale sezoniere sau dacă căptușeala nu atinge eficiența țintă.';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, ediția a 3-a (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-// About
 $ec_lang['about_main_menu']='Despre';
 $ec_lang['install_main_menu']='Instalare';
 $ec_lang['install_main_title']='Instalează EngCalcs';
@@ -440,7 +417,6 @@ $ec_lang['contactSpamPrefix']='Cinci plus unu este egal cu';
 $ec_lang['contactSpamPostfix']='(Vă rugăm să scrieți cu litere. 1=unu 2=doi 3=trei 4=patru 5=cinci 6=șase 7=șapte +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Trimiteți Mesajul';
 $ec_lang['contact_success']='Mulțumesc că ați luat timp pentru a scrie.';
-// Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='Proiectarea Canalului Rapid de Anrocament (Robinson)';
 $ec_lang['rc_main_title']='Calculator Online Gratuit pentru Proiectarea Canalului Rapid de Anrocament — Robinson (1998)';
 $ec_lang['rc_main_desc']='Dimensionarea Pietrei de Protecție a Canalului Rapid — Robinson, Rice & Kadavy (1998)';
@@ -499,12 +475,10 @@ $ec_lang['rc_notes_6_def']='Cota suprafeței superioare a pietrei de protecție 
 $ec_lang['rc_notes_7_def']='Când adâncimea normală în canalul de intrare este mai mică decât sarcina hidraulică (H<sub>p</sub>) necesară pentru a evacua q<sub>t</sub>, apare restricție de debit sau înălțare în amonte de intrarea în canal. Aceasta este în general acceptabilă — înălțarea reduce viteza și previne eroziunea în amonte. Verificare: utilizați un calculator de deversor pentru a determina H<sub>p</sub> pentru q<sub>t</sub> și lățimea crestei date, și comparați cu adâncimea normală a canalului de intrare. Dacă H<sub>p</sub> depășește adâncimea normală, va apărea înălțare.';
 $ec_lang['rc_notes_4_term']='Referință';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS publică, de asemenea, un <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">tabel Excel</a> bazat pe aceeași metodă.';
-// Sketch labels
 $ec_lang['rc_sketch_filter']          = 'Filtru';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Curbă de coronament';
 $ec_lang['rc_sketch_outlet_apron']    = 'Radier de ieșire';
 $ec_lang['rc_sketch_radius']          = 'rază';
-// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Presiune Irigație';
 $ec_lang['ip_main_title']='Calculator Online Gratuit pentru Presiunea de Irigație & Uniformitatea Distribuției';
 $ec_lang['ip_main_desc']='Presiunea Ramurii Test și Estimarea Uniformității';
@@ -557,7 +531,6 @@ $ec_lang['ip_notes_5_def']='Rata de aplicare și debitul sistemului/zonei folose
 
 
 
-// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Rețea de conducte ramificată';
 $ec_lang['bpn_main_title']='Calculator online gratuit de presiune pentru rețele de conducte ramificate (fără bucle)';
 $ec_lang['bpn_main_desc']='Debit și presiune în rețea de conducte ramificată (arborescentă)';
@@ -620,17 +593,9 @@ $ec_lang['lpn_title_units']='Unități {units}';
 $ec_lang['lpn_tool_select']='Selectare';
 $ec_lang['lpn_tool_add_junction']='Joncțiune';
 $ec_lang['lpn_tool_add_reservoir']='Rezervor';
-// A TANK is a separate element from a reservoir (ROADMAP Task 248, 2026-08-14), not a
-// reservoir with a level typed into it. A reservoir never runs down; a tank does. A
-// steady-state solve cannot tell them apart, which is exactly why the two need different
-// names on screen -- the difference is in what happens next, not in this instant.
 $ec_lang['lpn_tool_add_tank']='Bazin';
 $ec_lang['lpn_tool_add_pipe']='Conductă';
 $ec_lang['lpn_tool_add_pump']='Pompă';
-// A VALVE is a LINK, like a pipe and a pump -- it sits in the line between two nodes, not on a
-// node (ROADMAP Task 248 phase 2, 2026-08-14). Four types are offered and the page names each one
-// by what it does as well as by the abbreviation an engineer already knows, because the letters
-// alone teach nobody and the words alone are longer than a modeller wants to read every time.
 $ec_lang['lpn_tool_add_valve']='Vană';
 $ec_lang['lpn_tool_add_text']='Text';
 $ec_lang['lpn_tool_delete']='Ștergere';
@@ -641,29 +606,9 @@ $ec_lang['lpn_field_text_rotation']='Unghi (grade)';
 $ec_lang['lpn_field_text_match_pipe']='Rotiți la unghiul legăturii celei mai apropiate';
 $ec_lang['lpn_field_text_flip']='Rotește 180°';
 $ec_lang['lpn_field_elev']='Cotă';
-// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
-// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
-// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
-// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='Cota terenului sau a conductei în acest nod. Măsurați-o față de orice reper zero doriți, atât timp cât toate nodurile folosesc același reper.';
-// A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
-// at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
-// This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
-// was no tank. Since Task 248 there is one, and the two are different elements: a reservoir's level
-// never moves, a tank's does. Raising a reservoir's head is still a legitimate thing to do -- it is
-// just not how you model storage any more.
 $ec_lang['lpn_field_head']='Sarcină';
-// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
-// outright that it is a height and not a pressure, which is the exact confusion the glossary's
-// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Nivelul suprafeței apei în rezervor, măsurat ca înălțime, nu ca presiune. Lăsați necompletat pentru a plasa suprafața apei la cota rezervorului.';
-// ---- Tank fields (Task 248) ----
-// EVERY ONE OF THESE IS A HEIGHT IN THE ELEVATION/HEAD UNIT, the tank diameter included, and each
-// tip says so in words a reader can act on. The diameter is the one that catches people: it is a
-// distance across the ground of the same order as the elevations beside it, so reading it in the
-// pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
-// "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
-// a tank level from the vessel floor, not from the same zero the elevations use.
 $ec_lang['lpn_tank_elev_tip']='Cota fundului bazinului. Adâncimile apei din bazin se măsoară în sus de aici.';
 $ec_lang['lpn_field_tank_level']='Adâncimea apei';
 $ec_lang['lpn_field_tank_level_tip']='Adâncimea apei aflate în bazin, măsurată în sus de la fundul bazinului. Suprafața apei este cota fundului bazinului plus această adâncime.';
@@ -673,15 +618,9 @@ $ec_lang['lpn_field_tank_maxlevel']='Adâncimea maximă a apei';
 $ec_lang['lpn_field_tank_maxlevel_tip']='Adâncimea apei la care bazinul este plin, măsurată în sus de la fundul bazinului.';
 $ec_lang['lpn_field_tank_diameter']='Diametrul bazinului';
 $ec_lang['lpn_field_tank_diameter_tip']='Lățimea bazinului dintr-o parte în alta. Este exprimată în aceleași unități ca și cota, nu în unitățile diametrului conductei. Stabilește câtă apă reține o anumită adâncime.';
-// 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
-// same guard lpn_field_head_tip carries for the reservoir.
 $ec_lang['lpn_tank_head_tip']='Cota suprafeței apei din bazin: cota fundului bazinului plus adâncimea apei. Acesta este nivelul pe care rezolvitorul îl folosește pentru bazin.';
 $ec_lang['lpn_close']='Închidere';
 $ec_lang['lpn_empty_hint']='Utilizați Fișier, Proiect nou pentru a deschide un exemplu. Sau începeți prin a adăuga un rezervor, o joncțiune și o conductă din bara de instrumente.';
-// The examples gallery (ROADMAP Task 314). lpn_empty_hint above is no longer rendered by the page
-// -- the empty canvas shows the gallery instead -- but the key is KEPT rather than deleted while
-// the gallery is new: it is the fallback sentence if the manifest cannot be fetched, and deleting
-// a key translated into 26 languages to get it back a week later is the expensive direction.
 $ec_lang['lpn_examples_heading']='Deschideți un exemplu';
 $ec_lang['lpn_examples_sub']='Fiecare se deschide ca o copie proprie. Modificați-o, salvați-o sau deschideți o copie nouă și începeți din nou.';
 $ec_lang['lpn_examples_open']='Deschide';
@@ -690,21 +629,9 @@ $ec_lang['lpn_examples_blank']='Sau începeți cu o hartă goală';
 $ec_lang['lpn_examples_size']='Noduri: {nodes}, legături: {links}';
 $ec_lang['lpn_examples_failed']='Exemplele nu au putut fi încărcate. Utilizați Fișier, Proiect nou pentru a începe un desen.';
 $ec_lang['lpn_examples_loading']='Se încarcă exemplele…';
-// Two new Help rows (Tom, 2026-08-14). "Fix something" is a VERB, which is the point: it invites
-// the small correction people actually send -- a wrong word, a bad number -- rather than sounding
-// like a request for money or code, which is what "Contribute" reads as to most visitors. It opens
-// contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Reparați ceva';
 $ec_lang['lpn_help_notes']='Note despre această pagină';
 $ec_lang['lpn_status_example_opened']='{name} a fost deschis. Este copia dvs.: salvați-o cu Fișier, Salvează ca.';
-// Each example's own card text. These live here, and NOT in the examples folder's own JSON, for one
-// reason: a string that is not in a lang file is a string no translator will ever see. The manifest
-// carries the English as a fallback for an example that has no keys yet, so a new example still
-// shows up in English the moment its file is dropped in.
-// FLOW UNIT FIRST in each description (Tom, 2026-08-14: "list flow units first for two reasons:
-// EPANET and clarity"). EPANET identifies a whole unit system by its flow unit -- its [OPTIONS]
-// setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
-// the name of the system, and the length units as detail that follows from it.
 $ec_lang['lpn_ex_basic_si_title']='Rețea de bază, L/s (SI)';
 $ec_lang['lpn_ex_basic_si_desc']='Începeți de aici. Un rezervor, o pompă și un mic inel: cel mai mic aranjament care funcționează totuși ca o rețea de apă. Litri pe secundă, cu metri și milimetri.';
 $ec_lang['lpn_ex_basic_us_title']='Rețea de bază, gpm (SUA)';
@@ -728,10 +655,6 @@ $ec_lang['lpn_units_elevhead']='Cotă și sarcină';
 $ec_lang['lpn_units_pressure']='Presiune';
 $ec_lang['lpn_units_flow']='Debit';
 $ec_lang['lpn_units_velocity']='Viteză';
-// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
-// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
-// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
-// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='Gradient de pierdere de sarcină';
 $ec_lang['lpn_result_gradient_tip']='Pierderea de sarcină împărțită la lungimea conductei. Folosiți-o pentru a compara conducte de lungimi diferite față de o singură limită de proiectare.';
 $ec_lang['lpn_result_head']='Sarcină';
@@ -740,98 +663,39 @@ $ec_lang['lpn_result_pressure']='Presiune';
 $ec_lang['lpn_result_flow']='Debit';
 $ec_lang['lpn_result_velocity']='Viteză';
 $ec_lang['lpn_result_headloss']='Pierdere de sarcină';
-// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
-// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
-// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
-// Settings live INSIDE each project document, so deleting every project deletes every setting too:
-// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
-// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
-// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='Resetează doar setările acestui proiect. Desenul dvs. și celelalte proiecte nu sunt modificate. Pentru a salva setările preferate în vederea reutilizării, salvați un fișier proiect care conține numai setări.';
 $ec_lang['lpn_reset_all_tip']='Șterge fiecare proiect, fiecare imagine de fundal, fiecare setare și alegerile dvs. de unități, apoi reîncarcă pagina exact așa cum o vede un vizitator nou. Aceasta este singura resetare care șterge totul.';
-// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
-// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
-// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
-// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
-// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_confirm']='Acest calculator stochează unitățile și valorile introduse ale proiectului așa cum au fost tastate, dar anterior converta numerele în SI pentru stocare. Acest proiect a fost salvat înainte de această schimbare, deci numerele sale sunt stocate în SI. Le convertim o ultimă dată la unitățile curente? Pentru a vă putea decide, iată câteva diametre care ar fi convertite, cu valorile lor înainte și după:';
 $ec_lang['lpn_v2_restore_yes']='Conversie';
 $ec_lang['lpn_v2_restore_never']='Nu. Nu mai întrebați niciodată.';
 $ec_lang['lpn_v2_restore_no']='Închide, ca să verific mai întâi unitățile curente';
 $ec_lang['lpn_storage_too_new']='Acest proiect a fost salvat de o versiune mai nouă a paginii, deci nu poate fi deschis aici.';
-// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
-// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
-// something that is not in a file, so closing it asks first; a tab without one closes silently. A
-// browser project always wears one (it is in no file at all); a file project wears one only while it
-// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
-// our words for talking about the code, and the user sees only a name, an asterisk, and a file
-// extension.
-// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
-// conventional relationship and the reason the duplication between them is correct rather than
-// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
-// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
-// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='Fișier';
 $ec_lang['lpn_menu_edit']='Editare';
 $ec_lang['lpn_menu_insert']='Inserare';
 $ec_lang['lpn_menu_view']='Vizualizare';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Setări';
-// Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
-// incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
-// could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
-// the plural read as "guides to the calculators" and overstated it; here it needs no qualifier.
-// And every other menu-bar item acts on the project, while this one leaves the site -- unremarkable
-// as a row inside Help, out of place as a sixth document verb.
 $ec_lang['lpn_menu_help']='Ajutor';
-// PLURAL is literally true and is not aspirational (Tom, 2026-08-13): the single post contains
-// three use-case walkthroughs of this calculator. So the row links straight to the post; no blog
-// label page is needed to make the plural honest.
-//
-// The post is in English and the label does NOT say so (Tom, 2026-08-13): "I am inclined to take my
-// chances with automatic browser translators and not flag it as English." Browser translation is
-// good enough on a blog page, and a permanent "(in English)" cost more, constantly, than the
-// occasional reader who meets it untranslated.
 $ec_lang['lpn_help_walkthroughs']='Tutoriale';
-// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
-// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
-// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
-// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
-// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Ștergere rețea';
 $ec_lang['lpn_confirm_delete_network']='Ștergeți fiecare nod, conductă și etichetă text din acest proiect? Imaginea de fundal, numele proiectului și setările dvs. sunt păstrate. Această acțiune nu poate fi anulată.';
 $ec_lang['lpn_view_units']='Unități';
-// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Salvează tot';
-// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
-// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
-// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='Proiect{n}';
 $ec_lang['lpn_project_copy_suffix']='(copie)';
 $ec_lang['lpn_project_rename']='Redenumire';
-// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='Proiect nou…';
-// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
-// with the toolbar button of that name -- an example is a whole network, so it starts a project
-// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Proiect xy gol, unități US (gpm)';
 $ec_lang['lpn_new_blank_si']='Proiect xy gol, unități SI (l/s)';
-// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
-// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Deschidere…';
 $ec_lang['lpn_file_save']='Salvare';
 $ec_lang['lpn_file_saveas']='Salvare ca…';
 $ec_lang['lpn_file_revert']='Revenire';
 $ec_lang['lpn_file_close']='Închidere';
-// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
-// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Fișiere recente';
 $ec_lang['lpn_recent_tip']='Redeschide {file} fără să fie nevoie să îl căutați pe calculator.';
 $ec_lang['lpn_recent_denied']='Nu a fost acordată permisiunea de a deschide acel fișier, deci nu a fost deschis.';
 $ec_lang['lpn_recent_gone']='Nu s-a putut deschide {file}. Este posibil să fi fost mutat, redenumit sau șters, deci a fost scos din lista recentă.';
-// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
-// around it.
 $ec_lang['lpn_tab_new']='Proiect nou';
 $ec_lang['lpn_tab_all']='Toate proiectele';
 $ec_lang['lpn_tab_menu']='Meniu proiect';
@@ -841,20 +705,10 @@ $ec_lang['lpn_tab_move_right']='Mutare la dreapta';
 $ec_lang['lpn_tab_unsaved']='Nesalvat într-un fișier';
 $ec_lang['lpn_import_bad_file']='Acel fișier nu a putut fi citit ca proiect salvat de pe această pagină.';
 $ec_lang['lpn_import_no_room']='Nu mai există suficient spațiu de stocare în browser pentru a adăuga acest proiect. Ștergeți un proiect de care nu mai aveți nevoie și încercați din nou.';
-// ---- EPANET .inp import (ROADMAP Task 196) ----
-// The import REPORTS every difference between the file and what this page can hold, so each
-// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
-// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
-// another sentence, and none may become one.
-// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
-// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_inp']='Import fișier EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Citește o rețea dintr-un fișier EPANET, fie fișierul text .inp, fie fișierul .net salvat de EPANET, și o salvează în acest browser ca proiect nou. Această pagină nu poate scrie înapoi un fișier EPANET, deci folosiți Fișier, Salvare ca pentru a vă păstra munca.';
 $ec_lang['lpn_inp_bad_file']='Acel fișier nu a putut fi citit ca fișier de rețea EPANET.';
-// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
-// the way out named here always works, so keep the instruction in the message rather than leaving
-// the reader to guess.
 $ec_lang['lpn_net_bad_file']='Acesta pare a fi un fișier .net EPANET, dar această pagină nu l-a putut citi. Deschideți-l în EPANET și folosiți acolo comanda Fișier, Export, Rețea pentru a-l salva ca fișier .inp, apoi importați acel fișier.';
 $ec_lang['lpn_inp_report_heading']='S-a importat {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} joncțiuni, rezervoare și bazine, {links} conducte, pompe și vane, în {units}.';
@@ -863,9 +717,6 @@ $ec_lang['lpn_inp_report_label_anchor']='Etichetele de text sunt plasate așa cu
 $ec_lang['lpn_inp_report_lead']='Această pagină nu conține tot ce conține EPANET. Iată ce s-a schimbat la import:';
 $ec_lang['lpn_inp_drop_headloss']='Acest fișier nu folosește formula Hazen-Williams. Această pagină calculează cu Hazen-Williams, deci numerele de rugozitate ale conductelor au fost păstrate exact așa cum au fost scrise, dar rezultatele de aici nu vor coincide cu cele din EPANET.';
 $ec_lang['lpn_inp_drop_tank_curve']='Aceste bazine nu au pereți drepți: fișierul dă forma lor ca o curbă. Au fost importate ca bazine rotunde, fiecare cu diametrul scris în fișier. Suprafața apei rămâne cea stabilită de fișier, deci rezultatele coincid; doar forma este simplificată.';
-// Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
-// a loss; the first two are reported because the reader deserves to know which engine is now
-// working out their network, not because anything was thrown away.
 $ec_lang['lpn_inp_drop_tcv']='Aceste vane de reglare au fost importate ca vane de reglare, păstrând pierderea pe care le-o dă fișierul. Oricare dintre cei doi rezolvitori le poate calcula.';
 $ec_lang['lpn_inp_drop_valve_active']='Aceste vane controlează presiunea sau debitul și se deschid și se închid singure pe măsură ce apa se schimbă. Nimic din ele nu s-a pierdut la import, iar această pagină le rezolvă cu rezolvitorul EPANET, activând singură acel rezolvitor pentru această rețea.';
 $ec_lang['lpn_inp_drop_valve']='Aceste vane sunt descrise printr-o curbă sau printr-o pierdere de presiune fixă, iar această pagină nu are un astfel de element. Au fost importate ca și conducte deschise, deci rețeaua rămâne conectată, dar nimic nu mai reține presiunea sau debitul acolo.';
@@ -883,44 +734,11 @@ $ec_lang['lpn_inp_drop_quality']='Calitatea apei, reacțiile chimice și setări
 $ec_lang['lpn_inp_drop_backdrop']='Acest fișier indică o imagine de fundal, dar nu conține imaginea propriu-zisă. Adăugați-o dvs. cu Fișier, Imagine de fundal, Adaugă imagine.';
 $ec_lang['lpn_inp_drop_dangling']='Aceste conducte indică o joncțiune care nu se află în fișier, deci au fost omise.';
 $ec_lang['lpn_inp_drop_units']='Unitatea de debit numită în acest fișier nu este cunoscută de această pagină, deci fiecare număr a fost citit ca galoane pe minut. Verificați fiecare număr înainte de a folosi rezultatele.';
-// {name} is a project name; word order is the translator's to choose. Says where the user landed,
-// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
-// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='S-a deschis {name} dintr-un fișier și a fost adăugat în acest browser ca proiect nou.';
-// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
-// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
-// browser they test in. That is expected, not a bug.
-// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='Fișier proiect';
-// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot connect to a file, so every press really is another copy in the downloads folder.
-// The label says which of the two you are getting rather than leaving the duplicate looking like a
-// bug.
-// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
-// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
-// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
-// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
-// notice after the act -- at the moment the question arises -- rather than in a label forever.
-// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
-// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
-// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
-// anyway -- a disabled button fires no mouse events.
-// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
-// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
-// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
-// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
-// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='Acest browser nu se poate conecta la un fișier, deci deschiderea unui fișier aici este de fapt o încărcare: proiectul este copiat în acest browser, iar singurul mod de a salva munca înapoi în fișier este să suprascrieți fișierul cu Fișier, Salvare ca.';
-// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
-// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='Salvează în fișierul conectat.';
 $ec_lang['lpn_file_saveas_tip']='Alegeți un fișier în care să salvați. Acest proiect se conectează la acel fișier, iar Salvare va scrie în el de atunci încolo.';
-// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
-// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
-// is no API for it, and the download attribute cannot override the setting -- but the user can turn
-// that setting on themselves, and then Save as really does let them overwrite the file they started
-// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
-// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='Salvează folosind setările de Descărcare ale browserului dvs. Acest browser nu se poate conecta la un fișier, deci Salvare este dezactivată și este disponibilă doar Salvare ca. Dacă activați setarea browserului \'Întreabă unde să salvezi fiecare fișier\', puteți alege fișierul original și îl puteți suprascrie.';
 $ec_lang['lpn_status_uploaded']='Fișierul proiect a fost încărcat. Nu se poate menține nicio conexiune la el, deci singurul mod de a salva înapoi în el este folosind Fișier, Salvare ca.';
 $ec_lang['lpn_status_downloaded']='S-a descărcat {file}. Acest browser nu se poate conecta la un fișier, deci acest proiect rămâne marcat ca nesalvat într-un fișier.';
@@ -929,45 +747,18 @@ $ec_lang['lpn_status_already_open']='Acel fișier este deja deschis aici ca {nam
 $ec_lang['lpn_status_already_open_dirty']='Acel fișier este deja deschis aici ca {name}, cu modificări pe care nu le-ați salvat în el. S-a comutat la el în loc să se deschidă o a doua copie. Folosiți Fișier, Revenire dacă doriți în schimb versiunea de pe disc.';
 $ec_lang['lpn_status_saved']='S-a salvat {file}.';
 $ec_lang['lpn_status_reverted']='S-a încărcat din nou {file} de pe disc.';
-// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
-// purpose: a program that writes your file behind your back takes away your right to walk away from
-// a session. So these three carry the whole close/discard/revert conversation.
-// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_confirm']='Salvați modificările din {name} înainte de a-l închide?';
-// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
-// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_confirm']='{name} este păstrat doar în acest browser. Dacă îl închideți fără să îl salvați într-un fișier, se pierde definitiv.';
 $ec_lang['lpn_close_discard']='Închide fără să salvezi';
 $ec_lang['lpn_cancel']='Anulare';
 $ec_lang['lpn_revert_confirm']='Renunțați la modificările făcute și încărcați din nou {file} de pe disc?';
-// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
-// page load, so the link is gone even though we still know the name. Says what to do, not just what
-// happened.
 $ec_lang['lpn_file_needs_reopen']='Acest proiect provine din {file}, dar conexiunea la acel fișier s-a pierdut. Alegeți din nou fișierul pentru a vă conecta la el.';
-// Says what is still safe before it says what failed: the reassurance is the part a worried user
-// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Nu s-a putut scrie în fișier. Este posibil să fi fost mutat sau redenumit, sau permisiunea să fi fost retrasă. Munca dvs. este în continuare salvată în acest browser.';
 $ec_lang['lpn_file_changed_elsewhere']='Altcineva a salvat în acest fișier de când l-ați deschis, deci salvarea acum ar suprascrie munca lor. Folosiți Fișier, Salvare ca pentru a vă păstra modificările într-un fișier propriu, sau Fișier, Revenire pentru a renunța la ale dvs. și a le încărca pe ale lor.';
-// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
-// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
-// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-// Initials, and said to be public: whoever opens the same file sees this name, including outside the
-// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
-// rather than a name makes the safe answer the obvious one.
-// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
-// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='Ce ar trebui să vadă colegii când aveți acest proiect deschis? Inițialele dvs. sunt ideale. Oricine deschide același fișier poate vedea acest nume, deci nu folosiți nimic privat.';
-// The stand-in when someone locked a project before giving a name. Reads in place of {name}
-// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Altcineva';
-// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
-// moment of opening, with both real answers on it -- the way every drawing and document program has
-// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} are acest fișier deschis.';
 $ec_lang['lpn_lock_open_readonly']='Deschide doar-citire';
-// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
-// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
-// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Creează o copie';
 $ec_lang['lpn_lock_break']='Anulează blocarea lor';
 $ec_lang['lpn_lock_open_heading_times']='{name} are acest fișier deschis; ultima editare a fost acum {x}, la {y} după ultima salvare.';
@@ -980,83 +771,35 @@ $ec_lang['lpn_ago_minutes']='{n} minute';
 $ec_lang['lpn_ago_hours']='{n} ore';
 $ec_lang['lpn_ago_days']='{n} zile';
 $ec_lang['lpn_ago_unknown']='un timp necunoscut';
-// Read-only means read-only: it never turns itself back into an editable file while you are looking
-// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
-// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
-// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='Doar-citire: {name} are acest fișier deschis. Puteți modifica orice doriți aici, dar nu puteți salva. Folosiți Fișier, Salvare ca pentru a salva într-un alt fișier.';
-// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
-// stops a colleague editing the same file. Editing still works -- an unreachable server must never
-// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
-// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='Atenție: nu s-a putut contacta serverul pentru a verifica sau crea o blocare pe acest proiect, deci nimic nu împiedică un coleg să editeze același fișier în același timp. Veți fi anunțat dacă blocarea începe din nou să funcționeze.';
 $ec_lang['lpn_lock_storage_error']='Atenție: acest site nu poate salva înregistrările de blocare, deci nimic nu împiedică un coleg să editeze același fișier în același timp. Aceasta este o eroare de configurare pe server, nu ceva ce puteți remedia aici — folderul de blocare nu poate fi scris de serverul web.';
 $ec_lang['lpn_lock_full_error']='Atenție: acest site a rămas fără spațiu pentru a înregistra cine are ce proiect deschis, deci nimic nu împiedică un coleg să editeze același fișier în același timp. Aceasta este o eroare de configurare pe server, nu ceva ce puteți remedia aici.';
 $ec_lang['lpn_lock_not_asked']='Blocarea nu funcționează pentru acest proiect, deci nimic nu împiedică un coleg să editeze același fișier în același timp. Acest browser nu are încă niciun nume înregistrat pentru dvs., sau proiectul nu are niciun identificator — salvarea proiectului într-un fișier stabilește ambele.';
 $ec_lang['lpn_lock_restored']='Blocarea funcționează din nou, iar acest fișier este acum al dvs. pentru a salva în el.';
 $ec_lang['lpn_lock_dismiss']='Ascunde acest mesaj';
-// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
-// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
-// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='Proiectul dvs. va fi salvat într-un fișier pe acest calculator. Este salvat atunci când solicitați, și în niciun alt moment, deci nimic nu este scris în acel fișier fără știrea dvs.';
 $ec_lang['lpn_file_training_2']='Pentru ca două persoane să nu editeze niciodată un fișier în același timp, acest site urmărește cine îl are deschis. Dacă cineva îl are deja deschis, îl puteți totuși deschide și vizualiza, sau puteți păstra propria dvs. copie.';
-// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
-// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
-// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
-// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
-// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='Prima dată când salvați, browserul dvs. vă va întreba dacă acest site poate edita fișierul. Această întrebare vine de la browser, nu de la noi, iar răspunsul afirmativ este ceea ce permite funcției Salvare să scrie munca dvs. înapoi. De obicei este întrebată o singură dată per fișier.';
-// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
-// false -- the name is never written into the project file. It is held in this browser and on this
-// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
-// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='Dați un nume scurt după care colegii dvs. vă vor recunoaște. Inițialele dvs. sunt ideale. Oricine deschide același fișier îl poate vedea, deci nu folosiți nimic privat.';
 $ec_lang['lpn_file_training_name']='Inițialele dvs.';
 $ec_lang['lpn_file_training_continue']='Continuare';
-// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
-// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Alegeți din nou fișierul';
 $ec_lang['lpn_file_reconnect']='Reconectare la acest fișier';
 $ec_lang['lpn_file_reconnect_alert']='Acest proiect provine din {file}. Browserul dvs. are nevoie din nou de permisiunea dvs. înainte de a putea scrie în el. Reconectați-vă mai jos.';
-// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
-// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Acesta este același fișier pe care îl are deschis altcineva, deci nu poate fi suprascris. Alegeți un alt fișier sau un alt nume.';
 $ec_lang['lpn_saveas_overwrites_project']='Acel fișier conține deja un alt proiect, {name}. Salvarea aici îl înlocuiește complet. Continuați?';
 $ec_lang['lpn_saveas_overwrites_newer']='Acel fișier s-a schimbat de când l-ați văzut ultima dată, deci aproape sigur altcineva a salvat în el. Salvarea aici înlocuiește versiunea lor cu a dvs. Continuați?';
-// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
-// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
-// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
-// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='Nume pentru acest proiect';
-// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
-// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
-// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
-// separate Delete for it to be confused with.)
-// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='S-a închis {closed}. Se afișează acum {opened}.';
 $ec_lang['lpn_status_closed_empty']='S-a închis {closed}. S-a pornit un proiect nou, gol.';
 $ec_lang['lpn_storage_full']='Nu s-a salvat. Spațiul de stocare al browserului este plin sau indisponibil, deci modificările dvs. recente se vor pierde la închiderea acestei file.';
 $ec_lang['lpn_notes_1_term']='Regim permanent';
-// A TANK IS HELD AT ITS LEVEL, and the note says so out loud (Task 248). This is the honest
-// limit of a steady-state tool with a tank in it: the tank is a correct fixed water level for
-// the instant being solved -- which is exactly what EPANET solves at time zero -- but the level
-// does not fall as water is drawn from it. A reader who is not told that will reasonably assume
-// otherwise, because a tank that never empties is not a tank anybody has met.
 $ec_lang['lpn_notes_1_def']='Rezolvă un singur set de cerințe odată, folosind același algoritm de gradient global pe care îl folosește EPANET. Nu modelează modul în care rețeaua se schimbă în timp. Un bazin este menținut la nivelul de apă pe care îl introduceți: în cadrul unei singure soluții, nu se golește și nu se umple niciodată.';
 $ec_lang['lpn_notes_2_term']='Nu este modelat';
-// VALVES LEFT THIS NOTE ON 2026-08-14 (Task 248 phase 2), and what replaces the old sentence is
-// the honest half of it: the valves are all modeled now, but the three that open and close on
-// their own are solved by the EPANET solver and not by the built-in solver. That is a real
-// thing for a reader to know -- it is why such a network needs the engine downloaded once.
 $ec_lang['lpn_notes_2_def']='Calitatea apei și cerințele care variază pe parcursul zilei nu sunt modelate. Despre vane: o vană de reglare funcționează cu oricare dintre cei doi rezolvitori, iar vanele care se deschid și se închid singure (PRV, PSV, FCV) sunt rezolvate cu rezolvitorul EPANET, pe care această pagină îl activează singură atunci când rețeaua dvs. conține una.';
 $ec_lang['lpn_notes_3_term']='Salvarea proiectelor';
 $ec_lang['lpn_notes_3_def']='Fiecare proiect este o filă, iar fiecare filă este salvată în acest browser pe măsură ce lucrați. Ștergerea datelor browserului le șterge pe toate, deci păstrați-vă munca într-un fișier: Fișier, Salvare ca. Un asterisc pe o filă înseamnă că aceasta conține modificări care nu se află într-un fișier. Nimic nu este scris vreodată într-un fișier decât dacă solicitați. În unele browsere un proiect se conectează la fișierul în care îl salvați, iar Fișier, Salvare scrie de atunci încolo în același fișier; în altele nicio conexiune nu este posibilă, deci Salvare este dezactivată și este disponibilă doar Salvare ca. Atunci când un fișier proiect este păstrat pe o unitate partajată, această pagină vă spune dacă un coleg îl are deja deschis, astfel încât două persoane să nu scrie una peste alta.';
-// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
-// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
-// to stay readable on a phone, while the Notes section is already this page's documentation home,
-// prints with the page, and is translated with everything else. The popup carries a one-line
-// pointer to here instead (lpn_pump_curve_note).
-// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Curba pompei';
 $ec_lang['lpn_notes_5_def']='O pompă respectă H = H₀ − aQ^b, unde H este sarcina adăugată de pompă, iar Q este debitul care trece prin ea. Introduceți unul, două sau trei puncte de pe curba producătorului. Trei puncte — sarcina la debit zero, punctul normal de funcționare și punctul de debit maxim — determină direct H₀, a și b, și urmăresc cel mai fidel o curbă publicată. Două puncte ajustează o parabolă (b = 2) cu vârful la debit zero. Un singur punct folosește o regulă uzuală: sarcina la debit zero este 1,33 × sarcina introdusă, iar debitul maxim este 2 × debitul introdus, ceea ce dă tot b = 2. O pompă fără niciun punct introdus nu adaugă nicio sarcină. Curba nu este întreruptă acolo unde sarcina ajunge la zero, deci a cere unei pompe mai mult debit decât poate oferi curba sa dă o sarcină negativă. Soluția este o pompă mai mare sau o cerință mai mică, nu o altă ajustare a curbei.';
 $ec_lang['lpn_notes_4_term']='Adăugiri planificate';
@@ -1068,20 +811,6 @@ $ec_lang['lpn_id_taken']='Acel ID este deja folosit.';
 $ec_lang['lpn_diag_no_fixed_head']='Adăugați un rezervor sau un bazin. Rețeaua are nevoie de cel puțin un nivel de apă cunoscut înainte de a putea fi rezolvată.';
 $ec_lang['lpn_diag_dangling_link']='O conductă sau o pompă se conectează la un nod care nu mai există:';
 $ec_lang['lpn_diag_unreachable']='Aceste noduri nu au niciun traseu către un rezervor:';
-// BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
-// this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
-// looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
-// ---- Warming the EPANET solver (Tom, 2026-08-14) ----
-// The 664 KB solver is fetched the moment a network first needs it -- when an active valve type is
-// chosen, when the solver is switched on, or when a project arrives already holding one -- because
-// that is the moment the user is still online. These three say what is happening in plain terms,
-// and the point of all three is the SECOND half of each sentence: the fetch happens once and then
-// the network works offline. A message that only said "downloading" would explain the wait without
-// explaining why it is worth it.
-// TWO PAIRS, because the same fetch has two reasons and one message cannot be true of both.
-// Tom turned the solver ON and was told about VALVES he had not created (2026-08-14). The valve
-// pair is right when a valve triggered the fetch; the plain pair is right when the user simply
-// chose the solver.
 $ec_lang['lpn_engine_fetching']='Se obține rezolvitorul EPANET. Este descărcat o singură dată și apoi păstrat pe acest dispozitiv, astfel încât funcționează ulterior offline.';
 $ec_lang['lpn_engine_ready']='Rezolvitorul EPANET se află acum pe acest dispozitiv și funcționează offline.';
 $ec_lang['lpn_engine_fetching_valve']='Se obține rezolvitorul EPANET, astfel încât această vană poate fi rezolvată acum și offline mai târziu.';
@@ -1091,25 +820,11 @@ $ec_lang['lpn_diag_valve_needs_epanet']='Aceste vane se deschid și se închid s
 $ec_lang['lpn_diag_valve_on_fixed_head']='Aceste vane sunt conectate direct la un rezervor sau la un bazin, care deja stabilește nivelul apei acolo, așa că nu mai rămâne nimic de controlat pentru vană. Introduceți o conductă scurtă între vană și rezervor sau bazin:';
 $ec_lang['lpn_diag_not_converged']='Nu s-a găsit nicio soluție. Verificați dacă există valori imposibile în realitate, cum ar fi un diametru zero.';
 $ec_lang['lpn_field_roughness']='Rugozitate';
-// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
-// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
-// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Coeficientul Hazen-Williams C. Un număr mai mare înseamnă o conductă mai netedă: aproximativ 150 pentru plastic nou, 130 pentru oțel sau fontă nouă și 100 pentru conductă veche.';
 $ec_lang['lpn_field_length']='Lungime';
 $ec_lang['lpn_field_length_tip']='Lungimea conductei. Cu Auto activat, lungimea este măsurată din ceea ce ați desenat. Dezactivați Auto pentru a introduce o lungime diferită de desen.';
-// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
-// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
-// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
-// ---- Valve fields (Task 248 phase 2) ----
-// THE SETTING IS A DIFFERENT QUANTITY FOR EACH TYPE, which is why there are three labels here and
-// not one "Setting". A pressure, a flow and a bare loss coefficient are not the same number in
-// different units, and one shared label would have to be vague enough to cover all three.
 $ec_lang['lpn_field_valve_type']='Tipul vanei';
 $ec_lang['lpn_field_valve_type_tip']='Ce face vana. O vană de reglaj menține o pierdere fixă. Celelalte trei mențin o presiune sau un debit și se deschid complet, se închid sau se închid parțial pe măsură ce apa se schimbă. Schimbarea tipului introduce un nou număr inițial în setarea de mai jos, deoarece o presiune nu este un debit și niciuna dintre ele nu este un coeficient de pierdere.';
-// THE ENGLISH IS ELLIPTICAL ON PURPOSE -- the noun "valve" is dropped because the dropdown above
-// already says "Valve type" -- so a translator meets a bare modifier with no head noun, and
-// "throttle" alone pulls hard toward a car accelerator. Each _syn supplies the noun plus alternates
-// (Wave 0, sprint 316; wording approved by Tom 2026-08-14, who rejected "pressure holding" for PSV).
 $ec_lang['lpn_valve_type_tcv']='Reglaj (TCV)';
 $ec_lang['lpn_valve_type_prv']='Reducătoare de presiune (PRV)';
 $ec_lang['lpn_valve_type_psv']='Susținătoare de presiune (PSV)';
@@ -1124,13 +839,7 @@ $ec_lang['lpn_field_valve_diameter_tip']='Lățimea deschiderii prin vană. Vite
 $ec_lang['lpn_field_valve_km_tip']='Pierderea corpului vanei atunci când vana stă complet deschisă, pe lângă orice elimină setarea vanei. Este exprimată ca multiplu al sarcinii de viteză. Folosiți 0 pentru a o ignora.';
 $ec_lang['lpn_field_km']='Coeficient de pierdere locală, k';
 $ec_lang['lpn_field_km_tip']='Pierderea de la coturi, vane și fitinguri pe această conductă, exprimată ca un multiplu al sarcinii cinetice. Folosiți 0 pentru o conductă simplă, dreaptă.';
-// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
-// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
-// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
-// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='Pierdere locală, k';
-// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
-// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Sursa curbei';
 $ec_lang['lpn_pump_curve_own']='Introduceți puncte mai jos';
 $ec_lang['lpn_pump_curve_ref_note']='Se folosește curba introdusă pentru pompa {id}.';
@@ -1138,9 +847,6 @@ $ec_lang['lpn_pump_curve_note']='Unul, două sau trei puncte — vezi \'Curba po
 $ec_lang['lpn_pump_point1']='Punctul 1';
 $ec_lang['lpn_pump_point2']='Punctul 2';
 $ec_lang['lpn_pump_point3']='Punctul 3';
-// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
-// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
-// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='Mod: Selectare. Faceți clic pe un element sau pe o etichetă pentru a-l vedea sau modifica. Trageți pentru a muta un nod, un vârf sau o etichetă. Faceți dublu clic pe o conductă pentru a adăuga sau elimina un vârf.';
 $ec_lang['lpn_mode_delete']='Mod: Ștergere. Faceți clic pe un element pentru a-l elimina.';
 $ec_lang['lpn_mode_add_junction']='Mod: Adăugare joncțiune. Faceți clic pe hartă pentru a plasa o joncțiune. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
@@ -1149,26 +855,11 @@ $ec_lang['lpn_mode_add_tank']='Mod: Adăugare bazin. Faceți clic pe hartă pent
 $ec_lang['lpn_mode_add_pipe']='Mod: Adăugare conductă. Faceți clic pe un nod, apoi pe alt nod, pentru a le conecta. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
 $ec_lang['lpn_mode_add_pump']='Mod: Adăugare pompă. Faceți clic pe un nod, apoi pe alt nod, pentru a le conecta. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
 $ec_lang['lpn_mode_add_valve']='Mod: Adăugare vană. Faceți clic pe un nod, apoi pe alt nod, pentru a le conecta. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
-// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
-// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Mod: Adăugare text. Faceți clic pe hartă pentru a plasa o etichetă text. Faceți clic lângă un nod pentru a atașa textul la acel nod. Comutați la modul Selectare pentru a modifica sau muta elemente și etichete.';
-// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
-// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
-// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
-// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
-// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Folosiți acest mod pentru a modifica, muta și trage elemente pe hartă.';
 $ec_lang['lpn_tip_labels_draggable']='Puteți trage o etichetă pentru a o muta. Faceți dublu clic pe o etichetă pentru a o readuce la poziția ei automată.';
 $ec_lang['lpn_field_auto']='Automat';
 $ec_lang['lpn_method_switch_confirm']='Schimbarea metodei de frecare nu modifică numerele de rugozitate deja introduse pe conductele dvs., iar o rugozitate pentru o metodă nu are sens pentru alta. Verificați fiecare conductă după aceasta. Schimbați oricum?';
-// "Shut", not "Closed" (Tom, 2026-08-14: *"We change in English to ... good catch!"*). Wave 0 found
-// that "closed" is a live polysemy INSIDE hydraulics -- a CLOSED CONDUIT is a full, pressurised pipe
-// as opposed to an open channel, and every pipe on this page is one, so the wrong reading is not
-// obviously wrong to a translator. Fixing the English fixes all 27 languages and needs no _syn.
-// Chosen over Tom's other candidates for reasons worth keeping: "Blocked" and "Plugged" imply a
-// FAULT rather than a state the user chose; "Off" is vague on a pipe; "No flow" names the RESULT, on
-// a page where flow is a computed output. And this label's own tip already said "Shut this pipe so
-// no water can pass through it" -- the English had already picked the word, in the sentence beside it.
 $ec_lang['lpn_field_closed']='Închisă';
 $ec_lang['lpn_field_closed_tip']='Închideți această conductă astfel încât apa să nu poată trece prin ea. Conducta rămâne pe hartă și își păstrează toate numerele, iar dvs. o puteți redeschide oricând.';
 $ec_lang['lpn_field_x']='X';
@@ -1180,9 +871,6 @@ $ec_lang['lpn_labels_heading_link']='Etichete legături';
 $ec_lang['lpn_labels_decimals_tip']='Numărul de zecimale afișate pentru această etichetă';
 $ec_lang['lpn_labels_mark_extrema']='Marchează valorile cele mai mari și cele mai mici';
 $ec_lang['lpn_labels_mark_extrema_tip']='Desenează o linie deasupra celei mai mari valori de fiecare fel de pe hartă și o linie sub cea mai mică valoare de acel fel, ca să puteți identifica cele două extreme fără să citiți numerele.';
-// "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the elements
-// you draw from now on, and this is the way to say "I meant the ones already here". {n} and
-// {skipped} are whole numbers; {prefix} is the text the user typed.
 $ec_lang['lpn_settings_apply_to_all']='Aplică la toate';
 $ec_lang['lpn_settings_apply_to_all_tip']='Fiecare element de acest tip deja desenat primește un ID care începe cu acest text. Fiecare își păstrează numărul. Un ID care nu se termină într-un număr rămâne neschimbat.';
 $ec_lang['lpn_confirm_apply_prefix']='Redenumiți {n} elemente astfel încât ID-urile lor să înceapă cu {prefix}? Fiecare își păstrează numărul.';
@@ -1193,52 +881,17 @@ $ec_lang['lpn_labels_suffix_tip']='Text afișat după această valoare pe hartă
 $ec_lang['lpn_labels_suffix_gradient_tip']='Text afișat după gradientul de pierdere de sarcină pe hartă. Nu introduceți semnul procent aici. Acesta este adăugat automat atunci când unitatea este procent.';
 $ec_lang['lpn_labels_separator']='Text între valori';
 $ec_lang['lpn_labels_separator_tip']='Text între o valoare și următoarea pe o etichetă. Implicit, un spațiu.';
-// The priority column in the Labels box (ROADMAP Task 397). Both tips say "1 matters most", because
-// that one sentence is what the two columns share; what differs is WHAT the number orders, and each
-// tip says which. Kept plain and short: these sit on a small box in a crowded row.
 $ec_lang['lpn_labels_priority']='Prioritate';
 $ec_lang['lpn_labels_priority_link_tip']='Ordinea în care valorile sunt eliminate atunci când o etichetă nu încape. 1 este păstrată cel mai mult timp.';
-// NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
-// learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
-// value and this box is on a node row, so it reads as demand here.
 $ec_lang['lpn_labels_priority_node_tip']='Prioritate pentru a decide a cui etichetă este eliminată prima atunci când harta este aglomerată: cea mai mică cerință, presiunea cea mai apropiată de mijlocul intervalului, sau cota ori sarcina cea mai apropiată de cea a nodurilor vecine. 1 decide primul.';
-// Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
-// the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='Înainte';
 $ec_lang['lpn_labels_col_after']='După';
 $ec_lang['lpn_labels_col_decimals']='Zecimale';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Imagine de fundal…';
 $ec_lang['lpn_backdrop_add']='Adăugare';
-// BARE VERBS, and they are only correct because BOTH doors now print a "Background image" heading
-// over them (backdropRows() in js/looped-network.js). The 2026-08-04 ruling that made these
-// "Scale image"/"Position image" was right about the defect -- a bare verb orphans in the Insert
-// menu, where nothing above it says what is being scaled -- and wrong about the cheapest fix: the
-// object belongs in ONE heading, not repeated in five labels. Never restore a bare verb here
-// without checking the heading is still rendered.
-// Two ways to set the same number, so both say which one they are (Task 276). Picking is the coarse
-// step -- Tom, 2026-08-10: "mouse (and hand!!!) picking is never precise" -- and the other is the
-// correction. The second label NAMES the World File rather than saying "by typing", because the
-// World File was "hidden and hard to discover" (Tom, 2026-08-13) and a menu is where it gets found.
-// "The size of one pixel ON THE MAP", in all three, and NOT "pixel size" (Task 297 Wave 0). "Pixel
-// size" reads just as easily as the image's pixel DIMENSIONS -- a property of the file -- as it does
-// the distance one pixel covers, which is the only thing the code wants. Tom, 2026-08-13, chose the
-// qualifier: "'map' is better than real world or real" -- the reader is looking at a map, so the
-// frame they are being asked about is the one already in front of them.
-// The longer label costs nothing since Task 276 made this control a menu button rather than a
-// <select>, so a row label no longer sets the collapsed width.
-// "world file" stays LOWERCASE. Title Case reads as a brand and invites a translator to leave it in
-// English; the concept carries its own glossary.json entry instead.
-//
-// There are NO lpn_backdrop_wld_ask/_none/_choose keys (Tom, 2026-08-13): "We don't ask for world
-// file... We ask for a paste of World File contents." The dialog that opened a second file picker is
-// gone; the two doors that remain both take the CONTENTS -- the multi-select picker and the textarea
-// behind lpn_backdrop_scale_entry. Do not re-add an ask.
 $ec_lang['lpn_backdrop_scale']='Scalare prin indicare';
 $ec_lang['lpn_backdrop_scale_entry']='Scalare din fișier de georeferențiere sau din dimensiunea unui pixel de pe hartă';
-// Scale FROM CURRENT, about a picked point (Tom, 2026-08-16). The relative sibling of the two
-// absolute scale commands above: it changes the size by a factor and holds one point still, which
-// is what the last stage of fitting an aerial photograph actually needs.
 $ec_lang['lpn_backdrop_scale_from']='Scalează din dimensiunea actuală, în jurul unui punct ales de dvs.';
 $ec_lang['lpn_backdrop_scale_from_prompt1']='Faceți clic pe punctul din imaginea de fundal care trebuie să rămână pe loc.';
 $ec_lang['lpn_backdrop_scale_from_prompt2']='Scalați față de dimensiunea actuală. 1 o păstrează neschimbată, 1.1 o mărește cu 10%, 0.9 o micșorează cu 10%.';
@@ -1251,14 +904,8 @@ $ec_lang['lpn_backdrop_remove']='Eliminare';
 $ec_lang['lpn_backdrop_remove_confirm']='Eliminați imaginea de fundal?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Faceți clic pe două puncte de pe imaginea de fundal, cum ar fi cele două capete ale unei scări grafice. Apoi introduceți distanța reală dintre ele.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Distanța reală dintre cele două puncte';
-// Tom's own wording, 2026-08-16. "Base point" is the drafting term and it is what the second step
-// then has a destination FOR; "any point on the background image" did not say that the two steps are
-// one move. The second names the panel it is about to show, so the alert and the panel read as one
-// step rather than two.
 $ec_lang['lpn_backdrop_position_prompt1']='Faceți clic pe punctul de bază (pe imagine) pentru mutare.';
 $ec_lang['lpn_backdrop_position_prompt2']='Alegeți metoda pentru punctul de destinație, apoi faceți clic pe Continuare.';
-// The standing "you are in the middle of something" bar, shown while a background-image scale or
-// move is waiting for a click. It carries the only visible way out of that state.
 $ec_lang['lpn_backdrop_busy']='Se ajustează imaginea de fundal.';
 $ec_lang['lpn_backdrop_target_label']='Mută acel punct la:';
 $ec_lang['lpn_backdrop_target_node']='Un nod';
@@ -1282,25 +929,8 @@ $ec_lang['lpn_push_elements']='Noduri și conducte:';
 $ec_lang['lpn_push_none_displayed']='Nicio valoare inițială nu este afișată ca etichetă în acest moment, deci nu este nimic de aplicat. Activați etichetele pentru proprietățile dorite în panoul Etichete, apoi încercați din nou.';
 $ec_lang['lpn_push_nothing']='Niciun element existent nu are vreuna dintre proprietățile care se aplică.';
 $ec_lang['lpn_push_no_change']='Fiecare element are deja aceste valori, deci nimic nu s-ar schimba.';
-// ---- Scenarios (ROADMAP Task 184) ----
-// A project holds one drawing and a list of scenarios. Base is the drawing itself; every other
-// scenario is nothing but a set of values of its own, laid over Base.
-// "Own values", not "overrides": the readout sits in an 11px status strip beside the units, and the
-// question it answers is how much of this scenario is its own rather than inherited.
 $ec_lang['lpn_scenario_label']='Scenariu';
 $ec_lang['lpn_scenario_base']='Bază';
-// "Custom", not "Own" (Tom, 2026-08-14: *"I love 'custom'. 'Changed' is a little dangerous."*),
-// and the reason is a TRANSLATION reason rather than an English one -- which is why it is worth
-// a comment. "Own values" calques directly onto the standard term for EIGENVALUES in most of
-// Europe: es valores propios, pt valores proprios, de Eigenwerte, cs vlastni hodnota, hr vlastita
-// vrijednost, bg/ru/sr sobstveni. Ten languages in sprint 316 had to detect and route around that
-// independently, and three of them, forced off the calque, landed on "CHANGED values" -- which is
-// FALSE here, because a scenario's custom value may be identical to Base's (see
-// lpn_scenario_override_tip, and the assertion in dev/lpn-spike/scenario-harness.js).
-// "Custom" has no calque path into mathematics in any of them, so the trap does not exist to be
-// routed around, and it says ownership without implying difference. Seven languages had already
-// chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
-// pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
 $ec_lang['lpn_scenario_overrides']='Valori specifice';
 $ec_lang['lpn_scenario_tip']='Setul de valori pe care desenul le arată și pe care pagina le rezolvă acum. Faceți clic pentru a schimba scenariile, sau pentru a adăuga, redenumi sau șterge unul.';
 $ec_lang['lpn_scenario_new']='Scenariu nou…';
@@ -1311,11 +941,6 @@ $ec_lang['lpn_scenario_delete']='Ștergere scenariu';
 $ec_lang['lpn_scenario_delete_confirm']='Ștergeți scenariul {name} și cele {n} valori care îi aparțin exclusiv? Desenul propriu-zis nu este modificat.';
 $ec_lang['lpn_scenario_override']='Doar în acest scenariu';
 $ec_lang['lpn_scenario_override_tip']='Bifat înseamnă că această valoare aparține exclusiv acestui scenariu, chiar dacă este același număr ca la Bază. Debifați pentru a folosi din nou valoarea de Bază.';
-// "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
-// place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
-// scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
-// The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
-// Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Scenariul de bază: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} este în afara rețelei în {scenario}. Rămâne pe desen și în celelalte scenarii ale dvs.';
 $ec_lang['lpn_scenario_push_btn']='Aplică valorile de Bază la toate scenariile';
@@ -1329,58 +954,27 @@ $ec_lang['lpn_push_base_only']='Această acțiune modifică desenul propriu-zis,
 $ec_lang['lpn_field_active']='Parte din rețea';
 $ec_lang['lpn_field_active_tip']='Debifați această casetă pentru a lăsa elementul pe desen dar în afara rețelei: este desenat gri, iar rezolvitorul îl ignoră. Într-un scenariu, așa se comută o conductă propusă între activă și inactivă.';
 $ec_lang['lpn_settings_emitter_exponent']='Exponent emițător';
-// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
-// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Calcul';
 $ec_lang['lpn_settings_tolerance']='Toleranță de convergență';
 $ec_lang['lpn_settings_tolerance_tip']='Cât de aproape trebuie să ajungă rezolvitorul înainte de a se opri. Un număr mai mic este mai exact și durează mai mult.';
 $ec_lang['lpn_settings_engine_epanet']='Rezolvă cu rezolvitorul EPANET';
-// "IS FASTER" WAS FALSE AND IS GONE (Tom, 2026-08-14: *"is our tip about 'faster' right? I
-// thought you proved that it's too close to call."* He is right, and it was my own measurement
-// that showed it). Task 313 timed both: at this page's 10-20 node target the built-in solver is
-// 0.30 ms against EPANET's 0.41 ms -- the same number to a person -- and at 201 nodes EPANET is
-// TEN TIMES faster, because ours is a dense O(n^3) Cholesky and EPANET is sparse. So the honest
-// trade is not speed at all: it is the one-time download, which is the thing a visitor on a slow
-// connection actually pays.
 $ec_lang['lpn_settings_engine_epanet_tip']='Rulează rezolvitorul EPANET de la US EPA, chiar aici, în browserul dvs. Pentru o rețea de această dimensiune nu veți observa nicio diferență de viteză. Cele două rezolvitoare dau rezultate apropiate, dar nu identice: EPANET rotunjește valoarea pe care o folosește pentru gravitație, astfel încât pierderile locale (minore) ies cu aproximativ 0,08% mai mici decât la rezolvitorul intern, iar cu rugozitatea Manning pierderea de sarcină iese cu aproximativ 0,6% mai mică. Prima dată când bifați această opțiune, se descarcă aproximativ 650 KB, care rămân apoi pe acest dispozitiv.';
 $ec_lang['lpn_engine_loading']='Se încarcă rezolvitorul EPANET…';
 $ec_lang['lpn_engine_failed']='Rezolvitorul EPANET nu a putut fi încărcat. Se afișează în schimb rezolvitorul integrat.';
-// Said out loud, never silently: the user picked the built-in solver and this network was sent to
-// the EPANET solver anyway, because it holds a valve the built-in solver does not work out. The
-// setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_engine_valve_route']='Rezolvat cu rezolvitorul EPANET, deoarece aceste vane se deschid și se închid singure:';
 $ec_lang['lpn_unit_unknown']='Acest desen indică o unitate pe care această pagină nu o oferă: {unit}. Totul este păstrat și afișat exact așa cum a fost primit, iar nimic nu a fost modificat. Nu se poate calcula nimic până când această pagină nu învață unitatea respectivă, deoarece nu știe cât de mare este aceasta.';
 $ec_lang['lpn_engine_manning_note']='Notă: cu rugozitate Manning, EPANET calculează o pierdere de sarcină cu aproximativ 0,6% mai mică decât rezolvitorul integrat.';
 $ec_lang['lpn_settings_text_size']='Dimensiune text (pixeli)';
-// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
-// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
-// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Dimensiune simbol (pixeli)';
 $ec_lang['lpn_settings_link_width']='Grosime linie conductă (pixeli)';
 $ec_lang['lpn_settings_align_labels']='Aliniază etichetele conductelor cu conductele';
 $ec_lang['lpn_settings_readability_bias']='Întoarce o etichetă cu susul în jos când se înclină la stânga verticalei cu mai mult de acest număr de grade';
 $ec_lang['lpn_settings_readability_bias_tip']='Întoarce o etichetă pentru a o menține cu susul în sus atunci când se înclină la stânga verticalei cu mai mult de acest număr de grade.';
 $ec_lang['lpn_settings_mask_labels']='Fundal opac în spatele etichetelor';
-// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
-// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Opacitate simbol (0 până la 1)';
-// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
-// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Opacitate imagine de fundal (0 până la 1)';
 $ec_lang['lpn_settings_map_display']='Aspectul hărții';
-// PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
-// to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
-// LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
-// will list them; that is expected and they are kept on purpose, because restoring a settings row
-// is cheap and recovering 27 translations is not.
-//
-// **IF THE ROW EVER COMES BACK, REWRITE THE TIP FIRST -- it is now FALSE in all 27 languages.** It
-// promises "part of the page is always left to scroll", which is the exact behaviour the fit-the-
-// window change removed. Reusing it as-is would ship a confident wrong explanation everywhere at
-// once, which is worse than having no tip at all.
 $ec_lang['lpn_settings_map_height_px']='Înălțimea hărții (pixeli de ecran)';
-// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
-// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='Pe un ecran mic, harta este desenată mai scurtă decât atât, astfel încât o parte din pagină rămâne întotdeauna pentru derulare.';
 $ec_lang['lpn_settings_legend_position']='Poziția legendei';
 $ec_lang['lpn_settings_legend_top_left']='Sus stânga';
@@ -1410,7 +1004,6 @@ $ec_lang['lpn_confirm_restore_defaults']='Resetați toate setările (prefixe ID,
 $ec_lang['lpn_settings_wipe_btn']='Șterge totul pe această pagină';
 $ec_lang['lpn_confirm_wipe']='Ștergeți TOTUL salvat pentru această pagină — fiecare proiect, fiecare imagine de fundal, toate setările și alegerile dvs. de unități — și reîncărcați pagina așa cum ar vedea-o un vizitator complet nou? Această acțiune nu poate fi anulată.';
 
-// Batch: lpn_ translation sprint (ro) 2026-08-19
 $ec_lang['lpn_field_text_align']='Aliniere orizontală';
 $ec_lang['lpn_field_text_align_left']='Stânga';
 $ec_lang['lpn_field_text_align_center']='Centru';

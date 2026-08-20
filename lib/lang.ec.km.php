@@ -2,8 +2,6 @@
 
 // All missing text declarations will fall back to English.
 
-// Units (alphabetical order)
-// Necessary for calculator units selectors
 $ec_lang['u_depthFrac']='ប្រភាគ';
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='ft^2';
@@ -53,9 +51,6 @@ $ec_lang['u_hp']='hp';
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
 
-// Page text
-// In page order for easiest maintenance.
-// Menu and General
 $ec_lang['menu_brand']='HawsEDC ម៉ាស៊ីនគណនា';
 $ec_lang['menu_main_list']='បញ្ជីម៉ាស៊ីនគណនា';
 $ec_lang['menu_main_hydraulics']='វិស្វកម្មហ៊ីដ្រូលីក';
@@ -66,10 +61,6 @@ $ec_lang['template_welcome']='ទម្លាក់ការភ័យខ្ល�
 $ec_lang['template_feedback']='តើអ្នកអាចណែនាំពាក្យសម្ដីឱ្យប្រសើរជាងនេះនៅលើទំព័រនេះ ឬអ្វីផ្សេងទៀតបានទេ? តើអ្នកចង់ជួយ ឬចង់រៀនបង្កើតឧបករណ៍បែបនេះដែរឬទេ? សូមទាក់ទងខ្ញុំ។';
 $ec_lang['template_printable_title']='ចំណងជើងដែលអាចបោះពុម្ព';
 $ec_lang['template_printable_subtitle']='ចំណងជើងរងដែលអាចបោះពុម្ព';
-// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
-// prose, and they are translated into all 26 languages for one reason: consent that the visitor
-// cannot read is not consent. The long-form privacy notice and terms are a separate question --
-// English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_body']='តើយើងអាចរក្សាលេខមួយខ្ទង់ក្នុងទំព័រនីមួយៗ នៅក្នុងទំហំផ្ទុករបស់កម្មវិធីរុករកនេះ ដើម្បីការពារយើងកុំឲ្យកត់ត្រាការចូលមើលដដែលៗបានទេ?';
 $ec_lang['consent_accept']='យល់ព្រមលើសំណើនេះ';
 $ec_lang['consent_accept_all']='យល់ព្រមជានិច្ច';
@@ -101,7 +92,6 @@ $ec_lang['ec_name_tip']='រក្សាទុកទិន្នន័យបញ�
 $ec_lang['calc_copy_link']='ចម្លងតំណ';
 $ec_lang['ec_related_calcs']='ម៉ាស៊ីនគណនាដែលពាក់ព័ន្ធ៖';
 $ec_lang['calc_copy_link_done']='បានចម្លង!';
-// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់';
 $ec_lang['dw_main_title']='ម៉ាស៊ីនគណនា Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
 $ec_lang['dw_main_desc']='ការបាត់បង់ទំនាប់ក្នុងបំពង់ Darcy-Weisbach តាមប្រឡោះ ភាពរញ៉េរញ៉ៃ និងលំហូរដែលបានកំណត់';
@@ -117,7 +107,6 @@ $ec_lang['dw_regime_transitional']='លំហូរផ្លាស់ប្ដ�
 $ec_lang['dw_regime_turbulent']='លំហូររញ្ជួយ';
 $ec_lang['dw_friction_factor_method']='វិធីសាស្ត្រកត្តាកកិត';
 $ec_lang['dw_friction_factor']='កត្តាកកិត, f';
-// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Hazen-Williams ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់';
 $ec_lang['hw_main_title']='ម៉ាស៊ីនគណនា Hazen-Williams ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
 $ec_lang['hw_main_desc']='ការបាត់បង់ទំនាប់ក្នុងបំពង់ Hazen-Williams តាមប្រឡោះ ភាពរញ៉េរញ៉ៃ និងលំហូរដែលបានកំណត់';
@@ -135,7 +124,6 @@ $ec_lang['hw_roughness']='មេគុណ Hazen-Williams, C';
 $ec_lang['hw_note_1']='<dl><dt>ម៉ាស៊ីនគណនានេះមិនធ្វើគំរូទម្រង់បំពង់រវាងចុងទាំងពីរទេ។</dt><dd>វាប្រើតែកម្ពស់ចំហៀងលើ និងចំហៀងក្រោមដែលអ្នកបញ្ចូលប៉ុណ្ណោះ។ ប្រសិនបើដីលើកកម្ពស់ខ្ពស់ជាងចុងទាំងពីរនៅចំណុចណាមួយចន្លោះនោះ សម្ពាធនៅចំណុចខ្ពស់នោះនឹងទាបជាងសម្ពាធណាមួយដែលបានរាយការណ៍នៅទីនេះ។ សូមគណនាម្ដងទៀតសម្រាប់ប្រវែងពីចុងខាងលើដល់ចំណុចខ្ពស់នោះ ដើម្បីត្រួតពិនិត្យ។</dd><dd>កន្លែងណាដែល HGL ធ្លាក់ចុះក្រោមបំពង់ ទឹកស្ថិតនៅក្រោមសម្ពាធអវិជ្ជមាន។ ខ្យល់នឹងចេញពីទឹក បំពង់ជញ្ជាំងស្ដើងអាចរលំបាក់ ហើយទឹកក្រោមដីកខ្វក់អាចត្រូវបានទាញចូលតាមថ្នាំបំពង់។ រក្សាបំពង់ឲ្យស្ថិតនៅក្រោមសម្ពាធវិជ្ជមានគ្រប់ទីកន្លែង ហើយពិចារណាដាក់វ៉ាល់ខ្យល់ (air valve) នៅរាល់ចំណុចខ្ពស់។</dd><dt>សម្ពាធចំហៀងលើ គឺជាលក្ខខណ្ឌព្រំដែនដែលអ្នកផ្ដល់ឲ្យ។</dt><dd>អានតម្លៃពីម៉ែត្រ (gauge) ពីកម្រិតទឹកក្នុងធុងស្តុក (កម្ពស់ទឹកខាងលើបំពង់) ឬពីខ្សែកោងម៉ាស៊ីនបូម។ ម៉ាស៊ីនបូមផ្ដល់សម្ពាធតិចជាងនៅពេលលំហូរកើនឡើង ដូច្នេះសូមប្រើចំណុចលើខ្សែកោងដែលត្រូវនឹងលំហូរដែលបានបញ្ចូលខាងលើ។</dd><dt>សូមបូកសរុបមេគុណការបាត់បង់មូលដ្ឋាន (local) ដោយខ្លួនអ្នក។</dt><dd>បូកសរុបតម្លៃ K សម្រាប់រាល់វ៉ាល់ ចំណុចកោង តភ្ជាប់បីផ្លូវ (tee) ម៉ែត្រ និងច្រកចូលនីមួយៗនៅលើបន្ទាត់ ហើយបញ្ចូលផលបូកនោះ។ តាមតំណភ្ជាប់នៅចំណុចបញ្ចូលនោះ ដើម្បីមើលតម្លៃធម្មតា។ លើបំពង់មេបញ្ជូនទឹកវែង ការបាត់បង់ទាំងនេះមានទំហំតូចបើប្រៀបធៀបនឹងកកិត ប៉ុន្តែក្នុងបំពង់ខាងក្នុងស្ថានីយខ្លីៗ ការបាត់បង់ទាំងនេះអាចជាភាគច្រើននៃការបាត់បង់សរុប។</dd></dl>';
 
 
-// Manning Irregular
 $ec_lang['mi_menu']='Manning ប្រឡាយខណ្ឌកាត់មិនទៀងទាត់';
 $ec_lang['mi_main_title']='ម៉ាស៊ីនគណនា Manning សម្រាប់ប្រឡាយខណ្ឌកាត់មិនទៀងទាត់ ឥតគិតថ្លៃ';
 $ec_lang['mi_main_desc']='ម៉ាស៊ីនគណនាលំហូរឯកសណ្ឋាន Manning សម្រាប់ប្រឡាយខណ្ឌកាត់មិនទៀងទាត់';
@@ -163,7 +151,6 @@ $ec_lang['mi_notes_1_term']='n ផ្សំ';
 $ec_lang['mi_notes_1_def']='ម៉ាស៊ីនគណនានេះអនុវត្តតាមសៀវភៅណែនាំ HEC-RAS ក្នុងការគណនា n ផ្សំសម្រាប់តំបន់ ដោយប្រើវិធីសាស្ត្រ Chow 1959, ទំព័រ 136, សមីការ 6-17 (មិនមែន 6-18)។';
 $ec_lang['mi_notes_2_term']='ស្រទាប់ថ្មការពារ';
 $ec_lang['mi_notes_2_def']='ប្រើម៉ាស៊ីនគណនា Manning ប្រឡាយជ្រូងចតុកោណ ដើម្បីរចនាស្រទាប់ថ្មការពារ។ ម៉ាស៊ីនគណនានេះសមស្របជាងសម្រាប់ខណ្ឌធម្មជាតិ។';
-// Manning Pipe Flow
 $ec_lang['mpf_main_menu']='Manning ការហូរទឹកក្នុងបំពង់';
 $ec_lang['mpf_main_title']='ម៉ាស៊ីនគណនា Manning ការហូរទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
 $ec_lang['mpf_main_desc']='រូបមន្ត Manning ការហូរទឹកបំពង់ឯកសណ្ឋានជាមួយ ជម្រាល និងជម្រៅដែលបានកំណត់';
@@ -192,7 +179,6 @@ $ec_lang['mpf_solver_enter_positive_q']='សូមបញ្ចូល Q គោល
 $ec_lang['mpf_solver_no_solution']='គ្មានដំណោះស្រាយ៖ Q លើសសមត្ថភាពបំពង់នៅ y/d0 = 93.8% (Qmax = {qmax} គិតជាឯកតាដែលបានជ្រើសរើស)។';
 $ec_lang['mpf_solve_btn']='ដោះស្រាយ';
 $ec_lang['mpf_solve_for_flow']='សម្រាប់លំហូរ, Q =';
-// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning ការបាត់បង់ទំនាប់ក្នុងបំពង់';
 $ec_lang['mphl_main_title']='ម៉ាស៊ីនគណនា Manning ការបាត់បង់ទំនាប់ក្នុងបំពង់ ឥតគិតថ្លៃ';
 $ec_lang['mphl_main_desc']='រូបមន្ត Manning ការបាត់បង់ទំនាប់ ជាមួយការហូរពេញ';
@@ -209,7 +195,6 @@ $ec_lang['mphl_egl_1']='EGL ចំហៀងក្រោម';
 $ec_lang['mphl_egl_2']='EGL ចំហៀងលើ';
 $ec_lang['mphl_hgl_egl_tip']='អាចមិនត្រឹមត្រូវ ប្រសិនបើបំពង់នៅខ្ពស់។ សូមមើលកំណត់សម្គាល់។';
 $ec_lang['mphl_note_1']='<dl><dt>ម៉ាស៊ីនគណនានេះមិនធ្វើគំរូទម្រង់បំពង់រវាងចុងទាំងពីរទេ។</dt><dd>ប្រសិនបើ HGL ធ្លាក់ចុះក្រោមផ្នែកខាងលើនៃបំពង់ត្រង់ចំណុចណាមួយ ការគណនានេះអាចមិនត្រឹមត្រូវ។</dd><dt>សម្រាប់លក្ខខណ្ឌចំហ (culvert) ចាំបាច់ត្រូវពិនិត្យលក្ខខណ្ឌត្រួតពិនិត្យធាតុចូល។</dt><dd>1. HGL ខាងលើ មិនអាចទាបជាងកម្ពស់ហូរជម្រៅធម្មតា ខាងលើ (ឬទាបជាងបំពង់!)។</dd><dd>2. ទំនាប់ទឹក culvert ត្រូវបានតំណាងប្រសើរជាងដោយ EGL ខាងលើ ជាជាង HGL ខាងលើ។</dd><dd>3. មើល <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">ការណែនាំ 2 នាទីរបស់ខ្ញុំ</a> សម្រាប់ការគណនាទំនាប់ទឹក culvert ស្ដង់ដារ ដោយប្រើ <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> ដែលជាកម្មវិធីគណនា culvert ឥតគិតថ្លៃ ពីរដ្ឋបាលផ្លូវហាយវេសហព័ន្ធសហរដ្ឋអាមេរិក។</dd><dd>4. ទំព័រនេះដោះស្រាយតែករណីត្រួតពិនិត្យផ្នែកចេញ (outlet control) ប៉ុណ្ណោះ គឺករណីបំពង់ហូរពេញ ដែលលក្ខខណ្ឌនៅខាងក្រោមជាអ្នកកំណត់ទំនាប់ទឹក។ ការរចនា culvert គឺជាការសម្រេចថាតើត្រួតពិនិត្យផ្នែកចូល (inlet control) ឬត្រួតពិនិត្យផ្នែកចេញ (outlet control) ជាអ្នកគ្រប់គ្រង ដូច្នេះប្រើ HY-8 រាល់ពេលដែលអាចជាករណីណាមួយក្នុងចំណោមទាំងពីរ។</dd></dl>';
-// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning ប្រឡាយជ្រូងចតុកោណ';
 $ec_lang['mtc_main_title']='ម៉ាស៊ីនគណនា Manning ប្រឡាយជ្រូងចតុកោណ ឥតគិតថ្លៃ';
 $ec_lang['mtc_main_desc']='រូបមន្ត Manning សម្រាប់លំហូរឯកសណ្ឋានក្នុងប្រឡាយជ្រូងចតុកោណ តាមជម្រាល និងជម្រៅដែលបានកំណត់';
@@ -244,7 +229,6 @@ $ec_lang['mtc_note_1']='<dl><dt>ការធ្វើម្ដងទៀតដោ
 $ec_lang['mtc_note_2_term']='ការពិនិត្យល្បឿន';
 $ec_lang['mtc_note_2_def']='ល្បឿនខ្ពស់បង្ហាញថាមានការធ្លាក់កម្ពស់ដ៏ធំដែលបង្កើតថាមពលជាក់លាក់ខ្ពស់បែបនេះ។ ថាមពលនោះអាចបាត់បង់យ៉ាងឆាប់រហ័សនៅតំបន់ពង្រីក ការបត់ ឬការស្ទះ។ សូមផ្ទៀងផ្ទាត់ថាតើនេះសមហេតុផលសម្រាប់ទីតាំងនេះ។';
 $ec_lang['mtc_solver_no_solution']='រកមិនឃើញដំណោះស្រាយសម្រាប់ Q ដែលបានផ្ដល់ ជាមួយនឹងធាតុចូលប្រឡាយទាំងនេះ។';
-// Weir Flow Simple
 $ec_lang['ws_main_menu']='ការហូរស្ទីងសាមញ្ញ';
 $ec_lang['ws_main_title']='ម៉ាស៊ីនគណនាការហូរស្ទីងកំពូលទទឹងសាមញ្ញតាមអនឡាញ ឥតគិតថ្លៃ';
 $ec_lang['ws_main_desc']='ម៉ាស៊ីនគណនាការហូរស្ទីងកំពូលទទឹងសាមញ្ញ';
@@ -253,7 +237,6 @@ $ec_lang['ws_headWaterHeight']='<span class="ec-help" title="ថាមពលក�
 $ec_lang['ws_weirCoefficient']='មេគុណស្ទីង, C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='កំណត់ចំណាំ';
 $ec_lang['ws_notes_we_term']='សមីការស្ទីង';
-// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='ការហូរស្ទីងកំពូលមិនទៀងទាត់';
 $ec_lang['wi_main_title']='ម៉ាស៊ីនគណនាការហូរស្ទីងតាមអនឡាញ ឥតគិតថ្លៃ — ចែកជាចម្រៀក ជម្រៅប្រែប្រួល និងកំពូលមិនទៀងទាត់';
 $ec_lang['wi_main_desc']='ម៉ាស៊ីនគណនាការហូរស្ទីងកំពូលមិនទៀងទាត់';
@@ -263,7 +246,6 @@ $ec_lang['wi_incrementalFlow']='លំហូរជាដំណាក់កាល
 $ec_lang['wi_cumulativeFlow']='លំហូរសរុប';
 $ec_lang['wi_save_and_calculate']='រក្សាទុក និងគណនា';
 $ec_lang['wi_notes_we_def']='q = ប្រសិនបើ (ចម្ងាយ = 0) នោះ 0 បើមិនដូច្នេះទេ ប្រសិនបើ (ជម្រាល=0) នោះ cw*ចម្ងាយ*d<sub>0</sub><sup>1.5</sup> បើមិនដូច្នេះទេ cw/(2.5*ជម្រាល) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) ដែល d<sub>1</sub> និង d<sub>0</sub> តែងតែវិជ្ជមាន ឬ សូន្យ';
-// Orifice Flow
 $ec_lang['or_main_menu']='ការហូរប្រហោង';
 $ec_lang['or_main_title']='ម៉ាស៊ីនគណនាការហូរប្រហោងតាមអនឡាញ ឥតគិតថ្លៃ';
 $ec_lang['or_main_desc']='ការហូរប្រហោង — សេរី ឬ ជ្រុក';
@@ -295,7 +277,6 @@ $ec_lang['or_notes_3_term']='មេគុណលំហូរ';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> ស្ថិតក្នុងចន្លោះប្រហែល 0.60–0.65 សម្រាប់ប្រហោងគែមមុត។ ធាតុចូលមូល ឬបញ្ច្រាស (re-entrant) ប្រើតម្លៃខុសគ្នា។ សូមមើល <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> ឬ HEC-RAS Hydraulic Reference Manual សម្រាប់ការណែនាំបន្ថែម។';
 $ec_lang['or_notes_4_term']='ការជ្រុក';
 $ec_lang['or_notes_4_def']='នៅពេល TWE ស្ថិតនៅលើបាតរន្ធ ម៉ាស៊ីនគណនានេះនឹងអនុវត្តសមីការប្រហោងជ្រុកដោយស្វ័យប្រវត្តិ ដោយប្រើ h = HWE − TWE។ នៅពេល TWE ស្ថិតនៅ ឬ ក្រោមបាតរន្ធ ការហូរចេញសេរីត្រូវបានសន្មត និង h = HWE − ចំណុចកណ្ដាល។';
-// Micro-Hydro Power
 $ec_lang['mhp_main_menu']='ថាមពលវារីអគ្គិសនីខ្នាតតូច';
 $ec_lang['mhp_main_title']='ម៉ាស៊ីនគណនាថាមពលវារីអគ្គិសនីខ្នាតតូចលើអនឡាញ ឥតគិតថ្លៃ';
 $ec_lang['mhp_main_desc']='ម៉ាស៊ីនគណនាផលិតថាមពលវារីអគ្គិសនីខ្នាតតូច ថាមពលទឹករត់';
@@ -328,7 +309,6 @@ $ec_lang['mhp_notes_6_def']='ប្រសិទ្ធភាពរោងចក្
 $ec_lang['mhp_notes_7_term']='ថាមពលប្រចាំឆ្នាំ';
 $ec_lang['mhp_notes_7_def']='ថាមពលប្រចាំឆ្នាំសន្មតថាមានប្រតិបត្តិការហូរពេញជានិច្ច (8760 ម៉ោង/ឆ្នាំ)។ ការផលិតជាក់ស្តែងនឹងទាបជាងនេះ ដោយសារការប្រែប្រួលលំហូរតាមរដូវ ការឈប់ថែទាំ និងកត្តាបន្ទុក (load factor)។';
 
-// Orifice Drain Time
 $ec_lang['odt_main_menu']='ស្រះ និងធុង — ពេលបង្ហូរទឹក';
 $ec_lang['odt_main_title']='ម៉ាស៊ីនគណនាពេលបង្ហូរទឹកស្រះ អាង ឬ ធុងតាមអនឡាញ ឥតគិតថ្លៃ (ប្រហោង)';
 $ec_lang['odt_main_desc']='ស្រះ អាង ឬ ធុង — ពេលបង្ហូរទឹកតាមច្រកចេញប្រហោង, វិធីសាស្ត្របរិមាណកោណ';
@@ -356,10 +336,7 @@ $ec_lang['odt_q_max']='លំហូរអតិបរមា, Q<sub>max</sub>';
 $ec_lang['odt_vol']='បរិមាណដែលបានបង្ហូរ';
 $ec_lang['odt_sketch_start']='ចាប់ផ្ដើម';
 $ec_lang['odt_sketch_end']='ចប់';
-// Contact us.
 
-// Irrigation
-// Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='គម្លាតរវាងក្បាលបញ្ចេញទឹក, S<sub>e</sub>';
 $ec_lang['ip_sl']='គម្លាតរវាងបំពង់រង, S<sub>l</sub>';
 $ec_lang['ip_n_e']='ចំនួនក្បាលបញ្ចេញទឹកក្នុងបំពង់រងមួយ, n<sub>e</sub>';
@@ -370,7 +347,6 @@ $ec_lang['ip_pr']='អត្រាដាក់ទឹក, PR';
 $ec_lang['ip_q_lat']='លំហូរក្នុងបំពង់រងមួយ, Q<sub>lat</sub>';
 $ec_lang['ip_q_sys']='លំហូរតំបន់, Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='ពេលដំណើរការ (ម៉ោង)';
-// Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='ការជ្រាបទឹកប្រឡាយ';
 $ec_lang['cs_main_title']='ម៉ាស៊ីនគណនាការជ្រាបទឹកប្រឡាយ និងប្រសិទ្ធភាពដឹកជញ្ជូនឥតគិតថ្លៃតាមអ៊ីនធឺណិត';
 $ec_lang['cs_main_desc']='ការបាត់បង់ដោយការជ្រាបទឹកប្រឡាយ និងប្រសិទ្ធភាពដឹកជញ្ជូន — វិធីសាស្ត្រលំហូរចូល-ចេញ';
@@ -405,7 +381,6 @@ $ec_lang['cs_notes_2_def']='ប្រឡាយដីធម្មតាគ្ម�
 $ec_lang['cs_notes_3_term']='ការត្រឡប់វិនិយោគស្រទាប់';
 $ec_lang['cs_notes_3_def']='បញ្ចូលតម្លៃទឹក និងថ្លៃដើមស្រទាប់ជារូបិយប័ណ្ណណាមួយ ដោយប្រើឲ្យស្របគ្នា។ ផ្ទៃស្រទាប់ = ប្រវែងចម្រៀកប្រឡាយ × បរិវេណសើម — បរិវេណសើមនៃផ្នែកកាត់ខ្នាតប្រឡាយនៅជម្រៅលំហូរដែលបានវាស់ (ទទឹងបាត បូកនឹងជម្រាលសើមទាំងពីរចំហៀង)។ តម្លៃប្រចាំឆ្នាំដែលទទួលបានមកវិញសន្មតថាប្រឡាយដែលបានស្រទាប់សម្រេចបាននូវគោលដៅ E<sub>c</sub> ជាប់ជានិច្ច។ រយៈពេលសងវិញជាក់ស្តែងនឹងវែងជាងនេះ សម្រាប់ប្រឡាយប្រើតាមរដូវ ឬប្រសិនបើស្រទាប់មិនឈានដល់ប្រសិទ្ធភាពគោលដៅ។';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, ការបោះពុម្ពទី 3 (2001)។ FAO Irrigation and Drainage Paper 57 (1999)។';
-// About
 $ec_lang['about_main_menu']='អំពី';
 $ec_lang['install_main_menu']='ដំឡើង';
 $ec_lang['install_main_title']='ដំឡើង EngCalcs';
@@ -437,7 +412,6 @@ $ec_lang['contactSpamPrefix']='ប្រាំ​ បូក​ មួយ​ ស�
 $ec_lang['contactSpamPostfix']='(សូម​ សរសេរ​ ជា​ ពាក្យ​។ 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='ផ្ញើ​ សារ';
 $ec_lang['contact_success']='សូមថ្លែងអរគុណដែលបានចំណាយពេលសរសេរ។';
-// Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='រចនាប្រឡាយថ្មជម្រាល (Robinson)';
 $ec_lang['rc_main_title']='ម៉ាស៊ីនគណនារចនាប្រឡាយថ្មជម្រាលលើអនឡាញ ឥតគិតថ្លៃ — Robinson (1998)';
 $ec_lang['rc_main_desc']='ការកំណត់ទំហំថ្មការពារសម្រាប់ប្រឡាយថ្មជម្រាល — Robinson, Rice & Kadavy (1998)';
@@ -496,12 +470,10 @@ $ec_lang['rc_notes_6_def']='កម្រិតកំពូលនៃថ្មក�
 $ec_lang['rc_notes_7_def']='នៅពេលជម្រៅធម្មតានៅក្នុងប្រឡាយច្រកចូល តូចជាងក្បាលទឹកស្ទីង (H<sub>p</sub>) ដែលត្រូវការសម្រាប់ឲ្យ q<sub>t</sub> ហូរកាត់បាន នោះលំហូរនឹងចង្អៀត ឬកើតមានទឹកដាំងខាងលើច្រកចូល។ ជាទូទៅនេះអាចទទួលយកបាន — ទឹកដាំងកាត់បន្ថយល្បឿន និងទប់ស្កាត់ការហូរច្រោះខាងលើ។ ដើម្បីត្រួតពិនិត្យ: ប្រើម៉ាស៊ីនគណនាលំហូរស្ទីង ដើម្បីរកតម្លៃ H<sub>p</sub> សម្រាប់ q<sub>t</sub> និងទទឹងកំពូល ដែលបានផ្ដល់ ហើយប្រៀបធៀបជាមួយជម្រៅធម្មតានៃប្រឡាយច្រកចូល។ ប្រសិនបើ H<sub>p</sub> លើសជម្រៅធម្មតា នោះទឹកដាំងនឹងកើតមាន។';
 $ec_lang['rc_notes_4_term']='ឯកសារយោង';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS ក៏បានបោះពុម្ពផ្សាយ <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">សន្លឹកកិច្ចការ Excel</a> ដោយផ្អែកលើវិធីសាស្ត្រដូចគ្នា។';
-// Sketch labels
 $ec_lang['rc_sketch_filter']='តម្រង';
 $ec_lang['rc_sketch_top_crest_curve']='ខ្សែកោងកំពូល';
 $ec_lang['rc_sketch_outlet_apron']='បន្ទះការពារច្រកចេញ';
 $ec_lang['rc_sketch_radius']='កាំ';
-// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='សម្ពាធស្រោចស្រព';
 $ec_lang['ip_main_title']='ម៉ាស៊ីនគណនាសម្ពាធស្រោចស្រព និងឯកសណ្ឋានភាពចែកចាយ ឥតគិតថ្លៃតាមអ៊ីនធឺណិត';
 $ec_lang['ip_main_desc']='សម្ពាធសាខាសាកល្បង និងការប៉ាន់ស្មានឯកសណ្ឋានភាព';
@@ -554,7 +526,6 @@ $ec_lang['ip_notes_5_def']='អត្រាដាក់ទឹក និងលំ
 
 
 
-// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='បណ្ដាញបំពង់បែកសាខា';
 $ec_lang['bpn_main_title']='ម៉ាស៊ីនគណនាសម្ពាធបណ្ដាញបំពង់បែកសាខា ឥតគិតថ្លៃតាមអ៊ីនធឺណិត (គ្មានរង្វិលបិទ)';
 $ec_lang['bpn_main_desc']='លំហូរ និងសម្ពាធនៃបណ្ដាញបំពង់បែកសាខា (ដូចមែកឈើ)';
@@ -624,18 +595,8 @@ $ec_lang['lpn_tool_delete']='លុប';
 $ec_lang['lpn_tool_zoom_extent']='ពង្រីកឲ្យសមនឹងអេក្រង់';
 $ec_lang['lpn_new_text']='អត្ថបទ';
 $ec_lang['lpn_field_elev']='កម្ពស់';
-// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
-// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
-// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
-// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='កម្រិតដីឬបំពង់នៅថ្នាំងនេះ។ វាស់ពីចំណុចសូន្យណាមួយដែលអ្នកចង់បាន ដរាបណាថ្នាំងទាំងអស់ប្រើចំណុចសូន្យតែមួយ។';
-// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
-// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
-// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='ថ្ពល់';
-// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
-// outright that it is a height and not a pressure, which is the exact confusion the glossary's
-// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='កម្រិតផ្ទៃទឹកនៅក្នុងអាងស្តុក វាស់ជាកម្ពស់ មិនមែនជាសម្ពាធទេ។ ទុកទទេ ដើម្បីឲ្យផ្ទៃទឹកស្ថិតនៅកម្ពស់អាងស្តុក។';
 $ec_lang['lpn_close']='បិទ';
 $ec_lang['lpn_empty_hint']='ប្រើម៉ឺនុយឯកសារ, គម្រោងថ្មី ដើម្បីបើកគំរូមួយ។ ឬចាប់ផ្ដើមដោយបន្ថែមអាងស្តុក ថ្នាំង និងបំពង់ពីរបារឧបករណ៍។';
@@ -648,10 +609,6 @@ $ec_lang['lpn_units_elevhead']='កម្ពស់ និងថ្ពល់';
 $ec_lang['lpn_units_pressure']='សម្ពាធ';
 $ec_lang['lpn_units_flow']='លំហូរ';
 $ec_lang['lpn_units_velocity']='ល្បឿន';
-// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
-// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
-// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
-// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='ជម្រាលការបាត់បង់ថ្ពល់';
 $ec_lang['lpn_result_gradient_tip']='ការបាត់បង់ថ្ពល់ចែកនឹងប្រវែងបំពង់។ ប្រើវាដើម្បីប្រៀបធៀបបំពង់ដែលមានប្រវែងខុសគ្នា ធៀបនឹងដែនកំណត់រចនាតែមួយ។';
 $ec_lang['lpn_result_head']='ថ្ពល់';
@@ -660,84 +617,39 @@ $ec_lang['lpn_result_pressure']='សម្ពាធ';
 $ec_lang['lpn_result_flow']='លំហូរ';
 $ec_lang['lpn_result_velocity']='ល្បឿន';
 $ec_lang['lpn_result_headloss']='ការបាត់បង់ថ្ពល់';
-// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
-// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
-// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
-// Settings live INSIDE each project document, so deleting every project deletes every setting too:
-// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
-// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
-// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='កំណត់ឡើងវិញតែការកំណត់របស់គម្រោងនេះប៉ុណ្ណោះ។ គំនូរ និងគម្រោងផ្សេងទៀតរបស់អ្នកមិនផ្លាស់ប្ដូរទេ។ ដើម្បីរក្សាទុកការកំណត់ដែលអ្នកចូលចិត្តសម្រាប់ប្រើឡើងវិញ សូមរក្សាទុកឯកសារគម្រោងដែលមានតែការកំណត់ប៉ុណ្ណោះ។';
 $ec_lang['lpn_reset_all_tip']='លុបគម្រោងទាំងអស់ រូបភាពផ្ទៃខាងក្រោយទាំងអស់ ការកំណត់ទាំងអស់ និងជម្រើសខ្នាតវាស់របស់អ្នក រួចផ្ទុកទំព័រឡើងវិញដូចអ្នកចូលមើលលើកដំបូង។ នេះជាការកំណត់ឡើងវិញតែមួយគត់ដែលលុបអ្វីៗទាំងអស់។';
-// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
-// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
-// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
-// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
-// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_confirm']='ម៉ាស៊ីនគណនានេះរក្សាទុកខ្នាតវាស់ និងតម្លៃបញ្ចូលរបស់គម្រោងតាមអ្វីដែលបានវាយបញ្ចូល ប៉ុន្តែពីមុនវាបំប្លែងលេខទៅជា SI សម្រាប់ការផ្ទុក។ គម្រោងនេះត្រូវបានរក្សាទុកមុនពេលមានការផ្លាស់ប្ដូរនោះ ដូច្នេះលេខរបស់វាត្រូវបានផ្ទុកជា SI។ តើបំប្លែងវាម្ដងចុងក្រោយទៅជាខ្នាតវាស់បច្ចុប្បន្នទេ? ដើម្បីឲ្យអ្នកវិនិច្ឆ័យ នេះជាអង្កត់ផ្ចិតមួយចំនួនដែលនឹងត្រូវបំប្លែង ជាមួយតម្លៃមុន និងក្រោយ:';
 $ec_lang['lpn_v2_restore_yes']='បំប្លែង';
 $ec_lang['lpn_v2_restore_never']='ទេ។ កុំសួរម្ដងទៀត។';
 $ec_lang['lpn_v2_restore_no']='បិទ ដើម្បីឲ្យខ្ញុំពិនិត្យខ្នាតវាស់បច្ចុប្បន្នសិន';
 $ec_lang['lpn_storage_too_new']='គម្រោងនេះត្រូវបានរក្សាទុកដោយកំណែថ្មីជាងនៃទំព័រនេះ ដូច្នេះមិនអាចបើកនៅទីនេះបានទេ។';
-// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
-// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
-// something that is not in a file, so closing it asks first; a tab without one closes silently. A
-// browser project always wears one (it is in no file at all); a file project wears one only while it
-// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
-// our words for talking about the code, and the user sees only a name, an asterisk, and a file
-// extension.
-// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
-// conventional relationship and the reason the duplication between them is correct rather than
-// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
-// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
-// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='ឯកសារ';
 $ec_lang['lpn_menu_edit']='កែសម្រួល';
 $ec_lang['lpn_menu_insert']='បញ្ចូល';
 $ec_lang['lpn_menu_view']='ទិដ្ឋភាព';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='ការកំណត់';
 $ec_lang['lpn_menu_help']='ជំនួយ';
 $ec_lang['lpn_help_walkthroughs']='មគ្គុទ្ទេសក៍';
-// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
-// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
-// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
-// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
-// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='លុបបណ្ដាញ';
 $ec_lang['lpn_confirm_delete_network']='លុបថ្នាំង ខ្សែបំពង់ និងស្លាកអក្សរទាំងអស់ក្នុងគម្រោងនេះមែនទេ? រូបភាពផ្ទៃខាងក្រោយ ឈ្មោះគម្រោង និងការកំណត់របស់អ្នកនៅតែរក្សាទុក។ សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។';
 $ec_lang['lpn_view_units']='ខ្នាតវាស់';
-// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='រក្សាទុកទាំងអស់';
-// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
-// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
-// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='គម្រោង{n}';
 $ec_lang['lpn_project_copy_suffix']='(ច្បាប់ចម្លង)';
 $ec_lang['lpn_project_rename']='ប្ដូរឈ្មោះ';
-// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='គម្រោងថ្មី…';
-// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
-// with the toolbar button of that name -- an example is a whole network, so it starts a project
-// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='គម្រោង xy ទទេ ខ្នាតវាស់ US (gpm)';
 $ec_lang['lpn_new_blank_si']='គម្រោង xy ទទេ ខ្នាតវាស់ SI (l/s)';
-// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
-// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='បើក…';
 $ec_lang['lpn_file_save']='រក្សាទុក';
 $ec_lang['lpn_file_saveas']='រក្សាទុកជា…';
 $ec_lang['lpn_file_revert']='ត្រឡប់មកវិញ';
 $ec_lang['lpn_file_close']='បិទ';
-// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
-// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='ឯកសារថ្មីៗ';
 $ec_lang['lpn_recent_tip']='បើក {file} ម្ដងទៀត ដោយមិនចាំបាច់ស្វែងរកវានៅក្នុងកុំព្យូទ័ររបស់អ្នក។';
 $ec_lang['lpn_recent_denied']='សិទ្ធិបើកឯកសារនោះមិនត្រូវបានផ្ដល់ឲ្យទេ ដូច្នេះវាមិនត្រូវបានបើកទេ។';
 $ec_lang['lpn_recent_gone']='មិនអាចបើក {file} បានទេ។ វាប្រហែលជាត្រូវបានផ្លាស់ទី ប្ដូរឈ្មោះ ឬលុប ដូច្នេះវាត្រូវបានដកចេញពីបញ្ជីឯកសារថ្មីៗ។';
-// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
-// around it.
 $ec_lang['lpn_tab_new']='គម្រោងថ្មី';
 $ec_lang['lpn_tab_all']='គម្រោងទាំងអស់';
 $ec_lang['lpn_tab_menu']='ម៉ឺនុយគម្រោង';
@@ -747,20 +659,10 @@ $ec_lang['lpn_tab_move_right']='ផ្លាស់ទីទៅស្ដាំ';
 $ec_lang['lpn_tab_unsaved']='មិនទាន់រក្សាទុកទៅឯកសារ';
 $ec_lang['lpn_import_bad_file']='ឯកសារនោះមិនអាចអានជាគម្រោងដែលរក្សាទុកពីទំព័រនេះបានទេ។';
 $ec_lang['lpn_import_no_room']='ទំហំផ្ទុករបស់កម្មវិធីរុករកមិនគ្រប់គ្រាន់ដើម្បីបន្ថែមគម្រោងនេះទេ។ សូមលុបគម្រោងដែលអ្នកលែងត្រូវការ រួចសាកល្បងម្ដងទៀត។';
-// ---- EPANET .inp import (ROADMAP Task 196) ----
-// The import REPORTS every difference between the file and what this page can hold, so each
-// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
-// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
-// another sentence, and none may become one.
-// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
-// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='យល់ព្រម';
 $ec_lang['lpn_file_import_inp']='នាំចូលឯកសារ EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='អានបណ្ដាញចេញពីឯកសារ EPANET ទាំងឯកសារអត្ថបទ .inp ឬឯកសារ .net ដែល EPANET រក្សាទុក រួចរក្សាទុកវានៅក្នុងកម្មវិធីរុករកនេះជាគម្រោងថ្មី។ ទំព័រនេះមិនអាចសរសេរឯកសារ EPANET ត្រឡប់វិញបានទេ ដូច្នេះសូមប្រើឯកសារ, រក្សាទុកជា ដើម្បីរក្សាទុកការងាររបស់អ្នក។';
 $ec_lang['lpn_inp_bad_file']='ឯកសារនោះមិនអាចអានជាឯកសារបណ្ដាញ EPANET បានទេ។';
-// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
-// the way out named here always works, so keep the instruction in the message rather than leaving
-// the reader to guess.
 $ec_lang['lpn_net_bad_file']='នេះមើលទៅដូចជាឯកសារ .net របស់ EPANET ប៉ុន្តែទំព័រនេះមិនអាចអានវាបានទេ។ សូមបើកវានៅក្នុង EPANET ហើយប្រើពាក្យបញ្ជាឯកសារ, នាំចេញ, បណ្ដាញ នៅទីនោះ ដើម្បីរក្សាទុកជាឯកសារ .inp រួចនាំចូលឯកសារនោះ។';
 $ec_lang['lpn_inp_report_heading']='បាននាំចូល {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} ថ្នាំង អាងស្តុក និងធុងទឹក, {links} បំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់, គិតជា {units}។';
@@ -783,44 +685,11 @@ $ec_lang['lpn_inp_drop_quality']='គុណភាពទឹក ប្រតិក
 $ec_lang['lpn_inp_drop_backdrop']='ឯកសារនេះហៅឈ្មោះរូបភាពផ្ទៃខាងក្រោយមួយ ប៉ុន្តែមិនផ្ទុករូបភាពនោះខ្លួនឯងទេ។ សូមបន្ថែមវាដោយខ្លួនអ្នកតាមរយៈ ឯកសារ, រូបភាពផ្ទៃខាងក្រោយ, បន្ថែមរូបភាព។';
 $ec_lang['lpn_inp_drop_dangling']='បំពង់ទាំងនេះហៅឈ្មោះថ្នាំងមួយដែលមិននៅក្នុងឯកសារ ដូច្នេះវាត្រូវបានលុបចោល។';
 $ec_lang['lpn_inp_drop_units']='ខ្នាតវាស់លំហូរដែលមានឈ្មោះនៅក្នុងឯកសារនេះ មិនមែនជាខ្នាតដែលទំព័រនេះស្គាល់ទេ ដូច្នេះលេខទាំងអស់ត្រូវបានអានជាហ្គាឡុងក្នុងមួយនាទី។ សូមពិនិត្យលេខគ្រប់ចំនួន មុននឹងប្រើចម្លើយទាំងនោះ។';
-// {name} is a project name; word order is the translator's to choose. Says where the user landed,
-// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
-// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='បានបើក {name} ពីឯកសារមួយ ហើយបានបន្ថែមវាទៅកម្មវិធីរុករកនេះជាគម្រោងថ្មី។';
-// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
-// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
-// browser they test in. That is expected, not a bug.
-// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='ឯកសារគម្រោង';
-// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot connect to a file, so every press really is another copy in the downloads folder.
-// The label says which of the two you are getting rather than leaving the duplicate looking like a
-// bug.
-// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
-// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
-// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
-// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
-// notice after the act -- at the moment the question arises -- rather than in a label forever.
-// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
-// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
-// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
-// anyway -- a disabled button fires no mouse events.
-// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
-// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
-// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
-// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
-// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='កម្មវិធីរុករកនេះមិនអាចភ្ជាប់ទៅឯកសារបានទេ ដូច្នេះការបើកឯកសារនៅទីនេះគឺជាការផ្ទុកឡើងជាក់ស្ដែង៖ គម្រោងត្រូវបានចម្លងចូលទៅកម្មវិធីរុករកនេះ ហើយមធ្យោបាយតែមួយគត់ដើម្បីរក្សាទុកការងាររបស់អ្នកត្រឡប់ទៅឯកសារវិញគឺសរសេរជាន់ពីលើឯកសារនោះដោយប្រើ ឯកសារ, រក្សាទុកជា។';
-// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
-// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='រក្សាទុកទៅឯកសារដែលបានភ្ជាប់។';
 $ec_lang['lpn_file_saveas_tip']='ជ្រើសរើសឯកសារមួយដើម្បីរក្សាទុក។ គម្រោងនេះភ្ជាប់ទៅឯកសារនោះ ហើយរក្សាទុកនឹងសរសេរទៅវាចាប់ពីពេលនោះតទៅ។';
-// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
-// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
-// is no API for it, and the download attribute cannot override the setting -- but the user can turn
-// that setting on themselves, and then Save as really does let them overwrite the file they started
-// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
-// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='រក្សាទុកដោយប្រើការកំណត់ទាញយករបស់កម្មវិធីរុករករបស់អ្នក។ កម្មវិធីរុករកនេះមិនអាចភ្ជាប់ទៅឯកសារបានទេ ដូច្នេះរក្សាទុកត្រូវបានបិទ ហើយមានតែរក្សាទុកជាទេដែលអាចប្រើបាន។ បើអ្នកបើកការកំណត់កម្មវិធីរុករក "សួរកន្លែងរក្សាទុកសម្រាប់ឯកសារនីមួយៗ" អ្នកអាចជ្រើសរើសឯកសារដើម ហើយសរសេរជាន់ពីលើវា។';
 $ec_lang['lpn_status_uploaded']='ឯកសារគម្រោងត្រូវបានផ្ទុកឡើង។ គ្មានការភ្ជាប់ណាមួយអាចរក្សាបានទេ ដូច្នេះមធ្យោបាយតែមួយគត់ដើម្បីរក្សាទុកត្រឡប់ទៅវាវិញគឺដោយប្រើ ឯកសារ, រក្សាទុកជា។';
 $ec_lang['lpn_status_downloaded']='បានទាញយក {file}។ កម្មវិធីរុករកនេះមិនអាចភ្ជាប់ទៅឯកសារបានទេ ដូច្នេះគម្រោងនេះនៅតែសម្គាល់ថាមិនទាន់រក្សាទុកទៅឯកសារ។';
@@ -829,45 +698,18 @@ $ec_lang['lpn_status_already_open']='ឯកសារនោះកំពុងប�
 $ec_lang['lpn_status_already_open_dirty']='ឯកសារនោះកំពុងបើកនៅទីនេះជា {name} រួចហើយ ជាមួយការផ្លាស់ប្ដូរដែលអ្នកមិនទាន់រក្សាទុកទៅវា។ នេះបានប្ដូរទៅវាជាជាងបើកច្បាប់ចម្លងទីពីរ។ ប្រើ ឯកសារ, ត្រឡប់មកវិញ បើអ្នកចង់បានកំណែនៅលើថាសវិញ។';
 $ec_lang['lpn_status_saved']='បានរក្សាទុក {file}។';
 $ec_lang['lpn_status_reverted']='បានផ្ទុក {file} ម្ដងទៀតពីថាស។';
-// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
-// purpose: a program that writes your file behind your back takes away your right to walk away from
-// a session. So these three carry the whole close/discard/revert conversation.
-// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_confirm']='រក្សាទុកការផ្លាស់ប្ដូររបស់អ្នកទៅ {name} មុននឹងបិទវាទេ?';
-// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
-// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_confirm']='{name} ត្រូវបានរក្សាទុកនៅក្នុងកម្មវិធីរុករកនេះតែប៉ុណ្ណោះ។ បើអ្នកបិទវាដោយមិនរក្សាទុកទៅឯកសារមួយ វានឹងបាត់អស់កល្បជានិច្ច។';
 $ec_lang['lpn_close_discard']='បិទដោយមិនរក្សាទុក';
 $ec_lang['lpn_cancel']='បោះបង់';
 $ec_lang['lpn_revert_confirm']='បោះបង់ការផ្លាស់ប្ដូរដែលអ្នកបានធ្វើ ហើយផ្ទុក {file} ម្ដងទៀតពីថាសមែនទេ?';
-// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
-// page load, so the link is gone even though we still know the name. Says what to do, not just what
-// happened.
 $ec_lang['lpn_file_needs_reopen']='គម្រោងនេះមកពី {file} ប៉ុន្តែការភ្ជាប់ទៅឯកសារនោះបានបាត់ទៅហើយ។ សូមជ្រើសរើសឯកសារនោះម្ដងទៀត ដើម្បីភ្ជាប់ទៅវា។';
-// Says what is still safe before it says what failed: the reassurance is the part a worried user
-// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='មិនអាចសរសេរទៅឯកសារបានទេ។ វាប្រហែលជាត្រូវបានផ្លាស់ទី ប្ដូរឈ្មោះ ឬសិទ្ធិត្រូវបានដកហូតវិញ។ ការងាររបស់អ្នកនៅតែត្រូវបានរក្សាទុកនៅក្នុងកម្មវិធីរុករកនេះ។';
 $ec_lang['lpn_file_changed_elsewhere']='មានគេផ្សេងទៀតបានរក្សាទុកទៅឯកសារនេះចាប់តាំងពីអ្នកបានបើកវា ដូច្នេះការរក្សាទុកឥឡូវនេះនឹងសរសេរជាន់ពីលើការងាររបស់ពួកគេ។ ប្រើ ឯកសារ, រក្សាទុកជា ដើម្បីរក្សាការផ្លាស់ប្ដូររបស់អ្នកនៅក្នុងឯកសារផ្ទាល់ខ្លួន ឬ ឯកសារ, ត្រឡប់មកវិញ ដើម្បីបោះបង់ការផ្លាស់ប្ដូររបស់អ្នក ហើយផ្ទុករបស់ពួកគេវិញ។';
-// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
-// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
-// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-// Initials, and said to be public: whoever opens the same file sees this name, including outside the
-// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
-// rather than a name makes the safe answer the obvious one.
-// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
-// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='តើមិត្តរួមការគួរឃើញអ្វី នៅពេលអ្នកបើកគម្រោងនេះ? អក្សរកាត់ឈ្មោះរបស់អ្នកគឺល្អបំផុត។ អ្នកណាដែលបើកឯកសារដូចគ្នាអាចឃើញវាបាន ដូច្នេះកុំប្រើអ្វីឯកជន។';
-// The stand-in when someone locked a project before giving a name. Reads in place of {name}
-// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='អ្នកណាម្នាក់ផ្សេងទៀត';
-// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
-// moment of opening, with both real answers on it -- the way every drawing and document program has
-// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} កំពុងបើកឯកសារនេះ។';
 $ec_lang['lpn_lock_open_readonly']='បើកបានតែអានប៉ុណ្ណោះ';
-// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
-// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
-// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='បង្កើតច្បាប់ចម្លងមួយ';
 $ec_lang['lpn_lock_break']='បំបែកសោរបស់ពួកគេ';
 $ec_lang['lpn_lock_open_heading_times']='{name} កំពុងបើកឯកសារនេះ ការកែប្រែចុងក្រោយគឺ {x} មុន ហើយ {y} បន្ទាប់ពីការរក្សាទុកចុងក្រោយ។';
@@ -880,59 +722,26 @@ $ec_lang['lpn_ago_minutes']='{n} នាទី';
 $ec_lang['lpn_ago_hours']='{n} ម៉ោង';
 $ec_lang['lpn_ago_days']='{n} ថ្ងៃ';
 $ec_lang['lpn_ago_unknown']='ពេលវេលាមិនស្គាល់';
-// Read-only means read-only: it never turns itself back into an editable file while you are looking
-// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
-// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
-// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='បានតែអាន៖ {name} កំពុងបើកឯកសារនេះ។ អ្នកអាចផ្លាស់ប្ដូរអ្វីៗនៅទីនេះបានតាមចិត្ត ប៉ុន្តែអ្នកមិនអាចរក្សាទុកបានទេ។ ប្រើ ឯកសារ, រក្សាទុកជា ដើម្បីរក្សាទុកទៅឯកសារផ្សេង។';
-// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
-// stops a colleague editing the same file. Editing still works -- an unreachable server must never
-// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
-// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='ប្រយ័ត្ន៖ មិនអាចទាក់ទងម៉ាស៊ីនមេដើម្បីពិនិត្យ ឬបង្កើតសោលើគម្រោងនេះបានទេ ដូច្នេះគ្មានអ្វីរារាំងមិត្តរួមការពីការកែប្រែឯកសារដូចគ្នានៅពេលតែមួយទេ។ អ្នកនឹងត្រូវបានប្រាប់ ប្រសិនបើការចាក់សោចាប់ផ្ដើមដំណើរការឡើងវិញ។';
 $ec_lang['lpn_lock_storage_error']='ប្រយ័ត្ន៖ គេហទំព័រនេះមិនអាចរក្សាទុកកំណត់ត្រាសោបានទេ ដូច្នេះគ្មានអ្វីរារាំងមិត្តរួមការពីការកែប្រែឯកសារដូចគ្នានៅពេលតែមួយទេ។ នេះជាកំហុសក្នុងការដំឡើងនៅលើម៉ាស៊ីនមេ មិនមែនអ្វីដែលអ្នកអាចជួសជុលនៅទីនេះទេ — ថតសោមិនអាចសរសេរបានដោយម៉ាស៊ីនមេគេហទំព័រ។';
 $ec_lang['lpn_lock_full_error']='ប្រយ័ត្ន៖ គេហទំព័រនេះអស់ទំហំសម្រាប់កត់ត្រាថាអ្នកណាកំពុងបើកគម្រោងណា ដូច្នេះគ្មានអ្វីរារាំងមិត្តរួមការពីការកែប្រែឯកសារដូចគ្នានៅពេលតែមួយទេ។ នេះជាកំហុសក្នុងការដំឡើងនៅលើម៉ាស៊ីនមេ មិនមែនអ្វីដែលអ្នកអាចជួសជុលនៅទីនេះទេ។';
 $ec_lang['lpn_lock_not_asked']='ការចាក់សោមិនកំពុងដំណើរការសម្រាប់គម្រោងនេះទេ ដូច្នេះគ្មានអ្វីរារាំងមិត្តរួមការពីការកែប្រែឯកសារដូចគ្នានៅពេលតែមួយទេ។ កម្មវិធីរុករកនេះមិនទាន់មានឈ្មោះកត់ត្រាសម្រាប់អ្នកនៅឡើយ ឬគម្រោងគ្មានលេខសម្គាល់ទេ — ការរក្សាទុកគម្រោងទៅឯកសារកំណត់ទាំងពីរនេះ។';
 $ec_lang['lpn_lock_restored']='ការចាក់សោកំពុងដំណើរការឡើងវិញ ហើយឯកសារនេះឥឡូវនេះជារបស់អ្នកសម្រាប់រក្សាទុក។';
 $ec_lang['lpn_lock_dismiss']='លាក់សារនេះ';
-// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
-// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
-// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='គម្រោងរបស់អ្នកនឹងត្រូវបានរក្សាទុកនៅក្នុងឯកសារមួយនៅលើកុំព្យូទ័រនេះ។ វាត្រូវបានរក្សាទុកនៅពេលអ្នកសុំ ហើយពុំមានពេលណាផ្សេងទៀតទេ ដូច្នេះគ្មានអ្វីត្រូវបានសរសេរទៅឯកសារនោះដោយអ្នកមិនដឹងខ្លួនទេ។';
 $ec_lang['lpn_file_training_2']='ដើម្បីកុំឲ្យមនុស្សពីរនាក់កែប្រែឯកសារតែមួយក្នុងពេលតែមួយ គេហទំព័រនេះកត់ត្រាថាអ្នកណាកំពុងបើកវា។ ប្រសិនបើអ្នកណាម្នាក់កំពុងបើកវារួចហើយ អ្នកនៅតែអាចបើក និងមើលវាបាន ឬរក្សាទុកច្បាប់ចម្លងផ្ទាល់ខ្លួន។';
-// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
-// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
-// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
-// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
-// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='លើកទីមួយដែលអ្នករក្សាទុក កម្មវិធីរុករករបស់អ្នកនឹងសួរថាតើគេហទំព័រនេះអាចកែប្រែឯកសារនោះបានឬទេ។ សំណួរនោះមកពីកម្មវិធីរុករក មិនមែនមកពីយើងទេ ហើយការឆ្លើយថាបានគឺជាអ្វីដែលអនុញ្ញាតឲ្យរក្សាទុកសរសេរការងាររបស់អ្នកត្រឡប់ទៅវិញ។ ជាធម្មតាវាត្រូវបានសួរតែម្ដងគត់ក្នុងមួយឯកសារ។';
-// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
-// false -- the name is never written into the project file. It is held in this browser and on this
-// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
-// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='ផ្ដល់ឈ្មោះខ្លីមួយដែលមិត្តរួមការរបស់អ្នកនឹងស្គាល់អ្នក។ អក្សរកាត់ឈ្មោះរបស់អ្នកគឺល្អបំផុត។ អ្នកណាដែលបើកឯកសារដូចគ្នាអាចឃើញវាបាន ដូច្នេះកុំប្រើអ្វីឯកជន។';
 $ec_lang['lpn_file_training_name']='អក្សរកាត់ឈ្មោះរបស់អ្នក';
 $ec_lang['lpn_file_training_continue']='បន្ត';
-// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
-// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='ជ្រើសរើសឯកសារម្ដងទៀត';
 $ec_lang['lpn_file_reconnect']='ភ្ជាប់ទៅឯកសារនេះឡើងវិញ';
 $ec_lang['lpn_file_reconnect_alert']='គម្រោងនេះមកពី {file}។ កម្មវិធីរុករករបស់អ្នកត្រូវការសិទ្ធិពីអ្នកម្ដងទៀត មុននឹងអាចសរសេរទៅវាបាន។ ភ្ជាប់ឡើងវិញខាងក្រោម។';
-// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
-// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='នោះជាឯកសារដូចគ្នាដែលអ្នកណាម្នាក់ផ្សេងទៀតកំពុងបើក ដូច្នេះមិនអាចរក្សាទុកជាន់ពីលើវាបានទេ។ ជ្រើសរើសឯកសារ ឬឈ្មោះផ្សេង។';
 $ec_lang['lpn_saveas_overwrites_project']='ឯកសារនោះកំពុងផ្ទុកគម្រោងផ្សេងមួយរួចហើយ គឺ {name}។ ការរក្សាទុកនៅទីនេះនឹងជំនួសវាទាំងស្រុង។ បន្តទេ?';
 $ec_lang['lpn_saveas_overwrites_newer']='ឯកសារនោះបានផ្លាស់ប្ដូរចាប់តាំងពីអ្នកបានឃើញវាចុងក្រោយ ដូច្នេះស្ទើរតែប្រាកដថាមានអ្នកណាម្នាក់ផ្សេងទៀតបានរក្សាទុកទៅវារួចហើយ។ ការរក្សាទុកនៅទីនេះនឹងជំនួសកំណែរបស់ពួកគេដោយកំណែរបស់អ្នក។ បន្តទេ?';
-// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
-// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
-// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
-// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='ឈ្មោះសម្រាប់គម្រោងនេះ';
-// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
-// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
-// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
-// separate Delete for it to be confused with.)
-// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='បានបិទ {closed}។ ឥឡូវនេះកំពុងបង្ហាញ {opened}។';
 $ec_lang['lpn_status_closed_empty']='បានបិទ {closed}។ បានចាប់ផ្ដើមគម្រោងទទេថ្មីមួយ។';
 $ec_lang['lpn_storage_full']='មិនបានរក្សាទុកទេ។ ទំហំផ្ទុករបស់កម្មវិធីរុករកពេញ ឬមិនអាចប្រើបាន ដូច្នេះការផ្លាស់ប្ដូរថ្មីៗរបស់អ្នកនឹងបាត់ នៅពេលអ្នកបិទផ្ទាំងនេះ។';
@@ -942,12 +751,6 @@ $ec_lang['lpn_notes_2_term']='មិនធ្វើគំរូ';
 $ec_lang['lpn_notes_2_def']='គុណភាពទឹក និងតម្រូវការដែលផ្លាស់ប្ដូរពេញមួយថ្ងៃ មិនត្រូវបានធ្វើគំរូទេ។ ចំពោះវ៉ាល់៖ វ៉ាល់ត្រួតពិនិត្យរបាំងលំហូរដំណើរការនៅក្នុងឧបករណ៍ដោះស្រាយណាមួយ ចំណែកឯវ៉ាល់ដែលបើក និងបិទដោយខ្លួនឯង (PRV, PSV, FCV) ត្រូវបានដោះស្រាយដោយឧបករណ៍ដោះស្រាយ EPANET ដែលទំព័រនេះបើកដោយខ្លួនឯង នៅពេលបណ្ដាញរបស់អ្នកមានវ៉ាល់ប្រភេទនេះ។';
 $ec_lang['lpn_notes_3_term']='ការរក្សាទុកគម្រោង';
 $ec_lang['lpn_notes_3_def']='គម្រោងនីមួយៗគឺជាផ្ទាំងមួយ ហើយផ្ទាំងនីមួយៗត្រូវបានរក្សាទុកនៅក្នុងកម្មវិធីរុករកនេះខណៈពេលអ្នកធ្វើការ។ ការជម្រះទិន្នន័យកម្មវិធីរុករករបស់អ្នកលុបវាទាំងអស់ ដូច្នេះសូមរក្សាការងាររបស់អ្នកនៅក្នុងឯកសារមួយ៖ ឯកសារ, រក្សាទុកជា។ សញ្ញាផ្កាយ (*) នៅលើផ្ទាំងមួយមានន័យថាវាផ្ទុកការផ្លាស់ប្ដូរដែលមិននៅក្នុងឯកសារ។ គ្មានអ្វីត្រូវបានសរសេរទៅឯកសារឡើយ លុះត្រាតែអ្នកសុំ។ នៅក្នុងកម្មវិធីរុករកខ្លះ គម្រោងមួយភ្ជាប់ទៅឯកសារដែលអ្នករក្សាទុកវា ហើយ ឯកសារ, រក្សាទុក សរសេរត្រឡប់ទៅឯកសារដដែលនោះចាប់ពីពេលនោះតទៅ; នៅក្នុងកម្មវិធីរុករកផ្សេងទៀត គ្មានការភ្ជាប់អាចធ្វើទៅបានទេ ដូច្នេះរក្សាទុកត្រូវបានបិទ ហើយមានតែរក្សាទុកជាទេដែលអាចប្រើបាន។ នៅពេលឯកសារគម្រោងមួយត្រូវបានរក្សានៅលើដ្រាយវ៍ដែលចែករំលែក ទំព័រនេះប្រាប់អ្នកថាតើមិត្តរួមការណាមួយកំពុងបើកវារួចហើយឬអត់ ដើម្បីកុំឲ្យមនុស្សពីរនាក់សរសេរជាន់លើគ្នា។';
-// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
-// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
-// to stay readable on a phone, while the Notes section is already this page's documentation home,
-// prints with the page, and is translated with everything else. The popup carries a one-line
-// pointer to here instead (lpn_pump_curve_note).
-// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='ខ្សែកោងម៉ាស៊ីនបូម';
 $ec_lang['lpn_notes_5_def']='ម៉ាស៊ីនបូមមួយធ្វើតាម H = H₀ − aQ^b ដែល H ជាថ្ពល់ដែលម៉ាស៊ីនបូមបន្ថែម ហើយ Q ជាលំហូរឆ្លងកាត់វា។ បញ្ចូលមួយ ពីរ ឬបីចំណុចពីខ្សែកោងរបស់ក្រុមហ៊ុនផលិត។ បីចំណុច — ថ្ពល់ត្រង់លំហូរសូន្យ ចំណុចធ្វើការធម្មតា និងចំណុចលំហូរខ្ពស់បំផុត — សម្របទៅ H₀, a និង b ដោយផ្ទាល់ ហើយតាមខ្សែកោងដែលបានបោះពុម្ពស្អិតបំផុត។ ពីរចំណុចសម្របទៅប៉ារ៉ាបូល (b = 2) ដែលកំពូលរបស់វានៅត្រង់លំហូរសូន្យ។ ចំណុចមួយប្រើក្បួនធម្មតា៖ ថ្ពល់ត្រង់លំហូរសូន្យគឺ ១.៣៣ × ថ្ពល់ដែលអ្នកបញ្ចូល ហើយលំហូរខ្ពស់បំផុតគឺ ២ × លំហូរដែលអ្នកបញ្ចូល ដែលផ្ដល់ b = 2 ដដែល។ ម៉ាស៊ីនបូមមួយដែលគ្មានចំណុចត្រូវបានបញ្ចូលមិនបន្ថែមថ្ពល់ទាល់តែសោះ។ ខ្សែកោងមិនត្រូវបានកាត់ចេញត្រង់ចំណុចដែលថ្ពល់ឈានដល់សូន្យទេ ដូច្នេះការសុំម៉ាស៊ីនបូមឲ្យផ្ដល់លំហូរច្រើនជាងអ្វីដែលខ្សែកោងរបស់វាអាចផ្ដល់បាន ផ្ដល់ថ្ពល់អវិជ្ជមាន។ ដំណោះស្រាយគឺម៉ាស៊ីនបូមធំជាង ឬតម្រូវការតូចជាង មិនមែនការសម្របខ្សែកោងផ្សេងទេ។';
 $ec_lang['lpn_notes_4_term']='ការបន្ថែមដែលបានគ្រោងទុក';
@@ -961,24 +764,12 @@ $ec_lang['lpn_diag_dangling_link']='បំពង់ ឬម៉ាស៊ីនប�
 $ec_lang['lpn_diag_unreachable']='ថ្នាំងទាំងនេះគ្មានផ្លូវទៅអាងស្តុកទេ៖';
 $ec_lang['lpn_diag_not_converged']='រកមិនឃើញដំណោះស្រាយទេ។ សូមពិនិត្យរកតម្លៃដែលមិនអាចមានក្នុងជីវិតពិត ដូចជាអង្កត់ផ្ចិតសូន្យ។';
 $ec_lang['lpn_field_roughness']='ភាពរដិបរដុប';
-// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
-// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
-// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C។ លេខខ្ពស់ជាងមានន័យថាបំពង់រលោងជាង៖ ប្រហែល ១៥០ សម្រាប់ប្លាស្ទិកថ្មី ១៣០ សម្រាប់ដែក ឬដែកថ្មី និង ១០០ សម្រាប់បំពង់ចាស់។';
 $ec_lang['lpn_field_length']='ប្រវែង';
 $ec_lang['lpn_field_length_tip']='ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។';
-// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
-// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
-// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='មេគុណការបាត់បង់មូលដ្ឋាន, k';
 $ec_lang['lpn_field_km_tip']='ការបាត់បង់ពីកែង វ៉ាល់ និងគ្រឿងបំពាក់នៅលើបំពង់នេះ រាប់ជាចំនួនគុណនៃថ្ពល់ល្បឿន។ ប្រើ ០ សម្រាប់បំពង់ត្រង់ធម្មតា។';
-// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
-// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
-// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
-// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='ការបាត់បង់មូលដ្ឋាន, k';
-// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
-// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='ប្រភពខ្សែកោង';
 $ec_lang['lpn_pump_curve_own']='បញ្ចូលចំណុចខាងក្រោម';
 $ec_lang['lpn_pump_curve_ref_note']='កំពុងប្រើខ្សែកោងដែលបានបញ្ចូលសម្រាប់ម៉ាស៊ីនបូម {id}។';
@@ -986,23 +777,13 @@ $ec_lang['lpn_pump_curve_note']='មួយ ពីរ ឬបីចំណុច �
 $ec_lang['lpn_pump_point1']='ចំណុច ១';
 $ec_lang['lpn_pump_point2']='ចំណុច ២';
 $ec_lang['lpn_pump_point3']='ចំណុច ៣';
-// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
-// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
-// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='របៀប៖ ជ្រើសរើស។ ចុចធាតុ ឬស្លាកមួយដើម្បីមើល ឬផ្លាស់ប្ដូរវា។ អូសដើម្បីផ្លាស់ទីថ្នាំង ចំណុចកោង ឬស្លាកមួយ។ ចុចទ្វេដងលើបំពង់ដើម្បីបន្ថែម ឬដកចំណុចកោង។';
 $ec_lang['lpn_mode_delete']='របៀប៖ លុប។ ចុចធាតុមួយដើម្បីលុបវា។';
 $ec_lang['lpn_mode_add_junction']='របៀប៖ បន្ថែមថ្នាំង។ ចុចលើផែនទីដើម្បីដាក់ថ្នាំងមួយ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
 $ec_lang['lpn_mode_add_reservoir']='របៀប៖ បន្ថែមអាងស្តុក។ ចុចលើផែនទីដើម្បីដាក់អាងស្តុកមួយ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
 $ec_lang['lpn_mode_add_pipe']='របៀប៖ បន្ថែមបំពង់។ ចុចថ្នាំងមួយ រួចថ្នាំងមួយទៀត ដើម្បីភ្ជាប់វា។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
 $ec_lang['lpn_mode_add_pump']='របៀប៖ បន្ថែមម៉ាស៊ីនបូម។ ចុចថ្នាំងមួយ រួចថ្នាំងមួយទៀត ដើម្បីភ្ជាប់វា។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
-// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
-// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='របៀប៖ បន្ថែមអក្សរ។ ចុចលើផែនទីដើម្បីដាក់ស្លាកអក្សរមួយ។ ចុចជិតថ្នាំងមួយដើម្បីភ្ជាប់អក្សរនោះទៅថ្នាំងនោះ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
-// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
-// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
-// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
-// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
-// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='ប្រើរបៀបនេះដើម្បីផ្លាស់ប្ដូរ ផ្លាស់ទី និងអូសរបស់របស់នៅលើផែនទី។';
 $ec_lang['lpn_tip_labels_draggable']='អ្នកអាចអូសស្លាកមួយដើម្បីផ្លាស់ទីវា។ ចុចទ្វេដងលើស្លាកមួយដើម្បីបញ្ជូនវាត្រឡប់ទៅទីតាំងស្វ័យប្រវត្តិរបស់វា។';
 $ec_lang['lpn_field_auto']='ស្វ័យប្រវត្តិ';
@@ -1018,9 +799,6 @@ $ec_lang['lpn_labels_mark_extrema_tip']='គូរបន្ទាត់មួយ
 $ec_lang['lpn_field_id']='លេខសម្គាល់';
 $ec_lang['lpn_backdrop_menu']='រូបភាពផ្ទៃខាងក្រោយ…';
 $ec_lang['lpn_backdrop_add']='បន្ថែម';
-// Bare verbs (Add/Move/Remove/Scale...), not "...image": the menu heading lpn_backdrop_menu
-// ("Background image...") already carries the object, so repeating "image" on every command
-// reads as an oversight, not as clarity.
 $ec_lang['lpn_backdrop_scale']='កំណត់មាត្រដ្ឋានដោយចុចចំណុច';
 $ec_lang['lpn_backdrop_scale_entry']='កំណត់មាត្រដ្ឋានតាមឯកសារកូអរដោនេផែនទី ឬតាមទំហំភីកសែលមួយលើផែនទី';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='បញ្ចូលទំហំភីកសែលមួយលើផែនទី ឬបិទភ្ជាប់មាតិកាពេញលេញនៃឯកសារកូអរដោនេផែនទីសម្រាប់រូបភាព';
@@ -1057,8 +835,6 @@ $ec_lang['lpn_push_none_displayed']='គ្មានតម្លៃចាប់�
 $ec_lang['lpn_push_nothing']='គ្មានធាតុមានស្រាប់ណាមួយមានលក្ខណៈសម្បត្តិណាមួយក្នុងចំណោមដែលកំពុងអនុវត្តទេ។';
 $ec_lang['lpn_push_no_change']='ធាតុគ្រប់យ៉ាងមានតម្លៃទាំងនេះរួចហើយ ដូច្នេះគ្មានអ្វីនឹងផ្លាស់ប្ដូរទេ។';
 $ec_lang['lpn_settings_emitter_exponent']='និទស្សន្តកន្លែងលេច';
-// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
-// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='ការគណនា';
 $ec_lang['lpn_settings_tolerance']='ភាពអត់ធ្មត់នៃការសម្រុះសម្រួល';
 $ec_lang['lpn_settings_tolerance_tip']='ថាតើឧបករណ៍ដោះស្រាយត្រូវជិតប៉ុណ្ណាមុននឹងឈប់។ លេខតូចជាងមានភាពត្រឹមត្រូវជាង ប៉ុន្តែចំណាយពេលច្រើនជាង។';
@@ -1068,20 +844,11 @@ $ec_lang['lpn_engine_loading']='កំពុងផ្ទុកឧបករណ៍
 $ec_lang['lpn_engine_failed']='មិនអាចផ្ទុកឧបករណ៍ដោះស្រាយ EPANET បានទេ។ កំពុងបង្ហាញឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយជំនួសវិញ។';
 $ec_lang['lpn_engine_manning_note']='ចំណាំ៖ ជាមួយភាពក្រញ៉ោងម៉ាន់នីង EPANET គណនាការបាត់បង់ថ្ពល់ទាបជាងឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយប្រហែល ០.៦%។';
 $ec_lang['lpn_settings_text_size']='ទំហំអក្សរ (ភិចសែល)';
-// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
-// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
-// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='ទំហំសញ្ញា (ភិចសែល)';
-// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
-// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='ភាពស្រអាប់សញ្ញា (០ ដល់ ១)';
-// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
-// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='ភាពស្រអាប់រូបភាពផ្ទៃខាងក្រោយ (០ ដល់ ១)';
 $ec_lang['lpn_settings_map_display']='រូបរាងផែនទី';
 $ec_lang['lpn_settings_map_height_px']='កម្ពស់ផែនទី (ភិចសែលអេក្រង់)';
-// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
-// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='នៅលើអេក្រង់តូច ផែនទីត្រូវបានគូរខ្លីជាងនេះ ដើម្បីឲ្យផ្នែកនោះនៃទំព័រនៅតែអាចរំកិលបានជានិច្ច។';
 $ec_lang['lpn_settings_legend_position']='ទីតាំងតារាងសញ្ញា';
 $ec_lang['lpn_settings_legend_top_left']='កំពូលឆ្វេង';
@@ -1094,7 +861,6 @@ $ec_lang['lpn_confirm_restore_defaults']='កំណត់ការកំណត�
 $ec_lang['lpn_settings_wipe_btn']='លុបអ្វីៗទាំងអស់នៅលើទំព័រនេះ';
 $ec_lang['lpn_confirm_wipe']='លុបអ្វីៗទាំងអស់ដែលបានរក្សាទុកសម្រាប់ទំព័រនេះ — គម្រោងគ្រប់មួយ រូបភាពផ្ទៃខាងក្រោយគ្រប់មួយ ការកំណត់ទាំងអស់ និងជម្រើសខ្នាតវាស់របស់អ្នក — រួចផ្ទុកទំព័រឡើងវិញដូចអ្នកចូលមើលថ្មីម្នាក់នឹងឃើញមែនទេ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។';
 
-// Sprint 316: storage tanks, control valves, and scenarios (Khmer)
 $ec_lang['lpn_tool_add_tank']='ធុងទឹក';
 $ec_lang['lpn_tool_add_valve']='វ៉ាល់';
 $ec_lang['lpn_tank_elev_tip']='កម្ពស់បាតធុងទឹក។ ជម្រៅទឹកក្នុងធុងវាស់ឡើងលើពីទីនេះ។';

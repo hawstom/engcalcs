@@ -2,7 +2,6 @@
 
 // 简体中文 — All missing text declarations will fall back to English.
 
-// Units (alphabetical order)
 $ec_lang['u_depthFrac']='比例';
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='平方英尺';
@@ -57,9 +56,6 @@ $ec_lang['u_hp']='hp';
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
 
-// Page text
-// In page order for easiest maintenance.
-// Menu and General
 $ec_lang['menu_brand']='HawsEDC 计算器';
 $ec_lang['menu_main_list']='计算器列表';
 $ec_lang['menu_main_hydraulics']='水力学';
@@ -70,10 +66,6 @@ $ec_lang['template_welcome']='把恐惧留在门外；这里说爱的语言。�
 $ec_lang['template_feedback']='您能否为本页面的措辞提出更好的建议，或者还有别的想法？您想帮忙，还是想学习制作这样的工具？欢迎与我联系。';
 $ec_lang['template_printable_title']='可打印标题';
 $ec_lang['template_printable_subtitle']='可打印副标题';
-// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
-// prose, and they are translated into all 26 languages for one reason: consent that the visitor
-// cannot read is not consent. The long-form privacy notice and terms are a separate question --
-// English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_body']='是否允许我们在此浏览器保存一个数字，用于避免重复记录本页面的访问次数？';
 $ec_lang['consent_accept']='同意本次';
 $ec_lang['consent_accept_all']='同意，以后不再询问';
@@ -105,7 +97,6 @@ $ec_lang['ec_name_tip']='将这些输入值保存到网址中以便书签、历�
 $ec_lang['calc_copy_link']='复制链接';
 $ec_lang['ec_related_calcs']='相关计算器：';
 $ec_lang['calc_copy_link_done']='已复制！';
-// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='达西-韦斯巴赫管道水头损失';
 $ec_lang['dw_main_title']='免费在线达西-韦斯巴赫管道水头损失计算器';
 $ec_lang['dw_main_desc']='在给定管径、粗糙度和流量条件下的达西-韦斯巴赫管道水头损失';
@@ -121,7 +112,6 @@ $ec_lang['dw_regime_transitional']='过渡流';
 $ec_lang['dw_regime_turbulent']='紊流';
 $ec_lang['dw_friction_factor_method']='摩擦系数计算方法';
 $ec_lang['dw_friction_factor']='摩擦系数，f';
-// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='哈森-威廉管道水头损失';
 $ec_lang['hw_main_title']='免费在线哈森-威廉管道水头损失计算器';
 $ec_lang['hw_main_desc']='在给定管径、粗糙度和流量条件下的哈森-威廉管道水头损失';
@@ -139,7 +129,6 @@ $ec_lang['hw_roughness']='哈森-威廉系数，C';
 $ec_lang['hw_note_1']='<dl><dt>本计算器不考虑两端之间的管道高程变化。</dt><dd>计算仅使用您输入的上游和下游高程。若地面在两端之间某处高于两端高程，该最高点处的实际压力将低于本计算器报告的任何压力。请针对从上游端到该最高点的管长重新运行本计算器进行检验。</dd><dd>当测压管水头线低于管道时，管内水处于负压状态。此时空气会从水中析出，薄壁管道可能发生塌陷，脏污地下水也可能从接口处被吸入。应使管线各处保持正压，并考虑在每个最高点设置进排气阀。</dd><dt>上游压力是您提供的边界条件。</dt><dd>可从压力表读取，也可根据水箱水位（管道以上的水深）或水泵特性曲线确定。水泵在流量增大时所提供的压力会降低，因此应使用与上方所输入流量相匹配的曲线上的点。</dd><dt>局部水头损失系数需自行累加。</dt><dd>将管线上每个阀门、弯头、三通、水表和进水口的 K 值相加，并输入其总和。可通过该输入项旁的链接查看典型值。在长距离输水干管中，这些损失相对于沿程摩擦损失而言较小，但在较短的站内管道中，它们可能占损失的大部分。</dd></dl>';
 
 
-// Manning Irregular
 $ec_lang['mi_menu']='曼宁不规则断面明渠';
 $ec_lang['mi_main_title']='免费在线曼宁不规则断面明渠计算器';
 $ec_lang['mi_main_desc']='不规则断面明渠曼宁均匀流计算器';
@@ -167,7 +156,6 @@ $ec_lang['mi_notes_1_term']='综合 n 值';
 $ec_lang['mi_notes_1_def']='本计算器遵循 HEC-RAS 参考手册的方法，采用 Chow（1959）第 136 页公式 6-17（而非 6-18）计算各分区的综合 n 值。';
 $ec_lang['mi_notes_2_term']='石材护坡';
 $ec_lang['mi_notes_2_def']='如需设计护坡石材，请使用曼宁梯形渠道计算器。本计算器更适用于天然断面。';
-// Manning Pipe Flow
 $ec_lang['mpf_main_menu']='曼宁管流';
 $ec_lang['mpf_main_title']='免费在线曼宁管流计算器';
 $ec_lang['mpf_main_desc']='在给定坡度和水深条件下的曼宁公式均匀管流';
@@ -196,7 +184,6 @@ $ec_lang['mpf_solver_enter_positive_q']='请输入正值目标流量 Q。';
 $ec_lang['mpf_solver_no_solution']='无解：在 y/d0 = 93.8% 处，Q 已超过管道通流能力（所选单位下 Qmax = {qmax}）。';
 $ec_lang['mpf_solve_btn']='求解';
 $ec_lang['mpf_solve_for_flow']='对于流量，Q =';
-// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='曼宁管道水头损失';
 $ec_lang['mphl_main_title']='免费在线曼宁管道水头损失计算器';
 $ec_lang['mphl_main_desc']='在给定满流流量条件下的曼宁公式水头损失';
@@ -213,7 +200,6 @@ $ec_lang['mphl_egl_1']='下游能量坡降线';
 $ec_lang['mphl_egl_2']='上游能量坡降线';
 $ec_lang['mphl_hgl_egl_tip']='管道高程较高时可能不适用，详见注释。';
 $ec_lang['mphl_note_1']='<dl><dt>本计算器不模拟两端之间的管道剖面。</dt><dd>若测压管水头线在任一位置低于管顶，本计算结果可能不适用。</dd><dt>对于开口进水口（涵洞）情况，需检验进口控制条件。</dt><dd>1. 上游测压管水头线不得低于上游正常水深处高程（也不得低于管顶！）。</dd><dd>2. 涵洞水位更宜用上游能量坡降线而非测压管水头线表示。</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>（美国联邦公路管理局提供的免费涵洞计算程序）进行简单标准涵洞水位计算的方法。</dd><dd>4. 本页仅求解出流控制情况：管道满流，由下游条件决定水头。涵洞设计的任务是判断进流控制还是出流控制起控制作用，因此在两者都可能起作用时应使用 HY-8。</dd></dl>';
-// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='曼宁梯形渠道';
 $ec_lang['mtc_main_title']='免费在线曼宁公式梯形渠道计算器';
 $ec_lang['mtc_main_desc']='给定坡度和水深条件下的曼宁公式梯形渠道均匀流计算器';
@@ -248,7 +234,6 @@ $ec_lang['mtc_note_1']='<dl><dt>石材粒径与糙率自动迭代设计</dt><dd>
 $ec_lang['mtc_note_2_term']='流速校核';
 $ec_lang['mtc_note_2_def']='流速过高说明存在较大的高程落差，从而产生了较高的比能。该能量可能在扩散段、弯道或障碍物处迅速耗散。请核实这在现场条件下是否合理。';
 $ec_lang['mtc_solver_no_solution']='在当前渠道输入条件下，未找到满足给定流量 Q 的解。';
-// Weir Flow Simple
 $ec_lang['ws_main_menu']='简单堰流';
 $ec_lang['ws_main_title']='免费在线简单宽顶堰流计算器';
 $ec_lang['ws_main_desc']='简单宽顶堰流计算器';
@@ -257,7 +242,6 @@ $ec_lang['ws_headWaterHeight']='<span class="ec-help" title="单位重量水体�
 $ec_lang['ws_weirCoefficient']='堰流系数，C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='注释';
 $ec_lang['ws_notes_we_term']='堰流方程';
-// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='不规则堰流';
 $ec_lang['wi_main_title']='免费在线分段变深不规则堰流计算器';
 $ec_lang['wi_main_desc']='不规则堰流计算器';
@@ -267,7 +251,6 @@ $ec_lang['wi_incrementalFlow']='分段流量';
 $ec_lang['wi_cumulativeFlow']='累计流量';
 $ec_lang['wi_save_and_calculate']='保存并计算';
 $ec_lang['wi_notes_we_def']='q = 若（堰长 = 0）则 0，若（坡度=0）则 cw*堰长*d<sub>0</sub><sup>1.5</sup>，否则 cw/(2.5*坡度) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>)，其中 d<sub>1</sub> 和 d<sub>0</sub> 始终为正值或零';
-// Orifice Flow
 $ec_lang['or_main_menu']='孔口流量';
 $ec_lang['or_main_title']='免费在线孔口流量计算器';
 $ec_lang['or_main_desc']='孔口流量 — 自由出流或淹没出流';
@@ -299,7 +282,6 @@ $ec_lang['or_notes_3_term']='流量系数';
 $ec_lang['or_notes_3_def']='锐缘孔口的 C<sub>d</sub> 约为 0.60–0.65。圆角或内缩入口的值不同。请参考 <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> 或 HEC-RAS 水力学参考手册。';
 $ec_lang['or_notes_4_term']='淹没';
 $ec_lang['or_notes_4_def']='当下游水位高于孔口底部时，计算器自动采用淹没孔口方程，h = HWE − TWE。当下游水位等于或低于孔底时，采用自由出流假定，h = HWE − 形心高程。';
-// Micro-Hydro Power
 $ec_lang['mhp_main_menu']='微型水力发电';
 $ec_lang['mhp_main_title']='免费在线微型水力发电计算器';
 $ec_lang['mhp_main_desc']='径流式微型水力发电功率计算器';
@@ -332,7 +314,6 @@ $ec_lang['mhp_notes_6_def']='微水电中常用的 Pelton 和贯流式水轮机�
 $ec_lang['mhp_notes_7_term']='年发电量';
 $ec_lang['mhp_notes_7_def']='年发电量假设全年满负荷连续运行（8760 小时/年）。实际发电量将因季节性流量变化、维护停机和负荷因子而偏低。';
 
-// Orifice Drain Time
 $ec_lang['odt_main_menu']='池塘与水箱排水时间';
 $ec_lang['odt_main_title']='免费在线池塘、蓄水池和水箱排水时间计算器（孔口）';
 $ec_lang['odt_main_desc']='池塘、蓄水池或水箱排水时间 — 孔口出流，锥体体积法';
@@ -360,10 +341,7 @@ $ec_lang['odt_q_max']='最大流量，Q<sub>max</sub>';
 $ec_lang['odt_vol']='排出水量';
 $ec_lang['odt_sketch_start']='开始';
 $ec_lang['odt_sketch_end']='结束';
-// Contact us.
 
-// Irrigation
-// Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='滴头间距，S<sub>e</sub>';
 $ec_lang['ip_sl']='毛管间距，S<sub>l</sub>';
 $ec_lang['ip_n_e']='每条毛管滴头数，n<sub>e</sub>';
@@ -374,7 +352,6 @@ $ec_lang['ip_pr']='灌水强度，PR';
 $ec_lang['ip_q_lat']='每条毛管流量，Q<sub>lat</sub>';
 $ec_lang['ip_q_sys']='灌区流量，Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='运行时间（小时）';
-// Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='渠道渗漏';
 $ec_lang['cs_main_title']='免费在线渠道渗漏损失与输水效率计算器';
 $ec_lang['cs_main_desc']='渠道渗漏损失 & 输水效率 — 进出流量差值法';
@@ -409,7 +386,6 @@ $ec_lang['cs_notes_2_def']='典型无衬砌土渠：E<sub>c</sub> = 60–80%。�
 $ec_lang['cs_notes_3_term']='衬砌投资回收';
 $ec_lang['cs_notes_3_def']='请输入统一货币单位下的水价值和衬砌成本。衬砌面积 = 渠段长度 × 湿周 — 即测量流量水深处渠道横断面的湿周（渠底宽度加两侧湿润边坡长度）。年回收价值假设衬砌渠道持续达到目标 E<sub>c</sub>。季节性渠道或衬砌未达目标效率时，实际投资回收期将更长。';
 $ec_lang['cs_notes_4_def']='美国垦务局（USBR）<em>量水手册</em>第3版（2001年）。联合国粮农组织灌溉与排水文件第57号（1999年）。';
-// About
 $ec_lang['about_main_menu']='关于';
 $ec_lang['install_main_menu']='安装';
 $ec_lang['install_main_title']='安装 EngCalcs';
@@ -441,7 +417,6 @@ $ec_lang['contactSpamPrefix']='五加一等于';
 $ec_lang['contactSpamPostfix']='（请用英文拼写。1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6）';
 $ec_lang['contactSubmitButton']='发送消息';
 $ec_lang['contact_success']='感谢您抽出宝贵的时间来写信。';
-// Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='块石陡槽设计（Robinson）';
 $ec_lang['rc_main_title']='免费在线块石陡槽设计计算器 — Robinson (1998)';
 $ec_lang['rc_main_desc']='陡槽护坡尺寸设计 — Robinson, Rice & Kadavy (1998)';
@@ -500,12 +475,10 @@ $ec_lang['rc_notes_6_def']='出口段护坡顶面高程应不高于下游渠道�
 $ec_lang['rc_notes_7_def']='当进口渠道正常水深小于通过 q<sub>t</sub> 所需的堰顶水头（H<sub>p</sub>）时，陡槽进口上游将出现受阻壅水。这通常是可以接受的——壅水可降低流速，防止上游冲刷。检验方法：使用堰流计算器，根据给定的 q<sub>t</sub> 和堰顶宽度求出 H<sub>p</sub>，并与进口渠道正常水深比较。若 H<sub>p</sub> 超过正常水深，则将发生壅水。';
 $ec_lang['rc_notes_4_term']='参考文献';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS 亦发布了基于同一方法的 <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel 计算表</a>。';
-// Sketch labels
 $ec_lang['rc_sketch_filter']          = '过滤层';
 $ec_lang['rc_sketch_top_crest_curve'] = '顶部堰顶曲线';
 $ec_lang['rc_sketch_outlet_apron']    = '出口护坦';
 $ec_lang['rc_sketch_radius']          = '半径';
-// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='灌溉压力';
 $ec_lang['ip_main_title']='免费在线灌溉压力与分布均匀度计算器';
 $ec_lang['ip_main_desc']='测试毛管压力与均匀度估算';
@@ -558,7 +531,6 @@ $ec_lang['ip_notes_5_def']='灌水强度和系统/灌区流量采用估计的田
 
 
 
-// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='分支管网';
 $ec_lang['bpn_main_title']='免费在线分支管网（无环路）压力计算器';
 $ec_lang['bpn_main_desc']='分支（树状）管网流量与压力';
@@ -632,18 +604,8 @@ $ec_lang['lpn_field_text_rotation']='角度（度）';
 $ec_lang['lpn_field_text_match_pipe']='转向与最近管道相同的角度';
 $ec_lang['lpn_field_text_flip']='旋转180°';
 $ec_lang['lpn_field_elev']='高程';
-// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
-// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
-// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
-// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='该节点的地面或管道标高。基准面可任意选取，只要所有节点使用同一基准即可。';
-// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
-// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
-// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='水头';
-// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
-// outright that it is a height and not a pressure, which is the exact confusion the glossary's
-// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='水库的水面标高，以高度表示，而非压力。留空则水面标高取节点高程。';
 $ec_lang['lpn_close']='关闭';
 $ec_lang['lpn_empty_hint']='使用"文件"菜单中的"新建项目"打开示例。或者从工具栏开始添加水库、节点和管道。';
@@ -681,10 +643,6 @@ $ec_lang['lpn_units_elevhead']='高程与水头';
 $ec_lang['lpn_units_pressure']='压力';
 $ec_lang['lpn_units_flow']='流量';
 $ec_lang['lpn_units_velocity']='流速';
-// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
-// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
-// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
-// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='水力坡降';
 $ec_lang['lpn_result_gradient_tip']='水头损失除以管道长度。用于比较不同长度管道相对于同一设计限值的表现。';
 $ec_lang['lpn_result_head']='水头';
@@ -693,84 +651,39 @@ $ec_lang['lpn_result_pressure']='压力';
 $ec_lang['lpn_result_flow']='流量';
 $ec_lang['lpn_result_velocity']='流速';
 $ec_lang['lpn_result_headloss']='水头损失';
-// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
-// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
-// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
-// Settings live INSIDE each project document, so deleting every project deletes every setting too:
-// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
-// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
-// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='仅重置本项目的设置。您的绘图和其他项目不会受影响。若要保存常用设置以便复用，可保存一个只含设置的项目文件。';
 $ec_lang['lpn_reset_all_tip']='删除全部项目、全部背景图片、全部设置以及您的单位选择，然后按首次访问者所见的样子重新加载页面。这是唯一会清除所有内容的重置。';
-// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
-// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
-// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
-// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
-// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_confirm']='本计算器现在按输入原样存储项目单位和数值，但此前曾将数值转换为国际单位制（SI）后存储。该项目保存于此更改之前，因此其数值以 SI 存储。是否再转换一次为当前单位？为便于您判断，以下列出几个将被转换的管径，附转换前后的数值：';
 $ec_lang['lpn_v2_restore_yes']='转换';
 $ec_lang['lpn_v2_restore_never']='不。以后不再询问。';
 $ec_lang['lpn_v2_restore_no']='关闭，让我先检查当前单位';
 $ec_lang['lpn_storage_too_new']='该项目由更新版本的页面保存，此处无法打开。';
-// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
-// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
-// something that is not in a file, so closing it asks first; a tab without one closes silently. A
-// browser project always wears one (it is in no file at all); a file project wears one only while it
-// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
-// our words for talking about the code, and the user sees only a name, an asterisk, and a file
-// extension.
-// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
-// conventional relationship and the reason the duplication between them is correct rather than
-// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
-// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
-// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='文件';
 $ec_lang['lpn_menu_edit']='编辑';
 $ec_lang['lpn_menu_insert']='插入';
 $ec_lang['lpn_menu_view']='视图';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='设置';
 $ec_lang['lpn_menu_help']='帮助';
 $ec_lang['lpn_help_walkthroughs']='教程';
-// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
-// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
-// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
-// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
-// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='删除管网';
 $ec_lang['lpn_confirm_delete_network']='删除本项目中的所有节点、管道和文字标签？背景图片、项目名称和设置会保留。此操作无法撤销。';
 $ec_lang['lpn_view_units']='单位';
-// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='全部保存';
-// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
-// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
-// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='项目{n}';
 $ec_lang['lpn_project_copy_suffix']='（副本）';
 $ec_lang['lpn_project_rename']='重命名';
-// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='新建项目…';
-// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
-// with the toolbar button of that name -- an example is a whole network, so it starts a project
-// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='空白 xy 项目，美制单位（gpm）';
 $ec_lang['lpn_new_blank_si']='空白 xy 项目，国际单位制（L/s）';
-// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
-// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='打开…';
 $ec_lang['lpn_file_save']='保存';
 $ec_lang['lpn_file_saveas']='另存为…';
 $ec_lang['lpn_file_revert']='还原';
 $ec_lang['lpn_file_close']='关闭';
-// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
-// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='最近使用的文件';
 $ec_lang['lpn_recent_tip']='再次打开 {file}，无需在电脑中查找该文件。';
 $ec_lang['lpn_recent_denied']='未获得打开该文件的权限，因此未能打开。';
 $ec_lang['lpn_recent_gone']='无法打开 {file}。它可能已被移动、重命名或删除，因此已从最近列表中移除。';
-// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
-// around it.
 $ec_lang['lpn_tab_new']='新建项目';
 $ec_lang['lpn_tab_all']='全部项目';
 $ec_lang['lpn_tab_menu']='项目菜单';
@@ -780,20 +693,10 @@ $ec_lang['lpn_tab_move_right']='右移';
 $ec_lang['lpn_tab_unsaved']='尚未保存到文件';
 $ec_lang['lpn_import_bad_file']='该文件无法作为本页面保存的项目读取。';
 $ec_lang['lpn_import_no_room']='浏览器存储空间不足，无法添加该项目。请删除一个不再需要的项目后重试。';
-// ---- EPANET .inp import (ROADMAP Task 196) ----
-// The import REPORTS every difference between the file and what this page can hold, so each
-// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
-// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
-// another sentence, and none may become one.
-// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
-// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='确定';
 $ec_lang['lpn_file_import_inp']='导入 EPANET 文件…';
 $ec_lang['lpn_file_import_inp_tip']='从 EPANET 文件（.inp 文本文件或 EPANET 保存的 .net 文件）中读取管网，并将其作为新项目保存在本浏览器中。本页面尚不能写回 EPANET 文件，因此请使用"文件"、"另存为"来保留您的成果。';
 $ec_lang['lpn_inp_bad_file']='该文件无法作为 EPANET 管网文件读取。';
-// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
-// the way out named here always works, so keep the instruction in the message rather than leaving
-// the reader to guess.
 $ec_lang['lpn_net_bad_file']='这看起来是一个 EPANET .net 文件，但本页面无法读取它。请在 EPANET 中打开它，使用其中的"文件"、"导出"、"管网"命令另存为 .inp 文件，然后再导入该文件。';
 $ec_lang['lpn_inp_report_heading']='已导入 {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} 个节点、水库和水箱，{links} 条管道、水泵和阀门，单位为 {units}。';
@@ -817,44 +720,11 @@ $ec_lang['lpn_inp_drop_quality']='水质、化学反应及水泵能耗设置未�
 $ec_lang['lpn_inp_drop_backdrop']='该文件指定了一张背景图片，但未包含图片本身。请使用"文件"、"背景图片"、"添加图片"自行添加。';
 $ec_lang['lpn_inp_drop_dangling']='这些管道所指定的节点不在文件中，因此未被导入。';
 $ec_lang['lpn_inp_drop_units']='该文件中标明的流量单位不是本页面已知的单位，因此所有数值均按加仑每分钟读取。请在使用结果前核对每一个数值。';
-// {name} is a project name; word order is the translator's to choose. Says where the user landed,
-// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
-// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='已从文件打开 {name}，并将其作为新项目添加到本浏览器中。';
-// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
-// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
-// browser they test in. That is expected, not a bug.
-// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='项目文件';
-// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot connect to a file, so every press really is another copy in the downloads folder.
-// The label says which of the two you are getting rather than leaving the duplicate looking like a
-// bug.
-// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
-// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
-// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
-// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
-// notice after the act -- at the moment the question arises -- rather than in a label forever.
-// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
-// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
-// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
-// anyway -- a disabled button fires no mouse events.
-// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
-// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
-// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
-// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
-// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='本浏览器无法连接到文件，因此在此打开文件其实是一次上传：项目会被复制到本浏览器中，唯一将成果写回该文件的方法是使用"文件"、"另存为"覆盖该文件。';
-// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
-// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='保存到已连接的文件。';
 $ec_lang['lpn_file_saveas_tip']='选择要保存到的文件。此项目将连接到该文件，此后"保存"会写入该文件。';
-// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
-// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
-// is no API for it, and the download attribute cannot override the setting -- but the user can turn
-// that setting on themselves, and then Save as really does let them overwrite the file they started
-// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
-// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='使用浏览器的下载设置进行保存。本浏览器无法连接到文件，因此"保存"不可用，只能使用"另存为"。若开启浏览器的"每次下载前询问保存位置"设置，即可选中原文件将其覆盖。';
 $ec_lang['lpn_status_uploaded']='项目文件已上传。无法与其保持连接，因此唯一写回该文件的方法是使用"文件"、"另存为"。';
 $ec_lang['lpn_status_downloaded']='已下载 {file}。本浏览器无法连接到文件，因此该项目仍标记为尚未保存到文件。';
@@ -863,45 +733,18 @@ $ec_lang['lpn_status_already_open']='该文件已在此处以 {name} 打开，�
 $ec_lang['lpn_status_already_open_dirty']='该文件已在此处以 {name} 打开，且含有尚未保存到该文件的更改。已切换到该项目，而非再打开一份副本。如需改用磁盘上的版本，请使用"文件"、"还原"。';
 $ec_lang['lpn_status_saved']='已保存 {file}。';
 $ec_lang['lpn_status_reverted']='已从磁盘重新载入 {file}。';
-// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
-// purpose: a program that writes your file behind your back takes away your right to walk away from
-// a session. So these three carry the whole close/discard/revert conversation.
-// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_confirm']='关闭前是否将更改保存到 {name}？';
-// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
-// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_confirm']='{name} 仅保存在本浏览器中。若不将其保存到文件即关闭，它将永久丢失。';
 $ec_lang['lpn_close_discard']='不保存并关闭';
 $ec_lang['lpn_cancel']='取消';
 $ec_lang['lpn_revert_confirm']='放弃您所做的更改，并从磁盘重新载入 {file}？';
-// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
-// page load, so the link is gone even though we still know the name. Says what to do, not just what
-// happened.
 $ec_lang['lpn_file_needs_reopen']='此项目来自 {file}，但与该文件的连接已丢失。请重新选择该文件以恢复连接。';
-// Says what is still safe before it says what failed: the reassurance is the part a worried user
-// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='无法写入该文件。它可能已被移动或重命名，或写入权限已被撤销。您的成果仍保存在本浏览器中。';
 $ec_lang['lpn_file_changed_elsewhere']='自您打开此文件以来，其他人已保存过它，因此现在保存会覆盖对方的成果。使用"文件"、"另存为"将您的更改保存到您自己的文件中，或使用"文件"、"还原"放弃您的更改并载入对方的版本。';
-// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
-// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
-// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-// Initials, and said to be public: whoever opens the same file sees this name, including outside the
-// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
-// rather than a name makes the safe answer the obvious one.
-// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
-// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='当您打开此项目时，希望同事看到什么名字？使用您的姓名缩写最为合适。打开同一文件的任何人都能看到此名字，因此请勿使用任何隐私信息。';
-// The stand-in when someone locked a project before giving a name. Reads in place of {name}
-// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='其他人';
-// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
-// moment of opening, with both real answers on it -- the way every drawing and document program has
-// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} 已打开此文件。';
 $ec_lang['lpn_lock_open_readonly']='以只读方式打开';
-// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
-// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
-// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='创建副本';
 $ec_lang['lpn_lock_break']='解除对方的锁定';
 $ec_lang['lpn_lock_open_heading_times']='{name} 已打开此文件；上次编辑距今 {x}，距上次保存 {y}。';
@@ -914,59 +757,26 @@ $ec_lang['lpn_ago_minutes']='{n} 分钟';
 $ec_lang['lpn_ago_hours']='{n} 小时';
 $ec_lang['lpn_ago_days']='{n} 天';
 $ec_lang['lpn_ago_unknown']='未知时长';
-// Read-only means read-only: it never turns itself back into an editable file while you are looking
-// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
-// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
-// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='只读：{name} 已打开此文件。您可以在此随意更改任何内容，但无法保存。请使用"文件"、"另存为"保存到其他文件。';
-// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
-// stops a colleague editing the same file. Editing still works -- an unreachable server must never
-// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
-// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='请注意：无法连接服务器以检查或创建此项目的锁定，因此没有任何机制阻止同事同时编辑同一文件。若锁定功能恢复正常，系统会通知您。';
 $ec_lang['lpn_lock_storage_error']='请注意：本站点无法保存锁定记录，因此没有任何机制阻止同事同时编辑同一文件。这是服务器端的配置问题，您在此处无法修复——锁定文件夹对 Web 服务器不可写。';
 $ec_lang['lpn_lock_full_error']='请注意：本站点记录项目打开状态的空间已用尽，因此没有任何机制阻止同事同时编辑同一文件。这是服务器端的配置问题，您在此处无法修复。';
 $ec_lang['lpn_lock_not_asked']='此项目未启用锁定功能，因此没有任何机制阻止同事同时编辑同一文件。此浏览器尚未记录您的名字，或该项目没有标识符——将项目保存到文件即可设置两者。';
 $ec_lang['lpn_lock_restored']='锁定功能已恢复正常，此文件现在可供您保存。';
 $ec_lang['lpn_lock_dismiss']='隐藏此消息';
-// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
-// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
-// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='您的项目将保存在本电脑上的一个文件中。它只在您主动要求时才会保存，其他任何时候都不会，因此不会有内容在您不知情的情况下被写入该文件。';
 $ec_lang['lpn_file_training_2']='为避免两人同时编辑同一文件，本站点会记录该文件当前是谁打开的。若已有人打开，您仍可以打开并查看，或保留一份自己的副本。';
-// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
-// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
-// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
-// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
-// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='首次保存时，浏览器会询问是否允许本站点编辑该文件。这个提问来自浏览器本身，而非我们，回答"是"才能让"保存"把您的成果写回该文件。通常每个文件只会询问一次。';
-// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
-// false -- the name is never written into the project file. It is held in this browser and on this
-// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
-// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='请输入一个简短的名字，供同事识别您的身份。使用您的姓名缩写最为合适。打开同一文件的任何人都能看到此名字，因此请勿使用任何隐私信息。';
 $ec_lang['lpn_file_training_name']='您的姓名缩写';
 $ec_lang['lpn_file_training_continue']='继续';
-// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
-// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='重新选择该文件';
 $ec_lang['lpn_file_reconnect']='重新连接该文件';
 $ec_lang['lpn_file_reconnect_alert']='此项目来自 {file}。浏览器需要您再次授权才能写入该文件。请在下方重新连接。';
-// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
-// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='这与他人已打开的文件相同，因此无法保存覆盖。请选择其他文件或其他名称。';
 $ec_lang['lpn_saveas_overwrites_project']='该文件已保存了另一个项目 {name}。在此保存将完全覆盖它。是否继续？';
 $ec_lang['lpn_saveas_overwrites_newer']='自您上次查看以来该文件已发生变化，几乎可以肯定是其他人已保存过它。在此保存将用您的版本覆盖对方的版本。是否继续？';
-// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
-// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
-// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
-// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='此项目的名称';
-// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
-// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
-// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
-// separate Delete for it to be confused with.)
-// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='已关闭 {closed}。当前显示 {opened}。';
 $ec_lang['lpn_status_closed_empty']='已关闭 {closed}。已新建一个空项目。';
 $ec_lang['lpn_storage_full']='未保存。浏览器存储空间已满或不可用，因此关闭此标签页时您近期的更改将丢失。';
@@ -976,12 +786,6 @@ $ec_lang['lpn_notes_2_term']='未建模的内容';
 $ec_lang['lpn_notes_2_def']='水质以及全天变化的需水量均未建模。关于阀门：节流阀（TCV）可在两种求解器中使用；能自行开关的阀门（PRV、PSV、FCV）由 EPANET 求解器求解，当管网中含有此类阀门时，本页面会自动启用该求解器。';
 $ec_lang['lpn_notes_3_term']='保存项目';
 $ec_lang['lpn_notes_3_def']='每个项目对应一个标签页，且在您操作时即保存在本浏览器中。清除浏览器数据会将它们全部删除，因此请把成果保存到文件中：使用"文件"、"另存为"。标签页上的星号表示其中含有尚未保存到文件的更改。除非您主动要求，否则不会有任何内容写入文件。在部分浏览器中，项目会连接到您保存的文件，此后"文件"、"保存"会写回该文件；在另一些浏览器中无法建立此连接，因此"保存"不可用，只能使用"另存为"。当项目文件保存在共享磁盘上时，本页面会提示您该文件是否已被同事打开，以避免两人互相覆盖成果。';
-// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
-// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
-// to stay readable on a phone, while the Notes section is already this page's documentation home,
-// prints with the page, and is translated with everything else. The popup carries a one-line
-// pointer to here instead (lpn_pump_curve_note).
-// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='水泵曲线';
 $ec_lang['lpn_notes_5_def']='水泵遵循 H = H₀ − aQ^b，其中 H 是水泵增加的水头，Q 是通过水泵的流量。可输入制造商曲线上的一个、两个或三个点。三个点——零流量时的水头、正常工作点和最大流量点——可直接拟合出 H₀、a 和 b，最贴合已发布的曲线。两个点则拟合出顶点在零流量处的抛物线（b = 2）。若只输入一个点，则按常用经验法则处理：零流量水头取所输入水头的 1.33 倍，最大流量取所输入流量的 2 倍，同样得到 b = 2。未输入任何点的水泵不增加任何水头。曲线在水头降至零时不会被截断，因此若要求水泵输出超出其曲线上限的流量，会得到负的水头。解决办法是换用更大的水泵或降低需水量，而不是更换拟合曲线的方式。';
 $ec_lang['lpn_notes_4_term']='计划中的功能';
@@ -1000,24 +804,12 @@ $ec_lang['lpn_engine_ready_valve']='EPANET 求解器现已保存在本设备上�
 $ec_lang['lpn_engine_unavailable']='无法获取 EPANET 求解器，而它正是用于求解能够自动开闭的阀门。请连接一次互联网，此后它就会保存在本设备上。';
 $ec_lang['lpn_diag_not_converged']='未找到解。请检查是否存在现实中不可能出现的数值，例如管径为零。';
 $ec_lang['lpn_field_roughness']='糙率';
-// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
-// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
-// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C 值。数值越大表示管壁越光滑：新塑料管约为 150，新钢管或铸铁管约为 130，老旧管道约为 100。';
 $ec_lang['lpn_field_length']='长度';
 $ec_lang['lpn_field_length_tip']='管道的长度。开启"自动"时，长度按您绘制的图形测量得出。关闭"自动"可输入与图形不同的长度。';
-// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
-// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
-// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='局部损失系数，k';
 $ec_lang['lpn_field_km_tip']='该管道上弯头、阀门和管件造成的损失，以流速水头的倍数计。直管无附件时取 0。';
-// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
-// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
-// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
-// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='局部损失，k';
-// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
-// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='曲线来源';
 $ec_lang['lpn_pump_curve_own']='在下方输入各点';
 $ec_lang['lpn_pump_curve_ref_note']='使用为水泵 {id} 输入的曲线。';
@@ -1025,23 +817,13 @@ $ec_lang['lpn_pump_curve_note']='一个、两个或三个点——参见下方"�
 $ec_lang['lpn_pump_point1']='点 1';
 $ec_lang['lpn_pump_point2']='点 2';
 $ec_lang['lpn_pump_point3']='点 3';
-// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
-// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
-// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='模式：选择。点击某个元件或标签以查看或更改它。拖动可移动节点、折点或标签。双击管道可添加或删除折点。';
 $ec_lang['lpn_mode_delete']='模式：删除。点击某个元件即可将其移除。';
 $ec_lang['lpn_mode_add_junction']='模式：添加节点。点击地图以放置节点。切换到"选择"模式可更改或移动元件和标签。';
 $ec_lang['lpn_mode_add_reservoir']='模式：添加水库。点击地图以放置水库。切换到"选择"模式可更改或移动元件和标签。';
 $ec_lang['lpn_mode_add_pipe']='模式：添加管道。依次点击一个节点、再点击另一个节点，将它们连接起来。切换到"选择"模式可更改或移动元件和标签。';
 $ec_lang['lpn_mode_add_pump']='模式：添加水泵。依次点击一个节点、再点击另一个节点，将它们连接起来。切换到"选择"模式可更改或移动元件和标签。';
-// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
-// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='模式：添加文字。点击地图以放置文字标签。点击靠近某节点的位置可将文字附加到该节点。切换到"选择"模式可更改或移动元件和标签。';
-// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
-// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
-// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
-// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
-// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='使用此模式可更改、移动和拖动地图上的内容。';
 $ec_lang['lpn_tip_labels_draggable']='您可以拖动标签以移动它。双击标签可使其回到自动位置。';
 $ec_lang['lpn_field_auto']='自动';
@@ -1073,8 +855,6 @@ $ec_lang['lpn_labels_col_decimals']='小数位';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='背景图片…';
 $ec_lang['lpn_backdrop_add']='添加';
-// BARE VERBS: both doors now print a "Background image" heading above them, so the object no
-// longer needs naming in each row.
 $ec_lang['lpn_backdrop_scale']='选点设置比例';
 $ec_lang['lpn_backdrop_scale_entry']='按配准文件或地图上一个像素的大小设置比例';
 $ec_lang['lpn_backdrop_scale_from']='以当前大小为基础缩放，围绕您选取的点';
@@ -1115,8 +895,6 @@ $ec_lang['lpn_push_none_displayed']='当前没有任何起始值以标签形式�
 $ec_lang['lpn_push_nothing']='没有任何已有元件具有正在应用的这些属性。';
 $ec_lang['lpn_push_no_change']='所有元件已经是这些数值，因此不会有任何变化。';
 $ec_lang['lpn_settings_emitter_exponent']='喷射（漏损）指数';
-// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
-// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='计算';
 $ec_lang['lpn_settings_tolerance']='收敛容差';
 $ec_lang['lpn_settings_tolerance_tip']='求解器停止前需要达到的接近程度。数值越小结果越精确，但耗时越长。';
@@ -1126,25 +904,16 @@ $ec_lang['lpn_engine_loading']='正在加载 EPANET 求解器…';
 $ec_lang['lpn_engine_failed']='无法加载 EPANET 求解器，改用内置求解器。';
 $ec_lang['lpn_engine_manning_note']='注意：使用曼宁糙率时，EPANET 计算出的水头损失比内置求解器约低 0.6%。';
 $ec_lang['lpn_settings_text_size']='文字大小（像素）';
-// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
-// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
-// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='符号大小（像素）';
 $ec_lang['lpn_settings_link_width']='管道线宽（像素）';
 $ec_lang['lpn_settings_align_labels']='管道标签与管道对齐';
 $ec_lang['lpn_settings_readability_bias']='标签向左偏离竖直方向超过多少度时上下翻转（度）';
 $ec_lang['lpn_settings_readability_bias_tip']='当标签向左偏离竖直方向超过此角度时，将其上下翻转，使其保持正向朝上。';
 $ec_lang['lpn_settings_mask_labels']='标签背后加不透明背景';
-// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
-// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='符号不透明度（0 到 1）';
-// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
-// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='背景图片不透明度（0 到 1）';
 $ec_lang['lpn_settings_map_display']='地图外观';
 $ec_lang['lpn_settings_map_height_px']='地图高度（屏幕像素）';
-// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
-// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='在小屏幕上，地图的绘制高度会小于此数值，以便页面始终留有可滚动的部分。';
 $ec_lang['lpn_settings_legend_position']='图例位置';
 $ec_lang['lpn_settings_legend_top_left']='左上';
@@ -1235,7 +1004,6 @@ $ec_lang['lpn_field_active_tip']='取消勾选可使该元件保留在图中但�
 $ec_lang['lpn_engine_valve_route']='因以下阀门会自行开闭，本次求解使用了 EPANET 求解器：';
 $ec_lang['lpn_unit_unknown']='此图纸中标明的单位 {unit} 不是本页面提供的单位。所有内容均按原样保留和显示，未作任何更改。在本页面识别该单位之前无法给出结果，因为无法判断其大小。';
 
-// --- lpn_ delta batch 1 (translation sprint, zh) ---
 $ec_lang['lpn_field_text_align']='水平对齐方式';
 $ec_lang['lpn_field_text_align_left']='左对齐';
 $ec_lang['lpn_field_text_align_center']='居中';
@@ -1289,7 +1057,6 @@ $ec_lang['lpn_color_legend_open_tip']='点击可打开"可见性"面板并更改
 $ec_lang['lpn_color_node_field']='节点着色依据';
 $ec_lang['lpn_color_link_field']='管道着色依据';
 
-// --- lpn_ delta batch 2 (translation sprint, zh) ---
 $ec_lang['lpn_color_ramp_sequential']='顺序渐变';
 $ec_lang['lpn_color_ramp_diverging']='发散渐变';
 $ec_lang['lpn_settings_color_classes']='区间数量';
@@ -1340,7 +1107,6 @@ $ec_lang['lpn_clean_map_tip']='隐藏模式说明行和坐标读数，使截图�
 $ec_lang['lpn_find_menu']='查找';
 $ec_lang['lpn_find_title']='查找元件';
 
-// --- lpn_ delta batch 3 (translation sprint, zh) ---
 $ec_lang['lpn_find_scope']='搜索范围';
 $ec_lang['lpn_find_scope_all']='全部';
 $ec_lang['lpn_find_property']='属性';

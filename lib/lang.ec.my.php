@@ -2,8 +2,6 @@
 
 // All missing text declarations will fall back to English.
 
-// Units (alphabetical order)
-// Necessary for calculator units selectors
 $ec_lang['u_depthFrac']='အပိုင်းကိန်း';
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='ft^2';
@@ -58,9 +56,6 @@ $ec_lang['u_hp']='hp';
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
 
-// Page text
-// In page order for easiest maintenance.
-// Menu and General
 $ec_lang['menu_brand']='HawsEDC တွက်ချက်မှုကိရိယာများ';
 $ec_lang['menu_main_list']='တွက်ချက်မှုကိရိယာများ စာရင်း';
 $ec_lang['menu_main_hydraulics']='ဟိုက်ဒရောလစ်';
@@ -71,10 +66,6 @@ $ec_lang['template_welcome']='သင့်ကြောက်ရွံ့မှ�
 $ec_lang['template_feedback']='ဒီစာမျက်နှာက စာသားတွေကို ပိုကောင်းအောင် အကြံပြုနိုင်ပါသလား၊ ဒါမှမဟုတ် တခြားဘာအကြံမဆို ရှိပါသလား။ ကူညီချင်ပါသလား၊ ဒါမှမဟုတ် ဒီလိုကိရိယာမျိုး ဖန်တီးတတ်အောင် သင်လေ့လာချင်ပါသလား။ ကျွန်ုပ်ကို ဆက်သွယ်ပါ။';
 $ec_lang['template_printable_title']='မှတ်တမ်းတင်ရာ ခေါင်းစဉ်';
 $ec_lang['template_printable_subtitle']='မှတ်တမ်းတင်ရာ အမည်ငယ်';
-// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
-// prose, and they are translated into all 26 languages for one reason: consent that the visitor
-// cannot read is not consent. The long-form privacy notice and terms are a separate question --
-// English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_body']='ဤဘရောက်ဇာပရိုဖိုင်၏ သိုလှောင်ခန်းထဲတွင် စာမျက်နှာတစ်ခုလျှင် ဂဏန်းတစ်လုံးစီ ထားရှိပြီး၊ ဤစာမျက်နှာသို့ အကြိမ်ကြိမ် ဝင်ရောက်ကြည့်ရှုမှုများကို ထပ်ခါထပ်ခါ မှတ်တမ်းမတင်စေရန် ခွင့်ပြုပါမည်လား။';
 $ec_lang['consent_accept']='ဤတောင်းဆိုချက်ကို လက်ခံမည်';
 $ec_lang['consent_accept_all']='အမြဲတမ်း လက်ခံမည်';
@@ -106,7 +97,6 @@ $ec_lang['ec_name_tip']='ထည့်သွင်းချက်များက�
 $ec_lang['calc_copy_link']='လင့်ခ် ကူးယူရန်';
 $ec_lang['ec_related_calcs']='ဆက်စပ်တွက်ချက်စက်များ:';
 $ec_lang['calc_copy_link_done']='ကူးယူပြီးပါပြီ!';
-// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု';
 $ec_lang['dw_main_title']='အခမဲ့ အွန်လိုင်း Darcy-Weisbach သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['dw_main_desc']='သတ်မှတ်အချင်း၊ ကြမ်းတမ်းမှုနှင့် စီးဆင်းမှုတွင် Darcy-Weisbach သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု';
@@ -122,7 +112,6 @@ $ec_lang['dw_regime_transitional']='အသွင်ကူးပြောင်�
 $ec_lang['dw_regime_turbulent']='လှုပ်ရှားသောစီးဆင်းမှု (turbulent)';
 $ec_lang['dw_friction_factor_method']='ပွတ်တိုက်မှုကိန်း နည်းလမ်း';
 $ec_lang['dw_friction_factor']='ပွတ်တိုက်မှုကိန်း, f';
-// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Hazen-Williams သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု';
 $ec_lang['hw_main_title']='အခမဲ့ အွန်လိုင်း Hazen-Williams သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['hw_main_desc']='သတ်မှတ်အချင်း၊ ကြမ်းတမ်းမှုနှင့် စီးဆင်းမှုတွင် Hazen-Williams သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု';
@@ -140,7 +129,6 @@ $ec_lang['hw_roughness']='Hazen-Williams ကိန်း, C';
 $ec_lang['hw_note_1']='<dl><dt>ဤတွက်ချက်စက်သည် အစွန်းနှစ်ဖက်ကြား ပိုက်၏ အနေအထား (profile) ကို ထည့်သွင်းတွက်ချက်ခြင်း မရှိပါ။</dt><dd>၎င်းသည် သင်ထည့်သွင်းသော အပေါ်ဘက်နှင့် အောက်ဘက် အမြင့်များကိုသာ အသုံးပြုသည်။ ကြားရှိ တစ်နေရာရာတွင် မြေပြင်သည် အစွန်းနှစ်ဖက်ထက် ပိုမြင့်တက်နေပါက ထိုမြင့်ရာနေရာ၏ ဖိအားသည် ဤနေရာတွင် တင်ပြထားသော ဖိအားများထက် နိမ့်ပါသည်။ ၎င်းကို စစ်ဆေးရန် အပေါ်ဘက်စွန်းမှ မြင့်ရာနေရာအထိ အလျားဖြင့် တွက်ချက်စက်ကို ထပ်မံအသုံးပြုပါ။</dd><dd>HGL သည် ပိုက်အောက်သို့ ကျဆင်းသည့်နေရာများတွင် ရေသည် အနုတ်ဖိအားအောက်တွင် ရှိသည်။ လေသည် ရေထဲမှ ခွဲထွက်လာနိုင်ပြီး၊ နံရံပါးသော ပိုက်ပြိုကျနိုင်ကာ၊ ညစ်ညမ်းသော မြေအောက်ရေသည် ဆက်စပ်ချိတ်ဆက်ရာနေရာများမှ ဝင်ရောက်လာနိုင်သည်။ တစ်လျှောက်လုံးတွင် အပေါင်းဖိအားအောက်တွင် ပိုက်လိုင်းကို ထိန်းထားပြီး၊ မြင့်ရာနေရာတိုင်းတွင် လေထွက်ပေါက် (air valve) တပ်ဆင်ရန် စဉ်းစားပါ။</dd><dt>အပေါ်ဘက်ဖိအားသည် သင်ပေးသွင်းသော နယ်နိမိတ်အခြေအနေ (boundary condition) တစ်ခုဖြစ်သည်။</dt><dd>၎င်းကို ဖိအားတိုင်းစက်မှ၊ ရေတိုင်ကီ ရေမျက်နှာပြင်အမြင့် (ပိုက်အထက်ရှိ ရေအမြင့်) မှ၊ သို့မဟုတ် ရေတင်စက်မျဉ်းကွေး (pump curve) မှ ဖတ်ယူပါ။ ရေတင်စက်သည် ရေစီးနှုန်း မြင့်တက်လာသည်နှင့်အမျှ ဖိအားနည်းလာသောကြောင့်၊ အထက်တွင် ထည့်သွင်းထားသော ရေစီးနှုန်းနှင့် ကိုက်ညီသည့် မျဉ်းကွေးပေါ်ရှိအမှတ်ကို အသုံးပြုပါ။</dd><dt>ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်းများ (minor/local loss coefficients) ကို သင်ကိုယ်တိုင် ပေါင်းထည့်ပါ။</dt><dd>ပိုက်လိုင်းပေါ်ရှိ ရေတံခါး၊ ကွေးကွေးနေရာ၊ တီးချိတ်၊ မီတာနှင့် ဝင်ပေါက် တိုင်း၏ K တန်ဖိုးများကို စုစုပေါင်းလုပ်ပြီး ၎င်းစုစုပေါင်းကို ထည့်သွင်းပါ။ ပုံမှန်တန်ဖိုးများအတွက် ထိုထည့်သွင်းရေးနေရာရှိ လင့်ခ်ကို လိုက်ပါ။ ရေရှည်ပို့ဆောင်ရေးပင်မပိုက် (long transmission main) တွင် ဤဆုံးရှုံးမှုများသည် ပွတ်တိုက်ဆုံးရှုံးမှုနှင့်နှိုင်းယှဉ်လျှင် သေးငယ်သော်လည်း၊ တိုတောင်းသော စခန်းပိုက်လိုင်း (station piping) တွင် ၎င်းတို့သည် ဆုံးရှုံးမှု အများစုဖြစ်နိုင်သည်။</dd></dl>';
 
 
-// Manning Irregular
 $ec_lang['mi_menu']='Manning မညီမညာ မြောင်းကြောင်း';
 $ec_lang['mi_main_title']='အခမဲ့ အွန်လိုင်း Manning ဖြတ်ပိုင်းမညီမညာသော မြောင်းကြောင်း တွက်ချက်မှုကိရိယာ';
 $ec_lang['mi_main_desc']='ဖြတ်ပိုင်းမညီမညာသော မြောင်းကြောင်း Manning တစ်သမတ်တည်း စီးဆင်းမှု တွက်ချက်မှုကိရိယာ';
@@ -168,7 +156,6 @@ $ec_lang['mi_notes_1_term']='ပေါင်းစပ် n';
 $ec_lang['mi_notes_1_def']='ဤတွက်ချက်မှုကိရိယာသည် Chow 1959၊ ၁၃၆ မျက်နှာ၊ ညီမျှခြင်း 6-17 (6-18 မဟုတ်) ကို အသုံးပြု၍ ဇုန်ပေါင်းစပ် n တွက်ချက်ရာတွင် HEC-RAS ကိုးကားစာအုပ်ကို လိုက်နာသည်။';
 $ec_lang['mi_notes_2_term']='ကျောက်အကာ';
 $ec_lang['mi_notes_2_def']='ကျောက်အကာ ဒီဇိုင်းဆွဲရန် Manning Trapezoidal Channel Calculator ကို အသုံးပြုပါ။ ဤတွက်ချက်မှုကိရိယာသည် သဘာဝအပိုင်းများအတွက် ပိုသင့်တော်သည်။';
-// Manning Pipe Flow
 $ec_lang['mpf_main_menu']='Manning သွတ်ပိုက် စီးဆင်းမှု';
 $ec_lang['mpf_main_title']='အခမဲ့ အွန်လိုင်း Manning သွတ်ပိုက် စီးဆင်းမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['mpf_main_desc']='သတ်မှတ်အစောက်နှင့် နက်ရှိုင်းမှုတွင် Manning ဖော်မြူလာ တစ်သမတ်တည်း သွတ်ပိုက် စီးဆင်းမှု';
@@ -197,7 +184,6 @@ $ec_lang['mpf_solver_enter_positive_q']='အသုံးပြုလိုသေ
 $ec_lang['mpf_solver_no_solution']='အဖြေမရှိပါ: y/d0 = 93.8% တွင် Q သည် ပိုက်၏ စွမ်းဆောင်ရည်ကို ကျော်လွန်နေသည် (Qmax = {qmax}, ရွေးချယ်ထားသော ယူနစ်များဖြင့်)။';
 $ec_lang['mpf_solve_btn']='ဖြေရှင်းရန်';
 $ec_lang['mpf_solve_for_flow']='ရေစီးနှုန်းအတွက်, Q =';
-// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု';
 $ec_lang['mphl_main_title']='အခမဲ့ အွန်လိုင်း Manning သွတ်ပိုက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['mphl_main_desc']='သတ်မှတ်အပြည့်စီးဆင်းမှုတွင် Manning ဖော်မြူလာ ဖိမြင့်ဆင့်ဆုံးရှုံးမှု';
@@ -214,7 +200,6 @@ $ec_lang['mphl_egl_1']='အောက်ဘက် EGL';
 $ec_lang['mphl_egl_2']='အပေါ်ဘက် EGL';
 $ec_lang['mphl_hgl_egl_tip']='ပိုက်မြင့်နေပါက မမှန်ကန်နိုင်ပါ။ မှတ်ချက်များကို ကြည့်ပါ။';
 $ec_lang['mphl_note_1']='<dl><dt>ဤတွက်စက်သည် အစွန်းနှစ်ဖက်ကြားရှိ ပိုက်၏ အနေအထား (ပရိုဖိုင်) ကို ပုံဖော်တွက်ချက်ခြင်း မရှိပါ။</dt><dd>HGL သည် မည်သည့်နေရာတွင်မဆို ပိုက်၏ထိပ်အောက်သို့ ကျဆင်းသွားပါက ဤတွက်ချက်မှုသည် မမှန်ကန်နိုင်ပါ။</dd><dt>ဖွင့်လှစ်ဝင်ပေါက် (ကြောင်းဖြတ်) အခြေအနေတွင် ဝင်ပေါက်ထိန်းချုပ်မှု အခြေအနေများကို စစ်ဆေးရန် လိုအပ်သည်။</dt><dd>1. အပေါ်ဘက် HGL သည် အပေါ်ဘက် ပုံမှန်နက်ရှိုင်းမှု စီးဆင်းမှုအမြင့် (သို့မဟုတ် သွတ်ပိုက်ထက် နိမ့်) ထက် နိမ့်၍မရပါ။</dd><dd>2. ကြောင်းဖြတ်တစ်ခု၏ ရေတက်ဘက်ရေသည် အပေါ်ဘက် HGL ထက် အပေါ်ဘက် EGL ဖြင့် ပိုကောင်းစွာ ကိုယ်စားပြုသည်။</dd><dd>3. <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> (အမေရိကန်ပြည်ထောင်စု ဖက်ဒရယ်လမ်းပန်းဆက်သွယ်ရေးဌာန၏ အခမဲ့ ကြောင်းဖြတ်ပရိုဂရမ်) ကို အသုံးပြုသည့် ရိုးရှင်းသောစံကြောင်းဖြတ် ရေတက်ဘက်ရေတွက်ချက်မှုများအတွက် <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">ကျွန်ုပ်၏ ၂ မိနစ် သင်ခန်းစာကို ကြည့်ပါ</a>။</dd><dd>4. ဤစာမျက်နှာသည် ထွက်ပေါက်ထိန်းချုပ်မှု အခြေအနေကိုသာ ဖြေရှင်းပေးသည်: ပိုက်တစ်ခုလုံး ရေပြည့်စီးဆင်းနေပြီး၊ အောက်ဘက်အခြေအနေများက ခေါင်းဆုံးကို သတ်မှတ်သည့် အခြေအနေ။ ကြောင်းဖြတ်ဒီဇိုင်းသည် ဝင်ပေါက်ထိန်းချုပ်မှု သို့မဟုတ် ထွက်ပေါက်ထိန်းချုပ်မှု အနက် မည်သည့်အရာက အုပ်စိုးမည်ကို ဆုံးဖြတ်ရသည့်အလုပ်ဖြစ်သောကြောင့်၊ နှစ်မျိုးစလုံး ဖြစ်နိုင်ချေရှိလျှင် HY-8 ကို အမြဲသုံးပါ။</dd></dl>';
-// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Trapezoidal မြောင်းကြောင်း';
 $ec_lang['mtc_main_title']='အခမဲ့ အွန်လိုင်း Manning ဖော်မြူလာ Trapezoidal မြောင်းကြောင်း တွက်ချက်မှုကိရိယာ';
 $ec_lang['mtc_main_desc']='သတ်မှတ်အစောက်နှင့် နက်ရှိုင်းမှုတွင် Manning ဖော်မြူလာ တစ်သမတ်တည်း Trapezoidal မြောင်းကြောင်း စီးဆင်းမှု';
@@ -249,7 +234,6 @@ $ec_lang['mtc_note_1']='<dl><dt>အလိုအလျောက် ကျော�
 $ec_lang['mtc_note_2_term']='ရေအလျင်နှုန်းစစ်ဆေးမှု';
 $ec_lang['mtc_note_2_def']='ရေအလျင်နှုန်းမြင့်မားမှုသည် ထိုကဲ့သို့ မြင့်မားသော သီးသန့်စွမ်းအင်ကို ဖြစ်ပေါ်စေသည့် အမြင့်ကျဆင်းမှု ကြီးမားစွာ ရှိခဲ့ကြောင်း ဆိုလိုသည်။ ထိုစွမ်းအင်သည် ကျယ်ပြူးမှုများ၊ ကောက်ကြောင်းများ သို့မဟုတ် အတားအဆီးများတွင် မြန်မြန်ဆုံးရှုံးနိုင်သည်။ ဤနေရာအတွက် သင့်တော်မှုရှိကြောင်း စစ်ဆေးပါ။';
 $ec_lang['mtc_solver_no_solution']='ဤမြောင်းကြောင်းဒေတာများဖြင့် ပေးထားသော Q အတွက် အဖြေရှာမတွေ့ပါ။';
-// Weir Flow Simple
 $ec_lang['ws_main_menu']='ရိုးရှင်းသော ဆည်တမံ စီးဆင်းမှု';
 $ec_lang['ws_main_title']='အခမဲ့ အွန်လိုင်း ရိုးရှင်းသော ကျယ်ပြန့်ထိပ်ပါ ဆည်တမံ စီးဆင်းမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['ws_main_desc']='ရိုးရှင်းသော ကျယ်ပြန့်ထိပ်ပါ ဆည်တမံ စီးဆင်းမှု တွက်ချက်မှုကိရိယာ';
@@ -258,7 +242,6 @@ $ec_lang['ws_headWaterHeight']='<span class="ec-help" title="ရေ၏ အလေ
 $ec_lang['ws_weirCoefficient']='ဆည်တမံကိန်းဂဏန်း, C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='မှတ်ချက်များ';
 $ec_lang['ws_notes_we_term']='ဆည်တမံညီမျှခြင်း';
-// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='မညီမညာ ဆည်တမံ စီးဆင်းမှု';
 $ec_lang['wi_main_title']='အခမဲ့ အွန်လိုင်း အပိုင်းပိုင်း ပြောင်းလဲသောနက်ရှိုင်းမှုနှင့် မညီမညာ ဆည်တမံ စီးဆင်းမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['wi_main_desc']='မညီမညာ ဆည်တမံ စီးဆင်းမှု တွက်ချက်မှုကိရိယာ';
@@ -268,7 +251,6 @@ $ec_lang['wi_incrementalFlow']='တိုးမြှင့်စီးဆင်
 $ec_lang['wi_cumulativeFlow']='စုစုပေါင်းစီးဆင်းမှု';
 $ec_lang['wi_save_and_calculate']='သိမ်းဆည်းပြီး တွက်ချက်ရန်';
 $ec_lang['wi_notes_we_def']='q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0</sub><sup>1.5</sup> else cw/(2.5*slope) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) ဖြင့် d<sub>1</sub> နှင့် d<sub>0</sub> သည် အမြဲတမ်း သုည သို့မဟုတ် အပေါင်းကိန်းများဖြစ်သည်';
-// Orifice Flow
 $ec_lang['or_main_menu']='ဂေါက်ဝမှ စီးဆင်းမှု';
 $ec_lang['or_main_title']='အခမဲ့ အွန်လိုင်း ဂေါက်ဝမှ စီးဆင်းမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['or_main_desc']='ဂေါက်ဝမှ စီးဆင်းမှု — လွတ်လပ်သော သို့မဟုတ် နစ်မွန်းသော';
@@ -300,7 +282,6 @@ $ec_lang['or_notes_3_term']='ရေထွက်ကိန်း';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> သည် ချွန်ထက်သောဘောင်ပါ ဂေါက်ဝများအတွက် ၀.၆၀–၀.၆၅ ခန့်ဖြစ်သည်။ ဝိုင်းသော သို့မဟုတ် ပြန်ဝင်သောဝင်ပေါက်များသည် ကွဲပြားသောတန်ဖိုးများ အသုံးပြုသည်။ လမ်းညွှန်မှုအတွက် <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> သို့မဟုတ် HEC-RAS Hydraulic Reference Manual ကို ကြည့်ပါ။';
 $ec_lang['or_notes_4_term']='နစ်မွန်းမှု';
 $ec_lang['or_notes_4_def']='TWE သည် ဖွင့်လှစ်မှု၏ အောက်ခြေအပေါ်တွင်ရှိသောအခါ ဤတွက်ချက်မှုကိရိယာသည် h = HWE − TWE ကိုအသုံးပြု၍ နစ်မွန်းသောဂေါက်ဝညီမျှခြင်းကို အလိုအလျောက်သုံးသည်။ TWE သည် အောက်ခြေတွင်ရှိသော သို့မဟုတ် အောက်တွင်ရှိသောအခါ လွတ်လပ်သောကျဆင်းမှုဟု မှတ်ယူပြီး h = HWE − ဗဟိုချက်ဖြစ်သည်။';
-// Micro-Hydro Power
 $ec_lang['mhp_main_menu']='အသေးစား ရေအားလျှပ်စစ်';
 $ec_lang['mhp_main_title']='အခမဲ့ အွန်လိုင်း အသေးစား ရေအားလျှပ်စစ် တွက်ချက်စက်';
 $ec_lang['mhp_main_desc']='မြစ်ရေစီးအတိုင်း အသေးစား ရေအားလျှပ်စစ် ထုတ်လုပ်မှု တွက်ချက်စက်';
@@ -333,7 +314,6 @@ $ec_lang['mhp_notes_6_def']='အသေးစား ရေအားလျှပ�
 $ec_lang['mhp_notes_7_term']='နှစ်စဉ်စွမ်းအင်';
 $ec_lang['mhp_notes_7_def']='နှစ်စဉ်စွမ်းအင်သည် အဆက်မပြတ် အပြည့်အဝ လည်ပတ်မှု (တစ်နှစ်လျှင် ၈၇၆၀ နာရီ) ကို ယူဆသည်။ ရာသီအလိုက် ရေစီးနှုန်း ကွဲပြားမှု၊ ပြုပြင်ထိန်းသိမ်းစဉ် ရပ်ဆိုင်းချိန်နှင့် ဝန်တင်ကိန်းကြောင့် တကယ့်ထုတ်လုပ်မှုသည် ပိုနည်းပါလိမ့်မည်။';
 
-// Orifice Drain Time
 $ec_lang['odt_main_menu']='ရေကန် နှင့် တိုင်ကီ ရေထုတ်ချိန်';
 $ec_lang['odt_main_title']='အခမဲ့ အွန်လိုင်း ရေကန်၊ ရေလှောင်ကန်နှင့် တိုင်ကီ ရေထုတ်ချိန် တွက်ချက်မှုကိရိယာ (ဂေါက်ဝ)';
 $ec_lang['odt_main_desc']='ရေကန်၊ ရေလှောင်ကန် သို့မဟုတ် တိုင်ကီ ရေထုတ်ချိန် — ဂေါက်ဝ ထွက်ပေါက်၊ ကွာဖြတ်ပမာဏနည်းလမ်း';
@@ -361,10 +341,7 @@ $ec_lang['odt_q_max']='အများဆုံးစီးဆင်းနှု
 $ec_lang['odt_vol']='ထုတ်လွှတ်ပမာဏ';
 $ec_lang['odt_sketch_start']='စတင်';
 $ec_lang['odt_sketch_end']='အဆုံးသတ်';
-// Contact us.
 
-// Irrigation
-// Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='ရေထုတ်ကိရိယာ အကွာအဝေး, S<sub>e</sub>';
 $ec_lang['ip_sl']='ဘေးပိုက် အကွာအဝေး, S<sub>l</sub>';
 $ec_lang['ip_n_e']='ဘေးပိုက်တစ်ခုလျှင် ရေထုတ်ကိရိယာ အရေအတွက်, n<sub>e</sub>';
@@ -375,7 +352,6 @@ $ec_lang['ip_pr']='ရေသွင်းနှုန်း, PR';
 $ec_lang['ip_q_lat']='ဘေးပိုက်တစ်ခုလျှင် ရေစီးနှုန်း, Q<sub>lat</sub>';
 $ec_lang['ip_q_sys']='ဇုန် ရေစီးနှုန်း, Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='လည်ပတ်ချိန် (နာရီ)';
-// Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='မြောင်း ရေစိမ့်ဆင်းမှု';
 $ec_lang['cs_main_title']='အခမဲ့ အွန်လိုင်း မြောင်းရေစိမ့်ဆင်းဆုံးရှုံးမှုနှင့် ရေသယ်ပို့ထိရောက်မှု တွက်ချက်စက်';
 $ec_lang['cs_main_desc']='မြောင်းရေစိမ့်ဆင်းဆုံးရှုံးမှုနှင့် ရေသယ်ပို့ထိရောက်မှု — ဝင်ရေ-ထွက်ရေ နည်းလမ်း';
@@ -410,7 +386,6 @@ $ec_lang['cs_notes_2_def']='ပုံမှန် အနားမကာသော
 $ec_lang['cs_notes_3_term']='အနားကာ ရင်းနှီးငွေပြန်ဆပ်မှု';
 $ec_lang['cs_notes_3_def']='ရေတန်ဖိုးနှင့် အနားကာကုန်ကျစရိတ်ကို မည်သည့်ငွေကြေးဖြင့်မဆို တသမတ်တည်း ထည့်သွင်းပါ။ အနားကာဧရိယာ = ပိုက်အပိုင်းအလျား × စိုစွတ်နယ်နိမိတ် — တိုင်းတာထားသော ရေနက်တွင် မြောင်းဖြတ်ပိုင်း၏ စိုစွတ်သောနယ်နိမိတ် (ကြမ်းခင်းအကျယ်နှင့် စောင်းကာနှစ်ဖက်စလုံး၏ စိုစွတ်မှု)။ တစ်နှစ်လျှင် ပြန်လည်ရရှိသောတန်ဖိုးသည် အနားကာပြီးသော မြောင်းသည် ပန်းတိုင် E<sub>c</sub> ကို အဆက်မပြတ် ရရှိသည်ဟု ယူဆသည်။ ရာသီအလိုက်စီးဆင်းသော မြောင်းများ သို့မဟုတ် အနားကာမှုသည် ပန်းတိုင်ထိရောက်မှုသို့ မရောက်ပါက တကယ့်ပြန်ဆပ်ကာလသည် ပိုကြာပါလိမ့်မည်။';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>၊ ၃ ကြိမ်မြောက်ထုတ်ဝေမှု (2001)။ FAO Irrigation and Drainage Paper 57 (1999)။';
-// About
 $ec_lang['about_main_menu']='အကြောင်း';
 $ec_lang['install_main_menu']='ထည့်သွင်း';
 $ec_lang['install_main_title']='EngCalcs ထည့်သွင်းရန်';
@@ -442,7 +417,6 @@ $ec_lang['contactSpamPrefix']='ငါးပေါင်း တစ်ညီ';
 $ec_lang['contactSpamPostfix']='(ကျေးဇူးပြု၍ စကားလုံးဖြင့် ရေးပါ။ 1=တစ် 2=နှစ် 3=သုံး 4=လေး 5=ငါး 6=ခြောက် 7=ခုနစ် +=ပေါင်း 5+1=6)';
 $ec_lang['contactSubmitButton']='မက်ဆေ့တင်ပြရန်';
 $ec_lang['contact_success']='ရေးပေးသည့်အချိန်များအတွက် ကျေးဇူးတင်ပါသည်။';
-// Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='ကျောက်ထောင်ချောင်း ဒီဇိုင်း (Robinson)';
 $ec_lang['rc_main_title']='အခမဲ့ အွန်လိုင်း ကျောက်ထောင်ချောင်း ဒီဇိုင်း တွက်ချက်စက် — Robinson (1998)';
 $ec_lang['rc_main_desc']='ကျောက်ထောင်ချောင်း ကျောက်ကာ အရွယ်အစား သတ်မှတ်ခြင်း — Robinson, Rice & Kadavy (1998)';
@@ -501,12 +475,10 @@ $ec_lang['rc_notes_6_def']='ထွက်ပေါက်ပိုင်းရှ�
 $ec_lang['rc_notes_7_def']='ဝင်ပေါက်ချောင်းရှိ ပုံမှန်ရေနက်မှုသည် q<sub>t</sub> ကို ဖြတ်သန်းစေရန် လိုအပ်သော ဆည်တမံ ရေမျက်နှာပြင်အမြင့် (H<sub>p</sub>) ထက် နည်းသောအခါ၊ ချောင်းဝင်ပေါက်၏ အပေါ်ဘက်တွင် စီးဆင်းမှု ကန့်သတ်ခြင်း သို့မဟုတ် ရေဝပ်မှု ဖြစ်ပေါ်သည်။ ဤသည် ယေဘုယျအားဖြင့် လက်ခံနိုင်သည် — ရေဝပ်မှုသည် ရေအလျင်နှုန်းကို လျှော့ချပြီး အပေါ်ဘက် ရေတိုက်စားမှုကို တားဆီးသည်။ စစ်ဆေးရန်: ပေးထားသော q<sub>t</sub> နှင့် ထိပ်ဆုံးအနံအတွက် H<sub>p</sub> ကို ရှာဖွေရန် ဆည်တမံရေစီး တွက်ချက်စက်ကို အသုံးပြုပြီး ဝင်ပေါက်ချောင်း ပုံမှန်ရေနက်မှုနှင့် နှိုင်းယှဉ်ပါ။ H<sub>p</sub> သည် ပုံမှန်ရေနက်မှုထက် ကျော်လွန်ပါက ရေဝပ်မှု ဖြစ်ပေါ်လိမ့်မည်။';
 $ec_lang['rc_notes_4_term']='ကိုးကားချက်';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). “<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>.” <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS သည် တူညီသော နည်းစနစ်ကို အခြေခံ၍ <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel စာရင်းဇယား</a> တစ်ခုကိုလည်း ထုတ်ပြန်ထားသည်။';
-// Sketch labels
 $ec_lang['rc_sketch_filter']='စစ်ထုတ်အလွှာ';
 $ec_lang['rc_sketch_top_crest_curve']='ထိပ်ဆုံး ကွေးမျဉ်း';
 $ec_lang['rc_sketch_outlet_apron']='ထွက်ပေါက် ကြိုပြင်';
 $ec_lang['rc_sketch_radius']='အချင်းဝက်';
-// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='ရေသွင်းစနစ် ဖိအား';
 $ec_lang['ip_main_title']='အခမဲ့ အွန်လိုင်း ဆည်မြောင်းဖိအားနှင့် ဖြန့်ဝေမှုညီမျှမှု တွက်ချက်စက်';
 $ec_lang['ip_main_desc']='စမ်းသပ် ဌာနခွဲ ဖိအားနှင့် ညီမျှမှု ခန့်မှန်းချက်';
@@ -559,7 +531,6 @@ $ec_lang['ip_notes_5_def']='ရေသွင်းနှုန်းနှင့�
 
 
 
-// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='ဌာနခွဲပိုက်ကွန်ရက်';
 $ec_lang['bpn_main_title']='အခမဲ့ အွန်လိုင်း ဌာနခွဲပိုက်ကွန်ရက် ဖိအား တွက်ချက်စက် (ပတ်ကွင်း မပါ)';
 $ec_lang['bpn_main_desc']='ဌာနခွဲ (သစ်ပင်ပုံစံ) ပိုက်ကွန်ရက် စီးဆင်းမှုနှင့် ဖိအား';
@@ -633,18 +604,8 @@ $ec_lang['lpn_field_text_rotation']='ထောင့် (ဒီဂရီ)';
 $ec_lang['lpn_field_text_match_pipe']='အနီးဆုံး လိုင်း၏ ထောင့်ဘက်သို့ လှည့်ပါ';
 $ec_lang['lpn_field_text_flip']='180° လှည့်ရန်';
 $ec_lang['lpn_field_elev']='အမြင့်';
-// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
-// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
-// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
-// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='ဤနေရာရှိ မြေမျက်နှာပြင် (သို့) ပိုက်အဆင့်။ မည်သည့်သုညမှတ်ကိုမဆို အသုံးပြု၍ တိုင်းတာနိုင်သော်လည်း၊ နေရာတိုင်းတွင် တူညီသောမှတ်ကို အသုံးပြုရမည်။';
-// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
-// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
-// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='ဖိမြင့်ဆင့်';
-// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
-// outright that it is a height and not a pressure, which is the exact confusion the glossary's
-// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='ရေကန်ရှိ ရေမျက်နှာပြင်အဆင့်ကို အမြင့်တစ်ခုအဖြစ် တိုင်းတာသည်၊ ဖိအားအဖြစ် မဟုတ်ပါ။ ရေမျက်နှာပြင်ကို ရေကန်၏အမြင့်တွင် ထားလိုပါက ဗလာချန်ထားပါ။';
 $ec_lang['lpn_close']='ပိတ်ရန်';
 $ec_lang['lpn_empty_hint']='ဥပမာတစ်ခု ဖွင့်ရန် ဖိုင် > ပရောဂျက်အသစ် ကိုသုံးပါ။ သို့မဟုတ် ကိရိယာဘားမှ ရေကန်၊ ဆက်စပ်နေရာနှင့် ပိုက်လိုင်း ထည့်ခြင်းဖြင့် စတင်ပါ။';
@@ -682,10 +643,6 @@ $ec_lang['lpn_units_elevhead']='အမြင့်နှင့် ဖိမြ�
 $ec_lang['lpn_units_pressure']='ဖိအား';
 $ec_lang['lpn_units_flow']='ရေစီးနှုန်း';
 $ec_lang['lpn_units_velocity']='ရေအလျင်နှုန်း';
-// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
-// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
-// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
-// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='ဖိမြင့်ဆင့်ဆုံးရှုံးမှု အစောက်';
 $ec_lang['lpn_result_gradient_tip']='ဖိမြင့်ဆင့်ဆုံးရှုံးမှုကို ပိုက်၏အလျားနှင့် စားခြင်း။ ဒီဇိုင်းကန့်သတ်ချက် တစ်ခုတည်းနှင့် နှိုင်းယှဉ်ရန် အလျားမတူသော ပိုက်များကို ယှဉ်ရန် အသုံးပြုပါ။';
 $ec_lang['lpn_result_head']='ဖိမြင့်ဆင့်';
@@ -694,84 +651,39 @@ $ec_lang['lpn_result_pressure']='ဖိအား';
 $ec_lang['lpn_result_flow']='ရေစီးနှုန်း';
 $ec_lang['lpn_result_velocity']='ရေအလျင်နှုန်း';
 $ec_lang['lpn_result_headloss']='ဖိမြင့်ဆင့်ဆုံးရှုံးမှု';
-// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
-// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
-// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
-// Settings live INSIDE each project document, so deleting every project deletes every setting too:
-// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
-// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
-// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='ဤပရောဂျက်၏ ဆက်တင်များကိုသာ ပြန်လည်သတ်မှတ်သည်။ သင်၏ ပုံနှင့် အခြားပရောဂျက်များကို မပြောင်းလဲပါ။ သင်နှစ်သက်သော ဆက်တင်များကို နောက်တွင်ပြန်သုံးရန် သိမ်းလိုပါက၊ ဆက်တင်များသာပါသော ပရောဂျက်ဖိုင်တစ်ခု သိမ်းဆည်းပါ။';
 $ec_lang['lpn_reset_all_tip']='ပရောဂျက်အားလုံး၊ နောက်ခံပုံအားလုံး၊ ဆက်တင်အားလုံးနှင့် သင်၏ယူနစ်ရွေးချယ်မှုများကို ဖျက်ပြီးနောက်၊ ပထမဆုံးအကြိမ် လာရောက်ကြည့်ရှုသူတစ်ဦးမြင်ရသည့်အတိုင်း စာမျက်နှာကို ပြန်ဖွင့်ပေးသည်။ ၎င်းသည် အားလုံးကို ရှင်းလင်းပေးသော တစ်ခုတည်းသော ပြန်လည်သတ်မှတ်ခြင်းဖြစ်သည်။';
-// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
-// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
-// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
-// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
-// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_confirm']='ဤတွက်ချက်စက်သည် ပရောဂျက်ယူနစ်များနှင့် ထည့်သွင်းချက်များကို ရိုက်ထည့်သည့်အတိုင်း သိမ်းဆည်းသည်၊ သို့သော် ယခင်က ဂဏန်းများကို SI ယူနစ်သို့ ပြောင်းလဲပြီး သိမ်းဆည်းခဲ့သည်။ ဤပရောဂျက်ကို ထိုပြောင်းလဲမှုမတိုင်မီ သိမ်းဆည်းခဲ့ခြင်းဖြစ်၍ ၎င်း၏ဂဏန်းများသည် SI ဖြင့် သိမ်းထားသည်။ ၎င်းတို့ကို လက်ရှိယူနစ်များသို့ နောက်ဆုံးတစ်ကြိမ် ပြောင်းလဲမလား။ သင်ဆုံးဖြတ်နိုင်ရန် ပြောင်းလဲမည့် အချင်းအချို့ကို ပြောင်းလဲမီနှင့် ပြောင်းလဲပြီးတန်ဖိုးများနှင့်တကွ ဖော်ပြထားသည် -';
 $ec_lang['lpn_v2_restore_yes']='ပြောင်းလဲရန်';
 $ec_lang['lpn_v2_restore_never']='မလုပ်ပါနှင့်။ နောက်နောင် ထပ်မမေးပါနှင့်။';
 $ec_lang['lpn_v2_restore_no']='လက်ရှိယူနစ်များကို အရင်စစ်ဆေးနိုင်ရန် ပိတ်ပါ';
 $ec_lang['lpn_storage_too_new']='ဤပရောဂျက်ကို စာမျက်နှာ၏ ပိုမိုနောက်ပိုင်းဗားရှင်းတစ်ခုက သိမ်းဆည်းခဲ့ခြင်းဖြစ်၍၊ ဤနေရာတွင် ဖွင့်၍မရပါ။';
-// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
-// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
-// something that is not in a file, so closing it asks first; a tab without one closes silently. A
-// browser project always wears one (it is in no file at all); a file project wears one only while it
-// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
-// our words for talking about the code, and the user sees only a name, an asterisk, and a file
-// extension.
-// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
-// conventional relationship and the reason the duplication between them is correct rather than
-// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
-// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
-// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='ဖိုင်';
 $ec_lang['lpn_menu_edit']='တည်းဖြတ်ရန်';
 $ec_lang['lpn_menu_insert']='ထည့်သွင်းရန်';
 $ec_lang['lpn_menu_view']='ကြည့်ရှုရန်';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='ဆက်တင်များ';
 $ec_lang['lpn_menu_help']='အကူအညီ';
 $ec_lang['lpn_help_walkthroughs']='လမ်းညွှန်များ';
-// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
-// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
-// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
-// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
-// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='ကွန်ရက် ဖျက်ရန်';
 $ec_lang['lpn_confirm_delete_network']='ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။';
 $ec_lang['lpn_view_units']='ယူနစ်များ';
-// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='အားလုံးကို သိမ်းရန်';
-// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
-// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
-// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='ပရောဂျက်{n}';
 $ec_lang['lpn_project_copy_suffix']='(မိတ္တူ)';
 $ec_lang['lpn_project_rename']='အမည်ပြောင်းရန်';
-// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='ပရောဂျက်အသစ်…';
-// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
-// with the toolbar button of that name -- an example is a whole network, so it starts a project
-// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='ပရောဂျက် ဗလာ၊ xy၊ US ယူနစ် (gpm)';
 $ec_lang['lpn_new_blank_si']='ပရောဂျက် ဗလာ၊ xy၊ SI ယူနစ် (L/s)';
-// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
-// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='ဖွင့်ရန်…';
 $ec_lang['lpn_file_save']='သိမ်းရန်';
 $ec_lang['lpn_file_saveas']='တခြားအမည်ဖြင့် သိမ်းရန်…';
 $ec_lang['lpn_file_revert']='မူရင်းပြန်ယူရန်';
 $ec_lang['lpn_file_close']='ပိတ်ရန်';
-// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
-// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='လတ်တလော ဖွင့်ခဲ့သော ဖိုင်များ';
 $ec_lang['lpn_recent_tip']='{file} ကို သင့်ကွန်ပျူတာတွင် ပြန်ရှာစရာမလိုဘဲ ထပ်ဖွင့်ရန်။';
 $ec_lang['lpn_recent_denied']='ထိုဖိုင်ကိုဖွင့်ရန် ခွင့်ပြုချက်မရခဲ့သောကြောင့် မဖွင့်နိုင်ခဲ့ပါ။';
 $ec_lang['lpn_recent_gone']='{file} ကို ဖွင့်၍မရပါ။ ၎င်းကို နေရာရွှေ့ထား၊ အမည်ပြောင်းထား သို့မဟုတ် ဖျက်ထားနိုင်သောကြောင့်၊ လတ်တလောစာရင်းမှ ဖယ်ရှားလိုက်ပါသည်။';
-// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
-// around it.
 $ec_lang['lpn_tab_new']='ပရောဂျက်အသစ်';
 $ec_lang['lpn_tab_all']='ပရောဂျက်အားလုံး';
 $ec_lang['lpn_tab_menu']='ပရောဂျက် မီနူး';
@@ -781,20 +693,10 @@ $ec_lang['lpn_tab_move_right']='ညာဘက်ရွှေ့ရန်';
 $ec_lang['lpn_tab_unsaved']='ဖိုင်တစ်ခုအဖြစ် မသိမ်းဆည်းရသေးပါ';
 $ec_lang['lpn_import_bad_file']='ထိုဖိုင်ကို ဤစာမျက်နှာမှ သိမ်းဆည်းထားသော ပရောဂျက်တစ်ခုအဖြစ် ဖတ်၍မရပါ။';
 $ec_lang['lpn_import_no_room']='ဤပရောဂျက်ကို ထည့်ရန် ဘရောက်ဇာသိုလှောင်ခန်း လုံလောက်စွာ ကျန်မရှိတော့ပါ။ မလိုအပ်တော့သော ပရောဂျက်တစ်ခုကို ဖျက်ပြီး ထပ်ကြိုးစားပါ။';
-// ---- EPANET .inp import (ROADMAP Task 196) ----
-// The import REPORTS every difference between the file and what this page can hold, so each
-// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
-// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
-// another sentence, and none may become one.
-// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
-// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='အိုကေ';
 $ec_lang['lpn_file_import_inp']='EPANET ဖိုင် တင်သွင်းရန်…';
 $ec_lang['lpn_file_import_inp_tip']='EPANET ဖိုင်တစ်ခု (.inp စာသားဖိုင် သို့မဟုတ် EPANET က သိမ်းဆည်းသော .net ဖိုင်) မှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး ဤဘရောက်ဇာတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။ ဤစာမျက်နှာသည် EPANET ဖိုင်ပြန်ရေး၍မရပါ၊ သို့ဖြစ်၍ သင့်အလုပ်ကို ဆက်ထားရန် ဖိုင် > တခြားအမည်ဖြင့် သိမ်းရန် ကို အသုံးပြုပါ။';
 $ec_lang['lpn_inp_bad_file']='ထိုဖိုင်ကို EPANET ကွန်ရက်ဖိုင်တစ်ခုအဖြစ် ဖတ်၍မရပါ။';
-// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
-// the way out named here always works, so keep the instruction in the message rather than leaving
-// the reader to guess.
 $ec_lang['lpn_net_bad_file']='ဤဖိုင်သည် EPANET .net ဖိုင်နှင့် တူပါသည်၊ သို့သော် ဤစာမျက်နှာက ၎င်းကို ဖတ်၍မရပါ။ EPANET တွင် ၎င်းကိုဖွင့်ပြီး ဖိုင် > တင်ပို့ရန် > ကွန်ရက် ညွှန်ကြားချက်ကို သုံး၍ .inp ဖိုင်တစ်ခုအဖြစ် သိမ်းဆည်းပြီးမှ ထိုဖိုင်ကို တင်သွင်းပါ။';
 $ec_lang['lpn_inp_report_heading']='{file} ကို တင်သွင်းပြီးပါပြီ';
 $ec_lang['lpn_inp_report_counts']='ဆက်စပ်နေရာ၊ ရေကန်နှင့် ရေတိုက် {nodes} ခု၊ ပိုက်လိုင်း၊ ရေတင်စက်နှင့် ဗားလ် {links} ခု၊ {units} ဖြင့်။';
@@ -818,44 +720,11 @@ $ec_lang['lpn_inp_drop_quality']='ရေအရည်အသွေး၊ ဓာတ
 $ec_lang['lpn_inp_drop_backdrop']='ဤဖိုင်သည် နောက်ခံပုံတစ်ခု၏အမည်ကို ဖော်ပြထားသော်လည်း ပုံကိုယ်တိုင်ကို မပါဝင်ပါ။ ဖိုင် > နောက်ခံပုံ > ပုံထည့်ရန် ကို အသုံးပြု၍ ကိုယ်တိုင်ထည့်ပါ။';
 $ec_lang['lpn_inp_drop_dangling']='ဤပိုက်လိုင်းများသည် ဖိုင်ထဲတွင် မပါသော ဆက်စပ်နေရာတစ်ခု၏အမည်ကို ဖော်ပြထားသောကြောင့်၊ ၎င်းတို့ကို ချန်ထားခဲ့ပါသည်။';
 $ec_lang['lpn_inp_drop_units']='ဤဖိုင်တွင် အမည်ပေးထားသော ရေစီးနှုန်း ယူနစ်ကို ဤစာမျက်နှာက မသိသောကြောင့်၊ ဂဏန်းတိုင်းကို မိနစ်လျှင် ဂါလံ (gpm) အဖြစ် ဖတ်ခဲ့ပါသည်။ အဖြေများကို အသုံးမပြုမီ ဂဏန်းတိုင်းကို စစ်ဆေးပါ။';
-// {name} is a project name; word order is the translator's to choose. Says where the user landed,
-// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
-// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။';
-// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
-// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
-// browser they test in. That is expected, not a bug.
-// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='ပရောဂျက်ဖိုင်';
-// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot connect to a file, so every press really is another copy in the downloads folder.
-// The label says which of the two you are getting rather than leaving the duplicate looking like a
-// bug.
-// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
-// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
-// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
-// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
-// notice after the act -- at the moment the question arises -- rather than in a label forever.
-// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
-// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
-// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
-// anyway -- a disabled button fires no mouse events.
-// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
-// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
-// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
-// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
-// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='ဤဘရောက်ဇာသည် ဖိုင်တစ်ခုနှင့် ချိတ်ဆက်၍မရသောကြောင့်၊ ဤနေရာတွင် ဖိုင်တစ်ခုဖွင့်ခြင်းသည် တင်ပို့ခြင်း (upload) တစ်ခုသာဖြစ်သည် - ပရောဂျက်ကို ဤဘရောက်ဇာထဲသို့ ကူးယူထားပြီး၊ သင့်အလုပ်ကို ဖိုင်ထဲသို့ ပြန်သိမ်းနိုင်သော တစ်ခုတည်းသောနည်းလမ်းမှာ ဖိုင် > တခြားအမည်ဖြင့် သိမ်းရန် ဖြင့် ဖိုင်အား ပြန်ရေးသိမ်းရန်သာ ဖြစ်သည်။';
-// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
-// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='ချိတ်ဆက်ထားသော ဖိုင်ထဲသို့ သိမ်းဆည်းသည်။';
 $ec_lang['lpn_file_saveas_tip']='သိမ်းဆည်းရန် ဖိုင်တစ်ခုကို ရွေးချယ်ပါ။ ဤပရောဂျက်သည် ထိုဖိုင်နှင့် ချိတ်ဆက်သွားပြီး၊ ထိုအချိန်မှစ၍ သိမ်းရန် က ထိုဖိုင်ထဲသို့ ရေးသိမ်းပေးပါလိမ့်မည်။';
-// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
-// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
-// is no API for it, and the download attribute cannot override the setting -- but the user can turn
-// that setting on themselves, and then Save as really does let them overwrite the file they started
-// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
-// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='သင့်ဘရောက်ဇာ၏ ဒေါင်းလုတ် ဆက်တင်များကို အသုံးပြု၍ သိမ်းဆည်းသည်။ ဤဘရောက်ဇာသည် ဖိုင်တစ်ခုနှင့် ချိတ်ဆက်၍မရသောကြောင့်၊ သိမ်းရန် ကို ပိတ်ထားပြီး တခြားအမည်ဖြင့် သိမ်းရန် ကိုသာ အသုံးပြုနိုင်သည်။ သင့်ဘရောက်ဇာ ဆက်တင် “ဖိုင်တစ်ခုစီကို မည်သည့်နေရာတွင် သိမ်းမည်ကို မေးပါ” ကို ဖွင့်ထားပါက၊ မူရင်းဖိုင်ကို ရွေးချယ်ပြီး ၎င်းအပေါ် ပြန်ရေးသိမ်းနိုင်ပါသည်။';
 $ec_lang['lpn_status_uploaded']='ပရောဂျက်ဖိုင်ကို တင်ပို့ပြီးပါပြီ။ ၎င်းနှင့် ဆက်လက်ချိတ်ဆက်၍မရသောကြောင့်၊ ၎င်းထဲသို့ ပြန်သိမ်းနိုင်သော တစ်ခုတည်းသောနည်းလမ်းမှာ ဖိုင် > တခြားအမည်ဖြင့် သိမ်းရန် ကို အသုံးပြုရန်သာ ဖြစ်သည်။';
 $ec_lang['lpn_status_downloaded']='{file} ကို ဒေါင်းလုတ်ဆွဲပြီးပါပြီ။ ဤဘရောက်ဇာသည် ဖိုင်တစ်ခုနှင့် ချိတ်ဆက်၍မရသောကြောင့်၊ ဤပရောဂျက်ကို ဖိုင်တစ်ခုသို့ မသိမ်းရသေးဟု ဆက်လက် အမှတ်အသားပြုထားပါသည်။';
@@ -864,45 +733,18 @@ $ec_lang['lpn_status_already_open']='ထိုဖိုင်ကို ဤနေ
 $ec_lang['lpn_status_already_open_dirty']='ထိုဖိုင်ကို ဤနေရာတွင် {name} အဖြစ် ဖွင့်ထားပြီးသားဖြစ်ပြီး၊ ၎င်းထဲသို့ မသိမ်းရသေးသော ပြောင်းလဲမှုများပါရှိသည်။ ဒုတိယမိတ္တူတစ်ခု ထပ်မဖွင့်ဘဲ ထိုဖိုင်ဆီသို့ ပြောင်းလိုက်ပါသည်။ ဒစ်စ်ခ်ပေါ်ရှိ ဗားရှင်းကို အလိုရှိပါက ဖိုင် > မူရင်းပြန်ယူရန် ကို အသုံးပြုပါ။';
 $ec_lang['lpn_status_saved']='{file} ကို သိမ်းဆည်းပြီးပါပြီ။';
 $ec_lang['lpn_status_reverted']='{file} ကို ဒစ်စ်ခ်မှ ထပ်မံ ဖွင့်ယူလိုက်ပါသည်။';
-// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
-// purpose: a program that writes your file behind your back takes away your right to walk away from
-// a session. So these three carry the whole close/discard/revert conversation.
-// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_confirm']='{name} ကို မပိတ်မီ သင့်ပြောင်းလဲမှုများကို သိမ်းမလား။';
-// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
-// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_confirm']='{name} ကို ဤဘရောက်ဇာတွင်သာ သိမ်းဆည်းထားပါသည်။ ဖိုင်တစ်ခုသို့ မသိမ်းဘဲ ပိတ်လိုက်ပါက၊ ၎င်းသည် အပြီးတိုင် ပျောက်ဆုံးသွားပါလိမ့်မည်။';
 $ec_lang['lpn_close_discard']='မသိမ်းဘဲ ပိတ်ရန်';
 $ec_lang['lpn_cancel']='ပယ်ဖျက်ရန်';
 $ec_lang['lpn_revert_confirm']='သင်ပြုလုပ်ထားသော ပြောင်းလဲမှုများကို စွန့်ပစ်ပြီး {file} ကို ဒစ်စ်ခ်မှ ထပ်မံဖွင့်မလား။';
-// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
-// page load, so the link is gone even though we still know the name. Says what to do, not just what
-// happened.
 $ec_lang['lpn_file_needs_reopen']='ဤပရောဂျက်သည် {file} မှ လာခဲ့သော်လည်း၊ ထိုဖိုင်နှင့် ချိတ်ဆက်မှု ပြတ်တောက်သွားပါသည်။ ၎င်းနှင့် ပြန်ချိတ်ဆက်ရန် ဖိုင်ကို ထပ်မံရွေးချယ်ပါ။';
-// Says what is still safe before it says what failed: the reassurance is the part a worried user
-// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='ဖိုင်ထဲသို့ ရေးသွင်း၍မရပါ။ ၎င်းကို နေရာရွှေ့ထား၊ အမည်ပြောင်းထားနိုင်သည် သို့မဟုတ် ခွင့်ပြုချက် ရုပ်သိမ်းခံရနိုင်ပါသည်။ သင့်အလုပ်ကို ဤဘရောက်ဇာတွင် ဆက်လက်သိမ်းဆည်းထားပါသည်။';
 $ec_lang['lpn_file_changed_elsewhere']='သင်ဤဖိုင်ကို ဖွင့်ပြီးနောက် တခြားတစ်ဦးက ၎င်းထဲသို့ သိမ်းဆည်းခဲ့ပါသည်၊ သို့ဖြစ်၍ ယခုသိမ်းလိုက်ပါက ၎င်းတို့၏အလုပ်အပေါ် ပြန်ရေးသိမ်းသွားပါလိမ့်မည်။ သင့်ပြောင်းလဲမှုများကို ကိုယ်ပိုင်ဖိုင်တစ်ခုတွင် ထားလိုပါက ဖိုင် > တခြားအမည်ဖြင့် သိမ်းရန် ကို အသုံးပြုပါ၊ သို့မဟုတ် သင့်ပြောင်းလဲမှုများကို စွန့်ပစ်ပြီး ၎င်းတို့၏ဗားရှင်းကို ဖွင့်လိုပါက ဖိုင် > မူရင်းပြန်ယူရန် ကို အသုံးပြုပါ။';
-// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
-// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
-// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-// Initials, and said to be public: whoever opens the same file sees this name, including outside the
-// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
-// rather than a name makes the safe answer the obvious one.
-// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
-// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='သင်ဤပရောဂျက်ကို ဖွင့်ထားစဉ် လုပ်ဖော်ကိုင်ဖက်များ မည်သည်ကို မြင်သင့်သနည်း။ သင့်အက္ခရာအတိုကောက် (initials) သည် အသင့်တော်ဆုံးဖြစ်သည်။ တူညီသောဖိုင်ကို ဖွင့်သူတိုင်း ၎င်းကို မြင်နိုင်သောကြောင့်၊ သီးသန့်အချက်အလက်များကို မသုံးပါနှင့်။';
-// The stand-in when someone locked a project before giving a name. Reads in place of {name}
-// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='တခြားတစ်ဦး';
-// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
-// moment of opening, with both real answers on it -- the way every drawing and document program has
-// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} က ဤဖိုင်ကို ဖွင့်ထားသည်။';
 $ec_lang['lpn_lock_open_readonly']='ဖတ်ရန်သာ ဖွင့်ရန်';
-// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
-// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
-// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='မိတ္တူတစ်ခု ဖန်တီးရန်';
 $ec_lang['lpn_lock_break']='၎င်းတို့၏ သော့ကို ချိုးရန်';
 $ec_lang['lpn_lock_open_heading_times']='{name} က ဤဖိုင်ကို ဖွင့်ထားသည်။ နောက်ဆုံးတည်းဖြတ်မှုမှာ {x} က ဖြစ်ပြီး၊ နောက်ဆုံးသိမ်းဆည်းမှုပြီးနောက် {y} ကြာပါသည်။';
@@ -915,59 +757,26 @@ $ec_lang['lpn_ago_minutes']='{n} မိနစ်';
 $ec_lang['lpn_ago_hours']='{n} နာရီ';
 $ec_lang['lpn_ago_days']='{n} ရက်';
 $ec_lang['lpn_ago_unknown']='မသိသောအချိန်';
-// Read-only means read-only: it never turns itself back into an editable file while you are looking
-// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
-// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
-// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='ဖတ်ရန်သာ - {name} က ဤဖိုင်ကို ဖွင့်ထားသည်။ ဤနေရာတွင် သင်လိုသလို မည်သည့်အရာကိုမဆို ပြောင်းလဲနိုင်သော်လည်း၊ သိမ်း၍မရပါ။ တခြားဖိုင်တစ်ခုသို့ သိမ်းလိုပါက ဖိုင် > တခြားအမည်ဖြင့် သိမ်းရန် ကို အသုံးပြုပါ။';
-// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
-// stops a colleague editing the same file. Editing still works -- an unreachable server must never
-// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
-// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='သတိပြုပါ - ဤပရောဂျက်အပေါ် သော့ခတ်ခြင်းကို စစ်ဆေးရန် (သို့) ဖန်တီးရန် ဆာဗာကို မရောက်နိုင်ခဲ့ပါ၊ သို့ဖြစ်၍ လုပ်ဖော်ကိုင်ဖက်တစ်ဦးက တူညီသောဖိုင်ကို တစ်ချိန်တည်း တည်းဖြတ်ခြင်းမှ ဟန့်တားနိုင်မည့်အရာ မရှိတော့ပါ။ သော့ခတ်ခြင်း ပြန်လည်အလုပ်လုပ်လာပါက သင့်ကို အကြောင်းကြားပါလိမ့်မည်။';
 $ec_lang['lpn_lock_storage_error']='သတိပြုပါ - ဤဆိုက်သည် သော့ခတ်မှတ်တမ်းများကို သိမ်းဆည်း၍မရပါ၊ သို့ဖြစ်၍ လုပ်ဖော်ကိုင်ဖက်တစ်ဦးက တူညီသောဖိုင်ကို တစ်ချိန်တည်း တည်းဖြတ်ခြင်းမှ ဟန့်တားနိုင်မည့်အရာ မရှိတော့ပါ။ ၎င်းသည် ဆာဗာ၏ တပ်ဆင်မှုအမှား ဖြစ်ပြီး၊ ဤနေရာတွင် သင်ပြင်ဆင်နိုင်သော အရာမဟုတ်ပါ — သော့ခတ် ဖိုင်တွဲကို ဝဘ်ဆာဗာက ရေးသွင်းခွင့် မရှိပါ။';
 $ec_lang['lpn_lock_full_error']='သတိပြုပါ - မည်သူက မည်သည့်ပရောဂျက်ကို ဖွင့်ထားသည်ကို မှတ်တမ်းတင်ရန် ဤဆိုက်တွင် နေရာကုန်သွားပါသည်၊ သို့ဖြစ်၍ လုပ်ဖော်ကိုင်ဖက်တစ်ဦးက တူညီသောဖိုင်ကို တစ်ချိန်တည်း တည်းဖြတ်ခြင်းမှ ဟန့်တားနိုင်မည့်အရာ မရှိတော့ပါ။ ၎င်းသည် ဆာဗာ၏ တပ်ဆင်မှုအမှား ဖြစ်ပြီး၊ ဤနေရာတွင် သင်ပြင်ဆင်နိုင်သော အရာမဟုတ်ပါ။';
 $ec_lang['lpn_lock_not_asked']='ဤပရောဂျက်အတွက် သော့ခတ်ခြင်း အလုပ်မလုပ်နေပါ၊ သို့ဖြစ်၍ လုပ်ဖော်ကိုင်ဖက်တစ်ဦးက တူညီသောဖိုင်ကို တစ်ချိန်တည်း တည်းဖြတ်ခြင်းမှ ဟန့်တားနိုင်မည့်အရာ မရှိတော့ပါ။ ဤဘရောက်ဇာတွင် သင့်အတွက် မှတ်တမ်းတင်ထားသော အမည် မရှိသေးပါ၊ သို့မဟုတ် ပရောဂျက်တွင် သက်သေခံနံပါတ် မရှိပါ — ပရောဂျက်ကို ဖိုင်တစ်ခုသို့ သိမ်းဆည်းလိုက်ခြင်းက နှစ်ခုစလုံးကို သတ်မှတ်ပေးပါလိမ့်မည်။';
 $ec_lang['lpn_lock_restored']='သော့ခတ်ခြင်း ပြန်လည်အလုပ်လုပ်နေပြီဖြစ်ပြီး၊ ဤဖိုင်ကို ယခုအခါ သင့်ကိုယ်ပိုင်အဖြစ် သိမ်းဆည်းနိုင်ပါပြီ။';
 $ec_lang['lpn_lock_dismiss']='ဤစာကို ဖျောက်ရန်';
-// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
-// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
-// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='သင့်ပရောဂျက်ကို ဤကွန်ပျူတာပေါ်ရှိ ဖိုင်တစ်ခုတွင် သိမ်းဆည်းပါလိမ့်မည်။ သင်တောင်းဆိုချိန်တွင်သာ သိမ်းဆည်းပြီး၊ အခြားအချိန်တွင် သိမ်းဆည်းမည်မဟုတ်သောကြောင့်၊ သင်မသိဘဲ ထိုဖိုင်ထဲသို့ မည်သည့်အရာမျှ ရေးသွင်းမည် မဟုတ်ပါ။';
 $ec_lang['lpn_file_training_2']='လူနှစ်ဦးသည် ဖိုင်တစ်ခုတည်းကို တစ်ချိန်တည်း မည်သည့်အခါမျှ တည်းဖြတ်မိမည် မဟုတ်စေရန်၊ ဤဆိုက်က မည်သူ ဖွင့်ထားသည်ကို မှတ်တမ်းတင်ထားပါသည်။ တစ်စုံတစ်ဦးက ၎င်းကို ဖွင့်ထားပြီးသားဖြစ်ပါက၊ သင်သည် ၎င်းကို ဖွင့်ကြည့်နိုင်သေးသည် (သို့) ကိုယ်ပိုင်မိတ္တူတစ်ခု ထားနိုင်သေးသည်။';
-// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
-// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
-// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
-// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
-// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='သင်ပထမဆုံးအကြိမ် သိမ်းဆည်းသောအခါ၊ ဤဆိုက်သည် ဖိုင်ကို တည်းဖြတ်ခွင့်ရှိမရှိကို သင့်ဘရောက်ဇာက မေးပါလိမ့်မည်။ ထိုမေးခွန်းသည် ဘရောက်ဇာမှ လာခြင်းဖြစ်ပြီး ကျွန်ုပ်တို့ထံမှ မဟုတ်ပါ၊ ခွင့်ပြုသည်ဟု ဖြေဆိုခြင်းကသာ သိမ်းရန် အား သင့်အလုပ်ကို ပြန်ရေးသွင်းနိုင်စေသည်။ ပုံမှန်အားဖြင့် ဖိုင်တစ်ခုလျှင် တစ်ကြိမ်သာ မေးလေ့ရှိသည်။';
-// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
-// false -- the name is never written into the project file. It is held in this browser and on this
-// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
-// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='လုပ်ဖော်ကိုင်ဖက်များ သင့်ကို သိနိုင်မည့် အမည်တိုတစ်ခု ပေးပါ။ သင့်အက္ခရာအတိုကောက်သည် အသင့်တော်ဆုံးဖြစ်သည်။ တူညီသောဖိုင်ကို ဖွင့်သူတိုင်း ၎င်းကို မြင်နိုင်သောကြောင့်၊ သီးသန့်အချက်အလက်များကို မသုံးပါနှင့်။';
 $ec_lang['lpn_file_training_name']='သင့်အက္ခရာအတိုကောက်';
 $ec_lang['lpn_file_training_continue']='ဆက်လုပ်ရန်';
-// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
-// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='ဖိုင်ကို ထပ်မံရွေးချယ်ရန်';
 $ec_lang['lpn_file_reconnect']='ဤဖိုင်နှင့် ပြန်ချိတ်ဆက်ရန်';
 $ec_lang['lpn_file_reconnect_alert']='ဤပရောဂျက်သည် {file} မှ လာခဲ့ပါသည်။ ၎င်းထဲသို့ ရေးသွင်းနိုင်ရန် သင့်ဘရောက်ဇာက သင့်ခွင့်ပြုချက်ကို ထပ်မံလိုအပ်ပါသည်။ အောက်တွင် ပြန်ချိတ်ဆက်ပါ။';
-// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
-// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='ထိုဖိုင်သည် တခြားတစ်ဦး ဖွင့်ထားသော ဖိုင်တစ်ခုတည်း ဖြစ်သောကြောင့်၊ ၎င်းအပေါ် ပြန်ရေးသိမ်း၍မရပါ။ တခြားဖိုင် (သို့) တခြားအမည်တစ်ခုကို ရွေးချယ်ပါ။';
 $ec_lang['lpn_saveas_overwrites_project']='ထိုဖိုင်တွင် တခြားပရောဂျက်တစ်ခု {name} ရှိနှင့်ပြီးသားဖြစ်သည်။ ဤနေရာတွင် သိမ်းလိုက်ပါက ၎င်းကို လုံးဝ အစားထိုးလိုက်ပါလိမ့်မည်။ ဆက်လုပ်မလား။';
 $ec_lang['lpn_saveas_overwrites_newer']='သင်နောက်ဆုံးမြင်ခဲ့သည့်အချိန်မှစ၍ ထိုဖိုင်သည် ပြောင်းလဲသွားပါသည်၊ သို့ဖြစ်၍ တစ်စုံတစ်ဦးက ၎င်းထဲသို့ သိမ်းဆည်းခဲ့ခြင်း ဖြစ်နိုင်ချေများပါသည်။ ဤနေရာတွင် သိမ်းလိုက်ပါက ၎င်းတို့၏ဗားရှင်းကို သင့်ဗားရှင်းဖြင့် အစားထိုးလိုက်ပါလိမ့်မည်။ ဆက်လုပ်မလား။';
-// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
-// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
-// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
-// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='ဤပရောဂျက်အတွက် အမည်';
-// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
-// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
-// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
-// separate Delete for it to be confused with.)
-// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='{closed} ကို ပိတ်လိုက်ပါသည်။ ယခု {opened} ကို ပြသနေပါသည်။';
 $ec_lang['lpn_status_closed_empty']='{closed} ကို ပိတ်လိုက်ပါသည်။ ပရောဂျက်အသစ် ဗလာတစ်ခု စတင်လိုက်ပါသည်။';
 $ec_lang['lpn_storage_full']='မသိမ်းရသေးပါ။ ဘရောက်ဇာသိုလှောင်ခန်း ပြည့်နေခြင်း (သို့) မရရှိနိုင်ခြင်းကြောင့်၊ ဤတဲ့ဘ်ကို ပိတ်လိုက်သောအခါ သင့်လတ်တလော ပြောင်းလဲမှုများ ပျောက်ဆုံးသွားပါလိမ့်မည်။';
@@ -977,12 +786,6 @@ $ec_lang['lpn_notes_2_term']='ပုံစံမပြုထားသောအ�
 $ec_lang['lpn_notes_2_def']='ရေအရည်အသွေးနှင့် တစ်နေ့တာအတွင်း ပြောင်းလဲနေသော ရေလိုအပ်ချက်များကို ပုံစံမပြုထားပါ။ ဗားလ်များနှင့် ပတ်သက်၍ - ညှစ်ဗားလ်သည် ဖြေရှင်းစက် နှစ်ခုစလုံးတွင် အလုပ်လုပ်ပြီး၊ ၎င်းတို့ကိုယ်တိုင် ဖွင့်/ပိတ် လုပ်ဆောင်ကြသော ဗားလ်များ (PRV, PSV, FCV) ကို EPANET ဖြေရှင်းစက်ဖြင့် ဖြေရှင်းပေးသည်။ ဤစာမျက်နှာက သင့်ကွန်ရက်တွင် ထိုသို့သော ဗားလ်တစ်ခု ပါရှိပါက ထိုဖြေရှင်းစက်ကို အလိုအလျောက် ဖွင့်ပေးလိုက်သည်။';
 $ec_lang['lpn_notes_3_term']='ပရောဂျက်များ သိမ်းဆည်းခြင်း';
 $ec_lang['lpn_notes_3_def']='ပရောဂျက်တိုင်းသည် တဲ့ဘ်တစ်ခုဖြစ်ပြီး၊ တဲ့ဘ်တိုင်းကို သင်အလုပ်လုပ်နေစဉ် ဤဘရောက်ဇာတွင် သိမ်းဆည်းထားပါသည်။ သင့်ဘရောက်ဇာဒေတာကို ရှင်းလင်းလိုက်ပါက ၎င်းတို့ အားလုံးကို ဖျက်ပစ်ပါလိမ့်မည်၊ သို့ဖြစ်၍ သင့်အလုပ်ကို ဖိုင် > တခြားအမည်ဖြင့် သိမ်းရန် ဖြင့် ဖိုင်တစ်ခုတွင် ထားပါ။ တဲ့ဘ်တစ်ခုပေါ်ရှိ ကြယ်ပွင့်အမှတ်အသားသည် ဖိုင်ထဲတွင် မပါသော ပြောင်းလဲမှုများ ပါရှိသည်ဟု ဆိုလိုသည်။ သင်တောင်းဆိုမှသာ ဖိုင်တစ်ခုသို့ မည်သည့်အရာမျှ ရေးသွင်းမည် ဖြစ်သည်။ အချို့ဘရောက်ဇာများတွင် ပရောဂျက်သည် သင်သိမ်းဆည်းသော ဖိုင်နှင့် ချိတ်ဆက်သွားပြီး၊ ဖိုင် > သိမ်းရန် သည် ထိုအချိန်မှစ၍ ထိုဖိုင်တစ်ခုတည်းသို့ ပြန်ရေးသိမ်းပေးပါလိမ့်မည်။ အခြားများတွင် ချိတ်ဆက်မှု မဖြစ်နိုင်သောကြောင့်၊ သိမ်းရန် ကို ပိတ်ထားပြီး တခြားအမည်ဖြင့် သိမ်းရန် ကိုသာ အသုံးပြုနိုင်သည်။ ပရောဂျက်ဖိုင်တစ်ခုကို မျှဝေဒရိုက်ဗ်တစ်ခုတွင် ထားရှိသောအခါ၊ လုပ်ဖော်ကိုင်ဖက်တစ်ဦးက ၎င်းကို ဖွင့်ထားပြီးသားလားဟု ဤစာမျက်နှာက ပြောပြပါလိမ့်မည်၊ သို့မှသာ လူနှစ်ဦးသည် တစ်ဦးအပေါ်တစ်ဦး ပြန်ရေးသိမ်းမိမည် မဟုတ်ပါ။';
-// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
-// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
-// to stay readable on a phone, while the Notes section is already this page's documentation home,
-// prints with the page, and is translated with everything else. The popup carries a one-line
-// pointer to here instead (lpn_pump_curve_note).
-// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='ရေတင်စက် ကွေးမျဉ်း';
 $ec_lang['lpn_notes_5_def']='ရေတင်စက်တစ်ခုသည် H = H₀ − aQ^b ဆိုသည့် ညီမျှခြင်းကို လိုက်နာသည်၊ ဤတွင် H မှာ ရေတင်စက်က ထပ်ပေါင်းပေးသော ဖိမြင့်ဆင့်ဖြစ်ပြီး Q မှာ ၎င်းကိုဖြတ်၍ စီးဆင်းသော ရေစီးနှုန်းဖြစ်သည်။ ထုတ်လုပ်သူ၏ ကွေးမျဉ်းမှ အမှတ် တစ်ခု၊ နှစ်ခု (သို့) သုံးခုကို ထည့်သွင်းပါ။ အမှတ်သုံးခု — ရေစီးနှုန်းသုညတွင် ဖိမြင့်ဆင့်၊ ပုံမှန်အလုပ်လုပ်သည့်အမှတ်နှင့် အမြင့်ဆုံးရေစီးနှုန်းရှိသည့်အမှတ် — တို့သည် H₀၊ a နှင့် b ကို တိုက်ရိုက်ချိန်ညှိပေးပြီး ထုတ်ဝေထားသော ကွေးမျဉ်းနှင့် အနီးဆုံး လိုက်ပါသည်။ အမှတ်နှစ်ခုကမူ ရေစီးနှုန်းသုညတွင် အထွတ်ရှိသော ပါရာဘိုလာ (b = 2) တစ်ခုနှင့် ကိုက်ညီစေသည်။ အမှတ်တစ်ခုတည်းကမူ ယေဘုယျစည်းမျဉ်းတစ်ခုကို သုံးသည် - ရေစီးနှုန်းသုညတွင် ဖိမြင့်ဆင့်မှာ သင်ထည့်သွင်းသည့် ဖိမြင့်ဆင့်၏ 1.33 ဆဖြစ်ပြီး၊ အမြင့်ဆုံးရေစီးနှုန်းမှာ သင်ထည့်သွင်းသည့် ရေစီးနှုန်း၏ 2 ဆဖြစ်ပြီး၊ ၎င်းသည်လည်း b = 2 ကို ပေးပါသည်။ အမှတ်တစ်ခုမျှ မထည့်သွင်းထားသော ရေတင်စက်တစ်ခုသည် ဖိမြင့်ဆင့် လုံးဝ ထပ်မပေါင်းပါ။ ဖိမြင့်ဆင့် သုညသို့ရောက်သည့်နေရာတွင် ကွေးမျဉ်းကို ဖြတ်၍ ရပ်တန့်ထားခြင်း မရှိသောကြောင့်၊ ရေတင်စက်တစ်ခုအား ၎င်း၏ကွေးမျဉ်း ပေးနိုင်သည်ထက် ပိုသော ရေစီးနှုန်းကို တောင်းဆိုပါက အနုတ်ဖိမြင့်ဆင့် ရရှိပါလိမ့်မည်။ ဤပြဿနာကို ဖြေရှင်းရန်မှာ ကွေးမျဉ်း အသစ်ချိန်ညှိခြင်း မဟုတ်ဘဲ၊ ရေတင်စက်ကြီးတစ်ခု (သို့) လိုအပ်ချက်နည်းသော ပမာဏတစ်ခု ရွေးချယ်ရန်သာ ဖြစ်သည်။';
 $ec_lang['lpn_notes_4_term']='စီစဉ်ထားသော ထပ်တိုးမှုများ';
@@ -1001,24 +804,12 @@ $ec_lang['lpn_engine_ready_valve']='EPANET ဖြေရှင်းစက်သ�
 $ec_lang['lpn_engine_unavailable']='ကိုယ်တိုင် ဖွင့်/ပိတ် လုပ်ဆောင်သော ဗားလ်များကို ဖြေရှင်းပေးသည့် EPANET ဖြေရှင်းစက်ကို ရယူ၍မရခဲ့ပါ။ အင်တာနက်ကို တစ်ကြိမ်သာ ချိတ်ဆက်ပါ၊ ထို့နောက် ဤစက်ပေါ်တွင် သိမ်းထားပါလိမ့်မည်။';
 $ec_lang['lpn_diag_not_converged']='အဖြေ မတွေ့ရှိခဲ့ပါ။ အချင်းသုည ကဲ့သို့ လက်တွေ့ဘဝတွင် မဖြစ်နိုင်သော တန်ဖိုးများကို စစ်ဆေးပါ။';
 $ec_lang['lpn_field_roughness']='ကြမ်းတမ်းမှု';
-// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
-// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
-// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C။ ဂဏန်းမြင့်လေ ပိုက်ချောမွေ့လေဖြစ်သည် - ပလပ်စတစ်အသစ်အတွက် ခန့်မှန်းခြေ 150၊ သံမဏိ (သို့) သံအသစ်အတွက် 130 နှင့် ပိုက်ဟောင်းအတွက် 100 ခန့်ဖြစ်သည်။';
 $ec_lang['lpn_field_length']='အလျား';
 $ec_lang['lpn_field_length_tip']='ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။';
-// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
-// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
-// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k';
 $ec_lang['lpn_field_km_tip']='ဤပိုက်လိုင်းပေါ်ရှိ ကွေ့ချိုးမှုများ၊ ဗားလ်များနှင့် ဆက်စပ်ပစ္စည်းများမှ ဆုံးရှုံးမှု၊ ရေအလျင် ဖိမြင့်ဆင့်၏ အဆများအဖြစ် တွက်ချက်သည်။ ဖြောင့်တန်းသော ပိုက်လိုင်း သာမန်တစ်ခုအတွက် 0 ကို သုံးပါ။';
-// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
-// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
-// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
-// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='ဒေသဆိုင်ရာ ဆုံးရှုံးမှု၊ k';
-// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
-// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='ကွေးမျဉ်း အရင်းအမြစ်';
 $ec_lang['lpn_pump_curve_own']='အောက်တွင် အမှတ်များ ထည့်သွင်းရန်';
 $ec_lang['lpn_pump_curve_ref_note']='ရေတင်စက် {id} အတွက် ထည့်သွင်းထားသော ကွေးမျဉ်းကို အသုံးပြုနေသည်။';
@@ -1026,23 +817,13 @@ $ec_lang['lpn_pump_curve_note']='အမှတ် တစ်ခု၊ နှစ်
 $ec_lang['lpn_pump_point1']='အမှတ် ၁';
 $ec_lang['lpn_pump_point2']='အမှတ် ၂';
 $ec_lang['lpn_pump_point3']='အမှတ် ၃';
-// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
-// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
-// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='မုဒ် - ရွေးချယ်ရန်။ အစိတ်အပိုင်းတစ်ခု (သို့) အညွှန်းတစ်ခုကို ကြည့်ရန် (သို့) ပြောင်းလဲရန် နှိပ်ပါ။ နေရာတစ်ခု၊ အမှတ်တစ်ခု (သို့) အညွှန်းတစ်ခုကို ရွှေ့ရန် ဖိဆွဲပါ။ ပိုက်လိုင်းတစ်ခုတွင် အမှတ်ထည့်ရန် (သို့) ဖယ်ရှားရန် နှစ်ချက်နှိပ်ပါ။';
 $ec_lang['lpn_mode_delete']='မုဒ် - ဖျက်ရန်။ အစိတ်အပိုင်းတစ်ခုကို ဖယ်ရှားရန် နှိပ်ပါ။';
 $ec_lang['lpn_mode_add_junction']='မုဒ် - ဆက်စပ်နေရာ ထည့်ရန်။ ဆက်စပ်နေရာတစ်ခု ထားရန် မြေပုံကို နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းလဲရန် (သို့) ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
 $ec_lang['lpn_mode_add_reservoir']='မုဒ် - ရေကန် ထည့်ရန်။ ရေကန်တစ်ခု ထားရန် မြေပုံကို နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းလဲရန် (သို့) ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
 $ec_lang['lpn_mode_add_pipe']='မုဒ် - ပိုက်လိုင်း ထည့်ရန်။ နေရာတစ်ခုနှင့် ကျန်နေရာတစ်ခုကို ချိတ်ဆက်ရန် ၎င်းတို့ကို အသီးသီး နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းလဲရန် (သို့) ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
 $ec_lang['lpn_mode_add_pump']='မုဒ် - ရေတင်စက် ထည့်ရန်။ နေရာတစ်ခုနှင့် ကျန်နေရာတစ်ခုကို ချိတ်ဆက်ရန် ၎င်းတို့ကို အသီးသီး နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းလဲရန် (သို့) ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
-// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
-// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='မုဒ် - စာသား ထည့်ရန်။ စာသား အညွှန်းတစ်ခု ထားရန် မြေပုံကို နှိပ်ပါ။ စာသားကို နေရာတစ်ခုနှင့် တွဲချိတ်ရန် ထိုနေရာအနီးတွင် နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းလဲရန် (သို့) ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
-// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
-// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
-// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
-// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
-// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='မြေပုံပေါ်ရှိ အရာများကို ပြောင်းလဲရန်၊ ရွှေ့ရန်နှင့် ဖိဆွဲရန် ဤမုဒ်ကို အသုံးပြုပါ။';
 $ec_lang['lpn_tip_labels_draggable']='အညွှန်းတစ်ခုကို ရွှေ့ရန် ဖိဆွဲနိုင်ပါသည်။ ၎င်း၏ အလိုအလျောက်တည်နေရာသို့ ပြန်ပို့ရန် အညွှန်းကို နှစ်ချက်နှိပ်ပါ။';
 $ec_lang['lpn_field_auto']='အလိုအလျောက်';
@@ -1074,8 +855,6 @@ $ec_lang['lpn_labels_col_decimals']='ဒဿမ';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='နောက်ခံပုံ…';
 $ec_lang['lpn_backdrop_add']='ထည့်ရန်';
-// BARE VERBS: the "Background image…" heading above them now carries the object, so the verb
-// alone acts on it (see the English source comment at this key for the full history).
 $ec_lang['lpn_backdrop_scale']='ရွေးချယ်၍ အတိုင်းအတာ သတ်မှတ်ရန်';
 $ec_lang['lpn_backdrop_scale_entry']='ပုံနေရာသတ်မှတ်ဖိုင် (သို့) မြေပုံပေါ်ရှိ ပစ်ဆယ်တစ်ခု၏ အရွယ်အစားဖြင့် အတိုင်းအတာ သတ်မှတ်ရန်';
 $ec_lang['lpn_backdrop_scale_from']='လက်ရှိအရွယ်အစားမှ၊ သင်ရွေးချယ်သော အမှတ်တစ်ခုပတ်လည် အတိုင်းအတာ ပြောင်းရန်';
@@ -1116,8 +895,6 @@ $ec_lang['lpn_push_none_displayed']='ယခု အစပြုတန်ဖို
 $ec_lang['lpn_push_nothing']='ရှိပြီးသား အစိတ်အပိုင်း မည်သည့်တစ်ခုမျှ အသုံးချမည့် ဂုဏ်သတ္တိများ မရှိပါ။';
 $ec_lang['lpn_push_no_change']='အစိတ်အပိုင်းတိုင်းတွင် ဤတန်ဖိုးများ ရှိနှင့်ပြီးဖြစ်သောကြောင့်၊ မည်သည့်အရာမျှ ပြောင်းလဲမည် မဟုတ်ပါ။';
 $ec_lang['lpn_settings_emitter_exponent']='ဖျန်းစက် ထပ်ကိန်း';
-// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
-// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='တွက်ချက်မှု';
 $ec_lang['lpn_settings_tolerance']='အဖြေ ချဉ်းကပ်မှု သည်းခံချက်';
 $ec_lang['lpn_settings_tolerance_tip']='ရပ်တန့်မီ ဖြေရှင်းစက် မည်မျှ နီးကပ်ရမည်ကို ဆိုလိုသည်။ ဂဏန်းငယ်လေ ပိုတိကျပြီး ပိုကြာလေဖြစ်သည်။';
@@ -1128,25 +905,16 @@ $ec_lang['lpn_engine_failed']='EPANET ဖြေရှင်းစက်ကို
 $ec_lang['lpn_unit_unknown']='ဤပုံသည် ဤစာမျက်နှာက မပေးသော ယူနစ်တစ်ခုကို ဖော်ပြထားသည် - {unit}။ ဝင်လာသည့်အတိုင်း အရာအားလုံးကို ထိန်းသိမ်းပြသထားပြီး၊ မည်သည့်အရာမျှ ပြောင်းလဲမထားပါ။ ဤစာမျက်နှာအား ထိုယူနစ်ကို မသင်ကြားရသေးသရွေ့ မည်သည့်အရာမျှ တွက်ချက်၍မရပါ၊ အကြောင်းမှာ ၎င်း၏ အရွယ်အစားကို မသိသောကြောင့်ဖြစ်သည်။';
 $ec_lang['lpn_engine_manning_note']='မှတ်ချက် - Manning ကြမ်းတမ်းမှုဖြင့် EPANET သည် တွဲထားသော ဖြေရှင်းစက်ထက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှုကို ခန့်မှန်းခြေ 0.6% နည်းစွာ တွက်ချက်ပါသည်။';
 $ec_lang['lpn_settings_text_size']='စာသား အရွယ်အစား (ပစ်ဆယ်များ)';
-// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
-// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
-// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='သင်္ကေတ အရွယ်အစား (ပစ်ဆယ်များ)';
 $ec_lang['lpn_settings_link_width']='ပိုက်လိုင်း အထူ (ပစ်ဆယ်များ)';
 $ec_lang['lpn_settings_align_labels']='ပိုက်အညွှန်းများကို ပိုက်လိုင်းနှင့် ညီညွတ်အောင် တန်းရန်';
 $ec_lang['lpn_settings_readability_bias']='အညွှန်းသည် ဒေါင်လိုက်မှ ဘယ်ဘက်သို့ ဒီဂရီ ဤမျှထက်ပိုစောင်းလျှင် အောက်ခေါင်းစိုက် ပြန်လှည့်ပါ';
 $ec_lang['lpn_settings_readability_bias_tip']='အညွှန်းသည် ဒေါင်လိုက်မှ ဘယ်ဘက်သို့ ဤဒီဂရီအရေအတွက်ထက် ပိုစောင်းနေလျှင်၊ တည့်မတ်နေစေရန် အညွှန်းကို ပြန်လှည့်ပေးသည်။';
 $ec_lang['lpn_settings_mask_labels']='အညွှန်းများ၏နောက်ကွယ်တွင် အစိုင်အခဲ နောက်ခံ';
-// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
-// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='သင်္ကေတ မြင်နိုင်မှု (0 မှ 1)';
-// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
-// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='နောက်ခံပုံ မြင်နိုင်မှု (0 မှ 1)';
 $ec_lang['lpn_settings_map_display']='မြေပုံ အသွင်အပြင်';
 $ec_lang['lpn_settings_map_height_px']='မြေပုံ အမြင့် (စခရင် ပစ်ဆယ်များ)';
-// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
-// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='စခရင်သေးငယ်ပါက မြေပုံကို ဤအရွယ်အစားထက် ပိုတိုအောင် ရေးဆွဲသောကြောင့်၊ စာမျက်နှာ၏ တစ်စိတ်တစ်ပိုင်းကို လှိမ့်ရန် အမြဲကျန်ရစ်စေသည်။';
 $ec_lang['lpn_settings_legend_position']='မြေပုံသော့ချက် တည်နေရာ';
 $ec_lang['lpn_settings_legend_top_left']='ဘယ်ဘက်အပေါ်';
@@ -1176,7 +944,6 @@ $ec_lang['lpn_confirm_restore_defaults']='ဆက်တင်အားလုံ�
 $ec_lang['lpn_settings_wipe_btn']='ဤစာမျက်နှာပေါ်ရှိ အရာအားလုံးကို ဖျက်ရန်';
 $ec_lang['lpn_confirm_wipe']='ဤစာမျက်နှာအတွက် သိမ်းဆည်းထားသော အရာအားလုံး — ပရောဂျက်တိုင်း၊ နောက်ခံပုံတိုင်း၊ ဆက်တင်အားလုံးနှင့် သင့်ယူနစ်ရွေးချယ်မှုများ — ကို ဖျက်ပြီး၊ လာရောက်ကြည့်ရှုသူ လုံးဝအသစ်တစ်ဦးက မြင်ရသည့်အတိုင်း စာမျက်နှာကို ပြန်ဖွင့်မလား။ ၎င်းကို နောက်ပြန်ဖျက်၍မရပါ။';
 
-// Sprint 316-tanks-valves-scenarios (2026-08-14): tanks, control valves, scenarios
 $ec_lang['lpn_tool_add_tank']='ရေတိုက်';
 $ec_lang['lpn_tool_add_valve']='ဗားလ်';
 $ec_lang['lpn_tank_elev_tip']='ရေတိုက်ကြမ်းပြင်၏ အမြင့်။ ရေတိုက်ရှိ ရေနက်ရှိုင်းမှုများကို ဤနေရာမှ အပေါ်သို့ တိုင်းတာသည်။';

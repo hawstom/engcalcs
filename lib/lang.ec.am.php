@@ -2,8 +2,6 @@
 
 // አማርኛ — All missing text declarations will fall back to English.
 
-// Units (alphabetical order)
-// Necessary for calculator units selectors
 $ec_lang['u_depthFrac']='ክፍልፋይ';
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='ft^2';
@@ -58,9 +56,6 @@ $ec_lang['u_hp']='hp';
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
 
-// Page text
-// In page order for easiest maintenance.
-// Menu and General
 $ec_lang['menu_brand']='HawsEDC ካልኩሌተሮች';
 $ec_lang['menu_main_list']='የካልኩሌተሮች ዝርዝር';
 $ec_lang['menu_main_hydraulics']='ሃይድሮሊክስ';
@@ -71,10 +66,6 @@ $ec_lang['template_welcome']='ፍርሃትህን በር ላይ ትተህ ግባ;
 $ec_lang['template_feedback']='የዚህ ገጽ አገላለጽን የተሻለ አድርገው መጠቆም ይችላሉ ወይስ ሌላ ሐሳብ አለዎት? መርዳት ወይም እንደዚህ ያሉ መሳሪያዎችን መስራት መማር ይፈልጋሉ? እባክዎ ያግኙኝ።';
 $ec_lang['template_printable_title']='ሊታተም የሚችል ርዕስ';
 $ec_lang['template_printable_subtitle']='ሊታተም የሚችል ንዑስ ርዕስ';
-// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
-// prose, and they are translated into all 26 languages for one reason: consent that the visitor
-// cannot read is not consent. The long-form privacy notice and terms are a separate question --
-// English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_body']='ተደጋጋሚ ጉብኝቶችን መመዝገብ ለማስቀረት በዚህ አሳሽ መገለጫ ማከማቻ ውስጥ በእያንዳንዱ ገጽ አንድ ቁጥር ብቻ እንድናስቀምጥ ይፈቅዱልናል?';
 $ec_lang['consent_accept']='ይህን ይፍቀዱ';
 $ec_lang['consent_accept_all']='ሁሌም ይፍቀዱ';
@@ -106,7 +97,6 @@ $ec_lang['ec_name_tip']='እነዚህ ግቤቶች ወደ URL ያስቀምጣል
 $ec_lang['calc_copy_link']='ቅዳ ሊንክ';
 $ec_lang['ec_related_calcs']='ተዛማጅ ማስያዎች፦';
 $ec_lang['calc_copy_link_done']='ተቀድቷል!';
-// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach የቧንቧ ሄድ ኪሳራ';
 $ec_lang['dw_main_title']='ነፃ ኦንላይን Darcy-Weisbach የቧንቧ ሄድ ኪሳራ ካልኩሌተር';
 $ec_lang['dw_main_desc']='Darcy-Weisbach የቧንቧ ሄድ ኪሳራ በተሰጠ ዲያሜትር፣ ሻካሪነት እና ፍሰት';
@@ -122,7 +112,6 @@ $ec_lang['dw_regime_transitional']='ሽግግር';
 $ec_lang['dw_regime_turbulent']='ቱርቡሌንት';
 $ec_lang['dw_friction_factor_method']='የግጭት ፋክተር ዘዴ';
 $ec_lang['dw_friction_factor']='ግጭት ፋክተር, f';
-// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Hazen-Williams የቧንቧ ሄድ ኪሳራ';
 $ec_lang['hw_main_title']='ነፃ ኦንላይን Hazen-Williams የቧንቧ ሄድ ኪሳራ ካልኩሌተር';
 $ec_lang['hw_main_desc']='Hazen-Williams የቧንቧ ሄድ ኪሳራ በተሰጠ ዲያሜትር፣ ሻካሪነት እና ፍሰት';
@@ -140,7 +129,6 @@ $ec_lang['hw_roughness']='Hazen-Williams ቅንጅት, C';
 $ec_lang['hw_note_1']='<dl><dt>ይህ ማስያ በሁለቱ ጫፎች መካከል ያለውን የቧንቧ መገለጫ (ፕሮፋይል) አይቀርጽም።</dt><dd>የሚጠቀመው እርስዎ ያስገቡትን ወደ ላይ እና ዝቅ ባለ ፍሰት ከፍታዎች ብቻ ነው። መሬቱ በመሃል ላይ ከሁለቱም ጫፎች ከፍ ካለ፣ በዚያ ከፍተኛ ነጥብ ላይ ያለው ግፊት እዚህ ከተዘገበው ግፊት ያንሳል። ያንን ለማረጋገጥ ካልኩሌተሩን ከወደ ላይ ባለ ፍሰት ጫፍ እስከ ከፍተኛው ነጥብ ላለው ርዝመት እንደገና ያሂዱት።</dd><dd>HGL ከቧንቧው በታች በሚወድቅበት ቦታ ውሃው በአሉታዊ ግፊት ውስጥ ነው። አየር ከመፍትሄው ይወጣል፣ ቀጭን ግድግዳ ያለው ቧንቧ ሊሰነጠቅ ይችላል፣ ቆሻሻ የከርሰ ምድር ውሃም በመገጣጠሚያዎቹ በኩል ሊገባ ይችላል። መስመሩን በሁሉም ቦታ በአዎንታዊ ግፊት ስር ያቆዩት፣ በእያንዳንዱ ከፍተኛ ነጥብ ላይ የአየር ቫልቭ ማካተትንም ያስቡበት።</dd><dt>ወደ ላይ ባለ ፍሰት ግፊት እርስዎ የሚያቀርቡት የድንበር ሁኔታ ነው።</dt><dd>ከመለኪያ (gauge)፣ ከማጠራቀሚያ ታንክ የውሃ ወለል (ከቧንቧው በላይ ያለው የውሃ ከፍታ)፣ ወይም ከፓምፕ ኩርባ ያንብቡት። ፍሰቱ እየጨመረ ሲሄድ ፓምፕ ያነሰ ግፊት ይሰጣል፣ ስለዚህ ከላይ ከገባው ፍሰት ጋር የሚዛመደውን የኩርባ ነጥብ ይጠቀሙ።</dd><dt>ጥቃቅን (አካባቢያዊ) ኪሳራ ቅንጅቶችን እራስዎ ይደምሩ።</dt><dd>በመስመሩ ላይ ላለ ለእያንዳንዱ ቫልቭ፣ መታጠፊያ፣ ቲ፣ ሜትር እና መግቢያ ያሉትን K ዋጋዎች ይደምሩ፣ ያንንም ድምር ያስገቡ። የተለመዱ ዋጋዎችን ለማግኘት በዚያ ግቤት ላይ ያለውን አገናኝ ይከተሉ። በረጅም ማስተላለፊያ ዋና ቧንቧ ላይ እነዚህ ኪሳራዎች ከግጭት አንፃር ትንሽ ናቸው፣ ነገር ግን በአጭር የጣቢያ ቧንቧ ውስጥ አብዛኛውን ኪሳራ ሊሆኑ ይችላሉ።</dd></dl>';
 
 
-// Manning Irregular
 $ec_lang['mi_menu']='Manning ያልተስተካከለ ቅርጽ ቦይ';
 $ec_lang['mi_main_title']='ነፃ ኦንላይን Manning ያልተስተካከለ ቅርጽ ቦይ ካልኩሌተር';
 $ec_lang['mi_main_desc']='ያልተስተካከለ ቅርጽ ቦይ Manning ወጥ ፍሰት ካልኩሌተር';
@@ -168,7 +156,6 @@ $ec_lang['mi_notes_1_term']='ጥምር n';
 $ec_lang['mi_notes_1_def']='ይህ ካልኩሌተር HEC-RAS የማጣቀሻ ማኑዋልን ተከትሎ Chow 1959, ገጽ 136, እኩልታ 6-17 (6-18 ሳይሆን) ተጠቅሞ የክልል ጥምር n ያሰላል።';
 $ec_lang['mi_notes_2_term']='የድንጋይ ሽፋን';
 $ec_lang['mi_notes_2_def']='የድንጋይ ሽፋን ለመንደፍ Manning ትራፔዞይዳዊ ቦይ ካልኩሌተርን ይጠቀሙ። ይህ ካልኩሌተር ለተፈጥሯዊ ተሻጋሪ ክፍሎች ይበልጥ ተስማሚ ነው።';
-// Manning Pipe Flow
 $ec_lang['mpf_main_menu']='Manning የቧንቧ ፍሰት';
 $ec_lang['mpf_main_title']='ነፃ ኦንላይን Manning የቧንቧ ፍሰት ካልኩሌተር';
 $ec_lang['mpf_main_desc']='Manning ቀመር ወጥ የቧንቧ ፍሰት በተሰጠ ቁልቁለት እና ጥልቀት';
@@ -197,7 +184,6 @@ $ec_lang['mpf_solver_enter_positive_q']='አዎንታዊ ዒላማ Q ያስገ�
 $ec_lang['mpf_solver_no_solution']='ውጤት የለም፦ Q ከቧንቧው አቅም ይበልጣል y/d0 = 93.8% ላይ (Qmax = {qmax} በተመረጡት አሃዶች)።';
 $ec_lang['mpf_solve_btn']='ፍታ';
 $ec_lang['mpf_solve_for_flow']='ለፍሰት, Q =';
-// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning የቧንቧ ሄድ ኪሳራ';
 $ec_lang['mphl_main_title']='ነፃ ኦንላይን Manning የቧንቧ ሄድ ኪሳራ ካልኩሌተር';
 $ec_lang['mphl_main_desc']='Manning ቀመር ሄድ ኪሳራ ሙሉ ፍሰት ሲሰጥ';
@@ -214,7 +200,6 @@ $ec_lang['mphl_egl_1']='ዝቅ ባለ ፍሰት EGL';
 $ec_lang['mphl_egl_2']='ወደ ላይ ባለ ፍሰት EGL';
 $ec_lang['mphl_hgl_egl_tip']='ቧንቧው ከፍ ያለ ከሆነ ትክክለኛ ላይሆን ይችላል። ማስታወሻዎችን ይመልከቱ።';
 $ec_lang['mphl_note_1']='<dl><dt>ይህ ማስያ በሁለቱ ጫፎች መካከል ያለውን የቧንቧ መገለጫ (ፕሮፋይል) አይቀርጽም።</dt><dd>HGL በማንኛውም ቦታ ከቧንቧው ጫፍ በታች ከሆነ፣ ይህ ስሌት ትክክለኛ ላይሆን ይችላል።</dd><dt>ለክፍት መግቢያ (culvert) ሁኔታ፣ የመግቢያ ቁጥጥር ሁኔታዎችን ማረጋገጥ ያስፈልጋል።</dt><dd>1. የወደ ላይ ባለ ፍሰት HGL ከወደ ላይ ባለ ፍሰት ተፈጥሯዊ ጥልቀት ፍሰት ከፍታ በላይ (እንዲሁም ከቧንቧው በላይ) መሆን አለበት።</dd><dd>2. የ culvert የላይኛው ውሃ ከወደ ላይ ባለ ፍሰት HGL ይልቅ በወደ ላይ ባለ ፍሰት EGL በተሻለ ይወከላል።</dd><dd>3. ለቀላል መደበኛ culvert የላይኛው ውሃ ስሌቶች <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">የ2 ደቂቃ ትምህርቴን</a> ይመልከቱ፣ ከዩ.ኤስ. የፌዴራል ሀይዌይ አስተዳደር የተገኘ ነጻ የ culvert ፕሮግራም የሆነውን <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> ተጠቅሞ።</dd><dd>4. ይህ ገጽ የሚፈታው የውጤት ቁጥጥር (outlet control) ሁኔታን ብቻ ነው፦ ሙሉ ሆኖ የሚፈስ ቧንቧ፣ የታችኛው ውሃ ሁኔታዎች ሄዱን የሚወስኑበት። የ culvert ንድፍ ስራ የመግቢያ ቁጥጥር (inlet control) ወይም የውጤት ቁጥጥር (outlet control) እንደሚቆጣጠር መወሰን ነው፣ ስለዚህ ሁለቱም ሊሆኑ በሚችሉበት ጊዜ ሁሉ HY-8ን ተጠቀም።</dd></dl>';
-// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning ትራፔዞይዳዊ ቦይ';
 $ec_lang['mtc_main_title']='ነፃ ኦንላይን Manning ቀመር ትራፔዞይዳዊ ቦይ ካልኩሌተር';
 $ec_lang['mtc_main_desc']='Manning ቀመር ወጥ ትራፔዞይዳዊ ቦይ ፍሰት በተሰጠ ቁልቁለት እና ጥልቀት';
@@ -249,7 +234,6 @@ $ec_lang['mtc_note_1']='<dl><dt>አውቶማቲክ የድንጋይ መጠን እ
 $ec_lang['mtc_note_2_term']='የፍጥነት ምርመራ';
 $ec_lang['mtc_note_2_def']='ከፍተኛ ፍጥነት ከሚገኝ ቁልቁለት ከፍተኛ ልዩ ሃይልን ያሳያል። ያ ሃይል በስፋፊዎች፣ ጥምዞች ወይም እንቅፋቶች ላይ በፍጥነት ሊጠፋ ይችላል። ይህ ለቦታው ምክንያታዊ መሆኑን ያረጋግጡ።';
 $ec_lang['mtc_solver_no_solution']='በእነዚህ የቦዮ ግቤቶች ለተሰጠው Q መፍትሔ አልተገኘም።';
-// Weir Flow Simple
 $ec_lang['ws_main_menu']='ቀላል ዊር ፍሰት';
 $ec_lang['ws_main_title']='ነፃ ኦንላይን ቀላል ሰፊ-ጫፍ ዊር ፍሰት ካልኩሌተር';
 $ec_lang['ws_main_desc']='ቀላል ሰፊ-ጫፍ ዊር ፍሰት ካልኩሌተር';
@@ -258,7 +242,6 @@ $ec_lang['ws_headWaterHeight']='<span class="ec-help" title="በአንድ አሃ
 $ec_lang['ws_weirCoefficient']='የዊር ቅንጅት, C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='ማስታወሻዎች';
 $ec_lang['ws_notes_we_term']='የዊር እኩልታ';
-// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='መደበኛ ያልሆነ ዊር ፍሰት';
 $ec_lang['wi_main_title']='ነፃ ኦንላይን ክፍልፋይ፣ ተለዋዋጭ ጥልቀት፣ መደበኛ ያልሆነ ዊር ፍሰት ካልኩሌተር';
 $ec_lang['wi_main_desc']='መደበኛ ያልሆነ ዊር ፍሰት ካልኩሌተር';
@@ -268,7 +251,6 @@ $ec_lang['wi_incrementalFlow']='ተጨማሪ ፍሰት';
 $ec_lang['wi_cumulativeFlow']='ድምር ፍሰት';
 $ec_lang['wi_save_and_calculate']='አስቀምጥ እና አሰላ';
 $ec_lang['wi_notes_we_def']='q = ርዝመት = 0 ከሆነ 0፤ አለበለዚያ ቁልቁለት = 0 ከሆነ cw*ርዝመት*d<sub>0</sub><sup>1.5</sup>፤ አለበለዚያ cw/(2.5*ቁልቁለት) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>)፣ እዚህ ላይ d<sub>1</sub> እና d<sub>0</sub> ሁልጊዜ አዎንታዊ ወይም ዜሮ ናቸው';
-// Orifice Flow
 $ec_lang['or_main_menu']='ቀዳዳ ፍሰት';
 $ec_lang['or_main_title']='ነፃ ኦንላይን ቀዳዳ ፍሰት ካልኩሌተር';
 $ec_lang['or_main_desc']='ቀዳዳ ፍሰት — ነፃ ወይም የተጠለቀ';
@@ -300,7 +282,6 @@ $ec_lang['or_notes_3_term']='የፍሰት ቅንጅት';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> ለሹል-ጫፍ ቀዳዳዎች ከ0.60 እስከ 0.65 አካባቢ ይደርሳል። ክብ ወይም ወደ ውስጥ ዘልቀው የገቡ (re-entrant) መግቢያዎች ግን የተለያዩ ዋጋዎችን ይጠቀማሉ። ለተጨማሪ መመሪያ <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> ወይም የHEC-RAS Hydraulic Reference Manual ይመልከቱ።';
 $ec_lang['or_notes_4_term']='መጠለቅ';
 $ec_lang['or_notes_4_def']='TWE ከክፍት ቦታው ግርጌ (invert) በላይ ሲሆን ይህ ካልኩሌተር በራስ-ሰር h = HWE − TWE የተጠለቀ ቀዳዳ እኩልታን ይጠቀማል። TWE ከግርጌው ጋር እኩል ወይም ከዚያ ዝቅ ሲል ግን ነፃ ፍሰት ተብሎ ተወስዶ h = HWE − ማዕከል ይሰላል።';
-// Micro-Hydro Power
 $ec_lang['mhp_main_menu']='ማይክሮ-ሃይድሮ ኃይል';
 $ec_lang['mhp_main_title']='ነፃ የመስመር ላይ ማይክሮ-ሃይድሮ ኃይል ካልኩሌተር';
 $ec_lang['mhp_main_desc']='የወንዝ-ፍሰት ማይክሮ-ሃይድሮ ኃይል ውፅዓት ካልኩሌተር';
@@ -333,7 +314,6 @@ $ec_lang['mhp_notes_6_def']='ለማይክሮ-ሃይድሮ ስርዓቶች ተለ
 $ec_lang['mhp_notes_7_term']='ዓመታዊ ሃይል';
 $ec_lang['mhp_notes_7_def']='ዓመታዊ ሃይል ያለማቋረጥ ሙሉ-ፍሰት ስራ (8760 ሰዓት/ዓመት) እንዳለ ይገምታል። ትክክለኛው ምርት በወቅታዊ የፍሰት ልዩነት፣ የጥገና ማቆሚያ ጊዜ እና የጭነት መጠን ምክንያት ያንሳል።';
 
-// Orifice Drain Time
 $ec_lang['odt_main_menu']='ኩሬና ታንክ ፍሳሽ ጊዜ';
 $ec_lang['odt_main_title']='ነፃ ኦንላይን ኩሬ፣ ቤዝን እና ታንክ ፍሳሽ ጊዜ ካልኩሌተር (ቀዳዳ)';
 $ec_lang['odt_main_desc']='ኩሬ፣ ቤዝን ወይም ታንክ ፍሳሽ ጊዜ — የቀዳዳ መውጫ፣ ኮኒካዊ መጠን ዘዴ';
@@ -361,10 +341,7 @@ $ec_lang['odt_q_max']='ከፍተኛ ፍሰት, Q<sub>max</sub>';
 $ec_lang['odt_vol']='የፈሰሰ መጠን';
 $ec_lang['odt_sketch_start']='ጅምር';
 $ec_lang['odt_sketch_end']='ፍጻሜ';
-// Contact us.
 
-// Irrigation
-// Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='የኤሚተር ክፍተት, S<sub>e</sub>';
 $ec_lang['ip_sl']='የላተራል ክፍተት, S<sub>l</sub>';
 $ec_lang['ip_n_e']='ኤሚተሮች በላተራል, n<sub>e</sub>';
@@ -375,7 +352,6 @@ $ec_lang['ip_pr']='የልፍፍ መጠን, PR';
 $ec_lang['ip_q_lat']='ፍሰት በላተራል, Q<sub>lat</sub>';
 $ec_lang['ip_q_sys']='የዞን ፍሰት, Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='የስራ ጊዜ (ሰዓታት)';
-// Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='የቦይ ዘልቆ ማለፍ';
 $ec_lang['cs_main_title']='ነፃ ኦንላይን የቦይ ዘልቆ ማለፍ ኪሳራና የቦይ ማጓጓዝ ብቃት ካልኩሌተር';
 $ec_lang['cs_main_desc']='የቦይ ዘልቆ ማለፍ ኪሳራና የቦይ ማጓጓዝ ብቃት — የመግቢያ-መውጫ ዘዴ';
@@ -410,7 +386,6 @@ $ec_lang['cs_notes_2_def']='ዓይነተኛ ያልተሸፈኑ የምድር ቦ�
 $ec_lang['cs_notes_3_term']='የሽፋን መመለሻ';
 $ec_lang['cs_notes_3_def']='የውሃ ዋጋንና የሽፋን ወጪን በማንኛውም ወጥ ምንዛሬ ያስገቡ። የሽፋን ስፋት = የክፍል ርዝመት × የተረጠቀ ዙሪያ — በተለካው የፍሰት ጥልቀት ላይ ያለው የቦይ መስቀለኛ ክፍል የተረጠቀ ዙሪያ (የታችኛው ስፋት ከሁለቱም የተረጠቁ ጎኖች ጋር)። የሚመለሰው ዓመታዊ ዋጋ የተሸፈነው ቦይ ዒላማ E<sub>c</sub>ን ያለማቋረጥ እንደሚያሳካ ይገምታል። ለወቅታዊ ቦዮች ወይም ሽፋኑ ዒላማ ብቃቱን ካላሳካ ትክክለኛው የመመለሻ ጊዜ ይረዝማል።';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3ኛ እትም (2001)። FAO Irrigation and Drainage Paper 57 (1999)።';
-// About
 $ec_lang['about_main_menu']='ስለ';
 $ec_lang['install_main_menu']='ጫን';
 $ec_lang['install_main_title']='EngCalcs ይጫኑ';
@@ -442,7 +417,6 @@ $ec_lang['contactSpamPrefix']='አምስት ሲደምር አንድ ይሆናል'
 $ec_lang['contactSpamPostfix']='(እባክህ በቃላት ፃፍ። 1=አንድ 2=ሁለት 3=ሦስት 4=አራት 5=አምስት 6=ስድስት 7=ሰባት +=ሲደምር 5+1=6)';
 $ec_lang['contactSubmitButton']='መልዕክት ላክ';
 $ec_lang['contact_success']='ለመጻፍ ጊዜ ለወጣህ አመሰግናለሁ።';
-// Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='የድንጋይ-ምቀጫ ቦዩ ዲዛይን (Robinson)';
 $ec_lang['rc_main_title']='ነፃ የመስመር ላይ የድንጋይ-ምቀጫ ቦዩ ዲዛይን ካልኩሌተር — Robinson (1998)';
 $ec_lang['rc_main_desc']='የፈጣን ቦዩ ድንጋይ ሽፋን መጠን — Robinson, Rice & Kadavy (1998)';
@@ -501,12 +475,10 @@ $ec_lang['rc_notes_6_def']='በመውጫ ክፍል ውስጥ ያለው የድን
 $ec_lang['rc_notes_7_def']='የመግቢያ ቦይ ውስጥ ያለው መደበኛ ጥልቀት q<sub>t</sub>ን ለማሳለፍ ከሚያስፈልገው ዌር ሄድ (H<sub>p</sub>) ያነሰ ሲሆን፣ ገደብ ያለው ፍሰት ወይም ኩሬ መያዝ ከፈጣን ቦዩ መግቢያ ከላይ በኩል ይከሰታል። ይህ በአጠቃላይ ተቀባይነት አለው — ኩሬ መያዝ ፍጥነትን ይቀንሳል እና ከላይ በኩል ያለውን ሸርሸራ ይከላከላል። ለማረጋገጥ፦ ለተሰጠው q<sub>t</sub> እና የጫፍ ስፋት H<sub>p</sub>ን ለማግኘት የዌር ፍሰት ካልኩሌተር ይጠቀሙ፣ ከመግቢያ ቦዩ መደበኛ ጥልቀት ጋርም ያወዳድሩት። H<sub>p</sub> ከመደበኛ ጥልቀት ቢበልጥ፣ ኩሬ መያዝ ይከሰታል።';
 $ec_lang['rc_notes_4_term']='ማጣቀሻ';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). “<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">የድንጋይ-ምቀጫ ቦዮች ዲዛይን</a>.” <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS ደግሞ በተመሳሳይ ዘዴ ላይ የተመሠረተ <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel ሰነድ</a> ያትማል።';
-// Sketch labels
 $ec_lang['rc_sketch_filter']          = 'ማጣሪያ';
 $ec_lang['rc_sketch_top_crest_curve'] = 'የላይኛው ጫፍ ኩርባ';
 $ec_lang['rc_sketch_outlet_apron']    = 'የመውጫ ሰሌዳ';
 $ec_lang['rc_sketch_radius']          = 'ራዲየስ';
-// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='የመስኖ ግፊት';
 $ec_lang['ip_main_title']='ነፃ ኦንላይን የመስኖ ግፊትና የስርጭት ወጥነት ካልኩሌተር';
 $ec_lang['ip_main_desc']='የሙከራ ቅርንጫፍ ግፊትና የወጥነት ግምት';
@@ -559,7 +531,6 @@ $ec_lang['ip_notes_5_def']='የልፍፍ መጠንና የሲስተም/ዞን ፍ
 
 
 
-// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='ቅርንጫፍ ያለው የቧንቧ መረብ';
 $ec_lang['bpn_main_title']='ነፃ ኦንላይን ቅርንጫፍ ያለው የቧንቧ መረብ ግፊት ካልኩሌተር (ያለ ቀለበት)';
 $ec_lang['bpn_main_desc']='ቅርንጫፍ ያለው (ዛፍ-ቅርጽ) የቧንቧ መረብ ፍሰትና ግፊት';
@@ -633,18 +604,8 @@ $ec_lang['lpn_field_text_rotation']='ማዕዘን (ዲግሪ)';
 $ec_lang['lpn_field_text_match_pipe']='ወደ ቅርቡ ግንኙነት ማዕዘን ይሽከርከሩ';
 $ec_lang['lpn_field_text_flip']='በ180° አዙር';
 $ec_lang['lpn_field_elev']='ከፍታ';
-// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
-// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
-// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
-// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='በዚህ ነጥብ ላይ ያለው የመሬት ወይም የቧንቧ ደረጃ። ከፈለጉት ከማንኛውም ዜሮ መነሻ መለካት ይችላሉ፣ ሁሉም ነጥቦች ተመሳሳዩን መነሻ እስከተጠቀሙ ድረስ።';
-// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
-// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
-// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='ሄድ';
-// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
-// outright that it is a height and not a pressure, which is the exact confusion the glossary's
-// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='በማጠራቀሚያው ውስጥ ያለው የውሃ ወለል ደረጃ፣ እንደ ከፍታ የሚለካ እንጂ እንደ ግፊት አይደለም። የውሃ ወለሉን በማጠራቀሚያው ከፍታ ላይ ለማድረግ ባዶ ይተውት።';
 $ec_lang['lpn_close']='ዝጋ';
 $ec_lang['lpn_empty_hint']='ናሙና ለመክፈት ፋይል፣ አዲስ ፕሮጀክት ይጠቀሙ። ወይም ከመሳሪያ አሞሌው ማጠራቀሚያ፣ መገናኛ እና ቧንቧ በመጨመር ይጀምሩ።';
@@ -682,10 +643,6 @@ $ec_lang['lpn_units_elevhead']='ከፍታና ሄድ';
 $ec_lang['lpn_units_pressure']='ግፊት';
 $ec_lang['lpn_units_flow']='ፍሰት';
 $ec_lang['lpn_units_velocity']='ፍጥነት';
-// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
-// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
-// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
-// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='የሄድ ኪሳራ ቅልመት';
 $ec_lang['lpn_result_gradient_tip']='የሄድ ኪሳራ በቧንቧው ርዝመት ተካፍሎ የሚገኝ ውጤት። የተለያየ ርዝመት ያላቸውን ቧንቧዎች ከአንድ የንድፍ ገደብ ጋር ለማወዳደር ይጠቀሙበት።';
 $ec_lang['lpn_result_head']='ሄድ';
@@ -694,84 +651,39 @@ $ec_lang['lpn_result_pressure']='ግፊት';
 $ec_lang['lpn_result_flow']='ፍሰት';
 $ec_lang['lpn_result_velocity']='ፍጥነት';
 $ec_lang['lpn_result_headloss']='የሄድ ኪሳራ';
-// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
-// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
-// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
-// Settings live INSIDE each project document, so deleting every project deletes every setting too:
-// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
-// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
-// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='የዚህን ፕሮጀክት ቅንብሮች ብቻ ወደ መጀመሪያው ይመልሳል። ስዕልዎና ሌሎች ፕሮጀክቶችዎ አይለወጡም። የወደዷቸውን ቅንብሮች ዳግም ለመጠቀም ለማስቀመጥ፣ ከቅንብሮች ውጪ ምንም የሌለበት የፕሮጀክት ፋይል ያስቀምጡ።';
 $ec_lang['lpn_reset_all_tip']='ሁሉንም ፕሮጀክቶች፣ ሁሉንም የበስተጀርባ ምስሎች፣ ሁሉንም ቅንብሮች እና የመረጡትን መለኪያ ክፍሎች ይሰርዛል፣ ከዚያም ገጹን ልክ እንደ መጀመሪያ ጎብኚ እንደሚያዩት ዳግም ይጭናል። ሁሉንም ነገር የሚያጸዳ ብቸኛው ዳግም ማስጀመሪያ ይህ ነው።';
-// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
-// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
-// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
-// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
-// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_confirm']='ይህ ማስያ የፕሮጀክት መለኪያ ክፍሎችንና ግቤቶችን እንደገቡ ያስቀምጣል፣ ነገር ግን ቀደም ብሎ ቁጥሮችን ለማከማቻ ወደ SI ይለውጥ ነበር። ይህ ፕሮጀክት ከዚያ ለውጥ በፊት ስለተቀመጠ፣ ቁጥሮቹ በSI ተቀምጠዋል። ለመጨረሻ ጊዜ ወደ አሁኑ መለኪያ ክፍሎች ይለውጧቸው? እርስዎ እንዲፈርዱበት፣ የሚለወጡ አንዳንድ ዲያሜትሮች ከለውጡ በፊትና በኋላ ካላቸው ዋጋዎች ጋር እነሆ፦';
 $ec_lang['lpn_v2_restore_yes']='ለውጥ';
 $ec_lang['lpn_v2_restore_never']='አይ። ዳግም አትጠይቅ።';
 $ec_lang['lpn_v2_restore_no']='አሁን ያለውን መለኪያ ክፍል መጀመሪያ ለማየት ዝጋ';
 $ec_lang['lpn_storage_too_new']='ይህ ፕሮጀክት በገጹ አዲስ እትም ስለተቀመጠ እዚህ ሊከፈት አይችልም።';
-// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
-// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
-// something that is not in a file, so closing it asks first; a tab without one closes silently. A
-// browser project always wears one (it is in no file at all); a file project wears one only while it
-// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
-// our words for talking about the code, and the user sees only a name, an asterisk, and a file
-// extension.
-// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
-// conventional relationship and the reason the duplication between them is correct rather than
-// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
-// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
-// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='ፋይል';
 $ec_lang['lpn_menu_edit']='አርትዕ';
 $ec_lang['lpn_menu_insert']='አስገባ';
 $ec_lang['lpn_menu_view']='ዕይታ';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='ቅንብሮች';
 $ec_lang['lpn_menu_help']='እገዛ';
 $ec_lang['lpn_help_walkthroughs']='ደረጃ በደረጃ መመሪያ';
-// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
-// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
-// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
-// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
-// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='መረብ ሰርዝ';
 $ec_lang['lpn_confirm_delete_network']='በዚህ ፕሮጀክት ውስጥ ያሉትን ሁሉንም ነጥቦች፣ ቧንቧዎችና የጽሑፍ ምልክቶች ይሰርዙ? የበስተጀርባ ምስሉ፣ የፕሮጀክቱ ስምና ቅንብሮችዎ ይቆያሉ። ይህ ሊቀለበስ አይችልም።';
 $ec_lang['lpn_view_units']='መለኪያ ክፍሎች';
-// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='ሁሉንም አስቀምጥ';
-// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
-// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
-// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='ፕሮጀክት{n}';
 $ec_lang['lpn_project_copy_suffix']='(ግልባጭ)';
 $ec_lang['lpn_project_rename']='ዳግም ሰይም';
-// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='አዲስ ፕሮጀክት…';
-// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
-// with the toolbar button of that name -- an example is a whole network, so it starts a project
-// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='ባዶ የXY ፕሮጀክት፣ የአሜሪካ መለኪያ ክፍሎች (gpm)';
 $ec_lang['lpn_new_blank_si']='ባዶ የXY ፕሮጀክት፣ SI መለኪያ ክፍሎች (l/s)';
-// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
-// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='ክፈት…';
 $ec_lang['lpn_file_save']='አስቀምጥ';
 $ec_lang['lpn_file_saveas']='እንደ አስቀምጥ…';
 $ec_lang['lpn_file_revert']='እንደነበር መልስ';
 $ec_lang['lpn_file_close']='ዝጋ';
-// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
-// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='የቅርብ ጊዜ ፋይሎች';
 $ec_lang['lpn_recent_tip']='{file}ን በኮምፒውተርዎ ላይ ፈልገው ሳያገኙ ዳግም ይክፈቱ።';
 $ec_lang['lpn_recent_denied']='ያንን ፋይል ለመክፈት ፈቃድ ስላልተሰጠ አልተከፈተም።';
 $ec_lang['lpn_recent_gone']='{file}ን መክፈት አልተቻለም። ተንቀሳቅሶ፣ ስሙ ተቀይሮ ወይም ተሰርዞ ሊሆን ስለሚችል ከቅርብ ጊዜ ዝርዝሩ ተነስቷል።';
-// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
-// around it.
 $ec_lang['lpn_tab_new']='አዲስ ፕሮጀክት';
 $ec_lang['lpn_tab_all']='ሁሉም ፕሮጀክቶች';
 $ec_lang['lpn_tab_menu']='የፕሮጀክት ዝርዝር';
@@ -781,20 +693,10 @@ $ec_lang['lpn_tab_move_right']='ወደ ቀኝ አንቀሳቅስ';
 $ec_lang['lpn_tab_unsaved']='ወደ ፋይል አልተቀመጠም';
 $ec_lang['lpn_import_bad_file']='ያ ፋይል ከዚህ ገጽ እንደተቀመጠ ፕሮጀክት ሊነበብ አልቻለም።';
 $ec_lang['lpn_import_no_room']='ይህን ፕሮጀክት ለመጨመር በቂ የአሳሽ ማከማቻ የለም። የማያስፈልግዎትን ፕሮጀክት ሰርዘው እንደገና ይሞክሩ።';
-// ---- EPANET .inp import (ROADMAP Task 196) ----
-// The import REPORTS every difference between the file and what this page can hold, so each
-// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
-// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
-// another sentence, and none may become one.
-// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
-// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='እሺ';
 $ec_lang['lpn_file_import_inp']='የEPANET ፋይል አስገባ…';
 $ec_lang['lpn_file_import_inp_tip']='ከEPANET ፋይል፣ ወይም ከ.inp የጽሑፍ ፋይል ወይም EPANET ከሚያስቀምጠው .net ፋይል፣ መረብ ያንብቡና በዚህ አሳሽ ውስጥ እንደ አዲስ ፕሮጀክት ያስቀምጡ። ይህ ገጽ የEPANET ፋይል መልሶ መጻፍ ስለማይችል፣ ስራዎን ለማቆየት ፋይል፣ እንደ አስቀምጥ ይጠቀሙ።';
 $ec_lang['lpn_inp_bad_file']='ያ ፋይል እንደ EPANET መረብ ፋይል ሊነበብ አልቻለም።';
-// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
-// the way out named here always works, so keep the instruction in the message rather than leaving
-// the reader to guess.
 $ec_lang['lpn_net_bad_file']='ይህ የEPANET .net ፋይል ይመስላል፣ ነገር ግን ይህ ገጽ ሊያነበው አልቻለም። በEPANET ውስጥ ይክፈቱትና እዚያ ያለውን ፋይል፣ ላክ፣ መረብ የሚለውን ትዕዛዝ ተጠቅመው እንደ .inp ፋይል ያስቀምጡት፣ ከዚያም እሱን ያስገቡ።';
 $ec_lang['lpn_inp_report_heading']='{file} ገብቷል';
 $ec_lang['lpn_inp_report_counts']='{nodes} መገናኛዎች፣ ማጠራቀሚያዎችና ታንኮች፣ {links} ቧንቧዎች፣ ፓምፖችና ቫልቮች፣ በ{units}።';
@@ -818,44 +720,11 @@ $ec_lang['lpn_inp_drop_quality']='የውሃ ጥራት፣ የኬሚካል ግብ�
 $ec_lang['lpn_inp_drop_backdrop']='ይህ ፋይል የበስተጀርባ ምስል ይጠቅሳል ነገር ግን ራሱን ምስሉን አልያዘም። እርስዎ ራስዎ ፋይል፣ የበስተጀርባ ምስል፣ ምስል ጨምር ተጠቅመው ይጨምሩት።';
 $ec_lang['lpn_inp_drop_dangling']='እነዚህ ቧንቧዎች በፋይሉ ውስጥ የሌለ መገናኛ ይጠቅሳሉ፣ ስለዚህ ቀርተዋል።';
 $ec_lang['lpn_inp_drop_units']='በዚህ ፋይል የተጠቀሰው የፍሰት መለኪያ ክፍል ይህ ገጽ የማያውቀው ነው፣ ስለዚህ እያንዳንዱ ቁጥር እንደ ጋሎን በደቂቃ ተነብቧል። መልሶቹን ከመጠቀምዎ በፊት እያንዳንዱን ቁጥር ያረጋግጡ።';
-// {name} is a project name; word order is the translator's to choose. Says where the user landed,
-// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
-// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='{name}ን ከፋይል ከፍቶ በዚህ አሳሽ ውስጥ እንደ አዲስ ፕሮጀክት ጨምሯል።';
-// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
-// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
-// browser they test in. That is expected, not a bug.
-// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='የፕሮጀክት ፋይል';
-// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot connect to a file, so every press really is another copy in the downloads folder.
-// The label says which of the two you are getting rather than leaving the duplicate looking like a
-// bug.
-// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
-// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
-// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
-// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
-// notice after the act -- at the moment the question arises -- rather than in a label forever.
-// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
-// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
-// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
-// anyway -- a disabled button fires no mouse events.
-// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
-// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
-// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
-// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
-// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='ይህ አሳሽ ከፋይል ጋር መገናኘት ስለማይችል፣ እዚህ ፋይል መክፈት በእውነቱ መስቀል ነው፦ ፕሮጀክቱ ወደዚህ አሳሽ ተገልብጦ ይገባል፣ ስራዎን ወደ ፋይሉ መልሶ ለማስቀመጥ ብቸኛው መንገድ ፋይል፣ እንደ አስቀምጥ ተጠቅመው ፋይሉን መተካት ነው።';
-// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
-// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='ከተገናኘው ፋይል ጋር ያስቀምጣል።';
 $ec_lang['lpn_file_saveas_tip']='የሚያስቀምጡበትን ፋይል ይምረጡ። ይህ ፕሮጀክት ከዚያ ፋይል ጋር ይገናኛል፣ ከዚያ በኋላ አስቀምጥ ወደዚያው ይጽፋል።';
-// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
-// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
-// is no API for it, and the download attribute cannot override the setting -- but the user can turn
-// that setting on themselves, and then Save as really does let them overwrite the file they started
-// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
-// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='የአሳሽዎን የማውረጃ ቅንብሮች ተጠቅሞ ያስቀምጣል። ይህ አሳሽ ከፋይል ጋር መገናኘት ስለማይችል፣ አስቀምጥ ተሰናክሏል፣ እንደ አስቀምጥ ብቻ ይገኛል። የአሳሽዎን «እያንዳንዱን ፋይል የት እንደሚቀመጥ ጠይቅ» የሚለውን ቅንብር ካበሩ፣ የመጀመሪያውን ፋይል መርጠው መተካት ይችላሉ።';
 $ec_lang['lpn_status_uploaded']='የፕሮጀክት ፋይል ተስቅሏል። ከእሱ ጋር ግንኙነት ማቆየት ስለማይቻል፣ መልሶ ወደ እሱ ለማስቀመጥ ብቸኛው መንገድ ፋይል፣ እንደ አስቀምጥ መጠቀም ነው።';
 $ec_lang['lpn_status_downloaded']='{file} ወርዷል። ይህ አሳሽ ከፋይል ጋር መገናኘት ስለማይችል፣ ይህ ፕሮጀክት ወደ ፋይል እንዳልተቀመጠ ምልክት ተደርጎበት ይቆያል።';
@@ -864,45 +733,18 @@ $ec_lang['lpn_status_already_open']='ያ ፋይል እዚህ ቀድሞውኑ እ
 $ec_lang['lpn_status_already_open_dirty']='ያ ፋይል እዚህ ቀድሞውኑ እንደ {name} ተከፍቷል፣ ወደ እሱ ያላስቀመጡ ለውጦችም አሉት። ሁለተኛ ግልባጭ ከመክፈት ይልቅ ወደዚያው ተቀይሯል። በምትኩ በዲስክ ላይ ያለውን እትም ከፈለጉ ፋይል፣ እንደነበር መልስ ይጠቀሙ።';
 $ec_lang['lpn_status_saved']='{file} ተቀምጧል።';
 $ec_lang['lpn_status_reverted']='{file}ን ከዲስክ ዳግም ጭኗል።';
-// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
-// purpose: a program that writes your file behind your back takes away your right to walk away from
-// a session. So these three carry the whole close/discard/revert conversation.
-// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_confirm']='ከመዝጋትዎ በፊት ለውጦችዎን ወደ {name} ያስቀምጡ?';
-// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
-// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_confirm']='{name} የሚቀመጠው በዚህ አሳሽ ውስጥ ብቻ ነው። ወደ ፋይል ሳያስቀምጡት ከዘጉት፣ ለዘላለም ይጠፋል።';
 $ec_lang['lpn_close_discard']='ሳያስቀምጡ ዝጋ';
 $ec_lang['lpn_cancel']='ይቅር';
 $ec_lang['lpn_revert_confirm']='ያደረጓቸውን ለውጦች ጥለው {file}ን ከዲስክ ዳግም ይጫኑ?';
-// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
-// page load, so the link is gone even though we still know the name. Says what to do, not just what
-// happened.
 $ec_lang['lpn_file_needs_reopen']='ይህ ፕሮጀክት ከ{file} የመጣ ነው፣ ነገር ግን ከዚያ ፋይል ጋር ያለው ግንኙነት ጠፍቷል። ከእሱ ጋር ለመገናኘት ፋይሉን እንደገና ይምረጡ።';
-// Says what is still safe before it says what failed: the reassurance is the part a worried user
-// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='ወደ ፋይሉ መጻፍ አልተቻለም። ተንቀሳቅሶ ወይም ስሙ ተቀይሮ ሊሆን ይችላል፣ ወይም ፈቃዱ ተነስቶ ሊሆን ይችላል። ስራዎ አሁንም በዚህ አሳሽ ውስጥ ተቀምጧል።';
 $ec_lang['lpn_file_changed_elsewhere']='ከከፈቱት ወዲህ ሌላ ሰው ወደዚህ ፋይል አስቀምጧል፣ ስለዚህ አሁን ማስቀመጥ የእነሱን ስራ ይተካል። ለውጦችዎን በራስዎ ፋይል ውስጥ ለማቆየት ፋይል፣ እንደ አስቀምጥ ይጠቀሙ፣ ወይም የእርስዎን ጥለው የእነሱን ለመጫን ፋይል፣ እንደነበር መልስ ይጠቀሙ።';
-// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
-// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
-// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-// Initials, and said to be public: whoever opens the same file sees this name, including outside the
-// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
-// rather than a name makes the safe answer the obvious one.
-// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
-// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='ይህን ፕሮጀክት ከፍተው ሲይዙ ባልደረቦችዎ ምን ማየት አለባቸው? የስምዎ ፊደላት ተስማሚ ናቸው። ተመሳሳዩን ፋይል የሚከፍት ማንኛውም ሰው ሊያየው ስለሚችል፣ ግላዊ የሆነ ነገር አይጠቀሙ።';
-// The stand-in when someone locked a project before giving a name. Reads in place of {name}
-// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='ሌላ ሰው';
-// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
-// moment of opening, with both real answers on it -- the way every drawing and document program has
-// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} ይህን ፋይል ከፍቶ ይዟል።';
 $ec_lang['lpn_lock_open_readonly']='ለንባብ ብቻ ክፈት';
-// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
-// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
-// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='ግልባጭ ፍጠር';
 $ec_lang['lpn_lock_break']='ቁልፋቸውን ስበር';
 $ec_lang['lpn_lock_open_heading_times']='{name} ይህን ፋይል ከፍቶ ይዟል፤ የመጨረሻው ማስተካከያ ከ{x} በፊት ነበር፣ ከመጨረሻው ማስቀመጥ በኋላ በ{y}።';
@@ -915,59 +757,26 @@ $ec_lang['lpn_ago_minutes']='{n} ደቂቃዎች';
 $ec_lang['lpn_ago_hours']='{n} ሰዓቶች';
 $ec_lang['lpn_ago_days']='{n} ቀናት';
 $ec_lang['lpn_ago_unknown']='ያልታወቀ ጊዜ';
-// Read-only means read-only: it never turns itself back into an editable file while you are looking
-// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
-// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
-// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='ለንባብ ብቻ፦ {name} ይህን ፋይል ከፍቶ ይዟል። እዚህ የፈለጉትን ሁሉ መቀየር ይችላሉ፣ ነገር ግን ማስቀመጥ አይችሉም። ወደ ሌላ ፋይል ለማስቀመጥ ፋይል፣ እንደ አስቀምጥ ይጠቀሙ።';
-// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
-// stops a colleague editing the same file. Editing still works -- an unreachable server must never
-// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
-// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='ማስጠንቀቂያ፦ በዚህ ፕሮጀክት ላይ ቁልፍ ለማረጋገጥ ወይም ለመፍጠር አገልጋዩን ማግኘት አልተቻለም፣ ስለዚህ ባልደረባ በተመሳሳይ ጊዜ ተመሳሳዩን ፋይል ከማስተካከል የሚያግደው ነገር የለም። ቁልፍ ማድረግ እንደገና መስራት ሲጀምር ይነገርዎታል።';
 $ec_lang['lpn_lock_storage_error']='ማስጠንቀቂያ፦ ይህ ድረ-ገጽ የቁልፍ መዝገቦችን ማስቀመጥ ስለማይችል፣ ባልደረባ በተመሳሳይ ጊዜ ተመሳሳዩን ፋይል ከማስተካከል የሚያግደው ነገር የለም። ይህ በአገልጋዩ ላይ ያለ የማዋቀር ችግር ነው፣ እዚህ ላይ ማስተካከል የሚችሉት ነገር አይደለም — የቁልፍ ማህደሩ በድር አገልጋዩ ሊጻፍበት አይችልም።';
 $ec_lang['lpn_lock_full_error']='ማስጠንቀቂያ፦ ይህ ድረ-ገጽ የትኛው ፕሮጀክት በማን ተከፍቶ እንዳለ ለመመዝገብ ቦታ አልቀረውም፣ ስለዚህ ባልደረባ በተመሳሳይ ጊዜ ተመሳሳዩን ፋይል ከማስተካከል የሚያግደው ነገር የለም። ይህ በአገልጋዩ ላይ ያለ የማዋቀር ችግር ነው፣ እዚህ ላይ ማስተካከል የሚችሉት ነገር አይደለም።';
 $ec_lang['lpn_lock_not_asked']='ለዚህ ፕሮጀክት ቁልፍ ማድረግ አልተጀመረም፣ ስለዚህ ባልደረባ በተመሳሳይ ጊዜ ተመሳሳዩን ፋይል ከማስተካከል የሚያግደው ነገር የለም። ይህ አሳሽ እስካሁን ለእርስዎ የተመዘገበ ስም የለውም፣ ወይም ፕሮጀክቱ መለያ የለውም — ፕሮጀክቱን ወደ ፋይል ማስቀመጥ ሁለቱንም ያዘጋጃል።';
 $ec_lang['lpn_lock_restored']='ቁልፍ ማድረግ እንደገና እየሰራ ነው፣ ይህ ፋይልም አሁን የእርስዎ ለማስቀመጥ ነው።';
 $ec_lang['lpn_lock_dismiss']='ይህን መልእክት ደብቅ';
-// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
-// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
-// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='ፕሮጀክትዎ በዚህ ኮምፒውተር ላይ ባለ ፋይል ውስጥ ይቀመጣል። የሚቀመጠው እርስዎ ሲጠይቁ ብቻ ነው፣ ሌላ ጊዜ አይደለም፣ ስለዚህ ምንም ነገር ካላወቁት ወደ ፋይሉ አይጻፍም።';
 $ec_lang['lpn_file_training_2']='ሁለት ሰዎች በተመሳሳይ ጊዜ አንድ ፋይል እንዳያስተካክሉ፣ ይህ ድረ-ገጽ ማን ከፍቶ እንዳለ ይከታተላል። ሌላ ሰው ቀድሞውኑ ከፍቶት ካለ፣ አሁንም ከፍተው ማየት ወይም የራስዎን ግልባጭ ማስቀመጥ ይችላሉ።';
-// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
-// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
-// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
-// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
-// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='ለመጀመሪያ ጊዜ ሲያስቀምጡ፣ አሳሽዎ ይህ ድረ-ገጽ ፋይሉን ማስተካከል እንደሚችል ይጠይቃል። ይህ ጥያቄ የሚመጣው ከአሳሹ ነው፣ ከእኛ አይደለም፣ አዎ ማለትም አስቀምጥ ስራዎን መልሶ እንዲጽፍ የሚፈቅድ ነው። ብዙ ጊዜ በአንድ ፋይል አንድ ጊዜ ብቻ ይጠየቃል።';
-// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
-// false -- the name is never written into the project file. It is held in this browser and on this
-// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
-// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='ባልደረቦችዎ በአጭር ስም እንዲያውቁዎት ይስጡ። የስምዎ ፊደላት ተስማሚ ናቸው። ተመሳሳዩን ፋይል የሚከፍት ማንኛውም ሰው ሊያየው ስለሚችል፣ ግላዊ የሆነ ነገር አይጠቀሙ።';
 $ec_lang['lpn_file_training_name']='የስምዎ ፊደላት';
 $ec_lang['lpn_file_training_continue']='ቀጥል';
-// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
-// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='ፋይሉን እንደገና ይምረጡ';
 $ec_lang['lpn_file_reconnect']='ከዚህ ፋይል ጋር ዳግም ተገናኝ';
 $ec_lang['lpn_file_reconnect_alert']='ይህ ፕሮጀክት ከ{file} የመጣ ነው። ወደ እሱ ከመጻፉ በፊት አሳሽዎ ፈቃድዎን እንደገና ይፈልጋል። ከታች ዳግም ይገናኙ።';
-// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
-// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='ያ ሌላ ሰው ከፍቶት ካለው ፋይል ጋር ተመሳሳይ ስለሆነ በላዩ ላይ ማስቀመጥ አይቻልም። ሌላ ፋይል ወይም ሌላ ስም ይምረጡ።';
 $ec_lang['lpn_saveas_overwrites_project']='ያ ፋይል ቀድሞውኑ ሌላ ፕሮጀክት፣ {name}ን ይዟል። እዚህ ማስቀመጥ ሙሉ በሙሉ ይተካዋል። ይቀጥሉ?';
 $ec_lang['lpn_saveas_overwrites_newer']='ያ ፋይል መጨረሻ ካዩት ወዲህ ተለውጧል፣ ስለዚህ ሌላ ሰው በእርግጠኝነት ወደ እሱ አስቀምጦ ይሆናል። እዚህ ማስቀመጥ የእነሱን እትም በእርስዎ ይተካል። ይቀጥሉ?';
-// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
-// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
-// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
-// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='ለዚህ ፕሮጀክት ስም';
-// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
-// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
-// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
-// separate Delete for it to be confused with.)
-// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='{closed} ተዘግቷል። አሁን {opened} እየታየ ነው።';
 $ec_lang['lpn_status_closed_empty']='{closed} ተዘግቷል። አዲስ ባዶ ፕሮጀክት ተጀምሯል።';
 $ec_lang['lpn_storage_full']='አልተቀመጠም። የአሳሽ ማከማቻ ሞልቷል ወይም አይገኝም፣ ስለዚህ ይህን ትር ሲዘጉ የቅርብ ጊዜ ለውጦችዎ ይጠፋሉ።';
@@ -977,12 +786,6 @@ $ec_lang['lpn_notes_2_term']='ያልተመሰለ';
 $ec_lang['lpn_notes_2_def']='የውሃ ጥራትና በቀን ውስጥ የሚለዋወጡ ፍላጎቶች አይመሰሉም። ቫልቮች እንዲህ ናቸው፦ የመቆጣጠሪያ ቫልቭ በማንኛውም ፈታች ይሰራል፣ በራሳቸው የሚከፈቱና የሚዘጉ ቫልቮች (PRV, PSV, FCV) ደግሞ በEPANET ፈታች ይፈታሉ፣ ይህም ገጽ መረብዎ አንዱን ሲይዝ በራሱ የሚያበራው ነው።';
 $ec_lang['lpn_notes_3_term']='ፕሮጀክቶችን ማስቀመጥ';
 $ec_lang['lpn_notes_3_def']='እያንዳንዱ ፕሮጀክት አንድ ትር ነው፣ እያንዳንዱ ትርም ሲሰሩ በዚህ አሳሽ ውስጥ ይቀመጣል። የአሳሽዎን መረጃ ማጽዳት ሁሉንም ይሰርዛል፣ ስለዚህ ስራዎን በፋይል ውስጥ ያቆዩ፦ ፋይል፣ እንደ አስቀምጥ። በትር ላይ ያለ ኮከብ ምልክት ወደ ፋይል ያልገቡ ለውጦችን እንደያዘ ያሳያል። እርስዎ ካልጠየቁ በስተቀር ምንም ነገር ወደ ፋይል አይጻፍም። በአንዳንድ አሳሾች ፕሮጀክት ካስቀመጡበት ፋይል ጋር ይገናኛል፣ ከዚያ በኋላ ፋይል፣ አስቀምጥ ወደዚያው ፋይል መልሶ ይጽፋል፤ በሌሎች ደግሞ ግንኙነት አይቻልም፣ ስለዚህ አስቀምጥ ተሰናክሎ እንደ አስቀምጥ ብቻ ይገኛል። የፕሮጀክት ፋይል በጋራ ድራይቭ ላይ ሲቀመጥ፣ ይህ ገጽ ባልደረባ ቀድሞውኑ ከፍቶት እንደሆነ ይነግርዎታል፣ ስለዚህ ሁለት ሰዎች እርስ በእርስ አይተካኩም።';
-// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
-// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
-// to stay readable on a phone, while the Notes section is already this page's documentation home,
-// prints with the page, and is translated with everything else. The popup carries a one-line
-// pointer to here instead (lpn_pump_curve_note).
-// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='የፓምፕ ኩርባ';
 $ec_lang['lpn_notes_5_def']='ፓምፕ H = H₀ − aQ^b ይከተላል፣ H ፓምፑ የሚጨምረው ሄድ ሲሆን Q ደግሞ በእሱ ውስጥ የሚያልፍ ፍሰት ነው። ከአምራቹ ኩርባ አንድ፣ ሁለት ወይም ሦስት ነጥቦችን ያስገቡ። ሦስት ነጥቦች — ፍሰቱ ዜሮ ሲሆን ያለው ሄድ፣ መደበኛው የስራ ነጥብ፣ እና ከፍተኛው ፍሰት ነጥብ — H₀ ፣ a እና b ን በቀጥታ ያስማሙ፣ ከታተመው ኩርባ ጋር በጣም ተቀራራቢ ናቸው። ሁለት ነጥቦች ፓራቦላ (b = 2) ጫፉ ፍሰቱ ዜሮ ላይ ሆኖ ያስማሙ። አንድ ነጥብ የተለመደ ደንብ ይጠቀማል፦ ፍሰቱ ዜሮ ሲሆን ያለው ሄድ ካስገቡት ሄድ 1.33 × ሲሆን፣ ከፍተኛው ፍሰትም ካስገቡት ፍሰት 2 × ነው፣ ይህም እንደገና b = 2 ይሰጣል። ምንም ነጥብ ያልገባለት ፓምፕ ምንም ሄድ አይጨምርም። ኩርባው ሄዱ ዜሮ በሚደርስበት ቦታ አይቆረጥም፣ ስለዚህ ኩርባው ከሚያቀርበው በላይ ፍሰት ከፓምፑ መጠየቅ አሉታዊ ሄድ ይሰጣል። መፍትሄው ትልቅ ፓምፕ ወይም ትንሽ ፍላጎት ነው፣ የተለየ የኩርባ ማስማማት አይደለም።';
 $ec_lang['lpn_notes_4_term']='የታቀዱ ተጨማሪዎች';
@@ -1001,24 +804,12 @@ $ec_lang['lpn_engine_ready_valve']='የEPANET ፈታች አሁን በዚህ መ�
 $ec_lang['lpn_engine_unavailable']='የEPANET ፈታች ሊገኝ አልቻለም፣ በራሳቸው የሚከፈቱና የሚዘጉ ቫልቮችን ሊፈታ የሚችለው እሱ ብቻ ነው። አንድ ጊዜ ኢንተርኔት ይገናኙ፣ ከዚያ በኋላ በዚህ መሣሪያ ላይ ይቀመጣል።';
 $ec_lang['lpn_diag_not_converged']='መፍትሄ አልተገኘም። እንደ ዜሮ ዲያሜትር ያሉ በእውነታው የማይቻሉ ዋጋዎችን ያረጋግጡ።';
 $ec_lang['lpn_field_roughness']='ሻካሪነት';
-// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
-// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
-// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='የHazen-Williams C። ከፍ ያለ ቁጥር ለስላሳ ቧንቧ ማለት ነው፦ ለአዲስ ፕላስቲክ በግምት 150፣ ለአዲስ ብረት ወይም ብረት ብረት 130፣ ለአሮጌ ቧንቧ 100።';
 $ec_lang['lpn_field_length']='ርዝመት';
 $ec_lang['lpn_field_length_tip']='የቧንቧው ርዝመት። ራስ-ሰር በርቶ ሳለ ርዝመቱ ከስዕልዎ ይለካል። ከስዕሉ የተለየ ርዝመት ለመተየብ ራስ-ሰርን ያጥፉ።';
-// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
-// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
-// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='ጥቃቅን (አካባቢያዊ) ኪሳራ ኮፊሸንት፣ k';
 $ec_lang['lpn_field_km_tip']='ከዚህ ቧንቧ ጠማማዎች፣ ቫልቮችና ማያያዣዎች የሚመጣ ኪሳራ፣ የፍጥነት ሄድ ብዜት ተደርጎ የሚቆጠር። ለቀላል ቀጥተኛ ቧንቧ 0 ይጠቀሙ።';
-// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
-// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
-// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
-// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='ጥቃቅን ኪሳራ፣ k';
-// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
-// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='የኩርባ ምንጭ';
 $ec_lang['lpn_pump_curve_own']='ነጥቦችን ከታች ያስገቡ';
 $ec_lang['lpn_pump_curve_ref_note']='ለፓምፕ {id} የገባውን ኩርባ በመጠቀም ላይ።';
@@ -1026,23 +817,13 @@ $ec_lang['lpn_pump_curve_note']='አንድ፣ ሁለት ወይም ሦስት ነ�
 $ec_lang['lpn_pump_point1']='ነጥብ 1';
 $ec_lang['lpn_pump_point2']='ነጥብ 2';
 $ec_lang['lpn_pump_point3']='ነጥብ 3';
-// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
-// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
-// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='ሁነታ፦ ምረጥ። ለማየት ወይም ለመቀየር አካል ወይም ምልክት ይጫኑ። ነጥብን፣ መታጠፊያን ወይም ምልክትን ለማንቀሳቀስ ይጎትቱ። ወደ ቧንቧ መታጠፊያ ለመጨመር ወይም ለማስወገድ ቧንቧውን ሁለቴ ይጫኑ።';
 $ec_lang['lpn_mode_delete']='ሁነታ፦ ሰርዝ። አካልን ለማስወገድ ይጫኑት።';
 $ec_lang['lpn_mode_add_junction']='ሁነታ፦ መገናኛ ጨምር። መገናኛ ለማስቀመጥ ካርታውን ይጫኑ። አካሎችንና ምልክቶችን ለመቀየር ወይም ለማንቀሳቀስ ወደ ምረጥ ሁነታ ይቀይሩ።';
 $ec_lang['lpn_mode_add_reservoir']='ሁነታ፦ ማጠራቀሚያ ጨምር። ማጠራቀሚያ ለማስቀመጥ ካርታውን ይጫኑ። አካሎችንና ምልክቶችን ለመቀየር ወይም ለማንቀሳቀስ ወደ ምረጥ ሁነታ ይቀይሩ።';
 $ec_lang['lpn_mode_add_pipe']='ሁነታ፦ ቧንቧ ጨምር። ለማገናኘት አንድ ነጥብ ከዚያም ሌላ ነጥብ ይጫኑ። አካሎችንና ምልክቶችን ለመቀየር ወይም ለማንቀሳቀስ ወደ ምረጥ ሁነታ ይቀይሩ።';
 $ec_lang['lpn_mode_add_pump']='ሁነታ፦ ፓምፕ ጨምር። ለማገናኘት አንድ ነጥብ ከዚያም ሌላ ነጥብ ይጫኑ። አካሎችንና ምልክቶችን ለመቀየር ወይም ለማንቀሳቀስ ወደ ምረጥ ሁነታ ይቀይሩ።';
-// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
-// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='ሁነታ፦ ጽሑፍ ጨምር። የጽሑፍ ምልክት ለማስቀመጥ ካርታውን ይጫኑ። ጽሑፉን ከአንድ ነጥብ ጋር ለማያያዝ ወደ ነጥቡ ቅርብ ይጫኑ። አካሎችንና ምልክቶችን ለመቀየር ወይም ለማንቀሳቀስ ወደ ምረጥ ሁነታ ይቀይሩ።';
-// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
-// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
-// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
-// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
-// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='በካርታው ላይ ነገሮችን ለመቀየር፣ ለማንቀሳቀስ እና ለመጎተት ይህን ሁነታ ይጠቀሙ።';
 $ec_lang['lpn_tip_labels_draggable']='ምልክትን ለማንቀሳቀስ መጎተት ይችላሉ። ወደ ራስ-ሰር ቦታው ለመመለስ ምልክቱን ሁለቴ ይጫኑ።';
 $ec_lang['lpn_field_auto']='ራስ-ሰር';
@@ -1074,9 +855,6 @@ $ec_lang['lpn_labels_col_decimals']='አስርዮሽ';
 $ec_lang['lpn_field_id']='መለያ';
 $ec_lang['lpn_backdrop_menu']='የበስተጀርባ ምስል…';
 $ec_lang['lpn_backdrop_add']='ጨምር';
-// Bare verbs, not "Scale image" / "Position image" (Tom, 2026-08-13 supersedes the 2026-08-04 note
-// this replaced): the "Background image..." heading above them in the menu now carries the object,
-// so repeating "image" on one member of the set reads as an oversight.
 $ec_lang['lpn_backdrop_scale']='በመምረጥ አዘጋጅ';
 $ec_lang['lpn_backdrop_scale_entry']='በወርልድ ፋይል ወይም በካርታው ላይ ባለው የአንድ ፒክሰል መጠን አዘጋጅ';
 $ec_lang['lpn_backdrop_scale_from']='ካሁኑ መጠን፣ በመረጡት ነጥብ ዙሪያ አዘጋጅ';
@@ -1117,8 +895,6 @@ $ec_lang['lpn_push_none_displayed']='አሁን ምንም የመነሻ ዋጋ እ
 $ec_lang['lpn_push_nothing']='ከሚተገበሩት ንብረቶች ውስጥ ማንኛውንም ያለው ነባር አካል የለም።';
 $ec_lang['lpn_push_no_change']='እያንዳንዱ አካል ቀድሞውኑ እነዚህን ዋጋዎች ስላለው፣ ምንም ነገር አይለወጥም።';
 $ec_lang['lpn_settings_emitter_exponent']='የመርጫ አርቃቂ';
-// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
-// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='ስሌት';
 $ec_lang['lpn_settings_tolerance']='የመቀራረብ ልዩነት ገደብ';
 $ec_lang['lpn_settings_tolerance_tip']='ማስያው ከማቆሙ በፊት ምን ያህል መቀራረብ እንዳለበት። ትንሽ ቁጥር በጣም ትክክለኛ ነው እና ረዘም ያለ ጊዜ ይወስዳል።';
@@ -1128,25 +904,16 @@ $ec_lang['lpn_engine_loading']='የEPANET ፈታች በመጫን ላይ…';
 $ec_lang['lpn_engine_failed']='የEPANET ፈታች ሊጫን አልቻለም። በምትኩ አብሮ የተሰራውን ማስያ በማሳየት ላይ።';
 $ec_lang['lpn_engine_manning_note']='ማስታወሻ፦ የማኒንግ ሻካሪነት ሲጠቀሙ፣ EPANET ከአብሮ ከተሰራው ማስያ በግምት 0.6% ያነሰ የሄድ ኪሳራ ያሰላል።';
 $ec_lang['lpn_settings_text_size']='የጽሑፍ መጠን (ፒክሰሎች)';
-// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
-// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
-// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='የምልክት መጠን (ፒክሰሎች)';
 $ec_lang['lpn_settings_link_width']='የቧንቧ መስመር ውፍረት (ፒክሰሎች)';
 $ec_lang['lpn_settings_align_labels']='የቧንቧ ምልክቶችን ከቧንቧዎች ጋር አሰልፍ';
 $ec_lang['lpn_settings_readability_bias']='ምልክት ከቋሚው ግራ ከዚህ ቁጥር ዲግሪ በላይ ካዘነበለ ገልብጠው ያሳዩት';
 $ec_lang['lpn_settings_readability_bias_tip']='ምልክቱ ከቋሚው መስመር ግራ በኩል ከዚህ ቁጥር ዲግሪ በላይ ካዘነበለ፣ ትክክለኛውን ገጽታ ለመጠበቅ ገልብጠው ያሳዩት።';
 $ec_lang['lpn_settings_mask_labels']='ከምልክቶች በስተጀርባ ጠንካራ ቀለም';
-// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
-// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='የምልክት ግልጽነት (0 እስከ 1)';
-// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
-// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='የበስተጀርባ ምስል ግልጽነት (0 እስከ 1)';
 $ec_lang['lpn_settings_map_display']='የካርታ ገጽታ';
 $ec_lang['lpn_settings_map_height_px']='የካርታ ቁመት (የማያ ገጽ ፒክሰሎች)';
-// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
-// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='በትንሽ ማያ ገጽ ላይ ካርታው ከዚህ ያነሰ ቁመት ተስሎ ይታያል፣ ስለዚህ የገጹ ክፍል ሁልጊዜ ለመሸብለል ይቀራል።';
 $ec_lang['lpn_settings_legend_position']='የመግለጫ ሳጥን ቦታ';
 $ec_lang['lpn_settings_legend_top_left']='ከላይ ግራ';
@@ -1237,7 +1004,6 @@ $ec_lang['lpn_field_active_tip']='ይህን ሳጥን ባዶ ያድርጉት አ
 $ec_lang['lpn_engine_valve_route']='በEPANET ፈታች ተፈትቷል፣ ምክንያቱም እነዚህ ቫልቮች በራሳቸው ስለሚከፈቱ እና ስለሚዘጉ፦';
 $ec_lang['lpn_unit_unknown']='ይህ ስዕል ይህ ገጽ የማያውቀውን የመለኪያ ክፍል ይጠቅሳል፦ {unit}። ሁሉም ነገር በትክክል እንደገባ ተይዞ ይታያል፣ ምንም አልተለወጠም። ይህ ገጽ ይህን ክፍል እስኪያውቅ ድረስ መልስ ሊሰጥ አይችልም፣ ምክንያቱም መጠኑ ምን ያህል እንደሆነ የሚታወቅበት መንገድ የለም።';
 
-// Task 438 sprint additions (2026-08-19)
 $ec_lang['lpn_field_text_align']='አግድም አሰላለፍ';
 $ec_lang['lpn_field_text_align_left']='ግራ';
 $ec_lang['lpn_field_text_align_center']='መሃል';
