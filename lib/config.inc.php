@@ -521,21 +521,34 @@ if (!ecAnalyticsConsented() && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[EC
 define('LPN_LOCK_DIR', dirname(__DIR__) . '/lpn-locks');
 
 /* **THE MAPBOX PUBLIC TOKEN, for the satellite basemap on a lat/lon project (ROADMAP Task 452).**
- * Tom created the account and this token 2026-08-19, at his own request for satellite imagery
- * ("epanetjs uses OpenStreet with MapBox and serves satellite imagery. Add that.").
+ * Tom created the account and the token 2026-08-19, at his own request for satellite imagery.
  *
- * **A PUBLIC TOKEN IS NOT A SECRET, AND THIS ONE IS DELIBERATELY IN THE PAGE.** Mapbox issues two
- * kinds: `pk.` public tokens, which carry read scopes only and are designed to ship in client
- * JavaScript, and `sk.` secret tokens, which carry write scopes and must never leave a server. A
- * `sk.` token belongs nowhere in this repository. What protects a public token is not secrecy but
- * the URL restriction set on it in the Mapbox account, which is what stops another site spending
- * the quota; there is no server-side check we could add here that would do better.
+ * **IT IS NOT IN THIS REPOSITORY, AND THE REASON IS NOT SECRECY.** A `pk.` token carries read
+ * scopes only, is designed to ship in client JavaScript, and is readable from the page source by
+ * anyone the moment the satellite map works at all -- so hiding it buys nothing. What it is not
+ * is OURS TO PUBLISH: this repo is public and GPL-3, the token is billable to Tom's account, and
+ * GitHub's push protection refuses a commit containing one. Keeping it out of git settles all
+ * three at once. (A `sk.` SECRET token carries write scopes and belongs nowhere near a browser or
+ * a repository, ever.)
  *
- * It lives here rather than in js/looped-network.js so it can be rotated without touching an
- * 18,000-line file, and it reaches the page through pageConfig exactly as EC_GEOSEARCH_COOKIE does.
- * An EMPTY string is a supported state: the satellite rows disappear and the street map is the
- * only basemap, which is what a fork of this suite with no Mapbox account gets. */
-define('EC_MAPBOX_TOKEN', 'pk.eyJ1IjoiaGF3c3RvbSIsImEiOiJjbXQweWhyNnkwYjIzMnpvYmo1bTdteHo1In0.d2sf5oNs0dJzXl96rAmryA');
+ * So it lives in `lib/mapbox-token.php`, which .gitignore excludes:
+ *
+ *     <?php return 'pk.your-token-here';
+ *
+ * **AN ABSENT FILE IS A SUPPORTED STATE, not an error.** No token means no satellite rows in the
+ * View menu at all -- js/looped-network.js hides them rather than offering a row that fetches a
+ * 401 per tile, because a user cannot tell our missing account from their missing internet. That
+ * is also exactly what a fork of this suite gets, which is the correct default for somebody who
+ * has no Mapbox account and did not ask for one.
+ *
+ * **DEPLOYMENT: this file does not travel with `git pull`**, so it is uploaded to production by
+ * hand once, like ../sitemap.xml. It changes only when the token is rotated. */
+define('EC_MAPBOX_TOKEN', (function () {
+    $f = __DIR__ . '/mapbox-token.php';
+    if (!is_file($f)) { return ''; }
+    $v = require $f;
+    return is_string($v) ? trim($v) : '';
+})());
 // Housekeeping, since the honor-system design deliberately never auto-expires a LOCK. This expires
 // the on-disk RECORD long after any plausible session, purely so abandoned projects don't leak
 // files forever. 30 days is far past a working day; it can never end a live edit.
