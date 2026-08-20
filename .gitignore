@@ -35,7 +35,3 @@ dev/epanet-models/
 # tool, this one records what ships to visitors. See dev/dependency-management.md.
 /node_modules/
 
-# The Mapbox public token (ROADMAP Task 452). Not a secret, but not ours to publish either:
-# the repo is public and the token is billable to Tom's account. lib/config.inc.php explains,
-# and an absent file simply hides the satellite basemap. Uploaded to production by hand.
-lib/mapbox-token.php

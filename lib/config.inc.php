@@ -521,37 +521,18 @@ if (!ecAnalyticsConsented() && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[EC
 define('LPN_LOCK_DIR', dirname(__DIR__) . '/lpn-locks');
 
 /* **THE MAPBOX PUBLIC TOKEN, for the satellite basemap on a lat/lon project (ROADMAP Task 452).**
- * Tom created the account and the token 2026-08-19, at his own request for satellite imagery.
+ * Tom created the account and this token 2026-08-19, at his own request for satellite imagery.
  *
- * **THE TOKEN IS NOT IN THIS FILE, AND SECRECY IS NOT THE REASON.** A `pk.` token carries READ
- * scopes only, is designed by Mapbox to ship in client JavaScript, and ours is echoed into every
- * visitor's page through pageConfig -- so it is public the moment the feature works at all, and
- * hiding it from git hides it from nobody. What actually protects it is the URL restriction set
- * on it in the Mapbox account, which is what stops another site spending the quota. (A `sk.`
- * SECRET token carries WRITE scopes and belongs nowhere near a browser or a repository, ever.)
+ * **A `pk.` TOKEN IS NOT A SECRET.** It carries READ scopes only, Mapbox designs it to ship in
+ * client JavaScript, and this one is echoed into every visitor's page through pageConfig -- so it
+ * is public the moment the feature works at all. What protects it is the URL restriction set on it
+ * in the Mapbox account, which is what stops another site spending the quota. A `sk.` SECRET token
+ * carries WRITE scopes and belongs nowhere near a browser or a repository, ever.
  *
- * **IT IS OUT OF THE REPOSITORY BECAUSE GITHUB WILL NOT TAKE IT.** Push protection rejects the
- * push with "Mapbox Secret Access Token" -- matching the shape, not the scope -- and the bypass
- * URL 404'd for Tom. It was tried both ways on 2026-08-19; this is the one that pushes.
- * **Do NOT split, encode or obfuscate the string to get a scanner past it.**
- *
- * So the value lives in `lib/mapbox-token.php`, which .gitignore excludes:
- *
- *     <?php return 'pk.your-token-here';
- *
- * **THE COST, stated plainly so it is not rediscovered:** deployment here is `git pull`, so this
- * file does not travel with a commit and must be uploaded to production by hand, once, like
- * ../sitemap.xml. When it is missing the satellite rows simply are not offered -- see
- * js/looped-network.js, which hides them rather than showing a row that fetches a 401 per tile,
- * because a user cannot tell our missing account from their missing internet. That is also
- * exactly what a fork of this suite gets, which is the right default for somebody who has no
- * Mapbox account and never asked for one. */
-define('EC_MAPBOX_TOKEN', (function () {
-    $f = __DIR__ . '/mapbox-token.php';
-    if (!is_file($f)) { return ''; }
-    $v = require $f;
-    return is_string($v) ? trim($v) : '';
-})());
+ * An empty string is a supported state: no token means no satellite rows in the View menu at all,
+ * because a row that fetches a 401 per tile leaves a user unable to tell our missing account from
+ * their missing internet. That is what a fork of this suite gets. */
+define('EC_MAPBOX_TOKEN', 'pk.eyJ1IjoiaGF3c3RvbSIsImEiOiJjbXQweWhyNnkwYjIzMnpvYmo1bTdteHo1In0.d2sf5oNs0dJzXl96rAmryA');
 // Housekeeping, since the honor-system design deliberately never auto-expires a LOCK. This expires
 // the on-disk RECORD long after any plausible session, purely so abandoned projects don't leak
 // files forever. 30 days is far past a working day; it can never end a live edit.
