@@ -146,6 +146,9 @@ run_check "calculator harnesses ($CALC_HARNESS_N)" blocking sh dev/scripts/run_c
 
 # --- Advisory: real findings, but judgement calls that must not block a commit ------------------
 run_check "example folder"               advisory php dev/scripts/example_folder_check.php
+# One project mode, ONE name inside each language. Advisory because the 14 findings it opens
+# with are pre-existing translation work, not a regression anybody just caused.
+run_check "mode names"                   advisory php dev/scripts/mode_name_check.php
 run_check "key hygiene"                  advisory php dev/scripts/key_hygiene_check.php --strict
 run_check "size budget"                  advisory php dev/scripts/size_budget_check.php --strict
 run_check "english drift"                advisory sh -c 'php dev/scripts/detect_english_drift.php | grep -q "^CHANGED" && exit 1 || exit 0'

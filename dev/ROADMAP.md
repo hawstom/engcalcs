@@ -204,6 +204,18 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   only in a tip is reachable by the search) using a different word. Whether the two terms come back
   — in the tip, or as `$ec_lang_syn` where the search cannot reach them — is Tom's wording call.
 
+- 55|458| **One project mode, two names, in four languages.** `dev/scripts/mode_name_check.php` (new,
+  advisory, in `check_all.sh`) opens on **14 disagreements in ru, sr, tr and zh** — a language's
+  `lpn_geomap` or `lpn_xymap` says one thing and its other mode-naming strings say another, so a
+  reader meets two names for one kind of project. All pre-existing; sprint 438 caused five more in
+  cs and those were realigned the same day.
+  - Fixing them is translation work in inflected languages (Russian's are declined), so it belongs
+    in a sprint, not in a sed. The check names the exact strings.
+  - **The rule this replaces was FALSE prose in `glossary.json`** — "lat/lon and XY are carried
+    unchanged into every language", while 10 of 26 files already translated `lpn_geomap`. Agents
+    quoted it back all sprint. Entry rewritten; the key list the check walks is derived from the
+    English, so a new mode-naming string joins it by itself.
+
 - 70|450| **The Run button gives no sign it did anything, and it needs a run box.** Tom, 2026-08-19:
   *"The Run button does nothing… It needs a box with a progress bar and completion report. epanetjs
   also includes a link to the EPANET run report."* The wiring is live (`requestRun()` →

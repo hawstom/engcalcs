@@ -1063,6 +1063,78 @@
    ],
    "disposition": "english",
    "resolution": "States the consequence and the cure in the same sentence: one moment to show, and Total run time in Settings is where to change it. 'Total run time' is quoted from lpn_time_duration, so the sentence names a control the reader can actually find; if that label is retranslated, this string must follow it."
+  },
+  {
+   "key": "lpn_ex_net3_world_title",
+   "source": "translator",
+   "lang": "es",
+   "complaint": "Reported independently by es, fr, it, ro and hr: the title is a proper noun plus the project-mode name, so in a language that keeps 'lat/lon' literal there is nothing left to translate and the identical-to-english gate fires on a correct value.",
+   "readings": [
+    "correctly identical, and the exempt list is what is missing",
+    "a translation defect needing a different rendering"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Not an English defect -- a TOOLING defect, and an expensive one. Three agents distorted a correct title to get past the gate (hr invented a phrase inconsistent with its own other mode-name strings, bg swapped the comma for an em dash, de renamed a correct 'XY' to 'XY-Ebene'). All three reverted; lpn_ex_net3_world_title and lpn_xymap added to translation_exempt_keys.json. A gate that forces a wrong translation is worse than no gate."
+  },
+  {
+   "key": "lpn_labels_col_drop",
+   "source": "translator",
+   "lang": "tr",
+   "complaint": "Reported by tr and sw: 'Drop' is a deliberately narrow column heading, and neither language has a short word that is unmistakably 'leave this label off the map' rather than 'a fall in head or elevation' -- the hydraulic sense being live on this very page.",
+   "readings": [
+    "a word for omit/skip",
+    "a word cognate with a hydraulic drop"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The English is right and the glossary trap term already warns about exactly this; every language that reported it chose the omit sense correctly. Recorded because two independent reports on one heading is the threshold at which a third would make it an English problem. Turkish notes its rendering is longer than the English and wants a native check for column fit."
+  },
+  {
+   "key": "lpn_color_mode_pretty",
+   "source": "translator",
+   "lang": "sw",
+   "complaint": "'Pretty (rounded)' names a GIS class-break algorithm, but 'Pretty' alone gives no hint the subject is rounding rather than appearance, so a translator has to already know the convention.",
+   "readings": [
+    "tidy/rounded numbers",
+    "attractive"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Referred to Tom, and it is a naming call, which CLAUDE.md reserves for him. 'Pretty' is QGIS's own word for the class-break method that rounds limits to tidy numbers. Keeping it costs a guess in every language that does not know that tool; changing it costs recognisability for everyone who does. Nothing shipped wrong -- the '(rounded)' parenthetical carries the meaning, which is why 25 languages rendered it correctly. One line from Tom closes it."
+  },
+  {
+   "key": "lpn_time_run",
+   "source": "translator",
+   "lang": "hi",
+   "complaint": "In Hindi the glossary's instruction -- tie the Run button to the same root as 'Total run time' -- produces the exact word the shipped Play button already uses, so Run and Play would carry one label.",
+   "readings": [
+    "a distinct verb for Run (compute/work out)",
+    "the glossary's root, colliding with Play"
+   ],
+   "disposition": "glossary",
+   "resolution": "The agent chose correctly and several other languages hit the same fork independently (ar, ur, fa, he all separated Run from Play). The glossary's 'run (a simulation)' entry should say that Run must not collide with Play in the target language, and that separating them wins where it would. Worth adding before the next sprint."
+  },
+  {
+   "key": "lpn_settings_sec_visualization",
+   "source": "translator",
+   "lang": "ps",
+   "complaint": "The section heading has no stated scope, so it is unclear whether it means visualizing generally -- overlapping the View menu -- or specifically the colour-and-label controls it contains.",
+   "readings": [
+    "the colour and label styling controls",
+    "a general 'ways of viewing the map' heading"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Tom ruled on this word 2026-08-19, keeping Visualization over Symbology: 'visualization is more specific to this application, where we are trying to quickly visualize the performance of a large system instead of poring through reams of numbers.' The scope ambiguity is real but the alternative is jargon; the section's own contents resolve it on screen."
+  },
+  {
+   "key": "lpn_settings_sec_visualization",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "Second report on this heading, after ps: 'Visualization' has no settled Burmese equivalent the way the neighbouring section names do, so the agent coined a compound rather than translating an established term.",
+   "readings": [
+    "a coined compound meaning visual display",
+    "a transliterated loanword"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Same ruling as the ps report. Tom chose Visualization over Symbology 2026-08-19 precisely because it is specific to what this page is for -- seeing a large system's performance at a glance instead of reading numbers -- and Symbology is the more jargonistic word, not the less. A coined compound in a low-resource language is the expected and correct outcome for a concept with no local term; the register rule says describe the thing plainly, which is what happened."
   }
  ]
 }

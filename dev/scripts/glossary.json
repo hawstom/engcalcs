@@ -3782,9 +3782,10 @@
    "term": "project mode name",
    "symbol": "",
    "avoid": [
-    "translating the mode names themselves. \"lat/lon\" and \"XY\" are carried unchanged into every language: they are what the menus, the status bar and the New project rows call the two kinds of project, and they appear in about a dozen strings that must all agree.",
-    "expanding \"XY\" into words in some strings and leaving it as letters in others -- that is how one mode ends up with two names inside one language file.",
-    "reading \"XY\" as a placeholder for something to be filled in. It is the name of the flat-grid mode."
+    "giving one mode TWO names inside one language. That is the only real defect here, and dev/scripts/mode_name_check.php now catches it: whatever your file calls the mode in lpn_geomap / lpn_xymap, every other string that names the mode uses that same rendering.",
+    "expanding \"XY\" into words in some strings and leaving it as letters in others -- the same defect, on the other mode.",
+    "reading \"XY\" as a placeholder for something to be filled in. It is the name of the flat-grid mode.",
+    "assuming the mode names must stay English. THIS ENTRY USED TO SAY SO and it was FALSE: 10 of the 26 language files already translate lpn_geomap (am, ar, de, fa, he, ru, sr, tr, ur, zh) and 16 keep it literal. Both are fine. Translate it or keep it, but then be consistent."
    ],
    "context": "A project is in one of two modes. A lat/lon project has geographic coordinates and can draw a street map behind it; an XY project is drawn on a plain local grid with no place on the Earth. The names appear in lpn_geomap, lpn_xymap and in the prose of lpn_georef_menu, lpn_georef_tip, lpn_georef_intro, lpn_georef_confirm, lpn_georef_done, lpn_georef_on_map and the four New project rows.",
    "translation_notes": "[2026-08-19, sprint 438 wave 0] Raised because the names are coined and nothing marked them as coined, so some agents would translate them and others keep them. A per-label synonym would have to be repeated across nine strings; one concept pointer is the right shape.",
