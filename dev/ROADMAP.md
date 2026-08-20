@@ -629,6 +629,38 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
 
+- 70|462| **[H] The toolbar wants a water-network group, and LIBRARIES is the missing idea.** Tom,
+  2026-08-20: *"for Water Networks, I think we also need the following in a group: Libraries
+  (Patterns, Curves, Controls, Pumps, Pipes, Custom), **Settings**, Simulate, Transport, Time
+  selectors."*
+  - **This is Task 460's answer taking shape.** 460 says the document carries patterns, curves and
+    controls while the interface carries none; "Libraries" is where they would live, and Pumps /
+    Pipes / Custom extend the same idea to reusable definitions the network points AT rather than
+    copies of. Scope the two together.
+  - Note it puts **Settings inside this group**, which cuts against Task 452's gear-at-the-far-right
+    — see Task 463, where Tom also says the gear should not be a toolbar button at all.
+
+- 65|463| **[H] The gear and the pane toggle should sit ON THE MAP, not on the toolbar.** Tom,
+  2026-08-20: *"Right edge gear: Toolbar button is the wrong paradigm. It should be a gear directly
+  on the page background. So should be the pane toggle."*
+  - This supersedes yesterday's move of the gear to the right-hand end of the strip, which answered
+    "where" but not "what kind of control". A floating overlay on the drawing surface is a different
+    paradigm from a strip button, and the map already has overlays (the legends, the basemap credit,
+    the coordinate readout) so the mechanism exists.
+  - **Read against Task 462**, which asks for Settings INSIDE a toolbar group. The two are in
+    tension and Tom holds both; resolve with him before building either.
+
+- 55|464| **[H] Screenshot prep is not earning its toolbar slot.** Tom, 2026-08-20, three separate
+  complaints: *"I can't see myself using the Screenshot prep tool, partly because I can screenshot
+  within the junk that's showing on the map, and it's taking up valuable real estate"*; *"The camera
+  isn't speaking to me. It might help if the tip started with 'Screenshot prep: ….' Maybe relegate
+  this to the menu?"*; and *"It can't hide the bottom status bar, and yet it hides coordinates. That
+  seems feeble."*
+  - Three fixes of increasing size: start the tip with the feature's own name; move the row off the
+    toolbar into the View menu; and make the hide actually complete, or stop calling it that. The
+    third is the one that decides whether the feature is worth keeping at all — a clean-map mode
+    that leaves the status bar on is not a clean map.
+
 - 80|460| **[H] Time modelling needs an INTERFACE, and a plan before any of it is built.** Tom,
   2026-08-19: *"We aren't where we need to be yet to do time modeling. We need to add patterns,
   curves, and controls. I think I already mentioned this. We have to plan this."* He is right, and
@@ -701,7 +733,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   Tom, 2026-08-18: *"Phones have the swipe superpower that is not idiomatic on a PC… Maybe a
   different phone layout convention that could translate to the PC such as transforming the toolbar
   into some sort of a side menu. This would have the advantage of using side real estate when height
-  real estate is very limited."* Raised, not scoped. Note the standing rule that this page is a
+  real estate is very limited."* Raised, not scoped. **Raised again 2026-08-20 with the trigger
+  named:** *"Did I already suggest putting the menu and the toolbar vertically down the left edge
+  when the screen is wider than tall?"* He had (2026-08-18, above). The new part is the
+  CONDITION — wider than tall — which makes it a responsive rule rather than a redesign, and
+  which is measurable rather than a matter of taste. Note the standing rule that this page is a
   full-window drawing surface and is almost impossible on a phone, so the PHONE half of this is worth
   little; the SIDE-MENU half is worth something on its own merits, on a laptop with 800px of height.
 
