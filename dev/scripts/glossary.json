@@ -3846,6 +3846,34 @@
    "translation_notes": "[2026-08-19, sprint 438 Wave 0] Precedent set for lpn_labels_col_decimals_example, whose whole value is the example 0.000 and which Tom said may become 0,000 where needed. lpn_time_format_tip carries four such examples and nothing in the English says they are localisable.",
    "translations": {},
    "source": "sprint 438-wave0, 2026-08-19"
+  },
+  "scenario": {
+   "term": "scenario",
+   "symbol": "",
+   "avoid": [
+    "a native Swahili word for scenario: hali, mfano and toleo are all already taken inside lib/lang.ec.sw.php by Mode, example and file version respectively, so reusing one gives that file two meanings for one word.",
+    "an eigenvalue-adjacent word for the sibling string \"own values\"."
+   ],
+   "context": "A named set of overridden values a project can hold beside its base network.",
+   "translation_notes": "[2026-08-20] Rescued from a comment the Swahili translator left in lib/lang.ec.sw.php. Comments were stripped from the 26 translated files that day because they were copies of the English rationale; these few were the translator's OWN rulings and had no home outside that file. A glossary entry is the one place a later sprint actually reads. No established Swahili engineering standard was found, so the transliteration was a deliberate choice, not a shortcut; Base is Msingi.",
+   "translations": {
+    "sw": "Senario"
+   },
+   "source": "Rescued 2026-08-20 from a translator comment in lib/lang.ec.sw.php"
+  },
+  "tank level": {
+   "term": "tank level",
+   "symbol": "",
+   "avoid": [
+    "rendering a tank's level as a site-datum ELEVATION. A tank level is a DEPTH of water above the tank's own bottom, and the two are different quantities that a reader will act on differently.",
+    "in Swahili specifically: mwinuko (elevation) for this. The word is kina (depth), and the two are kept lexically distinct throughout lib/lang.ec.sw.php."
+   ],
+   "context": "The depth of water in a tank, measured above the tank's own floor -- not a height above sea level.",
+   "translation_notes": "[2026-08-20] Rescued from a comment the Swahili translator left in lib/lang.ec.sw.php. Comments were stripped from the 26 translated files that day because they were copies of the English rationale; these few were the translator's OWN rulings and had no home outside that file. A glossary entry is the one place a later sprint actually reads.",
+   "translations": {
+    "sw": "kina"
+   },
+   "source": "Rescued 2026-08-20 from a translator comment in lib/lang.ec.sw.php"
   }
  }
 }
