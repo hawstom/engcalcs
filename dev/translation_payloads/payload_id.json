@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1195,
-        "delta_key_count": 1,
+        "expected_key_count": 1196,
+        "delta_key_count": 2,
         "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
@@ -450,10 +450,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_geomap": "lat\/lon"
+        "lpn_geomap": "lat\/lon",
+        "lpn_color_mode_manual": "Manual"
     },
     "keys": {
-        "lpn_geomap": "lat\/lon"
+        "lpn_geomap": "lat\/lon",
+        "lpn_color_mode_manual": "Manual"
     },
     "key_context": {
         "lpn_geomap": {
@@ -470,6 +472,18 @@
                     "value": "Ubah ke lat\/lon…",
                     "english": "Convert to lat\/lon…"
                 }
+            }
+        },
+        "lpn_color_mode_manual": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Tekanan",
+                    "english": "Pressure"
+                },
+                "next_translated": null
             }
         }
     },

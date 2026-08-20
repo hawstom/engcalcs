@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 1195,
-        "delta_key_count": 1,
+        "expected_key_count": 1196,
+        "delta_key_count": 2,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -443,10 +443,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_geomap": "lat\/lon"
+        "lpn_geomap": "lat\/lon",
+        "lpn_color_mode_manual": "Manual"
     },
     "keys": {
-        "lpn_geomap": "lat\/lon"
+        "lpn_geomap": "lat\/lon",
+        "lpn_color_mode_manual": "Manual"
     },
     "key_context": {
         "lpn_geomap": {
@@ -463,6 +465,18 @@
                     "value": "Převést na lat\/lon…",
                     "english": "Convert to lat\/lon…"
                 }
+            }
+        },
+        "lpn_color_mode_manual": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Tlak",
+                    "english": "Pressure"
+                },
+                "next_translated": null
             }
         }
     },

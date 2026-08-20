@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ar",
-        "expected_key_count": 1195,
-        "delta_key_count": 1,
+        "expected_key_count": 1196,
+        "delta_key_count": 2,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -435,10 +435,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_labels_col_decimals_example": "0.000"
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_color_mode_manual": "Manual"
     },
     "keys": {
-        "lpn_labels_col_decimals_example": "0.000"
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_color_mode_manual": "Manual"
     },
     "key_context": {
         "lpn_labels_col_decimals_example": {
@@ -455,6 +457,18 @@
                     "value": "الترتيب",
                     "english": "Rank"
                 }
+            }
+        },
+        "lpn_color_mode_manual": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "الضغط",
+                    "english": "Pressure"
+                },
+                "next_translated": null
             }
         }
     },

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 1195,
-        "delta_key_count": 1,
+        "expected_key_count": 1196,
+        "delta_key_count": 2,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -440,10 +440,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_labels_col_decimals_example": "0.000"
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_color_mode_manual": "Manual"
     },
     "keys": {
-        "lpn_labels_col_decimals_example": "0.000"
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_color_mode_manual": "Manual"
     },
     "key_context": {
         "lpn_labels_col_decimals_example": {
@@ -460,6 +462,18 @@
                     "value": "ደረጃ",
                     "english": "Rank"
                 }
+            }
+        },
+        "lpn_color_mode_manual": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "ግፊት",
+                    "english": "Pressure"
+                },
+                "next_translated": null
             }
         }
     },

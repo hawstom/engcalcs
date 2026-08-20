@@ -386,6 +386,22 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(400);
 		report.eq(JSON.stringify(((await storedSettings(a)).colorBreaks || {})['node.pressure']),
 			'[10,20,30,40,50,60]', 'a valid set of limits is stored exactly as typed');
+		// **AND THE METHOD SELECTOR GOES TO MANUAL**, because that is what it now is (Tom,
+		// 2026-08-19). Shown and stored, never offered: the option is in the list only while it is
+		// the current one, and it is disabled, so nobody can choose "leave the numbers alone".
+		const manual = await a.page.evaluate(() => {
+			const sel = document.getElementById('lpn_set_color_mode_node');
+			const opt = [...sel.options].filter(o => o.value === 'manual')[0];
+			return { value: sel.value, text: opt && opt.textContent,
+				disabled: !!(opt && opt.disabled),
+				link: [...document.getElementById('lpn_set_color_mode_link').options]
+					.some(o => o.value === 'manual') };
+		});
+		report.eq(manual.value, 'manual', 'typing a limit puts the method selector on Manual');
+		report.ok(/\S/.test(manual.text || ''), '...named in the page language, not left blank',
+			manual.text);
+		report.ok(manual.disabled, '...and it cannot be CHOSEN — it is a state, not a method');
+		report.ok(!manual.link, '...and a field nobody has typed over is offered no Manual at all');
 
 		// The legend is the second door in — it is the chrome already telling the user what the
 		// colours mean — and since Task 441 it opens the box on its Coloring section.

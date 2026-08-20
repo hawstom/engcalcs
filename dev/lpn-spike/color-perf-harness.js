@@ -26,7 +26,7 @@ const L = loadLoopedNetwork(
 	"\t\tonZoomChanged: onZoomChanged,\n" +
 	"\t\tstate: function () { return state; },\n" +
 	"\t\tpaintNodeColor: paintNodeColor, paintLinkColor: paintLinkColor,\n" +
-	"\t\tthawBreaks: thawBreaks,\n" +
+	"\t\tclearBreaks: function (g, f) { delete settings.colorBreaks[g + '.' + f]; },\n" +
 	"\t\tnodeFill: function (id) { return nodeEls[id] ? (nodeEls[id].circle.style.fill || '') : null; },\n" +
 	"\t\tnodeSymbolColor: function (id) { return (nodeEls[id] && nodeEls[id].symbol) ? (nodeEls[id].symbol.style.color || '') : null; },\n" +
 	"\t\tlinkStroke: function (id) { return linkEls[id] ? (linkEls[id].line.style.stroke || '') : null; },\n" +
@@ -104,23 +104,23 @@ s.colorLinkField = 'diameter';
 
 // ---- 1. a repaint's cost does not grow with the network ---------------------------------------
 console.log('== breaksFor() per repaint ==');
-// **THAWED BEFORE EACH MEASUREMENT, or the measurement is vacuous.** Since Task 448 a repaint of
-// an already-classified field computes nothing at all, and a harness counting zero on both sizes
-// would report O(1) about a code path it never entered. Thawing puts the work back so there is a
-// cost to be shown not to grow.
-function thawBoth() { L.thawBreaks('node', 'elev'); L.thawBreaks('link', 'diameter'); }
+// **THE LIMITS ARE EMPTIED BEFORE EACH MEASUREMENT, or the measurement is vacuous.** Since Task
+// 448 a repaint of a field whose limits are filled in computes nothing at all, and a harness
+// counting zero on both sizes would report O(1) about a code path it never entered. Emptying them
+// puts the work back so there is a cost to be shown not to grow.
+function emptyBoth() { L.clearBreaks('node', 'elev'); L.clearBreaks('link', 'diameter'); }
 const small = growTo(5);
-thawBoth();
+emptyBoth();
 const cSmall = count(() => L.refreshValueColors());
 const big = growTo(11);
-thawBoth();
+emptyBoth();
 const cBig = count(() => L.refreshValueColors());
 console.log('   ' + small.links + ' links -> ' + cSmall + ' calls;  ' + big.links + ' links -> ' + cBig + ' calls');
 ok('a repaint computes the breaks ONCE PER GROUP, not once per element',
 	cSmall <= 4 && cBig <= 4, cSmall + '/' + cBig);   // two groups, and the legend reads each once
 ok('...so the count does not grow with the network', cSmall === cBig, cSmall + ' vs ' + cBig);
-// **TASK 448 REMOVED THE REST OF THE COST.** The limits are FROZEN the first time they are asked
-// for, so the one-element callers (paint*Color with no breaks argument, which is what a single
+// **TASK 448 REMOVED THE REST OF THE COST.** The limits are FILLED IN the first time they are
+// asked for, so the one-element callers (paint*Color with no breaks argument, which is what a single
 // rebuilt element still uses) read a stored array and never reach the mode at all. The pre-hoist
 // shape -- one call per element, the measurement Task 446 recorded -- can no longer be reproduced,
 // which is the strongest form the fix can take.
@@ -131,20 +131,20 @@ const perElement = count(function () {
 });
 console.log('   per-element path over ' + (big.nodes + big.links) + ' elements: ' +
 	perElement + ' calls');
-ok('the per-element path costs NOTHING once the limits are frozen', perElement === 0,
+ok('the per-element path costs NOTHING once the limits are filled in', perElement === 0,
 	String(perElement));
-// Where the cost went, measured rather than asserted: a thawed field re-derives ONCE PER GROUP, at
+// Where the cost went, measured rather than asserted: an emptied field re-derives ONCE PER GROUP, at
 // the first element painted, and every element after it is free. Two groups, two calls, whatever
 // the size of the network.
-L.thawBreaks('node', 'elev');
-L.thawBreaks('link', 'diameter');
-const afterThaw = count(function () {
+L.clearBreaks('node', 'elev');
+L.clearBreaks('link', 'diameter');
+const afterEmpty = count(function () {
 	doc.nodes.forEach(n => L.paintNodeColor(n.id));
 	doc.links.forEach(l => L.paintLinkColor(l.id));
 });
-console.log('   ...and after thawing both fields: ' + afterThaw + ' calls');
-ok('a thawed field costs one call per GROUP, once, and nothing thereafter', afterThaw === 2,
-	String(afterThaw));
+console.log('   ...and after emptying both fields: ' + afterEmpty + ' calls');
+ok('an emptied field costs one call per GROUP, once, and nothing thereafter', afterEmpty === 2,
+	String(afterEmpty));
 
 // ---- 2. the colours are unchanged -------------------------------------------------------------
 // A perf fix that moves one element into a neighbouring class is a regression, so the hoisted

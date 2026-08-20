@@ -124,12 +124,19 @@ sources.forEach(function (s) {
 // THE FIVE MODES, on distributions with answers worked out by hand
 // ============================================================================================
 
-// Six algorithmic modes and one criterion mode. The order is stable because a saved project stores
-// the KEY, and because a picker that reshuffles between visits is a picker nobody trusts.
-ok(R.MODES.length === 7, 'seven modes', R.MODES.map(function (m) { return m.key; }).join());
+// Six algorithmic modes, one criterion mode, and `manual` -- which is a STATE the picker shows and
+// a project stores, never a thing to choose, so it is in MODES (it needs a name) and out of
+// modesFor() (nobody may pick it). The order is stable because a saved project stores the KEY, and
+// because a picker that reshuffles between visits is a picker nobody trusts.
+ok(R.MODES.length === 8, 'eight modes', R.MODES.map(function (m) { return m.key; }).join());
 ok(R.MODES.map(function (m) { return m.key; }).join() ===
-	'equal,quantile,jenks,stddev,pretty,log,pressure',
-	'the GIS names, then logarithmic, then the criterion, in a stable order');
+	'equal,quantile,jenks,stddev,pretty,log,pressure,manual',
+	'the GIS names, then logarithmic, then the criterion, then manual, in a stable order');
+ok(R.MANUAL_MODE === 'manual' && R.MODES.filter(function (m) { return m.manual; }).length === 1,
+	'exactly one mode is marked manual, and it is the one MANUAL_MODE names');
+ok(!R.modesFor().some(function (m) { return m.manual; }) &&
+	!R.modesFor('pressure').some(function (m) { return m.manual; }),
+	'...and it is offered for no field, with or without one -- it is a state, not a choice');
 // **THE CRITERION MODE IS OFFERED ONLY FOR ITS OWN QUANTITY.** A mode called Pressure offered while
 // colouring velocity is an invitation to a wrong map, so modesFor() filters by field.
 ok(R.modesFor('velocity').length === 6 && !R.modesFor('velocity').some(function (m) { return m.criterion; }),
