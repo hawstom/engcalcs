@@ -115,11 +115,14 @@ oversubscribed and the harness was measuring the load rather than the algorithm.
 
 **Two rules follow.**
 
-1. **A wall-clock ratio must not BLOCK a build.** It is a genuinely useful measurement — that check
-   is what proves the uniform grid stayed linear — but its failure mode is "somebody else was
-   compiling", which is not a defect and not actionable. Either widen such a bound until only a real
-   regression can trip it, or move the check to the advisory tier where `size_budget_check.php` and
-   `key_hygiene_check.php` already live.
+1. **MEASURE THE TWO SIDES OF A RATIO ALTERNATELY, and it is the fix that was actually applied.**
+   The harness already took a minimum over five batches, which defends against a brief spike — and
+   did not save it, because load that arrives between the two measurements and STAYS makes every
+   batch of the second size honestly slow. Interleaving puts both sizes under the same conditions
+   whatever those conditions are. Same trick `dev/browser-pass/specs/perf.js` uses, for the same
+   reason. Re-measured after the change on the same loaded machine: **1.16x**, against 2.02x
+   before and a 2.0 bound. Widening the bound would have hidden the next real regression; this
+   does not.
 2. **Before believing a perf failure, re-run the ONE harness alone.** It costs seconds and it is the
    difference between a real regression and a busy afternoon. The same applies to
    `dev/browser-pass/specs/perf.js`, whose own comments already say its numbers swing by a factor of

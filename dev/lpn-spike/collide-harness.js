@@ -443,17 +443,27 @@ console.log('\n--- cost ---');
 	// batches is the closest thing to the machine's real cost and is the standard way to benchmark
 	// under load. The assertion is a ratio of two such minima, so it stays a statement about the
 	// ALGORITHM rather than about the afternoon.
-	function msPerPass(n) {
-		const { labels, obs } = net(n), best = [];
-		for (let w = 0; w < 3; w++) { C.placeLabels(labels, obs, { inner: 6, outer: 15, k: 0.25 }); }
-		for (let b = 0; b < 5; b++) {
-			const t = process.hrtime.bigint();
-			for (let i = 0; i < 3; i++) { C.placeLabels(labels, obs, { inner: 6, outer: 15, k: 0.25 }); }
-			best.push(Number(process.hrtime.bigint() - t) / 3 / 1e6);
-		}
-		return Math.min.apply(null, best);
+	//
+	// **AND THE TWO SIZES ARE MEASURED ALTERNATELY, not one after the other.** Taking a minimum
+	// defends against a brief spike; it does NOT defend against load that arrives between the two
+	// measurements and stays, because then every batch of the second size is slow and its minimum
+	// is honestly slow. That is exactly what happened on 2026-08-20 with three subagents building
+	// at once: this check reported 2.02x against a bound of 2 and blocked the build, and the same
+	// commit measured 0.60x on a quiet machine. Interleaving puts both sizes under the same
+	// conditions whatever those conditions are, which is the trick dev/browser-pass/specs/perf.js
+	// already uses for the same reason. See dev/testing-notes.md.
+	function pass(fixture) {
+		const t = process.hrtime.bigint();
+		for (let i = 0; i < 3; i++) { C.placeLabels(fixture.labels, fixture.obs, { inner: 6, outer: 15, k: 0.25 }); }
+		return Number(process.hrtime.bigint() - t) / 3 / 1e6;
 	}
-	const small = msPerPass(220), big = msPerPass(1000);
+	function msPerPassPair(nA, nB) {
+		const a = net(nA), b = net(nB), bestA = [], bestB = [];
+		for (let w = 0; w < 3; w++) { pass(a); pass(b); }
+		for (let i = 0; i < 5; i++) { bestA.push(pass(a)); bestB.push(pass(b)); }
+		return [Math.min.apply(null, bestA), Math.min.apply(null, bestB)];
+	}
+	const [small, big] = msPerPassPair(220, 1000);
 	console.log(`       220 labels (Net3's own count): ${small.toFixed(1)} ms per pass`);
 	console.log(`       1000 labels:                   ${big.toFixed(1)} ms per pass`);
 	// THE ASSERTION IS THE SLOPE, not the clock, so it means the same thing on any machine. Linear
