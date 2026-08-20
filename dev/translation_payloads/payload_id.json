@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1195,
-        "delta_key_count": 1,
+        "expected_key_count": 1197,
+        "delta_key_count": 3,
         "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
@@ -450,10 +450,14 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_geomap": "lat\/lon"
+        "lpn_geomap": "lat\/lon",
+        "lpn_notes_color_term": "Color band limits stay the same",
+        "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own."
     },
     "keys": {
-        "lpn_geomap": "lat\/lon"
+        "lpn_geomap": "lat\/lon",
+        "lpn_notes_color_term": "Color band limits stay the same",
+        "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own."
     },
     "key_context": {
         "lpn_geomap": {
@@ -469,6 +473,38 @@
                     "key": "lpn_georef_menu",
                     "value": "Ubah ke lat\/lon…",
                     "english": "Convert to lat\/lon…"
+                }
+            }
+        },
+        "lpn_notes_color_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "Skenario, agar satu proyek dapat menyimpan beberapa set kebutuhan. Tabel hasil simpul dan pipa. Penulisan berkas EPANET .inp, agar sebuah proyek dapat dikembalikan ke EPANET. Komentar dan saran selalu diterima dengan senang hati (lihat tautan masukan di atas).",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Elements can be colored by their results, and Find picks out every element that meets a test."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_epanet_term",
+                    "value": "Konstanta Hazen-Williams disesuaikan dengan EPANET",
+                    "english": "Hazen-Williams constants match EPANET"
+                }
+            }
+        },
+        "lpn_notes_color_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "Skenario, agar satu proyek dapat menyimpan beberapa set kebutuhan. Tabel hasil simpul dan pipa. Penulisan berkas EPANET .inp, agar sebuah proyek dapat dikembalikan ke EPANET. Komentar dan saran selalu diterima dengan senang hati (lihat tautan masukan di atas).",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Elements can be colored by their results, and Find picks out every element that meets a test."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_epanet_term",
+                    "value": "Konstanta Hazen-Williams disesuaikan dengan EPANET",
+                    "english": "Hazen-Williams constants match EPANET"
                 }
             }
         }

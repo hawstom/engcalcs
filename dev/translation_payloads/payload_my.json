@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1195,
-        "delta_key_count": 2,
+        "expected_key_count": 1197,
+        "delta_key_count": 4,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -443,10 +443,14 @@
     },
     "keys_to_translate": {
         "lpn_geomap": "lat\/lon",
+        "lpn_notes_color_term": "Color band limits stay the same",
+        "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own.",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "keys": {
         "lpn_geomap": "lat\/lon",
+        "lpn_notes_color_term": "Color band limits stay the same",
+        "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own.",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "key_context": {
@@ -463,6 +467,38 @@
                     "key": "lpn_georef_menu",
                     "value": "lat\/lon အဖြစ် ပြောင်းရန်…",
                     "english": "Convert to lat\/lon…"
+                }
+            }
+        },
+        "lpn_notes_color_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "ပရောဂျက်တစ်ခုတွင် လိုအပ်ချက်များစွာကို ကိုင်ဆောင်နိုင်ရန် အခြေအနေအမျိုးမျိုး (scenarios)။ နေရာနှင့် ပိုက်လိုင်း အဖြေဇယားများ။ ပရောဂျက်တစ်ခုကို EPANET ဆီသို့ ပြန်ထုတ်နိုင်ရန် EPANET .inp ဖိုင်များ ရေးသားခြင်း။ မှတ်ချက်များနှင့် အကြံပြုချက်များကို အမြဲကြိုဆိုပါသည် (အထက်ရှိ တုံ့ပြန်ချက် လင့်ခ်ကို ကြည့်ပါ)။",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Elements can be colored by their results, and Find picks out every element that meets a test."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_epanet_term",
+                    "value": "Hazen-Williams ကိန်းသေများသည် EPANET နှင့် ကိုက်ညီသည်",
+                    "english": "Hazen-Williams constants match EPANET"
+                }
+            }
+        },
+        "lpn_notes_color_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "ပရောဂျက်တစ်ခုတွင် လိုအပ်ချက်များစွာကို ကိုင်ဆောင်နိုင်ရန် အခြေအနေအမျိုးမျိုး (scenarios)။ နေရာနှင့် ပိုက်လိုင်း အဖြေဇယားများ။ ပရောဂျက်တစ်ခုကို EPANET ဆီသို့ ပြန်ထုတ်နိုင်ရန် EPANET .inp ဖိုင်များ ရေးသားခြင်း။ မှတ်ချက်များနှင့် အကြံပြုချက်များကို အမြဲကြိုဆိုပါသည် (အထက်ရှိ တုံ့ပြန်ချက် လင့်ခ်ကို ကြည့်ပါ)။",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Elements can be colored by their results, and Find picks out every element that meets a test."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_epanet_term",
+                    "value": "Hazen-Williams ကိန်းသေများသည် EPANET နှင့် ကိုက်ညီသည်",
+                    "english": "Hazen-Williams constants match EPANET"
                 }
             }
         },

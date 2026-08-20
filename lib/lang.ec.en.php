@@ -1778,19 +1778,19 @@ $ec_lang['lpn_prompt_project_name']='Name for this project';
 $ec_lang['lpn_status_closed_opened']='Closed {closed}. Now showing {opened}.';
 $ec_lang['lpn_status_closed_empty']='Closed {closed}. Started a new empty project.';
 $ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.';
-$ec_lang['lpn_notes_1_term']='Steady state';
-// A TANK IS HELD AT ITS LEVEL, and the note says so out loud (Task 248). This is the honest
-// limit of a steady-state tool with a tank in it: the tank is a correct fixed water level for
-// the instant being solved -- which is exactly what EPANET solves at time zero -- but the level
-// does not fall as water is drawn from it. A reader who is not told that will reasonably assume
-// otherwise, because a tank that never empties is not a tank anybody has met.
-$ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same global gradient algorithm EPANET uses. It does not model how the network changes over time. A tank is held at the water level you give it: within one solution it never runs down and never fills.';
+$ec_lang['lpn_notes_1_term']='How it is solved';
+// EXTENDED-PERIOD SIMULATION SHIPS (Task 248), so this note no longer says the page cannot run
+// over time. What survives from the old wording is the ONE limit that is still real and still
+// surprising: the built-in solver does a single moment and holds every tank at its starting
+// level, so a whole run needs the EPANET solver. dev/lpn-spike/eps-net3-harness.js reproduces
+// EPA's own published 24-hour Net3 report at all 25 reporting steps.
+$ec_lang['lpn_notes_1_def']='Each moment is solved with the same global gradient algorithm EPANET uses. Set a total run time and the EPANET solver works out every reporting step in turn: tanks fill and drain, demands follow their patterns, and the toolbar plays the run back. The built-in solver works out one moment at a time and holds every tank at its starting level.';
 $ec_lang['lpn_notes_2_term']='Not modeled';
 // VALVES LEFT THIS NOTE ON 2026-08-14 (Task 248 phase 2), and what replaces the old sentence is
 // the honest half of it: the valves are all modeled now, but the three that open and close on
 // their own are solved by the EPANET solver and not by the built-in solver. That is a real
 // thing for a reader to know -- it is why such a network needs the engine downloaded once.
-$ec_lang['lpn_notes_2_def']='Water quality and demands that change through the day are not modeled. Valves are: a throttle valve works in either solver, and the valves that open and close on their own (PRV, PSV, FCV) are solved with the EPANET solver, which this page turns on by itself when your network holds one.';
+$ec_lang['lpn_notes_2_def']='Water quality is not modeled. Valves are: a throttle valve works in either solver, and the valves that open and close on their own (PRV, PSV, FCV) are solved with the EPANET solver, which this page turns on by itself when your network holds one.';
 $ec_lang['lpn_notes_3_term']='Saving projects';
 $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -1801,8 +1801,18 @@ $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in t
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Pump curve';
 $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.';
-$ec_lang['lpn_notes_4_term']='Planned additions';
-$ec_lang['lpn_notes_4_def']='Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Writing EPANET .inp files, so that a project can go back out to EPANET. Comments and suggestions are always welcome (see the feedback link above).';
+// WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
+// export). A planned-additions list is stale the moment it is right, and it tells a returning
+// user the tool is less capable than it is, so this slot now points at what is here instead.
+// The invitation it used to carry lives in Help > Fix something.
+$ec_lang['lpn_notes_4_term']='Also on this page';
+$ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Elements can be colored by their results, and Find picks out every element that meets a test.';
+// COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
+// expected to be stable through an animation... recomputing at each time step gives a wrong
+// impression of the system. In this we are ratifying EPANET."* The mechanism is
+// settings.colorFrozenBreaks in js/looped-network.js.
+$ec_lang['lpn_notes_color_term']='Color band limits stay the same';
+$ec_lang['lpn_notes_color_def']='Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own.';
 $ec_lang['lpn_notes_epanet_term']='Hazen-Williams constants match EPANET';
 $ec_lang['lpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';

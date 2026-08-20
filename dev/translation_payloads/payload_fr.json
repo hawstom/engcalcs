@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 1195,
-        "delta_key_count": 1,
+        "expected_key_count": 1197,
+        "delta_key_count": 3,
         "exempt_key_count": 43,
         "exempt_keys": [
             "u_depthFrac",
@@ -460,10 +460,14 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_geomap": "lat\/lon"
+        "lpn_geomap": "lat\/lon",
+        "lpn_notes_color_term": "Color band limits stay the same",
+        "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own."
     },
     "keys": {
-        "lpn_geomap": "lat\/lon"
+        "lpn_geomap": "lat\/lon",
+        "lpn_notes_color_term": "Color band limits stay the same",
+        "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own."
     },
     "key_context": {
         "lpn_geomap": {
@@ -479,6 +483,38 @@
                     "key": "lpn_georef_menu",
                     "value": "Convertir en lat\/lon…",
                     "english": "Convert to lat\/lon…"
+                }
+            }
+        },
+        "lpn_notes_color_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "Les scénarios, pour qu'un même projet puisse contenir plusieurs jeux de demandes. Des tableaux de résultats par nœud et par conduite. Lire et écrire des fichiers EPANET .inp. Vos commentaires et suggestions sont toujours les bienvenus (voir le lien de retour ci-dessus).",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Elements can be colored by their results, and Find picks out every element that meets a test."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_epanet_term",
+                    "value": "Les constantes de Hazen-Williams correspondent maintenant à EPANET (août 2026)",
+                    "english": "Hazen-Williams constants match EPANET"
+                }
+            }
+        },
+        "lpn_notes_color_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_4_def",
+                    "value": "Les scénarios, pour qu'un même projet puisse contenir plusieurs jeux de demandes. Des tableaux de résultats par nœud et par conduite. Lire et écrire des fichiers EPANET .inp. Vos commentaires et suggestions sont toujours les bienvenus (voir le lien de retour ci-dessus).",
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Elements can be colored by their results, and Find picks out every element that meets a test."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_epanet_term",
+                    "value": "Les constantes de Hazen-Williams correspondent maintenant à EPANET (août 2026)",
+                    "english": "Hazen-Williams constants match EPANET"
                 }
             }
         }
