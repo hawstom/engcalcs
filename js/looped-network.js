@@ -17068,8 +17068,11 @@ var EngCalcs = EngCalcs || {};
 				text = 'LINK ' + (link ? link.id : '1') + ' OPEN IF NODE ' + (node ? node.id : '1') + ' BELOW 0',
 				read = libReadControl(text);
 			saveUndoSnapshot();
-			libControls().push(read.rec ||
-				{ link: link ? link.id : '1', raw: text, action: {}, condition: null, text: {} });
+			// Same rule as the edit path below: on an empty network the starter sentence names
+			// nothing real, so it goes in as text with no condition -- visible, marked, and unable
+			// to reach the engine.
+			libControls().push(read.ok ? read.rec
+				: { link: '', raw: text, action: {}, condition: null, text: {} });
 			libCommit();
 			rebuildLibraryBox();
 		}));
@@ -17109,8 +17112,15 @@ var EngCalcs = EngCalcs || {};
 				// blur is the one thing an editor must never do. It is stored with no condition,
 				// which is exactly what lpnTimeModelBlock skips -- so it is visibly there, plainly
 				// marked as not understood, and cannot reach a solve.
-				libControls()[i] = read.rec ||
-					{ link: '', raw: '', action: {}, condition: null, text: {} };
+				// **ONLY A FULLY UNDERSTOOD SENTENCE IS STORED AS A LIVE CONTROL**, and "understood"
+				// includes naming elements that are really here. js/lpn-epanet.js composes a
+				// [CONTROLS] line from the record and hands the whole `.inp` to EPANET, which
+				// REJECTS a control on a link it has never heard of -- so one sentence naming a
+				// deleted pipe would take the entire run down rather than being ignored. A record
+				// with no condition is exactly what lpnTimeModelBlock skips, so an unreadable or
+				// dangling sentence is kept, shown, marked, and inert.
+				libControls()[i] = read.ok ? read.rec
+					: { link: '', raw: '', action: {}, condition: null, text: {} };
 				libControls()[i].raw = box.value.trim();
 				libCommit();
 			});

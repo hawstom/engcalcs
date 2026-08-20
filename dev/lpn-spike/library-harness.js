@@ -203,6 +203,18 @@ function check(ok, msg, detail) {
 	check(clock.length === 1 && clock[0].condition.seconds === 3 * 3600,
 		'the clocktime control we typed reaches it as 3 am', JSON.stringify(clock[0] && clock[0].condition));
 
+	// **A SENTENCE THAT NAMES SOMETHING THIS NETWORK DOES NOT HAVE MUST NOT REACH THE ENGINE.**
+	// js/lpn-epanet.js composes a [CONTROLS] line out of the record and hands the whole `.inp` to
+	// EPANET, which REJECTS a control on a link it has never heard of -- so one dangling sentence
+	// would take the entire run down rather than being quietly ignored. The editor keeps such a
+	// sentence as text with NO CONDITION, which is exactly the shape lpnTimeModelBlock drops.
+	const before = L.timeBlock().controls.length;
+	back.controls.push({ link: '', raw: 'LINK NOPE OPEN AT TIME 1', action: {}, condition: null, text: {} });
+	check(L.timeBlock().controls.length === before,
+		'a sentence kept as text with no condition never reaches the solver',
+		`${before} before, ${L.timeBlock().controls.length} after`);
+	back.controls.pop();
+
 	const model = L.assembleModel();
 	model.time = L.timeBlock();
 	await EngCalcs.lpnEpanetLoad('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'));
