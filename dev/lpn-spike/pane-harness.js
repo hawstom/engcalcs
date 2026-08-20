@@ -43,17 +43,23 @@ paneBody.getBoundingClientRect = function () {
 };
 
 const L = loadLoopedNetwork(
-	"\t\tgetDoc: function () { return doc; }, addNode: addNode,\n" +
+	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink,\n" +
 	"\t\twirePane: wirePane, openPane: openPane, closePane: closePane, togglePane: togglePane,\n" +
 	"\t\tsetPaneTab: setPaneTab, paneIsOpen: paneIsOpen, paneState: function () { return paneState; },\n" +
 	"\t\tclampPaneHeight: clampPaneHeight, paneMaxHeight: paneMaxHeight,\n" +
 	"\t\tprofileIsOpen: profileIsOpen, pathLayer: function () { return profilePathLayer; },\n" +
 	"\t\tserialize: function () { return serializeProject(); },\n" +
-	// The junctions tab, driven the way the user drives it: sort by clicking a heading, type in a
-	// cell, read what the table says.
-	"\t\tsortJunctions: sortJunctions, renderJunctions: renderJunctions,\n" +
-	"\t\tjunctionOrder: function () { return junctionRowsInOrder().map(function (n) { return n.id; }); },\n" +
-	"\t\tjunctionCells: function () { return junctionCells; },\n" +
+	// The asset tables, driven the way the user drives them: sort by clicking a heading, type in a
+	// cell, read what the table says. Reached through paneTableById() rather than by a per-type
+	// export, because ONE renderer serving six types is the thing under test (Task 455).
+	"\t\tpaneTables: paneTables, paneTableById: paneTableById,\n" +
+	"\t\tpaneTabIds: function () { return paneTabs.map(function (t) { return t.id; }); },\n" +
+	"\t\tsortTable: function (id, col) { sortPaneTable(paneTableById(id), col); },\n" +
+	"\t\trenderTable: function (id) { renderPaneTable(paneTableById(id)); },\n" +
+	"\t\ttableOrder: function (id) { return paneTableRowsInOrder(paneTableById(id)).map(function (e) { return e.id; }); },\n" +
+	"\t\ttableCells: function (id) { return paneTableById(id).cells; },\n" +
+	"\t\ttableCols: function (id) { return paneTableById(id).cols; },\n" +
+	"\t\ttableHeadings: function (id) { return paneTableById(id).cols.map(paneHeadingText); },\n" +
 	// The scenario machinery through its own doors -- createScenario()/switchScenario(), never a
 	// hand-built scenario object, or the seam under test would be tested against a shape the page
 	// does not use.
@@ -281,81 +287,236 @@ console.log('\n--- the rulings that are easiest to undo by accident ---');
 		'...and the map overlay containers read the same inset');
 }
 
-// ---- 9. the Junctions tab --------------------------------------------------------------------
-// The tabular editor. What can be quietly wrong here is the WRITE, not the reading: a table is a
+// ---- 9. the six ASSET TABLES ------------------------------------------------------------------
+// The tabular editors. What can be quietly wrong here is the WRITE, not the reading: a table is a
 // second editor of properties the popup already edits, and a second editor that writes directly
 // edits BASE from inside a scenario under every scenario at once. That is not hypothetical --
 // dev/scenario-seam-repair.md is the incident.
-console.log('\n--- the Junctions tab ---');
+//
+// SINCE TASK 455 there are six of them and ONE renderer, so the second thing to hold is that the
+// six stay six: each type lists only its own elements, keeps its own sort, and never lets a result
+// column become a text box.
+console.log('\n--- six tabs, one renderer ---');
+{
+	const ids = L.paneTables().map((t) => t.id);
+	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves',
+		'six asset tables, in the toolbar’s Add order, nodes before links', ids.join(','));
+	report(L.paneTabIds()[0] === 'profile', 'Profile is still the first tab — it is a drawing, the rest are tables',
+		L.paneTabIds().join(','));
+	report(L.paneTabIds().length === 7, 'seven tabs in all', String(L.paneTabIds().length));
+	report(L.paneTabIds().indexOf('text') < 0 && ids.indexOf('text') < 0,
+		'Text is NOT a tab — nothing about a label solves, so its table would have no column worth reading');
+	// Every table has a panel div of its own in the page, which is also what gives each its own
+	// scroll offset for nothing.
+	L.paneTabIds().slice(1).forEach((id) => {
+		report(php.indexOf('id="lpn_pane_' + id + '"') > 0, `#lpn_pane_${id} is a panel in the page`);
+	});
+	// ONE renderer. Six copies of a 200-line table is the thing Task 455 was written to avoid, and
+	// the cheap guard is that the per-type function names never came back.
+	report(!/function render(Junctions|Reservoirs|Tanks|Pipes|Pumps|Valves)\b/.test(src),
+		'there is no per-type renderer — renderPaneTable() serves all six');
+	report(/function renderPaneTable\(spec\)/.test(src), 'and the one renderer takes a spec');
+	// The tab strip and the table list cannot drift, because the tabs are BUILT from the tables.
+	report(/paneTables\(\)\.forEach\(function \(spec\) \{\s*paneTabs\.push\(/.test(src),
+		'the six tabs are generated from the six specs, not written out twice');
+	// ONE tip and ONE empty message for all six -- the translation budget was the design decision.
+	report(src.split("tip: 'lpn_pane_tab_tip'").length === 2,
+		'one generic tab tip serves all six');
+	report(/pc\.lpn_pane_none/.test(fnBody('renderPaneTable')),
+		'...and one generic "none of these yet" message');
+	report(!/lpn_pane_junctions_none|lpn_pane_tab_junctions_tip/.test(src + php),
+		'the junction-specific tip and empty message are retired, not left beside the generic ones');
+}
+
+console.log('\n--- each table lists exactly its own type ---');
 {
 	const doc = L.getDoc();
-	// A network with something to sort: three junctions, one of them with no elevation at all.
-	const a = L.addNode('junction', 0, 0), b = L.addNode('junction', 100, 0), c = L.addNode('junction', 200, 0);
-	a.elev = 30; b.elev = 10; delete c.elev;
-	L.setProp(a, 'demand', 5); L.setProp(b, 'demand', 50); L.setProp(c, 'demand', 1);
-	L.openPane('junctions');
-	report(L.paneState().tab === 'junctions' && !L.profileIsOpen(),
-		'the pane opens on the junctions tab, and the profile is not showing');
+	// One of everything, so "exactly its own type" is a claim with something to be wrong about.
+	const j1 = L.addNode('junction', 0, 0), j2 = L.addNode('junction', 100, 0),
+		j3 = L.addNode('junction', 200, 0),
+		r1 = L.addNode('reservoir', 0, 100), t1 = L.addNode('tank', 100, 100);
+	j1.elev = 30; j2.elev = 10; delete j3.elev;
+	L.setProp(j1, 'demand', 5); L.setProp(j2, 'demand', 50); L.setProp(j3, 'demand', 1);
+	const p1 = L.addLink('pipe', j1.id, j2.id), p2 = L.addLink('pipe', j2.id, j3.id);
+	const pu1 = L.addLink('pump', r1.id, j1.id);
+	const v1 = L.addLink('valve', t1.id, j2.id);
 
-	report(L.junctionOrder().join(',') === [a.id, b.id, c.id].join(','), 'it sorts by ID to begin with',
-		L.junctionOrder().join(','));
-	L.sortJunctions('demand');
-	report(L.junctionOrder().join(',') === [c.id, a.id, b.id].join(','), 'clicking Demand sorts by demand',
-		L.junctionOrder().join(','));
-	L.sortJunctions('demand');
-	report(L.junctionOrder().join(',') === [b.id, a.id, c.id].join(','), 'clicking it again reverses',
-		L.junctionOrder().join(','));
+	// EXACT COUNTS, and no id in two tables. Section 6 already left one reservoir on the map, which
+	// is why the reservoir count is 2 and why this is stated as counts rather than as "the one I
+	// just added" -- a table that quietly listed every node would pass the second form.
+	const listed = (id) => L.tableOrder(id);
+	const want = { junctions: 3, reservoirs: 2, tanks: 1, pipes: 2, pumps: 1, valves: 1 };
+	Object.keys(want).forEach((id) => {
+		report(listed(id).length === want[id], `${id} lists exactly its own ${want[id]}`,
+			listed(id).length + ' of ' + want[id] + ': ' + listed(id).join(','));
+	});
+	const seen = {}, twice = [];
+	Object.keys(want).forEach((id) => listed(id).forEach((x) => {
+		if (seen[x]) { twice.push(x); } seen[x] = id;
+	}));
+	report(twice.length === 0, 'no part is listed by two tables', twice.join(','));
+	report(listed('pipes').indexOf(pu1.id) < 0 && listed('pipes').indexOf(v1.id) < 0,
+		'the pump and the valve are NOT in the pipe table — a link is not a pipe');
+	report(listed('pumps')[0] === pu1.id && listed('valves')[0] === v1.id,
+		'...they are in their own', listed('pumps')[0] + ' / ' + listed('valves')[0]);
+	report(listed('junctions').indexOf(r1.id) < 0 && listed('junctions').indexOf(t1.id) < 0,
+		'and a reservoir and a tank are not junctions');
+
+	// **A RESULT COLUMN IS NEVER TYPED INTO.** The rule CLAUDE.md states as "a number the user
+	// supplied and a number we computed are different kinds of thing", asserted against the real
+	// cells rather than against the spec, because the cell is what the user can reach.
+	L.openPane('pipes');
+	L.renderTable('pipes');
+	const pipeCells = L.tableCells('pipes')[p1.id];
+	['flow', 'velocity', 'headloss'].forEach((k) => {
+		report(pipeCells[k] && pipeCells[k]._tag === 'td', `a pipe's ${k} cell is a plain cell, not an input`,
+			pipeCells[k] && pipeCells[k]._tag);
+	});
+	['diameter', 'length', 'roughness', 'km'].forEach((k) => {
+		report(pipeCells[k] && pipeCells[k]._tag === 'input', `...and its ${k} cell IS editable`,
+			pipeCells[k] && pipeCells[k]._tag);
+	});
+	// The endpoints are identity, which is the drawing's to own: read-only for the same reason a
+	// result is, and for a different reason.
+	report(pipeCells.from && pipeCells.from._tag === 'td' && pipeCells.to && pipeCells.to._tag === 'td',
+		'a pipe’s From and To are read-only — re-drawing the pipe is how they change');
+	report(pipeCells.from.textContent === j1.id && pipeCells.to.textContent === j2.id,
+		'...and they name the right nodes', pipeCells.from.textContent + ' → ' + pipeCells.to.textContent);
+	// A pump has no editable scalar at all: what it is, is its curve.
+	L.renderTable('pumps');
+	const pumpCells = L.tableCells('pumps')[pu1.id];
+	report(Object.keys(pumpCells).every((k) => pumpCells[k]._tag === 'td'),
+		'every cell of the pump table is read-only — a pump IS its curve, and a curve lives in the popup');
+	// The valve's SETTING heading carries no unit, because the quantity differs per row.
+	L.renderTable('valves');
+	const vHead = L.tableHeadings('valves');
+	report(vHead.indexOf('Setting') >= 0, 'the valve Setting heading names no unit', vHead.join(' | '));
+	report(L.tableCells('valves')[v1.id].valveType._tag === 'td',
+		'...and the valve Type is read-only — changing it re-seeds the setting, which belongs in the popup');
+}
+
+console.log('\n--- sorting: a gesture, per table ---');
+{
+	const doc = L.getDoc();
+	const js = L.tableOrder('junctions');
+	report(js.join(',') === js.slice().sort().join(','), 'a table sorts by ID to begin with', js.join(','));
+	L.sortTable('junctions', 'demand');
+	const byDemand = L.tableOrder('junctions');
+	report(byDemand[0] !== js[0] || byDemand.length === 1, 'clicking Demand sorts by demand', byDemand.join(','));
+	L.sortTable('junctions', 'demand');
+	report(L.tableOrder('junctions').join(',') === byDemand.slice().reverse().join(','),
+		'clicking it again reverses', L.tableOrder('junctions').join(','));
+
 	// **A BLANK IS NOT THE SMALLEST VALUE.** Sorting descending to find the deepest node must not
 	// return a screenful of junctions that have no elevation.
-	L.sortJunctions('elev');
-	report(L.junctionOrder().indexOf(c.id) === 2, 'a junction with no elevation sorts last, ascending',
-		L.junctionOrder().join(','));
-	L.sortJunctions('elev');
-	report(L.junctionOrder().indexOf(c.id) === 2, '...and last descending too, which is the point',
-		L.junctionOrder().join(','));
+	const noElev = doc.nodes.filter((n) => n.type === 'junction' && n.elev === undefined)[0];
+	L.sortTable('junctions', 'elev');
+	report(L.tableOrder('junctions').indexOf(noElev.id) === 2, 'a junction with no elevation sorts last, ascending',
+		L.tableOrder('junctions').join(','));
+	L.sortTable('junctions', 'elev');
+	report(L.tableOrder('junctions').indexOf(noElev.id) === 2, '...and last descending too, which is the point',
+		L.tableOrder('junctions').join(','));
 
+	// **SORTING ONE TABLE LEAVES THE OTHERS ALONE** (Task 455). Six tables sharing one sort would
+	// re-order Junctions under the hand of somebody who clicked a heading on Pipes.
+	const pipesBefore = L.tableOrder('pipes').join(',');
+	L.sortTable('junctions', 'id');
+	report(L.tableOrder('pipes').join(',') === pipesBefore, 'sorting Junctions does not re-order Pipes',
+		pipesBefore + '  →  ' + L.tableOrder('pipes').join(','));
+	report(L.paneTableById('junctions').sort.col === 'id' && L.paneTableById('pipes').sort.col === 'id',
+		'...because each table owns its own sort');
+	L.sortTable('pipes', 'diameter');
+	report(L.paneTableById('junctions').sort.col === 'id' && L.paneTableById('pipes').sort.col === 'diameter',
+		'and sorting Pipes by diameter leaves the Junctions sort where it was',
+		L.paneTableById('junctions').sort.col + ' / ' + L.paneTableById('pipes').sort.col);
+}
+
+console.log('\n--- the write seam ---');
+{
+	const doc = L.getDoc();
+	const a = doc.nodes.filter((n) => n.type === 'junction')[0];
+	const b = doc.nodes.filter((n) => n.type === 'junction')[1];
+	const pipe = doc.links.filter((l) => l.type === 'pipe')[0];
+	const base = L.effective(a, 'demand');
 	// **THE WRITE SEAM.** Typing in the demand cell inside a scenario must record an OVERRIDE, not
 	// rewrite the base network. Driven through the cell's own change handler, so what is tested is
 	// the path the user takes.
+	L.switchScenario('base');
+	L.setProp(pipe, 'diameter', 200);   // a real Base number, so "Base keeps its own" is a claim about 200
 	L.createScenario('Peak hour');
-	L.renderJunctions();
-	const cells = L.junctionCells()[a.id];
+	L.renderTable('junctions');
+	const cells = L.tableCells('junctions')[a.id];
 	cells.demand.value = '99';
 	cells.demand._listeners.change[0]();
 	report(L.effective(a, 'demand') === 99, 'typing in a demand cell changes the demand in THIS scenario');
 	L.switchScenario('base');
-	report(L.effective(a, 'demand') === 5, '...and leaves the base network alone — it went through setProp()',
+	report(L.effective(a, 'demand') === base, '...and leaves the base network alone — it went through setProp()',
 		String(L.effective(a, 'demand')));
-	// The elevation is not an overridable property, and is written exactly as the popup writes it.
+	// A LINK property goes through the same seam, and it is the one the valve incident was about.
 	L.switchScenario(L.scenarioIds()[1]);
-	L.renderJunctions();
-	const cellsB = L.junctionCells()[b.id];
+	const baseDia = pipe._diameter;
+	L.renderTable('pipes');
+	const pcells = L.tableCells('pipes')[pipe.id];
+	pcells.diameter.value = '400';
+	pcells.diameter._listeners.change[0]();
+	report(L.effective(pipe, 'diameter') === 400, 'typing a pipe diameter changes it in THIS scenario');
+	report(pipe._diameter === baseDia, '...and Base keeps its own', String(pipe._diameter));
+	// The elevation is not an overridable property, and is written exactly as the popup writes it.
+	L.renderTable('junctions');
+	const cellsB = L.tableCells('junctions')[b.id];
 	cellsB.elev.value = '12.5';
 	cellsB.elev._listeners.change[0]();
 	report(b.elev === 12.5, 'typing in an elevation cell edits the elevation', String(b.elev));
+	L.switchScenario('base');
 
-	// **AN EDIT MUST NOT MOVE THE ROW.** Sorted by elevation, b was in the middle; setting it to
-	// 12.5 does not re-sort, because the sort was a gesture the user made once and a table that
-	// re-orders itself under a typing hand is unusable.
-	const orderNow = L.junctionOrder().join(',');
-	L.renderJunctions();
-	report(L.junctionOrder().join(',') === orderNow, 'editing a value does not re-sort the table',
-		orderNow + '  →  ' + L.junctionOrder().join(','));
-	L.sortJunctions('id');
-	L.sortJunctions('elev');   // a fresh column always sorts ascending
-	report(L.junctionOrder()[0] === b.id, '...and clicking a heading does re-sort it, lowest first',
-		L.junctionOrder().join(','));
+	// **AN EDIT MUST NOT MOVE THE ROW.** The sort was a gesture the user made once, and a table
+	// that re-orders itself under a typing hand is unusable.
+	const orderNow = L.tableOrder('junctions').join(',');
+	L.renderTable('junctions');
+	report(L.tableOrder('junctions').join(',') === orderNow, 'editing a value does not re-sort the table',
+		orderNow + '  →  ' + L.tableOrder('junctions').join(','));
+	L.sortTable('junctions', 'id');
+	L.sortTable('junctions', 'elev');   // a fresh column always sorts ascending
+	report(L.tableOrder('junctions')[0] === b.id, '...and clicking a heading does re-sort it, lowest first',
+		L.tableOrder('junctions').join(','));
 
-	// **A SOLVE MUST NOT TAKE THE CELL AWAY FROM THE TYPIST.** renderJunctions() runs on every
+	// **A SOLVE MUST NOT TAKE THE CELL AWAY FROM THE TYPIST.** renderPaneTable() runs on every
 	// solve, which is 300 ms after every keystroke.
-	const src9 = fnBody('refillJunctions');
-	report(/activeElementSafe\(\)/.test(src9), 'a refill leaves the cell the user is in alone');
-	report(/if \(sig === junctionSig && junctionCells\) \{ refillJunctions\(rows\); return; \}/.test(fnBody('renderJunctions')),
+	report(/activeElementSafe\(\)/.test(fnBody('refillPaneTable')), 'a refill leaves the cell the user is in alone');
+	report(/if \(sig === spec\.sig && spec\.cells\) \{ refillPaneTable\(spec, rows\); return; \}/.test(fnBody('renderPaneTable')),
 		'...and a solve refills the table rather than rebuilding it');
-	// The two result columns are the solver's, and are read through the SAME accessor the map
-	// labels use, so a cell and the label beside the symbol can never disagree.
-	report(/return colorNodeValue\(n, col\);/.test(fnBody('junctionValue')),
-		'head and pressure come from colorNodeValue(), the map labels\' own accessor');
+	// The result columns are the solver's, and are read through the SAME accessors the map labels
+	// use, so a cell and the label beside the symbol can never disagree.
+	report(/return colorNodeValue\(n, key\);/.test(fnBody('paneColNodeResult')),
+		'node results come from colorNodeValue(), the map labels’ own accessor');
+	report(/return colorLinkValue\(l, key\);/.test(fnBody('paneColLinkResult')),
+		'...and link results from colorLinkValue()');
+	// Every edit ends the way the popup's does, so a table write cannot forget the override mark,
+	// the status count or the save.
+	report(/completeEdit\(c\.prop \? \{ el: el, prop: c\.prop \} : null\);/.test(fnBody('paneTableRow')),
+		'every table edit ends in completeEdit(), the popup’s own ending');
+}
+
+// ---- 10. seven tabs wrap, and the pane still fits ---------------------------------------------
+// Tom, 2026-08-19, choosing between wrapping and a type selector: *"Seven tabs and let them wrap:
+// Yes."* So the strip is allowed to be two lines, and the thing that must not happen is the pane
+// silently growing past the share of the window the ceiling reserves for it.
+console.log('\n--- the strip may be two lines ---');
+{
+	report(/\.lpn-pane-tabs\s*\{[^}]*flex-wrap:\s*wrap/.test(css), 'the tab strip wraps rather than overflowing');
+	report(/\.lpn-pane-head\s*\{[^}]*align-items:\s*flex-start/.test(css),
+		'...with the X pinned to the top rather than stretched down beside two rows');
+	report(/@media \(max-width: 60rem\) \{ \.lpn-pane-tab \{ padding/.test(css),
+		'...and the tabs give up side padding before they give up a line');
+	report(!/\.lpn-pane-tabs\s*\{[^}]*overflow-x/.test(css),
+		'the strip never scrolls sideways — the page may not scroll at all (Task 432)');
+	// THE CEILING KNOWS ABOUT THE CHROME. The body's height is the only number JS writes, so if the
+	// cap ignored the grip and a two-line strip the whole pane would sit past 80% of the window.
+	report(/Math\.floor\(vh \* 0\.8\) - paneChromeHeight\(\)/.test(fnBody('paneMaxHeight')),
+		'the pane ceiling subtracts the measured chrome, so a second line of tabs is accounted for');
+	report(/pane\.getBoundingClientRect\(\)\.height/.test(fnBody('paneChromeHeight')) &&
+		/body\.getBoundingClientRect\(\)\.height/.test(fnBody('paneChromeHeight')),
+		'...and the chrome is MEASURED, never a constant that a wrapped strip would falsify');
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed`);

@@ -698,13 +698,13 @@
                 "lpn_labels_col_rank",
                 "lpn_new_geo_si",
                 "lpn_new_geo_us",
-                "lpn_pane_junctions_none",
+                "lpn_pane_none",
                 "lpn_pane_resize",
                 "lpn_pane_right_toggle",
                 "lpn_pane_right_toggle_tip",
                 "lpn_pane_sort_tip",
                 "lpn_pane_tab_junctions",
-                "lpn_pane_tab_junctions_tip",
+                "lpn_pane_tab_tip",
                 "lpn_pane_toggle",
                 "lpn_pane_toggle_tip",
                 "lpn_profile_axis_elev",
@@ -1542,13 +1542,13 @@
         "lpn_notes_color_term": "8b53e66b696e9b737a151a107083be02d276dbf5",
         "lpn_notes_epanet_def": "58224d932181c3c20dfda2d61e6a8bc168d12e6b",
         "lpn_notes_epanet_term": "bf763064f120b082f63d20ec1b5efbcee7003d9e",
-        "lpn_pane_junctions_none": "6c467069f551c0e95f0b41aa367dfccc61684fd4",
+        "lpn_pane_none": "6c467069f551c0e95f0b41aa367dfccc61684fd4",
         "lpn_pane_resize": "ec7886a3bab174ee59d4ffc0b0bbb1272abafee3",
         "lpn_pane_right_toggle": "7d9ff4f0de398581c4640bcbb6e536c355a391be",
         "lpn_pane_right_toggle_tip": "a87afa19af1816cefc826dd45cad9a60ebee0ff2",
         "lpn_pane_sort_tip": "8f0d327910845105c937a478aa1143486f3d33c9",
         "lpn_pane_tab_junctions": "b836e8bcdde86c43aeb171e94a0bb2a815027fef",
-        "lpn_pane_tab_junctions_tip": "feeacc0d5fe73604243814a27eeb83a157ab9956",
+        "lpn_pane_tab_tip": "feeacc0d5fe73604243814a27eeb83a157ab9956",
         "lpn_pane_toggle": "60f64e2a4af99ca6f78cf4ac18d694573a67cc41",
         "lpn_pane_toggle_tip": "98d719b29ed66c3afeb455f21135fed42ec9913b",
         "lpn_prefix_applied": "7671fd83e608738f499fcb730d216c5dd152e0dd",
@@ -4554,7 +4554,7 @@
             "words": 4,
             "ends_sentence": false
         },
-        "lpn_pane_junctions_none": {
+        "lpn_pane_none": {
             "words": 6,
             "ends_sentence": true
         },
@@ -4578,7 +4578,7 @@
             "words": 1,
             "ends_sentence": false
         },
-        "lpn_pane_tab_junctions_tip": {
+        "lpn_pane_tab_tip": {
             "words": 10,
             "ends_sentence": true
         },

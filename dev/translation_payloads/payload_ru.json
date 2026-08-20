@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 1201,
-        "delta_key_count": 6,
+        "expected_key_count": 1209,
+        "delta_key_count": 14,
         "exempt_key_count": 19,
         "exempt_keys": [
             "calc_units_us",
@@ -439,16 +439,32 @@
         "lpn_basemap_satellite_show": "Show satellite images",
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
+        "lpn_pane_tab_reservoirs": "Reservoirs",
+        "lpn_pane_tab_tanks": "Tanks",
+        "lpn_pane_tab_pipes": "Pipes",
+        "lpn_pane_tab_pumps": "Pumps",
+        "lpn_pane_tab_valves": "Valves",
         "lpn_notes_color_term": "Color band limits stay the same",
         "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own.",
+        "lpn_field_from": "From",
+        "lpn_field_to": "To",
+        "lpn_field_valve_setting": "Setting",
         "lpn_color_mode_manual": "Manual"
     },
     "keys": {
         "lpn_basemap_satellite_show": "Show satellite images",
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
+        "lpn_pane_tab_reservoirs": "Reservoirs",
+        "lpn_pane_tab_tanks": "Tanks",
+        "lpn_pane_tab_pipes": "Pipes",
+        "lpn_pane_tab_pumps": "Pumps",
+        "lpn_pane_tab_valves": "Valves",
         "lpn_notes_color_term": "Color band limits stay the same",
         "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own.",
+        "lpn_field_from": "From",
+        "lpn_field_to": "To",
+        "lpn_field_valve_setting": "Setting",
         "lpn_color_mode_manual": "Manual"
     },
     "key_context": {
@@ -500,6 +516,86 @@
                 }
             }
         },
+        "lpn_pane_tab_reservoirs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_junctions",
+                    "value": "Узлы",
+                    "english": "Junctions"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_tab_tip",
+                    "value": "Все узлы в виде таблицы, которую можно сортировать и редактировать.",
+                    "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
+        "lpn_pane_tab_tanks": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_junctions",
+                    "value": "Узлы",
+                    "english": "Junctions"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_tab_tip",
+                    "value": "Все узлы в виде таблицы, которую можно сортировать и редактировать.",
+                    "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
+        "lpn_pane_tab_pipes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_junctions",
+                    "value": "Узлы",
+                    "english": "Junctions"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_tab_tip",
+                    "value": "Все узлы в виде таблицы, которую можно сортировать и редактировать.",
+                    "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
+        "lpn_pane_tab_pumps": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_junctions",
+                    "value": "Узлы",
+                    "english": "Junctions"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_tab_tip",
+                    "value": "Все узлы в виде таблицы, которую можно сортировать и редактировать.",
+                    "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
+        "lpn_pane_tab_valves": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_junctions",
+                    "value": "Узлы",
+                    "english": "Junctions"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_tab_tip",
+                    "value": "Все узлы в виде таблицы, которую можно сортировать и редактировать.",
+                    "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
         "lpn_notes_color_term": {
             "reason": "missing",
             "current_value": null,
@@ -529,6 +625,54 @@
                     "key": "lpn_notes_epanet_term",
                     "value": "Константы Хазена-Вильямса соответствуют EPANET",
                     "english": "Hazen-Williams constants match EPANET"
+                }
+            }
+        },
+        "lpn_field_from": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length",
+                    "value": "Длина",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "Длина трубы. При включённом «Авто» длина измеряется по нарисованному на карте. Отключите «Авто», чтобы ввести длину, отличающуюся от рисунка.",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                }
+            }
+        },
+        "lpn_field_to": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length",
+                    "value": "Длина",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "Длина трубы. При включённом «Авто» длина измеряется по нарисованному на карте. Отключите «Авто», чтобы ввести длину, отличающуюся от рисунка.",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                }
+            }
+        },
+        "lpn_field_valve_setting": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_valve_setting_flow_tip",
+                    "value": "Наибольший расход, который пропускает клапан. Если через клапан хочет пройти меньше воды, он остаётся полностью открытым и не создаёт потерь.",
+                    "english": "The most water the valve lets through. When less water than this wants to pass, the valve stands fully open and adds no loss."
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_setting_loss",
+                    "value": "Коэффициент потерь",
+                    "english": "Loss coefficient"
                 }
             }
         },

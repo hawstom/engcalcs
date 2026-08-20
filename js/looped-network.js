@@ -6637,15 +6637,22 @@ var EngCalcs = EngCalcs || {};
 			refresh: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
 			hide: function () { drawProfilePath(null); }
 		},
-		{
-			id: 'junctions', panel: 'lpn_pane_junctions', label: 'lpn_pane_tab_junctions',
-			tip: 'lpn_pane_tab_junctions_tip',
-			// A rebuild on entry, because the tab may have been away for a whole editing session;
-			// a refill afterwards, because renderJunctions() decides that for itself.
-			show: function () { junctionSig = ''; junctionOrderIds = null; renderJunctions(); },
-			refresh: renderJunctions
-		}
 	];
+	// **THE SIX ASSET TABLES JOIN THE STRIP FROM ONE LIST** (Task 455). Profile stays first and stays
+	// apart -- it is a drawing and the other six are tables -- and the six follow in the toolbar's
+	// own Add order, nodes before links, so the two strips teach each other.
+	//
+	// Built here rather than written out six times: a tab is nothing but its table's own
+	// declaration, so there is no per-type tab code that could disagree with the per-type columns.
+	// A rebuild on entry, because the tab may have been away for a whole editing session; a refill
+	// afterwards, because renderPaneTable() decides that for itself.
+	paneTables().forEach(function (spec) {
+		paneTabs.push({
+			id: spec.id, panel: spec.panel, label: spec.label, tip: 'lpn_pane_tab_tip',
+			show: function () { paneTableReset(spec); renderPaneTable(spec); },
+			refresh: function () { renderPaneTable(spec); }
+		});
+	});
 	var paneState = { open: false, h: LPN_PANE_DEFAULT, tab: paneTabs[0].id };
 	function paneEl() { return document.getElementById('lpn_pane'); }
 	function paneIsOpen() { return !!paneState.open; }
@@ -6676,13 +6683,27 @@ var EngCalcs = EngCalcs || {};
 	// (the curtain -- see the markup note on height="10000"). Deriving a ceiling from either would
 	// pin the pane at its floor on the one pass where the user has not touched anything yet, so
 	// half the window stands in until there is something true to measure.
+	//
+	// **AND THE STRIP CAN BE TWO LINES.** Since Task 455 there are seven tabs and they wrap, so the
+	// pane's chrome -- its grip and its tab strip -- is no longer a constant. It is MEASURED, for
+	// the same reason everything else here is: the body's height is the only number JS writes, so a
+	// taller strip makes the whole pane taller, and a ceiling that did not know about it would let
+	// a two-line strip push the pane past the share of the window this cap exists to reserve.
+	// `room` needs no correction, because a taller strip has already shrunk the measured map.
+	function paneChromeHeight() {
+		var pane = paneEl(), body = document.getElementById('lpn_pane_body'), p, b;
+		if (!pane || !body || !paneState.open) { return 0; }
+		p = pane.getBoundingClientRect().height;
+		b = body.getBoundingClientRect().height;
+		return (p > b && b > 0) ? p - b : 0;
+	}
 	function paneMaxHeight() {
 		var vh = window.innerHeight || 800, body = document.getElementById('lpn_pane_body'),
 			map = svg ? svg.getBoundingClientRect().height : 0,
 			mine = body ? body.getBoundingClientRect().height : 0,
 			room = map + mine - LPN_PANE_MAP_MIN;
 		if (!(map > 0) || map > vh) { room = Math.floor(vh / 2); }
-		return Math.max(LPN_PANE_MIN, Math.min(room, Math.floor(vh * 0.8)));
+		return Math.max(LPN_PANE_MIN, Math.min(room, Math.floor(vh * 0.8) - paneChromeHeight()));
 	}
 	function clampPaneHeight(h) {
 		if (!(h > 0)) { h = LPN_PANE_DEFAULT; }
@@ -6690,13 +6711,26 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The one place the pane's state reaches the page. Everything else sets paneState and calls
 	// this, so open/close/switch/drag cannot each grow their own idea of what the DOM should say.
-	function applyPaneLayout() {
-		var pane = paneEl(), body = document.getElementById('lpn_pane_body'), btn;
+	//
+	// **AND IT MEASURES TWICE WHEN THE ANSWER MOVED UNDER IT.** The ceiling is derived from the map's
+	// height, and applyMapHeight() has just changed that -- so on a window that got shorter, or
+	// NARROWER (a narrow window wraps the menu bar, the toolbar and, since Task 455, the seven-tab
+	// strip, and every wrap takes height from the map), the first clamp was computed against the
+	// layout being replaced. Measured at 520x900 before this: the pane kept its 260 px, the map hit
+	// its 80 px floor and the page ran 60 px past the bottom of the window, converging only if the
+	// user resized a second time. One extra pass fixes it, which is the same device applyMapHeight()
+	// uses for the same reason.
+	function applyPaneLayout(secondPass) {
+		var pane = paneEl(), body = document.getElementById('lpn_pane_body'), btn, applied, want;
 		if (!pane) { return; }
 		pane.style.display = paneState.open ? 'flex' : 'none';
+		// **THE STORED HEIGHT IS THE USER'S WISH; THE CLAMP IS APPLIED, NOT WRITTEN BACK.** A window
+		// narrowed to 520 px leaves room for a 168 px pane, and writing that back would mean the
+		// pane you dragged to 400 came back as 168 for good once you widened the window again. The
+		// ceiling is a fact about the window; the number is a fact about the user.
 		if (paneState.open) {
-			paneState.h = clampPaneHeight(paneState.h);
-			if (body) { body.style.height = paneState.h + 'px'; }
+			applied = clampPaneHeight(paneState.h);
+			if (body) { body.style.height = applied + 'px'; }
 		}
 		paneTabs.forEach(function (t) {
 			var panel = document.getElementById(t.panel), on = t.id === paneState.tab, tab;
@@ -6708,6 +6742,10 @@ var EngCalcs = EngCalcs || {};
 		if (btn) { btn.setAttribute('aria-pressed', paneState.open ? 'true' : 'false'); }
 		// THE CANVAS IS RE-MEASURED, NEVER TOLD. See the note at the top of this section.
 		applyMapHeight();
+		if (!secondPass && paneState.open) {
+			want = clampPaneHeight(paneState.h);
+			if (want !== applied) { applyPaneLayout(true); }
+		}
 	}
 	// Switching tabs is a HIDE and a SHOW, in that order: the outgoing tab takes its map drawing
 	// with it before the incoming one puts its own there.
@@ -7542,55 +7580,249 @@ var EngCalcs = EngCalcs || {};
 			if (EngCalcs.initTips) { EngCalcs.initTips(h); }
 		});
 	}
-	// ---- Tab: JUNCTIONS, the first tabular editor (ROADMAP Task 434) --------------------------
+	// ---- Tabs: THE ASSET TABLES (ROADMAP Task 434; all six types since Task 455) ----------------
 	//
-	// The same document the map shows, as a spreadsheet: one row per junction, every column
-	// sortable, the two typed values editable in place. It is the view for the questions a drawing
-	// answers badly -- "which node has no elevation", "who is at 12 psi", "is that demand really
-	// 1,500" -- and EPANET has had it since 2.0.
+	// The same document the map shows, as a spreadsheet: one row per part, every column sortable,
+	// the typed values editable in place. It is the view for the questions a drawing answers badly
+	// -- "which node has no elevation", "who is at 12 psi", "which pipe is over 3 m/s" -- and
+	// EPANET has had it since 2.0.
 	//
-	// **EVERY WRITE GOES THROUGH THE SAME SEAM THE PROPERTY POPUP USES**, which for a demand means
-	// setProp(): a direct write edits BASE from inside a scenario, silently, under every scenario at
-	// once (dev/scripts/scenario_seam_check.php, dev/scenario-seam-repair.md). An elevation is not
-	// overridable and is written as the popup writes it. Two editors of one property must not have
-	// two ideas of what editing it means, so the setters here are line-for-line the popup's.
+	// **ONE RENDERER, SIX COLUMN SPECS.** Tom, 2026-08-19: *"The bottom pane tabs should include all
+	// assets."* Six near-copies of a 200-line renderer would rot the first time one of them learned
+	// something the other five did not, so a type DECLARES ITSELF as a row of paneTables(): the
+	// panel div it fills, which elements it holds, and its columns. Everything below reads that and
+	// nothing else, so the seventh type is a literal rather than a file.
+	//
+	// **TEXT IS NOT AN ASSET AND GETS NO TAB.** Nothing about a text label solves, and a table of
+	// them would have no column worth reading.
+	//
+	// **EVERY WRITE GOES THROUGH THE SAME SEAM THE PROPERTY POPUP USES**, which for an overridable
+	// property means setProp(): a direct write edits BASE from inside a scenario, silently, under
+	// every scenario at once (dev/scripts/scenario_seam_check.php, dev/scenario-seam-repair.md). An
+	// elevation is not overridable and is written as the popup writes it. Two editors of one
+	// property must not have two ideas of what editing it means, so the setters here are
+	// line-for-line the popup's, and both finish through completeEdit().
 	//
 	// **A NUMBER HERE IS THE NUMBER THE USER TYPED**, in the unit the heading names -- no conversion
-	// in either direction, exactly as in the popup (Task 263). The two RESULT columns are the
-	// opposite kind of thing and are read-only: they come from the solve, through the same accessor
-	// the map labels and the colour ramp use, so a table cell and the label beside the symbol can
-	// never disagree.
-	var junctionSort = { col: 'id', dir: 1 };
-	var junctionCells = null, junctionSig = '', junctionOrderIds = null;
-	// The unit-bearing headings are rebuilt from these, so a unit switch re-labels the table for the
-	// same reason it re-renders the popup. `result` marks a column the solver owns.
-	var JUNCTION_COLS = [
-		{ key: 'id', label: 'lpn_field_id' },
-		{ key: 'elev', label: 'lpn_field_elev', unit: function () { return 'lpn_u_elevhead'; } },
-		{ key: 'demand', label: 'bpn_demand', unit: function () { return 'lpn_u_flow'; } },
-		{ key: 'head', label: 'lpn_result_head', result: true, unit: function () { return resultUnit('elevhead'); } },
-		{ key: 'pressure', label: 'lpn_result_pressure', result: true, unit: function () { return resultUnit('pressure'); } }
-	];
-	function junctionNodes() {
-		return doc.nodes.filter(function (n) { return n.type === 'junction'; });
+	// in either direction, exactly as in the popup (Task 263). A RESULT is the opposite kind of
+	// thing and is read-only, because a number the user supplied and a number we computed must
+	// never occupy the same field (CLAUDE.md). Results come through the same accessors the map
+	// labels and the colour ramp use, so a table cell and the label beside the symbol can never
+	// disagree -- which is also why a pump's head GAIN reads here as a negative head LOSS, the one
+	// way this page has ever expressed it.
+	//
+	// **EACH TYPE KEEPS ITS OWN SORT**, on the spec itself, so sorting Pipes by velocity cannot
+	// re-order Junctions under the hand of somebody typing in them. Each keeps its own SCROLL
+	// position too, and that one costs no code: a scroll offset belongs to the element that
+	// scrolls, and there are six panel divs.
+	function paneColId() {
+		return { key: 'id', label: 'lpn_field_id', get: function (el) { return el.id; } };
 	}
-	function junctionValue(n, col) {
-		if (col === 'id') { return n.id; }
-		if (col === 'elev') { return n.elev; }
-		if (col === 'demand') { return effective(n, 'demand'); }
-		return colorNodeValue(n, col);
+	function paneColElev() {
+		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead,
+			get: function (n) { return n.elev; },
+			set: function (n, v) { n.elev = v; updateNode(n.id); } };
 	}
-	function junctionPresent(v) {
+	// A link's two ends, read-only and as TEXT: which node a pipe lands on is identity, and identity
+	// is never overridable (a node cannot be in two places at once in one rendered map). Re-drawing
+	// the pipe is how it changes.
+	function paneColEnds() {
+		return [
+			{ key: 'from', label: 'lpn_field_from', get: function (l) { return l.from; } },
+			{ key: 'to', label: 'lpn_field_to', get: function (l) { return l.to; } }
+		];
+	}
+	function paneColDiameter() {
+		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; },
+			prop: 'diameter', get: function (l) { return effective(l, 'diameter'); },
+			set: function (l, v) { setProp(l, 'diameter', v); } };
+	}
+	// The results a link has. Velocity is pipe-and-valve only (a pump has no diameter, so its stored
+	// velocity is a fallback 0 that reads as "no flow"), so it is declared by the tables that can
+	// show it rather than filtered out of a shared list at render time.
+	function paneColLinkResult(key, label, unit) {
+		return { key: key, label: label, result: true, unit: unit,
+			get: function (l) { return colorLinkValue(l, key); } };
+	}
+	function paneColNodeResult(key, label, unit) {
+		return { key: key, label: label, result: true, unit: unit,
+			get: function (n) { return colorNodeValue(n, key); } };
+	}
+	function paneUnitFlow() { return resultUnit('flow'); }
+	function paneUnitHead() { return resultUnit('elevhead'); }
+	function paneUnitPressure() { return resultUnit('pressure'); }
+	function paneUnitVelocity() { return resultUnit('velocity'); }
+	function paneUnitElevHead() { return 'lpn_u_elevhead'; }
+	// The valve's type, as the word the popup's own selector shows. READ-ONLY here on purpose:
+	// changing the type re-seeds the setting and drops every scenario's override on it, which is a
+	// decision that belongs where its consequences are spelled out.
+	function paneValveTypeText(l) {
+		var pc = EngCalcs.pageConfig || {}, vt = (l.valveType || 'TCV').toUpperCase();
+		return pc['lpn_valve_type_' + vt.toLowerCase()] || vt;
+	}
+	// Built once, on demand, because paneTabs is assembled at load time and these column getters
+	// name functions declared further down the file.
+	var paneTablesCache = null;
+	function paneTables() {
+		if (!paneTablesCache) { paneTablesCache = buildPaneTables(); }
+		return paneTablesCache;
+	}
+	function buildPaneTables() {
+		return [
+			{
+				id: 'junctions', panel: 'lpn_pane_junctions', label: 'lpn_pane_tab_junctions',
+				group: 'node', type: 'junction',
+				cols: [
+					paneColId(), paneColElev(),
+					{ key: 'demand', label: 'bpn_demand', unit: function () { return 'lpn_u_flow'; },
+						prop: 'demand', get: function (n) { return effective(n, 'demand'); },
+						set: function (n, v) { setProp(n, 'demand', v); } },
+					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
+					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure)
+				]
+			},
+			{
+				id: 'reservoirs', panel: 'lpn_pane_reservoirs', label: 'lpn_pane_tab_reservoirs',
+				group: 'node', type: 'reservoir',
+				cols: [
+					paneColId(), paneColElev(),
+					// BLANK MEANS "follow the elevation", exactly as in the popup, where the
+					// elevation is this field's placeholder. So an empty cell here is a reservoir
+					// whose water surface is its ground, not a reservoir with no head.
+					{ key: 'head', label: 'lpn_field_head', unit: paneUnitElevHead,
+						prop: 'head', get: function (n) { return effective(n, 'head'); },
+						set: function (n, v) { setProp(n, 'head', v); updateNode(n.id); } },
+					// The head ABOVE the ground, which is what a reservoir is worth. Blank where the
+					// ground is unknown -- an imported reservoir states a head and no elevation, and
+					// a 0 there would assert what the file never said (Task 390).
+					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure)
+				]
+			},
+			{
+				id: 'tanks', panel: 'lpn_pane_tanks', label: 'lpn_pane_tab_tanks',
+				group: 'node', type: 'tank',
+				cols: [
+					paneColId(), paneColElev(),
+					{ key: 'level', label: 'lpn_field_tank_level', unit: paneUnitElevHead,
+						prop: 'level', get: function (n) { return effective(n, 'level'); },
+						set: function (n, v) { setProp(n, 'level', v); } },
+					{ key: 'minLevel', label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead,
+						get: function (n) { return n.minLevel; },
+						set: function (n, v) { n.minLevel = v; updateNode(n.id); } },
+					{ key: 'maxLevel', label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead,
+						get: function (n) { return n.maxLevel; },
+						set: function (n, v) { n.maxLevel = v; updateNode(n.id); } },
+					// The Elevation/Head unit, not the pipe-diameter unit: a tank diameter is a
+					// distance across the ground, and inches would put a 15 m tank on screen as
+					// 15000. The popup says the same thing in its tip.
+					{ key: 'tankDiameter', label: 'lpn_field_tank_diameter', unit: paneUnitElevHead,
+						get: function (n) { return n.tankDiameter; },
+						set: function (n, v) { n.tankDiameter = v; updateNode(n.id); } },
+					// The WATER SURFACE, derived and read-only: it is the number the solve uses, so
+					// it must be visible, but a second editable field would be two numbers that have
+					// to agree.
+					paneColNodeResult('head', 'lpn_result_head', paneUnitHead)
+				]
+			},
+			{
+				id: 'pipes', panel: 'lpn_pane_pipes', label: 'lpn_pane_tab_pipes',
+				group: 'link', type: 'pipe',
+				cols: [paneColId()].concat(paneColEnds(), [
+					paneColDiameter(),
+					// TYPING A LENGTH TURNS AUTO OFF, which is exactly what the popup's own box does
+					// -- and lenAuto is Base-owned geometry, so it is only cleared in Base.
+					{ key: 'length', label: 'lpn_field_length', unit: function () { return 'lpn_u_length'; },
+						prop: 'length', get: function (l) { return effective(l, 'length'); },
+						set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
+					// Label, symbol and unit all follow settings.method (Task 271), through the same
+					// function the popup and the Labels legend use.
+					{ key: 'roughness', label: roughnessLabel,
+						unit: function () { return frictionMethod() === 'dw' ? 'lpn_u_roughness' : ''; },
+						prop: 'roughness', get: function (l) { return effective(l, 'roughness'); },
+						set: function (l, v) { setProp(l, 'roughness', v); } },
+					{ key: 'km', label: 'lpn_field_km_short', prop: 'k',
+						get: function (l) { return effective(l, 'k') || 0; },
+						set: function (l, v) { setProp(l, 'k', v); } },
+					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
+					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
+					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
+				])
+			},
+			{
+				id: 'pumps', panel: 'lpn_pane_pumps', label: 'lpn_pane_tab_pumps',
+				group: 'link', type: 'pump',
+				// A PUMP HAS NO EDITABLE SCALAR: what it is, is its curve, and a curve is a table of
+				// its own that belongs in the popup. So this tab is a reading of the pumps -- where
+				// they are and what they are doing -- and every cell in it is honest about that.
+				// Head loss, not head gain: lpn-solver.js reports a pump's contribution as a
+				// NEGATIVE head loss, and this reads the same accessor the map label does, so the
+				// cell and the label beside the symbol cannot disagree.
+				cols: [paneColId()].concat(paneColEnds(), [
+					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
+					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
+				])
+			},
+			{
+				id: 'valves', panel: 'lpn_pane_valves', label: 'lpn_pane_tab_valves',
+				group: 'link', type: 'valve',
+				cols: [paneColId()].concat(paneColEnds(), [
+					{ key: 'valveType', label: 'lpn_field_valve_type', get: paneValveTypeText },
+					// **THE SETTING HEADING CARRIES NO UNIT, AND THAT IS THE HONEST ANSWER.** A
+					// valve's setting is a different physical quantity per type -- a pressure, a
+					// flow, or a bare loss coefficient -- so in a table of mixed valves there is no
+					// one unit a column heading could name without lying about some of the rows.
+					// The Type column beside it says which quantity each row is, and the popup is
+					// where the unit is spelled out. Stamping one unit here would be exactly the
+					// trap renderValveFields() exists to avoid.
+					{ key: 'setting', label: 'lpn_field_valve_setting', prop: 'setting',
+						get: function (l) { return effective(l, 'setting'); },
+						set: function (l, v) { setProp(l, 'setting', v); } },
+					paneColDiameter(),
+					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
+					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
+					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
+				])
+			}
+		].map(function (spec) {
+			// The per-type view state. On the SPEC, so six tables genuinely have six of everything
+			// and no map keyed by id can be reached with the wrong one.
+			spec.sort = { col: 'id', dir: 1 };
+			spec.cells = null;
+			spec.sig = '';
+			spec.orderIds = null;
+			return spec;
+		});
+	}
+	function paneTableById(id) {
+		var list = paneTables(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].id === id) { return list[i]; } }
+		return null;
+	}
+	function paneTableReset(spec) { spec.sig = ''; spec.orderIds = null; }
+	function paneTableElements(spec) {
+		var pool = spec.group === 'link' ? doc.links : doc.nodes;
+		return pool.filter(function (x) { return x.type === spec.type; });
+	}
+	function paneColByKey(spec, key) {
+		var i;
+		for (i = 0; i < spec.cols.length; i++) { if (spec.cols[i].key === key) { return spec.cols[i]; } }
+		return null;
+	}
+	function paneCellValue(spec, el, key) {
+		var c = paneColByKey(spec, key);
+		return c ? c.get(el) : undefined;
+	}
+	function panePresent(v) {
 		return v !== undefined && v !== null && v !== '' && !(typeof v === 'number' && !isFinite(v));
 	}
 	// **A BLANK IS LAST IN BOTH DIRECTIONS.** Sorting descending to find the biggest demand must not
 	// hand back a screenful of junctions that have no demand at all -- an empty cell is the absence
 	// of a value, not the smallest one, so it is ranked outside the direction rather than inside it.
-	function junctionSorted(nodes) {
-		var col = junctionSort.col, dir = junctionSort.dir;
-		return nodes.slice().sort(function (a, b) {
-			var va = junctionValue(a, col), vb = junctionValue(b, col),
-				pa = junctionPresent(va), pb = junctionPresent(vb);
+	function paneTableSorted(spec, rows) {
+		var col = spec.sort.col, dir = spec.sort.dir;
+		return rows.slice().sort(function (a, b) {
+			var va = paneCellValue(spec, a, col), vb = paneCellValue(spec, b, col),
+				pa = panePresent(va), pb = panePresent(vb);
 			if (pa !== pb) { return pa ? -1 : 1; }
 			if (!pa) { return String(a.id).localeCompare(String(b.id), undefined, { numeric: true }); }
 			if (typeof va === 'number' && typeof vb === 'number') { return (va - vb) * dir; }
@@ -7600,45 +7832,50 @@ var EngCalcs = EngCalcs || {};
 	// **A SORT IS A GESTURE, NOT A LIVE RULE.** The order is fixed when a heading is clicked and
 	// then held: an edit that changes a demand must not make its row jump somewhere else in the
 	// table, and a solve lands 300 ms after every keystroke, so a live re-sort would move rows out
-	// from under the hand that is typing in them. New junctions join in the current sort, deleted
-	// ones drop out, and everything else stays where the reader last saw it.
-	function junctionRowsInOrder() {
+	// from under the hand that is typing in them. New parts join in the current sort, deleted ones
+	// drop out, and everything else stays where the reader last saw it.
+	function paneTableRowsInOrder(spec) {
 		var pool = {}, out = [];
-		junctionNodes().forEach(function (n) { pool[n.id] = n; });
-		(junctionOrderIds || []).forEach(function (id) {
+		paneTableElements(spec).forEach(function (el) { pool[el.id] = el; });
+		(spec.orderIds || []).forEach(function (id) {
 			if (pool[id]) { out.push(pool[id]); delete pool[id]; }
 		});
-		junctionSorted(Object.keys(pool).map(function (id) { return pool[id]; }))
-			.forEach(function (n) { out.push(n); });
-		junctionOrderIds = out.map(function (n) { return n.id; });
+		paneTableSorted(spec, Object.keys(pool).map(function (id) { return pool[id]; }))
+			.forEach(function (el) { out.push(el); });
+		spec.orderIds = out.map(function (el) { return el.id; });
 		return out;
 	}
-	function junctionNumText(v) {
+	function paneNumText(v) {
 		return (typeof v === 'number' && isFinite(v)) ? String(+v.toFixed(6)) : '';
 	}
-	function junctionHeadingText(c) {
-		var pc = EngCalcs.pageConfig || {}, text = pc[c.label] || c.key;
-		return c.unit ? text + ' (' + unitLabel(c.unit()) + ')' : text;
+	function paneHeadingText(c) {
+		var pc = EngCalcs.pageConfig || {},
+			text = (typeof c.label === 'function') ? c.label() : (pc[c.label] || c.key),
+			u = c.unit ? c.unit() : '';
+		return u ? text + ' (' + unitLabel(u) + ')' : text;
 	}
 	// What the table would have to be REBUILT for, as opposed to merely refilled: which rows are
 	// present, the order they are in, and the headings (which carry the units). A solve changes none
 	// of those, and a solve is what happens 300 ms after every keystroke -- so a rebuild on every one
 	// would take the cell the user is typing in out from under them.
-	function junctionSignature(rows) {
-		return rows.map(function (n) { return n.id; }).join('|') + '||' +
-			JUNCTION_COLS.map(junctionHeadingText).join('|');
+	function paneTableSignature(spec, rows) {
+		return rows.map(function (el) { return el.id; }).join('|') + '||' +
+			spec.cols.map(paneHeadingText).join('|');
 	}
-	function renderJunctions() {
-		var host = document.getElementById('lpn_pane_junctions'), pc = EngCalcs.pageConfig || {},
-			rows = junctionRowsInOrder(), sig = junctionSignature(rows), table, thead, tr, tbody, note;
+	function renderPaneTable(spec) {
+		var host = document.getElementById(spec.panel), pc = EngCalcs.pageConfig || {},
+			rows = paneTableRowsInOrder(spec), sig = paneTableSignature(spec, rows),
+			table, thead, tr, tbody, note;
 		if (!host) { return; }
-		if (sig === junctionSig && junctionCells) { refillJunctions(rows); return; }
-		junctionSig = sig;
-		junctionCells = {};
+		if (sig === spec.sig && spec.cells) { refillPaneTable(spec, rows); return; }
+		spec.sig = sig;
+		spec.cells = {};
 		host.innerHTML = '';
 		if (!rows.length) {
 			note = document.createElement('p');
-			note.textContent = pc.lpn_pane_junctions_none || 'This network has no junctions yet.';
+			// One message for all six: "none of these yet" is true of every tab, and the tab the
+			// reader is standing on already says which these are.
+			note.textContent = pc.lpn_pane_none || 'This network has none of these yet.';
 			host.appendChild(note);
 			return;
 		}
@@ -7646,98 +7883,94 @@ var EngCalcs = EngCalcs || {};
 		table.className = 'lpn-pane-table';
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
-		JUNCTION_COLS.forEach(function (c) {
+		spec.cols.forEach(function (c) {
 			var th = document.createElement('th'), b = document.createElement('button');
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
 			// The arrow is on the sorted column only, and it is the whole of the sort UI: a heading
 			// that is a button already says it can be clicked.
-			b.textContent = junctionHeadingText(c) +
-				(junctionSort.col === c.key ? (junctionSort.dir > 0 ? ' ▲' : ' ▼') : '');
+			b.textContent = paneHeadingText(c) +
+				(spec.sort.col === c.key ? (spec.sort.dir > 0 ? ' ▲' : ' ▼') : '');
 			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
-			b.addEventListener('click', function () { sortJunctions(c.key); });
+			b.addEventListener('click', function () { sortPaneTable(spec, c.key); });
 			th.appendChild(b);
-			if (junctionSort.col === c.key) { th.setAttribute('aria-sort', junctionSort.dir > 0 ? 'ascending' : 'descending'); }
+			if (spec.sort.col === c.key) { th.setAttribute('aria-sort', spec.sort.dir > 0 ? 'ascending' : 'descending'); }
 			tr.appendChild(th);
 		});
 		thead.appendChild(tr);
 		table.appendChild(thead);
 		tbody = document.createElement('tbody');
-		rows.forEach(function (n) { tbody.appendChild(junctionRow(n)); });
+		rows.forEach(function (el) { tbody.appendChild(paneTableRow(spec, el)); });
 		table.appendChild(tbody);
 		host.appendChild(table);
 		if (EngCalcs.initTips) { EngCalcs.initTips(host); }
 	}
-	function sortJunctions(col) {
-		junctionSort.dir = (junctionSort.col === col) ? -junctionSort.dir : 1;
-		junctionSort.col = col;
-		junctionOrderIds = null;   // the click is the whole of what re-orders the table
-		renderJunctions();
+	function sortPaneTable(spec, col) {
+		spec.sort.dir = (spec.sort.col === col) ? -spec.sort.dir : 1;
+		spec.sort.col = col;
+		spec.orderIds = null;   // the click is the whole of what re-orders the table
+		renderPaneTable(spec);
 	}
-	function junctionRow(n) {
+	function paneTableRow(spec, el) {
 		var tr = document.createElement('tr'), cells = {};
-		JUNCTION_COLS.forEach(function (c) {
-			var td = document.createElement('td'), btn, input;
+		spec.cols.forEach(function (c) {
+			var td = document.createElement('td'), btn, input, v;
 			if (c.key === 'id') {
-				// The ID is a way BACK TO THE MAP, not a text box: it selects the junction and pans
-				// to it, the same gesture a Find result row is. Renaming stays in the property
-				// popup, where the clash rules and the undo snapshot already live.
+				// The ID is a way BACK TO THE MAP, not a text box: it selects the part and pans to
+				// it, the same gesture a Find result row is. Renaming stays in the property popup,
+				// where the clash rules and the undo snapshot already live.
 				btn = document.createElement('button');
 				btn.type = 'button';
 				btn.className = 'lpn-pane-goto';
-				btn.textContent = n.id;
-				btn.addEventListener('click', function () { findGoTo('node', n.id); });
+				btn.textContent = el.id;
+				btn.addEventListener('click', function () { findGoTo(spec.group, el.id); });
 				td.appendChild(btn);
-			} else if (c.result) {
-				td.className = 'lpn-pane-num';
+			} else if (c.result || !c.set) {
+				// **A RESULT IS NEVER AN INPUT**, and neither is an identity the drawing owns. Both
+				// are plain cells with no control in them at all, so there is no path by which
+				// either could be typed into.
+				v = c.get(el);
+				if (c.result) { td.className = 'lpn-pane-num'; }
+				else { td.textContent = panePresent(v) ? String(v) : ''; }
 				cells[c.key] = td;
 			} else {
 				input = document.createElement('input');
 				input.type = 'number';
-				input.value = junctionNumText(junctionValue(n, c.key));
-				input.setAttribute('aria-label', junctionHeadingText(c) + ' ' + n.id);
+				input.value = paneNumText(c.get(el));
+				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
 				input.addEventListener('change', function () {
-					junctionEdit(n, c.key, +input.value);
+					// The popup's own ending, not a second one: set, then completeEdit(), which
+					// marks the override, re-counts the status bar, re-solves and saves.
+					c.set(el, +input.value);
+					completeEdit(c.prop ? { el: el, prop: c.prop } : null);
+					refreshPopupIfOpen();
 				});
 				td.appendChild(input);
 				cells[c.key] = input;
 			}
 			tr.appendChild(td);
 		});
-		junctionCells[n.id] = cells;
+		spec.cells[el.id] = cells;
 		return tr;
-	}
-	// The popup's setters, not a second pair. `+input.value` (so a cleared box reads 0) and
-	// updateNode() are both what unitNumberField() does; the demand goes through setProp() and ends
-	// in afterPropertyEdit(), which is what marks an override inside a scenario.
-	function junctionEdit(n, col, v) {
-		if (col === 'elev') {
-			n.elev = v;
-			updateNode(n.id);
-			scheduleSolve();
-			return;
-		}
-		setProp(n, 'demand', v);
-		updateNode(n.id);
-		afterPropertyEdit(n);
-		refreshPopupIfOpen();
 	}
 	// Refill, not rebuild: the results change on every solve and the typed values change when the
 	// map is edited, but the table itself is the same table. **A CELL THE USER IS IN IS LEFT
 	// ALONE** -- overwriting it mid-edit is the classic live-table defect, where half a typed number
 	// is replaced by the old one on the next tick.
-	function refillJunctions(rows) {
-		rows.forEach(function (n) {
-			var cells = junctionCells[n.id];
+	function refillPaneTable(spec, rows) {
+		rows.forEach(function (el) {
+			var cells = spec.cells[el.id];
 			if (!cells) { return; }
-			JUNCTION_COLS.forEach(function (c) {
+			spec.cols.forEach(function (c) {
 				var target = cells[c.key], v;
 				if (!target) { return; }
-				v = junctionValue(n, c.key);
+				v = c.get(el);
 				if (c.result) {
-					target.textContent = junctionPresent(v) ? String(plainRound(v, 2)) : '';
+					target.textContent = panePresent(v) ? String(plainRound(v, 2)) : '';
+				} else if (!c.set) {
+					target.textContent = panePresent(v) ? String(v) : '';
 				} else if (target !== activeElementSafe()) {
-					target.value = junctionNumText(v);
+					target.value = paneNumText(v);
 				}
 			});
 		});

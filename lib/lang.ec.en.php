@@ -1438,11 +1438,16 @@ $ec_lang['lpn_georef_goto']='Go to…';
 // profile first, tables later. The toggle is on the toolbar because it is the strip a reader
 // scans for "what else can this page show me".
 $ec_lang['lpn_pane_toggle']='Bottom panel';
-$ec_lang['lpn_pane_toggle_tip']='Show or hide the panel below the map. It holds the profile and the junction table.';
+$ec_lang['lpn_pane_toggle_tip']='Show or hide the panel below the map. It holds the profile and a table for each kind of part.';
 $ec_lang['lpn_pane_resize']='Drag to make the panel taller or shorter';
 $ec_lang['lpn_pane_tab_junctions']='Junctions';
-$ec_lang['lpn_pane_tab_junctions_tip']='Every junction as a table you can sort and edit.';
-$ec_lang['lpn_pane_junctions_none']='This network has no junctions yet.';
+$ec_lang['lpn_pane_tab_reservoirs']='Reservoirs';
+$ec_lang['lpn_pane_tab_tanks']='Tanks';
+$ec_lang['lpn_pane_tab_pipes']='Pipes';
+$ec_lang['lpn_pane_tab_pumps']='Pumps';
+$ec_lang['lpn_pane_tab_valves']='Valves';
+$ec_lang['lpn_pane_tab_tip']='These parts as a table you can sort. Results are read-only.';
+$ec_lang['lpn_pane_none']='This network has none of these yet.';
 $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
 
 $ec_lang['lpn_clean_map']='Hide map readouts';
@@ -1851,6 +1856,8 @@ $ec_lang['lpn_field_roughness']='Roughness';
 // selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. A higher number means a smoother pipe: about 150 for new plastic, 130 for new steel or iron, and 100 for old pipe.';
 $ec_lang['lpn_field_length']='Length';
+$ec_lang['lpn_field_from']='From';
+$ec_lang['lpn_field_to']='To';
 $ec_lang['lpn_field_length_tip']='Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing.';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
@@ -1886,6 +1893,7 @@ $ec_lang['lpn_field_valve_setting_pressure']='Pressure setting';
 $ec_lang['lpn_field_valve_setting_pressure_tip']='The pressure the valve keeps. A pressure reducing valve keeps the pressure on its downstream side at or below this value. A pressure sustaining valve keeps the pressure on its upstream side at or above this value.';
 $ec_lang['lpn_field_valve_setting_flow']='Flow setting';
 $ec_lang['lpn_field_valve_setting_flow_tip']='The most water the valve lets through. When less water than this wants to pass, the valve stands fully open and adds no loss.';
+$ec_lang['lpn_field_valve_setting']='Setting';
 $ec_lang['lpn_field_valve_setting_loss']='Loss coefficient';
 $ec_lang['lpn_field_valve_setting_loss_tip']='How much head the throttle valve removes, counted as a multiple of the velocity head. Use 0 for a valve standing fully open. This one number is the whole of a throttle valve\'s loss.';
 $ec_lang['lpn_field_valve_diameter_tip']='Width of the opening through the valve. The speed of the water through the valve is computed from this width, and the loss follows from that speed.';

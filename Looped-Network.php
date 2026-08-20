@@ -462,11 +462,25 @@ echoHeader("EngCalcs", $html_title, "", false);
 			</div>
 			<div id="lpn_profile_chart"></div>
 		</div>
-		<?php // ---- Tab: Junctions (Task 434) ----
+		<?php // ---- Tabs: one ASSET TABLE per type (Task 434, all six since Task 455) ----
 		      // The document as a spreadsheet, built entirely in JS: the rows are the network and
 		      // the headings carry the current units. Every write goes through the same seam the
-		      // property popup uses -- setProp() for a demand -- see renderJunctions(). ?>
+		      // property popup uses -- setProp() for an overridable property -- see
+		      // renderPaneTable() and PANE_TABLES, which is the ONE renderer all six share.
+		      //
+		      // ONE HOST DIV PER TYPE, and that is what gives each type its own SCROLL POSITION for
+		      // free: a scroll offset belongs to the element that scrolls, so six elements keep six
+		      // offsets and nothing has to remember them. A single host reused by six tabs would
+		      // have one, and sorting Pipes would land the reader halfway down Junctions.
+		      //
+		      // Text is NOT here and is not coming: nothing about a text label solves, so a table
+		      // of them would have no column worth reading (Task 455). ?>
 		<div id="lpn_pane_junctions" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_junctions"></div>
+		<div id="lpn_pane_reservoirs" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_reservoirs"></div>
+		<div id="lpn_pane_tanks" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_tanks"></div>
+		<div id="lpn_pane_pipes" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_pipes"></div>
+		<div id="lpn_pane_pumps" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_pumps"></div>
+		<div id="lpn_pane_valves" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_valves"></div>
 	</div>
 </div>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
@@ -864,8 +878,13 @@ EngCalcs.pageConfig = {
 	lpn_pane_toggle: <?=json_encode($ec_lang['lpn_pane_toggle'])?>,
 	lpn_pane_toggle_tip: <?=json_encode($ec_lang['lpn_pane_toggle_tip'])?>,
 	lpn_pane_tab_junctions: <?=json_encode($ec_lang['lpn_pane_tab_junctions'])?>,
-	lpn_pane_tab_junctions_tip: <?=json_encode($ec_lang['lpn_pane_tab_junctions_tip'])?>,
-	lpn_pane_junctions_none: <?=json_encode($ec_lang['lpn_pane_junctions_none'])?>,
+	lpn_pane_tab_reservoirs: <?=json_encode($ec_lang['lpn_pane_tab_reservoirs'])?>,
+	lpn_pane_tab_tanks: <?=json_encode($ec_lang['lpn_pane_tab_tanks'])?>,
+	lpn_pane_tab_pipes: <?=json_encode($ec_lang['lpn_pane_tab_pipes'])?>,
+	lpn_pane_tab_pumps: <?=json_encode($ec_lang['lpn_pane_tab_pumps'])?>,
+	lpn_pane_tab_valves: <?=json_encode($ec_lang['lpn_pane_tab_valves'])?>,
+	lpn_pane_tab_tip: <?=json_encode($ec_lang['lpn_pane_tab_tip'])?>,
+	lpn_pane_none: <?=json_encode($ec_lang['lpn_pane_none'])?>,
 	lpn_pane_sort_tip: <?=json_encode($ec_lang['lpn_pane_sort_tip'])?>,
 	lpn_time_menu: <?=json_encode($ec_lang['lpn_time_menu'])?>,
 	lpn_time_menu_tip: <?=json_encode($ec_lang['lpn_time_menu_tip'])?>,
@@ -953,6 +972,7 @@ EngCalcs.pageConfig = {
 	lpn_field_valve_setting_pressure_tip: <?=json_encode($ec_lang['lpn_field_valve_setting_pressure_tip'])?>,
 	lpn_field_valve_setting_flow: <?=json_encode($ec_lang['lpn_field_valve_setting_flow'])?>,
 	lpn_field_valve_setting_flow_tip: <?=json_encode($ec_lang['lpn_field_valve_setting_flow_tip'])?>,
+	lpn_field_valve_setting: <?=json_encode($ec_lang['lpn_field_valve_setting'])?>,
 	lpn_field_valve_setting_loss: <?=json_encode($ec_lang['lpn_field_valve_setting_loss'])?>,
 	lpn_field_valve_setting_loss_tip: <?=json_encode($ec_lang['lpn_field_valve_setting_loss_tip'])?>,
 	lpn_field_valve_diameter_tip: <?=json_encode($ec_lang['lpn_field_valve_diameter_tip'])?>,
@@ -961,6 +981,8 @@ EngCalcs.pageConfig = {
 	lpn_field_roughness: <?=json_encode($ec_lang['lpn_field_roughness'])?>,
 	lpn_field_roughness_tip: <?=json_encode($ec_lang['lpn_field_roughness_tip'])?>,
 	lpn_field_length: <?=json_encode($ec_lang['lpn_field_length'])?>,
+	lpn_field_from: <?=json_encode($ec_lang['lpn_field_from'])?>,
+	lpn_field_to: <?=json_encode($ec_lang['lpn_field_to'])?>,
 	lpn_field_length_tip: <?=json_encode($ec_lang['lpn_field_length_tip'])?>,
 	lpn_field_km: <?=json_encode($ec_lang['lpn_field_km'])?>,
 	lpn_field_km_tip: <?=json_encode($ec_lang['lpn_field_km_tip'])?>,

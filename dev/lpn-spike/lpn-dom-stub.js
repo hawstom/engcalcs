@@ -195,10 +195,12 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_map_footer',
   // The scenario selector/readout in the map's status strip (ROADMAP Task 184).
   'lpn_scenario_btn',
-  // The bottom pane and its one tab so far (ROADMAP Task 434). The pane's own body is where the
-  // height JS writes lands, and the profile's three boxes are built into on every render.
+  // The bottom pane and its seven tabs (ROADMAP Task 434, all six asset tables since Task 455). The
+  // pane's own body is where the height JS writes lands, and the profile's three boxes are built
+  // into on every render. ONE PANEL DIV PER TABLE, which is what gives each its own scroll offset.
   'lpn_pane', 'lpn_pane_grip', 'lpn_pane_head', 'lpn_pane_tabs', 'lpn_pane_close',
-  'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions',
+  'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions', 'lpn_pane_reservoirs',
+  'lpn_pane_tanks', 'lpn_pane_pipes', 'lpn_pane_pumps', 'lpn_pane_valves',
   'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note',
   // The Settings box (ROADMAP Task 441): the two panes, the filter, the three section shells, the
   // sub-headings that are jump targets, and the hosts their builders write into. The three

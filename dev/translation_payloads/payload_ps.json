@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 1201,
-        "delta_key_count": 8,
+        "expected_key_count": 1209,
+        "delta_key_count": 16,
         "exempt_key_count": 24,
         "exempt_keys": [
             "u_imgd",
@@ -445,8 +445,16 @@
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
+        "lpn_pane_tab_reservoirs": "Reservoirs",
+        "lpn_pane_tab_tanks": "Tanks",
+        "lpn_pane_tab_pipes": "Pipes",
+        "lpn_pane_tab_pumps": "Pumps",
+        "lpn_pane_tab_valves": "Valves",
         "lpn_notes_color_term": "Color band limits stay the same",
         "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own.",
+        "lpn_field_from": "From",
+        "lpn_field_to": "To",
+        "lpn_field_valve_setting": "Setting",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_color_mode_manual": "Manual"
     },
@@ -455,8 +463,16 @@
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
+        "lpn_pane_tab_reservoirs": "Reservoirs",
+        "lpn_pane_tab_tanks": "Tanks",
+        "lpn_pane_tab_pipes": "Pipes",
+        "lpn_pane_tab_pumps": "Pumps",
+        "lpn_pane_tab_valves": "Valves",
         "lpn_notes_color_term": "Color band limits stay the same",
         "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own.",
+        "lpn_field_from": "From",
+        "lpn_field_to": "To",
+        "lpn_field_valve_setting": "Setting",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_color_mode_manual": "Manual"
     },
@@ -525,6 +541,86 @@
                 }
             }
         },
+        "lpn_pane_tab_reservoirs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_junctions",
+                    "value": "جنکشنونه",
+                    "english": "Junctions"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_tab_tip",
+                    "value": "هر جنکشن د یوه جدول په توګه چې تاسو یې ترتیبولی او سمولی شئ.",
+                    "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
+        "lpn_pane_tab_tanks": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_junctions",
+                    "value": "جنکشنونه",
+                    "english": "Junctions"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_tab_tip",
+                    "value": "هر جنکشن د یوه جدول په توګه چې تاسو یې ترتیبولی او سمولی شئ.",
+                    "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
+        "lpn_pane_tab_pipes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_junctions",
+                    "value": "جنکشنونه",
+                    "english": "Junctions"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_tab_tip",
+                    "value": "هر جنکشن د یوه جدول په توګه چې تاسو یې ترتیبولی او سمولی شئ.",
+                    "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
+        "lpn_pane_tab_pumps": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_junctions",
+                    "value": "جنکشنونه",
+                    "english": "Junctions"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_tab_tip",
+                    "value": "هر جنکشن د یوه جدول په توګه چې تاسو یې ترتیبولی او سمولی شئ.",
+                    "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
+        "lpn_pane_tab_valves": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_junctions",
+                    "value": "جنکشنونه",
+                    "english": "Junctions"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_tab_tip",
+                    "value": "هر جنکشن د یوه جدول په توګه چې تاسو یې ترتیبولی او سمولی شئ.",
+                    "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
         "lpn_notes_color_term": {
             "reason": "missing",
             "current_value": null,
@@ -554,6 +650,54 @@
                     "key": "lpn_notes_epanet_term",
                     "value": "د Hazen-Williams ثابتونه د EPANET سره سمون لري",
                     "english": "Hazen-Williams constants match EPANET"
+                }
+            }
+        },
+        "lpn_field_from": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length",
+                    "value": "اوږدوالی",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "د پایپ اوږدوالی. کله چې Auto فعال وي، اوږدوالی د هغه څه نه اندازه کیږي چې تاسو رسم کړی. Auto غیرفعال کړئ ترڅو یو اوږدوالی ولیکئ چې د رسم نه توپیر لري.",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                }
+            }
+        },
+        "lpn_field_to": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length",
+                    "value": "اوږدوالی",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "د پایپ اوږدوالی. کله چې Auto فعال وي، اوږدوالی د هغه څه نه اندازه کیږي چې تاسو رسم کړی. Auto غیرفعال کړئ ترڅو یو اوږدوالی ولیکئ چې د رسم نه توپیر لري.",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                }
+            }
+        },
+        "lpn_field_valve_setting": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_valve_setting_flow_tip",
+                    "value": "هغه ترټولو ډیر بهاو چې والو یې تیروي. کله چې تر دې کم اوبه تیریدل غواړي، والو بشپړ خلاص پاتې کیږي او هیڅ ضیاع نه اضافه کوي.",
+                    "english": "The most water the valve lets through. When less water than this wants to pass, the valve stands fully open and adds no loss."
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_setting_loss",
+                    "value": "د ضیاع ضریب",
+                    "english": "Loss coefficient"
                 }
             }
         },
