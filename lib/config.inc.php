@@ -521,38 +521,36 @@ if (!ecAnalyticsConsented() && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[EC
 define('LPN_LOCK_DIR', dirname(__DIR__) . '/lpn-locks');
 
 /* **THE MAPBOX PUBLIC TOKEN, for the satellite basemap on a lat/lon project (ROADMAP Task 452).**
- * Tom created the account and this token 2026-08-19, at his own request for satellite imagery.
+ * Tom created the account and the token 2026-08-19, at his own request for satellite imagery.
  *
- * **IT IS IN THE REPOSITORY ON PURPOSE, and secrecy is not the question.** A `pk.` token carries
- * READ scopes only, is designed by Mapbox to ship in client JavaScript, and this one is echoed
- * into every visitor's page through pageConfig -- so it is public the moment the feature works at
- * all, and keeping it out of git would hide it from nobody. What protects it is the URL
- * restriction set on it in the Mapbox account, which is what stops another site spending the
- * quota. (A `sk.` SECRET token carries WRITE scopes and belongs nowhere near a browser or a
- * repository, ever. If you are pasting one here, stop.)
+ * **THE TOKEN IS NOT IN THIS FILE, AND SECRECY IS NOT THE REASON.** A `pk.` token carries READ
+ * scopes only, is designed by Mapbox to ship in client JavaScript, and ours is echoed into every
+ * visitor's page through pageConfig -- so it is public the moment the feature works at all, and
+ * hiding it from git hides it from nobody. What actually protects it is the URL restriction set
+ * on it in the Mapbox account, which is what stops another site spending the quota. (A `sk.`
+ * SECRET token carries WRITE scopes and belongs nowhere near a browser or a repository, ever.)
  *
- * **GitHub's push protection flags this line as a "Mapbox Secret Access Token".** It matches the
- * shape, not the scope. Tom turned Secret Protection off for this repository on 2026-08-19 after
- * the bypass URL 404'd for him. If it is ever turned back on, the override below is the way
- * through -- do NOT split, encode or obfuscate the string to get past a scanner.
+ * **IT IS OUT OF THE REPOSITORY BECAUSE GITHUB WILL NOT TAKE IT.** Push protection rejects the
+ * push with "Mapbox Secret Access Token" -- matching the shape, not the scope -- and the bypass
+ * URL 404'd for Tom. It was tried both ways on 2026-08-19; this is the one that pushes.
+ * **Do NOT split, encode or obfuscate the string to get a scanner past it.**
  *
- * **WHY NOT AN UNTRACKED FILE, which is where this briefly lived.** Deployment here is `git pull`,
- * so an untracked file is a permanent manual upload and a silent failure mode: the satellite rows
- * would simply vanish on production and nothing would say why. CLAUDE.md already records that cost
- * for ../sitemap.xml, and a second one buys nothing when the value is public anyway.
+ * So the value lives in `lib/mapbox-token.php`, which .gitignore excludes:
  *
- * **THE OVERRIDE, for a fork rather than for us.** `lib/mapbox-token.php` (git-ignored) wins if it
- * exists, so somebody running their own copy can use their own account without editing a tracked
- * file, and Tom can rotate without a commit. An EMPTY result is fully supported: no token means no
- * satellite rows at all, because a row that fetches a 401 per tile leaves the user unable to tell
- * our missing account from their missing internet. */
+ *     <?php return 'pk.your-token-here';
+ *
+ * **THE COST, stated plainly so it is not rediscovered:** deployment here is `git pull`, so this
+ * file does not travel with a commit and must be uploaded to production by hand, once, like
+ * ../sitemap.xml. When it is missing the satellite rows simply are not offered -- see
+ * js/looped-network.js, which hides them rather than showing a row that fetches a 401 per tile,
+ * because a user cannot tell our missing account from their missing internet. That is also
+ * exactly what a fork of this suite gets, which is the right default for somebody who has no
+ * Mapbox account and never asked for one. */
 define('EC_MAPBOX_TOKEN', (function () {
     $f = __DIR__ . '/mapbox-token.php';
-    if (is_file($f)) {
-        $v = require $f;
-        if (is_string($v) && trim($v) !== '') { return trim($v); }
-    }
-    return 'pk.eyJ1IjoiaGF3c3RvbSIsImEiOiJjbXQweWhyNnkwYjIzMnpvYmo1bTdteHo1In0.d2sf5oNs0dJzXl96rAmryA';
+    if (!is_file($f)) { return ''; }
+    $v = require $f;
+    return is_string($v) ? trim($v) : '';
 })());
 // Housekeeping, since the honor-system design deliberately never auto-expires a LOCK. This expires
 // the on-disk RECORD long after any plausible session, purely so abandoned projects don't leak
