@@ -171,21 +171,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     in place: a project written under the old sense would silently invert. That migration is the
     task, not the relabelling.
 
-- 65|455| **"Assets" is the long-term word for the six system types, and the bottom pane should have a
-  tab for each.** Tom, 2026-08-19: *"The bottom pane tabs should include all assets. Also, despite
-  our existing work, I think that 'assets' is the right long-term term for our six types of system
-  features."*
-  - Six: junction, reservoir, tank, pipe, pump, valve. **Text is not an asset** — nothing about it
-    solves and a table of it has no columns worth reading. Tabs in the toolbar's own Add order,
-    nodes before links, with Profile staying first because it is a drawing and the rest are tables.
-  - **The word is the utility industry's own** (an asset register is a real document a real utility
-    keeps), and it says these are things somebody owns and replaces — which `element` never did.
-    Cost: EPANET says "objects" and epanet-js says "assets", so this moves toward the newer
-    neighbour; and every string carrying "element" is a paid re-rendering in 26 languages.
-    **So adopt it in the English and let the NEXT sprint carry it**, rather than running one for it.
-  - **[H] Open: seven tabs wrapping on a narrow window, or Profile plus one "Assets" tab with a type
-    selector.** Recommended the former. Shown to Tom 2026-08-19.
-
+- 45|461| **[H] "Assets" or "parts"? The tabs shipped saying PARTS.** Task 455 needed a word for
+  "the six kinds of thing in a network" in three new strings, and Tom's ruling was to adopt
+  "assets" in the English and let the NEXT sprint carry it — but shipping one string saying
+  "assets" beside a suite that says element and part everywhere would read as a third synonym
+  rather than a rename. So the new strings say "parts" and the rename is still owed.
+  - The real task is the suite-wide pass: every visible string carrying "element" becomes "asset",
+    in one commit, and one sprint retranslates them. `rename_lang_key.php` handles the keys; the
+    VALUES are the paid part.
 - 60|456| **Net3-World has no time model at all**, which is why Tom's Run button and step selector
   looked broken: `times`, `patterns` and `controls` are all absent from the file, so the duration is
   0, there is exactly one reporting step and Play has nowhere to go. Net3 itself carries all three.
