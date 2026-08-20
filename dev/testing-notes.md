@@ -100,3 +100,32 @@ out of it — which tests a *copy* in a context the browser never has.
   hoists its own `var EngCalcs` and starts a second, empty one.
 
 ---
+
+## A TIMING assertion in a blocking harness is a flake waiting for a busy machine
+
+Found 2026-08-20, during a night with three subagents running builds and browser passes at once.
+`check_all.sh` reported **BLOCKING FAILURES: lpn harnesses**, and the single failing line was
+`collide-harness.js`'s scaling check:
+
+    FAIL  the cost per label barely grows from 220 labels to 1000 -- the pass is linear
+          2.02x the per-label cost at 4.5x the size
+
+Run alone, the same commit gives **0.60x**. Nothing was wrong with the code; the machine was
+oversubscribed and the harness was measuring the load rather than the algorithm.
+
+**Two rules follow.**
+
+1. **A wall-clock ratio must not BLOCK a build.** It is a genuinely useful measurement — that check
+   is what proves the uniform grid stayed linear — but its failure mode is "somebody else was
+   compiling", which is not a defect and not actionable. Either widen such a bound until only a real
+   regression can trip it, or move the check to the advisory tier where `size_budget_check.php` and
+   `key_hygiene_check.php` already live.
+2. **Before believing a perf failure, re-run the ONE harness alone.** It costs seconds and it is the
+   difference between a real regression and a busy afternoon. The same applies to
+   `dev/browser-pass/specs/perf.js`, whose own comments already say its numbers swing by a factor of
+   two with what else is running, and which is why that spec alternates its before/after builds.
+
+**And check for a stuck process while you are there.** The same investigation turned up a
+`closed-link-harness.js` that had been spinning at 99% CPU for **fifty hours**, left behind by an
+earlier session — one whole core gone, silently, making every measurement on that machine worse.
+`ps -eo pid,etimes,pcpu,args --sort=-etimes | grep lpn-spike` finds one in a second.
