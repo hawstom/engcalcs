@@ -241,17 +241,21 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Put it somewhere a user can read it, not only in `js/vendor/README.md`: this is the provenance
     question anyone comparing us against EPANET asks first, and it is a point of credibility.
 
-- 60|452| **Satellite imagery, from Mapbox.** Tom, 2026-08-19: *"epanetjs uses OpenStreet with MapBox
-  and serves satellite imagery. Add that."* Tom chose Mapbox over a keyless source when asked.
-  - **BLOCKED on Tom creating a Mapbox account and a PUBLIC access token restricted to his domains.**
-    The token ships in our JS, which is how Mapbox intends public tokens to be used, but it makes his
-    account billable if the free tier is ever exceeded — so the token is his to create, not ours.
-  - **It makes `privacy.php` name a SECOND third party, and `js/vendor/README.md`'s "no third-party
-    request of any kind" is already false for the OSM basemap.** Both need the same edit, and the
-    new strings land in a later sprint. Attribution: Mapbox requires its own wordmark and text.
-  - Design: `project.basemap` is already the field (`'osm'` today), so this is another value on it
-    plus a picker, not a new mechanism. An `.inp` exporter still skips it.
-
+- 40|452| **Satellite imagery from Mapbox — BUILT, and blocked on one decision about the token.**
+  Tom asked for it, chose Mapbox over a keyless source, created the account and supplied a public
+  `pk.` token 2026-08-19. Shipped: a second tile source beside OpenStreetMap, its own View row, its
+  own required attribution (Mapbox names Mapbox and Maxar as well as OpenStreetMap), and a fallback
+  to the street map when there is no token, so a fork of the suite simply has no satellite row.
+  - **GitHub push protection refuses the commit, calling it a "Mapbox Secret Access Token".** It is
+    a public token — `pk.`, read scopes only, designed to ship in client JavaScript, and readable
+    from the page source by anyone the moment it works at all. Two honest resolutions and both are
+    Tom's: he allows it once through the URL GitHub prints, or the token moves to an untracked file
+    that has to be uploaded to production by hand like `sitemap.xml` already is. **Do not evade the
+    scanner by splitting or encoding the string.**
+  - `privacy.php` now has a section naming both OpenStreetMap and Mapbox. **It previously claimed
+    "nothing on this site is loaded from anybody else's server", which had been false since the OSM
+    basemap shipped** — the tiles were always a third-party request. `js/vendor/README.md` said the
+    same thing and is corrected.
 - 60|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
   English pass asking *"list every plausible reading; more than one means rewrite"*, both waves
