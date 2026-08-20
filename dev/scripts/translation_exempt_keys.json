@@ -447,6 +447,16 @@
    "category": "abbreviation",
    "languages": "*",
    "reason": "IMGD -- imperial million gallons per day. Sibling of u_mgd ('MGD'), which needs no entry because ecIsUniversalKey() auto-exempts a u_ key whose English has no run of four letters. IMGD has exactly four, so it falls off that heuristic by one character while meaning the same kind of thing. Several languages do render it (Mgal imp/dia, Mgal imp/j, Mgal imp/Tag) and exemption does not stop them -- it only says that keeping the Latin abbreviation, as many scripts do for unit symbols, is a legitimate answer rather than an untranslated string."
+  },
+  "lpn_xymap": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "XY -- the flat-grid project mode's name, two letters rather than words. Marked exempt 2026-08-19 after the de agent renamed a correct 'XY' to 'XY-Ebene' purely to stop the identical-to-english check firing: a gate that forces a wrong translation is worse than no gate."
+  },
+  "lpn_ex_net3_world_title": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "EPANET Net3 is the sample network's own name, and the rest of the title is the project-mode name. Where a language keeps 'lat/lon' literal the whole title is legitimately identical to English; where it translates the mode name (10 of 26 files do) the value differs on its own. Exempt means identical is permanently CORRECT here, not that it must be identical. Added 2026-08-19 after the gate pushed three agents into distorting a correct title to defeat it -- an invented phrase, an em dash for a comma, and a coinage inconsistent with the same file's other mode-name strings."
   }
  }
 }
