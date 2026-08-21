@@ -602,7 +602,11 @@ html[lang="zh"] .ec-welcome {
 	display: flex; align-items: flex-end; gap: 2px;
 	border-bottom: 1px solid #999; margin-bottom: 6px; padding: 0 2px;
 }
-.lpn-tabs-scroll { display: flex; align-items: flex-end; gap: 2px; overflow-x: auto; flex: 1 1 auto; }
+/* **overflow-y MUST BE STATED.** A box with `overflow-x: auto` and overflow-y left at `visible`
+   computes the y axis to `auto` too (CSS Overflow 3), so the strip grew a vertical scrollbar at
+   its right edge for content that is one row tall and can never overflow that way (Tom,
+   2026-08-21). `hidden` is the fix; there is nothing above or below a tab to reach. */
+.lpn-tabs-scroll { display: flex; align-items: flex-end; gap: 2px; overflow-x: auto; overflow-y: hidden; flex: 1 1 auto; }
 .lpn-tab { display: inline-flex; align-items: stretch; background: #ececec; border: 1px solid #999; border-bottom: none; border-radius: 4px 4px 0 0; margin-bottom: -1px; }
 /* The current tab is white and open at the bottom -- continuous with the page under it. */
 .lpn-tab-current { background: #fff; }
@@ -1166,7 +1170,12 @@ html[lang="zh"] .ec-welcome {
 	/* The heading row repeats on every sheet -- a page 3 of figures with no headings on it is a
 	   page of numbers nobody can read. Not sticky: sticky is a screen idea, and print needs the
 	   table-header-group behaviour a <thead> already has. */
-	.lpn-print-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+	/* **THE SAME WIDTH IT HAS ON SCREEN, WHICH IS ITS CONTENT'S** (Tom, 2026-08-21: "these are
+	   very narrow tables, and they are expanded to fit a page"). `width: 100%` stretched a
+	   four-column table across the sheet and put inches of white between a label and its
+	   number. .lpn-pane-table carries no width at all on screen; the print copy now matches. */
+	.lpn-print-table { border-collapse: collapse; font-size: 9pt; }
+	.lpn-print-table td.lpn-pane-num { text-align: right; font-variant-numeric: tabular-nums; }
 	.lpn-print-table thead { display: table-header-group; }
 	.lpn-print-table thead th { position: static; border-bottom: 1pt solid #000; }
 	.lpn-print-table th, .lpn-print-table td { padding: 1pt 6pt 1pt 0; }

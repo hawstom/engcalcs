@@ -339,4 +339,27 @@ r.section('a dry section is dry, and says so rather than dividing by zero');
 	});
 }());
 
+// =========================================================================================
+r.section('a zero-length segment prints nothing, never NaN (Task 475)');
+
+// Two stations typed at the SAME station is a real typing mistake, and it makes a region whose
+// wetted perimeter and area are both zero -- so rh = 0/0 and every quantity off it is NaN.
+// EngCalcs.miFixed2() is the one seam that turns a number into text, and a non-finite one
+// becomes ''. Asserted on the RAW cell text: parseFloat('NaN') and parseFloat('') are both NaN,
+// so a numeric check here would pass on the defect it is meant to catch.
+(function () {
+	const x = [0, 30, 30, 70, 100];
+	const z = [6, 3, 3, 3, 6];
+	const n = [null, 0.040, 0.035, 0.030, 0.040];
+	const bank = [null, true, true, true, true];
+	const p = loadSection(x, z, n, bank, WS, S0);
+	['rh', 'n617', 'v617', 'hv617', 'fr617', 'q617', 't', 'pw', 'a', 'tau'].forEach(function (name) {
+		const bad = x.map((_, i) => p.rowHtml(name, i)).filter(t => /nan|infinity/i.test(String(t)));
+		r.ok(bad.length === 0, `${name}: no cell says NaN or Infinity`, bad.join(', '), '');
+	});
+	// And the fix did not blank the section: the region left of the doubled station is real.
+	r.ok(String(p.rowHtml('fr617', 1)) !== '', 'a real region still prints its Froude number',
+		p.rowHtml('fr617', 1), 'a number');
+}());
+
 r.finish();

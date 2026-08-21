@@ -47,7 +47,7 @@ EngCalcs.pageCalculator = function (objForm) {
 		// Point
 		// Bottom shear stress depends on y, so we report it for a point and don't store it with the section.
 		tau = d1 * this.Manning.s0;
-		document.getElementsByName('tau')[iStation].innerHTML = (tau * EngCalcs.unitFactor(objForm['tauu'])).toFixed(2);
+		document.getElementsByName('tau')[iStation].innerHTML = EngCalcs.miFixed2(tau * EngCalcs.unitFactor(objForm['tauu']));
 		// Do the calcs and output if this is not the first row
 		if(iStation > 0) {
 			this.Manning.n = document.getElementsByName('n')[iStation].value;
@@ -93,20 +93,20 @@ EngCalcs.pageCalculator = function (objForm) {
 			}
 			// Output
 			// Segment
-			document.getElementsByName('t')[iStation].innerHTML = (this.Manning.t * EngCalcs.unitFactor(objForm['tu'])).toFixed(2);
-			document.getElementsByName('pw')[iStation].innerHTML = (this.Manning.pw * EngCalcs.unitFactor(objForm['pwu'])).toFixed(2);
-			document.getElementsByName('a')[iStation].innerHTML = (this.Manning.a * EngCalcs.unitFactor(objForm['au'])).toFixed(2);
+			document.getElementsByName('t')[iStation].innerHTML = EngCalcs.miFixed2(this.Manning.t * EngCalcs.unitFactor(objForm['tu']));
+			document.getElementsByName('pw')[iStation].innerHTML = EngCalcs.miFixed2(this.Manning.pw * EngCalcs.unitFactor(objForm['pwu']));
+			document.getElementsByName('a')[iStation].innerHTML = EngCalcs.miFixed2(this.Manning.a * EngCalcs.unitFactor(objForm['au']));
 			// Region
 			if (this.Manning.isBank) {
 				this.Manning.closeRegion();
 				maxRegionVelocity = Math.max(maxRegionVelocity, this.Manning.v617);
 				minRegionVelocity = Math.min(minRegionVelocity, this.Manning.v617);
-				document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * EngCalcs.unitFactor(objForm['rhu'])).toFixed(2);
-				document.getElementsByName('n617')[iStation].innerHTML = this.Manning.n617.toFixed(2);
-				document.getElementsByName('v617')[iStation].innerHTML = (this.Manning.v617 * EngCalcs.unitFactor(objForm['v617u'])).toFixed(2);
-				document.getElementsByName('hv617')[iStation].innerHTML = (this.Manning.hv617 * EngCalcs.unitFactor(objForm['hv617u'])).toFixed(2);
-				document.getElementsByName('fr617')[iStation].innerHTML = this.Manning.fr617.toFixed(2);
-				document.getElementsByName('q617')[iStation].innerHTML = (this.Manning.q617 * EngCalcs.unitFactor(objForm['q617u'])).toFixed(2);
+				document.getElementsByName('rh')[iStation].innerHTML = EngCalcs.miFixed2(this.Manning.rh * EngCalcs.unitFactor(objForm['rhu']));
+				document.getElementsByName('n617')[iStation].innerHTML = EngCalcs.miFixed2(this.Manning.n617);
+				document.getElementsByName('v617')[iStation].innerHTML = EngCalcs.miFixed2(this.Manning.v617 * EngCalcs.unitFactor(objForm['v617u']));
+				document.getElementsByName('hv617')[iStation].innerHTML = EngCalcs.miFixed2(this.Manning.hv617 * EngCalcs.unitFactor(objForm['hv617u']));
+				document.getElementsByName('fr617')[iStation].innerHTML = EngCalcs.miFixed2(this.Manning.fr617);
+				document.getElementsByName('q617')[iStation].innerHTML = EngCalcs.miFixed2(this.Manning.q617 * EngCalcs.unitFactor(objForm['q617u']));
 			} else {
 				document.getElementsByName('rh')[iStation].innerHTML = '';
 				document.getElementsByName('n617')[iStation].innerHTML = '';
@@ -121,7 +121,7 @@ EngCalcs.pageCalculator = function (objForm) {
 		elev0=elev1;
 		d0=d1;
 	}
-	document.getElementById('q_617').innerHTML = (this.Manning.q617c * EngCalcs.unitFactor(objForm['q_617u'])).toFixed(2);
+	document.getElementById('q_617').innerHTML = EngCalcs.miFixed2(this.Manning.q617c * EngCalcs.unitFactor(objForm['q_617u']));
 	var vCheckStatus = (minRegionVelocity === Infinity) ? ''
 		: (maxRegionVelocity > EngCalcs.VELOCITY_OK.max) ? 'high'
 		: (minRegionVelocity < EngCalcs.VELOCITY_OK.min) ? 'low'
@@ -232,6 +232,17 @@ EngCalcs.pageCalculatorInitialize = function (objForm) {
 	this.cookieValue = 'v' + (this.cookieFormatVersion || 1) + ',' + this.cookieValue;
 	this.createCookie();
 	this.cookieToForm(objForm);
+};
+
+// **A NUMBER WE COULD NOT COMPUTE PRINTS AS NOTHING, NEVER AS "NaN"** (Tom, 2026-08-21:
+// "mi Fr NaN: Fix it to blank", Task 475). A zero-length segment -- two stations typed at the
+// same station -- gives a region pw = 0 and a = 0, so rh = 0/0 and every quantity derived from it
+// is NaN. Blanking at the ONE place a number becomes text is why this file has no per-quantity
+// guard: the arithmetic is left alone and honestly undefined, and the cell simply says nothing.
+// Infinity is caught by the same test, which is the point of isFinite over isNaN.
+EngCalcs.miFixed2 = function (x) {
+	'use strict';
+	return isFinite(x) ? x.toFixed(2) : '';
 };
 
 EngCalcs.Manning.recalc = function () {
