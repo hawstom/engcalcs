@@ -88,10 +88,6 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
     ground distances (`1/cos(latitude)`: ~15% at 40°, ~30% at 50°). This is the strongest argument for
     the standing rule that **`len` is stored and overridable, never derived.**
 
-- 100|246| **Give `lpn_` a real file identity: `.lwn` extension and standard file-toolbar icons.**
-  Tom, 2026-08-09, from the epanet-js UX read. JSON inside, `.lwn` outside; new/open/save/save-as
-  icons on the toolbar. Cheap, and it is what makes a saved network feel like a document. I bought LibreWaterNet.org, and it points to lpn. I feel that is a stable name: lwn
-
 - 100|405| WAIT: sprint — **Resync four English strings the sprint itself earned.** Sprint 397 closed at zero drift and
   zero delta; these four were edited AFTER that baseline, so `detect_english_drift.php` now flags them
   and 26 translations render the superseded text. Small, well-defined resync — one agent per language
@@ -256,16 +252,6 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
     toggle above safe to build. `dev/lpn-spike/run-box-harness.js`, `specs/projectmenu.js`.
     The menu bar's own bare **Settings item was removed** 2026-08-21 (Tom): once Project's first
     row opened the panel, the bar offered the same box twice. The toolbar button is untouched.
-
-- 75|471| **A rejected `.inp` falls back to the steady answer without saying so.** Found while
-  fixing Task 466. `EngCalcs.lpnEpanetRun` THROWS on a rejected input rather than returning
-  `{ok:false}`, and the page's rejection handler calls `noEngine(model)` — so a run EPANET refused
-  looks to the user exactly like a run that happened. That is why one dangling control read as "the
-  run just didn't happen" rather than as an error.
-  - Two halves, and the second needs a sprint: make the failure reachable, and say it. `buildInp`
-    already carries a `warnings` array of codes; the drop Task 466 now makes is silent because
-    `lpnTimeModelBlock` has no such channel and the conditionless drop it already made was silent
-    too. Both want one message: what we ignored, and that the numbers came from our own solver.
 
 - 50|207| **The dilettante path: make replying cost one tap, not five steps.** Full design
   record in **`dev/dilettante-path.md`** — the cost ladder (Rung 0 is a tap with no text), the three
