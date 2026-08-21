@@ -590,6 +590,30 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     at `effective()`. Task 462's Curves section is deliberately a VIEWER so this has one obvious
     home and no second write path to unpick.
 
+- 75|473| **Canal Seepage converts both currency inputs BACKWARDS, and only under the US preset.**
+  Found 2026-08-21 by the new `cs-harness.js`, verified independently. `cs_water_value` is a price
+  *per unit volume* and `cs_lining_cost` *per unit area*, so each converts by the RECIPROCAL of its
+  unit's factor — but both are read with `readFormInput(..., hasUnits = true)`, which divides. Every
+  money answer is wrong by the factor SQUARED.
+  - Measured (20 cfs in / 18 out, 5,000 ft, 20 ft wetted perimeter, $1.00/ft³ water, $2.00/ft²
+    lining, US preset): annual value lost prints **$50,608.53** and should be **$63,115,200** (1,247×);
+    total lining cost prints **$1,726.19** and should be **$200,000** (116×); payback is 10.76× long.
+  - **Invisible in SI, where every factor is 1** — so it is wrong in exactly the preset an English
+    first-time visitor opens on.
+  - The real question is whether the suite gets a per-unit-INVERSE unit concept or the page multiplies
+    locally; that belongs to Task 390's paradigm, which is why this is not a one-line sed.
+
+- 60|474| **Manning Irregular's region Froude number is low by ~2× on any compound region.**
+  Found 2026-08-21 by the new `mi-harness.js`, verified independently. `closeRegion()` swaps in the
+  region's total area and wetted perimeter before `recalc()`, but nothing ever accumulates a region
+  TOP WIDTH — there is no `tc` anywhere in the file — so `this.t` still holds the LAST SEGMENT's
+  width and `Fr = V√(T/gA)` mixes a region area with a segment width. Error factor
+  `√(T_region/T_last_segment)`; single-segment regions are correct, which is why it survived.
+  - Measured (stations 0/30/40/60/70/100, elevations 6/3/1/1/3/6, WS 5.0 ft, S0 = 0.0025, banks at
+    30 and 70): page prints **0.28**, the definition gives **0.554**.
+  - Needs Tom's confirmation that a region's top width is the sum of its wet segments' top widths
+    before the accumulator is added.
+
 - 55|471| **A rejected `.inp` falls back to the steady answer without saying so.** Found while
   fixing Task 466. `EngCalcs.lpnEpanetRun` THROWS on a rejected input rather than returning
   `{ok:false}`, and the page's rejection handler calls `noEngine(model)` — so a run EPANET refused

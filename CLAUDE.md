@@ -419,15 +419,19 @@ worth roughly ten a human must remember**, and this file's unexecutable half is 
 
 ### What the free tier does NOT cover
 
-- **Nine calculators have a worked-example test of their math, and six do not.** Anchored against the
-  source method: `mpf`, `mtc`, `dw`, `hw`, `or`, `odt`, `ws`, `mphl`, `mhp`, plus `rc` partially (its
+- **Every calculator now has a worked-example test of its math except `rc`**, which is partial (its
   Robinson coefficients are unverified — the paper is paywalled and the free copy is a page scan).
-  **No math anchor at all: `mi`, `wi`, `ip`, `bpn`, `cs`.** For those, "the harnesses pass" still
-  means running and not emitting NaN, and says nothing about a wrong coefficient. Add a worked example
-  for the page you are editing; it is under an hour, and `dev/calc-spike/README.md` is the recipe.
+  The five that had none — `mi`, `wi`, `ip`, `bpn`, `cs` — were anchored 2026-08-21 and **two of them
+  were wrong**: Canal Seepage's currency inputs convert backwards (Task 473) and Manning Irregular's
+  region Froude number mixes a region area with a segment top width (Task 474). Both defects are
+  recorded, neither is asserted, and the build stays green. Add a worked example for any new page;
+  it is under an hour, and `dev/calc-spike/README.md` is the recipe.
 - **Row-table calculators** (Branched-Network, Irrigation-Pressure, Manning-Irregular,
-  Weir-Flow-Irregular) run, but the results inside their dynamic rows do not — building the rows needs
-  a richer DOM than `calc-page.js` has. The smoke harness names them as it goes.
+  Weir-Flow-Irregular) now build their rows in their OWN per-page harness — `calc-page.js` grew
+  `initRows()`/`addRow()`/`cell()` and the pages' own initializers do the building. The SMOKE harness
+  still does not, and names them as it goes. `Manning-Irregular.php` is the exception even per-page:
+  its initializer seeds through the cookie, so its shipped defaults are covered only by
+  `dev/browser-pass/mi-defaults.js`.
 
 ---
 
