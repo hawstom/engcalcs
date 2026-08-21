@@ -1,13 +1,13 @@
 {
 	"_note": "Per-example metadata for the gallery (ROADMAP Task 314), keyed by file name. Everything a machine CAN derive is derived by dev/scripts/generate_examples.php from the project itself -- node and link counts, unit system, thumbnail -- and is deliberately not repeated here. The card's TITLE and DESCRIPTION are not here either: they live in lib/lang.ec.en.php as lpn_ex_<key>_title and lpn_ex_<key>_desc, because a string outside a lang file is a string no translator will ever see. So this file holds exactly two things a machine cannot work out: which lang keys an example uses, and where it sits on the wall.",
 
-	"_order": "Lower sorts earlier. Omit it (0) to let size decide, which is the normal case: the wall runs small to large so a visitor meets the legible networks before Net3. Set it only where size cannot express the intent -- the two basics are the same size, so without it their sequence is whatever the filesystem returned.",
+	"_order": "Lower sorts earlier. Omit it (0) to let node+link count decide, which is the normal case: the tail of the wall runs small to large so a visitor grows into Net3 rather than opening on the densest thing we ship. Set it where size cannot express the intent. The head of the wall is set on purpose and is not size-ordered at all -- Net3-World leads because it is the real geographic project, Elm Street Center follows, and the two basics are the same size, so without a key their sequence would be whatever the filesystem returned.",
 
 	"Basic-example-SI-units-lpn.json": { "key": "basic_si", "order": -20 },
 	"Basic-example-US-units-lpn.json": { "key": "basic_us", "order": -10 },
 	"Net1-lpn.json": { "key": "net1" },
 	"Net2-lpn.json": { "key": "net2" },
 	"Net3-lpn.json": { "key": "net3" },
-	"Net3-World-lpn.json": { "key": "net3_world" },
-	"Elm-Street-Center-lpn.json": { "key": "elm_street" }
+	"Net3-World-lpn.json": { "key": "net3_world", "order": -40 },
+	"Elm-Street-Center-lpn.json": { "key": "elm_street", "order": -30 }
 }

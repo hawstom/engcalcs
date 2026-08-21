@@ -213,21 +213,30 @@ console.log('\n-- layout: a deliberate order, not an accident of equal size --')
 		'every entry carries an explicit order');
 	const si = examples.filter(function (e) { return e.system === 'si'; });
 	report(si.length > 0, 'the shelf has at least one SI example', `${si.length}`);
-	// Tom, 2026-08-14: "I like that the SI network comes first since it's our only SI example." Two
-	// examples of the same size cannot express that through a size sort, so it is pinned here --
-	// an intent that survives only because a sort happens to be stable will silently flip.
-	report(examples[0].system === 'si', 'and an SI example leads the wall', examples[0].title);
+	// **THE HEAD OF THE WALL IS TOM'S, AND IT IS NOT SIZE-ORDERED** (2026-08-21): Net3-World leads
+	// because it is the real geographic project, Elm Street Center second. This used to assert that
+	// an SI example led -- that was Tom's 2026-08-14 ruling when the basics were the head, and it is
+	// superseded, not broken. What survives of it is checked just below: SI still precedes US among
+	// the two basics, which is what he actually cared about and what a size sort cannot express.
+	report(examples[0].file === 'Net3-World-lpn.json', 'Net3-World leads the wall', examples[0].file);
+	report(examples[1].file === 'Elm-Street-Center-lpn.json', 'and Elm Street Center is second',
+		examples[1].file);
 	let sorted = true;
 	for (let i = 1; i < examples.length; i++) {
 		const a = examples[i - 1], b = examples[i];
 		const ka = [a.order, a.nodes + a.links], kb = [b.order, b.nodes + b.links];
 		if (ka[0] > kb[0] || (ka[0] === kb[0] && ka[1] > kb[1])) { sorted = false; }
 	}
-	report(sorted, 'the wall runs order-then-size, so it grows from small to large');
+	report(sorted, 'the wall runs order-then-size, so its tail grows from small to large');
 	// The two basics are the pair the reader compares, so the longer explanation belongs on the one
 	// they meet first; the second only has to say how it differs.
 	const basics = examples.filter(function (e) { return /^Basic network/.test(e.title); });
 	if (basics.length === 2) {
+		// Tom, 2026-08-14: "I like that the SI network comes first since it's our only SI example."
+		// The two basics are the same size, so a size sort cannot express this -- it is pinned in
+		// examples.json, and an intent that survives only because a sort happens to be stable will
+		// silently flip.
+		report(basics[0].system === 'si', 'SI still comes first of the two basics', basics[0].file);
 		report(basics[0].description.length > basics[1].description.length,
 			'the leading basic carries the fuller description; the other is the also-ran',
 			`${basics[0].description.length} vs ${basics[1].description.length}`);

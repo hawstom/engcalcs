@@ -3,6 +3,32 @@
     "generated": "dev/scripts/generate_examples.php",
     "examples": [
         {
+            "file": "Net3-World-lpn.json",
+            "order": -40,
+            "titleKey": "lpn_ex_net3_world_title",
+            "descKey": "lpn_ex_net3_world_desc",
+            "title": "EPANET Net3, lat/lon",
+            "description": "The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.",
+            "system": "us",
+            "flow": "gpm",
+            "nodes": 97,
+            "links": 119,
+            "thumb": "Net3-World-lpn.svg"
+        },
+        {
+            "file": "Elm-Street-Center-lpn.json",
+            "order": -30,
+            "titleKey": "lpn_ex_elm_street_title",
+            "descKey": "lpn_ex_elm_street_desc",
+            "title": "Elm Street Center",
+            "description": "A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.",
+            "system": "us",
+            "flow": "gpm",
+            "nodes": 18,
+            "links": 19,
+            "thumb": "Elm-Street-Center-lpn.svg"
+        },
+        {
             "file": "Basic-example-SI-units-lpn.json",
             "order": -20,
             "titleKey": "lpn_ex_basic_si_title",
@@ -42,19 +68,6 @@
             "thumb": "Net1-lpn.svg"
         },
         {
-            "file": "Elm-Street-Center-lpn.json",
-            "order": 0,
-            "titleKey": "lpn_ex_elm_street_title",
-            "descKey": "lpn_ex_elm_street_desc",
-            "title": "Elm Street Center",
-            "description": "A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.",
-            "system": "us",
-            "flow": "gpm",
-            "nodes": 18,
-            "links": 19,
-            "thumb": "Elm-Street-Center-lpn.svg"
-        },
-        {
             "file": "Net2-lpn.json",
             "order": 0,
             "titleKey": "lpn_ex_net2_title",
@@ -66,19 +79,6 @@
             "nodes": 36,
             "links": 40,
             "thumb": "Net2-lpn.svg"
-        },
-        {
-            "file": "Net3-World-lpn.json",
-            "order": 0,
-            "titleKey": "lpn_ex_net3_world_title",
-            "descKey": "lpn_ex_net3_world_desc",
-            "title": "EPANET Net3, lat/lon",
-            "description": "The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.",
-            "system": "us",
-            "flow": "gpm",
-            "nodes": 97,
-            "links": 119,
-            "thumb": "Net3-World-lpn.svg"
         },
         {
             "file": "Net3-lpn.json",
