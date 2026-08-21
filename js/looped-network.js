@@ -13106,23 +13106,15 @@ var EngCalcs = EngCalcs || {};
 		openMenu(anchor, [
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', fn: zoomExtent },
 			{ separator: true },
-			// The popover openers position themselves from evt.currentTarget, so a menu row hands them
-			// the menu-bar button it came from -- the popover then opens under "View", where the eye
-			// already is, rather than under a toolbar button that may not even be on screen.
-			{ icon: 'labels', label: pc.lpn_tool_labels || 'Labels', fn: function () { openSettingsBox('labels'); } },
-			// The profile is a VIEW of the network (Task 409), not an edit of it, so it lives beside
-			// Labels rather than in Insert. Since Task 434 it is a TAB in the bottom pane, so the
-			// row opens the pane on that tab -- open, never toggle: a menu row that names a view
-			// shows it.
-			// **THE PROFILE ICON, not the eye that was standing in for it** (Tom, 2026-08-18: "It's
-			// not there still. It's an eye"). 'profile' has been in lib/Icons.lib.php since the icon
-			// set was drawn and was used nowhere; both doors to the profile point at it now, this
-			// row and the toolbar button in wireToolbar().
-			{ icon: 'profile', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
-				fn: function () { closeMenu(); openPane('profile'); } },
+			// **NO LABELS ROW AND NO PROFILE ROW** (Tom, 2026-08-21). Labels is a SECTION of the
+			// Settings box, reachable from the box's own index and from a click on the colour
+			// legend, so the row was a third door to a box whose button is on the toolbar. Profile
+			// moved to the Project menu, beside Tables, where the two things you READ beside the
+			// map now sit together -- see openProjectBarMenu(). What is left here is the drawing
+			// itself: how it is framed, how much furniture is over it, and where on Earth it is.
 			// The label states what the row will DO, because this menu has no checkmark column --
 			// the same convention the street-map row below follows.
-			{ icon: 'camera', label: cleanMapOn() ? (pc.lpn_clean_map_off || 'Show map readouts') : (pc.lpn_clean_map || 'Clean map'),
+			{ icon: 'camera', label: cleanMapOn() ? (pc.lpn_clean_map_off || 'Show map readouts') : (pc.lpn_clean_map || 'Reduce map clutter'),
 				tip: pc.lpn_clean_map_tip,
 				fn: function () { setCleanMap(!cleanMapOn()); } },
 			// HIDDEN OUTSIDE A GEOGRAPHIC PROJECT, not disabled: a grid project's x/y are canvas

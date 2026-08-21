@@ -1459,9 +1459,12 @@ $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
 $ec_lang['lpn_pane_print']='Print table';
 $ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.';
 
-$ec_lang['lpn_clean_map']='Hide map readouts';
+// "Reduce map clutter" rather than "Hide map readouts" (Tom, 2026-08-21: "more honest and
+// understandable"). The row names what it will DO, and what it does is take furniture off the
+// picture -- a reader who has never met the word "readout" still knows what clutter is.
+$ec_lang['lpn_clean_map']='Reduce map clutter';
 $ec_lang['lpn_clean_map_off']='Show map readouts';
-$ec_lang['lpn_clean_map_tip']='Hide the mode line and the coordinate readout so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back.';
+$ec_lang['lpn_clean_map_tip']='Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back.';
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
 // lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
