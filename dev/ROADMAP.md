@@ -165,7 +165,16 @@ the block.
     (`ec_geosearch`), with text that draws exactly that distinction. This is a gap in the privacy PAGE
     only, and the fix is purely additive — a disclosure added, never one removed.
   - **Cheap:** `privacy.php` is English-authoritative and hard-coded, so this is one edit and no
-    sprint. Needs Tom because it is legal text; wording is drafted and waiting.
+    sprint. Needs Tom because it is legal text. **Wording is drafted and waiting in
+    `dev/privacy-third-party-draft.md`.**
+  - **Tom, 2026-08-21: *"Is it adequate to say that we prompt you individually for every exception?"*
+    As the RULE yes — it is the better rule, because it does not go stale when a fourth service ships.
+    As the WHOLE disclosure no: the consent prompt must name the recipient anyway, so naming the three
+    here costs nothing, and "we will tell you at the time" is the footnote-you-have-to-find this page
+    rejects. The draft states both.**
+  - **The trap:** the live paragraph ends *"We send them nothing about you"* — true of the tiles,
+    FALSE of the search, which sends what you typed. Scoping that sentence to the tiles is the part of
+    the edit that is easy to get wrong.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
@@ -401,12 +410,20 @@ the block.
   2026-08-21. Measured on Manning Pipe Flow: the form's focus order is `d0`, `d0u`, `n`, `sf`, `sfu`,
   the solve button, `solver_q`, `solver_qu`, `dd0`, `dd0u`, then **thirteen more result unit selects**
   before the print button. Four numbers to type, twenty-three stops to do it.
-  - **It needs a ruling, because every mechanism costs something.** `tabindex="-1"` on the selects
-    makes units unreachable by keyboard at all. A positive `tabindex` hoists the inputs above the whole
-    navbar. Intercepting Tab in JS is the only one that keeps both, and it means this page answers a
-    key the browser normally owns.
-  - No "X hider" is rendered by `lib/Calculators.lib.php` — Tom named one, so it is either a
-    JS-built row-table control or something on `lpn_`. Ask which before designing.
+  - **RULED: solve it in HTML, not by intercepting Tab in JS** (Tom, 2026-08-21: *"I meant HTML"*).
+    Reasonable, but it rules out both `tabindex` levers with it: `tabindex="-1"` on the selects makes
+    changing a unit keyboard-unreachable, which is a WCAG 2.1.1 failure and not merely a nuisance, and
+    a positive `tabindex` hoists the whole form above the navbar document-wide.
+  - **That leaves the one HTML mechanism with no cost to anybody: DOM ORDER, because tab order IS DOM
+    order.** Put the number inputs before the unit selects in the source and place the selects beside
+    them visually. **The blocker is that the form is a `<table>`** (`lib/Calculators.lib.php:295`), and
+    a table's cells cannot be reordered visually — only flex or grid has `order`. So this task is
+    really "re-lay the calculator form as a grid", suite-wide across 16 pages, and it should be priced
+    as that rather than as a tab-order tweak.
+  - **The "X hider" IS rendered here after all** — `<td class="engcalcs-x">` at lines 310 and 333, a
+    Bootstrap collapse `<a href="#…">`, one per input row AND one per result row. It has an `href`, so
+    it is focusable, and the audit above did not count it. **Re-measure the real stop count before
+    designing**; the twenty-three may be an undercount.
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   HW draws 580 confirmed humans (18% human-of-reach, the suite'''s second-biggest front door) but only
