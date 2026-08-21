@@ -280,17 +280,28 @@ console.log('\n--- a project is born clean, however it was born ---');
 		require('path').join(__dirname, '../../js/looped-network.js'), 'utf8');
 	const at = src.indexOf('var firstId = newProjectId()');
 	const branch = src.slice(at, at + 1400);
-	ok('the boot-registered first project records a saved signature',
-		/savedSig: docSignature\(\)/.test(branch), branch.slice(0, 120));
+	// **AND THE STAMP IS TAKEN AFTER THE SEEDING** (Task 418). Stamped in the branch it was still
+	// too early: seedDefaultInputs() runs afterwards and fills settings.defaults, which
+	// docSignature() covers, so the first autosave found a document nobody had touched already
+	// changed and the asterisk never cleared. What the baseline describes has to be the document
+	// the visitor is first shown.
+	ok('the boot branch does NOT stamp the signature inline — the document is not finished yet',
+		!/savedSig: docSignature\(\)/.test(branch), branch.slice(0, 120));
+	ok('...it flags the project as born clean instead', /bornClean = true;/.test(branch));
+	const seedAt = src.indexOf('\t\tseedDefaultInputs();', at);   // init()'s own, not the one in refreshAllFromDocument()
+	const after = src.slice(seedAt, seedAt + 600);
+	ok('...and the stamp is taken after seedDefaultInputs()',
+		/if \(bornClean\)/.test(after) && /savedSig = docSignature\(\);/.test(after),
+		after.slice(0, 120));
 	// The name is part of the signature, so it has to be set before the signature is taken or the
 	// entry is stamped against a document it does not describe.
-	ok('...taken after its name is set, since the name is part of the signature',
-		branch.indexOf('project.name = firstName') < branch.indexOf('savedSig: docSignature()'));
+	ok('...which is after its name is set, since the name is part of the signature',
+		src.indexOf('project.name = firstName') < seedAt);
 	// And the reason it is inline rather than a call: stampProjectSaved() ends in renderTabs().
 	// Comments stripped: the code EXPLAINS why it does not call stampProjectSaved(), and a naive
 	// search finds the explanation and calls it a call. Third time this file's family has met that.
 	ok('...inline, because stampProjectSaved would repaint a tab strip that is not wired yet',
-		!/stampProjectSaved/.test(branch.replace(/^[ \t]*\/\/.*$/gm, '')));
+		!/stampProjectSaved/.test((branch + after).replace(/^[ \t]*\/\/.*$/gm, '')));
 }
 
 console.log('\n--- a malformed or missing view falls back to fitting ---');

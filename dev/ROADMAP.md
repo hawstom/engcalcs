@@ -170,16 +170,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     quoted it back all sprint. Entry rewritten; the key list the check walks is derived from the
     English, so a new mode-naming string joins it by itself.
 
-- 55|451| **Say which EPANET we run, and where it comes from.** The run report says Version 2.3.05
-  while EPA's own download page still offers 2.2.0, which reads like a fabrication and is not one:
-  EPANET development moved to Open Water Analytics (a community + EPA collaboration) after EPA's
-  2.2.0 of Dec 2019, and OWA released 2.3 in Jul 2024 and **2.3.5 on 2025-02-20**. The engine encodes
-  its version as major.minor.patch with a two-digit patch, so 2.3.5 prints as `2.3.05`. We vendor
-  epanet-js 0.9.0 (MIT, Luke Butler), which wraps OWA-EPANET — `js/vendor/README.md` already records
-  the wrapper but not the engine's own version or lineage.
-  - Put it somewhere a user can read it, not only in `js/vendor/README.md`: this is the provenance
-    question anyone comparing us against EPANET asks first, and it is a point of credibility.
-
 - 40|452| **Satellite imagery from Mapbox — BUILT, and blocked on one decision about the token.**
   Tom asked for it, chose Mapbox over a keyless source, created the account and supplied a public
   `pk.` token 2026-08-19. Shipped: a second tile source beside OpenStreetMap, its own View row, its
@@ -505,12 +495,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
     drawing is still correct.
 
-- 55|440| **Closing a big project still costs nine seconds, and 60% of it is one loop.**
-  `refreshLabelText()`'s LINK half interleaves a write and a measurement per label, and its shed
-  cascade measures inside the same iteration — so `getBBox` forces a synchronous layout per label per
-  rung. The node half was split into write-all-then-measure-all and the whole close went 24,262 →
-  9,484 ms on 256 junctions; the link half needs the loop split into three passes. The number to beat
-  is in `dev/browser-pass/specs/perf.js`.
+- 50|472| **`alignedSideFor()` walks every link to place one label, which is the next quadratic.**
+  With the four measurement quadratics fixed (Task 440), a Close of the 256-junction grid spends 21%
+  of its self time in `linkPointList()` — 480 x 480 calls on that drawing — against getBBox()'s 6.2%.
+  The number to beat and the profile it came from are at the top of `dev/browser-pass/specs/perf.js`;
+  a saving worth defending is worth a COUNTABLE guard, as `dev/lpn-spike/label-batch-harness.js` is.
 
 - 55|436| **Placement follow-ups, after Tom's first real use (2026-08-18).** The tool is two visible
   steps now — step 1 detached (the project holds still while the map moves under it), step 2 attached
@@ -568,17 +557,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the pipe · 4 labels pushed apart where they collide · 5 values dropped from a crowded label
     (shedding) · 6 labels hidden because the zoom is too far out · 7 leader lines drawn.
   - Stopping at N answers "did my change help?" — the answer is two drawings at the same step.
-
-- 55|418| **The first project of a first visit is marked dirty with nobody having touched it**, so its
-  tab wears a permanent asterisk. Found by the Task 414 browser-pass repair, 2026-08-17, and it is
-  Tom's 2026-08-15 "the initial project gets an unwarranted asterisk" -- the stamp was moved and is
-  still too early.
-  - **Measured:** `lpn_index` is written at boot with a `savedSig` and no `dirty`; within ~200 ms the
-    first autosave finds a different signature and sets `dirty: true`. It never clears until a save.
-  - **Cause is boot ORDER, not the signature:** the branch stamps the baseline inline
-    (`savedSig: docSignature()`) and only then runs `seedDefaultInputs()`, which fills
-    `settings.defaults` -- and `docSignature()` covers those. Stamp after the seeding.
-  - Written up at the top of `dev/browser-pass/specs/boot.js`. No knowingly-red spec was added.
 
 - 25|417| **Long-press on an element should enter Edit mode, exactly as a click does.** Tom,
   2026-08-17. The guard that switches to Edit mode on click does not fire when a long press begins a

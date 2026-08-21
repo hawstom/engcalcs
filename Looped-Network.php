@@ -833,6 +833,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_notes_4_term']?></dt><dd><?=$ec_lang['lpn_notes_4_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_color_term']?></dt><dd><?=$ec_lang['lpn_notes_color_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_epanet_term']?></dt><dd><?=$ec_lang['lpn_notes_epanet_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
 </dl>
 	</div>
 </div>
@@ -936,6 +937,8 @@ EngCalcs.pageConfig = {
 	lpn_pane_tab_tip: <?=json_encode($ec_lang['lpn_pane_tab_tip'])?>,
 	lpn_pane_none: <?=json_encode($ec_lang['lpn_pane_none'])?>,
 	lpn_pane_sort_tip: <?=json_encode($ec_lang['lpn_pane_sort_tip'])?>,
+	lpn_pane_print: <?=json_encode($ec_lang['lpn_pane_print'])?>,
+	lpn_pane_print_tip: <?=json_encode($ec_lang['lpn_pane_print_tip'])?>,
 	lpn_time_menu: <?=json_encode($ec_lang['lpn_time_menu'])?>,
 	lpn_time_menu_tip: <?=json_encode($ec_lang['lpn_time_menu_tip'])?>,
 	lpn_time_duration: <?=json_encode($ec_lang['lpn_time_duration'])?>,

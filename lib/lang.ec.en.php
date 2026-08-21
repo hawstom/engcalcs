@@ -1456,6 +1456,8 @@ $ec_lang['lpn_pane_tab_valves']='Valves';
 $ec_lang['lpn_pane_tab_tip']='These parts as a table you can sort. Results are read-only.';
 $ec_lang['lpn_pane_none']='This network has none of these yet.';
 $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
+$ec_lang['lpn_pane_print']='Print table';
+$ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.';
 
 $ec_lang['lpn_clean_map']='Hide map readouts';
 $ec_lang['lpn_clean_map_off']='Show map readouts';
@@ -1839,6 +1841,8 @@ $ec_lang['lpn_notes_color_term']='Color band boundaries stay the same';
 $ec_lang['lpn_notes_color_def']='Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.';
 $ec_lang['lpn_notes_epanet_term']='Hazen-Williams constants match EPANET';
 $ec_lang['lpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
+$ec_lang['lpn_notes_engine_term']='Which EPANET this page runs';
+$ec_lang['lpn_notes_engine_def']='The EPANET solver on this page is OWA-EPANET 2.3.5, released on 20 February 2025. EPANET is developed by Open Water Analytics, a community that works with the United States Environmental Protection Agency, which released version 2.2.0 in December 2019. The run report calls it 2.3.05 because the engine writes the last number in two digits. It reaches this page through epanet-js 0.9.0 by Luke Butler, under the MIT licence, and it runs inside your browser: your network is never sent anywhere to be solved.';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
 $ec_lang['lpn_id_taken']='That ID is already in use.';
 $ec_lang['lpn_diag_no_fixed_head']='Add a reservoir or a tank. The network needs at least one known water level before it can be solved.';

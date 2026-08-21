@@ -32,6 +32,17 @@ the OWA-EPANET engine (also MIT). Full licence text: `epanet-js.LICENSE`. MIT is
 GPL-3-compatible, so EngCalcs remains GPL v3 or later; the licence file must ship with any
 redistribution.
 
+### Which EPANET that is (ROADMAP Task 451)
+
+**The engine inside the wrapper is OWA-EPANET 2.3.5, released 2025-02-20.** The run report prints
+it as `2.3.05` — the engine encodes its version as major.minor.patch with a two-digit patch — and
+that number reads like a fabrication beside EPA's own download page, which still offers 2.2.0.
+It is not one: EPANET development moved to **Open Water Analytics**, a community and EPA
+collaboration, after EPA's 2.2.0 of December 2019; OWA released 2.3 in July 2024 and 2.3.5 on
+2025-02-20. The user-facing half of this is a Notes entry on the page itself
+(`lpn_notes_engine_term` / `_def`), because it is the provenance question anyone comparing us
+against EPANET asks first.
+
 **Name collision, because it caused real confusion when this was scoped:** the *web app* at
 epanetjs.com is FSL-1.1-MIT — not FLOSS today, MIT after two years. This is the separate MIT
 **toolkit**. We use the toolkit and have never read the app's source.

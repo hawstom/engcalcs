@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1242,
-        "delta_key_count": 50,
+        "expected_key_count": 1246,
+        "delta_key_count": 54,
         "exempt_key_count": 30,
         "exempt_keys": [
             "calc_units_us",
@@ -459,12 +459,16 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_pane_print": "Print table",
+        "lpn_pane_print_tip": "Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.",
         "lpn_menu_project": "Project",
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
+        "lpn_notes_engine_term": "Which EPANET this page runs",
+        "lpn_notes_engine_def": "The EPANET solver on this page is OWA-EPANET 2.3.5, released on 20 February 2025. EPANET is developed by Open Water Analytics, a community that works with the United States Environmental Protection Agency, which released version 2.2.0 in December 2019. The run report calls it 2.3.05 because the engine writes the last number in two digits. It reaches this page through epanet-js 0.9.0 by Luke Butler, under the MIT licence, and it runs inside your browser: your network is never sent anywhere to be solved.",
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
@@ -511,12 +515,16 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_pane_print": "Print table",
+        "lpn_pane_print_tip": "Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.",
         "lpn_menu_project": "Project",
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
+        "lpn_notes_engine_term": "Which EPANET this page runs",
+        "lpn_notes_engine_def": "The EPANET solver on this page is OWA-EPANET 2.3.5, released on 20 February 2025. EPANET is developed by Open Water Analytics, a community that works with the United States Environmental Protection Agency, which released version 2.2.0 in December 2019. The run report calls it 2.3.05 because the engine writes the last number in two digits. It reaches this page through epanet-js 0.9.0 by Luke Butler, under the MIT licence, and it runs inside your browser: your network is never sent anywhere to be solved.",
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
@@ -743,6 +751,38 @@
                 }
             }
         },
+        "lpn_pane_print": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Ordina in base a questa colonna. Fai clic di nuovo per invertire l'ordine.",
+                    "english": "Sort by this column. Click again to reverse it."
+                },
+                "next_translated": {
+                    "key": "lpn_clean_map",
+                    "value": "Nascondi le indicazioni sulla mappa",
+                    "english": "Hide map readouts"
+                }
+            }
+        },
+        "lpn_pane_print_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Ordina in base a questa colonna. Fai clic di nuovo per invertire l'ordine.",
+                    "english": "Sort by this column. Click again to reverse it."
+                },
+                "next_translated": {
+                    "key": "lpn_clean_map",
+                    "value": "Nascondi le indicazioni sulla mappa",
+                    "english": "Hide map readouts"
+                }
+            }
+        },
         "lpn_menu_project": {
             "reason": "missing",
             "current_value": null,
@@ -836,6 +876,38 @@
                     "key": "lpn_notes_epanet_term",
                     "value": "Le costanti di Hazen-Williams corrispondono a EPANET",
                     "english": "Hazen-Williams constants match EPANET"
+                }
+            }
+        },
+        "lpn_notes_engine_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_epanet_def",
+                    "value": "Nell'agosto 2026 il coefficiente e l'esponente di Hazen-Williams sono stati modificati per corrispondere a EPANET. I risultati di perdita di carico differiscono dalle versioni precedenti di questa pagina fino allo 0,1 percento, un valore molto più piccolo dell'incertezza sul valore di C stesso.",
+                    "english": "In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself."
+                },
+                "next_translated": {
+                    "key": "lpn_id_invalid",
+                    "value": "Inserisci un ID senza spazi e senza virgolette.",
+                    "english": "Enter an ID with no spaces and no quotation marks."
+                }
+            }
+        },
+        "lpn_notes_engine_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_epanet_def",
+                    "value": "Nell'agosto 2026 il coefficiente e l'esponente di Hazen-Williams sono stati modificati per corrispondere a EPANET. I risultati di perdita di carico differiscono dalle versioni precedenti di questa pagina fino allo 0,1 percento, un valore molto più piccolo dell'incertezza sul valore di C stesso.",
+                    "english": "In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself."
+                },
+                "next_translated": {
+                    "key": "lpn_id_invalid",
+                    "value": "Inserisci un ID senza spazi e senza virgolette.",
+                    "english": "Enter an ID with no spaces and no quotation marks."
                 }
             }
         },

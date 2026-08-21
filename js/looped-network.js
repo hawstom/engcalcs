@@ -6861,6 +6861,12 @@ var EngCalcs = EngCalcs || {};
 		});
 		btn = document.getElementById('lpn_pane_btn');
 		if (btn) { btn.setAttribute('aria-pressed', paneState.open ? 'true' : 'false'); }
+		// **PRINT BELONGS TO A TABLE, so it is only there on a table.** Profile is a drawing and
+		// prints with the map; a Print button beside it would promise a sheet this code cannot
+		// make. Hidden rather than disabled: a disabled control invites the question of what would
+		// enable it, and the answer here is "a different tab", which the tab strip already says.
+		btn = document.getElementById('lpn_pane_print');
+		if (btn) { btn.style.display = activePaneTableSpec() ? '' : 'none'; }
 		// THE CANVAS IS RE-MEASURED, NEVER TOLD. See the note at the top of this section.
 		applyMapHeight();
 		if (pass < LPN_PANE_SETTLE && paneState.open) {
@@ -6924,6 +6930,20 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		if (x) { x.addEventListener('click', closePane); }
+		// Built here, not in the markup: it carries a tip, and .ec-help written into a page's HTML
+		// is what tip_markup_check.php exists to stop. Same treatment as a tab button.
+		if (!document.getElementById('lpn_pane_print') && x && x.parentNode) {
+			(function () {
+				var b = document.createElement('button');
+				b.type = 'button';
+				b.id = 'lpn_pane_print';
+				b.className = 'lpn-pane-print';
+				b.textContent = pc.lpn_pane_print || 'Print table';
+				if (pc.lpn_pane_print_tip) { b.title = pc.lpn_pane_print_tip; b.className += ' ec-help'; }
+				b.addEventListener('click', function () { printPaneTable(activePaneTableSpec()); });
+				x.parentNode.insertBefore(b, x);
+			}());
+		}
 		// **THE TOP EDGE IS THE HANDLE.** Pointer events, not mouse: one code path for mouse, pen
 		// and touch, with pointer capture so a fast drag that leaves the grip keeps resizing
 		// instead of stopping dead -- the pointer slop a real hand needs.
@@ -7995,6 +8015,17 @@ var EngCalcs = EngCalcs || {};
 	function paneNumText(v) {
 		return (typeof v === 'number' && isFinite(v)) ? String(+v.toFixed(6)) : '';
 	}
+	// **ONE FUNCTION DECIDES WHAT A CELL SAYS**, and the screen and the printed sheet both read it.
+	// A result rounds to 2 decimals; a typed number reads back exactly as it is stored; an
+	// identity reads verbatim. Two of these written separately is how a sheet in somebody's hand
+	// comes to round differently from the screen it was taken off.
+	function paneCellText(c, el) {
+		var v = c.get(el);
+		if (!panePresent(v)) { return ''; }
+		if (c.result) { return String(plainRound(v, 2)); }
+		if (!c.set) { return String(v); }
+		return paneNumText(v);
+	}
 	function paneHeadingText(c) {
 		var pc = EngCalcs.pageConfig || {},
 			text = (typeof c.label === 'function') ? c.label() : (pc[c.label] || c.key),
@@ -8069,7 +8100,7 @@ var EngCalcs = EngCalcs || {};
 	function paneTableRow(spec, el) {
 		var tr = document.createElement('tr'), cells = {};
 		spec.cols.forEach(function (c) {
-			var td = document.createElement('td'), btn, input, v;
+			var td = document.createElement('td'), btn, input;
 			if (c.key === 'id') {
 				// The ID is a way BACK TO THE MAP, not a text box: it selects the part and pans to
 				// it, the same gesture a Find result row is. Renaming stays in the property popup,
@@ -8084,14 +8115,13 @@ var EngCalcs = EngCalcs || {};
 				// **A RESULT IS NEVER AN INPUT**, and neither is an identity the drawing owns. Both
 				// are plain cells with no control in them at all, so there is no path by which
 				// either could be typed into.
-				v = c.get(el);
 				if (c.result) { td.className = 'lpn-pane-num'; }
-				else { td.textContent = panePresent(v) ? String(v) : ''; }
+				else { td.textContent = paneCellText(c, el); }
 				cells[c.key] = td;
 			} else {
 				input = document.createElement('input');
 				input.type = 'number';
-				input.value = paneNumText(c.get(el));
+				input.value = paneCellText(c, el);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
 				input.addEventListener('change', function () {
 					// The popup's own ending, not a second one: set, then completeEdit(), which
@@ -8117,21 +8147,117 @@ var EngCalcs = EngCalcs || {};
 			var cells = spec.cells[el.id];
 			if (!cells) { return; }
 			spec.cols.forEach(function (c) {
-				var target = cells[c.key], v;
+				var target = cells[c.key];
 				if (!target) { return; }
-				v = c.get(el);
-				if (c.result) {
-					target.textContent = panePresent(v) ? String(plainRound(v, 2)) : '';
-				} else if (!c.set) {
-					target.textContent = panePresent(v) ? String(v) : '';
+				if (c.result || !c.set) {
+					target.textContent = paneCellText(c, el);
 				} else if (target !== activeElementSafe()) {
-					target.value = paneNumText(v);
+					target.value = paneCellText(c, el);
 				}
 			});
 		});
 	}
 	function activeElementSafe() {
 		try { return document.activeElement; } catch (e) { return null; }
+	}
+
+	// ---- PRINTING THE TABLE YOU ARE LOOKING AT ------------------------------------------------
+	//
+	// Tom, 2026-08-21: *"Make a way to print any table."*
+	//
+	// **ONE PRINTER, SIX TABLES**, for the same reason there is one renderer: a print path that
+	// knew about types would be a seventh place a column list is written down, and the first one
+	// to go stale. It reads the spec, so it prints whatever the spec says -- the headings through
+	// paneHeadingText(), so the units on the paper are the units on the screen; the rows through
+	// paneTableRowsInOrder(), so the sort the reader chose is the order that prints; the cells
+	// through paneCellText(), which is also what fills them on screen.
+	//
+	// **A STATIC COPY, NOT THE LIVE TABLE.** Print rules that beat the live pane into a sheet of
+	// paper would be a second layout of the same table, maintained in CSS: it is a 260 px
+	// scrolling box with a sticky heading row, sort buttons and number inputs in it, and an
+	// <input> prints as the CONTROL -- an empty-looking box where the number should be. A plain
+	// table built from the spec has none of that, and its editable cells are simply their values.
+	//
+	// **NO POPUP.** A popup is blockable, and a blocked one fails silently at the moment the user
+	// pressed the button. This appends to document.body, prints, and takes itself away again, so
+	// the worst that can happen is the browser's own print dialog.
+	function paneBuildPrintable(spec) {
+		var pc = EngCalcs.pageConfig || {}, wrap = document.createElement('div'),
+			rows = paneTableRowsInOrder(spec), table, thead, tbody, tr, h;
+		wrap.id = 'lpn_print_area';
+		// **THE SHEET SAYS WHOSE NETWORK AND WHICH TABLE.** A page of numbers with no project name
+		// on it is a page nobody can file, and the tab strip that answered "which parts are these"
+		// is not on the paper.
+		h = document.createElement('h1');
+		h.textContent = (typeof project === 'object' && project && project.name) || '';
+		wrap.appendChild(h);
+		h = document.createElement('h2');
+		h.textContent = pc[spec.label] || spec.id;
+		wrap.appendChild(h);
+		if (!rows.length) {
+			h = document.createElement('p');
+			h.textContent = pc.lpn_pane_none || 'This network has none of these yet.';
+			wrap.appendChild(h);
+			return wrap;
+		}
+		table = document.createElement('table');
+		table.className = 'lpn-pane-table lpn-print-table';
+		thead = document.createElement('thead');
+		tr = document.createElement('tr');
+		spec.cols.forEach(function (c) {
+			var th = document.createElement('th');
+			th.textContent = paneHeadingText(c);
+			tr.appendChild(th);
+		});
+		thead.appendChild(tr);
+		table.appendChild(thead);
+		tbody = document.createElement('tbody');
+		rows.forEach(function (el) {
+			var row = document.createElement('tr');
+			spec.cols.forEach(function (c) {
+				var td = document.createElement('td');
+				// A number is a number whether it was typed or computed: both columns are figures
+				// and both read as one column only if they are right-aligned. The ID and the two
+				// ends stay left, where a name belongs.
+				if (c.result || c.set) { td.className = 'lpn-pane-num'; }
+				td.textContent = paneCellText(c, el);
+				row.appendChild(td);
+			});
+			tbody.appendChild(row);
+		});
+		table.appendChild(tbody);
+		wrap.appendChild(table);
+		return wrap;
+	}
+	// Taken down on afterprint where the browser has one, so nothing is removed while the print
+	// engine is still reading the page -- and again at the head of the next print, so a browser
+	// that never fires it cannot leave this sheet standing in for the map on the next Ctrl+P.
+	var panePrintArea = null;
+	function paneEndPrint() {
+		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
+		if (panePrintArea && panePrintArea.parentNode) {
+			panePrintArea.parentNode.removeChild(panePrintArea);
+		}
+		panePrintArea = null;
+	}
+	function printPaneTable(spec) {
+		if (!spec || !document.body) { return; }
+		paneEndPrint();
+		panePrintArea = paneBuildPrintable(spec);
+		document.body.appendChild(panePrintArea);
+		document.body.classList.add('lpn-printing-table');
+		if (typeof window.onafterprint !== 'undefined' && window.addEventListener) {
+			window.addEventListener('afterprint', paneEndPrint);
+			window.print();
+		} else {
+			try { window.print(); } finally { paneEndPrint(); }
+		}
+	}
+	// The active tab, as a table -- or nothing, which is what Profile is. The button that calls
+	// this is hidden on Profile for the same reason; both read the same answer, so a tab that is
+	// not a table can neither show the button nor be reached through it.
+	function activePaneTableSpec() {
+		return paneTableById(paneState.tab);
 	}
 
 	// ---- the PROFILE panel (ROADMAP Task 409) ------------------------------
@@ -13411,7 +13537,7 @@ var EngCalcs = EngCalcs || {};
 		// the pane before it starts reporting sizes.
 		profileResizeWatch();
 		wireUnitGroups();
-		var opening = initLibrary();
+		var opening = initLibrary(), bornClean = false;
 		if (opening) {
 			applySaved(opening);
 			buildDom();
@@ -13435,12 +13561,17 @@ var EngCalcs = EngCalcs || {};
 			// with NO savedSig is dirty from its first breath -- and the asterisk is then inescapable,
 			// because Revert is for FILE projects and would be disabled on it.
 			//
-			// Stamped inline rather than by calling stampProjectSaved(), for the same reason the entry
-			// is pushed inline: that function ends in renderTabs(), and the tab strip is not wired
-			// yet. The name is set FIRST because the signature includes it.
-			library.projects.push({
-				id: firstId, name: firstName, updated: Date.now(), savedSig: docSignature()
-			});
+			// **THE BASELINE IS STAMPED AFTER seedDefaultInputs(), NOT HERE** (Task 418). Stamped
+			// here it was still too early: the seeding fills settings.defaults a few lines below,
+			// docSignature() covers those, and the first autosave then found a document that had
+			// changed with nobody having touched it -- a permanent asterisk on the first project of
+			// a first visit. What the baseline has to describe is the document as the visitor is
+			// first shown it, and that document does not exist until the seeding has run.
+			//
+			// Inline rather than stampProjectSaved(), for the same reason the entry is pushed
+			// inline: that function ends in renderTabs(), and the tab strip is not wired yet.
+			library.projects.push({ id: firstId, name: firstName, updated: Date.now() });
+			bornClean = true;
 			saveIndex();
 		}
 		wireNotesPopup();
@@ -13449,6 +13580,13 @@ var EngCalcs = EngCalcs || {};
 		// still-null default would render as an empty box). Also necessarily after the units strip
 		// is in the DOM, which is what the seeding exists to wait for.
 		seedDefaultInputs();
+		// The born-clean baseline, now that the document is the one the visitor will be shown. See
+		// the note above at "AND IT IS BORN CLEAN": nothing between there and here is a user edit,
+		// so this is still the untouched document -- it is just the whole of it (Task 418).
+		if (bornClean) {
+			var firstEntry = indexEntry(library.openId);
+			if (firstEntry) { firstEntry.savedSig = docSignature(); saveIndex(); }
+		}
 		// One call builds all four sections, so wireLabelsPopup() is gone: its whole body was
 		// rebuildLabelsFields(), which rebuildSettingsBox() now runs alongside its three siblings.
 		wireSettingsBox();
