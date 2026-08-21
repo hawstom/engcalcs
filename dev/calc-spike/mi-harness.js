@@ -40,18 +40,16 @@
 // dev/browser-pass/mi-defaults.js, which drives the real page in a real browser (Task 233). What
 // is NOT covered anywhere else is whether the arithmetic is right, and that is this file.
 //
-// ONE DEFECT FOUND AND DELIBERATELY NOT ASSERTED -- THE REGION FROUDE NUMBER (fr617).
-// closeRegion() replaces the working area and wetted perimeter with the REGION totals before
-// recomputing, but not the top width: Manning.t is left holding the last SEGMENT's top width.
-// Fr = V sqrt(T / (g A)) then mixes a region area with a segment width, and comes out low by
-// sqrt(T_region / T_last_segment) on any region made of more than one segment. On the section
-// below the main channel spans stations 30-70, T = 40 ft in three segments of 10, 20 and 10 ft,
-// and the page prints Fr = 0.28 where the definition gives 0.554 -- a factor of two.
-// A one-segment region is unaffected, which is why the two overbanks here agree exactly.
-// This harness therefore asserts fr617 only on single-segment regions, and PRINTS the compound
-// case rather than asserting either number: pinning the wrong one as expected would make the
-// defect permanent, and asserting the right one would leave a red harness in the build. Deciding
-// what Fr should mean for a compound section is a judgement call for a person, not a test.
+// THE REGION FROUDE NUMBER (fr617) IS A COMPOUND-SECTION ASSERTION ON PURPOSE.
+// closeRegion() swaps the REGION totals for area, wetted perimeter AND top width in before it
+// recomputes, so Fr = V sqrt(T/(g A)) is a region quantity throughout. It once swapped only the
+// first two, leaving Manning.t holding the LAST SEGMENT's top width, and every multi-segment
+// region came out low by sqrt(T_region/T_last_segment) -- on the section below the main channel
+// spans stations 30-70 with T = 40 ft in three segments of 10, 20 and 10 ft, and the page printed
+// 0.28 where the definition gives 0.554 (ROADMAP Task 474). A one-segment region was unaffected,
+// which is why the two overbanks always agreed. So this file asserts fr617 on BOTH shapes: the
+// single-segment overbanks prove the fix did not break the case that already worked, and the
+// three-segment main channel is the case that was wrong.
 //
 // MUTATIONS TRIED, all caught:
 //   1. Manning R^(2/3) -> R^(1/2)                  (every region's velocity and discharge)
@@ -60,6 +58,7 @@
 //   4. segment area (d0^2-d1^2)/(2s) -> (d0-d1)/(2s)  (area, R and Q on every sloping segment)
 //   5. tau = d * s0 -> d * s0 * s0                  (the shear-stress column)
 //   6. top width t = l*pw/hypotenuse -> l           (the Froude number, on the sloping regions)
+//   7. region top width tc dropped, t left per-segment  (the main channel's Froude number)
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -238,15 +237,22 @@ REGIONS.forEach(function (reg, k) {
 	nearDisplayed(cell(page, 'rh', row), ref.R / FT, 2, `${label}: hydraulic radius A/P, ft`);
 	nearDisplayed(cell(page, 'v617', row), ref.V / FT, 2, `${label}: velocity by Manning, ft/s`);
 	nearDisplayed(cell(page, 'hv617', row), ref.hv / FT, 2, `${label}: velocity head V^2/2g, ft`);
-	if (reg.to === reg.from) {
-		nearDisplayed(cell(page, 'fr617', row), ref.fr, 2, `${label}: Froude number`);
-	} else {
-		console.log(`  --    ${label}: Froude number NOT asserted -- the page prints ` +
-			`${cell(page, 'fr617', row)} where V sqrt(T/gA) gives ${ref.fr.toFixed(3)}; ` +
-			`see the note at the top of this file`);
-	}
+	// Asserted on single- and multi-segment regions alike -- see the note at the top of the file.
+	nearDisplayed(cell(page, 'fr617', row), ref.fr, 2,
+		`${label}: Froude number, from the REGION top width (${reg.to - reg.from + 1} segment(s))`);
 	nearDisplayed(cell(page, 'q617', row), ref.Q / (FT * FT * FT), 2, `${label}: discharge V A, ft3/s`);
 });
+
+// The compound main channel, stated as the bare number a person can check by hand: T = 40 ft in
+// three segments of 10, 20 and 10 ft, and Fr is 0.554 -- not the 0.28 the page printed while the
+// region top width was missing.
+(function () {
+	const mc = REGIONS[1];
+	nearDisplayed(regionSi(mc.from, mc.to, X, Z, N, WS, S0).T / FT, 40, 9,
+		'the main channel\'s top width is the sum of its three segments, 40 ft');
+	nearDisplayed(cell(page, 'fr617', mc.to), 0.554, 2,
+		'and its Froude number is 0.554, not the 0.28 of Task 474');
+}());
 
 // The composite roughness of the two single-segment overbanks must be the segment's own n --
 // the formula's own degenerate case, and the cheapest way to see it is not misapplied.

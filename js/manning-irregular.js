@@ -29,6 +29,7 @@ EngCalcs.pageCalculator = function (objForm) {
 	d50_mra;
 	this.Manning.ac = 0;
 	this.Manning.pwc = 0;
+	this.Manning.tc = 0;
 	this.Manning.ncompterm617c = 0;
 	this.Manning.ncompterm618c = 0;
 	this.Manning.qc = 0;
@@ -60,6 +61,14 @@ EngCalcs.pageCalculator = function (objForm) {
 			this.Manning.pw = (this.Manning.a == 0) ? 0 : (s == 0) ? l :  Math.abs(this.wedgeWettedPerimeter(d0, s) - this.wedgeWettedPerimeter(d1, s));
 			this.Manning.pwc = this.Manning.pwc + this.Manning.pw;
 			this.Manning.t = l*this.Manning.pw/hypotenuse;
+			// A REGION'S TOP WIDTH IS THE SUM OF ITS WET SEGMENTS' TOP WIDTHS (ROADMAP Task 474).
+			// Accumulated here beside ac and pwc because closeRegion() needs all three: it swaps
+			// the region totals in before recalc(), and Fr = V sqrt(T/gA) is the one result that
+			// reads t. Without this the region Froude number mixed a region area with the LAST
+			// segment's width and came out low by sqrt(T_region/T_last_segment) -- 0.28 instead of
+			// 0.554 on the shipped sample section. A one-segment region was always right, which is
+			// how it survived. dev/calc-spike/mi-harness.js asserts the compound case.
+			this.Manning.tc = this.Manning.tc + this.Manning.t;
 			this.Manning.da = this.Manning.a / this.Manning.t;
 			this.Manning.isBank = document.getElementsByName('is_bank')[iStation].checked;
 			arrSketchSegments.push({
@@ -243,6 +252,7 @@ EngCalcs.Manning.recalc = function () {
 EngCalcs.Manning.closeRegion = function () {
 	this.pw = this.pwc;
 	this.a = this.ac;
+	this.t = this.tc;
 	this.n = Math.pow(this.ncompterm617c, (2/3))/Math.pow(this.pwc, (2/3));
 	this.recalc();
 	this.n617 = this.n;
@@ -260,6 +270,7 @@ EngCalcs.Manning.closeRegion = function () {
 	this.q618c = this.q618c + this.q;
 	this.pwc = 0;
 	this.ac = 0;
+	this.tc = 0;
 	this.ncompterm617c = 0;
 	this.ncompterm618c = 0;
 };
