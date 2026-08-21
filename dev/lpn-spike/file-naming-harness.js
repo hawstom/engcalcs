@@ -1,6 +1,13 @@
-// Task 315 — headless check of the project FILE NAME round trip.
+// Tasks 315 and 246 — headless check of the project FILE NAME round trip, and of the `.lwn`
+// identity that replaced the `-lpn` suffix.
 //
 //   node dev/lpn-spike/file-naming-harness.js
+//
+// The file is `.lwn` outside and JSON inside (Task 246). What that costs is a compatibility
+// obligation this harness is the guard for: EVERY name this page has ever written must still come
+// back as the project it names — `-lpn-hawsedc-engcalcs.json`, `-lpn.json`, and now bare `.lwn` —
+// because stranding somebody's saved documents to tidy up an extension is the worst trade
+// available here.
 //
 // Written 2026-08-14, the day the suffix went from `-lpn-hawsedc-engcalcs` to `-lpn`, because that
 // change puts a silent project-renaming bug one typo away and nothing else in the repo could see
@@ -51,8 +58,11 @@ const SUFFIX = constant('LPN_FILE_SUFFIX');
 const LEGACY = constant('LPN_FILE_SUFFIX_LEGACY');
 const FORMAT = constant('LPN_FILE_FORMAT');
 const APP = constant('LPN_FILE_APP');
+const EXT = constant('LPN_FILE_EXT');
+const EXT_LEGACY = constant('LPN_FILE_EXT_LEGACY');
 
 const LPN_FILE_SUFFIX = SUFFIX, LPN_FILE_SUFFIX_LEGACY = LEGACY;
+const LPN_FILE_EXT = EXT, LPN_FILE_EXT_LEGACY = EXT_LEGACY;
 eval(extract('safeFileName'));
 eval(extract('projectFileName'));
 eval(extract('projectNameFromFileName'));
@@ -67,10 +77,13 @@ function eq(actual, expected, label) {
 	report(actual === expected, label, actual === expected ? '' : `got ${JSON.stringify(actual)}, want ${JSON.stringify(expected)}`);
 }
 
-console.log('\n-- the suffix is short, and it is the one the constant says --');
-eq(projectFileName('Elm Street Center'), 'Elm-Street-Center' + SUFFIX + '.json', 'a spaced name becomes a dashed filename');
-report(SUFFIX.length <= 8, 'the suffix is short', `${SUFFIX.length} chars, was ${LEGACY.length}`);
-report(/\.json$/.test(projectFileName('X')), 'the extension is still .json — no generation-1 extension yet');
+console.log('\n-- the file identity: `.lwn`, and nothing else in the name (Task 246) --');
+eq(projectFileName('Elm Street Center'), 'Elm-Street-Center' + EXT, 'a spaced name becomes a dashed filename');
+eq(EXT, '.lwn', 'the extension is the one Tom bought the domain for');
+// The `-lpn` suffix existed only because a generic `.json` could not say what the file was. It has
+// an extension to say that now, so a new file must not wear BOTH -- that is the same fact twice.
+report(projectFileName('X').indexOf(SUFFIX) < 0, 'a NEW filename carries no -lpn suffix any more', projectFileName('X'));
+report(projectFileName('X').slice(-EXT.length) === EXT, 'and does carry the extension');
 
 console.log('\n-- round trip: name -> filename -> name --');
 [
@@ -85,9 +98,16 @@ console.log('\n-- round trip: name -> filename -> name --');
 	eq(projectNameFromFileName(projectFileName(name)), collapsed, `round trip: ${JSON.stringify(name)}`);
 });
 
-console.log('\n-- the legacy suffix is read FOREVER --');
-eq(projectNameFromFileName('Elm-Street-Center' + LEGACY + '.json'), 'Elm-Street-Center', 'a file saved before 2026-08-14 still opens with its name intact');
+console.log('\n-- everything ever written still opens (Task 246 strands nobody) --');
+eq(projectNameFromFileName('Elm-Street-Center' + LEGACY + EXT_LEGACY), 'Elm-Street-Center', 'a file saved before 2026-08-14 still opens with its name intact');
 eq(projectNameFromFileName('Elm-Street-Center' + LEGACY + '.JSON'), 'Elm-Street-Center', 'and the extension match is case-insensitive');
+eq(projectNameFromFileName('Elm-Street-Center' + SUFFIX + EXT_LEGACY), 'Elm-Street-Center', 'and so does a `-lpn.json` file, which is what most of them are');
+eq(projectNameFromFileName('Elm-Street-Center' + EXT), 'Elm-Street-Center', 'while a new `.lwn` gives its name back plainly');
+eq(projectNameFromFileName('Elm-Street-Center' + EXT.toUpperCase()), 'Elm-Street-Center', '...case-insensitively too');
+// An unescaped `.` in the extension pattern would eat the last letter of a name ending in `alwn`.
+// Silent, and it renames the user's project on the next save, which is what this whole function's
+// comment block is about.
+eq(projectNameFromFileName('Shoalwn'), 'Shoalwn', 'a name that merely ENDS in the extension letters is left alone');
 
 console.log('\n-- the suffixes overlap, so an UNANCHORED strip mangles --');
 // `-lpn` really is a prefix of `-lpn-hawsedc-engcalcs`. Task 315 read that as "strip longest
@@ -96,19 +116,19 @@ console.log('\n-- the suffixes overlap, so an UNANCHORED strip mangles --');
 // what makes an unanchored implementation silently wrong — but the ordering itself is not the bug.
 report(LEGACY.indexOf(SUFFIX) === 0, 'the short suffix is a prefix of the long one');
 const mangled = 'Elm-Street-Center' + LEGACY.slice(SUFFIX.length);
-report(projectNameFromFileName('Elm-Street-Center' + LEGACY + '.json') !== mangled,
+report(projectNameFromFileName('Elm-Street-Center' + LEGACY + EXT_LEGACY) !== mangled,
 	'a legacy file does not come back wearing the long suffix’s tail', `must not be ${JSON.stringify(mangled)}`);
 
 console.log('\n-- EXACTLY ONE suffix is stripped, never both --');
 // A user's project genuinely called `Z-lpn` was written by the old code as
 // `Z-lpn-lpn-hawsedc-engcalcs.json`. Chaining two replaces re-opens it as `Z`, silently losing
 // four characters the user typed.
-eq(projectNameFromFileName('Z' + SUFFIX + LEGACY + '.json'), 'Z' + SUFFIX, 'a legacy file whose project name ends in the short suffix keeps it');
-eq(projectNameFromFileName('Z' + LEGACY + SUFFIX + '.json'), 'Z' + LEGACY, 'and a new file whose project name ends in the long suffix keeps that');
+eq(projectNameFromFileName('Z' + SUFFIX + LEGACY + EXT_LEGACY), 'Z' + SUFFIX, 'a legacy file whose project name ends in the short suffix keeps it');
+eq(projectNameFromFileName('Z' + LEGACY + SUFFIX + EXT_LEGACY), 'Z' + LEGACY, 'and a new file whose project name ends in the long suffix keeps that');
 
 console.log('\n-- a name that is nothing but punctuation still yields a filename --');
-eq(projectFileName('///'), 'project' + SUFFIX + '.json', 'safeFileName’s fallback survives the suffix change');
-report(projectNameFromFileName('.json') === '.json', 'a filename that strips to empty returns itself rather than an empty project name');
+eq(projectFileName('///'), 'project' + EXT, 'safeFileName’s fallback survives the extension change');
+report(projectNameFromFileName(EXT) === EXT, 'a filename that strips to empty returns itself rather than an empty project name');
 
 console.log('\n-- the format marker, which is what makes the short name safe --');
 // The whole argument for cutting 26 characters off every filename is that the document now says
@@ -124,6 +144,53 @@ report(/^https:\/\//.test(APP), 'the app value is an https URL', APP);
 const origin = (fs.readFileSync(path.join(__dirname, '../../lib/config.inc.php'), 'utf8')
 	.match(/define\('CANONICAL_ORIGIN',\s*'([^']+)'\)/) || [])[1];
 report(!!origin && APP.indexOf(origin + '/') === 0, 'the app URL is under CANONICAL_ORIGIN', `${APP} vs ${origin}`);
+
+console.log('\n-- the pickers: write one extension, read both --');
+{
+	const save = extract('fileTypes');
+	const open = extract('fileTypesOpen');
+	report(save.indexOf('LPN_FILE_EXT_LEGACY') < 0 && save.indexOf('LPN_FILE_EXT') >= 0,
+		'Save as offers `.lwn` and only `.lwn`');
+	report(open.indexOf('LPN_FILE_EXT') >= 0 && open.indexOf('LPN_FILE_EXT_LEGACY') >= 0,
+		'Open accepts both, so an existing `.json` project is never stranded');
+	// The picker for OPEN must not be handed the save list, which is the one-character mistake that
+	// would hide every pre-Task-246 file behind a filter.
+	report(/showOpenFilePicker\(\{ multiple: false, types: fileTypesOpen\(\) \}\)/.test(src),
+		'and the Open picker is the one that gets the wider list');
+	report(/showSaveFilePicker\(\{ suggestedName: suggested, types: fileTypes\(\) \}\)/.test(src),
+		'while Save as gets the narrow one');
+	// The no-File-System-Access-API fallback is an <input type=file>, and its accept list is in the
+	// PHP. Same rule, different file, and it has been forgotten before.
+	const php = fs.readFileSync(path.join(__dirname, '../../Looped-Network.php'), 'utf8');
+	const inp = (php.match(/id="lpn_project_file"[^>]*/) || [''])[0];
+	report(inp.indexOf(EXT) >= 0 && inp.indexOf(EXT_LEGACY) >= 0,
+		'and the upload fallback accepts both too', inp);
+}
+
+console.log('\n-- open / save / save as, in that order, on the toolbar (Task 246) --');
+{
+	const bar = extract('wireToolbar');
+	// Where each button is NAMED, which is where it is built -- the icon name is the second
+	// argument to setIconLabel(), so a quoted `, 'open',` is that button and nothing else.
+	const order = ['open', 'save', 'saveas'].map(function (icon) {
+		return { icon: icon, at: bar.indexOf(", '" + icon + "',") };
+	});
+	order.forEach(function (o) { report(o.at >= 0, `the toolbar has a ${o.icon} button`); });
+	report(order.every(function (o, i) { return i === 0 || o.at > order[i - 1].at; }),
+		'and they are in the order every document program puts them in',
+		order.map(function (o) { return `${o.icon}@${o.at}`; }).join(' '));
+	// **NEW PROJECT IS THE ONE OF THE FOUR THAT IS NOT HERE**, and it is not an oversight. Task 246
+	// asks for all four; Tom removed New from the strip by name afterwards, on 2026-08-15, and
+	// dev/lpn-spike/toolbar-harness.js holds that instruction and asserts the absence. Both files
+	// would have to change together to put it back, which is the point of asserting it twice.
+	report(bar.indexOf(", 'new',") < 0, 'and New project is still off it, as Tom asked on 2026-08-15');
+	// Every icon has to be in the shared PHP set, or a button ships with no glyph at all.
+	const icons = fs.readFileSync(path.join(__dirname, '../../lib/Icons.lib.php'), 'utf8');
+	['new', 'open', 'save', 'saveas'].forEach(function (name) {
+		report(new RegExp("'" + name + "'\\s*=>").test(icons), `${name} is drawn in lib/Icons.lib.php`);
+	});
+	report(/openFromFile\(\)/.test(bar), 'and Open is the same command as File > Open…');
+}
 
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);

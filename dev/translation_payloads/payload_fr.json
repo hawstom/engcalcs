@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 1252,
-        "delta_key_count": 60,
+        "expected_key_count": 1253,
+        "delta_key_count": 61,
         "exempt_key_count": 43,
         "exempt_keys": [
             "u_depthFrac",
@@ -478,6 +478,7 @@
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
+        "lpn_file_open_tip": "Open a project file saved from this page.",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
         "lpn_notes_engine_term": "Which EPANET this page runs",
@@ -540,6 +541,7 @@
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
+        "lpn_file_open_tip": "Open a project file saved from this page.",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
         "lpn_notes_engine_term": "Which EPANET this page runs",
@@ -869,6 +871,22 @@
                     "key": "lpn_profile_from",
                     "value": "De",
                     "english": "From"
+                }
+            }
+        },
+        "lpn_file_open_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_upload_explain",
+                    "value": "Ce navigateur ne peut pas se connecter à un fichier, donc ouvrir un fichier ici revient à le téléverser : le projet est copié dans ce navigateur, et le seul moyen d'enregistrer votre travail dans le fichier est d'écraser celui-ci avec Fichier, Enregistrer sous.",
+                    "english": "This browser cannot connect to a file, so opening a file here is really an upload: the project is copied into this browser, and the only way to save your work back to the file is to overwrite the file with File, Save as."
+                },
+                "next_translated": {
+                    "key": "lpn_file_save_tip",
+                    "value": "Enregistre dans le fichier connecté.",
+                    "english": "Saves to the connected file."
                 }
             }
         },

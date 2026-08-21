@@ -10248,10 +10248,28 @@ var EngCalcs = EngCalcs || {};
 	// than any filename scheme, because a file in a forgotten folder is exactly the file somebody
 	// renamed. With that carried inside, the suffix only has to disambiguate at a glance.
 	//
-	// Deliberately still `.json`: the schema is moving and the product name is unsettled, so an
-	// extension would encode a name that does not exist yet -- and a web page cannot deliver the
-	// only real payoff of one (OS double-click association and a file-manager icon). Task 315 has
-	// the trigger that starts that clock.
+	// **THE EXTENSION IS `.lwn`, AND THE NAME IS STABLE** (Task 246). Tom, 2026-08-21: *"I bought
+	// LibreWaterNet.org, and it points to lpn. I feel that is a stable name: lwn"*. That is the
+	// trigger Task 315 was waiting for -- the argument for staying on `.json` was that an extension
+	// would encode a product name that did not exist yet, and now it does.
+	//
+	// **JSON INSIDE, `.lwn` OUTSIDE.** Nothing about the document changes; serializeProject() still
+	// writes JSON and acceptImportedText() still parses it, so a `.lwn` renamed to `.json` opens in
+	// any text editor exactly as before. The extension is a name for the KIND of document, which is
+	// the one thing a filename can carry that the file's own `format` key cannot: it is what the OS
+	// sorts, filters and (one day) associates on.
+	var LPN_FILE_EXT = '.lwn';
+	// **A FILE SAVED AS `.json` STILL OPENS, FOREVER.** Every project written before this wears it,
+	// and stranding somebody's documents to tidy up an extension would be the worst trade this page
+	// could make. Read on open, never written.
+	var LPN_FILE_EXT_LEGACY = '.json';
+	// **NEW FILES CARRY NO `-lpn` SUFFIX ANY MORE.** It existed for exactly one reason -- with a
+	// generic `.json` extension, something in the NAME had to say what the file was at a glance --
+	// and `.lwn` says it better, in the place an operating system actually looks. `Elm-Street.lwn`
+	// beats `Elm-Street-lpn.json`, and `Elm-Street-lpn.lwn` would be saying it twice.
+	//
+	// Both suffixes are still STRIPPED on the way in, forever: see projectNameFromFileName(), where
+	// getting this wrong silently renames a user's project on its next save.
 	var LPN_FILE_SUFFIX = '-lpn';
 	// Every file written before 2026-08-14 wears this. It is READ FOREVER -- see
 	// projectNameFromFileName(), where stripping it in the wrong order silently renames a project.
@@ -10303,7 +10321,7 @@ var EngCalcs = EngCalcs || {};
 				: ''));
 	}
 	function projectFileName(name) {
-		return safeFileName(name === undefined ? projectDisplayName(project) : name) + LPN_FILE_SUFFIX + '.json';
+		return safeFileName(name === undefined ? projectDisplayName(project) : name) + LPN_FILE_EXT;
 	}
 	// The Phase 1 path, and still the fallback wherever the File System Access API is missing
 	// (Firefox and Safari today). A one-shot download: the browser owns where it lands and there is
@@ -11073,9 +11091,23 @@ var EngCalcs = EngCalcs || {};
 	var fileWriteBusy = false;   // a write is in flight; never start a second one over it
 	var fileError = false;
 	function fileApiAvailable() { return typeof window.showSaveFilePicker === 'function'; }
+	// **WHAT WE WRITE.** One extension, ours, so a Save-as picker offers `.lwn` and nothing else --
+	// a save that can produce two extensions is a library where half the documents are invisible to
+	// the other half's filter.
 	function fileTypes() {
 		var pc = EngCalcs.pageConfig || {};
-		return [{ description: pc.lpn_file_type_desc || 'Project file', accept: { 'application/json': ['.json'] } }];
+		return [{ description: pc.lpn_file_type_desc || 'Project file', accept: { 'application/json': [LPN_FILE_EXT] } }];
+	}
+	// **WHAT WE READ**, which is deliberately wider: every project saved before Task 246 is a
+	// `.json`, and an Open dialogue that cannot see them would strand them behind an extension
+	// change nobody asked the user about. One entry rather than two, so the picker opens showing
+	// both kinds at once instead of making the user know which era their file is from.
+	function fileTypesOpen() {
+		var pc = EngCalcs.pageConfig || {};
+		return [{
+			description: pc.lpn_file_type_desc || 'Project file',
+			accept: { 'application/json': [LPN_FILE_EXT, LPN_FILE_EXT_LEGACY] }
+		}];
 	}
 	// Same honesty rule setStorageError() follows: a user who thinks they are editing a file must be
 	// told the moment they are not. Cleared by the next write that succeeds.
@@ -11367,7 +11399,15 @@ var EngCalcs = EngCalcs || {};
 	// is harmless while the strips stay `$`-ANCHORED. dev/lpn-spike/file-naming-harness.js pins both.
 
 	function projectNameFromFileName(fname) {
-		var s = String(fname).replace(/\.json$/i, ''), lower = s.toLowerCase();
+		// Either extension, because either can arrive: `.lwn` is what we write now and `.json` is
+		// what every file saved before Task 246 wears. Built from the constants rather than typed,
+		// so a future extension cannot be added in one place and forgotten in the other.
+		// The dot is escaped: an unescaped `.lwn` would also match `Xalwn`, which is a silent
+		// one-character rename of somebody's project rather than a visible bug.
+		var extRe = new RegExp('(' +
+				[LPN_FILE_EXT, LPN_FILE_EXT_LEGACY].join('|').replace(/\./g, '\\.') + ')$', 'i'),
+			s = String(fname).replace(extRe, ''),
+			lower = s.toLowerCase();
 		if (lower.slice(-LPN_FILE_SUFFIX_LEGACY.length) === LPN_FILE_SUFFIX_LEGACY) {
 			s = s.slice(0, -LPN_FILE_SUFFIX_LEGACY.length);
 		} else if (lower.slice(-LPN_FILE_SUFFIX.length) === LPN_FILE_SUFFIX) {
@@ -11602,7 +11642,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!requireFileIdentity('open')) { return; }
 		var picked;
-		try { picked = await window.showOpenFilePicker({ multiple: false, types: fileTypes() }); }
+		try { picked = await window.showOpenFilePicker({ multiple: false, types: fileTypesOpen() }); }
 		catch (err) { return; } // cancelled
 		await openHandle(picked[0]);
 	}
@@ -13732,7 +13772,26 @@ var EngCalcs = EngCalcs || {};
 		// SAVE AS IS NOT A SECOND-CLASS TWIN: a browser project has no file yet and a read-only
 		// project cannot write back to one, so on this page Save As is frequently the ONLY thing Save
 		// can mean. Both buttons, always, so the one that will work is on screen.
+		//
+		// **OPEN JOINED THEM (Task 246); NEW DID NOT, AND THAT IS DELIBERATE.** Task 246 asks for
+		// "new/open/save/save-as icons on the toolbar", which is the file group every document
+		// program puts first. Three of the four are here. New project is not, because Tom removed it
+		// by name six days after writing that line -- 2026-08-15: *"Let's remove New project and
+		// Background image from the toolbar and add Save and (since our paradigm often makes it the
+		// only choice) Save as…"* -- and dev/lpn-spike/toolbar-harness.js records that instruction
+		// with its reasoning. The later, more specific instruction wins; putting New back is a
+		// ten-line change if Tom wants the full four.
+		//
+		// Open is not covered by that removal: it was never on the strip and was never argued
+		// against, and it is the one file command with no other fast route in -- Save and Save as
+		// have buttons, and starting a new project is once per project, but finding an existing one
+		// is how most sessions begin.
 		var fileGroup = group();
+		var openBtn = document.createElement('button');
+		openBtn.type = 'button';
+		setIconLabel(openBtn, 'open', pc.lpn_file_open || 'Open…', pc.lpn_file_open_tip);
+		openBtn.addEventListener('click', function () { openFromFile(); });
+		fileGroup.appendChild(openBtn);
 		var saveBtn = document.createElement('button');
 		saveBtn.type = 'button';
 		setIconLabel(saveBtn, 'save', pc.lpn_file_save || 'Save', pc.lpn_file_save_tip);

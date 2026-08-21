@@ -182,7 +182,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 	<?php // Project import (Task 195). Lives here in the page, not inside any popover body, because
 	      // those bodies get rebuilt wholesale and would take the input's wired change handler with
 	      // them -- the same reason lpn_backdrop_file sits here. ?>
-	<input type="file" id="lpn_project_file" accept=".json,application/json" style="display:none">
+	<input type="file" id="lpn_project_file" accept=".lwn,.json,application/json" style="display:none">
 	<?php // EPANET import (Task 196). A SECOND picker rather than another accept type on the one
 	      // above: the two feed different readers, and one input serving both would have to guess
 	      // which from the extension -- a guess whose wrong answer is silent.
@@ -194,7 +194,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 	      // it serves is the recovery path for a lon/lat network in either kind of file. Which reader
 	      // a chosen file goes to is decided from its first character -- a project file is JSON --
 	      // never from its name, so the accept list only tidies the picker. ?>
-	<input type="file" id="lpn_geo_file" accept=".json,.inp,.net,application/json,text/plain" style="display:none">
+	<input type="file" id="lpn_geo_file" accept=".lwn,.json,.inp,.net,application/json,text/plain" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
 	      // mirrors #lpn_settings_box's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
@@ -1372,6 +1372,9 @@ EngCalcs.pageConfig = {
 	lpn_saveas_same_file: <?=json_encode($ec_lang['lpn_saveas_same_file'])?>,
 	lpn_saveas_overwrites_project: <?=json_encode($ec_lang['lpn_saveas_overwrites_project'])?>,
 	lpn_saveas_overwrites_newer: <?=json_encode($ec_lang['lpn_saveas_overwrites_newer'])?>,
+<?php   // The Open button on the toolbar (Task 246). It is icon-only there and carries a tip for
+        // the same reason Save and Save as do. ?>
+	lpn_file_open_tip: <?=json_encode($ec_lang['lpn_file_open_tip'])?>,
 	lpn_file_save_tip: <?=json_encode($ec_lang['lpn_file_save_tip'])?>,
 	lpn_file_saveas_tip: <?=json_encode($ec_lang['lpn_file_saveas_tip'])?>,
 	lpn_file_saveas_tip_download: <?=json_encode($ec_lang['lpn_file_saveas_tip_download'])?>,

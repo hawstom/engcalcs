@@ -1678,6 +1678,10 @@ $ec_lang['lpn_file_type_desc']='Project file';
 // file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
 // lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='This browser cannot connect to a file, so opening a file here is really an upload: the project is copied into this browser, and the only way to save your work back to the file is to overwrite the file with File, Save as.';
+// The tip on the Open button, which reached the toolbar with Task 246. It exists because that
+// button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
+// is where the rest of it lives.
+$ec_lang['lpn_file_open_tip']='Open a project file saved from this page.';
 // Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
 // cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='Saves to the connected file.';
