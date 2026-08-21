@@ -158,20 +158,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - The real task is the suite-wide pass: every visible string carrying "element" becomes "asset",
     in one commit, and one sprint retranslates them. `rename_lang_key.php` handles the keys; the
     VALUES are the paid part.
-- 60|456| **Net3-World has no time model at all**, which is why Tom's Run button and step selector
-  looked broken: `times`, `patterns` and `controls` are all absent from the file, so the duration is
-  0, there is exactly one reporting step and Play has nowhere to go. Net3 itself carries all three.
-  Not a converter defect — `georefFinish()` moves coordinates and touches none of them; the file was
-  saved from a Net3 that predated them.
-  - **The file is Tom's paste and ours to leave alone.** The fix is his: open Net3, File > Convert to
-    lat/lon, save over Net3-World. One operation, versus retyping 7 time fields, 5 patterns and 6
-    controls.
-  - **DONE, the product half (2026-08-19):** a project with no duration disables step-back, Play,
-    step-forward and the step selector, and every one of them carries `lpn_time_no_period`, which
-    names the cause and points at Total run time. Run stays live — with no duration it is an
-    ordinary recalculate. Five browser checks. **What is left is Tom's re-import**, and the task
-    stays open only for that.
-
 - 55|458| **One project mode, two names, in four languages.** `dev/scripts/mode_name_check.php` (new,
   advisory, in `check_all.sh`) opens on **14 disagreements in ru, sr, tr and zh** — a language's
   `lpn_geomap` or `lpn_xymap` says one thing and its other mode-naming strings say another, so a
@@ -929,9 +915,9 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     `dev/outreach-owa-post.md` — a real question, not an announcement. The name is legally safe
     (EPANET is public domain) but names run on community norms, and the note is cheap insurance.
 
-- 30|246| **Give `lpn_` a real file identity: `.lpn` extension and standard file-toolbar icons.**
-  Tom, 2026-08-09, from the epanet-js UX read. JSON inside, `.lpn` outside; new/open/save/save-as
-  icons on the toolbar. Cheap, and it is what makes a saved network feel like a document.
+- 85|246| **Give `lpn_` a real file identity: `.lwn` extension and standard file-toolbar icons.**
+  Tom, 2026-08-09, from the epanet-js UX read. JSON inside, `.lwn` outside; new/open/save/save-as
+  icons on the toolbar. Cheap, and it is what makes a saved network feel like a document. I bought LibreWaterNet.org, and it points to lpn. I feel that is a stable name: lwn
 
 - 20|247| **Demand allocation by customer (epanet-js has it, EPANET does not).** Tom, 2026-08-09.
   Assign named demands to a junction and sum them, rather than typing one lumped figure. Genuinely
