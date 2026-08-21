@@ -10,14 +10,33 @@ section is that most of what follows should never be said out loud.
 
 ---
 
-## 1. The voice rule — lead with invitation, not comparison
+## 1. The lead — an invitation to build, not a product pitch
 
-**Tom, 2026-08-14, when asked where our disposition toward epanet-js should live:** *"I'm not keen
-on saying a lot about comparisons with EPANET or epanetjs. I lean toward saying little more than
-'Join us in building LibreEPANET, for the community and by the community, today.' Or some such."*
+**Tom, 2026-08-21, redirecting LibreWaterNet.org:** *"I would rather focus on (A) building a new
+community-owned solution together. 'Looking for stakeholders, not for money.' 'Advisors, bug reports,
+power users with wish lists, and non-profit directors' and (B) 'World class and world owned' 'Water
+network design and management software for everybody everywhere.' More later, I hope."*
 
-That is the register. It matches what `about_body_html` already does with the licence — *"This is
-an invitation, not a price"* — and it is the reason this file is short.
+Those four quoted phrases are the copy brief, not raw material — use them as written.
+
+- **Pillar A is the ask.** *Looking for stakeholders, not for money.* Named audience, in Tom's order:
+  **advisors, bug reports, power users with wish lists, and non-profit directors.** There is no
+  donation route and none is implied; an ask that reads as fundraising with the ask hidden is worse
+  than no ask.
+- **Pillar B is the identity.** *World class and world owned.* *Water network design and management
+  software for everybody everywhere.*
+- **The invitation LEADS; the product follows it.** The product must still be findable — somebody
+  arriving because they want a network model has to learn it exists and works — but below the ask,
+  not above it. (Superseded lead, recorded so it is not reinstated by habit: the draft opened
+  *"Draw the network. Solve it. Publish the map."*)
+- **Say "we have not decided that yet" out loud.** There is no foundation, no board, no governance
+  document, no funding model and no dated roadmap. Inventing one is the failure mode here; the
+  absence is the reason advisors are wanted, so state it as the reason.
+
+This register was already Tom's on 2026-08-14, asked where our disposition toward epanet-js should
+live: *"I'm not keen on saying a lot about comparisons with EPANET or epanetjs. I lean toward saying
+little more than 'Join us in building LibreEPANET, for the community and by the community, today.'"*
+It matches what `about_body_html` does with the licence — *"This is an invitation, not a price."*
 
 Consequences, so the rule is operational rather than a sentiment:
 
@@ -27,9 +46,10 @@ Consequences, so the rule is operational rather than a sentiment:
 - **A comparison belongs only on a page where it can be substantiated**, which Task 296 already
   anticipated and nobody has written. If that page is ever wanted, it is a deliberate decision, not
   a place to spill this file into.
-- **"For the community, by the community" is the ask.** The invitation is to *build*, not to
-  *switch*. We are not running a migration campaign.
+- **The invitation is to *build*, not to *switch*.** We are not running a migration campaign.
 - **We are not the aggrieved party.** Nothing here is a grievance, and it should not read as one.
+
+The draft front door carrying this lead is `dev/librewaternet-landing/index.html`.
 
 ## 2. The one fact worth stating plainly
 
@@ -61,12 +81,14 @@ a verifiable fact rather than a matter of taste:
 1. **A licence that cannot be revoked.** GPL v3+ against FSL-1.1-MIT. See §2.
 2. **26 languages.** The suite's deepest single investment and the hardest thing here to replicate.
 3. **The annotated map** — see §4.
-4. **Offline PWA, and no third-party STORAGE at all.** *Corrected 2026-08-21: the older wording here,
-   "no third-party request of any kind", is no longer true and must not be repeated.* There are now
-   exactly two, both on the map page and both opt-in by using a feature: OpenStreetMap raster tiles for
-   a geographic project, and Nominatim for a place-name search. `dev/cookie-storage-inventory.md` is
-   the current and authoritative statement; state the exceptions plainly rather than burying them,
-   because a privacy claim with a footnote a reader has to go and find is not a privacy claim.
+4. **Offline PWA, and no third-party STORAGE at all.** There are **three** third-party requests, all
+   on the map page and all opt-in by using the feature: OpenStreetMap street tiles, Mapbox satellite
+   tiles, and Nominatim place-name search, which has its own consent gate (`ec_geosearch`) because a
+   tile says where you are looking and a search says what you typed. *"No third-party request of any
+   kind" is false and must never be written again.* The public framing is **we ask you each time, per
+   feature** — and the count is small enough to state, so state both. `dev/cookie-storage-inventory.md`
+   is authoritative; a privacy claim with a footnote a reader has to go and find is not a privacy
+   claim.
 5. **Distribution.** Real existing reach into hands that are not shopping for a network solver.
 
 ### Phone and field use is DEMOTED, and is not touted
@@ -176,7 +198,7 @@ Revisit when the gate clears.
 | `js/vendor/README.md` | The FSL/MIT split, verbatim and authoritative. Do not duplicate it. |
 | `dev/looped-network-calculator-scope.md` | Scope gravity toward EPANET as the project's biggest risk; what is cut, and why. |
 | `dev/outreach-owa-post.md` | The register for approaching a developer community, and a worked example. |
-| `dev/cookie-storage-inventory.md` | The no-third-party claim `privacy.php` makes publicly. |
+| `dev/cookie-storage-inventory.md` | The three opt-in third-party requests, and what `privacy.php` says publicly. |
 | ROADMAP Task 222 | Original 2026-08-05 research; the EPANET-as-qualification-gate ruling. |
 | ROADMAP Task 244 | The navbar term for the licence distinction. |
 | ROADMAP Task 296 | Trademarks out of titles; "with the EPANET engine", never "EPANET-powered". |
