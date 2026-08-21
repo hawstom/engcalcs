@@ -10,11 +10,12 @@ const { Session } = require('../lib/session');
 
 exports.title = '1 & 5. First save, save again, save as, and opening';
 
-// The suffix is `-lpn`, four characters, since Task 315 — the 30-character `-lpn-hawsedc-engcalcs`
-// it used to be is still READ (projectNameFromFileName) but is never written again. FILE1 is spelt
-// the way the page itself would suggest it, because the check below is that it does.
-const FILE1 = 'Project1-lpn.json';
-const FILE2 = 'Second-lpn.json';
+// The extension is `.lwn` and there is no name suffix at all, since Task 246 — `-lpn.json` and the
+// 30-character `-lpn-hawsedc-engcalcs.json` are still READ (projectNameFromFileName) but are never
+// written again. FILE1 is spelt the way the page itself would suggest it, because the check below
+// is that it does.
+const FILE1 = 'Project1.lwn';
+const FILE2 = 'Second.lwn';
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -45,7 +46,7 @@ exports.run = async function ({ browser, report }) {
 
 		const calls = await a.pickerCalls();
 		report.eq(calls.length, 1, 'Continue reaches the file dialog');
-		report.eq(calls[0] && calls[0].suggestedName, FILE1, 'suggested name is <project>-lpn.json');
+		report.eq(calls[0] && calls[0].suggestedName, FILE1, 'suggested name is <project>.lwn');
 
 		const text1 = await a.readFile(FILE1);
 		report.ok(!!text1, 'the file exists on disk');
