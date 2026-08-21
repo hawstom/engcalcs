@@ -7,15 +7,18 @@ EngCalcs.pageCalculator = function(objForm) {
 	this.readFormInput(objForm, 'cs_Q_out',        hasUnits = true);
 	this.readFormInput(objForm, 'cs_L',            hasUnits = true);
 	this.readFormInput(objForm, 'cs_wp',           hasUnits = true);
-	this.readFormInput(objForm, 'cs_water_value',  hasUnits = true);
-	this.readFormInput(objForm, 'cs_lining_cost',  hasUnits = true);
+	// Prices PER a unit, so they convert by the RECIPROCAL of the unit factor -- a cubic metre
+	// of water costs 35.3147 times what a cubic foot costs. readFormInput() divides, which is
+	// right for a quantity and wrong by the factor SQUARED for a rate (Task 473).
+	this.readFormInputPerUnit(objForm, 'cs_water_value');
+	this.readFormInputPerUnit(objForm, 'cs_lining_cost');
 	this.readFormInput(objForm, 'cs_Ec_target',    hasUnits = false);
 
 	var Q_in      = this.var.cs_Q_in;      // m³/s SI
 	var Q_out     = this.var.cs_Q_out;     // m³/s SI
 	var L         = this.var.cs_L;         // m SI
 	var wp        = this.var.cs_wp;        // m SI
-	var wv        = this.var.cs_water_value;  // currency per m³ SI (unit factor applied by readFormInput)
+	var wv        = this.var.cs_water_value;  // currency per m³ SI
 	var lc        = this.var.cs_lining_cost;  // currency per m² SI
 	var Ec_target = this.var.cs_Ec_target; // fraction 0–1
 
@@ -34,10 +37,8 @@ EngCalcs.pageCalculator = function(objForm) {
 	var lining_area = L * wp;  // m²
 	this.var.cs_lining_area = lining_area;
 
-	// Annual volume lost in m³; water_value is currency/m³ after unit conversion
+	// Annual volume lost in m³; wv is currency/m³ SI
 	var annual_vol_lost = this.var.cs_Vol_year;  // m³
-	// wv was read with hasUnits=true using the m3/ft3/acft unit selector,
-	// so readFormInput divided by the unit factor, giving currency/m³ SI.
 	var annual_value_lost = annual_vol_lost * wv;
 	this.var.cs_annual_value_lost = annual_value_lost;
 
@@ -50,7 +51,6 @@ EngCalcs.pageCalculator = function(objForm) {
 	var annual_value_recovered = annual_vol_recovered * wv;
 	this.var.cs_annual_value_recovered = annual_value_recovered;
 
-	// lc was read with hasUnits=true using the m2/ft2 unit selector → currency/m² SI
 	var total_lining_cost = lining_area * lc;
 	this.var.cs_lining_total_cost = total_lining_cost;
 

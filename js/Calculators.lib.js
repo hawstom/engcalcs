@@ -814,6 +814,20 @@ EngCalcs.readFormInput = function (objForm, name, hasUnits) {
 	this.var[name] = objForm[name].value / numUnitsFactor;
 };
 
+/**
+	* readFormInputPerUnit() -- read a RATE expressed PER one of the field's units: a price per
+	* cubic foot, a cost per square metre. ADDITIVE, beside readFormInput(), never a change to it.
+	*
+	* readFormInput() DIVIDES by the factor, which is right for a QUANTITY of that unit (20 ft3 is
+	* 20/35.3147 m3). A price PER that unit converts by the RECIPROCAL -- a cubic metre of water
+	* costs 35.3147 times what a cubic foot costs -- so this MULTIPLIES. Getting the two confused
+	* is wrong by the factor SQUARED and is invisible under SI, where every factor is 1 (Task 473).
+	*/
+EngCalcs.readFormInputPerUnit = function (objForm, name) {
+	'use strict';
+	this.var[name] = objForm[name].value * this.unitFactor(objForm[name + 'u']);
+};
+
 EngCalcs.writeFormResult = function (objForm, name, precision, hasUnits) {
 	'use strict';
 	var numUnitsFactor = (hasUnits === true) ? this.unitFactor(objForm[name + 'u']) : 1;

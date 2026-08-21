@@ -19,26 +19,23 @@
 // them are right. That second half is the whole risk on this page, and it is where the defect
 // below lives.
 //
-// A DEFECT FOUND, AND DELIBERATELY NOT ASSERTED -- THE TWO CURRENCY INPUTS ARE CONVERTED THE
-// WRONG WAY ROUND. `cs_water_value` is a price PER UNIT VOLUME and `cs_lining_cost` a price PER
-// UNIT AREA, so each converts by the RECIPROCAL of its unit's factor: a cubic metre of water
-// costs 35.3147 times what a cubic foot costs. Both are read with `readFormInput(..., true)`,
-// which DIVIDES by the factor, so each is wrong by the factor SQUARED:
+// THE TWO CURRENCY INPUTS ARE RATES, AND CONVERT BY THE RECIPROCAL. `cs_water_value` is a price
+// PER UNIT VOLUME and `cs_lining_cost` a price PER UNIT AREA, so each converts by the RECIPROCAL
+// of its unit's factor: a cubic metre of water costs 35.3147 times what a cubic foot costs. Both
+// were once read with `readFormInput(..., true)`, which DIVIDES, so each was wrong by the factor
+// SQUARED -- and invisible under SI, where every factor is 1. The page now reads them through
+// `readFormInputPerUnit()` (Task 473), and the US money figures below are ASSERTED, not printed:
 //
 //     20 cfs in, 18 cfs out, 5,000 ft of canal, 20 ft wetted perimeter, water at $1.00/ft3,
 //     lining at $2.00/ft2, target Ec 0.95, under the US preset:
-//       annual value lost        page: $50,608.53      63,115,200 ft3 x $1/ft3 = $63,115,200
-//       annual value recovered   page: $25,304.27      31,557,600 ft3 x $1/ft3 = $31,557,600
-//       total lining cost        page: $1,726.19       100,000 ft2 x $2/ft2    = $200,000
-//     -- low by 35.3147^2 = 1,247 on the two water figures and by 10.7639^2 = 115.9 on the
-//     lining, and the payback years that divide one by the other are 10.76x too long.
+//       annual value lost        63,115,200 ft3 x $1/ft3 = $63,115,200   (was $50,608.53)
+//       annual value recovered   31,557,600 ft3 x $1/ft3 = $31,557,600   (was $25,304.27)
+//       total lining cost        100,000 ft2 x $2/ft2    = $200,000      (was $1,726.19)
+//     -- the old page was low by 35.3147^2 = 1,247 on the two water figures and by
+//     10.7639^2 = 115.9 on the lining, with the payback years 10.76x too long.
 //
-// UNDER THE SI PRESET EVERY FACTOR IS 1 AND ALL FOUR ARE CORRECT, which is why this was invisible:
-// the money section is right in metric and wrong in the preset the page opens on in English.
-// This harness asserts the money identities under SI, where they hold, and PRINTS the US case
-// rather than asserting either number -- pinning the wrong value as expected would make the
-// defect permanent, and asserting the right one would leave a red harness in the build.
-// Fixing it is a change to a shipped page's arithmetic and belongs to a person.
+// The RESULT side needs no such care: every currency result is a plain amount with no unit
+// select, written with hasUnits = false, and cs_payback_years is written straight into its cell.
 //
 // MUTATIONS TRIED, all caught:
 //   1. cs_Vol_year 365.25 -> 365                  (the annual volume and the SI money figures)
@@ -46,6 +43,7 @@
 //   3. the Ec_target > Ec_now clamp removed       (a target below the present efficiency)
 //   4. lining_area = L * wp -> L + wp             (lining area and the SI lining cost)
 //   5. cs_Vol_day 86400 -> 3600                   (the daily volume)
+//   6. readFormInputPerUnit -> readFormInput       (the US money figures and the US payback)
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -145,9 +143,8 @@ r.section('the same canal in SI -- the identities are unit-free, so they must su
 // =========================================================================================
 r.section('the money section, asserted where its unit conversions are the identity');
 
-// SI only, and the header explains why: under any other preset the two price inputs are converted
-// by their unit factor instead of its reciprocal. With every SI factor equal to 1 the arithmetic
-// is visible on its own, and these are the identities it is supposed to satisfy.
+// Under SI every factor is 1, so the arithmetic is visible on its own; the US block below is the
+// one that exercises the reciprocal conversion of the two price inputs.
 const si = loadCase('si');
 (function () {
 	const qLoss = CASE.qIn - CASE.qOut;
@@ -177,13 +174,46 @@ const si = loadCase('si');
 		`${(cost / recovered).toFixed(2)} years`);
 }());
 
-// And the US case, printed rather than asserted -- see the note at the top of this file.
-console.log(`  --    US preset: annual value lost reads ${us.html('cs_annual_value_lost')} where ` +
-	`${(CASE.qIn - CASE.qOut) * YEAR} ft3 at $${CASE.waterValue}/ft3 is ` +
-	`${(CASE.qIn - CASE.qOut) * YEAR * CASE.waterValue}`);
-console.log(`  --    US preset: lining bill reads ${us.html('cs_lining_total_cost')} where ` +
-	`${CASE.lengthFt * CASE.wpFt} ft2 at $${CASE.liningCost}/ft2 is ` +
-	`${CASE.lengthFt * CASE.wpFt * CASE.liningCost}`);
+// The same money, entered in US units -- the case that was wrong by the factor squared.
+(function () {
+	const qLoss = CASE.qIn - CASE.qOut;
+	const volYearFt3 = qLoss * YEAR;                               // ft3 lost in a Julian year
+	const areaFt2 = CASE.lengthFt * CASE.wpFt;                     // ft2 of lining
+	nearDisplayed(us.num('cs_annual_value_lost'), volYearFt3 * CASE.waterValue, 2,
+		'ft3 lost per year at a price per ft3 is that many dollars');
+	const recoveredFt3 = CASE.qIn * (CASE.ecTarget - CASE.qOut / CASE.qIn) * YEAR;
+	nearDisplayed(us.num('cs_annual_value_recovered'), recoveredFt3 * CASE.waterValue, 2,
+		'and the ft3 recovered by lining likewise');
+	nearDisplayed(us.num('cs_lining_total_cost'), areaFt2 * CASE.liningCost, 2,
+		'ft2 of lining at a price per ft2 is that many dollars');
+	// Currency is currency: the same physical canal at the same physical price must cost the
+	// same in either preset, and that invariance is what proves the direction of the conversion.
+	const siEquiv = loadCalculator('Canal-Seepage.php', { lang: 'es' });
+	siEquiv.units('si');
+	siEquiv.set({
+		cs_Q_in: CASE.qIn * FT3, cs_Q_out: CASE.qOut * FT3,
+		cs_L: CASE.lengthFt * FT, cs_wp: CASE.wpFt * FT,
+		cs_water_value: CASE.waterValue / FT3,      // the same price, per cubic metre
+		cs_lining_cost: CASE.liningCost / FT2,      // the same price, per square metre
+		cs_Ec_target: CASE.ecTarget
+	});
+	siEquiv.run();
+	r.close(siEquiv.num('cs_annual_value_lost'), us.num('cs_annual_value_lost'), 1e-6,
+		'the annual value lost is the same money in SI as in US');
+	r.close(siEquiv.num('cs_lining_total_cost'), us.num('cs_lining_total_cost'), 1e-6,
+		'and so is the lining bill');
+}());
+
+// Payback in US units, on the slow case, so the reciprocal reaches the years figure too.
+(function () {
+	// Water worth 2 cents a cubic foot against $4/ft2 lining: a payback of years, where the
+	// one-decimal cell means something.
+	const slowUs = loadCase('us', { waterValue: 0.02, liningCost: 4 });
+	const recovered = CASE.qIn * (CASE.ecTarget - CASE.qOut / CASE.qIn) * YEAR * 0.02;
+	const cost = CASE.lengthFt * CASE.wpFt * 4;
+	nearDisplayed(parseFloat(slowUs.html('cs_payback_years')), cost / recovered, 1,
+		'simple payback in US units is the capital cost over the annual saving');
+}());
 
 // =========================================================================================
 r.section('the recovery clamp, and a payback that does not exist');
