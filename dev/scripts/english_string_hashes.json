@@ -736,7 +736,7 @@
                 "lpn_settings_search",
                 "lpn_settings_search_tip",
                 "lpn_settings_sec_calculation",
-                "lpn_settings_sec_elements",
+                "lpn_settings_sec_assets",
                 "lpn_settings_sec_map",
                 "lpn_status_converted",
                 "lpn_status_inp_exported",
@@ -1581,7 +1581,7 @@
         "lpn_pump_point3": "0ddcc506737670ee2d236267c045c6c350bf161a",
         "lpn_push_base_only": "799b53da4ce1ca7bc4f89c34eb3f1371cfae69a6",
         "lpn_push_confirm": "9c2147d01b7df431fa33e0bf3a9ba2121359d7e4",
-        "lpn_push_elements": "affd85585aaa05156085b6b36922a0074ce00a8c",
+        "lpn_push_assets": "affd85585aaa05156085b6b36922a0074ce00a8c",
         "lpn_push_no_change": "689f4cfc508207bb07a4e150b8bc9d2ed3ae2b67",
         "lpn_push_none_displayed": "86ae736ed5731b82efd555a332539d0465596111",
         "lpn_push_nothing": "79e9a0d336c84a5564847658059c9ef2e9f5c305",
@@ -1682,7 +1682,7 @@
         "lpn_settings_search": "9a6f37a7bf9c2e64efe7d7374dda5f7ae051bd8b",
         "lpn_settings_search_tip": "eb6af12fb4dbea319a6924ce0b890cfaf8ee368d",
         "lpn_settings_sec_calculation": "dc6751bd6532a841494c31d2cb271a6c23434bcc",
-        "lpn_settings_sec_elements": "3d6a7a7cedeede15fa63358493d0150b024a7c02",
+        "lpn_settings_sec_assets": "3d6a7a7cedeede15fa63358493d0150b024a7c02",
         "lpn_settings_sec_map": "de1c309b44683a001edb720820f80e41779d3f21",
         "lpn_settings_sec_visualization": "d175985b87dd9f620aa960059c730b4a35e3bcb5",
         "lpn_settings_show_titles": "35992d6f38a21a851fe018bde1467dc3a8a875ad",
@@ -4710,7 +4710,7 @@
             "words": 23,
             "ends_sentence": true
         },
-        "lpn_push_elements": {
+        "lpn_push_assets": {
             "words": 3,
             "ends_sentence": true
         },
@@ -5110,7 +5110,7 @@
             "words": 1,
             "ends_sentence": false
         },
-        "lpn_settings_sec_elements": {
+        "lpn_settings_sec_assets": {
             "words": 2,
             "ends_sentence": false
         },

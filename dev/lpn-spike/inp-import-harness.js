@@ -96,7 +96,10 @@ const L = loadLoopedNetwork(
 	// a second opinion about our own format.
 	"\t\topenAsGeo: openAsGeoFile, serialize: serializeProject,\n" +
 	"\t\tgeorefState: function () { return georef; }, georefCancel: georefCancel,\n" +
-	"\t\tgeorefFinish: georefFinish, georefSetTransform: georefSetTransform, "
+	"\t\tgeorefFinish: georefFinish, georefSetTransform: georefSetTransform,\n" +
+	// Task 447, revised 2026-08-21: the reinterpret arm is a BUTTON now, not a guess, so the
+	// harness has to press it the way the bar does.
+	"\t\tgeorefArmAsDegrees: georefArmAsDegrees, "
 );
 L.buildLayers();
 
@@ -621,17 +624,28 @@ console.log('\n--- Import xy to lat/lon…, over an .inp and over a project file
 // structurally rather than by rounding: the document is written only by georefSetTransform(), and
 // only a user gesture calls that. The `!==` check after a real drag is what stops that from being a
 // wizard that quietly applies nothing.
-console.log('\n--- the numbers decide where the wizard opens, and a reinterpret moves nothing ---');
+console.log('\n--- the wizard always opens at step 1, and the reinterpret button moves nothing ---');
 {
 	// The file's own coordinates, y NEGATED because memory is y-down and the file is Cartesian.
 	const FILE_COORDS = '[["J1",-122.5686103,-38.106067],["R1",-122.57,-38.107]]';
 	const coords = () => JSON.stringify(L.getDoc().nodes.map(n => [n.id, n.x, n.y]));
 
+	// **THE RANGE TEST NO LONGER DECIDES ANYTHING** (Tom, 2026-08-21: EPA's own Net3, whose
+	// coordinates run x 8..45 and y 0..31, armed as degrees and landed in North Darfur). Every
+	// small drawing fits inside +/-180 and +/-90, so the test's answer was never evidence. The
+	// wizard opens where the menu row promised, and the reinterpret case is offered as a button.
 	L.openAsGeo({ name: 'really-lonlat.inp', _text: INP_NONE });
-	const armed = L.georefState();
-	ok('coordinates that CAN be read as degrees arm the wizard attached, on the ground',
-		!!armed && armed.step === 2, armed && armed.step);
-	ok('...and not one of them moved', coords() === FILE_COORDS, coords());
+	let armed = L.georefState();
+	ok('coordinates that CAN be read as degrees still open at step 1, like any other drawing',
+		!!armed && armed.step === 1, armed && armed.step);
+	ok('...and the bar is told it may offer the reinterpret button', !!armed && armed.mayBeDegrees === true);
+
+	// Pressing it is what arms the reinterpret, and it is exact AFTER a step of panning because it
+	// rebuilds from the numbers the document arrived with, not from what step 1 has been drawing.
+	L.georefArmAsDegrees();
+	armed = L.georefState();
+	ok('the button arms the wizard attached, on the ground', !!armed && armed.step === 2, armed && armed.step);
+	ok('...and not one coordinate moved', coords() === FILE_COORDS, coords());
 	L.georefFinish();
 	ok('Keep this placement, untouched, commits the file\'s own numbers byte for byte',
 		coords() === FILE_COORDS, coords());
@@ -640,20 +654,22 @@ console.log('\n--- the numbers decide where the wizard opens, and a reinterpret 
 	// The other direction, so the pass-through above cannot be hiding a wizard that never applies
 	// anything: a real gesture must really move the network.
 	L.openAsGeo({ name: 'really-lonlat.inp', _text: INP_NONE });
+	L.georefArmAsDegrees();
 	L.georefSetTransform(EngCalcs.lpnGeorefWithTranslation(L.georefState().t, 0.01, -0.02));
 	ok('after a real drag the coordinates DID change', coords() !== FILE_COORDS, coords());
 	L.georefCancel();
 	ok('...and Cancel puts the file\'s own numbers back, byte for byte', coords() === FILE_COORDS, coords());
 
 	// State Plane: half a million feet east, four million north. No such pair is a coordinate on the
-	// Earth, so there is no question to ask and the wizard opens where it always did.
+	// Earth, so the button is not offered at all.
 	const STATE_PLANE = probeInp(['[BACKDROP]', ' UNITS  Feet', ''])
 		.replace(' J1  -122.5686103  38.106067', ' J1  579350  4218000')
 		.replace(' R1  -122.5700  38.1070', ' R1  579900  4218600');
 	L.openAsGeo({ name: 'state-plane.inp', _text: STATE_PLANE });
 	const far = L.georefState();
-	ok('coordinates that CANNOT be degrees open detached, at the centre of the world',
+	ok('coordinates that CANNOT be degrees open at step 1 too, at the centre of the world',
 		!!far && far.step === 1, far && far.step);
+	ok('...and the reinterpret button is not offered for them', !!far && far.mayBeDegrees === false);
 	ok('...with the model mapped onto plausible lon/lat rather than left at half a million',
 		L.getDoc().nodes.every(n => Math.abs(n.x) <= 180 && Math.abs(n.y) <= 90), coords());
 	L.georefCancel();

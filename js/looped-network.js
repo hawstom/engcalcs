@@ -5686,6 +5686,12 @@ var EngCalcs = EngCalcs || {};
 		georefBarEl('lpn_georef_detach').textContent = pc.lpn_georef_detach || 'Pick it up again';
 		georefBarEl('lpn_georef_detach').style.display = detached ? 'none' : '';
 		if (georefBarEl('lpn_georef_goto')) { georefBarEl('lpn_georef_goto').style.display = detached ? '' : 'none'; }
+		// Offered only while the model is still in hand, and only when the numbers COULD be
+		// coordinates -- see georefStart(). It is the one thing on this bar that says the drawing
+		// does not need placing at all.
+		if (georefBarEl('lpn_georef_asdeg')) {
+			georefBarEl('lpn_georef_asdeg').style.display = (detached && georef.mayBeDegrees) ? '' : 'none';
+		}
 		georefBarEl('lpn_georef_finish').style.display = detached ? 'none' : '';
 		georefBarEl('lpn_georef_numbers').style.display = detached ? 'none' : '';
 		if (!detached && georef.t) {
@@ -5722,6 +5728,13 @@ var EngCalcs = EngCalcs || {};
 		// travel: the model follows the middle of the map, so moving the map is the whole gesture.
 		var go = georefBarEl('lpn_georef_goto');
 		if (go) { go.addEventListener('click', goToLatLon); }
+		var asdeg = georefBarEl('lpn_georef_asdeg');
+		if (asdeg) {
+			asdeg.addEventListener('click', function () {
+				if (!georef || !georef.mayBeDegrees) { return; }
+				georefArmAsDegrees();
+			});
+		}
 		georefBarEl('lpn_georef_drop').addEventListener('click', georefAttach);
 		georefBarEl('lpn_georef_detach').addEventListener('click', georefDetach);
 		georefBarEl('lpn_georef_finish').addEventListener('click', georefFinish);
@@ -5897,7 +5910,19 @@ var EngCalcs = EngCalcs || {};
 		// cannot be done to the precision it already had. So the range test picks the wizard's
 		// STARTING POSITION. It decides nothing behind the user's back: the bar is armed either way,
 		// Keep this placement still commits and Cancel still restores.
-		if (georefSrcReadsAsDegrees()) { georefArmAsDegrees(); return; }
+		// **THE RANGE TEST NO LONGER DECIDES ANYTHING BY ITSELF** (Tom, 2026-08-21, importing EPA's
+		// own Net3: *"it put me at Step 2 in North Darfur"*). Net3's coordinates run x 8..45,
+		// y 0..31 -- an ordinary small XY drawing, and also a perfectly valid lon/lat box, so the
+		// test said DEGREES and dropped the model at 26E 15N. It could not have said anything else:
+		// nearly every drawing made on a plain grid fits inside +/-180 and +/-90, so the test's
+		// false-positive rate on the case it is supposed to reject is close to 100%.
+		//
+		// So the wizard always opens at step 1, which is what the menu row the user chose promised,
+		// and the reinterpret case is a BUTTON on the bar instead of a guess. Nothing is lost by
+		// waiting: georefArmAsDegrees() rebuilds every point from `georef.restore`, the numbers the
+		// document arrived with, so arming it after a step of panning is exactly as exact as arming
+		// it on the first frame.
+		georef.mayBeDegrees = georefSrcReadsAsDegrees();
 		// **THE CONVERSION OPENS ON THE WHOLE EARTH.** Tom, 2026-08-18: *"Change the default view to
 		// entire world, whatever location and zoom that is, so that they can zoom to their
 		// location."* The old home view was the ground under EPA's Net3, which is a fine place for a
@@ -5964,15 +5989,18 @@ var EngCalcs = EngCalcs || {};
 		georef.t = t;
 		georef.rotDeg = 0;
 		georefSuspend(true);
-		// **NO FIT HERE, AND NO WHOLE-EARTH VIEW EITHER.** The view this project opened with was
-		// fitted to these very coordinates a moment ago, and not one of them has moved -- a scale in
-		// pixels per drawing unit and a scale in pixels per degree are the same number when the
-		// drawing unit IS a degree. Refitting would be the re-baselining Tom called "vanishingly
-		// defensible", and carrying the model out to the middle of the ocean is the thing this whole
-		// path exists to avoid.
+		// **AND THE VIEW GOES TO THE MODEL.** This used to refuse to fit, on the argument that the
+		// view was still the one fitted to these very coordinates when the project opened. That was
+		// true while arming happened on the wizard's first frame; it is not true now that the user
+		// reaches this through a button on the bar, by which time step 1 has already carried them
+		// out to the whole Earth. Fitting is not re-baselining anything -- not one coordinate moves
+		// here -- it is pointing the camera at where the numbers say the network already is.
 		buildDom();
 		refreshSymbolSizes();
 		refreshTextLabelSizes();
+		// AUTOMATIC, because the user asked to reinterpret the coordinates and not to change the
+		// view: a bare fit here would set the asterisk for a camera move nobody made.
+		zoomExtent(true);
 		georefApplyCompensation();
 		georefDrawFrame();
 		georefRefreshBar();
@@ -7616,22 +7644,14 @@ var EngCalcs = EngCalcs || {};
 			}
 			target.appendChild(wrap);
 			target.appendChild(msg);
-			// FILL THEM FROM THE METHOD AGAIN. The one button here, because the modes replaced the
-			// two one-shot buttons that used to write numbers into these boxes: "Equal intervals"
-			// and "Equal counts" are modes now, and a user who has typed over them needs a way
-			// back. It writes; it does not switch anything to a live setting, because there is no
-			// live setting -- the limits are static for the project either way.
-			var btnWrap = document.createElement('div');
-			btnWrap.style.marginTop = '4px';
-			var clearBtn = document.createElement('button');
-			clearBtn.type = 'button';
-			clearBtn.textContent = pc.lpn_settings_color_auto || 'Automatic';
-			clearBtn.addEventListener('click', function () {
-				fillFromMethod(group, field);
-				refreshValueColors(); saveToStorage(); syncColorControls();
-			});
-			btnWrap.appendChild(clearBtn);
-			target.appendChild(btnWrap);
+			// **THERE IS NO "AUTOMATIC" BUTTON** (Tom, 2026-08-21: *"What is the 'Automatic' button
+			// for. It contradicts the explanation. Automatic happens when you choose a
+			// classification method. Manual happens when you change a boundary."*). Exactly so, and
+			// the button was worse than redundant: on a set the user had typed over -- the only
+			// state anybody would press it in -- it silently switched the method to Equal intervals
+			// while calling itself Automatic. Choosing a method in the dropdown above already
+			// refills these boxes from the system as it is now, says which method it used, and is
+			// the same one gesture. A user who wants the numbers back picks the method they meant.
 		}
 		buildGroup('node');
 		buildGroup('link');
@@ -15116,9 +15136,16 @@ var EngCalcs = EngCalcs || {};
 		// The prefix/suffix pair for one row. Both boxes show the EFFECTIVE text (so an untouched
 		// row still displays the default the map is printing) and write into labelSettings, which
 		// is what makes them per-project and what carries them into a saved file.
-		// TWO ROWS GET THEIR OWN TIP, both answering a question the user asks AT THAT BOX: ID ships
-		// blank while every other row shows a letter (an ID already begins with its own automatic
-		// prefix, J1, L1), and the gradient prints a '%' nobody typed.
+		// **ONE ROW GETS ITS OWN TIP, AND IT IS THE GRADIENT** -- it prints a '%' nobody typed, which
+		// is real behaviour the user cannot see anywhere else. The ID row used to get one too, and
+		// it is gone (Tom, 2026-08-21: *"Are IDs processed specially, such as stripping alphabetics
+		// or checking something in the event a prefix is given under symbology? I am thinking that
+		// this should not happen and ID should not need a special tip."*). It is not, and it should
+		// not: an ID label prints the stored ID exactly, a prefix typed on that row prints exactly
+		// as typed in front of it, and the only thing that made the row look special was that its
+		// DEFAULT prefix is blank -- which is also true of diameter and length, neither of which
+		// explains itself. A tip that exists to reassure the reader about a rule the page does not
+		// have is a tip that invents the rule.
 		// A tip, NOT a parenthetical in the row's LABEL: those label strings are shared with
 		// renderLabelsLegend(), so a parenthetical would print on the map legend too.
 
@@ -15126,7 +15153,7 @@ var EngCalcs = EngCalcs || {};
 			return {
 				prefix: {
 					value: labelPrefixFor(group, key),
-					title: (key === 'id' ? pc.lpn_labels_prefix_id_tip : pc.lpn_labels_prefix_tip) ||
+					title: pc.lpn_labels_prefix_tip ||
 						'Text shown before this value on the map',
 					onChange: function (v) { labelSettings.prefix[group][key] = v; }
 				},
@@ -15894,7 +15921,7 @@ var EngCalcs = EngCalcs || {};
 			// while "17 pipes and 5 junctions" would need one in every target language.
 			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing element with the current default inputs? Values you have typed will be overwritten. You can undo this.')
 				+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
-				+ '\n' + (pc.lpn_push_elements || 'Elements:') + ' ' + targets;
+				+ '\n' + (pc.lpn_push_assets || 'Nodes and pipes:') + ' ' + targets;
 			if (!window.confirm(msg)) { return; }
 			saveUndoSnapshot();
 			doc.nodes.forEach(function (n) {

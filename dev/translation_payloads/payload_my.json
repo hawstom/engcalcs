@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1237,
-        "delta_key_count": 44,
+        "expected_key_count": 1238,
+        "delta_key_count": 47,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -446,12 +446,15 @@
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
+        "lpn_georef_asdeg_btn": "These are already lon\/lat",
+        "lpn_georef_asdeg_tip": "Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.",
         "lpn_georef_asdegrees": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press Keep this placement.",
         "lpn_pane_tab_reservoirs": "Reservoirs",
         "lpn_pane_tab_tanks": "Tanks",
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
         "lpn_field_from": "From",
@@ -469,7 +472,7 @@
         "lpn_library_patterns_tip": "A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.",
         "lpn_library_curves": "Curves",
         "lpn_library_curves_tip": "A curve is the points that say how a pump performs: how much head it makes at each flow.",
-        "lpn_library_curves_note": "A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that element and change its points there.",
+        "lpn_library_curves_note": "A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that asset and change its points there.",
         "lpn_library_controls": "Controls",
         "lpn_library_controls_tip": "A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.",
         "lpn_library_pattern_add": "Add a pattern",
@@ -492,12 +495,15 @@
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
+        "lpn_georef_asdeg_btn": "These are already lon\/lat",
+        "lpn_georef_asdeg_tip": "Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.",
         "lpn_georef_asdegrees": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press Keep this placement.",
         "lpn_pane_tab_reservoirs": "Reservoirs",
         "lpn_pane_tab_tanks": "Tanks",
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
         "lpn_field_from": "From",
@@ -515,7 +521,7 @@
         "lpn_library_patterns_tip": "A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.",
         "lpn_library_curves": "Curves",
         "lpn_library_curves_tip": "A curve is the points that say how a pump performs: how much head it makes at each flow.",
-        "lpn_library_curves_note": "A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that element and change its points there.",
+        "lpn_library_curves_note": "A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that asset and change its points there.",
         "lpn_library_controls": "Controls",
         "lpn_library_controls_tip": "A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.",
         "lpn_library_pattern_add": "Add a pattern",
@@ -598,6 +604,38 @@
                 }
             }
         },
+        "lpn_georef_asdeg_btn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_geo_tip",
+                    "value": "ဒေသန္တရ ဂရစ်ဒ်မှ လက်တွေ့ကမ္ဘာသို့။ xy ဂရစ်ဒ်ပေါ်တွင် ရေးဆွဲထားသော ပုံကို ပထဝီညှိကိန်းများအပေါ်သို့ ထားပါ၊ သို့မှသာ ၎င်းသည် ရှိသင့်ရာ လမ်းမြေပုံနေရာတွင် ကျနေမည်။ သင်ရိုက်ထည့်ခဲ့သော ဂဏန်းတိုင်း ဒီအတိုင်းကျန်ရှိနေမည် — X နှင့် Y တို့သာ လောင်ဂျီတွဒ်နှင့် လတ်တီကျုဒ်အဖြစ် ပြောင်းလဲမည်။",
+                    "english": "Opens a project file or an EPANET file in a new tab, on the street map. You place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. If the numbers in the file already are a longitude and a latitude, one button says so and the network jumps straight to where it belongs. Every number you typed stays as it is."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "ဤ xy ပရောဂျက်ကို ပထဝီပရောဂျက်အဖြစ် ပြောင်းမလား။ သင့်ပရောဂျက်ကို ကမ္ဘာ့မြေပုံ၏ အလယ်တွင် ထားပေးလိုက်ပါပြီ။ သင့်တည်နေရာသို့ ဇူးမ်လုပ်ပြီး မော်ဒယ်ကို လိုသလို ရွှေ့ပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ အစိတ်အပိုင်းများကို ချိန်ညှိစတင်ရန် အသင့်ဖြစ်သောအခါ ‘ဤနေရာချထားမှုကို ထားရှိပါ’ ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here."
+                }
+            }
+        },
+        "lpn_georef_asdeg_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_geo_tip",
+                    "value": "ဒေသန္တရ ဂရစ်ဒ်မှ လက်တွေ့ကမ္ဘာသို့။ xy ဂရစ်ဒ်ပေါ်တွင် ရေးဆွဲထားသော ပုံကို ပထဝီညှိကိန်းများအပေါ်သို့ ထားပါ၊ သို့မှသာ ၎င်းသည် ရှိသင့်ရာ လမ်းမြေပုံနေရာတွင် ကျနေမည်။ သင်ရိုက်ထည့်ခဲ့သော ဂဏန်းတိုင်း ဒီအတိုင်းကျန်ရှိနေမည် — X နှင့် Y တို့သာ လောင်ဂျီတွဒ်နှင့် လတ်တီကျုဒ်အဖြစ် ပြောင်းလဲမည်။",
+                    "english": "Opens a project file or an EPANET file in a new tab, on the street map. You place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. If the numbers in the file already are a longitude and a latitude, one button says so and the network jumps straight to where it belongs. Every number you typed stays as it is."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "ဤ xy ပရောဂျက်ကို ပထဝီပရောဂျက်အဖြစ် ပြောင်းမလား။ သင့်ပရောဂျက်ကို ကမ္ဘာ့မြေပုံ၏ အလယ်တွင် ထားပေးလိုက်ပါပြီ။ သင့်တည်နေရာသို့ ဇူးမ်လုပ်ပြီး မော်ဒယ်ကို လိုသလို ရွှေ့ပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ အစိတ်အပိုင်းများကို ချိန်ညှိစတင်ရန် အသင့်ဖြစ်သောအခါ ‘ဤနေရာချထားမှုကို ထားရှိပါ’ ကို နှိပ်ပါ။",
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here."
+                }
+            }
+        },
         "lpn_georef_asdegrees": {
             "reason": "missing",
             "current_value": null,
@@ -605,7 +643,7 @@
                 "previous_translated": {
                     "key": "lpn_file_import_geo_tip",
                     "value": "ဒေသန္တရ ဂရစ်ဒ်မှ လက်တွေ့ကမ္ဘာသို့။ xy ဂရစ်ဒ်ပေါ်တွင် ရေးဆွဲထားသော ပုံကို ပထဝီညှိကိန်းများအပေါ်သို့ ထားပါ၊ သို့မှသာ ၎င်းသည် ရှိသင့်ရာ လမ်းမြေပုံနေရာတွင် ကျနေမည်။ သင်ရိုက်ထည့်ခဲ့သော ဂဏန်းတိုင်း ဒီအတိုင်းကျန်ရှိနေမည် — X နှင့် Y တို့သာ လောင်ဂျီတွဒ်နှင့် လတ်တီကျုဒ်အဖြစ် ပြောင်းလဲမည်။",
-                    "english": "Opens a project file or an EPANET file in a new tab, on the street map. If the numbers in it can be read as a longitude and a latitude, the network opens right where it belongs. If they cannot, you place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. Every number you typed stays as it is."
+                    "english": "Opens a project file or an EPANET file in a new tab, on the street map. You place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. If the numbers in the file already are a longitude and a latitude, one button says so and the network jumps straight to where it belongs. Every number you typed stays as it is."
                 },
                 "next_translated": {
                     "key": "lpn_georef_intro",
@@ -694,6 +732,22 @@
                 }
             }
         },
+        "lpn_profile_title_syn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_title",
+                    "value": "လမ်းကြောင်းတစ်လျှောက် ပရိုဖိုင်း",
+                    "english": "Profile along a path"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_from",
+                    "value": "မှ",
+                    "english": "From"
+                }
+            }
+        },
         "lpn_notes_color_term": {
             "reason": "missing",
             "current_value": null,
@@ -701,7 +755,7 @@
                 "previous_translated": {
                     "key": "lpn_notes_4_def",
                     "value": "ပရောဂျက်တစ်ခုတွင် လိုအပ်ချက်များစွာကို ကိုင်ဆောင်နိုင်ရန် အခြေအနေအမျိုးမျိုး (scenarios)။ နေရာနှင့် ပိုက်လိုင်း အဖြေဇယားများ။ ပရောဂျက်တစ်ခုကို EPANET ဆီသို့ ပြန်ထုတ်နိုင်ရန် EPANET .inp ဖိုင်များ ရေးသားခြင်း။ မှတ်ချက်များနှင့် အကြံပြုချက်များကို အမြဲကြိုဆိုပါသည် (အထက်ရှိ တုံ့ပြန်ချက် လင့်ခ်ကို ကြည့်ပါ)။",
-                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Elements can be colored by their results, and Find picks out every element that meets a test."
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that meets a test."
                 },
                 "next_translated": {
                     "key": "lpn_notes_epanet_term",
@@ -717,7 +771,7 @@
                 "previous_translated": {
                     "key": "lpn_notes_4_def",
                     "value": "ပရောဂျက်တစ်ခုတွင် လိုအပ်ချက်များစွာကို ကိုင်ဆောင်နိုင်ရန် အခြေအနေအမျိုးမျိုး (scenarios)။ နေရာနှင့် ပိုက်လိုင်း အဖြေဇယားများ။ ပရောဂျက်တစ်ခုကို EPANET ဆီသို့ ပြန်ထုတ်နိုင်ရန် EPANET .inp ဖိုင်များ ရေးသားခြင်း။ မှတ်ချက်များနှင့် အကြံပြုချက်များကို အမြဲကြိုဆိုပါသည် (အထက်ရှိ တုံ့ပြန်ချက် လင့်ခ်ကို ကြည့်ပါ)။",
-                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Elements can be colored by their results, and Find picks out every element that meets a test."
+                    "english": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that meets a test."
                 },
                 "next_translated": {
                     "key": "lpn_notes_epanet_term",

@@ -783,19 +783,25 @@ console.log('== the limits are static, and a method fills them ==');
 		return (lk.children || []).every(o => o.value !== R.MANUAL_MODE);
 	})());
 
-	// AUTOMATIC FILLS THEM FROM THE METHOD AGAIN, and a field on Manual has no method to ask, so it
-	// moves to equal interval rather than leaving the picker naming a source that did not answer.
+	// **THERE IS NO AUTOMATIC BUTTON, AND THE DROPDOWN IS THE WAY BACK** (Tom, 2026-08-21: *"What
+	// is the 'Automatic' button for. It contradicts the explanation."*). It did the same job as
+	// choosing a method, and did it worse: on a field the user had typed over -- the only state
+	// anybody pressed it in -- it silently moved the method to Equal intervals while calling itself
+	// Automatic. So this now checks the button is gone and that the gesture it stood for still
+	// works through the control that names what it is doing.
 	L.buildColoringSection();
 	const autoBtn = walk(byId.lpn_set_colors_node)
 		.filter(e => e.tagName === 'BUTTON' && /Automatic/i.test(allText(e)))[0];
-	ok('the Automatic button is there to fill them again', !!autoBtn);
+	ok('there is no Automatic button', !autoBtn);
 	const typed = (s.colorBreaks['node.pressure'] || []).join(',');
-	fire(autoBtn, 'click');
-	ok('Automatic replaces the typed numbers with the method\'s answer',
+	const backSel = walk(byId.lpn_set_colors_node).filter(e => e.id === 'lpn_set_color_mode_node')[0];
+	backSel.value = 'equal';
+	fire(backSel, 'change');
+	ok('choosing a method replaces the typed numbers with that method\'s answer',
 		(s.colorBreaks['node.pressure'] || []).length > 0 &&
 		(s.colorBreaks['node.pressure'] || []).join(',') !== typed,
 		(s.colorBreaks['node.pressure'] || []).join(','));
-	ok('...and a field that was on Manual now names the method that answered',
+	ok('...and the field is on that method, not on Manual and not on a guess',
 		L.colorModeOf('node', 'pressure') === 'equal', L.colorModeOf('node', 'pressure'));
 	ok('...and what is stored is what is drawn',
 		L.effectiveBreaks('node', 'pressure').join(',') === (s.colorBreaks['node.pressure'] || []).join(','));

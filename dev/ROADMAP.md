@@ -656,6 +656,29 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **[H] The icon.** Tom asked: water drop? A drop reads at 16 px and says *the water model* rather
     than *a document*; a hydrant is more specific and busier. Decide before drawing.
 
+- 40|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
+  *"Properties are never dropped from node labels, so Node label drop order is a lie... As I look at
+  Net3, it seems to me that in many cases we could see many more node labels if some of the
+  requested node properties were dropped. We probably should try to implement it and then judge
+  whether the cost is too high."*
+  - Today the node Drop column orders the TESTS that decide which whole label is hidden
+    (`nodeDropKey`); only link labels shed (`shedOrder`, `shedToSegment`). The column reads as a
+    property drop order in both lists and is one only in one of them.
+  - **ANY overlap, not a vertical one** (Tom left the question open in the tip). `js/lpn-collide.js`
+    relaxes boxes and has no notion of an axis, so classifying an overlap as vertical means
+    inventing that notion and answering it for a diagonal overlap. A shed row also shortens the
+    widest line as often as not, so the axis would not predict what the shed buys anyway.
+  - Shed LAST, after placement has failed: place, find the labels still overlapping, drop the
+    lowest-ranked property from each, re-measure, re-place, repeat; hide only when one property is
+    left and the pair still overlaps. That loop is the cost to measure — link shedding is one
+    monotone width per step, node shedding changes a box and so changes the relaxation.
+  - **The tip is written and waiting.** `lpn_labels_priority_node_tip` says what is true today; the
+    agreed target wording is: *"The order in which properties are given up when two node labels
+    would overlap. The property numbered 1 is given up first, on both labels. When one property is
+    left and the two still overlap, a whole label is hidden: the one whose remaining value is worth
+    showing least — the lowest demand, the pressure nearest the middle of the range, or the
+    elevation or head closest to the neighbouring nodes."* Swap it in when this lands.
+
 - 25|468| **Demand categories on a junction — the breakdown the importer already flattens.**
   EPANET stacks (base demand, pattern, category) triples on one node and sums them; `js/lpn-inp.js`
   reads them, sums them into this page's single `demand`, and reports `demand-categories` as a

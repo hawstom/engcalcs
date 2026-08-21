@@ -239,9 +239,14 @@ console.log('\n--- moving the view is an edit, unless the app moved it ---');
 	// rezoom? To what? Who cares?"; boot on an empty map "Why is a zoom needed?"; and overall,
 	// "refitting and re-baselining: I see it as vanishingly defensible"). Seven became two, both of
 	// them the same case: a document that has no stored view has to be given one, once.
+	// The cap went 3 -> 4 on 2026-08-21, for georefArmAsDegrees(): pressing "These are already
+	// lon/lat" says the coordinates need no placing, and the camera then has to go to where those
+	// numbers put the network -- which by then is nowhere near the whole-Earth view step 1 opens
+	// on. Marked automatic because the user asked to reinterpret coordinates, not to move the view.
+	// **A FIFTH NEEDS THE SAME KIND OF SENTENCE, not a bumped number.**
 	const autos = (code.match(/zoomExtent\(true\)/g) || []).length;
-	ok('...and there are at most three of them left, all "this document has no view yet"',
-		autos <= 3, autos + ' automatic fit(s)');
+	ok('...and there are at most four of them left, each one named and argued for',
+		autos <= 4, autos + ' automatic fit(s)');
 	// **BOOT MUST GO THROUGH restoreViewOrFit(), NOT STRAIGHT TO A FIT**, or a reload ignores the
 	// document's saved view -- the one path where a user most expects to come back to where they
 	// were was the one path that would not. It had its own sequence and never picked up the call

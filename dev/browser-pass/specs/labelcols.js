@@ -173,6 +173,38 @@ exports.run = async function ({ browser, report }) {
 			`needs ${squeezed.scroll} px in ${squeezed.client} px` +
 			(squeezed.worst ? `; widest offender "${squeezed.worst.txt || squeezed.worst.id}" over by ${squeezed.worst.over}` : ''));
 
+		// ---- **AND THE COLUMNS DO NOT WALK RIGHT AS THE BOX GROWS** ------------------------------
+		//
+		// Tom, 2026-08-21: *"the Labels columns always float right. It seems like there should be
+		// something like a maximum width for the checkbox and labels column. Map appearance and Time
+		// seem to do it right."* Same defect the ID prefixes had, from the same cause: the name is
+		// `flex: 1 1 auto` and took every pixel the box was widened by. The ceiling is 11.5rem =
+		// --lpn-set-name, so a labels row and a settings row share ONE control x.
+		const walk2 = [];
+		for (const w of ['30rem', '44rem', '80rem']) {
+			await a.page.evaluate((width) => { document.getElementById('lpn_settings_box').style.width = width; }, w);
+			await a.settle(150);
+			walk2.push(await a.page.evaluate((width) => {
+				const pane = document.getElementById('lpn_setbox_content'), paneR = pane.getBoundingClientRect();
+				const row = document.getElementById('lpn_labels_node_fields').children[1];
+				const set = document.querySelector('#lpn_set_id_fields .lpn-set-row');
+				return {
+					w: width,
+					x: +(row.children[1].getBoundingClientRect().left - paneR.left).toFixed(1),
+					setX: set ? +(set.children[1].getBoundingClientRect().left - paneR.left).toFixed(1) : null
+				};
+			}, w));
+		}
+		const spread2 = Math.max(...walk2.map(d => d.x)) - Math.min(...walk2.map(d => d.x));
+		report.ok(spread2 <= 4,
+			'widening the box from 30rem to 80rem leaves the Labels columns where they were',
+			walk2.map(d => `${d.w}: x ${d.x}`).join('; ') + ` — spread ${spread2.toFixed(1)} px`);
+		report.ok(walk2.every(d => d.setX === null || Math.abs(d.x - d.setX) <= 8),
+			'...and they stand on the same x as every other control in the box',
+			walk2.map(d => `${d.w}: labels ${d.x} vs settings ${d.setX}`).join('; '));
+		await a.page.evaluate(() => { document.getElementById('lpn_settings_box').style.width = ''; });
+		await a.settle(150);
+
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');
 	} finally {
 		await a.close();

@@ -560,10 +560,26 @@ html[lang="zh"] .ec-welcome {
    them. Calculate is NOT one of them -- it works the moments out rather than choosing which one you
    are looking at, which is the same reason it is not in the transport's own comment in
    js/lpn-time.js. */
-#lpn_toolbar { display: flex; flex-wrap: wrap; align-items: center; row-gap: 4px; }
-/* Three groups (Add / Delete-Undo-Select / Zoom-Example) -- a wider gap, not a line, separates
-   them (Tom, 2026-07-30: a divider line was more than needed). */
-.lpn-toolbar-group { display: inline-flex; gap: 6px; margin-right: 14px; align-items: center; }
+/* **THE STRIP IS A REGION, AND ITS SECTIONS ARE DIVIDED** (Tom, 2026-08-21: "Don't toolbars
+   usually have region dividers/borders? Top, sections, bottom as applicable?"). They do, and this
+   one did not: a rule under the strip separates it from the tab strip and the map below, and a
+   hairline between groups separates the sections from each other.
+
+   This SUPERSEDES 2026-07-30's "a wider gap, not a line ... a divider line was more than needed",
+   which was decided when every control on the strip was a word. Words separate themselves; a run
+   of bare icons at one spacing does not, and 14 px of air between groups is not legible as a
+   boundary when the icons inside a group are 6 px apart.
+
+   Not on .lpn-toolbar-end: it is already pushed to the far edge by an auto margin, so a line
+   beside it would mark a gap the eye has already read. */
+#lpn_toolbar {
+	display: flex; flex-wrap: wrap; align-items: center; row-gap: 4px;
+	border-bottom: 1px solid #d6d6d6; padding-bottom: 4px; margin-bottom: 4px;
+}
+.lpn-toolbar-group { display: inline-flex; gap: 6px; margin-right: 12px; align-items: center; }
+.lpn-toolbar-group + .lpn-toolbar-group:not(.lpn-toolbar-end) {
+	border-left: 1px solid #d6d6d6; padding-left: 12px;
+}
 .lpn-transport-btn { font: inherit; cursor: pointer; }
 /* The right-hand end of the strip: Find and the bottom-pane toggle (Task 434). Pushed there by an
    auto margin rather than placed at a fixed offset, so it stays at the edge at every window width
@@ -1549,6 +1565,22 @@ html[lang="zh"] .ec-welcome {
    the names break mid-word, which the rule above allows and which is the correct last resort. */
 #lpn_labels_node_fields,
 #lpn_labels_link_fields { min-width: 13rem; }
+/* **AND A CEILING ON THE NAME, so the columns stop walking right** (Tom, 2026-08-21: "the Labels
+   columns always float right. It seems like there should be something like a maximum width for the
+   checkbox and labels column. Map appearance and Time seem to do it right"). They do, and this is
+   the same fix they got: the name is `flex: 1 1 auto`, so every pixel the panel is widened by went
+   to the name and carried the four boxes out to the right edge with it. With a ceiling the name
+   stops growing, the boxes stay where the reader last saw them, and the spare width goes to nobody
+   -- which is what a settings dialog does.
+
+   11.5rem is --lpn-set-name, the ceiling on the name column of every other row in this box, so a
+   labels row and a settings row now share ONE x for their controls rather than each having its
+   own. The heading row's lead cell takes it too, or the headings would stagger against the boxes
+   they name -- the defect this list has been fixed for twice. */
+#lpn_labels_node_fields > div > label,
+#lpn_labels_link_fields > div > label,
+#lpn_labels_node_fields > div > span:first-child,
+#lpn_labels_link_fields > div > span:first-child { max-width: 11.5rem; }
 
 /* ==== No window scrollbar on the map page (ROADMAP Task 432) =================================
    Tom, 2026-08-18: *"Our bottom controls bar should be the hard bottom of the page."* This is a

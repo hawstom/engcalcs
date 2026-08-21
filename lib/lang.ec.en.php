@@ -1125,7 +1125,7 @@ $ec_lang['lpn_tool_select']='Select';
 $ec_lang_syn['lpn_tool_select']='Select mode; the mode (state) in which you pick (select, choose, pick, point at, indicate, signal) things to act on rather than add things.';
 $ec_lang['lpn_tool_add_junction']='Junction';
 $ec_lang['lpn_tool_add_reservoir']='Reservoir';
-// A TANK is a separate element from a reservoir (ROADMAP Task 248, 2026-08-14), not a
+// A TANK is a separate asset from a reservoir (ROADMAP Task 248, 2026-08-14), not a
 // reservoir with a level typed into it. A reservoir never runs down; a tank does. A
 // steady-state solve cannot tell them apart, which is exactly why the two need different
 // names on screen -- the difference is in what happens next, not in this instant.
@@ -1172,7 +1172,7 @@ $ec_lang['lpn_field_elev_tip']='Ground or pipe level at this node. Measure it fr
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
 // This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
-// was no tank. Since Task 248 there is one, and the two are different elements: a reservoir's level
+// was no tank. Since Task 248 there is one, and the two are different assets: a reservoir's level
 // never moves, a tank's does. Raising a reservoir's head is still a legitimate thing to do -- it is
 // just not how you model storage any more.
 $ec_lang['lpn_field_head']='Head';
@@ -1359,7 +1359,13 @@ $ec_lang['lpn_xymap']='xy';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
 $ec_lang['lpn_file_import_geo']='Import xy to lat/lon…';
-$ec_lang['lpn_file_import_geo_tip']='Opens a project file or an EPANET file in a new tab, on the street map. If the numbers in it can be read as a longitude and a latitude, the network opens right where it belongs. If they cannot, you place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. Every number you typed stays as it is.';
+$ec_lang['lpn_file_import_geo_tip']='Opens a project file or an EPANET file in a new tab, on the street map. You place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. If the numbers in the file already are a longitude and a latitude, one button says so and the network jumps straight to where it belongs. Every number you typed stays as it is.';
+// **THE BUTTON, NOT A GUESS** (Tom, 2026-08-21, on importing Net3 and landing in North Darfur).
+// Offered in step 1 whenever every coordinate in the file would also be a valid longitude and
+// latitude -- which nearly every small drawing is -- so the sentence has to make the user the
+// judge rather than announce a finding.
+$ec_lang['lpn_georef_asdeg_btn']='These are already lon/lat';
+$ec_lang['lpn_georef_asdeg_tip']='Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.';
 $ec_lang['lpn_georef_asdegrees']='The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press Keep this placement.';
 $ec_lang['lpn_georef_intro']='Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here.';
 $ec_lang['lpn_georef_adjust']='The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to turn it. Or type the scale and the turn below.';
@@ -1423,8 +1429,8 @@ $ec_lang['lpn_georef_scale']='Ground distance per drawing unit';
 $ec_lang['lpn_georef_scale_tip']='How far one unit of your drawing reaches on the ground. A drawing made on a plain grid usually says nothing about this, so set it here — or let Go to… ask you how wide the site is and work it out.';
 $ec_lang['lpn_georef_rotation']='Turn anticlockwise (degrees)';
 $ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model, anticlockwise, so that its north points north.';
-$ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag single elements afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.';
-$ec_lang['lpn_georef_done']='This is a lat/lon project now. Drag any element to move it closer to where it really is.';
+$ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag single assets afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.';
+$ec_lang['lpn_georef_done']='This is a lat/lon project now. Drag any asset to move it closer to where it really is.';
 $ec_lang['lpn_georef_on_map']='This project is already on lat/lon.';
 $ec_lang['lpn_georef_empty']='That file has no network in it, so there is nothing to place.';
 $ec_lang['lpn_georef_unavailable']='The placement tool did not load. Reload the page and try again.';
@@ -1486,7 +1492,7 @@ $ec_lang['lpn_confirm_delete_network']='Delete every node, pipe, and text label 
 // Map Finder does, and a condition on a value, which nothing else offers. "Find" is the word every
 // editor uses for it.
 $ec_lang['lpn_find_menu']='Find';
-$ec_lang['lpn_find_title']='Find elements';
+$ec_lang['lpn_find_title']='Find assets';
 $ec_lang['lpn_find_scope']='What to search';
 $ec_lang['lpn_find_scope_all']='Everything';
 $ec_lang['lpn_find_property']='Property';
@@ -1519,8 +1525,9 @@ $ec_lang['lpn_find_no_value']='Type what to look for.';
 // {u} is a unit name, {n} a count and {len} a length; they are substituted, not concatenated, so a
 // language that puts the unit somewhere else can.
 $ec_lang['lpn_profile_menu']='Profile';
-$ec_lang['lpn_profile_tip']='Draw the ground and the hydraulic grade line along a path through the network.';
-$ec_lang['lpn_profile_title']='Profile along a route';
+$ec_lang['lpn_profile_tip']='Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.';
+$ec_lang['lpn_profile_title']='Profile along a path';
+$ec_lang['lpn_profile_title_syn']='Profile or cross section along a path, route, or way';
 $ec_lang['lpn_profile_from']='From';
 $ec_lang['lpn_profile_to']='To';
 $ec_lang['lpn_profile_pick']='Add nodes to the route by clicking them on the map';
@@ -1584,7 +1591,7 @@ $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add 
 // ---- EPANET .inp import (ROADMAP Task 196) ----
 // The import REPORTS every difference between the file and what this page can hold, so each
 // lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
-// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
+// to a list of asset IDs at render time and to nothing else -- no key here is a fragment of
 // another sentence, and none may become one.
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
@@ -1617,7 +1624,7 @@ $ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the fil
 // working out their network, not because anything was thrown away.
 $ec_lang['lpn_inp_drop_tcv']='These throttle valves came in as throttle valves, holding the same loss the file gives them. Either solver can work them out.';
 $ec_lang['lpn_inp_drop_valve_active']='These valves control pressure or flow, and they open and close on their own as the water changes. Nothing about them was lost on the way in, and this page solves them with the EPANET solver, turning that solver on by itself for this network.';
-$ec_lang['lpn_inp_drop_valve']='These valves are described by a curve or by a fixed pressure drop, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is holding pressure or flow there any more.';
+$ec_lang['lpn_inp_drop_valve']='These valves are described by a curve or by a fixed pressure drop, and this page has no such asset. They came in as open pipes, so the network is still joined up, but nothing is holding pressure or flow there any more.';
 $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.';
 $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
 $ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out, because the part of this page that runs a network through time did not load. Every demand is the number written in the file.';
@@ -1815,7 +1822,7 @@ $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the he
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
 $ec_lang['lpn_notes_4_term']='Also on this page';
-$ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Elements can be colored by their results, and Find picks out every element that meets a test.';
+$ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that meets a test.';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -1918,20 +1925,20 @@ $ec_lang['lpn_pump_point3']='Point 3';
 // Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
-$ec_lang['lpn_mode_select']='Mode: Select. Click an element or a label to see or change it. Drag to move a node, a vertex, or a label. Double-click a pipe to add or remove a vertex.';
-$ec_lang['lpn_mode_delete']='Mode: Delete. Click an element to remove it.';
+$ec_lang['lpn_mode_select']='Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Double-click a pipe to add or remove a vertex.';
+$ec_lang['lpn_mode_delete']='Mode: Delete. Click an asset to remove it.';
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
-$ec_lang['lpn_select_first']='Nothing is picked. Click an element on the map first, then press Delete.';
-$ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels.';
-$ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Click the map to place a reservoir. Switch to Select mode to change or move elements and labels.';
-$ec_lang['lpn_mode_add_tank']='Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move elements and labels.';
-$ec_lang['lpn_mode_add_pipe']='Mode: Add Pipe. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.';
-$ec_lang['lpn_mode_add_pump']='Mode: Add Pump. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.';
-$ec_lang['lpn_mode_add_valve']='Mode: Add Valve. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.';
+$ec_lang['lpn_select_first']='Nothing is picked. Click an asset on the map first, then press Delete.';
+$ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Click the map to place a reservoir. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_tank']='Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_pipe']='Mode: Add Pipe. Click a node, then another node, to connect them. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_pump']='Mode: Add Pump. Click a node, then another node, to connect them. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_valve']='Mode: Add Valve. Click a node, then another node, to connect them. Switch to Select mode to change or move assets and labels.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
-$ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a text label. Click near a node to attach the text to that node. Switch to Select mode to change or move elements and labels.';
+$ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a text label. Click near a node to attach the text to that node. Switch to Select mode to change or move assets and labels.';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
@@ -1965,19 +1972,18 @@ $ec_lang['lpn_labels_heading_link']='Link labels';
 $ec_lang['lpn_labels_decimals_tip']='Decimal places shown for this label';
 $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
 $ec_lang['lpn_labels_mark_extrema_tip']='Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.';
-// "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the elements
+// "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
 $ec_lang['lpn_settings_apply_to_all']='Apply to all';
-$ec_lang['lpn_settings_apply_to_all_tip']='Every element of this kind that is already drawn gets an ID starting with this text. Each one keeps its number. An ID that does not end in a number is left alone.';
-$ec_lang['lpn_confirm_apply_prefix']='Rename {n} elements so their IDs start with {prefix}? Each one keeps its number.';
-$ec_lang['lpn_prefix_applied']='Renamed {n} elements. {skipped} others were left alone.';
-$ec_lang['lpn_labels_prefix_tip']='Text shown before this value on the map';
-$ec_lang['lpn_labels_prefix_id_tip']='Text shown before the ID on the map. Leave this blank and the ID is shown on its own, starting with the letter it was given, such as J1 or L1.';
-$ec_lang['lpn_labels_suffix_tip']='Text shown after this value on the map';
-$ec_lang['lpn_labels_suffix_gradient_tip']='Text shown after the head loss gradient on the map. Do not type a percent sign here. It is added for you when the units are percent.';
+$ec_lang['lpn_settings_apply_to_all_tip']='Every asset of this kind that is already drawn gets an ID starting with this text. Each one keeps its number. An ID that does not end in a number is left alone.';
+$ec_lang['lpn_confirm_apply_prefix']='Rename {n} assets so their IDs start with {prefix}? Each one keeps its number.';
+$ec_lang['lpn_prefix_applied']='Renamed {n} assets. {skipped} others were left alone.';
+$ec_lang['lpn_labels_prefix_tip']='Text added before this property on map labels';
+$ec_lang['lpn_labels_suffix_tip']='Text added after this property on map labels';
+$ec_lang['lpn_labels_suffix_gradient_tip']='Text added after the head loss gradient on map labels. Do not type a percent sign here. It is added for you when the units are percent.';
 $ec_lang['lpn_labels_separator']='Text between values';
-$ec_lang['lpn_labels_separator_tip']='Text between one value and the next on a label. A space by default.';
+$ec_lang['lpn_labels_separator_tip']='Text between one property and the next on a label. A space by default.';
 // The Drop column in the Labels box (ROADMAP Task 397; inverted by Task 445). Both tips say "1 is
 // dropped first", because that one sentence is what the two columns share; what differs is WHAT the
 // number orders, and each tip says which. Kept plain and short: these sit on a small box in a
@@ -1988,7 +1994,7 @@ $ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped 
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
-$ec_lang['lpn_labels_priority_node_tip']='The order in which these tests are given up when the map is too crowded to show every node label: the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to that of the neighbouring nodes. The test numbered 1 is given up first, so the highest number decides which label is dropped.';
+$ec_lang['lpn_labels_priority_node_tip']='Which node property decides, when two labels would overlap and one of them has to go. The highest number decides first and the number 1 counts last. The label that goes is the one whose value is worth showing least: the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to that of the neighbouring nodes.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='Before';
@@ -2066,22 +2072,22 @@ $ec_lang['lpn_settings_show_titles']='Show page titles';
 $ec_lang['lpn_settings_show_titles_tip']='Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
-// a NEW element is created with; "starting" reads as the initial condition of a run, which on a
+// a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
 // page that now has a duration and a clock is a different thing entirely -- and a tank really does
-// have one. The heading is the bare word because it sits inside the "New elements" section; the
+// have one. The heading is the bare word because it sits inside the "New assets" section; the
 // three push strings below it stopped saying "starting values" in sprint 438's Wave 0, which found
 // them still carrying the rejected wording.
 $ec_lang['lpn_settings_defaults']='Values';
-$ec_lang_syn['lpn_settings_defaults']='Values, Values for new elements, Values given to new elements, Values used when an element is created | avoid: starting values in the sense of the initial condition of a run; the current values of the selected element';
-$ec_lang['lpn_settings_defaults_note']='Used for elements you create from now on. Existing elements are not changed.';
+$ec_lang_syn['lpn_settings_defaults']='Values, Values for new assets, Values given to new assets, Values used when an asset is created | avoid: starting values in the sense of the initial condition of a run; the current values of the selected asset';
+$ec_lang['lpn_settings_defaults_note']='Used for assets you create from now on. Existing assets are not changed.';
 $ec_lang['lpn_settings_push_note']='Only the properties whose labels are showing right now are applied.';
-$ec_lang['lpn_settings_push_btn']='Apply these values to all elements';
-$ec_lang['lpn_push_confirm']='Replace these properties on every existing element with the values now set for new elements? Values you have typed will be overwritten. You can undo this.';
+$ec_lang['lpn_settings_push_btn']='Apply these values to all assets';
+$ec_lang['lpn_push_confirm']='Replace these properties on every existing asset with the values now set for new assets? Values you have typed will be overwritten. You can undo this.';
 $ec_lang['lpn_push_properties']='Properties:';
-$ec_lang['lpn_push_elements']='Nodes and pipes:';
+$ec_lang['lpn_push_assets']='Nodes and pipes:';
 $ec_lang['lpn_push_none_displayed']='None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.';
-$ec_lang['lpn_push_nothing']='No existing element has any of the properties being applied.';
-$ec_lang['lpn_push_no_change']='Every element already has these values, so nothing would change.';
+$ec_lang['lpn_push_nothing']='No existing asset has any of the properties being applied.';
+$ec_lang['lpn_push_no_change']='Every asset already has these values, so nothing would change.';
 // ---- Scenarios (ROADMAP Task 184) ----
 // A project holds one drawing and a list of scenarios. Base is the drawing itself; every other
 // scenario is nothing but a set of values of its own, laid over Base.
@@ -2131,10 +2137,10 @@ $ec_lang['lpn_scenario_push_values']='Values thrown away:';
 // A COUNT follows this label, not a list. Alternates are Tom's own (2026-08-14).
 $ec_lang_syn['lpn_scenario_push_values']='Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values';
 $ec_lang['lpn_scenario_push_none']='No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.';
-$ec_lang['lpn_delete_drops_overrides']='Deleting this element also throws away {n} values that your scenarios hold for it. Continue?';
+$ec_lang['lpn_delete_drops_overrides']='Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?';
 $ec_lang['lpn_push_base_only']='This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.';
 $ec_lang['lpn_field_active']='Part of this network';
-$ec_lang['lpn_field_active_tip']='Clear this box to leave the element on the drawing but out of the network: it is drawn grey and the solver ignores it. In a scenario this is how a proposed pipe is switched on and off.';
+$ec_lang['lpn_field_active_tip']='Clear this box to leave the asset on the drawing but out of the network: it is drawn grey and the solver ignores it. In a scenario this is how a proposed pipe is switched on and off.';
 // ---- Task 412: a Base-wide property SAYS it is Base-wide ----
 // Shown only inside a scenario, on the rows that have no "Only in this scenario" box, so the two
 // states are read the same way. Before this, a Base-wide row was announced by an ABSENCE, and an
@@ -2235,7 +2241,6 @@ $ec_lang['lpn_settings_color_key_position']='Color legend position';
 $ec_lang['lpn_settings_color_breaks']='Color band boundaries';
 $ec_lang['lpn_settings_color_equal_intervals']='Equal intervals';
 $ec_lang['lpn_settings_color_equal_counts']='Equal counts';
-$ec_lang['lpn_settings_color_auto']='Automatic';
 $ec_lang['lpn_settings_color_no_values']='There are no values to work from yet. Solve the network first.';
 $ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own.';
 $ec_lang['lpn_settings_wipe_btn']='Erase everything on this page';
@@ -2312,7 +2317,7 @@ $ec_lang['lpn_time_settings_open']='Time settings';
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_visualization']='Visualization';
 $ec_lang['lpn_settings_sec_map']='Map and page';
-$ec_lang['lpn_settings_sec_elements']='New elements';
+$ec_lang['lpn_settings_sec_assets']='New assets';
 $ec_lang['lpn_settings_sec_calculation']='Calculation';
 $ec_lang['lpn_settings_node_symbology']='Node symbology';
 $ec_lang['lpn_settings_link_symbology']='Link symbology';
@@ -2371,7 +2376,7 @@ $ec_lang['lpn_library_patterns']='Patterns';
 $ec_lang['lpn_library_patterns_tip']='A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.';
 $ec_lang['lpn_library_curves']='Curves';
 $ec_lang['lpn_library_curves_tip']='A curve is the points that say how a pump performs: how much head it makes at each flow.';
-$ec_lang['lpn_library_curves_note']='A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that element and change its points there.';
+$ec_lang['lpn_library_curves_note']='A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that asset and change its points there.';
 $ec_lang['lpn_library_controls']='Controls';
 $ec_lang['lpn_library_controls_tip']='A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to

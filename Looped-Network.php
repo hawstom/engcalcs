@@ -290,6 +290,10 @@ echoHeader("EngCalcs", $html_title, "", false);
 					<input type="number" id="lpn_georef_rot_in" step="any" style="width:5em"></label>
 			</span>
 			<button type="button" id="lpn_georef_goto"><?=$ec_lang['lpn_georef_goto']?></button>
+			<?php // Shown in step 1 only, and only when every coordinate could also be a lon/lat pair
+			      // (georefRefreshBar). It is the reinterpret case, which used to be a range test
+			      // deciding for the user -- and deciding wrong for any drawing on a small grid. ?>
+			<button type="button" id="lpn_georef_asdeg" style="display:none"><?=ecTipLabel($ec_lang['lpn_georef_asdeg_btn'], $ec_lang['lpn_georef_asdeg_tip'])?></button>
 			<button type="button" id="lpn_georef_drop"><?=$ec_lang['lpn_georef_drop']?></button>
 			<button type="button" id="lpn_georef_detach"></button>
 			<button type="button" id="lpn_georef_finish"><?=$ec_lang['lpn_georef_finish']?></button>
@@ -679,7 +683,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 				      // Everything here decides what the NEXT element you draw looks like and is called;
 				      // nothing here changes anything already drawn. ?>
 				<section id="lpn_set_sec_elements" class="lpn-set-sec" data-set-sec="elements">
-					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_elements']?></h3>
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_assets']?></h3>
 					<div class="lpn-set-secbody">
 						<div class="lpn-set-sub" id="lpn_set_sub_idPrefixes"><?=$ec_lang['lpn_settings_id_prefixes']?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_id_fields" class="lpn-set-part"></div></div>
@@ -1085,7 +1089,6 @@ EngCalcs.pageConfig = {
 	lpn_confirm_apply_prefix: <?=json_encode($ec_lang['lpn_confirm_apply_prefix'])?>,
 	lpn_prefix_applied: <?=json_encode($ec_lang['lpn_prefix_applied'])?>,
 	lpn_labels_prefix_tip: <?=json_encode($ec_lang['lpn_labels_prefix_tip'])?>,
-	lpn_labels_prefix_id_tip: <?=json_encode($ec_lang['lpn_labels_prefix_id_tip'])?>,
 	lpn_labels_suffix_tip: <?=json_encode($ec_lang['lpn_labels_suffix_tip'])?>,
 	lpn_labels_suffix_gradient_tip: <?=json_encode($ec_lang['lpn_labels_suffix_gradient_tip'])?>,
 	lpn_labels_separator: <?=json_encode($ec_lang['lpn_labels_separator'])?>,
@@ -1411,7 +1414,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_push_btn: <?=json_encode($ec_lang['lpn_settings_push_btn'])?>,
 	lpn_push_confirm: <?=json_encode($ec_lang['lpn_push_confirm'])?>,
 	lpn_push_properties: <?=json_encode($ec_lang['lpn_push_properties'])?>,
-	lpn_push_elements: <?=json_encode($ec_lang['lpn_push_elements'])?>,
+	lpn_push_assets: <?=json_encode($ec_lang['lpn_push_assets'])?>,
 	lpn_push_none_displayed: <?=json_encode($ec_lang['lpn_push_none_displayed'])?>,
 	lpn_push_nothing: <?=json_encode($ec_lang['lpn_push_nothing'])?>,
 	lpn_push_no_change: <?=json_encode($ec_lang['lpn_push_no_change'])?>,
@@ -1493,7 +1496,6 @@ EngCalcs.pageConfig = {
 	lpn_settings_color_breaks: <?=json_encode($ec_lang['lpn_settings_color_breaks'])?>,
 	lpn_settings_color_equal_intervals: <?=json_encode($ec_lang['lpn_settings_color_equal_intervals'])?>,
 	lpn_settings_color_equal_counts: <?=json_encode($ec_lang['lpn_settings_color_equal_counts'])?>,
-	lpn_settings_color_auto: <?=json_encode($ec_lang['lpn_settings_color_auto'])?>,
 	lpn_settings_color_no_values: <?=json_encode($ec_lang['lpn_settings_color_no_values'])?>,
 	calc_defaults: <?=json_encode($ec_lang['calc_defaults'])?>,
 	lpn_confirm_restore_defaults: <?=json_encode($ec_lang['lpn_confirm_restore_defaults'])?>,
