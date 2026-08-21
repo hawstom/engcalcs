@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1246,
-        "delta_key_count": 55,
+        "expected_key_count": 1252,
+        "delta_key_count": 61,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -467,6 +467,12 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_engine_refused": "The EPANET solver would not accept this network, so it did not run.",
+        "lpn_engine_refused_why": "The EPANET solver said: {message}",
+        "lpn_engine_refused_fallback": "The numbers on screen came from the built-in solver instead.",
+        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.",
+        "lpn_control_dangling_note": "These controls name an element that is no longer in this project, so they were left out: {ids}",
+        "lpn_control_unreadable_note": "These controls could not be read, so they were left out: {ids}",
         "lpn_settings_color_credits": "Credits",
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
@@ -524,6 +530,12 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_engine_refused": "The EPANET solver would not accept this network, so it did not run.",
+        "lpn_engine_refused_why": "The EPANET solver said: {message}",
+        "lpn_engine_refused_fallback": "The numbers on screen came from the built-in solver instead.",
+        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.",
+        "lpn_control_dangling_note": "These controls name an element that is no longer in this project, so they were left out: {ids}",
+        "lpn_control_unreadable_note": "These controls could not be read, so they were left out: {ids}",
         "lpn_settings_color_credits": "Credits",
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
@@ -953,6 +965,102 @@
                     "key": "lpn_field_valve_setting_loss",
                     "value": "ক্ষতি সহগ",
                     "english": "Loss coefficient"
+                }
+            }
+        },
+        "lpn_engine_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "দ্রষ্টব্য: ম্যানিং রাফনেসের ক্ষেত্রে, EPANET বিল্ট-ইন সমাধানকারীর চেয়ে প্রায় ০.৬% কম জলশীর্ষ ক্ষতি গণনা করে।",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "লক্ষ্য করুন: EPANET সমাধানকারী দিয়ে স্থানীয় ক্ষতি বিল্ট-ইন সমাধানকারীর চেয়ে সামান্য কম আসে, কারণ EPANET মহাকর্ষের জন্য যে মান ব্যবহার করে তা রাউন্ড করে।",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
+        "lpn_engine_refused_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "দ্রষ্টব্য: ম্যানিং রাফনেসের ক্ষেত্রে, EPANET বিল্ট-ইন সমাধানকারীর চেয়ে প্রায় ০.৬% কম জলশীর্ষ ক্ষতি গণনা করে।",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "লক্ষ্য করুন: EPANET সমাধানকারী দিয়ে স্থানীয় ক্ষতি বিল্ট-ইন সমাধানকারীর চেয়ে সামান্য কম আসে, কারণ EPANET মহাকর্ষের জন্য যে মান ব্যবহার করে তা রাউন্ড করে।",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
+        "lpn_engine_refused_fallback": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "দ্রষ্টব্য: ম্যানিং রাফনেসের ক্ষেত্রে, EPANET বিল্ট-ইন সমাধানকারীর চেয়ে প্রায় ০.৬% কম জলশীর্ষ ক্ষতি গণনা করে।",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "লক্ষ্য করুন: EPANET সমাধানকারী দিয়ে স্থানীয় ক্ষতি বিল্ট-ইন সমাধানকারীর চেয়ে সামান্য কম আসে, কারণ EPANET মহাকর্ষের জন্য যে মান ব্যবহার করে তা রাউন্ড করে।",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
+        "lpn_time_run_fell_back": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "দ্রষ্টব্য: ম্যানিং রাফনেসের ক্ষেত্রে, EPANET বিল্ট-ইন সমাধানকারীর চেয়ে প্রায় ০.৬% কম জলশীর্ষ ক্ষতি গণনা করে।",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "লক্ষ্য করুন: EPANET সমাধানকারী দিয়ে স্থানীয় ক্ষতি বিল্ট-ইন সমাধানকারীর চেয়ে সামান্য কম আসে, কারণ EPANET মহাকর্ষের জন্য যে মান ব্যবহার করে তা রাউন্ড করে।",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
+        "lpn_control_dangling_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "দ্রষ্টব্য: ম্যানিং রাফনেসের ক্ষেত্রে, EPANET বিল্ট-ইন সমাধানকারীর চেয়ে প্রায় ০.৬% কম জলশীর্ষ ক্ষতি গণনা করে।",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "লক্ষ্য করুন: EPANET সমাধানকারী দিয়ে স্থানীয় ক্ষতি বিল্ট-ইন সমাধানকারীর চেয়ে সামান্য কম আসে, কারণ EPANET মহাকর্ষের জন্য যে মান ব্যবহার করে তা রাউন্ড করে।",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
+        "lpn_control_unreadable_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "দ্রষ্টব্য: ম্যানিং রাফনেসের ক্ষেত্রে, EPANET বিল্ট-ইন সমাধানকারীর চেয়ে প্রায় ০.৬% কম জলশীর্ষ ক্ষতি গণনা করে।",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "লক্ষ্য করুন: EPANET সমাধানকারী দিয়ে স্থানীয় ক্ষতি বিল্ট-ইন সমাধানকারীর চেয়ে সামান্য কম আসে, কারণ EPANET মহাকর্ষের জন্য যে মান ব্যবহার করে তা রাউন্ড করে।",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
                 }
             }
         },

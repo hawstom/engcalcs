@@ -19637,9 +19637,30 @@ var EngCalcs = EngCalcs || {};
 		function warned(code) {
 			return (result.warnings || []).some(function (w) { return w.code === code; });
 		}
+		// **WHAT WE LEFT OUT, NAMED** (Tasks 466, 471). js/lpn-time.js drops a control sentence that
+		// names an element which is no longer there -- it must, EPANET rejects the whole input over
+		// one of them -- and until now it did so without a word, so a saved control simply stopped
+		// working. `{ids}` is the list, because "a control was ignored" with nothing to point at
+		// leaves the user hunting through every sentence they ever wrote.
+		function warnedIds(code) {
+			var ids = [];
+			(result.warnings || []).forEach(function (w) {
+				if (w.code === code) { ids = ids.concat(w.ids || []); }
+			});
+			return ids;
+		}
+		function droppedNote(code, key, fallback) {
+			var ids = warnedIds(code);
+			if (ids.length === 0) { return ''; }
+			return (pc[key] || fallback).replace('{ids}', ids.join(', '));
+		}
 		var manningNote = warned('manning-constant-differs'),
 			minorNote = warned('minor-loss-gravity-differs');
 		setStatus([valveRouteNote,
+			droppedNote('control-dangling', 'lpn_control_dangling_note',
+				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
+			droppedNote('control-unreadable', 'lpn_control_unreadable_note',
+				'These controls could not be read, so they were left out: {ids}'),
 			// The same kind of thing as valveRouteNote: a fact about THIS network that has to be
 			// known to read the numbers on screen. Here, that only the first reporting time is
 			// being kept up to date, because working the whole period out costs more than this
@@ -19667,6 +19688,27 @@ var EngCalcs = EngCalcs || {};
 		setStatus(pc.lpn_engine_loading || 'Loading the EPANET engine…');
 		EngCalcs.lpnSolveEpanet(model, { tol: settings.tolerance }).then(function (result) {
 			if (myToken !== epanetToken) { return; }   // a newer solve already started; drop this one
+			// **EPANET READ THIS NETWORK AND WOULD NOT TAKE IT** (Task 471). Not a load failure --
+			// the engine is here -- and not a failure to converge, which is what applySolveResult()
+			// would print for a result with no issues on it. Say what it objected to, in its own
+			// words, and say that the numbers now on screen are the built-in solver's.
+			if (result.refused) {
+				var said = [
+					(pc.lpn_engine_refused || 'The EPANET solver would not accept this network.'),
+					result.engineError
+						? (pc.lpn_engine_refused_why || 'The EPANET solver said: {message}')
+							.replace('{message}', result.engineError)
+						: '',
+					(pc.lpn_engine_refused_fallback || 'The numbers on screen came from the built-in solver instead.')
+				].filter(function (t) { return !!t; }).join(' ');
+				// The native answer is drawn FIRST -- applySolveResult() owns the status bar on its
+				// way out, so a refusal written before it would be overwritten by its own note and
+				// the user would read nothing about the refusal at all.
+				applySolveResult(EngCalcs.lpnSolve(model, { tol: settings.tolerance }));
+				setStatus(said);
+				if (window.console && console.warn) { console.warn('EPANET refused the network:', result.engineError); }
+				return;
+			}
 			applySolveResult(result);
 		}, function (err) {
 			if (myToken !== epanetToken) { return; }

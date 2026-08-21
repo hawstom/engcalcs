@@ -968,6 +968,7 @@ EngCalcs.pageConfig = {
         // while it works, and `lpn_close` is the word already on every other dismiss control here. ?>
 	lpn_time_run_done: <?=json_encode($ec_lang['lpn_time_run_done'])?>,
 	lpn_time_run_failed: <?=json_encode($ec_lang['lpn_time_run_failed'])?>,
+	lpn_time_run_fell_back: <?=json_encode($ec_lang['lpn_time_run_fell_back'])?>,
 	lpn_time_run_report: <?=json_encode($ec_lang['lpn_time_run_report'])?>,
 	lpn_time_run_report_tip: <?=json_encode($ec_lang['lpn_time_run_report_tip'])?>,
 	lpn_time_no_report: <?=json_encode($ec_lang['lpn_time_no_report'])?>,
@@ -1466,6 +1467,12 @@ EngCalcs.pageConfig = {
 	lpn_engine_failed: <?=json_encode($ec_lang['lpn_engine_failed'])?>,
 	lpn_engine_valve_route: <?=json_encode($ec_lang['lpn_engine_valve_route'])?>,
 	lpn_engine_manning_note: <?=json_encode($ec_lang['lpn_engine_manning_note'])?>,
+<?php   // EPANET said no (Task 471), and the controls it would have said no over (Task 466). ?>
+	lpn_engine_refused: <?=json_encode($ec_lang['lpn_engine_refused'])?>,
+	lpn_engine_refused_why: <?=json_encode($ec_lang['lpn_engine_refused_why'])?>,
+	lpn_engine_refused_fallback: <?=json_encode($ec_lang['lpn_engine_refused_fallback'])?>,
+	lpn_control_dangling_note: <?=json_encode($ec_lang['lpn_control_dangling_note'])?>,
+	lpn_control_unreadable_note: <?=json_encode($ec_lang['lpn_control_unreadable_note'])?>,
 	lpn_engine_minor_loss_note: <?=json_encode($ec_lang['lpn_engine_minor_loss_note'])?>,
 	lpn_unit_unknown: <?=json_encode($ec_lang['lpn_unit_unknown'])?>,
 	lpn_settings_text_size: <?=json_encode($ec_lang['lpn_settings_text_size'])?>,

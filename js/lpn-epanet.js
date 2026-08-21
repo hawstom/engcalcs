@@ -379,6 +379,18 @@
 			'\n Accuracy 1e-8\n Trials 200\n Unbalanced Continue 10\n\n' +
 			'[END]\n';
 
+		// **THE TIME BLOCK'S OWN DROPS COME OUT HERE** (Task 466). EngCalcs.lpnTimeModelBlock throws
+		// away a control naming an element that no longer exists -- it has to, EPANET rejects the
+		// whole input over one of them -- and until now it did so silently. It has no channel of its
+		// own to the status bar, and inventing a second one would give the page two places to look
+		// for "what did we ignore"; this array is already that place, already carried on the solve
+		// result, and already read by js/looped-network.js's applySolveResult(). So the block states
+		// its drops as the same {code, ids} records lpnToInp states its own, and one message design
+		// serves both.
+		if (eps && Array.isArray(time.warnings) && time.warnings.length > 0) {
+			warnings = warnings.concat(time.warnings);
+		}
+
 		return { inp: inp, warnings: warnings };
 	};
 
@@ -647,6 +659,38 @@
 	}
 
 	/**
+	 * **A REFUSAL AND AN ABSENT ENGINE ARE DIFFERENT CONDITIONS, AND THEY LEAVE HERE BY DIFFERENT
+	 * DOORS** (ROADMAP Task 471).
+	 *
+	 * EPANET refusing our `.inp` is a fact about THIS NETWORK -- one dangling control, one setting
+	 * it would not take -- and the user has to be told what it objected to. The engine being
+	 * unreachable is a fact about this SESSION: the network is fine, there is nothing to fix, and
+	 * the honest answer is the one instant our own solver can give.
+	 *
+	 * Both used to arrive as a rejected promise, so the page's single rejection handler called
+	 * noEngine() for both -- and a run EPANET refused outright looked exactly like a run that
+	 * happened, with our steady answer on screen and nothing saying the engine never ran. That is
+	 * the whole of Task 471. **A rejected promise now means only "no engine"**; a refusal is a
+	 * RESOLVED result carrying `refused: true`. The two can no longer be confused by a caller that
+	 * forgets to look, because they no longer arrive at the same place.
+	 *
+	 * `engineError` is EPANET's own words, verbatim and untranslated: they name what it choked on,
+	 * which is the part a user can act on, and nothing of ours could reconstruct them. The caller
+	 * says the rest in the user's language.
+	 */
+	function engineRefusal(err, extra) {
+		var out = {
+			ok: false, refused: true, engine: 'epanet', issues: [], warnings: [],
+			converged: false, iterations: 0,
+			engineError: String((err && err.message) || err || '')
+		}, k;
+		for (k in (extra || {})) {
+			if (Object.prototype.hasOwnProperty.call(extra, k)) { out[k] = extra[k]; }
+		}
+		return out;
+	}
+
+	/**
 	 * Drop the open Project. The page never needs this -- the signature handles every edit -- but
 	 * a test that wants to time or prove the cold path needs a way back to it, and so does any
 	 * caller that has to release the WASM heap.
@@ -675,13 +719,16 @@
 		var sig = signatureOf(model);
 		var url = opts.moduleUrl || null;
 
+		// **ONLY THIS CALL MAY REJECT**, and its rejection means the module could not be fetched or
+		// instantiated -- no engine. Everything after it is EPANET reading OUR network, and a throw
+		// there is a REFUSAL, which resolves instead. See engineRefusal().
 		return EngCalcs.lpnEpanetLoad(opts.moduleUrl).then(function (mod) {
 			// Reuse the open Project when the model is still the same SHAPE; otherwise rebuild.
 			// getting this wrong in the reuse direction is the silent-stale-answer failure the
 			// section comment above is about, so the test is on the derived signature and on
 			// nothing the caller told us.
 			var reusable = session && session.sig === sig && session.moduleUrl === url;
-			return reusable ? session : openSession(mod, model, sig, url);
+			return Promise.resolve(reusable ? session : openSession(mod, model, sig, url));
 		}).then(function (s) {
 			try {
 				pushValues(s, model);
@@ -732,8 +779,13 @@
 				// pushed, hydraulics possibly still open. Keeping it would make the NEXT solve
 				// answer from that unknown state, so drop it and let the next call reopen cold.
 				closeSession();
-				throw e;
+				return engineRefusal(e, { warnings: s.warnings || [] });
 			}
+		}, function (e) {
+			// openSession() itself threw: EPANET would not even parse the file we wrote. The same
+			// condition one step earlier, and the same answer.
+			closeSession();
+			return engineRefusal(e, {});
 		});
 	};
 
@@ -859,11 +911,18 @@
 					p.openH();
 					p.initH(0);
 				} catch (e) {
-					shutdown();
-					throw e;
+					// **THE REFUSAL** (Task 471). EPANET has our file and will not take it -- a
+					// dangling control, an id it cannot resolve. It resolves rather than rejects,
+					// so the page can tell this apart from an engine it could not fetch, and it
+					// carries the engine's own report because a rejected open still writes one and
+					// that text is the only place the offending line is named.
+					return engineRefusal(e, {
+						warnings: built.warnings, frames: [], report: shutdown(),
+						duration: duration, reportStart: reportStart, reportStep: reportStep
+					});
 				}
 
-				return new Promise(function (resolve, reject) {
+				return new Promise(function (resolve) {
 					function slice() {
 						var slice0 = nowMs(), finished = false, f, report;
 						try {
@@ -913,8 +972,14 @@
 								if (nowMs() - slice0 >= sliceMs) { break; }
 							}
 						} catch (e) {
-							shutdown();
-							reject(e);
+							// A refusal can also arrive mid-run: EPANET checks some things only
+							// when it reaches them. Same condition, same shape, resolved for the
+							// same reason -- and the frames gathered so far go, because a partial
+							// period drawn as a whole one is the silent wrong answer again.
+							resolve(engineRefusal(e, {
+								warnings: built.warnings, frames: [], report: shutdown(),
+								duration: duration, reportStart: reportStart, reportStep: reportStep
+							}));
 							return;
 						}
 						if (!finished) {

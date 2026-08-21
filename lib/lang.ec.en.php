@@ -2202,6 +2202,25 @@ $ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because these
 $ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. Nothing can be computed until this page is taught that unit, because it does not know how large one of them is.';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.';
 $ec_lang_syn['lpn_engine_manning_note']='';
+// ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
+// Three sentences for three different facts, on the model of lpn_unit_unknown: what would not
+// happen, what the solver itself objected to, and where the numbers on screen actually came from.
+// A user told only the first goes looking for a broken pipe; a user told none of them -- which is
+// what shipped until now -- reads our own solver's answer as EPANET's.
+$ec_lang['lpn_engine_refused']='The EPANET solver would not accept this network, so it did not run.';
+// {message} is EPANET's own text and is NOT translated: it names what the solver choked on, which
+// is the only part a user can act on, and nothing of ours could reconstruct it.
+$ec_lang['lpn_engine_refused_why']='The EPANET solver said: {message}';
+$ec_lang['lpn_engine_refused_fallback']='The numbers on screen came from the built-in solver instead.';
+// The run's own version of that last sentence: a period run has a moment and a tank level to name,
+// and a one-moment solve does not, which is where the shared label stops.
+$ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.';
+// ---- controls we could not use (ROADMAP Task 466) ---------------------------------------------
+// A control naming an element that is no longer drawn has to be left out -- EPANET rejects the
+// whole network over one of them -- and {ids} names which, because "a control was ignored" with
+// nothing to point at leaves the user reading every sentence they ever wrote.
+$ec_lang['lpn_control_dangling_note']='These controls name an element that is no longer in this project, so they were left out: {ids}';
+$ec_lang['lpn_control_unreadable_note']='These controls could not be read, so they were left out: {ids}';
 $ec_lang['lpn_engine_minor_loss_note']='Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity.';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 1246,
-        "delta_key_count": 54,
+        "expected_key_count": 1252,
+        "delta_key_count": 60,
         "exempt_key_count": 29,
         "exempt_keys": [
             "u_imgd",
@@ -471,6 +471,12 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_engine_refused": "The EPANET solver would not accept this network, so it did not run.",
+        "lpn_engine_refused_why": "The EPANET solver said: {message}",
+        "lpn_engine_refused_fallback": "The numbers on screen came from the built-in solver instead.",
+        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.",
+        "lpn_control_dangling_note": "These controls name an element that is no longer in this project, so they were left out: {ids}",
+        "lpn_control_unreadable_note": "These controls could not be read, so they were left out: {ids}",
         "lpn_settings_color_credits": "Credits",
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
@@ -527,6 +533,12 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_engine_refused": "The EPANET solver would not accept this network, so it did not run.",
+        "lpn_engine_refused_why": "The EPANET solver said: {message}",
+        "lpn_engine_refused_fallback": "The numbers on screen came from the built-in solver instead.",
+        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.",
+        "lpn_control_dangling_note": "These controls name an element that is no longer in this project, so they were left out: {ids}",
+        "lpn_control_unreadable_note": "These controls could not be read, so they were left out: {ids}",
         "lpn_settings_color_credits": "Credits",
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
@@ -955,6 +967,102 @@
                     "key": "lpn_field_valve_setting_loss",
                     "value": "Coeficient de pierdere",
                     "english": "Loss coefficient"
+                }
+            }
+        },
+        "lpn_engine_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "Notă: cu rugozitate Manning, EPANET calculează o pierdere de sarcină cu aproximativ 0,6% mai mică decât rezolvitorul integrat.",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "Notă: cu rezolvitorul EPANET, pierderile locale (minore) ies puțin mai mici decât cu rezolvitorul intern, deoarece EPANET rotunjește valoarea pe care o folosește pentru gravitație.",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
+        "lpn_engine_refused_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "Notă: cu rugozitate Manning, EPANET calculează o pierdere de sarcină cu aproximativ 0,6% mai mică decât rezolvitorul integrat.",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "Notă: cu rezolvitorul EPANET, pierderile locale (minore) ies puțin mai mici decât cu rezolvitorul intern, deoarece EPANET rotunjește valoarea pe care o folosește pentru gravitație.",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
+        "lpn_engine_refused_fallback": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "Notă: cu rugozitate Manning, EPANET calculează o pierdere de sarcină cu aproximativ 0,6% mai mică decât rezolvitorul integrat.",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "Notă: cu rezolvitorul EPANET, pierderile locale (minore) ies puțin mai mici decât cu rezolvitorul intern, deoarece EPANET rotunjește valoarea pe care o folosește pentru gravitație.",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
+        "lpn_time_run_fell_back": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "Notă: cu rugozitate Manning, EPANET calculează o pierdere de sarcină cu aproximativ 0,6% mai mică decât rezolvitorul integrat.",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "Notă: cu rezolvitorul EPANET, pierderile locale (minore) ies puțin mai mici decât cu rezolvitorul intern, deoarece EPANET rotunjește valoarea pe care o folosește pentru gravitație.",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
+        "lpn_control_dangling_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "Notă: cu rugozitate Manning, EPANET calculează o pierdere de sarcină cu aproximativ 0,6% mai mică decât rezolvitorul integrat.",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "Notă: cu rezolvitorul EPANET, pierderile locale (minore) ies puțin mai mici decât cu rezolvitorul intern, deoarece EPANET rotunjește valoarea pe care o folosește pentru gravitație.",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
+        "lpn_control_unreadable_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "Notă: cu rugozitate Manning, EPANET calculează o pierdere de sarcină cu aproximativ 0,6% mai mică decât rezolvitorul integrat.",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "Notă: cu rezolvitorul EPANET, pierderile locale (minore) ies puțin mai mici decât cu rezolvitorul intern, deoarece EPANET rotunjește valoarea pe care o folosește pentru gravitație.",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
                 }
             }
         },

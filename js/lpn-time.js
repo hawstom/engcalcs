@@ -155,12 +155,39 @@
 				return set;
 			},
 			liveLinks = known(doc && doc.links),
-			liveNodes = known(doc && doc.nodes);
+			liveNodes = known(doc && doc.nodes),
+			// **A DROP THE USER NEVER HEARS ABOUT IS A DROP THE USER CANNOT FIX** (Task 471, closing
+			// the reporting half of Task 466). Every `return` below removes a sentence the user
+			// wrote, and every one of them was silent -- which is why a control naming a deleted
+			// pump read on screen as "the Calculate button does nothing".
+			//
+			// The channel is `{code, ids}` records, IDENTICAL IN SHAPE to the ones lpnToInp already
+			// carries, and js/lpn-epanet.js concatenates the two arrays -- so there is one place a
+			// reader looks for "what did we ignore", and one message design, rather than a second
+			// parallel mechanism for the same sentence.
+			warn = [],
+			note = function (code, id) {
+				var i;
+				for (i = 0; i < warn.length; i++) {
+					if (warn[i].code === code) { warn[i].ids.push(id); return; }
+				}
+				warn.push({ code: code, ids: [id] });
+			},
+			// What to CALL a dropped sentence on screen. Its link id when it has one, and otherwise
+			// the raw text the user typed -- a control kept as text has no id to name it by, and
+			// "one control was ignored" with nothing to point at is barely better than silence.
+			nameOf = function (c) {
+				return String((c && c.link) || (c && c.raw) || '').trim() ||
+					String((c && c.text && c.text.raw) || '?');
+			};
 		((doc && doc.controls) || []).forEach(function (c) {
 			var out, cond = c && c.condition;
-			if (!cond) { return; }
-			if (liveLinks && !liveLinks[String(c.link)]) { return; }
-			if (liveNodes && cond.kind === 'node' && !liveNodes[String(cond.node)]) { return; }
+			if (!cond) { note('control-unreadable', nameOf(c)); return; }
+			if (liveLinks && !liveLinks[String(c.link)]) { note('control-dangling', nameOf(c)); return; }
+			if (liveNodes && cond.kind === 'node' && !liveNodes[String(cond.node)]) {
+				note('control-dangling', String(cond.node));
+				return;
+			}
 			out = { link: c.link, action: {}, condition: null };
 			if (c.action && c.action.status) { out.action.status = c.action.status; }
 			else if (c.action && isFinite(c.action.setting)) {
@@ -169,7 +196,7 @@
 					c.action.settingUnit === 'press' ? conv(c.action.setting, 'lpn_u_pressure') :
 					c.action.settingUnit === 'flow' ? conv(c.action.setting, 'lpn_u_flow') :
 					c.action.setting;
-			} else { return; }
+			} else { note('control-unreadable', nameOf(c)); return; }
 			if (cond.kind === 'node') {
 				out.condition = {
 					kind: 'node', node: cond.node, cmp: cond.cmp,
@@ -186,7 +213,8 @@
 			times: times,
 			patterns: (doc && doc.patterns) || [],
 			defaultPattern: (doc && doc.defaultPattern) || null,
-			controls: controls
+			controls: controls,
+			warnings: warn
 		};
 	};
 
@@ -351,6 +379,22 @@
 			// already the sentence the status bar uses for exactly this moment.
 			runDone: pageConfig.lpn_time_run_done || 'The run finished. Reporting times: {frames}. Time taken: {secs} s.',
 			runFailed: pageConfig.lpn_time_run_failed || 'The run did not finish, so there are no results for the later times.',
+			// ---- a REFUSED run (Task 471) ----
+			// **THREE SENTENCES, BECAUSE THERE ARE THREE FACTS AND THEY ARE NOT THE SAME FACT.**
+			// "The solver would not take this network", "here is what it objected to", and "so what
+			// you are looking at came from somewhere else" answer three different questions, and a
+			// user who is told only the first goes looking for a broken pipe. Same shape as
+			// lpn_unit_unknown: what we could not do, and what we did instead, both said out loud.
+			// The first two are `lpn_engine_*` rather than `lpn_time_run_*` and are shared with the
+			// steady-state path in js/looped-network.js: "the solver would not accept this network"
+			// and "it said this" are the same two facts whether one moment was asked for or a whole
+			// period. Only the third differs, because only a RUN has a moment and a tank level to
+			// name -- which is where whole-label reuse stops.
+			runRefused: pageConfig.lpn_engine_refused || 'The EPANET solver would not accept this network, so it did not run.',
+			// EPANET's own words, untranslated on purpose -- they name what it choked on, and
+			// nothing of ours could reconstruct that.
+			runRefusedWhy: pageConfig.lpn_engine_refused_why || 'The EPANET solver said: {message}',
+			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.',
 			runReport: pageConfig.lpn_time_run_report || 'EPANET run report',
 			close: pageConfig.lpn_close || 'Close'
 			// **FIVE STRINGS LEFT THIS LIST WITH THE PANE TAB**: lpn_time_tank, lpn_time_level and
@@ -552,6 +596,20 @@
 			}
 			if (!run.ok) {
 				state.run = null;
+				// **A REFUSAL IS NOT A FAILURE TO CONVERGE AND NOT AN ABSENT ENGINE** (Task 471).
+				// EPANET read our network and would not take it; handing this result to host.apply()
+				// would print "Did not converge", which sends the user looking for a zero diameter
+				// that is not there.
+				if (run.refused) {
+					// EPANET writes a report even on an input it rejects, and that text is the one
+					// place the offending line is named -- so it is KEPT here, unlike a failure,
+					// and Project > EPANET run report can show it.
+					lastReport = run.report || ''; lastReportMs = state.lastRunMs;
+					lastReportFrames = 0;
+					boxFailed(token, refusedText(run));
+					engineRefused(model, run);
+					return;
+				}
 				host.apply(run);
 				// The last run FAILED, so there is no report -- and the previous run's report is not
 				// an answer to what just happened. Cleared rather than kept.
@@ -667,6 +725,34 @@
 		host.status(strings().noEngine.replace('{time}', EC.lpnTimeElapsedText(state.t)));
 		renderPanel();
 		return true;
+	}
+
+	/**
+	 * **THE HONEST ANSWER WHEN THE ENGINE IS THERE AND SAID NO** (Task 471). noEngine()'s sibling,
+	 * and deliberately not noEngine() itself: that message ends "connect to the internet once to
+	 * fetch the EPANET solver", which is exactly wrong here -- the solver was fetched, it ran, and
+	 * it rejected this network. Telling a user to go online is a dead end they can spend an hour on.
+	 *
+	 * Three sentences, and the middle one is EPANET's: what would not happen, why in the engine's
+	 * own words, and where the numbers now on screen actually came from. The last is the one Task
+	 * 471 is really about -- our steady answer was already being drawn, and nothing said so.
+	 */
+	function engineRefused(model, run) {
+		var S = strings();
+		state.run = null;
+		host.apply(host.native(model));
+		host.status([
+			refusedText(run),
+			S.runFellBack.replace('{time}', EC.lpnTimeElapsedText(state.t))
+		].filter(function (t) { return !!t; }).join(' '));
+		renderPanel();
+		return true;
+	}
+	// What the refusal itself says, without the fallback sentence -- the status bar wants all three
+	// and the run box wants only these two, so the shared part is composed once.
+	function refusedText(run) {
+		var S = strings(), why = (run && run.engineError) || '';
+		return why ? S.runRefused + ' ' + S.runRefusedWhy.replace('{message}', why) : S.runRefused;
 	}
 
 	function clampTime() {
@@ -874,7 +960,7 @@
 	// That keeps this whole feature inside this file: js/looped-network.js needs no new element, no
 	// new id and no new call site for it.
 
-	var boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, token: 0 },
+	var boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0 },
 		boxReport = '',
 		// Whether the report inside the box starts EXPANDED. It does when the box was opened to show
 		// a report and only then -- a run in progress opens its own box collapsed, because the
@@ -890,7 +976,7 @@
 	var lastReport = '', lastReportMs = 0, lastReportFrames = 0;
 
 	function boxStart(token) {
-		boxState = { open: true, phase: 'running', fraction: 0, frames: 0, ms: 0, reportLength: 0, token: token };
+		boxState = { open: true, phase: 'running', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: token };
 		boxReport = '';
 		boxReportOpen = false;
 		renderBox(true);
@@ -915,15 +1001,18 @@
 		boxState.reportLength = boxReport.length;
 		renderBox(true);
 	}
-	function boxFailed(token) {
+	// `message` overrides the generic "the run did not finish" -- a REFUSAL knows more than that and
+	// the box is where the user is already looking when it happens.
+	function boxFailed(token, message) {
 		if (!boxState.open || boxState.token !== token) { return; }
 		boxState.phase = 'failed';
+		boxState.message = message || '';
 		boxReport = '';
 		boxState.reportLength = 0;
 		renderBox(true);
 	}
 	function boxHide() {
-		boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, token: 0 };
+		boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0 };
 		boxReport = '';
 		boxReportOpen = false;
 		renderBox(true);
@@ -954,7 +1043,7 @@
 
 	function boxMessage(S) {
 		if (boxState.phase === 'running') { return S.running; }
-		if (boxState.phase === 'failed') { return S.runFailed; }
+		if (boxState.phase === 'failed') { return boxState.message || S.runFailed; }
 		return S.runDone
 			.replace('{frames}', String(boxState.frames))
 			// Two decimals under a second, one above it. A 40 ms run printed as "0.0 s" reads as
@@ -1069,7 +1158,7 @@
 		if (!lastReport) { return false; }
 		boxState = {
 			open: true, phase: 'done', fraction: 1, frames: lastReportFrames,
-			ms: lastReportMs, reportLength: lastReport.length, token: 0
+			ms: lastReportMs, reportLength: lastReport.length, message: '', token: 0
 		};
 		boxReport = lastReport;
 		boxReportOpen = true;
