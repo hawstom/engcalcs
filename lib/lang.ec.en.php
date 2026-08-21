@@ -1459,15 +1459,33 @@ $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
 $ec_lang['lpn_pane_print']='Print table';
 $ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.';
 
-$ec_lang['lpn_clean_map']='Hide map readouts';
+// "Reduce map clutter" rather than "Hide map readouts" (Tom, 2026-08-21: "more honest and
+// understandable"). The row names what it will DO, and what it does is take furniture off the
+// picture -- a reader who has never met the word "readout" still knows what clutter is.
+$ec_lang['lpn_clean_map']='Reduce map clutter';
 $ec_lang['lpn_clean_map_off']='Show map readouts';
-$ec_lang['lpn_clean_map_tip']='Hide the mode line and the coordinate readout so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back.';
+$ec_lang['lpn_clean_map_tip']='Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back.';
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
 // lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 $ec_lang['lpn_menu_project']='Project';
+$ec_lang['lpn_tables_menu']='Tables';
+$ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.';
+// The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
+// button?" for somebody whose project recalculates by itself, and that sentence is not true of the
+// toolbar button, which is the one that goes away.
+$ec_lang['lpn_run_menu_tip']='Work out this network now. Looking for a Run button? While this project works itself out after every change, the toolbar has no Run button. Turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics, and the button comes back.';
+// ---- automatic recalculation (Task 467) ----
+// "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
+// out over time, and this switch is about the run, not about the drawing.
+$ec_lang['lpn_settings_auto_run']='Recalculate the simulation for this project automatically';
+$ec_lang['lpn_settings_auto_run_tip']='When this is on, this project works itself out again shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be worked out gets in the way of typing, and the Calculate button comes back so you choose when to run.';
+// Says what it MEASURED and where the switch is, in that order. The number first, because a person
+// who has just waited a second already knows something is slow and wants it confirmed, not
+// explained. {secs} is one decimal.
+$ec_lang['lpn_time_run_slow']='This network took {secs} s to work out, and it is set to work itself out again after every change. To stop that and get a Calculate button back, turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics.';
 $ec_lang['lpn_time_no_report']='There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.

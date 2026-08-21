@@ -156,6 +156,8 @@ async function runSection() {
 	// case at all, which is exactly the "stub that removes the coupling" dev/testing-notes.md warns
 	// about. It varies the one quantity the real thing varies: how long a run takes.
 	let engineCalls = 0, cost = 5;
+	// The project's auto-run setting, as the host reports it (Task 467).
+	let autoRun = true;
 	EngCalcs.lpnEpanetRun = function () {
 		engineCalls++;
 		return wait(cost).then(() => ({
@@ -191,7 +193,11 @@ async function runSection() {
 		solve: solveNow, solveNow: solveNow,
 		native: () => ({ ok: true, converged: true, heads: {}, flows: {} }),
 		snapshot: () => {}, save: () => {},
-		toSI: (v) => v, toDisplay: (v) => v, unitLabel: () => ''
+		toSI: (v) => v, toDisplay: (v) => v, unitLabel: () => '',
+		// The project setting, driven from this harness the way the Settings checkbox drives it in
+		// the page (Task 467). Not a constant: the whole of what the task changed is that this
+		// answer comes from the user rather than from a stopwatch.
+		autoRun: () => autoRun
 	});
 	// Short enough to test in a second; the shipped values and the reasoning behind them are on
 	// EC.LPN_TIME_AUTO in js/lpn-time.js.
@@ -237,20 +243,40 @@ async function runSection() {
 	eq(engineCalls, 1, 'and exactly one once the editing stops -- the burst is coalesced, not queued');
 	eq(EngCalcs.lpnTimeRunState().frames, 25, 'the period is back');
 
-	// ---- an expensive network stops re-running itself ----
+	// ---- AN EXPENSIVE NETWORK KEEPS RE-RUNNING ITSELF, AND IS TOLD IT IS EXPENSIVE ----
 	//
-	// The budget is a MEASUREMENT, not a setting: the page times its own run and stops volunteering
-	// once that measurement says a run costs more than a pause the user would not notice.
-	cost = 90;   // over the 60 ms budget set above
+	// **THIS IS THE ASSERTION TASK 467 INVERTED, and the inversion is the point.** The budget used
+	// to be a silent VETO: measure a slow run, stop volunteering, say nothing about why. That is two
+	// states pretending to be one -- the user reads "automatically" while the page has quietly gone
+	// manual, with the only evidence a run that never comes. Automatic now means automatic, and the
+	// measurement advises instead. What must hold is that the page keeps its promise AND says what
+	// it measured.
+	EngCalcs.LPN_TIME_SLOW_MS = 60;
+	cost = 90;   // over the slow threshold set on the line above
+	statuses.length = 0;
 	EngCalcs.lpnTimeRunNow();
 	await wait(160);
 	check(EngCalcs.lpnTimeRunState().lastRunMs > 60, 'a slow run is measured as slow',
 		`${Math.round(EngCalcs.lpnTimeRunState().lastRunMs)} ms`);
-	check(!EngCalcs.lpnTimeRunState().auto, 'so the page stops running the period by itself');
+	check(EngCalcs.lpnTimeRunState().auto,
+		'and the page KEEPS running the period by itself — the measurement no longer vetoes it');
+	check(statuses.some((t) => t && /\d/.test(t) && /automatically|Recalculate/i.test(t)),
+		'...but it SAYS so, naming the setting and the seconds it took',
+		JSON.stringify(statuses[statuses.length - 1] || ''));
 	engineCalls = 0;
 	hydraulicEdit(); await wait(10); hydraulicEdit();
 	await wait(160);
-	eq(engineCalls, 0, 'AND AN EDIT NOW PROVOKES NOTHING AT ALL, however long the user waits');
+	eq(engineCalls, 1, 'AND AN EDIT STILL PROVOKES A RUN, coalesced as before');
+	eq(EngCalcs.lpnTimeRunState().frames, 25, 'so the frames come back without anybody pressing Run');
+
+	// ---- TURNING THE SETTING OFF IS WHAT STOPS IT ----
+	//
+	// The user's answer, not a measurement. This is the state that used to be reached by accident.
+	autoRun = false;
+	engineCalls = 0;
+	hydraulicEdit(); await wait(10); hydraulicEdit();
+	await wait(160);
+	eq(engineCalls, 0, 'with the setting off, an edit provokes NOTHING, however long the user waits');
 	eq(EngCalcs.lpnTimeCurrentFrame(), null, 'nothing stale is left behind to draw');
 	check(EngCalcs.lpnTimeStatusNote().length > 0,
 		'and the page SAYS the later times are not being kept up to date');
@@ -261,6 +287,7 @@ async function runSection() {
 	eq(engineCalls, 1, 'Run works the whole period out');
 	eq(EngCalcs.lpnTimeRunState().frames, 25, 'and the frames are back');
 	eq(EngCalcs.lpnTimeStatusNote(), '', 'and the page stops saying they are out of date');
+	autoRun = true;
 
 	// ---- a duration of 0 is not a run at all ----
 	doc.times.duration = 0;

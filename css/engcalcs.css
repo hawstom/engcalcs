@@ -1144,11 +1144,13 @@ html[lang="zh"] .ec-welcome {
 .lpn-pane-sort { font-weight: bold; }
 .lpn-pane-goto { text-decoration: underline; }
 .lpn-pane-sort:hover, .lpn-pane-goto:hover { color: #0645ad; }
-/* Print, beside the X and pinned to the same top-right corner, so a wrapping tab strip never
-   pushes it out of the reader's reach. It is a small text button rather than an icon: it is the
-   only control in this corner that DOES something to the content. */
+/* Print, at the LEADING edge of the pane head, ahead of the tab strip (Tom, 2026-08-21: it was
+   "poorly discoverable" in the top-right corner, where the eye reads window controls rather than
+   an action). flex:0 0 auto keeps it its own width while the tab strip beside it does the
+   wrapping, so a strip that wraps to two rows never moves it. It is a small text button rather
+   than an icon: it is the only control in this row that DOES something to the content. */
 .lpn-pane-print {
-	flex: 0 0 auto; align-self: flex-start; margin: 1px 0 0; padding: 2px 8px; font: inherit;
+	flex: 0 0 auto; align-self: flex-start; margin: 1px 6px 0 0; padding: 2px 8px; font: inherit;
 	font-size: .85em; background: #f6f6f6; border: 1px solid #bbb; color: #333; cursor: pointer;
 }
 .lpn-pane-print:hover, .lpn-pane-print:focus { background: #eee; color: #000; }

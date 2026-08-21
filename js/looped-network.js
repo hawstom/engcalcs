@@ -2431,6 +2431,22 @@ var EngCalcs = EngCalcs || {};
 			// a slow connection and why the default has not moved. See Task 313 -- the per-solve gap
 			// that remains is our own .inp round trip, not the engine.
 			engine: 'native',
+			// **AUTOMATIC RECALCULATION, AS A STATED PREFERENCE** (ROADMAP Task 467). Tom,
+			// 2026-08-20: *"a toggle under Calculation.Hydraulics for 'Recalculate the simulation
+			// for this project automatically.' If it's on, we do our debounce and calculate, and we
+			// hide the Calculate button."*
+			//
+			// **DEFAULT ON, because ON is what the page already did.** The measured heuristic it
+			// replaces (EC.LPN_TIME_AUTO) allowed an automatic run on every network that ran inside
+			// its budget, which is every ordinary one -- so defaulting OFF would take working
+			// behaviour away from everybody to protect the few. The few are protected by the advice
+			// instead: a run that measures over EC.LPN_TIME_SLOW_MS says so and names the switch.
+			//
+			// It is a PROJECT setting, not a browser one, for the reason units are (see "there are
+			// no browser units, only PROJECT units"): a big network and a small one want different
+			// answers, and the answer belongs to the network. It serializes for free -- the whole
+			// `settings` object goes into serializeProject().
+			autoRun: true,
 			// Default input values for NEWLY created elements -- a mode the user re-enters mid-draw
 			// ("OK, now all the 8 inch pipes"), not a one-time setup. Same "future, not retroactive"
 			// rule as idPrefixes: changing one never touches an element that already exists.
@@ -6738,25 +6754,14 @@ var EngCalcs = EngCalcs || {};
 	// highlight belonging to something nobody can see.
 	// `show` runs on becoming the visible tab, `refresh` on every solve and every document change
 	// while it IS the visible one, `hide` on ceasing to be.
-	var paneTabs = [
-		{
-			id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
-			// profileSeedStops() first, because the document may have changed under an open panel:
-			// a stop whose node was deleted is cleared here rather than left to draw a route
-			// through a ghost.
-			show: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
-			refresh: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
-			hide: function () { drawProfilePath(null); }
-		},
-	];
-	// **THE SIX ASSET TABLES JOIN THE STRIP FROM ONE LIST** (Task 455). Profile stays first and stays
-	// apart -- it is a drawing and the other six are tables -- and the six follow in the toolbar's
-	// own Add order, nodes before links, so the two strips teach each other.
+	// **THE SIX ASSET TABLES COME FIRST, FROM ONE LIST** (Task 455), in the toolbar's own Add order,
+	// nodes before links, so the two strips teach each other.
 	//
 	// Built here rather than written out six times: a tab is nothing but its table's own
 	// declaration, so there is no per-type tab code that could disagree with the per-type columns.
 	// A rebuild on entry, because the tab may have been away for a whole editing session; a refill
 	// afterwards, because renderPaneTable() decides that for itself.
+	var paneTabs = [];
 	paneTables().forEach(function (spec) {
 		paneTabs.push({
 			id: spec.id, panel: spec.panel, label: spec.label, tip: 'lpn_pane_tab_tip',
@@ -6764,6 +6769,26 @@ var EngCalcs = EngCalcs || {};
 			refresh: function () { renderPaneTable(spec); }
 		});
 	});
+	// **PROFILE IS LAST** (Tom, 2026-08-21: "making Profile the last tab"). It is still the odd one
+	// out -- a drawing where the other six are tables -- and the end of the strip is where an odd
+	// one out belongs, rather than the front, where it stood between the reader and the six things
+	// that are alike. Putting it last is also what lets the Print button hold the leading edge:
+	// print acts on a TABLE, and the tabs it applies to are now the ones next to it.
+	paneTabs.push({
+		id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
+		// profileSeedStops() first, because the document may have changed under an open panel:
+		// a stop whose node was deleted is cleared here rather than left to draw a route
+		// through a ghost.
+		show: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
+		refresh: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
+		hide: function () { drawProfilePath(null); }
+	});
+	// **THE PANE OPENS ON THE FIRST TABLE, WHICH IS THE CHANGE THIS REORDER MAKES.** paneTabs[0] is
+	// no longer the profile, and that is right: a reader who opens the pane without naming a tab
+	// wants the parts list far more often than the one drawing, and the profile needs stops chosen
+	// before it says anything at all. Every other door names its tab -- openPane('profile') from
+	// the Project menu, openPane(paneTables()[0].id) from Tables -- so this default is only ever
+	// the toolbar toggle's first use in a fresh browser.
 	var paneState = { open: false, h: LPN_PANE_DEFAULT, tab: paneTabs[0].id };
 	function paneEl() { return document.getElementById('lpn_pane'); }
 	function paneIsOpen() { return !!paneState.open; }
@@ -6912,7 +6937,7 @@ var EngCalcs = EngCalcs || {};
 		var pane = paneEl(), strip = document.getElementById('lpn_pane_tabs'),
 			grip = document.getElementById('lpn_pane_grip'),
 			x = document.getElementById('lpn_pane_close'), pc = EngCalcs.pageConfig || {},
-			dragFrom = null;
+			head = null, dragFrom = null;
 		if (!pane) { return; }
 		if (strip) {
 			paneTabs.forEach(function (t) {
@@ -6932,7 +6957,15 @@ var EngCalcs = EngCalcs || {};
 		if (x) { x.addEventListener('click', closePane); }
 		// Built here, not in the markup: it carries a tip, and .ec-help written into a page's HTML
 		// is what tip_markup_check.php exists to stop. Same treatment as a tab button.
-		if (!document.getElementById('lpn_pane_print') && x && x.parentNode) {
+		//
+		// **FIRST CHILD OF THE HEAD, at the extreme left edge** (Tom, 2026-08-21: the print button
+		// "is poorly discoverable ... try putting it at extreme left"). It used to sit beside the X
+		// in the top-RIGHT corner, which is where a window's own controls live and therefore where
+		// the eye reads "close", not "do something to this table". The left edge is the first thing
+		// read in an LTR language and the first thing read in an RTL one too, because the flex row
+		// reverses with the document.
+		head = document.getElementById('lpn_pane_head');
+		if (!document.getElementById('lpn_pane_print') && head) {
 			(function () {
 				var b = document.createElement('button');
 				b.type = 'button';
@@ -6941,7 +6974,7 @@ var EngCalcs = EngCalcs || {};
 				b.textContent = pc.lpn_pane_print || 'Print table';
 				if (pc.lpn_pane_print_tip) { b.title = pc.lpn_pane_print_tip; b.className += ' ec-help'; }
 				b.addEventListener('click', function () { printPaneTable(activePaneTableSpec()); });
-				x.parentNode.insertBefore(b, x);
+				head.insertBefore(b, head.firstChild);
 			}());
 		}
 		// **THE TOP EDGE IS THE HANDLE.** Pointer events, not mouse: one code path for mouse, pen
@@ -12486,10 +12519,31 @@ var EngCalcs = EngCalcs || {};
 		if (!strip) { return; }
 		var stripHeightBefore = strip.getBoundingClientRect().height;
 		strip.innerHTML = '';
-		// The vertical list lives at the LEFT edge of the strip (Tom's sketch). On a narrow screen it
-		// is the only way in, because CSS hides the strip itself there: this page has no horizontal
+		// **THE STRIP READS + THEN ≡ THEN THE TABS, AND + IS AT THE EXTREME LEFT EDGE** (Tom,
+		// 2026-08-21: *"Google puts the '+' for new tabs left of the hamburger. Extreme left edge.
+		// Do that."*). The + used to sit at the far RIGHT, after the tabs, where a browser puts it --
+		// but a browser's + follows a strip that starts at the window edge, and this one does not:
+		// it follows a scrolling holder, so with enough projects open the + was pushed off the end
+		// and the one control that makes a new project became the one you had to scroll to find.
+		// A fixed edge is what makes a control findable; the two fixed controls now hold it.
+		var plus = document.createElement('button');
+		plus.type = 'button';
+		plus.className = 'lpn-tab-btn';
+		plus.textContent = '+';
+		plus.title = pc.lpn_tab_new || 'New project';
+		// OPENS THE CHOOSER, exactly as File > New project does (Tom, 2026-08-10, agreeing it was a
+		// defect: "it should open the chooser, which will become the units and method chooser").
+		// It used to call newProject() directly, which inherits whatever units happened to be on the
+		// strip -- the last place on this page where a project's units were decided by accident, and
+		// the very thing Task 264 removed from the File menu. Both doors now ask the same question.
+		// stopPropagation for the reason every menu opener here does it: see buildMenuBar().
+		plus.addEventListener('click', function (e) { e.stopPropagation(); openNewProjectMenu(e.currentTarget); });
+		strip.appendChild(plus);
+		// The vertical list sits second, still left of the tabs (Tom's sketch). On a narrow screen it
+		// is the only way in, because CSS hides the tabs themselves there: this page has no horizontal
 		// room to spare on a phone, and a tab strip that wraps to three lines above a map is worse
-		// than a list behind one button.
+		// than a list behind one button. Both it and the + survive that hiding, because both are
+		// outside .lpn-tabs-scroll.
 		var all = document.createElement('button');
 		all.type = 'button';
 		all.className = 'lpn-tab-btn';
@@ -12504,19 +12558,6 @@ var EngCalcs = EngCalcs || {};
 		// touched a different project could never be found twice in the same place.
 		library.projects.forEach(function (p) { holder.appendChild(buildTab(p)); });
 		strip.appendChild(holder);
-		var plus = document.createElement('button');
-		plus.type = 'button';
-		plus.className = 'lpn-tab-btn';
-		plus.textContent = '+';
-		plus.title = pc.lpn_tab_new || 'New project';
-		// OPENS THE CHOOSER, exactly as File > New project does (Tom, 2026-08-10, agreeing it was a
-		// defect: "it should open the chooser, which will become the units and method chooser").
-		// It used to call newProject() directly, which inherits whatever units happened to be on the
-		// strip -- the last place on this page where a project's units were decided by accident, and
-		// the very thing Task 264 removed from the File menu. Both doors now ask the same question.
-		// stopPropagation for the reason every menu opener here does it: see buildMenuBar().
-		plus.addEventListener('click', function (e) { e.stopPropagation(); openNewProjectMenu(e.currentTarget); });
-		strip.appendChild(plus);
 		// THE ONLY DOCUMENT-DRIVEN THING THAT MAY MOVE THE MAP'S BOTTOM, and it is not the document:
 		// it is this strip wrapping onto another line when enough projects are open. Measured rather
 		// than assumed, so opening a project that does not change the strip's height re-measures
@@ -13106,23 +13147,15 @@ var EngCalcs = EngCalcs || {};
 		openMenu(anchor, [
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', fn: zoomExtent },
 			{ separator: true },
-			// The popover openers position themselves from evt.currentTarget, so a menu row hands them
-			// the menu-bar button it came from -- the popover then opens under "View", where the eye
-			// already is, rather than under a toolbar button that may not even be on screen.
-			{ icon: 'labels', label: pc.lpn_tool_labels || 'Labels', fn: function () { openSettingsBox('labels'); } },
-			// The profile is a VIEW of the network (Task 409), not an edit of it, so it lives beside
-			// Labels rather than in Insert. Since Task 434 it is a TAB in the bottom pane, so the
-			// row opens the pane on that tab -- open, never toggle: a menu row that names a view
-			// shows it.
-			// **THE PROFILE ICON, not the eye that was standing in for it** (Tom, 2026-08-18: "It's
-			// not there still. It's an eye"). 'profile' has been in lib/Icons.lib.php since the icon
-			// set was drawn and was used nowhere; both doors to the profile point at it now, this
-			// row and the toolbar button in wireToolbar().
-			{ icon: 'profile', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
-				fn: function () { closeMenu(); openPane('profile'); } },
+			// **NO LABELS ROW AND NO PROFILE ROW** (Tom, 2026-08-21). Labels is a SECTION of the
+			// Settings box, reachable from the box's own index and from a click on the colour
+			// legend, so the row was a third door to a box whose button is on the toolbar. Profile
+			// moved to the Project menu, beside Tables, where the two things you READ beside the
+			// map now sit together -- see openProjectBarMenu(). What is left here is the drawing
+			// itself: how it is framed, how much furniture is over it, and where on Earth it is.
 			// The label states what the row will DO, because this menu has no checkmark column --
 			// the same convention the street-map row below follows.
-			{ icon: 'camera', label: cleanMapOn() ? (pc.lpn_clean_map_off || 'Show map readouts') : (pc.lpn_clean_map || 'Clean map'),
+			{ icon: 'camera', label: cleanMapOn() ? (pc.lpn_clean_map_off || 'Show map readouts') : (pc.lpn_clean_map || 'Reduce map clutter'),
 				tip: pc.lpn_clean_map_tip,
 				fn: function () { setCleanMap(!cleanMapOn()); } },
 			// HIDDEN OUTSIDE A GEOGRAPHIC PROJECT, not disabled: a grid project's x/y are canvas
@@ -13164,17 +13197,32 @@ var EngCalcs = EngCalcs || {};
 		]);
 	}
 	// **THE PROJECT MENU** (ROADMAP Task 467). Tom, 2026-08-20: *"Maybe we can have a Project menu
-	// with Settings, Library, and Report under it?"*
+	// with Settings, Library, and Report under it?"*, and his own row order of 2026-08-21:
+	// Settings, Libraries | Profile, Tables | Run, EPANET run report.
 	//
-	// It is a MENU HOME for two boxes that already have toolbar buttons, plus the one thing that had
-	// no door at all. Not a replacement: Libraries and Settings keep their buttons, because the
-	// toolbar is the high-use subset and both are high-use. What is new here is Report.
+	// **THREE GROUPS, AND THE SEPARATORS ARE THE ARGUMENT.** What the project IS (Settings and its
+	// Libraries), what you READ beside it (the Profile drawing and the six part tables), and what
+	// you RUN on it (the run itself and the report it wrote). The toolbar mirrors these groups in
+	// the same order -- see wireToolbar() -- so the two strips teach each other.
 	//
-	// **REPORT IS WHY THIS MENU EXISTS.** EPANET's own run report is written into the run box, and
-	// the run box only appears for a run somebody pressed Calculate for -- so on a network that
-	// re-runs itself after a quiet moment, which is the common case, the report was produced and
-	// then unreachable. js/lpn-time.js now keeps the last one whether a box was shown or not, and
-	// this row puts it back on screen.
+	// **THE THREE ROWS THAT EARN THE MENU ARE PROFILE, TABLES AND RUN**, and each answers a
+	// discoverability gap Tom named:
+	//   * Profile came out of the View menu. It is a thing you READ about this project, not a way
+	//     of framing the drawing, and beside Tables it now has a sibling.
+	//   * Tables was "a gap barely discoverable with the bottom pane button" -- the tables existed
+	//     with no door but one unlabelled toolbar toggle. This row opens the pane on the FIRST
+	//     table, never on the profile: the profile has its own row directly above.
+	//   * Run is here so the menu has a door to the calculation at all, and its tip answers "where
+	//     is my Run button?" -- the toolbar button is hidden while this project recalculates by
+	//     itself (settings.autoRun), and a user who has never seen the checkbox has no other way to
+	//     find that out. **ALWAYS PRESENT, never hidden with the button**: the same reasoning the
+	//     report row below states, that a row which vanishes teaches nobody.
+	//
+	// **REPORT WAS THE FIRST OF THEM.** EPANET's own run report is written into the run box, and
+	// the run box only appears for a run somebody pressed Run for -- so on a network that re-runs
+	// itself after a quiet moment, which is the common case, the report was produced and then
+	// unreachable. js/lpn-time.js keeps the last one whether a box was shown or not, and this row
+	// puts it back on screen.
 	//
 	// Named openProjectBarMenu(), NOT openProjectMenu(): that name is taken by the TAB's own menu
 	// (rename, duplicate, close), which is about one project rather than about the open one.
@@ -13192,6 +13240,42 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { toggleLibraryBox(); }
 			},
 			{ separator: true },
+			// The row that came out of View (Tom, 2026-08-21). Since Task 434 the profile is a TAB
+			// in the bottom pane, so this opens the pane on that tab -- open, never toggle: a menu
+			// row that names a view shows it. The icon is the one drawn for it in
+			// lib/Icons.lib.php, a jagged ground line closed down to a datum.
+			{
+				icon: 'profile', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
+				fn: function () { closeMenu(); openPane('profile'); }
+			},
+			// **THE FIRST TABLE, NOT THE PROFILE TAB.** paneTables()[0] rather than a literal
+			// 'junctions', so this row cannot drift from the strip it opens; and the pane's own
+			// remembered tab is deliberately not honoured here, because a row called Tables that
+			// opened the profile would be a lie the first time it mattered.
+			{
+				icon: 'table', label: pc.lpn_tables_menu || 'Tables', tip: pc.lpn_tables_menu_tip,
+				fn: function () {
+					var tables = paneTables();
+					closeMenu();
+					if (tables.length) { openPane(tables[0].id); }
+				}
+			},
+			{ separator: true },
+			// **THE MENU'S ROW IS ALWAYS HERE; THE TOOLBAR'S BUTTON IS NOT** (Task 467). Tom wrote
+			// "Run (if present)" of the TOOLBAR, where the button goes away while this project
+			// recalculates by itself. A menu row that vanished with it would leave a user who
+			// wonders where Run went with nothing to read -- so the row stays and its tip is what
+			// explains the missing button.
+			{
+				icon: 'run', label: pc.lpn_time_run || 'Run', tip: pc.lpn_run_menu_tip,
+				fn: function () {
+					closeMenu();
+					// runSolve(), not solveNow(): solveNow is only the NAME this is exported
+					// under at the foot of the file, not a function in scope here.
+					if (EngCalcs.lpnTimeRunNow) { EngCalcs.lpnTimeRunNow(); }
+					else { runSolve(); }
+				}
+			},
 			{
 				icon: 'info', label: pc.lpn_time_run_report || 'EPANET run report',
 				tip: pc.lpn_time_run_report_tip,
@@ -13859,16 +13943,10 @@ var EngCalcs = EngCalcs || {};
 		// often; View > Hide map readouts was always the other door and is now the only one. The
 		// pressed state it needed lives on that menu row, which redraws its own label each time the
 		// menu opens (openViewMenu), so nothing has to be kept in step with a button any more.
-		// **THE PROFILE, AND IT IS TWO DOORS TO ONE IMPLEMENTATION** -- this button and the View >
-		// Profile row, which Tom kept deliberately ("I like that the command is under the View
-		// menu"). Both call openPane('profile'); nothing about the profile lives in either.
-		// The icon is the one drawn for it: a jagged ground line closed down to a datum, so it reads
-		// as a body of earth rather than as a sparkline.
-		var profileBtn = document.createElement('button');
-		profileBtn.type = 'button';
-		setIconLabel(profileBtn, 'profile', pc.lpn_profile_menu || 'Profile', pc.lpn_profile_tip);
-		profileBtn.addEventListener('click', function () { openPane('profile'); });
-		viewGroup.appendChild(profileBtn);
+		// **THE PROFILE BUTTON IS NOT HERE ANY MORE** -- it moved down to the project group, beside
+		// Tables, when the strip was re-grouped to mirror the Project menu (Tom, 2026-08-21). This
+		// group is now Zoom to fit alone: what is left in it is the one command that changes how you
+		// are LOOKING at the drawing, which is also all the View menu still holds.
 		// **THERE IS NO LABELS BUTTON.** Tom, 2026-08-18: "Toolbar.Labels: We can remove this button
 		// now. Everything is simpler than EPANET or epanetjs because all project settings are in
 		// (tada!) Settings." Every route to the label controls still works and none of them was this
@@ -13913,23 +13991,59 @@ var EngCalcs = EngCalcs || {};
 		// button in toolbarIconIndex, which is what Help > "What the toolbar icons mean" is derived
 		// from. Shown whether or not the network has a duration; a project with none has exactly one
 		// step and the selector says so.
+		// **THE STRIP MIRRORS THE PROJECT MENU FROM HERE ON** (Tom, 2026-08-21, giving both orders in
+		// one line: "Settings Libraries | Profile Tables | Run"). Two strips that name the same
+		// commands in two different orders make the user learn the interface twice; in one order
+		// each teaches the other. The groups carry the menu's separators: what the project IS, what
+		// you READ beside it, and what you RUN on it.
 		var netGroup = group();
-		// **LIBRARIES IS THE MISSING IDEA, not a fourth way to the Settings box** (Tasks 462/460).
-		// The document has carried patterns, curves and controls since Task 423 and nothing on the
-		// page could see one; this button is that door. See the Libraries box further down for why
-		// it is a box of its own rather than a Settings section or three more pane tabs.
+		// Settings first, matching the menu. **LIBRARIES IS THE MISSING IDEA, not a fourth way to
+		// the Settings box** (Tasks 462/460): the document has carried patterns, curves and controls
+		// since Task 423 and nothing on the page could see one; this button is that door. See the
+		// Libraries box further down for why it is a box of its own rather than a Settings section
+		// or three more pane tabs.
+		var settingsBtn = document.createElement('button');
+		settingsBtn.type = 'button';
+		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
+		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
+		netGroup.appendChild(settingsBtn);
 		var libBtn = document.createElement('button');
 		libBtn.type = 'button';
 		libBtn.id = 'lpn_library_btn';
 		setIconLabel(libBtn, 'library', pc.lpn_library_menu || 'Libraries', pc.lpn_library_menu_tip);
 		libBtn.addEventListener('click', function () { toggleLibraryBox(); });
 		netGroup.appendChild(libBtn);
-		var settingsBtn = document.createElement('button');
-		settingsBtn.type = 'button';
-		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
-		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
-		netGroup.appendChild(settingsBtn);
-		if (EngCalcs.lpnTimeMountToolbar) { EngCalcs.lpnTimeMountToolbar(netGroup, setIconLabel); }
+
+		// **WHAT YOU READ BESIDE THE PROJECT.** The profile is TWO DOORS TO ONE IMPLEMENTATION --
+		// this button and the Project > Profile menu row; both call openPane('profile') and nothing
+		// about the profile lives in either. Its icon is the one drawn for it: a jagged ground line
+		// closed down to a datum, so it reads as a body of earth rather than as a sparkline.
+		var readGroup = group();
+		var profileBtn = document.createElement('button');
+		profileBtn.type = 'button';
+		setIconLabel(profileBtn, 'profile', pc.lpn_profile_menu || 'Profile', pc.lpn_profile_tip);
+		profileBtn.addEventListener('click', function () { openPane('profile'); });
+		readGroup.appendChild(profileBtn);
+		// **TABLES OPENS THE FIRST TABLE, NEVER THE PROFILE TAB**, for the reason the menu row states.
+		// It is a COMMAND, not the pressed/unpressed pane toggle at the right end of the strip: that
+		// one reports whether the pane is open and can close it, this one names what you will find
+		// inside. Two controls, two questions -- and the tables were "a gap barely discoverable with
+		// the bottom pane button" (Tom, 2026-08-21) precisely because only the toggle existed.
+		var tablesBtn = document.createElement('button');
+		tablesBtn.type = 'button';
+		setIconLabel(tablesBtn, 'table', pc.lpn_tables_menu || 'Tables', pc.lpn_tables_menu_tip);
+		tablesBtn.addEventListener('click', function () {
+			var tables = paneTables();
+			if (tables.length) { openPane(tables[0].id); }
+		});
+		readGroup.appendChild(tablesBtn);
+
+		// **WHAT YOU RUN ON IT.** Its own group, so Run and the transport sit after Profile and
+		// Tables exactly as they do in the menu. js/lpn-time.js owns everything in it, including
+		// whether the Calculate button is on the strip at all -- see EC.lpnTimeAutoRun().
+		var runGroup = group();
+		runGroup.id = 'lpn_toolbar_run';
+		if (EngCalcs.lpnTimeMountToolbar) { EngCalcs.lpnTimeMountToolbar(runGroup, setIconLabel); }
 
 		// **THE RIGHT EDGE OF THE STRIP: GO SOMEWHERE, AND SHOW SOMETHING** (Task 434). Tom put the
 		// pane toggles there "beside a goto-by-ID search", which is what Find already is (Task 420)
@@ -16445,6 +16559,24 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 		});
 		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET solver', engInput, pc.lpn_settings_engine_epanet_tip);
+		// **AUTOMATIC RECALCULATION** (Task 467, Tom 2026-08-20). The switch this page had was a
+		// measurement nobody could see; this is the same decision made out loud. Turning it OFF puts
+		// the Calculate button back on the toolbar -- js/lpn-time.js reads this through the host's
+		// autoRun() and renders the strip accordingly, so there is nothing to keep in step here.
+		var autoInput = document.createElement('input');
+		autoInput.type = 'checkbox';
+		autoInput.checked = (settings.autoRun !== false);
+		autoInput.addEventListener('change', function () {
+			settings.autoRun = autoInput.checked;
+			// Re-render the strip immediately: the whole point of the checkbox is that the button
+			// appears or disappears, and a change you have to provoke a solve to see reads as broken.
+			if (EngCalcs.lpnTimeRenderPanel) { EngCalcs.lpnTimeRenderPanel(); }
+			// Turning it ON is a request for an up-to-date answer, so give one rather than waiting
+			// for the next edit. Turning it OFF asks for nothing, and costs nothing.
+			if (settings.autoRun) { scheduleSolve(); }
+			saveToStorage();
+		});
+		row(compBody, pc.lpn_settings_auto_run || 'Recalculate the simulation for this project automatically', autoInput, pc.lpn_settings_auto_run_tip);
 		// ---- restore defaults (Tom, 2026-07-30) ----
 		// Resets settings/labelSettings only -- the network (nodes/links/labels) and backdrop are
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
@@ -19827,7 +19959,13 @@ var EngCalcs = EngCalcs || {};
 			// The one door from the Time TAB (the transport) to the Time SETTINGS, which moved to
 			// the Settings box in Task 441. Handed over rather than reached for, so lpn-time.js
 			// still knows nothing about this page beyond the seam.
-			openSettings: openSettingsBox
+			openSettings: openSettingsBox,
+			// **THE ONE PLACE js/lpn-time.js READS THE AUTO-RUN PREFERENCE** (Task 467). Handed over
+			// rather than reached for, like every other line of this seam: that file knows nothing
+			// about `settings` and must not learn. `!== false` rather than a truth test, so a
+			// project saved before this setting existed reads as ON -- which is what it did.
+			autoRun: function () { return settings.autoRun !== false; },
+			setAutoRun: function (on) { settings.autoRun = !!on; saveToStorage(); rebuildSettingsFields(); }
 		});
 	}
 	// **THE WHOLE SEAM TO js/lpn-search.js** (Task 437). One call, at script scope, so the placement

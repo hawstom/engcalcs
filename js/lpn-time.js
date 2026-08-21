@@ -329,6 +329,25 @@
 	EC.LPN_TIME_AUTO = { budgetMs: 400, idleMs: 900 };
 
 	/**
+	 * **THE MEASUREMENT IS NOW ADVICE, NOT A VETO** (ROADMAP Task 467). Everything above still holds
+	 * as the description of a cost; what changed is who decides. A checkbox that silently stopped
+	 * obeying above 400 ms was two states pretending to be one -- the user reads "automatically" and
+	 * the page has quietly gone manual, with the only evidence a run that never happens.
+	 *
+	 * So: automatic means automatic. `budgetMs` no longer gates anything. When a run measures over
+	 * this threshold the status bar says so and names the switch, and the user turns it off or does
+	 * not. Tom's *"multiplied burden ... not good for data entry efficiency"* (2026-08-19) is
+	 * answered by the offer, not by a hidden veto.
+	 *
+	 * 1 s rather than 400 ms because these are different questions. 400 ms is where a page stops
+	 * feeling live, which is the right threshold for a decision made silently and often. This one
+	 * interrupts somebody to tell them something, so it must be the point where the cost is
+	 * undeniable rather than the point where it becomes noticeable -- a second is a pause a person
+	 * reports without being prompted.
+	 */
+	EC.LPN_TIME_SLOW_MS = 1000;
+
+	/**
 	 * EVERY STRING THIS FILE SHOWS, in one place, and read through an explicit `pageConfig.<key>`
 	 * on purpose: dev/scripts/pageconfig_check.php greps the source for exactly that shape, and a
 	 * lookup through a variable key is INVISIBLE to it. That invisibility is how a page silently
@@ -396,6 +415,7 @@
 			runRefusedWhy: pageConfig.lpn_engine_refused_why || 'The EPANET solver said: {message}',
 			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.',
 			runReport: pageConfig.lpn_time_run_report || 'EPANET run report',
+			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to work out, and it is set to work itself out again after every change. To stop that and get a Calculate button back, turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics.',
 			close: pageConfig.lpn_close || 'Close'
 			// **FIVE STRINGS LEFT THIS LIST WITH THE PANE TAB**: lpn_time_tank, lpn_time_level and
 			// lpn_time_settings_open named the tank table and the door to the settings, and
@@ -515,13 +535,32 @@
 	}
 
 	/**
-	 * May the page re-run the period by itself? Only while the last measured run of THIS network
-	 * came in under the budget. Unmeasured (a document that has just arrived) counts as allowed:
-	 * the first run is how the measurement is taken, and refusing to take it would leave every
-	 * project manual forever.
+	 * May the page re-run the period by itself? **ONE QUESTION NOW: what did the user ask for**
+	 * (Task 467). The measurement that used to decide this is EC.LPN_TIME_SLOW_MS's job and only
+	 * advises -- see there for why a silent veto and a checkbox cannot both be the answer.
+	 *
+	 * `!== false` on the host side, so a project saved before the setting existed reads as ON.
+	 * A page with no host at all (a Node harness) counts as ON for the same reason the old
+	 * "unmeasured counts as allowed" did: refusing would make every unconfigured case manual.
 	 */
 	function autoRunAllowed() {
-		return state.lastRunMs === null || state.lastRunMs <= EC.LPN_TIME_AUTO.budgetMs;
+		return !host || !host.autoRun || host.autoRun();
+	}
+	/**
+	 * The advice, once per run that earns it. Not `host.status()` on a timer and not a dialog: the
+	 * status bar is where this page says what it just did, and this is a fact about the run that
+	 * just finished.
+	 *
+	 * **IT NAMES THE SWITCH RATHER THAN OFFERING A BUTTON**, because the status bar is text
+	 * (setStatus writes textContent) and a sentence a user can act on beats a control this bar
+	 * cannot carry. Task 467 keeps the clickable version open.
+	 */
+	function adviseIfSlow() {
+		var S = strings(), secs;
+		if (!host || !autoRunAllowed()) { return; }
+		if (state.lastRunMs === null || state.lastRunMs <= EC.LPN_TIME_SLOW_MS) { return; }
+		secs = (state.lastRunMs / 1000).toFixed(1);
+		host.status(S.runSlowAdvice.replace('{secs}', secs));
 	}
 	function cancelIdleRun() {
 		if (state.idle) { clearTimeout(state.idle); state.idle = null; }
@@ -628,6 +667,8 @@
 			state.runSig = sig;
 			clampTime();
 			showFrame();
+			// Last, so the advice is the sentence left standing rather than one this run overwrites.
+			adviseIfSlow();
 		}, function (err) {
 			state.lastRunMs = nowMs() - t0;
 			runFinished();
@@ -1227,6 +1268,16 @@
 	 * directly would build four correct buttons the guide has never heard of -- and
 	 * dev/browser-pass/specs/toolbar.js asserts that the guide lists exactly the strip.
 	 */
+	/**
+	 * Show or hide the Calculate button to match the project's auto-run setting (Task 467). Called
+	 * when the strip is built and whenever the setting changes, which is what EC.lpnTimeRenderPanel
+	 * is for -- js/looped-network.js's checkbox calls it directly so the button appears the instant
+	 * the box is ticked, rather than at the next solve.
+	 */
+	function syncRunButton() {
+		if (!ui || !ui.run) { return; }
+		ui.run.style.display = autoRunAllowed() ? 'none' : '';
+	}
 	EC.lpnTimeMountToolbar = function (container, iconLabel) {
 		var S = strings(), name;
 		if (!container) { return; }
@@ -1274,6 +1325,16 @@
 		// make the one feature it announces undiscoverable in the state most people open the page
 		// in. It is never the ONLY way to a period result -- see EC.LPN_TIME_AUTO.
 		ui.run = btn('run', S.run, function () { requestRun(true); }, S.runTip);
+		// **HIDDEN WHILE THIS PROJECT WORKS ITSELF OUT** (Task 467). Tom, 2026-08-20: *"If it's on,
+		// we do our debounce and calculate, and we hide the Calculate button."* A button that
+		// recomputes what is already being recomputed is a button whose press changes nothing
+		// visible, and this strip has no room for one.
+		//
+		// **THE MENU ROW IS NOT HIDDEN WITH IT**, and that is the whole reason the row exists: a
+		// user who wonders where Run went finds it in Project > Run, whose tip says which setting
+		// took the button away. A row that vanished too would leave the question unanswerable.
+		// display, not removal, so renderPanel() can put it back without rebuilding the strip.
+		syncRunButton();
 		ui.prev = btn('step-back', S.prev, function () { stepBy(-1); }, null, true);
 		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } }, null, true);
 		ui.next = btn('step-fwd', S.next, function () { stepBy(1); }, null, true);
@@ -1341,8 +1402,15 @@
 	// The one thing a solve or a clock edit still has to repaint: the transport on the toolbar.
 	// Kept under its old name because it is called from eight places that mean "the run changed".
 	function renderPanel() {
+		syncRunButton();
 		renderTransport();
 	}
+	/**
+	 * The one door js/looped-network.js has to this file's own chrome (Task 467). Its auto-run
+	 * checkbox calls it so the Calculate button appears or disappears on the tick, rather than at
+	 * whatever solve happens next.
+	 */
+	EC.lpnTimeRenderPanel = renderPanel;
 
 	/**
 	 * The whole seam. js/looped-network.js calls this once, at script scope, and everything this
