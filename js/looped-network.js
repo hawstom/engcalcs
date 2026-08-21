@@ -13537,7 +13537,7 @@ var EngCalcs = EngCalcs || {};
 		// the pane before it starts reporting sizes.
 		profileResizeWatch();
 		wireUnitGroups();
-		var opening = initLibrary();
+		var opening = initLibrary(), bornClean = false;
 		if (opening) {
 			applySaved(opening);
 			buildDom();
@@ -13561,12 +13561,17 @@ var EngCalcs = EngCalcs || {};
 			// with NO savedSig is dirty from its first breath -- and the asterisk is then inescapable,
 			// because Revert is for FILE projects and would be disabled on it.
 			//
-			// Stamped inline rather than by calling stampProjectSaved(), for the same reason the entry
-			// is pushed inline: that function ends in renderTabs(), and the tab strip is not wired
-			// yet. The name is set FIRST because the signature includes it.
-			library.projects.push({
-				id: firstId, name: firstName, updated: Date.now(), savedSig: docSignature()
-			});
+			// **THE BASELINE IS STAMPED AFTER seedDefaultInputs(), NOT HERE** (Task 418). Stamped
+			// here it was still too early: the seeding fills settings.defaults a few lines below,
+			// docSignature() covers those, and the first autosave then found a document that had
+			// changed with nobody having touched it -- a permanent asterisk on the first project of
+			// a first visit. What the baseline has to describe is the document as the visitor is
+			// first shown it, and that document does not exist until the seeding has run.
+			//
+			// Inline rather than stampProjectSaved(), for the same reason the entry is pushed
+			// inline: that function ends in renderTabs(), and the tab strip is not wired yet.
+			library.projects.push({ id: firstId, name: firstName, updated: Date.now() });
+			bornClean = true;
 			saveIndex();
 		}
 		wireNotesPopup();
@@ -13575,6 +13580,13 @@ var EngCalcs = EngCalcs || {};
 		// still-null default would render as an empty box). Also necessarily after the units strip
 		// is in the DOM, which is what the seeding exists to wait for.
 		seedDefaultInputs();
+		// The born-clean baseline, now that the document is the one the visitor will be shown. See
+		// the note above at "AND IT IS BORN CLEAN": nothing between there and here is a user edit,
+		// so this is still the untouched document -- it is just the whole of it (Task 418).
+		if (bornClean) {
+			var firstEntry = indexEntry(library.openId);
+			if (firstEntry) { firstEntry.savedSig = docSignature(); saveIndex(); }
+		}
 		// One call builds all four sections, so wireLabelsPopup() is gone: its whole body was
 		// rebuildLabelsFields(), which rebuildSettingsBox() now runs alongside its three siblings.
 		wireSettingsBox();

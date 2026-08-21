@@ -583,17 +583,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     (shedding) · 6 labels hidden because the zoom is too far out · 7 leader lines drawn.
   - Stopping at N answers "did my change help?" — the answer is two drawings at the same step.
 
-- 55|418| **The first project of a first visit is marked dirty with nobody having touched it**, so its
-  tab wears a permanent asterisk. Found by the Task 414 browser-pass repair, 2026-08-17, and it is
-  Tom's 2026-08-15 "the initial project gets an unwarranted asterisk" -- the stamp was moved and is
-  still too early.
-  - **Measured:** `lpn_index` is written at boot with a `savedSig` and no `dirty`; within ~200 ms the
-    first autosave finds a different signature and sets `dirty: true`. It never clears until a save.
-  - **Cause is boot ORDER, not the signature:** the branch stamps the baseline inline
-    (`savedSig: docSignature()`) and only then runs `seedDefaultInputs()`, which fills
-    `settings.defaults` -- and `docSignature()` covers those. Stamp after the seeding.
-  - Written up at the top of `dev/browser-pass/specs/boot.js`. No knowingly-red spec was added.
-
 - 25|417| **Long-press on an element should enter Edit mode, exactly as a click does.** Tom,
   2026-08-17. The guard that switches to Edit mode on click does not fire when a long press begins a
   drag, so a touch user who presses and drags is editing an element the page does not think is
