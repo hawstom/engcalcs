@@ -612,6 +612,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     at `effective()`. Task 462's Curves section is deliberately a VIEWER so this has one obvious
     home and no second write path to unpick.
 
+- 55|471| **A rejected `.inp` falls back to the steady answer without saying so.** Found while
+  fixing Task 466. `EngCalcs.lpnEpanetRun` THROWS on a rejected input rather than returning
+  `{ok:false}`, and the page's rejection handler calls `noEngine(model)` — so a run EPANET refused
+  looks to the user exactly like a run that happened. That is why one dangling control read as "the
+  run just didn't happen" rather than as an error.
+  - Two halves, and the second needs a sprint: make the failure reachable, and say it. `buildInp`
+    already carries a `warnings` array of codes; the drop Task 466 now makes is silent because
+    `lpnTimeModelBlock` has no such channel and the conditionless drop it already made was silent
+    too. Both want one message: what we ignored, and that the numbers came from our own solver.
+
 - 55|467| **Automatic recalculation as a stated preference.** Tom, 2026-08-20: *"a toggle under
   Calculation.Hydraulics for 'Recalculate the simulation for this project automatically.' If it's
   on, we do our debounce and calculate, and we hide the Calculate button."* The machinery is
