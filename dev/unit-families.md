@@ -22,6 +22,21 @@ array-splitting cannot do. Two cases in HW alone:
   is ambiguous for `partial_head` — whichever appears later in the list wins, which is precisely
   today's `inH₂O`-overwrites-`psi` bug.
 
+## A field may be a RATE PER its unit, and then the conversion is the reciprocal
+
+Canal Seepage prices water per unit volume and lining per unit area, and marks both in
+`Canal-Seepage.php` with `'separator' => '/'` — the `$` … `/` … `[ft3]` reading of the control.
+The unit select still names the family (`volume`, `land_area`); what differs is the direction:
+`EngCalcs.readFormInput()` DIVIDES by the factor, which is right for a quantity of that unit, while
+a price PER that unit MULTIPLIES — a cubic metre of water costs 35.3147 times what a cubic foot
+costs. Reading a rate with the quantity helper is wrong by the factor SQUARED and is invisible
+under SI, where every factor is 1; that shipped on this page until Task 473.
+
+`EngCalcs.readFormInputPerUnit()` is the one helper for this, added beside `readFormInput()` rather
+than as a flag on it, so no existing caller could change behaviour. **`'separator' => '/'` is the
+marker to look for**, and as of Task 473 Canal Seepage is the only page in the suite that carries
+it.
+
 ---
 
 ## Why the preset buttons are wrong today (the two defects, for reference)
