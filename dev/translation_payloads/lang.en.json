@@ -1029,7 +1029,7 @@
         "lpn_labels_heading_link": "Link labels",
         "lpn_labels_decimals_tip": "Decimal places shown for this label",
         "lpn_labels_mark_extrema": "Mark highest and lowest values",
-        "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.",
+        "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map (an overline), and a line below the lowest value of that kind (an underline), so you can pick out the two ends without reading the numbers.",
         "lpn_settings_apply_to_all": "Apply to all",
         "lpn_settings_apply_to_all_tip": "Every asset of this kind that is already drawn gets an ID starting with this text. Each one keeps its number. An ID that does not end in a number is left alone.",
         "lpn_confirm_apply_prefix": "Rename {n} assets so their IDs start with {prefix}? Each one keeps its number.",
