@@ -32,11 +32,19 @@ exports.run = async function ({ browser, report }) {
 		report.ok(tabs[0].current, 'and it is the current tab');
 		report.has(tabs[0].title, 'Not saved to a file', 'a project with no file says so');
 
-		// **THE FIRST PROJECT ARRIVES CLEAN** (Task 418, closed). It did not: `lpn_index` was
-		// written at boot with a `savedSig`, and within ~200 ms, with no user action at all, the
-		// first autosave found a different signature and set `dirty: true` for good. The cause was
-		// boot ORDER — the baseline was stamped before seedDefaultInputs() filled
-		// settings.defaults, which docSignature() covers — and the fix is to stamp after it.
+		// **THE FIRST PROJECT ARRIVES CLEAN** (Task 418). It did not: `lpn_index` was written at
+		// boot with a `savedSig`, and with no user action at all the first autosave found a
+		// different signature and set `dirty: true` for good.
+		//
+		// **THIS ASSERTION HAS NEVER BEEN RUN IN A BROWSER.** It was written alongside a first fix
+		// — the baseline was stamped before seedDefaultInputs() filled settings.defaults, and moved
+		// after it — and Tom still saw the asterisk afterwards. The second cause was the CANVAS
+		// SIZE: docSignature() includes `view`, currentView() answers null until applyMapHeight()
+		// gives the canvas a height on `window load`, so the baseline described a viewless document
+		// and the next autosave called the arriving view an edit. Fixed in noteMapSized() and
+		// saveToStorage(); covered headlessly by dev/lpn-spike/boot-clean-harness.js, which fails
+		// 4 of 13 checks without it. What this spec adds over that harness is a REAL layout, which
+		// is the quantity the harness has to model rather than measure.
 		//
 		// **ASSERTED AFTER A SETTLE, because the defect needed one.** At the moment of the first
 		// paint the tab was clean either way; it was the autosave a fifth of a second later that

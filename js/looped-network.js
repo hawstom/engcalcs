@@ -9456,8 +9456,17 @@ var EngCalcs = EngCalcs || {};
 			// is always dirty -- exactly right, since a browser project is in no file at all.
 			// The strip is redrawn only when the answer CHANGES: this runs on every pointer move of a
 			// drag, and a full tab re-render per frame would be visible.
-			var nowDirty = docSignature() !== entry.savedSig;
-			if (nowDirty !== !!entry.dirty) { entry.dirty = nowDirty; renderTabs(); }
+			// **THE SIGNATURE MEANS NOTHING UNTIL THE CANVAS HAS A SIZE** (Task 418). `view` is part
+			// of it and currentView() answers null before first layout, so an autosave that beats
+			// `window load` -- the boot solve is on a 300 ms debounce, and a slow subresource pushes
+			// `load` past it -- would compare a viewless document against a saved signature that has
+			// a view and raise the asterisk on a document nobody touched. Worse, that verdict is
+			// self-sealing: rebaseSignatureIfClean() only rebases a CLEAN project. Leave the flag as
+			// it stands; noteMapSized() settles it the moment there is a canvas to describe.
+			if (mapSized) {
+				var nowDirty = docSignature() !== entry.savedSig;
+				if (nowDirty !== !!entry.dirty) { entry.dirty = nowDirty; renderTabs(); }
+			}
 		}
 		saveIndex();
 	}
@@ -13623,6 +13632,11 @@ var EngCalcs = EngCalcs || {};
 		// The born-clean baseline, now that the document is the one the visitor will be shown. See
 		// the note above at "AND IT IS BORN CLEAN": nothing between there and here is a user edit,
 		// so this is still the untouched document -- it is just the whole of it (Task 418).
+		//
+		// **AND IT IS STILL NOT THE FINAL WORD, because `view` is part of the signature and there is
+		// no view yet.** The canvas is authored at height 0 behind the curtain, so currentView()
+		// answers null here whatever the drawing is. noteMapSized() re-baselines once the canvas has
+		// a size; see the note there.
 		if (bornClean) {
 			var firstEntry = indexEntry(library.openId);
 			if (firstEntry) { firstEntry.savedSig = docSignature(); saveIndex(); }
@@ -15688,14 +15702,27 @@ var EngCalcs = EngCalcs || {};
 		// The basemap needs a viewport to know which tiles are in it, so the first honest chance to
 		// draw one is here, not at init.
 		scheduleBasemapRefresh();
-		if (!fitWhenSized) { return; }
-		fitWhenSized = false;
-		var wasAuto = autoFitWhenSized;
+		var wasAuto = autoFitWhenSized, v = pendingRestore;
 		autoFitWhenSized = false;
-		var v = pendingRestore;
 		pendingRestore = null;
-		if (validView(v) && applyView(v)) { return; }
-		zoomExtent(wasAuto);
+		if (fitWhenSized) {
+			fitWhenSized = false;
+			if (!(validView(v) && applyView(v))) { zoomExtent(wasAuto); }
+		}
+		// **NOTHING THAT HAPPENED BEFORE THE CANVAS HAD A SIZE WAS A USER EDIT** (Task 418), so this
+		// re-baselines once, here, and never again -- the mapSized guard above makes this function
+		// run exactly once per page load, and rebaseSignatureIfClean() still refuses a project that
+		// is genuinely dirty.
+		//
+		// It is needed because `view` is part of docSignature() and currentView() answers NULL
+		// while the canvas has no height. So the baseline stamped at boot describes a document with
+		// no view, and the first autosave after the canvas is sized compares it against one that
+		// HAS a view and finds a difference nobody made: a permanent asterisk on the first project
+		// of a first visit, permanent because rebaseSignatureIfClean() then refuses forever.
+		//
+		// AFTER the deferred fit/restore above, not before: rebasing first would stamp the view as
+		// it is on the way in and let the restore that follows dirty the project instead.
+		rebaseSignatureIfClean();
 	}
 	function applyMapHeight(secondPass) {
 		if (!svg) { return; }
