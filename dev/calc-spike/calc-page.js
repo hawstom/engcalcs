@@ -61,16 +61,19 @@ function dumpForm(pageName, lang) {
 // Deliberately thin. A calculator touches .value, .innerHTML, .textContent, .className and
 // .classList and nothing else; anything richer would be inventing browser behaviour that the
 // assertions then depend on.
-function mkEl(id, written) {
+function mkEl(id, written, tagName) {
 	const el = {
 		id: id,
+		tagName: (tagName || '').toUpperCase(),
 		value: '',
 		_innerHTML: '',
 		_text: '',
+		attributes: {},
 		className: '',
 		style: {},
 		dataset: {},
 		children: [],
+		parentNode: null,
 		rows: 0,
 		classList: {
 			_s: new Set(),
@@ -80,15 +83,37 @@ function mkEl(id, written) {
 		},
 		addEventListener() {},
 		removeEventListener() {},
-		querySelector() { return null; },
-		querySelectorAll() { return []; },
-		getElementsByTagName() { return this.children; },
-		appendChild(c) { this.children.push(c); return c; },
-		removeChild(c) { const i = this.children.indexOf(c); if (i >= 0) { this.children.splice(i, 1); } return c; },
-		insertRow() { const row = mkEl('tr'); this.children.push(row); return row; },
+		// **A GENERATED CELL'S IDENTITY IS ITS `name`, NOT AN id.** addCalcRow() gives every cell it
+		// builds a name and no id, and the row-table calculators then reach them through
+		// document.getElementsByName(). A stub without setAttribute leaves every such cell nameless,
+		// and every row result goes to the same nowhere while the run still looks clean.
+		setAttribute(k, v) { this.attributes[k] = String(v); },
+		getAttribute(k) { return Object.prototype.hasOwnProperty.call(this.attributes, k) ? this.attributes[k] : null; },
+		hasAttribute(k) { return Object.prototype.hasOwnProperty.call(this.attributes, k); },
+		getElementsByTagName(tag) { return collectByTag(this, tag); },
+		querySelector(sel) { const m = collectBySelector(this, sel); return m.length ? m[0] : null; },
+		querySelectorAll(sel) { return collectBySelector(this, sel); },
+		appendChild(c) { this.children.push(c); c.parentNode = this; return c; },
+		removeChild(c) { const i = this.children.indexOf(c); if (i >= 0) { this.children.splice(i, 1); c.parentNode = null; } return c; },
+		insertRow() { const row = mkEl('', written, 'tr'); this.appendChild(row); return row; },
+		contains(other) {
+			if (other === this) { return true; }
+			return this.children.some(c => c && typeof c.contains === 'function' && c.contains(other));
+		},
 		closest() { return null; },
 		focus() {}, select() {}, click() {}
 	};
+	// **`el.name = x` AND `el.setAttribute('name', x)` MUST BE THE SAME FACT.** addCalcRow() sets an
+	// INPUT's name as a property and an output TD's as an attribute, and branched-network.js then
+	// finds a row's inputs with querySelector('input[name="..."]'). A stub that kept the two apart
+	// read every input cell back as blank -- which does not throw and does not print: it solves a
+	// network of zero-length pipes with zero demand and reports it cleanly.
+	Object.defineProperty(el, 'name', {
+		get() { return el.attributes.name || ''; },
+		set(v) { el.attributes.name = String(v == null ? '' : v); },
+		enumerable: true, configurable: true
+	});
+	if (id) { el.name = id; }
 	// **AN ELEMENT OWNS ITS CHILDREN'S TEXT, AND A STUB THAT FORGETS THAT LIES QUIETLY.** Assigning
 	// textContent REPLACES the children; reading it walks them. setLabel() builds a button as an
 	// <svg> plus a text node, so a plain string property reads back "" for every button on the page
@@ -105,11 +130,51 @@ function mkEl(id, written) {
 	// innerHTML is tracked, not stored plainly, so a harness can ask afterwards which cells the
 	// calculator actually WROTE. That is what makes a suite-wide smoke test possible without a
 	// per-page list of result names: the page tells you what its outputs are by writing them.
+	// Assigning it also DROPS the children, which is how every row-table page empties its table
+	// (`document.getElementById('CalcsBody').innerHTML = ''`).
 	Object.defineProperty(el, 'innerHTML', {
 		get() { return this._innerHTML; },
-		set(v) { this._innerHTML = v; if (written) { written.add(id); } }
+		set(v) {
+			this._innerHTML = v;
+			if (this.children.length) { this.children.forEach(c => { c.parentNode = null; }); this.children.length = 0; }
+			if (written) { written.add(this); }
+		}
 	});
 	return el;
+}
+
+/** Every descendant of `root` (root itself excluded) whose tagName matches, in document order. */
+function collectByTag(root, tag) {
+	const want = String(tag).toUpperCase();
+	const out = [];
+	(function walk(node) {
+		for (const c of node.children) {
+			if (!c) { continue; }
+			if (want === '*' || c.tagName === want) { out.push(c); }
+			walk(c);
+		}
+	}(root));
+	return out;
+}
+
+/**
+ * The one selector shape the calculators actually use: `tag[attr="value"]`, `[attr="value"]` or a
+ * bare `tag`. Deliberately not a CSS engine -- anything richer would be inventing browser behaviour
+ * the assertions then lean on. THROWS on a selector it cannot honour rather than returning nothing,
+ * because "no match" and "I did not understand you" are different answers and the silent one reads
+ * back as an empty row.
+ */
+function collectBySelector(root, sel) {
+	const m = /^\s*([a-zA-Z]*)\s*(?:\[\s*([a-zA-Z_-]+)\s*=\s*"([^"]*)"\s*\])?\s*$/.exec(sel);
+	if (!m || (!m[1] && !m[2])) {
+		throw new Error(`calc-page.js: selector '${sel}' is beyond this stub (tag[attr="value"] only)`);
+	}
+	const want = m[1] ? m[1].toUpperCase() : '';
+	return collectByTag(root, '*').filter(function (c) {
+		if (want && c.tagName !== want) { return false; }
+		if (m[2] && c.getAttribute(m[2]) !== m[3]) { return false; }
+		return true;
+	});
 }
 
 /**
@@ -140,7 +205,7 @@ function loadCalculator(pageName, opts) {
 			form[name] = mkRadioGroup(name, f.options, f.value);
 			continue;
 		}
-		const el = mkEl(name, written);
+		const el = mkEl(name, written, f.tag === 'select' ? 'select' : 'input');
 		el.value = f.value === null ? '' : f.value;
 		if (f.tag === 'select') {
 			el._family = f.family;
@@ -153,18 +218,44 @@ function loadCalculator(pageName, opts) {
 
 	// --- element bag: every id the page rendered, created on first touch ---
 	const pageIds = new Set(dump.ids);
+	const MAY_BE_ABSENT = new Set(['points_data']);
 	const els = {};
 	function getElementById(id) {
 		if (form[id] && form[id].id) { return form[id]; }
 		if (els[id]) { return els[id]; }
 		if (!pageIds.has(id)) {
+			// **AN ID A CALCULATOR PROBES FOR IS NOT AN ID IT WRITES TO.** addCalcRow() asks for
+			// 'points_data' behind an `if (...)` because only some row-table pages carry that
+			// textarea -- Branched-Network has one, Irrigation-Pressure does not. A browser answers
+			// null there and the page carries on, so throwing would report a working page as broken.
+			// The guarded probes are named ONE BY ONE rather than the rule being softened to "return
+			// null for anything", which is how the loud throw would stop catching a real lost row.
+			if (MAY_BE_ABSENT.has(id)) { return null; }
 			throw new Error(
 				`${pageName}: the calculator wrote to element '${id}', which the rendered page does ` +
 				`not contain. In a browser getElementById returns null there and the calculator ` +
 				`throws on every keystroke. Either the page lost a row or the name was misspelled.`
 			);
 		}
-		els[id] = mkEl(id, written);
+		makePageEl(id);
+		return els[id];
+	}
+
+	// **CalcsBody IS THE <tbody> INSIDE CalcsTable, and a stub that leaves them unrelated breaks
+	// row building in a way that reads as "the page has no table".** addCalcRow() appends to
+	// `getElementById('CalcsTable').getElementsByTagName('TBODY')[0]` while every calculator READS
+	// `getElementById('CalcsBody')`, so unless the same element answers both, rows are created into
+	// an orphan and every row result is silently blank. They are therefore created as a pair,
+	// whichever one the page asks for first.
+	const PAGE_EL_TAGS = { CalcsTable: 'table', CalcsBody: 'tbody', CalcsForm: 'form' };
+	function makePageEl(id) {
+		if (els[id]) { return els[id]; }
+		els[id] = mkEl(id, written, PAGE_EL_TAGS[id] || 'div');
+		if (id === 'CalcsTable' || id === 'CalcsBody') {
+			const table = (id === 'CalcsTable') ? els[id] : makePageEl('CalcsTable');
+			const body = (id === 'CalcsBody') ? els[id] : makePageEl('CalcsBody');
+			if (body.parentNode !== table) { table.appendChild(body); }
+		}
 		return els[id];
 	}
 
@@ -175,16 +266,34 @@ function loadCalculator(pageName, opts) {
 		querySelector() { return null; },
 		querySelectorAll() { return []; },
 		addEventListener() {},
-		createElement(tag) { return mkEl(tag, null); },
+		createElement(tag) { return mkEl('', written, tag); },
+		/**
+		 * The row tables' ONLY addressing mechanism. addCalcRow() builds cells with a `name` and no
+		 * id, and every row-table calculator writes its results through this call -- so without it
+		 * `mi`, `wi`, `ip` and `bpn` cannot be tested past their singleton fields at all.
+		 * Falls back to the named form control when nothing in the element tree matches, which is
+		 * what a browser would return for a singleton field.
+		 */
+		getElementsByName(name) {
+			const out = [], seen = new Set();
+			const roots = [documentStub.body].concat(Object.values(els));
+			for (const root of roots) {
+				for (const c of collectByTag(root, '*')) {
+					if (c.name === name && !seen.has(c)) { seen.add(c); out.push(c); }
+				}
+			}
+			if (!out.length && form[name] && form[name].id) { out.push(form[name]); }
+			return out;
+		},
 		// **A TEXT NODE IS A NODE.** setLabel() builds `icon + text` by appending one, so a stub
 		// without this throws the moment any button changes its own label -- which the Copy link
 		// button does on every success, swapping in a tick for 1.5 s. Modelled as an element with a
 		// tag no markup has, so anything walking children can still read it and nothing mistakes it
 		// for a real tag.
-		createTextNode(text) { const n = mkEl('#text', null); n.textContent = String(text); return n; },
+		createTextNode(text) { const n = mkEl('', null, '#text'); n.textContent = String(text); return n; },
 		cookie: '',
-		body: mkEl('body', null),
-		documentElement: mkEl('html', null),
+		body: mkEl('', null, 'body'),
+		documentElement: mkEl('', null, 'html'),
 		readyState: 'complete'
 	};
 	const sandbox = {
@@ -222,6 +331,10 @@ function loadCalculator(pageName, opts) {
 	// with the scripts. Without it every EngCalcs.unitFactor() call answers 1 and every
 	// US-unit assertion on this page would quietly pass in metres.
 	EngCalcs.unitFactors = dump.unitFactors;
+	// Emitted by the same inline block, and just as invisible when missing: the row-table pages
+	// seed their sample rows from it (`var us = (this.defaultUnitSet === 'us')`), so leaving it
+	// undefined builds every default row in metric numbers under the US preset -- a 100 in pipe.
+	EngCalcs.defaultUnitSet = dump.defaultUnitSet;
 	EngCalcs.pageConfig = Object.assign({}, EngCalcs.pageConfig, dump.pageConfig);
 
 	// --- the handle ---
@@ -331,13 +444,96 @@ function loadCalculator(pageName, opts) {
 		 * 19 calculators without a hand-maintained list of result names per page.
 		 */
 		outputs() {
-			const out = {};
-			for (const id of written) { out[id] = getElementById(id).innerHTML; }
+			const out = {}, seen = {};
+			for (const el of written) {
+				if (el.id) { out[el.id] = el.innerHTML; continue; }
+				// A generated row cell has a name and no id, so it is reported as `name[row]` --
+				// the index is its position among the cells of that name, which IS its row.
+				const key = el.name || el.tagName || 'el';
+				seen[key] = seen[key] || 0;
+				out[key + '[' + seen[key] + ']'] = el.innerHTML;
+				seen[key] += 1;
+			}
 			return out;
 		},
 
 		/** Forgets what has been written so far, so a second run() reports only its own outputs. */
-		forget() { written.clear(); return api; }
+		forget() { written.clear(); return api; },
+
+		// ---- dynamic row tables ---------------------------------------------------------------
+		// The four row-table calculators (`bpn`, `ip`, `mi`, `wi`) write nothing at all until their
+		// rows exist, and the rows are built by the page's OWN pageCalculatorInitialize() /
+		// pageAddCalcRow() -- which is exactly what should be exercised, since the sample rows they
+		// seed are a per-preset default like any other and have been wrong before (Task 233).
+		// So the harness never builds a row itself; it calls the page's builder and then addresses
+		// the cells the way the calculator does, by name and row index.
+
+		/** Builds the page's default rows, exactly as a first-time visitor gets them. */
+		initRows() {
+			if (typeof EngCalcs.pageCalculatorInitialize !== 'function') {
+				throw new Error(`${pageName}: defines no pageCalculatorInitialize -- it has no row table`);
+			}
+			EngCalcs.pageCalculatorInitialize(form);
+			return api;
+		},
+
+		/** Removes the last row, exactly as the page's own "-" button does. */
+		removeRow() {
+			EngCalcs.deleteSingleCalcRow();
+			return api;
+		},
+
+		/** Adds one more row, exactly as the page's own "+" button does. */
+		addRow() {
+			if (typeof EngCalcs.pageAddCalcRow !== 'function') {
+				throw new Error(`${pageName}: defines no pageAddCalcRow -- it has no row table`);
+			}
+			EngCalcs.pageAddCalcRow();
+			return api;
+		},
+
+		/** How many rows the page believes it has. */
+		rowCount() { return EngCalcs.numCalcRows; },
+
+		/** Every cell named `name`, one per row, in row order. */
+		cells(name) { return documentStub.getElementsByName(name); },
+
+		/** One row's cell, by name. Throws by row index rather than returning undefined. */
+		cell(name, row) {
+			const all = documentStub.getElementsByName(name);
+			if (!all[row]) {
+				throw new Error(`${pageName}: no cell named '${name}' in row ${row} (${all.length} rows have one)`);
+			}
+			return all[row];
+		},
+
+		/** Types into row `row`, in DISPLAY units: setRow(1, { bpn_l: 500, bpn_diameter: 3 }). */
+		setRow(row, obj) {
+			for (const [name, v] of Object.entries(obj)) {
+				const el = api.cell(name, row);
+				if (v === null || v === undefined) { el.checked = false; el.value = ''; }
+				else if (typeof v === 'boolean') { el.checked = v; }
+				else { el.value = String(v); }
+			}
+			return api;
+		},
+
+		/** The raw innerHTML of a row result cell -- for verdict strings. */
+		rowHtml(name, row) { return api.cell(name, row).innerHTML; },
+
+		/** A row result as the page displays it, in the currently selected DISPLAY unit. */
+		rowNum(name, row) {
+			const raw = api.cell(name, row).innerHTML;
+			const n = parseFloat(raw);
+			if (!isFinite(n)) { throw new Error(`${pageName}: row ${row} '${name}' is not a number: "${raw}"`); }
+			return n;
+		},
+
+		/** The same value in SI, using the column's own unit select. */
+		rowSi(name, row) { return api.rowNum(name, row) / api.factor(name); },
+
+		/** What is currently typed in a row INPUT cell. */
+		rowInput(name, row) { return api.cell(name, row).value; }
 	};
 	return api;
 }
