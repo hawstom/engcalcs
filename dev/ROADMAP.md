@@ -509,12 +509,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
     drawing is still correct.
 
-- 55|440| **Closing a big project still costs nine seconds, and 60% of it is one loop.**
-  `refreshLabelText()`'s LINK half interleaves a write and a measurement per label, and its shed
-  cascade measures inside the same iteration — so `getBBox` forces a synchronous layout per label per
-  rung. The node half was split into write-all-then-measure-all and the whole close went 24,262 →
-  9,484 ms on 256 junctions; the link half needs the loop split into three passes. The number to beat
-  is in `dev/browser-pass/specs/perf.js`.
+- 50|471| **`alignedSideFor()` walks every link to place one label, which is the next quadratic.**
+  With the four measurement quadratics fixed (Task 440), a Close of the 256-junction grid spends 21%
+  of its self time in `linkPointList()` — 480 x 480 calls on that drawing — against getBBox()'s 6.2%.
+  The number to beat and the profile it came from are at the top of `dev/browser-pass/specs/perf.js`;
+  a saving worth defending is worth a COUNTABLE guard, as `dev/lpn-spike/label-batch-harness.js` is.
 
 - 55|436| **Placement follow-ups, after Tom's first real use (2026-08-18).** The tool is two visible
   steps now — step 1 detached (the project holds still while the map moves under it), step 2 attached
