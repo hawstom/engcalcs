@@ -139,24 +139,6 @@ the block.
   - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
     drawing is still correct.
 
-- 100|467| **Automatic recalculation as a stated preference.** Tom, 2026-08-20: *"a toggle under
-  Calculation.Hydraulics for 'Recalculate the simulation for this project automatically.' If it's
-  on, we do our debounce and calculate, and we hide the Calculate button."* The machinery is
-  `EC.LPN_TIME_AUTO` (Task 248) — this makes the invisible measured heuristic an explicit project
-  setting. **This is what is left of the task.**
-  - **Keep the measurement, demote it to ADVICE.** A checkbox that silently stops obeying above 400
-    ms is two states pretending to be one. Automatic means automatic; when a run measures over ~1 s
-    the status bar says so and offers to turn it off. Tom's *"multiplied burden ... not good for
-    data entry efficiency"* (2026-08-19) is answered by the offer, not by a hidden veto.
-  - **THE PROJECT MENU SHIPPED 2026-08-21** — Settings, Libraries, and the EPANET run report, under
-    a `project` icon traced from Tom's own 17×17 pixel drawing of a part-unrolled plan set. Report is
-    the row that earns the menu: the run box appears only for a run somebody pressed Calculate for,
-    so an automatic run produced a report that nothing could show. `js/lpn-time.js` keeps the last
-    report whether a box was shown or not (`EC.lpnTimeShowReport`), which is also what makes the
-    toggle above safe to build. `dev/lpn-spike/run-box-harness.js`, `specs/projectmenu.js`.
-    The menu bar's own bare **Settings item was removed** 2026-08-21 (Tom): once Project's first
-    row opened the panel, the bar offered the same box twice. The toolbar button is untouched.
-
 - 100|480| **[H] `privacy.php` says "exactly one exception" and there are now three.** Live legal text,
   found 2026-08-21. It discloses OSM and Mapbox tiles; it does not mention the Nominatim place-name
   search, which shipped later and is the **most** sensitive of the three — a tile says where you are
@@ -376,6 +358,10 @@ the block.
   `lpn_notes_*` (Task 448's stability note and the Notes review) and `lpn_file_import_inp_tip`. Plus
   the keys written since: `lpn_color_mode_manual`, `lpn_time_no_period`, and the three
   `lpn_basemap_satellite_*`. Needs Tom's authorization, and a Wave 0 over the changed set first.
+  - **Earned 2026-08-21 by the menu/toolbar rework:** `lpn_clean_map` CHANGED to Tom's own wording
+    ("Reduce map clutter", replacing "Clean map" — he called it "more honest and understandable"), so
+    26 translations of it are now stale. NEW: `lpn_tables_menu`, `lpn_tables_menu_tip`,
+    `lpn_run_menu_tip`, `lpn_settings_auto_run`, `lpn_settings_auto_run_tip`, `lpn_time_run_slow`.
 
 - 50|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
   *"Properties are never dropped from node labels, so Node label drop order is a lie... As I look at
