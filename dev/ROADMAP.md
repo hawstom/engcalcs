@@ -1,76 +1,43 @@
-# Introduction
+# Roadmap
 
-This is a prioritized, bulleted roadmap for the EngCalcs hydraulic calculator suite.
-
-**Format: `Priority|ID| Description`.** One flat list, highest priority first, lowest ID first inside a
-band. There are no category sections: as of 2026-08-21 they were measured dead, with **81 of 87 open
-tasks in `Calculator Improvements` alone**, so the heading sorted nothing and cost a decision on every
-new task. Standing prose that was NOT a task — the new-calculator scoring axes, the Energy-for-Water
-candidates, the Search Console evidence base — moved to `# Reference` at the foot of this file.
-
-**PRIORITY IS ONE OF FIVE VALUES AND NOTHING ELSE:**
+Open tasks for the EngCalcs hydraulic calculator suite. **Format: `Priority|ID| Description`.** One
+flat list, highest priority first, lowest ID first inside a band. `# Reference` at the foot holds the
+standing prose that is not a task.
 
 | Priority | Means |
 |---|---|
 | **100** | **Next.** Being worked, or the thing to pick up on finishing something. |
-| **75** | **Soon.** Real, wanted, and queued behind Next. |
+| **75** | **Soon.** Real, wanted, queued behind Next. |
 | **50** | **Someday.** Agreed worth doing; nothing is waiting on it. |
 | **25** | **Maybe.** Worth keeping; not obviously worth doing. |
 | **5** | **Parked.** Alive only so it is not re-proposed from scratch. |
-| **0** | **Closed** — and *only* that. The block moves to `dev/roadmap-closed-ids.md` in the same edit; `php dev/scripts/roadmap_id_check.php` enforces both directions. |
+| **0** | **Closed** — the block moves to `dev/roadmap-closed-ids.md` in the same edit. |
 
-**Ties are the point, not a failure.** Twelve tasks at 75 says "these are the soon ones" honestly; it
-does not pretend to rank them. Pick from a band by what is in front of you.
+Five values and nothing between them. Ties are the point: twelve tasks at 75 says "these are the soon
+ones" honestly rather than pretending to rank them. *(Replaced a 0–100 free scale on 2026-08-21, when
+88 tasks used 19 distinct values and 40 of them sat between 40 and 60. The rejected alternative was to
+re-space the fine scale; 45-vs-50 is a distinction nobody can re-derive a month later.)*
 
-*(Replaced a 0–100 free scale on 2026-08-21, on Tom's "I don't understand the roadmap priorities".
-Measured: 88 open tasks across **19 distinct priority values**, nothing above 85 — so a documented
-ceiling of 100 nobody used made every number read ~15 low — and 40 of the 88 jammed between 40 and 60
-in eight-way ties. The rejected alternative was to keep the fine scale and re-space it; it was rejected
-because the scale never failed for lack of room. It failed because 45-vs-50 is a distinction nobody
-can re-derive a month later, so the extra resolution was noise wearing the costume of precision.)*
+**ID is permanent** — never reused, never changed, unrelated to priority. Cite one as "Task N". A
+sub-item under a parent may use a dotted ID (`146.01`) and is still a full bullet.
 
-**ID is permanent** — never reused, never changed, unrelated to priority. Cite one in prose as
-"Task N", in another task's text, in a commit message, in `dev/` docs. A task that is one of several
-concrete sub-items under a single parent may use a dotted ID, `parent.nn` (e.g. `146.01`); it is still
-a full `Priority|ID|` bullet, just grouped under its parent by ID.
+**A marker says what a task is WAITING ON. It never changes the priority**, because worth and
+reachability are different questions.
 
-**A marker says what a task is WAITING ON, and a marker never changes the priority.** Priority is
-worth; a marker is reachability, and they are different questions:
+- **`WAIT: sprint`** — needs Tom to authorize a paid translation sprint. No AI may launch one. It does
+  not block anyone else; work around it.
+- **`CHECK: YYYY-MM-DD`** — a gate, not a deadline. Before the date the work yields nothing; after it
+  the task is doable *at the priority it already had*. Only a task whose value DECAYS gets its priority
+  changed, and then say why.
 
-- **`WAIT: sprint`** — blocked on Tom authorizing a paid translation sprint. **No AI may launch one.**
-  This exists because Task 405 sat at the third-highest priority on the board while being unstartable
-  by anyone but Tom, and a number cannot say that.
-- **`CHECK: YYYY-MM-DD`** — waiting on the calendar. **A gate, not a deadline**: before it the work
-  yields nothing; after it the task becomes doable **at whatever priority it already had**. An arrived
-  date means "you may now do this", never "do this next". *(An earlier draft said to raise the priority
-  on arrival. Tom: "Use the real priority, and don't let the date promote it.")* The one exception is a
-  task whose **value decays** — then change the priority and say why; that is worth changing, not the
-  date acting.
+**Actor tags:** `[CC]` Claude Code, `[CP]` Copilot, `[H]` needs a human decision, `[CC→CP]` / `[CP→CC]`
+a split task. Untagged = actor-agnostic. Lifecycle: `cross-platform-planning.md` §2.2.2.
 
-**Actor tags** show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Copilot,
-`[H]` = Human decision needed, `[CC→CP]` / `[CP→CC]` = split task (first actor works, then updates the
-tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-planning.md` §2.2.2.
-
-
-## LENGTH DISCIPLINE (Tom, 2026-08-05) — read this before writing a task
-
-**Tom's complaint, verbatim and correct:** *"We are getting huge, and now apparently gratuitous, roadmap bloat. Task 219 could have been a single line: 'Add lpn to Related links on hw, bpn, and ip.'"* He was right. This file went **1,720 → 5,634 lines in nine days** (2026-07-27 → 2026-08-05, a 3.3× growth), and Task 219 was written at 44 lines for what is a three-line PHP edit plus one real blocker. It is now 9.
-
-**The default is 1–3 lines.** Most tasks are a sentence. Write the sentence and stop.
-
-**The one test that decides whether a line may be added: would a competent person, reading the short version, DO SOMETHING DIFFERENT if this line were there?** If not, cut it. That test kills, specifically:
-- Reasoning that leads to the obvious action. If the action is obvious, the reasoning is decoration.
-- Restating the request, then agreeing with it, then explaining why it is a good idea.
-- Rejected alternatives nobody proposed.
-- Explaining what a thing is, when the reader can open the file and see.
-
-**Expansion is EARNED, and only by these four:** (a) a decision with a real rejected alternative, so it is not relitigated; (b) a measured number, so it is not re-measured; (c) a non-obvious constraint or blocker; (d) a correction of something previously recorded wrong here. Task 213's ratio table and Task 219's identity-string blocker earn their lines. Almost nothing else does.
-
-**Hard cap ~15 lines.** Past that, the content is a `dev/*.md` document and the task is one line pointing at it. `dev/` already holds a dozen such docs; that is the mechanism, use it.
-
-**On close, COMPRESS — do not just set priority to 0 and move the block.** A closed task is ≤5 lines: what changed, where it lives, and any finding a future reader needs. The narrative of how it got built is not that. (Standing offenders as of 2026-08-05: Task 195 at 296 lines, 140 at 252, 211 at 218, 203 at 198. Mean task block is 26 lines and median is 13, so these are 8–20× typical.)
-
-**This is a real cost, not tidiness.** The file is loaded into context to answer almost any question about this project; every gratuitous line is paid for repeatedly, by both humans and AI, forever.
+**Length: 1–3 lines, hard cap ~15.** One test for adding a line — *would a competent person reading
+the short version DO SOMETHING DIFFERENT if it were there?* Expansion is earned by a decision with a
+real rejected alternative, a measured number, a non-obvious blocker, or a correction. Past the cap the
+content is a `dev/*.md` and the task is one line pointing at it. Compress on close, do not just move
+the block.
 
 # Tasks
 
@@ -87,6 +54,47 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
   - **Web Mercator must NOT become the document's coordinate system**, and its distances are not
     ground distances (`1/cos(latitude)`: ~15% at 40°, ~30% at 50°). This is the strongest argument for
     the standing rule that **`len` is stored and overridable, never derived.**
+  - **THE ONLY UNDECLARED PROJECT IS THE ONE AT BOOT.** File > New declares grid-or-geographic by
+    which of its four rows you click, and an import reads it from the file — so every other route
+    already carries the answer (Tom, 2026-08-21, confirmed in `newProjectRows()`). What is left is the
+    first tab of a first visit, which is born grid without anybody saying so. Task 477 is where that
+    gets asked.
+
+- 100|388| **The documentation is written as a transcript of revision, not as current state.**
+  The habit is that a correction is APPENDED, never SUBSTITUTED. The rule: when a decision is
+  superseded, delete the superseded reasoning — keep the conclusion and the one rejected alternative
+  that would otherwise be re-proposed.
+  - **DONE, roadmap half (2026-08-16):** 11,871 lines across ROADMAP + archive → 3,265, then the
+    archive itself dropped to a 321-line ID ledger on Tom's ruling. Its text is in git.
+  - **DONE, CLAUDE.md (2026-08-16):** 1,213 lines / 100 KB → 560 / 36 KB (**36%**). Rules a script
+    enforces are now one table row naming the script. Deep reference moved to
+    `dev/language-strings.md`, `dev/testing-notes.md`, `dev/translation-process.md`.
+  - **DONE, commit messages (2026-08-16):** subject-only by default, ≤72 chars, body only when a
+    reader would act differently, ≤40 words. Measured: Tom's oldest 300 commits had no body 68% of
+    the time (median 84 words); the AI era wrote one on 99 of the last 100 (median 297 words).
+  - **STILL OPEN.** (a) `js/looped-network.js` at 47% comment lines — the sibling `js/lpn-*.js`
+    files were done 2026-08-16, but `looped-network.js` was held back because a concurrent track
+    owned it. (b) DONE 2026-08-18: the last over-budget open roadmap blocks are compacted;
+    `roadmap_id_check.php` names any new one in size order, so this stays a worklist not a search.
+  - **Rewriting the 986 existing commit messages is NOT recommended** and needs Tom's ruling: it
+    rewrites every SHA, forces a push, breaks production's `git pull`, dangles 43 SHA citations in
+    `dev/*.md`, and saves no context — nothing ever loads a commit message.
+
+- 100|389| **Search and replace inputs across the network — WANTED, and no longer gated on network
+  size.** Tom, 2026-08-16: *"I would like search and replace embraced more explicitly."* That
+  reverses this file's earlier position, which said find-and-replace was a big-network tool we
+  should not borrow for a design tool. The reversal is deliberate: a designer re-roughening every
+  PVC pipe, or bumping every 6-inch main to 8-inch after a fire-flow run, is doing DESIGN, not
+  management — the operation is just as native to 15 pipes as to 4,000.
+  - Pairs with Task 353 (find elements by searching): **353 is the query, 389 is the query plus a
+    write.** Build 353's selector first and let 389 reuse it rather than growing a second one.
+  - Must preview before it writes — "37 pipes will change" with the ability to cancel — and must be
+    one undo step, not 37.
+  - Goes through `setProp()` like every other property write, or it edits BASE from inside a
+    scenario. That seam has already produced five user-reachable defects; `scenario_seam_check.php`
+    guards it.
+  - Distinct from Task 185 (Match/Copy properties), which stays a click-source-then-click-targets
+    tool. Both ship; neither replaces the other.
 
 - 100|405| WAIT: sprint — **Resync four English strings the sprint itself earned.** Sprint 397 closed at zero drift and
   zero delta; these four were edited AFTER that baseline, so `detect_english_drift.php` now flags them
@@ -104,6 +112,50 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
   - **BLOCKED ON TOM'S AUTHORIZATION, not on work.** It is a translation sprint, and a sprint spawns
     paid agents; CLAUDE.md forbids inferring that from a general "proceed". The English is already
     edited, so the whole remaining task is the 26 renderings.
+
+- 100|428| **Thematic mode must not hide TEXT.** Tom, 2026-08-18: *"Turning off Text on 'no labels' is
+  unexpected."* A Text object is a note the user placed, not a generated label, and the two are
+  already different things everywhere else (Tasks 342, 407).
+  - **And the right home for a blanket hide is the Labels box, as "Temporarily hide all"** — which
+    would leave Text visible, because Text is not a label. Unticking every field there is already an
+    adequate interface; the thematic mode should not be a second one.
+
+- 100|436| **A wheel notch on the map costs a full label relayout, and that is editor-wide.**
+  Measured on Net3, median per notch: 157 ms XY, 162 ms lat/lon, **26 ms with labels off**. lat/lon is
+  not intrinsically slower — the georeferencing tool is ~20x cheaper than the editor it runs inside.
+  **The task is why a relayout runs on every notch at all.**
+  - Placement leftovers, small: a background image is not carried onto the map, the two-control-point
+    path (`lpnGeorefFromTwoPoints`) is built and tested with no interface, and Finish is not undoable.
+  - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the
+    map's own 1/cos(latitude) — 9% from 20° to 31°. Unavoidable on an unprojected display without an
+    anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.
+
+- 100|439| **The lat/lon drawing comes apart past ~600,000 px/degree, and it is Task 354 in degrees.**
+  A node's `<circle>` rasterises at x = −41,548,184 and is simply not on screen, while `maxScale()`
+  for a geographic project is 5.56e7. The medicine is the one Task 354 already used — coordinates
+  local to an origin — but `LPN_ORIGIN_THRESHOLD` is 1e4 and a longitude is 122, so no geographic
+  document is ever rebased, and `georefStart()` deliberately sets `doc.origin = {0, 0}`. Touches the
+  placement tool, the basemap and the stored file format, so it is its own task.
+  - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
+    drawing is still correct.
+
+- 100|467| **Automatic recalculation as a stated preference.** Tom, 2026-08-20: *"a toggle under
+  Calculation.Hydraulics for 'Recalculate the simulation for this project automatically.' If it's
+  on, we do our debounce and calculate, and we hide the Calculate button."* The machinery is
+  `EC.LPN_TIME_AUTO` (Task 248) — this makes the invisible measured heuristic an explicit project
+  setting. **This is what is left of the task.**
+  - **Keep the measurement, demote it to ADVICE.** A checkbox that silently stops obeying above 400
+    ms is two states pretending to be one. Automatic means automatic; when a run measures over ~1 s
+    the status bar says so and offers to turn it off. Tom's *"multiplied burden ... not good for
+    data entry efficiency"* (2026-08-19) is answered by the offer, not by a hidden veto.
+  - **THE PROJECT MENU SHIPPED 2026-08-21** — Settings, Libraries, and the EPANET run report, under
+    a `project` icon traced from Tom's own 17×17 pixel drawing of a part-unrolled plan set. Report is
+    the row that earns the menu: the run box appears only for a run somebody pressed Calculate for,
+    so an automatic run produced a report that nothing could show. `js/lpn-time.js` keeps the last
+    report whether a box was shown or not (`EC.lpnTimeShowReport`), which is also what makes the
+    toggle above safe to build. `dev/lpn-spike/run-box-harness.js`, `specs/projectmenu.js`.
+    The menu bar's own bare **Settings item was removed** 2026-08-21 (Tom): once Project's first
+    row opened the panel, the bar offered the same box twice. The toolbar button is untouched.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
@@ -125,11 +177,6 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
   - **OPEN — add the suggestion-box instruction to the standard agent prompt template**, so it is not
     re-typed per sprint and cannot be forgotten.
 
-- 75|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
-  reply to outreach, and he has replied gratefully. This is the first real conversation this suite's
-  mission has earned; prepare for the meeting and record what comes of it. Not a search-reach task,
-  but it lives here because it is the same goal reached by a better road.
-
 - 75|378| **[H] Give the seven harnesses a network some other way, and delete
   `drawExampleNetwork()`.** The 289-line code-drawn ring main lost its last user-facing caller when
   Task 375's follow-up removed the File > New "From examples" rows, but seven harnesses still build
@@ -142,69 +189,10 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
   - The care needed is that those harnesses assert solved pressures and specific IDs. Migrate one
     first and diff its output against the current run before touching the other six.
 
-- 75|388| **The documentation is written as a transcript of revision, not as current state.**
-  The habit is that a correction is APPENDED, never SUBSTITUTED. The rule: when a decision is
-  superseded, delete the superseded reasoning — keep the conclusion and the one rejected alternative
-  that would otherwise be re-proposed.
-  - **DONE, roadmap half (2026-08-16):** 11,871 lines across ROADMAP + archive → 3,265, then the
-    archive itself dropped to a 321-line ID ledger on Tom's ruling. Its text is in git.
-  - **DONE, CLAUDE.md (2026-08-16):** 1,213 lines / 100 KB → 560 / 36 KB (**36%**). Rules a script
-    enforces are now one table row naming the script. Deep reference moved to
-    `dev/language-strings.md`, `dev/testing-notes.md`, `dev/translation-process.md`.
-  - **DONE, commit messages (2026-08-16):** subject-only by default, ≤72 chars, body only when a
-    reader would act differently, ≤40 words. Measured: Tom's oldest 300 commits had no body 68% of
-    the time (median 84 words); the AI era wrote one on 99 of the last 100 (median 297 words).
-  - **STILL OPEN.** (a) `js/looped-network.js` at 47% comment lines — the sibling `js/lpn-*.js`
-    files were done 2026-08-16, but `looped-network.js` was held back because a concurrent track
-    owned it. (b) DONE 2026-08-18: the last over-budget open roadmap blocks are compacted;
-    `roadmap_id_check.php` names any new one in size order, so this stays a worklist not a search.
-  - **Rewriting the 986 existing commit messages is NOT recommended** and needs Tom's ruling: it
-    rewrites every SHA, forces a push, breaks production's `git pull`, dangles 43 SHA citations in
-    `dev/*.md`, and saves no context — nothing ever loads a commit message.
-
-- 75|389| **Search and replace inputs across the network — WANTED, and no longer gated on network
-  size.** Tom, 2026-08-16: *"I would like search and replace embraced more explicitly."* That
-  reverses this file's earlier position, which said find-and-replace was a big-network tool we
-  should not borrow for a design tool. The reversal is deliberate: a designer re-roughening every
-  PVC pipe, or bumping every 6-inch main to 8-inch after a fire-flow run, is doing DESIGN, not
-  management — the operation is just as native to 15 pipes as to 4,000.
-  - Pairs with Task 353 (find elements by searching): **353 is the query, 389 is the query plus a
-    write.** Build 353's selector first and let 389 reuse it rather than growing a second one.
-  - Must preview before it writes — "37 pipes will change" with the ability to cancel — and must be
-    one undo step, not 37.
-  - Goes through `setProp()` like every other property write, or it edits BASE from inside a
-    scenario. That seam has already produced five user-reachable defects; `scenario_seam_check.php`
-    guards it.
-  - Distinct from Task 185 (Match/Copy properties), which stays a click-source-then-click-targets
-    tool. Both ship; neither replaces the other.
-
-- 75|436| **Placement follow-ups, after Tom's first real use (2026-08-18).** The tool is two visible
-  steps now — step 1 detached (the project holds still while the map moves under it), step 2 attached
-  (handles live). `dev/georeferencing.md`.
-  - **[H] Convert into a NEW project rather than in place — recommended, not built.** Today the
-    conversion mutates the open project, so Cancel is the only way back and after Finish the user's XY
-    file is one Save away from being overwritten by a lat/lon one. Tom raised it; the mechanism
-    already exists (`importProject()` lands an `.inp` in a new tab, `saveProjectAs()` duplicates a
-    project whole). Costs two tabs and a naming convention.
-  - **The label pipeline is what a wheel notch costs, and it is editor-wide, not conversion-specific.**
-    Measured on Net3, median per notch: 157 ms XY, 162 ms finished lat/lon, **26 ms with labels off**.
-    lat/lon is NOT intrinsically slower. A raster stand-in for the model was considered and is not
-    needed — the conversion itself is ~20x cheaper than the editor it came from. **The real task is
-    why a relayout runs on every notch at all.**
-  - A background image is still not carried onto the map; the two-control-point path
-    (`lpnGeorefFromTwoPoints`) is built, tested and has no interface; Finish is not undoable.
-  - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the
-    map's own 1/cos(latitude) — 9% from 20° to 31°. Unavoidable on an unprojected display without an
-    anisotropic transform, which `js/lpn-georef.js` refuses by design.
-
-- 75|439| **The lat/lon drawing comes apart past ~600,000 px/degree, and it is Task 354 in degrees.**
-  A node's `<circle>` rasterises at x = −41,548,184 and is simply not on screen, while `maxScale()`
-  for a geographic project is 5.56e7. The medicine is the one Task 354 already used — coordinates
-  local to an origin — but `LPN_ORIGIN_THRESHOLD` is 1e4 and a longitude is 122, so no geographic
-  document is ever rebased, and `georefStart()` deliberately sets `doc.origin = {0, 0}`. Touches the
-  placement tool, the basemap and the stored file format, so it is its own task.
-  - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
-    drawing is still correct.
+- 75|426| **The SI and US preset buttons give no clue what they do.** Tom, 2026-08-18. They change
+  every unit at once, which under Task 422's rule is a reinterpretation of the whole document. Label
+  them *Non-destructive (doesn't rewrite inputs)* — or whatever wording Task 425 settles on, so the
+  two agree.
 
 - 75|458| WAIT: sprint — **One project mode, two names, in four languages.** `dev/scripts/mode_name_check.php` (new,
   advisory, in `check_all.sh`) opens on **14 disagreements in ru, sr, tr and zh** — a language's
@@ -218,40 +206,41 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
     quoted it back all sprint. Entry rewritten; the key list the check walks is derived from the
     English, so a new mode-naming string joins it by itself.
 
-- 75|465| **[H] Reusable DEFINITIONS — Pumps, Pipes, Custom — start at `effective()`, not at a screen.**
-  Tom named them beside Patterns/Curves/Controls in Task 462, but they are a different idea and
-  Task 462 deliberately left them out. Patterns, curves and controls are things the document already
-  HOLDS; a "150 mm PVC" pipe type carrying diameter, roughness and minor-loss k, referenced by 400
-  pipes so that editing it changes all 400, is a new INDIRECTION through the element model.
-  - The cost, in order: a definitions table plus a `typeRef` on the element (small); **a third
-    resolution layer under `effective()`** — override → element → type-default — and `effective()`
-    is the one seam the solver, the renderer, the labels, the popups and the six pane tables all
-    read through (this is the expensive part, and exactly the shared seam CLAUDE.md warns about);
-    and **a visible detached-versus-inherited state per property**, or a user edits a definition and
-    cannot see why nothing moved.
-  - **EPANET has no such concept**, so an `.inp` export flattens it and an import can never rebuild
-    it — which breaks Task 281's byte-identical round trip for anything typed.
-  - Worth doing, and worth a real productivity win on a large model. Task 390-sized, and it starts
-    at `effective()`. Task 462's Curves section is deliberately a VIEWER so this has one obvious
-    home and no second write path to unpick.
+- 75|465| **[H] Reusable pipe and pump TYPES — one "150 mm PVC" definition that 400 pipes point at,
+  so editing it edits all 400.** A type carries diameter, roughness and minor-loss k; an element names
+  a type instead of repeating the numbers. Tom named these beside Patterns/Curves/Controls in Task 462,
+  but those are things the document already HOLDS — this is a new indirection through the element model.
+  - **It starts at `effective()`, which is the expensive part.** A third resolution layer — override →
+    element → type-default — under the one seam the solver, renderer, labels, popups and six pane
+    tables all read through. Plus a visible detached-versus-inherited state per property, or a user
+    edits a definition and cannot see why nothing moved.
+  - **EPANET has no such concept**, so an `.inp` export flattens it and an import can never rebuild it,
+    which breaks Task 281's byte-identical round trip for anything typed. Task 390-sized.
 
-- 75|467| **Automatic recalculation as a stated preference.** Tom, 2026-08-20: *"a toggle under
-  Calculation.Hydraulics for 'Recalculate the simulation for this project automatically.' If it's
-  on, we do our debounce and calculate, and we hide the Calculate button."* The machinery is
-  `EC.LPN_TIME_AUTO` (Task 248) — this makes the invisible measured heuristic an explicit project
-  setting. **This is what is left of the task.**
-  - **Keep the measurement, demote it to ADVICE.** A checkbox that silently stops obeying above 400
-    ms is two states pretending to be one. Automatic means automatic; when a run measures over ~1 s
-    the status bar says so and offers to turn it off. Tom's *"multiplied burden ... not good for
-    data entry efficiency"* (2026-08-19) is answered by the offer, not by a hidden veto.
-  - **THE PROJECT MENU SHIPPED 2026-08-21** — Settings, Libraries, and the EPANET run report, under
-    a `project` icon traced from Tom's own 17×17 pixel drawing of a part-unrolled plan set. Report is
-    the row that earns the menu: the run box appears only for a run somebody pressed Calculate for,
-    so an automatic run produced a report that nothing could show. `js/lpn-time.js` keeps the last
-    report whether a box was shown or not (`EC.lpnTimeShowReport`), which is also what makes the
-    toggle above safe to build. `dev/lpn-spike/run-box-harness.js`, `specs/projectmenu.js`.
-    The menu bar's own bare **Settings item was removed** 2026-08-21 (Tom): once Project's first
-    row opened the panel, the bar offered the same box twice. The toolbar button is untouched.
+- 75|476| **[H] Convert to lat/lon should land in a NEW project, not mutate the open one.** Today the
+  conversion mutates in place, so Cancel is the only way back and after Finish the user's XY file is one
+  Save away from being overwritten by a lat/lon one. The mechanism exists — `importProject()` lands an
+  `.inp` in a new tab, `saveProjectAs()` duplicates a project whole. Costs two tabs and a naming
+  convention. Extracted from Task 436, where it was the only decision in a performance task.
+
+- 75|477| **[H] A New-project WIZARD instead of the four-row File > New fly-out.** Tom, 2026-08-21,
+  on epanet-js: *"they have a wizard box with xy and lat/lon as the top choices, and if lat/lon is
+  selected, a search box is enabled. Below it are the units and head loss formula selectors."*
+  - It answers three open things at once: the coordinate declaration for the boot project (Task 145's
+    last gap), a home for the geocoder that already works (Task 437), and head-loss formula at creation
+    rather than buried in Settings.
+  - **Against it:** the current fly-out ASKS FOR NOTHING — the choice is which row you click, and a
+    wizard puts a form in front of the commonest action. Weigh that before building.
+
+- 75|479| **LibreWaterNet.org needs a landing page, and this account needs a hosting decision.**
+  Draft the page in `dev/` first. epanet-js has one at epanetjs.com for app.epanetjs.com; ours is the
+  same shape. Positioning is settled in `dev/positioning.md` — lead with the invitation, not the
+  comparison.
+  - **The hosting half is the part that needs Tom.** The repo lives at
+    `~/public_html/hawsedc/engcalcs`, a subfolder of constructionnotesmanager.com, so the suite is
+    publicly reachable at `constructionnotesmanager.com/hawsedc/engcalcs` with broken CSS. `~/librewaternet.org`
+    and `~/libreepanet.org` are already web roots. Options and the recommendation:
+    `dev/hosting-layout.md`.
 
 - 50|207| **The dilettante path: make replying cost one tap, not five steps.** Full design
   record in **`dev/dilettante-path.md`** — the cost ladder (Rung 0 is a tap with no text), the three
@@ -264,32 +253,23 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
 
-- 50|248.02| **Patterns (Task 248 child) — a named multiplier series, and the boundary conditions
-  that read one.** Tom, 2026-08-17 named the uses, and they are wider than demand:
-  demands and supplies, **reservoir heads** (a river or source level that varies), **pump schedules**
-  (on/off or a speed multiplier), water-quality source concentrations, and **electricity pricing**.
-  - EPANET's `[PATTERNS]` is a list of multipliers per pattern time step; a junction, a reservoir, a
-    pump and a source each name one. The importer reports every one of these as dropped today
-    (`demand-pattern`, `head-pattern`), so the import side already knows where they attach.
-  - **Water quality is NOT in scope and cannot be scoped by Tom** — 2026-08-17: *"I don't know
-    anything about water quality modeling including diffusivity and bulk/wall reactions."* Build the
-    pattern mechanism so a WQ source could read one later; do not build WQ on the strength of it.
-  - **THE EXPORT HALF IS DONE (2026-08-18).** `[PATTERNS]`, `[CONTROLS]`, `[TIMES]`, `[OPTIONS]
-    Pattern` and the `[JUNCTIONS]` pattern column are all written back, each value as its own text —
-    Net3 exports at 1,229 of 1,229 tokens byte-identical.
-  - **THE RUN IS DONE TOO (2026-08-18).** A pattern now reaches EPANET as a pattern rather than as a
-    pre-multiplied demand, and Net3 matches EPA's published 24-hour report to 0.005 ft of head over
-    2,425 comparisons. **What is left here is an EDITOR** — nothing on this page creates, names or
-    changes a pattern, or attaches one to a reservoir head or a pump. Imported ones are carried,
-    solved and written back untouched.
+- 50|248.02| **Patterns (Task 248 child) — attach one to a RESERVOIR HEAD and a PUMP.** Everything
+  else shipped: the Libraries box creates, renames, edits and deletes patterns with a sparkline, the
+  property popup attaches one to a junction demand, `[PATTERNS]`/`[TIMES]`/`[OPTIONS] Pattern` round-trip
+  byte-identically, and Net3 matches EPA's published 24-hour report to 0.005 ft over 2,425 comparisons.
+  - **Water quality is NOT in scope and cannot be scoped by Tom** (2026-08-17: *"I don't know anything
+    about water quality modeling"*). Build the mechanism so a WQ source could read a pattern later; do
+    not build WQ on the strength of it.
 
-- 50|248.03| **Controls (Task 248 child) — simple and rule-based.** Turning pumps, pipes and valves
-  on and off, and changing a setting, on tank level, on time, or on a node pressure. EPANET's
-  `[CONTROLS]` (simple) and `[RULES]` (rule-based).
-  - Simple controls first: they are four sentence shapes and they cover the great majority of real
-    models. Rule-based is a language, and it can wait for evidence that a user has one.
-  - The `active` property (Task 184/407) is already how a link is switched off in a scenario, so a
-    control writes through a mechanism that exists; what is new is that it fires from a CONDITION.
+- 25|248.03| **Rule-based controls, EPANET's `[RULES]` (Task 248 child).** Simple `[CONTROLS]` shipped
+  2026-08-18 — the Libraries box adds, edits, validates and deletes them, an unreadable sentence is kept
+  and marked rather than discarded, and only a fully understood one reaches the engine.
+  - Deliberately parked: rule-based is a language, and it can wait for evidence that a user has one.
+
+- 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
+  reply to outreach, and he has replied gratefully. This is the first real conversation this suite's
+  mission has earned; prepare for the meeting and record what comes of it. Not a search-reach task,
+  but it lives here because it is the same goal reached by a better road.
 
 - 50|408| **Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.**
   Tom, 2026-08-17. A toggle or picker for the increment, not a forced snap — free dragging must stay
@@ -304,61 +284,28 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
     visitors norm (`js/vendor/` today holds only the EPANET engine). Decide the mechanism before
     scoping the toggle above.
 
-- 50|425| **The unit-change question, in Tom's own words.** He rewrote it 2026-08-18; use this
-  wording rather than paraphrasing it, and add the CANCEL the first cut lacked.
-  - Title: *This unit decides what your inputs mean*. Then *cfs is the unit of what you enter for*
-    and the field names **one per line**, not a comma list.
-  - Then *Options for units change*: **Non-destructive** — leaves every input as it is and
-    reinterprets it in the new unit. **Destructive** — rewrites every input with a mathematical
-    conversion so the physical characteristics of the network stay very close to the same within
-    conversion tolerances; loses the original inputs.
+- 50|425| **The dialog shown when you change a unit on the lpn page and the project already has
+  content.** It asks what the change should mean to the numbers already typed. Use Tom's own wording
+  (2026-08-18) rather than paraphrasing it, and add the CANCEL the first cut lacked.
+  - Title: *This unit decides what your inputs mean*. Then *cfs is the unit of what you enter for* and
+    the field names **one per line**, not a comma list.
+  - Then *Options for units change*: **Non-destructive** — leaves every input as it is and reinterprets
+    it in the new unit. **Destructive** — rewrites every input with a mathematical conversion so the
+    network stays physically close to the same within conversion tolerances; loses the original inputs.
   - Buttons: **Non-destructive · Destructive · Cancel**.
-  - **Open, and worth doing:** back the original inputs up before a Destructive change, or offer to.
-    An undo snapshot is already taken; whether that is enough is the question.
+  - **Open:** back the original inputs up before a Destructive change, or offer to. An undo snapshot is
+    already taken; whether that is enough is the question.
 
-- 50|426| **The SI and US preset buttons give no clue what they do.** Tom, 2026-08-18. They change
-  every unit at once, which under Task 422's rule is a reinterpretation of the whole document. Label
-  them *Non-destructive (doesn't rewrite inputs)* — or whatever wording Task 425 settles on, so the
-  two agree.
+- 50|427| **Say on the map which field it is coloured by.** The two Coloring dropdowns shipped
+  2026-08-18, but a project opened later shows a coloured map and no statement of what the colour
+  means. Candidate home: under or replacing the legend title.
 
-- 50|427| **Two dropdowns shipped 2026-08-18; what is left is documenting the CHOICE.** Nodes and
-  links have a dropdown each in the Settings box's Coloring section, neither clears the other, and
-  clicking the legend opens the box on that section. `dev/browser-pass/specs/color.js`.
-  - **OPEN: once a field is chosen the picker is poorly documented** for anyone who opens the
-    project later. Candidate home: the bottom of the map, rightward, under or replacing the legend
-    title.
-
-- 50|428| **Thematic mode must not hide TEXT.** Tom, 2026-08-18: *"Turning off Text on 'no labels' is
-  unexpected."* A Text object is a note the user placed, not a generated label, and the two are
-  already different things everywhere else (Tasks 342, 407).
-  - **And the right home for a blanket hide is the Labels box, as "Temporarily hide all"** — which
-    would leave Text visible, because Text is not a label. Unticking every field there is already an
-    adequate interface; the thematic mode should not be a second one.
-
-- 50|429| **The RAMP picker shipped 2026-08-18; the RANGES picker is what is left.** The ramp
-  dropdown groups its schemes by ColorBrewer family — **sequential** and **diverging**, the standard
-  vocabulary (matplotlib, d3, QGIS, ArcGIS), not epanet-js's non-standard "Continuous" — and draws
-  the ramp beside its name. Five ramps: EPANET's own, viridis, gray, and ColorBrewer's YlGnBu and
-  RdYlBu, whose Apache-2.0 licence is honoured by the credit line in the panel.
-  - **OPEN: the Ranges picker.** Today the ranges are four break boxes plus Equal intervals / Equal
-    counts / Automatic. Tom wants one dropdown choosing among 5 calculation modes and a number of
-    breaks, reading closed as e.g. `Ranges: 7 Pretty breaks`.
-  - **OPEN: more ramps.** Tom asked for dozens; five is what one pass could attribute properly.
-    ColorBrewer's full set is Apache-2.0 and can be added wholesale under the same credit.
-  - *"If Classes isn't standard, I would call it Breaks, Tiers, or Quantity, and I would list it
-    first on the closed dropdown."*
-  - epanet-js also offers a single Label per symbology; **our Labels model is better and stays.**
-
-- 50|432| **A window scrollbar should not exist on this page.** Tom, 2026-08-18: *"Our bottom controls
-  bar should be the hard bottom of the page."* The map is a full-window drawing surface; anything
-  that scrolls the WINDOW moves the whole application.
-  - **A CSS fix landed 2026-08-18 and is UNVERIFIED in a browser.** The overflow was the `form`'s
-    `margin-bottom: 1px`, which collapses out of body's box and into the document's scroll height —
-    no measurement inside `flowBelowMap()` can ever see it. Now zeroed, and `html` is
-    `overflow: hidden`, both scoped by `html:has(#lpn_canvas)` so the other 15 calculators still
-    scroll. **Deliberate cost:** below `LPN_MAP_MIN` (80px) what used to be scroll-reachable is now
-    clipped, so on a very short window `#lpn_map_footer` is unreachable. That is what "hard bottom"
-    means, but it is a real change.
+- 50|429| **The Ranges picker.** Today: four break boxes plus Equal intervals / Equal counts /
+  Automatic. Tom wants one dropdown choosing among 5 calculation modes and a number of breaks, reading
+  closed as e.g. `Ranges: 7 Pretty breaks`. *"If Classes isn't standard, I would call it Breaks, Tiers,
+  or Quantity, and I would list it first on the closed dropdown."*
+  - The RAMP picker and the ramp catalogue are done — 41 ramps in Brewer's three families in
+    `js/lpn-ramps.js`, each published at 3–7 classes, the rainbow kept last and never the default.
 
 - 50|433| **Profile: the last piece is the CHOOSER.** Tom, 2026-08-18: *"Amazing. Now we just need a
   good UI."* Two of the three are done — the route is drawn on the map, and the panel is now the
@@ -371,59 +318,16 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
     moving 90.8 ft at node 61 while the ground holds still. A browser pass here is about the
     chooser, not about whether it animates.
 
-- 50|434| **Both panes shipped 2026-08-18.** BOTTOM: `#lpn_pane`, docked below the canvas in normal
-  flow, resizable by its top grip, remembering height/open/tab per browser in `lpn_pane`. Tabs:
-  **Profile** and **Junctions** (sortable, editing through `setProp()`). RIGHT: `#lpn_rpane`,
-  which held Labels and Color by value for part of one day and is now **empty and kept** — Task 441
-  moved both into the Settings box, at Tom's word, and left the frame standing for whatever docks
-  next. Width/open per browser in `lpn_rpane`. Both toggles are the right-edge toolbar group beside
-  Find. Harnesses `dev/lpn-spike/pane-harness.js`, `dev/browser-pass/specs/{profile,visibility}.js`.
-  - **The pane is in normal FLOW, and that is the whole mechanism.** `flowBelowMap()` measures
-    `body.bottom - svg.bottom`, so the map gives up exactly the pane's height *by measurement* — the
-    pane never writes a canvas height and never touches `serializeProject()`.
-  - **The RIGHT pane is an OVERLAY, and deliberately not in flow.** It takes no height from the map,
-    so the one measured number stays one number; a ResizeObserver on the canvas keeps it registered.
-  - **NO LEFT PANE, ever** (Tom: "Don't copy the epanetjs left pane"). Settings is a floating box
-    (Task 441), not a pane, and the harness asserts neither it nor Labels is a bottom-pane tab.
-  - **OPEN: Settings joins the right pane as its third section** — Tom's (c). Left out of this pass
-    because Settings carries the units block and the solver numbers, which is a move worth doing on
-    its own. The property popup stays as it is: Tom calls it good.
-  - **OPEN, and it needs Tom:** the toolbar toggle opens the pane on whatever tab you left it on, so
-    it does not mean "profile". If Task 433's *"reached from a toolbar button"* meant one button per
-    tab, that is a per-tab toggle set rather than one pane toggle. Likewise Find is a button opening a
-    a floating panel, not a live type-an-ID box sitting IN the toolbar strip.
-  - Pipes/Pumps/Valves tabs are a few lines each in the registry, and are not built.
+- 50|437| **[H] The geocoder works; it has no interface outside the placement tool.** `js/lpn-search.js`
+  talks to Nominatim and is used by Convert to lat/lon…'s Go to… — the third-party-host and privacy
+  question was decided there, so this is now an interface question, not a policy one.
+  - **What Tom wants weighed (2026-08-21):** epanet-js puts it in a NEW-PROJECT WIZARD rather than a
+    menu. That is Task 477; if the wizard is built, this becomes a search box inside it and no separate
+    work at all. Decide 477 first.
 
-- 50|437| **[H] Search the lat/lon map by place name — needs Tom's ruling, not a design.** Tom, 2026-08-18:
-  *"We need either the ability to zoom out to the globe or to search by name or to go to lat/lon."*
-  The first and third shipped the same day; this one is the only one that costs something.
-  - **It needs a GEOCODER, which would be a second third-party host.** `dev/geographic-projects.md`
-    §4 says the tile server is the only host this page talks to, and `dev/browser-pass/specs/
-    basemap.js` asserts it. Nominatim is the free option and its usage policy requires an identifying
-    User-Agent and no heavy use; a paid one means a key, which means a billing account.
-  - The privacy cost is real and specific: a search sends **what the user typed** to that host, where
-    a tile request only ever sends where they are looking.
-  - Cheaper alternatives that need no host, if the answer is no: paste a coordinate (built), paste an
-    OpenStreetMap or Google Maps URL and read the lat/lon out of it (no request at all), or import a
-    file that already carries coordinates.
-
-- 50|441| **The Settings box shipped 2026-08-18, and it is where whole-project settings live.** One
-  draggable, closeable, two-pane box (`#lpn_settings_box`): an index derived from the content on the
-  left, four sections on the right — **Labels**, **Settings**, **Time**, **Coloring** — and a filter
-  across the top that matches TIPS as well as titles. Tom's rule, and it settles every future
-  "where does this control live" question: *"If it's for the entire project, it's in Settings."*
-  Per-element stays in the property popup. `dev/browser-pass/specs/visibility.js`.
-  - **Nothing collapses** (Tom: *"No need ever to collapse; just scroll/jump to your section."*),
-    which discharged the collapse half of Task 284; what is left of that task is the sub-heading
-    sticky and the narrow-screen design.
-  - **It merged two colour editors into one.** The right pane's and the Settings panel's wrote the
-    same keys and had already drifted — one had the ramp families, the other the legend position.
-  - **The right pane survives, EMPTY** (Tom: *"For now we can keep the right pane, but empty it."*),
-    and no longer covers the legend: an open panel publishes its width as `--lpn-overlay-right`,
-    which every right-hand overlay adds to its inset.
-  - **OPEN, and Tom raised it without asking for it yet:** docking left or right, and an AutoCAD-style
-    anchor-and-flyout with autohide. Nothing in the box is designed against it — it is one element
-    with one placement function.
+- 50|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
+  autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
+  against it — one element, one placement function.
 
 - 50|442| **[H] The toolbar may want to become a side menu, and phones have a gesture we do not use.**
   Tom, 2026-08-18: *"Phones have the swipe superpower that is not idiomatic on a PC… Maybe a
@@ -436,15 +340,6 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
   which is measurable rather than a matter of taste. Note the standing rule that this page is a
   full-window drawing surface and is almost impossible on a phone, so the PHONE half of this is worth
   little; the SIDE-MENU half is worth something on its own merits, on a laptop with 800px of height.
-
-- 50|445| **Labels: invert priority to "Drop first in case of conflict", 1 dropping first.** Tom,
-  2026-08-19: "our labels priority paradigm really wants to be Labels.Drop First In Case of Conflict
-  … it's a version bump because the order of the numbers reverses. But it's the right thing to do."
-  - Column heading is **Drop**, not an overlap icon — a word needs no learning and is short enough
-    not to widen the column.
-  - **The stored number reverses meaning, so stored documents must be migrated**, not reinterpreted
-    in place: a project written under the old sense would silently invert. That migration is the
-    task, not the relabelling.
 
 - 50|452| **Satellite imagery from Mapbox — BUILT, and blocked on one decision about the token.**
   Tom asked for it, chose Mapbox over a keyless source, created the account and supplied a public
@@ -467,15 +362,6 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
   `lpn_notes_*` (Task 448's stability note and the Notes review) and `lpn_file_import_inp_tip`. Plus
   the keys written since: `lpn_color_mode_manual`, `lpn_time_no_period`, and the three
   `lpn_basemap_satellite_*`. Needs Tom's authorization, and a Wave 0 over the changed set first.
-
-- 50|461| **[H] "Assets" or "parts"? The tabs shipped saying PARTS.** Task 455 needed a word for
-  "the six kinds of thing in a network" in three new strings, and Tom's ruling was to adopt
-  "assets" in the English and let the NEXT sprint carry it — but shipping one string saying
-  "assets" beside a suite that says element and part everywhere would read as a third synonym
-  rather than a rename. So the new strings say "parts" and the rename is still owed.
-  - The real task is the suite-wide pass: every visible string carrying "element" becomes "asset",
-    in one commit, and one sprint retranslates them. `rename_lang_key.php` handles the keys; the
-    VALUES are the paid part.
 
 - 50|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
   *"Properties are never dropped from node labels, so Node label drop order is a lie... As I look at
@@ -506,6 +392,17 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
   The number to beat and the profile it came from are at the top of `dev/browser-pass/specs/perf.js`;
   a saving worth defending is worth a COUNTABLE guard, as `dev/lpn-spike/label-batch-harness.js` is.
 
+- 50|478| **[H] Tab should walk down the input column, not sideways into every unit select.** Tom,
+  2026-08-21. Measured on Manning Pipe Flow: the form's focus order is `d0`, `d0u`, `n`, `sf`, `sfu`,
+  the solve button, `solver_q`, `solver_qu`, `dd0`, `dd0u`, then **thirteen more result unit selects**
+  before the print button. Four numbers to type, twenty-three stops to do it.
+  - **It needs a ruling, because every mechanism costs something.** `tabindex="-1"` on the selects
+    makes units unreachable by keyboard at all. A positive `tabindex` hoists the inputs above the whole
+    navbar. Intercepting Tab in JS is the only one that keeps both, and it means this page answers a
+    key the browser normally owns.
+  - No "X hider" is rendered by `lib/Calculators.lib.php` — Tom named one, so it is either a
+    JS-built row-table control or something on `lpn_`. Ask which before designing.
+
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   HW draws 580 confirmed humans (18% human-of-reach, the suite'''s second-biggest front door) but only
   11% of them calculate, against a 51–67% band on six comparable pages — ~517 lost humans per period.
@@ -514,8 +411,6 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
     C-value table on the page; calculator queries mean a real UX leak.
   - **Do not promote Task 146 on the 11% number alone** — it does not yet distinguish a leak from
     satisfied reference demand, because `human` counts anyone who dwells 10 s without typing.
-
-- 25|146.04| **Node/link report tables (Task 146 child).** Tabular results view.
 
 - 25|146.05| **EPANET-style element browser (Task 146 child).** List/select elements from a panel
   rather than only the canvas. **If this lists TEXT elements** (EPANET's own Browser does have a
@@ -594,11 +489,6 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
   Split out of Task 225 when the rest of it closed 2026-08-09 — this piece is a punch-list document
   rewrite against live controls, not a code fix, so it needs a browser pass rather than static
   reading.
-
-- 25|475| **Manning Irregular emits NaN for a zero-length segment.** Two stations sharing a station
-  value give `hypotenuse = 0`, so `t = 0*0/0 = NaN`. Pre-existing and already visible in the segment
-  `t` cell; since Task 474 it also reaches that region's Froude number. Found 2026-08-21 by
-  `mi-harness.js`. Reject a zero-length segment, or say why NaN is the honest answer.
 
 - 25|234| **Canal Seepage must prove its worth or go (Tom, 2026-08-08: "in my crosshairs").** After
   Task 232 removed `Irrigation.php`, `cs_` is the remaining page Tom is not proud of — his standing
@@ -806,6 +696,11 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
     attribution and no caching, is what it does allow. Decide the policy before writing the box.
   - epanet-js's own version then answers *"No matching projections found here"*, as though an
     `.inp` carried a projection — it has no placement wizard. Ours does; this is only its front door.
+
+- 25|475| **Manning Irregular emits NaN for a zero-length segment.** Two stations sharing a station
+  value give `hypotenuse = 0`, so `t = 0*0/0 = NaN`. Pre-existing and already visible in the segment
+  `t` cell; since Task 474 it also reaches that region's Froude number. Found 2026-08-21 by
+  `mi-harness.js`. Reject a zero-length segment, or say why NaN is the honest answer.
 
 - 5|114| **Reservoir / detention routing calculator (Modified Puls) — full scope in
   `dev/detention-routing-scope.md`.** A time-stepping engine, which is the real departure from the
