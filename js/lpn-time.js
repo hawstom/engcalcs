@@ -137,10 +137,30 @@
 	EC.lpnTimeModelBlock = function (doc, toSI) {
 		var times = (doc && doc.times) || EC.lpnTimesDefaults(),
 			conv = typeof toSI === 'function' ? toSI : function (v) { return v; },
-			controls = [];
+			controls = [],
+			// **A SENTENCE NAMING AN ELEMENT THAT NO LONGER EXISTS IS DROPPED HERE TOO** (Task 466).
+			// EPANET REJECTS a control on an unknown link, so one dangling sentence takes the whole
+			// run down rather than being ignored. A control names an element on BOTH sides -- the
+			// controlled link, and for a level or pressure condition the node it watches -- and
+			// either can have been deleted after the document was saved. Only a document that
+			// DECLARES its topology can be asked the question: a block built from a parsed file
+			// (dev/lpn-spike/net3-model.js) has controls and no element arrays, and filtering
+			// against an absent list would drop every control it has.
+			known = function (list) {
+				var set = null;
+				if (Array.isArray(list)) {
+					set = Object.create(null);
+					list.forEach(function (e) { if (e && e.id !== undefined) { set[String(e.id)] = true; } });
+				}
+				return set;
+			},
+			liveLinks = known(doc && doc.links),
+			liveNodes = known(doc && doc.nodes);
 		((doc && doc.controls) || []).forEach(function (c) {
 			var out, cond = c && c.condition;
 			if (!cond) { return; }
+			if (liveLinks && !liveLinks[String(c.link)]) { return; }
+			if (liveNodes && cond.kind === 'node' && !liveNodes[String(cond.node)]) { return; }
 			out = { link: c.link, action: {}, condition: null };
 			if (c.action && c.action.status) { out.action.status = c.action.status; }
 			else if (c.action && isFinite(c.action.setting)) {

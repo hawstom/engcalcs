@@ -626,14 +626,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     at `effective()`. Task 462's Curves section is deliberately a VIEWER so this has one obvious
     home and no second write path to unpick.
 
-- 55|466| **`lpnTimeModelBlock` will hand EPANET a control naming an element that no longer exists.**
-  Found while building Task 462. `js/lpn-epanet.js` composes a `[CONTROLS]` line from every stored
-  control, and EPANET REJECTS a control on an unknown link — so one dangling sentence takes the
-  whole run down rather than being ignored. The Libraries editor can no longer create that state
-  (a sentence naming a missing id is kept as text with no condition), **but a saved document whose
-  element was deleted after import still can.** The guard belongs in `lpnTimeModelBlock`, which
-  drops conditionless records already.
-
 - 55|467| **Automatic recalculation as a stated preference.** Tom, 2026-08-20: *"a toggle under
   Calculation.Hydraulics for 'Recalculate the simulation for this project automatically.' If it's
   on, we do our debounce and calculate, and we hide the Calculate button."* The machinery is
