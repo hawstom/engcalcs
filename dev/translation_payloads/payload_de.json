@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 1238,
-        "delta_key_count": 45,
+        "expected_key_count": 1239,
+        "delta_key_count": 46,
         "exempt_key_count": 35,
         "exempt_keys": [
             "calc_units_us",
@@ -463,6 +463,7 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
@@ -510,6 +511,7 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
@@ -719,6 +721,22 @@
                     "key": "lpn_pane_tab_tip",
                     "value": "Alle Entnahmeknoten als Tabelle, die Sie sortieren und bearbeiten können.",
                     "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
+        "lpn_profile_tip_syn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_tip",
+                    "value": "Zeichnet das Gelände und die Druckhöhenlinie entlang einer Route durch das Netz.",
+                    "english": "Draw the ground and the hydraulic grade line along a path through the network."
+                },
+                "next_translated": {
+                    "key": "lpn_profile_title",
+                    "value": "Profil entlang einer Route",
+                    "english": "Profile along a path"
                 }
             }
         },

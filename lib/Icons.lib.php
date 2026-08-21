@@ -303,6 +303,22 @@ $ec_icons = array(
 		. '<path d="M12 7.5C14.4 5.6 17.2 5 20.5 5.2V16.5C17.2 16.3 14.4 16.9 12 18.8"/>'
 		. '<path d="M12 7.5V18.8"/>',
 
+	// PROJECT: a plan set, unrolled (ROADMAP Task 467). A REAL OBJECT, and the one this trade
+	// means by "the project" -- Tom, 2026-08-21: *"I'd make it unrolled as much as possible... If
+	// you can make maybe one end of the roll with writing depicted on the outside, that would be
+	// very 'plan set'."* So the sheet is flat and carries the drawing, and only its far end is
+	// still rolled.
+	// **NOT A ROLLED TUBE**, which was the other half of his sketch and is the one shape this page
+	// cannot use: a cylinder in a water-network toolbar reads as a PIPE, and 'pipe' is two icons
+	// away. Nor a hard hat (says construction, not water) and not a water drop (says water, not
+	// the job) -- both were considered, and the roll is the one that means "the whole job".
+	// The two lines inside are the drawing, at the density every file-with-text icon uses; the
+	// opening in the rolled end is what keeps it from reading as a page with a bent corner.
+	'project'    => '<path d="M15.5 6H2.5V18H15.5"/>'
+		. '<path d="M15.5 6C19.2 6 21.2 8.6 21.2 12C21.2 15.4 19.2 18 15.5 18"/>'
+		. '<path d="M16.9 12C16.9 10.2 18 9.1 19.4 9.4"/>'
+		. '<path d="M6 9.6H12.2"/><path d="M6 14.4H10.2"/>',
+
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
 	// version of that." Two interlocking horizontal capsules — a chain link lying flat, which is

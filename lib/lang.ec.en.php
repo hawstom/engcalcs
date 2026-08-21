@@ -1525,7 +1525,8 @@ $ec_lang['lpn_find_no_value']='Type what to look for.';
 // {u} is a unit name, {n} a count and {len} a length; they are substituted, not concatenated, so a
 // language that puts the unit somewhere else can.
 $ec_lang['lpn_profile_menu']='Profile';
-$ec_lang['lpn_profile_tip']='Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.';
+$ec_lang['lpn_profile_tip']='Draw the ground and the hydraulic grade line along a path through the network.';
+$ec_lang['lpn_profile_tip_syn']='Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.';
 $ec_lang['lpn_profile_title']='Profile along a path';
 $ec_lang['lpn_profile_title_syn']='Profile or cross section along a path, route, or way';
 $ec_lang['lpn_profile_from']='From';

@@ -679,17 +679,33 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     showing least — the lowest demand, the pressure nearest the middle of the range, or the
     elevation or head closest to the neighbouring nodes."* Swap it in when this lands.
 
+- 30|470| **Search for a place by name while placing a model.** Tom, 2026-08-21, on epanet-js:
+  *"It lets you search for your location (which is a nice API that we need to implement)."* Today
+  Go to… takes a latitude and longitude, which is the wrong question to ask somebody whose site is
+  "Mesa, Arizona".
+  - **THE BLOCKER IS THE POLICY, NOT THE CODE.** Geocoding means a second third-party request, and
+    the OSM tiles are currently the only one the suite makes (`dev/geographic-projects.md`). Nominatim
+    is the free option and its usage policy forbids autocomplete-as-you-type; a search on ENTER, with
+    attribution and no caching, is what it does allow. Decide the policy before writing the box.
+  - epanet-js's own version then answers *"No matching projections found here"*, as though an
+    `.inp` carried a projection — it has no placement wizard. Ours does; this is only its front door.
+
 - 25|468| **Demand categories on a junction — the breakdown the importer already flattens.**
   EPANET stacks (base demand, pattern, category) triples on one node and sums them; `js/lpn-inp.js`
-  reads them, sums them into this page's single `demand`, and reports `demand-categories` as a
-  difference on every import that had one. So the data arrives and is thrown away today.
+  reads them, sums them into this page's single `demand`, and reports `demand-categories` on every
+  import that had one. So the data arrives and is thrown away today.
   - Design, not analysis: *50 gpm residential + 20 gpm irrigation on this node* is how the demand is
     actually assembled. With Task 191 (emitters) this completes the EPANET flow model bar the global
     demand multiplier, which the importer already applies.
-  - **No "Category not found. Add?" dialog** (Tom floated one). EPANET categories are free text, not
-    a namespace, and a modal in the data-entry path buys a registry EPANET does not have. A
-    `<datalist>` of the categories already used in the project gives the same discoverability with
-    no dialog, and makes a typo visible instead of interrogated.
+  - **WHAT THE TWO COLUMNS MEAN, settled by Tom 2026-08-21: the PATTERN is the type of user
+    ("residential", "restaurant"); the CATEGORY is WHO ("Elm Acres", "Taco Bell 354").** That is why
+    no validation is needed and no registry is wanted — it is a name, not a key. Label it *Category*
+    with the tip *"Name or description of the user or users using this pattern"*. EPANET itself
+    validates nothing here and runs happily with varying descriptions on one pattern.
+  - **epanet-js measured (Tom, 2026-08-21): it has no Category column at all — base demand and
+    pattern only — and it imports categories as CONSTANT FLOWS, losing the pattern link even though
+    it imports the patterns themselves.** So this is a place we can be plainly better, not just
+    different; see `dev/positioning.md`.
   - Touches the scenario write seam (`setProp`), the popup, the importer, and Task 281's exporter —
     a per-category override is the question to settle first.
 
