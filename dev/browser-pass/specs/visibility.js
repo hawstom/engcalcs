@@ -355,25 +355,26 @@ exports.run = async function ({ browser, report }) {
 		// on it -- and the fix was a tip rather than a longer label, which is the same trade every
 		// other label in this review made.
 		//
-		// **THE SEARCH TERM IS "highest", NOT "overline", AND THAT IS A LOSS TO REPORT.** Tom's ask
-		// named overline and underline specifically; the Wave 0 English pass then rewrote the tip to
-		// "a line above / a line below" for readability, which is better English and removes both
-		// words from the page, so neither is findable any more. This spec now asserts the CONTRACT
-		// -- a word living only in a tip is reachable by the search -- and the question of whether
-		// the two words come back is Tom's wording call, recorded in ROADMAP Task 457.
-		await a.page.evaluate(() => {
-			const f = document.getElementById('lpn_setbox_filter');
-			f.value = 'highest';
-			f.dispatchEvent(new Event('input', { bubbles: true }));
-		});
-		await a.settle(300);
-		const extrema = await a.page.evaluate(() => {
-			const rows = [...document.querySelectorAll('#lpn_labels_options > *')]
-				.filter(r => r.style.display !== 'none');
-			return { rows: rows.length, text: rows.map(r => r.textContent.trim()).join(' | ') };
-		});
-		report.eq(extrema.rows, 1, 'a word that is only in a tip still finds its row, and only it',
-			extrema.text);
+		// **THE SEARCH TERM IS "overline", WHICH IS THE WORD TOM ASKED FOR** (Task 457, closed
+		// 2026-08-21). A Wave 0 English pass had rewritten the tip to "a line above / a line below"
+		// and taken both his words off the page; the tip now glosses the plain phrasing with the two
+		// terms, so this probe checks the CONTRACT (a word living only in a tip is reachable) and his
+		// actual ask at the same time. "underline" is checked too -- one word could come back alone.
+		for (const word of ['overline', 'underline']) {
+			await a.page.evaluate((w) => {
+				const f = document.getElementById('lpn_setbox_filter');
+				f.value = w;
+				f.dispatchEvent(new Event('input', { bubbles: true }));
+			}, word);
+			await a.settle(300);
+			const extrema = await a.page.evaluate(() => {
+				const rows = [...document.querySelectorAll('#lpn_labels_options > *')]
+					.filter(r => r.style.display !== 'none');
+				return { rows: rows.length, text: rows.map(r => r.textContent.trim()).join(' | ') };
+			});
+			report.eq(extrema.rows, 1, `"${word}" — a word only in a tip — finds its row, and only it`,
+				extrema.text);
+		}
 		await a.page.evaluate(() => {
 			const f = document.getElementById('lpn_setbox_filter');
 			f.value = '';
@@ -635,14 +636,22 @@ exports.run = async function ({ browser, report }) {
 			document.getElementById('lpn_settings_box').style.display === 'flex'),
 			'View > Labels opens it too');
 		report.eq(await shownSection(a), 'visual', '...on the category the labels are in');
-		// The menu bar's own Settings item, which is deliberately identical to the toolbar button.
+		// Project > Settings. The menu bar's own bare Settings item is GONE (Tom, 2026-08-21), so this
+		// row is the bar's only door to the box; that it is the SAME box is the thing worth checking.
 		await closeBox(a);
 		await a.settle(200);
-		await a.page.evaluate(() => { document.getElementById('lpn_menu_settings').click(); });
+		await a.page.evaluate(() => {
+			document.getElementById('lpn_menu_project').click();
+			const row = [...document.querySelectorAll('#lpn_menu_list button')][0];
+			if (row) { row.click(); }
+		});
 		await a.settle(400);
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_settings_box').style.display === 'flex'),
-			'and the menu bar Settings item opens the same box');
+			'and Project > Settings opens the same box');
+		report.eq(await a.page.evaluate(() =>
+			document.querySelectorAll('#lpn_menubar #lpn_menu_settings').length), 0,
+			'...with no bare Settings item left on the menu bar');
 
 		// The label checkboxes really are in it, exactly once — the failure a moved feature makes
 		// is two homes that drift, not a missing one.

@@ -172,13 +172,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     ordinary recalculate. Five browser checks. **What is left is Tom's re-import**, and the task
     stays open only for that.
 
-- 30|457| **[H] "Overline" and "underline" are no longer findable, and Tom asked for them by name.**
-  He asked 2026-08-19 that the high/low mark row be searchable by those two words; the Wave 0
-  English pass then rewrote its tip to "a line above / a line below", which is better English and
-  removes both words from the page. `specs/visibility.js` now asserts the contract (a word living
-  only in a tip is reachable by the search) using a different word. Whether the two terms come back
-  — in the tip, or as `$ec_lang_syn` where the search cannot reach them — is Tom's wording call.
-
 - 55|458| **One project mode, two names, in four languages.** `dev/scripts/mode_name_check.php` (new,
   advisory, in `check_all.sh`) opens on **14 disagreements in ru, sr, tr and zh** — a language's
   `lpn_geomap` or `lpn_xymap` says one thing and its other mode-naming strings say another, so a
@@ -656,6 +649,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     so an automatic run produced a report that nothing could show. `js/lpn-time.js` keeps the last
     report whether a box was shown or not (`EC.lpnTimeShowReport`), which is also what makes the
     toggle above safe to build. `dev/lpn-spike/run-box-harness.js`, `specs/projectmenu.js`.
+    The menu bar's own bare **Settings item was removed** 2026-08-21 (Tom): once Project's first
+    row opened the panel, the bar offered the same box twice. The toolbar button is untouched.
 
 - 40|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
   *"Properties are never dropped from node labels, so Node label drop order is a lie... As I look at

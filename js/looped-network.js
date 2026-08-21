@@ -13025,7 +13025,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		]);
 	}
-		// openSettingsMenu() is GONE (Tom, 2026-08-08). Its three rows now live where they belong: Settings
+	// openSettingsMenu() is GONE (Tom, 2026-08-08). Its three rows now live where they belong: Settings
 	// and Units are sections of the panel, and Clear calculator is the button at its foot --
 	// which it already was, so the menu row was the duplicate, not the button.
 	function buildMenuBar() {
@@ -13037,16 +13037,12 @@ var EngCalcs = EngCalcs || {};
 			{ id: 'lpn_menu_edit', icon: 'edit', label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
 			{ id: 'lpn_menu_insert', icon: 'insert', label: pc.lpn_menu_insert || 'Insert', open: openInsertMenu },
 			{ id: 'lpn_menu_view', icon: 'view', label: pc.lpn_menu_view || 'View', open: openViewMenu },
-			// Between View and Settings on purpose: it holds what belongs to THIS PROJECT rather
-			// than to the drawing (View) or to the page (Settings, which is a panel of its own and
-			// stays a panel -- see below).
+			// After View: it holds what belongs to THIS PROJECT rather than to the drawing (View).
+			// It is also the menu bar's ONLY door to Settings -- the bare Settings item that used to
+			// sit here is gone (Tom, 2026-08-21). It was the one menu-bar item that opened a panel
+			// rather than a pull-down, and once Project's first row opened the same panel the bar was
+			// offering the same box twice. The toolbar button is untouched.
 			{ id: 'lpn_menu_project', icon: 'project', label: pc.lpn_menu_project || 'Project', open: openProjectBarMenu },
-			// Settings is the one menu-bar item that opens a PANEL, not a pull-down (Tom,
-			// 2026-08-08): "there be a duplicated identical Settings that lives on the Toolbar and in
-			// the Menu". Identical label, identical element, both places -- which is the rule the old
-			// arrangement broke by making the toolbar button open the panel and the menu open a list
-			// whose first row was also called Settings.
-			{ id: 'lpn_menu_settings', icon: 'settings', label: pc.lpn_menu_settings || 'Settings', open: function () { toggleSettingsBox(); } },
 			// Last, where a Help menu goes everywhere else. One row today (Walkthroughs); it is also
 			// the home for the things that currently have none -- EPANET solver notes, keyboard
 			// shortcuts, "report a problem".
