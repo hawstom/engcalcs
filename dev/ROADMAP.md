@@ -157,6 +157,16 @@ the block.
     The menu bar's own bare **Settings item was removed** 2026-08-21 (Tom): once Project's first
     row opened the panel, the bar offered the same box twice. The toolbar button is untouched.
 
+- 100|480| **[H] `privacy.php` says "exactly one exception" and there are now three.** Live legal text,
+  found 2026-08-21. It discloses OSM and Mapbox tiles; it does not mention the Nominatim place-name
+  search, which shipped later and is the **most** sensitive of the three — a tile says where you are
+  looking, a search says what you typed.
+  - **The app itself is fine**: `js/lpn-search.js` has its own consent gate and its own cookie
+    (`ec_geosearch`), with text that draws exactly that distinction. This is a gap in the privacy PAGE
+    only, and the fix is purely additive — a disclosure added, never one removed.
+  - **Cheap:** `privacy.php` is English-authoritative and hard-coded, so this is one edit and no
+    sprint. Needs Tom because it is legal text; wording is drafted and waiting.
+
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
   English pass asking *"list every plausible reading; more than one means rewrite"*, both waves
@@ -260,11 +270,6 @@ the block.
   - **Water quality is NOT in scope and cannot be scoped by Tom** (2026-08-17: *"I don't know anything
     about water quality modeling"*). Build the mechanism so a WQ source could read a pattern later; do
     not build WQ on the strength of it.
-
-- 25|248.03| **Rule-based controls, EPANET's `[RULES]` (Task 248 child).** Simple `[CONTROLS]` shipped
-  2026-08-18 — the Libraries box adds, edits, validates and deletes them, an unreadable sentence is kept
-  and marked rather than discarded, and only a fully understood one reaches the engine.
-  - Deliberately parked: rule-based is a language, and it can wait for evidence that a user has one.
 
 - 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
   reply to outreach, and he has replied gratefully. This is the first real conversation this suite's
@@ -532,8 +537,11 @@ the block.
     `runH()/nextH()`, so the ceiling is 1/N of the cost and N is largest exactly where it hurts.
     "Re-solve only the changed path" is wrong in a looped network at any size: the global gradient
     method moves every flow when one diameter changes.
-  - **What is left are the EDITORS:** patterns (248.02), controls (248.03), curves (248.04) — all
-    read, solved and written back today, none creatable on the page. Task 384's ramp reads a run.
+  - **The EDITORS shipped too** (Libraries box, 2026-08-20): patterns are created, renamed, edited
+    and deleted with a sparkline, simple controls are added and validated sentence by sentence, and
+    curves are a viewer by design (248.04). **All that is left of this task is attaching a pattern to
+    a reservoir head or a pump (248.02) and rule-based `[RULES]` (248.03)** — so the LibreEPANET gate
+    is nearly clear, and 248 is no longer the blocker it was written as.
   - **A valve has THREE states in EPANET, not two:** closed, fully open, and ACTIVE. `EN_INITSTATUS =
     OPEN` opens it fully with its setting IGNORED; `EN_INITSETTING` restores active, so status is
     written BEFORE setting. Written the other way a network solves with the valve wide open — exactly
@@ -543,6 +551,11 @@ the block.
     describe the gate as one (`dev/positioning.md` §6). Tom, 2026-08-14: *"we have no less technical
     authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
     all public domain."*
+
+- 25|248.03| **Rule-based controls, EPANET's `[RULES]` (Task 248 child).** Simple `[CONTROLS]` shipped
+  2026-08-18 — the Libraries box adds, edits, validates and deletes them, an unreadable sentence is kept
+  and marked rather than discarded, and only a fully understood one reaches the engine.
+  - Deliberately parked: rule-based is a language, and it can wait for evidence that a user has one.
 
 - 25|248.04| **Curves (Task 248 child) — probably NEVER a separate interface.** Tom, 2026-08-17:
   *"We may be able to avoid curves as a separate interface indefinitely by reporting them and

@@ -167,9 +167,15 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   `EngCalcs.lpnIsFixedHead` is the one place that equivalence is declared. A tank diameter is in the
   LENGTH unit while a pipe diameter is in millimetres; only `dev/lpn-spike/tank-harness.js` asserts
   that, because no solve ever reads it.
-- **A geographic project draws OpenStreetMap raster tiles behind it** — the only third-party request
-  the suite makes, never cached by us, never in the service worker's manifest, attribution required
-  on the map. It is `project.basemap`, never `backdrop.href`, and an `.inp` exporter must skip it.
+- **A geographic project draws raster tiles behind it** — OpenStreetMap for the street map, Mapbox
+  for satellite (gated on `EC_MAPBOX_TOKEN`; absent means no satellite option). Never cached by us,
+  never in the service worker's manifest, attribution required on the map and one credit set per
+  source. It is `project.basemap`, never `backdrop.href`, and an `.inp` exporter must skip it.
+- **THE SUITE MAKES THREE THIRD-PARTY REQUESTS, ALL ON THIS PAGE, ALL OPT-IN:** OSM tiles, Mapbox
+  satellite tiles, and Nominatim place-name search (`js/lpn-search.js`). **The search is the sensitive
+  one and has its own consent gate** (`ec_geosearch`), separate from the analytics one, because a tile
+  says where you are LOOKING and a search says what you TYPED. Do not write "the only third-party
+  request" anywhere; it has been false since the geocoder shipped.
   The display is still unprojected; the tiles are placed per-tile in lon/lat so they register anyway.
   `dev/geographic-projects.md`.
 - **Reads EPANET `.inp` files** (`js/lpn-inp.js`), importing the supported subset and reporting every

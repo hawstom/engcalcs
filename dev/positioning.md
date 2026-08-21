@@ -61,9 +61,12 @@ a verifiable fact rather than a matter of taste:
 1. **A licence that cannot be revoked.** GPL v3+ against FSL-1.1-MIT. See §2.
 2. **26 languages.** The suite's deepest single investment and the hardest thing here to replicate.
 3. **The annotated map** — see §4.
-4. **Offline PWA, with no third-party request of any kind.** See `dev/cookie-storage-inventory.md`:
-   *"No third party at all… a materially better position than most sites are in."* `privacy.php`
-   says this publicly and it is true.
+4. **Offline PWA, and no third-party STORAGE at all.** *Corrected 2026-08-21: the older wording here,
+   "no third-party request of any kind", is no longer true and must not be repeated.* There are now
+   exactly two, both on the map page and both opt-in by using a feature: OpenStreetMap raster tiles for
+   a geographic project, and Nominatim for a place-name search. `dev/cookie-storage-inventory.md` is
+   the current and authoritative statement; state the exceptions plainly rather than burying them,
+   because a privacy claim with a footnote a reader has to go and find is not a privacy claim.
 5. **Distribution.** Real existing reach into hands that are not shopping for a network solver.
 
 ### Phone and field use is DEMOTED, and is not touted
@@ -182,11 +185,12 @@ Revisit when the gate clears.
 
 Costed 2026-08-14. **It is a VARIANT, not a fork — do not start by copying the page.**
 
-- **The cheapest hosting answer avoids the path refactor entirely.** There are 112 hardcoded
-  `/engcalcs/` paths, plus `sw.js` and `manifest.json` scoped there. A vhost with `Alias /engcalcs`
-  pointing at this directory, and a rewrite of `/` to `Looped-Network.php`, resolves every asset
-  unchanged. Prefer that over an `EC_BASE` refactor. `echoHeader()`'s `"normal"` branch already gives
-  a chrome-free header.
+- **The cheapest hosting answer avoids the path refactor entirely.** There are **210** hardcoded
+  `/engcalcs/` paths (measured 2026-08-21; this said 112 in 2026-08-14), plus `sw.php` scoped there.
+  An `Alias /engcalcs` pointing at this directory — or a symlink, on this host — resolves every asset
+  unchanged. Prefer that over an `EC_BASE` refactor; the count rising makes the refactor worse, not
+  more urgent. `echoHeader()`'s `"normal"` branch already gives a chrome-free header. Full layout and
+  the recommendation: `dev/hosting-layout.md`.
 - **`CANONICAL_ORIGIN` is hardcoded and must NOT be derived from `HTTP_HOST`.** A second domain needs
   a host → variant WHITELIST, or it reintroduces the canonical-poisoning hole that constant exists to
   prevent.

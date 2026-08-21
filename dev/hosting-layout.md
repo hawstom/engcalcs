@@ -45,47 +45,58 @@ That goes in `~/public_html/.htaccess`, which is the parent site and **not in th
 repo** — so it is a manual edit on the server, not a `git pull`. Do not *block* the
 route; a 403 throws away links that a 301 keeps.
 
-## 3. What actually blocks serving this suite at a different address
+## 3. Serving it at a second domain — the cheap way, already costed
 
-Three things, in increasing cost:
+`dev/positioning.md` §6.1 costed this on 2026-08-14 and its ruling stands: **serve the
+suite at `<newdomain>/engcalcs/` and change no code.** A symlink is enough on this host —
 
-1. **`CANONICAL_ORIGIN` is one hard-coded origin.** A second deployment would announce
-   hawsedc.com as its canonical and ask Google to de-index itself.
-2. **210 absolute `/engcalcs/` paths.** They are mechanical to fix — derive the prefix
-   once from `dirname($_SERVER['SCRIPT_NAME'])` and the suite becomes
-   location-independent everywhere at once, including the broken route above. A check
-   script can then forbid a new hard-coded one, the way `unit_factor_check.php`
-   forbids a typed conversion factor.
-3. **The service worker's scope is its own path.** `sw.php` sits in the suite root and
-   caps its scope there; its precache manifest is generated at request time and
-   `sw_manifest_check.php` diffs it against what pages really request. Both follow the
-   prefix automatically once (2) is done — but the check has to be re-run against a
-   deployment at a different prefix before believing it.
+```
+ln -s ~/public_html/hawsedc/engcalcs ~/librewaternet.org/engcalcs
+```
 
-Nothing here is hard. It is one focused pass, and it is worth doing **once**, before
-there are two deployments to keep in step rather than after.
+— and `~/librewaternet.org/index.html` becomes the landing page. Every absolute
+`/engcalcs/…` path resolves, the service worker keeps its scope, and there is one
+checkout to `git pull`. An `Alias` in a vhost does the same thing more cleanly if cPanel
+exposes one; the symlink needs `Options +FollowSymLinks`, which is normally on but is
+worth testing before relying on it — see `.htaccess`'s warning about `Options -Indexes`
+for how loudly this host fails an ungranted `Options`.
+
+**The tempting alternative — deriving the prefix from `dirname($_SERVER['SCRIPT_NAME'])`
+so the suite runs anywhere — is REJECTED.** It buys a prettier URL for a real refactor,
+and the URL is not worth it while one symlink does the job.
+
+**Correction to `dev/positioning.md` §6.1, measured 2026-08-21:** it says 112 hardcoded
+`/engcalcs/` paths. There are now **210**, across the 18 calculator pages, `sw.php`,
+`js/lpn-epanet.js` and `js/lpn-search.js`. The refactor got more expensive, not less,
+which strengthens the ruling above rather than weakening it.
+
+### The one thing that genuinely must change
+
+**`CANONICAL_ORIGIN` is the hard-coded string `https://hawsedc.com`.** Serve the same
+files on librewaternet.org and every page there asks Google to index hawsedc.com
+instead — the new site would be invisible by construction. §6.1 already names the fix: a
+**host → variant whitelist**, never a value derived from `HTTP_HOST`, because that
+constant exists precisely to stop a spoofed `Host` header poisoning the canonical.
+
+That is the gate. It is small, it is the only code change required, and shipping a
+second domain without it is worse than not shipping one.
 
 ## 4. Recommendation
 
-**Do these, in this order:**
+1. **Now, five minutes, no code:** add the 301 in §2 to `~/public_html/.htaccess`. The
+   egg is gone.
+2. **Before LibreWaterNet.org serves anything:** the `CANONICAL_ORIGIN` whitelist (§3),
+   with a check guarding it. This is the gate.
+3. **Then:** landing page at `~/librewaternet.org/index.html`, in **its own repository** —
+   a marketing page and an engineering suite have different release cadences and should
+   not share one. Symlink `engcalcs` beside it. This is epanet-js's shape
+   (epanetjs.com → app.epanetjs.com), reached without a subdomain.
+4. **LibreEPANET.org stays parked** until Task 248 lands — sequencing, not legitimacy
+   (`dev/positioning.md` §6). Point it at the LibreWaterNet landing page meanwhile so the
+   name is not dark.
 
-1. **Now, five minutes:** add the 301 above to `~/public_html/.htaccess`. The egg is
-   gone and nothing else has to change.
-2. **Before LibreWaterNet.org serves anything:** make the path prefix and the canonical
-   origin derived rather than typed (§3.1 and §3.2), with a check guarding both. This
-   is the gate — skip it and the second site ships asking to be de-indexed.
-3. **Then adopt epanet-js's shape**, which is the right one: `librewaternet.org` is a
-   small static landing page in **its own repository**, and `app.librewaternet.org` is
-   this suite. They are different things with different release cadences and should not
-   share a repo. `~/librewaternet.org` already exists as a document root; the app
-   subdomain needs one more.
-4. **LibreEPANET.org stays parked** until Task 248 lands — that gate is sequencing, not
-   legitimacy (`dev/positioning.md`). Point it at the LibreWaterNet landing page in the
-   meantime so the name is not dark.
-
-**`hawsedc.com/engcalcs/` keeps working throughout and does not move.** It is the
-indexed address, it carries the whole search history, and there is no version of this
-plan where breaking it is worth anything.
+**`hawsedc.com/engcalcs/` keeps working throughout and does not move.** It is the indexed
+address and carries the whole search history; no version of this plan is worth breaking it.
 
 ## 5. The local working directory
 
