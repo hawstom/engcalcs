@@ -303,21 +303,35 @@ $ec_icons = array(
 		. '<path d="M12 7.5C14.4 5.6 17.2 5 20.5 5.2V16.5C17.2 16.3 14.4 16.9 12 18.8"/>'
 		. '<path d="M12 7.5V18.8"/>',
 
-	// PROJECT: a plan set, unrolled (ROADMAP Task 467). A REAL OBJECT, and the one this trade
-	// means by "the project" -- Tom, 2026-08-21: *"I'd make it unrolled as much as possible... If
-	// you can make maybe one end of the roll with writing depicted on the outside, that would be
-	// very 'plan set'."* So the sheet is flat and carries the drawing, and only its far end is
-	// still rolled.
-	// **NOT A ROLLED TUBE**, which was the other half of his sketch and is the one shape this page
-	// cannot use: a cylinder in a water-network toolbar reads as a PIPE, and 'pipe' is two icons
-	// away. Nor a hard hat (says construction, not water) and not a water drop (says water, not
-	// the job) -- both were considered, and the roll is the one that means "the whole job".
-	// The two lines inside are the drawing, at the density every file-with-text icon uses; the
-	// opening in the rolled end is what keeps it from reading as a page with a bent corner.
-	'project'    => '<path d="M15.5 6H2.5V18H15.5"/>'
-		. '<path d="M15.5 6C19.2 6 21.2 8.6 21.2 12C21.2 15.4 19.2 18 15.5 18"/>'
-		. '<path d="M16.9 12C16.9 10.2 18 9.1 19.4 9.4"/>'
-		. '<path d="M6 9.6H12.2"/><path d="M6 14.4H10.2"/>',
+	// PROJECT: a plan set, part unrolled (ROADMAP Task 467). **TRACED FROM TOM'S OWN 17x17 PIXEL
+	// DRAWING**, 2026-08-21, decoded out of the PNG run by run rather than eyeballed, and not
+	// redesigned: same stroke count, same topology, same proportions. What it shows, left to right:
+	// the ROLL, its outer wall vertical and its bottom rounded where it sits on the table; THREE
+	// sheet edges coming out of it, because a set is never one sheet ("You never pull out only one
+	// sheet"); and the TITLE BLOCK, a divided strip down the right, which is the half only an
+	// insider reads.
+	//
+	// **THE ONE ICON AT stroke-width 1.5, AND THAT IS THE WHOLE REASON SIX ROUNDS OF THIS MISSED.**
+	// Measured: a 16 px drawing with a 1 px line is 1/16 of the icon; this set's 2-unit stroke in a
+	// 24 box is 1/12 -- a third heavier. Every redraw at 2 came back fatter than the sketch and every
+	// detail that fitted his grid filled in on ours; at 17 px, which is what a menu row draws, the
+	// top sheet edge closes up entirely. So the geometry keeps the weight it was drawn at. Restoring
+	// the house weight is deleting the <g>; do that only if the strip's evenness matters more than
+	// this drawing, and expect the top edge to close.
+	//
+	// Rejected on the way here, so they are not re-proposed: a rolled TUBE (a cylinder on this page
+	// reads as a PIPE, two icons away), a water drop (says water, not the job), a hard hat (says
+	// construction), and a corner-curled single sheet (a set is not one sheet). A coil small enough
+	// to sit at a corner cannot hold its opening: two 2-unit strokes need about 4 units between
+	// centres at 16 px and such a coil has room for 1.5.
+	'project'    => '<g stroke-width="1.5">'
+		. '<path d="M1.8 3C1.8 2.2 2.6 1.8 3.6 1.8H6C7.8 1.8 9 2.9 9.6 4.6L10.2 5.4H21"/>'
+		. '<path d="M21 5.4V21"/><path d="M10.2 21H21"/>'
+		. '<path d="M1.8 3V19.8C1.8 20.6 2.8 21 4.2 21C5.6 21 6.6 20.6 6.6 19.8"/>'
+		. '<path d="M1.8 9H6.6C8.4 9 10.2 10.8 10.2 12.6H15"/>'
+		. '<path d="M1.8 17.4H6.6C8.4 17.4 9 18.6 9 19.8"/>'
+		. '<path d="M15 5.4V21"/><path d="M15 17.4H21"/>'
+		. '</g>',
 
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
