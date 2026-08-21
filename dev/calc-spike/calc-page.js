@@ -218,11 +218,19 @@ function loadCalculator(pageName, opts) {
 
 	// --- element bag: every id the page rendered, created on first touch ---
 	const pageIds = new Set(dump.ids);
+	const MAY_BE_ABSENT = new Set(['points_data']);
 	const els = {};
 	function getElementById(id) {
 		if (form[id] && form[id].id) { return form[id]; }
 		if (els[id]) { return els[id]; }
 		if (!pageIds.has(id)) {
+			// **AN ID A CALCULATOR PROBES FOR IS NOT AN ID IT WRITES TO.** addCalcRow() asks for
+			// 'points_data' behind an `if (...)` because only some row-table pages carry that
+			// textarea -- Branched-Network has one, Irrigation-Pressure does not. A browser answers
+			// null there and the page carries on, so throwing would report a working page as broken.
+			// The guarded probes are named ONE BY ONE rather than the rule being softened to "return
+			// null for anything", which is how the loud throw would stop catching a real lost row.
+			if (MAY_BE_ABSENT.has(id)) { return null; }
 			throw new Error(
 				`${pageName}: the calculator wrote to element '${id}', which the rendered page does ` +
 				`not contain. In a browser getElementById returns null there and the calculator ` +
@@ -466,6 +474,12 @@ function loadCalculator(pageName, opts) {
 				throw new Error(`${pageName}: defines no pageCalculatorInitialize -- it has no row table`);
 			}
 			EngCalcs.pageCalculatorInitialize(form);
+			return api;
+		},
+
+		/** Removes the last row, exactly as the page's own "-" button does. */
+		removeRow() {
+			EngCalcs.deleteSingleCalcRow();
 			return api;
 		},
 
