@@ -256,6 +256,17 @@ $ec_icons = array(
 	'pane-bottom' => '<path d="M3 13h18v6H3z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 5h18v14H3z"/><path d="M3 13h18"/>',
 	'pane-right'  => '<path d="M14 5h7v14h-7z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 5h18v14H3z"/><path d="M14 5v14"/>',
 
+	// A TABLE, and it is deliberately NOT pane-bottom (Tom, 2026-08-21: the tables were "a gap
+	// barely discoverable with the bottom pane button"). pane-bottom draws the CONTAINER -- a
+	// window with a band shaded along one edge -- and answers "where does it appear". This draws
+	// the CONTENT: a ruled grid with its heading row filled, the shape of a printed schedule on a
+	// plan sheet, which is the object an engineer already reads. Two icons for two questions, and
+	// the button that says "Tables" must not draw the same picture as the one that says "Bottom
+	// panel" or neither teaches anything.
+	// The heading row is shaded rather than stroked heavier: at 14px an extra stroke weight is
+	// invisible, while a filled band still reads as "this row is different".
+	'table'       => '<path d="M3 5h18v4H3z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 5h18v14H3z"/><path d="M3 9h18"/><path d="M3 14h18"/><path d="M10 9v10"/>',
+
 	// ---- Time playback transport (Task 248) ----
 	// The tape-transport convention, drawn straight and deliberately not reinvented. This set's
 	// preference for a physical referent does not apply: there is no object here, only a mark every

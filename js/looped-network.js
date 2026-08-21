@@ -13237,7 +13237,7 @@ var EngCalcs = EngCalcs || {};
 			// remembered tab is deliberately not honoured here, because a row called Tables that
 			// opened the profile would be a lie the first time it mattered.
 			{
-				icon: 'pane-bottom', label: pc.lpn_tables_menu || 'Tables', tip: pc.lpn_tables_menu_tip,
+				icon: 'table', label: pc.lpn_tables_menu || 'Tables', tip: pc.lpn_tables_menu_tip,
 				fn: function () {
 					var tables = paneTables();
 					closeMenu();
@@ -13927,16 +13927,10 @@ var EngCalcs = EngCalcs || {};
 		// often; View > Hide map readouts was always the other door and is now the only one. The
 		// pressed state it needed lives on that menu row, which redraws its own label each time the
 		// menu opens (openViewMenu), so nothing has to be kept in step with a button any more.
-		// **THE PROFILE, AND IT IS TWO DOORS TO ONE IMPLEMENTATION** -- this button and the View >
-		// Profile row, which Tom kept deliberately ("I like that the command is under the View
-		// menu"). Both call openPane('profile'); nothing about the profile lives in either.
-		// The icon is the one drawn for it: a jagged ground line closed down to a datum, so it reads
-		// as a body of earth rather than as a sparkline.
-		var profileBtn = document.createElement('button');
-		profileBtn.type = 'button';
-		setIconLabel(profileBtn, 'profile', pc.lpn_profile_menu || 'Profile', pc.lpn_profile_tip);
-		profileBtn.addEventListener('click', function () { openPane('profile'); });
-		viewGroup.appendChild(profileBtn);
+		// **THE PROFILE BUTTON IS NOT HERE ANY MORE** -- it moved down to the project group, beside
+		// Tables, when the strip was re-grouped to mirror the Project menu (Tom, 2026-08-21). This
+		// group is now Zoom to fit alone: what is left in it is the one command that changes how you
+		// are LOOKING at the drawing, which is also all the View menu still holds.
 		// **THERE IS NO LABELS BUTTON.** Tom, 2026-08-18: "Toolbar.Labels: We can remove this button
 		// now. Everything is simpler than EPANET or epanetjs because all project settings are in
 		// (tada!) Settings." Every route to the label controls still works and none of them was this
@@ -13981,23 +13975,59 @@ var EngCalcs = EngCalcs || {};
 		// button in toolbarIconIndex, which is what Help > "What the toolbar icons mean" is derived
 		// from. Shown whether or not the network has a duration; a project with none has exactly one
 		// step and the selector says so.
+		// **THE STRIP MIRRORS THE PROJECT MENU FROM HERE ON** (Tom, 2026-08-21, giving both orders in
+		// one line: "Settings Libraries | Profile Tables | Run"). Two strips that name the same
+		// commands in two different orders make the user learn the interface twice; in one order
+		// each teaches the other. The groups carry the menu's separators: what the project IS, what
+		// you READ beside it, and what you RUN on it.
 		var netGroup = group();
-		// **LIBRARIES IS THE MISSING IDEA, not a fourth way to the Settings box** (Tasks 462/460).
-		// The document has carried patterns, curves and controls since Task 423 and nothing on the
-		// page could see one; this button is that door. See the Libraries box further down for why
-		// it is a box of its own rather than a Settings section or three more pane tabs.
+		// Settings first, matching the menu. **LIBRARIES IS THE MISSING IDEA, not a fourth way to
+		// the Settings box** (Tasks 462/460): the document has carried patterns, curves and controls
+		// since Task 423 and nothing on the page could see one; this button is that door. See the
+		// Libraries box further down for why it is a box of its own rather than a Settings section
+		// or three more pane tabs.
+		var settingsBtn = document.createElement('button');
+		settingsBtn.type = 'button';
+		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
+		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
+		netGroup.appendChild(settingsBtn);
 		var libBtn = document.createElement('button');
 		libBtn.type = 'button';
 		libBtn.id = 'lpn_library_btn';
 		setIconLabel(libBtn, 'library', pc.lpn_library_menu || 'Libraries', pc.lpn_library_menu_tip);
 		libBtn.addEventListener('click', function () { toggleLibraryBox(); });
 		netGroup.appendChild(libBtn);
-		var settingsBtn = document.createElement('button');
-		settingsBtn.type = 'button';
-		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
-		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
-		netGroup.appendChild(settingsBtn);
-		if (EngCalcs.lpnTimeMountToolbar) { EngCalcs.lpnTimeMountToolbar(netGroup, setIconLabel); }
+
+		// **WHAT YOU READ BESIDE THE PROJECT.** The profile is TWO DOORS TO ONE IMPLEMENTATION --
+		// this button and the Project > Profile menu row; both call openPane('profile') and nothing
+		// about the profile lives in either. Its icon is the one drawn for it: a jagged ground line
+		// closed down to a datum, so it reads as a body of earth rather than as a sparkline.
+		var readGroup = group();
+		var profileBtn = document.createElement('button');
+		profileBtn.type = 'button';
+		setIconLabel(profileBtn, 'profile', pc.lpn_profile_menu || 'Profile', pc.lpn_profile_tip);
+		profileBtn.addEventListener('click', function () { openPane('profile'); });
+		readGroup.appendChild(profileBtn);
+		// **TABLES OPENS THE FIRST TABLE, NEVER THE PROFILE TAB**, for the reason the menu row states.
+		// It is a COMMAND, not the pressed/unpressed pane toggle at the right end of the strip: that
+		// one reports whether the pane is open and can close it, this one names what you will find
+		// inside. Two controls, two questions -- and the tables were "a gap barely discoverable with
+		// the bottom pane button" (Tom, 2026-08-21) precisely because only the toggle existed.
+		var tablesBtn = document.createElement('button');
+		tablesBtn.type = 'button';
+		setIconLabel(tablesBtn, 'table', pc.lpn_tables_menu || 'Tables', pc.lpn_tables_menu_tip);
+		tablesBtn.addEventListener('click', function () {
+			var tables = paneTables();
+			if (tables.length) { openPane(tables[0].id); }
+		});
+		readGroup.appendChild(tablesBtn);
+
+		// **WHAT YOU RUN ON IT.** Its own group, so Run and the transport sit after Profile and
+		// Tables exactly as they do in the menu. js/lpn-time.js owns everything in it, including
+		// whether the Calculate button is on the strip at all -- see EC.lpnTimeAutoRun().
+		var runGroup = group();
+		runGroup.id = 'lpn_toolbar_run';
+		if (EngCalcs.lpnTimeMountToolbar) { EngCalcs.lpnTimeMountToolbar(runGroup, setIconLabel); }
 
 		// **THE RIGHT EDGE OF THE STRIP: GO SOMEWHERE, AND SHOW SOMETHING** (Task 434). Tom put the
 		// pane toggles there "beside a goto-by-ID search", which is what Find already is (Task 420)
