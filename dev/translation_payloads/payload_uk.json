@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 1242,
-        "delta_key_count": 50,
+        "expected_key_count": 1244,
+        "delta_key_count": 52,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -454,6 +454,8 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_pane_print": "Print table",
+        "lpn_pane_print_tip": "Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.",
         "lpn_menu_project": "Project",
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
@@ -506,6 +508,8 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_pane_print": "Print table",
+        "lpn_pane_print_tip": "Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.",
         "lpn_menu_project": "Project",
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
@@ -735,6 +739,38 @@
                     "key": "lpn_pane_tab_tip",
                     "value": "Усі вузли у вигляді таблиці, яку можна сортувати та редагувати.",
                     "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
+        "lpn_pane_print": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Сортувати за цим стовпцем. Клацніть ще раз, щоб змінити порядок на зворотний.",
+                    "english": "Sort by this column. Click again to reverse it."
+                },
+                "next_translated": {
+                    "key": "lpn_clean_map",
+                    "value": "Сховати показники на карті",
+                    "english": "Hide map readouts"
+                }
+            }
+        },
+        "lpn_pane_print_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Сортувати за цим стовпцем. Клацніть ще раз, щоб змінити порядок на зворотний.",
+                    "english": "Sort by this column. Click again to reverse it."
+                },
+                "next_translated": {
+                    "key": "lpn_clean_map",
+                    "value": "Сховати показники на карті",
+                    "english": "Hide map readouts"
                 }
             }
         },

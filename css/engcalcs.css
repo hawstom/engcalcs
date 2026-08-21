@@ -1140,6 +1140,38 @@ html[lang="zh"] .ec-welcome {
 .lpn-pane-sort { font-weight: bold; }
 .lpn-pane-goto { text-decoration: underline; }
 .lpn-pane-sort:hover, .lpn-pane-goto:hover { color: #0645ad; }
+/* Print, beside the X and pinned to the same top-right corner, so a wrapping tab strip never
+   pushes it out of the reader's reach. It is a small text button rather than an icon: it is the
+   only control in this corner that DOES something to the content. */
+.lpn-pane-print {
+	flex: 0 0 auto; align-self: flex-start; margin: 1px 0 0; padding: 2px 8px; font: inherit;
+	font-size: .85em; background: #f6f6f6; border: 1px solid #bbb; color: #333; cursor: pointer;
+}
+.lpn-pane-print:hover, .lpn-pane-print:focus { background: #eee; color: #000; }
+
+/* PRINTING ONE TABLE (Tom, 2026-08-21: "Make a way to print any table").
+   The sheet is a STATIC COPY of the active table, built by paneBuildPrintable() and appended
+   straight to <body> so that hiding "everything else" is one rule with no ancestor to fight. It
+   is display:none on screen and never seen there; it exists only between the button and the
+   browser's print dialog, and printPaneTable() takes it away again afterwards.
+
+   The map's own printing is untouched: without .lpn-printing-table on the body nothing below
+   applies, so Ctrl+P still prints the drawing exactly as it did. */
+#lpn_print_area { display: none; }
+@media print {
+	body.lpn-printing-table > *:not(#lpn_print_area) { display: none !important; }
+	body.lpn-printing-table #lpn_print_area { display: block !important; }
+	#lpn_print_area h1 { font-size: 14pt; margin: 0 0 2pt; }
+	#lpn_print_area h2 { font-size: 12pt; margin: 0 0 8pt; font-weight: normal; }
+	/* The heading row repeats on every sheet -- a page 3 of figures with no headings on it is a
+	   page of numbers nobody can read. Not sticky: sticky is a screen idea, and print needs the
+	   table-header-group behaviour a <thead> already has. */
+	.lpn-print-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+	.lpn-print-table thead { display: table-header-group; }
+	.lpn-print-table thead th { position: static; border-bottom: 1pt solid #000; }
+	.lpn-print-table th, .lpn-print-table td { padding: 1pt 6pt 1pt 0; }
+	.lpn-print-table tr { page-break-inside: avoid; }
+}
 
 /* ==== The Settings box (ROADMAP Task 441) ====================================================
    One box for everything that belongs to the whole project. A FLOATING BOX, not a pull-down: it

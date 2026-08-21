@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 1242,
-        "delta_key_count": 49,
+        "expected_key_count": 1244,
+        "delta_key_count": 51,
         "exempt_key_count": 35,
         "exempt_keys": [
             "calc_units_us",
@@ -463,6 +463,8 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_pane_print": "Print table",
+        "lpn_pane_print_tip": "Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.",
         "lpn_menu_project": "Project",
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
@@ -514,6 +516,8 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_pane_print": "Print table",
+        "lpn_pane_print_tip": "Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.",
         "lpn_menu_project": "Project",
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
@@ -727,6 +731,38 @@
                     "key": "lpn_pane_tab_tip",
                     "value": "Alle Entnahmeknoten als Tabelle, die Sie sortieren und bearbeiten können.",
                     "english": "These parts as a table you can sort. Results are read-only."
+                }
+            }
+        },
+        "lpn_pane_print": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Nach dieser Spalte sortieren. Erneut klicken, um die Reihenfolge umzukehren.",
+                    "english": "Sort by this column. Click again to reverse it."
+                },
+                "next_translated": {
+                    "key": "lpn_clean_map",
+                    "value": "Kartenanzeigen ausblenden",
+                    "english": "Hide map readouts"
+                }
+            }
+        },
+        "lpn_pane_print_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Nach dieser Spalte sortieren. Erneut klicken, um die Reihenfolge umzukehren.",
+                    "english": "Sort by this column. Click again to reverse it."
+                },
+                "next_translated": {
+                    "key": "lpn_clean_map",
+                    "value": "Kartenanzeigen ausblenden",
+                    "english": "Hide map readouts"
                 }
             }
         },

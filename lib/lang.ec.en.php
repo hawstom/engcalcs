@@ -1456,6 +1456,8 @@ $ec_lang['lpn_pane_tab_valves']='Valves';
 $ec_lang['lpn_pane_tab_tip']='These parts as a table you can sort. Results are read-only.';
 $ec_lang['lpn_pane_none']='This network has none of these yet.';
 $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
+$ec_lang['lpn_pane_print']='Print table';
+$ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.';
 
 $ec_lang['lpn_clean_map']='Hide map readouts';
 $ec_lang['lpn_clean_map_off']='Show map readouts';
