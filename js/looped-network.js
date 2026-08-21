@@ -12503,10 +12503,31 @@ var EngCalcs = EngCalcs || {};
 		if (!strip) { return; }
 		var stripHeightBefore = strip.getBoundingClientRect().height;
 		strip.innerHTML = '';
-		// The vertical list lives at the LEFT edge of the strip (Tom's sketch). On a narrow screen it
-		// is the only way in, because CSS hides the strip itself there: this page has no horizontal
+		// **THE STRIP READS + THEN ≡ THEN THE TABS, AND + IS AT THE EXTREME LEFT EDGE** (Tom,
+		// 2026-08-21: *"Google puts the '+' for new tabs left of the hamburger. Extreme left edge.
+		// Do that."*). The + used to sit at the far RIGHT, after the tabs, where a browser puts it --
+		// but a browser's + follows a strip that starts at the window edge, and this one does not:
+		// it follows a scrolling holder, so with enough projects open the + was pushed off the end
+		// and the one control that makes a new project became the one you had to scroll to find.
+		// A fixed edge is what makes a control findable; the two fixed controls now hold it.
+		var plus = document.createElement('button');
+		plus.type = 'button';
+		plus.className = 'lpn-tab-btn';
+		plus.textContent = '+';
+		plus.title = pc.lpn_tab_new || 'New project';
+		// OPENS THE CHOOSER, exactly as File > New project does (Tom, 2026-08-10, agreeing it was a
+		// defect: "it should open the chooser, which will become the units and method chooser").
+		// It used to call newProject() directly, which inherits whatever units happened to be on the
+		// strip -- the last place on this page where a project's units were decided by accident, and
+		// the very thing Task 264 removed from the File menu. Both doors now ask the same question.
+		// stopPropagation for the reason every menu opener here does it: see buildMenuBar().
+		plus.addEventListener('click', function (e) { e.stopPropagation(); openNewProjectMenu(e.currentTarget); });
+		strip.appendChild(plus);
+		// The vertical list sits second, still left of the tabs (Tom's sketch). On a narrow screen it
+		// is the only way in, because CSS hides the tabs themselves there: this page has no horizontal
 		// room to spare on a phone, and a tab strip that wraps to three lines above a map is worse
-		// than a list behind one button.
+		// than a list behind one button. Both it and the + survive that hiding, because both are
+		// outside .lpn-tabs-scroll.
 		var all = document.createElement('button');
 		all.type = 'button';
 		all.className = 'lpn-tab-btn';
@@ -12521,19 +12542,6 @@ var EngCalcs = EngCalcs || {};
 		// touched a different project could never be found twice in the same place.
 		library.projects.forEach(function (p) { holder.appendChild(buildTab(p)); });
 		strip.appendChild(holder);
-		var plus = document.createElement('button');
-		plus.type = 'button';
-		plus.className = 'lpn-tab-btn';
-		plus.textContent = '+';
-		plus.title = pc.lpn_tab_new || 'New project';
-		// OPENS THE CHOOSER, exactly as File > New project does (Tom, 2026-08-10, agreeing it was a
-		// defect: "it should open the chooser, which will become the units and method chooser").
-		// It used to call newProject() directly, which inherits whatever units happened to be on the
-		// strip -- the last place on this page where a project's units were decided by accident, and
-		// the very thing Task 264 removed from the File menu. Both doors now ask the same question.
-		// stopPropagation for the reason every menu opener here does it: see buildMenuBar().
-		plus.addEventListener('click', function (e) { e.stopPropagation(); openNewProjectMenu(e.currentTarget); });
-		strip.appendChild(plus);
 		// THE ONLY DOCUMENT-DRIVEN THING THAT MAY MOVE THE MAP'S BOTTOM, and it is not the document:
 		// it is this strip wrapping onto another line when enough projects are open. Measured rather
 		// than assumed, so opening a project that does not change the strip's height re-measures
