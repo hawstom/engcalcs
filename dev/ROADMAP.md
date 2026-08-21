@@ -184,16 +184,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     quoted it back all sprint. Entry rewritten; the key list the check walks is derived from the
     English, so a new mode-naming string joins it by itself.
 
-- 55|451| **Say which EPANET we run, and where it comes from.** The run report says Version 2.3.05
-  while EPA's own download page still offers 2.2.0, which reads like a fabrication and is not one:
-  EPANET development moved to Open Water Analytics (a community + EPA collaboration) after EPA's
-  2.2.0 of Dec 2019, and OWA released 2.3 in Jul 2024 and **2.3.5 on 2025-02-20**. The engine encodes
-  its version as major.minor.patch with a two-digit patch, so 2.3.5 prints as `2.3.05`. We vendor
-  epanet-js 0.9.0 (MIT, Luke Butler), which wraps OWA-EPANET — `js/vendor/README.md` already records
-  the wrapper but not the engine's own version or lineage.
-  - Put it somewhere a user can read it, not only in `js/vendor/README.md`: this is the provenance
-    question anyone comparing us against EPANET asks first, and it is a point of credibility.
-
 - 40|452| **Satellite imagery from Mapbox — BUILT, and blocked on one decision about the token.**
   Tom asked for it, chose Mapbox over a keyless source, created the account and supplied a public
   `pk.` token 2026-08-19. Shipped: a second tile source beside OpenStreetMap, its own View row, its

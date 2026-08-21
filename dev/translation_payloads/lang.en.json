@@ -955,6 +955,8 @@
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
         "lpn_notes_epanet_term": "Hazen-Williams constants match EPANET",
         "lpn_notes_epanet_def": "In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.",
+        "lpn_notes_engine_term": "Which EPANET this page runs",
+        "lpn_notes_engine_def": "The EPANET solver on this page is OWA-EPANET 2.3.5, released on 20 February 2025. EPANET is developed by Open Water Analytics, a community that works with the United States Environmental Protection Agency, which released version 2.2.0 in December 2019. The run report calls it 2.3.05 because the engine writes the last number in two digits. It reaches this page through epanet-js 0.9.0 by Luke Butler, under the MIT licence, and it runs inside your browser: your network is never sent anywhere to be solved.",
         "lpn_id_invalid": "Enter an ID with no spaces and no quotation marks.",
         "lpn_id_taken": "That ID is already in use.",
         "lpn_diag_no_fixed_head": "Add a reservoir or a tank. The network needs at least one known water level before it can be solved.",
@@ -1246,7 +1248,7 @@
         "lpn_field_demand_pattern": "Demand pattern",
         "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
     },
-    "count": 1244,
+    "count": 1246,
     "active_prefixes": [
         "about",
         "bpn",

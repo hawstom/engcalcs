@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1244,
-        "delta_key_count": 53,
+        "expected_key_count": 1246,
+        "delta_key_count": 55,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -462,6 +462,8 @@
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
+        "lpn_notes_engine_term": "Which EPANET this page runs",
+        "lpn_notes_engine_def": "The EPANET solver on this page is OWA-EPANET 2.3.5, released on 20 February 2025. EPANET is developed by Open Water Analytics, a community that works with the United States Environmental Protection Agency, which released version 2.2.0 in December 2019. The run report calls it 2.3.05 because the engine writes the last number in two digits. It reaches this page through epanet-js 0.9.0 by Luke Butler, under the MIT licence, and it runs inside your browser: your network is never sent anywhere to be solved.",
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
@@ -517,6 +519,8 @@
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
+        "lpn_notes_engine_term": "Which EPANET this page runs",
+        "lpn_notes_engine_def": "The EPANET solver on this page is OWA-EPANET 2.3.5, released on 20 February 2025. EPANET is developed by Open Water Analytics, a community that works with the United States Environmental Protection Agency, which released version 2.2.0 in December 2019. The run report calls it 2.3.05 because the engine writes the last number in two digits. It reaches this page through epanet-js 0.9.0 by Luke Butler, under the MIT licence, and it runs inside your browser: your network is never sent anywhere to be solved.",
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
@@ -869,6 +873,38 @@
                     "key": "lpn_notes_epanet_term",
                     "value": "হেজেন-উইলিয়ামস ধ্রুবক EPANET-এর সাথে মেলানো হয়েছে",
                     "english": "Hazen-Williams constants match EPANET"
+                }
+            }
+        },
+        "lpn_notes_engine_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_epanet_def",
+                    "value": "২০২৬ সালের আগস্টে হেজেন-উইলিয়ামস সহগ ও সূচক EPANET-এর সাথে মেলাতে পরিবর্তন করা হয়েছে। জলশীর্ষ ক্ষতির ফলাফল এই পৃষ্ঠার আগের সংস্করণগুলো থেকে সর্বোচ্চ ০.১ শতাংশ ভিন্ন, যা C মানের অনিশ্চয়তার চেয়ে অনেক কম।",
+                    "english": "In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself."
+                },
+                "next_translated": {
+                    "key": "lpn_id_invalid",
+                    "value": "কোনো ফাঁকা স্থান বা উদ্ধৃতি চিহ্ন ছাড়া একটি ID লিখুন।",
+                    "english": "Enter an ID with no spaces and no quotation marks."
+                }
+            }
+        },
+        "lpn_notes_engine_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_epanet_def",
+                    "value": "২০২৬ সালের আগস্টে হেজেন-উইলিয়ামস সহগ ও সূচক EPANET-এর সাথে মেলাতে পরিবর্তন করা হয়েছে। জলশীর্ষ ক্ষতির ফলাফল এই পৃষ্ঠার আগের সংস্করণগুলো থেকে সর্বোচ্চ ০.১ শতাংশ ভিন্ন, যা C মানের অনিশ্চয়তার চেয়ে অনেক কম।",
+                    "english": "In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself."
+                },
+                "next_translated": {
+                    "key": "lpn_id_invalid",
+                    "value": "কোনো ফাঁকা স্থান বা উদ্ধৃতি চিহ্ন ছাড়া একটি ID লিখুন।",
+                    "english": "Enter an ID with no spaces and no quotation marks."
                 }
             }
         },
