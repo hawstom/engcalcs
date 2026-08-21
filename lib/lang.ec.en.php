@@ -2383,7 +2383,7 @@ $ec_lang['lpn_library_pattern_values_tip']='The multipliers, separated by spaces
 // (Task 193): the order of the three differs by language and a sandwich cannot express that.
 $ec_lang['lpn_library_pattern_span']='{n} multipliers, {step} apart, covering {span}';
 $ec_lang['lpn_library_pattern_none']='No pattern';
-$ec_lang['lpn_library_default_pattern']='Pattern for demands that name none';
+$ec_lang['lpn_library_default_pattern']='Default demand pattern';
 $ec_lang['lpn_library_default_pattern_tip']='Every junction that does not name a pattern of its own follows this one. It is what an EPANET file states as its Pattern option.';
 $ec_lang['lpn_library_control_add']='Add a control';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,

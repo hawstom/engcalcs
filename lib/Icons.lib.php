@@ -293,14 +293,15 @@ $ec_icons = array(
 	// 16px instead of closing into a bar.
 	'run'        => '<path d="M13 2L4 14h6l-1 8 9-12h-6z" fill="currentColor" stroke="none"/>',
 
-	// LIBRARIES: three books standing on a shelf (ROADMAP Task 462). A REAL OBJECT, which is this
-	// project's rule for an icon -- a shelf of reference volumes is what a library IS, and it is how
-	// a library is drawn everywhere from a road sign to a bookshop's own logo. Deliberately NOT a
-	// stack of papers or a database cylinder: both already mean something else on this page (a file,
-	// and nothing at all), and neither says "a set of named things you reach for by name".
-	// The shelf line under the books is what keeps three narrow rectangles from reading as a bar
-	// chart at 16 px; the third book leans, which is the one detail that says books rather than boxes.
-	'library'    => '<path d="M4 4h3v14H4z"/><path d="M8.5 4h3v14h-3z"/><path d="M14.6 4.9l2.9.8-3.6 13.2-2.9-.8z"/><path d="M3 20h18"/>',
+	// LIBRARIES: an open book (ROADMAP Task 462). A REAL OBJECT, and the one every library sign in
+	// the world is drawn as -- two page blocks meeting at a spine.
+	// The three books on a shelf that shipped first are gone: at 16 px their 3-unit widths and
+	// 1.5-unit gaps were narrower than the 2-unit stroke, so the uprights merged and the leaning
+	// third book crossed them. Tom: "it looks maybe like a shelf of books, but it's hard to make
+	// out." Nothing here is narrower than the stroke twice over.
+	'library'    => '<path d="M12 7.5C9.6 5.6 6.8 5 3.5 5.2V16.5C6.8 16.3 9.6 16.9 12 18.8"/>'
+		. '<path d="M12 7.5C14.4 5.6 17.2 5 20.5 5.2V16.5C17.2 16.3 14.4 16.9 12 18.8"/>'
+		. '<path d="M12 7.5V18.8"/>',
 
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal

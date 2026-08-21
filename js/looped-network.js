@@ -15923,7 +15923,8 @@ var EngCalcs = EngCalcs || {};
 		// opacity, which are not sizes, and stranding those two in a group of their own would be
 		// more clicking than it saves.
 		var sizeInput = document.createElement('input');
-		sizeInput.type = 'number'; sizeInput.step = '1'; sizeInput.min = '1'; sizeInput.value = settings.textSize;
+		sizeInput.type = 'number'; sizeInput.className = 'ec-spin';
+		sizeInput.step = '1'; sizeInput.min = '1'; sizeInput.value = settings.textSize;
 		sizeInput.addEventListener('change', function () {
 			if (+sizeInput.value > 0) { settings.textSize = +sizeInput.value; refreshFontSizes(); saveToStorage(); }
 			else { sizeInput.value = settings.textSize; }
@@ -15935,14 +15936,16 @@ var EngCalcs = EngCalcs || {};
 		// expressed as a multiple of a text size made the user do a division to answer "how big is
 		// the dot", which is the only question they were ever asking.
 		var symInput = document.createElement('input');
-		symInput.type = 'number'; symInput.step = '1'; symInput.min = '1'; symInput.value = settings.symbolSize;
+		symInput.type = 'number'; symInput.className = 'ec-spin';
+		symInput.step = '1'; symInput.min = '1'; symInput.value = settings.symbolSize;
 		symInput.addEventListener('change', function () {
 			if (+symInput.value > 0) { settings.symbolSize = +symInput.value; refreshSymbolSizes(); relayoutLabels(); saveToStorage(); }
 			else { symInput.value = settings.symbolSize; }
 		});
 		row(mapBody, pc.lpn_settings_symbol_size || 'Symbol size (pixels)', symInput);
 		var lwInput = document.createElement('input');
-		lwInput.type = 'number'; lwInput.step = '0.5'; lwInput.min = '0.5'; lwInput.value = settings.linkWidth;
+		lwInput.type = 'number'; lwInput.className = 'ec-spin';
+		lwInput.step = '1'; lwInput.min = '1'; lwInput.value = settings.linkWidth;
 		lwInput.addEventListener('change', function () {
 			if (+lwInput.value > 0) { settings.linkWidth = +lwInput.value; refreshSymbolSizes(); saveToStorage(); }
 			else { lwInput.value = settings.linkWidth; }
@@ -15962,7 +15965,8 @@ var EngCalcs = EngCalcs || {};
 		// north-south mains wants the doorway well clear of vertical, and a diagonal transmission
 		// main barely cares.
 		var biasInput = document.createElement('input');
-		biasInput.type = 'number'; biasInput.step = '5'; biasInput.min = LPN_FLIP_LEFT_MIN; biasInput.max = LPN_FLIP_LEFT_MAX;
+		biasInput.type = 'number'; biasInput.className = 'ec-spin';
+		biasInput.step = '1'; biasInput.min = LPN_FLIP_LEFT_MIN; biasInput.max = LPN_FLIP_LEFT_MAX;
 		biasInput.value = labelFlipLeftOfVertical();
 		biasInput.addEventListener('change', function () {
 			var v = +biasInput.value;
@@ -16899,11 +16903,11 @@ var EngCalcs = EngCalcs || {};
 	// Settings rule exists to prevent.
 	function buildDefaultPatternRow(host) {
 		var pc = EngCalcs.pageConfig || {}, row = libEl('div', 'lpn-lib-note'),
-			lab = libEl('span', 'ec-help', pc.lpn_library_default_pattern || 'Pattern for demands that name none'),
+			lab = libEl('span', 'ec-help', pc.lpn_library_default_pattern || 'Default demand pattern'),
 			sel = document.createElement('select');
 		if (pc.lpn_library_default_pattern_tip) { lab.title = pc.lpn_library_default_pattern_tip; }
 		libFillPatternOptions(sel, doc.defaultPattern);
-		sel.setAttribute('aria-label', pc.lpn_library_default_pattern || 'Pattern for demands that name none');
+		sel.setAttribute('aria-label', pc.lpn_library_default_pattern || 'Default demand pattern');
 		sel.addEventListener('change', function () {
 			doc.defaultPattern = sel.value || null;
 			libCommit();
@@ -18570,7 +18574,20 @@ var EngCalcs = EngCalcs || {};
 		refreshScenarioStatus();
 		scheduleSolve();
 	}
+	// Ctrl+Z UNDOES THE MAP, EXCEPT WHERE THE USER IS TYPING (Tom, 2026-08-20, on the Controls
+	// library: "It was scary when I entered an unknown node... could/should there be a CTRL+Z in the
+	// Library fields?"). It already exists -- the browser's own text undo -- and this handler was
+	// taking it away from every input on the page, so a mistyped control line, a wrong diameter in
+	// the property popup and a wrong number in Settings all had no way back but retyping. Undoing
+	// the whole map because somebody wanted the last word back is worse than not undoing at all.
+	function isTextEntry(el) {
+		if (!el) { return false; }
+		if (el.isContentEditable) { return true; }
+		var tag = (el.tagName || '').toLowerCase();
+		return tag === 'input' || tag === 'textarea' || tag === 'select';
+	}
 	document.addEventListener('keydown', function (e) {
+		if (isTextEntry(e.target)) { return; }
 		if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
 	});
 
