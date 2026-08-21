@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 1239,
-        "delta_key_count": 48,
+        "expected_key_count": 1242,
+        "delta_key_count": 51,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -454,6 +454,8 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_menu_project": "Project",
+        "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
@@ -465,6 +467,7 @@
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",
+        "lpn_time_run_report_tip": "What the EPANET solver itself printed about the last run: how it settled, and anything it warned about. It is the solver’s own text, not ours.",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_color_mode_manual": "Manual",
         "lpn_library_menu": "Libraries",
@@ -504,6 +507,8 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_menu_project": "Project",
+        "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
@@ -515,6 +520,7 @@
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",
+        "lpn_time_run_report_tip": "What the EPANET solver itself printed about the last run: how it settled, and anything it warned about. It is the solver’s own text, not ours.",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_color_mode_manual": "Manual",
         "lpn_library_menu": "Libraries",
@@ -734,6 +740,38 @@
                 }
             }
         },
+        "lpn_menu_project": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map_tip",
+                    "value": "मोड पंक्ति और निर्देशांक रीडआउट छुपाता है, ताकि स्क्रीनशॉट में केवल मानचित्र दिखे। आपकी ड्राइंग नहीं बदलती, और यह विकल्प सहेजा नहीं जाता — पृष्ठ फिर से लोड करने पर रीडआउट वापस आ जाते हैं।",
+                    "english": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "सेटिंग्स",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_time_no_report": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map_tip",
+                    "value": "मोड पंक्ति और निर्देशांक रीडआउट छुपाता है, ताकि स्क्रीनशॉट में केवल मानचित्र दिखे। आपकी ड्राइंग नहीं बदलती, और यह विकल्प सहेजा नहीं जाता — पृष्ठ फिर से लोड करने पर रीडआउट वापस आ जाते हैं।",
+                    "english": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "सेटिंग्स",
+                    "english": "Settings"
+                }
+            }
+        },
         "lpn_profile_tip_syn": {
             "reason": "missing",
             "current_value": null,
@@ -895,6 +933,22 @@
             }
         },
         "lpn_time_run_report": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_note",
+                    "value": "आप नेटवर्क को उसके पहले रिपोर्टिंग समय पर देख रहे हैं। यह नेटवर्क अपनी पूरी समय अवधि में गणना करने में इतना समय लेता है कि जब तक आप काम करते हैं, बाद के समय के परिणाम अद्यतन नहीं रखे जाते। उन्हें अद्यतन करने के लिए गणना करें दबाएँ।",
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "गति",
+                    "english": "Speed"
+                }
+            }
+        },
+        "lpn_time_run_report_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

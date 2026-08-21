@@ -207,6 +207,38 @@ async function boxSection() {
 	eq(EngCalcs.lpnTimeRunReport(), report, 'and it holds EPANET\'s own report, unedited');
 	eq(done.reportLength, report.length, '...with its length in the state a test can read');
 
+	// ---- THE REPORT OUTLIVES THE BOX (ROADMAP Task 467) ----
+	//
+	// Project > EPANET run report is the row that exists because the report was unreachable: the box
+	// only ever appears for a run somebody pressed Calculate for, so on a network that re-runs itself
+	// after a quiet moment -- the common case -- EPANET printed a report and nothing could show it.
+	// Two properties, and the second is the one a stub could hide:
+	//   * closing the box does not destroy the report;
+	//   * an AUTOMATIC run, which never had a box at all, still leaves one.
+	EngCalcs.lpnTimeRunBoxHide();
+	eq(EngCalcs.lpnTimeRunBoxState().open, false, 'set up: the box is closed, as its X closes it');
+	eq(EngCalcs.lpnTimeLastReport(), report, 'the last run\'s report is kept after the run');
+	check(EngCalcs.lpnTimeShowReport(), 'and Project > EPANET run report puts it back on screen');
+	{
+		const shown = EngCalcs.lpnTimeRunBoxState();
+		eq(shown.open, true, '...in the run box, which is the one place a run\'s outcome is shown');
+		eq(shown.phase, 'done', '...saying the run finished rather than that one is running');
+		eq(shown.reportLength, report.length, '...with the whole report in it');
+		eq(EngCalcs.lpnTimeRunReport(), report, '...unedited');
+	}
+
+	// The automatic case, which is the one the row was built for. A fresh edit, no Calculate, no box
+	// -- and a report at the end of it all the same.
+	EngCalcs.lpnTimeRunBoxHide();
+	report = 'Page 1  EPANET  automatic run\n  Hydraulic Status: balanced\n';
+	hydraulicEdit();
+	await wait(160);
+	eq(EngCalcs.lpnTimeRunBoxState().open, false, 'an automatic run still opens no box');
+	eq(EngCalcs.lpnTimeLastReport(), report, '...and still records its report');
+	check(EngCalcs.lpnTimeShowReport(), '...which the menu row can show');
+	eq(EngCalcs.lpnTimeRunReport(), report, '...and it is THIS run\'s report, not the earlier one');
+	EngCalcs.lpnTimeRunBoxHide();
+
 	// ---- A SUPERSEDED RUN TAKES ITS BOX WITH IT ----
 	//
 	// This is the one that matters. The page solves on a 300 ms debounce and a WASM round trip can

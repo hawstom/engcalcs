@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hr",
-        "expected_key_count": 1239,
-        "delta_key_count": 47,
+        "expected_key_count": 1242,
+        "delta_key_count": 50,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -454,6 +454,8 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_menu_project": "Project",
+        "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
@@ -465,6 +467,7 @@
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",
+        "lpn_time_run_report_tip": "What the EPANET solver itself printed about the last run: how it settled, and anything it warned about. It is the solver’s own text, not ours.",
         "lpn_color_mode_manual": "Manual",
         "lpn_library_menu": "Libraries",
         "lpn_library_menu_tip": "Manage the demand patterns, pump curves and control rules for this project.",
@@ -503,6 +506,8 @@
         "lpn_pane_tab_pipes": "Pipes",
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
+        "lpn_menu_project": "Project",
+        "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_notes_color_term": "Color band boundaries stay the same",
@@ -514,6 +519,7 @@
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",
+        "lpn_time_run_report_tip": "What the EPANET solver itself printed about the last run: how it settled, and anything it warned about. It is the solver’s own text, not ours.",
         "lpn_color_mode_manual": "Manual",
         "lpn_library_menu": "Libraries",
         "lpn_library_menu_tip": "Manage the demand patterns, pump curves and control rules for this project.",
@@ -732,6 +738,38 @@
                 }
             }
         },
+        "lpn_menu_project": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map_tip",
+                    "value": "Sakrij redak načina rada i očitanje koordinata, tako da snimka zaslona prikazuje samo kartu. Vaš crtež se ne mijenja, a ovaj izbor se ne pohranjuje — ponovno učitavanje stranice vraća očitanja.",
+                    "english": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Postavke",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_time_no_report": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map_tip",
+                    "value": "Sakrij redak načina rada i očitanje koordinata, tako da snimka zaslona prikazuje samo kartu. Vaš crtež se ne mijenja, a ovaj izbor se ne pohranjuje — ponovno učitavanje stranice vraća očitanja.",
+                    "english": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Postavke",
+                    "english": "Settings"
+                }
+            }
+        },
         "lpn_profile_tip_syn": {
             "reason": "missing",
             "current_value": null,
@@ -893,6 +931,22 @@
             }
         },
         "lpn_time_run_report": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_note",
+                    "value": "Vidite mrežu u prvom trenutku izvještavanja. Ovoj mreži treba toliko dugo da izračuna cijelo svoje razdoblje da se rezultati za kasnija vremena ne ažuriraju dok radite. Pritisnite Pokreni da ih ažurirate.",
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "Brzina",
+                    "english": "Speed"
+                }
+            }
+        },
+        "lpn_time_run_report_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

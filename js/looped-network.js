@@ -12980,7 +12980,52 @@ var EngCalcs = EngCalcs || {};
 			}
 		]);
 	}
-	// openSettingsMenu() is GONE (Tom, 2026-08-08). Its three rows now live where they belong: Settings
+	// **THE PROJECT MENU** (ROADMAP Task 467). Tom, 2026-08-20: *"Maybe we can have a Project menu
+	// with Settings, Library, and Report under it?"*
+	//
+	// It is a MENU HOME for two boxes that already have toolbar buttons, plus the one thing that had
+	// no door at all. Not a replacement: Libraries and Settings keep their buttons, because the
+	// toolbar is the high-use subset and both are high-use. What is new here is Report.
+	//
+	// **REPORT IS WHY THIS MENU EXISTS.** EPANET's own run report is written into the run box, and
+	// the run box only appears for a run somebody pressed Calculate for -- so on a network that
+	// re-runs itself after a quiet moment, which is the common case, the report was produced and
+	// then unreachable. js/lpn-time.js now keeps the last one whether a box was shown or not, and
+	// this row puts it back on screen.
+	//
+	// Named openProjectBarMenu(), NOT openProjectMenu(): that name is taken by the TAB's own menu
+	// (rename, duplicate, close), which is about one project rather than about the open one.
+	function openProjectBarMenu(anchor) {
+		var pc = EngCalcs.pageConfig || {};
+		openMenu(anchor, [
+			{
+				icon: 'settings', label: pc.lpn_menu_settings || 'Settings',
+				tip: pc.lpn_tool_settings_tip,
+				fn: function () { toggleSettingsBox(); }
+			},
+			{
+				icon: 'library', label: pc.lpn_library_menu || 'Libraries',
+				tip: pc.lpn_library_menu_tip,
+				fn: function () { toggleLibraryBox(); }
+			},
+			{ separator: true },
+			{
+				icon: 'info', label: pc.lpn_time_run_report || 'EPANET run report',
+				tip: pc.lpn_time_run_report_tip,
+				// **SHOWN, OR EXPLAINED -- never an empty box.** The row is always here rather than
+				// hidden when there is nothing to show: a row that disappears teaches nobody that the
+				// report exists, while a sentence saying why there is none teaches exactly that (the
+				// native solver prints nothing, so a network that has never reached EPANET has no
+				// report and never will until it does).
+				fn: function () {
+					if (EngCalcs.lpnTimeShowReport && EngCalcs.lpnTimeShowReport()) { return; }
+					setNotice(pc.lpn_time_no_report ||
+						'There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.');
+				}
+			}
+		]);
+	}
+		// openSettingsMenu() is GONE (Tom, 2026-08-08). Its three rows now live where they belong: Settings
 	// and Units are sections of the panel, and Clear calculator is the button at its foot --
 	// which it already was, so the menu row was the duplicate, not the button.
 	function buildMenuBar() {
@@ -12992,6 +13037,10 @@ var EngCalcs = EngCalcs || {};
 			{ id: 'lpn_menu_edit', icon: 'edit', label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
 			{ id: 'lpn_menu_insert', icon: 'insert', label: pc.lpn_menu_insert || 'Insert', open: openInsertMenu },
 			{ id: 'lpn_menu_view', icon: 'view', label: pc.lpn_menu_view || 'View', open: openViewMenu },
+			// Between View and Settings on purpose: it holds what belongs to THIS PROJECT rather
+			// than to the drawing (View) or to the page (Settings, which is a panel of its own and
+			// stays a panel -- see below).
+			{ id: 'lpn_menu_project', icon: 'project', label: pc.lpn_menu_project || 'Project', open: openProjectBarMenu },
 			// Settings is the one menu-bar item that opens a PANEL, not a pull-down (Tom,
 			// 2026-08-08): "there be a duplicated identical Settings that lives on the Toolbar and in
 			// the Menu". Identical label, identical element, both places -- which is the rule the old

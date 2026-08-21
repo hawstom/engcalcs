@@ -966,6 +966,8 @@ EngCalcs.pageConfig = {
 	lpn_time_run_done: <?=json_encode($ec_lang['lpn_time_run_done'])?>,
 	lpn_time_run_failed: <?=json_encode($ec_lang['lpn_time_run_failed'])?>,
 	lpn_time_run_report: <?=json_encode($ec_lang['lpn_time_run_report'])?>,
+	lpn_time_run_report_tip: <?=json_encode($ec_lang['lpn_time_run_report_tip'])?>,
+	lpn_time_no_report: <?=json_encode($ec_lang['lpn_time_no_report'])?>,
 	lpn_close: <?=json_encode($ec_lang['lpn_close'])?>,
 	lpn_time_speed: <?=json_encode($ec_lang['lpn_time_speed'])?>,
 	lpn_time_speed_tip: <?=json_encode($ec_lang['lpn_time_speed_tip'])?>,
@@ -1257,6 +1259,7 @@ EngCalcs.pageConfig = {
 	lpn_geosearch_version: <?=json_encode(EC_GEOSEARCH_VERSION)?>,
 	lpn_geosearch_days: <?=json_encode(EC_GEOSEARCH_DAYS)?>,
 	lpn_menu_settings: <?=json_encode($ec_lang['lpn_menu_settings'])?>,
+	lpn_menu_project: <?=json_encode($ec_lang['lpn_menu_project'])?>,
 	lpn_menu_help: <?=json_encode($ec_lang['lpn_menu_help'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
 	<?php // Reused verbatim from the suite navbar, not re-keyed: same words, same two pages, already

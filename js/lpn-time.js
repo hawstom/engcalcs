@@ -533,10 +533,16 @@
 			if (!run.ok) {
 				state.run = null;
 				host.apply(run);
+				// The last run FAILED, so there is no report -- and the previous run's report is not
+				// an answer to what just happened. Cleared rather than kept.
+				lastReport = ''; lastReportMs = 0; lastReportFrames = 0;
 				boxFailed(token);
 				renderPanel();
 				return;
 			}
+			lastReport = (run && run.report) || '';
+			lastReportMs = state.lastRunMs;
+			lastReportFrames = ((run && run.frames) || []).length;
 			boxDone(token, run, state.lastRunMs);
 			state.run = run;
 			// The model these frames came out of, so a later edit can ask whether it changed.
@@ -551,6 +557,7 @@
 				if (boxState.token === token) { boxHide(); }
 				return;
 			}
+			lastReport = ''; lastReportMs = 0; lastReportFrames = 0;
 			boxFailed(token);
 			noEngine(model);
 			if (root.console && console.warn) { console.warn('EPANET extended-period run failed:', err); }
@@ -849,11 +856,23 @@
 
 	var boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, token: 0 },
 		boxReport = '',
+		// Whether the report inside the box starts EXPANDED. It does when the box was opened to show
+		// a report and only then -- a run in progress opens its own box collapsed, because the
+		// report does not exist yet and the thing to watch is the bar.
+		boxReportOpen = false,
 		boxUi = null;
+	// **THE LAST RUN'S REPORT OUTLIVES THE BOX, and is kept whether or not a box was ever shown.**
+	// `boxReport` is the copy the box is rendering and dies with it; this is the document's answer to
+	// "what did the engine say last time", which Project > EPANET run report asks (Task 467). Without
+	// it that row could only ever answer for a run the user pressed Calculate for, and an automatic
+	// run -- the common case, see EC.LPN_TIME_AUTO -- would leave it silent or, worse, showing the
+	// report of some older run that did have a box.
+	var lastReport = '', lastReportMs = 0, lastReportFrames = 0;
 
 	function boxStart(token) {
 		boxState = { open: true, phase: 'running', fraction: 0, frames: 0, ms: 0, reportLength: 0, token: token };
 		boxReport = '';
+		boxReportOpen = false;
 		renderBox(true);
 	}
 	function boxProgress(p) {
@@ -886,6 +905,7 @@
 	function boxHide() {
 		boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, token: 0 };
 		boxReport = '';
+		boxReportOpen = false;
 		renderBox(true);
 	}
 
@@ -956,7 +976,7 @@
 		if (boxReport) {
 			boxUi.pre.textContent = boxReport;
 			boxUi.report.style.display = '';
-			boxUi.report.open = false;
+			boxUi.report.open = boxReportOpen;
 		} else {
 			boxUi.pre.textContent = '';
 			boxUi.report.style.display = 'none';
@@ -1010,6 +1030,32 @@
 	 * EngCalcs.lpnEpanetRun. Empty string when there is none.
 	 */
 	EC.lpnTimeRunReport = function () { return boxReport; };
+	/**
+	 * **PROJECT > EPANET RUN REPORT** (Task 467): put the last run's report on screen.
+	 *
+	 * Returns false when there is none, and says nothing itself -- the caller owns the message,
+	 * because "no report yet" is a sentence about the PAGE (nothing has been run, or the native
+	 * solver ran it, which prints nothing) and js/looped-network.js is where the page talks.
+	 *
+	 * It reuses the run box rather than opening a second window: the box is already the one place
+	 * this page shows a run's outcome, it already closes on its X, Enter and Escape, and a second
+	 * window would be a second thing to keep in step with the report's format.
+	 */
+	EC.lpnTimeLastReport = function () { return lastReport; };
+	// The same act as the box's X, Escape and Enter, exposed so a harness can close it the way a
+	// person does rather than by reaching into state.
+	EC.lpnTimeRunBoxHide = function () { boxHide(); };
+	EC.lpnTimeShowReport = function () {
+		if (!lastReport) { return false; }
+		boxState = {
+			open: true, phase: 'done', fraction: 1, frames: lastReportFrames,
+			ms: lastReportMs, reportLength: lastReport.length, token: 0
+		};
+		boxReport = lastReport;
+		boxReportOpen = true;
+		renderBox(true);
+		return true;
+	};
 
 	// ================================================================================================
 	// THE TRANSPORT, ON THE TOOLBAR

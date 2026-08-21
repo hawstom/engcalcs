@@ -1460,6 +1460,13 @@ $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
 $ec_lang['lpn_clean_map']='Hide map readouts';
 $ec_lang['lpn_clean_map_off']='Show map readouts';
 $ec_lang['lpn_clean_map_tip']='Hide the mode line and the coordinate readout so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back.';
+// THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
+// Settings, Library, and Report under it?" Its rows borrow the names they already have --
+// lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
+// it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
+// alternative and Tom kept Project.
+$ec_lang['lpn_menu_project']='Project';
+$ec_lang['lpn_time_no_report']='There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Settings';
@@ -2292,6 +2299,7 @@ $ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting
 $ec_lang['lpn_time_run_done']='The run finished. Reporting times: {frames}. Time taken: {secs} s.';
 $ec_lang['lpn_time_run_failed']='The run did not finish, so there are no results for the later times.';
 $ec_lang['lpn_time_run_report']='EPANET run report';
+$ec_lang['lpn_time_run_report_tip']='What the EPANET solver itself printed about the last run: how it settled, and anything it warned about. It is the solver’s own text, not ours.';
 
 $ec_lang['lpn_time_speed']='Speed';
 $ec_lang['lpn_time_speed_tip']='How fast the run plays back.';
