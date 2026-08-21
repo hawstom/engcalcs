@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 1253,
-        "delta_key_count": 61,
+        "expected_key_count": 1259,
+        "delta_key_count": 67,
         "exempt_key_count": 29,
         "exempt_keys": [
             "u_imgd",
@@ -461,6 +461,12 @@
         "lpn_pane_print": "Print table",
         "lpn_pane_print_tip": "Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.",
         "lpn_menu_project": "Project",
+        "lpn_tables_menu": "Tables",
+        "lpn_tables_menu_tip": "Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.",
+        "lpn_run_menu_tip": "Work out this network now. Looking for a Run button? While this project works itself out after every change, the toolbar has no Run button. Turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics, and the button comes back.",
+        "lpn_settings_auto_run": "Recalculate the simulation for this project automatically",
+        "lpn_settings_auto_run_tip": "When this is on, this project works itself out again shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be worked out gets in the way of typing, and the Calculate button comes back so you choose when to run.",
+        "lpn_time_run_slow": "This network took {secs} s to work out, and it is set to work itself out again after every change. To stop that and get a Calculate button back, turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics.",
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
@@ -524,6 +530,12 @@
         "lpn_pane_print": "Print table",
         "lpn_pane_print_tip": "Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.",
         "lpn_menu_project": "Project",
+        "lpn_tables_menu": "Tables",
+        "lpn_tables_menu_tip": "Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.",
+        "lpn_run_menu_tip": "Work out this network now. Looking for a Run button? While this project works itself out after every change, the toolbar has no Run button. Turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics, and the button comes back.",
+        "lpn_settings_auto_run": "Recalculate the simulation for this project automatically",
+        "lpn_settings_auto_run_tip": "When this is on, this project works itself out again shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be worked out gets in the way of typing, and the Calculate button comes back so you choose when to run.",
+        "lpn_time_run_slow": "This network took {secs} s to work out, and it is set to work itself out again after every change. To stop that and get a Calculate button back, turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics.",
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
@@ -776,7 +788,7 @@
                 "next_translated": {
                     "key": "lpn_clean_map",
                     "value": "Ascunde indicatoarele hărții",
-                    "english": "Hide map readouts"
+                    "english": "Reduce map clutter"
                 }
             }
         },
@@ -792,7 +804,7 @@
                 "next_translated": {
                     "key": "lpn_clean_map",
                     "value": "Ascunde indicatoarele hărții",
-                    "english": "Hide map readouts"
+                    "english": "Reduce map clutter"
                 }
             }
         },
@@ -803,7 +815,103 @@
                 "previous_translated": {
                     "key": "lpn_clean_map_tip",
                     "value": "Ascunde linia de mod și indicatorul de coordonate, astfel încât o captură de ecran să arate doar harta. Desenul dvs. nu este afectat, iar această alegere nu este salvată — reîncărcarea paginii readuce indicatoarele.",
-                    "english": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                    "english": "Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Setări",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tables_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map_tip",
+                    "value": "Ascunde linia de mod și indicatorul de coordonate, astfel încât o captură de ecran să arate doar harta. Desenul dvs. nu este afectat, iar această alegere nu este salvată — reîncărcarea paginii readuce indicatoarele.",
+                    "english": "Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Setări",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tables_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map_tip",
+                    "value": "Ascunde linia de mod și indicatorul de coordonate, astfel încât o captură de ecran să arate doar harta. Desenul dvs. nu este afectat, iar această alegere nu este salvată — reîncărcarea paginii readuce indicatoarele.",
+                    "english": "Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Setări",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_run_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map_tip",
+                    "value": "Ascunde linia de mod și indicatorul de coordonate, astfel încât o captură de ecran să arate doar harta. Desenul dvs. nu este afectat, iar această alegere nu este salvată — reîncărcarea paginii readuce indicatoarele.",
+                    "english": "Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Setări",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_settings_auto_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map_tip",
+                    "value": "Ascunde linia de mod și indicatorul de coordonate, astfel încât o captură de ecran să arate doar harta. Desenul dvs. nu este afectat, iar această alegere nu este salvată — reîncărcarea paginii readuce indicatoarele.",
+                    "english": "Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Setări",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_settings_auto_run_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map_tip",
+                    "value": "Ascunde linia de mod și indicatorul de coordonate, astfel încât o captură de ecran să arate doar harta. Desenul dvs. nu este afectat, iar această alegere nu este salvată — reîncărcarea paginii readuce indicatoarele.",
+                    "english": "Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Setări",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_time_run_slow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map_tip",
+                    "value": "Ascunde linia de mod și indicatorul de coordonate, astfel încât o captură de ecran să arate doar harta. Desenul dvs. nu este afectat, iar această alegere nu este salvată — reîncărcarea paginii readuce indicatoarele.",
+                    "english": "Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
                 },
                 "next_translated": {
                     "key": "lpn_menu_settings",
@@ -819,7 +927,7 @@
                 "previous_translated": {
                     "key": "lpn_clean_map_tip",
                     "value": "Ascunde linia de mod și indicatorul de coordonate, astfel încât o captură de ecran să arate doar harta. Desenul dvs. nu este afectat, iar această alegere nu este salvată — reîncărcarea paginii readuce indicatoarele.",
-                    "english": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                    "english": "Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
                 },
                 "next_translated": {
                     "key": "lpn_menu_settings",
