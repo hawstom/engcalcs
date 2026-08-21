@@ -2431,6 +2431,22 @@ var EngCalcs = EngCalcs || {};
 			// a slow connection and why the default has not moved. See Task 313 -- the per-solve gap
 			// that remains is our own .inp round trip, not the engine.
 			engine: 'native',
+			// **AUTOMATIC RECALCULATION, AS A STATED PREFERENCE** (ROADMAP Task 467). Tom,
+			// 2026-08-20: *"a toggle under Calculation.Hydraulics for 'Recalculate the simulation
+			// for this project automatically.' If it's on, we do our debounce and calculate, and we
+			// hide the Calculate button."*
+			//
+			// **DEFAULT ON, because ON is what the page already did.** The measured heuristic it
+			// replaces (EC.LPN_TIME_AUTO) allowed an automatic run on every network that ran inside
+			// its budget, which is every ordinary one -- so defaulting OFF would take working
+			// behaviour away from everybody to protect the few. The few are protected by the advice
+			// instead: a run that measures over EC.LPN_TIME_SLOW_MS says so and names the switch.
+			//
+			// It is a PROJECT setting, not a browser one, for the reason units are (see "there are
+			// no browser units, only PROJECT units"): a big network and a small one want different
+			// answers, and the answer belongs to the network. It serializes for free -- the whole
+			// `settings` object goes into serializeProject().
+			autoRun: true,
 			// Default input values for NEWLY created elements -- a mode the user re-enters mid-draw
 			// ("OK, now all the 8 inch pipes"), not a one-time setup. Same "future, not retroactive"
 			// rule as idPrefixes: changing one never touches an element that already exists.
@@ -16543,6 +16559,24 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 		});
 		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET solver', engInput, pc.lpn_settings_engine_epanet_tip);
+		// **AUTOMATIC RECALCULATION** (Task 467, Tom 2026-08-20). The switch this page had was a
+		// measurement nobody could see; this is the same decision made out loud. Turning it OFF puts
+		// the Calculate button back on the toolbar -- js/lpn-time.js reads this through the host's
+		// autoRun() and renders the strip accordingly, so there is nothing to keep in step here.
+		var autoInput = document.createElement('input');
+		autoInput.type = 'checkbox';
+		autoInput.checked = (settings.autoRun !== false);
+		autoInput.addEventListener('change', function () {
+			settings.autoRun = autoInput.checked;
+			// Re-render the strip immediately: the whole point of the checkbox is that the button
+			// appears or disappears, and a change you have to provoke a solve to see reads as broken.
+			if (EngCalcs.lpnTimeRenderPanel) { EngCalcs.lpnTimeRenderPanel(); }
+			// Turning it ON is a request for an up-to-date answer, so give one rather than waiting
+			// for the next edit. Turning it OFF asks for nothing, and costs nothing.
+			if (settings.autoRun) { scheduleSolve(); }
+			saveToStorage();
+		});
+		row(compBody, pc.lpn_settings_auto_run || 'Recalculate the simulation for this project automatically', autoInput, pc.lpn_settings_auto_run_tip);
 		// ---- restore defaults (Tom, 2026-07-30) ----
 		// Resets settings/labelSettings only -- the network (nodes/links/labels) and backdrop are
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
@@ -19925,7 +19959,13 @@ var EngCalcs = EngCalcs || {};
 			// The one door from the Time TAB (the transport) to the Time SETTINGS, which moved to
 			// the Settings box in Task 441. Handed over rather than reached for, so lpn-time.js
 			// still knows nothing about this page beyond the seam.
-			openSettings: openSettingsBox
+			openSettings: openSettingsBox,
+			// **THE ONE PLACE js/lpn-time.js READS THE AUTO-RUN PREFERENCE** (Task 467). Handed over
+			// rather than reached for, like every other line of this seam: that file knows nothing
+			// about `settings` and must not learn. `!== false` rather than a truth test, so a
+			// project saved before this setting existed reads as ON -- which is what it did.
+			autoRun: function () { return settings.autoRun !== false; },
+			setAutoRun: function (on) { settings.autoRun = !!on; saveToStorage(); rebuildSettingsFields(); }
 		});
 	}
 	// **THE WHOLE SEAM TO js/lpn-search.js** (Task 437). One call, at script scope, so the placement

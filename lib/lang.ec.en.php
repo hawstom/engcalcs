@@ -1477,6 +1477,15 @@ $ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the 
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
 $ec_lang['lpn_run_menu_tip']='Work out this network now. Looking for a Run button? While this project works itself out after every change, the toolbar has no Run button. Turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics, and the button comes back.';
+// ---- automatic recalculation (Task 467) ----
+// "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
+// out over time, and this switch is about the run, not about the drawing.
+$ec_lang['lpn_settings_auto_run']='Recalculate the simulation for this project automatically';
+$ec_lang['lpn_settings_auto_run_tip']='When this is on, this project works itself out again shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be worked out gets in the way of typing, and the Calculate button comes back so you choose when to run.';
+// Says what it MEASURED and where the switch is, in that order. The number first, because a person
+// who has just waited a second already knows something is slow and wants it confirmed, not
+// explained. {secs} is one decimal.
+$ec_lang['lpn_time_run_slow']='This network took {secs} s to work out, and it is set to work itself out again after every change. To stop that and get a Calculate button back, turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics.';
 $ec_lang['lpn_time_no_report']='There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.

@@ -1267,6 +1267,9 @@ EngCalcs.pageConfig = {
 	lpn_tables_menu: <?=json_encode($ec_lang['lpn_tables_menu'])?>,
 	lpn_tables_menu_tip: <?=json_encode($ec_lang['lpn_tables_menu_tip'])?>,
 	lpn_run_menu_tip: <?=json_encode($ec_lang['lpn_run_menu_tip'])?>,
+	lpn_settings_auto_run: <?=json_encode($ec_lang['lpn_settings_auto_run'])?>,
+	lpn_settings_auto_run_tip: <?=json_encode($ec_lang['lpn_settings_auto_run_tip'])?>,
+	lpn_time_run_slow: <?=json_encode($ec_lang['lpn_time_run_slow'])?>,
 	lpn_menu_help: <?=json_encode($ec_lang['lpn_menu_help'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
 	<?php // Reused verbatim from the suite navbar, not re-keyed: same words, same two pages, already
