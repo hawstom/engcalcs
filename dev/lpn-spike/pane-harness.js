@@ -301,8 +301,17 @@ console.log('\n--- six tabs, one renderer ---');
 	const ids = L.paneTables().map((t) => t.id);
 	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves',
 		'six asset tables, in the toolbar’s Add order, nodes before links', ids.join(','));
-	report(L.paneTabIds()[0] === 'profile', 'Profile is still the first tab — it is a drawing, the rest are tables',
+	// **PROFILE IS LAST, NOT FIRST** (Tom, 2026-08-21: "making Profile the last tab"). It is still
+	// the odd one out -- a drawing where the other six are tables -- and the end of the strip is
+	// where an odd one out belongs; at the front it stood between the reader and the six things
+	// that are alike. Asserted at BOTH ends, because the bug this catches is a reorder that drops
+	// it somewhere in the middle of the six.
+	report(L.paneTabIds()[L.paneTabIds().length - 1] === 'profile',
+		'Profile is the LAST tab — it is a drawing, the six before it are tables',
 		L.paneTabIds().join(','));
+	report(L.paneTabIds()[0] === 'junctions',
+		'...so the strip OPENS on a table, which is what the Print button beside it acts on',
+		L.paneTabIds()[0]);
 	report(L.paneTabIds().length === 7, 'seven tabs in all', String(L.paneTabIds().length));
 	report(L.paneTabIds().indexOf('text') < 0 && ids.indexOf('text') < 0,
 		'Text is NOT a tab — nothing about a label solves, so its table would have no column worth reading');

@@ -6738,25 +6738,14 @@ var EngCalcs = EngCalcs || {};
 	// highlight belonging to something nobody can see.
 	// `show` runs on becoming the visible tab, `refresh` on every solve and every document change
 	// while it IS the visible one, `hide` on ceasing to be.
-	var paneTabs = [
-		{
-			id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
-			// profileSeedStops() first, because the document may have changed under an open panel:
-			// a stop whose node was deleted is cleared here rather than left to draw a route
-			// through a ghost.
-			show: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
-			refresh: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
-			hide: function () { drawProfilePath(null); }
-		},
-	];
-	// **THE SIX ASSET TABLES JOIN THE STRIP FROM ONE LIST** (Task 455). Profile stays first and stays
-	// apart -- it is a drawing and the other six are tables -- and the six follow in the toolbar's
-	// own Add order, nodes before links, so the two strips teach each other.
+	// **THE SIX ASSET TABLES COME FIRST, FROM ONE LIST** (Task 455), in the toolbar's own Add order,
+	// nodes before links, so the two strips teach each other.
 	//
 	// Built here rather than written out six times: a tab is nothing but its table's own
 	// declaration, so there is no per-type tab code that could disagree with the per-type columns.
 	// A rebuild on entry, because the tab may have been away for a whole editing session; a refill
 	// afterwards, because renderPaneTable() decides that for itself.
+	var paneTabs = [];
 	paneTables().forEach(function (spec) {
 		paneTabs.push({
 			id: spec.id, panel: spec.panel, label: spec.label, tip: 'lpn_pane_tab_tip',
@@ -6764,6 +6753,26 @@ var EngCalcs = EngCalcs || {};
 			refresh: function () { renderPaneTable(spec); }
 		});
 	});
+	// **PROFILE IS LAST** (Tom, 2026-08-21: "making Profile the last tab"). It is still the odd one
+	// out -- a drawing where the other six are tables -- and the end of the strip is where an odd
+	// one out belongs, rather than the front, where it stood between the reader and the six things
+	// that are alike. Putting it last is also what lets the Print button hold the leading edge:
+	// print acts on a TABLE, and the tabs it applies to are now the ones next to it.
+	paneTabs.push({
+		id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
+		// profileSeedStops() first, because the document may have changed under an open panel:
+		// a stop whose node was deleted is cleared here rather than left to draw a route
+		// through a ghost.
+		show: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
+		refresh: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
+		hide: function () { drawProfilePath(null); }
+	});
+	// **THE PANE OPENS ON THE FIRST TABLE, WHICH IS THE CHANGE THIS REORDER MAKES.** paneTabs[0] is
+	// no longer the profile, and that is right: a reader who opens the pane without naming a tab
+	// wants the parts list far more often than the one drawing, and the profile needs stops chosen
+	// before it says anything at all. Every other door names its tab -- openPane('profile') from
+	// the Project menu, openPane(paneTables()[0].id) from Tables -- so this default is only ever
+	// the toolbar toggle's first use in a fresh browser.
 	var paneState = { open: false, h: LPN_PANE_DEFAULT, tab: paneTabs[0].id };
 	function paneEl() { return document.getElementById('lpn_pane'); }
 	function paneIsOpen() { return !!paneState.open; }
@@ -6912,7 +6921,7 @@ var EngCalcs = EngCalcs || {};
 		var pane = paneEl(), strip = document.getElementById('lpn_pane_tabs'),
 			grip = document.getElementById('lpn_pane_grip'),
 			x = document.getElementById('lpn_pane_close'), pc = EngCalcs.pageConfig || {},
-			dragFrom = null;
+			head = null, dragFrom = null;
 		if (!pane) { return; }
 		if (strip) {
 			paneTabs.forEach(function (t) {
@@ -6932,7 +6941,15 @@ var EngCalcs = EngCalcs || {};
 		if (x) { x.addEventListener('click', closePane); }
 		// Built here, not in the markup: it carries a tip, and .ec-help written into a page's HTML
 		// is what tip_markup_check.php exists to stop. Same treatment as a tab button.
-		if (!document.getElementById('lpn_pane_print') && x && x.parentNode) {
+		//
+		// **FIRST CHILD OF THE HEAD, at the extreme left edge** (Tom, 2026-08-21: the print button
+		// "is poorly discoverable ... try putting it at extreme left"). It used to sit beside the X
+		// in the top-RIGHT corner, which is where a window's own controls live and therefore where
+		// the eye reads "close", not "do something to this table". The left edge is the first thing
+		// read in an LTR language and the first thing read in an RTL one too, because the flex row
+		// reverses with the document.
+		head = document.getElementById('lpn_pane_head');
+		if (!document.getElementById('lpn_pane_print') && head) {
 			(function () {
 				var b = document.createElement('button');
 				b.type = 'button';
@@ -6941,7 +6958,7 @@ var EngCalcs = EngCalcs || {};
 				b.textContent = pc.lpn_pane_print || 'Print table';
 				if (pc.lpn_pane_print_tip) { b.title = pc.lpn_pane_print_tip; b.className += ' ec-help'; }
 				b.addEventListener('click', function () { printPaneTable(activePaneTableSpec()); });
-				x.parentNode.insertBefore(b, x);
+				head.insertBefore(b, head.firstChild);
 			}());
 		}
 		// **THE TOP EDGE IS THE HANDLE.** Pointer events, not mouse: one code path for mouse, pen
