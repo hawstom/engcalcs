@@ -311,27 +311,25 @@ $ec_icons = array(
 	// sheet"); and the TITLE BLOCK, a divided strip down the right, which is the half only an
 	// insider reads.
 	//
-	// **THE ONE ICON AT stroke-width 1.5, AND THAT IS THE WHOLE REASON SIX ROUNDS OF THIS MISSED.**
-	// Measured: a 16 px drawing with a 1 px line is 1/16 of the icon; this set's 2-unit stroke in a
-	// 24 box is 1/12 -- a third heavier. Every redraw at 2 came back fatter than the sketch and every
-	// detail that fitted his grid filled in on ours; at 17 px, which is what a menu row draws, the
-	// top sheet edge closes up entirely. So the geometry keeps the weight it was drawn at. Restoring
-	// the house weight is deleting the <g>; do that only if the strip's evenness matters more than
-	// this drawing, and expect the top edge to close.
+	// **HOUSE WEIGHT, chosen by Tom over the weight it was drawn at** (2026-08-21). The measurement
+	// behind that choice is worth keeping, because it is what made six rounds of redrawing miss: a
+	// 16 px drawing with a 1 px line is 1/16 of the icon, while this set's 2-unit stroke in a 24 box
+	// is 1/12 -- a third heavier -- so every redraw came back fatter than the sketch and details
+	// that fitted his grid filled in on ours. The cost is paid at 17 px, the size a menu row draws:
+	// the top sheet edge closes toward the one below it. Accepted, because one icon at its own
+	// weight is a visible seam in a strip and this one would have been the only 1.5 on it.
 	//
 	// Rejected on the way here, so they are not re-proposed: a rolled TUBE (a cylinder on this page
 	// reads as a PIPE, two icons away), a water drop (says water, not the job), a hard hat (says
 	// construction), and a corner-curled single sheet (a set is not one sheet). A coil small enough
 	// to sit at a corner cannot hold its opening: two 2-unit strokes need about 4 units between
 	// centres at 16 px and such a coil has room for 1.5.
-	'project'    => '<g stroke-width="1.5">'
-		. '<path d="M1.8 3C1.8 2.2 2.6 1.8 3.6 1.8H6C7.8 1.8 9 2.9 9.6 4.6L10.2 5.4H21"/>'
+	'project'    => '<path d="M1.8 3C1.8 2.2 2.6 1.8 3.6 1.8H6C7.8 1.8 9 2.9 9.6 4.6L10.2 5.4H21"/>'
 		. '<path d="M21 5.4V21"/><path d="M10.2 21H21"/>'
 		. '<path d="M1.8 3V19.8C1.8 20.6 2.8 21 4.2 21C5.6 21 6.6 20.6 6.6 19.8"/>'
 		. '<path d="M1.8 9H6.6C8.4 9 10.2 10.8 10.2 12.6H15"/>'
 		. '<path d="M1.8 17.4H6.6C8.4 17.4 9 18.6 9 19.8"/>'
-		. '<path d="M15 5.4V21"/><path d="M15 17.4H21"/>'
-		. '</g>',
+		. '<path d="M15 5.4V21"/><path d="M15 17.4H21"/>',
 
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
