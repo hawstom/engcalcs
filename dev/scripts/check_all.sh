@@ -16,14 +16,15 @@
 # without a human or a paid agent, and it is deliberately the first thing to reach for.
 #
 # WHAT IT DOES NOT COVER, stated because a checklist that hides its own gaps is worse than none:
-#   - Only TWO calculators have a worked-example test of their math: Manning Pipe Flow and Manning
-#     Trapezoidal Channel, the two core ones (Task 292). Every other calculator is checked only for
-#     running, for not emitting NaN, and for opening on a passing design -- which is real coverage
-#     of the catastrophic failures, and no coverage at all of a wrong coefficient. Adding a worked
-#     example is a per-page cost; spend it on the page being edited.
+#   - EVERY calculator now has a worked-example test of its math except rc, whose Robinson
+#     coefficients are unverified (the paper is paywalled and the free copy is a page scan). The
+#     last five were anchored 2026-08-21 and TWO OF THEM WERE WRONG -- Canal Seepage's currency
+#     inputs converted backwards (Task 473) and Manning Irregular's region Froude number mixed a
+#     region area with a segment top width (Task 474). That is what a worked example buys, and it
+#     is why adding one is the first thing to spend on a page being edited.
 #   - Calculators whose results live in DYNAMIC ROWS (Branched-Network, Irrigation-Pressure,
-#     Manning-Irregular, Weir-Flow-Irregular) are run, but their row results are not: building the
-#     rows needs a richer DOM than dev/calc-spike/calc-page.js has. The smoke harness names them
+#     Manning-Irregular, Weir-Flow-Irregular) build their rows in their OWN per-page harness now;
+#     the SMOKE harness still does not, and names them
 #     as it goes rather than passing them silently.
 #   - Nothing here reads code for design, duplication, or a subtle logic error. That is what
 #     /code-review is for, and it is billed and user-triggered -- an AI cannot launch it.
@@ -165,8 +166,7 @@ if [ -n "$ADVISORY" ]; then
 fi
 echo "All blocking checks pass."
 echo ""
-echo "Not covered here, and worth knowing: mi, wi, ip, bpn and cs have no worked-example test of"
-echo "their math -- they are checked for running, not for being right -- and nothing"
-echo "above reads code for design or logic errors. /code-review covers that, is billed, and only a"
-echo "human can start it."
+echo "Not covered here, and worth knowing: rc's Robinson coefficients are still unverified (the"
+echo "paper is paywalled), and nothing above reads code for design or logic errors."
+echo "/code-review covers that, is billed, and only a human can start it."
 exit 0

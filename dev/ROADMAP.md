@@ -109,19 +109,6 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
     paid agents; CLAUDE.md forbids inferring that from a general "proceed". The English is already
     edited, so the whole remaining task is the 26 renderings.
 
-- 100|473| **Canal Seepage converts both currency inputs BACKWARDS, and only under the US preset.**
-  Found 2026-08-21 by the new `cs-harness.js`, verified independently. `cs_water_value` is a price
-  *per unit volume* and `cs_lining_cost` *per unit area*, so each converts by the RECIPROCAL of its
-  unit's factor — but both are read with `readFormInput(..., hasUnits = true)`, which divides. Every
-  money answer is wrong by the factor SQUARED.
-  - Measured (20 cfs in / 18 out, 5,000 ft, 20 ft wetted perimeter, $1.00/ft³ water, $2.00/ft²
-    lining, US preset): annual value lost prints **$50,608.53** and should be **$63,115,200** (1,247×);
-    total lining cost prints **$1,726.19** and should be **$200,000** (116×); payback is 10.76× long.
-  - **Invisible in SI, where every factor is 1** — so it is wrong in exactly the preset an English
-    first-time visitor opens on.
-  - The real question is whether the suite gets a per-unit-INVERSE unit concept or the page multiplies
-    locally; that belongs to Task 390's paradigm, which is why this is not a one-line sed.
-
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
   English pass asking *"list every plausible reading; more than one means rewrite"*, both waves
@@ -279,17 +266,6 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
     already carries a `warnings` array of codes; the drop Task 466 now makes is silent because
     `lpnTimeModelBlock` has no such channel and the conditionless drop it already made was silent
     too. Both want one message: what we ignored, and that the numbers came from our own solver.
-
-- 75|474| **Manning Irregular's region Froude number is low by ~2× on any compound region.**
-  Found 2026-08-21 by the new `mi-harness.js`, verified independently. `closeRegion()` swaps in the
-  region's total area and wetted perimeter before `recalc()`, but nothing ever accumulates a region
-  TOP WIDTH — there is no `tc` anywhere in the file — so `this.t` still holds the LAST SEGMENT's
-  width and `Fr = V√(T/gA)` mixes a region area with a segment width. Error factor
-  `√(T_region/T_last_segment)`; single-segment regions are correct, which is why it survived.
-  - Measured (stations 0/30/40/60/70/100, elevations 6/3/1/1/3/6, WS 5.0 ft, S0 = 0.0025, banks at
-    30 and 70): page prints **0.28**, the definition gives **0.554**.
-  - Needs Tom's confirmation that a region's top width is the sum of its wet segments' top widths
-    before the accumulator is added.
 
 - 50|207| **The dilettante path: make replying cost one tap, not five steps.** Full design
   record in **`dev/dilettante-path.md`** — the cost ladder (Rung 0 is a tap with no text), the three
@@ -632,6 +608,11 @@ tag on handing off). Untagged = actor-agnostic. Full lifecycle: `cross-platform-
   Split out of Task 225 when the rest of it closed 2026-08-09 — this piece is a punch-list document
   rewrite against live controls, not a code fix, so it needs a browser pass rather than static
   reading.
+
+- 25|475| **Manning Irregular emits NaN for a zero-length segment.** Two stations sharing a station
+  value give `hypotenuse = 0`, so `t = 0*0/0 = NaN`. Pre-existing and already visible in the segment
+  `t` cell; since Task 474 it also reaches that region's Froude number. Found 2026-08-21 by
+  `mi-harness.js`. Reject a zero-length segment, or say why NaN is the honest answer.
 
 - 25|234| **Canal Seepage must prove its worth or go (Tom, 2026-08-08: "in my crosshairs").** After
   Task 232 removed `Irrigation.php`, `cs_` is the remaining page Tom is not proud of — his standing
