@@ -352,6 +352,12 @@ class Session {
 	// what a screen reader and a keyboard user get. Matching on that means these specs go on naming
 	// the buttons the way a person does, and it also fails loudly if a button ever loses its name --
 	// which for an icon-only control is the defect that matters most.
+	// The accessible name of every button on the strip, in order -- what toolbarClick() matches
+	// against, exposed so a spec can assert that a control is NOT there any more.
+	async toolbarNames() {
+		return this.page.$$eval('#lpn_toolbar button',
+			(bs) => bs.map((b) => ((b.getAttribute('aria-label') || b.textContent) || '').trim()));
+	}
 	async toolbarClick(label) {
 		const btns = await this.page.$$('#lpn_toolbar button');
 		const seen = [];

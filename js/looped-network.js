@@ -8566,8 +8566,6 @@ var EngCalcs = EngCalcs || {};
 			var el = document.getElementById(id);
 			if (el) { el.style.display = cleanMap ? 'none' : ''; }
 		});
-		var btn = document.getElementById('lpn_clean_map_btn');
-		if (btn) { btn.setAttribute('aria-pressed', cleanMap ? 'true' : 'false'); }
 	}
 
 	function setMode(newMode) {
@@ -13572,15 +13570,11 @@ var EngCalcs = EngCalcs || {};
 		setIconLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit', pc.lpn_tool_zoom_extent_tip);
 		extentBtn.addEventListener('click', zoomExtent);
 		viewGroup.appendChild(extentBtn);
-		// A pressed/unpressed toggle, not a command -- the mode is invisible on the map itself once
-		// the readouts are gone, so the button has to be the thing that says it is on.
-		var cleanBtn = document.createElement('button');
-		cleanBtn.type = 'button';
-		cleanBtn.id = 'lpn_clean_map_btn';
-		setIconLabel(cleanBtn, 'camera', pc.lpn_clean_map || 'Clean map', pc.lpn_clean_map_tip);
-		cleanBtn.setAttribute('aria-pressed', cleanMapOn() ? 'true' : 'false');
-		cleanBtn.addEventListener('click', function () { setCleanMap(!cleanMapOn()); });
-		viewGroup.appendChild(cleanBtn);
+		// **THERE IS NO CLEAN-MAP BUTTON** (Tom, 2026-08-20: "Relegate Hide map readouts to the View
+		// menu"). It is a once-before-a-screenshot command, and a toolbar slot is for what you do
+		// often; View > Hide map readouts was always the other door and is now the only one. The
+		// pressed state it needed lives on that menu row, which redraws its own label each time the
+		// menu opens (openViewMenu), so nothing has to be kept in step with a button any more.
 		// **THE PROFILE, AND IT IS TWO DOORS TO ONE IMPLEMENTATION** -- this button and the View >
 		// Profile row, which Tom kept deliberately ("I like that the command is under the View
 		// menu"). Both call openPane('profile'); nothing about the profile lives in either.

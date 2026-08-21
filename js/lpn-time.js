@@ -684,16 +684,25 @@
 	function play() {
 		var stops = EC.lpnReportTimes(docTimes());
 		if (state.playing || stops.length < 2) { return; }
+		// **PLAY STOPS AT THE END; IT DOES NOT LOOP** (Tom, 2026-08-20: "for this application, it's
+		// best not to offer autoloop. The beginning and end often aren't obvious, so it's good to
+		// come to a stop at the end"). It used to wrap, on the argument that a daily pattern IS a
+		// loop -- true of the PATTERN, and not of the run: a run has a first reporting time and a
+		// last one, tanks do not come back to their starting level, and a viewer watching a wrapped
+		// animation cannot tell the join from an ordinary step. Stopping is also what says the run
+		// ended rather than that the browser is busy.
+		// Pressing Play at the end starts again from the beginning, the way every player does --
+		// otherwise the button looks broken on the one press that is most likely after a watch.
+		if (state.t === stops[stops.length - 1]) { setTime(stops[0]); }
 		state.playing = true;
 		// 400 ms a frame at 1x: fast enough to read as motion, slow enough to see a tank rise. It is
 		// a MULTIPLIER on that rather than a millisecond box, because the only question a viewer has
-		// is "faster or slower than this", and epanet-js's own control asks it the same way. Wrapping
-		// rather than stopping at the end, because a daily pattern IS a loop and stopping dead at
-		// 24:00 hides the join.
+		// is "faster or slower than this", and epanet-js's own control asks it the same way.
 		state.timer = setInterval(function () {
 			var s = EC.lpnReportTimes(docTimes()),
 				i = s.indexOf(state.t);
-			setTime(s[(i + 1) % s.length]);
+			if (i < 0 || i >= s.length - 1) { pause(); return; }
+			setTime(s[i + 1]);
 		}, frameMs());
 		renderPanel();
 	}
@@ -1067,11 +1076,17 @@
 		var S = strings(), name;
 		if (!container) { return; }
 		name = iconLabel || function (el2, icon, n, tip) { EC.setIconLabel(el2, icon, n, tip); };
-		function btn(icon, label, fn, tip) {
+		// `transport` marks the three PLAYER controls, and it is what css/engcalcs.css exempts from
+		// the flat icon-only styling the rest of the strip took on (Tom, 2026-08-20: "toolbars have
+		// icons, not buttons... The Transport is the exception, of course; buttons are its
+		// paradigm"). Calculate is not one of them -- it works the moments out rather than choosing
+		// which moment is showing, which is the same line drawn just below.
+		function btn(icon, label, fn, tip, transport) {
 			var b = document.createElement('button');
 			b.type = 'button';
 			name(b, icon, label, tip || null);
 			b.setAttribute('data-icon', icon);
+			if (transport) { b.className = 'lpn-transport-btn'; }
 			b.addEventListener('click', fn);
 			container.appendChild(b);
 			return b;
@@ -1104,9 +1119,9 @@
 		// make the one feature it announces undiscoverable in the state most people open the page
 		// in. It is never the ONLY way to a period result -- see EC.LPN_TIME_AUTO.
 		ui.run = btn('run', S.run, function () { requestRun(true); }, S.runTip);
-		ui.prev = btn('step-back', S.prev, function () { stepBy(-1); });
-		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } });
-		ui.next = btn('step-fwd', S.next, function () { stepBy(1); });
+		ui.prev = btn('step-back', S.prev, function () { stepBy(-1); }, null, true);
+		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } }, null, true);
+		ui.next = btn('step-fwd', S.next, function () { stepBy(1); }, null, true);
 		// **THE STEP SELECTOR IS THE ONLY CONTROL THAT SAYS WHICH MOMENT IS SHOWING.** The slider in
 		// the pane is gone rather than mirrored here: two controls for one current step are two
 		// controls that can disagree, and only one of them is on screen when the pane is shut.

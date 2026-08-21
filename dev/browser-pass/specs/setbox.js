@@ -313,6 +313,38 @@ exports.run = async function ({ browser, report }) {
 		report.ok(drift.every(d => d.lefts === 1),
 			'...with the one control column intact at the widest of them',
 			drift.map(d => `${d.w}: ${d.lefts}`).join(', '));
+		// ---- AND IT DOES NOT WRAP IN THE MIDDLE EITHER -------------------------------------
+		//
+		// Tom, 2026-08-20, the FOURTH report: *"At certain middle widths -- yes, paradoxically this
+		// doesn't happen at the narrowest, and it doesn't happen at the widest -- the buttons wrap
+		// under the inputs."* The sweep above starts at the shipped 34rem, so the band that was
+		// actually broken -- 17 to 23rem, where the row kept two columns but shrank the control
+		// column to 9rem while the pair needs about 190px -- was never measured. THIS is the check
+		// that would have caught all four reports: at EVERY width, a box plus a button is on one
+		// line. Not "at the widths we ship at".
+		const sweep = [];
+		for (const w of ['20rem', '22rem', '24rem', '26rem', '28rem', '30rem', '34rem', '40rem', '50rem', '64rem', '80rem']) {
+			await a.page.evaluate((width) => { document.getElementById('lpn_settings_box').style.width = width; }, w);
+			await a.settle(120);
+			sweep.push(await a.page.evaluate((width) => {
+				const r = document.querySelector('#lpn_set_id_fields .lpn-set-row');
+				const ctl = r.children[1], inp = ctl.querySelector('input'), btn = ctl.querySelector('button');
+				const ir = inp.getBoundingClientRect(), br = btn.getBoundingClientRect();
+				return {
+					w: width, wrapped: br.top > ir.top + 2,
+					// Stacked means the control sits under its name rather than beside it -- the
+					// legitimate narrow layout, and a different thing from the button wrapping.
+					stacked: ctl.getBoundingClientRect().top > r.children[0].getBoundingClientRect().top + 2
+				};
+			}, w));
+		}
+		const bad = sweep.filter(d => d.wrapped);
+		report.ok(bad.length === 0,
+			'"Apply to all" stays beside its box at EVERY width from 20rem to 80rem, not just the shipped ones',
+			bad.length ? bad.map(d => d.w).join(', ') + ' wrapped' : sweep.map(d => d.w + (d.stacked ? ' stacked' : '')).join(', '));
+		report.ok(sweep.some(d => d.stacked) && sweep.some(d => !d.stacked),
+			'...and the sweep really does cross the stacking breakpoint, so both layouts were measured',
+			sweep.map(d => `${d.w}:${d.stacked ? 'stacked' : 'two-column'}`).join(', '));
 		await a.page.evaluate(() => { document.getElementById('lpn_settings_box').style.width = ''; });
 		await a.settle(200);
 

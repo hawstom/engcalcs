@@ -1373,8 +1373,8 @@ $ec_lang['lpn_georef_size_prompt']='About how wide is the site, across the whole
 // explanation first changes this and nothing else.
 $ec_lang['lpn_tip_join']='{name} — {tip}';
 $ec_lang['lpn_tool_add_junction_tip']='Click the map to add a junction: a point where pipes meet or where water is used.';
-$ec_lang['lpn_tool_add_reservoir_tip']='Click the map to add a reservoir: a source that holds one fixed water level.';
-$ec_lang['lpn_tool_add_tank_tip']='Click the map to add a tank: storage with a water surface that you set.';
+$ec_lang['lpn_tool_add_reservoir_tip']='Click the map to add a reservoir: an infinite source with a fixed water level.';
+$ec_lang['lpn_tool_add_tank_tip']='Click the map to add a tank: variable storage depending on variable levels.';
 $ec_lang['lpn_tool_add_pipe_tip']='Click one node and then another to draw a pipe between them.';
 $ec_lang['lpn_tool_add_pump_tip']='Click one node and then another to put a pump between them.';
 $ec_lang['lpn_tool_add_valve_tip']='Click one node and then another to put a valve between them.';
@@ -1519,7 +1519,7 @@ $ec_lang['lpn_find_no_value']='Type what to look for.';
 // {u} is a unit name, {n} a count and {len} a length; they are substituted, not concatenated, so a
 // language that puts the unit somewhere else can.
 $ec_lang['lpn_profile_menu']='Profile';
-$ec_lang['lpn_profile_tip']='Draw the ground and the hydraulic grade line along a route through the network.';
+$ec_lang['lpn_profile_tip']='Draw the ground and the hydraulic grade line along a path through the network.';
 $ec_lang['lpn_profile_title']='Profile along a route';
 $ec_lang['lpn_profile_from']='From';
 $ec_lang['lpn_profile_to']='To';
@@ -1937,7 +1937,7 @@ $ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a text lab
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map.';
+$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. Self-sets intelligently sometimes.';
 $ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?';
@@ -2275,10 +2275,10 @@ $ec_lang['lpn_time_next']='Step forward';
 $ec_lang['lpn_time_last']='Go to the end';
 $ec_lang['lpn_time_tank']='Tank';
 $ec_lang['lpn_time_level']='Water level';
-$ec_lang['lpn_time_run']='Run';
-$ec_lang_syn['lpn_time_run']='Simulate, execute, or compute';
-$ec_lang['lpn_time_run_tip']='Work out this network at each of its reporting times, from the first one to the last.';
-$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date.';
+$ec_lang['lpn_time_run']='Calculate';
+$ec_lang_syn['lpn_time_run']='Simulate, calculate, execute, or compute';
+$ec_lang['lpn_time_run_tip']='Run the model for all hydraulic time steps.';
+$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date.';
 // ---- The run box (ROADMAP Task 450) ----------------------------------------------------------
 // Three keys, and no more: 'lpn_time_running' is already the sentence for a run in progress and
 // 'lpn_close' is already the word on every other dismiss control on this page, so both are
@@ -2363,7 +2363,7 @@ $ec_lang['lpn_color_mode_manual']='Manual';
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Libraries';
-$ec_lang['lpn_library_menu_tip']='Libraries: the demand patterns, pump curves and control rules this project holds. Open it to see them, change them, or add one.';
+$ec_lang['lpn_library_menu_tip']='Manage the demand patterns, pump curves and control rules for this project.';
 // The three section names. Each is the word EPANET's own input file uses for the section, because
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
@@ -2384,7 +2384,7 @@ $ec_lang['lpn_library_pattern_values_tip']='The multipliers, separated by spaces
 $ec_lang['lpn_library_pattern_span']='{n} multipliers, {step} apart, covering {span}';
 $ec_lang['lpn_library_pattern_none']='No pattern';
 $ec_lang['lpn_library_default_pattern']='Default demand pattern';
-$ec_lang['lpn_library_default_pattern_tip']='Every junction that does not name a pattern of its own follows this one. It is what an EPANET file states as its Pattern option.';
+$ec_lang['lpn_library_default_pattern_tip']='Every junction with no pattern uses this one.';
 $ec_lang['lpn_library_control_add']='Add a control';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the

@@ -641,16 +641,34 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   element was deleted after import still can.** The guard belongs in `lpnTimeModelBlock`, which
   drops conditionless records already.
 
-- 55|464| **Screenshot prep is not earning its toolbar slot. AUTHORISED 2026-08-20** ("Yeah"). Tom, 2026-08-20, three separate
-  complaints: *"I can't see myself using the Screenshot prep tool, partly because I can screenshot
-  within the junk that's showing on the map, and it's taking up valuable real estate"*; *"The camera
-  isn't speaking to me. It might help if the tip started with 'Screenshot prep: ….' Maybe relegate
-  this to the menu?"*; and *"It can't hide the bottom status bar, and yet it hides coordinates. That
-  seems feeble."*
-  - Three fixes of increasing size: start the tip with the feature's own name; move the row off the
-    toolbar into the View menu; and make the hide actually complete, or stop calling it that. The
-    third is the one that decides whether the feature is worth keeping at all — a clean-map mode
-    that leaves the status bar on is not a clean map.
+- 55|467| **Automatic recalculation as a stated preference, and a Project menu to hold what the run
+  box stops showing.** Tom, 2026-08-20: *"a toggle under Calculation.Hydraulics for 'Recalculate the
+  simulation for this project automatically.' If it's on, we do our debounce and calculate, and we
+  hide the Calculate button."* The machinery is `EC.LPN_TIME_AUTO` (Task 248) — this makes the
+  invisible measured heuristic an explicit project setting.
+  - **Keep the measurement, demote it to ADVICE.** A checkbox that silently stops obeying above 400
+    ms is two states pretending to be one. Automatic means automatic; when a run measures over ~1 s
+    the status bar says so and offers to turn it off. Tom's *"multiplied burden ... not good for
+    data entry efficiency"* (2026-08-19) is answered by the offer, not by a hidden veto.
+  - **Automatic hides the run box, so the EPANET run report loses its only door.** Not a toolbar
+    icon — Tom on epanet-js's: *"I think it's kind of a waste of real estate."* A **Project menu**
+    (Settings, Libraries, Report), which also gives the two toolbar boxes a menu home.
+  - **[H] The icon.** Tom asked: water drop? A drop reads at 16 px and says *the water model* rather
+    than *a document*; a hydrant is more specific and busier. Decide before drawing.
+
+- 25|468| **Demand categories on a junction — the breakdown the importer already flattens.**
+  EPANET stacks (base demand, pattern, category) triples on one node and sums them; `js/lpn-inp.js`
+  reads them, sums them into this page's single `demand`, and reports `demand-categories` as a
+  difference on every import that had one. So the data arrives and is thrown away today.
+  - Design, not analysis: *50 gpm residential + 20 gpm irrigation on this node* is how the demand is
+    actually assembled. With Task 191 (emitters) this completes the EPANET flow model bar the global
+    demand multiplier, which the importer already applies.
+  - **No "Category not found. Add?" dialog** (Tom floated one). EPANET categories are free text, not
+    a namespace, and a modal in the data-entry path buys a registry EPANET does not have. A
+    `<datalist>` of the categories already used in the project gives the same discoverability with
+    no dialog, and makes a typo visible instead of interrogated.
+  - Touches the scenario write seam (`setProp`), the popup, the importer, and Task 281's exporter —
+    a per-category override is the question to settle first.
 
 - 35|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
   and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves shipped

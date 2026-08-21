@@ -54,7 +54,6 @@ language key it comes from.
 | 11 | `del` | `lpn_tool_delete` | **NEW** `lpn_tool_delete_tip` | Delete — … |
 | 12 | `undo` | `lpn_tool_undo` | **NEW** `lpn_tool_undo_tip` | Undo — … |
 | 13 | `zoom` | `lpn_tool_zoom_extent` | **NEW** `lpn_tool_zoom_extent_tip` | Zoom to fit — … |
-| 14 | `camera` | `lpn_clean_map` / `lpn_clean_map_off` when pressed | `lpn_clean_map_tip` | Clean map — Hide the mode line and the coordinate readout … |
 | 15 | `labels` | `lpn_tool_labels` | `lpn_tip_labels_draggable` | Labels — You can drag a label to move it. … |
 | 16 | *(none — a `<select>`)* | — | `lpn_tool_color_tip` | see §4 |
 | 17 | `settings` | `lpn_tool_settings` | **NEW** `lpn_tool_settings_tip` | Settings — … |
@@ -120,9 +119,9 @@ first.
 - The icon's `aria-hidden="true"` stays. `EC_ICON_OPEN_TAG` sets it, and the reason in
   `Icons.lib.php` is unchanged — the icon is not a second thing to announce.
 - A pressed toggle keeps `aria-pressed`; the name must NOT flip with the state (`aria-pressed`
-  already says pressed). The one exception is Clean map, whose *word itself* changes
-  (`lpn_clean_map` ↔ `lpn_clean_map_off`) because it names two different commands rather than two
-  states of one; the `aria-label` follows the word.
+  already says pressed). Clean map used to be the exception, with a word that changed
+  (`lpn_clean_map` ↔ `lpn_clean_map_off`); it left the strip for the View menu on 2026-08-20, where
+  a row with no checkmark column still names what it will do.
 
 Rejected: a `<span class="visually-hidden">` carrying the word instead. It has real advantages — it
 is what browser find-in-page and machine translation see — but it puts two mechanisms in `setLabel()`

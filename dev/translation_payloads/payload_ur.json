@@ -459,7 +459,7 @@
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_color_mode_manual": "Manual",
         "lpn_library_menu": "Libraries",
-        "lpn_library_menu_tip": "Libraries: the demand patterns, pump curves and control rules this project holds. Open it to see them, change them, or add one.",
+        "lpn_library_menu_tip": "Manage the demand patterns, pump curves and control rules for this project.",
         "lpn_library_patterns": "Patterns",
         "lpn_library_patterns_tip": "A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.",
         "lpn_library_curves": "Curves",
@@ -473,7 +473,7 @@
         "lpn_library_pattern_span": "{n} multipliers, {step} apart, covering {span}",
         "lpn_library_pattern_none": "No pattern",
         "lpn_library_default_pattern": "Default demand pattern",
-        "lpn_library_default_pattern_tip": "Every junction that does not name a pattern of its own follows this one. It is what an EPANET file states as its Pattern option.",
+        "lpn_library_default_pattern_tip": "Every junction with no pattern uses this one.",
         "lpn_library_control_add": "Add a control",
         "lpn_library_control_tip": "One sentence, in the words EPANET uses. Four shapes: LINK 9 OPEN IF NODE 2 BELOW 110, LINK 9 CLOSED IF NODE 2 ABOVE 140, LINK 10 OPEN AT TIME 1, and LINK 12 CLOSED AT CLOCKTIME 3 AM. Instead of OPEN or CLOSED you may write a number, which is a valve setting or a pump speed. Leave the keywords in English; they are what the page reads.",
         "lpn_library_control_ok": "✓ Understood",
@@ -504,7 +504,7 @@
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_color_mode_manual": "Manual",
         "lpn_library_menu": "Libraries",
-        "lpn_library_menu_tip": "Libraries: the demand patterns, pump curves and control rules this project holds. Open it to see them, change them, or add one.",
+        "lpn_library_menu_tip": "Manage the demand patterns, pump curves and control rules for this project.",
         "lpn_library_patterns": "Patterns",
         "lpn_library_patterns_tip": "A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.",
         "lpn_library_curves": "Curves",
@@ -518,7 +518,7 @@
         "lpn_library_pattern_span": "{n} multipliers, {step} apart, covering {span}",
         "lpn_library_pattern_none": "No pattern",
         "lpn_library_default_pattern": "Default demand pattern",
-        "lpn_library_default_pattern_tip": "Every junction that does not name a pattern of its own follows this one. It is what an EPANET file states as its Pattern option.",
+        "lpn_library_default_pattern_tip": "Every junction with no pattern uses this one.",
         "lpn_library_control_add": "Add a control",
         "lpn_library_control_tip": "One sentence, in the words EPANET uses. Four shapes: LINK 9 OPEN IF NODE 2 BELOW 110, LINK 9 CLOSED IF NODE 2 ABOVE 140, LINK 10 OPEN AT TIME 1, and LINK 12 CLOSED AT CLOCKTIME 3 AM. Instead of OPEN or CLOSED you may write a number, which is a valve setting or a pump speed. Leave the keywords in English; they are what the page reads.",
         "lpn_library_control_ok": "✓ Understood",
@@ -775,7 +775,7 @@
                 "previous_translated": {
                     "key": "lpn_time_run_note",
                     "value": "آپ نیٹ ورک کو پہلے رپورٹنگ وقت پر دیکھ رہے ہیں۔ اس نیٹ ورک کو اس کے پورے وقتی دورانیے میں حل کرنے میں اتنا وقت لگتا ہے کہ کام کرتے وقت بعد کے اوقات کے نتائج تازہ نہیں رکھے جاتے۔ انہیں تازہ کرنے کے لیے حل کریں دبائیں۔",
-                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
                 },
                 "next_translated": {
                     "key": "lpn_time_speed",
@@ -791,7 +791,7 @@
                 "previous_translated": {
                     "key": "lpn_time_run_note",
                     "value": "آپ نیٹ ورک کو پہلے رپورٹنگ وقت پر دیکھ رہے ہیں۔ اس نیٹ ورک کو اس کے پورے وقتی دورانیے میں حل کرنے میں اتنا وقت لگتا ہے کہ کام کرتے وقت بعد کے اوقات کے نتائج تازہ نہیں رکھے جاتے۔ انہیں تازہ کرنے کے لیے حل کریں دبائیں۔",
-                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
                 },
                 "next_translated": {
                     "key": "lpn_time_speed",
@@ -807,7 +807,7 @@
                 "previous_translated": {
                     "key": "lpn_time_run_note",
                     "value": "آپ نیٹ ورک کو پہلے رپورٹنگ وقت پر دیکھ رہے ہیں۔ اس نیٹ ورک کو اس کے پورے وقتی دورانیے میں حل کرنے میں اتنا وقت لگتا ہے کہ کام کرتے وقت بعد کے اوقات کے نتائج تازہ نہیں رکھے جاتے۔ انہیں تازہ کرنے کے لیے حل کریں دبائیں۔",
-                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
                 },
                 "next_translated": {
                     "key": "lpn_time_speed",

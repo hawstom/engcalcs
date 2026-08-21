@@ -530,13 +530,41 @@ html[lang="zh"] .ec-welcome {
 .lpn-curve-table th, .lpn-curve-table td { padding: 1px 4px 1px 0; text-align: left; font-weight: normal; border: 0; }
 .lpn-curve-table thead th { font-weight: bold; }
 .lpn-curve-table input { width: 7em; }
-/* A leading checkmark, not just bold/outline (Tom) -- reads as a standard menu "this is
-   active" mark rather than a generic emphasis style. */
-#lpn_toolbar button[aria-pressed="true"]::before { content: "\2713 "; }
+/* **A TOOLBAR HOLDS ICONS, NOT BUTTONS** (Tom, 2026-08-20: "I have used the word 'Buttons'
+   consistently. But in reality, toolbars have icons, not buttons. Change the style to be more like
+   a normal toolbar; no 'button' paradigm."). So the chrome goes: no border, no background, no
+   push-button relief until the pointer is on one -- which is how every toolbar the user already
+   owns behaves, and what the menu bar directly above has always done (.lpn-menubar-item, whose
+   hover colours these deliberately match: one strip of chrome, one treatment).
+
+   THE LEADING CHECKMARK IS GONE WITH IT. `content: "\2713 "` in front of an icon shoved the
+   drawing sideways and made a pressed tool a different width from an unpressed one; a toolbar says
+   "this tool is active" by keeping the icon lit, so a pressed control is a filled well. That is
+   not a reversal of Tom's checkmark: he asked for it when these were text buttons, and the mark he
+   wanted was "a standard menu 'this is active' mark" -- which is what a menu ROW still gets.
+
+   Bigger, too. An icon with a button around it is read as the button; an icon alone is the target,
+   and 1.35em is the size at which a 24-unit drawing survives without one. */
+#lpn_toolbar button:not(.lpn-transport-btn) {
+	background: none; border: 1px solid transparent; border-radius: 4px;
+	font: inherit; color: inherit; padding: 3px 5px; line-height: 1; cursor: pointer;
+}
+#lpn_toolbar button:not(.lpn-transport-btn):hover { background: #def; border-color: #9bd; }
+#lpn_toolbar button:not(.lpn-transport-btn)[aria-pressed="true"] { background: #cfe3f7; border-color: #6aa6d8; }
+#lpn_toolbar button:not(.lpn-transport-btn):disabled { opacity: .4; cursor: default; background: none; border-color: transparent; }
+#lpn_toolbar button .ec-icon { width: 1.35em; height: 1.35em; vertical-align: -0.25em; }
+/* **THE TRANSPORT IS THE ONE EXCEPTION, AND IT KEEPS ITS BUTTONS** (same message: "The Transport is
+   the exception, of course; buttons are its paradigm"). Play, step back and step forward are the
+   controls of a player, and a player's controls are buttons everywhere from a tape deck to a video
+   site. They opt out by class rather than by position, so moving the group cannot silently restyle
+   them. Calculate is NOT one of them -- it works the moments out rather than choosing which one you
+   are looking at, which is the same reason it is not in the transport's own comment in
+   js/lpn-time.js. */
+#lpn_toolbar { display: flex; flex-wrap: wrap; align-items: center; row-gap: 4px; }
 /* Three groups (Add / Delete-Undo-Select / Zoom-Example) -- a wider gap, not a line, separates
    them (Tom, 2026-07-30: a divider line was more than needed). */
-#lpn_toolbar { display: flex; flex-wrap: wrap; align-items: center; row-gap: 4px; }
-.lpn-toolbar-group { display: inline-flex; gap: 6px; margin-right: 14px; }
+.lpn-toolbar-group { display: inline-flex; gap: 6px; margin-right: 14px; align-items: center; }
+.lpn-transport-btn { font: inherit; cursor: pointer; }
 /* The right-hand end of the strip: Find and the bottom-pane toggle (Task 434). Pushed there by an
    auto margin rather than placed at a fixed offset, so it stays at the edge at every window width
    and drops to its own line with the rest when the strip wraps. */
@@ -1314,22 +1342,27 @@ html[lang="zh"] .ec-welcome {
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
 .lpn-set-row > :first-child, .lpn-set-name { overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
 /* **AND IT REDUCES GRACEFULLY** (Tom, 2026-08-19: "the width does not reduce gracefully"). Below
-   17rem of content pane the two tracks stop paying: the control column has already given back its
-   extra width by then, 9rem of what is left is still the control column, and the name is down to a
-   word a line. So the row stacks -- name, then control under it, still at the
-   column's left edge. A CONTAINER query, not a media query: what decides this is how far the user
-   dragged the box's own edge, and the window may be 2000 px wide while this pane is 250. A browser
-   without container queries simply keeps the two columns, which is where this shipped. */
+   the width that holds a name beside a full control column, the row stacks -- name, then control
+   under it. A CONTAINER query, not a media query: what decides this is how far the user dragged
+   the box's own edge, and the window may be 2000 px wide while this pane is 250. Written on
+   .lpn-set-row rather than on the box, because the box is the container's ANCESTOR and a container
+   query cannot restyle the element it is measuring. */
 .lpn-setbox-content { container-type: inline-size; container-name: lpnset; }
-/* A WIDE CONTROL COLUMN IS SOMETHING THE PANE PAYS FOR, so a pane too narrow to afford it buys the
-   name back instead and lets a box-plus-button wrap its button under its box, which is where that
-   pair shipped and is still the graceful answer when there is no room. Written on .lpn-set-row
-   rather than on the box, because the box is the container's ANCESTOR and a container query cannot
-   restyle the element it is measuring. */
-@container lpnset (max-width: 23rem) {
-	.lpn-set-row { --lpn-set-col: var(--lpn-set-ctl); }
-}
-@container lpnset (max-width: 17rem) {
+/* **THERE IS NO MIDDLE BAND ANY MORE** (Tom, 2026-08-20, FOURTH report: "At certain middle widths
+   -- yes, paradoxically this doesn't happen at the narrowest, and it doesn't happen at the widest
+   -- the buttons wrap under the inputs"). That is exactly what two breakpoints produced, and the
+   arithmetic says why: between 17 and 23 rem the row kept TWO columns but shrank the control
+   column to --lpn-set-ctl (9rem = 144px), and an ID prefix box plus "Apply to all" measures about
+   190px. Below 17rem the row stacked and the group got the whole width, so it fit; above 23rem the
+   column was 12.5rem and it fit. Only the band in between was too narrow to hold the pair and too
+   wide to stop trying -- the paradox, and the reason three fixes aimed at the wide end all missed.
+
+   So the band is deleted rather than retuned. A row either has room for a name beside a full-width
+   control column, or it stacks; there is no width at which it has room for part of one. 24rem is
+   the two tracks (11.5 + 12.5) plus their gap, i.e. the first width at which the two-column form
+   is honest. A browser without container queries keeps the two columns, which is where this
+   shipped. */
+@container lpnset (max-width: 24rem) {
 	.lpn-set-row { grid-template-columns: minmax(0, 1fr); }
 }
 .lpn-rp-credit { margin-top: 6px; }
