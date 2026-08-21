@@ -49,7 +49,7 @@ const L = loadLoopedNetwork(
   "\t\tapplySaved: applySaved, restorePending: function () { return pendingV2Restore; },\n" +
   "\t\tnewProject: newProject, offerUnitRestore: offerUnitRestore,\n" +
   "\t\ttabAsterisk: tabAsterisk, indexEntry: indexEntry, openId: function () { return library.openId; },\n" +
-  "\t\tsaveToStorage: saveToStorage,\n" +
+  "\t\tsaveToStorage: saveToStorage, armMapSizing: armMapSizing,\n" +
   "\t\tnewBlankProject: newBlankProject, refreshMapStatus: refreshMapStatus,\n" +
   "\t\tunitSetLabel: unitSetLabel,\n" +
   // Task 277. The gesture is driven through the REAL pointer handlers below; applyDrag() is
@@ -106,6 +106,12 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   console.log('\n--- ' + which.toUpperCase() + ' unit set ---');
   setUnitSet(which);
   L.reset();
+  // **THE CANVAS ALWAYS ACQUIRES A SIZE, so a harness that never lets it is a state no browser is
+  // in.** init() never runs here, so `window load` -> armMapSizing() never does either -- and since
+  // Task 418 saveToStorage() declines to judge a document whose canvas has no size, because
+  // docSignature() includes the view and currentView() answers null until there is one. Without
+  // this call nothing in this file could ever earn an asterisk. Idempotent: only the first lands.
+  L.armMapSizing();
   // Simulate a RETURNING visitor: loadFromStorage() merges a saved settings object onto the
   // defaults, so someone who used the page before the default moved to 20 still carries 2.5. The
   // example must override that -- raising the default alone never reaches them. This is exactly

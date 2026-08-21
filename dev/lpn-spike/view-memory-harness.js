@@ -285,11 +285,16 @@ console.log('\n--- a project is born clean, however it was born ---');
 	// docSignature() covers, so the first autosave found a document nobody had touched already
 	// changed and the asterisk never cleared. What the baseline describes has to be the document
 	// the visitor is first shown.
+	//
+	// Necessary and NOT sufficient: the baseline is still taken before the canvas has a height, so
+	// the view in it is null and the view arriving on `window load` looked like an edit too. That
+	// half is settled in noteMapSized() and saveToStorage(), and is asserted behaviourally by
+	// dev/lpn-spike/boot-clean-harness.js rather than by reading the source here.
 	ok('the boot branch does NOT stamp the signature inline — the document is not finished yet',
 		!/savedSig: docSignature\(\)/.test(branch), branch.slice(0, 120));
 	ok('...it flags the project as born clean instead', /bornClean = true;/.test(branch));
 	const seedAt = src.indexOf('\t\tseedDefaultInputs();', at);   // init()'s own, not the one in refreshAllFromDocument()
-	const after = src.slice(seedAt, seedAt + 600);
+	const after = src.slice(seedAt, seedAt + 1200);
 	ok('...and the stamp is taken after seedDefaultInputs()',
 		/if \(bornClean\)/.test(after) && /savedSig = docSignature\(\);/.test(after),
 		after.slice(0, 120));
