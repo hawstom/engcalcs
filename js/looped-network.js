@@ -8050,6 +8050,14 @@ var EngCalcs = EngCalcs || {};
 		rows.forEach(function (el) { tbody.appendChild(paneTableRow(spec, el)); });
 		table.appendChild(tbody);
 		host.appendChild(table);
+		// **THE FIRST DRAW FILLS THE RESULT CELLS TOO** (Tom, 2026-08-21: "Add current results to
+		// the bottom pane tables"). They were there and empty: paneTableRow() creates a result cell
+		// with no text, because the text is refillPaneTable()'s to write -- and a refill only
+		// happens on the NEXT solve. Open a tab on a network that has already settled and every
+		// result column reads blank until something is edited. Refilling here rather than teaching
+		// paneTableRow() to format is the one-seam fix: a cell's first value and its every later
+		// value are then written by the same line, so they cannot round differently.
+		refillPaneTable(spec, rows);
 		if (EngCalcs.initTips) { EngCalcs.initTips(host); }
 	}
 	function sortPaneTable(spec, col) {

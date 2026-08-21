@@ -1233,7 +1233,12 @@ html[lang="zh"] .ec-welcome {
    em-based size for a heading is a size relative to whatever it happens to be nested in, which is
    the wrong thing for a heading to be relative to. */
 .lpn-set-head {
-	position: sticky; top: 0; z-index: 1; background: #fff; margin: 0 0 4px;
+	/* **ABOVE THE COLOUR-BAND BOXES, NOT TIED WITH THEM** (Tom, 2026-08-21: the band inputs "cover
+	   the main heading above them (Visualization) on scroll"). Those boxes are position:relative
+	   z-index:1 so they can straddle their swatch join; at an equal z-index the later element in
+	   the DOM wins, and a sticky heading that scrolls UNDER its own section's controls is not
+	   sticky. 2 is the whole fix -- the heading is opaque already. */
+	position: sticky; top: 0; z-index: 2; background: #fff; margin: 0 0 4px;
 	padding: 4px 0; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid #ccc;
 }
 .lpn-set-sec { margin-bottom: 14px; }
@@ -1338,8 +1343,9 @@ html[lang="zh"] .ec-welcome {
 	--lpn-set-name: 11.5rem;
 	--lpn-set-num: 4.5rem;
 	/* A colour band boundary, which is one number in a stack of at most six and needs no room for a
-	   name -- Tom, 2026-08-20: "They are too wide. They could be about half as wide." */
-	--lpn-set-numsm: 2.5rem;
+	   name -- Tom, 2026-08-20: "They are too wide. They could be about half as wide." Widened 25%
+	   on his 2026-08-21 re-read: half was a shade too tight for a five-digit head in metres. */
+	--lpn-set-numsm: 3.125rem;
 }
 .lpn-set-row {
 	display: grid; grid-template-columns: minmax(0, var(--lpn-set-name, 11.5rem)) var(--lpn-set-col, 9rem);
