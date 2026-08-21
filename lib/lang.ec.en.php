@@ -1471,6 +1471,12 @@ $ec_lang['lpn_clean_map_tip']='Take the mode line and the coordinate readout off
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 $ec_lang['lpn_menu_project']='Project';
+$ec_lang['lpn_tables_menu']='Tables';
+$ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.';
+// The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
+// button?" for somebody whose project recalculates by itself, and that sentence is not true of the
+// toolbar button, which is the one that goes away.
+$ec_lang['lpn_run_menu_tip']='Work out this network now. Looking for a Run button? While this project works itself out after every change, the toolbar has no Run button. Turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics, and the button comes back.';
 $ec_lang['lpn_time_no_report']='There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.

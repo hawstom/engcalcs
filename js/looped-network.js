@@ -13156,17 +13156,32 @@ var EngCalcs = EngCalcs || {};
 		]);
 	}
 	// **THE PROJECT MENU** (ROADMAP Task 467). Tom, 2026-08-20: *"Maybe we can have a Project menu
-	// with Settings, Library, and Report under it?"*
+	// with Settings, Library, and Report under it?"*, and his own row order of 2026-08-21:
+	// Settings, Libraries | Profile, Tables | Run, EPANET run report.
 	//
-	// It is a MENU HOME for two boxes that already have toolbar buttons, plus the one thing that had
-	// no door at all. Not a replacement: Libraries and Settings keep their buttons, because the
-	// toolbar is the high-use subset and both are high-use. What is new here is Report.
+	// **THREE GROUPS, AND THE SEPARATORS ARE THE ARGUMENT.** What the project IS (Settings and its
+	// Libraries), what you READ beside it (the Profile drawing and the six part tables), and what
+	// you RUN on it (the run itself and the report it wrote). The toolbar mirrors these groups in
+	// the same order -- see wireToolbar() -- so the two strips teach each other.
 	//
-	// **REPORT IS WHY THIS MENU EXISTS.** EPANET's own run report is written into the run box, and
-	// the run box only appears for a run somebody pressed Calculate for -- so on a network that
-	// re-runs itself after a quiet moment, which is the common case, the report was produced and
-	// then unreachable. js/lpn-time.js now keeps the last one whether a box was shown or not, and
-	// this row puts it back on screen.
+	// **THE THREE ROWS THAT EARN THE MENU ARE PROFILE, TABLES AND RUN**, and each answers a
+	// discoverability gap Tom named:
+	//   * Profile came out of the View menu. It is a thing you READ about this project, not a way
+	//     of framing the drawing, and beside Tables it now has a sibling.
+	//   * Tables was "a gap barely discoverable with the bottom pane button" -- the tables existed
+	//     with no door but one unlabelled toolbar toggle. This row opens the pane on the FIRST
+	//     table, never on the profile: the profile has its own row directly above.
+	//   * Run is here so the menu has a door to the calculation at all, and its tip answers "where
+	//     is my Run button?" -- the toolbar button is hidden while this project recalculates by
+	//     itself (settings.autoRun), and a user who has never seen the checkbox has no other way to
+	//     find that out. **ALWAYS PRESENT, never hidden with the button**: the same reasoning the
+	//     report row below states, that a row which vanishes teaches nobody.
+	//
+	// **REPORT WAS THE FIRST OF THEM.** EPANET's own run report is written into the run box, and
+	// the run box only appears for a run somebody pressed Run for -- so on a network that re-runs
+	// itself after a quiet moment, which is the common case, the report was produced and then
+	// unreachable. js/lpn-time.js keeps the last one whether a box was shown or not, and this row
+	// puts it back on screen.
 	//
 	// Named openProjectBarMenu(), NOT openProjectMenu(): that name is taken by the TAB's own menu
 	// (rename, duplicate, close), which is about one project rather than about the open one.
@@ -13184,6 +13199,42 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { toggleLibraryBox(); }
 			},
 			{ separator: true },
+			// The row that came out of View (Tom, 2026-08-21). Since Task 434 the profile is a TAB
+			// in the bottom pane, so this opens the pane on that tab -- open, never toggle: a menu
+			// row that names a view shows it. The icon is the one drawn for it in
+			// lib/Icons.lib.php, a jagged ground line closed down to a datum.
+			{
+				icon: 'profile', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
+				fn: function () { closeMenu(); openPane('profile'); }
+			},
+			// **THE FIRST TABLE, NOT THE PROFILE TAB.** paneTables()[0] rather than a literal
+			// 'junctions', so this row cannot drift from the strip it opens; and the pane's own
+			// remembered tab is deliberately not honoured here, because a row called Tables that
+			// opened the profile would be a lie the first time it mattered.
+			{
+				icon: 'pane-bottom', label: pc.lpn_tables_menu || 'Tables', tip: pc.lpn_tables_menu_tip,
+				fn: function () {
+					var tables = paneTables();
+					closeMenu();
+					if (tables.length) { openPane(tables[0].id); }
+				}
+			},
+			{ separator: true },
+			// **THE MENU'S ROW IS ALWAYS HERE; THE TOOLBAR'S BUTTON IS NOT** (Task 467). Tom wrote
+			// "Run (if present)" of the TOOLBAR, where the button goes away while this project
+			// recalculates by itself. A menu row that vanished with it would leave a user who
+			// wonders where Run went with nothing to read -- so the row stays and its tip is what
+			// explains the missing button.
+			{
+				icon: 'run', label: pc.lpn_time_run || 'Run', tip: pc.lpn_run_menu_tip,
+				fn: function () {
+					closeMenu();
+					// runSolve(), not solveNow(): solveNow is only the NAME this is exported
+					// under at the foot of the file, not a function in scope here.
+					if (EngCalcs.lpnTimeRunNow) { EngCalcs.lpnTimeRunNow(); }
+					else { runSolve(); }
+				}
+			},
 			{
 				icon: 'info', label: pc.lpn_time_run_report || 'EPANET run report',
 				tip: pc.lpn_time_run_report_tip,
