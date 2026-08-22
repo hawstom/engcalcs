@@ -88,6 +88,7 @@
         "calc_inputs": "Inputs",
         "calc_results": "Results",
         "view_hide_line": "[Hide this line]",
+        "view_lines_chooser": "Show or hide lines",
         "view_printable": "Printable version (reload the page to return to the normal view)",
         "ec_name_label": "Save this calculation:",
         "ec_name_placeholder": "Name",
@@ -1261,7 +1262,7 @@
         "lpn_field_demand_pattern": "Demand pattern",
         "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
     },
-    "count": 1259,
+    "count": 1260,
     "active_prefixes": [
         "about",
         "bpn",

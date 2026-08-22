@@ -261,6 +261,53 @@ document.addEventListener('DOMContentLoaded', function() {
 <?php
 }
 
+/**
+ * The plain text of a line's own label, for the line chooser's checkbox.
+ *
+ * The `?` tip glyph goes first -- it is decoration inside the label markup and would read as
+ * "Diameter ?" on a checkbox -- and then all remaining markup, so the chooser adds no focusable
+ * stop of its own for a label that happens to be a link. Entities are decoded here because the
+ * emitter escapes; doing both would ship a visible `&amp;`.
+ */
+function ecLineLabelText($html)
+{
+    // A label cell may carry controls of its own after a <br /> -- Orifice.php puts the
+    // circular/rectangular radios there -- and their text is not the line's name. The first <br>
+    // ends the name.
+    $html = preg_split('/<br\b[^>]*>/i', $html, 2);
+    $html = $html[0];
+    $text = preg_replace('/<span class="ec-tip">.*?<\/span>/i', '', $html);
+    $text = html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8');
+    return trim(preg_replace('/\s+/u', ' ', $text));
+}
+
+/**
+ * ONE KEYBOARD DOOR PER COLUMN to the show/hide-a-line function (ROADMAP Task 478 phase 1).
+ *
+ * The per-line "X" is kept exactly where it is for mouse and touch, but carries tabindex="-1"
+ * and aria-hidden="true" -- so up to thirty one-character links leave the tab order. This
+ * <details> replaces them with a single stop while it is closed (a closed <details> does not
+ * render its contents, so none of the checkboxes are focusable), and it is also the only way
+ * that has ever existed to bring a hidden line BACK without reloading the page.
+ *
+ * Closed by default on purpose: open, it would cost one stop per line all over again.
+ */
+function echoLineChooser($lines, $id)
+{
+    global $ec_lang;
+    if (!$lines) { return; }
+?>
+					<details class="engcalcs-line-chooser d-print-none" data-ec-chooser="<?=$id?>">
+						<summary><?=$ec_lang['view_lines_chooser']?></summary>
+						<div class="engcalcs-line-chooser-body">
+<?php foreach ($lines as $line) : ?>
+							<label class="engcalcs-line-chooser-item"><input type="checkbox" data-ec-line="<?=$line['id']?>" checked /> <?=htmlspecialchars($line['label'], ENT_QUOTES, 'UTF-8')?></label>
+<?php endforeach; ?>
+						</div>
+					</details>
+<?php
+}
+
 function echoCalculatorForm($arrayInputs, $arrayResults, $flagFormAppend = false, $flagHideUnits = false)
 {
     global $ec_lang;
@@ -271,6 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (pdc) pdc.addEventListener('click', function() { EngCalcs.pointsDataCopy(); });
 	var pdp = document.getElementById('points_data_paste');
 	if (pdp) pdp.addEventListener('click', function() { EngCalcs.pointsDataPaste(); });
+	EngCalcs.initLineChoosers();
 	document.getElementById('btn-printable').addEventListener('click', function() {
 		document.querySelectorAll('.d-print-none').forEach(function(el) { el.style.display = 'none'; });
 	});
@@ -300,20 +348,27 @@ document.addEventListener('DOMContentLoaded', function() {
 					<table>
 						<tbody>
 <?php
+	$chooserInputs = array();
 	foreach ($arrayInputs as $input) {
+		$chooserInputs[] = array('id' => $input['name'].'_row', 'label' => ecLineLabelText($input['label']));
 ?>
 							<tr class="collapse show" id="<?=$input['name']?>_row">
 								<td><label for='<?=$input['name']?>'><?=$input['label']?></label><?php if (!empty($input['control'])) echo $input['control']; ?></td>
 								<td>
 									<?php echo inputHtml($input['name'], $input['type'], $input['default'], "\t\t\t\t\t\t\t\t\t");?><?php if (!empty($input['separator'])) echo ' ' . $input['separator'] . ' '; ?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?>
 								</td>
-								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$input['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row">X</a></td>
+								<?php // tabindex="-1" AND aria-hidden="true" together: the canonical duplicated-control
+								      // pattern (Task 478). aria-hidden alone on a focusable element fails axe's
+								      // aria-hidden-focus rule -- it is the tabindex that makes the pair legal. The
+								      // keyboard reaches this same function through echoLineChooser() below. ?>
+								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$input['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row" tabindex="-1" aria-hidden="true">X</a></td>
 							</tr>
 <?php
 	}
 ?>
 						</tbody>
 					</table>
+					<?php echoLineChooser($chooserInputs, 'inputs'); ?>
 				</td>
 <?php if ($arrayResults) : ?>
 				<td>
@@ -321,7 +376,9 @@ document.addEventListener('DOMContentLoaded', function() {
 					<table>
 						<tbody>
 <?php
+	$chooserResults = array();
 	foreach ($arrayResults as $result) {
+		$chooserResults[] = array('id' => $result['name'].'_row', 'label' => ecLineLabelText($result['label']));
 ?>
 							<tr class="collapse show" id="<?=$result['name']?>_row">
 								<td><?=$result['label']?></td>
@@ -330,13 +387,14 @@ document.addEventListener('DOMContentLoaded', function() {
 									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>
 
 								</td>
-								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$result['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row">X</a></td>
+								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$result['name']?>_row" aria-expanded="true" aria-controls="<?=$result['name']?>_row" tabindex="-1" aria-hidden="true">X</a></td>
 							</tr>
 <?php
 	}
 ?>
 						</tbody>
 					</table>
+					<?php echoLineChooser($chooserResults, 'results'); ?>
 				</td>
 <?php endif; ?>
 			</tr>
