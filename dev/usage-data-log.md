@@ -334,3 +334,117 @@ Two smaller findings worth keeping:
   is R = D/4?* — for 118 impressions and **zero clicks**.
 - One query was `"kikokotoo" -site:reddit.com …`, the Swahili word taken straight from
   `lib/lang.ec.sw.php` — i.e. an agent searching our own translated string.
+
+---
+
+## 2026-08-21 — per-calculator reach / shopping / using, and a METRIC BREAK
+
+Supplied by Tom, with his own reading: *"Ahem. LPN has jumped to position 3 with 40 humans using."*
+
+| page | reach | shopping | using | %shop of reach | %use of shop |
+|---|---:|---:|---:|---:|---:|
+| contact | 3 | 3 | 0 | 100% | 0% |
+| Manning-Pipe-Flow | 172 | 156 | 121 | 91% | 78% |
+| Manning-Trap | 93 | 52 | 40 | 56% | 77% |
+| **Looped-Network** | **61** | **16** | **11** | **26%** | **69%** |
+| Manning-Irregular | 65 | 17 | 12 | 26% | 71% |
+| Hazen-Williams | 60 | 12 | 7 | 20% | 58% |
+| Darcy-Weisbach | 54 | 9 | 5 | 17% | 56% |
+| Manning-Pipe-Head-Loss | 63 | 8 | 2 | 13% | 25% |
+| Branched-Network | 53 | 5 | 1 | 9% | 20% |
+| Weir-Flow-Simple | 62 | 5 | 3 | 8% | 60% |
+| Weir-Flow-Irregular | 60 | 3 | 1 | 5% | 33% |
+| Irrigation-Pressure | 53 | 2 | 0 | 4% | 0% |
+| Rock-Chute | 58 | 2 | 0 | 3% | 0% |
+| Orifice | 59 | 1 | 0 | 2% | 0% |
+| Orifice-Drain-Time | 57 | 0 | 1 | 0% | n/a |
+| index | 108 | 0 | 0 | 0% | n/a |
+| privacy / terms / About / Install / Micro-Hydro-Power / Canal-Seepage | 51–57 | 0 | 0 | 0% | n/a |
+| sdnet / formmailsuccess | 2 / 1 | 0 | 0 | 0% | n/a |
+
+### Two corrections to the read, before anything else
+
+- **"Position 3" is right**, on this report's own sort (%shopping of reach), once `contact` is set
+  aside at n = 3. By shopping alone lpn is 4th (16 against Manning-Irregular's 17 — a tie at this n);
+  by using alone, 4th. Every reading puts it 3rd or 4th, up from **6th** on 2026-08-09.
+- **"40 humans using" is Manning-Trap's row**, one line above. **Lpn's using is 11.**
+
+### THIS TABLE IS NOT COMPARABLE TO 2026-08-09 OR 2026-08-11
+
+Reach fell by the same factor on every page at once — MPF 2.5%, MTC 2.4%, lpn 2.8%, HW 2.3%,
+MI 2.8%, DW 2.5%, CS 2.5% of their 08-09 values. **A uniform 40x on sixteen pages simultaneously is a
+change to the denominator, not to the audience**, and %shop-of-reach rising 2–10x on every page at
+the same time confirms it: no behavioural story moves sixteen pages together in lockstep.
+
+Two candidate causes, both cheap for Tom to settle and neither yet established:
+
+1. **A shorter window.** The earlier tables may be cumulative-to-date and this one a few days.
+2. **The consent buckets.** `ecLogBucketSuffix()` deduplicates consented rows and leaves everyone
+   else's marked `visit` and undeduplicated. **CLAUDE.md forbids summing them — one counts people,
+   the other counts page loads.** A reach of ~2,000 behaves like page loads and a reach of ~55 like
+   people, so a report that changed which bucket it reads would produce exactly this.
+
+**So: no cross-time claim may be made from this table** — not "lpn's conversion rose from 14% to
+69%", not "reach collapsed". What survives across time is **rank**, which is what the 2026-08-09
+entry already established as the robust statistic here.
+
+### Within the table, comparisons ARE valid, and lpn's news is real
+
+The instrumentation is the shared `js/Calculators.lib.js` and fires identically on every page, so a
+difference between two rows of one table is behaviour. Wilson 95% intervals on use-of-shopping:
+
+| page | use/shop | point | Wilson 95% |
+|---|---:|---:|---|
+| Manning-Pipe-Flow | 121/156 | 78% | [70%, 83%] |
+| Manning-Trap | 40/52 | 77% | [64%, 86%] |
+| Manning-Irregular | 12/17 | 71% | [47%, 87%] |
+| **Looped-Network** | **11/16** | **69%** | **[44%, 86%]** |
+| Hazen-Williams | 7/12 | 58% | [32%, 81%] |
+| Weir-Flow-Simple | 3/5 | 60% | [23%, 88%] |
+| Darcy-Weisbach | 5/9 | 56% | [27%, 81%] |
+| Manning-Pipe-Head-Loss | 2/8 | 25% | [7%, 59%] |
+| Branched-Network | 1/5 | 20% | [4%, 62%] |
+
+**The defensible claim, and it is a strong one: lpn's interval now OVERLAPS Manning-Pipe-Flow's and
+Manning-Trap's.** On 2026-08-09 it did not — 7/51 was [7%, 26%] against a Manning band of 58–70%,
+which is what made "worst-converting" tempting and wrong for a different reason. A map editor that is
+statistically indistinguishable from a three-field form is the result, and it does not depend on the
+broken cross-time comparison.
+
+Against its true peer group (the standing rule: rank complex calculators against each other), lpn
+leads Branched-Network 16/11 to 5/1, Irrigation-Pressure to 2/0 and Weir-Flow-Irregular to 3/1, and
+ties Manning-Irregular at 17/12. **First or second among the complicated calculators, on a page
+shipped 2026-07-30.**
+
+### One confound, checked in code rather than left as a worry
+
+`maybeLogCalcUsage()` fires at the first `runSolve()` **more than 10 s after page load**, once per
+page load. **The boot path is safe**: a reopened project calls `scheduleSolve()` at init
+(`js/looped-network.js:13697`), which lands ~300 ms in, and the 10 s gate returns *before* setting
+the dedupe flag, so a boot solve neither logs nor consumes the slot. A zoom never schedules a solve.
+
+**But automatic recalculation became a setting, default ON, on 2026-08-20 (Task 467) — inside this
+window.** It replaced `EC.LPN_TIME_AUTO`'s measured heuristic, which allowed an automatic run only
+where the last one stayed under 400 ms. So more user edits now reach `runSolve()` than before on
+exactly the networks that used to be excluded. Nobody is being counted who did not edit — but **the
+event got easier to trigger on this page during the period being measured**, which is one more reason
+the cross-time comparison is unavailable rather than merely noisy.
+
+### The rows worth a second look
+
+- **Manning-Pipe-Head-Loss, 2/8 = 25%, against its sibling Manning-Pipe-Flow's 78%.** Two Manning
+  pipe calculators, one audience, and the low one is *simple*, so complexity does not excuse it. n = 8
+  and the interval is [7%, 59%], so this is a **watch item, not a finding** — but it is the same shape
+  as Task 144 and it is the one place in the suite where two near-identical pages can be diffed.
+- **Task 144 (the Hazen-Williams leak) is stated in metrics this table does not use.** Its "580
+  confirmed humans, 18% human-of-reach, 11% calculate" is not comparable to this table's 12 shopping
+  and 58% use-of-shopping. **Re-derive Task 144 on current definitions before spending anything on
+  it**; at priority 25 it is not urgent, and acting on a stale denominator would be.
+- **Six calculators returned 5 shoppers and 1 user between them** — Irrigation-Pressure, Rock-Chute,
+  Orifice, Micro-Hydro-Power, Canal-Seepage, Orifice-Drain-Time. **This is not a case for cutting
+  them** (zero reach ≠ low value, and it never has been here); it is the honest price of the suite's
+  breadth, and it is worth stating once so the choice to carry it stays deliberate rather than
+  unnoticed.
+- **`contact` converted 0 of 3.** n = 3 is nothing. It is logged only because **both of the
+  LibreWaterNet landing page's calls to action point at `contact.php`**, so it is the one funnel where
+  a small number is worth watching before a launch rather than after.
