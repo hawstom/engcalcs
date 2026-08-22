@@ -151,25 +151,6 @@ the block.
     past tense is fine, so this is ADVISORY — the output is "verify these sentences are written in the
     past tense", not a failure. It would have caught all four.
 
-- 100|480| **[H] `privacy.php` says "exactly one exception" and there are now three.** Live legal text,
-  found 2026-08-21. It discloses OSM and Mapbox tiles; it does not mention the Nominatim place-name
-  search, which shipped later and is the **most** sensitive of the three — a tile says where you are
-  looking, a search says what you typed.
-  - **The app itself is fine**: `js/lpn-search.js` has its own consent gate and its own cookie
-    (`ec_geosearch`), with text that draws exactly that distinction. This is a gap in the privacy PAGE
-    only, and the fix is purely additive — a disclosure added, never one removed.
-  - **Cheap:** `privacy.php` is English-authoritative and hard-coded, so this is one edit and no
-    sprint. Needs Tom because it is legal text. **Wording is drafted and waiting in
-    `dev/privacy-third-party-draft.md`.**
-  - **Tom, 2026-08-21: *"Is it adequate to say that we prompt you individually for every exception?"*
-    As the RULE yes — it is the better rule, because it does not go stale when a fourth service ships.
-    As the WHOLE disclosure no: the consent prompt must name the recipient anyway, so naming the three
-    here costs nothing, and "we will tell you at the time" is the footnote-you-have-to-find this page
-    rejects. The draft states both.**
-  - **The trap:** the live paragraph ends *"We send them nothing about you"* — true of the tiles,
-    FALSE of the search, which sends what you typed. Scoping that sentence to the tiles is the part of
-    the edit that is easy to get wrong.
-
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
   English pass asking *"list every plausible reading; more than one means rewrite"*, both waves
