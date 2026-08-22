@@ -320,6 +320,9 @@ the block.
   - **What Tom wants weighed (2026-08-21):** epanet-js puts it in a NEW-PROJECT WIZARD rather than a
     menu. That is Task 477; if the wizard is built, this becomes a search box inside it and no separate
     work at all. Decide 477 first.
+  - **Kept OUT of the Project menu, 2026-08-21**, when the element Find went in there: Tom, on where
+    the place search should sit, *"We will have to address 1 later."* A row that vanishes in every
+    grid project is not a discovery fix, so it waits on 477 rather than taking the cheap door.
 
 - 50|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed

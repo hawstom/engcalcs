@@ -459,11 +459,11 @@
         "lpn_menu_project": "Project",
         "lpn_tables_menu": "Tables",
         "lpn_tables_menu_tip": "Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.",
-        "lpn_run_menu_tip": "Work out this network now. Looking for a Run button? While this project works itself out after every change, the toolbar has no Run button. Turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics, and the button comes back.",
-        "lpn_settings_auto_run": "Recalculate the simulation for this project automatically",
-        "lpn_settings_auto_run_tip": "When this is on, this project works itself out again shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be worked out gets in the way of typing, and the Calculate button comes back so you choose when to run.",
-        "lpn_time_run_slow": "This network took {secs} s to work out, and it is set to work itself out again after every change. To stop that and get a Calculate button back, turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics.",
-        "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
+        "lpn_run_menu_tip": "Recalculate this network now. Looking for a Run button? While this project recalculates after every change, the toolbar has no Run button. Turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics, and the button comes back.",
+        "lpn_settings_auto_run": "Recalculate automatically",
+        "lpn_settings_auto_run_tip": "When this is on, this project recalculates shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be recalculated gets in the way of typing, and the Calculate button comes back so you choose when to run.",
+        "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.",
+        "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -477,7 +477,7 @@
         "lpn_engine_refused": "The EPANET solver would not accept this network, so it did not run.",
         "lpn_engine_refused_why": "The EPANET solver said: {message}",
         "lpn_engine_refused_fallback": "The numbers on screen came from the built-in solver instead.",
-        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.",
+        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. It calculates one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.",
         "lpn_control_dangling_note": "These controls name an element that is no longer in this project, so they were left out: {ids}",
         "lpn_control_unreadable_note": "These controls could not be read, so they were left out: {ids}",
         "lpn_settings_color_credits": "Credits",
@@ -493,7 +493,7 @@
         "lpn_library_patterns_tip": "A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.",
         "lpn_library_curves": "Curves",
         "lpn_library_curves_tip": "A curve is the points that say how a pump performs: how much head it makes at each flow.",
-        "lpn_library_curves_note": "A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that asset and change its points there.",
+        "lpn_library_curves_note": "A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that asset and change its points there. For a pump the line drawn is the curve the run uses, fitted through the points; for a valve it is the straight steps between them.",
         "lpn_library_controls": "Controls",
         "lpn_library_controls_tip": "A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.",
         "lpn_library_pattern_add": "Add a pattern",
@@ -529,11 +529,11 @@
         "lpn_menu_project": "Project",
         "lpn_tables_menu": "Tables",
         "lpn_tables_menu_tip": "Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.",
-        "lpn_run_menu_tip": "Work out this network now. Looking for a Run button? While this project works itself out after every change, the toolbar has no Run button. Turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics, and the button comes back.",
-        "lpn_settings_auto_run": "Recalculate the simulation for this project automatically",
-        "lpn_settings_auto_run_tip": "When this is on, this project works itself out again shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be worked out gets in the way of typing, and the Calculate button comes back so you choose when to run.",
-        "lpn_time_run_slow": "This network took {secs} s to work out, and it is set to work itself out again after every change. To stop that and get a Calculate button back, turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics.",
-        "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.",
+        "lpn_run_menu_tip": "Recalculate this network now. Looking for a Run button? While this project recalculates after every change, the toolbar has no Run button. Turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics, and the button comes back.",
+        "lpn_settings_auto_run": "Recalculate automatically",
+        "lpn_settings_auto_run_tip": "When this is on, this project recalculates shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be recalculated gets in the way of typing, and the Calculate button comes back so you choose when to run.",
+        "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.",
+        "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -547,7 +547,7 @@
         "lpn_engine_refused": "The EPANET solver would not accept this network, so it did not run.",
         "lpn_engine_refused_why": "The EPANET solver said: {message}",
         "lpn_engine_refused_fallback": "The numbers on screen came from the built-in solver instead.",
-        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.",
+        "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. It calculates one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.",
         "lpn_control_dangling_note": "These controls name an element that is no longer in this project, so they were left out: {ids}",
         "lpn_control_unreadable_note": "These controls could not be read, so they were left out: {ids}",
         "lpn_settings_color_credits": "Credits",
@@ -563,7 +563,7 @@
         "lpn_library_patterns_tip": "A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.",
         "lpn_library_curves": "Curves",
         "lpn_library_curves_tip": "A curve is the points that say how a pump performs: how much head it makes at each flow.",
-        "lpn_library_curves_note": "A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that asset and change its points there.",
+        "lpn_library_curves_note": "A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that asset and change its points there. For a pump the line drawn is the curve the run uses, fitted through the points; for a valve it is the straight steps between them.",
         "lpn_library_controls": "Controls",
         "lpn_library_controls_tip": "A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.",
         "lpn_library_pattern_add": "Add a pattern",
@@ -1213,7 +1213,7 @@
                 "previous_translated": {
                     "key": "lpn_time_run_note",
                     "value": "आप नेटवर्क को उसके पहले रिपोर्टिंग समय पर देख रहे हैं। यह नेटवर्क अपनी पूरी समय अवधि में गणना करने में इतना समय लेता है कि जब तक आप काम करते हैं, बाद के समय के परिणाम अद्यतन नहीं रखे जाते। उन्हें अद्यतन करने के लिए गणना करें दबाएँ।",
-                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to calculate over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
                 },
                 "next_translated": {
                     "key": "lpn_time_speed",
@@ -1229,7 +1229,7 @@
                 "previous_translated": {
                     "key": "lpn_time_run_note",
                     "value": "आप नेटवर्क को उसके पहले रिपोर्टिंग समय पर देख रहे हैं। यह नेटवर्क अपनी पूरी समय अवधि में गणना करने में इतना समय लेता है कि जब तक आप काम करते हैं, बाद के समय के परिणाम अद्यतन नहीं रखे जाते। उन्हें अद्यतन करने के लिए गणना करें दबाएँ।",
-                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to calculate over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
                 },
                 "next_translated": {
                     "key": "lpn_time_speed",
@@ -1245,7 +1245,7 @@
                 "previous_translated": {
                     "key": "lpn_time_run_note",
                     "value": "आप नेटवर्क को उसके पहले रिपोर्टिंग समय पर देख रहे हैं। यह नेटवर्क अपनी पूरी समय अवधि में गणना करने में इतना समय लेता है कि जब तक आप काम करते हैं, बाद के समय के परिणाम अद्यतन नहीं रखे जाते। उन्हें अद्यतन करने के लिए गणना करें दबाएँ।",
-                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to calculate over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
                 },
                 "next_translated": {
                     "key": "lpn_time_speed",
@@ -1261,7 +1261,7 @@
                 "previous_translated": {
                     "key": "lpn_time_run_note",
                     "value": "आप नेटवर्क को उसके पहले रिपोर्टिंग समय पर देख रहे हैं। यह नेटवर्क अपनी पूरी समय अवधि में गणना करने में इतना समय लेता है कि जब तक आप काम करते हैं, बाद के समय के परिणाम अद्यतन नहीं रखे जाते। उन्हें अद्यतन करने के लिए गणना करें दबाएँ।",
-                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to calculate over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date."
                 },
                 "next_translated": {
                     "key": "lpn_time_speed",

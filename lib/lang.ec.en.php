@@ -1476,17 +1476,17 @@ $ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the 
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
-$ec_lang['lpn_run_menu_tip']='Work out this network now. Looking for a Run button? While this project works itself out after every change, the toolbar has no Run button. Turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics, and the button comes back.';
+$ec_lang['lpn_run_menu_tip']='Recalculate this network now. Looking for a Run button? While this project recalculates after every change, the toolbar has no Run button. Turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics, and the button comes back.';
 // ---- automatic recalculation (Task 467) ----
 // "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
 // out over time, and this switch is about the run, not about the drawing.
-$ec_lang['lpn_settings_auto_run']='Recalculate the simulation for this project automatically';
-$ec_lang['lpn_settings_auto_run_tip']='When this is on, this project works itself out again shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be worked out gets in the way of typing, and the Calculate button comes back so you choose when to run.';
+$ec_lang['lpn_settings_auto_run']='Recalculate automatically';
+$ec_lang['lpn_settings_auto_run_tip']='When this is on, this project recalculates shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be recalculated gets in the way of typing, and the Calculate button comes back so you choose when to run.';
 // Says what it MEASURED and where the switch is, in that order. The number first, because a person
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
-$ec_lang['lpn_time_run_slow']='This network took {secs} s to work out, and it is set to work itself out again after every change. To stop that and get a Calculate button back, turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics.';
-$ec_lang['lpn_time_no_report']='There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.';
+$ec_lang['lpn_time_run_slow']='This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.';
+$ec_lang['lpn_time_no_report']='There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Settings';
@@ -1832,7 +1832,7 @@ $ec_lang['lpn_notes_1_term']='How it is solved';
 // surprising: the built-in solver does a single moment and holds every tank at its starting
 // level, so a whole run needs the EPANET solver. dev/lpn-spike/eps-net3-harness.js reproduces
 // EPA's own published 24-hour Net3 report at all 25 reporting steps.
-$ec_lang['lpn_notes_1_def']='Each moment is solved with the same global gradient algorithm EPANET uses. Set a total run time and the EPANET solver works out every reporting step in turn: tanks fill and drain, demands follow their patterns, and the toolbar plays the run back. The built-in solver works out one moment at a time and holds every tank at its starting level.';
+$ec_lang['lpn_notes_1_def']='Each moment is solved with the same global gradient algorithm EPANET uses. Set a total run time and the EPANET solver calculates every reporting step in turn: tanks fill and drain, demands follow their patterns, and the toolbar plays the run back. The built-in solver calculates one moment at a time and holds every tank at its starting level.';
 $ec_lang['lpn_notes_2_term']='Not modeled';
 // VALVES LEFT THIS NOTE ON 2026-08-14 (Task 248 phase 2), and what replaces the old sentence is
 // the honest half of it: the valves are all modeled now, but the three that open and close on
@@ -2218,7 +2218,7 @@ $ec_lang_syn['lpn_engine_loading']='';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
 $ec_lang_syn['lpn_engine_failed']='';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
-// the EPANET solver anyway, because it holds a valve the built-in solver does not work out. The
+// the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because these valves open and close on their own:';
 $ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. Nothing can be computed until this page is taught that unit, because it does not know how large one of them is.';
@@ -2236,7 +2236,7 @@ $ec_lang['lpn_engine_refused_why']='The EPANET solver said: {message}';
 $ec_lang['lpn_engine_refused_fallback']='The numbers on screen came from the built-in solver instead.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
-$ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.';
+$ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in solver instead. It calculates one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.';
 // ---- controls we could not use (ROADMAP Task 466) ---------------------------------------------
 // A control naming an element that is no longer drawn has to be left out -- EPANET rejects the
 // whole network over one of them -- and {ids} names which, because "a control was ignored" with
@@ -2328,9 +2328,9 @@ $ec_lang['lpn_time_report_start']='Report start time';
 $ec_lang['lpn_time_clock_start']='Clock time at the start';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
 $ec_lang['lpn_time_running']='Working out the whole time period with the EPANET solver.';
-$ec_lang['lpn_time_no_engine']='The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs the whole period.';
+$ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs the whole period.';
 $ec_lang['lpn_time_slider']='Time';
-$ec_lang['lpn_time_no_period']='This project has no time period, so there is one moment to show. Set a Total run time in Settings to work the network out over time.';
+$ec_lang['lpn_time_no_period']='This project has no time period, so there is one moment to show. Set a Total run time in Settings to calculate the network over time.';
 $ec_lang['lpn_time_first']='Go to the start';
 $ec_lang['lpn_time_prev']='Step back';
 $ec_lang['lpn_time_play']='Play';
@@ -2342,7 +2342,7 @@ $ec_lang['lpn_time_level']='Water level';
 $ec_lang['lpn_time_run']='Calculate';
 $ec_lang_syn['lpn_time_run']='Simulate, calculate, execute, or compute';
 $ec_lang['lpn_time_run_tip']='Run the model for all hydraulic time steps.';
-$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date.';
+$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. This network takes so long to calculate over its whole time period that the results for the later times are not kept up to date while you work. Press Calculate to bring them up to date.';
 // ---- The run box (ROADMAP Task 450) ----------------------------------------------------------
 // Three keys, and no more: 'lpn_time_running' is already the sentence for a run in progress and
 // 'lpn_close' is already the word on every other dismiss control on this page, so both are
@@ -2436,7 +2436,7 @@ $ec_lang['lpn_library_patterns']='Patterns';
 $ec_lang['lpn_library_patterns_tip']='A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.';
 $ec_lang['lpn_library_curves']='Curves';
 $ec_lang['lpn_library_curves_tip']='A curve is the points that say how a pump performs: how much head it makes at each flow.';
-$ec_lang['lpn_library_curves_note']='A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that asset and change its points there.';
+$ec_lang['lpn_library_curves_note']='A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that asset and change its points there. For a pump the line drawn is the curve the run uses, fitted through the points; for a valve it is the straight steps between them.';
 $ec_lang['lpn_library_controls']='Controls';
 $ec_lang['lpn_library_controls_tip']='A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to

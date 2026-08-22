@@ -1730,6 +1730,9 @@ html:has(#lpn_canvas) { overflow: hidden; }
 /* The sparkline. A fixed height and a fluid width: it is a SHAPE check ("is this the daily curve I
    meant?"), not a chart to read values off, so it needs no axis and no numbers. */
 .lpn-lib-spark { display: block; width: 100%; height: 46px; background: #fafafa; border: 1px solid #ddd; }
+/* A curve is read in two dimensions -- flow across, head up -- so it gets more height than a
+   pattern, which is read only for its ups and downs along one axis. */
+.lpn-lib-chart { height: 76px; }
 .lpn-lib-note { font-size: .9em; opacity: .8; margin: 2px 0; }
 .lpn-lib-verdict { font-size: .9em; }
 /* The section a library entry list sits under. Its heading is not sticky -- unlike Settings, only

@@ -13260,6 +13260,22 @@ var EngCalcs = EngCalcs || {};
 					if (tables.length) { openPane(tables[0].id); }
 				}
 			},
+			// **A COPY OF EDIT > FIND, AND OF THE TOOLBAR'S OWN BUTTON** (Tom, 2026-08-21: *"Add
+			// Search to the Project menu... this is good for discovery"*). A command in two menus is
+			// correct on this page, not duplication to clean up -- Edit holds it because Find acts
+			// on the ELEMENTS, and it is here because "find a part in this project" is what somebody
+			// reaches the Project menu for after Profile and Tables have shown them the network is
+			// bigger than the screen. It anchors on the menu the way Edit's row does, so the popup
+			// opens under the item that was clicked.
+			//
+			// **NOT ON THE TOOLBAR AGAIN**: the strip already carries Find at its right-hand end,
+			// beside the pane toggle, so the strip stops mirroring the Project menu exactly at this
+			// one row. That is the cheaper of the two prices -- the alternative was the same button
+			// twice on one strip.
+			{
+				icon: 'find', label: pc.lpn_find_menu || 'Find', tip: pc.lpn_find_menu_tip,
+				fn: function () { toggleFindPopup(anchor); }
+			},
 			{ separator: true },
 			// **THE MENU'S ROW IS ALWAYS HERE; THE TOOLBAR'S BUTTON IS NOT** (Task 467). Tom wrote
 			// "Run (if present)" of the TOOLBAR, where the button goes away while this project
@@ -13287,7 +13303,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () {
 					if (EngCalcs.lpnTimeShowReport && EngCalcs.lpnTimeShowReport()) { return; }
 					setNotice(pc.lpn_time_no_report ||
-						'There is no run report yet. The report is EPANET’s own text, so it appears once this network has been worked out with the EPANET solver.');
+						'There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.');
 				}
 			}
 		]);
@@ -16576,7 +16592,7 @@ var EngCalcs = EngCalcs || {};
 			if (settings.autoRun) { scheduleSolve(); }
 			saveToStorage();
 		});
-		row(compBody, pc.lpn_settings_auto_run || 'Recalculate the simulation for this project automatically', autoInput, pc.lpn_settings_auto_run_tip);
+		row(compBody, pc.lpn_settings_auto_run || 'Recalculate automatically', autoInput, pc.lpn_settings_auto_run_tip);
 		// ---- restore defaults (Tom, 2026-07-30) ----
 		// Resets settings/labelSettings only -- the network (nodes/links/labels) and backdrop are
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
@@ -17435,6 +17451,93 @@ var EngCalcs = EngCalcs || {};
 			host.appendChild(entry);
 		});
 	}
+	// The curve chart, and it answers the same question the pattern sparkline does -- what SHAPE is
+	// this? -- for the one library section that had only a table of numbers. No axis, no numbers, no
+	// interaction; the table below it is where the numbers are.
+	//
+	// **IT DRAWS WHAT THE SOLVER APPLIES**, which is the rule libSparkline's step line follows and
+	// is the whole reason this is not one function for both kinds:
+	//
+	//   - A PUMP runs on the FITTED curve H = h0 - a Q^b (EngCalcs.lpnPumpFromCurve), never on
+	//     straight lines between the typed points. On a ONE-POINT curve there is no line to draw at
+	//     all -- EPANET's rule turns that single duty point into shutoff 1.33H and runout 2Q, a fact
+	//     about the pump the user is running that the table cannot show and this chart can.
+	//   - A GPV's head loss is interpolated LINEARLY between its points, so straight segments are
+	//     what it applies.
+	//
+	// The fit is plain algebra on the pairs and carries no units of its own, so it runs on the
+	// DISPLAY numbers and converts nothing. pumpFit() is the one site that crosses to SI, and this
+	// is deliberately not a second one.
+	function libCurveChart(pts, isPump) {
+		var W = 300, H = 76, pad = 4, svgNS = 'http://www.w3.org/2000/svg',
+			el = document.createElementNS(svgNS, 'svg'),
+			xs, ys, xlo, xhi, ylo, yhi, fit, i, q, h, d = '', path, span;
+		el.setAttribute('class', 'lpn-lib-spark lpn-lib-chart');
+		el.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+		el.setAttribute('preserveAspectRatio', 'none');
+		el.setAttribute('aria-hidden', 'true');
+		if (!pts || !pts.length) { return el; }
+		xs = pts.map(function (p) { return +p[0]; });
+		ys = pts.map(function (p) { return +p[1]; });
+		if (xs.concat(ys).some(function (v) { return !isFinite(v); })) { return el; }
+		fit = isPump && EngCalcs.lpnPumpFromCurve ? EngCalcs.lpnPumpFromCurve(pts.map(function (p) {
+			return [+p[0], +p[1]];
+		})) : null;
+		if (fit && !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b))) { fit = null; }
+		// **A PUMP CURVE IS FRAMED ON THE ORIGIN**, because shutoff head and runout flow are the two
+		// ends a person reads it by, and a frame that started at the first typed point would hide
+		// both. A GPV curve is framed on its own points: its x range is whatever flows it covers,
+		// and zero need not be one of them.
+		xlo = fit ? 0 : Math.min.apply(null, xs);
+		xhi = fit ? Math.max.apply(null, xs) * 1.15 : Math.max.apply(null, xs);
+		ylo = fit ? 0 : Math.min.apply(null, ys);
+		yhi = fit ? Math.max(fit.h0, Math.max.apply(null, ys)) * 1.05 : Math.max.apply(null, ys);
+		// A ONE-POINT GPV curve, or a flat one, is a real curve and must not divide by zero -- the
+		// same guard libSparkline gives a flat pattern.
+		if (!(xhi > xlo)) { xlo -= 0.5; xhi += 0.5; }
+		if (!(yhi > ylo)) { ylo -= 0.5; yhi += 0.5; }
+		function xAt(v) { return pad + (W - 2 * pad) * (v - xlo) / (xhi - xlo); }
+		function yAt(v) { return pad + (H - 2 * pad) * (1 - (v - ylo) / (yhi - ylo)); }
+		if (fit) {
+			// Sampled, because H = h0 - a Q^b is not a polyline. 48 steps across 300px is finer than
+			// the pixels, so the curvature is the curve's and not the sampling's. Stops where head
+			// reaches zero: past runout the fitted head is negative and the pump is not operating
+			// there, so drawing it would invent a working range.
+			for (i = 0; i <= 48; i++) {
+				q = xlo + (xhi - xlo) * (i / 48);
+				h = fit.h0 - fit.a * Math.pow(q, fit.b);
+				if (!isFinite(h) || h < 0) { break; }
+				d += (d ? 'L' : 'M') + xAt(q).toFixed(1) + ' ' + yAt(h).toFixed(1);
+			}
+		} else {
+			pts.slice().sort(function (u, v) { return u[0] - v[0]; }).forEach(function (p, n) {
+				d += (n ? 'L' : 'M') + xAt(+p[0]).toFixed(1) + ' ' + yAt(+p[1]).toFixed(1);
+			});
+		}
+		if (d) {
+			path = document.createElementNS(svgNS, 'path');
+			path.setAttribute('d', d);
+			path.setAttribute('fill', 'none');
+			path.setAttribute('stroke', '#05a');
+			path.setAttribute('stroke-width', '1.5');
+			path.setAttribute('vector-effect', 'non-scaling-stroke');
+			el.appendChild(path);
+		}
+		// **THE TYPED POINTS ARE MARKED, and on a pump that is the point of the whole drawing:** the
+		// line is ours and the dots are theirs, so a duty point sitting off the fitted curve -- which
+		// is what a three-point fit through awkward numbers looks like -- is visible rather than
+		// smoothed away.
+		pts.forEach(function (p) {
+			var dot = document.createElementNS(svgNS, 'circle');
+			dot.setAttribute('cx', xAt(+p[0]).toFixed(1));
+			dot.setAttribute('cy', yAt(+p[1]).toFixed(1));
+			dot.setAttribute('r', '2.5');
+			dot.setAttribute('fill', '#05a');
+			dot.setAttribute('vector-effect', 'non-scaling-stroke');
+			el.appendChild(dot);
+		});
+		return el;
+	}
 	// **CURVES IS A VIEWER, AND THE HONEST REASON IS THAT THERE IS NOTHING FOR IT TO OWN YET.**
 	// This document has no curve table: a pump's points live on the pump (`curvePoints`) and
 	// `curveRef` names ANOTHER PUMP whose points it copies, so there is no shared definition for a
@@ -17468,6 +17571,9 @@ var EngCalcs = EngCalcs || {};
 			goTo.className = 'lpn-pane-goto';
 			headRow.appendChild(goTo);
 			entry.appendChild(headRow);
+			// Above the table, where the pattern section puts its sparkline: the shape first and the
+			// numbers under it, so the two sections are read the same way.
+			entry.appendChild(libCurveChart(pts, l.type === 'pump'));
 			table.className = 'lpn-pane-table';
 			[(pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
 				valueLabel + ' (' + unitLabel('lpn_u_elevhead') + ')'].forEach(function (t) {

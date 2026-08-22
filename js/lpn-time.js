@@ -415,7 +415,7 @@
 			runRefusedWhy: pageConfig.lpn_engine_refused_why || 'The EPANET solver said: {message}',
 			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.',
 			runReport: pageConfig.lpn_time_run_report || 'EPANET run report',
-			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to work out, and it is set to work itself out again after every change. To stop that and get a Calculate button back, turn off “Recalculate the simulation for this project automatically” in Settings, under Calculation, Hydraulics.',
+			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.',
 			close: pageConfig.lpn_close || 'Close'
 			// **FIVE STRINGS LEFT THIS LIST WITH THE PANE TAB**: lpn_time_tank, lpn_time_level and
 			// lpn_time_settings_open named the tank table and the door to the settings, and

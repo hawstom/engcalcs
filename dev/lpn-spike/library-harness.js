@@ -37,7 +37,7 @@ const L = loadLoopedNetwork(
 	"\t\tsetDoc: function (d) { doc = d; },\n" +
 	"\t\tgetDoc: function () { return doc; },\n" +
 	"\t\tparseMultipliers: libParseMultipliers, formatMultipliers: libFormatMultipliers,\n" +
-	"\t\tspanText: libSpanText, sparkline: libSparkline,\n" +
+	"\t\tspanText: libSpanText, sparkline: libSparkline, curveChart: libCurveChart,\n" +
 	"\t\treadControl: libReadControl, controlText: libControlText,\n" +
 	"\t\trenamePattern: libRenamePattern, deletePattern: libDeletePattern,\n" +
 	"\t\tcurves: libCurves, freeId: libFreeId\n"
@@ -286,6 +286,55 @@ function check(ok, msg, detail) {
 	curves[1].curveRef = curves[0].id;
 	check(L.curves().length === 1, 'a pump that borrows another\'s curve is not a second entry',
 		String(L.curves().length));
+
+	// ---- 6. THE CURVE CHART DRAWS WHAT THE SOLVER APPLIES --------------------------------------
+	//
+	// Same standard as the sparkline above -- it is a SHAPE, so what is asserted is that a shape
+	// always comes out and that it is the RIGHT KIND of shape for the kind of curve. The kind is the
+	// whole point: a pump runs on the fitted H = h0 - a Q^b, so its chart is a sampled curve; a GPV
+	// interpolates linearly, so its chart is straight segments through the typed points.
+	console.log('\n-- the curve chart --');
+	function chartOf(el) {
+		const path = (el.children || []).filter((c) => c._tag === 'path')[0];
+		const dots = (el.children || []).filter((c) => c._tag === 'circle');
+		return { d: path ? String(path.d || '') : '', dots: dots, path: path };
+	}
+	const empties = chartOf(L.curveChart([], true));
+	check(!empties.path && empties.dots.length === 0,
+		'a curve with no points draws nothing at all rather than throwing');
+
+	// A pump with ONE duty point is the case the table cannot show: there is no line between two
+	// points, and EPANET's rule still gives it a shutoff head of 1.33 H and a runout of 2 Q.
+	const one = chartOf(L.curveChart([[600, 150]], true));
+	check(one.d && !/NaN/.test(one.d), 'a ONE-POINT pump curve still draws a curve, not NaN', one.d.slice(0, 40));
+	check((one.d.match(/L/g) || []).length > 8,
+		'and it is SAMPLED, not a straight line between points it does not have',
+		String((one.d.match(/L/g) || []).length));
+	check(one.dots.length === 1, 'with the one typed point marked on it', String(one.dots.length));
+
+	// The fitted curve must FALL as flow rises, which is the one thing everybody knows about a pump
+	// curve and the thing a sign error in the frame would invert. y grows DOWNWARD in SVG, so a
+	// falling head is a rising y.
+	const pumpPts = curves[0].curvePoints;
+	const fitted = chartOf(L.curveChart(pumpPts, true));
+	const ys = (fitted.d.match(/[ML]([-\d.]+) ([-\d.]+)/g) || []).map((m) => +m.split(' ')[1]);
+	check(ys.length > 8 && ys[ys.length - 1] > ys[0],
+		'head falls as flow rises, so the drawn curve descends left to right',
+		ys.length ? ys[0].toFixed(1) + ' -> ' + ys[ys.length - 1].toFixed(1) : '');
+	check(fitted.dots.length === pumpPts.length,
+		'and every typed point is marked, so a point off the fit is visible rather than smoothed away',
+		String(fitted.dots.length));
+
+	// A GPV head-loss curve: n points, n-1 straight segments, because that is what the engine
+	// interpolates. A sampled curve here would draw a head loss no run ever applies.
+	const gpv = chartOf(L.curveChart([[0, 0], [100, 4], [200, 15]], false));
+	check((gpv.d.match(/L/g) || []).length === 2,
+		'a head-loss curve is straight segments through its points, one fewer than the points',
+		String((gpv.d.match(/L/g) || []).length));
+	check(gpv.dots.length === 3, 'with all three points marked', String(gpv.dots.length));
+	const flatCurve = chartOf(L.curveChart([[50, 3]], false));
+	check(flatCurve.d && !/NaN/.test(flatCurve.d),
+		'and a single-point head-loss curve is a zero range that must not divide by zero', flatCurve.d);
 
 	console.log(failures ? `\n${failures} FAILED` : '\nall checks passed');
 	process.exit(failures ? 1 : 0);
