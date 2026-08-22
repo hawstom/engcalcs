@@ -24,7 +24,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 ?>
 <div class="ec-legal">
 
-<p><em>Last updated: 14 August 2026. This notice covers hawsedc.com, including the EngCalcs
+<p><em>Last updated: 21 August 2026. This notice covers hawsedc.com, including the EngCalcs
 engineering calculators at hawsedc.com/engcalcs.</em></p>
 
 <h2>The short version</h2>
@@ -35,7 +35,8 @@ vendor, no tag manager, no advertising network, and no social media pixel on thi
 identifier that could be traced back to you.</p>
 
 <p>The calculators run entirely in your browser. <strong>The numbers you type are never sent to
-us.</strong></p>
+us.</strong> Three optional features on one page can fetch something from OpenStreetMap or Mapbox,
+and each of them asks you first; they are described under <em>Who else sees it</em> below.</p>
 
 <h2>Who we are</h2>
 
@@ -59,8 +60,9 @@ to translate into.</p>
 unhelpful page from an uninteresting one. That fact is one of: which reference link you followed
 (the address of the page we sent you to &mdash; never anything you typed); that you changed some
 input, without which input or what you put in it; which measurement units you chose; that this
-browser had used this calculator before; or, on the pipe-network map, which drawing tool you
-reached for first and which error message you met. <strong>Nothing you type is ever included</strong>,
+browser had used this calculator before; that you copied the page&rsquo;s link to share it, without
+where you shared it; or, on the pipe-network map, which drawing tool you reached for first and which
+error message you met. <strong>Nothing you type is ever included</strong>,
 and none of it can be connected to you.</p>
 
 <p>To count you once rather than once per page you open, we need to keep a small amount of
@@ -128,6 +130,12 @@ its last activity.</p>
 		<td>No &mdash; its only job is to honour your answer, including a no</td>
 	</tr>
 	<tr>
+		<td><code>ec_geosearch</code></td>
+		<td>Your permission to send a place-name search to OpenStreetMap from the Looped Pipe Network map, and when you gave it. Only a yes is ever stored; a no is not stored at all</td>
+		<td>1 year</td>
+		<td>No &mdash; its only job is to honour a yes you gave in order to use that search</td>
+	</tr>
+	<tr>
 		<td><code>ec_blang</code></td>
 		<td>The single digit <code>1</code>, meaning we have already recorded which language your browser asks for, so we do not record it again</td>
 		<td>1 year</td>
@@ -146,6 +154,12 @@ its last activity.</p>
 		<td>No &mdash; it is your document, kept so we can give it back</td>
 	</tr>
 	<tr>
+		<td>Your initials and your page layout (browser storage, not a cookie)</td>
+		<td>The name or initials you type for shared-file locking in the Looped Pipe Network calculator, and how you left that page&rsquo;s panels arranged</td>
+		<td>Until you delete them</td>
+		<td>No &mdash; you typed the one and arranged the other deliberately</td>
+	</tr>
+	<tr>
 		<td>A queue of unsent counts (browser storage, not a cookie)</td>
 		<td>Lets a count recorded while you were offline reach us later</td>
 		<td>Until it is sent</td>
@@ -153,7 +167,7 @@ its last activity.</p>
 	</tr>
 </table>
 
-<p>The two items that need your permission are not written unless you say yes, and if you change
+<p>The items marked <strong>Yes</strong> above are not written unless you say yes, and if you change
 your mind they are deleted. You can change your answer at any time using the
 <strong><?=htmlspecialchars($ec_lang['consent_settings_link'], ENT_QUOTES, 'UTF-8')?></strong> link
 at the foot of every page.</p>
@@ -165,22 +179,44 @@ no processor, no analytics service, and no advertising partner.</p>
 
 <p><strong>Every stylesheet, script and font comes from this site.</strong> There is no content
 delivery network, no hosted font, no advertising tag and no embedded video. Nothing you type into a
-calculator is ever sent anywhere.</p>
+calculator&rsquo;s input boxes is ever sent anywhere. The one thing you can type that leaves your
+browser is a place-name search on the map, which is described below and which asks you first.</p>
 
-<p><strong>There is exactly one exception, and only on one page.</strong> The Looped Pipe Network
-calculator can draw a map behind your network, and those map images are photographs and drawings of
-the real world that we do not hold. When &mdash; and only when &mdash; you switch that map on, your
-browser fetches the picture tiles it needs directly from
+<p><strong>Three features reach outside this site, all of them on one page, and every one of them
+asks you first.</strong> The rule matters more than the list: nothing goes to anybody else until you
+switch that particular feature on, and each one asks separately, because they do not tell the same
+thing about you. All three belong to the Looped Pipe Network calculator, and every other page in the
+suite makes none of them.</p>
+
+<p><strong>1 and 2. The map behind your network.</strong> That calculator can draw a map behind your
+network, and those map images are photographs and drawings of the real world that we do not hold.
+When &mdash; and only when &mdash; you switch that map on, your browser fetches the picture tiles it
+needs directly from
 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>
 for the street map, or from <a href="https://www.mapbox.com/" target="_blank" rel="noopener">Mapbox</a>
 for the satellite images. Those requests carry your IP address and which part of the world you are
-looking at, and they are governed by
-<a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener">OpenStreetMap&rsquo;s privacy policy</a>
-and <a href="https://www.mapbox.com/legal/privacy" target="_blank" rel="noopener">Mapbox&rsquo;s privacy policy</a>
-respectively. We send them nothing about you and nothing about your network &mdash; not its name,
-not its shape, not one number in it &mdash; and we store none of those images on your device
-ourselves. Turn the map off and the requests stop; every other page in the suite makes none of
-them.</p>
+looking at. <strong>We send them nothing about you and nothing about your network</strong> &mdash;
+not its name, not its shape, not one number in it &mdash; and we store none of those images on your
+device ourselves. Turn the map off and the requests stop.</p>
+
+<p><strong>3. Searching for a place by name, which is the sensitive one and has its own separate
+question.</strong> A map tile says where you are <em>looking</em>; a search says what you
+<em>typed</em>. So when you use <em>Search for a place by name</em> on that map, the words you type
+go to OpenStreetMap&rsquo;s
+<a href="https://operations.osmfoundation.org/policies/nominatim/" target="_blank" rel="noopener">Nominatim</a>
+place-name service, together with your IP address, to be turned into a location. We send nothing
+else with them: not your network, not where the map is currently pointing, and nothing about you
+beyond the request itself. We keep no record of your searches, on our server or on your device. That is why it asks you on its own instead of
+riding on the answer you gave about the map, and why your yes is remembered in its own
+<code>ec_geosearch</code> cookie. Say no and everything else on that page keeps working exactly as
+it did, including going to a latitude and longitude you type yourself.</p>
+
+<p>What each company then does with the request is governed by its own privacy policy:
+<a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener">OpenStreetMap&rsquo;s</a>
+for the street map and the place-name search, and
+<a href="https://www.mapbox.com/legal/privacy" target="_blank" rel="noopener">Mapbox&rsquo;s</a> for
+the satellite images. If a fourth such feature is ever added, it will ask you in the same way,
+before it sends anything.</p>
 
 <h2>Where it goes</h2>
 

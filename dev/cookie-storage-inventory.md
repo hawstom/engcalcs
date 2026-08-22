@@ -150,25 +150,29 @@ asserts this and fails if the probe is widened to `lpn_`.
 check whether something exempt already answers the question.** The expensive part of storing
 something is never the bytes — it is the sentence in the banner it makes false.
 
-**No third-party STORAGE, and exactly two third-party requests, both on one page and both under the
+**No third-party STORAGE, and exactly three third-party requests, all on one page and all under the
 visitor's control.** No analytics vendor, no tag manager, no ad network, no CDN fonts, and no CDN
 (Task 287: Bootstrap was coming from jsDelivr, which set no cookie but did tell a third party the
 visitor's IP and user-agent on every page load; it is now served from this origin alongside
-`js/vendor/epanet-js.js`). The two that remain both belong to the Looped-Network map:
+`js/vendor/epanet-js.js`). The three that remain all belong to the Looped-Network map:
 
 - **`tile.openstreetmap.org`** — the street-map pictures behind a geographic project. Off by a
   View-menu row, nothing cached by us, and it only ever says *where the visitor is looking*.
   `dev/geographic-projects.md` §4.
+- **`api.mapbox.com`** — the satellite pictures, the same feature with a second source (Task 452).
+  Same View-menu row, same silence about the visitor, and gated on `EC_MAPBOX_TOKEN`: no token means
+  the option does not exist, which is the state a fork of this suite is in.
 - **`nominatim.openstreetmap.org`** — place-name search (Task 437). Sent only on an explicit search,
   only after its own separate consent, and it says *what the visitor typed*, which is why it has a
   question of its own rather than riding on the tiles' silence.
 
-> **`privacy.php` IS NOW OUT OF DATE AND SAYS SO WRONGLY.** It still reads *"Nothing on this site is
-> loaded from anybody else's server… no embedded map or video."* The basemap already made that
-> sentence false and the geocoder makes it more so. It is not a hard sentence to fix — the honest
-> version is "one page can load street-map pictures and answer a place-name search from
-> OpenStreetMap, and both are yours to decline" — but it is legal text on a page nobody editing the
-> map is looking at, so it needs its own task rather than a side edit.
+> **`privacy.php` NOW STATES ALL THREE** (Task 480, 2026-08-21). Its *Who else sees it* section names
+> the tiles and the search separately and keeps them separate on purpose: *"We send them nothing about
+> you and nothing about your network"* is true of the tiles and FALSE of the search, which sends the
+> words the visitor typed. **Do not fold the search back under the tiles' sentence.** The page also
+> states the rule the list rests on — nothing leaves until you switch that feature on, and each asks
+> separately — so a fourth service is a new paragraph, not a contradiction. `ec_geosearch` is in its
+> device-storage table.
 
 ## 4. Server-side collection (GDPR, not ePrivacy)
 

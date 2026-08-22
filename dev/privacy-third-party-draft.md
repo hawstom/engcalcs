@@ -1,7 +1,11 @@
 # Draft: the third-party paragraph in `privacy.php` (Task 480)
 
-Live legal text. **Nothing here ships until Tom says yes.** English-authoritative and hard-coded, so
-this is one edit and no translation sprint.
+**SHIPPED 2026-08-21 (Tom authorized it that day). The live text is in `privacy.php` under
+*Who else sees it*, and that page — not this draft — is authoritative from here on.** Kept only for
+the two rulings below, which a future editor of that paragraph needs and which the paragraph itself
+cannot state: why the three services are named rather than left to the prompts, and why the search
+must never be folded back under the tiles' sentence. The shipped wording differs from the draft in
+detail (numbered features, the Nominatim policy link, a closing line about a fourth service).
 
 ## The ruling this draft implements
 
