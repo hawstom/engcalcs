@@ -139,6 +139,18 @@ the block.
   - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
     drawing is still correct.
 
+- 50|481| **A closed task cited as pending is how three false claims shipped in one day.** On
+  2026-08-21 `CLAUDE.md` said extended-period simulation was "not built yet" and that `.inp` export
+  was "not written yet"; the LibreWaterNet landing draft said both. All four had shipped 2026-08-18.
+  **Tom caught it, not a check** — *"This is false. How could you not know that?"*
+  - **The mechanism is structural, not carelessness.** Closing a task DELETES its block (that is the
+    rule, and it is right), so nothing re-scans the prose that quoted it. An honesty paragraph is the
+    first thing to rot, and it rots in the direction that makes us look worse than we are.
+  - **The check is mechanical and cheap:** extract every `Task N` mention from `CLAUDE.md` and
+    `dev/*.md`, and flag any N that appears in `dev/roadmap-closed-ids.md`. A closed task cited in the
+    past tense is fine, so this is ADVISORY — the output is "verify these sentences are written in the
+    past tense", not a failure. It would have caught all four.
+
 - 100|480| **[H] `privacy.php` says "exactly one exception" and there are now three.** Live legal text,
   found 2026-08-21. It discloses OSM and Mapbox tiles; it does not mention the Nominatim place-name
   search, which shipped later and is the **most** sensitive of the three — a tile says where you are
@@ -396,36 +408,29 @@ the block.
   a saving worth defending is worth a COUNTABLE guard, as `dev/lpn-spike/label-batch-harness.js` is.
 
 - 50|478| **[H] Tab should walk down the input column, not sideways into every unit select.** Tom,
-  2026-08-21. **RE-MEASURED ACROSS ALL 16 PAGES 2026-08-21 and the earlier count of twenty-three was
-  wrong.** Stops inside `#formInput`, worst first: Irrigation-Pressure **83** (25 X-hiders),
-  Manning-Trap **74** (30), Darcy-Weisbach **70** (30), Hazen-Williams **62** (25), Manning-Pipe-Flow
-  **52** (19). **The X-hiders alone are 35–43% of every stop on the five worst pages** — more than
-  the unit selects contribute, and the reason the fix below is split the way it is.
-  - **RULED: solve it in HTML, not by intercepting Tab in JS** (Tom, 2026-08-21: *"I meant HTML"*).
-    Reasonable, but it rules out both `tabindex` levers with it: `tabindex="-1"` on the selects makes
-    changing a unit keyboard-unreachable, which is a WCAG 2.1.1 failure and not merely a nuisance, and
-    a positive `tabindex` hoists the whole form above the navbar document-wide.
-  - **PHASE 1 — THE X-HIDERS, and they are the whole of the cheap win.** One
-    `<a href="#row">X</a>` per row (`lib/Calculators.lib.php:310` and `:333`, the `engcalcs-x` cells),
-    already an accessibility defect on its own: up to thirty links whose entire accessible name is
-    "X", and **no way back** — a hidden line returns only on a page reload, which nothing says.
-    **Keep the X exactly where it is visually, take it out of the tab order, and give the function ONE
-    keyboard door per calculator**: a closed `<details>` holding a checkbox per line. Closed it is one
-    stop; it satisfies WCAG 2.1.1 because the function stays keyboard-reachable; and it adds the
-    un-hide path that does not exist today. The suite's word for the thing is a **line**, not a row —
-    `view_hide_line` already says `[Hide this line]`.
-  - **PHASE 2 — DOM ORDER, its own task, and worth less than it looks.** Tab order IS DOM order, and
-    the blocker is that the two lists are nested `<table>`s, whose cells cannot be reordered visually
-    — only flex or grid has `order`. It is ONE FUNCTION, not sixteen pages (`echoCalculatorForm()`,
-    and only the two INNER tables need to become grids), but it is a layout change to all sixteen
-    calculators that no harness can see and only a browser pass can confirm. **Price it against what
-    is left after phase 1: roughly one unit select and sometimes one label link per number, taking the
-    crossing from ~2x to ~1.5x.** A label link is real navigation and stays focusable.
-  - **MAKE IT A CHECK, not a rule** (CLAUDE.md): `dev/scripts/focus_order_check.php` renders each page
-    and extracts the focusable sequence. Phase 1 asserts, blocking, that the per-line hide control
-    contributes at most ONE stop per calculator; it reports the per-page stop table above as advisory
-    so the number is never guessed again. Phase 2 flips "every number input precedes every unit select
-    in its column" from advisory to blocking. Write it BEFORE the fix.
+  2026-08-21. **PHASE 1 SHIPPED 2026-08-21** — the per-line X-hiders left the tab order, which was
+  35–43% of every stop on the worst pages: Irrigation-Pressure **83 → 60**, Manning-Trap **74 → 46**,
+  Darcy-Weisbach **70 → 42**, Hazen-Williams **62 → 39**, Manning-Pipe-Flow **52 → 35**. The X keeps
+  its place and its click; it carries `tabindex="-1" aria-hidden="true"` (the pair is required, or it
+  fails axe's `aria-hidden-focus`), and `echoLineChooser()` gives the function one keyboard door per
+  column — a closed `<details>`, one stop, which also adds the un-hide path that never existed.
+  `dev/scripts/focus_order_check.php` holds it: blocking at ≤1 hide stop per page, and it prints the
+  per-page table so the number is never guessed again.
+  - **WHAT IS LEFT — phase 2, and it is worth less than it looks.** Tab order IS DOM order, and the
+    blocker is that the two lists are nested `<table>`s whose cells cannot be reordered visually
+    (only flex or grid has `order`). It is ONE FUNCTION, not sixteen pages — `echoCalculatorForm()`,
+    and only the two INNER tables need to become grids — but it is a layout change to all sixteen
+    calculators that no harness can see and only a browser pass can confirm. **The prize is the
+    `x-cross` column the check now prints** (number inputs sitting after a unit select):
+    Manning-Trap 16, Irrigation-Pressure 12, Orifice-Drain-Time 9, Branched-Network 8,
+    Darcy-Weisbach 8, Manning-Pipe-Flow 4. Flip that column from advisory to blocking when it lands.
+  - **RULED: HTML, not a JS Tab interceptor** (Tom, 2026-08-21: *"I meant HTML"*). That also rules out
+    both `tabindex` levers: `-1` on a select makes changing a unit keyboard-unreachable (a WCAG 2.1.1
+    failure, not a nuisance), and a positive `tabindex` hoists the whole form above the navbar
+    document-wide. A label link is real navigation and stays focusable.
+  - **Needs one browser pass**, and only these: Orifice with a circular shape must not list "Width, W"
+    in the chooser (and must list it when rectangular); Manning-Trap, that an X'd line comes back from
+    the chooser; and any page's print preview, that an X'd line stays out and the chooser does not print.
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   HW draws 580 confirmed humans (18% human-of-reach, the suite'''s second-biggest front door) but only
