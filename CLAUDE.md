@@ -186,8 +186,11 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   request" anywhere; it has been false since the geocoder shipped.
   The display is still unprojected; the tiles are placed per-tile in lon/lat so they register anyway.
   `dev/geographic-projects.md`.
-- **Reads EPANET `.inp` files** (`js/lpn-inp.js`), importing the supported subset and reporting every
-  difference — never rejecting, never dropping silently. Does not write one yet (Task 281).
+- **Reads AND WRITES EPANET `.inp` files** (`js/lpn-inp.js` — one file, so one opinion about the
+  format). Import takes the supported subset and reports every difference, never rejecting and never
+  dropping silently; export shipped 2026-08-18 and returns 1,280 numeric tokens across Net1/2/3
+  character-for-character. Five round trips are genuinely impossible and are REPORTED rather than
+  faked (see the closed Task 281 entry for the list). **"Does not write one yet" is FALSE.**
 - **Do not reason about this page from a phone.** It is a full-window drawing surface with a menu
   bar, toolbar, tab strip and property popup, and is almost impossible on a phone. The other
   calculators are a form and an answer and are fine there. Say "pointer slop" when you mean
@@ -545,7 +548,7 @@ US file made a round trip through two factors that are not exact inverses: **710
   the old SI-always paradigm is still un-purged.
 - **This is testable and must be tested: import then export is BYTE-IDENTICAL for every value the
   user did not edit.** Not "within tolerance" — identical. That is also the acceptance criterion for
-  Task 281 (`.inp` export), not an afterthought to it.
+  Task 281 (`.inp` export) — met, and guarded by `dev/lpn-spike/inp-export-harness.js`.
 
 ### Changing a unit reinterprets the typed number; it does not convert it
 
