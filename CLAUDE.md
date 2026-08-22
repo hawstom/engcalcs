@@ -153,7 +153,11 @@ a map editor over it (`js/looped-network.js`). **A core calculator, in scope in 
 Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMAP Task 146 and its
 `146.nn` children.
 
-- **Element types:** junction, reservoir, tank, pipe, pump, valve, text.
+- **Element types:** junction, reservoir, tank, pipe, pump, valve, text. **Our vocabulary is NOT
+  EPANET's and stays that way** (Tom, 2026-08-21, ROADMAP Task 482): what we call a **Label**
+  EPANET calls Notation/Annotation, and what EPANET calls a **Label** is our **Text** object.
+  There is no industry standard to defer to, so write new strings in OUR vocabulary — every one
+  written in EPANET's adds to a rename we have already declined.
 - **EXTENDED-PERIOD SIMULATION SHIPPED 2026-08-18, THROUGH THE EPANET ENGINE ONLY** (`js/lpn-time.js`).
   Tanks fill and drain, demands follow patterns, the bottom pane scrubs the frames; checked against
   all 25 steps of EPA's own `Net3.rpt` to 0.005 ft over 2,425 head comparisons
