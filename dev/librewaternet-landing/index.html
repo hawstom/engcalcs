@@ -176,7 +176,20 @@ h1 .rule-under {
 	background: var(--paper);
 	padding: .55rem;
 }
-.plate svg { display: block; width: 100%; height: auto; }
+/* The figure is a SLOT, and the inline SVG in it is a PLACEHOLDER for a real
+   screenshot, animated GIF or video of the app. Any of those drops straight in
+   here -- same element position, same box -- so replacing the drawing is not a
+   layout change. Requirements for the replacement asset: dev/positioning.md §9. */
+.plate > svg,
+.plate > img,
+.plate > video {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 760 / 430;
+	object-fit: cover;
+	background: var(--paper-2);
+}
 
 /* Title block, bottom-right of a real sheet. */
 .titleblock {
@@ -322,6 +335,9 @@ a:focus-visible, .btn:focus-visible {
 			</div>
 
 			<figure class="plate" style="margin:0">
+				<!-- PLACEHOLDER. This drafted network stands in for a real screen of the app.
+				     Swap it for an image (PNG or animated GIF) or a video element in the same
+				     760x430 box and nothing else on the page moves. dev/positioning.md §9. -->
 				<svg id="net" viewBox="0 0 760 430" role="img"
 					aria-label="A looped water distribution network: a reservoir feeding a pumped main into four loops of pipe, a storage tank at the north-east, with drafting callouts naming the pump, the tank, a 300 millimetre main and a junction pressure.">
 				</svg>
@@ -338,7 +354,7 @@ a:focus-visible, .btn:focus-visible {
 	<section id="stakeholders" class="invite">
 		<span class="label">Looking for stakeholders, not for money</span>
 		<h2>Four kinds of person we are looking for</h2>
-		<p>There is nothing to buy here and nothing to donate to. What the project is short of is people who will steer it &mdash; and it is early enough that steering still changes where it goes.</p>
+		<p>There is nothing to buy here, and no money to send &mdash; there is no donation button and there will not be one. Everything else, we are asking for: your time, your judgement, your experience, the bug you hit, the thing you need it to do next. What the project is short of is people who will steer it &mdash; and it is early enough that steering still changes where it goes.</p>
 		<div class="roles">
 			<article>
 				<h3>Advisors</h3>
@@ -374,24 +390,24 @@ a:focus-visible, .btn:focus-visible {
 			<article>
 				<div class="swatch" id="sw-draw"></div>
 				<h3>Draw</h3>
-				<p>Junctions, reservoirs, tanks, pipes, pumps and valves, placed on a map. Put it on real ground with a street or satellite basemap behind it, or keep it schematic. Open an EPANET <code>.inp</code> file and it tells you every difference it found rather than dropping anything quietly.</p>
+				<p>Junctions, reservoirs, tanks, pipes, pumps and valves, placed on a map. Put it on real ground with a street or satellite basemap behind it, or keep it schematic. Open an EPANET <code>.inp</code> or <code>.net</code> file and it tells you every difference it found rather than dropping anything quietly. Write an <code>.inp</code> back out and every number you did not change comes back character for character.</p>
 			</article>
 			<article>
 				<div class="swatch" id="sw-solve"></div>
 				<h3>Solve</h3>
-				<p>Pressures and flows from the global gradient method, or from the EPANET engine itself running in your browser. Colour the map by pressure, flow, velocity or head loss, in any of 41 colour ramps.</p>
+				<p>Pressures and flows from the global gradient method, or from the EPANET engine itself running in your browser. Solve one instant, or run a whole day &mdash; demand patterns, simple controls, tanks that fill and drain, and a transport that steps through the run. Colour the map by pressure, flow, velocity or head loss, in any of 41 colour ramps.</p>
 			</article>
 			<article>
 				<div class="swatch" id="sw-publish"></div>
 				<h3>Publish</h3>
-				<p>Labels you control. Drag one where you want it, set what it says, and it stays there &mdash; with leader lines that follow. The point is an exhibit somebody else can read, which is the part most tools leave you to do again by hand.</p>
+				<p>Labels you control. Drag one where you want it, set what it says, and it stays there &mdash; with leader lines that follow. The point is an exhibit somebody else can read, which is the part that otherwise gets redone by hand in a drawing program.</p>
 			</article>
 		</div>
 		<div class="actions" style="margin-top:2.2rem">
 			<a class="btn btn-primary" href="https://hawsedc.com/engcalcs/Looped-Network.php">Open the app</a>
 			<a class="btn btn-ghost" href="https://github.com/hawstom/engcalcs">Read the source</a>
 		</div>
-		<p class="note" style="margin-top:1.6rem">Being honest about the edges: extended-period simulation is not built yet, so today it solves a single point in time. It is a drawing surface, so it wants a real screen and a pointer.</p>
+		<p class="note" style="margin-top:1.6rem">Being honest about the edges: a run over time goes through the EPANET engine, and the built-in solver has no time dimension &mdash; where the engine is unavailable the page solves a single instant and says so. A pattern attaches to a demand, not yet to a reservoir head or a pump, and rule-based controls are not built. A few things an EPANET file cannot carry back out &mdash; a pump with no curve, a label of more than one line &mdash; are named when you export rather than quietly lost. There is no water quality modelling. And it is a drawing surface, so it wants a real screen and a pointer.</p>
 	</section>
 
 	<section id="languages">

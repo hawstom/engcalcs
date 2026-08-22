@@ -158,7 +158,15 @@ register of `dev/outreach-owa-post.md` (a real question, not an announcement).
 
 Tom's ruling, 2026-08-14: the rebranded site waits until **tanks, valves and extended-period
 simulation** ship (Task 248). Those three are what Task 296 relied on when it refused *"web clone of
-EPANET"*, and they are the whole of the honesty case.
+EPANET"*, and they are the whole of the honesty case. **All three have now shipped** — tanks and
+valves 2026-08-14, the run 2026-08-18 through the EPANET engine, checked against every step of EPA's
+own `Net3.rpt`. What is left of Task 248 is a pattern on a reservoir head or a pump (248.02) and
+rule-based `[RULES]` (248.03). **"No extended-period simulation yet" is FALSE and must not be
+written again**; it stood in the landing draft until Tom caught it, three days after the run shipped.
+The built-in solver has no time dimension and is not getting one, so a run is an EPANET-engine
+capability and public copy must say which. **`.inp` EXPORT shipped the same day and the same draft
+called that missing too**, so the rule is general: check `dev/roadmap-closed-ids.md` before writing
+any "not built yet" sentence, because this page's honesty paragraph is the first thing to rot.
 
 **The gate is about SEQUENCING, not legitimacy.** It is not a hedge about our right to the name —
 see above — and it must never be cited as one.
@@ -188,6 +196,76 @@ them; recorded as **deferred, not dropped**.
   motion.
 
 Revisit when the gate clears.
+
+## 8. Their "EPANET user's dilemma", and why we decline to answer it
+
+epanetjs.com's front page poses three horns: classic EPANET is *"clunky and outdated"*; the big
+platforms are *"overpriced and bloated with features you don't need"*; browser tools *"force your
+data into the cloud."* Their tiers, read 2026-08-21, for calibration only: a free tier, Pro $950/yr,
+Teams from $4,400.
+
+**We do not answer it, and the declining is the decision.** A dilemma is a SHOPPER's device — here
+are your three bad options, buy the fourth — and §1 declines the shopper frame on purpose. An
+invitation that opens by ranking the alternatives has already become a pitch. So nothing on the
+front door is shaped as a rebuttal to this, and nothing below belongs in public copy. It is what to
+say when a person raises it with us, which they will.
+
+- **Horn 1 is a claim we must NOT make.** *"Clunky and outdated"* is about EPA's UI, and we would be
+  deriding our own engine and a public good we use for free — while §6 has us writing a courtesy
+  note to OpenWaterAnalytics. We are also not a reaction to EPANET's interface: we exist because
+  engineering happens in 27 languages, on machines with no software budget. Say what we built —
+  draw, solve, publish, in your language — never what someone else's UI lacks.
+- **Horn 2 we simply do not enter.** We have no price to compare, and §1 bans naming the vendors.
+  "There is no paid tier" is a fact about us and is the whole of our answer.
+- **Horn 3 is where we are strongest and quietest.** No account, no upload, no server-side model, and
+  it installs and runs with the cable out. State it exactly as §3.4 requires — three opt-in
+  third-party requests, named, asked per feature. Overclaiming is the one way to lose an argument we
+  currently win: anyone with a network tab can check, and *"no third-party request of any kind"* is
+  false.
+- **The fourth horn their frame cannot contain: the TOOL can be withdrawn, not just the data.** Their
+  three horns are all about where your model lives; none of them asks whether the software will
+  still be yours. GPL v3+ against FSL-1.1-MIT is that question, and it is the one comparative fact §2
+  licenses. **Is it a real argument or a debating point? Both, and the split matters.** It is real
+  for anyone whose horizon is longer than one project: a free tier is a business decision, and the
+  two-year conversion runs per released version, so the app you use today is not FLOSS today. It
+  becomes a debating point the moment we imply something is being taken away or a bait-and-switch is
+  planned — there is no evidence of either, and §1 says we are not the aggrieved party. State our
+  licence; do not narrate theirs. (§7 is this same argument aimed at a funder rather than a user.)
+
+**Where the frame is right, and where we lose.** Recorded so nobody has to rediscover it mid-
+conversation:
+
+- Their product is more finished and better staffed, and their free tier does real work today for
+  free. "Free" is not our differentiator; *irrevocable* is.
+- **"Community-owned" is an aspiration, and a serious evaluator will ask who decides.** Today the
+  answer is Tom. There is no foundation, no board, no governance document and no funding model. §1
+  turns that into the reason advisors are wanted, which is honest — but it is still a weakness, and
+  saying "we have not decided yet" is only credible while we are also asking someone to help decide.
+- They took $150,000 of founding sponsorship (§7); we have volunteer time. A funded project
+  outliving an unfunded one is the ordinary case, so **do not answer longevity with a promise that
+  we will last.** Answer it with the licence, which does not require us to.
+
+## 9. The front door's hero asset — Tom's, and still to come
+
+**Tom, 2026-08-21:** *"The biggest blocker is the graphic. I have to prepare a graphic of the real
+thing, possibly a video or an animated GIF."*
+
+The inline SVG `#net` in `dev/librewaternet-landing/index.html` is a **placeholder**, not the
+design — a drafted network standing in for a real screen. The figure is a slot: an image (PNG or
+animated GIF) or a video element drops into the same place with no layout change. What the
+replacement has to satisfy:
+
+- **A 760 × 430 box (1.77:1).** Anything materially wider or taller is cropped, not reflowed.
+- **Both themes.** The page has a full dark palette, so a screen grab with a white surround reads as
+  a bug in dark mode. Either supply a light and a dark version, or frame it so the app's own canvas
+  fills the box.
+- **What it must show, in the page's own order:** a real network on a real basemap; labels a human
+  placed, with their leader lines; the colouring. If it moves, show the RUN — tanks filling and
+  draining is the newest capability and a still cannot say it.
+- **No live trademarks and no real client system without permission**, and it must stay legible at
+  the 1160 px sheet width and at phone width.
+- The title block under the figure (Project / Junctions / Engine / Licence) is HTML and stays; it is
+  not part of the image.
 
 ---
 
