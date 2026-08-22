@@ -47,6 +47,11 @@ const L = loadLoopedNetwork(
 	"\t\tsetZoom: function (s) { state.s = s; },\n" +
 	"\t\tvisibleMapWidth: visibleMapWidth,\n" +
 	"\t\tsvgHas: function (c) { return svg.classList.contains(c); },\n" +
+	// The WHOLE class string, not a membership test: section 4 asks css/engcalcs.css which of its
+	// own rules would fire, and that question cannot be asked one guessed class at a time.
+	"\t\tsvgClasses: function () { return svg.getAttribute('class') || ''; },\n" +
+	"\t\tsetThematic: function (on) { settings.colorThematic = !!on; refreshValueColors(); },\n" +
+	"\t\tsetHideAll: setLabelsHiddenAll, hideAllOn: labelsHiddenAllOn,\n" +
 	"\t\tnodeEl: function (id) { return nodeEls[id]; },\n" +
 	"\t\tlinkEl: function (id) { return linkEls[id]; },\n" +
 	"\t\tlabelEl: function (id) { return labelEls[id]; },\n" +
@@ -181,6 +186,141 @@ console.log('\n--- an anchored Text label is re-laid-out on every zoom, or its l
 		ok('the leader lands on the label\'s own box edge at zoom ' + z, leaderIsOnTheBoxEdge(tag.id),
 			JSON.stringify(L.leaderEnd(tag.id)) + ' vs box ' + JSON.stringify(L.textBox(tag.id)));
 	});
+}
+
+// ---- 4. NO SUPPRESSOR REACHES THE USER'S OWN TEXT (Task 428) ---------------------------------
+// Tom, 2026-08-18: *"Turning off Text on 'no labels' is unexpected."* Thematic mode used to put
+// `.lpn-thematic` on the <svg> and css/engcalcs.css hid `.lpn-thematic .lpn-lbl` -- and a Text
+// object the user typed carries `.lpn-lbl` exactly as a generated label does, so somebody's own
+// writing vanished when they changed colouring mode.
+//
+// **THIS SECTION READS THE REAL STYLESHEET, and that is the point.** The defect lived in the JOIN
+// between two files: the JS knew which elements were authored content, the CSS selector could not
+// see it, and neither file was wrong on its own. A check that asserted "the svg carries class X"
+// would pass against any class, including one the stylesheet hides everything with -- the stub
+// would have removed the very coupling that broke. So the question asked here is the browser's own:
+// GIVEN what the JS put on the <svg>, would any hiding rule in css/engcalcs.css fire on this
+// element? Both halves are asserted in every state -- the generated label DOES hide, the Text
+// label does NOT -- because a harness in which nothing hides at all would pass the second half
+// alone, which is exactly the wrong-reason pass dev/testing-notes.md warns about.
+const fs = require('fs'), path = require('path');
+const CSS_PATH = path.join(__dirname, '..', '..', 'css', 'engcalcs.css');
+
+// A deliberately SMALL CSS reader: comments out, at-rule preludes treated as nesting, every rule
+// kept as {selector list, declarations}. It is not a CSS engine and does not need to be -- a
+// selector shape it cannot read is recorded rather than quietly answering "no match".
+function cssRules(src) {
+	var s = src.replace(/\/\*[\s\S]*?\*\//g, ''), out = [], sel = '', i = 0;
+	while (i < s.length) {
+		var c = s.charAt(i);
+		if (c === '{') {
+			var pre = sel.trim(); sel = '';
+			if (pre.charAt(0) === '@') { i++; continue; }   // @media/@supports: nest, don't consume
+			var d = 1, j = i + 1, body = '';
+			while (j < s.length) {
+				var k = s.charAt(j);
+				if (k === '{') { d++; } else if (k === '}') { d--; if (d === 0) { break; } }
+				body += k; j++;
+			}
+			out.push({ sel: pre, body: body });
+			i = j + 1; continue;
+		}
+		if (c === '}') { sel = ''; i++; continue; }
+		sel += c; i++;
+	}
+	return out;
+}
+// A compound this reader understands is class tokens and nothing else. Ids, element names,
+// combinators and functional pseudo-classes are recorded as unreadable.
+function classTokens(compound) {
+	if (!/^(\.[A-Za-z0-9_-]+)+$/.test(compound)) { return null; }
+	return compound.split('.').filter(Boolean);
+}
+var unreadable = [];
+// `svgCls` is what the JS put on the <svg>; `elCls` is the element's own class attribute. Every
+// hiding rule that can reach a label is either one compound on the target or an ancestor compound
+// plus a target compound -- and the only classed ancestor a label has is the <svg> itself, because
+// the world and layer <g>s carry no classes (the stub builds them that way, as the page does).
+function ruleHides(rule, svgCls, elCls) {
+	if (!/(^|[;\s])(display\s*:\s*none|visibility\s*:\s*hidden)/.test(rule.body)) { return false; }
+	var svgSet = svgCls.split(/\s+/).filter(Boolean), elSet = elCls.split(/\s+/).filter(Boolean);
+	function has(set, toks) { return toks.every(function (t) { return set.indexOf(t) >= 0; }); }
+	return rule.sel.split(',').some(function (one) {
+		var parts = one.trim().split(/\s+/);
+		if (parts.length > 2) { unreadable.push(one.trim()); return false; }
+		var target = classTokens(parts[parts.length - 1]);
+		if (!target) { unreadable.push(one.trim()); return false; }
+		if (!has(elSet, target)) { return false; }
+		if (parts.length === 1) { return true; }
+		var anc = classTokens(parts[0]);
+		if (!anc) { unreadable.push(one.trim()); return false; }
+		return has(svgSet, anc);
+	});
+}
+console.log('\n--- no way of hiding labels reaches a Text object the user placed ---');
+{
+	const RULES = cssRules(fs.readFileSync(CSS_PATH, 'utf8'));
+	ok('the stylesheet parsed into rules at all', RULES.length > 50, RULES.length + ' rules');
+	// The reader's own guard. The rule the original defect was written in must be one this reader
+	// can actually evaluate -- if a future edit reshaped it into a form classTokens() cannot read,
+	// this whole section would stop being able to see the defect and would still say ALL PASS.
+	ok('the reader can evaluate an `.ancestor .target` class rule, both ways',
+		ruleHides({ sel: '.lpn-labels-hidden .lpn-annotation', body: 'visibility: hidden;' },
+			'lpn-labels-hidden', 'lpn-lbl lpn-annotation') &&
+		!ruleHides({ sel: '.lpn-labels-hidden .lpn-annotation', body: 'visibility: hidden;' },
+			'lpn-labels-hidden', 'lpn-lbl'));
+
+	L.setZoom(1);
+	function gen() { return L.nodeEl(a.id).text; }
+	function own() { return L.labelEl(title.id).text; }
+	function hiddenByCss(e) {
+		var svgCls = L.svgClasses(), elCls = classes(e);
+		return RULES.some(function (r) { return ruleHides(r, svgCls, elCls); });
+	}
+	function state(name) {
+		ok(name + ': the generated node label is hidden', hiddenByCss(gen()),
+			'svg="' + L.svgClasses() + '" el="' + classes(gen()) + '"');
+		ok(name + ': the user\'s own Text is NOT', !hiddenByCss(own()),
+			'svg="' + L.svgClasses() + '" el="' + classes(own()) + '"');
+	}
+	// Baseline, so the states below mean something: with nothing suppressed neither is hidden.
+	ok('with nothing suppressed the generated label is drawn', !hiddenByCss(gen()));
+	ok('...and so is the Text', !hiddenByCss(own()));
+
+	// (a) THEMATIC MODE -- the one Tom reported.
+	L.setThematic(true);
+	state('thematic map');
+	L.setThematic(false);
+	ok('switching thematic off brings the generated label back', !hiddenByCss(gen()));
+	ok('...and left the Text alone throughout', !hiddenByCss(own()));
+
+	// (b) THE LABELS BOX'S BLANKET HIDE -- the second half of the ruling, and the reason the
+	// thematic mode need not be a second interface for this.
+	L.setHideAll(true);
+	ok('the blanket hide records itself', L.hideAllOn());
+	state('temporarily hide all');
+	L.setHideAll(false);
+	ok('unticking it brings the generated label back', !hiddenByCss(gen()));
+	ok('...and it is TEMPORARY: nothing outside this session holds it', !L.hideAllOn());
+
+	// (c) THE SUPPRESSORS COMPOSE, and none of them is a per-element edit: two on at once is still
+	// one class on the <svg>, and turning one off does not reveal labels the other is still hiding.
+	L.setThematic(true); L.setHideAll(true);
+	state('both at once');
+	L.setThematic(false);
+	ok('one suppressor off, the other still on: the generated label stays hidden', hiddenByCss(gen()));
+	ok('...and the Text is still there', !hiddenByCss(own()));
+	L.setHideAll(false);
+	ok('both off: everything is back', !hiddenByCss(gen()) && !hiddenByCss(own()));
+
+	// The reader's blind-spot report, scoped to the selectors that could possibly reach a label.
+	// A rule about print areas or tab strips is none of this check's business; one about .lpn-lbl
+	// that the reader silently skipped would be.
+	var blind = unreadable.filter(function (sel) {
+		return /lpn-lbl|lpn-annotation|lpn-leader|lpn-draglbl/.test(sel);
+	});
+	ok('every hiding rule that mentions a label class was readable', blind.length === 0,
+		blind.join(' | '));
 }
 
 console.log('\n--- the halo toggle ---');

@@ -252,15 +252,31 @@ ok('clearFields disposes one tooltip per .ec-help', disposed === 2, 'disposed=' 
 ok('clearFields empties the container', box.innerHTML === '');
 global.window.bootstrap.Tooltip.getInstance = () => null;
 
+// **KEYS WRITTEN AHEAD OF THE COMMIT THAT OWNS lib/lang.ec.en.php.** A translation sprint -- or a
+// concurrent track -- holds that file, so work landing beside one names its keys in the
+// `pc.key || 'English'` fallback position and ships the English literal until the key arrives. Each
+// pending key is listed here rather than being invisible, and the list is SELF-CLEANING: a pending
+// key that HAS arrived fails below, so whoever adds it to the lang file is told to delete the line
+// in the same commit. EMPTY is the normal state.
+//
+// Read by ALL THREE checks below, not only the dangling one: a key that has not reached the lang
+// file has not reached Looped-Network.php's pageConfig either, and cannot -- an emitted
+// `$ec_lang['...']` that does not exist is the "undefined" pageconfig_check.php exists to stop.
+const PENDING_KEYS = [
+	// Task 428's blanket hide, in the Labels box. The English lives in the JS fallbacks.
+	'lpn_labels_hide_all', 'lpn_labels_hide_all_tip', 'lpn_labels_hide_all_note'
+];
+function pending(k) { return PENDING_KEYS.indexOf(k) >= 0; }
+
 // --- 4. every tip key the JS reads actually exists in the lang file -----
 const jsSrc = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
 const wanted = [...new Set([...jsSrc.matchAll(/pc\.(lpn_[a-z0-9_]*_tip)\b/g)].map(x => x[1]))];
-const missing = wanted.filter(k => !(k in EngCalcs.pageConfig));
+const missing = wanted.filter(k => !(k in EngCalcs.pageConfig) && !pending(k));
 ok('every pc.*_tip the JS reads exists in lang.ec.en.php', missing.length === 0, missing.join(','));
 
 // --- 5. ...and each is also emitted into pageConfig by the PHP page -----
 const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
-const notEmitted = wanted.filter(k => php.indexOf('\t' + k + ':') < 0);
+const notEmitted = wanted.filter(k => php.indexOf('\t' + k + ':') < 0 && !pending(k));
 ok('every tip key is emitted into pageConfig', notEmitted.length === 0, notEmitted.join(','));
 
 // --- 6. no key referenced anywhere in JS/PHP is absent from the lang file
@@ -268,22 +284,7 @@ const allRefs = [...new Set([
   ...[...jsSrc.matchAll(/pc\.(lpn_[a-z0-9_]+)/g)].map(x => x[1]),
   ...[...php.matchAll(/\$ec_lang\['(lpn_[a-z0-9_]+)'\]/g)].map(x => x[1])
 ])];
-// **KEYS WRITTEN AHEAD OF THE SPRINT THAT OWNS lib/lang.ec.en.php.** A translation sprint holds that
-// file, so work landing beside one names its keys in the `pc.key || 'English'` fallback position and
-// ships the English literal until the sprint adds them. Each one is listed here rather than being
-// invisible -- and the list is SELF-CLEANING: a pending key that HAS arrived fails below, so whoever
-// adds it to the lang file is told to delete the line here in the same commit.
-// **EMPTY, AND THAT IS THE NORMAL STATE.** A key goes on this list only while a JS literal is
-// waiting for `lib/lang.ec.en.php` -- which happens when a feature lands during a translation
-// sprint that owns that file. The check below fails when a pending key ARRIVES, so the list cleans
-// itself: whoever adds the key is told to delete the line. Task 145's five placement-bar keys went
-// on 2026-08-18 and came off the same day.
-// **EMPTY, AND THAT IS THE NORMAL STATE.** A key goes on this list only while a JS literal waits for
-// `lib/lang.ec.en.php` -- which happens when a feature lands while a translation sprint owns that
-// file. The check below fails when a pending key ARRIVES, so the list cleans itself: whoever adds
-// the key is told to delete the line. The ramp picker's eleven went on and came off the same day.
-const PENDING_KEYS = [];
-const dangling = allRefs.filter(k => !(k in EngCalcs.pageConfig) && PENDING_KEYS.indexOf(k) < 0);
+const dangling = allRefs.filter(k => !(k in EngCalcs.pageConfig) && !pending(k));
 ok('no dangling lpn_ key reference', dangling.length === 0, dangling.join(','));
 const arrived = PENDING_KEYS.filter(k => k in EngCalcs.pageConfig);
 ok('every key still on the pending list is still pending', arrived.length === 0,
