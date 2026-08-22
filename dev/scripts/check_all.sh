@@ -79,6 +79,11 @@ run_check "html balance (every page)"    blocking php dev/scripts/html_balance_c
 # target. Neither is visible to the person who introduced it.
 run_check "pageConfig php->js bridge"    blocking php dev/scripts/pageconfig_check.php
 run_check "tip markup via helpers"       blocking php dev/scripts/tip_markup_check.php
+# Task 478. Tabbing down a calculator walked sideways through thirty one-character "X" links --
+# 35-43% of every keyboard stop on the worst pages, with no keyboard way to bring a line back. This
+# renders each page and asserts, blocking, that the per-line hide control costs at most ONE stop;
+# it prints the per-page stop table as advisory so the number is measured rather than guessed.
+run_check "form keyboard stops"          blocking php dev/scripts/focus_order_check.php
 # Task 319. A log column is written by a machine and read by awk, so a stray tab in visitor-supplied
 # text forges a row that looks exactly like a real one. The defect was DUPLICATION -- the same three
 # unfiltered lines pasted into five writers -- so this checks the helper's behaviour AND that nobody

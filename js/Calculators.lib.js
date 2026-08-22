@@ -1053,3 +1053,71 @@ EngCalcs.adjustInputWidth = function () {
 		el.style.width = inputWidth;
 	});
 };
+
+// ---- The line chooser: one keyboard door to show/hide a line (ROADMAP Task 478 phase 1) -------
+//
+// The per-line "X" is unchanged for mouse and touch but is out of the tab order now
+// (tabindex="-1" + aria-hidden="true"), so this closed <details> of checkboxes is the keyboard
+// path to the same function -- and the only path of any kind that brings a hidden line BACK
+// without a page reload.
+//
+// ONE MECHANISM WRITES A LINE'S VISIBILITY, and it is Bootstrap's Collapse. The X drives these
+// same rows through data-bs-toggle="collapse", so a raw `classList.add('show')` here would be a
+// second writer of one row's state -- exactly the write-seam defect CLAUDE.md warns about, and it
+// would desynchronise Bootstrap's own bookkeeping the first time the two were used together.
+// getOrCreateInstance(row, {toggle: false}) is the right call: `toggle: false` because the
+// constructor's default is to toggle immediately, and getOrCreateInstance (not `new`) because the
+// X may already have built an instance for this row. The one classList path below runs only when
+// the Bootstrap bundle is absent, in which case the X is dead too and there is no second writer.
+//
+// THE SEAM THIS MUST NOT BREAK: a line can also be hidden by the PAGE'S OWN LOGIC, with
+// `style.display` -- js/orifice.js and js/orifice-drain-time.js hide #w_row when the orifice is
+// round, because a round orifice has no width. That is not the user hiding a line, so the chooser
+// neither offers it nor resurrects it: such a line's checkbox is hidden from the panel entirely
+// while the page keeps it suppressed, and reappears, correctly stated, when the page stops.
+EngCalcs.initLineChoosers = function () {
+	var choosers = document.querySelectorAll('.engcalcs-line-chooser');
+	if (!choosers.length) { return; }
+
+	function lineOf(checkbox) {
+		return document.getElementById(checkbox.getAttribute('data-ec-line'));
+	}
+	// Suppressed BY THE PAGE, not by the user. Inline display:none is the page's own signal; the
+	// user's hiding is the absence of the Bootstrap `show` class.
+	function suppressedByPage(row) {
+		return row.style.display === 'none';
+	}
+	function setLineShown(row, shown) {
+		if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+			var c = bootstrap.Collapse.getOrCreateInstance(row, { toggle: false });
+			if (shown) { c.show(); } else { c.hide(); }
+		} else {
+			row.classList.toggle('show', shown);
+		}
+	}
+	// The X can change a line behind the panel's back, so every checkbox is re-read from the DOM
+	// each time the panel opens rather than trusting what it last showed.
+	function sync(chooser) {
+		chooser.querySelectorAll('input[data-ec-line]').forEach(function (cb) {
+			var row = lineOf(cb);
+			var item = cb.closest ? cb.closest('.engcalcs-line-chooser-item') : null;
+			if (!row || suppressedByPage(row)) { if (item) { item.hidden = true; } return; }
+			if (item) { item.hidden = false; }
+			cb.checked = row.classList.contains('show');
+		});
+	}
+
+	choosers.forEach(function (chooser) {
+		chooser.addEventListener('toggle', function () {
+			if (chooser.open) { sync(chooser); }
+		});
+		chooser.addEventListener('change', function (e) {
+			var cb = e.target;
+			if (!cb || !cb.getAttribute || !cb.getAttribute('data-ec-line')) { return; }
+			var row = lineOf(cb);
+			if (!row || suppressedByPage(row)) { return; }
+			setLineShown(row, cb.checked);
+		});
+		sync(chooser);
+	});
+};
