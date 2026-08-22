@@ -418,14 +418,22 @@ console.log('== thematic mode ==');
 {
 	fresh('us');
 	const s = L.getSettings();
+	// **THE MARK IS `lpn-labels-hidden`, NOT A CLASS OF ITS OWN** (Task 428). Thematic mode used to
+	// add `lpn-thematic`, which css/engcalcs.css hid `.lpn-lbl` under -- and a Text object the user
+	// typed is a `.lpn-lbl` too, so the mode took their own writing off the map. Every suppressor
+	// now arrives at applyLabelVisibility() and hides `.lpn-annotation`, which authored content is
+	// not a member of by construction. dev/lpn-spike/label-visibility-harness.js section 4 is where
+	// that is asserted against the real stylesheet; this is the colour side of the same fact.
 	ok('thematic is OFF by default -- it is a mode, never the state a user is handed',
-		!s.colorThematic && !L.svgClasses().contains('lpn-thematic'));
+		!s.colorThematic && !L.svgClasses().contains('lpn-labels-hidden'));
 	s.colorThematic = true;
 	L.refreshValueColors();
-	ok('turning it on marks the svg', L.svgClasses().contains('lpn-thematic'));
+	ok('turning it on marks the svg', L.svgClasses().contains('lpn-labels-hidden'));
+	ok('...through the ONE label-suppression class, never a second one of its own',
+		!L.svgClasses().contains('lpn-thematic'));
 	s.colorThematic = false;
 	L.refreshValueColors();
-	ok('turning it off unmarks it', !L.svgClasses().contains('lpn-thematic'));
+	ok('turning it off unmarks it', !L.svgClasses().contains('lpn-labels-hidden'));
 	// THE POINT OF DOING IT WITH A CLASS. The mode must not have written anything into the user's
 	// own label choices, or turning it off could not give them back.
 	fresh('us');
@@ -435,7 +443,7 @@ console.log('== thematic mode ==');
 	s.colorThematic = false; L.refreshValueColors();
 	ok('the mode never edits the user\'s label choices while it is ON', during === before);
 	ok('so turning it off gives back exactly the labels that were there',
-		L.labelSettingsJson() === before && !L.svgClasses().contains('lpn-thematic'));
+		L.labelSettingsJson() === before && !L.svgClasses().contains('lpn-labels-hidden'));
 }
 
 // ---- 9. the colour key -----------------------------------------------------------------------

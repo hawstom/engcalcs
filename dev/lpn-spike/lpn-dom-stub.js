@@ -26,11 +26,20 @@ function mkEl(tag) {
     nodeType: 1,
     tagName: (tag || 'div').toUpperCase(), _tag: tag, children: [], dataset: {},
     style: { _props: {}, setProperty(k, v) { this._props[k] = v; }, getPropertyValue(k) { return this._props[k] || ''; }, removeProperty(k) { delete this._props[k]; } },
+    // **classList AND THE `class` ATTRIBUTE ARE THE SAME THING**, as they are in a browser. They
+    // were two independent stores here, and that is a stub removing a coupling: the page declares
+    // membership through setAttribute('class', ...) (el(), annotationEl()) and suppresses through
+    // classList.toggle() on the <svg>, so a harness asking "would this stylesheet rule fire on this
+    // element" got an empty class attribute for an element the code had just classed. Backed by the
+    // attribute string, which is what a rule is written against.
     classList: {
-      _s: new Set(),
-      add(...c) { c.forEach(x => this._s.add(x)); }, remove(...c) { c.forEach(x => this._s.delete(x)); },
-      contains(c) { return this._s.has(c); },
-      toggle(c, on) { if (on === undefined) { on = !this._s.has(c); } if (on) { this._s.add(c); } else { this._s.delete(c); } return on; }
+      _el: null,
+      _toks() { return String(this._el['class'] || '').split(/\s+/).filter(Boolean); },
+      _put(t) { this._el['class'] = t.join(' '); },
+      add(...c) { const t = this._toks(); c.forEach(x => { if (t.indexOf(x) < 0) { t.push(x); } }); this._put(t); },
+      remove(...c) { this._put(this._toks().filter(x => c.indexOf(x) < 0)); },
+      contains(c) { return this._toks().indexOf(c) >= 0; },
+      toggle(c, on) { if (on === undefined) { on = !this.contains(c); } if (on) { this.add(c); } else { this.remove(c); } return on; }
     },
     className: '', id: '', title: '', type: '', value: '', _text: '', _innerHTML: '',
     checked: false, placeholder: '', step: '', min: '', _listeners: {},
@@ -167,6 +176,10 @@ function mkEl(tag) {
       this._text = v === undefined || v === null ? '' : String(v);
     }
   });
+  // Each element gets its OWN classList view, bound to that element's attribute -- the object
+  // literal above is shared by construction otherwise, and one shared class set across every
+  // element is a worse fiction than the one this replaced.
+  el.classList = Object.assign({}, el.classList, { _el: el });
   return el;
 }
 
