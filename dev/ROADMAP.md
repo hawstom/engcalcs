@@ -113,13 +113,6 @@ the block.
     paid agents; CLAUDE.md forbids inferring that from a general "proceed". The English is already
     edited, so the whole remaining task is the 26 renderings.
 
-- 100|428| **Thematic mode must not hide TEXT.** Tom, 2026-08-18: *"Turning off Text on 'no labels' is
-  unexpected."* A Text object is a note the user placed, not a generated label, and the two are
-  already different things everywhere else (Tasks 342, 407).
-  - **And the right home for a blanket hide is the Labels box, as "Temporarily hide all"** — which
-    would leave Text visible, because Text is not a label. Unticking every field there is already an
-    adequate interface; the thematic mode should not be a second one.
-
 - 100|436| **A wheel notch on the map costs a full label relayout, and that is editor-wide.**
   Measured on Net3, median per notch: 157 ms XY, 162 ms lat/lon, **26 ms with labels off**. lat/lon is
   not intrinsically slower — the georeferencing tool is ~20x cheaper than the editor it runs inside.
