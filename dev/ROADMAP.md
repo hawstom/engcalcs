@@ -373,6 +373,9 @@ the block.
   `lpn_notes_*` (Task 448's stability note and the Notes review) and `lpn_file_import_inp_tip`. Plus
   the keys written since: `lpn_color_mode_manual`, `lpn_time_no_period`, and the three
   `lpn_basemap_satellite_*`. Needs Tom's authorization, and a Wave 0 over the changed set first.
+  **ASKED AND HELD, 2026-08-21:** offered a full 26-language run or a core-four run, Tom chose
+  "hold the sprint entirely". The queue keeps accumulating; do not re-propose without a reason he
+  has not already heard.
   - **Earned 2026-08-21 by the menu/toolbar rework:** `lpn_clean_map` CHANGED to Tom's own wording
     ("Reduce map clutter", replacing "Clean map" — he called it "more honest and understandable"), so
     26 translations of it are now stale. NEW: `lpn_tables_menu`, `lpn_tables_menu_tip`,
@@ -1004,6 +1007,29 @@ the block.
     annotations gives branded types in place, and the Node harnesses already provide a
     build-adjacent place to run a checker.
   - Evaluate together before any of it — this is on the roadmap as a possibility, not a plan.
+
+- 5|482| **EPANET's vocabulary collides with ours, and we are keeping ours.** Tom, 2026-08-21, from
+  a session with EPANET: what we call **Labels** EPANET calls **Notation/Annotation**, and what
+  EPANET calls **Labels** is what we call **Text** objects.
+  - **RULED: stay our course, at priority 5.** Tom's reasoning, and it is the argument to re-read
+    before anyone reopens this: *"Annotation probably has no specific meaning, and various software
+    apps have used terms like Results Field, Map Output, or Results Variable. And for Label (Text
+    object), the same holds true, with most using the word 'Text' as part of their terminology, such
+    as Drawing Text, Free Text Decoration, Map Graphic Text, Map Note, Text Annotation."* **There is
+    no industry standard to defer to here**, so EPANET's words carry no more authority than ours, and
+    a rename would cost a 26-language key family plus the vocabulary inside saved projects.
+  - **Recorded so NEW strings do not drift.** The decision is cheap now and expensive later: every
+    string written in the other vocabulary adds to the rename we have just declined.
+  - **A real feature gap found the same day, and it is separate: EPANET can METER a node or link.**
+    A Text/Label is associated with an element, and EPANET puts that element's current notation
+    property — it allows exactly one at a time, for links and for nodes each — under the text you
+    typed, all in a rectangular bubble with a pale yellow background. We have no equivalent. Note the
+    asymmetry that makes it interesting rather than simply missing: **our labels already carry
+    MULTIPLE properties and drag freely**, which is `dev/positioning.md` §4. Copying it wholesale
+    would be scope gravity.
+  - **The general point, which outranks both bullets.** Tom: *"there is an unknown amount of EPANET
+    that we don't yet implement."* The LibreWaterNet landing page now says exactly that, instead of
+    listing edges as though the list were complete.
 
 - 5|400| **Phase 3 — bounded local search on the residue. LOWERED 60→15, Tom 2026-08-17: "Phases 1
   and 2 are good enough for GIS mode or management mode. Phase 3 may be helpful for report mode."**

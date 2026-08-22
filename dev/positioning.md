@@ -215,8 +215,15 @@ say when a person raises it with us, which they will.
   note to OpenWaterAnalytics. We are also not a reaction to EPANET's interface: we exist because
   engineering happens in 27 languages, on machines with no software budget. Say what we built —
   draw, solve, publish, in your language — never what someone else's UI lacks.
-- **Horn 2 we simply do not enter.** We have no price to compare, and §1 bans naming the vendors.
-  "There is no paid tier" is a fact about us and is the whole of our answer.
+- **Horn 2 is OURS, and it is more specific than "we are free."** Tom, 2026-08-21: *"our
+  differentiator **is** no-cost scenarios and everything else."* **Scenarios are behind their Pro
+  tier at $950/yr, and behind ours at nothing** — so is the advanced model builder. That makes free a
+  checkable claim about a named feature a working engineer is quoted a price for, not a vague virtue.
+  Say *everything is free, including the parts that are normally the paid tier.* Still no vendor
+  named and still no price of ours to compare (§1) — the fact is about us.
+  **Superseded, and it would be re-proposed by anyone reasoning from first principles: "free is not
+  our differentiator, irrevocable is."** That is wrong on the facts. Irrevocable is the SECOND
+  argument, not a replacement for the first.
 - **Horn 3 is where we are strongest and quietest.** No account, no upload, no server-side model, and
   it installs and runs with the cable out. State it exactly as §3.4 requires — three opt-in
   third-party requests, named, asked per feature. Overclaiming is the one way to lose an argument we
@@ -235,8 +242,8 @@ say when a person raises it with us, which they will.
 **Where the frame is right, and where we lose.** Recorded so nobody has to rediscover it mid-
 conversation:
 
-- Their product is more finished and better staffed, and their free tier does real work today for
-  free. "Free" is not our differentiator; *irrevocable* is.
+- Their product is more finished and better staffed, and their free tier does real work today. What
+  their free tier does NOT do is the paid part — see horn 2, which is where our answer lives.
 - **"Community-owned" is an aspiration, and a serious evaluator will ask who decides.** Today the
   answer is Tom. There is no foundation, no board, no governance document and no funding model. §1
   turns that into the reason advisors are wanted, which is honest — but it is still a weakness, and
