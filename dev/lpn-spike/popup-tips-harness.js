@@ -262,10 +262,7 @@ global.window.bootstrap.Tooltip.getInstance = () => null;
 // Read by ALL THREE checks below, not only the dangling one: a key that has not reached the lang
 // file has not reached Looped-Network.php's pageConfig either, and cannot -- an emitted
 // `$ec_lang['...']` that does not exist is the "undefined" pageconfig_check.php exists to stop.
-const PENDING_KEYS = [
-	// Task 428's blanket hide, in the Labels box. The English lives in the JS fallbacks.
-	'lpn_labels_hide_all', 'lpn_labels_hide_all_tip', 'lpn_labels_hide_all_note'
-];
+const PENDING_KEYS = [];
 function pending(k) { return PENDING_KEYS.indexOf(k) >= 0; }
 
 // --- 4. every tip key the JS reads actually exists in the lang file -----

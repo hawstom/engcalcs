@@ -2005,6 +2005,9 @@ $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
 $ec_lang['lpn_labels_decimals_tip']='Decimal places shown for this label';
+$ec_lang['lpn_labels_hide_all']='Temporarily hide all';
+$ec_lang['lpn_labels_hide_all_tip']='Takes every node and link label off the map in one step, without changing which fields you have chosen above. Text you placed yourself is not a label and stays on the map.';
+$ec_lang['lpn_labels_hide_all_note']='Text you placed stays on the map.';
 $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
@@ -2296,7 +2299,7 @@ $ec_lang['lpn_color_ramp_gray']='Light to dark gray';
 $ec_lang['lpn_settings_color_reverse']='Reverse the color order';
 $ec_lang['lpn_color_none']='No color';
 $ec_lang['lpn_settings_color_thematic']='Thematic map (colors only)';
-$ec_lang['lpn_settings_color_thematic_tip']='Hides every label so that only the colors are left on the map. Your label choices are kept, and turning this off brings them back.';
+$ec_lang['lpn_settings_color_thematic_tip']='Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.';
 $ec_lang['lpn_settings_color_key_position']='Color legend position';
 $ec_lang['lpn_settings_color_breaks']='Color band boundaries';
 $ec_lang['lpn_settings_color_equal_intervals']='Equal intervals';

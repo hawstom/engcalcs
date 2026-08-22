@@ -958,17 +958,16 @@ html[lang="zh"] .ec-welcome {
    an inline style is what the stylesheet's own black loses to, and clearing it restores that black
    exactly rather than needing a second rule to undo the first. */
 
-/* TASK 327's THEMATIC MODE, in one declaration. Two honest products: a DRAWING (dark linework and
-   labels -- what you plot) and a THEMATIC MAP (colour by one field, no labels -- what you read at
-   a glance across 97 nodes). EPANET's mistake is not having colour, it is having only the second
-   and making the first hard, so this is a MODE and never the default.
-   The labels are hidden by a CLASS ON THE SVG rather than by switching labelSettings off. That
-   distinction is the whole reason the mode is reversible: after switching the mode off, the user
-   gets back exactly the labels they had, and nothing they see afterwards is a state this code
-   wrote into their project. Flow arrows deliberately stay -- direction is not a number, and it is
-   the one annotation you still need at a glance. */
-.lpn-thematic .lpn-lbl,
-.lpn-thematic .lpn-leader { display: none; }
+/* TASK 327's THEMATIC MODE HAS NO RULE HERE ANY MORE, and that is the fix for Task 428.
+   It used to be `.lpn-thematic .lpn-lbl { display: none }` -- and `.lpn-lbl` is worn by generated
+   labels AND by the Text the user placed, so a selector could not tell authored content from
+   annotation and the mode silently deleted the user's own notes from view. Tom, 2026-08-18:
+   *"Turning off Text on 'no labels' is unexpected."*
+   Suppression now goes through applyLabelVisibility() in js/looped-network.js, the ONE seam, which
+   hides `.lpn-annotation` -- a membership annotationEl() declares at the build site, where the
+   difference is actually known. Do not reinstate a rule here; a second path is the whole defect.
+   What survives unchanged: the mode is still reversible because labelSettings is never written,
+   and flow arrows still stay, direction not being a number. */
 
 /* The colour key. Its own overlay, created by colorLegendEl() in js/looped-network.js and placed
    by applyColorLegendPosition() from settings.colorLegendPosition -- so top/bottom/left/right are

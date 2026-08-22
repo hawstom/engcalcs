@@ -1040,6 +1040,9 @@
         "lpn_labels_heading_node": "Node labels",
         "lpn_labels_heading_link": "Link labels",
         "lpn_labels_decimals_tip": "Decimal places shown for this label",
+        "lpn_labels_hide_all": "Temporarily hide all",
+        "lpn_labels_hide_all_tip": "Takes every node and link label off the map in one step, without changing which fields you have chosen above. Text you placed yourself is not a label and stays on the map.",
+        "lpn_labels_hide_all_note": "Text you placed stays on the map.",
         "lpn_labels_mark_extrema": "Mark highest and lowest values",
         "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map (an overline), and a line below the lowest value of that kind (an underline), so you can pick out the two ends without reading the numbers.",
         "lpn_settings_apply_to_all": "Apply to all",
@@ -1171,7 +1174,7 @@
         "lpn_settings_color_reverse": "Reverse the color order",
         "lpn_color_none": "No color",
         "lpn_settings_color_thematic": "Thematic map (colors only)",
-        "lpn_settings_color_thematic_tip": "Hides every label so that only the colors are left on the map. Your label choices are kept, and turning this off brings them back.",
+        "lpn_settings_color_thematic_tip": "Hides the node and link labels so that only the colors are left on the map. Text you placed yourself stays. Your label choices are kept, and turning this off brings them back.",
         "lpn_settings_color_key_position": "Color legend position",
         "lpn_settings_color_breaks": "Color band boundaries",
         "lpn_settings_color_equal_intervals": "Equal intervals",
@@ -1262,7 +1265,7 @@
         "lpn_field_demand_pattern": "Demand pattern",
         "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
     },
-    "count": 1260,
+    "count": 1263,
     "active_prefixes": [
         "about",
         "bpn",
