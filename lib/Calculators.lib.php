@@ -282,29 +282,44 @@ function ecLineLabelText($html)
 }
 
 /**
- * ONE KEYBOARD DOOR PER COLUMN to the show/hide-a-line function (ROADMAP Task 478 phase 1).
+ * THE ONE KEYBOARD DOOR to the show/hide-a-line function, and the only way to un-hide a line
+ * without reloading the page (ROADMAP Task 478 phase 1; redesigned the same day).
  *
- * The per-line "X" is kept exactly where it is for mouse and touch, but carries tabindex="-1"
- * and aria-hidden="true" -- so up to thirty one-character links leave the tab order. This
- * <details> replaces them with a single stop while it is closed (a closed <details> does not
- * render its contents, so none of the checkboxes are focusable), and it is also the only way
- * that has ever existed to bring a hidden line BACK without reloading the page.
+ * The per-line "X" keeps its place and its click, but carries tabindex="-1" and aria-hidden="true"
+ * -- so up to thirty one-character links leave the tab order. This closed <details> is what puts
+ * the function back on the keyboard, at exactly ONE stop: a closed <details> does not render its
+ * contents, so none of the checkboxes are focusable. Closed by default on purpose -- open, it
+ * would cost one stop per line all over again.
  *
- * Closed by default on purpose: open, it would cost one stop per line all over again.
+ * WHY IT SITS WITH THE PRINTABLE VERSION BUTTON, and not under each column (Tom, 2026-08-21,
+ * browser test: *"What is 'the chooser'? The line comes back on reload. The hint is on the
+ * Printable version button."*). Two facts in that sentence. He did not recognise a generic
+ * accessibility door dropped under a column of numbers, and the knowledge of how to get a line
+ * back lived on the print button. Hiding a line is not a general-purpose view feature -- it is
+ * PRINT PREPARATION, the way you drop a line you do not want on the sheet. So the control that
+ * hides lines and the control that prints them are one group, at the foot of the form where the
+ * printing decision is actually made. Two per-column choosers also cost two keyboard stops for
+ * one function; one costs one, and the two columns survive as headings inside it.
  */
-function echoLineChooser($lines, $id)
+function echoLineChooser($groups)
 {
     global $ec_lang;
-    if (!$lines) { return; }
+    $any = false;
+    foreach ($groups as $g) { if ($g['lines']) { $any = true; } }
+    if (!$any) { return; }
 ?>
-					<details class="engcalcs-line-chooser d-print-none" data-ec-chooser="<?=$id?>">
-						<summary><?=$ec_lang['view_lines_chooser']?></summary>
-						<div class="engcalcs-line-chooser-body">
-<?php foreach ($lines as $line) : ?>
-							<label class="engcalcs-line-chooser-item"><input type="checkbox" data-ec-line="<?=$line['id']?>" checked /> <?=htmlspecialchars($line['label'], ENT_QUOTES, 'UTF-8')?></label>
+	<details class="engcalcs-line-chooser d-print-none" data-ec-chooser="lines">
+		<summary><?=$ec_lang['view_lines_chooser']?></summary>
+		<div class="engcalcs-line-chooser-body">
+<?php foreach ($groups as $group) : ?>
+<?php if (!$group['lines']) { continue; } ?>
+			<div class="engcalcs-line-chooser-group"><?=$group['heading']?></div>
+<?php foreach ($group['lines'] as $line) : ?>
+			<label class="engcalcs-line-chooser-item"><input type="checkbox" data-ec-line="<?=$line['id']?>" checked /> <?=htmlspecialchars($line['label'], ENT_QUOTES, 'UTF-8')?></label>
 <?php endforeach; ?>
-						</div>
-					</details>
+<?php endforeach; ?>
+		</div>
+	</details>
 <?php
 }
 
@@ -360,16 +375,17 @@ document.addEventListener('DOMContentLoaded', function() {
 								<?php // tabindex="-1" AND aria-hidden="true" together: the canonical duplicated-control
 								      // pattern (Task 478). aria-hidden alone on a focusable element fails axe's
 								      // aria-hidden-focus rule -- it is the tabindex that makes the pair legal. The
-								      // keyboard reaches this same function through echoLineChooser() below. ?>
-								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$input['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row" tabindex="-1" aria-hidden="true">X</a></td>
+								      // keyboard reaches this same function through the line chooser echoLineChooser() emits
+								      // beside the Printable version button. ?>
+								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$input['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row" tabindex="-1" aria-hidden="true" title="<?=htmlspecialchars($ec_lang['view_hide_line'], ENT_QUOTES, 'UTF-8')?>">X</a></td>
 							</tr>
 <?php
 	}
 ?>
 						</tbody>
 					</table>
-					<?php echoLineChooser($chooserInputs, 'inputs'); ?>
 				</td>
+<?php $chooserResults = array(); ?>
 <?php if ($arrayResults) : ?>
 				<td>
 					<?php echo $ec_lang['calc_results'];?>
@@ -387,14 +403,13 @@ document.addEventListener('DOMContentLoaded', function() {
 									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>
 
 								</td>
-								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$result['name']?>_row" aria-expanded="true" aria-controls="<?=$result['name']?>_row" tabindex="-1" aria-hidden="true">X</a></td>
+								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$result['name']?>_row" aria-expanded="true" aria-controls="<?=$result['name']?>_row" tabindex="-1" aria-hidden="true" title="<?=htmlspecialchars($ec_lang['view_hide_line'], ENT_QUOTES, 'UTF-8')?>">X</a></td>
 							</tr>
 <?php
 	}
 ?>
 						</tbody>
 					</table>
-					<?php echoLineChooser($chooserResults, 'results'); ?>
 				</td>
 <?php endif; ?>
 			</tr>
@@ -412,7 +427,15 @@ document.addEventListener('DOMContentLoaded', function() {
 ?>
 <?php if ($flagFormAppend === true) {echoCalculatorFormAppend();} ?>
 </form>
-<p class="d-print-none"><button type="button" id="btn-printable"><?=ecIcon('print')?><?=$ec_lang['view_printable']?></button></p>
+<?php // Print preparation, one group: the button that makes the sheet, and the chooser that says
+      // which lines are on it. See echoLineChooser() for why the chooser lives here. ?>
+<div class="engcalcs-print-tools d-print-none">
+	<p><button type="button" id="btn-printable"><?=ecIcon('print')?><?=$ec_lang['view_printable']?></button></p>
+<?php echoLineChooser(array(
+	array('heading' => $ec_lang['calc_inputs'], 'lines' => $chooserInputs),
+	array('heading' => $ec_lang['calc_results'], 'lines' => $chooserResults),
+)); ?>
+</div>
 <?php
 }
 function echoCookieScript ()

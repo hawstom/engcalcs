@@ -467,7 +467,7 @@
         ]
     },
     "keys_to_translate": {
-        "view_lines_chooser": "Show or hide lines",
+        "view_lines_chooser": "Choose lines to show and print",
         "lpn_basemap_satellite_show": "Show satellite images",
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
@@ -538,7 +538,7 @@
         "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
     },
     "keys": {
-        "view_lines_chooser": "Show or hide lines",
+        "view_lines_chooser": "Choose lines to show and print",
         "lpn_basemap_satellite_show": "Show satellite images",
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
@@ -616,7 +616,7 @@
                 "previous_translated": {
                     "key": "view_hide_line",
                     "value": "[এই লাইনটি লুকান]",
-                    "english": "[Hide this line]"
+                    "english": "Hide this line"
                 },
                 "next_translated": {
                     "key": "view_printable",
