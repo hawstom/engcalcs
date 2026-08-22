@@ -396,23 +396,30 @@ the block.
   a saving worth defending is worth a COUNTABLE guard, as `dev/lpn-spike/label-batch-harness.js` is.
 
 - 50|478| **[H] Tab should walk down the input column, not sideways into every unit select.** Tom,
-  2026-08-21. Measured on Manning Pipe Flow: the form's focus order is `d0`, `d0u`, `n`, `sf`, `sfu`,
-  the solve button, `solver_q`, `solver_qu`, `dd0`, `dd0u`, then **thirteen more result unit selects**
-  before the print button. Four numbers to type, twenty-three stops to do it.
+  2026-08-21. **RE-MEASURED 2026-08-21 and the earlier count of twenty-three was wrong: Manning Pipe
+  Flow has 52 focusable stops inside `#formInput`** — 7 inputs, 17 unit selects, 4 buttons, 5 label
+  links and **19 X-hiders**. Getting from `d0` to `n` costs three intervening stops.
   - **RULED: solve it in HTML, not by intercepting Tab in JS** (Tom, 2026-08-21: *"I meant HTML"*).
     Reasonable, but it rules out both `tabindex` levers with it: `tabindex="-1"` on the selects makes
     changing a unit keyboard-unreachable, which is a WCAG 2.1.1 failure and not merely a nuisance, and
     a positive `tabindex` hoists the whole form above the navbar document-wide.
-  - **That leaves the one HTML mechanism with no cost to anybody: DOM ORDER, because tab order IS DOM
-    order.** Put the number inputs before the unit selects in the source and place the selects beside
-    them visually. **The blocker is that the form is a `<table>`** (`lib/Calculators.lib.php:295`), and
-    a table's cells cannot be reordered visually — only flex or grid has `order`. So this task is
-    really "re-lay the calculator form as a grid", suite-wide across 16 pages, and it should be priced
-    as that rather than as a tab-order tweak.
-  - **The "X hider" IS rendered here after all** — `<td class="engcalcs-x">` at lines 310 and 333, a
-    Bootstrap collapse `<a href="#…">`, one per input row AND one per result row. It has an `href`, so
-    it is focusable, and the audit above did not count it. **Re-measure the real stop count before
-    designing**; the twenty-three may be an undercount.
+  - **DO THE X-HIDERS FIRST, AND THEY ARE NOT THE SAME TASK.** 19 of the 52 stops are one
+    `<a href="#row">X</a>` per row (`lib/Calculators.lib.php`, the `engcalcs-x` cells), which is more
+    than the unit selects contribute and is already an accessibility defect on its own: nineteen links
+    whose entire accessible name is "X". **Replacing them with ONE "choose which rows to show"
+    control removes 18 stops and improves the name at the same time** — no re-lay, no grid, no risk to
+    the other fifteen pages. Do this before anything below; the remaining complaint may not survive it.
+  - **Then, and only then, DOM ORDER, because tab order IS DOM order.** The blocker is that the two
+    lists are nested `<table>`s (`lib/Calculators.lib.php:~299` and `~318`), and table cells cannot be
+    reordered visually — only flex or grid has `order`. **But it is ONE FUNCTION, not sixteen pages:**
+    every calculator renders through `echoCalculatorForm()`, and only the two INNER tables need to
+    become grids — the outer two-column table can stay. Emit label+input pairs first and the selects
+    after, placing every item with explicit `grid-row`/`grid-column`. The real cost is not the layout:
+    it is that the per-row Bootstrap collapse currently hangs off a `<tr>`, and a flat grid has no row
+    to hang it on — which is the second reason to settle the X-hiders first.
+  - **MAKE IT A CHECK, not a rule** (CLAUDE.md): `focus_order_check.php` renders each page, extracts
+    the focusable sequence, and asserts every number input precedes every unit select in its column.
+    Write it BEFORE the fix, so the fix is verified and cannot silently regress.
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   HW draws 580 confirmed humans (18% human-of-reach, the suite'''s second-biggest front door) but only
