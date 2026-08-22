@@ -153,8 +153,16 @@ a map editor over it (`js/looped-network.js`). **A core calculator, in scope in 
 Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMAP Task 146 and its
 `146.nn` children.
 
-- **Element types:** junction, reservoir, tank, pipe, pump, valve, text. **No extended-period
-  simulation yet** — ROADMAP Task 248, a gate on the LibreEPANET.org launch.
+- **Element types:** junction, reservoir, tank, pipe, pump, valve, text.
+- **EXTENDED-PERIOD SIMULATION SHIPPED 2026-08-18, THROUGH THE EPANET ENGINE ONLY** (`js/lpn-time.js`).
+  Tanks fill and drain, demands follow patterns, the bottom pane scrubs the frames; checked against
+  all 25 steps of EPA's own `Net3.rpt` to 0.005 ft over 2,425 head comparisons
+  (`dev/lpn-spike/eps-net3-harness.js`). **The built-in solver has no time dimension and is not
+  getting one** — with EPANET unreachable the page solves one instant and says so. What is left of
+  Task 248 is a pattern on a reservoir head or a pump (248.02) and rule-based `[RULES]` (248.03).
+  **"No extended-period simulation yet" is FALSE.** It stood in this file and on the LibreWaterNet
+  landing draft until 2026-08-21, three days after the run shipped, and Tom caught it, not a check.
+  Do not restore it.
 - **Valves are the one place the two engines deliberately differ.** A throttle valve (TCV) is a minor
   loss on a zero-length link and solves in either engine. PRV/PSV/FCV switch their own state inside
   the iteration and solve through **EPANET only** — measured ~9x faster than our own solver, so a
