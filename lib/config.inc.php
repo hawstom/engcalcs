@@ -88,8 +88,11 @@ define('CANONICAL_ORIGIN', 'https://hawsedc.com');
 //                    than every time (Task 286). Carries the same raw Accept-Language tag as
 //                    'browser', but once per page load, because nothing may be stored to
 //                    de-duplicate against. Always marked 'visit' in the trailing bucket column.
-// A FIFTH COLUMN, 'visit', appears on undeduplicated rows only; its absence means a deduplicated
-// row, which is what every row written before Task 286 is. See ecLogBucketSuffix() below.
+// EVERY LOG HERE ENDS WITH A BUCKET COLUMN holding 'visitor' (consented, deduplicated) or 'visit'
+// (everybody else, one row per page load). Always written, always last -- see ecLogBucketSuffix()
+// below for why it is not the optional marker it used to be. Rows written before 2026-08-21 carry
+// 'visit' or no column at all, and a last field holding neither token is a legacy 'visitor' row.
+// THE TWO ARE NEVER SUMMED: one counts people, the other counts page loads.
 // Run log/lang-log-stats.sh to analyze.
 define('LANG_LOG', dirname(__DIR__) . '/log/engcalcs-lang.log');
 
@@ -496,12 +499,20 @@ function ecBrowserLangTag() {
  *   visitors — consented, de-duplicated. Today's numbers, unchanged.
  *   visits   — everybody else, one row per event, no de-duplication and nothing stored.
  *
- * A row with no trailing column is a 'visitor' row, which is what every row written before this
- * task was. That is why the marker is emitted only for 'visit': the whole existing history stays
- * byte-identical and every existing awk field index keeps its meaning.
+ * ALWAYS PRESENT, ALWAYS LAST, ALWAYS ONE OF TWO TOKENS (changed 2026-08-21). The original design
+ * emitted the column for 'visit' rows only, so a visitor row was inferred from being SHORT -- and
+ * the report had to carry a per-log table of which column index to test (5, 5, 5, 6, 7). That is
+ * one edit away from silently mixing the two buckets, which is the single error the usage report
+ * exists to prevent, and it is ambiguous outright on the signal log, whose 'detail' column can
+ * legitimately be empty. With the token always written, every reader tests the LAST field and no
+ * index is involved.
+ *
+ * Rows written before this change carry 'visit' or nothing; a last field holding neither token is
+ * a legacy visitor row, and log/lang-log-stats.sh reads it as one. The format is otherwise
+ * unchanged, so a mixed-vintage log still reports correctly.
  */
 function ecLogBucketSuffix() {
-    return ecAnalyticsConsented() ? '' : "\tvisit";
+    return ecAnalyticsConsented() ? "\tvisitor" : "\tvisit";
 }
 
 // A visitor who has withdrawn consent, or refused it, must not keep carrying the storage it

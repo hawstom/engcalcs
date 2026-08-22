@@ -18,8 +18,10 @@
  *
  * BEFORE YOU DELETE ANYTHING, SNAPSHOT THE REPORT. `sh log/lang-log-stats.sh` produces aggregate
  * numbers with no rows in them; pasting that into dev/usage-data-log.md keeps the history that
- * decisions actually use, while the raw rows go away. Then deleting often costs nothing at all.
- * That is the answer to "is deleting often bad": on its own, a little; with a snapshot first, no.
+ * decisions actually use, while the raw rows go away. PASTE THE REPORT'S WINDOW AND FINGERPRINT
+ * LINES WITH IT -- a trim changes the window, and a snapshot with no window recorded cannot be
+ * compared to the one before it. That is exactly how the 2026-08-21 scale break happened.
+ * With a snapshot first, deleting often costs nothing at all; on its own, a little.
  *
  * Usage:
  *   php dev/scripts/trim_logs.php            # report what would be deleted, change nothing
@@ -43,7 +45,11 @@ if ($months < 1 || $months > 26) {
 }
 
 $cutoff = gmdate('Y-m-d\TH:i:s\Z', strtotime("-{$months} months"));
-$logs = [LANG_LOG, HUMAN_VIEW_LOG, CALC_USAGE_LOG, TITLE_LOG, CONTACT_SEND_LOG];
+// SIGNAL_LOG belongs here as much as the rest: it is visitor-derived data and privacy.php's
+// 26-month promise is about the usage counts, not about which file they landed in. It was missing
+// until 2026-08-21, so the behaviour-signal rows were the one set the retention backstop never
+// touched.
+$logs = [LANG_LOG, HUMAN_VIEW_LOG, CALC_USAGE_LOG, TITLE_LOG, CONTACT_SEND_LOG, SIGNAL_LOG];
 
 printf("Retention: %d months. Cutoff: %s. %s\n\n", $months, $cutoff, $apply ? 'APPLYING.' : 'Dry run -- nothing will be written.');
 

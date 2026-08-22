@@ -448,3 +448,85 @@ the cross-time comparison is unavailable rather than merely noisy.
 - **`contact` converted 0 of 3.** n = 3 is nothing. It is logged only because **both of the
   LibreWaterNet landing page's calls to action point at `contact.php`**, so it is the one funnel where
   a small number is worth watching before a launch rather than after.
+
+---
+
+## 2026-08-21 (later) — the 40x scale break EXPLAINED, and the report rebuilt to enforce its own rules
+
+### The bucket question, answered from the code
+
+**The 2026-08-21 table was read from the CONSENTED bucket only. The 2026-08-09 and 2026-08-11
+tables were read from every row in the log, because the bucket did not exist yet.** That is the
+40x, and it is candidate 2 of the two the entry above offered.
+
+The consent banner and `ecLogBucketSuffix()` shipped in `bd4aeebc`, **2026-08-11**, between the
+`lpn` re-read and the 08-21 snapshot. From that commit onward a visitor who has not answered the
+banner is logged `source=anon` with a trailing `visit` marker, and **every funnel section of
+`log/lang-log-stats.sh` read the filtered visitor copy** — so the whole non-consenting majority,
+which is most of the audience, silently left the denominator on every page at once. Nothing
+behavioural is needed to explain the uniformity: the filter applies to all sixteen pages equally.
+
+A hand trim of the logs (`dev/scripts/trim_logs.php`, or Tom deleting by hand, which he does) may
+have shortened the window as well, and candidate 1 cannot be ruled out after the fact — **because
+no report ever printed its window.** That is now fixed rather than argued about.
+
+### What the rebuilt report does about it
+
+`log/lang-log-stats.sh` was rewritten so that the standing rules of this file are arithmetic the
+reader cannot skip rather than prose the reader must remember.
+
+- **WINDOW, DURATION and FINGERPRINT print at the top and again at the bottom of every run.** The
+  fingerprint is `win=<start>..<end> days=<n> rows=<six counts>`. The script stores the previous
+  run's fingerprint in `log/.last-report-window` and **prints it beside this one, with an explicit
+  refusal to compare when they differ.** `--days=N` cuts every log to the same window.
+- **The two buckets are separate tables with the UNIT in every column heading** — `people` and
+  `page loads`. There is **no total row anywhere in the file**, on purpose. The consent share of
+  rows is printed once, labelled a rate of ROWS and not of humans, and it is the number that would
+  have made the 08-21 break obvious on sight.
+- **Every ratio carries a Wilson 95% interval, computed.** A denominator under 40 marks the point
+  estimate `~`; under 5 suppresses it entirely and prints only the interval. The legend states the
+  test: two rows differ only if their intervals do not overlap.
+- **Rank leads the report**, in its own section and nowhere else. **The funnel tables have no rank
+  column at all** — a row's position there moves with the sort, and both 08-21 read errors (a
+  position read as a rank, a number read off the adjacent row) were position errors.
+- **A language section**, in two halves that must not be confused: SERVED (the page was rendered
+  in that language) and ASKED FOR (the browser's Accept-Language). The gap between them is a
+  discovery defect, not a translation-quality one.
+- **A quiet-pages list**, seeded from the reach log so a page with traffic and no shoppers appears,
+  and stated once per run as a deliberate cost rather than a case for cutting anything.
+
+### Repeat use: already free, nothing new proposed
+
+The `repeat` signal (Task 200) already answers it and stores nothing new — it reads the page's own
+input cookie, or a saved `lpn` project document, both exempt storage that exists anyway. It is
+consenting-visitors-only by necessity (an analytics READ is still an analytics access), so it is a
+sample and never a total. It now has its own section with a rate against people-bucket shopping.
+**No new storage was added or proposed; `consent_body` is untouched and `EC_CONSENT_VERSION` did
+not move.**
+
+### FORMAT CHANGE — start a fresh round of logging
+
+`ecLogBucketSuffix()` now writes the bucket column **always, last, and as one of two tokens**:
+`visitor` or `visit`. It used to emit the column only for `visit` rows, so a visitor row was
+inferred from being SHORT — and the report carried a per-log table of which column index to test
+(5, 5, 5, 6, 7), one edit away from silently mixing the buckets, and ambiguous outright on the
+signal log whose `detail` column can legitimately be empty. Every reader now tests the LAST field.
+
+Mixed-vintage logs still report correctly (a last field holding neither token is read as a legacy
+`visitor` row), so a fresh round is a clean baseline rather than a repair. `trim_logs.php` also
+gained `SIGNAL_LOG`, which the retention backstop had never touched.
+
+### Not fixed, and the next task
+
+**`engcalcs-lang.log`'s language column means two different things depending on the row's source.**
+`get`/`cookie`/`view` rows carry the language we SERVED; `browser`/`anon` rows carry the raw
+Accept-Language tag instead. Since Task 286 the `anon` rows are the majority, so **for most of the
+audience the reach log does not record which language we served at all** — the language section can
+only answer that question from the two confirmed-human logs. The fix is one line in
+`logLanguageSelection()` (`lib/Language.lib.php`): write the served language and the browser tag as
+two columns instead of overloading one. It was left alone here only because that file belonged to
+another agent's territory during this work.
+
+Also outstanding: **`formmail.php` does not call `ecLogBucketSuffix()`**, so the contact-send log is
+the one log with no bucket column. The report handles it explicitly rather than guessing, but a
+send row cannot currently be matched to the bucket its click came from.
