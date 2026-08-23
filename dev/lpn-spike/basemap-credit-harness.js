@@ -1,0 +1,194 @@
+// THE TILE ATTRIBUTION IS ON SCREEN WHENEVER A TILE IS -- ROADMAP Task 145. Run with:
+//   node dev/lpn-spike/basemap-credit-harness.js
+//
+// WHY THIS EXISTS. Tom, 2026-08-23, looking at a saved geographic project on a PC with
+// OpenStreetMap tiles drawn behind it: *"we also have no map attribution on the map."* He was
+// right, and it is a LICENCE condition rather than a cosmetic one: OSM's tile usage policy and
+// Mapbox's terms both require the credit for as long as their tiles are displayed.
+//
+// THE DEFECT WAS A FUNCTION NOT BEING CALLED, which is precisely the shape dev/testing-notes.md
+// says an assertion about a call cannot catch. The credit was refreshed by refreshBasemapChrome(),
+// which had three callers -- the style setter, the georeference finish, and
+// refreshAllFromDocument() -- and the BOOT path goes through none of them. Boot applies the saved
+// project, draws the network, and then noteMapSized() schedules refreshBasemap() ALONE, because
+// tiles are the one thing that needs a viewport before it can be drawn. So reopening a saved
+// geographic project painted tiles with the credit still at the inline display:none it ships with.
+//
+// So this file asserts ONE PROPERTY, everywhere, over the real code:
+//
+//     whenever a tile element exists, the credit is displayed, and the set it shows names the
+//     source whose tiles are on screen.
+//
+// It is checked after a BOOT-LIKE sequence first, because that is the path that broke, and then
+// after every other way the tiles can change. A fourth call site would satisfy a "was it called"
+// test and still leave the fifth path to be discovered by a user; the credit now hangs off the
+// painter itself, and the source check at the end is what holds it there.
+
+const fs = require('fs');
+const path = require('path');
+const { byId, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+
+const ROOT = path.resolve(__dirname, '..', '..') + path.sep;
+
+const L = loadLoopedNetwork(
+	// The layers init() builds, in init()'s own order -- the basemap below the user's backdrop.
+	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
+	"\t\t\tworld = el('g', {}, svg);\n" +
+	"\t\t\tbasemapLayer = el('g', { 'class': 'lpn-basemap' }, world); basemapEls = {};\n" +
+	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
+	"\t\t\tmodelLayer = el('g', {}, world);\n" +
+	"\t\t\tlinksLayer = el('g', {}, modelLayer); nodesLayer = el('g', {}, modelLayer);\n" +
+	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
+	"\t\t\trubberBandEl = el('line', {}, world); },\n" +
+	// The boot sequence's own two steps, plus the one that runs when the canvas finally has a size.
+	"\t\tapplySaved: applySaved, buildDom: buildDom, noteMapSized: noteMapSized,\n" +
+	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
+	"\t\tsetView: function (v) { applyView(v); }, geoHome: geoHomeView,\n" +
+	"\t\tlayer: function () { return basemapLayer; },\n" +
+	"\t\tsetStyle: setBasemapStyle, setBasemapOn: setBasemapOn,\n" +
+	"\t\tstyle: basemapStyle, basemapOn: basemapOn, isGeo: isGeoProject,\n" +
+	"\t\tsatAvailable: satelliteAvailable,\n" +
+	"\t\trefreshAll: refreshAllFromDocument,\n" +
+	"\t\tgetProject: function () { return project; }, serialize: serializeProject "
+);
+
+let fails = 0;
+function ok(name, cond, extra) {
+	console.log((cond ? 'PASS  ' : 'FAIL  ') + name + (extra === undefined ? '' : '   ' + extra));
+	if (!cond) { fails++; }
+}
+byId.lpn_toolbar.querySelectorAll = () => [];
+
+const credit = byId.lpn_basemap_credit;
+function creditShown() { return credit.style.display !== 'none' && credit.style.display !== undefined; }
+function setsShown() {
+	return credit.children.filter(c => c.style.display !== 'none')
+		.map(c => c.getAttribute('data-basemap-credit'));
+}
+function tileHosts() {
+	return L.layer().children.map(e => String(e.href || '').replace(/^https:\/\/([^/]*)\/.*/, '$1'));
+}
+// THE ONE PROPERTY, asked of whatever state the page is in right now. Every section below calls it.
+function invariant(where) {
+	const hosts = tileHosts(), n = hosts.length;
+	const sets = setsShown();
+	if (n === 0) {
+		ok(where + ': no tiles, so no credit is required', !creditShown() || sets.length === 0,
+			'display=' + credit.style.display + ' sets=' + sets.join(','));
+		return;
+	}
+	ok(where + ': ' + n + ' tiles are on screen, so the credit is DISPLAYED', creditShown(),
+		'display=' + credit.style.display);
+	ok(where + ': ...and exactly one source set is shown', sets.length === 1, sets.join(','));
+	// It must name the source whose tiles are actually being fetched, not merely SOME source: the
+	// two sets carry different wording because Mapbox's terms name its imagery supplier as well.
+	const expect = hosts.every(h => h === 'tile.openstreetmap.org') ? 'osm'
+		: (hosts.every(h => h === 'api.mapbox.com') ? 'satellite' : '(mixed)');
+	ok(where + ': ...and it is the set for the tiles being fetched, ' + expect,
+		sets[0] === expect, 'showing ' + sets.join(',') + ' for ' + hosts[0]);
+}
+
+// ---- 0. what the page ships ----------------------------------------------------------------------
+console.log('\n--- the markup: hidden until the code shows it, and one set per source ---');
+{
+	const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+	const at = php.indexOf('id="lpn_basemap_credit"');
+	const div = php.slice(at, php.indexOf('</div>', at));
+	ok('the credit element exists on the page', at > 0);
+	// This is the fact that made the defect possible and is worth naming: the element is inert
+	// until JS shows it, so "the markup is there" is not evidence of anything.
+	ok('...and it ships display:none, so only the code can put it on screen',
+		/style="display:none/.test(div));
+	ok('...and it is NOT d-print-none: the tiles print, so the credit prints',
+		div.indexOf('d-print-none') < 0);
+	const sets = [...div.matchAll(/data-basemap-credit="([a-z]+)"/g)].map(m => m[1]);
+	ok('...and carries one credit set per tile source', sets.join(',') === 'osm,satellite',
+		sets.join(','));
+	ok('...naming OpenStreetMap for the street tiles', /openstreetmap\.org\/copyright/.test(div));
+	ok('...and Mapbox and its imagery supplier for the satellite ones',
+		/mapbox\.com/.test(div) && /maxar\.com/.test(div));
+}
+
+// ---- 1. THE BOOT PATH, which is the one that broke ------------------------------------------------
+// Not openProject(), not the View menu: the sequence init() runs when a saved geographic project is
+// already open. applySaved() then buildDom(), and the canvas gets its height LATER -- which is why
+// noteMapSized() is a separate step here, exactly as applyMapHeight() makes it one in the browser.
+global.EngCalcs.pageConfig.lpn_mapbox_token = 'pk.harness.token';
+L.buildLayers();
+L.setCanvas(1000, 500);
+const NET3W = JSON.parse(fs.readFileSync(
+	ROOT + 'dev/water-network-examples/Net3-World-lpn.json', 'utf8'));
+
+async function main() {
+	console.log('\n--- a saved geographic project, opened the way a page load opens one ---');
+	L.applySaved(JSON.parse(JSON.stringify(NET3W)));
+	L.buildDom();
+	ok('Net3-World is geographic and asks for street tiles',
+		L.isGeo() && L.getProject().basemap === 'osm');
+	ok('...and nothing has drawn a tile yet, because the canvas has no size',
+		L.layer().children.length === 0);
+	invariant('before the canvas is sized');
+
+	// The canvas gets its height. THIS IS THE WHOLE BOOT PATH: noteMapSized() schedules the basemap
+	// refresh and calls nothing else, so anything the credit needed from another entry point is
+	// exactly what was missing on screen.
+	L.setView(L.geoHome());
+	L.noteMapSized();
+	await new Promise((r) => setTimeout(r, 200));   // the 120 ms debounce inside scheduleBasemapRefresh()
+	ok('the boot path drew tiles', L.layer().children.length > 0,
+		L.layer().children.length + ' <image> elements');
+	invariant('on the boot path');
+
+	// ---- 2. the other ways the tiles change ---------------------------------------------------------
+	console.log('\n--- and every other route to a tile carries the credit with it ---');
+	L.setStyle('satellite');
+	ok('the satellite style fetches Mapbox tiles',
+		tileHosts().length > 0 && tileHosts().every(h => h === 'api.mapbox.com'), tileHosts()[0]);
+	invariant('after switching to satellite');
+
+	L.setStyle('satellite');   // the same style again is the OFF toggle
+	ok('asking for the style already showing turns the basemap off', !L.basemapOn());
+	invariant('with the basemap off');
+
+	L.setStyle('osm');
+	invariant('after switching back to the street map');
+
+	// Opening a different project: refreshAllFromDocument()'s route.
+	L.refreshAll();
+	invariant('after a project-wide repaint');
+
+	// A GRID PROJECT HAS NO TILES AND MUST HAVE NO CREDIT -- crediting OpenStreetMap on a drawing
+	// with no OpenStreetMap data on it is its own kind of wrong.
+	const grid = JSON.parse(JSON.stringify(NET3W));
+	delete grid.project.coords;
+	delete grid.project.basemap;
+	L.applySaved(grid);
+	L.refreshAll();
+	ok('a grid project draws no tiles', L.layer().children.length === 0);
+	invariant('on a grid project');
+
+	// ---- 3. the structural half: the credit cannot be separated from the painter ------------------
+	// Behaviour above is the test; this is what stops the next person re-creating the defect by
+	// adding a sixth path that paints tiles. The credit refreshes inside the ONE function that
+	// paints them, so there is no call site left to forget.
+	console.log('\n--- the credit hangs off the painter, so no caller can forget it ---');
+	{
+		const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+		const code = src.split('\n').filter(l => !/^\s*\/\//.test(l)).join('\n');
+		const chromeCalls = (code.match(/refreshBasemapChrome\(\)/g) || []).length;
+		// One definition, one call. If this rises, the seam has been re-opened.
+		ok('refreshBasemapChrome() is defined once and called once',
+			(code.match(/function refreshBasemapChrome/g) || []).length === 1 && chromeCalls === 2,
+			chromeCalls + ' occurrences including the definition');
+		const body = code.slice(code.indexOf('function refreshBasemap()'));
+		ok('...and its one caller is refreshBasemap(), the function that paints the tiles',
+			/function refreshBasemap\(\)\s*\{[^}]*refreshBasemapChrome\(\)/.test(body));
+		ok('...which is still the only place tile <image> elements are made',
+			(code.match(/'class': 'lpn-basemap-tile'/g) || []).length === 1);
+	}
+
+	console.log(fails === 0 ? '\nAll basemap-credit checks passed.' : '\n' + fails + ' FAILED');
+	process.exit(fails ? 1 : 0);
+}
+
+main();

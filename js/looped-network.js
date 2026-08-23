@@ -4707,7 +4707,12 @@ var EngCalcs = EngCalcs || {};
 				latT = tileLat(y, z); latB = tileLat(y + 1, z);
 				yT = inwardY(latT);
 				out.push({
-					key: z + '/' + x + '/' + y, z: z, x: x, y: y,
+					// **THE SOURCE IS PART OF A TILE'S IDENTITY**, not just its URL. Keyed on
+					// z/x/y alone, the diff below saw the same key already drawn when the style
+					// changed and kept the OLD <image>: switching the street map to satellite left
+					// OpenStreetMap tiles on screen -- under the Mapbox credit -- until a pan or a
+					// zoom happened to ask for different tile numbers.
+					key: basemapStyle() + '/' + z + '/' + x + '/' + y, z: z, x: x, y: y,
 					url: tileSource().url().replace('{z}', z).replace('{x}', x).replace('{y}', y),
 					px: inwardX(lonL), py: yT, pw: lonR - lonL, ph: inwardY(latB) - yT
 				});
@@ -4726,7 +4731,6 @@ var EngCalcs = EngCalcs || {};
 	function setBasemapStyle(style) {
 		project.basemap = (basemapOn() && basemapStyle() === style) ? 'off' : style;
 		refreshBasemap();
-		refreshBasemapChrome();
 		saveToStorage();
 	}
 	function setBasemapOn(on) { setBasemapStyle(on ? 'osm' : 'off'); }
@@ -4735,9 +4739,10 @@ var EngCalcs = EngCalcs || {};
 	// require DIFFERENT wording -- Mapbox's terms name Mapbox and its imagery supplier as well as
 	// OpenStreetMap -- so the credit swaps with the style rather than naming everyone at all times,
 	// which would credit a provider whose tiles are not on screen.
-	// The credit and the teaser change on exactly the same events -- a project opens, a project is
-	// georeferenced, the basemap style changes -- so they have one entry point rather than two lists
-	// of call sites, one of which would eventually be missed.
+	// The credit and the teaser change on exactly the same events, so they have one entry point --
+	// and that entry point has exactly ONE caller, refreshBasemap(), which is the function that
+	// paints the tiles. Nothing else may call this: a second caller is a second thing to keep in
+	// step, and the first version of this had three of them and still missed the boot path.
 	function refreshBasemapChrome() {
 		refreshBasemapCredit();
 		refreshBasemapTeaser();
@@ -4790,7 +4795,22 @@ var EngCalcs = EngCalcs || {};
 		if (basemapTimer) { clearTimeout(basemapTimer); }
 		basemapTimer = setTimeout(function () { basemapTimer = null; refreshBasemap(); }, 120);
 	}
+	// **THE ONE PLACE TILES ARE PAINTED IS THE ONE PLACE THE CREDIT IS REFRESHED, AND THAT IS THE
+	// WHOLE POINT** (Tom, 2026-08-23: *"we also have no map attribution on the map."*). The credit
+	// used to be refreshed only by refreshBasemapChrome()'s three callers -- setBasemapStyle(), the
+	// georeference finish and refreshAllFromDocument() -- and the BOOT path goes through none of
+	// them: it applies the saved project and then noteMapSized() schedules refreshBasemap() alone,
+	// because tiles need a viewport. So reopening a saved geographic project drew OpenStreetMap
+	// tiles with the credit still at its inline display:none -- a licence breach, silent, and on
+	// the commonest path there is.
+	//
+	// A fourth call site would have been the same design that failed. Instead the credit hangs off
+	// the painter, so no caller can paint tiles without it and none has to remember.
 	function refreshBasemap() {
+		paintBasemapTiles();
+		refreshBasemapChrome();
+	}
+	function paintBasemapTiles() {
 		if (!basemapLayer) { return; }
 		var k, r, tl, br, list, want;
 		if (!basemapOn() || !svg || !mapSized) {
@@ -5955,7 +5975,6 @@ var EngCalcs = EngCalcs || {};
 		project.basemap = 'osm';
 		doc.origin = { x: 0, y: 0 };
 		refreshBasemap();
-		refreshBasemapChrome();
 		refreshMapStatus();
 		setMode('select');
 		// **TWO DIFFERENT JOBS WEAR ONE COMMAND, AND THE NUMBERS SAY WHICH** (Task 447).
@@ -10068,7 +10087,6 @@ var EngCalcs = EngCalcs || {};
 		// Grid or geographic, and basemap on or off, both belong to the project -- so switching
 		// projects can turn the tiles and their attribution on or off (Task 145).
 		refreshBasemap();
-		refreshBasemapChrome();
 		lastSolveResult = null;
 		closePopup();
 		buildDom();
