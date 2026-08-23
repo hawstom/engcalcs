@@ -8139,18 +8139,22 @@ var EngCalcs = EngCalcs || {};
 		return paneNumText(v);
 	}
 	// **A HEADING AND ITS CELLS ARE ONE COLUMN, SO THEY CARRY THE SAME CLASSES** (Tom, 2026-08-23:
-	// "the inputs and the headings are not middle/center justified with each other. Inputs are left
-	// and headings are center"). A <button> is centred by every browser's own stylesheet, and a
-	// heading long enough to wrap -- which on a phone is most of them -- then centres its lines over
-	// a column of left-or-right-aligned cells. One predicate, `c.result || c.set`, decides the
-	// alignment of the whole column here, and it is the same predicate the printed sheet has always
-	// used: a number is a number whether it was typed or computed, and figures read as one column
-	// only when they are right-aligned. An ID, a node name and a valve type stay left.
+	// "the inputs and the headings are not middle/center justified with each other"). Three classes,
+	// each answering a different question, and the screen and the printed sheet read them
+	// differently:
 	//
-	// The per-key class is what lets a stylesheet reach ONE column -- the Pipes table is wider than a
-	// phone and its Roughness and Minor loss columns are narrowed below the breakpoint.
-	function paneCellClass(c) {
-		return 'lpn-pane-col-' + c.key + ((c.result || c.set) ? ' lpn-pane-num' : '');
+	//   lpn-pane-first  WHERE the column is. The leftmost one is left-aligned and every other column
+	//                   is centred -- Tom's rule for these tables, chosen over right-aligning the
+	//                   figures: "in tables, center is safest for everything but the first column".
+	//                   Position, not content, so a table that gains a column cannot end up with two.
+	//   lpn-pane-num    WHAT the column holds. It no longer carries the screen alignment; it carries
+	//                   tabular figures, and it is still what the PRINTED sheet aligns right.
+	//   lpn-pane-col-x  WHICH column it is, so a stylesheet can reach exactly one -- the Pipes table
+	//                   is wider than a phone and two of its columns are narrowed below the
+	//                   breakpoint.
+	function paneCellClass(c, i) {
+		return 'lpn-pane-col-' + c.key + (i === 0 ? ' lpn-pane-first' : '') +
+			((c.result || c.set) ? ' lpn-pane-num' : '');
 	}
 	function paneHeadingText(c) {
 		var pc = EngCalcs.pageConfig || {},
@@ -8187,9 +8191,9 @@ var EngCalcs = EngCalcs || {};
 		table.className = 'lpn-pane-table';
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
-		spec.cols.forEach(function (c) {
+		spec.cols.forEach(function (c, i) {
 			var th = document.createElement('th'), b = document.createElement('button');
-			th.className = paneCellClass(c);
+			th.className = paneCellClass(c, i);
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
 			// The arrow is on the sorted column only, and it is the whole of the sort UI: a heading
@@ -8226,9 +8230,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	function paneTableRow(spec, el) {
 		var tr = document.createElement('tr'), cells = {};
-		spec.cols.forEach(function (c) {
+		spec.cols.forEach(function (c, i) {
 			var td = document.createElement('td'), btn, input;
-			td.className = paneCellClass(c);
+			td.className = paneCellClass(c, i);
 			if (c.key === 'id') {
 				// The ID is a way BACK TO THE MAP, not a text box: it selects the part and pans to
 				// it, the same gesture a Find result row is. Renaming stays in the property popup,
@@ -8331,9 +8335,9 @@ var EngCalcs = EngCalcs || {};
 		table.className = 'lpn-pane-table lpn-print-table';
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
-		spec.cols.forEach(function (c) {
+		spec.cols.forEach(function (c, i) {
 			var th = document.createElement('th');
-			th.className = paneCellClass(c);
+			th.className = paneCellClass(c, i);
 			th.textContent = paneHeadingText(c);
 			tr.appendChild(th);
 		});
@@ -8342,9 +8346,9 @@ var EngCalcs = EngCalcs || {};
 		tbody = document.createElement('tbody');
 		rows.forEach(function (el) {
 			var row = document.createElement('tr');
-			spec.cols.forEach(function (c) {
+			spec.cols.forEach(function (c, i) {
 				var td = document.createElement('td');
-				td.className = paneCellClass(c);
+				td.className = paneCellClass(c, i);
 				td.textContent = paneCellText(c, el);
 				row.appendChild(td);
 			});
@@ -17761,10 +17765,11 @@ var EngCalcs = EngCalcs || {};
 			entry.appendChild(libCurveChart(pts, l.type === 'pump'));
 			table.className = 'lpn-pane-table';
 			[(pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
-				valueLabel + ' (' + unitLabel('lpn_u_elevhead') + ')'].forEach(function (t) {
+				valueLabel + ' (' + unitLabel('lpn_u_elevhead') + ')'].forEach(function (t, i) {
 				var th = document.createElement('th');
-				// Both columns are figures, so both headings sit over their own right-aligned cells.
-				th.className = 'lpn-pane-num';
+				// It is a .lpn-pane-table, so it takes the pane tables' rule as they take it: the
+				// first column left, the second centred, heading and cell alike.
+				th.className = 'lpn-pane-num' + (i === 0 ? ' lpn-pane-first' : '');
 				th.textContent = t;
 				hrow.appendChild(th);
 			});
@@ -17772,9 +17777,9 @@ var EngCalcs = EngCalcs || {};
 			table.appendChild(thead);
 			pts.forEach(function (p) {
 				var tr = document.createElement('tr');
-				[p[0], p[1]].forEach(function (v) {
+				[p[0], p[1]].forEach(function (v, i) {
 					var td = document.createElement('td');
-					td.className = 'lpn-pane-num';
+					td.className = 'lpn-pane-num' + (i === 0 ? ' lpn-pane-first' : '');
 					td.textContent = String(+(+v).toFixed(6));
 					tr.appendChild(td);
 				});

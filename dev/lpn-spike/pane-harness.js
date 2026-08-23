@@ -556,7 +556,7 @@ console.log('\n--- the strip may be two lines ---');
 // table: ten headings centred over cells aligned left or right, now ten agreeing.
 console.log('\n--- heading and cells share one alignment ---');
 {
-	const NUM = 'lpn-pane-num';
+	const NUM = 'lpn-pane-num', FIRST = 'lpn-pane-first';
 	// The real panels, filled by the real renderer -- every one of the six, because "it applies to
 	// all of the tables" is the claim being checked.
 	L.paneTables().forEach(function (spec) {
@@ -579,6 +579,13 @@ console.log('\n--- heading and cells share one alignment ---');
 			(ths[i].classList.contains(NUM)) !== !!(c.result || c.set));
 		report(wrong.length === 0, spec.id + ': exactly the number columns are marked as numbers',
 			wrong.map((c) => c.key).join(','));
+		// **AND EXACTLY ONE COLUMN IS THE FIRST ONE**, which is what the alignment now hangs on:
+		// left there, centred everywhere else, heading and cell alike.
+		const firstTh = spec.cols.map((c, i) => i).filter((i) => ths[i].classList.contains(FIRST));
+		const firstTd = spec.cols.map((c, i) => i).filter((i) => tds[i].classList.contains(FIRST));
+		report(firstTh.length === 1 && firstTh[0] === 0 && firstTd.length === 1 && firstTd[0] === 0,
+			spec.id + ': one column is marked first, and it is the leftmost',
+			firstTh.join(',') + ' / ' + firstTd.join(','));
 	});
 	// The ID column is the worked example of the other side: a name is not a figure.
 	L.renderTable('pipes');
@@ -589,11 +596,23 @@ console.log('\n--- heading and cells share one alignment ---');
 	report(pipeThs[5].classList.contains('lpn-pane-col-roughness'),
 		'...and every column names itself, which is what lets one column be narrowed',
 		pipeThs[5].className);
+	// The Libraries curve table is a .lpn-pane-table too, so it takes the same positional rule --
+	// read from the source, because that section is built inside the Libraries box and has no
+	// panel of its own here.
+	const curve = fnBody('buildCurveSection');
+	report(/th\.className = 'lpn-pane-num' \+ \(i === 0 \? ' lpn-pane-first' : ''\)/.test(curve) &&
+		/td\.className = 'lpn-pane-num' \+ \(i === 0 \? ' lpn-pane-first' : ''\)/.test(curve),
+		'the Libraries curve table marks its first column the same way');
 }
 
-// ---- 12. the rules that alignment, the sticky heading and the phone widths hang on -------------
+// ---- 12. the rules that alignment, the box widths and the sticky heading hang on --------------
 // Read from css/engcalcs.css and asked of the elements the renderer above actually built. Asserting
 // that a class was applied proves nothing on its own; these two sections together are the chain.
+//
+// **AND THE INPUT IS ASKED, NOT ONLY ITS CELL.** That is the question that was not asked last time:
+// the <td> was given an alignment, the <th> was given the same one, and the box the user types in
+// went on taking the browser's. A control's own stylesheet wins inside the control, so a cell's
+// alignment reaches an <input> only where something says `inherit`.
 console.log('\n--- and the stylesheet answers accordingly ---');
 {
 	const CSS = require('./pane-table-css.js').load(path.join(ROOT, 'css', 'engcalcs.css'));
@@ -607,11 +626,12 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 	// A heading really does sit inside a <thead>, and `.lpn-pane-table thead th` is the rule that
 	// makes it stick -- a chain missing that node would answer "no rule" to every sticky question.
 	const chainTo = (node) => [html, panel, table].concat(node.tag === 'th' ? [thead] : [], [tr, node]);
-	const cell = (tag, key, num) => chainTo({ tag: tag,
-		cls: ['lpn-pane-col-' + key].concat(num ? ['lpn-pane-num'] : []) });
+	const clsFor = (key, num, first) => ['lpn-pane-col-' + key]
+		.concat(first ? ['lpn-pane-first'] : [], num ? ['lpn-pane-num'] : []);
+	const cell = (tag, key, num, first) => chainTo({ tag: tag, cls: clsFor(key, num, first) });
 	const inputIn = (key) => [html, panel, table, tr,
-		{ tag: 'td', cls: ['lpn-pane-col-' + key, 'lpn-pane-num'] }, { tag: 'input', cls: [] }];
-	const sortBtn = chainTo({ tag: 'th', cls: ['lpn-pane-col-flow', 'lpn-pane-num'] })
+		{ tag: 'td', cls: clsFor(key, true, false) }, { tag: 'input', cls: [] }];
+	const sortBtn = chainTo({ tag: 'th', cls: clsFor('flow', true, false) })
 		.concat([{ tag: 'button', cls: ['lpn-pane-sort'] }]);
 	const align = (chain, w) => CSS.winning(CSS.rules, chain, w, 'text-align', blind);
 	const width = (chain, w) => CSS.winning(CSS.rules, chain, w, 'width', blind);
@@ -619,24 +639,59 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 	// **THE READER'S OWN SELF-TEST.** Two answers it must get right before any answer it gives is
 	// worth reading, and a selector it cannot parse is collected and reported at the end rather
 	// than silently answering "no rule".
-	report(align(cell('td', 'id', false), WIDE) === 'left', 'reader self-test: a plain cell reads left');
-	report(width(inputIn('length'), WIDE) === '7em' && width(inputIn('length'), SMALL) === '3.5em',
+	report(align(cell('td', 'id', false, true), WIDE) === 'left', 'reader self-test: the first cell reads left');
+	report(width(inputIn('length'), WIDE) === '7em' &&
+		width(inputIn('length'), SMALL) === '3.5em',
 		'reader self-test: the number box is 7em wide and 3.5em on a phone',
 		width(inputIn('length'), WIDE) + ' / ' + width(inputIn('length'), SMALL));
 
-	// 1. ALIGNMENT. The same question for the heading and for the cell, at both widths.
+	// 1. ALIGNMENT. Tom, 2026-08-23: *"Right is great justification for numbers. But in tables,
+	// center is safest for everything but the first column... Make the headings center and we will
+	// be back to where we started, focusing on the inputs as we should."* So the question is asked
+	// of POSITION, at both widths, of the heading and of the cell -- and of the box inside the cell.
 	[WIDE, SMALL].forEach((w) => {
-		report(align(cell('th', 'flow', true), w) === 'right' && align(cell('td', 'flow', true), w) === 'right',
-			'a number column is right at ' + w + 'px, heading and cell alike');
-		report(align(cell('th', 'id', false), w) === 'left' && align(cell('td', 'id', false), w) === 'left',
-			'...and a name column is left at ' + w + 'px, heading and cell alike');
+		report(align(cell('th', 'id', false, true), w) === 'left' &&
+			align(cell('td', 'id', false, true), w) === 'left',
+			'the first column is left at ' + w + 'px, heading and cell alike');
+		report(align(cell('th', 'flow', true, false), w) === 'center' &&
+			align(cell('td', 'flow', true, false), w) === 'center',
+			'...a figures column is centred at ' + w + 'px, heading and cell alike');
+		report(align(cell('th', 'from', false, false), w) === 'center' &&
+			align(cell('td', 'from', false, false), w) === 'center',
+			'...and so is a column of names that is not the first', align(cell('td', 'from', false, false), w));
+		// **THE HALF THAT SLIPPED THROUGH.** A <td> aligns the box; the text inside a form control
+		// is aligned by the browser's own stylesheet unless something hands it back.
+		report(align(inputIn('length'), w) === 'inherit',
+			'...and the INPUT takes its cell’s alignment rather than the browser’s at ' + w + 'px',
+			String(align(inputIn('length'), w)));
 	});
-	// The heading BUTTON is what the browser centres, so the reset is the whole fix.
+	// The heading BUTTON is the other control with a stylesheet of its own -- every browser centres
+	// a <button>, which is what made the headings disagree with their cells in the first place.
 	report(align(sortBtn, WIDE) === 'inherit',
 		'the sort button hands its alignment back to its own heading cell', align(sortBtn, WIDE));
 
-	// 2. THE STICKY HEADING, and the 6px band the rows were scrolling through above it.
-	const thChain = cell('th', 'flow', true);
+	// 2. THE PRINTED SHEET IS A SEPARATE QUESTION AND DID NOT MOVE. Names left, figures right, as it
+	// has been since it shipped: nobody types on paper, and a printed column of figures reads as one
+	// only when it is right-aligned. The screen rules are the same selectors, so this is the check
+	// that they do not leak onto it.
+	{
+		const printTable = { tag: 'table', cls: ['lpn-pane-table', 'lpn-print-table'] };
+		const pCell = (tag, key, num, first) => [html, printTable]
+			.concat(tag === 'th' ? [thead] : [], [tr, { tag: tag, cls: clsFor(key, num, first) }]);
+		const pAlign = (chain) => CSS.winning(CSS.rules, chain, WIDE, 'text-align', blind, 'print');
+		report(pAlign(pCell('td', 'flow', true, false)) === 'right' &&
+			pAlign(pCell('th', 'flow', true, false)) === 'right',
+			'on paper a figures column is still right', pAlign(pCell('td', 'flow', true, false)));
+		report(pAlign(pCell('td', 'from', false, false)) === 'left' &&
+			pAlign(pCell('td', 'id', false, true)) === 'left',
+			'...and a name column, first or not, is still left');
+		// And the screen is not answering with the paper's rules either way round.
+		report(align(cell('td', 'flow', true, false), WIDE) === 'center',
+			'...while the screen is unaffected by any of it');
+	}
+
+	// 3. THE STICKY HEADING, and the 6px band the rows were scrolling through above it.
+	const thChain = cell('th', 'flow', true, false);
 	report(CSS.winning(CSS.rules, [html, panel], WIDE, 'padding-top', blind) === '0',
 		'a scrolling panel has no top padding -- a sticky top:0 sticks to the CONTENT edge, and the ' +
 		'padding above it is the band the sliver showed in');
@@ -656,24 +711,28 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 	report(CSS.winning(CSS.rules, thChain, WIDE, 'border-bottom', blind) === null,
 		'...and is not a border, which under border-collapse would scroll on its own');
 
-	// 3. THE PHONE-ONLY WIDTHS on the two columns Tom named, and the desktop that must not move.
-	report(width(cell('th', 'roughness', true), SMALL) === '4.2em' &&
+	// 4. THE PHONE-ONLY WIDTHS on the two columns Tom named, and the desktop that must not move.
+	report(width(cell('th', 'roughness', true, false), SMALL) === '4.2em' &&
 		width(inputIn('roughness'), SMALL) === '2.6em',
 		'Roughness narrows below the breakpoint -- 0.60 of its column, 0.74 of its box');
 	report(width(inputIn('km'), SMALL) === '1.75em',
 		'...and the Minor loss box is half what it was');
-	report(width(cell('th', 'km', true), SMALL) === '2.9em',
+	report(width(cell('th', 'km', true, false), SMALL) === '2.9em',
 		'...inside a column that stops at four lines of heading rather than six');
-	report(CSS.winning(CSS.rules, cell('th', 'roughness', true), SMALL, 'overflow-wrap', blind) === 'anywhere',
+	report(CSS.winning(CSS.rules, cell('th', 'roughness', true, false), SMALL, 'overflow-wrap', blind) === 'anywhere',
 		'a narrowed heading may break mid-word -- it is that or an abbreviation, and an abbreviation ' +
 		'is 26 translations');
-	// **THE REGRESSION THIS COULD CAUSE**, and the one the whole punch list keeps risking.
-	report(width(cell('th', 'roughness', true), WIDE) === null && width(cell('th', 'km', true), WIDE) === null,
-		'the desktop columns are untouched at 1200px',
-		width(cell('th', 'roughness', true), WIDE) + ' / ' + width(cell('th', 'km', true), WIDE));
-	report(width(inputIn('roughness'), WIDE) === '7em' && width(inputIn('km'), WIDE) === '7em',
-		'...and so are the desktop boxes',
-		width(inputIn('roughness'), WIDE) + ' / ' + width(inputIn('km'), WIDE));
+	// **TOM SAW THE PHONE AND SAID "On phone, widths are good".** Every phone box is 3.5em unless
+	// that block names it, and the desktop per-column widths arrive as a CUSTOM PROPERTY precisely
+	// so that they cannot reach down here: an inline width would have beaten all of it.
+	['length', 'elev', 'demand', 'diameter', 'level'].forEach((key) => {
+		report(width(inputIn(key), SMALL) === '3.5em', 'the phone box for ' + key + ' is untouched at 3.5em',
+			String(width(inputIn(key), SMALL)));
+	});
+	report(width(cell('th', 'roughness', true, false), WIDE) === null && width(cell('th', 'km', true, false), WIDE) === null,
+		'no desktop COLUMN carries a width, so a narrower box can never force a heading to wrap ' +
+		'-- the heading row is as tall as it was',
+		width(cell('th', 'roughness', true, false), WIDE) + ' / ' + width(cell('th', 'km', true, false), WIDE));
 
 	// The reader's blind-spot report, scoped to the selectors that could possibly reach what this
 	// section asks about. A rule about the menu bar or a spinner is none of its business, and a
