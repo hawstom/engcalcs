@@ -255,6 +255,19 @@ the block.
   what our labels already do, so reproducing it is not obviously worth it. Tom: *"I'm not opposed to
   implementing this, and it may be better to implement it than to discuss it."*
 
+- 50|488| **The Print table button crowds the tab strip it shares.**
+  Tom, 2026-08-23: it monopolises a column in the bottom pane's header row, and the table tabs
+  cannot wrap past it. *"This isn't great, but it's not a blocker. And I can't think of a solution."*
+  Neither can this file yet — logged so a solution is recognised if one turns up, not because one is
+  known. Candidates worth measuring before proposing: the button as an icon with no text, or moved
+  into the pane's own overflow.
+
+- 25|489| **Offer OpenStreetMap's "Improve this map" link beside the credit.**
+  epanet-js carries four credits at the map's lower right — © Mapbox, © OpenStreetMap, Improve this
+  map, © Maxar — and we carry three of them. The edit link is not required by either provider's
+  terms; it is what a good OSM citizen offers, and it costs one anchor and one string in 27
+  languages. Weigh that against the fact that nobody has asked for it.
+
 - 50|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
   `sw.php` and `consent.php`, and three `Redirect 301` rules in `.htaccess` naming it absolutely.
