@@ -1082,7 +1082,18 @@ html[lang="zh"] .ec-welcome {
    MEASUREMENT (paneChromeHeight), so a second line is subtracted from the window like anything
    else -- nothing here assumes one line, and nothing here scrolls sideways. */
 .lpn-pane-head { display: flex; align-items: flex-start; gap: 4px; border-bottom: 1px solid #ddd; }
-.lpn-pane-tabs { display: flex; flex-wrap: wrap; gap: 2px 2px; flex: 1 1 auto; min-width: 0; }
+.lpn-pane-strip {
+	display: flex; flex-wrap: wrap; align-items: flex-start; gap: 2px 2px;
+	flex: 1 1 auto; min-width: 0;
+}
+/* `display: contents` IS THE WHOLE OF TASK 488. The Print button and the seven tabs must wrap
+   as ONE row of items, or the button holds a column and the tabs wrap only within the
+   remainder -- which is what Tom saw: "it monopolises a column ... and the table tabs cannot
+   wrap past it". Dissolving the tablist's box puts its tabs directly into .lpn-pane-strip's
+   flow beside the button, so a second line starts at the pane's left edge and uses its full
+   width. The ELEMENT stays, so role="tablist" still owns the tabs and nothing else -- which is
+   why the button was not simply appended inside it. */
+.lpn-pane-tabs { display: contents; }
 /* A TAB, not a push-button: flat, with the selected one joined to the panel below it by having no
    bottom border of its own. Same reasoning as the menu bar's flat items -- a row of raised
    buttons here would read as a second toolbar. */
@@ -1701,6 +1712,30 @@ html[lang="zh"] .ec-welcome {
 .lpn-basemap-teaser.lpn-basemap-teaser-on {
 	background-color: #eae7e0;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23eae7e0'/%3E%3Cg stroke='%23c3bdb1' stroke-width='0.9' fill='none'%3E%3Cpath d='M0 6.5 L24 6.5'/%3E%3Cpath d='M0 13.5 L24 13.5'/%3E%3Cpath d='M0 19.5 L24 19.5'/%3E%3Cpath d='M5.5 0 L5.5 24'/%3E%3Cpath d='M12 0 L12 24'/%3E%3Cpath d='M18.5 0 L18.5 24'/%3E%3C/g%3E%3Cpath stroke='%23c3bdb1' stroke-width='1.4' fill='none' d='M0 10 L24 10.6'/%3E%3Cpath fill='%2310304f' d='M24 0 L24 11 L13 0 Z'/%3E%3Cpath fill='%232e7d32' d='M24 4 L24 9 L19 4 Z'/%3E%3Cpath stroke='%23fff' stroke-width='0.8' fill='none' d='M13 0 L24 11'/%3E%3C/svg%3E");
+}
+
+/* ==== The Mapbox wordmark in the satellite credit (ROADMAP Task 489) ========================
+   MAPBOX'S LOGO IS A LICENCE TERM, NOT A COURTESY: *"Maps using Mapbox map designs, data or
+   software usually must display the Mapbox logo and text attribution."* Raster tiles from
+   api.mapbox.com/v4/mapbox.satellite are Mapbox-supplied data, so it applies to the satellite
+   basemap. It rides in #lpn_basemap_credit's satellite set beside the three text links, which is
+   where the strip already is; their docs put the logo bottom-left and the text bottom-right and
+   allow either to be repositioned, so one strip carrying both is inside the terms and is one less
+   thing to keep on screen.
+
+   **EMBEDDED, NEVER FETCHED.** The mark is a data: URI here rather than an <img> pointing at
+   api.mapbox.com, because a request to Mapbox from a page whose visitor has not turned satellite
+   on is exactly what #lpn_basemap_teaser was built to avoid -- the teaser draws its own thumbnail
+   for the same reason. The artwork is Mapbox's own, taken verbatim from mapbox-gl.css (the
+   dark-on-light variant, which is the one for our translucent white strip); their terms forbid
+   restyling it, so nothing here recolours it. 65px is the width their attribution page states,
+   and 17px is the height that keeps the 88:23 artwork's aspect ratio exactly. */
+.lpn-mapbox-logo {
+	display: inline-block; vertical-align: middle;
+	width: 65px; height: 17px;
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 29 29'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-9z'/%3E%3C/svg%3E");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
 }
 
 /* ==== The Labels panel's column headings (ROADMAP Task 435) ==================================

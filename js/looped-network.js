@@ -7037,13 +7037,17 @@ var EngCalcs = EngCalcs || {};
 		// Built here, not in the markup: it carries a tip, and .ec-help written into a page's HTML
 		// is what tip_markup_check.php exists to stop. Same treatment as a tab button.
 		//
-		// **FIRST CHILD OF THE HEAD, at the extreme left edge** (Tom, 2026-08-21: the print button
-		// "is poorly discoverable ... try putting it at extreme left"). It used to sit beside the X
-		// in the top-RIGHT corner, which is where a window's own controls live and therefore where
-		// the eye reads "close", not "do something to this table". The left edge is the first thing
-		// read in an LTR language and the first thing read in an RTL one too, because the flex row
-		// reverses with the document.
-		head = document.getElementById('lpn_pane_head');
+		// **FIRST CHILD OF THE TAB STRIP, at the extreme left edge** (Tom, 2026-08-21: the print
+		// button "is poorly discoverable ... try putting it at extreme left"). It used to sit beside
+		// the X in the top-RIGHT corner, which is where a window's own controls live and therefore
+		// where the eye reads "close", not "do something to this table". The left edge is the first
+		// thing read in an LTR language and the first thing read in an RTL one too, because the flex
+		// row reverses with the document.
+		//
+		// It goes inside #lpn_pane_strip rather than beside it (Task 488): a sibling of the tab
+		// strip holds a column of its own and the tabs can only wrap within what is left. In the
+		// strip it is one wrapping item among the tabs, so a second line starts at the left edge.
+		head = document.getElementById('lpn_pane_strip') || document.getElementById('lpn_pane_head');
 		if (!document.getElementById('lpn_pane_print') && head) {
 			(function () {
 				var b = document.createElement('button');
@@ -15727,19 +15731,27 @@ var EngCalcs = EngCalcs || {};
 			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = '6px';
 			lead.style.flex = '1 1 auto';
 			row.appendChild(lead);
-			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip],
-				[pc.lpn_labels_col_after || 'After', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip],
+			// **A COLUMN HAS ONE ALIGNMENT, AND THE HEADING IS PART OF THE COLUMN** -- the box's own
+			// rule, stated in css/engcalcs.css beside the text-align declarations it governs, and
+			// the last thing in this list that still read as "too far right" (Task 435). The two
+			// numeric columns draw their own spinner arrows and centre their digit, so their
+			// headings centre; the affix boxes hold WORDS and keep their natural start alignment,
+			// so a centred "Before" stood right of every letter it named. `start`, not `left`,
+			// because the same row has to read correctly in an RTL language.
+			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip, 'start'],
+				[pc.lpn_labels_col_after || 'After', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip, 'start'],
 				[pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
 					(pc.lpn_labels_col_decimals || 'Decimals') + ' \u2014 ' +
-						(pc.lpn_labels_decimals_tip || 'Decimal places shown for this label')],
+						(pc.lpn_labels_decimals_tip || 'Decimal places shown for this label'), 'center'],
 				[pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
 					(pc.lpn_labels_priority || 'Priority') + ' \u2014 ' +
-						((group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) || '')]
+						((group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) || ''),
+					'center']
 			].forEach(function (h, i) {
 				var cell = document.createElement('span');
 				cell.textContent = h[0];
 				cell.style.width = h[1]; cell.style.flex = '0 0 auto';
-				cell.style.textAlign = 'center';
+				cell.style.textAlign = h[3];
 				if (h[2]) { cell.title = h[2]; cell.className = 'ec-help'; }
 				// The affix boxes take the row's own 6px gap; the two numeric columns carry their own
 				// margin as well, so their headings must match or they sit half a gap left of the box
