@@ -72,8 +72,17 @@
 // relayoutLabels(). The cascade in the first of those was the last un-batched one: it ran a label
 // to the bottom before starting the next, which is one forced layout per label per rung, and it is
 // now three passes like refreshLabelText()'s -- 44-458 ms measured here, and COUNTED at 1,008
-// forced layouts per notch down to 9 in dev/lpn-spike/zoom-reshed-harness.js. What is left of that
-// pass is shedAlignedForConflicts(), which is sequential because its decisions read each other.
+// forced layouts per notch down to 9 in dev/lpn-spike/zoom-reshed-harness.js.
+//
+// **AND THEN shedAlignedForConflicts() WAS THE WHOLE OF WHAT WAS LEFT** -- 0.3-1.8 s of a notch on
+// this grid, in over 9M box-overlap tests. Its cascade still runs one label at a time and always
+// will, because each label it places is an obstacle for the next; what was wrong was the obstacle
+// WALK inside it, which grew with the drawing exactly as Task 472's did. Same medicine, same shape
+// of guard: the boxes go into Collide.boxIndex() and, COUNTED on the same two networks,
+//
+//     overlap tests per label    231 (112 pipes) / 860 (480 pipes)  ->  7.3 / 7.1
+//
+// with every placement byte-identical. dev/lpn-spike/aligned-shed-index-harness.js is the guard.
 //
 // **THE BOUNDS ARE GENEROUS ON PURPOSE — well clear of the measurement, not a hair over it.** This
 // pass runs on whatever machine is free, and a timing check that fails on a busy one teaches people
