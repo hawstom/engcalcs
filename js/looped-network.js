@@ -2532,8 +2532,7 @@ var EngCalcs = EngCalcs || {};
 			// classes apart somewhere around there. A document saved before this key existed is
 			// held at the five bands it was drawn in -- see applySaved().
 			//
-			// PER GROUP for the same reason the ramp is, and it fixes a real crossing: a criterion
-			// mode chosen for pressure used to force the LINK map to five classes as well.
+			// PER GROUP for the same reason the ramp is -- see criterionClassCount().
 			colorClassesNode: 7,
 			colorClassesLink: 7,
 			colorReverseNode: false,
@@ -3141,9 +3140,8 @@ var EngCalcs = EngCalcs || {};
 		return undefined;
 	}
 	function colorFieldOf(group) { return group === 'node' ? settings.colorNodeField : settings.colorLinkField; }
-	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, used by the Visibility panel's two
-	// dropdowns and by the Settings panel's two rows, so the same question is never asked two
-	// different ways in two places.
+	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, read by every control that offers a
+	// colour field, so the same question is never asked two different ways in two places.
 	//
 	// **PRESSURE AND VELOCITY ARE FIRST**, and that is Tom's ordering rather than the map's: they
 	// are the two questions a distribution network is actually asked. The rest follow in the order
@@ -3857,7 +3855,8 @@ var EngCalcs = EngCalcs || {};
 	// not wrap, so it needs a per-label width plus a greedy re-wrap on every font-size change -- pure
 	// geometry, belonging in js/lpn-geom.js.
 	// **THE EXPORT CONSTRAINT: EPANET's [LABELS] is ONE quoted string per line**, so a multi-line
-	// Text cannot round-trip through an `.inp`. Task 281 decides N labels or one flattened line.
+	// Text cannot round-trip through an `.inp`. It is FLATTENED to one line and reported -- see
+	// js/lpn-inp.js's `label-multiline-flattened`.
 	function textLabelLines(lb) {
 		var t = effective(lb, 'text');
 		return String(t === undefined || t === null ? '' : t).split('\n');
@@ -12690,10 +12689,10 @@ var EngCalcs = EngCalcs || {};
 	var VIEW_POPOVERS = ['lpn_notes_popup'];
 	// The control that opened the popover now showing -- the toolbar button, or the menu-bar item.
 	// Same job openMenuAnchor does for the menus, and needed for the same reason: the click that
-	// OPENED a popover must not also be read as a click away from it. Task 372 -- until then the
-	// dismissal exempted the whole menu bar and the whole toolbar instead, which was a blunt way of
-	// protecting these two buttons and cost Tom the thing he reported: "When Labels or Settings are
-	// open, clicking in the top row of the menu bar does not close them."
+	// OPENED a popover must not also be read as a click away from it (Task 372). Exempting the whole
+	// menu bar and the whole toolbar instead is the blunt version, and it costs what Tom reported:
+	// "When Labels or Settings are open, clicking in the top row of the menu bar does not close
+	// them."
 	var viewPopoverAnchor = null;
 	function closeViewPopovers(except) {
 		VIEW_POPOVERS.forEach(function (id) {
@@ -14098,11 +14097,11 @@ var EngCalcs = EngCalcs || {};
 		// box on its Labels section, and the Settings button beside this one opens the box itself. A
 		// toolbar slot is the most expensive space on the page, and a second door to a box whose own
 		// button is two icons away is not worth one.
-		// **COLOUR BY VALUE IS TWO DROPDOWNS, AND THEY ARE IN THE VISIBILITY PANEL** (ROADMAP Task
-		// 427). One select doing both fields is the tempting design and Tom saw the beauty of it --
+		// **COLOUR BY VALUE IS TWO DROPDOWNS, AND THEY ARE IN THE SETTINGS BOX** (ROADMAP Task 427,
+		// then Task 441). One select doing both fields is the tempting design and Tom saw it --
 		// "but it's not the expectation": EPANET and epanet-js both give nodes and links a dropdown
 		// each, and choosing a node field silently clears the link field. Two controls, two legends,
-		// no clearing. See buildVisibilityColors(); the toolbar keeps no select at all, which is
+		// no clearing. See buildColoringSection(); the toolbar keeps no select at all, which is
 		// also what the icon-only strip asked for -- a field-name dropdown was the one wide control
 		// left on it.
 		// **THE SETTINGS GEAR IS NOT HERE, AND NOT AT THE RIGHT-HAND END EITHER.** It is in the
@@ -16160,7 +16159,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **NOTHING HERE DEPENDS ON THE ZOOM ANY MORE** (Tom, 2026-08-19: "Always show labels, Zoom
 	// level, Current view, etc.: Remove that entire concept ... now that we have good hiding and
-	// Thematic map"). A map-width threshold hid labels automatically, and the Visibility panel's
+	// Thematic map"). A map-width threshold hid labels automatically, and the Settings box's
 	// explicit per-field hiding and Thematic mode now do that job deliberately; a second, implicit
 	// mechanism was one more thing to learn and one more thing to be surprised by. Do not
 	// reintroduce it -- and note that it is NOT what keeps map-unit text sizing out (see
@@ -16613,7 +16612,7 @@ var EngCalcs = EngCalcs || {};
 		row(mapBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput);
 		// **NO SCALE-DEPENDENT LABEL VISIBILITY ROW HERE.** A "Widest view that shows labels" number
 		// with a "Use current view" capture button used to sit at this point and is gone (Tom,
-		// 2026-08-19); the Visibility panel and Thematic mode are where labels are turned off now.
+		// 2026-08-19); the Labels section and Thematic mode are where labels are turned off now.
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
