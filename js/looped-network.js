@@ -4078,19 +4078,12 @@ var EngCalcs = EngCalcs || {};
 		}
 		an = nodeById(lb.anchorNode); px = an.x + lb.x; py = an.y + lb.y;
 		box = textLabelBox(lb, le, px, py);
-		// **AN EDGE-JUSTIFIED LABEL IS ATTACHED TO ITS LEADER, AND THE ATTACHMENT DOES NOT MOVE.**
-		// With `align` left or right the anchored edge IS the label's own point, so the leader ends
-		// at lb.x and the text grows away from it. Nothing here reads the measured width, which is
-		// the whole point: change the text size and the leader does not budge.
-		//
-		// A CENTRED label has no such edge and keeps the older rule below -- still right for a label
-		// the user dragged, which is centred on wherever they dropped it.
 		// **THE LEADER ENDS AT THE LABEL'S OWN POINT, AND NOTHING HERE READS A WIDTH.** An anchored
 		// label is edge-justified by labelHAlign(), so its anchored edge IS lb.x -- change the text,
 		// change the size, change the zoom, and the leader does not move. That is Tom's "hold it
-		// inviolate", and it is why the old flip-with-hysteresis rule is gone rather than kept for a
-		// case: with the side derived from the offset there is nothing left to flip, and hysteresis
-		// existed only to stop a centred label's attachment flickering as it crossed its node.
+		// inviolate", and it is why there is no flip-with-hysteresis rule here: with the side derived
+		// from the offset there is nothing left to flip, and hysteresis existed only to stop a
+		// centred label's attachment flickering as it crossed its node.
 		// **RE-DERIVED ON EVERY MOVE, which is what makes it automatic.** Dragging a label across
 		// its node changes the sign of lb.x and therefore the anchored edge, so the element's own
 		// text-anchor has to be rewritten here -- otherwise the leader crosses over and the words
