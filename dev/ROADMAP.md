@@ -156,25 +156,16 @@ the block.
     **but it blocks the next sprint launch until he rules.** The 16, plus 9 wording proposals and 7
     `$ec_lang_syn` proposals, are in `239-wave0-calcs.json`.
 
-- 75|378| **Delete `drawExampleNetwork()` from `js/looped-network.js`: ONE MECHANICAL CUT LEFT.**
-  Seven of ten harnesses now open the shipped gallery file through `dev/lpn-spike/example-fixture.js`
-  -- the path a visitor takes, which the code path never was. The other three cannot: they assert
-  things about THAT drawing (`example-network`, 16 assertions), about a new project's default of
-  seven colour classes (`color-ramp`; the gallery file predates the per-group colour keys, so
-  `applySaved()` pins it to five), and about the shipped `textSize` of 11 (`label-shed`; the gallery
-  file carries 9, running the cascade 9->9->7->3->1 instead of 9->9->6->2->1).
-  - **MOVED rather than migrated.** The 279 lines now live verbatim in
-    `dev/lpn-spike/example-draw-fixture.js`, spliced back into the module's own scope by
-    `loadLoopedNetwork()`'s new `preludeSource` argument, so the function still closes over the real
-    `doc`, `settings`, `setProp()` and `el()`. Migrating the three instead would have meant
-    re-fitting their assertions to a different network -- changing what they test to land a
-    refactor. All three run byte-identical to their pre-move stdout, and a mutated fixture fails
-    five assertions, which is what proves the relocated copy is the one running.
-  - **TO DO: delete lines 14259-14537** (comment block and function), and the now-dangling reference
-    in the `textSize: 11` comment at line 2503. Held back only for a concurrent track on that file.
-  - Still open, and NOT closed by the move: `settings.engine` is `epanet` in the gallery file and
-    `native` from the code, invisible only because the stub never defines `lpnSolveEpanet` -- a stub
-    holding a coupling constant, per `dev/testing-notes.md`.
+- 50|496| **The harness stub has no EPANET engine, so `settings.engine` never matters.**
+  Extracted from Task 378 on close, and the move that closed it made this MORE true: the three
+  harnesses on the code-drawn fixture sit permanently on `engine: native`. A gallery file says
+  `epanet`, the fixture says `native`, and every harness passes either way solely because
+  `dev/lpn-spike/lpn-dom-stub.js` never defines `EngCalcs.lpnSolveEpanet` — so `runSolve()` falls
+  through to the native solver whatever the setting says. That is a stub holding a coupling
+  constant, the exact shape `dev/testing-notes.md` warns about: ask which quantity the real thing
+  varies that the stub holds fixed. Nothing routed to EPANET is under test on this path, PRV/PSV/FCV
+  included.
+
 
 - 75|477| **[H] New blank project startup wizard: xy/lat-lon, units, head loss.** Tom, 2026-08-22,
   naming the scope. It replaces the four-row File > New fly-out; on epanet-js, *"they have a wizard

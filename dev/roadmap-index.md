@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**73 open tasks.** Next (100): 5 · Soon (75): 8 · Someday (50): 9 · Maybe (25): 24 · Parked (5): 27
+**73 open tasks.** Next (100): 5 · Soon (75): 7 · Someday (50): 10 · Maybe (25): 24 · Parked (5): 27
 
 ## 100 — Next (5)
 
@@ -17,10 +17,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
 
-## 75 — Soon (8)
+## 75 — Soon (7)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
-- Task 378 — Delete `drawExampleNetwork()` from `js/looped-network.js`: ONE MECHANICAL CUT LEFT.
 - Task 442 — [H] · The toolbar may want to become a side menu.
 - Task 477 — [H] · New blank project startup wizard: xy/lat-lon, units, head loss.
 - Task 478 — [H] · Tab should walk down the input column, not sideways.
@@ -28,7 +27,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 483 — EPANET import: carry unhandled features into a per-asset import notes field.
 - Task 495 — [H] · REMIND TOM: does an input accept more characters than its width shows?
 
-## 50 — Someday (9)
+## 50 — Someday (10)
 
 - Task 207 — The dilettante path: make replying cost one tap, not five steps.
 - Task 248.02 — Patterns: attach one to a RESERVOIR HEAD and a PUMP.
@@ -39,6 +38,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
 - Task 469 — Node labels should SHED properties before one of them is hidden.
+- Task 496 — The harness stub has no EPANET engine, so `settings.engine` never matters.
 
 ## 25 — Maybe (24)
 
