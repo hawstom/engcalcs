@@ -86,7 +86,7 @@
 			"from": "R1",
 			"to": "J1",
 			"verts": [],
-			"_diameter": 4,
+			"_diameter": 100,
 			"_roughness": 100,
 			"_length": 200,
 			"lenAuto": true,
