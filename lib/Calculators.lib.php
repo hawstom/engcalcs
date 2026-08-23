@@ -272,6 +272,168 @@ document.addEventListener('DOMContentLoaded', function() {
 <?php
 }
 
+/**
+ * The calculator's input lines, as a CSS grid whose DOM is COLUMN-MAJOR (ROADMAP Task 478).
+ *
+ * WHY THIS IS NOT A <table> ANY MORE. Tab order is DOM order, and a table's DOM is row-major: the
+ * cursor left every number box sideways into that line's unit select and its "X" before it reached
+ * the next number. Tom, 2026-08-22: *"One entire column at a time... it is less bad to force a user
+ * tabber person into 'do an entire column at once' than 'do an entire row at once'"* -- somebody is
+ * editing one to three variables, and a walk through a whole row defeats tabbing. `tabindex="-1"`
+ * on everything but the inputs was REJECTED: it takes a control off the keyboard entirely, so a
+ * keyboard-only user could not switch ft to m (WCAG 2.1.1) and the "X" would become mouse-only.
+ * Reordering the DOM is the only tool that reorders the walk without removing anything from it.
+ *
+ * So the cells are emitted in COLUMN GROUPS -- every input, then every label, then every unit
+ * select, then every X -- and each carries `grid-row:N`, which puts it back on the line the user
+ * sees.
+ *
+ * FOUR COLUMNS WHERE THE TABLE HAD THREE, and the widths land in the same places to the pixel: the
+ * input and its unit select used to share one cell separated by a single space, so the seam between
+ * the two new columns draws no rule and takes no padding, and the space is emitted as a real
+ * no-break space instead. `dev/browser-pass/fieldgrid-layout.js` measures every control on every
+ * calculator against the old markup in a browser; 2px + 2px of padding in place of that space was
+ * the first attempt and it narrowed every form by 1.1px.
+ *
+ * WHERE IT IS NOT THE SAME LAYOUT, AND WHY THAT CANNOT BE FIXED HERE: a <td> wraps its contents and
+ * two grid columns cannot. On a window too narrow for the form, a squeezed table used to drop a
+ * wide unit select onto a second line under its input; now the label column takes the whole squeeze
+ * and the select stays on the line. Wrapping needs the input and the select inside one box, and tab
+ * order follows that box's DOM, so the two cannot both be had. ROADMAP Task 478 holds the
+ * measurement and Tom's ruling.
+ *
+ * WHAT A SCREEN READER LOSES, AND WHAT IT DOES NOT. The <table> that was here had no <th>, no
+ * caption and no headers: it was a LAYOUT table, and it announced no row/column relationship worth
+ * having. What names a field is its `<label for>`, and that is untouched -- every input still has
+ * one, still announced with it, wherever in the document the label sits. The real cost is that
+ * visual order and DOM order now differ (WCAG 1.3.2): read straight through, the form gives the
+ * inputs, then the label column with its links and radio buttons, then the unit selects. A reader
+ * tabbing gets exactly what Tom asked for; a reader browsing linearly hears each label twice, once
+ * with its input and once as text. That is the trade, it is deliberate, and it is not a silent one.
+ *
+ * A LINE IS FOUR SIBLING CELLS NOW, so its "X" is a multi-target collapse
+ * (`data-bs-target=".ec-line-<name>"`). `id="<name>_row"` stays on the INPUT cell, because
+ * js/orifice.js, js/orifice-drain-time.js and js/branched-network.js hide a whole line by that id;
+ * echoLineMirrorScript() below watches it and hides the line's other three cells with it.
+ */
+function echoInputGrid($arrayInputs)
+{
+	global $ec_lang;
+
+	$hideTip = htmlspecialchars($ec_lang['view_hide_line'], ENT_QUOTES, 'UTF-8');
+	$labelsPlain = array();   // label cells with no <select> of their own
+	$labelsSelect = array();  // ... and the ones that have one; emitted last, see below
+	$cellsInput = array();
+	$cellsUnits = array();
+	$cellsX = array();
+
+	$row = 0;
+	foreach ($arrayInputs as $input) {
+		$row++;
+		$n = $input['name'];
+		$e = htmlspecialchars($n, ENT_QUOTES, 'UTF-8');
+		$line = ' collapse show ec-line-' . $e;
+		$at = ' style="grid-row:' . $row . '"';
+		$control = empty($input['control']) ? '' : $input['control'];
+
+		// One cell: the outer div is the grid item (it carries the id, the line class and the
+		// row), and `.ec-fg-in` inside it is what gets vertically centred. The pair is what makes
+		// a two-line label leave the blue rules straight -- see the CSS note in css/engcalcs.css.
+		$cell = function ($id, $classes, $content, $extra = '') use ($line, $at) {
+			return '<div id="' . $id . '"' . $extra . ' class="ec-fg-cell ' . $classes . $line . '"' . $at . '>'
+				. '<div class="ec-fg-in">' . $content . '</div></div>';
+		};
+
+		$label = $cell($e . '_rowl', 'ec-fg-label',
+			'<label for="' . $e . '">' . $input['label'] . '</label>' . $control);
+		// A label cell carrying its own <select> -- the inline "Solve for flow" control -- has to
+		// come after the label cells carrying radio buttons, or those radios would sit after a
+		// select again and the walk would cross back. Order within each group is line order, and
+		// grid-row means neither group moves on screen.
+		if (strpos($control, '<select') !== false) { $labelsSelect[] = $label; }
+		else { $labelsPlain[] = $label; }
+
+		ob_start();
+		echoUnitSelect($n . 'u', $input['units'], '');
+		$select = trim(ob_get_clean());
+
+		// THE NO-BREAK SPACE IS THE OLD LAYOUT, TO THE PIXEL. The input and its select shared one
+		// <td> separated by a single space; the two are separate cells now, and that seam draws no
+		// rule and takes no padding, so the space has to be a real character or the form narrows.
+		// It goes in only where there IS a select to be spaced from -- Weir-Flow-Simple has no
+		// unit selects at all, and a trailing space there would push its "X" column sideways.
+		$cellsInput[] = $cell($e . '_row', 'ec-fg-input',
+			inputHtml($n, $input['type'], $input['default'], '') . ($select === '' ? '' : '&nbsp;'),
+			' data-ec-line="' . $e . '"');
+
+		// Emitted even where the field has no unit select, because this cell draws the rule
+		// between the value column and the X column -- a table drew that rule on every line.
+		$cellsUnits[] = $cell($e . '_rowu', 'ec-fg-units',
+			(empty($input['separator']) ? '' : $input['separator'] . ' ') . $select);
+
+		// The "X" is a real tab stop, deliberately (Tom, 2026-08-22). It is the ONLY way to hide a
+		// line, so taking it off the keyboard would make the function mouse-only -- WCAG 2.1.1 by
+		// omission. It still costs one stop per line; the stops simply no longer sit between two
+		// numbers, which is the whole of Task 478.
+		$cellsX[] = $cell($e . '_rowx', 'ec-fg-x engcalcs-x d-print-none',
+			'<a data-bs-toggle="collapse" href="#' . $e . '_row" data-bs-target=".ec-line-' . $e . '"'
+			. ' aria-expanded="true"'
+			. ' aria-controls="' . $e . '_rowl ' . $e . '_row ' . $e . '_rowu ' . $e . '_rowx"'
+			. ' title="' . $hideTip . '">X</a>');
+	}
+?>
+					<div class="ec-fieldgrid">
+<?php
+	foreach (array_merge($cellsInput, $labelsPlain, $labelsSelect, $cellsUnits, $cellsX) as $html) {
+		echo "\t\t\t\t\t\t" . $html . "\n";
+	}
+?>
+					</div>
+<?php
+}
+
+/**
+ * Keeps `getElementById('<name>_row').style.display = 'none'` hiding a WHOLE line.
+ *
+ * Three calculators hide a line that way -- js/orifice.js and js/orifice-drain-time.js on the
+ * rectangular-only width, js/branched-network.js on the Darcy-Weisbach-only viscosity -- and since
+ * Task 478 a line is four sibling cells rather than one <tr>, so that id can only be on one of
+ * them. It is on the input cell, and this mirrors its display onto the other three.
+ *
+ * Emitted INLINE and run immediately rather than on DOMContentLoaded: echoCookieScript() calls
+ * readCookieAndCalc() from a plain <script> at the foot of the page, so the first pageCalculator()
+ * -- the one that does the initial hiding -- runs before DOMContentLoaded fires.
+ */
+function echoLineMirrorScript()
+{
+?>
+<script>
+(function () {
+	var grid = document.querySelector('#formInput .ec-fieldgrid');
+	if (!grid || !window.MutationObserver) { return; }
+	// A CLASS, not a copy of the inline style. "View printable" hides every .d-print-none element
+	// by writing display:none on it, and the per-line X is one of those; mirroring an inline ''
+	// onto it would put the X back on a printable sheet. An inline style outranks a class, so the
+	// print button keeps the last word and this still hides and un-hides the line.
+	function mirror(cell) {
+		var line = cell.getAttribute('data-ec-line');
+		if (!line) { return; }
+		var off = cell.style.display === 'none';
+		grid.querySelectorAll('.ec-line-' + line).forEach(function (el) {
+			if (el !== cell) { el.classList.toggle('ec-line-off', off); }
+		});
+	}
+	var observer = new MutationObserver(function (records) {
+		records.forEach(function (record) { mirror(record.target); });
+	});
+	grid.querySelectorAll('.ec-fg-input[data-ec-line]').forEach(function (cell) {
+		observer.observe(cell, { attributes: true, attributeFilter: ['style'] });
+	});
+})();
+</script>
+<?php
+}
+
 function echoCalculatorForm($arrayInputs, $arrayResults, $flagFormAppend = false, $flagHideUnits = false)
 {
     global $ec_lang;
@@ -308,27 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			<tr>
 				<td>
 					<?=$ec_lang['calc_inputs']?>
-					<table>
-						<tbody>
-<?php
-	foreach ($arrayInputs as $input) {
-?>
-							<tr class="collapse show" id="<?=$input['name']?>_row">
-								<td><label for='<?=$input['name']?>'><?=$input['label']?></label><?php if (!empty($input['control'])) echo $input['control']; ?></td>
-								<td>
-									<?php echo inputHtml($input['name'], $input['type'], $input['default'], "\t\t\t\t\t\t\t\t\t");?><?php if (!empty($input['separator'])) echo ' ' . $input['separator'] . ' '; ?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?>
-								</td>
-								<?php // The "X" is a real tab stop, deliberately (Tom, 2026-08-22). It is the ONLY
-								      // way to hide a line, so taking it off the keyboard would make the function
-								      // mouse-only -- WCAG 2.1.1 by omission. It costs one stop per line, and that
-								      // cost is accepted. ?>
-								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$input['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row" title="<?=htmlspecialchars($ec_lang['view_hide_line'], ENT_QUOTES, 'UTF-8')?>">X</a></td>
-							</tr>
-<?php
-	}
-?>
-						</tbody>
-					</table>
+					<?php echoInputGrid($arrayInputs); ?>
 				</td>
 <?php if ($arrayResults) : ?>
 				<td>
@@ -369,6 +511,7 @@ document.addEventListener('DOMContentLoaded', function() {
 ?>
 <?php if ($flagFormAppend === true) {echoCalculatorFormAppend();} ?>
 </form>
+<?php echoLineMirrorScript(); ?>
 <div class="engcalcs-print-tools d-print-none">
 	<p><button type="button" id="btn-printable"><?=ecIcon('print')?><?=$ec_lang['view_printable']?></button></p>
 </div>

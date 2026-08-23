@@ -198,19 +198,35 @@ the block.
     directory in that same pass and not before (`dev/hosting-layout.md` §5).
 
 - 75|478| **[H] Tab should walk down the input column, not sideways.**
-  Tom, 2026-08-22: *"One entire column at a time... it is less bad to force a user tabber person into
-  'do an entire column at once' than 'do an entire row at once'"* — a user is focused on one to three
-  variables, and sending them through a whole row defeats tabbing. Row-tables `mi`, `wi`, `ip` and
-  `bpn` are where the win is largest.
-  - **DOM ORDER, NOT `tabindex`, is the tool that delivers exactly that.** Lay the two inner tables
-    built by `echoCalculatorForm()` out as a CSS grid whose DOM is column-major — all inputs, then
-    all units, then all X's — so Tab walks the entire input column and nothing loses keyboard access.
+  BUILT; awaiting Tom on one measured layout difference, below. Tom, 2026-08-22: *"One entire column
+  at a time... it is less bad to force a user tabber person into 'do an entire column at once' than
+  'do an entire row at once'"*.
+  - **BUILT.** `echoInputGrid()` (lib/Calculators.lib.php) emits the input lines as a CSS grid whose
+    DOM is column-major — every input, then every label, then every unit select, then every X — each
+    cell placed back on its line with `grid-row`. `x-cross` is **0 on all fifteen pages the grid
+    builds** (was: Manning-Trap 16, Irrigation-Pressure 12, Orifice-Drain-Time 9, Branched-Network 8,
+    Darcy-Weisbach 8, Manning-Pipe-Flow 4) and `focus_order_check.php` now FAILS on any grid page
+    that is not at zero. Looped-Network is the one calculator with no grid (its inputs are a property
+    sheet) and keeps 6, reported only.
+  - **THE ONE THING TOM HAS TO RULE ON, and the reason this is not closed.** **While the form fits
+    the window the layout is identical to the pixel** — every control, every rule, every language,
+    LTR and RTL, verified by `dev/browser-pass/fieldgrid-layout.js`, which serves the old markup and
+    the new side by side and compares every box. **When the window is too narrow for the form it is
+    not.** A `<td>` wraps its contents and two grid columns cannot: the input and its unit select
+    shared one cell, so a squeezed table used to drop a wide unit select onto a second line under its
+    input. Now the label column takes the whole squeeze and the select stays on the line — one row
+    shorter, panel a few px wider and up to 78px shorter, overall form width unchanged, no new
+    horizontal scrolling. In English it appears on Manning-Trap below ~1400px and Rock-Chute below
+    ~1200px; in the languages with long unit names it starts higher (Manning-Trap and Rock-Chute at
+    1400px in most, Irrigation-Pressure and Canal-Seepage in bg/de) and is gone by 1920px everywhere.
+    Arguably tidier, but it is a change, and **wrapping and column-major tab order are mutually
+    exclusive**: wrapping needs the input and the select in one box, and tab order follows that box's
+    DOM. Tom decides; there is no third option to find.
   - **Rejected: `tabindex="-1"` on everything but titles and inputs.** It removes a control from the
     keyboard entirely, so a keyboard-only user could not switch ft to m (WCAG 2.1.1 requires all
     functionality to be keyboard-operable), and the per-row X would become mouse-only.
-  - The prize is `dev/scripts/focus_order_check.php`'s advisory `x-cross` column (a number input
-    sitting after a unit select): Manning-Trap 16, Irrigation-Pressure 12, Orifice-Drain-Time 9,
-    Branched-Network 8, Darcy-Weisbach 8, Manning-Pipe-Flow 4. It flips to blocking when this lands.
+  - Still owed once Tom rules: his own browser pass on hiding a line (the X is a multi-target
+    collapse now) and on the three pages whose own script hides a line by id.
 
 - 75|483| **EPANET import: carry unhandled features into a per-asset import notes field.**
   Tom, 2026-08-22. Today an import reports its differences and then the information is discarded; a
