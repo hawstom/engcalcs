@@ -6061,12 +6061,12 @@ var EngCalcs = EngCalcs || {};
 		georef.t = t;
 		georef.rotDeg = 0;
 		georefSuspend(true);
-		// **AND THE VIEW GOES TO THE MODEL.** This used to refuse to fit, on the argument that the
-		// view was still the one fitted to these very coordinates when the project opened. That was
-		// true while arming happened on the wizard's first frame; it is not true now that the user
-		// reaches this through a button on the bar, by which time step 1 has already carried them
-		// out to the whole Earth. Fitting is not re-baselining anything -- not one coordinate moves
-		// here -- it is pointing the camera at where the numbers say the network already is.
+		// **AND THE VIEW GOES TO THE MODEL.** Refusing to fit -- on the argument that the view is
+		// still the one fitted to these very coordinates when the project opened -- holds only while
+		// arming happens on the wizard's first frame. The user reaches this through a button on the
+		// bar, by which time step 1 has carried them out to the whole Earth. Fitting re-baselines
+		// nothing: not one coordinate moves here, the camera merely points at where the numbers say
+		// the network already is.
 		buildDom();
 		refreshSymbolSizes();
 		refreshTextLabelSizes();
@@ -6381,8 +6381,8 @@ var EngCalcs = EngCalcs || {};
 	// **TOP n AND BOTTOM n ARE CONDITIONS, NOT A SEPARATE BOX** (Tom, 2026-08-18: *"We want the
 	// dropdown to include two more items, 'Top n' and 'Bottom n'. And we don't need a second input.
 	// The Value input will serve for n."*). A first cut put a "how many at each end" number beside
-	// the value and split every long list into two halves; that answered a question nobody asked,
-	// and it asked for a number on searches that had no ends. Asking for the extremes is a
+	// the value splits every long list into two halves, answering a question nobody asked and
+	// demanding a number on searches that have no ends. Asking for the extremes is a
 	// CONDITION on the same footing as "is greater than", and it reuses the box already there.
 	function findOpDefs() {
 		var pc = EngCalcs.pageConfig || {};
@@ -6780,9 +6780,8 @@ var EngCalcs = EngCalcs || {};
 	// ---- THE BOTTOM PANE (ROADMAP Task 434) --------------------------------------------------
 	//
 	// One resizable panel docked under the map, carrying a TAB for each thing that is READ WHILE
-	// THE MAP IS EDITED: the profile now, the tabular editors (Junctions, Pipes, Pumps, Valves)
-	// next. Tom, 2026-08-18, naming the frame that Tasks 284, 427, 433 and 146.04 were each about
-	// to invent separately.
+	// THE MAP IS EDITED: the profile, and the six asset tables. Tom, 2026-08-18, naming the frame
+	// that Tasks 284, 427, 433 and 146.04 were each about to invent separately.
 	//
 	// **THE PANE NEVER TELLS THE CANVAS HOW TALL TO BE.** It sits in normal flow below the map, and
 	// applyMapHeight() sizes the canvas from `body.bottom - svg.bottom` -- so a pane that really is
