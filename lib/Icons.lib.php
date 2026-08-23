@@ -314,33 +314,60 @@ $ec_icons = array(
 		. '<path d="M12 7.5C14.4 5.6 17.2 5 20.5 5.2V16.5C17.2 16.3 14.4 16.9 12 18.8"/>'
 		. '<path d="M12 7.5V18.8"/>',
 
-	// PROJECT: a plan set, part unrolled (ROADMAP Task 467). **TRACED FROM TOM'S OWN 17x17 PIXEL
-	// DRAWING**, 2026-08-21, decoded out of the PNG run by run rather than eyeballed, and not
-	// redesigned: same stroke count, same topology, same proportions. What it shows, left to right:
-	// the ROLL, its outer wall vertical and its bottom rounded where it sits on the table; THREE
-	// sheet edges coming out of it, because a set is never one sheet ("You never pull out only one
-	// sheet"); and the TITLE BLOCK, a divided strip down the right, which is the half only an
-	// insider reads.
+	// PROJECT: a plan set, part unrolled (ROADMAP Task 467). Traced from Tom's own 17x17 pixel
+	// drawing and not redesigned since: same stroke count, same topology, same proportions. What it
+	// shows, left to right: the ROLL, its outer wall vertical and its bottom rounded where it sits
+	// on the table; THREE sheet edges coming out of it, because a set is never one sheet ("You never
+	// pull out only one sheet"); and the TITLE BLOCK, an END-OF-SHEET strip down the whole right
+	// edge, cut into four rows -- the half only an insider reads.
 	//
-	// **HOUSE WEIGHT, chosen by Tom over the weight it was drawn at** (2026-08-21). The measurement
-	// behind that choice is worth keeping, because it is what made six rounds of redrawing miss: a
-	// 16 px drawing with a 1 px line is 1/16 of the icon, while this set's 2-unit stroke in a 24 box
-	// is 1/12 -- a third heavier -- so every redraw came back fatter than the sketch and details
-	// that fitted his grid filled in on ours. The cost is paid at 17 px, the size a menu row draws:
-	// the top sheet edge closes toward the one below it. Accepted, because one icon at its own
-	// weight is a visible seam in a strip and this one would have been the only 1.5 on it.
+	// THE TITLE BLOCK IS A SUBDIVIDED STRIP, NEVER A LOWER-RIGHT BOX (Tom, 2026-08-22: "the lower
+	// right title block looks almost the same as the roll of paper"). One low division turns the
+	// strip's foot into a small rounded-looking mass sitting opposite the roll, and two similar
+	// masses at opposite corners is the whole defect -- the eye reads two of the same object. A
+	// repeated rhythm of rows reads as a different KIND of thing from a single shape, so the fix is
+	// the count of divisions, not their placement.
 	//
-	// Rejected on the way here, so they are not re-proposed: a rolled TUBE (a cylinder on this page
-	// reads as a PIPE, two icons away), a water drop (says water, not the job), a hard hat (says
-	// construction), and a corner-curled single sheet (a set is not one sheet). A coil small enough
-	// to sit at a corner cannot hold its opening: two 2-unit strokes need about 4 units between
-	// centres at 16 px and such a coil has room for 1.5.
+	// FOUR ROWS, and the number is measured rather than chosen. At 17 px two 2-unit strokes need
+	// about 3.5 units between centres to leave any daylight at all (3.0 leaves a quarter-covered
+	// pixel, 2.5 closes solid). The strip runs 5.4 to 21, so 15.6 units holds four rows and not
+	// five. The three rules sit at 9, 12.6 and 16.8 rather than at even quarters because the middle
+	// sheet edge lands on the strip at y=12.6: an even-quarter rule at 13.2 would sit 0.6 from it,
+	// and two strokes 0.6 apart are one fat stroke. Collinear is the only clean resolution, and
+	// pinning 12.6 then halving each side is what puts the other two where they are.
+	//
+	// NO THICKNESS LINES, though Tom asked for them at the roll, the bottom and the right edge
+	// (widest at the right, "due to the nature of rolling stacks of paper"). A thickness line is
+	// parallel and close to the edge it doubles, which is exactly the case that fills in, and the
+	// box has no room: the drawing already reaches x=21 and y=21, so the widest offset that stays
+	// inside 24 is 2 units at the right and at the bottom, and 1.8 at the roll -- all below the 2.5
+	// at which the pair goes solid. Measured, not assumed: at 2.0 the gap column samples 100%
+	// covered. This needs the sheet moved in, which is the redesign Tom ruled out, so it waits.
+	//
+	// HOUSE WEIGHT, chosen by Tom over the weight it was drawn at. The measurement behind that is
+	// worth keeping, because it is what made six rounds of redrawing miss: a 16 px drawing with a
+	// 1 px line is 1/16 of the icon, while this set's 2-unit stroke in a 24 box is 1/12 -- a third
+	// heavier -- so every redraw came back fatter than the sketch and details that fitted his grid
+	// filled in on ours. The cost is paid at 17 px, the size a menu row draws: the top sheet edge
+	// closes toward the one below it. Accepted, because one icon at its own weight is a visible
+	// seam in a strip and this one would have been the only 1.5 on it.
+	//
+	// VERIFY BY MEASURING, NOT BY EYE -- there is no rasterizer here, and every round that trusted
+	// the 24-unit drawing shipped something fatter than intended. `php dev/scripts/icon_ascii_preview.php
+	// project` prints the coverage grid at 17 px and at 24 px. The 17 px grid is the verdict.
+	//
+	// Rejected on the way here, so they are not re-proposed: a lower-right title block (above); a
+	// rolled TUBE (a cylinder on this page reads as a PIPE, two icons away); a water drop (says
+	// water, not the job); a hard hat (says construction); and a corner-curled single sheet (a set
+	// is not one sheet). A coil small enough to sit at a corner cannot hold its opening: it has room
+	// for 1.5 units between stroke centres where 3.5 is the floor.
 	'project'    => '<path d="M1.8 3C1.8 2.2 2.6 1.8 3.6 1.8H6C7.8 1.8 9 2.9 9.6 4.6L10.2 5.4H21"/>'
 		. '<path d="M21 5.4V21"/><path d="M10.2 21H21"/>'
 		. '<path d="M1.8 3V19.8C1.8 20.6 2.8 21 4.2 21C5.6 21 6.6 20.6 6.6 19.8"/>'
 		. '<path d="M1.8 9H6.6C8.4 9 10.2 10.8 10.2 12.6H15"/>'
 		. '<path d="M1.8 17.4H6.6C8.4 17.4 9 18.6 9 19.8"/>'
-		. '<path d="M15 5.4V21"/><path d="M15 17.4H21"/>',
+		. '<path d="M15 5.4V21"/>'
+		. '<path d="M15 9H21"/><path d="M15 12.6H21"/><path d="M15 16.8H21"/>',
 
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
