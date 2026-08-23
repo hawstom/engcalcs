@@ -2334,10 +2334,10 @@ var EngCalcs = EngCalcs || {};
 			// silently reinterprets every already-saved network's toggles. Non-numeric fields (ID)
 			// have no entry. Three fields depart from the default 2, each for a reason about the
 			// QUANTITY:
-			//   roughness 0 -- this page is Hazen-Williams only (assembleModel() hardcodes method:'hw')
-			//     and a C-factor is a dimensionless integer: 100, 130, 140. REVISIT IF A
-			//     FRICTION-METHOD SELECTOR IS EVER ADDED -- Darcy-Weisbach's roughness is a HEIGHT
-			//     (0.00015 m), which prints as "0" at 0 decimals.
+			//   roughness 0 -- a Hazen-Williams C-factor is a dimensionless integer: 100, 130, 140.
+			//     **THIS ONE DOES NOT FOLLOW settings.method, AND THE METHOD IS SELECTABLE** (Task
+			//     271): Darcy-Weisbach's roughness is a HEIGHT (0.00015 m), which prints as "0" at 0
+			//     decimals.
 			//   diameter 0 -- inches and millimetres are both whole-number standards in this trade.
 			//   gradient 4 -- the only field whose unit family offers two forms differing by 100x
 			//     (gradePercent and plain rise/run). 2 decimals is useless as a ratio, where a typical
@@ -19174,10 +19174,6 @@ var EngCalcs = EngCalcs || {};
 		renderLabelFields(labelId);
 		openPopupAt(sx, sy);
 	}
-	// Roughness has no unit selector for now: Phase 1 assumes Hazen-Williams (js/lpn-solver.js's
-	// default), whose C-factor is dimensionless. Darcy-Weisbach's roughness HEIGHT does need
-	// units (the scope doc's roughness family is "DW only") -- revisit once a friction-method
-	// selector exists (matching bpn_'s own method switch) and this can be genuinely conditional.
 	// Open/Closed link state (Task 146.07): explicitly NOT a "valve" and NOT modelled by abusing the
 	// minor-loss coefficient -- a plain boolean.
 	//
