@@ -40,7 +40,15 @@ $P = array(
 	'xr'      => 21.2,   // fanned right edge
 	'xtb'     => 16.6,   // title block upright
 	'copies'  => 3,
-	'wthick'  => 3.0,
+	'wfan'    => 3.0,    // the RIGHT edge: several sheets fanned out by having been rolled. The
+	                     // fattest line, and the only genuinely fanned one.
+	'wroll'   => 2.5,    // the roll's back edge and its bottom end: a stack, but rolled tight, not
+	                     // fanned.
+	'wbottom' => 2.0,    // the bottom edge. Tom, 2026-08-23: "far less pronounced than the right edge
+	                     // fanning fatness, partly because of perspective making it appear shorter
+	                     // than it is, like the ellipse roll instead of a circle, and partly because
+	                     // the bottom edge is not fanned." So barely above standard.
+	'wthick'  => 3.0,    // kept as the ceiling the others are read against
 	'wthin'   => 1.5,    // THE NARROWEST THAT SURVIVES 17 px, and everything takes it except the
 	                     // three heavy lines. Tom, 2026-08-23: 'All the linework should be as narrow
 	                     // as feasible (not to disappear at 17 px) so that we can fit things.'
@@ -99,7 +107,7 @@ $out = array();
 // not hidden behind the sheets in front of it; above, the same curve's top half only. Always the
 // heavy stroke: one fat line is how the whole roll of sheets is drawn.
 $out[] = '<ellipse cx="' . $f($cx) . '" cy="' . $f($cyBot) . '" rx="' . $f($P['rx'])
-	. '" ry="' . $f($P['ry']) . '" stroke-width="' . $f($P['wthick']) . '"/>';
+	. '" ry="' . $f($P['ry']) . '" stroke-width="' . $f($P['wroll']) . '"/>';
 // **ONLY THE BOTTOM IS A STACK** (Tom, 2026-08-23: *"only the bottom needs extra thick lines to
 // represent a stack of sheets"*). A copy higher up is one sheet's own edge wrapping the roll, so it
 // takes the thin stroke; the earlier version copied the heavy weight up with the shape and made
@@ -111,14 +119,22 @@ for ($i = 1; $i < $n; $i++) {
 // so it carries the heavy stroke. Without it the copies read as separate curves floating one above
 // another instead of as one roll; it is also what lets theta0 go back to 180, because every arc now
 // starts ON this line.
-$out[] = '<path stroke-width="' . $f($P['wthick']) . '" stroke-linecap="butt" d="M'
+$out[] = '<path stroke-width="' . $f($P['wroll']) . '" stroke-linecap="butt" d="M'
 	. $f($P['xl']) . ' ' . $f($cyTop) . 'V' . $f($cyBot) . '"/>';
 // The fanned right edge and the bottom copy's sag and flat, as ONE mitered path, so the lower-right
 // corner is a join and comes out square. Its butt top end stops one thin half-width short of the
 // top run, so it lands flush with that edge rather than bulging a round cap past the corner above.
-$out[] = '<path stroke-width="' . $f($P['wthick']) . '" stroke-linejoin="miter" stroke-linecap="butt"'
-	. ' d="M' . $f($P['xr']) . ' ' . $f($yTopRun - $P['wthin']/2)
-	. 'V' . $f($P['ytable']) . 'H' . $f($p3[0])
+// **THE FANNED RIGHT EDGE AND THE BOTTOM EDGE ARE NOW TWO PATHS, BECAUSE THEY ARE TWO WEIGHTS.**
+// One mitered path gave a clean square corner but forced one width on both, and the bottom edge is
+// neither fanned nor seen square-on. Two butt-capped strokes meeting at the corner leave a visible
+// STEP there, which is what a thick edge running into a thinner one really looks like. The vertical
+// runs half its own width past the tabletop so the corner fills.
+$out[] = '<path stroke-width="' . $f($P['wfan']) . '" stroke-linecap="butt" d="M'
+	. $f($P['xr']) . ' ' . $f($yTopRun - $P['wthin']/2)
+	. 'V' . $f($P['ytable'] + $P['wbottom']/2) . '"/>';
+$out[] = '<path stroke-width="' . $f($P['wbottom']) . '" stroke-linejoin="miter" stroke-linecap="butt"'
+	. ' d="M' . $f($P['xr'] + $P['wfan']/2) . ' ' . $f($P['ytable'])
+	. 'H' . $f($p3[0])
 	. 'C' . $pt($c2) . ' ' . $pt($c1) . ' ' . $pt($p0) . '"/>';
 // Every copy above the bottom: sag and flat are one sheet edge, so the light stroke. The top copy
 // is the sheet's top edge and runs to the fanned right edge, carrying the upper-right corner as a

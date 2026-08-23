@@ -359,15 +359,19 @@ $ec_icons = array(
 	// needs the room. A path with no stroke-width inherits 2 from EC_ICON_OPEN_TAG, so EVERY narrow
 	// path states its width; lowering the parameter alone silently does nothing.
 	//
-	// THREE WEIGHTS, ON PURPOSE. The set otherwise uses one, and a lighter WHOLE icon was rejected for
-	// exactly that reason — an odd weight in a menu strip is a visible seam. A heavier accent inside
-	// one icon is a different question, and it is the only way to say "a stack of sheets" here: a
-	// second parallel line cannot, because the widest offset that stays in the box is 2.0 and a pair
-	// at 2.0 samples as a solid bar. **ONLY THREE LINES ARE HEAVY** — the bottom edge (table plus
-	// stack), the fanned right edge, and the roll's back edge, which is the outside of the rolled
-	// stack and is why Tom called it "wider than standard". The bottom ellipse goes with them. Every
-	// copy above the bottom is one sheet's own edge and takes the 1.5. Copying the heavy weight up
-	// with the shape made three stacks where there is one.
+	// FOUR WEIGHTS, AND EACH ONE MEANS SOMETHING PHYSICAL. A second parallel line cannot say
+	// "thickness" here — the widest offset that stays in the box is 2.0 and a pair at 2.0 samples as
+	// a solid bar — so thickness is carried by the stroke itself:
+	//   1.5  a single sheet's own edge: every copy above the bottom, and the title-block upright.
+	//   2.0  the bottom edge. Tom, 2026-08-23: "far less pronounced than the right edge fanning
+	//        fatness, partly because of perspective making it appear shorter than it is, like the
+	//        ellipse roll instead of a circle, and partly because the bottom edge is not fanned."
+	//   2.5  the roll — its back edge and its bottom end. A stack, but rolled tight.
+	//   3.0  the fanned right edge, the only genuinely fanned line, and the fattest.
+	// **THE BOTTOM AND RIGHT EDGES ARE THEREFORE TWO PATHS, NOT ONE MITERED PATH.** One path gave a
+	// clean square corner and forced one width on both. Two butt-capped strokes meeting there leave a
+	// visible STEP, which is what a thick edge running into a thinner one really looks like.
+	// Copying the heavy weight up with the shape made three stacks where there is one.
 	//
 	// SHARP CORNERS at upper and lower right — "rounding is not realistic for a plan sheet". The
 	// shared open tag sets stroke-linejoin="round", so each corner is a JOIN INSIDE ONE PATH carrying
@@ -392,11 +396,12 @@ $ec_icons = array(
 	// (says construction); a corner-curled single sheet ("You never pull out only one sheet"); and a
 	// title block in the LOWER RIGHT ONLY, which made a closed box the same size as the roll at the
 	// opposite corner, and two equal masses read as two of the same object.
-	'project'    => '<ellipse cx="4.8" cy="19.6" rx="2.8" ry="1.4" stroke-width="3"/>'
+	'project'    => '<ellipse cx="4.8" cy="19.6" rx="2.8" ry="1.4" stroke-width="2.5"/>'
 		. '<path stroke-width="1.5" d="M2 11.5C2 11.199 2.194 10.906 2.554 10.664C2.914 10.422 3.42 10.245 3.997 10.159C4.574 10.072 5.192 10.081 5.758 10.184"/>'
 		. '<path stroke-width="1.5" d="M2 3.4C2 3.099 2.194 2.806 2.554 2.564C2.914 2.322 3.42 2.145 3.997 2.059C4.574 1.972 5.192 1.981 5.758 2.084"/>'
-		. '<path stroke-width="3" stroke-linecap="butt" d="M2 3.4V19.6"/>'
-		. '<path stroke-width="3" stroke-linejoin="miter" stroke-linecap="butt" d="M21.2 4.05V21H13C8.5 21 7.922 18.678 5.758 18.284"/>'
+		. '<path stroke-width="2.5" stroke-linecap="butt" d="M2 3.4V19.6"/>'
+		. '<path stroke-width="3" stroke-linecap="butt" d="M21.2 4.05V22"/>'
+		. '<path stroke-width="2" stroke-linejoin="miter" stroke-linecap="butt" d="M22.7 21H13C8.5 21 7.922 18.678 5.758 18.284"/>'
 		. '<path stroke-width="1.5" stroke-linejoin="miter" d="M5.758 10.184C7.922 10.578 8.5 12.9 13 12.9H16.6"/>'
 		. '<path stroke-width="1.5" stroke-linejoin="miter" d="M5.758 2.084C7.922 2.478 8.5 4.8 13 4.8H21.2"/>'
 		. '<path stroke-width="1.5" d="M16.6 4.8V21"/>',
