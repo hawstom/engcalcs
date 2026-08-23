@@ -712,6 +712,45 @@ console.log('\n--- the Settings index pane (Tom asked for 0.8 of it on the PC, a
 	ok('an index row may wrap, and may break a long word',
 		winning(RULES, link, WIDE, DOC_IDS, false, 'white-space') === 'normal' &&
 		winning(RULES, link, WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
+	// The Libraries box borrows the whole Settings shell, so its own narrower index is an override
+	// on the same class rather than a second pane design (Tom's item 9).
+	const libpanes = node('div', '', ['lpn-setbox-panes'], node('div', 'lpn_library_box', ['lpn-popover', 'lpn-setbox', 'lpn-libbox'], body));
+	const libindex = node('nav', 'lpn_libbox_index', ['lpn-setbox-index'], libpanes);
+	ok('the Libraries index pane is 5.25rem -- 0.70 x the 7.5rem it shipped at',
+		winning(RULES, libindex, WIDE, DOC_IDS, false, 'flex-basis') === '5.25rem');
+	ok('...and it takes the phone width below the breakpoint, like every other index',
+		winning(RULES, libindex, SMALL, DOC_IDS, false, 'flex-basis') === '4.5rem');
+}
+
+// ============================================================================================
+// 9. THE NON-BLOCKERS: A SHORT SCREEN, AND THE TABLES IN THE BOTTOM PANE
+// ============================================================================================
+console.log('\n--- a box on a short screen, and the pane tables (Tom\'s items 5 and 10) ---');
+{
+	// **KEYED OFF THE VIEWPORT HEIGHT, NOT THE 640px WIDTH**, because a short window on a laptop is
+	// the same problem and is not a phone. The reader treats @supports as always applying, so the
+	// dvh rule is the one that must be found at BOTH widths -- which is the assertion, since a
+	// height limit that only a phone gets would be the wrong shape for this item.
+	const setbox = node('div', 'lpn_settings_box', ['lpn-popover', 'lpn-setbox'], body);
+	[[WIDE, 'a wide window'], [SMALL, 'a phone']].forEach(([w, what]) => {
+		ok('in ' + what + ' the Settings box is capped in dvh, not vh',
+			winning(RULES, setbox, w, DOC_IDS, false, 'max-height') === '96dvh',
+			'got ' + winning(RULES, setbox, w, DOC_IDS, false, 'max-height'));
+		ok('...and its opening height is capped the same way',
+			winning(RULES, setbox, w, DOC_IDS, false, 'height') === 'min(46rem, 92dvh)');
+	});
+	// A cap alone would only move the overflow inside the box; the panes are what scroll.
+	const panes2 = node('div', '', ['lpn-setbox-panes'], setbox);
+	ok('...and the panes inside it scroll, so the capped box does not spill',
+		winning(RULES, node('div', '', ['lpn-setbox-content'], panes2), SMALL, DOC_IDS, false, 'overflow') === 'auto');
+
+	// Tom's (10). The one imposed width in those tables, halved below the breakpoint.
+	const tbl = node('table', '', ['lpn-pane-table'], node('div', 'lpn_pane', [], body));
+	const cell = node('input', '', [], node('td', '', [], node('tr', '', [], tbl)));
+	ok('a pane table number box is 3.5em on a small screen -- half of what it was',
+		winning(RULES, cell, SMALL, DOC_IDS, false, 'width') === '3.5em');
+	ok('...and 7em on the desktop, which did not move',
+		winning(RULES, cell, WIDE, DOC_IDS, false, 'width') === '7em');
 }
 
 // The reader's blind-spot report, scoped to selectors that could possibly reach what this file

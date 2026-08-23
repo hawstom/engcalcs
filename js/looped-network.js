@@ -6842,8 +6842,12 @@ var EngCalcs = EngCalcs || {};
 		b = body.getBoundingClientRect().height;
 		return (p > b && b > 0) ? p - b : 0;
 	}
+	// viewportHeight(), not window.innerHeight: the pane's ceiling is a fact about what the reader
+	// can SEE, and a mobile browser's innerHeight counts the strip behind its own toolbars. An
+	// over-tall pane is subtracted from the map by measurement (flowBelowMap), so the map hits its
+	// floor and the page runs off the bottom -- the same symptom, one element further down.
 	function paneMaxHeight() {
-		var vh = window.innerHeight || 800, body = document.getElementById('lpn_pane_body'),
+		var vh = viewportHeight(), body = document.getElementById('lpn_pane_body'),
 			map = svg ? svg.getBoundingClientRect().height : 0,
 			mine = body ? body.getBoundingClientRect().height : 0,
 			room = map + mine - LPN_PANE_MAP_MIN;

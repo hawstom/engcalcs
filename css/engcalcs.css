@@ -1239,6 +1239,20 @@ html[lang="zh"] .ec-welcome {
 /* The title sits in the 40px drag band, left of the X. It is text, not a control, so it never
    swallows a drag: `e.target` on a pointerdown here is the title, not the box -- hence
    pointer-events:none, which hands the whole band back to the box's own drag handler. */
+/* **AND THE SAME THREE HEIGHTS IN dvh** (Tom, 2026-08-22: "The settings box and possibly other
+   boxes needs to be height-limited for short screens"). It WAS limited -- to 96vh -- and on a phone
+   that is the wrong 100%: vh counts the strip behind the retracting address bar, the same
+   measurement error that put the map's own bottom out of reach. So the box opened at 92% of a
+   height the reader did not have and its foot sat behind the browser's furniture.
+
+   Keyed off the viewport HEIGHT, not the 640px width: a short window on a laptop is the same
+   problem and is not a phone. AFTER the rule it overrides, because @supports adds no specificity
+   and an equally specific rule later in the file would simply win. Nothing else is needed -- the
+   body is a flex column with `min-height: 0` and both panes scroll inside themselves, so a capped
+   box scrolls rather than spilling, and .lpn-libbox borrows this whole shell. */
+@supports (height: 100dvh) {
+	.lpn-setbox { height: min(46rem, 92dvh); min-height: min(18rem, 92dvh); max-height: 96dvh; }
+}
 .lpn-setbox-title {
 	position: absolute; top: 10px; left: 12px; font-weight: bold; pointer-events: none;
 }
@@ -1721,6 +1735,12 @@ html:has(#lpn_canvas) { overflow: hidden; }
    44rem against Settings' 34. Everything else -- the height, the minimums, the resize -- is
    inherited deliberately. */
 .lpn-libbox { width: min(44rem, 94vw); }
+/* **AND A NARROWER INDEX AGAIN** (Tom, 2026-08-22: "The Libraries box can have an Index pane width
+   0.70 * current, at least in English"). 0.7 x the 7.5rem both boxes shipped at. It is a shorter
+   list of shorter names than Settings' -- Patterns, Curves, Controls -- so it can give up more, and
+   what it gives up goes to the pattern series and the control sentence, which are the two things
+   this box exists to show whole. */
+#lpn_library_box .lpn-setbox-index { flex-basis: 5.25rem; }
 /* An entry is one pattern, one curve or one control: a block with a rule under it, so a list of
    them reads as a list of things rather than as a paragraph of controls. */
 .lpn-lib-entry { padding: 6px 0 8px; border-bottom: 1px solid #eee; }
@@ -1840,6 +1860,19 @@ html:has(#lpn_canvas) { overflow: hidden; }
 	   The index itself imposes no floor at all now that its rows wrap. The desktop figure is 6rem,
 	   in .lpn-setbox-index above. */
 	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: 4.5rem; }
+
+	/* 5b. THE BOTTOM-PANE TABLES' NUMBER BOXES (Tom, 2026-08-22: "The Tables in the bottom pane have
+	   some columns, inputs I think, with artificially limited shrink that can in general be about
+	   50% of current"). `.lpn-pane-table input { width: 7em }` is the only imposed width anywhere in
+	   those tables -- every other column is a heading button, a plain cell or an ID link and is
+	   already as narrow as its own content -- so it is the only thing there is to halve. 3.5em holds
+	   five digits at this font, and an input scrolls its own content rather than truncating it, so a
+	   longer number is typed and read normally in a shorter box.
+
+	   BELOW THE BREAKPOINT ONLY. Tom's "in general" may well have meant at every width; the standing
+	   rule is that the desktop layout does not move unless he asked for that layout to move, and
+	   this item did not say so. Moving it out of this block is a one-line change if he confirms. */
+	html:has(#lpn_canvas) .lpn-pane-table input { width: 3.5em; }
 
 	/* 6. THE SYMBOLOGY ROWS WRAP AS A GROUP (Tom, 2026-08-22, choosing between his own two ideas:
 	   "Idea B is to wrap the four inputs for Before/After/Decimal/Drop together below the checkbox
