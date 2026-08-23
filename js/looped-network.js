@@ -15780,6 +15780,39 @@ var EngCalcs = EngCalcs || {};
 	// canvas. It decides only whether such a window gets a small map that fits the page or a bigger
 	// one that pushes the status strip off the bottom. Not zero, which leaves nothing to aim at.
 	var LPN_MAP_MIN = 80;
+	// **THE HEIGHT THE USER CAN SEE IS NOT window.innerHeight ON A PHONE** (Tom, 2026-08-22: "The
+	// legends think they have more room at the bottom than they do, and they are running off the
+	// bottom of the map. Only on small screen. This can't be scrolled.").
+	//
+	// Nothing is wrong with where the legends are: both are `bottom: 4px` inside the map wrapper, so
+	// they are AT the map's bottom by construction. What was wrong is the map's own height. A mobile
+	// browser reports `innerHeight` for the LARGE viewport -- the page as it would be with the
+	// retractable address bar and bottom toolbar out of the way -- so the canvas was sized to a strip
+	// of page that is behind that chrome. The bottom of the map, and with it the two legends, the
+	// status strip and the tile attribution, sat under the browser's own furniture; `touch-action:
+	// none` on the canvas and `overflow: hidden` on the root (Task 432) then mean there is nothing to
+	// scroll to reach them, which is exactly what Tom reported. Choosing a Top position worked around
+	// it because the top of the map has never been in doubt.
+	//
+	// The DYNAMIC viewport is what the user can see, and visualViewport reports it. So the two
+	// heights are made to AGREE at the one place the map's height is decided, rather than the
+	// legends being nudged back into view -- a nudged legend drifts again the next time the pane
+	// opens. On a desktop the two are equal to the pixel, so nothing above the breakpoint moves.
+	//
+	// `* scale` takes a pinch zoom back out: vv.height is in VISUAL pixels, and only the browser
+	// chrome's share of the difference belongs in a layout measurement. `Math.min` because a wrong
+	// answer here may only ever be SMALLER than innerHeight -- a bigger one is the bug.
+	//
+	// NO visualViewport 'resize' LISTENER, deliberately. The root cannot scroll, so the dynamic
+	// toolbars do not retract on their own and the value is stable between the resize and
+	// orientationchange events that already re-measure. Subscribing would instead make the map
+	// resize under the on-screen keyboard, which shrinks the visual viewport on iOS every time a
+	// property box is typed into.
+	function viewportHeight() {
+		var vh = window.innerHeight || 800, vv = window.visualViewport;
+		if (!vv || !(vv.height > 0)) { return vh; }
+		return Math.min(vh, Math.round(vv.height * (vv.scale || 1)));
+	}
 	// How much ordinary page sits BELOW the canvas, in document flow. The popovers do not count:
 	// every one of them is position:fixed and display:none, so they occupy no flow at all -- which
 	// is why this measures the document rather than listing elements by id, a list that would go
@@ -15801,7 +15834,7 @@ var EngCalcs = EngCalcs || {};
 		return below > 0 ? below : 0;
 	}
 	function effectiveMapHeight() {
-		var vh = window.innerHeight || 800;
+		var vh = viewportHeight();
 		if (!svg) { return vh; }
 		var docEl = document.documentElement;
 		var rect = svg.getBoundingClientRect();
@@ -15945,7 +15978,7 @@ var EngCalcs = EngCalcs || {};
 		// One bounded re-measure, NEVER a loop. By the time this runs the new height has been applied
 		// and the page re-laid out around it. The floor is exempt because a canvas at LPN_MAP_MIN is
 		// allowed to overflow -- that overflow is a decision.
-		var vh = window.innerHeight || 800;
+		var vh = viewportHeight();
 		if (!secondPass && before.bottom > vh + 1 && before.height > LPN_MAP_MIN) {
 			applyMapHeight(true);
 		}
