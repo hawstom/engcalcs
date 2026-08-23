@@ -26,6 +26,68 @@ $testanswer='six';
 $to = 'tom.haws@gmail.com';
 
 /**
+ * Names the page the visitor was on BEFORE they clicked the invitation, or says it was not recorded.
+ *
+ * Tom, 2026-08-22: *"I have no idea what calculator this person was using."* The obvious instrument
+ * is the wrong one: $_SERVER['HTTP_REFERER'] on this request is contact.php, which every sender has
+ * in common and which tells him nothing. The originating page has to be CARRIED from the calculator
+ * page to the form, so this reads it from two places, in order:
+ *
+ *   1. a hidden 'origin' field posted by contact.php;
+ *   2. failing that, a 'from' or 'origin' query parameter on the contact.php URL we were referred
+ *      from -- which works on its own, with no hidden field, as soon as the invitation link carries
+ *      one.
+ *
+ * Both halves are visitor-supplied text and NEITHER is echoed. The value is matched against the
+ * suite's real page list -- the basenames of the .php files that sit beside this one -- and only a
+ * name that matches is printed. Anything else, including a referrer from outside the suite, reads
+ * "not recorded". Guessing a page would be worse than not knowing: an invented answer to "which
+ * calculator was this?" is exactly the kind of number this project refuses to print elsewhere.
+ *
+ * Stores nothing on the visitor's device and reads nothing that is stored there, so it is outside
+ * the consent question entirely: it is one line of transient message content, gone when Tom deletes
+ * the e-mail. consent_body is untouched and EC_CONSENT_VERSION does not move.
+ *
+ * @return string  a real page name, or '' when nothing usable was carried through.
+ */
+function ecContactOriginPage() {
+  $claim = '';
+  if (isset($_POST['origin']) && is_string($_POST['origin'])) {
+    $claim = $_POST['origin'];
+  }
+  if ($claim === '' && isset($_SERVER['HTTP_REFERER'])) {
+    // OUR OWN HOST ONLY. A referrer from anywhere else is somebody else's page nominating one of
+    // ours, and the honest report of that is "not recorded" -- the whole value of this line is that
+    // Tom can trust it. The site answers on www and non-www with no redirect, so the comparison
+    // ignores a leading 'www.' rather than pretending there is one canonical host.
+    $refHost = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
+    $ourHost = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+    $strip = function ($h) { return preg_replace('/^www\./i', '', strtolower(explode(':', (string)$h)[0])); };
+    $sameSite = ($refHost === null || $refHost === '') || ($ourHost !== '' && $strip($refHost) === $strip($ourHost));
+    $q = $sameSite ? parse_url($_SERVER['HTTP_REFERER'], PHP_URL_QUERY) : '';
+    if (is_string($q) && $q !== '') {
+      parse_str($q, $params);
+      foreach (array('from', 'origin') as $k) {
+        if (isset($params[$k]) && is_string($params[$k]) && $params[$k] !== '') {
+          $claim = $params[$k];
+          break;
+        }
+      }
+    }
+  }
+  if ($claim === '') return '';
+  // basename() first so a claim of '../../etc/passwd' or a full URL cannot name anything but a
+  // leaf, then an exact match against the pages that actually exist. The list is DERIVED, so a
+  // calculator added next year is covered without anybody remembering this file.
+  $claim = basename(trim($claim), '.php');
+  if ($claim === '' || !preg_match('/^[A-Za-z0-9._-]{1,64}$/', $claim)) return '';
+  foreach (glob(__DIR__ . '/*.php') as $f) {
+    if (strcasecmp(basename($f, '.php'), $claim) === 0) return basename($f, '.php');
+  }
+  return '';
+}
+
+/**
  * Records one SUCCESSFUL contact-form send to CONTACT_SEND_LOG (ROADMAP Task 206).
  *
  * Called only from the mail() success branch, which is the entire point: this is the half of the
@@ -56,7 +118,13 @@ function ecLogContactSend() {
   }
   // 'contact' rather than 'formmail': the page-basename column has to match the view rows this
   // number is divided by, or the funnel does not line up.
-  $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . 'contact' . "\t" . $lang . "\t" . $browserLang . "\n";
+  // The bucket column every other log writer appends (ecLogBucketSuffix, lib/config.inc.php).
+  // Without it this was the one log a row could not be matched to the consent bucket its click
+  // came from, so the contact funnel had a denominator in two units and a numerator in neither.
+  // Rows written before this change have four fields and no token; the report counts them as
+  // "no bucket column" rather than assigning them to either side.
+  $bucket = function_exists('ecLogBucketSuffix') ? ecLogBucketSuffix() : '';
+  $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . 'contact' . "\t" . $lang . "\t" . $browserLang . $bucket . "\n";
   @file_put_contents(CONTACT_SEND_LOG, $line, FILE_APPEND | LOCK_EX);
 }
 
@@ -111,6 +179,13 @@ if (preg_match("/(\r|\n)/", $postSubject) or preg_match("/@/",$postSubject)) {
 
 // Get the message
 $message = $postMessage.$postMoreMessage;
+
+// WHERE DID THEY COME FROM. Appended by us, below the visitor's own words and behind a rule so it
+// cannot be mistaken for part of the message. Labelled honestly in both directions: a page name
+// only when one was actually carried through, and the words "not recorded" -- never a guess --
+// when it was not. See ecContactOriginPage().
+$originPage = ecContactOriginPage();
+$message .= "\n\n-- \nCame from: " . ($originPage !== '' ? $originPage : 'not recorded') . "\n";
 
 // Use a fixed internal success page (do not trust user input for redirects).
 $successfile = 'formmailsuccess.php';
