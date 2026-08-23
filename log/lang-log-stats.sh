@@ -6,7 +6,12 @@
 #   bash log/lang-log-stats.sh --days=30  restrict the window to the last N days
 #   bash log/lang-log-stats.sh --out=FILE also write the report to FILE (still prints it)
 #   bash log/lang-log-stats.sh --archive=spock/2026-08-14
-#                                         report a rotated archive instead of the live logs
+#   bash log/lang-log-stats.sh --archive=2026-08-14
+#                                         report a rotated archive instead of the live logs. An
+#                                         archive is named by its ENDING date, so the bare date is
+#                                         enough; a path still works from anywhere.
+#   php dev/scripts/archive_logs.php --verify
+#                                         list every archive and say whether the record has a hole
 #
 # --out WRITES A FILE AND NOTHING ELSE. It does not publish anything: pick a path under dev/ or
 # spock/, both blocked from web access. The one PUBLISHED copy is written by
@@ -49,7 +54,12 @@ set -u
 # rotated set instead, which is the only way a window that has already been trimmed away can be
 # reported at all. The archived filenames ARE the live filenames, so nothing here has to know
 # anything about an archive except its directory -- dropping six hand-moved files into
-# spock/2026-08-14/ registers them, and no code changes.
+# spock/2026-08-14/ is still enough to report them, and no code changes.
+#
+# A rotation ALSO leaves a .archive-manifest.json naming the window it sealed (ROADMAP Task 485),
+# and the PROVENANCE line below says whether this archive has one. A hand-moved archive does not,
+# which is not an error -- it means the window printed below is everything that archive can prove
+# about itself. `php dev/scripts/archive_logs.php --verify` audits the whole chain.
 #
 # TWO THINGS MUST NEVER BE CONFUSABLE with a live run, because dev/usage-data-log.md records a 40x
 # scale break that happened from exactly this class of mistake:
@@ -65,11 +75,18 @@ for arg in "$@"; do
     case "$arg" in
         --archive=*)
             DIR="${arg#--archive=}"
+            # An archive's IDENTITY is its ending date, so --archive=2026-08-14 resolves against
+            # spock/ and means the same thing as --archive=spock/2026-08-14. A path is still a
+            # path, which is what lets an archive be reported from anywhere it has been copied to.
+            if [ ! -d "$DIR" ] && [ -d "$(dirname "$0")/../spock/$DIR" ]; then
+                DIR="$(dirname "$0")/../spock/$DIR"
+            fi
             SOURCE_KIND="archive"
             SOURCE_NAME="$(basename "$DIR")"
             if [ ! -d "$DIR" ]; then
                 echo "No such archive directory: $DIR" >&2
-                echo "Archives live in spock/<YYYY-MM-DD>/ -- see spock/README.md." >&2
+                echo "Archives live in spock/<YYYY-MM-DD>/ and may be named by their ending date" >&2
+                echo "alone: --archive=2026-08-14. See spock/README.md." >&2
                 exit 1
             fi
             ;;
@@ -92,7 +109,7 @@ for arg in "$@"; do
         --days=*)    WINDOW_DAYS="${arg#--days=}"; PASS_ARGS="$PASS_ARGS $arg" ;;
         --out=*)     OUT_PATH="${arg#--out=}" ;;
         --archive=*) PASS_ARGS="$PASS_ARGS $arg" ;;   # already consumed above; passed through --out
-        --help|-h) sed -n '2,14p' "$0"; exit 0 ;;
+        --help|-h) sed -n '2,18p' "$0"; exit 0 ;;
         *) echo "Unknown option: $arg" >&2; exit 1 ;;
     esac
 done
@@ -221,6 +238,28 @@ WIN_DAYS=$(awk -v a="$WIN_START" -v b="$WIN_END" 'BEGIN{
     d = (mktime(b) - mktime(a)) / 86400
     printf "%.1f", (d > 0 ? d : 0)
 }')
+
+# PROVENANCE: whether this archive registered itself when it was sealed. An archive with a manifest
+# can be shown to be a complete window; one without can only be shown to hold what it holds, which
+# is a different claim and prints as a different line. Counting the "cutoff" token counts the
+# recorded retention trims — dev/scripts/archive_logs.php writes exactly one per trim record — so
+# no JSON parser has to exist on the server for this line to be true.
+PROVENANCE_LINE=""
+if [ "$SOURCE_KIND" = "archive" ]; then
+    MANIFEST="$DIR/.archive-manifest.json"
+    if [ -f "$MANIFEST" ]; then
+        TRIMS=$(grep -c '"cutoff"' "$MANIFEST" 2>/dev/null || true)
+        [ -n "$TRIMS" ] || TRIMS=0
+        if [ "$TRIMS" -gt 0 ]; then
+            PROVENANCE_LINE="registered, and SHORTENED since — $TRIMS retention trim(s) recorded in its manifest."
+        else
+            PROVENANCE_LINE="registered — its manifest names the window it was sealed with, untrimmed."
+        fi
+    else
+        PROVENANCE_LINE="UNREGISTERED — no manifest, so the window below is all this archive can prove."
+    fi
+fi
+
 if [ "$SOURCE_KIND" = "archive" ]; then
     SOURCE_TAG="archive:${SOURCE_NAME}"
     SOURCE_LINE="ARCHIVE  $DIR  — these are ROTATED logs, not the live ones."
@@ -236,6 +275,7 @@ echo "==========================================================================
 echo " ENGCALCS USAGE REPORT"
 echo "==============================================================================="
 echo " SOURCE        $SOURCE_LINE"
+[ -n "$PROVENANCE_LINE" ] && echo " PROVENANCE    $PROVENANCE_LINE"
 echo " WINDOW        $WIN_START  ..  $WIN_END"
 echo " DURATION      $WIN_DAYS days"
 echo " FINGERPRINT   $FINGERPRINT"

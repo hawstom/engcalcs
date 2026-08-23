@@ -197,7 +197,9 @@ address and message; the log line itself is `ts / 'contact' / lang / browser_lan
 **Nothing in section 4 is served over HTTP.** Rotated copies live in `spock/<YYYY-MM-DD>/`
 (`dev/scripts/archive_logs.php`), which `spock/.htaccess` denies exactly as `log/.htaccess` denies
 the live set, and `dev/scripts/trim_logs.php` walks the archives so the 26-month promise in
-`privacy.php` follows the rows when they move. The one served thing is an **aggregate** report at an
+`privacy.php` follows the rows when they move — recording each archive deletion in that archive's
+own manifest, so `php dev/scripts/archive_logs.php --verify` can show the promise being kept rather
+than asserting it. The one served thing is an **aggregate** report at an
 unguessable path under `spock/public/` — counts, no per-event data, timestamps truncated to a date.
 Publishing counts discloses nothing about any individual and so changes no promise; publishing rows
 would change the deal `consent_body` states, which is a banner rewrite, 26 retranslations and an
