@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Gunakan Kalkulator Saluran Trapesium Manning untuk m
 $ec_lang['mpf_main_menu']='Aliran Pipa Manning';
 $ec_lang['mpf_main_title']='Kalkulator Aliran Pipa Manning Gratis Daring';
 $ec_lang['mpf_main_desc']='Rumus Manning untuk Aliran Pipa Seragam pada Kemiringan dan Kedalaman Tertentu';
-$ec_lang['mpf_spreadheet_notice']='Spreadsheet Aliran Pipa Manning';
+$ec_lang['mpf_spreadsheet_notice']='Spreadsheet Aliran Pipa Manning';
 $ec_lang['mpf_pipe_diameter']='Diameter pipa, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Koefisien kekasaran Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Kemiringan gesekan, S<sub>f</sub></a><span class="ec-help" title="Terkadang sama dengan kemiringan pipa. Ikuti tautan untuk penjelasan (hanya dalam bahasa Inggris)."><span class="ec-tip">?</span></span>';

@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='चट्टान अस्तर डिज़ा�
 $ec_lang['mpf_main_menu']='मैनिंग पाइप प्रवाह';
 $ec_lang['mpf_main_title']='मुफ़्त ऑनलाइन मैनिंग पाइप प्रवाह कैलकुलेटर';
 $ec_lang['mpf_main_desc']='दिए गए ढलान और गहराई पर मैनिंग सूत्र एकसमान पाइप प्रवाह';
-$ec_lang['mpf_spreadheet_notice']='मैनिंग पाइप प्रवाह स्प्रेडशीट';
+$ec_lang['mpf_spreadsheet_notice']='मैनिंग पाइप प्रवाह स्प्रेडशीट';
 $ec_lang['mpf_pipe_diameter']='पाइप व्यास, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='मैनिंग खुरदरापन, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">घर्षण ढलान, S<sub>f</sub></a><span class="ec-help" title="कभी-कभी पाइप ढलान के बराबर। व्याख्या के लिए लिंक पर जाएं (केवल अंग्रेज़ी में)।"><span class="ec-tip">?</span></span>';

@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Използвайте калкулатора за �
 $ec_lang['mpf_main_menu']='Водно количество в тръбопровод по Манинг';
 $ec_lang['mpf_main_title']='Безплатен онлайн калкулатор за водно количество в тръбопровод по Манинг';
 $ec_lang['mpf_main_desc']='Равномерно водно количество в тръбопровод по формулата на Манинг при зададени наклон и дълбочина';
-$ec_lang['mpf_spreadheet_notice']='Електронна таблица за водно количество в тръбопровод по Манинг';
+$ec_lang['mpf_spreadsheet_notice']='Електронна таблица за водно количество в тръбопровод по Манинг';
 $ec_lang['mpf_pipe_diameter']='Диаметър на тръбата, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Коефициент на грапавост на Манинг, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Хидравличен наклон, S<sub>f</sub></a><span class="ec-help" title="Понякога равен на наклона на тръбата. Последвайте връзката за обяснение (само на английски)."><span class="ec-tip">?</span></span>';

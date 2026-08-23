@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Koristite kalkulator trapezoidnog kanala prema Manni
 $ec_lang['mpf_main_menu']='Manning protok kroz cijev';
 $ec_lang['mpf_main_title']='Besplatni online kalkulator Manning protoka kroz cijev';
 $ec_lang['mpf_main_desc']='Manning formula — jednolik protok kroz cijev pri zadanom nagibu i dubini';
-$ec_lang['mpf_spreadheet_notice']='Excel tablica za Manningov protok kroz cijev';
+$ec_lang['mpf_spreadsheet_notice']='Excel tablica za Manningov protok kroz cijev';
 $ec_lang['mpf_pipe_diameter']='Promjer cijevi, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manningov koeficijent hrapavosti, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Nagib trenja, S<sub>f</sub></a><span class="ec-help" title="Ponekad jednak nagibu cijevi. Slijedite poveznicu za objašnjenje (samo na engleskom)."><span class="ec-tip">?</span></span>';

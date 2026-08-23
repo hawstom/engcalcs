@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Folosiți Calculatorul Manning pentru Canal Trapezoi
 $ec_lang['mpf_main_menu']='Manning Curgere Conductă';
 $ec_lang['mpf_main_title']='Calculator Gratuit Online Manning Curgere Conductă';
 $ec_lang['mpf_main_desc']='Formula Manning Curgere Uniformă în Conductă la Pantă și Adâncime Date';
-$ec_lang['mpf_spreadheet_notice']='Foaie de calcul Curgere în Conductă Manning';
+$ec_lang['mpf_spreadsheet_notice']='Foaie de calcul Curgere în Conductă Manning';
 $ec_lang['mpf_pipe_diameter']='Diametrul conductei, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Coeficientul de rugozitate Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Panta de frecare, S<sub>f</sub></a><span class="ec-help" title="Uneori egală cu panta conductei. Urmați linkul pentru explicație (doar în engleză)."><span class="ec-tip">?</span></span>';

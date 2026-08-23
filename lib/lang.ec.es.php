@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Use la Calculadora de canal trapecial según Manning
 $ec_lang['mpf_main_menu']='Flujo según Manning en tuberías';
 $ec_lang['mpf_main_title']='Calculadora gratis en línea de la fórmula de Manning para flujo uniforme en tuberías';
 $ec_lang['mpf_main_desc']='Caudal y velocidad de flujo uniforme en tuberías según Manning, a partir de la pendiente y el calado';
-$ec_lang['mpf_spreadheet_notice']='Hoja de cálculo: Flujo según Manning en tuberías';
+$ec_lang['mpf_spreadsheet_notice']='Hoja de cálculo: Flujo según Manning en tuberías';
 $ec_lang['mpf_pipe_diameter']='Diámetro de la tubería, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Coeficiente de rugosidad de Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pendiente de fricción, S<sub>f</sub></a><span class="ec-help" title="A veces igual a la pendiente de la tubería. Siga el enlace para la explicación (solo en inglés)."><span class="ec-tip">?</span></span>';

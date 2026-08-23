@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Користите калкулатор трапез
 $ec_lang['mpf_main_menu']='Проток у цевима по Manningу';
 $ec_lang['mpf_main_title']='Бесплатни онлајн калкулатор протока у цевима по Manningу';
 $ec_lang['mpf_main_desc']='Манингова формула равномерног течења у цевима при задатом нагибу и дубини';
-$ec_lang['mpf_spreadheet_notice']='Табела Manning протока у цевима';
+$ec_lang['mpf_spreadsheet_notice']='Табела Manning протока у цевима';
 $ec_lang['mpf_pipe_diameter']='Пречник цеви, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Манингов коефицијент храпавости, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Нагиб трења, S<sub>f</sub></a><span class="ec-help" title="Понекад једнак нагибу цеви. Пратите везу за објашњење (само на енглеском)."><span class="ec-tip">?</span></span>';

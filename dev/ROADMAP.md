@@ -145,24 +145,30 @@ the block.
     ambiguous against the colour key, whose control already says `Color legend position`. 26 stale.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
-  mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
-  English pass asking *"list every plausible reading; more than one means rewrite"*, both waves
-  writing to `dev/english-friction/<sprint>.json`, with `friction_check.php` blocking sprint *launch*
-  on wave-0 findings and sprint *close* on translator findings.
+  mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
+  more than one means rewrite"*, both waves writing to `dev/english-friction/<sprint>.json`, with
+  `friction_check.php` blocking sprint *launch* on wave-0 findings and sprint *close* on translator
+  findings. `refer-to-human` deliberately does NOT close the gate; escalating is not resolving.
   - **Why it exists: `lpn_` HAD a Wave 0 and it did not work.** Task 193 reviewed all 226 English keys
     and rewrote 51, and the sprint still shipped "Zoom to fit", "Map display and sizes" and "Restore
     defaults" — all three caught later by Tom reading the *Spanish*. Wave 0 was not skipped; it was
-    not falsifiable. A fluent reader resolves ambiguity automatically and invisibly, so the fix had to
-    be a different QUESTION, not more diligence.
-  - **`refer-to-human` deliberately does NOT close the gate.** Escalating is not resolving, and an
-    escalation that silently closed would rebuild the exact hole this replaces.
-  - **DONE, and the yield is measured.** `dev/english-friction/239-wave0-lpn.json`: run over all 225
-    `lpn_` strings AFTER Task 193 had reviewed the same keys and rewritten 51, it found **36 more —
-    6 high, 22 medium, 8 low — and 26 English strings were rewritten.** That is the number Tom asked
-    for ("I lean to yes, but let's try it"): falsification finds a further 16% of the key set on top
-    of a completed review. It earns its permanent place.
+    not falsifiable. The fix had to be a different QUESTION, not more diligence.
+  - **THE YIELD IS MEASURED TWICE NOW, AND IT DEPENDS ENTIRELY ON HOW SETTLED THE ENGLISH IS.**
+    `lpn_`, freshly-written feature UI: 36 findings on 225 keys, **26 rewrites (11.6%)**.
+    The fifteen non-lpn calculators, mature label sets already through a completed review
+    (`239-wave0-calcs.json`): 35 findings on 415 keys, **6 rewrites (1.4%)**, dismissal rate 37%
+    against a 9.8% historical wave-0 rate. **Budget a Wave 0 at the `lpn_` rate for NEW English only.**
+    One of the six was still a real catch — `mphl_hgl_egl_tip` would have produced a false sentence in
+    26 languages.
+  - **NEXT, and it is free: pre-filter the pass to skip keys that already carry a non-empty
+    `$ec_lang_syn`** (102 of 527 non-lpn keys do). Six of thirteen dismissals were re-flags of keys
+    whose syn entry already answered the complaint; this drops the false-positive rate 37% → ~21%.
   - **OPEN — add the suggestion-box instruction to the standard agent prompt template**, so it is not
     re-typed per sprint and cannot be forgotten.
+  - **[H] `friction_check.php` NOW EXITS 1 with 16 `refer-to-human` entries awaiting Tom's ruling.**
+    That is the escalation mechanism working, and it is not in `check_all.sh` so it blocks no commit —
+    **but it blocks the next sprint launch until he rules.** The 16, plus 9 wording proposals and 7
+    `$ec_lang_syn` proposals, are in `239-wave0-calcs.json`.
 
 - 75|378| **[H] Give the seven harnesses a network some other way, and delete
   `drawExampleNetwork()`.** The 289-line code-drawn ring main lost its last user-facing caller when

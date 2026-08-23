@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Taş kaplama tasarımı için Manning Trapezoidal Ka
 $ec_lang['mpf_main_menu']='Manning Boru Akışı';
 $ec_lang['mpf_main_title']='Ücretsiz Çevrimiçi Manning Boru Akışı Hesaplayıcısı';
 $ec_lang['mpf_main_desc']='Belirli Eğim ve Derinlikte Manning Formülü ile Düzgün Boru Akışı';
-$ec_lang['mpf_spreadheet_notice']='Manning Boru Akışı elektronik tablosu';
+$ec_lang['mpf_spreadsheet_notice']='Manning Boru Akışı elektronik tablosu';
 $ec_lang['mpf_pipe_diameter']='Boru çapı, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manning pürüzlülük katsayısı, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Sürtünme eğimi, S<sub>f</sub></a><span class="ec-help" title="Bazen boru eğimine eşit. Açıklama için bağlantıyı izleyin (yalnızca İngilizce)."><span class="ec-tip">?</span></span>';

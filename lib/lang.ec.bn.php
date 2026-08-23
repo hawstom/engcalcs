@@ -154,7 +154,7 @@ $ec_lang['mi_notes_2_def']='পাথরের আস্তরণ ডিজা�
 $ec_lang['mpf_main_menu']='ম্যানিং পাইপ প্রবাহ';
 $ec_lang['mpf_main_title']='বিনামূল্যে অনলাইন ম্যানিং পাইপ প্রবাহ ক্যালকুলেটর';
 $ec_lang['mpf_main_desc']='নির্দিষ্ট ঢাল ও গভীরতায় ম্যানিং ফর্মুলা সুষম পাইপ প্রবাহ';
-$ec_lang['mpf_spreadheet_notice']='ম্যানিং পাইপ প্রবাহ স্প্রেডশিট';
+$ec_lang['mpf_spreadsheet_notice']='ম্যানিং পাইপ প্রবাহ স্প্রেডশিট';
 $ec_lang['mpf_pipe_diameter']='পাইপ ব্যাস, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='ম্যানিং রুক্ষতা, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">ঘর্ষণ ঢাল, S<sub>f</sub></a><span class="ec-help" title="কখনও কখনও পাইপ ঢালের সমান। ব্যাখ্যার জন্য লিঙ্ক অনুসরণ করুন (শুধুমাত্র ইংরেজিতে)।"><span class="ec-tip">?</span></span>';

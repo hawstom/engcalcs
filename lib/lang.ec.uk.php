@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Для проектування кам\'яного �
 $ec_lang['mpf_main_menu']='Manning — Течія в трубі';
 $ec_lang['mpf_main_title']='Безкоштовний онлайн-калькулятор течії в трубі за Manning';
 $ec_lang['mpf_main_desc']='Рівномірна течія в трубі за формулою Manning при заданому похилі та глибині';
-$ec_lang['mpf_spreadheet_notice']='Таблиця течії в трубі за Manning';
+$ec_lang['mpf_spreadsheet_notice']='Таблиця течії в трубі за Manning';
 $ec_lang['mpf_pipe_diameter']='Діаметр труби, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Коефіцієнт шорсткості Маннінга, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Ухил тертя, S<sub>f</sub></a><span class="ec-help" title="Іноді дорівнює ухилу труби. Перейдіть за посиланням для пояснення (лише англійською)."><span class="ec-tip">?</span></span>';

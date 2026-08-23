@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Utilisez le calculateur de canal trapézoïdal Manni
 $ec_lang['mpf_main_menu']='Écoulement Manning en conduite';
 $ec_lang['mpf_main_title']='Calculateur gratuit en ligne de la formule Manning pour l\'écoulement en conduite';
 $ec_lang['mpf_main_desc']='Écoulement uniforme Manning en conduite à pente et taux de remplissage donnés';
-$ec_lang['mpf_spreadheet_notice']='Feuille de calcul Écoulement Manning en conduite';
+$ec_lang['mpf_spreadsheet_notice']='Feuille de calcul Écoulement Manning en conduite';
 $ec_lang['mpf_pipe_diameter']='Diamètre de la conduite, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Rugosité de Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pente de frottement, S<sub>f</sub></a><span class="ec-help" title="Parfois égale à la pente de la conduite. Suivez le lien pour l\'explication (en anglais seulement)."><span class="ec-tip">?</span></span>';

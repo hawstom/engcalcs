@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Tumia Kikokotoo cha Mfereji wa Trapezoidi wa Manning
 $ec_lang['mpf_main_menu']='Mtiririko wa Bomba la Manning';
 $ec_lang['mpf_main_title']='Kikokotoo cha Bure Mtandaoni cha Mtiririko wa Bomba la Manning';
 $ec_lang['mpf_main_desc']='Mtiririko Sawia wa Bomba la Fomula ya Manning kwa Mteremko na Kina Kilichowekwa';
-$ec_lang['mpf_spreadheet_notice']='Lahajedwali la Mtiririko wa Bomba la Manning';
+$ec_lang['mpf_spreadsheet_notice']='Lahajedwali la Mtiririko wa Bomba la Manning';
 $ec_lang['mpf_pipe_diameter']='Kipenyo cha bomba, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Mgawo wa usuguo wa Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Mteremko wa msuguano, S<sub>f</sub></a><span class="ec-help" title="Labda sawa na mteremko wa bomba. Fuata kiungo kwa maelezo (kwa Kiingereza pekee)."><span class="ec-tip">?</span></span>';

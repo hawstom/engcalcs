@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Usare il Calcolatore Canale Trapezoidale Manning per
 $ec_lang['mpf_main_menu']='Portata in tubazione Manning';
 $ec_lang['mpf_main_title']='Calcolatore gratuito online portata in tubazione Manning';
 $ec_lang['mpf_main_desc']='Formula di Manning per flusso uniforme in tubazione a pendenza e profondità date';
-$ec_lang['mpf_spreadheet_notice']='Foglio di calcolo Portata in tubazione Manning';
+$ec_lang['mpf_spreadsheet_notice']='Foglio di calcolo Portata in tubazione Manning';
 $ec_lang['mpf_pipe_diameter']='Diametro tubazione, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Scabrezza di Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Pendenza di attrito, S<sub>f</sub></a><span class="ec-help" title="Talvolta uguale alla pendenza della tubazione. Segui il link per la spiegazione (solo in inglese)."><span class="ec-tip">?</span></span>';

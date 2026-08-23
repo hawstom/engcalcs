@@ -1890,7 +1890,7 @@
         "mpf_solve_for_flow": "084fc8a608147bb4173af65a607bad3eca755004",
         "mpf_solver_enter_positive_q": "b22c35a784776a90e5a4edc78e68f7741ce55ab9",
         "mpf_solver_no_solution": "76dacc801a4d56dd44952848ae8f9ac1046892a4",
-        "mpf_spreadheet_notice": "53e8163a2feddeadbf852cca3dfdc651668cf3a4",
+        "mpf_spreadsheet_notice": "53e8163a2feddeadbf852cca3dfdc651668cf3a4",
         "mpf_top_width": "d02667d4026d46f410af047e0351e922e798e424",
         "mpf_velocity": "494f01b3a34058ece807e1dd3972976e83768e1e",
         "mpf_velocity_head": "9a8abd44ddb1d58ca42bd9a2ca6ffbcc817f0921",
@@ -5942,7 +5942,7 @@
             "words": 16,
             "ends_sentence": true
         },
-        "mpf_spreadheet_notice": {
+        "mpf_spreadsheet_notice": {
             "words": 4,
             "ends_sentence": false
         },

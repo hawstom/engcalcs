@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Pro návrh kamenného opevnění použijte kalkulát
 $ec_lang['mpf_main_menu']='Průtok v potrubí Manning';
 $ec_lang['mpf_main_title']='Bezplatný online kalkulátor průtoku v potrubí Manning';
 $ec_lang['mpf_main_desc']='Manningova rovnice pro rovnoměrný průtok v potrubí při daném sklonu a hloubce';
-$ec_lang['mpf_spreadheet_notice']='Manningova tabulka průtoku v potrubí';
+$ec_lang['mpf_spreadsheet_notice']='Manningova tabulka průtoku v potrubí';
 $ec_lang['mpf_pipe_diameter']='Průměr potrubí, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manningův součinitel drsnosti, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Třecí sklon, S<sub>f</sub></a><span class="ec-help" title="Někdy roven sklonu potrubí. Sledujte odkaz pro vysvětlení (pouze v angličtině)."><span class="ec-tip">?</span></span>';

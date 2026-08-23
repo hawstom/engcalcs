@@ -158,7 +158,7 @@
         "mpf_main_menu": "Manning Pipe Flow",
         "mpf_main_title": "Free Online Manning Pipe Flow Calculator",
         "mpf_main_desc": "Manning Formula Uniform Pipe Flow at Given Slope and Depth",
-        "mpf_spreadheet_notice": "Manning Pipe Flow spreadsheet",
+        "mpf_spreadsheet_notice": "Manning Pipe Flow spreadsheet",
         "mpf_pipe_diameter": "Pipe diameter, d<sub>0<\/sub>",
         "mpf_manningRoughness": "Manning roughness, n",
         "mpf_friction_slope": "<a target=\"_blank\" href=\"..\/frictionslope.php\">Friction slope, S<sub>f<\/sub><\/a><span class=\"ec-help\" title=\"Sometimes equal to pipe slope. Follow link for explanation (English only).\"><span class=\"ec-tip\">?<\/span><\/span>",

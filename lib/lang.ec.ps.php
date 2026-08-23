@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='د کاڼو پوښ ډیزاین کولو لپاره 
 $ec_lang['mpf_main_menu']='Manning د پایپ بهاو';
 $ec_lang['mpf_main_title']='وړیا آنلاین Manning د پایپ بهاو محاسبه';
 $ec_lang['mpf_main_desc']='د Manning فارمول یکسان د پایپ بهاو د ورکړل شوي میل او ژوروالي سره';
-$ec_lang['mpf_spreadheet_notice']='Manning د پایپ بهاو محاسبې پاڼه';
+$ec_lang['mpf_spreadsheet_notice']='Manning د پایپ بهاو محاسبې پاڼه';
 $ec_lang['mpf_pipe_diameter']='د پایپ قطر، d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='د Manning خشونت، n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">د اصطکاک میل، S<sub>f</sub></a><span class="ec-help" title="کله ناکله د پایپ میل سره مساوي. د توضیح لپاره لینک تعقیب کړئ (یوازې په انګلیسي)."><span class="ec-tip">?</span></span>';

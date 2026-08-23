@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='如需设计护坡石材，请使用曼宁梯形渠�
 $ec_lang['mpf_main_menu']='曼宁管流';
 $ec_lang['mpf_main_title']='免费在线曼宁管流计算器';
 $ec_lang['mpf_main_desc']='在给定坡度和水深条件下的曼宁公式均匀管流';
-$ec_lang['mpf_spreadheet_notice']='曼宁管流电子表格';
+$ec_lang['mpf_spreadsheet_notice']='曼宁管流电子表格';
 $ec_lang['mpf_pipe_diameter']='管径，d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='曼宁糙率系数，n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">摩擦坡度，S<sub>f</sub></a><span class="ec-help" title="有时等于管道坡度。点击链接查看说明（仅英文）。"><span class="ec-tip">?</span></span>';

@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Verwenden Sie den Manning-Trapezkanal-Rechner für d
 $ec_lang['mpf_main_menu']='Rohrdurchfluss Manning';
 $ec_lang['mpf_main_title']='Kostenloser Online-Rechner Rohrdurchfluss Manning';
 $ec_lang['mpf_main_desc']='Manning-Formel für gleichförmigen Rohrdurchfluss bei gegebenem Gefälle und Füllhöhe';
-$ec_lang['mpf_spreadheet_notice']='Manning-Rohrdurchfluss-Tabelle';
+$ec_lang['mpf_spreadsheet_notice']='Manning-Rohrdurchfluss-Tabelle';
 $ec_lang['mpf_pipe_diameter']='Rohrdurchmesser, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manning-Rauheitskoeffizient, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Reibungsgefälle, S<sub>f</sub></a><span class="ec-help" title="Mitunter gleich dem Rohrgefälle. Dem Link für die Erklärung folgen (nur auf Englisch)."><span class="ec-tip">?</span></span>';

@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='استخدم حاسبة قناة مانينغ شبه
 $ec_lang['mpf_main_menu']='جريان في الأنابيب — مانينغ';
 $ec_lang['mpf_main_title']='حاسبة جريان الأنابيب بمانينغ المجانية عبر الإنترنت';
 $ec_lang['mpf_main_desc']='جريان منتظم في الأنابيب بمعادلة مانينغ عند ميل وعمق معلومَين';
-$ec_lang['mpf_spreadheet_notice']='جدول بيانات جريان الأنابيب بمعادلة مانينغ';
+$ec_lang['mpf_spreadsheet_notice']='جدول بيانات جريان الأنابيب بمعادلة مانينغ';
 $ec_lang['mpf_pipe_diameter']='قطر الأنبوب، d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='معامل خشونة مانينغ، n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">ميل الاحتكاك، S<sub>f</sub></a><span class="ec-help" title="يساوي أحياناً ميل الأنبوب. اتبع الرابط للحصول على شرح (باللغة الإنجليزية فقط)."><span class="ec-tip">?</span></span>';

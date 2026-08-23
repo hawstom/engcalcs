@@ -154,7 +154,7 @@ $ec_lang['mi_notes_2_def']='پتھر کی استر ڈیزائن کرنے کے ل
 $ec_lang['mpf_main_menu']='مانینگ پائپ بہاؤ';
 $ec_lang['mpf_main_title']='مفت آنلائن مانینگ پائپ بہاؤ حاسبہ';
 $ec_lang['mpf_main_desc']='دیے گئے ڈھلان اور گہرائی پر مانینگ فارمولا یکساں پائپ بہاؤ';
-$ec_lang['mpf_spreadheet_notice']='مانینگ پائپ بہاؤ اسپریڈشیٹ';
+$ec_lang['mpf_spreadsheet_notice']='مانینگ پائپ بہاؤ اسپریڈشیٹ';
 $ec_lang['mpf_pipe_diameter']='پائپ قطر، d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='مانینگ کھردرا پن، n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">رگڑ ڈھلان، S<sub>f</sub></a><span class="ec-help" title="بعض اوقات پائپ ڈھلان کے برابر۔ وضاحت کے لیے لنک پر جائیں (صرف انگریزی میں)۔"><span class="ec-tip">?</span></span>';

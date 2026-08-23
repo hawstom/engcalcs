@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='የድንጋይ ሽፋን ለመንደፍ Manning �
 $ec_lang['mpf_main_menu']='Manning የቧንቧ ፍሰት';
 $ec_lang['mpf_main_title']='ነፃ ኦንላይን Manning የቧንቧ ፍሰት ካልኩሌተር';
 $ec_lang['mpf_main_desc']='Manning ቀመር ወጥ የቧንቧ ፍሰት በተሰጠ ቁልቁለት እና ጥልቀት';
-$ec_lang['mpf_spreadheet_notice']='Manning የቧንቧ ፍሰት ሰንጠረዥ';
+$ec_lang['mpf_spreadsheet_notice']='Manning የቧንቧ ፍሰት ሰንጠረዥ';
 $ec_lang['mpf_pipe_diameter']='የቧንቧ ዲያሜትር, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='የማኒንግ ሻካሪነት, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">የግጭት ቁልቁለት, S<sub>f</sub></a><span class="ec-help" title="አንዳንዴ ከቧንቧ ቁልቁለት ጋር እኩል። ማብራሪያ ለማግኘት አገናኙን ይከተሉ (በእንግሊዝኛ ብቻ)።"><span class="ec-tip">?</span></span>';

@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='برای طراحی پوشش سنگی از ماشی�
 $ec_lang['mpf_main_menu']='جریان لوله Manning';
 $ec_lang['mpf_main_title']='ماشین‌حساب رایگان آنلاین جریان لوله Manning';
 $ec_lang['mpf_main_desc']='جریان یکنواخت لوله با فرمول Manning برای شیب و عمق مشخص';
-$ec_lang['mpf_spreadheet_notice']='صفحه گسترده جریان لوله Manning';
+$ec_lang['mpf_spreadsheet_notice']='صفحه گسترده جریان لوله Manning';
 $ec_lang['mpf_pipe_diameter']='قطر لوله، d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='ضریب زبری Manning، n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">شیب اصطکاک، S<sub>f</sub></a><span class="ec-help" title="گاهی برابر شیب لوله. برای توضیحات روی پیوند کلیک کنید (فقط به انگلیسی)."><span class="ec-tip">?</span></span>';

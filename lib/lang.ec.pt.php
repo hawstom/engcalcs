@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='Use a Calculadora de Canal Trapecial de Manning para
 $ec_lang['mpf_main_menu']='Vazão em tubulação por Manning';
 $ec_lang['mpf_main_title']='Calculadora gratuita online da fórmula de Manning para vazão em tubulação';
 $ec_lang['mpf_main_desc']='Escoamento uniforme pela Fórmula de Manning para declividade e profundidade informadas';
-$ec_lang['mpf_spreadheet_notice']='Planilha de Escoamento em Tubulação (Manning)';
+$ec_lang['mpf_spreadsheet_notice']='Planilha de Escoamento em Tubulação (Manning)';
 $ec_lang['mpf_pipe_diameter']='Diâmetro da tubulação, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Coeficiente de rugosidade de Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">Declividade de atrito, S<sub>f</sub></a><span class="ec-help" title="Às vezes igual à declividade da tubulação. Siga o link para a explicação (somente em inglês)."><span class="ec-tip">?</span></span>';

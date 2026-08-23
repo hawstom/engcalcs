@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='ကျောက်အကာ ဒီဇိုင်း
 $ec_lang['mpf_main_menu']='Manning သွတ်ပိုက် စီးဆင်းမှု';
 $ec_lang['mpf_main_title']='အခမဲ့ အွန်လိုင်း Manning သွတ်ပိုက် စီးဆင်းမှု တွက်ချက်မှုကိရိယာ';
 $ec_lang['mpf_main_desc']='သတ်မှတ်အစောက်နှင့် နက်ရှိုင်းမှုတွင် Manning ဖော်မြူလာ တစ်သမတ်တည်း သွတ်ပိုက် စီးဆင်းမှု';
-$ec_lang['mpf_spreadheet_notice']='Manning သွတ်ပိုက် စီးဆင်းမှု ဇယားဖိုင်';
+$ec_lang['mpf_spreadsheet_notice']='Manning သွတ်ပိုက် စီးဆင်းမှု ဇယားဖိုင်';
 $ec_lang['mpf_pipe_diameter']='သွတ်ပိုက် အချင်း, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='Manning ကြမ်းတမ်းမှုကိန်း, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">ပွတ်တိုက်မှုအစောက်, S<sub>f</sub></a><span class="ec-help" title="ပိုက်အစောက်နှင့် တူနိုင်။ ရှင်းလင်းချက်အတွက် လင့်ခ်ကိုနှိပ်ပါ (အင်္ဂလိပ်ဘာသာဖြင့်သာ)။"><span class="ec-tip">?</span></span>';

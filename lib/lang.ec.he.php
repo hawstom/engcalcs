@@ -159,7 +159,7 @@ $ec_lang['mi_notes_2_def']='לתכנון חיפוי סלע יש להשתמש ב�
 $ec_lang['mpf_main_menu']='זרימה בצינור — Manning';
 $ec_lang['mpf_main_title']='מחשבון זרימה בצינור לפי Manning — חינם מקוון';
 $ec_lang['mpf_main_desc']='זרימה אחידה בצינור לפי נוסחת Manning בשיפוע ועומק נתונים';
-$ec_lang['mpf_spreadheet_notice']='גיליון אלקטרוני לזרימה בצינור לפי Manning';
+$ec_lang['mpf_spreadsheet_notice']='גיליון אלקטרוני לזרימה בצינור לפי Manning';
 $ec_lang['mpf_pipe_diameter']='קוטר הצינור, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='מקדם החספוס של Manning, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">שיפוע חיכוך, S<sub>f</sub></a><span class="ec-help" title="לעתים שווה לשיפוע הצינור. עקוב אחר הקישור להסבר (באנגלית בלבד)."><span class="ec-tip">?</span></span>';

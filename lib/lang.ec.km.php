@@ -154,7 +154,7 @@ $ec_lang['mi_notes_2_def']='ប្រើម៉ាស៊ីនគណនា Mannin
 $ec_lang['mpf_main_menu']='Manning ការហូរទឹកក្នុងបំពង់';
 $ec_lang['mpf_main_title']='ម៉ាស៊ីនគណនា Manning ការហូរទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
 $ec_lang['mpf_main_desc']='រូបមន្ត Manning ការហូរទឹកបំពង់ឯកសណ្ឋានជាមួយ ជម្រាល និងជម្រៅដែលបានកំណត់';
-$ec_lang['mpf_spreadheet_notice']='សៀវភៅបញ្ជីលំហូរបំពង់ Manning';
+$ec_lang['mpf_spreadsheet_notice']='សៀវភៅបញ្ជីលំហូរបំពង់ Manning';
 $ec_lang['mpf_pipe_diameter']='ប្រឡោះបំពង់, d<sub>0</sub>';
 $ec_lang['mpf_manningRoughness']='ភាពក្រញ៉ោងម៉ាន់នីង, n';
 $ec_lang['mpf_friction_slope']='<a target="_blank" href="../frictionslope.php">ជម្រាលកកិត, S<sub>f</sub></a><span class="ec-help" title="ជួនកាល ស្មើនឹងជម្រាលបំពង់។ តាមតំណភ្ជាប់សម្រាប់ការពន្យល់ (ជាភាសាអង់គ្លេសតែប៉ុណ្ណោះ)។"><span class="ec-tip">?</span></span>';
