@@ -141,6 +141,8 @@ the block.
     ("Reduce map clutter"); NEW `lpn_color_mode_manual`, `lpn_time_no_period`, three
     `lpn_basemap_satellite_*`, `lpn_tables_menu(_tip)`, `lpn_run_menu_tip`,
     `lpn_settings_auto_run(_tip)`, `lpn_time_run_slow`. Wave 0 over the changed set first.
+  - **Earned 2026-08-23:** `lpn_settings_legend_position` → `Labels legend position`; Tom found it
+    ambiguous against the colour key, whose control already says `Color legend position`. 26 stale.
 
 - 50|481| **A closed task cited as pending ships false claims.** Three shipped in one day. On
   2026-08-21 `CLAUDE.md` said extended-period simulation was "not built yet" and that `.inp` export
