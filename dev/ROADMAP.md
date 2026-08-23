@@ -222,18 +222,13 @@ the block.
   what our labels already do, so reproducing it is not obviously worth it. Tom: *"I'm not opposed to
   implementing this, and it may be better to implement it than to discuss it."*
 
-- 100|491| **A Darcy-Weisbach roughness prints on the map label as "0".**
-  Found 2026-08-23 during Task 388's comment pass, and the stale comment is why it survived:
-  `defaultLabelSettings().decimals.link.roughness = 0` is right for a Hazen-Williams C (100/130/140)
-  and wrong for a roughness HEIGHT — `defaultRoughnessFor('dw')` returns ~0.0015, which rounds to 0.
-  The method is user-selectable and has been since Task 271. **The decimals must follow
-  `settings.method`**, and the harness must assert the DW case, not just the HW one.
-  - **Tom, 2026-08-23:** *"DW e throws a wrench in our works. It's tiny. And we aren't asking for f,
-    are we? Anyway, this takes a lot more input width than C or n. No fun."* Confirmed: the page asks
-    for e and solves f, never asking the user for f.
-  - **[H] REMIND TOM TO TEST THIS: an input accepts more characters than its width shows.** He
-    believes it does and wants it confirmed in a browser before the column width is treated as a
-    constraint on how many decimals e can carry. Do not widen a column on the assumption first.
+- 75|495| **[H] REMIND TOM: does an input accept more characters than its width shows?**
+  Extracted from Task 491 on close. He believes it does — *"inputs are flexible. You can enter more
+  than their width"* (2026-08-23) — and asked to be reminded to confirm it in a browser before a
+  pane-table column width is treated as a constraint on how many decimals a value can carry. The
+  narrow boxes riding on it are Minor loss at 1.4em and Diameter at 2.1em; if typing into either
+  proves lossy, restore 2.1em and 2.8em. `dev/lpn-spike/pane-harness.js` holds both measurements
+  as knowingly-failing checks so the answer has somewhere to land.
 
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus

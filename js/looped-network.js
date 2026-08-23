@@ -2335,9 +2335,11 @@ var EngCalcs = EngCalcs || {};
 			// have no entry. Three fields depart from the default 2, each for a reason about the
 			// QUANTITY:
 			//   roughness 0 -- a Hazen-Williams C-factor is a dimensionless integer: 100, 130, 140.
-			//     **THIS ONE DOES NOT FOLLOW settings.method, AND THE METHOD IS SELECTABLE** (Task
-			//     271): Darcy-Weisbach's roughness is a HEIGHT (0.00015 m), which prints as "0" at 0
-			//     decimals.
+			//     **THE SHIPPED 0 IS THE HAZEN-WILLIAMS CASE ONLY.** The method is selectable
+			//     (Task 271) and a Manning n or a Darcy-Weisbach e printed as "0" at 0 places, so
+			//     syncRoughnessLabelDecimals() raises this entry whenever the method or the
+			//     roughness unit leaves it unable to show the number. Every other entry here is a
+			//     constant and this one is a starting value.
 			//   diameter 0 -- inches and millimetres are both whole-number standards in this trade.
 			//   gradient 4 -- the only field whose unit family offers two forms differing by 100x
 			//     (gradePercent and plain rise/run). 2 decimals is useless as a ratio, where a typical
@@ -2402,6 +2404,8 @@ var EngCalcs = EngCalcs || {};
 		};
 	}
 	var labelSettings = defaultLabelSettings();
+	// The roughness decimal places syncRoughnessLabelDecimals() last computed. See it for why.
+	var roughnessDecimalsAuto = 0;
 
 	// Gear/settings panel -- like labelSettings, a VIEW/preference object, not network content:
 	// persisted to localStorage as a sibling key, deliberately NOT part of the undo-snapshotted
@@ -9889,6 +9893,9 @@ var EngCalcs = EngCalcs || {};
 		// `markExtrema` is a bare boolean, which Object.assign() onto a primitive silently discards.
 
 		labelSettings = defaultLabelSettings();
+		// Back to the shipped baseline with it, or a roughness count merged in from the file
+		// below would be judged against the LAST project's automatic value (Task 491).
+		roughnessDecimalsAuto = 0;
 		var savedLS = saved.labelSettings || {}, savedDec = savedLS.decimals || {};
 		Object.assign(labelSettings.node, savedLS.node || {});
 		Object.assign(labelSettings.link, savedLS.link || {});
@@ -15176,6 +15183,9 @@ var EngCalcs = EngCalcs || {};
 			if (frictionMethod() === 'dw') {
 				doc.links.forEach(function (l) { conv(l, '_roughness'); });
 				convOverrides('roughness');
+				// mm -> ft moves e three orders of magnitude, so the places that showed 1.5 show
+				// 0.0 (Task 491). Raised only when it has gone unreadable, never lowered.
+				syncRoughnessLabelDecimals();
 			}
 		} else if (name === 'lpn_u_elevhead') {
 			doc.nodes.forEach(function (nd) {
@@ -15375,6 +15385,38 @@ var EngCalcs = EngCalcs || {};
 		if (method === 'dw') { return +(0.0015 * unitFactor('lpn_u_roughness')).toPrecision(3); }
 		return 130;
 	}
+	// **HOW MANY DECIMAL PLACES A ROUGHNESS LABEL NEEDS, WHICH THE METHOD AND THE UNIT DECIDE**
+	// (Task 491). A Hazen-Williams C is a dimensionless integer and 0 places is right for it -- but
+	// the method is selectable (Task 271) and the roughness unit is too, so 0 is right for exactly
+	// one of the six combinations. A Manning n (0.013) and a Darcy-Weisbach e (0.0049 ft, 1.5 mm)
+	// both print as "0" at 0 places: a number the user never typed, on the map's only legend.
+	//
+	// TWO SIGNIFICANT FIGURES of the method's own typical roughness, read in the unit now displayed,
+	// which lands on the trade's conventions in every case: C 130 -> 0, n 0.013 -> 3, e 1.5 mm -> 1,
+	// e 0.0049 ft -> 4. A per-method constant would have been enough for C and n and wrong for e,
+	// whose magnitude moves three orders between millimetres and feet.
+	function defaultRoughnessDecimals() {
+		var typical = defaultRoughnessFor(frictionMethod());
+		if (!(typical > 0)) { return 2; }
+		return Math.max(0, 1 - Math.floor(Math.log(typical) / Math.LN10));
+	}
+	// **FOLLOWS THE DEFAULT UNTIL THE USER OVERRIDES IT, THEN STOPS FOLLOWING** -- the same
+	// arrangement as a prefix, reached differently because this map ships filled and a prefix map
+	// ships empty. `roughnessDecimalsAuto` remembers the value this function last computed; a
+	// stored count still equal to it was nobody's decision and is replaced, and anything else is a
+	// number the user put on the Labels spinner and is left alone.
+	//
+	// It starts at 0, which is both defaultLabelSettings()'s shipped value and the Hazen-Williams
+	// answer -- so a project SAVED before this existed, carrying the 0 that was the whole bug, is
+	// corrected when it opens, while a project carrying a count somebody chose keeps it.
+	//
+	// A simpler rule was tried and is wrong: "raise it whenever the typical roughness rounds to
+	// zero" leaves 1.5 mm at 0 places, because 1.5 rounds to 2 and 2 is not zero.
+	function syncRoughnessLabelDecimals() {
+		var dec = labelSettings.decimals.link, next = defaultRoughnessDecimals();
+		if (dec.roughness === roughnessDecimalsAuto) { dec.roughness = next; }
+		roughnessDecimalsAuto = next;
+	}
 	// The roughness unit selector is the one unit control on this page that is conditional: it is
 	// meaningless under Manning and Hazen-Williams, where the number has no units at all. Hidden
 	// rather than removed, so the select keeps its unit family and stays visible to the us/si
@@ -15382,6 +15424,10 @@ var EngCalcs = EngCalcs || {};
 	function applyMethodUI() {
 		var row = document.getElementById('lpn_u_roughness_row');
 		if (row) { row.style.display = frictionMethod() === 'dw' ? '' : 'none'; }
+		// Here, and not at the three call sites: every route that can change the friction method --
+		// the settings select, opening a project, and the example that forces Hazen-Williams --
+		// already comes through this function to move the unit row.
+		syncRoughnessLabelDecimals();
 	}
 	// The bottom-right map overlay: the few facts you need in order to read the numbers on the map at
 	// all. Map labels are bare numbers by design, which is right for the drawing and leaves a
@@ -16801,6 +16847,7 @@ var EngCalcs = EngCalcs || {};
 			// here, or every default input would come back blank instead of at its starting value.
 			seedDefaultInputs();
 			labelSettings = defaultLabelSettings();
+			roughnessDecimalsAuto = 0;
 			// No applyMapHeight() -- the canvas height stopped being a setting when the Map height
 			// row was retired, and it is a fact about the ENVIRONMENT (Tom, 2026-08-15: *"Map bottom
 			// has nothing to do with the model at all. It's the environment."*). Restoring defaults

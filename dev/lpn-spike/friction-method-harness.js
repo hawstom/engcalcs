@@ -27,6 +27,13 @@ const L = loadLoopedNetwork(
 	"\t\tsettingsFieldsEl: function () { return document.getElementById('lpn_set_hydraulics_fields'); },\n" +
 	"\t\troughnessRowShown: function () { var r = document.getElementById('lpn_u_roughness_row'); return r ? r.style.display !== 'none' : null; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, defaultSettings: defaultSettings,\n" +
+	"\t\tdefaultRoughnessDecimals: defaultRoughnessDecimals,\n" +
+	"\t\tlabelDecimals: function () { return labelSettings.decimals.link.roughness; },\n" +
+	"\t\tsetLabelDecimals: function (d) { labelSettings.decimals.link.roughness = d; },\n" +
+	"\t\tresetLabels: function () { labelSettings = defaultLabelSettings();\n" +
+	"\t\t\troughnessDecimalsAuto = 0; },\n" +
+	"\t\troughnessLabelText: function (v) { return plainRound(v, labelSettings.decimals.link.roughness)\n" +
+	"\t\t\t.toFixed(labelSettings.decimals.link.roughness); },\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
 	"\t\t\tnextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };\n" +
@@ -197,6 +204,59 @@ ok('example roughness is an HW C, and is now read as one',
 	L.getDoc().links.filter(function (l) { return l.type !== 'pump'; })
 		.every(function (l) { return L.effective(l, 'roughness') > 50; }));
 ok('forcing the method also re-applies the unit row', L.roughnessRowShown() === false);
+
+// ---- 9. The map label's DECIMAL PLACES follow the method, and the unit with it (Task 491) ----
+// The bug: labelSettings.decimals.link.roughness shipped as 0, right for a Hazen-Williams C
+// (100/130/140) and wrong for every other combination the page offers. A Manning n of 0.013 and a
+// Darcy-Weisbach e of 0.0049 ft both printed on the map as "0" -- and the Labels popover is the
+// map's only legend, so nothing else on screen said what that column was.
+//
+// **THE ASSERTION IS THE PRINTED STRING, NOT THE SETTING.** A places count merely "different from
+// 0" would pass while still rounding e away; what has to be true is that the number a user reads
+// is the number their pipe carries.
+setUnitSet('us');
+L.reset();
+L.resetLabels();
+L.drawExample();
+ok('HW keeps 0 places -- a C-factor is an integer', L.labelDecimals() === 0, L.labelDecimals());
+ok('...and 130 prints as "130"', L.roughnessLabelText(130) === '130', L.roughnessLabelText(130));
+
+L.setMethod('manning'); L.applyMethodUI();
+ok('Manning raises the places', L.labelDecimals() === 3, L.labelDecimals());
+ok('...and n = 0.013 prints as itself, not "0"',
+	L.roughnessLabelText(0.013) === '0.013', L.roughnessLabelText(0.013));
+
+// US preset: the roughness family's unit is ft, so a typical e is 0.0049 ft.
+L.setMethod('dw'); L.applyMethodUI();
+ok('Darcy-Weisbach in feet needs four places', L.labelDecimals() === 4, L.labelDecimals());
+ok('...and e = 0.005 ft prints as itself, not "0"',
+	L.roughnessLabelText(0.005) === '0.0050', L.roughnessLabelText(0.005));
+
+// SI preset: the same e is 1.5 mm, three orders larger, so ONE per-method constant would have to
+// be wrong at one end or the other. This is why the places are derived from the typical VALUE and
+// not from the method's name.
+setUnitSet('si');
+L.reset();
+L.resetLabels();
+L.drawExample();
+L.setMethod('dw'); L.applyMethodUI();
+ok('Darcy-Weisbach in millimetres needs one place', L.labelDecimals() === 1, L.labelDecimals());
+ok('...and e = 1.5 mm prints as itself', L.roughnessLabelText(1.5) === '1.5', L.roughnessLabelText(1.5));
+
+// **THE USER'S OWN NUMBER STOPS THE FOLLOWING, IN BOTH DIRECTIONS.** Six places is more than the
+// default and 0 is fewer, and neither is ours to overrule once it has been typed on the spinner.
+L.setLabelDecimals(6);
+L.setMethod('manning'); L.applyMethodUI();
+ok('a count the user raised survives a method change', L.labelDecimals() === 6, L.labelDecimals());
+L.setLabelDecimals(0);
+L.setMethod('dw'); L.applyMethodUI();
+ok('...and one the user lowered survives it too', L.labelDecimals() === 0, L.labelDecimals());
+
+// A project SAVED before this existed carries the 0 that was the bug, and 0 is also the shipped
+// baseline -- so opening it corrects the count instead of preserving a defect as a preference.
+L.resetLabels();
+L.setMethod('dw'); L.applyMethodUI();
+ok('a stored 0 that nobody chose is corrected on open', L.labelDecimals() === 1, L.labelDecimals());
 
 console.log(fails === 0 ? '\nAll checks passed.' : '\n' + fails + ' FAILURE(S).');
 process.exit(fails === 0 ? 0 : 1);
