@@ -195,12 +195,6 @@ the block.
     landing page's own repository at `~/librewaternet.org/index.html`. Move the local working
     directory in that same pass and not before (`dev/hosting-layout.md` §5).
 
-- 75|472| **`alignedSideFor()` walks every link to place one label.**
-  It is the next quadratic. With the four measurement quadratics fixed (Task 440), a Close of the 256-junction grid spends 21%
-  of its self time in `linkPointList()` — 480 x 480 calls on that drawing — against getBBox()'s 6.2%.
-  The number to beat and the profile it came from are at the top of `dev/browser-pass/specs/perf.js`;
-  a saving worth defending is worth a COUNTABLE guard, as `dev/lpn-spike/label-batch-harness.js` is.
-
 - 75|478| **[H] Tab should walk down the input column, not sideways.**
   Tom, 2026-08-22: *"One entire column at a time... it is less bad to force a user tabber person into
   'do an entire column at once' than 'do an entire row at once'"* — a user is focused on one to three
