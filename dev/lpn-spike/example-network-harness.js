@@ -1,4 +1,4 @@
-// Harness for drawExampleNetwork() in js/looped-network.js -- run with:
+// Harness for drawExampleNetwork(), the code-drawn example network -- run with:
 //   node dev/lpn-spike/example-network-harness.js
 //
 // WHY THIS EXISTS. The example network is the first thing a visitor sees the calculator do, and
@@ -21,6 +21,8 @@
 const {
   ROOT, mkEl, byId, ensure, unitSelects, setUnitSet, setHitTarget, loadLoopedNetwork, GPM, FT, IN
 } = require('./lpn-dom-stub.js');
+const { drawExampleSource } = require('./example-fixture.js');
+
 const fs = require('fs');
 
 const L = loadLoopedNetwork(
@@ -87,7 +89,10 @@ const L = loadLoopedNetwork(
   "\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
   "\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
   "\t\t\tlabelsLayer = el('g', {}, world);\n" +
-  "\t\t\trubberBandEl = el('line', {}, world); } "
+  "\t\t\trubberBandEl = el('line', {}, world); } ",
+	// The code-drawn ring main, moved out of the shipped file (Task 378) and spliced back
+	// into its own scope here. See dev/lpn-spike/example-draw-fixture.js.
+	drawExampleSource()
 );
 
 let fails = 0;
@@ -173,7 +178,7 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
   // ONE drawing for both presets. Map coordinates FOLLOW the Length/Map declaration (they are not
   // unitless), so this same 1400 x 700 layout is a 1400 ft ring in US and a 1400 m ring in SI --
-  // a physically larger system, accepted deliberately. See drawExampleNetwork()'s comment.
+  // a physically larger system, accepted deliberately. See example-draw-fixture.js's comment.
   ok('ring extent is 1400 x 700 in both unit sets', near(w, 1400, 1) && near(h, 700, 1),
     w.toFixed(0) + ' x ' + h.toFixed(0));
   const cx = (Math.max(...xs) + Math.min(...xs)) / 2, cy = (Math.max(...ys) + Math.min(...ys)) / 2;

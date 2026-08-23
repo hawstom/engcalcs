@@ -27,6 +27,8 @@
 
 const assert = require('assert');
 const { setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { drawExampleSource } = require('./example-fixture.js');
+
 
 let checks = 0;
 function ok(cond, what) { assert.ok(cond, what); checks++; }
@@ -49,7 +51,10 @@ const L = loadLoopedNetwork(
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
 	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
-	"\t\t\trubberBandEl = el('line', {}, world); }"
+	"\t\t\trubberBandEl = el('line', {}, world); }",
+	// The code-drawn ring main, moved out of the shipped file (Task 378) and spliced back
+	// into its own scope here. See dev/lpn-spike/example-draw-fixture.js.
+	drawExampleSource()
 );
 
 setUnitSet('us');

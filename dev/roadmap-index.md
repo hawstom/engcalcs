@@ -20,7 +20,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 ## 75 — Soon (8)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
-- Task 378 — Delete `drawExampleNetwork()`; three harnesses still hold it in the shipped file.
+- Task 378 — Delete `drawExampleNetwork()` from `js/looped-network.js`: ONE MECHANICAL CUT LEFT.
 - Task 442 — [H] · The toolbar may want to become a side menu.
 - Task 477 — [H] · New blank project startup wizard: xy/lat-lon, units, head loss.
 - Task 478 — [H] · Tab should walk down the input column, not sideways.
