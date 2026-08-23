@@ -1129,3 +1129,56 @@ awk: cmd. line:6: (FILENAME=- FNR=12) warning: sqrt: called with negative argume
 
  Snapshotting into dev/usage-data-log.md: paste the WINDOW and FINGERPRINT lines with
  whatever table you keep. A table pasted without them cannot be compared to anything.
+
+---
+
+## 2026-08-23 — the logs get archived, and exactly one aggregate gets published
+
+Not a snapshot. A change to where these numbers live, recorded here because every future snapshot
+in this file is affected by it.
+
+### Where the logs go now
+
+Rotation is `php dev/scripts/archive_logs.php --apply` (dry run by default, like `trim_logs.php`).
+It moves the six live logs into **`spock/<YYYY-MM-DD>/`** — *the date is the ENDING date*, the day
+they were archived — recreates them empty, verifies the row count before it reports success, and
+refuses outright if that directory already exists. `spock` is Tom's name for the directory; the
+derivation is in `spock/README.md` and is not a typo.
+
+**Nothing registers an archive.** Hand-moving six files into `spock/2026-08-14/` is the whole
+procedure, which matters because deploying logging to a new location orphans the old set. Both
+readers glob.
+
+Read one back with `bash log/lang-log-stats.sh --archive=spock/2026-08-14`. The report grew a
+**SOURCE** line naming the archive, printed on the header and again in the footer, and its
+FINGERPRINT now leads with `src=live` or `src=archive:<name>`. **A fingerprint pasted into this
+file without an `src=` prefix predates 2026-08-23 and is a live run by definition.** Each archive
+keeps its own `.last-report-window`, so PREVIOUS RUN never compares an archive against the live
+logs — the exact shape of the 40x scale break above.
+
+`dev/scripts/trim_logs.php` now walks `spock/*/` as well. **It did not before**, so before this
+change an archived log was data the 26-month promise in `privacy.php` never reached. Moving a file
+does not change what the page told the visitor about it.
+
+### What is published, and what is not
+
+Tom offered to publish everything, raw logs included, and deferred the judgement. **The raw logs
+stay private; one aggregate report is served.**
+
+The content is close to harmless, verified writer by writer rather than assumed: none of the six
+records `REMOTE_ADDR`, `HTTP_USER_AGENT`, a session id, or anything a visitor typed. A row is a
+timestamp, a page, a language, a source and a bucket, and every visitor-supplied column goes
+through `ecBrowserLangTag()` or an explicit allowlist first.
+
+**But publishing is a promise question, not a content question.** `privacy.php` does not say
+"published on the web", so publishing per-event rows changes the deal even though each row is
+benign — and CLAUDE.md prices that change: a `consent_body` rewrite, 26 retranslations, and an
+`EC_CONSENT_VERSION` bump that re-asks everybody. It is also irreversible once indexed. An
+aggregate report changes no promise, so that is what gets served.
+
+`sh dev/scripts/publish_usage_report.sh` writes `spock/reports/usage-<date>.txt` plus a stable
+`usage-latest.txt` (both denied over HTTP) and one served copy under `spock/public/` at an
+unguessable filename. The served copy truncates **every timestamp to its date** and tags its
+fingerprint `redacted=date`, so a published copy and a private one can never be pasted here as the
+same run. It is not in `robots.txt` — a `Disallow` line publishes the very name it protects — and
+carries `<meta name="robots" content="noindex">` instead.
