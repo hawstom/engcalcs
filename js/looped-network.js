@@ -5380,17 +5380,16 @@ var EngCalcs = EngCalcs || {};
 	// **THE PARADIGM IS THE IMAGE-PLACEMENT ONE, NOT A MENU OF COMMANDS** (Tom's option 3, his own
 	// preference): the whole model behaves like one picture being dropped onto the map, with corner
 	// handles to size it, the body to move it and a top handle to turn it, and a Finish that commits.
-	// Insert/Move/Scale/Rotate as four separate menu commands was option 2 and is not built -- it
-	// asks the user to name the operation before doing it, which is exactly the hurdle Tom flagged.
+	// Insert/Move/Scale/Rotate as four separate menu commands (option 2) asks the user to name the
+	// operation before doing it, which is the hurdle Tom flagged.
 	//
 	// **THE SCALE IS NOT KNOWN, AND WE MUST FIND IT AS WELL AS THE PLACE.** Tom, 2026-08-18, on the
 	// EPANET examples he actually converted: *"Your grid does not already say how big one drawing
 	// unit is; these EPANET examples and many old systems are drawn on arbitrary 'schematic'
 	// canvases. We must find both location and scale."* Reading `lengthField()` and declaring one
 	// drawing unit to be one Length/Map unit lands a whole schematic system inside a few metres of
-	// pavement. The scale is therefore something the user SETS -- by sizing
-	// the map behind the model in step 1, by telling Go to… roughly how wide the site is, or by
-	// typing it in step 2.
+	// pavement. The scale is therefore something the user SETS -- by sizing the map behind the model
+	// in step 1, by telling Go to… roughly how wide the site is, or by typing it in step 2.
 	//
 	// **THE TWO STEPS ARE NAMED, VISIBLE, AND THE USER SWITCHES BETWEEN THEM AT WILL.** Tom: *"there
 	// is an uncomfortable gray area between the described modes… I need the map either to come along
