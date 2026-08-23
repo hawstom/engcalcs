@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**81 open tasks.** Next (100): 7 · Soon (75): 10 · Someday (50): 12 · Maybe (25): 25 · Parked (5): 27
+**80 open tasks.** Next (100): 7 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 25 · Parked (5): 27
 
 ## 100 — Next (7)
 
@@ -19,11 +19,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
 - Task 489 — Our Mapbox attribution is incomplete, and theirs is a licence term.
 
-## 75 — Soon (10)
+## 75 — Soon (9)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 378 — [H] · Give the seven harnesses a network some other way, and delete `drawExampleNetwork()`.
-- Task 426 — The SI and US preset buttons give no clue what they do.
 - Task 442 — [H] · The toolbar may want to become a side menu.
 - Task 472 — `alignedSideFor()` walks every link to place one label.
 - Task 477 — [H] · New blank project startup wizard: xy/lat-lon, units, head loss.
@@ -107,5 +106,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-81 of 81 titles are within 4–12 words. `!` marks the rest;
+80 of 80 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

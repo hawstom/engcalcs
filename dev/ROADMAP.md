@@ -188,11 +188,6 @@ the block.
   - The care needed is that those harnesses assert solved pressures and specific IDs. Migrate one
     first and diff its output against the current run before touching the other six.
 
-- 75|426| **The SI and US preset buttons give no clue what they do.** Tom, 2026-08-18. They change
-  every unit at once, which under Task 422's rule is a reinterpretation of the whole document. Label
-  them *Non-destructive (doesn't rewrite inputs)* — or whatever wording Task 425 settles on, so the
-  two agree.
-
 - 75|477| **[H] New blank project startup wizard: xy/lat-lon, units, head loss.** Tom, 2026-08-22,
   naming the scope. It replaces the four-row File > New fly-out; on epanet-js, *"they have a wizard
   box with xy and lat/lon as the top choices, and if lat/lon is selected, a search box is enabled.
@@ -338,6 +333,11 @@ the block.
   - Buttons: **Non-destructive · Destructive · Cancel**.
   - **Open:** back the original inputs up before a Destructive change, or offer to. An undo snapshot is
     already taken; whether that is enough is the question.
+  - **AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry**, proposed while Task 426 borrowed the word
+    *Non-destructive* for the shared units row. A translator cannot recover the term of art from the
+    words, so: `$ec_lang_syn['calc_set_units_tip']='Changes the unit shown on every field at once
+    (switches the whole page to that unit system); safe, harmless, does not overwrite anything,
+    leaves your entries untouched, keeps the numbers you typed.'`
 
 - 50|433| **Profile: the last piece is the path CHOOSER.** Tom, 2026-08-18: *"Amazing. Now we just need a
   good UI."* Two of the three are done — the route is drawn on the map, and the panel is now the
