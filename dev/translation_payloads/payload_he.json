@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 1260,
+        "expected_key_count": 1262,
         "delta_key_count": 68,
         "exempt_key_count": 20,
         "exempt_keys": [
@@ -26,7 +26,7 @@
             "lpn_field_x",
             "lpn_field_y"
         ],
-        "out_of_scope_key_count": 7,
+        "out_of_scope_key_count": 9,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
             "calc",

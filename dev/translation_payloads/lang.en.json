@@ -153,6 +153,8 @@
         "mi_q617": "Q",
         "mi_notes_1_term": "Composite n",
         "mi_notes_1_def": "This calculator follows HEC-RAS Reference Manual in calculating region composite n using Chow 1959, page 136, equation 6-17 (not 6-18).",
+        "mi_notes_3_term": "Errata",
+        "mi_notes_3_def": "Found and fixed 23 August 2026. A segment drawn exactly vertical — two points at the same station, one above the other, which is how a rectangular channel, a box culvert or a retaining wall is drawn — added no wetted perimeter. Results from before that date are too high for any section with a vertical wall: a channel 10 wide and 5 deep was given a wetted perimeter of 10 instead of 20, and flow about 1.6 times the correct value. A sloping bank, however steep, was never affected, and neither was a wall standing above the water. If you used this page on a section with a vertical wall, please run it again.",
         "mi_notes_2_term": "Rock lining",
         "mi_notes_2_def": "Use the Manning Trapezoidal Channel Calculator to design rock lining. This calculator is better suited to natural sections.",
         "mpf_main_menu": "Manning Pipe Flow",
@@ -1262,7 +1264,7 @@
         "lpn_field_demand_pattern": "Demand pattern",
         "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
     },
-    "count": 1260,
+    "count": 1262,
     "active_prefixes": [
         "about",
         "bpn",

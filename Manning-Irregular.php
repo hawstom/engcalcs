@@ -133,6 +133,7 @@ function echoCalculatorFormAppend() {
 <dl>
 <dt><?=$ec_lang['mi_notes_1_term']?></dt><dd><?=$ec_lang['mi_notes_1_def']?></dd>
 <dt><?=$ec_lang['mi_notes_2_term']?></dt><dd><?=$ec_lang['mi_notes_2_def']?></dd>
+<dt><?=$ec_lang['mi_notes_3_term']?></dt><dd><?=$ec_lang['mi_notes_3_def']?></dd>
 <dt><?=$ec_lang['mtc_note_2_term']?></dt><dd><?=$ec_lang['mtc_note_2_def']?></dd>
 </dl>
 <script>

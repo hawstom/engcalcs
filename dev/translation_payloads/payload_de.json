@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 1260,
+        "expected_key_count": 1262,
         "delta_key_count": 67,
         "exempt_key_count": 35,
         "exempt_keys": [
@@ -41,7 +41,7 @@
             "lpn_time_pause",
             "lpn_time_tank"
         ],
-        "out_of_scope_key_count": 9,
+        "out_of_scope_key_count": 11,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
             "calc",
