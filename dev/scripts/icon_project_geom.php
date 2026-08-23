@@ -1,179 +1,143 @@
 <?php
 /**
- * icon_project_geom.php — emit the 'project' icon geometry from ONE motif.
+ * icon_project_geom.php — emit the 'project' icon from ONE physical model.
  *
- * WHY A GENERATOR. Tom's construction (2026-08-23) is a single motif — the TOP HALF of the roll's
- * ellipse, the catenary that leaves it tangentially, and the horizontal run to the title block —
- * COPIED VERTICALLY. Copied, not offset: every point moves down by the same dy, so each copy is
- * congruent to the original. (An AutoCAD-style offset would make a parallel curve, which for a
- * catenary is a different curve, and that is the mistake the earlier renditions kept making.)
- * Identity is structural here: the copies come out of one parameter set differing only in dy.
+ * **THE MODEL IS A WIREFRAME, NOT A SET OF STROKES** (Tom, 2026-08-23). Six earlier rounds used a
+ * stroke's WIDTH to stand for an object's thickness, and that model cannot hold: a stroke paints
+ * symmetrically about a path, so the object's real boundary is at nominal ± w/2 — a number nobody
+ * ever states. Two features of different thickness then cannot meet, because neither one's true edge
+ * exists in the model. Drawing the wireframe those strokes implied exposed three contradictions at
+ * once: the roll's core had been eaten to a 0.15 slit, its outer edge sat 1.25 units BELOW the
+ * tabletop it rests on, and the "thick" bottom was a translated copy of a catenary, which is not
+ * the same curve. Tom: *"if we wanted to get this (or any design) right from the beginning, we
+ * should start with a wire frame (zero line widths or infinite resolution)."*
  *
- * The roll is ONE roll, drawn as a fat line — every sheet in it collapses into that one stroke.
- * Its LOWER half exists only at the bottom copy, where it actually rests on the table; higher up
- * the sheets in front hide it, so those copies are an arc.
+ * So every dimension here is a real dimension, and there are exactly two kinds of thing:
+ *   FILL   material seen edge-on. The roll (an annulus round its core), the fan of sheet edges at
+ *          the right, and the stack lying on the table.
+ *   EDGE   where material stops. One line each. A single sheet has no drawable thickness, so it
+ *          never gets two.
  *
- * Paste the output into $ec_icons['project'] and check it with icon_ascii_preview.php at 17 px.
+ * **FORESHORTENING IS DERIVED, NOT CHOSEN.** A round roll end drawn rx × ry declares the vertical
+ * compression k = ry/rx. Anything lying FLAT is seen through that same k, so the stack's apparent
+ * thickness is its real thickness × k. The fan is seen FACE-ON and is not foreshortened at all,
+ * which is why it is visibly fatter than the bottom.
+ *
+ * **ONE MOTIF, COPIED.** The roll's upper arc (180°→290°), the catenary that leaves it along its
+ * tangent, and the flat run to the title block, translated in y by `dy` — copied, never offset. An
+ * offset curve is parallel at a constant perpendicular distance, which for a catenary is a different
+ * curve. Only the BOTTOM copy closes underneath and shows its core; higher up the sheet in front
+ * hides it. The middle copy is a fold on the face of the sheet and stops at the title block; the top
+ * and bottom are edges of the sheet and run out to the fan.
  *
  *   php dev/scripts/icon_project_geom.php                 # the shipped numbers
- *   php dev/scripts/icon_project_geom.php --copies=2      # measure the alternative
- *   php dev/scripts/icon_project_geom.php --preview --ry=3
+ *   php dev/scripts/icon_project_geom.php --wire=0.6 --preview
+ *
+ * Copyright 2009 Thomas Gail Haws
+ * Licensed under GNU GPL v3.0 or later
  */
 
 $P = array(
-	'xl'      => 2.0,    // leftmost roll centerline (a thick stroke paints to xl - wthick/2)
-	'ytop'    => 2.0,    // the top copy's arc crown
-	'ytable'  => 21.0,   // bottom sheet edge / tabletop centerline
-	'rx'      => 2.8,    // SMALL. A big roll eats the horizontal room the catenary needs, and Tom's
-	                     // read was that the earlier 4.8 was 'about twice as large as it really can
-	                     // be feasibly'. Shrinking it is what bought the sag its length.
-	'ry'      => 1.4,    // 2 : 1, major axis HORIZONTAL -- a round roll seen obliquely foreshortens
-	                     // vertically. At this size the end fills solid under the heavy stroke; it
-	                     // reads as the end of a tight roll, and a hole would cost the sag its room.
-	'theta0'  => 180.0,  // the full top half. It can be 180 again now that the roll carries its own
-	                     // straight back edge: the arcs land ON that line instead of floating
-	                     // beside each other, so the crowding that forced 200 is gone.
-	'theta'   => -70.0,  // where the sheet leaves the roll, degrees, SVG y-down (negative = above)
-	'xland'   => 13.0,   // where the sag flattens onto the sheet
-	'lead'    => 2.2,    // control-arm length along the roll's tangent
-	'trail'   => 4.5,    // control-arm length back along the flat
-	'xr'      => 21.2,   // fanned right edge
-	'xtb'     => 16.6,   // title block upright
-	'copies'  => 3,
-	'deco'    => 1,      // the vicinity map and the two signature lines
-	'wfan'    => 3.0,    // the RIGHT edge: several sheets fanned out by having been rolled. The
-	                     // fattest line, and the only genuinely fanned one.
-	'wroll'   => 2.5,    // the roll's bottom END only: a stack, but rolled tight, not fanned.
-	'wback'   => 0.75,    // the roll's BACK EDGE. Tom, 2026-08-23, looking at it at 2.5: "mistakenly
-	                     // fat/wide still. And making it narrower buys us yet more horizontal space."
-	                     // It is the silhouette of the roll, not a cut end, so it is a line like any
-	                     // other sheet edge.
-	'wbottom' => 2.0,    // the bottom edge. Tom, 2026-08-23: "far less pronounced than the right edge
-	                     // fanning fatness, partly because of perspective making it appear shorter
-	                     // than it is, like the ellipse roll instead of a circle, and partly because
-	                     // the bottom edge is not fanned." So barely above standard.
-	'wthick'  => 3.0,    // kept as the ceiling the others are read against
-	'wthin'   => 0.75,   // BRAVE. Tom, 2026-08-23: "Are we sure that the standard narrow stroke
-	                     // can't be any narrower? Could we get brave and try half as wide?
-	                     // Antialiasing can do miracles." At 17 px this samples ~25% grey rather
-	                     // than solid, which is the whole question -- back off to 1.0 or 1.5 with one
-	                     // flag if it reads as faint instead of as fine.
-	'wthin_was' => 1.5,  // the previous value, kept so backing off is a substitution not a guess    // THE NARROWEST THAT SURVIVES 17 px, and everything takes it except the
-	                     // three heavy lines. Tom, 2026-08-23: 'All the linework should be as narrow
-	                     // as feasible (not to disappear at 17 px) so that we can fit things.'
-	                     // A path with no stroke-width would inherit 2 from EC_ICON_OPEN_TAG, so every
-	                     // narrow path states its width -- otherwise lowering this does nothing.
+	'cx'      => 3.9,    'cy'    => 21.6,   // the roll, resting on the table
+	'rx'      => 3.5,    'ry'    => 1.85,   // 2 : 1 -- a round end seen obliquely. k = ry/rx = 0.529
+	'crx'     => 1.6,    'cry'   => 0.75,   // the core it is wound on
+	'dy'      => 9.7,                        // between copies, read off Tom's own 1700-box wireframe
+	'th0'     => 180.0,  'th1'   => 290.0,  // the roll's VISIBLE arc: leftmost, over the crown, to
+	                                         // where the sheet leaves
+	'lead'    => 2.4,                        // down the tangent. THIS is what makes the sheet HANG
+	                                         // rather than step -- shortening it flattens the
+	                                         // catenary into an S between two endpoints.
+	'trail'   => 3.8,                        // back along the flat
+	'xland'   => 11.4,   'yflat' => 23.3,    // where the bottom sheet flattens onto the table
+	'xtb'     => 19.1,                       // title block, left edge
+	'xfan'    => 21.9,   'xr'    => 23.6,    // the fan of sheet edges: inside, outside
+	'stackreal' => 0.85,                     // REAL thickness of the stack; apparent = this × k
+	'wire'    => 0.35,                       // the hairline. Every edge is one of these.
+	'deco'    => 1,
 );
 foreach (array_slice($argv, 1) as $a) {
 	if (preg_match('/^--([a-z]+)=(-?[\d.]+)$/', $a, $m) && isset($P[$m[1]])) { $P[$m[1]] = (float)$m[2]; }
 }
-$n = max(2, (int)$P['copies']);
-$f = function($v) { return rtrim(rtrim(number_format($v, 3, '.', ''), '0'), '.'); };
-$pt = function($p) use ($f) { return $f($p[0]) . ' ' . $f($p[1]); };
+$f  = function ($v) { return rtrim(rtrim(number_format($v, 3, '.', ''), '0'), '.'); };
+$k  = $P['ry'] / $P['rx'];
+$st = round($P['stackreal'] * $k, 2);
+$W  = $f($P['wire']);
 
-$cx      = $P['xl'] + $P['rx'];
-$cyBot   = $P['ytable'] - $P['ry'];                  // the roll kisses the table
-$cyTop   = $P['ytop'] + $P['ry'];                    // the top copy's crown kisses the icon's top
-$dy      = ($cyBot - $cyTop) / ($n - 1);
-$yTopRun = $P['ytable'] - ($n - 1) * $dy;
-
-// Ellipse point and tangent at an angle, SVG y-down.
-$ept = function($th) use ($cx, $cyBot, $P) {
-	return array($cx + $P['rx']*cos($th), $cyBot + $P['ry']*sin($th)); };
-$etan = function($th) use ($P) { return array(-$P['rx']*sin($th), $P['ry']*cos($th)); };
-
-// The upper arc, as cubics: from the roll's leftmost point, over the crown, to where the sheet
-// leaves. Standard circular-arc approximation, scaled by rx/ry: handle = (4/3)tan(dtheta/4).
-$th0 = deg2rad($P['theta0']);                         // left end of the visible arc
-$th1 = 2*M_PI + deg2rad($P['theta']);                 // the tangent point, going over the top
-$segs = 3;
-$arc = array();
-for ($k = 0; $k < $segs; $k++) {
-	$a = $th0 + ($th1-$th0)*$k/$segs; $b = $th0 + ($th1-$th0)*($k+1)/$segs;
-	$h = 4.0/3.0 * tan(($b-$a)/4.0);
-	$p0 = $ept($a); $p3 = $ept($b); $t0 = $etan($a); $t3 = $etan($b);
-	$arc[] = array(array($p0[0]+$h*$t0[0], $p0[1]+$h*$t0[1]),
-		array($p3[0]-$h*$t3[0], $p3[1]-$h*$t3[1]), $p3);
-}
-$arcStart = $ept($th0);
-
-// The sag and the flat, hung off the same tangent point.
-$p0 = $ept($th1);
-$t  = $etan($th1); $tl = sqrt($t[0]*$t[0] + $t[1]*$t[1]);
-$c1 = array($p0[0] + $P['lead']*$t[0]/$tl, $p0[1] + $P['lead']*$t[1]/$tl);
-$c2 = array($P['xland'] - $P['trail'], $P['ytable']);
-$p3 = array($P['xland'], $P['ytable']);
-
-$up = function($p, $o) { return array($p[0], $p[1] - $o); };
-$arcD = function($o) use ($arc, $arcStart, $up, $pt) {
-	$d = 'M' . $pt($up($arcStart, $o));
-	foreach ($arc as $s) { $d .= 'C' . $pt($up($s[0], $o)) . ' ' . $pt($up($s[1], $o)) . ' ' . $pt($up($s[2], $o)); }
-	return $d;
+// An elliptical arc as cubics. `A` is deliberately not used: dev/scripts/icon_ascii_preview.php
+// models M/L/H/V/C/Z only, so an arc written as `A` would be invisible to the one tool that checks
+// this drawing -- which is exactly how a wrong version nearly shipped.
+$cub = function ($cx, $cy, $rx, $ry, $t0, $t1, $segs) {
+	$ept = function ($t) use ($cx, $cy, $rx, $ry) { return array($cx + $rx*cos($t), $cy + $ry*sin($t)); };
+	$tan = function ($t) use ($rx, $ry) { return array(-$rx*sin($t), $ry*cos($t)); };
+	$out = array();
+	for ($i = 0; $i < $segs; $i++) {
+		$a = $t0 + ($t1-$t0)*$i/$segs; $b = $t0 + ($t1-$t0)*($i+1)/$segs;
+		$h = 4.0/3.0 * tan(($b-$a)/4.0);
+		$p0 = $ept($a); $p3 = $ept($b); $ta = $tan($a); $tb = $tan($b);
+		$out[] = array(array($p0[0]+$h*$ta[0], $p0[1]+$h*$ta[1]),
+			array($p3[0]-$h*$tb[0], $p3[1]-$h*$tb[1]), $p3);
+	}
+	return array($ept($t0), $out);
+};
+$dof = function ($start, $cubs, $close, $off) use ($f) {
+	$d = 'M' . $f($start[0]) . ' ' . $f($start[1] - $off);
+	foreach ($cubs as $c) {
+		$d .= 'C' . $f($c[0][0]) . ' ' . $f($c[0][1]-$off) . ' ' . $f($c[1][0]) . ' ' . $f($c[1][1]-$off)
+			. ' ' . $f($c[2][0]) . ' ' . $f($c[2][1]-$off);
+	}
+	return $d . ($close ? 'Z' : '');
 };
 
+list($os, $oc) = $cub($P['cx'], $P['cy'], $P['rx'], $P['ry'], 0, 2*M_PI, 4);          // roll, outer
+list($is, $ic) = $cub($P['cx'], $P['cy'], $P['crx'], $P['cry'], 0, 2*M_PI, 4);        // roll, core
+$t0 = deg2rad($P['th0']); $t1 = deg2rad($P['th1']);
+list($as, $ac) = $cub($P['cx'], $P['cy'], $P['rx'], $P['ry'], $t0, $t1, 3);           // roll, visible arc
+
+$lv = array($P['cx'] + $P['rx']*cos($t1), $P['cy'] + $P['ry']*sin($t1));
+$tv = array(-$P['rx']*sin($t1), $P['ry']*cos($t1));
+$tl = sqrt($tv[0]*$tv[0] + $tv[1]*$tv[1]);
+$k1 = array($lv[0] + $P['lead']*$tv[0]/$tl, $lv[1] + $P['lead']*$tv[1]/$tl);
+$k2 = array($P['xland'] - $P['trail'], $P['yflat']);
+$p3 = array($P['xland'], $P['yflat']);
+$sag = function ($off, $xend) use ($f, $lv, $k1, $k2, $p3) {
+	return 'M' . $f($lv[0]) . ' ' . $f($lv[1]-$off) . 'C' . $f($k1[0]) . ' ' . $f($k1[1]-$off)
+		. ' ' . $f($k2[0]) . ' ' . $f($k2[1]-$off) . ' ' . $f($p3[0]) . ' ' . $f($p3[1]-$off)
+		. 'H' . $f($xend);
+};
+$edge = function ($d) use ($W) { return '<path stroke-width="' . $W . '" d="' . $d . '"/>'; };
+
+$ytop = $P['yflat'] - 2*$P['dy'];
 $out = array();
-// The roll. At the bottom it is a closed ellipse, because that is the one place its underside is
-// not hidden behind the sheets in front of it; above, the same curve's top half only. Always the
-// heavy stroke: one fat line is how the whole roll of sheets is drawn.
-$out[] = '<ellipse cx="' . $f($cx) . '" cy="' . $f($cyBot) . '" rx="' . $f($P['rx'])
-	. '" ry="' . $f($P['ry']) . '" stroke-width="' . $f($P['wroll']) . '"/>';
-// **ONLY THE BOTTOM IS A STACK** (Tom, 2026-08-23: *"only the bottom needs extra thick lines to
-// represent a stack of sheets"*). A copy higher up is one sheet's own edge wrapping the roll, so it
-// takes the thin stroke; the earlier version copied the heavy weight up with the shape and made
-// three stacks where there is one.
-for ($i = 1; $i < $n; $i++) {
-	$out[] = '<path stroke-width="' . $f($P['wthin']) . '" d="' . $arcD($i*$dy) . '"/>';
+// ---- FILLS ----
+$out[] = '<path fill="currentColor" stroke="none" fill-rule="evenodd" d="'
+	. $dof($os, $oc, true, 0) . $dof($is, $ic, true, 0) . '"/>';
+$out[] = '<rect x="' . $f($P['xfan']) . '" y="' . $f($ytop) . '" width="' . $f($P['xr']-$P['xfan'])
+	. '" height="' . $f($P['yflat']-$ytop) . '" fill="currentColor" stroke="none"/>';
+$out[] = '<path fill="currentColor" stroke="none" d="' . $sag(0, $P['xr'])
+	. 'V' . $f($P['yflat']+$st) . 'H' . $f($p3[0])
+	. 'C' . $f($k2[0]) . ' ' . $f($k2[1]+$st) . ' ' . $f($k1[0]) . ' ' . $f($k1[1]+$st)
+	. ' ' . $f($lv[0]) . ' ' . $f($lv[1]+$st) . 'Z"/>';
+// ---- EDGES ----
+$out[] = $edge('M' . $f($P['cx']-$P['rx']) . ' ' . $f($P['cy']-2*$P['dy']) . 'V' . $f($P['cy']));
+foreach (array(array(2*$P['dy'], $P['xr']), array($P['dy'], $P['xtb'])) as $c) {
+	$out[] = $edge($dof($as, $ac, false, $c[0]));
+	$out[] = $edge($sag($c[0], $c[1]));
 }
-// **THE ROLL'S STRAIGHT BACK EDGE**, against the icon's left edge — the outside of the rolled stack,
-// so it carries the heavy stroke. Without it the copies read as separate curves floating one above
-// another instead of as one roll; it is also what lets theta0 go back to 180, because every arc now
-// starts ON this line.
-$out[] = '<path stroke-width="' . $f($P['wback']) . '" stroke-linecap="butt" d="M'
-	. $f($P['xl']) . ' ' . $f($cyTop) . 'V' . $f($cyBot) . '"/>';
-// The fanned right edge and the bottom copy's sag and flat, as ONE mitered path, so the lower-right
-// corner is a join and comes out square. Its butt top end stops one thin half-width short of the
-// top run, so it lands flush with that edge rather than bulging a round cap past the corner above.
-// **THE FANNED RIGHT EDGE AND THE BOTTOM EDGE ARE NOW TWO PATHS, BECAUSE THEY ARE TWO WEIGHTS.**
-// One mitered path gave a clean square corner but forced one width on both, and the bottom edge is
-// neither fanned nor seen square-on. Two butt-capped strokes meeting at the corner leave a visible
-// STEP there, which is what a thick edge running into a thinner one really looks like. The vertical
-// runs half its own width past the tabletop so the corner fills.
-$out[] = '<path stroke-width="' . $f($P['wfan']) . '" stroke-linecap="butt" d="M'
-	. $f($P['xr']) . ' ' . $f($yTopRun - $P['wthin']/2)
-	. 'V' . $f($P['ytable'] + $P['wbottom']/2) . '"/>';
-$out[] = '<path stroke-width="' . $f($P['wbottom']) . '" stroke-linejoin="miter" stroke-linecap="butt"'
-	. ' d="M' . $f($P['xr'] + $P['wfan']/2) . ' ' . $f($P['ytable'])
-	. 'H' . $f($p3[0])
-	. 'C' . $pt($c2) . ' ' . $pt($c1) . ' ' . $pt($p0) . '"/>';
-// Every copy above the bottom: sag and flat are one sheet edge, so the light stroke. The top copy
-// is the sheet's top edge and runs to the fanned right edge, carrying the upper-right corner as a
-// join inside its own path; a middle copy is a fold on the face of the sheet and stops at the
-// title block rather than crossing into it.
-for ($i = 1; $i < $n; $i++) {
-	$o = $i * $dy;
-	$out[] = '<path stroke-width="' . $f($P['wthin']) . '" stroke-linejoin="miter" d="M' . $pt($up($p0, $o)) . 'C' . $pt($up($c1, $o))
-		. ' ' . $pt($up($c2, $o)) . ' ' . $pt($up($p3, $o))
-		. 'H' . $f($i === $n - 1 ? $P['xr'] : $P['xtb']) . '"/>';
-}
-// The title block: one upright near the right edge. The sheet's own right, top and bottom edges
-// close the box; nothing goes inside it.
-$out[] = '<path stroke-width="' . $f($P['wthin']) . '" d="M' . $f($P['xtb']) . ' ' . $f($yTopRun) . 'V' . $f($P['ytable']) . '"/>';
-
-// **DECORATION ON THE FACE OF THE SHEET** (Tom's sketch 5): a vicinity map in the upper right of the
-// sheet area and two signature lines for approval in the lower right, both clear of the catenaries.
-// They sit in the two pockets the middle copy leaves -- above it under the top flat, and below it
-// above the bottom sag. Set --deco=0 to drop them.
+$out[] = $edge($dof($os, $oc, true, 0));
+$out[] = $edge($dof($is, $ic, true, 0));
+$out[] = $edge($sag(0, $P['xr']));
+$out[] = $edge('M' . $f($P['xfan']) . ' ' . $f($ytop) . 'V' . $f($P['yflat']));
+$out[] = $edge('M' . $f($P['xr']) . ' ' . $f($ytop) . 'V' . $f($P['yflat']+$st));
+$out[] = $edge('M' . $f($P['xtb']) . ' ' . $f($ytop) . 'V' . $f($P['yflat']));
+$out[] = $edge('M20 10.2V15.6');
+$out[] = $edge('M20.9 11.6V14.1');
 if ((int)$P['deco'] === 1) {
-	$out[] = '<rect x="12" y="6.2" width="3.6" height="3.4" stroke-width="' . $f($P['wthin']) . '"/>';
-	$out[] = '<path stroke-width="' . $f($P['wthin']) . '" d="M12 15.6H15.6"/>';
-	$out[] = '<path stroke-width="' . $f($P['wthin']) . '" d="M12 17.6H15.6"/>';
+	$out[] = '<rect x="14.3" y="5.2" width="3" height="2.7" stroke-width="' . $W . '"/>';
+	$out[] = $edge('M13.2 19.4H17.6');
+	$out[] = $edge('M13.2 20.8H17.6');
 }
-
 $geom = implode('', $out);
 echo $geom, "\n";
-
-// --preview draws the candidate straight away, at the two sizes that matter, without it having to
-// be pasted into Icons.lib.php first. 17 px is the verdict; 24 px only shows the intent.
 if (in_array('--preview', $argv, true)) {
 	require_once(__DIR__ . '/icon_ascii_preview.php');
 	foreach (array(17, 24) as $s) {

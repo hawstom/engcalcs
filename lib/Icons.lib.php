@@ -314,105 +314,72 @@ $ec_icons = array(
 		. '<path d="M12 7.5C14.4 5.6 17.2 5 20.5 5.2V16.5C17.2 16.3 14.4 16.9 12 18.8"/>'
 		. '<path d="M12 7.5V18.8"/>',
 
-	// PROJECT: a plan set, part unrolled (ROADMAP Task 467). Built to Tom's own construction, and the
-	// drawing is ONE MOTIF — the visible upper arc of the roll, the catenary that leaves it
-	// tangentially, and the flat run to the title block — COPIED VERTICALLY, three times.
+	// PROJECT: a plan set, part unrolled (ROADMAP Task 467). **THE MODEL IS A WIREFRAME, and that is
+	// the whole lesson of seven rounds.** Six of them used a stroke's WIDTH to stand for an object's
+	// thickness. That model cannot hold: a stroke paints symmetrically about a path, so the object's
+	// real boundary sits at nominal +- w/2, a number nobody ever states, and two features of different
+	// thickness therefore cannot meet. Drawing the wireframe those strokes implied exposed three
+	// contradictions at once -- the roll's core had been eaten to a 0.15 slit, its outer edge sat 1.25
+	// units BELOW the tabletop it rests on, and the "thick" bottom was a TRANSLATED copy of a catenary,
+	// which is a different curve. Tom, 2026-08-23: *"if we wanted to get this (or any design) right
+	// from the beginning, we should start with a wire frame (zero line widths or infinite resolution)."*
 	//
-	// **COPIED, NOT OFFSET, and that is the correction six earlier renditions failed** (Tom,
-	// 2026-08-23): "while these features are parallel in the real world on the paper as straight
-	// lines, they are not parallel in our oblique view of a sagging sheet; they are copies upward of
-	// the bottom edge", and "don't literally mean offsets... in the AutoCAD sense". An offset curve
-	// is parallel at a constant PERPENDICULAR distance, which for a catenary is a different curve.
-	// Here every point of a copy moves down by the same 6.2, so the copies are congruent; read the
-	// path string and every y differs by exactly 6.2, x by nothing.
+	// So there are exactly two kinds of thing here, and the distinction is the model:
+	//   FILL   material seen edge-on: the roll (an annulus round its core), the fan of sheet edges at
+	//          the right, and the stack lying on the table.
+	//   EDGE   where material stops. One hairline each. A single sheet has no drawable thickness, so
+	//          it never gets two.
 	//
-	// **THERE IS ONE ROLL, drawn as one fat line** — "here all sheets collapse to a fat line". Not a
-	// roll per sheet and not an ellipse per sheet. What repeats is the roll's TOP arc; its underside
-	// exists only in the bottom copy, where it actually rests on the table, so the bottom roll is a
-	// closed <ellipse> and the two above it are arcs of that same ellipse.
+	// **FORESHORTENING IS DERIVED.** A round roll end drawn 3.5 x 1.85 declares k = ry/rx = 0.529.
+	// Anything lying FLAT is seen through that same k, so the stack's 0.85 of real thickness appears
+	// as 0.45. The fan is seen FACE-ON and is not foreshortened at all, which is why it is visibly
+	// fatter than the bottom -- Tom's own hair-split, now a consequence rather than a nudge.
 	//
-	// **HOUSE WEIGHT (2 units in a 24 box) SETS EVERY DIMENSION.** Measured: two 2-unit strokes need
-	// 3.5 units between centres to keep daylight at 17 px, so 1.5 units of daylight is the floor.
-	//   - **THE ROLL END IS AN ELLIPSE, 2 : 1, MAJOR AXIS HORIZONTAL** (rx 2.8, ry 1.4). It was a
-	//     circle until Tom said so: a round roll seen obliquely foreshortens vertically, and drawing
-	//     it round is the same class of error as drawing the sheet edges as three different curves.
-	//   - **AND IT IS SMALL, because the roll competes with the sag for horizontal room.** At rx 4.8
-	//     there was none left and the catenary collapsed to an almost vertical drop — Tom: "about
-	//     twice as large as it really can be feasibly... we just need to give it all a bit more
-	//     horizontal space by shrinking the roll of paper." At this size the end fills solid under
-	//     the heavy stroke. That is accepted: it reads as the end of a tight roll, and buying back a
-	//     hole costs the sag the room that makes it a catenary at all.
-	//   - **THE ROLL'S STRAIGHT BACK EDGE** runs down the icon's left at x = 2.0, and it is what makes
-	//     three copies read as one roll instead of as curves floating one above another. It also
-	//     returns theta0 to 180 — the literal top half — because every arc now starts ON that line
-	//     rather than beside the flank of the arc below it.
-	//   - The title block is the box made by ONE upright at x=16.6 plus the sheet's own right, top and
-	//     bottom edges, and NOTHING is inside it. 16.6 is as wide as the block can be while its
-	//     upright still clears the 3-unit right edge by 1.5.
-	//   - THE DECORATIONS FIT NOW, and only because the roll shrank: a vicinity map in the upper right
-	//     of the sheet face and two approval signature lines in the lower right, in the two pockets
-	//     the middle copy leaves. They were impossible at the old roll size, when the clear lane was
-	//     about one unit wide. `--deco=0` drops them.
+	// **ONE MOTIF, COPIED, NEVER OFFSET.** The roll's visible arc (180-290 degrees), the catenary that
+	// leaves it ALONG ITS TANGENT, and the flat run, translated in y by 9.7. An offset curve is
+	// parallel at a constant perpendicular distance, which for a catenary is a different curve. The
+	// long `lead` down the tangent is what makes the sheet HANG rather than step; shortening it
+	// flattens the catenary into an S between two endpoints, which is what it became the one time this
+	// was drawn as edges without it. Only the BOTTOM copy closes underneath and shows its core.
+	// The middle copy is a fold on the FACE of the sheet and stops at the title block; the top and
+	// bottom are edges OF the sheet and run out to the fan.
 	//
-	// **THE NARROWEST LINE EVERYWHERE IT WILL SURVIVE.** Tom, 2026-08-23: "All the linework should be
-	// as narrow as feasible (not to disappear at 17 px) so that we can fit things." So the standard
-	// stroke here is 1.5, not the set's 2 — this icon carries more line than any other in the set and
-	// needs the room. A path with no stroke-width inherits 2 from EC_ICON_OPEN_TAG, so EVERY narrow
-	// path states its width; lowering the parameter alone silently does nothing.
+	// **SHIPPED AT WIREFRAME WEIGHT ON PURPOSE** (Tom: *"I am tempted to try shipping it exactly like
+	// this and see how it ages"*). Every edge is 0.35, which at 17 px is a quarter of a pixel: the
+	// three FILLS carry the icon at menu size and the linework is a whisper. That is a deliberate
+	// experiment, not an oversight. `--wire=` is the one dial that backs it off, and 0.35 -> 1.0 is
+	// the first step if it reads as absent rather than as fine.
 	//
-	// FOUR WEIGHTS, AND EACH ONE MEANS SOMETHING PHYSICAL. A second parallel line cannot say
-	// "thickness" here — the widest offset that stays in the box is 2.0 and a pair at 2.0 samples as
-	// a solid bar — so thickness is carried by the stroke itself:
-	//   0.75 a single sheet's own edge, the title-block upright, the roll's BACK edge and the
-	//        decorations. Deliberately braver than the set's 2 — Tom asked for half of 1.5 to see
-	//        whether antialiasing carries it. At 17 px it samples ~25% grey, not solid; `--wthin=1.5`
-	//        and `--wback=1.5` put it back. The back edge came down from 2.5 on his reading that it
-	//        was "mistakenly fat" and that narrowing it buys horizontal room.
-	//   2.0  the bottom edge. Tom, 2026-08-23: "far less pronounced than the right edge fanning
-	//        fatness, partly because of perspective making it appear shorter than it is, like the
-	//        ellipse roll instead of a circle, and partly because the bottom edge is not fanned."
-	//   2.5  the roll — its back edge and its bottom end. A stack, but rolled tight.
-	//   3.0  the fanned right edge, the only genuinely fanned line, and the fattest.
-	// **THE BOTTOM AND RIGHT EDGES ARE THEREFORE TWO PATHS, NOT ONE MITERED PATH.** One path gave a
-	// clean square corner and forced one width on both. Two butt-capped strokes meeting there leave a
-	// visible STEP, which is what a thick edge running into a thinner one really looks like.
-	// Copying the heavy weight up with the shape made three stacks where there is one.
+	// Rejected, so they are not re-proposed: a stroke width standing for a thickness (see above); an
+	// AutoCAD-style OFFSET of the sag; a CIRCLE for the roll end; a roll big enough to leave the
+	// catenary no horizontal room; a WIDE title block with an interior upright; a lower-right title
+	// block (it made a mass the size of the roll at the opposite corner); a rolled TUBE (reads as a
+	// PIPE, two icons away); a water drop; a hard hat; a corner-curled single sheet.
 	//
-	// SHARP CORNERS at upper and lower right — "rounding is not realistic for a plan sheet". The
-	// shared open tag sets stroke-linejoin="round", so each corner is a JOIN INSIDE ONE PATH carrying
-	// stroke-linejoin="miter"; no ecIcon() plumbing was needed, because linejoin is an inherited
-	// presentation attribute an element overrides for itself, exactly as 'help' overrides linecap.
-	// The thick right edge also takes stroke-linecap="butt" and stops one thin half-width short of
-	// the top run, so its end lands flush with that edge instead of bulging a 1.5-unit round cap past
-	// the corner it is supposed to square. icon_ascii_preview.php models both, so those are measured.
-	//
-	// The geometry is GENERATED, not typed: `php dev/scripts/icon_project_geom.php` prints the string
-	// below from one parameter set, which is what makes congruence structural instead of something a
-	// later editor has to preserve by hand. Edit the parameters there, not the path here, and check
-	// with `php dev/scripts/icon_ascii_preview.php project` (coverage grid at 17 and 24) or the
-	// generator's own --preview.
-	//
-	// Rejected, so they are not re-proposed: an AutoCAD-style OFFSET of the sag; a CIRCLE for the roll
-	// end; the heavy stroke copied up with the shape; a closed ellipse in every copy; TWO copies (with the upper rolls now arcs rather than closed ellipses, dropping the
-	// middle leaves the left half of the mark empty); a WIDE title block with an interior upright
-	// ("it can't be that wide and still look reminiscent"); a sheet edge drawn as
-	// horizontal-elbow-horizontal (a creased sheet, not a sagging one); a rolled TUBE (a cylinder on
-	// this page reads as a PIPE, two icons away); a water drop (says water, not the job); a hard hat
-	// (says construction); a corner-curled single sheet ("You never pull out only one sheet"); and a
-	// title block in the LOWER RIGHT ONLY, which made a closed box the same size as the roll at the
-	// opposite corner, and two equal masses read as two of the same object.
-	'project'    => '<ellipse cx="4.8" cy="19.6" rx="2.8" ry="1.4" stroke-width="2.5"/>'
-		. '<path stroke-width="0.75" d="M2 11.5C2 11.199 2.194 10.906 2.554 10.664C2.914 10.422 3.42 10.245 3.997 10.159C4.574 10.072 5.192 10.081 5.758 10.184"/>'
-		. '<path stroke-width="0.75" d="M2 3.4C2 3.099 2.194 2.806 2.554 2.564C2.914 2.322 3.42 2.145 3.997 2.059C4.574 1.972 5.192 1.981 5.758 2.084"/>'
-		. '<path stroke-width="0.75" stroke-linecap="butt" d="M2 3.4V19.6"/>'
-		. '<path stroke-width="3" stroke-linecap="butt" d="M21.2 4.425V22"/>'
-		. '<path stroke-width="2" stroke-linejoin="miter" stroke-linecap="butt" d="M22.7 21H13C8.5 21 7.922 18.678 5.758 18.284"/>'
-		. '<path stroke-width="0.75" stroke-linejoin="miter" d="M5.758 10.184C7.922 10.578 8.5 12.9 13 12.9H16.6"/>'
-		. '<path stroke-width="0.75" stroke-linejoin="miter" d="M5.758 2.084C7.922 2.478 8.5 4.8 13 4.8H21.2"/>'
-		. '<path stroke-width="0.75" d="M16.6 4.8V21"/>'
-		. '<rect x="12" y="6.2" width="3.6" height="3.4" stroke-width="0.75"/>'
-		. '<path stroke-width="0.75" d="M12 15.6H15.6"/>'
-		. '<path stroke-width="0.75" d="M12 17.6H15.6"/>',
+	// The geometry is GENERATED: `php dev/scripts/icon_project_geom.php` prints the string below from
+	// the model above, so congruence and foreshortening are structural rather than maintained by hand.
+	// Edit the parameters there, not the path here. `--preview` and
+	// `php dev/scripts/icon_ascii_preview.php project` render it -- note that the previewer models
+	// M/L/H/V/C/Z only, which is why every arc here is written as cubics and never as `A`.
+	'project'    => '<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M7.4 21.6C7.4 22.622 5.833 23.45 3.9 23.45C1.967 23.45 0.4 22.622 0.4 21.6C0.4 20.578 1.967 19.75 3.9 19.75C5.833 19.75 7.4 20.578 7.4 21.6ZM5.5 21.6C5.5 22.014 4.784 22.35 3.9 22.35C3.016 22.35 2.3 22.014 2.3 21.6C2.3 21.186 3.016 20.85 3.9 20.85C4.784 20.85 5.5 21.186 5.5 21.6Z"/>'
+		. '<rect x="21.9" y="3.9" width="1.7" height="19.4" fill="currentColor" stroke="none"/>'
+		. '<path fill="currentColor" stroke="none" d="M5.097 19.862C7.454 20.315 7.6 23.3 11.4 23.3H23.6V23.75H11.4C7.6 23.75 7.454 20.765 5.097 20.312Z"/>'
+		. '<path stroke-width="0.35" d="M0.4 2.2V21.6"/>'
+		. '<path stroke-width="0.35" d="M0.4 2.2C0.4 1.802 0.643 1.415 1.093 1.095C1.542 0.776 2.175 0.542 2.896 0.428C3.618 0.314 4.389 0.325 5.097 0.462"/>'
+		. '<path stroke-width="0.35" d="M5.097 0.462C7.454 0.915 7.6 3.9 11.4 3.9H23.6"/>'
+		. '<path stroke-width="0.35" d="M0.4 11.9C0.4 11.502 0.643 11.115 1.093 10.795C1.542 10.476 2.175 10.242 2.896 10.128C3.618 10.014 4.389 10.025 5.097 10.162"/>'
+		. '<path stroke-width="0.35" d="M5.097 10.162C7.454 10.615 7.6 13.6 11.4 13.6H19.1"/>'
+		. '<path stroke-width="0.35" d="M7.4 21.6C7.4 22.622 5.833 23.45 3.9 23.45C1.967 23.45 0.4 22.622 0.4 21.6C0.4 20.578 1.967 19.75 3.9 19.75C5.833 19.75 7.4 20.578 7.4 21.6Z"/>'
+		. '<path stroke-width="0.35" d="M5.5 21.6C5.5 22.014 4.784 22.35 3.9 22.35C3.016 22.35 2.3 22.014 2.3 21.6C2.3 21.186 3.016 20.85 3.9 20.85C4.784 20.85 5.5 21.186 5.5 21.6Z"/>'
+		. '<path stroke-width="0.35" d="M5.097 19.862C7.454 20.315 7.6 23.3 11.4 23.3H23.6"/>'
+		. '<path stroke-width="0.35" d="M21.9 3.9V23.3"/>'
+		. '<path stroke-width="0.35" d="M23.6 3.9V23.75"/>'
+		. '<path stroke-width="0.35" d="M19.1 3.9V23.3"/>'
+		. '<path stroke-width="0.35" d="M20 10.2V15.6"/>'
+		. '<path stroke-width="0.35" d="M20.9 11.6V14.1"/>'
+		. '<rect x="14.3" y="5.2" width="3" height="2.7" stroke-width="0.35"/>'
+		. '<path stroke-width="0.35" d="M13.2 19.4H17.6"/>'
+		. '<path stroke-width="0.35" d="M13.2 20.8H17.6"/>',
 
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
