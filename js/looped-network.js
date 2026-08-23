@@ -11762,7 +11762,8 @@ var EngCalcs = EngCalcs || {};
 			//
 			// **Shown EVERY time, not once per browser.** Never spend a shown-once token before the
 			// thing it guards has happened, and "once per browser" is the wrong default for a fact
-			// that CHANGES WHAT A COMMAND MEANS. Task 209's snooze system is the long-term home.
+			// that CHANGES WHAT A COMMAND MEANS. A snoozable tip system was declined (Task 209), so
+			// there is no shown-once machinery to move this into.
 			openDialog(function (body) {
 				[pc.lpn_file_upload_explain].forEach(function (txt) {
 					if (!txt) { return; }
@@ -18226,9 +18227,8 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 	}
 	// SI value -> current display unit, read-only. Used for solve results: the property popups
-	// are the canonical results location (Tom, 2026-07-30) -- Map labels and a Report/table view
-	// are later presentation layers over this same computed data (scope doc Phase 2), not a
-	// separate source of truth.
+	// are the canonical results location (Tom, 2026-07-30) -- the map labels and the asset tables
+	// are presentation layers over this same computed data, not a separate source of truth.
 	function readonlyUnitField(fields, labelText, unitId, siValue, tip) {
 		readonlyField(fields, labelText + ' (' + unitLabel(unitId) + ')', siValue * unitFactor(unitId), tip);
 	}
