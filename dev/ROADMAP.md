@@ -212,18 +212,9 @@ the block.
     publicly reachable at `constructionnotesmanager.com/hawsedc/engcalcs` with broken CSS. `~/librewaternet.org`
     and `~/libreepanet.org` are already web roots. Options and the recommendation:
     `dev/hosting-layout.md`.
-
-- 75|486| **A small-screen presentation pass for the map editor.**
-  Tom, 2026-08-22, for crawlers and humans alike on a phone: hide page titles, hide or collapse the
-  HawsEDC navbar, keep only the transport controls on the toolbar, and drop menu text to icons.
-  - **The goal is "well, maybe", not a phone app.** Tom: *"the truth is that this is a PC app, just
-    like EPANET and epanetjs, and epanetjs takes the same stance only a little more strongly than I
-    want to put it. For PC of course, but go ahead and try it on your phone... We are not usable on a
-    phone today, IMO. We will be with those four small-screen tasks done."* The desktop layout stays
-    authoritative; a phone is still not evidence for a design decision here.
-  - **BLOCKING: `dev/librewaternet-landing/index.html` already claims the page is "tested and usable
-    on a phone screen", and that claim is FALSE until this ships.** The landing page must not go live
-    before it.
+  - **GATE: the page claims the map editor is "tested and usable on a phone screen".** Task 486
+    shipped the four small-screen items on 2026-08-22, but Tom is the one who ruled us not usable
+    today, so the claim goes live only after HIS own phone pass — not after a harness.
 
 - 75|485| **Give the production log archives a systematic path and naming.**
   All six production logs begin at 2026-08-14T11:57–11:58Z because Tom archived them there, with
