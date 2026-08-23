@@ -263,7 +263,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	<?php // SI first, US second (Tom, 2026-07-30): the suite serves a worldwide audience, and the
 	      // vast majority of it is metric -- leading with the one system that's a minority worldwide
 	      // reads as US-centric. Button IDs/behavior are unchanged, only the visual order. ?>
-	<?=ecIcon('units')?><?=$ec_lang['calc_set_units']?> <button type="button" id="set_units_si"><?=$ec_lang['calc_units_si']?></button><button type="button" id="set_units_us"><?=$ec_lang['calc_units_us']?></button> <a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
+	<?php // Task 426: the two buttons change every unit at once, and what they do NOT do is the
+	      // part nobody could guess -- they leave the typed numbers alone and reinterpret them,
+	      // which is Task 422's rule. The tip goes on the row label, which already reads as
+	      // introducing exactly these two buttons, so the row keeps ONE '?'. ?>
+	<?=ecTipLabel(ecIcon('units').$ec_lang['calc_set_units'], $ec_lang['calc_set_units_tip'])?> <button type="button" id="set_units_si"><?=$ec_lang['calc_units_si']?></button><button type="button" id="set_units_us"><?=$ec_lang['calc_units_us']?></button> <a data-bs-toggle="collapse" href="#set_units_row" aria-expanded="true" aria-controls="set_units_row"><?=$ec_lang['view_hide_line']?></a>
 </div>
 <?php
 }
