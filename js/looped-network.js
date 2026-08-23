@@ -20,14 +20,13 @@ var EngCalcs = EngCalcs || {};
 	var state = { tx: 0, ty: 0, s: 1 };
 	// `settings.textSize` is SCREEN PIXELS, full stop -- shared by a node's ID/pressure label, a
 	// link's label, and a user-added Text label. Returned in WORLD units (divided by the current
-	// scale) because everything here is drawn in world coordinates, so the division must be
-	// re-applied whenever state.s changes (refreshFontSizes(), from onZoomChanged()) rather than
-	// once at build time like every other geometry.
+	// scale), so the division is re-applied whenever state.s changes (refreshFontSizes(), from
+	// onZoomChanged()) rather than once at build time like every other geometry.
 	//
 	// **DO NOT REINTRODUCE MAP-UNIT TEXT SIZING.** Text and symbols are furniture of the VIEW, not
-	// features of the model. A world-unit size is a size whose legibility depends on how far you are
-	// zoomed out, and no floor, warning or better default fixes that: Net3's map-unit text at 0.2
-	// units is a fraction of a pixel, so a correct network imports and shows nothing.
+	// features of the model, and no floor, warning or better default fixes a size whose legibility
+	// depends on the zoom: Net3's map-unit text at 0.2 units is a fraction of a pixel, so a correct
+	// network imports and shows nothing.
 	//
 	// mult: a Text label's own per-label size multiplier (lb.sizeMult, default 1), stacked on the
 	// shared settings.textSize -- node/link labels never pass one.
@@ -1882,8 +1881,7 @@ var EngCalcs = EngCalcs || {};
 	// overrides; every other scenario is nothing but a collection of overrides, and is a row in the
 	// same array flagged isBase -- so the selector has no special case, and because nothing carries a
 	// parent pointer a scenario-of-a-scenario is UNREPRESENTABLE rather than discouraged.
-	// Like settings/backdrop and unlike doc, these are not undo-snapshotted. Task 184 answers "does
-	// an override edit join the undo stack" with yes, so expect this to move into the snapshot.
+	// Snapshotted with doc, so an override edit joins the undo stack -- see saveUndoSnapshot().
 	function defaultScenarios() {
 		// name 'Base' is the shape Task 184 documents; display code should key off isBase and render
 		// its own localized word, never echo this string, so the stored data stays language-free.
@@ -1955,8 +1953,8 @@ var EngCalcs = EngCalcs || {};
 	// and so are id and type. Junction `elev` is survey data, not a design variable. A tank's `level`
 	// and a reservoir's `head` are the opposite case and ARE overridable -- see the note below.
 	// `active` is an ordinary boolean here and is how topology varies: a proposed loop lives in Base
-	// inactive and a scenario overrides it active. Nothing sets `active` yet -- effective() treats
-	// its absence as true.
+	// inactive and a scenario overrides it active. ABSENT reads as true -- effective() is the one
+	// place that default lives.
 	// `status` is this file's name for the open/closed state; `length` is the escape valve for "same
 	// drawing, different length", since a drag recomputes Base's auto length for every scenario.
 	// `level` is a design variable in exactly the way a reservoir's head is.
@@ -1984,9 +1982,9 @@ var EngCalcs = EngCalcs || {};
 		if (!el) { return undefined; }
 		var ov = activeScenario().overrides[ovKey(el)];
 		if (ov && Object.prototype.hasOwnProperty.call(ov, prop)) { return ov[prop]; }
-		// `active` has no stored property yet (nothing sets it) -- its absence must read as true, not
-		// undefined/falsy, so a topology no scenario has touched is never mistaken for inactive. This
-		// is the one property effective() defaults itself, per the trap note in Task 146.08 step 2.
+		// An ABSENT `active` must read as true, not undefined/falsy, so a topology no scenario has
+		// touched is never mistaken for inactive. This is the one property effective() defaults
+		// itself, per the trap note in Task 146.08 step 2.
 		if (prop === 'active' && el['_' + prop] === undefined) { return true; }
 		return el['_' + prop];
 	}
@@ -5377,12 +5375,11 @@ var EngCalcs = EngCalcs || {};
 	//   internally      `project.coords` is 'geo', or absent, which is the XY grid
 	//   user-facing     **XY** and **lat/lon** -- "no caps so as not to imply any proper names"
 	//
-	// Two earlier answers were wrong and are recorded so neither comes back. "World map / XY grid"
-	// was argued for on the grounds that `lpn_new_geo_us` already shipped "world map" in 27
-	// languages, dressed up as a worry that Flat Earth would be misread; Tom: *"The joke is thousands
-	// of years old. Who hasn't heard of it?"* Then "GeoMap", which was his own first suggestion and
-	// which he withdrew: *"I am embarrassed I said GeoMap; it or Geomap are too evocative of a
-	// trademarkish thing."* `lat/lon` is shorter than "geographic" and claims nothing.
+	// Two names are recorded so neither comes back. "World map / XY grid", argued for because
+	// `lpn_new_geo_us` already shipped "world map" in 27 languages and Flat Earth might be misread;
+	// Tom: *"The joke is thousands of years old. Who hasn't heard of it?"* And "GeoMap", withdrawn by
+	// Tom: *"I am embarrassed I said GeoMap; it or Geomap are too evocative of a trademarkish
+	// thing."* `lat/lon` is shorter than "geographic" and claims nothing.
 	//
 	// Flat Earth / Round Earth stays, in the TIP and in `$ec_lang_syn` (both written 2026-08-18 with
 	// Tom's permission and in his own words), because it is fun, instructive, and exactly the
@@ -5397,9 +5394,9 @@ var EngCalcs = EngCalcs || {};
 	// **THE SCALE IS NOT KNOWN, AND WE MUST FIND IT AS WELL AS THE PLACE.** Tom, 2026-08-18, on the
 	// EPANET examples he actually converted: *"Your grid does not already say how big one drawing
 	// unit is; these EPANET examples and many old systems are drawn on arbitrary 'schematic'
-	// canvases. We must find both location and scale."* An earlier build read `lengthField()` and
-	// declared that one drawing unit was one Length/Map unit; on a schematic that lands a whole
-	// system inside a few metres of pavement. The scale is now something the user SETS -- by sizing
+	// canvases. We must find both location and scale."* Reading `lengthField()` and declaring one
+	// drawing unit to be one Length/Map unit lands a whole schematic system inside a few metres of
+	// pavement. The scale is therefore something the user SETS -- by sizing
 	// the map behind the model in step 1, by telling Go to… roughly how wide the site is, or by
 	// typing it in step 2.
 	//
@@ -14089,39 +14086,35 @@ var EngCalcs = EngCalcs || {};
 		viewGroup.appendChild(extentBtn);
 		// **THERE IS NO CLEAN-MAP BUTTON** (Tom, 2026-08-20: "Relegate Hide map readouts to the View
 		// menu"). It is a once-before-a-screenshot command, and a toolbar slot is for what you do
-		// often; View > Hide map readouts was always the other door and is now the only one. The
-		// pressed state it needed lives on that menu row, which redraws its own label each time the
-		// menu opens (openViewMenu), so nothing has to be kept in step with a button any more.
-		// **THE PROFILE BUTTON IS NOT HERE ANY MORE** -- it moved down to the project group, beside
-		// Tables, when the strip was re-grouped to mirror the Project menu (Tom, 2026-08-21). This
-		// group is now Zoom to fit alone: what is left in it is the one command that changes how you
-		// are LOOKING at the drawing, which is also all the View menu still holds.
+		// often. Its pressed state lives on that menu row, which redraws its own label each time the
+		// menu opens (openViewMenu), so nothing has to be kept in step with a button.
+		// **THE PROFILE BUTTON IS IN THE PROJECT GROUP**, beside Tables, since the strip was
+		// re-grouped to mirror the Project menu (Tom, 2026-08-21). This group is Zoom to fit alone:
+		// the one command that changes how you are LOOKING at the drawing, which is also all the
+		// View menu still holds.
 		// **THERE IS NO LABELS BUTTON.** Tom, 2026-08-18: "Toolbar.Labels: We can remove this button
 		// now. Everything is simpler than EPANET or epanetjs because all project settings are in
-		// (tada!) Settings." Every route to the label controls still works and none of them was this
-		// button: View > Labels and a click on the colour legend both open the Settings box on its
-		// Labels section, and the Settings button beside this one opens the box itself. A toolbar
-		// slot is the most expensive space on the page, and a second door to a box whose own button
-		// is two icons away is not worth one.
-		// **COLOUR BY VALUE IS TWO DROPDOWNS NOW, AND THEY ARE IN THE VISIBILITY PANEL** (ROADMAP
-		// Task 427). The one select that did both fields shipped with Task 327 and Tom saw the
-		// beauty of it -- "but it's not the expectation": EPANET and epanet-js both give nodes and
-		// links a dropdown each, and choosing a node field silently clearing the link field is the
-		// behaviour that made the single control surprising. Two controls, two legends, no
-		// clearing. See buildVisibilityColors(); the toolbar keeps no select at all, which is also
-		// what the icon-only strip asked for -- a field-name dropdown was the one wide control left
-		// on it.
-		// **THE SETTINGS GEAR IS NOT HERE, AND IT IS NOT AT THE RIGHT-HAND END EITHER ANY MORE.**
-		// It is in the water-network group below. Tom, 2026-08-20: "for Water Networks, I think we
-		// also need the following in a group: Libraries (Patterns, Curves, Controls, Pumps, Pipes,
-		// Custom), **Settings**, Simulate, Transport, Time selectors." That supersedes the previous
-		// day's "the standard location of the settings gear icon is near the top-right corner",
-		// which put it at the far right for one review. **HIS NEWER WORD WINS; do not move it back
-		// to the end group on the strength of that older quote**, which is still true about gears
-		// in general and is no longer what he wants here. Asked whether it should instead float on
-		// the map, he ruled against that too: "Toggles on map doesn't sound right to me. What we
-		// have now plus the lpn group (Libraries, Settings, Transport, and Time selectors) seems
-		// like the right way to go."
+		// (tada!) Settings." View > Labels and a click on the colour legend both open the Settings
+		// box on its Labels section, and the Settings button beside this one opens the box itself. A
+		// toolbar slot is the most expensive space on the page, and a second door to a box whose own
+		// button is two icons away is not worth one.
+		// **COLOUR BY VALUE IS TWO DROPDOWNS, AND THEY ARE IN THE VISIBILITY PANEL** (ROADMAP Task
+		// 427). One select doing both fields is the tempting design and Tom saw the beauty of it --
+		// "but it's not the expectation": EPANET and epanet-js both give nodes and links a dropdown
+		// each, and choosing a node field silently clears the link field. Two controls, two legends,
+		// no clearing. See buildVisibilityColors(); the toolbar keeps no select at all, which is
+		// also what the icon-only strip asked for -- a field-name dropdown was the one wide control
+		// left on it.
+		// **THE SETTINGS GEAR IS NOT HERE, AND NOT AT THE RIGHT-HAND END EITHER.** It is in the
+		// water-network group below. Tom, 2026-08-20: "for Water Networks, I think we also need the
+		// following in a group: Libraries (Patterns, Curves, Controls, Pumps, Pipes, Custom),
+		// **Settings**, Simulate, Transport, Time selectors." That supersedes his earlier "the
+		// standard location of the settings gear icon is near the top-right corner". **HIS NEWER
+		// WORD WINS; do not move it back to the end group on the strength of that older quote**,
+		// which is still true about gears in general and is no longer what he wants here. Asked
+		// whether it should instead float on the map, he ruled against that too: "Toggles on map
+		// doesn't sound right to me. What we have now plus the lpn group (Libraries, Settings,
+		// Transport, and Time selectors) seems like the right way to go."
 
 		// **THE WATER-NETWORK GROUP** (ROADMAP Task 462). Tom, 2026-08-20: "for Water Networks, I
 		// think we also need the following in a group: Libraries (Patterns, Curves, Controls, Pumps,
