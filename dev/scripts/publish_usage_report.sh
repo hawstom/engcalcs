@@ -7,10 +7,17 @@
 #   sh dev/scripts/publish_usage_report.sh --archive=spock/2026-08-14
 #   sh dev/scripts/publish_usage_report.sh --archive=2026-08-14      # an archive IS its ending date
 #
-# **THE SERVED COPY IS NOT REACHABLE YET.** spock/public/.htaccess has its grant commented out
-# pending one explicit yes from Tom (2026-08-23): a permanently readable, unauthenticated URL of
-# visitor analytics is outward-facing and cannot be recalled once the link exists. Running this
-# script is harmless meanwhile — it writes the file and Apache refuses to serve it.
+# **THE SERVED COPY IS REACHABLE.** Tom said "spock: Make it reachable" on 2026-08-23 and the grant
+# in spock/public/.htaccess is on. It waited for that one explicit yes rather than riding in on a
+# general approval, because a permanently readable, unauthenticated URL of visitor analytics is
+# outward-facing and cannot be recalled once the link exists.
+#
+# **BUT THE GRANT ALONE PUBLISHES NOTHING, AND THAT IS THE PART THAT SURPRISES PEOPLE.** .gitignore
+# tracks spock/'s directories and .htaccess files and IGNORES THE DATA — deliberately, so publishing
+# a file has to be a line somebody writes on purpose. So this report is NOT carried to production by
+# `git pull`: it has to be generated ON production, from production's own logs, which are the only
+# logs that mean anything anyway. Until that happens the URL is a 404 with the door open. Run this
+# script there, by hand or from the cron block in dev/usage-data-log.md.
 #
 # Every argument is handed straight to log/lang-log-stats.sh, which stays the only thing that
 # computes anything. This script decides WHERE the output goes and WHAT is redacted, and nothing

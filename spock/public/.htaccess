@@ -4,19 +4,23 @@
 # mirrors the parent's IfModule shape deliberately: whichever authz module the host has, parent and
 # child speak the SAME dialect. Mixing mod_authz_core in one and mod_access_compat in the other is
 # how a deny silently stops applying.
-# **THE GRANT IS OFF UNTIL TOM SAYS OTHERWISE (2026-08-23).** He asked for a report he could hand
-# to an agent over curl and said "I will do what you advise"; the advice was aggregate-only, and
-# that is what publish_usage_report.sh writes. But a permanently readable, unauthenticated URL of
-# visitor analytics on the production site is outward-facing and cannot be recalled once the link
-# exists, so the switch waits for one explicit yes rather than riding in on a general approval.
-# TO TURN IT ON: delete the four `# ` prefixes below. Nothing else changes.
-# <IfModule mod_authz_core.c>
-#     Require all granted
-# </IfModule>
-# <IfModule !mod_authz_core.c>
-#     Order allow,deny
-#     Allow from all
-# </IfModule>
+# **THE GRANT IS ON. Tom said "spock: Make it reachable" on 2026-08-23**, which is the one explicit
+# yes it was waiting for -- a permanently readable, unauthenticated URL of visitor analytics cannot
+# be recalled once the link exists, so it was never going to ride in on a general approval.
+#
+# WHAT THIS GRANTS IS THE AGGREGATE AND ONLY THE AGGREGATE. publish_usage_report.sh writes counts,
+# no per-event data, every timestamp truncated to a date. The raw logs stay denied by the parent
+# spock/.htaccess and by log/.htaccess, and they stay denied for a reason that is not about their
+# content: privacy.php does not tell visitors their rows are published, so publishing rows would
+# change that promise and cost a consent_body rewrite, 26 retranslations and an EC_CONSENT_VERSION
+# bump that re-asks everybody. Do not "simplify" this by granting the parent.
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
+</IfModule>
 
 # Aggregate counts, no per-event data -- but no reason to be in a search index either. The
 # filename is unguessable and NOT in robots.txt: a Disallow line publishes the very name it is
