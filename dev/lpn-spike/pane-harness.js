@@ -263,6 +263,18 @@ console.log('\n--- the rulings that are easiest to undo by accident ---');
 	report(php.indexOf('id="lpn_setbox_close"') > box, '...and an X, because it is a box, not a menu');
 	report(/makePanelDraggable\(box/.test(fnBody('wireSettingsBox')),
 		'...and it drags by its chrome, like the property popup');
+	// **AND IT RESIZES BY FINGER AS WELL AS BY MOUSE** (Tom, 2026-08-23: "I can't figure out how to
+	// resize Settings on a phone. Is that our fault?"). `resize: both` is a mouse-only affordance in
+	// every mobile engine, so the box needs a real element with pointer handlers on top of it. Both
+	// boxes wear the .lpn-setbox shell, so both get the grabber or the two disagree about what that
+	// shell means.
+	['wireSettingsBox', 'wireLibraryBox'].forEach((fn) => {
+		report(/addPanelResizeGrip\(box\)/.test(fnBody(fn)),
+			`${fn}() gives its box a touch resize grabber`);
+	});
+	report(/grip\.addEventListener\('pointerdown'/.test(fnBody('addPanelResizeGrip')) &&
+		/setPointerCapture/.test(fnBody('addPanelResizeGrip')),
+		'...built on pointer events with capture, so a fast drag off the square keeps resizing');
 	// NOTHING COLLAPSES (Tom: "No need ever to collapse; just scroll/jump to your section"). The
 	// <details> the right pane used are gone, and section() no longer builds a disclosure button.
 	report(!/lpn-rp-sec/.test(php), 'no collapsing <details> sections are left in the page');

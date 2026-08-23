@@ -1236,6 +1236,28 @@ html[lang="zh"] .ec-welcome {
 	max-width: 98vw;
 	max-height: 96vh;
 }
+/* **THE TOUCH HALF OF `resize: both`** (Tom, 2026-08-23, on a phone: "I can't figure out how to
+   resize Settings on a phone. Is that our fault?" -- it was). The browser's own grabber answers a
+   mouse only: mobile Safari paints none at all and Chrome for Android paints one that a finger
+   cannot drag. So the property above was, on a phone, a decoration.
+
+   ONLY WHERE A COARSE POINTER EXISTS, so a mouse-only machine never sees this square and keeps the
+   native widget it always had -- the desktop is unchanged by construction. `any-pointer`, not
+   `pointer`: a touch laptop has a fine PRIMARY pointer and a finger as well, and that hand deserves
+   the grabber too.
+
+   28 px, not the 18 px LPN_RESIZE_CORNER reserves for the mouse: that is pointer slop for a cursor.
+   Drawn as two diagonal rules, the way every resize corner in every toolkit is drawn, so it reads
+   as a grabber without a word of text -- and therefore without a language key. */
+.lpn-resize-grip { display: none; }
+@media (any-pointer: coarse) {
+	.lpn-resize-grip {
+		display: block; position: absolute; right: 0; bottom: 0; width: 28px; height: 28px;
+		z-index: 2; cursor: se-resize; touch-action: none;
+		background:
+			linear-gradient(315deg, transparent 0 8px, #999 8px 10px, transparent 10px 13px, #999 13px 15px, transparent 15px);
+	}
+}
 /* The title sits in the 40px drag band, left of the X. It is text, not a control, so it never
    swallows a drag: `e.target` on a pointerdown here is the title, not the box -- hence
    pointer-events:none, which hands the whole band back to the box's own drag handler. */
@@ -1268,9 +1290,14 @@ html[lang="zh"] .ec-welcome {
    the same one and it keeps going the same way: an index row may wrap, and a name on two lines is
    still a name, while a control squeezed to half its width is not still a control. So the 24 px
    goes to the content pane. The phone figure is narrower again and is measured rather than scaled;
-   it is in the small-screen block at the foot of this file. */
+   it is in the small-screen block at the foot of this file.
+
+   **AND IT GAVE BACK A TENTH, 6.6rem** (Tom, 2026-08-23, having now used the narrowed box on a PC:
+   "Settings.index 1.1"). The 0.8 above was decided sight-unseen; this is the correction after
+   looking at it. PC ONLY -- the phone figure he asked about in the same breath went the other way
+   and is unchanged at 4.5rem. */
 .lpn-setbox-index {
-	flex: 0 0 6rem; min-width: 0; overflow: auto;
+	flex: 0 0 6.6rem; min-width: 0; overflow: auto;
 	border-right: 1px solid #ddd; padding-right: 6px; font-size: .9em;
 }
 .lpn-setbox-content { flex: 1 1 auto; min-width: 0; overflow: auto; font-size: .9em; }
@@ -1944,17 +1971,49 @@ html:has(#lpn_canvas) { overflow: hidden; }
 	   already says mid-word wrap in a column heading is acceptable and column width is king. */
 	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(2),
 	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(2) { width: 2.08rem !important; }
+	/* **EXCEPT After, WHICH CAME BACK TO 1.6rem** (Tom, 2026-08-23, after using the phone layout:
+	   "After 2.0 (make it like Decimal and Drop)"). The two instructions do not agree and the
+	   PARENTHESIS is the one to follow: 2.0 x 1.04 = 2.08rem would make After the WIDEST of the four
+	   on a touch screen, where Decimal and Drop are 1.6rem -- the opposite of "like" them. So it
+	   lands on their number.
+
+	   1.6rem is ~26 px, which holds two characters of content once the input's own padding and
+	   border are paid -- enough for a bare `ft` or `m`, and a longer affix scrolls inside its box
+	   rather than being cut off. At 1.04rem it could not show one. */
 	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(3),
-	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(3) { width: 1.04rem !important; }
+	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(3) { width: 1.6rem !important; }
 	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(4),
 	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(5),
 	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(4),
 	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(5) { width: 2.56rem !important; }
 	/* The list's own floor comes down with them, or the box would still refuse to narrow past a
-	   width the rows no longer need. 10.5rem is the four boxes (8.24rem) plus their three gaps and
-	   two margins; the name above them wraps as freely as it always has. */
+	   width the rows no longer need. 11rem is the four boxes (8.8rem, After included at its new
+	   1.6rem) plus their three gaps and two margins; the name above them wraps between words. */
 	html:has(#lpn_canvas) #lpn_labels_node_fields,
-	html:has(#lpn_canvas) #lpn_labels_link_fields { min-width: 10.5rem; }
+	html:has(#lpn_canvas) #lpn_labels_link_fields { min-width: 11rem; }
+
+	/* 7b. **AND THE NAME ON THAT FIRST LINE NEVER BREAKS MID-WORD** (Tom, 2026-08-23, drawing three
+	   panels: the roomy desktop row, then the cramped one reading `Dem/and`, `Hea/d`, `Pres/sure`,
+	   `Elev/ation`, then what he wants -- the checkbox and the whole name on line 1, the four inputs
+	   on line 2).
+
+	   The mid-word break is `overflow-wrap: anywhere` on the label, and that rule is RIGHT where it
+	   was written: on the desktop the name shares its line with the four columns, and a name whose
+	   min-content width exceeds its share pushes every column out of line with its heading (Task
+	   435, twice). None of that survives item 6 above -- here the name is `flex: 1 1 100%` and owns
+	   the whole row -- so the reason for breaking anywhere is gone and only the ugliness is left.
+
+	   `normal`, NOT `nowrap`. Every English name fits its line at 360 px, which is the layout Tom
+	   drew; the longest TRANSLATION does not -- "Gradijent gubitka tlačne visine" (hr, 31 characters;
+	   ro and id are the same length) wants ~230 px against the ~205 px the content pane leaves at
+	   that width. `nowrap` would answer that with the sideways scrollbar this box has twice been
+	   narrowed to get rid of, on the one list every visitor opens. A break BETWEEN WORDS is not the
+	   defect he objected to: `Gradijent gubitka` over `tlačne visine` is still whole words, and it
+	   costs nothing in any language whose name already fits on the line. */
+	html:has(#lpn_canvas) #lpn_labels_node_fields > div > label,
+	html:has(#lpn_canvas) #lpn_labels_link_fields > div > label {
+		overflow-wrap: normal; word-break: normal;
+	}
 
 	/* 8. NO SPINNER ON A TOUCH SCREEN, AND THE WIDTH THAT PAID FOR IT COMES BACK (Tom: "since the
 	   spinner is not available on touch screen, drop the spinner on touch screen and on touch screen
@@ -1971,7 +2030,10 @@ html:has(#lpn_canvas) { overflow: hidden; }
 	   1.6rem, NOT the 0.2 x 3.2rem = 0.64rem Tom named. 0.64rem is 10 px, which with an input's own
 	   padding and border leaves about 4 px of content -- it cannot show ONE digit, and these two
 	   columns are bounded at 32 and 99, so they must show TWO. 1.6rem is the honest floor for two
-	   digits and is still half the shipped width. */
+	   digits and is still half the shipped width. It is also, since item 7's correction, exactly what
+	   After is -- which is what Tom asked for when he said to make After like Decimal and Drop, so
+	   on a touch screen the three of them are one width and only Before is wider. The floor rises to
+	   9rem with them: 2.08 + three at 1.6 = 6.88rem of boxes plus the gaps and margins. */
 	@media (hover: none) and (pointer: coarse) {
 		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(4),
 		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(5),
@@ -1986,6 +2048,6 @@ html:has(#lpn_canvas) { overflow: hidden; }
 			appearance: none; -webkit-appearance: none; margin: 0;
 		}
 		html:has(#lpn_canvas) #lpn_labels_node_fields,
-		html:has(#lpn_canvas) #lpn_labels_link_fields { min-width: 8.5rem; }
+		html:has(#lpn_canvas) #lpn_labels_link_fields { min-width: 9rem; }
 	}
 }

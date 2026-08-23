@@ -218,6 +218,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_map_footer',
   // The satellite teaser, a cell of that strip (ROADMAP Task 452).
   'lpn_basemap_teaser',
+  // The tile attribution (ROADMAP Task 145). It was NOT here, so refreshBasemapCredit() returned at
+  // its first line in every harness and the licence credit was the one piece of map chrome no test
+  // could see -- which is how it shipped invisible on the boot path (Task 486).
+  'lpn_basemap_credit',
   // The scenario selector/readout in the map's status strip (ROADMAP Task 184).
   'lpn_scenario_btn',
   // The bottom pane and its seven tabs (ROADMAP Task 434, all six asset tables since Task 455). The
@@ -253,6 +257,30 @@ byId.lpn_menu_popup2.appendChild(byId.lpn_menu_list2);
 // falls back to rendering into the colour host only when it is NOT on the page. A parentless stub
 // would exercise that fallback and never the shipped placement.
 byId.lpn_setbox_content.appendChild(byId.lpn_set_ramp_credits);
+
+// **THE CREDIT'S TWO SOURCE SETS ARE MODELLED, NOT INVENTED.** refreshBasemapCredit() shows one
+// `[data-basemap-credit]` span and hides the other, so a stub with no children would let it "swap"
+// nothing at all and pass. The names are READ OUT OF Looped-Network.php, so a set added or renamed
+// there arrives here rather than being asserted against a copy that has drifted.
+{
+  const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+  const div = php.slice(php.indexOf('id="lpn_basemap_credit"'));
+  const names = [...div.slice(0, div.indexOf('</div>')).matchAll(/data-basemap-credit="([a-z]+)"/g)]
+    .map(m => m[1]);
+  if (names.length < 2) {
+    throw new Error('lpn-dom-stub.js: could not read the [data-basemap-credit] sets out of ' +
+      'Looped-Network.php. Point this reader at their new home -- do NOT hard-code them.');
+  }
+  const credit = byId.lpn_basemap_credit;
+  credit.style.display = 'none';   // the shipped inline style: JS has to turn it on
+  names.forEach((n) => {
+    const sp = mkEl('span');
+    sp.setAttribute('data-basemap-credit', n);
+    sp._text = '\u00a9 ' + n;
+    credit.appendChild(sp);
+  });
+  credit.querySelectorAll = (sel) => (sel === '[data-basemap-credit]' ? credit.children.slice() : []);
+}
 
 // A unit <select> the way echoUnitSelect() renders one: option.value is the unit's KEY ('ft'),
 // and the factor is a lookup from it (Task 390). unitEl() finds these by NAME, not id.
