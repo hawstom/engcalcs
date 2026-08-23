@@ -16560,7 +16560,7 @@ var EngCalcs = EngCalcs || {};
 		// weakest case there is for promoting a row out of its section. The earlier "fiddled with
 		// often" justification for keeping it loose did not survive contact with the section it
 		// obviously belongs to.
-		row(mapBody, pc.lpn_settings_legend_position || 'Legend position', legendSelect);
+		row(mapBody, pc.lpn_settings_legend_position || 'Labels legend position', legendSelect);
 		// There is no "Saving to a file" section (Task 211): nothing is written to a file on a timer.
 		// Its 60-180 s range protected a coupling rather than the user -- one number doing three jobs
 		// (write interval, lock heartbeat, takeover threshold).
