@@ -214,9 +214,8 @@ the block.
     publicly reachable at `constructionnotesmanager.com/hawsedc/engcalcs` with broken CSS. `~/librewaternet.org`
     and `~/libreepanet.org` are already web roots. Options and the recommendation:
     `dev/hosting-layout.md`.
-  - **GATE: the page claims the map editor is "tested and usable on a phone screen".** Task 486
-    shipped the four small-screen items on 2026-08-22, but Tom is the one who ruled us not usable
-    today, so the claim goes live only after HIS own phone pass — not after a harness.
+  - **Phone gate LIFTED 2026-08-23** — Tom's own pass: *"For today's standards, we are gold."* The
+    page says his line, *"On a phone: try it. We did."*, and nothing stronger.
 
 - 75|485| **Give the production log archives a systematic path and naming.**
   All six production logs begin at 2026-08-14T11:57–11:58Z because Tom archived them there, with

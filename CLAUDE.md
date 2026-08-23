@@ -201,11 +201,12 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   hand-and-mouse tolerance; a 44px touch target is not an argument here. **This is a PC app the way
   EPANET and epanet-js are** — epanet-js takes that stance slightly harder than Tom wants to, and his
   framing is *"for PC of course, but go ahead and try it on your phone"*. Tom ruled it **not usable on a
-  phone** on 2026-08-22, and the four small-screen items he named — hide page titles, collapse the
+  phone** on 2026-08-22; the four small-screen items he named — hide page titles, collapse the
   navbar, keep only the transport controls, drop menu text to icons — shipped the same day at one
-  `max-width: 640px` breakpoint (closed Task 486, guarded by `dev/lpn-spike/small-screen-harness.js`).
-  Whether that reached "well, maybe" is **his** call and he has not made it yet, so claim nothing
-  about phone usability in public until he does. The other calculators are a form and an answer and are fine as they
+  `max-width: 640px` breakpoint (closed Task 486, guarded by `dev/lpn-spike/small-screen-harness.js`),
+  and on 2026-08-23 he passed it: *"For today's standards, we are gold."* **The sanctioned public
+  claim is his own and it is deliberately unfalsifiable: "Try it. We did."** Never upgrade that to a
+  promise the next phone can contradict. The other calculators are a form and an answer and are fine as they
   are.
 
 ---
