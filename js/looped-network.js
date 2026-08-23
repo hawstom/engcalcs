@@ -4726,7 +4726,7 @@ var EngCalcs = EngCalcs || {};
 	function setBasemapStyle(style) {
 		project.basemap = (basemapOn() && basemapStyle() === style) ? 'off' : style;
 		refreshBasemap();
-		refreshBasemapCredit();
+		refreshBasemapChrome();
 		saveToStorage();
 	}
 	function setBasemapOn(on) { setBasemapStyle(on ? 'osm' : 'off'); }
@@ -4735,6 +4735,42 @@ var EngCalcs = EngCalcs || {};
 	// require DIFFERENT wording -- Mapbox's terms name Mapbox and its imagery supplier as well as
 	// OpenStreetMap -- so the credit swaps with the style rather than naming everyone at all times,
 	// which would credit a provider whose tiles are not on screen.
+	// The credit and the teaser change on exactly the same events -- a project opens, a project is
+	// georeferenced, the basemap style changes -- so they have one entry point rather than two lists
+	// of call sites, one of which would eventually be missed.
+	function refreshBasemapChrome() {
+		refreshBasemapCredit();
+		refreshBasemapTeaser();
+	}
+	// **THE TEASER APPEARS ON EXACTLY THE CONDITION THE MENU ROW DOES**, by calling the same two
+	// predicates rather than by restating them: a third copy of "geographic, and we have a token"
+	// is a third thing to keep in step with openViewMenu(). It carries the SAME two strings as that
+	// row and toggles through the SAME setBasemapStyle() seam, so the corner and the menu cannot
+	// come to mean different things -- including the seam's own rule that asking for the style
+	// already showing turns the basemap off.
+	//
+	// IT SURVIVES BELOW 640px. The small-screen pass takes the toolbar away and reduces the menu
+	// bar to icons, so a phone reader has strictly FEWER routes to this than a desktop one; taking
+	// the corner control off the device with the fewest routes is backwards. It costs one 40px
+	// square in a strip that is already there.
+	function refreshBasemapTeaser() {
+		var pc = EngCalcs.pageConfig || {}, b = document.getElementById('lpn_basemap_teaser'), on;
+		if (!b) { return; }
+		if (!isGeoProject() || !satelliteAvailable()) { b.style.display = 'none'; return; }
+		b.style.display = '';
+		on = basemapOn() && basemapStyle() === 'satellite';
+		b.classList.toggle('lpn-basemap-teaser-on', on);
+		var name = on ? (pc.lpn_basemap_satellite_hide || 'Hide satellite images')
+			: (pc.lpn_basemap_satellite_show || 'Show satellite images');
+		b.setAttribute('aria-label', name);
+		b.setAttribute('aria-pressed', on ? 'true' : 'false');
+		b.title = name;
+	}
+	function wireBasemapTeaser() {
+		var b = document.getElementById('lpn_basemap_teaser');
+		if (!b) { return; }
+		b.addEventListener('click', function () { setBasemapStyle('satellite'); });
+	}
 	function refreshBasemapCredit() {
 		var c = document.getElementById('lpn_basemap_credit'), sat;
 		if (!c) { return; }
@@ -5919,7 +5955,7 @@ var EngCalcs = EngCalcs || {};
 		project.basemap = 'osm';
 		doc.origin = { x: 0, y: 0 };
 		refreshBasemap();
-		refreshBasemapCredit();
+		refreshBasemapChrome();
 		refreshMapStatus();
 		setMode('select');
 		// **TWO DIFFERENT JOBS WEAR ONE COMMAND, AND THE NUMBERS SAY WHICH** (Task 447).
@@ -10032,7 +10068,7 @@ var EngCalcs = EngCalcs || {};
 		// Grid or geographic, and basemap on or off, both belong to the project -- so switching
 		// projects can turn the tiles and their attribution on or off (Task 145).
 		refreshBasemap();
-		refreshBasemapCredit();
+		refreshBasemapChrome();
 		lastSolveResult = null;
 		closePopup();
 		buildDom();
@@ -13785,6 +13821,8 @@ var EngCalcs = EngCalcs || {};
 		wireLibraryBox();
 		buildMenuBar();
 		wireScenarioButton();
+		wireBasemapTeaser();
+		refreshBasemapTeaser();
 		wireTabs();
 		applyLegendPosition();
 		applyMapHeight();

@@ -540,8 +540,14 @@ console.log('\n--- nothing leaks to the other fifteen calculators ---');
 });
 ok('...and the navbar there keeps its padding', declaredAt(RULES, otherNav, 360, OTHER_IDS, 'padding-top') === null);
 
+// **THE SATELLITE TEASER SURVIVES THE PHONE, AND THAT IS A DECISION.** The small-screen pass takes
+// the whole toolbar away and reduces the menu bar to icons, so a phone reader has strictly fewer
+// routes to the satellite row than a desktop one -- taking the corner control off the device with
+// the fewest routes is backwards. It costs one 40px square in a strip that is already on screen.
 console.log('\n--- what may never be hidden at any width ---');
-[[credit, 'the basemap attribution']].forEach(([n, label]) => {
+const teaser = node('button', 'lpn_basemap_teaser', ['lpn-basemap-teaser'],
+	node('div', 'lpn_map_footer', ['d-print-none'], body));
+[[credit, 'the basemap attribution'], [teaser, 'the satellite teaser']].forEach(([n, label]) => {
 	ok(label + ' is visible on a small screen', !hiddenAt(RULES, n, SMALL, DOC_IDS));
 	ok('...' + label + ' is visible on the desktop', !hiddenAt(RULES, n, WIDE, DOC_IDS));
 });

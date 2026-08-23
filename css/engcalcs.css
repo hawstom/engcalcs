@@ -1573,6 +1573,38 @@ html[lang="zh"] .ec-welcome {
    overlay stack is pointer-events:none by default and this one cell opts back in. */
 .lpn-color-legend { pointer-events: auto; cursor: pointer; }
 
+/* ==== THE SATELLITE TEASER (ROADMAP Task 452) ================================================
+   Tom, 2026-08-22: *"Should there be a little 'satellite' teaser tile/button in the corner of the
+   map like at Google Maps?"* It is a cell of #lpn_map_footer rather than a corner of its own -- see
+   the markup comment in Looped-Network.php for why the corners were all spoken for.
+
+   **THE PICTURE IS DRAWN HERE AND FETCHES NOTHING.** A real tile behind it would be a third-party
+   request made before the user asked for one, which is the thing the whole basemap is opt-in to
+   avoid. Two overlapping repeating gradients over a ground colour read as an aerial photograph at
+   40 px the way a thumbnail does -- fields and a road, not a picture of anywhere.
+
+   THE PRESSED STATE IS THE OTHER SOURCE. When satellite images are already showing, the tile shows
+   the pale grey-green of a street map, because a toggle's picture is what you get by pressing it.
+   `aria-pressed` carries the same fact for a reader who gets no picture at all. */
+.lpn-basemap-teaser {
+	pointer-events: auto;
+	width: 40px; height: 40px; flex: 0 0 auto;
+	padding: 0; cursor: pointer;
+	border: 1px solid #666; border-radius: 2px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+	background-color: #4a6b3a;
+	background-image:
+		repeating-linear-gradient(60deg, rgba(0, 0, 0, .22) 0 4px, rgba(255, 255, 255, .10) 4px 9px),
+		repeating-linear-gradient(150deg, rgba(0, 0, 0, .18) 0 6px, rgba(120, 100, 60, .30) 6px 13px);
+}
+.lpn-basemap-teaser:hover, .lpn-basemap-teaser:focus { border-color: #0b57d0; }
+.lpn-basemap-teaser.lpn-basemap-teaser-on {
+	background-color: #eae7e0;
+	background-image:
+		repeating-linear-gradient(0deg, rgba(0, 0, 0, .30) 0 1px, rgba(0, 0, 0, 0) 1px 11px),
+		repeating-linear-gradient(90deg, rgba(0, 0, 0, .30) 0 1px, rgba(0, 0, 0, 0) 1px 14px);
+}
+
 /* ==== The Labels panel's column headings (ROADMAP Task 435) ==================================
    The four column headings must sit over the controls they name. They did not, and border-box
    (the earlier pass) was only half the cause: BOOTSTRAP'S REBOOT GIVES EVERY FORM CONTROL

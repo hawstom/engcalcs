@@ -29,6 +29,9 @@ const L = loadLoopedNetwork(
 	"\t\tBUDGET: LPN_TILE_BUDGET, MAXZ: tileSource().maxZ,\n" +
 	// Task 452: two sources now, so the ceiling and the URL are read off the ACTIVE one.
 	"\t\tstyle: basemapStyle, setStyle: setBasemapStyle, satAvailable: satelliteAvailable,\n" +
+	// Task 452's corner teaser: the same two predicates and the same seam as the View row.
+	"\t\trefreshTeaser: refreshBasemapTeaser, wireTeaser: wireBasemapTeaser,\n" +
+	"\t\tisGeo: isGeoProject,\n" +
 	"\t\ttileUrl: function () { return tileSource().url(); },\n" +
 	"\t\tbasemapOn: basemapOn, setBasemapOn: setBasemapOn,\n" +
 	"\t\trefresh: refreshBasemap, layer: function () { return basemapLayer; },\n" +
@@ -323,6 +326,84 @@ ok('turning it back on says so on the project', L.getProject().basemap === 'osm'
 	p.basemap = 'orthophoto-2027';
 	ok('an unknown style falls back to the street map, never to nothing',
 		L.style() === 'osm' && /openstreetmap/.test(L.tileUrl()), p.basemap);
+	L.setStyle('osm');
+}
+
+// ---- THE CORNER TEASER (Task 452, second slice) --------------------------------------------
+//
+// Tom, 2026-08-22: *"It's live, but the interface has no way to activate it. Should there be a
+// little 'satellite' teaser tile/button in the corner of the map like at Google Maps?"*
+//
+// There WAS a way -- View > Show satellite images -- and reading openViewMenu() says exactly why he
+// could not find it: the row carries `hidden: !isGeoProject() || !satelliteAvailable()`, so on a
+// grid project it is not in the menu at all. The teaser must therefore appear on EXACTLY that
+// condition and no other, or the corner and the menu come to disagree about whether this network
+// can have photographs behind it. That is what this section checks, by driving the real function.
+console.log('\n--- the corner teaser appears where the menu row does, and nowhere else ---');
+{
+	const fs2 = require('fs');
+	const path2 = require('path');
+	const php = fs2.readFileSync(path2.join(__dirname, '../../Looped-Network.php'), 'utf8');
+	// A CELL OF THE STATUS STRIP. Asserted against the markup because that placement is the whole
+	// answer to "where can it go that the two legends and the attribution are not" -- a teaser moved
+	// out into a corner of its own would collide with a legend in one of six positions.
+	const footer = php.indexOf('id="lpn_map_footer"');
+	const teaser = php.indexOf('id="lpn_basemap_teaser"');
+	const footerEnd = php.indexOf('id="lpn_basemap_credit"');
+	ok('the teaser is inside the map status strip, not in a corner of its own',
+		footer > 0 && teaser > footer && teaser < footerEnd);
+	// NO NEW LANGUAGE KEY. It wears the two the View row already wears; a third string for the same
+	// command would be 26 translations for a synonym of one we have.
+	ok('...and it carries no string of its own',
+		php.indexOf('lpn_basemap_teaser_') < 0 &&
+		!/id="lpn_basemap_teaser"[^>]*>[^<]/.test(php));
+
+	const btn = byId.lpn_basemap_teaser;
+	global.EngCalcs.pageConfig.lpn_basemap_satellite_show = 'Show satellite images';
+	global.EngCalcs.pageConfig.lpn_basemap_satellite_hide = 'Hide satellite images';
+	L.wireTeaser();
+
+	// A GRID PROJECT HAS NO SATELLITE ROW, and must have no teaser: satellite tiles are placed per
+	// tile in lon/lat and mean nothing over canvas x/y.
+	L.reset();
+	global.EngCalcs.pageConfig.lpn_mapbox_token = 'pk.harness.token';
+	L.refreshTeaser();
+	ok('a grid project gets no teaser', !L.isGeo() && btn.style.display === 'none');
+
+	// A GEOGRAPHIC PROJECT WITH NO TOKEN gets none either -- the same reason the row is hidden:
+	// a button that fetches a 401 per tile is worse than no button.
+	L.reset(L.GEO);
+	global.EngCalcs.pageConfig.lpn_mapbox_token = '';
+	L.refreshTeaser();
+	ok('a geographic project with no Mapbox token gets no teaser either',
+		btn.style.display === 'none');
+
+	// AND WITH BOTH, IT IS THERE.
+	global.EngCalcs.pageConfig.lpn_mapbox_token = 'pk.harness.token';
+	L.getProject().basemap = 'osm';
+	L.refreshTeaser();
+	ok('a geographic project with a token gets the teaser', btn.style.display === '');
+	ok('...named by the string the menu row uses, so nothing new was written',
+		btn.getAttribute('aria-label') === 'Show satellite images', btn.getAttribute('aria-label'));
+	ok('...and it says it is a toggle that is currently off',
+		btn.getAttribute('aria-pressed') === 'false');
+
+	// **ONE SEAM.** The click goes through setBasemapStyle(), which is what makes the corner and the
+	// menu row behave identically -- including the seam's own rule that asking for the style already
+	// showing turns the basemap off.
+	const click = function () { btn._listeners.click.forEach(function (f) { f(); }); };
+	click();
+	ok('clicking it turns the satellite images on', L.basemapOn() && L.style() === 'satellite');
+	L.refreshTeaser();
+	ok('...and the tile then offers the way back', btn.getAttribute('aria-pressed') === 'true' &&
+		btn.getAttribute('aria-label') === 'Hide satellite images');
+	ok('...and shows the other source, which is what a toggle\'s picture is for',
+		String(btn.getAttribute('class')).indexOf('lpn-basemap-teaser-on') >= 0);
+	click();
+	ok('...and clicking again goes through the same seam the menu row does', !L.basemapOn());
+	L.refreshTeaser();
+	ok('...leaving the teaser offering the images again',
+		btn.getAttribute('aria-label') === 'Show satellite images');
 	L.setStyle('osm');
 }
 
