@@ -13109,7 +13109,7 @@ var EngCalcs = EngCalcs || {};
 			// two links to one destination halve each other's weight rather than doubling the
 			// invitation (echoFeedback() in lib/Calculators.lib.php).
 
-			{ icon: 'mail', label: pc.lpn_help_fix || 'Fix something', fn: ext('contact.php') },
+			{ icon: 'mail', label: pc.lpn_help_fix || 'Fix something', fn: ext('contact.php?from=Looped-Network') },
 			{ separator: true },
 			// **THE LEGAL ROW LIVES HERE BECAUSE THIS PAGE HAS NO FOOTER.** Task 286 requires the
 			// notice to be FINDABLE and withdrawal to be as easy as consent; it never required a

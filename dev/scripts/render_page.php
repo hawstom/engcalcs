@@ -42,19 +42,26 @@ ini_set('display_errors', 'stderr');
 $__rp_root = dirname(__DIR__, 2);
 $__rp_page = '';
 $__rp_lang = '';
+$__rp_query = '';
 foreach (array_slice($argv, 1) as $__rp_arg) {
     if (preg_match('/^--lang=([a-z]{2})$/i', $__rp_arg, $__rp_m)) { $__rp_lang = strtolower($__rp_m[1]); }
+    elseif (substr($__rp_arg, 0, 6) === '--get=') { $__rp_query = substr($__rp_arg, 6); }
     elseif (substr($__rp_arg, 0, 1) !== '-' && $__rp_page === '') { $__rp_page = basename($__rp_arg); }
 }
 $__rp_path = $__rp_root . '/' . $__rp_page;
 if ($__rp_page === '' || !is_file($__rp_path)) {
-    fwrite(STDERR, "render_page.php: usage: php dev/scripts/render_page.php <Page.php> [--lang=xx]\n");
+    fwrite(STDERR, "render_page.php: usage: php dev/scripts/render_page.php <Page.php> [--lang=xx] [--get=k=v&k2=v2]\n");
     exit(1);
 }
 if ($__rp_lang !== '') { $_COOKIE['ec_language'] = $__rp_lang; }
 
 // The suite reads these; a CLI SAPI supplies none of them.
-$_SERVER['REQUEST_URI']    = '/engcalcs/' . $__rp_page;
+// --get= seeds $_GET and the query half of REQUEST_URI. `?lang=` is still not the way to set a
+// language -- that calls setcookie() and logs a selection; use --lang. This is for the pages that
+// read a parameter of their own, such as contact.php's ?from=.
+if ($__rp_query !== '') { parse_str($__rp_query, $_GET); }
+$_SERVER['QUERY_STRING']   = $__rp_query;
+$_SERVER['REQUEST_URI']    = '/engcalcs/' . $__rp_page . ($__rp_query !== '' ? '?' . $__rp_query : '');
 $_SERVER['SCRIPT_NAME']    = '/engcalcs/' . $__rp_page;
 $_SERVER['SERVER_NAME']    = 'hawsedc.com';
 $_SERVER['HTTP_HOST']      = 'hawsedc.com';

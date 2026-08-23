@@ -73,6 +73,15 @@ Mesa, AZ  85201<br />
       name="more_message"
       value="\n---\nIf this message needs translation, use AI."
     >
+<?php // Carries the calculator the invitation was clicked on into the e-mail formmail.php sends.
+      // Emitted only when ?from= is present and looks like a page basename; a sender who arrived
+      // by the menu or by typing the URL posts nothing and the e-mail says "not recorded", which
+      // is the honest answer. formmail.php checks the value against the real page list again --
+      // this is a convenience for the reader, never a trusted input. ?>
+<?php $ecFrom = isset($_GET['from']) && is_string($_GET['from']) ? $_GET['from'] : '';
+      if ($ecFrom !== '' && preg_match('/^[A-Za-z0-9._-]{1,64}$/', $ecFrom)) : ?>
+    <input type="hidden" name="origin" value="<?=htmlspecialchars($ecFrom, ENT_QUOTES, 'UTF-8')?>">
+<?php endif; ?>
   </p>
 </form>
 

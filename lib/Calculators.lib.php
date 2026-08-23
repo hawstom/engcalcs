@@ -26,7 +26,14 @@ function echoFeedback(){
 	      // that could sit at any depth, and the site answers on all four of http/https x www/non-www
 	      // with no redirect, so a path anchored at the site root is the only form that cannot drift.
 	      // Menus.lib.php:44 already uses exactly this form. ?>
-	<a href="/engcalcs/contact.php"><?=$ec_lang['template_feedback']?></a>
+	<?php // ?from= names the page the invitation was clicked on, so the e-mail formmail.php sends
+	      // can say which calculator somebody was using (Tom, 2026-08-22: "I have no idea what
+	      // calculator this person was using"). HTTP_REFERER cannot answer that -- on the submit
+	      // request it is contact.php, which every sender has in common. The value is a basename
+	      // this page already knows; formmail.php still checks it against the real page list and
+	      // prints "not recorded" for anything it does not recognise, so nothing here is trusted
+	      // downstream. Nothing is stored on the device: it is one parameter on one link. ?>
+	<a href="/engcalcs/contact.php?from=<?=rawurlencode(pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_FILENAME))?>"><?=$ec_lang['template_feedback']?></a>
 </p>
 <?php
 }

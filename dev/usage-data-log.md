@@ -530,3 +530,602 @@ another agent's territory during this work.
 Also outstanding: **`formmail.php` does not call `ecLogBucketSuffix()`**, so the contact-send log is
 the one log with no bucket column. The report handles it explicitly rather than guessing, but a
 send row cannot currently be matched to the bucket its click came from.
+
+## 2026-08-21 — Full report immediately after deploying reporting change
+
+===============================================================================
+ ENGCALCS USAGE REPORT
+===============================================================================
+ WINDOW        2026-08-14T11:57:21Z  ..  2026-08-22T23:24:13Z
+ DURATION      8.5 days
+ FINGERPRINT   win=2026-08-14T11:57:21Z..2026-08-22T23:24:13Z days=8.5 rows=60363/2511/1587/87/4302/1
+ PREVIOUS RUN  (none recorded — this is the first run against this log directory)
+
+ Paste the WINDOW and FINGERPRINT lines with any number taken from this report. Two
+ snapshots whose fingerprints differ describe different populations: dev/usage-data-log.md
+ records a 40x scale break that happened because the window was never stated.
+
+-------------------------------------------------------------------------------
+ DEFINITIONS — the four tiers, narrowest last
+-------------------------------------------------------------------------------
+   reach     a page load recorded in engcalcs-lang.log. INCLUDES CRAWLERS. High reach with
+             ~0% shopping is a bot signature, not an audience.
+   shopping  a confirmed-human page view: the beacon fires once this browser has been
+             around >=10s, whether or not anybody calculates. Window shopping.
+   using     a confirmed calculation: a user-triggered recalculation >=10s after load. It
+             means 'typed their own numbers', not 'looked at the default answer'.
+   naming    a Printable Title or Subtitle was typed — they mean to show it to somebody.
+
+   %shopping = shopping/reach. A LOWER BOUND on human reach, never an estimate of it.
+   %using    = using/shopping.
+   ~         the denominator is under 40. The number is printed, but it is not a verdict.
+   -         the denominator is under 5. No ratio is printed at all.
+   [lo-hi]%  Wilson 95% interval. TWO ROWS DIFFER ONLY IF THEIR INTERVALS DO NOT OVERLAP.
+
+-------------------------------------------------------------------------------
+ THE TWO BUCKETS — never summed, never in the same table
+-------------------------------------------------------------------------------
+   people      rows from visitors who agreed to being counted once instead of every time.
+               De-duplicated per (visit, page). ONE ROW IS ONE PERSON.
+   page loads  rows from everybody else — refused, or has not answered the banner. Nothing
+               is stored on their device, so nothing tells their second load from their
+               first. ONE ROW IS ONE PAGE LOAD.
+
+   These are different UNITS. Adding them produces a number with no meaning, and a page
+   whose non-consenting visitors reload a lot would simply look more popular. There is no
+   total row anywhere in this report, on purpose.
+
+   log                                        people   page loads
+   engcalcs-lang.log                            1494        58869
+   engcalcs-human-view.log                       307         2204
+   engcalcs-calc-usage.log                       210         1377
+   engcalcs-title.log                             32           55
+   engcalcs-signal.log                           847         3455
+   engcalcs-contact-send.log                       1 (server-side)
+
+   Consent share of reach rows: 2.5%
+   THIS IS A RATE OF ROWS, NOT OF HUMANS, and it is the only bridge between the two
+   buckets. Rows written before the consent banner shipped (2026-08-11) are all people
+   rows by definition, so the share is understated while any of them remain in the
+   window. IF THIS SHARE IS SMALL, the people-bucket tables below describe a small
+   minority of the audience — that is the whole of the 2026-08-21 scale break.
+
+===============================================================================
+ RANK BY SHOPPING — the statistic that survives a window change
+===============================================================================
+   dev/usage-data-log.md establishes rank as the robust number here: counts move with the
+   window and the consent share, ratios move with n, rank moves with the audience. Read
+   this table first, and read the ratio tables below only for within-window comparisons.
+
+   STANDING RULE: rank the complicated calculators against EACH OTHER — Looped-Network,
+   Irrigation-Pressure, Branched-Network, Manning-Irregular, Weir-Flow-Irregular — never
+   against Manning-Pipe-Flow or Manning-Trap. 'Using' fires after one keystroke on a
+   three-field form and after drawing a network on the map, so the ratio is not portable
+   across complexity classes.
+
+   rank   page                                 people       page loads
+   1      Manning-Pipe-Flow                       164             1741
+   2      Manning-Trap                             52              213
+   3      Looped-Network                           20               48
+   4      Manning-Irregular                        19               38
+   5      Hazen-Williams                           12               59
+   6      Darcy-Weisbach                            9               16
+   7      Manning-Pipe-Head-Loss                    8               34
+   8      Weir-Flow-Simple                          7               14
+   9      Branched-Network                          5                4
+   10     Weir-Flow-Irregular                       3               14
+   11     contact                                   3                2
+   12     Rock-Chute                                2                4
+   13     Irrigation-Pressure                       2                0
+   14     Orifice                                   1                9
+   15     Orifice-Drain-Time                        0                5
+   16     Canal-Seepage                             0                2
+   17     Micro-Hydro-Power                         0                1
+
+   Rank is by the people bucket, with the page-load bucket printed beside it so a
+   disagreement between the two is visible. They are different units; the ranks are
+   comparable, the counts are not.
+
+===============================================================================
+ FUNNEL BY PAGE — PEOPLE (consented, de-duplicated: one row = one person)
+===============================================================================
+   page                           reach  shopping     using  %shopping 95% CI         %using 95% CI
+   Manning-Pipe-Flow                177       164       124        93% [88-96]%          76% [69-82]%
+   Manning-Trap                      96        52        40        54% [44-64]%          77% [64-86]%
+   Looped-Network                    67        20        12        30% [20-42]%         60%~ [39-78]%
+   Manning-Irregular                 71        19        14        27% [18-38]%         74%~ [51-88]%
+   Hazen-Williams                    63        12         7        19% [11-30]%         58%~ [32-81]%
+   Darcy-Weisbach                    58         9         5        16% [8-27]%          56%~ [27-81]%
+   Manning-Pipe-Head-Loss            66         8         2        12% [6-22]%          25%~ [7-59]%
+   Weir-Flow-Simple                  67         7         3        10% [5-20]%          43%~ [16-75]%
+   Branched-Network                  57         5         1         9% [4-19]%          20%~ [4-62]%
+   Weir-Flow-Irregular               64         3         1         5% [2-13]%             - [6-79]%
+   contact                            3         3         0          - [44-100]%           - [0-56]%
+   Rock-Chute                        61         2         0         3% [1-11]%             - [0-66]%
+   Irrigation-Pressure               56         2         0         4% [1-12]%             - [0-66]%
+   Orifice                           63         1         0         2% [0-8]%              - [0-79]%
+   Orifice-Drain-Time                60         0         1         0% [0-6]%            n/a
+   index                            117         0         0         0% [0-3]%            n/a
+   privacy                           61         0         0         0% [0-6]%            n/a
+   Micro-Hydro-Power                 58         0         0         0% [0-6]%            n/a
+   terms                             58         0         0         0% [0-6]%            n/a
+   About                             57         0         0         0% [0-6]%            n/a
+   Install                           56         0         0         0% [0-6]%            n/a
+   Canal-Seepage                     55         0         0         0% [0-7]%            n/a
+   sdnet                              2         0         0          - [0-66]%           n/a
+   formmailsuccess                    1         0         0          - [0-79]%           n/a
+
+   Units: every count in this table is PEOPLE.
+
+===============================================================================
+ FUNNEL BY PAGE — PAGE LOADS (everybody else: one row = one page load)
+===============================================================================
+   Not a smaller or larger version of the table above. A different unit, and for most
+   windows the larger population. Do not divide one table by the other.
+
+   page                           reach  shopping     using  %shopping 95% CI         %using 95% CI
+   Manning-Pipe-Flow               5504      1741      1144        32% [30-33]%          66% [63-68]%
+   Manning-Trap                    3280       213       139         6% [6-7]%            65% [59-71]%
+   Hazen-Williams                  3600        59        28         2% [1-2]%            47% [35-60]%
+   Looped-Network                  3143        48         5         2% [1-2]%            10% [5-22]%
+   Manning-Irregular               2511        38        13         2% [1-2]%           34%~ [21-50]%
+   Manning-Pipe-Head-Loss          2513        34        19         1% [1-2]%           56%~ [39-71]%
+   Darcy-Weisbach                  2432        16         5         1% [0-1]%           31%~ [14-56]%
+   Weir-Flow-Irregular             2388        14         7         1% [0-1]%           50%~ [27-73]%
+   Weir-Flow-Simple                2348        14         7         1% [0-1]%           50%~ [27-73]%
+   Orifice                         2376         9         5         0% [0-1]%           56%~ [27-81]%
+   Orifice-Drain-Time              2353         5         2         0% [0-0]%           40%~ [12-77]%
+   Rock-Chute                      2339         4         2         0% [0-0]%              - [15-85]%
+   Branched-Network                2241         4         1         0% [0-0]%              - [5-70]%
+   Canal-Seepage                   2357         2         0         0% [0-0]%              - [0-66]%
+   contact                          199         2         0         1% [0-4]%              - [0-66]%
+   Micro-Hydro-Power               2427         1         0         0% [0-0]%              - [0-79]%
+   index                           4541         0         0         0% [0-0]%            n/a
+   Irrigation-Pressure             2417         0         0         0% [0-0]%            n/a
+   About                           2390         0         0         0% [0-0]%            n/a
+   privacy                         2354         0         0         0% [0-0]%            n/a
+   terms                           2331         0         0         0% [0-0]%            n/a
+   Install                         2236         0         0         0% [0-0]%            n/a
+   turn                             179         0         0         0% [0-2]%            n/a
+   Orifice-Drain-Time-Ref           145         0         0         0% [0-3]%            n/a
+   gradlbl                           56         0         0         0% [0-6]%            n/a
+   pointsin                          43         0         0         0% [0-8]%            n/a
+   fselect                           38         0         0        0%~ [0-9]%            n/a
+   proflbl                           34         0         0        0%~ [0-10]%           n/a
+   gdd                               26         0         0        0%~ [0-13]%           n/a
+   endtick                           15         0         0        0%~ [0-20]%           n/a
+   sdnet                             15         0         0        0%~ [0-20]%           n/a
+   tip                               15         0         0        0%~ [0-20]%           n/a
+   turntheo                          15         0         0        0%~ [0-20]%           n/a
+   ddmsw                              8         0         0        0%~ [0-32]%           n/a
+
+   Units: every count in this table is PAGE LOADS.
+
+   NEITHER FUNNEL TABLE CARRIES A RANK COLUMN. Rank is stated once, in its own section
+   above. A row's position here moves with the sort, and a position read as a rank — or a
+   number read off the row above the one meant — is the mistake dev/usage-data-log.md
+   records for 2026-08-21.
+
+===============================================================================
+ THE QUIET PAGES — a cost the project carries deliberately
+===============================================================================
+   Pages that returned almost nothing in this window, both buckets pooled purely to decide
+   membership of this list (no count is printed, because a pooled count would be a sum).
+
+   THIS IS NOT AN ARGUMENT FOR CUTTING THEM. Zero reach is a discovery/SEO gap, not a
+   value signal, and it never has been one here. It is stated once per run so that the
+   choice to carry the suite's breadth stays deliberate rather than unnoticed.
+
+   About
+   Canal-Seepage
+   ddmsw
+   endtick
+   formmailsuccess
+   fselect
+   gdd
+   gradlbl
+   index
+   Install
+   Irrigation-Pressure
+   Micro-Hydro-Power
+   Orifice-Drain-Time-Ref
+   pointsin
+   privacy
+   proflbl
+   sdnet
+   terms
+   tip
+   turn
+   turntheo
+
+   The page list comes from the REACH log, so a page with traffic and no shoppers appears
+   here. A page absent from every log in this window does not — it has no rows to be
+   counted by. Cross-check against the calculator list before concluding anything about a
+   page you cannot see.
+
+===============================================================================
+ LANGUAGE — does anybody use the 26 translations?
+===============================================================================
+   The suite's deepest recurring spend, and the number that should sequence a translation
+   sprint. Two different questions live here and they must not be confused:
+     SERVED    which language the page was actually rendered in (column 3 of the human
+               logs). This is 'somebody used a translation'.
+     ASKED FOR the browser's first Accept-Language tag (column 4). This is 'somebody
+               wanted one', and it is true even of visitors who were served English.
+
+   PEOPLE — confirmed-human page views: 307
+     served a language other than en                    72  23% [19-29]%
+     browser asked for a language other than en         90  29% [25-35]%
+
+   PAGE LOADS — confirmed-human page views: 2204
+     served a language other than en                   285  13% [12-14]%
+     browser asked for a language other than en        307  14% [13-15]%
+
+   THE GAP BETWEEN THOSE TWO LINES IS THE FINDING. 'Asked for' well above 'served' means
+   people who wanted a translation did not get one — a detection or discovery defect, not
+   a translation-quality one, and a completely different fix.
+
+--- Language x calculator, confirmed humans, non-English served (PEOPLE) ---
+    Every row is a real person: bots essentially never reach either beacon. This is the
+    sprint-sequencing view — is anyone showing up on a calculator in a language we
+    translated, and do they get as far as computing?
+
+    lang     calculator                   shopping      using    %using 95% CI
+    es       Manning-Pipe-Flow                  30         13      43%~ [27-61]%
+    es       Manning-Trap                       11          8      73%~ [43-90]%
+awk: cmd. line:6: (FILENAME=- FNR=3) warning: sqrt: called with negative argument -0.009584
+    es       Hazen-Williams                      5          6     120%~ [-nan-100]%
+    es       Manning-Irregular                   3          2         - [21-94]%
+    es       Darcy-Weisbach                      3          2         - [21-94]%
+    he       Manning-Pipe-Flow                   2          2         - [34-100]%
+    fr       Manning-Pipe-Flow                   2          2         - [34-100]%
+    fr       Darcy-Weisbach                      2          2         - [34-100]%
+    es       Manning-Pipe-Head-Loss              2          0         - [0-66]%
+    es       Looped-Network                      2          0         - [0-66]%
+awk: cmd. line:6: (FILENAME=- FNR=11) warning: sqrt: called with negative argument -1.0396
+    pt       Manning-Trap                        1          2         - [-nan-100]%
+awk: cmd. line:6: (FILENAME=- FNR=12) warning: sqrt: called with negative argument -1.0396
+    pt       Manning-Pipe-Flow                   1          2         - [-nan-100]%
+    zh       Manning-Pipe-Flow                   1          1         - [21-100]%
+    pt       Manning-Pipe-Head-Loss              1          1         - [21-100]%
+    id       Manning-Trap                        1          0         - [0-79]%
+    es       Weir-Flow-Simple                    1          0         - [0-79]%
+    es       Rock-Chute                          1          0         - [0-79]%
+    es       contact                             1          0         - [0-79]%
+    bg       Manning-Pipe-Head-Loss              1          0         - [0-79]%
+    ar       Manning-Irregular                   1          0         - [0-79]%
+    cs       Orifice-Drain-Time                  0          1       n/a
+
+--- Language demand from the reach log (both buckets, kept apart) ---
+    'get' rows are an explicit ?lang=XX choice; 'browser'/'anon' rows carry the raw
+    Accept-Language tag; 'cookie' rows are a returning visitor on a saved preference.
+    'view' rows are excluded from demand — they would double-count the visit's language.
+
+    language       people   page loads
+    en                278        37545
+    es                116         3572
+    fr                  4          995
+    pt                  4          894
+    bg                  4          328
+    de                  3          401
+    cs                  3          341
+    ar                  2          392
+    zh                  1          925
+    he                  1          546
+    ro                  1          221
+    pl                  1          167
+    tr                  0          404
+    it                  0          390
+    id                  0          341
+    ru                  0          338
+    km                  0          290
+    sw                  0          289
+    fa                  0          288
+    bn                  0          265
+    ur                  0          259
+    sr                  0          248
+    ps                  0          240
+    hi                  0          239
+    my                  0          234
+    hr                  0          230
+    uk                  0          230
+    am                  0          223
+    sv                  0           93
+    fi                  0           68
+    ca                  0           67
+    nn                  0           67
+    el                  0           51
+    nl                  0           46
+    hu                  0           24
+    lt                  0           23
+    is                  0           22
+    nb                  0           22
+    sl                  0           22
+    xx                  0            5
+    ja                  0            2
+    th                  0            2
+
+--- Arrival pattern for non-English humans (bot-dwell check) ---
+    A crawler that dwells >=10s trips the shopping beacon and never calculates, which is
+    exactly the signature of a language with high shopping and near-zero using. Humans
+    spread out. 12 views on 1 day with a burst of 8 is a crawler; 12 over 9 days, burst 1,
+    is 12 people.
+
+    lang            views       days      burst
+    es                227          9          2
+    pt                 34          8          3
+    fr                 32          6          2
+    he                 19          6          3
+    zh                  8          6          1
+    it                  5          2          1
+    de                  5          2          1
+    bg                  5          4          1
+    id                  4          2          2
+    tr                  3          2          1
+    cs                  3          2          1
+    hr                  2          1          1
+    fa                  2          2          1
+    ar                  2          1          1
+    ur                  1          1          1
+    sw                  1          1          1
+    sr                  1          1          1
+    ru                  1          1          1
+    ro                  1          1          1
+    bn                  1          1          1
+
+===============================================================================
+ REPEAT USE — the strongest value signal here, and it cost no new storage
+===============================================================================
+   A row means this browser had already left WORK behind on this page: its own input
+   cookie on a calculator, a saved project DOCUMENT on Looped-Network. Both are EXEMPT
+   storage that exists anyway, so measuring this stored nothing new and left
+   consent_body true. It means USED, not opened — the Looped-Network project index will
+   not do, because a first visit writes one before the visitor touches anything.
+
+   ONE STRUCTURAL UNDERCOUNT, not a defect: CONSENTING VISITORS ONLY. Reading exempt
+   storage for an analytics purpose is still an analytics access. Treat it as a sample,
+   never as a total, and never divide it by a count that includes the page-load bucket.
+
+   page                          people shop   returned   %repeat 95% CI
+   Manning-Pipe-Flow                     164         94       57% [50-65]%
+   Manning-Trap                           52         25       48% [35-61]%
+   Looped-Network                         20          4      20%~ [8-42]%
+   Manning-Irregular                      19         17      89%~ [69-97]%
+   Hazen-Williams                         12          4      33%~ [14-61]%
+   Darcy-Weisbach                          9          1      11%~ [2-44]%
+   Weir-Flow-Simple                        7          2      29%~ [8-64]%
+
+===============================================================================
+ NAMED CALCULATIONS — they meant to show it to another person
+===============================================================================
+   The closest instrument this suite has to its own reason for existing. A view says they
+   looked, a calculation says they got an answer, a typed title says they intend to put
+   the result in front of somebody else. The text typed is never sent and never stored.
+
+   PEOPLE       titles     15   subtitles     17
+   PAGE LOADS   titles     32   subtitles     23
+
+--- Named per confirmed calculation, by page (PEOPLE) ---
+   page                              calcs      named    %named 95% CI
+   Manning-Pipe-Flow                   124          6        5% [2-10]%
+   Manning-Trap                         40          3        8% [3-20]%
+   Manning-Irregular                    14          4      29%~ [12-55]%
+   Looped-Network                       12          0       0%~ [0-24]%
+   Hazen-Williams                        7          0       0%~ [0-35]%
+   Darcy-Weisbach                        5          0       0%~ [0-43]%
+   Weir-Flow-Simple                      3          0         - [0-56]%
+   Manning-Pipe-Head-Loss                2          1         - [9-91]%
+   Weir-Flow-Irregular                   1          1         - [21-100]%
+   Orifice-Drain-Time                    1          0         - [0-79]%
+   Branched-Network                      1          0         - [0-79]%
+
+===============================================================================
+ CONTACT FUNNEL — invitation clicks -> messages actually sent
+===============================================================================
+   clicks = confirmed-human views of contact.php. sends = messages formmail.php actually
+   mailed, logged server-side in its success branch and NOT de-duplicated, because one
+   person writing twice is two messages. The send log has no bucket column, so clicks are
+   shown for both buckets and the reader picks the honest denominator.
+
+   invitation clicks (people)              3
+   invitation clicks (page loads)          2
+   messages sent                           1
+
+   The two causes of a contact drought call for OPPOSITE fixes: few clicks means the
+   invitation is invisible (wording and placement are the lever); many clicks and few
+   sends means the invitation works and the FORM is the barrier. At these counts neither
+   is established — read the pair of raw numbers, not a ratio.
+
+===============================================================================
+ WHAT PEOPLE DID NEXT (Tasks 216 and 200)
+===============================================================================
+   Everything above counts how many. This counts what they then did, and it is never
+   divided by anything but a view count.
+
+   ONE CAUTION FOR THE WHOLE SECTION: these rows de-duplicate per PAGE LOAD, in the
+   page's own memory, while views and calculations de-duplicate per VISIT against the
+   ec_seen cookie — whose five bits are full, and whose sixth would make the consent
+   banner's 'a single digit per page' untrue. So a signal count and a people-bucket view
+   count are different units. The only place a rate is honest is the PAGE-LOAD bucket,
+   where nothing is stored and therefore both sides are page loads. That is why the
+   rates below come from that bucket and the people bucket shows raw counts.
+
+--- Signal rows by event ---
+    event            people   page loads
+    units               340         1795
+    touch               276         1452
+    repeat              147            0
+    outbound             61          199
+    lpn                  23            7
+    share                 0            2
+
+=== Reference lookups (Task 216) ===
+    A click OUT of /engcalcs/. THE ROW THAT MATTERS IS ANY ROW NOT 'en': everything we
+    link to is English, so a visitor reading in Spanish who opens an English-only
+    roughness table has told us everything a survey would. Feeds Task 217.
+
+    154 www.engineeringtoolbox.com/mannings-roughness-d_799.html
+     47 hawsedc.com/frictionslope.php
+     10 www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html
+      8 epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf
+      7 www.engineeringtoolbox.com/froude-number-d_578.html
+      7 hawsedc.com/sewslope.php
+      6 hawsedc.com/download.php
+      5 github.com/hawstom/engcalcs/blob/master/README.md
+      4 www.engineeringtoolbox.com/hazen-williams-coefficients-d_798.html
+      3 www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html
+      2 www.youtube.com/watch
+      2 hawsedc.com/peakfact.php
+      1 www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Ch
+      1 www.fhwa.dot.gov/engineering/hydraulics/software/hy8
+      1 hawsedc.com/support.php
+      1 hawsedc.com/famtree.php
+      1 en.wikipedia.org/wiki/Darcy_friction_factor_formulae
+
+--- Reference clicks by served language ---
+    224 en
+     23 es
+     10 fr
+      2 it
+      1 pt
+
+=== Did they touch anything? (Task 200) ===
+    A view with no calculation splits two ways and the two call for opposite fixes:
+    somebody who never touched an input could not understand the page; somebody who
+    touched it and left tried it and did not want it. Rate from the page-load bucket.
+
+    page                        page loads    touched  %touched 95% CI
+    Manning-Pipe-Flow                 1741       1218       70% [68-72]%
+    Manning-Trap                       213        142       67% [60-73]%
+    Hazen-Williams                      59         29       49% [37-62]%
+    Looped-Network                      48          2        4% [1-14]%
+    Manning-Irregular                   38         14      37%~ [23-53]%
+    Manning-Pipe-Head-Loss              34         18      53%~ [37-69]%
+    Darcy-Weisbach                      16          5      31%~ [14-56]%
+    Weir-Flow-Simple                    14          7      50%~ [27-73]%
+    Weir-Flow-Irregular                 14          7      50%~ [27-73]%
+    Orifice                              9          5      56%~ [27-81]%
+    Orifice-Drain-Time                   5          2      40%~ [12-77]%
+    Rock-Chute                           4          2         - [15-85]%
+    Branched-Network                     4          1         - [5-70]%
+    contact                              2          0         - [0-66]%
+    Canal-Seepage                        2          0         - [0-66]%
+    Micro-Hydro-Power                    1          0         - [0-79]%
+
+=== Units actually chosen (Task 200) ===
+    Validates EC_DEFAULT_UNIT_SET-by-language and the per-family defaults of Task 162.
+    READ THIS TO REORDER OPTIONS, NEVER TO DELETE ONE. An unused option costs a user
+    essentially nothing; a missing one costs them the whole calculator.
+
+--- Preset button clicks ---
+    240 preset:si
+    119 preset:us
+
+--- Preset clicks by served language (a language always clicking US is one this gets wrong) ---
+    215 en      preset:si
+    112 en      preset:us
+     18 es      preset:si
+      4 es      preset:us
+      2 pt      preset:si
+      2 he      preset:si
+      1 id      preset:us
+      1 id      preset:si
+      1 he      preset:us
+      1 fa      preset:us
+      1 fa      preset:si
+      1 bg      preset:si
+
+--- Individual unit selections, by family ---
+    378 slope:gradePercent
+    228 fraction:depthPercent
+    178 flow_channel:lps
+    129 distance_small:mm
+    119 flow_channel:gpm
+     92 distance_small:m
+     88 slope:grade
+     77 flow_channel:m3ps
+     67 fraction:depthFrac
+     59 flow_channel:mgd
+     50 velocity:mps
+     41 flow_area:m2
+     37 distance_small:ft
+     33 distance_medium:m
+     27 stress:npm2
+     25 flow_channel:ft3ps
+     24 distance_small:in
+     22 velocity_head:mh2o
+     11 distance_medium:mm
+     10 flow_area:mm2
+      8 distance_medium:in
+      7 partial_head:fth2o
+      6 partial_head:bar
+      6 flow_pipe:m3ps
+      5 partial_head:mh2o
+      5 distance_medium:ft
+      4 velocity:ftps
+      4 flow_pipe:lps
+      3 velocity_head:mmh2o
+      3 stress:psf
+      3 flow_pipe:gpm
+      3 flow_channel:mld
+      3 flow_area:in2
+      3 flow_area:ft2
+      2 velocity_head:psi
+      2 velocity_head:fth2o
+      2 velocity_head:bar
+      2 partial_head:psi
+      2 flow_pipe:ft3ps
+      1 total_head:mh2o
+
+=== Looped-Network: where the map interface loses people (Task 200) ===
+    first:  which of the four ways INTO a network the visitor reached for first. This is
+            the first evidence bearing on the empty-canvas decision closed 2026-07-29
+            with no data: a large first:example share vindicates it, a large 'nothing'
+            share overturns it.
+    diag:   which pre-solve complaint is actually met. The biggest one names the next
+            thing to fix on that page.
+
+      9 first:example
+      3 first:import
+      3 first:element
+      1 first:backdrop
+
+    page loads (page-load bucket)        48
+      of those, did something             5
+      of those, did NOTHING              43
+    'Nothing' is a residual, not a logged event, so it also absorbs anyone who left
+    before the page finished loading.
+
+--- Diagnostics met ---
+      9 diag:unreachable
+      3 diag:not-converged
+      2 diag:no-fixed-head
+
+=== Sharing a calculation (Task 228) ===
+    'copy' means the clipboard took the link; 'manual' means the browser had none here
+    and the link was shown to be copied by hand. A large manual share is a
+    browser-support fact, not a failure. NOT MEASURED and not measurable from here:
+    whether anybody ever OPENED a shared link — it arrives as an ordinary page view.
+
+      2 copy
+
+===============================================================================
+ COVERAGE — each tier began logging on a DIFFERENT date
+===============================================================================
+   If the calculation log started after the page-view log, %using is understated for
+   every row above: some counted shoppers arrived before a calculation could be recorded
+   at all. Check these dates before treating any conversion rate as real.
+
+   log                                  rows  first in window       last in window
+   engcalcs-lang.log                   60363  2026-08-14T11:57:40Z  2026-08-22T23:24:13Z
+   engcalcs-human-view.log              2511  2026-08-14T11:57:50Z  2026-08-22T22:59:28Z
+   engcalcs-calc-usage.log              1587  2026-08-14T11:57:21Z  2026-08-22T22:37:09Z
+   engcalcs-contact-send.log               1  2026-08-21T14:48:58Z  2026-08-21T14:48:58Z
+   engcalcs-title.log                     87  2026-08-14T14:27:01Z  2026-08-22T00:07:27Z
+   engcalcs-signal.log                  4302  2026-08-14T11:58:25Z  2026-08-22T22:37:37Z
+
+ WINDOW        2026-08-14T11:57:21Z  ..  2026-08-22T23:24:13Z   (8.5 days)
+ FINGERPRINT   win=2026-08-14T11:57:21Z..2026-08-22T23:24:13Z days=8.5 rows=60363/2511/1587/87/4302/1
+
+ Snapshotting into dev/usage-data-log.md: paste the WINDOW and FINGERPRINT lines with
+ whatever table you keep. A table pasted without them cannot be compared to anything.
