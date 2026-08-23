@@ -406,8 +406,8 @@ the block.
   - **Do not guess a fix.** The decisive step is one observation: pull the HW page's own Search
     Console query export and segment it (the doc says exactly how). Reference-lookup queries mean a
     C-value table on the page; calculator queries mean a real UX leak.
-  - **Do not promote Task 146 on the 11% number alone** — it does not yet distinguish a leak from
-    satisfied reference demand, because `human` counts anyone who dwells 10 s without typing.
+  - **The 11% is not on its own a verdict** — `human` counts anyone who dwells 10 s without typing, so
+    it does not separate a UX leak from satisfied reference demand. The segmentation above is how to tell.
 
 - 25|185| **Match/Copy properties tool (originated during Task 146).** Tom, 2026-07-30: "In the absence of the
   table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
