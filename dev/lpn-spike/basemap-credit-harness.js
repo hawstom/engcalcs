@@ -138,6 +138,15 @@ async function main() {
 	ok('the boot path drew tiles', L.layer().children.length > 0,
 		L.layer().children.length + ' <image> elements');
 	invariant('on the boot path');
+	// **THE SATELLITE TEASER IS THE SAME STORY** (Task 452, Tom: *"there is no current way to turn
+	// my geomap view into a satellite view"*). It rides the same chrome refresh, so a boot that
+	// forgot the credit forgot the corner control too. Bottom-left, a cell of the status strip --
+	// which is also where Google Maps, the page Tom compared us to, puts its own basemap thumbnail.
+	ok('...and the satellite teaser is offered, since this browser has a Mapbox token',
+		L.satAvailable() && byId.lpn_basemap_teaser.style.display !== 'none',
+		'display=' + byId.lpn_basemap_teaser.style.display + ' title=' + byId.lpn_basemap_teaser.title);
+	ok('...labelled with the command it performs',
+		/satellite/i.test(byId.lpn_basemap_teaser.title || ''), byId.lpn_basemap_teaser.title);
 
 	// ---- 2. the other ways the tiles change ---------------------------------------------------------
 	console.log('\n--- and every other route to a tile carries the credit with it ---');
