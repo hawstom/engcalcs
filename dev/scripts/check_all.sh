@@ -104,6 +104,7 @@ run_check "service worker precache"      blocking php dev/scripts/sw_manifest_ch
 # repo -- present on every machine anyone looks at, absent exactly where nobody looks until a deploy.
 # LibreEPANET.org (Task 306) is by definition a standalone deploy and would have hit the same wall.
 run_check "suite ships its own assets"   blocking php dev/scripts/standalone_assets_check.php
+run_check "canonical origin whitelist"   blocking php dev/scripts/canonical_origin_check.php
 # The vendored third-party files are what the manifest says they are, nothing ships undeclared, and
 # package.json agrees with what is committed. js/vendor/README.md documented all this in prose and
 # nothing checked it, so the record and the bytes were free to drift apart in silence (Task 413).

@@ -189,16 +189,22 @@ the block.
     wizard puts a form in front of the commonest action. Weigh that before building.
 
 - 75|479| **LibreWaterNet.org needs a landing page, and this account needs a hosting decision.**
-  Draft the page in `dev/` first. epanet-js has one at epanetjs.com for app.epanetjs.com; ours is the
-  same shape. Positioning is settled in `dev/positioning.md` — lead with the invitation, not the
-  comparison.
-  - **The hosting half is the part that needs Tom.** The repo lives at
-    `~/public_html/hawsedc/engcalcs`, a subfolder of constructionnotesmanager.com, so the suite is
-    publicly reachable at `constructionnotesmanager.com/hawsedc/engcalcs` with broken CSS. `~/librewaternet.org`
-    and `~/libreepanet.org` are already web roots. Options and the recommendation:
-    `dev/hosting-layout.md`.
-  - **Phone gate LIFTED 2026-08-23** — Tom's own pass: *"For today's standards, we are gold."* The
-    page says his line, *"On a phone: try it. We did."*, and nothing stronger.
+  Options, the measured facts and the recommendation: `dev/hosting-layout.md`. Positioning is settled
+  in `dev/positioning.md` — lead with the invitation, not the comparison.
+  - **DONE 2026-08-23, the whole code half.** `CANONICAL_ORIGIN` is now a host → origin whitelist
+    (`lib/config.inc.php`), so the same checkout served at librewaternet.org stops asking Google to
+    index hawsedc.com. Blocking guard: `dev/scripts/canonical_origin_check.php`. **Nothing else in
+    the suite needs changing to serve a second domain** — the 210 absolute `/engcalcs/…` paths all
+    resolve under `<newdomain>/engcalcs/`, which is why the symlink beats the refactor.
+  - **DONE 2026-08-23, the landing draft** (`dev/librewaternet-landing/index.html`): titled
+    `LibreWaterNet.org`, leading with a Start-a-model button to `Looped-Network.php`, phone gate
+    lifted on Tom's own pass.
+  - **[H] WHAT IS LEFT IS TOM'S, and it is all server work, none of it a `git pull`:** the 301 for
+    the broken `constructionnotesmanager.com/hawsedc/engcalcs` route (one `RedirectMatch` in
+    `~/public_html/.htaccess`, outside this repo); `ln -s ~/public_html/hawsedc/engcalcs
+    ~/librewaternet.org/engcalcs` after testing `Options +FollowSymLinks` on this host; and the
+    landing page's own repository at `~/librewaternet.org/index.html`. Move the local working
+    directory in that same pass and not before (`dev/hosting-layout.md` §5).
 
 - 75|485| **Give the production log archives a systematic path and naming.**
   All six production logs begin at 2026-08-14T11:57–11:58Z because Tom archived them there, with

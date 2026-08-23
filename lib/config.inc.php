@@ -71,13 +71,45 @@ if (DEBUG_MODE) {
 
 define('BASE_DIRECTORY', $basedirectory);
 
-// The one origin every canonical/hreflang/sitemap URL is built from (ROADMAP Task 149).
-// Deliberately NOT derived from $_SERVER['HTTP_HOST']: that is client-supplied, so a spoofed
-// Host header would emit a poisoned <link rel="canonical"> pointing search engines off-site.
-// The server currently answers on all four of http/https x www/non-www with no redirect, so
-// this constant is the only thing telling Google which one to index. Non-www https matches the
-// form used in 27 of the 29 hard-coded site URLs across the repo and the parent site.
-define('CANONICAL_ORIGIN', 'https://hawsedc.com');
+// The one origin every canonical/hreflang/sitemap URL is built from (ROADMAP Task 149). The server
+// answers on all four of http/https x www/non-www with no redirect, so this constant is the only
+// thing telling Google which address to index. Non-www https matches the form used in 27 of the 29
+// hard-coded site URLs across the repo and the parent site.
+//
+// A HOST -> ORIGIN WHITELIST, never a value derived from $_SERVER['HTTP_HOST'] (ROADMAP Task 479). The suite is served at
+// <host>/engcalcs/ on more than one domain -- hawsedc.com is the indexed address and never moves,
+// and librewaternet.org serves the same checkout through a symlink. A single hard-coded origin
+// would make the second domain invisible by construction: every page there would ask Google to
+// index hawsedc.com instead. But deriving the origin from HTTP_HOST reopens exactly the hole this
+// constant exists to close.
+//
+// The whitelist is the resolution, and the reason it is safe is worth stating: a spoofed Host
+// header can only ever select an origin WE ALREADY OWN AND LISTED. Anything unrecognised -- an
+// attacker's header, an IP address, a staging hostname nobody registered -- falls through to the
+// default and emits the indexed address, which is the safe answer and also the correct one. There
+// is no input that can point a canonical URL off-site.
+//
+// Match on the bare hostname: lowercased, port stripped, one leading 'www.' removed, because
+// the server answers on all four of http/https x www/non-www with no redirect and each pair must
+// land on one origin. Add a domain here and nowhere else; ec_canonical_check.php reads this array.
+$ec_canonical_origins = Array(
+    'hawsedc.com'                    => 'https://hawsedc.com',
+    'librewaternet.org'              => 'https://librewaternet.org',
+    'constructionnotesmanager.com'   => 'https://hawsedc.com',
+);
+define('CANONICAL_ORIGIN_DEFAULT', 'https://hawsedc.com');
+
+$ec_canonical_host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
+if (($ec_colon = strpos($ec_canonical_host, ':')) !== false) {
+    $ec_canonical_host = substr($ec_canonical_host, 0, $ec_colon);
+}
+if (substr($ec_canonical_host, 0, 4) === 'www.') {
+    $ec_canonical_host = substr($ec_canonical_host, 4);
+}
+define('CANONICAL_ORIGIN', isset($ec_canonical_origins[$ec_canonical_host])
+    ? $ec_canonical_origins[$ec_canonical_host]
+    : CANONICAL_ORIGIN_DEFAULT);
+unset($ec_canonical_host, $ec_colon);
 
 // Language demand log — stored in log/ at the project root, blocked from HTTP by log/.htaccess.
 // Each line: ISO-8601 UTC timestamp TAB lang-code TAB source TAB page-basename

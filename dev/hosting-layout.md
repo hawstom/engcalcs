@@ -70,16 +70,32 @@ and the URL is not worth it while one symlink does the job.
 `js/lpn-epanet.js` and `js/lpn-search.js`. The refactor got more expensive, not less,
 which strengthens the ruling above rather than weakening it.
 
-### The one thing that genuinely must change
+### The one code change — SHIPPED 2026-08-23
 
-**`CANONICAL_ORIGIN` is the hard-coded string `https://hawsedc.com`.** Serve the same
-files on librewaternet.org and every page there asks Google to index hawsedc.com
-instead — the new site would be invisible by construction. §6.1 already names the fix: a
-**host → variant whitelist**, never a value derived from `HTTP_HOST`, because that
-constant exists precisely to stop a spoofed `Host` header poisoning the canonical.
+`CANONICAL_ORIGIN` was the hard-coded string `https://hawsedc.com`, which would have made
+librewaternet.org invisible by construction: every page there asking Google to index
+hawsedc.com instead. It is now the **host → variant whitelist** §6.1 named — never a value
+derived from `HTTP_HOST`, because that constant exists precisely to stop a spoofed `Host`
+header poisoning the canonical.
 
-That is the gate. It is small, it is the only code change required, and shipping a
-second domain without it is worse than not shipping one.
+`$ec_canonical_origins` in `lib/config.inc.php` maps a bare hostname (lowercased, port
+stripped, one leading `www.` removed) to its origin. **A spoofed Host can only ever select
+an origin we already own and listed**; anything unrecognised falls through to
+`CANONICAL_ORIGIN_DEFAULT`, which is the indexed address. Verified per host:
+
+| `Host:` | `CANONICAL_ORIGIN` |
+|---|---|
+| `hawsedc.com`, `www.hawsedc.com`, absent | `https://hawsedc.com` |
+| `librewaternet.org`, `WWW.LibreWaterNet.org:443` | `https://librewaternet.org` |
+| `constructionnotesmanager.com` | `https://hawsedc.com` |
+| `evil.example.com` | `https://hawsedc.com` |
+
+`dev/scripts/canonical_origin_check.php` is blocking and keeps it a whitelist: it fails on a
+computed value, on a non-https or path-bearing origin, on a default that is not itself
+whitelisted, and on `generate_sitemap.php`'s own `$origin` drifting from that default (the
+sitemap runs outside a web request, so it carries its own copy). Mutation-tested against all
+three. **No code change is left. What remains for LibreWaterNet.org is server work only:**
+the symlink, the landing page, and testing `Options +FollowSymLinks`.
 
 ## 4. Recommendation
 
