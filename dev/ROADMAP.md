@@ -243,13 +243,6 @@ the block.
   what our labels already do, so reproducing it is not obviously worth it. Tom: *"I'm not opposed to
   implementing this, and it may be better to implement it than to discuss it."*
 
-- 50|488| **The Print table button crowds the tab strip it shares.**
-  Tom, 2026-08-23: it monopolises a column in the bottom pane's header row, and the table tabs
-  cannot wrap past it. *"This isn't great, but it's not a blocker. And I can't think of a solution."*
-  Neither can this file yet — logged so a solution is recognised if one turns up, not because one is
-  known. Candidates worth measuring before proposing: the button as an icon with no text, or moved
-  into the pane's own overflow.
-
 - 100|490| **[H] A shipped defect overstated Q by 1.587x, and nobody was told.**
   Found and fixed 2026-08-23 under Task 475. Any cross-section with a VERTICAL WALL — a lined ditch,
   a box culvert, a rectangular channel — got no wetted perimeter from that wall, because the old test
@@ -260,23 +253,6 @@ the block.
   - **The open question is Tom's and it is not technical:** anybody who used the page on a walled
     section before today has a wrong number and does not know it. Say nothing, note it on the page, or
     say it out loud? The suite has no mailing list, so "tell the users" has no mechanism.
-
-- 100|489| **Our Mapbox attribution is incomplete, and theirs is a licence term.**
-  Checked against `docs.mapbox.com/help/getting-started/attribution/` on 2026-08-23, after Tom
-  photographed epanet-js showing a Mapbox logo under its basemap switcher AND five text links at the
-  map's lower right. We show `© Mapbox`, `© OpenStreetMap` and `© Maxar` and are missing two things:
-  - **The Mapbox WORDMARK/LOGO is required, not optional** — *"Maps using Mapbox map designs, data or
-    software usually must display the Mapbox logo and text attribution."* The one exemption is for
-    maps that use neither Mapbox styles nor Mapbox data, and even that one still requires the logo.
-    Raster tiles from `api.mapbox.com/v4/mapbox.satellite` are Mapbox-supplied data, so it applies.
-  - **`Improve this map`, linked to `https://apps.mapbox.com/feedback/`**, is part of their required
-    text attribution — not the OSM courtesy link this task first recorded it as.
-  Also confirm the two links we do have point where they require: `© Mapbox` →
-  `https://www.mapbox.com/about/maps`, `© OpenStreetMap` → `https://www.openstreetmap.org/copyright`.
-  **Scope is the satellite credit set only**; the OpenStreetMap street-map set is unaffected. The
-  logo must be drawn or embedded, never fetched — a request to Mapbox before the user turns satellite
-  on is the thing `#lpn_basemap_teaser` was already built to avoid. Read against their live page
-  before implementing; this entry is a summary, and their terms are the authority.
 
 - 50|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
@@ -661,15 +637,18 @@ the block.
   selected for editing. Same guard, second trigger. See Task 192 for why long-press is the touch
   equivalent generally.
 
-- 25|435| **The Labels panel's column headings sit too far right.** Tom, 2026-08-18: still misaligned
-  after the earlier pass. A CSS fix in `.lpn-labels-*`; the columns are the decimals, priority and
-  affix spinners.
-  - **A CSS fix landed 2026-08-18 and is UNVERIFIED in a browser.** The cause was a font size, not a
-    width: Bootstrap's Reboot makes controls inherit `1rem` while `columnHeadings()` sets the heading
-    row to `0.85em`, so every heading was ~15% narrower than the control it names and the leftmost
-    flex item absorbed the whole shortfall (~38px at "Before", ~11px at "Priority"). The panel is now
-    anchored at `1rem` with the four column widths restated in `rem`. Look at both the Node and Link
-    lists, including the node ID row, which uses two spacers instead of spinners.
+- 25|435| **[H] The Labels panel's column headings sit too far right.** Tom, 2026-08-18.
+  - **The width half is now PROVED, not merely believed.** `dev/lpn-spike/label-columns-harness.js`
+    builds the real Node and Link lists through `rebuildLabelsFields()` and computes every column's
+    edge offsets from the row's right edge under the stylesheet's `!important` widths: heading row and
+    every field row agree to the pixel, node ID row with its two spacers included. Mutation-tested.
+  - **What was still wrong, and is changed:** `columnHeadings()` centred all four headings, but the
+    Before/After columns hold left-aligned text boxes, so a centred "Before" reads as sitting right of
+    its column. Affix headings are now `start` (not `left` — RTL), numeric headings stay `center`,
+    which is the alignment rule `css/engcalcs.css` already states.
+  - **NEEDS TOM'S EYES, and that is the only thing left.** Whether the panel now LOOKS right is a
+    browser pass; and if "too far right" meant something other than the centring, this is the change
+    to re-examine.
 
 - 25|468| **Demand categories on a junction — the breakdown the importer already flattens.**
   EPANET stacks (base demand, pattern, category) triples on one node and sums them; `js/lpn-inp.js`

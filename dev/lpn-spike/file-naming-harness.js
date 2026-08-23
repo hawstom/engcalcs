@@ -139,11 +139,16 @@ report(ser.indexOf('format: LPN_FILE_FORMAT') >= 0, 'serializeProject() writes t
 report(ser.indexOf('app: LPN_FILE_APP') >= 0, 'serializeProject() writes the app key');
 report(FORMAT.length > 0 && !/\s/.test(FORMAT), 'the format value is a single token', JSON.stringify(FORMAT));
 report(/^https:\/\//.test(APP), 'the app value is an https URL', APP);
-// Not `www.` — lib/config.inc.php's CANONICAL_ORIGIN has no www, and a marker pointing at a
+// Not `www.` — no origin in lib/config.inc.php's whitelist has one, and a marker pointing at a
 // hostname that redirects is a marker that will one day point at nothing.
-const origin = (fs.readFileSync(path.join(__dirname, '../../lib/config.inc.php'), 'utf8')
-	.match(/define\('CANONICAL_ORIGIN',\s*'([^']+)'\)/) || [])[1];
-report(!!origin && APP.indexOf(origin + '/') === 0, 'the app URL is under CANONICAL_ORIGIN', `${APP} vs ${origin}`);
+//
+// CANONICAL_ORIGIN became a host -> origin lookup when the suite gained a second domain (Task 479),
+// so the origin to compare against is CANONICAL_ORIGIN_DEFAULT: the marker is baked into a saved
+// FILE, which outlives the request that wrote it and has no Host header of its own. It must name the
+// indexed address, not whichever domain the author happened to be on.
+const config = fs.readFileSync(path.join(__dirname, '../../lib/config.inc.php'), 'utf8');
+const origin = (config.match(/define\('CANONICAL_ORIGIN_DEFAULT',\s*'([^']+)'\)/) || [])[1];
+report(!!origin && APP.indexOf(origin + '/') === 0, 'the app URL is under CANONICAL_ORIGIN_DEFAULT', `${APP} vs ${origin}`);
 
 console.log('\n-- the pickers: write one extension, read both --');
 {

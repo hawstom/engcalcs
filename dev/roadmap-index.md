@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**77 open tasks.** Next (100): 8 · Soon (75): 9 · Someday (50): 11 · Maybe (25): 23 · Parked (5): 26
+**75 open tasks.** Next (100): 7 · Soon (75): 9 · Someday (50): 10 · Maybe (25): 23 · Parked (5): 26
 
-## 100 — Next (8)
+## 100 — Next (7)
 
 - Task 145 — GEOGRAPHIC PROJECTS: grid or geographic, declared before anything is drawn.
 - Task 388 — Documentation is written as a transcript of revision, not current state.
@@ -17,7 +17,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 436 — A wheel notch costs a full label relayout, editor-wide.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
-- Task 489 — Our Mapbox attribution is incomplete, and theirs is a licence term.
 - Task 490 — [H] · A shipped defect overstated Q by 1.587x, and nobody was told.
 
 ## 75 — Soon (9)
@@ -32,7 +31,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 483 — EPANET import: carry unhandled features into a per-asset import notes field.
 - Task 485 — Give the production log archives a systematic path and naming.
 
-## 50 — Someday (11)
+## 50 — Someday (10)
 
 - Task 207 — The dilettante path: make replying cost one tap, not five steps.
 - Task 248.02 — Patterns: attach one to a RESERVOIR HEAD and a PUMP.
@@ -44,7 +43,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
 - Task 469 — Node labels should SHED properties before one of them is hidden.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
-- Task 488 — The Print table button crowds the tab strip it shares.
 
 ## 25 — Maybe (23)
 
@@ -68,7 +66,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 390 — Finish the unit paradigm migration: a unit is a NAME.
 - Task 416 — The tester control panel: move it, prune it, repurpose it.
 - Task 417 — Long-press on an element should enter Edit mode.
-- Task 435 — The Labels panel's column headings sit too far right.
+- Task 435 — [H] · The Labels panel's column headings sit too far right.
 - Task 468 — Demand categories on a junction — the breakdown the importer already flattens.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 
@@ -103,5 +101,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-77 of 77 titles are within 4–12 words. `!` marks the rest;
+75 of 75 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
