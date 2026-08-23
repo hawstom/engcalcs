@@ -310,10 +310,10 @@ the block.
   - The RAMP picker and the ramp catalogue are done — 41 ramps in Brewer's three families in
     `js/lpn-ramps.js`, each published at 3–7 classes, the rainbow kept last and never the default.
 
-- 50|433| **Profile: the last piece is the CHOOSER.** Tom, 2026-08-18: *"Amazing. Now we just need a
+- 50|433| **Profile: the last piece is the path CHOOSER.** Tom, 2026-08-18: *"Amazing. Now we just need a
   good UI."* Two of the three are done — the route is drawn on the map, and the panel is now the
   full-height Profile tab of Task 434's bottom pane.
-  - **The chooser should be the Google Maps gesture EPANET uses:** click the starting node, hover
+  - **The path chooser should be the Google Maps gesture epanetjs uses:** click the starting node, hover
     along the path, click to add a waypoint, double-click to end. Not two pull-downs.
   - **The animation half is already done and proved headless.** The chart follows the transport with
     no listener of its own (`showFrame` → `applySolveResult` → `refreshPaneIfOpen`);
@@ -335,29 +335,19 @@ the block.
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
 
-- 50|442| **[H] The toolbar may want to become a side menu.**
-  Phones also have a gesture we do not use. Tom, 2026-08-18: *"Phones have the swipe superpower that is not idiomatic on a PC… Maybe a
-  different phone layout convention that could translate to the PC such as transforming the toolbar
-  into some sort of a side menu. This would have the advantage of using side real estate when height
+- 75|442| **[H] The toolbar may want to become a side menu.**
+  transform the toolbar
+  into some sort of a side menu. This would have the advantage of using sidereal estate when height
   real estate is very limited."* Raised, not scoped. **Raised again 2026-08-20 with the trigger
   named:** *"Did I already suggest putting the menu and the toolbar vertically down the left edge
   when the screen is wider than tall?"* He had (2026-08-18, above). The new part is the
-  CONDITION — wider than tall — which makes it a responsive rule rather than a redesign, and
-  which is measurable rather than a matter of taste. Note the standing rule that this page is a
-  full-window drawing surface and is almost impossible on a phone, so the PHONE half of this is worth
-  little; the SIDE-MENU half is worth something on its own merits, on a laptop with 800px of height.
+  CONDITION — wider than tall — which makes it a responsive rule rather than a redesign, and which is measurable rather than a matter of taste. the SIDE-MENU half is worth something on its own merits, on a laptop with 800px of height.
 
-- 50|452| **Satellite imagery from Mapbox: BUILT, blocked on the token decision.**
+- 75|452| **Satellite imagery from Mapbox: BUILT, blocked on the token decision.**
   Tom asked for it, chose Mapbox over a keyless source, created the account and supplied a public
   `pk.` token 2026-08-19. Shipped: a second tile source beside OpenStreetMap, its own View row, its
   own required attribution (Mapbox names Mapbox and Maxar as well as OpenStreetMap), and a fallback
   to the street map when there is no token, so a fork of the suite simply has no satellite row.
-  - **GitHub push protection refuses the commit, calling it a "Mapbox Secret Access Token".** It is
-    a public token — `pk.`, read scopes only, designed to ship in client JavaScript, and readable
-    from the page source by anyone the moment it works at all. Two honest resolutions and both are
-    Tom's: he allows it once through the URL GitHub prints, or the token moves to an untracked file
-    that has to be uploaded to production by hand like `sitemap.xml` already is. **Do not evade the
-    scanner by splitting or encoding the string.**
   - `privacy.php` now has a section naming both OpenStreetMap and Mapbox. **It previously claimed
     "nothing on this site is loaded from anybody else's server", which had been false since the OSM
     basemap shipped** — the tiles were always a third-party request. `js/vendor/README.md` said the
