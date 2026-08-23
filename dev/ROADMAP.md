@@ -683,17 +683,6 @@ the block.
   - Touches the scenario write seam (`setProp`), the popup, the importer, and Task 281's exporter —
     a per-category override is the question to settle first.
 
-- 25|470| **Search for a place by name while placing a model.** Tom, 2026-08-21, on epanet-js:
-  *"It lets you search for your location (which is a nice API that we need to implement)."* Today
-  Go to… takes a latitude and longitude, which is the wrong question to ask somebody whose site is
-  "Mesa, Arizona".
-  - **THE BLOCKER IS THE POLICY, NOT THE CODE.** Geocoding means a second third-party request, and
-    the OSM tiles are currently the only one the suite makes (`dev/geographic-projects.md`). Nominatim
-    is the free option and its usage policy forbids autocomplete-as-you-type; a search on ENTER, with
-    attribution and no caching, is what it does allow. Decide the policy before writing the box.
-  - epanet-js's own version then answers *"No matching projections found here"*, as though an
-    `.inp` carried a projection — it has no placement wizard. Ours does; this is only its front door.
-
 - 25|475| **Manning Irregular emits NaN for a zero-length segment.** Two stations sharing a station
   value give `hypotenuse = 0`, so `t = 0*0/0 = NaN`. Pre-existing and already visible in the segment
   `t` cell; since Task 474 it also reaches that region's Froude number. Found 2026-08-21 by
@@ -1011,10 +1000,6 @@ the block.
   - **"Most-open angle(s)" is Task 411, not this task** — candidate *generation*, orthogonal to the
     reduction rules, and the "start in open territory" precondition the relaxation bullet assumes.
     Literature pass done 2026-08-17: `dev/most-open-angle-brainstorm.md`.
-
-- 5|410| **Animation: a time-frame slider, once Task 248 lands.**
-  Time display, play, pause, speed. Tom, 2026-08-17, naming the EPANET/HEC-RAS convention as the shape to copy. Same "constantly
-  desirable, fit in when there's time" tier as Tasks 327 and 409.
 
 # Reference
 

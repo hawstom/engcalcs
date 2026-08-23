@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**80 open tasks.** Next (100): 7 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 25 · Parked (5): 27
+**78 open tasks.** Next (100): 7 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 24 · Parked (5): 26
 
 ## 100 — Next (7)
 
@@ -46,7 +46,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 488 — The Print table button crowds the tab strip it shares.
 
-## 25 — Maybe (25)
+## 25 — Maybe (24)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -70,11 +70,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 417 — Long-press on an element should enter Edit mode.
 - Task 435 — The Labels panel's column headings sit too far right.
 - Task 468 — Demand categories on a junction — the breakdown the importer already flattens.
-- Task 470 — Search for a place by name while placing a model.
 - Task 475 — Manning Irregular emits NaN for a zero-length segment.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 
-## 5 — Parked (27)
+## 5 — Parked (26)
 
 - Task 114 — Reservoir / detention routing calculator (Modified Puls) — full scope in `dev/detention-routing-scope.md`.
 - Task 116 — Solar water pumping sizing.
@@ -101,10 +100,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 355 — Long labels and short pipes — WAIT AND TEST.
 - Task 391 — [H] · Evaluate `// @ts-check` with JSDoc branded types — a joint decision, not a proposal.
 - Task 400 — Phase 3: bounded local search on the label residue.
-- Task 410 — Animation: a time-frame slider, once Task 248 lands.
 - Task 482 — EPANET's vocabulary collides with ours, and we are keeping ours.
 
 ---
 
-80 of 80 titles are within 4–12 words. `!` marks the rest;
+78 of 78 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
