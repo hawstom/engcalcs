@@ -21,7 +21,7 @@
 # THE LOGS IT READS. All tab-separated, all beginning with an ISO-8601 UTC timestamp. See
 # lib/config.inc.php for the authoritative field lists.
 #
-#   engcalcs-lang.log         reach     ts lang source page [bucket]
+#   engcalcs-lang.log         reach     ts lang source page [served asked] [bucket]
 #   engcalcs-human-view.log   shopping  ts page lang browser_lang [bucket]
 #   engcalcs-calc-usage.log   using     ts page lang browser_lang [bucket]
 #   engcalcs-title.log        naming    ts page lang browser_lang field [bucket]
@@ -388,6 +388,46 @@ echo ""
     /^NONE/ { print "    (no confirmed non-English person has reached any calculator in this window)"; next }
     !hdr { printf "    %-8s %-26s %10s %10s %9s %-11s\n", "lang", "calculator", "shopping", "using", "%using", "95% CI"; hdr=1 }
     { printf "    %-8s %-26s %10d %10d %9s %-11s\n", $3, $4, $1, $2, rate($2,$1), ($1>0?wilson($2,$1):"") }'
+echo ""
+echo "--- What the reach log SERVED, and what it was ASKED for (both buckets) ---"
+echo "    Column 2 of engcalcs-lang.log means different things on different rows -- the served"
+echo "    language on 'get'/'cookie'/'view' rows, the raw Accept-Language tag on 'browser'/'anon'"
+echo "    ones -- so it could never answer 'what did we serve?' for the anon majority, which is"
+echo "    most of the audience. Every row now also carries BOTH facts in their own columns,"
+echo "    written as a pair before the bucket suffix. Rows written before that change carry"
+echo "    neither and are counted as UNCLASSIFIED here rather than folded in."
+echo ""
+for b in p l; do
+    if [ "$b" = "p" ]; then label="PEOPLE"; else label="PAGE LOADS"; fi
+    tot=$(n_of "$TMP/$b-lang")
+    if [ "$tot" -eq 0 ]; then
+        echo "    $label — no reach rows in this window."
+        echo ""
+        continue
+    fi
+    # NF>=6 is exactly "this row has the served/asked pair": the old format was ts lang source page
+    # [bucket], four or five fields, and the pair is written together or not at all.
+    class=$(awk -F'\t' 'NF>=6' "$TMP/$b-lang" | wc -l | tr -d ' ')
+    unclass=$((tot - class))
+    echo "    $label — reach rows: $tot   classified: $class   unclassified (older format): $unclass"
+    if [ "$class" -gt 0 ]; then
+        awk -F'\t' "$AWK_LIB"'
+            NF>=6 {
+                split($5,a,"-"); split($6,q,"-")
+                if (a[1] != "") { srv++; if (a[1] != "en") srvnon++ }
+                if (q[1] != "") { ask++; if (q[1] != "en") asknon++ }
+            }
+            END {
+                printf "      %-44s %6d  %s %s\n", "served a language other than en", srvnon+0,
+                       rate(srvnon+0, srv+0), wilson(srvnon+0, srv+0)
+                printf "      %-44s %6d  %s %s\n", "browser asked for a language other than en", asknon+0,
+                       rate(asknon+0, ask+0), wilson(asknon+0, ask+0)
+            }' "$TMP/$b-lang"
+    fi
+    echo ""
+done
+echo "    Read this beside the confirmed-human figures above: this one covers every page load,"
+echo "    crawlers included, so it is the wider and the dirtier of the two measurements."
 echo ""
 echo "--- Language demand from the reach log (both buckets, kept apart) ---"
 echo "    'get' rows are an explicit ?lang=XX choice; 'browser'/'anon' rows carry the raw"
