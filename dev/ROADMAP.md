@@ -215,20 +215,34 @@ the block.
     landing page's own repository at `~/librewaternet.org/index.html`. Move the local working
     directory in that same pass and not before (`dev/hosting-layout.md` §5).
 
-- 75|478| **[H] Tab should walk down the input column, not sideways.**
+- 100|478| **[H] BUILT AND WAITING ON ONE RULING: Tab walks the input column.**
   Tom, 2026-08-22: *"One entire column at a time... it is less bad to force a user tabber person into
-  'do an entire column at once' than 'do an entire row at once'"* — a user is focused on one to three
-  variables, and sending them through a whole row defeats tabbing. Row-tables `mi`, `wi`, `ip` and
-  `bpn` are where the win is largest.
-  - **DOM ORDER, NOT `tabindex`, is the tool that delivers exactly that.** Lay the two inner tables
-    built by `echoCalculatorForm()` out as a CSS grid whose DOM is column-major — all inputs, then
-    all units, then all X's — so Tab walks the entire input column and nothing loses keyboard access.
-  - **Rejected: `tabindex="-1"` on everything but titles and inputs.** It removes a control from the
-    keyboard entirely, so a keyboard-only user could not switch ft to m (WCAG 2.1.1 requires all
-    functionality to be keyboard-operable), and the per-row X would become mouse-only.
-  - The prize is `dev/scripts/focus_order_check.php`'s advisory `x-cross` column (a number input
-    sitting after a unit select): Manning-Trap 16, Irrigation-Pressure 12, Orifice-Drain-Time 9,
-    Branched-Network 8, Darcy-Weisbach 8, Manning-Pipe-Flow 4. It flips to blocking when this lands.
+  'do an entire column at once' than 'do an entire row at once'"*. Built 2026-08-23 as DOM order, not
+  `tabindex` (which would take a unit select off the keyboard entirely — WCAG 2.1.1). **It is on the
+  local branch `task-478-fieldgrid`, deliberately unmerged.** `echoInputGrid()` emits column-major
+  cells placed by `grid-row`.
+  - **x-cross is 0 on all 15 grid pages** (was 16 on Manning-Trap, 12 on Irrigation-Pressure, 9, 8,
+    8, 7, 7, 7, 6, 5, 5, 4, 1). `focus_order_check.php` now BLOCKS, gated on a property of the page
+    — renders `.ec-fieldgrid` ⇒ x-cross must be 0 — never a hand list. `Looped-Network.php` is not an
+    `echoCalculatorForm()` page and stays advisory.
+  - **Layout is pixel-identical in English at 1400px on all 16 pages**, at every width from 1500px
+    up, and in all five RTL languages. Verified by `dev/browser-pass/fieldgrid-layout.js`, which
+    serves the repo twice and compares every control's box; re-run independently before this note.
+  - **THE ONE RULING NEEDED, and it is structural, not a bug.** A `<td>` wraps its contents; two grid
+    columns cannot. Where the window is too narrow, a wide unit select used to drop onto a second
+    line under its input and now stays on the line, the label column absorbing the squeeze — one row
+    shorter, form width unchanged, no new horizontal scrolling. English: Manning-Trap below ~1400px,
+    Rock-Chute below ~1200px. At 1400px in other languages: Manning-Trap in 14, Rock-Chute in 13,
+    Irrigation-Pressure in 4. Gone by 1920px. Wrapping needs the input and the select in one box, and
+    tab order follows that box — there is no third option.
+  - **Accepted cost, written down not quiet:** WCAG 1.3.2. Visual order and DOM order now differ, so
+    a screen reader browsing LINEARLY hears inputs, then labels, then selects, and each label twice;
+    a reader TABBING gets what Tom asked for. The old markup was a layout table (no `<th>`, no
+    caption), so no row/column relationship is lost.
+  - Needs a browser pass before merge: the X button hides all four cells of a line; the conditional
+    lines on Orifice, Orifice-Drain-Time and Branched-Network appear and disappear whole; "Printable
+    version" then toggling the orifice shape keeps the X's gone; the collapse animation.
+
 
 - 75|483| **EPANET import: carry unhandled features into a per-asset import notes field.**
   Tom, 2026-08-22. Today an import reports its differences and then the information is discarded; a
