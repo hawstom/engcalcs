@@ -1741,3 +1741,83 @@ html:has(#lpn_canvas) { overflow: hidden; }
 
 /* Print preparation: the Printable version button. */
 .engcalcs-print-tools > p { margin-bottom: 0.2em; }
+
+/* ==== THE SMALL-SCREEN PRESENTATION PASS FOR THE MAP EDITOR (ROADMAP Task 486) ===============
+
+   Tom, 2026-08-22, naming four concessions "for both crawlers and humans if they are on a
+   mobile/small screen": hide page titles, hide or at least collapse the HawsEDC navbar, hide all
+   the toolbar buttons except for the transport, and drop the menu bar to icons. His frame decides
+   every judgement call below: *"the truth is that this is a PC app... For PC of course, but go
+   ahead and try it on your phone."* So this is a DEFENSIBLE PHONE, not a phone-first redesign --
+   the desktop layout above the breakpoint is untouched, byte for byte, and nothing here changes
+   what any control does.
+
+   THE BREAKPOINT IS 640px, AND IT IS THE ONE THIS PAGE ALREADY HAD. The project tab strip drops to
+   the current tab alone at exactly this width, for exactly this reason ("A map page has no
+   horizontal room to spare on a phone"). A second threshold would make the page reorganise itself
+   twice on the way down, which is worse than either threshold being slightly wrong. It is a
+   VIEWPORT, not a user agent: a phone is the case Tom named, but a narrow window on a laptop gets
+   the same relief and no UA string has to be guessed at.
+
+   SCOPED BY WHAT ONLY THIS PAGE HAS, the same way Task 432 scopes the no-scrollbar rule: <body>
+   carries no page class, and the other fifteen calculators are a form and an answer whose titles
+   and navbar must stay exactly as they are. A browser without `:has()` drops the rule and gets
+   today's layout, which is the safe direction.
+
+   WHAT IS DELIBERATELY NOT HIDDEN AT ANY WIDTH: #lpn_basemap_credit (tile attribution is a licence
+   condition, not chrome) and every consent surface, which lives in the footer and is never
+   selected here. */
+@media (max-width: 640px) {
+
+	/* 1. THE PAGE TITLES. The h1, the welcome line and the page description -- the same three ids
+	   the "Show page titles" preference already takes away (Task 289), so a phone simply gets that
+	   preference's answer without having to find the switch. Above the breakpoint the preference
+	   still governs and this rule is not in play. */
+	html:has(#lpn_canvas) #ec-page-title,
+	html:has(#lpn_canvas) #ec-page-welcome,
+	html:has(#lpn_canvas) #ec-page-desc { display: none; }
+
+	/* 2. THE NAVBAR IS COLLAPSED, NOT HIDDEN, and Tom's own wording allows either ("hide or at
+	   least collapse"). Bootstrap has already folded it to one row here -- brand, Libre mark,
+	   hamburger -- and what is behind that hamburger is the only route on the page to the other
+	   fifteen calculators AND to the language picker, which on a 27-language suite is not a thing
+	   to take away from the one device where a reader is most likely to be in their own country.
+	   So the height goes and the routes stay: the bar's own vertical padding to nothing, the brand
+	   to body size, and the "Libre Software" wordmark away (it already goes at 400px suite-wide --
+	   this brings that forward on this page only, where the row is competing with a drawing
+	   surface). Measured against Bootstrap's defaults this is most of the bar's height. */
+	html:has(#lpn_canvas) .navbar { padding-top: 0; padding-bottom: 0; }
+	html:has(#lpn_canvas) .navbar-brand { font-size: 1rem; padding-top: 0.1rem; padding-bottom: 0.1rem; }
+	html:has(#lpn_canvas) .ec-nav-libre { display: none; }
+
+	/* 3. THE TOOLBAR KEEPS THE TRANSPORT AND NOTHING ELSE. `.lpn-transport-btn` is the class
+	   js/lpn-time.js puts on the three player controls and only on them, so this is the same line
+	   the toolbar's own styling already draws between a player and an icon -- not a second, parallel
+	   list of buttons that could drift from it.
+
+	   EVERY BUTTON THIS HIDES HAS A MENU: Open/Save/Save as in File, the seven Insert tools and
+	   Select/Undo/Find/Libraries/Delete in Insert and Edit, Zoom to fit in View, and
+	   Settings/Profile/Tables/Run in Project. Select had none until Task 486 added the Edit row --
+	   see openEditMenu(). The one control with no exact menu twin is the bottom-pane TOGGLE, and
+	   the pane is still opened by Project > Tables or Project > Profile and closed by its own X.
+
+	   THE TWO <select>s STAY. They are not buttons, and the step selector is the only control on
+	   the page that says which moment is showing -- a transport you cannot read is not a transport.
+	   Run is a button and is not a player control (js/lpn-time.js is explicit about that), so it
+	   goes; on a project with auto-run on, which is the default, it is already hidden anyway.
+
+	   The run group then has to give up the divider and the gap it wears as a MIDDLE group, or the
+	   strip would open with a rule and 12px of air in front of its first control. */
+	html:has(#lpn_canvas) #lpn_toolbar > .lpn-toolbar-group:not(#lpn_toolbar_run) { display: none; }
+	html:has(#lpn_canvas) #lpn_toolbar_run button:not(.lpn-transport-btn) { display: none; }
+	html:has(#lpn_canvas) #lpn_toolbar_run { border-left: 0; padding-left: 0; margin-right: 0; }
+
+	/* 4. THE MENU BAR DROPS TO ICONS. The word is a <span class="lpn-menubar-word"> that
+	   buildMenuBar() builds for this rule to reach; the accessible name is on the button as an
+	   aria-label at every width, so what goes is the ink and not the name. Six icons instead of six
+	   words is the difference between a menu bar that fits a phone and one that wraps to two lines
+	   above a map. */
+	html:has(#lpn_canvas) .lpn-menubar-word { display: none; }
+	/* An icon alone in a box padded for a word reads as a gap with a drawing in it. */
+	html:has(#lpn_canvas) .lpn-menubar-item { padding: 3px 6px; }
+}

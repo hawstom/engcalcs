@@ -176,6 +176,16 @@ function mkEl(tag) {
       this._text = v === undefined || v === null ? '' : String(v);
     }
   });
+  // **className IS THE SAME STORE AS classList AND THE `class` ATTRIBUTE** (Task 486), for the
+  // reason the classList comment above already gives: they were two independent fields here, so an
+  // element the page had classed with `el.className = 'x'` answered an empty `class` attribute --
+  // and a harness asking "would this stylesheet rule fire on this element" got the wrong answer for
+  // every control built that way, which is most of the toolbar and the whole menu bar.
+  Object.defineProperty(el, 'className', {
+    get() { return String(this['class'] || ''); },
+    set(v) { this['class'] = v === undefined || v === null ? '' : String(v); },
+    enumerable: true, configurable: true
+  });
   // Each element gets its OWN classList view, bound to that element's attribute -- the object
   // literal above is shared by construction otherwise, and one shared class set across every
   // element is a worse fiction than the one this replaced.
@@ -396,7 +406,6 @@ global.EngCalcs = {
       ? unitFactors[name] : 1;
   },
   iconEl: () => mkEl('g'),
-  setLabel: (el, iconName, text) => { el.textContent = text; },
   // The REAL EngCalcs.setUnits (js/Calculators.lib.js) moves every unit select to a preset and then
   // calls submitForm(), which re-enters EngCalcs.pageCalculator. Both halves matter and this stub
   // does both: without it `if (EngCalcs.setUnits)` was simply false here, so every code path that
@@ -407,6 +416,36 @@ global.EngCalcs = {
   }
 };
 global.bootstrap = global.window.bootstrap = { Tooltip: { getInstance: () => null, getOrCreateInstance: () => ({ hide() {}, dispose() {} }) } };
+
+// ---- the two label builders, READ OUT OF js/Calculators.lib.js ------------------------------
+// **NOT RESTATED, for the reason bootstrap.js gives about EngCalcs.G** -- a second copy drifts
+// silently. setLabel() was a one-line fake here (`el.textContent = text`) and setIconLabel() was
+// missing altogether, which is the stub failure dev/testing-notes.md names: the fake held the
+// element STRUCTURE constant. In the browser a labelled control is an <svg> plus a text node, and
+// an icon-only one is an <svg> plus an aria-label, a title and .ec-help -- so any harness asking
+// what a control is actually made of, or whether it has an accessible name, was asking a stub that
+// had thrown all of that away. Task 486 needs exactly that question answered.
+//
+// The whole file cannot be require()d (it touches the DOM at load), so the two assignments are
+// sliced out by brace matching and evaluated on their own. `this` is the EngCalcs they are called
+// through, exactly as in the browser.
+{
+  const libSrc = fs.readFileSync(ROOT + 'js/Calculators.lib.js', 'utf8');
+  ['setLabel', 'setIconLabel'].forEach((name) => {
+    const at = libSrc.indexOf('EngCalcs.' + name + ' = function');
+    if (at < 0) {
+      throw new Error('lpn-dom-stub.js: could not find "EngCalcs.' + name + ' = function" in ' +
+        'js/Calculators.lib.js. If it moved or was renamed, point this reader at its new home -- ' +
+        'do NOT re-implement it here.');
+    }
+    let i = libSrc.indexOf('{', at), depth = 0, end = i;
+    for (; end < libSrc.length; end++) {
+      if (libSrc[end] === '{') { depth++; }
+      else if (libSrc[end] === '}') { depth--; if (depth === 0) { end++; break; } }
+    }
+    global.EngCalcs[name] = (0, eval)('(' + libSrc.slice(libSrc.indexOf('function', at), end) + ')');
+  });
+}
 
 // ---- pageConfig, read from the real lang file ---------------------------
 // Not stubbed: the example's annotations ARE lang strings, so a harness with an empty pageConfig
