@@ -1628,29 +1628,51 @@ html[lang="zh"] .ec-welcome {
 
    **THE PICTURE IS DRAWN HERE AND FETCHES NOTHING.** A real tile behind it would be a third-party
    request made before the user asked for one, which is the thing the whole basemap is opt-in to
-   avoid. Two overlapping repeating gradients over a ground colour read as an aerial photograph at
-   40 px the way a thumbnail does -- fields and a road, not a picture of anywhere.
+   avoid. So is a hosted image of the earth: the drawing below is an inline SVG in this stylesheet,
+   and nothing about it leaves the page.
+
+   IT IS THE WORLD (Tom, 2026-08-23: *"For the tile/button, we should use something that looks like
+   the world. Google uses an actual thumbnail of a tile nearby or something like that... we could use
+   something like [Blue Marble]"*). What it replaced was two crossed gradients meant to read as
+   fields and a road, and at 40px they read as a texture rather than as anywhere. A coastline cannot
+   be faithful at 40px and would turn to mud; what carries is four masses in the right PLACES --
+   North America upper left, South America below it, Eurasia across the top with Africa hanging from
+   its middle, Australia lower right. Checked at 20 and 40px with
+   `dev/scripts/icon_ascii_preview.php --geom=`, which is the only rasterizer this project has, and
+   then looked at. The rounded corners and the 1px border are the other half of what epanet-js's own
+   switcher does well: at 40px they are what separates a tile from the map behind it.
 
    THE PRESSED STATE IS THE OTHER SOURCE. When satellite images are already showing, the tile shows
-   the pale grey-green of a street map, because a toggle's picture is what you get by pressing it.
-   `aria-pressed` carries the same fact for a reader who gets no picture at all. */
+   a pale street map, because a toggle's picture is what you get by pressing it --
+   Google's own behaviour, and the one Tom is citing. `aria-pressed` carries the same fact for a
+   reader who gets no picture at all. Neither picture asks the page theme anything: an ocean this
+   dark and a land this green are both legible against a light page and a dark one, and the button
+   paints its own ground either way. */
 .lpn-basemap-teaser {
 	pointer-events: auto;
 	width: 40px; height: 40px; flex: 0 0 auto;
 	padding: 0; cursor: pointer;
-	border: 1px solid #666; border-radius: 2px;
+	border: 1px solid #666; border-radius: 4px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
-	background-color: #4a6b3a;
-	background-image:
-		repeating-linear-gradient(60deg, rgba(0, 0, 0, .22) 0 4px, rgba(255, 255, 255, .10) 4px 9px),
-		repeating-linear-gradient(150deg, rgba(0, 0, 0, .18) 0 6px, rgba(120, 100, 60, .30) 6px 13px);
+	background-color: #10304f;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%2310304f'/%3E%3Cg fill='%233d8b3d'%3E%3Cpath d='M1.8 3 L9.6 2.6 L8.8 5.8 L7.2 6.6 L6.4 9.2 L5 8.4 L3.4 6 L1.8 4.4 Z'/%3E%3Cpath d='M7 10 L10.6 9.4 L10.2 12.8 L8.8 15.6 L8 19 L7 15 L6.4 11.8 Z'/%3E%3Cpath d='M10.6 3.2 L22.6 2.6 L22.8 7.4 L18 8.8 L16.2 8.4 L16 10.6 L15 14 L13.6 16.8 L12.4 13 L12.2 9.2 L10.2 6.2 Z'/%3E%3Cpath d='M18.6 14.2 L22.6 13.6 L22.8 17.4 L19.4 18 Z'/%3E%3C/g%3E%3C/svg%3E");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
 }
 .lpn-basemap-teaser:hover, .lpn-basemap-teaser:focus { border-color: #0b57d0; }
+/* THE CORNER PEEL, and it is the one part of epanet-js's own switcher worth taking (Tom,
+   2026-08-23, pasting two screenshots of it: *"It's acceptable now. But see what I see at
+   epanetjs"*). A tile that shows only the destination says what you get and not what you leave;
+   the peeled corner says both at once, and at 40px the wedge is an 18px triangle -- measured, not
+   guessed. It goes on the STREET-MAP picture, which is the one showing while satellite is on, so
+   the imagery is what shows through the peel.
+
+   WHAT WAS DELIBERATELY NOT TAKEN: their tile carries the mapbox wordmark baked into its bottom-
+   left corner. Naming a control after its provider is promotion, and the attribution it discharges
+   for them is already discharged here by #lpn_basemap_credit, which appears whenever a tile does. */
 .lpn-basemap-teaser.lpn-basemap-teaser-on {
 	background-color: #eae7e0;
-	background-image:
-		repeating-linear-gradient(0deg, rgba(0, 0, 0, .30) 0 1px, rgba(0, 0, 0, 0) 1px 11px),
-		repeating-linear-gradient(90deg, rgba(0, 0, 0, .30) 0 1px, rgba(0, 0, 0, 0) 1px 14px);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23eae7e0'/%3E%3Cg stroke='%23c3bdb1' stroke-width='0.9' fill='none'%3E%3Cpath d='M0 6.5 L24 6.5'/%3E%3Cpath d='M0 13.5 L24 13.5'/%3E%3Cpath d='M0 19.5 L24 19.5'/%3E%3Cpath d='M5.5 0 L5.5 24'/%3E%3Cpath d='M12 0 L12 24'/%3E%3Cpath d='M18.5 0 L18.5 24'/%3E%3C/g%3E%3Cpath stroke='%23c3bdb1' stroke-width='1.4' fill='none' d='M0 10 L24 10.6'/%3E%3Cpath fill='%2310304f' d='M24 0 L24 11 L13 0 Z'/%3E%3Cpath fill='%232e7d32' d='M24 4 L24 9 L19 4 Z'/%3E%3Cpath stroke='%23fff' stroke-width='0.8' fill='none' d='M13 0 L24 11'/%3E%3C/svg%3E");
 }
 
 /* ==== The Labels panel's column headings (ROADMAP Task 435) ==================================
