@@ -1135,11 +1135,20 @@ html[lang="zh"] .ec-welcome {
    in it. The padding moves into the sticky heading itself below, so the table still opens with air
    above it and there is no band left for anything to show in. */
 .lpn-pane-panel.lpn-pane-scroll { padding-top: 0; }
-/* The tabular editors. Column width is king: headings stay narrow, cells stay tight, and the
-   number columns are right-aligned so a column of figures reads as one. The heading row STICKS,
-   because a table you scroll is a table whose headings you lose. */
+/* The tabular editors. Column width is king: headings stay narrow and cells stay tight. The
+   heading row STICKS, because a table you scroll is a table whose headings you lose. */
 .lpn-pane-table { border-collapse: collapse; font-size: .9em; }
-.lpn-pane-table th, .lpn-pane-table td { padding: 1px 6px 1px 0; text-align: left; border: 0; }
+/* **THE FIRST COLUMN IS LEFT AND EVERY OTHER COLUMN IS CENTRED, HEADING AND CELL ALIKE** (Tom,
+   2026-08-23: "Right is great justification for numbers. But in tables, center is safest for
+   everything but the first column... Make the headings center and we will be back to where we
+   started, focusing on the inputs as we should"). Right-aligning the figures was tried and
+   overruled: it is right for a column of numerals in isolation and wrong here, where what the
+   reader is looking at is the boxes they type in.
+   THE CLASS COMES FROM THE COLUMN'S POSITION, not from what it holds, so a table that gains a
+   column cannot acquire a second left one. The printed sheet keeps the old names-left,
+   figures-right split -- restated in @media print below. */
+.lpn-pane-table th, .lpn-pane-table td { padding: 1px 6px 1px 0; text-align: center; border: 0; }
+.lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: left; }
 /* z-index, because a sticky cell only outranks the rows by paint order and one positioned thing in
    a row would beat it; padding-top, because the panel's own is gone; and the rule under the
    headings is an INSET SHADOW rather than a border -- under `border-collapse: collapse` the border
@@ -1148,13 +1157,25 @@ html[lang="zh"] .ec-welcome {
 	position: sticky; top: 0; z-index: 2; background: #fff;
 	padding-top: 6px; box-shadow: inset 0 -1px 0 #ccc;
 }
-/* **A COLUMN HAS ONE ALIGNMENT, HEADING INCLUDED.** Every browser's own stylesheet centres a
-   <button>, so the sort heading centred its wrapped lines over cells that were left or right --
-   which is what Tom saw. `inherit` hands the heading back to its own <th>. */
-.lpn-pane-table th.lpn-pane-num, .lpn-pane-table td.lpn-pane-num {
-	text-align: right; font-variant-numeric: tabular-nums;
-}
-.lpn-pane-table input { width: 7em; }
+/* **A CONTROL DOES NOT INHERIT ITS CELL'S ALIGNMENT; IT HAS TO BE TOLD.** Every browser's own
+   stylesheet aligns a form control's text for itself -- `start` on an <input>, centre on a
+   <button> -- so a <td> that declares an alignment aligns the BOX and not the number inside the
+   control standing in it. That is the whole of what Tom saw when the headings moved and the input
+   cells did not: one class on both, one of them overruled from inside. `inherit` on every control
+   in these tables hands the alignment back to the cell that owns it.
+   .lpn-pane-num no longer carries an alignment of its own: on screen the position decides, and
+   what "this column is figures" is still worth here is tabular figures. */
+.lpn-pane-table th.lpn-pane-num, .lpn-pane-table td.lpn-pane-num { font-variant-numeric: tabular-nums; }
+/* **THE BOX WIDTH BELONGS TO THE COLUMN, AND THE COLUMN DECLARES IT** (Tom, 2026-08-23, as
+   multiples of the 7em every box used to be: Minor loss 0.2, Roughness 0.3, Length 0.6, Diameter
+   0.3, and 0.5 for the tank, reservoir and junction figures). The number lives on the column
+   descriptor in js/looped-network.js and arrives here as `--lpn-pane-col-w`; a column that names
+   none keeps the 7em. A hand-kept CSS list keyed by column class was the alternative, and it goes
+   silently wrong the day a column key is renamed or a table gains one.
+   IT IS A CUSTOM PROPERTY AND NOT AN INLINE WIDTH, because an inline `style="width"` beats every
+   stylesheet there is -- including the 360px widths below, which Tom has already approved and
+   which this must not move. */
+.lpn-pane-table input { width: var(--lpn-pane-col-w, 7em); text-align: inherit; }
 /* A heading that sorts and an ID that goes to the map are both flat text buttons: they are the
    cell, not a control sitting in it. */
 .lpn-pane-sort, .lpn-pane-goto {
@@ -1197,10 +1218,17 @@ html[lang="zh"] .ec-welcome {
 	   four-column table across the sheet and put inches of white between a label and its
 	   number. .lpn-pane-table carries no width at all on screen; the print copy now matches. */
 	.lpn-print-table { border-collapse: collapse; font-size: 9pt; }
-	.lpn-print-table td.lpn-pane-num { text-align: right; font-variant-numeric: tabular-nums; }
+	/* **THE SHEET KEEPS THE OLD SPLIT: names left, figures right.** The screen went to centred
+	   columns because the reader is aiming at the boxes they type in; nobody types on paper, and a
+	   printed column of figures reads as one only when it is right-aligned. Restated rather than
+	   inherited, because the screen rules above are the same selectors at the same specificity --
+	   these win by coming later, and the first column is left in both places either way. */
+	.lpn-print-table th, .lpn-print-table td { padding: 1pt 6pt 1pt 0; text-align: left; }
+	.lpn-print-table th.lpn-pane-num, .lpn-print-table td.lpn-pane-num {
+		text-align: right; font-variant-numeric: tabular-nums;
+	}
 	.lpn-print-table thead { display: table-header-group; }
 	.lpn-print-table thead th { position: static; border-bottom: 1pt solid #000; box-shadow: none; padding-top: 1pt; }
-	.lpn-print-table th, .lpn-print-table td { padding: 1pt 6pt 1pt 0; }
 	.lpn-print-table tr { page-break-inside: avoid; }
 }
 

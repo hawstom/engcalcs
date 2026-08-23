@@ -787,8 +787,13 @@ console.log('\n--- a box on a short screen, and the pane tables (Tom\'s items 5 
 	const cell = node('input', '', [], node('td', '', [], node('tr', '', [], tbl)));
 	ok('a pane table number box is 3.5em on a small screen -- half of what it was',
 		winning(RULES, cell, SMALL, DOC_IDS, false, 'width') === '3.5em');
-	ok('...and 7em on the desktop, which did not move',
-		winning(RULES, cell, WIDE, DOC_IDS, false, 'width') === '7em');
+	// On the desktop the width now comes from the COLUMN, which declares it as a custom property
+	// (Tom, 2026-08-23, gave a factor per column) -- and the 7em every box used to be survives as
+	// the fallback for a column that names none. What matters here is only that the phone box is
+	// still 3.5em: this rule is later and more specific, so no desktop column can reach it.
+	ok('...and the desktop takes its column’s width, falling back to the 7em it always was',
+		winning(RULES, cell, WIDE, DOC_IDS, false, 'width') === 'var(--lpn-pane-col-w, 7em)',
+		'got ' + winning(RULES, cell, WIDE, DOC_IDS, false, 'width'));
 }
 
 // The reader's blind-spot report, scoped to selectors that could possibly reach what this file

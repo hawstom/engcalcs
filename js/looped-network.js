@@ -7898,7 +7898,7 @@ var EngCalcs = EngCalcs || {};
 		return { key: 'id', label: 'lpn_field_id', get: function (el) { return el.id; } };
 	}
 	function paneColElev() {
-		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead,
+		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead, em: 3.5,
 			get: function (n) { return n.elev; },
 			set: function (n, v) { n.elev = v; updateNode(n.id); } };
 	}
@@ -7911,8 +7911,10 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'to', label: 'lpn_field_to', get: function (l) { return l.to; } }
 		];
 	}
+	// 2.8em rather than the 2.1 Tom named for it: the same box serves Pipes and Valves, and in the
+	// SI preset a diameter is millimetres, so "1200" is four characters and 2.1em shows three.
 	function paneColDiameter() {
-		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; },
+		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; }, em: 2.8,
 			prop: 'diameter', get: function (l) { return effective(l, 'diameter'); },
 			set: function (l, v) { setProp(l, 'diameter', v); } };
 	}
@@ -7953,7 +7955,7 @@ var EngCalcs = EngCalcs || {};
 				group: 'node', type: 'junction',
 				cols: [
 					paneColId(), paneColElev(),
-					{ key: 'demand', label: 'bpn_demand', unit: function () { return 'lpn_u_flow'; },
+					{ key: 'demand', label: 'bpn_demand', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
 						prop: 'demand', get: function (n) { return effective(n, 'demand'); },
 						set: function (n, v) { setProp(n, 'demand', v); } },
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
@@ -7968,7 +7970,7 @@ var EngCalcs = EngCalcs || {};
 					// BLANK MEANS "follow the elevation", exactly as in the popup, where the
 					// elevation is this field's placeholder. So an empty cell here is a reservoir
 					// whose water surface is its ground, not a reservoir with no head.
-					{ key: 'head', label: 'lpn_field_head', unit: paneUnitElevHead,
+					{ key: 'head', label: 'lpn_field_head', unit: paneUnitElevHead, em: 3.5,
 						prop: 'head', get: function (n) { return effective(n, 'head'); },
 						set: function (n, v) { setProp(n, 'head', v); updateNode(n.id); } },
 					// The head ABOVE the ground, which is what a reservoir is worth. Blank where the
@@ -7982,19 +7984,19 @@ var EngCalcs = EngCalcs || {};
 				group: 'node', type: 'tank',
 				cols: [
 					paneColId(), paneColElev(),
-					{ key: 'level', label: 'lpn_field_tank_level', unit: paneUnitElevHead,
+					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
-					{ key: 'minLevel', label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead,
+					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead,
 						get: function (n) { return n.minLevel; },
 						set: function (n, v) { n.minLevel = v; updateNode(n.id); } },
-					{ key: 'maxLevel', label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead,
+					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead,
 						get: function (n) { return n.maxLevel; },
 						set: function (n, v) { n.maxLevel = v; updateNode(n.id); } },
 					// The Elevation/Head unit, not the pipe-diameter unit: a tank diameter is a
 					// distance across the ground, and inches would put a 15 m tank on screen as
 					// 15000. The popup says the same thing in its tip.
-					{ key: 'tankDiameter', label: 'lpn_field_tank_diameter', unit: paneUnitElevHead,
+					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitElevHead,
 						get: function (n) { return n.tankDiameter; },
 						set: function (n, v) { n.tankDiameter = v; updateNode(n.id); } },
 					// The WATER SURFACE, derived and read-only: it is the number the solve uses, so
@@ -8010,16 +8012,21 @@ var EngCalcs = EngCalcs || {};
 					paneColDiameter(),
 					// TYPING A LENGTH TURNS AUTO OFF, which is exactly what the popup's own box does
 					// -- and lenAuto is Base-owned geometry, so it is only cleared in Base.
-					{ key: 'length', label: 'lpn_field_length', unit: function () { return 'lpn_u_length'; },
+					{ key: 'length', label: 'lpn_field_length', unit: function () { return 'lpn_u_length'; }, em: 4.2,
 						prop: 'length', get: function (l) { return effective(l, 'length'); },
 						set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
 					// Label, symbol and unit all follow settings.method (Task 271), through the same
 					// function the popup and the Labels legend use.
-					{ key: 'roughness', label: roughnessLabel,
+					{ key: 'roughness', label: roughnessLabel, em: 2.1,
 						unit: function () { return frictionMethod() === 'dw' ? 'lpn_u_roughness' : ''; },
 						prop: 'roughness', get: function (l) { return effective(l, 'roughness'); },
 						set: function (l, v) { setProp(l, 'roughness', v); } },
-					{ key: 'km', label: 'lpn_field_km_short', prop: 'k',
+					// 2.1em, not the 1.4 that 0.2 works out to. Tom set the acceptance test himself
+					// (2026-08-23: "'2.5' needs to work okay"): three characters, and 1.4em shows
+					// one. 2.07em is the least that shows three and 2.1em is the width Roughness
+					// beside it already uses. The vertical argument does not decide it either way --
+					// no desktop column carries a width, so a smaller box never wraps a heading.
+					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 2.1,
 						get: function (l) { return effective(l, 'k') || 0; },
 						set: function (l, v) { setProp(l, 'k', v); } },
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
@@ -8139,18 +8146,30 @@ var EngCalcs = EngCalcs || {};
 		return paneNumText(v);
 	}
 	// **A HEADING AND ITS CELLS ARE ONE COLUMN, SO THEY CARRY THE SAME CLASSES** (Tom, 2026-08-23:
-	// "the inputs and the headings are not middle/center justified with each other. Inputs are left
-	// and headings are center"). A <button> is centred by every browser's own stylesheet, and a
-	// heading long enough to wrap -- which on a phone is most of them -- then centres its lines over
-	// a column of left-or-right-aligned cells. One predicate, `c.result || c.set`, decides the
-	// alignment of the whole column here, and it is the same predicate the printed sheet has always
-	// used: a number is a number whether it was typed or computed, and figures read as one column
-	// only when they are right-aligned. An ID, a node name and a valve type stay left.
+	// "the inputs and the headings are not middle/center justified with each other"). Three classes,
+	// each answering a different question, and the screen and the printed sheet read them
+	// differently:
 	//
-	// The per-key class is what lets a stylesheet reach ONE column -- the Pipes table is wider than a
-	// phone and its Roughness and Minor loss columns are narrowed below the breakpoint.
-	function paneCellClass(c) {
-		return 'lpn-pane-col-' + c.key + ((c.result || c.set) ? ' lpn-pane-num' : '');
+	//   lpn-pane-first  WHERE the column is. The leftmost one is left-aligned and every other column
+	//                   is centred -- Tom's rule for these tables, chosen over right-aligning the
+	//                   figures: "in tables, center is safest for everything but the first column".
+	//                   Position, not content, so a table that gains a column cannot end up with two.
+	//   lpn-pane-num    WHAT the column holds. It no longer carries the screen alignment; it carries
+	//                   tabular figures, and it is still what the PRINTED sheet aligns right.
+	//   lpn-pane-col-x  WHICH column it is, so a stylesheet can reach exactly one -- the Pipes table
+	//                   is wider than a phone and two of its columns are narrowed below the
+	//                   breakpoint.
+	function paneCellClass(c, i) {
+		return 'lpn-pane-col-' + c.key + (i === 0 ? ' lpn-pane-first' : '') +
+			((c.result || c.set) ? ' lpn-pane-num' : '');
+	}
+	// **THE COLUMN OWNS ITS BOX WIDTH, AND SAYS SO IN em** (Tom, 2026-08-23, per column, as
+	// multiples of the 7em every box used to be). It travels as a CUSTOM PROPERTY rather than an
+	// inline `style.width` on purpose: an inline width beats every stylesheet, and the phone widths
+	// in css/engcalcs.css -- which Tom has approved and this must not move -- are a stylesheet.
+	// A column that declares no `em` says nothing at all, and CSS's own fallback is the old 7em.
+	function paneApplyColWidth(input, c) {
+		if (c.em) { input.style.setProperty('--lpn-pane-col-w', c.em + 'em'); }
 	}
 	function paneHeadingText(c) {
 		var pc = EngCalcs.pageConfig || {},
@@ -8187,9 +8206,9 @@ var EngCalcs = EngCalcs || {};
 		table.className = 'lpn-pane-table';
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
-		spec.cols.forEach(function (c) {
+		spec.cols.forEach(function (c, i) {
 			var th = document.createElement('th'), b = document.createElement('button');
-			th.className = paneCellClass(c);
+			th.className = paneCellClass(c, i);
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
 			// The arrow is on the sorted column only, and it is the whole of the sort UI: a heading
@@ -8226,9 +8245,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	function paneTableRow(spec, el) {
 		var tr = document.createElement('tr'), cells = {};
-		spec.cols.forEach(function (c) {
+		spec.cols.forEach(function (c, i) {
 			var td = document.createElement('td'), btn, input;
-			td.className = paneCellClass(c);
+			td.className = paneCellClass(c, i);
 			if (c.key === 'id') {
 				// The ID is a way BACK TO THE MAP, not a text box: it selects the part and pans to
 				// it, the same gesture a Find result row is. Renaming stays in the property popup,
@@ -8248,6 +8267,7 @@ var EngCalcs = EngCalcs || {};
 			} else {
 				input = document.createElement('input');
 				input.type = 'number';
+				paneApplyColWidth(input, c);
 				input.value = paneCellText(c, el);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
 				input.addEventListener('change', function () {
@@ -8331,9 +8351,9 @@ var EngCalcs = EngCalcs || {};
 		table.className = 'lpn-pane-table lpn-print-table';
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
-		spec.cols.forEach(function (c) {
+		spec.cols.forEach(function (c, i) {
 			var th = document.createElement('th');
-			th.className = paneCellClass(c);
+			th.className = paneCellClass(c, i);
 			th.textContent = paneHeadingText(c);
 			tr.appendChild(th);
 		});
@@ -8342,9 +8362,9 @@ var EngCalcs = EngCalcs || {};
 		tbody = document.createElement('tbody');
 		rows.forEach(function (el) {
 			var row = document.createElement('tr');
-			spec.cols.forEach(function (c) {
+			spec.cols.forEach(function (c, i) {
 				var td = document.createElement('td');
-				td.className = paneCellClass(c);
+				td.className = paneCellClass(c, i);
 				td.textContent = paneCellText(c, el);
 				row.appendChild(td);
 			});
@@ -17761,10 +17781,11 @@ var EngCalcs = EngCalcs || {};
 			entry.appendChild(libCurveChart(pts, l.type === 'pump'));
 			table.className = 'lpn-pane-table';
 			[(pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
-				valueLabel + ' (' + unitLabel('lpn_u_elevhead') + ')'].forEach(function (t) {
+				valueLabel + ' (' + unitLabel('lpn_u_elevhead') + ')'].forEach(function (t, i) {
 				var th = document.createElement('th');
-				// Both columns are figures, so both headings sit over their own right-aligned cells.
-				th.className = 'lpn-pane-num';
+				// It is a .lpn-pane-table, so it takes the pane tables' rule as they take it: the
+				// first column left, the second centred, heading and cell alike.
+				th.className = 'lpn-pane-num' + (i === 0 ? ' lpn-pane-first' : '');
 				th.textContent = t;
 				hrow.appendChild(th);
 			});
@@ -17772,9 +17793,9 @@ var EngCalcs = EngCalcs || {};
 			table.appendChild(thead);
 			pts.forEach(function (p) {
 				var tr = document.createElement('tr');
-				[p[0], p[1]].forEach(function (v) {
+				[p[0], p[1]].forEach(function (v, i) {
 					var td = document.createElement('td');
-					td.className = 'lpn-pane-num';
+					td.className = 'lpn-pane-num' + (i === 0 ? ' lpn-pane-first' : '');
 					td.textContent = String(+(+v).toFixed(6));
 					tr.appendChild(td);
 				});

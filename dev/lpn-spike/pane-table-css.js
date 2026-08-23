@@ -46,9 +46,14 @@ function parse(src) {
 	return { rules: out, unreadable: unreadable };
 }
 
-// Only what this file's rules use: a max-width in px or rem.
-function mediaApplies(media, widthPx) {
+// Only what this file's rules use: a media TYPE, and a max-width in px or rem. The type matters
+// because the printed sheet and the screen deliberately disagree about alignment now: a reader that
+// let `@media print` answer a screen question would have reported the screen as unchanged while the
+// paper rules quietly overrode it.
+function mediaApplies(media, widthPx, mediaType) {
+	const type = mediaType || 'screen';
 	return media.every((q) => {
+		if (/@media\s+print\b/.test(q) !== (type === 'print')) { return false; }
 		let m = /max-width:\s*([0-9.]+)px/.exec(q);
 		if (m && !(widthPx <= parseFloat(m[1]))) { return false; }
 		m = /max-width:\s*([0-9.]+)rem/.exec(q);
@@ -106,10 +111,10 @@ function declValue(decls, prop) {
 // What the page would compute for `prop` on the last node of `chain` at this viewport width.
 // **LAST match in source order wins**, which is what a browser does for equal specificity and is
 // how this file is written: the plain rule first, the narrow-screen override later.
-function winning(rules, chain, widthPx, prop, unreadable) {
+function winning(rules, chain, widthPx, prop, unreadable, mediaType) {
 	let value = null;
 	rules.forEach((r) => {
-		if (!mediaApplies(r.media, widthPx)) { return; }
+		if (!mediaApplies(r.media, widthPx, mediaType)) { return; }
 		if (!matches(chain, r.sel, unreadable)) { return; }
 		const v = declValue(r.decls, prop);
 		if (v !== null) { value = v; }
