@@ -108,6 +108,37 @@ console.log('\n--- the markup: hidden until the code shows it, and one set per s
 	ok('...naming OpenStreetMap for the street tiles', /openstreetmap\.org\/copyright/.test(div));
 	ok('...and Mapbox and its imagery supplier for the satellite ones',
 		/mapbox\.com/.test(div) && /maxar\.com/.test(div));
+
+	// ---- MAPBOX'S ATTRIBUTION IS A LICENCE TERM, AND IT HAS FOUR PARTS (ROADMAP Task 489) --------
+	// Their attribution page requires the WORDMARK as well as the text, and names the three text
+	// links by exact label and exact URL. Checked here against the satellite set only; the street
+	// set is OpenStreetMap's and is unaffected.
+	const sat = div.slice(div.indexOf('data-basemap-credit="satellite"'));
+	ok('the satellite set carries the Mapbox WORDMARK, which is required and not optional',
+		/class="lpn-mapbox-logo"/.test(sat));
+	ok('...linked, and labelled for a screen reader', /aria-label="Mapbox"/.test(sat));
+	ok('...and "Improve this map" -> apps.mapbox.com/feedback/, part of their required text',
+		/href="https:\/\/apps\.mapbox\.com\/feedback\/"[^>]*>Improve this map</.test(sat));
+	ok('...and "© Mapbox" -> mapbox.com/about/maps, the URL they specify',
+		/href="https:\/\/www\.mapbox\.com\/about\/maps\/?"[^>]*>© Mapbox</.test(sat));
+	ok('...and "© OpenStreetMap" -> openstreetmap.org/copyright, likewise',
+		/href="https:\/\/www\.openstreetmap\.org\/copyright"[^>]*>© OpenStreetMap</.test(sat));
+
+	// **THE MARK IS DRAWN HERE, NOT FETCHED.** This is the half that is easy to regress: pasting
+	// Mapbox's own <img src="https://api.mapbox.com/..."> satisfies every assertion above and makes
+	// the page call Mapbox on load, which is exactly what #lpn_basemap_teaser exists to avoid.
+	ok('the wordmark is not an image fetched from anywhere', !/<img/i.test(sat));
+	const css = fs.readFileSync(ROOT + 'css/engcalcs.css', 'utf8');
+	const rule = css.slice(css.indexOf('.lpn-mapbox-logo {'),
+		css.indexOf('}', css.indexOf('.lpn-mapbox-logo {')));
+	ok('...it is a CSS rule with an embedded data: URI', /background-image:\s*url\("data:image\/svg/.test(rule),
+		rule.length + ' chars');
+	ok('...and that rule names no host at all', !/https?:\/\/(?!www\.w3\.org)/.test(rule));
+	// Nothing anywhere on the page may name a Mapbox HOST outside a link href or the tile URL the
+	// JS builds only once satellite is asked for.
+	const fetchable = [...php.matchAll(/(?:src|srcset)="([^"]*mapbox[^"]*)"/gi)].map(m => m[1]);
+	ok('no element on the page FETCHES anything from Mapbox', fetchable.length === 0,
+		fetchable.join(' '));
 }
 
 // ---- 1. THE BOOT PATH, which is the one that broke ------------------------------------------------
@@ -139,6 +170,11 @@ async function main() {
 	ok('the boot path drew tiles', L.layer().children.length > 0,
 		L.layer().children.length + ' <image> elements');
 	invariant('on the boot path');
+	// TASK 489'S OTHER HALF, AT RUNTIME: a page that has not been asked for satellite has sent
+	// Mapbox nothing. The wordmark is embedded, so showing the credit chrome cannot call them
+	// either -- only asking for the style can.
+	ok('...and nothing has been fetched from Mapbox, since satellite was never asked for',
+		tileHosts().every(h => h.indexOf('mapbox') < 0), tileHosts().join(','));
 	// **THE SATELLITE TEASER IS THE SAME STORY** (Task 452, Tom: *"there is no current way to turn
 	// my geomap view into a satellite view"*). It rides the same chrome refresh, so a boot that
 	// forgot the credit forgot the corner control too. Bottom-left, a cell of the status strip --
