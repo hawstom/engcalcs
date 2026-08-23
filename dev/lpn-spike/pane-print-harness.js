@@ -29,7 +29,7 @@
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
-const { byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { byId, ensure, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -40,9 +40,13 @@ function report(ok, label, detail) {
 
 setUnitSet('us');
 
-// **THE STUB MUST KNOW THE PANE HEAD CONTAINS THE X**, because the Print button is inserted into
-// the page beside it. Without that one containment the button is never built, every assertion about
-// it is vacuously skipped, and the harness passes on a page that has no button at all.
+// **THE STUB MUST KNOW THE SHAPE OF THE PANE HEAD**, because the Print button is inserted into it.
+// Without that containment the button is never built, every assertion about it is vacuously
+// skipped, and the harness passes on a page that has no button at all. The head holds the wrapping
+// strip and the X; the strip holds the tablist, and the button joins it there (ROADMAP Task 488).
+ensure('lpn_pane_strip');
+byId.lpn_pane_head.appendChild(byId.lpn_pane_strip);
+byId.lpn_pane_strip.appendChild(byId.lpn_pane_tabs);
 byId.lpn_pane_head.appendChild(byId.lpn_pane_close);
 
 // **THE STUB MUST KNOW ONE THING ABOUT PRINTING: window.print() reads the page as it stands at the
@@ -291,9 +295,28 @@ console.log('\n--- pressing Print ---');
 {
 	// Findable by its id once it is in the page, which is what a real DOM does and what this stub's
 	// fixed id map cannot do for an element the page built.
-	byId.lpn_pane_print = byId.lpn_pane_head.children.filter((c) => c.id === 'lpn_pane_print')[0] || null;
+	byId.lpn_pane_print = byId.lpn_pane_strip.children.filter((c) => c.id === 'lpn_pane_print')[0] || null;
 	const btn = byId.lpn_pane_print;
 	report(!!btn, 'the pane head carries a Print button');
+	// ---- TASK 488: the button shares the tabs' wrapping flow, it does not own a column ----------
+	// Tom, 2026-08-23: "it monopolises a column in the bottom pane's header row, and the table tabs
+	// cannot wrap past it." The fix is structural and lives in two places at once, so both are
+	// asserted: the button is a CHILD of the wrapping strip, and the tablist inside that strip has
+	// no box of its own, which is what puts its tabs in the same flow as the button.
+	report(byId.lpn_pane_strip.children.indexOf(btn) === 0,
+		'...as the FIRST item of the wrapping strip, at the extreme left edge');
+	report(byId.lpn_pane_head.children.every((c) => c.id !== 'lpn_pane_print'),
+		'...and NOT a sibling of the strip, which is what gave it a column of its own');
+	{
+		const php = fs.readFileSync(path.join(ROOT, 'Looped-Network.php'), 'utf8');
+		report(/id="lpn_pane_strip"[\s\S]{0,200}id="lpn_pane_tabs"/.test(php),
+			'...the page nests the tablist inside that strip');
+		report(/id="lpn_pane_tabs"[\s\S]{0,120}<\/div>\s*<\/div>\s*<button[^>]*id="lpn_pane_close"/.test(php),
+			'...and leaves the X outside it, so it stays pinned to the top-right corner');
+		report(/\.lpn-pane-strip \{[^}]*flex-wrap: wrap/.test(css), '...the strip is the wrapping row');
+		report(/\.lpn-pane-tabs \{ display: contents; \}/.test(css),
+			'...and the tablist has no box, so its tabs wrap beside the button and not inside it');
+	}
 	report(!!btn && btn.textContent === 'Print table', '...labelled from its own lang key', btn && btn.textContent);
 	report(!!btn && /ec-help/.test(btn.className) && !!btn.title,
 		'...with a tip a tap can reveal, like every other control on this page');

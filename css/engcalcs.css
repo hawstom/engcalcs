@@ -1082,7 +1082,18 @@ html[lang="zh"] .ec-welcome {
    MEASUREMENT (paneChromeHeight), so a second line is subtracted from the window like anything
    else -- nothing here assumes one line, and nothing here scrolls sideways. */
 .lpn-pane-head { display: flex; align-items: flex-start; gap: 4px; border-bottom: 1px solid #ddd; }
-.lpn-pane-tabs { display: flex; flex-wrap: wrap; gap: 2px 2px; flex: 1 1 auto; min-width: 0; }
+.lpn-pane-strip {
+	display: flex; flex-wrap: wrap; align-items: flex-start; gap: 2px 2px;
+	flex: 1 1 auto; min-width: 0;
+}
+/* `display: contents` IS THE WHOLE OF TASK 488. The Print button and the seven tabs must wrap
+   as ONE row of items, or the button holds a column and the tabs wrap only within the
+   remainder -- which is what Tom saw: "it monopolises a column ... and the table tabs cannot
+   wrap past it". Dissolving the tablist's box puts its tabs directly into .lpn-pane-strip's
+   flow beside the button, so a second line starts at the pane's left edge and uses its full
+   width. The ELEMENT stays, so role="tablist" still owns the tabs and nothing else -- which is
+   why the button was not simply appended inside it. */
+.lpn-pane-tabs { display: contents; }
 /* A TAB, not a push-button: flat, with the selected one joined to the panel below it by having no
    bottom border of its own. Same reasoning as the menu bar's flat items -- a row of raised
    buttons here would read as a second toolbar. */

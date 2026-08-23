@@ -462,7 +462,15 @@ echoHeader("EngCalcs", $html_title, "", false);
 		title="<?=htmlspecialchars($ec_lang['lpn_pane_resize'])?>"
 		aria-label="<?=htmlspecialchars($ec_lang['lpn_pane_resize'])?>"></div>
 	<div id="lpn_pane_head" class="lpn-pane-head">
-		<div id="lpn_pane_tabs" class="lpn-pane-tabs" role="tablist"></div>
+		<?php // ONE WRAPPING FLOW FOR THE PRINT BUTTON AND THE TABS (ROADMAP Task 488). The button
+		      // used to be a sibling of the tab strip, so it held a column of its own and the tabs
+		      // wrapped inside whatever was left instead of running under it. Both are items of
+		      // this one wrapper now; the tablist keeps its own element (and therefore owns tabs
+		      // and nothing else) but has no box of its own, so its tabs wrap alongside the button.
+		      // The X stays outside, which is what keeps it pinned to the top-right corner. ?>
+		<div id="lpn_pane_strip" class="lpn-pane-strip">
+			<div id="lpn_pane_tabs" class="lpn-pane-tabs" role="tablist"></div>
+		</div>
 		<button type="button" id="lpn_pane_close" class="lpn-pane-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	</div>
 	<div id="lpn_pane_body" class="lpn-pane-body">

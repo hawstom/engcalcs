@@ -524,12 +524,15 @@ console.log('\n--- the write seam ---');
 // silently growing past the share of the window the ceiling reserves for it.
 console.log('\n--- the strip may be two lines ---');
 {
-	report(/\.lpn-pane-tabs\s*\{[^}]*flex-wrap:\s*wrap/.test(css), 'the tab strip wraps rather than overflowing');
+	// The wrapping row is .lpn-pane-strip, which holds the Print button AND the tablist; the
+	// tablist itself is `display: contents` so both wrap as one flow (Task 488). Asking
+	// .lpn-pane-tabs for flex-wrap here would pass on a strip that cannot wrap at all.
+	report(/\.lpn-pane-strip \{[^}]*flex-wrap: wrap/.test(css), 'the tab strip wraps rather than overflowing');
 	report(/\.lpn-pane-head\s*\{[^}]*align-items:\s*flex-start/.test(css),
 		'...with the X pinned to the top rather than stretched down beside two rows');
 	report(/@media \(max-width: 60rem\) \{ \.lpn-pane-tab \{ padding/.test(css),
 		'...and the tabs give up side padding before they give up a line');
-	report(!/\.lpn-pane-tabs\s*\{[^}]*overflow-x/.test(css),
+	report(!/\.lpn-pane-strip \{[^}]*overflow-x/.test(css),
 		'the strip never scrolls sideways — the page may not scroll at all (Task 432)');
 	// THE CEILING KNOWS ABOUT THE CHROME. The body's height is the only number JS writes, so if the
 	// cap ignored the grip and a two-line strip the whole pane would sit past 80% of the window.
