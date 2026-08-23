@@ -15731,19 +15731,27 @@ var EngCalcs = EngCalcs || {};
 			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = '6px';
 			lead.style.flex = '1 1 auto';
 			row.appendChild(lead);
-			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip],
-				[pc.lpn_labels_col_after || 'After', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip],
+			// **A COLUMN HAS ONE ALIGNMENT, AND THE HEADING IS PART OF THE COLUMN** -- the box's own
+			// rule, stated in css/engcalcs.css beside the text-align declarations it governs, and
+			// the last thing in this list that still read as "too far right" (Task 435). The two
+			// numeric columns draw their own spinner arrows and centre their digit, so their
+			// headings centre; the affix boxes hold WORDS and keep their natural start alignment,
+			// so a centred "Before" stood right of every letter it named. `start`, not `left`,
+			// because the same row has to read correctly in an RTL language.
+			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip, 'start'],
+				[pc.lpn_labels_col_after || 'After', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip, 'start'],
 				[pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
 					(pc.lpn_labels_col_decimals || 'Decimals') + ' \u2014 ' +
-						(pc.lpn_labels_decimals_tip || 'Decimal places shown for this label')],
+						(pc.lpn_labels_decimals_tip || 'Decimal places shown for this label'), 'center'],
 				[pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
 					(pc.lpn_labels_priority || 'Priority') + ' \u2014 ' +
-						((group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) || '')]
+						((group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) || ''),
+					'center']
 			].forEach(function (h, i) {
 				var cell = document.createElement('span');
 				cell.textContent = h[0];
 				cell.style.width = h[1]; cell.style.flex = '0 0 auto';
-				cell.style.textAlign = 'center';
+				cell.style.textAlign = h[3];
 				if (h[2]) { cell.title = h[2]; cell.className = 'ec-help'; }
 				// The affix boxes take the row's own 6px gap; the two numeric columns carry their own
 				// margin as well, so their headings must match or they sit half a gap left of the box
