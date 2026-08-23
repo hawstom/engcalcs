@@ -141,24 +141,13 @@ single quotes with `\'` escaping; no HTML entities; no tags; every `{placeholder
 
 ## Suggestion box — file a grievance about the English
 
-If any English string made you guess, file it. You are the only person who will ever
-notice, and a string that made you guess will make the next 25 translators guess too.
+**Read `suggestion_box` in your payload and follow it.** It is part of your instructions, not a
+footnote.
 
-File an entry when: the English has more than one plausible reading; a verb or adjective
-has no stated object; a word's intended sense is not its most common sense; a term maps
-onto a dangerous second sense in your language; a claim in the text looks false or stale;
-or the tooling handed you a preferred_translation that is wrong for the context.
-
-Report them in your final message as a JSON array, separate from your prose:
-
-FRICTION: [
-  {"key": "<lang key>", "complaint": "<what made you guess, in one sentence>",
-   "readings": ["<reading you chose>", "<reading you rejected>"]}
-]
-
-An empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a
-human's attention. But do not stay quiet to be agreeable either: this channel exists
-because real complaints were previously buried in prose and never acted on.
+This section used to carry its own copy of that text. It does not any more, and that is the point:
+`generate_translation_payloads.php` extracts the one canonical block from
+`dev/translation-process.md` into every payload (Task 239), so a brief that retyped it would drift
+from what the agents are actually told and nobody would be able to say which copy was current.
 
 ## Final report
 
