@@ -1159,7 +1159,9 @@ html[lang="zh"] .ec-welcome {
    column cannot acquire a second left one. The printed sheet keeps the old names-left,
    figures-right split -- restated in @media print below. */
 .lpn-pane-table th, .lpn-pane-table td { padding: 1px 6px 1px 0; text-align: center; border: 0; }
-.lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: left; }
+/* start, not left: the first column is the leading one, and in an RTL language that is the
+   right-hand edge. Same rule the Labels panel's affix headings follow (Task 435). */
+.lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: start; }
 /* z-index, because a sticky cell only outranks the rows by paint order and one positioned thing in
    a row would beat it; padding-top, because the panel's own is gone; and the rule under the
    headings is an INSET SHADOW rather than a border -- under `border-collapse: collapse` the border

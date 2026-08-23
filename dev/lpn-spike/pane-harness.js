@@ -652,7 +652,7 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 	// **THE READER'S OWN SELF-TEST.** Two answers it must get right before any answer it gives is
 	// worth reading, and a selector it cannot parse is collected and reported at the end rather
 	// than silently answering "no rule".
-	report(align(cell('td', 'id', false, true), WIDE) === 'left', 'reader self-test: the first cell reads left');
+	report(align(cell('td', 'id', false, true), WIDE) === 'start', 'reader self-test: the first cell reads start');
 	report(width(inputIn('length'), WIDE) === 'var(--lpn-pane-col-w, 7em)' &&
 		width(inputIn('length'), SMALL) === '3.5em',
 		'reader self-test: the desktop box takes its column’s width and the phone box is 3.5em',
@@ -663,9 +663,12 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 	// be back to where we started, focusing on the inputs as we should."* So the question is asked
 	// of POSITION, at both widths, of the heading and of the cell -- and of the box inside the cell.
 	[WIDE, SMALL].forEach((w) => {
-		report(align(cell('th', 'id', false, true), w) === 'left' &&
-			align(cell('td', 'id', false, true), w) === 'left',
-			'the first column is left at ' + w + 'px, heading and cell alike');
+		// `start`, not `left`: the first column is the LEADING one, which in an RTL language is
+		// the right-hand edge. The print rules below still say `left` and are asserted separately —
+		// they are a different question and did not move.
+		report(align(cell('th', 'id', false, true), w) === 'start' &&
+			align(cell('td', 'id', false, true), w) === 'start',
+			'the first column leads at ' + w + 'px, heading and cell alike');
 		report(align(cell('th', 'flow', true, false), w) === 'center' &&
 			align(cell('td', 'flow', true, false), w) === 'center',
 			'...a figures column is centred at ' + w + 'px, heading and cell alike');
@@ -766,29 +769,44 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 	// to five figures, an SI diameter is millimetres so 1200 is four, a Hazen-Williams C is three
 	// (the shipped default method), and a minor-loss k has to show "2.5" -- Tom's own acceptance
 	// test for that column, and three characters because the decimal point is one of them.
+	// **EVERY COLUMN NOW SHIPS THE FACTOR TOM DECLARED**, including the two that used to deviate.
+	// `narrow: true` marks a column whose box is knowingly smaller than its longest value — see the
+	// paragraph below, which is the live question, not a footnote.
 	const WANT = [
 		['junctions', 'elev', 3.5, 4], ['junctions', 'demand', 3.5, 4],
 		['reservoirs', 'elev', 3.5, 4], ['reservoirs', 'head', 3.5, 4],
 		['tanks', 'level', 3.5, 4], ['tanks', 'minLevel', 3.5, 4], ['tanks', 'maxLevel', 3.5, 4],
 		['tanks', 'tankDiameter', 3.5, 4],
-		['pipes', 'diameter', 2.8, 4], ['pipes', 'length', 4.2, 5],
-		['pipes', 'roughness', 2.1, 3], ['pipes', 'km', 2.1, 3]
+		['pipes', 'diameter', 2.1, 4, true], ['pipes', 'length', 4.2, 5],
+		['pipes', 'roughness', 2.1, 3], ['pipes', 'km', 1.4, 3, true]
 	];
-	WANT.forEach(([tid, key, em, needs]) => {
+	WANT.forEach(([tid, key, em, needs, narrow]) => {
 		const col = L.tableCols(tid).filter((c) => c.key === key)[0];
 		report(!!col && col.em === em, tid + '/' + key + ': the column declares ' + em + 'em',
 			col ? String(col.em) : 'no such column');
-		report(chars(em) >= needs, '...and ' + em + 'em shows ' + chars(em) + ' characters, needing ' + needs);
+		if (narrow) {
+			// Asserted as a KNOWN shortfall rather than dropped. If the arithmetic ever changes,
+			// somebody is told; a check that simply stopped asking would not notice either way.
+			report(chars(em) < needs, '...and ' + em + 'em knowingly shows ' + chars(em)
+				+ ' of the ' + needs + ' characters that column can hold');
+		} else {
+			report(chars(em) >= needs, '...and ' + em + 'em shows ' + chars(em) + ' characters, needing ' + needs);
+		}
 	});
-	// **THE ONE FACTOR NOT MET, AND THE MEASUREMENT THAT DECIDED IT.** 0.2 of 7em is 1.4em, which
-	// shows a single character; Tom's test for this column is that "2.5" is fully visible, and that
-	// is three. 2.07em is the least width that shows three, so 2.1em ships.
-	report(chars(1.4) < 3, 'Minor loss at the 0.2 asked for would show ' + chars(1.4) + ' character',
-		'"2.5" needs 3; shipped 2.1em / ' + chars(2.1));
-	// Diameter is the other deviation and for the same kind of reason: 0.3 is 2.1em and three
-	// characters, and the same box serves an SI diameter, which is in millimetres.
-	report(chars(2.1) < 4, 'Diameter at the 0.3 asked for would show ' + chars(2.1) + ' characters',
-		'shipped 2.8em / ' + chars(2.8));
+	// **THE TWO NARROW COLUMNS, AND THE UNTESTED BELIEF THEY REST ON.** Tom asked for 0.2 on Minor
+	// loss and 0.3 on Diameter, was shown that 1.4em displays one character of "2.5" and 2.1em three
+	// of an SI diameter's "1200", widened both, and then reversed himself the same day (2026-08-23)
+	// on a different ground: *"inputs are flexible. You can enter more than their width. Remind me
+	// to test this later."* So the boxes are back at his factors, and the measurements below are
+	// kept because they are exactly what his test has to overrule.
+	//
+	// **HE HAS NOT RUN THAT TEST** (ROADMAP Task 491). If a narrow box turns out to truncate or hide
+	// what was typed, the widths to restore are 2.1em for Minor loss (2.07em is the least that shows
+	// three characters) and 2.8em for Diameter.
+	report(chars(1.4) < 3, 'Minor loss at 1.4em shows ' + chars(1.4) + ' character of "2.5"',
+		'restore 2.1em if typing into it proves lossy');
+	report(chars(2.1) < 4, 'Diameter at 2.1em shows ' + chars(2.1) + ' characters of an SI "1200"',
+		'restore 2.8em if typing into it proves lossy');
 
 	// The reader's blind-spot report, scoped to the selectors that could possibly reach what this
 	// section asks about. A rule about the menu bar or a spinner is none of its business, and a

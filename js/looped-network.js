@@ -7898,7 +7898,7 @@ var EngCalcs = EngCalcs || {};
 	// 2.8em rather than the 2.1 Tom named for it: the same box serves Pipes and Valves, and in the
 	// SI preset a diameter is millimetres, so "1200" is four characters and 2.1em shows three.
 	function paneColDiameter() {
-		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; }, em: 2.8,
+		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; }, em: 2.1,
 			prop: 'diameter', get: function (l) { return effective(l, 'diameter'); },
 			set: function (l, v) { setProp(l, 'diameter', v); } };
 	}
@@ -8005,12 +8005,17 @@ var EngCalcs = EngCalcs || {};
 						unit: function () { return frictionMethod() === 'dw' ? 'lpn_u_roughness' : ''; },
 						prop: 'roughness', get: function (l) { return effective(l, 'roughness'); },
 						set: function (l, v) { setProp(l, 'roughness', v); } },
-					// 2.1em, not the 1.4 that 0.2 works out to. Tom set the acceptance test himself
-					// (2026-08-23: "'2.5' needs to work okay"): three characters, and 1.4em shows
-					// one. 2.07em is the least that shows three and 2.1em is the width Roughness
-					// beside it already uses. The vertical argument does not decide it either way --
-					// no desktop column carries a width, so a smaller box never wraps a heading.
-					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 2.1,
+					// 1.4em, the 0.2 Tom declared. It was widened to 2.1 earlier on 2026-08-23 to pass
+					// his own acceptance test ("'2.5' needs to work okay": 1.4em shows one of those
+					// three characters), and he reversed that the same day on the ground that a box
+					// is not a limit -- *"inputs are flexible. You can enter more than their width."*
+					// So the box shows one character and accepts as many as you type. **THAT IS
+					// UNTESTED IN A BROWSER AND HE ASKED TO BE REMINDED** (ROADMAP Task 491); if it
+					// turns out a narrow box actually truncates or hides what was typed, 2.07em is
+					// the least that shows three characters. The vertical argument decides nothing
+					// either way -- no desktop column carries a width, so a small box never wraps a
+					// heading.
+					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 1.4,
 						get: function (l) { return effective(l, 'k') || 0; },
 						set: function (l, v) { setProp(l, 'k', v); } },
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
