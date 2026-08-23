@@ -211,10 +211,11 @@ the defendant.
 ## What is NOT a Task 430 problem, but will look like one
 
 If "not identical" was measured by **running the exported file in EPANET** rather than by reading
-it, the cause is elsewhere and is much larger than 32 characters: the writer emits no `[PATTERNS]`,
-no `[OPTIONS] Pattern`, no `[TIMES]`, `[CONTROLS]` or `[RULES]`. Net3's `[OPTIONS] Pattern 1`
-multiplies nearly every junction demand, and dropping it puts demands about a third low — the same
-measurement recorded under **Task 423**. Solve the export-fidelity question there, not here.
+it, the cause is elsewhere. That was the case when this was written: the writer emitted no
+`[PATTERNS]`, `[OPTIONS] Pattern`, `[TIMES]` or `[CONTROLS]`, and Net3's `[OPTIONS] Pattern 1`
+multiplies nearly every junction demand, so dropping it put demands about a third low. **All four
+sections ship now** (Task 423 landed the read side; the writer emits them in EPANET's own order).
+`[RULES]` is the one still absent, tracked as ROADMAP Task 248.03.
 
 Tom's own models are `.net`, and that path has one genuine value change of its own worth knowing
 about: `netToInp()`'s `coord()` (`js/lpn-net.js:253`) writes map coordinates as `toFixed(4)`. A

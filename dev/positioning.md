@@ -125,10 +125,13 @@ stance only a little more strongly than I want to put it. For PC of course, but 
 on your phone."* And on where we stand today: *"We are not usable on a phone today, IMO. We will be
 with those four small-screen tasks done."*
 
-So the target is **"obviously never tried on a phone" → "well, maybe"**, and nothing beyond it. The
-four items are Task 486. Until they ship, no public page may claim the map editor is usable on a
-phone — `dev/librewaternet-landing/index.html` already carries that claim and must not go live
-first. Revisit the positioning beyond that only if outside advice says otherwise.
+The target was **"obviously never tried on a phone" → "well, maybe"**, and nothing beyond it. The
+four small-screen items shipped 2026-08-22 (Task 486) and **Tom made the phone pass on 2026-08-23**,
+which is the only thing that could settle it. **The sanctioned public wording is exactly "Try it. We
+did." and nothing stronger** — an invitation to try, never a claim that it is good there. A public
+page still may not call the map editor *usable* on a phone, and the demotion above is unchanged:
+mobile stays out of a headline, a tagline, or a list of reasons to choose us. Revisit the
+positioning beyond that only if outside advice says otherwise.
 
 ## 4. Design, not management — and the annotated map is the evidence
 

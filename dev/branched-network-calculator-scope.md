@@ -164,16 +164,17 @@ optionally a spatial data view second.
   elevations (Elevation API, keyed/metered) back into the main form. The core solve never depends on
   it, so it can be aborted with zero cost to Phase 1. Quarantines the paradigm departure (keyed
   external API, Google Cloud billing/quota) to one optional surface.
-- **Phase 3 (conditional, uncommitted) — looped networks.** Considered only once Phase 2 has made us
-  expert at the map mashup (loops need a map to stay sane) **or** if users ask for it. Brings back
-  iteration (Hardy-Cross et al.); do not start it before the map is solid.
+- ~~**Phase 3 (conditional, uncommitted) — looped networks.**~~ **BUILT.** It became `lpn_`, the
+  Looped Pipe Network map calculator — a core calculator, live since 2026-07-29, with its own map,
+  its own global-gradient solver and the vendored EPANET engine beside it. Scope:
+  `dev/looped-network-calculator-scope.md`. The gate below no longer binds and the phase's own
+  prediction was wrong in an instructive direction: the map did not have to come first and be solid,
+  it came WITH the loops, because loops are what made a drawing surface unavoidable.
 
-> **Tracking note (2026-07-27):** Phases 2 and 3 are now **ROADMAP Tasks 145 and 146**, extracted
-> because Task 137 closed and unbuilt phases parked inside a completed block never resurface during
-> prioritization. The phase descriptions above remain the design spec; the roadmap tasks carry the
-> priority and the gate. Task 146 also notes that Phase 3's gate is an **OR** — the "users ask"
-> branch may be satisfied independently of the map work by Task 144's Hazen-Williams finding, in
-> which case "do not start it before the map is solid" no longer binds.
+> **Tracking note:** Phase 2 is **ROADMAP Task 145** (geographic projects), extracted from this
+> document because Task 137 closed and unbuilt phases parked inside a completed block never resurface
+> during prioritization. That extraction rule is the durable lesson here; Task 146 carried Phase 3
+> and is itself now closed.
 
 ## Honesty / framing
 
