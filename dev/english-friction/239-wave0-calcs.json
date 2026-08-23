@@ -1,0 +1,445 @@
+{
+ "sprint": "239-wave0-calcs",
+ "description": "Adversarial Wave 0 (ROADMAP Task 239) over the 415 English strings of the fifteen non-lpn calculators (dw, hw, mi, mpf, mphl, mtc, ws, wi, or, odt, mhp, ip, cs, rc, bpn). Chosen because this key set already had a COMPLETED review-style Wave 0 in July 2026 (dev/english-review-wave0.md, all six calculator categories plus the rc/ip harvest), which makes it the clean measurement Task 239 asks for: what does falsification find on top of a finished review? The question asked of every string was NOT 'is this good?' but 'list every plausible reading; more than one means flag'. Result: 35 findings on 415 keys (8.4%) -- 1 high, 22 medium, 12 low. 6 English strings were rewritten in lib/lang.ec.en.php by this pass. 13 findings were knocked down by the pass itself and are recorded as dismissed, because the false-positive rate is half the measurement. 16 are referred to the human: $ec_lang_syn is off-limits to AI by standing rule, and a wording choice is Tom's call, so both kinds stay open by design until he rules. No non-English file was touched; an absent key falls back to English.",
+ "entries": [
+  {
+   "key": "mphl_hgl_egl_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: 'May not be valid if pipe is high' never says high in WHAT. On a page whose inputs are a diameter, a length, two elevations and a loss coefficient, every one of those is a candidate for 'high', and two of them (diameter, elevation) are ordinary readings. The note this tip points at says something quite specific and different: the calculation is suspect where the HGL drops below the top of the pipe. A translator picking the diameter reading writes a sentence that is simply false, and no later check can see it.",
+   "readings": [
+    "the pipe lies above the hydraulic grade line somewhere along its length (intended)",
+    "the pipe is at a high elevation",
+    "the pipe is large in diameter",
+    "the pressure in the pipe is high"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten: 'May not be valid if pipe is high. See notes.' -> 'May not be valid where the pipe rises above the hydraulic grade line. See notes.' The object of 'high' is now named and matches mphl_note_1."
+  },
+  {
+   "key": "mhp_hl_ok_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Within 10% target' has two readings that differ by an order of magnitude -- loss is below the 10%-of-gross-head target, or loss is within 10 percent OF the target (i.e. up to 11%). The second is a perfectly normal engineering sentence, which is what makes it dangerous. Nothing in the string says what the 10% is a percentage of; only mhp_notes_3_def says it, three sections away.",
+   "readings": [
+    "head loss is below 10% of gross head, the economical target (intended)",
+    "head loss is within 10 percent of whatever the target value is"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten: 'Within 10% target — economical.' -> 'Head loss is under 10% of gross head — economical.' The quantity and its base are both named."
+  },
+  {
+   "key": "mhp_hl_warn_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: same defect as mhp_hl_ok_tip, and the three tips are a sibling set that must stay parallel. 'Exceeds 10% target' does not say what exceeds, nor what the 10% is of.",
+   "readings": [
+    "head loss is more than 10% of gross head (intended)",
+    "some value exceeds the target by 10 percent"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten: 'Exceeds 10% target. Consider a larger pipe.' -> 'Head loss is over 10% of gross head. Consider a larger pipe.'"
+  },
+  {
+   "key": "mhp_hl_bad_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: same defect, third member of the set. 'Resize pipe' is also a bare imperative with no article, which several languages will render as a noun phrase.",
+   "readings": [
+    "head loss is more than 20% of gross head (intended)",
+    "some value exceeds the target by 20 percent"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten: 'Exceeds 20% target. Resize pipe.' -> 'Head loss is over 20% of gross head. Resize the pipe.'"
+  },
+  {
+   "key": "mtc_note_1",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: step 2 of the iteration list read 'The requested roughness calculation is copied to input roughness.' A 'roughness calculation' is not a thing that can be copied -- the referent is the NUMBER produced by the method the user selected, and 'requested' is doing the work of 'that you chose'. An English reader has to reconstruct the sentence from the surrounding steps; a translator with no page in front of them cannot.",
+   "readings": [
+    "the roughness value produced by the method you selected is written into the roughness input (intended)",
+    "the roughness calculation you asked for is duplicated somewhere",
+    "the input roughness is recalculated"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten inside mtc_note_1: '...2. The roughness value from the method you chose is copied into the roughness input.' Rest of the note untouched."
+  },
+  {
+   "key": "rc_notes_1_def",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: the note called Equation 1's domain 'mild slopes' while the label the user actually sees for the same equation (rc_eq1) calls it 'gentle slope'. Two English words for one condition in one calculator is a defect for the English reader, and 'mild slope' is worse than merely inconsistent: it is the standard open-channel classification term (M-curves), and none of these slopes are hydraulically mild -- Equation 1 runs to S0 = 0.10. A translator reaching for their language's established 'mild slope' term imports a wrong technical claim.",
+   "readings": [
+    "the flatter of the two rock-chute slope bands, S0 < 0.10 (intended)",
+    "hydraulically mild slope in the M1/M2 backwater-classification sense"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten: 'Equation 1 applies for mild slopes' -> 'Equation 1 applies for gentle slopes', matching rc_eq1's own wording. 'Steep slopes' for Equation 2 already matched rc_eq2 and was left alone."
+  },
+  {
+   "key": "cs_pct_loss",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: the label says 'Fraction lost' and the field beside it defaults to the percent unit (Units.lib.php maps the 'percentage' family to depthPercent), so the page routinely shows 'Fraction lost   12.5 %'. The label and the number disagree in kind. A translator choosing their language's word for 'fraction' (a ratio, 0 to 1) is translating faithfully and still mislabels the displayed value; one choosing 'percentage' contradicts the English. Also unstated: lost as a share of WHAT (inflow).",
+   "readings": [
+    "the seepage loss as a ratio of inflow, 0 to 1",
+    "the seepage loss as a percentage of inflow",
+    "the portion of the reach where loss occurs"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Referred: this is a wording choice on a visible label. Candidates offered to Tom: 'Loss, share of inflow' or 'Loss / inflow'. Not written."
+  },
+  {
+   "key": "rc_sketch_filter",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: a bare 'Filter' on a definition sketch. In software vocabulary Filter is overwhelmingly a control or a verb, and this suite has filters elsewhere in its UI. The sketch means the granular filter/bedding layer under the rock. Every language has a settled construction term for that layer and a different word for the UI sense, and the string gives no signal which is wanted.",
+   "readings": [
+    "the filter (bedding) layer beneath the rock lining (intended)",
+    "a UI filter control",
+    "the verb: to filter"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Referred: sketch labels are Tom's call (sketch standards, minimal labels). Candidate: 'Filter layer'. Not written."
+  },
+  {
+   "key": "odt_sketch_start",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: a bare 'Start' on the drain-time sketch, where it marks the starting water surface. Read cold it is the imperative verb that begins a run, and this page has a calculate action. Its partner odt_sketch_end has the same problem with the same object left out.",
+   "readings": [
+    "the starting water surface level (intended)",
+    "Start: begin the calculation",
+    "the beginning of the time axis"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Referred: either a sketch-label rewording ('Start level' / 'End level') or an $ec_lang_syn entry, both Tom's call. Not written."
+  },
+  {
+   "key": "odt_sketch_end",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: partner of odt_sketch_start. 'End' alone is a noun, a verb and a time boundary; the intended sense is the ending water surface level.",
+   "readings": [
+    "the ending water surface level (intended)",
+    "End: stop the run",
+    "the end of the pond/basin"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Referred with odt_sketch_start; the two must be answered together. Not written."
+  },
+  {
+   "key": "mtc_n_strickler",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'n for design rock size (Strickler method)' -- the preposition carries the whole meaning and it points both ways. The value is n computed FROM the design rock size; the string equally supports 'the n you should use when designing rock size'. Four sibling keys share the pattern (mtc_n_strickler, mtc_n_blodgett, mtc_n_bathurst, mtc_n_pi), so whichever reading a translator picks, they pick it four times consistently and invisibly.",
+   "readings": [
+    "roughness computed from the design rock size by this method (intended)",
+    "the roughness to use for the purpose of sizing rock"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Referred: changing four visible labels is a wording decision. Candidate: 'n from design rock size (Strickler method)' across all four. Not written."
+  },
+  {
+   "key": "mtc_blodgett_v_bathurst",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: the label 'Blodgett vs. Bathurst' names a comparison, but the cell does not report a comparison -- js/Manning.lib.js writes one of 'Bathurst', 'Blodgett', '----' or '++++', i.e. which method the relative submergence selects, or a marker for out of range. A translator reads the label as 'difference between the two methods' and may render it as a quantity heading. The two range markers are also untranslatable glyphs whose meaning (below range / above range) appears nowhere.",
+   "readings": [
+    "which of the two roughness methods applies at this relative submergence (intended)",
+    "the numerical difference between the Blodgett and Bathurst results",
+    "a side-by-side of both values"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Referred: a label rewrite here is Tom's call and the column is width-constrained. Candidate: 'Method selected (Blodgett or Bathurst)'. Not written."
+  },
+  {
+   "key": "bpn_topology_warn_short",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: the short verdict cell says 'Network'. Its siblings in that role are verdict words -- 'Low' for pressure, 'OK'/'High' elsewhere -- so the slot's convention is a judgement, and 'Network' is a bare noun that judges nothing. It means 'the network topology is broken'. Every language will translate the noun and inherit the same emptiness.",
+   "readings": [
+    "there is a problem with the network topology (intended)",
+    "a heading naming the network",
+    "the network is fine"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Referred: wording call. Candidates: 'Broken', 'Check IDs', 'Unconnected'. Not written."
+  },
+  {
+   "key": "ip_max_head",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'Max. allow. pipe pressure' stacks two abbreviations, and the second one is the ambiguous one -- 'allow.' expands to allowable (a limit) or allowance (a margin added). The tip resolves it, but the tip is a separate key that a translator may batch separately from the label.",
+   "readings": [
+    "maximum allowable pipe pressure (intended)",
+    "maximum pressure allowance"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Referred: expanding to 'Max. allowable pipe pressure' costs label width, which is Tom's call. Not written."
+  },
+  {
+   "key": "mhp_notes_3_def",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'often falls around 4-6% where electricity is most valuable' -- 'where' is locative or conditional, and both make sense here (in high-tariff regions; in situations where power is worth more). Several languages must choose different conjunctions for the two.",
+   "readings": [
+    "in places or markets where electricity commands a high price (intended)",
+    "in the situation where electricity has the greatest value",
+    "at the point on the curve where the power is worth most"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Referred: a one-word wording change in a notes paragraph. Candidate: 'where electricity has a high value'. Not written."
+  },
+  {
+   "key": "ip_press",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Press.' is the abbreviation of Pressure and also the imperative of the verb to press, and abbreviation-with-period is exactly the form a UI uses for a button. This is a results column heading with no tip of its own, sitting next to 'Flow'. $ec_lang_syn['ip_press'] is empty, so nothing tells the translator which word is being shortened.",
+   "readings": [
+    "pressure at this node, abbreviated for column width (intended)",
+    "the imperative verb: press this"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "$ec_lang_syn proposal for Tom (AI may not write it): 'Pressure (head) at this reach's downstream node -- an abbreviation of the noun Pressure, never the verb | layout: column heading; avoid: the imperative verb \"press\"'. Not written."
+  },
+  {
+   "key": "ip_t_run",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Runtime (hours)' is a computing term of art (a runtime library, at runtime) as well as the irrigation sense of how long the zone runs. In a suite that is software, the wrong sense is the more available one for a translator working from a string list. $ec_lang_syn['ip_t_run'] is empty.",
+   "readings": [
+    "how long the zone must run to apply the target depth (intended)",
+    "runtime in the software sense",
+    "elapsed time of the calculation"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "$ec_lang_syn proposal for Tom: 'How long the zone must run (irrigation time, operating time, watering duration) to apply the target depth. | avoid: the computing sense of \"runtime\"'. An English change to 'Run time (hours)' is the alternative and is also his call. Not written."
+  },
+  {
+   "key": "mi_n617",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: the column heading is 'Comp.<br />n'. The existing $ec_lang_syn entry carries commentary only ('| layout: column heading; symbol') and no synonyms, so it says how to lay the string out but never says what 'Comp.' abbreviates. Composite, computed, comparison and component are all live expansions and only one is right; the neighbouring keys (mi_notes_1_term 'Composite n') are a separate batch.",
+   "readings": [
+    "composite n for the region, by Chow 6-17 (intended)",
+    "computed n",
+    "comparison n",
+    "component n"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "$ec_lang_syn proposal for Tom: prepend a payload to the existing entry -- 'Composite (combined, weighted) Manning n for the whole region, from the segment n values | layout: column heading; symbol'. Not written."
+  },
+  {
+   "key": "dw_friction_factor_method",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Friction factor method' is a three-noun stack with two bracketings -- [friction factor] method (the equation used to get f, intended) or friction [factor method] / a named 'friction-factor method' of doing something else. Languages that must build an explicit genitive have to choose. $ec_lang_syn is empty.",
+   "readings": [
+    "which equation is used to compute the friction factor f (intended)",
+    "a design method known as the friction factor method"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "$ec_lang_syn proposal for Tom: 'Which equation is used to compute the friction factor f (equation for f, f formula, method for the friction factor).' Not written."
+  },
+  {
+   "key": "wi_save_and_calculate",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Save and Calculate' never says what is saved or where. In 2026 the dominant reading of Save on a web page is 'write a file to my computer', and this suite genuinely has file save elsewhere (the network page writes .inp). Here it stores the entered cross-section points in the page's own input cookie and recalculates. A translator choosing the file sense promises something the button does not do.",
+   "readings": [
+    "store the values you entered on this page and recalculate (intended)",
+    "save a file to disk, then calculate",
+    "save the results"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "$ec_lang_syn proposal for Tom: 'Store (keep, remember) the values entered on this page and calculate again. | layout: button; avoid: saving a file to disk'. Not written."
+  },
+  {
+   "key": "mhp_vel_ok_short",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: the three short verdicts 'OK', 'High', 'Low' stand alone in a narrow cell whose row label ('Velocity check') is a separate key. Out of context High and Low are also quality judgements (high quality, low quality) and, in several languages, must agree in gender with the noun they describe -- which the translator cannot see. $ec_lang_syn is empty for all three.",
+   "readings": [
+    "the velocity is high / low / acceptable (intended)",
+    "a quality or priority rating",
+    "a position: upper / lower"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "$ec_lang_syn proposal for Tom, on all three (mhp_vel_ok_short / mhp_vel_high_short / mhp_vel_low_short): 'Verdict on the flow velocity: acceptable / too high / too low. | layout: column heading'. Note the same three words are shared by ip_pressure_*_short and bpn_pressure_warn_short, where the subject is pressure, so the entries must be per key. Not written."
+  },
+  {
+   "key": "mhp_annual_kwh",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'Annual energy at 100% capacity' -- capacity factor (running every hour of the year, which is what mhp_notes_7_def says) or rated capacity (running at full output whenever it runs). The two differ by the capacity factor itself, often a factor of two or more.",
+   "readings": [
+    "energy if the plant ran at full output all 8760 hours (intended)",
+    "energy at the plant's rated capacity, over however many hours it runs",
+    "energy at 100% of installed capacity, unspecified duration"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "$ec_lang_syn proposal for Tom: 'Energy produced in a year if the plant ran at full output every hour (8760 h) -- an upper bound, before any capacity factor.' Not written."
+  },
+  {
+   "key": "mpf_solve_for_flow",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium (filed, then knocked down): 'for Flow, Q =' is a sentence fragment beginning with a preposition, which is the exact shape that broke the original word-level design in gendered, word-order and RTL languages.",
+   "readings": [
+    "the connective in '[Solve] for Flow, Q = __'",
+    "a standalone label"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Not a defect. lib/Calculators.lib.php:126-137 makes the connective ONE whole key on purpose, precisely so word order and case agreement stay the translator's decision; the alternative (a preposition composed with a separate noun at render time) is the thing the design already rejected. The fragment is the fix, not the bug."
+  },
+  {
+   "key": "mpf_note_1",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low (filed, then knocked down): the string opens <dl><dt>...</dd> and never closes the <dl>, which reads as malformed markup a translator might try to repair.",
+   "readings": [
+    "an unbalanced definition list",
+    "half of a list closed elsewhere"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Manning-Pipe-Flow.php:48 supplies the closing </dl> immediately after echoing the key. html_balance_check.php passes on the rendered page, and lang_tag_parity_check.php --strict already requires each language to match English tag for tag, so a translator who 'repairs' it fails the build loudly rather than silently."
+  },
+  {
+   "key": "mi_station",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium (filed, then knocked down): 'Sta' is an abbreviation with no expansion in the string, and 'station' is a documented bus-stop mistranslation trap.",
+   "readings": [
+    "station/chainage along the alignment",
+    "a transit stop"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Already answered: $ec_lang_syn['mi_station'] carries the expansion, the 'Distance' alias and an explicit avoid for the transit-stop sense, with the languages it was corrected in named. Re-flagging it is Wave 0 rediscovering a channel that already exists."
+  },
+  {
+   "key": "mi_is_bank",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium (filed, then knocked down): 'R_h, Q region boundary (Bank)' -- 'Bank' is a strong polysemy (financial institution) and the noun stack has more than one bracketing.",
+   "readings": [
+    "this point divides two hydraulic regions",
+    "financial bank",
+    "a bank of instruments"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Already answered: $ec_lang_syn['mi_is_bank'] gives Boundary/divider/edge/break plus 'bank as in HEC-RAS' and the layout tag."
+  },
+  {
+   "key": "wi_notes_we_def",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium (filed, then knocked down): the weir equation is written as if/then/else pseudocode, and a translator may translate the keywords, the operators, or both, inconsistently across languages.",
+   "readings": [
+    "pseudocode to be read as a formula",
+    "prose to be translated"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Already answered: $ec_lang_syn['wi_notes_we_def'] names it as pseudocode, carries the symbol flag, and states explicitly which words may be translated and which structure stays."
+  },
+  {
+   "key": "cs_water_value",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium (filed, then knocked down): 'Water value' is monetary worth or a numeric value of a water quantity, and the string names no currency.",
+   "readings": [
+    "the price of water per unit volume",
+    "a numeric value describing the water"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Already answered: $ec_lang_syn['cs_water_value'] gives 'Monetary value (price, worth) of water per unit volume' and states that the currency is deliberately unspecified."
+  },
+  {
+   "key": "bpn_elev_down",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low (filed, then knocked down): 'DS elev.' uses an unexpanded two-letter abbreviation and, unlike bpn_p_down, the label has no tip of its own.",
+   "readings": [
+    "downstream elevation",
+    "some other DS"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Already answered: $ec_lang_syn['bpn_elev_down'] expands DS and says which elevation it is; the missing tip does not reach the translator's problem."
+  },
+  {
+   "key": "bpn_p_down",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low (filed, then knocked down): 'DS press.' stacks the DS abbreviation with the same Press./press verb ambiguity as ip_press.",
+   "readings": [
+    "downstream pressure",
+    "an imperative: press"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Already answered: $ec_lang_syn['bpn_p_down'] expands both halves. Recorded because ip_press, whose entry is EMPTY, has the identical defect and is referred above -- the pair is the evidence that the gap is per key, not per concept."
+  },
+  {
+   "key": "mtc_pi_ok",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low (filed, then knocked down): 'd50 in P&I range' uses an ampersand initialism that appears nowhere else in the string.",
+   "readings": [
+    "Phillips & Ingersoll",
+    "principal and interest",
+    "some other P&I"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Not a defect in practice: the tip on the same control (mtc_pi_ok_tip) spells out 'Phillips & Ingersoll, 1998' and the sibling label mtc_n_pi spells it out too. The expansion is inside the same batch."
+  },
+  {
+   "key": "ws_main_menu",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low (filed, then knocked down): 'Weir Flow Simple' and 'Weir Flow Irregular' put the adjective last, which is not natural English word order and invites a calqued word order in languages that would otherwise front it.",
+   "readings": [
+    "the simple weir-flow calculator",
+    "a simple kind of weir flow"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Deliberate: these are identity strings whose shared 'Weir Flow' prefix groups the two calculators together in the menu. dev/language-strings.md already tells translators never to calque word order in either role, so the risk it names is covered by a standing rule rather than by this string."
+  },
+  {
+   "key": "ip_elev_ds_missing_warn",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low (filed, then knocked down): 'defaulted to flat' uses 'flat' as a hydraulic shorthand for zero elevation change.",
+   "readings": [
+    "no elevation change along the reach",
+    "flat as in level ground",
+    "a flat (apartment)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The control's own tip (ip_elev_ds) states 'defaults to flat / same as the node above if left blank' in the same breath, so the gloss travels with the term inside one calculator's batch."
+  },
+  {
+   "key": "hw_notes_epanet_term",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low (filed, then knocked down): 'constants now match EPANET' uses a time-relative 'now' that goes stale, and the same string is duplicated verbatim at bpn_notes_epanet_term.",
+   "readings": [
+    "as of a stated release",
+    "at the present moment, whenever you read this"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The string dates itself in the same breath ('(August 2026)'), so 'now' cannot drift loose. The duplication with bpn_notes_epanet_term/def is real but is key-consolidation work, which CLAUDE.md keeps as one full-suite English pass rather than a per-calculator fix; it is reported to the human as an observation, not filed as a defect here."
+  },
+  {
+   "key": "cs_notes_2_def",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low (filed, then knocked down): 'Seepage losses above 30% of inflow often justify a lining investment' -- 'justify' can read as 'prove worthwhile' or 'require an explanation'.",
+   "readings": [
+    "make a lining investment worth its cost",
+    "call for a justification to be written"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The sentence names the investment as the object, which settles it in every language checked in the July pass; the second reading needs a different object. Recorded so a later pass does not re-file it."
+  }
+ ]
+}
