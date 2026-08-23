@@ -18,6 +18,12 @@ ones" honestly rather than pretending to rank them. *(Replaced a 0–100 free sc
 88 tasks used 19 distinct values and 40 of them sat between 40 and 60. The rejected alternative was to
 re-space the fine scale; 45-vs-50 is a distinction nobody can re-derive a month later.)*
 
+**Every task OPENS with an executive-summary title of 4–12 words** — the first bolded run of the
+description, after any marker or actor tag. The exact rule, and why that range, is in
+`dev/scripts/roadmap_lib.php`; `roadmap_id_check.php` reports the ones outside it (advisory while
+the backlog catches up). Anything longer belongs in the body. `dev/roadmap-index.md` is those
+titles alone, the whole backlog in one screen — generated, never hand-edited.
+
 **ID is permanent** — never reused, never changed, unrelated to priority. Cite one as "Task N". A
 sub-item under a parent may use a dotted ID (`146.01`) and is still a full bullet.
 
@@ -41,8 +47,8 @@ the block.
 
 # Tasks
 
-- 100|145| **GEOGRAPHIC PROJECTS: a project declares grid or geographic before anything is drawn, the
-  same way it declares units.** Scope, the three places "geo is just another unit" stops holding, the
+- 100|145| **GEOGRAPHIC PROJECTS: grid or geographic, declared before anything is drawn.**
+  A project declares it the same way it declares units. Scope, the three places "geo is just another unit" stops holding, the
   basemap, the unprojected display and the projection seam: **`dev/geographic-projects.md`**.
   - **DONE, slices 1-3:** the declaration and degrees at every user boundary; the OpenStreetMap
     raster basemap; and the placement tool (File > Convert to lat/lon…), plus a globe-wide
@@ -60,7 +66,7 @@ the block.
     first tab of a first visit, which is born grid without anybody saying so. Task 477 is where that
     gets asked.
 
-- 100|388| **The documentation is written as a transcript of revision, not as current state.**
+- 100|388| **Documentation is written as a transcript of revision, not current state.**
   The habit is that a correction is APPENDED, never SUBSTITUTED. The rule: when a decision is
   superseded, delete the superseded reasoning — keep the conclusion and the one rejected alternative
   that would otherwise be re-proposed.
@@ -80,8 +86,8 @@ the block.
     rewrites every SHA, forces a push, breaks production's `git pull`, dangles 43 SHA citations in
     `dev/*.md`, and saves no context — nothing ever loads a commit message.
 
-- 100|389| **Search and replace inputs across the network — WANTED, and no longer gated on network
-  size.** Tom, 2026-08-16: *"I would like search and replace embraced more explicitly."* That
+- 100|389| **Search and replace inputs across the network, no longer gated on size.**
+  WANTED, and no longer gated on network size. Tom, 2026-08-16: *"I would like search and replace embraced more explicitly."* That
   reverses this file's earlier position, which said find-and-replace was a big-network tool we
   should not borrow for a design tool. The reversal is deliberate: a designer re-roughening every
   PVC pipe, or bumping every 6-inch main to 8-inch after a fire-flow run, is doing DESIGN, not
@@ -113,7 +119,8 @@ the block.
     paid agents; CLAUDE.md forbids inferring that from a general "proceed". The English is already
     edited, so the whole remaining task is the 26 renderings.
 
-- 100|436| **A wheel notch on the map costs a full label relayout, and that is editor-wide.**
+- 100|436| **A wheel notch costs a full label relayout, editor-wide.**
+  A wheel notch on the map costs a full label relayout, and that is editor-wide.
   Measured on Net3, median per notch: 157 ms XY, 162 ms lat/lon, **26 ms with labels off**. lat/lon is
   not intrinsically slower — the georeferencing tool is ~20x cheaper than the editor it runs inside.
   **The task is why a relayout runs on every notch at all.**
@@ -123,8 +130,8 @@ the block.
     map's own 1/cos(latitude) — 9% from 20° to 31°. Unavoidable on an unprojected display without an
     anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.
 
-- 100|439| **The lat/lon drawing comes apart past ~600,000 px/degree, and it is Task 354 in degrees.**
-  A node's `<circle>` rasterises at x = −41,548,184 and is simply not on screen, while `maxScale()`
+- 100|439| **The lat/lon drawing comes apart past ~600,000 px/degree.**
+  It is Task 354 in degrees. A node's `<circle>` rasterises at x = −41,548,184 and is simply not on screen, while `maxScale()`
   for a geographic project is 5.56e7. The medicine is the one Task 354 already used — coordinates
   local to an origin — but `LPN_ORIGIN_THRESHOLD` is 1e4 and a longitude is 122, so no geographic
   document is ever rebased, and `georefStart()` deliberately sets `doc.origin = {0, 0}`. Touches the
@@ -132,7 +139,7 @@ the block.
   - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
     drawing is still correct.
 
-- 50|481| **A closed task cited as pending is how three false claims shipped in one day.** On
+- 50|481| **A closed task cited as pending ships false claims.** Three shipped in one day. On
   2026-08-21 `CLAUDE.md` said extended-period simulation was "not built yet" and that `.inp` export
   was "not written yet"; the LibreWaterNet landing draft said both. All four had shipped 2026-08-18.
   **Tom caught it, not a check** — *"This is false. How could you not know that?"*
@@ -193,8 +200,8 @@ the block.
     quoted it back all sprint. Entry rewritten; the key list the check walks is derived from the
     English, so a new mode-naming string joins it by itself.
 
-- 75|465| **[H] Reusable pipe and pump TYPES — one "150 mm PVC" definition that 400 pipes point at,
-  so editing it edits all 400.** A type carries diameter, roughness and minor-loss k; an element names
+- 75|465| **[H] Reusable pipe and pump TYPES, so editing one edits 400.**
+  One "150 mm PVC" definition that 400 pipes point at. A type carries diameter, roughness and minor-loss k; an element names
   a type instead of repeating the numbers. Tom named these beside Patterns/Curves/Controls in Task 462,
   but those are things the document already HOLDS — this is a new indirection through the element model.
   - **It starts at `effective()`, which is the expensive part.** A third resolution layer — override →
@@ -204,7 +211,7 @@ the block.
   - **EPANET has no such concept**, so an `.inp` export flattens it and an import can never rebuild it,
     which breaks Task 281's byte-identical round trip for anything typed. Task 390-sized.
 
-- 75|476| **[H] Convert to lat/lon should land in a NEW project, not mutate the open one.** Today the
+- 75|476| **[H] Convert to lat/lon should land in a NEW project.** Not mutate the open one. Today the
   conversion mutates in place, so Cancel is the only way back and after Finish the user's XY file is one
   Save away from being overwritten by a lat/lon one. The mechanism exists — `importProject()` lands an
   `.inp` in a new tab, `saveProjectAs()` duplicates a project whole. Costs two tabs and a naming
@@ -229,6 +236,13 @@ the block.
     and `~/libreepanet.org` are already web roots. Options and the recommendation:
     `dev/hosting-layout.md`.
 
+- 75|485| **All six production logs start within four minutes of 2026-08-14.**
+  Nobody archived, purged or emptied them, yet the window is 8.5 days and `engcalcs-lang.log`,
+  `-human-view.log`, `-calc-usage.log`, `-title.log`, `-signal.log` and `-contact-send.log` each
+  begin at 2026-08-14T11:57–11:58Z. Six files truncated at once is one event, not attrition —
+  candidates are host log rotation, a deploy that recreated the directory, or a quota event.
+  **Until it is identified, no window longer than the current one can be trusted to exist.**
+
 - 50|207| **The dilettante path: make replying cost one tap, not five steps.** Full design
   record in **`dev/dilettante-path.md`** — the cost ladder (Rung 0 is a tap with no text), the three
   portable Wikipedia mechanisms, the honesty boundary, the spam design, and the codebase-specific
@@ -240,7 +254,7 @@ the block.
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
 
-- 50|248.02| **Patterns (Task 248 child) — attach one to a RESERVOIR HEAD and a PUMP.** Everything
+- 50|248.02| **Patterns: attach one to a RESERVOIR HEAD and a PUMP.** Task 248 child. Everything
   else shipped: the Libraries box creates, renames, edits and deletes patterns with a sparkline, the
   property popup attaches one to a junction demand, `[PATTERNS]`/`[TIMES]`/`[OPTIONS] Pattern` round-trip
   byte-identically, and Net3 matches EPA's published 24-hour report to 0.005 ft over 2,425 comparisons.
@@ -266,8 +280,8 @@ the block.
     visitors norm (`js/vendor/` today holds only the EPANET engine). Decide the mechanism before
     scoping the toggle above.
 
-- 50|425| **The dialog shown when you change a unit on the lpn page and the project already has
-  content.** It asks what the change should mean to the numbers already typed. Use Tom's own wording
+- 50|425| **The unit-change dialog for an lpn project that already has content.**
+  It asks what the change should mean to the numbers already typed. Use Tom's own wording
   (2026-08-18) rather than paraphrasing it, and add the CANCEL the first cut lacked.
   - Title: *This unit decides what your inputs mean*. Then *cfs is the unit of what you enter for* and
     the field names **one per line**, not a comma list.
@@ -282,7 +296,7 @@ the block.
   2026-08-18, but a project opened later shows a coloured map and no statement of what the colour
   means. Candidate home: under or replacing the legend title.
 
-- 50|429| **The Ranges picker.** Today: four break boxes plus Equal intervals / Equal counts /
+- 50|429| **The Ranges picker: one dropdown for mode and break count.** Today: four break boxes plus Equal intervals / Equal counts /
   Automatic. Tom wants one dropdown choosing among 5 calculation modes and a number of breaks, reading
   closed as e.g. `Ranges: 7 Pretty breaks`. *"If Classes isn't standard, I would call it Breaks, Tiers,
   or Quantity, and I would list it first on the closed dropdown."*
@@ -314,8 +328,8 @@ the block.
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
 
-- 50|442| **[H] The toolbar may want to become a side menu, and phones have a gesture we do not use.**
-  Tom, 2026-08-18: *"Phones have the swipe superpower that is not idiomatic on a PC… Maybe a
+- 50|442| **[H] The toolbar may want to become a side menu.**
+  Phones also have a gesture we do not use. Tom, 2026-08-18: *"Phones have the swipe superpower that is not idiomatic on a PC… Maybe a
   different phone layout convention that could translate to the PC such as transforming the toolbar
   into some sort of a side menu. This would have the advantage of using side real estate when height
   real estate is very limited."* Raised, not scoped. **Raised again 2026-08-20 with the trigger
@@ -326,7 +340,7 @@ the block.
   full-window drawing surface and is almost impossible on a phone, so the PHONE half of this is worth
   little; the SIDE-MENU half is worth something on its own merits, on a laptop with 800px of height.
 
-- 50|452| **Satellite imagery from Mapbox — BUILT, and blocked on one decision about the token.**
+- 50|452| **Satellite imagery from Mapbox: BUILT, blocked on the token decision.**
   Tom asked for it, chose Mapbox over a keyless source, created the account and supplied a public
   `pk.` token 2026-08-19. Shipped: a second tile source beside OpenStreetMap, its own View row, its
   own required attribution (Mapbox names Mapbox and Maxar as well as OpenStreetMap), and a fallback
@@ -378,41 +392,40 @@ the block.
     showing least — the lowest demand, the pressure nearest the middle of the range, or the
     elevation or head closest to the neighbouring nodes."* Swap it in when this lands.
 
-- 50|472| **`alignedSideFor()` walks every link to place one label, which is the next quadratic.**
-  With the four measurement quadratics fixed (Task 440), a Close of the 256-junction grid spends 21%
+- 50|472| **`alignedSideFor()` walks every link to place one label.**
+  It is the next quadratic. With the four measurement quadratics fixed (Task 440), a Close of the 256-junction grid spends 21%
   of its self time in `linkPointList()` — 480 x 480 calls on that drawing — against getBBox()'s 6.2%.
   The number to beat and the profile it came from are at the top of `dev/browser-pass/specs/perf.js`;
   a saving worth defending is worth a COUNTABLE guard, as `dev/lpn-spike/label-batch-harness.js` is.
 
-- 50|478| **[H] Tab should walk down the input column, not sideways into every unit select.** Tom,
-  2026-08-21. **PHASE 1 SHIPPED 2026-08-21** — the per-line X-hiders left the tab order, which was
-  35–43% of every stop on the worst pages: Irrigation-Pressure **83 → 60**, Manning-Trap **74 → 46**,
-  Darcy-Weisbach **70 → 42**, Hazen-Williams **62 → 39**, Manning-Pipe-Flow **52 → 35**. The X keeps
-  its place and its click; it carries `tabindex="-1" aria-hidden="true"` (the pair is required, or it
-  fails axe's `aria-hidden-focus`), and `echoLineChooser()` gives the function one keyboard door per
-  column — a closed `<details>`, one stop, which also adds the un-hide path that never existed.
-  `dev/scripts/focus_order_check.php` holds it: blocking at ≤1 hide stop per page, and it prints the
-  per-page table so the number is never guessed again.
-  - **WHAT IS LEFT — phase 2, and it is worth less than it looks.** Tab order IS DOM order, and the
-    blocker is that the two lists are nested `<table>`s whose cells cannot be reordered visually
-    (only flex or grid has `order`). It is ONE FUNCTION, not sixteen pages — `echoCalculatorForm()`,
-    and only the two INNER tables need to become grids — but it is a layout change to all sixteen
-    calculators that no harness can see and only a browser pass can confirm. **The prize is the
-    `x-cross` column the check now prints** (number inputs sitting after a unit select):
-    Manning-Trap 16, Irrigation-Pressure 12, Orifice-Drain-Time 9, Branched-Network 8,
-    Darcy-Weisbach 8, Manning-Pipe-Flow 4. Flip that column from advisory to blocking when it lands.
-  - **RULED: HTML, not a JS Tab interceptor** (Tom, 2026-08-21: *"I meant HTML"*). That also rules out
-    both `tabindex` levers: `-1` on a select makes changing a unit keyboard-unreachable (a WCAG 2.1.1
-    failure, not a nuisance), and a positive `tabindex` hoists the whole form above the navbar
+- 50|478| **[H] Tab should walk down the input column, not sideways.**
+  Phase 2: the two INNER tables built by `echoCalculatorForm()` become grids, so every number input
+  precedes its own unit select. It is ONE FUNCTION but a layout change to all sixteen calculators
+  that no harness can see — only a browser pass confirms it. The prize is the `x-cross` column
+  `dev/scripts/focus_order_check.php` prints (a number input sitting after a unit select):
+  Manning-Trap 16, Irrigation-Pressure 12, Orifice-Drain-Time 9, Branched-Network 8,
+  Darcy-Weisbach 8, Manning-Pipe-Flow 4. Flip that column from advisory to blocking when it lands.
+  - **The X paradigm stays and the per-row X links are back in the tab order** (Tom, 2026-08-22).
+    `echoLineChooser()` and the `tabindex="-1" aria-hidden="true"` hiders are scrapped, and
+    `focus_order_check.php` is advisory rather than blocking on its hide-stop count.
+  - **RULED: HTML, not a JS Tab interceptor** (Tom, 2026-08-21: *"I meant HTML"*). That also rules
+    out both `tabindex` levers: `-1` on a select makes changing a unit keyboard-unreachable (a WCAG
+    2.1.1 failure, not a nuisance), and a positive `tabindex` hoists the whole form above the navbar
     document-wide. A label link is real navigation and stays focusable.
-  - **Needs one browser pass**, and only these: Orifice with a circular shape must not list "Width, W"
-    in the chooser (and must list it when rectangular); Manning-Trap, that an X'd line comes back from
-    the chooser; and any page's print preview, that an X'd line stays out and the chooser does not print.
+
+- 50|483| **EPANET import: carry unhandled features into a per-asset import notes field.**
+  Tom, 2026-08-22. Today an import reports its differences and then the information is discarded; a
+  notes field the user can read would keep it, e.g. *"EPANET Label was marked a Meter associated
+  with Link 999 and anchored to Link 999."* He leans toward IMPLEMENTING the anchor (a Text object
+  associated with a node or link) and merely NOTING the Meter — EPANET's Meter shows whichever
+  single notation property is selected on Nodes or Links at that moment, which is less flexible than
+  what our labels already do, so reproducing it is not obviously worth it. Tom: *"I'm not opposed to
+  implementing this, and it may be better to implement it than to discuss it."*
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
-  HW draws 580 confirmed humans (18% human-of-reach, the suite'''s second-biggest front door) but only
+  HW draws 580 confirmed humans (18% human-of-reach, the suite's second-biggest front door) but only
   11% of them calculate, against a 51–67% band on six comparable pages — ~517 lost humans per period.
-  - **Do not guess a fix.** The decisive step is one observation: pull the HW page'''s own Search
+  - **Do not guess a fix.** The decisive step is one observation: pull the HW page's own Search
     Console query export and segment it (the doc says exactly how). Reference-lookup queries mean a
     C-value table on the page; calculator queries mean a real UX leak.
   - **Do not promote Task 146 on the 11% number alone** — it does not yet distinguish a leak from
@@ -465,8 +478,8 @@ the block.
   - **If the tables come out essentially identical, that is a legitimate reason NOT to build it.** The
     case rests on multilingual reach and on owning the reference, not on the existing one being wrong.
 
-- 25|218| **Find advisors and proteges — a standing, nagged commitment, not a task that completes.**
-  Tom, 2026-08-05: *"I still need help knowing where to try to connect with advisors and proteges;
+- 25|218| **Find advisors and proteges: a standing, nagged commitment.**
+  Not a task that completes. Tom, 2026-08-05: *"I still need help knowing where to try to connect with advisors and proteges;
   this is not my strength. r/civilengineering is mostly frivolous talk."* And the same day: *"This is
   not my strength or passion. I'll want you to hold my hand and push me to 'eat my veggies.' I may
   have to get in my car and go to lunch. I will need pushing."* **So the nagging is authorized and
@@ -496,7 +509,7 @@ the block.
   rewrite against live controls, not a code fix, so it needs a browser pass rather than static
   reading.
 
-- 25|234| **Canal Seepage must prove its worth or go (Tom, 2026-08-08: "in my crosshairs").** After
+- 25|234| **Canal Seepage must prove its worth or go.** Tom, 2026-08-08: *"in my crosshairs"*. After
   Task 232 removed `Irrigation.php`, `cs_` is the remaining page Tom is not proud of — his standing
   position is that it was AI momentum rather than a real need, and it is already under a
   do-not-promote (never propose it for links, outreach, or feature work).
@@ -516,8 +529,8 @@ the block.
   fits the irrigation/rural-water audience. Below Task 184 (scenarios), which epanet-js charges for
   and Tom therefore wants raised.
 
-- 25|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
-  and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves shipped
+- 25|248| **Extended-period simulation, the GATE on the LibreEPANET.org launch.**
+  Last of the three things the EPANET engine unlocked; Tasks 306/307. Tanks and valves shipped
   2026-08-14, PBV and GPV 2026-08-17.
   - **THE RUN SHIPPED 2026-08-18** (`js/lpn-time.js`, `EngCalcs.lpnEpanetRun`): the seven time
     settings are editable, EPANET's own `runH()/nextH()` loop gives a frame per reporting step, a
@@ -599,8 +612,8 @@ the block.
     still writes it so old and new project files keep one shape. Drop it only alongside a storage
     version bump, the way `fileAutosaveSeconds` was left.
 
-- 25|285| **We do not know what devices anybody uses this on, and several decisions have quietly
-  assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."*
+- 25|285| **We do not know what devices anybody uses this on.**
+  Several decisions have quietly assumed an answer. Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."*
   `log-human-view.php` and `log-calc-event.php` record **page and language and nothing else**, so
   there is no device signal anywhere in this project's instrumentation — every touch-target,
   breakpoint and two-pane-layout argument ever made here has rested on a guess.
@@ -633,8 +646,8 @@ the block.
   arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops
   fitting on a screen.
 
-- 25|390| **Finish the unit paradigm migration: a unit is a NAME, and a file's numbers are the
-  user's.** Diagnosis, measurements and dependency order: **`dev/unit-paradigm-migration.md`**.
+- 25|390| **Finish the unit paradigm migration: a unit is a NAME.**
+  And a file's numbers are the user's. Diagnosis, measurements and dependency order: **`dev/unit-paradigm-migration.md`**.
   - **All six steps are DONE** (five 2026-08-16, the reservoir head 2026-08-17). What is left is the
     acceptance criterion, which only `.inp` EXPORT can satisfy.
   - **No choice of constant could have fixed this**: 36.7% of a 20,000 sample fails to round-trip
@@ -645,7 +658,7 @@ the block.
   - **Acceptance: import then export is BYTE-IDENTICAL for every value the user did not edit.** Also
     Task 281's criterion.
 
-- 25|416| **The tester control panel: move it, prune it, and make it the request channel.** Tom,
+- 25|416| **The tester control panel: move it, prune it, repurpose it.** Make it the request channel. Tom,
   2026-08-17: *"I am not using it much because it seems like mostly noise."* Today it is
   `?debug=labels`, built by `buildLabelBench()`.
   - **Move to the LEFT edge** (away from Settings and Labels), **prune the obsolete numbers**, and
@@ -665,7 +678,7 @@ the block.
     (shedding) · 6 labels hidden because the zoom is too far out · 7 leader lines drawn.
   - Stopping at N answers "did my change help?" — the answer is two drawings at the same step.
 
-- 25|417| **Long-press on an element should enter Edit mode, exactly as a click does.** Tom,
+- 25|417| **Long-press on an element should enter Edit mode.** Exactly as a click does. Tom,
   2026-08-17. The guard that switches to Edit mode on click does not fire when a long press begins a
   drag, so a touch user who presses and drags is editing an element the page does not think is
   selected for editing. Same guard, second trigger. See Task 192 for why long-press is the touch
@@ -716,6 +729,12 @@ the block.
   `t` cell; since Task 474 it also reaches that region's Froude number. Found 2026-08-21 by
   `mi-harness.js`. Reject a zero-length segment, or say why NaN is the honest answer.
 
+- 25|484| **Log which unhandled EPANET features actually arrive in real imports.**
+  A server-side count of the import features we do not handle, so Task 483 and its siblings are
+  driven by what users really bring rather than by what we imagine. **This is analytics, so the log
+  row is gated on `ecAnalyticsConsented()`** — the non-obvious part, and the reason it is not simply
+  a counter.
+
 - 5|114| **Reservoir / detention routing calculator (Modified Puls) — full scope in
   `dev/detention-routing-scope.md`.** A time-stepping engine, which is the real departure from the
   suite's steady-state weir and orifice calculators. **Hydrology stays out of scope** — the user
@@ -764,8 +783,8 @@ the block.
 
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
 
-- 5|155|[H] **Deploy and verify the Task 149 search-index fix — deployed, awaiting Search Console
-  confirmation.** Steps 1–5 (sitemap uploaded, `robots.txt` Sitemap line, sitemap submitted in
+- 5|155|[H] **The Task 149 search-index fix awaits Search Console confirmation.**
+  Deployed already. Steps 1–5 (sitemap uploaded, `robots.txt` Sitemap line, sitemap submitted in
   Search Console, code pushed, one canonical origin) were all done and verified live 2026-07-28 — do
   not re-verify them by hand. Only the wait is left, which is why the priority dropped 50 → 10.
   - **CHECK: 2026-09-01.** `site:hawsedc.com inurl:lang=es` should start returning results, and the
@@ -828,8 +847,8 @@ the block.
   cell. Large; parked deliberately behind Task 185, which gets most of the practical benefit for a
   fraction of the work.
 
-- 5|191| **Junction emitters — surface the pressure-dependent demand the solver already has
-  (originated during Task 146).** Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"
+- 5|191| **Junction emitters: surface the pressure-dependent demand already solved.**
+  Originated during Task 146. Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"
   row: *"Do we have emitters? Do we do something with this?"* The honest answer was **no** — that
   control was removed in the same session (see the note in `rebuildSettingsFields()`), because:
   - **`js/lpn-solver.js` fully implements emitters** — `qe = K·ΔH^n` with the matching Jacobian
@@ -861,8 +880,8 @@ the block.
   - **Do not hijack right-click inside form fields**; the popup's text inputs must keep native
     copy/paste. **Disable-with-reason rather than hide**, so the vocabulary stays learnable.
 
-- 5|194| **Touch gesture model: one finger scrolls the page, two fingers pan the map (originated
-  during Task 146).** Raised by Tom, 2026-07-31, after the canvas-fills-the-phone lock-up: *"It didn't occur
+- 5|194| **Touch gestures: one finger scrolls the page, two pan the map.**
+  Originated during Task 146. Raised by Tom, 2026-07-31, after the canvas-fills-the-phone lock-up: *"It didn't occur
   to me to try to scroll with two fingers. That's just an idea. It looks like it occurred to you
   too."* The height cap in `applyMapHeight()` already prevents the trap, so this is an improvement,
   not a fix — it removes the underlying conflict instead of bounding it.
@@ -877,8 +896,8 @@ the block.
     the layer they all sit on. Not a tweak. If it lands, keep the height cap anyway — it costs
     nothing and is the belt to this braces.
 
-- 5|202| **`zh` converts at ~15% where its peers convert at 50–75% — PARKED until n=30, with a
-  pre-registered threshold.** Everything cheap has been eliminated: **not bots** (arrival pattern is
+- 5|202| **`zh` converts at ~15% where its peers convert at 50–75%.**
+  PARKED until n=30, with a pre-registered threshold. Everything cheap has been eliminated: **not bots** (arrival pattern is
   more human-shaped than `es`), **not missing strings** (`lang_parity_check` reports only `lpn_`
   gaps; all `mpf_` keys present, unit tokens translated, `EC_DEFAULT_UNIT_SET` correctly SI), **not a
   wrong promise in search** (`mpf_main_title` = 免费在线曼宁管流计算器, unambiguously a calculator, and
@@ -995,18 +1014,18 @@ the block.
   - **Recorded so NEW strings do not drift.** The decision is cheap now and expensive later: every
     string written in the other vocabulary adds to the rename we have just declined.
   - **A real feature gap found the same day, and it is separate: EPANET can METER a node or link.**
-    A Text/Label is associated with an element, and EPANET puts that element's current notation
-    property — it allows exactly one at a time, for links and for nodes each — under the text you
-    typed, all in a rectangular bubble with a pale yellow background. We have no equivalent. Note the
-    asymmetry that makes it interesting rather than simply missing: **our labels already carry
-    MULTIPLE properties and drag freely**, which is `dev/positioning.md` §4. Copying it wholesale
-    would be scope gravity.
-  - **The general point, which outranks both bullets.** Tom: *"there is an unknown amount of EPANET
-    that we don't yet implement."* The LibreWaterNet landing page now says exactly that, instead of
-    listing edges as though the list were complete.
+    A Text/Label is associated with an element, and EPANET puts that element's one selected notation
+    property under the text you typed, in a pale yellow bubble. **Our labels already carry MULTIPLE
+    properties and drag freely** (`dev/positioning.md` §4), so copying it wholesale is scope gravity.
+  - **DEFERRED ON PURPOSE, and that is the position, not indecision** (Tom, 2026-08-22). Change is
+    inevitable and refactoring is a value, because foresight is never perfect; overvaluing the past
+    is as much a weakness as ignoring it; listen to users; there is an unknown depth of possible
+    correction, so the aim is to act rightly now rather than lock the decision early. Tom: *"there is
+    an unknown amount of EPANET that we don't yet implement."*
 
-- 5|400| **Phase 3 — bounded local search on the residue. LOWERED 60→15, Tom 2026-08-17: "Phases 1
-  and 2 are good enough for GIS mode or management mode. Phase 3 may be helpful for report mode."**
+- 5|400| **Phase 3: bounded local search on the label residue.**
+  Tom, 2026-08-17, lowering it 60→15: *"Phases 1 and 2 are good enough for GIS mode or management
+  mode. Phase 3 may be helpful for report mode."*
   Parked for real-world feedback from Tom's colleague Mary (Philippines) rather than scheduled work;
   an event gate, not a `CHECK:` date.
   - Wagner & Wolff's three optimum-preserving reduction rules on an explicit conflict graph, then a
@@ -1023,8 +1042,8 @@ the block.
     reduction rules, and the "start in open territory" precondition the relaxation bullet assumes.
     Literature pass done 2026-08-17: `dev/most-open-angle-brainstorm.md`.
 
-- 5|410| **Animation: a time-frame slider (time display, play, pause, speed) once Task 248 lands.**
-  Tom, 2026-08-17, naming the EPANET/HEC-RAS convention as the shape to copy. Same "constantly
+- 5|410| **Animation: a time-frame slider, once Task 248 lands.**
+  Time display, play, pause, speed. Tom, 2026-08-17, naming the EPANET/HEC-RAS convention as the shape to copy. Same "constantly
   desirable, fit in when there's time" tier as Tasks 327 and 409.
 
 # Reference
