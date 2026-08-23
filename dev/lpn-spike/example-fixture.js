@@ -1,9 +1,11 @@
 // The harnesses' network, opened the way a visitor opens one (ROADMAP Task 378).
 //
-// WHY THIS EXISTS. Seven harnesses used to build their network by calling drawExampleNetwork(),
-// a 289-line code-drawn ring main in js/looped-network.js that no menu item reached any more -- so
-// it shipped to every visitor purely to give the test suite a fixture. The gallery file is the same
-// ring main, already shipped, already the thing a visitor actually opens; reading it through
+// WHY THIS EXISTS. Ten harnesses used to build their network by calling drawExampleNetwork(),
+// a code-drawn ring main in js/looped-network.js that no menu item reached any more -- so it
+// shipped to every visitor purely to give the test suite a fixture. Seven took the gallery file
+// instead (below); the other three took the fixture itself, which moved into this folder
+// (example-draw-fixture.js). The gallery file is the same ring main, already shipped, already
+// the thing a visitor actually opens; reading it through
 // acceptImportedText() + applySaved() gives the harnesses their network AND exercises the open path,
 // which the code path never did.
 //
@@ -46,4 +48,15 @@ function openExample(L, system) {
 	return saved;
 }
 
-module.exports = { EXAMPLE_EXPORTS, openExample, exampleText, examplePath };
+// THE OTHER HALF OF TASK 378, for the three harnesses the gallery file cannot serve. This is the
+// code-drawn ring main that used to live in js/looped-network.js, read as TEXT so lpn-dom-stub.js
+// can splice it back into that file's own scope at load time. example-draw-fixture.js states why it
+// moved and what it costs; read that before touching either end.
+//
+// Pass it as loadLoopedNetwork()'s second argument and drawExampleNetwork() is in scope exactly as
+// it always was -- no other change to a harness.
+function drawExampleSource() {
+	return fs.readFileSync(__dirname + '/example-draw-fixture.js', 'utf8');
+}
+
+module.exports = { EXAMPLE_EXPORTS, openExample, exampleText, examplePath, drawExampleSource };

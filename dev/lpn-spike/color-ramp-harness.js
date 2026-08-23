@@ -19,6 +19,8 @@
 // solver's own pressures and velocities, not about numbers this file made up.
 
 const { ROOT, mkEl, byId, ensure, unitSelects, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { drawExampleSource } = require('./example-fixture.js');
+
 // The same module the page loads, asked directly: an expectation computed from it is the coupling
 // under test, while a retyped hex or a retyped break would be testing a copy.
 const R = require(ROOT + 'js/lpn-ramps.js').lpnRamps;
@@ -54,7 +56,10 @@ const L = loadLoopedNetwork(
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
 	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
-	"\t\t\trubberBandEl = el('line', {}, world); } "
+	"\t\t\trubberBandEl = el('line', {}, world); } ",
+	// The code-drawn ring main, moved out of the shipped file (Task 378) and spliced back
+	// into its own scope here. See dev/lpn-spike/example-draw-fixture.js.
+	drawExampleSource()
 );
 
 let fails = 0;

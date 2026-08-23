@@ -421,7 +421,7 @@ global.requestAnimationFrame = f => setTimeout(f, 0);
 // iconEl comes from js/Icons.lib.js in the browser; the map symbols only need to not throw here.
 // iconEl/setLabel come from js/Icons.lib.js in the browser; here they only need to not throw.
 // The example's annotations are composed from strings that already exist elsewhere in the suite
-// (see drawExampleNetwork()); the page emits them into pageConfig, so the harness must too, read
+// (see example-draw-fixture.js); the page emits them into pageConfig, so the harness must too, read
 // from the real lang file rather than restated here.
 global.EngCalcs = {
   pageConfig: {}, initTips: () => {},
@@ -540,12 +540,21 @@ function setHitTarget(el) {
  * Load js/looped-network.js with `injectSource` -- the body of a `global.__LPN = { ... }`
  * assignment -- spliced in just before its DOMContentLoaded listener, and return that object.
  * Each harness names only the internals it actually drives.
+ *
+ * `preludeSource` is optional RAW SOURCE spliced into the SAME scope, ahead of that object. It
+ * exists for one thing: a fixture that has to live in dev/lpn-spike/ but must still close over the
+ * page's own internals (dev/lpn-spike/example-draw-fixture.js, ROADMAP Task 378). It is spliced
+ * inside the module's function scope, so what it declares sees doc, settings, setProp(), el() and
+ * the rest exactly as a function written in the file would -- which is the whole reason the fixture
+ * could leave the shipped file without becoming a re-implementation. It is NOT a place to stub
+ * anything out: overriding a page internal from here would remove the coupling the harness exists
+ * to test (dev/testing-notes.md).
  */
-function loadLoopedNetwork(injectSource) {
+function loadLoopedNetwork(injectSource, preludeSource) {
 	let src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
 	const marker = "\tdocument.addEventListener('DOMContentLoaded'";
 	if (src.indexOf(marker) < 0) { throw new Error('injection marker not found'); }
-	src = src.replace(marker, '\tglobal.__LPN = {\n' + injectSource + '\n\t};\n' + marker);
+	src = src.replace(marker, (preludeSource ? preludeSource + '\n' : '') + '\tglobal.__LPN = {\n' + injectSource + '\n\t};\n' + marker);
 	// INDIRECT eval, and the indirection is load-bearing. js/looped-network.js opens with
 	// `var EngCalcs = EngCalcs || {};` -- the browser idiom for "reuse the one the earlier script
 	// tags made". A DIRECT eval inside this function would hoist a fresh function-scoped

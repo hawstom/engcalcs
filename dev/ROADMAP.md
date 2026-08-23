@@ -153,23 +153,25 @@ the block.
     **but it blocks the next sprint launch until he rules.** The 16, plus 9 wording proposals and 7
     `$ec_lang_syn` proposals, are in `239-wave0-calcs.json`.
 
-- 75|378| **Delete `drawExampleNetwork()`; three harnesses still hold it in the shipped file.**
-  289 code-drawn lines that no menu item reaches, shipping to every visitor for the test suite's
-  benefit. **Seven of ten migrated 2026-08-23** onto `dev/lpn-spike/example-fixture.js`, which opens
-  the gallery file through `acceptImportedText()` + `applySaved()` — the path a visitor takes, which
-  the code path never was. Each was diffed byte-identical against its pre-change stdout.
-  - **The remaining three are blocked on real differences, not on effort.** `example-network`
-    (16 assertions), `color-ramp` (the gallery file predates the per-group colour keys, so
-    `applySaved()` pins it to five classes and the harness is about a new project's seven), and
-    `label-shed` (the gallery carries `settings.textSize: 9` against the shipped 11, so the length
-    cascade runs 9→9→7→3→1 instead of 9→9→6→2→1).
-  - **The answer is probably to MOVE the function, not migrate the last three.** A fixture belongs
-    in `dev/lpn-spike/`, injected into the module the stub already evals; the three keep their exact
-    network and visitors stop carrying it. Weigh that against migrating, which changes what those
-    three test.
-  - Measured while migrating: US is exact and SI agrees to ~1e-13, but `settings.engine` differs
-    (`epanet` in the file, `native` from the code) and is invisible only because the stub never
-    defines `lpnSolveEpanet` — a stub holding a coupling constant, per `dev/testing-notes.md`.
+- 75|378| **Delete `drawExampleNetwork()` from `js/looped-network.js`: ONE MECHANICAL CUT LEFT.**
+  Seven of ten harnesses now open the shipped gallery file through `dev/lpn-spike/example-fixture.js`
+  -- the path a visitor takes, which the code path never was. The other three cannot: they assert
+  things about THAT drawing (`example-network`, 16 assertions), about a new project's default of
+  seven colour classes (`color-ramp`; the gallery file predates the per-group colour keys, so
+  `applySaved()` pins it to five), and about the shipped `textSize` of 11 (`label-shed`; the gallery
+  file carries 9, running the cascade 9->9->7->3->1 instead of 9->9->6->2->1).
+  - **MOVED rather than migrated.** The 279 lines now live verbatim in
+    `dev/lpn-spike/example-draw-fixture.js`, spliced back into the module's own scope by
+    `loadLoopedNetwork()`'s new `preludeSource` argument, so the function still closes over the real
+    `doc`, `settings`, `setProp()` and `el()`. Migrating the three instead would have meant
+    re-fitting their assertions to a different network -- changing what they test to land a
+    refactor. All three run byte-identical to their pre-move stdout, and a mutated fixture fails
+    five assertions, which is what proves the relocated copy is the one running.
+  - **TO DO: delete lines 14259-14537** (comment block and function), and the now-dangling reference
+    in the `textSize: 11` comment at line 2503. Held back only for a concurrent track on that file.
+  - Still open, and NOT closed by the move: `settings.engine` is `epanet` in the gallery file and
+    `native` from the code, invisible only because the stub never defines `lpnSolveEpanet` -- a stub
+    holding a coupling constant, per `dev/testing-notes.md`.
 
 - 75|477| **[H] New blank project startup wizard: xy/lat-lon, units, head loss.** Tom, 2026-08-22,
   naming the scope. It replaces the four-row File > New fly-out; on epanet-js, *"they have a wizard
