@@ -161,6 +161,11 @@ run_check "example folder"               advisory php dev/scripts/example_folder
 run_check "mode names"                   advisory php dev/scripts/mode_name_check.php
 run_check "key hygiene"                  advisory php dev/scripts/key_hygiene_check.php --strict
 run_check "size budget"                  advisory php dev/scripts/size_budget_check.php --strict
+# Task 481. Three false "not built yet" claims shipped in one day, two found by Tom and none by any
+# check. This cites-a-closed-task scan is the mechanical half of that shape; the ranking is what
+# keeps it short. Advisory by construction -- citing a closed task as a RECORD is legitimate, so
+# only a human can tell a stale claim from a correct citation.
+run_check "stale claim worklist"        advisory php dev/scripts/stale_claim_check.php
 run_check "english drift"                advisory sh -c 'php dev/scripts/detect_english_drift.php | grep -q "^CHANGED" && exit 1 || exit 0'
 
 echo ""

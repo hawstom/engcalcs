@@ -422,6 +422,7 @@ own failure; this table is an index, not a duplicate of that text.
 | `roadmap_id_check.php` | ID uniqueness across ROADMAP + closed ledger; priority 0 means closed and nothing else |
 | `run_harnesses.sh` | The lpn solver and editor harnesses (count derived from the glob, never typed) |
 | `run_calc_harnesses.sh` | Every calculator's own `pageCalculator` against its own rendered HTML |
+| `stale_claim_check.php` | *Advisory.* A `Task N` cited in `CLAUDE.md` or a `dev/*.md` whose task is CLOSED, ranked by whether a negation sits beside it — the shape of the three false "not built yet" claims that shipped in one day. A worklist, never a verdict |
 | *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php` | Judgement calls that must not block a commit |
 
 **When you are about to write a new rule in this file, first ask whether it can be a check.** Every
@@ -447,9 +448,9 @@ worth roughly ten a human must remember**, and this file's unexecutable half is 
 - **Every calculator now has a worked-example test of its math except `rc`**, which is partial (its
   Robinson coefficients are unverified — the paper is paywalled and the free copy is a page scan).
   The five that had none — `mi`, `wi`, `ip`, `bpn`, `cs` — were anchored 2026-08-21 and **two of them
-  were wrong**: Canal Seepage's currency inputs convert backwards (Task 473) and Manning Irregular's
-  region Froude number mixes a region area with a segment top width (Task 474). Both defects are
-  recorded, neither is asserted, and the build stays green. Add a worked example for any new page;
+  were wrong**: Canal Seepage's currency inputs converted backwards (Task 473) and Manning Irregular's
+  region Froude number mixed a region area with a segment top width (Task 474). Both are fixed, and
+  each is now asserted by its own harness. Add a worked example for any new page;
   it is under an hour, and `dev/calc-spike/README.md` is the recipe.
 - **Row-table calculators** (Branched-Network, Irrigation-Pressure, Manning-Irregular,
   Weir-Flow-Irregular) now build their rows in their OWN per-page harness — `calc-page.js` grew
