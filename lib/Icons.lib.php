@@ -333,11 +333,15 @@ $ec_icons = array(
 	//
 	// **HOUSE WEIGHT (2 units in a 24 box) SETS EVERY DIMENSION.** Measured: two 2-unit strokes need
 	// 3.5 units between centres to keep daylight at 17 px, so 1.5 units of daylight is the floor.
-	//   - **THE ROLL END IS AN ELLIPSE, 2 : 1, MAJOR AXIS HORIZONTAL** (rx 4.8, ry 2.4). It was a
+	//   - **THE ROLL END IS AN ELLIPSE, 2 : 1, MAJOR AXIS HORIZONTAL** (rx 2.8, ry 1.4). It was a
 	//     circle until Tom said so: a round roll seen obliquely foreshortens vertically, and drawing
 	//     it round is the same class of error as drawing the sheet edges as three different curves.
-	//     2.4 is also the flattest ry that leaves the bottom ellipse a visible hole under a 3-wide
-	//     stroke — 1.8 units of it, about 1.3 px at 17.
+	//   - **AND IT IS SMALL, because the roll competes with the sag for horizontal room.** At rx 4.8
+	//     there was none left and the catenary collapsed to an almost vertical drop — Tom: "about
+	//     twice as large as it really can be feasibly... we just need to give it all a bit more
+	//     horizontal space by shrinking the roll of paper." At this size the end fills solid under
+	//     the heavy stroke. That is accepted: it reads as the end of a tight roll, and buying back a
+	//     hole costs the sag the room that makes it a catenary at all.
 	//   - **THE ROLL'S STRAIGHT BACK EDGE** runs down the icon's left at x = 2.0, and it is what makes
 	//     three copies read as one roll instead of as curves floating one above another. It also
 	//     returns theta0 to 180 — the literal top half — because every arc now starts ON that line
@@ -349,14 +353,21 @@ $ec_icons = array(
 	//     could not be had anyway: such a mark has to clear the top edge, the bottom edge, the sag on
 	//     its left and the block on its right, which leaves a lane about 1 unit wide.
 	//
-	// TWO WEIGHTS, ON PURPOSE. The set otherwise uses one, and a lighter WHOLE icon was rejected for
+	// **THE NARROWEST LINE EVERYWHERE IT WILL SURVIVE.** Tom, 2026-08-23: "All the linework should be
+	// as narrow as feasible (not to disappear at 17 px) so that we can fit things." So the standard
+	// stroke here is 1.5, not the set's 2 — this icon carries more line than any other in the set and
+	// needs the room. A path with no stroke-width inherits 2 from EC_ICON_OPEN_TAG, so EVERY narrow
+	// path states its width; lowering the parameter alone silently does nothing.
+	//
+	// THREE WEIGHTS, ON PURPOSE. The set otherwise uses one, and a lighter WHOLE icon was rejected for
 	// exactly that reason — an odd weight in a menu strip is a visible seam. A heavier accent inside
 	// one icon is a different question, and it is the only way to say "a stack of sheets" here: a
 	// second parallel line cannot, because the widest offset that stays in the box is 2.0 and a pair
-	// at 2.0 samples as a solid bar. **ONLY THE BOTTOM IS A STACK** — the bottom ellipse, the bottom
-	// edge (table plus stack), the roll's back edge (the outside of the rolled stack) and the fanned
-	// right edge are 3. Every copy above the bottom is one sheet's own edge and is 2. Copying the
-	// heavy weight up with the shape made three stacks where there is one.
+	// at 2.0 samples as a solid bar. **ONLY THREE LINES ARE HEAVY** — the bottom edge (table plus
+	// stack), the fanned right edge, and the roll's back edge, which is the outside of the rolled
+	// stack and is why Tom called it "wider than standard". The bottom ellipse goes with them. Every
+	// copy above the bottom is one sheet's own edge and takes the 1.5. Copying the heavy weight up
+	// with the shape made three stacks where there is one.
 	//
 	// SHARP CORNERS at upper and lower right — "rounding is not realistic for a plan sheet". The
 	// shared open tag sets stroke-linejoin="round", so each corner is a JOIN INSIDE ONE PATH carrying
@@ -381,14 +392,14 @@ $ec_icons = array(
 	// (says construction); a corner-curled single sheet ("You never pull out only one sheet"); and a
 	// title block in the LOWER RIGHT ONLY, which made a closed box the same size as the roll at the
 	// opposite corner, and two equal masses read as two of the same object.
-	'project'    => '<ellipse cx="6.8" cy="18.6" rx="4.8" ry="2.4" stroke-width="3"/>'
-		. '<path stroke-width="2" d="M2 11.5C2 10.897 2.454 10.317 3.271 9.873C4.087 9.43 5.208 9.157 6.409 9.108C7.611 9.059 8.805 9.238 9.755 9.609"/>'
-		. '<path stroke-width="2" d="M2 4.4C2 3.797 2.454 3.217 3.271 2.773C4.087 2.33 5.208 2.057 6.409 2.008C7.611 1.959 8.805 2.138 9.755 2.509"/>'
-		. '<path stroke-width="3" stroke-linecap="butt" d="M2 4.4V18.6"/>'
-		. '<path stroke-width="3" stroke-linejoin="miter" stroke-linecap="butt" d="M21.2 5.8V21H13C9.8 21 11.804 17.509 9.755 16.709"/>'
-		. '<path stroke-linejoin="miter" d="M9.755 9.609C11.804 10.409 9.8 13.9 13 13.9H16.6"/>'
-		. '<path stroke-linejoin="miter" d="M9.755 2.509C11.804 3.309 9.8 6.8 13 6.8H21.2"/>'
-		. '<path d="M16.6 6.8V21"/>',
+	'project'    => '<ellipse cx="4.8" cy="19.6" rx="2.8" ry="1.4" stroke-width="3"/>'
+		. '<path stroke-width="1.5" d="M2 11.5C2 11.199 2.194 10.906 2.554 10.664C2.914 10.422 3.42 10.245 3.997 10.159C4.574 10.072 5.192 10.081 5.758 10.184"/>'
+		. '<path stroke-width="1.5" d="M2 3.4C2 3.099 2.194 2.806 2.554 2.564C2.914 2.322 3.42 2.145 3.997 2.059C4.574 1.972 5.192 1.981 5.758 2.084"/>'
+		. '<path stroke-width="3" stroke-linecap="butt" d="M2 3.4V19.6"/>'
+		. '<path stroke-width="3" stroke-linejoin="miter" stroke-linecap="butt" d="M21.2 4.05V21H13C8.5 21 7.922 18.678 5.758 18.284"/>'
+		. '<path stroke-width="1.5" stroke-linejoin="miter" d="M5.758 10.184C7.922 10.578 8.5 12.9 13 12.9H16.6"/>'
+		. '<path stroke-width="1.5" stroke-linejoin="miter" d="M5.758 2.084C7.922 2.478 8.5 4.8 13 4.8H21.2"/>'
+		. '<path stroke-width="1.5" d="M16.6 4.8V21"/>',
 
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal

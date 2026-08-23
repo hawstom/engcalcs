@@ -24,23 +24,28 @@ $P = array(
 	'xl'      => 2.0,    // leftmost roll centerline (a thick stroke paints to xl - wthick/2)
 	'ytop'    => 2.0,    // the top copy's arc crown
 	'ytable'  => 21.0,   // bottom sheet edge / tabletop centerline
-	'rx'      => 4.8,
-	'ry'      => 2.4,    // an oblique view of a round roll end. Major axis HORIZONTAL, 2 : 1 --
-	                     // a circle here was the standing mistake, and a round roll seen at an angle
-	                     // foreshortens vertically. 2.4 is also the flattest that leaves the bottom
-	                     // ellipse a visible hole under a 3-wide stroke.
+	'rx'      => 2.8,    // SMALL. A big roll eats the horizontal room the catenary needs, and Tom's
+	                     // read was that the earlier 4.8 was 'about twice as large as it really can
+	                     // be feasibly'. Shrinking it is what bought the sag its length.
+	'ry'      => 1.4,    // 2 : 1, major axis HORIZONTAL -- a round roll seen obliquely foreshortens
+	                     // vertically. At this size the end fills solid under the heavy stroke; it
+	                     // reads as the end of a tight roll, and a hole would cost the sag its room.
 	'theta0'  => 180.0,  // the full top half. It can be 180 again now that the roll carries its own
 	                     // straight back edge: the arcs land ON that line instead of floating
 	                     // beside each other, so the crowding that forced 200 is gone.
-	'theta'   => -52.0,  // where the sheet leaves the roll, degrees, SVG y-down (negative = above)
+	'theta'   => -70.0,  // where the sheet leaves the roll, degrees, SVG y-down (negative = above)
 	'xland'   => 13.0,   // where the sag flattens onto the sheet
 	'lead'    => 2.2,    // control-arm length along the roll's tangent
-	'trail'   => 3.2,    // control-arm length back along the flat
+	'trail'   => 4.5,    // control-arm length back along the flat
 	'xr'      => 21.2,   // fanned right edge
 	'xtb'     => 16.6,   // title block upright
 	'copies'  => 3,
 	'wthick'  => 3.0,
-	'wthin'   => 2.0,
+	'wthin'   => 1.5,    // THE NARROWEST THAT SURVIVES 17 px, and everything takes it except the
+	                     // three heavy lines. Tom, 2026-08-23: 'All the linework should be as narrow
+	                     // as feasible (not to disappear at 17 px) so that we can fit things.'
+	                     // A path with no stroke-width would inherit 2 from EC_ICON_OPEN_TAG, so every
+	                     // narrow path states its width -- otherwise lowering this does nothing.
 );
 foreach (array_slice($argv, 1) as $a) {
 	if (preg_match('/^--([a-z]+)=(-?[\d.]+)$/', $a, $m) && isset($P[$m[1]])) { $P[$m[1]] = (float)$m[2]; }
@@ -121,13 +126,13 @@ $out[] = '<path stroke-width="' . $f($P['wthick']) . '" stroke-linejoin="miter" 
 // title block rather than crossing into it.
 for ($i = 1; $i < $n; $i++) {
 	$o = $i * $dy;
-	$out[] = '<path stroke-linejoin="miter" d="M' . $pt($up($p0, $o)) . 'C' . $pt($up($c1, $o))
+	$out[] = '<path stroke-width="' . $f($P['wthin']) . '" stroke-linejoin="miter" d="M' . $pt($up($p0, $o)) . 'C' . $pt($up($c1, $o))
 		. ' ' . $pt($up($c2, $o)) . ' ' . $pt($up($p3, $o))
 		. 'H' . $f($i === $n - 1 ? $P['xr'] : $P['xtb']) . '"/>';
 }
 // The title block: one upright near the right edge. The sheet's own right, top and bottom edges
 // close the box; nothing goes inside it.
-$out[] = '<path d="M' . $f($P['xtb']) . ' ' . $f($yTopRun) . 'V' . $f($P['ytable']) . '"/>';
+$out[] = '<path stroke-width="' . $f($P['wthin']) . '" d="M' . $f($P['xtb']) . ' ' . $f($yTopRun) . 'V' . $f($P['ytable']) . '"/>';
 
 $geom = implode('', $out);
 echo $geom, "\n";
