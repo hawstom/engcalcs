@@ -6420,8 +6420,9 @@ var EngCalcs = EngCalcs || {};
 	// and offering a search on it would be a control that can only be operated by guessing.
 	//
 	// Its WORDS are what a person knows it by, so those are what the search reads and what a result
-	// row prints. If the ID ever becomes visible -- 146.05's element browser is where that would
-	// happen -- this exemption is the thing to remove.
+	// row prints. **IF A TEXT ID EVER BECOMES VISIBLE ON ANY SCREEN, THIS EXEMPTION IS THE THING TO
+	// REMOVE** -- see the closed Task 146.05 entry, which carries the same question for the Settings
+	// ID-prefix list.
 	function findLabelHasNoId(cand) { return cand.group === 'label'; }
 	function findValueOf(cand, prop) {
 		if (prop === 'id') { return findLabelHasNoId(cand) ? undefined : cand.el.id; }
@@ -6721,7 +6722,7 @@ var EngCalcs = EngCalcs || {};
 		box.appendChild(head);
 		var list = document.createElement('div');
 		// Bounded because the panel is a pull-down, not a report: a 4,000-pipe answer is a scroll
-		// bar either way, and Task 146.04's report tables are where a long list belongs.
+		// bar either way, and the bottom pane's asset tables are where a long list belongs.
 		list.style.maxHeight = '14em';
 		list.style.overflowY = 'auto';
 		findResults.forEach(function (c) { list.appendChild(findResultRow(c)); });
@@ -6911,19 +6912,18 @@ var EngCalcs = EngCalcs || {};
 	// **AND IT MEASURES UNTIL THE ANSWER STOPS MOVING.** The ceiling is derived from the map's
 	// height, and applyMapHeight() has just changed that -- so on a window that got shorter, or
 	// NARROWER (a narrow window wraps the menu bar, the toolbar and, since Task 455, the seven-tab
-	// strip, and every wrap takes height from the map), the first clamp was computed against the
-	// layout being replaced. Measured at 520x900 before this: the pane kept its 260 px, the map hit
-	// its 80 px floor and the page ran 60 px past the bottom of the window, converging only if the
-	// user resized a second time.
+	// strip, and every wrap takes height from the map), a single clamp is computed against the
+	// layout being replaced. Measured at 520x900: the pane keeps its 260 px, the map hits its 80 px
+	// floor and the page runs 60 px past the bottom of the window, converging only if the user
+	// resizes a second time.
 	//
-	// **IT WAS EXACTLY ONE EXTRA PASS, AND ONE WAS NOT ENOUGH.** Task 462 put one more button on the
-	// toolbar and merged the transport into the water-network group, which at 520 px is one more
-	// wrapped line -- and the page went 27 px past the bottom of the window again, because the
-	// second pass's own re-layout moved the ceiling a third time. A fixed number of passes is a
-	// guess at how many times the layout will settle, and every future control on that strip is
-	// another chance for the guess to be wrong. It LOOPS to a fixed point instead, with a small cap
-	// so a layout that genuinely oscillates cannot hang the page. dev/browser-pass/specs/pane.js
-	// measures the result at 520x900, which is where this fails first.
+	// **AND ONE EXTRA PASS IS NOT ENOUGH EITHER** -- the second pass's own re-layout moves the
+	// ceiling a third time, which at 520 px ran the page 27 px past the bottom again as soon as the
+	// toolbar gained one more wrapped line. A fixed number of passes is a guess at how many times
+	// the layout will settle, and every future control on that strip is another chance for the guess
+	// to be wrong. It LOOPS to a fixed point instead, with a small cap so a layout that genuinely
+	// oscillates cannot hang the page. dev/browser-pass/specs/pane.js measures the result at
+	// 520x900, which is where this fails first.
 	var LPN_PANE_SETTLE = 6;
 	function applyPaneLayout(pass) {
 		var pane = paneEl(), body = document.getElementById('lpn_pane_body'), btn, applied, want;
