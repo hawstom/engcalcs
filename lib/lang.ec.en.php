@@ -156,6 +156,7 @@ $ec_lang_syn['index_main_title']='';
 $ec_lang['index_meta_desc_plain']='Free hydraulic engineering calculators for pipes, channels, weirs and irrigation. They run in your browser, work offline, and are available in 27 languages.';
 $ec_lang['calc_set_units']='Set units:';
 $ec_lang_syn['calc_set_units']='';
+$ec_lang['calc_set_units_tip']='Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.';
 $ec_lang['calc_units_us']='US';
 $ec_lang_syn['calc_units_us']='';
 $ec_lang['calc_units_si']='SI';
