@@ -13001,6 +13001,13 @@ var EngCalcs = EngCalcs || {};
 	function openEditMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
+			// **SELECT IS A MENU ROW BECAUSE THE TOOLBAR IS NOT ALWAYS THERE** (Task 486). Below the
+			// small-screen breakpoint every toolbar control except the transport is hidden, and
+			// Select was the one of them with no other door: Insert can put you into add-junction
+			// mode from the menu bar, and nothing in the menus could put you back. Escape does it,
+			// which is no answer on the device the concession is for. Same key, same icon, same
+			// call as the toolbar button -- two doors, one implementation.
+			{ icon: 'select', label: pc.lpn_tool_select || 'Select', fn: function () { setMode('select'); } },
 			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', fn: undo },
 			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
 			// menu is about; View holds the things that change how the map is drawn. Every editor
@@ -13340,11 +13347,29 @@ var EngCalcs = EngCalcs || {};
 			// shortcuts, "report a problem".
 			{ id: 'lpn_menu_help', icon: 'help', label: pc.lpn_menu_help || 'Help', open: openHelpMenu }
 		].forEach(function (m) {
-			var b = document.createElement('button');
+			var b = document.createElement('button'), word;
 			b.type = 'button';
 			b.id = m.id;
 			b.className = 'lpn-menubar-item';
-			setLabel(b, m.icon, m.label);
+			// **THE WORD IS IN AN ELEMENT OF ITS OWN, and that is the whole mechanism behind Task
+			// 486's fourth item** ("Hide the Menu text, leaving only icons"). EngCalcs.setLabel()
+			// appends the label as a bare TEXT NODE, and a stylesheet cannot reach one -- so the
+			// small-screen rule in css/engcalcs.css would have had nothing to select. The icon comes
+			// from setLabel() exactly as before (one place draws an icon, dev/toolbar-icons.md); only
+			// the word is built here.
+			//
+			// **aria-label CARRIES THE SAME STRING, unconditionally.** Once the word is off screen
+			// this button's only content is an aria-hidden <svg>, which is announced as "button" and
+			// nothing else. It is set at every width rather than only below the breakpoint because a
+			// media query cannot reach the accessibility tree, and a redundant accessible name on a
+			// labelled button costs nothing. Same key as the visible word -- NOT a parallel "short"
+			// key, which would be 26 translations per menu for no gain.
+			setLabel(b, m.icon, '');
+			word = document.createElement('span');
+			word.setAttribute('class', 'lpn-menubar-word');
+			word.textContent = m.label;
+			b.appendChild(word);
+			b.setAttribute('aria-label', m.label);
 			b.addEventListener('click', function (e) { e.stopPropagation(); m.open(e.currentTarget); });
 			bar.appendChild(b);
 		});
