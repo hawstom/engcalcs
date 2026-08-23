@@ -55,12 +55,46 @@ EngCalcs.pageCalculator = function (objForm) {
 			rise=elev1-elev0;
 			hypotenuse = Math.pow(l*l+rise*rise,0.5);
 			s = (l == 0) ? 0 : rise/l;
-			this.Manning.a = (s==0) ? (d0*l) : (d0*d0-d1*d1)/(2*s);
+			// A ZERO-LENGTH SEGMENT IS A VERTICAL WALL, AND A WALL IS A LEGITIMATE SECTION
+			// (ROADMAP Task 475). Two stations at the same station value with different
+			// elevations is how anyone draws a rectangular channel, a box culvert or a
+			// retaining wall, so the answer is not to reject it -- it is to give the wall the
+			// three quantities it actually has:
+			//
+			//   area          0     -- it has no horizontal extent
+			//   top width     0     -- likewise
+			//   wetted perimeter    |d0 - d1|, the SUBMERGED HEIGHT of the wall
+			//
+			// That last one is the part this page used to get wrong, and it was wrong by a
+			// factor of two on the commonest section there is: a 10 ft wide rectangular channel
+			// 5 ft deep has P = 5 + 10 + 5 = 20 ft and R = 2.5 ft, but with both walls
+			// contributing nothing the page reported P = 10 ft and R = 5 ft -- and Manning goes
+			// as R^(2/3), so the discharge came out 1.6x high. The old `a == 0` test could not
+			// tell a wall (zero area, real perimeter) from a DRY bed (zero area, no perimeter),
+			// and both walls fell down the dry branch.
+			//
+			// |d0 - d1| is right in every case, which is why no further branch is needed: both
+			// ends under water gives the whole wall, one end above gives the wet part, and both
+			// ends above gives zero.
+			//
+			// The NaN this task was reported for is now just the degenerate member of that same
+			// family. Two stations typed identically -- same station AND same elevation -- is a
+			// wall of zero height: area 0, perimeter |d0 - d0| = 0, top width 0. It contributes
+			// nothing to its region instead of poisoning it, which is what a segment describing
+			// no bed at all should do. Reaching t through `l*pw/hypotenuse` is what produced
+			// 0*0/0; the top width of a vertical segment is 0 by inspection and is written so.
+			if (l === 0) {
+				this.Manning.a = 0;
+				this.Manning.pw = Math.abs(d0 - d1);
+				this.Manning.t = 0;
+			} else {
+				this.Manning.a = (s==0) ? (d0*l) : (d0*d0-d1*d1)/(2*s);
+				// Three shorthand "if" statements nested/strung together
+				this.Manning.pw = (this.Manning.a == 0) ? 0 : (s == 0) ? l :  Math.abs(this.wedgeWettedPerimeter(d0, s) - this.wedgeWettedPerimeter(d1, s));
+				this.Manning.t = l*this.Manning.pw/hypotenuse;
+			}
 			this.Manning.ac = this.Manning.ac + this.Manning.a;
-			// Three shorthand "if" statements nested/strung together
-			this.Manning.pw = (this.Manning.a == 0) ? 0 : (s == 0) ? l :  Math.abs(this.wedgeWettedPerimeter(d0, s) - this.wedgeWettedPerimeter(d1, s));
 			this.Manning.pwc = this.Manning.pwc + this.Manning.pw;
-			this.Manning.t = l*this.Manning.pw/hypotenuse;
 			// A REGION'S TOP WIDTH IS THE SUM OF ITS WET SEGMENTS' TOP WIDTHS (ROADMAP Task 474).
 			// Accumulated here beside ac and pwc because closeRegion() needs all three: it swaps
 			// the region totals in before recalc(), and Fr = V sqrt(T/gA) is the one result that
@@ -69,7 +103,8 @@ EngCalcs.pageCalculator = function (objForm) {
 			// 0.554 on the shipped sample section. A one-segment region was always right, which is
 			// how it survived. dev/calc-spike/mi-harness.js asserts the compound case.
 			this.Manning.tc = this.Manning.tc + this.Manning.t;
-			this.Manning.da = this.Manning.a / this.Manning.t;
+			// A wall has no top width, so it has no average depth either -- 0, not 0/0.
+			this.Manning.da = (this.Manning.t === 0) ? 0 : this.Manning.a / this.Manning.t;
 			this.Manning.isBank = document.getElementsByName('is_bank')[iStation].checked;
 			arrSketchSegments.push({
 				sectionX1: station0,
@@ -235,10 +270,12 @@ EngCalcs.pageCalculatorInitialize = function (objForm) {
 };
 
 // **A NUMBER WE COULD NOT COMPUTE PRINTS AS NOTHING, NEVER AS "NaN"** (Tom, 2026-08-21:
-// "mi Fr NaN: Fix it to blank", Task 475). A zero-length segment -- two stations typed at the
-// same station -- gives a region pw = 0 and a = 0, so rh = 0/0 and every quantity derived from it
-// is NaN. Blanking at the ONE place a number becomes text is why this file has no per-quantity
-// guard: the arithmetic is left alone and honestly undefined, and the cell simply says nothing.
+// "mi Fr NaN: Fix it to blank", Task 475). This is the LAST line of defence, not the fix for any
+// particular defect: the zero-length segment that prompted it is now solved as the vertical wall
+// it is, up in pageCalculator. What still reaches here is the honestly undefined case -- a region
+// entirely out of the water has a = 0 and pw = 0, so rh = 0/0, and a section with no depth
+// anywhere has nothing to say about hydraulic radius. Blanking at the ONE place a number becomes
+// text is why this file has no per-quantity guard.
 // Infinity is caught by the same test, which is the point of isFinite over isNaN.
 EngCalcs.miFixed2 = function (x) {
 	'use strict';
