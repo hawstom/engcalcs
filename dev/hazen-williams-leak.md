@@ -1,7 +1,11 @@
 # The Hazen-Williams conversion leak
 
-Diagnostic record for ROADMAP Task 144. Nothing here has been acted on; the task is open because the
-decisive step is an observation nobody has made yet.
+Diagnostic record for ROADMAP Task 144.
+
+**READ THIS FIRST: the intervention this document proposed has SHIPPED, and the outlier it was
+written about is not visible in the current measurement.** Both are established below. What is left
+of the task is one reading of the rebuilt usage report, and it is not the Search Console export this
+document used to call decisive.
 
 ## The measurement (2026-07-27 usage snapshot, `dev/usage-data-log.md`)
 
@@ -54,15 +58,18 @@ Hazen-Williams is empirical, water-only, and its user base is unusually unit-mon
 municipal water distribution (AWWA) and **NFPA 13 fire-sprinkler hydraulics, which mandates
 Hazen-Williams by name**, both work natively and almost exclusively in **gpm, psi, inches, feet**.
 
-The page opens on `m3ps`/`m`/`mh2o`. Worse than the units is the **scale**: the default q = 1 m³/s is
-**15,850 gpm** through a 1 m (39") main — a city transmission line — when a typical arrival wants a
-6" main at 400 gpm. Every field is wrong *and* off by a factor of ~40. A DW visitor, being metric
-already, changes numbers; an HW visitor must change four unit dropdowns *and* four numbers before the
-page says anything true. The `C` default of 100 ("old pipe") compounds it — new-main practice is
-130–140, and NFPA wants 120 (steel) or 150 (CPVC).
+**Until 2026-07-28 the page opened on `m3ps`/`m`/`mh2o` at q = 1 m³/s** — **15,850 gpm** through a
+1 m (39") main, a city transmission line, when a typical arrival wants a 6" main at 400 gpm. Every
+field was wrong *and* off by a factor of ~40, and the `C` default of 100 ("old pipe") compounded it
+against a new-main practice of 130–140 and NFPA's 120/150. A DW visitor, being metric already,
+changed numbers; an HW visitor had to change four unit dropdowns *and* four numbers before the page
+said anything true.
 
-Note `mpf_` converts at **67% with those same metric defaults**, which is strong evidence they are
-not independently fatal.
+That is the shape of the argument that produced the intervention below, and it is recorded because
+it is the reasoning a future reader would otherwise re-derive — **not because the page still behaves
+that way.** It does not; see "The intervention SHIPPED". The counter-evidence is also worth keeping:
+`mpf_` converted at **67% with those same metric defaults**, which is strong evidence they were not
+independently fatal.
 
 ## The one structural difference from the pages that DO convert
 
@@ -86,35 +93,67 @@ reading HW is not broken — it is **not enough**.
 That makes the Task 138 HW→BPN link a partial test, and cheap to observe: if BPN's human count climbs
 while HW's conversion stays flat, the leak is scope, not usability.
 
-## The decisive next step — observe, do not guess
+## The intervention SHIPPED, one day after the measurement
 
-Pull the **HW page's own Search Console query export** — the same source that produced the sewer-slope
-query data in Task 151. Segment for:
+The "cheapest candidate intervention" this document proposed — *"default `Hazen-Williams.php` to the
+`in` unit set at a realistic waterline scale (6", 400 gpm, 1000 ft, C = 130)"* — went in on
+**2026-07-28** as part of `9c47608f` (ROADMAP Tasks 162/164/165/166/167, "named unit families, real
+defaults, upstream-first HW"), the day after the 2026-07-27 snapshot that produced the 11%. Read out
+of the rendered English page today, field by field:
 
-- **fire protection** (`sprinkler`, `NFPA`, `fire flow`, `friction loss psi`) — a large US audience
-  with rigid unit expectations
-- **unit words** (`gpm`, `psi`, `inch`) — direct confirmation of the defaults hypothesis
-- **sizing intent** (`pipe size for`, `water main sizing`) — direct confirmation of the solver gap
-- **`c factor` / `c value`** — the reference-lookup reading, which Tom does not buy and which this
-  export can settle either way
-- **Spanish / Portuguese** (`pérdida de carga`, `perda de carga`) — Hazen-Williams is standard
-  practice in Latin America, so a non-US metric segment may be present and would argue *against*
-  flipping the defaults wholesale
+    q = 400 gpm    d = 6 in    l = 1000 ft    c = 130    p_up = 60 psi
 
-If the queries are `hazen williams c values` / `formula` / `equation`, this is reference demand and
-the right response is a **C-value table on the page**, not a network solver. If they are
-`hazen williams calculator` / `pipe pressure loss calculator`, it is a real UX leak and Task 146 gets
-its evidence. **Do not promote Task 146 on the strength of the 11% number alone** — that number does
-not yet distinguish the two.
+That is the proposal verbatim. The SI-first defaults hypothesis is therefore **no longer a
+hypothesis to test but a change already made**, and every reading below is post-intervention.
 
-## Cheapest candidate intervention, if the export supports the units hypothesis
+## The outlier does not reproduce
 
-Default `Hazen-Williams.php` to the `in` unit set at a realistic waterline scale (6", 400 gpm,
-1000 ft, C = 130). This needs **no new translation** — the unit sets already exist and defaults are
-numbers — making it the cheapest testable change on the board. The `in` set already maps to
-in/gpm/psi/ft²/ftps, so no unit work is needed either; only a decision about the *initial* selection,
-which today is simply the first entry in each `units` array. Do not ship it before the export:
-per-page default divergence is a real cost, and the Spanish/Portuguese segment could argue against it.
+The 2026-08-21 report gives Hazen-Williams **use-of-shopping 58% (7 of 12)**. `shopping` is the same
+counter the 2026-07-27 table called `human` — renamed, not redefined — so this is the same ratio that
+read 11% (63 of 580). Within its own table 58% is unremarkable: MPF 78%, MTC 77%, MI 71%, DW 56%,
+MPHL 25%, BPN 20%. **Hazen-Williams is no longer the outlier, and there is no 51–67% band for it to
+sit outside of.**
+
+The sample is small but not uninformative in the one direction that matters. If HW's true rate were
+still 10.9%, the chance of seeing 7 or more uses in 12 shoppers is **8.6e-5**. So the 11% is
+refuted even at n = 12. What n = 12 cannot do is *establish* the new rate — the Wilson 95% interval
+on 7/12 is [32%, 81%], which overlaps everything in the table.
+
+**AND THE TWO CANDIDATE CAUSES ARE PERFECTLY CONFOUNDED, so do not claim the defaults fixed it.**
+Between the two snapshots the page's defaults changed *and* the report began reading the consented
+bucket only (`bd4aeebc`, 2026-08-11 — the 40x scale break, explained in `dev/usage-data-log.md`).
+Both predict exactly this move:
+
+- **the defaults explanation** — visitors now arrive at a 6" main at 400 gpm and calculate;
+- **the traffic-composition explanation** — restricting to visitors who answered a consent banner
+  removes the JS-rendering crawlers and preview agents that inflated `human` and deflated `%used`
+  simultaneously, which is what this document's second section predicted all along.
+
+Nothing in the 2026-08-21 table separates them, and one snapshot never will.
+
+## The decisive next step, corrected: one report run, not a query export
+
+**The Search Console route this document used to call decisive is aimed at a few per cent of the
+traffic.** In the 2026-07-27 export the whole Hazen-Williams query cluster is 305 impressions and
+**16 clicks**, against **580 counted humans on the same date**; suite-wide it is 565 clicks against
+4,042 humans. Even allowing for mismatched windows, Google organic cannot account for more than a
+small fraction of who is on this page, so segmenting its queries cannot characterize the audience
+whose behaviour the 11% describes. (Google only — Bing, direct, links and assistants are all
+outside it.) The export is still worth pulling for the *discoverability* question; it is not
+evidence about this one.
+
+What settles Task 144 is **one run of the rebuilt `log/lang-log-stats.sh`**, which prints its window,
+duration and fingerprint and refuses to compare across windows. Read HW's use-of-shopping and the
+band pages' from the SAME run and the same bucket:
+
+- HW inside the band, intervals overlapping MPF/MTC/MI → **there is no leak left to fix**, and the
+  task closes as diagnosed rather than as built.
+- HW below the band with non-overlapping intervals → the leak survived the defaults change, which
+  kills the units hypothesis outright and leaves scope (Tom's network reading) and the missing
+  inverse solver as the live candidates.
+
+Wait for a denominator the report does not mark `~` (it flags any under 40 and suppresses any under
+5). At HW's 08-21 volume that is a longer window, not a different query.
 
 ## Extracted
 
