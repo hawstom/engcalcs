@@ -32,6 +32,12 @@
 const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
 const DEFAULT_OUTPUT_DIR = __DIR__ . '/../../dev/translation_payloads';
 const GLOSSARY_PATH = __DIR__ . '/glossary.json';
+// The one canonical copy of the translator's suggestion-box instruction (ROADMAP Task 239). It is
+// extracted into every payload rather than retyped into every sprint's prompt, because a step that
+// has to be remembered per sprint is a step that gets forgotten -- and an agent that never received
+// it cannot file the complaint friction_check.php is waiting for.
+const SUGGESTION_BOX_SOURCE = __DIR__ . '/../translation-process.md';
+const SUGGESTION_BOX_HEADING = '## The suggestion box';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
 const TARGET_LANGS = [
     'am', 'ar', 'bg', 'bn', 'cs', 'de', 'es', 'fa', 'fr', 'he', 'hi', 'hr', 'id', 'it', 'km', 'my',
@@ -77,6 +83,7 @@ function main(array $argv): void
         fail('Invalid glossary JSON structure in: ' . GLOSSARY_PATH);
     }
 
+    $suggestionBox = loadSuggestionBox();
     $exemptMap = ecLoadExemptMap();
     $coverage = ecLoadCoverage();
     $termIndex = termIndexByName($glossaryData['terms']);
@@ -163,7 +170,11 @@ function main(array $argv): void
                 'glossary_injection_notes' => 'Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.',
                 'context_notes' => 'Use key_context.neighbors to keep register consistent with nearby translated strings.',
                 'syn_notes' => 'Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists.',
+                'suggestion_box_notes' => 'Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.',
             ],
+            // ROADMAP Task 239. Extracted verbatim from dev/translation-process.md so it reaches
+            // every agent, every language, every batch size, without being retyped per sprint.
+            'suggestion_box' => $suggestionBox,
             'prompt_context_by_prefix' => $promptByPrefix,
             'glossary_terms_by_prefix' => $termsByPrefix,
             'keys_to_translate' => $deltaKeys,
@@ -261,6 +272,9 @@ function runFreshnessCheck(array $opts): int
         // it changes every payload's content. It lives in its own include as of 2026-08-12 and
         // therefore has to be named here -- __FILE__ alone stopped covering it that day.
         __DIR__ . '/prefix_terms.inc.php',
+        // Every payload carries the suggestion-box block copied out of the SOP, so editing that
+        // block changes every payload's content and must make them stale.
+        SUGGESTION_BOX_SOURCE,
         __FILE__,
     ];
     $commonNewest = 0;
@@ -371,6 +385,36 @@ function loadLangArray(string $file): array
     }
 
     return $ec_lang;
+}
+
+/**
+ * Pulls the suggestion-box block out of dev/translation-process.md -- the first fenced code block
+ * under the "## The suggestion box" heading. One source of truth: the SOP shows the human what to
+ * paste, and this hands the identical text to the agent through its own payload, so the two cannot
+ * drift and a sprint that forgets to paste it still delivers it.
+ *
+ * A failure here is fatal on purpose. A payload that quietly shipped without the suggestion box
+ * would take a whole sprint's findings with it, and nothing downstream would notice.
+ */
+function loadSuggestionBox(): string
+{
+    if (!file_exists(SUGGESTION_BOX_SOURCE)) {
+        fail('Suggestion-box source not found: ' . SUGGESTION_BOX_SOURCE);
+    }
+    $md = (string)file_get_contents(SUGGESTION_BOX_SOURCE);
+    $at = strpos($md, SUGGESTION_BOX_HEADING);
+    if ($at === false) {
+        fail('No "' . SUGGESTION_BOX_HEADING . '" heading in ' . basename(SUGGESTION_BOX_SOURCE)
+            . ' -- every payload carries that block, so it cannot be renamed without updating this script.');
+    }
+    if (!preg_match('/^```\n(.*?)^```/ms', substr($md, $at), $m)) {
+        fail('No fenced block under "' . SUGGESTION_BOX_HEADING . '" in ' . basename(SUGGESTION_BOX_SOURCE) . '.');
+    }
+    $block = trim($m[1]);
+    if ($block === '') {
+        fail('The suggestion-box block in ' . basename(SUGGESTION_BOX_SOURCE) . ' is empty.');
+    }
+    return $block;
 }
 
 function loadEnglishIntentMap(string $file): array

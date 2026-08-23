@@ -140,11 +140,14 @@ the block.
     against a 9.8% historical wave-0 rate. **Budget a Wave 0 at the `lpn_` rate for NEW English only.**
     One of the six was still a real catch — `mphl_hgl_egl_tip` would have produced a false sentence in
     26 languages.
-  - **NEXT, and it is free: pre-filter the pass to skip keys that already carry a non-empty
-    `$ec_lang_syn`** (102 of 527 non-lpn keys do). Six of thirteen dismissals were re-flags of keys
-    whose syn entry already answered the complaint; this drops the false-positive rate 37% → ~21%.
-  - **OPEN — add the suggestion-box instruction to the standard agent prompt template**, so it is not
-    re-typed per sprint and cannot be forgotten.
+  - **DONE — `wave0_keyset.php` assembles the pass set and pre-filters keys that already carry a
+    non-empty `$ec_lang_syn`** (104 of 582 non-lpn keys, 17.9%). Replayed on `239-wave0-calcs.json`:
+    9 of 35 findings skipped, dismissal rate 37% → 23% (the prediction was ~21%). **It also skips
+    one confirmed rewrite, `mtc_note_1`** — so the skipped set is enumerable (`--skipped`) and is a
+    cheaper second look, never a key ruled correct. `--measure=<sprint>` redoes the arithmetic.
+  - **DONE — the suggestion box now ships inside every payload** as `suggestion_box`, extracted by
+    the generator from the one canonical block in `dev/translation-process.md`. No longer retyped
+    per sprint; the generator fails hard if that block goes missing.
   - **[H] `friction_check.php` NOW EXITS 1 with 16 `refer-to-human` entries awaiting Tom's ruling.**
     That is the escalation mechanism working, and it is not in `check_all.sh` so it blocks no commit —
     **but it blocks the next sprint launch until he rules.** The 16, plus 9 wording proposals and 7
