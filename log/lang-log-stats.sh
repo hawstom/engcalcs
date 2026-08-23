@@ -72,13 +72,28 @@ MIN_N=5
 # Injected into every awk program that prints a ratio. wilson() returns "lo-hi" as whole percents;
 # rate() returns the point estimate with a '~' when the denominator is under the floor and "-" when
 # it is under MIN_N.
+# BOTH FUNCTIONS ARE TOTAL, and they have to be: k CAN EXCEED n here. %using is using/shopping,
+# and the two beacons are independently gated -- maybeLogHumanView fires once the browser has been
+# around >=10s, maybeLogCalcUsage fires on a user-triggered recalculation >=10s after LOAD, and the
+# two de-duplicate on different keys. So a person can be recorded calculating without ever being
+# recorded shopping, and a k/n over 1 is a real reading of two real counts, not a corrupt log.
+# The first version of this file computed sqrt() of a negative variance in exactly that case: awk
+# printed a warning and the interval read "[-nan-100]%" on the production run of 2026-08-21.
+# Neither count is clamped and no row is dropped -- the ratio is printed as ">100%" and its
+# interval as "n/a", because a proportion interval on something that is not a proportion is noise.
 AWK_LIB=$(cat <<'AWKLIB'
-function wilson(k, n,   p, z, d, c, m, lo, hi) {
+function wilson(k, n,   p, z, d, c, m, s, lo, hi) {
     if (n <= 0) return "n/a"
-    p = k / n; z = 1.96
+    if (k > n) return "n/a"
+    p = k / n
+    if (p < 0) p = 0
+    if (p > 1) p = 1
+    z = 1.96
     d = 1 + z*z/n
     c = (p + z*z/(2*n)) / d
-    m = z * sqrt(p*(1-p)/n + z*z/(4*n*n)) / d
+    s = p*(1-p)/n + z*z/(4*n*n)
+    if (s < 0) s = 0
+    m = z * sqrt(s) / d
     lo = c - m; hi = c + m
     if (lo < 0) lo = 0
     if (hi > 1) hi = 1
@@ -87,6 +102,7 @@ function wilson(k, n,   p, z, d, c, m, lo, hi) {
 function rate(k, n,   v) {
     if (n <= 0) return "n/a"
     if (n < EC_MIN_N) return "-"
+    if (k > n) return ">100%"
     v = sprintf("%.0f%%", 100*k/n)
     return (n < EC_FLOOR_N) ? v "~" : v
 }
@@ -182,7 +198,13 @@ echo "             means 'typed their own numbers', not 'looked at the default a
 echo "   naming    a Printable Title or Subtitle was typed — they mean to show it to somebody."
 echo ""
 echo "   %shopping = shopping/reach. A LOWER BOUND on human reach, never an estimate of it."
-echo "   %using    = using/shopping."
+echo "   %using    = using/shopping. A RATIO OF TWO INDEPENDENTLY GATED BEACONS, and it can exceed"
+echo "               100%. The shopping beacon needs the browser to have been around >=10s; the"
+echo "               using beacon needs a user-triggered recalculation >=10s after LOAD, and the"
+echo "               two de-duplicate on different keys — so somebody can be recorded calculating"
+echo "               and never recorded shopping. Read it as a rough conversion indicator, NOT as"
+echo "               a share of a population. Over 100% it prints '>100%' with no interval; both"
+echo "               counts are printed beside it and neither is ever clamped or dropped."
 echo "   ~         the denominator is under $FLOOR_N. The number is printed, but it is not a verdict."
 echo "   -         the denominator is under $MIN_N. No ratio is printed at all."
 echo "   [lo-hi]%  Wilson 95% interval. TWO ROWS DIFFER ONLY IF THEIR INTERVALS DO NOT OVERLAP."
@@ -234,6 +256,8 @@ ec_funnel_pages() {
                  rate($1,$3), ($3>0?wilson($1,$3):""), rate($2,$1), ($1>0?wilson($2,$1):"") }'
     echo ""
     echo "   Units: every count in this table is ${unit}."
+    echo "   A '>100%' in %using is not corruption: shopping and using are separately gated beacons"
+    echo "   with different de-duplication keys, so a row can record a calculation with no view."
 }
 
 echo ""
