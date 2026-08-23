@@ -261,68 +261,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <?php
 }
 
-/**
- * The plain text of a line's own label, for the line chooser's checkbox.
- *
- * The `?` tip glyph goes first -- it is decoration inside the label markup and would read as
- * "Diameter ?" on a checkbox -- and then all remaining markup, so the chooser adds no focusable
- * stop of its own for a label that happens to be a link. Entities are decoded here because the
- * emitter escapes; doing both would ship a visible `&amp;`.
- */
-function ecLineLabelText($html)
-{
-    // A label cell may carry controls of its own after a <br /> -- Orifice.php puts the
-    // circular/rectangular radios there -- and their text is not the line's name. The first <br>
-    // ends the name.
-    $html = preg_split('/<br\b[^>]*>/i', $html, 2);
-    $html = $html[0];
-    $text = preg_replace('/<span class="ec-tip">.*?<\/span>/i', '', $html);
-    $text = html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8');
-    return trim(preg_replace('/\s+/u', ' ', $text));
-}
-
-/**
- * THE ONE KEYBOARD DOOR to the show/hide-a-line function, and the only way to un-hide a line
- * without reloading the page (ROADMAP Task 478 phase 1; redesigned the same day).
- *
- * The per-line "X" keeps its place and its click, but carries tabindex="-1" and aria-hidden="true"
- * -- so up to thirty one-character links leave the tab order. This closed <details> is what puts
- * the function back on the keyboard, at exactly ONE stop: a closed <details> does not render its
- * contents, so none of the checkboxes are focusable. Closed by default on purpose -- open, it
- * would cost one stop per line all over again.
- *
- * WHY IT SITS WITH THE PRINTABLE VERSION BUTTON, and not under each column (Tom, 2026-08-21,
- * browser test: *"What is 'the chooser'? The line comes back on reload. The hint is on the
- * Printable version button."*). Two facts in that sentence. He did not recognise a generic
- * accessibility door dropped under a column of numbers, and the knowledge of how to get a line
- * back lived on the print button. Hiding a line is not a general-purpose view feature -- it is
- * PRINT PREPARATION, the way you drop a line you do not want on the sheet. So the control that
- * hides lines and the control that prints them are one group, at the foot of the form where the
- * printing decision is actually made. Two per-column choosers also cost two keyboard stops for
- * one function; one costs one, and the two columns survive as headings inside it.
- */
-function echoLineChooser($groups)
-{
-    global $ec_lang;
-    $any = false;
-    foreach ($groups as $g) { if ($g['lines']) { $any = true; } }
-    if (!$any) { return; }
-?>
-	<details class="engcalcs-line-chooser d-print-none" data-ec-chooser="lines">
-		<summary><?=$ec_lang['view_lines_chooser']?></summary>
-		<div class="engcalcs-line-chooser-body">
-<?php foreach ($groups as $group) : ?>
-<?php if (!$group['lines']) { continue; } ?>
-			<div class="engcalcs-line-chooser-group"><?=$group['heading']?></div>
-<?php foreach ($group['lines'] as $line) : ?>
-			<label class="engcalcs-line-chooser-item"><input type="checkbox" data-ec-line="<?=$line['id']?>" checked /> <?=htmlspecialchars($line['label'], ENT_QUOTES, 'UTF-8')?></label>
-<?php endforeach; ?>
-<?php endforeach; ?>
-		</div>
-	</details>
-<?php
-}
-
 function echoCalculatorForm($arrayInputs, $arrayResults, $flagFormAppend = false, $flagHideUnits = false)
 {
     global $ec_lang;
@@ -333,7 +271,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (pdc) pdc.addEventListener('click', function() { EngCalcs.pointsDataCopy(); });
 	var pdp = document.getElementById('points_data_paste');
 	if (pdp) pdp.addEventListener('click', function() { EngCalcs.pointsDataPaste(); });
-	EngCalcs.initLineChoosers();
 	document.getElementById('btn-printable').addEventListener('click', function() {
 		document.querySelectorAll('.d-print-none').forEach(function(el) { el.style.display = 'none'; });
 	});
@@ -363,21 +300,18 @@ document.addEventListener('DOMContentLoaded', function() {
 					<table>
 						<tbody>
 <?php
-	$chooserInputs = array();
 	foreach ($arrayInputs as $input) {
-		$chooserInputs[] = array('id' => $input['name'].'_row', 'label' => ecLineLabelText($input['label']));
 ?>
 							<tr class="collapse show" id="<?=$input['name']?>_row">
 								<td><label for='<?=$input['name']?>'><?=$input['label']?></label><?php if (!empty($input['control'])) echo $input['control']; ?></td>
 								<td>
 									<?php echo inputHtml($input['name'], $input['type'], $input['default'], "\t\t\t\t\t\t\t\t\t");?><?php if (!empty($input['separator'])) echo ' ' . $input['separator'] . ' '; ?><?php echoUnitSelect($input['name'].'u', $input['units'], "\t\t\t\t\t\t\t\t\t");?>
 								</td>
-								<?php // tabindex="-1" AND aria-hidden="true" together: the canonical duplicated-control
-								      // pattern (Task 478). aria-hidden alone on a focusable element fails axe's
-								      // aria-hidden-focus rule -- it is the tabindex that makes the pair legal. The
-								      // keyboard reaches this same function through the line chooser echoLineChooser() emits
-								      // beside the Printable version button. ?>
-								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$input['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row" tabindex="-1" aria-hidden="true" title="<?=htmlspecialchars($ec_lang['view_hide_line'], ENT_QUOTES, 'UTF-8')?>">X</a></td>
+								<?php // The "X" is a real tab stop, deliberately (Tom, 2026-08-22). It is the ONLY
+								      // way to hide a line, so taking it off the keyboard would make the function
+								      // mouse-only -- WCAG 2.1.1 by omission. It costs one stop per line, and that
+								      // cost is accepted. ?>
+								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$input['name']?>_row" aria-expanded="true" aria-controls="<?=$input['name']?>_row" title="<?=htmlspecialchars($ec_lang['view_hide_line'], ENT_QUOTES, 'UTF-8')?>">X</a></td>
 							</tr>
 <?php
 	}
@@ -385,16 +319,13 @@ document.addEventListener('DOMContentLoaded', function() {
 						</tbody>
 					</table>
 				</td>
-<?php $chooserResults = array(); ?>
 <?php if ($arrayResults) : ?>
 				<td>
 					<?php echo $ec_lang['calc_results'];?>
 					<table>
 						<tbody>
 <?php
-	$chooserResults = array();
 	foreach ($arrayResults as $result) {
-		$chooserResults[] = array('id' => $result['name'].'_row', 'label' => ecLineLabelText($result['label']));
 ?>
 							<tr class="collapse show" id="<?=$result['name']?>_row">
 								<td><?=$result['label']?></td>
@@ -403,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
 									<?php echoUnitSelect($result['name'].'u',$result['units'], "\t\t\t\t\t\t\t\t\t");?>
 
 								</td>
-								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$result['name']?>_row" aria-expanded="true" aria-controls="<?=$result['name']?>_row" tabindex="-1" aria-hidden="true" title="<?=htmlspecialchars($ec_lang['view_hide_line'], ENT_QUOTES, 'UTF-8')?>">X</a></td>
+								<td class="engcalcs-x d-print-none"><a data-bs-toggle="collapse" href="#<?=$result['name']?>_row" aria-expanded="true" aria-controls="<?=$result['name']?>_row" title="<?=htmlspecialchars($ec_lang['view_hide_line'], ENT_QUOTES, 'UTF-8')?>">X</a></td>
 							</tr>
 <?php
 	}
@@ -427,14 +358,8 @@ document.addEventListener('DOMContentLoaded', function() {
 ?>
 <?php if ($flagFormAppend === true) {echoCalculatorFormAppend();} ?>
 </form>
-<?php // Print preparation, one group: the button that makes the sheet, and the chooser that says
-      // which lines are on it. See echoLineChooser() for why the chooser lives here. ?>
 <div class="engcalcs-print-tools d-print-none">
 	<p><button type="button" id="btn-printable"><?=ecIcon('print')?><?=$ec_lang['view_printable']?></button></p>
-<?php echoLineChooser(array(
-	array('heading' => $ec_lang['calc_inputs'], 'lines' => $chooserInputs),
-	array('heading' => $ec_lang['calc_results'], 'lines' => $chooserResults),
-)); ?>
 </div>
 <?php
 }

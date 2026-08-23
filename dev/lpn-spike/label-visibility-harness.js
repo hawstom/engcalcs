@@ -51,7 +51,6 @@ const L = loadLoopedNetwork(
 	// own rules would fire, and that question cannot be asked one guessed class at a time.
 	"\t\tsvgClasses: function () { return svg.getAttribute('class') || ''; },\n" +
 	"\t\tsetThematic: function (on) { settings.colorThematic = !!on; refreshValueColors(); },\n" +
-	"\t\tsetHideAll: setLabelsHiddenAll, hideAllOn: labelsHiddenAllOn,\n" +
 	"\t\tnodeEl: function (id) { return nodeEls[id]; },\n" +
 	"\t\tlinkEl: function (id) { return linkEls[id]; },\n" +
 	"\t\tlabelEl: function (id) { return labelEls[id]; },\n" +
@@ -294,24 +293,12 @@ console.log('\n--- no way of hiding labels reaches a Text object the user placed
 	ok('switching thematic off brings the generated label back', !hiddenByCss(gen()));
 	ok('...and left the Text alone throughout', !hiddenByCss(own()));
 
-	// (b) THE LABELS BOX'S BLANKET HIDE -- the second half of the ruling, and the reason the
-	// thematic mode need not be a second interface for this.
-	L.setHideAll(true);
-	ok('the blanket hide records itself', L.hideAllOn());
-	state('temporarily hide all');
-	L.setHideAll(false);
-	ok('unticking it brings the generated label back', !hiddenByCss(gen()));
-	ok('...and it is TEMPORARY: nothing outside this session holds it', !L.hideAllOn());
-
-	// (c) THE SUPPRESSORS COMPOSE, and none of them is a per-element edit: two on at once is still
-	// one class on the <svg>, and turning one off does not reveal labels the other is still hiding.
-	L.setThematic(true); L.setHideAll(true);
-	state('both at once');
+	// (b) A SECOND ROUND, because a suppressor that latched would pass (a) once and never again:
+	// the revival path (refreshLabelSuppression) has to put the generated label back every time.
+	L.setThematic(true);
+	state('thematic map, second time');
 	L.setThematic(false);
-	ok('one suppressor off, the other still on: the generated label stays hidden', hiddenByCss(gen()));
-	ok('...and the Text is still there', !hiddenByCss(own()));
-	L.setHideAll(false);
-	ok('both off: everything is back', !hiddenByCss(gen()) && !hiddenByCss(own()));
+	ok('both off again: everything is back', !hiddenByCss(gen()) && !hiddenByCss(own()));
 
 	// The reader's blind-spot report, scoped to the selectors that could possibly reach a label.
 	// A rule about print areas or tab strips is none of this check's business; one about .lpn-lbl
