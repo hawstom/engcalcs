@@ -4739,10 +4739,9 @@ var EngCalcs = EngCalcs || {};
 	// require DIFFERENT wording -- Mapbox's terms name Mapbox and its imagery supplier as well as
 	// OpenStreetMap -- so the credit swaps with the style rather than naming everyone at all times,
 	// which would credit a provider whose tiles are not on screen.
-	// The credit and the teaser change on exactly the same events, so they have one entry point --
-	// and that entry point has exactly ONE caller, refreshBasemap(), which is the function that
-	// paints the tiles. Nothing else may call this: a second caller is a second thing to keep in
-	// step, and the first version of this had three of them and still missed the boot path.
+	// The credit and the teaser change on exactly the same events, so they have one entry point,
+	// with exactly ONE caller: refreshBasemap(), the function that paints the tiles. Nothing else
+	// may call this -- a second caller is a second thing to keep in step.
 	function refreshBasemapChrome() {
 		refreshBasemapCredit();
 		refreshBasemapTeaser();
@@ -4807,16 +4806,12 @@ var EngCalcs = EngCalcs || {};
 		basemapTimer = setTimeout(function () { basemapTimer = null; refreshBasemap(); }, 120);
 	}
 	// **THE ONE PLACE TILES ARE PAINTED IS THE ONE PLACE THE CREDIT IS REFRESHED, AND THAT IS THE
-	// WHOLE POINT** (Tom, 2026-08-23: *"we also have no map attribution on the map."*). The credit
-	// used to be refreshed only by refreshBasemapChrome()'s three callers -- setBasemapStyle(), the
-	// georeference finish and refreshAllFromDocument() -- and the BOOT path goes through none of
-	// them: it applies the saved project and then noteMapSized() schedules refreshBasemap() alone,
-	// because tiles need a viewport. So reopening a saved geographic project drew OpenStreetMap
-	// tiles with the credit still at its inline display:none -- a licence breach, silent, and on
-	// the commonest path there is.
-	//
-	// A fourth call site would have been the same design that failed. Instead the credit hangs off
-	// the painter, so no caller can paint tiles without it and none has to remember.
+	// WHOLE POINT** (Tom, 2026-08-23: *"we also have no map attribution on the map."*). Refreshing
+	// the credit from named call sites instead misses the BOOT path, which applies the saved project
+	// and then reaches refreshBasemap() alone through noteMapSized(), because tiles need a viewport:
+	// reopening a saved geographic project then drew OpenStreetMap tiles with the credit still at
+	// its inline display:none -- a licence breach, silent, and on the commonest path there is. The
+	// credit hangs off the painter, so no caller can paint tiles without it.
 	function refreshBasemap() {
 		paintBasemapTiles();
 		refreshBasemapChrome();
@@ -5833,24 +5828,21 @@ var EngCalcs = EngCalcs || {};
 		georefBarEl('lpn_georef_cancel').addEventListener('click', georefCancel);
 	}
 
-	// ---- the three stages ----------------------------------------------------------------------
 	// ---- GO TO A COORDINATE (Task 145) ---------------------------------------------------------
 	//
 	// Tom, 2026-08-18: *"We need either the ability to zoom out to the globe or to search by name or
-	// to go to lat/lon."* This is the third, and the zoom floor above is the first. The second --
-	// searching by PLACE NAME -- is Task 441 and is not built here on purpose: it needs a geocoder,
-	// which would be a SECOND third-party host on a page whose whole privacy claim is that the tile
-	// server is the only one. That is Tom's call, not a detail of this command.
+	// to go to lat/lon."* This is the third; the zoom floor above is the first; searching by place
+	// name is js/lpn-search.js.
 	//
 	// **IT ACCEPTS WHAT PEOPLE PASTE, AND REFUSES WHAT IT CANNOT READ.** `38.106, -122.569` is what
 	// every map on Earth hands you, so that order -- LATITUDE FIRST -- is what this reads.
 	//
 	// **THE DECIMAL COMMA IS THE WHOLE DIFFICULTY, and getting it wrong is SILENT.** Most of our 26
 	// languages write 38,106 for what English writes 38.106, so a pasted European coordinate reads
-	// `38,106 -122,569` -- and the first version of this took the first two integers out of it and
-	// travelled to 38 N 106 E, Inner Mongolia, with no message of any kind. A wrong map is far worse
-	// than a refusal. Found by dev/browser-pass/specs/goto.js; Wave 0 had flagged the same trap in
-	// the tip's own example (dev/english-friction/438-wave0.json).
+	// `38,106 -122,569`; taking the first two integers out of that travels to 38 N 106 E, Inner
+	// Mongolia, with no message of any kind. A wrong map is far worse than a refusal. Guarded by
+	// dev/browser-pass/specs/goto.js; Wave 0 flagged the same trap in the tip's own example
+	// (dev/english-friction/438-wave0.json).
 	//
 	// The rule that resolves it: **match numbers GREEDILY, then COUNT them, and refuse anything that
 	// is not exactly two.** A comma inside a number binds tighter than a comma between two, so
@@ -6817,7 +6809,8 @@ var EngCalcs = EngCalcs || {};
 	//
 	// What is NOT here, and is not coming: Settings and the Labels box (Tom, explicitly). Both hang
 	// off their own toolbar button as pull-downs, and a setting is not something you read beside
-	// the drawing. A LEFT pane is not planned at all. A RIGHT pane is Tasks 427/284's to settle.
+	// the drawing. A LEFT pane is not planned at all; the RIGHT pane is empty on purpose (see its
+	// own note below).
 	var LPN_PANE_KEY = 'lpn_pane';
 	// The pane's own floor, and the map's. Between them they decide how far the grip can travel:
 	// a drag can always leave the map a canvas worth looking at, so there is no gesture that hides
@@ -9160,12 +9153,10 @@ var EngCalcs = EngCalcs || {};
 	// rather than one tri-state because they answer different questions and both can be true.
 	// **THE SHOP WINDOW IS FOR A FIRST VISIT, AND IT IS ANSWERED ONCE** (ROADMAP Task 431).
 	//
-	// Two wrong answers were shipped before this one, and each looked right in the case it was
-	// written for. A single PAGE-level flag meant opening an example cleared it for everybody, so
-	// the next empty tab focused got the wall again. Keying it PER PROJECT fixed that and left
-	// Tom's real complaint standing: *"Still happens when I switch to each new project tab after
-	// page reload."* Of course it did -- every one of those tabs has genuinely never had content,
-	// so a per-project answer says yes to every one of them, forever.
+	// **NEITHER A PAGE-LEVEL FLAG NOR A PER-PROJECT ONE.** A page-level flag is cleared by opening
+	// an example, so the next empty tab focused gets the wall again. A per-project flag answers
+	// Tom's *"Still happens when I switch to each new project tab after page reload"* with yes
+	// forever, because every one of those tabs has genuinely never had content.
 	//
 	// The question the wall actually asks is **"is this person new here?"**, which is asked once and
 	// answered for good. So the flag lives on `library`, which is already in localStorage and
@@ -20205,11 +20196,10 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (!result.ok || !result.converged) {
 			lastSolveResult = null;
-			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS, and until Task 248 phase 2
-			// both printed "Did not converge". They separated the moment the native solver gained a
-			// reason to refuse a perfectly sound network (an active valve, when EPANET could not be
-			// loaded): telling that user their network did not converge sends them to look for a
-			// zero diameter that is not there.
+			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS. The native solver can refuse
+			// a perfectly sound network (an active valve, when EPANET could not be loaded), and
+			// telling that user their network did not converge sends them to look for a zero
+			// diameter that is not there.
 			if (result.issues && result.issues.length > 0) {
 				result.issues.forEach(function (issue) { logLpnDiag(issue.code); });
 				setStatus(result.issues.map(diagIssueText).join(' '));
