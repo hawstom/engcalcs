@@ -8001,7 +8001,7 @@ var EngCalcs = EngCalcs || {};
 						set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
 					// Label, symbol and unit all follow settings.method (Task 271), through the same
 					// function the popup and the Labels legend use.
-					{ key: 'roughness', label: roughnessLabel, em: 2.1,
+					{ key: 'roughness', label: roughnessLabel, em: 2.31,
 						unit: function () { return frictionMethod() === 'dw' ? 'lpn_u_roughness' : ''; },
 						prop: 'roughness', get: function (l) { return effective(l, 'roughness'); },
 						set: function (l, v) { setProp(l, 'roughness', v); } },

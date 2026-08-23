@@ -26,7 +26,10 @@ const src = fs.readFileSync(path.join(__dirname, '../../js/looped-network.js'), 
 // therefore keeps the 7em default; that is legitimate and is asserted separately below.
 const DECLARED = {
 	km:           0.2,
-	roughness:    0.3,
+	// 0.33, not the declared 0.3: Tom asked for the Roughness box 10% wider on PC
+	// (2026-08-23). 0.3 x 1.1 = 0.33 x 7em = 2.31em. The phone box is untouched -- below
+	// the breakpoint every box in these tables is a flat 3.5em.
+	roughness:    0.33,
 	length:       0.6,
 	diameter:     0.3,
 	elev:         0.5,   // junction, reservoir and tank all reach this through paneColElev()
@@ -95,8 +98,10 @@ const noteRaw = /multiples of the 7em every box used to be[\s\S]*?\*\//.exec(css
 const note = noteRaw ? [noteRaw[0].replace(/\s+/g, ' ')] : null;
 report(!!note, 'css/engcalcs.css carries the declared list beside --lpn-pane-col-w');
 if (note) {
-	[['Minor loss', 0.2], ['Roughness', 0.3], ['Length', 0.6], ['Diameter', 0.3]].forEach(function (p) {
-		report(note[0].indexOf(p[0] + ' ' + p[1]) >= 0,
+	// A BOUNDARY, NOT indexOf: 'Roughness 0.3' is a prefix of 'Roughness 0.33', so a substring
+	// search reports a stale note as fresh on exactly the edit most likely to make it stale.
+	[['Minor loss', 0.2], ['Roughness', 0.33], ['Length', 0.6], ['Diameter', 0.3]].forEach(function (p) {
+		report(new RegExp(p[0] + ' ' + String(p[1]).replace('.', '\\.') + '(?![0-9])').test(note[0]),
 			'the stylesheet note still says ' + p[0] + ' ' + p[1]);
 	});
 	report(/0\.5 for the tank, reservoir and junction/.test(note[0]),

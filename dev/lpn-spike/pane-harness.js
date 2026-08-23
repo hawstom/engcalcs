@@ -778,7 +778,7 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 		['tanks', 'level', 3.5, 4], ['tanks', 'minLevel', 3.5, 4], ['tanks', 'maxLevel', 3.5, 4],
 		['tanks', 'tankDiameter', 3.5, 4],
 		['pipes', 'diameter', 2.1, 4, true], ['pipes', 'length', 4.2, 5],
-		['pipes', 'roughness', 2.1, 3], ['pipes', 'km', 1.4, 3, true]
+		['pipes', 'roughness', 2.31, 3], ['pipes', 'km', 1.4, 3, true]
 	];
 	WANT.forEach(([tid, key, em, needs, narrow]) => {
 		const col = L.tableCols(tid).filter((c) => c.key === key)[0];
