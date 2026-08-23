@@ -69,6 +69,10 @@ run_check "php syntax (all .php)"        blocking sh -c 'find . -name "*.php" -n
 # service worker is no longer a file here -- Task 318 replaced sw.js with the generated sw.php --
 # so its syntax is checked by parsing what sw.php actually emits, inside the manifest check below.
 run_check "js syntax (all shipped js)"   blocking sh -c 'for f in js/*.js js/vendor/*.js; do [ -f "$f" ] || continue; node --check "$f" >/dev/null || { echo "FAILED: $f"; exit 1; }; done'
+# Shell was the one language here that nothing parsed, and the gap had teeth: log/lang-log-stats.sh
+# is 600 lines of bash whose only reader is a human running it by hand, and this file is another.
+# A typo in either surfaces as a broken run at the moment somebody wanted an answer, not before.
+run_check "shell syntax (all .sh)"       blocking sh -c 'find . -name "*.sh" -not -path "./node_modules/*" -not -path "./dev/browser-pass/node_modules/*" -print0 | xargs -0 -n1 bash -n || { echo "A script above failed bash -n; the parser message names the file and the line."; exit 1; }'
 
 # --- Does every page still produce well-formed HTML ------------------------------------------
 run_check "html balance (every page)"    blocking php dev/scripts/html_balance_check.php
