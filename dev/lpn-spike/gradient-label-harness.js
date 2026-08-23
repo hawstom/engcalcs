@@ -14,9 +14,11 @@
 // NUMBERS, and a label whose text ends in '%' must still tie with one that does not.
 
 const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
 const L = loadLoopedNetwork(
-	"\t\tdrawExample: drawExampleNetwork, runSolve: runSolve, assembleModel: assembleModel,\n" +
+	EXAMPLE_EXPORTS +
+	"\t\trunSolve: runSolve, assembleModel: assembleModel,\n" +
 	"\t\tgetDoc: function () { return doc; }, effective: effective,\n" +
 	"\t\tlabelSettings: function () { return labelSettings; }, refreshLabelText: refreshLabelText,\n" +
 	"\t\tlinkLabel: function (id) { return linkEls[id].lines.map(function (l) { return l.text; }); },\n" +
@@ -58,7 +60,7 @@ console.log('=== head loss gradient: the label carries its % ===');
 setUnitSet('us');
 L.buildLayers();
 L.seedDefaultInputs();
-L.drawExample();
+openExample(L);
 L.runSolve();
 
 // Only the gradient, so a stray '%' anywhere in the stack is unmistakably this line.

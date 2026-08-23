@@ -13,9 +13,11 @@
 // app's own arithmetic.
 
 const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
 const L = loadLoopedNetwork(
-	"\t\tdrawExample: drawExampleNetwork, runSolve: runSolve, assembleModel: assembleModel,\n" +
+	EXAMPLE_EXPORTS +
+	"\t\trunSolve: runSolve, assembleModel: assembleModel,\n" +
 	"\t\tgetDoc: function () { return doc; }, effective: effective, linkById: linkById,\n" +
 	"\t\tfrictionMethod: frictionMethod, roughnessLabel: roughnessLabel,\n" +
 	"\t\troughnessSymbol: roughnessSymbol, roughnessSI: roughnessSI,\n" +
@@ -79,7 +81,7 @@ console.log('=== Task 271: friction-method choice ===');
 
 setUnitSet('us');
 L.reset();
-L.drawExample();
+openExample(L);
 
 // ---- 1. Default is unchanged ---------------------------------------------------------------
 ok('default method is still Hazen-Williams', L.frictionMethod() === 'hw', L.frictionMethod());
@@ -168,7 +170,7 @@ ok('DW default roughness is 0.0015 m expressed in ft',
 // above could still pass.
 setUnitSet('us');
 L.reset();
-L.drawExample();
+openExample(L);
 const heads = {};
 ['hw', 'manning', 'dw'].forEach(function (m) {
 	L.setMethod(m);
@@ -190,14 +192,15 @@ function spread(a, b) {
 ok('Manning and HW give different heads', spread('hw', 'manning') > 1e-4, spread('hw', 'manning'));
 ok('DW and HW give different heads', spread('hw', 'dw') > 1e-4, spread('hw', 'dw'));
 
-// ---- 8. The example FORCES Hazen-Williams ---------------------------------------------------
-// A trap created BY this task: newProject() inherits settings from the project you were in, so a
-// visitor sitting on Manning who chose Example would get a ring main whose pipes carry n = 130 --
-// an HW C read as a Manning n, four orders of magnitude out, converging happily to nonsense.
+// ---- 8. The example ARRIVES Hazen-Williams, whatever the visitor was sitting on --------------
+// A trap created BY this task: settings are inherited from the project you were in, so a visitor
+// sitting on Manning who opened the example would get a ring main whose pipes carry n = 130 -- an
+// HW C read as a Manning n, four orders of magnitude out, converging happily to nonsense. The
+// gallery file states its own method, and applySaved() takes the FILE's, which is what closes it.
 setUnitSet('us');
 L.reset();
 L.setMethod('manning');
-L.drawExample();
+openExample(L);
 ok('example forces Hazen-Williams even from a Manning project',
 	L.frictionMethod() === 'hw', L.frictionMethod());
 ok('example roughness is an HW C, and is now read as one',
@@ -217,7 +220,7 @@ ok('forcing the method also re-applies the unit row', L.roughnessRowShown() === 
 setUnitSet('us');
 L.reset();
 L.resetLabels();
-L.drawExample();
+openExample(L);
 ok('HW keeps 0 places -- a C-factor is an integer', L.labelDecimals() === 0, L.labelDecimals());
 ok('...and 130 prints as "130"', L.roughnessLabelText(130) === '130', L.roughnessLabelText(130));
 
@@ -238,7 +241,7 @@ ok('...and e = 0.005 ft prints as itself, not "0"',
 setUnitSet('si');
 L.reset();
 L.resetLabels();
-L.drawExample();
+openExample(L, 'si');
 L.setMethod('dw'); L.applyMethodUI();
 ok('Darcy-Weisbach in millimetres needs one place', L.labelDecimals() === 1, L.labelDecimals());
 ok('...and e = 1.5 mm prints as itself', L.roughnessLabelText(1.5) === '1.5', L.roughnessLabelText(1.5));

@@ -21,9 +21,11 @@
 // 75% -- a smaller arrow that still reserves the old space is a half-applied change nobody sees.
 
 const { setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
 const L = loadLoopedNetwork(
-	"\t\tdrawExample: drawExampleNetwork, runSolve: runSolve, assembleModel: assembleModel,\n" +
+	EXAMPLE_EXPORTS +
+	"\t\trunSolve: runSolve, assembleModel: assembleModel,\n" +
 	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\tlabelSettings: function () { return labelSettings; }, refreshLabelText: refreshLabelText,\n" +
 	"\t\tlinkLabel: function (id) { return linkEls[id].lines.map(function (l) { return l.text; }); },\n" +
@@ -67,7 +69,7 @@ console.log('=== solve results: which sign reaches the reader ===');
 setUnitSet('us');
 L.buildLayers();
 L.seedDefaultInputs();
-L.drawExample();
+openExample(L);
 L.runSolve();
 
 const raw = EngCalcs.lpnSolve(L.assembleModel(), { tol: 1e-9 });
