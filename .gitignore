@@ -3,6 +3,18 @@ error_log
 *xlsx
 log/
 
+# Archived usage logs and the reports built from them (spock/, named for the log in your own eye --
+# spock/README.md carries Tom's derivation). Same arrangement log/ has always had: the directory,
+# its README and its two .htaccess files are tracked, the data is not. The whitelist shape is
+# deliberate -- a new file under spock/ is ignored by default, so publishing one has to be a line
+# somebody writes on purpose.
+spock/*
+!spock/.htaccess
+!spock/README.md
+!spock/public/
+spock/public/*
+!spock/public/.htaccess
+
 # Lock records are runtime state, like log/. The directory and its .htaccess are tracked;
 # the records themselves are not.
 lpn-locks/*.json

@@ -5,10 +5,13 @@
 #   bash log/lang-log-stats.sh            from the project root
 #   bash log/lang-log-stats.sh --days=30  restrict the window to the last N days
 #   bash log/lang-log-stats.sh --out=FILE also write the report to FILE (still prints it)
+#   bash log/lang-log-stats.sh --archive=spock/2026-08-14
+#                                         report a rotated archive instead of the live logs
 #
-# --out WRITES A FILE AND NOTHING ELSE. It does not publish anything: pick a path under dev/, which
-# is blocked from web access, and note that whether these aggregate numbers are ever put on the web
-# is Tom's decision and nobody else's. Nothing here touches .htaccess and nothing here should.
+# --out WRITES A FILE AND NOTHING ELSE. It does not publish anything: pick a path under dev/ or
+# spock/, both blocked from web access. The one PUBLISHED copy is written by
+# dev/scripts/publish_usage_report.sh into spock/public/, which is the only granted path under
+# spock/ and holds the aggregate only. Nothing here touches .htaccess and nothing here should.
 #
 # WHAT THIS FILE IS FOR, beyond printing numbers. dev/usage-data-log.md records the same
 # analytical mistakes being made repeatedly by people who had already written the rule down: a
@@ -41,7 +44,38 @@
 
 set -u
 
+# ---- which directory of logs is being reported on ---------------------------------------------
+# Default: the live logs beside this script. --archive=spock/<YYYY-MM-DD> points every read at a
+# rotated set instead, which is the only way a window that has already been trimmed away can be
+# reported at all. The archived filenames ARE the live filenames, so nothing here has to know
+# anything about an archive except its directory -- dropping six hand-moved files into
+# spock/2026-08-14/ registers them, and no code changes.
+#
+# TWO THINGS MUST NEVER BE CONFUSABLE with a live run, because dev/usage-data-log.md records a 40x
+# scale break that happened from exactly this class of mistake:
+#   * SOURCE prints on the header AND on the footer, naming the archive;
+#   * FINGERPRINT carries src=live or src=archive:<name>, so two pasted reports show the mismatch
+#     even if somebody quotes nothing but that one line.
+# The state file lives beside the logs it describes, so an archived run compares itself against the
+# last archived run of the SAME archive and never against the live one.
 DIR="$(dirname "$0")"
+SOURCE_KIND="live"
+SOURCE_NAME=""
+for arg in "$@"; do
+    case "$arg" in
+        --archive=*)
+            DIR="${arg#--archive=}"
+            SOURCE_KIND="archive"
+            SOURCE_NAME="$(basename "$DIR")"
+            if [ ! -d "$DIR" ]; then
+                echo "No such archive directory: $DIR" >&2
+                echo "Archives live in spock/<YYYY-MM-DD>/ -- see spock/README.md." >&2
+                exit 1
+            fi
+            ;;
+    esac
+done
+
 RAW_LANG="$DIR/engcalcs-lang.log"
 RAW_VIEW="$DIR/engcalcs-human-view.log"
 RAW_CALC="$DIR/engcalcs-calc-usage.log"
@@ -55,9 +89,10 @@ OUT_PATH=""
 PASS_ARGS=""
 for arg in "$@"; do
     case "$arg" in
-        --days=*) WINDOW_DAYS="${arg#--days=}"; PASS_ARGS="$PASS_ARGS $arg" ;;
-        --out=*)  OUT_PATH="${arg#--out=}" ;;
-        --help|-h) sed -n '2,12p' "$0"; exit 0 ;;
+        --days=*)    WINDOW_DAYS="${arg#--days=}"; PASS_ARGS="$PASS_ARGS $arg" ;;
+        --out=*)     OUT_PATH="${arg#--out=}" ;;
+        --archive=*) PASS_ARGS="$PASS_ARGS $arg" ;;   # already consumed above; passed through --out
+        --help|-h) sed -n '2,14p' "$0"; exit 0 ;;
         *) echo "Unknown option: $arg" >&2; exit 1 ;;
     esac
 done
@@ -70,13 +105,19 @@ if [ -n "$OUT_PATH" ]; then
     bash "$0" $PASS_ARGS | tee "$OUT_PATH"
     echo ""
     echo " Report written to $OUT_PATH"
-    echo " Nothing about this publishes it. dev/ is blocked from web access on purpose, and whether"
-    echo " these numbers are served anywhere is Tom's call, not this script's."
+    echo " NOTHING ABOUT --out PUBLISHES ANYTHING. dev/ and spock/ are both blocked from web access;"
+    echo " the one served copy is written by dev/scripts/publish_usage_report.sh, deliberately, to"
+    echo " the single granted path spock/public/. This script still touches no .htaccess."
     exit 0
 fi
 
 if [ ! -f "$RAW_LANG" ]; then
     echo "Log file not found: $RAW_LANG"
+    if [ "$SOURCE_KIND" = "archive" ]; then
+        echo "(That archive holds no engcalcs-lang.log. An archive is the six live filenames,"
+        echo " unchanged -- see spock/README.md.)"
+        exit 1
+    fi
     echo "(No page access has been recorded yet.)"
     exit 1
 fi
@@ -180,13 +221,21 @@ WIN_DAYS=$(awk -v a="$WIN_START" -v b="$WIN_END" 'BEGIN{
     d = (mktime(b) - mktime(a)) / 86400
     printf "%.1f", (d > 0 ? d : 0)
 }')
-FINGERPRINT="win=${WIN_START}..${WIN_END} days=${WIN_DAYS} rows=$(n_of "$TMP/lang")/$(n_of "$TMP/view")/$(n_of "$TMP/calc")/$(n_of "$TMP/title")/$(n_of "$TMP/signal")/$(n_of "$TMP/send")"
+if [ "$SOURCE_KIND" = "archive" ]; then
+    SOURCE_TAG="archive:${SOURCE_NAME}"
+    SOURCE_LINE="ARCHIVE  $DIR  — these are ROTATED logs, not the live ones."
+else
+    SOURCE_TAG="live"
+    SOURCE_LINE="LIVE     $DIR  — the logs currently being written to."
+fi
+FINGERPRINT="src=${SOURCE_TAG} win=${WIN_START}..${WIN_END} days=${WIN_DAYS} rows=$(n_of "$TMP/lang")/$(n_of "$TMP/view")/$(n_of "$TMP/calc")/$(n_of "$TMP/title")/$(n_of "$TMP/signal")/$(n_of "$TMP/send")"
 PREV_FINGERPRINT=""
 [ -f "$STATE" ] && PREV_FINGERPRINT=$(cat "$STATE")
 
 echo "==============================================================================="
 echo " ENGCALCS USAGE REPORT"
 echo "==============================================================================="
+echo " SOURCE        $SOURCE_LINE"
 echo " WINDOW        $WIN_START  ..  $WIN_END"
 echo " DURATION      $WIN_DAYS days"
 echo " FINGERPRINT   $FINGERPRINT"
@@ -200,6 +249,10 @@ if [ -n "$PREV_FINGERPRINT" ]; then
     fi
 else
     echo " PREVIOUS RUN  (none recorded — this is the first run against this log directory)"
+    if [ "$SOURCE_KIND" = "archive" ]; then
+        echo "               An archive keeps its own .last-report-window beside its logs, so an"
+        echo "               archived run is never compared against a live one."
+    fi
 fi
 printf '%s\n' "$FINGERPRINT" > "$STATE" 2>/dev/null || true
 echo ""
@@ -724,6 +777,7 @@ for pair in "engcalcs-lang.log:lang" "engcalcs-human-view.log:view" "engcalcs-ca
     printf "   %-32s %8s  %-21s %-21s\n" "${pair%%:*}" "$(n_of "$f")" "$(first_of "$f")" "$(last_of "$f")"
 done
 echo ""
+echo " SOURCE        $SOURCE_LINE"
 echo " WINDOW        $WIN_START  ..  $WIN_END   ($WIN_DAYS days)"
 echo " FINGERPRINT   $FINGERPRINT"
 echo ""
@@ -732,8 +786,8 @@ echo " whatever table you keep. A table pasted without them cannot be compared t
 echo ""
 echo " To keep this run as a file, one command:"
 echo ""
-echo "     bash log/lang-log-stats.sh --out=dev/usage-report-$(date -u +%Y-%m-%d).txt"
+echo "     bash log/lang-log-stats.sh --out=spock/reports/usage-$(date -u +%Y-%m-%d).txt"
 echo ""
-echo " That writes a file and publishes nothing. dev/ is blocked from web access deliberately, and"
-echo " whether these aggregate numbers are ever served is Tom's decision — no script makes it."
+echo " That writes a file and publishes nothing — spock/ is denied over HTTP. To ALSO serve the"
+echo " aggregate at its unguessable published path:  sh dev/scripts/publish_usage_report.sh"
 echo ""
