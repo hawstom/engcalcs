@@ -235,42 +235,6 @@ the block.
     believes it does and wants it confirmed in a browser before the column width is treated as a
     constraint on how many decimals e can carry. Do not widen a column on the assumption first.
 
-- 100|493| **[CC] Table inputs: per-field widths, and centre every column but the first.**
-  Tom, 2026-08-23, from a PC pass. **Phone widths are already good — do not change them.** Scaling
-  factors he gave, by field: Pipe k 0.2 · Pipe roughness 0.3 · Length 0.6 · Diameter 0.3 · Tank
-  elevation 0.5 · Tank water depth 0.5 · Tank lowest water depth 0.5 · Tank highest water depth 0.5 ·
-  Tank diameter 0.5 · Reservoir elevation 0.5 · Reservoir head 0.5 · Junction elevation 0.5 ·
-  Junction demand 0.5.
-  - **And: horizontally centre every column's inputs AND headings except the leftmost.** The first
-    column keeps its natural start alignment. Same rule `css/engcalcs.css` already states for the
-    Labels panel (Task 435), so apply it the same way — `start`/`center`, never `left`, for RTL.
-
-- 100|494| **[CC] Make the published usage report reachable.**
-  Tom, 2026-08-23: *"spock: Make it reachable."* This is the one explicit yes
-  `dev/scripts/publish_usage_report.sh` has been waiting on — uncomment the serve grant in
-  `spock/public/.htaccess`. **Only the aggregate is served and that does not change:** the raw
-  per-event logs stay private, because publishing them would contradict `privacy.php` and cost a
-  `consent_body` rewrite, 26 retranslations and an `EC_CONSENT_VERSION` bump. The published copy
-  truncates timestamps to a date, carries `noindex`, and its filename is deliberately unguessable and
-  deliberately absent from `robots.txt`. Verify it actually serves on production, since the grant
-  needs an `AllowOverride` this repo cannot confirm from here.
-
-- 100|490| **[H→CC] A shipped defect overstated Q by 1.587x, and nobody was told.**
-  Found and fixed 2026-08-23 under Task 475. A cross-section with a VERTICAL WALL — a lined ditch, a
-  box culvert, a rectangular channel — got no wetted perimeter from that wall, because the old test
-  could not tell a wall (zero area, real perimeter) from a dry bed (zero area, no perimeter). A
-  10 ft × 5 ft box reported P = 10 ft, R = 5 ft instead of P = 20 ft, R = 2.5 ft; Manning goes as
-  R^(2/3), so Q came out **2^(2/3) = 1.587x** high. Asserted by `dev/calc-spike/mi-harness.js`.
-  - **TOM'S CALL, 2026-08-23: be honest about it in the page's own Notes, as an ERRATA carrying the
-    date it was discovered and fixed.** No mailing list exists, so the page is the only channel.
-  - **MEASURED ANSWER to his question, and it corrects the assumption in it.** The defect was a CLIFF
-    at exactly zero horizontal run, not a degradation approaching vertical, and **orientation was
-    irrelevant** — it fired identically whether the bank rose or fell, high point or low point,
-    because with `l === 0` the slope is forced to 0 and the area is `d0 * l` = 0 either way.
-    "Almost vertical" was never wrong: at a horizontal run of 1e-9 ft the old code already returned
-    the exact perimeter. What DID matter is submergence — the loss is the SUBMERGED height of the
-    wall, so a wall entirely above water was always correctly zero.
-
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
   `sw.php` and `consent.php`, and three `Redirect 301` rules in `.htaccess` naming it absolutely.
