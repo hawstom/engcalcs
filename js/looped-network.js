@@ -4765,16 +4765,27 @@ var EngCalcs = EngCalcs || {};
 		b.style.display = '';
 		on = basemapOn() && basemapStyle() === 'satellite';
 		b.classList.toggle('lpn-basemap-teaser-on', on);
-		var name = on ? (pc.lpn_basemap_satellite_hide || 'Hide satellite images')
+		// The name says what the PRESS will do, not what is showing -- the button swaps the two
+		// basemaps, so from satellite it offers the street map and never "Hide".
+		var name = on ? (pc.lpn_basemap_show || 'Show street map')
 			: (pc.lpn_basemap_satellite_show || 'Show satellite images');
 		b.setAttribute('aria-label', name);
 		b.setAttribute('aria-pressed', on ? 'true' : 'false');
 		b.title = name;
 	}
+	// **THE TEASER SWAPS THE TWO BASEMAPS. IT NEVER TURNS THEM OFF**, and that is the whole
+	// difference between it and the View rows. setBasemapStyle() toggles off when asked for the
+	// style already showing, which is right for a row that reads "Hide satellite images" and wrong
+	// for a corner tile: Tom pressed it twice and lost the basemap entirely -- "I get satellite, but
+	// now I lost map. No more map. Satellite has attribution, Map has nothing." Turning the tiles
+	// off stays in the View menu, where a row says so in words.
+	function toggleBasemapTeaser() {
+		setBasemapStyle(basemapOn() && basemapStyle() === 'satellite' ? 'osm' : 'satellite');
+	}
 	function wireBasemapTeaser() {
 		var b = document.getElementById('lpn_basemap_teaser');
 		if (!b) { return; }
-		b.addEventListener('click', function () { setBasemapStyle('satellite'); });
+		b.addEventListener('click', toggleBasemapTeaser);
 	}
 	function refreshBasemapCredit() {
 		var c = document.getElementById('lpn_basemap_credit'), sat;

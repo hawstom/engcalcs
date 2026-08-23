@@ -46,6 +46,7 @@ const L = loadLoopedNetwork(
 	"\t\tsetView: function (v) { applyView(v); }, geoHome: geoHomeView,\n" +
 	"\t\tlayer: function () { return basemapLayer; },\n" +
 	"\t\tsetStyle: setBasemapStyle, setBasemapOn: setBasemapOn,\n" +
+	"\t\tteaserPress: toggleBasemapTeaser,\n" +
 	"\t\tstyle: basemapStyle, basemapOn: basemapOn, isGeo: isGeoProject,\n" +
 	"\t\tsatAvailable: satelliteAvailable,\n" +
 	"\t\trefreshAll: refreshAllFromDocument,\n" +
@@ -147,6 +148,27 @@ async function main() {
 		'display=' + byId.lpn_basemap_teaser.style.display + ' title=' + byId.lpn_basemap_teaser.title);
 	ok('...labelled with the command it performs',
 		/satellite/i.test(byId.lpn_basemap_teaser.title || ''), byId.lpn_basemap_teaser.title);
+
+	// **THE TEASER SWAPS; IT NEVER TURNS THE TILES OFF.** The View rows toggle off when asked for
+	// the style already showing, which is right for a row that reads "Hide satellite images". The
+	// corner tile inherited that and it was wrong: Tom pressed it twice and the basemap vanished --
+	// "I get satellite, but now I lost map. No more map. Satellite has attribution, Map has
+	// nothing." Pressing it any number of times must leave a basemap on screen.
+	L.teaserPress();
+	ok('one press on the teaser shows satellite', L.basemapOn() && L.style() === 'satellite',
+		'on=' + L.basemapOn() + ' style=' + L.style());
+	invariant('after one press on the teaser');
+	L.teaserPress();
+	ok('a second press returns the STREET map rather than nothing',
+		L.basemapOn() && L.style() === 'osm', 'on=' + L.basemapOn() + ' style=' + L.style());
+	invariant('after a second press on the teaser');
+	L.teaserPress(); L.teaserPress(); L.teaserPress();
+	ok('and no number of presses can leave the map bare', L.basemapOn(),
+		'on=' + L.basemapOn() + ' style=' + L.style());
+	// Hand section 2 the state it starts from. The presses above end on satellite, and the next
+	// block's first assertion is that ASKING for satellite fetches Mapbox tiles -- which the OFF
+	// toggle would defeat. Reset explicitly rather than by counting presses.
+	L.setStyle('osm');
 
 	// ---- 2. the other ways the tiles change ---------------------------------------------------------
 	console.log('\n--- and every other route to a tile carries the credit with it ---');
