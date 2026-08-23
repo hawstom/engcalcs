@@ -20,14 +20,13 @@ var EngCalcs = EngCalcs || {};
 	var state = { tx: 0, ty: 0, s: 1 };
 	// `settings.textSize` is SCREEN PIXELS, full stop -- shared by a node's ID/pressure label, a
 	// link's label, and a user-added Text label. Returned in WORLD units (divided by the current
-	// scale) because everything here is drawn in world coordinates, so the division must be
-	// re-applied whenever state.s changes (refreshFontSizes(), from onZoomChanged()) rather than
-	// once at build time like every other geometry.
+	// scale), so the division is re-applied whenever state.s changes (refreshFontSizes(), from
+	// onZoomChanged()) rather than once at build time like every other geometry.
 	//
 	// **DO NOT REINTRODUCE MAP-UNIT TEXT SIZING.** Text and symbols are furniture of the VIEW, not
-	// features of the model. A world-unit size is a size whose legibility depends on how far you are
-	// zoomed out, and no floor, warning or better default fixes that: Net3's map-unit text at 0.2
-	// units is a fraction of a pixel, so a correct network imports and shows nothing.
+	// features of the model, and no floor, warning or better default fixes a size whose legibility
+	// depends on the zoom: Net3's map-unit text at 0.2 units is a fraction of a pixel, so a correct
+	// network imports and shows nothing.
 	//
 	// mult: a Text label's own per-label size multiplier (lb.sizeMult, default 1), stacked on the
 	// shared settings.textSize -- node/link labels never pass one.
@@ -1882,8 +1881,7 @@ var EngCalcs = EngCalcs || {};
 	// overrides; every other scenario is nothing but a collection of overrides, and is a row in the
 	// same array flagged isBase -- so the selector has no special case, and because nothing carries a
 	// parent pointer a scenario-of-a-scenario is UNREPRESENTABLE rather than discouraged.
-	// Like settings/backdrop and unlike doc, these are not undo-snapshotted. Task 184 answers "does
-	// an override edit join the undo stack" with yes, so expect this to move into the snapshot.
+	// Snapshotted with doc, so an override edit joins the undo stack -- see saveUndoSnapshot().
 	function defaultScenarios() {
 		// name 'Base' is the shape Task 184 documents; display code should key off isBase and render
 		// its own localized word, never echo this string, so the stored data stays language-free.
@@ -1955,8 +1953,8 @@ var EngCalcs = EngCalcs || {};
 	// and so are id and type. Junction `elev` is survey data, not a design variable. A tank's `level`
 	// and a reservoir's `head` are the opposite case and ARE overridable -- see the note below.
 	// `active` is an ordinary boolean here and is how topology varies: a proposed loop lives in Base
-	// inactive and a scenario overrides it active. Nothing sets `active` yet -- effective() treats
-	// its absence as true.
+	// inactive and a scenario overrides it active. ABSENT reads as true -- effective() is the one
+	// place that default lives.
 	// `status` is this file's name for the open/closed state; `length` is the escape valve for "same
 	// drawing, different length", since a drag recomputes Base's auto length for every scenario.
 	// `level` is a design variable in exactly the way a reservoir's head is.
@@ -1984,9 +1982,9 @@ var EngCalcs = EngCalcs || {};
 		if (!el) { return undefined; }
 		var ov = activeScenario().overrides[ovKey(el)];
 		if (ov && Object.prototype.hasOwnProperty.call(ov, prop)) { return ov[prop]; }
-		// `active` has no stored property yet (nothing sets it) -- its absence must read as true, not
-		// undefined/falsy, so a topology no scenario has touched is never mistaken for inactive. This
-		// is the one property effective() defaults itself, per the trap note in Task 146.08 step 2.
+		// An ABSENT `active` must read as true, not undefined/falsy, so a topology no scenario has
+		// touched is never mistaken for inactive. This is the one property effective() defaults
+		// itself, per the trap note in Task 146.08 step 2.
 		if (prop === 'active' && el['_' + prop] === undefined) { return true; }
 		return el['_' + prop];
 	}
@@ -2336,10 +2334,10 @@ var EngCalcs = EngCalcs || {};
 			// silently reinterprets every already-saved network's toggles. Non-numeric fields (ID)
 			// have no entry. Three fields depart from the default 2, each for a reason about the
 			// QUANTITY:
-			//   roughness 0 -- this page is Hazen-Williams only (assembleModel() hardcodes method:'hw')
-			//     and a C-factor is a dimensionless integer: 100, 130, 140. REVISIT IF A
-			//     FRICTION-METHOD SELECTOR IS EVER ADDED -- Darcy-Weisbach's roughness is a HEIGHT
-			//     (0.00015 m), which prints as "0" at 0 decimals.
+			//   roughness 0 -- a Hazen-Williams C-factor is a dimensionless integer: 100, 130, 140.
+			//     **THIS ONE DOES NOT FOLLOW settings.method, AND THE METHOD IS SELECTABLE** (Task
+			//     271): Darcy-Weisbach's roughness is a HEIGHT (0.00015 m), which prints as "0" at 0
+			//     decimals.
 			//   diameter 0 -- inches and millimetres are both whole-number standards in this trade.
 			//   gradient 4 -- the only field whose unit family offers two forms differing by 100x
 			//     (gradePercent and plain rise/run). 2 decimals is useless as a ratio, where a typical
@@ -2534,8 +2532,7 @@ var EngCalcs = EngCalcs || {};
 			// classes apart somewhere around there. A document saved before this key existed is
 			// held at the five bands it was drawn in -- see applySaved().
 			//
-			// PER GROUP for the same reason the ramp is, and it fixes a real crossing: a criterion
-			// mode chosen for pressure used to force the LINK map to five classes as well.
+			// PER GROUP for the same reason the ramp is -- see criterionClassCount().
 			colorClassesNode: 7,
 			colorClassesLink: 7,
 			colorReverseNode: false,
@@ -3143,9 +3140,8 @@ var EngCalcs = EngCalcs || {};
 		return undefined;
 	}
 	function colorFieldOf(group) { return group === 'node' ? settings.colorNodeField : settings.colorLinkField; }
-	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, used by the Visibility panel's two
-	// dropdowns and by the Settings panel's two rows, so the same question is never asked two
-	// different ways in two places.
+	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, read by every control that offers a
+	// colour field, so the same question is never asked two different ways in two places.
 	//
 	// **PRESSURE AND VELOCITY ARE FIRST**, and that is Tom's ordering rather than the map's: they
 	// are the two questions a distribution network is actually asked. The rest follow in the order
@@ -3859,7 +3855,8 @@ var EngCalcs = EngCalcs || {};
 	// not wrap, so it needs a per-label width plus a greedy re-wrap on every font-size change -- pure
 	// geometry, belonging in js/lpn-geom.js.
 	// **THE EXPORT CONSTRAINT: EPANET's [LABELS] is ONE quoted string per line**, so a multi-line
-	// Text cannot round-trip through an `.inp`. Task 281 decides N labels or one flattened line.
+	// Text cannot round-trip through an `.inp`. It is FLATTENED to one line and reported -- see
+	// js/lpn-inp.js's `label-multiline-flattened`.
 	function textLabelLines(lb) {
 		var t = effective(lb, 'text');
 		return String(t === undefined || t === null ? '' : t).split('\n');
@@ -4081,19 +4078,12 @@ var EngCalcs = EngCalcs || {};
 		}
 		an = nodeById(lb.anchorNode); px = an.x + lb.x; py = an.y + lb.y;
 		box = textLabelBox(lb, le, px, py);
-		// **AN EDGE-JUSTIFIED LABEL IS ATTACHED TO ITS LEADER, AND THE ATTACHMENT DOES NOT MOVE.**
-		// With `align` left or right the anchored edge IS the label's own point, so the leader ends
-		// at lb.x and the text grows away from it. Nothing here reads the measured width, which is
-		// the whole point: change the text size and the leader does not budge.
-		//
-		// A CENTRED label has no such edge and keeps the older rule below -- still right for a label
-		// the user dragged, which is centred on wherever they dropped it.
 		// **THE LEADER ENDS AT THE LABEL'S OWN POINT, AND NOTHING HERE READS A WIDTH.** An anchored
 		// label is edge-justified by labelHAlign(), so its anchored edge IS lb.x -- change the text,
 		// change the size, change the zoom, and the leader does not move. That is Tom's "hold it
-		// inviolate", and it is why the old flip-with-hysteresis rule is gone rather than kept for a
-		// case: with the side derived from the offset there is nothing left to flip, and hysteresis
-		// existed only to stop a centred label's attachment flickering as it crossed its node.
+		// inviolate", and it is why there is no flip-with-hysteresis rule here: with the side derived
+		// from the offset there is nothing left to flip, and hysteresis existed only to stop a
+		// centred label's attachment flickering as it crossed its node.
 		// **RE-DERIVED ON EVERY MOVE, which is what makes it automatic.** Dragging a label across
 		// its node changes the sign of lb.x and therefore the anchored edge, so the element's own
 		// text-anchor has to be rewritten here -- otherwise the leader crosses over and the words
@@ -4739,10 +4729,9 @@ var EngCalcs = EngCalcs || {};
 	// require DIFFERENT wording -- Mapbox's terms name Mapbox and its imagery supplier as well as
 	// OpenStreetMap -- so the credit swaps with the style rather than naming everyone at all times,
 	// which would credit a provider whose tiles are not on screen.
-	// The credit and the teaser change on exactly the same events, so they have one entry point --
-	// and that entry point has exactly ONE caller, refreshBasemap(), which is the function that
-	// paints the tiles. Nothing else may call this: a second caller is a second thing to keep in
-	// step, and the first version of this had three of them and still missed the boot path.
+	// The credit and the teaser change on exactly the same events, so they have one entry point,
+	// with exactly ONE caller: refreshBasemap(), the function that paints the tiles. Nothing else
+	// may call this -- a second caller is a second thing to keep in step.
 	function refreshBasemapChrome() {
 		refreshBasemapCredit();
 		refreshBasemapTeaser();
@@ -4807,16 +4796,12 @@ var EngCalcs = EngCalcs || {};
 		basemapTimer = setTimeout(function () { basemapTimer = null; refreshBasemap(); }, 120);
 	}
 	// **THE ONE PLACE TILES ARE PAINTED IS THE ONE PLACE THE CREDIT IS REFRESHED, AND THAT IS THE
-	// WHOLE POINT** (Tom, 2026-08-23: *"we also have no map attribution on the map."*). The credit
-	// used to be refreshed only by refreshBasemapChrome()'s three callers -- setBasemapStyle(), the
-	// georeference finish and refreshAllFromDocument() -- and the BOOT path goes through none of
-	// them: it applies the saved project and then noteMapSized() schedules refreshBasemap() alone,
-	// because tiles need a viewport. So reopening a saved geographic project drew OpenStreetMap
-	// tiles with the credit still at its inline display:none -- a licence breach, silent, and on
-	// the commonest path there is.
-	//
-	// A fourth call site would have been the same design that failed. Instead the credit hangs off
-	// the painter, so no caller can paint tiles without it and none has to remember.
+	// WHOLE POINT** (Tom, 2026-08-23: *"we also have no map attribution on the map."*). Refreshing
+	// the credit from named call sites instead misses the BOOT path, which applies the saved project
+	// and then reaches refreshBasemap() alone through noteMapSized(), because tiles need a viewport:
+	// reopening a saved geographic project then drew OpenStreetMap tiles with the credit still at
+	// its inline display:none -- a licence breach, silent, and on the commonest path there is. The
+	// credit hangs off the painter, so no caller can paint tiles without it.
 	function refreshBasemap() {
 		paintBasemapTiles();
 		refreshBasemapChrome();
@@ -5382,12 +5367,11 @@ var EngCalcs = EngCalcs || {};
 	//   internally      `project.coords` is 'geo', or absent, which is the XY grid
 	//   user-facing     **XY** and **lat/lon** -- "no caps so as not to imply any proper names"
 	//
-	// Two earlier answers were wrong and are recorded so neither comes back. "World map / XY grid"
-	// was argued for on the grounds that `lpn_new_geo_us` already shipped "world map" in 27
-	// languages, dressed up as a worry that Flat Earth would be misread; Tom: *"The joke is thousands
-	// of years old. Who hasn't heard of it?"* Then "GeoMap", which was his own first suggestion and
-	// which he withdrew: *"I am embarrassed I said GeoMap; it or Geomap are too evocative of a
-	// trademarkish thing."* `lat/lon` is shorter than "geographic" and claims nothing.
+	// Two names are recorded so neither comes back. "World map / XY grid", argued for because
+	// `lpn_new_geo_us` already shipped "world map" in 27 languages and Flat Earth might be misread;
+	// Tom: *"The joke is thousands of years old. Who hasn't heard of it?"* And "GeoMap", withdrawn by
+	// Tom: *"I am embarrassed I said GeoMap; it or Geomap are too evocative of a trademarkish
+	// thing."* `lat/lon` is shorter than "geographic" and claims nothing.
 	//
 	// Flat Earth / Round Earth stays, in the TIP and in `$ec_lang_syn` (both written 2026-08-18 with
 	// Tom's permission and in his own words), because it is fun, instructive, and exactly the
@@ -5396,17 +5380,16 @@ var EngCalcs = EngCalcs || {};
 	// **THE PARADIGM IS THE IMAGE-PLACEMENT ONE, NOT A MENU OF COMMANDS** (Tom's option 3, his own
 	// preference): the whole model behaves like one picture being dropped onto the map, with corner
 	// handles to size it, the body to move it and a top handle to turn it, and a Finish that commits.
-	// Insert/Move/Scale/Rotate as four separate menu commands was option 2 and is not built -- it
-	// asks the user to name the operation before doing it, which is exactly the hurdle Tom flagged.
+	// Insert/Move/Scale/Rotate as four separate menu commands (option 2) asks the user to name the
+	// operation before doing it, which is the hurdle Tom flagged.
 	//
 	// **THE SCALE IS NOT KNOWN, AND WE MUST FIND IT AS WELL AS THE PLACE.** Tom, 2026-08-18, on the
 	// EPANET examples he actually converted: *"Your grid does not already say how big one drawing
 	// unit is; these EPANET examples and many old systems are drawn on arbitrary 'schematic'
-	// canvases. We must find both location and scale."* An earlier build read `lengthField()` and
-	// declared that one drawing unit was one Length/Map unit; on a schematic that lands a whole
-	// system inside a few metres of pavement. The scale is now something the user SETS -- by sizing
-	// the map behind the model in step 1, by telling Go to… roughly how wide the site is, or by
-	// typing it in step 2.
+	// canvases. We must find both location and scale."* Reading `lengthField()` and declaring one
+	// drawing unit to be one Length/Map unit lands a whole schematic system inside a few metres of
+	// pavement. The scale is therefore something the user SETS -- by sizing the map behind the model
+	// in step 1, by telling Go to… roughly how wide the site is, or by typing it in step 2.
 	//
 	// **THE TWO STEPS ARE NAMED, VISIBLE, AND THE USER SWITCHES BETWEEN THEM AT WILL.** Tom: *"there
 	// is an uncomfortable gray area between the described modes… I need the map either to come along
@@ -5833,24 +5816,21 @@ var EngCalcs = EngCalcs || {};
 		georefBarEl('lpn_georef_cancel').addEventListener('click', georefCancel);
 	}
 
-	// ---- the three stages ----------------------------------------------------------------------
 	// ---- GO TO A COORDINATE (Task 145) ---------------------------------------------------------
 	//
 	// Tom, 2026-08-18: *"We need either the ability to zoom out to the globe or to search by name or
-	// to go to lat/lon."* This is the third, and the zoom floor above is the first. The second --
-	// searching by PLACE NAME -- is Task 441 and is not built here on purpose: it needs a geocoder,
-	// which would be a SECOND third-party host on a page whose whole privacy claim is that the tile
-	// server is the only one. That is Tom's call, not a detail of this command.
+	// to go to lat/lon."* This is the third; the zoom floor above is the first; searching by place
+	// name is js/lpn-search.js.
 	//
 	// **IT ACCEPTS WHAT PEOPLE PASTE, AND REFUSES WHAT IT CANNOT READ.** `38.106, -122.569` is what
 	// every map on Earth hands you, so that order -- LATITUDE FIRST -- is what this reads.
 	//
 	// **THE DECIMAL COMMA IS THE WHOLE DIFFICULTY, and getting it wrong is SILENT.** Most of our 26
 	// languages write 38,106 for what English writes 38.106, so a pasted European coordinate reads
-	// `38,106 -122,569` -- and the first version of this took the first two integers out of it and
-	// travelled to 38 N 106 E, Inner Mongolia, with no message of any kind. A wrong map is far worse
-	// than a refusal. Found by dev/browser-pass/specs/goto.js; Wave 0 had flagged the same trap in
-	// the tip's own example (dev/english-friction/438-wave0.json).
+	// `38,106 -122,569`; taking the first two integers out of that travels to 38 N 106 E, Inner
+	// Mongolia, with no message of any kind. A wrong map is far worse than a refusal. Guarded by
+	// dev/browser-pass/specs/goto.js; Wave 0 flagged the same trap in the tip's own example
+	// (dev/english-friction/438-wave0.json).
 	//
 	// The rule that resolves it: **match numbers GREEDILY, then COUNT them, and refuse anything that
 	// is not exactly two.** A comma inside a number binds tighter than a comma between two, so
@@ -6080,12 +6060,12 @@ var EngCalcs = EngCalcs || {};
 		georef.t = t;
 		georef.rotDeg = 0;
 		georefSuspend(true);
-		// **AND THE VIEW GOES TO THE MODEL.** This used to refuse to fit, on the argument that the
-		// view was still the one fitted to these very coordinates when the project opened. That was
-		// true while arming happened on the wizard's first frame; it is not true now that the user
-		// reaches this through a button on the bar, by which time step 1 has already carried them
-		// out to the whole Earth. Fitting is not re-baselining anything -- not one coordinate moves
-		// here -- it is pointing the camera at where the numbers say the network already is.
+		// **AND THE VIEW GOES TO THE MODEL.** Refusing to fit -- on the argument that the view is
+		// still the one fitted to these very coordinates when the project opened -- holds only while
+		// arming happens on the wizard's first frame. The user reaches this through a button on the
+		// bar, by which time step 1 has carried them out to the whole Earth. Fitting re-baselines
+		// nothing: not one coordinate moves here, the camera merely points at where the numbers say
+		// the network already is.
 		buildDom();
 		refreshSymbolSizes();
 		refreshTextLabelSizes();
@@ -6400,8 +6380,8 @@ var EngCalcs = EngCalcs || {};
 	// **TOP n AND BOTTOM n ARE CONDITIONS, NOT A SEPARATE BOX** (Tom, 2026-08-18: *"We want the
 	// dropdown to include two more items, 'Top n' and 'Bottom n'. And we don't need a second input.
 	// The Value input will serve for n."*). A first cut put a "how many at each end" number beside
-	// the value and split every long list into two halves; that answered a question nobody asked,
-	// and it asked for a number on searches that had no ends. Asking for the extremes is a
+	// the value splits every long list into two halves, answering a question nobody asked and
+	// demanding a number on searches that have no ends. Asking for the extremes is a
 	// CONDITION on the same footing as "is greater than", and it reuses the box already there.
 	function findOpDefs() {
 		var pc = EngCalcs.pageConfig || {};
@@ -6439,8 +6419,9 @@ var EngCalcs = EngCalcs || {};
 	// and offering a search on it would be a control that can only be operated by guessing.
 	//
 	// Its WORDS are what a person knows it by, so those are what the search reads and what a result
-	// row prints. If the ID ever becomes visible -- 146.05's element browser is where that would
-	// happen -- this exemption is the thing to remove.
+	// row prints. **IF A TEXT ID EVER BECOMES VISIBLE ON ANY SCREEN, THIS EXEMPTION IS THE THING TO
+	// REMOVE** -- see the closed Task 146.05 entry, which carries the same question for the Settings
+	// ID-prefix list.
 	function findLabelHasNoId(cand) { return cand.group === 'label'; }
 	function findValueOf(cand, prop) {
 		if (prop === 'id') { return findLabelHasNoId(cand) ? undefined : cand.el.id; }
@@ -6740,7 +6721,7 @@ var EngCalcs = EngCalcs || {};
 		box.appendChild(head);
 		var list = document.createElement('div');
 		// Bounded because the panel is a pull-down, not a report: a 4,000-pipe answer is a scroll
-		// bar either way, and Task 146.04's report tables are where a long list belongs.
+		// bar either way, and the bottom pane's asset tables are where a long list belongs.
 		list.style.maxHeight = '14em';
 		list.style.overflowY = 'auto';
 		findResults.forEach(function (c) { list.appendChild(findResultRow(c)); });
@@ -6799,9 +6780,8 @@ var EngCalcs = EngCalcs || {};
 	// ---- THE BOTTOM PANE (ROADMAP Task 434) --------------------------------------------------
 	//
 	// One resizable panel docked under the map, carrying a TAB for each thing that is READ WHILE
-	// THE MAP IS EDITED: the profile now, the tabular editors (Junctions, Pipes, Pumps, Valves)
-	// next. Tom, 2026-08-18, naming the frame that Tasks 284, 427, 433 and 146.04 were each about
-	// to invent separately.
+	// THE MAP IS EDITED: the profile, and the six asset tables. Tom, 2026-08-18, naming the frame
+	// that Tasks 284, 427, 433 and 146.04 were each about to invent separately.
 	//
 	// **THE PANE NEVER TELLS THE CANVAS HOW TALL TO BE.** It sits in normal flow below the map, and
 	// applyMapHeight() sizes the canvas from `body.bottom - svg.bottom` -- so a pane that really is
@@ -6817,7 +6797,8 @@ var EngCalcs = EngCalcs || {};
 	//
 	// What is NOT here, and is not coming: Settings and the Labels box (Tom, explicitly). Both hang
 	// off their own toolbar button as pull-downs, and a setting is not something you read beside
-	// the drawing. A LEFT pane is not planned at all. A RIGHT pane is Tasks 427/284's to settle.
+	// the drawing. A LEFT pane is not planned at all; the RIGHT pane is empty on purpose (see its
+	// own note below).
 	var LPN_PANE_KEY = 'lpn_pane';
 	// The pane's own floor, and the map's. Between them they decide how far the grip can travel:
 	// a drag can always leave the map a canvas worth looking at, so there is no gesture that hides
@@ -6930,19 +6911,18 @@ var EngCalcs = EngCalcs || {};
 	// **AND IT MEASURES UNTIL THE ANSWER STOPS MOVING.** The ceiling is derived from the map's
 	// height, and applyMapHeight() has just changed that -- so on a window that got shorter, or
 	// NARROWER (a narrow window wraps the menu bar, the toolbar and, since Task 455, the seven-tab
-	// strip, and every wrap takes height from the map), the first clamp was computed against the
-	// layout being replaced. Measured at 520x900 before this: the pane kept its 260 px, the map hit
-	// its 80 px floor and the page ran 60 px past the bottom of the window, converging only if the
-	// user resized a second time.
+	// strip, and every wrap takes height from the map), a single clamp is computed against the
+	// layout being replaced. Measured at 520x900: the pane keeps its 260 px, the map hits its 80 px
+	// floor and the page runs 60 px past the bottom of the window, converging only if the user
+	// resizes a second time.
 	//
-	// **IT WAS EXACTLY ONE EXTRA PASS, AND ONE WAS NOT ENOUGH.** Task 462 put one more button on the
-	// toolbar and merged the transport into the water-network group, which at 520 px is one more
-	// wrapped line -- and the page went 27 px past the bottom of the window again, because the
-	// second pass's own re-layout moved the ceiling a third time. A fixed number of passes is a
-	// guess at how many times the layout will settle, and every future control on that strip is
-	// another chance for the guess to be wrong. It LOOPS to a fixed point instead, with a small cap
-	// so a layout that genuinely oscillates cannot hang the page. dev/browser-pass/specs/pane.js
-	// measures the result at 520x900, which is where this fails first.
+	// **AND ONE EXTRA PASS IS NOT ENOUGH EITHER** -- the second pass's own re-layout moves the
+	// ceiling a third time, which at 520 px ran the page 27 px past the bottom again as soon as the
+	// toolbar gained one more wrapped line. A fixed number of passes is a guess at how many times
+	// the layout will settle, and every future control on that strip is another chance for the guess
+	// to be wrong. It LOOPS to a fixed point instead, with a small cap so a layout that genuinely
+	// oscillates cannot hang the page. dev/browser-pass/specs/pane.js measures the result at
+	// 520x900, which is where this fails first.
 	var LPN_PANE_SETTLE = 6;
 	function applyPaneLayout(pass) {
 		var pane = paneEl(), body = document.getElementById('lpn_pane_body'), btn, applied, want;
@@ -9160,12 +9140,10 @@ var EngCalcs = EngCalcs || {};
 	// rather than one tri-state because they answer different questions and both can be true.
 	// **THE SHOP WINDOW IS FOR A FIRST VISIT, AND IT IS ANSWERED ONCE** (ROADMAP Task 431).
 	//
-	// Two wrong answers were shipped before this one, and each looked right in the case it was
-	// written for. A single PAGE-level flag meant opening an example cleared it for everybody, so
-	// the next empty tab focused got the wall again. Keying it PER PROJECT fixed that and left
-	// Tom's real complaint standing: *"Still happens when I switch to each new project tab after
-	// page reload."* Of course it did -- every one of those tabs has genuinely never had content,
-	// so a per-project answer says yes to every one of them, forever.
+	// **NEITHER A PAGE-LEVEL FLAG NOR A PER-PROJECT ONE.** A page-level flag is cleared by opening
+	// an example, so the next empty tab focused gets the wall again. A per-project flag answers
+	// Tom's *"Still happens when I switch to each new project tab after page reload"* with yes
+	// forever, because every one of those tabs has genuinely never had content.
 	//
 	// The question the wall actually asks is **"is this person new here?"**, which is asked once and
 	// answered for good. So the flag lives on `library`, which is already in localStorage and
@@ -9716,9 +9694,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		// v3 -> v4: coordinates become Cartesian. A NORMAL migration -- convert and stamp -- because
 		// it asks the user nothing (Tom, 2026-08-11: "We always upgrade the file to the current
-		// format. Right?" Right, and the first cut of this wrongly left v3 documents at v3 forever,
-		// relying on serializeProject() writing openDocVersion. That turned the ONE documented
-		// exception below into two, the second undocumented and for no reason at all).
+		// format. Right?"). Leaving v3 documents at v3 and relying on serializeProject() writing
+		// openDocVersion would make a SECOND standing exception beside the v2 one below, for no
+		// reason at all -- v2 lags because its units question is the user's to answer, and nothing
+		// else does.
 		if (saved.v === 3) {
 			flipStoredY(saved);
 			saved.v = 4;
@@ -9942,9 +9921,9 @@ var EngCalcs = EngCalcs || {};
 		var savedPrefixes = savedSettings.idPrefixes || {};
 		delete savedSettings.defaults; delete savedSettings.sectionsOpen; delete savedSettings.idPrefixes;
 		settings = Object.assign(defaultSettings(), savedSettings);
-		// **A PROJECT SAVED UNDER THE TWO-FIELD DESIGN KEEPS ITS NUMBERS.** For the length of one
-		// day the method's answer was frozen into a second field, `colorFrozenBreaks`, and the
-		// design was rejected (Task 448). Those numbers are the ones that project was drawn in, so
+		// **A PROJECT SAVED UNDER THE TWO-FIELD DESIGN KEEPS ITS NUMBERS.** That design froze the
+		// method's answer into a second field, `colorFrozenBreaks`, and was rejected (Task 448).
+		// Those numbers are the ones that project was drawn in, so
 		// they move into colorBreaks -- where they now simply are the limits -- rather than being
 		// dropped, which would repaint somebody's map on open. A key the user had also typed over
 		// wins, because that is the field they were looking at. The old key is then DELETED so
@@ -11782,7 +11761,8 @@ var EngCalcs = EngCalcs || {};
 			//
 			// **Shown EVERY time, not once per browser.** Never spend a shown-once token before the
 			// thing it guards has happened, and "once per browser" is the wrong default for a fact
-			// that CHANGES WHAT A COMMAND MEANS. Task 209's snooze system is the long-term home.
+			// that CHANGES WHAT A COMMAND MEANS. A snoozable tip system was declined (Task 209), so
+			// there is no shown-once machinery to move this into.
 			openDialog(function (body) {
 				[pc.lpn_file_upload_explain].forEach(function (txt) {
 					if (!txt) { return; }
@@ -12702,10 +12682,10 @@ var EngCalcs = EngCalcs || {};
 	var VIEW_POPOVERS = ['lpn_notes_popup'];
 	// The control that opened the popover now showing -- the toolbar button, or the menu-bar item.
 	// Same job openMenuAnchor does for the menus, and needed for the same reason: the click that
-	// OPENED a popover must not also be read as a click away from it. Task 372 -- until then the
-	// dismissal exempted the whole menu bar and the whole toolbar instead, which was a blunt way of
-	// protecting these two buttons and cost Tom the thing he reported: "When Labels or Settings are
-	// open, clicking in the top row of the menu bar does not close them."
+	// OPENED a popover must not also be read as a click away from it (Task 372). Exempting the whole
+	// menu bar and the whole toolbar instead is the blunt version, and it costs what Tom reported:
+	// "When Labels or Settings are open, clicking in the top row of the menu bar does not close
+	// them."
 	var viewPopoverAnchor = null;
 	function closeViewPopovers(except) {
 		VIEW_POPOVERS.forEach(function (id) {
@@ -14098,39 +14078,35 @@ var EngCalcs = EngCalcs || {};
 		viewGroup.appendChild(extentBtn);
 		// **THERE IS NO CLEAN-MAP BUTTON** (Tom, 2026-08-20: "Relegate Hide map readouts to the View
 		// menu"). It is a once-before-a-screenshot command, and a toolbar slot is for what you do
-		// often; View > Hide map readouts was always the other door and is now the only one. The
-		// pressed state it needed lives on that menu row, which redraws its own label each time the
-		// menu opens (openViewMenu), so nothing has to be kept in step with a button any more.
-		// **THE PROFILE BUTTON IS NOT HERE ANY MORE** -- it moved down to the project group, beside
-		// Tables, when the strip was re-grouped to mirror the Project menu (Tom, 2026-08-21). This
-		// group is now Zoom to fit alone: what is left in it is the one command that changes how you
-		// are LOOKING at the drawing, which is also all the View menu still holds.
+		// often. Its pressed state lives on that menu row, which redraws its own label each time the
+		// menu opens (openViewMenu), so nothing has to be kept in step with a button.
+		// **THE PROFILE BUTTON IS IN THE PROJECT GROUP**, beside Tables, since the strip was
+		// re-grouped to mirror the Project menu (Tom, 2026-08-21). This group is Zoom to fit alone:
+		// the one command that changes how you are LOOKING at the drawing, which is also all the
+		// View menu still holds.
 		// **THERE IS NO LABELS BUTTON.** Tom, 2026-08-18: "Toolbar.Labels: We can remove this button
 		// now. Everything is simpler than EPANET or epanetjs because all project settings are in
-		// (tada!) Settings." Every route to the label controls still works and none of them was this
-		// button: View > Labels and a click on the colour legend both open the Settings box on its
-		// Labels section, and the Settings button beside this one opens the box itself. A toolbar
-		// slot is the most expensive space on the page, and a second door to a box whose own button
-		// is two icons away is not worth one.
-		// **COLOUR BY VALUE IS TWO DROPDOWNS NOW, AND THEY ARE IN THE VISIBILITY PANEL** (ROADMAP
-		// Task 427). The one select that did both fields shipped with Task 327 and Tom saw the
-		// beauty of it -- "but it's not the expectation": EPANET and epanet-js both give nodes and
-		// links a dropdown each, and choosing a node field silently clearing the link field is the
-		// behaviour that made the single control surprising. Two controls, two legends, no
-		// clearing. See buildVisibilityColors(); the toolbar keeps no select at all, which is also
-		// what the icon-only strip asked for -- a field-name dropdown was the one wide control left
-		// on it.
-		// **THE SETTINGS GEAR IS NOT HERE, AND IT IS NOT AT THE RIGHT-HAND END EITHER ANY MORE.**
-		// It is in the water-network group below. Tom, 2026-08-20: "for Water Networks, I think we
-		// also need the following in a group: Libraries (Patterns, Curves, Controls, Pumps, Pipes,
-		// Custom), **Settings**, Simulate, Transport, Time selectors." That supersedes the previous
-		// day's "the standard location of the settings gear icon is near the top-right corner",
-		// which put it at the far right for one review. **HIS NEWER WORD WINS; do not move it back
-		// to the end group on the strength of that older quote**, which is still true about gears
-		// in general and is no longer what he wants here. Asked whether it should instead float on
-		// the map, he ruled against that too: "Toggles on map doesn't sound right to me. What we
-		// have now plus the lpn group (Libraries, Settings, Transport, and Time selectors) seems
-		// like the right way to go."
+		// (tada!) Settings." View > Labels and a click on the colour legend both open the Settings
+		// box on its Labels section, and the Settings button beside this one opens the box itself. A
+		// toolbar slot is the most expensive space on the page, and a second door to a box whose own
+		// button is two icons away is not worth one.
+		// **COLOUR BY VALUE IS TWO DROPDOWNS, AND THEY ARE IN THE SETTINGS BOX** (ROADMAP Task 427,
+		// then Task 441). One select doing both fields is the tempting design and Tom saw it --
+		// "but it's not the expectation": EPANET and epanet-js both give nodes and links a dropdown
+		// each, and choosing a node field silently clears the link field. Two controls, two legends,
+		// no clearing. See buildColoringSection(); the toolbar keeps no select at all, which is
+		// also what the icon-only strip asked for -- a field-name dropdown was the one wide control
+		// left on it.
+		// **THE SETTINGS GEAR IS NOT HERE, AND NOT AT THE RIGHT-HAND END EITHER.** It is in the
+		// water-network group below. Tom, 2026-08-20: "for Water Networks, I think we also need the
+		// following in a group: Libraries (Patterns, Curves, Controls, Pumps, Pipes, Custom),
+		// **Settings**, Simulate, Transport, Time selectors." That supersedes his earlier "the
+		// standard location of the settings gear icon is near the top-right corner". **HIS NEWER
+		// WORD WINS; do not move it back to the end group on the strength of that older quote**,
+		// which is still true about gears in general and is no longer what he wants here. Asked
+		// whether it should instead float on the map, he ruled against that too: "Toggles on map
+		// doesn't sound right to me. What we have now plus the lpn group (Libraries, Settings,
+		// Transport, and Time selectors) seems like the right way to go."
 
 		// **THE WATER-NETWORK GROUP** (ROADMAP Task 462). Tom, 2026-08-20: "for Water Networks, I
 		// think we also need the following in a group: Libraries (Patterns, Curves, Controls, Pumps,
@@ -14269,9 +14245,9 @@ var EngCalcs = EngCalcs || {};
 	// like a survey or state-plane grid. Extent 1400 x 700, centre exactly 5000,5000.
 	//
 	// **NOTHING IN THE APP CALLS THIS.** The gallery ships the same ring main as
-	// Basic-example-US/SI-units-lpn.json. It stays as the fixture SEVEN harnesses build their network
-	// from -- closed-link, gradient-label, id-prefix, friction-method, label-affix, readout-sign and
-	// example-network. Retiring it means giving those a network some other way (Task 378).
+	// Basic-example-US/SI-units-lpn.json. It stays as the fixture the dev/lpn-spike/ harnesses build
+	// their network from -- `grep -l drawExampleNetwork dev/lpn-spike` is the list, and it grows.
+	// Retiring it means giving every one of those a network some other way (Task 378).
 	function drawExampleNetwork(system) {
 		if (doc.nodes.length > 0) {
 			var pc = EngCalcs.pageConfig || {};
@@ -16176,7 +16152,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **NOTHING HERE DEPENDS ON THE ZOOM ANY MORE** (Tom, 2026-08-19: "Always show labels, Zoom
 	// level, Current view, etc.: Remove that entire concept ... now that we have good hiding and
-	// Thematic map"). A map-width threshold hid labels automatically, and the Visibility panel's
+	// Thematic map"). A map-width threshold hid labels automatically, and the Settings box's
 	// explicit per-field hiding and Thematic mode now do that job deliberately; a second, implicit
 	// mechanism was one more thing to learn and one more thing to be surprised by. Do not
 	// reintroduce it -- and note that it is NOT what keeps map-unit text sizing out (see
@@ -16629,7 +16605,7 @@ var EngCalcs = EngCalcs || {};
 		row(mapBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput);
 		// **NO SCALE-DEPENDENT LABEL VISIBILITY ROW HERE.** A "Widest view that shows labels" number
 		// with a "Use current view" capture button used to sit at this point and is gone (Tom,
-		// 2026-08-19); the Visibility panel and Thematic mode are where labels are turned off now.
+		// 2026-08-19); the Labels section and Thematic mode are where labels are turned off now.
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
@@ -18250,9 +18226,8 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 	}
 	// SI value -> current display unit, read-only. Used for solve results: the property popups
-	// are the canonical results location (Tom, 2026-07-30) -- Map labels and a Report/table view
-	// are later presentation layers over this same computed data (scope doc Phase 2), not a
-	// separate source of truth.
+	// are the canonical results location (Tom, 2026-07-30) -- the map labels and the asset tables
+	// are presentation layers over this same computed data, not a separate source of truth.
 	function readonlyUnitField(fields, labelText, unitId, siValue, tip) {
 		readonlyField(fields, labelText + ' (' + unitLabel(unitId) + ')', siValue * unitFactor(unitId), tip);
 	}
@@ -19190,10 +19165,6 @@ var EngCalcs = EngCalcs || {};
 		renderLabelFields(labelId);
 		openPopupAt(sx, sy);
 	}
-	// Roughness has no unit selector for now: Phase 1 assumes Hazen-Williams (js/lpn-solver.js's
-	// default), whose C-factor is dimensionless. Darcy-Weisbach's roughness HEIGHT does need
-	// units (the scope doc's roughness family is "DW only") -- revisit once a friction-method
-	// selector exists (matching bpn_'s own method switch) and this can be genuinely conditional.
 	// Open/Closed link state (Task 146.07): explicitly NOT a "valve" and NOT modelled by abusing the
 	// minor-loss coefficient -- a plain boolean.
 	//
@@ -20205,11 +20176,10 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (!result.ok || !result.converged) {
 			lastSolveResult = null;
-			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS, and until Task 248 phase 2
-			// both printed "Did not converge". They separated the moment the native solver gained a
-			// reason to refuse a perfectly sound network (an active valve, when EPANET could not be
-			// loaded): telling that user their network did not converge sends them to look for a
-			// zero diameter that is not there.
+			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS. The native solver can refuse
+			// a perfectly sound network (an active valve, when EPANET could not be loaded), and
+			// telling that user their network did not converge sends them to look for a zero
+			// diameter that is not there.
 			if (result.issues && result.issues.length > 0) {
 				result.issues.forEach(function (issue) { logLpnDiag(issue.code); });
 				setStatus(result.issues.map(diagIssueText).join(' '));
