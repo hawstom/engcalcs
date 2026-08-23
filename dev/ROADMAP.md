@@ -206,13 +206,6 @@ the block.
     landing page's own repository at `~/librewaternet.org/index.html`. Move the local working
     directory in that same pass and not before (`dev/hosting-layout.md` §5).
 
-- 75|485| **Give the production log archives a systematic path and naming.**
-  All six production logs begin at 2026-08-14T11:57–11:58Z because Tom archived them there, with
-  advice from this project. The archives are on the server and available for analysis; what they lack
-  is a convention.
-  - Give them a systematic path and file naming so `log/lang-log-stats.sh` can be pointed at a
-    historical window, and so a future reader can tell an archive boundary from a data loss.
-
 - 75|472| **`alignedSideFor()` walks every link to place one label.**
   It is the next quadratic. With the four measurement quadratics fixed (Task 440), a Close of the 256-junction grid spends 21%
   of its self time in `linkPointList()` — 480 x 480 calls on that drawing — against getBBox()'s 6.2%.
@@ -254,17 +247,18 @@ the block.
     section before today has a wrong number and does not know it. Say nothing, note it on the page, or
     say it out loud? The suite has no mailing list, so "tell the users" has no mechanism.
 
-- 50|487| **The suite only works when its URL path is `/engcalcs/`.**
+- 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
   `sw.php` and `consent.php`, and three `Redirect 301` rules in `.htaccess` naming it absolutely.
-  - **This does NOT block Task 479's move** (corrected 2026-08-23; the earlier claim that it did was
-    wrong). Moving the folder to `public_html/hawsedc.com/engcalcs` moves the document root with it,
-    so the URL path stays `/engcalcs/` and nothing breaks. What it blocks is serving the suite at a
-    DIFFERENT path — which is already true today: `constructionnotesmanager.com/hawsedc/engcalcs`
-    renders with broken CSS for exactly this reason.
-  - **The fix is one derived base-path constant plus a check that fails on a new hardcoded prefix.**
-    Root-relative was itself the 2026-08-08 fix for a `../` bug, so keep root-relative and make the
-    ROOT a variable — do NOT go back to relative paths.
+  **210 counting the JS.**
+  - **DEMOTED 25 on 2026-08-23, because this task and `dev/hosting-layout.md` §3 contradicted each
+    other and the hosting doc is right.** The refactor is rejected while a symlink does the job:
+    serving at `<newdomain>/engcalcs/` needs no code at all, and the count grew 112 → 210 between
+    measurements, so the refactor gets more expensive over time, not less. This blocks nothing that
+    is planned.
+  - **It becomes real only if the suite must be served at a path that is NOT `/engcalcs/`.** Then the
+    fix is one derived base-path constant plus a check failing on a new hardcoded prefix — and keep
+    root-relative, because root-relative was itself the 2026-08-08 fix for a `../` bug.
 
 - 50|207| **The dilettante path: make replying cost one tap, not five steps.** Full design
   record in **`dev/dilettante-path.md`** — the cost ladder (Rung 0 is a tap with no text), the three
