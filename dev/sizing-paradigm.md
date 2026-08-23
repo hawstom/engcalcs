@@ -273,7 +273,10 @@ evidence the frame is right.
   it costs nothing to leave written down. It should not be built in phase 1.
 - **Dragging ships today**, so phase 1 is not "do not build it" but "do not carry it forward
   unexamined". The honest question after phase 1 is whether anyone reaches for it any more.
-- ROADMAP Task 328 drops accordingly. It is not wrong; it is premature.
+- ROADMAP Task 328 was dropped in priority on that reasoning, and then CLOSED 2026-08-14 by a
+  different route: the defect it named turned out to be that the leader stored the TEXT's corner,
+  so the angle slid with the zoom. The angle-as-hint design above is still unbuilt and is not
+  tracked by 328 any more.
 
 ## Amended within the hour: dragging is WANTED, just not first
 
@@ -292,7 +295,8 @@ the call because it depends on what the drawing is *for*. Denying it is exactly 
 painful, so building automatic placement and stopping there would reproduce the weakness we set out
 to fix.
 
-**They share a gesture and are otherwise unrelated features.** Phase 1 removes the drudgery; Task 328
-keeps the authorship. Sequencing stands — the angle-hint design can only be judged once we can see
-what automatic placement leaves behind — but the destination is both, not one.
+**They share a gesture and are otherwise unrelated features.** Automatic placement removes the
+drudgery; deliberate dragging keeps the authorship. Sequencing stands — the angle-hint design can
+only be judged once we can see what automatic placement leaves behind — but the destination is both,
+not one.
 

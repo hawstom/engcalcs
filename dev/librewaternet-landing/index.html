@@ -1,4 +1,4 @@
-<title>LibreWaterNet.org</title>
+<title>LibreWaterNet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;800&family=Barlow+Condensed:wght@500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
@@ -166,22 +166,6 @@ h1 .rule-under {
 	transition: background-color .15s ease, color .15s ease;
 }
 .btn-primary { background: var(--water); color: var(--paper); }
-/* The one button the page is FOR. Bigger than its neighbours on purpose -- a reader
-   who wants the software and not the invitation should find it without reading. */
-.btn-go {
-	font-size: 1.22rem;
-	padding: .95rem 2.1rem;
-	background: var(--water); color: var(--paper);
-	border-color: var(--water);
-}
-.btn-go:hover, .btn-go:focus-visible { background: var(--ink); border-color: var(--ink); }
-.actions-note {
-	font-family: "Barlow Condensed", system-ui, sans-serif;
-	text-transform: uppercase; letter-spacing: .09em;
-	font-size: .82rem; color: var(--ink-soft);
-	margin-top: .8rem;
-}
-.actions-note a { color: inherit; }
 .btn-primary:hover, .btn-primary:focus-visible { background: var(--ink); border-color: var(--ink); }
 .btn-ghost { color: var(--water); background: transparent; }
 .btn-ghost:hover, .btn-ghost:focus-visible { background: var(--water-soft); }
@@ -330,7 +314,6 @@ a:focus-visible, .btn:focus-visible {
 	<header class="topbar">
 		<div class="wordmark"><span class="libre">Libre</span>WaterNet</div>
 		<nav class="label">
-			<a href="https://hawsedc.com/engcalcs/Looped-Network.php">Open the app</a>
 			<a href="#stakeholders">Who we need</a>
 			<a href="#what">What exists</a>
 			<a href="#languages">Languages</a>
@@ -346,10 +329,9 @@ a:focus-visible, .btn:focus-visible {
 				<p class="lede"><em>Water network design and management software for everybody everywhere.</em></p>
 				<p class="lede-2"><strong>Looking for stakeholders, not for money.</strong> We are building this together, and the people who use it should own it. Come and tell us what it has to be.</p>
 				<div class="actions">
-					<a class="btn btn-go" href="https://hawsedc.com/engcalcs/Looped-Network.php">Start a model now</a>
-					<a class="btn btn-ghost" href="#stakeholders">See who we need</a>
+					<a class="btn btn-primary" href="#stakeholders">See who we need</a>
+					<a class="btn btn-ghost" href="https://hawsedc.com/engcalcs/contact.php">Write to us</a>
 				</div>
-				<p class="actions-note">Free, no sign-up, runs in your browser &middot; <a href="https://hawsedc.com/engcalcs/Looped-Network.php">Open an example instead</a></p>
 			</div>
 
 			<figure class="plate" style="margin:0">
@@ -425,7 +407,7 @@ a:focus-visible, .btn:focus-visible {
 			<a class="btn btn-primary" href="https://hawsedc.com/engcalcs/Looped-Network.php">Open the app</a>
 			<a class="btn btn-ghost" href="https://github.com/hawstom/engcalcs">Read the source</a>
 		</div>
-		<p class="note" style="margin-top:1.6rem">Being honest about the edges: development has followed an informal path of assumed most critical features, and there are a lot of unknown gaps between this application and EPANET. The gaps we do know: a run over time goes through the EPANET engine, and the built-in solver has no time dimension. A pattern attaches to a demand, not yet to a reservoir head or a pump. Rule-based controls and water quality modelling are not built. And it is a PC application first. On a phone: try it. We did.</p>
+		<p class="note" style="margin-top:1.6rem">Being honest about the edges: development has followed an informal path of assumed most critical features, and there are a lot of unknown gaps between this application and EPANET. The gaps we do know: a run over time goes through the EPANET engine, and the built-in solver has no time dimension. A pattern attaches to a demand, not yet to a reservoir head or a pump. Rule-based controls and water quality modelling are not built. And it is a PC application, the way EPANET is. On a phone &mdash; try it. We did.</p>
 	</section>
 
 	<section id="languages">

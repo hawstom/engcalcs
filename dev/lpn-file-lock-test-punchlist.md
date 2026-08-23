@@ -747,7 +747,7 @@ second tab row).
       `window.showSaveFilePicker` is `undefined` and **every file feature below silently degrades to
       the download fallback**. This is what happened in the first pass.
 - [x] Visit any page once with `?ec_nolog=1` **in each browser/profile you test in**, so this pass
-      does not land in the usage numbers Task 203 is being computed from.
+      does not land in the usage numbers.
 - [x] Use a Chromium browser (Chrome/Edge) for §1–§10. Firefox/Safari are §11.
 - [x] **For §6–§8 you need two *separate browser profiles*, not two tabs.** Two tabs share
       `localStorage`, so they share one identity token and the lock reads as "mine" in both — you

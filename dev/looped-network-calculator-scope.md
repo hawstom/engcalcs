@@ -1,9 +1,8 @@
 # Looped Pipe Network Calculator (Map Interface) — Scope
 
-Status: **Phases 0, 0.5, and 1 shipped; Phase 2 mostly shipped. Live as a PREVIEW page** (2026-07-29
-on). ROADMAP Task 146 carries the decision log and shipped-phase history; the remaining unbuilt work
-is no longer phase-shaped — it is tracked as individually-prioritized child tasks **146.01–146.09**
-(plus Task 145) directly in `dev/ROADMAP.md`, reorganized 2026-07-29. Prefix **`lpn_`**; page
+Status: **A CORE CALCULATOR, live since 2026-07-29. Never call it a preview.** The phase scheme it
+was built under is closed with Task 146; remaining work is tracked as individually-prioritized tasks
+directly in `dev/ROADMAP.md`, and the shipped-phase history is in git. Prefix **`lpn_`**; page
 `Looped-Network.php`; JS `js/looped-network.js`.
 
 **This calculator is only loosely related to the rest of the suite (Tom, 2026-07-29), and that is a

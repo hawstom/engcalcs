@@ -99,8 +99,10 @@ counts before anything paid launches.
   - **It is not the exempt list and must never be merged with it.** *exempt* = identical to English
     is permanently correct (the key is finished); *out of scope* = not translated yet, by decision
     (the key is not started). Merging them restores the permanent floor Task 161 removed.
-  - **Live consequence:** `lpn_`'s sprint (ROADMAP Task 146.06) is `lpn_` × es, pt, fr, tr — 205
-    keys × 4 languages — plus its 3 identity strings in the other 22. Not a 26-agent sprint.
+  - **Worked example, now historical:** `lpn_`'s first sprint was scoped by this cross as `lpn_` × es,
+    pt, fr, tr plus its 3 identity strings in the other 22 — not a 26-agent sprint. `lpn_` has since
+    been carried much further than that floor; read the lang files, not this line, for what is
+    translated today.
   - `php dev/scripts/coverage_selftest.php` asserts all of the above against the real declaration.
 
 ## Scenario A — Adding a new calculator

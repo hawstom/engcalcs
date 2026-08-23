@@ -103,9 +103,12 @@ query data in Task 151. Segment for:
 
 If the queries are `hazen williams c values` / `formula` / `equation`, this is reference demand and
 the right response is a **C-value table on the page**, not a network solver. If they are
-`hazen williams calculator` / `pipe pressure loss calculator`, it is a real UX leak and Task 146 gets
-its evidence. **Do not promote Task 146 on the strength of the 11% number alone** — that number does
-not yet distinguish the two.
+`hazen williams calculator` / `pipe pressure loss calculator`, it is a real UX leak.
+
+**The prioritization half of this is spent:** the looped-network calculator was built and Task 146 is
+closed, so there is no longer a task to promote or hold back. What survives is the measurement
+question — the 11% number alone still does not distinguish reference demand from a UX leak, and the
+Search Console segmentation below is still the way to tell.
 
 ## Cheapest candidate intervention, if the export supports the units hypothesis
 
