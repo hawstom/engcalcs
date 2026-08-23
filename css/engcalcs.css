@@ -1739,14 +1739,5 @@ html:has(#lpn_canvas) { overflow: hidden; }
 .lpn-lib-sec { margin: 0; }
 .lpn-lib-sec > h3 { margin: 0 0 4px; padding: 0 0 4px; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid #ccc; }
 
-/* Print preparation: the Printable version button and, under it, the line chooser -- the one
-   keyboard door to show/hide a line (ROADMAP Task 478). Closed by default in the markup, so it
-   costs exactly one tab stop per page; the per-line "X" is unchanged visually and simply left
-   the tab order. */
+/* Print preparation: the Printable version button. */
 .engcalcs-print-tools > p { margin-bottom: 0.2em; }
-.engcalcs-line-chooser { margin: 0 0 0.9em 0.2em; font-size: 0.9em; }
-.engcalcs-line-chooser-group { font-weight: bold; margin-top: 0.4em; }
-.engcalcs-line-chooser > summary { cursor: pointer; }
-.engcalcs-line-chooser-body { padding: 0.3em 0 0 1em; }
-.engcalcs-line-chooser-item { display: block; padding: 0.15em 0; }
-.engcalcs-line-chooser-item > input { margin-right: 0.4em; }

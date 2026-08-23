@@ -2,23 +2,18 @@
 /**
  * focus_order_check.php -- how many keyboard stops does a calculator form cost to walk?
  *
- * WHY THIS EXISTS (ROADMAP Task 478, 2026-08-21). Tom, tabbing down a calculator: the cursor does
- * not walk the input column, it walks sideways through every unit select and every per-line hide
- * control. The count was guessed at twenty-three; measured, it was eighty-three on
- * Irrigation-Pressure, and 35-43% of every stop on the five worst pages was the one-character "X"
- * link that hides a line. A number nobody can reproduce gets re-guessed, so it is measured here.
+ * WHY THIS EXISTS (ROADMAP Task 478). Tom, tabbing down a calculator: the cursor does not walk
+ * the input column, it walks sideways through every unit select and every per-line hide control.
+ * The count was guessed at twenty-three; measured, it was eighty-three on Irrigation-Pressure. A
+ * number nobody can reproduce gets re-guessed, so it is measured here.
  *
- * BLOCKING (phase 1), two assertions:
- *   1. the per-line hide control contributes AT MOST ONE STOP per calculator. The X keeps working
- *      for mouse and touch; it carries tabindex="-1" + aria-hidden="true" -- the canonical
- *      duplicated-control pattern.
- *   2. THE KEYBOARD DOOR EXISTS: exactly one line chooser per page, closed, listing every line the
- *      X can hide. Without this, assertion 1 could be "passed" by deleting the chooser, which turns
- *      the tabindex="-1" into a WCAG 2.1.1 failure. The chooser sits OUTSIDE #formInput -- it is
- *      grouped with the Printable version button, because hiding a line is print preparation -- so
- *      it is measured against the whole document rather than the focus sequence.
+ * THIS SCRIPT IS ADVISORY. It measures; it does not judge. The per-line "X" is a real tab stop on
+ * purpose -- it is the only way to hide a line, so taking it off the keyboard would make the
+ * function mouse-only (WCAG 2.1.1 by omission). That cost is accepted, and the `hide` column
+ * simply reports it. The one thing that still fails the build is a page that will not render at
+ * all, or a calculator page with no #formInput -- neither is a judgement call.
  *
- * ADVISORY: the per-page stop table, and the phase-2 measurement (see PHASE 2 below).
+ * The live measurement is the x-cross column: ROADMAP Task 478 phase 2 (see PHASE 2 below).
  *
  * ONE SUBPROCESS PER PAGE, via dev/scripts/render_page.php -- see that file's header for why
  * rendering a page any other way silently produces a stub missing most of its unit selects.
@@ -28,7 +23,7 @@
  *   php dev/scripts/focus_order_check.php -v         # + the full focus sequence per page
  *   php dev/scripts/focus_order_check.php Orifice.php
  *
- * Exit 0 when every page passes the blocking assertion, 1 otherwise.
+ * Exit 0 unless a page fails to render or has no #formInput.
  *
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
@@ -123,31 +118,6 @@ function focus_stops($html)
 }
 
 /**
- * The keyboard door, measured against the WHOLE document rather than the focus sequence: the
- * chooser is deliberately outside #formInput, grouped with the Printable version button.
- *
- * Returns how many per-line X hide links the page has, how many choosers, whether one ships open,
- * and how many lines the chooser offers.
- */
-function chooser_state($html)
-{
-    $prev = libxml_use_internal_errors(true);
-    $doc = new DOMDocument();
-    $doc->loadHTML('<?xml encoding="UTF-8">' . $html);
-    libxml_clear_errors();
-    libxml_use_internal_errors($prev);
-
-    $xpath = new DOMXPath($doc);
-    $sel = '//details[contains(concat(" ", normalize-space(@class), " "), " engcalcs-line-chooser ")]';
-    return array(
-        'xlinks'   => $xpath->query('//td[contains(concat(" ", normalize-space(@class), " "), " engcalcs-x ")]/a')->length,
-        'choosers' => $xpath->query($sel)->length,
-        'boxes'    => $xpath->query($sel . '//input[@data-ec-line]')->length,
-        'open'     => $xpath->query($sel . '[@open]')->length > 0,
-    );
-}
-
-/**
  * PHASE 2 measurement, ADVISORY ON PURPOSE -- and this is the one place to flip it.
  *
  * Tab order is DOM order, and today each number input is immediately followed by its own unit
@@ -182,7 +152,6 @@ foreach ($pages as $path) {
         $fail[] = "$name: page did not render. Run `php dev/scripts/render_page.php $name` and read the error.";
         continue;
     }
-    $door = chooser_state($html);
     $stops = focus_stops($html);
     if ($stops === null) {
         $fail[] = "$name: no #formInput in the rendered page. If this page is not a calculator, it should not match calculator_pages() in this script.";
@@ -196,20 +165,6 @@ foreach ($pages as $path) {
         if ($s[2]) { $hide++; }
     }
     $rows[] = array($name, count($stops), $hide, $kinds, unit_select_crossings($stops));
-
-    // ---- BLOCKING -----------------------------------------------------------------------
-    if ($hide > 1) {
-        $fail[] = "$name: the per-line hide control costs $hide keyboard stops (at most 1 allowed).";
-    }
-    if ($door['xlinks'] > 0) {
-        if ($door['choosers'] !== 1) {
-            $fail[] = "$name: {$door['xlinks']} per-line X hide links but {$door['choosers']} line choosers (exactly 1 required).";
-        } elseif ($door['open']) {
-            $fail[] = "$name: the line chooser ships open, so every checkbox in it is a keyboard stop. It must be a closed <details>.";
-        } elseif ($door['boxes'] !== $door['xlinks']) {
-            $fail[] = "$name: the line chooser offers {$door['boxes']} lines but the X hides {$door['xlinks']} -- the keyboard cannot reach every line the mouse can.";
-        }
-    }
 
     if ($verbose) {
         echo "  $name focus sequence:\n";
@@ -228,22 +183,15 @@ foreach ($rows as $r) {
     printf("%-28s %6d %6d %8d  %s\n", $r[0], $r[1], $r[2], $r[4], implode(' ', $kinds));
 }
 echo "\n";
-echo "hide    = stops inside a .engcalcs-x cell (blocking: at most 1 per page).\n";
-echo "x-cross = number inputs that come after a unit select -- the phase 2 prize, advisory only.\n";
+echo "hide    = stops inside a .engcalcs-x cell -- one per line, the accepted cost of\n";
+echo "          keeping the only way to hide a line on the keyboard.\n";
+echo "x-cross = number inputs that come after a unit select -- the phase 2 prize.\n";
 
 if ($fail) {
     echo "\nFAIL\n";
     foreach ($fail as $f) { echo "  $f\n"; }
-    echo "\n";
-    echo "  Every `<td class=\"engcalcs-x\">` link -- the one whose whole accessible name is \"X\" --\n";
-    echo "  is in the tab order, once per line, and there is no keyboard way back.\n";
-    echo "  FIX, in lib/Calculators.lib.php: give that <a> BOTH tabindex=\"-1\" and aria-hidden=\"true\"\n";
-    echo "  (the pair is required -- aria-hidden alone on a focusable element fails axe's\n";
-    echo "  aria-hidden-focus rule), and keep the keyboard path to the same function in the ONE\n";
-    echo "  closed <details> line chooser echoLineChooser() emits beside the Printable version\n";
-    echo "  button, which costs one stop while closed and lists every line the X can hide.\n";
     exit(1);
 }
-echo "\nOK: " . count($rows) . " calculator pages, the line-hide control costs at most one stop on each,\n";
-echo "    and each has one closed line chooser listing every line the X can hide.\n";
+echo "\nOK: " . count($rows) . " calculator pages measured. This script is advisory --\n";
+echo "    the stop counts above are a measurement, not a budget.\n";
 exit(0);
