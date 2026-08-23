@@ -14,6 +14,15 @@
  * THE DATE IN THE DIRECTORY NAME IS THE ARCHIVE'S ENDING DATE -- the day it was rotated, not the
  * day its first row was written. That is Tom's naming rule and spock/README.md states it too.
  *
+ * AND THE ROTATION REGISTERS ITSELF (ROADMAP Task 485). It writes a .archive-manifest.json naming
+ * the window it just closed, the row count of each of the six, and the archive it follows. The
+ * ending date alone can point a report at a window; it cannot tell a later reader whether the hole
+ * between two archives is a quiet fortnight, a retention trim doing its job, or logging that went
+ * somewhere else for a month. Deleted rows leave nothing behind, so only something written at the
+ * moment of rotation can answer that -- and `--verify` is what reads it back. See
+ * dev/scripts/log_archive_manifest.inc.php for the format and for why the DIRECTORY NAME did not
+ * change to carry any of this.
+ *
  * WHY spock. Tom, 2026-08-22: *"I derived spock because Jesus said not to worry about the speck in
  * your sibling's eye when there is a log in your own eye, and speck reminded me of spock."*
  *
@@ -26,10 +35,12 @@
  * Usage:
  *   php dev/scripts/archive_logs.php            # report what would move, change nothing
  *   php dev/scripts/archive_logs.php --apply    # move it
+ *   php dev/scripts/archive_logs.php --verify   # audit every archive; exit 1 on an unexplained gap
  */
 require_once __DIR__ . '/../../lib/config.inc.php';
+require_once __DIR__ . '/log_archive_manifest.inc.php';
 
-$opts = getopt('', ['apply', 'help']);
+$opts = getopt('', ['apply', 'verify', 'help']);
 if (isset($opts['help'])) {
     fwrite(STDERR, "See the comment block at the top of this file.\n");
     exit(0);
@@ -44,6 +55,48 @@ $dest = $root . '/spock/' . $date;
 // SIGNAL_LOG ended up outside the 26-month promise until 2026-08-21; these three lists are meant to
 // stay identical, and a new log writer owes an edit to all of them.
 $logs = [LANG_LOG, HUMAN_VIEW_LOG, CALC_USAGE_LOG, TITLE_LOG, CONTACT_SEND_LOG, SIGNAL_LOG];
+$knownNames = array_map('basename', $logs);
+
+// ---- --verify: the chain, read back -----------------------------------------------------------
+// Reads only. It is the half of Task 485 that turns "a future reader can tell an archive boundary
+// from a data loss" from a thing somebody must remember into a thing a command answers, so it is
+// meant to be run from cron beside the rotation -- see the crontab recipe in dev/usage-data-log.md.
+if (isset($opts['verify'])) {
+    $dirs = ec_archive_dirs($root . '/spock');
+    if (!$dirs) {
+        echo "No archives under spock/. Nothing to verify.\n";
+        exit(0);
+    }
+    printf("Archives under %s/spock, oldest first. %d found.\n\n", $root, count($dirs));
+    $unexplained = 0;
+    $prev = null;
+    foreach ($dirs as $dir) {
+        $state = ec_archive_state($dir, $knownNames);
+        $m = $state['manifest'];
+        printf("%s  %-9s %8d rows  window %s .. %s\n",
+            $state['name'],
+            $m === null ? 'derived' : (isset($m['provenance']) ? $m['provenance'] : 'rotated'),
+            $state['now']['rows'],
+            ec_manifest_day($state['now']['first_row']) ?: '(none)',
+            ec_manifest_day($state['now']['last_row'])  ?: '(none)');
+        foreach (ec_archive_findings($state, $prev) as $f) {
+            $mark = $f['level'] === 'unexplained' ? '!!' : ($f['level'] === 'note' ? ' -' : ' .');
+            printf("    %s %s\n", $mark, $f['text']);
+            if ($f['level'] === 'unexplained') $unexplained++;
+        }
+        $prev = $state;
+    }
+    echo "\n";
+    if ($unexplained) {
+        // A gap in TRAFFIC is normal and prints as a note. This counts only holes in the DATA that
+        // nothing wrote down, which is the one thing an archive is supposed to make impossible.
+        fwrite(STDERR, "$unexplained unexplained finding(s). Every one is a hole in the record that\n");
+        fwrite(STDERR, "nothing accounted for. Write what happened into dev/usage-data-log.md.\n");
+        exit(1);
+    }
+    echo "Every archive accounted for.\n";
+    exit(0);
+}
 
 /** Row count that agrees with the report's own `wc -l`: lines, not records. */
 function ec_row_count($path) {
@@ -96,8 +149,18 @@ if (!$apply) {
     echo "\nSnapshot the aggregates first, so the window survives the rotation:\n";
     echo "    bash log/lang-log-stats.sh --out=spock/reports/usage-$date.txt\n";
     echo "Then re-run with --apply.\n";
+    echo "Audit what is already archived with:  php dev/scripts/archive_logs.php --verify\n";
     exit(0);
 }
+
+// Read the window BEFORE the move, and name the archive this one follows BEFORE $dest exists --
+// afterwards $dest is itself the newest directory and would name itself as its own predecessor.
+$spans = [];
+foreach ($present as $log => $ignored) {
+    $spans[basename($log)] = ec_manifest_row_span($log);
+}
+$existing = ec_archive_dirs($root . '/spock');
+$predecessor = $existing ? basename(end($existing)) : null;
 
 if (!@mkdir($dest, 0750, true) && !is_dir($dest)) {
     fwrite(STDERR, "Could not create $dest\n");
@@ -138,5 +201,39 @@ if (is_file($state)) {
     @rename($state, $dest . '/.last-report-window');
 }
 
+// ---- register the archive ----------------------------------------------------------------------
+// This is the row of the ledger that no reader can reconstruct later. The rows say what is HERE;
+// only this says what was here when the directory was sealed, and therefore what a subsequent
+// difference means.
+$first = null; $last = null;
+$perLog = [];
+foreach ($spans as $name => $s) {
+    $perLog[$name] = ['rows' => $s['rows'], 'first_row' => $s['first_row'], 'last_row' => $s['last_row']];
+    if ($s['first_row'] !== null && ($first === null || $s['first_row'] < $first)) $first = $s['first_row'];
+    if ($s['last_row']  !== null && ($last  === null || $s['last_row']  > $last))  $last  = $s['last_row'];
+}
+$manifest = [
+    'schema'          => 1,
+    'archive'         => $date,          // the ENDING date, and the directory name
+    'archived_at'     => gmdate('Y-m-d\TH:i:s\Z'),
+    'tool'            => 'archive_logs.php',
+    'provenance'      => 'rotated',      // vs an archive with no manifest, which reads as 'derived'
+    'predecessor'     => $predecessor,   // null only for the first archive ever taken
+    'covers'          => ['first_row' => $first, 'last_row' => $last, 'rows' => $moved],
+    'logs'            => $perLog,
+    'retention_trims' => [],             // appended to by dev/scripts/trim_logs.php
+];
+if (!ec_manifest_write($dest, $manifest)) {
+    fwrite(STDERR, "  WARNING: could not write " . ec_manifest_path($dest) . "\n");
+    fwrite(STDERR, "  The logs moved and no row was lost. The archive is simply unregistered, and\n");
+    fwrite(STDERR, "  --verify will report it as 'derived'.\n");
+}
+
 printf("\nMoved %d row(s). %s\n", $moved, $failed ? "$failed file(s) FAILED -- see above." : 'All six accounted for.');
+printf("Registered %s covering %s .. %s%s\n",
+    ec_manifest_path($dest),
+    ec_manifest_day($first) ?: '(no dated row)',
+    ec_manifest_day($last)  ?: '(no dated row)',
+    $predecessor === null ? ' (first archive)' : ", following $predecessor");
 echo "Read it back with:  bash log/lang-log-stats.sh --archive=spock/$date\n";
+echo "Audit the chain:    php dev/scripts/archive_logs.php --verify\n";

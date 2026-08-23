@@ -22,41 +22,81 @@ spock/
     engcalcs-signal.log
     engcalcs-contact-send.log
     .last-report-window        written by lang-log-stats.sh when it reports against this archive
+    .archive-manifest.json     written by archive_logs.php when it seals the archive
   reports/                     aggregate reports. usage-<date>.txt plus usage-latest.txt
   public/                      the ONE web-reachable thing here (see public/.htaccess)
 ```
 
-**The filenames inside an archive are the live filenames, unchanged.** Nothing registers an
-archive anywhere: dropping the six files into `spock/2026-08-14/` by hand is the whole procedure,
-and both the report and the retention trim pick it up on their next run with no edit to anything.
-That matters because deploying logging to a new location orphans the old logs, and hand-moving
+**The filenames inside an archive are the live filenames, unchanged**, and an archive's identity is
+its directory name. Dropping the six files into `spock/2026-08-14/` by hand is still enough: both
+the report and the retention trim pick it up on their next run with no edit to anything, which has
+to keep working because deploying logging to a new location orphans the old logs and hand-moving
 them must not need a code change.
+
+## The manifest, and the question it answers
+
+A rotation writes `.archive-manifest.json` naming the window it just sealed, the row count of each
+of the six, and the archive it follows. The ending date alone can POINT a report at a window; it
+cannot tell a later reader whether the hole between two archives is a quiet fortnight, a retention
+trim doing its job, or logging that went somewhere else for a month. Deleted rows leave nothing
+behind, so only something written at the moment of rotation can say — and `dev/scripts/trim_logs.php`
+appends its own row to the manifest whenever it deletes from an archive, for the same reason.
+
+**The directory name did not change to carry any of this, and must not.** Encoding the window in
+the name — `spock/2026-07-01_2026-08-14/` — is the obvious alternative and is worse three ways: it
+orphans every archive already on the server, it is a claim no code verifies, and it duplicates what
+the manifest holds exactly. Format and rationale: `dev/scripts/log_archive_manifest.inc.php`.
+
+**An archive with no manifest is a valid archive.** It reads as `derived`: the window it shows is
+everything it can prove about itself, which is exactly what the old hand-moved sets could ever
+prove.
+
+## Auditing
+
+```
+php dev/scripts/archive_logs.php --verify
+```
+
+Lists every archive oldest-first with its window and provenance, and flags a hole in the record:
+rows gone with no trim recorded, a manifest naming a predecessor that is not here, two archives
+covering one window. A gap in TRAFFIC prints as a note; only an unrecorded gap in DATA exits 1, so
+this is safe to run from cron and be mailed only when something is wrong.
 
 ## Reading an archive
 
 ```
 bash log/lang-log-stats.sh --archive=spock/2026-08-14
+bash log/lang-log-stats.sh --archive=2026-08-14      # same thing — an archive IS its ending date
 ```
 
-Same report, different window. It prints a `SOURCE` line naming the archive, and its FINGERPRINT
-carries `src=archive:<name>` where a live run carries `src=live`, so an archived run and a live run
-can never be pasted into `dev/usage-data-log.md` and mistaken for each other.
+Same report, different window. It prints a `SOURCE` line naming the archive, a `PROVENANCE` line
+saying whether that archive registered itself, and its FINGERPRINT carries `src=archive:<name>`
+where a live run carries `src=live` — so an archived run and a live run can never be pasted into
+`dev/usage-data-log.md` and mistaken for each other.
 
 ## Rotating
 
 ```
 php dev/scripts/archive_logs.php            # dry run: what would move
-php dev/scripts/archive_logs.php --apply    # move it, and recreate the live logs empty
+php dev/scripts/archive_logs.php --apply    # move it, recreate the live logs empty, register it
 ```
 
 Refuses to run if today's archive directory already exists, and verifies every row arrived before
-it truncates anything.
+it truncates anything. Snapshot the aggregate first (the dry run prints the command) — the live
+window is not recoverable from the archive once the report has moved on.
 
 ## Retention
 
 `dev/scripts/trim_logs.php` walks `spock/*/` as well as `log/`. It has to: `privacy.php` promises
 usage counts are kept at most 26 months, and an archive that retention never touches turns that
-promise into a lie the moment the first archive is 27 months old.
+promise into a lie the moment the first archive is 27 months old. Every deletion it makes inside an
+archive is appended to that archive's manifest, so `--verify` reads the shortened window as
+retention rather than as a loss.
+
+## Running it on a schedule
+
+The recommended crontab — cadence, ordering and why — is in `dev/usage-data-log.md`, under
+"Running this on a schedule". Nothing is enabled here.
 
 ## What is tracked in git
 

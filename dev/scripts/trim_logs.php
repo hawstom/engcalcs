@@ -30,8 +30,17 @@
  *
  * It walks the ARCHIVES in spock/<date>/ as well as the live logs -- see the comment beside the
  * $logs list for why it has to.
+ *
+ * AND IT SIGNS ITS WORK (ROADMAP Task 485). A trim inside an archive is a deliberate deletion that
+ * makes the archive's own manifest describe a window wider than the rows now present. Unrecorded,
+ * that difference is indistinguishable from data quietly going missing, which is the one thing
+ * archiving is supposed to rule out. So every trim appends a row to that archive's
+ * .archive-manifest.json, and `php dev/scripts/archive_logs.php --verify` reports a shortened
+ * archive as explained rather than as a hole. The LIVE logs need none of this: they have no
+ * manifest and no boundary to lose, because their window is whatever they currently hold.
  */
 require_once __DIR__ . '/../../lib/config.inc.php';
+require_once __DIR__ . '/log_archive_manifest.inc.php';
 
 $opts = getopt('', ['apply', 'months::', 'help']);
 if (isset($opts['help'])) {
@@ -82,6 +91,7 @@ foreach (glob($archiveRoot . '/*', GLOB_ONLYDIR) ?: [] as $dir) {
 printf("Retention: %d months. Cutoff: %s. %s\n\n", $months, $cutoff, $apply ? 'APPLYING.' : 'Dry run -- nothing will be written.');
 
 $totalDropped = 0;
+$archiveDrops = [];   // dir => [filename => rows deleted], for the manifest write below
 foreach ($logs as $log) {
     // Archived rows and live rows are the same rows under the same promise, so an archive is
     // labelled by its directory rather than treated as a different kind of thing.
@@ -115,6 +125,46 @@ foreach ($logs as $log) {
         file_put_contents($tmp, $kept ? implode("\n", $kept) . "\n" : '');
         rename($tmp, $log);
     }
+    if ($dropped > 0 && strpos($log, $archiveRoot . '/') === 0) {
+        $archiveDrops[dirname($log)][basename($log)] = $dropped;
+    }
+}
+
+// ---- record every archive trim in that archive's own manifest ----------------------------------
+if ($apply) {
+    foreach ($archiveDrops as $dir => $perFile) {
+        $m = ec_manifest_read($dir);
+        if ($m === null) {
+            // An archive that predates the manifest, or one hand-moved in. It still gets a record,
+            // because a deletion we performed is precisely the fact a later reader cannot recover.
+            // 'covers' is left absent on purpose: we do not know what this archive held before us,
+            // and inventing it would be worse than saying nothing.
+            $m = [
+                'schema'          => 1,
+                'archive'         => basename($dir),
+                'tool'            => 'trim_logs.php',
+                'provenance'      => 'unregistered',
+                'predecessor'     => null,
+                'retention_trims' => [],
+            ];
+        }
+        if (!isset($m['retention_trims']) || !is_array($m['retention_trims'])) $m['retention_trims'] = [];
+        $m['retention_trims'][] = [
+            'at'      => gmdate('Y-m-d\TH:i:s\Z'),
+            'months'  => $months,
+            'cutoff'  => $cutoff,
+            'dropped' => array_sum($perFile),
+            'logs'    => $perFile,
+        ];
+        if (ec_manifest_write($dir, $m)) {
+            printf("  recorded trim in %s\n", ec_manifest_path($dir));
+        } else {
+            fwrite(STDERR, "  WARNING: rows were deleted from " . basename($dir)
+                . " but its manifest could not be written.\n");
+            fwrite(STDERR, "  --verify will report that archive as an unexplained loss. Say what\n");
+            fwrite(STDERR, "  happened in dev/usage-data-log.md.\n");
+        }
+    }
 }
 
 printf("\n%s %d row(s).\n", $apply ? 'Deleted' : 'Would delete', $totalDropped);
@@ -124,4 +174,9 @@ foreach ($strays as $f) {
 if (!$apply && $totalDropped > 0) {
     echo "Snapshot the aggregates into dev/usage-data-log.md first:  sh log/lang-log-stats.sh\n";
     echo "Then re-run with --apply.\n";
+    if ($archiveDrops) {
+        printf("--apply would also record the deletion in %d archive manifest(s), so the shortened\n",
+            count($archiveDrops));
+        echo "window reads as retention rather than as a loss.\n";
+    }
 }

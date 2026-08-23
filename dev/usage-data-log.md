@@ -1145,12 +1145,20 @@ they were archived — recreates them empty, verifies the row count before it re
 refuses outright if that directory already exists. `spock` is Tom's name for the directory; the
 derivation is in `spock/README.md` and is not a typo.
 
-**Nothing registers an archive.** Hand-moving six files into `spock/2026-08-14/` is the whole
-procedure, which matters because deploying logging to a new location orphans the old set. Both
-readers glob.
+**A rotation registers itself; a hand-moved archive still works.** `archive_logs.php --apply`
+writes `.archive-manifest.json` into the archive it seals — the window, each log's row count, and
+the archive it follows — and `trim_logs.php` appends a row to that manifest every time it deletes
+from an archive. That is what lets `php dev/scripts/archive_logs.php --verify` say whether a hole in
+the record is a quiet stretch, retention doing its job, or something nobody wrote down; it exits 1
+only on the last. Hand-moving six files into `spock/2026-08-14/` remains enough to report them —
+that has to keep working, because deploying logging to a new location orphans the old set — and such
+an archive reads as `derived`: what it shows is all it can prove. **The directory name did not
+change and must not**; encoding the window in it orphans everything already on the server and is a
+claim no code verifies.
 
-Read one back with `bash log/lang-log-stats.sh --archive=spock/2026-08-14`. The report grew a
-**SOURCE** line naming the archive, printed on the header and again in the footer, and its
+Read one back with `bash log/lang-log-stats.sh --archive=spock/2026-08-14`, or by its ending date
+alone, `--archive=2026-08-14`. The report grew a **SOURCE** line naming the archive, printed on the
+header and again in the footer, a **PROVENANCE** line saying whether that archive is registered, and its
 FINGERPRINT now leads with `src=live` or `src=archive:<name>`. **A fingerprint pasted into this
 file without an `src=` prefix predates 2026-08-23 and is a live run by definition.** Each archive
 keeps its own `.last-report-window`, so PREVIOUS RUN never compares an archive against the live
@@ -1182,3 +1190,48 @@ unguessable filename. The served copy truncates **every timestamp to its date** 
 fingerprint `redacted=date`, so a published copy and a private one can never be pasted here as the
 same run. It is not in `robots.txt` — a `Disallow` line publishes the very name it protects — and
 carries `<meta name="robots" content="noindex">` instead.
+
+### Running this on a schedule
+
+**Nothing here is enabled.** Tom asked on 2026-08-23 whether reporting could run on a server cron;
+this is the recipe, not a switch that has been thrown. The repo contains no cron entry and this
+section does not create one.
+
+The whole point of a schedule is that the ROTATION is the part a human forgets, and a forgotten
+rotation is the exact mechanism behind the 40x scale break recorded above — one ever-growing window
+with nothing to compare it to.
+
+```cron
+# EngCalcs usage logs. Times are the server's local time; the archive is named in UTC.
+# Adjust the two paths to the real checkout.
+MAILTO=your-address@example.com
+ENGCALCS=/home/USER/public_html/engcalcs
+
+# Weekly: refresh the aggregate report. Writes files only; publishes nothing while
+# spock/public/.htaccess keeps its grant commented out.
+10 0 * * 1  cd $ENGCALCS && sh dev/scripts/publish_usage_report.sh >/dev/null
+
+# Monthly: snapshot the window that is about to close, THEN rotate. In this order, or the
+# live window's own report is lost the moment the logs move.
+5 0 1 * *   cd $ENGCALCS && sh dev/scripts/publish_usage_report.sh >/dev/null && php dev/scripts/archive_logs.php --apply
+
+# Monthly, the day after: the 26-month retention backstop, across the live logs and every archive.
+5 1 2 * *   cd $ENGCALCS && php dev/scripts/trim_logs.php --apply
+
+# Daily: audit the chain. stdout is discarded, so cron mails only when --verify finds a hole in
+# the record that nothing accounted for -- that is the whole design of its exit code.
+0 6 * * *   cd $ENGCALCS && php dev/scripts/archive_logs.php --verify >/dev/null
+```
+
+**Why monthly for the rotation.** A month is the shortest window that regularly clears the report's
+own small-n floor of 40, so each archive is a window worth comparing on its own. Weekly would give
+52 directories a year of mostly unreadable ratios; quarterly would starve the comparison the
+rotation exists to enable and leave a lost quarter costing three months instead of one.
+
+**Why the audit is daily and everything else is not.** Reading is free and finding a hole late is
+not. The three writing entries change data and are deliberately infrequent.
+
+Two cautions before pasting. The host may not offer cron at all on a shared plan — check
+`crontab -l` first. And `archive_logs.php` refuses a second rotation on the same UTC date, so a
+manual rotation on the 1st makes that night's cron entry exit 1 and mail its refusal; that is the
+guard working, not a fault.
