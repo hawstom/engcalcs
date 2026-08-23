@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**77 open tasks.** Next (100): 7 · Soon (75): 9 · Someday (50): 11 · Maybe (25): 24 · Parked (5): 26
+**77 open tasks.** Next (100): 8 · Soon (75): 9 · Someday (50): 11 · Maybe (25): 23 · Parked (5): 26
 
-## 100 — Next (7)
+## 100 — Next (8)
 
 - Task 145 — GEOGRAPHIC PROJECTS: grid or geographic, declared before anything is drawn.
 - Task 388 — Documentation is written as a transcript of revision, not current state.
@@ -18,6 +18,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
 - Task 489 — Our Mapbox attribution is incomplete, and theirs is a licence term.
+- Task 490 — [H] · A shipped defect overstated Q by 1.587x, and nobody was told.
 
 ## 75 — Soon (9)
 
@@ -45,7 +46,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 488 — The Print table button crowds the tab strip it shares.
 
-## 25 — Maybe (24)
+## 25 — Maybe (23)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -69,7 +70,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 417 — Long-press on an element should enter Edit mode.
 - Task 435 — The Labels panel's column headings sit too far right.
 - Task 468 — Demand categories on a junction — the breakdown the importer already flattens.
-- Task 475 — Manning Irregular emits NaN for a zero-length segment.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 
 ## 5 — Parked (26)

@@ -244,6 +244,17 @@ the block.
   known. Candidates worth measuring before proposing: the button as an icon with no text, or moved
   into the pane's own overflow.
 
+- 100|490| **[H] A shipped defect overstated Q by 1.587x, and nobody was told.**
+  Found and fixed 2026-08-23 under Task 475. Any cross-section with a VERTICAL WALL — a lined ditch,
+  a box culvert, a rectangular channel — got no wetted perimeter from that wall, because the old test
+  could not tell a wall (zero area, real perimeter) from a dry bed (zero area, no perimeter). A 10 ft
+  × 5 ft box reported P = 10 ft and R = 5 ft instead of P = 20 ft and R = 2.5 ft, and Manning goes as
+  R^(2/3), so discharge came out **2^(2/3) = 1.587x** too high. It is fixed and asserted by
+  `dev/calc-spike/mi-harness.js` (the old code fails 10 of its checks).
+  - **The open question is Tom's and it is not technical:** anybody who used the page on a walled
+    section before today has a wrong number and does not know it. Say nothing, note it on the page, or
+    say it out loud? The suite has no mailing list, so "tell the users" has no mechanism.
+
 - 100|489| **Our Mapbox attribution is incomplete, and theirs is a licence term.**
   Checked against `docs.mapbox.com/help/getting-started/attribution/` on 2026-08-23, after Tom
   photographed epanet-js showing a Mapbox logo under its basemap switcher AND five text links at the
@@ -389,13 +400,15 @@ the block.
     elevation or head closest to the neighbouring nodes."* Swap it in when this lands.
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
-  HW draws 580 confirmed humans (18% human-of-reach, the suite's second-biggest front door) but only
-  11% of them calculate, against a 51–67% band on six comparable pages — ~517 lost humans per period.
-  - **Do not guess a fix.** The decisive step is one observation: pull the HW page's own Search
-    Console query export and segment it (the doc says exactly how). Reference-lookup queries mean a
-    C-value table on the page; calculator queries mean a real UX leak.
-  - **The 11% is not on its own a verdict** — `human` counts anyone who dwells 10 s without typing, so
-    it does not separate a UX leak from satisfied reference demand. The segmentation above is how to tell.
+  **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
+  `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary
+  beside MPF 78% and DW 56%; P(X ≥ 7 | n = 12) = 8.6e-5 against the old rate. **The two causes are
+  confounded** — the defaults changed AND the report began reading the consented bucket only — so do
+  not claim the defaults fixed it.
+  - **The Search Console route this task used to call decisive is superseded.** That export covers 16
+    clicks against 580 counted humans; Google organic cannot characterize this audience. What settles
+    it is one run of the rebuilt `log/lang-log-stats.sh` over HW and the band pages, same window and
+    same bucket, long enough that the denominator is not marked `~`.
 
 - 25|185| **Match/Copy properties tool (originated during Task 146).** Tom, 2026-07-30: "In the absence of the
   table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
@@ -670,11 +683,6 @@ the block.
     different; see `dev/positioning.md`.
   - Touches the scenario write seam (`setProp`), the popup, the importer, and Task 281's exporter —
     a per-category override is the question to settle first.
-
-- 25|475| **Manning Irregular emits NaN for a zero-length segment.** Two stations sharing a station
-  value give `hypotenuse = 0`, so `t = 0*0/0 = NaN`. Pre-existing and already visible in the segment
-  `t` cell; since Task 474 it also reaches that region's Froude number. Found 2026-08-21 by
-  `mi-harness.js`. Reject a zero-length segment, or say why NaN is the honest answer.
 
 - 25|484| **Log which unhandled EPANET features actually arrive in real imports.**
   A server-side count of the import features we do not handle, so Task 483 and its siblings are
