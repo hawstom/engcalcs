@@ -144,18 +144,6 @@ the block.
   - **Earned 2026-08-23:** `lpn_settings_legend_position` → `Labels legend position`; Tom found it
     ambiguous against the colour key, whose control already says `Color legend position`. 26 stale.
 
-- 50|481| **A closed task cited as pending ships false claims.** Three shipped in one day. On
-  2026-08-21 `CLAUDE.md` said extended-period simulation was "not built yet" and that `.inp` export
-  was "not written yet"; the LibreWaterNet landing draft said both. All four had shipped 2026-08-18.
-  **Tom caught it, not a check** — *"This is false. How could you not know that?"*
-  - **The mechanism is structural, not carelessness.** Closing a task DELETES its block (that is the
-    rule, and it is right), so nothing re-scans the prose that quoted it. An honesty paragraph is the
-    first thing to rot, and it rots in the direction that makes us look worse than we are.
-  - **The check is mechanical and cheap:** extract every `Task N` mention from `CLAUDE.md` and
-    `dev/*.md`, and flag any N that appears in `dev/roadmap-closed-ids.md`. A closed task cited in the
-    past tense is fine, so this is ADVISORY — the output is "verify these sentences are written in the
-    past tense", not a failure. It would have caught all four.
-
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
   English pass asking *"list every plausible reading; more than one means rewrite"*, both waves

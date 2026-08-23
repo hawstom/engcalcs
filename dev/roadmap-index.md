@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**78 open tasks.** Next (100): 7 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 24 · Parked (5): 26
+**77 open tasks.** Next (100): 7 · Soon (75): 9 · Someday (50): 11 · Maybe (25): 24 · Parked (5): 26
 
 ## 100 — Next (7)
 
@@ -31,7 +31,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 483 — EPANET import: carry unhandled features into a per-asset import notes field.
 - Task 485 — Give the production log archives a systematic path and naming.
 
-## 50 — Someday (12)
+## 50 — Someday (11)
 
 - Task 207 — The dilettante path: make replying cost one tap, not five steps.
 - Task 248.02 — Patterns: attach one to a RESERVOIR HEAD and a PUMP.
@@ -42,7 +42,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
 - Task 469 — Node labels should SHED properties before one of them is hidden.
-- Task 481 — A closed task cited as pending ships false claims.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 488 — The Print table button crowds the tab strip it shares.
 
@@ -104,5 +103,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-78 of 78 titles are within 4–12 words. `!` marks the rest;
+77 of 77 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
