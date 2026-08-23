@@ -145,9 +145,9 @@ section verbatim. Sequence recap:
    target lang file path, full instructions (glossary terms + values + notes, relevant
    `$ec_lang_syn` entries, HTML/symbol-preservation rules, any known wrong-sense traps carried
    over from prior audits of related terms in that language family), **and the suggestion-box
-   block from § "The suggestion box", pasted in verbatim.** It is an ingredient of the prompt,
-   not a reminder to the orchestrator: an agent that was never given the block files nothing,
-   and the sprint closes looking clean.
+   block, which every payload now carries as `suggestion_box` — tell the agent to read it.** It is
+   an ingredient of the prompt, not a reminder to the orchestrator: an agent that was never given
+   the block files nothing, and the sprint closes looking clean.
 4. **Post-sprint QA, in order:**
    - `php dev/scripts/lang_syntax_validate.php --lang=<codes>` — clean of escape-leakage,
      tag-imbalance, foreign-script findings.
@@ -289,11 +289,19 @@ read-only watchlist dump and grep-slice are free and can be done any time.
 - **Column-heading vs. tooltip width discipline**: shared label's short form goes in the
   column-heading key, long form in the tooltip — never the reverse (width-is-king).
 
-## The suggestion box — paste this into EVERY translation agent prompt
+## The suggestion box — every translation agent gets it, mechanically
 
 Every translator, every wave, every language, every batch size. Not optional, not Wave-1-only.
 Tom, 2026-08-08: *"**Every translator** needs a suggestion box, an ombudsman, and a place to file
-grievances about the working conditions."* Copy the block below verbatim into the agent prompt:
+grievances about the working conditions."*
+
+**This block is the ONE canonical copy, and `generate_translation_payloads.php` extracts it into
+every payload as `suggestion_box`** (ROADMAP Task 239) — the fenced block below, verbatim, is what
+each agent reads out of its own payload. So editing it here changes what every agent is told, and
+makes every payload stale until they are regenerated. Do not retype it into a sprint brief; tell the
+agent to read `suggestion_box` and follow it. The generator **fails hard** if the heading or the
+fence goes missing, because a payload that shipped without it would silently take a whole sprint's
+findings with it.
 
 ```
 ## Suggestion box — file a grievance about the English
@@ -362,6 +370,9 @@ standing tripwire.
 - `dev/scripts/detect_english_drift.php` — English-source staleness tripwire (see section above);
   `--check` gates on any CHANGED key, `--json` emits the resync key list, `--update` re-baselines
   `english_string_hashes.json`.
+- `dev/scripts/wave0_keyset.php` — assemble the Wave 0 pass set and pre-filter keys that already
+  carry a `$ec_lang_syn`; `--skipped` enumerates what it dropped, `--no-filter` restores the raw set,
+  `--measure=<sprint>` replays a friction log against the filter.
 - `dev/scripts/generate_translation_payloads.php` — build per-language JSON payloads;
   `--check` verifies freshness against lang files/glossary/exempt list/coverage declaration/generator
   (hard gate before any sprint).
@@ -404,6 +415,12 @@ question about paths.
    there is more than one, propose a rewrite."** Falsification, not review. Findings go to
    `dev/english-friction/<sprint>.json` and route through the English/synonym/glossary rule above.
    **`php dev/scripts/friction_check.php --sprint=<id>` must exit 0.**
+   **Assemble the pass set with `php dev/scripts/wave0_keyset.php --new-and-changed --prefix=<p>`**,
+   which drops keys already carrying a non-empty `$ec_lang_syn` — that channel has already answered
+   this exact question, and re-asking produces a re-flag. Measured against `239-wave0-calcs.json`:
+   9 of 35 findings skipped, dismissal rate 37% → 23%. **It also skipped one confirmed rewrite**
+   (`mtc_note_1`), so a skipped key is a cheaper second look, not a key ruled correct — `--skipped`
+   lists every one with its syn entry, and `--measure=<sprint>` re-runs the arithmetic on any log.
 1. **`php dev/scripts/gloss_ref_check.php` must exit 0.**
 2. **Regenerate payloads** so the delta reflects current lang files:
    `php dev/scripts/generate_translation_payloads.php`. **This is the orchestrating AI's job, never
@@ -467,10 +484,11 @@ languages. An AND would leave Manning Pipe Flow untranslated in 22 languages.
 1. **Announce the count before spawning**: "Starting N agents, one for each language."
 2. Spawn all agents in a single message with `run_in_background: true` and `model: "sonnet"`.
 3. Each agent receives: the payload JSON path, the target lang file path, full instructions
-   including glossary terms, synonym notes, and all translation rules, **and the suggestion-box
-   block from § "The suggestion box" pasted in verbatim.** Every agent, every wave, every batch
-   size — it is a required part of the prompt template, not an optional extra, and an agent that
-   never received it cannot file the complaint the gate is waiting for.
+   including glossary terms, synonym notes, and all translation rules, **and the suggestion box —
+   which is now in the payload itself, as `suggestion_box`.** Every agent, every wave, every batch
+   size, delivered by the generator rather than retyped per sprint; the prompt's job is only to say
+   "read it and follow it." An agent that never received it cannot file the complaint the gate is
+   waiting for, which is why it stopped being something a human has to remember.
 
 **Model policy: Sonnet is mandatory for every translation agent, every batch size, every language, no
 exceptions. Haiku is fully deprecated for translation.** Evidence
