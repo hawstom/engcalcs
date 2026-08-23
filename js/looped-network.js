@@ -399,6 +399,36 @@ var EngCalcs = EngCalcs || {};
 	function linkLabelAligned(l) {
 		return !!settings.alignPipeLabels && l.lx === undefined && l.ly === undefined;
 	}
+	// ---- THE NEAREST OTHER PIPE IS ASKED FOR ONCE PER PASS, NOT ONCE PER LABEL -------------------
+	//
+	// alignedSideFor() below asks "how close does this candidate position come to some OTHER pipe",
+	// and it used to answer by walking every link in the document -- 480 x 480 calls to
+	// linkPointList() on the 256-junction grid of dev/browser-pass/specs/perf.js, and 21% of the self
+	// time of opening it once the four measurement quadratics were fixed (Task 440).
+	//
+	// Geom.buildSegmentIndex() turns the whole drawing into one uniform grid of segments, and each
+	// query walks outward from its own cell until the ring is further off than the best distance
+	// found. Same number out (the index is exact, not approximate), one linkPointList() per link
+	// instead of one per link per label.
+	//
+	// **HELD FOR THE DURATION OF A PASS, WHICH IS WHY THERE IS NO INVALIDATION TO REMEMBER** -- the
+	// same bargain mapBox() makes with the canvas box. Geometry cannot change in the middle of a
+	// synchronous layout pass, and a caller outside one builds a throwaway index whose cost is the
+	// one walk it replaces. There is therefore exactly ONE implementation of the question, not a fast
+	// path and a slow path that can drift apart.
+	var linkSegIndexHeld = null, linkSegDepth = 0;
+	function buildLinkSegIndex() {
+		return Geom.buildSegmentIndex(doc.links.map(function (l) {
+			return { key: l.id, pts: linkPointList(l) };
+		}));
+	}
+	function linkSegIndex() {
+		if (!linkSegDepth) { return buildLinkSegIndex(); }
+		if (!linkSegIndexHeld) { linkSegIndexHeld = buildLinkSegIndex(); }
+		return linkSegIndexHeld;
+	}
+	function beginLinkGeomHold() { linkSegDepth++; }
+	function endLinkGeomHold() { if (--linkSegDepth <= 0) { linkSegDepth = 0; linkSegIndexHeld = null; } }
 	// WHICH SIDE OF THE PIPE: prefer the top, and take the other side when the top is congested.
 	// Congestion is distance to the nearest OTHER link -- a link's own centreline is not an obstacle
 	// to its own label. A MARGIN before switching, so the top stays the default rather than
@@ -406,15 +436,9 @@ var EngCalcs = EngCalcs || {};
 	// no reader can see are worse than an occasionally tight drawing.
 	var LPN_SIDE_SWITCH_MARGIN = 1.35;
 	function alignedSideFor(l, top, bottom) {
-		var clearTop = Infinity, clearBot = Infinity;
-		doc.links.forEach(function (o) {
-			if (o.id === l.id) { return; }
-			var pts = linkPointList(o), dt, db;
-			dt = Geom.pointToPolylineDistance(pts, top.x, top.y);
-			db = Geom.pointToPolylineDistance(pts, bottom.x, bottom.y);
-			if (dt < clearTop) { clearTop = dt; }
-			if (db < clearBot) { clearBot = db; }
-		});
+		var idx = linkSegIndex(),
+			clearTop = Geom.nearestSegmentDistance(idx, top.x, top.y, l.id),
+			clearBot = Geom.nearestSegmentDistance(idx, bottom.x, bottom.y, l.id);
 		return clearBot > clearTop * LPN_SIDE_SWITCH_MARGIN ? -1 : 1;
 	}
 	// A PIPE TOO SHORT TO CARRY ITS OWN LABEL DOES NOT CARRY ONE. The map-width threshold cannot
@@ -16317,8 +16341,11 @@ var EngCalcs = EngCalcs || {};
 		reshedTimer = setTimeout(function () {
 			reshedTimer = null;
 			if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
-			reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
-			relayoutLabels();
+			beginLinkGeomHold();
+			try {
+				reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
+				relayoutLabels();
+			} finally { endLinkGeomHold(); }
 		}, 120);
 	}
 	// ID-prefix validation, same illegal-character set as validateNewId() (no spaces/quotes) plus
@@ -19786,7 +19813,8 @@ var EngCalcs = EngCalcs || {};
 	// rather than a try/finally around 200 lines, so the pass itself reads exactly as it did.
 	function refreshLabelText() {
 		beginMapBoxHold();
-		try { refreshLabelTextPass(); } finally { endMapBoxHold(); }
+		beginLinkGeomHold();
+		try { refreshLabelTextPass(); } finally { endMapBoxHold(); endLinkGeomHold(); }
 	}
 	function refreshLabelTextPass() {
 		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
@@ -20094,12 +20122,13 @@ var EngCalcs = EngCalcs || {};
 	function relayoutLabels() {
 		lastLayoutScale = state.s;
 		beginMapBoxHold();   // one canvas measurement for the whole pass -- see mapBox()
+		beginLinkGeomHold(); // one segment index for the whole pass -- see linkSegIndex()
 		try {
 			runLabelCollisionAvoidance();
 			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
 			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
 			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
-		} finally { endMapBoxHold(); }
+		} finally { endMapBoxHold(); endLinkGeomHold(); }
 	}
 	function runSolve() {
 		// **NO ARITHMETIC WHILE THE PROJECT IS BEING PLACED** (Task 145, Tom: "disable calculations

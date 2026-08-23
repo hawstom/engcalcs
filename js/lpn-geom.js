@@ -468,6 +468,131 @@ EngCalcs.lpnGeom = (function () {
 		return best;
 	}
 
+
+	// ---- "HOW CLOSE IS THE NEAREST OTHER PIPE" IS A LOCAL QUESTION, NOT A WALK ------------------
+	//
+	// pointToPolylineDistance() answers it for ONE polyline, and looped-network.js's alignedSideFor()
+	// used to call it for EVERY link to decide which side of its own pipe ONE label hangs on --
+	// 480 x 480 on the 256-junction grid dev/browser-pass/specs/perf.js is measured against, and 21%
+	// of the self time of opening it. Nothing about the answer is global: a candidate position is
+	// beaten by whichever pipe happens to be nearest it, and every pipe further away than the best
+	// found so far cannot change it.
+	//
+	// So the segments go into a uniform grid once per pass and each query walks OUTWARD in rings
+	// until the ring itself is further away than the best distance already found.
+	//
+	// **THE ANSWER IS THE SAME NUMBER, NOT AN APPROXIMATION OF IT**, and that is what makes this an
+	// optimisation rather than a change to the drawing: a label placed on the other side of its pipe
+	// is a defect, not a saving. `dev/lpn-spike/aligned-side-index-harness.js` requires this to agree
+	// with pointToPolylineDistance() exactly, and counts the calls that prove the walk is gone.
+	//
+	// **A SEGMENT SPANNING MANY CELLS GOES IN A LIST THAT IS ALWAYS CHECKED**, rather than into every
+	// cell it crosses. A transmission main across a whole network would otherwise be filed thousands
+	// of times, which is the cost this is here to remove, paid at build time instead.
+	var SEG_INDEX_MAX_AXIS = 256, SEG_INDEX_MAX_CELLS = 32;
+	// `entries` is [{key, pts}] -- key is whatever the caller wants back for "whose segment is this",
+	// and is what a query excludes. Point lists come in exactly as pointToPolylineDistance() takes
+	// them, so there is one shape of geometry in this file and not two.
+	function buildSegmentIndex(entries) {
+		var segs = [], i, j, pts, a, b,
+			minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+		function usable(p) { return !!p && isFinite(p.x) && isFinite(p.y); }
+		function addSeg(key, ax, ay, bx, by) {
+			segs.push({ key: key, ax: ax, ay: ay, bx: bx, by: by });
+			if (ax < minX) { minX = ax; } if (ax > maxX) { maxX = ax; }
+			if (bx < minX) { minX = bx; } if (bx > maxX) { maxX = bx; }
+			if (ay < minY) { minY = ay; } if (ay > maxY) { maxY = ay; }
+			if (by < minY) { minY = by; } if (by > maxY) { maxY = by; }
+		}
+		for (i = 0; i < (entries || []).length; i++) {
+			pts = (entries[i] && entries[i].pts) || [];
+			// A single usable point is a degenerate segment, which is what pointToSegmentDistance()
+			// already treats a zero-length one as -- so a stub link still registers.
+			for (j = 0; j + 1 < pts.length; j++) {
+				a = pts[j]; b = pts[j + 1];
+				if (usable(a) && usable(b)) { addSeg(entries[i].key, a.x, a.y, b.x, b.y); }
+				else if (usable(a)) { addSeg(entries[i].key, a.x, a.y, a.x, a.y); }
+				else if (usable(b)) { addSeg(entries[i].key, b.x, b.y, b.x, b.y); }
+			}
+			if (pts.length === 1 && usable(pts[0])) {
+				addSeg(entries[i].key, pts[0].x, pts[0].y, pts[0].x, pts[0].y);
+			}
+		}
+		var idx = { segs: segs, big: segs, cells: null, cell: 0, minX: 0, minY: 0, nx: 0, ny: 0 };
+		if (!segs.length) { idx.big = []; return idx; }
+		// About one segment per cell, capped so a degenerate bounding box (every pipe on one line)
+		// cannot ask for an unbounded grid.
+		var span = Math.max(maxX - minX, maxY - minY),
+			axis = Math.max(1, Math.min(SEG_INDEX_MAX_AXIS, Math.ceil(Math.sqrt(segs.length))));
+		if (!(span > 0) || !isFinite(span)) { idx.big = segs; return idx; }
+		idx.cell = span / axis;
+		idx.minX = minX; idx.minY = minY;
+		idx.nx = axis; idx.ny = axis;
+		idx.cells = [];
+		idx.big = [];
+		for (i = 0; i < axis * axis; i++) { idx.cells.push(null); }
+		function cellOf(v, lo) {
+			var k = Math.floor((v - lo) / idx.cell);
+			return k < 0 ? 0 : (k > axis - 1 ? axis - 1 : k);
+		}
+		for (i = 0; i < segs.length; i++) {
+			var s = segs[i],
+				x0 = cellOf(Math.min(s.ax, s.bx), minX), x1 = cellOf(Math.max(s.ax, s.bx), minX),
+				y0 = cellOf(Math.min(s.ay, s.by), minY), y1 = cellOf(Math.max(s.ay, s.by), minY);
+			if ((x1 - x0 + 1) * (y1 - y0 + 1) > SEG_INDEX_MAX_CELLS) { idx.big.push(s); continue; }
+			for (var cy = y0; cy <= y1; cy++) {
+				for (var cx = x0; cx <= x1; cx++) {
+					var k = cy * axis + cx;
+					if (!idx.cells[k]) { idx.cells[k] = []; }
+					idx.cells[k].push(s);
+				}
+			}
+		}
+		return idx;
+	}
+	// The distance from (px, py) to the nearest segment in the index whose key is NOT `excludeKey`.
+	// Infinity when there is no such segment, exactly as pointToPolylineDistance() of nothing is.
+	function nearestSegmentDistance(idx, px, py, excludeKey) {
+		var best = Infinity;
+		function consider(arr) {
+			var t, s, d;
+			for (t = 0; t < arr.length; t++) {
+				s = arr[t];
+				if (s.key === excludeKey) { continue; }
+				d = pointToSegmentDistance(px, py, s.ax, s.ay, s.bx, s.by);
+				if (d < best) { best = d; }
+			}
+		}
+		function cellAt(gx, gy) {
+			if (gx < 0 || gy < 0 || gx > idx.nx - 1 || gy > idx.ny - 1) { return; }
+			var list = idx.cells[gy * idx.nx + gx];
+			if (list) { consider(list); }
+		}
+		if (!idx) { return best; }
+		consider(idx.big);
+		if (!idx.cells) { return best; }
+		// The query point's own cell, UNCLAMPED: a point outside the drawing is still a definite
+		// number of rings away from everything in it, and clamping it would break the stopping rule
+		// below by pretending it sits on the edge.
+		var cx = Math.floor((px - idx.minX) / idx.cell), cy = Math.floor((py - idx.minY) / idx.cell),
+			nx = idx.nx, ny = idx.ny,
+			// The first ring that can touch the grid at all, and the last that can.
+			rFrom = Math.max(0, -cx, cx - (nx - 1), -cy, cy - (ny - 1)),
+			rTo = Math.max(Math.abs(cx), Math.abs(cx - (nx - 1)), Math.abs(cy), Math.abs(cy - (ny - 1))),
+			r, g;
+		for (r = rFrom; r <= rTo; r++) {
+			// **THE STOPPING RULE IS (r - 1), NOT r.** The point sits somewhere inside its own cell,
+			// not at its centre, so a cell r rings out is only guaranteed to be (r - 1) cells away.
+			// Off by one here and the nearest pipe is sometimes missed -- silently, on one label.
+			if (best <= (r - 1) * idx.cell) { break; }
+			if (r === 0) { cellAt(cx, cy); continue; }
+			// The perimeter of the ring only; everything inside it was done on an earlier pass.
+			for (g = cx - r; g <= cx + r; g++) { cellAt(g, cy - r); cellAt(g, cy + r); }
+			for (g = cy - r + 1; g <= cy + r - 1; g++) { cellAt(cx - r, g); cellAt(cx + r, g); }
+		}
+		return best;
+	}
+
 	return {
 		polylineLength: polylineLength,
 		geodesicMeters: geodesicMeters,
@@ -487,6 +612,8 @@ EngCalcs.lpnGeom = (function () {
 		orientedLabelBox: orientedLabelBox,
 		pointToSegmentDistance: pointToSegmentDistance,
 		pointToPolylineDistance: pointToPolylineDistance,
+		buildSegmentIndex: buildSegmentIndex,
+		nearestSegmentDistance: nearestSegmentDistance,
 		angularGap: angularGap,
 		directionOpenness: directionOpenness,
 		mostOpenDirection: mostOpenDirection

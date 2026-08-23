@@ -51,10 +51,19 @@
 // **WHAT IS LEFT IS NO LONGER MEASUREMENT.** Under Chrome's sampling profiler, on this same network
 // and this same Close (23,016 ms before against 9,875 ms after, both under the profiler's own
 // overhead), getBBox() went from 53.7% of self time to 6.2%. The three biggest remaining
-// are linkPointList() at 21%, readMapBox() at 16% and the collision geometry at about 13% — and the
-// first is quadratic for a reason that has nothing to do with labels' text: alignedSideFor() walks
-// EVERY link to decide which side of its own pipe one label hangs on, which is 480 x 480 on this
-// drawing. That is the next task here, and this file is where its number lives.
+// were linkPointList() at 21%, readMapBox() at 16% and the collision geometry at about 13%.
+//
+// **AND THE FIRST OF THOSE WAS THE LAST QUADRATIC** (Task 472). It was quadratic for a reason that
+// has nothing to do with labels' text: alignedSideFor() walked EVERY link to decide which side of
+// its own pipe ONE label hangs on. The drawing now goes into a segment index once per layout pass
+// and each query walks outward from its own cell, which is the same answer out of a local question.
+// COUNTED rather than timed, one relayoutLabels() pass on this same 480-pipe grid:
+//
+//     linkPointList() calls    682,052  ->  6,184
+//
+// and every label landed in the same place, to the character, on all 480 of them.
+// `dev/lpn-spike/aligned-side-index-harness.js` is the guard: it requires the index to return what
+// walking every pipe returns, and counts the calls at two network sizes.
 //
 // **THE BOUNDS ARE GENEROUS ON PURPOSE — well clear of the measurement, not a hair over it.** This
 // pass runs on whatever machine is free, and a timing check that fails on a busy one teaches people
