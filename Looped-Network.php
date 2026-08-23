@@ -353,6 +353,25 @@ echoHeader("EngCalcs", $html_title, "", false);
 			      // and deletes. pointer-events:auto because the strip itself is inert -- it is an
 			      // overlay over the map, and this is the one thing in it that is not just a
 			      // readout. Filled and wired by refreshScenarioStatus()/wireScenarioButton(). ?>
+			<?php // THE SATELLITE TEASER (ROADMAP Task 452). Tom, 2026-08-22: *"It's live, but the
+			      // interface has no way to activate it. Should there be a little 'satellite' teaser
+			      // tile/button in the corner of the map like at Google Maps?"* There WAS a way --
+			      // View > Show satellite images -- but the row carries `hidden: !isGeoProject() ||
+			      // !satelliteAvailable()`, so on a grid project it does not exist at all, and on a
+			      // geographic one it is four rows down a menu.
+			      //
+			      // A CELL OF THIS STRIP, NOT A SEVENTH CORNER. The two legends can each be parked in
+			      // any of six corners and the tile attribution owns the seventh, so a teaser in a
+			      // corner of its own has nowhere it cannot collide. This strip is already the
+			      // bottom-left band, is already what zoomExtent() reserves against
+			      // (overlayReserve('lpn_map_footer')), already wraps on a narrow window and is
+			      // already d-print-none -- which is the whole list of things a teaser needs.
+			      //
+			      // THE THUMBNAIL IS DRAWN, NOT FETCHED. A real satellite tile behind this button
+			      // would be a third-party request made before the user asked for one, which is
+			      // precisely what the basemap is opt-in to avoid. It is CSS, in css/engcalcs.css.
+			      // Shown, labelled and wired by refreshBasemapTeaser() in looped-network.js. ?>
+			<button type="button" id="lpn_basemap_teaser" class="lpn-basemap-teaser" style="display:none"></button>
 			<button type="button" id="lpn_scenario_btn" style="pointer-events:auto;font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px;border:1px solid #bbb"></button>
 			<div id="lpn_map_status" style="background:rgba(255,255,255,.8);padding:2px 6px"></div>
 			<?php // Monospace, and only this one: the X/Y digits change on every pointer move, and a

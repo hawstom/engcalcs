@@ -12,6 +12,12 @@
 // wrong; the next resize measures the scrolled page. Nothing in that loop tends back toward a
 // correct answer.
 //
+// **THE VIEWPORT IT MEASURES AGAINST IS viewportHeight(), NOT window.innerHeight**, because a
+// mobile browser reports innerHeight for the LARGE viewport and the map then ends up behind the
+// address bar. This sandbox gives the window no `visualViewport`, which is the desktop case, so
+// every expectation below is unchanged by that; the phone case is asserted in
+// dev/lpn-spike/small-screen-harness.js section 7, against the real loaded module.
+//
 // effectiveMapHeight() is measurement arithmetic over four numbers, and every one of them comes
 // from the browser. That is exactly the shape a harness can pin down without one: feed the four
 // numbers directly, including the impossible combinations a real browser produces at the worst
@@ -68,6 +74,7 @@ function scope(env) {
 		Math: Math
 	};
 	const fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN',
+		extract('viewportHeight') + '\n' +
 		extract('flowBelowMap') + '\n' + extract('effectiveMapHeight') + '\n' +
 		'return effectiveMapHeight();');
 	return fn(sandbox.window, sandbox.document, sandbox.svg, sandbox.LPN_MAP_MIN);
@@ -153,6 +160,7 @@ console.log('\n--- resizing the canvas keeps the view centre, and tiny changes a
 			// page's own boot does: the first applyMapHeight() records it and re-centres nothing.
 			lastMapBox = env.lastBox === undefined ? { w: 1400, h: env.h0 } : env.lastBox;
 		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'state', 'setTransform', 'pageSettled', 'LPN_MAP_HEIGHT_DEADBAND', 'lastMapBox', 'noteMapSized',
+			extract('viewportHeight') + '\n' +
 			extract('flowBelowMap') + '\n' + extract('effectiveMapHeight') + '\n' +
 			extract('applyMapHeight') +
 			'\nreturn applyMapHeight();');

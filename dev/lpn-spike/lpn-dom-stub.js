@@ -216,6 +216,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_project_file', 'lpn_inp_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',
   'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2', 'lpn_map_status',
   'lpn_map_footer',
+  // The satellite teaser, a cell of that strip (ROADMAP Task 452).
+  'lpn_basemap_teaser',
   // The scenario selector/readout in the map's status strip (ROADMAP Task 184).
   'lpn_scenario_btn',
   // The bottom pane and its seven tabs (ROADMAP Task 434, all six asset tables since Task 455). The

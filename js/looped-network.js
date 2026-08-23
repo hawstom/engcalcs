@@ -4726,7 +4726,7 @@ var EngCalcs = EngCalcs || {};
 	function setBasemapStyle(style) {
 		project.basemap = (basemapOn() && basemapStyle() === style) ? 'off' : style;
 		refreshBasemap();
-		refreshBasemapCredit();
+		refreshBasemapChrome();
 		saveToStorage();
 	}
 	function setBasemapOn(on) { setBasemapStyle(on ? 'osm' : 'off'); }
@@ -4735,6 +4735,42 @@ var EngCalcs = EngCalcs || {};
 	// require DIFFERENT wording -- Mapbox's terms name Mapbox and its imagery supplier as well as
 	// OpenStreetMap -- so the credit swaps with the style rather than naming everyone at all times,
 	// which would credit a provider whose tiles are not on screen.
+	// The credit and the teaser change on exactly the same events -- a project opens, a project is
+	// georeferenced, the basemap style changes -- so they have one entry point rather than two lists
+	// of call sites, one of which would eventually be missed.
+	function refreshBasemapChrome() {
+		refreshBasemapCredit();
+		refreshBasemapTeaser();
+	}
+	// **THE TEASER APPEARS ON EXACTLY THE CONDITION THE MENU ROW DOES**, by calling the same two
+	// predicates rather than by restating them: a third copy of "geographic, and we have a token"
+	// is a third thing to keep in step with openViewMenu(). It carries the SAME two strings as that
+	// row and toggles through the SAME setBasemapStyle() seam, so the corner and the menu cannot
+	// come to mean different things -- including the seam's own rule that asking for the style
+	// already showing turns the basemap off.
+	//
+	// IT SURVIVES BELOW 640px. The small-screen pass takes the toolbar away and reduces the menu
+	// bar to icons, so a phone reader has strictly FEWER routes to this than a desktop one; taking
+	// the corner control off the device with the fewest routes is backwards. It costs one 40px
+	// square in a strip that is already there.
+	function refreshBasemapTeaser() {
+		var pc = EngCalcs.pageConfig || {}, b = document.getElementById('lpn_basemap_teaser'), on;
+		if (!b) { return; }
+		if (!isGeoProject() || !satelliteAvailable()) { b.style.display = 'none'; return; }
+		b.style.display = '';
+		on = basemapOn() && basemapStyle() === 'satellite';
+		b.classList.toggle('lpn-basemap-teaser-on', on);
+		var name = on ? (pc.lpn_basemap_satellite_hide || 'Hide satellite images')
+			: (pc.lpn_basemap_satellite_show || 'Show satellite images');
+		b.setAttribute('aria-label', name);
+		b.setAttribute('aria-pressed', on ? 'true' : 'false');
+		b.title = name;
+	}
+	function wireBasemapTeaser() {
+		var b = document.getElementById('lpn_basemap_teaser');
+		if (!b) { return; }
+		b.addEventListener('click', function () { setBasemapStyle('satellite'); });
+	}
 	function refreshBasemapCredit() {
 		var c = document.getElementById('lpn_basemap_credit'), sat;
 		if (!c) { return; }
@@ -5919,7 +5955,7 @@ var EngCalcs = EngCalcs || {};
 		project.basemap = 'osm';
 		doc.origin = { x: 0, y: 0 };
 		refreshBasemap();
-		refreshBasemapCredit();
+		refreshBasemapChrome();
 		refreshMapStatus();
 		setMode('select');
 		// **TWO DIFFERENT JOBS WEAR ONE COMMAND, AND THE NUMBERS SAY WHICH** (Task 447).
@@ -6842,8 +6878,12 @@ var EngCalcs = EngCalcs || {};
 		b = body.getBoundingClientRect().height;
 		return (p > b && b > 0) ? p - b : 0;
 	}
+	// viewportHeight(), not window.innerHeight: the pane's ceiling is a fact about what the reader
+	// can SEE, and a mobile browser's innerHeight counts the strip behind its own toolbars. An
+	// over-tall pane is subtracted from the map by measurement (flowBelowMap), so the map hits its
+	// floor and the page runs off the bottom -- the same symptom, one element further down.
 	function paneMaxHeight() {
-		var vh = window.innerHeight || 800, body = document.getElementById('lpn_pane_body'),
+		var vh = viewportHeight(), body = document.getElementById('lpn_pane_body'),
 			map = svg ? svg.getBoundingClientRect().height : 0,
 			mine = body ? body.getBoundingClientRect().height : 0,
 			room = map + mine - LPN_PANE_MAP_MIN;
@@ -10028,7 +10068,7 @@ var EngCalcs = EngCalcs || {};
 		// Grid or geographic, and basemap on or off, both belong to the project -- so switching
 		// projects can turn the tiles and their attribution on or off (Task 145).
 		refreshBasemap();
-		refreshBasemapCredit();
+		refreshBasemapChrome();
 		lastSolveResult = null;
 		closePopup();
 		buildDom();
@@ -13781,6 +13821,8 @@ var EngCalcs = EngCalcs || {};
 		wireLibraryBox();
 		buildMenuBar();
 		wireScenarioButton();
+		wireBasemapTeaser();
+		refreshBasemapTeaser();
 		wireTabs();
 		applyLegendPosition();
 		applyMapHeight();
@@ -15780,6 +15822,39 @@ var EngCalcs = EngCalcs || {};
 	// canvas. It decides only whether such a window gets a small map that fits the page or a bigger
 	// one that pushes the status strip off the bottom. Not zero, which leaves nothing to aim at.
 	var LPN_MAP_MIN = 80;
+	// **THE HEIGHT THE USER CAN SEE IS NOT window.innerHeight ON A PHONE** (Tom, 2026-08-22: "The
+	// legends think they have more room at the bottom than they do, and they are running off the
+	// bottom of the map. Only on small screen. This can't be scrolled.").
+	//
+	// Nothing is wrong with where the legends are: both are `bottom: 4px` inside the map wrapper, so
+	// they are AT the map's bottom by construction. What was wrong is the map's own height. A mobile
+	// browser reports `innerHeight` for the LARGE viewport -- the page as it would be with the
+	// retractable address bar and bottom toolbar out of the way -- so the canvas was sized to a strip
+	// of page that is behind that chrome. The bottom of the map, and with it the two legends, the
+	// status strip and the tile attribution, sat under the browser's own furniture; `touch-action:
+	// none` on the canvas and `overflow: hidden` on the root (Task 432) then mean there is nothing to
+	// scroll to reach them, which is exactly what Tom reported. Choosing a Top position worked around
+	// it because the top of the map has never been in doubt.
+	//
+	// The DYNAMIC viewport is what the user can see, and visualViewport reports it. So the two
+	// heights are made to AGREE at the one place the map's height is decided, rather than the
+	// legends being nudged back into view -- a nudged legend drifts again the next time the pane
+	// opens. On a desktop the two are equal to the pixel, so nothing above the breakpoint moves.
+	//
+	// `* scale` takes a pinch zoom back out: vv.height is in VISUAL pixels, and only the browser
+	// chrome's share of the difference belongs in a layout measurement. `Math.min` because a wrong
+	// answer here may only ever be SMALLER than innerHeight -- a bigger one is the bug.
+	//
+	// NO visualViewport 'resize' LISTENER, deliberately. The root cannot scroll, so the dynamic
+	// toolbars do not retract on their own and the value is stable between the resize and
+	// orientationchange events that already re-measure. Subscribing would instead make the map
+	// resize under the on-screen keyboard, which shrinks the visual viewport on iOS every time a
+	// property box is typed into.
+	function viewportHeight() {
+		var vh = window.innerHeight || 800, vv = window.visualViewport;
+		if (!vv || !(vv.height > 0)) { return vh; }
+		return Math.min(vh, Math.round(vv.height * (vv.scale || 1)));
+	}
 	// How much ordinary page sits BELOW the canvas, in document flow. The popovers do not count:
 	// every one of them is position:fixed and display:none, so they occupy no flow at all -- which
 	// is why this measures the document rather than listing elements by id, a list that would go
@@ -15801,7 +15876,7 @@ var EngCalcs = EngCalcs || {};
 		return below > 0 ? below : 0;
 	}
 	function effectiveMapHeight() {
-		var vh = window.innerHeight || 800;
+		var vh = viewportHeight();
 		if (!svg) { return vh; }
 		var docEl = document.documentElement;
 		var rect = svg.getBoundingClientRect();
@@ -15945,7 +16020,7 @@ var EngCalcs = EngCalcs || {};
 		// One bounded re-measure, NEVER a loop. By the time this runs the new height has been applied
 		// and the page re-laid out around it. The floor is exempt because a canvas at LPN_MAP_MIN is
 		// allowed to overflow -- that overflow is a decision.
-		var vh = window.innerHeight || 800;
+		var vh = viewportHeight();
 		if (!secondPass && before.bottom > vh + 1 && before.height > LPN_MAP_MIN) {
 			applyMapHeight(true);
 		}
@@ -16523,7 +16598,7 @@ var EngCalcs = EngCalcs || {};
 		// weakest case there is for promoting a row out of its section. The earlier "fiddled with
 		// often" justification for keeping it loose did not survive contact with the section it
 		// obviously belongs to.
-		row(mapBody, pc.lpn_settings_legend_position || 'Legend position', legendSelect);
+		row(mapBody, pc.lpn_settings_legend_position || 'Labels legend position', legendSelect);
 		// There is no "Saving to a file" section (Task 211): nothing is written to a file on a timer.
 		// Its 60-180 s range protected a coupling rather than the user -- one number doing three jobs
 		// (write interval, lock heartbeat, takeover threshold).

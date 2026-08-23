@@ -92,11 +92,19 @@ function cssRules(src) {
 // `print`, `prefers-color-scheme` and `prefers-reduced-motion` are all declared NOT to apply --
 // this harness is about the screen a person is looking at. @supports always applies: every
 // condition in this file is one every current engine satisfies.
-function mediaApplies(media, widthPx) {
+// **AND A POINTER DIMENSION, because a media query is a viewport test and a touch test is not one.**
+// The spinner-removal half of Tom's item (8) is asked as `(hover: none) and (pointer: coarse)`,
+// nested inside the width block; a reader that ignored those two conditions would answer "it
+// applies" at every width and prove the opposite of what the nesting is for.
+function mediaApplies(media, widthPx, touch) {
 	return media.every((q) => {
 		if (q.startsWith('@supports')) { return true; }
 		if (/\bprint\b/.test(q)) { return false; }
 		if (/prefers-/.test(q)) { return false; }
+		if (/hover:\s*none/.test(q) && !touch) { return false; }
+		if (/pointer:\s*coarse/.test(q) && !touch) { return false; }
+		if (/hover:\s*hover/.test(q) && touch) { return false; }
+		if (/pointer:\s*fine/.test(q) && touch) { return false; }
 		let m = /max-width:\s*([0-9.]+)px/.exec(q);
 		if (m && !(widthPx <= parseFloat(m[1]))) { return false; }
 		m = /min-width:\s*([0-9.]+)px/.exec(q);
@@ -113,13 +121,33 @@ function mediaApplies(media, widthPx) {
 // reported rather than silently answered false, which is what would turn this file green forever.
 const unreadable = new Set();
 function compound(part) {
-	const toks = part.match(/(::?[a-z-]+\([^)]*\)|[#.][A-Za-z0-9_-]+|^[a-z][a-z0-9]*|\*)/g);
+	const toks = part.match(/(::?[a-z-]+\([^)]*\)|::?[a-z-]+|[#.][A-Za-z0-9_-]+|^[a-z][a-z0-9]*|\*)/g);
 	if (!toks || toks.join('') !== part) { return null; }
-	const spec = { tag: null, ids: [], cls: [], not: [], has: [] };
+	const spec = { tag: null, ids: [], cls: [], not: [], has: [], nth: [], last: false, state: null };
 	for (const t of toks) {
 		if (t === '*') { continue; }
 		else if (t[0] === '#') { spec.ids.push(t.slice(1)); }
 		else if (t[0] === '.') { spec.cls.push(t.slice(1)); }
+		// **:nth-child COUNTS ELEMENTS, NOT VISIBLE ONES**, which is why the labels heading row can
+		// lose its lead cell to `display: none` and still have its four headings matched as children
+		// 2-5. A reader that renumbered would report the columns lining up where they do not.
+		else if (t.startsWith(':nth-child(')) {
+			const n = t.slice(11, -1).trim();
+			if (!/^[0-9]+$/.test(n)) { return null; }
+			spec.nth.push(+n);
+		} else if (t === ':first-child') { spec.nth.push(1); }
+		else if (t === ':last-child') { spec.last = true; }
+		// **A STATE THIS READER IS ENTITLED TO DECLARE FALSE.** Nothing here is hovered, focused,
+		// pressed, disabled or checked -- these are rules about a moment, and every question this
+		// file asks is about the resting page. Declaring it is what keeps such a selector out of the
+		// blind-spot report, where it would read as a rule the reader could not understand.
+		else if (/^:(hover|focus|focus-visible|active|disabled|enabled|checked|visited|target)$/.test(t)) {
+			spec.state = false;
+		}
+		// A PSEUDO-ELEMENT IS NOT AN ELEMENT IN THIS TREE. `::-webkit-inner-spin-button` styles a
+		// part the browser draws inside an <input>; no node here is it, and no question this file
+		// asks is about one. Declared rather than left unreadable, for the same reason as above.
+		else if (t.startsWith('::')) { spec.state = false; }
 		else if (t.startsWith(':not(')) {
 			const inner = compound(t.slice(5, -1));
 			if (!inner) { return null; }
@@ -133,6 +161,11 @@ function compound(part) {
 	}
 	return spec;
 }
+// 1-based position among the parent's element children. A node with no parent is an only child.
+function childIndex(node) {
+	if (!node.parent) { return 1; }
+	return node.parent.children.indexOf(node) + 1;
+}
 function matchesCompound(node, spec, docIds) {
 	if (!spec) { return false; }
 	if (spec.tag && node.tag !== spec.tag) { return false; }
@@ -140,6 +173,9 @@ function matchesCompound(node, spec, docIds) {
 	if (spec.cls.some((c) => node.cls.indexOf(c) < 0)) { return false; }
 	if (spec.not.some((n) => matchesCompound(node, n, docIds))) { return false; }
 	if (spec.has.some((id) => docIds.indexOf(id) < 0)) { return false; }
+	if (spec.nth.some((n) => childIndex(node) !== n)) { return false; }
+	if (spec.last && node.parent && childIndex(node) !== node.parent.children.length) { return false; }
+	if (spec.state === false) { return false; }
 	return true;
 }
 function matches(node, sel, docIds) {
@@ -174,22 +210,45 @@ function matches(node, sel, docIds) {
 }
 
 // A node is hidden at this width if any applying rule matching it OR an ancestor says so.
-function hiddenAt(RULES, node, widthPx, docIds) {
+function hiddenAt(RULES, node, widthPx, docIds, touch) {
 	for (let n = node; n; n = n.parent) {
 		for (const r of RULES) {
 			if (!/display:\s*none/.test(r.body)) { continue; }
-			if (!mediaApplies(r.media, widthPx)) { continue; }
+			if (!mediaApplies(r.media, widthPx, touch)) { continue; }
 			if (matches(n, r.sel, docIds)) { return r; }
 		}
 	}
 	return null;
 }
+// **WHICH DECLARATION ACTUALLY WINS**, which declaredAt() below does not ask: it answers with the
+// FIRST match in the file, and every width in the labels lists is declared twice -- once near the
+// top of the stylesheet for the desktop and once in the small-screen block. Asking the first would
+// report the desktop width at 360 px, on a rule that never fires there.
+//
+// Order and importance only, not specificity. Every pair this is used on is `!important` against
+// `!important` or bare against bare, and the small-screen selector carries the extra
+// `html:has(#lpn_canvas)`, so it wins on specificity as well as on order and the two answers cannot
+// disagree. An unreadable selector is reported by the blind-spot check at the foot of the file.
+function winning(RULES, node, widthPx, docIds, touch, prop) {
+	const re = new RegExp('(?:^|;)\\s*' + prop + ':\\s*([^;]+)');
+	let best = null;
+	for (const r of RULES) {
+		if (!mediaApplies(r.media, widthPx, touch)) { continue; }
+		const m = re.exec(r.body);
+		if (!m) { continue; }
+		if (!matches(node, r.sel, docIds)) { continue; }
+		const val = m[1].trim(), imp = /!important/.test(val);
+		if (best && best.imp && !imp) { continue; }
+		best = { val: val.replace(/!important/, '').trim(), imp: imp };
+	}
+	return best ? best.val : null;
+}
 // Any applying rule that matches this node and declares the property -- used for the navbar,
 // which is COLLAPSED rather than hidden, so "is it display:none" is the wrong question.
-function declaredAt(RULES, node, widthPx, docIds, prop) {
+function declaredAt(RULES, node, widthPx, docIds, prop, touch) {
 	const re = new RegExp(prop + ':\\s*([^;]+)');
 	for (const r of RULES) {
-		if (!mediaApplies(r.media, widthPx)) { continue; }
+		if (!mediaApplies(r.media, widthPx, touch)) { continue; }
 		const m = re.exec(r.body);
 		if (m && matches(node, r.sel, docIds)) { return m[1].trim(); }
 	}
@@ -248,7 +307,12 @@ function idsIn(root) {
 const L = stub.loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, setDoc: function (d) { doc = d; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs,\n" +
-	"\t\tbuildMenuBar: buildMenuBar, wireToolbar: wireToolbar,\n" +
+		"\t\tbuildMenuBar: buildMenuBar, wireToolbar: wireToolbar,\n" +
+		// Section 7 drives the map's height arithmetic directly, and section 8 builds the two
+		// symbology lists with the real builder rather than modelling their rows here -- a modelled
+		// row would keep passing the day labelCheckbox() adds a column.
+		"\t\teffectiveMapHeight: function () { return effectiveMapHeight(); },\n" +
+		"\t\trebuildLabelsFields: rebuildLabelsFields,\n" +
 	// **THE MENUS, OPENED FOR REAL.** openMenu() is swapped for a collector rather than the row
 	// arrays being read out of the source text: a source read would pass on a row that throws, and
 	// would miss a row assembled conditionally (File's Save/Save as, View's basemap pair).
@@ -476,17 +540,230 @@ console.log('\n--- nothing leaks to the other fifteen calculators ---');
 });
 ok('...and the navbar there keeps its padding', declaredAt(RULES, otherNav, 360, OTHER_IDS, 'padding-top') === null);
 
+// **THE SATELLITE TEASER SURVIVES THE PHONE, AND THAT IS A DECISION.** The small-screen pass takes
+// the whole toolbar away and reduces the menu bar to icons, so a phone reader has strictly fewer
+// routes to the satellite row than a desktop one -- taking the corner control off the device with
+// the fewest routes is backwards. It costs one 40px square in a strip that is already on screen.
 console.log('\n--- what may never be hidden at any width ---');
-[[credit, 'the basemap attribution']].forEach(([n, label]) => {
+const teaser = node('button', 'lpn_basemap_teaser', ['lpn-basemap-teaser'],
+	node('div', 'lpn_map_footer', ['d-print-none'], body));
+[[credit, 'the basemap attribution'], [teaser, 'the satellite teaser']].forEach(([n, label]) => {
 	ok(label + ' is visible on a small screen', !hiddenAt(RULES, n, SMALL, DOC_IDS));
 	ok('...' + label + ' is visible on the desktop', !hiddenAt(RULES, n, WIDE, DOC_IDS));
 });
+
+
+// ============================================================================================
+// 7. THE MAP HEIGHT AGREES WITH THE HEIGHT THE USER CAN SEE (Tom's item 11)
+// ============================================================================================
+// Tom, 2026-08-22: *"The legends think they have more room at the bottom than they do, and they are
+// running off the bottom of the map. Only on small screen. This can't be scrolled."*
+//
+// **THE LEGENDS WERE NEVER WRONG.** Both are `bottom: 4px` inside the map wrapper, so a legend is at
+// the map's bottom by construction and nothing about it can drift. What was wrong is the map's own
+// height: effectiveMapHeight() measured `window.innerHeight`, and a mobile browser reports that for
+// the LARGE viewport -- the page as it would be if the address bar and the bottom toolbar were out
+// of the way. So the canvas was sized to include a strip of page that is behind the browser's own
+// furniture, and everything anchored to its bottom went there with it, unreachable because the
+// canvas swallows touches (`touch-action: none`) and the root does not scroll (Task 432).
+//
+// This section asks the arithmetic directly, with the layout MODELLED rather than measured -- the
+// stub's rects are constants, and a constant rect is the stub failure dev/testing-notes.md names.
+// The one physical relationship modelled here is the only one the formula reads: the canvas starts
+// `above` pixels down and `below` pixels of page follow it, so body.bottom is canvas.bottom + below.
+console.log('\n--- the map is never taller than the viewport the user can actually see ---');
+{
+	const canvas = stub.byId.lpn_canvas;
+	const realCanvasRect = canvas.getBoundingClientRect;
+	const realBodyRect = global.document.body.getBoundingClientRect;
+	const ABOVE = 156, BELOW = 0, APPLIED = 600;
+	const layout = function (layoutH, visibleH) {
+		canvas.getBoundingClientRect = () => ({ left: 0, top: ABOVE, right: 360, bottom: ABOVE + APPLIED, width: 360, height: APPLIED });
+		global.document.body.getBoundingClientRect = () => ({ left: 0, top: 0, right: 360, bottom: ABOVE + APPLIED + BELOW, width: 360, height: ABOVE + APPLIED + BELOW });
+		global.window.innerHeight = layoutH;
+		if (visibleH === null) { delete global.window.visualViewport; }
+		else { global.window.visualViewport = { height: visibleH, scale: 1 }; }
+		return L.effectiveMapHeight();
+	};
+	// A desktop, where the two viewports are the same number: the answer must not move at all.
+	const plain = layout(900, null);
+	ok('with no visualViewport the map still fills the window below the chrome', plain === 900 - ABOVE,
+		plain + ' from a 900px window whose canvas starts at ' + ABOVE);
+	ok('...and a visualViewport that agrees changes nothing', layout(900, 900) === plain);
+	// A phone whose browser chrome covers 90px of the layout viewport.
+	const phone = layout(740, 650);
+	ok('a map on a phone is sized to the DYNAMIC viewport, not the large one', phone === 650 - ABOVE,
+		phone + ', wanted ' + (650 - ABOVE));
+	ok('...so the bottom of the map -- and every legend anchored to it -- is on screen',
+		ABOVE + phone + BELOW <= 650, 'map ends at ' + (ABOVE + phone) + ' of 650 visible');
+	// A pinch zoom shrinks the visual viewport and is NOT browser chrome, so it must not shrink the
+	// map: vv.height * vv.scale takes the zoom back out.
+	global.window.visualViewport = { height: 370, scale: 2 };
+	ok('a pinch zoom does not shrink the map', L.effectiveMapHeight() === 740 - ABOVE,
+		L.effectiveMapHeight() + ' at scale 2 in a 740px window');
+	// And the floor still wins in a window too short to hold anything.
+	ok('a window shorter than the chrome above the map still leaves a map', layout(200, 120) === 80);
+	delete global.window.visualViewport;
+	global.window.innerHeight = 900;
+	canvas.getBoundingClientRect = realCanvasRect;
+	global.document.body.getBoundingClientRect = realBodyRect;
+}
+
+// ============================================================================================
+// 8. THE SYMBOLOGY ROWS GET NARROWER GRACEFULLY (Tom's items 6, 7 and 8)
+// ============================================================================================
+// The two lists are built by the REAL builder, so the row shape asserted below is the row shape the
+// visitor gets -- a hand-modelled row would keep passing the day a column is added.
+console.log('\n--- the Node and Link symbology rows wrap as a group below the breakpoint ---');
+L.rebuildLabelsFields();
+const TOUCH = true;
+['node', 'link'].forEach((group) => {
+	const list = adopt(stub.byId['lpn_labels_' + group + '_fields'], body);
+	const rows = list.children;
+	ok(group + ' symbology built its rows for real', rows.length > 3, rows.length + ' rows');
+	const heading = rows[0], field = rows.filter((r) => r.children.some((c) => c.tag === 'input'))[0];
+	ok('...the first row is the column headings', heading.children.every((c) => c.tag === 'span'));
+	ok('...and a field row carries a label and its boxes', !!field && field.children[0].tag === 'label');
+
+	// (7) IDEA B: the label takes a whole line, so the four boxes wrap together under it.
+	ok(group + ': the name takes the whole line on a small screen',
+		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'flex') === '1 1 100%');
+	ok('...and the row is allowed to wrap at all',
+		winning(RULES, field, SMALL, DOC_IDS, false, 'flex-wrap') === 'wrap');
+	ok('...and the 11.5rem ceiling on the name is lifted with it',
+		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'max-width') === 'none');
+	ok('...while on the desktop the name keeps its ceiling and no flex of its own',
+		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'flex') === null &&
+		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'max-width') === '11.5rem');
+	ok('...and the desktop row does not wrap',
+		winning(RULES, field, WIDE, DOC_IDS, false, 'flex-wrap') === null);
+	// The heading row's lead cell goes, so the headings start where the wrapped group starts.
+	ok(group + ": the heading row's lead cell goes on a small screen",
+		!!hiddenAt(RULES, heading.children[0], SMALL, DOC_IDS));
+	ok('...and stays on the desktop', !hiddenAt(RULES, heading.children[0], WIDE, DOC_IDS));
+
+	// (8) THE FOUR COLUMNS, HEADING AND BOX ALIKE. A heading that is not the same width as the box
+	// under it is the defect this list has already been fixed for twice, so the assertion is that
+	// the two agree -- at every width, and with and without a spinner.
+	const want = { 2: '2.08rem', 3: '1.04rem', 4: '2.56rem', 5: '2.56rem' };
+	const wantTouch = { 2: '2.08rem', 3: '1.04rem', 4: '1.6rem', 5: '1.6rem' };
+	const wantWide = { 2: '2.6rem', 3: '2.6rem', 4: '3.2rem', 5: '3.2rem' };
+	[2, 3, 4, 5].forEach((i) => {
+		const h = heading.children[i - 1], b = field.children[i - 1];
+		ok(group + ' column ' + i + ' is ' + want[i] + ' on a small screen',
+			winning(RULES, h, SMALL, DOC_IDS, false, 'width') === want[i],
+			'heading says ' + winning(RULES, h, SMALL, DOC_IDS, false, 'width'));
+		ok('...and its box says the same thing',
+			winning(RULES, b, SMALL, DOC_IDS, false, 'width') === want[i],
+			'box says ' + winning(RULES, b, SMALL, DOC_IDS, false, 'width'));
+		// **ON THE DESKTOP THE BOX'S WIDTH IS NOT IN THE STYLESHEET AT ALL** -- labelCheckbox()
+		// writes it inline -- so the desktop question is asked of the two places it really lives:
+		// the heading's CSS rule and the box's own inline style. That they are the same string is
+		// the property the last two rounds of Task 435 were about.
+		ok('...the desktop heading is unchanged at ' + wantWide[i],
+			winning(RULES, h, WIDE, DOC_IDS, false, 'width') === wantWide[i],
+			'got ' + winning(RULES, h, WIDE, DOC_IDS, false, 'width'));
+		ok('...and the box it names still carries that width inline',
+			(b.el.style.width || wantWide[i]) === wantWide[i], 'inline width ' + b.el.style.width);
+		ok('...and on a TOUCH screen below the breakpoint it is ' + wantTouch[i],
+			winning(RULES, h, SMALL, DOC_IDS, TOUCH, 'width') === wantTouch[i] &&
+			winning(RULES, b, SMALL, DOC_IDS, TOUCH, 'width') === wantTouch[i]);
+		// **THE TOUCH RULE MAY NOT REACH THE DESKTOP.** It is nested inside the width block for
+		// exactly this reason, and a touchscreen laptop is the case that would prove it wrong.
+		// **THE TOUCH RULE MAY NOT REACH THE DESKTOP**, and the question is asked as "does the
+		// pointer type change the answer up here", which is the property, rather than as a width --
+		// a spacer <span> and an <input> legitimately answer differently on the desktop.
+		ok('...and a TOUCH screen ABOVE the breakpoint changes nothing',
+			winning(RULES, h, WIDE, DOC_IDS, TOUCH, 'width') === winning(RULES, h, WIDE, DOC_IDS, false, 'width') &&
+			winning(RULES, b, WIDE, DOC_IDS, TOUCH, 'width') === winning(RULES, b, WIDE, DOC_IDS, false, 'width'));
+	});
+	// The two numeric boxes give up their spinner on touch, and only there.
+	// EVERY spinner in the list, not the first row's -- a node's ID row has neither, so a check
+	// written against one row would have asserted nothing on half the lists.
+	const spin = [];
+	rows.forEach((r) => r.children.forEach((c) => { if (c.cls.indexOf('ec-spin') >= 0) { spin.push(c); } }));
+	ok(group + ' has spinner boxes on its field rows', spin.length > 0, spin.length + ' found');
+	spin.forEach((b) => {
+		ok('...the spinner goes on a touch screen below the breakpoint',
+			winning(RULES, b, SMALL, DOC_IDS, TOUCH, 'appearance') === 'textfield');
+		ok('...and stays for a pointer at the same width',
+			winning(RULES, b, SMALL, DOC_IDS, false, 'appearance') === null);
+		ok('...and stays on a touch screen above it',
+			winning(RULES, b, WIDE, DOC_IDS, TOUCH, 'appearance') === null);
+	});
+	// And the list's own floor comes down, or the box still refuses to narrow.
+	ok(group + ' list floor is 10.5rem on a small screen',
+		winning(RULES, list, SMALL, DOC_IDS, false, 'min-width') === '10.5rem');
+	ok('...8.5rem when the spinners have gone too',
+		winning(RULES, list, SMALL, DOC_IDS, TOUCH, 'min-width') === '8.5rem');
+	ok('...and 13rem on the desktop, untouched',
+		winning(RULES, list, WIDE, DOC_IDS, false, 'min-width') === '13rem' &&
+		winning(RULES, list, WIDE, DOC_IDS, TOUCH, 'min-width') === '13rem');
+});
+
+console.log('\n--- the Settings index pane (Tom asked for 0.8 of it on the PC, and narrower here) ---');
+{
+	const panes = node('div', '', ['lpn-setbox-panes'], body);
+	const index = node('div', 'lpn_setbox_index', ['lpn-setbox-index'], panes);
+	ok('the index pane is 6rem on the desktop -- 0.8 x the 7.5rem it shipped at',
+		winning(RULES, index, WIDE, DOC_IDS, false, 'flex') === '0 0 6rem');
+	ok('...and 4.5rem below the breakpoint',
+		winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis') === '4.5rem');
+	ok('...with nothing narrowing it above the breakpoint',
+		winning(RULES, index, WIDE, DOC_IDS, false, 'flex-basis') === null);
+	// A <button> does not wrap its text by itself, so without this the narrower pane answers with a
+	// sideways scrollbar instead of a second line -- measured at 94px of "Node symbology" in a 65px
+	// box before the rule was added.
+	const link = node('button', '', ['lpn-setbox-link'], index);
+	ok('an index row may wrap, and may break a long word',
+		winning(RULES, link, WIDE, DOC_IDS, false, 'white-space') === 'normal' &&
+		winning(RULES, link, WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
+	// The Libraries box borrows the whole Settings shell, so its own narrower index is an override
+	// on the same class rather than a second pane design (Tom's item 9).
+	const libpanes = node('div', '', ['lpn-setbox-panes'], node('div', 'lpn_library_box', ['lpn-popover', 'lpn-setbox', 'lpn-libbox'], body));
+	const libindex = node('nav', 'lpn_libbox_index', ['lpn-setbox-index'], libpanes);
+	ok('the Libraries index pane is 5.25rem -- 0.70 x the 7.5rem it shipped at',
+		winning(RULES, libindex, WIDE, DOC_IDS, false, 'flex-basis') === '5.25rem');
+	ok('...and it takes the phone width below the breakpoint, like every other index',
+		winning(RULES, libindex, SMALL, DOC_IDS, false, 'flex-basis') === '4.5rem');
+}
+
+// ============================================================================================
+// 9. THE NON-BLOCKERS: A SHORT SCREEN, AND THE TABLES IN THE BOTTOM PANE
+// ============================================================================================
+console.log('\n--- a box on a short screen, and the pane tables (Tom\'s items 5 and 10) ---');
+{
+	// **KEYED OFF THE VIEWPORT HEIGHT, NOT THE 640px WIDTH**, because a short window on a laptop is
+	// the same problem and is not a phone. The reader treats @supports as always applying, so the
+	// dvh rule is the one that must be found at BOTH widths -- which is the assertion, since a
+	// height limit that only a phone gets would be the wrong shape for this item.
+	const setbox = node('div', 'lpn_settings_box', ['lpn-popover', 'lpn-setbox'], body);
+	[[WIDE, 'a wide window'], [SMALL, 'a phone']].forEach(([w, what]) => {
+		ok('in ' + what + ' the Settings box is capped in dvh, not vh',
+			winning(RULES, setbox, w, DOC_IDS, false, 'max-height') === '96dvh',
+			'got ' + winning(RULES, setbox, w, DOC_IDS, false, 'max-height'));
+		ok('...and its opening height is capped the same way',
+			winning(RULES, setbox, w, DOC_IDS, false, 'height') === 'min(46rem, 92dvh)');
+	});
+	// A cap alone would only move the overflow inside the box; the panes are what scroll.
+	const panes2 = node('div', '', ['lpn-setbox-panes'], setbox);
+	ok('...and the panes inside it scroll, so the capped box does not spill',
+		winning(RULES, node('div', '', ['lpn-setbox-content'], panes2), SMALL, DOC_IDS, false, 'overflow') === 'auto');
+
+	// Tom's (10). The one imposed width in those tables, halved below the breakpoint.
+	const tbl = node('table', '', ['lpn-pane-table'], node('div', 'lpn_pane', [], body));
+	const cell = node('input', '', [], node('td', '', [], node('tr', '', [], tbl)));
+	ok('a pane table number box is 3.5em on a small screen -- half of what it was',
+		winning(RULES, cell, SMALL, DOC_IDS, false, 'width') === '3.5em');
+	ok('...and 7em on the desktop, which did not move',
+		winning(RULES, cell, WIDE, DOC_IDS, false, 'width') === '7em');
+}
 
 // The reader's blind-spot report, scoped to selectors that could possibly reach what this file
 // checks. A rule about print sheets or curve tables is none of this check's business.
 {
 	const blind = [...unreadable].filter((sel) =>
-		/lpn-menubar|lpn-toolbar|lpn_toolbar|lpn_menubar|ec-page-|navbar|ec-nav-libre|lpn-transport/.test(sel));
+		/lpn-menubar|lpn-toolbar|lpn_toolbar|lpn_menubar|ec-page-|navbar|ec-nav-libre|lpn-transport|lpn_labels_|lpn-setbox/.test(sel));
 	ok('every rule that mentions the chrome this pass touches was readable', blind.length === 0,
 		blind.join(' | '));
 }
