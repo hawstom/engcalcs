@@ -198,11 +198,14 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
 - **Design this page for a pointer; then make a phone survivable.** It is a full-window drawing
   surface with a menu bar, toolbar, tab strip and property popup, so the desktop layout is the
   authoritative one and no design argument starts from a phone. Say "pointer slop" when you mean
-  hand-and-mouse tolerance; a 44px touch target is not an argument here. But **"almost impossible on
-  a phone" is retired** (Tom, 2026-08-22): it is tested and usable there, and the small-screen pass
-  he asked for is Task 486 — hide page titles, collapse the navbar, keep only the transport
-  controls on the toolbar, and drop menu text to icons. The other calculators are a form and an
-  answer and are fine as they are.
+  hand-and-mouse tolerance; a 44px touch target is not an argument here. **This is a PC app the way
+  EPANET and epanet-js are** — epanet-js takes that stance slightly harder than Tom wants to, and his
+  framing is *"for PC of course, but go ahead and try it on your phone"*. **It is NOT usable on a
+  phone today** (Tom, 2026-08-22), and the four small-screen items of Task 486 — hide page titles,
+  collapse the navbar, keep only the transport controls on the toolbar, drop menu text to icons —
+  are what he expects to move it from "obviously never tried on a phone" to "well, maybe". Say so
+  conditionally until they ship. The other calculators are a form and an answer and are fine as they
+  are.
 
 ---
 
