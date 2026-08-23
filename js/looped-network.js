@@ -8138,6 +8138,20 @@ var EngCalcs = EngCalcs || {};
 		if (!c.set) { return String(v); }
 		return paneNumText(v);
 	}
+	// **A HEADING AND ITS CELLS ARE ONE COLUMN, SO THEY CARRY THE SAME CLASSES** (Tom, 2026-08-23:
+	// "the inputs and the headings are not middle/center justified with each other. Inputs are left
+	// and headings are center"). A <button> is centred by every browser's own stylesheet, and a
+	// heading long enough to wrap -- which on a phone is most of them -- then centres its lines over
+	// a column of left-or-right-aligned cells. One predicate, `c.result || c.set`, decides the
+	// alignment of the whole column here, and it is the same predicate the printed sheet has always
+	// used: a number is a number whether it was typed or computed, and figures read as one column
+	// only when they are right-aligned. An ID, a node name and a valve type stay left.
+	//
+	// The per-key class is what lets a stylesheet reach ONE column -- the Pipes table is wider than a
+	// phone and its Roughness and Minor loss columns are narrowed below the breakpoint.
+	function paneCellClass(c) {
+		return 'lpn-pane-col-' + c.key + ((c.result || c.set) ? ' lpn-pane-num' : '');
+	}
 	function paneHeadingText(c) {
 		var pc = EngCalcs.pageConfig || {},
 			text = (typeof c.label === 'function') ? c.label() : (pc[c.label] || c.key),
@@ -8175,6 +8189,7 @@ var EngCalcs = EngCalcs || {};
 		tr = document.createElement('tr');
 		spec.cols.forEach(function (c) {
 			var th = document.createElement('th'), b = document.createElement('button');
+			th.className = paneCellClass(c);
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
 			// The arrow is on the sorted column only, and it is the whole of the sort UI: a heading
@@ -8213,6 +8228,7 @@ var EngCalcs = EngCalcs || {};
 		var tr = document.createElement('tr'), cells = {};
 		spec.cols.forEach(function (c) {
 			var td = document.createElement('td'), btn, input;
+			td.className = paneCellClass(c);
 			if (c.key === 'id') {
 				// The ID is a way BACK TO THE MAP, not a text box: it selects the part and pans to
 				// it, the same gesture a Find result row is. Renaming stays in the property popup,
@@ -8227,8 +8243,7 @@ var EngCalcs = EngCalcs || {};
 				// **A RESULT IS NEVER AN INPUT**, and neither is an identity the drawing owns. Both
 				// are plain cells with no control in them at all, so there is no path by which
 				// either could be typed into.
-				if (c.result) { td.className = 'lpn-pane-num'; }
-				else { td.textContent = paneCellText(c, el); }
+				if (!c.result) { td.textContent = paneCellText(c, el); }
 				cells[c.key] = td;
 			} else {
 				input = document.createElement('input');
@@ -8318,6 +8333,7 @@ var EngCalcs = EngCalcs || {};
 		tr = document.createElement('tr');
 		spec.cols.forEach(function (c) {
 			var th = document.createElement('th');
+			th.className = paneCellClass(c);
 			th.textContent = paneHeadingText(c);
 			tr.appendChild(th);
 		});
@@ -8328,10 +8344,7 @@ var EngCalcs = EngCalcs || {};
 			var row = document.createElement('tr');
 			spec.cols.forEach(function (c) {
 				var td = document.createElement('td');
-				// A number is a number whether it was typed or computed: both columns are figures
-				// and both read as one column only if they are right-aligned. The ID and the two
-				// ends stay left, where a name belongs.
-				if (c.result || c.set) { td.className = 'lpn-pane-num'; }
+				td.className = paneCellClass(c);
 				td.textContent = paneCellText(c, el);
 				row.appendChild(td);
 			});
@@ -17750,6 +17763,8 @@ var EngCalcs = EngCalcs || {};
 			[(pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
 				valueLabel + ' (' + unitLabel('lpn_u_elevhead') + ')'].forEach(function (t) {
 				var th = document.createElement('th');
+				// Both columns are figures, so both headings sit over their own right-aligned cells.
+				th.className = 'lpn-pane-num';
 				th.textContent = t;
 				hrow.appendChild(th);
 			});
