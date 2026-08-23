@@ -104,6 +104,13 @@ the block.
     - **THIS PASS CONVERGES ACROSS PASSES,** which is a trap for anyone comparing it: it seeds node
       labels as obstacles where the last layout PLACED them, so two identical runs back to back in
       one process already disagree on one label. Compare backends in separate processes.
+  - **AND IT IS STILL 2.5–3.3 s END TO END, WHICH THE COUNTS CANNOT SEE.** Measured in Chromium
+    AFTER both fixes above, on the same 736-element geographic grid: the block after a zoom runs
+    2.5–3.3 s with labels on against **0.5–0.7 s with every label field switched off**, so what is
+    left is label work. One run of the identical gesture hit 16.9 s. Forced layouts are held at 9
+    per notch and overlap tests at ~7 per label, so the remaining cost is PER-LABEL work no index
+    removes — text measurement is the suspect and is unproven. `specs/perf.js` reports the number
+    and asserts no bound: the spread is wider than any honest threshold.
   - Placement leftovers, small: a background image is not carried onto the map, the two-control-point
     path (`lpnGeorefFromTwoPoints`) is built and tested with no interface, and Finish is not undoable.
   - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the
