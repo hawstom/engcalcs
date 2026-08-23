@@ -13,7 +13,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 - Task 145 — GEOGRAPHIC PROJECTS: grid or geographic, declared before anything is drawn.
 - Task 389 — Search and replace inputs across the network, no longer gated on size.
-- Task 436 — A wheel notch costs a full label relayout, editor-wide.
+- Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
 

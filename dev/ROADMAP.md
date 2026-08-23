@@ -82,14 +82,17 @@ the block.
   - Distinct from Task 185 (Match/Copy properties), which stays a click-source-then-click-targets
     tool. Both ship; neither replaces the other.
 
-- 100|436| **A wheel notch costs a full label relayout, editor-wide.**
-  Measured on Net3, median per notch: 157 ms XY, 162 ms lat/lon, **26 ms with labels off**. lat/lon is
-  not intrinsically slower — the georeferencing tool is ~20x cheaper than the editor it runs inside.
-  **The task is why a relayout runs on every notch at all.**
-  - **INTENT: a zoom resumes from the current state instead of starting from scratch.** A wheel notch
-    changes scale, not topology, so the relayout should continue from the current label placement
-    rather than re-running placement from nothing. Tom's proposal and the right shape; the intended
-    direction, not binding on an implementer who finds better.
+- 100|436| **What a wheel notch costs, and the placement leftovers.**
+  **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
+  What that one pass costs, in Chromium on the 480-pipe grid `specs/perf.js` builds: 1.3–7.3 s in
+  `reshedLinkLabels()` against 0.06–0.24 s in `relayoutLabels()`. So the relayout was never the
+  problem; the CONTENT cascade beside it was, running one label at a time — the quadratic Task 440
+  fixed in `refreshLabelText()` and left in this path. Batched 2026-08-23: **1,008 forced layouts per
+  notch → 9** on a 112-pipe grid, every label keeping the same values, guarded by
+  `dev/lpn-spike/zoom-reshed-harness.js`; 44–458 ms in the browser.
+  - **WHAT IS LEFT IS `shedAlignedForConflicts()`,** now the whole of it: 0.3–1.8 s per notch, over
+    9M box-overlap tests across eleven passes. Its cascade has a cross-label term, so it cannot be
+    batched — but its obstacle walk is un-indexed, which is the shape Task 472 fixed for segments.
   - Placement leftovers, small: a background image is not carried onto the map, the two-control-point
     path (`lpnGeorefFromTwoPoints`) is built and tested with no interface, and Finish is not undoable.
   - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the
