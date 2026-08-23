@@ -236,6 +236,13 @@ the block.
     and `~/libreepanet.org` are already web roots. Options and the recommendation:
     `dev/hosting-layout.md`.
 
+- 75|485| **All six production logs start within four minutes of 2026-08-14.**
+  Nobody archived, purged or emptied them, yet the window is 8.5 days and `engcalcs-lang.log`,
+  `-human-view.log`, `-calc-usage.log`, `-title.log`, `-signal.log` and `-contact-send.log` each
+  begin at 2026-08-14T11:57–11:58Z. Six files truncated at once is one event, not attrition —
+  candidates are host log rotation, a deploy that recreated the directory, or a quota event.
+  **Until it is identified, no window longer than the current one can be trusted to exist.**
+
 - 50|207| **The dilettante path: make replying cost one tap, not five steps.** Full design
   record in **`dev/dilettante-path.md`** — the cost ladder (Rung 0 is a tap with no text), the three
   portable Wikipedia mechanisms, the honesty boundary, the spam design, and the codebase-specific
@@ -391,35 +398,34 @@ the block.
   The number to beat and the profile it came from are at the top of `dev/browser-pass/specs/perf.js`;
   a saving worth defending is worth a COUNTABLE guard, as `dev/lpn-spike/label-batch-harness.js` is.
 
-- 50|478| **[H] Tab should walk down the input column, not sideways into every unit select.** Tom,
-  2026-08-21. **PHASE 1 SHIPPED 2026-08-21** — the per-line X-hiders left the tab order, which was
-  35–43% of every stop on the worst pages: Irrigation-Pressure **83 → 60**, Manning-Trap **74 → 46**,
-  Darcy-Weisbach **70 → 42**, Hazen-Williams **62 → 39**, Manning-Pipe-Flow **52 → 35**. The X keeps
-  its place and its click; it carries `tabindex="-1" aria-hidden="true"` (the pair is required, or it
-  fails axe's `aria-hidden-focus`), and `echoLineChooser()` gives the function one keyboard door per
-  column — a closed `<details>`, one stop, which also adds the un-hide path that never existed.
-  `dev/scripts/focus_order_check.php` holds it: blocking at ≤1 hide stop per page, and it prints the
-  per-page table so the number is never guessed again.
-  - **WHAT IS LEFT — phase 2, and it is worth less than it looks.** Tab order IS DOM order, and the
-    blocker is that the two lists are nested `<table>`s whose cells cannot be reordered visually
-    (only flex or grid has `order`). It is ONE FUNCTION, not sixteen pages — `echoCalculatorForm()`,
-    and only the two INNER tables need to become grids — but it is a layout change to all sixteen
-    calculators that no harness can see and only a browser pass can confirm. **The prize is the
-    `x-cross` column the check now prints** (number inputs sitting after a unit select):
-    Manning-Trap 16, Irrigation-Pressure 12, Orifice-Drain-Time 9, Branched-Network 8,
-    Darcy-Weisbach 8, Manning-Pipe-Flow 4. Flip that column from advisory to blocking when it lands.
-  - **RULED: HTML, not a JS Tab interceptor** (Tom, 2026-08-21: *"I meant HTML"*). That also rules out
-    both `tabindex` levers: `-1` on a select makes changing a unit keyboard-unreachable (a WCAG 2.1.1
-    failure, not a nuisance), and a positive `tabindex` hoists the whole form above the navbar
+- 50|478| **[H] Tab should walk down the input column, not sideways.**
+  Phase 2: the two INNER tables built by `echoCalculatorForm()` become grids, so every number input
+  precedes its own unit select. It is ONE FUNCTION but a layout change to all sixteen calculators
+  that no harness can see — only a browser pass confirms it. The prize is the `x-cross` column
+  `dev/scripts/focus_order_check.php` prints (a number input sitting after a unit select):
+  Manning-Trap 16, Irrigation-Pressure 12, Orifice-Drain-Time 9, Branched-Network 8,
+  Darcy-Weisbach 8, Manning-Pipe-Flow 4. Flip that column from advisory to blocking when it lands.
+  - **The X paradigm stays and the per-row X links are back in the tab order** (Tom, 2026-08-22).
+    `echoLineChooser()` and the `tabindex="-1" aria-hidden="true"` hiders are scrapped, and
+    `focus_order_check.php` is advisory rather than blocking on its hide-stop count.
+  - **RULED: HTML, not a JS Tab interceptor** (Tom, 2026-08-21: *"I meant HTML"*). That also rules
+    out both `tabindex` levers: `-1` on a select makes changing a unit keyboard-unreachable (a WCAG
+    2.1.1 failure, not a nuisance), and a positive `tabindex` hoists the whole form above the navbar
     document-wide. A label link is real navigation and stays focusable.
-  - **Needs one browser pass**, and only these: Orifice with a circular shape must not list "Width, W"
-    in the chooser (and must list it when rectangular); Manning-Trap, that an X'd line comes back from
-    the chooser; and any page's print preview, that an X'd line stays out and the chooser does not print.
+
+- 50|483| **EPANET import: carry unhandled features into a per-asset import notes field.**
+  Tom, 2026-08-22. Today an import reports its differences and then the information is discarded; a
+  notes field the user can read would keep it, e.g. *"EPANET Label was marked a Meter associated
+  with Link 999 and anchored to Link 999."* He leans toward IMPLEMENTING the anchor (a Text object
+  associated with a node or link) and merely NOTING the Meter — EPANET's Meter shows whichever
+  single notation property is selected on Nodes or Links at that moment, which is less flexible than
+  what our labels already do, so reproducing it is not obviously worth it. Tom: *"I'm not opposed to
+  implementing this, and it may be better to implement it than to discuss it."*
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
-  HW draws 580 confirmed humans (18% human-of-reach, the suite'''s second-biggest front door) but only
+  HW draws 580 confirmed humans (18% human-of-reach, the suite's second-biggest front door) but only
   11% of them calculate, against a 51–67% band on six comparable pages — ~517 lost humans per period.
-  - **Do not guess a fix.** The decisive step is one observation: pull the HW page'''s own Search
+  - **Do not guess a fix.** The decisive step is one observation: pull the HW page's own Search
     Console query export and segment it (the doc says exactly how). Reference-lookup queries mean a
     C-value table on the page; calculator queries mean a real UX leak.
   - **Do not promote Task 146 on the 11% number alone** — it does not yet distinguish a leak from
@@ -723,6 +729,12 @@ the block.
   `t` cell; since Task 474 it also reaches that region's Froude number. Found 2026-08-21 by
   `mi-harness.js`. Reject a zero-length segment, or say why NaN is the honest answer.
 
+- 25|484| **Log which unhandled EPANET features actually arrive in real imports.**
+  A server-side count of the import features we do not handle, so Task 483 and its siblings are
+  driven by what users really bring rather than by what we imagine. **This is analytics, so the log
+  row is gated on `ecAnalyticsConsented()`** — the non-obvious part, and the reason it is not simply
+  a counter.
+
 - 5|114| **Reservoir / detention routing calculator (Modified Puls) — full scope in
   `dev/detention-routing-scope.md`.** A time-stepping engine, which is the real departure from the
   suite's steady-state weir and orifice calculators. **Hydrology stays out of scope** — the user
@@ -1002,15 +1014,14 @@ the block.
   - **Recorded so NEW strings do not drift.** The decision is cheap now and expensive later: every
     string written in the other vocabulary adds to the rename we have just declined.
   - **A real feature gap found the same day, and it is separate: EPANET can METER a node or link.**
-    A Text/Label is associated with an element, and EPANET puts that element's current notation
-    property — it allows exactly one at a time, for links and for nodes each — under the text you
-    typed, all in a rectangular bubble with a pale yellow background. We have no equivalent. Note the
-    asymmetry that makes it interesting rather than simply missing: **our labels already carry
-    MULTIPLE properties and drag freely**, which is `dev/positioning.md` §4. Copying it wholesale
-    would be scope gravity.
-  - **The general point, which outranks both bullets.** Tom: *"there is an unknown amount of EPANET
-    that we don't yet implement."* The LibreWaterNet landing page now says exactly that, instead of
-    listing edges as though the list were complete.
+    A Text/Label is associated with an element, and EPANET puts that element's one selected notation
+    property under the text you typed, in a pale yellow bubble. **Our labels already carry MULTIPLE
+    properties and drag freely** (`dev/positioning.md` §4), so copying it wholesale is scope gravity.
+  - **DEFERRED ON PURPOSE, and that is the position, not indecision** (Tom, 2026-08-22). Change is
+    inevitable and refactoring is a value, because foresight is never perfect; overvaluing the past
+    is as much a weakness as ignoring it; listen to users; there is an unknown depth of possible
+    correction, so the aim is to act rightly now rather than lock the decision early. Tom: *"there is
+    an unknown amount of EPANET that we don't yet implement."*
 
 - 5|400| **Phase 3: bounded local search on the label residue.**
   Tom, 2026-08-17, lowering it 60→15: *"Phases 1 and 2 are good enough for GIS mode or management
