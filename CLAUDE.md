@@ -195,10 +195,14 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   dropping silently; export shipped 2026-08-18 and returns 1,280 numeric tokens across Net1/2/3
   character-for-character. Five round trips are genuinely impossible and are REPORTED rather than
   faked (see the closed Task 281 entry for the list). **"Does not write one yet" is FALSE.**
-- **Do not reason about this page from a phone.** It is a full-window drawing surface with a menu
-  bar, toolbar, tab strip and property popup, and is almost impossible on a phone. The other
-  calculators are a form and an answer and are fine there. Say "pointer slop" when you mean
-  hand-and-mouse tolerance; a 44px touch target is not an argument here.
+- **Design this page for a pointer; then make a phone survivable.** It is a full-window drawing
+  surface with a menu bar, toolbar, tab strip and property popup, so the desktop layout is the
+  authoritative one and no design argument starts from a phone. Say "pointer slop" when you mean
+  hand-and-mouse tolerance; a 44px touch target is not an argument here. But **"almost impossible on
+  a phone" is retired** (Tom, 2026-08-22): it is tested and usable there, and the small-screen pass
+  he asked for is on the roadmap — hide page titles, collapse the navbar, keep only the transport
+  controls on the toolbar, and drop menu text to icons. The other calculators are a form and an
+  answer and are fine as they are.
 
 ---
 
