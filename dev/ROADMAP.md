@@ -153,17 +153,23 @@ the block.
     **but it blocks the next sprint launch until he rules.** The 16, plus 9 wording proposals and 7
     `$ec_lang_syn` proposals, are in `239-wave0-calcs.json`.
 
-- 75|378| **[H] Give the seven harnesses a network some other way, and delete
-  `drawExampleNetwork()`.** The 289-line code-drawn ring main lost its last user-facing caller when
-  Task 375's follow-up removed the File > New "From examples" rows, but seven harnesses still build
-  their network from it — closed-link, gradient-label, id-prefix, friction-method, label-affix,
-  readout-sign and example-network. So it ships to every visitor as dead weight for the benefit of
-  the test suite, which is worth saying out loud rather than leaving to be rediscovered.
-  - **The obvious replacement is the gallery file it was copied into.** `examples/Basic-example-US-
-    units-lpn.json` is the same network; a fixture that reads it through `acceptImportedText()` +
-    `applySaved()` would also be testing the path a real user takes, which the code path never was.
-  - The care needed is that those harnesses assert solved pressures and specific IDs. Migrate one
-    first and diff its output against the current run before touching the other six.
+- 75|378| **Delete `drawExampleNetwork()`; three harnesses still hold it in the shipped file.**
+  289 code-drawn lines that no menu item reaches, shipping to every visitor for the test suite's
+  benefit. **Seven of ten migrated 2026-08-23** onto `dev/lpn-spike/example-fixture.js`, which opens
+  the gallery file through `acceptImportedText()` + `applySaved()` — the path a visitor takes, which
+  the code path never was. Each was diffed byte-identical against its pre-change stdout.
+  - **The remaining three are blocked on real differences, not on effort.** `example-network`
+    (16 assertions), `color-ramp` (the gallery file predates the per-group colour keys, so
+    `applySaved()` pins it to five classes and the harness is about a new project's seven), and
+    `label-shed` (the gallery carries `settings.textSize: 9` against the shipped 11, so the length
+    cascade runs 9→9→7→3→1 instead of 9→9→6→2→1).
+  - **The answer is probably to MOVE the function, not migrate the last three.** A fixture belongs
+    in `dev/lpn-spike/`, injected into the module the stub already evals; the three keep their exact
+    network and visitors stop carrying it. Weigh that against migrating, which changes what those
+    three test.
+  - Measured while migrating: US is exact and SI agrees to ~1e-13, but `settings.engine` differs
+    (`epanet` in the file, `native` from the code) and is invisible only because the stub never
+    defines `lpnSolveEpanet` — a stub holding a coupling constant, per `dev/testing-notes.md`.
 
 - 75|477| **[H] New blank project startup wizard: xy/lat-lon, units, head loss.** Tom, 2026-08-22,
   naming the scope. It replaces the four-row File > New fly-out; on epanet-js, *"they have a wizard
