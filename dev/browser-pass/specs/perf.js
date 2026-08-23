@@ -65,6 +65,16 @@
 // `dev/lpn-spike/aligned-side-index-harness.js` is the guard: it requires the index to return what
 // walking every pipe returns, and counts the calls at two network sizes.
 //
+// **AND THE NOTCH BELOW IS NOT THE WHOLE OF A NOTCH** (Task 436). It dispatches ten wheel events in
+// one synchronous loop, so no timer can fire between them and what it times is the handler alone --
+// 4-10 ms on this grid. The label work is in the debounced reshed AFTER the last notch, and on this
+// same 480-pipe grid that pass measured 1.3-7.3 s in reshedLinkLabels() against 0.06-0.24 s in
+// relayoutLabels(). The cascade in the first of those was the last un-batched one: it ran a label
+// to the bottom before starting the next, which is one forced layout per label per rung, and it is
+// now three passes like refreshLabelText()'s -- 44-458 ms measured here, and COUNTED at 1,008
+// forced layouts per notch down to 9 in dev/lpn-spike/zoom-reshed-harness.js. What is left of that
+// pass is shedAlignedForConflicts(), which is sequential because its decisions read each other.
+//
 // **THE BOUNDS ARE GENEROUS ON PURPOSE — well clear of the measurement, not a hair over it.** This
 // pass runs on whatever machine is free, and a timing check that fails on a busy one teaches people
 // to ignore failures. What they catch is the QUADRATIC coming back, which is an order of magnitude;

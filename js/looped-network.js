@@ -611,7 +611,12 @@ var EngCalcs = EngCalcs || {};
 	// one value alive: dropping the last is not a shed but the hide, which linkLabelTooShort() owns.
 	// **THE BAND BETWEEN SHEDDING AND HIDING IS THE CASCADE ITSELF, not a fudge factor** -- a label
 	// sheds while its run exceeds its segment, and hides only if even its best single value does.
-
+	//
+	// **NOTHING ON THE PAGE CALLS THIS ANY MORE, AND IT IS NOT DEBT** (Task 436). Both paths that
+	// shed now batch (refreshLabelText and reshedLinkLabels), and this is the SEQUENTIAL REFERENCE
+	// IMPLEMENTATION they are checked against -- one label's cascade run to the bottom on its own,
+	// in the same file, so a harness comparing the two is comparing shipped code with shipped code.
+	// dev/lpn-spike/label-batch-harness.js and dev/lpn-spike/zoom-reshed-harness.js both use it.
 	function shedToSegment(le, l, allLines, fsNow) {
 		var room = linkLabelRoom(l, le.alignedAlong),
 			order = shedOrder(allLines), gone = 0, kept = allLines;
@@ -665,16 +670,32 @@ var EngCalcs = EngCalcs || {};
 	// **THE CHEAP CASE COSTS NOTHING**, which is what makes this affordable on a zoom: a label
 	// already showing everything, whose banked pixel width still fits, needs no render and no
 	// measurement -- linkLabelRunLength() is a division.
+	//
+	// **AND THE EXPENSIVE CASE IS BATCHED, exactly as refreshLabelText()'s is** (Task 436). Task 440
+	// took the one-label-at-a-time cascade out of the CONTENT path and left it in this one, and this
+	// is the path a wheel notch runs: on the 480-pipe grid dev/browser-pass/specs/perf.js measures,
+	// one notch spent 1.3-7.3 SECONDS here, against 60-200 ms in relayoutLabels() after it. Every
+	// label writes its full content, every label is then measured, and the cascade runs a RUNG at a
+	// time across all of them -- one forced layout per rung instead of one per label per rung.
+	// It is the same decision for the reason shedToSegmentBatch() gives: this cascade has no
+	// cross-label term. `dev/lpn-spike/zoom-reshed-harness.js` asserts that against shedToSegment(),
+	// which stays as the sequential reference implementation.
 	function reshedLinkLabels(fsNow, fs) {
+		var work = [];
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id];
 			if (!le || le.empty || labelIsDragged(l)) { return; }
 			var all = le.allLines;
 			if (!all || all.length < 2) { return; }
 			if (!le.shedCount && linkLabelRunLength(le) <= linkLabelRoom(l, le.alignedAlong)) { return; }
-			le.lines = shedToSegment(le, l, all, fsNow);
-			le.shedCount = all.length - le.lines.length;
+			work.push({ l: l, le: le, all: all });
 		});
+		// The full content first, for every participant -- which is what shedToSegment()'s own first
+		// render did, and what makes an UNSHED possible at all (see the cascade's own note).
+		work.forEach(function (rec) { writeLabelGlyphs(rec.le, rec.l, rec.all, fsNow); });
+		work.forEach(function (rec) { measureLabelWidths(rec.le); });
+		shedToSegmentBatch(work, fsNow);
+		work.forEach(function (rec) { rec.le.shedCount = rec.all.length - rec.le.lines.length; });
 		shedAlignedForConflicts(fsNow, fs);
 	}
 	// The keep-set after `gone` sheds: the first `gone` entries of the worst-first order are out.
