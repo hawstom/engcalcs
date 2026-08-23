@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**81 open tasks.** Next (100): 6 · Soon (75): 10 · Someday (50): 12 · Maybe (25): 26 · Parked (5): 27
+**81 open tasks.** Next (100): 7 · Soon (75): 10 · Someday (50): 12 · Maybe (25): 25 · Parked (5): 27
 
-## 100 — Next (6)
+## 100 — Next (7)
 
 - Task 145 — GEOGRAPHIC PROJECTS: grid or geographic, declared before anything is drawn.
 - Task 388 — Documentation is written as a transcript of revision, not current state.
@@ -17,6 +17,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 436 — A wheel notch costs a full label relayout, editor-wide.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
+- Task 489 — Our Mapbox attribution is incomplete, and theirs is a licence term.
 
 ## 75 — Soon (10)
 
@@ -46,7 +47,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 488 — The Print table button crowds the tab strip it shares.
 
-## 25 — Maybe (26)
+## 25 — Maybe (25)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -73,7 +74,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 470 — Search for a place by name while placing a model.
 - Task 475 — Manning Irregular emits NaN for a zero-length segment.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
-- Task 489 — Offer OpenStreetMap's "Improve this map" link beside the credit.
 
 ## 5 — Parked (27)
 

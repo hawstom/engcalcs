@@ -262,11 +262,22 @@ the block.
   known. Candidates worth measuring before proposing: the button as an icon with no text, or moved
   into the pane's own overflow.
 
-- 25|489| **Offer OpenStreetMap's "Improve this map" link beside the credit.**
-  epanet-js carries four credits at the map's lower right — © Mapbox, © OpenStreetMap, Improve this
-  map, © Maxar — and we carry three of them. The edit link is not required by either provider's
-  terms; it is what a good OSM citizen offers, and it costs one anchor and one string in 27
-  languages. Weigh that against the fact that nobody has asked for it.
+- 100|489| **Our Mapbox attribution is incomplete, and theirs is a licence term.**
+  Checked against `docs.mapbox.com/help/getting-started/attribution/` on 2026-08-23, after Tom
+  photographed epanet-js showing a Mapbox logo under its basemap switcher AND five text links at the
+  map's lower right. We show `© Mapbox`, `© OpenStreetMap` and `© Maxar` and are missing two things:
+  - **The Mapbox WORDMARK/LOGO is required, not optional** — *"Maps using Mapbox map designs, data or
+    software usually must display the Mapbox logo and text attribution."* The one exemption is for
+    maps that use neither Mapbox styles nor Mapbox data, and even that one still requires the logo.
+    Raster tiles from `api.mapbox.com/v4/mapbox.satellite` are Mapbox-supplied data, so it applies.
+  - **`Improve this map`, linked to `https://apps.mapbox.com/feedback/`**, is part of their required
+    text attribution — not the OSM courtesy link this task first recorded it as.
+  Also confirm the two links we do have point where they require: `© Mapbox` →
+  `https://www.mapbox.com/about/maps`, `© OpenStreetMap` → `https://www.openstreetmap.org/copyright`.
+  **Scope is the satellite credit set only**; the OpenStreetMap street-map set is unaffected. The
+  logo must be drawn or embedded, never fetched — a request to Mapbox before the user turns satellite
+  on is the thing `#lpn_basemap_teaser` was already built to avoid. Read against their live page
+  before implementing; this entry is a summary, and their terms are the authority.
 
 - 50|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
