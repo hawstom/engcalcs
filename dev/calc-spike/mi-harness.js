@@ -134,8 +134,14 @@ function segArea(x0, z0, x1, z1, ws) {
 	return sum * h / 3;
 }
 
-/** Wetted perimeter: the straight-line length of the bed between the ends of the wet span. */
+/** Wetted perimeter: the straight-line length of the bed between the ends of the wet span.
+ *  A VERTICAL WALL has no wet SPAN and a real wet LENGTH -- the submerged height of the wall --
+ *  so it is stated here directly from the two depths rather than through wetSpan(), which is
+ *  parameterised by x and therefore has nothing to say about a segment of zero x-extent. */
 function segPerimeter(x0, z0, x1, z1, ws) {
+	if (x1 === x0) {
+		return Math.abs(Math.max(ws - z0, 0) - Math.max(ws - z1, 0));
+	}
 	const span = wetSpan(x0, z0, x1, z1, ws);
 	if (!span || span.b === span.a) { return 0; }
 	return Math.hypot(span.b - span.a, span.zb - span.za);
@@ -340,26 +346,98 @@ r.section('a dry section is dry, and says so rather than dividing by zero');
 }());
 
 // =========================================================================================
-r.section('a zero-length segment prints nothing, never NaN (Task 475)');
+r.section('a vertical wall is a real segment, not a NaN (Task 475)');
 
-// Two stations typed at the SAME station is a real typing mistake, and it makes a region whose
-// wetted perimeter and area are both zero -- so rh = 0/0 and every quantity off it is NaN.
-// EngCalcs.miFixed2() is the one seam that turns a number into text, and a non-finite one
-// becomes ''. Asserted on the RAW cell text: parseFloat('NaN') and parseFloat('') are both NaN,
-// so a numeric check here would pass on the defect it is meant to catch.
+// TWO STATIONS AT THE SAME STATION VALUE IS A VERTICAL WALL, and a wall is how anyone draws a
+// rectangular channel, a box culvert or a lined ditch. It is not a mistake to reject: it has zero
+// area and zero top width, and a WETTED PERIMETER equal to its submerged height. This section is
+// the smallest thing that says so, and the arithmetic is checkable in the head:
+//
+//     10 ft wide, walls 10 ft tall, water 5 ft deep, n = 0.030 throughout
+//     A = 50 ft2      P = 5 + 10 + 5 = 20 ft      T = 10 ft      R = A/P = 2.5 ft
+//
+// The pre-fix page put BOTH walls on the dry branch -- zero area was read as "nothing here" --
+// and reported P = 10 ft, R = 5 ft. Manning goes as R^(2/3), so it overstated the discharge of a
+// plain rectangular channel by 2^(2/3) = 1.587. That is the assertion that matters here; the
+// absence of NaN is the cheap half.
 (function () {
-	const x = [0, 30, 30, 70, 100];
-	const z = [6, 3, 3, 3, 6];
-	const n = [null, 0.040, 0.035, 0.030, 0.040];
-	const bank = [null, true, true, true, true];
+	const x = [0, 0, 10, 10];
+	const z = [10, 0, 0, 10];
+	// 0.030 and not, say, 0.013, only so the composite is checkable against the cell: every
+	// result is printed to two decimals, and a roughness of 0.013 reaches the reader as 0.01.
+	const n = [null, 0.030, 0.030, 0.030];
+	const bank = [null, false, false, true];
 	const p = loadSection(x, z, n, bank, WS, S0);
+
+	// The wall segments themselves, cell by cell.
+	[1, 3].forEach(function (i) {
+		nearDisplayed(cell(p, 'a', i), 0, 2, `the wall at station ${x[i]} has no wetted area`);
+		nearDisplayed(cell(p, 't', i), 0, 2, `the wall at station ${x[i]} has no top width`);
+		nearDisplayed(cell(p, 'pw', i), 5, 2,
+			`the wall at station ${x[i]} is wetted over its submerged height, 5 ft`);
+	});
+	nearDisplayed(cell(p, 'pw', 2), 10, 2, 'and the bed between them over its full 10 ft');
+
+	// The region, against Manning worked from those numbers.
+	const ref = regionSi(1, 3, x, z, n, WS, S0);
+	nearDisplayed(ref.P / FT, 20, 9, 'so the reference perimeter is 5 + 10 + 5 = 20 ft');
+	nearDisplayed(ref.A / (FT * FT), 50, 9, 'and the reference area is 50 ft2');
+	nearDisplayed(cell(p, 'rh', 3), 2.5, 2, 'the hydraulic radius is A/P = 2.5 ft, not the 5 ft');
+	nearDisplayed(cell(p, 'n617', 3), 0.030, 3, 'a wall of the same roughness leaves n composite');
+	nearDisplayed(cell(p, 'v617', 3), ref.V / FT, 2, 'the velocity is Manning on that R');
+	nearDisplayed(cell(p, 'fr617', 3), ref.fr, 2, 'and the Froude number uses T = 10 ft');
+	nearDisplayed(cell(p, 'q617', 3), ref.Q / (FT * FT * FT), 2, 'and Q = V A');
+	// Stated once more as the bare ratio the defect was, so a regression names itself.
+	r.ok(Math.abs(cell(p, 'rh', 3) - 5) > 1,
+		'the hydraulic radius is not the walls-ignored 5 ft', String(cell(p, 'rh', 3)), 'not ~5');
+
+	// A wall carries its own roughness into the composite like any other wetted boundary: rough
+	// walls on a smooth bed must composite ABOVE the bed's n and BELOW the walls'.
+	const rough = loadSection(x, z, [null, 0.050, 0.020, 0.050], bank, WS, S0);
+	const ncRough = cell(rough, 'n617', 3);
+	r.ok(ncRough > 0.020 && ncRough < 0.050,
+		'rough walls raise the composite roughness above the bed\'s own',
+		`n_c = ${ncRough}`, 'between 0.020 and 0.050');
+}());
+
+// =========================================================================================
+r.section('a duplicated station contributes nothing, and never NaN (Task 475)');
+
+// The degenerate wall -- same station AND same elevation -- is a wall of zero height. Zero area,
+// zero perimeter, zero top width: it describes no bed at all, so it must leave the section it was
+// typed into exactly as it was. That is a strictly stronger statement than "no cell says NaN",
+// and it is the subdivision-invariance test with a zero-length subdivision.
+(function () {
+	const x = [0, 30, 30, 40, 60, 70, 100];
+	const z = [6, 3, 3, 1, 1, 3, 6];
+	const n = [null, 0.040, 0.040, 0.035, 0.025, 0.030, 0.040];
+	const bank = [null, false, true, false, false, true, true];
+	const p = loadSection(x, z, n, bank, WS, S0);
+
+	// Every cell of the doubled section is a number or a blank, never NaN. Asserted on the RAW
+	// cell text: parseFloat('NaN') and parseFloat('') are both NaN, so a numeric check here would
+	// pass on the very defect it is meant to catch.
 	['rh', 'n617', 'v617', 'hv617', 'fr617', 'q617', 't', 'pw', 'a', 'tau'].forEach(function (name) {
 		const bad = x.map((_, i) => p.rowHtml(name, i)).filter(t => /nan|infinity/i.test(String(t)));
 		r.ok(bad.length === 0, `${name}: no cell says NaN or Infinity`, bad.join(', '), '');
 	});
-	// And the fix did not blank the section: the region left of the doubled station is real.
-	r.ok(String(p.rowHtml('fr617', 1)) !== '', 'a real region still prints its Froude number',
-		p.rowHtml('fr617', 1), 'a number');
+	// The zero-length segment's own cells are three zeroes, not three blanks -- it is computable,
+	// it just computes to nothing.
+	nearDisplayed(cell(p, 'a', 2), 0, 2, 'the duplicated station spans no area');
+	nearDisplayed(cell(p, 'pw', 2), 0, 2, 'wets no perimeter');
+	nearDisplayed(cell(p, 't', 2), 0, 2, 'and spans no top width');
+	// And the section it sits in is the section from the top of this file, unchanged.
+	nearDisplayed(parseFloat(p.html('q_617')), parseFloat(page.html('q_617')), 2,
+		'the section discharge is unchanged by the duplicate');
+	REGIONS.forEach(function (reg, k) {
+		const row = [2, 5, 6][k];
+		nearDisplayed(cell(p, 'v617', row), cell(page, 'v617', reg.to), 2,
+			`region ${k + 1}: velocity unchanged by the duplicate`);
+		nearDisplayed(cell(p, 'fr617', row), cell(page, 'fr617', reg.to), 2,
+			`region ${k + 1}: Froude number unchanged by the duplicate`);
+		nearDisplayed(cell(p, 'rh', row), cell(page, 'rh', reg.to), 2,
+			`region ${k + 1}: hydraulic radius unchanged by the duplicate`);
+	});
 }());
 
 r.finish();
