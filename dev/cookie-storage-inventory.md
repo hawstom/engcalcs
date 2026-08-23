@@ -188,7 +188,21 @@ visitor's IP and user-agent on every page load; it is now served from this origi
 
 The usage logs carrying **no IP and no session id** is a deliberate design already recorded in
 `lib/config.inc.php`, and it is the single strongest fact in this whole file: it is what keeps the
-analytics question a *cookie* question rather than a *personal data* question.
+analytics question a *cookie* question rather than a *personal data* question. Re-verified writer by
+writer 2026-08-23 across all six: no `REMOTE_ADDR`, no `HTTP_USER_AGENT`, no session id, and nothing
+the visitor typed — every visitor-supplied column passes `ecBrowserLangTag()` or an explicit
+allowlist first. (The `CONTACT_SEND_LOG` row above is a combined entry: the **email** carries name,
+address and message; the log line itself is `ts / 'contact' / lang / browser_lang / bucket`.)
+
+**Nothing in section 4 is served over HTTP.** Rotated copies live in `spock/<YYYY-MM-DD>/`
+(`dev/scripts/archive_logs.php`), which `spock/.htaccess` denies exactly as `log/.htaccess` denies
+the live set, and `dev/scripts/trim_logs.php` walks the archives so the 26-month promise in
+`privacy.php` follows the rows when they move. The one served thing is an **aggregate** report at an
+unguessable path under `spock/public/` — counts, no per-event data, timestamps truncated to a date.
+Publishing counts discloses nothing about any individual and so changes no promise; publishing rows
+would change the deal `consent_body` states, which is a banner rewrite, 26 retranslations and an
+`EC_CONSENT_VERSION` bump. **Nothing about any of this changes what is stored on a visitor's
+device**, so sections 1–3 are untouched by it.
 
 ---
 
