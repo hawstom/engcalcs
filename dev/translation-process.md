@@ -314,6 +314,15 @@ FRICTION: [
 An empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a
 human's attention. But do not stay quiet to be agreeable either: this channel exists
 because real complaints were previously buried in prose and never acted on.
+
+Where it goes and what happens next: the orchestrator copies each entry into
+dev/english-friction/<sprint>.json, adds "source": "translator" and "lang": "<your
+language code>", and answers it with a "disposition" plus a written "resolution" --
+english (the English was rewritten), intent, glossary, dismissed (with the reason), or
+refer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating
+is not resolving, and it stays visible until Tom rules on it. friction_check.php blocks
+the sprint from CLOSING while any entry of yours is unanswered, so filing one is expected
+work that the sprint waits on -- not a complaint about the sprint.
 ```
 
 The orchestrator collects these into `dev/english-friction/<sprint>.json`, routes each with the
