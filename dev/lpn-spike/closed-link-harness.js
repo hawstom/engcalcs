@@ -15,9 +15,11 @@
 // checkbox.
 
 const { ROOT, mkEl, byId, ensure, unitSelects, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
 const L = loadLoopedNetwork(
-	"\t\tdrawExample: drawExampleNetwork, runSolve: runSolve, assembleModel: assembleModel,\n" +
+	EXAMPLE_EXPORTS +
+	"\t\trunSolve: runSolve, assembleModel: assembleModel,\n" +
 	"\t\tgetDoc: function () { return doc; }, effective: effective,\n" +
 	"\t\tlinkById: linkById, rebuildLink: rebuildLink,\n" +
 	"\t\tlinkClass: function (id) { return linkEls[id] ? (linkEls[id].line.getAttribute('class') || '') : null; },\n" +
@@ -25,7 +27,7 @@ const L = loadLoopedNetwork(
 	// regression in renderLinkFields is caught here rather than only in a browser.
 	"\t\trenderLinkFields: renderLinkFields,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
-	"\t\tserializeProject: serializeProject, applySaved: applySaved, buildDom: buildDom,\n" +
+	"\t\tserializeProject: serializeProject,\n" +
 	"\t\tundo: undo, undoDepth: function () { return undoStack.length; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, defaultSettings: defaultSettings,\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
@@ -92,7 +94,7 @@ console.log('=== Task 146.07: Open/Closed link ===');
 
 setUnitSet('us');
 L.reset();
-L.drawExample();
+openExample(L);
 
 // Solve the way the app does: runSolve() for its side effects (labels, fit, status line), then
 // the model + solver directly for the numbers, exactly as example-network-harness.js does. The

@@ -29,6 +29,7 @@
 
 const assert = require('assert');
 const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 const Geom = require(ROOT + 'js/lpn-geom.js').lpnGeom;
 
 let checks = 0;
@@ -71,7 +72,8 @@ eq(Geom.mostOpenDirection([-90], SIDES, 1.35), 0, 'a pipe on the bisector is a d
 // ---- 2. the page: defaults, the table, and the context ------------------------------------------
 
 const L = loadLoopedNetwork(
-	"\t\tdrawExample: drawExampleNetwork, refreshLabelText: refreshLabelText,\n" +
+	EXAMPLE_EXPORTS +
+	"\t\trefreshLabelText: refreshLabelText,\n" +
 	"\t\tgetDoc: function () { return doc; },\n" +
 	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tdefaultLabelSettings: defaultLabelSettings,\n" +
@@ -176,7 +178,7 @@ eq(Geom.angularGap(sides[0], sides[1]), 90, 'the two sides are mirrored about ve
 setUnitSet('us');
 L.buildLayers();
 L.seedDefaultInputs();
-L.drawExample();
+openExample(L);
 L.runSolve();
 L.refreshLabelText();
 

@@ -24,9 +24,11 @@
 //      segment -- never on the separator beside it, and never on a label whose value only ties.
 
 const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
 const L = loadLoopedNetwork(
-	"\t\tdrawExample: drawExampleNetwork, runSolve: runSolve, assembleModel: assembleModel,\n" +
+	EXAMPLE_EXPORTS +
+	"\t\trunSolve: runSolve, assembleModel: assembleModel,\n" +
 	"\t\tgetDoc: function () { return doc; }, effective: effective,\n" +
 	"\t\tlabelSettings: function () { return labelSettings; }, refreshLabelText: refreshLabelText,\n" +
 	"\t\tsettings: function () { return settings; },\n" +
@@ -38,7 +40,7 @@ const L = loadLoopedNetwork(
 	"\t\tlinkTspans: function (id) { return this.tspanDump(linkEls[id].text); },\n" +
 	"\t\tnodeTspans: function (id) { return this.tspanDump(nodeEls[id].text); },\n" +
 	"\t\tlineCount: function (id) { return linkEls[id].lineCount; },\n" +
-	"\t\tserializeProject: serializeProject, applySaved: applySaved,\n" +
+	"\t\tserializeProject: serializeProject,\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, defaultSettings: defaultSettings,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -81,7 +83,7 @@ function rowText(row) { return row.map(function (s) { return s.text; }).join('')
 setUnitSet('us');
 L.buildLayers();
 L.seedDefaultInputs();
-L.drawExample();
+openExample(L);
 L.runSolve();
 
 const doc = L.getDoc();

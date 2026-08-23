@@ -18,9 +18,11 @@
 //      produces two elements answering to one id, and nothing else in the app would report it.
 
 const { setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
 const L = loadLoopedNetwork(
-	"\t\tdrawExample: drawExampleNetwork, runSolve: runSolve, getDoc: function () { return doc; },\n" +
+	EXAMPLE_EXPORTS +
+	"\t\trunSolve: runSolve, getDoc: function () { return doc; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, refreshLabelText: refreshLabelText,\n" +
 	"\t\tsettings: function () { return settings; }, nextIds: function () { return nextId; },\n" +
 	"\t\tscenarios: function () { return scenarios; }, ovKeyFor: ovKeyFor,\n" +
@@ -49,7 +51,7 @@ global.window.confirm = function () { return answer; };
 setUnitSet('us');
 L.buildLayers();
 L.seedDefaultInputs();
-L.drawExample();
+openExample(L);
 L.runSolve();
 
 const doc = L.getDoc();
