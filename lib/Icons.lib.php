@@ -333,15 +333,15 @@ $ec_icons = array(
 	//
 	// **HOUSE WEIGHT (2 units in a 24 box) SETS EVERY DIMENSION.** Measured: two 2-unit strokes need
 	// 3.5 units between centres to keep daylight at 17 px, so 1.5 units of daylight is the floor.
-	//   - THREE COPIES FIT, and the clearance that decides it is not the obvious one. Corresponding
-	//     parts of two copies are 6.2 apart everywhere by construction, so they can never crowd. What
-	//     crowds is a NON-corresponding pair: one arc's left endpoint against the steep left flank of
-	//     the arc below it. Drawn as the literal top half (arc starting at 180 degrees) that distance
-	//     is 3.38 against 3.0 units of stroke — 0.38 of daylight, and the three rolls weld into one
-	//     ribbon. Starting the VISIBLE arc at 200 degrees lifts the endpoint clear: 4.68, so 1.68 of
-	//     daylight. That is the whole reason theta0 is not 180.
-	//   - The bottom roll's hole is 3.6 x 3.8 units, 2.6 x 2.7 px at 17, so it reads as a ring rather
-	//     than a blob. An arc is a cheaper mark than a closed ellipse and needs no hole at all.
+	//   - **THE ROLL END IS AN ELLIPSE, 2 : 1, MAJOR AXIS HORIZONTAL** (rx 4.8, ry 2.4). It was a
+	//     circle until Tom said so: a round roll seen obliquely foreshortens vertically, and drawing
+	//     it round is the same class of error as drawing the sheet edges as three different curves.
+	//     2.4 is also the flattest ry that leaves the bottom ellipse a visible hole under a 3-wide
+	//     stroke — 1.8 units of it, about 1.3 px at 17.
+	//   - **THE ROLL'S STRAIGHT BACK EDGE** runs down the icon's left at x = 2.0, and it is what makes
+	//     three copies read as one roll instead of as curves floating one above another. It also
+	//     returns theta0 to 180 — the literal top half — because every arc now starts ON that line
+	//     rather than beside the flank of the arc below it.
 	//   - The title block is the box made by ONE upright at x=16.6 plus the sheet's own right, top and
 	//     bottom edges, and NOTHING is inside it. 16.6 is as wide as the block can be while its
 	//     upright still clears the 3-unit right edge by 1.5.
@@ -353,8 +353,10 @@ $ec_icons = array(
 	// exactly that reason — an odd weight in a menu strip is a visible seam. A heavier accent inside
 	// one icon is a different question, and it is the only way to say "a stack of sheets" here: a
 	// second parallel line cannot, because the widest offset that stays in the box is 2.0 and a pair
-	// at 2.0 samples as a solid bar. So the roll (all three arcs), the bottom edge (table plus stack)
-	// and the fanned right edge are 3; a single sheet's own edge is 2.
+	// at 2.0 samples as a solid bar. **ONLY THE BOTTOM IS A STACK** — the bottom ellipse, the bottom
+	// edge (table plus stack), the roll's back edge (the outside of the rolled stack) and the fanned
+	// right edge are 3. Every copy above the bottom is one sheet's own edge and is 2. Copying the
+	// heavy weight up with the shape made three stacks where there is one.
 	//
 	// SHARP CORNERS at upper and lower right — "rounding is not realistic for a plan sheet". The
 	// shared open tag sets stroke-linejoin="round", so each corner is a JOIN INSIDE ONE PATH carrying
@@ -370,8 +372,8 @@ $ec_icons = array(
 	// with `php dev/scripts/icon_ascii_preview.php project` (coverage grid at 17 and 24) or the
 	// generator's own --preview.
 	//
-	// Rejected, so they are not re-proposed: an AutoCAD-style OFFSET of the sag; a closed ellipse in
-	// every copy; TWO copies (with the upper rolls now arcs rather than closed ellipses, dropping the
+	// Rejected, so they are not re-proposed: an AutoCAD-style OFFSET of the sag; a CIRCLE for the roll
+	// end; the heavy stroke copied up with the shape; a closed ellipse in every copy; TWO copies (with the upper rolls now arcs rather than closed ellipses, dropping the
 	// middle leaves the left half of the mark empty); a WIDE title block with an interior upright
 	// ("it can't be that wide and still look reminiscent"); a sheet edge drawn as
 	// horizontal-elbow-horizontal (a creased sheet, not a sagging one); a rolled TUBE (a cylinder on
@@ -379,13 +381,14 @@ $ec_icons = array(
 	// (says construction); a corner-curled single sheet ("You never pull out only one sheet"); and a
 	// title block in the LOWER RIGHT ONLY, which made a closed box the same size as the roll at the
 	// opposite corner, and two equal masses read as two of the same object.
-	'project'    => '<ellipse cx="5.4" cy="17.7" rx="3.4" ry="3.3" stroke-width="3"/>'
-		. '<path stroke-width="3" d="M2.205 10.371C2.451 9.716 2.903 9.154 3.499 8.764C4.094 8.374 4.801 8.178 5.519 8.202C6.236 8.226 6.927 8.471 7.493 8.9"/>'
-		. '<path stroke-width="3" d="M2.205 4.171C2.451 3.516 2.903 2.954 3.499 2.564C4.094 2.174 4.801 1.978 5.519 2.002C6.236 2.026 6.927 2.271 7.493 2.7"/>'
-		. '<path stroke-width="3" stroke-linejoin="miter" stroke-linecap="butt" d="M21.2 7.6V21H13C9.8 21 9.246 16.429 7.493 15.1"/>'
-		. '<path stroke-linejoin="miter" d="M7.493 8.9C9.246 10.229 9.8 14.8 13 14.8H16.6"/>'
-		. '<path stroke-linejoin="miter" d="M7.493 2.7C9.246 4.029 9.8 8.6 13 8.6H21.2"/>'
-		. '<path d="M16.6 8.6V21"/>',
+	'project'    => '<ellipse cx="6.8" cy="18.6" rx="4.8" ry="2.4" stroke-width="3"/>'
+		. '<path stroke-width="2" d="M2 11.5C2 10.897 2.454 10.317 3.271 9.873C4.087 9.43 5.208 9.157 6.409 9.108C7.611 9.059 8.805 9.238 9.755 9.609"/>'
+		. '<path stroke-width="2" d="M2 4.4C2 3.797 2.454 3.217 3.271 2.773C4.087 2.33 5.208 2.057 6.409 2.008C7.611 1.959 8.805 2.138 9.755 2.509"/>'
+		. '<path stroke-width="3" stroke-linecap="butt" d="M2 4.4V18.6"/>'
+		. '<path stroke-width="3" stroke-linejoin="miter" stroke-linecap="butt" d="M21.2 5.8V21H13C9.8 21 11.804 17.509 9.755 16.709"/>'
+		. '<path stroke-linejoin="miter" d="M9.755 9.609C11.804 10.409 9.8 13.9 13 13.9H16.6"/>'
+		. '<path stroke-linejoin="miter" d="M9.755 2.509C11.804 3.309 9.8 6.8 13 6.8H21.2"/>'
+		. '<path d="M16.6 6.8V21"/>',
 
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal

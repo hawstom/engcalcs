@@ -24,10 +24,14 @@ $P = array(
 	'xl'      => 2.0,    // leftmost roll centerline (a thick stroke paints to xl - wthick/2)
 	'ytop'    => 2.0,    // the top copy's arc crown
 	'ytable'  => 21.0,   // bottom sheet edge / tabletop centerline
-	'rx'      => 3.4,
-	'ry'      => 3.3,
-	'theta0'  => 200.0,  // where the visible arc starts on the left; 180 is the full top half, but
-	                     // the copy below then crowds this endpoint (see Icons.lib.php)
+	'rx'      => 4.8,
+	'ry'      => 2.4,    // an oblique view of a round roll end. Major axis HORIZONTAL, 2 : 1 --
+	                     // a circle here was the standing mistake, and a round roll seen at an angle
+	                     // foreshortens vertically. 2.4 is also the flattest that leaves the bottom
+	                     // ellipse a visible hole under a 3-wide stroke.
+	'theta0'  => 180.0,  // the full top half. It can be 180 again now that the roll carries its own
+	                     // straight back edge: the arcs land ON that line instead of floating
+	                     // beside each other, so the crowding that forced 200 is gone.
 	'theta'   => -52.0,  // where the sheet leaves the roll, degrees, SVG y-down (negative = above)
 	'xland'   => 13.0,   // where the sag flattens onto the sheet
 	'lead'    => 2.2,    // control-arm length along the roll's tangent
@@ -91,9 +95,19 @@ $out = array();
 // heavy stroke: one fat line is how the whole roll of sheets is drawn.
 $out[] = '<ellipse cx="' . $f($cx) . '" cy="' . $f($cyBot) . '" rx="' . $f($P['rx'])
 	. '" ry="' . $f($P['ry']) . '" stroke-width="' . $f($P['wthick']) . '"/>';
+// **ONLY THE BOTTOM IS A STACK** (Tom, 2026-08-23: *"only the bottom needs extra thick lines to
+// represent a stack of sheets"*). A copy higher up is one sheet's own edge wrapping the roll, so it
+// takes the thin stroke; the earlier version copied the heavy weight up with the shape and made
+// three stacks where there is one.
 for ($i = 1; $i < $n; $i++) {
-	$out[] = '<path stroke-width="' . $f($P['wthick']) . '" d="' . $arcD($i*$dy) . '"/>';
+	$out[] = '<path stroke-width="' . $f($P['wthin']) . '" d="' . $arcD($i*$dy) . '"/>';
 }
+// **THE ROLL'S STRAIGHT BACK EDGE**, against the icon's left edge — the outside of the rolled stack,
+// so it carries the heavy stroke. Without it the copies read as separate curves floating one above
+// another instead of as one roll; it is also what lets theta0 go back to 180, because every arc now
+// starts ON this line.
+$out[] = '<path stroke-width="' . $f($P['wthick']) . '" stroke-linecap="butt" d="M'
+	. $f($P['xl']) . ' ' . $f($cyTop) . 'V' . $f($cyBot) . '"/>';
 // The fanned right edge and the bottom copy's sag and flat, as ONE mitered path, so the lower-right
 // corner is a join and comes out square. Its butt top end stops one thin half-width short of the
 // top run, so it lands flush with that edge rather than bulging a round cap past the corner above.
