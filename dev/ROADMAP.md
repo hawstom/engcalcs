@@ -102,28 +102,14 @@ the block.
   - Distinct from Task 185 (Match/Copy properties), which stays a click-source-then-click-targets
     tool. Both ship; neither replaces the other.
 
-- 100|405| WAIT: sprint — **Resync four English strings the sprint itself earned.** Sprint 397 closed at zero drift and
-  zero delta; these four were edited AFTER that baseline, so `detect_english_drift.php` now flags them
-  and 26 translations render the superseded text. Small, well-defined resync — one agent per language
-  over four keys, or fold into the next sprint.
-  - `lpn_settings_readability_bias` — **five languages raised it independently** (de, tr, it, he, bn),
-    which is this project's own threshold for an English-source defect. "Turned around" is rotated-to-
-    an-angle or flipped-180 in English, and only the second is what the setting does.
-  - `lpn_field_text_match_pipe` — three languages (it, uk, bg). It is a button that sets the angle once,
-    and "Match pipe angle" reads equally well as a toggle that keeps following.
-  - `lpn_examples_size` and `lpn_ex_net3_desc` — **both were factually wrong**, found by two agents
-    asking what a number counted. `{nodes}` is every node, not junctions; Net3 has 92 junctions, 3
-    tanks and 2 reservoirs, not "97 junctions, two tanks and a river source". Nothing in the build
-    compares prose against a network, so only a reader could have caught these.
-  - **BLOCKED ON TOM'S AUTHORIZATION, not on work.** It is a translation sprint, and a sprint spawns
-    paid agents; CLAUDE.md forbids inferring that from a general "proceed". The English is already
-    edited, so the whole remaining task is the 26 renderings.
-
 - 100|436| **A wheel notch costs a full label relayout, editor-wide.**
-  A wheel notch on the map costs a full label relayout, and that is editor-wide.
   Measured on Net3, median per notch: 157 ms XY, 162 ms lat/lon, **26 ms with labels off**. lat/lon is
   not intrinsically slower — the georeferencing tool is ~20x cheaper than the editor it runs inside.
   **The task is why a relayout runs on every notch at all.**
+  - **INTENT: a zoom resumes from the current state instead of starting from scratch.** A wheel notch
+    changes scale, not topology, so the relayout should continue from the current label placement
+    rather than re-running placement from nothing. Tom's proposal and the right shape; the intended
+    direction, not binding on an implementer who finds better.
   - Placement leftovers, small: a background image is not carried onto the map, the two-control-point
     path (`lpnGeorefFromTwoPoints`) is built and tested with no interface, and Finish is not undoable.
   - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the
@@ -138,6 +124,23 @@ the block.
   placement tool, the basemap and the stored file format, so it is its own task.
   - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
     drawing is still correct.
+
+- 100|459| WAIT: sprint — **The next sprint's contents, already earned.** Tasks 405 and 458 merged
+  here 2026-08-22: identical blocker, identical action — run one sprint. **ASKED AND HELD 2026-08-21:**
+  offered a full 26-language run or a core-four run, Tom chose "hold the sprint entirely"; do not
+  re-propose without a reason he has not already heard.
+  - **Four English strings resynced after sprint 397's zero-drift baseline (was 405).**
+    `lpn_settings_readability_bias` (five languages raised it independently — this project's own
+    threshold for an English-source defect) and `lpn_field_text_match_pipe` (three did; it is a
+    button, not a toggle). `lpn_examples_size` and `lpn_ex_net3_desc` were factually WRONG about what
+    a number counted, and nothing in the build compares prose against a network.
+  - **14 mode-name disagreements in ru, sr, tr and zh (was 458).** A language's `lpn_geomap` or
+    `lpn_xymap` disagrees with its other mode-naming strings, so a reader meets two names for one kind
+    of project. `mode_name_check.php` names the exact strings; inflected languages, so sprint not sed.
+  - **CHANGED/NEW since sprint 438:** five `lpn_notes_*`, `lpn_file_import_inp_tip`, `lpn_clean_map`
+    ("Reduce map clutter"); NEW `lpn_color_mode_manual`, `lpn_time_no_period`, three
+    `lpn_basemap_satellite_*`, `lpn_tables_menu(_tip)`, `lpn_run_menu_tip`,
+    `lpn_settings_auto_run(_tip)`, `lpn_time_run_slow`. Wave 0 over the changed set first.
 
 - 50|481| **A closed task cited as pending ships false claims.** Three shipped in one day. On
   2026-08-21 `CLAUDE.md` said extended-period simulation was "not built yet" and that `.inp` export
@@ -188,41 +191,15 @@ the block.
   them *Non-destructive (doesn't rewrite inputs)* — or whatever wording Task 425 settles on, so the
   two agree.
 
-- 75|458| WAIT: sprint — **One project mode, two names, in four languages.** `dev/scripts/mode_name_check.php` (new,
-  advisory, in `check_all.sh`) opens on **14 disagreements in ru, sr, tr and zh** — a language's
-  `lpn_geomap` or `lpn_xymap` says one thing and its other mode-naming strings say another, so a
-  reader meets two names for one kind of project. All pre-existing; sprint 438 caused five more in
-  cs and those were realigned the same day.
-  - Fixing them is translation work in inflected languages (Russian's are declined), so it belongs
-    in a sprint, not in a sed. The check names the exact strings.
-  - **The rule this replaces was FALSE prose in `glossary.json`** — "lat/lon and XY are carried
-    unchanged into every language", while 10 of 26 files already translated `lpn_geomap`. Agents
-    quoted it back all sprint. Entry rewritten; the key list the check walks is derived from the
-    English, so a new mode-naming string joins it by itself.
-
-- 75|465| **[H] Reusable pipe and pump TYPES, so editing one edits 400.**
-  One "150 mm PVC" definition that 400 pipes point at. A type carries diameter, roughness and minor-loss k; an element names
-  a type instead of repeating the numbers. Tom named these beside Patterns/Curves/Controls in Task 462,
-  but those are things the document already HOLDS — this is a new indirection through the element model.
-  - **It starts at `effective()`, which is the expensive part.** A third resolution layer — override →
-    element → type-default — under the one seam the solver, renderer, labels, popups and six pane
-    tables all read through. Plus a visible detached-versus-inherited state per property, or a user
-    edits a definition and cannot see why nothing moved.
-  - **EPANET has no such concept**, so an `.inp` export flattens it and an import can never rebuild it,
-    which breaks Task 281's byte-identical round trip for anything typed. Task 390-sized.
-
-- 75|476| **[H] Convert to lat/lon should land in a NEW project.** Not mutate the open one. Today the
-  conversion mutates in place, so Cancel is the only way back and after Finish the user's XY file is one
-  Save away from being overwritten by a lat/lon one. The mechanism exists — `importProject()` lands an
-  `.inp` in a new tab, `saveProjectAs()` duplicates a project whole. Costs two tabs and a naming
-  convention. Extracted from Task 436, where it was the only decision in a performance task.
-
-- 75|477| **[H] A New-project WIZARD instead of the four-row File > New fly-out.** Tom, 2026-08-21,
-  on epanet-js: *"they have a wizard box with xy and lat/lon as the top choices, and if lat/lon is
-  selected, a search box is enabled. Below it are the units and head loss formula selectors."*
+- 75|477| **[H] New blank project startup wizard: xy/lat-lon, units, head loss.** Tom, 2026-08-22,
+  naming the scope. It replaces the four-row File > New fly-out; on epanet-js, *"they have a wizard
+  box with xy and lat/lon as the top choices, and if lat/lon is selected, a search box is enabled.
+  Below it are the units and head loss formula selectors."*
   - It answers three open things at once: the coordinate declaration for the boot project (Task 145's
-    last gap), a home for the geocoder that already works (Task 437), and head-loss formula at creation
-    rather than buried in Settings.
+    last gap), head-loss formula at creation rather than buried in Settings, and a home for the
+    geocoder that already works — `js/lpn-search.js`, its search box enabled when lat/lon is chosen.
+    **Tom has ruled out a standalone search interface for now** (Task 437, closed into this one):
+    *"There's not a lot of reason for search once you are at your model."*
   - **Against it:** the current fly-out ASKS FOR NOTHING — the choice is which row you click, and a
     wizard puts a form in front of the commonest action. Weigh that before building.
 
@@ -239,16 +216,60 @@ the block.
 - 75|486| **A small-screen presentation pass for the map editor.**
   Tom, 2026-08-22, for crawlers and humans alike on a phone: hide page titles, hide or collapse the
   HawsEDC navbar, keep only the transport controls on the toolbar, and drop menu text to icons.
-  This retires "almost impossible on a phone" — his words are *"better used on a PC even though it
-  is tested and usable on a phone screen"*, which is now what `dev/librewaternet-landing` claims.
-  The desktop layout stays authoritative; a phone is still not evidence for a design decision here.
+  - **The goal is "well, maybe", not a phone app.** Tom: *"the truth is that this is a PC app, just
+    like EPANET and epanetjs, and epanetjs takes the same stance only a little more strongly than I
+    want to put it. For PC of course, but go ahead and try it on your phone... We are not usable on a
+    phone today, IMO. We will be with those four small-screen tasks done."* The desktop layout stays
+    authoritative; a phone is still not evidence for a design decision here.
+  - **BLOCKING: `dev/librewaternet-landing/index.html` already claims the page is "tested and usable
+    on a phone screen", and that claim is FALSE until this ships.** The landing page must not go live
+    before it.
 
-- 75|485| **All six production logs start within four minutes of 2026-08-14.**
-  Nobody archived, purged or emptied them, yet the window is 8.5 days and `engcalcs-lang.log`,
-  `-human-view.log`, `-calc-usage.log`, `-title.log`, `-signal.log` and `-contact-send.log` each
-  begin at 2026-08-14T11:57–11:58Z. Six files truncated at once is one event, not attrition —
-  candidates are host log rotation, a deploy that recreated the directory, or a quota event.
-  **Until it is identified, no window longer than the current one can be trusted to exist.**
+- 75|485| **Give the production log archives a systematic path and naming.**
+  All six production logs begin at 2026-08-14T11:57–11:58Z because Tom archived them there, with
+  advice from this project. The archives are on the server and available for analysis; what they lack
+  is a convention.
+  - Give them a systematic path and file naming so `log/lang-log-stats.sh` can be pointed at a
+    historical window, and so a future reader can tell an archive boundary from a data loss.
+
+- 75|472| **`alignedSideFor()` walks every link to place one label.**
+  It is the next quadratic. With the four measurement quadratics fixed (Task 440), a Close of the 256-junction grid spends 21%
+  of its self time in `linkPointList()` — 480 x 480 calls on that drawing — against getBBox()'s 6.2%.
+  The number to beat and the profile it came from are at the top of `dev/browser-pass/specs/perf.js`;
+  a saving worth defending is worth a COUNTABLE guard, as `dev/lpn-spike/label-batch-harness.js` is.
+
+- 75|478| **[H] Tab should walk down the input column, not sideways.**
+  Tom, 2026-08-22: *"One entire column at a time... it is less bad to force a user tabber person into
+  'do an entire column at once' than 'do an entire row at once'"* — a user is focused on one to three
+  variables, and sending them through a whole row defeats tabbing. Row-tables `mi`, `wi`, `ip` and
+  `bpn` are where the win is largest.
+  - **DOM ORDER, NOT `tabindex`, is the tool that delivers exactly that.** Lay the two inner tables
+    built by `echoCalculatorForm()` out as a CSS grid whose DOM is column-major — all inputs, then
+    all units, then all X's — so Tab walks the entire input column and nothing loses keyboard access.
+  - **Rejected: `tabindex="-1"` on everything but titles and inputs.** It removes a control from the
+    keyboard entirely, so a keyboard-only user could not switch ft to m (WCAG 2.1.1 requires all
+    functionality to be keyboard-operable), and the per-row X would become mouse-only.
+  - The prize is `dev/scripts/focus_order_check.php`'s advisory `x-cross` column (a number input
+    sitting after a unit select): Manning-Trap 16, Irrigation-Pressure 12, Orifice-Drain-Time 9,
+    Branched-Network 8, Darcy-Weisbach 8, Manning-Pipe-Flow 4. It flips to blocking when this lands.
+
+- 75|483| **EPANET import: carry unhandled features into a per-asset import notes field.**
+  Tom, 2026-08-22. Today an import reports its differences and then the information is discarded; a
+  notes field the user can read would keep it, e.g. *"EPANET Label was marked a Meter associated
+  with Link 999 and anchored to Link 999."* He leans toward IMPLEMENTING the anchor (a Text object
+  associated with a node or link) and merely NOTING the Meter — EPANET's Meter shows whichever
+  single notation property is selected on Nodes or Links at that moment, which is less flexible than
+  what our labels already do, so reproducing it is not obviously worth it. Tom: *"I'm not opposed to
+  implementing this, and it may be better to implement it than to discuss it."*
+
+- 75|487| **Moving the suite to another path means editing 79 links.**
+  Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
+  `sw.php` and `consent.php`, and three `Redirect 301` rules in `.htaccess` that name `/engcalcs/`
+  absolutely. Tom is contemplating three web document roots with independent repositories (Task 479,
+  `dev/hosting-layout.md`), and this is what stands in the way of moving any of them.
+  - **The fix is one derived base-path constant plus a check that fails on a new hardcoded prefix.**
+    Root-relative was itself the 2026-08-08 fix for a `../` bug, so keep root-relative and make the
+    ROOT a variable — do NOT go back to relative paths.
 
 - 50|207| **The dilettante path: make replying cost one tap, not five steps.** Full design
   record in **`dev/dilettante-path.md`** — the cost ladder (Rung 0 is a tap with no text), the three
@@ -299,17 +320,6 @@ the block.
   - **Open:** back the original inputs up before a Destructive change, or offer to. An undo snapshot is
     already taken; whether that is enough is the question.
 
-- 50|427| **Say on the map which field it is coloured by.** The two Coloring dropdowns shipped
-  2026-08-18, but a project opened later shows a coloured map and no statement of what the colour
-  means. Candidate home: under or replacing the legend title.
-
-- 50|429| **The Ranges picker: one dropdown for mode and break count.** Today: four break boxes plus Equal intervals / Equal counts /
-  Automatic. Tom wants one dropdown choosing among 5 calculation modes and a number of breaks, reading
-  closed as e.g. `Ranges: 7 Pretty breaks`. *"If Classes isn't standard, I would call it Breaks, Tiers,
-  or Quantity, and I would list it first on the closed dropdown."*
-  - The RAMP picker and the ramp catalogue are done — 41 ramps in Brewer's three families in
-    `js/lpn-ramps.js`, each published at 3–7 classes, the rainbow kept last and never the default.
-
 - 50|433| **Profile: the last piece is the path CHOOSER.** Tom, 2026-08-18: *"Amazing. Now we just need a
   good UI."* Two of the three are done — the route is drawn on the map, and the panel is now the
   full-height Profile tab of Task 434's bottom pane.
@@ -321,50 +331,32 @@ the block.
     moving 90.8 ft at node 61 while the ground holds still. A browser pass here is about the
     chooser, not about whether it animates.
 
-- 50|437| **[H] The geocoder works; it has no interface outside the placement tool.** `js/lpn-search.js`
-  talks to Nominatim and is used by Convert to lat/lon…'s Go to… — the third-party-host and privacy
-  question was decided there, so this is now an interface question, not a policy one.
-  - **What Tom wants weighed (2026-08-21):** epanet-js puts it in a NEW-PROJECT WIZARD rather than a
-    menu. That is Task 477; if the wizard is built, this becomes a search box inside it and no separate
-    work at all. Decide 477 first.
-  - **Kept OUT of the Project menu, 2026-08-21**, when the element Find went in there: Tom, on where
-    the place search should sit, *"We will have to address 1 later."* A row that vanishes in every
-    grid project is not a discovery fix, so it waits on 477 rather than taking the cheap door.
-
 - 50|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
 
 - 75|442| **[H] The toolbar may want to become a side menu.**
-  transform the toolbar
-  into some sort of a side menu. This would have the advantage of using sidereal estate when height
-  real estate is very limited."* Raised, not scoped. **Raised again 2026-08-20 with the trigger
-  named:** *"Did I already suggest putting the menu and the toolbar vertically down the left edge
-  when the screen is wider than tall?"* He had (2026-08-18, above). The new part is the
-  CONDITION — wider than tall — which makes it a responsive rule rather than a redesign, and which is measurable rather than a matter of taste. the SIDE-MENU half is worth something on its own merits, on a laptop with 800px of height.
+  Raised 2026-08-18: phones have a swipe superpower that is not idiomatic on a PC, so a different
+  phone layout convention that could translate to the PC — transforming the toolbar into some sort of
+  side menu — would use side real estate when height real estate is very limited. Raised, not scoped.
+  - **Raised again 2026-08-20 with the trigger named:** *"Did I already suggest putting the menu and
+    the toolbar vertically down the left edge when the screen is wider than tall?"* The new part is
+    the CONDITION — wider than tall — which makes it a responsive rule rather than a redesign, and
+    which is measurable rather than a matter of taste.
+  - This page is a full-window drawing surface designed for a pointer, so the PHONE half is worth
+    little on its own; the SIDE-MENU half is worth something regardless, on a laptop with 800px of
+    height.
 
-- 75|452| **Satellite imagery from Mapbox: BUILT, blocked on the token decision.**
-  Tom asked for it, chose Mapbox over a keyless source, created the account and supplied a public
-  `pk.` token 2026-08-19. Shipped: a second tile source beside OpenStreetMap, its own View row, its
-  own required attribution (Mapbox names Mapbox and Maxar as well as OpenStreetMap), and a fallback
-  to the street map when there is no token, so a fork of the suite simply has no satellite row.
-  - `privacy.php` now has a section naming both OpenStreetMap and Mapbox. **It previously claimed
-    "nothing on this site is loaded from anybody else's server", which had been false since the OSM
-    basemap shipped** — the tiles were always a third-party request. `js/vendor/README.md` said the
-    same thing and is corrected.
-
-- 50|459| WAIT: sprint — **The next sprint's contents, already earned.** Six English strings changed after sprint 438
-  launched and are flagged CHANGED with stale translations in 26 languages: the five rewritten
-  `lpn_notes_*` (Task 448's stability note and the Notes review) and `lpn_file_import_inp_tip`. Plus
-  the keys written since: `lpn_color_mode_manual`, `lpn_time_no_period`, and the three
-  `lpn_basemap_satellite_*`. Needs Tom's authorization, and a Wave 0 over the changed set first.
-  **ASKED AND HELD, 2026-08-21:** offered a full 26-language run or a core-four run, Tom chose
-  "hold the sprint entirely". The queue keeps accumulating; do not re-propose without a reason he
-  has not already heard.
-  - **Earned 2026-08-21 by the menu/toolbar rework:** `lpn_clean_map` CHANGED to Tom's own wording
-    ("Reduce map clutter", replacing "Clean map" — he called it "more honest and understandable"), so
-    26 translations of it are now stale. NEW: `lpn_tables_menu`, `lpn_tables_menu_tip`,
-    `lpn_run_menu_tip`, `lpn_settings_auto_run`, `lpn_settings_auto_run_tip`, `lpn_time_run_slow`.
+- 50|465| **[H] Reusable pipe and pump TYPES, so editing one edits 400.**
+  One "150 mm PVC" definition that 400 pipes point at. A type carries diameter, roughness and minor-loss k; an element names
+  a type instead of repeating the numbers. Tom named these beside Patterns/Curves/Controls in Task 462,
+  but those are things the document already HOLDS — this is a new indirection through the element model.
+  - **It starts at `effective()`, which is the expensive part.** A third resolution layer — override →
+    element → type-default — under the one seam the solver, renderer, labels, popups and six pane
+    tables all read through. Plus a visible detached-versus-inherited state per property, or a user
+    edits a definition and cannot see why nothing moved.
+  - **EPANET has no such concept**, so an `.inp` export flattens it and an import can never rebuild it,
+    which breaks Task 281's byte-identical round trip for anything typed. Task 390-sized.
 
 - 50|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
   *"Properties are never dropped from node labels, so Node label drop order is a lie... As I look at
@@ -389,36 +381,6 @@ the block.
     showing least — the lowest demand, the pressure nearest the middle of the range, or the
     elevation or head closest to the neighbouring nodes."* Swap it in when this lands.
 
-- 50|472| **`alignedSideFor()` walks every link to place one label.**
-  It is the next quadratic. With the four measurement quadratics fixed (Task 440), a Close of the 256-junction grid spends 21%
-  of its self time in `linkPointList()` — 480 x 480 calls on that drawing — against getBBox()'s 6.2%.
-  The number to beat and the profile it came from are at the top of `dev/browser-pass/specs/perf.js`;
-  a saving worth defending is worth a COUNTABLE guard, as `dev/lpn-spike/label-batch-harness.js` is.
-
-- 50|478| **[H] Tab should walk down the input column, not sideways.**
-  Phase 2: the two INNER tables built by `echoCalculatorForm()` become grids, so every number input
-  precedes its own unit select. It is ONE FUNCTION but a layout change to all sixteen calculators
-  that no harness can see — only a browser pass confirms it. The prize is the `x-cross` column
-  `dev/scripts/focus_order_check.php` prints (a number input sitting after a unit select):
-  Manning-Trap 16, Irrigation-Pressure 12, Orifice-Drain-Time 9, Branched-Network 8,
-  Darcy-Weisbach 8, Manning-Pipe-Flow 4. Flip that column from advisory to blocking when it lands.
-  - **The X paradigm stays and the per-row X links are back in the tab order** (Tom, 2026-08-22).
-    `echoLineChooser()` and the `tabindex="-1" aria-hidden="true"` hiders are scrapped, and
-    `focus_order_check.php` is advisory rather than blocking on its hide-stop count.
-  - **RULED: HTML, not a JS Tab interceptor** (Tom, 2026-08-21: *"I meant HTML"*). That also rules
-    out both `tabindex` levers: `-1` on a select makes changing a unit keyboard-unreachable (a WCAG
-    2.1.1 failure, not a nuisance), and a positive `tabindex` hoists the whole form above the navbar
-    document-wide. A label link is real navigation and stays focusable.
-
-- 50|483| **EPANET import: carry unhandled features into a per-asset import notes field.**
-  Tom, 2026-08-22. Today an import reports its differences and then the information is discarded; a
-  notes field the user can read would keep it, e.g. *"EPANET Label was marked a Meter associated
-  with Link 999 and anchored to Link 999."* He leans toward IMPLEMENTING the anchor (a Text object
-  associated with a node or link) and merely NOTING the Meter — EPANET's Meter shows whichever
-  single notation property is selected on Nodes or Links at that moment, which is less flexible than
-  what our labels already do, so reproducing it is not obviously worth it. Tom: *"I'm not opposed to
-  implementing this, and it may be better to implement it than to discuss it."*
-
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   HW draws 580 confirmed humans (18% human-of-reach, the suite's second-biggest front door) but only
   11% of them calculate, against a 51–67% band on six comparable pages — ~517 lost humans per period.
@@ -427,14 +389,6 @@ the block.
     C-value table on the page; calculator queries mean a real UX leak.
   - **Do not promote Task 146 on the 11% number alone** — it does not yet distinguish a leak from
     satisfied reference demand, because `human` counts anyone who dwells 10 s without typing.
-
-- 25|146.05| **EPANET-style element browser (Task 146 child).** List/select elements from a panel
-  rather than only the canvas. **If this lists TEXT elements** (EPANET's own Browser does have a
-  Labels category), restore the Text row to the Settings panel's ID-prefixes list — it was removed
-  2026-07-30 because a text element's ID is unreachable from every screen in the app, making the
-  control visibly inert. `settings.idPrefixes.T` and `nextId.T` were both kept, so restoring it is
-  one array entry in `rebuildSettingsFields()`. That row is only worth having once a text ID is
-  something the user can actually see.
 
 - 25|185| **Match/Copy properties tool (originated during Task 146).** Tom, 2026-07-30: "In the absence of the
   table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
