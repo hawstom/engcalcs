@@ -540,5 +540,149 @@ console.log('\n--- the strip may be two lines ---');
 		'...and the chrome is MEASURED, never a constant that a wrapped strip would falsify');
 }
 
+// ---- 11. a column has ONE alignment, and the heading is part of the column ---------------------
+// Tom, 2026-08-23: *"the inputs and the headings are not middle/center (?) justified with each
+// other. Inputs are left and headings are center. This looks worst on Reservoirs because they have
+// fewer, wider columns. But it applies to all of the tables."*
+//
+// **THE CENTRING CAME FROM THE BROWSER, NOT FROM US.** A sort heading is a <button>, and every
+// browser's own stylesheet centres a button's text; the <th> said `left` and was overruled inside
+// its own cell. Invisible while a heading is one line, and unmissable the moment it wraps -- which
+// on a phone is most of them, and worst where the columns are widest.
+//
+// The fix is a class on the heading matching the class on its cells, so this section asks the two
+// questions that can go wrong independently: does the RENDERER put the same class on both, and
+// does a RULE then fire on it. Measured in a real browser at 360px, Elm Street Center's Pipes
+// table: ten headings centred over cells aligned left or right, now ten agreeing.
+console.log('\n--- heading and cells share one alignment ---');
+{
+	const NUM = 'lpn-pane-num';
+	// The real panels, filled by the real renderer -- every one of the six, because "it applies to
+	// all of the tables" is the claim being checked.
+	L.paneTables().forEach(function (spec) {
+		L.renderTable(spec.id);
+		const host = byId[spec.panel];
+		const table = (host.children || []).filter((c) => c._tag === 'table')[0];
+		if (!table) { report(false, spec.id + ': the panel holds a table'); return; }
+		const thead = table.children.filter((c) => c._tag === 'thead')[0];
+		const tbody = table.children.filter((c) => c._tag === 'tbody')[0];
+		const ths = thead.children[0].children;
+		const tds = tbody.children[0].children;
+		report(ths.length === spec.cols.length && tds.length === spec.cols.length,
+			spec.id + ': one heading and one cell per column', ths.length + ' / ' + tds.length);
+		const disagree = spec.cols.filter((c, i) => ths[i].className !== tds[i].className);
+		report(disagree.length === 0, spec.id + ': every heading carries its own cells’ classes',
+			disagree.map((c) => c.key).join(','));
+		// And the class is the one the alignment hangs on: a number is a number whether it was typed
+		// or computed, which is the rule the printed sheet has always used.
+		const wrong = spec.cols.filter((c, i) =>
+			(ths[i].classList.contains(NUM)) !== !!(c.result || c.set));
+		report(wrong.length === 0, spec.id + ': exactly the number columns are marked as numbers',
+			wrong.map((c) => c.key).join(','));
+	});
+	// The ID column is the worked example of the other side: a name is not a figure.
+	L.renderTable('pipes');
+	const pipeTable = byId.lpn_pane_pipes.children.filter((c) => c._tag === 'table')[0];
+	const pipeThs = pipeTable.children.filter((c) => c._tag === 'thead')[0].children[0].children;
+	report(!pipeThs[0].classList.contains(NUM) && pipeThs[0].classList.contains('lpn-pane-col-id'),
+		'the ID heading is not a number column, and names itself');
+	report(pipeThs[5].classList.contains('lpn-pane-col-roughness'),
+		'...and every column names itself, which is what lets one column be narrowed',
+		pipeThs[5].className);
+}
+
+// ---- 12. the rules that alignment, the sticky heading and the phone widths hang on -------------
+// Read from css/engcalcs.css and asked of the elements the renderer above actually built. Asserting
+// that a class was applied proves nothing on its own; these two sections together are the chain.
+console.log('\n--- and the stylesheet answers accordingly ---');
+{
+	const CSS = require('./pane-table-css.js').load(path.join(ROOT, 'css', 'engcalcs.css'));
+	const blind = [];
+	const WIDE = 1200, SMALL = 360;
+	const html = { tag: 'html', cls: [], canvasHost: true };
+	const panel = { tag: 'div', cls: ['lpn-pane-panel', 'lpn-pane-scroll', 'on'] };
+	const table = { tag: 'table', cls: ['lpn-pane-table'] };
+	const thead = { tag: 'thead', cls: [] };
+	const tr = { tag: 'tr', cls: [] };
+	// A heading really does sit inside a <thead>, and `.lpn-pane-table thead th` is the rule that
+	// makes it stick -- a chain missing that node would answer "no rule" to every sticky question.
+	const chainTo = (node) => [html, panel, table].concat(node.tag === 'th' ? [thead] : [], [tr, node]);
+	const cell = (tag, key, num) => chainTo({ tag: tag,
+		cls: ['lpn-pane-col-' + key].concat(num ? ['lpn-pane-num'] : []) });
+	const inputIn = (key) => [html, panel, table, tr,
+		{ tag: 'td', cls: ['lpn-pane-col-' + key, 'lpn-pane-num'] }, { tag: 'input', cls: [] }];
+	const sortBtn = chainTo({ tag: 'th', cls: ['lpn-pane-col-flow', 'lpn-pane-num'] })
+		.concat([{ tag: 'button', cls: ['lpn-pane-sort'] }]);
+	const align = (chain, w) => CSS.winning(CSS.rules, chain, w, 'text-align', blind);
+	const width = (chain, w) => CSS.winning(CSS.rules, chain, w, 'width', blind);
+
+	// **THE READER'S OWN SELF-TEST.** Two answers it must get right before any answer it gives is
+	// worth reading, and a selector it cannot parse is collected and reported at the end rather
+	// than silently answering "no rule".
+	report(align(cell('td', 'id', false), WIDE) === 'left', 'reader self-test: a plain cell reads left');
+	report(width(inputIn('length'), WIDE) === '7em' && width(inputIn('length'), SMALL) === '3.5em',
+		'reader self-test: the number box is 7em wide and 3.5em on a phone',
+		width(inputIn('length'), WIDE) + ' / ' + width(inputIn('length'), SMALL));
+
+	// 1. ALIGNMENT. The same question for the heading and for the cell, at both widths.
+	[WIDE, SMALL].forEach((w) => {
+		report(align(cell('th', 'flow', true), w) === 'right' && align(cell('td', 'flow', true), w) === 'right',
+			'a number column is right at ' + w + 'px, heading and cell alike');
+		report(align(cell('th', 'id', false), w) === 'left' && align(cell('td', 'id', false), w) === 'left',
+			'...and a name column is left at ' + w + 'px, heading and cell alike');
+	});
+	// The heading BUTTON is what the browser centres, so the reset is the whole fix.
+	report(align(sortBtn, WIDE) === 'inherit',
+		'the sort button hands its alignment back to its own heading cell', align(sortBtn, WIDE));
+
+	// 2. THE STICKY HEADING, and the 6px band the rows were scrolling through above it.
+	const thChain = cell('th', 'flow', true);
+	report(CSS.winning(CSS.rules, [html, panel], WIDE, 'padding-top', blind) === '0',
+		'a scrolling panel has no top padding -- a sticky top:0 sticks to the CONTENT edge, and the ' +
+		'padding above it is the band the sliver showed in');
+	report(CSS.winning(CSS.rules, thChain, WIDE, 'padding-top', blind) === '6px',
+		'...the heading carries that padding itself, so the table still opens with air above it');
+	report(CSS.winning(CSS.rules, thChain, WIDE, 'position', blind) === 'sticky' &&
+		CSS.winning(CSS.rules, thChain, WIDE, 'top', blind) === '0',
+		'the heading row still sticks');
+	report(CSS.winning(CSS.rules, thChain, WIDE, 'z-index', blind) === '2',
+		'...above the rows rather than merely painted after them');
+	report(/^(#fff|rgb|white)/.test(String(CSS.winning(CSS.rules, thChain, WIDE, 'background', blind))),
+		'...opaque, in the pane’s own colour', CSS.winning(CSS.rules, thChain, WIDE, 'background', blind));
+	// The rule under the headings is an inset shadow: under `border-collapse: collapse` a border
+	// belongs to the TABLE, so it scrolls away from the sticky cell that declared it.
+	report(/inset 0 -1px 0/.test(String(CSS.winning(CSS.rules, thChain, WIDE, 'box-shadow', blind))),
+		'the line under the headings travels with them');
+	report(CSS.winning(CSS.rules, thChain, WIDE, 'border-bottom', blind) === null,
+		'...and is not a border, which under border-collapse would scroll on its own');
+
+	// 3. THE PHONE-ONLY WIDTHS on the two columns Tom named, and the desktop that must not move.
+	report(width(cell('th', 'roughness', true), SMALL) === '4.2em' &&
+		width(inputIn('roughness'), SMALL) === '2.6em',
+		'Roughness narrows below the breakpoint -- 0.60 of its column, 0.74 of its box');
+	report(width(inputIn('km'), SMALL) === '1.75em',
+		'...and the Minor loss box is half what it was');
+	report(width(cell('th', 'km', true), SMALL) === '2.9em',
+		'...inside a column that stops at four lines of heading rather than six');
+	report(CSS.winning(CSS.rules, cell('th', 'roughness', true), SMALL, 'overflow-wrap', blind) === 'anywhere',
+		'a narrowed heading may break mid-word -- it is that or an abbreviation, and an abbreviation ' +
+		'is 26 translations');
+	// **THE REGRESSION THIS COULD CAUSE**, and the one the whole punch list keeps risking.
+	report(width(cell('th', 'roughness', true), WIDE) === null && width(cell('th', 'km', true), WIDE) === null,
+		'the desktop columns are untouched at 1200px',
+		width(cell('th', 'roughness', true), WIDE) + ' / ' + width(cell('th', 'km', true), WIDE));
+	report(width(inputIn('roughness'), WIDE) === '7em' && width(inputIn('km'), WIDE) === '7em',
+		'...and so are the desktop boxes',
+		width(inputIn('roughness'), WIDE) + ' / ' + width(inputIn('km'), WIDE));
+
+	// The reader's blind-spot report, scoped to the selectors that could possibly reach what this
+	// section asks about. A rule about the menu bar or a spinner is none of its business, and a
+	// reader that listed those would be ignored within a week.
+	const mine = [...new Set(blind)].filter((sel) =>
+		/lpn-pane/.test(sel) && !/[:[]/.test(sel.replace('html:has(#lpn_canvas)', '')));
+	report(mine.length === 0, 'every pane-table selector this section met was one the reader understands',
+		mine.join(' | '));
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);

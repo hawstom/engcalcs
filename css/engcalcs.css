@@ -1127,18 +1127,39 @@ html[lang="zh"] .ec-welcome {
    rule comes later in this file. */
 .lpn-pane-panel.lpn-pane-scroll { overflow: auto; }
 .lpn-pane-panel.lpn-pane-scroll.on { display: block; }
+/* **NO TOP PADDING ON A SCROLLING PANEL, AND THAT IS THE WHOLE OF THE SLIVER FIX** (Tom,
+   2026-08-23: "when you scroll a table, a tiny sliver of the data is visible scrolling above the
+   headings. It's a little bit cool and a little bit embarrassing"). A sticky `top: 0` sticks to
+   the scrollport's CONTENT edge, so a container padded 6px at the top leaves a 6px band above the
+   heading row that the rows scroll through in plain sight -- measured at exactly 6.0px, with a row
+   in it. The padding moves into the sticky heading itself below, so the table still opens with air
+   above it and there is no band left for anything to show in. */
+.lpn-pane-panel.lpn-pane-scroll { padding-top: 0; }
 /* The tabular editors. Column width is king: headings stay narrow, cells stay tight, and the
    number columns are right-aligned so a column of figures reads as one. The heading row STICKS,
    because a table you scroll is a table whose headings you lose. */
 .lpn-pane-table { border-collapse: collapse; font-size: .9em; }
 .lpn-pane-table th, .lpn-pane-table td { padding: 1px 6px 1px 0; text-align: left; border: 0; }
-.lpn-pane-table thead th { position: sticky; top: 0; background: #fff; border-bottom: 1px solid #ccc; }
-.lpn-pane-table td.lpn-pane-num { text-align: right; font-variant-numeric: tabular-nums; }
+/* z-index, because a sticky cell only outranks the rows by paint order and one positioned thing in
+   a row would beat it; padding-top, because the panel's own is gone; and the rule under the
+   headings is an INSET SHADOW rather than a border -- under `border-collapse: collapse` the border
+   belongs to the table, not to the cell, so it scrolls away from the heading that owns it. */
+.lpn-pane-table thead th {
+	position: sticky; top: 0; z-index: 2; background: #fff;
+	padding-top: 6px; box-shadow: inset 0 -1px 0 #ccc;
+}
+/* **A COLUMN HAS ONE ALIGNMENT, HEADING INCLUDED.** Every browser's own stylesheet centres a
+   <button>, so the sort heading centred its wrapped lines over cells that were left or right --
+   which is what Tom saw. `inherit` hands the heading back to its own <th>. */
+.lpn-pane-table th.lpn-pane-num, .lpn-pane-table td.lpn-pane-num {
+	text-align: right; font-variant-numeric: tabular-nums;
+}
 .lpn-pane-table input { width: 7em; }
 /* A heading that sorts and an ID that goes to the map are both flat text buttons: they are the
    cell, not a control sitting in it. */
 .lpn-pane-sort, .lpn-pane-goto {
 	background: none; border: 0; font: inherit; padding: 0; cursor: pointer; color: inherit;
+	text-align: inherit;
 }
 .lpn-pane-sort { font-weight: bold; }
 .lpn-pane-goto { text-decoration: underline; }
@@ -1178,7 +1199,7 @@ html[lang="zh"] .ec-welcome {
 	.lpn-print-table { border-collapse: collapse; font-size: 9pt; }
 	.lpn-print-table td.lpn-pane-num { text-align: right; font-variant-numeric: tabular-nums; }
 	.lpn-print-table thead { display: table-header-group; }
-	.lpn-print-table thead th { position: static; border-bottom: 1pt solid #000; }
+	.lpn-print-table thead th { position: static; border-bottom: 1pt solid #000; box-shadow: none; padding-top: 1pt; }
 	.lpn-print-table th, .lpn-print-table td { padding: 1pt 6pt 1pt 0; }
 	.lpn-print-table tr { page-break-inside: avoid; }
 }
@@ -1932,6 +1953,35 @@ html:has(#lpn_canvas) { overflow: hidden; }
 	   rule is that the desktop layout does not move unless he asked for that layout to move, and
 	   this item did not say so. Moving it out of this block is a one-line change if he confirms. */
 	html:has(#lpn_canvas) .lpn-pane-table input { width: 3.5em; }
+
+	/* 5c. AND THE PIPES TABLE'S TWO WIDEST HEADINGS COME IN WITH THEM (Tom, 2026-08-23: "Pipes is
+	   the table with too much for a narrow screen, and it's not much more than a narrow screen can
+	   handle... Scale the width of the Roughness input 0.75 and column 0.6, Minor loss Km input 0.5
+	   and column 0.5 (approx.), just to help a little"). Ten columns of pipe measure 602px in a
+	   360px panel; these two were 100.4px and 56.4px of it.
+
+	   WRAP, NEVER ABBREVIATE. An abbreviated heading is a new English string and 26 translations of
+	   it, and mid-word wrap in a column heading is already the house rule. `overflow-wrap: anywhere`
+	   is what lets the declared width win: a table column can never be narrower than its own
+	   min-content, and without it "Roughness" is one unbreakable 60px word.
+
+	   MINOR LOSS STOPS AT 0.74 RATHER THAN THE 0.50 ASKED FOR, AND THE REASON IS VERTICAL. Its
+	   heading is the one that has to break mid-word to get narrow, and every break is another line
+	   in a heading row inside a pane 260px tall: at 0.50 the column is 31px and "Minor loss, k"
+	   becomes SIX lines, 129.7px against the 86.4px "Head loss (ft H2O)" already costs. 2.9em is the
+	   last width that still fits in four -- so the row is no taller than it was, and the 43px this
+	   saves vertically is worth more than the 14px it gives up sideways. The input inside it is the
+	   0.5 Tom asked for either way. Sideways scroll stays the fallback: this is a nudge, not a
+	   re-layout, and the table is still wider than the phone. Measured on Elm Street Center at
+	   360px: Roughness 100.4 -> 60.5, Minor loss 56.4 -> 41.8, the table 602 -> 547. */
+	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-roughness {
+		overflow-wrap: anywhere; width: 4.2em; min-width: 4.2em;
+	}
+	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-roughness input { width: 2.6em; }
+	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-km {
+		overflow-wrap: anywhere; width: 2.9em; min-width: 2.9em;
+	}
+	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-km input { width: 1.75em; }
 
 	/* 6. THE SYMBOLOGY ROWS WRAP AS A GROUP (Tom, 2026-08-22, choosing between his own two ideas:
 	   "Idea B is to wrap the four inputs for Before/After/Decimal/Drop together below the checkbox
