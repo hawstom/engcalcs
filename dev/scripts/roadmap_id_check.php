@@ -34,6 +34,8 @@
  *   php dev/scripts/roadmap_id_check.php --strict   # also fail on an over-long block
  */
 
+require_once __DIR__ . '/roadmap_lib.php';
+
 $root    = realpath(__DIR__ . '/../..');
 $openPath    = $root . '/dev/ROADMAP.md';
 $closedPath  = $root . '/dev/roadmap-closed-ids.md';
@@ -242,6 +244,58 @@ if ($long) {
     echo "at it. Expansion is earned only by a decision with a real rejected alternative, a measured\n";
     echo "number, a non-obvious blocker, or a correction of something recorded wrong here.\n";
     if ($strict) { $failed = true; }
+}
+
+// ---------------------------------------------------------------------------------------------
+// EXECUTIVE-SUMMARY TITLES. Every open task must OPEN with a short title a reader can scan.
+//
+// The definition of a title, and why 4-12 words, is in dev/scripts/roadmap_lib.php -- one place,
+// so this check and dev/roadmap-index.md can never disagree about what they are measuring.
+//
+// ADVISORY FOR NOW, BLOCKING LATER. This shipped 2026-08-22 against a backlog written before the
+// rule existed, so most tasks fail on day one. A check that fails the build on every commit gets
+// commented out, which is worse than no check at all. INTENDED END STATE: once the summary line
+// below reads "N of N", move this into the blocking set (drop the $strict guard) -- at that point
+// only a NEW non-conforming title can trip it, which is exactly what the rule is for.
+$titleBad = array();
+$titleAll = 0;
+foreach (roadmapParseTasks($openPath) as $t) {
+    if ($t['priority'] === 0) { continue; }
+    $titleAll++;
+    if (!$t['titleOk']) { $titleBad[] = $t; }
+}
+if ($titleBad) {
+    if ($failed) { echo "\n"; }
+    $label = $strict ? 'TITLES OUTSIDE 4-12 WORDS' : 'ADVISORY: titles outside 4-12 words';
+    echo $label . ' (' . count($titleBad) . " of $titleAll open tasks):\n\n";
+    foreach ($titleBad as $t) {
+        $shown = $t['title'] === '' ? '(no bolded run opens the description)' : $t['title'];
+        if (mb_strlen($shown) > 78) { $shown = mb_substr($shown, 0, 75) . '...'; }
+        printf("    line %-6d Task %-8s %2d words  %s\n", $t['line'], $t['id'], $t['titleWords'], $shown);
+    }
+    echo "\nA TITLE is the first bolded run of the description — the `**...**` that opens it, which\n";
+    echo "may wrap across lines. The `- priority|id|` prefix, a WAIT:/CHECK: marker and an actor\n";
+    echo "tag ([H], [CC], [CP], [CC->CP]) are metadata and are NOT part of it, even when the tag is\n";
+    echo "written inside the bold. A colon-led ALL-CAPS keyword IS part of it and IS counted.\n";
+    echo "A word is a whitespace token holding a letter or digit, so a bare em dash is not one.\n\n";
+    echo "It must be 4 to 12 words. Under four it is a stub, not a summary; past twelve it is the\n";
+    echo "sentence the BODY should carry. Do not delete content to make a title fit: shorten the\n";
+    echo "bolded run and keep the full original sentence as the first line of the body.\n";
+    if ($strict) { $failed = true; }
+}
+echo ($titleAll - count($titleBad)) . " of $titleAll open tasks have a conforming 4-12 word title.\n";
+
+// ---------------------------------------------------------------------------------------------
+// The generated index must match the roadmap. BLOCKING, unlike the two advisories above, because
+// regenerating is one command and "stale" is not a judgement call.
+$idx = escapeshellarg($root . '/dev/scripts/generate_roadmap_index.php');
+$out = array();
+$rc  = 0;
+exec('php ' . $idx . ' --check 2>&1', $out, $rc);
+if ($rc !== 0) {
+    if ($failed) { echo "\n"; }
+    echo implode("\n", $out) . "\n";
+    $failed = true;
 }
 
 if ($failed) {
