@@ -14246,9 +14246,9 @@ var EngCalcs = EngCalcs || {};
 	// like a survey or state-plane grid. Extent 1400 x 700, centre exactly 5000,5000.
 	//
 	// **NOTHING IN THE APP CALLS THIS.** The gallery ships the same ring main as
-	// Basic-example-US/SI-units-lpn.json. It stays as the fixture SEVEN harnesses build their network
-	// from -- closed-link, gradient-label, id-prefix, friction-method, label-affix, readout-sign and
-	// example-network. Retiring it means giving those a network some other way (Task 378).
+	// Basic-example-US/SI-units-lpn.json. It stays as the fixture the dev/lpn-spike/ harnesses build
+	// their network from -- `grep -l drawExampleNetwork dev/lpn-spike` is the list, and it grows.
+	// Retiring it means giving every one of those a network some other way (Task 378).
 	function drawExampleNetwork(system) {
 		if (doc.nodes.length > 0) {
 			var pc = EngCalcs.pageConfig || {};
