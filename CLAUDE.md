@@ -198,11 +198,14 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
 - **Design this page for a pointer; then make a phone survivable.** It is a full-window drawing
   surface with a menu bar, toolbar, tab strip and property popup, so the desktop layout is the
   authoritative one and no design argument starts from a phone. Say "pointer slop" when you mean
-  hand-and-mouse tolerance; a 44px touch target is not an argument here. But **"almost impossible on
-  a phone" is retired** (Tom, 2026-08-22): it is tested and usable there, and the small-screen pass
-  he asked for is Task 486 — hide page titles, collapse the navbar, keep only the transport
-  controls on the toolbar, and drop menu text to icons. The other calculators are a form and an
-  answer and are fine as they are.
+  hand-and-mouse tolerance; a 44px touch target is not an argument here. **This is a PC app the way
+  EPANET and epanet-js are** — epanet-js takes that stance slightly harder than Tom wants to, and his
+  framing is *"for PC of course, but go ahead and try it on your phone"*. **It is NOT usable on a
+  phone today** (Tom, 2026-08-22), and the four small-screen items of Task 486 — hide page titles,
+  collapse the navbar, keep only the transport controls on the toolbar, drop menu text to icons —
+  are what he expects to move it from "obviously never tried on a phone" to "well, maybe". Say so
+  conditionally until they ship. The other calculators are a form and an answer and are fine as they
+  are.
 
 ---
 
@@ -422,6 +425,7 @@ own failure; this table is an index, not a duplicate of that text.
 | `roadmap_id_check.php` | ID uniqueness across ROADMAP + closed ledger; priority 0 means closed and nothing else |
 | `run_harnesses.sh` | The lpn solver and editor harnesses (count derived from the glob, never typed) |
 | `run_calc_harnesses.sh` | Every calculator's own `pageCalculator` against its own rendered HTML |
+| `stale_claim_check.php` | *Advisory.* A `Task N` cited in `CLAUDE.md` or a `dev/*.md` whose task is CLOSED, ranked by whether a negation sits beside it — the shape of the three false "not built yet" claims that shipped in one day. A worklist, never a verdict |
 | *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php` | Judgement calls that must not block a commit |
 
 **When you are about to write a new rule in this file, first ask whether it can be a check.** Every
@@ -447,9 +451,9 @@ worth roughly ten a human must remember**, and this file's unexecutable half is 
 - **Every calculator now has a worked-example test of its math except `rc`**, which is partial (its
   Robinson coefficients are unverified — the paper is paywalled and the free copy is a page scan).
   The five that had none — `mi`, `wi`, `ip`, `bpn`, `cs` — were anchored 2026-08-21 and **two of them
-  were wrong**: Canal Seepage's currency inputs convert backwards (Task 473) and Manning Irregular's
-  region Froude number mixes a region area with a segment top width (Task 474). Both defects are
-  recorded, neither is asserted, and the build stays green. Add a worked example for any new page;
+  were wrong**: Canal Seepage's currency inputs converted backwards (Task 473) and Manning Irregular's
+  region Froude number mixed a region area with a segment top width (Task 474). Both are fixed, and
+  each is now asserted by its own harness. Add a worked example for any new page;
   it is under an hour, and `dev/calc-spike/README.md` is the recipe.
 - **Row-table calculators** (Branched-Network, Irrigation-Pressure, Manning-Irregular,
   Weir-Flow-Irregular) now build their rows in their OWN per-page harness — `calc-page.js` grew
