@@ -255,11 +255,14 @@ the block.
   what our labels already do, so reproducing it is not obviously worth it. Tom: *"I'm not opposed to
   implementing this, and it may be better to implement it than to discuss it."*
 
-- 75|487| **Moving the suite to another path means editing 79 links.**
+- 50|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
-  `sw.php` and `consent.php`, and three `Redirect 301` rules in `.htaccess` that name `/engcalcs/`
-  absolutely. Tom is contemplating three web document roots with independent repositories (Task 479,
-  `dev/hosting-layout.md`), and this is what stands in the way of moving any of them.
+  `sw.php` and `consent.php`, and three `Redirect 301` rules in `.htaccess` naming it absolutely.
+  - **This does NOT block Task 479's move** (corrected 2026-08-23; the earlier claim that it did was
+    wrong). Moving the folder to `public_html/hawsedc.com/engcalcs` moves the document root with it,
+    so the URL path stays `/engcalcs/` and nothing breaks. What it blocks is serving the suite at a
+    DIFFERENT path — which is already true today: `constructionnotesmanager.com/hawsedc/engcalcs`
+    renders with broken CSS for exactly this reason.
   - **The fix is one derived base-path constant plus a check that fails on a new hardcoded prefix.**
     Root-relative was itself the 2026-08-08 fix for a `../` bug, so keep root-relative and make the
     ROOT a variable — do NOT go back to relative paths.
