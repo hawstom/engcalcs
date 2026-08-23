@@ -16,7 +16,8 @@
  *
  * Reads the stroke width out of EC_ICON_OPEN_TAG rather than retyping it. Supports the subset the
  * set actually uses: path M/L/H/V/C/Z (absolute and relative), <circle>, <ellipse>, <rect>. An
- * element carrying its own stroke-width or fill is honoured. Advisory tool, not a build check.
+ * element carrying its own stroke-width, fill, stroke-linecap or stroke-linejoin is honoured, so a
+ * mitered corner and a butt end measure as what they actually paint. Advisory tool, not a build check.
  */
 
 require_once(__DIR__ . '/../../lib/Icons.lib.php');
@@ -115,12 +116,50 @@ function ec_ap_shapes($geom) {
 			$polys = array(array(array($x,$y), array($x+$w,$y), array($x+$w,$y+$h), array($x,$y+$h), array($x,$y)));
 		}
 		$fill = $get('fill'); $stroke = $get('stroke'); $sw = $get('stroke-width');
+		$cap = $get('stroke-linecap'); $join = $get('stroke-linejoin');
 		if ($fill !== null && $fill !== 'none') { foreach ($polys as $p) { $fills[] = $p; } }
 		if ($stroke !== 'none') {
-			foreach ($polys as $p) { $strokes[] = array('poly' => $p, 'w' => $sw === null ? null : (float)$sw); }
+			foreach ($polys as $p) {
+				$strokes[] = array('poly' => $p, 'w' => $sw === null ? null : (float)$sw,
+					'cap' => $cap === null ? 'round' : $cap, 'join' => $join === null ? 'round' : $join);
+				if ($join === 'miter') {
+					$hw = ($sw === null ? ec_ap_default_stroke_width() : (float)$sw) / 2.0;
+					foreach (ec_ap_miter_wedges($p, $hw) as $w) { $fills[] = $w; }
+				}
+			}
 		}
 	}
 	return array($strokes, $fills);
+}
+
+/**
+ * The extra paint a MITER join puts outside the round join the sampler models by default: at each
+ * interior vertex, the quad [vertex, offset point, miter tip, offset point] on the outer side.
+ * Returned as fill polygons. Exists because "sharp corner" is a claim about roughly a fifth of a
+ * pixel at 17 px, which is exactly the size of claim that has to be measured rather than asserted.
+ */
+function ec_ap_miter_wedges($poly, $hw, $limit = 4.0) {
+	$w = array();
+	for ($j = 1; $j < count($poly) - 1; $j++) {
+		list($ax, $ay) = $poly[$j-1]; list($bx, $by) = $poly[$j]; list($cx, $cy) = $poly[$j+1];
+		$ux = $bx-$ax; $uy = $by-$ay; $ul = sqrt($ux*$ux+$uy*$uy);
+		$vx = $cx-$bx; $vy = $cy-$by; $vl = sqrt($vx*$vx+$vy*$vy);
+		if ($ul < 1e-9 || $vl < 1e-9) { continue; }
+		$ux /= $ul; $uy /= $ul; $vx /= $vl; $vy /= $vl;
+		$cross = $ux*$vy - $uy*$vx;
+		if (abs($cross) < 1e-9) { continue; }          // straight through: no join at all
+		$s = ($cross > 0) ? 1.0 : -1.0;                  // outer side of the turn
+		$n1 = array($s*$uy, -$s*$ux); $n2 = array($s*$vy, -$s*$vx);
+		$p1 = array($bx + $hw*$n1[0], $by + $hw*$n1[1]);
+		$p2 = array($bx + $hw*$n2[0], $by + $hw*$n2[1]);
+		// Intersect the two offset lines: p1 + t*u  =  p2 + r*v
+		$t = (($p2[0]-$p1[0])*$vy - ($p2[1]-$p1[1])*$vx) / ($ux*$vy - $uy*$vx);
+		$m = array($p1[0] + $t*$ux, $p1[1] + $t*$uy);
+		$d = sqrt(($m[0]-$bx)*($m[0]-$bx) + ($m[1]-$by)*($m[1]-$by));
+		if ($d > $limit * $hw) { continue; }             // past stroke-miterlimit: renders as bevel
+		$w[] = array(array($bx,$by), $p1, $m, $p2, array($bx,$by));
+	}
+	return $w;
 }
 
 function ec_ap_dist2_seg($px, $py, $ax, $ay, $bx, $by) {
@@ -133,6 +172,21 @@ function ec_ap_dist2_seg($px, $py, $ax, $ay, $bx, $by) {
 		$qx = $ax + $t*$dx; $qy = $ay + $t*$dy;
 	}
 	return ($px-$qx)*($px-$qx) + ($py-$qy)*($py-$qy);
+}
+
+/** True unless the point lies past the polyline's own first or last endpoint (butt-cap clipping). */
+function ec_ap_within_ends($px, $py, $poly, $k, $n) {
+	// A closed ring has no ends to clip; without this the seam of a <circle> would lose a wedge.
+	if (abs($poly[0][0]-$poly[$n-1][0]) < 1e-9 && abs($poly[0][1]-$poly[$n-1][1]) < 1e-9) { return true; }
+	if ($k === 1) {
+		$dx = $poly[1][0]-$poly[0][0]; $dy = $poly[1][1]-$poly[0][1];
+		if (($px-$poly[0][0])*$dx + ($py-$poly[0][1])*$dy < 0) { return false; }
+	}
+	if ($k === $n - 1) {
+		$dx = $poly[$n-1][0]-$poly[$n-2][0]; $dy = $poly[$n-1][1]-$poly[$n-2][1];
+		if (($px-$poly[$n-1][0])*$dx + ($py-$poly[$n-1][1])*$dy > 0) { return false; }
+	}
+	return true;
 }
 
 function ec_ap_in_poly($px, $py, $poly) {
@@ -170,11 +224,14 @@ function ec_ap_render($geom, $size, $sub = 4) {
 						foreach ($strokes as $s) {
 							$hw = (($s['w'] === null ? $defw : $s['w']) / 2.0);
 							$hw2 = $hw * $hw;
-							$poly = $s['poly']; $n = count($poly);
+							$poly = $s['poly']; $n = count($poly); $butt = ($s['cap'] === 'butt');
 							for ($k = 1; $k < $n; $k++) {
-								if (ec_ap_dist2_seg($px, $py, $poly[$k-1][0], $poly[$k-1][1], $poly[$k][0], $poly[$k][1]) <= $hw2) {
-									$covered = true; break 2;
-								}
+								if (ec_ap_dist2_seg($px, $py, $poly[$k-1][0], $poly[$k-1][1], $poly[$k][0], $poly[$k][1]) > $hw2) { continue; }
+								// A butt cap paints nothing past either end of the whole polyline; a
+								// round one (the set's default) paints a half disc there.
+								if ($butt && ($k === 1 || $k === $n - 1)
+									&& !ec_ap_within_ends($px, $py, $poly, $k, $n)) { continue; }
+								$covered = true; break 2;
 							}
 						}
 					}
