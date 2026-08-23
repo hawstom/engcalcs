@@ -2277,7 +2277,7 @@ $ec_lang['lpn_settings_map_height_px']='Map height (screen pixels)';
 // own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='On a small screen the map is drawn shorter than this, so that part of the page is always left to scroll.';
 $ec_lang['lpn_settings_legend_position']='Labels legend position';
-$ec_lang_syn['lpn_settings_legend_position']='The position where the key table (legend, map key — the box explaining the symbols) sits on the map. | avoid: legend as a myth or folk tale';
+$ec_lang_syn['lpn_settings_legend_position']='The position where the key table (legend, map key — the box explaining the symbols) for node and link labels sits on the map. | avoid: legend as a myth or folk tale';
 $ec_lang['lpn_settings_legend_top_left']='Top left';
 $ec_lang['lpn_settings_legend_top_right']='Top right';
 $ec_lang['lpn_settings_legend_middle_left']='Middle left';
