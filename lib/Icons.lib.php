@@ -314,56 +314,78 @@ $ec_icons = array(
 		. '<path d="M12 7.5C14.4 5.6 17.2 5 20.5 5.2V16.5C17.2 16.3 14.4 16.9 12 18.8"/>'
 		. '<path d="M12 7.5V18.8"/>',
 
-	// PROJECT: a plan set, part unrolled (ROADMAP Task 467). Traced from Tom's own pixel drawings,
-	// decoded run by run rather than eyeballed. Left to right: the ROLL, its outer wall vertical and
-	// its bottom rounded where it sits on the table; the sheet edges coming out of it, because a set
-	// is never one sheet ("You never pull out only one sheet"); and the TITLE BLOCK, one tall narrow
-	// box down the right with a single upright stroke inside it standing for the rotated lines of
-	// text a real block carries -- a project name, a location.
+	// PROJECT: a plan set, part unrolled (ROADMAP Task 467). Built to Tom's own construction, and the
+	// drawing is ONE MOTIF — the visible upper arc of the roll, the catenary that leaves it
+	// tangentially, and the flat run to the title block — COPIED VERTICALLY, three times.
 	//
-	// **THE THREE CORRECTIONS TOM HAD TO MAKE MORE THAN ONCE, so do not undo them** (2026-08-23):
-	//   1. A SHEET SAGS; IT DOES NOT CREASE. Each sheet edge is ONE cubic from the roll to where it
-	//      lands. The earlier drawing ran horizontal, turned a rounded elbow, then ran horizontal
-	//      again -- which is a crease with the corner filed off, not a catenary. The fix was fewer
-	//      segments, not gentler ones.
-	//   2. THE SHEET LEAVES THE ROLL'S SURFACE. The roll's top cap and the top sheet are one path,
-	//      so the paper unwinds from the roll instead of starting beside it.
-	//   3. THE TITLE BLOCK IS AN OBJECT PLACED ON THE SHEET, not a partition of it. Rules running
-	//      edge to edge cut the strip into equal compartments and read as ruled paper.
+	// **COPIED, NOT OFFSET, and that is the correction six earlier renditions failed** (Tom,
+	// 2026-08-23): "while these features are parallel in the real world on the paper as straight
+	// lines, they are not parallel in our oblique view of a sagging sheet; they are copies upward of
+	// the bottom edge", and "don't literally mean offsets... in the AutoCAD sense". An offset curve
+	// is parallel at a constant PERPENDICULAR distance, which for a catenary is a different curve.
+	// Here every point of a copy moves down by the same 6.2, so the copies are congruent; read the
+	// path string and every y differs by exactly 6.2, x by nothing.
 	//
-	// **HOUSE WEIGHT (2 units in a 24 box), and that is what sets every dimension here.** Measured:
-	// two 2-unit strokes need 3.5 units between centres to keep daylight at 17 px, the size a menu
-	// row draws. Everything below follows from that one number:
-	//   - The block's left edge is at x = 13.5, not 15, so its wall and the text stroke at 17.25 sit
-	//     3.75 apart on both sides. At the old 6-unit width nothing fits: one stroke centred in it
-	//     clears only 3.0.
-	//   - ONE upright, not the couple Tom sketched. Two would need three 3.5 gaps -- 10.5 units in a
-	//     block 7.5 wide. Told, he can widen the block or accept one; the arithmetic is not close.
-	//   - Sketch 5's decorations inside the sheet -- a vicinity map, a signature line for approval --
-	//     are out of reach at 17 px for the same reason: a box small enough to read as a detail is
-	//     smaller than one stroke pair.
+	// **THERE IS ONE ROLL, drawn as one fat line** — "here all sheets collapse to a fat line". Not a
+	// roll per sheet and not an ellipse per sheet. What repeats is the roll's TOP arc; its underside
+	// exists only in the bottom copy, where it actually rests on the table, so the bottom roll is a
+	// closed <ellipse> and the two above it are arcs of that same ellipse.
 	//
-	// Thickness lines for the sheets behind (roll, bottom, right edge) were measured and dropped:
-	// the drawing reaches x = 21 and y = 21, so the widest offset inside the box is 2.0, and a pair
-	// at 2.0 samples as a solid bar. Honouring them needs the sheet ~8% smaller, which costs the
-	// roll and the block more than the thickness gains. Tom's "widest at the right" cannot be had
-	// at all: right and bottom both have 3 units of margin and the roll side has 1.8.
+	// **HOUSE WEIGHT (2 units in a 24 box) SETS EVERY DIMENSION.** Measured: two 2-unit strokes need
+	// 3.5 units between centres to keep daylight at 17 px, so 1.5 units of daylight is the floor.
+	//   - THREE COPIES FIT, and the clearance that decides it is not the obvious one. Corresponding
+	//     parts of two copies are 6.2 apart everywhere by construction, so they can never crowd. What
+	//     crowds is a NON-corresponding pair: one arc's left endpoint against the steep left flank of
+	//     the arc below it. Drawn as the literal top half (arc starting at 180 degrees) that distance
+	//     is 3.38 against 3.0 units of stroke — 0.38 of daylight, and the three rolls weld into one
+	//     ribbon. Starting the VISIBLE arc at 200 degrees lifts the endpoint clear: 4.68, so 1.68 of
+	//     daylight. That is the whole reason theta0 is not 180.
+	//   - The bottom roll's hole is 3.6 x 3.8 units, 2.6 x 2.7 px at 17, so it reads as a ring rather
+	//     than a blob. An arc is a cheaper mark than a closed ellipse and needs no hole at all.
+	//   - The title block is the box made by ONE upright at x=16.6 plus the sheet's own right, top and
+	//     bottom edges, and NOTHING is inside it. 16.6 is as wide as the block can be while its
+	//     upright still clears the 3-unit right edge by 1.5.
+	//   - No vicinity map and no approval line. The middle copy already occupies that space, and it
+	//     could not be had anyway: such a mark has to clear the top edge, the bottom edge, the sag on
+	//     its left and the block on its right, which leaves a lane about 1 unit wide.
 	//
-	// Rejected, so they are not re-proposed: a rolled TUBE (a cylinder on this page reads as a PIPE,
-	// two icons away), a water drop (says water, not the job), a hard hat (says construction), a
-	// corner-curled single sheet (a set is not one sheet), a coil small enough to sit at a corner
-	// (two 2-unit strokes need ~4 units between centres at 16 px; such a coil has room for 1.5), and
-	// a title block in the LOWER RIGHT ONLY -- it made a closed box the same size as the roll at the
+	// TWO WEIGHTS, ON PURPOSE. The set otherwise uses one, and a lighter WHOLE icon was rejected for
+	// exactly that reason — an odd weight in a menu strip is a visible seam. A heavier accent inside
+	// one icon is a different question, and it is the only way to say "a stack of sheets" here: a
+	// second parallel line cannot, because the widest offset that stays in the box is 2.0 and a pair
+	// at 2.0 samples as a solid bar. So the roll (all three arcs), the bottom edge (table plus stack)
+	// and the fanned right edge are 3; a single sheet's own edge is 2.
+	//
+	// SHARP CORNERS at upper and lower right — "rounding is not realistic for a plan sheet". The
+	// shared open tag sets stroke-linejoin="round", so each corner is a JOIN INSIDE ONE PATH carrying
+	// stroke-linejoin="miter"; no ecIcon() plumbing was needed, because linejoin is an inherited
+	// presentation attribute an element overrides for itself, exactly as 'help' overrides linecap.
+	// The thick right edge also takes stroke-linecap="butt" and stops one thin half-width short of
+	// the top run, so its end lands flush with that edge instead of bulging a 1.5-unit round cap past
+	// the corner it is supposed to square. icon_ascii_preview.php models both, so those are measured.
+	//
+	// The geometry is GENERATED, not typed: `php dev/scripts/icon_project_geom.php` prints the string
+	// below from one parameter set, which is what makes congruence structural instead of something a
+	// later editor has to preserve by hand. Edit the parameters there, not the path here, and check
+	// with `php dev/scripts/icon_ascii_preview.php project` (coverage grid at 17 and 24) or the
+	// generator's own --preview.
+	//
+	// Rejected, so they are not re-proposed: an AutoCAD-style OFFSET of the sag; a closed ellipse in
+	// every copy; TWO copies (with the upper rolls now arcs rather than closed ellipses, dropping the
+	// middle leaves the left half of the mark empty); a WIDE title block with an interior upright
+	// ("it can't be that wide and still look reminiscent"); a sheet edge drawn as
+	// horizontal-elbow-horizontal (a creased sheet, not a sagging one); a rolled TUBE (a cylinder on
+	// this page reads as a PIPE, two icons away); a water drop (says water, not the job); a hard hat
+	// (says construction); a corner-curled single sheet ("You never pull out only one sheet"); and a
+	// title block in the LOWER RIGHT ONLY, which made a closed box the same size as the roll at the
 	// opposite corner, and two equal masses read as two of the same object.
-	//
-	// Verify with `php dev/scripts/icon_ascii_preview.php project`, which prints the coverage grid at
-	// 17 and 24; `--geom=` measures a candidate without writing it here.
-	'project'    => '<path d="M1.8 3C1.8 2.2 2.6 1.8 3.6 1.8C7.2 1.8 8.4 5.4 12 5.4H21"/>'
-		. '<path d="M21 5.4V21"/><path d="M10.2 21H21"/>'
-		. '<path d="M1.8 3V19.8C1.8 20.6 2.8 21 4.2 21C5.6 21 6.6 20.6 6.6 19.8"/>'
-		. '<path d="M1.8 9C6 9 7.5 12.6 13.5 12.6"/>'
-		. '<path d="M1.8 17.4C6 17.4 7.2 21 10.2 21"/>'
-		. '<path d="M13.5 5.4V21"/><path d="M17.25 8.4V18"/>',
+	'project'    => '<ellipse cx="5.4" cy="17.7" rx="3.4" ry="3.3" stroke-width="3"/>'
+		. '<path stroke-width="3" d="M2.205 10.371C2.451 9.716 2.903 9.154 3.499 8.764C4.094 8.374 4.801 8.178 5.519 8.202C6.236 8.226 6.927 8.471 7.493 8.9"/>'
+		. '<path stroke-width="3" d="M2.205 4.171C2.451 3.516 2.903 2.954 3.499 2.564C4.094 2.174 4.801 1.978 5.519 2.002C6.236 2.026 6.927 2.271 7.493 2.7"/>'
+		. '<path stroke-width="3" stroke-linejoin="miter" stroke-linecap="butt" d="M21.2 7.6V21H13C9.8 21 9.246 16.429 7.493 15.1"/>'
+		. '<path stroke-linejoin="miter" d="M7.493 8.9C9.246 10.229 9.8 14.8 13 14.8H16.6"/>'
+		. '<path stroke-linejoin="miter" d="M7.493 2.7C9.246 4.029 9.8 8.6 13 8.6H21.2"/>'
+		. '<path d="M16.6 8.6V21"/>',
 
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
