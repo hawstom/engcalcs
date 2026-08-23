@@ -66,26 +66,6 @@ the block.
     first tab of a first visit, which is born grid without anybody saying so. Task 477 is where that
     gets asked.
 
-- 100|388| **Documentation is written as a transcript of revision, not current state.**
-  The habit is that a correction is APPENDED, never SUBSTITUTED. The rule: when a decision is
-  superseded, delete the superseded reasoning — keep the conclusion and the one rejected alternative
-  that would otherwise be re-proposed.
-  - **DONE, roadmap half (2026-08-16):** 11,871 lines across ROADMAP + archive → 3,265, then the
-    archive itself dropped to a 321-line ID ledger on Tom's ruling. Its text is in git.
-  - **DONE, CLAUDE.md (2026-08-16):** 1,213 lines / 100 KB → 560 / 36 KB (**36%**). Rules a script
-    enforces are now one table row naming the script. Deep reference moved to
-    `dev/language-strings.md`, `dev/testing-notes.md`, `dev/translation-process.md`.
-  - **DONE, commit messages (2026-08-16):** subject-only by default, ≤72 chars, body only when a
-    reader would act differently, ≤40 words. Measured: Tom's oldest 300 commits had no body 68% of
-    the time (median 84 words); the AI era wrote one on 99 of the last 100 (median 297 words).
-  - **STILL OPEN.** (a) `js/looped-network.js` at 47% comment lines — the sibling `js/lpn-*.js`
-    files were done 2026-08-16, but `looped-network.js` was held back because a concurrent track
-    owned it. (b) DONE 2026-08-18: the last over-budget open roadmap blocks are compacted;
-    `roadmap_id_check.php` names any new one in size order, so this stays a worklist not a search.
-  - **Rewriting the 986 existing commit messages is NOT recommended** and needs Tom's ruling: it
-    rewrites every SHA, forces a push, breaks production's `git pull`, dangles 43 SHA citations in
-    `dev/*.md`, and saves no context — nothing ever loads a commit message.
-
 - 100|389| **Search and replace inputs across the network, no longer gated on size.**
   WANTED, and no longer gated on network size. Tom, 2026-08-16: *"I would like search and replace embraced more explicitly."* That
   reverses this file's earlier position, which said find-and-replace was a big-network tool we
@@ -241,6 +221,14 @@ the block.
   single notation property is selected on Nodes or Links at that moment, which is less flexible than
   what our labels already do, so reproducing it is not obviously worth it. Tom: *"I'm not opposed to
   implementing this, and it may be better to implement it than to discuss it."*
+
+- 100|491| **A Darcy-Weisbach roughness prints on the map label as "0".**
+  Found 2026-08-23 during Task 388's comment pass, and the stale comment is why it survived:
+  `defaultLabelSettings().decimals.link.roughness = 0` is right for a Hazen-Williams C (100/130/140)
+  and wrong for a roughness HEIGHT — `defaultRoughnessFor('dw')` returns ~0.0015, which rounds to 0
+  on the label. The method is user-selectable and has been since Task 271; the comment above the
+  constant still said "this page is Hazen-Williams only". **The decimals must follow
+  `settings.method`**, and the harness should assert the DW case, not just the HW one.
 
 - 100|490| **[H] A shipped defect overstated Q by 1.587x, and nobody was told.**
   Found and fixed 2026-08-23 under Task 475. Any cross-section with a VERTICAL WALL — a lined ditch,
@@ -585,15 +573,13 @@ the block.
 
 - 25|322| **Standing advisories worth converting rather than re-reading.** `check_all.sh` reports
   these every run and nobody can act on them.
-  - **`js/looped-network.js` is 9,740 lines**, with `rebuildSettingsFields()` at 507 and
-    `drawExampleNetwork()` at 290. Task 293 established the split-by-PURITY pattern and it worked;
-    these two are the obvious next extractions.
-  - **`mpf_spreadheet_notice`** — misspelled, and `_notice` against the suite's seven `_note`. It is
-    one of the dead keys parked in Task 294 awaiting Tom's ruling; whatever he rules,
-    `rename_lang_key.php` fixes the spelling in one command.
-  - **The js syntax check globs `js/*.js` only**, so `sw.js` at the repo root and `js/vendor/` are
-    never syntax-checked. Given Task 318 lives entirely in `sw.js`, that is a gap worth one
-    character of glob. **DONE 2026-08-14** — glob widened; the rest of this task stands.
+  - **`js/looped-network.js` is 20,374 lines**, with `rebuildSettingsFields()` and
+    `drawExampleNetwork()` the two obvious extractions. Task 293 established the split-by-PURITY
+    pattern and it worked. *(The 9,740 recorded here through 2026-08-23 was less than half the truth —
+    an advisory nobody acts on is also an advisory nobody re-reads.)*
+  - **DONE 2026-08-23:** `mpf_spreadheet_notice` renamed to `mpf_spreadsheet_notice` across all 27
+    lang files in one `rename_lang_key.php` pass.
+  - **DONE 2026-08-14:** the js syntax check globs `sw.js` and `js/vendor/` too.
 
 - 25|348| **Sub-categories and paging in the examples gallery.** The grid is `auto-fit`, so both
   arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops
@@ -674,6 +660,11 @@ the block.
   driven by what users really bring rather than by what we imagine. **This is analytics, so the log
   row is gated on `ecAnalyticsConsented()`** — the non-obvious part, and the reason it is not simply
   a counter.
+
+- 5|492| **[H] Rewriting the 986 existing commit messages is NOT recommended.**
+  Extracted from Task 388 on close so it is not re-proposed from scratch. It rewrites every SHA,
+  forces a push, breaks production's `git pull` deploy, dangles 43 SHA citations in `dev/*.md`, and
+  saves no context — **nothing ever loads a commit message.** Alive only as a recorded no.
 
 - 5|114| **Reservoir / detention routing calculator (Modified Puls) — full scope in
   `dev/detention-routing-scope.md`.** A time-stepping engine, which is the real departure from the

@@ -7,17 +7,17 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**74 open tasks.** Next (100): 7 · Soon (75): 8 · Someday (50): 9 · Maybe (25): 24 · Parked (5): 26
+**75 open tasks.** Next (100): 7 · Soon (75): 8 · Someday (50): 9 · Maybe (25): 24 · Parked (5): 27
 
 ## 100 — Next (7)
 
 - Task 145 — GEOGRAPHIC PROJECTS: grid or geographic, declared before anything is drawn.
-- Task 388 — Documentation is written as a transcript of revision, not current state.
 - Task 389 — Search and replace inputs across the network, no longer gated on size.
 - Task 436 — A wheel notch costs a full label relayout, editor-wide.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
 - Task 490 — [H] · A shipped defect overstated Q by 1.587x, and nobody was told.
+- Task 491 — A Darcy-Weisbach roughness prints on the map label as "0".
 
 ## 75 — Soon (8)
 
@@ -69,7 +69,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 
-## 5 — Parked (26)
+## 5 — Parked (27)
 
 - Task 114 — Reservoir / detention routing calculator (Modified Puls) — full scope in `dev/detention-routing-scope.md`.
 - Task 116 — Solar water pumping sizing.
@@ -97,8 +97,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 391 — [H] · Evaluate `// @ts-check` with JSDoc branded types — a joint decision, not a proposal.
 - Task 400 — Phase 3: bounded local search on the label residue.
 - Task 482 — EPANET's vocabulary collides with ours, and we are keeping ours.
+- Task 492 — [H] · Rewriting the 986 existing commit messages is NOT recommended.
 
 ---
 
-74 of 74 titles are within 4–12 words. `!` marks the rest;
+75 of 75 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
