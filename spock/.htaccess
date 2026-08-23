@@ -1,0 +1,19 @@
+# Deny all HTTP access to this directory.
+#
+# THE ARCHIVED LOGS ARE PRIVATE. Their CONTENT is close to harmless -- verified writer by writer
+# 2026-08-23: no REMOTE_ADDR, no HTTP_USER_AGENT, no session id and nothing the visitor typed is
+# recorded in any of the six. But publishing is a PROMISE question, not a content question:
+# privacy.php tells visitors what happens to this data and does not say "published on the web".
+# Changing that deal costs a consent_body rewrite, 26 retranslations and an EC_CONSENT_VERSION
+# bump that re-asks everybody, and a crawler only has to index it once for it to be irreversible.
+#
+# The AGGREGATE report has none of that -- counts disclose nothing about any individual, and
+# publishing them changes no promise. So exactly one aggregate copy is served, out of
+# spock/public/, which re-grants access with its own .htaccess. Everything else here stays denied.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+</IfModule>

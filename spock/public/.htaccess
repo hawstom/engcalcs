@@ -1,0 +1,26 @@
+# The ONE web-reachable thing under spock/: the aggregate usage report.
+#
+# The parent spock/.htaccess denies everything. This re-grants, for this directory only, and it
+# mirrors the parent's IfModule shape deliberately: whichever authz module the host has, parent and
+# child speak the SAME dialect. Mixing mod_authz_core in one and mod_access_compat in the other is
+# how a deny silently stops applying.
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
+</IfModule>
+
+# Aggregate counts, no per-event data -- but no reason to be in a search index either. The
+# filename is unguessable and NOT in robots.txt: a Disallow line publishes the very name it is
+# meant to protect. mod_headers COULD NOT BE CONFIRMED on the production host, so this is guarded
+# and the served page ALSO carries <meta name="robots" content="noindex"> as the real guarantee.
+<IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+
+# NOTE for anyone tempted to add an Options line here: the root .htaccess already carries
+# `Options -Indexes`, and Options needs `AllowOverride Options`, a SEPARATE grant. Where it is not
+# granted Apache returns 500 for EVERY request under /engcalcs/. One directive with that failure
+# mode is enough; do not add a second.
