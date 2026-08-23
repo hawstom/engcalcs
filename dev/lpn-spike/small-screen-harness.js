@@ -637,6 +637,16 @@ const TOUCH = true;
 		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'max-width') === '11.5rem');
 	ok('...and the desktop row does not wrap',
 		winning(RULES, field, WIDE, DOC_IDS, false, 'flex-wrap') === null);
+	// **AND THE NAME ON THAT LINE NEVER BREAKS MID-WORD** (Tom, 2026-08-23, drawing `Dem/and`,
+	// `Hea/d`, `Pres/sure`, `Elev/ation` as the thing to stop). `overflow-wrap: anywhere` is what
+	// does it, and it is correct on the desktop, where the name shares its line with four columns
+	// and a too-wide name pushes every one of them off its heading (Task 435). Once the name owns
+	// the whole line there is nothing to protect and the break is pure damage.
+	ok('...and the name breaks between words only, never mid-word',
+		winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'overflow-wrap') === 'normal',
+		'small screen says ' + winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'overflow-wrap'));
+	ok('...while the desktop keeps the break-anywhere its column alignment depends on',
+		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
 	// The heading row's lead cell goes, so the headings start where the wrapped group starts.
 	ok(group + ": the heading row's lead cell goes on a small screen",
 		!!hiddenAt(RULES, heading.children[0], SMALL, DOC_IDS));
@@ -645,8 +655,8 @@ const TOUCH = true;
 	// (8) THE FOUR COLUMNS, HEADING AND BOX ALIKE. A heading that is not the same width as the box
 	// under it is the defect this list has already been fixed for twice, so the assertion is that
 	// the two agree -- at every width, and with and without a spinner.
-	const want = { 2: '2.08rem', 3: '1.04rem', 4: '2.56rem', 5: '2.56rem' };
-	const wantTouch = { 2: '2.08rem', 3: '1.04rem', 4: '1.6rem', 5: '1.6rem' };
+	const want = { 2: '2.08rem', 3: '1.6rem', 4: '2.56rem', 5: '2.56rem' };
+	const wantTouch = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '1.6rem' };
 	const wantWide = { 2: '2.6rem', 3: '2.6rem', 4: '3.2rem', 5: '3.2rem' };
 	[2, 3, 4, 5].forEach((i) => {
 		const h = heading.children[i - 1], b = field.children[i - 1];
@@ -692,10 +702,10 @@ const TOUCH = true;
 			winning(RULES, b, WIDE, DOC_IDS, TOUCH, 'appearance') === null);
 	});
 	// And the list's own floor comes down, or the box still refuses to narrow.
-	ok(group + ' list floor is 10.5rem on a small screen',
-		winning(RULES, list, SMALL, DOC_IDS, false, 'min-width') === '10.5rem');
-	ok('...8.5rem when the spinners have gone too',
-		winning(RULES, list, SMALL, DOC_IDS, TOUCH, 'min-width') === '8.5rem');
+	ok(group + ' list floor is 11rem on a small screen',
+		winning(RULES, list, SMALL, DOC_IDS, false, 'min-width') === '11rem');
+	ok('...9rem when the spinners have gone too',
+		winning(RULES, list, SMALL, DOC_IDS, TOUCH, 'min-width') === '9rem');
 	ok('...and 13rem on the desktop, untouched',
 		winning(RULES, list, WIDE, DOC_IDS, false, 'min-width') === '13rem' &&
 		winning(RULES, list, WIDE, DOC_IDS, TOUCH, 'min-width') === '13rem');
@@ -705,8 +715,9 @@ console.log('\n--- the Settings index pane (Tom asked for 0.8 of it on the PC, a
 {
 	const panes = node('div', '', ['lpn-setbox-panes'], body);
 	const index = node('div', 'lpn_setbox_index', ['lpn-setbox-index'], panes);
-	ok('the index pane is 6rem on the desktop -- 0.8 x the 7.5rem it shipped at',
-		winning(RULES, index, WIDE, DOC_IDS, false, 'flex') === '0 0 6rem');
+	// 6.6rem: 0.8 x the 7.5rem it shipped at, then 1.1 x that once Tom had used it (2026-08-23).
+	ok('the index pane is 6.6rem on the desktop',
+		winning(RULES, index, WIDE, DOC_IDS, false, 'flex') === '0 0 6.6rem');
 	ok('...and 4.5rem below the breakpoint',
 		winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis') === '4.5rem');
 	ok('...with nothing narrowing it above the breakpoint',
@@ -745,6 +756,27 @@ console.log('\n--- a box on a short screen, and the pane tables (Tom\'s items 5 
 		ok('...and its opening height is capped the same way',
 			winning(RULES, setbox, w, DOC_IDS, false, 'height') === 'min(46rem, 92dvh)');
 	});
+	// **AND IT CAN BE RESIZED BY A FINGER** (Tom, 2026-08-23: "I can't figure out how to resize
+	// Settings on a phone. Is that our fault?" -- it was: `resize: both` is the browser's own
+	// widget, and no mobile engine lets a touch drag it). The grabber addPanelResizeGrip() builds
+	// appears only where a coarse pointer exists, which is what leaves the desktop untouched --
+	// asked at BOTH widths, because a tablet in landscape is a wide window with a finger on it.
+	// `winning`, not `hiddenAt`: the grabber is declared display:none first and turned back on by
+	// the coarse-pointer rule, and hiddenAt() answers on the FIRST display:none it finds.
+	const grip = node('div', '', ['lpn-resize-grip'], setbox);
+	[[WIDE, 'a desktop window'], [SMALL, 'a narrow window']].forEach(([w, what]) => {
+		ok('the touch resize grabber is absent for a pointer in ' + what,
+			winning(RULES, grip, w, DOC_IDS, false, 'display') === 'none',
+			'got ' + winning(RULES, grip, w, DOC_IDS, false, 'display'));
+	});
+	[[SMALL, 'a phone'], [WIDE, 'a tablet in landscape']].forEach(([w, what]) => {
+		ok('...and it appears on ' + what,
+			winning(RULES, grip, w, DOC_IDS, TOUCH, 'display') === 'block',
+			'got ' + winning(RULES, grip, w, DOC_IDS, TOUCH, 'display'));
+	});
+	ok('...owning its own touch gestures, or the browser claims the drag for scrolling',
+		winning(RULES, grip, SMALL, DOC_IDS, TOUCH, 'touch-action') === 'none');
+
 	// A cap alone would only move the overflow inside the box; the panes are what scroll.
 	const panes2 = node('div', '', ['lpn-setbox-panes'], setbox);
 	ok('...and the panes inside it scroll, so the capped box does not spill',

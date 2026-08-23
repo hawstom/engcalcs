@@ -17140,6 +17140,10 @@ var EngCalcs = EngCalcs || {};
 			setboxLayout.top = pos.top;
 			saveSetboxLayout();
 		});
+		// The touch half of `resize: both` -- see addPanelResizeGrip(). The observer below stores
+		// whatever it produces, so a size dragged by finger is remembered exactly like one dragged
+		// by mouse.
+		addPanelResizeGrip(box);
 		// **THE SIZE IS OBSERVED, NOT LISTENED FOR.** `resize: both` is the browser's own widget and
 		// it fires no event of its own -- there is no `onresize` for an element -- so a
 		// ResizeObserver is the only way to learn what the user did. It also catches the other
@@ -17865,6 +17869,9 @@ var EngCalcs = EngCalcs || {};
 		// Dragged by its chrome, through the same seam the property popup, Find and the Settings box
 		// use. No onMove: nothing here remembers where it was put (see the note at libBoxIsOpen).
 		makePanelDraggable(box, null);
+		// It borrows .lpn-setbox's whole shell, `resize: both` included, so it borrows the touch
+		// grabber that makes that property mean anything on a phone.
+		addPanelResizeGrip(box);
 	}
 
 	// ---- minimal property popup ----
@@ -17889,6 +17896,55 @@ var EngCalcs = EngCalcs || {};
 	// The browser's resize widget is about 16 px; 18 gives it the same pointer slop every other
 	// grip on this page has.
 	var LPN_RESIZE_CORNER = 18;
+	// **`resize: both` IS A MOUSE-ONLY AFFORDANCE, AND THAT IS OUR FAULT, NOT THE READER'S**
+	// (Tom, 2026-08-23, on a phone: *"I can't figure out how to resize Settings on a phone. Is that
+	// our fault?"* -- yes). The browser's own grabber is not draggable by touch in either mobile
+	// engine, and Safari does not paint one at all, so on a phone the box had no resize whatever:
+	// nothing to see and nothing that answers a finger. A CSS property cannot be taught to accept a
+	// touch, so this adds the one thing that can -- a real element with pointer handlers.
+	//
+	// SHOWN ONLY WHERE A COARSE POINTER EXISTS (the @media (any-pointer: coarse) rule in
+	// css/engcalcs.css), so a mouse keeps the browser's native widget and the desktop is untouched.
+	// It is 28 px rather than LPN_RESIZE_CORNER's 18: that number is pointer slop for a mouse, and a
+	// hand needs more.
+	//
+	// NO min/max ARITHMETIC HERE. The box's own min-width/min-height/max-width/max-height clamp an
+	// inline width exactly as they clamp the CSS one, so the floors measured for this box hold
+	// without being restated -- and the ResizeObserver in wireSettingsBox() stores what resulted and
+	// slides the box back on screen, exactly as it does after a mouse resize.
+	function addPanelResizeGrip(box) {
+		if (!box || (box.querySelector && box.querySelector('.lpn-resize-grip'))) { return; }
+		var grip = document.createElement('div'), from = null;
+		grip.className = 'lpn-resize-grip';
+		// Decoration to a screen reader: it performs no command and carries no name, which also
+		// keeps it out of the 26 languages a labelled control would cost.
+		grip.setAttribute('aria-hidden', 'true');
+		box.appendChild(grip);
+		grip.addEventListener('pointerdown', function (e) {
+			var r = box.getBoundingClientRect();
+			from = { dx: r.right - e.clientX, dy: r.bottom - e.clientY, left: r.left, top: r.top };
+			// Pointer capture, so a fast drag that leaves the 28 px square keeps resizing rather
+			// than stopping dead -- the same slop wirePane()'s grip needs.
+			if (grip.setPointerCapture) { grip.setPointerCapture(e.pointerId); }
+			e.preventDefault();
+			// The box's own drag handler ignores a child target anyway; this says why out loud.
+			e.stopPropagation();
+		});
+		grip.addEventListener('pointermove', function (e) {
+			if (!from) { return; }
+			box.style.width = Math.round(e.clientX + from.dx - from.left) + 'px';
+			box.style.height = Math.round(e.clientY + from.dy - from.top) + 'px';
+		});
+		['pointerup', 'pointercancel'].forEach(function (evt) {
+			grip.addEventListener(evt, function (e) {
+				if (!from) { return; }
+				from = null;
+				if (grip.hasPointerCapture && grip.hasPointerCapture(e.pointerId)) {
+					grip.releasePointerCapture(e.pointerId);
+				}
+			});
+		});
+	}
 	function makePanelDraggable(popup, onMove) {
 		var drag = null;
 		popup.addEventListener('pointerdown', function (e) {
