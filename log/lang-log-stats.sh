@@ -4,6 +4,11 @@
 #
 #   bash log/lang-log-stats.sh            from the project root
 #   bash log/lang-log-stats.sh --days=30  restrict the window to the last N days
+#   bash log/lang-log-stats.sh --out=FILE also write the report to FILE (still prints it)
+#
+# --out WRITES A FILE AND NOTHING ELSE. It does not publish anything: pick a path under dev/, which
+# is blocked from web access, and note that whether these aggregate numbers are ever put on the web
+# is Tom's decision and nobody else's. Nothing here touches .htaccess and nothing here should.
 #
 # WHAT THIS FILE IS FOR, beyond printing numbers. dev/usage-data-log.md records the same
 # analytical mistakes being made repeatedly by people who had already written the rule down: a
@@ -21,12 +26,12 @@
 # THE LOGS IT READS. All tab-separated, all beginning with an ISO-8601 UTC timestamp. See
 # lib/config.inc.php for the authoritative field lists.
 #
-#   engcalcs-lang.log         reach     ts lang source page [bucket]
+#   engcalcs-lang.log         reach     ts lang source page [served asked] [bucket]
 #   engcalcs-human-view.log   shopping  ts page lang browser_lang [bucket]
 #   engcalcs-calc-usage.log   using     ts page lang browser_lang [bucket]
 #   engcalcs-title.log        naming    ts page lang browser_lang field [bucket]
 #   engcalcs-signal.log       behaviour ts page lang browser_lang event detail [bucket]
-#   engcalcs-contact-send.log sends     ts page lang browser_lang           (server-side, no bucket)
+#   engcalcs-contact-send.log sends     ts page lang browser_lang [bucket]   (server-side)
 #
 # THE BUCKET COLUMN IS THE LAST FIELD and holds 'visitor' or 'visit' (ecLogBucketSuffix()). Rows
 # written before 2026-08-21 carry a 'visit' marker or no marker at all; a row whose last field is
@@ -46,13 +51,29 @@ RAW_SEND="$DIR/engcalcs-contact-send.log"
 STATE="$DIR/.last-report-window"
 
 WINDOW_DAYS=""
+OUT_PATH=""
+PASS_ARGS=""
 for arg in "$@"; do
     case "$arg" in
-        --days=*) WINDOW_DAYS="${arg#--days=}" ;;
-        --help|-h) sed -n '2,6p' "$0"; exit 0 ;;
+        --days=*) WINDOW_DAYS="${arg#--days=}"; PASS_ARGS="$PASS_ARGS $arg" ;;
+        --out=*)  OUT_PATH="${arg#--out=}" ;;
+        --help|-h) sed -n '2,12p' "$0"; exit 0 ;;
         *) echo "Unknown option: $arg" >&2; exit 1 ;;
     esac
 done
+
+# --out re-runs this script once with everything but --out and tees the result. stdout IS the
+# report; anything a tool writes to stderr stays on the terminal and can never reach the file,
+# which is the property that matters after 2026-08-21, when awk warnings printed inside a table.
+if [ -n "$OUT_PATH" ]; then
+    # shellcheck disable=SC2086
+    bash "$0" $PASS_ARGS | tee "$OUT_PATH"
+    echo ""
+    echo " Report written to $OUT_PATH"
+    echo " Nothing about this publishes it. dev/ is blocked from web access on purpose, and whether"
+    echo " these numbers are served anywhere is Tom's call, not this script's."
+    exit 0
+fi
 
 if [ ! -f "$RAW_LANG" ]; then
     echo "Log file not found: $RAW_LANG"
@@ -72,13 +93,28 @@ MIN_N=5
 # Injected into every awk program that prints a ratio. wilson() returns "lo-hi" as whole percents;
 # rate() returns the point estimate with a '~' when the denominator is under the floor and "-" when
 # it is under MIN_N.
+# BOTH FUNCTIONS ARE TOTAL, and they have to be: k CAN EXCEED n here. %using is using/shopping,
+# and the two beacons are independently gated -- maybeLogHumanView fires once the browser has been
+# around >=10s, maybeLogCalcUsage fires on a user-triggered recalculation >=10s after LOAD, and the
+# two de-duplicate on different keys. So a person can be recorded calculating without ever being
+# recorded shopping, and a k/n over 1 is a real reading of two real counts, not a corrupt log.
+# The first version of this file computed sqrt() of a negative variance in exactly that case: awk
+# printed a warning and the interval read "[-nan-100]%" on the production run of 2026-08-21.
+# Neither count is clamped and no row is dropped -- the ratio is printed as ">100%" and its
+# interval as "n/a", because a proportion interval on something that is not a proportion is noise.
 AWK_LIB=$(cat <<'AWKLIB'
-function wilson(k, n,   p, z, d, c, m, lo, hi) {
+function wilson(k, n,   p, z, d, c, m, s, lo, hi) {
     if (n <= 0) return "n/a"
-    p = k / n; z = 1.96
+    if (k > n) return "n/a"
+    p = k / n
+    if (p < 0) p = 0
+    if (p > 1) p = 1
+    z = 1.96
     d = 1 + z*z/n
     c = (p + z*z/(2*n)) / d
-    m = z * sqrt(p*(1-p)/n + z*z/(4*n*n)) / d
+    s = p*(1-p)/n + z*z/(4*n*n)
+    if (s < 0) s = 0
+    m = z * sqrt(s) / d
     lo = c - m; hi = c + m
     if (lo < 0) lo = 0
     if (hi > 1) hi = 1
@@ -87,6 +123,7 @@ function wilson(k, n,   p, z, d, c, m, lo, hi) {
 function rate(k, n,   v) {
     if (n <= 0) return "n/a"
     if (n < EC_MIN_N) return "-"
+    if (k > n) return ">100%"
     v = sprintf("%.0f%%", 100*k/n)
     return (n < EC_FLOOR_N) ? v "~" : v
 }
@@ -182,7 +219,13 @@ echo "             means 'typed their own numbers', not 'looked at the default a
 echo "   naming    a Printable Title or Subtitle was typed — they mean to show it to somebody."
 echo ""
 echo "   %shopping = shopping/reach. A LOWER BOUND on human reach, never an estimate of it."
-echo "   %using    = using/shopping."
+echo "   %using    = using/shopping. A RATIO OF TWO INDEPENDENTLY GATED BEACONS, and it can exceed"
+echo "               100%. The shopping beacon needs the browser to have been around >=10s; the"
+echo "               using beacon needs a user-triggered recalculation >=10s after LOAD, and the"
+echo "               two de-duplicate on different keys — so somebody can be recorded calculating"
+echo "               and never recorded shopping. Read it as a rough conversion indicator, NOT as"
+echo "               a share of a population. Over 100% it prints '>100%' with no interval; both"
+echo "               counts are printed beside it and neither is ever clamped or dropped."
 echo "   ~         the denominator is under $FLOOR_N. The number is printed, but it is not a verdict."
 echo "   -         the denominator is under $MIN_N. No ratio is printed at all."
 echo "   [lo-hi]%  Wilson 95% interval. TWO ROWS DIFFER ONLY IF THEIR INTERVALS DO NOT OVERLAP."
@@ -204,7 +247,9 @@ printf "   %-38s %10s %12s\n" "log" "people" "page loads"
 for pair in "engcalcs-lang.log:lang" "engcalcs-human-view.log:view" "engcalcs-calc-usage.log:calc" "engcalcs-title.log:title" "engcalcs-signal.log:signal"; do
     printf "   %-38s %10s %12s\n" "${pair%%:*}" "$(n_of "$TMP/p-${pair##*:}")" "$(n_of "$TMP/l-${pair##*:}")"
 done
-printf "   %-38s %10s %12s\n" "engcalcs-contact-send.log" "$(n_of "$TMP/send")" "(server-side)"
+printf "   %-38s %10s %12s\n" "engcalcs-contact-send.log" \
+    "$(awk -F'\t' 'NF>=5 && $NF=="visitor"' "$TMP/send" | wc -l | tr -d ' ')" \
+    "$(awk -F'\t' 'NF>=5 && $NF=="visit"'   "$TMP/send" | wc -l | tr -d ' ')"
 echo ""
 LANG_ALL=$(n_of "$TMP/lang")
 if [ "$LANG_ALL" -gt 0 ]; then
@@ -234,6 +279,8 @@ ec_funnel_pages() {
                  rate($1,$3), ($3>0?wilson($1,$3):""), rate($2,$1), ($1>0?wilson($2,$1):"") }'
     echo ""
     echo "   Units: every count in this table is ${unit}."
+    echo "   A '>100%' in %using is not corruption: shopping and using are separately gated beacons"
+    echo "   with different de-duplication keys, so a row can record a calculation with no view."
 }
 
 echo ""
@@ -365,6 +412,46 @@ echo ""
     !hdr { printf "    %-8s %-26s %10s %10s %9s %-11s\n", "lang", "calculator", "shopping", "using", "%using", "95% CI"; hdr=1 }
     { printf "    %-8s %-26s %10d %10d %9s %-11s\n", $3, $4, $1, $2, rate($2,$1), ($1>0?wilson($2,$1):"") }'
 echo ""
+echo "--- What the reach log SERVED, and what it was ASKED for (both buckets) ---"
+echo "    Column 2 of engcalcs-lang.log means different things on different rows -- the served"
+echo "    language on 'get'/'cookie'/'view' rows, the raw Accept-Language tag on 'browser'/'anon'"
+echo "    ones -- so it could never answer 'what did we serve?' for the anon majority, which is"
+echo "    most of the audience. Every row now also carries BOTH facts in their own columns,"
+echo "    written as a pair before the bucket suffix. Rows written before that change carry"
+echo "    neither and are counted as UNCLASSIFIED here rather than folded in."
+echo ""
+for b in p l; do
+    if [ "$b" = "p" ]; then label="PEOPLE"; else label="PAGE LOADS"; fi
+    tot=$(n_of "$TMP/$b-lang")
+    if [ "$tot" -eq 0 ]; then
+        echo "    $label — no reach rows in this window."
+        echo ""
+        continue
+    fi
+    # NF>=6 is exactly "this row has the served/asked pair": the old format was ts lang source page
+    # [bucket], four or five fields, and the pair is written together or not at all.
+    class=$(awk -F'\t' 'NF>=6' "$TMP/$b-lang" | wc -l | tr -d ' ')
+    unclass=$((tot - class))
+    echo "    $label — reach rows: $tot   classified: $class   unclassified (older format): $unclass"
+    if [ "$class" -gt 0 ]; then
+        awk -F'\t' "$AWK_LIB"'
+            NF>=6 {
+                split($5,a,"-"); split($6,q,"-")
+                if (a[1] != "") { srv++; if (a[1] != "en") srvnon++ }
+                if (q[1] != "") { ask++; if (q[1] != "en") asknon++ }
+            }
+            END {
+                printf "      %-44s %6d  %s %s\n", "served a language other than en", srvnon+0,
+                       rate(srvnon+0, srv+0), wilson(srvnon+0, srv+0)
+                printf "      %-44s %6d  %s %s\n", "browser asked for a language other than en", asknon+0,
+                       rate(asknon+0, ask+0), wilson(asknon+0, ask+0)
+            }' "$TMP/$b-lang"
+    fi
+    echo ""
+done
+echo "    Read this beside the confirmed-human figures above: this one covers every page load,"
+echo "    crawlers included, so it is the wider and the dirtier of the two measurements."
+echo ""
 echo "--- Language demand from the reach log (both buckets, kept apart) ---"
 echo "    'get' rows are an explicit ?lang=XX choice; 'browser'/'anon' rows carry the raw"
 echo "    Accept-Language tag; 'cookie' rows are a returning visitor on a saved preference."
@@ -442,18 +529,41 @@ for b in p l; do
     s=$(awk -F'\t' '$5=="subtitle"' "$TMP/$b-title" | wc -l | tr -d ' ')
     printf "   %-12s titles %6d   subtitles %6d\n" "$label" "$t" "$s"
 done
+# A PAGE WITH NO TITLE INPUTS CANNOT SCORE HERE, AND A 0% SAYS THE OPPOSITE. The Printable Title
+# and Subtitle are rendered by echoCalculatorForm(); a page that does not call it -- Looped-Network,
+# which is a full-window map editor and has no such field -- has no instrument at all, and printing
+# "0%~" for it reads as a failure that is really an absence. The list is DERIVED from the source
+# below, never typed, so a page that gains or loses the form moves on its own.
+NO_TITLE_PAGES=""
+for f in "$DIR"/../*.php; do
+    [ -f "$f" ] || continue
+    b=$(basename "$f" .php)
+    # Comment lines are stripped first: Looped-Network.php MENTIONS echoCalculatorForm() in a
+    # comment explaining why it does not call it, and a plain grep read that as a call.
+    grep -vE '^[[:space:]]*(//|\*|#)' "$f" | grep -qE 'echoCalculatorForm[[:space:]]*\(' \
+        || NO_TITLE_PAGES="$NO_TITLE_PAGES $b"
+done
 if [ -s "$TMP/p-title" ] || [ -s "$TMP/l-title" ]; then
     echo ""
     echo "--- Named per confirmed calculation, by page (PEOPLE) ---"
     {
         awk -F'\t' '$5=="title" {print $2"\tnamed"}' "$TMP/p-title"
         awk -F'\t' '{print $2"\tcalc"}' "$TMP/p-calc"
-    } | awk -F'\t' "$AWK_LIB"'
+    } | awk -F'\t' -v notitle="$NO_TITLE_PAGES" "$AWK_LIB"'
+        BEGIN { split(notitle, q, " "); for (i in q) if (q[i] != "") none[q[i]] = 1 }
         { if ($2=="named") n[$1]++; else c[$1]++; seen[$1]=1 }
-        END { for (p in seen) printf "%d\t%s\t%d\n", (p in c?c[p]:0), p, (p in n?n[p]:0) }' \
+        END { for (p in seen) printf "%d\t%s\t%d\t%s\n", (p in c?c[p]:0), p, (p in n?n[p]:0), (p in none?"none":"") }' \
     | sort -rn | awk -F'\t' "$AWK_LIB"'
         !hdr { printf "   %-28s %10s %10s %9s %-11s\n", "page", "calcs", "named", "%named", "95% CI"; hdr=1 }
+        $4=="none" { printf "   %-28s %10d %10s %9s %-11s\n", $2, $1, "n/a", "n/a", "no title field"; next }
         { printf "   %-28s %10d %10d %9s %-11s\n", $2, $1, $3, rate($3,$1), ($1>0?wilson($3,$1):"") }'
+    echo ""
+    echo "   'no title field' is an ABSENCE OF INSTRUMENT, not a score of zero: that page renders no"
+    echo "   Printable Title or Subtitle, so nothing on it can reach this log. On Looped-Network the"
+    echo "   equivalent intent would be renaming a tab, saving a project, or placing a Text object."
+    echo "   NONE OF THE THREE IS LOGGED TODAY — engcalcs-signal.log's lpn rows carry only"
+    echo "   'first:<example|element|backdrop|import>' and 'diag:<code>'. Adding one is a roadmap"
+    echo "   decision, not something this report can infer."
 else
     echo "   (nobody has typed a Printable Title in this window)"
 fi
@@ -465,15 +575,24 @@ echo " CONTACT FUNNEL — invitation clicks -> messages actually sent"
 echo "==============================================================================="
 echo "   clicks = confirmed-human views of contact.php. sends = messages formmail.php actually"
 echo "   mailed, logged server-side in its success branch and NOT de-duplicated, because one"
-echo "   person writing twice is two messages. The send log has no bucket column, so clicks are"
-echo "   shown for both buckets and the reader picks the honest denominator."
+echo "   person writing twice is two messages. formmail.php now appends the same bucket column"
+echo "   every other writer appends, so a send can finally be matched to the bucket its click"
+echo "   came from. Rows written before that change have no token and are counted separately;"
+echo "   they are not assigned to either side."
 echo ""
 CLICKS_P=$(awk -F'\t' '$2=="contact"' "$TMP/p-view" | wc -l | tr -d ' ')
 CLICKS_L=$(awk -F'\t' '$2=="contact"' "$TMP/l-view" | wc -l | tr -d ' ')
 SENDS=$(n_of "$TMP/send")
+# NF>=5 is "this row carries a bucket token": the older format is ts page lang browser_lang.
+SENDS_P=$(awk -F'\t' 'NF>=5 && $NF=="visitor"' "$TMP/send" | wc -l | tr -d ' ')
+SENDS_L=$(awk -F'\t' 'NF>=5 && $NF=="visit"'   "$TMP/send" | wc -l | tr -d ' ')
+SENDS_U=$(awk -F'\t' 'NF<5'                    "$TMP/send" | wc -l | tr -d ' ')
 printf "   %-32s %8d\n" "invitation clicks (people)" "$CLICKS_P"
 printf "   %-32s %8d\n" "invitation clicks (page loads)" "$CLICKS_L"
 printf "   %-32s %8d\n" "messages sent" "$SENDS"
+printf "   %-32s %8d\n" "  of those, people bucket" "$SENDS_P"
+printf "   %-32s %8d\n" "  of those, page-load bucket" "$SENDS_L"
+printf "   %-32s %8d\n" "  of those, no bucket column" "$SENDS_U"
 echo ""
 echo "   The two causes of a contact drought call for OPPOSITE fixes: few clicks means the"
 echo "   invitation is invisible (wording and placement are the lever); many clicks and few"
@@ -610,4 +729,11 @@ echo " FINGERPRINT   $FINGERPRINT"
 echo ""
 echo " Snapshotting into dev/usage-data-log.md: paste the WINDOW and FINGERPRINT lines with"
 echo " whatever table you keep. A table pasted without them cannot be compared to anything."
+echo ""
+echo " To keep this run as a file, one command:"
+echo ""
+echo "     bash log/lang-log-stats.sh --out=dev/usage-report-$(date -u +%Y-%m-%d).txt"
+echo ""
+echo " That writes a file and publishes nothing. dev/ is blocked from web access deliberately, and"
+echo " whether these aggregate numbers are ever served is Tom's decision — no script makes it."
 echo ""

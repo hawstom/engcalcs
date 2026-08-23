@@ -34,7 +34,25 @@
 //                     as 'browser' does. Marked 'visit' in the trailing bucket column and kept
 //                     out of every de-duplicated total -- see ecLogBucketSuffix() in
 //                     lib/config.inc.php for why these are two numbers and never one.
-function logLanguageSelection($lang, $source) {
+//
+// TWO LANGUAGE COLUMNS, NOT ONE (added 2026-08-22). Column 2 has always meant different things on
+// different rows -- 'get'/'cookie'/'view' rows carry the language we SERVED, 'browser'/'anon' rows
+// carry the visitor's raw first Accept-Language tag -- and since Task 286 the 'anon' rows are the
+// large majority, so for most of the audience the reach log did not record what we served AT ALL.
+// Column 2 is left exactly as it was, because every older row already means what it means and
+// nothing can go back and re-read them. The two facts are now also written explicitly, as their
+// own columns, BEFORE the bucket suffix:
+//
+//   ts  lang  source  page  [served  asked]  bucket
+//
+// The bucket stays the LAST field, which every reader tests and nothing may disturb. The pair is
+// written together or not at all, so a row with 6+ fields has them and an older row (4 or 5
+// fields) does not -- log/lang-log-stats.sh reports those as unclassified rather than folding
+// them in. 'asked' comes from ecBrowserLangTag(), so it carries the same no-tab, 35-character
+// guarantee as every other visitor-supplied log column (Task 319); 'served' is one of our own
+// language codes, filtered here anyway because a log column's safety must not depend on where the
+// value came from.
+function logLanguageSelection($lang, $source, $served = '') {
     $logFile = defined('LANG_LOG') ? LANG_LOG : null;
     if (!$logFile) return;
     // Task 210: a browser that opted out of being counted is not counted here either. All three log
@@ -51,7 +69,10 @@ function logLanguageSelection($lang, $source) {
     }
     $page = isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '';
     $bucket = function_exists('ecLogBucketSuffix') ? ecLogBucketSuffix() : '';
-    $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . $lang . "\t" . $source . "\t" . $page . $bucket . "\n";
+    $servedCol = substr(preg_replace('/[^a-z0-9-]/', '', strtolower($served)), 0, 35);
+    $askedCol  = function_exists('ecBrowserLangTag') ? ecBrowserLangTag() : '';
+    $line = gmdate('Y-m-d\TH:i:s\Z') . "\t" . $lang . "\t" . $source . "\t" . $page
+          . "\t" . $servedCol . "\t" . $askedCol . $bucket . "\n";
     @file_put_contents($logFile, $line, FILE_APPEND | LOCK_EX);
 }
 
@@ -60,7 +81,9 @@ function logLanguageSelection($lang, $source) {
  *
  * The lang field carries the raw first Accept-Language tag rather than the language we served, so
  * this bucket answers the same demand question 'browser' rows answer -- it just answers it per
- * page load instead of per browser, because there is nowhere to remember the browser.
+ * page load instead of per browser, because there is nowhere to remember the browser. The language
+ * actually served travels in its own column instead of being lost (see logLanguageSelection): this
+ * is the majority bucket, so losing it here lost it for most of the audience.
  */
 function logAnonymousView($servedLang) {
     $raw = $servedLang;
@@ -71,7 +94,7 @@ function logAnonymousView($servedLang) {
     // are made from. Found by the agent that fixed the other five, which reported it rather than
     // silently widening its own task.
     $raw = ecBrowserLangTag();
-    logLanguageSelection($raw, 'anon');
+    logLanguageSelection($raw, 'anon', $servedLang);
 }
 
 // Map legacy/non-standard language codes to their correct ISO 639-1 equivalents.
@@ -114,7 +137,7 @@ function chooseLanguage($all_language_settings) {
                 'secure'   => function_exists('ecCookieSecure') ? ecCookieSecure() : true,
                 'httponly' => true,
             ]);
-            logLanguageSelection($lang, 'get');
+            logLanguageSelection($lang, 'get', $lang);
             return $lang;
         } else {
             return "en";
@@ -130,13 +153,13 @@ function chooseLanguage($all_language_settings) {
                 // "retains users across sessions" number in lang-log-stats.sh mean anything.
                 ecMarkSeen(EC_SEEN_VISIT, EC_SEEN_DEMAND);
                 ecMarkSeen($page, EC_SEEN_LANG_VIEW);
-                logLanguageSelection($cookieLang, 'cookie');
+                logLanguageSelection($cookieLang, 'cookie', $cookieLang);
             } elseif (!ecSeen($page, EC_SEEN_LANG_VIEW)) {
                 // A later page in the same visit. Logged so LANG_LOG's page breakdown covers every
                 // page visited rather than only the entry page, and excluded from the demand
                 // sections so it cannot double-count the visit's language.
                 ecMarkSeen($page, EC_SEEN_LANG_VIEW);
-                logLanguageSelection($cookieLang, 'view');
+                logLanguageSelection($cookieLang, 'view', $cookieLang);
             }
         } else {
             logAnonymousView($cookieLang);
@@ -255,7 +278,7 @@ function chooseLanguage($all_language_settings) {
         if (!isset($_COOKIE['ec_blang']) && isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             // Filtered -- see the note on the 'anon' call above. Same defect, same fix.
             $rawLang = ecBrowserLangTag();
-            logLanguageSelection($rawLang, 'browser');
+            logLanguageSelection($rawLang, 'browser', isset($winningLanguage) ? $winningLanguage : '');
             // VALUE IS A LITERAL 1 as of Task 288. It was the raw language tag, but every use site
             // is isset() -- the value was written and never read once. Storing a tag we do not read
             // made the banner's "a single digit" claim false for no benefit whatever.
