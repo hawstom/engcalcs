@@ -31,6 +31,12 @@
  *   php dev/scripts/stale_claim_check.php --all    # every citation of a closed task
  *   php dev/scripts/stale_claim_check.php --quiet   # summary line only
  *
+ * MEASURED 2026-08-23: the two demotions below took HIGH from 11 lines to 7. **All 7 that remain
+ * are still legitimate records**, and that is the expected steady state — there is no known stale
+ * claim in the repo today, so a true positive would be a NEW defect, not a backlog item. What the
+ * demotions bought is that the list no longer leads with a correction of a false claim, which is
+ * the one finding a reader would most likely act on backwards.
+ *
  * Exit 0 = nothing ranked high. Exit 1 = at least one high-ranked line to skim. Advisory either
  * way: check_all.sh runs it in the advisory group, where a non-zero exit prints and does not block.
  */
@@ -67,6 +73,33 @@ const MARKERS = [
     '/\bTODO\b/',
     '/\btoday it\b/i',
     '/\bonce (?:it|this|that) (?:ships|lands|exists)\b/i',
+];
+
+/* **HIGH IS FOR A PRESENT-TENSE CLAIM THAT A CAPABILITY DOES NOT EXIST.** Two kinds of line carry a
+ * marker and are records rather than claims, and both were ranking HIGH — which mattered, because
+ * on 2026-08-23 ALL ELEVEN high lines were legitimate records, and an advisory with no true
+ * positives teaches its reader to skip it. That is the same failure this file was written to catch
+ * in prose, arriving in the tool itself.
+ *
+ * PAST TENSE describes history. "Task 193 reviewed all 226 keys and it did not work" is the record
+ * of a thing that happened, not an assertion about what the suite does today. Demoted to MEDIUM,
+ * not dropped: a past-tense line can still be stale, it is just no longer worth reading first.
+ *
+ * A NEGATION THE LINE ITSELF MARKS FALSE is a correction, and corrections QUOTE the false claim —
+ * `**"Does not write one yet" is FALSE.**` is this file's own warning shape, and it was the
+ * top-ranked finding against `CLAUDE.md`. A checker that reports the fix as the defect makes the
+ * fix look like something to undo. */
+const PAST_TENSE = [
+    '/\b(?:did|was|were) not\b/i',
+    '/\b(?:didn\'t|wasn\'t|weren\'t)\b/i',
+    '/\b(?:could not|couldn\'t)\b/i',
+];
+const CORRECTION = [
+    '/\bis (?:FALSE|false|wrong|no longer true|stale)\b/',
+    '/\bwas (?:FALSE|false|wrong)\b/',
+    '/\bdo not restore\b/i',
+    '/\bno longer (?:true|the case)\b/i',
+    '/\bcorrected\b/i',
 ];
 
 $opts = ['all' => false, 'quiet' => false];
@@ -133,6 +166,19 @@ foreach ($files as $file) {
             ? 'negation/future marker "' . $own . '" on the same line'
             : ($near !== null ? 'negation/future marker "' . $near . '" on an adjacent line'
                               : 'closed task cited, no state-claim marker nearby');
+        // The two demotions. Checked only when the marker is on the citation's OWN line: a
+        // neighbouring line's tense says nothing about this one's.
+        if ($rank === 'high') {
+            $correction = matchIn(CORRECTION, $line);
+            $past = matchIn(PAST_TENSE, $own);
+            if ($correction !== null) {
+                $rank = 'medium';
+                $why = 'a correction, not a claim — the line marks it "' . $correction . '"';
+            } elseif ($past !== null) {
+                $rank = 'medium';
+                $why = 'past tense "' . $past . '" — a record of what happened, not a claim about now';
+            }
+        }
 
         $findings[$rank][] = [
             'file' => $rel,
@@ -142,6 +188,19 @@ foreach ($files as $file) {
             'text' => trim($line),
         ];
     }
+}
+
+function matchIn(array $patterns, ?string $text): ?string
+{
+    if ($text === null) {
+        return null;
+    }
+    foreach ($patterns as $re) {
+        if (preg_match($re, $text, $m)) {
+            return trim($m[0]);
+        }
+    }
+    return null;
 }
 
 function markerIn(string $text): ?string
