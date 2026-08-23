@@ -27,6 +27,9 @@
  *   php dev/scripts/trim_logs.php            # report what would be deleted, change nothing
  *   php dev/scripts/trim_logs.php --apply    # actually rewrite the logs
  *   php dev/scripts/trim_logs.php --months=6 --apply
+ *
+ * It walks the ARCHIVES in spock/<date>/ as well as the live logs -- see the comment beside the
+ * $logs list for why it has to.
  */
 require_once __DIR__ . '/../../lib/config.inc.php';
 
@@ -51,11 +54,40 @@ $cutoff = gmdate('Y-m-d\TH:i:s\Z', strtotime("-{$months} months"));
 // touched.
 $logs = [LANG_LOG, HUMAN_VIEW_LOG, CALC_USAGE_LOG, TITLE_LOG, CONTACT_SEND_LOG, SIGNAL_LOG];
 
+// AND EVERY ARCHIVE. Until 2026-08-23 this script read the six live paths and nothing else, so a
+// log rotated into spock/<date>/ by dev/scripts/archive_logs.php -- or hand-moved there, which is
+// how the first ones arrive -- was data the retention backstop never touched. privacy.php promises
+// usage counts are kept "at most 26 months"; an untouched archive turns that promise into a lie
+// the moment the first one is 27 months old, and nothing would have said so. Moving a file does
+// not change what the page told the visitor about it.
+//
+// Globbed rather than listed, so a hand-moved archive is covered the day it appears with no edit
+// to anything. A file in an archive that is not one of the six known names is skipped and NAMED --
+// deleting rows out of a file whose format this script has never seen is not a thing to do
+// quietly.
+$archiveRoot = dirname(__DIR__, 2) . '/spock';
+$known = array_map('basename', $logs);
+$strays = [];
+foreach (glob($archiveRoot . '/*', GLOB_ONLYDIR) ?: [] as $dir) {
+    if (basename($dir) === 'public' || basename($dir) === 'reports') continue;
+    foreach (glob($dir . '/*.log') ?: [] as $f) {
+        if (in_array(basename($f), $known, true)) {
+            $logs[] = $f;
+        } else {
+            $strays[] = $f;
+        }
+    }
+}
+
 printf("Retention: %d months. Cutoff: %s. %s\n\n", $months, $cutoff, $apply ? 'APPLYING.' : 'Dry run -- nothing will be written.');
 
 $totalDropped = 0;
 foreach ($logs as $log) {
-    $name = basename($log);
+    // Archived rows and live rows are the same rows under the same promise, so an archive is
+    // labelled by its directory rather than treated as a different kind of thing.
+    $name = (strpos($log, $archiveRoot . '/') === 0)
+        ? basename(dirname($log)) . '/' . basename($log)
+        : basename($log);
     if (!is_file($log)) {
         printf("  %-34s %s\n", $name, '(no file)');
         continue;
@@ -86,6 +118,9 @@ foreach ($logs as $log) {
 }
 
 printf("\n%s %d row(s).\n", $apply ? 'Deleted' : 'Would delete', $totalDropped);
+foreach ($strays as $f) {
+    printf("  SKIPPED (unknown filename, format unverified): %s\n", $f);
+}
 if (!$apply && $totalDropped > 0) {
     echo "Snapshot the aggregates into dev/usage-data-log.md first:  sh log/lang-log-stats.sh\n";
     echo "Then re-run with --apply.\n";
