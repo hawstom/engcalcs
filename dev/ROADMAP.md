@@ -90,9 +90,20 @@ the block.
   fixed in `refreshLabelText()` and left in this path. Batched 2026-08-23: **1,008 forced layouts per
   notch → 9** on a 112-pipe grid, every label keeping the same values, guarded by
   `dev/lpn-spike/zoom-reshed-harness.js`; 44–458 ms in the browser.
-  - **WHAT IS LEFT IS `shedAlignedForConflicts()`,** now the whole of it: 0.3–1.8 s per notch, over
-    9M box-overlap tests across eleven passes. Its cascade has a cross-label term, so it cannot be
-    batched — but its obstacle walk is un-indexed, which is the shape Task 472 fixed for segments.
+  - **`shedAlignedForConflicts()`'s obstacle walk is INDEXED, 2026-08-23.** It was the whole of what
+    was left — 0.3–1.8 s per notch in over 9M box-overlap tests. The cascade still runs one label at
+    a time and always will (each label placed is an obstacle for the next); what grew with the
+    drawing was `boxIsClear()`'s walk. Through `Collide.boxIndex()`: **231 → 7.3 overlap tests per
+    label on 112 pipes, 860 → 7.1 on 480** — the per-label rate now flat instead of rising. Every
+    placement byte-identical, proved by dumping both passes from separate processes.
+    `dev/lpn-spike/aligned-shed-index-harness.js` guards it.
+    - **An APPEND-ONLY grid that re-reads the caller's array on each query, not a tree.** The
+      difference from Task 472: that index is built once and held, this one absorbs an insert
+      between every pair of queries. A grid's insert has no rebalance, and syncing on query meant no
+      call site had to be told about the insert.
+    - **THIS PASS CONVERGES ACROSS PASSES,** which is a trap for anyone comparing it: it seeds node
+      labels as obstacles where the last layout PLACED them, so two identical runs back to back in
+      one process already disagree on one label. Compare backends in separate processes.
   - Placement leftovers, small: a background image is not carried onto the map, the two-control-point
     path (`lpnGeorefFromTwoPoints`) is built and tested with no interface, and Finish is not undoable.
   - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the

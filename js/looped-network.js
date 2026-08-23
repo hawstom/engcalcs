@@ -1170,9 +1170,18 @@ var EngCalcs = EngCalcs || {};
 	// order does not depend on anything the user can change by clicking.
 	// Does this box have the map to itself? Oriented, since an aligned label's box turns with its
 	// pipe and the axis-aligned box around a diagonal one is up to 5.2x its own area.
+	//
+	// **THROUGH AN INDEX, BECAUSE THE WALK WAS THE WHOLE OF A WHEEL NOTCH** (Task 436).
+	// shedAlignedForConflicts() calls this once per rung per label and every label it places is
+	// pushed onto `obs.boxes`, so the walk grew with the drawing at both ends: 231 overlap tests per
+	// label on a 112-pipe grid against 860 on a 480-pipe one. Collide.boxIndex() answers the
+	// identical question -- same boxOverlapDepth(), same boolean, on every input -- and it reads
+	// `obs.boxes.length` on each query, so a push anywhere is picked up with no call site changed.
+	// The index is CACHED ON THE OBSTACLE SET rather than passed in for the same reason.
 	function boxIsClear(b, obs, pad) {
 		var grown = Collide.box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a);
-		return !obs.boxes.some(function (o) { return Collide.boxOverlapDepth(grown, o) > 0; });
+		if (!obs.boxIndex) { obs.boxIndex = Collide.boxIndex(obs.boxes); }
+		return !obs.boxIndex.anyOverlap(grown);
 	}
 	function stationedLabelBox(l, le, along, w, h, fs, force) {
 		if (linkLabelAligned(l)) {
