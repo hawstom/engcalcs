@@ -200,7 +200,7 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   authoritative one and no design argument starts from a phone. Say "pointer slop" when you mean
   hand-and-mouse tolerance; a 44px touch target is not an argument here. But **"almost impossible on
   a phone" is retired** (Tom, 2026-08-22): it is tested and usable there, and the small-screen pass
-  he asked for is on the roadmap — hide page titles, collapse the navbar, keep only the transport
+  he asked for is Task 486 — hide page titles, collapse the navbar, keep only the transport
   controls on the toolbar, and drop menu text to icons. The other calculators are a form and an
   answer and are fine as they are.
 

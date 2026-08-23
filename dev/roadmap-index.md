@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**86 open tasks.** Next (100): 6 · Soon (75): 9 · Someday (50): 18 · Maybe (25): 26 · Parked (5): 27
+**87 open tasks.** Next (100): 6 · Soon (75): 10 · Someday (50): 18 · Maybe (25): 26 · Parked (5): 27
 
 ## 100 — Next (6)
 
@@ -18,7 +18,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 436 — A wheel notch costs a full label relayout, editor-wide.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
 
-## 75 — Soon (9)
+## 75 — Soon (10)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 378 — [H] · Give the seven harnesses a network some other way, and delete `drawExampleNetwork()`.
@@ -29,6 +29,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 477 — [H] · A New-project WIZARD instead of the four-row File > New fly-out.
 - Task 479 — LibreWaterNet.org needs a landing page, and this account needs a hosting decision.
 - Task 485 — All six production logs start within four minutes of 2026-08-14.
+- Task 486 — A small-screen presentation pass for the map editor.
 
 ## 50 — Someday (18)
 
@@ -112,5 +113,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-86 of 86 titles are within 4–12 words. `!` marks the rest;
+87 of 87 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

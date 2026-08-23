@@ -236,6 +236,13 @@ the block.
     and `~/libreepanet.org` are already web roots. Options and the recommendation:
     `dev/hosting-layout.md`.
 
+- 75|486| **A small-screen presentation pass for the map editor.**
+  Tom, 2026-08-22, for crawlers and humans alike on a phone: hide page titles, hide or collapse the
+  HawsEDC navbar, keep only the transport controls on the toolbar, and drop menu text to icons.
+  This retires "almost impossible on a phone" — his words are *"better used on a PC even though it
+  is tested and usable on a phone screen"*, which is now what `dev/librewaternet-landing` claims.
+  The desktop layout stays authoritative; a phone is still not evidence for a design decision here.
+
 - 75|485| **All six production logs start within four minutes of 2026-08-14.**
   Nobody archived, purged or emptied them, yet the window is 8.5 days and `engcalcs-lang.log`,
   `-human-view.log`, `-calc-usage.log`, `-title.log`, `-signal.log` and `-contact-send.log` each
