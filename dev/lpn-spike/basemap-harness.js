@@ -388,19 +388,24 @@ console.log('\n--- the corner teaser appears where the menu row does, and nowher
 	ok('...and it says it is a toggle that is currently off',
 		btn.getAttribute('aria-pressed') === 'false');
 
-	// **ONE SEAM.** The click goes through setBasemapStyle(), which is what makes the corner and the
-	// menu row behave identically -- including the seam's own rule that asking for the style already
-	// showing turns the basemap off.
+	// **ONE SEAM, TWO BEHAVIOURS, AND THE DIFFERENCE IS THE POINT.** The click goes through
+	// setBasemapStyle() like the menu row, but it never ASKS for the style already showing, so the
+	// seam's off-toggle cannot fire. A corner tile swaps the two basemaps; only a row that says
+	// "Hide" in words takes the tiles away. Tom, 2026-08-23, on the version that inherited the
+	// off-toggle: *"I get satellite, but now I lost map. No more map. Satellite has attribution,
+	// Map has nothing, no map and no attribution."*
 	const click = function () { btn._listeners.click.forEach(function (f) { f(); }); };
 	click();
 	ok('clicking it turns the satellite images on', L.basemapOn() && L.style() === 'satellite');
 	L.refreshTeaser();
-	ok('...and the tile then offers the way back', btn.getAttribute('aria-pressed') === 'true' &&
-		btn.getAttribute('aria-label') === 'Hide satellite images');
+	ok('...and the tile then offers the STREET map, not "hide"',
+		btn.getAttribute('aria-pressed') === 'true' &&
+		btn.getAttribute('aria-label') === 'Show street map', btn.getAttribute('aria-label'));
 	ok('...and shows the other source, which is what a toggle\'s picture is for',
 		String(btn.getAttribute('class')).indexOf('lpn-basemap-teaser-on') >= 0);
 	click();
-	ok('...and clicking again goes through the same seam the menu row does', !L.basemapOn());
+	ok('...and clicking again returns the street map rather than nothing',
+		L.basemapOn() && L.style() === 'osm', 'on=' + L.basemapOn() + ' style=' + L.style());
 	L.refreshTeaser();
 	ok('...leaving the teaser offering the images again',
 		btn.getAttribute('aria-label') === 'Show satellite images');
