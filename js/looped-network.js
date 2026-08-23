@@ -9695,9 +9695,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		// v3 -> v4: coordinates become Cartesian. A NORMAL migration -- convert and stamp -- because
 		// it asks the user nothing (Tom, 2026-08-11: "We always upgrade the file to the current
-		// format. Right?" Right, and the first cut of this wrongly left v3 documents at v3 forever,
-		// relying on serializeProject() writing openDocVersion. That turned the ONE documented
-		// exception below into two, the second undocumented and for no reason at all).
+		// format. Right?"). Leaving v3 documents at v3 and relying on serializeProject() writing
+		// openDocVersion would make a SECOND standing exception beside the v2 one below, for no
+		// reason at all -- v2 lags because its units question is the user's to answer, and nothing
+		// else does.
 		if (saved.v === 3) {
 			flipStoredY(saved);
 			saved.v = 4;
@@ -9921,9 +9922,9 @@ var EngCalcs = EngCalcs || {};
 		var savedPrefixes = savedSettings.idPrefixes || {};
 		delete savedSettings.defaults; delete savedSettings.sectionsOpen; delete savedSettings.idPrefixes;
 		settings = Object.assign(defaultSettings(), savedSettings);
-		// **A PROJECT SAVED UNDER THE TWO-FIELD DESIGN KEEPS ITS NUMBERS.** For the length of one
-		// day the method's answer was frozen into a second field, `colorFrozenBreaks`, and the
-		// design was rejected (Task 448). Those numbers are the ones that project was drawn in, so
+		// **A PROJECT SAVED UNDER THE TWO-FIELD DESIGN KEEPS ITS NUMBERS.** That design froze the
+		// method's answer into a second field, `colorFrozenBreaks`, and was rejected (Task 448).
+		// Those numbers are the ones that project was drawn in, so
 		// they move into colorBreaks -- where they now simply are the limits -- rather than being
 		// dropped, which would repaint somebody's map on open. A key the user had also typed over
 		// wins, because that is the field they were looking at. The old key is then DELETED so
