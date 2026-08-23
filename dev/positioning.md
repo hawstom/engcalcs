@@ -69,6 +69,21 @@ This is the substance behind Task 244's navbar term, and behind `About.php`'s *"
 Source License"* heading. **State our own licence; do not narrate theirs.** The contrast is
 available to anyone who looks, and it lands harder unspoken.
 
+### The honest statement about what we do not know
+
+**Tom, 2026-08-22, on finding that EPANET's "Labels" carry a Meter feature nobody had noticed:**
+*"EPANET appears to me to be of 'infinite' depth. And the only way I can cope with that vision is to
+retreat to the honest statement I gave you for our lwn splash page; 'We are what we are, and it's
+good and useful and usable. But we have no idea what we are not and what we don't know.'"*
+
+**This is a positioning asset, not a disclaimer.** It is the one claim about ourselves that the next
+surprise cannot falsify, and every roadmap and feature comparison we write implies the opposite —
+that the boundary of the gap is visible. It is not. Say so in public, and a discovery like the Meter
+becomes a confirmation of our honesty rather than a correction to it.
+
+Practically: never write a completeness claim against EPANET, in the roadmap or on a public page.
+Name what we do and what we know we lack; do not imply the second list is finished.
+
 ## 3. Where we actually differ
 
 Their stated audience, in their own words, is *"utilities, educators, and engineers with smaller
@@ -103,7 +118,17 @@ us.
 We keep *caring*: the `innerHeight * 0.72` cap in `effectiveMapHeight()` stays (it exists because
 `#lpn_canvas` has `touch-action:none`, so a canvas taller than the viewport traps a phone user with
 no scrollable page — Tom hit exactly that on 2026-07-31), and phone regressions are still bugs.
-Revisit the positioning only if outside advice says otherwise.
+
+**Tom softened the stance on 2026-08-22, and the softening has a stated goal and a stated limit.**
+*"the truth is that this is a PC app, just like EPANET and epanetjs, and epanetjs takes the same
+stance only a little more strongly than I want to put it. For PC of course, but go ahead and try it
+on your phone."* And on where we stand today: *"We are not usable on a phone today, IMO. We will be
+with those four small-screen tasks done."*
+
+So the target is **"obviously never tried on a phone" → "well, maybe"**, and nothing beyond it. The
+four items are Task 486. Until they ship, no public page may claim the map editor is usable on a
+phone — `dev/librewaternet-landing/index.html` already carries that claim and must not go live
+first. Revisit the positioning beyond that only if outside advice says otherwise.
 
 ## 4. Design, not management — and the annotated map is the evidence
 
