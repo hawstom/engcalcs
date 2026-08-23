@@ -2004,9 +2004,6 @@ $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
 $ec_lang['lpn_labels_decimals_tip']='Decimal places shown for this label';
-$ec_lang['lpn_labels_hide_all']='Temporarily hide all';
-$ec_lang['lpn_labels_hide_all_tip']='Takes every node and link label off the map in one step, without changing which fields you have chosen above. Text you placed yourself is not a label and stays on the map.';
-$ec_lang['lpn_labels_hide_all_note']='Text you placed stays on the map.';
 $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line

@@ -2887,20 +2887,10 @@ var EngCalcs = EngCalcs || {};
 	// applyLabelVisibility() knows about. Written only there; read by onZoomChanged() and
 	// scheduleReshed(), which skip the label pipeline when nothing readable is drawn.
 	var dataLabelsHidden = false;
-	// **A BLANKET HIDE IS A VIEW STATE, AND IT IS THE LABELS BOX'S** (Task 428). Unticking every
-	// field there was already an adequate interface, so this is the same box's one-gesture form of
-	// it -- not a second mechanism somewhere else. Session-scoped on purpose: it is not in
-	// labelSettings, so it is not saved, not carried into a scenario's inherited label settings, and
-	// a project cannot open with the user's own labels mysteriously off.
-	var labelsHiddenAll = false;
-	function labelsHiddenAllOn() { return labelsHiddenAll; }
-	function setLabelsHiddenAll(on) {
-		labelsHiddenAll = !!on;
-		refreshLabelSuppression();
-		// The key names label fields; with every label off it names lettering nobody can see. Same
-		// call the thematic checkbox makes, for the same reason.
-		renderLabelsLegend();
-	}
+	// **THERE IS NO BLANKET "hide all" CHECKBOX** (Tom, 2026-08-22, review: *"There is no such
+	// path as Labels... it has the identical behavior as Thematic map, except that it responds more
+	// slowly. I don't see the value."*). Unticking the field checkboxes is the per-field interface
+	// and Thematic map is the one-gesture one. Do not add a third.
 
 	// Symbol size. SCREEN PIXELS and INDEPENDENT OF THE TEXT (Task 331). `settings.symbolSize` is the
 	// DIAMETER OF A JUNCTION DOT, the one dimension on this map a person can picture; everything else
@@ -15647,31 +15637,6 @@ var EngCalcs = EngCalcs || {};
 		// blanket separator and individual prefixes and postfixes, of course").
 		if (optBox) {
 			optBox.innerHTML = '';
-			// **THE BLANKET HIDE LIVES HERE, WITH THE FIELDS IT HIDES** (Task 428). Unticking every
-			// checkbox above already does this; a one-gesture form of it belongs in the same box
-			// rather than riding on a colouring mode, where nobody looking for "turn the labels off"
-			// would find it and where it surprised the user by taking their own notes with it.
-			//
-			// **THE EXEMPTION IS SAID OUT LOUD, NOT LEFT TO BE DISCOVERED.** A deliberate
-			// distinction that is invisible reads as a bug in the other direction -- "it says ALL
-			// and my writing is still there". The tip carries the rule, and the line below appears
-			// while the box is ticked, so the answer is on screen at the exact moment the map looks
-			// wrong. Same trade Tom set for the high/low mark: short label, tip does the work.
-			var hideAllHint = document.createElement('div');
-			labelCheckbox(optBox, pc.lpn_labels_hide_all || 'Temporarily hide all',
-				labelsHiddenAllOn(), function (v) {
-					setLabelsHiddenAll(v);
-					hideAllHint.style.display = labelsHiddenAllOn() ? '' : 'none';
-				}, null, null, null,
-				pc.lpn_labels_hide_all_tip ||
-					'Takes every node and link label off the map in one step, without changing which fields you have chosen above. Text you placed yourself is not a label and stays on the map.');
-			hideAllHint.textContent = pc.lpn_labels_hide_all_note || 'Text you placed stays on the map.';
-			hideAllHint.className = 'lpn-set-name';
-			hideAllHint.style.display = labelsHiddenAllOn() ? '' : 'none';
-			// Indented under the row it explains, by the checkbox's own width plus the label gap --
-			// the same 6px this list uses between every control and its name.
-			hideAllHint.style.marginLeft = '1.4em';
-			optBox.appendChild(hideAllHint);
 			// **THE LABEL STAYS SHORT AND THE TIP CARRIES THE CONVENTION** (Tom's own rule from the
 			// same review: "we should have a shorter label with a tip ... this length goes beyond real
 			// estate issues to attention/clutter issues"). His "Mark highest (overline) and lowest
@@ -15744,11 +15709,9 @@ var EngCalcs = EngCalcs || {};
 		// -- so a key naming the label fields is a key to lettering nobody can see. The colour
 		// legend is the one that belongs on a thematic map and it is a different element
 		// (colorLegendBox), so this hides without touching that one.
-		// ...and by "Temporarily hide all" for the identical reason (Task 428): the two suppressors
-		// that take the whole label set off the map both take its key with it. The georef case is
-		// not here -- it is a transient gesture, not a mode, and the legend is chrome the placement
-		// never touches.
-		box.style.display = (any && !settings.colorThematic && !labelsHiddenAllOn()) ? '' : 'none';
+		// The georef case is not here -- it is a transient gesture, not a mode, and the legend is
+		// chrome the placement never touches.
+		box.style.display = (any && !settings.colorThematic) ? '' : 'none';
 		applyLegendPosition();
 	}
 	// There is no toggleLabelsPopup() any more. Labels moved to the Visibility panel (Task 427) and
@@ -16051,10 +16014,9 @@ var EngCalcs = EngCalcs || {};
 	// a rule of its own. What the OR governs is `.lpn-annotation`, so no suppressor can ever reach
 	// authored content again by construction.
 	//
-	// Three suppressors, and none of them is about how far out you are:
+	// Two suppressors, and neither of them is about how far out you are:
 	//   * generated annotation is off while the project is being placed on the map;
-	//   * thematic mode: colour is the message, so the lettering comes off;
-	//   * the Labels box's "Temporarily hide all".
+	//   * thematic mode: colour is the message, so the lettering comes off.
 	// And one per-label rule, which is about the MODEL rather than the view:
 	//   * a Text label switched off in this scenario is not there at all.
 	function applyLabelVisibility() {
@@ -16065,11 +16027,11 @@ var EngCalcs = EngCalcs || {};
 		// Tom dragged a label by accident while aiming the model, and every label is also work the
 		// page does on a gesture whose whole point is to be smooth. The user's own Text elements
 		// stay: they are content, and he asked for "only elements including text".
-		// **THE USER'S OWN TEXT SURVIVES ALL THREE**, which is the whole of Task 428 and was already
+		// **THE USER'S OWN TEXT SURVIVES BOTH**, which is the whole of Task 428 and was already
 		// the rule for the georef case: "only elements including text". A Text object is a note
 		// somebody placed; a label is annotation we generated. Tasks 342 and 407 made them different
 		// things everywhere else on this page, and this was the last place that conflated them.
-		dataLabelsHidden = !!(georefActive() || settings.colorThematic || labelsHiddenAll);
+		dataLabelsHidden = !!(georefActive() || settings.colorThematic);
 		if (svg) { svg.classList.toggle('lpn-labels-hidden', dataLabelsHidden); }
 		// Per label, so it cannot ride the one class on the <svg>: doc.labels is the user's own Text
 		// labels only, typically a handful, so the loop is cheap.
@@ -16088,7 +16050,7 @@ var EngCalcs = EngCalcs || {};
 	// applyLabelVisibility() directly.** While annotation is hidden the zoom path deliberately skips
 	// refreshFontSizes()/relayoutLabels() (see onZoomChanged), so labels that come back after a zoom
 	// are still positioned for the scale they were hidden at. Same revival the zoom path runs, in
-	// one place, so a third suppressor cannot forget it.
+	// one place, so a future suppressor cannot forget it.
 	function refreshLabelSuppression() {
 		var wasHidden = dataLabelsHidden;
 		applyLabelVisibility();

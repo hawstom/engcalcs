@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 1262,
-        "delta_key_count": 69,
+        "expected_key_count": 1259,
+        "delta_key_count": 66,
         "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
@@ -471,9 +471,6 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
-        "lpn_labels_hide_all": "Temporarily hide all",
-        "lpn_labels_hide_all_tip": "Takes every node and link label off the map in one step, without changing which fields you have chosen above. Text you placed yourself is not a label and stays on the map.",
-        "lpn_labels_hide_all_note": "Text you placed stays on the map.",
         "lpn_engine_refused": "The EPANET solver would not accept this network, so it did not run.",
         "lpn_engine_refused_why": "The EPANET solver said: {message}",
         "lpn_engine_refused_fallback": "The numbers on screen came from the built-in solver instead.",
@@ -542,9 +539,6 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
-        "lpn_labels_hide_all": "Temporarily hide all",
-        "lpn_labels_hide_all_tip": "Takes every node and link label off the map in one step, without changing which fields you have chosen above. Text you placed yourself is not a label and stays on the map.",
-        "lpn_labels_hide_all_note": "Text you placed stays on the map.",
         "lpn_engine_refused": "The EPANET solver would not accept this network, so it did not run.",
         "lpn_engine_refused_why": "The EPANET solver said: {message}",
         "lpn_engine_refused_fallback": "The numbers on screen came from the built-in solver instead.",
@@ -1075,54 +1069,6 @@
                     "key": "lpn_field_valve_setting_loss",
                     "value": "Kayıp katsayısı",
                     "english": "Loss coefficient"
-                }
-            }
-        },
-        "lpn_labels_hide_all": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_labels_decimals_tip",
-                    "value": "Bu etiket için gösterilen ondalık basamak sayısı",
-                    "english": "Decimal places shown for this label"
-                },
-                "next_translated": {
-                    "key": "lpn_labels_mark_extrema",
-                    "value": "En yüksek ve en düşük değerleri işaretle",
-                    "english": "Mark highest and lowest values"
-                }
-            }
-        },
-        "lpn_labels_hide_all_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_labels_decimals_tip",
-                    "value": "Bu etiket için gösterilen ondalık basamak sayısı",
-                    "english": "Decimal places shown for this label"
-                },
-                "next_translated": {
-                    "key": "lpn_labels_mark_extrema",
-                    "value": "En yüksek ve en düşük değerleri işaretle",
-                    "english": "Mark highest and lowest values"
-                }
-            }
-        },
-        "lpn_labels_hide_all_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_labels_decimals_tip",
-                    "value": "Bu etiket için gösterilen ondalık basamak sayısı",
-                    "english": "Decimal places shown for this label"
-                },
-                "next_translated": {
-                    "key": "lpn_labels_mark_extrema",
-                    "value": "En yüksek ve en düşük değerleri işaretle",
-                    "english": "Mark highest and lowest values"
                 }
             }
         },
