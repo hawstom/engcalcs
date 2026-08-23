@@ -40,16 +40,25 @@ $P = array(
 	'xr'      => 21.2,   // fanned right edge
 	'xtb'     => 16.6,   // title block upright
 	'copies'  => 3,
+	'deco'    => 1,      // the vicinity map and the two signature lines
 	'wfan'    => 3.0,    // the RIGHT edge: several sheets fanned out by having been rolled. The
 	                     // fattest line, and the only genuinely fanned one.
-	'wroll'   => 2.5,    // the roll's back edge and its bottom end: a stack, but rolled tight, not
-	                     // fanned.
+	'wroll'   => 2.5,    // the roll's bottom END only: a stack, but rolled tight, not fanned.
+	'wback'   => 0.75,    // the roll's BACK EDGE. Tom, 2026-08-23, looking at it at 2.5: "mistakenly
+	                     // fat/wide still. And making it narrower buys us yet more horizontal space."
+	                     // It is the silhouette of the roll, not a cut end, so it is a line like any
+	                     // other sheet edge.
 	'wbottom' => 2.0,    // the bottom edge. Tom, 2026-08-23: "far less pronounced than the right edge
 	                     // fanning fatness, partly because of perspective making it appear shorter
 	                     // than it is, like the ellipse roll instead of a circle, and partly because
 	                     // the bottom edge is not fanned." So barely above standard.
 	'wthick'  => 3.0,    // kept as the ceiling the others are read against
-	'wthin'   => 1.5,    // THE NARROWEST THAT SURVIVES 17 px, and everything takes it except the
+	'wthin'   => 0.75,   // BRAVE. Tom, 2026-08-23: "Are we sure that the standard narrow stroke
+	                     // can't be any narrower? Could we get brave and try half as wide?
+	                     // Antialiasing can do miracles." At 17 px this samples ~25% grey rather
+	                     // than solid, which is the whole question -- back off to 1.0 or 1.5 with one
+	                     // flag if it reads as faint instead of as fine.
+	'wthin_was' => 1.5,  // the previous value, kept so backing off is a substitution not a guess    // THE NARROWEST THAT SURVIVES 17 px, and everything takes it except the
 	                     // three heavy lines. Tom, 2026-08-23: 'All the linework should be as narrow
 	                     // as feasible (not to disappear at 17 px) so that we can fit things.'
 	                     // A path with no stroke-width would inherit 2 from EC_ICON_OPEN_TAG, so every
@@ -119,7 +128,7 @@ for ($i = 1; $i < $n; $i++) {
 // so it carries the heavy stroke. Without it the copies read as separate curves floating one above
 // another instead of as one roll; it is also what lets theta0 go back to 180, because every arc now
 // starts ON this line.
-$out[] = '<path stroke-width="' . $f($P['wroll']) . '" stroke-linecap="butt" d="M'
+$out[] = '<path stroke-width="' . $f($P['wback']) . '" stroke-linecap="butt" d="M'
 	. $f($P['xl']) . ' ' . $f($cyTop) . 'V' . $f($cyBot) . '"/>';
 // The fanned right edge and the bottom copy's sag and flat, as ONE mitered path, so the lower-right
 // corner is a join and comes out square. Its butt top end stops one thin half-width short of the
@@ -149,6 +158,16 @@ for ($i = 1; $i < $n; $i++) {
 // The title block: one upright near the right edge. The sheet's own right, top and bottom edges
 // close the box; nothing goes inside it.
 $out[] = '<path stroke-width="' . $f($P['wthin']) . '" d="M' . $f($P['xtb']) . ' ' . $f($yTopRun) . 'V' . $f($P['ytable']) . '"/>';
+
+// **DECORATION ON THE FACE OF THE SHEET** (Tom's sketch 5): a vicinity map in the upper right of the
+// sheet area and two signature lines for approval in the lower right, both clear of the catenaries.
+// They sit in the two pockets the middle copy leaves -- above it under the top flat, and below it
+// above the bottom sag. Set --deco=0 to drop them.
+if ((int)$P['deco'] === 1) {
+	$out[] = '<rect x="12" y="6.2" width="3.6" height="3.4" stroke-width="' . $f($P['wthin']) . '"/>';
+	$out[] = '<path stroke-width="' . $f($P['wthin']) . '" d="M12 15.6H15.6"/>';
+	$out[] = '<path stroke-width="' . $f($P['wthin']) . '" d="M12 17.6H15.6"/>';
+}
 
 $geom = implode('', $out);
 echo $geom, "\n";

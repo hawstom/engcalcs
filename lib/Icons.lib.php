@@ -349,9 +349,10 @@ $ec_icons = array(
 	//   - The title block is the box made by ONE upright at x=16.6 plus the sheet's own right, top and
 	//     bottom edges, and NOTHING is inside it. 16.6 is as wide as the block can be while its
 	//     upright still clears the 3-unit right edge by 1.5.
-	//   - No vicinity map and no approval line. The middle copy already occupies that space, and it
-	//     could not be had anyway: such a mark has to clear the top edge, the bottom edge, the sag on
-	//     its left and the block on its right, which leaves a lane about 1 unit wide.
+	//   - THE DECORATIONS FIT NOW, and only because the roll shrank: a vicinity map in the upper right
+	//     of the sheet face and two approval signature lines in the lower right, in the two pockets
+	//     the middle copy leaves. They were impossible at the old roll size, when the clear lane was
+	//     about one unit wide. `--deco=0` drops them.
 	//
 	// **THE NARROWEST LINE EVERYWHERE IT WILL SURVIVE.** Tom, 2026-08-23: "All the linework should be
 	// as narrow as feasible (not to disappear at 17 px) so that we can fit things." So the standard
@@ -362,7 +363,11 @@ $ec_icons = array(
 	// FOUR WEIGHTS, AND EACH ONE MEANS SOMETHING PHYSICAL. A second parallel line cannot say
 	// "thickness" here — the widest offset that stays in the box is 2.0 and a pair at 2.0 samples as
 	// a solid bar — so thickness is carried by the stroke itself:
-	//   1.5  a single sheet's own edge: every copy above the bottom, and the title-block upright.
+	//   0.75 a single sheet's own edge, the title-block upright, the roll's BACK edge and the
+	//        decorations. Deliberately braver than the set's 2 — Tom asked for half of 1.5 to see
+	//        whether antialiasing carries it. At 17 px it samples ~25% grey, not solid; `--wthin=1.5`
+	//        and `--wback=1.5` put it back. The back edge came down from 2.5 on his reading that it
+	//        was "mistakenly fat" and that narrowing it buys horizontal room.
 	//   2.0  the bottom edge. Tom, 2026-08-23: "far less pronounced than the right edge fanning
 	//        fatness, partly because of perspective making it appear shorter than it is, like the
 	//        ellipse roll instead of a circle, and partly because the bottom edge is not fanned."
@@ -397,14 +402,17 @@ $ec_icons = array(
 	// title block in the LOWER RIGHT ONLY, which made a closed box the same size as the roll at the
 	// opposite corner, and two equal masses read as two of the same object.
 	'project'    => '<ellipse cx="4.8" cy="19.6" rx="2.8" ry="1.4" stroke-width="2.5"/>'
-		. '<path stroke-width="1.5" d="M2 11.5C2 11.199 2.194 10.906 2.554 10.664C2.914 10.422 3.42 10.245 3.997 10.159C4.574 10.072 5.192 10.081 5.758 10.184"/>'
-		. '<path stroke-width="1.5" d="M2 3.4C2 3.099 2.194 2.806 2.554 2.564C2.914 2.322 3.42 2.145 3.997 2.059C4.574 1.972 5.192 1.981 5.758 2.084"/>'
-		. '<path stroke-width="2.5" stroke-linecap="butt" d="M2 3.4V19.6"/>'
-		. '<path stroke-width="3" stroke-linecap="butt" d="M21.2 4.05V22"/>'
+		. '<path stroke-width="0.75" d="M2 11.5C2 11.199 2.194 10.906 2.554 10.664C2.914 10.422 3.42 10.245 3.997 10.159C4.574 10.072 5.192 10.081 5.758 10.184"/>'
+		. '<path stroke-width="0.75" d="M2 3.4C2 3.099 2.194 2.806 2.554 2.564C2.914 2.322 3.42 2.145 3.997 2.059C4.574 1.972 5.192 1.981 5.758 2.084"/>'
+		. '<path stroke-width="0.75" stroke-linecap="butt" d="M2 3.4V19.6"/>'
+		. '<path stroke-width="3" stroke-linecap="butt" d="M21.2 4.425V22"/>'
 		. '<path stroke-width="2" stroke-linejoin="miter" stroke-linecap="butt" d="M22.7 21H13C8.5 21 7.922 18.678 5.758 18.284"/>'
-		. '<path stroke-width="1.5" stroke-linejoin="miter" d="M5.758 10.184C7.922 10.578 8.5 12.9 13 12.9H16.6"/>'
-		. '<path stroke-width="1.5" stroke-linejoin="miter" d="M5.758 2.084C7.922 2.478 8.5 4.8 13 4.8H21.2"/>'
-		. '<path stroke-width="1.5" d="M16.6 4.8V21"/>',
+		. '<path stroke-width="0.75" stroke-linejoin="miter" d="M5.758 10.184C7.922 10.578 8.5 12.9 13 12.9H16.6"/>'
+		. '<path stroke-width="0.75" stroke-linejoin="miter" d="M5.758 2.084C7.922 2.478 8.5 4.8 13 4.8H21.2"/>'
+		. '<path stroke-width="0.75" d="M16.6 4.8V21"/>'
+		. '<rect x="12" y="6.2" width="3.6" height="3.4" stroke-width="0.75"/>'
+		. '<path stroke-width="0.75" d="M12 15.6H15.6"/>'
+		. '<path stroke-width="0.75" d="M12 17.6H15.6"/>',
 
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
