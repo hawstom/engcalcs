@@ -6,6 +6,11 @@
 #   sh dev/scripts/publish_usage_report.sh --days=30
 #   sh dev/scripts/publish_usage_report.sh --archive=spock/2026-08-14
 #
+# **THE SERVED COPY IS NOT REACHABLE YET.** spock/public/.htaccess has its grant commented out
+# pending one explicit yes from Tom (2026-08-23): a permanently readable, unauthenticated URL of
+# visitor analytics is outward-facing and cannot be recalled once the link exists. Running this
+# script is harmless meanwhile — it writes the file and Apache refuses to serve it.
+#
 # Every argument is handed straight to log/lang-log-stats.sh, which stays the only thing that
 # computes anything. This script decides WHERE the output goes and WHAT is redacted, and nothing
 # else. It is built on that script's existing --out rather than being a second writer.
