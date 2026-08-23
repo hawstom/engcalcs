@@ -586,6 +586,16 @@ console.log('\n--- heading and cells share one alignment ---');
 		report(firstTh.length === 1 && firstTh[0] === 0 && firstTd.length === 1 && firstTd[0] === 0,
 			spec.id + ': one column is marked first, and it is the leftmost',
 			firstTh.join(',') + ' / ' + firstTd.join(','));
+		// **THE BOX WIDTH REACHES THE BOX**, as the custom property the stylesheet reads. A column
+		// that names no width says nothing at all, so CSS's own 7em fallback stands -- assert the
+		// silence too, or a stray default would be invisible here.
+		spec.cols.forEach((c, i) => {
+			const target = spec.cells[Object.keys(spec.cells)[0]][c.key];
+			if (!target || target._tag !== 'input') { return; }
+			report(target.style.getPropertyValue('--lpn-pane-col-w') === (c.em ? c.em + 'em' : ''),
+				spec.id + '/' + c.key + ': the box carries its column’s width',
+				target.style.getPropertyValue('--lpn-pane-col-w') || '(none)');
+		});
 	});
 	// The ID column is the worked example of the other side: a name is not a figure.
 	L.renderTable('pipes');
@@ -640,9 +650,9 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 	// worth reading, and a selector it cannot parse is collected and reported at the end rather
 	// than silently answering "no rule".
 	report(align(cell('td', 'id', false, true), WIDE) === 'left', 'reader self-test: the first cell reads left');
-	report(width(inputIn('length'), WIDE) === '7em' &&
+	report(width(inputIn('length'), WIDE) === 'var(--lpn-pane-col-w, 7em)' &&
 		width(inputIn('length'), SMALL) === '3.5em',
-		'reader self-test: the number box is 7em wide and 3.5em on a phone',
+		'reader self-test: the desktop box takes its column’s width and the phone box is 3.5em',
 		width(inputIn('length'), WIDE) + ' / ' + width(inputIn('length'), SMALL));
 
 	// 1. ALIGNMENT. Tom, 2026-08-23: *"Right is great justification for numbers. But in tables,
@@ -733,6 +743,49 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 		'no desktop COLUMN carries a width, so a narrower box can never force a heading to wrap ' +
 		'-- the heading row is as tall as it was',
 		width(cell('th', 'roughness', true, false), WIDE) + ' / ' + width(cell('th', 'km', true, false), WIDE));
+
+	// 5. WHAT THE DESKTOP BOXES ACTUALLY SHOW. Tom, 2026-08-23, gave a factor per column against the
+	// 7em they all were, with one condition: *"An input must still show its content."* There is no
+	// browser in this worktree, so the width is turned into characters by an arithmetic model whose
+	// three constants are all readable facts about the page, and the model is calibrated against the
+	// one figure a real browser has already produced here: 3.5em was MEASURED at five digits when
+	// the phone widths shipped.
+	const FONT_PX = 14.4;    // .lpn-pane-table's .9em, of Bootstrap's 1rem body -- and Bootstrap's
+	                         // reboot gives an <input> `font-size: inherit`, so the box's em is this
+	const DIGIT_PX = 7.92;   // 0.55em, the digit advance of the system sans-serif stack
+	const CHROME_PX = 6;     // the UA text box's own 1px border and 2px padding, both sides; the
+	                         // suite strips the number spinner, so nothing else is reserved
+	const chars = (em) => Math.floor((em * FONT_PX - CHROME_PX) / DIGIT_PX);
+	report(chars(3.5) === 5, 'model self-test: 3.5em shows five digits, as measured in a browser for the phone',
+		String(chars(3.5)));
+	report(chars(7) === 11, 'model self-test: the old 7em box showed eleven', String(chars(7)));
+	// Column, the width shipped, and the longest value that column really holds. A pipe length runs
+	// to five figures, an SI diameter is millimetres so 1200 is four, a Hazen-Williams C is three
+	// (the shipped default method), and a minor-loss k has to show "2.5" -- Tom's own acceptance
+	// test for that column, and three characters because the decimal point is one of them.
+	const WANT = [
+		['junctions', 'elev', 3.5, 4], ['junctions', 'demand', 3.5, 4],
+		['reservoirs', 'elev', 3.5, 4], ['reservoirs', 'head', 3.5, 4],
+		['tanks', 'level', 3.5, 4], ['tanks', 'minLevel', 3.5, 4], ['tanks', 'maxLevel', 3.5, 4],
+		['tanks', 'tankDiameter', 3.5, 4],
+		['pipes', 'diameter', 2.8, 4], ['pipes', 'length', 4.2, 5],
+		['pipes', 'roughness', 2.1, 3], ['pipes', 'km', 2.1, 3]
+	];
+	WANT.forEach(([tid, key, em, needs]) => {
+		const col = L.tableCols(tid).filter((c) => c.key === key)[0];
+		report(!!col && col.em === em, tid + '/' + key + ': the column declares ' + em + 'em',
+			col ? String(col.em) : 'no such column');
+		report(chars(em) >= needs, '...and ' + em + 'em shows ' + chars(em) + ' characters, needing ' + needs);
+	});
+	// **THE ONE FACTOR NOT MET, AND THE MEASUREMENT THAT DECIDED IT.** 0.2 of 7em is 1.4em, which
+	// shows a single character; Tom's test for this column is that "2.5" is fully visible, and that
+	// is three. 2.07em is the least width that shows three, so 2.1em ships.
+	report(chars(1.4) < 3, 'Minor loss at the 0.2 asked for would show ' + chars(1.4) + ' character',
+		'"2.5" needs 3; shipped 2.1em / ' + chars(2.1));
+	// Diameter is the other deviation and for the same kind of reason: 0.3 is 2.1em and three
+	// characters, and the same box serves an SI diameter, which is in millimetres.
+	report(chars(2.1) < 4, 'Diameter at the 0.3 asked for would show ' + chars(2.1) + ' characters',
+		'shipped 2.8em / ' + chars(2.8));
 
 	// The reader's blind-spot report, scoped to the selectors that could possibly reach what this
 	// section asks about. A rule about the menu bar or a spinner is none of its business, and a

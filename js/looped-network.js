@@ -7898,7 +7898,7 @@ var EngCalcs = EngCalcs || {};
 		return { key: 'id', label: 'lpn_field_id', get: function (el) { return el.id; } };
 	}
 	function paneColElev() {
-		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead,
+		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead, em: 3.5,
 			get: function (n) { return n.elev; },
 			set: function (n, v) { n.elev = v; updateNode(n.id); } };
 	}
@@ -7911,8 +7911,10 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'to', label: 'lpn_field_to', get: function (l) { return l.to; } }
 		];
 	}
+	// 2.8em rather than the 2.1 Tom named for it: the same box serves Pipes and Valves, and in the
+	// SI preset a diameter is millimetres, so "1200" is four characters and 2.1em shows three.
 	function paneColDiameter() {
-		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; },
+		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; }, em: 2.8,
 			prop: 'diameter', get: function (l) { return effective(l, 'diameter'); },
 			set: function (l, v) { setProp(l, 'diameter', v); } };
 	}
@@ -7953,7 +7955,7 @@ var EngCalcs = EngCalcs || {};
 				group: 'node', type: 'junction',
 				cols: [
 					paneColId(), paneColElev(),
-					{ key: 'demand', label: 'bpn_demand', unit: function () { return 'lpn_u_flow'; },
+					{ key: 'demand', label: 'bpn_demand', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
 						prop: 'demand', get: function (n) { return effective(n, 'demand'); },
 						set: function (n, v) { setProp(n, 'demand', v); } },
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
@@ -7968,7 +7970,7 @@ var EngCalcs = EngCalcs || {};
 					// BLANK MEANS "follow the elevation", exactly as in the popup, where the
 					// elevation is this field's placeholder. So an empty cell here is a reservoir
 					// whose water surface is its ground, not a reservoir with no head.
-					{ key: 'head', label: 'lpn_field_head', unit: paneUnitElevHead,
+					{ key: 'head', label: 'lpn_field_head', unit: paneUnitElevHead, em: 3.5,
 						prop: 'head', get: function (n) { return effective(n, 'head'); },
 						set: function (n, v) { setProp(n, 'head', v); updateNode(n.id); } },
 					// The head ABOVE the ground, which is what a reservoir is worth. Blank where the
@@ -7982,19 +7984,19 @@ var EngCalcs = EngCalcs || {};
 				group: 'node', type: 'tank',
 				cols: [
 					paneColId(), paneColElev(),
-					{ key: 'level', label: 'lpn_field_tank_level', unit: paneUnitElevHead,
+					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
-					{ key: 'minLevel', label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead,
+					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead,
 						get: function (n) { return n.minLevel; },
 						set: function (n, v) { n.minLevel = v; updateNode(n.id); } },
-					{ key: 'maxLevel', label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead,
+					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead,
 						get: function (n) { return n.maxLevel; },
 						set: function (n, v) { n.maxLevel = v; updateNode(n.id); } },
 					// The Elevation/Head unit, not the pipe-diameter unit: a tank diameter is a
 					// distance across the ground, and inches would put a 15 m tank on screen as
 					// 15000. The popup says the same thing in its tip.
-					{ key: 'tankDiameter', label: 'lpn_field_tank_diameter', unit: paneUnitElevHead,
+					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitElevHead,
 						get: function (n) { return n.tankDiameter; },
 						set: function (n, v) { n.tankDiameter = v; updateNode(n.id); } },
 					// The WATER SURFACE, derived and read-only: it is the number the solve uses, so
@@ -8010,16 +8012,21 @@ var EngCalcs = EngCalcs || {};
 					paneColDiameter(),
 					// TYPING A LENGTH TURNS AUTO OFF, which is exactly what the popup's own box does
 					// -- and lenAuto is Base-owned geometry, so it is only cleared in Base.
-					{ key: 'length', label: 'lpn_field_length', unit: function () { return 'lpn_u_length'; },
+					{ key: 'length', label: 'lpn_field_length', unit: function () { return 'lpn_u_length'; }, em: 4.2,
 						prop: 'length', get: function (l) { return effective(l, 'length'); },
 						set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
 					// Label, symbol and unit all follow settings.method (Task 271), through the same
 					// function the popup and the Labels legend use.
-					{ key: 'roughness', label: roughnessLabel,
+					{ key: 'roughness', label: roughnessLabel, em: 2.1,
 						unit: function () { return frictionMethod() === 'dw' ? 'lpn_u_roughness' : ''; },
 						prop: 'roughness', get: function (l) { return effective(l, 'roughness'); },
 						set: function (l, v) { setProp(l, 'roughness', v); } },
-					{ key: 'km', label: 'lpn_field_km_short', prop: 'k',
+					// 2.1em, not the 1.4 that 0.2 works out to. Tom set the acceptance test himself
+					// (2026-08-23: "'2.5' needs to work okay"): three characters, and 1.4em shows
+					// one. 2.07em is the least that shows three and 2.1em is the width Roughness
+					// beside it already uses. The vertical argument does not decide it either way --
+					// no desktop column carries a width, so a smaller box never wraps a heading.
+					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 2.1,
 						get: function (l) { return effective(l, 'k') || 0; },
 						set: function (l, v) { setProp(l, 'k', v); } },
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
@@ -8156,6 +8163,14 @@ var EngCalcs = EngCalcs || {};
 		return 'lpn-pane-col-' + c.key + (i === 0 ? ' lpn-pane-first' : '') +
 			((c.result || c.set) ? ' lpn-pane-num' : '');
 	}
+	// **THE COLUMN OWNS ITS BOX WIDTH, AND SAYS SO IN em** (Tom, 2026-08-23, per column, as
+	// multiples of the 7em every box used to be). It travels as a CUSTOM PROPERTY rather than an
+	// inline `style.width` on purpose: an inline width beats every stylesheet, and the phone widths
+	// in css/engcalcs.css -- which Tom has approved and this must not move -- are a stylesheet.
+	// A column that declares no `em` says nothing at all, and CSS's own fallback is the old 7em.
+	function paneApplyColWidth(input, c) {
+		if (c.em) { input.style.setProperty('--lpn-pane-col-w', c.em + 'em'); }
+	}
 	function paneHeadingText(c) {
 		var pc = EngCalcs.pageConfig || {},
 			text = (typeof c.label === 'function') ? c.label() : (pc[c.label] || c.key),
@@ -8252,6 +8267,7 @@ var EngCalcs = EngCalcs || {};
 			} else {
 				input = document.createElement('input');
 				input.type = 'number';
+				paneApplyColWidth(input, c);
 				input.value = paneCellText(c, el);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
 				input.addEventListener('change', function () {

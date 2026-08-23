@@ -1166,7 +1166,16 @@ html[lang="zh"] .ec-welcome {
    .lpn-pane-num no longer carries an alignment of its own: on screen the position decides, and
    what "this column is figures" is still worth here is tabular figures. */
 .lpn-pane-table th.lpn-pane-num, .lpn-pane-table td.lpn-pane-num { font-variant-numeric: tabular-nums; }
-.lpn-pane-table input { width: 7em; text-align: inherit; }
+/* **THE BOX WIDTH BELONGS TO THE COLUMN, AND THE COLUMN DECLARES IT** (Tom, 2026-08-23, as
+   multiples of the 7em every box used to be: Minor loss 0.2, Roughness 0.3, Length 0.6, Diameter
+   0.3, and 0.5 for the tank, reservoir and junction figures). The number lives on the column
+   descriptor in js/looped-network.js and arrives here as `--lpn-pane-col-w`; a column that names
+   none keeps the 7em. A hand-kept CSS list keyed by column class was the alternative, and it goes
+   silently wrong the day a column key is renamed or a table gains one.
+   IT IS A CUSTOM PROPERTY AND NOT AN INLINE WIDTH, because an inline `style="width"` beats every
+   stylesheet there is -- including the 360px widths below, which Tom has already approved and
+   which this must not move. */
+.lpn-pane-table input { width: var(--lpn-pane-col-w, 7em); text-align: inherit; }
 /* A heading that sorts and an ID that goes to the map are both flat text buttons: they are the
    cell, not a control sitting in it. */
 .lpn-pane-sort, .lpn-pane-goto {
