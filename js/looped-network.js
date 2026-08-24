@@ -15209,6 +15209,15 @@ var EngCalcs = EngCalcs || {};
 			? pc.lpn_field_roughness_tip
 			: (pc.bpn_roughness_tip || pc.lpn_field_roughness_tip);
 	}
+	// **THE REFERENCE TABLE FOLLOWS THE METHOD TOO** (Tom, 2026-08-23: *"like at mpf, dw, and hw,
+	// for lpn, bpn, and ip to have links to the same roughness tables"*). Three tables, because the
+	// three roughnesses are three different quantities -- a Manning user sent to a Hazen-Williams C
+	// table is worse off than with no link at all. The URLs are pageConfig, not literals here, so
+	// they sit beside the other reference links in the page rather than inside the editor.
+	function roughnessTableUrl() {
+		var urls = (EngCalcs.pageConfig || {}).lpn_roughness_urls;
+		return (urls && urls[frictionMethod()]) || '';
+	}
 	// The declared roughness as the SOLVER wants it. Dimensionless for Manning/HW, so the number
 	// passes through untouched; a length for Darcy-Weisbach, so it crosses the same unit boundary
 	// every other quantity does (Task 263: the document stores what was typed, the handoff
@@ -17952,14 +17961,38 @@ var EngCalcs = EngCalcs || {};
 	// These labels are built long after DOMContentLoaded, so js/Calculators.lib.js's page-load pass
 	// cannot see them -- initTips() has to be called on the container afterwards, which is why every
 	// setFieldLabel() caller ends with tipsIn(fields).
-	function setFieldLabel(label, text, tip) {
-		if (!tip) { label.textContent = text + ' '; return; }
-		var help = document.createElement('span'), glyph = document.createElement('span');
+	// **THE TWO NESTINGS ARE OPPOSITE, AND THAT IS THE WHOLE OF THIS FUNCTION** -- the same rule
+	// lib/Calculators.lib.php's ecTipLabel()/ecLinkTipLabel() pair follows, restated here because
+	// this popup builds its labels in JS. WITHOUT a link, `.ec-help` wraps the label text AND the
+	// glyph, or the tap target is one character. WITH one, the `<a>` is already a big target, so
+	// `.ec-help` wraps the glyph alone. Explanatory text never goes in the anchor's own title=:
+	// js/Calculators.lib.js only activates tap-triggered tooltips on `.ec-help[title]`, so on touch
+	// a bare `<a title>` just navigates and the text is never seen.
+	function setFieldLabel(label, text, tip, href) {
+		var help, glyph, a;
+		if (!tip && !href) { label.textContent = text + ' '; return; }
+		label.textContent = '';
+		glyph = document.createElement('span');
+		glyph.className = 'ec-tip'; glyph.textContent = '?';
+		if (href) {
+			a = document.createElement('a');
+			a.href = href; a.target = '_blank'; a.rel = 'noopener';
+			a.textContent = text;
+			label.appendChild(a);
+			label.appendChild(document.createTextNode(' '));
+			if (tip) {
+				help = document.createElement('span');
+				help.className = 'ec-help'; help.title = tip;
+				help.appendChild(glyph);
+				label.appendChild(help);
+			}
+			label.appendChild(document.createTextNode(' '));
+			return;
+		}
+		help = document.createElement('span');
 		help.className = 'ec-help'; help.title = tip;
 		help.appendChild(document.createTextNode(text + ' '));
-		glyph.className = 'ec-tip'; glyph.textContent = '?';
 		help.appendChild(glyph);
-		label.textContent = '';
 		label.appendChild(help);
 		label.appendChild(document.createTextNode(' '));
 	}
@@ -18745,7 +18778,7 @@ var EngCalcs = EngCalcs || {};
 				roughnessLabel() + (frictionMethod() === 'dw' ? ' (' + unitLabel('lpn_u_roughness') + ')' : ''),
 				effective(l, 'roughness'),
 				function (v) { setProp(l, 'roughness', v); refreshPopupIfOpen(); }, roughnessTip(),
-				{ el: l, prop: 'roughness' });
+				{ el: l, prop: 'roughness' }, roughnessTableUrl());
 			// Minor (local) loss coefficient, k_m -- dimensionless, so no unit conversion. Defaults
 			// from settings.defaults.k at creation. PLAIN-TEXT wording only, no <sub> markup: this
 			// popup's fields are built via textContent, and the suite's "k<sub>m</sub>" label
@@ -19139,11 +19172,11 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
-	function numberFieldPlain(fields, labelText, value, onChange, tip, ov) {
+	function numberFieldPlain(fields, labelText, value, onChange, tip, ov, href) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.value = value;
 		input.addEventListener('change', function () { onChange(+input.value); completeEdit(ov); });
-		setFieldLabel(label, labelText, tip);
+		setFieldLabel(label, labelText, tip, href);
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));

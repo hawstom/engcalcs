@@ -1093,6 +1093,15 @@ EngCalcs.pageConfig = {
 	lpn_demand_tip: <?=json_encode($ec_lang['lpn_demand_tip'])?>,
 	lpn_field_roughness: <?=json_encode($ec_lang['lpn_field_roughness'])?>,
 	lpn_field_roughness_tip: <?=json_encode($ec_lang['lpn_field_roughness_tip'])?>,
+	// The reference table for the roughness a user is typing, chosen by the friction method --
+	// a Manning user sent to a Hazen-Williams C table is worse off than with no link at all.
+	// The same three URLs Branched-Network.php declares; they are a THIRD copy across the suite
+	// (mpf, hw and dw each carry one inline too) and want one home -- ROADMAP Task 500.
+	lpn_roughness_urls: <?=json_encode(Array(
+		'hw' => 'https://www.engineeringtoolbox.com/hazen-williams-coefficients-d_798.html',
+		'manning' => 'https://www.engineeringtoolbox.com/mannings-roughness-d_799.html',
+		'dw' => 'https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31',
+	))?>,
 	lpn_field_length: <?=json_encode($ec_lang['lpn_field_length'])?>,
 	lpn_field_from: <?=json_encode($ec_lang['lpn_field_from'])?>,
 	lpn_field_to: <?=json_encode($ec_lang['lpn_field_to'])?>,
