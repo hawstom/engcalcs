@@ -157,20 +157,27 @@ while ((m = re.exec(langSrc))) {
 }
 
 // **THE REFERENCE-TABLE URLs ARE pageConfig TOO, and neither loader above sees them**: one is a
-// json_encode of a string literal and the other of an Array, so both are invisible to a regex
-// looking for $ec_lang or a bare constant. Read from the page's own source rather than pasted
-// here, or this harness would happily assert a link the page does not actually emit.
+// json_encode of a string and the other of an Array, so both are invisible to a regex looking for
+// $ec_lang or a bare constant. Since Task 500 the addresses live in lib/References.lib.php and the
+// page only NAMES them, so this reads both halves: the URLs from the one file that owns them, and
+// the wiring from the page, so the harness cannot assert a link the page does not actually emit.
 {
+  const refSrc = fs.readFileSync(ROOT + 'lib/References.lib.php', 'utf8');
+  const refs = {};
+  const rre = /^\t\t'([a-z_]+)' => '([^']+)',$/gm;
+  let rm;
+  while ((rm = rre.exec(refSrc))) { refs[rm[1]] = rm[2]; }
+
   const pageSrc = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
-  const km = /^\tlpn_km_url:\s*<\?=json_encode\('([^']+)'\)\?>,$/m.exec(pageSrc);
-  if (km) { EngCalcs.pageConfig.lpn_km_url = km[1]; }
-  const rough = /^\tlpn_roughness_urls:\s*<\?=json_encode\(Array\(([\s\S]*?)\)\)\?>,$/m.exec(pageSrc);
-  if (rough) {
-    const urls = {};
-    const pre = /'([a-z]+)'\s*=>\s*'([^']+)'/g;
-    let pm;
-    while ((pm = pre.exec(rough[1]))) { urls[pm[1]] = pm[2]; }
-    EngCalcs.pageConfig.lpn_roughness_urls = urls;
+  const km = /^\tlpn_km_url:\s*<\?=json_encode\(ecRefUrl\('([a-z_]+)'\)\)\?>,$/m.exec(pageSrc);
+  if (km && refs[km[1]]) { EngCalcs.pageConfig.lpn_km_url = refs[km[1]]; }
+  if (/^\tlpn_roughness_urls:\s*<\?=json_encode\(ecRefRoughnessUrls\(\)\)\?>,$/m.test(pageSrc)) {
+    // The hw/manning/dw keys are ecRefRoughnessUrls()'s contract with this pageConfig entry.
+    EngCalcs.pageConfig.lpn_roughness_urls = {
+      hw: refs.hazen_williams_c,
+      manning: refs.manning_n,
+      dw: refs.darcy_weisbach_e,
+    };
   }
 }
 

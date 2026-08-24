@@ -75,6 +75,10 @@ require_once('Units.lib.php');
 // Load the calculator functions
 require_once('Calculators.lib.php');
 
+// Load the outside reference-table URLs (ecRefUrl(), ecRefRoughnessUrls()). Fourteen calculator
+// pages link one of these tables; before ROADMAP Task 500 each page wrote the address out itself.
+require_once('References.lib.php');
+
 // Optional parent-site hooks (CSS injection, footer menu).
 // The parent site places engcalcs-parent-hooks.php two directories above engcalcs root.
 $_engcalcs_parent_hooks = realpath(__DIR__ . '/../../engcalcs-parent-hooks.php');

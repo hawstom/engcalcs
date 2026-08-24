@@ -16,7 +16,7 @@ echoCalculatorForm(
 		Array('name' => 'a0',        'type' => 'number', 'default' => Array('us' => '20000', 'si' => '2000'),  'units' => 'flow_area', 'label' => $ec_lang['odt_a0']),
 		Array('name' => 'd',       'type' => 'number', 'default' => Array('us' => '6', 'si' => '150'),  'units' => 'distance_small',         'label' => $ec_lang['odt_d'] . '<br /><input type="radio" name="shape" id="shape_circ" value="circular" checked onchange="EngCalcs.submitForm()"> <label for="shape_circ">' . $ec_lang['or_shape_circular'] . '</label> <input type="radio" name="shape" id="shape_rect" value="rectangular" onchange="EngCalcs.submitForm()"> <label for="shape_rect">' . $ec_lang['or_shape_rectangular'] . '</label>'),
 		Array('name' => 'w',       'type' => 'number', 'default' => Array('us' => '12', 'si' => '300'),  'units' => 'distance_small',         'label' => $ec_lang['odt_w']),
-		Array('name' => 'cd',      'type' => 'number', 'default' => '0.61', 'units' => NULL,                              'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">'.$ec_lang['or_cd'].'</a>'),
+		Array('name' => 'cd',      'type' => 'number', 'default' => '0.61', 'units' => NULL,                              'label' => '<a target="_blank" href="'.ecRefUrl('orifice_cd').'">'.$ec_lang['or_cd'].'</a>'),
 	),
 	//Results
 	Array(

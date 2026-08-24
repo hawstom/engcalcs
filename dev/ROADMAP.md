@@ -373,15 +373,6 @@ the block.
     never a background sweep, never overwriting an elevation somebody typed, and undoable in one
     step. Accuracy must be stated: 30 m ground resolution is a contour interval, not a survey.
 
-- 25|500| **One home for the reference-table URLs, now copied into four pages.**
-  The Hazen-Williams C, Manning n and Darcy-Weisbach roughness-height tables are linked from
-  `Manning-Pipe-Flow.php`, `Hazen-Williams.php`, `Darcy-Weisbach.php`, `Irrigation-Pressure.php`,
-  `Branched-Network.php` and `Looped-Network.php`, and the URL text is written out separately in
-  each. The EPA one is a 500-character `nepis.epa.gov` query string, so a silent divergence is very
-  easy and very hard to see. The minor-loss-coefficient link is duplicated the same way.
-  - Not urgent and not free: the natural home is `lib/`, and the file that would host it is being
-    rewritten on the `task-478-fieldgrid` branch. **Sequence this after 478 lands or is dropped.**
-
 - 25|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
   Tom, 2026-08-23: epanet-js runs one at `roadmap.epanetjs.com`, powered by Canny. Noted as an
   example to weigh, not a decision. The thing to weigh is that `dev/ROADMAP.md` is written for us and

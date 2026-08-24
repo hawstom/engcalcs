@@ -11,7 +11,7 @@ echoCalculatorForm(
     //Inputs
     Array(
         Array('name' => 'hw', 'type' => 'number', 'default' => '1', 'units' => NULL, 'label' => $ec_lang['or_hwe']),
-        Array('name' => 'cw', 'type' => 'number', 'default' => '3', 'units' => NULL, 'label' => '<a target="_blank" href="http://epg.modot.org/files/b/bc/749_Broad-Crested_Weir_Coefficients.pdf">'.$ec_lang['ws_weirCoefficient'].'</a>'),
+        Array('name' => 'cw', 'type' => 'number', 'default' => '3', 'units' => NULL, 'label' => '<a target="_blank" href="'.ecRefUrl('weir_coefficient').'">'.$ec_lang['ws_weirCoefficient'].'</a>'),
     ),
     //Results
     NULL,
