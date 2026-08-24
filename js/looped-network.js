@@ -886,7 +886,9 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE anything is placed, so every station obeys it.
 		le.hiddenShort = linkLabelTooShort(l, le);
-		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenCrowded);
+		// THREE WAYS A LINK LABEL IS NOT DRAWN, ONE SEAM: too long for its own segment, shed out and
+		// still in conflict, or standing on ground a node label has just taken (yieldStationedLabels()).
+		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenYielded);
 		var single = linkLabelStations(l).length === 1,
 			stations = single ? [le.alignedAlong] : drawnLinkLabelStations(l), i;
 		ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
@@ -1743,7 +1745,75 @@ var EngCalcs = EngCalcs || {};
 			h.placedSide = r.side;
 			if (r.dropped) { h.hiddenDropped = true; }
 		});
+		// **THE YIELDER HAS TO ACTUALLY LEAVE, and until 2026-08-23 it never did.** See
+		// yieldStationedLabels() -- this is the one call site, and it must run after BOTH placements.
+		yieldStationedLabels(nodePlaced, obs);
 		labelDebugReport(labels.concat(nodeLabels), placed.concat(nodePlaced), obs);
+	}
+	// **`yields` GRANTS THE GROUND; THIS IS WHAT MAKES THE HOLDER LEAVE IT** (Task 469, Tom's
+	// screenshot of 2026-08-23: a node's stacked readout printed straight through a `Q=` rotated
+	// along its own pipe, twice on one view of a geographic Net3).
+	//
+	// boxClearOf()'s middle answer lets a node label take a position held only by link labels, which
+	// is the node-outranks-link ruling and is right. What was missing is the other half: the link
+	// label went on being DRAWN on the ground it had just given up, so the ruling produced two
+	// labels on top of each other rather than the better one of the two. Measured on
+	// Net3-World at a working zoom: 60 node-label rows overprinting an aligned pipe label, up to
+	// 28 px deep, and ZERO node-on-node -- the one-sided signature of a rule only one side obeys.
+	//
+	// **THE YIELDER HIDES; IT DOES NOT SHED HERE, AND THAT IS THE CLOCK TALKING.** Shedding means
+	// rebuilding glyphs and forcing a layout, and this pass runs on every frame of a drag -- exactly
+	// why shedAlignedForConflicts() lives in the CONTENT path instead (see its own note). So the
+	// graceful rung stays where it is and this is the terminal one, the same hide §3.5 already ends
+	// the cascade with. A content pass clears the flag and re-decides from full, so a label given up
+	// for one crowded layout is back in contention on the next one.
+	//
+	// It cannot be folded into shedAlignedForConflicts() by seeding node labels better, and that is
+	// the thing to understand before "fixing" it there: that pass seeds node labels where the LAST
+	// layout put them, and where a node label ends up depends on the link boxes this pass commits.
+	// The two genuinely need each other's answer. Iterating them does converge -- measured, two more
+	// full passes to reach zero -- and costs three times a pass Task 436 has just spent its whole
+	// budget making affordable.
+	//
+	// **A YIELDED LABEL KEEPS ITS RESERVATION, which reads backwards and is what makes this stable.**
+	// §3.5's "a hidden label is not an obstacle" is about a label hidden because nothing would fit;
+	// this one is hidden because a node label is standing exactly there, and the node's own box says
+	// so on every later pass. Releasing the ground instead would free it, un-hide the label on the
+	// next pass, and hide it again on the one after -- a label blinking on a drawing nobody touched.
+	//
+	// INDEXED, for the same reason boxIsClear() is: this is every stationed label against every
+	// placed node line, which on the 480-pipe grid is a million box tests done one at a time.
+	function yieldStationedLabels(nodePlaced, obs) {
+		var nodeBoxes = [], taken = {}, i, j, bs, o, idx;
+		for (i = 0; i < nodePlaced.length; i++) {
+			if (nodePlaced[i].dropped) { continue; }
+			// The STAIRCASE the pass really reserved, not the block around it (Task 406): claiming
+			// the empty ground to the right of a short row would hide a pipe label nothing covers.
+			bs = nodePlaced[i].boxes || (nodePlaced[i].box ? [nodePlaced[i].box] : []);
+			for (j = 0; j < bs.length; j++) { nodeBoxes.push(bs[j]); }
+		}
+		if (nodeBoxes.length) {
+			idx = Collide.boxIndex(nodeBoxes);
+			for (i = 0; i < obs.boxes.length; i++) {
+				o = obs.boxes[i];
+				// linkOwner is placeStationedLabels()'s stamp, and it is the whole test: a box
+				// without one is a symbol, a Text object or a leader, none of which yields to
+				// anything.
+				if (o.linkOwner === undefined || taken[o.linkOwner]) { continue; }
+				if (idx.anyOverlap(o)) { taken[o.linkOwner] = true; }
+			}
+		}
+		// **CLEARED FOR EVERY LINK ON EVERY PASS**, dragged and hidden ones included, so the pass
+		// stays idempotent in the way addDataLabel()'s nudge is: a label that yielded once must be
+		// back in contention the next time, or the drawing only ever loses labels.
+		//
+		// **AND THE WHOLE CHAIN GOES, NEVER ONE STATION.** A repeated label's justification is the
+		// same name said again; one station missing from the middle of it reads as a different
+		// label, not as a shorter one (§3.5, which says the same of a shed).
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (le) { le.hiddenYielded = !!taken[l.id]; }
+		});
 	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped.
