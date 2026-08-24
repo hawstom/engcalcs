@@ -36,6 +36,75 @@ table, th, tr, td {
    forms are built from. Without this every calculator is a grid of blue boxes. */
 table.bare, table.bare > tbody > tr, table.bare > tbody > tr > td { border-width: 0px; }
 
+/* The calculator's input lines (ROADMAP Task 478, echoInputGrid() in lib/Calculators.lib.php).
+   The DOM is COLUMN-MAJOR -- every input, then every label, then every unit select, then every X
+   -- so Tab walks the input column instead of crossing each line sideways. Each cell carries its
+   own `grid-row:N`, which puts it back on the line the user sees, so this must reproduce what the
+   <table> above draws, to the pixel -- and does, wherever the form fits the window. Where it does
+   not fit, one thing differs and cannot be made not to; echoInputGrid()'s docblock says which:
+
+     - `auto` tracks, because an auto track sizes to max-content and shrinks toward min-content
+       when the container is narrow, which is what a table's auto layout does. `max-content` would
+       stop the labels wrapping on a narrow screen and turn the wrap into a horizontal scroll.
+     - `justify-content: start`, or auto tracks would STRETCH to fill the cell and push the X
+       column to the far right; a table shrink-wraps.
+     - THE CELL STRETCHES AND ITS CONTENT CENTRES, which is why there is an inner `.ec-fg-in`
+       and not just `align-items: center` on the grid. A <td> is middle-aligned (UA stylesheets
+       put `vertical-align: middle` on the row group and a cell inherits it), but it also fills
+       the row's height, and the bottom border is drawn on the FULL cell. Centring the grid items
+       themselves would shrink every short cell to its own content, and on a line whose label
+       runs to two -- Manning Trap's flow depth, with the solver control under it -- the blue
+       rule would break into four pieces at four different heights. So the cell keeps the
+       default `stretch`, draws the rule at the row's true bottom, and a flex centre inside it
+       puts the content back where a table put it.
+     - 1px blue rules, collapsed: the container draws the top and leading edges, every cell draws
+       its own trailing and bottom edge, so no two cells ever double one line. `.ec-fg-input`
+       draws NO trailing edge -- the input and its unit select shared one <td> before this and
+       must not gain a rule between them.
+     - LOGICAL properties throughout (block-start/inline-start), so ar/he/fa/ur/ps get the mirror
+       image without a second rule. `grid-column: 1` is already the leading column in RTL.
+
+   A hidden line is `.collapse` without `.show` on all four of its cells at once (the X is a
+   multi-target collapse), which removes them from the grid entirely, so the row they shared
+   collapses to zero height with no gap -- what `display: none` on a <tr> did. */
+.ec-fieldgrid {
+	display: grid;
+	grid-template-columns: auto auto auto auto;
+	justify-content: start;
+	border-block-start: 1px solid blue;
+	border-inline-start: 1px solid blue;
+}
+/* ONE CLASS, NO DESCENDANT COMBINATOR, and that is load-bearing: Bootstrap hides a collapsed line
+   with `.collapse:not(.show) { display: none }`, specificity (0,2,0). A `.ec-fieldgrid > .ec-fg-cell`
+   selector ties that and would win on source order, leaving every "hidden" line on screen. At
+   (0,1,0) Bootstrap wins whatever order the two stylesheets load in. */
+.ec-fg-cell {
+	display: flex;
+	align-items: center;
+}
+/* Written by echoLineMirrorScript() onto the other three cells of a line whose input cell a page's
+   own script has hidden by id. AFTER .ec-fg-cell on purpose -- the two tie on specificity, so
+   source order is what decides, and an inline style (which is what "View printable" writes) still
+   outranks both. */
+.ec-line-off { display: none; }
+.ec-fieldgrid > .ec-fg-cell {
+	padding: 0px 2px 0px 2px;
+	border-block-end: 1px solid blue;
+	border-inline-end: 1px solid blue;
+}
+.ec-fieldgrid > .ec-fg-cell > .ec-fg-in { min-width: 0; }
+.ec-fieldgrid > .ec-fg-label { grid-column: 1; }
+/* NO RULE AND NO PADDING AT THIS ONE SEAM. The input and its unit select shared a single <td>
+   before Task 478, separated by one space character, so the column boundary between them must
+   draw nothing and add nothing: echoInputGrid() puts a real no-break space at the end of the
+   input cell instead, which is the same glyph advance in any font and any language. 2px + 2px of
+   padding was the obvious substitute and it is measurably wrong -- it narrowed the whole form by
+   1.1px and moved every unit select and every result on the page with it
+   (dev/browser-pass/fieldgrid-layout.js measured it against the <table> version). */
+.ec-fieldgrid > .ec-fg-input { grid-column: 2; border-inline-end: 0; padding-inline-end: 0; }
+.ec-fieldgrid > .ec-fg-units { grid-column: 3; padding-inline-start: 0; }
+.ec-fieldgrid > .ec-fg-x     { grid-column: 4; }
+
 .input {
 	width: 7em;
 }

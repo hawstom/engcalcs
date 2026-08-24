@@ -7,13 +7,12 @@
  * The count was guessed at twenty-three; measured, it was eighty-three on Irrigation-Pressure. A
  * number nobody can reproduce gets re-guessed, so it is measured here.
  *
- * THIS SCRIPT IS ADVISORY. It measures; it does not judge. The per-line "X" is a real tab stop on
+ * THE STOP COUNTS ARE ADVISORY; THE x-cross COLUMN IS NOT. The per-line "X" is a real tab stop on
  * purpose -- it is the only way to hide a line, so taking it off the keyboard would make the
  * function mouse-only (WCAG 2.1.1 by omission). That cost is accepted, and the `hide` column
- * simply reports it. The one thing that still fails the build is a page that will not render at
- * all, or a calculator page with no #formInput -- neither is a judgement call.
- *
- * The live measurement is the x-cross column: ROADMAP Task 478 phase 2 (see PHASE 2 below).
+ * simply reports it. What DOES fail the build: a page that will not render, a calculator page with
+ * no #formInput, and a page laid out by echoInputGrid() whose x-cross is not zero -- see
+ * unit_select_crossings() below. None of the three is a judgement call.
  *
  * ONE SUBPROCESS PER PAGE, via dev/scripts/render_page.php -- see that file's header for why
  * rendering a page any other way silently produces a stub missing most of its unit selects.
@@ -118,15 +117,19 @@ function focus_stops($html)
 }
 
 /**
- * PHASE 2 measurement, ADVISORY ON PURPOSE -- and this is the one place to flip it.
+ * The Task 478 measurement: number inputs that come after a unit select.
  *
- * Tab order is DOM order, and today each number input is immediately followed by its own unit
- * select, so walking the input column costs about twice as many stops as there are numbers.
- * Fixing it means the two inner <table>s become grids (only flex/grid has `order`), which is a
- * layout change to all sixteen calculators that no harness can see -- ROADMAP Task 478 phase 2.
+ * Tab order is DOM order. The input form used to be a <table>, whose DOM is row-major, so every
+ * number box led sideways into its own unit select and its "X" before the next number -- walking
+ * the input column cost about twice as many stops as there were numbers. echoInputGrid() emits the
+ * same lines as a grid whose DOM is COLUMN-MAJOR, and this number went to zero on all fifteen
+ * pages it builds.
  *
- * When that lands, make $crossings a BLOCKING failure here: "every number input precedes every
- * unit select in its column". Until then it is reported so the size of the prize stays measured.
+ * SO IT BLOCKS NOW, and the gate is a PROPERTY OF THE PAGE, not a per-page allowance: a page that
+ * renders `.ec-fieldgrid` must be at zero. Nothing here is exempted by name and no page carries a
+ * budget it had to be given. Looped-Network.php is the one calculator not built by
+ * echoCalculatorForm() -- its inputs are a per-element property sheet in Looped-Network.php and
+ * js/looped-network.js -- so it has no grid, is still measured, and is still only reported.
  */
 function unit_select_crossings($stops)
 {
@@ -164,7 +167,19 @@ foreach ($pages as $path) {
         $kinds[$s[0]] = (isset($kinds[$s[0]]) ? $kinds[$s[0]] : 0) + 1;
         if ($s[2]) { $hide++; }
     }
-    $rows[] = array($name, count($stops), $hide, $kinds, unit_select_crossings($stops));
+    $crossings = unit_select_crossings($stops);
+    $isGrid = strpos($html, 'class="ec-fieldgrid"') !== false;
+    $rows[] = array($name, count($stops), $hide, $kinds, $crossings, $isGrid);
+
+    if ($isGrid && $crossings > 0) {
+        $fail[] = "$name: $crossings number input(s) come AFTER a unit select in the tab order, on a"
+            . " page laid out by echoInputGrid(). That grid's DOM is column-major so Tab walks the"
+            . " whole input column (ROADMAP Task 478); a crossing means a cell was emitted out of"
+            . " its column group, or a control carrying its own <select> was added to a label cell"
+            . " ahead of one carrying an <input>. Fix the emission order in echoInputGrid()"
+            . " (lib/Calculators.lib.php) -- never with tabindex, which takes the control off the"
+            . " keyboard altogether.";
+    }
 
     if ($verbose) {
         echo "  $name focus sequence:\n";
@@ -174,24 +189,25 @@ foreach ($pages as $path) {
     }
 }
 
-// ---- ADVISORY: the stop table, so this number is never guessed again ----------------------
+// ---- the stop table, so these numbers are never guessed again -----------------------------
 usort($rows, function ($a, $b) { return $b[1] - $a[1]; });
-printf("%-28s %6s %6s %8s  %s\n", 'page', 'stops', 'hide', 'x-cross', 'by kind');
+printf("%-28s %6s %6s %8s %5s  %s\n", 'page', 'stops', 'hide', 'x-cross', 'grid', 'by kind');
 foreach ($rows as $r) {
     $kinds = array();
     foreach ($r[3] as $k => $n) { $kinds[] = "$k=$n"; }
-    printf("%-28s %6d %6d %8d  %s\n", $r[0], $r[1], $r[2], $r[4], implode(' ', $kinds));
+    printf("%-28s %6d %6d %8d %5s  %s\n", $r[0], $r[1], $r[2], $r[4], $r[5] ? 'yes' : '-', implode(' ', $kinds));
 }
 echo "\n";
 echo "hide    = stops inside a .engcalcs-x cell -- one per line, the accepted cost of\n";
 echo "          keeping the only way to hide a line on the keyboard.\n";
-echo "x-cross = number inputs that come after a unit select -- the phase 2 prize.\n";
+echo "x-cross = number inputs that come after a unit select. BLOCKING wherever grid=yes.\n";
+echo "grid    = the input form is echoInputGrid()'s column-major grid (ROADMAP Task 478).\n";
 
 if ($fail) {
     echo "\nFAIL\n";
     foreach ($fail as $f) { echo "  $f\n"; }
     exit(1);
 }
-echo "\nOK: " . count($rows) . " calculator pages measured. This script is advisory --\n";
-echo "    the stop counts above are a measurement, not a budget.\n";
+echo "\nOK: " . count($rows) . " calculator pages measured. The stop and hide counts are a\n";
+echo "    measurement, not a budget; x-cross is a gate on every grid page.\n";
 exit(0);

@@ -79,6 +79,23 @@ docroot is fetched back and compared before the browser is launched. Only our ow
 it. A mismatch throws, naming the port, the docroot and what answered instead — the failure that
 used to be silent is now the loudest thing in the run.
 
+## The third runner in here: `fieldgrid-layout.js` (ROADMAP Task 478)
+
+`node fieldgrid-layout.js [--ref=HEAD] [--langs=de,bg,ar] [--width=1400]`
+
+Not part of `run.js`, and not about `lpn_`. It answers one question about a REFACTOR: **did anything
+move?** It serves the suite twice — once from `git archive <ref>`, once from the working tree — opens
+every calculator page in both, and compares the box of every control against the form's own origin.
+That is the only honest way to check "this rewrite changes no pixel", which is a claim reading markup
+cannot support and which no other check in the suite can see.
+
+Two things it taught the change it was written for, neither of which anyone would have found by
+inspection: a 2px+2px cell padding substituted for one space narrowed **every** calculator by 1.1px
+and dragged the results column with it; and where a language's unit names make a dropdown very wide,
+the old table used to wrap it under its input, which two grid columns cannot do. Use it for any
+future change to `echoCalculatorForm()` — and note that it is only meaningful BEFORE the change is
+committed, since after that `HEAD` is the change. Pass `--ref` to compare with something older.
+
 ## Reading a line that says DEFECT
 
 A handful of checks are worded as **DEFECT**, and they pass. They pin what the page does TODAY where
