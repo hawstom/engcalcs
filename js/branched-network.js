@@ -401,10 +401,19 @@ EngCalcs.bpnUpdateMethodUI = function () {
 		isDw = (method === 'dw'),
 		viscRow = document.getElementById('visc_row'),
 		rSym = document.getElementById('bpn_roughness_symbol'),
-		rSel = document.forms['formInput']['roughnessu'];
+		rSel = document.forms['formInput']['roughnessu'],
+		rLink,
+		urls;
 	if (viscRow) { viscRow.style.display = isDw ? '' : 'none'; }
 	if (rSel) { rSel.style.display = isDw ? '' : 'none'; }
-	if (rSym) { rSym.innerHTML = (method === 'manning') ? 'n' : (method === 'hw') ? 'C' : 'e'; }
+	if (rSym) {
+		rSym.innerHTML = (method === 'manning') ? 'n' : (method === 'hw') ? 'C' : 'e';
+		// The symbol lives inside the reference link (ecLinkTipLabel), so the anchor that
+		// wraps it is the one to retarget: n, C and e each have their own published table.
+		rLink = rSym.parentNode;
+		urls = this.pageConfig.bpn_roughness_urls;
+		if (rLink && rLink.tagName === 'A' && urls && urls[method]) { rLink.href = urls[method]; }
+	}
 };
 
 EngCalcs.bpnWriteRows = function (objForm) {
