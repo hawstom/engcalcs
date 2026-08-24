@@ -1484,10 +1484,13 @@ $ec_lang['lpn_clean_map_tip']='Take the mode line and the coordinate readout off
 // alternative and Tom kept Project.
 $ec_lang['lpn_menu_project']='Project';
 // THE ONE MENU-BAR ITEM WITH A TIP (Task 499.02). The other five are the words every application
-// uses; this one is ours, and the tip says what a person gains by opening it. Tom, 2026-08-24:
-// "Everything unique about this application is here in one place except the animation play controls.
-// There is no need to guess where things are."
-$ec_lang['lpn_menu_project_tip']='Everything about water network modeling is here in one place, except the animation play controls under the map. There is no need to guess where things are.';
+// uses; this one is ours, and the tip says what a person gains by opening it. **The value is TOM'S
+// OWN FINAL WORDING, 2026-08-24, and it is set verbatim** -- an earlier draft added "under the map"
+// to his sentence, which was both an edit he did not make and factually wrong: the transport sits in
+// the TOOLBAR, above the map. Do not qualify this sentence again. The rule it states is in
+// dev/looped-network-calculator-scope.md: every command lives in the menu bar, the transport is the
+// one exception, and it is exempt because it is a position in a run rather than a command.
+$ec_lang['lpn_menu_project_tip']='Everything about water network modeling is here in one place, except the animation play controls. There is no need to guess where things are.';
 $ec_lang['lpn_tables_menu']='Tables';
 $ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run

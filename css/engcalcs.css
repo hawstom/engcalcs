@@ -1902,6 +1902,38 @@ html[lang="zh"] .ec-welcome {
 #lpn_labels_link_fields > div > label,
 #lpn_labels_node_fields > div > span:first-child,
 #lpn_labels_link_fields > div > span:first-child { max-width: 11.5rem; }
+/* **AND WHEN THERE IS NO ROOM, THE FOUR COLUMNS DROP AS A BLOCK -- THE NAME NEVER WRAPS INSTEAD**
+   (Tom, 2026-08-24: "the labels are wrapping when what we want is for the four columns to wrap as a
+   block under the checkbox and label. Like the phone.").
+
+   The mid-word break the rules above allow is the LAST resort, and it had become the first: a name
+   is what the reader scans down, and breaking "Roughness, e" across two lines to keep four number
+   boxes on one is the wrong thing to protect. Below the same 24rem where .lpn-set-row gives up its
+   second column, a field row wraps instead -- name on its own line, then its four columns beneath
+   it, in the same order and at the same x as every other row's.
+
+   `flex-basis: 100%` on the name is what forces the break, and it is why the row needs `flex-wrap`
+   at all; the four columns stay direct children (the heading selectors above address them by
+   position, and three separate fixes have gone into keeping headings and boxes on one x), so they
+   move as a block because nothing else can fit beside them, not because they are boxed together.
+   The heading row's lead cell is EMPTY, so it is removed rather than given a blank line of its own:
+   its four headings then sit at the same left edge as the four boxes below them, which is the whole
+   invariant this list is held to.
+
+   The same container query as .lpn-set-row, deliberately -- one width at which this box changes
+   shape, not two. A browser without container queries keeps today's behaviour, which is the safe
+   direction. */
+@container lpnset (max-width: 24rem) {
+	#lpn_labels_node_fields > div,
+	#lpn_labels_link_fields > div { flex-wrap: wrap; }
+	/* `!important` is not decoration, for the reason stated above the heading widths: labelCheckbox()
+	   sets `flex: 1 1 auto` INLINE on the name, and an inline shorthand carries a flex-basis of
+	   `auto` that a stylesheet longhand cannot outrank. */
+	#lpn_labels_node_fields > div > label,
+	#lpn_labels_link_fields > div > label { flex-basis: 100% !important; max-width: 100%; }
+	#lpn_labels_node_fields > div > span:first-child,
+	#lpn_labels_link_fields > div > span:first-child { display: none; }
+}
 
 /* ==== No window scrollbar on the map page (ROADMAP Task 432) =================================
    Tom, 2026-08-18: *"Our bottom controls bar should be the hard bottom of the page."* This is a

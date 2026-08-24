@@ -24,12 +24,14 @@ exports.run = async function ({ browser, report }) {
 		await a.goto();
 
 		const rows = await a.menuRows('edit');
-		report.ok(rows.some(r => r.label === 'Find'), 'Edit carries a Find row');
+		// The row is called by the standard name (Task 389, Tom 2026-08-24) -- "Find and replace",
+		// under Edit, because that is what every editor calls it and nobody should have to be told.
+		report.ok(rows.some(r => r.label === 'Find and replace'), 'Edit carries a Find and replace row');
 
 		// Something to find. makeEdit() places one junction at a spot it has measured to be clear.
 		await a.makeEdit();
 
-		await a.menuClick('Find', 'edit');
+		await a.menuClick('Find and replace', 'edit');
 		const box = await a.page.evaluate(() => {
 			const p = document.getElementById('lpn_find_popup');
 			if (!p) { return null; }
@@ -147,7 +149,7 @@ exports.run = async function ({ browser, report }) {
 		// to get a hundred pipes onto this page without a hundred clicks.
 		await a.menuClick('[dev] Draw large test network', 'insert');
 		await a.settle(500);
-		await a.menuClick('Find', 'edit');
+		await a.menuClick('Find and replace', 'edit');
 		{
 			const listed = await a.page.evaluate(() => {
 				const p = document.getElementById('lpn_find_popup');
@@ -203,11 +205,12 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(150);
 		report.ok(await isOpen(), '...and so does Escape, which dismisses every pull-down but not this');
 
-		// Labels opens the Settings box (Task 441), which is a big two-pane box in the middle of the
-		// window -- so it is CLOSED again straight away. Leaving it up would put it over Find, and
-		// every gesture below would be aimed at whichever box happened to be on top, which measures
-		// the stacking order rather than the thing under test.
-		await a.menuClick('Labels', 'view');
+		// Project > Settings opens the Settings box (Task 441, moved under Project by Task 467),
+		// which is a big two-pane box in the middle of the window -- so it is CLOSED again straight
+		// away. Leaving it up would put it over Find, and every gesture below would be aimed at
+		// whichever box happened to be on top, which measures the stacking order rather than the
+		// thing under test. (The old door was View > Labels; that row is gone.)
+		await a.menuClick('Settings', 'project');
 		await a.settle(150);
 		report.ok(await isOpen(), '...and so does opening another panel');
 		await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
@@ -236,7 +239,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(!(await isOpen()), 'the X closes it, and nothing else does');
 
 		// And it comes back where it was left, not back at the menu's corner.
-		await a.menuClick('Find', 'edit');
+		await a.menuClick('Find and replace', 'edit');
 		await a.settle(200);
 		const backAt = await a.page.evaluate(() => {
 			const r = document.getElementById('lpn_find_popup').getBoundingClientRect();

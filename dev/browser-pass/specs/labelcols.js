@@ -68,11 +68,13 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();
 		await a.makeEdit();
 		// The Labels button opened a pull-down, then the Visibility panel (Task 427), then the
-		// Settings box on its Labels section (Task 441) -- and then it was removed, because the box
-		// it opened has its own button (Tom, 2026-08-18). The columns being measured travelled
-		// through every one of those moves unchanged, which is the point of measuring them here
-		// rather than asserting a stylesheet rule. The door used is the one Tom kept: View > Labels.
-		await a.menuClick('Labels', 'view');
+		// Settings box on its Labels section (Task 441), then View > Labels -- and now Project >
+		// Settings (Task 467), the Project menu having become the one place every command lives.
+		// The columns being measured travelled through every one of those moves unchanged, which is
+		// the point of measuring them here rather than asserting a stylesheet rule. **This spec went
+		// stale at the last move and threw rather than failed** -- a door that no longer exists is
+		// worth more noise than a check that quietly stops running.
+		await a.menuClick('Settings', 'project');
 		await a.settle(500);
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_settings_box').style.display === 'flex' &&
@@ -180,8 +182,13 @@ exports.run = async function ({ browser, report }) {
 		// seem to do it right."* Same defect the ID prefixes had, from the same cause: the name is
 		// `flex: 1 1 auto` and took every pixel the box was widened by. The ceiling is 11.5rem =
 		// --lpn-set-name, so a labels row and a settings row share ONE control x.
+		//
+		// **MEASURED FROM 44rem UP, not 30rem** (2026-08-24): below the container query's 24rem of
+		// CONTENT the row stacks on purpose, and a 30rem box is under it once the section nav has
+		// taken its column. Comparing a stacked row against an unstacked one measures the stacking,
+		// not the walk. The stacked state has its own checks below.
 		const walk2 = [];
-		for (const w of ['30rem', '44rem', '80rem']) {
+		for (const w of ['44rem', '60rem', '80rem']) {
 			await a.page.evaluate((width) => { document.getElementById('lpn_settings_box').style.width = width; }, w);
 			await a.settle(150);
 			walk2.push(await a.page.evaluate((width) => {
@@ -204,6 +211,61 @@ exports.run = async function ({ browser, report }) {
 			walk2.map(d => `${d.w}: labels ${d.x} vs settings ${d.setX}`).join('; '));
 		await a.page.evaluate(() => { document.getElementById('lpn_settings_box').style.width = ''; });
 		await a.settle(150);
+
+		// ---- **AND WHEN IT IS TOO NARROW, THE NAME KEEPS ITS LINE** --------------------------------
+		//
+		// Tom, 2026-08-24: *"the labels are wrapping when what we want is for the four columns to wrap
+		// as a block under the checkbox and label. Like the phone."* Below the container query's 24rem
+		// a field row wraps: the name takes a whole line, the four columns drop beneath it together.
+		//
+		// **THE CHECK IS GEOMETRIC, NOT A CLASS OR A RULE LOOKUP.** What went wrong before was the
+		// name breaking mid-word to keep four boxes on one line, and both states have the same markup
+		// and the same stylesheet -- only the painted boxes tell them apart. So: is the first column
+		// painted BELOW the name, and are the four columns still painted on one line as each other?
+		const stacked = await a.page.evaluate(() => {
+			const box = document.getElementById('lpn_settings_box'), was = box.style.width;
+			box.style.width = '22rem';
+			const out = { rows: [], head: null };
+			const list = document.getElementById('lpn_labels_node_fields');
+			const headCells = [...list.children[0].children];
+			out.head = headCells.map(c => +c.getBoundingClientRect().width.toFixed(1));
+			for (const row of [...list.children].slice(1)) {
+				const kids = [...row.children];
+				const name = kids[0].getBoundingClientRect();
+				const rowLine = parseFloat(getComputedStyle(row).lineHeight) || 16;
+				const cols = kids.slice(1).map(c => c.getBoundingClientRect());
+				out.rows.push({
+					name: (kids[0].textContent || '').trim(),
+					// the columns start below the name's last line
+					below: cols[0].top >= name.bottom - 1,
+					// ...and all four are on that SAME wrapped line, not spilling onto a third.
+					// Compared against the name's bottom rather than against each other, because
+					// the row is baseline-aligned and an empty spacer span and a spinner do not
+					// start at the same y -- the ID row holds two columns open with spacers, and
+					// asserting equal tops there measures baseline jitter, not line breaks.
+					oneLine: cols.every(c => c.top >= name.bottom - 1 && c.bottom <= name.bottom + rowLine * 1.6),
+					// ...and the name did NOT have to break mid-word: one line of text
+					nameLines: Math.round(name.height / parseFloat(getComputedStyle(kids[0]).lineHeight || '16'))
+				});
+			}
+			box.style.width = was;
+			return out;
+		});
+		await a.settle(150);
+		report.ok(stacked.rows.length > 0 && stacked.rows.every(r => r.below),
+			'narrowed below 24rem, each field row drops its four columns UNDER the name',
+			(stacked.rows.find(r => !r.below) || {}).name || `${stacked.rows.length} rows`);
+		report.ok(stacked.rows.every(r => r.oneLine),
+			'...and the four columns stay on one line as each other — they move as a block',
+			(stacked.rows.find(r => !r.oneLine) || {}).name || '');
+		report.ok(stacked.rows.every(r => r.nameLines <= 1),
+			'...and no name has to break mid-word to make room, which is what Tom was reading',
+			(stacked.rows.find(r => r.nameLines > 1) || {}).name || '');
+		// The heading row's lead cell is empty, so in this state it is removed rather than left
+		// holding a blank line: the four headings must still be there, over the four columns.
+		report.ok(stacked.head.length === 4 || stacked.head[0] === 0,
+			'...and the heading row spends no line on its own empty first cell',
+			`heading cells painted: ${stacked.head.join(', ')}`);
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');
 	} finally {

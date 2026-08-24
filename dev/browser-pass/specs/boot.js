@@ -30,7 +30,13 @@ exports.run = async function ({ browser, report }) {
 		const tabs = await a.tabs();
 		report.eq(tabs.length, 1, 'a first visit opens exactly one project');
 		report.ok(tabs[0].current, 'and it is the current tab');
-		report.has(tabs[0].title, 'Not saved to a file', 'a project with no file says so');
+		// **NOT "Not saved to a file" ANY MORE, AND THE ASSERTION BELOW IS WHY.** That note rides
+		// with the asterisk, which means UNSAVED CHANGES -- and Task 418 made the first project
+		// arrive clean, so a first visit has neither. The tooltip is the project's own name. This
+		// check was left asserting the pre-418 state and had gone stale, not broken.
+		report.has(tabs[0].title, 'Project', 'a first project names itself in its tab tooltip');
+		report.ok(tabs[0].title.indexOf('Not saved to a file') < 0,
+			'...and says nothing about unsaved changes, because it has none yet', tabs[0].title);
 
 		// **THE FIRST PROJECT ARRIVES CLEAN** (Task 418). It did not: `lpn_index` was written at
 		// boot with a `savedSig`, and with no user action at all the first autosave found a
