@@ -209,7 +209,8 @@ the block.
   and is a drawing feature: labelling a pipe, a pump or a valve with your own words and having the
   note follow it when the link moves. Real work, not a rename: the attachment point on a link is a
   position ALONG it, so it needs a parameter on the polyline rather than a second `anchorNode`, and
-  it touches label placement, the leader, collision avoidance and the Text popup.
+  it touches label placement, the leader, collision avoidance and the Text popup. **Task 247's meter
+  needs the same `linkAnchor {link, t}`** — whichever ships first builds it for both.
 
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
@@ -434,20 +435,22 @@ the block.
   `Irrigation.php` it has a real in-site path. Check what that contributes before assuming the
   numbers mean nobody wants it.
 
-- 50|247| **Customer accounts as meters on the system, lumped to the nearest node.** Tom,
-  2026-08-09 and expanded 2026-08-24. Assign named demands to a junction and sum them, rather than
-  typing one lumped figure. Genuinely fits the irrigation/rural-water audience. epanet-js has it;
-  EPANET does not.
-  - **The 2026-08-24 expansion, in Tom's words:** *"expand/envision as a Customer management model
-    where we are adding Customer account numbers, and these are meters on the system. Not sure where
-    this is headed, but let's at least think that way. And of course I assume that we lump the
-    Customer demands additively at their nearest (by length) node. Graphically, I think you pick a
-    point, it draws a meter rectangle, and then you pick a pipe and it connects perpendicularly from
-    the meter to the pipe."*
-  - **Scope first, build second** — "not sure where this is headed" is the reason. Design record and
-    the staged plan: `dev/customer-demands.md`.
-  - Read with Task 468 (demand categories on a junction, the breakdown the importer already
-    flattens) — they may be one task.
+- 50|247| **Customers: metered demands with account numbers, lumped to the nearest node.**
+  Tom, 2026-08-09, raised and expanded 2026-08-24. epanet-js has demand allocation by customer;
+  EPANET does not. **Full design, with the costs priced: `dev/customer-demands.md`.**
+  - **Tom's expansion, in his words:** *"expand/envision as a Customer management model where we are
+    adding Customer account numbers, and these are meters on the system. Not sure where this is
+    headed, but let's at least think that way. And of course I assume that we lump the Customer
+    demands additively at their nearest (by length) node. Graphically, I think you pick a point, it
+    draws a meter rectangle, and then you pick a pipe and it connects perpendicularly from the meter
+    to the pipe."*
+  - **Task 468 is a PREREQUISITE, not a sibling** — a Customer is one of its demand rows extended,
+    and 247 must not invent a second breakdown structure. Shares the attach-to-a-link-at-a-fraction
+    seam with Task 502.
+  - **Recommended first slice: an account number on a 468 demand row, no geometry** — it settles the
+    `.inp` answer while that is still cheap to change, and spends none of the drawing-surface budget.
+  - **The account number is a label on a demand, never a key into anything**, and it is the first
+    personal-adjacent data in the suite: it must never reach a log row or a usage statistic.
 
 - 25|248| **Extended-period simulation, the GATE on the LibreEPANET.org launch.**
   Last of the three things the EPANET engine unlocked; Tasks 306/307. Tanks and valves shipped
@@ -620,6 +623,7 @@ the block.
     different; see `dev/positioning.md`.
   - Touches the scenario write seam (`setProp`), the popup, the importer, and Task 281's exporter —
     a per-category override is the question to settle first.
+  - **Ship before Task 247, whose Customer is one of these rows extended** (`dev/customer-demands.md`).
 
 - 25|484| **Log which unhandled EPANET features actually arrive in real imports.**
   A server-side count of the import features we do not handle, so Task 483 and its siblings are

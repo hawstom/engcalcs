@@ -32,7 +32,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 ## 50 — Someday (4)
 
 - Task 207 — The dilettante path: make replying cost one tap, not five steps.
-- Task 247 — Customer accounts as meters on the system, lumped to the nearest node.
+- Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - Task 269 — ASU Engineers Without Borders answered, and asked to meet.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 
