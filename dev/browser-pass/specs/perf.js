@@ -84,6 +84,27 @@
 //
 // with every placement byte-identical. dev/lpn-spike/aligned-shed-index-harness.js is the guard.
 //
+// **AND THEN THE NODE HALF LEARNED TO SHED, WHICH ADDED COST BACK ON PURPOSE** (Task 469). A node
+// label that will not fit now gives up its lowest-ranked property and the placement is run again,
+// up to four rungs, instead of being hidden whole. Every rung is a fresh first-fit over the node
+// labels plus one batched write-and-measure, so a layout pass runs at most FIVE placements where it
+// used to run one, and the pass is COUNTED at 4 forced layouts rather than one per label.
+//
+// **IT IS GATED TO THE CONTENT PASSES, AND THAT GATE IS WHY IT IS AFFORDABLE.** `relayoutLabels()`
+// takes a `shedNodes` argument and only refreshLabelTextPass() and the debounced scheduleReshed()
+// pass it -- the same content/position line Task 399 drew for the link half. A DRAG FRAME therefore
+// pays nothing. Measured headless on this same 480-pipe grid and on Net3-World, master against the
+// change, alternating builds:
+//
+//     content pass, Net3-World s=30000     173 ms  ->    183-200 ms
+//     content pass, Net3-World s=5000      157 ms  ->    265-267 ms
+//     content pass, 480-pipe grid          720 ms  ->    878-963 ms
+//     drag frame, either network            unchanged (15-19 ms / 31-44 ms, both builds)
+//
+// and what it buys, in node labels actually drawn: 81 -> 96 of 97 at s=30000, 17 -> 33 at s=5000,
+// and 20 -> 50 on the grid, with the total number of values on screen unchanged or slightly up
+// (396 -> 402 at s=30000). dev/lpn-spike/node-shed-harness.js holds those numbers and the counts.
+//
 // **THE BOUNDS ARE GENEROUS ON PURPOSE — well clear of the measurement, not a hair over it.** This
 // pass runs on whatever machine is free, and a timing check that fails on a busy one teaches people
 // to ignore failures. What they catch is the QUADRATIC coming back, which is an order of magnitude;

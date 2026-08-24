@@ -1076,7 +1076,7 @@
         "lpn_labels_separator_tip": "Text between one property and the next on a label. A space by default.",
         "lpn_labels_priority": "Priority",
         "lpn_labels_priority_link_tip": "The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first.",
-        "lpn_labels_priority_node_tip": "Which node property decides, when two labels would overlap and one of them has to go. The highest number decides first and the number 1 counts last. The label that goes is the one whose value is worth showing least: the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to that of the neighbouring nodes.",
+        "lpn_labels_priority_node_tip": "The order in which properties are given up when two node labels would overlap. The property numbered 1 is given up first, on both labels. When one property is left and the two still overlap, a whole label is hidden: the one whose remaining value is worth showing least — the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to the neighbouring nodes.",
         "lpn_labels_col_before": "Before",
         "lpn_labels_col_after": "After",
         "lpn_labels_col_decimals": "Decimals",

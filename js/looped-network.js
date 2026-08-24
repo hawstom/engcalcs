@@ -711,6 +711,51 @@ var EngCalcs = EngCalcs || {};
 	function keptLines(lines, keep) {
 		return lines.filter(function (line, i) { return keep[i]; });
 	}
+	// **THE ONE PLACE A NODE LABEL'S GLYPHS ARE BUILT** (Task 469), the counterpart of
+	// writeLabelGlyphs(). The full label and every shed candidate go through it, so they cannot
+	// disagree about the row shape, the font size or the placeholder x.
+	//
+	// The x here is a placeholder: layoutNodeLabel(), after collision avoidance, sets the real final
+	// x/y on both the <text> and its tspans via repositionMultilineText().
+	//
+	// **THE FONT SIZE IS SET HERE, BEFORE THE TAPE MEASURE COMES OUT.** getBBox() returns WORLD units
+	// and noteMeasuredWidth() multiplies by the CURRENT scale to bank a pixel width, so both halves
+	// must belong to the same moment. A label's font-size is itself in world units (textSize / s), so
+	// writing glyphs after a zoom but before refreshFontSizes() has updated the element measures text
+	// drawn at the OLD scale and multiplies by the NEW one -- the banked pixel width is then wrong by
+	// exactly the zoom ratio, making obstacle boxes enormous when you zoom out.
+	// It is a WRITE, which is why it belongs in the write half and not beside the measurement.
+	function writeNodeLabelGlyphs(ne, n, lines, fsNow) {
+		var rows = composeRows(lines, true);   // a node label always stacks -- see composeRows()
+		setMultilineText(ne.text, nodeLabelBase(n).x, rows);
+		ne.lineCount = rows.length;
+		ne.lines = lines;   // the FIELD lines, one per value, whatever shape they were drawn in
+		ne.text.style.fontSize = fsNow;
+		return rows;
+	}
+	// A node field's shed rank, out of the user's own Drop column -- linkFieldRank()'s counterpart,
+	// and the SECOND consumer of labelSettings.priority.node, which until Task 469 had only one.
+	//
+	// **THE ID IS NOT IN THE COLUMN AND IS THEREFORE NEVER SHED.** labelSettings.priority.node holds
+	// demand, pressure, elev and head and nothing else, which is also exactly what
+	// LPN_NODE_DROP_RULE ranks: the four values a reader could weigh against each other. A node's ID
+	// is not one of them -- it is what the other four are ABOUT -- so a label sheds down to its ID
+	// plus one ranked value and then, if it still will not fit, goes whole.
+	function nodeFieldRank(field) {
+		var r = field && labelSettings.priority.node[field];
+		return typeof r === 'number' ? r : -Infinity;
+	}
+	// The shed order over the RANKED lines only, lowest rank first: the user's column is a drop order
+	// and 1 is the first value to go (Task 445). Unranked lines (the ID) are not in the order at all,
+	// so shedKeepSet() never reaches them.
+	function nodeShedOrder(lines) {
+		var order = [], i;
+		for (i = 0; i < lines.length; i++) {
+			if (typeof labelSettings.priority.node[lines[i].field] === 'number') { order.push(i); }
+		}
+		order.sort(function (a, b) { return nodeFieldRank(lines[a].field) - nodeFieldRank(lines[b].field); });
+		return order;
+	}
 	// **THE SHED STARTS BEFORE THE HIDE DOES, AND WITHOUT THAT GAP THE CASCADE IS INVISIBLE.** If
 	// the shed fires at `width > length` and linkLabelTooShort() hides at `length < width` -- the
 	// same comparison -- the only band in which a reader could SEE a shed is too wide at N values and
@@ -1642,9 +1687,157 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < n; i++) { if (a[i] !== b[i]) { return a[i] - b[i]; } }
 		return 0;
 	}
-	function runLabelCollisionAvoidance() {
-		var fs = effectiveFontSize(), labels = [], nodeLabels = [], stationed = [],
+	// **A NODE LABEL SHEDS PROPERTIES BEFORE ONE OF THEM IS HIDDEN** (Task 469). Tom, 2026-08-21:
+	// *"Properties are never dropped from node labels, so Node label drop order is a lie... it seems
+	// to me that in many cases we could see many more node labels if some of the requested node
+	// properties were dropped."* Until this, labelSettings.priority.node had one consumer,
+	// nodeDropKey(), and it only decided which WHOLE label went.
+	//
+	// **IT RUNS LAST, AFTER PLACEMENT HAS FAILED, and that ordering is the whole design.** A shed is
+	// paid for in information, so it must not be spent on a conflict the placement pass is about to
+	// solve by MOVING a label: place first, and shed only where first-fit has already run out of
+	// sides. That also makes the rung a fact rather than a judgement -- `dropped` is what
+	// placeLabelsFirstFit() reports when no side is clear and none is merely yielding.
+	//
+	// **ANY OVERLAP, NOT A VERTICAL ONE.** js/lpn-collide.js relaxes boxes and has no notion of an
+	// axis; classifying an overlap as vertical means inventing that notion and then answering it for
+	// a diagonal one. A shed row also shortens the widest line as often as not, so an axis would not
+	// predict what the shed buys anyway.
+	//
+	// **BOTH SIDES OF THE PAIR SHED, NOT ONLY THE LOSER**, which is what the Drop tip promises and
+	// also the only version that helps: in a first-fit the label that is dropped is by construction
+	// the lower-ranked one, and the ground it needs is being held by the WINNER. Shedding the loser
+	// alone makes it narrower in a space that never opens.
+	//
+	// **NO UNSHED PROBLEM AND NO RATCHET**, because the pass opens by putting every node label back
+	// to its full content (unshedNodeLabels()) and re-derives the whole cascade. Two runs over an
+	// untouched drawing therefore give the same answer, which is the promise addDataLabel() makes
+	// about the nudge and this pass has to keep too.
+	//
+	// COST: one extra first-fit placement per rung, plus one write and one measurement for each
+	// label that sheds -- batched, every write then every read, so a rung costs one forced layout and
+	// not one per label. The cap is what bounds the worst case: a node label carries at most four
+	// ranked values, so four rungs is the deepest any single label can go, and a fifth could only be
+	// a different label starting its own cascade. Measured on Net3-World and on a 480-pipe grid in
+	// dev/lpn-spike/node-shed-harness.js.
+	var LPN_NODE_SHED_MAX_RUNGS = 4;
+	// Back to full content, for the labels that are not already there. Cheap in the ordinary case:
+	// on a drawing where nothing shed last pass this is one scan and no DOM work at all.
+	function unshedNodeLabels(fsNow) {
+		var work = [];
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id];
+			if (!ne || ne.empty || !ne.allLines || !ne.lines) { return; }
+			if (ne.lines.length >= ne.allLines.length) { return; }
+			work.push({ n: n, ne: ne });
+		});
+		if (!work.length) { return; }
+		work.forEach(function (w) { writeNodeLabelGlyphs(w.ne, w.n, w.ne.allLines, fsNow); });
+		work.forEach(function (w) { measureLabelWidths(w.ne); });
+	}
+	// How far from its anchor this label can reach, which is placeLabelsFirstFit()'s own `_reach`:
+	// the furthest candidate endpoint, plus the label's full diagonal beyond it, plus the pad. Used
+	// only to reject far-apart pairs before any box arithmetic, so erring wide costs a few tests and
+	// erring narrow would miss a blocker.
+	function nodeLabelReach(lbl, pad) {
+		var far = 0, i, s = (lbl.sides && lbl.sides.length) ? lbl.sides : [lbl.home];
+		for (i = 0; i < s.length; i++) {
+			far = Math.max(far, Math.hypot(s[i].x - lbl.anchor.x, s[i].y - lbl.anchor.y));
+		}
+		return far + Math.hypot(lbl.w, lbl.h) + pad;
+	}
+	// One dropped label's blockers: the placed node labels standing on ground it could have used.
+	// Every candidate side is asked, because the drop means none of them was free -- naming only the
+	// preferred side's blocker would leave the label boxed in from a direction nobody shed for.
+	// The STAIRCASE on both sides (Task 406), and the pad on the query exactly as boxClearOf() grows
+	// it, so this asks the same question the placement pass just answered.
+	//
+	// **INDEXED, for the reason yieldStationedLabels() gives**: this is every dropped label against
+	// every placed row, which on a crowded 480-pipe grid is a million box tests done one at a time.
+	// Each placed row carries its label's id as `owner`, which is what makes the answer a NAME
+	// rather than a boolean -- Collide.boxIndex() could only say whether something was there.
+	function nodeShedBlockers(lbl, index, local, pad) {
+		var sides = (lbl.sides && lbl.sides.length) ? lbl.sides : [lbl.home], out = [], hit = {},
+			i, j, k, q, boxes, o;
+		index.near(lbl.anchor.x, lbl.anchor.y, nodeLabelReach(lbl, pad), local);
+		for (i = 0; i < sides.length; i++) {
+			boxes = Collide.labelLineBoxes(lbl, sides[i]);
+			for (k = 0; k < boxes.length; k++) {
+				q = pad > 0 ? Collide.box(boxes[k].cx, boxes[k].cy, boxes[k].w + 2 * pad,
+					boxes[k].h + 2 * pad, boxes[k].a) : boxes[k];
+				for (j = 0; j < local.boxes.length; j++) {
+					o = local.boxes[j];
+					if (o.owner === undefined || o.owner === lbl.id || hit[o.owner]) { continue; }
+					if (Collide.boxOverlapDepth(q, o) > 0) { hit[o.owner] = true; out.push(o.owner); }
+				}
+			}
+		}
+		return out;
+	}
+	// What one node label still has left to give up. Null when it has nothing: no lines, or one
+	// ranked value left -- and THAT is the hide. Dropping the last ranked value is not a shed; it is
+	// the terminal rung the drop key already owns, so the label stays dropped and goes whole.
+	function nodeShedRec(lbl, nodeOf) {
+		var n = nodeOf[lbl.id], ne = n && nodeEls[n.id];
+		if (!ne || ne.empty || !ne.allLines || !ne.lines) { return null; }
+		var all = ne.allLines, order = nodeShedOrder(all), gone = all.length - ne.lines.length;
+		if (gone >= order.length - 1) { return null; }
+		return { lbl: lbl, n: n, ne: ne, all: all, order: order, gone: gone };
+	}
+	function shedNodeLabelsForCrowding(nodeLabels, placed, obs, pad, fsNow) {
+		var byId = {}, nodeOf = {}, rungs = 0;
+		nodeLabels.forEach(function (l) { byId[l.id] = l; });
+		doc.nodes.forEach(function (n) { nodeOf[nodeLabelKey(n.id)] = n; });
+		while (rungs < LPN_NODE_SHED_MAX_RUNGS) {
+			var liveObs = { boxes: [], segments: [] }, dropped = [], recs = [], seen = {},
+				local = { boxes: [], segments: [] }, reach = 0, index;
+			placed.forEach(function (r) {
+				var lbl = byId[r.id];
+				if (!lbl) { return; }
+				if (r.dropped) { dropped.push(lbl); return; }
+				(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { liveObs.boxes.push(b); });
+			});
+			if (!dropped.length) { break; }
+			dropped.forEach(function (lbl) { reach = Math.max(reach, nodeLabelReach(lbl, pad)); });
+			index = Collide.grid(reach, liveObs);
+			liveObs.boxes.forEach(function (b, i) { index.addBox(i); });
+			var enlist = function (id) {
+				if (seen[id]) { return; }
+				var rec = nodeShedRec(byId[id], nodeOf);
+				if (!rec) { return; }
+				seen[id] = true; recs.push(rec);
+			};
+			dropped.forEach(function (lbl) {
+				enlist(lbl.id);
+				nodeShedBlockers(lbl, index, local, pad).forEach(enlist);
+			});
+			if (!recs.length) { break; }   // nothing left to give up: the drops stand and go whole
+			// EVERY WRITE, THEN EVERY READ -- one forced layout for the rung instead of one per
+			// label. Exactly shedToSegmentBatch()'s seam, for exactly its reason.
+			recs.forEach(function (rec) {
+				writeNodeLabelGlyphs(rec.ne, rec.n,
+					keptLines(rec.all, shedKeepSet(rec.all, rec.order, rec.gone + 1)), fsNow);
+			});
+			recs.forEach(function (rec) { measureLabelWidths(rec.ne); });
+			recs.forEach(function (rec) {
+				rec.lbl.w = labelBoxWidth(rec.ne);
+				rec.lbl.h = dataLabelBoxHeight(rec.ne.lineCount);
+				rec.lbl.lines = labelRowWidths(rec.ne);
+			});
+			placed = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+			rungs++;
+		}
+		lastNodeShedRungs = rungs;
+		return placed;
+	}
+	// The rungs the last pass ran, for a harness to read. Not a decision input -- nothing reads it.
+	var lastNodeShedRungs = 0;
+	function runLabelCollisionAvoidance(shedNodes) {
+		var fs = effectiveFontSize(), fsNow = fs + 'px', labels = [], nodeLabels = [], stationed = [],
 			obs = staticObstacles(), holders = {};
+		// **EVERY NODE LABEL STARTS FROM ITS FULL CONTENT** (Task 469), before anything is measured
+		// into a placement spec. Shedding down from whatever survived the last pass is a ratchet.
+		if (shedNodes) { unshedNodeLabels(fsNow); }
 		function addDataLabel(key, holder, anchor, home, dragged, lineCount) {
 			// Every nudge is cleared and re-derived from scratch on every pass, dragged or not, so
 			// the pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer
@@ -1730,6 +1923,18 @@ var EngCalcs = EngCalcs || {};
 		// tell the two apart. If a node label still cannot fit once link labels have shed, it drops.
 		var pad = fs * LPN_ALIGNED_PAD_FRAC,
 			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+		// **AND THEN THE ONES THAT DID NOT FIT GIVE UP A PROPERTY AND TRY AGAIN** (Task 469). This
+		// is the graceful rung the node half never had; the drop above is now its terminal one.
+		//
+		// **ONLY ON A CONTENT PASS, WHICH IS THE CLOCK TALKING AND THE SAME BARGAIN
+		// shedAlignedForConflicts() ALREADY MADE.** A shed rebuilds glyphs and forces a layout, and
+		// THIS function runs on every frame of a drag; the two callers that pass `shedNodes` are the
+		// ones that run when the CONTENT or the SCALE changes -- refreshLabelTextPass() and the
+		// debounced scheduleReshed() -- which is exactly where the link cascade lives. A drag frame
+		// places whatever content the last content pass decided, and re-decides on the way out.
+		if (shedNodes) {
+			nodePlaced = shedNodeLabelsForCrowding(nodeLabels, nodePlaced, obs, pad, fsNow);
+		}
 		// Every number the ring pass is steered by goes through ONE place, so ?debug=labels can
 		// override them live without a second code path deciding anything (see labelTuning()). It
 		// now serves free link labels and DRAGGED labels of either kind -- see addNodeFirstFit().
@@ -16788,7 +16993,7 @@ var EngCalcs = EngCalcs || {};
 			beginLinkGeomHold();
 			try {
 				reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
-				relayoutLabels();
+				relayoutLabels(true);   // a zoom changes the fit, so the node shed is re-decided too
 			} finally { endLinkGeomHold(); }
 		}, 120);
 	}
@@ -20483,21 +20688,13 @@ var EngCalcs = EngCalcs || {};
 			// collision box) must know it is really empty rather than really one blank line.
 			ne.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
-			// x here is a placeholder -- layoutNodeLabel() below (after collision avoidance) sets the
-			// real, final x/y on both the <text> and its tspans via repositionMultilineText().
-			var nRows = composeRows(lines, true);   // a node label always stacks -- see composeRows()
-			setMultilineText(ne.text, nodeLabelBase(n).x, nRows);
-			ne.lineCount = nRows.length;
+			// **THE FULL LIST IS KEPT BESIDE THE DRAWN ONE, exactly as a link label's is** (Task
+			// 469). The node shed cascade starts from the whole label every time; shedding down from
+			// whatever survived last pass is a ratchet, and a label that gave up a value at one
+			// crowded zoom could never get it back.
+			ne.allLines = lines;
 			nodeLines[n.id] = lines;
-			ne.lines = lines; // the FIELD lines, one per value, whatever shape they were drawn in
-			// **THE FONT SIZE MUST BE RIGHT FOR THIS SCALE BEFORE THE TAPE MEASURE COMES OUT.**
-			// getBBox() returns WORLD units and noteMeasuredWidth() multiplies by the CURRENT scale
-			// to bank a pixel width, so both halves must belong to the same moment. A label's
-			// font-size is itself in world units (textSize / s), so running this after a zoom but
-			// before refreshFontSizes() has updated the element measures text drawn at the OLD scale
-			// and multiplies by the NEW one -- the banked pixel width is then wrong by exactly the
-			// zoom ratio, making obstacle boxes enormous when you zoom out.
-			ne.text.style.fontSize = fsNow;
+			writeNodeLabelGlyphs(ne, n, lines, fsNow);
 		});
 		// **EVERY WRITE, THEN EVERY READ -- AND THAT SPLIT IS THE WHOLE OF WHY IT IS TWO LOOPS.**
 		// getBBox() and getComputedTextLength() are LAYOUT reads: taken between two DOM writes each
@@ -20588,7 +20785,9 @@ var EngCalcs = EngCalcs || {};
 		// laid out for real (text and leader) at its final, possibly-nudged position. The extrema
 		// marks need no third pass of their own any more (Task 333): they are text-decoration on the
 		// tspans set above, so they move with the text whatever moves it.
-		relayoutLabels();
+		// `true` is the node shed cascade (Task 469): this is a CONTENT pass, so it is allowed to
+		// decide content.
+		relayoutLabels(true);
 		doc.links.forEach(function (l) { updateArrow(l.id); });
 		renderLabelsLegend();
 		// Called from HERE and not from every caller of it, because the halos are filtered by the
@@ -20652,13 +20851,17 @@ var EngCalcs = EngCalcs || {};
 	// has a MEDIAN nudge of 43 world units and a worst of 68 -- labels flung clean off the far side
 	// of the network -- against a median of 3.9 at scale 20, where that drawing is read. Those nudges
 	// are CORRECT for the scale that produced them and nonsense at any other.
+	//
+	// **`shedNodes` IS THE CONTENT/POSITION LINE, AND ONLY TWO CALLERS PASS IT** (Task 469):
+	// refreshLabelTextPass() and the debounced scheduleReshed(). Everything else here -- every frame
+	// of a drag -- is position only, and places the content the last content pass decided.
 	var lastLayoutScale = null;
-	function relayoutLabels() {
+	function relayoutLabels(shedNodes) {
 		lastLayoutScale = state.s;
 		beginMapBoxHold();   // one canvas measurement for the whole pass -- see mapBox()
 		beginLinkGeomHold(); // one segment index for the whole pass -- see linkSegIndex()
 		try {
-			runLabelCollisionAvoidance();
+			runLabelCollisionAvoidance(shedNodes);
 			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
 			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
 			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
