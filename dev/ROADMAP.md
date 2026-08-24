@@ -104,29 +104,20 @@ the block.
   - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
     drawing is still correct.
 
-- 100|459| WAIT: sprint — **The next sprint's contents, already earned.** Tasks 405 and 458 merged
-  here 2026-08-22: identical blocker, identical action — run one sprint. **ASKED AND HELD 2026-08-21:**
-  offered a full 26-language run or a core-four run, Tom chose "hold the sprint entirely"; do not
-  re-propose without a reason he has not already heard.
-  - **Four English strings resynced after sprint 397's zero-drift baseline (was 405).**
-    `lpn_settings_readability_bias` (five languages raised it independently — this project's own
-    threshold for an English-source defect) and `lpn_field_text_match_pipe` (three did; it is a
-    button, not a toggle). `lpn_examples_size` and `lpn_ex_net3_desc` were factually WRONG about what
-    a number counted, and nothing in the build compares prose against a network.
-  - **14 mode-name disagreements in ru, sr, tr and zh (was 458).** A language's `lpn_geomap` or
-    `lpn_xymap` disagrees with its other mode-naming strings, so a reader meets two names for one kind
-    of project. `mode_name_check.php` names the exact strings; inflected languages, so sprint not sed.
-  - **CHANGED/NEW since sprint 438:** five `lpn_notes_*`, `lpn_file_import_inp_tip`, `lpn_clean_map`
-    ("Reduce map clutter"); NEW `lpn_color_mode_manual`, `lpn_time_no_period`, three
-    `lpn_basemap_satellite_*`, `lpn_tables_menu(_tip)`, `lpn_run_menu_tip`,
-    `lpn_settings_auto_run(_tip)`, `lpn_time_run_slow`. Wave 0 over the changed set first.
-  - **Earned 2026-08-23:** `lpn_settings_legend_position` → `Labels legend position`; Tom found it
-    ambiguous against the colour key, whose control already says `Color legend position`. 26 stale.
-  - **Earned 2026-08-24, and it is now the largest single reason to run: 49 NEW keys from Task 507**
-    — every string of the place-name search and the terrain elevation fill, **both permission
-    dialogs included**. Until this sprint runs, two dialogs asking to send a visitor's data to an
-    outside service are shown in English to readers of 26 languages. Also changed the same day:
-    `lpn_find_menu`/`_title`/`_menu_tip` → "Find and replace" (Task 389, 26 stale each).
+- 100|513| **What sprint 459 did not finish: three named jobs, all small.**
+  Extracted on closing 459 so they are not re-proposed from scratch. None blocks anything.
+  - **Glossary write-back has NOT been done, and the SOP calls it mandatory before close.** The 26
+    agents each reported the terms they used and several justified them against their own file's
+    incumbents (Pashto counted `والو` 46 to `سوپاپ` 7 and kept the incumbent). That reasoning is in
+    the transcript and nowhere else; `glossary.json`'s `preferred_translation` is where it belongs.
+  - **Nine mode-name disagreements survive in ru, sr and tr** (27 before the sprint). bg/bn/cs were
+    fixed mechanically by reverting `lpn_geomap` to `lat/lon`, which is what all six of their own
+    sibling strings already said. These three are different: anchor and siblings are both
+    translated, in different words. It needs each language's own vocabulary, not a sed.
+  - **Fourteen languages render `lpn_georef_asdeg_btn` in the old longitude-then-latitude order.**
+    English is now `lat/lon` (Tom, 2026-08-24) and the eleven carrying the literal `lon/lat` were
+    swapped; the rest translated the two words and need them reordered by someone who reads the
+    script. They are on the drift list, so the next sprint picks them up by itself.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;

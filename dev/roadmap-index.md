@@ -13,10 +13,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
-- Task 459 — WAIT: sprint · The next sprint's contents, already earned.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - Task 511 — Three georeferencing checks disagree with Mercator, and one of them is right.
 - ! Task 512 — The amber override ring reads as a stuck highlight nobody can turn off.
+- Task 513 — What sprint 459 did not finish: three named jobs, all small.
 
 ## 75 — Soon (10)
 
