@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**78 open tasks.** Next (100): 6 · Soon (75): 7 · Someday (50): 12 · Maybe (25): 26 · Parked (5): 27
+**78 open tasks.** Next (100): 6 · Soon (75): 6 · Someday (50): 13 · Maybe (25): 26 · Parked (5): 27
 
 ## 100 — Next (6)
 
@@ -18,17 +18,16 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
 - Task 469 — Node labels should SHED properties before one of them is hidden.
 
-## 75 — Soon (7)
+## 75 — Soon (6)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 442 — [H] · The toolbar may want to become a side menu.
 - Task 477 — [H] · New blank project startup wizard: xy/lat-lon, units, head loss.
 - Task 479 — LibreWaterNet.org needs a landing page, and this account needs a hosting decision.
-- Task 483 — EPANET import: carry unhandled features into a per-asset import notes field.
 - Task 495 — [H] · REMIND TOM: does an input accept more characters than its width shows?
 - Task 501 — [H] · Tom's own browser pass on the Task 478 field grid.
 
-## 50 — Someday (12)
+## 50 — Someday (13)
 
 - Task 207 — The dilettante path: make replying cost one tap, not five steps.
 - Task 248.02 — Patterns: attach one to a RESERVOIR HEAD and a PUMP.
@@ -42,6 +41,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 497 — Automatic elevations for a lat/lon project, from a terrain source.
 - Task 499.01 — Create a Scenarios menu icon
 - Task 499.02 — Add a tip to the lpn Project menu
+- Task 502 — A Text object anchored to a LINK, not only to a node.
 
 ## 25 — Maybe (26)
 

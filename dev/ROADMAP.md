@@ -233,14 +233,13 @@ the block.
   shape keeps the X's gone; the collapse animation still animates.
 
 
-- 75|483| **EPANET import: carry unhandled features into a per-asset import notes field.**
-  Tom, 2026-08-22. Today an import reports its differences and then the information is discarded; a
-  notes field the user can read would keep it, e.g. *"EPANET Label was marked a Meter associated
-  with Link 999 and anchored to Link 999."* He leans toward IMPLEMENTING the anchor (a Text object
-  associated with a node or link) and merely NOTING the Meter — EPANET's Meter shows whichever
-  single notation property is selected on Nodes or Links at that moment, which is less flexible than
-  what our labels already do, so reproducing it is not obviously worth it. Tom: *"I'm not opposed to
-  implementing this, and it may be better to implement it than to discuss it."*
+- 50|502| **A Text object anchored to a LINK, not only to a node.**
+  Extracted from Task 483 on close. A Text already follows a node (`anchorNode`, an offset plus a
+  leader) and an EPANET `.inp` can only ever anchor one to a node — so this buys nothing on import
+  and is a drawing feature: labelling a pipe, a pump or a valve with your own words and having the
+  note follow it when the link moves. Real work, not a rename: the attachment point on a link is a
+  position ALONG it, so it needs a parameter on the polyline rather than a second `anchorNode`, and
+  it touches label placement, the leader, collision avoidance and the Text popup.
 
 - 75|495| **[H] REMIND TOM: does an input accept more characters than its width shows?**
   Extracted from Task 491 on close. He believes it does — *"inputs are flexible. You can enter more

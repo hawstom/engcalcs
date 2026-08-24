@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1262,
-        "delta_key_count": 69,
+        "expected_key_count": 1264,
+        "delta_key_count": 71,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -501,6 +501,8 @@
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
+        "lpn_inp_drop_anchor_missing": "This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.",
+        "lpn_import_notes_heading": "From the EPANET file",
         "lpn_file_open_tip": "Open a project file saved from this page.",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
@@ -572,6 +574,8 @@
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
+        "lpn_inp_drop_anchor_missing": "This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.",
+        "lpn_import_notes_heading": "From the EPANET file",
         "lpn_file_open_tip": "Open a project file saved from this page.",
         "lpn_notes_color_term": "Color band boundaries stay the same",
         "lpn_notes_color_def": "Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.",
@@ -1015,6 +1019,38 @@
                     "key": "lpn_profile_from",
                     "value": "မှ",
                     "english": "From"
+                }
+            }
+        },
+        "lpn_inp_drop_anchor_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_units",
+                    "value": "ဤဖိုင်တွင် အမည်ပေးထားသော ရေစီးနှုန်း ယူနစ်ကို ဤစာမျက်နှာက မသိသောကြောင့်၊ ဂဏန်းတိုင်းကို မိနစ်လျှင် ဂါလံ (gpm) အဖြစ် ဖတ်ခဲ့ပါသည်။ အဖြေများကို အသုံးမပြုမီ ဂဏန်းတိုင်းကို စစ်ဆေးပါ။",
+                    "english": "The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_import_notes_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_units",
+                    "value": "ဤဖိုင်တွင် အမည်ပေးထားသော ရေစီးနှုန်း ယူနစ်ကို ဤစာမျက်နှာက မသိသောကြောင့်၊ ဂဏန်းတိုင်းကို မိနစ်လျှင် ဂါလံ (gpm) အဖြစ် ဖတ်ခဲ့ပါသည်။ အဖြေများကို အသုံးမပြုမီ ဂဏန်းတိုင်းကို စစ်ဆေးပါ။",
+                    "english": "The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers."
+                },
+                "next_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
                 }
             }
         },

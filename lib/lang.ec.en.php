@@ -1671,6 +1671,8 @@ $ec_lang['lpn_inp_drop_quality']='Water quality, chemical reaction and pump ener
 $ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
 $ec_lang['lpn_inp_drop_dangling']='These pipes name a junction that is not in the file, so they were left out.';
 $ec_lang['lpn_inp_drop_units']='The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.';
+$ec_lang['lpn_inp_drop_anchor_missing']='This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.';
+$ec_lang['lpn_import_notes_heading']='From the EPANET file';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
 // that is the part a user cannot see for themselves.

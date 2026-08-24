@@ -10790,6 +10790,24 @@ var EngCalcs = EngCalcs || {};
 		// one is this single line and `parsed.mapUnitsRaw`, which still says whether the file was
 		// silent or merely arbitrary. File > Import XY to lat/lon… is the recovery path meanwhile.
 		var geo = parsed.mapUnits === 'degrees';
+		// **WHAT THE FILE SAID ABOUT THIS ONE ELEMENT, KEPT ON THE ELEMENT** (Task 483). The import
+		// report is read once and dismissed; the note is the same fact filed where the user will be
+		// standing when it matters, which is the element's own property popup. Records, not
+		// sentences -- see EngCalcs.lpnInpNotes() for why the English is composed at display time.
+		//
+		// NOTHING THE FILE STATED IS REWRITTEN BY THIS. A note is metadata about a difference that
+		// has already happened; it adds a key the exporter does not write and touches no number.
+		//
+		// TWO MAPS, BECAUSE AN EPANET ID IS UNIQUE ONLY WITHIN ITS OWN KIND: Net3 holds a junction
+		// 123 and a pipe 123, and one map would give each the other's notes.
+		var inpNodeNotes = EngCalcs.lpnInpNotes ? EngCalcs.lpnInpNotes(parsed.dropped, 'node') : {},
+			inpLinkNotes = EngCalcs.lpnInpNotes ? EngCalcs.lpnInpNotes(parsed.dropped, 'link') : {};
+		function withInpNotes(el, notes) {
+			if (notes && notes.length) {
+				el.importNotes = notes.map(function (nt) { return { code: nt.code, detail: nt.detail }; });
+			}
+			return el;
+		}
 		// A flow from the file, in the unit the flow selector is now showing. `parsed.scale.flow`
 		// is m3/s per one of the file's units, so the SI step is the parser's own constant and
 		// this file keeps no second copy of it.
@@ -10803,14 +10821,14 @@ var EngCalcs = EngCalcs || {};
 				// THE FILE'S NUMBER IS A HEAD, so it becomes `_head` and no elevation is invented
 				// for it (Task 390). See the note in js/lpn-inp.js for why the old elevation=head
 				// write was a claim the file never made.
-				return carryInpTokens(n, { id: n.id, type: 'reservoir', x: n.x, y: n.y, _head: n.head }, LPN_INP_TOK_RESERVOIR);
+				return withInpNotes(carryInpTokens(n, { id: n.id, type: 'reservoir', x: n.x, y: n.y, _head: n.head }, LPN_INP_TOK_RESERVOIR), inpNodeNotes[n.id]);
 			}
 			if (n.type === 'tank') {
 				// A tank's four levels and its diameter are ALL in the Elevation/Head unit -- all
 				// vertical distances on the same staff, the diameter included, which is the one that
 				// surprises people. Nothing here is blank-means-follow the way a reservoir's head is:
 				// EPANET states every one, so every one is written.
-				return carryInpTokens(n, {
+				return withInpNotes(carryInpTokens(n, {
 					id: n.id, type: 'tank', x: n.x, y: n.y,
 					elev: n.elev,
 					// _level is scenario-overridable (leading underscore, read through effective())
@@ -10821,7 +10839,7 @@ var EngCalcs = EngCalcs || {};
 					minLevel: n.minLevel,
 					maxLevel: n.maxLevel,
 					tankDiameter: n.diameter
-				}, LPN_INP_TOK_TANK);
+				}, LPN_INP_TOK_TANK), inpNodeNotes[n.id]);
 			}
 			var j = {
 				id: n.id, type: 'junction', x: n.x, y: n.y,
@@ -10838,7 +10856,7 @@ var EngCalcs = EngCalcs || {};
 			// the junction here would put a name the file never wrote at this row into a field
 			// labelled as the file's.
 			if (n.demandPattern) { j.demandPattern = n.demandPattern; }
-			return carryInpTokens(n, j, LPN_INP_TOK_JUNCTION);
+			return withInpNotes(carryInpTokens(n, j, LPN_INP_TOK_JUNCTION), inpNodeNotes[n.id]);
 		});
 		var links = parsed.links.map(function (l) {
 			var out = {
@@ -10879,7 +10897,7 @@ var EngCalcs = EngCalcs || {};
 				// solver handoff, so an imported pump carries exactly what the file stated and
 				// nothing of ours.
 			}
-			return carryInpTokens(l, out, LPN_INP_TOK_LINK);
+			return withInpNotes(carryInpTokens(l, out, LPN_INP_TOK_LINK), inpLinkNotes[l.id]);
 		});
 		var nodeAt = {};
 		nodes.forEach(function (n) { nodeAt[n.id] = n; });
@@ -10905,7 +10923,7 @@ var EngCalcs = EngCalcs || {};
 			// An ANCHORED label stores an offset, so the file's text no longer states the number
 			// this record holds and carryInpTokens refuses it without being told. A free label
 			// stores the file's own point and keeps it.
-			return carryInpTokens(lb, {
+			return withInpNotes(carryInpTokens(lb, {
 				id: mintTextId(), _text: lb.text,
 				x: an ? lb.x - an.x : lb.x,
 				y: an ? lb.y - an.y : lb.y,
@@ -10915,7 +10933,7 @@ var EngCalcs = EngCalcs || {};
 				// the coordinate above is stored exactly as the file wrote it (Task 332). Not an
 				// "imported" flag: it is an alignment, and Task 342 makes it a user control.
 				align: 'left', valign: 'top'
-			}, LPN_INP_TOK_POINT);
+			}, LPN_INP_TOK_POINT), lb.notes);
 		});
 		// nextId must clear every id the file brought, or the next element drawn would collide with
 		// one. Only ids shaped like this page's own (prefix + number) can collide, so only those are
@@ -11018,6 +11036,9 @@ var EngCalcs = EngCalcs || {};
 			case 'energy': return pc.lpn_inp_drop_quality || 'Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.';
 			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain it. Add the picture yourself with Map, Backdrop.';
 			case 'dangling-link': return pc.lpn_inp_drop_dangling || 'These pipes name a junction that is not in the file, so they were left out.';
+			// OUR VOCABULARY, NOT EPANET'S: what EPANET calls a Label is our Text object, so the
+			// sentence names the Text and never the other word.
+			case 'label-anchor-missing': return pc.lpn_inp_drop_anchor_missing || 'This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.';
 			case 'unknown-flow-units': return pc.lpn_inp_drop_units || 'This file names a flow unit that EPANET does not have. All ten of the flow units EPANET uses are read exactly as the file writes them; this one could not be, so the file was read as gallons per minute. Check every number before you use the answers.';
 			default: return code;
 		}
@@ -18192,6 +18213,38 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
+	// ---- what the import could not keep about THIS element (ROADMAP Task 483) ----
+	//
+	// The last block in every property popup, and only for an element that has one. Read-only and
+	// deliberately plain: it is a record of something that already happened on the way in, not a
+	// field. Deleting the note would be deleting the only surviving statement of the difference, so
+	// there is no control to clear it -- it goes when the element does.
+	//
+	// **THE SENTENCE IS COMPOSED HERE, from the same inpDropText() the import report uses.** The
+	// document stores `{code, detail}` records, so a project imported in one language reads in
+	// whatever language its reader is using, and the popup and the report can never drift apart.
+	function importNotesField(fields, el) {
+		var pc = EngCalcs.pageConfig || {}, notes = el && el.importNotes;
+		if (!notes || !notes.length) { return; }
+		var head = document.createElement('div');
+		head.style.marginTop = '8px';
+		head.style.fontWeight = 'bold';
+		head.textContent = pc.lpn_import_notes_heading || 'From the EPANET file';
+		fields.appendChild(head);
+		var ul = document.createElement('ul');
+		ul.style.margin = '2px 0 0';
+		ul.style.paddingLeft = '18px';
+		notes.forEach(function (nt) {
+			var li = document.createElement('li');
+			// The detail is the file's own word for it -- a pattern name, a curve name, the anchor
+			// that was missing -- so it is shown verbatim in brackets rather than folded into the
+			// sentence, which no language can be composed into from fragments.
+			li.textContent = inpDropText(nt.code) +
+				(nt.detail === null || nt.detail === undefined || nt.detail === '' ? '' : ' (' + nt.detail + ')');
+			ul.appendChild(li);
+		});
+		fields.appendChild(ul);
+	}
 	// SI value -> current display unit, read-only. Used for solve results: the property popups
 	// are the canonical results location (Tom, 2026-07-30) -- the map labels and the asset tables
 	// are presentation layers over this same computed data, not a separate source of truth.
@@ -18656,6 +18709,7 @@ var EngCalcs = EngCalcs || {};
 		activeField(fields, n);
 		pushHereButton(fields, n);
 		coordFields(fields, outwardX(n.x), outwardY(n.y));
+		importNotesField(fields, n);
 		tipsIn(fields);
 	}
 	function openPopup(nodeId, sx, sy) {
@@ -18835,6 +18889,7 @@ var EngCalcs = EngCalcs || {};
 					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip);
 			}
 		}
+		importNotesField(fields, l);
 		tipsIn(fields);
 	}
 	// THE VALVE POPUP. Its shape changes with the type, and that is the point rather than an
@@ -19125,6 +19180,7 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(flipBtn);
 		fields.appendChild(document.createElement('br'));
 		coordFields(fields, outwardX(an ? an.x + lb.x : lb.x), outwardY(an ? an.y + lb.y : lb.y));
+		importNotesField(fields, lb);
 		tipsIn(fields);
 	}
 	function openLabelPopup(labelId, sx, sy) {
