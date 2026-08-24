@@ -1318,6 +1318,14 @@ EngCalcs.pageConfig = {
 	lpn_geosearch_cookie: <?=json_encode(EC_GEOSEARCH_COOKIE)?>,
 	lpn_geosearch_version: <?=json_encode(EC_GEOSEARCH_VERSION)?>,
 	lpn_geosearch_days: <?=json_encode(EC_GEOSEARCH_DAYS)?>,
+	<?php // THE TERRAIN LOOKUP'S CONSENT RECORD (Task 497), on the same footing and for the same
+	      // reasons: not language keys, just the name/version/lifetime of the cookie
+	      // js/lpn-terrain.js writes on a yes, so lib/config.inc.php stays the one place they are
+	      // decided. Every visitor-FACING string that feature shows is an English literal inside
+	      // js/lpn-terrain.js until lib/lang.ec.en.php gains its keys. ?>
+	lpn_terrain_cookie: <?=json_encode(EC_TERRAIN_COOKIE)?>,
+	lpn_terrain_version: <?=json_encode(EC_TERRAIN_VERSION)?>,
+	lpn_terrain_days: <?=json_encode(EC_TERRAIN_DAYS)?>,
 	lpn_menu_settings: <?=json_encode($ec_lang['lpn_menu_settings'])?>,
 	lpn_menu_project: <?=json_encode($ec_lang['lpn_menu_project'])?>,
 	lpn_menu_project_tip: <?=json_encode($ec_lang['lpn_menu_project_tip'])?>,
@@ -1617,6 +1625,11 @@ EngCalcs.pageConfig = {
       // is under, and with the same silent failure if it is broken: the View row simply never
       // appears. ?>
 <script src="/engcalcs/js/lpn-search.js?v=<?=filemtime(__DIR__.'/js/lpn-search.js')?>"></script>
+<?php // Elevations from the land surface, and its own consent gate (ROADMAP Task 497). BEFORE
+      // looped-network.js, which calls EngCalcs.lpnTerrainInit() at script scope -- same ordering
+      // rule as lpn-search.js above, same silent failure if it is broken: the View row simply
+      // never appears. ?>
+<script src="/engcalcs/js/lpn-terrain.js?v=<?=filemtime(__DIR__.'/js/lpn-terrain.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

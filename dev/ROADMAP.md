@@ -303,24 +303,6 @@ the block.
   - **EPANET has no such concept**, so an `.inp` export flattens it and an import can never rebuild it,
     which breaks Task 281's byte-identical round trip for anything typed. Task 390-sized.
 
-- 75|497| **Automatic elevations for a lat/lon project, from a terrain source.**
-  Tom asked 2026-08-23 whether this is on the roadmap and where the data would come from. It was
-  not; this is the entry. A geographic project knows every node's latitude and longitude, and
-  elevation is the one input a designer otherwise types by hand for every junction.
-  - **Mapbox Terrain-RGB is the strongest fit and the reason is that it is already paid for.**
-    `EC_MAPBOX_TOKEN` already gates satellite tiles, terrain is delivered as ordinary raster tiles,
-    and the elevation decodes client-side from the pixel — no server of ours, no new account, and
-    the same tile plumbing `project.basemap` already has. Alternatives if that gate is ever absent:
-    USGS 3DEP (US only, ~10 m, no key), Copernicus GLO-30 or SRTM through OpenTopoData
-    (self-hostable), Open-Elevation (free, rate-limited). Google's Elevation API is paid and keyed.
-  - **IT NEEDS ITS OWN CONSENT GATE, not the tile one.** A tile says where you are LOOKING; an
-    elevation query says where your NODES ARE, which is the model itself. That is the `ec_geosearch`
-    argument exactly, and the search got its own gate for it.
-  - **It WRITES numbers into the document, which is the hard constraint.** Only the user touches a
-    file's numbers. So it has to be an explicit action that FILLS a field the way typing does —
-    never a background sweep, never overwriting an elevation somebody typed, and undoable in one
-    step. Accuracy must be stated: 30 m ground resolution is a contour interval, not a survey.
-
 - 25|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
   Tom, 2026-08-23: epanet-js runs one at `roadmap.epanetjs.com`, powered by Canny. Noted as an
   example to weigh, not a decision. The thing to weigh is that `dev/ROADMAP.md` is written for us and

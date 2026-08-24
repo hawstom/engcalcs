@@ -181,15 +181,23 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   `EngCalcs.lpnIsFixedHead` is the one place that equivalence is declared. A tank diameter is in the
   LENGTH unit while a pipe diameter is in millimetres; only `dev/lpn-spike/tank-harness.js` asserts
   that, because no solve ever reads it.
-- **A geographic project draws raster tiles behind it** — OpenStreetMap for the street map, Mapbox
-  for satellite (gated on `EC_MAPBOX_TOKEN`; absent means no satellite option). Never cached by us,
-  never in the service worker's manifest, attribution required on the map and one credit set per
-  source. It is `project.basemap`, never `backdrop.href`, and an `.inp` exporter must skip it.
-- **THE SUITE MAKES THREE THIRD-PARTY REQUESTS, ALL ON THIS PAGE, ALL OPT-IN:** OSM tiles, Mapbox
-  satellite tiles, and Nominatim place-name search (`js/lpn-search.js`). **The search is the sensitive
-  one and has its own consent gate** (`ec_geosearch`), separate from the analytics one, because a tile
-  says where you are LOOKING and a search says what you TYPED. Do not write "the only third-party
-  request" anywhere; it has been false since the geocoder shipped.
+- **A geographic project draws raster tiles behind it, and can read ELEVATIONS from the same
+  account** (Task 497, `js/lpn-terrain.js`) — OpenStreetMap for the street map, Mapbox for satellite
+  and for Terrain-RGB (all gated on `EC_MAPBOX_TOKEN`; absent means neither option exists). The
+  tiles are never cached by us, never in the service worker's manifest, attribution required on the
+  map and one credit set per source. It is `project.basemap`, never `backdrop.href`, and an `.inp`
+  exporter must skip it. The elevation fill is a View-menu row that TYPES numbers into the document,
+  so it never overwrites an elevation without naming the number it would replace, it is one undo
+  snapshot, and it states its ~30 m accuracy in the interface, not in a comment.
+- **THE SUITE MAKES FOUR THIRD-PARTY REQUESTS, ALL ON THIS PAGE, ALL OPT-IN:** OSM tiles, Mapbox
+  satellite tiles, Nominatim place-name search (`js/lpn-search.js`), and Mapbox Terrain-RGB elevation
+  lookup (`js/lpn-terrain.js`, Task 497). **The last two are the sensitive ones and each has its own
+  consent gate** — `ec_geosearch` and `ec_terrain`, separate from the analytics one and from each
+  other, because a tile says where you are LOOKING, a search says what you TYPED, and a node
+  coordinate says where your NETWORK IS. Do not write "the only third-party request" anywhere; it has
+  been false since the geocoder shipped. **Adding one does NOT touch `consent_body`** — that banner
+  asks about one analytics digit and says nothing about third-party requests; each feature asks its
+  own question, so a fifth service is a new paragraph in `privacy.php`, not a version bump.
   The display is still unprojected; the tiles are placed per-tile in lon/lat so they register anyway.
   `dev/geographic-projects.md`.
 - **Reads AND WRITES EPANET `.inp` files** (`js/lpn-inp.js` — one file, so one opinion about the

@@ -6221,6 +6221,97 @@ var EngCalcs = EngCalcs || {};
 		applyView({ cx: inwardX(ll.lon), cy: inwardY(ll.lat), s: Math.max(state.s, Math.min(want, maxScale())) });
 		georefDetachTick();
 	}
+
+	// ---- Task 497: elevations read from the land surface ------------------------------------------
+	//
+	// **THE DOCUMENT SIDE OF js/lpn-terrain.js, AND DELIBERATELY THE WHOLE OF IT.** That file knows
+	// the tile scheme, the decode, the consent gate and every string; it has never seen a node. This
+	// is where the document, its units and its undo stack live, so this is where a number is written.
+	//
+	// **A NODE THAT ALREADY HAS AN ELEVATION IS NOT IN THE LIST AND IS NOT IN THE WRITE.** The test
+	// is made twice on purpose -- once to build the request, once at the moment of writing -- because
+	// between the two a person may have typed one, and only the user touches a file's numbers.
+	function terrainHasElev(n) { return typeof n.elev === 'number' && isFinite(n.elev); }
+	function terrainNodesNeedingElevation() {
+		if (!isGeoProject()) { return []; }
+		var out = [];
+		doc.nodes.forEach(function (n) {
+			if (terrainHasElev(n)) { return; }
+			// OUTWARD, because doc coordinates are local to doc.origin and Y-down (Task 354), and
+			// what a terrain server needs is a place on the Earth. A geographic project's outward
+			// x/y ARE longitude and latitude.
+			out.push({ id: n.id, lon: outwardX(n.x), lat: outwardY(n.y) });
+		});
+		return out;
+	}
+	function terrainNodesWithElevation() {
+		var c = 0;
+		doc.nodes.forEach(function (n) { if (terrainHasElev(n)) { c++; } });
+		return c;
+	}
+	/**
+	 * **THE NODES STILL SITTING ON THE STARTING ELEVATION, and why they are a SEPARATE question.**
+	 *
+	 * addNode() gives every new node `settings.defaults.nodeElev`, which is 0 -- so a network just
+	 * drawn on a map has no blank elevations at all, only zeros nobody typed. Filling those silently
+	 * would be exactly the rule this feature is built around breaking; refusing to fill them would
+	 * make the feature useless for the commonest case there is.
+	 *
+	 * So they are offered, in their own question, with the number named in it, and only when there
+	 * are no genuinely blank ones left to do first. **We cannot tell a seeded 0 from a typed 0**, and
+	 * rather than guess we say which number we are about to replace and let the person decide. One
+	 * Ctrl-Z puts it back either way.
+	 */
+	function terrainNodesAtDefaultElevation() {
+		var d = settings.defaults.nodeElev, out = [];
+		if (!isGeoProject() || typeof d !== 'number' || !isFinite(d)) { return { value: d, points: out }; }
+		doc.nodes.forEach(function (n) {
+			if (n.elev !== d) { return; }
+			out.push({ id: n.id, lon: outwardX(n.x), lat: outwardY(n.y) });
+		});
+		return { value: d, points: out };
+	}
+	/**
+	 * The batch write. Metres in, the project's own elevation unit out, and ONE undo snapshot in
+	 * front of the lot -- twenty nodes filled is one Ctrl-Z, because it was one command.
+	 *
+	 * The conversion is the RESULTS direction, not a third input-conversion site: these metres come
+	 * from outside the document exactly as a solved head does, and what lands in the field is the
+	 * number a person would have typed, in the unit the strip is showing.
+	 *
+	 * `elev` is survey data and is deliberately NOT in LPN_OVERRIDABLE (see the property popup's own
+	 * note), so this is a plain element write and carries no scenario override.
+	 *
+	 * `replaceValue` is the ONE value a node is allowed to already hold and still be written -- the
+	 * starting elevation the user answered a separate question about (see
+	 * terrainNodesAtDefaultElevation). Omitted, nothing that holds a number is touched at all. It is
+	 * a parameter rather than a flag inside the loop so that the permission travels with the call
+	 * that was confirmed, and cannot be left switched on for the next one.
+	 */
+	function terrainFillElevations(list, replaceValue) {
+		var mayReplace = (typeof replaceValue === 'number' && isFinite(replaceValue));
+		var pending = [];
+		(list || []).forEach(function (e) {
+			var n = nodeById(e.id);
+			if (!n) { return; }
+			if (terrainHasElev(n) && !(mayReplace && n.elev === replaceValue)) { return; }
+			if (typeof e.meters !== 'number' || !isFinite(e.meters)) { return; }
+			// Two decimals in the displayed unit. The raster's own quantum is 0.1 m, so more digits
+			// would be a precision the data does not have, and a person reading 143.7 ft can see at
+			// a glance that it is a contour reading rather than a survey mark.
+			var v = +toDisplay(e.meters, 'lpn_u_elevhead').toFixed(2);
+			if (!isFinite(v)) { return; }
+			pending.push({ n: n, v: v });
+		});
+		if (!pending.length) { return 0; }
+		saveUndoSnapshot();
+		pending.forEach(function (p) { p.n.elev = p.v; });
+		buildDom();
+		refreshPopupIfOpen();
+		scheduleSolve();
+		return pending.length;
+	}
+
 	// The default is the one Tom named: 3000 ft or 1000 m, whichever the project's own length unit
 	// is. It is a SITE, and it is a round number in the unit the user is already reading.
 	function georefDefaultSpan() {
@@ -10338,6 +10429,8 @@ var EngCalcs = EngCalcs || {};
 		try { if (EngCalcs.expireCookie) { EngCalcs.expireCookie(); } } catch (err) { /* non-fatal */ }
 		// AND THE PLACE-NAME SEARCH'S OWN CONSENT (Task 437), which is a setting by any reading.
 		if (EngCalcs.lpnSearchForget) { EngCalcs.lpnSearchForget(); }
+		// AND THE TERRAIN LOOKUP'S OWN CONSENT (Task 497), for exactly the same reason.
+		if (EngCalcs.lpnTerrainForget) { EngCalcs.lpnTerrainForget(); }
 	}
 	// The whole-page reset, behind one confirm. Extracted from the Settings button's inline handler
 	// (Task 211) so the Settings MENU can offer the same act -- one implementation, two doors, which
@@ -14219,6 +14312,21 @@ var EngCalcs = EngCalcs || {};
 					: (pc.lpn_basemap_satellite_show || 'Show satellite images'),
 				tip: pc.lpn_basemap_satellite_tip,
 				fn: function () { setBasemapStyle('satellite'); }
+			},
+			// **ELEVATIONS FROM THE LAND SURFACE** (Task 497). Hidden outside a geographic project
+			// for the same reason the rows above it are -- a grid project's x/y are canvas units
+			// with no place on the Earth -- and hidden without a Mapbox token for the same reason
+			// the satellite row is: a row that fetches a 401 and fills nothing in is worse than no
+			// row, because the user cannot tell our missing account from their missing internet.
+			// It writes numbers into the document, so it is a row you press, never a sweep; the
+			// consent gate, the counts, the accuracy sentence and the undo promise are all in
+			// js/lpn-terrain.js.
+			{
+				hidden: !isGeoProject() || !satelliteAvailable() || !EngCalcs.lpnTerrainFill,
+				icon: 'globe',
+				label: EngCalcs.lpnTerrainMenuLabel && EngCalcs.lpnTerrainMenuLabel(),
+				tip: EngCalcs.lpnTerrainMenuTip && EngCalcs.lpnTerrainMenuTip(),
+				fn: function () { EngCalcs.lpnTerrainFill(); }
 			}
 		]);
 	}
@@ -21391,6 +21499,20 @@ var EngCalcs = EngCalcs || {};
 	// usage-policy budget, its own consent gate and every string in them live in that file.
 	if (EngCalcs.lpnSearchInit) {
 		EngCalcs.lpnSearchInit({ isGeo: isGeoProject, goTo: goToPoint, notice: setNotice });
+	}
+	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). Six functions: what a geographic project
+	// is, the token that decides whether the feature exists at all, which nodes have no elevation,
+	// how many already have one, how to write a batch of them under one undo, and where to speak.
+	// The tile scheme, the Terrain-RGB decode, the request budget, the consent gate and every
+	// string live in that file.
+	if (EngCalcs.lpnTerrainInit) {
+		EngCalcs.lpnTerrainInit({
+			isGeo: isGeoProject, token: mapboxToken, notice: setNotice,
+			nodesNeedingElevation: terrainNodesNeedingElevation,
+			nodesWithElevation: terrainNodesWithElevation,
+			nodesAtDefaultElevation: terrainNodesAtDefaultElevation,
+			fill: terrainFillElevations
+		});
 	}
 
 	// Debounced, not run synchronously on every call site: a node drag alone calls updateNode()

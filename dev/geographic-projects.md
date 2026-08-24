@@ -117,3 +117,40 @@ Neither the tiles nor the geodesic length needs the seam. What the seam buys is 
 — a city that looks like its own map rather than 27% wide — and it should be its own task, done
 after the `.inp` round trip has settled, with a `drawPos()` write seam and a call-site count guard of
 the same shape as `dev/lpn-spike/local-origin-harness.js`.
+
+## 7. Elevations from the land surface (Task 497)
+
+A geographic project knows where every node is, so the one number a designer otherwise types by
+hand — junction by junction, off a contour map — can be read instead. **It is a View-menu row you
+press, never a sweep**, and `js/lpn-terrain.js` holds the whole of it.
+
+- **Mapbox Terrain-RGB, because it is already paid for.** `EC_MAPBOX_TOKEN` already gates satellite;
+  terrain is ordinary raster tiles on the same host through the same account, and the height decodes
+  client-side from the pixel: `-10000 + ((R·65536 + G·256 + B) · 0.1)` metres. No server of ours and
+  no second account. **No token, no row** — the same state a fork is in for satellite. If that gate
+  is ever absent the alternatives are USGS 3DEP (US only), Copernicus GLO-30 or SRTM through
+  OpenTopoData, and Open-Elevation.
+- **It writes numbers into the document, so it obeys the rule that governs that.** It fills a field
+  the way typing does; it never overwrites an elevation without naming the exact number it would
+  replace; and the whole batch is ONE undo snapshot, so one Ctrl-Z puts all of it back.
+- **The starting elevation is a SEPARATE question, and that is the one judgement call here.**
+  `addNode()` seeds every node with `settings.defaults.nodeElev`, which is 0 — so a freshly drawn
+  network has no blank elevations at all, only a number nobody typed. We cannot tell a seeded 0 from
+  a typed 0, so those are offered only once nothing is blank, in a confirm that names the number.
+  Guessing either way would be worse: filling them silently breaks the rule, refusing them makes the
+  feature useless for the commonest case there is.
+- **Its own consent gate, `ec_terrain`, and not the tiles'.** A tile says where you are LOOKING; a
+  node coordinate says where your NETWORK IS, which is the model itself. Same argument as
+  `ec_geosearch`, same shape of record, only a yes ever stored. `dev/cookie-storage-inventory.md`.
+- **The accuracy is stated in the interface, three times on the path a person walks** — the menu
+  tip, the confirm that runs the fill, and the notice afterwards. One sentence, written once in
+  `accuracy()`. 30 m of ground resolution is a contour interval, not a survey, and a number that
+  arrives by itself is trusted more than one that was typed.
+- **Budget:** one request per TILE, not per node — forty nodes on a site is one or two requests. The
+  zoom steps DOWN from 14 to meet a 24-tile budget rather than the extent being clipped (the
+  basemap's own policy), stops at 10 so the accuracy sentence stays true, and past 200 tiles the
+  command refuses in words. Nothing is cached on the device: what would be cached is a list of
+  places the visitor's own network stands.
+- `dev/lpn-spike/terrain-harness.js` drives the real page. Its tile stub returns BYTES encoded by
+  Mapbox's own formula from an independent inverse Mercator, so the tile arithmetic, the pixel
+  index and the decode are all still under test.

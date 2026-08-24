@@ -136,6 +136,12 @@ its last activity.</p>
 		<td>No &mdash; its only job is to honour a yes you gave in order to use that search</td>
 	</tr>
 	<tr>
+		<td><code>ec_terrain</code></td>
+		<td>Your permission to send the position of your network&rsquo;s nodes to Mapbox to read the ground elevation there, and when you gave it. Only a yes is ever stored; a no is not stored at all</td>
+		<td>1 year</td>
+		<td>No &mdash; its only job is to honour a yes you gave in order to use that feature</td>
+	</tr>
+	<tr>
 		<td><code>ec_blang</code></td>
 		<td>The single digit <code>1</code>, meaning we have already recorded which language your browser asks for, so we do not record it again</td>
 		<td>1 year</td>
@@ -182,10 +188,10 @@ delivery network, no hosted font, no advertising tag and no embedded video. Noth
 calculator&rsquo;s input boxes is ever sent anywhere. The one thing you can type that leaves your
 browser is a place-name search on the map, which is described below and which asks you first.</p>
 
-<p><strong>Three features reach outside this site, all of them on one page, and every one of them
+<p><strong>Four features reach outside this site, all of them on one page, and every one of them
 asks you first.</strong> The rule matters more than the list: nothing goes to anybody else until you
 switch that particular feature on, and each one asks separately, because they do not tell the same
-thing about you. All three belong to the Looped Pipe Network calculator, and every other page in the
+thing about you. All four belong to the Looped Pipe Network calculator, and every other page in the
 suite makes none of them.</p>
 
 <p><strong>1 and 2. The map behind your network.</strong> That calculator can draw a map behind your
@@ -211,12 +217,24 @@ riding on the answer you gave about the map, and why your yes is remembered in i
 <code>ec_geosearch</code> cookie. Say no and everything else on that page keeps working exactly as
 it did, including going to a latitude and longitude you type yourself.</p>
 
+<p><strong>4. Filling in elevations from the land surface, which also has its own separate
+question.</strong> On that same map you can ask us to fill in the ground elevation of the nodes that
+have none, instead of typing each one by hand. To do that, the latitude and longitude of each of
+those nodes goes to <a href="https://www.mapbox.com/" target="_blank" rel="noopener">Mapbox</a>,
+with your IP address, and the height of the land there comes back. That is a different thing to
+disclose from the map pictures above: the pictures say where you are <em>looking</em>, and these
+coordinates are <em>your network itself</em>. So it asks on its own, it never sends anything until
+you press it, and your yes is remembered in its own <code>ec_terrain</code> cookie. We send nothing
+else &mdash; not your project&rsquo;s name, not its pipes, not one other number in it &mdash; and we
+keep no record of it. Say no and everything else on that page keeps working exactly as it did, and
+you can type elevations in yourself as before.</p>
+
 <p>What each company then does with the request is governed by its own privacy policy:
 <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener">OpenStreetMap&rsquo;s</a>
 for the street map and the place-name search, and
 <a href="https://www.mapbox.com/legal/privacy" target="_blank" rel="noopener">Mapbox&rsquo;s</a> for
-the satellite images. If a fourth such feature is ever added, it will ask you in the same way,
-before it sends anything.</p>
+the satellite images and the land elevations. If a fifth such feature is ever added, it will ask you
+in the same way, before it sends anything.</p>
 
 <h2>Where it goes</h2>
 

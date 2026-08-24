@@ -576,6 +576,29 @@ define('LPN_LOCK_DIR', dirname(__DIR__) . '/lpn-locks');
  * because a row that fetches a 401 per tile leaves a user unable to tell our missing account from
  * their missing internet. That is what a fork of this suite gets. */
 define('EC_MAPBOX_TOKEN', 'pk.eyJ1IjoiaGF3c3RvbSIsImEiOiJjbXQweWhyNnkwYjIzMnpvYmo1bTdteHo1In0.d2sf5oNs0dJzXl96rAmryA');
+
+/* **THE TERRAIN LOOKUP'S OWN CONSENT RECORD (ROADMAP Task 497).** The name, the version and the
+ * lifetime of the cookie js/lpn-terrain.js writes when a visitor says yes to reading ground
+ * elevations from Mapbox Terrain-RGB. Same three-part "<state>.<unix-ts>.<policy-version>" shape as
+ * ec_consent and ec_geosearch, and **`1` is the only state that exists** -- a refusal writes nothing
+ * at all.
+ *
+ * **WHY IT IS A THIRD RECORD AND NOT THE BANNER'S.** ec_consent asks about one analytics digit;
+ * ec_geosearch asks about sending what the visitor TYPED to a geocoder; this asks about sending
+ * where their NODES ARE, which is the model itself. Three purposes, three questions, each asked at
+ * the moment it first matters. Folding any of them together would make one sentence describe two
+ * unrelated purposes and force an EC_CONSENT_VERSION bump that re-asks every visitor about
+ * analytics they have already answered.
+ *
+ * EC_TERRAIN_VERSION is separate from both other versions on purpose: changing WHAT we send, or WHO
+ * we send it to, must re-ask exactly the people who said yes to the old ask and nobody else.
+ *
+ * These three sit here beside EC_MAPBOX_TOKEN rather than in lib/Consent.lib.php with the
+ * ec_geosearch trio because the token is what decides whether this feature exists at all; a fork
+ * with no token has no terrain row and never writes this cookie. */
+define('EC_TERRAIN_COOKIE', 'ec_terrain');
+define('EC_TERRAIN_VERSION', '1');
+define('EC_TERRAIN_DAYS', 365); // one year, the house default
 // Housekeeping, since the honor-system design deliberately never auto-expires a LOCK. This expires
 // the on-disk RECORD long after any plausible session, purely so abandoned projects don't leak
 // files forever. 30 days is far past a working day; it can never end a live edit.
