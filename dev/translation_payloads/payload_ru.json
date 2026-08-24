@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 1274,
-        "delta_key_count": 79,
+        "expected_key_count": 1277,
+        "delta_key_count": 85,
         "exempt_key_count": 19,
         "exempt_keys": [
             "calc_units_us",
@@ -471,6 +471,12 @@
     },
     "keys_to_translate": {
         "calc_set_units_tip": "Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
+        "lpn_units_warn_lead": "{unit} is the unit of what you enter for:",
+        "lpn_units_options_head": "Options for units change:",
+        "lpn_units_nondestructive": "Non-destructive",
+        "lpn_units_nondestructive_desc": "Non-destructive: leaves every input as it is and reinterprets it in the new unit.",
+        "lpn_units_destructive": "Destructive",
+        "lpn_units_destructive_desc": "Destructive: rewrites every input with a mathematical conversion, so the network stays physically close to the same, within conversion tolerances. It loses the original inputs. Undo puts them back.",
         "lpn_basemap_satellite_show": "Show satellite images",
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
@@ -552,6 +558,12 @@
     },
     "keys": {
         "calc_set_units_tip": "Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
+        "lpn_units_warn_lead": "{unit} is the unit of what you enter for:",
+        "lpn_units_options_head": "Options for units change:",
+        "lpn_units_nondestructive": "Non-destructive",
+        "lpn_units_nondestructive_desc": "Non-destructive: leaves every input as it is and reinterprets it in the new unit.",
+        "lpn_units_destructive": "Destructive",
+        "lpn_units_destructive_desc": "Destructive: rewrites every input with a mathematical conversion, so the network stays physically close to the same, within conversion tolerances. It loses the original inputs. Undo puts them back.",
         "lpn_basemap_satellite_show": "Show satellite images",
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
@@ -645,6 +657,102 @@
                     "key": "calc_defaults",
                     "value": "Восстановить значения по умолчанию",
                     "english": "Restore defaults"
+                }
+            }
+        },
+        "lpn_units_warn_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Эта единица измерения определяет, что означают ваши числа",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "Теперь {n} значений означают {unit}. Ничего не было переписано.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_options_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Эта единица измерения определяет, что означают ваши числа",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "Теперь {n} значений означают {unit}. Ничего не было переписано.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_nondestructive": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Эта единица измерения определяет, что означают ваши числа",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "Теперь {n} значений означают {unit}. Ничего не было переписано.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_nondestructive_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Эта единица измерения определяет, что означают ваши числа",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "Теперь {n} значений означают {unit}. Ничего не было переписано.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_destructive": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Эта единица измерения определяет, что означают ваши числа",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "Теперь {n} значений означают {unit}. Ничего не было переписано.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_destructive_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Эта единица измерения определяет, что означают ваши числа",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "Теперь {n} значений означают {unit}. Ничего не было переписано.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
                 }
             }
         },

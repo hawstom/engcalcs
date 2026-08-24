@@ -2019,6 +2019,13 @@ html:has(#lpn_canvas) { overflow: hidden; }
 .lpn-lib-sec { margin: 0; }
 .lpn-lib-sec > h3 { margin: 0 0 4px; padding: 0 0 4px; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid #ccc; }
 
+/* THE FIELDS AN INPUT UNIT DECIDES, ONE PER LINE (ROADMAP Task 425). Tom asked for a column rather
+   than a comma list, and the reason is what the reader is doing with it: scanning for whether their
+   own quantity is in the set, which is a column-reading job. Indented so the names read as items of
+   the line above them rather than as more of the sentence. No bullets -- a marker per line would
+   add three glyphs and no meaning to a list of five. */
+.lpn-unit-fields { margin: 0.15em 0 0.7em 1.4em; }
+
 /* Print preparation: the Printable version button. */
 .engcalcs-print-tools > p { margin-bottom: 0.2em; }
 

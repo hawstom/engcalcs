@@ -21,7 +21,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 408 — Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.
-- Task 425 — The unit-change dialog for an lpn project that already has content.
 - Task 433 — Profile: the last piece is the path CHOOSER.
 - Task 477 — New blank project startup wizard: xy/lat-lon, units, head loss.
 - Task 479 — LibreWaterNet.org needs a landing page, and this account needs a hosting decision.
@@ -29,6 +28,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 499.01 — Create a Scenarios menu icon
 - Task 499.02 — Add a tip to the lpn Project menu
 - Task 502 — A Text object anchored to a LINK, not only to a node.
+- Task 503 — AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry
 
 ## 50 — Someday (4)
 
