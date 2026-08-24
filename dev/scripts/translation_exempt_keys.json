@@ -24,6 +24,21 @@
   "below even carry the tag. An explicit list is the honest mechanism."
  ],
  "exempt": {
+  "lpn_color_mode_manual": {
+   "category": "cognate",
+   "languages": ["es", "pt", "ro", "id"],
+   "reason": "Manual -- the colour-band mode where the reader sets the breaks. Four independent sprint-459 agents landed on the identical word; it is the ordinary term in each of these languages for this sense, not an untranslated string."
+  },
+  "mi_notes_3_term": {
+   "category": "cognate",
+   "languages": ["es", "pt"],
+   "reason": "Errata -- the Latin plural, borrowed unchanged. Not listed for fr, whose agent chose the singular Erratum on the ground that the note covers one erratum; that is a better rendering than an exemption, and the array form is what keeps it visible if another language ever lands here by accident."
+  },
+  "lpn_pane_tab_tanks": {
+   "category": "cognate",
+   "languages": ["de"],
+   "reason": "Tanks -- German uses Tank/Tanks for this, and the same file already says Tank in lpn_mode_add_tank. Coincidental identity in the plural only."
+  },
   "bpn_id": {
    "category": "symbol",
    "languages": "*",

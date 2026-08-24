@@ -376,7 +376,20 @@
 		}
 		s += '\n\n' + accuracy();
 		s += '\n\n' + t('lpn_terrain_undo', 'One Undo (Ctrl-Z) puts every one of them back.');
-		s += '\n\n' + tileCount + ' ' + t('lpn_terrain_requests', 'request(s) to api.mapbox.com.');
+		// **THE COUNT IS SUBSTITUTED, NOT CONCATENATED** -- Turkish filed this against sprint 459's
+		// English and was right: `count + ' ' + string` fixes the number to the FRONT of the sentence,
+		// and Turkish grammar wants it after the noun phrase. CLAUDE.md forbids composing a
+		// visitor-facing sentence from fragments at render time for exactly this reason.
+		//
+		// The concatenation survives as the FALLBACK, and that is deliberate rather than lazy: the
+		// languages translated before the English grew its `{n}` hold a fragment with no placeholder,
+		// and substituting into those would silently drop the count. A value carrying `{n}` decides
+		// where the number goes; one without it gets the old sentence, unchanged. The branch retires
+		// itself the day every language has resynced.
+		var req = t('lpn_terrain_requests', '{n} request(s) to api.mapbox.com.');
+		s += '\n\n' + (req.indexOf('{n}') >= 0
+			? req.replace(/\{n\}/g, tileCount)
+			: tileCount + ' ' + req);
 		return s;
 	}
 

@@ -148,6 +148,54 @@
       ],
       "disposition": "intent",
       "resolution": "RULED AND APPLIED 2026-08-24. Tom: \"there is a tip on Profile menu and Profile tab, identical. In other words, these are real strings. And these _syns are really needed. Are they simply keyed wrong? I guess 1. My mistake.\" -- which is the written permission $ec_lang_syn requires, and it also settles the confusion: lpn_profile_tip and lpn_profile_title ARE rendered (the menu row and the pane tab share one tip); it was only the _syn twins that nothing displayed. Both moved verbatim into $ec_lang_syn beside the keys they describe, and the two orphan $ec_lang keys deleted. No sprint now pays to translate a string nobody sees, and the synonyms reach translators through the channel written for them."
+    },
+    {
+      "key": "lpn_terrain_requests",
+      "source": "translator",
+      "lang": "tr",
+      "complaint": "A JS-concatenated fragment (tileCount + ' ' + string), which fixes the number to the FRONT of the sentence; Turkish wants it after the noun phrase. Bengali filed the same complaint independently for a different reason -- its numeral classifier টি must attach directly to the numeral, and concatenation put a space between them.",
+      "readings": [
+        "a tail fragment juxtaposed after a bare number, accepting reduced fluency",
+        "a whole sentence with {n}, like its own siblings lpn_terrain_done and lpn_terrain_missed"
+      ],
+      "disposition": "english",
+      "resolution": "FIXED 2026-08-24, mid-sprint. English became '{n} request(s) to api.mapbox.com.' and js/lpn-terrain.js substitutes it, keeping the old concatenation as a fallback for a value with no {n}. TWO LANGUAGES, TWO UNRELATED GRAMMARS, ONE STRING -- the English-source signal, and the tell was visible without either: this was the only counted string on that dialog whose siblings had a placeholder and it did not. The 19 languages already written were repaired by prefixing '{n} ', which reproduces the previous rendering character for character; Bengali got '{n}টি' with no space, as its agent had explained. COST OF THE TIMING: the payloads were built before the edit, so nine later agents met a payload disagreeing with the source. Do not edit the English while agents are reading a payload built from it -- a mid-sprint finding waits for close."
+    },
+    {
+      "key": "lpn_library_default_pattern",
+      "source": "translator",
+      "lang": "pt",
+      "complaint": "The pt glossary maps both 'default' and 'pattern' to 'padrão', so a literal composition reads 'Padrão de demanda padrão' -- a doubled word that reads like a typo.",
+      "readings": [
+        "Padrão de demanda predefinido (used)",
+        "Padrão de demanda padrão (literal, awkward)"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Dismissed as an ENGLISH defect: an English reader does not stumble on 'Default demand pattern', so by the routing rule this is not an English case. The agent's own fix -- 'predefinido' for default here -- is right and is kept. Recorded rather than silently closed because the collision is a standing property of Portuguese and will recur on any future key pairing those two words; a glossary note for pt is the place to settle it if it does."
+    },
+    {
+      "key": "lpn_georef_asdeg_btn",
+      "source": "translator",
+      "lang": "de",
+      "complaint": "Says 'lon/lat' while the sibling flow (lpn_goto_menu, 'Go to a latitude and longitude') and its own neighbour lpn_georef_asdegrees ('a longitude and a latitude') use the other order; the reversed order reads like a copy-paste variant rather than a deliberate distinction.",
+      "readings": [
+        "the same concept as lat/lon elsewhere, translated in the established order",
+        "literally lon/lat, producing an order inconsistency across three sibling strings"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "OPEN for Tom. The two orders are both defensible -- lon/lat is x-then-y and matches how a file's coordinates are actually stored, lat/lon is how people say it -- and the button is about what is IN the file, so the reversal may well be deliberate. It is a wording call on a control, which is his. Note it sits beside the unresolved mode-name question below."
+    },
+    {
+      "key": "lpn_settings_color_credits",
+      "source": "translator",
+      "lang": "de",
+      "complaint": "Bare 'Credits' with no object stated; could mean attribution for the map tiles or for the colour scheme. Had to read the surrounding source lines to confirm it is the latter.",
+      "readings": [
+        "colour-scheme attribution",
+        "map-tile source attribution"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Dismissed, and this is the second time: the word is a documented deliberate choice in js/looped-network.js and was already dismissed in the sprint-459 Wave 0 pass for the same reason. The German agent reached it independently and resolved it correctly from context in one step, which is the evidence that the context does the work. If a third language files it, that is the threshold to revisit."
     }
   ]
 }

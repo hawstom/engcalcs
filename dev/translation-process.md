@@ -525,6 +525,26 @@ real findings, and a paragraph at the end of a report is not a queue. **Nothing 
 silently:** an entry closes as `english`, `intent`, `glossary` or `dismissed` *with a reason*, or it
 escalates as `refer-to-human` and stays open until the human rules.
 
+### Two things sprint 459 cost that a brief can prevent (2026-08-24)
+
+**GIVE EACH AGENT ITS OWN SCRATCH DIRECTORY, AND SAY SO IN THE BRIEF.** Twenty-six agents share one
+scratchpad path. In 459 one agent's `batch1.py` was overwritten by another's mid-run; re-running the
+clobbered script appended **52 duplicate keys**, which its own duplicate scan caught and removed. The
+work survived because the agent checked. Nothing in the mechanism guarantees the next one will —
+this is a race, and it is silent. Require scratch work under a per-language path.
+
+**A KEY THAT ALREADY EXISTS MUST NOT ARRIVE IN `keys_to_translate`.** `lpn_geomap` is in the file
+holding `lat/lon`, and the generator listed it for every language with reason `equal_to_english`.
+**Six agents independently appended a duplicate**, caught it with `lang_syntax_validate.php` and
+removed it — six wasted cycles on one generator line. Worse, they then disagreed about what to do
+with it: most kept `lat/lon` because their own sibling strings already used it, two translated it in
+place, and those two now have the anchor translated and its six mode-naming siblings not, which is
+the exact disagreement `mode_name_check.php` reports and which this sprint existed partly to FIX.
+**An `equal_to_english` key needs a decision before launch, not twenty-six of them during.**
+`lpn_labels_col_decimals_example` (`0.000`) is the same trap and hit at least four more agents. Two
+keys, ten-plus wasted cycles, one fix: the generator must not list a key the target file already
+holds.
+
 ### Post-sprint QA (mandatory, in order)
 
 0. **`php dev/scripts/friction_check.php --sprint=<id>` must exit 0** — every translator complaint

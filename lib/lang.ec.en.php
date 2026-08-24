@@ -2494,6 +2494,15 @@ $ec_lang['lpn_library_menu_tip']='Manage the demand patterns, pump curves and co
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
 $ec_lang['lpn_library_patterns']='Patterns';
+// **THE SYNONYMS ARE TOM'S OWN, GIVEN 2026-08-24**, which is the written permission this array
+// requires. "Pattern" is the discipline's standard term and stays the label; the payload exists so
+// a translator who cannot recover the concept from that one word has the shape of it.
+//
+// ONE FLAG ON HIS LIST, for him to strike or keep: **"Run" collides with this page's own Run** --
+// the button that plays an extended-period simulation back. A translator reaching for the word
+// their language uses for a program run would name the wrong thing, and it is the one entry here
+// whose failure mode is a wrong label rather than a merely loose one.
+$ec_lang_syn['lpn_library_patterns']='Data series, Sequence, Time series, Progression, Run, Schedule, Variation profile';
 $ec_lang['lpn_library_patterns_tip']='A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.';
 $ec_lang['lpn_library_curves']='Curves';
 $ec_lang['lpn_library_curves_tip']='A curve is the points that say how a pump performs: how much head it makes at each flow.';
@@ -2588,7 +2597,7 @@ $ec_lang['lpn_terrain_confirm_default_1']='Every node already has an elevation, 
 $ec_lang['lpn_terrain_confirm_default_2']='Replace those {n} with the land surface?';
 $ec_lang['lpn_terrain_keep']='{k} node(s) already have an elevation and will not be touched.';
 $ec_lang['lpn_terrain_undo']='One Undo (Ctrl-Z) puts every one of them back.';
-$ec_lang['lpn_terrain_requests']='request(s) to api.mapbox.com.';
+$ec_lang['lpn_terrain_requests']='{n} request(s) to api.mapbox.com.';
 $ec_lang['lpn_terrain_busy']='Elevations are already being filled in. Wait for them.';
 $ec_lang['lpn_terrain_none_needed']='Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.';
 $ec_lang['lpn_terrain_no_nodes']='There are no nodes to fill in yet.';

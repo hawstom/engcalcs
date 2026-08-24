@@ -1331,7 +1331,7 @@
         "lpn_terrain_confirm_default_2": "Replace those {n} with the land surface?",
         "lpn_terrain_keep": "{k} node(s) already have an elevation and will not be touched.",
         "lpn_terrain_undo": "One Undo (Ctrl-Z) puts every one of them back.",
-        "lpn_terrain_requests": "request(s) to api.mapbox.com.",
+        "lpn_terrain_requests": "{n} request(s) to api.mapbox.com.",
         "lpn_terrain_busy": "Elevations are already being filled in. Wait for them.",
         "lpn_terrain_none_needed": "Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.",
         "lpn_terrain_no_nodes": "There are no nodes to fill in yet.",
