@@ -1699,7 +1699,9 @@ $ec_lang['lpn_inp_drop_demand_pattern']='These junctions change their demand thr
 $ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
 $ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
 $ec_lang['lpn_inp_drop_curve_missing']='This pump names a curve that is not in the file. It came in with no curve, so it adds no head.';
-$ec_lang['lpn_inp_drop_pump_other']='This pump is described by power, by speed, or by a schedule, rather than by a curve. It came in with no curve, so it adds no head.';
+$ec_lang['lpn_inp_drop_pump_other']='This pump is described by the power it draws, rather than by a curve. It came in with no curve, so it adds no head.';
+$ec_lang['lpn_inp_drop_head_pattern']='These reservoirs rise and fall through the day. Their patterns came in whole, and the water level you see is the one for the moment the clock is showing.';
+$ec_lang['lpn_inp_drop_pump_speed']='These pumps run at a speed other than the one their curve was measured at, or change speed through the day. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_setting']='These pipes, pumps and valves carry a setting this page cannot hold. They came in open.';
 $ec_lang['lpn_inp_drop_controls']='These controls and rules were left out. The pipes, pumps and valves they name came in at the state written in the file and stay that way.';
 $ec_lang['lpn_inp_drop_eps']='This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in.';
@@ -2369,7 +2371,7 @@ $ec_lang['lpn_time_report_start']='Report start time';
 $ec_lang['lpn_time_clock_start']='Clock time at the start';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
 $ec_lang['lpn_time_running']='Working out the whole time period with the EPANET solver.';
-$ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs the whole period.';
+$ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs the whole period.';
 $ec_lang['lpn_time_slider']='Time';
 $ec_lang['lpn_time_no_period']='This project has no time period, so there is one moment to show. Set a Total run time in Settings to calculate the network over time.';
 $ec_lang['lpn_time_first']='Go to the start';
@@ -2504,3 +2506,11 @@ $ec_lang['lpn_library_control_missing']='⚠ This network has nothing called {id
 // author can only be used by making it the default one, which is not what a library is for.
 $ec_lang['lpn_field_demand_pattern']='Demand pattern';
 $ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is.';
+// A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
+// Libraries box, one asset’s own choice lives in its property popup.
+$ec_lang['lpn_field_head_pattern']='Head pattern';
+$ec_lang['lpn_field_head_pattern_tip']='How this reservoir’s water level rises and falls through the run. The head above is multiplied by the pattern.';
+$ec_lang['lpn_field_pump_speed']='Relative speed';
+$ec_lang['lpn_field_pump_speed_tip']='1 is this pump turning at the speed its curve was measured at. 0.9 is the same pump turning slower, which lowers the head it adds and the flow it passes. A speed pattern takes the place of this number while the run is going.';
+$ec_lang['lpn_field_speed_pattern']='Speed pattern';
+$ec_lang['lpn_field_speed_pattern_tip']='How this pump’s speed rises and falls through the run. Each multiplier IS the relative speed for that part of the day, and takes the place of the speed above, so a multiplier of 0 stops the pump.';

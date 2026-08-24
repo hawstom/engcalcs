@@ -235,14 +235,6 @@ the block.
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
 
-- 50|248.02| **Patterns: attach one to a RESERVOIR HEAD and a PUMP.** Task 248 child. Everything
-  else shipped: the Libraries box creates, renames, edits and deletes patterns with a sparkline, the
-  property popup attaches one to a junction demand, `[PATTERNS]`/`[TIMES]`/`[OPTIONS] Pattern` round-trip
-  byte-identically, and Net3 matches EPA's published 24-hour report to 0.005 ft over 2,425 comparisons.
-  - **Water quality is NOT in scope and cannot be scoped by Tom** (2026-08-17: *"I don't know anything
-    about water quality modeling"*). Build the mechanism so a WQ source could read a pattern later; do
-    not build WQ on the strength of it.
-
 - 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
   reply to outreach, and he has replied gratefully. This is the first real conversation this suite's
   mission has earned; prepare for the meeting and record what comes of it. Not a search-reach task,
@@ -435,9 +427,10 @@ the block.
     method moves every flow when one diameter changes.
   - **The EDITORS shipped too** (Libraries box, 2026-08-20): patterns are created, renamed, edited
     and deleted with a sparkline, simple controls are added and validated sentence by sentence, and
-    curves are a viewer by design (248.04). **All that is left of this task is attaching a pattern to
-    a reservoir head or a pump (248.02) and rule-based `[RULES]` (248.03)** — so the LibreEPANET gate
-    is nearly clear, and 248 is no longer the blocker it was written as.
+    curves are a viewer by design (248.04). **A pattern attaches to a reservoir head and to a pump
+    speed as well as to a junction demand since 2026-08-24 (248.02), so all that is left of this task
+    is rule-based `[RULES]` (248.03)** — the LibreEPANET gate is nearly clear, and 248 is no longer
+    the blocker it was written as.
   - **A valve has THREE states in EPANET, not two:** closed, fully open, and ACTIVE. `EN_INITSTATUS =
     OPEN` opens it fully with its setting IGNORED; `EN_INITSETTING` restores active, so status is
     written BEFORE setting. Written the other way a network solves with the valve wide open — exactly

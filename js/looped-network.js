@@ -11446,7 +11446,7 @@ var EngCalcs = EngCalcs || {};
 		},
 		LPN_INP_TOK_LINK = {
 			length: '_length', diameter: '_diameter', roughness: '_roughness', k: '_k',
-			setting: '_setting'
+			setting: '_setting', speed: 'speed'
 		},
 		LPN_INP_TOK_POINT = { x: 'x', y: 'y' };
 
@@ -11493,7 +11493,12 @@ var EngCalcs = EngCalcs || {};
 				// THE FILE'S NUMBER IS A HEAD, so it becomes `_head` and no elevation is invented
 				// for it (Task 390). See the note in js/lpn-inp.js for why the old elevation=head
 				// write was a claim the file never made.
-				return withInpNotes(carryInpTokens(n, { id: n.id, type: 'reservoir', x: n.x, y: n.y, _head: n.head }, LPN_INP_TOK_RESERVOIR), inpNodeNotes[n.id]);
+				var rz = { id: n.id, type: 'reservoir', x: n.x, y: n.y, _head: n.head };
+				// **THE FILE'S OWN COLUMN, AND ONLY THAT** (Task 248.02), exactly as a junction's
+				// demand pattern below. EPANET has no [OPTIONS]-level default for a head pattern, so
+				// a blank column here means no pattern at all and nothing is resolved later.
+				if (n.headPattern) { rz.headPattern = n.headPattern; }
+				return withInpNotes(carryInpTokens(n, rz, LPN_INP_TOK_RESERVOIR), inpNodeNotes[n.id]);
 			}
 			if (n.type === 'tank') {
 				// A tank's four levels and its diameter are ALL in the Elevation/Head unit -- all
@@ -11565,6 +11570,11 @@ var EngCalcs = EngCalcs || {};
 				// same reason a number's token is kept beside it: it is the user's own text, and the
 				// exporter has no way to reconstruct it.
 				if (l.curveId) { out.curveId = l.curveId; }
+				// **SPEED AND ITS PATTERN** (Task 248.02). A relative speed of 1 is EPANET's own
+				// default and is not written onto the pump, for the same reason the blank pattern
+				// column is not: the field must say what the file said.
+				if (typeof l.speed === 'number' && isFinite(l.speed) && l.speed !== 1) { out.speed = l.speed; }
+				if (l.speedPattern) { out.speedPattern = l.speedPattern; }
 				// NO FITTED CURVE IS WRITTEN HERE (Task 390 step 5). pumpFit() derives h0/a/b at the
 				// solver handoff, so an imported pump carries exactly what the file stated and
 				// nothing of ours.
@@ -11689,14 +11699,18 @@ var EngCalcs = EngCalcs || {};
 			// is no longer the same report as a head pattern, which still is not. It stays in the
 			// report because the rest of the day still does not run.
 			case 'demand-pattern': return pc.lpn_inp_drop_demand_pattern || 'These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file\'s number multiplied by the pattern\'s first value — the same number EPANET shows at the start of its run.';
-			case 'head-pattern':
+			// A HEAD PATTERN IS NOW APPLIED (Task 248.02), exactly as a demand pattern is, so it is
+			// no longer the same report as a whole clock that failed to load.
+			case 'head-pattern': return pc.lpn_inp_drop_head_pattern || 'These reservoirs rise and fall through the day. Their patterns came in whole, and the water level you see is the one for the moment the clock is showing.';
 			case 'patterns': return pc.lpn_inp_drop_patterns || 'Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
 			case 'emitters-not-editable': return pc.lpn_inp_drop_emitters || 'These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see or change it yet.';
 			case 'pump-curve-reduced': return pc.lpn_inp_drop_curve_long || 'This pump curve had more than three points. Its lowest, middle and highest points were kept, which is the most this page fits a curve from.';
 			case 'pump-curve-missing': return pc.lpn_inp_drop_curve_missing || 'This pump names a curve that is not in the file. It came in with no curve, so it adds no head.';
-			case 'pump-constant-power':
+			// A SPEED AND A SCHEDULE ARE KEPT AND SOLVED (Task 248.02). Only constant POWER is still
+			// a pump this page cannot describe, so it keeps the old sentence by itself.
+			case 'pump-constant-power': return pc.lpn_inp_drop_pump_other || 'This pump is described by power, speed or a schedule rather than by a curve. It came in with no curve, so it adds no head.';
 			case 'pump-speed':
-			case 'pump-pattern': return pc.lpn_inp_drop_pump_other || 'This pump is described by power, speed or a schedule rather than by a curve. It came in with no curve, so it adds no head.';
+			case 'pump-pattern': return pc.lpn_inp_drop_pump_speed || 'This pump runs at a speed other than the one its curve was measured at, or changes speed through the day. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.';
 			case 'link-setting': return pc.lpn_inp_drop_setting || 'These links carry a setting this page cannot hold. They came in open.';
 			case 'controls':
 			case 'rules': return pc.lpn_inp_drop_controls || 'Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file and stays there.';
@@ -18131,9 +18145,21 @@ var EngCalcs = EngCalcs || {};
 			.replace('{step}', fmt(step))
 			.replace('{span}', fmt(step * n));
 	}
-	// A pattern's id is referenced from two other places, so a rename has to travel: the junctions
-	// that name it and the project's own default. Neither is a scenario-overridable property, so
-	// both are plain writes.
+	// **EVERY PLACE A PATTERN ID IS WRITTEN, IN ONE FUNCTION** (Task 248.02). There are four now --
+	// a junction's demand, a reservoir's head, a pump's speed and the project's own default -- and
+	// a rename or a delete that misses one leaves a reference to a name nothing answers to. None is
+	// a scenario-overridable property, so all of them are plain writes.
+	//
+	// `to` is the new name, or null to clear. Adding a fifth attachment point means adding it HERE
+	// and nowhere else, which is the whole reason this is not two copies of a forEach.
+	function libRepointPattern(was, to) {
+		doc.nodes.forEach(function (n) {
+			if (n.demandPattern === was) { n.demandPattern = to; }
+			if (n.headPattern === was) { n.headPattern = to; }
+		});
+		doc.links.forEach(function (l) { if (l.speedPattern === was) { l.speedPattern = to; } });
+		if (doc.defaultPattern === was) { doc.defaultPattern = to; }
+	}
 	function libRenamePattern(pat, want) {
 		var name = String(want || '').trim(), clash, was;
 		if (!name || name === pat.id) { return false; }
@@ -18141,8 +18167,7 @@ var EngCalcs = EngCalcs || {};
 		if (clash) { return false; }
 		was = pat.id;
 		pat.id = name;
-		doc.nodes.forEach(function (n) { if (n.demandPattern === was) { n.demandPattern = name; } });
-		if (doc.defaultPattern === was) { doc.defaultPattern = name; }
+		libRepointPattern(was, name);
 		return true;
 	}
 	function libDeletePattern(pat) {
@@ -18152,8 +18177,7 @@ var EngCalcs = EngCalcs || {};
 		// null for a name nothing answers to and lpnPatternValue turns that into a multiplier of 1,
 		// so the run would be right either way -- but the junction would still SAY it follows a
 		// pattern that is not there, and the next thing the user does is look for it.
-		doc.nodes.forEach(function (n) { if (n.demandPattern === was) { n.demandPattern = null; } });
-		if (doc.defaultPattern === was) { doc.defaultPattern = null; }
+		libRepointPattern(was, null);
 	}
 
 	// ---- CONTROLS --------------------------------------------------------------------------------
@@ -19448,6 +19472,16 @@ var EngCalcs = EngCalcs || {};
 				function () { return effective(n, 'head'); },
 				function (v) { setProp(n, 'head', v); updateNode(nodeId); refreshPopupIfOpen(); },
 				n.elev || 0, pc.lpn_field_head_tip, { el: n, prop: 'head' });
+			// **HOW THAT HEAD MOVES THROUGH THE RUN** (Task 248.02), the reservoir's twin of the
+			// junction's demand pattern below: the total head is the head above times the pattern's
+			// multiplier, which is EPANET's own rule. PER RESERVOIR, so it belongs here rather than
+			// in the Libraries box, and it is a plain write for the same reason the demand pattern
+			// is -- which pattern a source follows is a statement about the system, not a design
+			// variable a scenario asks "what if" about.
+			patternField(fields, pc.lpn_field_head_pattern || 'Head pattern',
+				function () { return n.headPattern; },
+				function (v) { n.headPattern = v || null; updateNode(nodeId); scheduleSolve(); saveToStorage(); },
+				pc.lpn_field_head_pattern_tip);
 			// No read-only Head row here (a junction gets one because its head is a solve RESULT) --
 			// the editable field above shows this reservoir's head, typed or inherited.
 			// The one place two DISPLAY units meet: head and elevation are declared in the
@@ -19544,6 +19578,37 @@ var EngCalcs = EngCalcs || {};
 		curvePointTable(fields, l, (pc.lpn_result_head || 'Head'), 'lpn_u_elevhead',
 			pc.lpn_pump_curve_note || 'One, two, or three points — see "Pump curve" in the Notes below.');
 	}
+	// **SPEED AND ITS SCHEDULE** (Task 248.02), the pump's twin of the reservoir's head pattern and
+	// the junction's demand pattern. Two rows, and they compose the way EPANET composes them: the
+	// SPEED is the number this pump runs at, and the PATTERN scales that number through the run --
+	// it does not replace it, so a speed of 0.9 on a pattern reading 1.1 is 0.99.
+	//
+	// **RELATIVE, AND THEREFORE DIMENSIONLESS**: 1 is the pump turning at the speed its curve was
+	// measured at, which is why this is numberFieldPlain and carries no unit selector. The label says
+	// so rather than leaving the reader to guess what "Speed" is in.
+	//
+	// Plain writes, no `ov`: neither is in LPN_OVERRIDABLE, so setProp() would write `_speed` into a
+	// field nothing reads. If a scenario ever wants "what if this pump ran at 0.8", `speed` earns its
+	// place in that table and both halves move together -- the field, and the read in assembleModel().
+	function renderPumpSpeedFields(fields, l) {
+		var pc = EngCalcs.pageConfig || {};
+		numberFieldPlain(fields, pc.lpn_field_pump_speed || 'Speed',
+			(typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1,
+			function (v) {
+				saveUndoSnapshot();
+				// **A BLANK, A ZERO AND A NEGATIVE ALL READ AS 1** -- the pump as its curve describes
+				// it. A cleared box arrives here as 0 and cannot be told from a typed one, and a pump
+				// at speed 0 is a pump that is off: switching one off silently because the user
+				// tabbed through an empty field is the failure to avoid. Turning a pump off has its
+				// own control on this popup, the Closed box below.
+				l.speed = (isFinite(v) && v > 0) ? v : 1;
+				afterPropertyEdit(l);
+			}, pc.lpn_field_pump_speed_tip);
+		patternField(fields, pc.lpn_field_speed_pattern || 'Speed pattern',
+			function () { return l.speedPattern; },
+			function (v) { l.speedPattern = v || null; afterPropertyEdit(l); },
+			pc.lpn_field_speed_pattern_tip);
+	}
 	// THE THREE-POINT CURVE TABLE, shared by the pump and by the GPV (Task 248). Both hold a curve
 	// that belongs to the element -- a pump's is (flow, head), a general purpose valve's is (flow,
 	// head LOSS) -- so only the second column's heading and unit differ. Two copies of this markup
@@ -19628,6 +19693,7 @@ var EngCalcs = EngCalcs || {};
 			renderValveFields(fields, l, linkId);
 		} else if (l.type === 'pump') {
 			renderPumpCurveFields(fields, l, linkId);
+			renderPumpSpeedFields(fields, l);
 		} else {
 			unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
 				function () { return effective(l, 'diameter'); },
@@ -20237,11 +20303,41 @@ var EngCalcs = EngCalcs || {};
 	// Returns 1 for every way of having no answer, so a hand-drawn network, a pre-Task-423 saved
 	// file and a page whose js/lpn-patterns.js failed to load all behave exactly as they did before.
 	function demandMultiplier(n, t) {
+		return patternMultiplier(n.demandPattern || doc.defaultPattern, t);
+	}
+	// **THE SAME ARITHMETIC FOR EVERY ATTACHMENT POINT** (Task 248.02). A pattern does not know what
+	// it is for -- js/lpn-patterns.js says so in its own header -- so a demand, a reservoir head and
+	// a pump speed read the multiplier through one function and cannot come to different
+	// conclusions about the wrap or the pattern start.
+	//
+	// Returns 1 for every way of having no answer, so a hand-drawn network, a project saved before
+	// patterns existed and a page whose js/lpn-patterns.js failed to load all behave as they did.
+	// **1 AND NEVER 0** -- "this element names no pattern" means unmodified.
+	function patternMultiplier(id, t) {
 		if (!EngCalcs.lpnPatternById || !doc.patterns || !doc.patterns.length) { return 1; }
-		var pat = EngCalcs.lpnPatternById(doc.patterns, n.demandPattern || doc.defaultPattern);
+		var pat = EngCalcs.lpnPatternById(doc.patterns, id);
 		if (!pat) { return 1; }
 		var times = doc.times || EngCalcs.lpnTimesDefaults();
 		return EngCalcs.lpnPatternValue(pat, t, times.patternStep, times.patternStart);
+	}
+	// A pump's relative speed at `t`.
+	//
+	// **A SPEED PATTERN REPLACES THE SPEED SETTING; IT DOES NOT SCALE IT.** That is EPANET's
+	// behaviour, MEASURED rather than inferred (dev/lpn-spike/pattern-attach-harness.js): a pump
+	// written `SPEED 1.2` alone develops exactly the affinity-law head for s = 1.2, and the same
+	// pump written `SPEED 2.0 PATTERN P` develops the head for s = P(t) with the 2.0 discarded
+	// entirely. So the multiplier IS the speed while a pattern is attached.
+	//
+	// We follow it rather than composing our own way round, for the reason CLAUDE.md gives for
+	// every other EPANET convention on this page: an extended-period run is EPANET's, so a page
+	// that multiplied here would show one number while you type and a different one when you run.
+	// It is not expressible in an `.inp` either -- there is no column for a speed and a pattern
+	// that compose -- and the file is canonical.
+	//
+	// 1 when the pump states neither, which is a pump running at the speed its curve was drawn for.
+	function pumpSpeedNow(l, t) {
+		if (l.speedPattern) { return patternMultiplier(l.speedPattern, t); }
+		return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1;
 	}
 
 	function assembleModel() {
@@ -20269,7 +20365,22 @@ var EngCalcs = EngCalcs || {};
 				// deliberately stores that field blank when the head just follows the elevation (see
 				// reservoirHead()). Copying rather than filling the blank in keeps the document's
 				// "still following elevation" state intact.
-				? { id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'), head: toSI(reservoirHead(n), 'lpn_u_elevhead') }
+				//
+				// **AND A HEAD PATTERN MULTIPLIES IT, EXACTLY AS EPANET DOES** (Task 248.02): a
+				// reservoir's total head is Head x Pattern. It is applied HERE and not on the
+				// document, the same boundary the demand multiplier crosses, so the number the user
+				// typed stays the number the user typed. `headBase` and the pattern's name ride
+				// along for an extended-period run, where EPANET does the multiplying on its own
+				// clock; js/lpn-epanet.js takes one or the other and never both.
+				// A reservoir on a pattern is still a FIXED HEAD -- EngCalcs.lpnIsFixedHead is
+				// unchanged and needs to be: what varies is the number, not the kind of boundary.
+				? {
+					id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'),
+					head: toSI(reservoirHead(n), 'lpn_u_elevhead') *
+						patternMultiplier(n.headPattern, modelTimeSeconds()),
+					headBase: toSI(reservoirHead(n), 'lpn_u_elevhead'),
+					headPattern: n.headPattern || null
+				}
 				// **THE MULTIPLIER GOES ON HERE, NOT ON THE DOCUMENT** (Task 423). A pattern scales
 				// the demand the user typed; it never replaces it. Doing it at this boundary is the
 				// same rule every unit conversion on this page follows -- the document holds what
@@ -20306,8 +20417,38 @@ var EngCalcs = EngCalcs || {};
 			// Only a pump gets one: js/lpn-solver.js and js/lpn-epanet.js both test the type first,
 			// so putting h0/a/b on a pipe only ever meant three undefined properties per link.
 			if (l.type === 'pump') {
-				var fit = pumpFit(l);
-				out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
+				var fit = pumpFit(l), s = pumpSpeedNow(l, modelTimeSeconds());
+				// **THE SPEED SCALES THE CURVE BY THE AFFINITY LAWS, AND THEY ARE EPANET'S OWN**
+				// (Task 248.02). Q scales with s and H with s^2, so the whole curve at speed s is
+				//     H = s^2 ( h0 - a (Q/s)^b )  =  (s^2 h0) - (a s^(2-b)) Q^b
+				// -- the fitted curve with two of its three coefficients moved and `b` untouched,
+				// which is why a speed needs no second law in js/lpn-solver.js.
+				// **THE EXPONENT IS 2-b, NOT -b**, and the difference is not small: at s = 1.32 on
+				// a b of about 1.5 it is 87 ft of pump head, and both versions solve without
+				// complaint. dev/lpn-spike/pattern-attach-harness.js checks the frames against
+				// EPANET's own answer rather than against this line.
+				// The UNSCALED pair rides along beside it for an extended-period run, where EPANET
+				// is handed the curve as drawn plus SPEED and PATTERN and does this itself. Handing
+				// it the scaled curve AND the speed would square the multiplier.
+				out.h0 = fit.h0 * s * s;
+				out.a = fit.a * Math.pow(s > 0 ? s : 1, 2 - fit.b);
+				out.b = fit.b;
+				// **A SPEED OF ZERO IS A PUMP THAT IS OFF, NOT A PUMP THAT SUCKS.** The algebra
+				// above degenerates at s = 0 into H = -a Q^b, a lossy connection water still flows
+				// through, and a schedule whose multiplier is 0 at night is the ordinary way to
+				// reach it. EPANET closes such a pump; so does this, in the MODEL only -- the
+				// document's own status is untouched, because being off at this instant is a fact
+				// about the clock and not about the network.
+				//
+				// **AND THE DOCUMENT'S OWN STATUS RIDES ALONG AS `statusBase`**, or an
+				// extended-period run would be handed a pump written Closed for all 24 hours
+				// because its schedule happened to say 0 at midnight. Same shape as demandBase and
+				// headBase: the instant in the ordinary field, the unclocked truth beside it.
+				out.statusBase = out.status;
+				if (!(s > 0)) { out.status = 'closed'; }
+				out.h0Base = fit.h0; out.aBase = fit.a;
+				out.speed = (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1;
+				out.speedPattern = l.speedPattern || null;
 			}
 			if (l.type === 'valve') {
 				// THE SETTING CROSSES THIS BOUNDARY IN THE UNIT ITS TYPE NAMES, which is why a valve
