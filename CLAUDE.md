@@ -163,7 +163,9 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   all 25 steps of EPA's own `Net3.rpt` to 0.005 ft over 2,425 head comparisons
   (`dev/lpn-spike/eps-net3-harness.js`). **The built-in solver has no time dimension and is not
   getting one** — with EPANET unreachable the page solves one instant and says so. What is left of
-  Task 248 is a pattern on a reservoir head or a pump (248.02) and rule-based `[RULES]` (248.03).
+  Task 248 is rule-based `[RULES]` (248.03) alone: patterns on a reservoir head and on a pump speed
+  shipped 2026-08-24 (248.02). **EPANET's pump speed pattern REPLACES the SPEED setting rather than
+  scaling it** — measured against the engine, and the exporter writes SPEED or PATTERN, never both.
   **"No extended-period simulation yet" is FALSE.** It stood in this file and on the LibreWaterNet
   landing draft until 2026-08-21, three days after the run shipped, and Tom caught it, not a check.
   Do not restore it.
