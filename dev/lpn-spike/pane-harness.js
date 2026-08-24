@@ -731,8 +731,11 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 	report(width(cell('th', 'roughness', true, false), SMALL) === '4.2em' &&
 		width(inputIn('roughness'), SMALL) === '2.6em',
 		'Roughness narrows below the breakpoint -- 0.60 of its column, 0.74 of its box');
-	report(width(inputIn('km'), SMALL) === '1.75em',
-		'...and the Minor loss box is half what it was');
+	// 2.19em, not the 1.75em it narrowed to first: Tom scaled the phone box 1.25x on 2026-08-23
+	// after using it, the same pass that scaled the desktop one 1.5x. The COLUMN stays at 2.9em --
+	// that width is held by its heading breaking into four lines, not by the box inside it.
+	report(width(inputIn('km'), SMALL) === '2.19em',
+		'...and the Minor loss box is 1.25x what it narrowed to');
 	report(width(cell('th', 'km', true, false), SMALL) === '2.9em',
 		'...inside a column that stops at four lines of heading rather than six');
 	report(CSS.winning(CSS.rules, cell('th', 'roughness', true, false), SMALL, 'overflow-wrap', blind) === 'anywhere',
@@ -778,7 +781,7 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 		['tanks', 'level', 3.5, 4], ['tanks', 'minLevel', 3.5, 4], ['tanks', 'maxLevel', 3.5, 4],
 		['tanks', 'tankDiameter', 3.5, 4],
 		['pipes', 'diameter', 2.1, 4, true], ['pipes', 'length', 4.2, 5],
-		['pipes', 'roughness', 2.31, 3], ['pipes', 'km', 1.4, 3, true]
+		['pipes', 'roughness', 2.31, 3], ['pipes', 'km', 2.1, 3]
 	];
 	WANT.forEach(([tid, key, em, needs, narrow]) => {
 		const col = L.tableCols(tid).filter((c) => c.key === key)[0];
@@ -793,18 +796,16 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 			report(chars(em) >= needs, '...and ' + em + 'em shows ' + chars(em) + ' characters, needing ' + needs);
 		}
 	});
-	// **THE TWO NARROW COLUMNS, AND THE UNTESTED BELIEF THEY REST ON.** Tom asked for 0.2 on Minor
+	// **ONE NARROW COLUMN LEFT, AND THE UNTESTED BELIEF IT RESTS ON.** Tom asked for 0.2 on Minor
 	// loss and 0.3 on Diameter, was shown that 1.4em displays one character of "2.5" and 2.1em three
-	// of an SI diameter's "1200", widened both, and then reversed himself the same day (2026-08-23)
-	// on a different ground: *"inputs are flexible. You can enter more than their width. Remind me
-	// to test this later."* So the boxes are back at his factors, and the measurements below are
-	// kept because they are exactly what his test has to overrule.
+	// of an SI diameter's "1200", widened both, then reversed himself the same day (2026-08-23) on a
+	// different ground: *"inputs are flexible. You can enter more than their width."*
 	//
-	// **HE HAS NOT RUN THAT TEST** (ROADMAP Task 491). If a narrow box turns out to truncate or hide
-	// what was typed, the widths to restore are 2.1em for Minor loss (2.07em is the least that shows
-	// three characters) and 2.8em for Diameter.
-	report(chars(1.4) < 3, 'Minor loss at 1.4em shows ' + chars(1.4) + ' character of "2.5"',
-		'restore 2.1em if typing into it proves lossy');
+	// **MINOR LOSS IS BACK AT 2.1em, and NOT because that test was run** -- he asked for the box
+	// 1.5x wider on PC after using it (2026-08-23), which lands on the same number by a different
+	// route. **THE TEST IS STILL OUTSTANDING** (ROADMAP Task 495) and Diameter still rides on it: if
+	// a narrow box turns out to truncate or hide what was typed, 2.8em is the width to restore
+	// there.
 	report(chars(2.1) < 4, 'Diameter at 2.1em shows ' + chars(2.1) + ' characters of an SI "1200"',
 		'restore 2.8em if typing into it proves lossy');
 

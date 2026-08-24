@@ -25,7 +25,10 @@ const src = fs.readFileSync(path.join(__dirname, '../../js/looped-network.js'), 
 // key -> the multiple of 7em Tom declared. A key absent here is a column that names no width and
 // therefore keeps the 7em default; that is legitimate and is asserted separately below.
 const DECLARED = {
-	km:           0.2,
+	// 0.3, not the declared 0.2: Tom asked for the Minor loss box 1.5x wider on PC
+	// (2026-08-23), which is 1.4em x 1.5 = 2.1em = 0.3 x 7em. The phone box is scaled
+	// separately, 1.25x, and lives in the max-width:640px block in css/engcalcs.css.
+	km:           0.3,
 	// 0.33, not the declared 0.3: Tom asked for the Roughness box 10% wider on PC
 	// (2026-08-23). 0.3 x 1.1 = 0.33 x 7em = 2.31em. The phone box is untouched -- below
 	// the breakpoint every box in these tables is a flat 3.5em.
@@ -100,7 +103,7 @@ report(!!note, 'css/engcalcs.css carries the declared list beside --lpn-pane-col
 if (note) {
 	// A BOUNDARY, NOT indexOf: 'Roughness 0.3' is a prefix of 'Roughness 0.33', so a substring
 	// search reports a stale note as fresh on exactly the edit most likely to make it stale.
-	[['Minor loss', 0.2], ['Roughness', 0.33], ['Length', 0.6], ['Diameter', 0.3]].forEach(function (p) {
+	[['Minor loss', 0.3], ['Roughness', 0.33], ['Length', 0.6], ['Diameter', 0.3]].forEach(function (p) {
 		report(new RegExp(p[0] + ' ' + String(p[1]).replace('.', '\\.') + '(?![0-9])').test(note[0]),
 			'the stylesheet note still says ' + p[0] + ' ' + p[1]);
 	});

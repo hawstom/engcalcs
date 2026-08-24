@@ -1180,7 +1180,7 @@ html[lang="zh"] .ec-welcome {
    what "this column is figures" is still worth here is tabular figures. */
 .lpn-pane-table th.lpn-pane-num, .lpn-pane-table td.lpn-pane-num { font-variant-numeric: tabular-nums; }
 /* **THE BOX WIDTH BELONGS TO THE COLUMN, AND THE COLUMN DECLARES IT** (Tom, 2026-08-23, as
-   multiples of the 7em every box used to be: Minor loss 0.2, Roughness 0.33, Length 0.6, Diameter
+   multiples of the 7em every box used to be: Minor loss 0.3, Roughness 0.33, Length 0.6, Diameter
    0.3, and 0.5 for the tank, reservoir and junction figures). The number lives on the column
    descriptor in js/looped-network.js and arrives here as `--lpn-pane-col-w`; a column that names
    none keeps the 7em. A hand-kept CSS list keyed by column class was the alternative, and it goes
@@ -2068,7 +2068,7 @@ html:has(#lpn_canvas) { overflow: hidden; }
 	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-km {
 		overflow-wrap: anywhere; width: 2.9em; min-width: 2.9em;
 	}
-	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-km input { width: 1.75em; }
+	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-km input { width: 2.19em; }
 
 	/* 6. THE SYMBOLOGY ROWS WRAP AS A GROUP (Tom, 2026-08-22, choosing between his own two ideas:
 	   "Idea B is to wrap the four inputs for Before/After/Decimal/Drop together below the checkbox

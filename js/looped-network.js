@@ -8073,7 +8073,7 @@ var EngCalcs = EngCalcs || {};
 					// the least that shows three characters. The vertical argument decides nothing
 					// either way -- no desktop column carries a width, so a small box never wraps a
 					// heading.
-					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 1.4,
+					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 2.1,
 						get: function (l) { return effective(l, 'k') || 0; },
 						set: function (l, v) { setProp(l, 'k', v); } },
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
