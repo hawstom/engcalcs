@@ -72,8 +72,17 @@
 // relayoutLabels(). The cascade in the first of those was the last un-batched one: it ran a label
 // to the bottom before starting the next, which is one forced layout per label per rung, and it is
 // now three passes like refreshLabelText()'s -- 44-458 ms measured here, and COUNTED at 1,008
-// forced layouts per notch down to 9 in dev/lpn-spike/zoom-reshed-harness.js. What is left of that
-// pass is shedAlignedForConflicts(), which is sequential because its decisions read each other.
+// forced layouts per notch down to 9 in dev/lpn-spike/zoom-reshed-harness.js.
+//
+// **AND THEN shedAlignedForConflicts() WAS THE WHOLE OF WHAT WAS LEFT** -- 0.3-1.8 s of a notch on
+// this grid, in over 9M box-overlap tests. Its cascade still runs one label at a time and always
+// will, because each label it places is an obstacle for the next; what was wrong was the obstacle
+// WALK inside it, which grew with the drawing exactly as Task 472's did. Same medicine, same shape
+// of guard: the boxes go into Collide.boxIndex() and, COUNTED on the same two networks,
+//
+//     overlap tests per label    231 (112 pipes) / 860 (480 pipes)  ->  7.3 / 7.1
+//
+// with every placement byte-identical. dev/lpn-spike/aligned-shed-index-harness.js is the guard.
 //
 // **THE BOUNDS ARE GENEROUS ON PURPOSE — well clear of the measurement, not a hair over it.** This
 // pass runs on whatever machine is free, and a timing check that fails on a busy one teaches people
@@ -155,6 +164,36 @@ async function notchMs(a) {
 	return ms;
 }
 
+// **THE DEFERRED RESHED, WHICH notchMs() ABOVE DELIBERATELY DOES NOT SEE.** A notch's handler is
+// small; the label work runs once, 120 ms after the LAST notch, and that pass is where the seconds
+// were. Nothing in this suite timed it until now — `settle(700)` simply waited it out — which is
+// how a 7.3 s pass sat behind a check that read 141 ms and passed.
+//
+// MEASURED WITHOUT INSTRUMENTING THE SOURCE: the pass is one long synchronous block, so it shows up
+// as the longest gap between animation frames. A requestAnimationFrame loop cannot run while the
+// main thread is busy, so the gap it records IS the block. That also means this needs no hook, no
+// exported timer and nothing in js/looped-network.js that exists only for a test.
+//
+// The floor is a frame (~16 ms), so a fast pass reads as roughly one frame rather than zero.
+async function reshedBlockMs(a, notches, dir) {
+	return await a.page.evaluate(([notches, dir]) => new Promise((resolve) => {
+		const c = document.getElementById('lpn_canvas');
+		const r = c.getBoundingClientRect();
+		for (let i = 0; i < notches; i++) {
+			c.dispatchEvent(new WheelEvent('wheel', {
+				deltaY: 100 * dir, clientX: r.x + r.width / 2, clientY: r.y + r.height / 2,
+				bubbles: true, cancelable: true
+			}));
+		}
+		var worst = 0, last = performance.now(), until = last + 8000;
+		(function frame(now) {
+			if (now - last > worst) { worst = now - last; }
+			last = now;
+			if (now < until) { requestAnimationFrame(frame); } else { resolve(worst); }
+		})(last);
+	}), [notches, dir]);
+}
+
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
 	try {
@@ -184,6 +223,22 @@ exports.run = async function ({ browser, report }) {
 		// ---- a wheel notch on it -----------------------------------------------------------------
 		const notch = await notchMs(a);
 		report.ok(notch < 250, 'a wheel notch on it stays under 250 ms', notch.toFixed(1) + ' ms');
+
+		// ---- and the label pass that runs after it -----------------------------------------------
+		// **REPORTED, NOT ASSERTED, AND THE NUMBER IS THE POINT.** Measured 2026-08-23 on this grid,
+		// AFTER the two count fixes that landed the same day: 2.5-3.3 s with labels on against
+		// 0.5-0.7 s with every label field switched off, so what remains is label work and not the
+		// drawing. One run of the identical gesture hit 16.9 s, which is why no bound is asserted --
+		// a check that red-lights on machine load teaches people to skim, and this spread is wider
+		// than any honest threshold.
+		//
+		// The counts are NOT the thing still costing seconds: zoom-reshed-harness.js holds forced
+		// layouts at 9 per notch and aligned-shed-index-harness.js holds overlap tests at ~7 per
+		// label. Whatever is left is per-label work no index removes -- text measurement is the
+		// suspect -- and it is recorded in ROADMAP Task 436 rather than guessed at here.
+		const reshed = await reshedBlockMs(a, 10, 1);
+		report.ok(true, 'the label pass after a zoom still blocks the main thread',
+			reshed.toFixed(0) + ' ms — see ROADMAP Task 436');
 
 		// ---- and closing a project that lands on it ----------------------------------------------
 		// The tab strip lands on the neighbour that slides into the closed tab's spot, so closing the

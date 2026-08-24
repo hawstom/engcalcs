@@ -7,27 +7,28 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**73 open tasks.** Next (100): 5 · Soon (75): 7 · Someday (50): 10 · Maybe (25): 24 · Parked (5): 27
+**78 open tasks.** Next (100): 7 · Soon (75): 6 · Someday (50): 12 · Maybe (25): 26 · Parked (5): 27
 
-## 100 — Next (5)
+## 100 — Next (7)
 
 - Task 145 — GEOGRAPHIC PROJECTS: grid or geographic, declared before anything is drawn.
 - Task 389 — Search and replace inputs across the network, no longer gated on size.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
+- Task 469 — Node labels should SHED properties before one of them is hidden.
+- Task 478 — [H] · BUILT AND WAITING ON ONE RULING: Tab walks the input column.
 
-## 75 — Soon (7)
+## 75 — Soon (6)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 442 — [H] · The toolbar may want to become a side menu.
 - Task 477 — [H] · New blank project startup wizard: xy/lat-lon, units, head loss.
-- Task 478 — [H] · Tab should walk down the input column, not sideways.
 - Task 479 — LibreWaterNet.org needs a landing page, and this account needs a hosting decision.
 - Task 483 — EPANET import: carry unhandled features into a per-asset import notes field.
 - Task 495 — [H] · REMIND TOM: does an input accept more characters than its width shows?
 
-## 50 — Someday (10)
+## 50 — Someday (12)
 
 - Task 207 — The dilettante path: make replying cost one tap, not five steps.
 - Task 248.02 — Patterns: attach one to a RESERVOIR HEAD and a PUMP.
@@ -37,10 +38,12 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 433 — Profile: the last piece is the path CHOOSER.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
-- Task 469 — Node labels should SHED properties before one of them is hidden.
 - Task 496 — The harness stub has no EPANET engine, so `settings.engine` never matters.
+- Task 497 — Automatic elevations for a lat/lon project, from a terrain source.
+- Task 499.01 — Create a Scenarios menu icon
+- Task 499.02 — Add a tip to the lpn Project menu
 
-## 25 — Maybe (24)
+## 25 — Maybe (26)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -66,6 +69,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 468 — Demand categories on a junction — the breakdown the importer already flattens.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
+- Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
+- Task 500 — One home for the reference-table URLs, now copied into four pages.
 
 ## 5 — Parked (27)
 
@@ -99,5 +104,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-73 of 73 titles are within 4–12 words. `!` marks the rest;
+78 of 78 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

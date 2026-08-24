@@ -46,6 +46,15 @@ Two string roles, two rules:
 - **Do not rename eponyms or bibliographic citations** — Manning, Darcy-Weisbach, Robinson and actual
   paper titles stay as published in every role.
 - **Prefer positive phrasing; watch for stacked negatives.**
+- **Spend em-dashes sparingly. A semicolon or a comma usually does the job.** Tom, 2026-08-23,
+  counting seven on one page of visitor-facing prose: *"while I probably was a heavy [Alt]+150
+  emdash user in the pre-AI age, I now find them a little embarrassing... very often a semi-colon or
+  even a comma (\*shudder\*) is a suitable replacement to avoid emdash overuse."* The dash has become
+  a machine-written tell, and a page that leans on it reads as generated whatever it says. Note the
+  measured counterweight he raised himself: epanet-js's own landing page has six, so this is a
+  matter of DENSITY and not a ban. One or two on a long page is fine; seven is the smell. Applies to
+  visitor-facing English everywhere (`$ec_lang` values, page copy, the LibreWaterNet landing draft),
+  and it is a style preference, not a check: there is no threshold a script could pick.
 
 This governs new calculators from day one, not just retrofits.
 

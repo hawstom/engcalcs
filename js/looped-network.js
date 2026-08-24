@@ -886,7 +886,9 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE anything is placed, so every station obeys it.
 		le.hiddenShort = linkLabelTooShort(l, le);
-		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenCrowded);
+		// THREE WAYS A LINK LABEL IS NOT DRAWN, ONE SEAM: too long for its own segment, shed out and
+		// still in conflict, or standing on ground a node label has just taken (yieldStationedLabels()).
+		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenYielded);
 		var single = linkLabelStations(l).length === 1,
 			stations = single ? [le.alignedAlong] : drawnLinkLabelStations(l), i;
 		ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
@@ -1170,9 +1172,18 @@ var EngCalcs = EngCalcs || {};
 	// order does not depend on anything the user can change by clicking.
 	// Does this box have the map to itself? Oriented, since an aligned label's box turns with its
 	// pipe and the axis-aligned box around a diagonal one is up to 5.2x its own area.
+	//
+	// **THROUGH AN INDEX, BECAUSE THE WALK WAS THE WHOLE OF A WHEEL NOTCH** (Task 436).
+	// shedAlignedForConflicts() calls this once per rung per label and every label it places is
+	// pushed onto `obs.boxes`, so the walk grew with the drawing at both ends: 231 overlap tests per
+	// label on a 112-pipe grid against 860 on a 480-pipe one. Collide.boxIndex() answers the
+	// identical question -- same boxOverlapDepth(), same boolean, on every input -- and it reads
+	// `obs.boxes.length` on each query, so a push anywhere is picked up with no call site changed.
+	// The index is CACHED ON THE OBSTACLE SET rather than passed in for the same reason.
 	function boxIsClear(b, obs, pad) {
 		var grown = Collide.box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a);
-		return !obs.boxes.some(function (o) { return Collide.boxOverlapDepth(grown, o) > 0; });
+		if (!obs.boxIndex) { obs.boxIndex = Collide.boxIndex(obs.boxes); }
+		return !obs.boxIndex.anyOverlap(grown);
 	}
 	function stationedLabelBox(l, le, along, w, h, fs, force) {
 		if (linkLabelAligned(l)) {
@@ -1734,7 +1745,75 @@ var EngCalcs = EngCalcs || {};
 			h.placedSide = r.side;
 			if (r.dropped) { h.hiddenDropped = true; }
 		});
+		// **THE YIELDER HAS TO ACTUALLY LEAVE, and until 2026-08-23 it never did.** See
+		// yieldStationedLabels() -- this is the one call site, and it must run after BOTH placements.
+		yieldStationedLabels(nodePlaced, obs);
 		labelDebugReport(labels.concat(nodeLabels), placed.concat(nodePlaced), obs);
+	}
+	// **`yields` GRANTS THE GROUND; THIS IS WHAT MAKES THE HOLDER LEAVE IT** (Task 469, Tom's
+	// screenshot of 2026-08-23: a node's stacked readout printed straight through a `Q=` rotated
+	// along its own pipe, twice on one view of a geographic Net3).
+	//
+	// boxClearOf()'s middle answer lets a node label take a position held only by link labels, which
+	// is the node-outranks-link ruling and is right. What was missing is the other half: the link
+	// label went on being DRAWN on the ground it had just given up, so the ruling produced two
+	// labels on top of each other rather than the better one of the two. Measured on
+	// Net3-World at a working zoom: 60 node-label rows overprinting an aligned pipe label, up to
+	// 28 px deep, and ZERO node-on-node -- the one-sided signature of a rule only one side obeys.
+	//
+	// **THE YIELDER HIDES; IT DOES NOT SHED HERE, AND THAT IS THE CLOCK TALKING.** Shedding means
+	// rebuilding glyphs and forcing a layout, and this pass runs on every frame of a drag -- exactly
+	// why shedAlignedForConflicts() lives in the CONTENT path instead (see its own note). So the
+	// graceful rung stays where it is and this is the terminal one, the same hide §3.5 already ends
+	// the cascade with. A content pass clears the flag and re-decides from full, so a label given up
+	// for one crowded layout is back in contention on the next one.
+	//
+	// It cannot be folded into shedAlignedForConflicts() by seeding node labels better, and that is
+	// the thing to understand before "fixing" it there: that pass seeds node labels where the LAST
+	// layout put them, and where a node label ends up depends on the link boxes this pass commits.
+	// The two genuinely need each other's answer. Iterating them does converge -- measured, two more
+	// full passes to reach zero -- and costs three times a pass Task 436 has just spent its whole
+	// budget making affordable.
+	//
+	// **A YIELDED LABEL KEEPS ITS RESERVATION, which reads backwards and is what makes this stable.**
+	// §3.5's "a hidden label is not an obstacle" is about a label hidden because nothing would fit;
+	// this one is hidden because a node label is standing exactly there, and the node's own box says
+	// so on every later pass. Releasing the ground instead would free it, un-hide the label on the
+	// next pass, and hide it again on the one after -- a label blinking on a drawing nobody touched.
+	//
+	// INDEXED, for the same reason boxIsClear() is: this is every stationed label against every
+	// placed node line, which on the 480-pipe grid is a million box tests done one at a time.
+	function yieldStationedLabels(nodePlaced, obs) {
+		var nodeBoxes = [], taken = {}, i, j, bs, o, idx;
+		for (i = 0; i < nodePlaced.length; i++) {
+			if (nodePlaced[i].dropped) { continue; }
+			// The STAIRCASE the pass really reserved, not the block around it (Task 406): claiming
+			// the empty ground to the right of a short row would hide a pipe label nothing covers.
+			bs = nodePlaced[i].boxes || (nodePlaced[i].box ? [nodePlaced[i].box] : []);
+			for (j = 0; j < bs.length; j++) { nodeBoxes.push(bs[j]); }
+		}
+		if (nodeBoxes.length) {
+			idx = Collide.boxIndex(nodeBoxes);
+			for (i = 0; i < obs.boxes.length; i++) {
+				o = obs.boxes[i];
+				// linkOwner is placeStationedLabels()'s stamp, and it is the whole test: a box
+				// without one is a symbol, a Text object or a leader, none of which yields to
+				// anything.
+				if (o.linkOwner === undefined || taken[o.linkOwner]) { continue; }
+				if (idx.anyOverlap(o)) { taken[o.linkOwner] = true; }
+			}
+		}
+		// **CLEARED FOR EVERY LINK ON EVERY PASS**, dragged and hidden ones included, so the pass
+		// stays idempotent in the way addDataLabel()'s nudge is: a label that yielded once must be
+		// back in contention the next time, or the drawing only ever loses labels.
+		//
+		// **AND THE WHOLE CHAIN GOES, NEVER ONE STATION.** A repeated label's justification is the
+		// same name said again; one station missing from the middle of it reads as a different
+		// label, not as a shorter one (§3.5, which says the same of a shed).
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (le) { le.hiddenYielded = !!taken[l.id]; }
+		});
 	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped.
@@ -7947,7 +8026,7 @@ var EngCalcs = EngCalcs || {};
 	// 2.8em rather than the 2.1 Tom named for it: the same box serves Pipes and Valves, and in the
 	// SI preset a diameter is millimetres, so "1200" is four characters and 2.1em shows three.
 	function paneColDiameter() {
-		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; }, em: 2.1,
+		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; }, em: 3,
 			prop: 'diameter', get: function (l) { return effective(l, 'diameter'); },
 			set: function (l, v) { setProp(l, 'diameter', v); } };
 	}
@@ -8050,7 +8129,7 @@ var EngCalcs = EngCalcs || {};
 						set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
 					// Label, symbol and unit all follow settings.method (Task 271), through the same
 					// function the popup and the Labels legend use.
-					{ key: 'roughness', label: roughnessLabel, em: 2.31,
+					{ key: 'roughness', label: roughnessLabel, em: 6,
 						unit: function () { return frictionMethod() === 'dw' ? 'lpn_u_roughness' : ''; },
 						prop: 'roughness', get: function (l) { return effective(l, 'roughness'); },
 						set: function (l, v) { setProp(l, 'roughness', v); } },
@@ -8064,7 +8143,7 @@ var EngCalcs = EngCalcs || {};
 					// the least that shows three characters. The vertical argument decides nothing
 					// either way -- no desktop column carries a width, so a small box never wraps a
 					// heading.
-					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 1.4,
+					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 3,
 						get: function (l) { return effective(l, 'k') || 0; },
 						set: function (l, v) { setProp(l, 'k', v); } },
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
@@ -14015,6 +14094,19 @@ var EngCalcs = EngCalcs || {};
 		// one path where a user most expects to come back to where they were. refreshAllFromDocument()
 		// ends in restoreViewOrFit(); boot has its own sequence and has to pick that up too.
 		restoreViewOrFit();
+		// **"?lpn_examples=1" OPENS THE GALLERY, so a link somewhere else can land on it.** The
+		// LibreWaterNet page had two calls to action pointing at the same bare URL, one of them
+		// labelled "Open an example" -- and a returning visitor with a project of their own would
+		// have got the map, not the gallery, so the promise was false for exactly the reader most
+		// likely to notice. This is the File > Open example... route, not a second mechanism:
+		// showExamplesOverlay() is the same call the menu item makes.
+		//
+		// The parameter is NOT scrubbed from the URL the way ?lpn_wipe=1 is. A wipe must not happen
+		// twice on a reload; a gallery reopening on a reload is what the link said it would do, and
+		// the URL stays shareable.
+		try {
+			if (/[?&]lpn_examples=1(&|$)/.test(window.location.search)) { showExamplesOverlay(); }
+		} catch (err) { /* location can throw in an exotic host; the page is fine without the overlay */ }
 		requestAnimationFrame(tick);
 	}
 
@@ -15130,6 +15222,18 @@ var EngCalcs = EngCalcs || {};
 			? pc.lpn_field_roughness_tip
 			: (pc.bpn_roughness_tip || pc.lpn_field_roughness_tip);
 	}
+	// **THE REFERENCE TABLE FOLLOWS THE METHOD TOO** (Tom, 2026-08-23: *"like at mpf, dw, and hw,
+	// for lpn, bpn, and ip to have links to the same roughness tables"*). Three tables, because the
+	// three roughnesses are three different quantities -- a Manning user sent to a Hazen-Williams C
+	// table is worse off than with no link at all. The URLs are pageConfig, not literals here, so
+	// they sit beside the other reference links in the page rather than inside the editor.
+	function roughnessTableUrl() {
+		var urls = (EngCalcs.pageConfig || {}).lpn_roughness_urls;
+		return (urls && urls[frictionMethod()]) || '';
+	}
+	// And the minor-loss table, which does NOT follow the method: k is one quantity whichever
+	// friction equation carries the pipe. One URL, so no lookup.
+	function kmTableUrl() { return (EngCalcs.pageConfig || {}).lpn_km_url || ''; }
 	// The declared roughness as the SOLVER wants it. Dimensionless for Manning/HW, so the number
 	// passes through untouched; a length for Darcy-Weisbach, so it crosses the same unit boundary
 	// every other quantity does (Task 263: the document stores what was typed, the handoff
@@ -16127,6 +16231,17 @@ var EngCalcs = EngCalcs || {};
 	function setPageTitlesShown(show) {
 		try { localStorage.setItem(PAGE_TITLES_KEY, show ? '1' : '0'); } catch (e) {}
 		applyPageTitles(show);
+		// **AND THE MAP TAKES THE ROOM BACK** (Tom, 2026-08-23: *"When I toggle the page titles, the
+		// height of the map doesn't respond. Turning them off creates an empty space (gap) below the
+		// map that doesn't resolve until a page reload."*). applyMapHeight() sizes the canvas from
+		// `body.bottom - svg.bottom`, and hiding three headings moves the svg up without changing
+		// that stored height -- so the gap is the height the headings used to occupy, still being
+		// reserved by a number nobody recalculated.
+		//
+		// This does NOT contradict the standing "no applyMapHeight() here" note on opening a project.
+		// That one says the bottom of the map does not depend on the MODEL. This is the ENVIRONMENT
+		// changing -- the same class of event as a window resize, which has always called it.
+		applyMapHeight();
 	}
 
 	// **THE SUB-HEADINGS ARE IN THE MARKUP NOW AND THIS FILLS THEM** (Task 441, restructured). The
@@ -16152,10 +16267,10 @@ var EngCalcs = EngCalcs || {};
 		// precedes its control cannot wrap without the control wrapping with it and cannot line its
 		// controls up down the panel; a flex row gives the words the slack, the control a right-hand
 		// column, and a long name two lines instead of a wider box.
-		function row(target, labelText, input, tip) {
+		function row(target, labelText, input, tip, href) {
 			var line = document.createElement('label'), text = document.createElement('span');
 			line.className = 'lpn-set-row';
-			setFieldLabel(text, labelText, tip);
+			setFieldLabel(text, labelText, tip, href);
 			line.appendChild(text);
 			line.appendChild(input);
 			target.appendChild(line);
@@ -16180,7 +16295,10 @@ var EngCalcs = EngCalcs || {};
 		// a default alters nothing that already exists. EngCalcs.pageCalculator re-runs this rebuild
 		// on a unit switch, so a default REINTERPRETS along with everything else -- a default diameter
 		// of 8 becomes 8 mm. unitId null means dimensionless (roughness, K).
-		function defaultRow(target, labelText, unitId, key, isValid) {
+		// `href`, where given, points at the reference table for the quantity -- the same tables the
+		// form calculators link to. setFieldLabel() does the link-plus-tip nesting; this only
+		// carries the URL through.
+		function defaultRow(target, labelText, unitId, key, isValid, tip, href) {
 			var input = document.createElement('input');
 			input.type = 'number'; input.step = 'any';
 			input.value = trimNum(settings.defaults[key]);
@@ -16189,7 +16307,7 @@ var EngCalcs = EngCalcs || {};
 				if (input.value !== '' && isFinite(v) && isValid(v)) { settings.defaults[key] = v; saveToStorage(); }
 				else { input.value = trimNum(settings.defaults[key]); }
 			});
-			row(target, unitId ? labelText + ' (' + unitLabel(unitId) + ')' : labelText, input);
+			row(target, unitId ? labelText + ' (' + unitLabel(unitId) + ')' : labelText, input, tip, href);
 		}
 		function any() { return true; }
 		function positive(v) { return v > 0; }
@@ -16264,10 +16382,15 @@ var EngCalcs = EngCalcs || {};
 		// reasoning as refreshLabelText()'s plainRound() treatment of these two fields.
 		// unitId is the roughness selector under Darcy-Weisbach (e is a length) and null otherwise
 		// (n and C are dimensionless) -- the one row here whose units depend on another setting.
-		defaultRow(defBody, roughnessLabel(), frictionMethod() === 'dw' ? 'lpn_u_roughness' : null, 'roughness', positive);
+		// **THE SAME REFERENCE TABLES THE POPUP LINKS TO** (Tom, 2026-08-23: *"I was specifically
+		// asking on behalf of lpn, at Settings.Values.Roughness"*). Roughness follows the friction
+		// method; k does not. Both URLs come from pageConfig, so the page states them once.
+		defaultRow(defBody, roughnessLabel(), frictionMethod() === 'dw' ? 'lpn_u_roughness' : null, 'roughness', positive,
+			roughnessTip(), roughnessTableUrl());
 		// No Length row, deliberately (Tom, 2026-07-30): lenAuto derives a pipe's length from the
 		// drawn geometry, so any default here would be overwritten the moment the pipe is drawn.
-		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, k', null, 'k', nonNegative);
+		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, k', null, 'k', nonNegative,
+			pc.lpn_field_km_tip, kmTableUrl());
 		// ---- push defaults to existing elements ----
 		// A HARD push, deliberately. "Update only elements still holding the OLD default" cannot tell
 		// a deliberately-typed 6 from an untouched 6, so it is SILENTLY destructive rather than
@@ -17862,14 +17985,38 @@ var EngCalcs = EngCalcs || {};
 	// These labels are built long after DOMContentLoaded, so js/Calculators.lib.js's page-load pass
 	// cannot see them -- initTips() has to be called on the container afterwards, which is why every
 	// setFieldLabel() caller ends with tipsIn(fields).
-	function setFieldLabel(label, text, tip) {
-		if (!tip) { label.textContent = text + ' '; return; }
-		var help = document.createElement('span'), glyph = document.createElement('span');
+	// **THE TWO NESTINGS ARE OPPOSITE, AND THAT IS THE WHOLE OF THIS FUNCTION** -- the same rule
+	// lib/Calculators.lib.php's ecTipLabel()/ecLinkTipLabel() pair follows, restated here because
+	// this popup builds its labels in JS. WITHOUT a link, `.ec-help` wraps the label text AND the
+	// glyph, or the tap target is one character. WITH one, the `<a>` is already a big target, so
+	// `.ec-help` wraps the glyph alone. Explanatory text never goes in the anchor's own title=:
+	// js/Calculators.lib.js only activates tap-triggered tooltips on `.ec-help[title]`, so on touch
+	// a bare `<a title>` just navigates and the text is never seen.
+	function setFieldLabel(label, text, tip, href) {
+		var help, glyph, a;
+		if (!tip && !href) { label.textContent = text + ' '; return; }
+		label.textContent = '';
+		glyph = document.createElement('span');
+		glyph.className = 'ec-tip'; glyph.textContent = '?';
+		if (href) {
+			a = document.createElement('a');
+			a.href = href; a.target = '_blank'; a.rel = 'noopener';
+			a.textContent = text;
+			label.appendChild(a);
+			label.appendChild(document.createTextNode(' '));
+			if (tip) {
+				help = document.createElement('span');
+				help.className = 'ec-help'; help.title = tip;
+				help.appendChild(glyph);
+				label.appendChild(help);
+			}
+			label.appendChild(document.createTextNode(' '));
+			return;
+		}
+		help = document.createElement('span');
 		help.className = 'ec-help'; help.title = tip;
 		help.appendChild(document.createTextNode(text + ' '));
-		glyph.className = 'ec-tip'; glyph.textContent = '?';
 		help.appendChild(glyph);
-		label.textContent = '';
 		label.appendChild(help);
 		label.appendChild(document.createTextNode(' '));
 	}
@@ -18655,7 +18802,7 @@ var EngCalcs = EngCalcs || {};
 				roughnessLabel() + (frictionMethod() === 'dw' ? ' (' + unitLabel('lpn_u_roughness') + ')' : ''),
 				effective(l, 'roughness'),
 				function (v) { setProp(l, 'roughness', v); refreshPopupIfOpen(); }, roughnessTip(),
-				{ el: l, prop: 'roughness' });
+				{ el: l, prop: 'roughness' }, roughnessTableUrl());
 			// Minor (local) loss coefficient, k_m -- dimensionless, so no unit conversion. Defaults
 			// from settings.defaults.k at creation. PLAIN-TEXT wording only, no <sub> markup: this
 			// popup's fields are built via textContent, and the suite's "k<sub>m</sub>" label
@@ -18663,7 +18810,7 @@ var EngCalcs = EngCalcs || {};
 			// not forcing markup into a plain-text slot.
 			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
 				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, pc.lpn_field_km_tip,
-				{ el: l, prop: 'k' });
+				{ el: l, prop: 'k' }, kmTableUrl());
 			lengthField(fields, l);
 		}
 		closedField(fields, l, linkId);
@@ -18783,7 +18930,7 @@ var EngCalcs = EngCalcs || {};
 			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k',
 				effective(l, 'k') || 0,
 				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); },
-				pc.lpn_field_valve_km_tip, { el: l, prop: 'k' });
+				pc.lpn_field_valve_km_tip, { el: l, prop: 'k' }, kmTableUrl());
 		}
 	}
 	function openLinkPopup(linkId, sx, sy) {
@@ -19049,11 +19196,11 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
-	function numberFieldPlain(fields, labelText, value, onChange, tip, ov) {
+	function numberFieldPlain(fields, labelText, value, onChange, tip, ov, href) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.value = value;
 		input.addEventListener('change', function () { onChange(+input.value); completeEdit(ov); });
-		setFieldLabel(label, labelText, tip);
+		setFieldLabel(label, labelText, tip, href);
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));

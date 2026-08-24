@@ -90,9 +90,34 @@ the block.
   fixed in `refreshLabelText()` and left in this path. Batched 2026-08-23: **1,008 forced layouts per
   notch → 9** on a 112-pipe grid, every label keeping the same values, guarded by
   `dev/lpn-spike/zoom-reshed-harness.js`; 44–458 ms in the browser.
-  - **WHAT IS LEFT IS `shedAlignedForConflicts()`,** now the whole of it: 0.3–1.8 s per notch, over
-    9M box-overlap tests across eleven passes. Its cascade has a cross-label term, so it cannot be
-    batched — but its obstacle walk is un-indexed, which is the shape Task 472 fixed for segments.
+  - **`shedAlignedForConflicts()`'s obstacle walk is INDEXED, 2026-08-23.** It was the whole of what
+    was left — 0.3–1.8 s per notch in over 9M box-overlap tests. The cascade still runs one label at
+    a time and always will (each label placed is an obstacle for the next); what grew with the
+    drawing was `boxIsClear()`'s walk. Through `Collide.boxIndex()`: **231 → 7.3 overlap tests per
+    label on 112 pipes, 860 → 7.1 on 480** — the per-label rate now flat instead of rising. Every
+    placement byte-identical, proved by dumping both passes from separate processes.
+    `dev/lpn-spike/aligned-shed-index-harness.js` guards it.
+    - **An APPEND-ONLY grid that re-reads the caller's array on each query, not a tree.** The
+      difference from Task 472: that index is built once and held, this one absorbs an insert
+      between every pair of queries. A grid's insert has no rebalance, and syncing on query meant no
+      call site had to be told about the insert.
+    - **THIS PASS CONVERGES ACROSS PASSES,** which is a trap for anyone comparing it: it seeds node
+      labels as obstacles where the last layout PLACED them, so two identical runs back to back in
+      one process already disagree on one label. Compare backends in separate processes.
+  - **AND IT IS STILL 2.5–3.3 s END TO END, WHICH THE COUNTS CANNOT SEE.** Measured in Chromium
+    AFTER both fixes above, on the same 736-element geographic grid: the block after a zoom runs
+    2.5–3.3 s with labels on against **0.5–0.7 s with every label field switched off**, so what is
+    left is label work. One run of the identical gesture hit 16.9 s. Forced layouts are held at 9
+    per notch and overlap tests at ~7 per label, so the remaining cost is PER-LABEL work no index
+    removes — text measurement is the suspect and is unproven. `specs/perf.js` reports the number
+    and asserts no bound: the spread is wider than any honest threshold.
+  - **AND THAT CONVERGENCE WAS HIDING A DEFECT, FIXED 2026-08-23.** Because the seed lags, a first
+    layout sheds link labels for ground the node labels do not take, and the node then takes ground
+    under a pipe label using `yields` — which granted the position and never made the holder leave.
+    Measured on `Net3-World`: 60 node label rows printed through an aligned pipe label, up to 28 px
+    deep, zero node-on-node. `yieldStationedLabels()` hides the yielder; node placements are
+    unchanged. Iterating the two passes instead also reaches zero and costs 3x.
+    `dev/lpn-spike/node-yield-harness.js`.
   - Placement leftovers, small: a background image is not carried onto the map, the two-control-point
     path (`lpnGeorefFromTwoPoints`) is built and tested with no interface, and Finish is not undoable.
   - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the
@@ -154,7 +179,10 @@ the block.
   - **[H] `friction_check.php` NOW EXITS 1 with 16 `refer-to-human` entries awaiting Tom's ruling.**
     That is the escalation mechanism working, and it is not in `check_all.sh` so it blocks no commit —
     **but it blocks the next sprint launch until he rules.** The 16, plus 9 wording proposals and 7
-    `$ec_lang_syn` proposals, are in `239-wave0-calcs.json`.
+    `$ec_lang_syn` proposals, are in `239-wave0-calcs.json`. **Tom answers in
+    `dev/english-friction/239-refer-to-human.md`** (2026-08-23: *"Give me a file or a page where I
+    can decide and comment"*) — one `**Tom:**` line per item, blank meaning not yet decided. Each
+    answer goes back into the JSON's `disposition` and `resolution`, which is what re-opens the gate.
 
 - 50|496| **The harness stub has no EPANET engine, so `settings.engine` never matters.**
   Extracted from Task 378 on close, and the move that closed it made this MORE true: the three
@@ -197,36 +225,34 @@ the block.
     landing page's own repository at `~/librewaternet.org/index.html`. Move the local working
     directory in that same pass and not before (`dev/hosting-layout.md` §5).
 
-- 75|478| **[H] Tab should walk down the input column, not sideways.**
-  BUILT; awaiting Tom on one measured layout difference, below. Tom, 2026-08-22: *"One entire column
-  at a time... it is less bad to force a user tabber person into 'do an entire column at once' than
-  'do an entire row at once'"*.
-  - **BUILT.** `echoInputGrid()` (lib/Calculators.lib.php) emits the input lines as a CSS grid whose
-    DOM is column-major — every input, then every label, then every unit select, then every X — each
-    cell placed back on its line with `grid-row`. `x-cross` is **0 on all fifteen pages the grid
-    builds** (was: Manning-Trap 16, Irrigation-Pressure 12, Orifice-Drain-Time 9, Branched-Network 8,
-    Darcy-Weisbach 8, Manning-Pipe-Flow 4) and `focus_order_check.php` now FAILS on any grid page
-    that is not at zero. Looped-Network is the one calculator with no grid (its inputs are a property
-    sheet) and keeps 6, reported only.
-  - **THE ONE THING TOM HAS TO RULE ON, and the reason this is not closed.** **While the form fits
-    the window the layout is identical to the pixel** — every control, every rule, every language,
-    LTR and RTL, verified by `dev/browser-pass/fieldgrid-layout.js`, which serves the old markup and
-    the new side by side and compares every box. **When the window is too narrow for the form it is
-    not.** A `<td>` wraps its contents and two grid columns cannot: the input and its unit select
-    shared one cell, so a squeezed table used to drop a wide unit select onto a second line under its
-    input. Now the label column takes the whole squeeze and the select stays on the line — one row
-    shorter, panel a few px wider and up to 78px shorter, overall form width unchanged, no new
-    horizontal scrolling. In English it appears on Manning-Trap below ~1400px and Rock-Chute below
-    ~1200px; in the languages with long unit names it starts higher (Manning-Trap and Rock-Chute at
-    1400px in most, Irrigation-Pressure and Canal-Seepage in bg/de) and is gone by 1920px everywhere.
-    Arguably tidier, but it is a change, and **wrapping and column-major tab order are mutually
-    exclusive**: wrapping needs the input and the select in one box, and tab order follows that box's
-    DOM. Tom decides; there is no third option to find.
-  - **Rejected: `tabindex="-1"` on everything but titles and inputs.** It removes a control from the
-    keyboard entirely, so a keyboard-only user could not switch ft to m (WCAG 2.1.1 requires all
-    functionality to be keyboard-operable), and the per-row X would become mouse-only.
-  - Still owed once Tom rules: his own browser pass on hiding a line (the X is a multi-target
-    collapse now) and on the three pages whose own script hides a line by id.
+- 100|478| **[H] BUILT AND WAITING ON ONE RULING: Tab walks the input column.**
+  Tom, 2026-08-22: *"One entire column at a time... it is less bad to force a user tabber person into
+  'do an entire column at once' than 'do an entire row at once'"*. Built 2026-08-23 as DOM order, not
+  `tabindex` (which would take a unit select off the keyboard entirely — WCAG 2.1.1). **It is on the
+  local branch `task-478-fieldgrid`, deliberately unmerged.** `echoInputGrid()` emits column-major
+  cells placed by `grid-row`.
+  - **x-cross is 0 on all 15 grid pages** (was 16 on Manning-Trap, 12 on Irrigation-Pressure, 9, 8,
+    8, 7, 7, 7, 6, 5, 5, 4, 1). `focus_order_check.php` now BLOCKS, gated on a property of the page
+    — renders `.ec-fieldgrid` ⇒ x-cross must be 0 — never a hand list. `Looped-Network.php` is not an
+    `echoCalculatorForm()` page and stays advisory.
+  - **Layout is pixel-identical in English at 1400px on all 16 pages**, at every width from 1500px
+    up, and in all five RTL languages. Verified by `dev/browser-pass/fieldgrid-layout.js`, which
+    serves the repo twice and compares every control's box; re-run independently before this note.
+  - **THE ONE RULING NEEDED, and it is structural, not a bug.** A `<td>` wraps its contents; two grid
+    columns cannot. Where the window is too narrow, a wide unit select used to drop onto a second
+    line under its input and now stays on the line, the label column absorbing the squeeze — one row
+    shorter, form width unchanged, no new horizontal scrolling. English: Manning-Trap below ~1400px,
+    Rock-Chute below ~1200px. At 1400px in other languages: Manning-Trap in 14, Rock-Chute in 13,
+    Irrigation-Pressure in 4. Gone by 1920px. Wrapping needs the input and the select in one box, and
+    tab order follows that box — there is no third option.
+  - **Accepted cost, written down not quiet:** WCAG 1.3.2. Visual order and DOM order now differ, so
+    a screen reader browsing LINEARLY hears inputs, then labels, then selects, and each label twice;
+    a reader TABBING gets what Tom asked for. The old markup was a layout table (no `<th>`, no
+    caption), so no row/column relationship is lost.
+  - Needs a browser pass before merge: the X button hides all four cells of a line; the conditional
+    lines on Orifice, Orifice-Drain-Time and Branched-Network appear and disappear whole; "Printable
+    version" then toggling the orifice shape keeps the X's gone; the collapse animation.
+
 
 - 75|483| **EPANET import: carry unhandled features into a per-asset import notes field.**
   Tom, 2026-08-22. Today an import reports its differences and then the information is discarded; a
@@ -241,9 +267,9 @@ the block.
   Extracted from Task 491 on close. He believes it does — *"inputs are flexible. You can enter more
   than their width"* (2026-08-23) — and asked to be reminded to confirm it in a browser before a
   pane-table column width is treated as a constraint on how many decimals a value can carry. The
-  narrow boxes riding on it are Minor loss at 1.4em and Diameter at 2.1em; if typing into either
-  proves lossy, restore 2.1em and 2.8em. `dev/lpn-spike/pane-harness.js` holds both measurements
-  as knowingly-failing checks so the answer has somewhere to land.
+  **Nothing rides on the answer any more.** Round 3 of the width review (2026-08-23, *"I confess I
+  am being too stingy"*) widened the last two narrow boxes past their longest values, so the
+  question is now about the suite's inputs generally, not about these four columns.
 
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
@@ -350,14 +376,56 @@ the block.
   - **EPANET has no such concept**, so an `.inp` export flattens it and an import can never rebuild it,
     which breaks Task 281's byte-identical round trip for anything typed. Task 390-sized.
 
-- 50|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
+- 50|497| **Automatic elevations for a lat/lon project, from a terrain source.**
+  Tom asked 2026-08-23 whether this is on the roadmap and where the data would come from. It was
+  not; this is the entry. A geographic project knows every node's latitude and longitude, and
+  elevation is the one input a designer otherwise types by hand for every junction.
+  - **Mapbox Terrain-RGB is the strongest fit and the reason is that it is already paid for.**
+    `EC_MAPBOX_TOKEN` already gates satellite tiles, terrain is delivered as ordinary raster tiles,
+    and the elevation decodes client-side from the pixel — no server of ours, no new account, and
+    the same tile plumbing `project.basemap` already has. Alternatives if that gate is ever absent:
+    USGS 3DEP (US only, ~10 m, no key), Copernicus GLO-30 or SRTM through OpenTopoData
+    (self-hostable), Open-Elevation (free, rate-limited). Google's Elevation API is paid and keyed.
+  - **IT NEEDS ITS OWN CONSENT GATE, not the tile one.** A tile says where you are LOOKING; an
+    elevation query says where your NODES ARE, which is the model itself. That is the `ec_geosearch`
+    argument exactly, and the search got its own gate for it.
+  - **It WRITES numbers into the document, which is the hard constraint.** Only the user touches a
+    file's numbers. So it has to be an explicit action that FILLS a field the way typing does —
+    never a background sweep, never overwriting an elevation somebody typed, and undoable in one
+    step. Accuracy must be stated: 30 m ground resolution is a contour interval, not a survey.
+
+- 25|500| **One home for the reference-table URLs, now copied into four pages.**
+  The Hazen-Williams C, Manning n and Darcy-Weisbach roughness-height tables are linked from
+  `Manning-Pipe-Flow.php`, `Hazen-Williams.php`, `Darcy-Weisbach.php`, `Irrigation-Pressure.php`,
+  `Branched-Network.php` and `Looped-Network.php`, and the URL text is written out separately in
+  each. The EPA one is a 500-character `nepis.epa.gov` query string, so a silent divergence is very
+  easy and very hard to see. The minor-loss-coefficient link is duplicated the same way.
+  - Not urgent and not free: the natural home is `lib/`, and the file that would host it is being
+    rewritten on the `task-478-fieldgrid` branch. **Sequence this after 478 lands or is dropped.**
+
+- 25|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
+  Tom, 2026-08-23: epanet-js runs one at `roadmap.epanetjs.com`, powered by Canny. Noted as an
+  example to weigh, not a decision. The thing to weigh is that `dev/ROADMAP.md` is written for us and
+  says things a public board should not (measured costs, what Tom is not proud of, who to ask), so a
+  public board is a SECOND artifact to keep current, not this one exposed.
+
+- 50|499.01| ** Create a Scenarios menu icon **
+  - Use the paradigm of this icon, probably without the page element. Described textually, this depicts scenarios as three branched children of a main project. It might be nice to make the shape of the main (project) and children (scenarios) reminiscent of our Project icon, possibly stripped of its details and scaled down. If not, then just squares with an aspect ratio representative of a 2H x 3H plan sheet https://www.flaticon.com/free-icon/scenario_17921358?term=scenario&page=1&position=8&origin=tag&related_id=17921358
+- 50|499.02| ** Add a tip to the lpn Project menu **
+  -  'Everything unique about this application is here in one place except the animation play controls. There is no need to guess where things are.'
+  - It would be good to have this reviewed by Mary before or after deployment. Either way is fine. - Tom 2026-08-23
+- 100|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
   *"Properties are never dropped from node labels, so Node label drop order is a lie... As I look at
   Net3, it seems to me that in many cases we could see many more node labels if some of the
   requested node properties were dropped. We probably should try to implement it and then judge
   whether the cost is too high."*
-  - Today the node Drop column orders the TESTS that decide which whole label is hidden
-    (`nodeDropKey`); only link labels shed (`shedOrder`, `shedToSegment`). The column reads as a
-    property drop order in both lists and is one only in one of them.
+  - **STILL NOT BUILT, and Tom is right that there is no evidence of it** (*"I can't see any evidence
+    of node labels dropping properties"*, 2026-08-23). Checked rather than assumed:
+    `labelSettings.priority.node` has exactly ONE consumer in `js/looped-network.js`, `nodeDropKey()`,
+    which builds a sort key deciding which whole label is hidden; `shedKeepSet()`/`keptLines()` are
+    called from three places and every one of them is a link. So it is not implemented-and-unreached
+    — there is nothing to reach. The column reads as a property drop order in both lists and is one
+    only in the link list. This is a FEATURE and wants scoping before it is written.
   - **ANY overlap, not a vertical one** (Tom left the question open in the tip). `js/lpn-collide.js`
     relaxes boxes and has no notion of an axis, so classifying an overlap as vertical means
     inventing that notion and answering it for a diagonal overlap. A shed row also shortens the

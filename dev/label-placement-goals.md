@@ -146,7 +146,9 @@ position it may take — `yields` on the obstacle box is how the caller tells th
 `lpn-collide.js` learning what a link is. A clear side still beats a held one, so the preferred-side
 order finishes before the fallback is used. Tom, 2026-08-17, on a bare node beside a labelled one:
 *"There's no reason why this node must be hidden except that it may conflict with the link. But the
-node is supposed to have preference."*
+node is supposed to have preference."* **The other half of that sentence is that the yielder then
+LEAVES:** a link label whose ground a node label has taken is hidden, or the ruling puts two labels
+on top of each other instead of leaving the better one of the two (§3.5).
 
 **Between the two classes: LINKS PLACE FIRST, NODES SURVIVE FIRST** (Tom, 2026-08-16: *"node-outranks-
 link is about dropping things. For placement, links have priority. But if there's no fit, the link
@@ -343,13 +345,34 @@ a ratchet. Every re-evaluation therefore starts from the FULL value list, never 
 last time, and the zoom path re-runs it (debounced, so a wheel spin costs one pass and not one per
 notch). Recomputing from full is what makes UNSHEDDING possible at all.
 
-**There is no repair pass, and its removal is part of the design rather than a tidy-up.** Phase 1
-shipped before Phase 2, so a node label with nowhere to go took a blocking link label's ground and
-hid it whole — the link had nothing to yield *with*. Now it has: the link label sheds values for the
-node label before placement runs, which is the graceful form of the same ruling. Keeping the crude
-mechanism alongside the graceful one left two doors to the same situation and a reader could not tell
-them apart (Tom, 2026-08-17: *"I am sometimes observing the repair happening, which is confusing."*).
-If a node label still cannot fit once link labels have shed, it drops — which is what §2.1 says.
+**THE SHED IS THE GRACEFUL RUNG AND IT RUNS FIRST, BUT IT CANNOT BE THE ONLY ONE.**
+`shedAlignedForConflicts()` makes a link label give up values for the node labels around it *before*
+placement runs, which is the graceful form of the node-outranks-link ruling. It cannot be complete,
+and the reason is structural rather than a bug to hunt: it seeds node labels where the LAST layout
+put them, and where a node label ends up depends on the link boxes placement is about to commit. The
+two need each other's answer. On a first layout — a project opened, a zoom step, a solve — the link
+label therefore sheds for ground the node label does not take, and the ground it *does* take was
+never contested. Measured on `Net3-World` at a working zoom: **60 node label rows printed straight
+through an aligned pipe label, up to 28 px deep, with zero node-on-node and zero pipe-on-pipe** —
+the one-sided signature of a rule only one side obeys. Iterating the two passes does converge (two
+more full passes to zero, measured) and costs three times a pass Task 436 spent its whole budget
+making affordable.
+
+**So the yielder has a terminal rung too: a link label whose ground a node label has just taken is
+HIDDEN** (`yieldStationedLabels()`, 2026-08-23). That is §2.2's survival order carried out rather
+than merely granted — `yields` says the node *may* take the position, and this is what makes the
+holder leave it. It is not the old repair pass, which fired *instead* of the shed and hid a link
+label that still had values to give (Tom, 2026-08-17: *"I am sometimes observing the repair
+happening, which is confusing."*); this one fires *after* it, only on what the shed could not
+foresee, and it hides for the same reason §3.5's cascade hides at the bottom. It does not shed there,
+because the collision pass runs on every frame of a drag and shedding rebuilds glyphs — the clock is
+why the graceful rung lives in the content path in the first place. A node label that still cannot
+fit once link labels have shed drops, which is what §2.1 says.
+
+**A yielded label KEEPS its reservation**, which reads backwards against "a hidden label is not an
+obstacle" and is the difference between a stable drawing and a blinking one: that rule is about a
+label hidden because nothing would fit, while this one is hidden because a node label is standing
+exactly there and says so on every later pass. Guard: `dev/lpn-spike/node-yield-harness.js`.
 
 **A SHED IS TESTED ON REAL OVERLAP, WITH NO PADDING.** The aligned-label slider's clearance
 (`LPN_ALIGNED_PAD_FRAC`, 0.35 of a font size) was reused here and should not have been: it grows the

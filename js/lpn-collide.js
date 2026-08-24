@@ -836,6 +836,160 @@ EngCalcs.lpnCollide = (function () {
 		}
 		return out;
 	}
+	// **"DOES THIS BOX TOUCH ANYTHING?" ASKED OF A PLAIN LIST -- THE DEFINITION.** boxIndex() below
+	// has to give this answer, box for box, on every input; aligned-shed-index-harness.js compares
+	// the two before it counts anything.
+	function anyBoxOverlap(q, boxes) {
+		var i;
+		for (i = 0; i < boxes.length; i++) {
+			if (boxOverlapDepth(q, boxes[i]) > 0) { return true; }
+		}
+		return false;
+	}
+	// A box bigger than this many cells is not binned at all -- it goes in `big` and is tested on
+	// every query. One box across a whole map would otherwise fill the index by itself.
+	var BOX_INDEX_MAX_CELLS = 4096;
+	/**
+	 * THE SAME QUESTION THROUGH A UNIFORM GRID, AND IT IS THE SAME ANSWER (ROADMAP Task 436).
+	 *
+	 * WHY IT EXISTS. shedAlignedForConflicts() asks boxIsClear() about one label at a time and each
+	 * label it places becomes an obstacle for the next, so the walk it was doing grew with the
+	 * drawing twice over: more labels asking, and more boxes to walk each time. Measured on the grid
+	 * dev/browser-pass/specs/perf.js builds, 112 pipes cost 231 overlap tests per label and 480 pipes
+	 * cost 860 -- the per-label rate rising with the drawing is the whole defect.
+	 *
+	 * **EXACT, NOT APPROXIMATE, AND THE REASON IS THAT THIS IS NOT A SCORE.** A near-miss here does
+	 * not cost a fraction of a point, it takes a number off an engineering drawing. So the broad
+	 * phase can only ever hand the narrow phase MORE candidates than it needs, never fewer: two
+	 * boxes that overlap have bounding boxes that overlap, floor() is monotone, so their cell ranges
+	 * overlap and they always share a cell. Every candidate then goes through the same
+	 * boxOverlapDepth() the walk used, so the boolean cannot differ.
+	 *
+	 * **AN APPEND-ONLY GRID THAT SYNCS ON QUERY, rather than a tree.** The obstacle list MUTATES
+	 * during the pass -- this is the difference from Task 472's segment index, which could be built
+	 * once and held because a zoom changes scale and not topology. The choice was between a
+	 * structure that rebalances on insert (an R-tree) and one that does not, and a grid does not:
+	 * an insert is a floor() and a push into each cell the box's bounding box touches, with no
+	 * rebalance and no comparison against anything already stored. It also means the index need not
+	 * be told about the insert at all. It reads `boxes.length` on each query and bins whatever
+	 * arrived since, so **any code anywhere that pushes onto the caller's array is picked up** and
+	 * no call site had to change. That holds because the array is APPEND-ONLY; a splice would strand
+	 * indices, which is why the index stores indices and would notice.
+	 *
+	 * The cell is the MEDIAN box diagonal of whatever is present at the first query -- a median
+	 * rather than a maximum so that one map-wide Text label cannot coarsen the grid into a single
+	 * cell, and that outlier lands in `big` instead.
+	 */
+	function boxIndex(boxes) {
+		var cells = new Map(), big = [], next = 0, cell = 0,
+			stamp = 0, seen = [], self;
+		function key(i, j) { return i * 4294967296 + j; }
+		// The AXIS-ALIGNED bounds of an oriented box. Tighter than the half-diagonal circle grid()
+		// bins by, which matters here because an aligned label lying along a diagonal pipe is long
+		// and thin and its circle is mostly empty.
+		function bounds(b) {
+			var c = boxCorners(b), i,
+				x0 = c[0].x, y0 = c[0].y, x1 = c[0].x, y1 = c[0].y;
+			for (i = 1; i < 4; i++) {
+				if (c[i].x < x0) { x0 = c[i].x; }
+				if (c[i].x > x1) { x1 = c[i].x; }
+				if (c[i].y < y0) { y0 = c[i].y; }
+				if (c[i].y > y1) { y1 = c[i].y; }
+			}
+			return { x0: x0, y0: y0, x1: x1, y1: y1 };
+		}
+		function finite(bb) {
+			return isFinite(bb.x0) && isFinite(bb.y0) && isFinite(bb.x1) && isFinite(bb.y1);
+		}
+		function pickCell() {
+			var ds = [], i, d;
+			for (i = 0; i < boxes.length; i++) {
+				d = Math.hypot(boxes[i].w, boxes[i].h);
+				if (isFinite(d) && d > 0) { ds.push(d); }
+			}
+			if (!ds.length) { return 0; }
+			ds.sort(function (a, b) { return a - b; });
+			return ds[ds.length >> 1];
+		}
+		function insert(idx) {
+			var bb = bounds(boxes[idx]);
+			// A box with a non-finite corner cannot be binned and must not be LOST: boxOverlapDepth()
+			// decides what a NaN box overlaps, not this.
+			if (!finite(bb)) { big.push(idx); return; }
+			var i0 = Math.floor(bb.x0 / cell), i1 = Math.floor(bb.x1 / cell),
+				j0 = Math.floor(bb.y0 / cell), j1 = Math.floor(bb.y1 / cell), i, j, k, c;
+			if ((i1 - i0 + 1) * (j1 - j0 + 1) > BOX_INDEX_MAX_CELLS) { big.push(idx); return; }
+			for (i = i0; i <= i1; i++) {
+				for (j = j0; j <= j1; j++) {
+					k = key(i, j); c = cells.get(k);
+					if (!c) { c = []; cells.set(k, c); }
+					c.push(idx);
+				}
+			}
+		}
+		function sync() {
+			if (next >= boxes.length) { return; }
+			// Deferred until there is something to measure: a cell chosen from an EMPTY list is a
+			// guess, and it would then stand for the whole pass.
+			if (!cell) {
+				cell = pickCell();
+				if (!(cell > 0) || !isFinite(cell)) { cell = 1; }
+			}
+			for (; next < boxes.length; next++) { insert(next); }
+		}
+		function hit(idx, q) {
+			if (seen[idx] === stamp) { return false; }
+			seen[idx] = stamp;
+			self.tests++;
+			return boxOverlapDepth(q, boxes[idx]) > 0;
+		}
+		self = {
+			// Overlap tests actually performed, for a harness to count. The point of the index is
+			// that this rises with the QUERY's neighbourhood and not with the drawing.
+			tests: 0,
+			// True iff any box in the list overlaps `q` -- the same boolean anyBoxOverlap() gives.
+			anyOverlap: function (q) {
+				sync();
+				// A FRESH STAMP FIRST, before anything reads seen[]: the deduplication is what
+				// stops a box that spans several cells being tested twice, and a stamp bumped
+				// half way through the query would let one through.
+				stamp++;
+				var i;
+				for (i = 0; i < big.length; i++) {
+					if (hit(big[i], q)) { return true; }
+				}
+				if (!boxes.length) { return false; }
+				var bb = bounds(q);
+				if (!finite(bb)) {
+					// Nothing to bin a query by, so ask the definition. Exact, merely slow, and it
+					// is the case boxOverlapDepth() rejects on its first line anyway.
+					for (i = 0; i < boxes.length; i++) {
+						if (hit(i, q)) { return true; }
+					}
+					return false;
+				}
+				var i0 = Math.floor(bb.x0 / cell), i1 = Math.floor(bb.x1 / cell),
+					j0 = Math.floor(bb.y0 / cell), j1 = Math.floor(bb.y1 / cell), j, c, k;
+				if ((i1 - i0 + 1) * (j1 - j0 + 1) > BOX_INDEX_MAX_CELLS) {
+					for (i = 0; i < boxes.length; i++) {
+						if (hit(i, q)) { return true; }
+					}
+					return false;
+				}
+				for (i = i0; i <= i1; i++) {
+					for (j = j0; j <= j1; j++) {
+						c = cells.get(key(i, j));
+						if (!c) { continue; }
+						for (k = 0; k < c.length; k++) {
+							if (hit(c[k], q)) { return true; }
+						}
+					}
+				}
+				return false;
+			}
+		};
+		return self;
+	}
 	function placeLabels(labels, obstacles, opts) {
 		opts = opts || {};
 		// **ONE REACH FOR THE WHOLE PASS, NOT ONE PER LABEL.** Tom, 2026-08-16: *"A single one is
@@ -1116,6 +1270,8 @@ EngCalcs.lpnCollide = (function () {
 		labelBoxAtEnd: labelBoxAtEnd,
 		obstaclesInReach: obstaclesInReach,
 		grid: grid,
+		anyBoxOverlap: anyBoxOverlap,
+		boxIndex: boxIndex,
 		rawScore: rawScore,
 		effectiveScores: effectiveScores,
 		placeLabels: placeLabels

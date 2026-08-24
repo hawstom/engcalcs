@@ -156,6 +156,24 @@ while ((m = re.exec(langSrc))) {
   }
 }
 
+// **THE REFERENCE-TABLE URLs ARE pageConfig TOO, and neither loader above sees them**: one is a
+// json_encode of a string literal and the other of an Array, so both are invisible to a regex
+// looking for $ec_lang or a bare constant. Read from the page's own source rather than pasted
+// here, or this harness would happily assert a link the page does not actually emit.
+{
+  const pageSrc = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+  const km = /^\tlpn_km_url:\s*<\?=json_encode\('([^']+)'\)\?>,$/m.exec(pageSrc);
+  if (km) { EngCalcs.pageConfig.lpn_km_url = km[1]; }
+  const rough = /^\tlpn_roughness_urls:\s*<\?=json_encode\(Array\(([\s\S]*?)\)\)\?>,$/m.exec(pageSrc);
+  if (rough) {
+    const urls = {};
+    const pre = /'([a-z]+)'\s*=>\s*'([^']+)'/g;
+    let pm;
+    while ((pm = pre.exec(rough[1]))) { urls[pm[1]] = pm[2]; }
+    EngCalcs.pageConfig.lpn_roughness_urls = urls;
+  }
+}
+
 // unit selects the page would render
 ['lpn_u_length', 'lpn_u_elevhead', 'lpn_u_pressure', 'lpn_u_diameter', 'lpn_u_flow',
  'lpn_u_velocity', 'lpn_u_gradient'].forEach(id => {
@@ -189,6 +207,7 @@ src = src.replace(marker,
   "\t\tassembleModel: assembleModel, effective: effective,\n" +
   "\t\trenderNodeFields: renderNodeFields, renderLinkFields: renderLinkFields,\n" +
   "\t\trebuildSettingsFields: rebuildSettingsFields, helpTip: helpTip,\n" +
+  "\t\tfrictionMethod: frictionMethod, roughnessTip: roughnessTip,\n" +
   "\t\tsetStatus: setStatus, setNotice: setNotice, discardProject: discardProject,\n" +
   "\t\tsetLibrary: function (l) { library = l; }, getLibrary: function () { return library; },\n" +
   // refreshAllFromDocument() touches the SVG layer variables, which only init() assigns -- and the
@@ -322,11 +341,29 @@ ok('heads below the reservoir head', ['J-1', 'J-2', 'J-3'].every(n => res.heads[
 // --- 9. INTEGRATION: render the real popups and read the tips off them --
 // This is what catches a mis-threaded argument -- setFieldLabel's own unit tests pass whether or
 // not the caller actually hands it the tip.
+// **TWO OPPOSITE NESTINGS, AND THE READER HAS TO KNOW BOTH.** Without a link, .ec-help wraps the
+// label WORDS and the glyph; with one, the <a> takes the words and .ec-help wraps the glyph alone
+// (CLAUDE.md's link+tip rule). A reader that only knew the first stopped seeing a field's name the
+// day that field gained a reference link -- and the sibling check keyed on VALUE rather than name
+// went on passing, which is exactly how a blind reader survives.
+function labelWordsFor(h) {
+  const words = h.children.find(c => c._text);
+  if (words) { return words.textContent; }
+  const a = ((h.parentNode || {}).children || []).find(c => c.tagName === 'A');
+  return a ? a.textContent : '';
+}
 function tipsOf(container) {
   const out = {};
+  container.querySelectorAll('.ec-help').forEach(h => { out[labelWordsFor(h).trim()] = h.title; });
+  return out;
+}
+// The reference link beside a field, keyed the same way, so a tip and its link are read off the
+// same row.
+function linksOf(container) {
+  const out = {};
   container.querySelectorAll('.ec-help').forEach(h => {
-    const words = h.children.find(c => c._text);
-    out[(words ? words.textContent : '').trim()] = h.title;
+    const a = ((h.parentNode || {}).children || []).find(c => c.tagName === 'A');
+    out[labelWordsFor(h).trim()] = a ? a.href : '';
   });
   return out;
 }
@@ -342,6 +379,47 @@ ok('link popup: Minor loss k carries its tip',
    Object.values(t).includes(PC.lpn_field_km_tip));
 ok('link popup: Length carries its tip', Object.values(t).includes(PC.lpn_field_length_tip));
 ok('link popup calls initTips on its container', global.__initTipsCalls.includes(pf));
+
+// --- 9b. THE REFERENCE TABLES, IN ALL FOUR PLACES A NUMBER IS TYPED -----
+// Tom, 2026-08-23: *"I was specifically asking on behalf of lpn, at Settings.Values.Roughness...
+// Let's add at lpn.settings.Values.km. Also, for km, add a link in the link editor box."* Roughness
+// follows the friction method and k does not, so the two are checked against DIFFERENT sources: a
+// method lookup, and one flat URL. Asserted against the URLs Looped-Network.php really emits, read
+// out of the page above -- a literal here would pass while the page emitted nothing at all.
+const ROUGH_URLS = PC.lpn_roughness_urls || {};
+const KM_URL = PC.lpn_km_url || '';
+ok('the page emits a roughness table for each of the three methods',
+   ['hw', 'manning', 'dw'].every(k => /^https?:\/\//.test(String(ROUGH_URLS[k]))),
+   JSON.stringify(Object.keys(ROUGH_URLS)));
+ok('the page emits one minor-loss table', /^https?:\/\//.test(KM_URL), KM_URL);
+ok('the three roughness tables are three DIFFERENT pages -- a Manning user sent to a C table is '
+   + 'worse off than with no link', new Set(['hw', 'manning', 'dw'].map(k => ROUGH_URLS[k])).size === 3);
+
+let lk = linksOf(pf);
+const roughKey = Object.keys(lk).find(k => k.startsWith('Roughness') || k === PC.lpn_field_roughness);
+ok('link popup: Roughness links to the table for the method in force',
+   lk[roughKey] === ROUGH_URLS[L.frictionMethod()], roughKey + ' -> ' + lk[roughKey]);
+const kmKey = Object.keys(lk).find(k => k === (PC.lpn_field_km || ''));
+ok('link popup: Minor loss k links to the minor-loss table', lk[kmKey] === KM_URL,
+   kmKey + ' -> ' + lk[kmKey]);
+
+// The Settings box's Values group -- the place Tom actually asked for, and a different call chain
+// (defaultRow -> row -> setFieldLabel) from the popup's (numberFieldPlain -> setFieldLabel).
+L.rebuildSettingsFields();
+const df = byId.lpn_set_default_fields;
+lk = linksOf(df);
+const sRough = Object.keys(lk).find(k => k.startsWith(String(PC.lpn_field_roughness).slice(0, 6))
+  || k.startsWith('Roughness') || k.startsWith('C '));
+ok('Settings > Values: Roughness links to the table for the method in force',
+   lk[sRough] === ROUGH_URLS[L.frictionMethod()], JSON.stringify(lk));
+ok('Settings > Values: Minor loss k links to the minor-loss table',
+   Object.values(lk).includes(KM_URL), JSON.stringify(lk));
+// A link with no tip is a plain <a> and needs no .ec-help at all, so every row this section found
+// must ALSO be carrying its tip -- otherwise the wrapper is there for nothing.
+const st = tipsOf(df);
+ok('...and both Settings rows carry their tips as well as their links',
+   st[sRough] === L.roughnessTip() && Object.values(st).includes(PC.lpn_field_km_tip),
+   JSON.stringify(st));
 
 global.__initTipsCalls.length = 0;
 L.renderNodeFields('J-1');
