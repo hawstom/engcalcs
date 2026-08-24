@@ -1054,3 +1054,126 @@ EngCalcs.adjustInputWidth = function () {
 	});
 };
 
+
+/**
+ * COLUMN-MAJOR TAB ACROSS THE DYNAMIC ROW TABLE, AND STRAIGHT INTO IT FROM THE FIELDS ABOVE.
+ *
+ * Tom, 2026-08-23, after using the Task 478 field grid: *"The four dynamic tables -- at mi, wi,
+ * bpn, and ip -- are not tabbed by column. I still think that column-wise is most predictable and
+ * helpful for the user... the top inputs should tab straight down to the dynamic table column 1
+ * with no detour to X etc."*
+ *
+ * **THIS IS A KEY HANDLER, NOT A DOM ORDER, AND THAT IS THE WHOLE DESIGN.** Task 478 got the top
+ * fields walking downward by emitting them column-major, which cost WCAG 1.3.2: visual order and
+ * DOM order now differ there. Doing the same to `#CalcsTable` would cost far more -- a real
+ * `<table>` with `<th>` headings would have to stop being one, and its rows are built at runtime by
+ * addCalcRow(), so every row added or deleted would have to re-thread the DOM. Intercepting Tab
+ * instead leaves the table exactly the table it is, and the chain recomputes itself on every
+ * keystroke, so adding a row needs no re-wiring at all.
+ *
+ * NOTHING IS TAKEN OFF THE KEYBOARD (WCAG 2.1.1). No tabindex is written; every control is still
+ * reachable, and Shift+Tab is the exact inverse of Tab at every seam. The order becomes:
+ *
+ *     top inputs -> table column 1 -> column 2 -> ... -> top unit selects -> top X's -> Solve
+ *
+ * so the two places a person TYPES are adjacent, which is the point, and the two places a person
+ * only occasionally CLICKS follow.
+ *
+ * ONE JUDGEMENT WORTH KNOWING: a hidden line's input is skipped, because a line the user hid with
+ * its X is not a stop they want. Hidden-ness is read at keystroke time from offsetParent, so it
+ * follows the collapse animation rather than a cached list.
+ */
+EngCalcs.columnTabVisible = function (el) {
+	'use strict';
+	return !!el && !el.disabled && el.offsetParent !== null;
+};
+
+/** The dynamic table as an array of columns, each an array of its focusable cells, top to bottom. */
+EngCalcs.columnTabTableColumns = function () {
+	'use strict';
+	var table = document.getElementById('CalcsTable'), cols = [], body;
+	if (!table) { return cols; }
+	body = table.tBodies[0];
+	if (!body) { return cols; }
+	Array.prototype.forEach.call(body.rows, function (r) {
+		Array.prototype.forEach.call(r.cells, function (cell, i) {
+			var ctl = cell.querySelector('input, select, textarea');
+			if (!ctl || !EngCalcs.columnTabVisible(ctl)) { return; }
+			if (!cols[i]) { cols[i] = []; }
+			cols[i].push(ctl);
+		});
+	});
+	// A column of unreachable cells leaves a hole in the array; drop it so "the next column" means
+	// the next one a person can actually get to.
+	return cols.filter(function (c) { return c && c.length; });
+};
+
+/** The top field grid's input column, and its unit-select column, in the order they are walked. */
+EngCalcs.columnTabGrid = function (which) {
+	'use strict';
+	var sel = which === 'units'
+		? '#formInput .ec-fieldgrid .ec-fg-units select'
+		: '#formInput .ec-fieldgrid .ec-fg-input input';
+	return Array.prototype.filter.call(document.querySelectorAll(sel), EngCalcs.columnTabVisible);
+};
+
+/**
+ * Where Tab (or Shift+Tab) should go from `el`, or null to let the browser do what it always did.
+ * Null is the answer almost everywhere: this only speaks at the seams it owns.
+ */
+EngCalcs.columnTabTarget = function (el, back) {
+	'use strict';
+	var cols = EngCalcs.columnTabTableColumns(), inputs, units, c, r, flat;
+	if (!cols.length) { return null; }
+	flat = [];
+	cols.forEach(function (col, ci) { col.forEach(function (ctl, ri) { flat.push([ctl, ci, ri]); }); });
+	c = -1;
+	flat.forEach(function (t) { if (t[0] === el) { c = t[1]; r = t[2]; } });
+
+	if (c >= 0) {
+		if (!back) {
+			if (r + 1 < cols[c].length) { return cols[c][r + 1]; }
+			if (c + 1 < cols.length) { return cols[c + 1][0]; }
+			// Out of the bottom of the last column: pick the top fields back up where the input
+			// column left off, so nothing between here and Solve has been skipped.
+			units = EngCalcs.columnTabGrid('units');
+			return units.length ? units[0] : null;
+		}
+		if (r > 0) { return cols[c][r - 1]; }
+		if (c > 0) { return cols[c - 1][cols[c - 1].length - 1]; }
+		inputs = EngCalcs.columnTabGrid('input');
+		return inputs.length ? inputs[inputs.length - 1] : null;
+	}
+
+	// The two seams above the table.
+	inputs = EngCalcs.columnTabGrid('input');
+	if (!back && inputs.length && el === inputs[inputs.length - 1]) { return cols[0][0]; }
+	units = EngCalcs.columnTabGrid('units');
+	if (back && units.length && el === units[0]) {
+		c = cols[cols.length - 1];
+		return c[c.length - 1];
+	}
+	return null;
+};
+
+/**
+ * Armed once, on the document, so a row added later is covered without re-wiring. Modified Tab
+ * (Ctrl/Alt/Meta) is left alone -- those are the browser's and the OS's.
+ */
+EngCalcs.wireColumnTabOrder = function () {
+	'use strict';
+	document.addEventListener('keydown', function (e) {
+		var next;
+		if (e.key !== 'Tab' || e.altKey || e.ctrlKey || e.metaKey) { return; }
+		next = EngCalcs.columnTabTarget(e.target, e.shiftKey);
+		if (!next) { return; }
+		e.preventDefault();
+		next.focus();
+		// A number box entered by Tab selects its contents, the way the browser's own Tab does.
+		if (typeof next.select === 'function' && next.tagName === 'INPUT') {
+			try { next.select(); } catch (err) { /* select() throws on some input types */ }
+		}
+	});
+};
+
+document.addEventListener('DOMContentLoaded', function () { EngCalcs.wireColumnTabOrder(); });
