@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**67 open tasks.** Next (100): 4 · Soon (75): 7 · Someday (50): 4 · Maybe (25): 25 · Parked (5): 27
+**67 open tasks.** Next (100): 4 · Soon (75): 7 · Someday (50): 5 · Maybe (25): 24 · Parked (5): 27
 
 ## 100 — Next (4)
 
@@ -26,14 +26,15 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 502 — A Text object anchored to a LINK, not only to a node.
 - Task 503 — AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry
 
-## 50 — Someday (4)
+## 50 — Someday (5)
 
 - Task 207 — The dilettante path: make replying cost one tap, not five steps.
+- Task 247 — Customers: metered demands with account numbers — full design in `dev/customer-demands.md`.
 - Task 248.02 — Patterns: attach one to a RESERVOIR HEAD and a PUMP.
 - Task 269 — ASU Engineers Without Borders answered, and asked to meet.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 
-## 25 — Maybe (25)
+## 25 — Maybe (24)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -42,7 +43,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 221 — Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
 - Task 234 — Canal Seepage must prove its worth or go.
-- Task 247 — Demand allocation by customer (epanet-js has it, EPANET does not).
 - Task 248 — Extended-period simulation, the GATE on the LibreEPANET.org launch.
 - Task 248.03 — Rule-based controls, EPANET's `[RULES]` (Task 248 child).
 - Task 248.04 — Curves (Task 248 child) — probably NEVER a separate interface.

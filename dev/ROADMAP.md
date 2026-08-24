@@ -209,7 +209,8 @@ the block.
   and is a drawing feature: labelling a pipe, a pump or a valve with your own words and having the
   note follow it when the link moves. Real work, not a rename: the attachment point on a link is a
   position ALONG it, so it needs a parameter on the polyline rather than a second `anchorNode`, and
-  it touches label placement, the leader, collision avoidance and the Text popup.
+  it touches label placement, the leader, collision avoidance and the Text popup. **Task 247's meter
+  needs the same `linkAnchor {link, t}`** — whichever ships first builds it for both.
 
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
@@ -406,10 +407,14 @@ the block.
   `Irrigation.php` it has a real in-site path. Check what that contributes before assuming the
   numbers mean nobody wants it.
 
-- 25|247| **Demand allocation by customer (epanet-js has it, EPANET does not).** Tom, 2026-08-09.
-  Assign named demands to a junction and sum them, rather than typing one lumped figure. Genuinely
-  fits the irrigation/rural-water audience. Below Task 184 (scenarios), which epanet-js charges for
-  and Tom therefore wants raised.
+- 50|247| **Customers: metered demands with account numbers — full design in
+  `dev/customer-demands.md`.** Raised to 50 by Tom, 2026-08-24, who expanded it into a customer
+  management model: an account number, a meter drawn on the map, a perpendicular service to a pipe,
+  and the demand lumped at the nearer end of that pipe by length. epanet-js has demand allocation by
+  customer; EPANET does not. **Task 468 is a prerequisite, not a sibling** — a Customer is one of its
+  demand rows, extended, and 247 must not invent a second breakdown structure. Shares the
+  attach-to-a-link-at-a-fraction seam with Task 502. Recommended first slice: an account number on a
+  468 demand row, no geometry.
 
 - 25|248| **Extended-period simulation, the GATE on the LibreEPANET.org launch.**
   Last of the three things the EPANET engine unlocked; Tasks 306/307. Tanks and valves shipped
@@ -582,6 +587,7 @@ the block.
     different; see `dev/positioning.md`.
   - Touches the scenario write seam (`setProp`), the popup, the importer, and Task 281's exporter —
     a per-category override is the question to settle first.
+  - **Ship before Task 247, whose Customer is one of these rows extended** (`dev/customer-demands.md`).
 
 - 25|484| **Log which unhandled EPANET features actually arrive in real imports.**
   A server-side count of the import features we do not handle, so Task 483 and its siblings are
