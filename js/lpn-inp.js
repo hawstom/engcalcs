@@ -216,8 +216,17 @@
 		}
 
 		var dropped = [];
-		function drop(code, ids, detail) {
-			dropped.push({ code: code, ids: ids || [], detail: detail === undefined ? null : detail });
+		// **`group` IS NOT DECORATION: AN EPANET ID IS ONLY UNIQUE WITHIN ITS OWN KIND.** Net3 has a
+		// junction 123 and a pipe 123, and 3 of its 4 element-naming differences name an id that
+		// exists twice -- so a per-asset note keyed by the bare id lands a junction's demand pattern
+		// on a pipe as well. The kind is known at the moment the difference is found and nowhere
+		// afterwards, so it is stated here rather than inferred from the code later. Null means the
+		// difference belongs to the network, not to an element.
+		function drop(code, ids, detail, group) {
+			dropped.push({
+				code: code, ids: ids || [], detail: detail === undefined ? null : detail,
+				group: group || null
+			});
 		}
 
 		// ---- [OPTIONS], first, because the flow unit fixes every other unit in the file ----
@@ -365,7 +374,7 @@
 			// as the file's, which is the confusion CLAUDE.md's number rule is about. Read it as
 			// `jn.demandPattern || parsed.defaultPattern`.
 			jn.demandPattern = r[3] || null;
-			if (r[3]) { drop('demand-pattern', [r[0]], r[3]); }
+			if (r[3]) { drop('demand-pattern', [r[0]], r[3], 'node'); }
 		}
 
 		rows = rawSections.RESERVOIRS || [];
@@ -387,7 +396,7 @@
 			// One token for one column, under the name the DOCUMENT stores it as.
 			mergeTok(rn, 'head', r[1], rn.head);
 			rn.headPattern = r[2] || null;
-			if (r[2]) { drop('head-pattern', [r[0]], r[2]); }
+			if (r[2]) { drop('head-pattern', [r[0]], r[2], 'node'); }
 		}
 
 		// TANKS ARE IMPORTED AS TANKS, never as a reservoir at their initial level -- that
@@ -427,7 +436,7 @@
 			// Reported rather than faked, per this module's whole contract.
 			if (r[7] && r[7] !== '*' && r[7] !== '0') { volCurveIds.push(r[0]); }
 		}
-		if (volCurveIds.length) { drop('tank-volume-curve', volCurveIds); }
+		if (volCurveIds.length) { drop('tank-volume-curve', volCurveIds, null, 'node'); }
 
 		// ---- demand categories ----
 		// [DEMANDS] REPLACES the [JUNCTIONS] demand rather than adding to it, measured rather than
@@ -454,9 +463,9 @@
 			// one pattern. Two categories on different patterns are two different daily shapes and
 			// no single one of them describes the sum -- which is what 'demand-categories' below
 			// already tells the user about the demand itself.
-			if (r[2]) { dn.demandPattern = r[2]; drop('demand-pattern', [r[0]], r[2]); }
+			if (r[2]) { dn.demandPattern = r[2]; drop('demand-pattern', [r[0]], r[2], 'node'); }
 		}
-		if (multiDemand.length) { drop('demand-categories', multiDemand); }
+		if (multiDemand.length) { drop('demand-categories', multiDemand, null, 'node'); }
 
 		// ---- emitters ----
 		// THE ONE QUANTITY STILL CONVERTED TO SI, and it is the exception that proves the rule: an
@@ -477,7 +486,7 @@
 		// Imported rather than dropped -- an emitter changes the answer, so removing it would be
 		// the silent-data-loss this module exists to avoid. But nothing in the UI can show or edit
 		// one yet (see the note at settings.emitterExponent), so the user is told it is there.
-		if (emitterIds.length) { drop('emitters-not-editable', emitterIds); }
+		if (emitterIds.length) { drop('emitters-not-editable', emitterIds, null, 'node'); }
 
 		// ---- links ----
 		var links = [], linkIndex = {};
@@ -490,7 +499,7 @@
 			// A check valve is a cut element. It is imported as an OPEN pipe -- the same pipe
 			// minus the one-way rule -- because dropping it would disconnect the network, and the
 			// caller reports it so the user knows the direction constraint is gone.
-			if (st === 'CV') { drop('check-valve', [r[0]]); st = 'OPEN'; }
+			if (st === 'CV') { drop('check-valve', [r[0]], null, 'link'); st = 'OPEN'; }
 			var pipe = {
 				id: r[0], type: 'pipe', from: r[1], to: r[2],
 				length: num(r[3]),                    // stays in the FILE's length unit -- see header
@@ -541,7 +550,7 @@
 					// `C_<pumpid>` and Net3's curves `1` and `2` come back as `C_10` and `C_335`.
 					pump.curveId = r[j + 1];
 					var pts = curves[r[j + 1]] || [];
-					if (!pts.length) { drop('pump-curve-missing', [r[0]], r[j + 1]); }
+					if (!pts.length) { drop('pump-curve-missing', [r[0]], r[j + 1], 'link'); }
 					else if (pts.length <= 3) { pump.curvePoints = pts.slice(); }
 					else {
 						// This page fits h = h0 - a Q^b from at most three points (see
@@ -550,26 +559,26 @@
 						// real operating range instead of only its low-flow end.
 						var sorted = pts.slice().sort(function (u, v) { return u[0] - v[0]; });
 						pump.curvePoints = [sorted[0], sorted[Math.floor((sorted.length - 1) / 2)], sorted[sorted.length - 1]];
-						drop('pump-curve-reduced', [r[0]], pts.length);
+						drop('pump-curve-reduced', [r[0]], pts.length, 'link');
 					}
 					j++;
 				} else if (kw === 'POWER') {
 					// A constant-power pump is H = P/(rho g Q) -- a different law from the one this
 					// page's solver carries, and not expressible as three points on ours. Imported
 					// as a curveless pump (a lossless connection) and reported.
-					drop('pump-constant-power', [r[0]], r[j + 1]);
+					drop('pump-constant-power', [r[0]], r[j + 1], 'link');
 					j++;
 				} else if (kw === 'SPEED') {
 					// Kept whatever it is, so a later reader need not re-tokenize the row; only a
 					// speed that is not 1 changes the answer, and only that is reported.
 					pump.speed = num(r[j + 1], 1);
-					if (pump.speed !== 1) { drop('pump-speed', [r[0]], r[j + 1]); }
+					if (pump.speed !== 1) { drop('pump-speed', [r[0]], r[j + 1], 'link'); }
 					j++;
 				} else if (kw === 'PATTERN') {
 					// A pump SCHEDULE: the multiplier series is a speed, not a demand, which is
 					// why js/lpn-patterns.js knows nothing about what a pattern is for.
 					pump.speedPattern = r[j + 1] || null;
-					drop('pump-pattern', [r[0]], r[j + 1]);
+					drop('pump-pattern', [r[0]], r[j + 1], 'link');
 					j++;
 				}
 			}
@@ -659,7 +668,7 @@
 				});
 				if (gcurve) {
 					vlink.curvePoints = gcurve.map(function (pt) { return [pt[0], pt[1]]; });
-					if (!gcurve.length && r[5]) { drop('gpv-curve-missing', [r[0]], r[5]); }
+					if (!gcurve.length && r[5]) { drop('gpv-curve-missing', [r[0]], r[5], 'link'); }
 				}
 			}
 			// A valve's diameter falls back to a plausible main when the column is blank, and a TCV's
@@ -670,8 +679,8 @@
 			if (vlink.type === 'valve') { mergeTok(vlink, 'setting', r[5], vlink.setting); }
 			links.push(vlink); linkIndex[vlink.id] = vlink;
 		}
-		if (tcvIds.length) { drop('valve-tcv', tcvIds); }
-		if (activeValveIds.length) { drop('valve-active', activeValveIds); }
+		if (tcvIds.length) { drop('valve-tcv', tcvIds, null, 'link'); }
+		if (activeValveIds.length) { drop('valve-active', activeValveIds, null, 'link'); }
 
 		// ---- [STATUS] overrides ----
 		rows = rawSections.STATUS || [];
@@ -692,7 +701,7 @@
 				sl.setting = +r[1];
 				mergeTok(sl, 'setting', r[1], sl.setting);
 			}
-			else { drop('link-setting', [r[0]], r[1]); }
+			else { drop('link-setting', [r[0]], r[1], 'link'); }
 		}
 
 		// ---- [CONTROLS] (ROADMAP Task 248.03) ----
@@ -719,7 +728,7 @@
 				var parsedCtl = EngCalcs.lpnParseControl(rows[i]);
 				if (!parsedCtl.ok) { drop('controls', [], parsedCtl.raw + ' (' + parsedCtl.error + ')'); continue; }
 				var ctl = parsedCtl.control, cLink = linkIndex[ctl.link];
-				if (!cLink) { drop('controls', [ctl.link], ctl.raw + ' (link not in file)'); continue; }
+				if (!cLink) { drop('controls', [ctl.link], ctl.raw + ' (link not in file)', 'link'); continue; }
 				if (ctl.action.setting !== undefined) {
 					ctl.action.settingUnit = cLink.type === 'valve'
 						? valveSettingUnit((cLink.valveType || '').toUpperCase())
@@ -727,7 +736,7 @@
 				}
 				if (ctl.condition.kind === 'node') {
 					var cNode = nodeIndex[ctl.condition.node];
-					if (!cNode) { drop('controls', [ctl.condition.node], ctl.raw + ' (node not in file)'); continue; }
+					if (!cNode) { drop('controls', [ctl.condition.node], ctl.raw + ' (node not in file)', 'node'); continue; }
 					// 'head' and 'press' are keys of `scale` below, so a caller wanting SI
 					// multiplies by scale[unit] and never re-derives which is which.
 					ctl.condition.unit = cNode.type === 'junction' ? 'press' : 'head';
@@ -765,10 +774,26 @@
 		rows = rawSections.LABELS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
-			// x y "text" [anchor node]. The anchor is kept: this page has the same concept.
-			var lb = { x: num(r[0]), y: num(r[1]), text: r[2] || '', anchorNode: r[3] || null };
+			// x y "text" [anchor node]. The anchor is kept: this page has the same concept, so a
+			// Text object imported from an anchored EPANET label follows its node exactly as one
+			// drawn here does.
+			var lb = { x: num(r[0]), y: num(r[1]), text: r[2] || '', anchorNode: r[3] || null, notes: [] };
 			mergeTok(lb, 'x', r[0], lb.x);
 			mergeTok(lb, 'y', r[1], lb.y);
+			// **AN ANCHOR NAMING SOMETHING THE FILE DOES NOT CONTAIN was silently forgotten** until
+			// Task 483: the text landed as a free-floating Text at the file's own point and nothing
+			// anywhere said what it had been attached to. A label carries no id of its own in the
+			// file, so its notes ride on the label record and docFromInp() moves them onto the Text
+			// element it mints. The anchor itself is still dropped -- there is nothing to follow --
+			// but the name it named survives in the note.
+			if (lb.anchorNode && !nodeIndex[lb.anchorNode]) {
+				lb.notes.push({ code: 'label-anchor-missing', detail: lb.anchorNode });
+				// The missing NAME rides in the ids slot so the report says which one; it is not an
+				// element id, and nothing reads it as one -- a Text element takes its notes from
+				// this record, never from the id map.
+				drop('label-anchor-missing', [lb.anchorNode], null, 'label');
+				lb.anchorNode = null;
+			}
 			labels.push(lb);
 		}
 
@@ -799,7 +824,7 @@
 			dangling.push(l.id);
 			return false;
 		});
-		if (dangling.length) { drop('dangling-link', dangling); }
+		if (dangling.length) { drop('dangling-link', dangling, null, 'link'); }
 
 		// ---- everything else we can only count ----
 		Object.keys(REPORTABLE).forEach(function (name) {
@@ -875,6 +900,40 @@
 			mapUnitsRaw: mapUnitsRaw,
 			dropped: dropped
 		};
+	};
+
+	/**
+	 * PER-ASSET IMPORT NOTES (ROADMAP Task 483). The import report is a dialog you read once and
+	 * dismiss; after that the fact that THIS pump lost its curve, or THIS junction had three demand
+	 * categories added together, was gone. This regroups `parsed.dropped` by the element each
+	 * difference NAMES, so docFromInp() can file a copy on the element itself and the property
+	 * popup can hand it back weeks later.
+	 *
+	 * **THE NOTE IS A RECORD, NOT A SENTENCE.** `{code, detail}` is stored, never rendered English:
+	 * the document is opened in whatever language the reader is using, and freezing the import-time
+	 * language into the file would make a Spanish reader's own project speak English forever. The
+	 * sentence is composed at display time from the same inpDropText() the report uses, so the two
+	 * can never drift apart either.
+	 *
+	 * A drop with no ids is network-wide (the flow unit, the head-loss formula) and belongs to no
+	 * element; it stays in the report alone. A drop naming a dangling link names something that is
+	 * deliberately NOT in the document, so it simply matches nothing here.
+	 */
+	EngCalcs.lpnInpNotes = function (dropped, group) {
+		var byId = {};
+		(dropped || []).forEach(function (d) {
+			if (!d || !d.ids || !d.ids.length) { return; }
+			// **KEYED BY KIND AS WELL AS BY ID.** A caller asking for nodes must not be handed a
+			// pipe's note because the two share a number -- see the comment on drop(). A difference
+			// that named no kind belongs to no element and is skipped here; it is still in the
+			// report, which is where a network-wide statement belongs.
+			if (!d.group || (group && d.group !== group)) { return; }
+			d.ids.forEach(function (id) {
+				if (!byId[id]) { byId[id] = []; }
+				byId[id].push({ code: d.code, detail: d.detail === undefined ? null : d.detail });
+			});
+		});
+		return byId;
 	};
 
 	// ============================================================================================
