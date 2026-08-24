@@ -670,6 +670,17 @@ html[lang="zh"] .ec-welcome {
    Above the toolbar, and holding every command on the page; the toolbar below is the high-use
    subset. Flat text buttons, because a menu bar that looks like a row of push-buttons reads as a
    second toolbar. */
+/* **THE CHROME OUTRANKS THE BOXES** (Tom, 2026-08-24: "The menus and toolbars (level 1 menus) need
+   a higher z-index than the boxes (Settings, Libraries, ...)"). The menu bar, the toolbar and the
+   tab strip are in normal flow with no z-index of their own, so a fixed box at z-index 22 painted
+   straight over them: a box dragged up the window swallowed the strip that opened it, and the
+   commands were behind the thing they had produced.
+   30 clears the boxes (22), the property popup (20) and the two menu pop-ups (31/32 are set inline
+   in Looped-Network.php, above this, because a menu must sit over the strip it hangs from). It stays
+   under Bootstrap's fixed navbar (1030), the run box (1085) and the registration bar (3000), which
+   are all deliberately above everything on the page.
+   `position: relative` is what makes z-index apply at all to a static block; it changes no layout. */
+#lpn_menubar, #lpn_toolbar, #lpn_tabs { position: relative; z-index: 30; }
 #lpn_menubar { display: flex; gap: 2px; margin-bottom: 4px; }
 .lpn-menubar-item { background: none; border: 1px solid transparent; font: inherit; padding: 3px 10px; cursor: pointer; }
 .lpn-menubar-item:hover { background: #def; border-color: #9bd; }

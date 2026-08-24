@@ -17,7 +17,12 @@ const { Session } = require('../lib/session');
 
 exports.title = '35. The Project menu';
 
-const EXPECTED = ['Settings', 'Libraries', 'EPANET run report'];
+// The menu opened with three rows and now has seven -- Profile, Tables, Scenarios and Calculate
+// moved in as the Project menu became the one place every command lives (2026-08-24). The list is
+// asserted in ORDER rather than as a set: a menu is read top to bottom, and the report row staying
+// last is what keeps the four everyday commands above the one that reports on a run.
+const EXPECTED = ['Settings', 'Libraries', 'Profile', 'Tables', 'Scenarios', 'Calculate',
+	'EPANET run report'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -39,6 +44,32 @@ exports.run = async function ({ browser, report }) {
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_settings_box').style.display === 'flex'),
 			'Settings opens the same box the toolbar gear opens');
+		// ---- **THE CHROME OUTRANKS THE BOX** (Tom, 2026-08-24) -----------------------------------
+		// "The menus and toolbars (level 1 menus) need a higher z-index than the boxes (Settings,
+		// Libraries, ...)." The three strips were in normal flow with no z-index, so a box dragged
+		// up the window painted over the menu bar that opened it. Asked as the user would find out:
+		// put the box over the menu bar, then ask the DOCUMENT what is on top at that point.
+		const stack = await a.page.evaluate(() => {
+			const box = document.getElementById('lpn_settings_box');
+			const bar = document.getElementById('lpn_menubar');
+			const r = bar.getBoundingClientRect();
+			const was = { top: box.style.top, left: box.style.left };
+			box.style.top = '0px';
+			box.style.left = '0px';
+			const x = Math.round(r.left + r.width / 2), y = Math.round(r.top + r.height / 2);
+			const hit = document.elementFromPoint(x, y);
+			const out = {
+				overBar: !!(hit && (hit.id === 'lpn_menubar' || hit.closest('#lpn_menubar'))),
+				what: hit ? (hit.id || hit.className || hit.tagName) : null,
+				boxCovers: box.getBoundingClientRect().top <= y && box.getBoundingClientRect().bottom >= y
+			};
+			box.style.top = was.top; box.style.left = was.left;
+			return out;
+		});
+		report.ok(stack.boxCovers, 'the Settings box can be moved over the menu bar', String(stack.boxCovers));
+		report.ok(stack.overBar, '...and the menu bar still paints on top of it',
+			'topmost element there is ' + stack.what);
+
 		await a.menuClick('Settings', 'project');
 		await a.settle(300);
 

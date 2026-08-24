@@ -290,6 +290,24 @@ exports.run = async function ({ browser, report }) {
 			}
 		}
 
+		// ---- **THE ROUTE MARK IS HOVER-GATED** (Tom, 2026-08-24) --------------------------------
+		// A permanent orange band over the route was on the map whenever the tab was open. It is now
+		// an answer to a question the reader asks by looking: pointer over the profile, mark on.
+		// Driven through real pointer events on the real panel, because that is the whole mechanism.
+		const away = await a.page.evaluate(() =>
+			document.querySelectorAll('#lpn_canvas .lpn-profile-path polyline').length);
+		report.ok(away === 0, 'with the pointer off the profile, the map carries no route mark', away);
+		await a.page.hover('#lpn_pane_profile');
+		await a.settle(200);
+		const over = await a.page.evaluate(() =>
+			document.querySelectorAll('#lpn_canvas .lpn-profile-path polyline').length);
+		report.ok(over > 0, '...and hovering the profile paints it', over + ' segment(s)');
+		await a.page.mouse.move(5, 5);
+		await a.settle(200);
+		const left = await a.page.evaluate(() =>
+			document.querySelectorAll('#lpn_canvas .lpn-profile-path polyline').length);
+		report.ok(left === 0, '...and moving away takes it off again', left);
+
 		// The pane is modeless: the map is edited underneath it throughout, and closing it leaves
 		// nothing behind -- neither the panel nor the route highlight it painted on the map, and the
 		// map takes its room back.

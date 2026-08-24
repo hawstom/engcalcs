@@ -95,6 +95,10 @@ const L = loadLoopedNetwork(
 	// **READ OFF THE DRAWING, NOT OFF THE VARIABLE.** A candidate nothing paints is invisible to
 	// the user, which is the same defect as no candidate at all. These two count the polylines the
 	// map layer actually holds, split by which of the two strokes they wear.
+	// The hover gate (Tom, 2026-08-24): the committed route is painted only while the pointer is
+	// over the profile panel, or while the chooser is running. Exposed so this harness can ask the
+	// question from both sides rather than only from the side that happens to be on.
+	"\t\thoverSet: function (on) { profileHoverSet(on); },\n" +
 	"\t\tmapSolid: function () {\n" +
 	"\t\t\tif (!profilePathLayer) { return []; }\n" +
 	"\t\t\treturn (profilePathLayer.children || []).filter(function (c) {\n" +
@@ -407,6 +411,13 @@ function startDraw() { pressProfile(); }
 	dblclick(X('D'), Y('D'), hit({ node: n.id.D }));
 	const before = JSON.stringify(L.profileStops());
 	const beforePath = JSON.stringify(L.profilePath().links);
+	// **THE COMMITTED ROUTE IS HOVER-GATED, so it is asked from both sides.** With the pointer away
+	// from the profile the map carries no orange band at all; the route still EXISTS, which is what
+	// the stop and link comparisons below are really about.
+	L.hoverSet(false);
+	ok('with the pointer away from the profile, the route is not painted on the map',
+		L.mapSolid().length === 0, before);
+	L.hoverSet(true);
 	ok('a route is displayed to begin with', L.mapSolid().length === 2, before);
 
 	// Now half-draw a different one and abandon it.

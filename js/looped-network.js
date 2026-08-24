@@ -7592,8 +7592,24 @@ var EngCalcs = EngCalcs || {};
 		// Closing the tab abandons a half-drawn path (Task 433) -- the same restore Escape does.
 		// Leaving the chooser armed under a closed panel would make the next map click mean
 		// something the user can no longer see.
-		hide: function () { profileShown = false; profileDrawCancel(); drawProfilePath(null); }
+		// Leaving the panel is leaving the hover, whatever the pointer does next: a pane that is
+		// closed cannot receive a pointerleave, and without this the map keeps a route mark
+		// belonging to something nobody can see.
+		hide: function () {
+			profileShown = false; profileHover = false;
+			profileDrawCancel(); drawProfilePath(null);
+		}
 	});
+	// The hover seam itself, wired once on the PANEL rather than on the chart: the reader's pointer
+	// is over "the profile" when it is anywhere in that panel, including its commentary line, and
+	// the chart is rebuilt from scratch on every render so a listener on it would have to be rewired
+	// each time.
+	(function wireProfileHover() {
+		var panel = document.getElementById('lpn_pane_profile');
+		if (!panel) { return; }
+		panel.addEventListener('pointerenter', function () { profileHoverSet(true); });
+		panel.addEventListener('pointerleave', function () { profileHoverSet(false); });
+	}());
 	// **THE PANE OPENS ON THE FIRST TABLE, WHICH IS THE CHANGE THIS REORDER MAKES.** paneTabs[0] is
 	// no longer the profile, and that is right: a reader who opens the pane without naming a tab
 	// wants the parts list far more often than the one drawing, and the profile needs stops chosen
@@ -9198,13 +9214,36 @@ var EngCalcs = EngCalcs || {};
 	// its result afterwards, and the user cannot tell a route through the wrong branch from the
 	// right one until it is too late to not commit it.
 	var profilePathLayer = null;
+	// **THE ROUTE IS MARKED ON THE MAP ONLY WHILE THE POINTER IS OVER THE PROFILE** (Tom,
+	// 2026-08-24: "The profile path is highlighted when the Profile tab is open. Can we make that
+	// only when the mouse is over the profile?"). A permanent orange band over a route the reader is
+	// not currently thinking about is one more thing on a drawing whose whole argument is that it is
+	// an exhibit; on hover it becomes an ANSWER to a question the reader just asked by looking.
+	//
+	// **THE CHOOSER IS EXEMPT, and that is not an exception so much as the same rule.** While the
+	// gesture is running the pointer is on the MAP, by definition -- that is where the stops are
+	// being picked -- so a hover test would hide exactly the feedback the gesture exists to give.
+	// Committed legs, the ghost leg and the stop rings all keep drawing throughout.
+	//
+	// `pointerenter`/`pointerleave` rather than `mouseenter`: a tap on the chart counts as entering
+	// it, so a touch reader gets the mark for as long as their finger is down, which is the closest
+	// thing to hover that exists there.
+	var profileHover = false;
+	function profileHoverSet(on) {
+		on = !!on;
+		if (profileHover === on) { return; }
+		profileHover = on;
+		if (profileIsOpen()) { drawProfilePath(profilePath()); }
+	}
 	function drawProfilePath(path) {
 		if (profilePathLayer && profilePathLayer.parentNode) {
 			profilePathLayer.parentNode.removeChild(profilePathLayer);
 		}
 		profilePathLayer = null;
 		var dr = profileState.draw;
-		if ((!path && !(dr && dr.stops.length)) || !world) { return; }
+		var choosing = !!(dr && dr.stops.length);
+		if (!profileHover && !choosing) { return; }
+		if ((!path && !choosing) || !world) { return; }
 		var sc = state.s || 1;
 		profilePathLayer = el('g', { 'class': 'lpn-profile-path', 'pointer-events': 'none' });
 		// BELOW the nodes and ABOVE the links: a route is about the pipes, so it must not bury the
