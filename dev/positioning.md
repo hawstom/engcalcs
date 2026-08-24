@@ -96,10 +96,11 @@ a verifiable fact rather than a matter of taste:
 1. **A licence that cannot be revoked.** GPL v3+ against FSL-1.1-MIT. See §2.
 2. **26 languages.** The suite's deepest single investment and the hardest thing here to replicate.
 3. **The annotated map** — see §4.
-4. **Offline PWA, and no third-party STORAGE at all.** There are **three** third-party requests, all
+4. **Offline PWA, and no third-party STORAGE at all.** There are **four** third-party requests, all
    on the map page and all opt-in by using the feature: OpenStreetMap street tiles, Mapbox satellite
-   tiles, and Nominatim place-name search, which has its own consent gate (`ec_geosearch`) because a
-   tile says where you are looking and a search says what you typed. *"No third-party request of any
+   tiles, Nominatim place-name search, and the Mapbox Terrain-RGB elevation lookup. The last two each
+   have their own consent gate (`ec_geosearch`, `ec_terrain`) because a tile says where you are
+   looking, a search says what you typed, and a node coordinate says where your network is. *"No third-party request of any
    kind" is false and must never be written again.* The public framing is **we ask you each time, per
    feature** — and the count is small enough to state, so state both. `dev/cookie-storage-inventory.md`
    is authoritative; a privacy claim with a footnote a reader has to go and find is not a privacy
@@ -268,7 +269,7 @@ say when a person raises it with us, which they will.
   our differentiator, irrevocable is."** That is wrong on the facts. Irrevocable is the SECOND
   argument, not a replacement for the first.
 - **Horn 3 is where we are strongest and quietest.** No account, no upload, no server-side model, and
-  it installs and runs with the cable out. State it exactly as §3.4 requires — three opt-in
+  it installs and runs with the cable out. State it exactly as §3.4 requires — four opt-in
   third-party requests, named, asked per feature. Overclaiming is the one way to lose an argument we
   currently win: anyone with a network tab can check, and *"no third-party request of any kind"* is
   false.
@@ -326,7 +327,7 @@ replacement has to satisfy:
 | `js/vendor/README.md` | The FSL/MIT split, verbatim and authoritative. Do not duplicate it. |
 | `dev/looped-network-calculator-scope.md` | Scope gravity toward EPANET as the project's biggest risk; what is cut, and why. |
 | `dev/outreach-owa-post.md` | The register for approaching a developer community, and a worked example. |
-| `dev/cookie-storage-inventory.md` | The three opt-in third-party requests, and what `privacy.php` says publicly. |
+| `dev/cookie-storage-inventory.md` | The four opt-in third-party requests, and what `privacy.php` says publicly. |
 | ROADMAP Task 222 | Original 2026-08-05 research; the EPANET-as-qualification-gate ruling. |
 | ROADMAP Task 244 | The navbar term for the licence distinction. |
 | ROADMAP Task 296 | Trademarks out of titles; "with the EPANET engine", never "EPANET-powered". |

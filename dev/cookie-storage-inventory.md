@@ -59,6 +59,7 @@ languages, is not a plausible candidate for "we do not target the EU."
 | `ec_consent` | `lib/Consent.lib.php` (JS) or `consent.php` (no-JS) | 1 year, readable by JS | The consent record: `<state>.<unix-ts>.<policy-version>` | **Exempt** — it exists solely to honour the answer given |
 | `ec_nolog` | `lib/config.inc.php` | 10 years | **Author/tester tool. NOT in the UI and NOT in `privacy.php`** (Tom, 2026-08-12: *"Why disclose it if it's not in the UI?"*). Stops a browser being counted at all, and is NOT redundant with `ec_consent`: refusing consent still writes an undeduplicated 'visit' row, while this writes nothing anywhere — verified 2026-08-12 against all five log writers. **It goes into `privacy.php` the day it gets a UI control**, because then the site would be offering it | **Exempt** — it only honours a choice |
 | `ec_geosearch` | `js/lpn-search.js` (JS only) | 1 year, readable by JS | **A second, purpose-specific consent record** (Task 437): the visitor said yes to place-name search on the Looped-Network map, which sends what they typed to `nominatim.openstreetmap.org`. Same `<state>.<unix-ts>.<policy-version>` shape as `ec_consent`, and **`1` is the only state that exists** — a refusal writes nothing at all. Version-pinned to `EC_GEOSEARCH_VERSION` (`lib/Consent.lib.php`), which is **separate from `EC_CONSENT_VERSION` on purpose**: changing what we send, or who we send it to, must re-ask exactly the people who said yes to the old ask and must NOT re-ask everybody about analytics | **Exempt** — the answer the visitor gave in order to get a service they explicitly requested, holding no identifier, no query and no result. Removed by Settings > Erase everything (`EngCalcs.lpnSearchForget()`, called from `wipeAllStorage()`) |
+| `ec_terrain` | `js/lpn-terrain.js` (JS only) | 1 year, readable by JS | **A third, purpose-specific consent record** (Task 497): the visitor said yes to reading ground elevations for the Looped-Network map, which sends the latitude and longitude of each node that needs one to `api.mapbox.com`. Same `<state>.<unix-ts>.<policy-version>` shape, and **`1` is the only state that exists** — a refusal writes nothing at all. Version-pinned to `EC_TERRAIN_VERSION` (`lib/config.inc.php`, beside `EC_MAPBOX_TOKEN`, because the token is what decides whether the feature exists at all). Separate from `ec_geosearch` because a search says *what the visitor typed* and this says *where their nodes are* — which is the model itself | **Exempt** — the answer the visitor gave in order to get a service they explicitly requested, holding no identifier, no coordinate and no result. Removed by Settings > Erase everything (`EngCalcs.lpnTerrainForget()`, called from `wipeAllStorage()`) |
 | `ec_blang` | `lib/Language.lib.php` | 1 year, HttpOnly | **Analytics only.** The literal value `1`, meaning the browser-language row has been written. Was the language tag until Task 288; every use site is `isset()`, so the value was written and never once read | **Requires consent.** Not written otherwise, deleted on withdrawal |
 | `ec_seen` | `ecMarkSeen()`, `lib/config.inc.php` | Session cookie, HttpOnly | **Analytics only.** One base-32 digit per page, five bits: language view, human view, calculation, title, subtitle. Plus one reserved `_v` entry for the visit's single demand row. **No identifier of any kind** | **Requires consent.** Not written otherwise, deleted on withdrawal |
 | ~~`PHPSESSID`~~ | — | — | **GONE as of Task 288.** It was a 32-hex unique identifier plus a server-side session file, and everything it held was "have we already counted this" — which needs no identifier to answer | — |
@@ -150,11 +151,11 @@ asserts this and fails if the probe is widened to `lpn_`.
 check whether something exempt already answers the question.** The expensive part of storing
 something is never the bytes — it is the sentence in the banner it makes false.
 
-**No third-party STORAGE, and exactly three third-party requests, all on one page and all under the
+**No third-party STORAGE, and exactly four third-party requests, all on one page and all under the
 visitor's control.** No analytics vendor, no tag manager, no ad network, no CDN fonts, and no CDN
 (Task 287: Bootstrap was coming from jsDelivr, which set no cookie but did tell a third party the
 visitor's IP and user-agent on every page load; it is now served from this origin alongside
-`js/vendor/epanet-js.js`). The three that remain all belong to the Looped-Network map:
+`js/vendor/epanet-js.js`). The four that remain all belong to the Looped-Network map:
 
 - **`tile.openstreetmap.org`** — the street-map pictures behind a geographic project. Off by a
   View-menu row, nothing cached by us, and it only ever says *where the visitor is looking*.
@@ -165,6 +166,11 @@ visitor's IP and user-agent on every page load; it is now served from this origi
 - **`nominatim.openstreetmap.org`** — place-name search (Task 437). Sent only on an explicit search,
   only after its own separate consent, and it says *what the visitor typed*, which is why it has a
   question of its own rather than riding on the tiles' silence.
+- **`api.mapbox.com` again, for terrain** — ground elevations (Task 497), and it is a fourth PURPOSE
+  on a host already in this list rather than a fourth host. Sent only when the visitor presses the
+  View-menu row, only after its own separate consent (`ec_terrain`), and it says *where the
+  visitor's nodes are*, which is the model itself. That is why it does not ride on the satellite
+  tiles' gate: those pictures say where you are looking, these coordinates say what you have built.
 
 > **`privacy.php` NOW STATES ALL THREE** (Task 480, 2026-08-21). Its *Who else sees it* section names
 > the tiles and the search separately and keeps them separate on purpose: *"We send them nothing about
@@ -172,7 +178,8 @@ visitor's IP and user-agent on every page load; it is now served from this origi
 > words the visitor typed. **Do not fold the search back under the tiles' sentence.** The page also
 > states the rule the list rests on — nothing leaves until you switch that feature on, and each asks
 > separately — so a fourth service is a new paragraph, not a contradiction. `ec_geosearch` is in its
-> device-storage table.
+> device-storage table. **The terrain lookup is its FOURTH paragraph and `ec_terrain` its own row**
+> (Task 497) — written the same day the feature shipped, which is what the rule above anticipated.
 
 ## 4. Server-side collection (GDPR, not ePrivacy)
 

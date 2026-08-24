@@ -257,8 +257,13 @@ console.log('\n--- one home for the concept ---');
 	// The two-step placement (detached/attached) added one more site to each pair: the settle that
 	// re-derives the document reads the model's anchor OUTWARD and plants it INWARD, which is the
 	// same boundary as every other one here.
-	ok('outwardX has one definition and thirteen call sites', count(/outwardX\(/g) === 14, count(/outwardX\(/g));
-	ok('outwardY has one definition and fourteen call sites', count(/outwardY\(/g) === 15, count(/outwardY\(/g));
+	// **TASK 497 ADDED TWO SITES TO EACH PAIR, and they are the same boundary again.** Reading the
+	// land surface under a node needs where the node is ON THE EARTH, not where it is in the
+	// document's local frame -- once for the nodes with no elevation and once for the nodes still on
+	// the starting elevation. A terrain lookup that skipped the shift would read the hillside half a
+	// million units away and write a perfectly plausible elevation into the document.
+	ok('outwardX has one definition and fifteen call sites', count(/outwardX\(/g) === 16, count(/outwardX\(/g));
+	ok('outwardY has one definition and sixteen call sites', count(/outwardY\(/g) === 17, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
