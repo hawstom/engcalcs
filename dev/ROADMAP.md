@@ -119,6 +119,33 @@ the block.
     swapped; the rest translated the two words and need them reordered by someone who reads the
     script. They are on the drift list, so the next sprint picks them up by itself.
 
+- 75|514| **Two different units both labelled "Pressure", both on screen at once.**
+  Found 2026-08-24 in screenshot 0026 while narrating the drop, and it is an ENGLISH defect, not a
+  translation one: the map status strip prints `Pressure: m H2O` from `lpn_u_pressure`, the INPUT
+  unit a valve setting is typed in, while the colour key prints `Pressure (psi)` from
+  `lpn_u_r_pressure`, the RESULTS unit. Both are correct and both say the same word.
+  - `lpn_units_pressure` and `lpn_result_pressure` are two keys holding the identical English value,
+    and so are `lpn_units_flow` and `lpn_result_flow`. The units strip separates them by POSITION --
+    an inputs column and a results column -- and neither readout carries that position with it.
+  - **[H] Wording is Tom's.** The routing rule sends this to the English (an English reader stumbles
+    too), and the fix is whatever distinguishes the two on a strip 11px tall in 27 languages.
+  - Same shape as Task 512: two different things wearing one mark, silently.
+
+- 75|515| **The Settings category index breaks its own labels mid-word.**
+  "Visualizati / on", "Node symbolog / y", "Map appearan / ce" -- visible in screenshots 0022, 0023,
+  0026 and 0029 through 0033, so it is the normal state, not a narrow window. The left column is
+  narrower than the labels it has to carry.
+  - Task 284 covers the Settings box's sticky headings and its narrow-screen collapse and does NOT
+    name this. Column width is king suite-wide and mid-word wrap is acceptable in a RESULTS table;
+    a navigation index a user reads to find a section is the case that rule was not written for.
+
+- 75|516| **The colour key stacks onto the label legend and covers it.**
+  Screenshot 0030: with nodes coloured by pressure AND links by velocity, two colour keys stack at
+  the right edge and print over the node/link label legend, which becomes unreadable. Both default
+  to the right and nothing separates them or gives way.
+  - One key is the common case and is fine. The defect appears only when both groups are coloured,
+    which is also when the map is carrying the most information.
+
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
   more than one means rewrite"*, both waves writing to `dev/english-friction/<sprint>.json`, with
