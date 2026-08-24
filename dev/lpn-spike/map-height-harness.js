@@ -331,5 +331,27 @@ console.log('\n--- an element with no layout box is not measured at all ---');
 		'and the page re-measures when the tab becomes visible again');
 }
 
+console.log('\n--- hiding the page titles gives the room back to the map ---');
+{
+	// Tom, 2026-08-23: "When I toggle the page titles, the height of the map doesn't respond.
+	// Turning them off creates an empty space (gap) below the map that doesn't resolve until a page
+	// reload." The gap IS the height the three headings used to occupy: applyPageTitles() moves the
+	// svg up, and the canvas keeps a height nobody recalculated.
+	//
+	// ASSERTED STRUCTURALLY, on the source with comments stripped, because the sandbox has no
+	// layout to measure -- what can be pinned here is that the toggle goes through the one function
+	// that owns the canvas height, and the whole defect was that it did not.
+	const body = stripComments(extract('setPageTitlesShown'));
+	report(/applyPageTitles\(/.test(body), 'the toggle still applies the visibility');
+	report(/applyMapHeight\(/.test(body), '...and re-measures the map, which is what was missing');
+	report(body.indexOf('applyPageTitles(') < body.indexOf('applyMapHeight('),
+		'...in that order -- measuring before the headings move would read the old layout');
+	// The neighbouring rule this must not be confused with. Opening a project deliberately does NOT
+	// call applyMapHeight(): the bottom of the map does not depend on the model. Page titles are the
+	// environment, like a window resize.
+	report(/resize.{0,4}applyMapHeight|applyMapHeight.{0,80}resize/s.test(stripComments(src)),
+		'and a window resize -- the same class of event -- still calls it too');
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);

@@ -16136,6 +16136,17 @@ var EngCalcs = EngCalcs || {};
 	function setPageTitlesShown(show) {
 		try { localStorage.setItem(PAGE_TITLES_KEY, show ? '1' : '0'); } catch (e) {}
 		applyPageTitles(show);
+		// **AND THE MAP TAKES THE ROOM BACK** (Tom, 2026-08-23: *"When I toggle the page titles, the
+		// height of the map doesn't respond. Turning them off creates an empty space (gap) below the
+		// map that doesn't resolve until a page reload."*). applyMapHeight() sizes the canvas from
+		// `body.bottom - svg.bottom`, and hiding three headings moves the svg up without changing
+		// that stored height -- so the gap is the height the headings used to occupy, still being
+		// reserved by a number nobody recalculated.
+		//
+		// This does NOT contradict the standing "no applyMapHeight() here" note on opening a project.
+		// That one says the bottom of the map does not depend on the MODEL. This is the ENVIRONMENT
+		// changing -- the same class of event as a window resize, which has always called it.
+		applyMapHeight();
 	}
 
 	// **THE SUB-HEADINGS ARE IN THE MARKUP NOW AND THIS FILLS THEM** (Task 441, restructured). The
