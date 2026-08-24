@@ -40,12 +40,12 @@ exports.run = async function ({ browser, report }) {
 		report.ok(/Longitude/.test(read) && /Latitude/.test(read),
 			'the coordinate readout speaks in degrees', read);
 
-		const m = read.match(/Longitude:\s*(-?[\d.]+)\s+Latitude:\s*(-?[\d.]+)/);
+		const m = read.match(/Latitude:\s*(-?[\d.]+)\s+Longitude:\s*(-?[\d.]+)/);
 		report.ok(!!m, '...with two numbers in it', read);
 		if (m) {
 			// Within a few hundred metres of the centre: the pointer is at the middle of the canvas,
 			// which is what the home view centres on.
-			report.ok(Math.abs(+m[1] - HOME.lon) < 1 && Math.abs(+m[2] - HOME.lat) < 1,
+			report.ok(Math.abs(+m[2] - HOME.lon) < 1 && Math.abs(+m[1] - HOME.lat) < 1,
 				'and the map opens on the whole world, centred on 0,0', m[1] + ', ' + m[2]);
 			// Six decimals is ~0.11 m. Two would put a whole site at one coordinate.
 			report.ok(/\.\d{6}\b/.test(m[1]), '...to a precision a pipe can be placed at', m[1]);

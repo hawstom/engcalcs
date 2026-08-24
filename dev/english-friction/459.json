@@ -182,8 +182,8 @@
         "the same concept as lat/lon elsewhere, translated in the established order",
         "literally lon/lat, producing an order inconsistency across three sibling strings"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "OPEN for Tom. The two orders are both defensible -- lon/lat is x-then-y and matches how a file's coordinates are actually stored, lat/lon is how people say it -- and the button is about what is IN the file, so the reversal may well be deliberate. It is a wording call on a control, which is his. Note it sits beside the unresolved mode-name question below."
+      "disposition": "english",
+      "resolution": "RULED AND FIXED 2026-08-24. Tom: \"Oops. A mistake. It should be lat/lon everywhere. I see that our status area says Lon Lat. I feel the confusion, but history says Lat/Lon.\" So the button reads 'These are already lat/lon', and the two places a coordinate is READ -- the status readout and the property popup -- now put Latitude first as well; both had been emitting the pair in x,y order, which is a fact about storage showing through into a line a person reads. X/Y projects keep x first, because there the pair really is x then y, and the internal {lon, lat} variable naming is untouched. Eleven languages carrying the literal 'lon/lat' were swapped mechanically; the rest translated the two words in the old order and resync on the next sprint through the drift baseline. **German found this by noticing the string disagreed with its own two neighbours** -- the same tell that found the missing {n}, one sibling out of step with the others."
     },
     {
       "key": "lpn_settings_color_credits",

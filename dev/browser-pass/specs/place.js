@@ -379,7 +379,9 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(600);
 		const b2 = await bar(a), afterAttach = await modelBox(a);
 		report.has(b2.step, 'Step 2 of 2', 'Drop it here moves to step 2');
-		report.has(b2.step, 'fine', '...which is the fine one');
+		// "fine" became "precise" in sprint 459's Wave 0: standalone, "fine" competes with the
+		// everyday sense of OK, and "quick/precise" is the contrast the two steps actually are.
+		report.has(b2.step, 'precise', '...which is the precise one');
 		report.ok(b2.numbers && b2.finish && b2.detach && !b2.drop,
 			'...offering Finish, the two numbers and a way back to step 1, and no longer Drop');
 		report.ok(Math.abs(afterAttach.cx - beforeAttach.cx) < 3 && Math.abs(afterAttach.cy - beforeAttach.cy) < 3,
@@ -677,7 +679,7 @@ exports.run = async function ({ browser, report }) {
 			await a.settle(600);
 			report.ok(await a.page.evaluate(() => document.getElementById('lpn_georef_bar').style.display === 'none'),
 				'a file that DOES say DEGREES just opens — its coordinates already are lon/lat');
-			report.has(await readout(a), 'Longitude', '...as a lat/lon project, read out of the file');
+			report.has(await readout(a), 'Latitude', '...as a lat/lon project, read out of the file');
 		}
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');

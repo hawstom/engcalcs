@@ -90,7 +90,7 @@ exports.run = async function ({ browser, report }) {
 		if (box) { await a.page.mouse.move(box.x + 2, box.y + 2); }
 		await a.settle(200);
 		const read = await a.page.evaluate(() => document.getElementById('lpn_coords').textContent);
-		const got = read.match(/Longitude:\s*(-?[\d.]+)\s+Latitude:\s*(-?[\d.]+)/);
+		const got = read.match(/Latitude:\s*(-?[\d.]+)\s+Longitude:\s*(-?[\d.]+)/);
 		report.ok(!!got, 'the pointer reads a longitude and a latitude over a tile', read);
 		if (got) {
 			// Reported in PIXELS, which is the unit the answer matters in — and the pointer was put
@@ -99,14 +99,14 @@ exports.run = async function ({ browser, report }) {
 			// hundreds.
 			const degPerPxX = (tileLon(tx + 1, z) - tileLon(tx, z)) / box.w;
 			const degPerPxY = (tileLat(ty, z) - tileLat(ty + 1, z)) / box.h;
-			const offX = (+got[1] - (tileLon(tx, z) + 2 * degPerPxX)) / degPerPxX;
-			const offY = ((tileLat(ty, z) - 2 * degPerPxY) - +got[2]) / degPerPxY;
+			const offX = (+got[2] - (tileLon(tx, z) + 2 * degPerPxX)) / degPerPxX;
+			const offY = ((tileLat(ty, z) - 2 * degPerPxY) - +got[1]) / degPerPxY;
 			report.ok(Math.abs(offX) < 4,
 				"a tile's west edge is at the longitude its own URL claims",
-				`${got[1]} vs ${tileLon(tx, z).toFixed(6)}  (${offX.toFixed(2)} px)`);
+				`${got[2]} vs ${tileLon(tx, z).toFixed(6)}  (${offX.toFixed(2)} px)`);
 			report.ok(Math.abs(offY) < 4,
 				"...and its north edge at that URL's latitude",
-				`${got[2]} vs ${tileLat(ty, z).toFixed(6)}  (${offY.toFixed(2)} px)`);
+				`${got[1]} vs ${tileLat(ty, z).toFixed(6)}  (${offY.toFixed(2)} px)`);
 		}
 
 		// THE OPPOSITE CORNER, and it is not a duplicate: the north-west corner alone is still right
@@ -115,12 +115,12 @@ exports.run = async function ({ browser, report }) {
 		if (box) { await a.page.mouse.move(box.x + box.w - 2, box.y + box.h - 2); }
 		await a.settle(200);
 		const read2 = await a.page.evaluate(() => document.getElementById('lpn_coords').textContent);
-		const got2 = read2.match(/Longitude:\s*(-?[\d.]+)\s+Latitude:\s*(-?[\d.]+)/);
+		const got2 = read2.match(/Latitude:\s*(-?[\d.]+)\s+Longitude:\s*(-?[\d.]+)/);
 		if (got2) {
 			const degPerPxY = (tileLat(ty, z) - tileLat(ty + 1, z)) / box.h;
-			const offS = (+got2[2] - (tileLat(ty + 1, z) + 2 * degPerPxY)) / degPerPxY;
+			const offS = (+got2[1] - (tileLat(ty + 1, z) + 2 * degPerPxY)) / degPerPxY;
 			report.ok(Math.abs(offS) < 4, "...and its SOUTH edge at the latitude one tile further on",
-				`${got2[2]} vs ${tileLat(ty + 1, z).toFixed(6)}  (${offS.toFixed(2)} px)`);
+				`${got2[1]} vs ${tileLat(ty + 1, z).toFixed(6)}  (${offS.toFixed(2)} px)`);
 		}
 
 		// ---- the attribution ------------------------------------------------------------------

@@ -1376,7 +1376,12 @@ $ec_lang['lpn_file_import_geo_tip']='Opens a project file or an EPANET file in a
 // Offered in step 1 whenever every coordinate in the file would also be a valid longitude and
 // latitude -- which nearly every small drawing is -- so the sentence has to make the user the
 // judge rather than announce a finding.
-$ec_lang['lpn_georef_asdeg_btn']='These are already lon/lat';
+// **LAT/LON, NOT LON/XY ORDER, AND THIS IS SETTLED** (Tom, 2026-08-24, after German filed it:
+// *"Oops. A mistake. It should be lat/lon everywhere... history says Lat/Lon."*). x-then-y is a real
+// convention and it is why this said lon/lat, but it is a convention about STORAGE, and this button
+// is read by a person. The internal code keeps naming its variables {lon, lat} in x,y order; that is
+// invisible and stays.
+$ec_lang['lpn_georef_asdeg_btn']='These are already lat/lon';
 $ec_lang['lpn_georef_asdeg_tip']='Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.';
 $ec_lang['lpn_georef_asdegrees']='The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press Keep this placement.';
 $ec_lang['lpn_georef_intro']='Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here.';
@@ -2498,11 +2503,10 @@ $ec_lang['lpn_library_patterns']='Patterns';
 // requires. "Pattern" is the discipline's standard term and stays the label; the payload exists so
 // a translator who cannot recover the concept from that one word has the shape of it.
 //
-// ONE FLAG ON HIS LIST, for him to strike or keep: **"Run" collides with this page's own Run** --
-// the button that plays an extended-period simulation back. A translator reaching for the word
-// their language uses for a program run would name the wrong thing, and it is the one entry here
-// whose failure mode is a wrong label rather than a merely loose one.
-$ec_lang_syn['lpn_library_patterns']='Data series, Sequence, Time series, Progression, Run, Schedule, Variation profile';
+// "Run" was on his list and he struck it the same day, on the collision: this page's Run is the
+// button that plays an extended-period simulation back, so a translator reaching for their word for
+// a program run would have named the wrong thing. Tom: *"Yes. It's not the best term."*
+$ec_lang_syn['lpn_library_patterns']='Data series, Sequence, Time series, Progression, Schedule, Variation profile';
 $ec_lang['lpn_library_patterns_tip']='A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.';
 $ec_lang['lpn_library_curves']='Curves';
 $ec_lang['lpn_library_curves_tip']='A curve is the points that say how a pump performs: how much head it makes at each flow.';

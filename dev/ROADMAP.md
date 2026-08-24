@@ -258,11 +258,21 @@ the block.
     written into a check. **Do not just re-baseline the numbers** — that converts a failing check
     into a passing one that asserts whatever the code does, which is the one outcome worth less
     than no check at all.
-  - Five other specs had gone stale the same way and were fixed that day (a View row that moved to
-    Project, a renamed menu row, a two-button dialog that grew a third, a tile box that became
-    square, the profile's deleted side controls). **The lesson is the pass itself: `node run.js` is
-    four minutes and it had drifted to 6 failures, five of them cosmetic and hiding the real one.**
-    Run it before it is needed.
+  - Eleven other specs had gone stale the same way and were fixed that day (a View row that moved to
+    Project — twice, a renamed menu row, a two-button dialog that grew a third, a tile box that
+    became square, the profile's deleted side controls, a first-visit tooltip Task 418 had changed,
+    four coordinate readouts that read longitude first, and "fine" → "precise").
+  - **STILL FAILING and NOT investigated, in `setbox.js`, `toolbar.js` and `time.js`:** "ticking it
+    puts the map into thematic mode"; "View > Labels opens it too" (that row is gone, so it is the
+    stale door again); "Settings is the last control on the strip" (the strip now ends *Step forward
+    | Find and replace | Bottom panel*); "every tip is wired for touch" (3 controls without
+    `.ec-help`); and four in Time modelling, one of which throws. **They are probably stale too, but
+    "probably" is exactly what this task exists to stop** — read each one.
+  - **The lesson is the pass itself. `node run.js` takes four minutes** and had drifted to 19
+    failures across 711 checks, most of them cosmetic and hiding the ones that are not. It had not
+    been run end to end in a long time, and earlier partial runs in this session were being cut off
+    by a too-short timeout, which is its own trap: **a truncated pass reports a subset and looks
+    like a clean one.** Give it 900 seconds.
 
 - 100|508| **Tom's screenshot drop: dozens of captures, indexed and reused.** His idea,
   2026-08-24: *"a folder in this project, not in git, where I can prolifically put screenshots by

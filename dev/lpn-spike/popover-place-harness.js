@@ -49,6 +49,12 @@ report(EDGE > 0, 'the viewport margin is read out of the file', String(EDGE));
 
 // A mutable window, so a section can put the same panel in a tall screen and a short one.
 var window = { innerWidth: 1200, innerHeight: 900 };
+// **THE CHROME FLOOR IS A STUB WITH A REAL NUMBER IN IT, not a stub that returns 0.** The page's
+// own chromeFloor() measures the menu bar, toolbar and tab strip; a stub returning nothing would
+// make every check below pass by removing the coupling it exists to test. It is a variable so a
+// section can put the panel under a tall strip and a short one, exactly as `window` does.
+var CHROME_FLOOR = 0;
+function chromeFloor() { return CHROME_FLOOR; }
 eval(`var POPUP_EDGE = ${EDGE};\n` + [
 	extract('panelPlacement'), extract('capPanelHeight'), extract('resetPanelHeight'),
 	extract('panelBody'), extract('openPanelAtAnchor'), extract('fitPanelToViewport')
@@ -260,6 +266,41 @@ console.log('\n-- clicking the menu bar dismisses an open popover (Tom, 2026-08-
 	report(!/lpn_settings_popup|lpn_settings_box/.test(
 		src.slice(src.indexOf('var VIEW_POPOVERS'), src.indexOf('var VIEW_POPOVERS') + 200)),
 		'the Settings box is not a click-away pull-down');
+}
+
+
+console.log('\n-- a panel hung below its button clears the WHOLE chrome, not just that button --');
+{
+	// The reported case: the Find panel hung off a menu row whose bottom was 279, while the toolbar
+	// and tab strip below it reached 356. It opened at 279 and its own close button was behind the
+	// toolbar.
+	window.innerHeight = 1200;
+	const anchor = rect(60, 250, 90, 29);
+	CHROME_FLOOR = 360;
+	const p = fakePanel(240, 400, 16, true);
+	openPanelAtAnchor(p, anchor);
+	report(px(p.style.top) >= CHROME_FLOOR,
+		'a downward panel starts below the last strip of chrome, not below its own row',
+		p.style.top + ' vs floor ' + CHROME_FLOOR);
+
+	// ...and with no chrome to clear it still hangs off its own button, unchanged.
+	CHROME_FLOOR = 0;
+	const q = fakePanel(240, 400, 16, true);
+	openPanelAtAnchor(q, anchor);
+	report(px(q.style.top) === anchor.bottom,
+		'...and with no chrome in the way it still hangs at the button\'s bottom edge', q.style.top);
+
+	// An UPWARD flip is never pushed down: it flipped to avoid its own anchor, and the floor would
+	// land it back on top of it.
+	window.innerHeight = 340;
+	CHROME_FLOOR = 300;
+	const r2 = fakePanel(240, 200, 16, true);
+	const at = openPanelAtAnchor(r2, rect(60, 250, 90, 29));
+	report(at.side !== 'below' ? px(r2.style.top) < 250 : true,
+		'an upward flip is not dragged down onto the control it flipped away from',
+		at.side + ' at ' + r2.style.top);
+	window.innerHeight = 900;
+	CHROME_FLOOR = 0;
 }
 
 console.log(`\n${checks - failures}/${checks} passed`);

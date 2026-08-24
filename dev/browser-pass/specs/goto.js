@@ -44,8 +44,10 @@ async function centre(a) {
 	await a.page.mouse.move(r.x + r.w / 2, r.y + r.h / 2);
 	await a.settle(150);
 	const text = await a.page.evaluate(() => document.getElementById('lpn_coords').textContent);
-	const m = text.match(/Longitude:\s*(-?[\d.]+)\s+Latitude:\s*(-?[\d.]+)/);
-	return m ? { lon: +m[1], lat: +m[2], text } : { text };
+	const m = text.match(/Latitude:\s*(-?[\d.]+)\s+Longitude:\s*(-?[\d.]+)/);
+	// Group 1 is the LATITUDE since 2026-08-24: the readout leads with it (Tom's ruling), and the
+	// capture order follows the text rather than the storage order.
+	return m ? { lat: +m[1], lon: +m[2], text } : { text };
 }
 // Type something into the Go to… prompt from the View menu and settle.
 async function goTo(a, typed) {

@@ -7507,7 +7507,7 @@ var EngCalcs = EngCalcs || {};
 			popup.style.display = 'block';
 			r = popup.getBoundingClientRect();
 			at = clampPanel(findUserPos.left, findUserPos.top, r.width, r.height,
-				window.innerWidth, window.innerHeight);
+				window.innerWidth, window.innerHeight, chromeFloor());
 			popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
 		} else if (anchorEl && anchorEl.getBoundingClientRect) {
 			openPanelAtAnchor(popup, anchorEl.getBoundingClientRect());
@@ -7515,7 +7515,7 @@ var EngCalcs = EngCalcs || {};
 			popup.style.display = 'block';
 			h = fitPanelToViewport(popup); r = popup.getBoundingClientRect();
 			popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
-			popup.style.top = Math.max(POPUP_EDGE, (window.innerHeight - h) / 2) + 'px';
+			popup.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
 		}
 		input = popup.querySelector('input[type=text]');
 		if (input) { input.focus(); input.select(); }
@@ -14397,7 +14397,7 @@ var EngCalcs = EngCalcs || {};
 		var h = fitPanelToViewport(popup);
 		var pr = popup.getBoundingClientRect();
 		popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - pr.width) / 2) + 'px';
-		popup.style.top = Math.max(POPUP_EDGE, (window.innerHeight - h) / 2) + 'px';
+		popup.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
 	}
 	function wireNotesPopup() {
 		var x = document.getElementById('lpn_notes_close');
@@ -15477,9 +15477,14 @@ var EngCalcs = EngCalcs || {};
 				// already on screen, already about coordinates, and it costs the user nothing --
 				// which is the whole reason there is no banner and no badge saying the same thing.
 				var pcc = EngCalcs.pageConfig || {};
+				// **LATITUDE FIRST** (Tom, 2026-08-24: "It should be lat/lon everywhere... history says
+				// Lat/Lon."). The readout led with Longitude because the drawing's x is the
+				// longitude and the pair was emitted in x,y order -- which is a fact about storage
+				// showing through into a line a person reads. X and Y keep their own order, because
+				// there x IS first.
 				coordsEl.textContent = isGeoProject()
-					? (pcc.lpn_field_lon || 'Longitude') + ': ' + coordText(outwardX(w.x)) +
-						'  ' + (pcc.lpn_field_lat || 'Latitude') + ': ' + coordText(outwardY(w.y))
+					? (pcc.lpn_field_lat || 'Latitude') + ': ' + coordText(outwardY(w.y)) +
+						'  ' + (pcc.lpn_field_lon || 'Longitude') + ': ' + coordText(outwardX(w.x))
 					: 'X: ' + coordText(outwardX(w.x)) + '  Y: ' + coordText(outwardY(w.y));
 			});
 		}
@@ -18254,7 +18259,7 @@ var EngCalcs = EngCalcs || {};
 		at = clampPanel(
 			setboxLayout.left === null ? home.left : setboxLayout.left,
 			setboxLayout.top === null ? home.top : setboxLayout.top,
-			r.width, r.height, window.innerWidth, window.innerHeight);
+			r.width, r.height, window.innerWidth, window.innerHeight, chromeFloor());
 		box.style.left = at.left + 'px';
 		box.style.top = at.top + 'px';
 		if (section && SETBOX_TARGETS[section]) {
@@ -18317,7 +18322,7 @@ var EngCalcs = EngCalcs || {};
 				// right edge is a one-way trip -- measured 2026-08-19: left 932 + 554 wide in a 1400
 				// window put the corner 86 px past the edge. Clamping here slides the box back the
 				// way a dragged one is clamped, which is the same promise in the other direction.
-				at = clampPanel(r.left, r.top, r.width, r.height, window.innerWidth, window.innerHeight);
+				at = clampPanel(r.left, r.top, r.width, r.height, window.innerWidth, window.innerHeight, chromeFloor());
 				if (at.left !== Math.round(r.left) || at.top !== Math.round(r.top)) {
 					box.style.left = at.left + 'px';
 					box.style.top = at.top + 'px';
@@ -19015,7 +19020,7 @@ var EngCalcs = EngCalcs || {};
 		rebuildLibraryBox();
 		r = box.getBoundingClientRect();
 		home = setboxHomeCorner(r.width, r.height);
-		at = clampPanel(home.left, home.top, r.width, r.height, window.innerWidth, window.innerHeight);
+		at = clampPanel(home.left, home.top, r.width, r.height, window.innerWidth, window.innerHeight, chromeFloor());
 		box.style.left = at.left + 'px';
 		box.style.top = at.top + 'px';
 		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
@@ -19133,7 +19138,7 @@ var EngCalcs = EngCalcs || {};
 		popup.addEventListener('pointermove', function (e) {
 			if (!drag) { return; }
 			var at = clampPanel(e.clientX - drag.dx, e.clientY - drag.dy, drag.w, drag.h,
-				window.innerWidth, window.innerHeight);
+				window.innerWidth, window.innerHeight, chromeFloor());
 			popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
 			// Remembered as it moves rather than on release: a drag that ends off-window, or is
 			// interrupted by the pointer being cancelled, still leaves the popup where it looks.
@@ -19367,10 +19372,18 @@ var EngCalcs = EngCalcs || {};
 	// The two coordinate rows every popup shows, in the vocabulary THIS project uses (Task 145).
 	// One function, so a node's popup and a label's popup cannot come to different conclusions about
 	// what x means -- and so a third caller gets it right by not deciding.
+	// **AND A GEOGRAPHIC PROJECT PUTS LATITUDE FIRST HERE TOO** (Tom, 2026-08-24). The popup and
+	// the status readout are the two places a coordinate is read, and they must agree; an X/Y
+	// project keeps x first, because there the pair really is x then y.
 	function coordFields(fields, x, y) {
 		var pc = EngCalcs.pageConfig || {}, geo = isGeoProject();
-		readonlyField(fields, geo ? (pc.lpn_field_lon || 'Longitude') : (pc.lpn_field_x || 'X'), coordText(x));
-		readonlyField(fields, geo ? (pc.lpn_field_lat || 'Latitude') : (pc.lpn_field_y || 'Y'), coordText(y));
+		if (geo) {
+			readonlyField(fields, pc.lpn_field_lat || 'Latitude', coordText(y));
+			readonlyField(fields, pc.lpn_field_lon || 'Longitude', coordText(x));
+			return;
+		}
+		readonlyField(fields, pc.lpn_field_x || 'X', coordText(x));
+		readonlyField(fields, pc.lpn_field_y || 'Y', coordText(y));
 	}
 	function readonlyField(fields, labelText, value, tip) {
 		var label = document.createElement('label'), span = document.createElement('span');
@@ -19494,11 +19507,33 @@ var EngCalcs = EngCalcs || {};
 	// after being clamped by the other. Smaller-than-margin viewports fall back to the left/top
 	// edge rather than going negative.
 	var POPUP_EDGE = 4;
-	function clampPanel(left, top, w, h, vw, vh) {
+	// **AND IT MAY NOT GO UNDER THE CHROME** (2026-08-24). The menu bar, toolbar and tab strip now
+	// paint above every panel (Tom's z-index ruling), which makes any part of a panel that overlaps
+	// them unclickable -- the Find panel's own close button was, in a short window. So the floor for
+	// `top` is the bottom of the chrome rather than the top of the viewport: the two rules together
+	// mean the chrome is always on top AND nothing is ever hidden beneath it.
+	//
+	// `topMin` is a PARAMETER rather than a call to the DOM inside here, because this function is
+	// the one piece of placement arithmetic that is pure and is evaluated in isolation by
+	// dev/lpn-spike/popup-drag-harness.js. Omitted, it behaves exactly as it always did.
+	function clampPanel(left, top, w, h, vw, vh, topMin) {
+		var floor = (typeof topMin === 'number' && topMin > POPUP_EDGE) ? topMin : POPUP_EDGE;
 		return {
 			left: Math.max(POPUP_EDGE, Math.min(left, vw - w - POPUP_EDGE)),
-			top: Math.max(POPUP_EDGE, Math.min(top, vh - h - POPUP_EDGE))
+			top: Math.max(floor, Math.min(top, vh - h - POPUP_EDGE))
 		};
+	}
+	// The bottom of the page chrome in viewport coordinates -- measured, not typed, because the strip
+	// wraps at narrow widths and is partly hidden below the small-screen breakpoint.
+	function chromeFloor() {
+		var lowest = 0;
+		['lpn_menubar', 'lpn_toolbar', 'lpn_tabs'].forEach(function (id) {
+			var e = document.getElementById(id);
+			if (!e || !e.offsetParent) { return; }
+			var b = e.getBoundingClientRect().bottom;
+			if (b > lowest) { lowest = b; }
+		});
+		return lowest ? lowest + POPUP_EDGE : POPUP_EDGE;
 	}
 	// WHERE A PULL-DOWN GOES, given the rect of the control that opened it (Task 372). Pure, so the
 	// one rule every popover on this page obeys can be asserted without a browser.
@@ -19569,13 +19604,18 @@ var EngCalcs = EngCalcs || {};
 			var h = fitPanelToViewport(panel);
 			var wantLeft = (ar.right + r.width > window.innerWidth - POPUP_EDGE) ? ar.left - r.width : ar.right;
 			panel.style.left = Math.max(POPUP_EDGE, Math.min(wantLeft, window.innerWidth - r.width - POPUP_EDGE)) + 'px';
-			panel.style.top = Math.max(POPUP_EDGE, Math.min(ar.top, window.innerHeight - h - POPUP_EDGE)) + 'px';
+			panel.style.top = Math.max(chromeFloor(), Math.min(ar.top, window.innerHeight - h - POPUP_EDGE)) + 'px';
 			return null;
 		}
 		at = panelPlacement(ar, r.width, r.height, window.innerWidth, window.innerHeight);
 		if (at.maxHeight != null) { capPanelHeight(panel, body, at.maxHeight, r.height); }
 		panel.style.left = at.left + 'px';
-		panel.style.top = at.top + 'px';
+		// **A PANEL HUNG BELOW ITS BUTTON CLEARS THE WHOLE CHROME, not just that button** (2026-08-24).
+		// The chrome paints above every panel now, so a panel that starts under the menu bar has its
+		// top band -- which is its drag surface AND its close button -- behind the toolbar below it.
+		// Only the DOWNWARD placement is lifted: a panel that deliberately flipped up is avoiding its
+		// own anchor, and pushing it down would land it on the thing it flipped to avoid.
+		panel.style.top = (at.top >= ar.bottom ? Math.max(chromeFloor(), at.top) : at.top) + 'px';
 		return at;
 	}
 	// For the panels that are NOT hung off a control -- the property popup (opened at a point on the
@@ -19607,7 +19647,7 @@ var EngCalcs = EngCalcs || {};
 		// ever chooses which end of it to lose.
 		h = fitPanelToViewport(popup);
 		r = popup.getBoundingClientRect();
-		at = clampPanel(sx, sy, r.width, h, window.innerWidth, window.innerHeight);
+		at = clampPanel(sx, sy, r.width, h, window.innerWidth, window.innerHeight, chromeFloor());
 		popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
 		EngCalcs.initTips(popup);
 	}

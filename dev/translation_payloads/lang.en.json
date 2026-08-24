@@ -702,7 +702,7 @@
         "lpn_xymap": "xy",
         "lpn_file_import_geo": "Import xy to lat\/lon…",
         "lpn_file_import_geo_tip": "Opens a project file or an EPANET file in a new tab, on the street map. You place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. If the numbers in the file already are a longitude and a latitude, one button says so and the network jumps straight to where it belongs. Every number you typed stays as it is.",
-        "lpn_georef_asdeg_btn": "These are already lon\/lat",
+        "lpn_georef_asdeg_btn": "These are already lat\/lon",
         "lpn_georef_asdeg_tip": "Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.",
         "lpn_georef_asdegrees": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press Keep this placement.",
         "lpn_georef_intro": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here.",
