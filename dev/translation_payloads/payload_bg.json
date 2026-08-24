@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 1278,
-        "delta_key_count": 87,
+        "expected_key_count": 1283,
+        "delta_key_count": 92,
         "exempt_key_count": 20,
         "exempt_keys": [
             "calc_units_us",
@@ -513,6 +513,11 @@
         "lpn_replace_scope": "Choose one kind of asset above to change values on.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
+        "lpn_profile_draw": "Choose the path on the map",
+        "lpn_profile_draw_stop": "Stop choosing",
+        "lpn_profile_draw_start": "Click the node where the path starts.",
+        "lpn_profile_draw_more": "Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.",
+        "lpn_profile_draw_blocked": "No route from {a} to {b}. Choose another node.",
         "lpn_inp_drop_anchor_missing": "This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.",
         "lpn_import_notes_heading": "From the EPANET file",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -602,6 +607,11 @@
         "lpn_replace_scope": "Choose one kind of asset above to change values on.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
+        "lpn_profile_draw": "Choose the path on the map",
+        "lpn_profile_draw_stop": "Stop choosing",
+        "lpn_profile_draw_start": "Click the node where the path starts.",
+        "lpn_profile_draw_more": "Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.",
+        "lpn_profile_draw_blocked": "No route from {a} to {b}. Choose another node.",
         "lpn_inp_drop_anchor_missing": "This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.",
         "lpn_import_notes_heading": "From the EPANET file",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -1318,6 +1328,86 @@
                     "key": "lpn_profile_from",
                     "value": "От",
                     "english": "From"
+                }
+            }
+        },
+        "lpn_profile_draw": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "Възли по пътя",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "Премахни всички",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_draw_stop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "Възли по пътя",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "Премахни всички",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_draw_start": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "Възли по пътя",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "Премахни всички",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_draw_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "Възли по пътя",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "Премахни всички",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_draw_blocked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "Възли по пътя",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "Премахни всички",
+                    "english": "Remove all"
                 }
             }
         },
