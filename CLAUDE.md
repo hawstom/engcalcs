@@ -591,6 +591,25 @@ US file made a round trip through two factors that are not exact inverses: **710
   user did not edit.** Not "within tolerance" — identical. That is also the acceptance criterion for
   Task 281 (`.inp` export) — met, and guarded by `dev/lpn-spike/inp-export-harness.js`.
 
+### Coordinate order: system is x,y = lon,lat; PUBLIC is lat,lon
+
+Tom, 2026-08-24, having found a button saying `lon/lat` and a status bar leading with Longitude:
+*"It should be lat/lon everywhere... history says Lat/Lon."* **The order follows whoever is
+reading.**
+
+- **System order — lon, lat.** x is longitude, y is latitude. Arithmetic, GeoJSON, every projection
+  formula. Everything computed, stored, projected or exported. Name such a pair `lonLat` /
+  `{lon, lat}`.
+- **Public order — lat, lon.** Every place a person reads a pair or types one: the status readout,
+  the property popup, the Go-to prompt, prose that names the two. Name such a pair `latLon`.
+- **A bare `coords` or `point` is the defect** — it commits to neither, so the next reader guesses.
+- **The one longitude-first sentence is the one that PAIRS them with x and y** ("the x and y in this
+  file really are a longitude and a latitude"): there the order IS the claim, and reversing it makes
+  the sentence false. Three shipped strings do this and are correct.
+
+`coord_order_check.php` enforces both halves and knows the exception; it is blocking, and it catches
+the two defects that produced the rule.
+
 ### Changing a unit reinterprets the typed number; it does not convert it
 
 1 becomes 1 ft instead of 1 m. Long-standing, deliberate, reviewed and kept. Do not "fix" it.

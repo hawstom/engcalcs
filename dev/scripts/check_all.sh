@@ -121,6 +121,7 @@ run_check "scenario write seam"          blocking php dev/scripts/scenario_seam_
 # unit hides that completely, so nothing else here could see it. Also checks that the pressure
 # factors and EngCalcs.G use the same gravity.
 run_check "unit conversion factors"      blocking php dev/scripts/unit_factor_check.php
+run_check "coordinate order"             blocking php dev/scripts/coord_order_check.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php

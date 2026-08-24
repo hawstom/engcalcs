@@ -8,7 +8,7 @@
             "titleKey": "lpn_ex_net3_world_title",
             "descKey": "lpn_ex_net3_world_desc",
             "title": "EPANET Net3, lat/lon",
-            "description": "The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.",
+            "description": "The same network as EPANET Net3, placed in a real location: its coordinates are latitude and longitude, and a street map is drawn behind it.",
             "system": "us",
             "flow": "gpm",
             "nodes": 97,

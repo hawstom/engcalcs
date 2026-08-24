@@ -1258,7 +1258,7 @@ $ec_lang['lpn_ex_net2_desc']='A branched distribution system with a tank, from E
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 $ec_lang['lpn_ex_net3_desc']='EPANET\'s large sample: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map.';
 $ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.';
+$ec_lang['lpn_ex_net3_world_desc']='The same network as EPANET Net3, placed in a real location: its coordinates are latitude and longitude, and a street map is drawn behind it.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
 $ec_lang['lpn_tool_undo']='Undo';
@@ -1371,7 +1371,7 @@ $ec_lang['lpn_xymap']='xy';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
 $ec_lang['lpn_file_import_geo']='Import xy to lat/lon…';
-$ec_lang['lpn_file_import_geo_tip']='Opens a project file or an EPANET file in a new tab, on the street map. You place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. If the numbers in the file already are a longitude and a latitude, one button says so and the network jumps straight to where it belongs. Every number you typed stays as it is.';
+$ec_lang['lpn_file_import_geo_tip']='Opens a project file or an EPANET file in a new tab, on the street map. You place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. If the x and y in the file already are a longitude and a latitude, one button says so and the network jumps straight to where it belongs. Every number you typed stays as it is.';
 // **THE BUTTON, NOT A GUESS** (Tom, 2026-08-21, on importing Net3 and landing in North Darfur).
 // Offered in step 1 whenever every coordinate in the file would also be a valid longitude and
 // latitude -- which nearly every small drawing is -- so the sentence has to make the user the
