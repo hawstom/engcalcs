@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1284,
-        "delta_key_count": 94,
+        "expected_key_count": 1288,
+        "delta_key_count": 98,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -523,6 +523,10 @@
         "lpn_profile_draw_start": "Click the node where the path starts.",
         "lpn_profile_draw_more": "Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.",
         "lpn_profile_draw_blocked": "No route from {a} to {b}. Choose another node.",
+        "lpn_profile_tap_start": "Tap the node where the path starts.",
+        "lpn_profile_tap_more": "Tap a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.",
+        "lpn_profile_say_idle": "Press Profile again to choose a new path on the map.",
+        "lpn_profile_none": "No path yet. Press Profile again to choose one on the map.",
         "lpn_inp_drop_anchor_missing": "This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.",
         "lpn_import_notes_heading": "From the EPANET file",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -619,6 +623,10 @@
         "lpn_profile_draw_start": "Click the node where the path starts.",
         "lpn_profile_draw_more": "Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.",
         "lpn_profile_draw_blocked": "No route from {a} to {b}. Choose another node.",
+        "lpn_profile_tap_start": "Tap the node where the path starts.",
+        "lpn_profile_tap_more": "Tap a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.",
+        "lpn_profile_say_idle": "Press Profile again to choose a new path on the map.",
+        "lpn_profile_none": "No path yet. Press Profile again to choose one on the map.",
         "lpn_inp_drop_anchor_missing": "This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.",
         "lpn_import_notes_heading": "From the EPANET file",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -1405,6 +1413,70 @@
             }
         },
         "lpn_profile_draw_blocked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "পথের মাঝের নোড",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "সব সরান",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_tap_start": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "পথের মাঝের নোড",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "সব সরান",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_tap_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "পথের মাঝের নোড",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "সব সরান",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_say_idle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "পথের মাঝের নোড",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "সব সরান",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_none": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

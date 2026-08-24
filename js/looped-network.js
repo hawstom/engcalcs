@@ -7419,15 +7419,17 @@ var EngCalcs = EngCalcs || {};
 	// print acts on a TABLE, and the tabs it applies to are now the ones next to it.
 	paneTabs.push({
 		id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
-		// profileSeedStops() first, because the document may have changed under an open panel:
-		// a stop whose node was deleted is cleared here rather than left to draw a route
-		// through a ghost.
-		show: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
+		// **PRESSING PROFILE AGAIN IS THE COMMAND THAT CHOOSES A PATH** (Task 506). Tom,
+		// 2026-08-24: *"Our button to create a new path can be the Profile button. That removes all
+		// our left-side controls."* So this tab has ONE meaning stated once -- show me the profile
+		// -- and the second press of it, while it is already the thing on show, is the second
+		// meaning: choose the path. profileTabShow() holds that rule; the hooks stay one line each.
+		show: function () { profileTabShow(); },
 		refresh: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
 		// Closing the tab abandons a half-drawn path (Task 433) -- the same restore Escape does.
 		// Leaving the chooser armed under a closed panel would make the next map click mean
 		// something the user can no longer see.
-		hide: function () { profileDrawCancel(); drawProfilePath(null); }
+		hide: function () { profileShown = false; profileDrawCancel(); drawProfilePath(null); }
 	});
 	// **THE PANE OPENS ON THE FIRST TABLE, WHICH IS THE CHANGE THIS REORDER MAKES.** paneTabs[0] is
 	// no longer the profile, and that is right: a reader who opens the pane without naming a tab
@@ -9197,83 +9199,60 @@ var EngCalcs = EngCalcs || {};
 		return (pc.lpn_result_pressure || 'Pressure') + ' ' + plainRound(v, 1) + ' ' + unitLabel(resultUnit('pressure'));
 	}
 
-	// ---- the panel's controls ---------------------------------------------
-	// The commentary line, held by reference from the moment rebuildProfileForm() makes it --
-	// profileDrawSay() writes to it on every pointer move, and a lookup per move is a lookup too
-	// many.
+	// ---- the panel: A COMMENTARY LINE, AND NOTHING ELSE (Task 506) ---------
+	//
+	// Tom, 2026-08-24, on the chooser that shipped the same day: *"I still think we can ditch the
+	// entire side interface for the profile. Our button to create a new path can be the Profile
+	// button. That removes all our left-side controls."* So it is gone -- the From/To pull-downs,
+	// the Choose-the-path button, the waypoint chips and their Remove-all. What is left is one line
+	// of running commentary, and the panel's whole job is now to say what the next press does.
+	//
+	// **THE LINE HAS TO CARRY WHAT THE CONTROLS CARRIED.** It is the only thing on screen that
+	// knows the gesture exists, so it is never empty: idle it says how to start one, half-drawn it
+	// says what the next press does, and refused it names the two nodes with no route between them.
+	// A control column that says nothing is worse than no column; a line that says the next step is
+	// worth more than both.
+	//
+	// **WHAT WENT WITH THE PULL-DOWNS, said out loud rather than quietly dropped:** changing ONE end
+	// of an existing path (they set `from` and `to` independently; the gesture always redraws the
+	// whole route), and removing ONE waypoint from it (the chips did that). Both are now "draw the
+	// path again", which for a three-stop route is three presses. Picking a node BY NAME also went,
+	// and that one has a home in the gesture: the map still pans while the chooser is running, so a
+	// node off the edge of the screen is reached the way every other off-screen node is.
+	//
+	// The line is held by reference from the moment rebuildProfileForm() makes it -- profileDrawSay()
+	// writes to it on every pointer move, and a lookup per move is a lookup too many.
 	var profileSayEl = null;
-	function profileNodeOptions() {
-		return doc.nodes.filter(profileNodeUsable).map(function (n) { return [n.id, n.id]; });
+	// Whether the profile tab is the one on show. **This is what makes the SECOND press mean
+	// something different from the first**, and it is a fact about the panel, not about the
+	// document, so hide() clears it and the page-load restore of an already-open pane does not
+	// count as a press.
+	var profileShown = false;
+	function profileTabShow() {
+		var again = profileShown;
+		profileShown = true;
+		// The document may have changed under a closed panel: a stop whose node was deleted is
+		// cleared here rather than left to draw a route through a ghost.
+		profileSeedStops();
+		if (again) {
+			// **PRESSED WHILE ALREADY SHOWING: choose a path.** A third press cancels, which is the
+			// same toggle the button it replaces had -- and the only cancel a touch user has, since
+			// there is no Escape key on a phone.
+			if (profileState.draw) { profileDrawCancel(); } else { profileDrawStart(); }
+			return;
+		}
+		rebuildProfileForm();
+		renderProfile();
 	}
 	function rebuildProfileForm() {
-		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_profile_form'),
-			opts = profileNodeOptions(), row, btn, chips, clr;
+		var box = document.getElementById('lpn_profile_form');
 		if (!box) { return; }
 		box.innerHTML = '';
-		// **THE PULL-DOWNS ARE NOT SHOWN WHILE THE PATH IS BEING DRAWN.** They edit `from`/`to`,
-		// which profileStops() is ignoring for the duration -- so a change made there would appear
-		// to do nothing at all, which is worse than not offering it.
-		if (!profileState.draw) {
-			findSelect(box, pc.lpn_profile_from || 'From', opts, profileState.from, function (v) {
-				profileState.from = v; renderProfile();
-			});
-			findSelect(box, pc.lpn_profile_to || 'To', opts, profileState.to, function (v) {
-				profileState.to = v; renderProfile();
-			});
-		}
-		// **THE BUTTON STARTS A GESTURE; IT IS NOT A MODE THE USER HAS TO REMEMBER TO TURN OFF.**
-		// Press it, draw the path on the map, and it ends itself on the double-click that finishes
-		// the route. Escape ends it too. The pull-downs above stay because they are the only way in
-		// with no pointer -- see profileDrawStart() for why touch gets no gesture of its own.
-		row = document.createElement('div');
-		row.style.margin = '4px 0';
-		btn = document.createElement('button');
-		btn.type = 'button';
-		btn.className = 'lpn-profile-draw' + (profileState.draw ? ' lpn-profile-drawing' : '');
-		btn.textContent = profileState.draw
-			? (pc.lpn_profile_draw_stop || 'Stop choosing')
-			: (pc.lpn_profile_draw || 'Choose the path on the map');
-		btn.title = pc.lpn_profile_pick || 'Add nodes to the route by clicking them on the map';
-		btn.addEventListener('click', function () {
-			if (profileState.draw) { profileDrawCancel(); } else { profileDrawStart(); }
-		});
-		row.appendChild(btn);
-		box.appendChild(row);
-
-		// The running commentary. It says what the NEXT click does, which is the only thing a
-		// half-finished gesture can usefully say, and it is the one place a refused click explains
-		// itself (profileDrawSay()).
 		profileSayEl = document.createElement('div');
 		profileSayEl.id = 'lpn_profile_say';
 		profileSayEl.className = 'lpn-profile-say';
-		profileSayEl.textContent = profileState.draw ? profileState.draw.say : '';
 		box.appendChild(profileSayEl);
-
-		chips = document.createElement('div');
-		chips.style.margin = '4px 0';
-		if (!profileState.draw && profileState.waypoints.length) {
-			chips.appendChild(document.createTextNode((pc.lpn_profile_through || 'Through') + ' '));
-			profileState.waypoints.forEach(function (id) {
-				var b = document.createElement('button');
-				b.type = 'button';
-				b.className = 'lpn-profile-chip';
-				b.textContent = id + ' ×';
-				b.addEventListener('click', function () { profileRemoveStop(id); });
-				chips.appendChild(b);
-			});
-			clr = document.createElement('button');
-			clr.type = 'button';
-			clr.textContent = pc.lpn_profile_clear || 'Clear';
-			clr.addEventListener('click', function () {
-				profileState.waypoints = []; rebuildProfileForm(); renderProfile();
-			});
-			chips.appendChild(clr);
-		}
-		box.appendChild(chips);
-	}
-	function profileRemoveStop(id) {
-		profileState.waypoints = profileState.waypoints.filter(function (w) { return w !== id; });
-		rebuildProfileForm(); renderProfile();
+		profileDrawSay(profileState.draw ? (profileState.draw.stops.length ? 'more' : 'start') : 'idle');
 	}
 	// ---- THE PATH CHOOSER (ROADMAP Task 433) -----------------------------------------------------
 	//
@@ -9298,9 +9277,53 @@ var EngCalcs = EngCalcs || {};
 	// and the chart would go blank with no way to tell which of the stops was the bad one. So the
 	// stop list never holds an unreachable pair, and the panel names the two nodes.
 	//
-	// **THERE IS NO TOUCH EQUIVALENT AND NONE IS INVENTED HERE.** The gesture is hover-driven, and a
-	// finger has no hover; a "tap, then tap Next" imitation would be a different, worse interaction
-	// wearing this one's name. Touch keeps the From/To pull-downs, which is what it always had.
+	// **THE TOUCH EQUIVALENT IS TOM'S OWN, AND IT IS THE SAME GESTURE** (Task 506, 2026-08-24):
+	// *"On phone, no hover is needed. What we can do is have short tap for tentative (hover), long
+	// tap for 'Add waypoint', and Double tap for end."* A finger has no hover, so the SHORT TAP is
+	// the hover -- it draws the candidate leg and commits nothing -- the LONG PRESS is the click,
+	// and the DOUBLE TAP is the double-click. Every state of the gesture is the same state; only
+	// the press that reaches it differs, which is why the two share every function below and differ
+	// in exactly one switch (`kind`) and one sentence of commentary.
+	//
+	// **THE ONE PLACE THE TWO DELIBERATELY AGREE RATHER THAN MIRROR: the FIRST stop.** A short tap
+	// with no stops yet COMMITS, exactly as the first click does, because there is nothing to
+	// preview until there is a stop to route from -- a tentative that draws nothing is a press that
+	// appears to do nothing, and the user would be holding a finger down to start a path they have
+	// no reason to think the page noticed.
+	//
+	// **AND THE POINTER GESTURE IS NOT MADE WORSE TO SERVE THE FINGER.** A mouse never reaches any
+	// of this: `kind` is 'click' for a pointer and the hover listener is untouched.
+	//
+	// PROFILE_HOLD_MS is the long press. 450 ms, between the 300 that fires while a careful user is
+	// still deciding and the 600 that feels broken; Android's own long press is 400-500. It is one
+	// named constant because it is a feel, and a feel gets re-tuned.
+	//
+	// **THE COLLISION, AND HOW IT IS RESOLVED.** ROADMAP Task 417 wants a long press on an element
+	// to enter Edit mode, which would be the same press on the same node. They never meet: this one
+	// is reached only while the chooser is running (profileDrawActive()), and while it runs the map
+	// deliberately opens no property popup at all -- the user is drawing a route, and a property
+	// sheet over the drawing is the opposite of what they asked for. The map's own pointerdown also
+	// starts NO element drag while the chooser runs, so a long press cannot nudge the junction it
+	// is aimed at; panning still works, because panning is how an off-screen node is reached.
+	var PROFILE_HOLD_MS = 450, PROFILE_DBLTAP_MS = 400;
+	// A double tap the page has just consumed. The browser sends its own `dblclick` after a touch
+	// double tap too, and by then the gesture is over -- so without this the second half of the
+	// finish would fall through to the map's ordinary double-click and insert a vertex in the pipe
+	// underneath. One timestamp, checked once.
+	var profileTouchEnded = 0, profileLastTap = null;
+	// Which vocabulary the commentary is written in. Seeded from the environment so a phone's FIRST
+	// prompt is already the right one, then corrected by the first press that says what it is.
+	var profileTouch = (function () {
+		try { return !!(window.matchMedia && window.matchMedia('(hover: none)').matches); } catch (e) { return false; }
+	}());
+	function profileSetTouch(on) {
+		if (profileTouch === on) { return; }
+		profileTouch = on;
+		if (profileState.draw) { profileDrawSay(profileState.draw.stops.length ? 'more' : 'start'); }
+	}
+	function profileTookDblclick() {
+		return (Date.now() - profileTouchEnded) < 700;
+	}
 	function profileDrawActive() { return !!profileState.draw && profileIsOpen(); }
 	function profileDrawStart() {
 		profileState.draw = {
@@ -9309,30 +9332,41 @@ var EngCalcs = EngCalcs || {};
 			ghost: null,
 			say: ''
 		};
+		profileLastTap = null;
 		profileDrawSay('start');
 		rebuildProfileForm();
 		renderProfile();
 	}
-	// The commentary line, by state name rather than by string, so the caller cannot get the two
+	// The commentary line, by state name rather than by string, so the caller cannot get the
 	// prompts the wrong way round. `detail` is the refusal's two node ids.
+	//
+	// **IT IS NEVER EMPTY.** 'idle' is a real state with a real sentence now that the panel has no
+	// controls: it is where the user finds out that the Profile button is also the way to choose a
+	// path, and the only place they can find that out.
 	function profileDrawSay(which, detail) {
-		var pc = EngCalcs.pageConfig || {}, d = profileState.draw, box;
-		if (!d) { return; }
-		if (which === 'start') {
-			d.say = pc.lpn_profile_draw_start || 'Click the node where the path starts.';
+		var pc = EngCalcs.pageConfig || {}, d = profileState.draw, txt;
+		if (which === 'idle' || !d) {
+			txt = pc.lpn_profile_say_idle || 'Press Profile again to choose a new path on the map.';
+		} else if (which === 'start') {
+			txt = profileTouch
+				? (pc.lpn_profile_tap_start || 'Tap the node where the path starts.')
+				: (pc.lpn_profile_draw_start || 'Click the node where the path starts.');
 		} else if (which === 'blocked') {
-			d.say = (pc.lpn_profile_draw_blocked || 'No route from {a} to {b}. Choose another node.')
+			txt = (pc.lpn_profile_draw_blocked || 'No route from {a} to {b}. Choose another node.')
 				.replace('{a}', detail[0]).replace('{b}', detail[1]);
 		} else {
-			d.say = pc.lpn_profile_draw_more ||
-				'Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.';
+			txt = profileTouch
+				? (pc.lpn_profile_tap_more ||
+					'Tap a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.')
+				: (pc.lpn_profile_draw_more ||
+					'Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.');
 		}
+		if (d) { d.say = txt; }
 		// Written straight into the line rather than through rebuildProfileForm(): this runs on every
-		// pointer move, and rebuilding the whole panel at pointer rate would throw away the button
-		// the user is about to press. Through the element rebuildProfileForm() made, not through a
+		// pointer move, and rebuilding the whole panel at pointer rate would throw away the element
+		// the user is reading. Through the element rebuildProfileForm() made, not through a
 		// getElementById() on every move.
-		box = profileSayEl;
-		if (box) { box.textContent = d.say; }
+		if (profileSayEl) { profileSayEl.textContent = txt; }
 	}
 	// The node the pointer is over, with pointer slop -- the same NODE_SNAP_PX every other node-
 	// picking gesture on this page uses, so a route is no harder to aim than a pipe is to draw.
@@ -9343,10 +9377,19 @@ var EngCalcs = EngCalcs || {};
 	// HOVER. Cheap by construction: it recomputes nothing unless the node under the pointer actually
 	// changed, so sweeping across bare map costs one distance loop per event and no Dijkstra at all.
 	function profileDrawHover(cx, cy) {
-		var d = profileState.draw, id, last, leg;
+		var d = profileState.draw, id;
 		if (!profileDrawActive() || !d.stops.length) { return; }
 		id = profileDrawNodeAt(cx, cy);
 		if (id === d.hover) { return; }
+		profileDrawTentative(id);
+	}
+	// THE TENTATIVE STATE ITSELF, by node id rather than by coordinate -- which is the whole of what
+	// a short tap needed. A mouse reaches it by moving; a finger reaches it by tapping; neither
+	// commits anything, and both draw the same dashed candidate. Splitting it out is what keeps
+	// "touch support" from being a second implementation of the preview.
+	function profileDrawTentative(id) {
+		var d = profileState.draw, last, leg;
+		if (!profileDrawActive() || !d.stops.length) { return; }
 		d.hover = id;
 		last = d.stops[d.stops.length - 1];
 		if (!id || id === last) {
@@ -9418,11 +9461,45 @@ var EngCalcs = EngCalcs || {};
 	// The one entry point the map's tap handler calls, so the chooser owns its own hit resolution
 	// (a node within pointer slop, not only a direct hit on the symbol) instead of the tap handler
 	// knowing about it.
-	function profilePickHit(cx, cy, t) {
-		var id;
+	//
+	// `kind` is what the press WAS, decided by the map handler that has the pointer type and the
+	// duration: 'click' from a pointer, 'tap' from a short touch, 'hold' from one that lasted
+	// PROFILE_HOLD_MS. The double tap is detected here rather than out there, because it is the
+	// chooser that knows which node the previous tap resolved to -- two taps a few pixels apart
+	// are one gesture only if they picked the same node.
+	function profilePickHit(cx, cy, t, kind) {
+		var d = profileState.draw, id, prev, now;
 		if (!profileDrawActive()) { return false; }
 		id = (t && t.dataset && t.dataset.node) || profileDrawNodeAt(cx, cy);
-		if (!id || !profileDrawClick(id)) { return false; }
+		if (!id) { return false; }
+		profileSetTouch(kind === 'tap' || kind === 'hold');
+		if (kind === 'tap') {
+			prev = profileLastTap;
+			now = Date.now();
+			profileLastTap = { id: id, t: now };
+			// DOUBLE TAP: the second short tap on the same node inside the window finishes the
+			// path, committing that node first -- exactly what the pointer's double-click does,
+			// whose first click commits and whose second is swallowed as a duplicate.
+			if (prev && prev.id === id && (now - prev.t) < PROFILE_DBLTAP_MS) {
+				profileLastTap = null;
+				if (d.stops.length) { profileDrawClick(id); }
+				profileTouchEnded = Date.now();
+				setSelection('node', id);
+				profileDrawEnd();
+				return true;
+			}
+			// The first stop commits on a plain tap -- see the note at the top of this section for
+			// why this one press agrees with the pointer instead of mirroring it.
+			if (!d.stops.length) {
+				if (!profileDrawClick(id)) { return false; }
+				setSelection('node', id);
+				return true;
+			}
+			profileDrawTentative(id);
+			return true;
+		}
+		profileLastTap = null;
+		if (!profileDrawClick(id)) { return false; }
 		setSelection('node', id);
 		return true;
 	}
@@ -9520,9 +9597,13 @@ var EngCalcs = EngCalcs || {};
 		// that path is computed -- so the two can never disagree about which route is being shown.
 		drawProfilePath(path);
 		if (!path) {
-			if (note) {
+			// **THE COMMENTARY LINE IS TALKING; THE NOTE STAYS OUT OF ITS WAY.** A half-drawn path
+			// is a path with one stop, which is a null path here -- and answering that with "there
+			// is no path" beside a line that is saying "double-click to finish" would be the panel
+			// contradicting itself mid-gesture.
+			if (note && !profileState.draw) {
 				note.textContent = (!profileState.from || !profileState.to)
-					? (pc.lpn_profile_choose || 'Choose a start node and an end node.')
+					? (pc.lpn_profile_none || 'No path yet. Press Profile again to choose one on the map.')
 					: (pc.lpn_profile_no_path || 'These two nodes are not connected by any route.');
 			}
 			return;
@@ -15176,6 +15257,16 @@ var EngCalcs = EngCalcs || {};
 			if (mode.indexOf('add-') === 0) { return; } // handled on click below, not drag
 			if (mode === 'delete') { return; }
 			// 'select' mode
+			// **WHILE THE PROFILE'S PATH CHOOSER IS RUNNING, NOTHING ON THE MAP IS DRAGGED** (Task
+			// 504). The press that adds a waypoint on touch is a LONG one, and a long press that
+			// wanders a few pixels is how a junction gets moved by somebody who was drawing a
+			// route. Panning still works, and has to: it is how a node off the edge of the screen
+			// is reached now that the From/To pull-downs are gone. The selection is set by
+			// profilePickHit() on the press that actually commits a stop.
+			if (profileDrawActive()) {
+				drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; Object.assign(drag, common);
+				return;
+			}
 			// **TOUCHING SOMETHING SELECTS IT, DOWN-STROKE, BEFORE ANY DRAG DECISION** (Task 415),
 			// and touching nothing clears. DOWN, not on the tap: a drag never becomes a tap (it fails
 			// the 4px threshold), so a user who nudged J2 and then pressed Delete would otherwise
@@ -15251,7 +15342,7 @@ var EngCalcs = EngCalcs || {};
 			// FINISHING THE PROFILE PATH (Task 433) comes before every other meaning of a
 			// double-click on this map -- while the chooser is running, a double-click is the end of
 			// the route and never a vertex, a label reset or a vertex removal.
-			if (profileDrawEnd()) { return; }
+			if (profileDrawEnd() || profileTookDblclick()) { return; }
 			var t = mapHitAt(e.clientX, e.clientY);
 			if (!t || !t.dataset) { return; }
 			// Double-click a dragged label to send it home (Tom, 2026-07-30: "Can we double-click a
@@ -15276,11 +15367,20 @@ var EngCalcs = EngCalcs || {};
 		// what makes this hold: the pointerdown happens while regMode is unambiguously still on.
 		svg.addEventListener('pointerdown', function (e) {
 			if (regMode || georefActive()) { downPt = null; return; }
-			downPt = { x: e.clientX, y: e.clientY };
+			// The TIME and the POINTER TYPE come along, because a press is not only a place any
+			// more: the profile's chooser reads a short touch, a long one and a double one as three
+			// different gestures (Task 506), and both facts are only available here.
+			downPt = { x: e.clientX, y: e.clientY, t: Date.now(), touch: e.pointerType === 'touch' };
 		});
 		svg.addEventListener('pointerup', function (e) {
 			if (regMode || georefActive()) { downPt = null; return; } // a pending registration sequence, or a placement in progress
 			if (!downPt || Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) >= 4) { downPt = null; return; }
+			// WHAT KIND OF PRESS THIS WAS, decided here because this is where both halves of it
+			// are known. A pointer is always a plain 'click'; a finger is a 'tap' or, past the
+			// long-press threshold, a 'hold'. Nothing but the profile chooser reads it today.
+			var tapKind = downPt.touch
+				? ((Date.now() - downPt.t) >= PROFILE_HOLD_MS ? 'hold' : 'tap')
+				: 'click';
 			downPt = null;
 			// elementFromPoint, not e.target: setPointerCapture(svg) retargets pointerup's
 			// target to the capturing element (svg itself) on desktop Chrome, so e.target here
@@ -15360,11 +15460,18 @@ var EngCalcs = EngCalcs || {};
 				else if (t.classList.contains('lpn-vhandle')) { saveUndoSnapshot(); removeVertex(t.dataset.link, +t.dataset.vidx); }
 				else if (t.dataset.link !== undefined) { deleteElement('link', t.dataset.link); }
 				else if (t.dataset.lbl !== undefined) { deleteElement('label', t.dataset.lbl); }
-			} else if (mode === 'select' && profilePickHit(e.clientX, e.clientY, t)) {
+			} else if (mode === 'select' && profilePickHit(e.clientX, e.clientY, t, tapKind)) {
 				// The profile's path chooser is running and it took this click (Task 433). The
 				// property popup deliberately does NOT also open: the user is drawing a route, and
 				// a property sheet over the drawing is the opposite of what they asked for.
 				// profilePickHit() sets the selection itself, since it resolves the node.
+				void 0;
+			} else if (mode === 'select' && profileDrawActive()) {
+				// **A MISS DURING THE GESTURE IS A MISS, NOT A REQUEST FOR A PROPERTY SHEET** (Task
+				// 504). The press landed on a pipe, a label or bare map while the user is drawing a
+				// route; opening a popup over that drawing is the opposite of what they asked for,
+				// and on touch it would arrive under a finger that is mid-gesture. Nothing happens,
+				// and the commentary line is still telling them what will.
 				void 0;
 			} else if (mode === 'select' && t.dataset.node) {
 				openPopup(t.dataset.node, e.clientX, e.clientY);
