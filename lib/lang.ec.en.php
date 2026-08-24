@@ -1401,7 +1401,7 @@ $ec_lang['lpn_tool_delete_tip']='Click anything on the map to remove it.';
 $ec_lang['lpn_tool_undo_tip']='Undo the last change.';
 $ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network in the window.';
 $ec_lang['lpn_tool_settings_tip']='Open the settings for this project.';
-$ec_lang['lpn_find_menu_tip']='Find a part by its ID, or find every part that meets a test.';
+$ec_lang['lpn_find_menu_tip']='Find a part by its ID, or find every part that meets a test, and change them all at once.';
 $ec_lang['lpn_help_icons']='What the toolbar icons mean';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Visibility';
@@ -1532,11 +1532,15 @@ $ec_lang_syn['lpn_help_walkthroughs']='Walkthroughs, Guided tours, Step-by-step 
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Delete network';
 $ec_lang['lpn_confirm_delete_network']='Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.';
-// Find (Tasks 420 and 353). One panel does both jobs: an exact ID lookup, which is what EPANET's
-// Map Finder does, and a condition on a value, which nothing else offers. "Find" is the word every
-// editor uses for it.
-$ec_lang['lpn_find_menu']='Find';
-$ec_lang['lpn_find_title']='Find assets';
+// Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
+// which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
+// write to everything the condition matched. **It is called by the standard name** -- Tom,
+// 2026-08-24: "call it the standard 'Find and replace'. Do that under Edit. Very conventional,
+// though deceptively understated for such a powerful thing, as always." The understatement is the
+// point: a conventional name is what makes a powerful command findable by somebody who has never
+// read a word about this page.
+$ec_lang['lpn_find_menu']='Find and replace';
+$ec_lang['lpn_find_title']='Find and replace';
 $ec_lang['lpn_find_scope']='What to search';
 $ec_lang['lpn_find_scope_all']='Everything';
 $ec_lang['lpn_find_property']='Property';
@@ -2519,3 +2523,72 @@ $ec_lang['lpn_field_pump_speed']='Relative speed';
 $ec_lang['lpn_field_pump_speed_tip']='1 is this pump turning at the speed its curve was measured at. 0.9 is the same pump turning slower, which lowers the head it adds and the flow it passes. A speed pattern takes the place of this number while the run is going.';
 $ec_lang['lpn_field_speed_pattern']='Speed pattern';
 $ec_lang['lpn_field_speed_pattern_tip']='How this pump’s speed rises and falls through the run. Each multiplier IS the relative speed for that part of the day, and takes the place of the speed above, so a multiplier of 0 stops the pump.';
+
+// ---- place-name search and terrain elevations (Task 507) ---------------------------------------
+// Both features ask an outside service for something, and each asks its own permission question
+// first. The dialog is the feature, so it is translated like anything else: it shipped as English
+// literals inside js/lpn-search.js and js/lpn-terrain.js, which meant a permission dialog nobody
+// could read in 26 of the 27 languages. The literals stay in those files as the fallback; these
+// keys are what the visitor actually sees.
+//
+// THE CONSENT TEXT IS ONE KEY PER PARAGRAPH, joined with a blank line in JS. A lang value is one
+// line by construction here -- nothing in these files has ever held a newline -- and splitting is
+// better than inventing a line-break placeholder: a translator sees four short questions instead of
+// one wall, and the order of the paragraphs stays ours rather than the translation's.
+$ec_lang['lpn_search_menu']='Search for a place by name…';
+$ec_lang['lpn_search_tip']='Find a town, a street or a landmark by name and move the map to it. The first use asks your permission, because the words you type go to OpenStreetMap’s place-name service.';
+$ec_lang['lpn_search_bar']='Search by name…';
+// The four paragraphs of the ask: what is sent and to whom; why this is a separate question from
+// the map pictures; the question itself; and what a no costs (nothing).
+$ec_lang['lpn_search_consent_1']='Search by place name sends the words you type to nominatim.openstreetmap.org, the OpenStreetMap Foundation’s free place-name service.';
+$ec_lang['lpn_search_consent_2']='This is a different service from the street map pictures behind your project. The pictures only say where you are looking. A search says what you typed. They will receive your search words and your IP address. We send nothing else, and we keep no record of your searches.';
+$ec_lang['lpn_search_consent_3']='May we use it?';
+$ec_lang['lpn_search_consent_4']='If you say no, everything else on this page keeps working exactly as it does now, including Go to a latitude and longitude. We remember a yes so that we need not ask again. A no is not stored at all.';
+$ec_lang['lpn_search_refused']='Place-name search is off, and nothing was sent. You can still use Go to a latitude and longitude.';
+$ec_lang['lpn_search_prompt']='Search for a place by name. A town, a street, a landmark — for example: Petaluma, California';
+$ec_lang['lpn_search_empty']='Type a place name to search for.';
+$ec_lang['lpn_search_working']='Searching…';
+$ec_lang['lpn_search_busy']='A search is already running. Wait for it to answer.';
+$ec_lang['lpn_search_choose']='More than one place matches. Which one?';
+$ec_lang['lpn_search_nochoice']='Nothing chosen, so the map has not moved.';
+$ec_lang['lpn_search_badchoice']='That is not one of the numbers in the list.';
+$ec_lang['lpn_search_none']='Nothing found for that name.';
+// Five different failures, five different next actions. Keep them distinct in translation too --
+// "search failed" for all five is exactly what this set exists to avoid.
+$ec_lang['lpn_search_rate']='The place-name service is asking us to slow down. Wait a minute and try again.';
+$ec_lang['lpn_search_http']='The place-name service answered with an error.';
+$ec_lang['lpn_search_timeout']='The place-name service did not answer in time. Everything else on this page works without it.';
+$ec_lang['lpn_search_unreadable']='The place-name service answered with something this page could not read.';
+$ec_lang['lpn_search_offline']='We could not reach the place-name service. You may be offline. Everything else on this page works without it, including Go to a latitude and longitude.';
+$ec_lang['lpn_search_toofast']='One search a second — that is what the place-name service allows. Try again in a moment.';
+$ec_lang['lpn_search_nofetch']='This browser cannot reach the place-name service.';
+$ec_lang['lpn_terrain_menu']='Fill in elevations from the land…';
+$ec_lang['lpn_terrain_tip']='Read the ground elevation under each node that has none, and type it in for you. A node that already has an elevation is left alone, and one Undo puts it all back. The first use asks your permission, because the positions of your nodes go to Mapbox.';
+// Shown three times -- the menu tip, the confirm and the result notice -- so that the three cannot
+// drift into three different claims about the same data. One sentence, translated once.
+$ec_lang['lpn_terrain_accuracy']='Terrain data is about 30 m across the ground and is commonly several metres out vertically. Treat it as a contour map, not a survey: check anything you rely on.';
+$ec_lang['lpn_terrain_consent_1']='Filling in elevations sends the position of each node that needs one — its latitude and longitude — to api.mapbox.com, to look up the height of the ground there.';
+$ec_lang['lpn_terrain_consent_2']='This is a different question from the map pictures behind your project. The pictures only say where you are looking. These positions are your network itself. Mapbox will receive those coordinates and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.';
+$ec_lang['lpn_terrain_consent_3']='May we use it?';
+$ec_lang['lpn_terrain_consent_4']='If you say no, everything else on this page keeps working exactly as it does now, and you can type elevations in yourself as before. We remember a yes so that we need not ask again. A no is not stored at all.';
+$ec_lang['lpn_terrain_refused']='Elevations were not filled in, and nothing was sent. You can type them in as before.';
+// {n} is a whole number, {k} a whole number, {v} an elevation with its unit, {m} and {f} whole
+// numbers. Substituted, never concatenated.
+$ec_lang['lpn_terrain_confirm']='Fill in the elevation of {n} node(s) from the land surface?';
+$ec_lang['lpn_terrain_confirm_default_1']='Every node already has an elevation, and {n} of them are still at {v}, which is the elevation a new node starts with rather than one you typed.';
+$ec_lang['lpn_terrain_confirm_default_2']='Replace those {n} with the land surface?';
+$ec_lang['lpn_terrain_keep']='{k} node(s) already have an elevation and will not be touched.';
+$ec_lang['lpn_terrain_undo']='One Undo (Ctrl-Z) puts every one of them back.';
+$ec_lang['lpn_terrain_requests']='request(s) to api.mapbox.com.';
+$ec_lang['lpn_terrain_busy']='Elevations are already being filled in. Wait for them.';
+$ec_lang['lpn_terrain_none_needed']='Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.';
+$ec_lang['lpn_terrain_no_nodes']='There are no nodes to fill in yet.';
+$ec_lang['lpn_terrain_offmap']='These node positions are not on the terrain map, so nothing was sent.';
+$ec_lang['lpn_terrain_too_wide']='These nodes are spread over too much of the Earth to read in one go ({n} tile requests). Nothing was sent.';
+$ec_lang['lpn_terrain_cancelled']='Nothing was changed and nothing was sent.';
+$ec_lang['lpn_terrain_nofetch']='This browser cannot reach the terrain service.';
+$ec_lang['lpn_terrain_working']='Reading the land surface…';
+$ec_lang['lpn_terrain_failed']='We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it.';
+$ec_lang['lpn_terrain_done']='{n} elevation(s) filled in.';
+$ec_lang['lpn_terrain_missed']='{m} could not be read and are still blank.';
+$ec_lang['lpn_terrain_partial']='{f} terrain tile(s) did not answer.';

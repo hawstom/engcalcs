@@ -303,7 +303,7 @@
 			'Read the ground elevation under each node that has none, and type it in for you. ' +
 			'A node that already has an elevation is left alone, and one Undo puts it all back. ' +
 			'The first use asks your permission, because the positions of your nodes go to ' +
-			'Mapbox. ') + accuracy();
+			'Mapbox.') + ' ' + accuracy();
 	};
 
 	// THE ASK ITSELF. Long on purpose -- it is the only thing the visitor decides from, and the
@@ -314,19 +314,29 @@
 	// styled by us at all, so the coloured-Accept-beside-grey-Reject dark pattern lib/Consent.lib.php
 	// spends a paragraph avoiding is not merely avoided here, it is impossible. Cancel and Escape
 	// both mean no.
+	//
+	// ONE KEY PER PARAGRAPH, joined here (Task 507). A $ec_lang value is a single line by
+	// construction, so the alternative was a line-break placeholder inside one long value; four
+	// short keys read better to a translator and keep the ORDER of the paragraphs ours. {n} is
+	// substituted across the whole joined text, so a language that wants to say how many nodes are
+	// about to be sent may put it in any of the four; the English says it in none.
 	function consentText(count) {
-		return t('lpn_terrain_consent',
-			'Filling in elevations sends the position of each node that needs one — its latitude ' +
-			'and longitude — to api.mapbox.com, to look up the height of the ground there.\n\n' +
-			'This is a different question from the map pictures behind your project. The pictures ' +
-			'only say where you are looking. These positions are your network itself. Mapbox will ' +
-			'receive those coordinates and your IP address. We send nothing else: no name, no ' +
-			'pipes, no project. We keep no record of it, and nothing is stored on this device ' +
-			'except your answer to this question.\n\n' +
-			'May we use it?\n\n' +
-			'If you say no, everything else on this page keeps working exactly as it does now, ' +
-			'and you can type elevations in yourself as before. We remember a yes so that we need ' +
-			'not ask again. A no is not stored at all.').replace('{n}', count);
+		return [
+			t('lpn_terrain_consent_1',
+				'Filling in elevations sends the position of each node that needs one — its latitude ' +
+				'and longitude — to api.mapbox.com, to look up the height of the ground there.'),
+			t('lpn_terrain_consent_2',
+				'This is a different question from the map pictures behind your project. The pictures ' +
+				'only say where you are looking. These positions are your network itself. Mapbox will ' +
+				'receive those coordinates and your IP address. We send nothing else: no name, no ' +
+				'pipes, no project. We keep no record of it, and nothing is stored on this device ' +
+				'except your answer to this question.'),
+			t('lpn_terrain_consent_3', 'May we use it?'),
+			t('lpn_terrain_consent_4',
+				'If you say no, everything else on this page keeps working exactly as it does now, ' +
+				'and you can type elevations in yourself as before. We remember a yes so that we need ' +
+				'not ask again. A no is not stored at all.')
+		].join('\n\n').replace(/\{n\}/g, count);
 	}
 
 	/** The gate. Returns true if we may send. Asks at most once per invocation. */
@@ -353,10 +363,12 @@
 		var s = (replacing === undefined)
 			? t('lpn_terrain_confirm',
 				'Fill in the elevation of {n} node(s) from the land surface?').replace('{n}', fillCount)
-			: t('lpn_terrain_confirm_default',
-				'Every node already has an elevation, and {n} of them are still at {v}, which is ' +
-				'the elevation a new node starts with rather than one you typed.\n\n' +
-				'Replace those {n} with the land surface?')
+			: [
+				t('lpn_terrain_confirm_default_1',
+					'Every node already has an elevation, and {n} of them are still at {v}, which is ' +
+					'the elevation a new node starts with rather than one you typed.'),
+				t('lpn_terrain_confirm_default_2', 'Replace those {n} with the land surface?')
+			].join('\n\n')
 				.replace(/\{n\}/g, fillCount).replace('{v}', replacing);
 		if (keepCount > 0 && replacing === undefined) {
 			s += '\n\n' + t('lpn_terrain_keep',

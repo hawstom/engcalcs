@@ -14218,7 +14218,7 @@ var EngCalcs = EngCalcs || {};
 			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
 			// menu is about; View holds the things that change how the map is drawn. Every editor
 			// puts Find in Edit for the same reason.
-			{ icon: 'find', label: pc.lpn_find_menu || 'Find', fn: function () { toggleFindPopup(anchor); } },
+			{ icon: 'find', label: pc.lpn_find_menu || 'Find and replace', fn: function () { toggleFindPopup(anchor); } },
 			// Libraries is in Edit for the same reason Find is: it acts on the CONTENT of the
 			// document -- the patterns, the curves and the controls it holds -- rather than on how
 			// the map is drawn. Two doors, one implementation, exactly as Settings has.
@@ -15359,7 +15359,7 @@ var EngCalcs = EngCalcs || {};
 		endGroup.className += ' lpn-toolbar-end';
 		var findBtn = document.createElement('button');
 		findBtn.type = 'button';
-		setIconLabel(findBtn, 'find', pc.lpn_find_menu || 'Find', pc.lpn_find_menu_tip);
+		setIconLabel(findBtn, 'find', pc.lpn_find_menu || 'Find and replace', pc.lpn_find_menu_tip);
 		findBtn.addEventListener('click', function () { toggleFindPopup(findBtn); });
 		endGroup.appendChild(findBtn);
 		// A pressed/unpressed toggle, like Clean map above: the pane's own X closes it too, so the

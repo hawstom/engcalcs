@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 1296,
-        "delta_key_count": 104,
+        "expected_key_count": 1345,
+        "delta_key_count": 153,
         "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
@@ -577,7 +577,56 @@
         "lpn_field_pump_speed": "Relative speed",
         "lpn_field_pump_speed_tip": "1 is this pump turning at the speed its curve was measured at. 0.9 is the same pump turning slower, which lowers the head it adds and the flow it passes. A speed pattern takes the place of this number while the run is going.",
         "lpn_field_speed_pattern": "Speed pattern",
-        "lpn_field_speed_pattern_tip": "How this pump’s speed rises and falls through the run. Each multiplier IS the relative speed for that part of the day, and takes the place of the speed above, so a multiplier of 0 stops the pump."
+        "lpn_field_speed_pattern_tip": "How this pump’s speed rises and falls through the run. Each multiplier IS the relative speed for that part of the day, and takes the place of the speed above, so a multiplier of 0 stops the pump.",
+        "lpn_search_menu": "Search for a place by name…",
+        "lpn_search_tip": "Find a town, a street or a landmark by name and move the map to it. The first use asks your permission, because the words you type go to OpenStreetMap’s place-name service.",
+        "lpn_search_bar": "Search by name…",
+        "lpn_search_consent_1": "Search by place name sends the words you type to nominatim.openstreetmap.org, the OpenStreetMap Foundation’s free place-name service.",
+        "lpn_search_consent_2": "This is a different service from the street map pictures behind your project. The pictures only say where you are looking. A search says what you typed. They will receive your search words and your IP address. We send nothing else, and we keep no record of your searches.",
+        "lpn_search_consent_3": "May we use it?",
+        "lpn_search_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, including Go to a latitude and longitude. We remember a yes so that we need not ask again. A no is not stored at all.",
+        "lpn_search_refused": "Place-name search is off, and nothing was sent. You can still use Go to a latitude and longitude.",
+        "lpn_search_prompt": "Search for a place by name. A town, a street, a landmark — for example: Petaluma, California",
+        "lpn_search_empty": "Type a place name to search for.",
+        "lpn_search_working": "Searching…",
+        "lpn_search_busy": "A search is already running. Wait for it to answer.",
+        "lpn_search_choose": "More than one place matches. Which one?",
+        "lpn_search_nochoice": "Nothing chosen, so the map has not moved.",
+        "lpn_search_badchoice": "That is not one of the numbers in the list.",
+        "lpn_search_none": "Nothing found for that name.",
+        "lpn_search_rate": "The place-name service is asking us to slow down. Wait a minute and try again.",
+        "lpn_search_http": "The place-name service answered with an error.",
+        "lpn_search_timeout": "The place-name service did not answer in time. Everything else on this page works without it.",
+        "lpn_search_unreadable": "The place-name service answered with something this page could not read.",
+        "lpn_search_offline": "We could not reach the place-name service. You may be offline. Everything else on this page works without it, including Go to a latitude and longitude.",
+        "lpn_search_toofast": "One search a second — that is what the place-name service allows. Try again in a moment.",
+        "lpn_search_nofetch": "This browser cannot reach the place-name service.",
+        "lpn_terrain_menu": "Fill in elevations from the land…",
+        "lpn_terrain_tip": "Read the ground elevation under each node that has none, and type it in for you. A node that already has an elevation is left alone, and one Undo puts it all back. The first use asks your permission, because the positions of your nodes go to Mapbox.",
+        "lpn_terrain_accuracy": "Terrain data is about 30 m across the ground and is commonly several metres out vertically. Treat it as a contour map, not a survey: check anything you rely on.",
+        "lpn_terrain_consent_1": "Filling in elevations sends the position of each node that needs one — its latitude and longitude — to api.mapbox.com, to look up the height of the ground there.",
+        "lpn_terrain_consent_2": "This is a different question from the map pictures behind your project. The pictures only say where you are looking. These positions are your network itself. Mapbox will receive those coordinates and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.",
+        "lpn_terrain_consent_3": "May we use it?",
+        "lpn_terrain_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, and you can type elevations in yourself as before. We remember a yes so that we need not ask again. A no is not stored at all.",
+        "lpn_terrain_refused": "Elevations were not filled in, and nothing was sent. You can type them in as before.",
+        "lpn_terrain_confirm": "Fill in the elevation of {n} node(s) from the land surface?",
+        "lpn_terrain_confirm_default_1": "Every node already has an elevation, and {n} of them are still at {v}, which is the elevation a new node starts with rather than one you typed.",
+        "lpn_terrain_confirm_default_2": "Replace those {n} with the land surface?",
+        "lpn_terrain_keep": "{k} node(s) already have an elevation and will not be touched.",
+        "lpn_terrain_undo": "One Undo (Ctrl-Z) puts every one of them back.",
+        "lpn_terrain_requests": "request(s) to api.mapbox.com.",
+        "lpn_terrain_busy": "Elevations are already being filled in. Wait for them.",
+        "lpn_terrain_none_needed": "Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.",
+        "lpn_terrain_no_nodes": "There are no nodes to fill in yet.",
+        "lpn_terrain_offmap": "These node positions are not on the terrain map, so nothing was sent.",
+        "lpn_terrain_too_wide": "These nodes are spread over too much of the Earth to read in one go ({n} tile requests). Nothing was sent.",
+        "lpn_terrain_cancelled": "Nothing was changed and nothing was sent.",
+        "lpn_terrain_nofetch": "This browser cannot reach the terrain service.",
+        "lpn_terrain_working": "Reading the land surface…",
+        "lpn_terrain_failed": "We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it.",
+        "lpn_terrain_done": "{n} elevation(s) filled in.",
+        "lpn_terrain_missed": "{m} could not be read and are still blank.",
+        "lpn_terrain_partial": "{f} terrain tile(s) did not answer."
     },
     "keys": {
         "calc_set_units_tip": "Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
@@ -683,7 +732,56 @@
         "lpn_field_pump_speed": "Relative speed",
         "lpn_field_pump_speed_tip": "1 is this pump turning at the speed its curve was measured at. 0.9 is the same pump turning slower, which lowers the head it adds and the flow it passes. A speed pattern takes the place of this number while the run is going.",
         "lpn_field_speed_pattern": "Speed pattern",
-        "lpn_field_speed_pattern_tip": "How this pump’s speed rises and falls through the run. Each multiplier IS the relative speed for that part of the day, and takes the place of the speed above, so a multiplier of 0 stops the pump."
+        "lpn_field_speed_pattern_tip": "How this pump’s speed rises and falls through the run. Each multiplier IS the relative speed for that part of the day, and takes the place of the speed above, so a multiplier of 0 stops the pump.",
+        "lpn_search_menu": "Search for a place by name…",
+        "lpn_search_tip": "Find a town, a street or a landmark by name and move the map to it. The first use asks your permission, because the words you type go to OpenStreetMap’s place-name service.",
+        "lpn_search_bar": "Search by name…",
+        "lpn_search_consent_1": "Search by place name sends the words you type to nominatim.openstreetmap.org, the OpenStreetMap Foundation’s free place-name service.",
+        "lpn_search_consent_2": "This is a different service from the street map pictures behind your project. The pictures only say where you are looking. A search says what you typed. They will receive your search words and your IP address. We send nothing else, and we keep no record of your searches.",
+        "lpn_search_consent_3": "May we use it?",
+        "lpn_search_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, including Go to a latitude and longitude. We remember a yes so that we need not ask again. A no is not stored at all.",
+        "lpn_search_refused": "Place-name search is off, and nothing was sent. You can still use Go to a latitude and longitude.",
+        "lpn_search_prompt": "Search for a place by name. A town, a street, a landmark — for example: Petaluma, California",
+        "lpn_search_empty": "Type a place name to search for.",
+        "lpn_search_working": "Searching…",
+        "lpn_search_busy": "A search is already running. Wait for it to answer.",
+        "lpn_search_choose": "More than one place matches. Which one?",
+        "lpn_search_nochoice": "Nothing chosen, so the map has not moved.",
+        "lpn_search_badchoice": "That is not one of the numbers in the list.",
+        "lpn_search_none": "Nothing found for that name.",
+        "lpn_search_rate": "The place-name service is asking us to slow down. Wait a minute and try again.",
+        "lpn_search_http": "The place-name service answered with an error.",
+        "lpn_search_timeout": "The place-name service did not answer in time. Everything else on this page works without it.",
+        "lpn_search_unreadable": "The place-name service answered with something this page could not read.",
+        "lpn_search_offline": "We could not reach the place-name service. You may be offline. Everything else on this page works without it, including Go to a latitude and longitude.",
+        "lpn_search_toofast": "One search a second — that is what the place-name service allows. Try again in a moment.",
+        "lpn_search_nofetch": "This browser cannot reach the place-name service.",
+        "lpn_terrain_menu": "Fill in elevations from the land…",
+        "lpn_terrain_tip": "Read the ground elevation under each node that has none, and type it in for you. A node that already has an elevation is left alone, and one Undo puts it all back. The first use asks your permission, because the positions of your nodes go to Mapbox.",
+        "lpn_terrain_accuracy": "Terrain data is about 30 m across the ground and is commonly several metres out vertically. Treat it as a contour map, not a survey: check anything you rely on.",
+        "lpn_terrain_consent_1": "Filling in elevations sends the position of each node that needs one — its latitude and longitude — to api.mapbox.com, to look up the height of the ground there.",
+        "lpn_terrain_consent_2": "This is a different question from the map pictures behind your project. The pictures only say where you are looking. These positions are your network itself. Mapbox will receive those coordinates and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.",
+        "lpn_terrain_consent_3": "May we use it?",
+        "lpn_terrain_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, and you can type elevations in yourself as before. We remember a yes so that we need not ask again. A no is not stored at all.",
+        "lpn_terrain_refused": "Elevations were not filled in, and nothing was sent. You can type them in as before.",
+        "lpn_terrain_confirm": "Fill in the elevation of {n} node(s) from the land surface?",
+        "lpn_terrain_confirm_default_1": "Every node already has an elevation, and {n} of them are still at {v}, which is the elevation a new node starts with rather than one you typed.",
+        "lpn_terrain_confirm_default_2": "Replace those {n} with the land surface?",
+        "lpn_terrain_keep": "{k} node(s) already have an elevation and will not be touched.",
+        "lpn_terrain_undo": "One Undo (Ctrl-Z) puts every one of them back.",
+        "lpn_terrain_requests": "request(s) to api.mapbox.com.",
+        "lpn_terrain_busy": "Elevations are already being filled in. Wait for them.",
+        "lpn_terrain_none_needed": "Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.",
+        "lpn_terrain_no_nodes": "There are no nodes to fill in yet.",
+        "lpn_terrain_offmap": "These node positions are not on the terrain map, so nothing was sent.",
+        "lpn_terrain_too_wide": "These nodes are spread over too much of the Earth to read in one go ({n} tile requests). Nothing was sent.",
+        "lpn_terrain_cancelled": "Nothing was changed and nothing was sent.",
+        "lpn_terrain_nofetch": "This browser cannot reach the terrain service.",
+        "lpn_terrain_working": "Reading the land surface…",
+        "lpn_terrain_failed": "We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it.",
+        "lpn_terrain_done": "{n} elevation(s) filled in.",
+        "lpn_terrain_missed": "{m} could not be read and are still blank.",
+        "lpn_terrain_partial": "{f} terrain tile(s) did not answer."
     },
     "key_context": {
         "calc_set_units_tip": {
@@ -2219,6 +2317,594 @@
             }
         },
         "lpn_field_speed_pattern_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_bar": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_consent_1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_consent_2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_consent_3": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_consent_4": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_prompt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_working": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_busy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_choose": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_nochoice": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_badchoice": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_rate": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_http": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_timeout": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_offline": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_toofast": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_search_nofetch": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_accuracy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_consent_1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_consent_2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_consent_3": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_consent_4": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_confirm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_confirm_default_1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_confirm_default_2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_keep": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_undo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_requests": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_busy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_none_needed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_no_nodes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_offmap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_too_wide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_cancelled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_nofetch": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_working": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_missed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Притисак",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_partial": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

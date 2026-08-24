@@ -257,18 +257,26 @@
 	// that lib/Consent.lib.php spends a paragraph avoiding is not merely avoided here, it is
 	// impossible. Cancel and Escape both mean no. This page already asks its other questions the
 	// same way (Go to a latitude and longitude, Clear everything).
+	//
+	// ONE KEY PER PARAGRAPH, joined here (Task 507). A $ec_lang value is a single line by
+	// construction, so the alternative was a line-break placeholder inside one long value; four
+	// short keys read better to a translator and keep the ORDER of the paragraphs ours.
 	function consentText() {
-		return t('lpn_search_consent',
-			'Search by place name sends the words you type to nominatim.openstreetmap.org, the ' +
-			'OpenStreetMap Foundation’s free place-name service.\n\n' +
-			'This is a different service from the street map pictures behind your project. The ' +
-			'pictures only say where you are looking. A search says what you typed. They will ' +
-			'receive your search words and your IP address. We send nothing else, and we keep no ' +
-			'record of your searches.\n\n' +
-			'May we use it?\n\n' +
-			'If you say no, everything else on this page keeps working exactly as it does now, ' +
-			'including Go to a latitude and longitude. We remember a yes so that we need not ask ' +
-			'again. A no is not stored at all.');
+		return [
+			t('lpn_search_consent_1',
+				'Search by place name sends the words you type to nominatim.openstreetmap.org, the ' +
+				'OpenStreetMap Foundation’s free place-name service.'),
+			t('lpn_search_consent_2',
+				'This is a different service from the street map pictures behind your project. The ' +
+				'pictures only say where you are looking. A search says what you typed. They will ' +
+				'receive your search words and your IP address. We send nothing else, and we keep no ' +
+				'record of your searches.'),
+			t('lpn_search_consent_3', 'May we use it?'),
+			t('lpn_search_consent_4',
+				'If you say no, everything else on this page keeps working exactly as it does now, ' +
+				'including Go to a latitude and longitude. We remember a yes so that we need not ask ' +
+				'again. A no is not stored at all.')
+		].join('\n\n');
 	}
 
 	// THE VIEW-MENU ROW'S OWN WORDS, exported rather than read by js/looped-network.js.
