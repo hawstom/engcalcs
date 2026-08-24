@@ -198,9 +198,14 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
 - **Design this page for a pointer; then make a phone survivable.** It is a full-window drawing
   surface with a menu bar, toolbar, tab strip and property popup, so the desktop layout is the
   authoritative one and no design argument starts from a phone. Say "pointer slop" when you mean
-  hand-and-mouse tolerance; a 44px touch target is not an argument here. **This is a PC app the way
-  EPANET and epanet-js are** — epanet-js takes that stance slightly harder than Tom wants to, and his
-  framing is *"for PC of course, but go ahead and try it on your phone"*. Tom ruled it **not usable on a
+  hand-and-mouse tolerance; a 44px touch target is not an argument here.
+  **BUT NEVER CALL IT A PC APPLICATION IN PUBLIC — Tom, 2026-08-24: *"It is not a PC application; it
+  is a web application."*** That is a ruling about IDENTITY, and it does not touch the design rule
+  above: pointer-first is still how it is built, and "it runs everywhere a browser runs" is still
+  what it is. The two are only in tension if you let a design priority leak into a positioning
+  claim, which is exactly what happened — the sentence *"And it is a PC application, the way EPANET
+  is"* stood on the LibreWaterNet draft and he struck it. Do not restore it, and do not reach for
+  epanet-js's harder version of the same stance either. Tom ruled it **not usable on a
   phone** on 2026-08-22; the four small-screen items he named — hide page titles, collapse the
   navbar, keep only the transport controls, drop menu text to icons — shipped the same day at one
   `max-width: 640px` breakpoint (closed Task 486, guarded by `dev/lpn-spike/small-screen-harness.js`),

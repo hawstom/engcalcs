@@ -119,19 +119,29 @@ We keep *caring*: the `innerHeight * 0.72` cap in `effectiveMapHeight()` stays (
 `#lpn_canvas` has `touch-action:none`, so a canvas taller than the viewport traps a phone user with
 no scrollable page — Tom hit exactly that on 2026-07-31), and phone regressions are still bugs.
 
-**Tom softened the stance on 2026-08-22, and the softening has a stated goal and a stated limit.**
-*"the truth is that this is a PC app, just like EPANET and epanetjs, and epanetjs takes the same
-stance only a little more strongly than I want to put it. For PC of course, but go ahead and try it
-on your phone."* And on where we stand today: *"We are not usable on a phone today, IMO. We will be
-with those four small-screen tasks done."*
+**The stance moved twice in three days, and where it landed is not where it started.** On
+2026-08-22 Tom's framing was *"this is a PC app, just like EPANET and epanetjs... For PC of course,
+but go ahead and try it on your phone"*, with *"We are not usable on a phone today, IMO"*. The four
+small-screen items shipped that day (Task 486); he passed the phone on 2026-08-23, and on 2026-08-24,
+after using it: *"phone usability is super solid now. I am a bit surprised."*
 
-The target was **"obviously never tried on a phone" → "well, maybe"**, and nothing beyond it. The
-four small-screen items shipped 2026-08-22 (Task 486) and **Tom made the phone pass on 2026-08-23**,
-which is the only thing that could settle it. **The sanctioned public wording is exactly "Try it. We
-did." and nothing stronger** — an invitation to try, never a claim that it is good there. A public
-page still may not call the map editor *usable* on a phone, and the demotion above is unchanged:
-mobile stays out of a headline, a tagline, or a list of reasons to choose us. Revisit the
-positioning beyond that only if outside advice says otherwise.
+**Two rulings came out of that, and they pull in opposite directions, which is the point.**
+
+- **"PC app" is retired as a description of ourselves.** Tom, 2026-08-24: *"It is not a PC
+  application; it is a web application."* The sentence *"And it is a PC application, the way EPANET
+  is"* stood on the landing draft and he struck it. Do not restore it, and do not borrow epanet-js's
+  harder version of the same stance. **Pointer-first remains how the editor is BUILT** (see CLAUDE.md);
+  it was never a claim about what the thing IS, and letting a design priority leak into a positioning
+  claim is precisely the mistake that sentence was.
+- **The phone claim is now a claim, not just an invitation** — and one indefinite article is doing
+  all the work. The sanctioned wording is the landing page's own sentence, verbatim: *"And although
+  you of course prefer working on your PC, it works also on a phone."* Tom chose *"a phone"* over
+  *"your phone"* himself, *"to be scrupulously honest"*: **"a phone" is a claim about the software;
+  "your phone" is a promise about a device we have never seen.** Never write the second.
+  (Superseded, recorded so it is not reinstated by habit: *"Try it. We did."*)
+
+**Unchanged by either ruling:** mobile stays out of a headline, a tagline, or a list of reasons to
+choose us. It is an honest aside in the honest-about-the-edges paragraph, and that is its place.
 
 ## 4. Design, not management — and the annotated map is the evidence
 
