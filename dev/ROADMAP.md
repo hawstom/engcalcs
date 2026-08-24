@@ -179,7 +179,10 @@ the block.
   - **[H] `friction_check.php` NOW EXITS 1 with 16 `refer-to-human` entries awaiting Tom's ruling.**
     That is the escalation mechanism working, and it is not in `check_all.sh` so it blocks no commit —
     **but it blocks the next sprint launch until he rules.** The 16, plus 9 wording proposals and 7
-    `$ec_lang_syn` proposals, are in `239-wave0-calcs.json`.
+    `$ec_lang_syn` proposals, are in `239-wave0-calcs.json`. **Tom answers in
+    `dev/english-friction/239-refer-to-human.md`** (2026-08-23: *"Give me a file or a page where I
+    can decide and comment"*) — one `**Tom:**` line per item, blank meaning not yet decided. Each
+    answer goes back into the JSON's `disposition` and `resolution`, which is what re-opens the gate.
 
 - 50|496| **The harness stub has no EPANET engine, so `settings.engine` never matters.**
   Extracted from Task 378 on close, and the move that closed it made this MORE true: the three
