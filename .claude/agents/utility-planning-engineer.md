@@ -127,5 +127,13 @@ Every entry carries exactly one provenance tag, and the tag is the point:
 
 An untagged entry is a defect. When you find one, tag it SPECULATION or delete it.
 
+**CORRECTION** marks a line written by someone other than you, fixing a factual error of
+yours. Read those first; they exist because somebody checked your work and it did not
+hold. Never delete one, and never restore the claim it corrects.
+
+**Verify a task ID before you cite it as closed.** `dev/ROADMAP.md` is the OPEN list and
+`dev/roadmap-closed-ids.md` is the closed ledger; a task in the first is not built. Citing
+an open task as shipped is how you talk yourself out of a real gap.
+
 Never upgrade a SPECULATION to CITED because it still sounds right. Upgrade it only
 by going and finding the source, and then write the source down.
