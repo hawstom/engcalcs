@@ -296,6 +296,30 @@ conversation:
   outliving an unfunded one is the ordinary case, so **do not answer longevity with a promise that
   we will last.** Answer it with the licence, which does not require us to.
 
+## 8.5 They have put multilingual behind the paywall (observed 2026-08-24)
+
+Tom sent a screenshot of epanet-js's **"Choose your model builder"** dialog — the GIS import path,
+offering **Legacy** against **Pro**. Legacy is marked *maintenance only* and its red-X list reads:
+pipe year and materials, projection preservation (WGS84 only), **"Multiple languages (English
+only)"**, custom attributes. Pro's green ticks are the same four. Tom: *"Very interesting. They've
+made their bed."*
+
+**What this is and is not.** It is one dialog on one import path, not their whole product, and it
+would be dishonest to describe it as "epanet-js is English-only" — the correct sentence is that on
+this path, in this dialog, multiple languages is a Pro line item. Recorded because it is a fact
+about the market and it is dated; a paywall can move.
+
+**What it does NOT license.** It is not landing-page copy, and the temptation it creates is exactly
+the one §8 already declines: answering somebody else's framing. Our 27 languages are ours because of
+Task 218's argument and the mission behind it, and they would be worth the same if every competitor
+gave theirs away. **Lead with the invitation, never with what they charge for.**
+
+The one thing it genuinely changes is a priority. Their free tier being English-only makes
+**Task 459's sprint** — and Task 507's 49 unkeyed strings, two of them permission dialogs — the
+place where our own claim is either true or a slogan. A suite that ships 27 languages and then asks
+for a stranger's node coordinates in English is arguing against itself. That is the reason to run
+the sprint, and it is a reason about us.
+
 ## 9. The front door's hero asset — Tom's, and still to come
 
 **Tom, 2026-08-21:** *"The biggest blocker is the graphic. I have to prepare a graphic of the real
