@@ -81,6 +81,7 @@ const L = loadLoopedNetwork(
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\tscenarioMenu: openScenarioMenu, menuRows: function () { return document.getElementById('lpn_menu_list'); },\n" +
 	"\t\twireScenarioButton: wireScenarioButton, statusText: function () { return document.getElementById('lpn_scenario_btn').textContent; },\n" +
+	"\t\tstatusTip: function () { return document.getElementById('lpn_scenario_btn').title || ''; },\n" +
 	"\t\tpushBaseToScenarios: pushBaseToScenarios, labelSettings: function () { return labelSettings; },\n" +
 	"\t\trefreshLabelText: refreshLabelText, refreshScenarioMarks: refreshScenarioMarks,\n" +
 	"\t\tnodeCircle: function (id) { return nodeEls[id].circle; },\n" +
@@ -439,6 +440,51 @@ console.log('\n--- the readout, the halos, and the guards ---');
 		!L.linkHalo(E.l1.id).classList.contains('lpn-override'));
 	ok('a pipe with no override never has one',
 		!L.linkHalo(E.l2.id).classList.contains('lpn-override'));
+
+	// ROADMAP Task 512 -- THE RING HAS TO EXPLAIN ITSELF. Tom and Mary each read the amber ring as a
+	// stuck highlight; it was working exactly as designed and said so nowhere a person would look.
+	// Two answers, and both are asserted here because either alone leaves the other half silent:
+	// an SVG <title> ON the ring, and a sentence on the readout that counts them.
+	//
+	// A <title> CHILD, not a title= attribute -- `title` is not a rendered attribute of an SVG
+	// element, so the attribute form would set something no browser ever shows and this harness
+	// would have passed on it. That is the mutant this assertion exists to catch.
+	function ringTitle(el) {
+		var i;
+		for (i = 0; el && i < el.childNodes.length; i++) {
+			if (el.childNodes[i].nodeName === 'title') { return el.childNodes[i].textContent; }
+		}
+		return null;
+	}
+	L.labelSettings().link.diameter = true;
+	L.refreshLabelText();
+	ok('the ring carries a title element saying what it is',
+		!!ringTitle(L.linkHalo(E.l1.id)), JSON.stringify(ringTitle(L.linkHalo(E.l1.id))));
+	ok('...which names the scenario, because that is the answer to "why is this ringed"',
+		(ringTitle(L.linkHalo(E.l1.id)) || '').indexOf(L.activeScenario().name) !== -1,
+		JSON.stringify(ringTitle(L.linkHalo(E.l1.id))) + ' should contain ' + L.activeScenario().name);
+	ok('an unringed element carries no stale title from an earlier scenario',
+		ringTitle(L.linkHalo(E.l2.id)) === null, JSON.stringify(ringTitle(L.linkHalo(E.l2.id))));
+	// The title must come and go WITH the ring, or the tooltip outlives the mark that prompted it.
+	L.labelSettings().link.diameter = false;
+	L.refreshLabelText();
+	ok('...and the title leaves with the ring when the Labels filter hides it',
+		ringTitle(L.linkHalo(E.l1.id)) === null, JSON.stringify(ringTitle(L.linkHalo(E.l1.id))));
+	L.labelSettings().link.diameter = true;
+	L.refreshLabelText();
+
+	// The readout half. The sentence appears only when there is something on the map to explain:
+	// with no overrides there are no rings, and a standing sentence about an absent mark is noise.
+	L.wireScenarioButton();
+	const tipWith = L.statusTip();
+	ok('the count explains itself when it is above zero',
+		L.overrideCount() > 0 && /ring/i.test(tipWith), L.overrideCount() + ' | ' + JSON.stringify(tipWith));
+	L.switchScenario('base');
+	L.wireScenarioButton();
+	ok('...and says nothing about rings in Base, where there are none',
+		!/ring/i.test(L.statusTip()), JSON.stringify(L.statusTip()));
+	L.switchScenario(L.getScenarios()[1].id);
+	L.wireScenarioButton();
 	// `status` has no Labels row, so it can only be always-on: a filter can hide only what it can name.
 	L.setProp(E.l2, 'status', 'closed');
 	L.refreshLabelText();

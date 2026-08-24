@@ -2445,6 +2445,20 @@ var EngCalcs = EngCalcs || {};
 		setLabel(btn, 'scenarios',
 			(pc.lpn_scenario_label || 'Scenario') + ': ' + scenarioDisplayName(scn)
 			+ ' | ' + (pc.lpn_scenario_overrides || 'Overrides') + ': ' + overrideCount(scn));
+		refreshScenarioTip(btn);
+	}
+	// **THE COUNT HAS TO SAY WHAT IT IS COUNTING** (ROADMAP Task 512). "Custom values: 3" and three
+	// amber rings on the map are the same fact, and nothing said so: Tom and Mary each read the rings
+	// as a stuck highlight without connecting them to the readout sitting under them. So the second
+	// sentence appears only when the count is above zero -- with no overrides there are no rings to
+	// explain, and a permanent sentence about a mark that is not on screen is noise.
+	function refreshScenarioTip(btn) {
+		var pc = EngCalcs.pageConfig || {}, tip = pc.lpn_scenario_tip || '';
+		if (!btn || !tip) { return; }
+		if (overrideCount(activeScenario()) > 0 && pc.lpn_scenario_overrides_tip) {
+			tip += ' ' + pc.lpn_scenario_overrides_tip;
+		}
+		btn.title = tip;
 	}
 	// Everything a scenario can change at once: which values the solve reads, which links are
 	// dashed, which elements are greyed out, which carry a halo, and what an open popup shows.
@@ -2560,7 +2574,8 @@ var EngCalcs = EngCalcs || {};
 		var btn = document.getElementById('lpn_scenario_btn');
 		if (!btn) { return; }
 		var pc = EngCalcs.pageConfig || {};
-		if (pc.lpn_scenario_tip) { btn.title = pc.lpn_scenario_tip; btn.className += ' ec-help'; }
+		if (pc.lpn_scenario_tip) { btn.className += ' ec-help'; }
+		refreshScenarioTip(btn);
 		// stopPropagation for the same reason every other menu opener in this file does it: the
 		// document-level dismissal in wireTabs() would otherwise close the menu this click opens.
 		btn.addEventListener('click', function (e) { e.stopPropagation(); openScenarioMenu(e.currentTarget); });
@@ -21357,19 +21372,58 @@ var EngCalcs = EngCalcs || {};
 		if (!ov) { return false; }
 		return Object.keys(ov).some(function (p) { return overrideIsDisplayed(el, p); });
 	}
+	// **THE RING HAS TO SAY WHAT IT IS, ON THE ELEMENT ITSELF** (ROADMAP Task 512). Tom, 2026-08-24,
+	// of two junctions in his own file: *"I don't know why, and I can't get them to unhighlight. I
+	// noticed this same thing in my colleague Mary's water report using lpn."* Two independent users
+	// read a designed mark as a stuck highlight, because the only place it was explained was the
+	// property popup -- reached by clicking the element, which is exactly what somebody who thinks
+	// the page is stuck does not do.
+	//
+	// An SVG `<title>` child, not a `title=` attribute: `title` is not a rendered attribute on an
+	// SVG element and the browser ignores it there. This is also why the ring cannot use the page's
+	// own `.ec-help` tip channel, which activates on HTML elements only.
+	//
+	// Named with the SCENARIO, because that is the answer to "why": the ring is not a state of the
+	// element, it is a fact about which scenario is showing. Switch to Base and it is gone.
+	function setOverrideTitle(el, marked) {
+		if (!el) { return; }
+		var t = null, i;
+		// A direct-child walk rather than querySelector(':scope > title'), so this works unchanged
+		// under the spike harnesses' DOM as well as in a browser.
+		for (i = 0; i < el.childNodes.length; i++) {
+			if (el.childNodes[i].nodeName === 'title') { t = el.childNodes[i]; break; }
+		}
+		if (!marked) { if (t) { el.removeChild(t); } return; }
+		if (!t) {
+			t = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+			// First child, so a reader hits it before any other content of the element.
+			el.insertBefore(t, el.firstChild);
+		}
+		t.textContent = overrideMarkText();
+	}
+	function overrideMarkText() {
+		var pc = EngCalcs.pageConfig || {};
+		return (pc.lpn_scenario_mark_tip
+			|| 'Ringed: this element holds a value that belongs to the scenario {name} alone.')
+			.replace('{name}', scenarioDisplayName(activeScenario()));
+	}
 	function refreshScenarioMarks() {
 		doc.nodes.forEach(function (n) {
-			var ne = nodeEls[n.id], off = !isActive(n);
+			var ne = nodeEls[n.id], off = !isActive(n), ov = hasDisplayedOverride(n);
 			if (!ne) { return; }
-			ne.circle.classList.toggle('lpn-override', hasDisplayedOverride(n));
+			ne.circle.classList.toggle('lpn-override', ov);
+			setOverrideTitle(ne.circle, ov);
 			ne.circle.classList.toggle('lpn-inactive', off);
 			if (ne.symbol) { ne.symbol.classList.toggle('lpn-inactive', off); }
 			ne.text.classList.toggle('lpn-inactive', off);
 		});
 		doc.links.forEach(function (l) {
-			var le = linkEls[l.id], off = !isActive(l);
+			var le = linkEls[l.id], off = !isActive(l), ov = hasDisplayedOverride(l);
 			if (!le) { return; }
-			if (le.halo) { le.halo.classList.toggle('lpn-override', hasDisplayedOverride(l)); }
+			if (le.halo) {
+				le.halo.classList.toggle('lpn-override', ov);
+				setOverrideTitle(le.halo, ov);
+			}
 			le.line.classList.toggle('lpn-inactive', off);
 			le.text.classList.toggle('lpn-inactive', off);
 			if (le.symbolG) { le.symbolG.classList.toggle('lpn-inactive', off); }

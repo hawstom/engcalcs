@@ -1129,6 +1129,8 @@
         "lpn_scenario_label": "Scenario",
         "lpn_scenario_base": "Base",
         "lpn_scenario_overrides": "Custom values",
+        "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
+        "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_scenario_menu": "Scenarios",
         "lpn_scenario_tip": "The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.",
         "lpn_scenario_new": "New scenario…",
@@ -1345,7 +1347,7 @@
         "lpn_terrain_missed": "{m} could not be read and are still blank.",
         "lpn_terrain_partial": "{f} terrain tile(s) did not answer."
     },
-    "count": 1343,
+    "count": 1345,
     "active_prefixes": [
         "about",
         "bpn",

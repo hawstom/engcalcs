@@ -2218,6 +2218,13 @@ $ec_lang_syn['lpn_scenario_base']='Base case, Baseline, Canonical, Source, Root,
 // chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
 // pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
 $ec_lang['lpn_scenario_overrides']='Custom values';
+// ROADMAP Task 512. The amber ring was designed, correct, and silent: two independent users read it
+// as a stuck highlight they could not turn off. These two strings are the ring's own explanation and
+// the readout's, so neither requires clicking the element to find out what is going on.
+// {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
+// showing, not a state of the element, and naming the scenario is what makes that recoverable.
+$ec_lang['lpn_scenario_mark_tip']='Ringed: this element holds a value that belongs to the scenario {name} alone.';
+$ec_lang['lpn_scenario_overrides_tip']='Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.';
 $ec_lang['lpn_scenario_menu']='Scenarios';
 $ec_lang['lpn_scenario_tip']='The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.';
 $ec_lang['lpn_scenario_new']='New scenario…';

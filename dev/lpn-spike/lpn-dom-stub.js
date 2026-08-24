@@ -17,8 +17,14 @@ const ROOT = path.resolve(__dirname, '..', '..') + path.sep;
 const GPM = 6.309019640343977e-5, FT = 0.3048, IN = 0.0254;
 
 // ---- minimal DOM --------------------------------------------------------
-function mkEl(tag) {
+// `svgNS` is not decoration either. A real DOM sets nodeName to the element's qualified name,
+// which for an SVG element is its LOWERCASE local name and for an HTML element is uppercase --
+// and page code that walks childNodes looking for a particular SVG child (the <title> on a
+// scenario override ring, ROADMAP Task 512) tests exactly that. A stub that reported one casing
+// for both would make such a walk pass here and find nothing in a browser, or the reverse.
+function mkEl(tag, svgNS) {
   const el = {
+    nodeName: svgNS ? String(tag) : String(tag || 'div').toUpperCase(),
     // nodeType 1 is not decoration: repositionMultilineText() moves ONLY element children
     // (`child.nodeType === 1`), so a stub element without it silently skipped every tspan and a
     // harness would have reported a multi-line label moving when the real page leaves its rows
@@ -373,7 +379,7 @@ const LPN_UNIT_PRESETS = {
 
 global.document = {
   createElement: mkEl,
-  createElementNS: (ns, tag) => mkEl(tag),
+  createElementNS: (ns, tag) => mkEl(tag, true),
   createTextNode: t => ({ nodeType: 3, textContent: t, _text: true, children: [] }),
   getElementById: id => byId[id] || null,
   querySelector: sel => {
