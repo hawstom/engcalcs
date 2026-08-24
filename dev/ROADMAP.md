@@ -228,6 +228,24 @@ the block.
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
 
+- 100|511| **Three georeferencing checks disagree with Mercator, and one of them is right.**
+  Found 2026-08-24 running the whole browser pass, which had not been run end to end in a while:
+  `dev/browser-pass/specs/georef.js` fails three ways since Task 145 drew the project in Web
+  Mercator — the model does not stay at one screen height while its ground scale is set
+  (199.7 → 210.4 px), a 90° turn measures **aspect 1.916 against a predicted 1.177**, and the
+  as-degrees path lands on Step 1 where the spec expects Step 2.
+  - **The spec's predictions are pre-Mercator arithmetic, so at least the third is certainly the
+    spec's fault.** The aspect one is NOT obviously either: 1.177 is a 1/cos(lat) stretch that the
+    Mercator frame should have removed, and 1.916 is a number somebody has to justify before it is
+    written into a check. **Do not just re-baseline the numbers** — that converts a failing check
+    into a passing one that asserts whatever the code does, which is the one outcome worth less
+    than no check at all.
+  - Five other specs had gone stale the same way and were fixed that day (a View row that moved to
+    Project, a renamed menu row, a two-button dialog that grew a third, a tile box that became
+    square, the profile's deleted side controls). **The lesson is the pass itself: `node run.js` is
+    four minutes and it had drifted to 6 failures, five of them cosmetic and hiding the real one.**
+    Run it before it is needed.
+
 - 100|508| **Tom's screenshot drop: dozens of captures, indexed and reused.** His idea,
   2026-08-24: *"a folder in this project, not in git, where I can prolifically put screenshots by
   the dozens."* `dev/screenshots/` exists and is gitignored; the convention is in its README —

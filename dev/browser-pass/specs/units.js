@@ -102,9 +102,15 @@ exports.run = async function ({ browser, report }) {
 			unit: document.querySelector('select[name="lpn_u_flow"]').value
 		}));
 		report.eq(asked.dialog, 'block', 'changing an INPUT unit asks first');
-		report.eq(asked.buttons.length, 2, '...with two answers');
-		report.ok(/Reinterpret/.test(asked.buttons[0]) && /Convert/.test(asked.buttons[1]),
-			'...Reinterpret and Convert, in that order', asked.buttons.join(' | '));
+		// **THREE ANSWERS, AND CANCEL IS THE THIRD.** The pair was Reinterpret/Convert; the dialog
+		// shipped 2026-08-24 naming the two by what they DO to the document -- a reinterpretation
+		// leaves every number alone, a conversion rewrites all of them -- and added the way out.
+		// Spec updated the same day, having gone stale rather than caught anything.
+		report.eq(asked.buttons.length, 3, '...with three answers');
+		report.ok(/Non-destructive/.test(asked.buttons[0]) && /Destructive/.test(asked.buttons[1]),
+			'...Non-destructive and Destructive, in that order', asked.buttons.join(' | '));
+		report.ok(/Cancel/.test(asked.buttons[2]),
+			'...and Cancel, so the question can be left unanswered', asked.buttons[2]);
 		// The fields it decides are NAMED, because that is what makes the question answerable.
 		report.ok(/Demand/.test(asked.text), '...naming the fields that unit decides',
 			asked.text.replace(/\s+/g, ' ').slice(0, 110));

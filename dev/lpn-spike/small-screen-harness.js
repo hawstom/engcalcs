@@ -64,7 +64,11 @@ function cssRules(src) {
 		const open = text.indexOf('{', i);
 		if (open < 0) { break; }
 		const prelude = text.slice(i, open).trim();
-		if (prelude.startsWith('@media') || prelude.startsWith('@supports')) {
+		// **`@container` IS READ AS A WRAPPER TOO, and that is not a nicety** (2026-08-24): the
+		// prelude of an unrecognised at-rule falls through to the ordinary-rule path, where it becomes
+		// a SELECTOR and its inner rules leak out unconditional. One container query in this
+		// stylesheet then read as an always-applying rule and broke four desktop assertions.
+		if (prelude.startsWith('@media') || prelude.startsWith('@supports') || prelude.startsWith('@container')) {
 			// Walk to the matching close brace and read the rules inside as a block.
 			let depth = 0, end = open;
 			for (; end < text.length; end++) {
@@ -99,6 +103,12 @@ function cssRules(src) {
 function mediaApplies(media, widthPx, touch) {
 	return media.every((q) => {
 		if (q.startsWith('@supports')) { return true; }
+		// **A CONTAINER QUERY IS NOT A VIEWPORT TEST, so this harness declares it does not apply.**
+		// It measures a PANEL the user can drag, and every question here is asked in viewport pixels;
+		// answering it against `widthPx` would be answering a different question and calling it this
+		// one. The Settings box's own container queries are measured where they can be measured
+		// honestly, in a real browser: dev/browser-pass/specs/labelcols.js.
+		if (q.startsWith('@container')) { return false; }
 		if (/\bprint\b/.test(q)) { return false; }
 		if (/prefers-/.test(q)) { return false; }
 		if (/hover:\s*none/.test(q) && !touch) { return false; }

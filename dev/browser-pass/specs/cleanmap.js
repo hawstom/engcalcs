@@ -16,7 +16,10 @@ const { Session } = require('../lib/session');
 // **THE ROW NAMES THE ACT, SO ITS NAME FLIPS** -- "Hide map readouts" / "Show map
 // readouts". The label lives here once: a spec that typed "Clean map" inline broke the day
 // Wave 0 gave the control a name that says what it does.
-const CLEAN_ON = 'Hide map readouts';
+// The ON row was renamed "Reduce map clutter" (Task 438 Wave 0) -- what it does, not what it
+// removes, because a reader who has never noticed the readouts cannot want them hidden. The OFF
+// row kept the concrete wording, since by then the reader HAS seen them go.
+const CLEAN_ON = 'Reduce map clutter';
 
 exports.title = '20. The clean map';
 

@@ -70,10 +70,13 @@ exports.run = async function ({ browser, report }) {
 		report.ok(opened, 'the examples gallery offers Net1');
 		await a.settle(900);
 
-		const rows = await a.menuRows('view');
-		report.ok(rows.some(r => r.label === 'Profile'), 'View carries a Profile row',
+		// **THE DOOR IS PROJECT > PROFILE** (Task 467 moved it out of View, which now holds only the
+		// things that change how the map is DRAWN). Updated 2026-08-24, when this spec was found
+		// throwing on a View row that no longer exists.
+		const rows = await a.menuRows('project');
+		report.ok(rows.some(r => r.label === 'Profile'), 'Project carries a Profile row',
 			rows.map(r => r.label).join(' | '));
-		await a.menuClick('Profile', 'view');
+		await a.menuClick('Profile', 'project');
 		await a.settle(400);
 
 		// **1. THE PANE IS ON THE SCREEN, AND THE PAGE STILL FITS THE WINDOW.** The pane takes its
@@ -234,71 +237,12 @@ exports.run = async function ({ browser, report }) {
 		});
 		await a.settle(900);
 
-		// **3. LIVE, part one: the path controls.** Changing the far end redraws immediately, with
-		// no button pressed.
-		const before = await chartShape(a.page);
-		const changed = await a.page.evaluate(() => {
-			const sels = document.querySelectorAll('#lpn_profile_form select');
-			const to = sels[1];
-			const other = [...to.options].map(o => o.value).filter(v => v !== to.value)[3];
-			if (!other) { return null; }
-			to.value = other;
-			to.dispatchEvent(new Event('change', { bubbles: true }));
-			return other;
-		});
-		await a.settle(300);
-		const after = await chartShape(a.page);
-		report.ok(!!changed, 'the To pull-down offers the network\'s nodes');
-		report.ok(after && before && after.nodes.join() !== before.nodes.join(),
-			'changing the end node redraws the profile at once — no Refresh button',
-			changed && ('now ends at ' + changed));
-
-		// **3. LIVE, part two: the waypoint gesture.** One checkbox, then a click on the map, and
-		// the route bends through that node. This is the whole of the path editing there is, and it
-		// exists only in a browser: it is a click on an SVG symbol.
-		await a.page.evaluate(() => {
-			const cb = document.querySelector('#lpn_profile_form input[type=checkbox]');
-			cb.checked = true;
-			cb.dispatchEvent(new Event('change', { bubbles: true }));
-		});
-		// **THE TARGET MUST NOT ALREADY BE ON THE ROUTE**, or the check passes for the wrong
-		// reason: adding a waypoint the route already visits correctly changes nothing, and an
-		// assertion that the drawing moved would then be asserting an accident of which node was
-		// nearest the corner of the window.
-		const pre = await chartShape(a.page);
-		const target = await a.page.evaluate((onRoute) => {
-			const panel = document.getElementById('lpn_pane').getBoundingClientRect();
-			const els = [...document.querySelectorAll('[data-node]')];
-			for (const e of els) {
-				if (onRoute.indexOf(e.dataset.node) >= 0) { continue; }
-				const r = e.getBoundingClientRect();
-				const x = r.x + r.width / 2, y = r.y + r.height / 2;
-				if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) { continue; }
-				// Not under the panel, or the click lands on the panel instead of the map.
-				if (x > panel.x - 8 && x < panel.x + panel.width + 8 &&
-					y > panel.y - 8 && y < panel.y + panel.height + 8) { continue; }
-				return { id: e.dataset.node, x: x, y: y };
-			}
-			return null;
-		}, pre.nodes);
-		if (!target) {
-			report.skip('a waypoint click bends the route',
-				'every node off the route is under the panel in this window');
-		} else {
-			await a.page.mouse.click(target.x, target.y);
-			await a.settle(400);
-			const post = await chartShape(a.page);
-			const chips = await a.page.evaluate(() => [...document.querySelectorAll('#lpn_profile_form button')]
-				.map(b => b.textContent));
-			report.ok(chips.some(t => t.indexOf(target.id) === 0),
-				'clicking a node on the map adds it to the route as a waypoint',
-				target.id + ' → ' + chips.join(' '));
-			report.ok(post.nodes.indexOf(target.id) >= 0,
-				'...and the redrawn profile really passes through it', post.nodes.join(' '));
-			report.ok(post.nodes.join() !== pre.nodes.join(),
-				'...so the drawing changed, live, from one click on the map',
-				pre.nodes.join(' ') + '  →  ' + post.nodes.join(' '));
-		}
+		// **PARTS ONE AND TWO OF THIS SECTION ARE GONE, AND THAT IS TASK 506.** They drove the
+		// profile's From/To pull-downs and its "add a waypoint" checkbox; the profile has no side
+		// interface any more -- the Profile button itself arms the chooser, and the gesture (press
+		// cycle, long press, double tap) is guarded by dev/lpn-spike/profile-chooser-harness.js on a
+		// fake clock, which can test both thresholds from both sides and this cannot.
+		// Deleted rather than skipped: a check that cannot run is noise, and the coverage moved.
 
 		// **3. LIVE, part three: an EDIT to the network, not to the path.** This is the check that
 		// holds refreshProfileIfOpen()'s call inside applySolveResult(): change a node's elevation
@@ -306,11 +250,6 @@ exports.run = async function ({ browser, report }) {
 		// that one call leaves the path controls still working and the profile silently stale, which
 		// is the failure a person would report as "it was right a minute ago".
 		{
-			await a.page.evaluate(() => {
-				const cb = document.querySelector('#lpn_profile_form input[type=checkbox]');
-				cb.checked = false;
-				cb.dispatchEvent(new Event('change', { bubbles: true }));
-			});
 			const beforeEdit = await chartShape(a.page);
 			const onRoute = beforeEdit.nodes;
 			const spot = await a.page.evaluate((ids) => {

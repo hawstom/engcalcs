@@ -55,10 +55,15 @@ exports.run = async function ({ browser, report }) {
 			.map(u => new URL(u).host))];
 		report.ok(away.length > 0 && away.every(h => h === TILE_HOST),
 			'...and the tile server is the ONLY host this page talks to', away.join(', ') || '(none)');
+		// **A TILE BOX IS SQUARE, AND THAT IS TASK 145.** These two checks asserted the opposite --
+		// a box taller than wide by 1/cos(lat), which is what a tile needs when the drawing frame is
+		// degrees of longitude and latitude. The project is drawn in WEB MERCATOR now, which is the
+		// tiles' OWN frame, so no stretch is left to apply and the ratio measures 1.0000. Corrected
+		// 2026-08-24; the failing number was the fix landing, not a defect.
 		report.ok(tiles.every(t => t.par === 'none'),
-			'...stretched into their boxes, because a box here is not square');
-		report.ok(tiles.every(t => Math.abs(t.h / t.w - 1) > 0.05),
-			'...which is visible: the boxes really are taller-than-wide by 1/cos(lat)',
+			'...placed by their boxes rather than by their own aspect ratio');
+		report.ok(tiles.every(t => Math.abs(t.h / t.w - 1) < 0.01),
+			'...and a tile box is SQUARE, because the drawing frame is the tiles\' own (Task 145)',
 			tiles[0] && (tiles[0].h / tiles[0].w).toFixed(4));
 
 		// ---- REGISTRATION, end to end through the page's own transform ------------------------
