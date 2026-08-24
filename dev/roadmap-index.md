@@ -7,15 +7,16 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**77 open tasks.** Next (100): 6 · Soon (75): 6 · Someday (50): 12 · Maybe (25): 26 · Parked (5): 27
+**78 open tasks.** Next (100): 7 · Soon (75): 6 · Someday (50): 12 · Maybe (25): 26 · Parked (5): 27
 
-## 100 — Next (6)
+## 100 — Next (7)
 
 - Task 145 — GEOGRAPHIC PROJECTS: grid or geographic, declared before anything is drawn.
 - Task 389 — Search and replace inputs across the network, no longer gated on size.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
+- Task 469 — Node labels should SHED properties before one of them is hidden.
 - Task 478 — [H] · BUILT AND WAITING ON ONE RULING: Tab walks the input column.
 
 ## 75 — Soon (6)
@@ -37,10 +38,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 433 — Profile: the last piece is the path CHOOSER.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
-- Task 469 — Node labels should SHED properties before one of them is hidden.
 - Task 496 — The harness stub has no EPANET engine, so `settings.engine` never matters.
 - Task 497 — Automatic elevations for a lat/lon project, from a terrain source.
-- Task 499 — [H] · Scenarios are neither in the Project menu nor mentioned there.
+- Task 499.01 — Create a Scenarios menu icon
+- Task 499.02 — Add a tip to the lpn Project menu
 
 ## 25 — Maybe (26)
 
@@ -103,5 +104,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-77 of 77 titles are within 4–12 words. `!` marks the rest;
+78 of 78 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

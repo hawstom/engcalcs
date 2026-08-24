@@ -406,18 +406,12 @@ the block.
   says things a public board should not (measured costs, what Tom is not proud of, who to ask), so a
   public board is a SECOND artifact to keep current, not this one exposed.
 
-- 50|499| **[H] Scenarios are neither in the Project menu nor mentioned there.**
-  Tom, 2026-08-23, offering both halves himself: *"Can the Project menu have a tip that says
-  'Everything you need to learn about water network modeling is here except Scenarios at the lower
-  left corner of the map.' Or we can add scenarios to this menu, but we will need an icon."*
-  - The two are not equivalent. A tip is one English string and no new icon, and it documents a
-    split rather than removing it. A menu row makes the split go away and costs an icon — and the
-    icon is the real work, since `lib/Icons.lib.php` icons are generated from a wireframe model.
-  - Whichever wins, the tip wording above needs an editing pass before it ships: the Project menu is
-    not where anybody learns water network modelling, and a tip that names a screen CORNER goes stale
-    the moment the control moves.
-
-- 50|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
+- 50|499.01| ** Create a Scenarios menu icon **
+  - Use the paradigm of this icon, probably without the page element. Described textually, this depicts scenarios as three branched children of a main project. It might be nice to make the shape of the main (project) and children (scenarios) reminiscent of our Project icon, possibly stripped of its details and scaled down. If not, then just squares with an aspect ratio representative of a 2H x 3H plan sheet https://www.flaticon.com/free-icon/scenario_17921358?term=scenario&page=1&position=8&origin=tag&related_id=17921358
+- 50|499.02| ** Add a tip to the lpn Project menu **
+  -  'Everything unique about this application is here in one place except the animation play controls. There is no need to guess where things are.'
+  - It would be good to have this reviewed by Mary before or after deployment. Either way is fine. - Tom 2026-08-23
+- 100|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
   *"Properties are never dropped from node labels, so Node label drop order is a lie... As I look at
   Net3, it seems to me that in many cases we could see many more node labels if some of the
   requested node properties were dropped. We probably should try to implement it and then judge
