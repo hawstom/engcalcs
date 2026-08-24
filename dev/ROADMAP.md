@@ -328,11 +328,6 @@ the block.
   says things a public board should not (measured costs, what Tom is not proud of, who to ask), so a
   public board is a SECOND artifact to keep current, not this one exposed.
 
-- 75|499.01| ** Create a Scenarios menu icon **
-  - Use the paradigm of this icon, probably without the page element. Described textually, this depicts scenarios as three branched children of a main project. It might be nice to make the shape of the main (project) and children (scenarios) reminiscent of our Project icon, possibly stripped of its details and scaled down. If not, then just squares with an aspect ratio representative of a 2H x 3H plan sheet https://www.flaticon.com/free-icon/scenario_17921358?term=scenario&page=1&position=8&origin=tag&related_id=17921358
-- 75|499.02| ** Add a tip to the lpn Project menu **
-  -  'Everything unique about this application is here in one place except the animation play controls. There is no need to guess where things are.'
-  - It would be good to have this reviewed by Mary before or after deployment. Either way is fine. - Tom 2026-08-23
 - 100|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
   *"Properties are never dropped from node labels, so Node label drop order is a lie... As I look at
   Net3, it seems to me that in many cases we could see many more node labels if some of the

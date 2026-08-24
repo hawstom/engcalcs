@@ -2226,8 +2226,15 @@ var EngCalcs = EngCalcs || {};
 		var scn = activeScenario();
 		// Same "Label: value | Label: value" shape as the units readout beside it (refreshMapStatus),
 		// and no plural agreement anywhere -- "Overrides: 1" needs no rule in any of the 27 languages.
-		btn.textContent = (pc.lpn_scenario_label || 'Scenario') + ': ' + scenarioDisplayName(scn)
-			+ ' | ' + (pc.lpn_scenario_overrides || 'Overrides') + ': ' + overrideCount(scn);
+		//
+		// Through setLabel(), so this control carries its icon the way every other menu opener on the
+		// page does (ROADMAP Task 499.01) -- one plan sheet branching into three, drawn once in
+		// lib/Icons.lib.php. It rebuilds the whole content, which is why the icon has to be re-applied
+		// on every refresh rather than set once in wireScenarioButton(): the text changes on every
+		// scenario switch and on every override, and a plain textContent assignment would wipe it.
+		setLabel(btn, 'scenarios',
+			(pc.lpn_scenario_label || 'Scenario') + ': ' + scenarioDisplayName(scn)
+			+ ' | ' + (pc.lpn_scenario_overrides || 'Overrides') + ': ' + overrideCount(scn));
 	}
 	// Everything a scenario can change at once: which values the solve reads, which links are
 	// dashed, which elements are greyed out, which carry a halo, and what an open popup shows.
@@ -13831,7 +13838,16 @@ var EngCalcs = EngCalcs || {};
 			// sit here is gone (Tom, 2026-08-21). It was the one menu-bar item that opened a panel
 			// rather than a pull-down, and once Project's first row opened the same panel the bar was
 			// offering the same box twice. The toolbar button is untouched.
-			{ id: 'lpn_menu_project', icon: 'project', label: pc.lpn_menu_project || 'Project', open: openProjectBarMenu },
+			// **THE ONE MENU-BAR ITEM THAT CARRIES A TIP** (ROADMAP Task 499.02). File, Edit, Insert,
+			// View and Help are the words every application uses and explaining them would be noise;
+			// Project is this page's own invention, and it is where the things that make this page
+			// more than a form are gathered. Tom, 2026-08-24, on what it should say: "Everything
+			// unique about this application is here in one place except the animation play controls.
+			// There is no need to guess where things are."
+			{
+				id: 'lpn_menu_project', icon: 'project', label: pc.lpn_menu_project || 'Project',
+				tip: pc.lpn_menu_project_tip, open: openProjectBarMenu
+			},
 			// Last, where a Help menu goes everywhere else. One row today (Walkthroughs); it is also
 			// the home for the things that currently have none -- EPANET solver notes, keyboard
 			// shortcuts, "report a problem".
@@ -13860,9 +13876,16 @@ var EngCalcs = EngCalcs || {};
 			word.textContent = m.label;
 			b.appendChild(word);
 			b.setAttribute('aria-label', m.label);
+			// Same wiring a menu ROW's tip gets in openMenu(): the title goes on the click target
+			// itself and .ec-help is what initTips() looks for, without which the tip is unreachable
+			// on touch. The class is appended rather than assigned -- 'lpn-menubar-item' is above.
+			if (m.tip) { b.title = m.tip; b.className += ' ec-help'; }
 			b.addEventListener('click', function (e) { e.stopPropagation(); m.open(e.currentTarget); });
 			bar.appendChild(b);
 		});
+		// The bar is built after page load, so its tips are new DOM and need arming for touch --
+		// the same call openMenu() makes on a freshly built popup (ROADMAP Task 173).
+		if (EngCalcs.initTips) { EngCalcs.initTips(bar); }
 	}
 	// Swaps the tab at `id` with its neighbor in the TAB STRIP order (library.projects, which is
 	// display order, not recency -- see the note at renderTabs()). Task 252, Tom 2026-08-09: "Either

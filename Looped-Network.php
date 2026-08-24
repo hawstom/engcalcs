@@ -1310,6 +1310,7 @@ EngCalcs.pageConfig = {
 	lpn_geosearch_days: <?=json_encode(EC_GEOSEARCH_DAYS)?>,
 	lpn_menu_settings: <?=json_encode($ec_lang['lpn_menu_settings'])?>,
 	lpn_menu_project: <?=json_encode($ec_lang['lpn_menu_project'])?>,
+	lpn_menu_project_tip: <?=json_encode($ec_lang['lpn_menu_project_tip'])?>,
 	lpn_tables_menu: <?=json_encode($ec_lang['lpn_tables_menu'])?>,
 	lpn_tables_menu_tip: <?=json_encode($ec_lang['lpn_tables_menu_tip'])?>,
 	lpn_run_menu_tip: <?=json_encode($ec_lang['lpn_run_menu_tip'])?>,

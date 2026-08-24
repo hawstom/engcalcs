@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 1274,
-        "delta_key_count": 80,
+        "expected_key_count": 1275,
+        "delta_key_count": 81,
         "exempt_key_count": 18,
         "exempt_keys": [
             "u_imgd",
@@ -484,6 +484,7 @@
         "lpn_pane_print": "Print table",
         "lpn_pane_print_tip": "Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.",
         "lpn_menu_project": "Project",
+        "lpn_menu_project_tip": "Everything this page can do that a plain calculator cannot is gathered here in one menu: the settings, the panels, the tables, the profile, and the search. Only the Play controls for a run over time sit somewhere else, under the map.",
         "lpn_tables_menu": "Tables",
         "lpn_tables_menu_tip": "Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.",
         "lpn_run_menu_tip": "Recalculate this network now. Looking for a Run button? While this project recalculates after every change, the toolbar has no Run button. Turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics, and the button comes back.",
@@ -566,6 +567,7 @@
         "lpn_pane_print": "Print table",
         "lpn_pane_print_tip": "Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.",
         "lpn_menu_project": "Project",
+        "lpn_menu_project_tip": "Everything this page can do that a plain calculator cannot is gathered here in one menu: the settings, the panels, the tables, the profile, and the search. Only the Play controls for a run over time sit somewhere else, under the map.",
         "lpn_tables_menu": "Tables",
         "lpn_tables_menu_tip": "Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.",
         "lpn_run_menu_tip": "Recalculate this network now. Looking for a Run button? While this project recalculates after every change, the toolbar has no Run button. Turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics, and the button comes back.",
@@ -858,6 +860,22 @@
             }
         },
         "lpn_menu_project": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_clean_map_tip",
+                    "value": "خط حالت و خوانش مختصات را پنهان کنید تا یک نماگرفت فقط نقشه را نشان دهد. ترسیم شما دست‌نخورده می‌ماند و این انتخاب ذخیره نمی‌شود — با بارگذاری دوبارهٔ صفحه، خوانش‌ها بازمی‌گردند.",
+                    "english": "Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back."
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "تنظیمات",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_menu_project_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
