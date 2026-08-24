@@ -20,7 +20,7 @@
 // (Tom, 2026-08-14), and the fit test that decides whether one is drawn at all must use the same
 // 75% -- a smaller arrow that still reserves the old space is a half-applied change nobody sees.
 
-const { setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { setUnitSet, loadLoopedNetwork, settleEpanet } = require('./lpn-dom-stub.js');
 const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
 const L = loadLoopedNetwork(
@@ -64,6 +64,12 @@ function popupRow(match) {
 	return null;
 }
 
+// ASYNC BECAUSE THE ENGINE IS (ROADMAP Task 496). The shipped gallery example this fixture opens
+// carries `"engine": "epanet"`, so runSolve() hands it to the real EPANET engine and comes back
+// before any answer exists -- which is what a visitor's browser does too. Reading a label on the
+// next line got empty strings. settleEpanet() waits for the solve the page started.
+async function main() {
+
 console.log('=== solve results: which sign reaches the reader ===');
 
 setUnitSet('us');
@@ -71,6 +77,7 @@ L.buildLayers();
 L.seedDefaultInputs();
 openExample(L);
 L.runSolve();
+await settleEpanet();
 
 const raw = EngCalcs.lpnSolve(L.assembleModel(), { tol: 1e-9 });
 const doc = L.getDoc();
@@ -155,3 +162,6 @@ ok('...and arrowFactor() is 75% of the symbol size',
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);
+
+}
+main().catch(function (e) { console.log('  FAIL harness threw -- ' + (e && e.stack || e)); process.exit(1); });

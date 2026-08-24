@@ -6,7 +6,7 @@
 // a wrong answer delivered confidently to all of them. This one cost three rounds of "the harness
 // passes and the browser does nothing", and the fix was attempted and reverted twice.
 //
-// The four properties below are the ones that were wrong, each with the shape of the failure:
+// The five properties below are the ones that were wrong, each with the shape of the failure:
 //
 //   1. **Text width follows FONT SIZE.** A real label's font size is a WORLD quantity
 //      (`textSize / state.s`), so its world width changes with every zoom. A stub returning
@@ -22,6 +22,8 @@
 //   4. **firstChild sees the text node.** Without it the standard
 //      `while (firstChild) removeChild(firstChild)` teardown clears nothing at all -- and with it,
 //      removeChild must actually clear the text, or that same loop never ends.
+//   5. **There is a real EPANET engine behind it.** Without one `settings.engine` cannot mean
+//      anything, and every harness passes identically on both engines -- see section 5.
 
 const { mkEl } = require('./lpn-dom-stub.js');
 
@@ -115,6 +117,26 @@ function text(words) { const t = mkEl('text'); t.textContent = words; return t; 
 	ok('the standard while-loop terminates', guard < 100, 'iterations ' + guard);
 	ok('...and really clears the text', t.textContent === '', JSON.stringify(t.textContent));
 	ok('an empty element has no firstChild', t.firstChild === null);
+}
+
+// ---- 5. the stub HAS an engine ------------------------------------------------------------------
+// The fifth property, and the one that was missing for the longest (ROADMAP Task 496): runSolve()
+// routes to EPANET only where EngCalcs.lpnSolveEpanet exists, so a stub without it holds the whole
+// engine choice constant and every harness passes identically on 'native' and 'epanet' -- with
+// nothing routed to EPANET under test at all. Asserted HERE, in the stub's own harness, because
+// the failure is silent everywhere else: nothing errors, the numbers are real, they simply always
+// come from the same engine. dev/lpn-spike/engine-route-harness.js is what checks the route is
+// taken; this is what checks the road exists.
+{
+	console.log('\n--- the vendored EPANET engine is really loaded ---');
+	const EngCalcs = global.EngCalcs;
+	ok('lpnSolveEpanet exists, so settings.engine can mean something',
+		typeof EngCalcs.lpnSolveEpanet === 'function', typeof EngCalcs.lpnSolveEpanet);
+	ok('lpnEpanetLoad exists and needs no url in Node',
+		typeof EngCalcs.lpnEpanetLoad === 'function', typeof EngCalcs.lpnEpanetLoad);
+	ok('the one place the native/EPANET line is drawn is present',
+		typeof EngCalcs.lpnValveIsNative === 'function' &&
+		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'PRV' }) === false);
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

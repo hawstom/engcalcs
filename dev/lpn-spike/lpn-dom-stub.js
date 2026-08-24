@@ -512,6 +512,68 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-profile.js'));
 // wrong thing.
 require(ROOT + 'js/lpn-ramps.js');
 
+// ---- the REAL EPANET engine (ROADMAP Task 496) ---------------------------
+//
+// **WITHOUT THIS, `settings.engine` MEANT NOTHING HERE.** runSolve() routes to EPANET only when
+// `EngCalcs.lpnSolveEpanet` exists; this stub never defined it, so every harness fell through to
+// the native solver whatever the setting said and passed identically on both engines -- with
+// nothing routed to EPANET (PRV/PSV/FCV included) under test at all. That is a stub holding the
+// coupling constant, the exact failure dev/testing-notes.md names.
+//
+// The engine really does run headless: js/vendor/epanet-js.js is an ES module and Node's dynamic
+// `import()` takes it from a file:// URL, which is what dev/lpn-spike/validate_epanet.js and
+// eps-net3-harness.js have been doing all along. Measured here: ~16 ms to import once, ~35 ms for
+// the first solve, sub-ms after. The only thing Node cannot do is the browser's DEFAULT url --
+// '/engcalcs/js/vendor/epanet-js.js' is a site-absolute path with no origin -- so the default is
+// filled in below. Nothing else about the bridge is changed, and the browser path is untouched.
+//
+// One piece of Node noise is silenced, and only this one: the first import of the vendored engine
+// prints MODULE_TYPELESS_PACKAGE_JSON, which is a remark about this repo having no package.json
+// "type" field and lands in the middle of a harness's assertions. Every other warning still prints.
+process.removeAllListeners('warning');
+process.on('warning', function (w) {
+	if (w && w.code === 'MODULE_TYPELESS_PACKAGE_JSON') { return; }
+	console.error(w && (w.stack || w.message) || String(w));
+});
+require(ROOT + 'js/lpn-epanet.js');
+const NODE_ENGINE_URL = 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js');
+{
+	const browserLoad = global.EngCalcs.lpnEpanetLoad;
+	global.EngCalcs.lpnEpanetLoad = function (url) { return browserLoad(url || NODE_ENGINE_URL); };
+}
+// A COUNTER AND A SETTLE POINT, because the engine is asynchronous and the page is not.
+// runSolveEpanet() hands the result back through a promise the caller cannot see, so a harness
+// that called solveNow() and read the results on the next line would be reading the PREVIOUS
+// solve -- a stale-but-plausible number, the worst kind. `epanetSolves()` is also the direct
+// observable a harness asserts on to prove the route was taken; the physics assertion (the two
+// engines' Chezy-Manning constants differ by 0.6%) is what proves the ANSWER came from there.
+// This wraps rather than replaces: the real lpnSolveEpanet still does all the work.
+let epanetCalls = 0, epanetPending = [];
+{
+	const realSolve = global.EngCalcs.lpnSolveEpanet;
+	global.EngCalcs.lpnSolveEpanet = function (model, options) {
+		epanetCalls++;
+		const p = realSolve.call(this, model, options);
+		epanetPending.push(p);
+		return p;
+	};
+}
+/** How many times the page has actually handed a network to EPANET. */
+function epanetSolves() { return epanetCalls; }
+/** Warm the engine once, so a later solve settles in a couple of turns rather than an import. */
+function warmEpanet() { return global.EngCalcs.lpnEpanetLoad(); }
+/** Await every EPANET solve the page has started, including any it starts while settling. */
+async function settleEpanet() {
+	for (let guard = 0; guard < 50 && epanetPending.length; guard++) {
+		const batch = epanetPending;
+		epanetPending = [];
+		await Promise.allSettled(batch);
+		await new Promise((r) => setTimeout(r, 0));
+	}
+	// One more turn for the .then() that applies the result to the page.
+	await new Promise((r) => setTimeout(r, 0));
+}
+
 // The pointer handlers hit-test through document.elementFromPoint rather than trusting e.target (a
 // real tap moves a few pixels between down and up). A test sets this to whatever it is pretending
 // is under the pointer; null means bare canvas.
@@ -567,4 +629,5 @@ function loadLoopedNetwork(injectSource, preludeSource) {
 	return global.__LPN;
 }
 
-module.exports = { ROOT, mkEl, byId, ensure, unitSelects, setUnitSet, setHitTarget, loadLoopedNetwork, LPN_UNIT_PRESETS, GPM, FT, IN };
+module.exports = { ROOT, mkEl, byId, ensure, unitSelects, setUnitSet, setHitTarget, loadLoopedNetwork, LPN_UNIT_PRESETS, GPM, FT, IN,
+	NODE_ENGINE_URL, epanetSolves, warmEpanet, settleEpanet };

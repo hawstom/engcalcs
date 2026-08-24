@@ -32,6 +32,19 @@ or `dev/calc-spike/` and reserve his time for what genuinely needs a real browse
   suspect the stub before the code:** ask which quantity the real thing varies that the stub holds
   constant. Fix by teaching the stub the one physical relationship under test, not by adding
   assertions.
+- **A MISSING FUNCTION IS A HELD-CONSTANT COUPLING TOO, and it is the quietest kind.** The same stub
+  never defined `EngCalcs.lpnSolveEpanet`, and `runSolve()` routes to EPANET only where that exists —
+  so every lpn harness fell through to the native solver whatever `settings.engine` said, passed
+  identically on both engines, and left everything routed to EPANET untested, PRV/PSV/FCV included.
+  The shipped gallery example says `"engine": "epanet"` and was being solved natively in three
+  harnesses that read numbers off the map. The engine really does run headless — Node's dynamic
+  `import()` takes `js/vendor/epanet-js.js` from a `file://` URL, ~16 ms once — so the fix was to
+  load it, not to write assertions around the gap. **The observable a routing test asserts on must
+  be PHYSICS, not a flag:** a counter saying "EPANET was called" still passes if the answer came
+  from elsewhere, so `engine-route-harness.js` pins the one place the two engines knowingly
+  disagree (Chezy-Manning, EPANET's head loss 0.9939–0.9944 of ours) and a fall-back reads 1.0000.
+  The cost of a real engine is that a solve is now ASYNCHRONOUS: `settleEpanet()` waits for it, and
+  a harness that reads a label on the next line reads the *previous* answer.
 - **IDEMPOTENCE IS THE CHEAPEST STRONG ASSERTION** for anything that sets a view or a layout. Tom's
   test for zoom-to-fit was *"open, reload, or switch and then zoom extents. Ideally nothing
   happens"* — and it found a defect that start-independence testing had missed. Applying an operation
