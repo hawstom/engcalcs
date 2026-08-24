@@ -825,9 +825,7 @@
         "lpn_replace_scope": "Choose one kind of asset above to change values on.",
         "lpn_profile_menu": "Profile",
         "lpn_profile_tip": "Draw the ground and the hydraulic grade line along a path through the network.",
-        "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title": "Profile along a path",
-        "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_profile_from": "From",
         "lpn_profile_to": "To",
         "lpn_profile_pick": "Add nodes to the route by clicking them on the map",
@@ -1347,7 +1345,7 @@
         "lpn_terrain_missed": "{m} could not be read and are still blank.",
         "lpn_terrain_partial": "{f} terrain tile(s) did not answer."
     },
-    "count": 1345,
+    "count": 1343,
     "active_prefixes": [
         "about",
         "bpn",

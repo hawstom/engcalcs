@@ -1591,10 +1591,16 @@ $ec_lang['lpn_replace_scope']='Choose one kind of asset above to change values o
 // {u} is a unit name, {n} a count and {len} a length; they are substituted, not concatenated, so a
 // language that puts the unit somewhere else can.
 $ec_lang['lpn_profile_menu']='Profile';
+// **THE SYNONYMS ARE IN THE SYNONYM CHANNEL, WHICH IS WHERE THEY WERE ALWAYS MEANT TO BE.** They
+// shipped as `lpn_profile_tip_syn` / `lpn_profile_title_syn` -- ordinary $ec_lang keys with no call
+// site, which nothing rendered and which a sprint would have translated into 26 languages for
+// nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
+// are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
+// permission $ec_lang_syn requires. Same text, correct array.
 $ec_lang['lpn_profile_tip']='Draw the ground and the hydraulic grade line along a path through the network.';
-$ec_lang['lpn_profile_tip_syn']='Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.';
+$ec_lang_syn['lpn_profile_tip']='Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.';
 $ec_lang['lpn_profile_title']='Profile along a path';
-$ec_lang['lpn_profile_title_syn']='Profile or cross section along a path, route, or way';
+$ec_lang_syn['lpn_profile_title']='Profile or cross section along a path, route, or way';
 $ec_lang['lpn_profile_from']='From';
 $ec_lang['lpn_profile_to']='To';
 $ec_lang['lpn_profile_pick']='Add nodes to the route by clicking them on the map';

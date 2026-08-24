@@ -146,8 +146,8 @@
         "leftover/misfiled content meant for $ec_lang_syn (most likely)",
         "a genuinely unwired future call site (dead for now, intentionally parked)"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "Needs a human call: either exclude lpn_profile_tip_syn / lpn_profile_title_syn from this sprint's scope as key debt (key_hygiene_check.php territory), or wire them to a real call site first. Recommend excluding from sprint 459 pending that decision -- translating dead keys is pure waste and the correct fix (moving the content into $ec_lang_syn) needs Tom's written approval per the off-limits rule."
+      "disposition": "intent",
+      "resolution": "RULED AND APPLIED 2026-08-24. Tom: \"there is a tip on Profile menu and Profile tab, identical. In other words, these are real strings. And these _syns are really needed. Are they simply keyed wrong? I guess 1. My mistake.\" -- which is the written permission $ec_lang_syn requires, and it also settles the confusion: lpn_profile_tip and lpn_profile_title ARE rendered (the menu row and the pane tab share one tip); it was only the _syn twins that nothing displayed. Both moved verbatim into $ec_lang_syn beside the keys they describe, and the two orphan $ec_lang keys deleted. No sprint now pays to translate a string nobody sees, and the synonyms reach translators through the channel written for them."
     }
   ]
 }

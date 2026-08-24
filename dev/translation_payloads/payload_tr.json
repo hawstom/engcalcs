@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 1345,
-        "delta_key_count": 155,
+        "expected_key_count": 1343,
+        "delta_key_count": 153,
         "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
@@ -568,8 +568,6 @@
         "lpn_replace_none": "Nothing would change.",
         "lpn_replace_no_value": "Type the new value.",
         "lpn_replace_scope": "Choose one kind of asset above to change values on.",
-        "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
-        "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_profile_draw": "Choose the path on the map",
         "lpn_profile_draw_stop": "Stop choosing",
         "lpn_profile_draw_start": "Click the node where the path starts.",
@@ -725,8 +723,6 @@
         "lpn_replace_none": "Nothing would change.",
         "lpn_replace_no_value": "Type the new value.",
         "lpn_replace_scope": "Choose one kind of asset above to change values on.",
-        "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
-        "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_profile_draw": "Choose the path on the map",
         "lpn_profile_draw_stop": "Stop choosing",
         "lpn_profile_draw_start": "Click the node where the path starts.",
@@ -1494,38 +1490,6 @@
                     "key": "lpn_profile_menu",
                     "value": "Profil",
                     "english": "Profile"
-                }
-            }
-        },
-        "lpn_profile_tip_syn": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_profile_tip",
-                    "value": "Şebeke boyunca seçilen bir güzergah üzerinde zemini ve hidrolik gradyan çizgisini çizin.",
-                    "english": "Draw the ground and the hydraulic grade line along a path through the network."
-                },
-                "next_translated": {
-                    "key": "lpn_profile_title",
-                    "value": "Güzergah boyunca profil",
-                    "english": "Profile along a path"
-                }
-            }
-        },
-        "lpn_profile_title_syn": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_profile_title",
-                    "value": "Güzergah boyunca profil",
-                    "english": "Profile along a path"
-                },
-                "next_translated": {
-                    "key": "lpn_profile_from",
-                    "value": "Başlangıç",
-                    "english": "From"
                 }
             }
         },
