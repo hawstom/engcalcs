@@ -1474,6 +1474,11 @@ $ec_lang['lpn_clean_map_tip']='Take the mode line and the coordinate readout off
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 $ec_lang['lpn_menu_project']='Project';
+// THE ONE MENU-BAR ITEM WITH A TIP (Task 499.02). The other five are the words every application
+// uses; this one is ours, and the tip says what a person gains by opening it. Tom, 2026-08-24:
+// "Everything unique about this application is here in one place except the animation play controls.
+// There is no need to guess where things are."
+$ec_lang['lpn_menu_project_tip']='Everything this page can do that a plain calculator cannot is gathered here in one menu: the settings, the panels, the tables, the profile, and the search. Only the Play controls for a run over time sit somewhere else, under the map.';
 $ec_lang['lpn_tables_menu']='Tables';
 $ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run

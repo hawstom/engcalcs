@@ -381,6 +381,26 @@ $ec_icons = array(
 		. '<path stroke-width="0.525" d="M13.2 19.4H17.6"/>'
 		. '<path stroke-width="0.525" d="M13.2 20.8H17.6"/>',
 
+	// SCENARIOS: one plan sheet branching into three (ROADMAP Task 499.01). The physical object is the
+	// same one the 'project' icon draws — a sheet of the plan set — because that is what a scenario IS
+	// here: the whole project again, with a few values changed. Tom, 2026-08-24: "three branched
+	// children of a main project... squares with an aspect ratio representative of a 2H x 3H plan
+	// sheet." So every rectangle is 3 wide by 2 high, the parent 9x6 and each child 6x4, and the
+	// branch is the ordinary trunk-spine-stub of a family tree.
+	//
+	// The 'project' icon's own DETAIL is deliberately dropped, which Tom offered as the fallback in
+	// the same note. It was drawn with a title-block band on the parent and measured at 17 px: the
+	// parent's 5-unit interior closed up to 1.5 units, about one pixel, so the sheet read as a solid
+	// block. A hint nobody can resolve is not a hint. Verify with
+	// `php dev/scripts/icon_ascii_preview.php scenarios --size=17` before changing any number here.
+	'scenarios'  => '<rect x="1.5" y="9" width="9" height="6"/>'
+		. '<rect x="16.5" y="3.5" width="6" height="4"/>'
+		. '<rect x="16.5" y="10" width="6" height="4"/>'
+		. '<rect x="16.5" y="16.5" width="6" height="4"/>'
+		. '<path d="M10.5 12h6"/>'
+		. '<path d="M13.5 5.5v13"/>'
+		. '<path d="M13.5 5.5h3M13.5 18.5h3"/>',
+
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
 	// version of that." Two interlocking horizontal capsules — a chain link lying flat, which is

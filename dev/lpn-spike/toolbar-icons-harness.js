@@ -162,5 +162,42 @@ console.log('\n-- the strings exist, in English only --');
 		'and none of them carries a tag — plainTextBoundKeys() cannot see this path');
 }
 
+// **THE MENU BAR IS NOT THE TOOLBAR, and the two rules are opposite** (ROADMAP Tasks 499.01, 499.02).
+// A toolbar button is icon-ONLY and must therefore go through setIconLabel(); a menu-bar item keeps
+// its word, so it goes through setLabel() and the icon is a prefix. What this section guards is the
+// two places that convention was incomplete: the Scenario readout had no icon at all, and no
+// menu-bar item could carry a tip because nothing wired one.
+console.log('\n-- the scenario control carries the shared icon --');
+{
+	const st = strip(fnBody(src, 'refreshScenarioStatus'));
+	report(/setLabel\(btn, 'scenarios'/.test(st),
+		'refreshScenarioStatus() builds the readout through setLabel() with the scenarios icon');
+	// The readout is rebuilt on every scenario switch and every override, so a bare textContent
+	// assignment anywhere in here would wipe the icon on the first change.
+	report(!/btn\.textContent =/.test(st),
+		'...and never assigns textContent, which would drop the icon on the next refresh');
+	report(/'scenarios'\s*=>/.test(icons), 'scenarios is in lib/Icons.lib.php, the one icon set');
+	// Geometry in the PHP set and nowhere else -- the same rule the transport glyphs came home to.
+	report(!/<rect x="16\.5"|M13\.5 5\.5/.test(src),
+		'and js/looped-network.js draws no path of its own for it');
+}
+
+console.log('\n-- the Project menu carries a tip --');
+{
+	const bar = strip(fnBody(src, 'buildMenuBar'));
+	report(/tip: pc\.lpn_menu_project_tip/.test(bar), 'the Project item declares a tip');
+	report(/b\.title = m\.tip/.test(bar), '...and buildMenuBar() puts it on the button as a title');
+	report(/ec-help/.test(bar), '...with .ec-help, the only selector initTips() wires');
+	report(/EngCalcs\.initTips\(bar\)/.test(bar),
+		'...and arms it, because the bar is built after page load and a tip built late is dead on touch');
+	report(en.indexOf("$ec_lang['lpn_menu_project_tip']") >= 0,
+		'lpn_menu_project_tip is in lib/lang.ec.en.php');
+	const line = en.split('\n').find(l => l.indexOf("$ec_lang['lpn_menu_project_tip']") === 0);
+	report(!!line && !/<[a-z]/i.test(line),
+		'...and carries no tag -- it reaches a title= through pageConfig, where Rule B cannot see it');
+	const page = fs.readFileSync(path.join(ROOT, 'Looped-Network.php'), 'utf8');
+	report(page.indexOf('lpn_menu_project_tip:') >= 0, '...and is bridged into pageConfig');
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);
