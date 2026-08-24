@@ -94,6 +94,17 @@ anything else → false.
 | `js/looped-network.js` | `lpn_` map editor |
 | `css/engcalcs.css` | App-wide styles |
 
+### Specialist agents (`.claude/agents/`, journals in `dev/agents/`)
+
+Persistent agents with a library, a journal and a research programme. First hire 2026-08-24:
+`utility-planning-engineer` — the design-and-planning engineer inside a water utility, the one seat
+nobody here has worked (Tom: *"Scale is my big and first blind spot... I have designed many Elm
+Street Center projects, but no Novatos."*). **An agent must carry something this repo does not
+already have** — external evidence, or a vantage point nobody occupies; an agent briefed from our
+own prose is an echo chamber in a second voice. Roster, the provenance rules, and the seats named
+but not filled: `dev/agents/README.md`. Candidate features it turns up go in its own hopper; it
+never edits `dev/ROADMAP.md`.
+
 ### Dev folder (`dev/`, blocked from web access)
 
 | Path | Purpose |
