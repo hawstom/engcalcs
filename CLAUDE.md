@@ -102,8 +102,9 @@ nobody here has worked (Tom: *"Scale is my big and first blind spot... I have de
 Street Center projects, but no Novatos."*). **An agent must carry something this repo does not
 already have** — external evidence, or a vantage point nobody occupies; an agent briefed from our
 own prose is an echo chamber in a second voice. Roster, the provenance rules, and the seats named
-but not filled: `dev/agents/README.md`. Candidate features it turns up go in its own hopper; it
-never edits `dev/ROADMAP.md`.
+but not filled: `dev/agents/README.md`. **Each agent keeps its own ranked wish list** — its
+priorities, in its order, expected to disagree with `dev/ROADMAP.md` and to say why. An agent
+never edits the roadmap; promoting a row is Tom's call.
 
 ### Dev folder (`dev/`, blocked from web access)
 

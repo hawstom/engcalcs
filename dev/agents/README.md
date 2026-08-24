@@ -5,9 +5,15 @@ agent. An agent starts every invocation with no memory of any previous one — i
 the only continuity it has. See `project-specialist-agent-roster` for why an agent must carry
 something this repository does not already have.
 
-| Agent | Seat | Journal |
+| Agent | Seat | Files |
 |---|---|---|
-| `utility-planning-engineer` | Design and planning inside a water utility — the system, not the parcel | `utility-planning-engineer/journal.md` |
+| `utility-planning-engineer` | Design and planning inside a water utility — the system, not the parcel | `journal.md`, `wishlist.md` |
+
+**Each agent keeps a journal and a wish list.** The journal is what it learned; the wish list is
+what it would build next, in its own order. Tom, 2026-08-24: *"We all have our pet priorities, and
+the utility engineer should have theirs."* A wish list is expected to DISAGREE with
+`dev/ROADMAP.md` — that disagreement is most of what a seat is for. No agent edits the roadmap;
+promoting a row is Tom's call.
 
 **Every journal entry carries one provenance tag.** CITED = external source, named. OBSERVED
 = this repository, `path:line`. SPECULATION = the agent's own inference. The first two may be
