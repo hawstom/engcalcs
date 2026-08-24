@@ -15303,6 +15303,16 @@ var EngCalcs = EngCalcs || {};
 	//
 	// `k` is the multiplier: a value means v in the OLD unit, so its number in the new one is
 	// v * fNew / fOld, both factors being units per SI.
+	//
+	// **AND IT IS THE ONE EDIT THAT MUST NOT GO THROUGH setProp()** -- said here because a reader who
+	// knows the write seam will reach for it. setProp() asks "Base or scenario?" and records an
+	// OVERRIDE when the answer is a scenario, which is exactly right for editing one element and
+	// exactly wrong here: this rewrites the DOCUMENT, Base and every scenario's overrides together,
+	// because a unit change is not about one scenario's value but about what all of them mean. Going
+	// through the seam would leave Base in the old unit and mint an override on every element of
+	// whichever scenario happened to be open. The writes are dynamic (`obj[prop]`), so
+	// scenario_seam_check.php cannot see them either way; this paragraph is the justification the
+	// check would otherwise be asking for.
 	function convertUnitValues(name, k) {
 		var n = 0;
 		function conv(obj, prop) {
@@ -15390,21 +15400,73 @@ var EngCalcs = EngCalcs || {};
 		if (JSON.stringify([doc, scenarios]) !== before) { setNotice('unit count mutated the document'); }
 		return n;
 	}
+	// **NO QUESTION WHEN THERE IS NOTHING TO DECIDE** (ROADMAP Task 425). The dialog is for a project
+	// that ALREADY HAS CONTENT. With no stored number in this quantity -- an empty project, or one
+	// whose elements simply carry nothing this unit decides -- Non-destructive and Destructive end at
+	// the same document, so the question has no answer that matters and a modal in front of the
+	// commonest first action on the page is pure cost. countUnitValues() is the exact test rather
+	// than "is doc.nodes empty": it counts the very numbers a conversion would rewrite, so the two
+	// can never disagree.
+	function unitChangeNeedsDialog(name) { return countUnitValues(name) > 0; }
+	// The question, in Tom's own words (2026-08-18), and NOT paraphrased: the title, the lead line,
+	// the field names ONE PER LINE rather than a comma list, and the two options named by what they
+	// do to the numbers already typed.
+	//
+	// The list is one element per name because a comma list is what he asked it not to be -- a
+	// reader scanning for "is my elevation in this?" reads a column, not a sentence.
+	//
+	// THE LEAD IS `lpn_units_warn_lead`, NOT the `lpn_units_warn_body` it replaces. The old key put the
+	// field names inside the sentence as `{list}`; the column is now built here, so an edit in place
+	// would have left 26 translations carrying a placeholder the page no longer fills -- a literal
+	// "{list}" on the map, which lang_tag_parity_check.php is blocking for exactly that reason. A new
+	// key falls back to English until a sprint reaches it, which is the correct untranslated state.
+	function buildUnitDialogBody(body, sel, name, to) {
+		var pc = EngCalcs.pageConfig || {}, fields = unitServes(name);
+		var h = document.createElement('div'), lead = document.createElement('div');
+		var list = document.createElement('div'), oh = document.createElement('div');
+		h.style.fontWeight = 'bold';
+		h.textContent = pc.lpn_units_warn_title || 'This unit decides what your inputs mean';
+		body.appendChild(h);
+		lead.textContent = String(pc.lpn_units_warn_lead || '{unit} is the unit of what you enter for:')
+			.replace('{unit}', unitLabelFor(sel, to));
+		body.appendChild(lead);
+		list.className = 'lpn-unit-fields';
+		fields.forEach(function (f) {
+			var row = document.createElement('div');
+			row.textContent = f;
+			list.appendChild(row);
+		});
+		body.appendChild(list);
+		oh.style.fontWeight = 'bold';
+		oh.textContent = pc.lpn_units_options_head || 'Options for units change:';
+		body.appendChild(oh);
+		[pc.lpn_units_nondestructive_desc, pc.lpn_units_destructive_desc].forEach(function (t) {
+			var d = document.createElement('div');
+			d.textContent = t || '';
+			body.appendChild(d);
+		});
+	}
 	function onInputUnitChange(sel, name) {
 		var pc = EngCalcs.pageConfig || {}, from = unitPrev[name], to = unitKey(name);
 		if (!from || !to || from === to) { rememberUnitSelections(); return; }
-		// Put it back until the question is answered. Nothing acts on the new unit before then.
+		if (!unitChangeNeedsDialog(name)) {
+			// Nothing typed that this unit decides, so the new unit simply stands. Still saved: the
+			// units are part of the PROJECT (there are no browser units on this page), so the choice
+			// has to survive the next open exactly as an element would.
+			rememberUnitSelections();
+			afterUnitChange();
+			return;
+		}
+		// Put it back until the question is answered. Nothing acts on the new unit before then --
+		// which is also what makes Cancel free: the select never left the unit it was on.
 		applyOneUnit(name, from);
-		openDialog(function (body) {
-			var h = document.createElement('div'), p2 = document.createElement('div');
-			h.style.fontWeight = 'bold';
-			h.textContent = pc.lpn_units_warn_title || 'This unit decides what your numbers mean';
-			p2.textContent = String(pc.lpn_units_warn_body || '')
-				.replace('{unit}', unitLabelFor(sel, to))
-				.replace('{list}', unitServes(name).join(', '));
-			body.appendChild(h); body.appendChild(p2);
-		}, [
-			{ label: pc.lpn_units_reinterpret || 'Reinterpret (change what they mean)', fn: function () {
+		openDialog(function (body) { buildUnitDialogBody(body, sel, name, to); }, [
+			// **NON-DESTRUCTIVE IS FIRST, AND IT IS THE SUITE'S STANDING BEHAVIOUR** -- "changing a
+			// unit reinterprets the typed number; it does not convert it", which CLAUDE.md marks
+			// absolute and which this page was once the one place to break. Destructive is the
+			// opt-in and must never become the quiet path: it is reached only by pressing the button
+			// that says what it does.
+			{ label: pc.lpn_units_nondestructive || 'Non-destructive', fn: function () {
 				var n = countUnitValues(name);
 				applyOneUnit(name, to);
 				rememberUnitSelections();
@@ -15412,7 +15474,26 @@ var EngCalcs = EngCalcs || {};
 				setNotice(String(pc.lpn_status_reinterpreted || '{n} values now mean {unit}. Nothing was rewritten.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
 			} },
-			{ label: pc.lpn_units_convert || 'Convert them all', fn: function () {
+			// **THE UNDO SNAPSHOT IS THE BACKUP, AND NO SECOND COPY IS OFFERED** (Task 425's open
+			// question, answered here).
+			//
+			// A Destructive change is a user-initiated edit of the document, so it gets exactly what
+			// every other edit gets: one snapshot, taken before anything moves, on the same 20-deep
+			// stack. A separate backup would be a second document with no home -- this page has one
+			// document and one undo stack (Task 184) -- and offering the choice would put a second
+			// question inside a dialog whose whole job is to ask one, at the moment the user is
+			// already deciding something harder.
+			//
+			// What was genuinely missing was not a backup but HALF AN UNDO: the snapshot carried the
+			// numbers and not the UNITS, so Ctrl+Z gave back the original values with the NEW unit
+			// still on the strip -- silently landing the user in the Non-destructive outcome they
+			// had just declined. saveUndoSnapshot() now records readUnitSelections() and undo()
+			// restores it, so one Ctrl+Z reverts the whole change.
+			//
+			// The one limit, stated because it is the only way to lose these numbers: switching
+			// projects clears the undo stack (clearUndo()), so after a project switch the original
+			// inputs live only in the file on disk -- which is untouched until the user saves.
+			{ label: pc.lpn_units_destructive || 'Destructive', fn: function () {
 				var fOld = EngCalcs.unitFactors[from], fNew = EngCalcs.unitFactors[to], n;
 				saveUndoSnapshot();
 				applyOneUnit(name, to);
@@ -15421,7 +15502,10 @@ var EngCalcs = EngCalcs || {};
 				afterUnitChange();
 				setNotice(String(pc.lpn_status_converted || '{n} values were rewritten into {unit}.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
-			} }
+			} },
+			// Cancel does nothing on purpose, and there is nothing for it to do: the select was put
+			// back before the dialog opened, no snapshot was taken, and no number was read.
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
 		]);
 	}
 	function applyOneUnit(name, key) {
@@ -19613,7 +19697,13 @@ var EngCalcs = EngCalcs || {};
 			// duplicates the ten numbers a scale or move changes and SHARES the one string, which is
 			// safe because strings are immutable: nothing can edit an image through a shared
 			// reference, and loading a new file assigns a whole new object.
-			backdrop: backdrop ? Object.assign({}, backdrop) : null
+			backdrop: backdrop ? Object.assign({}, backdrop) : null,
+			// **THE UNITS RIDE WITH THE DOCUMENT TOO** (ROADMAP Task 425). A bare number means
+			// nothing without them, so a snapshot that restored 1000 while the strip said metres
+			// would be half an undo -- and that is exactly what a Destructive unit change hit:
+			// Ctrl+Z gave back the original inputs under the NEW unit, quietly landing the user in
+			// the Non-destructive outcome they had just declined. Ten small strings per snapshot.
+			units: readUnitSelections()
 		});
 		if (undoStack.length > UNDO_LIMIT) { undoStack.shift(); }
 	}
@@ -19639,6 +19729,12 @@ var EngCalcs = EngCalcs || {};
 		// Restored too, because a snapshot taken in one scenario and undone from another would
 		// otherwise leave the map showing a scenario the restored values were never about.
 		if (scenarios.some(function (s) { return s.id === snap.state.active; })) { project.activeScenario = snap.state.active; }
+		// The units the restored numbers were typed in. Restored for every undo, not only the one
+		// after a unit change: a snapshot describes the state at one moment, and the unit is part of
+		// what a number meant at that moment. rememberUnitSelections() follows so the next change
+		// compares against the unit now on the strip rather than the one undone away.
+		if (snap.units && applyUnitSelections(snap.units)) { refreshMapStatus(); }
+		rememberUnitSelections();
 		recountNextId();
 		closePopup(); // whatever it referenced may no longer exist post-undo (e.g. undoing an Add)
 		buildDom();
