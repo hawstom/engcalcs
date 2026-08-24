@@ -728,16 +728,16 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 		'...and is not a border, which under border-collapse would scroll on its own');
 
 	// 4. THE PHONE-ONLY WIDTHS on the two columns Tom named, and the desktop that must not move.
-	report(width(cell('th', 'roughness', true, false), SMALL) === '4.2em' &&
-		width(inputIn('roughness'), SMALL) === '2.6em',
-		'Roughness narrows below the breakpoint -- 0.60 of its column, 0.74 of its box');
-	// 2.19em, not the 1.75em it narrowed to first: Tom scaled the phone box 1.25x on 2026-08-23
-	// after using it, the same pass that scaled the desktop one 1.5x. The COLUMN stays at 2.9em --
-	// that width is held by its heading breaking into four lines, not by the box inside it.
-	report(width(inputIn('km'), SMALL) === '2.19em',
-		'...and the Minor loss box is 1.25x what it narrowed to');
-	report(width(cell('th', 'km', true, false), SMALL) === '2.9em',
-		'...inside a column that stops at four lines of heading rather than six');
+	// Both were widened again in round 3 (2026-08-23). Roughness stops at 3.5em, the width every
+	// other phone box in these tables already has, rather than the 2.5 factor asked for -- the
+	// stylesheet states why. Minor loss takes the same 1.4 its desktop box took.
+	report(width(cell('th', 'roughness', true, false), SMALL) === '5em' &&
+		width(inputIn('roughness'), SMALL) === '3.5em',
+		'Roughness on a phone is the phone default box, not a narrower one');
+	report(width(inputIn('km'), SMALL) === '3em',
+		'...and the Minor loss box took the same 1.4 the desktop one took');
+	report(width(cell('th', 'km', true, false), SMALL) === '3.7em',
+		'...inside a column widened with it, which only shortens its heading');
 	report(CSS.winning(CSS.rules, cell('th', 'roughness', true, false), SMALL, 'overflow-wrap', blind) === 'anywhere',
 		'a narrowed heading may break mid-word -- it is that or an abbreviation, and an abbreviation ' +
 		'is 26 translations');
@@ -780,8 +780,8 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 		['reservoirs', 'elev', 3.5, 4], ['reservoirs', 'head', 3.5, 4],
 		['tanks', 'level', 3.5, 4], ['tanks', 'minLevel', 3.5, 4], ['tanks', 'maxLevel', 3.5, 4],
 		['tanks', 'tankDiameter', 3.5, 4],
-		['pipes', 'diameter', 2.1, 4, true], ['pipes', 'length', 4.2, 5],
-		['pipes', 'roughness', 2.31, 3], ['pipes', 'km', 2.1, 3]
+		['pipes', 'diameter', 3, 4], ['pipes', 'length', 4.2, 5],
+		['pipes', 'roughness', 6, 6], ['pipes', 'km', 3, 3]
 	];
 	WANT.forEach(([tid, key, em, needs, narrow]) => {
 		const col = L.tableCols(tid).filter((c) => c.key === key)[0];
@@ -796,18 +796,16 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 			report(chars(em) >= needs, '...and ' + em + 'em shows ' + chars(em) + ' characters, needing ' + needs);
 		}
 	});
-	// **ONE NARROW COLUMN LEFT, AND THE UNTESTED BELIEF IT RESTS ON.** Tom asked for 0.2 on Minor
-	// loss and 0.3 on Diameter, was shown that 1.4em displays one character of "2.5" and 2.1em three
-	// of an SI diameter's "1200", widened both, then reversed himself the same day (2026-08-23) on a
-	// different ground: *"inputs are flexible. You can enter more than their width."*
-	//
-	// **MINOR LOSS IS BACK AT 2.1em, and NOT because that test was run** -- he asked for the box
-	// 1.5x wider on PC after using it (2026-08-23), which lands on the same number by a different
-	// route. **THE TEST IS STILL OUTSTANDING** (ROADMAP Task 495) and Diameter still rides on it: if
-	// a narrow box turns out to truncate or hide what was typed, 2.8em is the width to restore
-	// there.
-	report(chars(2.1) < 4, 'Diameter at 2.1em shows ' + chars(2.1) + ' characters of an SI "1200"',
-		'restore 2.8em if typing into it proves lossy');
+	// **NO NARROW COLUMN IS LEFT.** Tom asked for 0.2 on Minor loss and 0.3 on Diameter, was shown
+	// that 1.4em displays one character of "2.5" and 2.1em three of an SI diameter's "1200", then
+	// reversed himself the same day (2026-08-23) on a different ground: *"inputs are flexible. You
+	// can enter more than their width."* Round 3 settled it from the other end instead -- *"I
+	// confess I am being too stingy"* -- and every column now shows its own longest value, so the
+	// belief is no longer load-bearing anywhere in this table. ROADMAP Task 495 asks him to confirm
+	// it in a browser anyway, because it is a fact about the suite's inputs and not about these
+	// four columns.
+	report(chars(3) >= 4, 'Diameter at 3em now shows ' + chars(3) + ' characters of an SI "1200"');
+	report(chars(6) >= 6, 'Roughness at 6em shows ' + chars(6) + ' characters of a DW "0.0015"');
 
 	// The reader's blind-spot report, scoped to the selectors that could possibly reach what this
 	// section asks about. A rule about the menu bar or a spinner is none of its business, and a

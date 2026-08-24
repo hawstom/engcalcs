@@ -8026,7 +8026,7 @@ var EngCalcs = EngCalcs || {};
 	// 2.8em rather than the 2.1 Tom named for it: the same box serves Pipes and Valves, and in the
 	// SI preset a diameter is millimetres, so "1200" is four characters and 2.1em shows three.
 	function paneColDiameter() {
-		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; }, em: 2.1,
+		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; }, em: 3,
 			prop: 'diameter', get: function (l) { return effective(l, 'diameter'); },
 			set: function (l, v) { setProp(l, 'diameter', v); } };
 	}
@@ -8129,7 +8129,7 @@ var EngCalcs = EngCalcs || {};
 						set: function (l, v) { setProp(l, 'length', v); if (inBaseScenario()) { l.lenAuto = false; } } },
 					// Label, symbol and unit all follow settings.method (Task 271), through the same
 					// function the popup and the Labels legend use.
-					{ key: 'roughness', label: roughnessLabel, em: 2.31,
+					{ key: 'roughness', label: roughnessLabel, em: 6,
 						unit: function () { return frictionMethod() === 'dw' ? 'lpn_u_roughness' : ''; },
 						prop: 'roughness', get: function (l) { return effective(l, 'roughness'); },
 						set: function (l, v) { setProp(l, 'roughness', v); } },
@@ -8143,7 +8143,7 @@ var EngCalcs = EngCalcs || {};
 					// the least that shows three characters. The vertical argument decides nothing
 					// either way -- no desktop column carries a width, so a small box never wraps a
 					// heading.
-					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 2.1,
+					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 3,
 						get: function (l) { return effective(l, 'k') || 0; },
 						set: function (l, v) { setProp(l, 'k', v); } },
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),

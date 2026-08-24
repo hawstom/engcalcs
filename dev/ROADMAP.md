@@ -264,9 +264,9 @@ the block.
   Extracted from Task 491 on close. He believes it does — *"inputs are flexible. You can enter more
   than their width"* (2026-08-23) — and asked to be reminded to confirm it in a browser before a
   pane-table column width is treated as a constraint on how many decimals a value can carry. The
-  narrow boxes riding on it are Minor loss at 1.4em and Diameter at 2.1em; if typing into either
-  proves lossy, restore 2.1em and 2.8em. `dev/lpn-spike/pane-harness.js` holds both measurements
-  as knowingly-failing checks so the answer has somewhere to land.
+  **Nothing rides on the answer any more.** Round 3 of the width review (2026-08-23, *"I confess I
+  am being too stingy"*) widened the last two narrow boxes past their longest values, so the
+  question is now about the suite's inputs generally, not about these four columns.
 
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus

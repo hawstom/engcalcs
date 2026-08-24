@@ -52,7 +52,8 @@ $P = array(
 	'xtb'     => 19.1,                       // title block, left edge
 	'xfan'    => 21.9,   'xr'    => 23.6,    // the fan of sheet edges: inside, outside
 	'stackreal' => 0.85,                     // REAL thickness of the stack; apparent = this × k
-	'wire'    => 0.35,                       // the hairline. Every edge is one of these.
+	'wire'    => 0.525,                      // the hairline. Every edge is one of these. Tom, 2026-08-23: 1.5x the
+	                                         // 0.35 first shipped; darker, and he passed it at 17px.
 	'deco'    => 1,
 );
 foreach (array_slice($argv, 1) as $a) {

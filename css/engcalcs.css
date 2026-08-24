@@ -1179,11 +1179,12 @@ html[lang="zh"] .ec-welcome {
    .lpn-pane-num no longer carries an alignment of its own: on screen the position decides, and
    what "this column is figures" is still worth here is tabular figures. */
 .lpn-pane-table th.lpn-pane-num, .lpn-pane-table td.lpn-pane-num { font-variant-numeric: tabular-nums; }
-/* **THE BOX WIDTH BELONGS TO THE COLUMN, AND THE COLUMN DECLARES IT** (Tom, 2026-08-23, as
-   multiples of the 7em every box used to be: Minor loss 0.3, Roughness 0.33, Length 0.6, Diameter
-   0.3, and 0.5 for the tank, reservoir and junction figures). The number lives on the column
-   descriptor in js/looped-network.js and arrives here as `--lpn-pane-col-w`; a column that names
-   none keeps the 7em. A hand-kept CSS list keyed by column class was the alternative, and it goes
+/* **THE BOX WIDTH BELONGS TO THE COLUMN, AND THE COLUMN DECLARES IT** (Tom, 2026-08-23, over three
+   rounds of review ending in "round the final widths to nice numbers always": Minor loss 3em,
+   Roughness 6em, Length 4.2em, Diameter 3em, and 3.5em for the tank, reservoir and junction
+   figures). Roughness is the wide one because a Darcy-Weisbach e is a small number with leading
+   zeros. The number lives on the column descriptor in js/looped-network.js and arrives here as
+   `--lpn-pane-col-w`; a column that names none keeps the 7em. A hand-kept CSS list keyed by column class was the alternative, and it goes
    silently wrong the day a column key is renamed or a table gains one.
    IT IS A CUSTOM PROPERTY AND NOT AN INLINE WIDTH, because an inline `style="width"` beats every
    stylesheet there is -- including the 360px widths below, which Tom has already approved and
@@ -2061,14 +2062,26 @@ html:has(#lpn_canvas) { overflow: hidden; }
 	   0.5 Tom asked for either way. Sideways scroll stays the fallback: this is a nudge, not a
 	   re-layout, and the table is still wider than the phone. Measured on Elm Street Center at
 	   360px: Roughness 100.4 -> 60.5, Minor loss 56.4 -> 41.8, the table 602 -> 547. */
+	/* ROUND 3 (Tom, 2026-08-23) WIDENED BOTH AGAIN, and the two asks landed differently here.
+	   Minor loss he scaled "1.25 to 1.5 on PC and phone", so the phone box takes the same 1.4 the
+	   desktop one took: 2.19 -> 3em, and the column with it, 2.9 -> 3.7em. Widening that column
+	   only REDUCES the heading lines the note above counted, so the vertical argument still holds.
+
+	   ROUGHNESS STOPS AT THE PHONE DEFAULT RATHER THAN THE 2.5 ASKED FOR. He named no platform for
+	   it, unlike Diameter's explicit "on PC", so it is meant to move here too -- but 2.6 x 2.5 is
+	   6.5em, which is most of a 360px panel and would undo the phone ruling he made the day before
+	   for the opposite reason. 3.5em is where the two meet: it is the width every other box in
+	   these tables already has below the breakpoint, so Roughness stops being the one column
+	   NARROWER than the default, and an input scrolls its own content, so a long e is still typed
+	   and read normally. Say so if the full 2.5 is wanted on a phone as well. */
 	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-roughness {
-		overflow-wrap: anywhere; width: 4.2em; min-width: 4.2em;
+		overflow-wrap: anywhere; width: 5em; min-width: 5em;
 	}
-	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-roughness input { width: 2.6em; }
+	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-roughness input { width: 3.5em; }
 	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-km {
-		overflow-wrap: anywhere; width: 2.9em; min-width: 2.9em;
+		overflow-wrap: anywhere; width: 3.7em; min-width: 3.7em;
 	}
-	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-km input { width: 2.19em; }
+	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-km input { width: 3em; }
 
 	/* 6. THE SYMBOLOGY ROWS WRAP AS A GROUP (Tom, 2026-08-22, choosing between his own two ideas:
 	   "Idea B is to wrap the four inputs for Before/After/Decimal/Drop together below the checkbox
