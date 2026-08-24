@@ -122,6 +122,11 @@ the block.
     `lpn_settings_auto_run(_tip)`, `lpn_time_run_slow`. Wave 0 over the changed set first.
   - **Earned 2026-08-23:** `lpn_settings_legend_position` → `Labels legend position`; Tom found it
     ambiguous against the colour key, whose control already says `Color legend position`. 26 stale.
+  - **Earned 2026-08-24, and it is now the largest single reason to run: 49 NEW keys from Task 507**
+    — every string of the place-name search and the terrain elevation fill, **both permission
+    dialogs included**. Until this sprint runs, two dialogs asking to send a visitor's data to an
+    outside service are shown in English to readers of 26 languages. Also changed the same day:
+    `lpn_find_menu`/`_title`/`_menu_tip` → "Find and replace" (Task 389, 26 stale each).
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
@@ -223,23 +228,46 @@ the block.
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
 
-- 100|507| **The terrain feature asks for consent in English only, in 27 languages.**
-  Shipped with Task 497 on 2026-08-24. `js/lpn-terrain.js` carries **no `$ec_lang` keys at all** —
-  the menu row, the accuracy sentence, the plan confirm and the whole first-use permission dialog
-  are English string literals in the source, and `EC_MAPBOX_TOKEN` is set, so the row is live for
-  every visitor in every language.
-  - **This is worse than an untranslated label, and that is the whole point of the task.** A
-    permission dialog someone cannot read is not a permission dialog. The suite's standing position
-    is that each outside service *asks separately*; asking in a language the reader does not have
-    hollows that out.
-  - **The precedent it was built on is real but weaker.** `js/lpn-search.js` reads two strings
-    through `pc.*` — and one of them, `lpn_search_menu`, **is missing from `lib/lang.ec.en.php` too**,
-    so the geocoder has the same hole on a smaller surface. Fix both; do not treat the geocoder as
-    permission to leave this one.
-  - The fix is mechanical: keys in `lib/lang.ec.en.php`, `pageConfig` lines in `Looped-Network.php`,
-    `pc.key || 'literal'` at each site. Then it is sprint material (Task 459).
-  - **[H] Until it is keyed, Tom may prefer the row hidden.** Hiding it is one line; it is his call,
-    because he asked for the feature and refusal already costs the visitor nothing.
+- 100|508| **Tom's screenshot drop: dozens of captures, indexed and reused.** His idea,
+  2026-08-24: *"a folder in this project, not in git, where I can prolifically put screenshots by
+  the dozens."* `dev/screenshots/` exists and is gitignored; the convention is in its README —
+  ordinal names (`0001.png`), PNG, no describing in the filename.
+  - **The value is that describing them is AI's job.** He captures; AI reads, writes one line per
+    file in the tracked `dev/screenshots/INDEX.md`, and says which are publishable. The pictures do
+    not survive a clone; what we learned from them does.
+  - **No thumbnailer exists on this machine** — no ImageMagick, no Pillow, no PHP GD. Not worth
+    installing one: a contact sheet is an untracked `sheet.html` with every image at 200 px wide,
+    which is a thumbnail a browser makes for free.
+  - Feeds Task 504 (a features list wants pictures), the LibreWaterNet landing page and its
+    `graphics-plan.md`, and Task 459's sense of what the interface actually looks like in each
+    language. **A screenshot is a screen** — the publishable/not judgement is made once, in the
+    index, not every time somebody reaches for an image.
+
+- 75|509| **The profile lost two operations; give them a door.** Task 506 removed
+  the whole left-hand control column and Tom agreed the page is better for it — *"You are right that
+  we lost something"* is about the two operations it took with it: changing ONE end of an existing
+  path, and removing ONE waypoint. Both are "draw it again" today.
+  - **His shape, and it keeps the panel to one line:** an entry-point button reading *"Profile along
+    a path"* with the commentary *"[Edit] or press Profile again to choose a new path on the map."*
+    Edit opens an **overlay box**, not a restored column — the map keeps its full width, and the
+    overlay is where the fiddly per-waypoint editing lives.
+  - Do not re-derive the gesture: the press-cycle and the touch thresholds shipped and are guarded
+    by `dev/lpn-spike/profile-chooser-harness.js`. This adds a door beside them.
+  - Four of the eight lang keys Task 506 left rendered by nothing (`lpn_profile_from`, `_to`,
+    `_through`, `_clear`) are plausibly what this box needs. Check before writing new ones — each
+    new key is 27 strings.
+
+- 75|510| **Named profiles: New, Rename, Delete, and a list to pick from.** Tom, 2026-08-24. A path
+  through the network is worth keeping — a client report has the same three or four profiles in it
+  every time — and today it exists only until the next one is drawn.
+  - **His placement: a menu arrow ON the Profile tab**, holding New / Rename / Delete and the list
+    of saved names. That keeps the pane at one line of commentary (Task 506's whole point) and puts
+    the list where the thing it names already lives.
+  - **A saved profile is a list of node IDs, so it belongs in the project file** and inherits every
+    rule there: it is the user's data, an unknown ID is reported rather than dropped, and the `.inp`
+    exporter skips it (EPANET has no such object).
+  - Depends on Task 509 only for where the Edit door goes; the storage question is independent and
+    is the part to settle first.
 
 - 75|504| **A features list, built from the roadmap's own closed ledger.** Tom, 2026-08-24, on the
   unit-change dialog landing: *"We may need to build a features list from our roadmap completions.
@@ -426,6 +454,11 @@ the block.
     `.inp` answer while that is still cheap to change, and spends none of the drawing-surface budget.
   - **The account number is a label on a demand, never a key into anything**, and it is the first
     personal-adjacent data in the suite: it must never reach a log row or a usage statistic.
+  - **Tom ruled the open questions 2026-08-24 — `dev/customer-demands.md` §7 has all of them.** The
+    two that change the build: a meter carries a **Count** (so *forty-two residential services* is
+    one symbol), and the attachment point is **user-draggable along its pipe** — a handle on the
+    `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
+    **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
 
 - 25|248| **Extended-period simulation, the GATE on the LibreEPANET.org launch.**
   Last of the three things the EPANET engine unlocked; Tasks 306/307. Tanks and valves shipped
@@ -600,6 +633,10 @@ the block.
   - Touches the scenario write seam (`setProp`), the popup, the importer, and Task 281's exporter —
     a per-category override is the question to settle first.
   - **Ship before Task 247, whose Customer is one of these rows extended** (`dev/customer-demands.md`).
+  - **Tom, 2026-08-24: the totals are ADDITIVE and nothing is deducted.** A junction's demand is its
+    own rows plus its customers' — placing a meter never edits a row the user typed. And the
+    exporter writes `[DEMANDS]` **itemized**, one row per demand: any lumping for readability is a
+    presentation decision in the pane and the popup, never a change to the file.
 
 - 25|484| **Log which unhandled EPANET features actually arrive in real imports.**
   A server-side count of the import features we do not handle, so Task 483 and its siblings are

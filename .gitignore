@@ -47,3 +47,11 @@ dev/epanet-models/
 # tool, this one records what ships to visitors. See dev/dependency-management.md.
 /node_modules/
 
+
+# Tom's screenshot drop (Task 508). He numbers them 0001.png and drops them in by the dozen; they
+# are raw material, sometimes large, and several will show a project name or a file path. The
+# directory, its README and the index AI writes about them are tracked; no image is. A picture that
+# earns a place on a public page gets copied OUT of here, deliberately, by a task.
+dev/screenshots/*
+!dev/screenshots/README.md
+!dev/screenshots/INDEX.md

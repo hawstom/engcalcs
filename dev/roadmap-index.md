@@ -7,16 +7,16 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**67 open tasks.** Next (100): 4 · Soon (75): 8 · Someday (50): 4 · Maybe (25): 24 · Parked (5): 27
+**69 open tasks.** Next (100): 4 · Soon (75): 10 · Someday (50): 4 · Maybe (25): 24 · Parked (5): 27
 
 ## 100 — Next (4)
 
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
-- Task 507 — The terrain feature asks for consent in English only, in 27 languages.
+- Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 
-## 75 — Soon (8)
+## 75 — Soon (10)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 408 — Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.
@@ -26,6 +26,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 503 — AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry
 - Task 504 — A features list, built from the roadmap's own closed ledger.
 - Task 505 — [H] · Move the local working directory to a `~/webdev` parent — Tom's proposal.
+- Task 509 — The profile lost two operations; give them a door.
+- Task 510 — Named profiles: New, Rename, Delete, and a list to pick from.
 
 ## 50 — Someday (4)
 
@@ -93,5 +95,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-67 of 67 titles are within 4–12 words. `!` marks the rest;
+69 of 69 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

@@ -226,3 +226,63 @@ an error report, and a shared project file now carries it. Anyone building this 
 **Recommended first slice: Slice 1**, on top of Task 468. It delivers the part of the vision that is
 unambiguously design work, it settles the `.inp` answer while it is still cheap to change, and it does
 not spend the drawing-surface budget before we know where this is headed.
+
+---
+
+## 7. Tom's rulings, 2026-08-24 — read these before building any of the above
+
+He answered the open questions in this document. Where a ruling contradicts an earlier section, **the
+ruling wins and the earlier text is what to change on the next edit.**
+
+**Additive, and nothing is deducted.** *"468 is a sum of all the 247 plus any additionals at the
+node (additive)."* And explicitly: *"For data entry, I think we don't do any fancy footwork like
+deducting flows at the node as meters are placed."* So placing a meter never edits the junction's
+own demand rows. A junction's total is what its own rows say plus what its customers say — one
+direction, no reconciliation pass, and nothing the user typed is ever rewritten by a gesture
+somewhere else (which is the suite's standing rule about the user's numbers, arriving here from a
+different door).
+
+**A meter may be a Type and a Count, not one object per service.** Tom's question — *"should we make
+meter only a Type and Count object?"* — is the cheap answer to the density problem §4 prices, and it
+is how a designer actually works: *forty-two single-family residential* is one line, one symbol, one
+place on the pipe. **Recommendation: build the Count field from the start and let it default to 1.**
+A customer with an account number is then the Count-of-1 case rather than a different kind of thing,
+and no migration is needed the day somebody wants both. The account number and a count above 1 are
+mutually exclusive in practice, and saying so in the interface is one sentence.
+
+**Go by our own wits.** *"I am inclined on this to go blind by the best of our wits in case we
+stumble on something better than the industry is doing."* So no more surveying of how epanet-js or
+WaterCAD does it. What has already been measured about epanet-js stays recorded because it is a
+fact, not a model to copy.
+
+**Symbol sizes, from him, as a starting point to measure against:** meter a **2–4 px dot**, service
+connector a **0.5–1 px stroke**. Real-world sizes of about **2 m across for the dot and 0.2 m for the
+connector** — *"and meter and connector (service line) can keep size instead of scaling when map
+extent gets bigger than 1000 m."* That is a **hybrid rule and it is the interesting part**: the
+symbols scale with the world while the site is smaller than a kilometre across, then stop and hold at
+their screen size beyond it. It is a different rule from every other symbol here, which are screen-
+space always, and it is right for the same reason a survey plan draws a meter to scale and a system
+map draws it as a dot. Measure it in the harness before treating the numbers as final.
+
+**`[DEMANDS]` is itemized.** *"Maybe itemized is the right way to go. 100 Demands on a node may be
+manageable, especially if we somehow lump/collapse them for presentation."* So the exporter writes
+one `[DEMANDS]` row per demand row, which is legal EPANET and loses nothing — the alternative was
+summing on the way out, which throws away the breakdown the whole feature exists to keep. **The
+lumping is a PRESENTATION decision on our side**, in the pane table and the popup, and it must never
+change what is written to the file.
+
+**There is a Customer table, and he wants it.** *"First slice is good thinking. Customers on a
+shoestring! And we can add a Customer table! Yes!"* The bottom pane already generates one tab per
+asset kind from a list (Task 455), so a Customer table is a row in that list rather than a new
+mechanism. **This also confirms the recommended first slice**: an account number on a 468 demand row
+with no geometry at all, which is enough to fill a table, settle the `.inp` answer while it is cheap,
+and spend none of the drawing-surface budget.
+
+**An override for where the service attaches.** Raised under Task 247: *"we probably also need to
+let there be an override for attachment point or, since you are suggesting saving it anyway, link
+arc distance internally. I guess if they click on a meter it can create a temporary draggable circle
+that slides along the pipe."* That is the `linkAnchor {link, t}` seam §4 already names, made
+directly editable: selecting a meter shows a handle on its pipe that slides along it and is
+constrained to it. **`t` is stored either way**, so this is a gesture on data we are already keeping,
+not a new field — and it is the same handle Task 502 needs, which is the second reason those two
+tasks must not build it twice.

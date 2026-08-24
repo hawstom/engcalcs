@@ -796,3 +796,23 @@ pipe into an inch browser!"* Consequences, all deliberate:
   conversion (`offerUnitRestore()`), asks before rewriting anything, and defaults to No.
 - The other calculators are unaffected — they have no document, so a unit select there is exactly the
   per-page control it always was.
+
+## Where a command lives: the menu bar holds everything (Tom, 2026-08-24)
+
+> "Everything about water network modeling is here in one place, except the animation play controls.
+> There is no need to guess where things are."
+
+**That is the rule for every command added from here on.** A new command goes in a menu — File, Edit,
+Insert, View, Help — and it goes there under its **conventional name**, not a name of ours. Find and
+replace (Task 389) is the worked example: it is under Edit, it is called "Find and replace", and
+nobody has to be told either fact.
+
+- **The toolbar and the popup are SECOND doors, never the only one.** A control reachable only by
+  clicking the right thing on the map is a control the user has to already know about. Select is the
+  standing precedent (Task 486): it is a toolbar button *and* an Edit row, because below the
+  small-screen breakpoint the toolbar is not there.
+- **The transport is the one exception, and it is exempt because it is not a command** — it is a
+  position in a run, and a scrubber is the control for that. Do not add a second exception without
+  saying which of those two things the new control is.
+- This is also a claim we can make in public, and it is stronger than a feature list: not "we have
+  27 features" but "there is nothing to hunt for".
