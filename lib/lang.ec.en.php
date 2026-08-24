@@ -1550,6 +1550,21 @@ $ec_lang['lpn_find_op_bottom']='Lowest n';
 // that meet at the node you found.
 $ec_lang['lpn_find_adjacent']='Connected';
 $ec_lang['lpn_find_no_value']='Type what to look for.';
+// Replace (Task 389): the same search, plus a write. It sits inside the Find panel, so the heading
+// says what the section does to the list above it rather than naming a second tool. "Assets" is the
+// word this page already uses for its nodes and pipes.
+$ec_lang['lpn_replace_title']='Change what was found';
+$ec_lang['lpn_replace_prop']='Property to change';
+$ec_lang['lpn_replace_value']='New value';
+$ec_lang['lpn_replace_button']='Replace';
+// The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
+// looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
+$ec_lang['lpn_replace_preview']='Change {n} assets?';
+$ec_lang['lpn_replace_apply']='Change them';
+$ec_lang['lpn_replace_done']='{n} assets changed. You can undo this in one step.';
+$ec_lang['lpn_replace_none']='Nothing would change.';
+$ec_lang['lpn_replace_no_value']='Type the new value.';
+$ec_lang['lpn_replace_scope']='Choose one kind of asset above to change values on.';
 // ---- the profile view (ROADMAP Task 409) ------------------------------------------------------
 // A drawing of the ground and the hydraulic grade line along one chosen route through the network.
 // {u} is a unit name, {n} a count and {len} a length; they are substituted, not concatenated, so a

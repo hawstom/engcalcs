@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 1262,
-        "delta_key_count": 69,
+        "expected_key_count": 1272,
+        "delta_key_count": 79,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -499,6 +499,16 @@
         "lpn_settings_auto_run_tip": "When this is on, this project recalculates shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be recalculated gets in the way of typing, and the Calculate button comes back so you choose when to run.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.",
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.",
+        "lpn_replace_title": "Change what was found",
+        "lpn_replace_prop": "Property to change",
+        "lpn_replace_value": "New value",
+        "lpn_replace_button": "Replace",
+        "lpn_replace_preview": "Change {n} assets?",
+        "lpn_replace_apply": "Change them",
+        "lpn_replace_done": "{n} assets changed. You can undo this in one step.",
+        "lpn_replace_none": "Nothing would change.",
+        "lpn_replace_no_value": "Type the new value.",
+        "lpn_replace_scope": "Choose one kind of asset above to change values on.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -570,6 +580,16 @@
         "lpn_settings_auto_run_tip": "When this is on, this project recalculates shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be recalculated gets in the way of typing, and the Calculate button comes back so you choose when to run.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.",
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.",
+        "lpn_replace_title": "Change what was found",
+        "lpn_replace_prop": "Property to change",
+        "lpn_replace_value": "New value",
+        "lpn_replace_button": "Replace",
+        "lpn_replace_preview": "Change {n} assets?",
+        "lpn_replace_apply": "Change them",
+        "lpn_replace_done": "{n} assets changed. You can undo this in one step.",
+        "lpn_replace_none": "Nothing would change.",
+        "lpn_replace_no_value": "Type the new value.",
+        "lpn_replace_scope": "Choose one kind of asset above to change values on.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -983,6 +1003,166 @@
                     "key": "lpn_menu_settings",
                     "value": "सेटिंग्स",
                     "english": "Settings"
+                }
+            }
+        },
+        "lpn_replace_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "जो खोजना है वह टाइप करें।",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "प्रोफ़ाइल",
+                    "english": "Profile"
+                }
+            }
+        },
+        "lpn_replace_prop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "जो खोजना है वह टाइप करें।",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "प्रोफ़ाइल",
+                    "english": "Profile"
+                }
+            }
+        },
+        "lpn_replace_value": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "जो खोजना है वह टाइप करें।",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "प्रोफ़ाइल",
+                    "english": "Profile"
+                }
+            }
+        },
+        "lpn_replace_button": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "जो खोजना है वह टाइप करें।",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "प्रोफ़ाइल",
+                    "english": "Profile"
+                }
+            }
+        },
+        "lpn_replace_preview": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "जो खोजना है वह टाइप करें।",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "प्रोफ़ाइल",
+                    "english": "Profile"
+                }
+            }
+        },
+        "lpn_replace_apply": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "जो खोजना है वह टाइप करें।",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "प्रोफ़ाइल",
+                    "english": "Profile"
+                }
+            }
+        },
+        "lpn_replace_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "जो खोजना है वह टाइप करें।",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "प्रोफ़ाइल",
+                    "english": "Profile"
+                }
+            }
+        },
+        "lpn_replace_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "जो खोजना है वह टाइप करें।",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "प्रोफ़ाइल",
+                    "english": "Profile"
+                }
+            }
+        },
+        "lpn_replace_no_value": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "जो खोजना है वह टाइप करें।",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "प्रोफ़ाइल",
+                    "english": "Profile"
+                }
+            }
+        },
+        "lpn_replace_scope": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "जो खोजना है वह टाइप करें।",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "प्रोफ़ाइल",
+                    "english": "Profile"
                 }
             }
         },
