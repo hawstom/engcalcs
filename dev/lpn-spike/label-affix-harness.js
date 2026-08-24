@@ -23,7 +23,7 @@
 //   5. THE EXTREMA MARK IS THE SEGMENT'S OWN text-decoration, and it must land on the NUMBER
 //      segment -- never on the separator beside it, and never on a label whose value only ties.
 
-const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { ROOT, setUnitSet, loadLoopedNetwork, settleEpanet } = require('./lpn-dom-stub.js');
 const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
 const L = loadLoopedNetwork(
@@ -80,11 +80,18 @@ function ok(name, cond, extra) {
 }
 function rowText(row) { return row.map(function (s) { return s.text; }).join(''); }
 
+// ASYNC BECAUSE THE ENGINE IS (ROADMAP Task 496). The shipped gallery example this fixture opens
+// carries `"engine": "epanet"`, so runSolve() hands it to the real EPANET engine and comes back
+// before any answer exists -- which is what a visitor's browser does too. Reading a label on the
+// next line got empty strings. settleEpanet() waits for the solve the page started.
+async function main() {
+
 setUnitSet('us');
 L.buildLayers();
 L.seedDefaultInputs();
 openExample(L);
 L.runSolve();
+await settleEpanet();
 
 const doc = L.getDoc();
 const ls = L.labelSettings();
@@ -331,3 +338,6 @@ ok('a built line carries no color property at all -- setMultilineText has nothin
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);
+
+}
+main().catch(function (e) { console.log('  FAIL harness threw -- ' + (e && e.stack || e)); process.exit(1); });

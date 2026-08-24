@@ -13,7 +13,7 @@
 // asserted, and so is the thing a suffix could break on its way past: the extrema badge compares
 // NUMBERS, and a label whose text ends in '%' must still tie with one that does not.
 
-const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { ROOT, setUnitSet, loadLoopedNetwork, settleEpanet } = require('./lpn-dom-stub.js');
 const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
 const L = loadLoopedNetwork(
@@ -55,6 +55,12 @@ function setGradientUnit(key) {
 	return false;
 }
 
+// ASYNC BECAUSE THE ENGINE IS (ROADMAP Task 496). The shipped gallery example this fixture opens
+// carries `"engine": "epanet"`, so runSolve() hands it to the real EPANET engine and comes back
+// before any answer exists -- which is what a visitor's browser does too. Reading a label on the
+// next line got six empty strings. settleEpanet() waits for the solve the page started.
+async function main() {
+
 console.log('=== head loss gradient: the label carries its % ===');
 
 setUnitSet('us');
@@ -62,6 +68,7 @@ L.buildLayers();
 L.seedDefaultInputs();
 openExample(L);
 L.runSolve();
+await settleEpanet();
 
 // Only the gradient, so a stray '%' anywhere in the stack is unmistakably this line.
 const ls = L.labelSettings();
@@ -107,3 +114,6 @@ ok('...and it actually marks something, so the check above is not vacuous',
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);
+
+}
+main().catch(function (e) { console.log('  FAIL harness threw -- ' + (e && e.stack || e)); process.exit(1); });

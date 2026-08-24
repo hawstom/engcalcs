@@ -184,17 +184,6 @@ the block.
     can decide and comment"*) — one `**Tom:**` line per item, blank meaning not yet decided. Each
     answer goes back into the JSON's `disposition` and `resolution`, which is what re-opens the gate.
 
-- 50|496| **The harness stub has no EPANET engine, so `settings.engine` never matters.**
-  Extracted from Task 378 on close, and the move that closed it made this MORE true: the three
-  harnesses on the code-drawn fixture sit permanently on `engine: native`. A gallery file says
-  `epanet`, the fixture says `native`, and every harness passes either way solely because
-  `dev/lpn-spike/lpn-dom-stub.js` never defines `EngCalcs.lpnSolveEpanet` — so `runSolve()` falls
-  through to the native solver whatever the setting says. That is a stub holding a coupling
-  constant, the exact shape `dev/testing-notes.md` warns about: ask which quantity the real thing
-  varies that the stub holds fixed. Nothing routed to EPANET is under test on this path, PRV/PSV/FCV
-  included.
-
-
 - 75|477| **[H] New blank project startup wizard: xy/lat-lon, units, head loss.** Tom, 2026-08-22,
   naming the scope. It replaces the four-row File > New fly-out; on epanet-js, *"they have a wizard
   box with xy and lat/lon as the top choices, and if lat/lon is selected, a search box is enabled.
