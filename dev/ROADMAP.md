@@ -66,22 +66,6 @@ the block.
     first tab of a first visit, which is born grid without anybody saying so. Task 477 is where that
     gets asked.
 
-- 100|389| **Search and replace inputs across the network, no longer gated on size.**
-  WANTED, and no longer gated on network size. Tom, 2026-08-16: *"I would like search and replace embraced more explicitly."* That
-  reverses this file's earlier position, which said find-and-replace was a big-network tool we
-  should not borrow for a design tool. The reversal is deliberate: a designer re-roughening every
-  PVC pipe, or bumping every 6-inch main to 8-inch after a fire-flow run, is doing DESIGN, not
-  management — the operation is just as native to 15 pipes as to 4,000.
-  - Pairs with Task 353 (find elements by searching): **353 is the query, 389 is the query plus a
-    write.** Build 353's selector first and let 389 reuse it rather than growing a second one.
-  - Must preview before it writes — "37 pipes will change" with the ability to cancel — and must be
-    one undo step, not 37.
-  - Goes through `setProp()` like every other property write, or it edits BASE from inside a
-    scenario. That seam has already produced five user-reachable defects; `scenario_seam_check.php`
-    guards it.
-  - Distinct from Task 185 (Match/Copy properties), which stays a click-source-then-click-targets
-    tool. Both ship; neither replaces the other.
-
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
   What that one pass costs, in Chromium on the 480-pipe grid `specs/perf.js` builds: 1.3–7.3 s in

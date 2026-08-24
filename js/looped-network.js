@@ -6423,8 +6423,9 @@ var EngCalcs = EngCalcs || {};
 	// **THE VALUES SEARCHED ARE THE VALUES PRINTED ON THE MAP.** colorValueOf() is the accessor the
 	// colour ramp and the map labels already read, in the DISPLAYED unit; a second accessor is a
 	// second answer to "what is this pipe's diameter".
-	// **READ-ONLY BY CONSTRUCTION.** It selects and moves the view; nothing below writes an element.
-	// Task 389 (search and replace) is this query plus a write through setProp().
+	// **THE QUERY ITSELF IS READ-ONLY.** Everything down to renderFindResults() selects and moves the
+	// view and writes no element. The write is Task 389, in its own section below it, and it goes
+	// through setProp() -- one selector, two things done with it.
 
 	var findState = { scope: 'all', prop: 'id', op: 'contains', value: '' };
 	var findResults = [];
@@ -6787,6 +6788,11 @@ var EngCalcs = EngCalcs || {};
 		setLabel(btn, 'find', pc.lpn_find_button || 'Find');
 		btn.addEventListener('click', runFind);
 		box.appendChild(btn);
+		// A rebuilt form is a CHANGED QUERY, so any pending preview is about a set that no longer
+		// exists. Dropped here rather than in each pull-down's handler, because this is the one
+		// place every scope and property change passes through.
+		replacePending = null;
+		buildReplaceForm(box);
 	}
 	function runFind() {
 		var pc = EngCalcs.pageConfig || {};
@@ -6854,6 +6860,247 @@ var EngCalcs = EngCalcs || {};
 		list.style.overflowY = 'auto';
 		findResults.forEach(function (c) { list.appendChild(findResultRow(c)); });
 		box.appendChild(list);
+	}
+	// ---- REPLACE: the same query, plus a write (ROADMAP Task 389) --------------------------------
+	//
+	// **389 IS 353's QUERY WITH A WRITE ON THE END, and it reuses the selector rather than growing a
+	// second one.** Everything above decides WHICH elements; everything below decides what one
+	// property of those elements becomes. A second query language for the write side would be two
+	// answers to "which pipes are under 8 inches" -- the exact mistake the one-panel Find was built
+	// to avoid.
+	//
+	// **THE WRITABLE PROPERTIES ARE pushSpecList()'s, not a new list.** That list already answers the
+	// three questions a bulk write asks -- what the property is called, which elements physically
+	// carry it (`applies`), and how it is written -- for the Settings push and the scenario push. A
+	// fourth opinion about which properties are inputs would drift the day somebody adds one. The
+	// consequence is the honest scope of this tool: it sets INPUTS. Pressure, velocity and flow are
+	// searchable because they are printed on the map, and are not replaceable because nothing writes
+	// them; `length` is left out with them, because "follow the drawing" (`lenAuto`) is a second
+	// decision per link that one value box cannot express.
+	//
+	// **THE VALUE IS IN THE DISPLAYED UNIT, exactly like the search box above it.** Both ends read
+	// and write the number printed on the drawing -- this page stores what the user typed, so no
+	// conversion happens here, and a conversion on one end alone would make "find 6, replace with 8"
+	// quietly mean two different sixes.
+	//
+	// **TEXT AND ID ARE OUT OF SCOPE, DELIBERATELY.** An id is an identity, not a value: rewriting
+	// ids in bulk has to answer uniqueness, the override map's keys and every link's from/to at
+	// once, and none of that is a find-and-replace. A Text label's words are a one-at-a-time edit on
+	// a handful of notes. Both stay searchable above; neither is writable here.
+	var replaceState = { prop: '', value: '' };
+	// The previewed set, held between "Replace" and "Change them" AS IDS, never as element objects --
+	// the same rule as a result row (findGoTo), for the same reason: the panel stays open across an
+	// edit, an undo and a project switch, and an element object outlives all three.
+	var replacePending = null;
+	// The message box, HELD RATHER THAN LOOKED UP BY ID. buildReplaceForm() creates it, and it is the
+	// only thing that ever does, so a reference is the honest way to name it -- and an id lookup
+	// would tie this to a div that Looped-Network.php does not declare.
+	var replaceMsgBox = null;
+	function replaceSpecs() {
+		var d = findScopeDef(findState.scope), cands;
+		if (d.key === 'all' || d.group === 'label') { return []; }
+		cands = findCandidates();
+		return pushSpecList().filter(function (s) {
+			if (s.group !== d.group) { return false; }
+			// Offered only where SOMETHING in this scope can hold it -- a pump has no roughness, so
+			// listing it under the Pump scope would be a control with no effect. The same honesty
+			// findPropDefs() applies on the search side.
+			return cands.some(function (c) { return s.applies(c.el); });
+		});
+	}
+	function replaceSpec(field) {
+		var specs = replaceSpecs(), i;
+		for (i = 0; i < specs.length; i++) { if (specs[i].field === field) { return specs[i]; } }
+		return null;
+	}
+	// **THE PROPERTY BEING SEARCHED IS OFFERED FIRST, when it is writable.** "Find every 6 inch main,
+	// make it 8" is the core case and it names one property twice, so the common job needs no second
+	// choice. A search on something unwritable (a pressure, or an ID) falls back to the first
+	// writable property -- the same fallback findNormalize() makes on the query side, for the same
+	// reason: a control left pointing at nothing reads as a broken feature.
+	function replaceNormalize() {
+		var specs = replaceSpecs();
+		if (!specs.length) { replaceState.prop = ''; return; }
+		if (specs.some(function (s) { return s.field === replaceState.prop; })) { return; }
+		replaceState.prop = replaceSpec(findState.prop) ? findState.prop : specs[0].field;
+	}
+	// What the write will actually change. NOT simply "what matched": an element the property does
+	// not apply to, and one already sitting at the new value, are both left out -- so the number in
+	// the preview is a promise about the document, not about the query.
+	function replaceTargets() {
+		var spec = replaceSpec(replaceState.prop), v = parseFloat(String(replaceState.value).trim()), out = [];
+		if (!spec || !isFinite(v)) { return out; }
+		findMatches().forEach(function (c) {
+			if (c.group !== spec.group || !spec.applies(c.el)) { return; }
+			var now = spec.get(c.el);
+			if (typeof now === 'number' && findNumEq(now, v)) { return; }
+			out.push({ group: c.group, id: c.el.id });
+		});
+		return out;
+	}
+	// The one write. A spec with a `prop` is overridable, so it goes through setProp() -- in Base
+	// that writes the element, in a scenario it records an override, and a direct write here would
+	// edit Base from inside a scenario across every matched element at once
+	// (dev/scenario-seam-repair.md). A spec with NO `prop` is Base-owned survey data (elevation) and
+	// its own set() is where that base-write is already declared; this does not invent a second one.
+	function replaceWrite(el, spec, v) {
+		if (spec.prop) { setProp(el, spec.prop, v); return; }
+		spec.set(el, v);
+	}
+	// The redraw half of afterPropertyEdit(), per element. Its other half -- re-solve, re-count,
+	// persist -- is deliberately NOT run per element: on a 4,000-pipe replace that would be 4,000
+	// whole-document saves to answer one action. applyReplace() runs it once, at the end.
+	function replaceRedraw(el) {
+		if (elGroup(el) === 'link') { rebuildLink(el); }
+		else if (nodeEls[el.id]) { updateNode(el.id); }
+	}
+	function replaceElement(ref) {
+		return ref.group === 'node' ? nodeById(ref.id) : linkById(ref.id);
+	}
+	// **NOTHING IS WRITTEN UNTIL THE COUNT HAS BEEN SEEN.** A bulk write is the one action on this
+	// page whose blast radius the user cannot see coming -- the matched pipes are spread over a map
+	// they are not looking at -- so the count IS the confirmation, and Cancel leaves the document
+	// untouched by construction: this function only measures.
+	function runReplacePreview() {
+		var pc = EngCalcs.pageConfig || {}, refs;
+		replaceNormalize();
+		if (!replaceState.prop) {
+			replacePending = null;
+			renderReplace(pc.lpn_replace_scope || 'Choose one kind of element to change.');
+			return;
+		}
+		if (String(replaceState.value).trim() === '' || !isFinite(parseFloat(replaceState.value))) {
+			replacePending = null;
+			renderReplace(pc.lpn_replace_no_value || 'Type the new value.');
+			return;
+		}
+		// The result list is re-run and redrawn beside the preview, so the rows on screen are the
+		// same query the count is about. A stale list beside a fresh count is two answers to one
+		// question, and the one on screen is the one that will be believed.
+		findResults = findMatches();
+		renderFindResults(null);
+		refs = replaceTargets();
+		if (!refs.length) {
+			replacePending = null;
+			renderReplace(pc.lpn_replace_none || 'Nothing would change.');
+			return;
+		}
+		replacePending = { prop: replaceState.prop, value: parseFloat(replaceState.value), refs: refs };
+		renderReplace(null);
+	}
+	function cancelReplace() { replacePending = null; renderReplace(null); }
+	function applyReplace() {
+		var pc = EngCalcs.pageConfig || {}, spec, n = 0;
+		if (!replacePending) { return 0; }
+		spec = replaceSpec(replacePending.prop);
+		if (!spec) { replacePending = null; renderReplace(null); return 0; }
+		// **ONE SNAPSHOT FOR THE WHOLE SET, so it is ONE undo step.** Snapshotting per element would
+		// make undoing a 37-pipe replace 37 presses of Ctrl+Z -- and with UNDO_LIMIT at 20 the first
+		// seventeen would already be gone, leaving the document permanently half-replaced.
+		saveUndoSnapshot();
+		replacePending.refs.forEach(function (ref) {
+			// Re-resolved by id: the set was measured before the button was pressed, so an element
+			// deleted in between is skipped rather than written through a stale reference.
+			var el = replaceElement(ref);
+			if (!el || !spec.applies(el)) { return; }
+			replaceWrite(el, spec, replacePending.value);
+			replaceRedraw(el);
+			n++;
+		});
+		replacePending = null;
+		// afterPropertyEdit()'s shared tail, once for the whole set.
+		refreshScenarioMarks();
+		refreshScenarioStatus();
+		scheduleSolve();
+		saveToStorage();
+		// The query is re-run over the document it just changed, because the rows are the panel's
+		// claim about the map: after "diameter equal to 6, set to 8" that list is correctly empty.
+		findResults = findMatches();
+		renderFindResults(null);
+		renderReplace(String(pc.lpn_replace_done || '{n} changed.').replace('{n}', String(n)));
+		return n;
+	}
+	// The preview line and its two buttons. `message` is a state the write cannot start from -- no
+	// scope, no value, nothing to change -- or the count after a finished write; a null message with
+	// a pending set draws the question and the buttons.
+	function renderReplace(message) {
+		var pc = EngCalcs.pageConfig || {}, box = replaceMsgBox, head, apply, cancel;
+		if (!box) { return; }
+		box.innerHTML = '';
+		if (message) {
+			head = document.createElement('div');
+			head.textContent = message;
+			box.appendChild(head);
+			return;
+		}
+		if (!replacePending) { return; }
+		head = document.createElement('div');
+		head.style.margin = '6px 0 2px';
+		head.textContent = String(pc.lpn_replace_preview || 'Change {n} elements?')
+			.replace('{n}', String(replacePending.refs.length));
+		box.appendChild(head);
+		apply = document.createElement('button');
+		apply.type = 'button';
+		setLabel(apply, 'edit', pc.lpn_replace_apply || 'Change them');
+		apply.addEventListener('click', applyReplace);
+		box.appendChild(apply);
+		cancel = document.createElement('button');
+		cancel.type = 'button';
+		cancel.textContent = pc.lpn_cancel || 'Cancel';
+		cancel.addEventListener('click', cancelReplace);
+		box.appendChild(cancel);
+	}
+	// Built onto the end of the Find form, not into a second panel: the query and the write are one
+	// action, and a Replace dialog beside a Find dialog would ask for the same three pull-downs
+	// twice. `box` is already in the document, so renderReplace() can find its message div by id.
+	function buildReplaceForm(box) {
+		var pc = EngCalcs.pageConfig || {}, specs, head, valWrap, valLab, input, btn, msg;
+		replaceNormalize();
+		head = document.createElement('div');
+		head.style.margin = '10px 0 2px';
+		head.style.fontWeight = 'bold';
+		head.textContent = pc.lpn_replace_title || 'Change what was found';
+		box.appendChild(head);
+		specs = replaceSpecs();
+		msg = document.createElement('div');
+		replaceMsgBox = msg;
+		if (!specs.length) {
+			// Said, not hidden: a Replace section that vanishes under "Everything" reads as a
+			// feature that comes and goes. One sentence names the one thing to do about it.
+			box.appendChild(msg);
+			renderReplace(pc.lpn_replace_scope || 'Choose one kind of element to change.');
+			return;
+		}
+		findSelect(box, pc.lpn_replace_prop || 'Set', specs.map(function (s) { return [s.field, s.label]; }),
+			replaceState.prop, function (v) {
+				replaceState.prop = v; replacePending = null; renderReplace(null);
+			});
+		valWrap = document.createElement('div');
+		valWrap.style.margin = '4px 0';
+		valLab = document.createElement('label');
+		valLab.textContent = pc.lpn_replace_value || 'To';
+		valLab.style.display = 'block';
+		input = document.createElement('input');
+		input.type = 'text';
+		input.value = replaceState.value;
+		input.style.width = '100%';
+		// A typed value drops the pending count: a number on screen about a value the box no longer
+		// holds is the one way a preview can lie.
+		input.addEventListener('input', function () {
+			replaceState.value = input.value; replacePending = null; renderReplace(null);
+		});
+		input.addEventListener('keydown', function (e) {
+			if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } runReplacePreview(); }
+		});
+		valLab.appendChild(input);
+		valWrap.appendChild(valLab);
+		box.appendChild(valWrap);
+		btn = document.createElement('button');
+		btn.type = 'button';
+		setLabel(btn, 'edit', pc.lpn_replace_button || 'Replace');
+		btn.addEventListener('click', runReplacePreview);
+		box.appendChild(btn);
+		box.appendChild(msg);
 	}
 	// `anchorEl` is the CONTROL to hang the panel under -- the menu-bar item, passed in by the row
 	// that opens it.
