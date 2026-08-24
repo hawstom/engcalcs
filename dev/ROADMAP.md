@@ -228,6 +228,24 @@ the block.
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
 
+- 100|512| **The amber override ring reads as a stuck highlight nobody can turn off.**
+  Tom, 2026-08-24, of two junctions in his own Elm Street file: *"J-F-FRAN and JF-ELM are
+  highlighted. I don't know why, and I can't get them to unhighlight. I noticed this same thing in
+  my colleague Mary's water report using lpn."*
+  - **It is working exactly as designed, and that is the finding.** `refreshScenarioMarks()` puts
+    `.lpn-override` — an amber ring — on any element carrying a value overridden in the current
+    scenario. His status bar says *Daily Flow | Custom values: 3*, and those two fire-flow junctions
+    are two of the three. There is nothing to unhighlight: the ring is a fact about the document.
+  - **Two independent users read a designed mark as a defect**, which is the whole signal. The only
+    place the ring is explained is the property popup's override row (Task 184) — reachable by
+    clicking the node, which is precisely what somebody who thinks the page is stuck will not do.
+  - The cheap candidates, in order of cost: a title on the ring; a status-bar phrase naming what the
+    count is counting; a legend row beside the colour key. **[H] Tom decides whether it should also
+    default OFF** — but note that hiding it makes a scenario's edits invisible on the map, which is
+    the opposite failure and probably worse.
+  - Do NOT confuse this with selection (one element, `selection`) or the profile route mark (orange
+    band, now hover-gated). Three different marks, three different meanings, all currently silent.
+
 - 100|511| **Three georeferencing checks disagree with Mercator, and one of them is right.**
   Found 2026-08-24 running the whole browser pass, which had not been run end to end in a while:
   `dev/browser-pass/specs/georef.js` fails three ways since Task 145 drew the project in Web
