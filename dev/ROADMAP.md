@@ -236,6 +236,24 @@ the block.
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
 
+- 100|507| **The terrain feature asks for consent in English only, in 27 languages.**
+  Shipped with Task 497 on 2026-08-24. `js/lpn-terrain.js` carries **no `$ec_lang` keys at all** —
+  the menu row, the accuracy sentence, the plan confirm and the whole first-use permission dialog
+  are English string literals in the source, and `EC_MAPBOX_TOKEN` is set, so the row is live for
+  every visitor in every language.
+  - **This is worse than an untranslated label, and that is the whole point of the task.** A
+    permission dialog someone cannot read is not a permission dialog. The suite's standing position
+    is that each outside service *asks separately*; asking in a language the reader does not have
+    hollows that out.
+  - **The precedent it was built on is real but weaker.** `js/lpn-search.js` reads two strings
+    through `pc.*` — and one of them, `lpn_search_menu`, **is missing from `lib/lang.ec.en.php` too**,
+    so the geocoder has the same hole on a smaller surface. Fix both; do not treat the geocoder as
+    permission to leave this one.
+  - The fix is mechanical: keys in `lib/lang.ec.en.php`, `pageConfig` lines in `Looped-Network.php`,
+    `pc.key || 'literal'` at each site. Then it is sprint material (Task 459).
+  - **[H] Until it is keyed, Tom may prefer the row hidden.** Hiding it is one line; it is his call,
+    because he asked for the feature and refusal already costs the visitor nothing.
+
 - 75|504| **A features list, built from the roadmap's own closed ledger.** Tom, 2026-08-24, on the
   unit-change dialog landing: *"We may need to build a features list from our roadmap completions.
   This is getting impressive."*
