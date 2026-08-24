@@ -36,6 +36,18 @@ table, th, tr, td {
    forms are built from. Without this every calculator is a grid of blue boxes. */
 table.bare, table.bare > tbody > tr, table.bare > tbody > tr > td { border-width: 0px; }
 
+/* **INPUTS AND RESULTS START AT THE SAME TOP EDGE** (Tom, 2026-08-24: on a narrow screen they are
+   "vertically aligned middle, and this is not good UX... both are initially visible from the top of
+   the page"). A <td> is middle-aligned by the UA stylesheet, so the SHORTER of the two columns
+   floats down the taller one -- and the narrower the window, the taller the Inputs column grows and
+   the further Results sinks below the fold.
+
+   Unconditional rather than behind the 640px breakpoint on purpose: the two columns are rarely the
+   same height at ANY width, and top is the right answer whenever they differ. One rule beats a rule
+   plus an exception. Scoped to `table.bare`'s own cells so it cannot reach a results table nested
+   inside one. */
+table.bare > tbody > tr > td { vertical-align: top; }
+
 /* The calculator's input lines (ROADMAP Task 478, echoInputGrid() in lib/Calculators.lib.php).
    The DOM is COLUMN-MAJOR -- every input, then every label, then every unit select, then every X
    -- so Tab walks the input column instead of crossing each line sideways. Each cell carries its

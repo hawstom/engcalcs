@@ -168,7 +168,7 @@ the block.
     can decide and comment"*) — one `**Tom:**` line per item, blank meaning not yet decided. Each
     answer goes back into the JSON's `disposition` and `resolution`, which is what re-opens the gate.
 
-- 75|477| **[H] New blank project startup wizard: xy/lat-lon, units, head loss.** Tom, 2026-08-22,
+- 75|477| **New blank project startup wizard: xy/lat-lon, units, head loss.** Tom, 2026-08-22,
   naming the scope. It replaces the four-row File > New fly-out; on epanet-js, *"they have a wizard
   box with xy and lat/lon as the top choices, and if lat/lon is selected, a search box is enabled.
   Below it are the units and head loss formula selectors."*
@@ -177,6 +177,11 @@ the block.
     geocoder that already works — `js/lpn-search.js`, its search box enabled when lat/lon is chosen.
     **Tom has ruled out a standalone search interface for now** (Task 437, closed into this one):
     *"There's not a lot of reason for search once you are at your model."*
+  - **UNITS, ANSWERED 2026-08-24.** Tom: *"all units are shown (6 for inputs and 5 for results) with
+    the US and SI presets to set them."* So the wizard shows every unit selector — not one unit-system
+    radio — and the two presets are the fast path that sets them all. That is the same paradigm the
+    calculator pages already use, and it is the reason a project's own units are declarative
+    (`serializeProject().units`) rather than a browser preference.
   - **Against it:** the current fly-out ASKS FOR NOTHING — the choice is which row you click, and a
     wizard puts a form in front of the commonest action. Weigh that before building.
 
@@ -198,29 +203,13 @@ the block.
     landing page's own repository at `~/librewaternet.org/index.html`. Move the local working
     directory in that same pass and not before (`dev/hosting-layout.md` §5).
 
-- 75|501| **[H] Tom's own browser pass on the Task 478 field grid.**
-  Merged 2026-08-24 on his instruction (*"Please merge"*), which is also his ruling on the narrow-
-  window wrap. What no harness here can answer, because each is a picture rather than a number:
-  the X button hides all four cells of a line; the conditional lines on Orifice, Orifice-Drain-Time
-  and Branched-Network appear and disappear whole; "Printable version" then toggling the orifice
-  shape keeps the X's gone; the collapse animation still animates.
-
-
-- 50|502| **A Text object anchored to a LINK, not only to a node.**
+- 75|502| **A Text object anchored to a LINK, not only to a node.**
   Extracted from Task 483 on close. A Text already follows a node (`anchorNode`, an offset plus a
   leader) and an EPANET `.inp` can only ever anchor one to a node — so this buys nothing on import
   and is a drawing feature: labelling a pipe, a pump or a valve with your own words and having the
   note follow it when the link moves. Real work, not a rename: the attachment point on a link is a
   position ALONG it, so it needs a parameter on the polyline rather than a second `anchorNode`, and
   it touches label placement, the leader, collision avoidance and the Text popup.
-
-- 75|495| **[H] REMIND TOM: does an input accept more characters than its width shows?**
-  Extracted from Task 491 on close. He believes it does — *"inputs are flexible. You can enter more
-  than their width"* (2026-08-23) — and asked to be reminded to confirm it in a browser before a
-  pane-table column width is treated as a constraint on how many decimals a value can carry. The
-  **Nothing rides on the answer any more.** Round 3 of the width review (2026-08-23, *"I confess I
-  am being too stingy"*) widened the last two narrow boxes past their longest values, so the
-  question is now about the suite's inputs generally, not about these four columns.
 
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
@@ -259,7 +248,7 @@ the block.
   mission has earned; prepare for the meeting and record what comes of it. Not a search-reach task,
   but it lives here because it is the same goal reached by a better road.
 
-- 50|408| **Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.**
+- 75|408| **Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.**
   Tom, 2026-08-17. A toggle or picker for the increment, not a forced snap — free dragging must stay
   available for whoever wants it.
   - **Open question, same day: magnet-style (soft pull toward the nearest increment, override-able by
@@ -272,7 +261,7 @@ the block.
     visitors norm (`js/vendor/` today holds only the EPANET engine). Decide the mechanism before
     scoping the toggle above.
 
-- 50|425| **The unit-change dialog for an lpn project that already has content.**
+- 75|425| **The unit-change dialog for an lpn project that already has content.**
   It asks what the change should mean to the numbers already typed. Use Tom's own wording
   (2026-08-18) rather than paraphrasing it, and add the CANCEL the first cut lacked.
   - Title: *This unit decides what your inputs mean*. Then *cfs is the unit of what you enter for* and
@@ -289,7 +278,7 @@ the block.
     (switches the whole page to that unit system); safe, harmless, does not overwrite anything,
     leaves your entries untouched, keeps the numbers you typed.'`
 
-- 50|433| **Profile: the last piece is the path CHOOSER.** Tom, 2026-08-18: *"Amazing. Now we just need a
+- 75|433| **Profile: the last piece is the path CHOOSER.** Tom, 2026-08-18: *"Amazing. Now we just need a
   good UI."* Two of the three are done — the route is drawn on the map, and the panel is now the
   full-height Profile tab of Task 434's bottom pane.
   - **The path chooser should be the Google Maps gesture epanetjs uses:** click the starting node, hover
@@ -304,19 +293,7 @@ the block.
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
 
-- 75|442| **[H] The toolbar may want to become a side menu.**
-  Raised 2026-08-18: phones have a swipe superpower that is not idiomatic on a PC, so a different
-  phone layout convention that could translate to the PC — transforming the toolbar into some sort of
-  side menu — would use side real estate when height real estate is very limited. Raised, not scoped.
-  - **Raised again 2026-08-20 with the trigger named:** *"Did I already suggest putting the menu and
-    the toolbar vertically down the left edge when the screen is wider than tall?"* The new part is
-    the CONDITION — wider than tall — which makes it a responsive rule rather than a redesign, and
-    which is measurable rather than a matter of taste.
-  - This page is a full-window drawing surface designed for a pointer, so the PHONE half is worth
-    little on its own; the SIDE-MENU half is worth something regardless, on a laptop with 800px of
-    height.
-
-- 50|465| **[H] Reusable pipe and pump TYPES, so editing one edits 400.**
+- 25|465| **[H] Reusable pipe and pump TYPES, so editing one edits 400.**
   One "150 mm PVC" definition that 400 pipes point at. A type carries diameter, roughness and minor-loss k; an element names
   a type instead of repeating the numbers. Tom named these beside Patterns/Curves/Controls in Task 462,
   but those are things the document already HOLDS — this is a new indirection through the element model.
@@ -327,7 +304,7 @@ the block.
   - **EPANET has no such concept**, so an `.inp` export flattens it and an import can never rebuild it,
     which breaks Task 281's byte-identical round trip for anything typed. Task 390-sized.
 
-- 50|497| **Automatic elevations for a lat/lon project, from a terrain source.**
+- 75|497| **Automatic elevations for a lat/lon project, from a terrain source.**
   Tom asked 2026-08-23 whether this is on the roadmap and where the data would come from. It was
   not; this is the entry. A geographic project knows every node's latitude and longitude, and
   elevation is the one input a designer otherwise types by hand for every junction.
@@ -351,9 +328,9 @@ the block.
   says things a public board should not (measured costs, what Tom is not proud of, who to ask), so a
   public board is a SECOND artifact to keep current, not this one exposed.
 
-- 50|499.01| ** Create a Scenarios menu icon **
+- 75|499.01| ** Create a Scenarios menu icon **
   - Use the paradigm of this icon, probably without the page element. Described textually, this depicts scenarios as three branched children of a main project. It might be nice to make the shape of the main (project) and children (scenarios) reminiscent of our Project icon, possibly stripped of its details and scaled down. If not, then just squares with an aspect ratio representative of a 2H x 3H plan sheet https://www.flaticon.com/free-icon/scenario_17921358?term=scenario&page=1&position=8&origin=tag&related_id=17921358
-- 50|499.02| ** Add a tip to the lpn Project menu **
+- 75|499.02| ** Add a tip to the lpn Project menu **
   -  'Everything unique about this application is here in one place except the animation play controls. There is no need to guess where things are.'
   - It would be good to have this reviewed by Mary before or after deployment. Either way is fine. - Tom 2026-08-23
 - 100|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
@@ -636,19 +613,6 @@ the block.
   drag, so a touch user who presses and drags is editing an element the page does not think is
   selected for editing. Same guard, second trigger. See Task 192 for why long-press is the touch
   equivalent generally.
-
-- 25|435| **[H] The Labels panel's column headings sit too far right.** Tom, 2026-08-18.
-  - **The width half is now PROVED, not merely believed.** `dev/lpn-spike/label-columns-harness.js`
-    builds the real Node and Link lists through `rebuildLabelsFields()` and computes every column's
-    edge offsets from the row's right edge under the stylesheet's `!important` widths: heading row and
-    every field row agree to the pixel, node ID row with its two spacers included. Mutation-tested.
-  - **What was still wrong, and is changed:** `columnHeadings()` centred all four headings, but the
-    Before/After columns hold left-aligned text boxes, so a centred "Before" reads as sitting right of
-    its column. Affix headings are now `start` (not `left` — RTL), numeric headings stay `center`,
-    which is the alignment rule `css/engcalcs.css` already states.
-  - **NEEDS TOM'S EYES, and that is the only thing left.** Whether the panel now LOOKS right is a
-    browser pass; and if "too far right" meant something other than the centring, this is the change
-    to re-examine.
 
 - 25|468| **Demand categories on a junction — the breakdown the importer already flattens.**
   EPANET stacks (base demand, pattern, category) triples on one node and sums them; `js/lpn-inp.js`

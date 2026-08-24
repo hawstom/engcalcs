@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**75 open tasks.** Next (100): 5 · Soon (75): 6 · Someday (50): 12 · Maybe (25): 25 · Parked (5): 27
+**71 open tasks.** Next (100): 5 · Soon (75): 10 · Someday (50): 4 · Maybe (25): 25 · Parked (5): 27
 
 ## 100 — Next (5)
 
@@ -17,29 +17,25 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
 - Task 469 — Node labels should SHED properties before one of them is hidden.
 
-## 75 — Soon (6)
+## 75 — Soon (10)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
-- Task 442 — [H] · The toolbar may want to become a side menu.
-- Task 477 — [H] · New blank project startup wizard: xy/lat-lon, units, head loss.
-- Task 479 — LibreWaterNet.org needs a landing page, and this account needs a hosting decision.
-- Task 495 — [H] · REMIND TOM: does an input accept more characters than its width shows?
-- Task 501 — [H] · Tom's own browser pass on the Task 478 field grid.
-
-## 50 — Someday (12)
-
-- Task 207 — The dilettante path: make replying cost one tap, not five steps.
-- Task 248.02 — Patterns: attach one to a RESERVOIR HEAD and a PUMP.
-- Task 269 — ASU Engineers Without Borders answered, and asked to meet.
 - Task 408 — Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.
 - Task 425 — The unit-change dialog for an lpn project that already has content.
 - Task 433 — Profile: the last piece is the path CHOOSER.
-- Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
-- Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
+- Task 477 — New blank project startup wizard: xy/lat-lon, units, head loss.
+- Task 479 — LibreWaterNet.org needs a landing page, and this account needs a hosting decision.
 - Task 497 — Automatic elevations for a lat/lon project, from a terrain source.
 - Task 499.01 — Create a Scenarios menu icon
 - Task 499.02 — Add a tip to the lpn Project menu
 - Task 502 — A Text object anchored to a LINK, not only to a node.
+
+## 50 — Someday (4)
+
+- Task 207 — The dilettante path: make replying cost one tap, not five steps.
+- Task 248.02 — Patterns: attach one to a RESERVOIR HEAD and a PUMP.
+- Task 269 — ASU Engineers Without Borders answered, and asked to meet.
+- Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 
 ## 25 — Maybe (25)
 
@@ -63,7 +59,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 390 — Finish the unit paradigm migration: a unit is a NAME.
 - Task 416 — The tester control panel: move it, prune it, repurpose it.
 - Task 417 — Long-press on an element should enter Edit mode.
-- Task 435 — [H] · The Labels panel's column headings sit too far right.
+- Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
 - Task 468 — Demand categories on a junction — the breakdown the importer already flattens.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
@@ -101,5 +97,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-75 of 75 titles are within 4–12 words. `!` marks the rest;
+71 of 71 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

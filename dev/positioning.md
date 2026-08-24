@@ -135,10 +135,15 @@ after using it: *"phone usability is super solid now. I am a bit surprised."*
   claim is precisely the mistake that sentence was.
 - **The phone claim is now a claim, not just an invitation** — and one indefinite article is doing
   all the work. The sanctioned wording is the landing page's own sentence, verbatim: *"And although
-  you of course prefer working on your PC, it works also on a phone."* Tom chose *"a phone"* over
+  you of course prefer working on your PC, it works also on a phone in tall mode."* Tom chose *"a phone"* over
   *"your phone"* himself, *"to be scrupulously honest"*: **"a phone" is a claim about the software;
   "your phone" is a promise about a device we have never seen.** Never write the second.
   (Superseded, recorded so it is not reinstated by habit: *"Try it. We did."*)
+- **"In tall mode" was added 2026-08-24, and it is a NARROWING, not a flourish.** Tom, closing Task
+  442: *"I have been using the phone in tall mode, which I think is best, and for that, putting the
+  menu on the side isn't great."* The claim now names the orientation he has actually used, so a
+  reader who turns the phone sideways and finds the drawing surface cramped has not been promised
+  otherwise. Same instinct as *"a phone"*: claim the thing observed, not the thing hoped for.
 
 **Unchanged by either ruling:** mobile stays out of a headline, a tagline, or a list of reasons to
 choose us. It is an honest aside in the honest-about-the-edges paragraph, and that is its place.
