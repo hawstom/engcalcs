@@ -36,7 +36,7 @@ later, that is what a Help page is for.
 **Use ONE network for all four.** Four screenshots of four different networks read as a gallery of
 things somebody once made; four views of one network read as one product. Elm Street Center is the
 obvious candidate — it is already in the repo, already shipped, and is a real place rather than
-`Net3`.
+`Net3`. [TGH: Actually, Net3 is Novato, California, and Elm Street Center is fictitious.]
 
 1. **The hero: the map as an exhibit.** Full window, labels on, coloured by pressure, the legend
    visible, a couple of labels dragged out on leader lines the way you would actually place them.
@@ -44,7 +44,7 @@ obvious candidate — it is already in the repo, already shipped, and is a real 
    most care.
 2. **Time.** The transport bar mid-run, a tank part full, the frame clock showing something other
    than hour 0. The page claims extended-period simulation; this is the one frame that shows it is
-   not a still calculator.
+   not a still calculator. [TGH: Only Net3 has time. I would have to figurs out how to add time to another. And only Elm Street has personalized attention to presentation. They are different in scale. One could even present them as Design (Elm) and Management (Novato/Net3)]
 3. **The import report.** An `.inp` opened, with the panel listing what it could not carry. Counter-
    intuitive and worth doing: **showing the honest limits is the most credible thing on the page.**
    Everyone claims import; almost nobody shows you what theirs dropped.
@@ -57,10 +57,10 @@ obvious candidate — it is already in the repo, already shipped, and is a real 
 - **Hide the consent banner** before capturing, and check no project name, file path, tab title or
   browser profile picture is in frame. A screenshot is a screen; it publishes whatever was on it.
 - **Capture at 2× device pixel ratio** and place the image at half that width, or it looks soft on
-  every modern screen. In Chromium: devtools device toolbar, set DPR to 2, capture full size.
+  every modern screen. In Chromium: devtools device toolbar, set DPR to 2, capture full size. [TGH: I don't know what you are saying. We are trying to get the images twice as large as we want to display them? Is that it?]
 - **PNG for anything containing UI text.** Never JPEG for a screenshot — JPEG ringing around small
   type is exactly what makes a screenshot look cheap.
-- **Same window size for all four**, so they stack down the page without jumping.
+- **Same window size for all four**, so they stack down the page without jumping. [TGH; Can you clip?]
 - **Alt text on every one.** This page argues that the software is reachable by everybody; an
   unlabelled image on it is an own goal.
 - **Self-host every file.** The suite's own rule is no runtime CDN, and the landing page is not an
@@ -106,8 +106,8 @@ question.
 
 ## The order to do it in
 
-1. The hero still. Stop there and put it on the page; it is more than half the value.
-2. The draw-and-solve clip.
+1. The hero still. Stop there and put it on the page; it is more than half the value. [TGH: This is easy, and anything worth doing is worth doing poorly. I just need to understand the specs better.]
+2. The draw-and-solve clip. [TGH: Youtube? Self-hosted? How do I make it small? I need specs.]
 3. The language still, then the import-report still, then the time still.
 4. The other two clips, if the first two turn out to be worth it.
 

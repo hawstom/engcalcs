@@ -38,11 +38,11 @@ press*, in the exact form a UI uses for a button. Nothing tells a translator whi
 Proposed payload:
 
 ```
-Pressure (head) at this reach's downstream node -- an abbreviation of the noun Pressure, never the verb | layout: column heading; avoid: the imperative verb "press"
+Pressure or pressure/piezometric head/height/charge/load at this reach's downstream node| layout: column heading; avoid: the imperative verb "press"
 ```
 
 **Tom:**
-
+It was laid out as a description. I changed it to a much more diverse syn entry. Please follow my example.
 ### 2. `ip_t_run` — Irrigation Pressure
 
 Currently: **`Runtime (hours)`** — a computing term of art as well as the irrigation sense. In a
@@ -59,7 +59,7 @@ There is an English alternative — `Run time (hours)`, two words — which fixe
 every language at once, and costs a retranslation of one key. Say if you would rather have that.
 
 **Tom:**
-
+OK.
 ### 3. `mi_n617` — Manning Irregular, results column
 
 Currently: **`Comp.<br />n`**. The existing entry carries commentary only (`| layout: column
@@ -69,11 +69,11 @@ component are all live, and only one is right.
 Proposed payload (prepends to the existing entry, keeping its commentary):
 
 ```
-Composite (combined, weighted) Manning n for the whole region, from the segment n values | layout: column heading; symbol
+Composite (combined, weighted) Manning n for the whole region, from the segment n and other hydraulic properties | layout: column heading; symbol
 ```
 
 **Tom:**
-
+I edited it.
 ### 4. `dw_friction_factor_method` — Darcy-Weisbach
 
 Currently: **`Friction factor method`** — a three-noun stack with two bracketings. `[friction
@@ -83,11 +83,11 @@ explicit genitive have to pick one.
 Proposed payload:
 
 ```
-Which equation is used to compute the friction factor f (equation for f, f formula, method for the friction factor).
+Which equation is used to compute the Darcy-Weisbach friction factor f (equation for f, f formula, method for the friction factor).
 ```
 
 **Tom:**
-
+I edited it.
 ### 5. `wi_save_and_calculate` — Weir Flow Irregular, button
 
 Currently: **`Save and Calculate`**. It stores the entered cross-section points in the page's own
@@ -96,7 +96,7 @@ and this suite genuinely does that elsewhere, so a translator choosing the file 
 something the button does not do.
 
 Proposed payload:
-
+Remove this and its parent key. There is no such button.
 ```
 Store (keep, remember) the values entered on this page and calculate again. | layout: button; avoid: saving a file to disk
 ```
@@ -121,7 +121,7 @@ subject is pressure rather than velocity — so the entries have to be per key, 
 Approving this implies six more of the same shape on those pages; say if you want those too.
 
 **Tom:**
-
+OK. I trust your judgement.
 ### 7. `mhp_annual_kwh` — Microhydropower
 
 Currently: **`Annual energy at 100% capacity`**. *Capacity factor* (every hour of the year, which is
@@ -135,7 +135,7 @@ Energy produced in a year if the plant ran at full output every hour (8760 h) --
 ```
 
 **Tom:**
-
+OK.
 ---
 
 ## Part 2 — Nine visible wording choices
@@ -153,7 +153,7 @@ value. It also never says lost as a share of what (inflow).
 Candidates: **`Loss, share of inflow`** · **`Loss / inflow`** · leave it.
 
 **Tom:**
-
+"Portion lost" or "Proportion lost" I am not sure.
 ### 9. `rc_sketch_filter` — Rock Chute definition sketch
 
 Currently: **`Filter`**. Means the granular filter/bedding layer under the rock. In software
@@ -165,7 +165,7 @@ Candidate: **`Filter layer`**. Note this is a sketch label, where your standing 
 what an engineer cannot infer — so *delete it* is also a real answer.
 
 **Tom:**
-
+"Filter" is correct because it may be a fabric or an aggregate layer.
 ### 10 & 11. `odt_sketch_start` / `odt_sketch_end` — Orifice Drain Time sketch
 
 Currently: **`Start`** and **`End`**, marking the starting and ending water surfaces. Read cold,
@@ -176,7 +176,7 @@ Candidates: **`Start level` / `End level`** · **`Start WS` / `End WS`** · a `$
 instead, leaving the English alone · leave them.
 
 **Tom:**
-
+Either of your suggestions is fine. I like Start WS and End WS. But "level" is good too.
 ### 12. `mtc_n_strickler` and its three siblings — Manning Trapezoidal Channel
 
 Currently: **`n for design rock size (Strickler method)`**, and identically for Blodgett, Bathurst
@@ -187,7 +187,7 @@ pick it four times, consistently and invisibly.
 Candidate: **`n from design rock size (Strickler method)`** across all four.
 
 **Tom:**
-
+Yes, "from".
 ### 13. `mtc_blodgett_v_bathurst` — Manning Trapezoidal Channel
 
 Currently: **`Blodgett vs. Bathurst`**, which names a comparison. The cell does not report one:
@@ -200,7 +200,7 @@ constrained, so it may not fit. Two separate questions here, and the second one 
 should `----` and `++++` get a legend?
 
 **Tom:**
-
+Leave as is or change "vs." to "or"
 ### 14. `bpn_topology_warn_short` — Branched Network verdict cell
 
 Currently: **`Network`**. Its siblings in that slot are verdicts — `Low` for pressure, `OK`/`High`
@@ -210,7 +210,7 @@ topology is broken.
 Candidates: **`Broken`** · **`Check IDs`** · **`Unconnected`** · leave it.
 
 **Tom:**
-
+Either use your best judgement or explain to me better. I am unclear on this.
 ### 15. `ip_max_head` — Irrigation Pressure
 
 Currently: **`Max. allow. pipe pressure`**. Two stacked abbreviations, and the second is the
@@ -220,7 +220,7 @@ resolves it, but the tip is a separate key a translator may batch separately.
 Candidate: **`Max. allowable pipe pressure`** — costs label width, which is your call.
 
 **Tom:**
-
+Leave as is. No ambiguity. Allowable and allowance result in the same thing.
 ### 16. `mhp_notes_3_def` — Microhydropower notes
 
 Currently: *"...often falls around 4–6% where electricity is most valuable."* *Where* is locative or
@@ -230,3 +230,4 @@ Candidate: **`where electricity has a high value`**. A one-word change in a note
 retranslation cost is one key.
 
 **Tom:**
+I don't know. Use your best judgement or explain to me better. 
