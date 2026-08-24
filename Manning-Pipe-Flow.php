@@ -15,7 +15,7 @@ echoCalculatorForm(
 	//Inputs
 	Array(
 		Array('name' => 'd0', 'type' => 'number', 'default' => Array('us' => '18', 'si' => '450'), 'units' => 'distance_small', 'label' => $ec_lang['mpf_pipe_diameter']),
-		Array('name' => 'n', 'type' => 'number', 'default' => '0.013', 'units' => NULL, 'label' => '<a target="_blank" href="http://www.engineeringtoolbox.com/mannings-roughness-d_799.html">'.$ec_lang['mpf_manningRoughness'].'</a>'),
+		Array('name' => 'n', 'type' => 'number', 'default' => '0.013', 'units' => NULL, 'label' => '<a target="_blank" href="'.ecRefUrl('manning_n').'">'.$ec_lang['mpf_manningRoughness'].'</a>'),
 		Array('name' => 'sf', 'type' => 'number', 'default' => '0.005', 'units' => 'slope', 'label' => $ec_lang['mpf_friction_slope']),
 		Array('name' => 'dd0', 'type' => 'number', 'default' => '0.5', 'units' => 'fraction', 'label' => $ec_lang['mpf_depth_ratio'], 'control' => solverControlHtml('EngCalcs.solveForDd0();')),
 	),

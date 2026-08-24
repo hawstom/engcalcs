@@ -3,14 +3,10 @@ require_once('lib/base.inc.php');
 $html_title = $ec_lang['bpn_main_title'];
 $html_desc = $ec_lang['bpn_main_desc'];
 // The roughness column's reference table depends on the selected friction method: a Manning
-// user sent to a Hazen-Williams C table is worse off than with no link at all. Declared once
-// here, rendered as the column's initial href, and handed to JS through pageConfig so
-// EngCalcs.bpnUpdateMethodUI() retargets the same anchor it already retitles.
-$bpn_roughness_urls = Array(
-	'hw' => 'https://www.engineeringtoolbox.com/hazen-williams-coefficients-d_798.html',
-	'manning' => 'https://www.engineeringtoolbox.com/mannings-roughness-d_799.html',
-	'dw' => 'https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31',
-);
+// user sent to a Hazen-Williams C table is worse off than with no link at all. Rendered as the
+// column's initial href, and handed to JS through pageConfig so EngCalcs.bpnUpdateMethodUI()
+// retargets the same anchor it already retitles. The addresses are in lib/References.lib.php.
+$bpn_roughness_urls = ecRefRoughnessUrls();
 echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['bpn_main_desc']?></h2>
@@ -27,7 +23,7 @@ echoCalculatorForm(
 		Array('name' => 'q_source2',   'type' => 'number', 'default' => '',     'units' => 'flow_node', 'label' => $ec_lang['bpn_supply2_q']),
 		Array('name' => 'h_source3',   'type' => 'number', 'default' => '',     'units' => 'partial_head', 'label' => $ec_lang['bpn_supply3_h']),
 		Array('name' => 'q_source3',   'type' => 'number', 'default' => '',     'units' => 'flow_node', 'label' => $ec_lang['bpn_supply3_q']),
-		Array('name' => 'visc',        'type' => 'number', 'default' => '1e-6', 'units' => NULL, 'label' => ecLinkTipLabel('https://www.engineersedge.com/fluid_flow/kinematic-viscosity-table.htm', $ec_lang['dw_kinematic_viscosity_short'], $ec_lang['dw_kinematic_viscosity_tip'])),
+		Array('name' => 'visc',        'type' => 'number', 'default' => '1e-6', 'units' => NULL, 'label' => ecLinkTipLabel(ecRefUrl('kinematic_viscosity'), $ec_lang['dw_kinematic_viscosity_short'], $ec_lang['dw_kinematic_viscosity_tip'])),
 		Array('name' => 'h_max_allow', 'type' => 'number', 'default' => '',     'units' => 'partial_head', 'label' => ecTipLabel($ec_lang['ip_max_head'], $ec_lang['ip_max_head_tip'])),
 		Array('name' => 'demand_mult', 'type' => 'number', 'default' => '1',    'units' => NULL, 'label' => ecTipLabel($ec_lang['bpn_demand_mult'], $ec_lang['bpn_demand_mult_tip'])),
 	),
@@ -76,7 +72,7 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'roughnessu', $units = 'roughness', $indent_string); ?>
 				</th>
 				<th>
-					<span class="ec-narrowcol"><?=ecLinkTipLabel('https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html', $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])?></span>
+					<span class="ec-narrowcol"><?=ecLinkTipLabel(ecRefUrl('minor_loss_k'), $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])?></span>
 				</th>
 				<th>
 					<?=ecTipLabel($ec_lang['bpn_demand'], $ec_lang['bpn_demand_tip'])?><br />
