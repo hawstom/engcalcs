@@ -328,33 +328,6 @@ the block.
   says things a public board should not (measured costs, what Tom is not proud of, who to ask), so a
   public board is a SECOND artifact to keep current, not this one exposed.
 
-- 100|469| **Node labels should SHED properties before one of them is hidden.** Tom, 2026-08-21:
-  *"Properties are never dropped from node labels, so Node label drop order is a lie... As I look at
-  Net3, it seems to me that in many cases we could see many more node labels if some of the
-  requested node properties were dropped. We probably should try to implement it and then judge
-  whether the cost is too high."*
-  - **STILL NOT BUILT, and Tom is right that there is no evidence of it** (*"I can't see any evidence
-    of node labels dropping properties"*, 2026-08-23). Checked rather than assumed:
-    `labelSettings.priority.node` has exactly ONE consumer in `js/looped-network.js`, `nodeDropKey()`,
-    which builds a sort key deciding which whole label is hidden; `shedKeepSet()`/`keptLines()` are
-    called from three places and every one of them is a link. So it is not implemented-and-unreached
-    — there is nothing to reach. The column reads as a property drop order in both lists and is one
-    only in the link list. This is a FEATURE and wants scoping before it is written.
-  - **ANY overlap, not a vertical one** (Tom left the question open in the tip). `js/lpn-collide.js`
-    relaxes boxes and has no notion of an axis, so classifying an overlap as vertical means
-    inventing that notion and answering it for a diagonal overlap. A shed row also shortens the
-    widest line as often as not, so the axis would not predict what the shed buys anyway.
-  - Shed LAST, after placement has failed: place, find the labels still overlapping, drop the
-    lowest-ranked property from each, re-measure, re-place, repeat; hide only when one property is
-    left and the pair still overlaps. That loop is the cost to measure — link shedding is one
-    monotone width per step, node shedding changes a box and so changes the relaxation.
-  - **The tip is written and waiting.** `lpn_labels_priority_node_tip` says what is true today; the
-    agreed target wording is: *"The order in which properties are given up when two node labels
-    would overlap. The property numbered 1 is given up first, on both labels. When one property is
-    left and the two still overlap, a whole label is hidden: the one whose remaining value is worth
-    showing least — the lowest demand, the pressure nearest the middle of the range, or the
-    elevation or head closest to the neighbouring nodes."* Swap it in when this lands.
-
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary

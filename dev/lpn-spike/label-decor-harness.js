@@ -116,13 +116,19 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	// in both branches. A harness cannot measure text, so it cannot catch this any other way.
 	//
 	// **THE WRITE AND THE READ ARE NOW SEPARATE FUNCTIONS** (Task 440), so the order is checked
-	// across the concatenation of everything the pass is made of: refreshLabelTextPass() (the node
-	// half, still inline), writeLabelGlyphs()/measureLabelWidths() (the link half's two halves) and
-	// renderLinkLabel(), which is the two back to back for a caller holding one label. Searching the
-	// sources rather than naming which holds which keeps this true through the next move as well.
-	const rlt = extract('refreshLabelText') + '\n' + extract('refreshLabelTextPass') +
-		'\n' + extract('writeLabelGlyphs') + '\n' + extract('renderLinkLabel') +
-		'\n' + extract('measureLabelWidths');
+	// across the concatenation of everything the pass is made of: refreshLabelTextPass(),
+	// writeNodeLabelGlyphs() and writeLabelGlyphs()/measureLabelWidths() (each half's own write and
+	// the one read), and renderLinkLabel(), which is the two back to back for a caller holding one
+	// label. Searching the sources rather than naming which holds which keeps this true through the
+	// next move as well -- Task 469 moved the node write out of refreshLabelTextPass() and into
+	// writeNodeLabelGlyphs(), and this list is where that shows up.
+	// **CONCATENATED WRITE HALVES FIRST, THEN THE PASSES THAT MEASURE**, which is the order the page
+	// runs them in: each kind's font size is written by its own write function and every measurement
+	// happens in a later loop that calls measureLabelWidths(). Reading the two halves in source order
+	// would say nothing, because a write function may be defined anywhere in the file.
+	const rlt = extract('writeNodeLabelGlyphs') + '\n' + extract('writeLabelGlyphs') +
+		'\n' + extract('refreshLabelText') + '\n' + extract('refreshLabelTextPass') +
+		'\n' + extract('renderLinkLabel') + '\n' + extract('measureLabelWidths');
 	['ne', 'le'].forEach(function (v) {
 		const set = rlt.indexOf(v + '.text.style.fontSize = fsNow;');
 		const measure = rlt.indexOf('measureLabelWidths(' + v + ')');
@@ -135,8 +141,8 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	// measureLabelWidths() is the only tape measure in the pass and is only ever called on labels
 	// already written by writeLabelGlyphs(). A getBBox() reappearing anywhere else in these
 	// functions is the defect, whatever order it is in.
-	['refreshLabelTextPass', 'writeLabelGlyphs', 'renderLinkLabel', 'shedToSegment',
-		'shedToSegmentBatch'].forEach(function (fn) {
+	['refreshLabelTextPass', 'writeLabelGlyphs', 'writeNodeLabelGlyphs', 'renderLinkLabel',
+		'shedToSegment', 'shedToSegmentBatch', 'shedNodeLabelsForCrowding'].forEach(function (fn) {
 		// Comment lines stripped: these functions EXPLAIN getBBox() at length, and a prose mention is
 		// not a call.
 		const code = extract(fn).split('\n').map(function (s) { return s.replace(/\/\/.*$/, ''); }).join('\n');
