@@ -271,7 +271,8 @@ console.log('\n--- a label sheds down to its name and one number, and then goes 
 		const ne = nodeEls[n.id];
 		return askedFields(ne).indexOf('id') >= 0 && shownFields(ne).indexOf('id') < 0;
 	});
-	report(lostId.length === 0, 'no label ever gives up its ID', lostId.join(', ') || 'none did');
+	report(lostId.length === 0, 'no label ever gives up its ID',
+		lostId.map(function (n) { return n.id; }).join(', ') || 'none did');
 	const stripped = shedders().filter(function (n) {
 		const ne = nodeEls[n.id];
 		return shownFields(ne).filter(function (f) {
@@ -279,7 +280,7 @@ console.log('\n--- a label sheds down to its name and one number, and then goes 
 		}).length === 0;
 	});
 	report(stripped.length === 0, 'no label is left with no ranked value at all',
-		stripped.join(', ') || 'none was');
+		stripped.map(function (n) { return n.id; }).join(', ') || 'none was');
 	// And the terminal rung is still reachable: some labels are hidden whole on this crowded view,
 	// or the drop key would have nothing left to decide.
 	const hidden = doc.nodes.filter(function (n) {
@@ -302,8 +303,15 @@ console.log('\n--- the label that was in the way sheds too, not only the one tha
 	});
 	report(shedDrawn.length > 0, 'labels that are drawn have shed, not only ones that were dropped',
 		shedDrawn.length + ' of ' + shed.length + ' shedding labels are on the drawing');
-	// The strong form: more labels shed than were ever dropped by the first placement. A
-	// loser-only cascade could never exceed the number of drops it started from.
+	// **THE STRONG FORM IS A MEASURED FLOOR, because "did this label ever get dropped" is not
+	// observable from outside the pass.** Deleting the blocker half and shedding only the loser was
+	// run on this exact view: 17 labels shed and 93 of 97 were drawn, in 4 rungs. Shedding both
+	// sides of the pair: 41 shed, 96 drawn, in 3. The floors below sit between the two, so the
+	// loser-only cascade fails them by name -- which is what a mutation test is for.
+	report(shed.length >= 30, 'far more labels shed than were ever dropped, which only the pair rule does',
+		shed.length + ' shedding (loser-only measured 17)');
+	report(drawnNodes().length >= 94, '...and it puts more of them on the drawing',
+		drawnNodes().length + ' of ' + doc.nodes.length + ' drawn (loser-only measured 93)');
 	report(L.shedRungs() > 0, 'the cascade ran at least one rung on this view',
 		L.shedRungs() + ' rungs');
 }
@@ -334,6 +342,20 @@ console.log('\n--- an untouched drawing sheds the same values every time, and a 
 	report(shedders().length > 0 && Math.abs(shedders().length - crowded) <= crowded,
 		'...and coming back to the crowded zoom sheds again',
 		shedders().length + ' shedding');
+
+	// **AND THE ZOOM PATH IS WHERE A RATCHET WOULD ACTUALLY BITE.** A content pass rewrites every
+	// node label at its full content before it starts, so it hides a ratchet completely; the
+	// debounced scheduleReshed() does NOT rebuild node text -- it reshapes the link labels and lays
+	// out -- so unless the pass puts every node label back to full itself, a value given up at one
+	// zoom could never be recovered at the next. Reproduced here the way that path runs: change the
+	// view, then lay out, with no refreshLabelText() in between.
+	if (!L.setView({ cx: cx, cy: cy, s: 30000 })) { throw new Error('view refused'); }
+	L.relayoutLabels(true);
+	const tight = shedders().length;
+	if (!L.setView({ cx: cx, cy: cy, s: 120000 })) { throw new Error('view refused'); }
+	L.relayoutLabels(true);
+	report(shedders().length < tight, 'a zoom with no content rebuild gives the values back too',
+		tight + ' -> ' + shedders().length + ' shedding, through relayoutLabels() alone');
 }
 
 // ---- 6b. CONTENT DECISIONS ON A CONTENT PASS, POSITION ONLY ON A DRAG FRAME ---------------------
