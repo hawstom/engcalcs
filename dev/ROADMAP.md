@@ -111,6 +111,13 @@ the block.
     per notch and overlap tests at ~7 per label, so the remaining cost is PER-LABEL work no index
     removes — text measurement is the suspect and is unproven. `specs/perf.js` reports the number
     and asserts no bound: the spread is wider than any honest threshold.
+  - **AND THAT CONVERGENCE WAS HIDING A DEFECT, FIXED 2026-08-23.** Because the seed lags, a first
+    layout sheds link labels for ground the node labels do not take, and the node then takes ground
+    under a pipe label using `yields` — which granted the position and never made the holder leave.
+    Measured on `Net3-World`: 60 node label rows printed through an aligned pipe label, up to 28 px
+    deep, zero node-on-node. `yieldStationedLabels()` hides the yielder; node placements are
+    unchanged. Iterating the two passes instead also reaches zero and costs 3x.
+    `dev/lpn-spike/node-yield-harness.js`.
   - Placement leftovers, small: a background image is not carried onto the map, the two-control-point
     path (`lpnGeorefFromTwoPoints`) is built and tested with no interface, and Finish is not undoable.
   - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the
@@ -406,9 +413,13 @@ the block.
   Net3, it seems to me that in many cases we could see many more node labels if some of the
   requested node properties were dropped. We probably should try to implement it and then judge
   whether the cost is too high."*
-  - Today the node Drop column orders the TESTS that decide which whole label is hidden
-    (`nodeDropKey`); only link labels shed (`shedOrder`, `shedToSegment`). The column reads as a
-    property drop order in both lists and is one only in one of them.
+  - **STILL NOT BUILT, and Tom is right that there is no evidence of it** (*"I can't see any evidence
+    of node labels dropping properties"*, 2026-08-23). Checked rather than assumed:
+    `labelSettings.priority.node` has exactly ONE consumer in `js/looped-network.js`, `nodeDropKey()`,
+    which builds a sort key deciding which whole label is hidden; `shedKeepSet()`/`keptLines()` are
+    called from three places and every one of them is a link. So it is not implemented-and-unreached
+    — there is nothing to reach. The column reads as a property drop order in both lists and is one
+    only in the link list. This is a FEATURE and wants scoping before it is written.
   - **ANY overlap, not a vertical one** (Tom left the question open in the tip). `js/lpn-collide.js`
     relaxes boxes and has no notion of an axis, so classifying an overlap as vertical means
     inventing that notion and answering it for a diagonal overlap. A shed row also shortens the
