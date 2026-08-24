@@ -14191,28 +14191,31 @@ var EngCalcs = EngCalcs || {};
 					if (tables.length) { openPane(tables[0].id); }
 				}
 			},
-			// **A COPY OF EDIT > FIND, AND OF THE TOOLBAR'S OWN BUTTON** (Tom, 2026-08-21: *"Add
-			// Search to the Project menu... this is good for discovery"*). A command in two menus is
-			// correct on this page, not duplication to clean up -- Edit holds it because Find acts
-			// on the ELEMENTS, and it is here because "find a part in this project" is what somebody
-			// reaches the Project menu for after Profile and Tables have shown them the network is
-			// bigger than the screen. It anchors on the menu the way Edit's row does, so the popup
-			// opens under the item that was clicked.
-			//
-			// **NOT ON THE TOOLBAR AGAIN**: the strip already carries Find at its right-hand end,
-			// beside the pane toggle, so the strip stops mirroring the Project menu exactly at this
-			// one row. That is the cheaper of the two prices -- the alternative was the same button
-			// twice on one strip.
-			{
-				icon: 'find', label: pc.lpn_find_menu || 'Find', tip: pc.lpn_find_menu_tip,
-				fn: function () { toggleFindPopup(anchor); }
-			},
+			// **FIND IS IN EDIT AND NOWHERE ELSE** (Tom, 2026-08-24, on shipping Replace: *"Add it
+			// to the Edit menu. Move from Project per universal convention. To us it's a milestone.
+			// To the world, it's just search and replace."*). It stood here as a second door for
+			// discovery (Tom, 2026-08-21: *"Add Search to the Project menu"*) -- superseded, and the
+			// reason is that Find now carries Replace, which every application on every platform
+			// puts in Edit. A duplicate row was affordable while this was our own novelty; it is not
+			// once the command is the one users already know where to find. The toolbar still
+			// carries Find at its right-hand end.
 			{ separator: true },
 			// **THE MENU'S ROW IS ALWAYS HERE; THE TOOLBAR'S BUTTON IS NOT** (Task 467). Tom wrote
 			// "Run (if present)" of the TOOLBAR, where the button goes away while this project
 			// recalculates by itself. A menu row that vanished with it would leave a user who
 			// wonders where Run went with nothing to read -- so the row stays and its tip is what
 			// explains the missing button.
+			// **SCENARIOS SITS WITH CALCULATE, NOT WITH SETTINGS** (Tom, 2026-08-24: *"Add to the
+			// Project menu. How about before Calculate under the divider?"*). The placement is the
+			// argument: a scenario is which set of values you are about to solve, so it belongs in
+			// the same group as the thing that solves them. It is the SECOND door -- the readout in
+			// the map's bottom status strip is the first and stays -- and both call
+			// openScenarioMenu(), so the two cannot drift.
+			{
+				icon: 'scenarios', label: pc.lpn_scenario_menu || 'Scenarios',
+				tip: pc.lpn_scenario_tip,
+				fn: function () { openScenarioMenu(anchor); }
+			},
 			{
 				icon: 'run', label: pc.lpn_time_run || 'Run', tip: pc.lpn_run_menu_tip,
 				fn: function () {

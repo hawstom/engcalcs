@@ -235,10 +235,38 @@ the block.
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
 
-- 50|248.02| **Patterns: attach one to a RESERVOIR HEAD and a PUMP.** Task 248 child. Everything
+- 75|504| **A features list, built from the roadmap's own closed ledger.** Tom, 2026-08-24, on the
+  unit-change dialog landing: *"We may need to build a features list from our roadmap completions.
+  This is getting impressive."*
+  - **The source already exists and is machine-readable:** `dev/roadmap-closed-ids.md` is one line
+    per closed ID, and `dev/scripts/roadmap_lib.php` already parses that format. So this is a
+    generator, not a writing project — the same shape as `generate_roadmap_index.php`.
+  - **The audience decides the wording, and it is not us.** A closed-ledger line is written for a
+    developer re-resolving a citation; a features list is read by somebody deciding whether to try
+    the page. Do not ship the ledger's prose verbatim under a new heading.
+  - Where it goes is open: the LibreWaterNet landing page (`dev/librewaternet-landing/index.html`)
+    is the obvious home, and Help is the other. Decide before generating.
+
+- 75|505| **[H] Move the local working directory to a `~/webdev` parent — Tom's proposal.**
+  Tom, 2026-08-24, proposing `~/webdev/engcalcs/` holding `hawsedc.com/engcalcs` and a sibling
+  `dev/`, plus links to `/var/www/hawsedc.local` and `/var/www/librewaternet.local`.
+  - **This is the plan `dev/hosting-layout.md` §5 already records** ("right shape, wrong moment"),
+    now with a concrete layout. Read §5 before acting: it prices the move as a changed primary
+    working directory, a re-rooted `CLAUDE.md`, and every `dev/scripts/*.php` path assumption
+    (`__DIR__ . '/../../lib'`).
+  - **The question Tom must answer first is whether `.git` splits from the working tree** — his
+    sketch puts `.git` under `dev/`, which is a different and much more expensive thing than a
+    parent folder. See the analysis handed to him 2026-08-24.
+  - Sequence it with the landing-page repository, not before: one move, one set of path fixes.
+
+- 75|248.02| **Patterns: attach one to a RESERVOIR HEAD and a PUMP.** Task 248 child. Everything
   else shipped: the Libraries box creates, renames, edits and deletes patterns with a sparkline, the
   property popup attaches one to a junction demand, `[PATTERNS]`/`[TIMES]`/`[OPTIONS] Pattern` round-trip
   byte-identically, and Net3 matches EPA's published 24-hour report to 0.005 ft over 2,425 comparisons.
+  - **RAISED TO 75 on 2026-08-24 as EPANET catch-up.** Tom asked *"Is this EPANET catch up? If so,
+    raise it to 75."* It is: EPANET varies a reservoir's head and a pump's speed by pattern and we
+    do not. That is the whole of the reason, and it is a different reason from the one that gets a
+    feature built because it is interesting.
   - **Water quality is NOT in scope and cannot be scoped by Tom** (2026-08-17: *"I don't know anything
     about water quality modeling"*). Build the mechanism so a WQ source could read a pattern later; do
     not build WQ on the strength of it.
@@ -406,10 +434,20 @@ the block.
   `Irrigation.php` it has a real in-site path. Check what that contributes before assuming the
   numbers mean nobody wants it.
 
-- 25|247| **Demand allocation by customer (epanet-js has it, EPANET does not).** Tom, 2026-08-09.
-  Assign named demands to a junction and sum them, rather than typing one lumped figure. Genuinely
-  fits the irrigation/rural-water audience. Below Task 184 (scenarios), which epanet-js charges for
-  and Tom therefore wants raised.
+- 50|247| **Customer accounts as meters on the system, lumped to the nearest node.** Tom,
+  2026-08-09 and expanded 2026-08-24. Assign named demands to a junction and sum them, rather than
+  typing one lumped figure. Genuinely fits the irrigation/rural-water audience. epanet-js has it;
+  EPANET does not.
+  - **The 2026-08-24 expansion, in Tom's words:** *"expand/envision as a Customer management model
+    where we are adding Customer account numbers, and these are meters on the system. Not sure where
+    this is headed, but let's at least think that way. And of course I assume that we lump the
+    Customer demands additively at their nearest (by length) node. Graphically, I think you pick a
+    point, it draws a meter rectangle, and then you pick a pipe and it connects perpendicularly from
+    the meter to the pipe."*
+  - **Scope first, build second** — "not sure where this is headed" is the reason. Design record and
+    the staged plan: `dev/customer-demands.md`.
+  - Read with Task 468 (demand categories on a junction, the breakdown the importer already
+    flattens) — they may be one task.
 
 - 25|248| **Extended-period simulation, the GATE on the LibreEPANET.org launch.**
   Last of the three things the EPANET engine unlocked; Tasks 306/307. Tanks and valves shipped

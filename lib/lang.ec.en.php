@@ -1487,7 +1487,7 @@ $ec_lang['lpn_menu_project']='Project';
 // uses; this one is ours, and the tip says what a person gains by opening it. Tom, 2026-08-24:
 // "Everything unique about this application is here in one place except the animation play controls.
 // There is no need to guess where things are."
-$ec_lang['lpn_menu_project_tip']='Everything unique about this application is here in one place except the animation play controls. There is no need to guess where things are.';
+$ec_lang['lpn_menu_project_tip']='Everything about water network modeling is here in one place, except the animation play controls under the map. There is no need to guess where things are.';
 $ec_lang['lpn_tables_menu']='Tables';
 $ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
@@ -2194,6 +2194,7 @@ $ec_lang_syn['lpn_scenario_base']='Base case, Baseline, Canonical, Source, Root,
 // chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
 // pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
 $ec_lang['lpn_scenario_overrides']='Custom values';
+$ec_lang['lpn_scenario_menu']='Scenarios';
 $ec_lang['lpn_scenario_tip']='The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.';
 $ec_lang['lpn_scenario_new']='New scenario…';
 $ec_lang['lpn_scenario_new_name']='Scenario {n}';

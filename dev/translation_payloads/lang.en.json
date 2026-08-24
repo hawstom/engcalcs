@@ -782,7 +782,7 @@
         "lpn_clean_map_off": "Show map readouts",
         "lpn_clean_map_tip": "Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back.",
         "lpn_menu_project": "Project",
-        "lpn_menu_project_tip": "Everything unique about this application is here in one place except the animation play controls. There is no need to guess where things are.",
+        "lpn_menu_project_tip": "Everything about water network modeling is here in one place, except the animation play controls under the map. There is no need to guess where things are.",
         "lpn_tables_menu": "Tables",
         "lpn_tables_menu_tip": "Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.",
         "lpn_run_menu_tip": "Recalculate this network now. Looking for a Run button? While this project recalculates after every change, the toolbar has no Run button. Turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics, and the button comes back.",
@@ -1125,6 +1125,7 @@
         "lpn_scenario_label": "Scenario",
         "lpn_scenario_base": "Base",
         "lpn_scenario_overrides": "Custom values",
+        "lpn_scenario_menu": "Scenarios",
         "lpn_scenario_tip": "The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.",
         "lpn_scenario_new": "New scenario…",
         "lpn_scenario_new_name": "Scenario {n}",
@@ -1285,7 +1286,7 @@
         "lpn_field_demand_pattern": "Demand pattern",
         "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
     },
-    "count": 1283,
+    "count": 1284,
     "active_prefixes": [
         "about",
         "bpn",
