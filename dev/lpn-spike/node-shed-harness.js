@@ -36,7 +36,7 @@
 
 const fsmod = require('fs');
 const stub = require('./lpn-dom-stub.js');
-const { ROOT, loadLoopedNetwork, setUnitSet } = stub;
+const { ROOT, loadLoopedNetwork, setUnitSet, settleEpanet, warmEpanet, epanetSolves } = stub;
 const Collide = require(ROOT + 'js/lpn-collide.js').lpnCollide;
 
 let checks = 0, failures = 0;
@@ -110,7 +110,6 @@ L.applySaved(JSON.parse(fsmod.readFileSync(
 L.buildDom();
 L.setView(L.geoHome());
 L.noteMapSized();
-L.runSolve();
 const ls = L.labelSettings();
 Object.keys(ls.node).forEach(function (k) { ls.node[k] = true; });
 Object.keys(ls.link).forEach(function (k) { ls.link[k] = true; });
@@ -161,11 +160,36 @@ function contentDump() {
 		}).join('\n');
 }
 
+// **ASYNC BECAUSE THE ENGINE IS** (Task 496). `Net3-World-lpn.json` carries
+// `"settings": {"engine": "epanet"}`, so runSolve() hands the network to the real EPANET engine and
+// returns BEFORE any answer exists -- which is what a visitor's browser does too. Until the stub
+// gained that engine this harness silently fell through to the native solver and solved
+// synchronously; measured on the merged tree without the settle below, every node label was built
+// from `[id,demand,elev]` with head and pressure simply absent, because refreshLabelTextPass()
+// only pushes those two lines when `lastSolveResult` has them. Every number this file printed was
+// therefore about a three-property drawing pretending to be a five-property one.
+//
+// **warmEpanet() BEFORE ANYTHING IS TIMED.** The first import of the vendored engine costs ~16 ms
+// and the first solve ~35 ms, and both would otherwise land inside whichever pass happened to run
+// first in the cost table.
+async function main() {
+
+await warmEpanet();
+L.runSolve();
+await settleEpanet();
 if (process.argv[2] === '--dump') {
 	zoomTo(Number(process.argv[3]) || 30000);
 	process.stdout.write(contentDump() + '\n');
 	process.exit(0);
 }
+report(epanetSolves() > 0, 'the drawing really went to EPANET, so these are solved numbers',
+	epanetSolves() + ' solves');
+report(doc.nodes.some(function (n) {
+	const ne = nodeEls[n.id];
+	return ne && (ne.allLines || []).some(function (l) { return l.field === 'pressure'; });
+}), '...and the labels carry the solved fields, not just the typed ones',
+	'head and pressure present on the drawing');
+
 
 // ---- 1. it fires at all -------------------------------------------------------------------------
 console.log('\n--- Net3-World: node labels give up properties rather than vanish ---');
@@ -305,9 +329,11 @@ console.log('\n--- the label that was in the way sheds too, not only the one tha
 		shedDrawn.length + ' of ' + shed.length + ' shedding labels are on the drawing');
 	// **THE STRONG FORM IS A MEASURED FLOOR, because "did this label ever get dropped" is not
 	// observable from outside the pass.** Deleting the blocker half and shedding only the loser was
-	// run on this exact view: 17 labels shed and 93 of 97 were drawn, in 4 rungs. Shedding both
-	// sides of the pair: 41 shed, 96 drawn, in 3. The floors below sit between the two, so the
-	// loser-only cascade fails them by name -- which is what a mutation test is for.
+	// run on this exact view, against the EPANET-solved drawing: 17 labels shed and 93 of 97 were
+	// drawn, in 4 rungs. Shedding both sides of the pair: 41 shed, 96 drawn, in 3. On the 480-pipe
+	// grid below the gap is wider still -- 39 node labels drawn loser-only against 50 with the pair
+	// rule. The floors below sit between the two, so the loser-only cascade fails them by name, which
+	// is what a mutation test is for.
 	report(shed.length >= 30, 'far more labels shed than were ever dropped, which only the pair rule does',
 		shed.length + ' shedding (loser-only measured 17)');
 	report(drawnNodes().length >= 94, '...and it puts more of them on the drawing',
@@ -440,8 +466,12 @@ console.log('\n--- and on the 480-pipe grid specs/perf.js uses ---');
 	const m = 16, x0 = -122.5686, y0 = 38.106, step = 0.0004, nodes = [], links = [];
 	for (let r = 0; r < m; r++) {
 		for (let c = 0; c < m; c++) {
+			// **`_head`, NOT `head`.** Every overridable property is read through effective(), which
+			// looks at the underscore field; a bare `head` is invisible to it, the reservoir falls back
+			// to its elevation, and EPANET answers "System has negative pressures" for a grid that was
+			// never supplied. Same for `_demand`.
 			nodes.push({ id: 'J' + (r * m + c), type: (r === 0 && c === 0) ? 'reservoir' : 'junction',
-				x: x0 + c * step, y: y0 + r * step, elev: 100, _demand: 5, head: 200 });
+				x: x0 + c * step, y: y0 + r * step, elev: 100, _demand: 0.2, _head: 400 });
 		}
 	}
 	let k = 0;
@@ -472,6 +502,7 @@ console.log('\n--- and on the 480-pipe grid specs/perf.js uses ---');
 	Object.keys(gls.link).forEach(function (k) { gls.link[k] = true; });
 	L.setView({ cx: x0 + step * m / 2, cy: y0 + step * m / 2, s: 80000 });
 	L.runSolve();
+	await settleEpanet();   // the grid is opened from the same project, so it goes to EPANET too
 	L.refreshLabelText();
 	let best = null;
 	for (let i = 0; i < 3; i++) {
@@ -483,9 +514,14 @@ console.log('\n--- and on the 480-pipe grid specs/perf.js uses ---');
 		`${best.placements} placements, ${best.layouts} forced layouts, ${best.ms.toFixed(1)} ms  ` +
 		`(drag frame ${best.dragMs.toFixed(1)} ms)`);
 	console.log(`       ${drawn} node labels drawn, ${shed} of them after shedding`);
+	report(drawn >= 45, '...and the pair rule earns its keep at this size',
+		drawn + ' node labels drawn (loser-only measured 39)');
 	report(best.placements <= 5, 'the cap holds on a big drawing too', best.placements + ' placements');
 	report(best.layouts < 40, 'and a rung is still one forced layout', best.layouts + ' forced layouts');
 }
 
 console.log(`\n${failures ? 'FAILURES: ' + failures : 'all ' + checks + ' checks passed'}`);
 process.exit(failures ? 1 : 0);
+
+}
+main().catch(function (e) { console.log("  FAIL harness threw -- " + (e && e.stack || e)); process.exit(1); });
