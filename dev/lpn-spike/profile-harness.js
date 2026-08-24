@@ -347,7 +347,10 @@ console.log('\n-- the route is drawn on the map --');
 	// Since Task 434 the profile is a TAB, so "closed" has three doors -- the pane's X, the toolbar
 	// toggle, and switching to another tab -- and all three go through paneTabs' `hide` hook. That
 	// hook is therefore the only place the clear has to be, and the only place it can be forgotten.
-	report(/id: 'profile'[\s\S]{0,1200}?hide: function \(\) \{ drawProfilePath\(null\); \}/.test(lnSrc),
+	// What must hold is that the hook CLEARS THE HIGHLIGHT, not that it does only that -- Task 433
+	// added profileDrawCancel() beside it so a half-drawn path cannot outlive the panel it is drawn
+	// in. Pinning the whole line verbatim made that addition look like a regression.
+	report(/id: 'profile'[\s\S]{0,1400}?hide: function \(\) \{[^}]*drawProfilePath\(null\);/.test(lnSrc),
 		'leaving the profile tab clears it');
 	report(/if \(paneState\.open && was && was !== now && was\.hide\) \{ was\.hide\(\); \}/.test(lnSrc),
 		'...switching tabs runs that hook');

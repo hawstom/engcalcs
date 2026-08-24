@@ -2282,3 +2282,19 @@ html:has(#lpn_canvas) { overflow: hidden; }
 		html:has(#lpn_canvas) #lpn_labels_link_fields { min-width: 9rem; }
 	}
 }
+
+/* ---- The profile's path chooser (Task 433) ---------------------------------------------------
+   The button that arms the gesture, and the line that says what the next click does. Both live in
+   the profile panel's control column, which is `font-size: .9em` already.
+
+   THE ARMED STATE HAS TO BE VISIBLE FROM THE MAP, not just from the button: the user's eyes are on
+   the drawing for the whole of this gesture, so the button reverses while it is running and the
+   commentary line is what they glance back at. */
+.lpn-profile-draw { width: 100%; }
+.lpn-profile-draw.lpn-profile-drawing { font-weight: bold; }
+.lpn-profile-say:empty { display: none; }
+.lpn-profile-say { margin: .25em 0 .4em; line-height: 1.3; }
+/* The candidate route and the ring on the node under the pointer. `pointer-events: none` is already
+   on the whole layer; this only exists so the dashes cannot be mistaken for the committed route by
+   anyone reading the SVG, and so a future stylesheet has one name to reach for. */
+.lpn-profile-ghost { pointer-events: none; }

@@ -828,6 +828,11 @@
         "lpn_profile_to": "To",
         "lpn_profile_pick": "Add nodes to the route by clicking them on the map",
         "lpn_profile_through": "Nodes on the way",
+        "lpn_profile_draw": "Choose the path on the map",
+        "lpn_profile_draw_stop": "Stop choosing",
+        "lpn_profile_draw_start": "Click the node where the path starts.",
+        "lpn_profile_draw_more": "Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.",
+        "lpn_profile_draw_blocked": "No route from {a} to {b}. Choose another node.",
         "lpn_profile_clear": "Remove all",
         "lpn_profile_choose": "Choose a start node and an end node.",
         "lpn_profile_no_path": "These two nodes are not connected by any route.",
@@ -1276,7 +1281,7 @@
         "lpn_field_demand_pattern": "Demand pattern",
         "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
     },
-    "count": 1274,
+    "count": 1279,
     "active_prefixes": [
         "about",
         "bpn",

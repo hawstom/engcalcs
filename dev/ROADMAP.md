@@ -278,17 +278,6 @@ the block.
     (switches the whole page to that unit system); safe, harmless, does not overwrite anything,
     leaves your entries untouched, keeps the numbers you typed.'`
 
-- 75|433| **Profile: the last piece is the path CHOOSER.** Tom, 2026-08-18: *"Amazing. Now we just need a
-  good UI."* Two of the three are done — the route is drawn on the map, and the panel is now the
-  full-height Profile tab of Task 434's bottom pane.
-  - **The path chooser should be the Google Maps gesture epanetjs uses:** click the starting node, hover
-    along the path, click to add a waypoint, double-click to end. Not two pull-downs.
-  - **The animation half is already done and proved headless.** The chart follows the transport with
-    no listener of its own (`showFrame` → `applySolveResult` → `refreshPaneIfOpen`);
-    `dev/lpn-spike/profile-eps-harness.js` walks Net3's 24-hour run and measures the grade line
-    moving 90.8 ft at node 61 while the ground holds still. A browser pass here is about the
-    chooser, not about whether it animates.
-
 - 50|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
