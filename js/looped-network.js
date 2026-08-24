@@ -7424,7 +7424,10 @@ var EngCalcs = EngCalcs || {};
 		// through a ghost.
 		show: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
 		refresh: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
-		hide: function () { drawProfilePath(null); }
+		// Closing the tab abandons a half-drawn path (Task 433) -- the same restore Escape does.
+		// Leaving the chooser armed under a closed panel would make the next map click mean
+		// something the user can no longer see.
+		hide: function () { profileDrawCancel(); drawProfilePath(null); }
 	});
 	// **THE PANE OPENS ON THE FIRST TABLE, WHICH IS THE CHANGE THIS REORDER MAKES.** paneTabs[0] is
 	// no longer the profile, and that is right: a reader who opens the pane without naming a tab
@@ -9000,7 +9003,12 @@ var EngCalcs = EngCalcs || {};
 	// gave it 36rem and a place to be in the way. So the profile owns no open/close state of its
 	// own: it is showing exactly when the pane is open on its tab, and paneTabs' show/hide hooks
 	// are the whole of its lifecycle.
-	var profileState = { from: '', to: '', waypoints: [], pick: false };
+	// `draw` is the PATH CHOOSER's whole state, and it is null except while the gesture is running
+	// (Task 433). `stops` is the click order -- NOT insertStop()'s least-added-length order, because a
+	// path the user is drawing stop by stop already states its own order and re-ordering it under the
+	// pointer would be the opposite of feedback. `saved` is the route that was on screen when the
+	// gesture started, so Escape can put it back.
+	var profileState = { from: '', to: '', waypoints: [], draw: null };
 	function profileIsOpen() { return paneIsOpen() && paneState.tab === 'profile'; }
 
 	// ---- THE ROUTE, ON THE MAP (ROADMAP Task 433) -----------------------------------------------
@@ -9018,13 +9026,20 @@ var EngCalcs = EngCalcs || {};
 	//
 	// The stops carry a ring each, because "where does this profile start" is the second question
 	// after "which way does it go", and the from/to pull-downs are in a panel that may be anywhere.
+	//
+	// **AND WHILE THE CHOOSER IS RUNNING, THE SAME LAYER CARRIES THE CANDIDATE** (Task 433) -- the
+	// route a click would commit, dashed and paler, from the last stop to the node under the pointer.
+	// That preview IS the gesture: without it "hover along the path" is just a click that reports
+	// its result afterwards, and the user cannot tell a route through the wrong branch from the
+	// right one until it is too late to not commit it.
 	var profilePathLayer = null;
 	function drawProfilePath(path) {
 		if (profilePathLayer && profilePathLayer.parentNode) {
 			profilePathLayer.parentNode.removeChild(profilePathLayer);
 		}
 		profilePathLayer = null;
-		if (!path || !world) { return; }
+		var dr = profileState.draw;
+		if ((!path && !(dr && dr.stops.length)) || !world) { return; }
 		var sc = state.s || 1;
 		profilePathLayer = el('g', { 'class': 'lpn-profile-path', 'pointer-events': 'none' });
 		// BELOW the nodes and ABOVE the links: a route is about the pipes, so it must not bury the
@@ -9033,7 +9048,7 @@ var EngCalcs = EngCalcs || {};
 		// the model got a group of its own (see modelLayer), and insertBefore on the wrong parent
 		// throws.
 		nodesLayer.parentNode.insertBefore(profilePathLayer, nodesLayer);
-		(path.links || []).forEach(function (id) {
+		((path && path.links) || []).forEach(function (id) {
 			var l = linkById(id);
 			if (!l) { return; }
 			el('polyline', {
@@ -9042,6 +9057,21 @@ var EngCalcs = EngCalcs || {};
 				'stroke-linecap': 'round', 'stroke-linejoin': 'round'
 			}, profilePathLayer);
 		});
+		// The candidate leg. Dashed and at half the opacity, so "committed" and "would be committed"
+		// are told apart at a glance and without colour -- the same distinction a rubber-band line
+		// makes while a pipe is being drawn.
+		if (dr && dr.ghost) {
+			(dr.ghost.links || []).forEach(function (id) {
+				var l = linkById(id);
+				if (!l) { return; }
+				el('polyline', {
+					points: linkPoints(l), fill: 'none', stroke: '#f60', 'stroke-opacity': 0.22,
+					'stroke-width': linkStrokeWidth() * 5, 'stroke-dasharray': (10 / sc) + ',' + (7 / sc),
+					'class': 'lpn-profile-ghost',
+					'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+				}, profilePathLayer);
+			});
+		}
 		profileStops().forEach(function (id) {
 			var nd = id && nodeById(id);
 			if (!nd) { return; }
@@ -9050,6 +9080,18 @@ var EngCalcs = EngCalcs || {};
 				stroke: '#f60', 'stroke-opacity': 0.9, 'stroke-width': 2 / sc
 			}, profilePathLayer);
 		});
+		// The node under the pointer wears a dashed ring of its own even when NO route reaches it,
+		// which is the case the reader most needs told apart from "the pointer is over nothing".
+		if (dr && dr.hover && dr.stops.indexOf(dr.hover) < 0) {
+			var hn = nodeById(dr.hover);
+			if (hn) {
+				el('circle', {
+					cx: hn.x, cy: hn.y, r: (nodeRadius(hn) + 5 / sc), fill: 'none',
+					stroke: '#f60', 'stroke-opacity': 0.55, 'stroke-width': 2 / sc,
+					'stroke-dasharray': (4 / sc) + ',' + (3 / sc), 'class': 'lpn-profile-ghost'
+				}, profilePathLayer);
+			}
+		}
 	}
 	// The pane follows the document without a listener of its own: every solve ends in a call to
 	// this, and every edit schedules a solve. A tab that is not on screen is not refreshed, and
@@ -9106,12 +9148,17 @@ var EngCalcs = EngCalcs || {};
 			return { id: l.id, from: l.from, to: l.to, length: effective(l, 'length') || 0 };
 		}));
 	}
+	// **WHILE THE CHOOSER IS RUNNING, THE STOPS ARE THE ONES BEING DRAWN**, and every consumer --
+	// the chart, the map highlight, the rings, the summary -- reads them here. One switch, so the
+	// half-drawn route can never be shown on the map while the chart still draws the old one.
 	function profileStops() {
+		if (profileState.draw) { return profileState.draw.stops.slice(); }
 		return [profileState.from].concat(profileState.waypoints, [profileState.to]);
 	}
 	function profilePath() {
-		if (!profileState.from || !profileState.to) { return null; }
-		return EngCalcs.lpnProfile.pathThrough(profileGraph(), profileStops());
+		var stops = profileStops();
+		if (stops.length < 2 || !stops[0] || !stops[stops.length - 1]) { return null; }
+		return EngCalcs.lpnProfile.pathThrough(profileGraph(), stops);
 	}
 	// The document resolved into the plain maps js/lpn-profile.js reads -- and the ONE place this
 	// feature crosses units.
@@ -9151,39 +9198,60 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// ---- the panel's controls ---------------------------------------------
+	// The commentary line, held by reference from the moment rebuildProfileForm() makes it --
+	// profileDrawSay() writes to it on every pointer move, and a lookup per move is a lookup too
+	// many.
+	var profileSayEl = null;
 	function profileNodeOptions() {
 		return doc.nodes.filter(profileNodeUsable).map(function (n) { return [n.id, n.id]; });
 	}
 	function rebuildProfileForm() {
 		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_profile_form'),
-			opts = profileNodeOptions(), row, lab, cb, chips, clr;
+			opts = profileNodeOptions(), row, btn, chips, clr;
 		if (!box) { return; }
 		box.innerHTML = '';
-		findSelect(box, pc.lpn_profile_from || 'From', opts, profileState.from, function (v) {
-			profileState.from = v; renderProfile();
-		});
-		findSelect(box, pc.lpn_profile_to || 'To', opts, profileState.to, function (v) {
-			profileState.to = v; renderProfile();
-		});
-		// **ONE CHECKBOX IS THE WHOLE PATH EDITOR.** With it on, clicking a node on the map puts the
-		// route through that node, and clicking one already on the route takes it back out; with it
-		// off the map behaves exactly as it always does. There is no drag, no handle and no gesture
-		// to learn. If a richer editor is ever wanted it starts from a feature that already works.
+		// **THE PULL-DOWNS ARE NOT SHOWN WHILE THE PATH IS BEING DRAWN.** They edit `from`/`to`,
+		// which profileStops() is ignoring for the duration -- so a change made there would appear
+		// to do nothing at all, which is worse than not offering it.
+		if (!profileState.draw) {
+			findSelect(box, pc.lpn_profile_from || 'From', opts, profileState.from, function (v) {
+				profileState.from = v; renderProfile();
+			});
+			findSelect(box, pc.lpn_profile_to || 'To', opts, profileState.to, function (v) {
+				profileState.to = v; renderProfile();
+			});
+		}
+		// **THE BUTTON STARTS A GESTURE; IT IS NOT A MODE THE USER HAS TO REMEMBER TO TURN OFF.**
+		// Press it, draw the path on the map, and it ends itself on the double-click that finishes
+		// the route. Escape ends it too. The pull-downs above stay because they are the only way in
+		// with no pointer -- see profileDrawStart() for why touch gets no gesture of its own.
 		row = document.createElement('div');
 		row.style.margin = '4px 0';
-		lab = document.createElement('label');
-		cb = document.createElement('input');
-		cb.type = 'checkbox';
-		cb.checked = !!profileState.pick;
-		cb.addEventListener('change', function () { profileState.pick = cb.checked; });
-		lab.appendChild(cb);
-		lab.appendChild(document.createTextNode(' ' + (pc.lpn_profile_pick || 'Click a node on the map to route through it')));
-		row.appendChild(lab);
+		btn = document.createElement('button');
+		btn.type = 'button';
+		btn.className = 'lpn-profile-draw' + (profileState.draw ? ' lpn-profile-drawing' : '');
+		btn.textContent = profileState.draw
+			? (pc.lpn_profile_draw_stop || 'Stop choosing')
+			: (pc.lpn_profile_draw || 'Choose the path on the map');
+		btn.title = pc.lpn_profile_pick || 'Add nodes to the route by clicking them on the map';
+		btn.addEventListener('click', function () {
+			if (profileState.draw) { profileDrawCancel(); } else { profileDrawStart(); }
+		});
+		row.appendChild(btn);
 		box.appendChild(row);
+
+		// The running commentary. It says what the NEXT click does, which is the only thing a
+		// half-finished gesture can usefully say, and it is the one place a refused click explains
+		// itself (profileDrawSay()).
+		profileSayEl = document.createElement('div');
+		profileSayEl.id = 'lpn_profile_say';
+		profileSayEl.className = 'lpn-profile-say';
+		profileSayEl.textContent = profileState.draw ? profileState.draw.say : '';
+		box.appendChild(profileSayEl);
 
 		chips = document.createElement('div');
 		chips.style.margin = '4px 0';
-		if (profileState.waypoints.length) {
+		if (!profileState.draw && profileState.waypoints.length) {
 			chips.appendChild(document.createTextNode((pc.lpn_profile_through || 'Through') + ' '));
 			profileState.waypoints.forEach(function (id) {
 				var b = document.createElement('button');
@@ -9207,21 +9275,166 @@ var EngCalcs = EngCalcs || {};
 		profileState.waypoints = profileState.waypoints.filter(function (w) { return w !== id; });
 		rebuildProfileForm(); renderProfile();
 	}
-	// A map click while the panel is picking. Returns true when it CONSUMED the click, so the
-	// property popup does not open on top of the drawing the user is building.
-	function profileClickNode(id) {
-		if (!profileIsOpen() || !profileState.pick || !id) { return false; }
-		if (!profileState.from) { profileState.from = id; }
-		else if (!profileState.to) { profileState.to = id; }
-		else if (profileState.waypoints.indexOf(id) >= 0) { profileRemoveStop(id); return true; }
-		else if (id === profileState.from || id === profileState.to) { return true; }
-		else {
-			profileState.waypoints = EngCalcs.lpnProfile.insertStop(
-				profileGraph(), profileStops(), id).slice(1, -1);
+	// ---- THE PATH CHOOSER (ROADMAP Task 433) -----------------------------------------------------
+	//
+	// Tom, 2026-08-18: *"Amazing. Now we just need a good UI."* The UI is Google Directions' own
+	// gesture, which is also the one epanet-js uses: **click the node the path starts at, move along
+	// the map to see where a click would take it, click to fix that stop, double-click to finish.**
+	// Escape abandons it and puts back the route that was on screen before.
+	//
+	// **THE HOVER IS THE FEATURE, NOT THE CLICKS.** A chooser that only reported its answer after
+	// each click would be a form with the fields painted on the map. What makes this readable is
+	// that the candidate leg is drawn BEFORE it is committed, so the user sees the route bend
+	// through the branch they are aiming at and can aim somewhere else for free.
+	//
+	// **THE ROUTING RULE, STATED ONCE:** a leg is the SHORTEST PATH BY TOTAL LINK LENGTH between two
+	// consecutive stops, through the graph of ACTIVE elements, using the same length the solver is
+	// given (profileGraph()). That is what an engineer means by "the way the water goes" on a
+	// drawing, and it is the same rule the suggested from/to route has always used -- the chooser
+	// adds waypoints to it, it does not introduce a second idea of a route.
+	//
+	// **WHEN NO PATH EXISTS THE CLICK IS REFUSED AND SAID OUT LOUD.** Not committed-and-broken:
+	// a stop that cannot be reached from the previous one would make every later leg meaningless,
+	// and the chart would go blank with no way to tell which of the stops was the bad one. So the
+	// stop list never holds an unreachable pair, and the panel names the two nodes.
+	//
+	// **THERE IS NO TOUCH EQUIVALENT AND NONE IS INVENTED HERE.** The gesture is hover-driven, and a
+	// finger has no hover; a "tap, then tap Next" imitation would be a different, worse interaction
+	// wearing this one's name. Touch keeps the From/To pull-downs, which is what it always had.
+	function profileDrawActive() { return !!profileState.draw && profileIsOpen(); }
+	function profileDrawStart() {
+		profileState.draw = {
+			stops: [],
+			hover: null,
+			ghost: null,
+			say: ''
+		};
+		profileDrawSay('start');
+		rebuildProfileForm();
+		renderProfile();
+	}
+	// The commentary line, by state name rather than by string, so the caller cannot get the two
+	// prompts the wrong way round. `detail` is the refusal's two node ids.
+	function profileDrawSay(which, detail) {
+		var pc = EngCalcs.pageConfig || {}, d = profileState.draw, box;
+		if (!d) { return; }
+		if (which === 'start') {
+			d.say = pc.lpn_profile_draw_start || 'Click the node where the path starts.';
+		} else if (which === 'blocked') {
+			d.say = (pc.lpn_profile_draw_blocked || 'No route from {a} to {b}. Choose another node.')
+				.replace('{a}', detail[0]).replace('{b}', detail[1]);
+		} else {
+			d.say = pc.lpn_profile_draw_more ||
+				'Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.';
 		}
-		rebuildProfileForm(); renderProfile();
+		// Written straight into the line rather than through rebuildProfileForm(): this runs on every
+		// pointer move, and rebuilding the whole panel at pointer rate would throw away the button
+		// the user is about to press. Through the element rebuildProfileForm() made, not through a
+		// getElementById() on every move.
+		box = profileSayEl;
+		if (box) { box.textContent = d.say; }
+	}
+	// The node the pointer is over, with pointer slop -- the same NODE_SNAP_PX every other node-
+	// picking gesture on this page uses, so a route is no harder to aim than a pipe is to draw.
+	function profileDrawNodeAt(cx, cy) {
+		var n = nearestNodeNearScreen(cx, cy, NODE_SNAP_PX);
+		return (n && profileNodeUsable(n)) ? n.id : null;
+	}
+	// HOVER. Cheap by construction: it recomputes nothing unless the node under the pointer actually
+	// changed, so sweeping across bare map costs one distance loop per event and no Dijkstra at all.
+	function profileDrawHover(cx, cy) {
+		var d = profileState.draw, id, last, leg;
+		if (!profileDrawActive() || !d.stops.length) { return; }
+		id = profileDrawNodeAt(cx, cy);
+		if (id === d.hover) { return; }
+		d.hover = id;
+		last = d.stops[d.stops.length - 1];
+		if (!id || id === last) {
+			d.ghost = null;
+			profileDrawSay('more');
+		} else {
+			leg = EngCalcs.lpnProfile.shortestPath(profileGraph(), last, id);
+			d.ghost = leg;
+			profileDrawSay(leg ? 'more' : 'blocked', [last, id]);
+		}
+		drawProfilePath(profilePath());
+	}
+	// A CLICK. Returns true when it consumed the click, so the property popup does not open on top
+	// of the drawing the user is building.
+	//
+	// A click on the stop just added is ignored rather than doubling it -- which is also what makes
+	// the double-click that ENDS the gesture safe, since its second tap arrives here first.
+	function profileDrawClick(id) {
+		var d = profileState.draw, last, leg;
+		if (!profileDrawActive() || !id) { return false; }
+		last = d.stops.length ? d.stops[d.stops.length - 1] : null;
+		if (id === last) { return true; }
+		if (last) {
+			leg = EngCalcs.lpnProfile.shortestPath(profileGraph(), last, id);
+			if (!leg) { profileDrawSay('blocked', [last, id]); drawProfilePath(profilePath()); return true; }
+		}
+		d.stops.push(id);
+		d.hover = null;
+		d.ghost = null;
+		profileDrawSay('more');
+		renderProfile();
 		return true;
 	}
+	// THE DOUBLE-CLICK THAT FINISHES. Its two taps have already run through profileDrawClick(), so
+	// the node under it is the last stop by the time this fires and there is nothing left to add --
+	// this only has to commit and get out of the way.
+	//
+	// A path of fewer than two stops is not a path, so ending there is a cancel: the user gets back
+	// the route they had rather than an empty chart.
+	function profileDrawEnd() {
+		var d = profileState.draw;
+		if (!profileDrawActive()) { return false; }
+		if (d.stops.length < 2) { profileDrawCancel(); return true; }
+		profileState.from = d.stops[0];
+		profileState.to = d.stops[d.stops.length - 1];
+		profileState.waypoints = d.stops.slice(1, -1);
+		profileState.draw = null;
+		rebuildProfileForm();
+		renderProfile();
+		return true;
+	}
+	// ESCAPE, and the button's own second press.
+	//
+	// **THE RECOVERY IS STRUCTURAL, NOT A STASH.** The gesture writes only into `draw.stops`, and
+	// `from`/`to`/`waypoints` are not touched until profileDrawEnd() commits -- so dropping `draw`
+	// IS the restore, and there is no snapshot to take, to keep in step, or to get wrong. A saved
+	// copy was written first and then removed: it could not fail, which is the same as saying it
+	// could not be tested. **Anything that writes a committed stop before the double-click breaks
+	// this silently**, so profile-chooser-harness.js asserts the displayed route comes back rather
+	// than asserting that a copy was restored.
+	function profileDrawCancel() {
+		var d = profileState.draw;
+		if (!d) { return false; }
+		profileState.draw = null;
+		rebuildProfileForm();
+		renderProfile();
+		return true;
+	}
+	// The one entry point the map's tap handler calls, so the chooser owns its own hit resolution
+	// (a node within pointer slop, not only a direct hit on the symbol) instead of the tap handler
+	// knowing about it.
+	function profilePickHit(cx, cy, t) {
+		var id;
+		if (!profileDrawActive()) { return false; }
+		id = (t && t.dataset && t.dataset.node) || profileDrawNodeAt(cx, cy);
+		if (!id || !profileDrawClick(id)) { return false; }
+		setSelection('node', id);
+		return true;
+	}
+	// Escape belongs to the chooser before it belongs to any menu: a half-drawn path is the newest
+	// thing on screen and the innermost thing Escape can cost. Capture phase and stopPropagation,
+	// for the same reason the Settings box's filter field takes its own Escape first.
+	document.addEventListener('keydown', function (e) {
+		if (e.key !== 'Escape' && e.key !== 'Esc') { return; }
+		if (!profileState.draw) { return; }
+		profileDrawCancel();
+		e.stopPropagation();
+	}, true);
 
 	// ---- the drawing -------------------------------------------------------
 	//
@@ -14932,6 +15145,12 @@ var EngCalcs = EngCalcs || {};
 			rubberBandEl.setAttribute('x1', from.x); rubberBandEl.setAttribute('y1', from.y);
 			rubberBandEl.setAttribute('x2', w.x); rubberBandEl.setAttribute('y2', w.y);
 		});
+		// The profile path chooser's hover (Task 433) -- the same shape as the rubber band above and
+		// for the same reason: between clicks the user must see what the next click would commit.
+		// Its own listener, so it is unaffected by whether either of the two above is wired.
+		svg.addEventListener('pointermove', function (e) {
+			profileDrawHover(e.clientX, e.clientY);
+		});
 
 		svg.addEventListener('pointerdown', function (e) {
 			if (regMode) { return; } // a Scale/Position registration click sequence is pending -- see wireBackdropMenu()
@@ -15026,6 +15245,10 @@ var EngCalcs = EngCalcs || {};
 			if (regMode) { return; } // otherwise two registration clicks landing on the same link also bend it
 			if (georefActive()) { return; }   // the model is locked while it is being placed (Task 145)
 			if (pendingLinkPopupTimer) { clearTimeout(pendingLinkPopupTimer); pendingLinkPopupTimer = null; }
+			// FINISHING THE PROFILE PATH (Task 433) comes before every other meaning of a
+			// double-click on this map -- while the chooser is running, a double-click is the end of
+			// the route and never a vertex, a label reset or a vertex removal.
+			if (profileDrawEnd()) { return; }
 			var t = mapHitAt(e.clientX, e.clientY);
 			if (!t || !t.dataset) { return; }
 			// Double-click a dragged label to send it home (Tom, 2026-07-30: "Can we double-click a
@@ -15134,11 +15357,12 @@ var EngCalcs = EngCalcs || {};
 				else if (t.classList.contains('lpn-vhandle')) { saveUndoSnapshot(); removeVertex(t.dataset.link, +t.dataset.vidx); }
 				else if (t.dataset.link !== undefined) { deleteElement('link', t.dataset.link); }
 				else if (t.dataset.lbl !== undefined) { deleteElement('label', t.dataset.lbl); }
-			} else if (mode === 'select' && t.dataset.node && profileClickNode(t.dataset.node)) {
-				// The profile panel is picking waypoints, and it took this click (Task 409). The
+			} else if (mode === 'select' && profilePickHit(e.clientX, e.clientY, t)) {
+				// The profile's path chooser is running and it took this click (Task 433). The
 				// property popup deliberately does NOT also open: the user is drawing a route, and
 				// a property sheet over the drawing is the opposite of what they asked for.
-				setSelection('node', t.dataset.node);
+				// profilePickHit() sets the selection itself, since it resolves the node.
+				void 0;
 			} else if (mode === 'select' && t.dataset.node) {
 				openPopup(t.dataset.node, e.clientX, e.clientY);
 			} else if (mode === 'select' && t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')) {
@@ -15508,6 +15732,16 @@ var EngCalcs = EngCalcs || {};
 	//
 	// `k` is the multiplier: a value means v in the OLD unit, so its number in the new one is
 	// v * fNew / fOld, both factors being units per SI.
+	//
+	// **AND IT IS THE ONE EDIT THAT MUST NOT GO THROUGH setProp()** -- said here because a reader who
+	// knows the write seam will reach for it. setProp() asks "Base or scenario?" and records an
+	// OVERRIDE when the answer is a scenario, which is exactly right for editing one element and
+	// exactly wrong here: this rewrites the DOCUMENT, Base and every scenario's overrides together,
+	// because a unit change is not about one scenario's value but about what all of them mean. Going
+	// through the seam would leave Base in the old unit and mint an override on every element of
+	// whichever scenario happened to be open. The writes are dynamic (`obj[prop]`), so
+	// scenario_seam_check.php cannot see them either way; this paragraph is the justification the
+	// check would otherwise be asking for.
 	function convertUnitValues(name, k) {
 		var n = 0;
 		function conv(obj, prop) {
@@ -15595,21 +15829,73 @@ var EngCalcs = EngCalcs || {};
 		if (JSON.stringify([doc, scenarios]) !== before) { setNotice('unit count mutated the document'); }
 		return n;
 	}
+	// **NO QUESTION WHEN THERE IS NOTHING TO DECIDE** (ROADMAP Task 425). The dialog is for a project
+	// that ALREADY HAS CONTENT. With no stored number in this quantity -- an empty project, or one
+	// whose elements simply carry nothing this unit decides -- Non-destructive and Destructive end at
+	// the same document, so the question has no answer that matters and a modal in front of the
+	// commonest first action on the page is pure cost. countUnitValues() is the exact test rather
+	// than "is doc.nodes empty": it counts the very numbers a conversion would rewrite, so the two
+	// can never disagree.
+	function unitChangeNeedsDialog(name) { return countUnitValues(name) > 0; }
+	// The question, in Tom's own words (2026-08-18), and NOT paraphrased: the title, the lead line,
+	// the field names ONE PER LINE rather than a comma list, and the two options named by what they
+	// do to the numbers already typed.
+	//
+	// The list is one element per name because a comma list is what he asked it not to be -- a
+	// reader scanning for "is my elevation in this?" reads a column, not a sentence.
+	//
+	// THE LEAD IS `lpn_units_warn_lead`, NOT the `lpn_units_warn_body` it replaces. The old key put the
+	// field names inside the sentence as `{list}`; the column is now built here, so an edit in place
+	// would have left 26 translations carrying a placeholder the page no longer fills -- a literal
+	// "{list}" on the map, which lang_tag_parity_check.php is blocking for exactly that reason. A new
+	// key falls back to English until a sprint reaches it, which is the correct untranslated state.
+	function buildUnitDialogBody(body, sel, name, to) {
+		var pc = EngCalcs.pageConfig || {}, fields = unitServes(name);
+		var h = document.createElement('div'), lead = document.createElement('div');
+		var list = document.createElement('div'), oh = document.createElement('div');
+		h.style.fontWeight = 'bold';
+		h.textContent = pc.lpn_units_warn_title || 'This unit decides what your inputs mean';
+		body.appendChild(h);
+		lead.textContent = String(pc.lpn_units_warn_lead || '{unit} is the unit of what you enter for:')
+			.replace('{unit}', unitLabelFor(sel, to));
+		body.appendChild(lead);
+		list.className = 'lpn-unit-fields';
+		fields.forEach(function (f) {
+			var row = document.createElement('div');
+			row.textContent = f;
+			list.appendChild(row);
+		});
+		body.appendChild(list);
+		oh.style.fontWeight = 'bold';
+		oh.textContent = pc.lpn_units_options_head || 'Options for units change:';
+		body.appendChild(oh);
+		[pc.lpn_units_nondestructive_desc, pc.lpn_units_destructive_desc].forEach(function (t) {
+			var d = document.createElement('div');
+			d.textContent = t || '';
+			body.appendChild(d);
+		});
+	}
 	function onInputUnitChange(sel, name) {
 		var pc = EngCalcs.pageConfig || {}, from = unitPrev[name], to = unitKey(name);
 		if (!from || !to || from === to) { rememberUnitSelections(); return; }
-		// Put it back until the question is answered. Nothing acts on the new unit before then.
+		if (!unitChangeNeedsDialog(name)) {
+			// Nothing typed that this unit decides, so the new unit simply stands. Still saved: the
+			// units are part of the PROJECT (there are no browser units on this page), so the choice
+			// has to survive the next open exactly as an element would.
+			rememberUnitSelections();
+			afterUnitChange();
+			return;
+		}
+		// Put it back until the question is answered. Nothing acts on the new unit before then --
+		// which is also what makes Cancel free: the select never left the unit it was on.
 		applyOneUnit(name, from);
-		openDialog(function (body) {
-			var h = document.createElement('div'), p2 = document.createElement('div');
-			h.style.fontWeight = 'bold';
-			h.textContent = pc.lpn_units_warn_title || 'This unit decides what your numbers mean';
-			p2.textContent = String(pc.lpn_units_warn_body || '')
-				.replace('{unit}', unitLabelFor(sel, to))
-				.replace('{list}', unitServes(name).join(', '));
-			body.appendChild(h); body.appendChild(p2);
-		}, [
-			{ label: pc.lpn_units_reinterpret || 'Reinterpret (change what they mean)', fn: function () {
+		openDialog(function (body) { buildUnitDialogBody(body, sel, name, to); }, [
+			// **NON-DESTRUCTIVE IS FIRST, AND IT IS THE SUITE'S STANDING BEHAVIOUR** -- "changing a
+			// unit reinterprets the typed number; it does not convert it", which CLAUDE.md marks
+			// absolute and which this page was once the one place to break. Destructive is the
+			// opt-in and must never become the quiet path: it is reached only by pressing the button
+			// that says what it does.
+			{ label: pc.lpn_units_nondestructive || 'Non-destructive', fn: function () {
 				var n = countUnitValues(name);
 				applyOneUnit(name, to);
 				rememberUnitSelections();
@@ -15617,7 +15903,26 @@ var EngCalcs = EngCalcs || {};
 				setNotice(String(pc.lpn_status_reinterpreted || '{n} values now mean {unit}. Nothing was rewritten.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
 			} },
-			{ label: pc.lpn_units_convert || 'Convert them all', fn: function () {
+			// **THE UNDO SNAPSHOT IS THE BACKUP, AND NO SECOND COPY IS OFFERED** (Task 425's open
+			// question, answered here).
+			//
+			// A Destructive change is a user-initiated edit of the document, so it gets exactly what
+			// every other edit gets: one snapshot, taken before anything moves, on the same 20-deep
+			// stack. A separate backup would be a second document with no home -- this page has one
+			// document and one undo stack (Task 184) -- and offering the choice would put a second
+			// question inside a dialog whose whole job is to ask one, at the moment the user is
+			// already deciding something harder.
+			//
+			// What was genuinely missing was not a backup but HALF AN UNDO: the snapshot carried the
+			// numbers and not the UNITS, so Ctrl+Z gave back the original values with the NEW unit
+			// still on the strip -- silently landing the user in the Non-destructive outcome they
+			// had just declined. saveUndoSnapshot() now records readUnitSelections() and undo()
+			// restores it, so one Ctrl+Z reverts the whole change.
+			//
+			// The one limit, stated because it is the only way to lose these numbers: switching
+			// projects clears the undo stack (clearUndo()), so after a project switch the original
+			// inputs live only in the file on disk -- which is untouched until the user saves.
+			{ label: pc.lpn_units_destructive || 'Destructive', fn: function () {
 				var fOld = EngCalcs.unitFactors[from], fNew = EngCalcs.unitFactors[to], n;
 				saveUndoSnapshot();
 				applyOneUnit(name, to);
@@ -15626,7 +15931,10 @@ var EngCalcs = EngCalcs || {};
 				afterUnitChange();
 				setNotice(String(pc.lpn_status_converted || '{n} values were rewritten into {unit}.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
-			} }
+			} },
+			// Cancel does nothing on purpose, and there is nothing for it to do: the select was put
+			// back before the dialog opened, no snapshot was taken, and no number was read.
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
 		]);
 	}
 	function applyOneUnit(name, key) {
@@ -19818,7 +20126,13 @@ var EngCalcs = EngCalcs || {};
 			// duplicates the ten numbers a scale or move changes and SHARES the one string, which is
 			// safe because strings are immutable: nothing can edit an image through a shared
 			// reference, and loading a new file assigns a whole new object.
-			backdrop: backdrop ? Object.assign({}, backdrop) : null
+			backdrop: backdrop ? Object.assign({}, backdrop) : null,
+			// **THE UNITS RIDE WITH THE DOCUMENT TOO** (ROADMAP Task 425). A bare number means
+			// nothing without them, so a snapshot that restored 1000 while the strip said metres
+			// would be half an undo -- and that is exactly what a Destructive unit change hit:
+			// Ctrl+Z gave back the original inputs under the NEW unit, quietly landing the user in
+			// the Non-destructive outcome they had just declined. Ten small strings per snapshot.
+			units: readUnitSelections()
 		});
 		if (undoStack.length > UNDO_LIMIT) { undoStack.shift(); }
 	}
@@ -19844,6 +20158,12 @@ var EngCalcs = EngCalcs || {};
 		// Restored too, because a snapshot taken in one scenario and undone from another would
 		// otherwise leave the map showing a scenario the restored values were never about.
 		if (scenarios.some(function (s) { return s.id === snap.state.active; })) { project.activeScenario = snap.state.active; }
+		// The units the restored numbers were typed in. Restored for every undo, not only the one
+		// after a unit change: a snapshot describes the state at one moment, and the unit is part of
+		// what a number meant at that moment. rememberUnitSelections() follows so the next change
+		// compares against the unit now on the strip rather than the one undone away.
+		if (snap.units && applyUnitSelections(snap.units)) { refreshMapStatus(); }
+		rememberUnitSelections();
 		recountNextId();
 		closePopup(); // whatever it referenced may no longer exist post-undo (e.g. undoing an Add)
 		buildDom();

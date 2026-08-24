@@ -197,7 +197,10 @@ console.log('\n--- what is remembered, and where ---');
 console.log('\n--- leaving the profile clears its route ---');
 {
 	const tabs = src.slice(src.indexOf('var paneTabs = ['), src.indexOf('var paneState ='));
-	report(/hide: function \(\) \{ drawProfilePath\(null\); \}/.test(tabs),
+	// What must hold is that the hook CLEARS THE HIGHLIGHT, not that it does only that -- Task 433
+	// added profileDrawCancel() beside it so a half-drawn path cannot outlive the panel it is being
+	// drawn in. Pinning the whole line verbatim made that addition look like a regression.
+	report(/hide: function \(\) \{[^}]*drawProfilePath\(null\);/.test(tabs),
 		'the profile tab declares a hide hook that clears the map highlight');
 	// The three doors out. Each must run the outgoing tab's hook, and each is a separate line of
 	// code that could forget.

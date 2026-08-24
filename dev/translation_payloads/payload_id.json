@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1275,
-        "delta_key_count": 81,
+        "expected_key_count": 1283,
+        "delta_key_count": 92,
         "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
@@ -485,6 +485,12 @@
     },
     "keys_to_translate": {
         "calc_set_units_tip": "Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
+        "lpn_units_warn_lead": "{unit} is the unit of what you enter for:",
+        "lpn_units_options_head": "Options for units change:",
+        "lpn_units_nondestructive": "Non-destructive",
+        "lpn_units_nondestructive_desc": "Non-destructive: leaves every input as it is and reinterprets it in the new unit.",
+        "lpn_units_destructive": "Destructive",
+        "lpn_units_destructive_desc": "Destructive: rewrites every input with a mathematical conversion, so the network stays physically close to the same, within conversion tolerances. It loses the original inputs. Undo puts them back.",
         "lpn_basemap_satellite_show": "Show satellite images",
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
@@ -520,6 +526,11 @@
         "lpn_replace_scope": "Choose one kind of asset above to change values on.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
+        "lpn_profile_draw": "Choose the path on the map",
+        "lpn_profile_draw_stop": "Stop choosing",
+        "lpn_profile_draw_start": "Click the node where the path starts.",
+        "lpn_profile_draw_more": "Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.",
+        "lpn_profile_draw_blocked": "No route from {a} to {b}. Choose another node.",
         "lpn_inp_drop_anchor_missing": "This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.",
         "lpn_import_notes_heading": "From the EPANET file",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -568,6 +579,12 @@
     },
     "keys": {
         "calc_set_units_tip": "Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
+        "lpn_units_warn_lead": "{unit} is the unit of what you enter for:",
+        "lpn_units_options_head": "Options for units change:",
+        "lpn_units_nondestructive": "Non-destructive",
+        "lpn_units_nondestructive_desc": "Non-destructive: leaves every input as it is and reinterprets it in the new unit.",
+        "lpn_units_destructive": "Destructive",
+        "lpn_units_destructive_desc": "Destructive: rewrites every input with a mathematical conversion, so the network stays physically close to the same, within conversion tolerances. It loses the original inputs. Undo puts them back.",
         "lpn_basemap_satellite_show": "Show satellite images",
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
@@ -603,6 +620,11 @@
         "lpn_replace_scope": "Choose one kind of asset above to change values on.",
         "lpn_profile_tip_syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
         "lpn_profile_title_syn": "Profile or cross section along a path, route, or way",
+        "lpn_profile_draw": "Choose the path on the map",
+        "lpn_profile_draw_stop": "Stop choosing",
+        "lpn_profile_draw_start": "Click the node where the path starts.",
+        "lpn_profile_draw_more": "Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.",
+        "lpn_profile_draw_blocked": "No route from {a} to {b}. Choose another node.",
         "lpn_inp_drop_anchor_missing": "This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.",
         "lpn_import_notes_heading": "From the EPANET file",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -663,6 +685,102 @@
                     "key": "calc_defaults",
                     "value": "Pulihkan Default",
                     "english": "Restore defaults"
+                }
+            }
+        },
+        "lpn_units_warn_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Satuan ini menentukan arti angka Anda",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "{n} nilai sekarang berarti {unit}. Tidak ada yang ditulis ulang.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_options_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Satuan ini menentukan arti angka Anda",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "{n} nilai sekarang berarti {unit}. Tidak ada yang ditulis ulang.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_nondestructive": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Satuan ini menentukan arti angka Anda",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "{n} nilai sekarang berarti {unit}. Tidak ada yang ditulis ulang.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_nondestructive_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Satuan ini menentukan arti angka Anda",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "{n} nilai sekarang berarti {unit}. Tidak ada yang ditulis ulang.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_destructive": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Satuan ini menentukan arti angka Anda",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "{n} nilai sekarang berarti {unit}. Tidak ada yang ditulis ulang.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
+                }
+            }
+        },
+        "lpn_units_destructive_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_units_warn_title",
+                    "value": "Satuan ini menentukan arti angka Anda",
+                    "english": "This unit decides what your inputs mean"
+                },
+                "next_translated": {
+                    "key": "lpn_status_reinterpreted",
+                    "value": "{n} nilai sekarang berarti {unit}. Tidak ada yang ditulis ulang.",
+                    "english": "{n} values now mean {unit}. Nothing was rewritten."
                 }
             }
         },
@@ -1223,6 +1341,86 @@
                     "key": "lpn_profile_from",
                     "value": "Dari",
                     "english": "From"
+                }
+            }
+        },
+        "lpn_profile_draw": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "Simpul yang dilewati",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "Hapus semua",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_draw_stop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "Simpul yang dilewati",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "Hapus semua",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_draw_start": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "Simpul yang dilewati",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "Hapus semua",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_draw_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "Simpul yang dilewati",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "Hapus semua",
+                    "english": "Remove all"
+                }
+            }
+        },
+        "lpn_profile_draw_blocked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_through",
+                    "value": "Simpul yang dilewati",
+                    "english": "Nodes on the way"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_clear",
+                    "value": "Hapus semua",
+                    "english": "Remove all"
                 }
             }
         },

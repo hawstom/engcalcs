@@ -261,33 +261,15 @@ the block.
     visitors norm (`js/vendor/` today holds only the EPANET engine). Decide the mechanism before
     scoping the toggle above.
 
-- 75|425| **The unit-change dialog for an lpn project that already has content.**
-  It asks what the change should mean to the numbers already typed. Use Tom's own wording
-  (2026-08-18) rather than paraphrasing it, and add the CANCEL the first cut lacked.
-  - Title: *This unit decides what your inputs mean*. Then *cfs is the unit of what you enter for* and
-    the field names **one per line**, not a comma list.
-  - Then *Options for units change*: **Non-destructive** — leaves every input as it is and reinterprets
-    it in the new unit. **Destructive** — rewrites every input with a mathematical conversion so the
-    network stays physically close to the same within conversion tolerances; loses the original inputs.
-  - Buttons: **Non-destructive · Destructive · Cancel**.
-  - **Open:** back the original inputs up before a Destructive change, or offer to. An undo snapshot is
-    already taken; whether that is enough is the question.
-  - **AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry**, proposed while Task 426 borrowed the word
-    *Non-destructive* for the shared units row. A translator cannot recover the term of art from the
-    words, so: `$ec_lang_syn['calc_set_units_tip']='Changes the unit shown on every field at once
-    (switches the whole page to that unit system); safe, harmless, does not overwrite anything,
-    leaves your entries untouched, keeps the numbers you typed.'`
-
-- 75|433| **Profile: the last piece is the path CHOOSER.** Tom, 2026-08-18: *"Amazing. Now we just need a
-  good UI."* Two of the three are done — the route is drawn on the map, and the panel is now the
-  full-height Profile tab of Task 434's bottom pane.
-  - **The path chooser should be the Google Maps gesture epanetjs uses:** click the starting node, hover
-    along the path, click to add a waypoint, double-click to end. Not two pull-downs.
-  - **The animation half is already done and proved headless.** The chart follows the transport with
-    no listener of its own (`showFrame` → `applySolveResult` → `refreshPaneIfOpen`);
-    `dev/lpn-spike/profile-eps-harness.js` walks Net3's 24-hour run and measures the grade line
-    moving 90.8 ft at node 61 while the ground holds still. A browser pass here is about the
-    chooser, not about whether it animates.
+- 75|503| **AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry**, proposed while Task 426 borrowed the
+  word *Non-destructive* for the shared units row and extracted from Task 425 on its close so the
+  proposal does not vanish into a closed block. A translator cannot recover the term of art from the
+  words, so: `$ec_lang_syn['calc_set_units_tip']='Changes the unit shown on every field at once
+  (switches the whole page to that unit system); safe, harmless, does not overwrite anything, leaves
+  your entries untouched, keeps the numbers you typed.'` **AI proposes; only Tom writes it.**
+  - While here: Task 425 left three keys in the 26 non-English files that English no longer defines
+    (`lpn_units_warn_body`, `lpn_units_reinterpret`, `lpn_units_convert`). Unreachable, so not a
+    defect — retire them with `rename_lang_key.php`'s 27-file pass, or in the next lpn sprint.
 
 - 50|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
