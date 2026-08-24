@@ -1106,6 +1106,9 @@ EngCalcs.pageConfig = {
 	lpn_field_from: <?=json_encode($ec_lang['lpn_field_from'])?>,
 	lpn_field_to: <?=json_encode($ec_lang['lpn_field_to'])?>,
 	lpn_field_length_tip: <?=json_encode($ec_lang['lpn_field_length_tip'])?>,
+	// The minor-loss table, the same one mphl, hw, dw, mhp, bpn and ip all link to. One URL rather
+	// than three: k is one quantity whatever friction method carries the pipe alongside it.
+	lpn_km_url: <?=json_encode('https://www.engineeringtoolbox.com/minor-loss-coefficients-pipes-d_626.html')?>,
 	lpn_field_km: <?=json_encode($ec_lang['lpn_field_km'])?>,
 	lpn_field_km_tip: <?=json_encode($ec_lang['lpn_field_km_tip'])?>,
 	lpn_field_km_short: <?=json_encode($ec_lang['lpn_field_km_short'])?>,

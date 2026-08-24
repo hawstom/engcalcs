@@ -14094,6 +14094,19 @@ var EngCalcs = EngCalcs || {};
 		// one path where a user most expects to come back to where they were. refreshAllFromDocument()
 		// ends in restoreViewOrFit(); boot has its own sequence and has to pick that up too.
 		restoreViewOrFit();
+		// **"?lpn_examples=1" OPENS THE GALLERY, so a link somewhere else can land on it.** The
+		// LibreWaterNet page had two calls to action pointing at the same bare URL, one of them
+		// labelled "Open an example" -- and a returning visitor with a project of their own would
+		// have got the map, not the gallery, so the promise was false for exactly the reader most
+		// likely to notice. This is the File > Open example... route, not a second mechanism:
+		// showExamplesOverlay() is the same call the menu item makes.
+		//
+		// The parameter is NOT scrubbed from the URL the way ?lpn_wipe=1 is. A wipe must not happen
+		// twice on a reload; a gallery reopening on a reload is what the link said it would do, and
+		// the URL stays shareable.
+		try {
+			if (/[?&]lpn_examples=1(&|$)/.test(window.location.search)) { showExamplesOverlay(); }
+		} catch (err) { /* location can throw in an exotic host; the page is fine without the overlay */ }
 		requestAnimationFrame(tick);
 	}
 
@@ -15218,6 +15231,9 @@ var EngCalcs = EngCalcs || {};
 		var urls = (EngCalcs.pageConfig || {}).lpn_roughness_urls;
 		return (urls && urls[frictionMethod()]) || '';
 	}
+	// And the minor-loss table, which does NOT follow the method: k is one quantity whichever
+	// friction equation carries the pipe. One URL, so no lookup.
+	function kmTableUrl() { return (EngCalcs.pageConfig || {}).lpn_km_url || ''; }
 	// The declared roughness as the SOLVER wants it. Dimensionless for Manning/HW, so the number
 	// passes through untouched; a length for Darcy-Weisbach, so it crosses the same unit boundary
 	// every other quantity does (Task 263: the document stores what was typed, the handoff
@@ -16251,10 +16267,10 @@ var EngCalcs = EngCalcs || {};
 		// precedes its control cannot wrap without the control wrapping with it and cannot line its
 		// controls up down the panel; a flex row gives the words the slack, the control a right-hand
 		// column, and a long name two lines instead of a wider box.
-		function row(target, labelText, input, tip) {
+		function row(target, labelText, input, tip, href) {
 			var line = document.createElement('label'), text = document.createElement('span');
 			line.className = 'lpn-set-row';
-			setFieldLabel(text, labelText, tip);
+			setFieldLabel(text, labelText, tip, href);
 			line.appendChild(text);
 			line.appendChild(input);
 			target.appendChild(line);
@@ -16279,7 +16295,10 @@ var EngCalcs = EngCalcs || {};
 		// a default alters nothing that already exists. EngCalcs.pageCalculator re-runs this rebuild
 		// on a unit switch, so a default REINTERPRETS along with everything else -- a default diameter
 		// of 8 becomes 8 mm. unitId null means dimensionless (roughness, K).
-		function defaultRow(target, labelText, unitId, key, isValid) {
+		// `href`, where given, points at the reference table for the quantity -- the same tables the
+		// form calculators link to. setFieldLabel() does the link-plus-tip nesting; this only
+		// carries the URL through.
+		function defaultRow(target, labelText, unitId, key, isValid, tip, href) {
 			var input = document.createElement('input');
 			input.type = 'number'; input.step = 'any';
 			input.value = trimNum(settings.defaults[key]);
@@ -16288,7 +16307,7 @@ var EngCalcs = EngCalcs || {};
 				if (input.value !== '' && isFinite(v) && isValid(v)) { settings.defaults[key] = v; saveToStorage(); }
 				else { input.value = trimNum(settings.defaults[key]); }
 			});
-			row(target, unitId ? labelText + ' (' + unitLabel(unitId) + ')' : labelText, input);
+			row(target, unitId ? labelText + ' (' + unitLabel(unitId) + ')' : labelText, input, tip, href);
 		}
 		function any() { return true; }
 		function positive(v) { return v > 0; }
@@ -16363,10 +16382,15 @@ var EngCalcs = EngCalcs || {};
 		// reasoning as refreshLabelText()'s plainRound() treatment of these two fields.
 		// unitId is the roughness selector under Darcy-Weisbach (e is a length) and null otherwise
 		// (n and C are dimensionless) -- the one row here whose units depend on another setting.
-		defaultRow(defBody, roughnessLabel(), frictionMethod() === 'dw' ? 'lpn_u_roughness' : null, 'roughness', positive);
+		// **THE SAME REFERENCE TABLES THE POPUP LINKS TO** (Tom, 2026-08-23: *"I was specifically
+		// asking on behalf of lpn, at Settings.Values.Roughness"*). Roughness follows the friction
+		// method; k does not. Both URLs come from pageConfig, so the page states them once.
+		defaultRow(defBody, roughnessLabel(), frictionMethod() === 'dw' ? 'lpn_u_roughness' : null, 'roughness', positive,
+			roughnessTip(), roughnessTableUrl());
 		// No Length row, deliberately (Tom, 2026-07-30): lenAuto derives a pipe's length from the
 		// drawn geometry, so any default here would be overwritten the moment the pipe is drawn.
-		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, k', null, 'k', nonNegative);
+		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, k', null, 'k', nonNegative,
+			pc.lpn_field_km_tip, kmTableUrl());
 		// ---- push defaults to existing elements ----
 		// A HARD push, deliberately. "Update only elements still holding the OLD default" cannot tell
 		// a deliberately-typed 6 from an untouched 6, so it is SILENTLY destructive rather than
@@ -18786,7 +18810,7 @@ var EngCalcs = EngCalcs || {};
 			// not forcing markup into a plain-text slot.
 			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
 				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, pc.lpn_field_km_tip,
-				{ el: l, prop: 'k' });
+				{ el: l, prop: 'k' }, kmTableUrl());
 			lengthField(fields, l);
 		}
 		closedField(fields, l, linkId);
@@ -18906,7 +18930,7 @@ var EngCalcs = EngCalcs || {};
 			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k',
 				effective(l, 'k') || 0,
 				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); },
-				pc.lpn_field_valve_km_tip, { el: l, prop: 'k' });
+				pc.lpn_field_valve_km_tip, { el: l, prop: 'k' }, kmTableUrl());
 		}
 	}
 	function openLinkPopup(linkId, sx, sy) {
