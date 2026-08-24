@@ -17,14 +17,62 @@ here, so nobody has to re-make it every time an image is reached for.
 | 0006 | Elm Street Center on its site plan, scenario menu open (Base / Daily Flow (3), New, Rename, Delete) | **Yes** | Shows scenarios, which nothing else here does |
 | 0007 | Elm Street Center full drawing, Settings searched for "underlin", one tip open explaining the highest/lowest marks | **Yes — and this is the hero candidate** | The annotated exhibit the landing page argues for: hand-placed labels, leader lines, a real site plan, a title block. `graphics-plan.md` step 1 |
 | 0008 | The same Elm Street network with the whole interface in **Romanian**, coloured by pressure, Find open | **Yes — and it is the language still** | Also the bug evidence: "Change what was found / Property to change / New value" are still English, because Task 389's keys have not been through a sprint |
+| 0009 | Desktop, English: the report dialog after importing `Net3.inp` — "97 junctions, reservoirs and tanks, 119 pipes, pumps and valves, in GPM", then what changed on the way in (patterns kept, water quality and pump energy left out) | **Yes** | The single best evidence for "reports every difference, never drops silently". Also shows the label legend at the right and Net3 drawn behind |
+| 0010 | Desktop, English: Net3 sitting on the OpenStreetMap world map with the georeferencing wizard's **Step 1 of 2 — quick** bar open (Go to… / Search by name… / These are already lon/lat / Put the model here / Cancel). The unplaced model lands over west Africa | **Yes** | The "before" frame of the georeferencing walkthrough 0010–0021. Also the pre-fix status readout: `Longitude: … Latitude: …`, and a button reading "These are already lon/lat" — both since corrected to latitude-first |
+| 0011 | The Nominatim consent prompt ("Search by place name sends the words you type to nominatim.openstreetmap.org …"), captured with the browser's bookmarks bar in frame | **No** | Browser chrome: a bookmark folder named "Tom" and a second one manually blacked out. The consent text itself is worth quoting; re-take without chrome |
+| 0012 | The Search-by-name prompt, empty, over Net3 on the world map. Browser URL bar and bookmarks bar in frame | **No** | Browser chrome, same bookmarks. Shows the example placeholder wording, "Petaluma, California" |
+| 0013 | Same prompt with **Novato, California** typed in | **No** | Browser chrome plus the profile avatar at top right |
+| 0014 | The follow-up prompt "About how wide is the site, across the whole project? (ft)" with 15000 typed | **No** | Browser chrome, bookmarks named "Tom" and "Matthew", profile avatar. The prompt is a good one to re-shoot: it is the whole of the scale question in one sentence |
+| 0015 | Desktop, English: the map has moved to Novato, California; the Nominatim attribution ribbon is across the top left; Step 1 bar still open; model not yet placed | **Yes** | Proves the geocoder credit shows where it must. Attribution ribbon and the OSM credit bottom right should both stay in any crop |
+| 0016 | Same, zoomed out one step so San Pablo Bay is in frame; Step 1 bar open | **Yes** | Cleaner than 0015 (no attribution ribbon over the drawing) but for that reason a worse citation still |
+| 0017 | **Step 2 of 2 — fine**: the model is on the ground, its bounding box drawn with four corner handles and the round rotate handle above, "Ground distance per drawing unit 720.927 ft", "Turn anticlockwise 0" | **Yes** | The clearest single frame of the place-and-scale interaction. The handle geometry reads correctly at full size |
+| 0018 | Step 2 zoomed in to street level over central Novato — Novato Boulevard, Novato High School, US 101 — the model's pipes now following real streets | **Yes** | The argument that a georeferenced model can be checked against the ground. Pipes are visibly off the streets here, which is honest: this is a placement in progress, not a survey |
+| 0019 | Near-duplicate of 0018 with the model nudged; the same Step 2 bar and the same 720.927 | **Yes** | Only useful as the second half of a before/after pair with 0018. On its own it adds nothing |
+| 0020 | Step 2 zoomed back out to the whole town, selection box and four handles around the model, ground distance now 752.49 ft | **Yes** | The best "placed and scaled" frame of the sequence: whole model, whole town, handles visible |
+| 0021 | The confirm dialog "Place the model here permanently? … the drawing stops being an xy project. To get xy back, close this project without saving." | **No** | Browser chrome, bookmarks, avatar. The wording is the honest version of a one-way door and is worth re-shooting clean |
+| 0022 | Desktop, English: Settings open on **Map and page → Page** over the georeferenced Net3; a tip is showing for "Show page titles" | **Yes** | Documents a layout defect: the Settings category index breaks words mid-word — "Visualizati / on", "Node symbolog / y", "Map appearan / ce". Not named by Task 284, which is about sticky headings and the narrow-screen collapse |
+| 0023 | The same view with the toolbar's Save tip showing — "Save — Saves to the connected file." | **Yes** | Pairs with 0024 as the file-handle story. Same mid-word index defect as 0022 |
+| 0024 | The first-save explainer: the file is written only when you ask, the site tracks who has it open, the browser's own permission question, and "Your initials" | **Yes** | The clearest statement anywhere of what saving does and does not do. A strong Help-page still |
+| 0025 | The Windows Save-as dialog on `Desktop\dup`, listing Elm-Street-Center-lpn.json, Net2-lpn.json and three `.lwn` files | **No** | A real file path and a real folder listing. Internally it is useful evidence that `.lwn` and `.json` both round-trip |
+| 0026 | The whole interface in **Romanian** — "Calculator online gratuit pentru rețele de distribuție a apei" — Setări open on Vizualizare, Net3 georeferenced on Novato and coloured by pressure, pressure key at the right | **Yes** | The Romanian counterpart to 0008 and a better picture than it: a real network on real ground with a translated colour key. Units are metric here (L/s, m H2O), which is the honest pairing with a non-English interface |
+| 0027 | Romanian, Libraries open on **Patterns** beside Setări on Calcul, with the time dropdown expanded down the hour list | **Yes** | Three panels at once, so it is evidence rather than a hero. Documents an untranslated label: "Recalculate automatically ?" reads English amid Romanian. The `ro` file now carries `lpn_settings_auto_run`, so this is a state since repaired |
+| 0028 | Desktop, English, **no dialog**: Net3 georeferenced on the Novato street map, coloured by pressure with the key at the right, and the bottom pane open on **Profile** — ground surface, hydraulic grade line, pressure band, "Nodes: 26, length: 79161 ft" | **Yes — the strongest new hero** | The only capture in the drop with exactly one panel open. Map above, profile below, both readable, nothing to explain away |
+| 0029 | Settings open on **Visualization**, the label-content checkboxes with their per-value decimal spinners; bottom pane still on Profile; street-level Novato behind | **Yes** | The best picture of label control. The Settings box is dragged over the menu bar and tab strip, which hides the page's own identity — worth avoiding in a public still |
+| 0030 | Same, scrolled to **Color band boundaries: Velocity**, links drawn in the viridis ramp, both a Pressure key and a Velocity key at the right | **Yes** | Documents a second layout defect: the colour key overlaps the node/link label legend, so the legend's rows are unreadable behind it. Both default to the right edge and nothing separates them. Not on the roadmap |
+| 0031 | Settings and Libraries → Patterns open together over a velocity-coloured Novato network, page titles switched off | **Yes** | Shows the pattern editor's sparkline-plus-numbers rows at full size. Two panels cover most of the drawing |
+| 0032 | Libraries → **Curves** beside Settings → Map appearance, over **satellite imagery**; the "Background image opacity" field is ringed in yellow highlighter | **Yes** | Pump curves as a plot plus their point table. The yellow ring is a hand annotation added after capture, so crop or re-take before any public use. Mapbox / OpenStreetMap / Maxar credits are in frame and correct |
+| 0033 | Libraries → **Controls** beside Settings → Calculation, over satellite: six simple controls (`Link 10 OPEN AT TIME 1`, `Link 335 OPEN IF Node 1 BELOW 17.1`, …), each marked "✓ Understood" | **Yes** | The evidence that simple `[CONTROLS]` are read and honoured, which is what makes what is left of Task 248 rule-based `[RULES]` alone. Also shows the ColorBrewer / viridis / EPANET credits at the foot of Settings |
 
-## What these eight taught us, beyond the three bugs
+## What the drop has taught us
 
-- **The two-network split in `graphics-plan.md` is right, and 0007 proves it.** Elm Street with its
-  site plan and hand-placed labels is a different kind of picture from Net3 on a street map, and
-  putting them side by side as Design and Management is stronger than either alone.
-- **Every desktop capture has three or four panels open at once.** That is what using the page looks
-  like, and it is not what a first picture of it should look like: a shopper reads overlapping
-  panels as clutter. For the landing page, one panel, deliberately placed.
-- **0008 is the cheapest argument on the whole site.** One image turns "27 languages" from a list of
-  names into a fact — and it also shows exactly where the gap is, which is the honest version.
+- **There are three kinds of picture here, not two.** `graphics-plan.md` split them as Design
+  (Elm Street on its site plan, 0007) and Management (Net3 on a street map, 0003). The
+  georeferencing sequence adds a third: a real network placed on real ground and then read against
+  it — 0028, where the profile pane is open under the map. It is the strongest still in the drop and
+  the best candidate for the second half of the landing page's pair.
+- **One panel, deliberately placed.** Almost every desktop capture has two to four panels open at
+  once, because that is what using the page looks like; a shopper reads overlapping panels as
+  clutter. 0028 is the one capture that does not, and it is also the one that needs no explaining.
+  For anything public, open one panel and nothing else.
+- **A panel dragged over the menu bar costs the page its identity.** In 0029–0031 the Settings box
+  covers the title, the File menu and the tab strip, so the frame no longer says what application it
+  is. Fine while working, wrong in a still.
+- **Language is still the cheapest argument on the site, and now it has a better frame.** 0008 made
+  it with Elm Street; 0026 makes it with a translated colour key over a real town, in metric, which
+  is the honest pairing. Both also show where the gap is: 0008's Find-and-replace strings and 0027's
+  "Recalculate automatically" were English inside a translated interface.
+- **The drop is where stale interface text gets caught.** Between them these images hold the
+  longitude-first coordinate readout and the "These are already lon/lat" button (both since
+  corrected to latitude-first), the old "Find assets" wording, and one Romanian label that had not
+  been through a sprint. None of these were found by a check; they were found by looking at a
+  picture.
+- **Two layout defects are on file only because somebody screenshotted them.** The Settings category
+  index breaks words mid-word (0022–0023), and the colour key overlaps the label legend when both
+  sit at the right edge (0030). Neither is on the roadmap.
+- **A sequence is worth more than a still for anything procedural.** 0010–0021 is the whole
+  georeferencing walkthrough in order: unplaced on the world map, consent, search, scale question,
+  placed, zoomed to street level, confirmed. That is a Help page or a blog post already, and six of
+  its twelve frames need re-taking only because the browser chrome is in them.
+- **Browser chrome is what disqualifies a frame, not the network.** Every unpublishable image here
+  fails for the same two reasons — a bookmarks bar with real names or a real file path — and both
+  are avoidable by capturing the page rather than the window.
