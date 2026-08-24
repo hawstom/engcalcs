@@ -150,15 +150,21 @@ byId.lpn_toolbar.querySelectorAll = () => [];
 	ok('...centred on the origin, in the document\'s own frame',
 		Math.abs(v.cx - L.GEO_HOME.lon) < 1e-9 && Math.abs(v.cy - (-L.GEO_HOME.lat)) < 1e-9,
 		JSON.stringify({ cx: v.cx, cy: v.cy }));
-	// Fitted on the SHORTER canvas axis, so the whole world is on screen whatever shape the window
-	// is -- and measured in DEGREES OF LATITUDE, because a whole-world view is defined by the map
-	// rather than by a ground distance. Web Mercator stops at 85.05 degrees, so the drawable world
-	// is 170.1 degrees tall.
+	// **THE MERCATOR WORLD IS SQUARE** (Task 145's projection seam): 360 drawing units on each side,
+	// because the cut-off latitude is exactly where mercY() reaches 180. It used to be 170.1 units
+	// tall, which is what an unprojected frame gives, and the assertion below is the clearest single
+	// number that says which frame the page is drawing in.
+	//
+	// The FLOOR still binds on a landscape canvas -- minScale() is "360 degrees of longitude fit the
+	// width, and no further, past which the map repeats itself" -- so on 800x600 the view is 360
+	// units wide and 270 tall, reaching latitude 79 rather than the 85.05 cut-off. Ice caps only.
 	L.setView(v);
-	const acrossDeg = Math.min(800, 600) / L.view().s;
-	ok('...spanning the whole drawable world, pole cut-off to pole cut-off',
-		Math.abs(acrossDeg - 2 * 85.0511287798066) < 1e-6,
-		acrossDeg.toFixed(4) + ' degrees of latitude');
+	const wideDeg = 800 / L.view().s, tallDeg = 600 / L.view().s;
+	ok('...spanning the whole world east to west, which is where the floor is set',
+		Math.abs(wideDeg - 360) < 1e-6, wideDeg.toFixed(4) + ' drawing units across');
+	ok('...and the drawable world is 360 units tall, not 170.1 -- the frame is Mercator',
+		Math.abs(tallDeg - 270) < 1e-6 && Math.abs(G.mercY(85.0511287798066) - 180) < 1e-9,
+		tallDeg.toFixed(4) + ' units down, mercY(85.0511) = ' + G.mercY(85.0511287798066).toFixed(6));
 	// A GRID project must get none of this.
 	L.reset();
 	L.setCanvas(800, 600);
@@ -185,8 +191,12 @@ byId.lpn_toolbar.querySelectorAll = () => [];
 	setUnitSet('us');
 	L.reset(L.GEO);
 	L.setCanvas(800, 600);
-	const a = L.addNode('junction', -111.9, 33.4).id;
-	const b = L.addNode('junction', -111.89, 33.4).id;
+	// **THE INTERNAL y IS MERCATOR NOW, NOT A LATITUDE** (Task 145). Placing a node at a bare 33.4
+	// puts it at latitude 28.5, and the geodesic below would then be measured somewhere else -- the
+	// exact silent failure this section is about, one frame further in. mercY() is the seam.
+	const memY = -G.mercY(33.4);
+	const a = L.addNode('junction', -111.9, memY).id;
+	const b = L.addNode('junction', -111.89, memY).id;
 	const l = L.addLink('pipe', a, b).id;
 	L.buildDom();
 	const meters = G.geodesicMeters(-111.9, 33.4, -111.89, 33.4);

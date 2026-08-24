@@ -27,6 +27,9 @@ require(ROOT + 'js/lpn-net.js');
 // georefStart() refuses outright without it, which would make the routing test below pass for the
 // wrong reason -- "no wizard armed" would be true whatever the file said.
 require(ROOT + 'js/lpn-georef.js');
+// The Mercator pair Task 145's projection seam draws through, for the assertions in the
+// DEGREES section below: the drawing frame is projected and the file is not.
+const Geom = require(ROOT + 'js/lpn-geom.js').lpnGeom;
 
 // FileReader is the browser's; the import path is written around it, so it is stubbed rather than
 // bypassed -- calling docFromInp() directly would skip importInpFromFile()'s own ordering, and the
@@ -556,10 +559,18 @@ const INP_STRANGE = probeInp(['[BACKDROP]', ' UNITS  Furlongs', '']);
 	ok('...with no origin shift under it', d.origin.x === 0 && d.origin.y === 0, JSON.stringify(d.origin));
 	// `===`, for the reason the header gives: a longitude is the user's number too.
 	const j1 = d.nodes.find(n => n.id === 'J1');
-	// Y is stored DOWN in memory and Cartesian in the file (flipStoredY), so the latitude comes back
-	// negated -- a sign flip is exact in doubles, which is why this can still be `===`.
-	ok('...and the longitude and latitude are the file\'s own numbers, exactly',
-		j1.x === -122.5686103 && j1.y === -38.106067, j1.x + ', ' + j1.y);
+	// **MEMORY IS WEB MERCATOR SINCE TASK 145'S PROJECTION SEAM**, y down, so the latitude arrives
+	// projected and negated. Longitude is untouched: Mercator x IS longitude.
+	ok('...the drawn position is the projection of the file\'s latitude',
+		j1.x === -122.5686103 && j1.y === -Geom.mercY(38.106067),
+		j1.x + ', ' + j1.y + ' (mercY(38.106067) = ' + Geom.mercY(38.106067) + ')');
+	// **AND THE FILE GETS ITS OWN BYTES BACK**, which is the property that actually matters and is
+	// now the harder one: mercLat(mercY(lat)) is a different double for 70% of latitudes, so this
+	// passes only because serializeProject() hands back the latitude the file stated rather than
+	// re-deriving it. Nothing in the projection may be allowed to edit the user's number.
+	const outJ1 = L.serialize().nodes.find(n => n.id === 'J1');
+	ok('...and saving hands the file its own longitude and latitude back, exactly',
+		outJ1.x === -122.5686103 && outJ1.y === 38.106067, outJ1.x + ', ' + outJ1.y);
 
 	importText(INP_NONE, 'grid.inp');
 	ok('a NONE file opens an XY project, with no prompt in the way',
@@ -627,8 +638,14 @@ console.log('\n--- Import xy to lat/lon…, over an .inp and over a project file
 console.log('\n--- the wizard always opens at step 1, and the reinterpret button moves nothing ---');
 {
 	// The file's own coordinates, y NEGATED because memory is y-down and the file is Cartesian.
-	const FILE_COORDS = '[["J1",-122.5686103,-38.106067],["R1",-122.57,-38.107]]';
-	const coords = () => JSON.stringify(L.getDoc().nodes.map(n => [n.id, n.x, n.y]));
+	// The file's OWN bytes, in the file's own Cartesian frame -- these are the two [COORDINATES]
+	// rows above, character for character. They were negated here while this read memory; the
+	// projection seam moved the reading to the saved document, where the sign is the file's.
+	const FILE_COORDS = '[["J1",-122.5686103,38.106067],["R1",-122.57,38.107]]';
+	// **READ OUT OF THE SAVED DOCUMENT, NOT OUT OF MEMORY** (Task 145's projection seam): memory is
+	// Web Mercator now and the file is longitude and latitude, and it is the FILE the promise is
+	// about. Reading memory would compare the reinterpret against a frame the user never sees.
+	const coords = () => JSON.stringify(L.serialize().nodes.map(n => [n.id, n.x, n.y]));
 
 	// **THE RANGE TEST NO LONGER DECIDES ANYTHING** (Tom, 2026-08-21: EPA's own Net3, whose
 	// coordinates run x 8..45 and y 0..31, armed as degrees and landed in North Darfur). Every

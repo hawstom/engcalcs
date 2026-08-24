@@ -44,6 +44,10 @@ derived.** A geographic project may OFFER a geodesic length; it may not quietly 
 the backdrop LAYER, not of the network. A plan sheet is State Plane, UTM or a site grid, and a
 network drawn over one must keep those coordinates whatever basemap is switched on behind it.
 
+**This is a rule about the FILE, and §6's seam does not bend it.** The drawing frame is Mercator; the
+document's coordinates are longitude and latitude, byte for byte the ones the user's file states. The
+distinction is the whole design, and the measurement that forces it is in §6.
+
 ## 4. The basemap: plain OpenStreetMap raster tiles, and it is built
 
 **Decided and shipped:** OSM raster tiles, hand-rolled, no library. No key, no billing account,
@@ -76,44 +80,61 @@ What follows from that choice, and is enforced in the code:
 - **`project.basemap` is NOT `backdrop.href`, and an `.inp` exporter must skip it.** `[BACKDROP]`
   in an `.inp` names an image FILE; a tile basemap is not a file and has no href to write.
 
-## 5. Tiles over an unprojected drawing: why they still register
+## 5. Tiles register because the DRAWING is Mercator now
 
-The display is still unprojected — longitude and latitude drawn straight — and §3 says Web Mercator
-must not become the document's coordinate system. So the tiles are unprojected to meet the drawing,
-rather than the drawing being projected to meet the tiles:
+**A tile box is square, at every latitude.** Since §6's seam landed, the drawing frame is Web
+Mercator, so a Web Mercator tile covers a square of it — the raster stretched linearly inside the box
+(`preserveAspectRatio="none"`) and the box are the same map rather than two maps agreeing at the
+edges. The chord approximation this section used to measure — 0.025 px at zoom 12, 3.1 px at zoom 5 —
+is **gone rather than smaller**, and `dev/lpn-spike/basemap-harness.js` still measures it, at ~1e-10
+px, so a regression back to an unprojected frame shows up as a number that stops being zero.
 
-**Each tile is placed at its own lon/lat rectangle.** That is exact on the x axis (Mercator x is
-linear in longitude) and computed by the inverse Mercator on the y axis, and the raster is then
-stretched linearly inside that box (`preserveAspectRatio="none"`, so the box is 1 : cos(latitude),
-not square). The only approximation left is the departure of the inverse Mercator from its own chord
-**across a single tile**: `|f''|h²/8`, measured in `dev/lpn-spike/basemap-harness.js` as **0.025 px
-at zoom 12 and 0.0015 px at zoom 16**, falling as `h²`. Sub-pixel at every zoom a network is drawn
-at, and the same measurement is 3.1 px at zoom 5, which is why it is measured rather than asserted.
+The tile mathematics and the drawing frame go through **one** Mercator: `Geom.mercY()` /
+`Geom.mercRadY()` in `js/lpn-geom.js`. A tile and the pipe drawn over it cannot disagree if there is
+only one formula, and the radian form is the primitive precisely so the tile grid's own numbers did
+not move by a bit when the second copy was merged away.
 
-What this does NOT fix is that the whole drawing, basemap included, is stretched east-west by
-`1/cos(latitude)` — 27% at 38°. The map is consistent with the pipes; it is a plate-carrée view of
-both.
+## 6. The projection seam: SHIPPED, and where it went
 
-## 6. The projection seam, and why it was not landed with the tiles
+**A geographic document is DRAWN in Web Mercator and STORED in longitude and latitude.** The whole of
+the boundary is `outwardY()` / `inwardY()` in `js/looped-network.js` — the same pair Task 354 built
+for the origin shift, because a frame change is a frame change. `x` needs nothing: Mercator x IS
+longitude. Guarded by `dev/lpn-spike/mercator-harness.js`.
 
-**It was examined and judged too large for one pass.** Two things decided it, and both are facts
-about the code rather than caution:
+Three properties make it cheap, and each is the answer to a real objection:
 
-1. **The document's coordinates flow into the drawing pipeline as the node OBJECTS themselves.**
-   `linkPointList()` returns `nodeById()` results; label offsets `lx`/`ly` are in document units;
-   the collision pass, the leader geometry, `bbox()`, `zoomExtent()`, the drag write-back and the
-   backdrop-registration wizard all measure in the same units. `js/looped-network.js` is 14.5k lines
-   with **184 reads of `.x`, 172 of `.y`, 23 calls to `screenToWorld()` and 45 to `state.s`.** A
-   projected shadow would have to reach nearly all of them, and every site missed is wrong **only in
-   geographic mode and only away from the equator** — invisible in a diff and invisible in English.
-2. **The cheap version — making the INTERNAL frame Mercator and leaving the FILE in lon/lat — is
-   blocked by a shared seam, not by its own difficulty.** It would be a small change to
-   `inwardX`/`inwardY`/`outwardX`/`outwardY` plus serialization, but `js/lpn-inp.js` (import) and
-   the `.inp` exporter write and read `doc.nodes[].x` directly. Redefining what that field means in
-   memory changes those files' meaning silently. That is a sequencing problem: it can be done, but
-   not concurrently with `.inp` work.
+- **The y unit is a DEGREE OF LONGITUDE** — mercY is 0 at the equator and 180 at the cut-off — so x
+  and y share one unit and the view transform stays a **uniform** scale. No anisotropic transform
+  anywhere, so a junction is still a circle and a pipe's stroke is still one width, and `bbox()`,
+  `zoomExtent()`, the label pass and the collision pass all keep working in drawing units with no
+  change at all. §3's rule is untouched: Web Mercator is the DISPLAY, and nothing of it reaches the
+  file.
+- **The 184 reads of `.x` never had to be touched.** They read the drawing frame, which is what they
+  always wanted; the frame's definition moved, not its consumers. That is what killed the
+  `drawPos()` shadow this section used to propose — a shadow reaches every site and this reaches one.
+- **`len` is still STORED and overridable, never derived.** A geographic length is a geodesic
+  (`linkGeomLength()`), read through `outwardY()`, and Mercator's `1/cos(latitude)` never touches it.
 
-Neither the tiles nor the geodesic length needs the seam. What the seam buys is a conformal display
-— a city that looks like its own map rather than 27% wide — and it should be its own task, done
-after the `.inp` round trip has settled, with a `drawPos()` write seam and a call-site count guard of
-the same shape as `dev/lpn-spike/local-origin-harness.js`.
+**REJECTED: storing the projection.** Putting Mercator in the file would have removed the boundary
+entirely, and it is forbidden: `mercLat(mercY(lat))` is a **different double for 69.8% of latitudes**
+(200,000 samples, worst departure 2.4e-13°), so every open-and-save of an untouched document would
+rewrite every latitude. That is a third conversion site on the user's own numbers. Instead
+`projectStoredGeo()` records the file's own latitude beside the projected one and
+`unprojectStoredGeo()` hands it straight back, on exactly `mergeTok()`'s invariant — the source is
+believed only while `mercY(source)` still equals the number drawn, so any edit invalidates it with
+nothing for a call site to remember. **Import then export is byte-identical for a DEGREES `.inp`,
+measured through `applySaved()`**, which is the route `inp-export-harness.js` does not take.
+
+Two smaller consequences, both stamped by the v9 → v10 step:
+
+- **`view.cy` and `backdrop.ty` are OURS and are stored in the drawing frame**, so they convert once
+  on open. Coordinates are lon/lat at every version and are never migrated.
+- **An export now writes `[BACKDROP] UNITS DEGREES`.** Without it a geographic project re-imported as
+  a grid one holding longitudes — nominal before the seam, and visibly wrong after it, because those
+  numbers would then be drawn unprojected.
+
+**Still open: Task 439.** The drawing frame is Mercator now, not longitude and latitude, but a
+longitude is still 122 and a Mercator y still 41, so float32 still comes apart past ~600,000
+px/degree and `LPN_ORIGIN_THRESHOLD`'s 1e4 still never fires for a geographic document. What this
+seam did give 439 is a frame to rebase in: `doc.origin` is applied AFTER the projection for a
+geographic document, so an origin there is a drawing-frame offset and moves no number in the file.

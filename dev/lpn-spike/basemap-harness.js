@@ -5,12 +5,14 @@
 // out from the pipes drawn on it is worse than no street map, because it looks authoritative. Every
 // way it goes wrong is silent and looks plausible on screen:
 //
-//   1. **A tile is placed as a SQUARE.** A tile is a square in Web Mercator and this document is
-//      longitude/latitude drawn straight, so a square box is wrong by 1/cos(latitude) in height --
-//      21% at 38 degrees. Nothing throws; the map is just gradually off toward the poles.
-//   2. **The inverse Mercator is approximated where it must be exact.** The tile's own north and
-//      south edges are exact inverse-Mercator latitudes. Only the raster INSIDE the box is
-//      linearised, and this file measures that error rather than asserting it is small.
+//   1. **A tile is placed in the WRONG FRAME.** Since Task 145's projection seam the drawing frame
+//      IS Web Mercator, so a tile box is SQUARE -- and it was 1 : cos(latitude) tall for as long as
+//      the drawing was longitude and latitude drawn straight. Either shape is silently plausible on
+//      screen; only one matches the frame the pipes are in, and the whole slice rests on the box
+//      and the node beside it going through the same mercY().
+//   2. **The raster inside the box is linearised.** It is linear in Mercator y and the box is now
+//      linear in Mercator y too, so the approximation section 4 used to measure has GONE rather
+//      than got smaller. Section 4 measures that it is really zero instead of asserting it.
 //   3. **The zoom level is picked off the wrong axis.** Longitude is drawn 1:1 here and latitude is
 //      the compressed axis, so matching latitude would magnify every tile past its own pixels.
 //   4. **A refresh asks for too many tiles.** The OSM tile usage policy forbids bulk downloading,
@@ -152,10 +154,12 @@ ok('...and it never exceeds OSM\'s own maximum', L.zoomFor(1e12) === L.MAXZ, 'z=
 
 ok('...nor goes below zero', L.zoomFor(1e-9) === 0 && L.zoomFor(0) === 0);
 
-// ---- 3. REGISTRATION: a tile's box is its own lon/lat rectangle ------------------------------------
+// ---- 3. REGISTRATION: a tile's box is its own rectangle IN THE DRAWING FRAME ----------------------
 // The one property the whole slice rests on. Internal coordinates are the document's, origin-shifted
-// (origin is 0 here) and Y-down, so px is the west edge's longitude and py is minus the north edge's
-// latitude.
+// (origin is 0 here) and Y-down, so px is the west edge's longitude and py is minus the Mercator y
+// of the north edge -- the same mercY() every node's latitude goes through (Task 145).
+const refMercY = lat => Math.log(Math.tan(lat * Math.PI / 180) +
+	1 / Math.cos(lat * Math.PI / 180)) * 180 / Math.PI;
 L.reset(L.GEO);
 const view = { lonMin: -122.60, lonMax: -122.53, latMin: 38.08, latMax: 38.13 };
 const scale = 256 * Math.pow(2, 14) / 360;   // native zoom 14
@@ -167,19 +171,23 @@ list.tiles.forEach(t => {
 	boxErr = Math.max(boxErr,
 		Math.abs(t.px - refLon(t.x, t.z)),
 		Math.abs(t.px + t.pw - refLon(t.x + 1, t.z)),
-		Math.abs(-t.py - refLat(t.y, t.z)),
-		Math.abs(-(t.py + t.ph) - refLat(t.y + 1, t.z)));
-	if (Math.abs(t.pw - t.ph) < 1e-12) { aspectSquare++; }
+		Math.abs(-t.py - refMercY(refLat(t.y, t.z))),
+		Math.abs(-(t.py + t.ph) - refMercY(refLat(t.y + 1, t.z))));
+	aspectSquare = Math.max(aspectSquare, Math.abs(t.ph / t.pw - 1));
 });
-ok('every tile box is exactly the tile\'s own lon/lat rectangle', boxErr < 1e-9, boxErr.toExponential(2));
-// The failure this is really guarding: a tile placed as a square would be right at the equator and
-// wrong everywhere else. At 38 degrees the box must be about cos(38) as tall as it is wide.
+ok('every tile box is exactly the tile\'s own rectangle in the drawing frame', boxErr < 1e-9,
+	boxErr.toExponential(2));
+// The failure this is really guarding, and it has CHANGED SIDES since the projection seam landed: a
+// box that is 1 : cos(latitude) tall was right while the drawing was unprojected and is wrong now.
+// A Web Mercator tile is square, and so is the ground it covers once the drawing is Mercator too.
 const t0 = list.tiles[0], midLat = -(t0.py + t0.ph / 2);
-ok('a tile box is NOT square away from the equator', aspectSquare === 0,
-	'h/w = ' + (t0.ph / t0.pw).toFixed(4));
-ok('...it is 1 : cos(latitude), which is what an unprojected frame requires',
-	near(t0.ph / t0.pw, Math.cos(midLat * Math.PI / 180), 2e-4),
-	(t0.ph / t0.pw).toFixed(6) + ' vs ' + Math.cos(midLat * Math.PI / 180).toFixed(6));
+ok('a tile box IS square, at 38 degrees as at the equator', aspectSquare < 1e-12,
+	'worst |h/w - 1| = ' + aspectSquare.toExponential(2));
+// Vacuous only if the frame really is Mercator: in an unprojected frame this same ratio is
+// cos(latitude), 0.788 at 38 N, so the number below is what says the projection is on.
+ok('...which is NOT what an unprojected frame would give',
+	Math.abs(1 - Math.cos(refLat(t0.y, t0.z) * Math.PI / 180)) > 0.15,
+	'unprojected would be ' + Math.cos(refLat(t0.y, t0.z) * Math.PI / 180).toFixed(6));
 
 // Tiles tile: consecutive rows and columns share an edge exactly, with no gap and no overlap.
 const byXY = {};
@@ -198,27 +206,34 @@ ok('every tile names the OSM tile server over https and nothing else',
 	list.tiles.every(t => t.url === 'https://tile.openstreetmap.org/' + t.z + '/' + t.x + '/' + t.y + '.png'),
 	list.tiles[0].url);
 
-// ---- 4. the linearisation error INSIDE a tile, measured rather than asserted ----------------------
-// The raster is stretched linearly across a box whose edges are exact, so the only error is the
-// departure of the inverse Mercator from its own chord across one tile. Measured in screen pixels at
-// that zoom's native scale, which is the number that decides whether it is visible.
+// ---- 4. the linearisation error INSIDE a tile -- now ZERO, and measured to say so -----------------
+// The raster is stretched linearly across the box. It is linear in MERCATOR y by construction, and
+// since the projection seam the box is linear in Mercator y as well, so the two agree everywhere
+// rather than only at the edges. This used to be a real approximation -- 0.025 px at z12, 3.1 px at
+// z5 -- and the same measurement is kept so a regression back to an unprojected frame shows up as a
+// number that stops being zero.
 function chordErrorPx(z, lat) {
 	const y0 = Math.floor(refY(lat, z)), pxPerDeg = 256 * Math.pow(2, z) / 360;
-	const latT = refLat(y0, z), latB = refLat(y0 + 1, z);
+	const mT = refMercY(refLat(y0, z)), mB = refMercY(refLat(y0 + 1, z));
 	let worst = 0;
 	for (let i = 1; i < 256; i++) {
 		const f = i / 256;
-		worst = Math.max(worst, Math.abs(refLat(y0 + f, z) - (latT + f * (latB - latT))));
+		worst = Math.max(worst, Math.abs(refMercY(refLat(y0 + f, z)) - (mT + f * (mB - mT))));
 	}
 	return worst * pxPerDeg;
 }
 const e12 = chordErrorPx(12, 45), e16 = chordErrorPx(16, 45), e5 = chordErrorPx(5, 45);
-ok('within one tile the linear stretch is far under a pixel at drawing zooms',
-	e12 < 0.1 && e16 < 0.01, 'z12 ' + e12.toFixed(4) + ' px, z16 ' + e16.toFixed(6) + ' px');
-// Not vacuous: the same measurement is over a pixel at a whole-continent zoom, which is why it is a
-// measurement and not a hand-wave. Nothing is drawn at z5, so nothing is claimed about it.
-ok('...and the same measurement is NOT small at a continent-wide zoom', e5 > 1,
-	'z5 ' + e5.toFixed(2) + ' px');
+// The residual is FLOAT NOISE, not an approximation: the tile edge goes lat -> merc through
+// tileLat() and mercY(), which are inverses in exact arithmetic and not in doubles. It is ~1e-10 px
+// at z12 and ~3e-9 at z16 -- it rises with the zoom only because a pixel gets smaller, and the
+// ceiling is set six orders above it so it measures the frame rather than the last bit of a double.
+ok('within one tile the raster and the box are the same map, to machine precision',
+	e12 < 1e-6 && e16 < 1e-6, 'z12 ' + e12.toExponential(2) + ' px, z16 ' + e16.toExponential(2) + ' px');
+// The one that used to be 3.1 px, and the reason this is measured at all: at a continent-wide zoom
+// the unprojected frame's error was visible. Nothing is drawn at z5, but the number is the clearest
+// evidence the approximation is gone rather than merely small.
+ok('...and it is zero at a continent-wide zoom too, where it used to be 3.1 px', e5 < 1e-6,
+	'z5 ' + e5.toExponential(2) + ' px');
 
 // ---- 5. the request budget, which is the tile-policy-relevant number -------------------------------
 const huge = L.tileList(-179, -80, 179, 80, 256 * Math.pow(2, 12) / 360);

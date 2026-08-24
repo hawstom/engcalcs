@@ -133,15 +133,16 @@ Labels and the solver are **off** for the whole of it, and come back on Finish o
   host on a page whose privacy claim is that the tile server is the only one. Tom's call.
 - **Finish is not undoable.** Cancel is the way back during placement; after Finish the route back is
   closing the project without saving. The confirm says so.
-- **The display is still unprojected**, stretched east-west by 1/cos(latitude) — 27% at 38°. The
-  tiles share the stretch, so the map and the pipes agree. That is Task 145's remaining
-  projection-seam work and is unchanged by this tool.
-- **A detached model changes WIDTH when the placement travels in latitude**, by the ratio of that
-  stretch at the two latitudes (9% for a pan from 20° to 31°). Its height and its centre do not move
-  at all. There is no way to hold both on an unprojected display without an anisotropic transform,
-  which `js/lpn-georef.js` refuses by design, so the latitude axis — the honest one — is the one
-  held. It settles into the picture the finished project will have, which is the alternative to a
-  jump at the moment of attaching.
+- **The display is CONFORMAL since Task 145's projection seam shipped** — the drawing frame is Web
+  Mercator, so a square on the ground is drawn square and the east-west stretch this list used to
+  name (27% at 38°) is gone. That also retired the limit beside it: a detached model no longer
+  changes WIDTH as the placement travels in latitude, because Mercator holds a shape's aspect. It
+  changes SIZE with latitude instead, which is Mercator's own scale factor and is what the basemap
+  under it does too. `dev/geographic-projects.md` §6.
+- **The tangent plane is still isotropic and `js/lpn-georef.js` still refuses an anisotropic
+  transform.** That is unrelated and unchanged: the transform maps a drawing onto the GROUND in
+  metres, and the projection maps the ground onto a SCREEN. Do not let the second talk the first
+  into a per-axis scale.
 - **The conversion mutates the OPEN project.** Cancel is the only way back during placement, and
   after Finish the route back is closing without saving — which puts the user's own XY file one
   Save away from being overwritten by a lat/lon one. Tom asked on 2026-08-18 whether the conversion

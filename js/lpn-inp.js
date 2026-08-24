@@ -1289,6 +1289,16 @@
 		// reported and nothing is written. That is the seam shared with the tile-basemap track: this
 		// writer recognises an image by its `href` and writes [BACKDROP] for nothing else.
 		var backdrop = doc.backdrop, backdropRows = [];
+		// **UNITS COMES FIRST AND IS NOT ABOUT THE IMAGE.** [BACKDROP] UNITS is the file's own
+		// statement about what its [COORDINATES] MEAN, which is the one thing the reader uses to
+		// decide grid or lat/lon (LPN_INP_MAP_UNITS above). A geographic project that exported
+		// without it re-imported as a GRID project holding longitudes -- and since Task 145's
+		// projection seam those numbers would then be drawn unprojected, so the loss is visible
+		// rather than merely nominal. Written only when geographic: a grid document's coordinates
+		// are canvas units and this page has no business claiming they are feet or metres.
+		if (doc.project && doc.project.coords === 'geo') {
+			backdropRows.push(row(['UNITS', 'DEGREES']));
+		}
 		if (backdrop && backdrop.href) {
 			// DIMENSIONS is lower-left x, lower-left y, upper-right x, upper-right y in map
 			// coordinates. `tx`/`ty` are the image's TOP-left corner in the stored Cartesian frame, so
