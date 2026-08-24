@@ -1,0 +1,59 @@
+[TITLE]
+Pattern attachment fixture -- ROADMAP Task 248.02. A reservoir on a HEAD pattern and a
+pump on a SPEED pattern, the two attachment points EPA's own Net1/Net2/Net3 never use.
+Hand-written, and deliberately TWO components so each anchor is exact: the flow through
+P1 and through PU1 is the junction demand and nothing else, so a head that moves can only
+have moved because the pattern moved it.
+
+[JUNCTIONS]
+;ID     Elev    Demand  Pattern
+ J1     50      200
+ J2     50      150
+
+[RESERVOIRS]
+;ID     Head    Pattern
+ R1     200.0   RHEAD
+ R2     10
+
+[PIPES]
+;ID     Node1   Node2   Length  Diam    Rough   MinorLoss  Status
+ P1     R1      J1      1000    12      130     0          Open
+
+[PUMPS]
+;ID     Node1   Node2   Parameters
+ PU1    R2      J2      HEAD C1  SPEED 1.20  PATTERN PSPD
+
+[CURVES]
+;ID     Flow    Head
+ C1     0       150
+ C1     200     120
+ C1     400     60
+
+[PATTERNS]
+;ID     Multipliers
+ RHEAD  1.05  0.98  0.96  0.94  0.92  0.90
+ RHEAD  0.92  0.94  0.96  0.98  1.0   1.02
+ PSPD   1.15  1.05  1.10  0.95  0.90  1.0
+ PSPD   1.0   1.05  1.10  0.95  0.90  1.0
+
+[TIMES]
+ Duration             11:00
+ Hydraulic Timestep   1:00
+ Pattern Timestep     1:00
+ Report Timestep      1:00
+
+[OPTIONS]
+ Units                GPM
+ Headloss             H-W
+ Accuracy             1e-8
+ Trials               200
+ Unbalanced           Continue 10
+
+[COORDINATES]
+;Node   X-Coord   Y-Coord
+ R1     0         100
+ J1     300       100
+ R2     0         300
+ J2     300       300
+
+[END]

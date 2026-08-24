@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 1288,
-        "delta_key_count": 99,
+        "expected_key_count": 1296,
+        "delta_key_count": 107,
         "exempt_key_count": 29,
         "exempt_keys": [
             "calc_units_us",
@@ -586,6 +586,8 @@
         "lpn_profile_tap_more": "Tap a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.",
         "lpn_profile_say_idle": "Press Profile again to choose a new path on the map.",
         "lpn_profile_none": "No path yet. Press Profile again to choose one on the map.",
+        "lpn_inp_drop_head_pattern": "These reservoirs rise and fall through the day. Their patterns came in whole, and the water level you see is the one for the moment the clock is showing.",
+        "lpn_inp_drop_pump_speed": "These pumps run at a speed other than the one their curve was measured at, or change speed through the day. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.",
         "lpn_inp_drop_anchor_missing": "This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.",
         "lpn_import_notes_heading": "From the EPANET file",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -631,7 +633,13 @@
         "lpn_library_control_bad": "⚠ Not understood",
         "lpn_library_control_missing": "⚠ This network has nothing called {id}",
         "lpn_field_demand_pattern": "Demand pattern",
-        "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+        "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is.",
+        "lpn_field_head_pattern": "Head pattern",
+        "lpn_field_head_pattern_tip": "How this reservoir’s water level rises and falls through the run. The head above is multiplied by the pattern.",
+        "lpn_field_pump_speed": "Relative speed",
+        "lpn_field_pump_speed_tip": "1 is this pump turning at the speed its curve was measured at. 0.9 is the same pump turning slower, which lowers the head it adds and the flow it passes. A speed pattern takes the place of this number while the run is going.",
+        "lpn_field_speed_pattern": "Speed pattern",
+        "lpn_field_speed_pattern_tip": "How this pump’s speed rises and falls through the run. Each multiplier IS the relative speed for that part of the day, and takes the place of the speed above, so a multiplier of 0 stops the pump."
     },
     "keys": {
         "calc_set_units_tip": "Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
@@ -687,6 +695,8 @@
         "lpn_profile_tap_more": "Tap a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.",
         "lpn_profile_say_idle": "Press Profile again to choose a new path on the map.",
         "lpn_profile_none": "No path yet. Press Profile again to choose one on the map.",
+        "lpn_inp_drop_head_pattern": "These reservoirs rise and fall through the day. Their patterns came in whole, and the water level you see is the one for the moment the clock is showing.",
+        "lpn_inp_drop_pump_speed": "These pumps run at a speed other than the one their curve was measured at, or change speed through the day. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.",
         "lpn_inp_drop_anchor_missing": "This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.",
         "lpn_import_notes_heading": "From the EPANET file",
         "lpn_file_open_tip": "Open a project file saved from this page.",
@@ -732,7 +742,13 @@
         "lpn_library_control_bad": "⚠ Not understood",
         "lpn_library_control_missing": "⚠ This network has nothing called {id}",
         "lpn_field_demand_pattern": "Demand pattern",
-        "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+        "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is.",
+        "lpn_field_head_pattern": "Head pattern",
+        "lpn_field_head_pattern_tip": "How this reservoir’s water level rises and falls through the run. The head above is multiplied by the pattern.",
+        "lpn_field_pump_speed": "Relative speed",
+        "lpn_field_pump_speed_tip": "1 is this pump turning at the speed its curve was measured at. 0.9 is the same pump turning slower, which lowers the head it adds and the flow it passes. A speed pattern takes the place of this number while the run is going.",
+        "lpn_field_speed_pattern": "Speed pattern",
+        "lpn_field_speed_pattern_tip": "How this pump’s speed rises and falls through the run. Each multiplier IS the relative speed for that part of the day, and takes the place of the speed above, so a multiplier of 0 stops the pump."
     },
     "key_context": {
         "calc_set_units_tip": {
@@ -1583,6 +1599,38 @@
                 }
             }
         },
+        "lpn_inp_drop_head_pattern": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_pump_other",
+                    "value": "Esta bomba se describe por potencia, por velocidad o por un programa, en vez de por una curva. Se incorporó sin curva, así que no agrega carga.",
+                    "english": "This pump is described by the power it draws, rather than by a curve. It came in with no curve, so it adds no head."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_setting",
+                    "value": "Estas tuberías, bombas y válvulas llevan un ajuste que esta página no puede guardar. Se incorporaron abiertas.",
+                    "english": "These pipes, pumps and valves carry a setting this page cannot hold. They came in open."
+                }
+            }
+        },
+        "lpn_inp_drop_pump_speed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_pump_other",
+                    "value": "Esta bomba se describe por potencia, por velocidad o por un programa, en vez de por una curva. Se incorporó sin curva, así que no agrega carga.",
+                    "english": "This pump is described by the power it draws, rather than by a curve. It came in with no curve, so it adds no head."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_setting",
+                    "value": "Estas tuberías, bombas y válvulas llevan un ajuste que esta página no puede guardar. Se incorporaron abiertas.",
+                    "english": "These pipes, pumps and valves carry a setting this page cannot hold. They came in open."
+                }
+            }
+        },
         "lpn_inp_drop_anchor_missing": {
             "reason": "missing",
             "current_value": null,
@@ -2212,6 +2260,78 @@
             }
         },
         "lpn_field_demand_pattern_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Presión",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_head_pattern": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Presión",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_head_pattern_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Presión",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_pump_speed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Presión",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_pump_speed_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Presión",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_speed_pattern": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Presión",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_speed_pattern_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

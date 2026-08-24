@@ -569,16 +569,20 @@
 					drop('pump-constant-power', [r[0]], r[j + 1], 'link');
 					j++;
 				} else if (kw === 'SPEED') {
-					// Kept whatever it is, so a later reader need not re-tokenize the row; only a
-					// speed that is not 1 changes the answer, and only that is reported.
+					// A RELATIVE SPEED, dimensionless: 1 is the curve as drawn, 0.9 is the same
+					// pump turning slower. It scales the curve as h = s^2 h0 - a (Q/s)^b, which is
+					// EPANET's own law and the one js/looped-network.js applies at the solve.
+					// The token is kept beside it like every other number the file states, so a
+					// `1.20` comes back out as `1.20`.
 					pump.speed = num(r[j + 1], 1);
+					mergeTok(pump, 'speed', r[j + 1], pump.speed);
 					if (pump.speed !== 1) { drop('pump-speed', [r[0]], r[j + 1], 'link'); }
 					j++;
 				} else if (kw === 'PATTERN') {
 					// A pump SCHEDULE: the multiplier series is a speed, not a demand, which is
 					// why js/lpn-patterns.js knows nothing about what a pattern is for.
 					pump.speedPattern = r[j + 1] || null;
-					drop('pump-pattern', [r[0]], r[j + 1], 'link');
+					if (r[j + 1]) { drop('pump-pattern', [r[0]], r[j + 1], 'link'); }
 					j++;
 				}
 			}
@@ -1094,10 +1098,15 @@
 				// page and not of the file. EPANET states one number, so the rule is resolved here --
 				// exactly as reservoirHead() resolves it for the solver.
 				var rh = eff(nd, 'head');
+				// **THE HEAD PATTERN IS THE THIRD COLUMN, AND IT IS THE NODE'S OWN OR NOTHING**
+				// (Task 248.02) -- the same rule the junction's pattern column follows below. There
+				// is no document-wide default for a head pattern in EPANET, so a blank column here
+				// really does mean "no pattern" and writing one would state what the user never did.
+				var rpat = nd.headPattern ? [String(nd.headPattern)] : [];
 				if (rh === undefined || rh === null || rh === '') {
-					reservoirs.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)]));
+					reservoirs.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)].concat(rpat)));
 				} else {
-					reservoirs.push(row([nd.id, n(cHead, nd, '_head', rh)]));
+					reservoirs.push(row([nd.id, n(cHead, nd, '_head', rh)].concat(rpat)));
 				}
 			} else if (nd.type === 'tank') {
 				// ID Elev InitLvl MinLvl MaxLvl Diam MinVol. Every one in the ELEVATION unit, the
@@ -1198,7 +1207,18 @@
 					for (j = 0; j < pts.length; j++) {
 						curves.push(row([cname, curveNum(cFlow, pts[j][0]), curveNum(cHead, pts[j][1])]));
 					}
-					pumps.push(row([lk.id, lk.from, lk.to, 'HEAD ' + cname]));
+					// **KEYWORD-VALUE PAIRS, AND ONLY THE ONES THIS PUMP ACTUALLY STATES** (Task
+					// 248.02). EPANET reads a [PUMPS] row as `HEAD c [SPEED s] [PATTERN p]` in any
+					// order; a speed of exactly 1 is EPANET's own default, so writing it would put a
+					// column in the file that the file it came from did not have. The SPEED token is
+					// kept like every other number's, so `1.20` returns as `1.20`.
+					var pumpRow = [lk.id, lk.from, lk.to, 'HEAD ' + cname],
+						psp = lk.speed;
+					if (typeof psp === 'number' && isFinite(psp) && psp !== 1) {
+						pumpRow.push('SPEED ' + n(PLAIN, lk, 'speed', psp));
+					}
+					if (lk.speedPattern) { pumpRow.push('PATTERN ' + String(lk.speedPattern)); }
+					pumps.push(row(pumpRow));
 					if (status === 'Closed') { statuses.push(row([lk.id, 'Closed'])); }
 				} else {
 					// A PUMP WITH NO CURVE IS THE ONE ELEMENT THAT CANNOT ROUND-TRIP. It is this

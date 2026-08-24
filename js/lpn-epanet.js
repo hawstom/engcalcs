@@ -110,7 +110,13 @@
 			n = model.nodes[i];
 			if (n.type === 'reservoir') {
 				// EPANET reservoirs carry a total head, which is exactly what we store.
-				reservoirs.push(' ' + n.id + '  ' + (n.head || 0));
+				// **UNDER `eps` THE HEAD IS THE BASE HEAD AND THE PATTERN IS NAMED BESIDE IT**
+				// (Task 248.02), for the same reason a junction's demand is written that way twenty
+				// lines down: EPANET multiplies Head by Pattern on its own clock, so writing the
+				// t=0 head under a pattern would apply the first multiplier twice.
+				reservoirs.push(' ' + n.id + '  ' +
+					(eps && n.headBase !== undefined ? n.headBase : (n.head || 0)) +
+					(eps && n.headPattern ? '  ' + n.headPattern : ''));
 			} else if (n.type === 'tank') {
 				// [TANKS] is  ID  Elev  InitLvl  MinLvl  MaxLvl  Diam  MinVol  [VolCurve].
 				//
@@ -212,7 +218,17 @@
 				// which is why that section exists below and did not before.
 				if (link.status === 'closed') { statuses.push(' ' + link.id + '  Closed'); }
 			} else if (link.type === 'pump') {
-				if (link.h0 > 0 || link.a > 0) {
+				// **UNDER `eps` THE CURVE IS THE UNSCALED ONE AND THE SPEED IS NAMED BESIDE IT**
+				// (Task 248.02). EPANET applies SPEED and its PATTERN to the curve itself, so
+				// sampling the already-scaled curve here and then stating the speed as well would
+				// apply the multiplier twice -- the pump-curve twin of the demand trap below.
+				// The STATUS is the document's for the same reason: assembleModel() closes a pump
+				// whose schedule reads 0 at this instant, and that is a fact about the instant.
+				var pumpEps = eps && link.h0Base !== undefined,
+					ph0 = pumpEps ? link.h0Base : link.h0,
+					pa = pumpEps ? link.aBase : link.a,
+					pStatus = (eps && link.statusBase !== undefined) ? link.statusBase : link.status;
+				if (ph0 > 0 || pa > 0) {
 					// Our curve is H = h0 - a Q^b, and EPANET fits exactly that form to a 3-point
 					// HEAD curve -- so three points sampled off our own curve round-trip it
 					// rather than approximating it, PROVIDED the first sample sits at Q = 0.
@@ -225,24 +241,34 @@
 					// 0.40 m and [.1, .5, .9] by 1.60 m. Anything whose first point has Q > 0 is
 					// wrong. dev/lpn-spike/validate_epanet.js carries a pump case so this cannot
 					// regress unnoticed.
-					var qMax = Math.pow(link.h0 / link.a, 1 / link.b),
+					var qMax = Math.pow(ph0 / pa, 1 / link.b),
 						pts = [0, 0.5, 0.9],
 						cname = 'C_' + link.id,
 						rows = [],
 						j, q, h;
 					for (j = 0; j < pts.length; j++) {
 						q = qMax * pts[j];
-						h = link.h0 - link.a * Math.pow(q, link.b);
+						h = ph0 - pa * Math.pow(q, link.b);
 						rows.push(' ' + cname + '  ' + (q * 1000) + '  ' + h);
 					}
 					curves.push(rows.join('\n'));
-					pumps.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  HEAD ' + cname);
+					// SPEED then PATTERN, and each only when the pump states one: a speed of 1 is
+					// EPANET's own default, so writing it would put a column in the file that says
+					// nothing. Both are dimensionless and cross unconverted.
+					// SPEED, or PATTERN, and never both: EPANET DISCARDS the speed of a pump that
+					// also names a pattern and uses the multiplier as the speed itself (measured --
+					// dev/lpn-spike/pattern-attach-harness.js). Writing both would state a number
+					// the engine throws away, which is the same rule as a TCV's minor-loss column
+					// above. Both are dimensionless and cross unconverted.
+					pumps.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  HEAD ' + cname +
+						(pumpEps && link.speedPattern ? '  PATTERN ' + link.speedPattern :
+							(pumpEps && link.speed !== undefined && link.speed !== 1 ? '  SPEED ' + link.speed : '')));
 					// **A PUMP HAS NO STATUS COLUMN EITHER**, exactly like a valve, so a closed one is
 					// stated in [STATUS] or it is written open. pushValues() writes EN_INITSTATUS over the
 					// top, which hid this for as long as every solve went through the warm path; an
 					// extended-period run opens a Project from the text alone, and Net3's pump 10 -- closed
 					// until its own control opens it at 1:00 -- came out 96 ft wrong at midnight.
-					if (link.status === 'closed') { statuses.push(' ' + link.id + '  Closed'); }
+					if (pStatus === 'closed') { statuses.push(' ' + link.id + '  Closed'); }
 				} else {
 					// A pump with NO curve is our own concept: a lossless connection, the state
 					// every freshly drawn pump is in. EPANET has no such element, so it becomes a
