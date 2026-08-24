@@ -4555,7 +4555,7 @@ var EngCalcs = EngCalcs || {};
 	// its shape, so this can only ever reject: a true hit on a dot, a stroke or a glyph is untouched
 	// in every project at every zoom, and no tolerance anywhere is widened.
 	//
-	// **THIS IS A GUARD, NOT THE CURE.** Past about 600,000 px/degree the drawing itself comes apart
+	// **THIS IS A GUARD, NOT THE CURE.** Past about 64,000 px/degree the drawing itself comes apart
 	// -- a node's own <circle> is rasterised at x = -41,548,184 and simply is not there -- which is
 	// Task 354's problem in degrees and wants the same medicine: coordinates local to an origin, so
 	// that nothing downstream ever sees a number whose float32 spacing is bigger than a symbol.

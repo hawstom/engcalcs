@@ -134,10 +134,19 @@ Two smaller consequences, both stamped by the v9 → v10 step:
   numbers would then be drawn unprojected.
 
 **Still open: Task 439.** The drawing frame is Mercator now, not longitude and latitude, but a
-longitude is still 122 and a Mercator y still 41, so float32 still comes apart past ~600,000
-px/degree and `LPN_ORIGIN_THRESHOLD`'s 1e4 still never fires for a geographic document. What this
-seam did give 439 is a frame to rebase in: `doc.origin` is applied AFTER the projection for a
-geographic document, so an origin there is a drawing-frame offset and moves no number in the file.
+longitude is still 122 and a Mercator y still 41, so float32 still comes apart — **measured
+2026-08-24 at 64,000 px/degree**, not the ~600,000 previously recorded here, with a node landing
+575 px from its own position at the deepest zoom the page permits
+(`dev/lpn-spike/geo-precision-harness.js`). `LPN_ORIGIN_THRESHOLD`'s 1e4 still never fires for a
+geographic document. What this seam did give 439 is a frame to rebase in: `doc.origin` is applied
+AFTER the projection for a geographic document, so an origin there is a drawing-frame offset and
+moves no number in the file.
+
+The origin must be snapped to a **power-of-two grid** (1/128°), not a decimal one: that makes the
+origin exactly representable and, by Sterbenz, makes `x − ox` exact for any origin near the model,
+so `(x − ox) + ox === x` and a shifted coordinate returns to the file as the bytes it arrived as.
+The open decision is where a geographic document's origin is STORED, given that `view.cx/cy` and
+`backdrop.tx/ty` are in the drawing frame — the two candidates are in Task 439.
 
 ## 7. Elevations from the land surface (Task 497)
 

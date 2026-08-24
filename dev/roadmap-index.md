@@ -12,7 +12,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 ## 100 — Next (6)
 
 - Task 436 — What a wheel notch costs, and the placement leftovers.
-- Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
+- Task 439 — The lat/lon drawing comes apart at 64,000 px/degree, not 600,000.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - Task 511 — Three georeferencing checks disagree with Mercator, and one of them is right.
 - ! Task 512 — The amber override ring reads as a stuck highlight nobody can turn off.
