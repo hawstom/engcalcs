@@ -478,7 +478,7 @@
     "keys_to_translate": {
         "calc_set_units_tip": "Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
         "lpn_units_warn_lead": "{unit} is the unit of what you enter for:",
-        "lpn_units_options_head": "Options for units change:",
+        "lpn_units_options_head": "When you change a unit:",
         "lpn_units_nondestructive": "Non-destructive",
         "lpn_units_nondestructive_desc": "Non-destructive: leaves every input as it is and reinterprets it in the new unit.",
         "lpn_units_destructive": "Destructive",
@@ -586,8 +586,8 @@
         "lpn_search_tip": "Find a town, a street or a landmark by name and move the map to it. The first use asks your permission, because the words you type go to OpenStreetMap’s place-name service.",
         "lpn_search_bar": "Search by name…",
         "lpn_search_consent_1": "Search by place name sends the words you type to nominatim.openstreetmap.org, the OpenStreetMap Foundation’s free place-name service.",
-        "lpn_search_consent_2": "This is a different service from the street map pictures behind your project. The pictures only say where you are looking. A search says what you typed. They will receive your search words and your IP address. We send nothing else, and we keep no record of your searches.",
-        "lpn_search_consent_3": "May we use it?",
+        "lpn_search_consent_2": "This is a different service from the street map pictures behind your project. The pictures only say where you are looking. A search says what you typed. The place-name service will receive your search words and your IP address. We send nothing else, and we keep no record of your searches.",
+        "lpn_search_consent_3": "May we send your searches to the place-name service?",
         "lpn_search_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, including Go to a latitude and longitude. We remember a yes so that we need not ask again. A no is not stored at all.",
         "lpn_search_refused": "Place-name search is off, and nothing was sent. You can still use Go to a latitude and longitude.",
         "lpn_search_prompt": "Search for a place by name. A town, a street, a landmark — for example: Petaluma, California",
@@ -610,7 +610,7 @@
         "lpn_terrain_accuracy": "Terrain data is about 30 m across the ground and is commonly several metres out vertically. Treat it as a contour map, not a survey: check anything you rely on.",
         "lpn_terrain_consent_1": "Filling in elevations sends the position of each node that needs one — its latitude and longitude — to api.mapbox.com, to look up the height of the ground there.",
         "lpn_terrain_consent_2": "This is a different question from the map pictures behind your project. The pictures only say where you are looking. These positions are your network itself. Mapbox will receive those coordinates and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.",
-        "lpn_terrain_consent_3": "May we use it?",
+        "lpn_terrain_consent_3": "May we send your node positions to Mapbox?",
         "lpn_terrain_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, and you can type elevations in yourself as before. We remember a yes so that we need not ask again. A no is not stored at all.",
         "lpn_terrain_refused": "Elevations were not filled in, and nothing was sent. You can type them in as before.",
         "lpn_terrain_confirm": "Fill in the elevation of {n} node(s) from the land surface?",
@@ -635,7 +635,7 @@
     "keys": {
         "calc_set_units_tip": "Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
         "lpn_units_warn_lead": "{unit} is the unit of what you enter for:",
-        "lpn_units_options_head": "Options for units change:",
+        "lpn_units_options_head": "When you change a unit:",
         "lpn_units_nondestructive": "Non-destructive",
         "lpn_units_nondestructive_desc": "Non-destructive: leaves every input as it is and reinterprets it in the new unit.",
         "lpn_units_destructive": "Destructive",
@@ -743,8 +743,8 @@
         "lpn_search_tip": "Find a town, a street or a landmark by name and move the map to it. The first use asks your permission, because the words you type go to OpenStreetMap’s place-name service.",
         "lpn_search_bar": "Search by name…",
         "lpn_search_consent_1": "Search by place name sends the words you type to nominatim.openstreetmap.org, the OpenStreetMap Foundation’s free place-name service.",
-        "lpn_search_consent_2": "This is a different service from the street map pictures behind your project. The pictures only say where you are looking. A search says what you typed. They will receive your search words and your IP address. We send nothing else, and we keep no record of your searches.",
-        "lpn_search_consent_3": "May we use it?",
+        "lpn_search_consent_2": "This is a different service from the street map pictures behind your project. The pictures only say where you are looking. A search says what you typed. The place-name service will receive your search words and your IP address. We send nothing else, and we keep no record of your searches.",
+        "lpn_search_consent_3": "May we send your searches to the place-name service?",
         "lpn_search_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, including Go to a latitude and longitude. We remember a yes so that we need not ask again. A no is not stored at all.",
         "lpn_search_refused": "Place-name search is off, and nothing was sent. You can still use Go to a latitude and longitude.",
         "lpn_search_prompt": "Search for a place by name. A town, a street, a landmark — for example: Petaluma, California",
@@ -767,7 +767,7 @@
         "lpn_terrain_accuracy": "Terrain data is about 30 m across the ground and is commonly several metres out vertically. Treat it as a contour map, not a survey: check anything you rely on.",
         "lpn_terrain_consent_1": "Filling in elevations sends the position of each node that needs one — its latitude and longitude — to api.mapbox.com, to look up the height of the ground there.",
         "lpn_terrain_consent_2": "This is a different question from the map pictures behind your project. The pictures only say where you are looking. These positions are your network itself. Mapbox will receive those coordinates and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.",
-        "lpn_terrain_consent_3": "May we use it?",
+        "lpn_terrain_consent_3": "May we send your node positions to Mapbox?",
         "lpn_terrain_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, and you can type elevations in yourself as before. We remember a yes so that we need not ask again. A no is not stored at all.",
         "lpn_terrain_refused": "Elevations were not filled in, and nothing was sent. You can type them in as before.",
         "lpn_terrain_confirm": "Fill in the elevation of {n} node(s) from the land surface?",
@@ -1026,7 +1026,7 @@
                 "next_translated": {
                     "key": "lpn_pane_tab_tip",
                     "value": "हर जंक्शन एक तालिका के रूप में, जिसे आप क्रमबद्ध और संपादित कर सकते हैं।",
-                    "english": "These parts as a table you can sort. Results are read-only."
+                    "english": "These parts shown as a table you can sort. Results are read-only."
                 }
             }
         },
@@ -1042,7 +1042,7 @@
                 "next_translated": {
                     "key": "lpn_pane_tab_tip",
                     "value": "हर जंक्शन एक तालिका के रूप में, जिसे आप क्रमबद्ध और संपादित कर सकते हैं।",
-                    "english": "These parts as a table you can sort. Results are read-only."
+                    "english": "These parts shown as a table you can sort. Results are read-only."
                 }
             }
         },
@@ -1058,7 +1058,7 @@
                 "next_translated": {
                     "key": "lpn_pane_tab_tip",
                     "value": "हर जंक्शन एक तालिका के रूप में, जिसे आप क्रमबद्ध और संपादित कर सकते हैं।",
-                    "english": "These parts as a table you can sort. Results are read-only."
+                    "english": "These parts shown as a table you can sort. Results are read-only."
                 }
             }
         },
@@ -1074,7 +1074,7 @@
                 "next_translated": {
                     "key": "lpn_pane_tab_tip",
                     "value": "हर जंक्शन एक तालिका के रूप में, जिसे आप क्रमबद्ध और संपादित कर सकते हैं।",
-                    "english": "These parts as a table you can sort. Results are read-only."
+                    "english": "These parts shown as a table you can sort. Results are read-only."
                 }
             }
         },
@@ -1090,7 +1090,7 @@
                 "next_translated": {
                     "key": "lpn_pane_tab_tip",
                     "value": "हर जंक्शन एक तालिका के रूप में, जिसे आप क्रमबद्ध और संपादित कर सकते हैं।",
-                    "english": "These parts as a table you can sort. Results are read-only."
+                    "english": "These parts shown as a table you can sort. Results are read-only."
                 }
             }
         },

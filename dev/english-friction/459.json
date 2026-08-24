@@ -1,0 +1,153 @@
+{
+  "sprint": "459",
+  "description": "Adversarial Wave 0 (translation sprint 459) over the 219 new-and-changed lpn_ keys reported by wave0_keyset.php --new-and-changed --prefix=lpn (3 of 222 in-scope keys pre-filtered as already carrying a non-empty $ec_lang_syn). The question asked of every string was NOT 'is this good?' but 'list every plausible reading; if there is more than one, propose a rewrite.' Special attention paid to the search and terrain consent dialogs per the task brief. Result: 11 findings -- 8 english, 1 english (consistency), 3 dismissed, 1 refer-to-human. Every entry is open in the sense that this pass proposes; it does not write $ec_lang or $ec_lang_syn. | Wave 0 findings ruled and applied 2026-08-24: eight English rewrites in lib/lang.ec.en.php, one referred key resolved from the code, ONE still open for Tom (the two orphan *_syn keys). The three consent-dialog findings were the important ones and all three are in the two permission dialogs Task 507 had just keyed.",
+  "entries": [
+    {
+      "key": "lpn_units_options_head",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "high: 'Options for units change:' has two parses -- a noun phrase 'options for [a units change]' (heading over the nondestructive/destructive choice that follows, the intended reading) and a clause 'options for units [change]', i.e. the options themselves change. The compressed noun-pile makes 'change' read as a verb on first pass.",
+      "readings": [
+        "the choices available for how a unit change is carried out (intended)",
+        "the available unit options are changing / have changed"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED 2026-08-24: 'Options for units change:' -> 'When you change a unit:'."
+    },
+    {
+      "key": "lpn_tool_add_tank_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "high: 'variable storage depending on variable levels' is circular -- it defines a tank's storage as depending on its own levels without saying what varies or why, and repeating 'variable' twice gives a translator nothing concrete to render. Its sibling lpn_tool_add_reservoir_tip ('an infinite source with a fixed water level') is concrete and parallel; this one is not.",
+      "readings": [
+        "storage whose water level rises and falls as it fills and drains (intended)",
+        "storage of a variable, unspecified amount, that happens to depend on levels that are also variable (no concrete picture)"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED 2026-08-24: '...variable storage depending on variable levels' -> '...storage whose water level rises and falls as it fills and empties'. The old wording used one word twice to define itself."
+    },
+    {
+      "key": "lpn_pane_tab_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "medium: 'These parts as a table you can sort.' is a sentence fragment -- it has a subject and two noun phrases but no verb, so 'as' has to be silently read as 'shown as' or 'presented as'. A translator without a strong intuition for English ellipsis has no verb to anchor a translation on.",
+      "readings": [
+        "These parts, shown as a table you can sort (intended)",
+        "not parseable as a complete sentence without inference"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED 2026-08-24: 'These parts as a table' -> 'These parts shown as a table' -- the missing verb."
+    },
+    {
+      "key": "lpn_tip_select",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "high: the second sentence, 'Self-sets intelligently sometimes.', has no recoverable subject or object. It is not clear what 'self-sets' (mode? a property? a value?), what makes it 'intelligent', or what 'sometimes' is conditioned on. This is the strongest single finding in the set -- an English reader has no plausible single reading, only a guess.",
+      "readings": [
+        "unrecoverable -- no antecedent for 'self' and no stated object for 'sets'"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED 2026-08-24, after reading what the code actually does. 'Self-sets intelligently sometimes' names seven `setMode('select')` call sites: opening a project or an example, clearing the network, restoring a georeferenced project, and the fat-finger rule (a tap in an Add mode that lands on something already there opens it instead of stacking a duplicate). Rewritten to 'The page comes back to this mode by itself after some actions, such as opening a project.' -- honest, translatable, and it names the case a user will actually meet rather than claiming intelligence."
+    },
+    {
+      "key": "lpn_notes_2_def",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "medium: 'Water quality is not modeled. Valves are: a throttle valve works in either solver, and...' -- 'Valves are:' promises a list or a definition after the colon, but what follows is a full compound sentence, not a completion of 'Valves are'. The colon creates a false expectation of a predicate.",
+      "readings": [
+        "Valves [behave as follows]: a throttle valve works in either solver... (intended)",
+        "Valves are: [some property or list] -- syntactically broken, no completion follows"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED 2026-08-24: 'Valves are:' -> 'Valves:' -- the colon carries it; the verb promised a completion that never came."
+    },
+    {
+      "key": "lpn_georef_step2",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "medium: 'Step 2 of 2 — fine' uses 'fine' in its precision sense (paired with 'Step 1 of 2 — quick' and lpn_georef_intro's 'Step 2 is the fine one'), but this label is rendered standalone as a short step indicator, decontextualized from the paragraph that anchors that sense. 'Fine' is one of English's most common polysemy traps -- its everyday sense is 'okay/satisfactory', which is nonsensical here but plausible enough to make a translator hesitate or guess wrong, especially since 'fine=precise' is a lower-frequency sense than 'fine=OK' or 'fine=weather'.",
+      "readings": [
+        "the fine (precise, detailed) step, as opposed to the quick one (intended)",
+        "Step 2 of 2 -- [status:] fine / OK",
+        "fine as in weather, irrelevant but momentarily available"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED 2026-08-24: 'Step 2 of 2 - fine' -> 'Step 2 of 2 - precise'. Pairs with step 1's 'quick', which is the contrast the two steps actually are, and drops the everyday 'fine = OK' reading entirely."
+    },
+    {
+      "key": "lpn_search_consent_2",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "high (consent dialog): 'They will receive your search words and your IP address.' -- 'They' has no clean antecedent inside this string; the service name (nominatim.openstreetmap.org / OpenStreetMap Foundation) was named two sentences earlier in the PRECEDING key (lpn_search_consent_1), a separate translation unit a translator may render out of that exact sequence. The parallel terrain dialog names the recipient explicitly in the analogous sentence ('Mapbox will receive those coordinates and your IP address.') -- this key is the one place in the two consent flows that relies on a pronoun instead. A consent string that names who receives your data should not depend on grammatical memory across two separately-translated strings, and pronoun gender/number agreement in many target languages depends on which antecedent a translator infers.",
+      "readings": [
+        "the place-name service / Nominatim / OpenStreetMap Foundation will receive... (intended, but not stated in this string)",
+        "the street map pictures mentioned in the previous sentence will receive...",
+        "no antecedent recoverable if this string is read alone"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED 2026-08-24: 'They will receive' -> 'The place-name service will receive', matching the terrain dialog's pattern of naming the recipient. In a consent dialog a pronoun with no antecedent is not a wording defect, it is a consent defect."
+    },
+    {
+      "key": "lpn_search_consent_3",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "high (consent dialog): 'May we use it?' -- this is the literal permission question the Accept/Reject buttons answer, and 'it' has no clean noun antecedent in the immediately preceding sentence ('...we keep no record of your searches.' -- 'searches' is plural, and 'it' cannot idiomatically refer back to it). The nearest singular candidates are 'the place-name service' (consent_1) or 'a search' (consent_2), both distant and both requiring the reader to reconstruct across string boundaries. This is exactly the class of ambiguity the brief calls out: the reader may correctly consent without being sure what they consented to.",
+      "readings": [
+        "May we send your searches to the place-name service? (intended)",
+        "May we use your search words / your IP address?",
+        "May we use your searches (the record we said we don't keep)?"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED 2026-08-24: 'May we use it?' -> 'May we send your searches to the place-name service?' Names both the thing sent and who gets it, so the question stands alone."
+    },
+    {
+      "key": "lpn_terrain_consent_3",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "high (consent dialog): same defect as lpn_search_consent_3 -- 'May we use it?' with no antecedent in the immediately preceding sentence, which ends '...nothing is stored on this device except your answer to this question.' The nearest singular candidate ('Mapbox') is two sentences back. Both consent flows share this exact string, which means the ambiguity is systemic to the pattern, not a one-off typo.",
+      "readings": [
+        "May we send your node positions to Mapbox? (intended)",
+        "May we use your node positions / your IP address?",
+        "unclear antecedent if read as the standalone consent question it functionally is"
+      ],
+      "disposition": "english",
+      "resolution": "APPLIED 2026-08-24: 'May we use it?' -> 'May we send your node positions to Mapbox?' Same fix, same reason."
+    },
+    {
+      "key": "lpn_settings_color_credits",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "low: 'Credits' as a bare link label could plausibly be read as financial credit rather than attribution/acknowledgement. Flagging because a later reviewer skimming this key in isolation (outside the code comment that explains it) would likely re-flag it.",
+      "readings": [
+        "acknowledgement of the color-ramp scheme's source/author (intended)",
+        "a financial credit or account balance"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Dismissed -- js/looped-network.js:~8330-8338 documents this as a deliberate word choice (Tom, 2026-08-20: 'THE WORD IS \"Credits\", NOT \"About\"' -- 'About' sounds like a Help link). 'Credits' in a software-attribution context is the dominant established UI sense; leaving as-is."
+    },
+    {
+      "key": "lpn_terrain_confirm_default_2",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "low: 'Replace those {n} with the land surface?' literally reads as replacing a value with a physical object rather than with an elevation reading taken from it. Only one plausible reading survives once the preceding string (lpn_terrain_confirm_default_1) is read first, since these two strings are always shown together as one dialog.",
+      "readings": [
+        "replace those elevations with elevations read from the land surface (intended, recoverable from context)",
+        "replace the nodes themselves with the land surface (not a serious competing reading given context)"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Dismissed -- always rendered directly under lpn_terrain_confirm_default_1, which supplies 'elevation' as the object being replaced; no realistic second reading in situ."
+    },
+    {
+      "key": "lpn_profile_tip_syn",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "process finding, not a wording defect: lpn_profile_tip_syn and lpn_profile_title_syn are ordinary $ec_lang keys (not entries in the off-limits $ec_lang_syn array) with no call site anywhere in js/ or *.php -- grep found them only in lang files and generated payloads. They read like synonym-rich variants of lpn_profile_tip / lpn_profile_title that were meant to go into $ec_lang_syn (which is exactly the payload shape: 'Draw the ground or grade... path, route, or way...') but were instead committed as their own translatable $ec_lang keys. As written, sprint 459 is about to pay for full sentence translations, in 26 languages, of two strings nothing displays.",
+      "readings": [
+        "leftover/misfiled content meant for $ec_lang_syn (most likely)",
+        "a genuinely unwired future call site (dead for now, intentionally parked)"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "Needs a human call: either exclude lpn_profile_tip_syn / lpn_profile_title_syn from this sprint's scope as key debt (key_hygiene_check.php territory), or wire them to a real call site first. Recommend excluding from sprint 459 pending that decision -- translating dead keys is pure waste and the correct fix (moving the content into $ec_lang_syn) needs Tom's written approval per the off-limits rule."
+    }
+  ]
+}

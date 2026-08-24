@@ -148,11 +148,14 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	ok('the lead names the chosen unit and what it is the unit OF',
 		lines[1] === chosen + ' is the unit of what you enter for:', lines[1]);
 	// **ONE NAME PER LINE, NOT A COMMA LIST** (Tom, 2026-08-18).
-	const fieldLines = lines.slice(2, lines.indexOf('Options for units change:'));
+	const fieldLines = lines.slice(2, lines.indexOf(global.EngCalcs.pageConfig.lpn_units_options_head));
 	ok('the fields it decides are listed', fieldLines.length >= 2, JSON.stringify(fieldLines));
 	ok('...one name per line', fieldLines.every(l => l.indexOf(',') < 0), JSON.stringify(fieldLines));
 	ok('...and Demand is one of them', fieldLines.indexOf('Demand') >= 0, JSON.stringify(fieldLines));
-	ok('the options are headed', lines.indexOf('Options for units change:') >= 0, JSON.stringify(lines));
+	// Reworded by sprint 459's Wave 0 (2026-08-24): 'Options for units change:' is a noun pile that
+	// parses two ways -- [options for units] [change] or [options for] [units change]. The heading is
+	// read from the key rather than retyped here, so the next rewording is not a second failure.
+	ok('the options are headed', lines.indexOf(global.EngCalcs.pageConfig.lpn_units_options_head) >= 0, JSON.stringify(lines));
 	ok('Non-destructive says it leaves the inputs alone',
 		lines.some(l => /^Non-destructive: leaves every input as it is/.test(l)), JSON.stringify(lines));
 	ok('Destructive says it rewrites them and that it loses the originals',

@@ -1276,7 +1276,7 @@ $ec_lang['lpn_demand_tip']='Flow taken out of the network at this node. Enter a 
 // 26 translations carrying a {list} the page no longer fills, and a literal "{list}" on the map.
 $ec_lang['lpn_units_warn_title']='This unit decides what your inputs mean';
 $ec_lang['lpn_units_warn_lead']='{unit} is the unit of what you enter for:';
-$ec_lang['lpn_units_options_head']='Options for units change:';
+$ec_lang['lpn_units_options_head']='When you change a unit:';
 // Each option's sentence opens with the word on its own button, so the button and the explanation
 // say the same word. Non-destructive is the suite's standing behaviour and the first button;
 // Destructive is the opt-in, and says out loud both what it costs and that Undo undoes it.
@@ -1382,7 +1382,7 @@ $ec_lang['lpn_georef_asdegrees']='The x and y in this file were read as a longit
 $ec_lang['lpn_georef_intro']='Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here.';
 $ec_lang['lpn_georef_adjust']='The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to turn it. Or type the scale and the turn below.';
 $ec_lang['lpn_georef_step1']='Step 1 of 2 — quick';
-$ec_lang['lpn_georef_step2']='Step 2 of 2 — fine';
+$ec_lang['lpn_georef_step2']='Step 2 of 2 — precise';
 $ec_lang['lpn_georef_step1_hint']='Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is roughly the right place and roughly the right size, then press Put the model here.';
 $ec_lang['lpn_georef_detach']='Pick it up again';
 $ec_lang['lpn_georef_size_prompt']='About how wide is the site, across the whole project?';
@@ -1392,7 +1392,7 @@ $ec_lang['lpn_georef_size_prompt']='About how wide is the site, across the whole
 $ec_lang['lpn_tip_join']='{name} — {tip}';
 $ec_lang['lpn_tool_add_junction_tip']='Click the map to add a junction: a point where pipes meet or where water is used.';
 $ec_lang['lpn_tool_add_reservoir_tip']='Click the map to add a reservoir: an infinite source with a fixed water level.';
-$ec_lang['lpn_tool_add_tank_tip']='Click the map to add a tank: variable storage depending on variable levels.';
+$ec_lang['lpn_tool_add_tank_tip']='Click the map to add a tank: storage whose water level rises and falls as it fills and empties.';
 $ec_lang['lpn_tool_add_pipe_tip']='Click one node and then another to draw a pipe between them.';
 $ec_lang['lpn_tool_add_pump_tip']='Click one node and then another to put a pump between them.';
 $ec_lang['lpn_tool_add_valve_tip']='Click one node and then another to put a valve between them.';
@@ -1465,7 +1465,7 @@ $ec_lang['lpn_pane_tab_tanks']='Tanks';
 $ec_lang['lpn_pane_tab_pipes']='Pipes';
 $ec_lang['lpn_pane_tab_pumps']='Pumps';
 $ec_lang['lpn_pane_tab_valves']='Valves';
-$ec_lang['lpn_pane_tab_tip']='These parts as a table you can sort. Results are read-only.';
+$ec_lang['lpn_pane_tab_tip']='These parts shown as a table you can sort. Results are read-only.';
 $ec_lang['lpn_pane_none']='This network has none of these yet.';
 $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
 $ec_lang['lpn_pane_print']='Print table';
@@ -1892,7 +1892,7 @@ $ec_lang['lpn_notes_2_term']='Not modeled';
 // the honest half of it: the valves are all modeled now, but the three that open and close on
 // their own are solved by the EPANET solver and not by the built-in solver. That is a real
 // thing for a reader to know -- it is why such a network needs the engine downloaded once.
-$ec_lang['lpn_notes_2_def']='Water quality is not modeled. Valves are: a throttle valve works in either solver, and the valves that open and close on their own (PRV, PSV, FCV) are solved with the EPANET solver, which this page turns on by itself when your network holds one.';
+$ec_lang['lpn_notes_2_def']='Water quality is not modeled. Valves: a throttle valve works in either solver, and the valves that open and close on their own (PRV, PSV, FCV) are solved with the EPANET solver, which this page turns on by itself when your network holds one.';
 $ec_lang['lpn_notes_3_term']='Saving projects';
 $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2032,7 +2032,7 @@ $ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a text lab
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. Self-sets intelligently sometimes.';
+$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. The page comes back to this mode by itself after some actions, such as opening a project.';
 $ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?';
@@ -2544,8 +2544,8 @@ $ec_lang['lpn_search_bar']='Search by name…';
 // The four paragraphs of the ask: what is sent and to whom; why this is a separate question from
 // the map pictures; the question itself; and what a no costs (nothing).
 $ec_lang['lpn_search_consent_1']='Search by place name sends the words you type to nominatim.openstreetmap.org, the OpenStreetMap Foundation’s free place-name service.';
-$ec_lang['lpn_search_consent_2']='This is a different service from the street map pictures behind your project. The pictures only say where you are looking. A search says what you typed. They will receive your search words and your IP address. We send nothing else, and we keep no record of your searches.';
-$ec_lang['lpn_search_consent_3']='May we use it?';
+$ec_lang['lpn_search_consent_2']='This is a different service from the street map pictures behind your project. The pictures only say where you are looking. A search says what you typed. The place-name service will receive your search words and your IP address. We send nothing else, and we keep no record of your searches.';
+$ec_lang['lpn_search_consent_3']='May we send your searches to the place-name service?';
 $ec_lang['lpn_search_consent_4']='If you say no, everything else on this page keeps working exactly as it does now, including Go to a latitude and longitude. We remember a yes so that we need not ask again. A no is not stored at all.';
 $ec_lang['lpn_search_refused']='Place-name search is off, and nothing was sent. You can still use Go to a latitude and longitude.';
 $ec_lang['lpn_search_prompt']='Search for a place by name. A town, a street, a landmark — for example: Petaluma, California';
@@ -2572,7 +2572,7 @@ $ec_lang['lpn_terrain_tip']='Read the ground elevation under each node that has 
 $ec_lang['lpn_terrain_accuracy']='Terrain data is about 30 m across the ground and is commonly several metres out vertically. Treat it as a contour map, not a survey: check anything you rely on.';
 $ec_lang['lpn_terrain_consent_1']='Filling in elevations sends the position of each node that needs one — its latitude and longitude — to api.mapbox.com, to look up the height of the ground there.';
 $ec_lang['lpn_terrain_consent_2']='This is a different question from the map pictures behind your project. The pictures only say where you are looking. These positions are your network itself. Mapbox will receive those coordinates and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.';
-$ec_lang['lpn_terrain_consent_3']='May we use it?';
+$ec_lang['lpn_terrain_consent_3']='May we send your node positions to Mapbox?';
 $ec_lang['lpn_terrain_consent_4']='If you say no, everything else on this page keeps working exactly as it does now, and you can type elevations in yourself as before. We remember a yes so that we need not ask again. A no is not stored at all.';
 $ec_lang['lpn_terrain_refused']='Elevations were not filled in, and nothing was sent. You can type them in as before.';
 // {n} is a whole number, {k} a whole number, {v} an elevation with its unit, {m} and {f} whole
