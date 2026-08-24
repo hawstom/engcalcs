@@ -204,10 +204,14 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   phone** on 2026-08-22; the four small-screen items he named — hide page titles, collapse the
   navbar, keep only the transport controls, drop menu text to icons — shipped the same day at one
   `max-width: 640px` breakpoint (closed Task 486, guarded by `dev/lpn-spike/small-screen-harness.js`),
-  and on 2026-08-23 he passed it: *"For today's standards, we are gold."* **The sanctioned public
-  claim is his own and it is deliberately unfalsifiable: "Try it. We did."** Never upgrade that to a
-  promise the next phone can contradict. The other calculators are a form and an answer and are fine as they
-  are.
+  and on 2026-08-23 he passed it: *"For today's standards, we are gold."* On 2026-08-24, after using
+  it: *"phone usability is super solid now. I am a bit surprised."* **The sanctioned public claim is
+  his own, and it is the LANDING PAGE'S current sentence, not a paraphrase:** *"And although you of
+  course prefer working on your PC, it works also on a phone."* The indefinite article is load-bearing
+  and he chose it deliberately (*"to be scrupulously honest"*) — **"a phone" is a claim about the
+  software; "your phone" is a promise about a device we have never seen.** Never write the second.
+  (Superseded, recorded so it is not reinstated by habit: "Try it. We did.") The other calculators
+  are a form and an answer and are fine as they are.
 
 ---
 

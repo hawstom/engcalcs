@@ -225,47 +225,12 @@ the block.
     landing page's own repository at `~/librewaternet.org/index.html`. Move the local working
     directory in that same pass and not before (`dev/hosting-layout.md` §5).
 
-- 100|478| **[H] BUILT AND WAITING ON ONE RULING: Tab walks the input column.**
-  Tom, 2026-08-22: *"One entire column at a time... it is less bad to force a user tabber person into
-  'do an entire column at once' than 'do an entire row at once'"*. Built 2026-08-23 as DOM order, not
-  `tabindex` (which would take a unit select off the keyboard entirely — WCAG 2.1.1). **It is on the
-  local branch `task-478-fieldgrid`, deliberately unmerged.** `echoInputGrid()` emits column-major
-  cells placed by `grid-row`.
-  - **x-cross is 0 on all 15 grid pages** (was 16 on Manning-Trap, 12 on Irrigation-Pressure, 9, 8,
-    8, 7, 7, 7, 6, 5, 5, 4, 1). `focus_order_check.php` now BLOCKS, gated on a property of the page
-    — renders `.ec-fieldgrid` ⇒ x-cross must be 0 — never a hand list. `Looped-Network.php` is not an
-    `echoCalculatorForm()` page and stays advisory.
-  - **Layout is pixel-identical in English at 1400px on all 16 pages**, at every width from 1500px
-    up, and in all five RTL languages. Verified by `dev/browser-pass/fieldgrid-layout.js`, which
-    serves the repo twice and compares every control's box; re-run independently before this note.
-  - **THE ONE RULING NEEDED, and it is structural, not a bug.** A `<td>` wraps its contents; two grid
-    columns cannot. Where the window is too narrow, a wide unit select used to drop onto a second
-    line under its input and now stays on the line, the label column absorbing the squeeze — one row
-    shorter, form width unchanged, no new horizontal scrolling. English: Manning-Trap below ~1400px,
-    Rock-Chute below ~1200px. At 1400px in other languages: Manning-Trap in 14, Rock-Chute in 13,
-    Irrigation-Pressure in 4. Gone by 1920px. Wrapping needs the input and the select in one box, and
-    tab order follows that box — there is no third option.
-  - **Accepted cost, written down not quiet:** WCAG 1.3.2. Visual order and DOM order now differ, so
-    a screen reader browsing LINEARLY hears inputs, then labels, then selects, and each label twice;
-    a reader TABBING gets what Tom asked for. The old markup was a layout table (no `<th>`, no
-    caption), so no row/column relationship is lost.
-  - Needs a browser pass before merge: the X button hides all four cells of a line; the conditional
-    lines on Orifice, Orifice-Drain-Time and Branched-Network appear and disappear whole; "Printable
-    version" then toggling the orifice shape keeps the X's gone; the collapse animation.
-  - **ROUND 2 SHIPPED ON THE BRANCH (2026-08-23), answering all three of Tom's follow-ups.** The
-    four dynamic tables now tab by column, and the last top input goes straight into the table's
-    first cell. Done as a Tab KEY HANDLER (`EngCalcs.wireColumnTabOrder`), not a DOM order: the
-    tables are real `<table>`s built at runtime by the one shared `addCalcRow()`, so a DOM answer
-    would have to unmake the table AND re-thread it on every row added. One handler, no `tabindex`,
-    Shift+Tab the exact inverse at every seam. **His "without too much heroic hacking" is answered
-    yes, and the reason is that all four pages share one table id and one row builder.**
-  - **Printable titles were already in the tab order** — first two stops in the form. What he met is
-    a 4-stop detour between the subtitle and the first field input (Restore defaults, SI, US, and
-    the units row's X). Measured, reported, left alone: removing them is the same WCAG 2.1.1 trade
-    this task already declined. `dev/browser-pass/specs/tabcolumn.js` prints the number.
-  - The guard is a BROWSER spec, not a static one, and that is forced: `focus_order_check.php` reads
-    DOM order and is blind to a key handler by construction. 36 checks; removing the wiring fails
-    20 of them, and disabling Shift+Tab alone fails 12.
+- 75|501| **[H] Tom's own browser pass on the Task 478 field grid.**
+  Merged 2026-08-24 on his instruction (*"Please merge"*), which is also his ruling on the narrow-
+  window wrap. What no harness here can answer, because each is a picture rather than a number:
+  the X button hides all four cells of a line; the conditional lines on Orifice, Orifice-Drain-Time
+  and Branched-Network appear and disappear whole; "Printable version" then toggling the orifice
+  shape keeps the X's gone; the collapse animation still animates.
 
 
 - 75|483| **EPANET import: carry unhandled features into a per-asset import notes field.**

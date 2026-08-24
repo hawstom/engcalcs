@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**78 open tasks.** Next (100): 7 · Soon (75): 6 · Someday (50): 12 · Maybe (25): 26 · Parked (5): 27
+**78 open tasks.** Next (100): 6 · Soon (75): 7 · Someday (50): 12 · Maybe (25): 26 · Parked (5): 27
 
-## 100 — Next (7)
+## 100 — Next (6)
 
 - Task 145 — GEOGRAPHIC PROJECTS: grid or geographic, declared before anything is drawn.
 - Task 389 — Search and replace inputs across the network, no longer gated on size.
@@ -17,9 +17,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 439 — The lat/lon drawing comes apart past ~600,000 px/degree.
 - Task 459 — WAIT: sprint · The next sprint's contents, already earned.
 - Task 469 — Node labels should SHED properties before one of them is hidden.
-- Task 478 — [H] · BUILT AND WAITING ON ONE RULING: Tab walks the input column.
 
-## 75 — Soon (6)
+## 75 — Soon (7)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 442 — [H] · The toolbar may want to become a side menu.
@@ -27,6 +26,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 479 — LibreWaterNet.org needs a landing page, and this account needs a hosting decision.
 - Task 483 — EPANET import: carry unhandled features into a per-asset import notes field.
 - Task 495 — [H] · REMIND TOM: does an input accept more characters than its width shows?
+- Task 501 — [H] · Tom's own browser pass on the Task 478 field grid.
 
 ## 50 — Someday (12)
 
