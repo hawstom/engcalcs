@@ -2,6 +2,15 @@
 require_once('lib/base.inc.php');
 $html_title = $ec_lang['bpn_main_title'];
 $html_desc = $ec_lang['bpn_main_desc'];
+// The roughness column's reference table depends on the selected friction method: a Manning
+// user sent to a Hazen-Williams C table is worse off than with no link at all. Declared once
+// here, rendered as the column's initial href, and handed to JS through pageConfig so
+// EngCalcs.bpnUpdateMethodUI() retargets the same anchor it already retitles.
+$bpn_roughness_urls = Array(
+	'hw' => 'https://www.engineeringtoolbox.com/hazen-williams-coefficients-d_798.html',
+	'manning' => 'https://www.engineeringtoolbox.com/mannings-roughness-d_799.html',
+	'dw' => 'https://nepis.epa.gov/Exe/ZyNET.exe/P1007WWU.txt?ZyActionD=ZyDocument&Client=EPA&Index=2000%20Thru%202005&SearchMethod=1&TocRestrict=n&&IntQFieldOp=0&ExtQFieldOp=0&XmlQuery=&File=D%3A%5CZYFILES%5CINDEX%20DATA%5C00THRU05%5CTXT%5C00000024%5CP1007WWU.txt&User=ANONYMOUS&Password=anonymous&SortMethod=h%7C-&MaximumDocuments=1&FuzzyDegree=0&ImageQuality=r75g8/r75g8/x150y150g16/i425&Display=hpfr&DefSeekPage=x&SearchBack=ZyActionL&Back=ZyActionS&BackDesc=Results%20page&MaximumPages=1&ZyEntry=31',
+);
 echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['bpn_main_desc']?></h2>
@@ -31,7 +40,7 @@ echoCalculatorForm(
 	$flagFormAppend = true
 );
 function echoCalculatorFormAppend() {
-	global $ec_lang;
+	global $ec_lang, $bpn_roughness_urls;
 	$indent_string = "\t\t\t\t\t";
 ?>
 	<p>
@@ -63,7 +72,7 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'diameteru', $units = 'distance_small', $indent_string); ?>
 				</th>
 				<th>
-					<?=ecTipLabel('<span id="bpn_roughness_symbol">C</span>', $ec_lang['bpn_roughness_tip'])?><br />
+					<?=ecLinkTipLabel($bpn_roughness_urls['hw'], '<span id="bpn_roughness_symbol">C</span>', $ec_lang['bpn_roughness_tip'])?><br />
 					<?php echoUnitSelect($name = 'roughnessu', $units = 'roughness', $indent_string); ?>
 				</th>
 				<th>
@@ -142,7 +151,8 @@ EngCalcs.pageConfig = {
 	mhp_vel_high_short: <?=json_encode($ec_lang['mhp_vel_high_short'])?>,
 	mhp_vel_low: <?=json_encode($ec_lang['mhp_vel_low'])?>,
 	mhp_vel_low_short: <?=json_encode($ec_lang['mhp_vel_low_short'])?>,
-	bpn_source_label: <?=json_encode($ec_lang['bpn_source_label'])?>
+	bpn_source_label: <?=json_encode($ec_lang['bpn_source_label'])?>,
+	bpn_roughness_urls: <?=json_encode($bpn_roughness_urls)?>
 };
 </script>
 <script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
