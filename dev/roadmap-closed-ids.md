@@ -140,6 +140,7 @@ state; this is only a list of numbers that were once used.
 - 0|141| [CLOSED 2026-07-27 as already answered] Is Kichwa (sw) / الرأس (ar) really the hydraulic-head term?
 - 0|142| [DONE 2026-07-28] ip_max_head label vs. tip mismatch — resolved on PRESSURE
 - 0|143| [
+- 0|145| [DONE 2026-08-24] Geographic projects: grid-or-geographic declared at creation, the OpenStreetMap raster basemap, the placement tool (File > Convert to lat/lon…), and the PROJECTION SEAM — a geographic document is DRAWN in Web Mercator and STORED in lon/lat, the whole boundary being outwardY()/inwardY(). Scope and the rejected alternative: dev/geographic-projects.md; the placement tool: dev/georeferencing.md. The boot-time declaration went to Task 477 and the float32 rebase to Task 439.
 - 0|146| [
 - 0|146.01| [CC] **[DONE 2026-07-30] Draggable data labels on leaders, collision avoidance, background mask (lpn_).**…
 - 0|146.02| [DONE 2026-08-08] EPANET-style icon toolbar — shipped as Task 231; map symbols extracted to 146.10

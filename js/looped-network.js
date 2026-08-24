@@ -2259,9 +2259,14 @@ var EngCalcs = EngCalcs || {};
 	function geoHomeView() {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0,
-			degLat = 2 * LPN_MERC_MAX_LAT;
+			// **THE MERCATOR WORLD IS SQUARE**, 360 drawing units on each side: the cut-off latitude
+			// is exactly where mercY() reaches 180. On a landscape canvas the floor below (360
+			// degrees of longitude across) is the binding constraint and the poles crop, which is
+			// why this is a max() rather than the bare quotient.
+			degLat = 360;
 		if (!w || !h) { return null; }
-		return { cx: inwardX(LPN_GEO_HOME.lon), cy: inwardY(LPN_GEO_HOME.lat), s: Math.min(w, h) / degLat };
+		return { cx: inwardX(LPN_GEO_HOME.lon), cy: inwardY(LPN_GEO_HOME.lat),
+			s: Math.max(minScale(), Math.min(w, h) / degLat) };
 	}
 	// Six decimals is ~0.11 m at the equator, finer than any pipe is placed and coarse enough to
 	// read. Two decimals (readonlyField()'s default) is ~1.1 km, one coordinate for a whole site.
@@ -3029,9 +3034,66 @@ var EngCalcs = EngCalcs || {};
 			? doc.origin : { x: 0, y: 0 };
 	}
 	function outwardX(x) { return x + docOrigin().x; }
-	function outwardY(y) { return cartesianY(y) + docOrigin().y; }
+	function outwardY(y) {
+		var c = cartesianY(y) + docOrigin().y;
+		return isGeoProject() ? Geom.mercLat(c) : c;
+	}
 	function inwardX(x) { return x - docOrigin().x; }
-	function inwardY(y) { return cartesianY(y - docOrigin().y); }
+	function inwardY(y) {
+		return cartesianY((isGeoProject() ? Geom.mercY(y) : y) - docOrigin().y);
+	}
+	// ---- THE PROJECTION SEAM (ROADMAP Task 145) -------------------------------------------------
+	//
+	// **A GEOGRAPHIC DOCUMENT IS DRAWN IN WEB MERCATOR AND STORED IN LONGITUDE AND LATITUDE.** The
+	// four functions above are the whole of the boundary between those two frames -- the same four
+	// Task 354 built for the origin shift, because a frame change is a frame change. x needs
+	// nothing: Mercator x IS longitude. Only y is projected, and its unit is a DEGREE OF LONGITUDE,
+	// so x and y share one unit and the view transform stays a UNIFORM scale. Nothing downstream
+	// changes: a junction is still a circle, a pipe's stroke is still one width, the label pass
+	// still lays out in drawing units -- and the picture is now the shape its own basemap is,
+	// instead of stretched east-west by 1 / cos(latitude) (19% at 33 N, 56% at 50 N).
+	//
+	// **THE FILE IS NEVER PROJECTED, AND THAT IS NOT A CONVENIENCE.** mercLat(mercY(lat)) fails to
+	// return the same double for 69.7% of latitudes (measured over 200,000 samples in
+	// dev/lpn-spike/mercator-harness.js; worst departure 2.4e-13 degrees). Storing the projection
+	// would make opening and saving an untouched file a THIRD conversion site on the user's own
+	// numbers, which CLAUDE.md forbids in terms. So projectStoredGeo() records the file's own
+	// latitude beside the projected one and unprojectStoredGeo() hands it straight back, on exactly
+	// mergeTok()'s invariant: the source is believed only while mercY(source) still equals the
+	// number drawn, so any edit invalidates it with nothing for a call site to remember.
+	//
+	// **THE ORIGIN IS IN THE DRAWING FRAME for a geographic document** -- subtracted after the
+	// projection, added back before the inverse. It is {0, 0} in every geographic document that
+	// exists (georefStart() and docFromInp() both write it), so this composes rather than converts;
+	// it is spelled this way because Task 439 wants small DRAWN numbers, which is the frame a
+	// rebase has to happen in.
+	var LPN_GEO_YSRC = '_ysrc';
+	// The document's coordinate points ONLY. eachStoredPoint() also visits `backdrop.tx/ty` and
+	// `view.cx/cy` -- through its {get, set} form, which is what `set` tests for -- and those two
+	// are OURS rather than the user's and are stored in the DRAWING frame from v10 onward. One list,
+	// one deliberate exclusion, rather than a second list that could drift from it.
+	function projectStoredGeo(o) {
+		eachStoredPoint(o, function (pt, get, set) {
+			if (set || !isFinite(pt.y)) { return; }
+			var lat = pt.y;
+			pt.y = Geom.mercY(lat);
+			pt[LPN_GEO_YSRC] = lat;
+		});
+		return o;
+	}
+	// Runs on the CLONE serializeProject() has already flipped to the file's Cartesian frame, so
+	// `pt.y` and mercY(source) are directly comparable. The marker never reaches a file.
+	function unprojectStoredGeo(o) {
+		eachStoredPoint(o, function (pt, get, set) {
+			if (set) { return; }
+			var src = pt[LPN_GEO_YSRC];
+			delete pt[LPN_GEO_YSRC];
+			if (!isFinite(pt.y)) { return; }
+			pt.y = (typeof src === 'number' && Geom.mercY(src) === pt.y)
+				? src : Geom.mercLat(pt.y);
+		});
+		return o;
+	}
 	function screenToWorld(sx, sy) {
 		var r = svg.getBoundingClientRect();
 		return { x: (sx - r.left - state.tx) / state.s, y: (sy - r.top - state.ty) / state.s };
@@ -4993,17 +5055,20 @@ var EngCalcs = EngCalcs || {};
 	// zoom level would be. Over budget, the zoom steps DOWN -- fewer, coarser tiles covering the
 	// same ground -- rather than the view being clipped.
 	var LPN_TILE_BUDGET = 192;
-	// The latitude Web Mercator is cut off at, and the reason a world map is square.
-	var LPN_MERC_MAX_LAT = 85.0511287798066;
+	// The latitude Web Mercator is cut off at, and the reason a world map is square. **ONE OPINION
+	// ABOUT MERCATOR**: the logarithm and its inverse live in js/lpn-geom.js, which is also what
+	// the drawing frame is projected with (see the seam note beside inwardY()). Spelling it twice
+	// is how a tile and the pipe drawn over it come to disagree. The RADIAN form is what these two
+	// want -- `mercRad / PI` is the tile grid's own y -- so the calls below are byte-identical to
+	// the expressions they replaced, which dev/lpn-spike/mercator-harness.js asserts.
+	var LPN_MERC_MAX_LAT = Geom.mercMaxLat;
 	function tileLon(x, z) { return x / Math.pow(2, z) * 360 - 180; }
 	function tileLat(y, z) {
-		var n = Math.PI * (1 - 2 * y / Math.pow(2, z));
-		return Math.atan(Math.sinh(n)) * 180 / Math.PI;
+		return Geom.mercLatFromRad(Math.PI * (1 - 2 * y / Math.pow(2, z)));
 	}
 	function lonToTileX(lon, z) { return (lon + 180) / 360 * Math.pow(2, z); }
 	function latToTileY(lat, z) {
-		var r = Math.max(-LPN_MERC_MAX_LAT, Math.min(LPN_MERC_MAX_LAT, lat)) * Math.PI / 180;
-		return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, z);
+		return (1 - Geom.mercRadY(lat) / Math.PI) / 2 * Math.pow(2, z);
 	}
 	// `scale` is state.s: screen pixels per world unit, and a world unit here is a DEGREE OF
 	// LONGITUDE. A zoom level spreads 360 degrees over 256 * 2^z pixels, so matching the two picks
@@ -6473,7 +6538,14 @@ var EngCalcs = EngCalcs || {};
 			var s = georef.restore[i++];
 			if (!s) { return; }
 			if (set) { set(inwardX(s.x), inwardY(s.y)); }
-			else { pt.x = inwardX(s.x); pt.y = inwardY(s.y); }
+			else {
+				pt.x = inwardX(s.x); pt.y = inwardY(s.y);
+				// **REINTERPRET'S WHOLE PROMISE IS "ITS OWN BYTES", and the projection would break
+				// it** -- inwardY() now returns mercY(lat), which does not invert exactly. The
+				// file's own latitude is recorded here so serializeProject() hands it straight
+				// back. Task 145.
+				pt[LPN_GEO_YSRC] = s.y;
+			}
 		});
 		var c = georefSrcCentre(),
 			mpd = EngCalcs.lpnGeorefMetersPerDegree(c.y),
@@ -10271,7 +10343,11 @@ var EngCalcs = EngCalcs || {};
 	// scenario value.
 	// 9 (Task 445): the Labels priority column is a DROP order -- 1 is given up first -- so every
 	// stored priority means the opposite of what it did at v8 and is inverted on open.
-	var LPN_STORAGE_VERSION = 9;
+	// 10 (Task 145): a geographic document is DRAWN in Web Mercator. Its coordinates are still
+	// stored in longitude and latitude -- they are the user's numbers -- but `view.cy` and
+	// `backdrop.ty` are ours and are stored in the drawing frame, so a v9 geographic document has
+	// those two converted once on open.
+	var LPN_STORAGE_VERSION = 10;
 	// ---- ROADMAP Task 274, second half ----
 	//
 	// From v4 the FILE stores Cartesian Y (up is positive), matching what the user sees and what
@@ -10483,7 +10559,12 @@ var EngCalcs = EngCalcs || {};
 		// From v4 the file is Cartesian. CLONED FIRST -- flipStoredY() mutates, and the object above
 		// holds live references to doc.nodes/links/labels, so flipping in place would turn the
 		// drawing upside down on screen every time it was saved.
-		if (out.v >= LPN_CARTESIAN_VERSION) { return flipStoredY(JSON.parse(JSON.stringify(out))); }
+		if (out.v >= LPN_CARTESIAN_VERSION) {
+			var snap = flipStoredY(JSON.parse(JSON.stringify(out)));
+			// The projection comes off LAST, in the file's own frame -- see the seam note beside
+			// inwardY(). An untouched coordinate leaves as the bytes it arrived as.
+			return isGeoProject() ? unprojectStoredGeo(snap) : snap;
+		}
 		return out;
 	}
 	function writeJSON(key, obj) {
@@ -10764,6 +10845,23 @@ var EngCalcs = EngCalcs || {};
 			invertLabelPriorities(saved);
 			saved.v = 9;
 		}
+		// ---- v9 -> v10: A GEOGRAPHIC DOCUMENT IS DRAWN IN WEB MERCATOR (Task 145) -----------------
+		//
+		// Coordinates are untouched: they are longitude and latitude in the file at every version,
+		// and the projection lives entirely in memory. What moves is the pair of drawing-frame
+		// numbers that are OURS -- where the reader was looking, and where a background image sits.
+		// Read as latitudes by a v10 page they would open a project a few degrees off its own site.
+		if (saved.v === 9) {
+			if (saved.project && saved.project.coords === LPN_COORDS_GEO) {
+				if (saved.view && isFinite(saved.view.cy)) {
+					saved.view.cy = Geom.mercY(saved.view.cy);
+				}
+				if (saved.backdrop && isFinite(saved.backdrop.ty)) {
+					saved.backdrop.ty = Geom.mercY(saved.backdrop.ty);
+				}
+			}
+			saved.v = 10;
+		}
 		// **There is deliberately NO v2 -> v3 step here, and v2 is the ONLY version that lags.**
 		// Every other migration converts and stamps; this one cannot, because the conversion is the
 		// USER'S to authorise. The document stays at v2 until they answer, and THE MISSING STAMP IS
@@ -10811,6 +10909,11 @@ var EngCalcs = EngCalcs || {};
 		// deliberate: every caller hands over a freshly parsed object it does not reuse, and
 		// doc.nodes/links/labels below are assigned BY REFERENCE from it, so a copy here would only
 		// double the memory and create a second thing to keep in step.
+		// Longitude/latitude in, Web Mercator out (Task 145's projection seam). BEFORE the flip,
+		// because the projection is defined on the file's Cartesian frame, and read off `saved`
+		// rather than isGeoProject() because `project` is not assigned until a few lines below.
+		if (saved.v >= LPN_CARTESIAN_VERSION &&
+			saved.project && saved.project.coords === LPN_COORDS_GEO) { projectStoredGeo(saved); }
 		if (saved.v >= LPN_CARTESIAN_VERSION) { flipStoredY(saved); }
 		// A different document is a different set of elements, and ids repeat across projects (every
 		// project has a J1). Dropping the selection here rather than letting refreshSelection() prune

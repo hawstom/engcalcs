@@ -47,25 +47,6 @@ the block.
 
 # Tasks
 
-- 100|145| **GEOGRAPHIC PROJECTS: grid or geographic, declared before anything is drawn.**
-  A project declares it the same way it declares units. Scope, the three places "geo is just another unit" stops holding, the
-  basemap, the unprojected display and the projection seam: **`dev/geographic-projects.md`**.
-  - **DONE, slices 1-3:** the declaration and degrees at every user boundary; the OpenStreetMap
-    raster basemap; and the placement tool (File > Convert to lat/lon…), plus a globe-wide
-    zoom floor and Go to latitude, longitude. Terms are Tom's: **XY** and **lat/lon**. Detail, and a
-    proposed `$ec_lang_syn` diff still awaiting his approval: **`dev/georeferencing.md`**.
-  - **NEXT: the projection seam, and it is its own task-sized piece of work.** The cheap version — an
-    internal Mercator frame with a lon/lat file — redefines `doc.nodes[].x` under `js/lpn-inp.js` and
-    the `.inp` exporter, so it must be sequenced AFTER them, not run beside them.
-  - **Web Mercator must NOT become the document's coordinate system**, and its distances are not
-    ground distances (`1/cos(latitude)`: ~15% at 40°, ~30% at 50°). This is the strongest argument for
-    the standing rule that **`len` is stored and overridable, never derived.**
-  - **THE ONLY UNDECLARED PROJECT IS THE ONE AT BOOT.** File > New declares grid-or-geographic by
-    which of its four rows you click, and an import reads it from the file — so every other route
-    already carries the answer (Tom, 2026-08-21, confirmed in `newProjectRows()`). What is left is the
-    first tab of a first visit, which is born grid without anybody saying so. Task 477 is where that
-    gets asked.
-
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
   What that one pass costs, in Chromium on the 480-pipe grid `specs/perf.js` builds: 1.3–7.3 s in
@@ -114,6 +95,12 @@ the block.
   local to an origin — but `LPN_ORIGIN_THRESHOLD` is 1e4 and a longitude is 122, so no geographic
   document is ever rebased, and `georefStart()` deliberately sets `doc.origin = {0, 0}`. Touches the
   placement tool, the basemap and the stored file format, so it is its own task.
+  - **Task 145's projection seam did NOT subsume this, and the numbers say why:** the drawing frame
+    is Web Mercator now rather than lon/lat, but a longitude is still 122 and a Mercator y still 41.
+    Same magnitude, same float32, same threshold that never fires. What it DID give this task is a
+    frame to rebase in — `doc.origin` is applied AFTER the projection for a geographic document, so
+    an origin there is a drawing-frame offset and moves no number in the file. The file-format half
+    of this task is therefore smaller than the block above assumes.
   - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
     drawing is still correct.
 

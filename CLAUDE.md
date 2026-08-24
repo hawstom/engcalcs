@@ -198,7 +198,11 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   been false since the geocoder shipped. **Adding one does NOT touch `consent_body`** — that banner
   asks about one analytics digit and says nothing about third-party requests; each feature asks its
   own question, so a fifth service is a new paragraph in `privacy.php`, not a version bump.
-  The display is still unprojected; the tiles are placed per-tile in lon/lat so they register anyway.
+  A geographic project is **drawn in Web Mercator and stored in longitude and latitude** —
+  `outwardY()`/`inwardY()` is the whole boundary, x needs nothing because Mercator x IS longitude, and
+  a tile box is square because the drawing frame is the tiles' own. **Storing the projection is
+  forbidden:** `mercLat(mercY(lat))` differs in the last bits for 69.8% of latitudes, so it would
+  rewrite every latitude on every open-and-save.
   `dev/geographic-projects.md`.
 - **Reads AND WRITES EPANET `.inp` files** (`js/lpn-inp.js` — one file, so one opinion about the
   format). Import takes the supported subset and reports every difference, never rejecting and never

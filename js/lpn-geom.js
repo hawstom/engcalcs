@@ -593,6 +593,37 @@ EngCalcs.lpnGeom = (function () {
 		return best;
 	}
 
+	// ---- WEB MERCATOR: the DISPLAY projection (ROADMAP Task 145's projection seam) ---------------
+	//
+	// **THIS IS NOT A DISTANCE AND MUST NEVER BE USED AS ONE.** geodesicMeters() above measures the
+	// ground; this pair maps the ground onto a SCREEN, and Web Mercator's scale error is
+	// 1 / cos(latitude) -- 19% at 33 N, 56% at 50 N, unbounded toward the poles. It exists so a
+	// geographic drawing has the shape its own basemap has. `len` stays STORED and overridable and
+	// is never derived from it.
+	//
+	// **ONE OPINION ABOUT MERCATOR, AND THIS IS IT.** js/looped-network.js spelled the same
+	// logarithm out a second time for its tile grid and now calls these; a tile and the pipe drawn
+	// over it cannot disagree if there is only one formula. It is a SPHERE, deliberately -- Web
+	// Mercator is defined on one, which is why the WGS84 constants above are not involved.
+	//
+	// The RADIAN form is the primitive and the degree pair wraps it, not the reverse: the tile grid
+	// wants `mercRadY / PI` and the drawing frame wants degrees, and going degrees-first would put a
+	// `* 180 / PI` and a `/ 180 * PI` around the tile expression that were not there before. Two
+	// multiplications that cancel algebraically do not cancel in doubles.
+	//
+	// The drawing frame's y unit is a DEGREE OF LONGITUDE: mercY() is 0 at the equator and 180 at
+	// the cut-off, so x and y share one unit and the map's view transform stays a UNIFORM scale.
+	// That is what makes the projection cheap -- no anisotropic transform anywhere, so a junction is
+	// still a circle and a pipe's stroke is still one width.
+	var MERC_MAX_LAT = 85.0511287798066;   // where mercRadY() reaches PI, and why a world map is square
+	function mercRadY(latDeg) {
+		var r = Math.max(-MERC_MAX_LAT, Math.min(MERC_MAX_LAT, latDeg)) * Math.PI / 180;
+		return Math.log(Math.tan(r) + 1 / Math.cos(r));
+	}
+	function mercLatFromRad(m) { return Math.atan(Math.sinh(m)) * 180 / Math.PI; }
+	function mercY(latDeg) { return mercRadY(latDeg) * 180 / Math.PI; }
+	function mercLat(yDeg) { return mercLatFromRad(yDeg * Math.PI / 180); }
+
 	return {
 		polylineLength: polylineLength,
 		geodesicMeters: geodesicMeters,
@@ -616,7 +647,12 @@ EngCalcs.lpnGeom = (function () {
 		nearestSegmentDistance: nearestSegmentDistance,
 		angularGap: angularGap,
 		directionOpenness: directionOpenness,
-		mostOpenDirection: mostOpenDirection
+		mostOpenDirection: mostOpenDirection,
+		mercMaxLat: MERC_MAX_LAT,
+		mercRadY: mercRadY,
+		mercLatFromRad: mercLatFromRad,
+		mercY: mercY,
+		mercLat: mercLat
 	};
 }());
 
