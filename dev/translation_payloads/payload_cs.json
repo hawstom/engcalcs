@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 1346,
-        "delta_key_count": 11,
+        "expected_key_count": 1347,
+        "delta_key_count": 12,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -445,6 +445,7 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_field_text_attached": "Attached to",
         "lpn_geomap": "lat\/lon",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
@@ -458,6 +459,7 @@
         "lpn_settings_legend_off": "Off"
     },
     "keys": {
+        "lpn_field_text_attached": "Attached to",
         "lpn_geomap": "lat\/lon",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
@@ -471,6 +473,22 @@
         "lpn_settings_legend_off": "Off"
     },
     "key_context": {
+        "lpn_field_text_attached": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_flip",
+                    "value": "Otočit o 180°",
+                    "english": "Turn 180°"
+                },
+                "next_translated": {
+                    "key": "lpn_field_elev",
+                    "value": "Nadmořská výška",
+                    "english": "Elevation"
+                }
+            }
+        },
         "lpn_geomap": {
             "reason": "equal_to_english",
             "current_value": "lat\/lon",

@@ -1156,6 +1156,9 @@ $ec_lang['lpn_field_text_valign_bottom']='Bottom';
 $ec_lang['lpn_field_text_rotation']='Angle (degrees)';
 $ec_lang['lpn_field_text_match_pipe']='Turn to the angle of the nearest link';
 $ec_lang['lpn_field_text_flip']='Turn 180°';
+// A Text object may follow a junction, reservoir or tank, or a station along a pipe, pump or
+// valve (Task 502). This row names what it is following. OUR VOCABULARY: the element is a Text.
+$ec_lang['lpn_field_text_attached']='Attached to';
 $ec_lang['lpn_field_elev']='Elevation';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
