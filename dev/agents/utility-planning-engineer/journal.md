@@ -219,12 +219,25 @@ ANSI store paywall — previews only, same posture as `rc`'s unreachable Robinso
   Declines Over Time"; pe.mcwane.com DIPRA hydraulic-savings sheet). For a 20–50 ft lateral this barely
   matters in absolute head loss — C=120 vs C=140 on 50 ft of 6 in pipe at fire flow is a few hundredths
   of a foot either way — so roughness is the cheapest of the four to default.
-- **NOT FOUND, and I looked**: a published `k` (minor-loss coefficient), equivalent length, or head-
-  loss-vs-flow curve for a dry-barrel hydrant's own internal waterway (the AWWA M17-governed number).
+- **SUPERSEDED 2026-08-25 by the follow-up entry at the head of this file — DO NOT ACT ON THIS
+  BULLET.** The number does exist. It is a maximum-allowable friction-loss spec in AWWA C502's QA
+  clause (3.0 psi at 1000 gpm through the 4½ in pumper nozzle), quoted verbatim in municipal design
+  standards and in manufacturers' own spec sheets, and it works out to **K ≈ 3.5** for the barrel.
+  What was wrong here was not the searching but the **filing**: it is indexed under manufacturing QA
+  and procurement boilerplate, not under "hydraulics" or "K-factor". Left standing rather than
+  deleted because the lesson is the search, and because a later invocation that finds only the
+  correction learns nothing about where to look next time.
+- ~~**NOT FOUND, and I looked**~~: a published `k` (minor-loss coefficient), equivalent length, or
+  head-loss-vs-flow curve for a dry-barrel hydrant's own internal waterway (the AWWA M17 number).
   Every hydrant manufacturer spec sheet I reached (Mueller Super Centurion, M&H 129/929) claims
   qualitatively that its valve geometry "minimizes friction loss" and none published a curve or
   coefficient. AWWA M17 itself (the document that should carry this) is paywalled beyond a preview.
-  **This is the one number in Tom's list of four I cannot honestly disclose a sourced default for.**
+  ~~**This is the one number in Tom's list of four I cannot honestly disclose a sourced default
+  for.**~~ — false, see the correction above.
+- **SPECULATION, AND NOW PARTLY OVERTAKEN**: this proposed modelling the barrel as a pipe segment
+  *instead of* carrying a k. Tom ruled that some k is non-negotiable, and a sourced k was then
+  found, so the answer is BOTH — barrel and lateral as pipe, plus a k of about 5. The reasoning
+  below is still the right reasoning about why an undersized waterway matters.
 - **SPECULATION**, my own, re-derive before relying on it: given the missing k, the wizard is better
   served by modelling the hydrant barrel as a short pipe segment at its actual waterway diameter
   (4½ in or 5¼ in, disclosed, user-editable) in series with the lateral, rather than inventing a k

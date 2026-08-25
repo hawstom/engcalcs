@@ -145,10 +145,33 @@ the block.
        **4½ or 5¼ in (114–133 mm)** behind a 6 in mechanical-joint inlet. Modelling "a 150 mm
        hydrant" as one 150 mm pipe leaves the real constriction out and reproduces **exactly the
        overstatement this task exists to prevent**.
-    2. **No publicly reachable minor-loss `k` or head-loss curve for a hydrant waterway** — AWWA M17
-       paywalled, no manufacturer publishes one. **Do NOT import the pitot Cd (0.90/0.80) as a `k`;**
-       it converts a field pitot reading to gpm and is a different quantity that merely sounds
-       adjacent. Round 2 of the research is aimed squarely at this gap.
+    2. **THE `k` EXISTS AFTER ALL, and round 2 found it 2026-08-25.** Not in the hydraulics
+       literature — in **AWWA C502's QA clause**, as a maximum-allowable friction loss: *3.0 psi at
+       1000 gpm through the 4½ in pumper nozzle*, quoted word-for-word in a municipal design
+       standard and in a manufacturer's own spec sheet, independently. Referenced to velocity in the
+       6 in lateral that is **K ≈ 3.5** for barrel + main valve + nozzle. Add Crane TP-410 fittings
+       for the rest of the run — tee off the main ≈1.0, gate valve ≈0.15, elbow ≈0.3–0.5 — and the
+       **recommended total is K ≈ 5, range 3–6**, carried as TWO labelled pieces (a QA-derived
+       dominant term plus a Crane-derived remainder), never as one measured number for a whole
+       assembly. It is a worst-case ALLOWABLE, so a real hydrant does at least this well — the
+       conservative direction. **Do NOT import the pitot Cd (0.90/0.80) as a `k`;** it converts a
+       field pitot reading to gpm and is a different quantity that merely sounds adjacent.
+    2b. **Tom's worry is confirmed, moderately.** At 1000 gpm through 6 in C=140 DI, friction is
+       64.5 ft per 1000 ft against the barrel's fixed 6.93 ft. So minor loss is **4.3x friction at
+       25 ft, 2.2x at 50 ft, and about equal at 100 ft** — across every lateral length real agency
+       standards use, minor loss is never the smaller term. (The agent's first pass reported 10-40x
+       from a mis-remembered Hazen-Williams constant and caught it by cross-checking against
+       Darcy-Weisbach. The corrected figures are the ones above.)
+    2c. **"To the building" is CLOSED — the answer is no.** AWWA M31 and NFPA 291 both define
+       performance at the outlet; WaterGEMS's own Hydrant element stops at the same boundary, with
+       the identical three fields and no published default for any of them. Past the nozzle is
+       fire-ground hydraulics, whose inputs a distribution model cannot know at design time because
+       the hose lay is chosen at the scene.
+    2d. **The saved library type carries:** make, model, waterway diameter (4½ or 5¼ in), outlet
+       configuration, and the `k` itself — editable, defaulting to ~5, with its source visible.
+       **Deliberately NOT in the type:** installation year and NFPA 291 colour class, which are
+       per-instance facts that go stale if baked into a reusable type; and the lateral's own
+       diameter, length and roughness, which stay per-instance ad-hoc inputs.
     3. **Ask or disclose, per quantity.** LENGTH must be asked — five agency standards span 25–100 ft
        for the same pipe. Diameter carries a disclosed 6 in; roughness a disclosed cement-lined DI
        C≈120–140, the cheapest of the four to get wrong.
