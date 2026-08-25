@@ -14,6 +14,78 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-08-25 — Task 530 research: the hydrant lateral assembly, so the wizard can ask or disclose
+
+Tom promoted my Task 530 wish to priority 75 and ruled it must ask-or-disclose diameter, roughness,
+`k` and length of a lateral+hydrant add-on, applied ad hoc before reporting fire flow. Findings,
+each independently searched, no primary AWWA/NFPA text reached (M17, C502, C503 are all behind the
+ANSI store paywall — previews only, same posture as `rc`'s unreachable Robinson paper).
+
+- **CITED** Lateral diameter and length: five US municipal water-system design standards, found
+  independently, agree on 6 in (150 mm) minimum lateral diameter and disagree on max length by 4x:
+  Addison TX 25 ft max (addisontx.gov, water_system_requirements.pdf), Prosper TX 100 ft max
+  (prospertx.gov Water-System-Design-Requirements), Northlake TX 50 ft max / 8 in required beyond 20 ft
+  (town.northlake.tx.us Part-IV-Water-and-Wastewater-Lines), Clyde Hill WA 50 ft max / 8 in beyond 50 ft
+  (codepublishing.com/WA/ClydeHill/13.08). **A defensible default is 6 in DI, ~25–50 ft** — the
+  *diameter* is near-universal across the sample; the *length* is genuinely site-specific (distance
+  from main to hydrant location) and no single number is honest as a silent default.
+- **CITED** AWWA C502 dry-barrel hydrants: main-valve waterway is 4½ in or 5¼ in (ANSI/AWWA C502-18
+  preview, webstore.ansi.org); **the inlet/shoe connection to the lateral is standardized at 6 in
+  (150 mm)**, mechanical-joint or flanged per AWWA C111/A21.11 (directindustry.com NAFFCO C502
+  listing; multiple manufacturer spec sheets, e.g. mh-valve.com Style 929). **This resolves what
+  Tom meant by "a 150 mm barrel": it is the standard hydrant SHOE connection, not the internal
+  waterway** — the two numbers differ (150 mm inlet vs 114–133 mm waterway) and a model that only
+  represents the inlet pipe size would still overstate capacity, because the internal valve opening
+  is the tighter constraint in most hydrants, and older/smaller hydrants in real systems (4 in valve,
+  or pre-C502 stock) are tighter still.
+- **CITED** NFPA 291 rated-capacity color code, at 20 psi residual: Class AA ≥1,500 gpm (light blue),
+  Class A 1,000–1,499 (green), Class B 500–999 (orange), Class C <500 (red) — consistent across
+  independent secondary sources (blog.ansi.org NFPA 291-2019 summary; loslunasnm.gov; allfirefighter.com).
+  Primary NFPA 291 text not reached (NFPA free-access reading room requires login I did not attempt).
+- **CITED** ISO's insurance grading practice caps the fire-flow credit from a single hydrant at
+  1,500 gpm regardless of what the main could otherwise deliver, and grades multi-hydrant credit down
+  by distance (1,000 gpm within 300 ft, 670 gpm 301–600 ft, 250 gpm 601–1,000 ft) — found independently
+  via blog.bentley.com ("Where Did This Equation for Hydrant Flow Test Results Come From?") and an
+  eng-tips.com thread quoting the same ISO rule. **This is the standard practitioners already use to
+  avoid the exact failure Tom named** — not a k-value cap but a flat ceiling applied to the reported
+  number, independent of what the hydraulics alone would say.
+- **CITED** Pitot-gauge field flow testing (a DIFFERENT measurement from what a model reports) uses
+  Q = 29.83·Cd·d²·√P with Cd = 0.90 (smooth, rounded outlet, most modern hydrants) or 0.80 (square,
+  sharp outlet, common on older stock) — consistent across IFSTA/NFPA-sourced summaries
+  (industrialmonitordirect.com NFPA 291 explainer; multiple hydrant-flow-calculator sites citing the
+  same constant and coefficient pair). **This Cd is NOT the lateral's minor-loss `k`** — it converts a
+  pitot reading at a flowing 2½ in outlet to gpm; it has no direct bearing on how our wizard should
+  model the barrel, but it is worth knowing the two numbers are unrelated so nobody imports 0.9 as a
+  `k` by pattern-match.
+- **CITED** One anonymous forum post (eng-tips.com, via search summary, not independently verified) put
+  a number on why a 6 in lateral at 1,500 gpm is a rough ceiling: velocity near 17 ft/s through a
+  90° turn at the hydrant base at that flow. **I could not reach the original thread to confirm the
+  arithmetic myself** (6 in pipe, 1,500 gpm ≈ 17 ft/s is dimensionally close — I did not independently
+  recompute it, flag as SPECULATION-adjacent until re-derived) — but the shape of the claim matches
+  every design standard above: a 6 in lateral is undersized for 1,500 gpm by any normal design
+  velocity limit (5–10 ft/s is the usual range in the same design standards, e.g. Northlake's 8 in
+  upsize rule exists for exactly this reason), so the wizard's own hydraulics, given a 6 in lateral,
+  will already show a large loss at high flow WITHOUT a separately-sourced k for the hydrant body.
+- **CITED** DI pipe Hazen-Williams C: AWWA/DIPRA cite C=140 for cement-lined new ductile iron, aging
+  toward ~120 over ~20 years (uni-bell.org "Ductile Iron Pipe's Hazen-Williams Flow Coefficient
+  Declines Over Time"; pe.mcwane.com DIPRA hydraulic-savings sheet). For a 20–50 ft lateral this barely
+  matters in absolute head loss — C=120 vs C=140 on 50 ft of 6 in pipe at fire flow is a few hundredths
+  of a foot either way — so roughness is the cheapest of the four to default.
+- **NOT FOUND, and I looked**: a published `k` (minor-loss coefficient), equivalent length, or head-
+  loss-vs-flow curve for a dry-barrel hydrant's own internal waterway (the AWWA M17-governed number).
+  Every hydrant manufacturer spec sheet I reached (Mueller Super Centurion, M&H 129/929) claims
+  qualitatively that its valve geometry "minimizes friction loss" and none published a curve or
+  coefficient. AWWA M17 itself (the document that should carry this) is paywalled beyond a preview.
+  **This is the one number in Tom's list of four I cannot honestly disclose a sourced default for.**
+- **SPECULATION**, my own, re-derive before relying on it: given the missing k, the wizard is better
+  served by modelling the hydrant barrel as a short pipe segment at its actual waterway diameter
+  (4½ in or 5¼ in, disclosed, user-editable) in series with the lateral, rather than inventing a k
+  for an unmodeled "point" hydrant — the velocity-squared loss through an undersized barrel then
+  emerges from the same Hazen-Williams/Darcy-Weisbach machinery already in `js/PipeHydraulics.lib.js`
+  and needs no separately-sourced coefficient at all. This also directly produces the number Tom
+  wants: a report that a 150 mm-shoe hydrant with a 4½ in waterway cannot pass an enormous flow,
+  because the waterway is now a real hydraulic element, not a caveat.
+
 ## 2026-08-24 — first invocation: "what glaring priority did we miss?" → nothing glaring
 
 - **ANSWER GIVEN: nothing glaring.** Reasoning and citations below. Also named one real,

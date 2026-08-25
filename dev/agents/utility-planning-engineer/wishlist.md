@@ -44,11 +44,25 @@ The rules that keep it honest:
   hydrant node and the critical node. Not designed. Re-derive before quoting this estimate.
 - **Why it is not urgent:** only the search step is unautomated, and this agent explicitly
   declined to call it a glaring miss.
+- **PROMOTED 2026-08-25** — Tom, on this row: *"Let's do it at least 75 priority."* Now
+  ROADMAP Task 530. His condition is scope, not method: the wizard must add a lateral+hydrant
+  assembly to a copy of the network and report flow at the hydrant outlet, never silently
+  assuming diameter/roughness/k/length. Full research: journal, 2026-08-25 entry.
+- **Re-derived size estimate, still not designed:** the search loop is still believed small
+  (a bisection wrapper around the existing sub-second solve). The assembly-modelling half is
+  the real unknown, and it is smaller than it first reads **if** the hydrant barrel is modelled
+  as an ordinary pipe segment at its waterway diameter rather than as a new element type needing
+  a sourced minor-loss `k` — no such `k` is publicly available (AWWA M17 is paywalled, and no
+  manufacturer spec sheet I reached publishes one). That choice avoids inventing the one number
+  this seat could not honestly source. Length cannot be defaulted at all (site-specific, 25–100 ft
+  across five agency standards found); diameter (6 in / 150 mm lateral) and roughness (DI, C≈120–140)
+  can carry disclosed defaults cheaply because the range barely moves the head loss at this length.
 
 **Where this sits against the roadmap:** nothing on `dev/ROADMAP.md` covers it, and I did not
 propose it as a glaring miss — the manual path works. I rank it first because it is the question
 the one real client report in this project exists to answer, and because it is the shape of work
-Tom actually does. That is a modest claim, not a case for priority 100.
+Tom actually does. That is a modest claim, not a case for priority 100. **Now moot as a ranking
+question** — Tom promoted it directly to Task 530 at priority 75, above where I had it.
 
 ## Declined
 
