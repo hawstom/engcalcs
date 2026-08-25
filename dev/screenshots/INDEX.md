@@ -42,6 +42,15 @@ here, so nobody has to re-make it every time an image is reached for.
 | 0031 | Settings and Libraries → Patterns open together over a velocity-coloured Novato network, page titles switched off | **Yes** | Shows the pattern editor's sparkline-plus-numbers rows at full size. Two panels cover most of the drawing |
 | 0032 | Libraries → **Curves** beside Settings → Map appearance, over **satellite imagery**; the "Background image opacity" field is ringed in yellow highlighter | **Yes** | Pump curves as a plot plus their point table. The yellow ring is a hand annotation added after capture, so crop or re-take before any public use. Mapbox / OpenStreetMap / Maxar credits are in frame and correct |
 | 0033 | Libraries → **Controls** beside Settings → Calculation, over satellite: six simple controls (`Link 10 OPEN AT TIME 1`, `Link 335 OPEN IF Node 1 BELOW 17.1`, …), each marked "✓ Understood" | **Yes** | The evidence that simple `[CONTROLS]` are read and honoured, which is what makes what is left of Task 248 rule-based `[RULES]` alone. Also shows the ColorBrewer / viridis / EPANET credits at the foot of Settings |
+| 0034 | **The first phone capture in the drop** (Tom's own, 2026-08-25, Chrome on Android, portrait, page region only). Net3-World on the OSM street map: collapsed navbar, toolbar, transport row, tab strip, scenario and units readouts all render. Over the drawing stand the mode hint, the EPANET minor-loss note, and the Pressure and Flow keys | **Not as is** | Nothing identifying in frame — no browser chrome, no phone status bar. **Superseded: it is the evidence behind Task 524** (mode hint now hidden below 640px, status note bounded), so it shows a defect that is fixed. Coordinate readout is the un-hovered `X: -- Y: --`, which is all a touch device ever sees. Corrects an earlier index entry: this file is PNG, not JPEG, and does not show a longitude-first readout |
+| 0035 | Near-duplicate of 0034, six pixels shorter and otherwise the same frame | **Not as is** | Two chances at the same shot, which is the drop working as intended. Use 0034 and ignore this one unless 0034 crops badly. Same Task 524 supersession |
+| 0036 | The same phone view with pipe 309's property popup open — ID, diameter 6 in, C 130, k 0, length 1580 ft, Auto/Shut/Part-of-network boxes, then solved flow 216.96 gpm, velocity 1.38 ft/sec, head loss 1.70 ft H2O | **Yes** | **The best phone frame in the drop and the only one worth publishing as is.** The popup is legible at phone width with real numbers, and the status readout reads `Latitude:` first — so this deploy already had the 2026-08-24 latitude-first fix. Behind the popup the labels legend, mode hint and note overlap each other, which Tasks 524 and 529 have since addressed |
+| 0037 | The popup closed again, zoomed to street level; the EPANET gravity note still standing | **Not as is** | Tom's point that a solve does not dismiss the note. **Fixed by Task 525** — the note is a fact about the engine, said once per project and engine choice, not re-emitted on every solve. Also the clearest count of the old overlay pile: mode hint, labels legend, engine note and two colour keys, five things in one corner |
+| 0038 | Settings open on Visualization → Link symbology at phone width | **Not as is — bug evidence, Task 527** | Two live defects, neither superseded. The category index breaks EVERY label mid-word — "Visualiz/ation", "Node symbo/logy", "Link symbo/logy", "Map appear/ance" (Task 515 is the desktop version, parked at Maybe; this is a worse order of ugly). And the label-content column headers read "BeforeAfter 0.000 Drop", touching each other and not aligned with the four boxes beneath |
+| 0039 | Bottom pane open on Profile, map above: ground surface, hydraulic grade line, pressure band, "Nodes: 26, length: 79161 ft" | **Not as is — bug evidence, Task 527** | The chart itself draws well and reads well. **Its axes do not:** the y ticks overprint into a solid smear and the x node labels are an unreadable scribble. That is the live defect and it is only the axes |
+| 0040 | The same Profile view scrolled, captured with the browser's own chrome in frame | **No** | The one phone frame that fails on the frame rather than the content: Chrome's URL bar showing `dev.hawsedc.com`, the tab count and the overflow menu. 0039 is the same view captured clean — use that. Same illegible axes (Task 527) |
+| 0041 | Bottom pane on the Pipes table, with Print table beside the tab row | **Not as is — bug evidence, Task 527** | **Checked and NOT a defect: the values are right.** Pipes 40, 50, 60 and 101 match `examples/Net3-World-lpn.json` exactly; pipe 20 reads diameter 1200 and k 12.2 against the file's 99 and 0, which are Tom's own unsaved edits (the tab shows `*Net3-World`) and are what raised the note he photographed. Nothing is clipped. The one defect is the header breaking "Roughnes/s, C" mid-word |
+| `Screenshot_20260825_012922.png` | The scenario menu open over the map — Base ticked, New scenario, Rename, Delete, Apply Base values to all scenarios — on **satellite** imagery rather than the street map the other eight use | **Not as is** | **Filename breaks the ordinal convention** (it is the grabber's own name); left as it is because it is Tom's file and not in git — index it here rather than rename it. The menu is well sized for touch. **Two supersessions: it is picture evidence for Task 528** — the menu hangs detached in mid-canvas instead of below the button that opened it — and the colour key it cuts off mid-list is answered by Task 529's **Off** placement |
 
 ## What the drop has taught us
 
@@ -69,6 +78,21 @@ here, so nobody has to re-make it every time an image is reached for.
 - **Two layout defects are on file only because somebody screenshotted them.** The Settings category
   index breaks words mid-word (0022–0023), and the colour key overlaps the label legend when both
   sit at the right edge (0030). Neither is on the roadmap.
+- **The phone session (0034–0041 and `Screenshot_20260825_012922.png`) paid for itself in one
+  sitting.** Nine frames from Tom's first real use of the page on a phone, 2026-08-25, and they
+  produced five tasks: 524 (overlays eating the canvas), 525 (an engine note a solve could not
+  dismiss), 528 (a menu detached from its button), 529 (**Off** as a legend placement), and 527 for
+  what is left. No harness found any of them; he found them by using the page and photographing it.
+- **A picture goes stale the moment the bug is fixed, and the index is where that gets said.**
+  Five fixes landed after these were shot and none was on `dev.hawsedc.com` at the time, so eight of
+  the nine show at least one defect that no longer exists. Every phone row names which task
+  superseded it, so nobody re-diagnoses a fixed bug from a stale frame. **All nine also show the old
+  Project toolbar icon**, since replaced by a water drop.
+- **Publishable and useful are different axes, and the phone rows were the first place that
+  mattered.** These frames are clean by the privacy test — one panel of Tom's own example network,
+  no chrome, no status bar, nothing identifying — and still mostly wrong to publish, because they
+  show fixed bugs. That is what **Not as is** means, and marking them a flat "No" would have retired
+  0036, which is the best phone frame we have.
 - **A sequence is worth more than a still for anything procedural.** 0010–0021 is the whole
   georeferencing walkthrough in order: unplaced on the world map, consent, search, scale question,
   placed, zoomed to street level, confirmed. That is a Help page or a blog post already, and six of
@@ -76,28 +100,21 @@ here, so nobody has to re-make it every time an image is reached for.
 - **Browser chrome is what disqualifies a frame, not the network.** Every unpublishable image here
   fails for the same two reasons — a bookmarks bar with real names or a real file path — and both
   are avoidable by capturing the page rather than the window.
-| 0034 | **The first phone capture in the drop.** Net3-World on the OSM map in Chrome on Android, portrait, at `dev.hawsedc.com`. The transport row, tab strip, colour key, scenario and units readouts all render; the mode hint and the EPANET minor-loss note stand over the network | **No — and JPEG, to be replaced** | Tom's own capture, 2026-08-25. Browser chrome and URL bar in frame. **It found ROADMAP Task 524**: the two overlays ate a quarter of the canvas with no way to dismiss them. It also shows `Longitude:` first, which is NOT a live defect — `dev.hawsedc.com` was behind master, where the readout has led with Latitude since 2026-08-24 |
-| 0035 | Phone, portrait, no browser chrome: Net3-World on the OSM map, the map half of the screen buried under the mode hint, the labels legend, the EPANET note and the colour key | **No — evidence** | The cleanest statement of the phone problem: **four independent overlays in one corner, overlapping each other as well as the drawing.** Coordinate readout still shows the un-hovered placeholder `X: -- Y: --`, which is all a touch device will ever see |
-| 0036 | Same, with pipe 309's property popup open — ID, diameter 6 in, C 130, k 0, length 1580 ft, and its solved flow, velocity and head loss | **No — evidence** | The popup itself is good on a phone: full-width, readable, real numbers. It also shows `Latitude:` FIRST, so this deploy has the 2026-08-24 fix and 0034's longitude-first line was a stale cache |
-| 0037 | The popup closed again; the note still there | **No — evidence** | Tom's point that a solve does not dismiss it. It could not: a solve is what created it (ROADMAP Task 525) |
-| 0038 | Settings open on Visualization → Link symbology at phone width | **No — evidence** | Two defects. The index column breaks EVERY label mid-word — "Visualiz/ation", "Node symbo/logy", "Map appear/ance" — far worse than the desktop case of Task 515. And the column headers read "BeforeAfter 0.000 Drop", touching each other and not lining up with the four boxes under them |
-| 0039 | Bottom pane open on Profile, map above | **No — evidence** | The profile draws well and is readable. Its axes are not: the y ticks overprint each other and the x node labels are an unreadable scribble |
-| 0040 | Same view, further down | **No — evidence** | **The strongest single frame of the phone problem: with the pane open the map half is 100% chrome and 0% network.** Nothing of the drawing is visible at all |
-| 0041 | Bottom pane on the Pipes table | **No — evidence** | The table works — values verified against `examples/Net3-World-lpn.json` and correct, including Tom's own edit of pipe 20 to k = 12.2, which is what raised the note he photographed. Nothing is clipped. One defect: the header breaks "Roughnes/s, C" mid-word |
-| 0042 | The scenario menu open over the map | **No — evidence** | The menu is well sized for touch. Behind it the colour key is cut off mid-list, so the Flow bands cannot be read at all |
 
 ## The remake queue — what to shoot next
 
 **2026-08-25.** Twelve of these went onto the public page (`screenshots.html` in the
 librewaternet.org repository). This is the list of shots that would have gone too, and what stopped
-each one. **Every entry is blocked by the frame, not by the software** — the page is ready, the
-capture is not.
+each one. Most are blocked by the frame rather than the software — the page is ready, the capture is
+not. **The two phone rows are the exception and are blocked by DATE:** the frames are clean, the
+software has moved on under them, and only a re-shoot fixes that.
 
 Shoot these deliberately rather than at random, and crop to the PAGE, not the window.
 
 | Want | Why it is not already here | What a good frame looks like |
 |---|---|---|
-| **A phone, in tall mode** | **There is not one phone capture in the whole drop.** The landing page's own sentence says it works on a phone in tall mode, and nothing on the site shows that | A real network on a phone held upright. The one claim we make with no picture behind it |
+| **A phone, in tall mode, after the five fixes** | Nine phone frames now exist (0034–0041 and `Screenshot_...`), but they predate Tasks 524, 525, 528 and 529, so all but 0036 show a defect that is fixed. 0036 alone is publishable as is | The same Net3-World view re-shot on today's master: mode hint gone, engine note said once, legends set to **Off**. That is the picture behind the landing page's "works also on a phone in tall mode" |
+| **A phone frame with no bottom pane and no legends** | Every phone frame either buries the map under overlays or gives the drawing half to a pane. Task 529's **Off** placement makes a clean one possible for the first time | The network filling the map area on a phone, nothing over it but the status strip. Tom ruled the pane-covers-map case NOT a defect, so this is a marketing frame, not a bug fix |
 | **Find and replace, one panel** | 0001 and 0002 both show it with three or four panels open, and 0001 still says the old "Find assets" | Find open, everything else closed, mid-replace so the count is visible |
 | **Romanian, after the unit fix** | 0026 is the language still and predates Task 521 — its status strip and colour key disagree about pressure units, which is fixed | Same view as 0026, retaken. Any of the 27 languages; Romanian is proven to fit |
 | **The Nominatim consent prompt** | 0011–0014 all have the browser's bookmarks bar and profile picture in frame | Just the dialog and the map. The consent wording is one of the most honest things in the suite and nothing shows it |
@@ -106,5 +123,7 @@ Shoot these deliberately rather than at random, and crop to the PAGE, not the wi
 | **Saving to a file** | 0025 shows a real folder listing and a real path | The browser's own permission prompt, over a network, in a folder whose name says nothing about you |
 
 **The one habit that fixes most of this:** capture the page region, not the browser window. Six of
-the eight unpublishable frames fail for that alone, and nothing on the page itself disqualified a
-single image.
+the eight unpublishable frames fail for that alone — 0011–0014, 0021, and now 0040 — and nothing on
+the page itself has ever disqualified a single image. **It holds on the phone too, and Tom already
+does it:** eight of the nine phone frames are cropped to the page and are clean; 0040 is the one
+that kept Chrome's URL bar, and 0039 is the same view shot correctly.
