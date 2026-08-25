@@ -356,12 +356,41 @@ $ec_icons = array(
 	// block (it made a mass the size of the roll at the opposite corner); a rolled TUBE (reads as a
 	// PIPE, two icons away); a water drop; a hard hat; a corner-curled single sheet.
 	//
+	// WATER (ROADMAP Task 523, 2026-08-25). The menu this opens was called Project until Tom renamed
+	// it: *"'Water' is just better all around. Fun to use, fun to teach, fun to own, fun to share."*
+	// A rolled set of plan sheets was the right drawing for a menu meaning "the document" and says
+	// nothing about water, so the glyph followed the name.
+	//
+	// **A M12 3.2C9.5 7.5 5.8 11.3 5.8 14.8C5.8 18.22 8.58 21 12 21C15.42 21 18.2 18.22 18.2 14.8C18.2 11.3 14.5 7.5 12 3.2Z, WHICH WAS REJECTED ONCE AND IS NOT SNEAKING PAST THAT RULING.** The rejection below
+	// is real and stands — for an icon that had to mean PROJECT. A menu called Water is a different
+	// question, and Tom chose the drop from six candidates drawn at true menu size (a water tower, a
+	// fire hydrant, and four drops).
+	//
+	// Filled at .18 with its own outline over it, which is the pair the Reservoir and Tank icons
+	// already use for a body of water — so the three read as one family rather than three authors.
+	//
+	// Written as CUBICS, never an `A` arc: the bowl is a circle of r = 6.2 about (12, 14.8) and the
+	// control offset is Kappa*r = 0.5523 * 6.2 = 3.42. That is not a style preference —
+	// `dev/scripts/icon_ascii_preview.php` models M/L/H/V/C/Z only, so an arc silently renders as
+	// nonsense there and the one tool that measures at 17 px goes blind. Verify with
+	// `php dev/scripts/icon_ascii_preview.php water --size=17`, remembering it cannot show opacity:
+	// the fill reads as solid black in ASCII and as a pale tint in a browser.
+	'water'      => '<path d="M12 3.2C9.5 7.5 5.8 11.3 5.8 14.8C5.8 18.22 8.58 21 12 21C15.42 21 18.2 18.22 18.2 14.8C18.2 11.3 14.5 7.5 12 3.2Z" fill="currentColor" stroke="none" opacity=".18"/>'
+		. '<path d="M12 3.2C9.5 7.5 5.8 11.3 5.8 14.8C5.8 18.22 8.58 21 12 21C15.42 21 18.2 18.22 18.2 14.8C18.2 11.3 14.5 7.5 12 3.2Z"/>',
+
+	// **KEPT, THOUGH NOTHING DRAWS IT TODAY** (2026-08-25). This is the rolled plan set that was the
+	// Project menu's icon until that menu became Water above. Tom, on losing it: *"We really came out
+	// victorious with our Plan icon. But it looks like now we need to change it."* It is six rounds
+	// of work and a physical model that still generates, so it keeps its geometry and its generator
+	// under a name that says what it draws. The `scenarios` icon below deliberately draws the same
+	// sheet and is unaffected.
+	//
 	// The geometry is GENERATED: `php dev/scripts/icon_project_geom.php` prints the string below from
 	// the model above, so congruence and foreshortening are structural rather than maintained by hand.
 	// Edit the parameters there, not the path here. `--preview` and
 	// `php dev/scripts/icon_ascii_preview.php project` render it -- note that the previewer models
 	// M/L/H/V/C/Z only, which is why every arc here is written as cubics and never as `A`.
-	'project'    => '<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M7.4 21.6C7.4 22.622 5.833 23.45 3.9 23.45C1.967 23.45 0.4 22.622 0.4 21.6C0.4 20.578 1.967 19.75 3.9 19.75C5.833 19.75 7.4 20.578 7.4 21.6ZM5.5 21.6C5.5 22.014 4.784 22.35 3.9 22.35C3.016 22.35 2.3 22.014 2.3 21.6C2.3 21.186 3.016 20.85 3.9 20.85C4.784 20.85 5.5 21.186 5.5 21.6Z"/>'
+	'plan'       => '<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M7.4 21.6C7.4 22.622 5.833 23.45 3.9 23.45C1.967 23.45 0.4 22.622 0.4 21.6C0.4 20.578 1.967 19.75 3.9 19.75C5.833 19.75 7.4 20.578 7.4 21.6ZM5.5 21.6C5.5 22.014 4.784 22.35 3.9 22.35C3.016 22.35 2.3 22.014 2.3 21.6C2.3 21.186 3.016 20.85 3.9 20.85C4.784 20.85 5.5 21.186 5.5 21.6Z"/>'
 		. '<rect x="21.9" y="3.9" width="1.7" height="19.4" fill="currentColor" stroke="none"/>'
 		. '<path fill="currentColor" stroke="none" d="M5.097 19.862C7.454 20.315 7.6 23.3 11.4 23.3H23.6V23.75H11.4C7.6 23.75 7.454 20.765 5.097 20.312Z"/>'
 		. '<path stroke-width="0.525" d="M0.4 2.2V21.6"/>'

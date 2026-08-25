@@ -14651,7 +14651,7 @@ var EngCalcs = EngCalcs || {};
 			// unique about this application is here in one place except the animation play controls.
 			// There is no need to guess where things are."
 			{
-				id: 'lpn_menu_project', icon: 'project', label: pc.lpn_menu_project || 'Project',
+				id: 'lpn_menu_project', icon: 'water', label: pc.lpn_menu_project || 'Project',
 				tip: pc.lpn_menu_project_tip, open: openProjectBarMenu
 			},
 			// Last, where a Help menu goes everywhere else. One row today (Walkthroughs); it is also
