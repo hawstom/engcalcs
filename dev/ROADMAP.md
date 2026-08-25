@@ -167,25 +167,6 @@ the block.
   - `dev/browser-pass/specs/georef.js` now predicts the correct aspect from the page's own
     `lpnGeorefMetersPerDegree` (1.916 predicted against 1.916 measured), so it will catch the fix.
 
-- 100|518| **Three transport buttons lose their tips to a className assignment.**
-  `js/lpn-time.js:1294`. `setIconLabel()` appends `.ec-help`; the next line is
-  `b.className = 'lpn-transport-btn'`, an ASSIGNMENT, which wipes it. `initTips()` only wires
-  `.ec-help[title]`, so Step back, Play and Step forward carry tips no touch user can reach —
-  exactly the three built with `transport: true`. The fix is one token, `+=`.
-  - Worth a moment before typing it: this is the third `className =` that has quietly discarded a
-    class the helper had just added. If there is a fourth, the check is cheaper than the fix.
-
-- 100|519| **A throwing spec truncates the browser pass and it reports the subset as a run.**
-  `dev/browser-pass/run.js` catches a throw OUTSIDE the spec loop, so the first spec that throws
-  ends the whole run. Measured 2026-08-24: `time.js` threw on a renamed button and
-  **7 of 35 specs never ran** — `search`, `setbox`, `crossproject`, `pane`, `library`,
-  `projectmenu`, `tabcolumn` — holding 12 further failures and 2 more throws of their own.
-  - **The baseline read "704/716 over 26 sections" and looked like twelve stragglers.** It was
-    26 sections out of 35, and nothing in the output said so. A truncated pass that looks like a
-    clean one is the trap Task 511 was written about; this is the mechanism behind it.
-  - Catch per spec, keep going, and **print the section count against the expected one** so a short
-    run cannot be mistaken for a passing one.
-
 - 75|514| **Two different units both labelled "Pressure", both on screen at once.**
   Found 2026-08-24 in screenshot 0026 while narrating the drop, and it is an ENGLISH defect, not a
   translation one: the map status strip prints `Pressure: m H2O` from `lpn_u_pressure`, the INPUT

@@ -59,21 +59,38 @@ const report = {
 	const browser = await launchBrowser(playwright);
 	console.log(`=== lpn_ browser pass === ${server.origin}  (${REPO})`);
 
+	// **ONE SPEC THROWING MUST NOT END THE RUN** (ROADMAP Task 519). The catch used to sit OUTSIDE
+	// this loop, so the first spec that threw took every spec after it with it -- and nothing said
+	// so. Measured 2026-08-24: time.js threw on a renamed button and SEVEN of the thirty-five specs
+	// never ran, holding twelve further failures and two more throws of their own. The output read
+	// "704/716 checks passed", which looks like twelve stragglers and was in fact nine whole
+	// sections missing.
+	//
+	// A truncated pass that looks like a clean one is worse than a failing one, so the count of
+	// sections actually RUN is printed against the count expected, every time, pass or fail.
+	let ran = 0;
 	try {
 		for (const name of specs) {
 			if (!SPECS.includes(name)) { console.log(`(no spec "${name}")`); continue; }
-			const spec = require(path.join(__dirname, 'specs', name + '.js'));
-			report.section(spec.title || name);
-			await spec.run({ browser, report });
+			try {
+				const spec = require(path.join(__dirname, 'specs', name + '.js'));
+				report.section(spec.title || name);
+				await spec.run({ browser, report });
+				ran++;
+			} catch (err) {
+				failures++;
+				console.log(`\n FAIL  ${current}: threw\n${err && err.stack ? err.stack : err}`);
+			}
 		}
-	} catch (err) {
-		failures++;
-		console.log(`\n FAIL  ${current}: threw\n${err && err.stack ? err.stack : err}`);
 	} finally {
 		await browser.close();
 		stopServer();
 	}
 
-	console.log(`\n${checks - failures}/${checks} checks passed${skipped ? `, ${skipped} left to the human list` : ''}.\n`);
+	// A spec that threw part-way through still counts as not-run: it reported some of its checks and
+	// abandoned the rest, and "27 of 35 sections" is the honest way to say that.
+	const short = ran < specs.length;
+	console.log(`\n${checks - failures}/${checks} checks passed${skipped ? `, ${skipped} left to the human list` : ''}.`);
+	console.log(`${ran}/${specs.length} sections completed${short ? '  <-- SHORT RUN: the rest threw and did not finish' : ''}.\n`);
 	process.exit(failures ? 1 : 0);
 }());

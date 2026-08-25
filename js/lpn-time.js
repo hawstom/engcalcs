@@ -1292,7 +1292,12 @@
 			b.type = 'button';
 			name(b, icon, label, tip || null);
 			b.setAttribute('data-icon', icon);
-			if (transport) { b.className = 'lpn-transport-btn'; }
+			// **APPEND, NEVER ASSIGN** (ROADMAP Task 518). setIconLabel() has just added `.ec-help` on
+			// the line above, and initTips() wires tips on `.ec-help[title]` and nothing else, so an
+			// assignment here left Step back, Play and Step forward with tips no touch user could
+			// reach -- the only three buttons built with `transport`. Every other tip site in the
+			// suite appends for exactly this reason.
+			if (transport) { b.className += ' lpn-transport-btn'; }
 			b.addEventListener('click', fn);
 			container.appendChild(b);
 			return b;
