@@ -1637,6 +1637,25 @@ $ec_lang['lpn_profile_axis_station']='Distance along the route ({u})';
 $ec_lang['lpn_profile_axis_elev']='Elevation and head ({u})';
 $ec_lang['lpn_profile_ground']='Ground surface';
 $ec_lang['lpn_profile_hgl']='Hydraulic grade line';
+// ---- Task 509: the two operations the control column took with it ----------------------------
+// Task 506 removed the From/To pull-downs and the waypoint chips, and with them the only way to
+// change ONE end of a path or take ONE node off it. They come back in an overlay box over the map,
+// reached by this button, so the panel stays one line and the map keeps its full width. The four
+// keys above (`_from`, `_to`, `_through`, `_clear`) are the box's own labels again.
+$ec_lang['lpn_profile_edit']='Edit';
+$ec_lang['lpn_profile_edit_tip']='Change one end of the path, or take one node off it, without drawing the whole path again.';
+// ---- Task 510: paths kept in the project, by name ---------------------------------------------
+// A client report carries the same three or four profiles every time, so a path is worth keeping.
+// {n} is a count, {name} a name the user typed and {ids} a list of node names; all substituted.
+$ec_lang['lpn_profile_saved']='Saved paths';
+$ec_lang['lpn_profile_new']='New saved path…';
+$ec_lang['lpn_profile_new_name']='Path {n}';
+$ec_lang['lpn_profile_rename']='Rename path…';
+$ec_lang['lpn_profile_delete']='Delete path';
+$ec_lang['lpn_profile_prompt_name']='Name for this path';
+$ec_lang['lpn_profile_delete_confirm']='Delete the saved path {name}? The drawing itself is not changed.';
+$ec_lang['lpn_profile_none_saved']='No saved paths yet';
+$ec_lang['lpn_profile_missing']='{name} names nodes that are not in this project: {ids}';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';

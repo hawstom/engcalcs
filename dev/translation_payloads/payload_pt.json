@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 1346,
-        "delta_key_count": 11,
+        "expected_key_count": 1357,
+        "delta_key_count": 22,
         "exempt_key_count": 37,
         "exempt_keys": [
             "u_imgd",
@@ -464,6 +464,17 @@
         "lpn_georef_twopt_pick2": "Now click a second known point, as far from the first one as you can.",
         "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
         "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
+        "lpn_profile_edit": "Edit",
+        "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
+        "lpn_profile_saved": "Saved paths",
+        "lpn_profile_new": "New saved path…",
+        "lpn_profile_new_name": "Path {n}",
+        "lpn_profile_rename": "Rename path…",
+        "lpn_profile_delete": "Delete path",
+        "lpn_profile_prompt_name": "Name for this path",
+        "lpn_profile_delete_confirm": "Delete the saved path {name}? The drawing itself is not changed.",
+        "lpn_profile_none_saved": "No saved paths yet",
+        "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off"
@@ -477,6 +488,17 @@
         "lpn_georef_twopt_pick2": "Now click a second known point, as far from the first one as you can.",
         "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
         "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
+        "lpn_profile_edit": "Edit",
+        "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
+        "lpn_profile_saved": "Saved paths",
+        "lpn_profile_new": "New saved path…",
+        "lpn_profile_new_name": "Path {n}",
+        "lpn_profile_rename": "Rename path…",
+        "lpn_profile_delete": "Delete path",
+        "lpn_profile_prompt_name": "Name for this path",
+        "lpn_profile_delete_confirm": "Delete the saved path {name}? The drawing itself is not changed.",
+        "lpn_profile_none_saved": "No saved paths yet",
+        "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off"
@@ -607,6 +629,182 @@
                     "key": "lpn_pane_toggle",
                     "value": "Painel inferior",
                     "english": "Bottom panel"
+                }
+            }
+        },
+        "lpn_profile_edit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_edit_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_saved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_new": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_new_name": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_rename": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_delete": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_prompt_name": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_delete_confirm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_none_saved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
                 }
             }
         },

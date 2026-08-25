@@ -554,6 +554,25 @@ echoHeader("EngCalcs", $html_title, "", false);
 	<div id="lpn_find_results"></div>
 	</div>
 </div>
+<?php // ---- The profile's path EDIT box (ROADMAP Task 509) ----
+      //
+      // The two operations Task 506's clean-out took with it: changing ONE end of an existing path,
+      // and taking ONE node off it. They come back as an OVERLAY, not as the restored left-hand
+      // column -- Tom, 2026-08-25, on the panel he had just been rid of. The map keeps its full
+      // width and the panel keeps its one line; the fiddly per-waypoint work happens here, over the
+      // drawing, only while somebody is doing it.
+      //
+      // Draggable, modeless and positioned from the Edit button's own screen rect, exactly like
+      // #lpn_find_popup above -- which is also why the top padding is 40px: that band is the drag
+      // surface, and `e.target` is the panel itself only there. Everything inside is built in JS,
+      // because every control in it is a list of the nodes in THIS document. ?>
+<div id="lpn_profile_edit_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:22rem">
+	<button type="button" id="lpn_profile_edit_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body">
+	<div style="font-weight:bold"><?=$ec_lang['lpn_profile_title']?></div>
+	<div id="lpn_profile_edit_form"></div>
+	</div>
+</div>
 <?php // ---- THE SETTINGS BOX (ROADMAP Task 441, absorbing 284) ----
       //
       // Tom, 2026-08-18: "a single grand two-paned, indexed, draggable, and closeable settings box
@@ -967,6 +986,22 @@ EngCalcs.pageConfig = {
 	lpn_profile_summary: <?=json_encode($ec_lang['lpn_profile_summary'])?>,
 	lpn_profile_axis_station: <?=json_encode($ec_lang['lpn_profile_axis_station'])?>,
 	lpn_profile_axis_elev: <?=json_encode($ec_lang['lpn_profile_axis_elev'])?>,
+	lpn_profile_from: <?=json_encode($ec_lang['lpn_profile_from'])?>,
+	lpn_profile_to: <?=json_encode($ec_lang['lpn_profile_to'])?>,
+	lpn_profile_through: <?=json_encode($ec_lang['lpn_profile_through'])?>,
+	lpn_profile_clear: <?=json_encode($ec_lang['lpn_profile_clear'])?>,
+	lpn_profile_choose: <?=json_encode($ec_lang['lpn_profile_choose'])?>,
+	lpn_profile_edit: <?=json_encode($ec_lang['lpn_profile_edit'])?>,
+	lpn_profile_edit_tip: <?=json_encode($ec_lang['lpn_profile_edit_tip'])?>,
+	lpn_profile_saved: <?=json_encode($ec_lang['lpn_profile_saved'])?>,
+	lpn_profile_new: <?=json_encode($ec_lang['lpn_profile_new'])?>,
+	lpn_profile_new_name: <?=json_encode($ec_lang['lpn_profile_new_name'])?>,
+	lpn_profile_rename: <?=json_encode($ec_lang['lpn_profile_rename'])?>,
+	lpn_profile_delete: <?=json_encode($ec_lang['lpn_profile_delete'])?>,
+	lpn_profile_prompt_name: <?=json_encode($ec_lang['lpn_profile_prompt_name'])?>,
+	lpn_profile_delete_confirm: <?=json_encode($ec_lang['lpn_profile_delete_confirm'])?>,
+	lpn_profile_none_saved: <?=json_encode($ec_lang['lpn_profile_none_saved'])?>,
+	lpn_profile_missing: <?=json_encode($ec_lang['lpn_profile_missing'])?>,
 	lpn_pane_toggle: <?=json_encode($ec_lang['lpn_pane_toggle'])?>,
 	lpn_pane_toggle_tip: <?=json_encode($ec_lang['lpn_pane_toggle_tip'])?>,
 	lpn_pane_tab_junctions: <?=json_encode($ec_lang['lpn_pane_tab_junctions'])?>,

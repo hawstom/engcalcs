@@ -25,10 +25,14 @@
 //
 // AND WHAT TASK 504 ADDED TO THAT LIST:
 //
-//   6. **A control comes back.** The panel is meant to have NONE -- Tom, 2026-08-24: *"I still
-//      think we can ditch the entire side interface for the profile."* A pull-down or a button
-//      reappearing in any state is the regression, so the count of both is asserted in every state
-//      the panel has.
+//   6. **A control comes back.** The panel is meant to have no PULL-DOWNS -- Tom, 2026-08-24: *"I
+//      still think we can ditch the entire side interface for the profile."* A select reappearing
+//      in any state is the regression, so its count is asserted in every state the panel has.
+//      **Task 509 sanctioned exactly ONE button on that line and no more**: the Edit door to the
+//      overlay box that carries the two operations Task 506 took (change one end, drop one
+//      waypoint). It is a DOOR, so it is asserted precisely -- one button when idle, and NONE while
+//      the chooser is running, because the box edits the stops profileStops() has stopped reading
+//      and a control that appears to do nothing is worse than no control.
 //   7. **The Profile button stops being the way in.** It is now the only way in: the second press
 //      arms the gesture, the third cancels it. Driven through the REAL tab button wirePane() builds.
 //   8. **The commentary line goes quiet.** With no controls it is the whole interface, so it is
@@ -284,14 +288,16 @@ function startDraw() { pressProfile(); }
 	const n = build();
 	ok('the Profile tab button exists and is the door', !!L.profileTabBtn());
 	ok('the panel offers NO pull-down', selectCount() === 0, selectCount() + ' selects');
-	ok('...and NO button', buttonCount() === 0, buttonCount() + ' buttons');
+	ok('...and exactly ONE button, the Edit door (Task 509)', buttonCount() === 1,
+		buttonCount() + ' buttons');
 	ok('...and the commentary line says how to choose a path',
 		/Profile/.test(L.sayText() || ''), JSON.stringify(L.sayText()));
 
 	startDraw();
 	ok('pressing Profile again arms the gesture', !!L.profileState().draw);
 	ok('...still no pull-down', selectCount() === 0, selectCount() + ' selects');
-	ok('...still no button', buttonCount() === 0, buttonCount() + ' buttons');
+	ok('...and the Edit door is WITHDRAWN while the chooser runs', buttonCount() === 0,
+		buttonCount() + ' buttons');
 
 	// THE THIRD PRESS CANCELS. On a phone this is the only cancel there is -- there is no Esc key.
 	click(X('A'), Y('A'), hit({ node: n.id.A }));
@@ -356,8 +362,8 @@ function startDraw() { pressProfile(); }
 		JSON.stringify(L.profileState().waypoints) === JSON.stringify([n.id.C]),
 		JSON.stringify(L.profileState()));
 	ok('no candidate is left on the map afterwards', L.mapGhost().length === 0);
-	ok('...and the panel is back to its idle line, with no controls',
-		selectCount() === 0 && buttonCount() === 0 && /Profile/.test(L.sayText() || ''),
+	ok('...and the panel is back to its idle line, with the Edit door and no pull-down',
+		selectCount() === 0 && buttonCount() === 1 && /Profile/.test(L.sayText() || ''),
 		JSON.stringify(L.sayText()));
 }
 

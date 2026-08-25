@@ -382,6 +382,16 @@ the block.
   - Four of the eight lang keys Task 506 left rendered by nothing (`lpn_profile_from`, `_to`,
     `_through`, `_clear`) are plausibly what this box needs. Check before writing new ones — each
     new key is 27 strings.
+  - **BUILT.** Those four are reused, and `_choose` as the box's empty-waypoint line. `_draw`,
+    `_draw_stop` and `_pick` are still rendered by nothing: they name a "choose the path on the
+    map" button, and pressing Profile again is that button now. Two new keys await Tom's wording:
+    `lpn_profile_edit` ('Edit') and `lpn_profile_edit_tip`. Guarded by
+    `dev/lpn-spike/profile-saved-harness.js`.
+  - **The one deviation from the shape above, and the argument for it:** the commentary reads
+    `[Edit] Press Profile again to choose a new path on the map.` — the button, then the WHOLE
+    existing sentence — not `[Edit] or press Profile again…`. A lowercase "or press…" is a sentence
+    fragment composed with a control at render time, which is the failure mode CLAUDE.md bans for
+    labels in gendered / word-order / RTL languages. Tom's call if he wants the `or`.
 
 - 100|510| **Named profiles: New, Rename, Delete, and a list to pick from.** Tom, 2026-08-24. A path
   through the network is worth keeping — a client report has the same three or four profiles in it
@@ -394,6 +404,13 @@ the block.
     exporter skips it (EPANET has no such object).
   - Depends on Task 509 only for where the Edit door goes; the storage question is independent and
     is the part to settle first.
+  - **BUILT.** `doc.profiles` is `[{id, name, stops}]` — the STOPS the user chose, not the resolved
+    route, so a route through a since-deleted pipe cannot be frozen into the file. It rides in
+    `serializeProject()`, in the undo snapshot and in the dirty signature; which one is SELECTED is
+    not stored, being a fact about a reader. Round trip, the unknown-id report and the `.inp`
+    exporter's silence are all asserted in `dev/lpn-spike/profile-saved-harness.js`.
+  - Nine new keys await Tom's wording: `lpn_profile_saved`, `_new`, `_new_name`, `_rename`,
+    `_delete`, `_prompt_name`, `_delete_confirm`, `_none_saved`, `_missing`.
 
 - 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
   reply to outreach, and he has replied gratefully. This is the first real conversation this suite's
