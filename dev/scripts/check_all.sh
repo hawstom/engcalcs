@@ -141,6 +141,10 @@ run_check "examples library fresh"       blocking php dev/scripts/generate_examp
 # reference ambiguous. And priority 0 is the file's only signal for "closed", so a blocked task
 # parked at 0, or a done one never moved under `## Completed`, both read as finished from outside.
 run_check "roadmap ids and closure"      blocking php dev/scripts/roadmap_id_check.php
+# Task 504. dev/features.md is generated from the hand-written dev/features-source.md, and this
+# also proves every ID a feature cites is genuinely closed -- so the list cannot claim something
+# that never shipped, and cannot go quietly stale after somebody edits the source.
+run_check "features list fresh"          blocking php dev/scripts/generate_features.php --check
 
 # --- lpn solver and editor --------------------------------------------------------------------
 # Count derived, not typed: the label said "(12)" while 15 scripts were running, because
