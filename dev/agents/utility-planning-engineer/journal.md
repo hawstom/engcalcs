@@ -14,6 +14,99 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-08-25 — Task 530 follow-up: the k I said did not exist was hiding under a different name
+
+Tom ruled *"including some k whatsoever is non-negotiable"* and asked for the number to be
+researched hard before falling back to reasonable judgment. My same-day entry below said flatly
+**"NOT FOUND, and I looked"** for a published k or head-loss curve for a hydrant's internal
+waterway. That was too quick — I had searched hydraulics textbooks and manufacturer marketing
+copy, not **procurement specifications**, and that is where the number actually lives.
+
+- **CITED — the number, found twice independently.** Two unrelated documents both state:
+  *"Friction loss shall not exceed 3.0 psig at 1000 GPM through the hydrant 4-1/2 in. pumper
+  nozzle"* — the Bryan/College Station TX joint municipal water design standard, Section 33 12 19
+  Fire Hydrants (bcsunited.net, revised 3/2024, explicitly tied to "AWWA C-502 latest revision,"
+  tested by an independent lab, PE-attested), and American-Darling/Waterous's own product
+  specification sheet for their ALPHA-base hydrants (american-usa.com), independent of each
+  other and agreeing to the tenth of a psi. This is a **maximum-allowable QA test limit under
+  AWWA C502**, not a textbook K — which is exactly why hydraulics references never carry it and
+  manufacturers only ever say "minimizes friction loss" in prose: the actual number lives in
+  procurement boilerplate, not in a hydraulics table. **A search summary (unverified against the
+  primary text — flag as secondary) said the AWWA C502 baseline itself is 5.0 psi at 1000 gpm and
+  that 3.0 psi is a tightened municipal/manufacturer spec** — I could not reach the primary
+  standard to confirm 5.0 psi directly; the 3.0 psi ceiling is doubly corroborated and is the
+  number I use.
+- **This converts to a real K, referenced to the 6 in lateral/shoe pipe** (the standard connection
+  size per my prior entry): 3.0 psi = 6.93 ft of head at Q=1000 gpm. In a 6 in pipe, V=11.35 ft/s,
+  V²/2g=2.00 ft, so **K ≈ 3.5** for the hydrant's own barrel + main valve + nozzle alone, as a
+  worst-case-allowable (conservative-for-design) value — real hydrants that pass QA perform at or
+  better than this, so using the ceiling under-states available flow rather than over-stating it,
+  which is the right direction to be wrong in a fire-flow tool.
+- **CITED, standard-fitting build-up for the rest of the assembly** (tee off the main, lateral
+  isolation gate valve, elbow into the riser) — Crane Technical Paper 410's own method,
+  K = n·f_T, corroborated independently across simupipe.com, midstreamcalculator.com and a
+  general-engineering K-table search: gate valve fully open K≈0.15, flanged 90° elbow K≈0.3–0.5,
+  tee flow-through-branch K≈1.0. **Build-up subtotal ≈1.5.** These are widely published,
+  textbook-standard values — unlike the hydrant barrel term, this part of the list was never the
+  gap.
+- **Recommended total: K ≈ 5 (range 3–6), referenced to the lateral pipe's own velocity, and
+  labelled honestly in two pieces** — the barrel/valve/nozzle term (~3.5, from a real AWWA C502
+  QA ceiling) dominates, and the lateral-fitting build-up (~1.5, from Crane) is the smaller,
+  fully-standard remainder. Never present the sum as one measured number; the provenance of each
+  half is different and a user should be able to see that.
+- **THE ARITHMETIC TOM ASKED FOR, done and corrected once already** (I made a 10x Hazen-Williams
+  error on the first pass — a units-mismatched textbook constant I half-remembered — and caught it
+  by cross-checking against the velocity form V=1.318·C·R^0.63·S^0.54 and against Darcy-Weisbach;
+  all three now agree). At Q=1000 gpm through 6 in C=140 cement-lined DI pipe: **friction loss is
+  64.5 ft per 1000 ft** (V=11.35 ft/s, well above any normal design velocity, which is exactly why
+  it is large). Against the fixed 6.93 ft hydrant-barrel loss: at a **25 ft lateral** (Addison TX's
+  standard), friction = 1.6 ft, **minor loss is 4.3× friction**; at **50 ft** (Northlake/Clyde Hill),
+  friction = 3.2 ft, minor loss is **2.2× friction**; at **100 ft** (Prosper TX's outer limit),
+  friction = 6.5 ft, **the two are about equal, 1.07:1**. The ratio depends almost entirely on
+  lateral length and weakly on flow (∝Q^0.148/L) — checked at 500 gpm too, same conclusion within
+  a few percent. **Verdict: across the whole realistic range of lateral lengths found in real
+  design standards, minor loss is never smaller than friction loss and is usually 2–4× it.** That
+  is a real, quantified, moderate version of Tom's worry — not the 10–40× dominance my first
+  (wrong) pass would have reported, which is why the "show your work" instruction mattered here.
+- **Q4 — is hose/nozzle analysis past the outlet standard practice for a distribution model?
+  NO, clean no, and here is the boundary.** AWWA M31 (required fire flow) and NFPA 291 (rated
+  capacity, hydrant flow testing) both define hydrant performance strictly AT THE HYDRANT OUTLET —
+  a pitot reading, not a delivered stream. WaterGEMS/WaterCAD's own Hydrant element (docs.bentley.com,
+  "Hydrant Attributes" and "Hydrants") stops at exactly the same boundary: it has a
+  `Minor Loss Coefficient (Hydrant Lateral)` / diameter / length toggle ("Include Lateral Losses")
+  and nothing past the nozzle — **no hose network, no nozzle pressure, no hand-line modeling
+  anywhere in the leading commercial tool.** Fire-ground hydraulics (hose friction loss, nozzle
+  reaction, pump discharge pressure) is IFSTA/NWCG pump-operator territory with its own manuals and
+  its own inputs (hose lay, chosen at the fire scene, not known to the utility's model at design
+  time). Carrying the analysis past the outlet would be building a second profession's tool inside
+  this one; the option is closed.
+- **Corroborating find, not the headline:** WaterGEMS/WaterCAD's own hydrant element ships with
+  the identical three fields Tom specified — minor loss coefficient, diameter, length of the
+  lateral — **and no published default for any of them**, confirmed by fetching both the WaterCAD
+  and HAMMER "Hydrant Attributes" pages directly. Even the market-leading paid tool leaves this to
+  the user. That is independent confirmation that "the research is thin" was the correct read of
+  the field, not a failure of this agent's first search — the AWWA C502 QA-spec number is the one
+  piece of ground truth that exists ANYWHERE, and it was worth the second pass to find it.
+- **Library "type" fields (Q5) — minimal set recommended:** make, model, main-valve/waterway
+  diameter (4½ or 5¼ in per AWWA C502 — the number that actually constrains flow, distinct from
+  the 6 in shoe), outlet configuration (count and size of nozzles), and the k itself (editable,
+  defaulting to the ~5 recommendation above, with its two-part source visible). **Deliberately
+  left out:** installation year and NFPA 291 colour class — both are per-instance, time-varying
+  FACTS ABOUT ONE INSTALLED HYDRANT (age, and a field-tested rated capacity that depends on that
+  hydrant's own main pressure on the day it was tested), not properties of a reusable type; baking
+  either into a saved type would go stale silently. Lateral diameter/length/roughness stay
+  per-instance ad-hoc inputs exactly as Task 530 already scopes them — they are site geometry, not
+  hydrant type.
+- **What this project's own heads would have gotten wrong:** both Tom's ruling and my own same-day
+  entry assumed the honest ending was "no defensible number exists, be reasonable, don't swallow a
+  camel." The literature is better than that assumption — there IS a real, twice-corroborated,
+  quantified industry number, it is just filed under AWWA C502 QA testing and municipal
+  procurement boilerplate rather than under "hydraulics" or "K-factor," which is exactly the kind
+  of place nobody inside a hydraulics-calculator codebase would think to search without being
+  told the number might not look like a K at all.
+
+---
+
 ## 2026-08-25 — market-research pass: wish list grown from one row to four new plus one promoted
 
 Tom, reacting to a one-row wish list: *"I am disappointed that their wish list is not
