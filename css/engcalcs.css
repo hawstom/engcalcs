@@ -2463,8 +2463,34 @@ html:has(#lpn_canvas) { overflow: hidden; }
 .lpn-profile-controls > * { margin: 0; }
 /* The commentary line is the only thing left that CHANGES, so it is the one allowed to take the
    rest of the row -- and to be the item that wraps to a line of its own when the pane is narrow. */
-#lpn_profile_form { flex: 1 1 16em; min-width: 12em; }
+#lpn_profile_form { flex: 1 1 16em; min-width: 12em; display: flex; flex-wrap: wrap;
+	align-items: baseline; gap: .1em .6em; }
 .lpn-profile-say { margin: 0; }
+/* ---- The Edit door and the box behind it (Task 509) -----------------------------------------
+   The panel's ONE control. It is a small button on the commentary line rather than anything larger,
+   because the entry point is not the feature: the feature is the overlay it opens, and the line
+   beside it still has to be the thing the eye reads first. */
+.lpn-profile-edit {
+	flex: 0 0 auto; font: inherit; font-size: .95em; padding: 1px 8px;
+	border: 1px solid #bbb; border-radius: 3px; background: #f6f6f6; cursor: pointer;
+}
+.lpn-profile-edit:hover, .lpn-profile-edit:focus { background: #eaeaea; border-color: #888; }
+/* A waypoint, and the Remove-all beside it. Each chip removes ITSELF -- the × is part of the label
+   rather than a second control inside the chip, so the whole chip is the target a hand can hit. */
+.lpn-profile-chip {
+	font: inherit; font-size: .9em; margin: 0 .25em .25em 0; padding: 1px 6px;
+	border: 1px solid #bbb; border-radius: 10px; background: #f6f6f6; cursor: pointer;
+}
+.lpn-profile-chip:hover, .lpn-profile-chip:focus { background: #eaeaea; border-color: #888; }
+/* ---- The saved-path menu on the Profile tab (Task 510) ---------------------------------------
+   An arrow ON the tab, not a second tab and not a toolbar button: Tom's placement, 2026-08-24, and
+   it puts the list of names where the thing they name already lives. Flat and narrow, so the tab
+   still reads as one tab with a marker on it rather than as two controls jammed together. */
+.lpn-pane-tab-menu {
+	background: none; border: 1px solid transparent; border-bottom: 0; font: inherit;
+	font-size: .8em; padding: 3px 5px; margin-inline-start: -8px; cursor: pointer; color: #333;
+}
+.lpn-pane-tab-menu:hover { background: #f2f2f2; }
 @media (max-width: 40rem) {
 	/* The stacked layout already scrolls the panel; the header row must not also become a column
 	   of four lines on a phone, where the chart has the least height to spare. */

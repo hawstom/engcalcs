@@ -401,7 +401,10 @@ console.log('\n-- the route is drawn on the map --');
 	// What must hold is that the hook CLEARS THE HIGHLIGHT, not that it does only that -- Task 433
 	// added profileDrawCancel() beside it so a half-drawn path cannot outlive the panel it is drawn
 	// in. Pinning the whole line verbatim made that addition look like a regression.
-	report(/id: 'profile'[\s\S]{0,1400}?hide: function \(\) \{[^}]*drawProfilePath\(null\);/.test(lnSrc),
+	// The window is generous because the tab's declaration keeps growing -- `refresh`, then Task
+	// 510's `menu` -- and a too-tight span makes an ADDITION next to the hook look like the hook
+	// going missing.
+	report(/id: 'profile'[\s\S]{0,2400}?hide: function \(\) \{[^}]*drawProfilePath\(null\);/.test(lnSrc),
 		'leaving the profile tab clears it');
 	report(/if \(paneState\.open && was && was !== now && was\.hide\) \{ was\.hide\(\); \}/.test(lnSrc),
 		'...switching tabs runs that hook');

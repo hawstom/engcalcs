@@ -237,6 +237,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions', 'lpn_pane_reservoirs',
   'lpn_pane_tanks', 'lpn_pane_pipes', 'lpn_pane_pumps', 'lpn_pane_valves',
   'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note',
+  // The profile's path EDIT box (ROADMAP Task 509) -- the overlay that carries the two
+  // operations Task 506's clean-out took with it. Absent from this list, profileEditEl()
+  // returns null and the whole door is invisible to every harness.
+  'lpn_profile_edit_popup', 'lpn_profile_edit_form', 'lpn_profile_edit_close',
   // The Settings box (ROADMAP Task 441): the two panes, the filter, the three section shells, the
   // sub-headings that are jump targets, and the hosts their builders write into. The three
   // lpn_labels_* boxes are already listed above -- they kept their IDs through the move.

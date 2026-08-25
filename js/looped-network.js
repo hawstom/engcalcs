@@ -8032,6 +8032,11 @@ var EngCalcs = EngCalcs || {};
 		// meaning: choose the path. profileTabShow() holds that rule; the hooks stay one line each.
 		show: function () { profileTabShow(); },
 		refresh: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
+		// **AN ARROW ON THE TAB, holding the saved paths** (Task 510, Tom's own placement). Declared
+		// as a property of the tab rather than written into wirePane() by name, so the strip stays
+		// one loop over one list -- a second tab wanting a menu adds this line and nothing else.
+		menuLabel: 'lpn_profile_saved',
+		menu: function (anchor) { openProfileSavedMenu(anchor); },
 		// Closing the tab abandons a half-drawn path (Task 433) -- the same restore Escape does.
 		// Leaving the chooser armed under a closed panel would make the next map click mean
 		// something the user can no longer see.
@@ -8040,6 +8045,9 @@ var EngCalcs = EngCalcs || {};
 		// belonging to something nobody can see.
 		hide: function () {
 			profileShown = false; profileHover = false;
+			// AND THE EDIT BOX GOES WITH IT (Task 509): it edits the path this tab draws, and left
+			// standing over a closed panel it would be a control for something nobody can see.
+			closeProfileEditPopup();
 			profileDrawCancel(); drawProfilePath(null);
 		}
 	});
@@ -8225,6 +8233,30 @@ var EngCalcs = EngCalcs || {};
 				if (t.tip && pc[t.tip]) { b.title = pc[t.tip]; b.className += ' ec-help'; }
 				b.addEventListener('click', function () { setPaneTab(t.id); });
 				strip.appendChild(b);
+				if (!t.menu) { return; }
+				// **THE ARROW NEVER GOES THROUGH THE TAB'S OWN show() WHEN THE TAB IS ALREADY ON
+				// SHOW**, and that is the whole care this button needs: on the profile, a second
+				// show() is the command that starts drawing a new path (Task 506), so an arrow that
+				// simply called openPane() would arm the chooser every time somebody reached for
+				// their saved paths.
+				(function () {
+					var m = document.createElement('button');
+					m.type = 'button';
+					m.id = 'lpn_pane_tab_menu_' + t.id;
+					m.className = 'lpn-pane-tab-menu';
+					m.textContent = '▾';
+					if (pc[t.menuLabel]) {
+						m.title = pc[t.menuLabel];
+						m.setAttribute('aria-label', pc[t.menuLabel]);
+						m.className += ' ec-help';
+					}
+					m.addEventListener('click', function (e) {
+						e.stopPropagation();
+						if (!paneState.open || paneState.tab !== t.id) { openPane(t.id); }
+						t.menu(m);
+					});
+					strip.appendChild(m);
+				}());
 			});
 		}
 		if (x) { x.addEventListener('click', closePane); }
@@ -9627,7 +9659,9 @@ var EngCalcs = EngCalcs || {};
 	// path the user is drawing stop by stop already states its own order and re-ordering it under the
 	// pointer would be the opposite of feedback. `saved` is the route that was on screen when the
 	// gesture started, so Escape can put it back.
-	var profileState = { from: '', to: '', waypoints: [], draw: null };
+	// `activeId` names the SAVED path on show (Task 510), or is empty for a path that has only
+	// been drawn. It is not in the file: see the saved-path note below for why.
+	var profileState = { from: '', to: '', waypoints: [], draw: null, activeId: '' };
 	function profileIsOpen() { return paneIsOpen() && paneState.tab === 'profile'; }
 
 	// ---- THE ROUTE, ON THE MAP (ROADMAP Task 433) -----------------------------------------------
@@ -9680,7 +9714,11 @@ var EngCalcs = EngCalcs || {};
 		profilePathLayer = null;
 		var dr = profileState.draw;
 		var choosing = !!(dr && dr.stops.length);
-		if (!profileHover && !choosing) { return; }
+		// **THE EDIT BOX IS ATTENDING TO THE PROFILE TOO** (Task 509). The hover rule (Tom,
+		// 2026-08-24) marks the route only while the reader is thinking about it; somebody with the
+		// box open is doing nothing else, and the box sits OVER the map, so a pointer inside it can
+		// never be inside the panel that the hover listener is on.
+		if (!profileHover && !choosing && !profileEditIsOpen()) { return; }
 		if ((!path && !choosing) || !world) { return; }
 		var sc = state.s || 1;
 		profilePathLayer = el('g', { 'class': 'lpn-profile-path', 'pointer-events': 'none' });
@@ -9885,14 +9923,304 @@ var EngCalcs = EngCalcs || {};
 		renderProfile();
 	}
 	function rebuildProfileForm() {
-		var box = document.getElementById('lpn_profile_form');
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_profile_form'), btn;
 		if (!box) { return; }
 		box.innerHTML = '';
+		// **THE DOOR BACK TO THE TWO LOST OPERATIONS** (Task 509). One button, on the same line as
+		// the commentary, opening an overlay over the map -- not a restored control column. Tom's
+		// own shape, 2026-08-25, for what Task 506 took: *"You are right that we lost something."*
+		//
+		// **IT IS NOT OFFERED WHILE THE CHOOSER IS RUNNING**, for exactly the reason the pull-downs
+		// were hidden then: the box edits `from`/`to`/`waypoints`, which profileStops() is ignoring
+		// for the duration, so a change made there would appear to do nothing at all.
+		if (!profileState.draw) {
+			btn = document.createElement('button');
+			btn.type = 'button';
+			btn.id = 'lpn_profile_edit_btn';
+			btn.className = 'lpn-profile-edit ec-help';
+			btn.textContent = pc.lpn_profile_edit || 'Edit';
+			btn.title = pc.lpn_profile_edit_tip ||
+				'Change one end of the path, or take one node off it, without drawing the whole path again.';
+			btn.addEventListener('click', function () { toggleProfileEditPopup(btn); });
+			box.appendChild(btn);
+		} else if (profileEditIsOpen()) {
+			// A gesture started while the box was open takes the box with it: it edits the very
+			// stops profileStops() has stopped reading.
+			closeProfileEditPopup();
+		}
 		profileSayEl = document.createElement('div');
 		profileSayEl.id = 'lpn_profile_say';
 		profileSayEl.className = 'lpn-profile-say';
 		box.appendChild(profileSayEl);
 		profileDrawSay(profileState.draw ? (profileState.draw.stops.length ? 'more' : 'start') : 'idle');
+		// Built after init()'s own pass, so the tip needs arming or a tap on it does nothing
+		// (ROADMAP Task 173's gap, the same one the pane tabs hit).
+		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
+		// The box is a view OF the path, so it follows every change to it rather than going stale
+		// behind the panel that changed it.
+		if (profileEditIsOpen()) { rebuildProfileEditForm(); }
+	}
+	// ---- THE EDIT BOX (ROADMAP Task 509) ---------------------------------------------------------
+	//
+	// **WHAT IT IS FOR, and it is exactly two things.** Task 506 removed the profile's left-hand
+	// control column and the page is better for it -- but it took with it the only way to change ONE
+	// end of an existing path and the only way to take ONE node off it, and both became "draw the
+	// whole path again". This box is those two operations and nothing else: two pull-downs and a row
+	// of waypoint chips. Pressing Profile again is still how a path is DRAWN, and this box never
+	// claims otherwise.
+	//
+	// **AN OVERLAY, NOT A COLUMN.** The column cost 15rem of the pane's width for the life of the
+	// pane, to carry controls touched once a session. An overlay costs that width only while
+	// somebody is using it, and it is over the MAP rather than over the chart, so the drawing it is
+	// editing stays visible beside it.
+	//
+	// It reuses the four keys Task 506 left rendered by nothing -- `_from`, `_to`, `_through`,
+	// `_clear` -- because they are the same four controls, wearing the same four labels.
+	var profileEditUserPos = null;
+	function profileEditEl() { return document.getElementById('lpn_profile_edit_popup'); }
+	function profileEditIsOpen() {
+		var box = profileEditEl();
+		return !!box && box.style.display === 'block';
+	}
+	function closeProfileEditPopup() {
+		var box = profileEditEl();
+		if (!box) { return; }
+		box.style.display = 'none';
+		// The route mark on the map is drawn while the reader is ATTENDING to the profile, and the
+		// box is one of the two places that can be true. Closing it withdraws that attention.
+		drawProfilePath(profilePath());
+	}
+	function toggleProfileEditPopup(anchorEl) {
+		var box = profileEditEl(), at, r;
+		if (!box) { return; }
+		if (profileEditIsOpen()) { closeProfileEditPopup(); return; }
+		rebuildProfileEditForm();
+		if (profileEditUserPos) {
+			// Re-clamped rather than restored blindly, for #lpn_find_popup's own reason: the window
+			// may have been resized smaller since, and a box remembered off-screen never comes back.
+			box.style.display = 'block';
+			r = box.getBoundingClientRect();
+			at = clampPanel(profileEditUserPos.left, profileEditUserPos.top, r.width, r.height,
+				window.innerWidth, window.innerHeight, chromeFloor());
+			box.style.left = at.left + 'px'; box.style.top = at.top + 'px';
+		} else if (anchorEl && anchorEl.getBoundingClientRect) {
+			openPanelAtAnchor(box, anchorEl.getBoundingClientRect());
+		} else {
+			box.style.display = 'block';
+		}
+		drawProfilePath(profilePath());
+	}
+	function rebuildProfileEditForm() {
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_profile_edit_form'),
+			opts = profileNodeOptions(), chips, clr;
+		if (!box) { return; }
+		box.innerHTML = '';
+		// **THE TWO ENDS, EACH ON ITS OWN.** This is the first of the two lost operations: the
+		// gesture always redraws the whole route, and these two change one end of it and leave
+		// everything else -- including the waypoints -- exactly where it was.
+		findSelect(box, pc.lpn_profile_from || 'From', opts, profileState.from, function (v) {
+			profileState.from = v; profileEditChanged();
+		});
+		findSelect(box, pc.lpn_profile_to || 'To', opts, profileState.to, function (v) {
+			profileState.to = v; profileEditChanged();
+		});
+		// **THE WAYPOINTS, ONE CHIP EACH.** The second lost operation. A chip removes ITSELF, which
+		// is the whole point -- Remove all was never the missing thing.
+		chips = document.createElement('div');
+		chips.style.margin = '4px 0';
+		if (profileState.waypoints.length) {
+			chips.appendChild(document.createTextNode((pc.lpn_profile_through || 'Nodes on the way') + ' '));
+			profileState.waypoints.forEach(function (id) {
+				var b = document.createElement('button');
+				b.type = 'button';
+				b.className = 'lpn-profile-chip';
+				b.textContent = id + ' ×';
+				b.addEventListener('click', function () {
+					profileState.waypoints = profileState.waypoints.filter(function (w) { return w !== id; });
+					profileEditChanged();
+				});
+				chips.appendChild(b);
+			});
+			clr = document.createElement('button');
+			clr.type = 'button';
+			clr.className = 'lpn-profile-chip';
+			clr.textContent = pc.lpn_profile_clear || 'Remove all';
+			clr.addEventListener('click', function () {
+				profileState.waypoints = []; profileEditChanged();
+			});
+			chips.appendChild(clr);
+		} else {
+			// Never empty: a box that says nothing about waypoints reads as a box that has lost
+			// them. `lpn_profile_choose` is the sentence the panel used to say in this state.
+			chips.appendChild(document.createTextNode(pc.lpn_profile_choose || 'Choose a start node and an end node.'));
+		}
+		box.appendChild(chips);
+	}
+	// Every edit in the box goes through here, so there is ONE answer to "what happens when the path
+	// changes": the box redraws, the chart redraws, and the map's route mark follows the same path
+	// the chart is drawn from (renderProfile() calls drawProfilePath()).
+	function profileEditChanged() {
+		rebuildProfileEditForm();
+		renderProfile();
+	}
+	function profileNodeOptions() {
+		return doc.nodes.filter(profileNodeUsable).map(function (n) { return [n.id, n.id]; });
+	}
+	function wireProfileEditPopup() {
+		var box = profileEditEl(), x = document.getElementById('lpn_profile_edit_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeProfileEditPopup); }
+		makePanelDraggable(box, function (pos) { profileEditUserPos = pos; });
+	}
+	// ---- SAVED PATHS (ROADMAP Task 510) ----------------------------------------------------------
+	//
+	// Tom, 2026-08-24: a client report carries the same three or four profiles every time, and today
+	// a path exists only until the next one is drawn.
+	//
+	// **A SAVED PATH IS A LIST OF NODE IDS, SO IT IS DOCUMENT DATA** -- it lives in `doc.profiles`,
+	// it is written into the project file by serializeProject(), it rides in the undo snapshot
+	// (which deep-clones `doc`), and it puts the asterisk on the tab like every other edit. It is
+	// NOT a browser preference: a path names this project's own junctions and means nothing beside
+	// any other project, which is the opposite of the pane's height and open tab.
+	//
+	// **THE STOPS, NOT THE ROUTE.** What is stored is what the user CHOSE -- the two ends and the
+	// waypoints -- and the route between them is derived on every open, exactly as it is derived on
+	// every keystroke today. Storing the resolved node list would freeze a route through pipes that
+	// may since have been deleted, and would then disagree with the chart drawn beside it.
+	//
+	// **AN ID THAT IS NOT IN THE DOCUMENT IS REPORTED, NEVER DROPPED.** It is the user's data
+	// (CLAUDE.md's file rule), and a junction deleted by accident is a junction that comes back with
+	// the next undo -- a saved path quietly pruned in the meantime would not. So the stored list is
+	// left exactly as it was written, the menu marks the path with a ⚠ and names the missing ids in
+	// its tip, and applying it draws the part that can be drawn and says what could not.
+	//
+	// **THE `.inp` EXPORTER SKIPS IT, and needs no code to do so:** EPANET has no such object, and
+	// js/lpn-inp.js writes from doc.nodes/doc.links alone. dev/lpn-spike/profile-saved-harness.js
+	// asserts that rather than trusting it.
+	//
+	// **WHICH ONE IS SELECTED IS NOT STORED.** That is a fact about this reader in this session, the
+	// same kind of thing as which pane tab is open, and a colleague opening the file should not
+	// inherit it.
+	function savedProfiles() { return (doc.profiles = doc.profiles || []); }
+	function savedProfileById(id) {
+		var list = savedProfiles(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].id === id) { return list[i]; } }
+		return null;
+	}
+	function activeSavedProfile() { return savedProfileById(profileState.activeId); }
+	function newSavedProfileId() {
+		return 'sp' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+	}
+	// The stops this saved path names that this document does not have. The one place that question
+	// is asked, so the menu's mark, the tip and the notice cannot disagree about it.
+	function profileMissingStops(p) {
+		return ((p && p.stops) || []).filter(function (id) { return !nodeById(id); });
+	}
+	// Every saved path with something missing, for a caller that wants to say so once rather than
+	// per path. Nothing is changed by asking.
+	function profileSavedIssues() {
+		return savedProfiles().map(function (p) {
+			return { id: p.id, name: p.name, missing: profileMissingStops(p) };
+		}).filter(function (r) { return r.missing.length > 0; });
+	}
+	function profileMissingText(p, missing) {
+		var pc = EngCalcs.pageConfig || {};
+		return (pc.lpn_profile_missing || '{name} names nodes that are not in this project: {ids}')
+			.replace('{name}', p.name || '').replace('{ids}', missing.join(', '));
+	}
+	// **APPLYING ONE DRAWS WHAT IT CAN AND SAYS WHAT IT CANNOT.** The unknown ids are left out of
+	// the DISPLAYED stops -- a stop with no node routes nowhere, and the panel would answer a
+	// missing junction with "these two nodes are not connected", which is the wrong sentence -- and
+	// they stay in the stored list untouched.
+	function applySavedProfile(p) {
+		var stops, usable, missing;
+		if (!p) { return; }
+		stops = (p.stops || []).slice();
+		missing = profileMissingStops(p);
+		usable = stops.filter(function (id) { return !!nodeById(id); });
+		profileState.activeId = p.id;
+		profileState.draw = null;
+		profileState.from = usable[0] || '';
+		profileState.to = usable.length > 1 ? usable[usable.length - 1] : '';
+		profileState.waypoints = usable.slice(1, -1);
+		if (missing.length) { setNotice(profileMissingText(p, missing)); }
+		rebuildProfileForm();
+		renderProfile();
+	}
+	function newSavedProfile() {
+		var pc = EngCalcs.pageConfig || {}, list = savedProfiles(), stops, suggested, v, p;
+		// The path now on the drawing is what gets a name, so there has to be one. Said out loud
+		// rather than offered and then silently saving nothing.
+		stops = profileStops().filter(function (id) { return !!id; });
+		if (stops.length < 2) {
+			setNotice(pc.lpn_profile_none || 'No path yet. Press Profile again to choose one on the map.');
+			return;
+		}
+		suggested = (pc.lpn_profile_new_name || 'Path {n}').replace('{n}', String(list.length + 1));
+		v = window.prompt(pc.lpn_profile_prompt_name || 'Name for this path', suggested);
+		if (v === null) { return; }
+		v = v.trim();
+		if (!v) { return; }
+		saveUndoSnapshot();
+		p = { id: newSavedProfileId(), name: v, stops: stops };
+		savedProfiles().push(p);
+		profileState.activeId = p.id;
+		saveToStorage();
+		rebuildProfileForm();
+	}
+	function renameSavedProfile() {
+		var pc = EngCalcs.pageConfig || {}, p = activeSavedProfile(), v;
+		if (!p) { return; }
+		v = window.prompt(pc.lpn_profile_prompt_name || 'Name for this path', p.name || '');
+		if (v === null || !v.trim()) { return; }
+		saveUndoSnapshot();
+		p.name = v.trim();
+		saveToStorage();
+		rebuildProfileForm();
+	}
+	function deleteSavedProfile() {
+		var pc = EngCalcs.pageConfig || {}, p = activeSavedProfile(), msg;
+		if (!p) { return; }
+		msg = (pc.lpn_profile_delete_confirm || 'Delete the saved path {name}? The drawing itself is not changed.')
+			.replace('{name}', p.name || '');
+		if (!window.confirm(msg)) { return; }
+		saveUndoSnapshot();
+		doc.profiles = savedProfiles().filter(function (x) { return x !== p; });
+		// The path stays on screen: deleting its NAME is not deleting the drawing, which is what the
+		// confirmation just promised.
+		profileState.activeId = '';
+		saveToStorage();
+		rebuildProfileForm();
+	}
+	// **THE MENU HANGS OFF THE PROFILE TAB** (Tom, 2026-08-24: "a menu arrow on the Profile tab").
+	// That is what keeps the panel at one line of commentary -- Task 506's whole point -- and it
+	// puts the list of names where the thing they name already lives. It is openMenu()'s ordinary
+	// pull-down, so it inherits the dismissal, the placement and the icon column every other menu on
+	// this page has.
+	function openProfileSavedMenu(anchor) {
+		var pc = EngCalcs.pageConfig || {}, rows = [], list = savedProfiles(), active = activeSavedProfile();
+		rows.push({ heading: true, label: pc.lpn_profile_saved || 'Saved paths' });
+		if (!list.length) {
+			rows.push({ label: pc.lpn_profile_none_saved || 'No saved paths yet', disabled: true, fn: function () {} });
+		}
+		list.forEach(function (p) {
+			var missing = profileMissingStops(p);
+			rows.push({
+				// A tick on the one you are looking at, the same marker the scenario menu uses; the
+				// ⚠ is CLAUDE.md's caution glyph and its whole explanation is in the tip.
+				label: (p.id === profileState.activeId ? '✓ ' : '  ') + (missing.length ? '⚠ ' : '') + (p.name || ''),
+				tip: missing.length ? profileMissingText(p, missing) : undefined,
+				fn: function () { applySavedProfile(p); }
+			});
+		});
+		rows.push({ separator: true });
+		rows.push({ icon: 'insert', label: pc.lpn_profile_new || 'New saved path…', fn: newSavedProfile });
+		// Disabled rather than hidden, so the vocabulary stays learnable -- this file's menu
+		// convention. Both act on the path you have selected, and with none selected there is
+		// nothing for them to name.
+		rows.push({ icon: 'edit', label: pc.lpn_profile_rename || 'Rename path…', disabled: !active, fn: renameSavedProfile });
+		rows.push({ icon: 'close', label: pc.lpn_profile_delete || 'Delete path', disabled: !active, fn: deleteSavedProfile });
+		openMenu(anchor, rows, 0);
 	}
 	// ---- THE PATH CHOOSER (ROADMAP Task 433) -----------------------------------------------------
 	//
@@ -11254,6 +11582,9 @@ var EngCalcs = EngCalcs || {};
 			// The clock (Task 423). Saved with the drawing because it is part of the model, not a
 			// preference: a project whose demands vary over the day means nothing without them.
 			patterns: doc.patterns || [], defaultPattern: doc.defaultPattern || null,
+			// Paths kept by name (Task 510). Document data, for the reason the saved-path note in
+			// the profile section gives: a path names THIS project's junctions.
+			profiles: doc.profiles || [],
 			times: doc.times || null, controls: doc.controls || [],
 			// Where the reader was looking. Not a reason to SAVE -- panning marks nothing dirty --
 			// but it rides along whenever something else does, so a file reopens where it was left.
@@ -11666,6 +11997,12 @@ var EngCalcs = EngCalcs || {};
 		doc.defaultPattern = saved.defaultPattern || null;
 		doc.times = saved.times || null;
 		doc.controls = saved.controls || [];
+		// Task 510's saved paths, taken VERBATIM. An id naming a node this document does not have
+		// is the user's data and is reported where it is used, never pruned here -- see
+		// profileMissingStops(). A file written before this existed simply has none.
+		doc.profiles = saved.profiles || [];
+		// Which one was selected is a fact about a reader, not about the file.
+		profileState.activeId = '';
 		dropStoredPumpFit(doc.links);
 		// Task 354. Not flipped by flipStoredY() above and must not be: the origin is stated in the
 		// FILE's Cartesian frame and outwardY()/inwardY() are written for exactly that -- flipping it
@@ -15685,6 +16022,7 @@ var EngCalcs = EngCalcs || {};
 		wirePointerEvents();
 		wirePopup();
 		wireFindPopup();
+		wireProfileEditPopup();
 		wirePane();
 		wireRightPane();
 		// After wirePane(), because the observer needs the chart's host to be in its final place in

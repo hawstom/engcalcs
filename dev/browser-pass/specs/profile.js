@@ -319,6 +319,80 @@ exports.run = async function ({ browser, report }) {
 			}
 		}
 
+		// ---- **THE EDIT DOOR AND THE SAVED-PATH ARROW** (Tasks 509, 510) ------------------------
+		//
+		// dev/lpn-spike/profile-saved-harness.js owns what these two DO -- one end moves and the
+		// waypoints survive; a saved path round-trips through the file. What only a real page can
+		// answer is whether the box is on the screen at all: it is `position: fixed` and placed from
+		// the Edit button's own rect, over a map whose height is measured, and the failure is a box
+		// hanging off the bottom of the window or behind the pane it was opened from.
+		{
+			const door = await a.page.evaluate(() => {
+				const b = document.getElementById('lpn_profile_edit_btn');
+				if (!b) { return null; }
+				const r = b.getBoundingClientRect();
+				return { x: r.x + r.width / 2, y: r.y + r.height / 2, text: b.textContent };
+			});
+			report.ok(!!door, 'the profile panel carries an Edit door', door && door.text);
+			if (door) {
+				await a.page.mouse.click(door.x, door.y);
+				await a.settle(300);
+				const box = await a.page.evaluate(() => {
+					const p = document.getElementById('lpn_profile_edit_popup');
+					if (!p || p.style.display !== 'block') { return null; }
+					const r = p.getBoundingClientRect();
+					return { x: r.x, y: r.y, w: r.width, h: r.height,
+						selects: p.querySelectorAll('select').length,
+						vw: window.innerWidth, vh: window.innerHeight };
+				});
+				report.ok(!!box, 'pressing it opens the overlay box');
+				report.ok(box && box.selects === 2, '...carrying the two ends, one pull-down each',
+					box && (box.selects + ' selects'));
+				report.ok(box && box.x >= 0 && box.y >= 0 &&
+					box.x + box.w <= box.vw + 1 && box.y + box.h <= box.vh + 1,
+					'...wholly inside the window', box && JSON.stringify(box));
+				// And it closes, because it has to be got rid of: it sits over the drawing.
+				await a.page.click('#lpn_profile_edit_close');
+				await a.settle(200);
+				const shut = await a.page.evaluate(() =>
+					document.getElementById('lpn_profile_edit_popup').style.display === 'none');
+				report.ok(shut, '...and the X shuts it again');
+			}
+
+			// THE ARROW ON THE TAB. Its one hazard is real and invisible in a harness that calls the
+			// menu directly: the tab's second show() is the command that starts drawing a path, so
+			// an arrow routed through the tab would arm the chooser every time.
+			const arrow = await a.page.evaluate(() => {
+				const b = document.getElementById('lpn_pane_tab_menu_profile');
+				if (!b) { return null; }
+				const r = b.getBoundingClientRect();
+				return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+			});
+			report.ok(!!arrow, 'the Profile tab carries a saved-path arrow');
+			if (arrow) {
+				await a.page.mouse.click(arrow.x, arrow.y);
+				await a.settle(250);
+				const menu = await a.page.evaluate(() => {
+					const p = document.getElementById('lpn_menu_popup');
+					return {
+						open: p && p.style.display === 'block',
+						rows: [...document.querySelectorAll('#lpn_menu_list .lpn-menu-row, #lpn_menu_list .lpn-menu-heading')]
+							.map(r => r.textContent.trim()),
+						say: (document.getElementById('lpn_profile_say') || {}).textContent || ''
+					};
+				});
+				report.ok(menu.open, '...and it opens a menu');
+				report.ok(menu.rows.some(r => /Saved paths/.test(r)) &&
+					menu.rows.some(r => /New saved path/.test(r)),
+					'...holding the saved paths and the New row', menu.rows.join(' | '));
+				report.ok(!/[Cc]lick the node|[Tt]ap the node/.test(menu.say),
+					'...WITHOUT arming the path chooser', JSON.stringify(menu.say));
+				// Dismissed, or it stands over the map for the rest of this section.
+				await a.page.mouse.click(5, 5);
+				await a.settle(200);
+			}
+		}
+
 		// ---- **THE ROUTE MARK IS HOVER-GATED** (Tom, 2026-08-24) --------------------------------
 		// A permanent orange band over the route was on the map whenever the tab was open. It is now
 		// an answer to a question the reader asks by looking: pointer over the profile, mark on.
