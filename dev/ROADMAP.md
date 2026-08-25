@@ -151,21 +151,23 @@ the block.
     swapped; the rest translated the two words and need them reordered by someone who reads the
     script. They are on the drift list, so the next sprint picks them up by itself.
 
-- 100|517| **The georeference settle scales on latitude, so the ground scale drifts.**
-  Found 2026-08-24 by Task 511's browser pass, then derived rather than baselined.
-  `georefReproject()` (`js/looped-network.js:5957`) settles a detached model with
-  `metersPerUnit: t0.metersPerUnit * r * (mpd1.lat / mpd0.lat)`, which preserves the model's
-  LATITUDE SPAN. That held the screen box only while the display was unprojected and screen y WAS
-  the latitude; under Task 145's Mercator frame y is `mercY(lat)`, so the model changes size every
-  time it settles at a new latitude — **199.7 → 210.4 px in the spec's own gesture**, with the width
-  sliding by the same factor.
-  - **It contradicts step 1's own promise to the user** — *nothing you do to the map moves the
-    model* — and it means a ground scale the user deliberately set does not stay set.
-  - Scaling on `mpd.lon` holds the width exactly and the height to within Mercator's own
-    conformality. Mechanism verified numerically to 0.05%: 210.51 px predicted against 210.4
-    measured, computed from `mercY` on the predicted span.
-  - `dev/browser-pass/specs/georef.js` now predicts the correct aspect from the page's own
-    `lpnGeorefMetersPerDegree` (1.916 predicted against 1.916 measured), so it will catch the fix.
+- 75|520| **Go to… sets the map scale from the wrong latitude, so the model jumps size.**
+  Found by `/code-review` 2026-08-24 while reviewing Task 517; PRE-EXISTING and not introduced by it.
+  `georefGoTo()` (`js/looped-network.js`) computes
+  `screenSpanPx = spanUnits * (metersPerUnit / mpd.lat) * state.s` and `degLat = spanMeters / mpd.lat`,
+  and evaluates **both** `mpd` at the DESTINATION latitude.
+  - **The two errors cancel today, which is why nothing has caught it.** `s = screenSpanPx / degLat`
+    divides the same wrong factor back out, so the axis is invisible — and that is also the trap:
+    changing only one of the two to `mpd.lon` breaks working code.
+  - **What does NOT cancel is the latitude.** `metersPerUnit` relates to where the model is hanging
+    NOW, so the first term needs `mpd.lon` at the model's CURRENT latitude while the second needs it
+    at the destination. The scale therefore lands wrong by `mpd.lon(current)/mpd.lon(destination)`.
+    Scenario: a model hanging at 60 N, Go to… an equatorial coordinate with a 1000 m site — the map
+    lands about 2x off and the model visibly jumps size at the moment of the Go-to.
+  - It breaks the same promise Task 517 enforced everywhere else — *nothing you do to the map moves
+    the model* — which is why it is worth doing rather than tolerating.
+  - **Needs a spec of its own first.** `dev/browser-pass/specs/goto.js` drives the dialog but asserts
+    nothing about the resulting scale, and the fix is a behaviour change: do not land it bare.
 
 - 75|514| **Two different units both labelled "Pressure", both on screen at once.**
   Found 2026-08-24 in screenshot 0026 while narrating the drop, and it is an ENGLISH defect, not a

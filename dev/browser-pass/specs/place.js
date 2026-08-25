@@ -99,7 +99,15 @@ async function modelBox(a) {
 //   NOT that latitude, which is the trap this replaces.
 async function modelLatSpan(a) {
 	return a.page.evaluate(() => {
-		const ys = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')].map(e => +e.getAttribute('cy'));
+		// **FILTERED TO ELEMENTS THAT REALLY CARRY `cy`.** TWO groups wear `lpn-symbols`
+		// (js/looped-network.js: linksLayer and nodesLayer), and a link's children are polylines with
+		// no `cy` at all -- `+null` is 0, so every pipe would report itself drawn on the equator and
+		// quietly become the max or the min. It does not bite on today's fixture, which is three
+		// circles and no drawn links, and that is exactly why it is worth closing: every derivation
+		// below reads top/bot/mid/span, and the day this fixture gains a link they would all go
+		// wrong together, silently, and look like a defect in the settle. Found by /code-review.
+		const ys = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')]
+			.filter(e => e.hasAttribute('cy')).map(e => +e.getAttribute('cy'));
 		const G = window.EngCalcs.lpnGeom;
 		const top = G.mercLat(-Math.min(...ys)), bot = G.mercLat(-Math.max(...ys));
 		return { top, bot, mid: (top + bot) / 2, span: top - bot,
@@ -327,67 +335,80 @@ exports.run = async function ({ browser, report }) {
 		await wheelIn(a, 8);
 		await panBy(a, 140, 90);
 		const m1 = await modelBox(a), v1 = await viewTransform(a), ls1 = await modelLatSpan(a);
-		report.ok(Math.abs(m1.cx - m0.cx) < 2 && Math.abs(m1.cy - m0.cy) < 2,
-			'the model stays exactly where it is on the screen while the map is panned and zoomed',
-			`centre moved ${(m1.cx - m0.cx).toFixed(2)}, ${(m1.cy - m0.cy).toFixed(2)} px`);
+		// **THE TWO AXES ARE DIFFERENT CLAIMS AND ARE ASSERTED SEPARATELY** (ROADMAP Task 517). x is
+		// exactly linear in longitude, so the horizontal centre does not move AT ALL — sub-pixel,
+		// not "within a couple of pixels".
+		report.ok(Math.abs(m1.cx - m0.cx) < 0.5,
+			'the model stays exactly where it is on the screen, horizontally, while the map moves',
+			`centre moved ${(m1.cx - m0.cx).toFixed(2)} px`);
 
-		// **WHAT THE SETTLE ACTUALLY HOLDS IS THE MODEL'S LATITUDE SPAN**, scaled by the zoom.
-		// georefReproject() sets metersPerUnit = mpu·(s0/s1)·(mpd1.lat/mpd0.lat), and a tangent
-		// plane's latitude extent is (north metres)/mpd.lat, so the two mpd.lat cancel and the
-		// span comes out multiplied by s0/s1 and by nothing else. That is the invariant, stated
-		// as arithmetic rather than as a screen measurement, so it says which axis the code holds.
+		// **VERTICALLY IT MOVES A LITTLE, AND THE AMOUNT IS DERIVED RATHER THAN TOLERATED.** What the
+		// settle pins is the transform's ANCHOR; the model's bounding-box centre is a different
+		// point, and this fixture spans forty-two degrees of latitude, over which mercY is strongly
+		// non-linear. So the box centre genuinely shifts relative to the anchor as the model travels,
+		// and a plain "< 2 px" was a tolerance standing in for arithmetic nobody had done — it passed
+		// at 1.82 px before Task 517 and would have failed at 2.30 px after it, on a change that
+		// made the WIDTH exact.
+		//
+		// Predicted straight from the page's own transform and its own drawn latitudes: screen y is
+		// s·(−mercY(lat)) + ty, and the box centre is the mean over top and bottom. The symbol radius
+		// cancels in a mean of two extremes, and the viewport-to-canvas offset cancels in the
+		// difference, so this compares two numbers that are each fully determined.
+		const predDcy = await a.page.evaluate(([t0, b0, s0, ty0, t1, b1, s1, ty1]) => {
+			const G = window.EngCalcs.lpnGeom;
+			const mid = (t, b) => -(G.mercY(t) + G.mercY(b)) / 2;
+			return (mid(t1, b1) * s1 + ty1) - (mid(t0, b0) * s0 + ty0);
+		}, [ls0.top, ls0.bot, v0.s, v0.ty, ls1.top, ls1.bot, v1.s, v1.ty]);
+		report.ok(Math.abs((m1.cy - m0.cy) - predDcy) < 1,
+			'...and vertically by exactly what Mercator moves its box centre, no more',
+			`moved ${(m1.cy - m0.cy).toFixed(2)} px for a predicted ${predDcy.toFixed(2)} px`);
+
+		// **WHAT THE SETTLE HOLDS IS THE MODEL'S SCREEN BOX** (ROADMAP Task 517, which fixed it).
+		// georefReproject() sets metersPerUnit = mpu·(s0/s1)·(mpd1.lon/mpd0.lon). Screen width is
+		// s·dx·mpu/mpd.lon, so every factor cancels and the width comes back EXACTLY 1 — no
+		// tolerance for latitude in it at all.
+		//
+		// It held the model's LATITUDE SPAN until Task 517 (`mpd.lat`), which was the same sentence
+		// while the display was unprojected and stopped being one at Task 145's projection seam. The
+		// model then changed size at every settle as it travelled north or south, and this spec
+		// measured it doing so: 199.7 → 210.4 px in this very gesture.
 		const zoomRatio = v0.s / v1.s;
-		report.ok(Math.abs((ls1.span / ls0.span) / zoomRatio - 1) < 0.01,
-			'...holding the model\'s LATITUDE span, scaled by the zoom — the settle\'s real invariant',
-			`${ls0.span.toFixed(4)}° -> ${ls1.span.toFixed(4)}° for a predicted ${(ls0.span * zoomRatio).toFixed(4)}°`);
+		report.ok(Math.abs(m1.w / m0.w - 1) < 0.01,
+			'...at ONE SCREEN WIDTH, exactly — the settle\'s real invariant, and step 1\'s promise',
+			`${m0.w.toFixed(1)} → ${m1.w.toFixed(1)} px, x${(m1.w / m0.w).toFixed(4)}`);
 
-		// **DEFECT (found by ROADMAP Task 511; the fix is a one-token change and needs its own ID).**
+		// The latitude span is now the quantity that MOVES, and saying so keeps the two invariants
+		// from being confused again: it goes as the zoom times k·cos(lat), because holding the
+		// screen box across a change of latitude is exactly what makes the ground span change.
+		const latPred = await a.page.evaluate(([p, q]) => {
+			const f = (lat) => {
+				const m = EngCalcs.lpnGeorefMetersPerDegree(lat);
+				return m.lon / m.lat;
+			};
+			return f(q) / f(p);
+		}, [ls0.mid, ls1.mid]);
+		report.ok(Math.abs((ls1.span / ls0.span) / (zoomRatio * latPred) - 1) < 0.01,
+			'...so the LATITUDE span is what gives, by the zoom and the map\'s own stretch',
+			`${ls0.span.toFixed(4)}° → ${ls1.span.toFixed(4)}° for a predicted ${(ls0.span * zoomRatio * latPred).toFixed(4)}°`);
+
+		// **THE HEIGHT IS PREDICTED FROM THE REAL MERCATOR SPAN, NOT FROM A LOCAL DERIVATIVE.**
+		// The tempting derivation is s·dy·mpu/(mpd.lat·cos lat), which leaves a neat k1/k0 residual —
+		// and it is WRONG HERE, by 2.2%, because it linearises dmercY/dlat = 1/cos(lat) about a point
+		// while this fixture spans FORTY-TWO DEGREES of latitude. Over a span that size mercY is not
+		// remotely linear, so the honest prediction takes the mercY difference across the model's
+		// actual top and bottom, which is what the screen height physically is.
 		//
-		// Holding the LATITUDE span held the SCREEN box only while the display was unprojected —
-		// screen y was the latitude, so span×s was the height and the two invariants were the same
-		// sentence. Since Task 145 the drawing frame is Web Mercator: y is mercY(lat), in degrees of
-		// LONGITUDE. Holding Δlat therefore no longer holds the height, and the model changes size
-		// at every settle as it travels north or south — 199.7 → 210.4 px in this very gesture,
-		// which is the step's own promise ("nothing the user does to the map moves the model")
-		// failing on the axis the centre check cannot see.
-		//
-		// The right invariant under a conformal projection is the model's SCREEN box, and x is
-		// exactly linear in longitude, so it is reached by scaling on mpd.lon instead:
-		//   js/looped-network.js georefReproject() -- `mpd1.lat / mpd0.lat` should be
-		//   `mpd1.lon / mpd0.lon`. That holds the width exactly and the height to within Mercator's
-		//   own conformality, and it is what makes the ground the user aimed at stay under the model.
-		//
-		// Pinned rather than left red (README, "Reading a line that says DEFECT"), and pinned as a
-		// DERIVATION rather than as the observed number: the predicted height ratio is computed from
-		// the PREDICTED latitude span, so a fix to georefReproject() breaks this line.
+		// Fed the PREDICTED latitude span rather than the measured one, so this stays a derivation:
+		// if the settle stopped holding the screen box, this line would have to move too.
 		const predH = await a.page.evaluate(([mid0, sp0, mid1, sp1, s0, s1]) => {
 			const G = window.EngCalcs.lpnGeom;
 			const merc = (mid, sp) => G.mercY(mid + sp / 2) - G.mercY(mid - sp / 2);
 			return (merc(mid1, sp1) * s1) / (merc(mid0, sp0) * s0);
-		}, [ls0.mid, ls0.span, ls1.mid, ls0.span * zoomRatio, v0.s, v1.s]);
+		}, [ls0.mid, ls0.span, ls1.mid, ls0.span * zoomRatio * latPred, v0.s, v1.s]);
 		report.ok(Math.abs((m1.h / m0.h) / predH - 1) < 0.01,
-			'DEFECT: it does NOT hold at one screen height — Mercator makes those two different things',
-			`${m0.h.toFixed(1)} -> ${m1.h.toFixed(1)} px, x${(m1.h / m0.h).toFixed(4)} for a predicted x${predH.toFixed(4)}`);
+			'...and at the screen height Mercator really gives that span at that latitude',
+			`x${(m1.h / m0.h).toFixed(5)} for a predicted x${predH.toFixed(5)} from ${ls0.mid.toFixed(2)}° to ${ls1.mid.toFixed(2)}°`);
 
-		// **DEFECT, the same one on the other axis.** The width changes by the ratio of the map's
-		// east-west stretch at the two ANCHOR latitudes — mpd.lat/mpd.lon, evaluated where
-		// georefReproject() evaluates it. Under the mpd.lon settle above this ratio would be
-		// exactly 1 and the model would not change width at all.
-		//
-		// The latitudes are the transform's own (modelLatSpan().mid). Read as raw `cy` — which is
-		// what this check did until Task 511 — they were mercY values, 22.3 and 31.8 standing in for
-		// real latitudes of 19.9 and 29.7, and the prediction came out 1.090 against a true 1.083.
-		// It passed on a 2% tolerance while being wrong about which two latitudes it was naming.
-		const stretch = await a.page.evaluate(([p, q]) => {
-			const r = (lat) => {
-				const m = EngCalcs.lpnGeorefMetersPerDegree(lat);
-				return m.lat / m.lon;
-			};
-			return r(q) / r(p);
-		}, [ls0.mid, ls1.mid]);
-		report.ok(Math.abs((m1.w / m0.w) / stretch - 1) < 0.01,
-			'DEFECT: and its width slides by the east-west stretch, which a Mercator settle would hold at 1',
-			`x${(m1.w / m0.w).toFixed(4)} for a predicted x${stretch.toFixed(4)} from ${ls0.mid.toFixed(2)}° to ${ls1.mid.toFixed(2)}°`);
 		report.ok(v1 && v1.s > v0.s * 2 && (v1.tx !== v0.tx || v1.ty !== v0.ty),
 			'...and the MAP really did move underneath it — that is the point of the step',
 			v1 && `${v0.s.toFixed(2)} -> ${v1.s.toFixed(2)} px/deg`);

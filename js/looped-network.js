@@ -5895,14 +5895,19 @@ var EngCalcs = EngCalcs || {};
 		if (!v) { return null; }
 		var w = (svg && svg.clientWidth) || 1000, h = (svg && svg.clientHeight) || 1000,
 			spanUnits = Math.max(b.maxX - b.minX, b.maxY - b.minY) || 1,
-			// Degrees of latitude one drawing unit should occupy on the screen right now...
+			// DRAWING-FRAME degrees one drawing unit should occupy on the screen right now...
 			degPerUnit = (Math.min(w, h) * GEOREF_START_FRACTION / spanUnits) / (state.s || 1),
 			mpd = EngCalcs.lpnGeorefMetersPerDegree(outwardY(v.cy));
 		return {
 			anchor: { x: c.x, y: c.y },
 			origin: { lon: outwardX(v.cx), lat: outwardY(v.cy) },
-			// ...and the metres that is, which is the number the tool is really hunting for.
-			metersPerUnit: degPerUnit * mpd.lat,
+			// ...and the metres that is. **mpd.lon, because a DRAWING-FRAME degree is a degree of
+			// LONGITUDE** (Task 145's seam: Mercator x IS longitude, and y shares its unit).
+			// This said mpd.lat until Task 517, which is a degree of LATITUDE and made the model's
+			// first placement 1/cos(lat) too big. The reachable error was 6.4%, not the 27% a reading
+			// at 38 N suggests: the one caller forces the view to GEOREF_WORLD_LAT (20) immediately
+			// before calling, so no other latitude is ever in play here.
+			metersPerUnit: degPerUnit * mpd.lon,
 			rotDeg: georef.rotDeg || 0
 		};
 	}
@@ -5934,10 +5939,20 @@ var EngCalcs = EngCalcs || {};
 	// SCREEN; this asks the new view what that screen point is on the Earth, and how many metres a
 	// drawing unit now covers, and re-derives every coordinate from `georef.src` once.
 	//
-	// The vertical is preserved exactly (a degree of latitude is the honest axis, and mpd.lat barely
-	// moves), so the picture only changes shape when the user has travelled far enough north or
-	// south to change the map's own east-west stretch -- which is the projection seam, showing
-	// itself where it belongs.
+	// **THE INVARIANT IS THE MODEL'S SCREEN BOX, and mpd.lon is what reaches it** (Task 517). Drawing
+	// x is exactly linear in longitude, so scaling metersPerUnit by mpd1.lon/mpd0.lon holds the
+	// width EXACTLY across a settle. The HEIGHT follows, but not to any fixed small number: mercY is
+	// only locally linear, so a model spanning a few kilometres keeps its height to a fraction of a
+	// percent while one spanning tens of degrees of latitude legitimately changes height by several
+	// percent as it travels. dev/browser-pass/specs/place.js predicts it from the full mercY
+	// difference for that reason, and measured 2.2% against the linearised form on a 42-degree
+	// fixture.
+	//
+	// It scaled on mpd.lat until Task 517, which held the model's LATITUDE SPAN instead. Those were
+	// the same sentence while the display was unprojected -- screen y WAS the latitude -- and Task
+	// 145 made them different: the model then changed size at every settle as it travelled north or
+	// south, 199.7 -> 210.4 px in one measured gesture, breaking step 1's own promise that nothing
+	// the user does to the map moves the model.
 	function georefReproject() {
 		georefSettleTimer = null;
 		if (!georefDetached() || !georef.t || !georef.frozen) { return; }
@@ -5955,7 +5970,7 @@ var EngCalcs = EngCalcs || {};
 		georefSetTransform({
 			anchor: { x: t0.anchor.x, y: t0.anchor.y },
 			origin: origin,
-			metersPerUnit: t0.metersPerUnit * r * (mpd1.lat / mpd0.lat),
+			metersPerUnit: t0.metersPerUnit * r * (mpd1.lon / mpd0.lon),
 			rotDeg: t0.rotDeg
 		});
 		georefApplyCompensation();
@@ -5984,11 +5999,18 @@ var EngCalcs = EngCalcs || {};
 	var GEOREF_ROTATE_MIN_PX = 34;
 	function georefRotateHandleSrc() {
 		var b = georefSrcBounds(), h = (b.maxY - b.minY) || (b.maxX - b.minX) || 1;
-		// Screen pixels -> doc units: divide out the map scale, then the metres-per-unit the
-		// transform is carrying, since a doc unit is not a pixel.
+		// Screen pixels -> doc units: divide out the map scale, turn the drawing degrees that leaves
+		// into ground metres, then divide by the metres-per-unit the transform is carrying.
+		//
+		// **THE MIDDLE STEP IS mpd.lon, AND IT USED TO BE DEG_PER_M** (ROADMAP Task 517, found by
+		// /code-review). `DEG_PER_M` is 1/111132, a degree of LATITUDE in metres, which was the right
+		// conversion while screen y was the latitude; since Task 145 a drawing degree is a degree of
+		// LONGITUDE, so the standoff came out 1/cos(lat) too far -- 30% at 40 N, 2x at 60 N -- wherever
+		// the GEOREF_ROTATE_MIN_PX floor bound rather than the proportional gap.
 		var mpu = (georef && georef.t && georef.t.metersPerUnit) || 1,
 			degPerPx = 1 / (state.s || 1),
-			minSrc = degPerPx * (GEOREF_ROTATE_MIN_PX) / Math.max(1e-9, (mpu * DEG_PER_M));
+			mpdLon = EngCalcs.lpnGeorefMetersPerDegree((georef.t && georef.t.origin.lat) || 0).lon,
+			minSrc = degPerPx * (GEOREF_ROTATE_MIN_PX) * mpdLon / Math.max(1e-9, mpu);
 		return { x: (b.minX + b.maxX) / 2, y: b.maxY + Math.max(h * GEOREF_ROTATE_GAP, minSrc) };
 	}
 
