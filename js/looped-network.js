@@ -3516,12 +3516,12 @@ var EngCalcs = EngCalcs || {};
 	// menu so nobody has to learn a second vocabulary. Display NAMES come from
 	// nodeFieldDefs()/linkFieldDefs(), the strings the Labels popover and the map legend use, so a
 	// colour key and a label key can never disagree about what a field is called.
-	// INPUT units for the typed fields, RESULT units for the solved ones (Task 422). `elev`, `demand`
-	// and `diameter` are what the user entered; everything else came out of the solver.
+	// ONE SET OF UNITS (Task 522): a typed elevation and a solved head are read in the same unit,
+	// so `elev` and `head` name the same selector and cannot drift apart.
 	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow',
-		head: 'lpn_u_r_elevhead', pressure: 'lpn_u_r_pressure' };
-	var COLOR_LINK_FIELDS = { diameter: 'lpn_u_diameter', roughness: '', flow: 'lpn_u_r_flow',
-		velocity: 'lpn_u_velocity', headloss: 'lpn_u_r_elevhead', gradient: 'lpn_u_gradient' };
+		head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure' };
+	var COLOR_LINK_FIELDS = { diameter: 'lpn_u_diameter', roughness: '', flow: 'lpn_u_flow',
+		velocity: 'lpn_u_velocity', headloss: 'lpn_u_elevhead', gradient: 'lpn_u_gradient' };
 	// The value a node/link is coloured by, IN THE DISPLAYED UNIT -- the same expressions
 	// refreshLabelText() prints, so the colour and the printed number can never describe different
 	// quantities. undefined means "this element has no such value" (no solve yet, or the field does
@@ -15034,7 +15034,7 @@ var EngCalcs = EngCalcs || {};
 		// After wirePane(), because the observer needs the chart's host to be in its final place in
 		// the pane before it starts reporting sizes.
 		profileResizeWatch();
-		wireUnitGroups();
+		wireUnitSelects();
 		var opening = initLibrary(), bornClean = false;
 		if (opening) {
 			applySaved(opening);
@@ -15978,62 +15978,44 @@ var EngCalcs = EngCalcs || {};
 	// no established real-world scale until Task 145's backdrop registration.
 	// By [name=], not getElementById: echoUnitSelect() emits name= only, never id=.
 	function unitEl(name) { return document.querySelector('select[name="' + name + '"]'); }
-	// The seven selectors this page owns, in one list, so reading and restoring a project's units
-	// cannot drift out of step with each other or with Looped-Network.php's units strip.
-	// ---- INPUT UNITS AND RESULT UNITS ARE TWO GROUPS (ROADMAP Task 422) --------------------------
+	// ---- ONE SET OF UNITS, NOT AN INPUT SET AND A RESULT SET (ROADMAP Task 522) -----------------
 	//
-	// Tom, 2026-08-18, having watched a flow unit switch turn 6,104 gpm into 1,338 cfs on Net3:
-	// *"split (duplicate) units selectors into a group serving inputs and a group serving results.
-	// The group serving results can be changed without fanfare. The group serving inputs simply gets
-	// a warning... Splitting the inputs is much more satisfactory."*
+	// Tom, 2026-08-24, reversing Task 422's split: *"I think it's our design mistake, and we
+	// shouldn't allow them to be independent or to diverge. We shouldn't have separate input and
+	// output units."*
 	//
-	// **THE TWO GROUPS DO DIFFERENT KINDS OF WORK, and that is the whole justification.** A RESULT
-	// unit is pure display: the solve is unchanged and 6,104 gpm really is 13.60 cfs, so it may be
-	// changed with no fanfare at all. An INPUT unit decides what the numbers in the document MEAN --
-	// changing it is a model change wearing a display control's clothes, which is why it is the one
-	// that asks.
+	// **THE ARGUMENT IS THAT A DESIGN WHERE TWO CONTROLS MAY LEGITIMATELY DISAGREE GIVES A DEFECT
+	// SOMEWHERE TO HIDE.** Task 521's bug -- the map status strip naming the page's boot units rather
+	// than the project's -- was read as two Pressure selects honestly showing two different settings
+	// -- confidently, and wrong. A screenshot showed both reading `psi`. With one selector per
+	// quantity there is no such reading available: a number in a unit the strip does not name is a
+	// bug, always, and says so on sight.
 	//
-	// Three quantities serve both sides and are therefore DUPLICATED: flow (a demand and a solved
-	// flow), elevation/head (an elevation and a solved head), pressure (a valve setting and a solved
-	// pressure). Diameter, length and roughness are inputs only; velocity and gradient are results
-	// only, and keep their names because they were never anything else.
+	// **"ONE SET" IS NOT A STRAIGHT MERGE.** Velocity and gradient are results-only and always were,
+	// so the set is the old input set PLUS those two. `lpn_u_roughness` is in the list although it is
+	// rendered in its own span and shown only under Darcy-Weisbach -- it decides what a typed
+	// roughness means, so it belongs here whatever its visibility, and being absent from this list
+	// was why a project never stored one (dev/inp-export-conversion-bug.md), which this merge ends.
 	//
-	// **THE INPUT GROUP KEEPS THE ORIGINAL KEY NAMES**, so every project ever saved still says what
-	// its numbers mean and nothing migrates. The result keys are additive and default to their input
-	// twin, so a file written before today opens reading results exactly as it did.
-	var LPN_UNIT_SELECTS = ['lpn_u_length', 'lpn_u_elevhead', 'lpn_u_pressure', 'lpn_u_diameter',
-		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient',
-		'lpn_u_r_elevhead', 'lpn_u_r_pressure', 'lpn_u_r_flow'];
-	// The INPUT selectors, in strip order. `lpn_u_roughness` is here although it is rendered in its
-	// own span and shown only under Darcy-Weisbach -- it decides what a typed roughness means, so it
-	// belongs to this group whatever its visibility.
-	var LPN_INPUT_SELECTS = ['lpn_u_length', 'lpn_u_diameter', 'lpn_u_roughness',
-		'lpn_u_elevhead', 'lpn_u_pressure', 'lpn_u_flow'];
-	// A RESULT's unit, by quantity. **Every conversion of a SOLVED number goes through this**, so a
-	// site that reads results in an input unit is a site that did not call it -- which is greppable,
-	// where a bare string is not.
-	var LPN_RESULT_UNIT = {
-		elevhead: 'lpn_u_r_elevhead', pressure: 'lpn_u_r_pressure', flow: 'lpn_u_r_flow',
-		velocity: 'lpn_u_velocity', gradient: 'lpn_u_gradient'
-	};
-	// Result key -> the input key it duplicates. Read by BOTH fallbacks below.
-	var LPN_RESULT_TWIN = {
+	// In strip order, which is Looped-Network.php's order.
+	var LPN_UNIT_SELECTS = ['lpn_u_length', 'lpn_u_diameter', 'lpn_u_elevhead', 'lpn_u_pressure',
+		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_roughness'];
+	// **THE OLD RESULT KEYS, KEPT ONLY TO BE READ OUT OF AN OLD FILE.** Written by no code path;
+	// this map exists so reconcileLegacyUnits() below can name them, and for nothing else.
+	var LPN_LEGACY_RESULT_KEYS = {
 		lpn_u_r_elevhead: 'lpn_u_elevhead',
 		lpn_u_r_pressure: 'lpn_u_pressure',
 		lpn_u_r_flow: 'lpn_u_flow'
 	};
-	// **A MISSING RESULT SELECT FALLS BACK TO ITS INPUT TWIN.** The twin rule is stated twice on
-	// purpose, at the two moments it can be needed: fillResultUnitDefaults() covers a FILE written
-	// before the split, and this covers a PAGE without the selects -- every harness stub, and the
-	// brief moment during boot before the strip is adopted. Without it a result reads through a
-	// select that is not there, `unitFactor()` answers 1, and a flow prints in m3/s: a silent,
-	// plausible, hundredfold-wrong number.
-	function resultUnit(q) {
-		var name = LPN_RESULT_UNIT[q];
-		if (!name) { return name; }
-		if (unitEl(name)) { return name; }
-		return LPN_RESULT_TWIN[name] || name;
-	}
+	// A RESULT's unit, by quantity. **Every conversion of a SOLVED number goes through this**, so a
+	// site that reads a result is greppable where a bare string is not. It now names the same
+	// selector the typed value uses, which IS Task 522 -- the indirection stays because it keeps
+	// "which unit is this answer in?" a question with one answer, in one place.
+	var LPN_RESULT_UNIT = {
+		elevhead: 'lpn_u_elevhead', pressure: 'lpn_u_pressure', flow: 'lpn_u_flow',
+		velocity: 'lpn_u_velocity', gradient: 'lpn_u_gradient'
+	};
+	function resultUnit(q) { return LPN_RESULT_UNIT[q]; }
 	// {selectName: unitKey}, e.g. {lpn_u_diameter: 'in'}. Stored by KEY, never by factor: a factor is
 	// a number whose meaning depends on a table that may be re-derived, while 'in' will mean inches
 	// forever. Since Task 390 that is also the <option>'s own value -- a unit's identity is its NAME
@@ -16079,21 +16061,39 @@ var EngCalcs = EngCalcs || {};
 	// recorded in unresolvedUnits, kept verbatim by readUnitSelections(), shown by unitLabel(), and
 	// it stops the solve.
 
-	// **A RESULT UNIT DEFAULTS TO ITS INPUT TWIN** (Task 422). Every project saved before the split
-	// records one flow unit, one head unit, one pressure unit -- the input ones, since those are what
-	// the numbers were in. Opening such a file must read its results exactly as it always did, so a
-	// missing result key is not a gap to fill with a preference: it is the input key, said once.
-	function fillResultUnitDefaults(units) {
+	// ---- OPENING A FILE THAT CARRIES BOTH MAPS (ROADMAP Task 522) -------------------------------
+	//
+	// **THIS IS THE WHOLE MIGRATION, AND IT IS ONE RULE IN ONE PLACE: THE INPUT UNIT WINS.**
+	//
+	// Three kinds of file exist. Before Task 422 a project named input keys only. Between Task 422
+	// and Task 522 it named both, and the two were allowed to disagree. From now on it names one set.
+	// All three open with no question asked, because the rule needs nothing from the user:
+	//
+	//   input key present -> it is the answer, and the `lpn_u_r_*` beside it is dropped.
+	//   input key absent   -> the legacy result key stands in, rather than the unit being lost.
+	//
+	// **WHY THE INPUT KEY AND NOT THE RESULT KEY, WHERE THEY DISAGREE.** The input unit says what the
+	// numbers stored in the file MEAN; the result unit only said how answers were printed. Taking the
+	// result unit would silently reinterpret every elevation, demand and setting in the document --
+	// the failure CLAUDE.md marks absolute -- while taking the input unit costs at most a display
+	// preference the user can change back in one click, on a strip that is right in front of them.
+	// A wrong reading is visible; a reinterpreted model is not.
+	//
+	// Mutates the map it is given, which is a COPY read out of the file rather than the file itself;
+	// the file on disk is untouched until the user saves.
+	function reconcileLegacyUnits(units) {
 		var name;
 		if (!units) { return units; }
-		for (name in LPN_RESULT_TWIN) {
-			if (!Object.prototype.hasOwnProperty.call(LPN_RESULT_TWIN, name)) { continue; }
-			if (!units[name] && units[LPN_RESULT_TWIN[name]]) { units[name] = units[LPN_RESULT_TWIN[name]]; }
+		for (name in LPN_LEGACY_RESULT_KEYS) {
+			if (!Object.prototype.hasOwnProperty.call(LPN_LEGACY_RESULT_KEYS, name)) { continue; }
+			if (!units[name]) { continue; }
+			if (!units[LPN_LEGACY_RESULT_KEYS[name]]) { units[LPN_LEGACY_RESULT_KEYS[name]] = units[name]; }
+			delete units[name];
 		}
 		return units;
 	}
 	function applyUnitSelections(units) {
-		fillResultUnitDefaults(units);
+		reconcileLegacyUnits(units);
 		// Cleared unconditionally, INCLUDING on the early return: this function is the one place a
 		// document's units are installed, so it owns the whole of that state. Clearing only in the
 		// matched branch would leave one document's unknown unit refusing to solve the next one.
@@ -16118,11 +16118,14 @@ var EngCalcs = EngCalcs || {};
 		});
 		return changed;
 	}
-	// ---- CHANGING AN INPUT UNIT ASKS FIRST (ROADMAP Task 422) ------------------------------------
+	// ---- CHANGING A UNIT THAT DECIDES SOMETHING ASKS FIRST (Task 422, narrowed by Task 522) ------
 	//
-	// A RESULT unit is pure display and changes with no fanfare. An INPUT unit decides what the
-	// numbers in the document MEAN, so it gets the question Tom asked for: reinterpret them, or
-	// convert them.
+	// A unit that decides what stored numbers MEAN gets the question Tom asked for: reinterpret them,
+	// or convert them. With one set of selectors that is no longer a property of WHICH GROUP a
+	// selector is in -- it is a property of whether this document holds a number that unit decides,
+	// which unitChangeNeedsDialog() already measured exactly (Task 425). So every selector goes
+	// through the same handler and velocity and gradient simply never have anything to count, which
+	// is why they still change with no fanfare without anybody maintaining a list saying so.
 	//
 	// **REINTERPRET IS THE DEFAULT AND THE STANDING RULE** ("1 becomes 1 ft instead of 1 m"); Convert
 	// exists only because he asked for a control, and only as a button somebody presses. Nothing here
@@ -16134,7 +16137,7 @@ var EngCalcs = EngCalcs || {};
 	// before anything acts on it -- and lets the select be put back if the user cancels.
 	var unitPrev = {};
 	function rememberUnitSelections() {
-		LPN_INPUT_SELECTS.forEach(function (n) {
+		LPN_UNIT_SELECTS.forEach(function (n) {
 			var k = unitKey(n);
 			if (k) { unitPrev[n] = k; }
 		});
@@ -16308,7 +16311,7 @@ var EngCalcs = EngCalcs || {};
 			body.appendChild(d);
 		});
 	}
-	function onInputUnitChange(sel, name) {
+	function onUnitChange(sel, name) {
 		var pc = EngCalcs.pageConfig || {}, from = unitPrev[name], to = unitKey(name);
 		if (!from || !to || from === to) { rememberUnitSelections(); return; }
 		if (!unitChangeNeedsDialog(name)) {
@@ -16391,14 +16394,14 @@ var EngCalcs = EngCalcs || {};
 		refreshAllFromDocument();
 		saveToStorage();
 	}
-	function wireUnitGroups() {
+	function wireUnitSelects() {
 		rememberUnitSelections();
 		document.addEventListener('change', function (e) {
 			var t = e.target, name = t && t.name;
-			if (!name || LPN_INPUT_SELECTS.indexOf(name) < 0) { return; }
+			if (!name || LPN_UNIT_SELECTS.indexOf(name) < 0) { return; }
 			if (e.stopPropagation) { e.stopPropagation(); }
 			if (e.preventDefault) { e.preventDefault(); }
-			onInputUnitChange(t, name);
+			onUnitChange(t, name);
 		}, true);
 	}
 	// Task 390: the select's value IS the unit's key ('in'), and the factor is a lookup from it

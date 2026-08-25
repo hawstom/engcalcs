@@ -1,10 +1,10 @@
 // THE UNIT-CHANGE DIALOG FOR A PROJECT THAT ALREADY HAS CONTENT -- ROADMAP Task 425. Run with:
 //   node dev/lpn-spike/unit-change-harness.js
 //
-// WHY THIS EXISTS, AND WHY IT IS NOT unit-split-harness.js. That harness proves the two GROUPS are
-// independent and that convertUnitValues() rewrites the right numbers. This one is about the
-// QUESTION: what a user is asked when an input unit changes under a network they have already
-// typed, and what each of the three answers does to the document.
+// WHY THIS EXISTS, AND WHY IT IS NOT unit-set-harness.js. That harness proves there is ONE set of
+// units and that convertUnitValues() rewrites the right numbers. This one is about the QUESTION:
+// what a user is asked when a unit changes under a network they have already typed, and what each
+// of the three answers does to the document.
 //
 // The four claims, and what each failure looks like on the page:
 //
@@ -28,10 +28,10 @@ const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getScenarios: function () { return scenarios; },\n" +
 	"\t\taddNode: addNode, addLink: addLink, setProp: setProp, buildDom: buildDom,\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
-	"\t\tonInputUnitChange: onInputUnitChange, remember: rememberUnitSelections,\n" +
+	"\t\tonUnitChange: onUnitChange, remember: rememberUnitSelections,\n" +
 	"\t\tapplyUnitSelections: applyUnitSelections, readUnitSelections: readUnitSelections,\n" +
 	"\t\tunitKey: unitKey, undo: undo, undoDepth: function () { return undoStack.length; },\n" +
-	"\t\tINPUTS: LPN_INPUT_SELECTS,\n" +
+	"\t\tINPUTS: LPN_UNIT_SELECTS,\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
 	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 };\n" +
@@ -55,8 +55,8 @@ byId.lpn_toolbar.querySelectorAll = () => [];
 setUnitSet('us');
 
 // ---- driving the page the way a hand does -------------------------------------------------------
-// A user picks a new option and the browser fires `change`; wireUnitGroups() catches it in the
-// capture phase and calls onInputUnitChange(). init() never runs in a harness, so the select is
+// A user picks a new option and the browser fires `change`; wireUnitSelects() catches it in the
+// capture phase and calls onUnitChange(). init() never runs in a harness, so the select is
 // moved and the handler called directly -- the same two steps, in the same order.
 function pickUnit(name, key) {
 	const sel = unitSelects[name];
@@ -65,7 +65,7 @@ function pickUnit(name, key) {
 	byId.lpn_dialog_body.children.length = 0;
 	byId.lpn_dialog_buttons.children.length = 0;
 	sel.selectedIndex = i;
-	L.onInputUnitChange(sel, name);
+	L.onUnitChange(sel, name);
 }
 // The dialog as a reader meets it: one line per element, which is exactly the property claim 4 is
 // about, so the reader and the assertion cannot disagree.
@@ -88,7 +88,7 @@ function buildNetwork() {
 	L.reset();
 	L.setCanvas(800, 600);
 	L.applyUnitSelections({ lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o',
-		lpn_u_pressure: 'psi', lpn_u_flow: 'gpm', lpn_u_r_flow: 'gpm' });
+		lpn_u_pressure: 'psi', lpn_u_flow: 'gpm' });
 	L.remember();
 	const r = L.addNode('reservoir', 0, 0), j = L.addNode('junction', 100, 0);
 	const pipe = L.addLink('pipe', r.id, j.id);
@@ -242,7 +242,7 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	press('Cancel');
 
 	// A scenario override is a value in the same unit as the property it overrides, so it converts
-	// with Base -- and comes back with Base. unit-split-harness.js proves the conversion; what is
+	// with Base -- and comes back with Base. unit-set-harness.js proves the conversion; what is
 	// checked here is that the UNDO reaches it too, which is the half a snapshot can silently miss.
 	const net2 = buildNetwork();
 	L.getScenarios().push({ id: 's1', name: 'Fire flow', overrides: { ['link:' + net2.pipe.id]: { length: 800 } } });

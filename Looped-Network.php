@@ -89,16 +89,20 @@ echoHeader("EngCalcs", $html_title, "", false);
 	      // this select is shown only under Darcy-Weisbach. It is server-rendered like every other
 	      // one so it keeps its unit family and is visible to the us/si preset buttons; hiding it
 	      // is a display decision made later, in applyMethodUI(). ?>
-	<?php // **TWO GROUPS, AND THE HEADINGS ARE THE POINT** (ROADMAP Task 422, Tom 2026-08-18). The
-	      // top row decides what the numbers in the DOCUMENT mean -- changing one is a model change,
-	      // and js/looped-network.js asks before it happens. The bottom row is pure display: the
-	      // solve is untouched, so it changes with no fanfare.
+	<?php // **ONE SET OF UNITS, NOT AN INPUT SET AND A RESULT SET** (ROADMAP Task 522, Tom 2026-08-24:
+	      // "we shouldn't allow them to be independent or to diverge"). Task 422 split this strip in
+	      // two, with flow, elevation/head and pressure appearing in both rows; changing one row's
+	      // Pressure while the other stayed put is a state a user cannot tell from a bug, and that is
+	      // exactly how Task 521's real bug was misread as a legitimate difference.
 	      //
-	      // Three quantities appear in BOTH rows because they genuinely serve both sides. That is a
-	      // duplication on purpose, not one to be tidied away: a demand and a solved flow are two
-	      // different numbers that happen to share a dimension. ?>
+	      // ONE SELECTOR PER QUANTITY, so a number is either in the unit this strip names or the page
+	      // is wrong. Velocity and gradient sit here because they always did -- they are results-only
+	      // and never had an input twin, which is why "one set" is the old input set PLUS two.
+	      //
+	      // No group heading now that there is one group: the Settings box already stands this block
+	      // under its own "Units" sub-heading, and a second identical word under it is noise. ?>
 	<?php // **EACH SELECTOR IS TWO LINES: THE NAME ABOVE, THE CONTROL BELOW** (ROADMAP Task 424, Tom
-	      // 2026-08-18, twice). Side by side, eleven name+select pairs make the widest thing in the
+	      // 2026-08-18, twice). Side by side, eight name+select pairs make the widest thing in the
 	      // Settings box by a distance, and the box then has to be as wide as the strip. Stacked, a
 	      // pair is as wide as the longer of its two halves instead of their sum, so the whole strip
 	      // wraps into a couple of tidy rows inside a sensible box.
@@ -108,22 +112,15 @@ echoHeader("EngCalcs", $html_title, "", false);
 	      // second click target for the select -- which on a narrow box means a stray tap opens a
 	      // dropdown the user was only reading. ?>
 	<div class="d-print-none" id="lpn_units_strip">
-		<div id="lpn_units_inputs" class="lpn-units-group">
-		<span class="lpn-units-head"><?=$ec_lang['lpn_units_group_inputs']?></span>
+		<div id="lpn_units_all" class="lpn-units-group">
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_length']?></span><?php echoUnitSelect('lpn_u_length', 'distance_site', ''); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_field_diameter']?></span><?php echoUnitSelect('lpn_u_diameter', 'distance_small', ''); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_elevhead']?></span><?php echoUnitSelect('lpn_u_elevhead', 'total_head', ''); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_pressure']?></span><?php echoUnitSelect('lpn_u_pressure', 'partial_head', ''); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_flow']?></span><?php echoUnitSelect('lpn_u_flow', 'flow_epanet', ''); ?></span>
-		<span class="lpn-units-item" id="lpn_u_roughness_row"><span class="lpn-units-name"><?=$ec_lang['lpn_field_roughness']?></span><?php echoUnitSelect('lpn_u_roughness', 'roughness', ''); ?></span>
-		</div>
-		<div id="lpn_units_results" class="lpn-units-group">
-		<span class="lpn-units-head"><?=$ec_lang['lpn_units_group_results']?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_head']?></span><?php echoUnitSelect('lpn_u_r_elevhead', 'total_head', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_pressure']?></span><?php echoUnitSelect('lpn_u_r_pressure', 'partial_head', ''); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_flow']?></span><?php echoUnitSelect('lpn_u_r_flow', 'flow_epanet', ''); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_velocity']?></span><?php echoUnitSelect('lpn_u_velocity', 'velocity', ''); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_gradient']?></span><?php echoUnitSelect('lpn_u_gradient', 'gradient', ''); ?></span>
+		<span class="lpn-units-item" id="lpn_u_roughness_row"><span class="lpn-units-name"><?=$ec_lang['lpn_field_roughness']?></span><?php echoUnitSelect('lpn_u_roughness', 'roughness', ''); ?></span>
 		</div>
 	</div><?php // #lpn_units_strip ?>
 	</div><?php // the flex wrapper ?>
@@ -910,8 +907,6 @@ EngCalcs.pageConfig = {
 	lpn_inp_drop_gpv_curve: <?=json_encode($ec_lang['lpn_inp_drop_gpv_curve'])?>,
 	lpn_gpv_curve_note: <?=json_encode($ec_lang['lpn_gpv_curve_note'])?>,
 	lpn_tool_color_tip: <?=json_encode($ec_lang["lpn_tool_color_tip"])?>,
-	lpn_units_group_inputs: <?=json_encode($ec_lang['lpn_units_group_inputs'])?>,
-	lpn_units_group_results: <?=json_encode($ec_lang['lpn_units_group_results'])?>,
 	lpn_units_warn_title: <?=json_encode($ec_lang['lpn_units_warn_title'])?>,
 	lpn_units_warn_lead: <?=json_encode($ec_lang['lpn_units_warn_lead'])?>,
 	lpn_units_options_head: <?=json_encode($ec_lang['lpn_units_options_head'])?>,
