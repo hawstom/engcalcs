@@ -83,8 +83,15 @@ the block.
     deep, zero node-on-node. `yieldStationedLabels()` hides the yielder; node placements are
     unchanged. Iterating the two passes instead also reaches zero and costs 3x.
     `dev/lpn-spike/node-yield-harness.js`.
-  - Placement leftovers, small: a background image is not carried onto the map, the two-control-point
-    path (`lpnGeorefFromTwoPoints`) is built and tested with no interface, and Finish is not undoable.
+  - **Placement leftovers: two of three done 2026-08-25.** A background image is now carried onto the
+    map with the drawing (it moves and resizes; a picture cannot TURN, and Finish says so), and Finish
+    is undoable — the snapshot is taken at `georefStart()` and pushed only on commit, so Ctrl+Z gives
+    back the exact grid the user opened. Every undo snapshot now carries `coords`/`basemap`, and the
+    VIEW is restored on the one undo that changes frame. `dev/lpn-spike/georef-carry-harness.js`.
+    **Left: `lpnGeorefFromTwoPoints` still has no interface, and the blocker is not the code.** Pick a
+    node, read a `lat, lon`, twice — but it needs a button on `#lpn_georef_bar` and about five new
+    strings, and the wording is Tom's. Also awaiting his wording: `lpn_georef_backdrop_unturned`,
+    shipping on its English fallback and listed in `popup-tips-harness.js`'s `PENDING_KEYS`.
   - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the
     map's own 1/cos(latitude) — 9% from 20° to 31°. Unavoidable on an unprojected display without an
     anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.

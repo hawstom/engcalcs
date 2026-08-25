@@ -267,8 +267,13 @@ console.log('\n--- one home for the concept ---');
 	// first draft called cartesianY() directly -- a fifth frame boundary, which is exactly the
 	// failure the cartesianY() count below exists to report. It does, immediately. Routed through
 	// the outward pair instead, so the boundary stays four functions wide.
-	ok('outwardX has one definition and sixteen call sites', count(/outwardX\(/g) === 17, count(/outwardX\(/g));
-	ok('outwardY has one definition and seventeen call sites', count(/outwardY\(/g) === 18, count(/outwardY\(/g));
+	// **TASK 436 ADDED ONE SITE TO EACH PAIR: THE BACKGROUND IMAGE.** The wizard now carries a
+	// backdrop onto the map with the drawing, and the picture's own position is a document
+	// coordinate like any other -- georefCaptureBackdrop() reads its centre OUTWARD and
+	// georefWriteBackdrop() plants it INWARD. It is the one such point eachStoredPoint() cannot
+	// reach on the LIVE document, so it is also the one that had to be spelled out here.
+	ok('outwardX has one definition and seventeen call sites', count(/outwardX\(/g) === 18, count(/outwardX\(/g));
+	ok('outwardY has one definition and eighteen call sites', count(/outwardY\(/g) === 19, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -285,8 +290,9 @@ console.log('\n--- one home for the concept ---');
 	// when a file's coordinates can be read as degrees, the wizard writes them back exactly as they
 	// came in -- captured OUTWARD, written INWARD -- so the numbers are the file's own bytes and a
 	// document with a local origin still lands where it belongs.
-	ok('inwardX has one definition and fifteen call sites', count(/inwardX\(/g) === 16, count(/inwardX\(/g));
-	ok('inwardY has one definition and sixteen call sites', count(/inwardY\(/g) === 17, count(/inwardY\(/g));
+	// ...and Task 436's backdrop is the other half of the same boundary, written INWARD.
+	ok('inwardX has one definition and sixteen call sites', count(/inwardX\(/g) === 17, count(/inwardX\(/g));
+	ok('inwardY has one definition and seventeen call sites', count(/inwardY\(/g) === 18, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

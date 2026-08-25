@@ -5910,6 +5910,73 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
+	// **THE BACKGROUND IMAGE COMES ALONG, AND eachStoredPoint() CANNOT REACH IT HERE.** Tom,
+	// 2026-08-24: *"it didn't occur to me that anybody would use a backdrop for a geographic
+	// project. They could."* A site plan behind the drawing is part of the picture being placed, so
+	// it moves with it. That iterator visits `o.backdrop.tx/ty` on a STORED document, but the live
+	// backdrop is a module variable and deliberately not in `doc` (its data URI would be cloned into
+	// every undo snapshot), so this captures it on its own.
+	//
+	// **THE CENTRE, NOT THE ANCHOR.** `tx/ty` is the world position of the image's own (0, 0) and
+	// `x/y/width/height` are an anchor and a size within the picture, exactly as eachStoredPoint()
+	// and flipStoredY() describe them. Anchoring the CENTRE means a turned placement pivots the
+	// image about its middle rather than about a corner -- see georefWriteBackdrop() on why it
+	// cannot be turned at all.
+	function georefCaptureBackdrop() {
+		if (!backdrop || !isFinite(backdrop.tx) || !isFinite(backdrop.ty)) { return null; }
+		var cx = backdrop.tx + backdrop.s * (backdrop.x + backdrop.width / 2),
+			cy = backdrop.ty + backdrop.s * (backdrop.y + backdrop.height / 2);
+		// `s` is doc units per image unit, and cx/cy go outward with every other point.
+		return {
+			cx: outwardX(cx), cy: outwardY(cy), s: backdrop.s,
+			prev: { tx: backdrop.tx, ty: backdrop.ty, s: backdrop.s }
+		};
+	}
+	// **THE PICTURE MOVES AND RESIZES; IT DOES NOT TURN.** A backdrop's transform is
+	// translate + uniform scale and nothing else -- `applyScaleEntry()` refuses a world file that
+	// rotates for the same reason, in a sentence already shipped in 27 languages. So a turned
+	// placement lands the image centred where it belongs at the right size, unturned, and
+	// georefFinish() says so rather than pretending. Adding a rotation to the backdrop is a change
+	// to what that shipped sentence promises, and therefore Tom's.
+	//
+	// The new scale is ONE conversion, and it is EXACT ON THE X AXIS: a doc unit is
+	// `metersPerUnit` metres, a metre east is `1 / mpd.lon` degrees of longitude, and Mercator x IS
+	// longitude. y takes the same number because the drawing frame's two units are the same size --
+	// which is what let the projection seam keep the view transform a uniform scale.
+	//
+	// **THE RESIDUAL IS M / N, ABOUT 0.4% AT MID LATITUDES, AND IT IS NORTH-SOUTH.** mercY() is the
+	// SPHERICAL Mercator formula evaluated at a geodetic latitude -- what every tile server does --
+	// so a doc unit north is not quite as many frame units as a doc unit east: the ratio is the
+	// meridional radius over the prime-vertical one. The model carries the same stretch, because it
+	// is drawn in the same frame; a picture cannot, because its transform is one uniform scale. So
+	// the image matches the drawing east-west exactly and is short by that ratio north-south.
+	// dev/lpn-spike/georef-carry-harness.js measures it rather than asserting it is small.
+	function georefWriteBackdrop(t) {
+		var b = georef && georef.bd;
+		if (!b || !backdrop) { return; }
+		var ll = EngCalcs.lpnGeorefToLonLat(t, b.cx, b.cy),
+			// **AT THE TRANSFORM'S OWN ANCHOR LATITUDE, NOT THE IMAGE'S.** js/lpn-georef.js freezes
+			// its radii at `origin.lat` so the map is exactly invertible, and every model point is
+			// placed with that one constant. Reading the radii at the picture's latitude instead
+			// makes its scale disagree with the drawing's by the difference between the two --
+			// 3.6e-5 on a site 800 units across, measured, and it grows with the model.
+			mpd = EngCalcs.lpnGeorefMetersPerDegree(t.origin.lat),
+			s = b.s * t.metersPerUnit / mpd.lon;
+		if (!isFinite(s) || s <= 0) { return; }
+		backdrop.s = s;
+		backdrop.tx = inwardX(ll.lon) - s * (backdrop.x + backdrop.width / 2);
+		backdrop.ty = inwardY(ll.lat) - s * (backdrop.y + backdrop.height / 2);
+		applyBackdropTransform();
+	}
+	// Does the placement's turn actually move this picture? Measured as the corner travel not
+	// turning costs, in the image's OWN pixels, so a hair of rotation on a small picture is not
+	// reported as a defect and a real turn on a big one always is.
+	function georefBackdropTurned(t) {
+		if (!backdrop || !t) { return false; }
+		var rad = (t.rotDeg % 360) * Math.PI / 180,
+			halfDiag = Math.hypot(backdrop.iw || 0, backdrop.ih || 0) / 2;
+		return halfDiag * Math.abs(Math.sin(rad)) > 1;
+	}
 	// Writes the mapped positions back in the SAME ORDER they were captured. Order stability is why
 	// the tool locks editing: an element added mid-placement would shift every index after it.
 	function georefWrite(t) {
@@ -5921,6 +5988,7 @@ var EngCalcs = EngCalcs || {};
 			if (set) { set(inwardX(ll.lon), inwardY(ll.lat)); }
 			else { pt.x = inwardX(ll.lon); pt.y = inwardY(ll.lat); }
 		});
+		georefWriteBackdrop(t);
 	}
 	function georefSrcBounds() { return EngCalcs.lpnGeorefBounds(georef.src); }
 	function georefSrcCentre() {
@@ -6520,8 +6588,14 @@ var EngCalcs = EngCalcs || {};
 		// its second half, the instructions, so those are said as a notice instead: a sentence you
 		// can read while you work beats a modal you must dismiss before you can start.
 		georef = {
-			step: GEOREF_STEP_DETACHED, src: georefCapture(), t: null,
+			step: GEOREF_STEP_DETACHED, src: georefCapture(), bd: georefCaptureBackdrop(), t: null,
 			frozen: null, rotDeg: 0,
+			// **WHAT UNDO GETS BACK IF THE USER FINISHES** (Task 436). Taken HERE, before one number
+			// has moved, because the wizard's whole run is one act to the person pressing Ctrl+Z --
+			// and by the time Finish runs the document holds degrees, so nothing at that end could
+			// reconstruct the drawing. Pushed onto the stack by georefFinish() and dropped on the
+			// floor by georefCancel(), which has already put everything back itself.
+			undoSnap: makeUndoSnapshot(),
 			// What Cancel puts back, kept SEPARATELY from `src`: the reinterpret path below replaces
 			// `src` with the same points expressed in its transform's own frame, and Cancel must
 			// still restore the numbers the document arrived with.
@@ -6633,6 +6707,17 @@ var EngCalcs = EngCalcs || {};
 		// coordinates backwards through it once makes the forward map reproduce them, and without
 		// this the user's first drag would jump the model sideways by exactly that ratio.
 		georef.src = georef.src.map(function (s) { return EngCalcs.lpnGeorefFromLonLat(t, s.x, s.y); });
+		// The backdrop is re-expressed in the same frame for the same reason, and its SCALE with it:
+		// reinterpret's promise is that nothing moves, so the picture has to come out the size it
+		// already is. georefWriteBackdrop() multiplies by metersPerUnit / mpd.lon, and this is the
+		// exact reciprocal of that, so the round trip returns the scale the image arrived with.
+		if (georef.bd) {
+			var bp = EngCalcs.lpnGeorefFromLonLat(t, georef.bd.cx, georef.bd.cy);
+			georef.bd.cx = bp.x;
+			georef.bd.cy = bp.y;
+			// `mpd` is already at t.origin.lat, which is the latitude georefWriteBackdrop() reads.
+			georef.bd.s = georef.bd.s * mpd.lon / t.metersPerUnit;
+		}
 		// ATTACHED from the first frame: the model is already on the ground, which is what step 2
 		// means. Step 1 exists to aim a drawing that is nowhere in particular.
 		georef.step = GEOREF_STEP_ATTACHED;
@@ -6697,8 +6782,17 @@ var EngCalcs = EngCalcs || {};
 	function georefFinish() {
 		var pc = EngCalcs.pageConfig || {};
 		if (!georef || georef.step !== GEOREF_STEP_ATTACHED) { return; }
+		// **THE CONFIRM STAYS, AND IT IS NO LONGER THE ONLY WAY BACK** (Task 436). Ctrl+Z now undoes
+		// the whole placement: the snapshot was taken at georefStart(), before one coordinate moved,
+		// so what comes back is the drawing the user opened and not a round trip through the
+		// transform. The confirm remains because undo is a net, not a door -- twenty snapshots deep,
+		// gone at the next project switch, and never in a file -- and because this is still the
+		// moment a project changes kind. If the wording is ever revisited it is `lpn_georef_confirm`,
+		// and that is Tom's.
 		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here for good?')) { return; }
 		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
+		var unturned = georefBackdropTurned(georef.t);
+		if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
 		// **THE VIEW IS CAPTURED BEFORE THE REFRESH AND PUT BACK AFTER IT.**
 		// refreshAllFromDocument() ends in restoreViewOrFit(), whose answer is the view remembered
 		// for this tab -- which is where the user was looking at the XY GRID, half a world away.
@@ -6724,7 +6818,14 @@ var EngCalcs = EngCalcs || {};
 		if (v) { applyView(v); }
 		saveToStorage();
 		renderTabs();
-		setNotice(pc.lpn_georef_done || 'This is a lat/lon project now. Drag any element to fine-tune it.');
+		// **A PICTURE THAT COULD NOT BE TURNED SAYS SO.** Two whole sentences joined, not a label
+		// built from fragments: the second is only true when the placement was turned and there was
+		// an image to turn, and saying nothing would leave a site plan silently off its own network.
+		// PLACEHOLDER ENGLISH -- `lpn_georef_backdrop_unturned` has no language key yet, and the
+		// wording is Tom's to write (Task 436).
+		setNotice((pc.lpn_georef_done || 'This is a lat/lon project now. Drag any element to fine-tune it.')
+			+ (unturned ? ' ' + (pc.lpn_georef_backdrop_unturned
+				|| 'The background image was moved and resized with the model, but it could not be turned. Use Background image > Move to line it up.') : ''));
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -6745,6 +6846,15 @@ var EngCalcs = EngCalcs || {};
 			if (set) { set(inwardX(s.x), inwardY(s.y)); }
 			else { pt.x = inwardX(s.x); pt.y = inwardY(s.y); }
 		});
+		// The picture goes back to the numbers it had, not to a number derived back through the
+		// transform: `prev` is the three it arrived with, so Cancel is `===` for the backdrop on the
+		// same terms it is for every coordinate.
+		if (backdrop && georef.bd) {
+			backdrop.tx = georef.bd.prev.tx;
+			backdrop.ty = georef.bd.prev.ty;
+			backdrop.s = georef.bd.prev.s;
+			applyBackdropTransform();
+		}
 		georef = null;
 		georefClearLayer();
 		georefApplyCompensation();
@@ -10690,6 +10800,17 @@ var EngCalcs = EngCalcs || {};
 			if (!isFinite(p.x) || !isFinite(p.y)) { return; }
 			if (set) { set(p.x + dx, p.y + dy); } else { pt.x = p.x + dx; pt.y = p.y + dy; }
 		});
+		// **AND THE BACKGROUND IMAGE, WHICH IS NOT IN `doc`.** eachStoredPoint() reaches
+		// `o.backdrop.tx/ty` on a stored document, so the LOAD-side rebase gets it for free; the
+		// live one cannot, because the open project's backdrop is a module variable. It is a
+		// position in the same internal frame as every coordinate above, so it takes the same
+		// vector -- and once georefFinish() carries a picture onto the map (Task 436), a backdrop
+		// left behind here is a site plan half a degree from its own network.
+		if (backdrop && isFinite(backdrop.tx) && isFinite(backdrop.ty)) {
+			backdrop.tx += dx;
+			backdrop.ty += dy;
+			applyBackdropTransform();
+		}
 		doc.origin = org;
 		state.tx -= state.s * dx;
 		state.ty -= state.s * dy;
@@ -20877,9 +20998,12 @@ var EngCalcs = EngCalcs || {};
 	// stack that restored the elements while leaving the overrides behind would undo half of a
 	// scenario-side change -- or, after undoing a Base-side deletion, resurrect an element whose
 	// overrides the deletion had purged.
-	function saveUndoSnapshot() {
-		markEdited(); // one seam, because every real mutation snapshots before it changes anything
-		undoStack.push({
+	// **BUILDING A SNAPSHOT AND PUSHING ONE ARE SEPARATE** (Task 436). One caller needs the two at
+	// different moments: the georeferencing wizard has to record the drawing BEFORE it starts --
+	// once Finish runs, the document holds degrees and no code could reconstruct the grid -- and
+	// must push it only if the user actually commits.
+	function makeUndoSnapshot() {
+		return {
 			state: JSON.parse(JSON.stringify({ doc: doc, scenarios: scenarios, active: project.activeScenario })),
 			// **THE BACKDROP IS SHALLOW-COPIED, AND THAT IS NOT A SHORTCUT.** Its `href` is a base64
 			// data URI -- 1.7 MB on Net2, 2.5 MB on Net3 -- so deep-cloning it into every one of
@@ -20893,9 +21017,23 @@ var EngCalcs = EngCalcs || {};
 			// would be half an undo -- and that is exactly what a Destructive unit change hit:
 			// Ctrl+Z gave back the original inputs under the NEW unit, quietly landing the user in
 			// the Non-destructive outcome they had just declined. Ten small strings per snapshot.
-			units: readUnitSelections()
-		});
+			units: readUnitSelections(),
+			// **WHICH FRAME THE NUMBERS ABOVE ARE IN, AND -- ONLY WHEN THAT CHANGES -- WHERE THE
+			// CAMERA WAS.** Two strings on every snapshot, so the one act that changes a project's
+			// KIND is undoable like everything else. The view is recorded on every snapshot and
+			// restored on almost none of them: undoing a diameter must not move the map, but a
+			// document put back into a frame the camera is not in has its whole drawing off screen
+			// -- grid numbers under a street-level lat/lon view. undo() draws that line.
+			coords: project.coords, basemap: project.basemap, view: currentView()
+		};
+	}
+	function pushUndoSnapshot(snap) {
+		undoStack.push(snap);
 		if (undoStack.length > UNDO_LIMIT) { undoStack.shift(); }
+	}
+	function saveUndoSnapshot() {
+		markEdited(); // one seam, because every real mutation snapshots before it changes anything
+		pushUndoSnapshot(makeUndoSnapshot());
 	}
 	// Switching projects drops the undo history (Task 146.08). The stack holds snapshots of the
 	// OUTGOING project's doc; leaving them in place would let one Undo in the newly-opened project
@@ -20906,6 +21044,12 @@ var EngCalcs = EngCalcs || {};
 		var snap = undoStack.pop();
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
+		// **THE FRAME COMES BACK BEFORE ANYTHING READS A COORDINATE** (Task 436). outwardX/outwardY
+		// ask isGeoProject(), and minScale()/maxScale() do too, so a document restored under the
+		// wrong `coords` is drawn in the wrong frame for the length of this function.
+		var coordsChanged = snap.coords !== project.coords;
+		project.coords = snap.coords;
+		project.basemap = snap.basemap;
 		// The backdrop rides in the same snapshot rather than in a stack of its own: a Move that
 		// nudged the image and a Move that nudged a node are the same kind of event to the person
 		// pressing Ctrl+Z, and two stacks would make the order of undos depend on which kind each one
@@ -20927,9 +21071,22 @@ var EngCalcs = EngCalcs || {};
 		rememberUnitSelections();
 		recountNextId();
 		closePopup(); // whatever it referenced may no longer exist post-undo (e.g. undoing an Add)
+		// A KIND CHANGE IS THE ONE UNDO THAT REDRAWS THE PAGE AROUND THE DRAWING: the tiles, the
+		// coordinate readout and the camera all describe the frame, not the document, and only this
+		// one undo changes which frame that is. Undoing a georeferencing Finish is the only act that
+		// gets here today (Task 436); anything else that ever changes `coords` is covered for free.
+		if (coordsChanged) {
+			refreshBasemap();
+			refreshMapStatus();
+		}
 		buildDom();
 		updateEmptyHint();
 		refreshScenarioStatus();
+		// **AND THE CAMERA, ONLY THEN.** A view is a point in one frame and means nothing in the
+		// other -- the restored grid coordinates would be off screen under the lat/lon view the user
+		// was left in, which reads as a lost drawing. Restored AFTER buildDom() so the scale clamp
+		// is applied against the frame the document is now in.
+		if (coordsChanged && snap.view) { applyView(snap.view); }
 		scheduleSolve();
 	}
 	// Ctrl+Z UNDOES THE MAP, EXCEPT WHERE THE USER IS TYPING (Tom, 2026-08-20, on the Controls
