@@ -59,7 +59,19 @@ There is an English alternative — `Run time (hours)`, two words — which fixe
 every language at once, and costs a retranslation of one key. Say if you would rather have that.
 
 **Tom:**
-OK.
+(1) I would be grateful for a style guide, or maybe I am creating it by intuition.
+(2) The computing sense of the word is the same as the irrigation sense if the word is "run". I would not ask for avoidance on that.
+```
+Time (or duration or length of time) of the run (or flow or operation) required for the zone to apply the target depth.
+```
+
+**RESOLVED 2026-08-25 — written to `$ec_lang_syn['ip_t_run']` exactly as above** (the stray closing
+quote dropped as a typo). **The `avoid:` clause was NOT written**, per his (2): the computing sense
+and the irrigation sense are the same sense when the word is "run", so there is nothing to warn
+against. The English label `Runtime (hours)` is left alone; the two-word alternative was not taken.
+His (1) — *"I would be grateful for a style guide, or maybe I am creating it by intuition"* — is a
+real request and is now ROADMAP Task 532.
+
 ### 3. `mi_n617` — Manning Irregular, results column
 
 Currently: **`Comp.<br />n`**. The existing entry carries commentary only (`| layout: column
@@ -102,7 +114,12 @@ Store (keep, remember) the values entered on this page and calculate again. | la
 ```
 
 **Tom:**
+Obsolete. Remove.
 
+**RESOLVED 2026-08-25 — already done, and by a different door.** `wi_save_and_calculate` was one of
+the five keys deleted under Task 294 the same day, on his blanket ruling there (*"294 as delete"*).
+Verified dead first — it was rendered by nothing — then removed from all 27 files along with its
+`$ec_lang_syn` entry. Nothing further to do here.
 ### 6. `mhp_vel_ok_short` / `mhp_vel_high_short` / `mhp_vel_low_short` — Microhydropower verdicts
 
 Currently: **`OK`**, **`High`**, **`Low`**, standing alone in a narrow cell. Their row label

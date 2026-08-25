@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**59 open tasks.** Next (100): 9 · Soon (75): 12 · Someday (50): 10 · Maybe (25): 12 · Parked (5): 16
+**60 open tasks.** Next (100): 9 · Soon (75): 13 · Someday (50): 10 · Maybe (25): 12 · Parked (5): 16
 
 ## 100 — Next (9)
 
@@ -21,7 +21,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 513 — Sprint 459's leftovers: two named strings nobody here can read.
 - Task 530 — Available fire flow at a hydrant, with the hydrant assembly modelled.
 
-## 75 — Soon (12)
+## 75 — Soon (13)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -35,6 +35,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 479 — [H] · One question left: should the suite answer at librewaternet.org/engcalcs/ ?
 - Task 503 — AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry
 - Task 531 — Tag the examples: US/SI, design/maintenance, xy/lat-lon.
+- ! Task 532 — An English style guide for label wording — Tom says he is writing one by intuition.
 
 ## 50 — Someday (10)
 
@@ -85,5 +86,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-57 of 59 titles are within 4–12 words. `!` marks the rest;
+57 of 60 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

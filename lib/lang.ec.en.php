@@ -696,7 +696,7 @@ $ec_lang_syn['ip_q_lat']='';
 $ec_lang['ip_q_sys']='Zone flow, Q<sub>zone</sub>';
 $ec_lang_syn['ip_q_sys']='';
 $ec_lang['ip_t_run']='Runtime (hours)';
-$ec_lang_syn['ip_t_run']='';
+$ec_lang_syn['ip_t_run']='Time (or duration or length of time) of the run (or flow or operation) required for the zone to apply the target depth.';
 // Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Canal Seepage';
 $ec_lang_syn['cs_main_menu']='| gloss: seepage';

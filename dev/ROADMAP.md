@@ -328,6 +328,27 @@ the block.
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
 
+- 75|532| **An English style guide for label wording — Tom says he is writing one by intuition.**
+  His own words, 2026-08-25, answering a friction question: *"I would be grateful for a style guide,
+  or maybe I am creating it by intuition."* **That sentence is the task**: rulings he has been making
+  one at a time for months are consistent with each other, nobody has written them down as rules,
+  and so each new one costs a conversation.
+  - **This is a HARVEST, not an invention.** The material already exists and is dated and quoted —
+    `dev/language-strings.md` (which is about the mechanics of a string, not the voice of a label),
+    the closed ledger, `dev/english-friction/*.json`, and `239-refer-to-human.md`. Read them and
+    extract the rules he has ALREADY applied rather than proposing a house style from taste.
+  - **Some are already stated elsewhere and belong in it by reference, not by copy:** column width is
+    king and mid-word wrap is acceptable in a results table; a verdict leads with `✓` or `⚠` and never
+    a translated marker word; loss symbols are lowercase `h` and total heads capital `H`; the
+    local-loss term is "Minor (local) loss" suite-wide; reuse a WHOLE label, never a fragment.
+  - **The open question is what it is FOR.** A guide read by a human is prose; a guide read by a
+    check is a script, and CLAUDE.md's own argument is that a rule a machine enforces is worth ten a
+    human must remember. **Some of these are checkable** (a verdict string starting with a glyph, a
+    label ending in a colon, a sentence in a column heading) and some are irreducibly judgement.
+    Sort them into those two piles as you go — that sorting is most of the value.
+  - **[H] The voice is his and the guide must quote him rather than paraphrase.** Where a ruling was
+    a one-off with no principle behind it, say so instead of inventing the principle.
+
 - 75|531| **Tag the examples: US/SI, design/maintenance, xy/lat-lon.**
   Tom, 2026-08-25: *"Reference 348. Phase 1 can be adding labels, tags, or keywords to the
   examples."* **Task 348 is sub-categories and paging in the gallery, and is deliberately unbuilt at
