@@ -6546,12 +6546,22 @@ var EngCalcs = EngCalcs || {};
 		if (!georef || !georef.t) { return; }
 		var b = georefSrcBounds(),
 			spanUnits = Math.max(b.maxX - b.minX, b.maxY - b.minY) || 1,
-			mpd = EngCalcs.lpnGeorefMetersPerDegree(ll.lat),
-			degLat = spanMeters / mpd.lat,
+			// **TWO LATITUDES, AND THEY ARE NOT THE SAME ONE** (Task 520). The metres a drawing unit
+			// is worth are the metres it is worth WHERE THE MODEL HANGS NOW -- `metersPerUnit` is
+			// stated against the frame frozen at its own transform's origin. The metres the site is
+			// worth are the metres AT THE DESTINATION. Both were read at the destination until this
+			// task, which cancelled the latitude out of the division entirely: the model then jumped
+			// by mpd.lon(hanging) / mpd.lon(destination) -- a factor of two between 60 N and the
+			// equator, measured in dev/browser-pass/specs/goto.js.
+			// **mpd.lon on both sides** (Task 517's seam): a drawing-frame degree is a degree of
+			// LONGITUDE, because Mercator x IS longitude and y shares its unit.
+			mpdNow = EngCalcs.lpnGeorefMetersPerDegree(georef.t.origin.lat),
+			mpdTo = EngCalcs.lpnGeorefMetersPerDegree(ll.lat),
+			degSpan = spanMeters / mpdTo.lon,
 			// The model's own screen span right now, in pixels: whatever it is, that many pixels
 			// must become `spanMeters` of ground.
-			screenSpanPx = spanUnits * (georef.t.metersPerUnit / mpd.lat) * (state.s || 1),
-			s = Math.max(minScale(), Math.min(maxScale(), screenSpanPx / degLat));
+			screenSpanPx = spanUnits * (georef.t.metersPerUnit / mpdNow.lon) * (state.s || 1),
+			s = Math.max(minScale(), Math.min(maxScale(), screenSpanPx / degSpan));
 		applyView({ cx: inwardX(ll.lon), cy: inwardY(ll.lat), s: s });
 		// The model is re-planted at the centre of the new view at the size just asked for, rather
 		// than left wherever it was hanging: this is the one movement of the model in step 1 that
@@ -9927,29 +9937,62 @@ var EngCalcs = EngCalcs || {};
 	// The MARGINS stay in the units the chart is drawn in and are subtracted from the measured box:
 	// they hold the y-axis numbers and title on the left, and the rotated node IDs plus the x-axis
 	// title below -- all of them text, whose size does not scale with the pane, which is exactly why
-	// they are constants rather than fractions.
+	// they are pixel counts rather than fractions. The reserve UNDER the axis is the one that varies,
+	// and only downward: it is what is actually going to be drawn there (see profileLayout()).
+	//
+	// **A FLOOR ON THE viewBox IS A FLOOR ON NOTHING -- IT IS A SHRINK RAY** (Task 527). w and h were
+	// floored at 240x180 before being written into the viewBox, so a pane 344x115 was drawn at
+	// 344x180 and then fitted into 115 by preserveAspectRatio: the whole chart, tick text included,
+	// came out at 0.64 scale. That is what "the profile's axes are illegible on a phone" was --
+	// 10px labels painted at 6.4px, invisible to the stylesheet because the font-size was right and
+	// the transform was not. **One user unit is one CSS pixel now, at every size**, and a chart with
+	// less room gets fewer labels instead (EngCalcs.lpnProfile.fitTicks / .labelStride).
 	var PROFILE_W = 560, PROFILE_H = 340,
 		PROFILE_MARGIN = { left: 58, top: 12, right: 16, bottom: 114 },
-		// The floor is a chart that is still a chart: below this the plot area collapses and the
-		// axis text overlaps itself, so a pane dragged to its own minimum gets a small chart rather
-		// than a broken one.
-		PROFILE_MIN_W = 240, PROFILE_MIN_H = 180;
-	// The drawing surface for the size the host currently is. Returns both the viewBox dimensions
-	// and the plot rectangle inside them, because every caller needs the pair and computing them
-	// apart is how the frame and the data end up on different rectangles.
-	function profileLayout(host) {
+		// What one label needs to itself, in CSS px, against .lpn-profile-tick's 10px and
+		// .lpn-profile-nodeid's 10px in css/engcalcs.css. A y label needs clearance above and below;
+		// an x station number is up to five digits across; a node ID is written at -60 degrees, so
+		// two of them clear each other on a fraction of their own length.
+		PROFILE_Y_LABEL_PX = 22, PROFILE_X_LABEL_PX = 46, PROFILE_ID_LABEL_PX = 15,
+		// Below this much plot the chart stops being a chart, so the bottom reserve gives way rather
+		// than the drawing. Above it the desktop's margins are untouched, which is the point:
+		// nothing here changes a chart that already had the room.
+		PROFILE_MIN_PLOT_H = 120;
+	// The drawing surface for the size the host currently is. Returns the viewBox dimensions, the
+	// plot rectangle inside them and what there is room to LABEL -- every caller needs them together,
+	// and computing them apart is how the frame and the data end up on different rectangles.
+	//
+	// `ids` is the node names the x axis will have to carry; the reserve under the axis is theirs,
+	// so it is measured from the longest of them rather than assumed.
+	function profileLayout(host, ids) {
 		var r = host && host.getBoundingClientRect ? host.getBoundingClientRect() : null,
 			w = r && r.width > 0 ? Math.round(r.width) : PROFILE_W,
-			h = r && r.height > 0 ? Math.round(r.height) : PROFILE_H;
-		w = Math.max(PROFILE_MIN_W, w);
-		h = Math.max(PROFILE_MIN_H, h);
+			h = r && r.height > 0 ? Math.round(r.height) : PROFILE_H,
+			longest = 0, i, idRoom, station, bottom, height;
+		for (i = 0; i < (ids || []).length; i++) { longest = Math.max(longest, String(ids[i]).length); }
+		// A digit is about 6px at 10px in the sans stack, and a name at -60 degrees hangs sin 60 of
+		// its own length below the axis.
+		idRoom = Math.min(84, Math.ceil(longest * 6 * 0.87) + 8);
+		// **THE STATION TITLE IS THE ONE LABEL THAT GOES.** It costs a whole line under the axis, and
+		// its payload -- the length unit -- is already on the summary line under the chart ("14
+		// nodes, 620 ft"). The ELEVATION title is kept at every size: it is written up the left
+		// margin, where it costs the drawing nothing, and no other line says which head unit this is.
+		station = (h - PROFILE_MARGIN.top - (16 + idRoom + 30)) >= PROFILE_MIN_PLOT_H;
+		bottom = (h - PROFILE_MARGIN.top - PROFILE_MARGIN.bottom) >= PROFILE_MIN_PLOT_H
+			? PROFILE_MARGIN.bottom
+			: Math.max(30, 16 + idRoom + (station ? 30 : 0));
+		height = Math.max(40, h - PROFILE_MARGIN.top - bottom);
 		return {
-			w: w, h: h,
+			w: w, h: h, stationTitle: station, bottom: bottom,
+			// Where that title sits: the desktop's own baseline while the desktop reserve is intact,
+			// and hard against the bottom edge once the reserve has been trimmed to what is drawn.
+			titleY: h - (bottom === PROFILE_MARGIN.bottom ? 42 : 8),
+			y: EngCalcs.lpnProfile.fitTicks(height, PROFILE_Y_LABEL_PX),
 			box: {
 				left: PROFILE_MARGIN.left,
 				top: PROFILE_MARGIN.top,
 				width: Math.max(40, w - PROFILE_MARGIN.left - PROFILE_MARGIN.right),
-				height: Math.max(40, h - PROFILE_MARGIN.top - PROFILE_MARGIN.bottom)
+				height: height
 			}
 		};
 	}
@@ -10008,12 +10051,32 @@ var EngCalcs = EngCalcs || {};
 			if (typeof n.ground === 'number') { values.push(n.ground); }
 			if (typeof n.head === 'number') { values.push(n.head); }
 		});
-		yB = EngCalcs.lpnProfile.axisBounds(values);
-		xB = EngCalcs.lpnProfile.stationBounds(series.length);
+		if (note) {
+			// **A PROFILE WITH NO SOLVE IS STILL A PROFILE.** The ground is the user's own typed
+			// numbers and is drawn whatever the solver did or did not manage; saying which half is
+			// missing beats an empty box.
+			//
+			// **SAID BEFORE THE CHART IS MEASURED, and that ordering is load-bearing** (Task 527).
+			// The summary shares the panel with the chart and wraps to a second line on a narrow
+			// one, so writing it afterwards took 22px off the host the chart had just been laid out
+			// for -- and the ResizeObserver then redrew it, blanking the note, growing the host and
+			// starting again: on a phone the chart was permanently laid out for a panel 22px taller
+			// than the one it was shown in, and preserveAspectRatio scaled the difference out of
+			// every label. The chart is measured against the panel it will actually be shown in now.
+			note.textContent = series.hgl.length
+				? String(pc.lpn_profile_summary || '{n} nodes, {len} {u}')
+					.replace('{n}', String(series.nodes.length))
+					.replace('{len}', String(plainRound(series.length, 1)))
+					.replace('{u}', unitLabel('lpn_u_length'))
+				: (pc.lpn_profile_no_solve || 'No results yet, so only the ground line is drawn.');
+		}
 		// MEASURED BEFORE ANYTHING IS DRAWN, and off the still-empty host: host.innerHTML was
 		// cleared at the top of this function, so the rect being read is the box the pane is giving
-		// the chart, never the size of the drawing already in it.
-		lay = profileLayout(host);
+		// the chart, never the size of the drawing already in it. It comes before the axis bounds
+		// because the room decides how many gridlines there is room to LABEL (Task 527).
+		lay = profileLayout(host, series.nodes.map(function (n) { return n.id; }));
+		yB = EngCalcs.lpnProfile.axisBounds(values, lay.y);
+		xB = EngCalcs.lpnProfile.stationBounds(series.length);
 		profileLastSize = { w: lay.w, h: lay.h };
 		box = lay.box;
 		svg = el('svg', { viewBox: '0 0 ' + lay.w + ' ' + lay.h, class: 'lpn-profile-svg' }, host);
@@ -10026,8 +10089,15 @@ var EngCalcs = EngCalcs || {};
 			el('line', { x1: box.left, y1: Y(v), x2: box.left + box.width, y2: Y(v), class: 'lpn-profile-grid' }, svg);
 			profileText(svg, box.left - 5, Y(v) + 3, String(plainRound(v, 2)), { class: 'lpn-profile-tick', 'text-anchor': 'end' });
 		});
-		EngCalcs.lpnProfile.ticks(xB).forEach(function (v) {
+		// **THE TICK IS DRAWN; ITS NUMBER MAY NOT BE.** Which of them there is room for is
+		// labelStride()'s answer, taken on the drawn positions -- so the axis keeps its structure at
+		// every width and loses only ink that would have landed on its neighbour.
+		var xTicks = EngCalcs.lpnProfile.ticks(xB), xKeep = {};
+		EngCalcs.lpnProfile.labelStride(xTicks.map(X), PROFILE_X_LABEL_PX)
+			.forEach(function (k) { xKeep[k] = true; });
+		xTicks.forEach(function (v, k) {
 			el('line', { x1: X(v), y1: box.top + box.height, x2: X(v), y2: box.top + box.height + 4, class: 'lpn-profile-axis' }, svg);
+			if (!xKeep[k]) { return; }
 			profileText(svg, X(v), box.top + box.height + 14, String(plainRound(v, 0)), { class: 'lpn-profile-tick', 'text-anchor': 'middle' });
 		});
 		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height, class: 'lpn-profile-frame' }, svg);
@@ -10049,13 +10119,24 @@ var EngCalcs = EngCalcs || {};
 				class: 'lpn-profile-hgl' }, svg);
 		});
 
-		// The nodes along the bottom, every one named: the question a profile answers is "WHERE
-		// along this route does that happen", and a station with no name cannot answer it.
-		series.nodes.forEach(function (n) {
+		// The nodes along the bottom, named: the question a profile answers is "WHERE along this
+		// route does that happen", and a station with no name cannot answer it.
+		//
+		// **NAMED AS WIDELY AS THE ROOM ALLOWS** (Task 527). Every node keeps its station line, its
+		// dot and its hover text; on a narrow chart only the names thin out, ends first, because
+		// fourteen names in 280px is the scribble Tom photographed and eight px of type would be the
+		// same defect wearing a different hat. The two ENDS are always named -- they are the two
+		// stations a reader looks for by name.
+		var idKeep = {};
+		EngCalcs.lpnProfile.labelStride(series.nodes.map(function (n) { return X(n.station); }), PROFILE_ID_LABEL_PX)
+			.forEach(function (k) { idKeep[k] = true; });
+		series.nodes.forEach(function (n, k) {
 			var x = X(n.station), t, ttl, parts, ptxt;
 			el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-profile-station' }, svg);
-			t = profileText(svg, 0, 0, n.id, { class: 'lpn-profile-nodeid', 'text-anchor': 'end' });
-			t.setAttribute('transform', 'translate(' + x + ',' + (box.top + box.height + 20) + ') rotate(-60)');
+			if (idKeep[k]) {
+				t = profileText(svg, 0, 0, n.id, { class: 'lpn-profile-nodeid', 'text-anchor': 'end' });
+				t.setAttribute('transform', 'translate(' + x + ',' + (box.top + box.height + 20) + ') rotate(-60)');
+			}
 			if (typeof n.ground === 'number') {
 				el('circle', { cx: x, cy: Y(n.ground), r: 2, class: 'lpn-profile-dot' }, svg);
 			}
@@ -10070,26 +10151,18 @@ var EngCalcs = EngCalcs || {};
 		});
 
 		// Axis titles. The unit is SUBSTITUTED into the string rather than concatenated onto it, so
-		// a language that puts it somewhere else can.
-		profileText(svg, box.left + box.width / 2, lay.h - 42,
-			String(pc.lpn_profile_axis_station || 'Distance along the path ({u})').replace('{u}', unitLabel('lpn_u_length')),
-			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		// a language that puts it somewhere else can. The station one is drawn only where there is
+		// room for it under the axis -- see profileLayout() for why that is the one that goes.
+		if (lay.stationTitle) {
+			profileText(svg, box.left + box.width / 2, lay.titleY,
+				String(pc.lpn_profile_axis_station || 'Distance along the path ({u})').replace('{u}', unitLabel('lpn_u_length')),
+				{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		}
 		profileText(svg, 0, 0,
 			String(pc.lpn_profile_axis_elev || 'Elevation and head ({u})').replace('{u}', unitLabel(resultUnit('elevhead'))),
 			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
 			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
 
-		if (note) {
-			// **A PROFILE WITH NO SOLVE IS STILL A PROFILE.** The ground is the user's own typed
-			// numbers and is drawn whatever the solver did or did not manage; saying which half is
-			// missing beats an empty box.
-			note.textContent = series.hgl.length
-				? String(pc.lpn_profile_summary || '{n} nodes, {len} {u}')
-					.replace('{n}', String(series.nodes.length))
-					.replace('{len}', String(plainRound(series.length, 1)))
-					.replace('{u}', unitLabel('lpn_u_length'))
-				: (pc.lpn_profile_no_solve || 'No results yet, so only the ground line is drawn.');
-		}
 	}
 
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why

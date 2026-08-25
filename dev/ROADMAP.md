@@ -161,22 +161,13 @@ the block.
     it.**
 
 - 75|520| **Go to… sets the map scale from the wrong latitude, so the model jumps size.**
-  Found by `/code-review` 2026-08-24 while reviewing Task 517; PRE-EXISTING and not introduced by it.
-  `georefGoTo()` (`js/looped-network.js`) computes
-  `screenSpanPx = spanUnits * (metersPerUnit / mpd.lat) * state.s` and `degLat = spanMeters / mpd.lat`,
-  and evaluates **both** `mpd` at the DESTINATION latitude.
-  - **The two errors cancel today, which is why nothing has caught it.** `s = screenSpanPx / degLat`
-    divides the same wrong factor back out, so the axis is invisible — and that is also the trap:
-    changing only one of the two to `mpd.lon` breaks working code.
-  - **What does NOT cancel is the latitude.** `metersPerUnit` relates to where the model is hanging
-    NOW, so the first term needs `mpd.lon` at the model's CURRENT latitude while the second needs it
-    at the destination. The scale therefore lands wrong by `mpd.lon(current)/mpd.lon(destination)`.
-    Scenario: a model hanging at 60 N, Go to… an equatorial coordinate with a 1000 m site — the map
-    lands about 2x off and the model visibly jumps size at the moment of the Go-to.
-  - It breaks the same promise Task 517 enforced everywhere else — *nothing you do to the map moves
-    the model* — which is why it is worth doing rather than tolerating.
-  - **Needs a spec of its own first.** `dev/browser-pass/specs/goto.js` drives the dialog but asserts
-    nothing about the resulting scale, and the fix is a behaviour change: do not land it bare.
+  **FIXED 2026-08-25 — READY TO CLOSE.** `georefGoTo()` read metres-per-degree at the DESTINATION on
+  both sides of one division, so the latitude cancelled out and the model jumped by
+  `mpd.lon(hanging) / mpd.lon(destination)`. It now takes the first at the transform's own origin
+  latitude and the second at the destination, both on `mpd.lon` (Task 517's seam).
+  - **The spec came first, and it was watched failing.** `dev/browser-pass/specs/goto.js` measures
+    the model's screen width across a Go-to: 334px before, 398px after at 38 N, and 626 → 314px
+    between 60 N and the equator — the predicted factor of two. All three are 334px now.
 
 - 25|515| **The Settings category index breaks its own labels mid-word.**
   "Visualizati / on", "Node symbolog / y", "Map appearan / ce" -- visible in screenshots 0022, 0023,
@@ -222,8 +213,11 @@ the block.
     exact, "Before" was a 40px word painting out of a 33px box; and the Roughness column keeps its
     word at a cost of 28px, which is the whole cost and was measured ("Roughness," is 94.4px, so no
     width between 72 and 100 helps).
-  - **The profile chart's axes are illegible on a phone** (0039, 0040): the y ticks overprint each
-    other and the x node labels are a scribble. The chart itself draws well — it is only the axes.
+  - **FIXED 2026-08-25, the profile's axes** (0039, 0040). The cause was not the label COUNT but
+    their SIZE: the viewBox was floored at 240x180 in a 344x115 pane, so `preserveAspectRatio` drew
+    everything at 0.64 and a 10px label came out at 6.4 — invisible to a stylesheet, since the
+    font-size was right and the transform was not. One user unit is one CSS pixel now, and a chart
+    with less room drops labels instead. 7 y labels 5.7px apart → 3 at 29px; plot 172x34 → 271x58.
   - **Checked and NOT a defect:** the phone table's values are correct, verified against
     `examples/Net3-World-lpn.json`. Rows 40/50/60/101 match exactly; pipe 20's odd numbers are Tom's
     own edit (k = 12.2), which is what raised the note he photographed. Nothing is clipped.

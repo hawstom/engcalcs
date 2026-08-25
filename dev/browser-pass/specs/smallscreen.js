@@ -181,7 +181,73 @@ exports.run = async function ({ browser, report }) {
 			'...Roughness in particular, which is the one Tom read as "Roughnes/s, C"',
 			rough ? rough.text + ' in ' + rough.width + 'px' : 'no such heading');
 
-		// ---- 4. THE DESKTOP IS UNTOUCHED, which is the regression all three could cause ---------
+		// ---- 4. THE PROFILE'S AXES (screenshots 0039, 0040) ------------------------------------
+		// The chart drew well and its axes did not: the y ticks overprinted each other and the node
+		// names along the bottom were a scribble. **The cause was not the number of labels, it was
+		// their SIZE**, and no stylesheet could see it: the chart's viewBox was floored at 240x180
+		// while the pane gave it 344x115, so preserveAspectRatio fitted the drawing at 0.64 and
+		// every 10px label came out at 6.4px. The floor is gone (one user unit is one CSS pixel at
+		// every size) and a chart with less room now drops labels instead.
+		await a.menuClick('Profile', 'project');
+		await a.settle(1200);
+		const chart = await a.page.evaluate(() => {
+			const host = document.getElementById('lpn_profile_chart');
+			const svg = host && host.querySelector('svg');
+			if (!svg) { return null; }
+			const box = (e) => { const r = e.getBoundingClientRect(); return { t: r.top, b: r.bottom, l: r.left, h: r.height }; };
+			const ticks = [...svg.querySelectorAll('text.lpn-profile-tick')];
+			const ids = [...svg.querySelectorAll('text.lpn-profile-nodeid')];
+			return {
+				// What one drawn pixel is worth. 1 means nothing is being scaled and a 10px label is
+				// 10px; 0.64 is what the phone was doing.
+				scale: svg.getScreenCTM().a,
+				host: { w: host.getBoundingClientRect().width, h: host.getBoundingClientRect().height },
+				y: ticks.filter(t => t.getAttribute('text-anchor') === 'end').map(t => Object.assign(box(t), { v: t.textContent })),
+				x: ticks.filter(t => t.getAttribute('text-anchor') === 'middle').map(t => Object.assign(box(t), { v: t.textContent })),
+				// A node name is written at -60 degrees, so what keeps two of them apart is the
+				// distance between their STATIONS, not their boxes, which overlap on any slant.
+				ids: ids.map(t => ({
+					v: t.textContent,
+					x: parseFloat((t.getAttribute('transform').match(/translate\(([-\d.]+)/) || [])[1])
+				})),
+				stations: svg.querySelectorAll('line.lpn-profile-station').length,
+				em: parseFloat(getComputedStyle(ids[0] || svg).fontSize)
+			};
+		});
+		report.ok(!!chart, 'the profile tab draws a chart at 360px');
+		if (chart) {
+			report.ok(chart.scale > 0.99 && chart.scale < 1.01,
+				'nothing is scaled down: a 10px label is drawn at 10px, not at 6.4',
+				`scale ${chart.scale.toFixed(3)} in ${Math.round(chart.host.w)}x${Math.round(chart.host.h)}`);
+			// The y ticks, in the order they are drawn down the axis. Two labels whose boxes touch
+			// are the overprinting Tom photographed, stated as a number.
+			const tops = chart.y.map(t => t.t).sort((p, q) => p - q);
+			const gaps = tops.slice(1).map((t, i) => t - tops[i]);
+			const worst = gaps.length ? Math.min(...gaps) : Infinity;
+			report.ok(chart.y.length >= 2, 'the elevation axis still carries numbers', chart.y.map(t => t.v).join(' '));
+			report.ok(worst >= (chart.y[0] ? chart.y[0].h : 10),
+				'...and no two of them overlap', `closest pair ${worst === Infinity ? 'n/a' : worst.toFixed(1)}px apart`);
+			// The x axis: station numbers side by side, and the node names on their slant.
+			const lefts = chart.x.map(t => t.l).sort((p, q) => p - q);
+			const xGap = lefts.length > 1 ? Math.min(...lefts.slice(1).map((l, i) => l - lefts[i])) : Infinity;
+			report.ok(chart.x.length >= 2, 'the station axis still carries numbers', chart.x.map(t => t.v).join(' '));
+			report.ok(xGap >= 20, '...and they are not printed on top of each other',
+				`closest pair ${xGap === Infinity ? 'n/a' : xGap.toFixed(1)}px apart`);
+			const xs = chart.ids.map(i => i.x).sort((p, q) => p - q);
+			// sin 60 of the station gap is the clearance between two names on a -60 degree slant.
+			const idGap = xs.length > 1 ? Math.min(...xs.slice(1).map((x, i) => x - xs[i])) * Math.sin(Math.PI / 3) : Infinity;
+			report.ok(chart.ids.length >= 2, 'nodes are still named along the bottom',
+				chart.ids.map(i => i.v).join(' '));
+			report.ok(idGap >= 10, '...with a line of text between one name and the next',
+				`closest pair ${idGap === Infinity ? 'n/a' : idGap.toFixed(1)}px apart`);
+			// Thinning the NAMES must not thin the chart: every node keeps its station line and its
+			// hover text, so nothing a reader can act on is lost with the ink.
+			report.ok(chart.stations > chart.ids.length,
+				'every node still has its station line — only the names thinned out',
+				`${chart.stations} stations, ${chart.ids.length} named`);
+		}
+
+		// ---- 5. THE DESKTOP IS UNTOUCHED, which is the regression all three could cause ---------
 		await a.page.setViewportSize(Session.VIEWPORT);
 		await a.settle(700);
 		await a.menuClick('Settings', 'project');
