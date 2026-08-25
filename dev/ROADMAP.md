@@ -107,7 +107,12 @@ the block.
     only-the-user-touches-a-file's-numbers rule. Sterbenz gives it: `x − ox` is exact whenever
     `ox/2 ≤ x ≤ 2·ox`, which holds for any origin chosen near the model, and a power-of-two origin
     is itself exactly representable. A decimal grid (1e-3) has neither property.
-  - **THE OPEN DECISION IS WHERE THE GEO ORIGIN LIVES, and it is a file-format question.** For a
+  - **DECIDED (Tom, 2026-08-24): OPTION B.** `view` and `backdrop` become absolute for a geographic
+    document, the origin is derived at load and never stored, and everything in the file is a real
+    place on Earth. **And his reason for caring about `backdrop` at all is worth keeping: *"it didn't
+    occur to me that anybody would use a backdrop for a geographic project. They could."*** — so the
+    migration must carry a backdrop correctly rather than treating it as a case that cannot arise.
+  - The decision, as it stood before he ruled: For a
     geographic document the file must keep ABSOLUTE longitude and latitude, so the origin cannot be
     baked into the stored coordinates the way `rebaseDocument()` does for an XY grid. But
     `view.cx/cy` and `backdrop.tx/ty` are stored in the DRAWING frame (v10), so an origin merely
@@ -169,17 +174,23 @@ the block.
   - **Needs a spec of its own first.** `dev/browser-pass/specs/goto.js` drives the dialog but asserts
     nothing about the resulting scale, and the fix is a behaviour change: do not land it bare.
 
-- 75|514| **Two different units both labelled "Pressure", both on screen at once.**
-  Found 2026-08-24 in screenshot 0026 while narrating the drop, and it is an ENGLISH defect, not a
-  translation one: the map status strip prints `Pressure: m H2O` from `lpn_u_pressure`, the INPUT
-  unit a valve setting is typed in, while the colour key prints `Pressure (psi)` from
-  `lpn_u_r_pressure`, the RESULTS unit. Both are correct and both say the same word.
-  - `lpn_units_pressure` and `lpn_result_pressure` are two keys holding the identical English value,
-    and so are `lpn_units_flow` and `lpn_result_flow`. The units strip separates them by POSITION --
-    an inputs column and a results column -- and neither readout carries that position with it.
-  - **[H] Wording is Tom's.** The routing rule sends this to the English (an English reader stumbles
-    too), and the fix is whatever distinguishes the two on a strip 11px tall in 27 languages.
-  - Same shape as Task 512: two different things wearing one mark, silently.
+- 75|522| **One set of units, not an input set and a results set — reverses Task 422.**
+  Tom, 2026-08-24: *"I think it's our design mistake, and we shouldn't allow them to be independent
+  or to diverge. We shouldn't have separate input and output units."*
+  - **This DISSOLVES what was filed as Task 514** rather than answering it. That task said the status
+    strip and the colour key showed two legitimately different Pressure settings and asked Tom for
+    two distinguishing words. The screenshot that arrived with this ruling shows both selects reading
+    `psi`, so the premise was false and the disagreement was Task 521's bug all along. **No wording
+    is needed; the second row goes away.** Recorded because the wrong diagnosis was confident and
+    well argued, and the thing that corrected it was a picture.
+  - Tom, on that sequence: the bug *"simply shows us serendipitously how wrong"* the split is. It is
+    the argument for this task — a design where two controls may legitimately disagree gives a defect
+    somewhere to hide, and it hid one from an AI reading the source with the code in front of it.
+  - Scope: `LPN_UNIT_SELECTS`, `LPN_RESULT_TWIN`, `fillResultUnitDefaults()`, the two groups in
+    `Looped-Network.php`, `dev/browser-pass/specs/units.js` (written to assert the split), and the
+    stored `units` map — an old project carrying both must open without asking anything.
+  - **Velocity and gradient are results-only and always were**, so "one set" is not a straight merge:
+    it is the input set plus the two that never had an input twin.
 
 - 25|515| **The Settings category index breaks its own labels mid-word.**
   "Visualizati / on", "Node symbolog / y", "Map appearan / ce" -- visible in screenshots 0022, 0023,
@@ -277,6 +288,27 @@ the block.
   position ALONG it, so it needs a parameter on the polyline rather than a second `anchorNode`, and
   it touches label placement, the leader, collision avoidance and the Text popup. **Task 247's meter
   needs the same `linkAnchor {link, t}`** — whichever ships first builds it for both.
+
+- 25|523| **Rename the Project menu to "Water" — Tom's alternate-reality idea.**
+  Tom, 2026-08-24: *"my big idea for what it ideally should be called instead of Project in an
+  alternate reality: Water. It's the Water modeling menu."* Floated, not decided; recorded so it is
+  not re-proposed from scratch.
+  - **The menu's own tip is already the argument for it.** `lpn_menu_project_tip` reads *"Everything
+    about water network modeling is here in one place, except the animation play controls."* The
+    label is weaker than its own description, and the description is already in Tom's words.
+  - **It is the one slot on the bar where a domain word is free.** File / Edit / Insert / View / Help
+    are conventions that only pay while they are the conventions everyone knows; Project is the only
+    entry this page invents, so it is the only one a rename cannot cost anything in familiarity.
+    EPANET also calls it Project, and our vocabulary is deliberately not EPANET's.
+  - **It translates better than almost any label in the suite.** "Water" exists in field register in
+    every one of the 27, including the five 0.65-tier languages where engineering vocabulary is
+    usually English. Very few of our strings can say that.
+  - **The real objection is collision, not taste:** `project` is also this app's noun for the
+    DOCUMENT — the tab strip, the project menu on a tab, `serializeProject()`, project units. A menu
+    named Water beside a document called a project is clearer; a menu named Project beside them is
+    ambiguous in the other direction. Worth checking which confusion is cheaper before acting.
+  - Also worth asking first: Settings and Libraries live in there, and they are setup rather than
+    modelling. If the name does not fit the contents, that is sometimes the menu's fault.
 
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus

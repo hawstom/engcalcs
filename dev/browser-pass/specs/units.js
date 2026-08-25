@@ -74,6 +74,51 @@ exports.run = async function ({ browser, report }) {
 			strip[0].selects.indexOf('lpn_u_velocity') < 0,
 			'velocity is a result only -- it was never an input');
 
+		// **THE MAP STATUS STRIP MUST NAME THE UNITS THAT ARE REALLY SELECTED** (ROADMAP Task 521).
+		// Tom found this from a screenshot: both Pressure selects read `psi` while the strip along the
+		// bottom of the map read `m H2O`, a unit that appeared nowhere in the Settings box.
+		//
+		// **IT ONLY APPEARS ON A FIRST LOAD, AND ONLY WHEN THE PROJECT'S UNITS DIFFER FROM THE PAGE'S
+		// DEFAULTS**, so it has to be reproduced rather than merely looked for. Written the obvious
+		// way -- read the strip, compare it with the selects -- this check PASSED against the broken
+		// code, because by the time the spec reached it the page had already been driven through
+		// paths that refresh the strip, and the default project's units match the page's anyway.
+		// That is the check-that-cannot-fail trap, caught by reverting the fix and re-running.
+		//
+		// So: put the project into units the page does NOT boot in, reload, and read the strip on the
+		// load that follows. Without the fix the strip names the page's defaults; with it, the
+		// project's.
+		{
+			// Put the PROJECT into units the PAGE does not boot in. setUnits() applies a whole preset
+			// by family and calls submitForm(), so it does not fire the per-select change handler and
+			// does not raise the reinterpret/convert question -- which is what makes it usable here.
+			await a.page.evaluate(() => { EngCalcs.setUnits('si'); });
+			await a.settle(500);
+			await a.reload();
+			await a.settle(800);
+			const agree = await a.page.evaluate(() => {
+				const lab = (n) => {
+					const s = document.querySelector('select[name="' + n + '"]');
+					return s ? s.options[s.selectedIndex].textContent : null;
+				};
+				return {
+					strip: (document.getElementById('lpn_map_status') || {}).textContent || '',
+					flow: lab('lpn_u_flow'), pressure: lab('lpn_u_pressure')
+				};
+			});
+			// Asserted against the LIVE selects, never a literal, so it holds in every language and
+			// under either preset and cannot be satisfied by the strip merely being non-empty.
+			report.ok(!!agree.flow && agree.strip.indexOf(agree.flow) >= 0,
+				'on a FIRST LOAD the status strip names the flow unit the project is really in',
+				JSON.stringify(agree.strip) + ' should contain ' + JSON.stringify(agree.flow));
+			report.ok(!!agree.pressure && agree.strip.indexOf(agree.pressure) >= 0,
+				'...and the pressure unit the project is really in',
+				JSON.stringify(agree.strip) + ' should contain ' + JSON.stringify(agree.pressure));
+			// Back to US, so the checks below start where they expect to.
+			await a.page.evaluate(() => { EngCalcs.setUnits('us'); });
+			await a.settle(400);
+		}
+
 		// A RESULT unit changes with no fanfare: the solve is untouched and the reading converts.
 		await a.page.evaluate(() => {
 			const s = document.querySelector('select[name="lpn_u_r_flow"]');

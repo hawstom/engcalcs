@@ -15074,6 +15074,24 @@ var EngCalcs = EngCalcs || {};
 			saveIndex();
 		}
 		wireNotesPopup();
+		// **THE MAP STATUS STRIP HAS TO BE RE-READ HERE, AND THIS IS THE ONLY PLACE THAT DOES IT ON
+		// BOOT** (ROADMAP Task 521, Tom 2026-08-24 with a screenshot of the strip disagreeing with
+		// the Settings box). The order that produces the defect:
+		//
+		//   1. Calculators.lib.js's DOMContentLoaded listener runs FIRST (see the note above
+		//      wireToolbar) and calls readCookieAndCalc() -> pageCalculator() -> refreshMapStatus().
+		//      The selects still hold whatever the PHP rendered, which for an SI-defaulting language
+		//      is L/s and m H2O.
+		//   2. init() then runs applySaved(), whose applyUnitSelections() installs the PROJECT's
+		//      units -- gpm and psi -- into those same selects.
+		//   3. Nothing reads the strip again, because THE BOOT PATH DOES NOT GO THROUGH
+		//      refreshAllFromDocument() (stated a few lines up, and true of every other readout it
+		//      refreshes as well).
+		//
+		// So the strip kept naming the units the PAGE was born with rather than the ones the PROJECT
+		// is in, on every first load of every project, in every SI-defaulting language. It is the
+		// units strip's own contradiction, sitting two inches from the box that disagrees with it.
+		refreshMapStatus();
 		// AFTER loadFromStorage() (so a saved default is never overwritten -- seedDefaultInputs()
 		// fills nulls only) and BEFORE wireSettingsBox() (which builds every section, and a
 		// still-null default would render as an empty box). Also necessarily after the units strip
