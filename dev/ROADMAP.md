@@ -281,10 +281,19 @@ the block.
       `https://hawsedc.com/engcalcs/…` and work. So this is a positioning choice, not a defect: does
       a visitor who arrives at LibreWaterNet stay on that domain when they start a model, or get
       handed to hawsedc.com?
+    - **IS THE MIRROR AN SEO PROBLEM? Tom asked, 2026-08-25. Answer: not a penalty, but AS
+      CONFIGURED TODAY it would split the signal, and the fix is one line.** Google's own position
+      on duplicate content across domains is that it is not grounds for a penalty, but that
+      identical pages must nominate ONE canonical or the engine picks for you and the ranking
+      signals divide between the two. **Our whitelist currently maps `librewaternet.org` to
+      `https://librewaternet.org`** (`lib/config.inc.php`), so a mirrored suite would serve two
+      copies of every page each declaring ITSELF canonical — precisely the split. Three ways out,
+      and the choice is Tom's: map `librewaternet.org` to `https://hawsedc.com` so the mirror defers
+      and consolidates; leave it self-canonical and accept a divided signal for a marketing gain;
+      or do not mirror, and let the landing page keep handing visitors to hawsedc.com as it does
+      now. **`canonical_origin_check.php` exists precisely so this is a lookup and not a guess.**
     - If yes, it is `ln -s ~/public_html/hawsedc/engcalcs ~/librewaternet.org/engcalcs` after
-      testing `Options +FollowSymLinks` on that host, plus a decision about which origin is canonical
-      for the suite's pages — **`canonical_origin_check.php` exists precisely so that is a lookup
-      and not a guess**, and getting it wrong points search engines at the wrong domain.
+      testing `Options +FollowSymLinks` on that host, plus the canonical decision above.
 
 - 100|502| **A Text object anchored to a LINK, not only to a node.**
   Extracted from Task 483 on close. A Text already follows a node (`anchorNode`, an offset plus a
@@ -318,6 +327,25 @@ the block.
   **Not blocked, but do not build blind.** Task 206's contact-funnel logging shipped 2026-08-07 and
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
+
+- 75|531| **Tag the examples: US/SI, design/maintenance, xy/lat-lon.**
+  Tom, 2026-08-25: *"Reference 348. Phase 1 can be adding labels, tags, or keywords to the
+  examples."* **Task 348 is sub-categories and paging in the gallery, and is deliberately unbuilt at
+  seven examples** — the grid is `auto-fit`, so both arrive without a rewrite when the wall stops
+  fitting a screen. This is the half worth doing BEFORE that day, because it is what any grouping or
+  filter would have to be built on.
+  - **The three axes are his**, and each is a fact the example already has rather than an opinion
+    somebody must supply: the unit set it opens in, whether it is a design exercise or a maintenance
+    one, and whether it is an XY grid or a geographic project. **Two of the three are derivable from
+    the file itself** (`units`, and `project.coords`), which is the cheap and non-rotting way to get
+    them — a tag nobody has to maintain cannot go stale.
+  - **Design vs maintenance is the one that needs a human**, and it is the one that carries real
+    meaning for somebody choosing where to start.
+  - `dev/scripts/generate_examples.php` builds the manifest and `generate_examples.php --check`
+    guards it, so a derived tag belongs there rather than hand-written beside each example.
+  - **A tag that is DISPLAYED is a string in 27 languages.** A tag used only to group or filter need
+    not be. Decide which before writing any key — this is the difference between a cheap task and a
+    sprint.
 
 - 100|508| **Tom's screenshot drop: dozens of captures, indexed and reused.** His idea,
   2026-08-24: *"a folder in this project, not in git, where I can prolifically put screenshots by
@@ -573,17 +601,6 @@ the block.
   - **Flow direction arrows stay.** epanet-js has none; Tom: *"I like that we do."* Recorded so a
     future tidy-up does not quietly remove them in the name of matching.
 
-- 100|284| **Settings box follow-ups, after the two-pane box shipped (Task 441).** The paradigm is in
-  place; what is left is the part that needs a second design.
-  - **The sticky heading is the SECTION only.** Tom asked for the current heading *and sub-heading*
-    to stick. Sub-headings scroll away today, which needs a second sticky level and a rule for what
-    happens when a short sub-section is on screen with its neighbour.
-  - **Narrow screen is a second design, so scope it as two.** The index probably collapses to a
-    drop-down under a breakpoint. Argue it on its own merits, never from phone use — Task 285.
-  - **`settings.sectionsOpen` is now stale, deliberately.** Nothing reads it; `defaultSettings()`
-    still writes it so old and new project files keep one shape. Drop it only alongside a storage
-    version bump, the way `fileAutosaveSeconds` was left.
-
 - 50|285| **We do not know what devices anybody uses this on.**
   Several decisions have quietly assumed an answer. Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."*
   `log-human-view.php` and `log-calc-event.php` record **page and language and nothing else**, so
@@ -811,18 +828,21 @@ the block.
   should figure out what "printable" should even mean per calculator type (a two-column input/
   result form vs. a map/canvas page are different problems) before building anything.
 
-- 75|178| **A moving Help asset, now that there is a real screenshots page to point at.**
-  Reworked by Tom 2026-08-25: *"178 reworked to link to lwn screenshots page."* The original was a
-  filmstrip GIF built from `dev/filmstrip-gif-recipe.md`; a 2026-07-30 proof of concept showed it is
-  cheap once set up (the hard part is precise SVG click targeting, not GIF assembly) and the POC
-  GIFs were never committed.
-  - **What changed is that the pictures now exist somewhere public.**
-    `https://librewaternet.org/screenshots.html` is live and carries the annotated plates, so Help
-    can LINK rather than carry its own asset — no GIF to build, host, cache-bust or keep in step
-    with an interface that moves.
-  - **Decide which before building either**: a link costs nothing and goes stale only when the page
-    does; a GIF shows a GESTURE, which a still cannot, and is the only one that answers "how do I
-    draw a pipe". They are not substitutes, and the recipe survives if the answer is both.
+- 75|178| **NOTHING in the suite links to the screenshots page. Fix that first.**
+  **CORRECTION, 2026-08-25.** The previous version of this block implied Help already pointed at
+  `https://librewaternet.org/screenshots.html`. Tom: *"What points at the live screenshots page? I
+  expected Help, but that doesn't."* **He is right and I checked: nothing does.** No `.php` in this
+  suite contains the string `librewaternet` outside `lib/config.inc.php`'s canonical whitelist. The
+  page is live, annotated and unreachable from the software it depicts.
+  - **Phase 1, and it is nearly free: a link from Help.** The pictures exist and are maintained in
+    another repository; Help carrying a link costs one string and goes stale only when the page
+    does. **[H] Where in Help, and the wording, are Tom's.**
+  - **Phase 2 is the original task and is NOT the same thing:** a filmstrip GIF from
+    `dev/filmstrip-gif-recipe.md` (the add-pipe / add-junction workflow). A 2026-07-30 proof of
+    concept showed it is cheap once set up — the hard part is precise SVG click targeting, not GIF
+    assembly — and the POC GIFs were never committed.
+  - **They are not substitutes.** A still shows a STATE; only a moving asset shows a GESTURE, and
+    "how do I draw a pipe" is a gesture. Doing phase 1 does not retire phase 2.
 
 - 5|181| **Per-element symbol sizing (originated during Task 146).** Task 180 shipped one overall
   `settings.symbolScale` multiplier ("Symbol size (relative to text)") covering node radius, pipe

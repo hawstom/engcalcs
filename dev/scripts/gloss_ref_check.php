@@ -183,5 +183,41 @@ if ($errors) {
     echo "dev/scripts/prefix_terms.inc.php, before any sprint runs.\n";
     exit(1);
 }
+/* ---------------------------------------------------------------------------------------------
+ * TWO TERMS MAY NOT SHARE A NAME, and this is the check that would have saved two of them.
+ *
+ * `termIndexByName()` keys the glossary by the term's NAME, so when two entries carry the same one
+ * the later simply WINS and the earlier is never delivered to any translation agent. Nothing warns:
+ * payloads generate, --check says FRESH, the sprint runs, and the losing entry's cautions were never
+ * shown to anybody. Found 2026-08-25 (ROADMAP Task 513), twice over in one file:
+ *
+ *   - `ponding` as ids 34 and 46. Entry 34's "this is a design goal, not flooding" rule had been
+ *     invisible to every sprint that ever ran.
+ *   - `scenario` as id 82 and as an entry keyed by the literal string. The string-keyed one won, so
+ *     translators saw a Swahili-specific note and NOT the three general cautions or the
+ *     case/variant framing.
+ *
+ * Both are merged. This check is here so the third one is caught in seconds rather than by a census
+ * somebody happened to run.
+ */
+$seenNames = array();
+$dupNames  = array();
+foreach ($glossary['terms'] as $key => $term) {
+    if (!is_array($term) || !isset($term['term'])) { continue; }
+    $n = $term['term'];
+    if (isset($seenNames[$n])) { $dupNames[$n][] = $key; }
+    else { $seenNames[$n] = $key; }
+}
+if ($dupNames) {
+    foreach ($dupNames as $n => $laterKeys) {
+        echo "DUPLICATE TERM NAME: \"$n\" appears as " . $seenNames[$n] . " and " .
+             implode(', ', $laterKeys) . "\n";
+    }
+    echo "\nOnly ONE entry may carry a given term name. termIndexByName() keys by name, so the\n";
+    echo "later entry wins every payload and the earlier one is delivered to nobody -- silently.\n";
+    echo "Merge them into one entry and delete the other.\n";
+    exit(1);
+}
+
 echo "PASS: every gloss pointer resolves and is wired to its prefix.\n";
 exit(0);

@@ -8,6 +8,7 @@ something this repository does not already have.
 | Agent | Seat | Files |
 |---|---|---|
 | `utility-planning-engineer` | Design and planning inside a water utility — the system, not the parcel | `journal.md`, `wishlist.md` |
+| `utility-field-operator` | The person who opens the map ON A PHONE, in the street, to read it rather than draw it | `journal.md`, `wishlist.md` |
 
 **Each agent keeps a journal and a wish list.** The journal is what it learned; the wish list is
 what it would build next, in its own order. Tom, 2026-08-24: *"We all have our pet priorities, and
@@ -24,5 +25,6 @@ SPECULATION is upgraded only by finding the source — never by still sounding r
 
 Tom, 2026-08-24, listing who else may deserve a place: the **data entry clerk** (tab order,
 customizable panes, every bell and whistle muffleable), the **surveyor**, and the **field
-inspector or operator** — *"they need a map!"*. None is being built yet. A seat earns an agent
+inspector or operator** — *"they need a map!"*. **The field operator was hired 2026-08-25** and is
+in the table above; the clerk and the surveyor are still unfilled. A seat earns an agent
 by carrying external evidence or a vantage point nobody here has, not by completing a set.

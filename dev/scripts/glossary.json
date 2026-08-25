@@ -3057,9 +3057,11 @@
    "avoid": [
     "a scene or setting in the dramatic/film sense",
     "a scenario in the \"worst case story\" narrative sense, where the language has a modelling or variant-case term",
-    "a copy or duplicate of the network -- a scenario is a set of differences, not a second network"
+    "a copy or duplicate of the network -- a scenario is a set of differences, not a second network",
+    "a native Swahili word for scenario: hali, mfano and toleo are all already taken inside lib/lang.ec.sw.php by Mode, example and file version respectively, so reusing one gives that file two meanings for one word.",
+    "an eigenvalue-adjacent word for the sibling string \"own values\"."
    ],
-   "translation_notes": "The concept is \"case\" or \"variant\", as used by scenario managers in InfoWater/WaterGEMS. Not yet visible in the UI as of 2026-07-31 (Base is the only scenario); seeded now so the sprint does not have to invent it later. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): a named set of demand overrides, not a duplicate network. All four used their modelling/variant-case term, not the dramatic or worst-case-story sense.",
+   "translation_notes": "The concept is \"case\" or \"variant\", as used by scenario managers in InfoWater/WaterGEMS. Not yet visible in the UI as of 2026-07-31 (Base is the only scenario); seeded now so the sprint does not have to invent it later. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): a named set of demand overrides, not a duplicate network. All four used their modelling/variant-case term, not the dramatic or worst-case-story sense. [2026-08-25, ROADMAP Task 513] MERGED with a second same-named entry that was keyed by the term STRING rather than by an id. Because termIndexByName() keys the glossary by NAME, that one won every payload -- so translators had been shown its Swahili-specific note and NOT the three cautions above or the case/variant framing. Its content is folded in here and it is deleted. Its own note, kept because it is a real observation: [2026-08-20] Rescued from a comment the Swahili translator left in lib/lang.ec.sw.php. Comments were stripped from the 26 translated files that day because they were copies of the English rationale; these few were the translator's OWN rulings and had no home outside that file. A glossary entry is the one place a later sprint actually reads. No established Swahili engineering standard was found, so the transliteration was a deliberate choice, not a shortcut; Base is Msingi.",
    "translations": {
     "am": "",
     "ar": "",
@@ -3082,12 +3084,13 @@
     "ro": "",
     "ru": "",
     "sr": "",
-    "sw": "",
+    "sw": "Senario",
     "tr": "senaryo",
     "uk": "",
     "ur": "",
     "zh": ""
-   }
+   },
+   "source": "merged 2026-08-25 with a string-keyed duplicate"
   },
   "83": {
    "term": "channel lining",
@@ -3818,20 +3821,6 @@
    "translation_notes": "[2026-08-19, sprint 438 Wave 0] Precedent set for lpn_labels_col_decimals_example, whose whole value is the example 0.000 and which Tom said may become 0,000 where needed. lpn_time_format_tip carries four such examples and nothing in the English says they are localisable.",
    "translations": {},
    "source": "sprint 438-wave0, 2026-08-19"
-  },
-  "scenario": {
-   "term": "scenario",
-   "symbol": "",
-   "avoid": [
-    "a native Swahili word for scenario: hali, mfano and toleo are all already taken inside lib/lang.ec.sw.php by Mode, example and file version respectively, so reusing one gives that file two meanings for one word.",
-    "an eigenvalue-adjacent word for the sibling string \"own values\"."
-   ],
-   "context": "A named set of overridden values a project can hold beside its base network.",
-   "translation_notes": "[2026-08-20] Rescued from a comment the Swahili translator left in lib/lang.ec.sw.php. Comments were stripped from the 26 translated files that day because they were copies of the English rationale; these few were the translator's OWN rulings and had no home outside that file. A glossary entry is the one place a later sprint actually reads. No established Swahili engineering standard was found, so the transliteration was a deliberate choice, not a shortcut; Base is Msingi.",
-   "translations": {
-    "sw": "Senario"
-   },
-   "source": "Rescued 2026-08-20 from a translator comment in lib/lang.ec.sw.php"
   },
   "tank level": {
    "term": "tank level",

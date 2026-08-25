@@ -7,11 +7,10 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**59 open tasks.** Next (100): 10 · Soon (75): 11 · Someday (50): 10 · Maybe (25): 12 · Parked (5): 16
+**59 open tasks.** Next (100): 9 · Soon (75): 12 · Someday (50): 10 · Maybe (25): 12 · Parked (5): 16
 
-## 100 — Next (10)
+## 100 — Next (9)
 
-- Task 284 — Settings box follow-ups, after the two-pane box shipped (Task 441).
 - Task 408 — Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 477 — New blank project startup wizard: xy/lat-lon, units, head loss.
@@ -22,9 +21,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 513 — Sprint 459's leftovers: two named strings nobody here can read.
 - Task 530 — Available fire flow at a hydrant, with the hydrant assembly modelled.
 
-## 75 — Soon (11)
+## 75 — Soon (12)
 
-- ! Task 178 — A moving Help asset, now that there is a real screenshots page to point at.
+- Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
@@ -35,6 +34,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 468 — Demand categories on a junction — the breakdown the importer already flattens.
 - Task 479 — [H] · One question left: should the suite answer at librewaternet.org/engcalcs/ ?
 - Task 503 — AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry
+- Task 531 — Tag the examples: US/SI, design/maintenance, xy/lat-lon.
 
 ## 50 — Someday (10)
 
@@ -85,5 +85,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-56 of 59 titles are within 4–12 words. `!` marks the rest;
+57 of 59 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
