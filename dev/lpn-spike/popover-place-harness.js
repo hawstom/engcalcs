@@ -63,7 +63,7 @@ eval(`var POPUP_EDGE = ${EDGE};\n` + [
 // bodyH: how tall the body WANTS to be. chrome: everything else in the panel, which a cap never
 // eats. The panel's measured height is chrome + min(bodyH, whatever cap is on the body) -- that is
 // the coupling, and it is what makes a capped panel actually shorter.
-function fakePanel(w, bodyH, chrome, hasBody) {
+function fakePanel(w, bodyH, chrome, hasBody, hasBand) {
 	const body = {
 		style: {},
 		getBoundingClientRect() {
@@ -73,7 +73,12 @@ function fakePanel(w, bodyH, chrome, hasBody) {
 	};
 	const panel = {
 		style: {},
-		querySelector(sel) { return (hasBody && sel === '.lpn-popover-body') ? body : null; },
+		// `.lpn-popover-x` is the CLOSE BUTTON, and openPanelAtAnchor() asks for it to decide whether
+		// this panel has a top band worth lifting clear of the chrome. A menu pull-down has none.
+		querySelector(sel) {
+			if (sel === '.lpn-popover-x') { return hasBand ? { tag: 'button' } : null; }
+			return (hasBody && sel === '.lpn-popover-body') ? body : null;
+		},
 		getBoundingClientRect() {
 			// A panel with no body wrapper scrolls itself, so its own max-height is what binds.
 			const own = parseFloat(panel.style.maxHeight);
@@ -277,15 +282,27 @@ console.log('\n-- a panel hung below its button clears the WHOLE chrome, not jus
 	window.innerHeight = 1200;
 	const anchor = rect(60, 250, 90, 29);
 	CHROME_FLOOR = 360;
-	const p = fakePanel(240, 400, 16, true);
+	const p = fakePanel(240, 400, 16, true, true);
 	openPanelAtAnchor(p, anchor);
 	report(px(p.style.top) >= CHROME_FLOOR,
 		'a downward panel starts below the last strip of chrome, not below its own row',
 		p.style.top + ' vs floor ' + CHROME_FLOOR);
 
+	// **AND A MENU PULL-DOWN IS NOT LIFTED, because it has no band to protect** (regression, Tom
+	// 2026-08-25: *"Menus have moved down and away from their buttons."*). The lift was written for
+	// the draggable boxes, whose top band carries the drag surface and the close button; the same
+	// entry point serves the menus, and applying it to them left the Water menu floating below the
+	// whole toolbar and tab strip with nothing joining it to the word that opened it.
+	CHROME_FLOOR = 360;
+	const m = fakePanel(240, 400, 16, true, false);
+	openPanelAtAnchor(m, anchor);
+	report(px(m.style.top) === anchor.bottom,
+		'a menu with no close button hangs at its own button, chrome or no chrome',
+		m.style.top + ' should be ' + anchor.bottom + ' (floor ' + CHROME_FLOOR + ')');
+
 	// ...and with no chrome to clear it still hangs off its own button, unchanged.
 	CHROME_FLOOR = 0;
-	const q = fakePanel(240, 400, 16, true);
+	const q = fakePanel(240, 400, 16, true, true);
 	openPanelAtAnchor(q, anchor);
 	report(px(q.style.top) === anchor.bottom,
 		'...and with no chrome in the way it still hangs at the button\'s bottom edge', q.style.top);

@@ -19675,7 +19675,17 @@ var EngCalcs = EngCalcs || {};
 		// top band -- which is its drag surface AND its close button -- behind the toolbar below it.
 		// Only the DOWNWARD placement is lifted: a panel that deliberately flipped up is avoiding its
 		// own anchor, and pushing it down would land it on the thing it flipped to avoid.
-		panel.style.top = (at.top >= ar.bottom ? Math.max(chromeFloor(), at.top) : at.top) + 'px';
+		//
+		// **AND ONLY A PANEL THAT HAS SUCH A BAND IS LIFTED** (regression found by Tom, 2026-08-25:
+		// *"Menus have moved down and away from their buttons."*). This one entry point serves the
+		// draggable boxes AND the menu pull-downs, and a pull-down has no band to protect: it is a
+		// list, it is dismissed by clicking away, and hanging it below the whole toolbar and tab
+		// strip leaves it floating in the middle of the drawing with nothing connecting it to the
+		// word that opened it. Tested by asking whether the panel carries a close button, which is
+		// the band's own control -- so the rule is derived from the thing it exists to protect
+		// rather than from a list of ids that would drift.
+		var hasBand = !!(panel.querySelector && panel.querySelector('.lpn-popover-x'));
+		panel.style.top = (hasBand && at.top >= ar.bottom ? Math.max(chromeFloor(), at.top) : at.top) + 'px';
 		return at;
 	}
 	// For the panels that are NOT hung off a control -- the property popup (opened at a point on the
