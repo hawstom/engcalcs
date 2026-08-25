@@ -213,6 +213,25 @@ the block.
   - **It is screenshot 0030**, which is what Tom asked for so he can look at it himself. He is not
     worried about it (2026-08-24), hence Maybe rather than Soon.
 
+- 75|526| **An EPANET warning is cached against a signature that cannot see it.**
+  Found 2026-08-25 while writing the harness for Task 525, and it is a DIFFERENT defect from that
+  one. `js/lpn-epanet.js` caches `built.warnings` on the open session for as long as
+  `signatureOf(model)` holds, on the stated reasoning that warnings *"depend only on the method and
+  on which pumps have curves -- both of which are in the signature, so a cached warning list can
+  never go stale under a value edit."*
+  - **That was true, and stopped being true when `minor-loss-gravity-differs` was added.** It is
+    raised from `lpnLinkK(link) > 0` — a VALUE — and `k` is not in the signature.
+  - **The costly direction is the one nobody sees.** Zeroing every minor loss leaves a stale warning
+    that merely says something harmless. **Adding** a minor loss to a network that had none raises
+    no warning at all, so a real difference between the two engines is never announced.
+  - Measured: with the model's own `k` at 0, `lastResult().warnings` still carries the code.
+    `dev/lpn-spike/engine-note-once-harness.js` section 4 pins it and breaks when it is fixed.
+  - Two ways out. Put "any k > 0" in the signature — cheap, but it rebuilds the session whenever a
+    minor loss crosses zero. Or compute this warning per solve rather than caching it, which is the
+    honest shape: it is a fact about current values, so it belongs where current values are read.
+  - **Also fix the comment.** It states an invariant the code no longer keeps, and it is exactly the
+    sentence a future reader would trust instead of checking.
+
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
   more than one means rewrite"*, both waves writing to `dev/english-friction/<sprint>.json`, with

@@ -11130,6 +11130,9 @@ var EngCalcs = EngCalcs || {};
 		// under mm now opens under mm however this browser was last left, because its numbers only
 		// mean anything alongside the units they were typed in.
 		applyUnitSelections(saved.units);
+		// A different document is a different network, so whether it HAS minor losses or Manning
+		// roughness is a new question and its engine notes are worth saying once again (Task 525).
+		resetEngineNotes();
 		// A pre-declarative document holds SI numbers and has not been ruled on. offerUnitRestore(),
 		// called by refreshAllFromDocument() once the network is on screen, asks about it there --
 		// the question is unanswerable in the abstract and obvious next to the drawing.
@@ -17938,6 +17941,8 @@ var EngCalcs = EngCalcs || {};
 		engInput.checked = (settings.engine === 'epanet');
 		engInput.addEventListener('change', function () {
 			settings.engine = engInput.checked ? 'epanet' : 'native';
+			// A different engine makes the engine-difference notes new again (Task 525).
+			resetEngineNotes();
 			// Fetch it now rather than on the next solve: the user just asked for this engine, so
 			// this is the moment to spend the 664 KB and the moment they will understand the wait.
 			if (settings.engine === 'epanet') { warmEpanetEngine('engine'); }
@@ -21673,8 +21678,29 @@ var EngCalcs = EngCalcs || {};
 			if (ids.length === 0) { return ''; }
 			return (pc[key] || fallback).replace('{ids}', ids.join(', '));
 		}
-		var manningNote = warned('manning-constant-differs'),
-			minorNote = warned('minor-loss-gravity-differs');
+		// **THE TWO ENGINE-DIFFERENCE NOTES ARE SAID ONCE, NOT ON EVERY SOLVE** (ROADMAP Task 525).
+		// Tom, 2026-08-25, from his phone, of the minor-loss one: *"a solve didn't dismiss it"* --
+		// and it could not, because a solve is what CREATES it. Both come from solver warnings that
+		// depend only on the ENGINE and the network having minor losses or Manning roughness, so
+		// they were re-emitted on every keystroke's solve and could never go away.
+		//
+		// They are also not facts about this solve. They are facts about the engine you picked,
+		// they are 0.08% and 0.6%, nothing can be done about either, and the identical sentences
+		// already sit in `lpn_settings_engine_epanet_tip` where the engine is chosen. Saying them
+		// once, the first time they arise, tells a user who never opens that tip; saying them
+		// forever spends a fifth of a phone screen on a rounding difference.
+		//
+		// Cleared when the ENGINE changes and when a different project is applied, because for
+		// either the fact is new again. Deliberately NOT persisted: a page reload is cheap, and a
+		// note nobody can ever see again is worse than one seen twice.
+		function noteOnce(code) {
+			if (!warned(code)) { return false; }
+			if (shownEngineNotes[code]) { return false; }
+			shownEngineNotes[code] = true;
+			return true;
+		}
+		var manningNote = noteOnce('manning-constant-differs'),
+			minorNote = noteOnce('minor-loss-gravity-differs');
 		setStatus([valveRouteNote,
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
@@ -21700,6 +21726,10 @@ var EngCalcs = EngCalcs || {};
 	// outlast the next edit. Without the token, a slow solve of an OLD network can land after a
 	// fast solve of the CURRENT one and silently overwrite correct results with stale ones --
 	// and it would look like a physics bug, not a race.
+	// Which engine-difference notes this project has already been told (Task 525). Reset by
+	// resetEngineNotes() on an engine change and on applySaved().
+	var shownEngineNotes = {};
+	function resetEngineNotes() { shownEngineNotes = {}; }
 	var epanetToken = 0;
 	function runSolveEpanet(model) {
 		var pc = EngCalcs.pageConfig || {};
