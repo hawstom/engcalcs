@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1345,
-        "delta_key_count": 5,
+        "expected_key_count": 1351,
+        "delta_key_count": 11,
         "exempt_key_count": 34,
         "exempt_keys": [
             "u_imgd",
@@ -455,6 +455,12 @@
     "keys_to_translate": {
         "lpn_geomap": "lat\/lon",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
+        "lpn_georef_twopt": "Use two known points",
+        "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
+        "lpn_georef_twopt_pick1": "Click a point on your drawing whose latitude and longitude you know.",
+        "lpn_georef_twopt_pick2": "Now click a second known point, as far from the first one as you can.",
+        "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
+        "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off"
@@ -462,6 +468,12 @@
     "keys": {
         "lpn_geomap": "lat\/lon",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
+        "lpn_georef_twopt": "Use two known points",
+        "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
+        "lpn_georef_twopt_pick1": "Click a point on your drawing whose latitude and longitude you know.",
+        "lpn_georef_twopt_pick2": "Now click a second known point, as far from the first one as you can.",
+        "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
+        "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off"
@@ -496,6 +508,102 @@
                     "key": "lpn_georef_on_map",
                     "value": "Proyek ini sudah dalam lat\/lon.",
                     "english": "This project is already on lat\/lon."
+                }
+            }
+        },
+        "lpn_georef_twopt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_goto",
+                    "value": "Pergi ke…",
+                    "english": "Go to…"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_toggle",
+                    "value": "Panel bawah",
+                    "english": "Bottom panel"
+                }
+            }
+        },
+        "lpn_georef_twopt_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_goto",
+                    "value": "Pergi ke…",
+                    "english": "Go to…"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_toggle",
+                    "value": "Panel bawah",
+                    "english": "Bottom panel"
+                }
+            }
+        },
+        "lpn_georef_twopt_pick1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_goto",
+                    "value": "Pergi ke…",
+                    "english": "Go to…"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_toggle",
+                    "value": "Panel bawah",
+                    "english": "Bottom panel"
+                }
+            }
+        },
+        "lpn_georef_twopt_pick2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_goto",
+                    "value": "Pergi ke…",
+                    "english": "Go to…"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_toggle",
+                    "value": "Panel bawah",
+                    "english": "Bottom panel"
+                }
+            }
+        },
+        "lpn_georef_twopt_same": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_goto",
+                    "value": "Pergi ke…",
+                    "english": "Go to…"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_toggle",
+                    "value": "Panel bawah",
+                    "english": "Bottom panel"
+                }
+            }
+        },
+        "lpn_georef_twopt_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_goto",
+                    "value": "Pergi ke…",
+                    "english": "Go to…"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_toggle",
+                    "value": "Panel bawah",
+                    "english": "Bottom panel"
                 }
             }
         },

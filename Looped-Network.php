@@ -287,6 +287,11 @@ echoHeader("EngCalcs", $html_title, "", false);
 					<input type="number" id="lpn_georef_rot_in" step="any" style="width:5em"></label>
 			</span>
 			<button type="button" id="lpn_georef_goto"><?=$ec_lang['lpn_georef_goto']?></button>
+			<?php // THE SURVEYOR'S ROUTE TO THE SAME PLACEMENT (Task 436). Shown in step 2 only, beside
+			      // the scale and turn boxes, because all three set the SAME transform by typing rather
+			      // than by dragging -- and because picking a point off the drawing needs the model to be
+			      // on the ground, which is what step 2 means. ?>
+			<button type="button" id="lpn_georef_twopt" style="display:none"><?=ecTipLabel($ec_lang['lpn_georef_twopt'], $ec_lang['lpn_georef_twopt_tip'])?></button>
 			<?php // Shown in step 1 only, and only when every coordinate could also be a lon/lat pair
 			      // (georefRefreshBar). It is the reinterpret case, which used to be a range test
 			      // deciding for the user -- and deciding wrong for any drawing on a small grid. ?>
@@ -1249,6 +1254,10 @@ EngCalcs.pageConfig = {
 	lpn_georef_step1_hint: <?=json_encode($ec_lang['lpn_georef_step1_hint'])?>,
 	lpn_georef_detach: <?=json_encode($ec_lang['lpn_georef_detach'])?>,
 	lpn_georef_size_prompt: <?=json_encode($ec_lang['lpn_georef_size_prompt'])?>,
+	lpn_georef_twopt_pick1: <?=json_encode($ec_lang['lpn_georef_twopt_pick1'])?>,
+	lpn_georef_twopt_pick2: <?=json_encode($ec_lang['lpn_georef_twopt_pick2'])?>,
+	lpn_georef_twopt_same: <?=json_encode($ec_lang['lpn_georef_twopt_same'])?>,
+	lpn_georef_twopt_done: <?=json_encode($ec_lang['lpn_georef_twopt_done'])?>,
 	lpn_tip_join: <?=json_encode($ec_lang['lpn_tip_join'])?>,
 	lpn_tool_add_junction_tip: <?=json_encode($ec_lang['lpn_tool_add_junction_tip'])?>,
 	lpn_tool_add_reservoir_tip: <?=json_encode($ec_lang['lpn_tool_add_reservoir_tip'])?>,

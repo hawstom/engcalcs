@@ -763,6 +763,12 @@
         "lpn_goto_prompt": "Latitude and longitude, in that order",
         "lpn_goto_bad": "That is not one latitude and one longitude. Try 38 -122, with a space between them.",
         "lpn_georef_goto": "Go to…",
+        "lpn_georef_twopt": "Use two known points",
+        "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
+        "lpn_georef_twopt_pick1": "Click a point on your drawing whose latitude and longitude you know.",
+        "lpn_georef_twopt_pick2": "Now click a second known point, as far from the first one as you can.",
+        "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
+        "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
         "lpn_pane_toggle": "Bottom panel",
         "lpn_pane_toggle_tip": "Show or hide the panel below the map. It holds the profile and a table for each kind of part.",
         "lpn_pane_resize": "Drag to make the panel taller or shorter",
@@ -1347,7 +1353,7 @@
         "lpn_terrain_missed": "{m} could not be read and are still blank.",
         "lpn_terrain_partial": "{f} terrain tile(s) did not answer."
     },
-    "count": 1345,
+    "count": 1351,
     "active_prefixes": [
         "about",
         "bpn",

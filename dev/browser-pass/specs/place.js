@@ -161,6 +161,32 @@ async function bar(a) {
 		};
 	});
 }
+// Where each drawn symbol is, in SCREEN pixels -- what a person aims at when the two-point tool asks
+// them to click a point they know. Same source as nodePos(), read as a position rather than as text.
+async function nodeScreenPts(a) {
+	return a.page.evaluate(() => [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')]
+		.map((e) => { const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; }));
+}
+// The longitudes the model is drawn at. doc.origin is {0, 0} for the whole of a placement and
+// Mercator x IS longitude, so a drawn cx is the longitude exactly -- which is what makes "the control
+// point landed on the number the user typed" checkable without asking the transform.
+async function drawnLons(a) {
+	return a.page.evaluate(() => [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')]
+		.map(e => +e.getAttribute('cx')));
+}
+// window.prompt answered from a QUEUE, the way specs/goto.js does it: the two-point tool asks once
+// per control point, and Session.answerPromptWith() holds a single answer.
+async function queuePrompts(a, answers) {
+	await a.page.evaluate((qa) => {
+		window.__realPrompt = window.prompt;
+		window.__asked = [];
+		let i = 0;
+		window.prompt = (msg, dflt) => { window.__asked.push({ msg: msg, dflt: dflt }); return qa[i++]; };
+	}, answers);
+}
+async function endPrompts(a) {
+	return a.page.evaluate(() => { window.prompt = window.__realPrompt; return window.__asked; });
+}
 async function handleCount(a) {
 	return a.page.evaluate(() => document.querySelectorAll('.lpn-georef-handle').length);
 }
@@ -791,6 +817,67 @@ exports.run = async function ({ browser, report }) {
 			report.ok(await a.page.evaluate(() => document.getElementById('lpn_georef_bar').style.display === 'none'),
 				'a file that DOES say DEGREES just opens — its coordinates already are lon/lat');
 			report.has(await readout(a), 'Latitude', '...as a lat/lon project, read out of the file');
+		}
+
+
+		// ---- 15. TWO KNOWN POINTS (Task 436) -----------------------------------------------------
+		// lpnGeorefFromTwoPoints() was written and tested with no way to reach it. The door is a
+		// button on this bar, and everything about it is a real-browser question: whether the button
+		// is where step 2's other precise controls are, whether a press on the canvas reaches the
+		// pick rather than dragging the body polygon that covers the whole model, and whether the
+		// node the click snapped to is the one named back to the user.
+		{
+			await a.newProject('us');
+			await a.settle(800);
+			await a.dismissGallery();
+			await drawL(a);
+			await placeCurrent(a, 'two-known-points.json');
+			report.ok(await a.page.evaluate(() => {
+				const e = document.getElementById('lpn_georef_twopt');
+				return !!e && getComputedStyle(e).display === 'none';
+			}), 'the two-point button is not offered in step 1, where a pick cannot be read');
+			await a.page.click('#lpn_georef_drop');
+			await a.settle(600);
+			report.ok(await a.page.evaluate(() => {
+				const e = document.getElementById('lpn_georef_twopt');
+				return !!e && getComputedStyle(e).display !== 'none';
+			}), '...and is offered in step 2, beside the scale and turn boxes');
+
+			await a.page.click('#lpn_georef_twopt');
+			await a.settle(300);
+			report.has(await a.notice(), 'Click a point', 'pressing it asks for the first known point');
+
+			// A coordinate a person would actually have for two corners of a site, ~1.2 km apart.
+			const P0 = { lat: 38.100000, lon: -122.560000 }, P1 = { lat: 38.106500, lon: -122.548000 };
+			const pts = await nodeScreenPts(a);
+			await queuePrompts(a, ['38.1, -122.56', '38,1065 -122,548']);
+			await a.page.mouse.click(pts[0].x, pts[0].y);
+			await a.settle(300);
+			report.has(await a.notice(), 'second known point', '...then for the second');
+			const midPts = await nodeScreenPts(a);
+			await a.page.mouse.click(midPts[2].x, midPts[2].y);
+			await a.settle(900);
+			const asked = await endPrompts(a);
+			report.eq(asked.length, 2, 'it asks once per control point and no more');
+			report.has(asked[0] && asked[0].msg, 'Latitude',
+				'...asking for a latitude and a longitude, in that order');
+			report.ok(asked[0] && /\(\S+\)/.test(asked[0].msg),
+				'...and naming the node it snapped to, so a wrong pick is visible before it commits',
+				asked[0] && asked[0].msg);
+
+			const lons = await drawnLons(a);
+			report.ok(Math.abs(lons[0] - P0.lon) < 1e-9 && Math.abs(lons[2] - P1.lon) < 1e-9,
+				'the two control points land on the exact coordinates the user typed',
+				lons.map(v => v.toFixed(7)).join(' '));
+			// The decimal COMMA is the trap parseLatLon() exists for, and the second answer above is
+			// written with one. If it had been half-read the model would be somewhere else entirely.
+			report.ok(Math.abs(lons[2] - P1.lon) < 1e-9,
+				'...including the one typed with a decimal comma, the way most of our languages write it');
+			report.has((await bar(a)).step, 'Step 2',
+				'...and the wizard is still in step 2: this is not a second commit path');
+			report.has(await a.notice(), 'Keep this placement', '...pointing at the same Finish as ever');
+			await a.page.click('#lpn_georef_cancel');
+			await a.settle(800);
 		}
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');
