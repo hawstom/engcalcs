@@ -164,12 +164,21 @@ ok('...including a vertex and a text label, which are coordinates too',
 	out1.links[0].verts[0].y + ', ' + out1.labels[0].y);
 ok('...and every longitude, untouched',
 	out1.nodes.every((n, i) => n.x === geoFile.nodes[i].x));
+// **AND LOCAL TO THE ORIGIN SINCE TASK 439**, so the drawn y is -(mercY(lat) - origin.y). Written
+// as that composition rather than as a bare projection: the raw number is now a frame detail, and
+// what has to hold is that the drawing is projected AND shifted -- which is exactly what outwardY()
+// composes. Left as a bare projection this reports a defect where there is none.
+const ORG_Y = L.docOrigin().y;
 L.getDoc().nodes.forEach((n, i) => {
-	if (Math.abs(n.y + Geom.mercY(LATS[i])) > 1e-12) { drawnProjected = false; }
+	if (Math.abs(n.y + (Geom.mercY(LATS[i]) - ORG_Y)) > 1e-12) { drawnProjected = false; }
 });
 ok('...while the DRAWING really is projected, so this is not passing by doing nothing',
-	drawnProjected && Math.abs(L.getDoc().nodes[0].y + 41.2723804) < 1e-6,
-	L.getDoc().nodes[0].y.toFixed(7));
+	drawnProjected && Math.abs(L.outwardY(L.getDoc().nodes[0].y) - LATS[0]) < 1e-9,
+	L.getDoc().nodes[0].y.toFixed(7) + ' local, outward ' + L.outwardY(L.getDoc().nodes[0].y));
+// NOT asserted here: that the local number is SMALL. This fixture spans most of the globe on
+// purpose, and no origin can make a world-wide model's coordinates small -- that is arithmetic, not
+// a defect. The magnitude claim belongs to a realistic site and is made in
+// dev/lpn-spike/geo-origin-harness.js, on a 440 m one.
 // The pass-through is guarded by a VALUE COMPARISON, not by discipline: nothing has to remember to
 // clear it. Moving one node must re-derive that one and leave the other seven alone.
 L.getDoc().nodes[2].y = L.inwardY(51.6);
@@ -288,11 +297,14 @@ ok('...and its inverse likewise',
 	(geomSrc.match(/Math\.atan\(Math\.sinh\(/g) || []).length === 1 &&
 	!/Math\.atan\(Math\.sinh\(/.test(src));
 // FIVE in the coordinate seam -- outwardY, inwardY, projectStoredGeo, and unprojectStoredGeo twice
-// (it tests the source before it trusts it) -- and TWO in the v9 -> v10 step. Every one is named in
-// a comment beside it; an EIGHTH is a site nobody wrote a reason for, and a site that should have
-// projected and did not is wrong only in a geographic project and only away from the equator.
-ok('mercY/mercLat are called from seven places in js/looped-network.js and no more',
-	count(/Geom\.mercY\(|Geom\.mercLat\(/g) === 7, count(/Geom\.mercY\(|Geom\.mercLat\(/g));
+// (it tests the source before it trusts it) -- TWO in the v9 -> v10 step, and ONE in
+// rebaseLiveGeoDoc() since Task 439, which projects the model's extent to decide which 1/128 cell
+// a geographic document's origin sits in. That last one is a real use of the seam rather than a way
+// round it: it reads through outwardY() and moves no coordinate. Every site is named in a comment
+// beside it; a NINTH is a site nobody wrote a reason for, and a site that should have projected and
+// did not is wrong only in a geographic project and only away from the equator.
+ok('mercY/mercLat are called from eight places in js/looped-network.js and no more',
+	count(/Geom\.mercY\(|Geom\.mercLat\(/g) === 8, count(/Geom\.mercY\(|Geom\.mercLat\(/g));
 ok('...and the tile grid uses the RADIAN form, which is what keeps its numbers unchanged',
 	count(/Geom\.mercRadY\(|Geom\.mercLatFromRad\(/g) === 2,
 	count(/Geom\.mercRadY\(|Geom\.mercLatFromRad\(/g));

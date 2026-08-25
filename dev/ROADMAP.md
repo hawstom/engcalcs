@@ -89,51 +89,6 @@ the block.
     map's own 1/cos(latitude) — 9% from 20° to 31°. Unavoidable on an unprojected display without an
     anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.
 
-- 100|439| **The lat/lon drawing comes apart at 64,000 px/degree, not 600,000.**
-  It is Task 354 in degrees. A node's `<circle>` rasterises at x = −41,548,184 and is simply not on screen, while `maxScale()`
-  for a geographic project is 5.56e7. The medicine is the one Task 354 already used — coordinates
-  local to an origin — but `LPN_ORIGIN_THRESHOLD` is 1e4 and a longitude is 122, so no geographic
-  document is ever rebased, and `georefStart()` deliberately sets `doc.origin = {0, 0}`. Touches the
-  placement tool, the basemap and the stored file format, so it is its own task.
-  - **MEASURED 2026-08-24, and the old "~600,000" was an order of magnitude too kind.**
-    `dev/lpn-spike/geo-precision-harness.js` models the composition the page asks for
-    (`s * x + tx`, setTransform()) in float32. On a 440 m site at longitude −122.57 it first exceeds
-    half a pixel at **64,000 px/degree**, and at the deepest zoom the page permits a node lands
-    **575 px** from where it was asked for. The Mercator y breaks the same way at 316 px.
-    The harness is validated against float64 first, which is exact to 9e-7 px.
-  - **The fix's arithmetic is proved and is EXACT, which is the part that was not obvious.** With
-    the origin snapped to a **power-of-two grid** (1/128°), `(x − ox) + ox === x` for every sample —
-    not close, identical — so shifting a coordinate in and back out cannot violate the
-    only-the-user-touches-a-file's-numbers rule. Sterbenz gives it: `x − ox` is exact whenever
-    `ox/2 ≤ x ≤ 2·ox`, which holds for any origin chosen near the model, and a power-of-two origin
-    is itself exactly representable. A decimal grid (1e-3) has neither property.
-  - **DECIDED (Tom, 2026-08-24): OPTION B.** `view` and `backdrop` become absolute for a geographic
-    document, the origin is derived at load and never stored, and everything in the file is a real
-    place on Earth. **And his reason for caring about `backdrop` at all is worth keeping: *"it didn't
-    occur to me that anybody would use a backdrop for a geographic project. They could."*** — so the
-    migration must carry a backdrop correctly rather than treating it as a case that cannot arise.
-  - The decision, as it stood before he ruled: For a
-    geographic document the file must keep ABSOLUTE longitude and latitude, so the origin cannot be
-    baked into the stored coordinates the way `rebaseDocument()` does for an XY grid. But
-    `view.cx/cy` and `backdrop.tx/ty` are stored in the DRAWING frame (v10), so an origin merely
-    derived from the extent at load time moves them whenever the extent has changed since the save.
-    Two ways out, and one has to be chosen before any code:
-    - **(a) a second stored field** — `origin` keeps meaning "the XY grid's local origin", a new
-      `geoOrigin` means "the drawing-frame offset", and node coordinates in the file are explicitly
-      not relative to it. Cheap, and it puts two things called origin in one file.
-    - **(b) make `view` and `backdrop` absolute for a geographic document** (a v11 migration), after
-      which the origin is free to be derived at load and never stored at all. Everything in the file
-      is then absolute, which is the simpler thing to explain — and it is a migration.
-  - Nothing is implemented. The harness above is a proof about the arithmetic, not about the page.
-  - **Task 145's projection seam did NOT subsume this, and the numbers say why:** the drawing frame
-    is Web Mercator now rather than lon/lat, but a longitude is still 122 and a Mercator y still 41.
-    Same magnitude, same float32, same threshold that never fires. What it DID give this task is a
-    frame to rebase in — `doc.origin` is applied AFTER the projection for a geographic document, so
-    an origin there is a drawing-frame offset and moves no number in the file. The file-format half
-    of this task is therefore smaller than the block above assumes.
-  - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
-    drawing is still correct.
-
 - 50|513| **Sprint 459's leftovers: two named strings nobody here can read.**
   The three jobs this task carried are done (2026-08-25). The glossary write-back was done from the
   SHIPPED STRINGS, not from the lost transcript — `dev/scripts/glossary_rendering_census.php` counts

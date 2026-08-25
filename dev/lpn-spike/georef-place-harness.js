@@ -36,7 +36,7 @@ const L = loadLoopedNetwork(
 	"\t\tgeorefSetTransform: georefSetTransform,\n" +
 	"\t\tgeorefCentre: georefSrcCentre, georefCorners: georefCornersSrc,\n" +
 	"\t\tparseLatLon: parseLatLon,\n" +
-	"\t\toutwardX: outwardX, outwardY: outwardY,\n" +
+	"\t\toutwardX: outwardX, outwardY: outwardY, docOrigin: docOrigin,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -187,12 +187,22 @@ ok('and every other number too',
 console.log('\n--- Finish commits, and the refusals are refusals ---');
 L.georefStart();
 L.georefAttach();
-const placed = JSON.stringify(doc.nodes.map(n => [n.id, n.x, n.y]));
+// **OUTWARD, NOT RAW** (ROADMAP Task 439). Finish now rebases the fresh geographic document onto
+// a local origin, so every raw `n.x` in memory legitimately changes -- that is the whole fix, and
+// a raw comparison here would fail for the right reason and read like a lost placement. The
+// promise being checked has always been about the coordinates the document REPORTS: outward is
+// where a placed coordinate lives, where it is stored, and what the user is shown.
+const placed = JSON.stringify(doc.nodes.map(n => [n.id, L.outwardX(n.x), L.outwardY(n.y)]));
 L.georefFinish();
 ok('Finish leaves no tool armed', L.georefState() === null);
 ok('...the project stays on the world map', L.getProject().coords === 'geo');
 ok('...and the placed coordinates are the ones that survive',
-	JSON.stringify(doc.nodes.map(n => [n.id, n.x, n.y])) === placed);
+	JSON.stringify(doc.nodes.map(n => [n.id, L.outwardX(n.x), L.outwardY(n.y)])) === placed,
+	JSON.stringify(doc.nodes.map(n => [n.id, L.outwardX(n.x), L.outwardY(n.y)])));
+// ...and the rebase really did happen, or the assertion above would be passing because nothing
+// moved rather than because the frame change is invisible.
+ok('...on a local origin, which is what makes them drawable at street zoom',
+	L.docOrigin().x !== 0 || L.docOrigin().y !== 0, JSON.stringify(L.docOrigin()));
 
 L.georefStart();
 ok('a project already on the GeoMap is refused, not re-placed', L.georefState() === null);

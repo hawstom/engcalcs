@@ -3087,25 +3087,57 @@ var EngCalcs = EngCalcs || {};
 	// `view.cx/cy` -- through its {get, set} form, which is what `set` tests for -- and those two
 	// are OURS rather than the user's and are stored in the DRAWING frame from v10 onward. One list,
 	// one deliberate exclusion, rather than a second list that could drift from it.
+	// **THE LONGITUDE NEEDS THE SAME CHANNEL AS THE LATITUDE, AND TASK 439 IS WHY.** Before the
+	// origin shift, x passed through untouched -- Mercator x IS longitude -- so it needed no source
+	// record. A shift changes that: `lon - ox` is exact only while lon is NEAR ox (Sterbenz), and a
+	// document is not obliged to be small. dev/lpn-spike/mercator-harness.js caught it on a fixture
+	// spanning latitude 1e-7 to 51 -- a node at 1e-7 came back as 1.0000000116860974e-7, and one at
+	// -0.1 as -0.10000000000000707. Both are the user's numbers, and CLAUDE.md's rule is identical,
+	// not close. So BOTH axes now carry the file's own value beside the drawn one.
+	var LPN_GEO_XSRC = '_xsrc';
 	function projectStoredGeo(o) {
 		eachStoredPoint(o, function (pt, get, set) {
 			if (set || !isFinite(pt.y)) { return; }
 			var lat = pt.y;
 			pt.y = Geom.mercY(lat);
 			pt[LPN_GEO_YSRC] = lat;
+			if (isFinite(pt.x)) { pt[LPN_GEO_XSRC] = pt.x; }
 		});
 		return o;
 	}
 	// Runs on the CLONE serializeProject() has already flipped to the file's Cartesian frame, so
-	// `pt.y` and mercY(source) are directly comparable. The marker never reaches a file.
-	function unprojectStoredGeo(o) {
+	// `pt.y` and mercY(source) are directly comparable. The markers never reach a file.
+	//
+	// **`org` IS THE ORIGIN THE DOCUMENT IS CURRENTLY LOCAL TO** (Task 439), and this function is
+	// the only place it comes back off a coordinate. The source is believed on exactly mergeTok()'s
+	// invariant, now stated against the SHIFTED number: the file's value is handed back only while
+	// the number actually drawn is still the one derived from it, so any edit invalidates it with
+	// nothing for a call site to remember. Anything else -- an edited node, a node dragged onto the
+	// map -- is a number of ours and is composed back arithmetically.
+	//
+	// `view.cx/cy` and `backdrop.tx/ty` get the plain add-back. They are OURS, not the user's, so a
+	// last-bit departure there breaks no rule; and it cannot accumulate, because the second round
+	// trip repeats the identical arithmetic on the identical input.
+	function unprojectStoredGeo(o, org) {
+		var ox = (org && isFinite(org.x)) ? org.x : 0,
+			oy = (org && isFinite(org.y)) ? org.y : 0;
 		eachStoredPoint(o, function (pt, get, set) {
-			if (set) { return; }
-			var src = pt[LPN_GEO_YSRC];
+			var p, xsrc, ysrc;
+			if (set) {
+				p = get();
+				if (isFinite(p.x) && isFinite(p.y)) { set(p.x + ox, p.y + oy); }
+				return;
+			}
+			xsrc = pt[LPN_GEO_XSRC];
+			ysrc = pt[LPN_GEO_YSRC];
+			delete pt[LPN_GEO_XSRC];
 			delete pt[LPN_GEO_YSRC];
+			if (isFinite(pt.x)) {
+				pt.x = (typeof xsrc === 'number' && xsrc - ox === pt.x) ? xsrc : pt.x + ox;
+			}
 			if (!isFinite(pt.y)) { return; }
-			pt.y = (typeof src === 'number' && Geom.mercY(src) === pt.y)
-				? src : Geom.mercLat(pt.y);
+			pt.y = (typeof ysrc === 'number' && Geom.mercY(ysrc) - oy === pt.y)
+				? ysrc : Geom.mercLat(pt.y + oy);
 		});
 		return o;
 	}
@@ -6672,6 +6704,15 @@ var EngCalcs = EngCalcs || {};
 		georefRefreshBar();
 		// FULL refresh now, and only now: this is the moment the project really did change kind, so
 		// the basemap, the status strip, the settings panel and the solve all have to be re-derived.
+		// **REBASED THE MOMENT IT BECOMES GEOGRAPHIC** (Task 439). Everything else here runs on a
+		// document whose coordinates are already degrees; without this it would carry origin {0, 0}
+		// until the tab was closed and reopened, and street-level zoom is the very next thing the
+		// user does.
+		var shift = rebaseLiveGeoDoc();
+		// `v` was read in the OLD frame, a few lines above and before the rebase. Moved with
+		// everything else, or putting it back below would undo the compensation and jump the map by
+		// the whole origin -- half the world, at this zoom.
+		if (v && shift) { v.cx += shift.dx; v.cy += shift.dy; }
 		refreshAllFromDocument();
 		if (v) { applyView(v); }
 		saveToStorage();
@@ -10520,6 +10561,136 @@ var EngCalcs = EngCalcs || {};
 		});
 		return o;
 	}
+	// ---- Task 439: a GEOGRAPHIC document's origin, derived and never stored ---------------------
+	//
+	// **THE SAME DISEASE AS TASK 354, IN DEGREES, AND LPN_ORIGIN_THRESHOLD CANNOT SEE IT.** That
+	// threshold is 1e4 and a longitude is 122, so no geographic document was ever rebased -- while
+	// maxScale() for one is MAX_SCALE_GRID / DEG_PER_M = 5.56e7 px/degree. Measured in
+	// dev/lpn-spike/geo-precision-harness.js, modelling the composition the page actually asks a
+	// rasteriser for (`s * x + tx`) in float32: the drawing first loses half a pixel at **64,000
+	// px/degree**, and at the deepest zoom the page permits a node lands **575 px** from where it
+	// was asked for. The browser-side symptom was a <circle> rasterised at x = -41,548,184.
+	//
+	// **THE GRID IS A POWER OF TWO AND THAT IS THE WHOLE OF WHY THIS IS ALLOWED.** Shifting a
+	// coordinate in and back out again must not change it by one bit, or this would be a third
+	// conversion site on the user's own numbers, which CLAUDE.md forbids in terms. Sterbenz gives
+	// it: `x - ox` is exact whenever ox/2 <= x <= 2*ox, which holds for any origin chosen near the
+	// model, and a power-of-two fraction of a degree is itself exactly representable. So
+	// `(x - ox) + ox === x` -- identical, not close. A decimal grid (1e-3, as LPN_ORIGIN_ROUND uses)
+	// has NEITHER property and would quietly rewrite every coordinate on every open-and-save.
+	var LPN_GEO_ORIGIN_GRID = 1 / 128;
+	// **OPTION B, RULED BY TOM 2026-08-24.** `view` and `backdrop` are ABSOLUTE in a geographic
+	// file, and the origin is derived at load and never stored. The alternative on the table was a
+	// second stored field beside `origin`, which is cheaper and puts two things called origin in one
+	// file; his reason for choosing this one is that everything in the file is then a real place on
+	// Earth, with nothing to explain.
+	//
+	// **AND SO THE FILE FORMAT DOES NOT MOVE.** A geographic file already stores absolute lon/lat
+	// coordinates and -- since origin has always been {0, 0} for one -- absolute `view` and
+	// `backdrop` too. Writing {0, 0} back out is therefore byte-identical to what v10 already
+	// writes, so there is no v11, no migration, and a file saved by this page still opens in one
+	// that predates it. For a geographic document `origin` is purely an in-memory frame.
+	//
+	// Chosen from the MODEL's own extent, not from `view` or `backdrop`: the view is where somebody
+	// happened to be looking and a backdrop can be miles wide, and neither should decide the frame
+	// the network is drawn in. Floored rather than centred for the same reason chooseOrigin() floors
+	// -- local coordinates come out small and positive.
+	function chooseGeoOrigin(o) {
+		var minX = Infinity, minY = Infinity;
+		eachStoredPoint(o, function (pt, get) {
+			if (get) { return; }   // view/backdrop reach the visitor through {get, set}; skip them
+			if (!isFinite(pt.x) || !isFinite(pt.y)) { return; }
+			if (pt.x < minX) { minX = pt.x; }
+			if (pt.y < minY) { minY = pt.y; }
+		});
+		if (!isFinite(minX) || !isFinite(minY)) { return { x: 0, y: 0 }; }
+		return {
+			x: Math.floor(minX / LPN_GEO_ORIGIN_GRID) * LPN_GEO_ORIGIN_GRID,
+			y: Math.floor(minY / LPN_GEO_ORIGIN_GRID) * LPN_GEO_ORIGIN_GRID
+		};
+	}
+	// Move every stored point -- the model AND the two that are ours, `view.cx/cy` and
+	// `backdrop.tx/ty` -- by one vector. One list serves both directions for the same reason
+	// eachStoredPoint() exists at all: two lists that had to agree would drift, and a coordinate
+	// missed here is a node half a degree from its own pipe.
+	function shiftStoredPoints(o, dx, dy) {
+		eachStoredPoint(o, function (pt, get, set) {
+			var p = get ? get() : pt;
+			if (!isFinite(p.x) || !isFinite(p.y)) { return; }
+			if (set) { set(p.x + dx, p.y + dy); }
+			else { pt.x = p.x + dx; pt.y = p.y + dy; }
+		});
+	}
+	// LOAD side. Runs on the stored document in the FILE's Cartesian frame, after the projection and
+	// before the flip, so `pt.y` is an absolute Mercator y and the origin it writes is in the frame
+	// outwardY()/inwardY() expect. Whatever the file said about `origin` is discarded, because for a
+	// geographic document that field is not the file's to state.
+	function rebaseGeoDocument(o) {
+		var org = chooseGeoOrigin(o);
+		shiftStoredPoints(o, -org.x, -org.y);
+		o.origin = org;
+		return o;
+	}
+	// The same rebase applied to the LIVE document, for the one moment a geographic document comes
+	// into existence without passing through a file: georefFinish(). Without it a freshly placed
+	// model keeps origin {0, 0} until the tab is closed and reopened -- and the wizard's last step
+	// is exactly where somebody zooms to street level to check their pipes against the road.
+	//
+	// The sign asymmetry is not a bug and is why this is not a call to shiftStoredPoints(): memory
+	// is Y-DOWN and the origin is stated in the Cartesian frame, so x moves by (old - new) and y
+	// moves by (new - old). outwardX/outwardY are the definition both halves answer to.
+	//
+	// **IT COMPENSATES THE VIEW ITSELF, AND THAT IS THE POINT.** A frame change that every caller
+	// had to remember to undo on screen is a frame change that will one day move somebody's map.
+	// The screen position of a world point is `s * x + tx`, so a document shifted by `d` keeps its
+	// picture exactly when `tx` moves by `-s * d`. The remembered view for this tab is shifted for
+	// the same reason -- it is a world point too, and leaving it would move the map at the next tab
+	// switch instead of now, which is worse.
+	//
+	// Returns the delta so a caller holding a view of its OWN in the old frame can move it. Null
+	// means nothing happened, so `if (rebaseLiveGeoDoc())` reads correctly.
+	function rebaseLiveGeoDoc() {
+		if (!isGeoProject()) { return null; }
+		var cur = docOrigin(), minX = Infinity, minY = Infinity, org, dx, dy, tv;
+		// **THROUGH outwardX/outwardY, NOT cartesianY().** Those four functions are the whole
+		// boundary between the drawing frame and the world, and local-origin-harness.js counts
+		// cartesianY()'s call sites for exactly this reason -- a fifth site added later without the
+		// origin shift is a coordinate wrong by half a world, and it looks ordinary in a diff. This
+		// caught that on the first run.
+		//
+		// mercY(outwardY(y)) is mercY(mercLat(...)), which is NOT the identity for 69.8% of
+		// latitudes -- and it does not need to be. It chooses which 1/128 cell the origin sits in;
+		// a departure of 1e-13 could only change the answer at an exact cell boundary, and both
+		// answers there are equally valid origins. NO COORDINATE IS MOVED BY THIS ROUND TRIP; the
+		// shift below is a subtraction of the chosen origin and nothing else.
+		eachStoredPoint(doc, function (pt, get) {
+			if (get) { return; }
+			if (!isFinite(pt.x) || !isFinite(pt.y)) { return; }
+			var X = outwardX(pt.x), Y = Geom.mercY(outwardY(pt.y));
+			if (X < minX) { minX = X; }
+			if (Y < minY) { minY = Y; }
+		});
+		if (!isFinite(minX) || !isFinite(minY)) { return null; }
+		org = {
+			x: Math.floor(minX / LPN_GEO_ORIGIN_GRID) * LPN_GEO_ORIGIN_GRID,
+			y: Math.floor(minY / LPN_GEO_ORIGIN_GRID) * LPN_GEO_ORIGIN_GRID
+		};
+		if (org.x === cur.x && org.y === cur.y) { return null; }
+		dx = cur.x - org.x;
+		dy = org.y - cur.y;
+		eachStoredPoint(doc, function (pt, get, set) {
+			var p = get ? get() : pt;
+			if (!isFinite(p.x) || !isFinite(p.y)) { return; }
+			if (set) { set(p.x + dx, p.y + dy); } else { pt.x = p.x + dx; pt.y = p.y + dy; }
+		});
+		doc.origin = org;
+		state.tx -= state.s * dx;
+		state.ty -= state.s * dy;
+		setTransform();
+		tv = tabViews[library.openId];
+		if (tv && isFinite(tv.cx) && isFinite(tv.cy)) { tv.cx += dx; tv.cy += dy; }
+		return { dx: dx, dy: dy };
+	}
 	// The version at which inputs became declarative. A document below it holds SI numbers that have
 	// not been ruled on, and that version alone is the ONLY thing the restore offer keys off -- a
 	// second flag beside it is one mechanism too many.
@@ -10635,7 +10806,21 @@ var EngCalcs = EngCalcs || {};
 			var snap = flipStoredY(JSON.parse(JSON.stringify(out)));
 			// The projection comes off LAST, in the file's own frame -- see the seam note beside
 			// inwardY(). An untouched coordinate leaves as the bytes it arrived as.
-			return isGeoProject() ? unprojectStoredGeo(snap) : snap;
+			//
+			// **THE ORIGIN GOES BACK ON FIRST** (Task 439), so what unprojectStoredGeo() sees is an
+			// absolute Mercator y -- the number projectStoredGeo() recorded `_ysrc` against. The
+			// add-back is exact by construction (the origin is a power-of-two fraction of a degree),
+			// which is what keeps "an untouched coordinate leaves as the bytes it arrived as" true
+			// rather than nearly true. The file then states origin {0, 0}, which is what a
+			// geographic file has always stated.
+			if (!isGeoProject()) { return snap; }
+			// The origin comes off INSIDE unprojectStoredGeo(), per coordinate, because whether a
+			// number can be handed back verbatim is decided against the shifted value. A separate
+			// add-back pass before it would destroy every source's equality test.
+			unprojectStoredGeo(snap, docOrigin());
+			// And the file states the identity, which is what a geographic file has always stated.
+			snap.origin = { x: 0, y: 0 };
+			return snap;
 		}
 		return out;
 	}
@@ -10985,7 +11170,15 @@ var EngCalcs = EngCalcs || {};
 		// because the projection is defined on the file's Cartesian frame, and read off `saved`
 		// rather than isGeoProject() because `project` is not assigned until a few lines below.
 		if (saved.v >= LPN_CARTESIAN_VERSION &&
-			saved.project && saved.project.coords === LPN_COORDS_GEO) { projectStoredGeo(saved); }
+			saved.project && saved.project.coords === LPN_COORDS_GEO) {
+			projectStoredGeo(saved);
+			// **AND THE ORIGIN IS DERIVED HERE, NOT READ** (Task 439). Between the projection and
+			// the flip is the only place the numbers are absolute Mercator in the file's own
+			// Cartesian frame, which is the frame `origin` is stated in. A geographic file does not
+			// get to say what its origin is; it says where its network is, and this decides the
+			// rest.
+			rebaseGeoDocument(saved);
+		}
 		if (saved.v >= LPN_CARTESIAN_VERSION) { flipStoredY(saved); }
 		// A different document is a different set of elements, and ids repeat across projects (every
 		// project has a J1). Dropping the selection here rather than letting refreshSelection() prune

@@ -262,8 +262,13 @@ console.log('\n--- one home for the concept ---');
 	// document's local frame -- once for the nodes with no elevation and once for the nodes still on
 	// the starting elevation. A terrain lookup that skipped the shift would read the hillside half a
 	// million units away and write a perfectly plausible elevation into the document.
-	ok('outwardX has one definition and fifteen call sites', count(/outwardX\(/g) === 16, count(/outwardX\(/g));
-	ok('outwardY has one definition and sixteen call sites', count(/outwardY\(/g) === 17, count(/outwardY\(/g));
+	// **TASK 439 ADDED ONE SITE TO EACH, and it is the one place the guard has caught something.**
+	// rebaseLiveGeoDoc() reads the model's extent to choose a geographic document's origin, and its
+	// first draft called cartesianY() directly -- a fifth frame boundary, which is exactly the
+	// failure the cartesianY() count below exists to report. It does, immediately. Routed through
+	// the outward pair instead, so the boundary stays four functions wide.
+	ok('outwardX has one definition and sixteen call sites', count(/outwardX\(/g) === 17, count(/outwardX\(/g));
+	ok('outwardY has one definition and seventeen call sites', count(/outwardY\(/g) === 18, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.

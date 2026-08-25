@@ -554,16 +554,29 @@ const INP_STRANGE = probeInp(['[BACKDROP]', ' UNITS  Furlongs', '']);
 	importText(INP_DEGREES, 'world.inp');
 	const p = L.getProject(), d = L.getDoc();
 	ok('a DEGREES file opens a lat/lon project', p.coords === 'geo', p.coords);
-	// Degrees start from zero by definition, so there is nothing for the survey-coordinate rebase
-	// to do -- and a shifted origin on a lon/lat document would move the network off the Earth.
-	ok('...with no origin shift under it', d.origin.x === 0 && d.origin.y === 0, JSON.stringify(d.origin));
+	// **AND IT DOES GET AN ORIGIN, WHICH IS THE OPPOSITE OF WHAT THIS ASSERTED** (Task 439). The
+	// old reasoning here -- "degrees start from zero by definition, so there is nothing to do" --
+	// was the exact mistake: a longitude is 122 and a float32's spacing at 122 is what loses the
+	// drawing at street zoom. What is true is that the SHIFT MUST NOT REACH THE FILE, which is the
+	// last assertion in this block and is where the promise really lives.
+	ok('...on a derived local origin, so it is still drawable zoomed in',
+		d.origin.x !== 0 && d.origin.y !== 0, JSON.stringify(d.origin));
+	ok('...and that origin is on the power-of-two grid, which is what makes the shift exact',
+		d.origin.x * 128 === Math.round(d.origin.x * 128) && d.origin.y * 128 === Math.round(d.origin.y * 128),
+		JSON.stringify(d.origin));
 	// `===`, for the reason the header gives: a longitude is the user's number too.
 	const j1 = d.nodes.find(n => n.id === 'J1');
 	// **MEMORY IS WEB MERCATOR SINCE TASK 145'S PROJECTION SEAM**, y down, so the latitude arrives
-	// projected and negated. Longitude is untouched: Mercator x IS longitude.
-	ok('...the drawn position is the projection of the file\'s latitude',
-		j1.x === -122.5686103 && j1.y === -Geom.mercY(38.106067),
-		j1.x + ', ' + j1.y + ' (mercY(38.106067) = ' + Geom.mercY(38.106067) + ')');
+	// projected and negated -- and since Task 439 it is also LOCAL to d.origin. Longitude is
+	// otherwise untouched: Mercator x IS longitude. Written as the outward composition rather than
+	// as a raw number, because the raw number is now a frame detail and the composition is the
+	// contract every readout, export and terrain lookup depends on.
+	ok('...the drawn position is the projection of the file\'s latitude, local to the origin',
+		j1.x + d.origin.x === -122.5686103 && -j1.y + d.origin.y === Geom.mercY(38.106067),
+		(j1.x + d.origin.x) + ', ' + (-j1.y + d.origin.y) +
+		' (mercY(38.106067) = ' + Geom.mercY(38.106067) + ')');
+	ok('...and the number actually handed to the renderer is small, which is the whole point',
+		Math.abs(j1.x) < 1 && Math.abs(j1.y) < 1, j1.x + ', ' + j1.y);
 	// **AND THE FILE GETS ITS OWN BYTES BACK**, which is the property that actually matters and is
 	// now the harder one: mercLat(mercY(lat)) is a different double for 70% of latitudes, so this
 	// passes only because serializeProject() hands back the latitude the file stated rather than
