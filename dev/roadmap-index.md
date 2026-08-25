@@ -63,7 +63,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
-- Task 515 — The Settings category index breaks its own labels mid-word.
+- Task 515 — The Settings category index breaks two English labels mid-word.
 - Task 516 — The colour key stacks onto the label legend and covers it.
 
 ## 5 — Parked (18)

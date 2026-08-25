@@ -168,7 +168,23 @@ the block.
        fire-ground hydraulics, whose inputs a distribution model cannot know at design time because
        the hose lay is chosen at the scene.
     2d. **The saved library type carries:** make, model, waterway diameter (4½ or 5¼ in), outlet
-       configuration, and the `k` itself — editable, defaulting to ~5, with its source visible.
+       configuration, and the `k` itself — editable, defaulting to ~5, with its source visible **and
+       with the VELOCITY IT IS REFERENCED TO stated beside it.** Tom, 2026-08-25: *"We must be
+       crystal clear on which velocity any k belongs to. I see this as critical in the hydrant
+       model."* The assembly has two diameters, so `V²/2g` differs by ~3.16x between them and a
+       re-referenced `k` moves the answer 18.9% — measured. `js/lpn-fireflow.js` now names the
+       reference in the constant names, in `assembly.k.referencedTo`, and per part.
+    2e. **A PRE-COMPUTED q-vs-loss TABLE WAS CONSIDERED AND DECLINED — `dev/fireflow-loss-table.md`.**
+       Tom asked whether EPANET takes one and whether the hydrant can be injected into the physical
+       model. **Yes to both, and the second is already what we do** (`lpnFireFlowBuild()` builds the
+       assembly onto a COPY). EPANET takes a loss table as a **GPV**, and `js/lpn-inp.js` already
+       imports and exports one. **But the saving is not real:** the assembly costs **+0.029 ms of a
+       0.613 ms solve** on 49 junctions and nothing measurable at 225, because the bisection's cost
+       is the NETWORK solve, which no table can remove. It would also cost the built-in solver —
+       `lpnValveIsNative` is true only for a TCV, so a GPV would make this search EPANET-only. A
+       stored table is also a cached derived value that can go stale. **Dimensions and a `k`, not a
+       table.** The one case that would justify points is a manufacturer's MEASURED curve, and even
+       then it converts to a `k` at the lateral's velocity for the solve.
        **Deliberately NOT in the type:** installation year and NFPA 291 colour class, which are
        per-instance facts that go stale if baked into a reusable type; and the lateral's own
        diameter, length and roughness, which stay per-instance ad-hoc inputs.
@@ -197,18 +213,32 @@ the block.
     for the lateral length and discloses the rest, the flow readout in the project's own units, and
     the saved-with-the-project hydrant type (fields listed above). Wording is Tom's.
 
-- 25|515| **The Settings category index breaks its own labels mid-word.**
-  "Visualizati / on", "Node symbolog / y", "Map appearan / ce" -- visible in screenshots 0022, 0023,
-  0026 and 0029 through 0033, so it is the normal state, not a narrow window. The left column is
-  narrower than the labels it has to carry.
-  - Task 284 covers the Settings box's sticky headings and its narrow-screen collapse and does NOT
-    name this. Column width is king suite-wide and mid-word wrap is acceptable in a RESULTS table;
-    a navigation index a user reads to find a section is the case that rule was not written for.
-  - **Tom, 2026-08-24, dropped it to Maybe:** *"I think we can't avoid some wrapping in some
-    languages. We must just accept it."* Kept open only because the wrap he was told about is in
-    **English** — "Visualizati / on" is not a long-language artefact — so if it is ever picked up,
-    the question is whether the English column is simply too narrow, not whether translations fit.
-
+- 25|515| **The Settings category index breaks two English labels mid-word.**
+  **MEASURED AND DECIDED 2026-08-25 — hyphenation is NOT the answer** (`dev/hyphenation-finding.md`,
+  all measured in the shipped Chromium against the real page, not argued from spec). Tom asked
+  whether a hyphenation system applies across many languages. Three findings kill it:
+  - **`hyphens: auto` changes literally nothing here.** 14 of 14 index rows identical. The column
+    already has `overflow-wrap: anywhere`, and where that allows an in-word break Chromium takes it
+    and never consults the dictionary. The two properties do not add up.
+  - **Removing `overflow-wrap` so hyphenation CAN work makes it worse** — "Visualization" then
+    overflows the pane, restoring the sideways scrollbar the pane was narrowed to be rid of.
+  - **Chromium does not hyphenate a CAPITALISED English word at all.** Measured; the same words
+    lowercase do hyphenate. Every index label is sentence case, so in the language Tom saw the
+    defect in, hyphenation cannot reach the offending word.
+  - Coverage, for the record: of 52 Chromium pattern files, 14 of our languages hyphenate and 13 do
+    not — and **tr is one of the four anchor languages and one of the real gaps** (with ro, id, sr,
+    sw). The rest (ar, fa, he, ps, ur, zh, km, my) do not hyphenate as a matter of orthography,
+    which is an answer rather than a gap.
+  - **And a suite-wide `hyphens: auto` would be actively wrong:** an absent key falls back to
+    English by design and nothing marks which strings fell back, so a Spanish page carries English
+    words under `lang="es"` — and Spanish patterns hyphenate English words happily (measured). It
+    would print visibly wrong hyphens where no check can see them.
+  - **[H] WHAT IS LEFT IS A WIDTH-VERSUS-WORDING CHOICE AND IT IS TOM'S.** Two of fourteen English
+    rows break: "Visualization" and "appearance". The index is 6.6rem leaving 90.6px of text;
+    **"Visualization" measures 104.2px**, so ending the break needs ~7.45rem — essentially the width
+    he narrowed twice on purpose. He cannot have both. Three ways out: a shorter English word for
+    `lpn_settings_sec_visualization` (the only label no width can help; **wording is his**), accept
+    it and close this on the evidence (his own current position), or widen back and give up 24px.
 - 25|516| **The colour key stacks onto the label legend and covers it.**
   Screenshot 0030: with nodes coloured by pressure AND links by velocity, two colour keys stack at
   the right edge and print over the node/link label legend, which becomes unreadable. Both default
@@ -403,6 +433,18 @@ the block.
   against it — one element, one placement function.
 
 - 25|465| **[H] Reusable pipe and pump TYPES, so editing one edits 400.**
+  - **RESEARCHED 2026-08-25 by `utility-planning-engineer`, and its answer is: TWO features, not
+    one — which is the thing we would have got wrong.** WaterGEMS separates a **Prototype** (stamps
+    starting values onto elements drawn AFTERWARDS, not retroactive) from an **Engineering Library**
+    (live-linked, retroactive). This task conflates them. Its recommendation: **leave the full type
+    system parked** — at this suite's stated scale the motivating case cannot arise, roughness is a
+    function of material AND AGE so even "a PVC type" needs a per-element qualifier, and diameter is
+    not shared even in the commercial tools. **Find-and-replace already does better than a library
+    on the thing that matters**: it previews an exact change count before writing and goes through
+    `setProp()`, where a live-linked library edit propagates with no confirmation step it could
+    find documented. **The one slice it does NOT rank low: a live-linked pump CURVE table** — no
+    aging wrinkle, no diameter conflation, `curveRef` already copies once, and the Curves panel's
+    own code comment names the missing piece (`js/looped-network.js:19466`).
   One "150 mm PVC" definition that 400 pipes point at. A type carries diameter, roughness and minor-loss k; an element names
   a type instead of repeating the numbers. Tom named these beside Patterns/Curves/Controls in Task 462,
   but those are things the document already HOLDS — this is a new indirection through the element model.
