@@ -2329,6 +2329,33 @@ html:has(#lpn_canvas) { overflow: hidden; }
 		}
 		html:has(#lpn_canvas) #lpn_labels_node_fields,
 		html:has(#lpn_canvas) #lpn_labels_link_fields { min-width: 9rem; }
+
+	}
+
+	/* 5. THE TWO MAP OVERLAYS DO NOT GET TO EAT THE DRAWING (ROADMAP Task 524). Tom, 2026-08-25,
+	   from a phone: the EPANET minor-loss note "is stuck open". It is not stuck -- #lpn_status is an
+	   advisory overlay that stands until the next solve replaces it, which is harmless in a desktop
+	   corner and is a quarter of the canvas on a phone, sitting on the network.
+
+	   #lpn_mode_hint GOES, and it goes because on touch it is not merely large but WRONG: "Click an
+	   asset... Drag to move... Double-click a pipe to add or remove a vertex" are mouse verbs, and
+	   there is no double-click on a phone. Task 253's clean-map toggle already hides exactly this
+	   element plus the coordinate readout, so a map without it is a state the page is known to
+	   survive -- this is that state, arrived at by screen size instead of by a menu.
+
+	   #lpn_status STAYS, because it is where a refusal to solve is announced and losing that would
+	   be the worse failure. It is bounded instead:
+
+	   - `max-width` goes UP, from the inline 60% to 92%. On a 400px phone 60% is 240px, and a
+	     narrow box makes a long note TALLER -- the inline value was tuned for a desktop where 60%
+	     is roomy, and it is exactly backwards here.
+	   - `max-height` caps it at a third of the short side and lets it scroll, so no note of any
+	     length can take more of the drawing than that. */
+	html:has(#lpn_canvas) #lpn_mode_hint { display: none; }
+	html:has(#lpn_canvas) #lpn_status {
+		max-width: 92%;
+		max-height: 33svh;
+		overflow-y: auto;
 	}
 }
 

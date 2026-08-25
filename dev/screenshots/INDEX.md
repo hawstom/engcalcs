@@ -76,6 +76,7 @@ here, so nobody has to re-make it every time an image is reached for.
 - **Browser chrome is what disqualifies a frame, not the network.** Every unpublishable image here
   fails for the same two reasons — a bookmarks bar with real names or a real file path — and both
   are avoidable by capturing the page rather than the window.
+| 0034 | **The first phone capture in the drop.** Net3-World on the OSM map in Chrome on Android, portrait, at `dev.hawsedc.com`. The transport row, tab strip, colour key, scenario and units readouts all render; the mode hint and the EPANET minor-loss note stand over the network | **No — and JPEG, to be replaced** | Tom's own capture, 2026-08-25. Browser chrome and URL bar in frame. **It found ROADMAP Task 524**: the two overlays ate a quarter of the canvas with no way to dismiss them. It also shows `Longitude:` first, which is NOT a live defect — `dev.hawsedc.com` was behind master, where the readout has led with Latitude since 2026-08-24 |
 
 ## The remake queue — what to shoot next
 

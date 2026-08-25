@@ -806,6 +806,36 @@ console.log('\n--- a box on a short screen, and the pane tables (Tom\'s items 5 
 		'got ' + winning(RULES, cell, WIDE, DOC_IDS, false, 'width'));
 }
 
+// ---- THE MAP OVERLAYS DO NOT EAT THE DRAWING (ROADMAP Task 524) ---------------------------
+// Tom, 2026-08-25, from his phone: the EPANET minor-loss note "is stuck open". It was not stuck --
+// #lpn_status stands until the next solve replaces it, which is a corner on a desktop and a quarter
+// of the canvas on a phone. The mode hint above it made it worse and is mouse-verb advice
+// ("Double-click a pipe") on a device with no double-click.
+{
+	const hint = node('div', 'lpn_mode_hint', [], body);
+	const status = node('p', 'lpn_status', ['ec-status-warn'], body);
+	ok('the mode hint is gone on a phone -- it is pointer advice, and three lines of it',
+		winning(RULES, hint, SMALL, DOC_IDS, false, 'display') === 'none');
+	ok('...and is still there for a pointer, where it is the page telling you what mode you are in',
+		winning(RULES, hint, WIDE, DOC_IDS, false, 'display') !== 'none');
+
+	// THE STATUS LINE STAYS. It is where a refusal to solve is announced, and hiding it would be a
+	// worse defect than the one being fixed. It is BOUNDED instead.
+	ok('the status overlay survives on a phone, because it carries the refusals',
+		winning(RULES, status, SMALL, DOC_IDS, false, 'display') !== 'none');
+	ok('...capped in height so no note of any length can take the map',
+		/^33svh$/.test(String(winning(RULES, status, SMALL, DOC_IDS, false, 'max-height'))),
+		'got ' + winning(RULES, status, SMALL, DOC_IDS, false, 'max-height'));
+	ok('...and it scrolls rather than clipping what it cannot show',
+		winning(RULES, status, SMALL, DOC_IDS, false, 'overflow-y') === 'auto');
+	// **WIDER, NOT NARROWER, and that is the counter-intuitive half.** The inline max-width is 60%,
+	// tuned for a desktop where 60% is roomy. On a 400px phone it is 240px, and a narrow box makes a
+	// long note TALLER. Going up to 92% is what actually shortens it.
+	ok('...and it is WIDER on a phone than the inline 60%, because narrow means taller',
+		winning(RULES, status, SMALL, DOC_IDS, false, 'max-width') === '92%',
+		'got ' + winning(RULES, status, SMALL, DOC_IDS, false, 'max-width'));
+}
+
 // The reader's blind-spot report, scoped to selectors that could possibly reach what this file
 // checks. A rule about print sheets or curve tables is none of this check's business.
 {
