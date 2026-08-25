@@ -393,14 +393,14 @@ the block.
 - 75|504| **A features list, built from the roadmap's own closed ledger.** Tom, 2026-08-24, on the
   unit-change dialog landing: *"We may need to build a features list from our roadmap completions.
   This is getting impressive."*
-  - **The source already exists and is machine-readable:** `dev/roadmap-closed-ids.md` is one line
-    per closed ID, and `dev/scripts/roadmap_lib.php` already parses that format. So this is a
-    generator, not a writing project — the same shape as `generate_roadmap_index.php`.
-  - **The audience decides the wording, and it is not us.** A closed-ledger line is written for a
-    developer re-resolving a citation; a features list is read by somebody deciding whether to try
-    the page. Do not ship the ledger's prose verbatim under a new heading.
-  - Where it goes is open: the LibreWaterNet landing page (its own repository since 2026-08-24)
-    is the obvious home, and Help is the other. Decide before generating.
+  - **Generated and blocking:** `dev/scripts/generate_features.php` writes `dev/features.md` from
+    the hand-written `dev/features-source.md` and proves every ID it cites is closed. 53 features
+    citing 87 of 448 closed IDs; the rest are fixes, refactors and rejections, and 135 are ledger
+    stubs with no text at all. Why the sentences are hand-written and not derived: the generator's
+    own docblock, with the three rejected alternatives.
+  - **TWO THINGS ARE TOM'S AND NEITHER IS DONE.** The WORDING is a first pass awaiting his edit.
+    And WHERE it goes is still open — the LibreWaterNet landing page (its own repository since
+    2026-08-24) or the Help menu. Nothing served reads the file; that wiring waits on his call.
 
 - 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
   reply to outreach, and he has replied gratefully. This is the first real conversation this suite's
