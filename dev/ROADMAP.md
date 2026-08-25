@@ -179,9 +179,23 @@ the block.
        system delivered through that hydrant at 20 psi, at that location. Available fire flow is
        quoted **at the outlet**. **ISO caps single-hydrant credit at 1,500 gpm** whatever the
        hydraulics say.
-  - The search itself is believed small — a loop around the existing sub-second solve, plus naming
-    the hydrant node and the critical node. **Not designed; re-derive that estimate before quoting
-    it.**
+  - **THE ENGINE SHIPPED 2026-08-25: `js/lpn-fireflow.js`, pure, plus
+    `dev/lpn-spike/fireflow-harness.js`.** `EngCalcs.lpnFireFlow(model, options)` always returns a
+    promise and takes **the solve as an injected dependency** — the native engine is synchronous,
+    EPANET's is a promise, an active valve routes to EPANET, and a search costs ~16 solves, so the
+    caller chooses. The assembly is built on a COPY (input byte-identical, asserted), the k is
+    derived from 3.0 psi at 1000 gpm rather than typed, and every assumption is overridable and
+    reported `supplied`/`default`. Every edge case has a name: `below-residual-at-rest`,
+    `search-ceiling-reached`, `solve-did-not-converge`, `hydrant-node-not-found`,
+    `hydrant-node-not-a-junction`, `lateral-length-required`. ISO's 1,500 gpm is a note, never a
+    clamp. Worked example checked against EPANET's own 4.727 equation and an independent root find.
+  - **MEASURED, and the second number is the surprise:** on the harness network the barrel
+    constriction (4½ in vs 6 in over 5 ft) is worth **1.06%**, while the k is worth **11.6%**. Both
+    are needed, but the barrel earns its place mostly by being where the QA-derived k is measured,
+    not by its own friction. Do not quote the constriction as the big term.
+  - **STILL TO BUILD: the wizard, and the hydrant library.** Language keys, the dialog that asks
+    for the lateral length and discloses the rest, the flow readout in the project's own units, and
+    the saved-with-the-project hydrant type (fields listed above). Wording is Tom's.
 
 - 25|515| **The Settings category index breaks its own labels mid-word.**
   "Visualizati / on", "Node symbolog / y", "Map appearan / ce" -- visible in screenshots 0022, 0023,
