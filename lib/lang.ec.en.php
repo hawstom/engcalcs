@@ -1445,6 +1445,12 @@ $ec_lang['lpn_goto_tip']='Move the map to a place you already have coordinates f
 $ec_lang['lpn_goto_prompt']='Latitude and longitude, in that order';
 $ec_lang['lpn_goto_bad']='That is not one latitude and one longitude. Try 38 -122, with a space between them.';
 $ec_lang['lpn_georef_goto']='Go to…';
+$ec_lang['lpn_georef_twopt']='Use two known points';
+$ec_lang['lpn_georef_twopt_tip']='Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.';
+$ec_lang['lpn_georef_twopt_pick1']='Click a point on your drawing whose latitude and longitude you know.';
+$ec_lang['lpn_georef_twopt_pick2']='Now click a second known point, as far from the first one as you can.';
+$ec_lang['lpn_georef_twopt_same']='That is the point you picked first. Pick a different one.';
+$ec_lang['lpn_georef_twopt_done']='The model now sits on the two points you gave. Check it, then press Keep this placement.';
 
 // ---- The bottom pane (ROADMAP Task 434) ----
 // One panel below the map, holding a tab for each thing that is read while the map is edited: the

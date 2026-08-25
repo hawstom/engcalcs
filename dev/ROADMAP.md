@@ -83,15 +83,15 @@ the block.
     deep, zero node-on-node. `yieldStationedLabels()` hides the yielder; node placements are
     unchanged. Iterating the two passes instead also reaches zero and costs 3x.
     `dev/lpn-spike/node-yield-harness.js`.
-  - **Placement leftovers: two of three done 2026-08-25.** A background image is now carried onto the
-    map with the drawing (it moves and resizes; a picture cannot TURN, and Finish says so), and Finish
-    is undoable — the snapshot is taken at `georefStart()` and pushed only on commit, so Ctrl+Z gives
-    back the exact grid the user opened. Every undo snapshot now carries `coords`/`basemap`, and the
-    VIEW is restored on the one undo that changes frame. `dev/lpn-spike/georef-carry-harness.js`.
-    **Left: `lpnGeorefFromTwoPoints` still has no interface, and the blocker is not the code.** Pick a
-    node, read a `lat, lon`, twice — but it needs a button on `#lpn_georef_bar` and about five new
-    strings, and the wording is Tom's. Also awaiting his wording: `lpn_georef_backdrop_unturned`,
-    shipping on its English fallback and listed in `popup-tips-harness.js`'s `PENDING_KEYS`.
+  - **Placement leftovers: all three done 2026-08-25.** A background image is carried onto the map
+    with the drawing (it moves and resizes; a picture cannot TURN, and Finish says so); Finish is
+    undoable — the snapshot is taken at `georefStart()` and pushed only on commit, so Ctrl+Z gives
+    back the exact grid the user opened; and `lpnGeorefFromTwoPoints` has a door at last, a button in
+    step 2 beside the scale and turn boxes. Step 2 and not step 1 because a pick inverts the live
+    transform, which a detached model's compensation makes a lie.
+    `dev/lpn-spike/georef-carry-harness.js`, `dev/lpn-spike/georef-twopoint-harness.js`,
+    `specs/place.js` §15. **Awaiting Tom's wording only:** the six `lpn_georef_twopt*` strings and
+    `lpn_georef_backdrop_unturned`, all shipping on placeholder English.
   - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the
     map's own 1/cos(latitude) — 9% from 20° to 31°. Unavoidable on an unprojected display without an
     anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.

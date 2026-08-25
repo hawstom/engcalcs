@@ -6216,6 +6216,12 @@ var EngCalcs = EngCalcs || {};
 	// says.
 	function georefPointerDown(e) {
 		if (!georef || !georef.t) { return false; }
+		// **A CONTROL-POINT PICK TAKES THE PRESS BEFORE ANY HANDLE DOES.** While the two-point tool is
+		// armed the body polygon is still on the canvas and still on top, so testing for a handle
+		// first would make every pick a drag of the whole model. `drag` is cleared rather than set:
+		// a pick is a press with no gesture after it, and leaving the previous drag record in place
+		// would let the next pointermove move the model.
+		if (georef.pick) { georefTwoPointClick(e); drag = null; return true; }
 		var target = document.elementFromPoint(e.clientX, e.clientY);
 		var kind = target && target.dataset ? target.dataset.georef : null;
 		if (!kind) { return false; }
@@ -6317,6 +6323,7 @@ var EngCalcs = EngCalcs || {};
 		if (georefBarEl('lpn_georef_asdeg')) {
 			georefBarEl('lpn_georef_asdeg').style.display = (detached && georef.mayBeDegrees) ? '' : 'none';
 		}
+		if (georefBarEl('lpn_georef_twopt')) { georefBarEl('lpn_georef_twopt').style.display = detached ? 'none' : ''; }
 		georefBarEl('lpn_georef_finish').style.display = detached ? 'none' : '';
 		georefBarEl('lpn_georef_numbers').style.display = detached ? 'none' : '';
 		if (!detached && georef.t) {
@@ -6358,6 +6365,16 @@ var EngCalcs = EngCalcs || {};
 			asdeg.addEventListener('click', function () {
 				if (!georef || !georef.mayBeDegrees) { return; }
 				georefArmAsDegrees();
+			});
+		}
+		// A TOGGLE, so the tool it arms can be put down again without leaving the wizard. There is no
+		// second label for the pressed state: the notice says what the next click will do, and it is
+		// the notice a user is reading while picking.
+		var twopt = georefBarEl('lpn_georef_twopt');
+		if (twopt) {
+			twopt.addEventListener('click', function () {
+				if (!georef) { return; }
+				if (georef.pick) { georefTwoPointStop(); } else { georefTwoPointStart(); }
 			});
 		}
 		georefBarEl('lpn_georef_drop').addEventListener('click', georefAttach);
@@ -6577,6 +6594,103 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 
+	// ---- TWO KNOWN POINTS: the surveyor's route to the same placement (Task 436) ----------------
+	//
+	// **THE MATH HAS BEEN HERE SINCE TASK 145; THIS IS ONLY THE DOOR.** Two control points fully
+	// determine a similarity -- four numbers for four unknowns -- so a user who already knows where
+	// two points on their drawing really are does not have to aim anything: they name the two, and
+	// the position, the scale and the turn all fall out exactly. EngCalcs.lpnGeorefFromTwoPoints()
+	// does the whole of the arithmetic.
+	//
+	// **IT LIVES IN STEP 2, BESIDE THE SCALE AND TURN BOXES, AND NOT BESIDE STEP 1.** Two reasons,
+	// and the second is the hard one:
+	//   - all three controls set the SAME transform by TYPING rather than by dragging, so this is
+	//     the third member of a set rather than a fourth way to start;
+	//   - a pick is read through georefPointerSrc(), which inverts the live transform at the live
+	//     view. In step 1 the drawing is held still by a compensating transform on modelLayer, so
+	//     where a node is DRAWN and where the transform says it is are different places, and a pick
+	//     would silently land on the wrong node. Attaching first costs one button press and moves
+	//     nothing.
+	//
+	// **IT IS NOT A SECOND COMMIT PATH.** It writes through georefSetTransform() like every gesture,
+	// leaves the wizard attached, and Keep this placement / Cancel are unchanged.
+	//
+	// **THE PICK SNAPS TO A NODE, AND THE PROMPT NAMES THE ONE IT CHOSE.** A vertex or a text label
+	// is not a point anybody surveys, and nearest-node is what "click the hydrant" means. There is
+	// no distance limit, deliberately: naming the node in the prompt makes a wrong pick visible and
+	// cancellable, which is a better answer than a slop radius that refuses a click near a node that
+	// is off the edge of the map.
+	function georefTwoPointStart() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!georef || !georef.t || georef.step !== GEOREF_STEP_ATTACHED) { return; }
+		georef.pick = { pts: [] };
+		setNotice(pc.lpn_georef_twopt_pick1 || 'Click a point on your drawing whose latitude and longitude you know.');
+	}
+	// Disarming says WHAT THE USER IS BACK TO rather than that something stopped -- the step 2
+	// instructions are the notice that was there before, so putting them back is the whole message.
+	function georefTwoPointStop() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!georef) { return; }
+		georef.pick = null;
+		setNotice(pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, a corner to resize it, the top handle to turn it.');
+	}
+	// The nearest NODE, in the model's own source coordinates. eachStoredPoint() visits every node
+	// first, in doc.nodes order, so georef.src[i] is doc.nodes[i] for i below that length -- the one
+	// place this file relies on that order outside georefWrite() itself.
+	function georefNearestNodeIndex(src) {
+		var i, s, d, best = -1, bestD = Infinity, n = Math.min(doc.nodes.length, georef.src.length);
+		for (i = 0; i < n; i++) {
+			s = georef.src[i];
+			if (!s || !isFinite(s.x) || !isFinite(s.y)) { continue; }
+			d = (s.x - src.x) * (s.x - src.x) + (s.y - src.y) * (s.y - src.y);
+			if (d < bestD) { bestD = d; best = i; }
+		}
+		return best;
+	}
+	function georefTwoPointClick(e) {
+		var pc = EngCalcs.pageConfig || {}, pk = georef.pick;
+		var idx = georefNearestNodeIndex(georefPointerSrc(georef.t, e.clientX, e.clientY));
+		if (idx < 0) { return; }
+		// A degenerate pair carries no scale and no rotation, and lpnGeorefFromTwoPoints() answers a
+		// metre-scale identity for it rather than NaN. That is the right answer for a library and the
+		// wrong one for a person, so the same point twice is refused here by name.
+		if (pk.pts.length === 1 && pk.pts[0].i === idx) {
+			setNotice(pc.lpn_georef_twopt_same || 'That is the point you picked first. Pick a different one.');
+			return;
+		}
+		var node = doc.nodes[idx], s = georef.src[idx];
+		// **parseLatLon() READS IT, AND NOTHING ELSE DOES.** The decimal comma, the greedy match and
+		// the two-numbers-exactly rule are all already solved there; a second reader here would be a
+		// second chance to get 38,106 wrong. The node's id rides along in parentheses exactly as
+		// georefAskSize() carries its unit -- it names WHICH point is being answered for, which is
+		// what makes a mis-snapped pick visible before it is committed.
+		var typed = window.prompt(
+			(pc.lpn_goto_prompt || 'Latitude and longitude, in that order') + ' (' + node.id + ')', '');
+		if (typed === null) { georefTwoPointStop(); return; }
+		var ll = parseLatLon(typed);
+		if (!ll) {
+			// Still armed, and on the SAME point: a typo costs one more click, not the whole sequence.
+			setNotice(pc.lpn_goto_bad || 'That is not one latitude and one longitude. Try 38 -122, with a space between them.');
+			return;
+		}
+		pk.pts.push({ i: idx, x: s.x, y: s.y, lon: ll.lon, lat: ll.lat });
+		if (pk.pts.length < 2) {
+			setNotice(pc.lpn_georef_twopt_pick2 || 'Now click a second known point, as far from the first one as you can.');
+			return;
+		}
+		georef.pick = null;
+		georefSetTransform(EngCalcs.lpnGeorefFromTwoPoints(pk.pts[0], pk.pts[1]));
+		// **AND THE VIEW GOES TO THE MODEL**, on the same argument georefArmAsDegrees() makes: the two
+		// coordinates the user typed have almost certainly moved the network off the screen, and a
+		// placement nobody can see cannot be checked. AUTOMATIC, so it does not set the edited
+		// asterisk for a camera move nobody made.
+		zoomExtent(true);
+		// Redrawn after the fit, because every handle is CLAMPED into the visible canvas and the
+		// canvas it must be clamped into is the one the fit just chose.
+		georefDrawFrame();
+		setNotice(pc.lpn_georef_twopt_done || 'The model now sits on the two points you gave. Check it, then press Keep this placement.');
+	}
+
 	function georefStart() {
 		var pc = EngCalcs.pageConfig || {};
 		if (georef) { return; }
@@ -6783,6 +6897,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	function georefDetach() {
 		if (!georef || georef.step !== GEOREF_STEP_ATTACHED) { return; }
+		// The two-point pick belongs to step 2 -- see georefTwoPointStart() on why a pick cannot be
+		// read while the model is held still -- so going back to step 1 puts the tool down.
+		georef.pick = null;
 		georef.step = GEOREF_STEP_DETACHED;
 		georef.frozen = { tx: state.tx, ty: state.ty, s: state.s };
 		georefApplyCompensation();

@@ -3,13 +3,13 @@
 `dev/geographic-projects.md` §1 already said this had to exist: *"Converting an existing project is a
 deliberate, separate operation (a georeferencing wizard — two known points, as the backdrop scale
 gesture already does), never a toggle."* This document is that operation. The two-known-points
-gesture is still available in the math (`lpnGeorefFromTwoPoints`) and is deliberately not the
-interface — see §3.
+gesture is the SECOND way through it, on the bar in step 2 — see §3.
 
 Code: `js/lpn-georef.js` (pure math), the `georef*` section of `js/looped-network.js` (the tool),
 `#lpn_georef_bar` in `Looped-Network.php`. Harnesses: `dev/lpn-spike/georef-harness.js` (arithmetic),
 `dev/lpn-spike/georef-place-harness.js` (the flow), `dev/lpn-spike/georef-carry-harness.js` (what the
-placement carries and what Ctrl+Z gives back).
+placement carries and what Ctrl+Z gives back), `dev/lpn-spike/georef-twopoint-harness.js` (the
+two-known-points door).
 
 ---
 
@@ -59,7 +59,10 @@ lists alone would also do. AI must not write these without written permission in
    corner to resize about the opposite corner, the round handle to turn. Or type the two numbers —
    "one drawing unit is ___ ft" and "turn ___ degrees counter-clockwise" — which act about the
    model's centre.
-5. **Finish** (confirmed) or **Cancel** (exact).
+5. **Or use two known points**, the third of step 2's typed controls: click a point on the drawing,
+   give its latitude and longitude, click a second, give its. Position, scale and turn all fall out
+   exactly — see §3.
+6. **Finish** (confirmed) or **Cancel** (exact).
 
 Labels and the solver are **off** for the whole of it, and come back on Finish or Cancel.
 
@@ -91,15 +94,31 @@ Labels and the solver are **off** for the whole of it, and come back on Finish o
   piece of furniture is just as unreachable. It works only because a corner drag measures its scale
   from where the pointer started rather than from the corner it belongs to — which is the same fix as
   *"When I click the project to move it, it jumps (to bring its center to my mouse?)"*.
-- **Two control points is the math, not the interface.** `lpnGeorefFromTwoPoints` is exported and
-  tested, and picking two survey points off a basemap is the *accurate* way to georeference. It is not
-  the first-run interface because it requires the user to already know two positions on their own
-  drawing. It is the natural home for a later "I have coordinates for these two hydrants".
-  **What that door would cost, priced 2026-08-25 (Task 436):** the code is small — pick a node, read
-  a `lat, lon` with the `parseLatLon()` that already exists, twice, then `georefSetTransform()` — but
-  it needs a BUTTON on `#lpn_georef_bar` in `Looped-Network.php` and about five new strings, and the
-  wording is Tom's. It is a wording decision wearing a feature's clothes, which is why it is still
-  waiting.
+- **Two control points is a SECOND door onto the same commit, and it is in step 2** (Task 436,
+  shipped 2026-08-25). Picking two survey points is the *accurate* way to georeference, and it is
+  not the first-run interface because it needs the user to already know two positions on their own
+  drawing — so it sits beside the scale and turn boxes, the third of the three controls that set the
+  transform by TYPING rather than by dragging. Press the button, click a point, give its latitude and
+  longitude, click a second, give its; `lpnGeorefFromTwoPoints()` does the rest.
+  - **Step 2 and not step 1, and the reason is mechanical.** A pick is read through
+    `georefPointerSrc()`, which inverts the live transform at the live view. In step 1 the drawing is
+    held still by a compensating transform on `modelLayer`, so where a node is DRAWN and where the
+    transform says it is are different places, and a pick would silently land on the wrong node.
+    Attaching first costs one press and moves nothing.
+  - **It is not a second commit path.** It writes through `georefSetTransform()` like every gesture
+    and leaves the wizard attached, so Keep this placement and Cancel are untouched. The view is
+    fitted to the model afterwards, on `georefArmAsDegrees()`'s own argument: the coordinates just
+    typed have almost certainly moved the network off the screen, and a placement nobody can see
+    cannot be checked.
+  - **The pick snaps to the nearest NODE and the prompt NAMES it.** A vertex or a text label is not
+    a point anybody surveys. There is no distance limit on purpose — naming the node makes a wrong
+    pick visible and cancellable, which beats a slop radius that refuses a click near a node clamped
+    off the edge of the map. `eachStoredPoint()` visits nodes first, in `doc.nodes` order, so
+    `georef.src[i]` is `doc.nodes[i]`; that is the one place outside `georefWrite()` relying on it.
+  - **`parseLatLon()` reads the coordinate and nothing else does**, and the prompt is `lpn_goto_prompt`
+    reused whole. A second reader here would be a second chance to get `38,106` wrong.
+  - **Six new strings ship on placeholder English awaiting Tom's wording:** `lpn_georef_twopt`,
+    `_tip`, `_pick1`, `_pick2`, `_same`, `_done`. They are in `lib/lang.ec.en.php` only.
 - **Editing is locked while placing.** `georefActive()` gates the same seams `regMode` does. The
   transform re-derives every point from a held-aside source array by INDEX, so an element added
   mid-placement would shift every index after it. Panning still works, because looking at where you
