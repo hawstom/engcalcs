@@ -8,7 +8,7 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-53 features, citing 87 of the 453 closed task IDs. The other 366 are
+54 features, citing 87 of the 454 closed task IDs. The other 367 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
 call a feature — and 135 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
@@ -27,6 +27,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - One button returns a page to a worked example that passes, so nothing is ever a blank form. <!-- 79 -->
 - Name a calculation and copy a link to it; the link carries your inputs, and nothing is shared unless you share it. <!-- 39, 80, 228 -->
 - Changing an input unit asks first, and says plainly that it reinterprets the numbers you typed rather than converting them. <!-- 422, 425 -->
+- Install it from the browser you already have, and every calculator keeps working with no network at all. <!-- 2 -->
 
 ## Drawing a water network
 
@@ -37,7 +38,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - Find elements by any property, jump straight to one by ID, and set a property across everything the search found. <!-- 353, 420, 389 -->
 - The File menu remembers your recent projects, and the map remembers where you were looking. <!-- 352, 360 -->
 - One toggle clears the readouts off the map when you want the drawing and nothing else. <!-- 253 -->
-- A Help menu on the page itself. <!-- 250 -->
+- A Help menu specific to this calculator. <!-- 250 -->
 - And although you of course prefer working on your PC, it works also on a phone in tall mode. <!-- 486 -->
 
 ## Solving it
@@ -45,17 +46,17 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - A looped network solved by the global gradient method, in the page, with no install and no upload. <!-- 146 -->
 - Or solved by the EPANET 2.3 engine itself, compiled into the page and named by version where you can see it. <!-- 451 -->
 - Standard gravity throughout, and where the two engines disagree the page tells you by how much. <!-- 419 -->
-- Answers follow your edits as you make them, and that is a project setting you can turn off. <!-- 467 -->
+- Answers follow your edits as you make them, and if a big network makes that slow, it is a project setting you can turn off. <!-- 467 -->
 
 ## Time
 
-- Extended-period simulation: tanks fill and drain, demands follow their patterns, and the transport controls scrub the run. <!-- 248.01, 423, 410 -->
+- Extended-period simulation: tanks fill and drain, demands follow their patterns, and a bar along the bottom plays the run or steps to any moment in it. <!-- 248.01, 423, 410 -->
 - Patterns on a reservoir head and on a pump's speed, beside the demand patterns. <!-- 248.02 -->
 - A Libraries box holding the patterns and curves a run needs. <!-- 460 -->
-- Run shows real progress, a completion report, and the engine's own report of the run. <!-- 450 -->
+- A Run button (optional, since answers can follow your edits instead) shows real progress, a completion report, and the engine's own report of the run. <!-- 450 -->
 - Colour limits hold still across a run, so a colour means the same thing at every step. <!-- 448 -->
 
-## Files, and EPANET
+## Files and EPANET
 
 - Opens EPANET `.inp` files, takes the part it supports, and reports every difference instead of dropping it quietly. <!-- 196 -->
 - An import note is filed on the element it concerns, and you read it in that element's own property box. <!-- 483 -->
@@ -63,7 +64,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - Projects are `.lwn` files — JSON inside, on your own disk, readable without us. <!-- 246 -->
 - An examples library that opens Net1, Net2, Net3, Elm Street Center and a Net3 placed on the world, in one click. <!-- 314, 257, 454 -->
 
-## The map, and the world
+## The map and the world
 
 - A geographic project is drawn in latitude and longitude over a street map or satellite imagery, with the same drawing tools. <!-- 145 -->
 - An existing x/y network can be placed on the world — moved, scaled and rotated onto its real ground. <!-- 476 -->
@@ -90,9 +91,9 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 
 - Change a few properties without disturbing the network they belong to, switch between those scenarios, and see at a glance which elements carry an override. <!-- 201, 407, 412, 512 -->
 
-## Language, licence and privacy
+## Language, licence, and privacy
 
 - Twenty-seven languages, across the whole suite and not only its menus. <!-- 7, 15, 22, 34 -->
 - Free software under the GNU GPL, source in the open. <!-- 244 -->
-- Installable, and it keeps working with no network once installed. <!-- 2, 4, 37 -->
+- It installs on a desktop or a phone as an app of its own, icon and all. <!-- 4, 37 -->
 - No account, no visitor identifier, and nothing counted about you unless you say yes. <!-- 286, 288 -->

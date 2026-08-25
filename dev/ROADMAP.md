@@ -96,7 +96,7 @@ the block.
     map's own 1/cos(latitude) — 9% from 20° to 31°. Unavoidable on an unprojected display without an
     anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.
 
-- 50|513| **Sprint 459's leftovers: two named strings nobody here can read.**
+- 100|513| **Sprint 459's leftovers: two named strings nobody here can read.**
   The three jobs this task carried are done (2026-08-25). The glossary write-back was done from the
   SHIPPED STRINGS, not from the lost transcript — `dev/scripts/glossary_rendering_census.php` counts
   which rendering each language really uses and how often, and its findings are written into the
@@ -250,7 +250,7 @@ the block.
     can decide and comment"*) — one `**Tom:**` line per item, blank meaning not yet decided. Each
     answer goes back into the JSON's `disposition` and `resolution`, which is what re-opens the gate.
 
-- 75|477| **New blank project startup wizard: xy/lat-lon, units, head loss.** Tom, 2026-08-22,
+- 100|477| **New blank project startup wizard: xy/lat-lon, units, head loss.** Tom, 2026-08-22,
   naming the scope. It replaces the four-row File > New fly-out; on epanet-js, *"they have a wizard
   box with xy and lat/lon as the top choices, and if lat/lon is selected, a search box is enabled.
   Below it are the units and head loss formula selectors."*
@@ -289,7 +289,7 @@ the block.
     landing page's own repository at `~/librewaternet.org/index.html`. Move the local working
     directory in that same pass and not before (`dev/hosting-layout.md` §5).
 
-- 75|502| **A Text object anchored to a LINK, not only to a node.**
+- 100|502| **A Text object anchored to a LINK, not only to a node.**
   Extracted from Task 483 on close. A Text already follows a node (`anchorNode`, an offset plus a
   leader) and an EPANET `.inp` can only ever anchor one to a node — so this buys nothing on import
   and is a drawing feature: labelling a pipe, a pump or a valve with your own words and having the
@@ -386,7 +386,7 @@ the block.
     nothing else; a frame full of defects can still be safe to publish. Judging the two together
     once retired the best phone frame in the drop as a flat "No". Use **Not as is** for safe-but-stale.
 
-- 75|509| **The profile lost two operations; give them a door.** Task 506 removed
+- 100|509| **The profile lost two operations; give them a door.** Task 506 removed
   the whole left-hand control column and Tom agreed the page is better for it — *"You are right that
   we lost something"* is about the two operations it took with it: changing ONE end of an existing
   path, and removing ONE waypoint. Both are "draw it again" today.
@@ -400,7 +400,7 @@ the block.
     `_through`, `_clear`) are plausibly what this box needs. Check before writing new ones — each
     new key is 27 strings.
 
-- 75|510| **Named profiles: New, Rename, Delete, and a list to pick from.** Tom, 2026-08-24. A path
+- 100|510| **Named profiles: New, Rename, Delete, and a list to pick from.** Tom, 2026-08-24. A path
   through the network is worth keeping — a client report has the same three or four profiles in it
   every time — and today it exists only until the next one is drawn.
   - **His placement: a menu arrow ON the Profile tab**, holding New / Rename / Delete and the list
@@ -417,7 +417,7 @@ the block.
   mission has earned; prepare for the meeting and record what comes of it. Not a search-reach task,
   but it lives here because it is the same goal reached by a better road.
 
-- 75|408| **Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.**
+- 100|408| **Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.**
   Tom, 2026-08-17. A toggle or picker for the increment, not a forced snap — free dragging must stay
   available for whoever wants it.
   - **Open question, same day: magnet-style (soft pull toward the nearest increment, override-able by
@@ -440,7 +440,7 @@ the block.
     (`lpn_units_warn_body`, `lpn_units_reinterpret`, `lpn_units_convert`). Unreachable, so not a
     defect — retire them with `rename_lang_key.php`'s 27-file pass, or in the next lpn sprint.
 
-- 50|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
+- 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
 
@@ -455,7 +455,7 @@ the block.
   - **EPANET has no such concept**, so an `.inp` export flattens it and an import can never rebuild it,
     which breaks Task 281's byte-identical round trip for anything typed. Task 390-sized.
 
-- 25|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
+- 50|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
   Tom, 2026-08-23: epanet-js runs one at `roadmap.epanetjs.com`, powered by Canny. Noted as an
   example to weigh, not a decision. The thing to weigh is that `dev/ROADMAP.md` is written for us and
   says things a public board should not (measured costs, what Tom is not proud of, who to ask), so a
@@ -472,7 +472,7 @@ the block.
     it is one run of the rebuilt `log/lang-log-stats.sh` over HW and the band pages, same window and
     same bucket, long enough that the denominator is not marked `~`.
 
-- 25|185| **Match/Copy properties tool (originated during Task 146).** Tom, 2026-07-30: "In the absence of the
+- 75|185| **Match/Copy properties tool (originated during Task 146).** Tom, 2026-07-30: "In the absence of the
   table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
   labels) say what properties to copy, top shows (or initial click gives) the Source object then you
   click the Target objects." Same interaction as AutoCAD's MATCHPROP and every GIS attribute-copy
@@ -511,7 +511,7 @@ the block.
   - **If the tables come out essentially identical, that is a legitimate reason NOT to build it.** The
     case rests on multilingual reach and on owning the reference, not on the existing one being wrong.
 
-- 25|218| **Find advisors and proteges: a standing, nagged commitment.**
+- 50|218| **Find advisors and proteges: a standing, nagged commitment.**
   Not a task that completes. Tom, 2026-08-05: *"I still need help knowing where to try to connect with advisors and proteges;
   this is not my strength. r/civilengineering is mostly frivolous talk."* And the same day: *"This is
   not my strength or passion. I'll want you to hold my hand and push me to 'eat my veggies.' I may
@@ -531,7 +531,7 @@ the block.
       EPICS — a larger and more durable protege pool than one club, and a faculty contact persists
       across years while student officers turn over every May.
 
-- 25|221| **Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.** Delete
+- 50|221| **Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.** Delete
   `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,
   `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is
   useful for about a year; after that it is archaeology in a user-facing Notes list.
@@ -542,7 +542,7 @@ the block.
   rewrite against live controls, not a code fix, so it needs a browser pass rather than static
   reading.
 
-- 25|234| **Canal Seepage must prove its worth or go.** Tom, 2026-08-08: *"in my crosshairs"*. After
+- 50|234| **Canal Seepage must prove its worth or go.** Tom, 2026-08-08: *"in my crosshairs"*. After
   Task 232 removed `Irrigation.php`, `cs_` is the remaining page Tom is not proud of — his standing
   position is that it was AI momentum rather than a real need, and it is already under a
   do-not-promote (never propose it for links, outreach, or feature work).
@@ -557,7 +557,7 @@ the block.
   `Irrigation.php` it has a real in-site path. Check what that contributes before assuming the
   numbers mean nobody wants it.
 
-- 50|247| **Customers: metered demands with account numbers, lumped to the nearest node.**
+- 75|247| **Customers: metered demands with account numbers, lumped to the nearest node.**
   Tom, 2026-08-09, raised and expanded 2026-08-24. epanet-js has demand allocation by customer;
   EPANET does not. **Full design, with the costs priced: `dev/customer-demands.md`.**
   - **Tom's expansion, in his words:** *"expand/envision as a Customer management model where we are
@@ -617,7 +617,7 @@ the block.
     authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
     all public domain."*
 
-- 25|248.03| **Rule-based controls, EPANET's `[RULES]` (Task 248 child).** Simple `[CONTROLS]` shipped
+- 75|248.03| **Rule-based controls, EPANET's `[RULES]` (Task 248 child).** Simple `[CONTROLS]` shipped
   2026-08-18 — the Libraries box adds, edits, validates and deletes them, an unreadable sentence is kept
   and marked rather than discarded, and only a fully understood one reaches the engine.
   - Deliberately parked: rule-based is a language, and it can wait for evidence that a user has one.
@@ -681,7 +681,7 @@ the block.
     than a disappointment; "a third of them" makes several open tasks much more urgent.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 
-- 25|322| **Standing advisories worth converting rather than re-reading.** `check_all.sh` reports
+- 75|322| **Standing advisories worth converting rather than re-reading.** `check_all.sh` reports
   these every run and nobody can act on them.
   - **`js/looped-network.js` is 20,374 lines**, with `rebuildSettingsFields()` and
     `drawExampleNetwork()` the two obvious extractions. Task 293 established the split-by-PURITY
@@ -727,13 +727,13 @@ the block.
     (shedding) · 6 labels hidden because the zoom is too far out · 7 leader lines drawn.
   - Stopping at N answers "did my change help?" — the answer is two drawings at the same step.
 
-- 25|417| **Long-press on an element should enter Edit mode.** Exactly as a click does. Tom,
+- 75|417| **Long-press on an element should enter Edit mode.** Exactly as a click does. Tom,
   2026-08-17. The guard that switches to Edit mode on click does not fire when a long press begins a
   drag, so a touch user who presses and drags is editing an element the page does not think is
   selected for editing. Same guard, second trigger. See Task 192 for why long-press is the touch
   equivalent generally.
 
-- 25|468| **Demand categories on a junction — the breakdown the importer already flattens.**
+- 75|468| **Demand categories on a junction — the breakdown the importer already flattens.**
   EPANET stacks (base demand, pattern, category) triples on one node and sums them; `js/lpn-inp.js`
   reads them, sums them into this page's single `demand`, and reports `demand-categories` on every
   import that had one. So the data arrives and is thrown away today.
@@ -814,7 +814,7 @@ the block.
     efficiencies must cite WHO/EAWAG/CAWST primary sources before shipping, never placeholders — a
     wrong default could tell someone unsafe water is safe.
 
-- 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
+- 50|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
 
 - 5|155|[H] **The Task 149 search-index fix awaits Search Console confirmation.**
   Deployed already. Steps 1–5 (sitemap uploaded, `robots.txt` Sitemap line, sitemap submitted in
@@ -857,7 +857,7 @@ the block.
   should figure out what "printable" should even mean per calculator type (a two-column input/
   result form vs. a map/canvas page are different problems) before building anything.
 
-- 5|178| **Build a real filmstrip-GIF Help asset from `dev/filmstrip-gif-recipe.md`** (e.g. the
+- 75|178| **Build a real filmstrip-GIF Help asset from `dev/filmstrip-gif-recipe.md`** (e.g. the
   add-pipe / add-junction workflow). A 2026-07-30 proof of concept showed this is cheap once set up;
   the recipe records the ~30 minutes of trial and error, of which the hard part is precise SVG click
   targeting, not GIF assembly. The POC GIFs were never committed.
@@ -870,7 +870,7 @@ the block.
   give more fine-grained control and right now just a two-dimensional control." Build it when
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
 
-- 5|186| **Table-paradigm editor with spreadsheet copy/paste (originated during Task 146).** Tom, 2026-07-30:
+- 50|186| **Table-paradigm editor with spreadsheet copy/paste (originated during Task 146).** Tom, 2026-07-30:
   "For the future a table-paradigm editor with spreadsheet-like copy and paste would be very cool."
   A grid of nodes and a grid of links, editable in place, with clipboard paste from a spreadsheet —
   what EPANET's own Data Browser tables and every serious package's tabular view provide, and the
@@ -948,7 +948,7 @@ the block.
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
 
-- 5|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
+- 50|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
   with that name, and set the map extent from the file's own `[BACKDROP] DIMENSIONS` so the image
@@ -959,13 +959,6 @@ the block.
     gone from hypothetical to the common case. The registration half is the valuable half: an
     `[BACKDROP] DIMENSIONS` record places the image in the model's own coordinates exactly, which
     is strictly better than the two-point scale gesture a human would otherwise perform by eye.
-
-- 5|294|[H] **Decide the 7 remaining dead language keys, one each.** `menu_main_list`,
-  `menu_main_language`, `mi_d50in`, `mpf_spreadheet_notice` (key name is misspelled too),
-  `wi_save_and_calculate`, `or_shape`, `contact_title` — rendered by nothing, 27 translated strings
-  apiece. Each is either lost content to restore (as Task 290's six Rock Chute notes turned out to
-  be) or debt to delete; only Tom can say which. Recorded so far only inside closed Task 290, where
-  nothing re-scans it.
 
 - 5|303| **Usage logging: the remaining lower-value questions.** Extracted from Task 200 when it
   closed 2026-08-14, so they survive the close rather than being buried in a DONE block nobody
