@@ -14,6 +14,61 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-08-25 — market-research pass: wish list grown from one row to four new plus one promoted
+
+Tom, reacting to a one-row wish list: *"I am disappointed that their wish list is not
+overwhelmingly long. Increase their research budget."* This entry is the outward-research pass;
+full case, citations and honest sizes are in `wishlist.md` — this is the compressed index.
+
+- **Row 1 (ranked highest): a scenario-level demand multiplier.** **CITED** three independent
+  published master plans (San Bernardino MWD Section 7, sbmwd.org; City of Squamish 2024 update,
+  squamish.ca; City of Astoria, astoria.gov) all structure their hydraulic chapter around the same
+  three named conditions — average day, maximum day (+fire), peak hour. **OBSERVED** the one
+  bulk-write tool `lpn_` has ("Apply starting values to all elements," `js/looped-network.js:17995`)
+  is Base-only and refuses inside a scenario (`:18003`) — so building "max day" over "average day"
+  today means hand-editing every junction, which stops being "one line" work well before 20 nodes.
+- **Row 2: a scenario comparison table (batch run).** **CITED** Bentley's own WaterGEMS docs
+  advertise exactly this — "batch run… results of multiple scenarios in one single application…
+  with only 2 clicks" (blog.virtuosity.com, docs.bentley.com) — read as evidence of demand, not of
+  quality, per this agent's standing instruction. **OBSERVED** nothing like it exists; results are
+  read one scenario at a time, and the closed Task 327 colour-by-value view is one-field-one-scenario
+  by explicit design ("two quantities coloured at once is a map with two legends").
+- **Row 3: water age only, a narrow crack in the blanket "water quality, in every form" cut.**
+  **CITED** EPANET's age analysis "requires no user-defined reaction coefficients… built-in
+  zero-order kinetics" (openepanet.org, a ResearchGate-indexed paper on EPANET water age) — unlike
+  chlorine decay, it needs no coefficient a design engineer would have to invent, which is the exact
+  failure mode that killed a sourced hydrant-barrel `k` in the entry below. **CITED** EPA's own TCR
+  distribution white paper and a real small-system case (Eureka, MO, Bartlett & West 2018 report)
+  both name oversized fire-flow-driven mains and poor tank turnover as the actual cause of water-age
+  complaints — the same failure mode Task 530's lateral work reveals from the demand side. **Thin
+  spot, named plainly:** no numeric water-age design standard found (Ten States Standards or
+  equivalent) — the guidance is qualitative, so a page reporting age would have no stated pass/fail
+  the way pressure and fire flow do.
+- **Row 4 (ranked last, honestly): plain WGS84 GeoJSON export of a geographic project.** **CITED**
+  real municipal as-built GIS submittal requirements exist and are specific — State Plane CRS,
+  Esri geodatabase, utility asset schema (montbelvieu.net "GIS Data Requirements"; New Jersey
+  American Water CAD-to-GIS standard) — and I state plainly that a raw WGS84 GeoJSON export does
+  NOT satisfy that requirement; it is at best a five-second head start for a utility's own GIS
+  person in QGIS, not a submittal. Small to build, small in what it actually solves.
+- **Roadmap disagreement, stated once:** Task 468 ("Demand categories on a junction," priority 25
+  Maybe) is framed on `dev/ROADMAP.md` purely as import fidelity ("the breakdown the importer
+  already flattens"). From this seat it is worth more — several master plans apply *different*
+  peaking factors by land-use category, which is exactly what demand categories would carry once a
+  scenario multiplier (Row 1) exists. I would move it to at least 50 (Someday) on that second,
+  independent reason.
+- **Declined, with reasons recorded in `wishlist.md` so they are not re-read from scratch:**
+  system-wide fire-flow mapping (needs a calibrated, detailed model at a scale this suite correctly
+  declines), land-use/GIS demand allocation (real, but "Being a GIS" is already cut for reasons that
+  apply word for word), full as-built GIS export meeting a real spec (same GIS-scope reason),
+  automated calibration against field flow tests (folds into Task 530's mechanism, not a
+  freestanding win at this scale, **SPECULATION**), chlorine/multi-species water quality (stays cut).
+- **What this project's own heads would have gotten wrong:** nobody inside this repo would have
+  found the master-plan literature's insistence on the avg-day/max-day/peak-hour triad (Row 1) —
+  it is outward evidence about a workflow this project has never had to run, and it is the one
+  finding this pass that changed my own ranking mid-research (I expected the comparison table,
+  Row 2, to rank first, until three independent master plans converged on the same three scenario
+  names and made the multiplier the thing without which the table has nothing to compare).
+
 ## 2026-08-25 — Task 530 research: the hydrant lateral assembly, so the wizard can ask or disclose
 
 Tom promoted my Task 530 wish to priority 75 and ruled it must ask-or-disclose diameter, roughness,
