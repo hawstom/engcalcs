@@ -48,7 +48,26 @@ foreach (array_merge(glob($root . '/*.php'), glob($root . '/lib/*.php'), glob($r
 // because there is no way to tell from here which members the runtime will ask for. Detected
 // rather than hard-coded, so a second dynamic family cannot quietly produce 40 false positives.
 preg_match_all('/\[\s*[\'"]([a-z0-9_]+_)[\'"]\s*\./i', $code, $m);
-$dynamicPrefixes = array_values(array_unique($m[1]));
+$dynamicPrefixes = $m[1];
+
+// **AND A FAMILY CONSUMED BY ITS PREFIX IS JUST AS LIVE AS ONE ASSEMBLED BY IT.** Added 2026-08-25
+// after this check reported 14 example titles and descriptions as dead: `lpn_ex_*` is built by
+// dev/scripts/generate_examples.php as "lpn_ex_{$key}_title" and consumed in Looped-Network.php by
+// `strpos($k, 'lpn_ex_') !== 0`. Neither form is a concatenation, so neither was seen, and the
+// check's one useful list was 40% noise -- which is how a check becomes one people learn to skip.
+//
+// Two more shapes, both DETECTED rather than named, for the reason the paragraph above gives:
+//   1. an interpolated build -- "prefix_{$k}_title"
+//   2. a prefix test -- strpos($k, 'prefix_'), or indexOf('prefix_') in JS
+// A prefix test is evidence the runtime walks the whole family, which is exactly what makes an
+// individual member unfindable from here.
+preg_match_all('/[\'"]([a-z0-9_]+_)\{\$/i', $code, $m2);
+$dynamicPrefixes = array_merge($dynamicPrefixes, $m2[1]);
+preg_match_all('/(?:strpos|indexOf|startsWith)\s*\(\s*[^,()]+,\s*[\'"]([a-z0-9_]+_)[\'"]/i', $code, $m3);
+$dynamicPrefixes = array_merge($dynamicPrefixes, $m3[1]);
+preg_match_all('/\.\s*(?:indexOf|startsWith)\s*\(\s*[\'"]([a-z0-9_]+_)[\'"]/i', $code, $m4);
+$dynamicPrefixes = array_merge($dynamicPrefixes, $m4[1]);
+$dynamicPrefixes = array_values(array_unique($dynamicPrefixes));
 
 $dead = [];
 foreach ($keys as $k) {
@@ -138,8 +157,13 @@ printf("1. RENDERED BY NOTHING: %d\n", count($dead));
 if ($dead) {
     echo "   Each of these is maintained in 27 language files and displayed on no page. Deleting one\n";
     echo "   retires 27 strings; keeping it means every future sprint translates it again.\n";
-    echo "   CHECK BEFORE DELETING: a key held deliberately for a feature that is coming back is a\n";
-    echo "   real thing here (lpn_settings_emitter_exponent is kept on purpose for Task 191).\n\n";
+    echo "   CHECK BEFORE DELETING. Two kinds listed here are NOT debt:\n";
+    echo "     - held for a feature that is coming back: lpn_settings_emitter_exponent for Task 191,\n";
+    echo "       the eight lpn_profile_* for Task 509.\n";
+    echo "     - the CANONICAL WORDING other strings are checked against. lpn_geomap and lpn_xymap\n";
+    echo "       are the two mode names; nothing prints them, and mode_name_check.php holds every\n";
+    echo "       other string's prose to them. Deleting one breaks a check and lets one language\n";
+    echo "       call the same mode two different things.\n\n";
     foreach ($dead as $k) { echo "   $k\n"; }
 }
 echo "\n";
