@@ -24,6 +24,25 @@ right; do not resize on the way in.
   page, which is a thumbnail without any image tooling — there is no ImageMagick, no Pillow and no
   PHP GD on this machine, and a browser resizing an `<img>` costs nothing.
 
+## Redacting one thing inside a capture
+
+There is no ImageMagick, no Pillow, no PHP GD and no sharp here, but a PNG is zlib plus five row
+filters and node ships zlib, so `dev/scripts/png_redact.js` does the two jobs that come up:
+
+    node dev/scripts/png_redact.js crop   in.PNG out.png X Y W H      # cut a piece out to look at
+    node dev/scripts/png_redact.js redact in.PNG out.png X,Y,W,H ...  # black a rectangle out
+
+**Crop first, always.** The way to find a rectangle is to cut the region out, look at it, and read
+the coordinates off what you see — guessing at a redaction and checking afterwards is how a
+black box lands next to the thing it was meant to cover. Verify by cropping the OUTPUT.
+
+It refuses to overwrite its input or any existing file, because painting over pixels is one-way
+and the only undo is still having the original. It handles 8-bit RGB and RGBA and refuses anything
+else by name rather than mangling it.
+
+Used 2026-08-24 on 0014 and 0021, to black out a bookmark folder named after a real person at
+Tom's request. Those two frames are still unpublishable for the rest of their browser chrome.
+
 ## Publishable is a decision, not a default
 
 A screenshot is a screen: it publishes whatever was on it. Before any image leaves this folder for

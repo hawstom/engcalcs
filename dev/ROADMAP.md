@@ -179,20 +179,26 @@ the block.
     too), and the fix is whatever distinguishes the two on a strip 11px tall in 27 languages.
   - Same shape as Task 512: two different things wearing one mark, silently.
 
-- 75|515| **The Settings category index breaks its own labels mid-word.**
+- 25|515| **The Settings category index breaks its own labels mid-word.**
   "Visualizati / on", "Node symbolog / y", "Map appearan / ce" -- visible in screenshots 0022, 0023,
   0026 and 0029 through 0033, so it is the normal state, not a narrow window. The left column is
   narrower than the labels it has to carry.
   - Task 284 covers the Settings box's sticky headings and its narrow-screen collapse and does NOT
     name this. Column width is king suite-wide and mid-word wrap is acceptable in a RESULTS table;
     a navigation index a user reads to find a section is the case that rule was not written for.
+  - **Tom, 2026-08-24, dropped it to Maybe:** *"I think we can't avoid some wrapping in some
+    languages. We must just accept it."* Kept open only because the wrap he was told about is in
+    **English** — "Visualizati / on" is not a long-language artefact — so if it is ever picked up,
+    the question is whether the English column is simply too narrow, not whether translations fit.
 
-- 75|516| **The colour key stacks onto the label legend and covers it.**
+- 25|516| **The colour key stacks onto the label legend and covers it.**
   Screenshot 0030: with nodes coloured by pressure AND links by velocity, two colour keys stack at
   the right edge and print over the node/link label legend, which becomes unreadable. Both default
   to the right and nothing separates them or gives way.
   - One key is the common case and is fine. The defect appears only when both groups are coloured,
     which is also when the map is carrying the most information.
+  - **It is screenshot 0030**, which is what Tom asked for so he can look at it himself. He is not
+    worried about it (2026-08-24), hence Maybe rather than Soon.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
@@ -294,24 +300,6 @@ the block.
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
 
-- 100|512| **The amber override ring reads as a stuck highlight nobody can turn off.**
-  Tom, 2026-08-24, of two junctions in his own Elm Street file: *"J-F-FRAN and JF-ELM are
-  highlighted. I don't know why, and I can't get them to unhighlight. I noticed this same thing in
-  my colleague Mary's water report using lpn."*
-  - **It is working exactly as designed, and that is the finding.** `refreshScenarioMarks()` puts
-    `.lpn-override` — an amber ring — on any element carrying a value overridden in the current
-    scenario. His status bar says *Daily Flow | Custom values: 3*, and those two fire-flow junctions
-    are two of the three. There is nothing to unhighlight: the ring is a fact about the document.
-  - **Two independent users read a designed mark as a defect**, which is the whole signal. The only
-    place the ring is explained is the property popup's override row (Task 184) — reachable by
-    clicking the node, which is precisely what somebody who thinks the page is stuck will not do.
-  - The cheap candidates, in order of cost: a title on the ring; a status-bar phrase naming what the
-    count is counting; a legend row beside the colour key. **[H] Tom decides whether it should also
-    default OFF** — but note that hiding it makes a scenario's edits invisible on the map, which is
-    the opposite failure and probably worse.
-  - Do NOT confuse this with selection (one element, `selection`) or the profile route mark (orange
-    band, now hover-gated). Three different marks, three different meanings, all currently silent.
-
 - 100|511| **Three georeferencing checks disagree with Mercator, and one of them is right.**
   Found 2026-08-24 running the whole browser pass, which had not been run end to end in a while:
   `dev/browser-pass/specs/georef.js` fails three ways since Task 145 drew the project in Web
@@ -400,10 +388,13 @@ the block.
     now with a concrete layout. Read §5 before acting: it prices the move as a changed primary
     working directory, a re-rooted `CLAUDE.md`, and every `dev/scripts/*.php` path assumption
     (`__DIR__ . '/../../lib'`).
-  - **The question Tom must answer first is whether `.git` splits from the working tree** — his
-    sketch puts `.git` under `dev/`, which is a different and much more expensive thing than a
-    parent folder. See the analysis handed to him 2026-08-24.
-  - Sequence it with the landing-page repository, not before: one move, one set of path fixes.
+  - **DECIDED (Tom, 2026-08-24): `.git` STAYS WITH THE WORKING TREE, exactly where it is now.** The
+    move is a parent folder and nothing else, so most paths survive and only the few that break get
+    fixed. A reading of his sketch that put `.git` under `dev/` was wrong and is not the plan.
+  - **AND `git init` in `~/webdev/librewaternet.org` — decided in the same breath.** That is its own
+    repository from the start, which is what makes this one move and one set of path fixes.
+  - Do it with no other session live in this directory: Tom keeps concurrent sessions here and does
+    not commit between turns, so a move under a live one strands whatever it is holding.
 
 - 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
   reply to outreach, and he has replied gratefully. This is the first real conversation this suite's

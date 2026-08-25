@@ -7,19 +7,18 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**75 open tasks.** Next (100): 7 · Soon (75): 13 · Someday (50): 4 · Maybe (25): 24 · Parked (5): 27
+**74 open tasks.** Next (100): 6 · Soon (75): 11 · Someday (50): 4 · Maybe (25): 26 · Parked (5): 27
 
-## 100 — Next (7)
+## 100 — Next (6)
 
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 439 — The lat/lon drawing comes apart at 64,000 px/degree, not 600,000.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - Task 511 — Three georeferencing checks disagree with Mercator, and one of them is right.
-- ! Task 512 — The amber override ring reads as a stuck highlight nobody can turn off.
 - Task 513 — What sprint 459 did not finish: three named jobs, all small.
 - Task 517 — The georeference settle scales on latitude, so the ground scale drifts.
 
-## 75 — Soon (13)
+## 75 — Soon (11)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 408 — Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.
@@ -32,8 +31,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 509 — The profile lost two operations; give them a door.
 - Task 510 — Named profiles: New, Rename, Delete, and a list to pick from.
 - Task 514 — Two different units both labelled "Pressure", both on screen at once.
-- Task 515 — The Settings category index breaks its own labels mid-word.
-- Task 516 — The colour key stacks onto the label legend and covers it.
 
 ## 50 — Someday (4)
 
@@ -42,7 +39,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 269 — ASU Engineers Without Borders answered, and asked to meet.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 
-## 25 — Maybe (24)
+## 25 — Maybe (26)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -68,6 +65,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
+- Task 515 — The Settings category index breaks its own labels mid-word.
+- Task 516 — The colour key stacks onto the label legend and covers it.
 
 ## 5 — Parked (27)
 
@@ -101,5 +100,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-74 of 75 titles are within 4–12 words. `!` marks the rest;
+74 of 74 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
