@@ -134,7 +134,7 @@ the block.
   - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
     drawing is still correct.
 
-- 40|513| **Sprint 459's leftovers: two named strings nobody here can read.**
+- 50|513| **Sprint 459's leftovers: two named strings nobody here can read.**
   The three jobs this task carried are done (2026-08-25). The glossary write-back was done from the
   SHIPPED STRINGS, not from the lost transcript — `dev/scripts/glossary_rendering_census.php` counts
   which rendering each language really uses and how often, and its findings are written into the

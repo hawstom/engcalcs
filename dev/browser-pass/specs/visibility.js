@@ -218,8 +218,7 @@ exports.run = async function ({ browser, report }) {
 				sub: px('#lpn_setbox_content .lpn-set-sub'),
 				note: px('#lpn_setbox_content .lpn-set-note'),
 				unitsName: px('#lpn_settings_box .lpn-units-name'),
-				subWeight: weight('#lpn_setbox_content .lpn-set-sub'),
-				unitsHeadWeight: weight('#lpn_settings_box .lpn-units-head')
+				subWeight: weight('#lpn_setbox_content .lpn-set-sub')
 			};
 		});
 		report.ok(type.head > type.sub, 'a section heading is bigger than a sub-heading',
@@ -230,8 +229,15 @@ exports.run = async function ({ browser, report }) {
 		report.ok(type.note > 0 && Math.abs(type.note - type.unitsName) < 0.6,
 			'small text in the box is the same size as the Input units field names',
 			`${type.note} px vs ${type.unitsName} px`);
-		report.eq(type.subWeight, type.unitsHeadWeight,
-			'...and a sub-heading carries the same weight as an Input units group heading');
+		// **THE ANCHOR FOR THE WEIGHT IS GONE, SO THE NUMBER IS ASSERTED DIRECTLY.** This used to
+		// compare a sub-heading against `.lpn-units-head`, the units strip's group heading -- until
+		// Task 522 merged the input and result sets and the strip stopped having groups to head.
+		// 600 is not a new number: it is the weight that heading carried, recorded beside the rule
+		// in css/engcalcs.css, and it is where the box's scale was taken from in the first place.
+		// Re-pointing this at some other element that happens to be 600 would have asserted a
+		// coincidence; naming the number asserts the decision.
+		report.eq(type.subWeight, '600',
+			'...and a sub-heading still carries the weight taken from the units strip');
 
 		// **NOTHING COLLAPSES** (Tom: "No need ever to collapse; just scroll/jump to your section").
 		report.eq(await a.page.evaluate(() =>

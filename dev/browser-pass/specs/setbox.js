@@ -249,7 +249,12 @@ exports.run = async function ({ browser, report }) {
 		report.ok(type.note === type.unit && type.sub > type.unit,
 			'...while a sub-heading still stands above all of them',
 			`note ${type.note}px, sub ${type.sub}px`);
-		report.ok(type.sels >= 10 && type.widest <= 144.5,
+		// The count is a FLOOR, and it is there so an empty query cannot pass this check by
+		// measuring nothing. It was 10 while the strip carried an input set and a result set;
+		// Task 522 merged them into one set of eight, so eight is what a full strip now holds.
+		// Left as a floor rather than pinned at 8 because roughness is conditional on the head
+		// loss method, and specs/units.js is where the exact membership is asserted.
+		report.ok(type.sels >= 8 && type.widest <= 144.5,
 			'the unit selects respect the same 9rem control width as every select in the box',
 			`${type.sels} selects, widest ${type.widest} px`);
 

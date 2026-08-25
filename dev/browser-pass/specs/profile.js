@@ -209,33 +209,54 @@ exports.run = async function ({ browser, report }) {
 		report.ok(ticks && Math.min(...ticks) > 100,
 			'the axis bottom is TRUNCATED, not anchored at zero', ticks && ('bottom ' + Math.min(...ticks)));
 
-		// **2. TWO HEADS, TWO UNITS (Task 422).** Elevations stay typed in feet; results move to
-		// metres. Both are drawn on one axis, so the axis must now be in metres — about 1/3.281 of
-		// what it was. A profile that read the elevation as though it were already in the result
-		// unit would leave the ground line at ~700 while the grade line dropped to ~300, which is
-		// the silent failure this check exists for: it still draws, and it is nonsense.
-		await a.page.evaluate(() => {
-			const s = document.querySelector('select[name="lpn_u_r_elevhead"]');
-			s.value = 'mh2o';
-			s.dispatchEvent(new Event('change', { bubbles: true }));
-		});
-		await a.settle(900);
+		// **2. TWO LINES, ONE UNIT.** Rewritten for Task 522, which merged the input and result
+		// unit sets and so deleted the two-heads-two-units arrangement this section used to drive.
+		// The failure it exists for is UNCHANGED, which is why it was rewritten rather than removed:
+		// the ground line and the grade line are drawn on ONE axis, and if either crossed units alone
+		// the chart would still draw and would be nonsense -- ground at ~700 while the grade dropped
+		// to ~300. One selector now decides both, so the check is that both follow it together.
+		//
+		// CONVERT, not reinterpret. A reinterpretation leaves every typed number exactly where it was,
+		// so the chart would come back identical and this would assert nothing. Converting rewrites the
+		// elevations, which is the only answer that moves the ground line.
+		async function setHeadUnit(unit) {
+			await a.page.evaluate((u) => {
+				const s = document.querySelector('select[name="lpn_u_elevhead"]');
+				s.value = u;
+				s.dispatchEvent(new Event('change', { bubbles: true }));
+			}, unit);
+			await a.settle(400);
+			// The head unit decides typed elevations, so it asks before it acts. Answer Destructive,
+			// which is the second of the three buttons (Non-destructive | Destructive | Cancel).
+			const asked = await a.page.evaluate(() => ({
+				dialog: document.getElementById('lpn_dialog').style.display,
+				buttons: [...document.querySelectorAll('#lpn_dialog_buttons button')].map(b => b.textContent)
+			}));
+			if (asked.dialog === 'block') {
+				await a.page.evaluate(() => {
+					const b = [...document.querySelectorAll('#lpn_dialog_buttons button')];
+					(b.find(x => /Destructive/.test(x.textContent)) || b[1]).click();
+				});
+			}
+			await a.settle(900);
+			return asked;
+		}
+
+		const askedHead = await setHeadUnit('mh2o');
+		report.eq(askedHead.dialog, 'block',
+			'the one head unit decides typed elevations, so it asks before it acts',
+			askedHead.buttons.join(' | '));
 		const metric = await yTicks(a.page);
 		const shapeM = await chartShape(a.page);
 		report.ok(metric && Math.max(...metric) < 500 && Math.max(...metric) > 200,
-			'switching the RESULT head unit to metres redraws the whole axis in metres',
+			'converting the head unit to metres redraws the whole axis in metres',
 			metric && metric.join(', '));
 		report.ok(shapeM && shapeM.ground.length > 0 && shapeM.hgl.length > 0,
-			'...with BOTH lines still drawn — the ground crossed units with the grade line');
+			'...with BOTH lines still drawn -- the ground crossed units with the grade line');
 		// The ground is below the grade line everywhere on this network, and that survives the unit
 		// change only if both crossed. Read off the drawing: a shaded band still exists.
 		report.ok(shapeM && shapeM.bands > 0, '...and the pressure band is still between them');
-		await a.page.evaluate(() => {
-			const s = document.querySelector('select[name="lpn_u_r_elevhead"]');
-			s.value = 'fth2o';
-			s.dispatchEvent(new Event('change', { bubbles: true }));
-		});
-		await a.settle(900);
+		await setHeadUnit('fth2o');
 
 		// **PARTS ONE AND TWO OF THIS SECTION ARE GONE, AND THAT IS TASK 506.** They drove the
 		// profile's From/To pull-downs and its "add a waypoint" checkbox; the profile has no side
@@ -261,6 +282,14 @@ exports.run = async function ({ browser, report }) {
 					if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) { continue; }
 					if (x > panel.x - 8 && x < panel.x + panel.width + 8 &&
 						y > panel.y - 8 && y < panel.y + panel.height + 8) { continue; }
+					// **AND THE NODE MUST ACTUALLY BE THE THING UNDER THE POINTER.** On screen is
+					// not enough: a map label drawn over its own node takes the click, and the
+					// popup that opens is the label's -- Size multiplier, Angle, Horizontal
+					// alignment -- with no elevation in it. That is what this section then
+					// reports, and it reads like the popup lost a field rather than like the
+					// spec clicking the wrong object. Ask the page what is on top.
+					const top = document.elementFromPoint(x, y);
+					if (!top || !top.closest('[data-node="' + id + '"]')) { continue; }
 					return { id: id, x: x, y: y };
 				}
 				return null;
