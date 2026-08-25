@@ -169,8 +169,8 @@ the block.
 
 - 75|527| **What is left on a phone after Tom's own rulings: three small-screen defects.**
   From his first real phone session, 2026-08-25, screenshots 0034-0042.
-  **Re-shoot before working on any of it** — Tasks 524, 525 and 529 all landed after these were
-  taken and none of them was on `dev.hawsedc.com` at the time.
+  `dev/screenshots/INDEX.md` has since re-read the drop against master and marks 0038-0041 as
+  showing LIVE defects rather than ones today's fixes superseded, so the frames stand as evidence.
   - **RULED NOT A DEFECT (Tom, 2026-08-25):** that the map shows nothing while the bottom pane is
     open. *"Real estate shortages are to be expected. If the Settings, Tables, Profile, or anything
     else displays at all, that's to be celebrated even if nothing else is visible. I don't think
@@ -182,12 +182,14 @@ the block.
     given the user, the legend is of less value now compared to when we were distinguishing coloured
     numbers."* What may still be worth checking after a re-shoot is only whether the DEFAULT
     placement wants to differ on a small screen.
-  - **The Settings index breaks EVERY label mid-word at phone width** — "Visualiz/ation",
-    "Node symbo/logy", "Map appear/ance" (0038). Task 515 is the desktop version and Tom parked it at
-    Maybe; the phone case is a different order of ugly and is worth its own decision.
-  - **The label-content column headers collide** (0038): "BeforeAfter 0.000 Drop", touching each
-    other and not aligned with the four input boxes beneath them.
-  - **A table column header breaks mid-word**: "Roughnes/s, C" (0041).
+  - **FIXED 2026-08-25, all three text defects**, at the same 640px breakpoint, and each is measured
+    in a real 360px Chromium by `dev/browser-pass/specs/smallscreen.js` (the rules themselves by
+    `dev/lpn-spike/small-screen-harness.js`). The index is a horizontal strip on a phone instead of a
+    column, so the content pane goes 238 → 320px and no name breaks; the symbology headings got the
+    `overflow-wrap` that makes the wrapping Tom chose actually reachable — their boxes were already
+    exact, "Before" was a 40px word painting out of a 33px box; and the Roughness column keeps its
+    word at a cost of 28px, which is the whole cost and was measured ("Roughness," is 94.4px, so no
+    width between 72 and 100 helps).
   - **The profile chart's axes are illegible on a phone** (0039, 0040): the y ticks overprint each
     other and the x node labels are a scribble. The chart itself draws well — it is only the axes.
   - **Checked and NOT a defect:** the phone table's values are correct, verified against

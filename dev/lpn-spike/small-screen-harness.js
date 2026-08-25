@@ -657,6 +657,19 @@ const TOUCH = true;
 		'small screen says ' + winning(RULES, field.children[0], SMALL, DOC_IDS, false, 'overflow-wrap'));
 	ok('...while the desktop keeps the break-anywhere its column alignment depends on',
 		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
+	// **A HEADING MUST WRAP INSIDE ITS COLUMN, NOT PAINT PAST IT** (ROADMAP Task 527). Tom,
+	// 2026-08-25, from a phone: "BeforeAfter 0.000 Drop", the four headings touching. The widths
+	// below were right -- measured in a real browser, every heading box sits on its control's box to
+	// a tenth of a pixel -- but "Before" is one 40px word in a 33px column and a span with no break
+	// opportunity simply overflows. So the wrapping this list chose (Tom's option (c), against (b)
+	// abbreviations) needed a property to make it reachable. THE HEADING ROW ONLY.
+	ok(group + ': a heading that overflows its column breaks rather than spilling',
+		winning(RULES, heading.children[1], SMALL, DOC_IDS, false, 'overflow-wrap') === 'anywhere',
+		'got ' + winning(RULES, heading.children[1], SMALL, DOC_IDS, false, 'overflow-wrap'));
+	ok('...on the phone only, where the columns are narrow enough to need it',
+		winning(RULES, heading.children[1], WIDE, DOC_IDS, false, 'overflow-wrap') === null);
+	ok('...and never on the boxes beneath it, which are sized and not text',
+		winning(RULES, field.children[1], SMALL, DOC_IDS, false, 'overflow-wrap') === null);
 	// The heading row's lead cell goes, so the headings start where the wrapped group starts.
 	ok(group + ": the heading row's lead cell goes on a small screen",
 		!!hiddenAt(RULES, heading.children[0], SMALL, DOC_IDS));
@@ -721,16 +734,27 @@ const TOUCH = true;
 		winning(RULES, list, WIDE, DOC_IDS, TOUCH, 'min-width') === '13rem');
 });
 
-console.log('\n--- the Settings index pane (Tom asked for 0.8 of it on the PC, and narrower here) ---');
+console.log('\n--- the Settings index pane (a column on the PC, a strip on a phone) ---');
 {
-	const panes = node('div', '', ['lpn-setbox-panes'], body);
+	const setboxHost = node('div', 'lpn_settings_box', ['lpn-popover', 'lpn-setbox'], body);
+	const panes = node('div', '', ['lpn-setbox-panes'], setboxHost);
 	const index = node('div', 'lpn_setbox_index', ['lpn-setbox-index'], panes);
 	// 6.6rem: 0.8 x the 7.5rem it shipped at, then 1.1 x that once Tom had used it (2026-08-23).
 	ok('the index pane is 6.6rem on the desktop',
 		winning(RULES, index, WIDE, DOC_IDS, false, 'flex') === '0 0 6.6rem');
-	ok('...and 4.5rem below the breakpoint',
-		winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis') === '4.5rem');
-	ok('...with nothing narrowing it above the breakpoint',
+	// **AND ON A PHONE IT IS NOT A PANE AT ALL** (ROADMAP Task 527). Tom, 2026-08-25: every label in
+	// it broke mid-word. No column narrow enough to leave the CONTENT pane its 230px can hold
+	// "Visualization", so the panes stack and the index becomes a strip of whole names. The three
+	// facts that make it that, rather than a column with different numbers.
+	ok('...and on a phone the panes stack, so the content pane gets the whole width',
+		winning(RULES, panes, SMALL, DOC_IDS, false, 'flex-direction') === 'column',
+		'got ' + winning(RULES, panes, SMALL, DOC_IDS, false, 'flex-direction'));
+	ok('...the index sizes itself to its own row rather than to a basis',
+		winning(RULES, index, SMALL, DOC_IDS, false, 'flex') === '0 0 auto');
+	ok('...and it scrolls sideways inside itself, never widening the box',
+		winning(RULES, index, SMALL, DOC_IDS, false, 'overflow-x') === 'auto');
+	ok('...with nothing of the sort above the breakpoint',
+		winning(RULES, panes, WIDE, DOC_IDS, false, 'flex-direction') === null &&
 		winning(RULES, index, WIDE, DOC_IDS, false, 'flex-basis') === null);
 	// A <button> does not wrap its text by itself, so without this the narrower pane answers with a
 	// sideways scrollbar instead of a second line -- measured at 94px of "Node symbology" in a 65px
@@ -739,13 +763,24 @@ console.log('\n--- the Settings index pane (Tom asked for 0.8 of it on the PC, a
 	ok('an index row may wrap, and may break a long word',
 		winning(RULES, link, WIDE, DOC_IDS, false, 'white-space') === 'normal' &&
 		winning(RULES, link, WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
+	// **AND ON THE STRIP IT MAY DO NEITHER.** A row that wrapped in a horizontal strip would be a
+	// name on two lines beside a name on one; a row that broke mid-word would be the defect this
+	// task is about, moved sideways. Both are turned off, and only here.
+	ok('...and on the phone strip it does neither -- a whole name or nothing',
+		winning(RULES, link, SMALL, DOC_IDS, false, 'white-space') === 'nowrap' &&
+		winning(RULES, link, SMALL, DOC_IDS, false, 'overflow-wrap') === 'normal',
+		'got ' + winning(RULES, link, SMALL, DOC_IDS, false, 'white-space') + ' / ' +
+		winning(RULES, link, SMALL, DOC_IDS, false, 'overflow-wrap'));
 	// The Libraries box borrows the whole Settings shell, so its own narrower index is an override
 	// on the same class rather than a second pane design (Tom's item 9).
 	const libpanes = node('div', '', ['lpn-setbox-panes'], node('div', 'lpn_library_box', ['lpn-popover', 'lpn-setbox', 'lpn-libbox'], body));
 	const libindex = node('nav', 'lpn_libbox_index', ['lpn-setbox-index'], libpanes);
 	ok('the Libraries index pane is 5.25rem -- 0.70 x the 7.5rem it shipped at',
 		winning(RULES, libindex, WIDE, DOC_IDS, false, 'flex-basis') === '5.25rem');
-	ok('...and it takes the phone width below the breakpoint, like every other index',
+	// **AND IT KEEPS THE COLUMN THE SETTINGS INDEX GAVE UP.** Task 527 turned that one into a strip
+	// because its names do not fit 65px; Patterns, Curves and Controls do, so this box pays neither
+	// the height nor the redesign and keeps the 4.5rem it has had since Task 486.
+	ok('...and it keeps its narrow COLUMN below the breakpoint, where Settings became a strip',
 		winning(RULES, libindex, SMALL, DOC_IDS, false, 'flex-basis') === '4.5rem');
 }
 
@@ -804,6 +839,23 @@ console.log('\n--- a box on a short screen, and the pane tables (Tom\'s items 5 
 	ok('...and the desktop takes its column’s width, falling back to the 7em it always was',
 		winning(RULES, cell, WIDE, DOC_IDS, false, 'width') === 'var(--lpn-pane-col-w, 7em)',
 		'got ' + winning(RULES, cell, WIDE, DOC_IDS, false, 'width'));
+
+	// **AND THE ROUGHNESS HEADING KEEPS ITS WORD** (ROADMAP Task 527). Tom, 2026-08-25, read
+	// "Roughnes/s, C" on a phone. `overflow-wrap: anywhere` is what lets a column be narrower than
+	// its own longest word, and "Roughness," measures 94.4px against the 66 that round 3's 5em
+	// leaves it. `break-word` moves that floor to the longest word: the heading breaks at its comma
+	// instead, and the column pays 28px for it. The km column is not paying anything -- its longest
+	// word is "Minor" at ~34px in a 47px column -- so it keeps `anywhere`.
+	const rough = node('th', '', ['lpn-pane-col-roughness', 'lpn-pane-num'], node('tr', '', [], tbl));
+	const km = node('th', '', ['lpn-pane-col-km', 'lpn-pane-num'], node('tr', '', [], tbl));
+	ok('the Roughness heading may not be split mid-word on a phone',
+		winning(RULES, rough, SMALL, DOC_IDS, false, 'overflow-wrap') === 'break-word',
+		'got ' + winning(RULES, rough, SMALL, DOC_IDS, false, 'overflow-wrap'));
+	ok('...and the km column, which has never needed the split, keeps the bounded width',
+		winning(RULES, km, SMALL, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
+	ok('...and neither is touched on the desktop',
+		winning(RULES, rough, WIDE, DOC_IDS, false, 'overflow-wrap') === null &&
+		winning(RULES, km, WIDE, DOC_IDS, false, 'overflow-wrap') === null);
 }
 
 // ---- THE MAP OVERLAYS DO NOT EAT THE DRAWING (ROADMAP Task 524) ---------------------------
