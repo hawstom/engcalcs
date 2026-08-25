@@ -7,14 +7,13 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**74 open tasks.** Next (100): 4 · Soon (75): 12 · Someday (50): 4 · Maybe (25): 27 · Parked (5): 27
+**74 open tasks.** Next (100): 3 · Soon (75): 12 · Someday (50): 4 · Maybe (25): 27 · Parked (5): 27 · priority 40 (40): 1
 
-## 100 — Next (4)
+## 100 — Next (3)
 
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 439 — The lat/lon drawing comes apart at 64,000 px/degree, not 600,000.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
-- Task 513 — What sprint 459 did not finish: three named jobs, all small.
 
 ## 75 — Soon (12)
 
@@ -37,6 +36,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - Task 269 — ASU Engineers Without Borders answered, and asked to meet.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
+
+## 40 — Priority 40 (1)
+
+- Task 513 — Sprint 459's leftovers: two named strings nobody here can read.
 
 ## 25 — Maybe (27)
 
