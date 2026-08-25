@@ -213,6 +213,28 @@ the block.
   - **It is screenshot 0030**, which is what Tom asked for so he can look at it himself. He is not
     worried about it (2026-08-24), hence Maybe rather than Soon.
 
+- 100|527| **The phone map is all chrome and no drawing, and four more small-screen defects.**
+  Tom's first real phone session, 2026-08-25, screenshots 0034-0042. **Tasks 524 and 525 already fix
+  the two worst offenders** (the mode hint is hidden below 640px, the status overlay is bounded, and
+  the engine note is said once) — those are pushed and were NOT yet on `dev.hawsedc.com` when these
+  were taken, so **re-shoot before working on anything below.** What those two do not touch:
+  - **The two legends still overlay the drawing, and with the bottom pane open there is nothing
+    left.** 0040 is the frame: pane open, map half of the screen, and 100% of that half is the
+    labels legend, the colour key and the readouts. **Zero pixels of network.** The colour key alone
+    is 14 rows; in 0042 it is cut off mid-list so the Flow bands cannot be read at all. Bounding
+    them is not enough — on a phone they need to collapse to something tappable.
+  - **The Settings index breaks EVERY label mid-word at phone width** — "Visualiz/ation",
+    "Node symbo/logy", "Map appear/ance" (0038). Task 515 is the desktop version of this and Tom
+    parked it at Maybe; the phone case is a different order of ugly and worth deciding separately.
+  - **The label-content column headers collide** (0038): "BeforeAfter 0.000 Drop", touching, and not
+    aligned with the four input boxes beneath them.
+  - **A table header breaks mid-word**: "Roughnes/s, C" (0041).
+  - **The profile chart's axes are illegible on a phone** (0039, 0040): y ticks overprint each other,
+    and the x node labels are a scribble. The chart itself draws well — it is only the axes.
+  - **Checked and NOT a defect:** the phone table's values are correct. They were verified against
+    `examples/Net3-World-lpn.json` — rows 40/50/60/101 match exactly, and pipe 20's odd numbers are
+    Tom's own edit (k = 12.2), which is what raised the note he photographed. Nothing is clipped.
+
 - 75|526| **An EPANET warning is cached against a signature that cannot see it.**
   Found 2026-08-25 while writing the harness for Task 525, and it is a DIFFERENT defect from that
   one. `js/lpn-epanet.js` caches `built.warnings` on the open session for as long as
