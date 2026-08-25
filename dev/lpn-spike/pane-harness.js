@@ -741,9 +741,18 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 		'...and the Minor loss box took the same 1.4 the desktop one took');
 	report(width(cell('th', 'km', true, false), SMALL) === '3.7em',
 		'...inside a column widened with it, which only shortens its heading');
-	report(CSS.winning(CSS.rules, cell('th', 'roughness', true, false), SMALL, 'overflow-wrap', blind) === 'anywhere',
-		'a narrowed heading may break mid-word -- it is that or an abbreviation, and an abbreviation ' +
-		'is 26 translations');
+	// **ROUND 4 REVERSED THIS ONE COLUMN** (Tom, 2026-08-25, from a phone: "Roughnes/s, C"; ROADMAP
+	// Task 527). `anywhere` is what lets a declared width beat a long word, and it was right when
+	// this column was 2.6em; round 3 widened it to 5em and "Roughness," is 94.4px against the 66 the
+	// heading then had. `break-word` puts the column's floor back at its longest word -- the heading
+	// breaks at its comma instead, and the column pays 28px. km keeps `anywhere` because nothing in
+	// it has ever split: its longest word is "Minor", ~34px in a 47px column.
+	report(CSS.winning(CSS.rules, cell('th', 'roughness', true, false), SMALL, 'overflow-wrap', blind) === 'break-word',
+		'the Roughness heading keeps its word rather than being split -- an abbreviation instead ' +
+		'would be 26 translations',
+		String(CSS.winning(CSS.rules, cell('th', 'roughness', true, false), SMALL, 'overflow-wrap', blind)));
+	report(CSS.winning(CSS.rules, cell('th', 'km', true, false), SMALL, 'overflow-wrap', blind) === 'anywhere',
+		'...while Minor loss, which has never had to split, keeps the bounded width');
 	// **TOM SAW THE PHONE AND SAID "On phone, widths are good".** Every phone box is 3.5em unless
 	// that block names it, and the desktop per-column widths arrive as a CUSTOM PROPERTY precisely
 	// so that they cannot reach down here: an inline width would have beaten all of it.

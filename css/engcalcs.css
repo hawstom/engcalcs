@@ -2150,14 +2150,47 @@ html:has(#lpn_canvas) { overflow: hidden; }
 	/* An icon alone in a box padded for a word reads as a gap with a drawing in it. */
 	html:has(#lpn_canvas) .lpn-menubar-item { padding: 3px 6px; }
 
-	/* 5. THE SETTINGS INDEX PANE, NARROWER AGAIN. 4.5rem, and the number was MEASURED at 360 px
-	   rather than scaled from the desktop one: it is the width at which the CONTENT pane -- the one
-	   holding the controls -- stops being the constraint. At 4.5rem the content pane is 238 px and
-	   the node symbology list, which is the widest thing in the box, needs 230 with the shrunken
-	   columns below; the box therefore opens on a phone with no sideways scrollbar anywhere in it.
-	   The index itself imposes no floor at all now that its rows wrap. The desktop figure is 6rem,
-	   in .lpn-setbox-index above. */
-	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: 4.5rem; }
+	/* 5. THE SETTINGS INDEX IS A ROW ON A PHONE, NOT A COLUMN (ROADMAP Task 527). Tom, 2026-08-25,
+	   from a phone: every label in it breaks mid-word -- "Visualiz/ation", "Node symbo/logy", "Map
+	   appear/ance". Measured at 360 px before the fix: the rows were 65 px wide and EIGHT of the
+	   fourteen split a word, which is not the "a name on two lines is still a name" trade the
+	   desktop pane makes. The house rule that mid-word wrap is acceptable is about a RESULTS column;
+	   this is a navigation index a reader scans to find a section.
+
+	   A NARROW COLUMN CANNOT BE FIXED BY WIDENING IT. "Visualization" needs ~91 px at this size and
+	   the pane had 65, but the pane is narrow because the CONTENT pane is the one that needs the
+	   width -- at the old 4.5rem it had 238 px against the 230 the node symbology list needs. Every
+	   pixel given to the index comes off that. So the index stops being a column: the panes stack,
+	   the index becomes one horizontally-scrolling strip of whole names above the content, and the
+	   content pane gets the box's full width instead of 238 px of it.
+
+	   It costs ~26 px of height, which is the one thing a phone has least of, and it buys back
+	   ~70 px of width for every control in the box. Rejected: abbreviating the section names (new
+	   English strings and 26 translations of each, for a phone-only cosmetic gain) and shrinking the
+	   index font until "Visualization" fits, which needs ~9 px type.
+
+	   SETTINGS ONLY. `.lpn-libbox` borrows this shell and its three names -- Patterns, Curves,
+	   Controls -- already fit 65 px unbroken, so it keeps the column and the 4.5rem phone width it
+	   has had since Task 486. The desktop pane above the breakpoint is untouched in both boxes; its
+	   figure is 6.6rem, in .lpn-setbox-index. */
+	html:has(#lpn_canvas) .lpn-libbox .lpn-setbox-index { flex-basis: 4.5rem; }
+	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-panes { flex-direction: column; gap: 4px; }
+	html:has(#lpn_canvas) #lpn_setbox_index {
+		flex: 0 0 auto; display: flex; gap: 2px;
+		overflow-x: auto; overflow-y: hidden;
+		border-right: 0; border-bottom: 1px solid #ddd;
+		padding-right: 0; padding-bottom: 3px;
+	}
+	/* A strip row is a whole name or it is not worth the strip: no wrap, and no mid-word break to
+	   wrap into. The width rule that made it a block row goes with the column. */
+	html:has(#lpn_canvas) #lpn_setbox_index .lpn-setbox-link {
+		flex: 0 0 auto; width: auto; white-space: nowrap; overflow-wrap: normal;
+	}
+	/* The two levels are still two levels: a section is bold and opens a group, its sub-headings
+	   follow it. The indent that said so down a column becomes the gap that says so along a row. */
+	html:has(#lpn_canvas) #lpn_setbox_index .lpn-setbox-link-sub { padding-left: 4px; }
+	html:has(#lpn_canvas) #lpn_setbox_index .lpn-setbox-link-sec { margin-top: 0; }
+	html:has(#lpn_canvas) #lpn_setbox_index .lpn-setbox-link-sec:not(:first-child) { margin-left: 8px; }
 
 	/* 5b. THE BOTTOM-PANE TABLES' NUMBER BOXES (Tom, 2026-08-22: "The Tables in the bottom pane have
 	   some columns, inputs I think, with artificially limited shrink that can in general be about
@@ -2204,8 +2237,24 @@ html:has(#lpn_canvas) { overflow: hidden; }
 	   these tables already has below the breakpoint, so Roughness stops being the one column
 	   NARROWER than the default, and an input scrolls its own content, so a long e is still typed
 	   and read normally. Say so if the full 2.5 is wanted on a phone as well. */
+	/* ROUND 4 (Tom, 2026-08-25, from a phone) BUYS THE WORD BACK AND PAYS 28 px FOR IT. The Pipes
+	   heading read "Roughnes/s, C"; the heading wants to break at its comma, "Roughness," over "C",
+	   and could not, because `overflow-wrap: anywhere` lets a column be narrower than its own longest
+	   word and round 3's 5em is exactly that.
+
+	   THE PRICE IS NOT NEGOTIABLE AND IT WAS MEASURED, not reasoned: "Roughness," is 94.4 px at this
+	   cell's own bold 14.4 px, so ANY layout that keeps the word whole makes this column 100.4 px --
+	   which is what it measured before round 2 narrowed it. There is no width between 72 and 100 that
+	   helps; 5.9em and 6.4em were both tried and both still split the word. So the choice is the word
+	   or the 28 px, and Tom's 2026-08-25 ruling is the later one: he read "Roughnes/s" and called it a
+	   defect. The table is 547 -> 575 px in a 360 px panel and was already scrolling sideways.
+
+	   `break-word`, NOT the removal of the property: it keeps the last-resort split for a language
+	   whose single word is longer than the panel, while putting the column's floor at the longest
+	   word instead of at one character. The km column keeps `anywhere` -- its longest word is "Minor"
+	   at ~34 px in a 47 px column, so it has never split and nothing there is being paid for. */
 	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-roughness {
-		overflow-wrap: anywhere; width: 5em; min-width: 5em;
+		overflow-wrap: break-word; width: 5em; min-width: 5em;
 	}
 	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-roughness input { width: 3.5em; }
 	html:has(#lpn_canvas) .lpn-pane-table .lpn-pane-col-km {
@@ -2266,6 +2315,25 @@ html:has(#lpn_canvas) { overflow: hidden; }
 	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(5),
 	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(4),
 	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(5) { width: 2.56rem !important; }
+	/* 7a. **AND A HEADING THAT DOES NOT FIT ITS COLUMN MUST WRAP INSIDE IT, NOT SPILL OUT OF IT**
+	   (ROADMAP Task 527). Tom, 2026-08-25, from a phone: the four headings read "BeforeAfter 0.000
+	   Drop", touching each other and out of line with the boxes beneath them. The widths above were
+	   applied and are exactly right -- measured at 360 px, every heading's BOX sits on its control's
+	   box to a tenth of a pixel. What is wrong is the ink: "Before" is one unbreakable word about
+	   40 px wide in a 33 px column, and with nothing to break it a span simply paints past its own
+	   edge and into its neighbour.
+
+	   So the wrapping the note above chose -- Tom's option (c), against (b) abbreviations -- was
+	   never actually reachable, because a word with no break opportunity does not wrap. This is the
+	   one property that gives it one. Mid-word wrap in a column heading is the house rule (CLAUDE.md:
+	   column width is king), and it applies here in a way it does not to the Settings index above:
+	   these are four columns of a table, not a list of destinations.
+
+	   THE HEADING ROW ONLY, matched as the list's first child, so the inputs below keep the sizing
+	   they have. */
+	html:has(#lpn_canvas) #lpn_labels_node_fields > div:first-child > span,
+	html:has(#lpn_canvas) #lpn_labels_link_fields > div:first-child > span { overflow-wrap: anywhere; }
+
 	/* The list's own floor comes down with them, or the box would still refuse to narrow past a
 	   width the rows no longer need. 11rem is the four boxes (8.8rem, After included at its new
 	   1.6rem) plus their three gaps and two margins; the name above them wraps between words. */
