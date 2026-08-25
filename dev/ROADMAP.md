@@ -273,7 +273,8 @@ the block.
     index hawsedc.com. Blocking guard: `dev/scripts/canonical_origin_check.php`. **Nothing else in
     the suite needs changing to serve a second domain** — the 210 absolute `/engcalcs/…` paths all
     resolve under `<newdomain>/engcalcs/`, which is why the symlink beats the refactor.
-  - **DONE 2026-08-23, the landing draft** (`dev/librewaternet-landing/index.html`): titled
+  - **DONE 2026-08-23, the landing draft** (moved 2026-08-24 to the librewaternet.org repository;
+    see `dev/librewaternet-landing.md`): titled
     `LibreWaterNet.org`, leading with a Start-a-model button to `Looped-Network.php`, phone gate
     lifted on Tom's own pass.
   - **[H] WHAT IS LEFT IS TOM'S, and it is all server work, none of it a `git pull`:** the 301 for
@@ -436,7 +437,7 @@ the block.
   - **The audience decides the wording, and it is not us.** A closed-ledger line is written for a
     developer re-resolving a citation; a features list is read by somebody deciding whether to try
     the page. Do not ship the ledger's prose verbatim under a new heading.
-  - Where it goes is open: the LibreWaterNet landing page (`dev/librewaternet-landing/index.html`)
+  - Where it goes is open: the LibreWaterNet landing page (its own repository since 2026-08-24)
     is the obvious home, and Help is the other. Decide before generating.
 
 - 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human

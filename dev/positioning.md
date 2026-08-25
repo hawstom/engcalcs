@@ -49,7 +49,10 @@ Consequences, so the rule is operational rather than a sentiment:
 - **The invitation is to *build*, not to *switch*.** We are not running a migration campaign.
 - **We are not the aggrieved party.** Nothing here is a grievance, and it should not read as one.
 
-The draft front door carrying this lead is `dev/librewaternet-landing/index.html`.
+The draft front door carrying this lead is `index.html` in the **librewaternet.org repository**
+(`~/webdev/librewaternet.org`), which is where the page moved on 2026-08-24. **This file remains the
+authority for its claims** — that repository's own `CLAUDE.md` points back here rather than
+restating, so there is one record and not two. See `dev/librewaternet-landing.md`.
 
 ## 2. The one fact worth stating plainly
 
@@ -345,7 +348,8 @@ the sprint, and it is a reason about us.
 **Tom, 2026-08-21:** *"The biggest blocker is the graphic. I have to prepare a graphic of the real
 thing, possibly a video or an animated GIF."*
 
-The inline SVG `#net` in `dev/librewaternet-landing/index.html` is a **placeholder**, not the
+The inline SVG `#net` in the landing page (now `index.html` in the librewaternet.org repository)
+is a **placeholder**, not the
 design — a drafted network standing in for a real screen. The figure is a slot: an image (PNG or
 animated GIF) or a video element drops into the same place with no layout change. What the
 replacement has to satisfy:

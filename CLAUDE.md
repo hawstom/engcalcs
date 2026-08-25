@@ -124,7 +124,17 @@ never edits the roadmap; promoting a row is Tom's call.
 | `dev/unit-families.md` | Unit-family design record and per-field rationale |
 | `dev/cookie-storage-inventory.md` | Everything stored on a visitor's device, and why |
 | `dev/scenario-seam-repair.md` | The `setProp()` write-seam incident and its guard |
-| `dev/positioning.md` | How `lpn_` is positioned against epanet-js; LibreEPANET.org |
+| `dev/positioning.md` | How `lpn_` is positioned against epanet-js; LibreEPANET.org. **Authority for every public claim, this repo's and the landing page's alike** |
+| `dev/librewaternet-landing.md` | The landing page left this repo 2026-08-24; where it went and what stayed |
+
+### The sibling repository: `~/webdev/librewaternet.org`
+
+The Claude Code project stays rooted HERE and drives both. **The catch is that the other
+repository's own `CLAUDE.md` does not load from a session rooted here** — so before writing or
+editing one word of landing-page copy, read `~/webdev/librewaternet.org/CLAUDE.md`. It carries the
+claim rules that have already had to be corrected on that draft twice (no completeness claim against
+EPANET; "a phone", never "your phone"). `dev/positioning.md` remains the authority; that file points
+back at it rather than restating it, so there is one record and not two.
 
 Paths to `lib/` inside `dev/scripts/*.php` use `__DIR__ . '/../../lib'`.
 
