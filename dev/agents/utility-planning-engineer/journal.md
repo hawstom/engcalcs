@@ -14,6 +14,46 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-08-25 — correction: coefficient availability is not a demand criterion; wish list re-ranked
+
+**CITED — Tom, replying point-by-point to the prior wish-list pass:** *"Lack of coefficients is not
+the same as lack of demand. Strip that criterion from our decision matrix."* This is a correction of
+a reasoning error in my own prior work, not a stylistic note, and it is recorded here so a later
+invocation does not re-import the bad criterion.
+
+- **What I had done wrong, named plainly:** Row 3 of the 2026-08-25 research pass ranked "water age
+  only" above chlorine partly BECAUSE age needs no user-supplied reaction coefficient and chlorine
+  does — and the same reasoning shaped my Task 530 hydrant-`k` recommendation (favoring "model the
+  barrel as a pipe" partly to avoid needing a separately-sourced coefficient). **That conflates two
+  different questions: does a user want this, and is a number easy for me to source.** They are
+  unrelated. A design engineer wanting chlorine residual reporting is not diminished by the fact
+  that the bulk decay coefficient has no textbook default.
+- **The corrected rule, going forward:** a missing or hard-to-source coefficient is a DESIGN
+  problem — solve it with ask-or-disclose (a user-editable field, no invented default presented as
+  fact, the interface states plainly when no default is offered and why) — not a reason to decline
+  or downrank a want. This is exactly the shape Task 530 already committed to for the hydrant `k`
+  before a sourced number was found, and it should have been generalized then rather than only after
+  Tom pointed it out.
+- **What actually changed when I re-applied this:** water quality is back in as three separable
+  rows (age, source tracing, chlorine/reaction) rather than one narrow age-only row with chlorine
+  declined; Task 530's own reasoning about the barrel is reworded so the pipe-segment recommendation
+  stands on its hydraulic merits (an undersized waterway is a real hydraulic element) rather than on
+  coefficient-avoidance as a design goal in itself.
+- **What did NOT change, checked honestly rather than assumed:** re-reading every other row in the
+  prior pass (scenario multiplier, comparison table, GeoJSON export, the declined system-wide
+  fire-flow and land-use-GIS items, the automated-calibration decline) — none of their reasoning used
+  coefficient availability as a criterion. **The stripped criterion only ever touched water quality
+  and the hydrant-`k` framing; it did not move any other ranking**, and I say so rather than
+  manufacturing movement elsewhere to look more responsive. Full re-ranked list: `wishlist.md`.
+- **Also answered this session, recorded there rather than duplicated here:** fire-flow mapping
+  reconsidered and promoted into the ranked list (Tom asked me to reconsider, not to comply — the
+  case for and against is written out in `wishlist.md` Row 3); land-use-GIS demand allocation moved
+  from Declined to Parked per Tom's distinction between the two; rule-based controls answered as an
+  operations want, not a design-and-planning one, from evidence (EPANET's own `[RULES]` worked
+  examples are pump/tank SCADA logic, not a sizing question).
+
+---
+
 ## 2026-08-25 — Task 530 follow-up: the k I said did not exist was hiding under a different name
 
 Tom ruled *"including some k whatsoever is non-negotiable"* and asked for the number to be
