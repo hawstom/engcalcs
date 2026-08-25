@@ -378,17 +378,27 @@ $ec_icons = array(
 	// **A TOWER, NOT A DROP** (Tom, 2026-08-25). The drop that shipped the day before lost against
 	// the View menu's eye: *"the water drop and the eye don't look different enough, especially with
 	// the association of tears and eyes."* Two almond-ish outlines one menu apart is a real
-	// collision, and the fix is a different SILHOUETTE rather than a better drop. He named a water
-	// tower (front view) and a dripping faucet and referenced two commercial line icons for the
-	// shape; this is an original drawing, as everything in this file is.
+	// collision, and the fix is a different SILHOUETTE rather than a better drop. He referenced
+	// commercial line icons for the SHAPE only; this is an original drawing, as everything here is.
 	//
-	// **THE FAUCET WAS DRAWN AND LOST ON A MEASUREMENT.** It needs a handle, a spout and a falling
-	// drip -- three fine features in one glyph -- and at 17px with a 2px stroke they merge into a
-	// smudge (`php dev/scripts/icon_ascii_preview.php`). A tower is ONE bold silhouette: a tank, a
-	// splay, a brace. If the faucet is ever wanted it needs a heavier, simpler drawing, not a
-	// retouch of this one.
-	'water'      => '<path d="M5 4H19L15.5 10.5H8.5Z"/><path d="M9 10.5L6.5 20"/>'
-		. '<path d="M15 10.5L17.5 20"/><path d="M8 14.5H16"/>',
+	// **THE ROOF IS PEAKED BECAUSE HE DREW IT THAT WAY.** The first tower drawn here had a flat
+	// trapezoid tank, and he sent back four sketches marking that one MINUS -- twice. What carries
+	// a plus in his hand is a pointed roof over a tank on splayed legs, with no cross brace. So the
+	// distinguishing feature is the ROOF, not the bracing, and a redraw that keeps a flat top is
+	// the same icon again however the legs are arranged.
+	//
+	// His other plus was the same tower with a TAPERED body, and swapping to it is one line:
+	//     '<path d="M12 2.5L6.5 7.5H17.5Z"/><path d="M7 7.5L9 13H15L17 7.5"/>'
+	//         . '<path d="M9.4 13L7 20.5"/><path d="M14.6 13L17 20.5"/>'
+	// Not left in the array as a second entry, because an icon nothing draws is an icon nobody
+	// maintains. His neutral sketch was a round bulb with a finial; his minus was the flat top.
+	//
+	// **THE FAUCET WAS DRAWN AND LOST ON A MEASUREMENT.** He liked one, and it needs a handle, a
+	// spout and a falling drip -- three fine features in one glyph -- which at 17px with a 2px
+	// stroke merge into a smudge (`php dev/scripts/icon_ascii_preview.php water --size=17`). If it
+	// is ever wanted it needs a heavier, simpler drawing, not a retouch of that one.
+	'water'      => '<path d="M12 2.5L7.5 7H16.5Z"/><path d="M8.6 7V13H15.4V7"/>'
+		. '<path d="M9.2 13L6.5 20.5"/><path d="M14.8 13L17.5 20.5"/>',
 
 	// CANDIDATES for the Water menu, drawn 2026-08-25. Tom: the drop and the eye *"don't look
 	// different enough, especially with the association of tears and eyes"*. He named a water tower
