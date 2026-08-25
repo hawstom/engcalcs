@@ -129,9 +129,27 @@ the block.
     - It also answers the failure he raised first: a report that a 150 mm barrel passes an enormous
       flow. With the assembly in the model that number cannot arise, because the barrel is in the
       hydraulics rather than in a caveat.
-  - **Research is IN SCOPE and comes first:** what a hydrant and lateral are actually rated to pass,
-    what diameter/roughness/`k`/length a practitioner would assume, and what "standard practice"
-    names them. Cite it. `utility-planning-engineer` holds this seat; its findings go to its hopper.
+  - **RESEARCH DONE 2026-08-25, and it CORRECTS THE PREMISE.** Full findings and citations:
+    `dev/agents/utility-planning-engineer/journal.md`. The four that change what gets built:
+    1. **150 mm is the hydrant's SHOE, not its waterway.** AWWA C502 sets the main-valve waterway at
+       **4½ or 5¼ in (114–133 mm)** behind a 6 in mechanical-joint inlet — two different numbers on
+       one hydrant. Modelling "a 150 mm hydrant" as a single 150 mm pipe would leave the real
+       constriction out of the model and reproduce **exactly the overstatement this task exists to
+       prevent**.
+    2. **There is no publicly reachable minor-loss `k` or head-loss curve for a hydrant waterway.**
+       AWWA M17 is paywalled; no manufacturer publishes one. The agent's answer, tagged SPECULATION
+       and wanting a second look: **do not invent a `k`** — model the barrel as a short pipe at its
+       waterway diameter in series with the lateral, and the loss falls out of the machinery already
+       in `js/PipeHydraulics.lib.js`. **Do NOT import the pitot Cd (0.90/0.80) as a `k`;** it
+       converts a field pitot reading to gpm and is a different quantity that merely sounds adjacent.
+    3. **Ask or disclose, decided per quantity.** LENGTH must be asked — five agency standards span
+       25–100 ft for the same pipe, because it is "how far is the main". Diameter carries a
+       disclosed 6 in; roughness a disclosed cement-lined DI C≈120–140, which is the cheapest of the
+       four to get wrong (hundredths of a foot over 50 ft).
+    4. **A "rated" flow is a SYSTEM measurement, not a hydrant property** — NFPA 291 rates what the
+       system delivered through that hydrant at 20 psi residual, at that location. Available fire
+       flow is quoted **at the outlet**, not at the main. **ISO caps single-hydrant credit at
+       1,500 gpm** regardless of what the hydraulics compute; that is the "standard care" rule.
   - The search itself is believed small — a loop around the existing sub-second solve, plus naming
     the hydrant node and the critical node. **Not designed; re-derive that estimate before quoting
     it.** The agent's own ranking, and its refusal to call this a glaring miss, are in

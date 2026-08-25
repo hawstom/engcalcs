@@ -103,7 +103,7 @@ have something to generate; the wording is his call, not ours.
 ## Reading the results
 
 - 434, 455| A table for each kind of part in the bottom pane — junctions, reservoirs, tanks, pipes, pumps and valves.
-- 384, 327| Colour the map by any value, from one control: four breaks, equal intervals or equal counts, three ramps.
+- 384, 327| Colour the map by any value, from one control: three to seven classes, eight ways of choosing where the breaks fall, and 41 colour ramps.
 - 409, 433, 506| Profiles. Click along the map to choose the path, and see ground, hydraulic grade and the pressure between them.
 
 ## Scenarios
