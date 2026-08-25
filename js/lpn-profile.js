@@ -357,6 +357,37 @@ EngCalcs.lpnProfile = (function () {
 		for (i = 0; i <= n; i++) { out.push(bounds.min + i * bounds.step); }
 		return out;
 	}
+	// **HOW MANY GRIDLINES THE ROOM WILL CARRY** (ROADMAP Task 527). `px` is the plot's own height in
+	// CSS pixels and `labelPx` is what one label needs to itself -- its own type plus enough white to
+	// read it as a separate number. The answer feeds axisBounds() as `ticks`/`maxTicks`, so a short
+	// chart gets FEWER numbers rather than smaller ones: 8 labels down a 34px axis is the phone
+	// defect, and 6px type would be the same defect wearing a different hat.
+	//
+	// The ceiling of 8 and the target of 5 are axisBounds()'s own defaults, so a chart with room to
+	// spare is labelled exactly as it always was.
+	function fitTicks(px, labelPx) {
+		var room = (px > 0 && labelPx > 0) ? Math.floor(px / labelPx) : 8,
+			maxTicks = Math.max(1, Math.min(8, room));
+		return { ticks: Math.max(2, Math.min(5, maxTicks)), maxTicks: maxTicks };
+	}
+	// **WHICH OF A ROW OF LABELS THERE IS ROOM FOR.** `positions` is their coordinates along the
+	// axis, in order; `minGap` is the closest two may be drawn without touching. Returns the INDICES
+	// to draw: greedily from the left, and the last one always, because the end of a path is the one
+	// station a reader looks for by name. The tick mark and the gridline are the caller's business
+	// and are drawn either way -- the axis keeps its structure and loses only ink nobody could read.
+	function labelStride(positions, minGap) {
+		var keep = [], p = positions || [], last, i;
+		for (i = 0; i < p.length; i++) {
+			if (!keep.length || p[i] - p[keep[keep.length - 1]] >= minGap) { keep.push(i); }
+		}
+		if (!p.length) { return keep; }
+		last = p.length - 1;
+		if (keep[keep.length - 1] !== last) {
+			if (keep.length > 1 && p[last] - p[keep[keep.length - 1]] < minGap) { keep.pop(); }
+			keep.push(last);
+		}
+		return keep;
+	}
 	// The horizontal axis needs no truncation — a profile starts at station 0 by definition — but it
 	// does need a non-zero width for the one-node case.
 	function stationBounds(total, opts) {
@@ -385,6 +416,8 @@ EngCalcs.lpnProfile = (function () {
 		niceStep: niceStep,
 		axisBounds: axisBounds,
 		ticks: ticks,
+		fitTicks: fitTicks,
+		labelStride: labelStride,
 		stationBounds: stationBounds,
 		plotX: plotX,
 		plotY: plotY

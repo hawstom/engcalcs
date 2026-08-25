@@ -331,6 +331,57 @@ console.log('\n--- Net1: the truncation payoff ---');
 		`${(truncated * 100).toFixed(0)}% vs ${(anchored * 100).toFixed(0)}%`);
 }
 
+// ---- WHAT THERE IS ROOM TO LABEL (ROADMAP Task 527) -----------------------------------------
+// Tom's phone session, 2026-08-25: the profile's axes were illegible -- the y ticks overprinting
+// each other and the x node names a scribble. The chart itself drew well, and that is the clue: the
+// drawing scales with the pane and TEXT DOES NOT, so a pane a third of a desktop's height gets a
+// third of the room and the same number of labels in it.
+//
+// The answer is fewer labels, never smaller ones. Both halves of that arithmetic are pure and live
+// here; where the ink actually lands at 360px is dev/browser-pass/specs/smallscreen.js.
+console.log('\n-- what there is room to label --');
+{
+	// A desktop plot is 214px of chart, and it must come out at exactly axisBounds()'s own defaults
+	// -- 8 and 5 -- or this feature has changed a chart nobody complained about.
+	const wide = Profile.fitTicks(214, 22);
+	report(wide.maxTicks === 8 && wide.ticks === 5, 'a desktop-sized axis keeps the defaults, 5 of 8',
+		JSON.stringify(wide));
+	// The phone: 58px of plot at 22px a label carries two gaps, so three numbers.
+	const phone = Profile.fitTicks(58, 22);
+	report(phone.maxTicks === 2, 'a 58px axis is allowed two steps, not eight', JSON.stringify(phone));
+	report(Profile.ticks(Profile.axisBounds([5057, 5203], phone)).length <= 3,
+		'...so Elm Street Center is labelled three times on a phone instead of seven');
+	report(Profile.ticks(Profile.axisBounds([5057, 5203], wide)).length > 3,
+		'...and is still labelled fully where there is room for it');
+	// Never zero, whatever the pane is dragged to: an axis with no numbers is not an axis. A pane
+	// dragged to the floor leaves 40px of plot and gets one step; a measurement of NOTHING is not a
+	// small chart, it is no measurement, and falls back to the defaults rather than to one gridline.
+	report(Profile.fitTicks(40, 22).maxTicks === 1, 'a pane dragged to its floor still gets an axis');
+	report(Profile.fitTicks(0, 22).maxTicks === 8 && Profile.fitTicks(-5, 22).maxTicks === 8,
+		'...and an unmeasurable pane falls back to the defaults, not to nothing');
+
+	// The x axis: labels are dropped, and the two ENDS are always kept.
+	const even = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+	report(JSON.stringify(Profile.labelStride(even, 10)) === JSON.stringify([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+		'labels that already clear each other are all drawn');
+	const thin = Profile.labelStride(even, 45);
+	report(thin[0] === 0 && thin[thin.length - 1] === even.length - 1,
+		'...and when they do not, the first and the last survive', JSON.stringify(thin));
+	report(thin.every((k, i) => i === 0 || even[k] - even[thin[i - 1]] >= 45 || k === even.length - 1),
+		'...with every drawn pair clear of each other');
+	// The last is kept by DROPPING its neighbour, not by crowding it: 98 goes so that 100, the end
+	// of the path, can be named.
+	const crowd = Profile.labelStride([0, 10, 20, 30, 98, 100], 45);
+	report(JSON.stringify(crowd) === JSON.stringify([0, 5]),
+		'a name right beside the last one gives way to it', JSON.stringify(crowd));
+	// Two coincident nodes -- a reservoir and the junction at its outlet, which is Elm Street
+	// Center's own first two stations -- must not print one name on top of the other.
+	report(Profile.labelStride([100, 100.4, 260], 15).length === 2,
+		'two nodes at the same station are named once');
+	report(Profile.labelStride([], 15).length === 0 && Profile.labelStride([7], 15).length === 1,
+		'an empty axis and a one-node axis are both answered');
+}
+
 // ---- THE ROUTE IS SHOWN ON THE MAP (ROADMAP Task 433) ---------------------------------------
 // Tom: "a route you cannot see is a route you cannot check." The DRAWING of it needs a browser, but
 // three structural properties do not, and each is a way the feature could be silently wrong: the

@@ -37,11 +37,9 @@ async function canvasRect(a) {
 		return { x: b.x, y: b.y, w: b.width, h: b.height };
 	});
 }
-// Where the MIDDLE of the map is, read the way a user reads it: hover the centre of the canvas and
-// look at the coordinate tracker.
-async function centre(a) {
-	const r = await canvasRect(a);
-	await a.page.mouse.move(r.x + r.w / 2, r.y + r.h / 2);
+// What the coordinate tracker says about one point of the canvas: hover it and read the corner.
+async function readAt(a, x, y) {
+	await a.page.mouse.move(x, y);
 	await a.settle(150);
 	const text = await a.page.evaluate(() => document.getElementById('lpn_coords').textContent);
 	const m = text.match(/Latitude:\s*(-?[\d.]+)\s+Longitude:\s*(-?[\d.]+)/);
@@ -49,12 +47,59 @@ async function centre(a) {
 	// capture order follows the text rather than the storage order.
 	return m ? { lat: +m[1], lon: +m[2], text } : { text };
 }
+// Where the MIDDLE of the map is, read the way a user reads it.
+async function centre(a) {
+	const r = await canvasRect(a);
+	return readAt(a, r.x + r.w / 2, r.y + r.h / 2);
+}
 // Type something into the Go to… prompt from the View menu and settle.
 async function goTo(a, typed) {
 	a.answerPromptWith(typed);
 	await a.menuClick(GOTO_ROW, 'view');
 	await a.settle(400);
 }
+// The Go to… on the PLACEMENT BAR, which asks two questions in a row — where, and how wide the site
+// is. Two prompts in one gesture is one more than Session.answerPromptWith() can hold (it keeps a
+// single answer, and the second dialog would be dismissed before a spec could set it), so
+// window.prompt is answered from a queue for this one button and put back straight after. Returns
+// what it was asked, which is itself part of the feature.
+async function barGoTo(a, typed, widthTyped) {
+	await a.page.evaluate((answers) => {
+		window.__realPrompt = window.prompt;
+		window.__asked = [];
+		let i = 0;
+		window.prompt = (msg, dflt) => { window.__asked.push({ msg: msg, dflt: dflt }); return answers[i++]; };
+	}, [typed, widthTyped]);
+	await a.page.click('#lpn_georef_goto');
+	await a.settle(700);
+	return a.page.evaluate(() => { window.prompt = window.__realPrompt; return window.__asked; });
+}
+// How wide the model is ON THE SCREEN, in pixels, measured between the CENTRES of the drawn
+// elements — a symbol's own size and a label's own box are screen-sized constants that say nothing
+// about the scale, and taking centres leaves them out. West-east only: Mercator's north-south
+// stretch is a real function of latitude, so a height would change with the destination even when
+// everything is right, while x IS longitude and cannot.
+async function modelWidthPx(a) {
+	return a.page.evaluate(() => {
+		let x0 = Infinity, x1 = -Infinity;
+		for (const e of document.querySelectorAll('#lpn_canvas .lpn-symbols > *')) {
+			const r = e.getBoundingClientRect(), cx = r.x + r.width / 2;
+			x0 = Math.min(x0, cx); x1 = Math.max(x1, cx);
+		}
+		return x1 - x0;
+	});
+}
+// The ground scale the map is at, in metres per screen pixel, read from the tracker at two points of
+// one row — the same two hovers a person would make.
+async function metresPerPx(a) {
+	const r = await canvasRect(a), y = r.y + r.h / 2;
+	const x1 = r.x + r.w * 0.3, x2 = r.x + r.w * 0.7;
+	const p1 = await readAt(a, x1, y), p2 = await readAt(a, x2, y);
+	if (p1.lon === undefined || p2.lon === undefined) { return NaN; }
+	const mpdLon = await a.page.evaluate((lat) => EngCalcs.lpnGeorefMetersPerDegree(lat).lon, p1.lat);
+	return Math.abs(p2.lon - p1.lon) * mpdLon / (x2 - x1);
+}
+function within(actual, wanted, frac) { return Math.abs(actual - wanted) <= Math.abs(wanted) * frac; }
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -131,6 +176,11 @@ exports.run = async function ({ browser, report }) {
 		// area in project length units."
 		await a.newProject();
 		await a.dismissGallery();
+		// THREE nodes, not one: the scale checks below measure how wide the model is on the screen,
+		// and a single junction is a symbol rather than a model — its screen width is the symbol's,
+		// which no scale can change. makeEdit() spaces them across the canvas.
+		await a.makeEdit();
+		await a.makeEdit();
 		await a.makeEdit();
 		// **THE WIZARD STARTS FROM A FILE (Task 447)**, so the drawing on screen is written out and
 		// opened again through File > Import xy to lat/lon… -- which lands it in a new tab, in step 1.
@@ -151,24 +201,12 @@ exports.run = async function ({ browser, report }) {
 			const b = document.getElementById('lpn_georef_goto');
 			return !!b && getComputedStyle(b).display !== 'none';
 		}), 'step 1 carries its own Go to… button');
-		// **TWO PROMPTS IN A ROW, so window.prompt is answered from a queue for this one gesture.**
-		// Session.answerPromptWith() holds a single answer and the second dialog would be dismissed
-		// before a spec could set it. Everything above this line uses the real dialog.
-		const asked = await a.page.evaluate(() => {
-			window.__realPrompt = window.prompt;
-			window.__asked = [];
-			const answers = ['38.106, -122.569', '3000'];
-			let i = 0;
-			window.prompt = (msg, dflt) => { window.__asked.push({ msg: msg, dflt: dflt }); return answers[i++]; };
-			return true;
-		});
-		void asked;
-		await a.page.click('#lpn_georef_goto');
-		await a.settle(700);
-		const prompts = await a.page.evaluate(() => {
-			window.prompt = window.__realPrompt;
-			return window.__asked;
-		});
+		// **TWO PROMPTS IN A ROW**, answered from a queue — see barGoTo(). Everything above this
+		// line uses the real dialog.
+		// How wide the model stands on the screen BEFORE the jump. Step 1's whole promise is that
+		// this number does not change: the model is held still and the map moves under it.
+		const widthBefore = await modelWidthPx(a);
+		const prompts = await barGoTo(a, '38.106, -122.569', '3000');
 		report.eq(prompts.length, 2, 'it asks two questions: where, and how big');
 		report.has(prompts[1] && prompts[1].msg, 'wide', '...the second being the width of the site');
 		report.has(prompts[1] && prompts[1].msg, 'ft', '...in the project\'s own length unit');
@@ -191,6 +229,48 @@ exports.run = async function ({ browser, report }) {
 			const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
 			return Math.abs(cx - (c.x + c.width / 2)) < 30 && Math.abs(cy - (c.y + c.height / 2)) < 30;
 		}), '...taking the model with it, planted in the middle of the view');
+
+		// ---- the SCALE it lands at (ROADMAP Task 520) --------------------------------------------
+		// Go to… travels AND zooms, so that the model — which is standing still on the screen —
+		// covers exactly the ground width just typed. Two things follow, and the pass checks both:
+		// the model is the same number of pixels wide afterwards as before (nothing you do to the
+		// map moves the model), and those pixels are worth the width that was asked for.
+		//
+		// **THE SCALE WAS READ AT THE WRONG LATITUDE, ON ONE SIDE OF ONE DIVISION.** The view scale
+		// took its metres-per-degree at the DESTINATION twice — once for the metres a drawing unit
+		// is worth where the model is hanging NOW, once for the degrees the site is worth where it
+		// is going — so the latitude cancelled out entirely and the model jumped by
+		// mpd.lon(hanging) / mpd.lon(destination). That is a factor of two between 60 N and the
+		// equator, and nothing here noticed it until this check: the error is invisible in the
+		// coordinate the map centres on, which was all this spec used to read.
+		let width = await modelWidthPx(a);
+		let mpp = await metresPerPx(a);
+		report.ok(within(width, widthBefore, 0.05),
+			'the model is the same size on the screen after the jump as before it',
+			`${widthBefore.toFixed(1)}px before, ${width.toFixed(1)}px after`);
+		report.ok(within(width * mpp, 914.4, 0.08),
+			'...and that width is the 3000 ft of ground that was asked for',
+			`${(width * mpp).toFixed(1)} m across`);
+
+		// Now the same site, twice, at latitudes far apart — which is where the cancelled factor
+		// used to show. 60 N first, then the equator: mpd.lon doubles between them.
+		await barGoTo(a, '60, 10', '3000');
+		width = await modelWidthPx(a);
+		mpp = await metresPerPx(a);
+		report.ok(within(width, widthBefore, 0.05),
+			'a jump to 60 N leaves the model the size it was',
+			`${widthBefore.toFixed(1)}px before, ${width.toFixed(1)}px after`);
+		report.ok(within(width * mpp, 914.4, 0.08),
+			'...still covering 3000 ft of ground', `${(width * mpp).toFixed(1)} m across`);
+
+		await barGoTo(a, '0, 10', '3000');
+		width = await modelWidthPx(a);
+		mpp = await metresPerPx(a);
+		report.ok(within(width, widthBefore, 0.05),
+			'and 60 N to the equator does not halve it either — the scale is read at both latitudes',
+			`${widthBefore.toFixed(1)}px before, ${width.toFixed(1)}px after`);
+		report.ok(within(width * mpp, 914.4, 0.08),
+			'...covering the same 3000 ft on the ground', `${(width * mpp).toFixed(1)} m across`);
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');
 	} finally {
