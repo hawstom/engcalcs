@@ -1080,6 +1080,7 @@ EngCalcs.pageConfig = {
 	lpn_field_text_rotation: <?=json_encode($ec_lang['lpn_field_text_rotation'])?>,
 	lpn_field_text_match_pipe: <?=json_encode($ec_lang['lpn_field_text_match_pipe'])?>,
 	lpn_field_text_flip: <?=json_encode($ec_lang['lpn_field_text_flip'])?>,
+	lpn_field_text_attached: <?=json_encode($ec_lang['lpn_field_text_attached'])?>,
 	lpn_field_elev: <?=json_encode($ec_lang['lpn_field_elev'])?>,
 	lpn_field_elev_tip: <?=json_encode($ec_lang['lpn_field_elev_tip'])?>,
 	lpn_field_head: <?=json_encode($ec_lang['lpn_field_head'])?>,

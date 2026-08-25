@@ -138,6 +138,40 @@ EngCalcs.lpnGeom = (function () {
 		return { index: 0, length: segs[0], total: total };
 	}
 
+	// THE INVERSE OF pointAlongPolyline(): given a point anywhere on the map, WHICH FRACTION of
+	// this polyline is nearest it. Returns { f, x, y, dist } -- the fraction by ARC LENGTH (so it
+	// is the same parameter pointAlongPolyline() takes), the point on the line, and how far the
+	// query point was from it.
+	//
+	// **THE FRACTION IS BY ARC LENGTH, NOT PER SEGMENT**, which is the whole reason this lives
+	// beside pointAlongPolyline() rather than being written out at a call site: on a bent pipe the
+	// nearest segment's own `t` and the polyline's `f` are nothing like each other, and a caller
+	// that stored the segment's t would put the point on the wrong leg the moment a vertex moved.
+	function nearestFractionOnPolyline(pts, px, py) {
+		var segs = [], total = 0, i, d, best = Infinity, bestRun = 0, bestPt = null, run = 0,
+			vx, vy, len2, t, qx, qy;
+		if (!pts || pts.length === 0) { return { f: 0, x: px, y: py, dist: Infinity }; }
+		if (pts.length === 1) {
+			return { f: 0, x: pts[0].x, y: pts[0].y, dist: Math.hypot(px - pts[0].x, py - pts[0].y) };
+		}
+		for (i = 0; i + 1 < pts.length; i++) {
+			d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+			segs.push(d); total += d;
+		}
+		for (i = 0; i < segs.length; i++) {
+			vx = pts[i + 1].x - pts[i].x; vy = pts[i + 1].y - pts[i].y;
+			len2 = vx * vx + vy * vy;
+			t = len2 ? ((px - pts[i].x) * vx + (py - pts[i].y) * vy) / len2 : 0;
+			t = t < 0 ? 0 : (t > 1 ? 1 : t);
+			qx = pts[i].x + vx * t; qy = pts[i].y + vy * t;
+			d = Math.hypot(px - qx, py - qy);
+			if (d < best) { best = d; bestRun = run + segs[i] * t; bestPt = { x: qx, y: qy }; }
+			run += segs[i];
+		}
+		if (!bestPt) { return { f: 0, x: pts[0].x, y: pts[0].y, dist: Infinity }; }
+		return { f: total > 0 ? bestRun / total : 0, x: bestPt.x, y: bestPt.y, dist: best };
+	}
+
 	// Place something at `along` (a fraction) on the polyline, then step it clear of any
 	// obstacle it would land on top of -- `obstacleDists` are along-distances in the same
 	// space `pointAlongPolyline().dist` reports (the editor passes flow-arrow positions).
@@ -630,6 +664,7 @@ EngCalcs.lpnGeom = (function () {
 		geodesicPolylineMeters: geodesicPolylineMeters,
 		polylinePointsAttr: polylinePointsAttr,
 		pointAlongPolyline: pointAlongPolyline,
+		nearestFractionOnPolyline: nearestFractionOnPolyline,
 		segmentAtFraction: segmentAtFraction,
 		dodgeAlongPolyline: dodgeAlongPolyline,
 		leaderAttachX: leaderAttachX,

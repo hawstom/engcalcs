@@ -1086,7 +1086,7 @@
 
 		var junctions = [], reservoirs = [], tanks = [], pipes = [], pumps = [], valves = [],
 			curves = [], emitters = [], statuses = [], coords = [], verts = [], labelRows = [],
-			nodeById = {}, omitted = {}, i, j, nd, lk, lb;
+			nodeById = {}, linkById = {}, omitted = {}, i, j, nd, lk, lb;
 
 		// ---- nodes ----
 		for (i = 0; i < (doc.nodes || []).length; i++) {
@@ -1148,6 +1148,7 @@
 		// ---- links ----
 		for (i = 0; i < (doc.links || []).length; i++) {
 			lk = doc.links[i];
+			linkById[lk.id] = lk;
 			if (!isActive(lk)) { continue; }
 			if (omitted[lk.from] || omitted[lk.to]) {
 				// A link to a node this scenario switched off has nowhere to land, and EPANET rejects
@@ -1254,12 +1255,33 @@
 		// left of where it sits, so the point is written unshifted and the difference REPORTED rather
 		// than guessed at. A label that arrived from an `.inp` is already stored left/top (Task 332)
 		// and needs no shift, which is why an imported file round-trips with no measurer at all.
-		var unmeasured = [];
+		// **EPANET'S ANCHOR IS A NODE AND ONLY A NODE.** A Text attached to a LINK (Task 502) has
+		// no fourth token it could be given, so the words go out at the place they are drawn and
+		// the attachment is REPORTED rather than faked -- writing the link id there would name a
+		// node that does not exist, and writing the nearest node would move the note.
+		// linkAnchorPoint() resolves the same fraction the editor draws at, from the file's own
+		// coordinates, so the exported point is where the reader was looking.
+		var unmeasured = [], linkAnchored = [];
+		function linkAnchorPoint(lb2) {
+			var lk = linkById[lb2.anchorLink], pts, t;
+			if (!lk || !EngCalcs.lpnGeom || !EngCalcs.lpnGeom.pointAlongPolyline) { return null; }
+			pts = [nodeById[lk.from]].concat(lk.verts || [], [nodeById[lk.to]]);
+			if (!pts[0] || !pts[pts.length - 1]) { return null; }
+			t = (typeof lb2.anchorT === 'number' && isFinite(lb2.anchorT))
+				? Math.max(0, Math.min(1, lb2.anchorT)) : 0.5;
+			return EngCalcs.lpnGeom.pointAlongPolyline(pts, t);
+		}
 		for (i = 0; i < (doc.labels || []).length; i++) {
 			lb = doc.labels[i];
 			if (!isActive(lb)) { continue; }
-			var anchor = lb.anchorNode ? nodeById[lb.anchorNode] : null,
-				px = (lb.x || 0) + (anchor ? (anchor.x || 0) : 0) + origin.x,
+			var anchor = lb.anchorNode ? nodeById[lb.anchorNode] : null;
+			if (!anchor && lb.anchorLink) {
+				// REPORTED WHETHER OR NOT THE POINT RESOLVES: the attachment is lost from the file
+				// either way, and the count the user is shown must say so.
+				anchor = linkAnchorPoint(lb);
+				linkAnchored.push(lb.id);
+			}
+			var px = (lb.x || 0) + (anchor ? (anchor.x || 0) : 0) + origin.x,
 				py = (lb.y || 0) + (anchor ? (anchor.y || 0) : 0) + origin.y,
 				// An anchored label is rendered from the side its offset points to and is vertically
 				// centred (labelHAlign/labelVAlign); a free one uses its own align/valign, which
@@ -1296,9 +1318,10 @@
 				text = text.replace(/"/g, "'");
 			}
 			labelRows.push(row([n(PLAIN, lb, 'x', px), n(PLAIN, lb, 'y', py), '"' + text + '"']
-				.concat(anchor ? [lb.anchorNode] : [])));
+				.concat(lb.anchorNode && anchor ? [lb.anchorNode] : [])));
 		}
 		if (unmeasured.length) { diff('label-anchor-unmeasured', unmeasured); }
+		if (linkAnchored.length) { diff('label-link-anchor-flattened', linkAnchored); }
 
 		// ---- backdrop ----
 		//

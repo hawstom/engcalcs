@@ -295,15 +295,6 @@ the block.
     - If yes, it is `ln -s ~/public_html/hawsedc/engcalcs ~/librewaternet.org/engcalcs` after
       testing `Options +FollowSymLinks` on that host, plus the canonical decision above.
 
-- 100|502| **A Text object anchored to a LINK, not only to a node.**
-  Extracted from Task 483 on close. A Text already follows a node (`anchorNode`, an offset plus a
-  leader) and an EPANET `.inp` can only ever anchor one to a node — so this buys nothing on import
-  and is a drawing feature: labelling a pipe, a pump or a valve with your own words and having the
-  note follow it when the link moves. Real work, not a rename: the attachment point on a link is a
-  position ALONG it, so it needs a parameter on the polyline rather than a second `anchorNode`, and
-  it touches label placement, the leader, collision avoidance and the Text popup. **Task 247's meter
-  needs the same `linkAnchor {link, t}`** — whichever ships first builds it for both.
-
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
   `sw.php` and `consent.php`, and three `Redirect 301` rules in `.htaccess` naming it absolutely.

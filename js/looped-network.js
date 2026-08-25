@@ -1167,8 +1167,8 @@ var EngCalcs = EngCalcs || {};
 		// that spot, so a data label goes round it and never the reverse.
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id]; if (!le) { return; }
-			var an = lb.anchorNode ? nodeById(lb.anchorNode) : null,
-				px = an ? an.x + lb.x : lb.x, py = an ? an.y + lb.y : lb.y,
+			var an = textAnchorPoint(lb), pt = textLabelPoint(lb),
+				px = pt.x, py = pt.y,
 				b = Geom.orientedLabelBox(px, py, textLabelWidth(le), textLabelHeight(lb),
 					labelHAlign(lb), labelVAlign(lb), textLabelSvgAngle(lb),
 					effectiveFontSize(lb && lb.sizeMult));
@@ -2168,7 +2168,8 @@ var EngCalcs = EngCalcs || {};
 
 	// The document. nodes: Junction/Reservoir/Tank (point elements). links: Pipe/Pump (two
 	// endpoints + optional bend vertices). labels: Text elements with a leader to an
-	// anchor node, OR a free-floating text with anchorNode === null.
+	// anchor node (`anchorNode`), or to a station along a link (`anchorLink` + `anchorT`,
+	// Task 502), OR a free-floating text with neither.
 	var doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
 
 	// The structural ID letters: LOOKUP KEYS into nextId and settings.idPrefixes, not the text an ID
@@ -3238,14 +3239,27 @@ var EngCalcs = EngCalcs || {};
 	// than its box, and at the same NODE_SNAP_PX: an anchor distance cannot make a large title block
 	// into a no-go zone the way its bounding box would.
 	function nearestLabelNearScreen(clientX, clientY, pxTolerance) {
-		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, lb, an, px, py, dPx;
+		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, lb, pt, dPx;
 		for (i = 0; i < doc.labels.length; i++) {
 			lb = doc.labels[i];
-			an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
-			px = an ? an.x + lb.x : lb.x;
-			py = an ? an.y + lb.y : lb.y;
-			dPx = Math.hypot(px - w.x, py - w.y) * state.s;
+			pt = textLabelPoint(lb);
+			dPx = Math.hypot(pt.x - w.x, pt.y - w.y) * state.s;
 			if (dPx <= bestPx) { best = lb; bestPx = dPx; }
+		}
+		return best;
+	}
+	// The LINK sibling of nearestNodeNearScreen() (Task 502), measured to the nearest point ON the
+	// centreline and reported with the fraction along it -- the parameter a Text anchor stores, so
+	// the caller never has to re-derive it. Screen pixels, same as the node snap, for the same
+	// reason: a world tolerance is visually huge zoomed out and invisible zoomed in.
+	function nearestLinkNearScreen(clientX, clientY, pxTolerance) {
+		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, l, hit, dPx;
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i];
+			if (!nodeById(l.from) || !nodeById(l.to)) { continue; }
+			hit = Geom.nearestFractionOnPolyline(linkPointList(l), w.x, w.y);
+			dPx = hit.dist * state.s;
+			if (dPx <= bestPx) { best = { link: l, t: hit.f }; bestPx = dPx; }
 		}
 		return best;
 	}
@@ -3356,7 +3370,11 @@ var EngCalcs = EngCalcs || {};
 	// Same architecture as the spike (dev/lpn-spike/phase0-acceptance.md round 1): a full
 	// teardown-and-rebuild on every drag frame was measured at 20-45fps; touching only the
 	// elements incident to what moved keeps drag at the display's real refresh rate.
-	var nodeEls = {}, linkEls = {}, labelEls = {}, incidentLinks = {}, labelsByAnchor = {};
+	// labelsByAnchor: node id -> the Text objects following it. labelsByLinkAnchor: the same for a
+	// link (Task 502). Two indexes rather than one keyed by anything, because a node and a link may
+	// legally share an id (Task 324) and a single map would make a note follow the wrong element.
+	var nodeEls = {}, linkEls = {}, labelEls = {}, incidentLinks = {}, labelsByAnchor = {},
+		labelsByLinkAnchor = {};
 	// Whether generated annotation is currently suppressed, for ANY of the three reasons
 	// applyLabelVisibility() knows about. Written only there; read by onZoomChanged() and
 	// scheduleReshed(), which skip the label pipeline when nothing readable is drawn.
@@ -4048,6 +4066,10 @@ var EngCalcs = EngCalcs || {};
 		paintNodeColor(n.id);   // a rebuilt element starts black; give it its colour immediately
 	}
 	function buildLinkEls(l) {
+		// CREATED ONCE, NOT CLEARED: rebuildLink() comes back through here for a link that already
+		// exists, and emptying the bucket would orphan every Text attached to that pipe the first
+		// time somebody added a bend to it.
+		if (!labelsByLinkAnchor[l.id]) { labelsByLinkAnchor[l.id] = []; }
 		// AUDIT HALO (Task 184) -- a wider line UNDER the pipe, so it reads as an outline and never a
 		// fill: the pipe keeps its own colour, dashes and result-driven styling and the halo composes
 		// with all of them. Built for every link and hidden by CSS until refreshScenarioMarks() marks
@@ -4289,7 +4311,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// A FREE-FLOATING Text has no leader and no side, so it keeps the manual control Task 342 added.
 	function labelHAlign(lb) {
-		if (lb && lb.anchorNode) { return lb.x >= 0 ? 'start' : 'end'; }
+		if (textIsAnchored(lb)) { return lb.x >= 0 ? 'start' : 'end'; }
 		var a = lb && lb.align;
 		return a === 'left' ? 'start' : a === 'right' ? 'end' : 'middle';
 	}
@@ -4298,7 +4320,7 @@ var EngCalcs = EngCalcs || {};
 	// choice -- there is no leader to disagree with.
 	function labelVAlign(lb) {
 		if (!lb) { return 'middle'; }
-		if (lb.anchorNode) { return 'middle'; }
+		if (textIsAnchored(lb)) { return 'middle'; }
 		if (lb.valign === 'top') { return 'hanging'; }
 		if (lb.valign === 'bottom') { return 'bottom'; }
 		return 'middle';
@@ -4463,12 +4485,64 @@ var EngCalcs = EngCalcs || {};
 	function textLeaderEnd(lb, le, px, py) {
 		return { x: px, y: py };
 	}
+	// ---- WHAT A TEXT OBJECT IS ATTACHED TO -- the ONE place an anchor becomes a point ------------
+	//
+	// OUR VOCABULARY, NOT EPANET'S (Task 482): a Text is the object a user types words into. What
+	// EPANET calls a Label is our Text; what we call a Label is EPANET's notation.
+	//
+	// A Text follows either a NODE (`anchorNode`, since Task 146) or a LINK (`anchorLink` plus
+	// `anchorT`, Task 502). Either way lb.x/lb.y are an OFFSET from the attachment point and never
+	// a position -- which is why eachStoredPoint() leaves an anchored Text out of the origin
+	// rebase, for both kinds and for the same reason.
+	//
+	// **A LINK ANCHOR IS A FRACTION OF THE LINK'S OWN ARC LENGTH, and that choice is the design.**
+	// A node is a point; a link is a polyline, so "attached to it" needs a station on the line.
+	// A stored fraction is the only one of the candidates that survives the drawing being edited:
+	//   * THE MIDPOINT, always -- then two notes on one main both point at the same spot, and a
+	//     note placed at a valve halfway along slides away from it the next time the file opens;
+	//   * THE NEAREST POINT, recomputed on every draw -- then dragging the WORDS moves the leader's
+	//     landing point, which is exactly what updateLabelGeometry()'s "hold it inviolate" rejects
+	//     for a node leader, and the attachment creeps along the pipe as the text is edited;
+	//   * A DISTANCE ALONG -- then shortening the pipe leaves the anchor off the end, and the clamp
+	//     that rescues it silently changes where the user put the note.
+	// A fraction is invariant when the link is moved, stretched, rotated or re-scaled, so the note
+	// stays where it was put RELATIVE TO THE PIPE -- which is what "it follows the link" means. It
+	// is chosen once, from where the user tapped (Geom.nearestFractionOnPolyline), and nothing but
+	// the drag handle Task 247 wants ever rewrites it.
+	//
+	// A VERTEX DRAG IS THE CASE THAT PROVES IT: adding or moving a bend changes the arc length, so
+	// the anchor moves along the new shape -- staying at the same PROPORTION of the pipe, which is
+	// the only definition that does not need the user to re-place the note afterwards.
+	function textAnchorT(lb) {
+		var t = lb && lb.anchorT;
+		return (typeof t === 'number' && isFinite(t)) ? Math.max(0, Math.min(1, t)) : 0.5;
+	}
+	function textIsAnchored(lb) { return !!(lb && (lb.anchorNode || lb.anchorLink)); }
+	// The attachment point in world coordinates, or null for a free-floating Text -- and null too
+	// when the anchor names something no longer in the drawing, which every caller below then
+	// treats as free-floating rather than throwing on a missing element.
+	function textAnchorPoint(lb) {
+		var l, p;
+		if (!lb) { return null; }
+		if (lb.anchorNode) { return nodeById(lb.anchorNode); }
+		if (!lb.anchorLink) { return null; }
+		l = linkById(lb.anchorLink);
+		if (!l || !nodeById(l.from) || !nodeById(l.to)) { return null; }
+		p = Geom.pointAlongPolyline(linkPointList(l), textAnchorT(lb));
+		return { x: p.x, y: p.y };
+	}
+	// Where the WORDS sit: the attachment point plus the offset, or lb.x/lb.y when there is no
+	// attachment. Every site that used to spell `an ? an.x + lb.x : lb.x` out for itself comes here
+	// instead, so a second kind of anchor could not be half-implemented.
+	function textLabelPoint(lb) {
+		var an = textAnchorPoint(lb);
+		return an ? { x: an.x + lb.x, y: an.y + lb.y } : { x: lb.x, y: lb.y };
+	}
 	function buildLabelEls(lb) {
-		var an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: lb.x, y: lb.y },
-			px = lb.anchorNode ? an.x + lb.x : lb.x,
-			py = lb.anchorNode ? an.y + lb.y : lb.y,
+		var an = textAnchorPoint(lb), pt = textLabelPoint(lb),
+			px = pt.x, py = pt.y,
 			leader = null, text;
-		if (lb.anchorNode) {
+		if (an) {
 			leader = el('line', { x1: an.x, y1: an.y, x2: px, y2: py, 'class': 'lpn-leader' }, labelsLayer);
 		}
 		text = el('text', {
@@ -4484,7 +4558,10 @@ var EngCalcs = EngCalcs || {};
 		labelEls[lb.id] = { leader: leader, text: text, side: 'right', width: w };
 		noteTextWidth(labelEls[lb.id], w);
 		applyTextLabelRotation(lb, labelEls[lb.id], px, py);
-		if (lb.anchorNode) { labelsByAnchor[lb.anchorNode].push(lb.id); }
+		// The two indexes are what make an anchored Text follow: updateNode() replays one and
+		// updateLinkGeometry() the other, so no listener anywhere has to know about Text objects.
+		if (lb.anchorNode && labelsByAnchor[lb.anchorNode]) { labelsByAnchor[lb.anchorNode].push(lb.id); }
+		if (lb.anchorLink && labelsByLinkAnchor[lb.anchorLink]) { labelsByLinkAnchor[lb.anchorLink].push(lb.id); }
 	}
 	// ONE function for "this label's CONTENT changed", and the three steps are always in this order:
 	// push the words into the element that already exists (a second buildLabelEls() orphans the
@@ -4503,14 +4580,14 @@ var EngCalcs = EngCalcs || {};
 	// the offset. Every row of a multi-line label carries that x explicitly (setMultilineText()),
 	// so it is needed wherever the content is rebuilt, not only where it is moved.
 	function textLabelAnchorX(lb) {
-		var an = lb && lb.anchorNode ? nodeById(lb.anchorNode) : null;
-		return an ? an.x + lb.x : lb.x;
+		return textLabelPoint(lb).x;
 	}
 
 	function buildDom() {
 		var i;
 		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; labelsLayer.innerHTML = '';
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
+		labelsByLinkAnchor = {};
 		for (i = 0; i < doc.nodes.length; i++) { buildNodeEls(doc.nodes[i]); }
 		for (i = 0; i < doc.links.length; i++) {
 			incidentLinks[doc.links[i].from].push(doc.links[i].id);
@@ -4530,11 +4607,25 @@ var EngCalcs = EngCalcs || {};
 		// <svg> would survive a rebuild, a class on a discarded <text> does not).
 		applyLabelVisibility();
 	}
+	// Every Text attached to this link, redrawn where the link's new shape puts it (Task 502).
+	function updateTextOnLink(id) {
+		var following = labelsByLinkAnchor[id] || [], i;
+		// Guarded on labelEls, exactly as relayoutLabels() guards its own sweep: the index is
+		// rebuilt by buildDom() and an id in it that has no element yet is simply not drawable.
+		for (i = 0; i < following.length; i++) {
+			if (labelEls[following[i]]) { updateLabelGeometry(following[i]); }
+		}
+	}
 	function updateLinkGeometry(id) {
 		var l = linkById(id), le = linkEls[id];
 		le.line.setAttribute('points', linkPoints(l));
 		if (le.halo) { le.halo.setAttribute('points', linkPoints(l)); }
 		layoutLinkLabel(id);
+		// **A TEXT ATTACHED TO THIS LINK FOLLOWS HERE, AND ONLY HERE** (Task 502). This is the one
+		// pass every reshaping goes through -- a node dragged (updateNode replays its incident
+		// links), a vertex dragged (updateVertex), a rebuild -- so there is no second listener and
+		// nothing to forget to call.
+		updateTextOnLink(id);
 		if (l.lenAuto) { l._length = linkGeomLength(l); }   // base-write: auto length follows the drawing, and geometry is Base-owned
 		updateArrow(id);
 		positionPumpSymbol(id);
@@ -4545,8 +4636,8 @@ var EngCalcs = EngCalcs || {};
 	// line, 100% = far edge at the line -- flipping later means the leader reaches across the text.
 	var ADVERSE_FRAC = 0.75;
 	function updateLabelGeometry(id) {
-		var lb = labelById(id), le = labelEls[id], an, px, py, box, halfW, att;
-		if (!lb.anchorNode) {
+		var lb = labelById(id), le = labelEls[id], an = textAnchorPoint(lb), px, py, box, halfW, att;
+		if (!an) {
 			// repositionMultilineText(), not two setAttribute()s: every ROW of a multi-line label
 			// carries its own x, so moving the parent alone would strand the rows where they were
 			// (Task 342). It sets the parent's x/y too, so the single-line case is unchanged.
@@ -4554,7 +4645,7 @@ var EngCalcs = EngCalcs || {};
 			applyTextLabelRotation(lb, le, lb.x, lb.y);
 			return;
 		}
-		an = nodeById(lb.anchorNode); px = an.x + lb.x; py = an.y + lb.y;
+		px = an.x + lb.x; py = an.y + lb.y;
 		box = textLabelBox(lb, le, px, py);
 		// **THE LEADER ENDS AT THE LABEL'S OWN POINT, AND NOTHING HERE READS A WIDTH.** An anchored
 		// label is edge-justified by labelHAlign(), so its anchored edge IS lb.x -- change the text,
@@ -4579,7 +4670,7 @@ var EngCalcs = EngCalcs || {};
 	// its absolute position, so there is no default to reset to and this is a no-op.
 	function resetTextLabelHome(id) {
 		var lb = labelById(id);
-		if (!lb || !lb.anchorNode) { return; }
+		if (!lb || !textIsAnchored(lb)) { return; }
 		var home = defaultLabelOffset();
 		if (lb.x === home.x && lb.y === home.y) { return; }
 		saveUndoSnapshot();
@@ -4679,6 +4770,9 @@ var EngCalcs = EngCalcs || {};
 		linkEls[l.id].leader.remove();
 		if (linkEls[l.id].symbolG) { linkEls[l.id].symbolG.remove(); }
 		buildLinkEls(l);
+		// A BEND ADDED OR REMOVED CHANGES THE ARC LENGTH, so a Text anchored at a fraction of it
+		// resolves to a new point. This path does not run updateLinkGeometry(), so it says so here.
+		updateTextOnLink(l.id);
 		refreshLabelText();
 	}
 	function insertVertex(linkId, pt) {
@@ -4726,8 +4820,8 @@ var EngCalcs = EngCalcs || {};
 		}
 		for (i = 0; i < doc.labels.length; i++) {
 			var lb = doc.labels[i], le = labelEls[lb.id] || { width: 10 },
-				an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: 0, y: 0 },
-				px = lb.anchorNode ? an.x + lb.x : lb.x, py = lb.anchorNode ? an.y + lb.y : lb.y,
+				fitPt = textLabelPoint(lb),
+				px = fitPt.x, py = fitPt.y,
 				// The label's OWN box, at its OWN anchor (Task 332) -- px/py is not necessarily its
 				// centre. The height is the label's own rendered height, never a constant: a
 				// hardcoded 2 is right only at text size 2.5, and at the shipped default a title at
@@ -4867,8 +4961,8 @@ var EngCalcs = EngCalcs || {};
 			var le = labelEls[lb.id]; if (!le) { return; }
 			if (ignoreDataLabels && le.text && le.text.classList &&
 				le.text.classList.contains('lpn-lbl-hidden')) { return; }
-			var an = lb.anchorNode ? nodeById(lb.anchorNode) : null,
-				px = an ? an.x + lb.x : lb.x, py = an ? an.y + lb.y : lb.y,
+			var pt = textLabelPoint(lb),
+				px = pt.x, py = pt.y,
 				box = textLabelBox(lb, le, px, py);
 			boxFor(px, py, box.x, box.y, box.w, box.h);
 		});
@@ -7374,15 +7468,14 @@ var EngCalcs = EngCalcs || {};
 	// Where the map has to go to show this element. A link has no point of its own, so it is the
 	// midpoint of its ends -- good enough to put a pipe on screen, and it needs no vertex walk.
 	function findPointOf(cand) {
-		var a, b, lb, an;
+		var a, b;
 		if (cand.group === 'node') { return { x: cand.el.x, y: cand.el.y }; }
 		if (cand.group === 'link') {
 			a = nodeById(cand.el.from); b = nodeById(cand.el.to);
 			if (!a || !b) { return null; }
 			return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
 		}
-		lb = cand.el; an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
-		return an ? { x: an.x + lb.x, y: an.y + lb.y } : { x: lb.x, y: lb.y };
+		return textLabelPoint(cand.el);
 	}
 	// **HOW MUCH OF THE DRAWING A RESULT NEEDS AROUND IT** (Tom, 2026-08-18: *"something like twice
 	// the average distance to its linked nodes"*). A node on its own is a dot: arriving at it from
@@ -7410,7 +7503,12 @@ var EngCalcs = EngCalcs || {};
 			a = nodeById(el.from); b = nodeById(el.to);
 			return (a && b) ? 2 * Math.hypot(b.x - a.x, b.y - a.y) : 0;
 		}
-		return el.anchorNode ? findContextLength('node', nodeById(el.anchorNode) || el) : 0;
+		// A Text borrows the neighbourhood of whatever it is attached to -- its node's, or its own
+		// link's length. A free-floating one has no neighbourhood and returns 0, which means "leave
+		// the zoom alone" rather than inventing a distance.
+		if (el.anchorNode) { return findContextLength('node', nodeById(el.anchorNode) || el); }
+		if (el.anchorLink && linkById(el.anchorLink)) { return findContextLength('link', linkById(el.anchorLink)); }
+		return 0;
 	}
 	// **A MINIMUM APPARENT SIZE, NOT A CHOSEN ZOOM.** Tom asked for a "shown length (min?)" and the
 	// question mark is the design: this only ever zooms IN. Somebody already looking closely at one
@@ -10442,14 +10540,29 @@ var EngCalcs = EngCalcs || {};
 	// anchorNode, if given, anchors the new Text to that node with a leader -- lb.x/lb.y become an
 	// OFFSET from the node (matching buildLabelEls'/updateLabelGeometry's model), computed here so
 	// the label still appears exactly where the user tapped, not snapped onto the node itself.
-	function addText(x, y, anchorNode) {
-		var id = mintId('X'), an = anchorNode ? nodeById(anchorNode) : null;
+	//
+	// `attach` is the LINK form of the same argument (Task 502): {link: id, t: fraction}, and the
+	// offset is taken from the point that fraction names. A Text has ONE anchor -- a node wins if
+	// both are somehow supplied, because a node is the more specific thing to have tapped.
+	function addText(x, y, anchorNode, attach) {
+		var id = mintId('X'), an = anchorNode ? nodeById(anchorNode) : null, lb, onLink = null;
+		if (!an && attach && linkById(attach.link)) {
+			onLink = attach;
+			an = textAnchorPoint({ anchorLink: attach.link, anchorT: attach.t });
+			if (!an) { onLink = null; }
+		}
 		// `_text` underscored, like every other overridable property (Task 184/146.08 step 2, Task
 		// 407): a call site that reads lb.text without going through effective() gets undefined
 		// immediately rather than reading Base while a scenario says something else.
-		var lb = an
-			? { id: id, _text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x - an.x, y: y - an.y, anchorNode: anchorNode, sizeMult: 1 }
-			: { id: id, _text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null, sizeMult: 1 };
+		lb = {
+			id: id, _text: EngCalcs.pageConfig.lpn_new_text || 'Text',
+			x: an ? x - an.x : x, y: an ? y - an.y : y,
+			anchorNode: (an && anchorNode) ? anchorNode : null, sizeMult: 1
+		};
+		// **THE LINK FIELDS ARE ADDED, NEVER WRITTEN AS null.** Every Text this page has ever
+		// created carries `anchorNode`, so that key stays unconditional; `anchorLink` is new, and a
+		// document that has no link anchor in it must come back out saying nothing about one.
+		if (onLink) { lb.anchorLink = onLink.link; lb.anchorT = onLink.t; }
 		doc.labels.push(lb);
 		// Drawn inside a scenario, a Text is born in Base switched off and switched on here -- the
 		// same membership rule addNode()/addLink() follow, and what makes "this scenario has its own
@@ -10744,6 +10857,12 @@ var EngCalcs = EngCalcs || {};
 		// text-decoration, so removing the text removes it. As separate elements it had to be hunted
 		// down here, and forgetting left orphaned labels behind a deleted pipe.
 		delete linkEls[id];
+		// **A TEXT ATTACHED TO A DELETED LINK GOES WITH IT**, which is deleteNode()'s rule for a
+		// node-anchored Text, unchanged (Task 502). The alternative -- cut it loose as free text --
+		// leaves a note pointing at nothing, in a place chosen as an OFFSET from something that is
+		// no longer there. One rule for both anchors; undo brings the note back with its link.
+		(labelsByLinkAnchor[id] || []).slice().forEach(function (lid) { deleteLabelById(lid); });
+		delete labelsByLinkAnchor[id];
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
 		incidentLinks[l.to] = incidentLinks[l.to].filter(function (x) { return x !== id; });
 		doc.links = doc.links.filter(function (x) { return x.id !== id; });
@@ -10757,8 +10876,11 @@ var EngCalcs = EngCalcs || {};
 		if (le.leader) { le.leader.remove(); }
 		le.text.remove();
 		delete labelEls[id];
-		if (lb.anchorNode) {
+		if (lb.anchorNode && labelsByAnchor[lb.anchorNode]) {
 			labelsByAnchor[lb.anchorNode] = labelsByAnchor[lb.anchorNode].filter(function (x) { return x !== id; });
+		}
+		if (lb.anchorLink && labelsByLinkAnchor[lb.anchorLink]) {
+			labelsByLinkAnchor[lb.anchorLink] = labelsByLinkAnchor[lb.anchorLink].filter(function (x) { return x !== id; });
 		}
 		doc.labels = doc.labels.filter(function (x) { return x.id !== id; });
 		purgeOverrides(ovKeyFor('label', id));   // see deleteNode(): a real deletion takes them with it
@@ -10839,12 +10961,13 @@ var EngCalcs = EngCalcs || {};
 	// units from its pipe.
 	//
 	// DELIBERATELY NOT HERE: `n.lx`/`l.ly` and an ANCHORED label's x/y are OFFSETS, and an offset
-	// does not move when the frame's origin does. `backdrop.x/y/width` are a size and an anchor
-	// within the image; only `backdrop.tx/ty` is a position. `view.extent` is a size.
+	// does not move when the frame's origin does -- for a Text on a LINK (Task 502) exactly as for
+	// one on a node, since both store the same kind of number. `backdrop.x/y/width` are a size and
+	// an anchor within the image; only `backdrop.tx/ty` is a position. `view.extent` is a size.
 	function eachStoredPoint(o, visit) {
 		(o.nodes || []).forEach(function (n) { visit(n); });
 		(o.links || []).forEach(function (l) { (l.verts || []).forEach(function (v) { visit(v); }); });
-		(o.labels || []).forEach(function (lb) { if (!lb.anchorNode) { visit(lb); } });
+		(o.labels || []).forEach(function (lb) { if (!lb.anchorNode && !lb.anchorLink) { visit(lb); } });
 		if (o.backdrop && typeof o.backdrop.tx === 'number') {
 			visit({}, function () { return { x: o.backdrop.tx, y: o.backdrop.ty }; },
 				function (x, y) { o.backdrop.tx = x; o.backdrop.ty = y; });
@@ -16136,9 +16259,9 @@ var EngCalcs = EngCalcs || {};
 				drag = { type: 'vertex', id: t.dataset.link, vidx: +t.dataset.vidx, offX: v.x - w1.x, offY: v.y - w1.y };
 				Object.assign(drag, common);
 			} else if (t.dataset.lbl !== undefined) {
-				var lb = labelById(t.dataset.lbl), an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: 0, y: 0 },
+				var lbPt = textLabelPoint(labelById(t.dataset.lbl)),
 					w2 = screenToWorld(e.clientX, e.clientY);
-				drag = { type: 'label', id: t.dataset.lbl, offX: (an.x + lb.x) - w2.x, offY: (an.y + lb.y) - w2.y };
+				drag = { type: 'label', id: t.dataset.lbl, offX: lbPt.x - w2.x, offY: lbPt.y - w2.y };
 				Object.assign(drag, common);
 			} else if (t.dataset.nodelbl !== undefined) {
 				// Task 146.01: dragging a node's OWN data label (id/elev/demand/... beside the
@@ -16285,8 +16408,14 @@ var EngCalcs = EngCalcs || {};
 				// ready, waiting on this). A tap within NODE_SNAP_PX anchors the new Text to that
 				// node, so it drags with it and grows a leader; otherwise it's free-floating.
 				var nearNode = nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
+				// **AND FAILING A NODE, A PIPE** (Task 502). A NODE WINS A TIE, deliberately: every
+				// link ends at a node, so near a junction both are within tolerance, and the node is
+				// the more specific thing the user can have meant. That ordering is also what keeps
+				// every existing drawing's behaviour exactly as it was.
+				var nearLink = nearNode ? null : nearestLinkNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
 				logLpnFirstAction('element');
-				addText(w.x, w.y, nearNode ? nearNode.id : null);
+				addText(w.x, w.y, nearNode ? nearNode.id : null,
+					nearLink ? { link: nearLink.link.id, t: nearLink.t } : null);
 			}
 			else if (mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve') {
 				// Same snap: elementFromPoint requires landing exactly on the node's small hit
@@ -16465,8 +16594,11 @@ var EngCalcs = EngCalcs || {};
 			relayoutLabels();
 		} else if (drag.type === 'label') {
 			snapshotDragOnce();
-			var w3 = screenToWorld(p.x, p.y), lb = labelById(drag.id), an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: 0, y: 0 };
-			if (lb.anchorNode) { lb.x = (w3.x + drag.offX) - an.x; lb.y = (w3.y + drag.offY) - an.y; }
+			// **DRAGGING THE WORDS MOVES THE OFFSET, NEVER THE ATTACHMENT.** For a link anchor that
+			// means `anchorT` is untouched here: the leader keeps landing where the user put it and
+			// only the note swings around it. Task 247 wants a separate handle for the station.
+			var w3 = screenToWorld(p.x, p.y), lb = labelById(drag.id), an = textAnchorPoint(lb);
+			if (an) { lb.x = (w3.x + drag.offX) - an.x; lb.y = (w3.y + drag.offY) - an.y; }
 			else { lb.x = w3.x + drag.offX; lb.y = w3.y + drag.offY; }
 			updateLabelGeometry(drag.id);
 			// Every label drag ends in relayoutLabels(), not just a layout of the one being dragged:
@@ -20358,6 +20490,8 @@ var EngCalcs = EngCalcs || {};
 		// silently reverts to nothing (resolveCurvePoints() only matches an exact id).
 		doc.links.forEach(function (other) { if (other.curveRef === oldId) { other.curveRef = newId; } });
 		linkEls[newId] = linkEls[oldId]; delete linkEls[oldId];
+		labelsByLinkAnchor[newId] = labelsByLinkAnchor[oldId] || []; delete labelsByLinkAnchor[oldId];
+		doc.labels.forEach(function (lb) { if (lb.anchorLink === oldId) { lb.anchorLink = newId; } });
 		linkEls[newId].line.setAttribute('data-link', newId);
 		linkEls[newId].handles.forEach(function (h) { h.setAttribute('data-link', newId); });
 	}
@@ -20880,8 +21014,7 @@ var EngCalcs = EngCalcs || {};
 	function renderLabelFields(labelId) {
 		var lb = labelById(labelId), fields = document.getElementById('lpn_popup_fields'),
 			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
-			label = document.createElement('label'), input = document.createElement('textarea'),
-			an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
+			label = document.createElement('label'), input = document.createElement('textarea');
 		title.textContent = pc.lpn_tool_add_text || 'Text';
 		clearFields(fields);
 		// WHAT THE NOTE SAYS IS OVERRIDABLE (Task 407), so this row reads through effective() and
@@ -20951,7 +21084,7 @@ var EngCalcs = EngCalcs || {};
 		// (associated text)? ... it's best to let the leader dragging functions handle
 		// justification."*
 		function alignRow(labelText, prop, options, dflt) {
-			if (lb.anchorNode) { return; }
+			if (textIsAnchored(lb)) { return; }
 			selectFieldPlain(fields, labelText, options, (lb[prop] || dflt), function (v) {
 				if ((lb[prop] || dflt) === v) { return; }
 				saveUndoSnapshot();
@@ -21040,7 +21173,7 @@ var EngCalcs = EngCalcs || {};
 			// Read at the label's RENDERED point, which for an anchored label is its node plus its
 			// offset -- not lb.x/lb.y, which is the offset alone and would find the pipe nearest
 			// the map origin.
-			var a = nearestLinkAngle(an ? an.x + lb.x : lb.x, an ? an.y + lb.y : lb.y);
+			var rp = textLabelPoint(lb), a = nearestLinkAngle(rp.x, rp.y);
 			if (a === null) { return; }   // no pipes drawn: nothing to match, and nothing to say
 			setRotation(a);
 		});
@@ -21055,7 +21188,17 @@ var EngCalcs = EngCalcs || {};
 		flipBtn.addEventListener('click', function () { setRotation(textLabelRotation(lb) + 180); });
 		fields.appendChild(flipBtn);
 		fields.appendChild(document.createElement('br'));
-		coordFields(fields, outwardX(an ? an.x + lb.x : lb.x), outwardY(an ? an.y + lb.y : lb.y));
+		var here = textLabelPoint(lb);
+		coordFields(fields, outwardX(here.x), outwardY(here.y));
+		// **WHAT THIS NOTE IS FOLLOWING, said out loud** (Task 502). Read-only: a Text is attached
+		// where it is placed, and detaching it is not a thing the page offers for a node anchor
+		// either -- so this row answers "which pipe is that leader going to", which is a real
+		// question on a map of parallel mains, and offers no control that would need a second one.
+		// Absent entirely on a free-floating Text: there is nothing to say.
+		if (textIsAnchored(lb)) {
+			readonlyField(fields, pc.lpn_field_text_attached || 'Attached to',
+				lb.anchorNode || lb.anchorLink);
+		}
 		importNotesField(fields, lb);
 		tipsIn(fields);
 	}

@@ -604,6 +604,7 @@
         "lpn_field_text_rotation": "Angle (degrees)",
         "lpn_field_text_match_pipe": "Turn to the angle of the nearest link",
         "lpn_field_text_flip": "Turn 180°",
+        "lpn_field_text_attached": "Attached to",
         "lpn_field_elev": "Elevation",
         "lpn_field_elev_tip": "Ground or pipe level at this node. Measure it from any zero you like, as long as every node uses the same one.",
         "lpn_field_head": "Head",
@@ -1348,7 +1349,7 @@
         "lpn_terrain_missed": "{m} could not be read and are still blank.",
         "lpn_terrain_partial": "{f} terrain tile(s) did not answer."
     },
-    "count": 1346,
+    "count": 1347,
     "active_prefixes": [
         "about",
         "bpn",

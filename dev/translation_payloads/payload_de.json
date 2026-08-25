@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 1346,
-        "delta_key_count": 10,
+        "expected_key_count": 1347,
+        "delta_key_count": 11,
         "exempt_key_count": 36,
         "exempt_keys": [
             "calc_units_us",
@@ -455,6 +455,7 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_field_text_attached": "Attached to",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
         "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
@@ -467,6 +468,7 @@
         "lpn_settings_legend_off": "Off"
     },
     "keys": {
+        "lpn_field_text_attached": "Attached to",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
         "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
@@ -479,6 +481,22 @@
         "lpn_settings_legend_off": "Off"
     },
     "key_context": {
+        "lpn_field_text_attached": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_flip",
+                    "value": "Um 180° drehen",
+                    "english": "Turn 180°"
+                },
+                "next_translated": {
+                    "key": "lpn_field_elev",
+                    "value": "Höhe",
+                    "english": "Elevation"
+                }
+            }
+        },
         "lpn_georef_backdrop_unrotated": {
             "reason": "missing",
             "current_value": null,
