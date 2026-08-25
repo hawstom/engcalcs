@@ -375,9 +375,25 @@ $ec_icons = array(
 	// nonsense there and the one tool that measures at 17 px goes blind. Verify with
 	// `php dev/scripts/icon_ascii_preview.php water --size=17`, remembering it cannot show opacity:
 	// the fill reads as solid black in ASCII and as a pale tint in a browser.
-	'water'      => '<path d="M12 3.2C9.5 7.5 5.8 11.3 5.8 14.8C5.8 18.22 8.58 21 12 21C15.42 21 18.2 18.22 18.2 14.8C18.2 11.3 14.5 7.5 12 3.2Z" fill="currentColor" stroke="none" opacity=".18"/>'
-		. '<path d="M12 3.2C9.5 7.5 5.8 11.3 5.8 14.8C5.8 18.22 8.58 21 12 21C15.42 21 18.2 18.22 18.2 14.8C18.2 11.3 14.5 7.5 12 3.2Z"/>',
+	// **A TOWER, NOT A DROP** (Tom, 2026-08-25). The drop that shipped the day before lost against
+	// the View menu's eye: *"the water drop and the eye don't look different enough, especially with
+	// the association of tears and eyes."* Two almond-ish outlines one menu apart is a real
+	// collision, and the fix is a different SILHOUETTE rather than a better drop. He named a water
+	// tower (front view) and a dripping faucet and referenced two commercial line icons for the
+	// shape; this is an original drawing, as everything in this file is.
+	//
+	// **THE FAUCET WAS DRAWN AND LOST ON A MEASUREMENT.** It needs a handle, a spout and a falling
+	// drip -- three fine features in one glyph -- and at 17px with a 2px stroke they merge into a
+	// smudge (`php dev/scripts/icon_ascii_preview.php`). A tower is ONE bold silhouette: a tank, a
+	// splay, a brace. If the faucet is ever wanted it needs a heavier, simpler drawing, not a
+	// retouch of this one.
+	'water'      => '<path d="M5 4H19L15.5 10.5H8.5Z"/><path d="M9 10.5L6.5 20"/>'
+		. '<path d="M15 10.5L17.5 20"/><path d="M8 14.5H16"/>',
 
+	// CANDIDATES for the Water menu, drawn 2026-08-25. Tom: the drop and the eye *"don't look
+	// different enough, especially with the association of tears and eyes"*. He named a water tower
+	// (front view) and a dripping faucet and referenced two commercial line icons for the SHAPE only;
+	// these are original drawings, as every icon in this file is.
 	// **KEPT, THOUGH NOTHING DRAWS IT TODAY** (2026-08-25). This is the rolled plan set that was the
 	// Project menu's icon until that menu became Water above. Tom, on losing it: *"We really came out
 	// victorious with our Plan icon. But it looks like now we need to change it."* It is six rounds
