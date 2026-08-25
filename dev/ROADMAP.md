@@ -312,12 +312,18 @@ the block.
   - **"Business logic" is what answers the Settings-and-Libraries objection.** Units, friction
     method, default sizes and the pipe and pump libraries are not setup — they are the business
     rules, and that is one category, not two. The menu is not holding two kinds of thing.
-  - **Waterworks was considered and dropped.** It names the SYSTEM rather than the substance and is
-    the more precise description, but it is longer, it is harder in 27 languages, and in English it
-    also means crying and (in British usage) the urinary tract. It survives in real utility names
-    (Des Moines Water Works), so the risk is manageable — but a name that needs that paragraph is
-    beaten by one that needs none. "Waterworks Foundation" was floated as an organisation name in
-    the same breath; that is a `dev/positioning.md` question, not this one.
+  - **Waterworks was considered and dropped — on LENGTH AND TRANSLATION, and on nothing else.** It
+    names the SYSTEM rather than the substance and is the more precise description; it is simply
+    longer on a menu bar and harder across 27 languages, where "water" is a word every one of them
+    has in field register.
+  - **The English idioms are NOT a mark against it, and recording them as one was wrong** (AI, then
+    corrected by Tom, 2026-08-24: *"just that: metaphorical references to the pipe and pump physical
+    reality"*). The municipal sense is the OLDER and primary one; *turn on the waterworks* for crying
+    and the British urinary usage are both metaphors borrowed FROM it. That makes the word strong
+    rather than compromised — English reached for it because a waterworks is a vivid image of pipes
+    and pumps under pressure. Do not re-raise the idioms as an objection.
+  - "Waterworks Foundation" was floated as an organisation name in the same breath; that is a
+    `dev/positioning.md` question, not this one.
   - **THE REASONING GOES WIDER THAN THIS MENU: it is a reason to keep EPANET's names off our
     surfaces.** Tom: *"They were always unclear, and we don't want to inherit any of those
     assumptions or associations."* That is the same rule CLAUDE.md already states for the element
