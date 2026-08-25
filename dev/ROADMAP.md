@@ -428,6 +428,13 @@ the block.
     `graphics-plan.md`, and Task 459's sense of what the interface actually looks like in each
     language. **A screenshot is a screen** — the publishable/not judgement is made once, in the
     index, not every time somebody reaches for an image.
+  - **A row must name the task that superseded it.** The 2026-08-25 phone session shot nine frames
+    and five fixes landed the same day, so eight of the nine now show a bug that is gone. Without
+    that note the next reader re-diagnoses a fixed defect from a stale picture — which is the whole
+    cost the index exists to avoid.
+  - **Publishable and useful are separate axes.** Publishable is the privacy test in the README and
+    nothing else; a frame full of defects can still be safe to publish. Judging the two together
+    once retired the best phone frame in the drop as a flat "No". Use **Not as is** for safe-but-stale.
 
 - 75|509| **The profile lost two operations; give them a door.** Task 506 removed
   the whole left-hand control column and Tom agreed the page is better for it — *"You are right that
