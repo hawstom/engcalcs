@@ -225,7 +225,15 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   a tile box is square because the drawing frame is the tiles' own. **Storing the projection is
   forbidden:** `mercLat(mercY(lat))` differs in the last bits for 69.8% of latitudes, so it would
   rewrite every latitude on every open-and-save.
-  `dev/geographic-projects.md`.
+  **THE MISSION SCOPE IS A 300 km SYSTEM SPAN** (Tom, 2026-08-25), and it is a statement about who
+  this page is for rather than about arithmetic — a globe-spanning utility has a budget in trillions.
+  Nothing enforces it and nothing should without his word. What it protects is `geodesicMeters()`,
+  which is NOT a geodesic: it treats a leg as flat in the frame of its mid-latitude, and that is what
+  fills every `lenAuto` length. Measured against Vincenty in
+  `dev/lpn-spike/scope-of-service-harness.js`: **206 ppm at the 300 km scope, still 0.1% at double
+  it** — so "highly conservative" is his phrase and the number agrees. Full record, and the three
+  things the bound does NOT mean: `dev/geographic-projects.md` (§2b, and the rest of that file for
+  everything else geographic).
 - **Reads AND WRITES EPANET `.inp` files** (`js/lpn-inp.js` — one file, so one opinion about the
   format). Import takes the supported subset and reports every difference, never rejecting and never
   dropping silently; export shipped 2026-08-18 and returns 1,280 numeric tokens across Net1/2/3
@@ -592,9 +600,18 @@ US file made a round trip through two factors that are not exact inverses: **710
   recognize this unit" is a different message from "we cannot give you answers"; say both.
 - **The one legitimate exception is the coordinate origin shift**, and it shows the shape a real
   exception must have: `doc.origin` makes coordinates local so float32 rasterising cannot lose a
-  pipe at x ≈ 579,350; the absolute position is unchanged by construction, the origin is stored in
-  the file, and `dev/lpn-spike/local-origin-harness.js` counts the call sites. Reversible, stored,
-  and guarded — anything claiming to be an exception must be all three.
+  pipe at x ≈ 579,350 (Task 354) or a node at longitude −122 (Task 439). The absolute position is
+  unchanged **by construction**, and `dev/lpn-spike/local-origin-harness.js` counts the call sites.
+  Reversible, recoverable and guarded — anything claiming to be an exception must be all three.
+  - **The two kinds recover the origin differently, and only one stores it.** An XY grid stores
+    `origin` in the file. A GEOGRAPHIC document does not: it stores absolute longitude and latitude,
+    states `origin` as `{0, 0}`, and DERIVES the frame at load from its own extent, floored onto a
+    **1/128° power-of-two grid** so `(x − ox) + ox === x` exactly. Because the file already looked
+    like that, the format did not move — no v11, no migration.
+  - **Exactness needs nearness to the ORIGIN, not a small model**, which is the trap: an origin on
+    the 1/128° grid can sit a degree from a coordinate that is itself a hair from zero, so Sterbenz
+    does not save you. Both axes therefore carry the file's own value beside the drawn one
+    (`_xsrc`/`_ysrc`), believed only while the drawn number is still the one derived from it.
 - **Converting to SOLVE is not an exception**, because it does not touch the document.
 - **THE INPUT FILE IS CANONICAL, so nothing of ours can validate it.** Our conversion factors cannot
   check a user's numbers — the only correct property is that they come back out unchanged. Phrasing
