@@ -4,13 +4,16 @@ One line per file: what it shows, and whether it could go on a public page. Writ
 looking at each image; the images themselves are not in git. See `README.md` for the convention.
 
 **Publishable** means: nothing in frame identifies a real person, a real file path, a browser
-profile, or a client's work, and the consent banner is not showing. It is a judgement made once,
-here, so nobody has to re-make it every time an image is reached for.
+profile, or a client's work, and the consent banner is not showing. It is a PRIVACY test and nothing
+else, made once, here, so nobody has to re-make it every time an image is reached for. **No** is that
+test failing. **Not as is** is that test passing while something in the content — a defect since
+fixed, a stale icon, a hand annotation — means the frame needs work before it goes out. What a frame
+is not marked down for is how many panels are open; see the clutter entry below.
 
 | # | What it shows | Publishable | Notes |
 |---|---|---|---|
-| 0001 | Wide desktop: Find panel open over the grid network, Settings box open on Node/Link symbology, Profile tab drawn in the bottom pane | **No** | Panel still says the old "Find assets"; three panels open at once reads as clutter rather than capability |
-| 0002 | Same window with the Project menu open (Settings, Libraries, Profile, Tables, Scenarios, Calculate) and a Replace in progress — "Change 1 assets?" then "1 found" | **Not as is** | Good evidence of Find-and-replace, but four overlapping panels. Worth re-taking with only the Find panel up |
+| 0001 | Wide desktop, one frame doing four pictures' work: the Find panel open over a grid network, the Settings box open on node and link symbology with its per-value decimal spinners, the Profile drawn in the bottom pane, and two project tabs along the top | **Yes** | Privacy-clean: a synthetic grid, projects called Project1 and Project2, no browser chrome. **This row corrects an earlier judgement.** It was marked **No** for showing three panels at once; Tom, 2026-08-25: *"I disagree about clutter. In this case it's parsimonious, and that's why I did it."* A frame with four things working at once is an inventory, and the CAPTION is what makes it one -- name what is on display, one clause each. Two things date it and neither is the panel count: the box says the old "Find assets", and the menu bar says Project where it now says Water |
+| 0002 | The same window with four things on display at once: the Project menu open (Settings, Libraries, Profile, Tables, Scenarios, Calculate), the Libraries box on Patterns, a Replace mid-flight -- "Change 1 assets?" then "1 found" -- and the Profile still drawn below | **Yes** | Privacy-clean, same as 0001. **Also corrects an earlier judgement**: "four overlapping panels" was given as the reason not to publish it, and Tom overruled that on 2026-08-25. Written to a caption that enumerates -- the menu, the pattern library, the replace, the profile -- it is the densest single picture of the page we have. Dated the same two ways as 0001, "Find assets" and the Project menu name |
 | 0003 | Narrow window (~840 px), Net3 on the OSM street map, colour key showing Pressure and Flow bands, Settings stacked one-column | **Yes** | The best evidence that the layout reduces gracefully. Also a natural "Management" still for the landing page |
 | 0004 | Narrow window, the ColorBrewer scheme picker open over Net3 on satellite imagery | **Yes** | Shows the colour work; the Mapbox/OSM/Maxar credits are in frame, which is correct and should stay |
 | 0005 | Desktop, the examples gallery open on all seven cards | **Yes** | The obvious "what do I get" still. Card text is legible at full size |
@@ -50,7 +53,13 @@ here, so nobody has to re-make it every time an image is reached for.
 | 0039 | Bottom pane open on Profile, map above: ground surface, hydraulic grade line, pressure band, "Nodes: 26, length: 79161 ft" | **Not as is — bug evidence, Task 527** | The chart itself draws well and reads well. **Its axes do not:** the y ticks overprint into a solid smear and the x node labels are an unreadable scribble. That is the live defect and it is only the axes |
 | 0040 | The same Profile view scrolled, captured with the browser's own chrome in frame | **No** | The one phone frame that fails on the frame rather than the content: Chrome's URL bar showing `dev.hawsedc.com`, the tab count and the overflow menu. 0039 is the same view captured clean — use that. Same illegible axes (Task 527) |
 | 0041 | Bottom pane on the Pipes table, with Print table beside the tab row | **Not as is — bug evidence, Task 527** | **Checked and NOT a defect: the values are right.** Pipes 40, 50, 60 and 101 match `examples/Net3-World-lpn.json` exactly; pipe 20 reads diameter 1200 and k 12.2 against the file's 99 and 0, which are Tom's own unsaved edits (the tab shows `*Net3-World`) and are what raised the note he photographed. Nothing is clipped. The one defect is the header breaking "Roughnes/s, C" mid-word |
-| `Screenshot_20260825_012922.png` | The scenario menu open over the map — Base ticked, New scenario, Rename, Delete, Apply Base values to all scenarios — on **satellite** imagery rather than the street map the other eight use | **Not as is** | **Filename breaks the ordinal convention** (it is the grabber's own name); left as it is because it is Tom's file and not in git — index it here rather than rename it. The menu is well sized for touch. **Two supersessions: it is picture evidence for Task 528** — the menu hangs detached in mid-canvas instead of below the button that opened it — and the colour key it cuts off mid-list is answered by Task 529's **Off** placement |
+| 0042 | Phone, portrait: the scenario menu open over the network on satellite imagery -- Base ticked, New scenario..., Rename scenario..., Delete scenario, Apply Base values to all scenarios -- with both colour keys and the labels legend stacked down the right | **Not as is** | **This is the file the index used to list under the grabber's own name `Screenshot_20260825_012922.png`;** it has since been renamed to the ordinal convention and this row replaces that one. The menu is well sized for touch. **Three supersessions:** Task 528 (the menu hangs detached in mid-canvas rather than below the button that opened it), Task 529 (the colour key it cuts off mid-list now has an **Off** placement), and the toolbar's old plan-sheet Project button, since a water drop on a menu now called Water. The mode hint and the engine note are piled behind the labels legend at top left (Tasks 524, 525) |
+| 0043 | Phone, portrait, **shot on today's master**: Find and replace filling the screen -- What to search: Pipe, Property: Diameter, Condition: equal to, Value 30, the Find and Replace buttons, then "13 found. Click one to go to it." and the hit list beneath | **Yes** | **Published** on `screenshots.html`. The first phone frame in the drop that is both clean and current: the water-drop Water button is in the toolbar, the panel says "Find and replace" rather than 0001's old "Find assets", and there is no overlay pile because the panel owns the screen. It also answers the remake queue's "Find and replace, one panel", on a phone rather than on the desktop it was asked for |
+| 0044 | Byte-identical re-drop of 0040 | **No** | Same md5 as `0040.png` -- an accidental second copy, which costs nothing and is worth saying rather than describing twice. Fails for 0040's reason: Chrome's URL bar showing `dev.hawsedc.com`, the tab count and the overflow menu are in frame. 0039 is the same view captured clean |
+| 0045 | Byte-identical re-drop of 0039 | **Not as is** | Same md5 as `0039.png`: the bottom pane on Profile at phone width. The chart itself draws and reads well; its AXES are the live defect (Task 527, not superseded) -- the y ticks overprint into a smear and the x node labels are a scribble |
+| 0046 | Phone, portrait, on today's master: the network at street level on satellite, both colour keys down the right, the node/link labels legend top left, nothing else open | **Not as is** | Privacy-clean and current -- water-drop Water button, and the mode hint is gone (Task 524). What stops it is LIVE, not superseded: the labels legend and the orange EPANET engine note still print over each other in the top-left corner, so the corner is unreadable. That is why it did not get a plate. The frame the remake queue wants is this one with both legends set to **Off** (Task 529) |
+| 0047 | Phone, portrait, on today's master: the **Water** menu open directly beneath the button that opened it -- Settings, Libraries, Profile, Tables, Scenarios, Calculate, EPANET run report -- over the network at street level on satellite, the Flow key at the right, and the units, friction method and scenario stated along the bottom | **Yes** | **Published** on `screenshots.html`. The proof frame for Task 528: the menu hangs from its own button instead of floating in mid-canvas. Shows the water-drop icon in the toolbar and the whole menu at a size a thumb can hit. 0046's top-left overlap is behind the menu here and barely reads |
+| 0048 | Desktop, 1920 wide, **no panel open at all**: `Net3-Novato-CA-World.lwn` on satellite imagery over Novato, nodes coloured by pressure and links by velocity, both keys and the labels legend down the right, and a latitude-first coordinate readout in the status strip | **Not as is** | Privacy-clean, and the cleanest wide frame in the drop -- zero panels, which not even 0028 manages. **One thing dates it:** the menu bar still reads Water beside the old rolled-plan glyph rather than the water drop (`lib/Icons.lib.php`, 2026-08-25), so re-shoot it rather than publish it. Two tabs are open, `*Project1` and the model, which is honest rather than staged |
 
 ## What the drop has taught us
 
@@ -59,10 +68,16 @@ here, so nobody has to re-make it every time an image is reached for.
   georeferencing sequence adds a third: a real network placed on real ground and then read against
   it — 0028, where the profile pane is open under the map. It is the strongest still in the drop and
   the best candidate for the second half of the landing page's pair.
-- **One panel, deliberately placed.** Almost every desktop capture has two to four panels open at
-  once, because that is what using the page looks like; a shopper reads overlapping panels as
-  clutter. 0028 is the one capture that does not, and it is also the one that needs no explaining.
-  For anything public, open one panel and nothing else.
+- **A crowded frame is not automatically a cluttered one, and this index said otherwise for a
+  while.** Almost every desktop capture has two to four panels open at once, because that is what
+  using the page looks like. That was read here as clutter and it was the wrong reading. Tom,
+  2026-08-25: *"I disagree about clutter. In this case it's parsimonious, and that's why I did it.
+  'In this shot we see on display the Pump curves graphed in the Library, the Pipe Table at the
+  bottom pane, and ....'"* One frame showing four things working together does four pictures' work.
+  **The caption is what turns a pile into an inventory** -- write it as an enumeration, naming what
+  is on display, one clause each, and the reader counts capabilities instead of counting boxes. A
+  frame with nothing open (0028, 0048) is still the easiest picture to read, but that is a
+  preference and not a rule, and it is no longer a reason to mark a frame down.
 - **A panel dragged over the menu bar costs the page its identity.** In 0029–0031 the Settings box
   covers the title, the File menu and the tab strip, so the frame no longer says what application it
   is. Fine while working, wrong in a still.
@@ -78,7 +93,7 @@ here, so nobody has to re-make it every time an image is reached for.
 - **Two layout defects are on file only because somebody screenshotted them.** The Settings category
   index breaks words mid-word (0022–0023), and the colour key overlaps the label legend when both
   sit at the right edge (0030). Neither is on the roadmap.
-- **The phone session (0034–0041 and `Screenshot_20260825_012922.png`) paid for itself in one
+- **The phone session (0034–0042) paid for itself in one
   sitting.** Nine frames from Tom's first real use of the page on a phone, 2026-08-25, and they
   produced five tasks: 524 (overlays eating the canvas), 525 (an engine note a solve could not
   dismiss), 528 (a menu detached from its button), 529 (**Off** as a legend placement), and 527 for
@@ -87,7 +102,16 @@ here, so nobody has to re-make it every time an image is reached for.
   Five fixes landed after these were shot and none was on `dev.hawsedc.com` at the time, so eight of
   the nine show at least one defect that no longer exists. Every phone row names which task
   superseded it, so nobody re-diagnoses a fixed bug from a stale frame. **All nine also show the old
-  Project toolbar icon**, since replaced by a water drop.
+  Project toolbar icon**, since replaced by a water drop on a menu now called Water.
+- **The re-shoot answered it: 0043, 0046 and 0047 are the same phone after the fixes**, and two of
+  them are on the public page. The proof is in the frame rather than in a ledger citation -- the
+  water drop is in the toolbar, the mode hint is gone, and in 0047 the menu hangs from the button
+  that opened it. What the re-shoot did NOT clear is the top-left corner, where the labels legend
+  and the engine note still print over each other; that is live and 0046 is the evidence.
+- **A capture is dated by its ICONS faster than by anything else in it.** 0048 was dropped later
+  than 0043–0047 and is nonetheless the older-looking frame, because its menu bar carries the
+  rolled-plan glyph the Water menu had until 2026-08-25. When judging whether a frame is current,
+  look at the toolbar before reading the dialogs.
 - **Publishable and useful are different axes, and the phone rows were the first place that
   mattered.** These frames are clean by the privacy test — one panel of Tom's own example network,
   no chrome, no status bar, nothing identifying — and still mostly wrong to publish, because they
@@ -103,19 +127,21 @@ here, so nobody has to re-make it every time an image is reached for.
 
 ## The remake queue — what to shoot next
 
-**2026-08-25.** Twelve of these went onto the public page (`screenshots.html` in the
-librewaternet.org repository). This is the list of shots that would have gone too, and what stopped
-each one. Most are blocked by the frame rather than the software — the page is ready, the capture is
-not. **The two phone rows are the exception and are blocked by DATE:** the frames are clean, the
-software has moved on under them, and only a re-shoot fixes that.
+**2026-08-25, revised the same day after the phone re-shoot.** Fourteen of these are on the public
+page (`screenshots.html` in the librewaternet.org repository). This is the list of shots that would
+have gone too, and what stopped each one. Most are blocked by the frame rather than the software —
+the page is ready, the capture is not. **A row blocked by DATE is the harder kind:** the frame is
+clean, the software has moved on under it, and only a re-shoot fixes that. Two such rows closed on
+2026-08-25 and two more opened.
 
 Shoot these deliberately rather than at random, and crop to the PAGE, not the window.
 
 | Want | Why it is not already here | What a good frame looks like |
 |---|---|---|
-| **A phone, in tall mode, after the five fixes** | Nine phone frames now exist (0034–0041 and `Screenshot_...`), but they predate Tasks 524, 525, 528 and 529, so all but 0036 show a defect that is fixed. 0036 alone is publishable as is | The same Net3-World view re-shot on today's master: mode hint gone, engine note said once, legends set to **Off**. That is the picture behind the landing page's "works also on a phone in tall mode" |
-| **A phone frame with no bottom pane and no legends** | Every phone frame either buries the map under overlays or gives the drawing half to a pane. Task 529's **Off** placement makes a clean one possible for the first time | The network filling the map area on a phone, nothing over it but the status strip. Tom ruled the pane-covers-map case NOT a defect, so this is a marketing frame, not a bug fix |
-| **Find and replace, one panel** | 0001 and 0002 both show it with three or four panels open, and 0001 still says the old "Find assets" | Find open, everything else closed, mid-replace so the count is visible |
+| ~~A phone, in tall mode, after the five fixes~~ **DONE 2026-08-25** | 0043 and 0047 are the re-shoot: water-drop toolbar, no mode hint, and the menu hanging from its own button. Both are on `screenshots.html` | -- |
+| **A phone frame with no legends over the map** | Still open, and 0046 is the evidence: on today's master the labels legend and the engine note print over each other in the top-left corner, so the map's corner is unreadable | The network filling the map area on a phone with both legends set to **Off** (Task 529), nothing over it but the status strip. Tom ruled the pane-covers-map case NOT a defect, so this is a marketing frame, not a bug fix |
+| **A wide desktop frame with today's icons** | 0048 is the cleanest wide capture in the drop -- zero panels open -- but its menu bar carries the pre-2026-08-25 rolled-plan glyph instead of the water drop | The same view re-shot, or any wide view with nothing open. It is the frame the front door would use |
+| **Find and replace on the DESKTOP, current wording** | 0043 answers this on a phone. 0001 and 0002 answer it on the desktop but say the old "Find assets" and name the menu Project | The desktop panel mid-replace so the count is visible. Panel count is NOT a reason to re-take it -- see the clutter entry above |
 | **Romanian, after the unit fix** | 0026 is the language still and predates Task 521 — its status strip and colour key disagree about pressure units, which is fixed | Same view as 0026, retaken. Any of the 27 languages; Romanian is proven to fit |
 | **The Nominatim consent prompt** | 0011–0014 all have the browser's bookmarks bar and profile picture in frame | Just the dialog and the map. The consent wording is one of the most honest things in the suite and nothing shows it |
 | **"Place the model here permanently?"** | 0021, same browser chrome | The confirm on its own. It is the plainest one-way-door warning we have written |

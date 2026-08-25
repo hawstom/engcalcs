@@ -245,7 +245,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 		      // diagnostic is deliberately NOT, because a diagnostic appears BECAUSE OF THE MODEL
 		      // and the fit must not depend on the model -- the same rule that keeps
 		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js). ?>
-		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));display:flex;flex-direction:column;align-items:flex-start;gap:4px;pointer-events:none">
+		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:calc(4px + var(--lpn-overlay-top, 0px));left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));display:flex;flex-direction:column;align-items:flex-start;gap:4px;pointer-events:none">
 			<div id="lpn_mode_hint" style="font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px"></div>
 			<?php // The solver's standing diagnostic ("Add a reservoir"), true until the model
 			      // changes. Deliberately NOT d-print-none: if the drawing on screen has no answers,

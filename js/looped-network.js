@@ -3986,11 +3986,12 @@ var EngCalcs = EngCalcs || {};
 	}
 	function applyColorLegendPosition() {
 		var box = colorLegendBox; if (!box) { return; }
-		if (legendIsOff(settings.colorLegendPosition)) { box.style.display = 'none'; return; }
+		if (legendIsOff(settings.colorLegendPosition)) { box.style.display = 'none'; applyOverlayTopInset(); return; }
 		var pos = LEGEND_POSITIONS[settings.colorLegendPosition] || LEGEND_POSITIONS['bottom-right'];
 		box.style.top = pos.top; box.style.bottom = pos.bottom;
 		box.style.left = pos.left; box.style.right = pos.right;
 		box.style.transform = pos.transform;
+		applyOverlayTopInset();
 	}
 	function buildNodeEls(n) {
 		var circle = el('circle', {
@@ -17800,13 +17801,44 @@ var EngCalcs = EngCalcs || {};
 	// box can be absent -- nothing to show, and thematic mode -- so a function that also un-hid would
 	// be a second opinion about display and would put the legend back on a thematic map. The dropdown
 	// therefore calls the RENDER rather than this, and the render calls this last.
+	// **A LEGEND IN THE TOP-LEFT CORNER SHARES THAT CORNER WITH THE STATUS STACK, so the stack moves
+	// down.** `#lpn_map_overlay_tl` holds the mode hint and the solver's standing diagnostic at
+	// top: 4px, left: 4px. Nothing collided while both legends defaulted to the right; Task 527's
+	// phone ruling put the labels legend upper left (Tom, 2026-08-25) and they landed on each other
+	// — visible in screenshot 0046, the labels legend printing through the orange engine note.
+	//
+	// Published as a CUSTOM PROPERTY for the same reason `--lpn-overlay-right` is: the consumer reads
+	// `calc(4px + var(--lpn-overlay-top, 0px))`, so a second top-left overlay added later inherits
+	// the behaviour by using the variable rather than by somebody remembering this function exists.
+	// It carries the extra inset only; the 4px edge gap stays in the overlay's own style.
+	//
+	// NOT phone-only, deliberately. A user may put either legend top-left at any width, and the
+	// collision is the same one there.
+	function applyOverlayTopInset() {
+		var wrap = svg && svg.parentNode, h = 0, i, box;
+		if (!wrap || !wrap.style) { return; }
+		var boxes = [
+			{ el: document.getElementById('lpn_labels_legend'), pos: settings.legendPosition },
+			{ el: colorLegendBox, pos: settings.colorLegendPosition }
+		];
+		for (i = 0; i < boxes.length; i++) {
+			box = boxes[i];
+			if (!box.el || box.pos !== 'top-left' || legendIsOff(box.pos)) { continue; }
+			if (box.el.style.display === 'none') { continue; }
+			h = Math.max(h, Math.round(box.el.getBoundingClientRect().height) || 0);
+		}
+		// 4px of air between the legend and whatever the stack puts under it, and only when there is
+		// something to clear.
+		wrap.style.setProperty('--lpn-overlay-top', h ? (h + 4) + 'px' : '0px');
+	}
 	function applyLegendPosition() {
 		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }
-		if (legendIsOff(settings.legendPosition)) { box.style.display = 'none'; return; }
+		if (legendIsOff(settings.legendPosition)) { box.style.display = 'none'; applyOverlayTopInset(); return; }
 		var pos = LEGEND_POSITIONS[settings.legendPosition] || LEGEND_POSITIONS['top-right'];
 		box.style.top = pos.top; box.style.bottom = pos.bottom;
 		box.style.left = pos.left; box.style.right = pos.right;
 		box.style.transform = pos.transform;
+		applyOverlayTopInset();
 	}
 	// Re-applies the current effectiveFontSize() to every already-built text element and reflows what
 	// depends on it -- needed when the user edits Text size and whenever state.s changes, since a

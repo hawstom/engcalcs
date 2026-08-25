@@ -929,6 +929,10 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 		try {
 			return fn(stub.loadLoopedNetwork(
 				"\t\tdefaultSettings: defaultSettings, applySaved: applySaved,\n" +
+				"\t\tapplyLegendPosition: applyLegendPosition,\n" +
+				"\t\tapplyColorLegendPosition: applyColorLegendPosition,\n" +
+				"\t\tsetLegendPos: function (a, b) { settings.legendPosition = a; settings.colorLegendPosition = b; },\n" +
+				"\t\tmapWrap: function () { return svg && svg.parentNode; },\n" +
 				"\t\tserializeProject: serializeProject,\n" +
 				"\t\tgetSettings: function () { return settings; },\n" +
 				"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -977,6 +981,62 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 		reopened.colorLegendPosition === 'bottom-right', 'got ' + reopened.colorLegendPosition);
 	ok('...and keeps its labels-legend corner too -- a default is not an override',
 		reopened.legendPosition === 'top-right', 'got ' + reopened.legendPosition);
+
+// ---- 11. A TOP-LEFT LEGEND AND THE STATUS STACK DO NOT SHARE THE CORNER -------------------------
+//
+// Task 527's phone ruling put the labels legend upper left. `#lpn_map_overlay_tl` -- the mode hint
+// and the solver's standing diagnostic -- is ALSO at top-left, so the two landed on each other.
+// Screenshot 0046 is the evidence: the labels legend printing through the orange engine note.
+// **This is a regression the ruling introduced**, not a pre-existing defect; nothing collided while
+// both legends defaulted to the right.
+//
+// The fix follows `--lpn-overlay-right` exactly: a published custom property that the stack reads as
+// extra `top`, so a second top-left overlay added later inherits the behaviour instead of somebody
+// having to remember. **Asserted on the PROPERTY, not on pixels** -- nothing here rasterises, and
+// what a harness can honestly prove is that the number is published when a legend is in that corner
+// and withdrawn when it is not.
+{
+	// The stub's canvas has no parent until something appends it, and applyOverlayTopInset() writes
+	// the property onto `svg.parentNode` — the real page's `#lpn_map_wrap`. Give it one, or the
+	// function returns early and all four assertions below pass for the wrong reason.
+	const inset = (labels, colour) => atWidth(SMALL, (M) => {
+		M.buildLayers();
+		const canvas = global.document.getElementById('lpn_canvas');
+		if (canvas && !canvas.parentNode) {
+			const wrap = global.document.createElement('div');
+			wrap.appendChild(canvas);
+		}
+		M.setLegendPos(labels, colour);
+		M.applyLegendPosition();
+		M.applyColorLegendPosition();
+		const wrap = M.mapWrap();
+		return wrap && wrap.style ? (wrap.style.getPropertyValue('--lpn-overlay-top') || '') : '(no wrap)';
+	});
+	const away = inset('top-right', 'bottom-right');
+    ok('with no legend in the top-left corner the stack is not pushed down at all',
+		away === '0px' || away === '', 'got "' + away + '"');
+	const under = inset('top-left', 'bottom-right');
+	ok('a labels legend in the top-left corner publishes an inset for the status stack',
+		/^\d+px$/.test(under) && parseInt(under, 10) > 0, 'got "' + under + '"');
+	const off = inset('off', 'bottom-right');
+	ok('...and turning that legend Off withdraws the inset again',
+		off === '0px' || off === '', 'got "' + off + '"');
+	// **The colour key is asserted at the SOURCE, not by driving it, and the difference is worth
+	// stating.** `colorLegendBox` is a module variable set only when the colour legend is actually
+	// built, which this stub does not do — so driving it here would return early and pass for the
+	// wrong reason, which is the exact trap `dev/testing-notes.md` warns about. What IS checkable is
+	// the wiring question: both placers must call the inset, or a user who puts the colour key in
+	// that corner by hand gets the collision back. The pixels are the browser pass's job.
+	const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+	const placers = src.match(/function applyColorLegendPosition\(\)[\s\S]*?\n\t\}/);
+	ok('the colour key placer calls the inset too, so the corner is not phone-only',
+		!!placers && /applyOverlayTopInset\(\)/.test(placers[0]),
+		placers ? 'found ' + (placers[0].match(/applyOverlayTopInset/g) || []).length + ' call(s)' : 'placer not found');
+	// The consumer half: the markup must actually READ the property, or publishing it is theatre.
+	const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+	ok('and #lpn_map_overlay_tl really reads it, so publishing it is not theatre',
+		/id="lpn_map_overlay_tl"[^>]*top:calc\(4px \+ var\(--lpn-overlay-top, 0px\)\)/.test(php));
+}
 }
 
 // The reader's blind-spot report, scoped to selectors that could possibly reach what this file
