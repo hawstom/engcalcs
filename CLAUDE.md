@@ -284,7 +284,7 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
     `mpf-harness.js` and anchor against the source method. Recipe: `dev/calc-spike/README.md`.
 11. **Add the prefix to `prefixToTermNames()` in `dev/scripts/generate_translation_payloads.php`,**
     listing the `glossary.json` terms it uses. A missing prefix silently falls back to three default
-    terms, so every glossary entry written for the calculator — definitions, `preferred_translation`,
+    terms, so every glossary entry written for the calculator — definitions, `translations`,
     and the `avoid` arrays that are the whole point of a trap term — becomes invisible to its
     translation agents. Nothing warns you: payloads generate, `--check` says FRESH, the sprint runs,
     and the guards were never delivered. **Verify by reading `glossary_terms_by_prefix.<prefix>` out

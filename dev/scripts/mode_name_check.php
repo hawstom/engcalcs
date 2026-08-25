@@ -77,7 +77,11 @@ foreach ($langs as $lang => $path) {
         if ($own === null || $own === '') { continue; }   // not translated yet is not a disagreement
         foreach ($m['keys'] as $k) {
             if (!isset($vals[$k]) || $vals[$k] === '') { continue; }   // absent falls back to English
-            if (strpos($vals[$k], $own) !== false) { continue; }
+            /* CASE-INSENSITIVE, because a capital letter at the start of a sentence is not a second
+             * name. Turkish's `enlem/boylam` opens `Enlem/boylama dönüştür…` in sentence case and
+             * takes a dative suffix; the suffix is a substring match already, the capital was not,
+             * and reporting that as one mode with two names sent a reader to rewrite good Turkish. */
+            if (mb_stripos($vals[$k], $own, 0, 'UTF-8') !== false) { continue; }
             /* A language that keeps the English name gets the English spelling everywhere, which the
              * test above already accepts. This only fires when the anchor and the string disagree. */
             $findings[] = array($lang, $k, $own, $vals[$k]);

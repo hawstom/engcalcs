@@ -134,27 +134,22 @@ the block.
   - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
     drawing is still correct.
 
-- 100|513| **What sprint 459 did not finish: three named jobs, all small.**
-  Extracted on closing 459 so they are not re-proposed from scratch. None blocks anything.
-  - **Glossary write-back has NOT been done, and the SOP calls it mandatory before close.** The 26
-    agents each reported the terms they used and several justified them against their own file's
-    incumbents (Pashto counted `والو` 46 to `سوپاپ` 7 and kept the incumbent). That reasoning is in
-    the transcript and nowhere else.
-    - **CORRECTION, 2026-08-24: `preferred_translation` DOES NOT EXIST.** Zero of `glossary.json`'s
-      118 terms carry such a field; the decisions live in `translation_notes`, per language, in
-      prose. Do not add a second mechanism — write there.
-    - **And the transcript is not the only evidence.** What each language SHIPPED is on disk and is
-      countable, which is what the Pashto agent actually did. A script reporting, per glossary term
-      and per language, which rendering the lang files really use and how often would recover most
-      of this without anybody's memory — and would keep recovering it.
-  - **Nine mode-name disagreements survive in ru, sr and tr** (27 before the sprint). bg/bn/cs were
-    fixed mechanically by reverting `lpn_geomap` to `lat/lon`, which is what all six of their own
-    sibling strings already said. These three are different: anchor and siblings are both
-    translated, in different words. It needs each language's own vocabulary, not a sed.
-  - **Fourteen languages render `lpn_georef_asdeg_btn` in the old longitude-then-latitude order.**
-    English is now `lat/lon` (Tom, 2026-08-24) and the eleven carrying the literal `lon/lat` were
-    swapped; the rest translated the two words and need them reordered by someone who reads the
-    script. They are on the drift list, so the next sprint picks them up by itself.
+- 40|513| **Sprint 459's leftovers: two named strings nobody here can read.**
+  The three jobs this task carried are done (2026-08-25). The glossary write-back was done from the
+  SHIPPED STRINGS, not from the lost transcript — `dev/scripts/glossary_rendering_census.php` counts
+  which rendering each language really uses and how often, and its findings are written into the
+  `translation_notes` of flow, head, emitter, slope, ponding, elevation, link, tank and valve.
+  `mode_name_check.php` went from 21 findings to 1. What is left needs a reader of the script:
+  - **`ar` calls the lat/lon mode `جغرافي` ("geographic"), which is not a pair at all.** Its
+    `lpn_georef_asdeg_btn` now names latitude first, but it names the PAIR while every other `ar`
+    string names the mode, so the two still disagree. Resolving it means choosing an Arabic mode
+    name, which is a translation decision, not an ordering one.
+  - **`zh` renders the pair `经纬度`, longitude-first, and that is the lexicalized compound.**
+    `纬经度` is not Chinese. Either the compound stands as an exception or zh gets a different
+    phrasing; a non-reader must not choose.
+  - **THERE ARE TWO `ponding` ENTRIES IN `glossary.json` (ids 34 and 46)** and the strings say
+    entry 46 is the one in use — 15 languages ship its rendering, entry 34's appears 0 or 1 times in
+    20 of 26 files. Merging them is a glossary-structure call and is left for a human.
 
 - 75|520| **Go to… sets the map scale from the wrong latitude, so the model jumps size.**
   Found by `/code-review` 2026-08-24 while reviewing Task 517; PRE-EXISTING and not introduced by it.

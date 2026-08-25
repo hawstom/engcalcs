@@ -427,8 +427,11 @@ question about paths.
    the user's.** The launcher must then run `--check` immediately before spawning; it prints
    `FRESH`/`STALE` and exits non-zero if any payload is older than its inputs. **A non-zero exit is a
    hard stop.**
-3. **Verify `glossary.json` has `preferred_translation` populated** for the prefix's key terms,
-   especially for the anchor languages.
+3. **Verify `glossary.json` has `translations[<lang>]` populated** for the prefix's key terms,
+   especially for the anchor languages. That field is what a translation agent sees, under the name
+   `preferred_translation` — `generate_translation_payloads.php` projects it into the payload under
+   that name, and **the name exists nowhere else**. Never add a `preferred_translation` field to
+   `glossary.json`; the decision prose belongs in `translation_notes`.
 4. **State the delta count and which calculators are affected** before asking for authorization.
    **Delta zero means zero:** keys correctly byte-identical to English (symbols, eponyms, brand names,
    cognates) live in `dev/scripts/translation_exempt_keys.json` and are not counted, though they are
@@ -580,6 +583,15 @@ holds.
    every stage re-derived the same terminology judgments from scratch. A populated entry turns a
    "re-read every sibling key and infer consistency" task into a one-line lookup for the next agent,
    in the next category, in the next language pass.
+   **Do not do it from the agents' prose. Run `php dev/scripts/glossary_rendering_census.php`**, which
+   counts, per term and per language, which rendering the lang files ACTUALLY SHIP and how often.
+   Sprint 459 closed with no write-back at all and its transcript is gone; the strings were still on
+   disk, and the census recovered the terminology from them (ROADMAP Task 513). Agent prose is a
+   memory of a decision, the strings are the decision, and only one of the two survives the session.
+   The script never writes to `glossary.json`: a count is evidence of usage, not a verdict on the
+   right word, so a human or a reading agent decides and records it in `translation_notes`.
+   **There is no `preferred_translation` field** — the decisions live in `translation_notes`, per
+   language, in prose. Do not invent a second mechanism.
 5. **`php dev/scripts/detect_english_drift.php --baseline-new`** — a sprint is not finished until you
    run it. A key added and translated by a sprint stays `NEW` forever otherwise, because only
    `--update` could baseline it and `--update` is refused while any drift is open. That deadlock made
