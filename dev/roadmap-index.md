@@ -7,14 +7,15 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**72 open tasks.** Next (100): 2 · Soon (75): 11 · Someday (50): 5 · Maybe (25): 27 · Parked (5): 27
+**72 open tasks.** Next (100): 3 · Soon (75): 10 · Someday (50): 5 · Maybe (25): 27 · Parked (5): 27
 
-## 100 — Next (2)
+## 100 — Next (3)
 
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
+- Task 530 — Available fire flow at a hydrant, with the hydrant assembly modelled.
 
-## 75 — Soon (11)
+## 75 — Soon (10)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 408 — Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.
@@ -26,7 +27,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 510 — Named profiles: New, Rename, Delete, and a list to pick from.
 - ! Task 520 — Go to… sets the map scale from the wrong latitude, so the model jumps size.
 - ! Task 527 — What is left on a phone after Tom's own rulings: three small-screen defects.
-- Task 530 — Available fire flow at a hydrant, with the hydrant assembly modelled.
 
 ## 50 — Someday (5)
 

@@ -5971,7 +5971,7 @@ var EngCalcs = EngCalcs || {};
 	// Does the placement's turn actually move this picture? Measured as the corner travel not
 	// turning costs, in the image's OWN pixels, so a hair of rotation on a small picture is not
 	// reported as a defect and a real turn on a big one always is.
-	function georefBackdropTurned(t) {
+	function georefBackdropRotated(t) {
 		if (!backdrop || !t) { return false; }
 		var rad = (t.rotDeg % 360) * Math.PI / 180,
 			halfDiag = Math.hypot(backdrop.iw || 0, backdrop.ih || 0) / 2;
@@ -6791,7 +6791,7 @@ var EngCalcs = EngCalcs || {};
 		// and that is Tom's.
 		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here for good?')) { return; }
 		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
-		var unturned = georefBackdropTurned(georef.t);
+		var unrotated = georefBackdropRotated(georef.t);
 		if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
 		// **THE VIEW IS CAPTURED BEFORE THE REFRESH AND PUT BACK AFTER IT.**
 		// refreshAllFromDocument() ends in restoreViewOrFit(), whose answer is the view remembered
@@ -6821,11 +6821,11 @@ var EngCalcs = EngCalcs || {};
 		// **A PICTURE THAT COULD NOT BE TURNED SAYS SO.** Two whole sentences joined, not a label
 		// built from fragments: the second is only true when the placement was turned and there was
 		// an image to turn, and saying nothing would leave a site plan silently off its own network.
-		// PLACEHOLDER ENGLISH -- `lpn_georef_backdrop_unturned` has no language key yet, and the
-		// wording is Tom's to write (Task 436).
+		// Wording and key name are Tom's, 2026-08-25. He chose ROTATED over "turned", so the key and
+		// the local both follow the word a user will read.
 		setNotice((pc.lpn_georef_done || 'This is a lat/lon project now. Drag any element to fine-tune it.')
-			+ (unturned ? ' ' + (pc.lpn_georef_backdrop_unturned
-				|| 'The background image was moved and resized with the model, but it could not be turned. Use Background image > Move to line it up.') : ''));
+			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
+				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.') : ''));
 	}
 	function georefCancel() {
 		if (!georef) { return; }

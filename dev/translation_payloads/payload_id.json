@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1344,
-        "delta_key_count": 4,
+        "expected_key_count": 1345,
+        "delta_key_count": 5,
         "exempt_key_count": 34,
         "exempt_keys": [
             "u_imgd",
@@ -454,12 +454,14 @@
     },
     "keys_to_translate": {
         "lpn_geomap": "lat\/lon",
+        "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off"
     },
     "keys": {
         "lpn_geomap": "lat\/lon",
+        "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off"
@@ -478,6 +480,22 @@
                     "key": "lpn_file_import_geo",
                     "value": "Ubah ke lat\/lon…",
                     "english": "Import xy to lat\/lon…"
+                }
+            }
+        },
+        "lpn_georef_backdrop_unrotated": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_done",
+                    "value": "Ini sekarang adalah proyek lat\/lon. Seret elemen mana pun untuk memindahkannya lebih dekat ke posisi sebenarnya.",
+                    "english": "This is a lat\/lon project now. Drag any asset to move it closer to where it really is."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_on_map",
+                    "value": "Proyek ini sudah dalam lat\/lon.",
+                    "english": "This project is already on lat\/lon."
                 }
             }
         },

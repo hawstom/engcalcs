@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 1344,
-        "delta_key_count": 4,
+        "expected_key_count": 1345,
+        "delta_key_count": 5,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -437,18 +437,36 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "keys": {
+        "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "key_context": {
+        "lpn_georef_backdrop_unrotated": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_done",
+                    "value": "此项目现在是经纬度项目。拖动任意元件，可将其移动到更接近实际位置的地方。",
+                    "english": "This is a lat\/lon project now. Drag any asset to move it closer to where it really is."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_on_map",
+                    "value": "此项目已经处于经纬度状态。",
+                    "english": "This project is already on lat\/lon."
+                }
+            }
+        },
         "lpn_scenario_mark_tip": {
             "reason": "missing",
             "current_value": null,

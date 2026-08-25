@@ -113,54 +113,52 @@ the block.
     entry 46 is the one in use — 15 languages ship its rendering, entry 34's appears 0 or 1 times in
     20 of 26 files. Merging them is a glossary-structure call and is left for a human.
 
-- 75|530| **Available fire flow at a hydrant, with the hydrant assembly modelled.**
-  Tom, 2026-08-25, promoting `utility-planning-engineer`'s own first wish: *"Let's do it at least 75
-  priority."* The question is *how much can this hydrant deliver while a critical node holds
-  >= 20 psi?* Flow and pressure trade against each other, so it is found by search: guess a hydrant
-  demand, solve, check the residual, bisect. Today the user does it by hand with scenario overrides,
-  which works and is unautomated only at the search step. AWWA M31 defines the required flow as the
-  rate at 20 psi residual for a stated duration; EPANET has no built-in tool for it, so this is not
-  a gap against EPANET.
-  - **THE HYDRANT ASSEMBLY IS PART OF THE ANSWER, AND THIS IS THE HALF THAT IS TOM'S.** His ruling,
-    2026-08-25, and it is scope rather than method: *"We must either ask or disclose our assumptions
-    about the diameter, roughness, k, and length of a hydrant and lateral assembly. The fire flow
-    wizard must include this add-on to the entered assets of the system, and this is an ad-hoc
-    add-on applied before asserting anything about fire flow."*
-    - So the wizard **adds an element to the network** — a lateral and a hydrant, with a diameter, a
-      roughness, a minor-loss `k` and a length — solves through it, and reports the flow at the
-      hydrant outlet, not at the main. **Ask or disclose: never silently assume.**
-    - **The add-on is AD-HOC and must not become part of the user's document.** It is the same
-      boundary the solve already respects — we compute from a copy — and the reason is stronger
-      here, because a hydrant assembly the user never drew must not appear in their asset list, in
-      their `.inp` export, or in a saved file.
-    - It also answers the failure he raised first: a report that a 150 mm barrel passes an enormous
-      flow. With the assembly in the model that number cannot arise, because the barrel is in the
-      hydraulics rather than in a caveat.
-  - **RESEARCH DONE 2026-08-25, and it CORRECTS THE PREMISE.** Full findings and citations:
-    `dev/agents/utility-planning-engineer/journal.md`. The four that change what gets built:
+- 100|530| **Available fire flow at a hydrant, with the hydrant assembly modelled.**
+  Promoted from the `utility-planning-engineer`'s own wish list (Tom, 2026-08-25). *How much can
+  this hydrant deliver while a critical node holds >= 20 psi?* Flow and pressure trade, so it is a
+  search: guess a hydrant demand, solve, check the residual, bisect. Today it is done by hand with
+  scenario overrides. AWWA M31 defines the required flow at 20 psi residual; EPANET has no built-in
+  tool for it, so this is not a gap against EPANET.
+  - **THE ASSEMBLY IS PART OF THE ANSWER, AND THE STANDARD IS NON-NEGOTIABLE.** Tom, 2026-08-25:
+    *"including **some** k whatsoever is non-negotiable"*, and *"we must either ask or disclose our
+    assumptions about the diameter, roughness, k, and length of a hydrant and lateral assembly. The
+    fire flow wizard must include this add-on to the entered assets of the system, and this is an
+    ad-hoc add-on applied before asserting anything about fire flow."*
+    - **BARREL + LATERAL + k**, agreeing with the research: model the hydrant's own waterway as a
+      short pipe at its real diameter, in series with the lateral, AND carry a k. Not one or the
+      other — a k of zero is not an option here.
+    - **THE DANGER IS THAT FRICTION IS NOT DOMINANT.** The runs are so short that minor losses
+      carry the answer, so this is *"the one place where we must most necessarily provide k guidance
+      and demand reasonable k."* **Research it to be standard; if the research is thin, be
+      reasonable and do not swallow a camel.**
+    - **The add-on is AD-HOC and never enters the user's document** — not the asset list, not a
+      saved file, not the `.inp` export. Same boundary the solve already keeps.
+    - **A FIRE HYDRANT LIBRARY IS SAVED WITH THE PROJECT** (Tom). So a hydrant type is a reusable
+      named thing, stored in the project file like any other user data, inheriting every rule there.
+  - **Fire hose losses are OUT OF SCOPE and that is deliberate** — *"we can safely leave the fire
+    hose losses to somebody else."* The one alternative he left open: a *"to the building"* analysis
+    including the fountain stream, **if that is standard**. Research decides; do not build it on a
+    hunch.
+  - **RESEARCH ROUND 1 DONE 2026-08-25** (`dev/agents/utility-planning-engineer/journal.md`), and it
+    corrected the premise. The four that change what gets built:
     1. **150 mm is the hydrant's SHOE, not its waterway.** AWWA C502 sets the main-valve waterway at
-       **4½ or 5¼ in (114–133 mm)** behind a 6 in mechanical-joint inlet — two different numbers on
-       one hydrant. Modelling "a 150 mm hydrant" as a single 150 mm pipe would leave the real
-       constriction out of the model and reproduce **exactly the overstatement this task exists to
-       prevent**.
-    2. **There is no publicly reachable minor-loss `k` or head-loss curve for a hydrant waterway.**
-       AWWA M17 is paywalled; no manufacturer publishes one. The agent's answer, tagged SPECULATION
-       and wanting a second look: **do not invent a `k`** — model the barrel as a short pipe at its
-       waterway diameter in series with the lateral, and the loss falls out of the machinery already
-       in `js/PipeHydraulics.lib.js`. **Do NOT import the pitot Cd (0.90/0.80) as a `k`;** it
-       converts a field pitot reading to gpm and is a different quantity that merely sounds adjacent.
-    3. **Ask or disclose, decided per quantity.** LENGTH must be asked — five agency standards span
-       25–100 ft for the same pipe, because it is "how far is the main". Diameter carries a
-       disclosed 6 in; roughness a disclosed cement-lined DI C≈120–140, which is the cheapest of the
-       four to get wrong (hundredths of a foot over 50 ft).
+       **4½ or 5¼ in (114–133 mm)** behind a 6 in mechanical-joint inlet. Modelling "a 150 mm
+       hydrant" as one 150 mm pipe leaves the real constriction out and reproduces **exactly the
+       overstatement this task exists to prevent**.
+    2. **No publicly reachable minor-loss `k` or head-loss curve for a hydrant waterway** — AWWA M17
+       paywalled, no manufacturer publishes one. **Do NOT import the pitot Cd (0.90/0.80) as a `k`;**
+       it converts a field pitot reading to gpm and is a different quantity that merely sounds
+       adjacent. Round 2 of the research is aimed squarely at this gap.
+    3. **Ask or disclose, per quantity.** LENGTH must be asked — five agency standards span 25–100 ft
+       for the same pipe. Diameter carries a disclosed 6 in; roughness a disclosed cement-lined DI
+       C≈120–140, the cheapest of the four to get wrong.
     4. **A "rated" flow is a SYSTEM measurement, not a hydrant property** — NFPA 291 rates what the
-       system delivered through that hydrant at 20 psi residual, at that location. Available fire
-       flow is quoted **at the outlet**, not at the main. **ISO caps single-hydrant credit at
-       1,500 gpm** regardless of what the hydraulics compute; that is the "standard care" rule.
+       system delivered through that hydrant at 20 psi, at that location. Available fire flow is
+       quoted **at the outlet**. **ISO caps single-hydrant credit at 1,500 gpm** whatever the
+       hydraulics say.
   - The search itself is believed small — a loop around the existing sub-second solve, plus naming
     the hydrant node and the critical node. **Not designed; re-derive that estimate before quoting
-    it.** The agent's own ranking, and its refusal to call this a glaring miss, are in
-    `dev/agents/utility-planning-engineer/wishlist.md`.
+    it.**
 
 - 75|520| **Go to… sets the map scale from the wrong latitude, so the model jumps size.**
   Found by `/code-review` 2026-08-24 while reviewing Task 517; PRE-EXISTING and not introduced by it.

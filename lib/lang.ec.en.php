@@ -1446,6 +1446,7 @@ $ec_lang['lpn_georef_rotation']='Turn anticlockwise (degrees)';
 $ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model, anticlockwise, so that its north points north.';
 $ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag single assets afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.';
 $ec_lang['lpn_georef_done']='This is a lat/lon project now. Drag any asset to move it closer to where it really is.';
+$ec_lang['lpn_georef_backdrop_unrotated']='The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.';
 $ec_lang['lpn_georef_on_map']='This project is already on lat/lon.';
 $ec_lang['lpn_georef_empty']='That file has no network in it, so there is nothing to place.';
 $ec_lang['lpn_georef_unavailable']='The placement tool did not load. Reload the page and try again.';

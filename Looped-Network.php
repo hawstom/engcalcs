@@ -1296,6 +1296,7 @@ EngCalcs.pageConfig = {
 	lpn_georef_asdegrees: <?=json_encode($ec_lang['lpn_georef_asdegrees'])?>,
 	lpn_georef_confirm: <?=json_encode($ec_lang['lpn_georef_confirm'])?>,
 	lpn_georef_done: <?=json_encode($ec_lang['lpn_georef_done'])?>,
+	lpn_georef_backdrop_unrotated: <?=json_encode($ec_lang['lpn_georef_backdrop_unrotated'])?>,
 	lpn_georef_on_map: <?=json_encode($ec_lang['lpn_georef_on_map'])?>,
 	lpn_georef_empty: <?=json_encode($ec_lang['lpn_georef_empty'])?>,
 	lpn_georef_unavailable: <?=json_encode($ec_lang['lpn_georef_unavailable'])?>,

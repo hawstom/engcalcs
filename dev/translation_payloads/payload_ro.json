@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 1344,
-        "delta_key_count": 4,
+        "expected_key_count": 1345,
+        "delta_key_count": 5,
         "exempt_key_count": 30,
         "exempt_keys": [
             "u_imgd",
@@ -450,12 +450,14 @@
     },
     "keys_to_translate": {
         "lpn_geomap": "lat\/lon",
+        "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off"
     },
     "keys": {
         "lpn_geomap": "lat\/lon",
+        "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off"
@@ -474,6 +476,22 @@
                     "key": "lpn_file_import_geo",
                     "value": "Conversie în lat\/lon…",
                     "english": "Import xy to lat\/lon…"
+                }
+            }
+        },
+        "lpn_georef_backdrop_unrotated": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_done",
+                    "value": "Acesta este acum un proiect lat\/lon. Trageți orice element pentru a-l apropia de locul unde se află cu adevărat.",
+                    "english": "This is a lat\/lon project now. Drag any asset to move it closer to where it really is."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_on_map",
+                    "value": "Acest proiect este deja pe lat\/lon.",
+                    "english": "This project is already on lat\/lon."
                 }
             }
         },
