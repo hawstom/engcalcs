@@ -191,6 +191,10 @@ the block.
     stored `units` map — an old project carrying both must open without asking anything.
   - **Velocity and gradient are results-only and always were**, so "one set" is not a straight merge:
     it is the input set plus the two that never had an input twin.
+  - **BUILT.** One strip of eight; `reconcileLegacyUnits()` is the single migration site and **the
+    input unit wins** where an old file's two maps disagree — it says what the stored numbers MEAN.
+    `dev/lpn-spike/unit-set-harness.js`. For Tom: `lpn_units_group_inputs` and
+    `lpn_units_group_results` are now rendered by nothing.
 
 - 25|515| **The Settings category index breaks its own labels mid-word.**
   "Visualizati / on", "Node symbolog / y", "Map appearan / ce" -- visible in screenshots 0022, 0023,
