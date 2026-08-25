@@ -340,6 +340,19 @@ the block.
   - **[H] The voice is his and the guide must quote him rather than paraphrase.** Where a ruling was
     a one-off with no principle behind it, say so instead of inventing the principle.
 
+- 75|533| **Renaming a link leaves `incidentLinks` pointing at the old id.**
+  Found 2026-08-25 by the Task 502 agent while building Text-on-a-link, and **left unfixed on
+  purpose** — it was outside that track's territory and is pre-existing, not something 502
+  introduced. Its harness says where it declines to assert it, which is the honest form.
+  - `applyLinkRename()` updates the link but does not remap `incidentLinks`, so the index still
+    holds the OLD id. **Move a node after renaming one of its links and the drag walks into a
+    missing `linkEls` entry.** Rename, then drag: that is the whole reproduction.
+  - It is the same shape as the defect Task 502's own index had to avoid — a second map keyed by id
+    that a rename can desynchronise. **Look for the others while you are in there**: `labelsByAnchor`
+    and the new `labelsByLinkAnchor` are keyed the same way, and a node rename is a real gesture too.
+  - **Not observed in the wild**, which is why it is 75 and not 100: renaming a link and then
+    dragging one of its nodes without an intervening redraw is a narrow path. It is still a throw.
+
 - 75|531| **Tag the examples: US/SI, design/maintenance, xy/lat-lon.**
   Tom, 2026-08-25: *"Reference 348. Phase 1 can be adding labels, tags, or keywords to the
   examples."* **Task 348 is sub-categories and paging in the gallery, and is deliberately unbuilt at
