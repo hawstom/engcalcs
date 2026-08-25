@@ -288,7 +288,13 @@ global.window.bootstrap.Tooltip.getInstance = () => null;
 // Read by ALL THREE checks below, not only the dangling one: a key that has not reached the lang
 // file has not reached Looped-Network.php's pageConfig either, and cannot -- an emitted
 // `$ec_lang['...']` that does not exist is the "undefined" pageconfig_check.php exists to stop.
-const PENDING_KEYS = [];
+const PENDING_KEYS = [
+  // Task 436: the wizard now carries a background image onto the map, and a picture cannot be
+  // TURNED (its transform is translate + uniform scale, and the shipped world-file refusal says so
+  // in 27 languages). georefFinish() therefore says the image was moved and resized but not turned.
+  // The English in the fallback is a PLACEHOLDER; the wording is Tom's.
+  'lpn_georef_backdrop_unturned'
+];
 function pending(k) { return PENDING_KEYS.indexOf(k) >= 0; }
 
 // --- 4. every tip key the JS reads actually exists in the lang file -----

@@ -8,7 +8,8 @@ interface — see §3.
 
 Code: `js/lpn-georef.js` (pure math), the `georef*` section of `js/looped-network.js` (the tool),
 `#lpn_georef_bar` in `Looped-Network.php`. Harnesses: `dev/lpn-spike/georef-harness.js` (arithmetic),
-`dev/lpn-spike/georef-place-harness.js` (the flow).
+`dev/lpn-spike/georef-place-harness.js` (the flow), `dev/lpn-spike/georef-carry-harness.js` (what the
+placement carries and what Ctrl+Z gives back).
 
 ---
 
@@ -94,6 +95,11 @@ Labels and the solver are **off** for the whole of it, and come back on Finish o
   tested, and picking two survey points off a basemap is the *accurate* way to georeference. It is not
   the first-run interface because it requires the user to already know two positions on their own
   drawing. It is the natural home for a later "I have coordinates for these two hydrants".
+  **What that door would cost, priced 2026-08-25 (Task 436):** the code is small — pick a node, read
+  a `lat, lon` with the `parseLatLon()` that already exists, twice, then `georefSetTransform()` — but
+  it needs a BUTTON on `#lpn_georef_bar` in `Looped-Network.php` and about five new strings, and the
+  wording is Tom's. It is a wording decision wearing a feature's clothes, which is why it is still
+  waiting.
 - **Editing is locked while placing.** `georefActive()` gates the same seams `regMode` does. The
   transform re-derives every point from a held-aside source array by INDEX, so an element added
   mid-placement would shift every index after it. Panning still works, because looking at where you
@@ -101,7 +107,8 @@ Labels and the solver are **off** for the whole of it, and come back on Finish o
 
 ## 4. The properties the harnesses pin
 
-`dev/lpn-spike/georef-place-harness.js` (arithmetic through the page) and
+`dev/lpn-spike/georef-place-harness.js` (arithmetic through the page),
+`dev/lpn-spike/georef-carry-harness.js` (the background image and Ctrl+Z) and
 `dev/browser-pass/specs/place.js` (the gestures, in a real browser).
 
 - **Cancel is exact, `===`, after two steps and a hundred adjustments.** Every preview re-derives from
@@ -118,6 +125,13 @@ Labels and the solver are **off** for the whole of it, and come back on Finish o
   outward Y-UP frame. A symmetric test network would never reveal a missing flip, so the harness uses
   an L-shaped one.
 - **A project already on the map is refused, not re-placed.**
+- **The background image comes along, and is graded against the DRAWING rather than against a ground
+  distance** — the picture is pinned to two nodes, so "did it come along" is a comparison against the
+  model and not against a remembered number. Its east-west scale matches the model to 1e-12; the
+  north-south residual is printed.
+- **Ctrl+Z after Finish gives back the exact grid coordinates, the exact backdrop placement, and the
+  camera** — and an ordinary undo, of an elevation, leaves the camera alone. Both halves are asserted,
+  because a view restored on every undo would be its own defect.
 
 ## 5. Known limits
 
@@ -125,14 +139,34 @@ Labels and the solver are **off** for the whole of it, and come back on Finish o
   from it: 0.015% over 5 km at latitude 38, 0.034% at latitude 60, ten times that over 50 km. The
   anchor is the model's own centre, which halves the worst case for free. Numbers and their latitude
   dependence are measured in `dev/lpn-spike/georef-harness.js`.
-- **A background image is not carried.** `backdrop.tx/ty` is in the grid's frame and is left alone;
-  a site plan behind a now-geographic model will be in the wrong place. `eachStoredPoint()` does visit
-  the backdrop for `doc`-shaped objects, but the tool captures from the live `doc`, whose backdrop
-  lives in a module variable outside it. Worth a task when somebody actually has both.
+- **A background image IS carried, and it cannot be TURNED.** Shipped 2026-08-25 (Task 436), on
+  Tom's *"it didn't occur to me that anybody would use a backdrop for a geographic project. They
+  could."* The wizard captures the image's CENTRE alongside the model's points, re-derives it from
+  the source on every preview like everything else, and puts it back exactly on Cancel. Two limits
+  are real and stated rather than hidden:
+  - **It moves and resizes; it does not turn.** A backdrop's transform is translate plus one uniform
+    scale — `applyScaleEntry()` refuses a rotating world file in a sentence already shipped in 27
+    languages — so a turned placement lands the picture centred and sized and unturned, and
+    `georefFinish()` says so. Giving a backdrop a rotation is a change to what that shipped sentence
+    promises, and therefore Tom's.
+  - **Its scale is exact east-west and short by M / N north-south, about 0.4% at mid latitudes.**
+    `mercY()` is the spherical Mercator formula at a geodetic latitude (what every tile server does),
+    so a drawing unit north is not quite as many frame units as one east. The model carries that
+    stretch because it is drawn in the frame; one uniform scale cannot. Measured, not asserted away,
+    in `dev/lpn-spike/georef-carry-harness.js`.
+  - **The live backdrop is not in `doc`**, so `eachStoredPoint()` cannot reach it and every pass that
+    walks the document has to be told about it separately. There are two: the wizard, and Task 439's
+    `rebaseLiveGeoDoc()` — which was silently leaving it behind until this task, and would have put a
+    site plan half a degree from its own network the moment one was carried.
 - **There is no place-name search** — Task 437. It needs a geocoder, which is a SECOND third-party
   host on a page whose privacy claim is that the tile server is the only one. Tom's call.
-- **Finish is not undoable.** Cancel is the way back during placement; after Finish the route back is
-  closing the project without saving. The confirm says so.
+- **Finish IS undoable** (Task 436). The snapshot is taken at `georefStart()`, before one number
+  moves, and pushed only if the user commits — so Ctrl+Z gives back the drawing they opened, `===`,
+  rather than a round trip through the transform. Every undo snapshot now carries `coords` and
+  `basemap`, and the VIEW is restored on the one undo that changes which frame the document is in: a
+  camera position means nothing in the other frame, and undoing a diameter must not move the map.
+  The confirm stays, because undo is a net and not a door — twenty snapshots deep, gone at the next
+  project switch, and never in a file.
 - **The display is CONFORMAL since Task 145's projection seam shipped** — the drawing frame is Web
   Mercator, so a square on the ground is drawn square and the east-west stretch this list used to
   name (27% at 38°) is gone. That also retired the limit beside it: a detached model no longer
@@ -143,8 +177,8 @@ Labels and the solver are **off** for the whole of it, and come back on Finish o
   transform.** That is unrelated and unchanged: the transform maps a drawing onto the GROUND in
   metres, and the projection maps the ground onto a SCREEN. Do not let the second talk the first
   into a per-axis scale.
-- **The conversion mutates the OPEN project.** Cancel is the only way back during placement, and
-  after Finish the route back is closing without saving — which puts the user's own XY file one
+- **The conversion mutates the OPEN project.** Cancel is the way back during placement and Ctrl+Z is
+  the way back after Finish; both are in-memory, so saving in between still puts the user's own XY file one
   Save away from being overwritten by a lat/lon one. Tom asked on 2026-08-18 whether the conversion
   should instead import into a NEW lat/lon project; the recommendation is yes, and it is his call
   and not a change this tool has made. An `.inp` import already lands in a new tab, so the shape
