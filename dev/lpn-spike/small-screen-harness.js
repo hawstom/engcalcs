@@ -888,6 +888,97 @@ console.log('\n--- a box on a short screen, and the pane tables (Tom\'s items 5 
 		'got ' + winning(RULES, status, SMALL, DOC_IDS, false, 'max-width'));
 }
 
+// ============================================================================================
+// 10. THE TWO LEGENDS' DEFAULT CORNERS DIFFER ON A PHONE (ROADMAP Task 527)
+// ============================================================================================
+// Tom, 2026-08-25: "527 on phone, color legend upper right and label legend upper left." Task 516
+// is the same collision on the desktop and he was explicitly not worried about it there, so the
+// desktop corners are asserted UNCHANGED beside every phone assertion -- a default that leaked
+// upward would move two boxes on every existing user's map.
+//
+// **THIS IS A DEFAULT, AND THE EXPENSIVE FAILURE IS FOR IT TO ACT LIKE AN OVERRIDE.** A placement
+// is stored in the project (settings is serialized whole), so a project saved on a desktop and
+// opened on a phone must open in the corner it was saved in. That is the last assertion here, and
+// it goes through the real applySaved() rather than through a modelled merge.
+//
+// Unlike everything above, this cannot be answered from the stylesheet: the corner is a settings
+// value, not a rule. So the module is LOADED AGAIN at each width and asked what it decided. This is
+// the last section in the file for that reason -- a second module instance reassigns the page-level
+// globals, and nothing after it may depend on the first.
+console.log('\n--- the corners a first-time visitor gets, and the corner a saved project keeps ---');
+{
+	// ONE BREAKPOINT, ASKED TWICE: the stylesheet asks it as a media query and defaultSettings()
+	// asks it through matchMedia. This is the only place the two 640s could drift apart, so the
+	// number is read out of the JS source and matched against the media condition of the rule that
+	// starts the phone pass -- the page-title rule, Tom's item 1.
+	const jsSrc = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
+	const jsQuery = /matchMedia\('\(max-width:\s*(\d+)px\)'\)/.exec(jsSrc);
+	ok('js/looped-network.js decides "small screen" with a max-width media query', !!jsQuery);
+	const titleRule = RULES.find((r) => /#ec-page-title/.test(r.sel) && r.media.some((m) => /max-width/.test(m)));
+	const cssPx = titleRule && /max-width:\s*(\d+)px/.exec(titleRule.media.join(' '));
+	ok('...at the same breakpoint the phone pass itself lives at',
+		!!(jsQuery && cssPx && jsQuery[1] === cssPx[1]),
+		'js ' + (jsQuery && jsQuery[1]) + ' vs css ' + (cssPx && cssPx[1]));
+
+	// defaultSettings() reads the viewport WHEN IT IS CALLED, so every question below is asked
+	// inside the width it is about -- including the module load itself, whose `var settings =
+	// defaultSettings()` runs at module scope.
+	function atWidth(px, fn) {
+		const prev = global.window.innerWidth;
+		global.window.innerWidth = px;
+		try {
+			return fn(stub.loadLoopedNetwork(
+				"\t\tdefaultSettings: defaultSettings, applySaved: applySaved,\n" +
+				"\t\tserializeProject: serializeProject,\n" +
+				"\t\tgetSettings: function () { return settings; },\n" +
+				"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
+				"\t\t\tworld = el('g', {}, svg);\n" +
+				"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
+				"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
+				"\t\t\tlabelsLayer = el('g', {}, world);\n" +
+				"\t\t\trubberBandEl = el('line', {}, world); }\n"));
+		} finally { global.window.innerWidth = prev; }
+	}
+
+	// The stub's own claim first. It answers a width query from innerWidth, and a stub that had gone
+	// back to a flat `false` would make every phone assertion below pass as a desktop.
+	ok('the stub answers a width query from the viewport it is pretending to be',
+		atWidth(SMALL, () => global.window.matchMedia('(max-width: 640px)').matches) === true &&
+		global.window.matchMedia('(max-width: 640px)').matches === false);
+
+	const phone = atWidth(SMALL, (M) => M.defaultSettings());
+	ok('a phone opens with the COLOUR key in the upper right',
+		phone.colorLegendPosition === 'top-right', 'got ' + phone.colorLegendPosition);
+	ok('...and the LABELS legend in the upper left, so the two do not stack',
+		phone.legendPosition === 'top-left', 'got ' + phone.legendPosition);
+
+	const desk = atWidth(WIDE, (M) => M.defaultSettings());
+	ok('the desktop colour key is untouched, still bottom right',
+		desk.colorLegendPosition === 'bottom-right', 'got ' + desk.colorLegendPosition);
+	ok('...and the desktop labels legend is untouched, still top right',
+		desk.legendPosition === 'top-right', 'got ' + desk.legendPosition);
+
+	// **A STORED CHOICE SURVIVES.** A project serialized on a desktop, opened at 360px: both corners
+	// must come back as they were saved, not as the phone's defaults. Serializing on the desktop
+	// instance is what makes the fixture the page's own writing rather than two retyped strings.
+	const savedOnPc = atWidth(WIDE, (M) => {
+		M.buildLayers();
+		return JSON.parse(JSON.stringify(M.serializeProject()));
+	});
+	ok('a project records the placement at all -- otherwise the case below is vacuous',
+		!!(savedOnPc.settings && savedOnPc.settings.legendPosition === 'top-right' &&
+			savedOnPc.settings.colorLegendPosition === 'bottom-right'));
+	const reopened = atWidth(SMALL, (M) => {
+		M.buildLayers();
+		M.applySaved(savedOnPc);
+		return M.getSettings();
+	});
+	ok('a project saved on a desktop keeps its colour-key corner when opened on a phone',
+		reopened.colorLegendPosition === 'bottom-right', 'got ' + reopened.colorLegendPosition);
+	ok('...and keeps its labels-legend corner too -- a default is not an override',
+		reopened.legendPosition === 'top-right', 'got ' + reopened.legendPosition);
+}
+
 // The reader's blind-spot report, scoped to selectors that could possibly reach what this file
 // checks. A rule about print sheets or curve tables is none of this check's business.
 {

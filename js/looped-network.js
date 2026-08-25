@@ -2763,6 +2763,17 @@ var EngCalcs = EngCalcs || {};
 	// The roughness decimal places syncRoughnessLabelDecimals() last computed. See it for why.
 	var roughnessDecimalsAuto = 0;
 
+	// **THE SMALL-SCREEN VIEWPORT, ASKED AT THE ONE BREAKPOINT THE PHONE PASS ALREADY USES**
+	// (640px, Task 486 -- see the block in css/engcalcs.css that explains why there is exactly one).
+	// The literal is repeated here rather than published from CSS because a media query is the only
+	// thing that can answer "is a rule firing"; dev/lpn-spike/small-screen-harness.js asserts that
+	// this number and the stylesheet's are the same number, so the two cannot drift.
+	// It is a VIEWPORT question, never a user-agent one, for the reason that block gives.
+	function smallScreen() {
+		try { return !!(window.matchMedia && window.matchMedia('(max-width: 640px)').matches); }
+		catch (e) { return false; }
+	}
+
 	// Gear/settings panel -- like labelSettings, a VIEW/preference object, not network content:
 	// persisted to localStorage as a sibling key, deliberately NOT part of the undo-snapshotted
 	// `doc`, and untouched by clearNetwork() ("New" clears the network, not your preferences).
@@ -2862,7 +2873,11 @@ var EngCalcs = EngCalcs || {};
 			// the control exists because a clean drawing with no backdrop reads better without the
 			// patches, which is a judgement about the sheet and therefore the user's to make.
 			maskLabels: true,
-			legendPosition: 'top-right', // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
+			// One of LEGEND_POSITIONS' keys below. On a pointer the corner is the original hardcoded
+			// CSS's, top right; **ON A PHONE THE TWO LEGENDS SWAP INTO THE TOP CORNERS** -- Tom,
+			// 2026-08-25: "527 on phone, color legend upper right and label legend upper left."
+			// See the colour key's own key below for why this is a DEFAULT and not an override.
+			legendPosition: smallScreen() ? 'top-left' : 'top-right',
 			// ---- colour by value (Task 384) ----
 			// FLAT KEYS, not one nested `colors` object: applySaved() merges with a TOP-LEVEL
 			// Object.assign and hand-lists the three nested objects it merges a level deeper, so a
@@ -2903,7 +2918,13 @@ var EngCalcs = EngCalcs || {};
 			colorThematic: false,
 			// The colour key's own corner, separate from the labels legend's so the two do not
 			// stack on top of each other. Opposite default corner for the same reason.
-			colorLegendPosition: 'bottom-right',
+			//
+			// **A DEFAULT, NEVER AN OVERRIDE.** applySaved() merges a stored settings object ON TOP
+			// of this one (Object.assign(defaultSettings(), savedSettings)), so a project that
+			// records a placement -- and every project does, settings being serialized whole --
+			// opens in the corner it was saved in on any screen. Only a first-time visitor, and
+			// Restore defaults, ever see the value below.
+			colorLegendPosition: smallScreen() ? 'top-right' : 'bottom-right',
 			// THE COLOUR BAND LIMITS, keyed 'node.pressure' / 'link.velocity', each an array of up
 			// to six numbers IN THE DISPLAY UNIT. **ONE FIELD, WHOEVER PUT THE NUMBERS THERE** --
 			// typed into the boxes, or written by pressing a classification method. Nothing records
