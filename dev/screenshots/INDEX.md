@@ -76,3 +76,26 @@ here, so nobody has to re-make it every time an image is reached for.
 - **Browser chrome is what disqualifies a frame, not the network.** Every unpublishable image here
   fails for the same two reasons — a bookmarks bar with real names or a real file path — and both
   are avoidable by capturing the page rather than the window.
+
+## The remake queue — what to shoot next
+
+**2026-08-25.** Twelve of these went onto the public page (`screenshots.html` in the
+librewaternet.org repository). This is the list of shots that would have gone too, and what stopped
+each one. **Every entry is blocked by the frame, not by the software** — the page is ready, the
+capture is not.
+
+Shoot these deliberately rather than at random, and crop to the PAGE, not the window.
+
+| Want | Why it is not already here | What a good frame looks like |
+|---|---|---|
+| **A phone, in tall mode** | **There is not one phone capture in the whole drop.** The landing page's own sentence says it works on a phone in tall mode, and nothing on the site shows that | A real network on a phone held upright. The one claim we make with no picture behind it |
+| **Find and replace, one panel** | 0001 and 0002 both show it with three or four panels open, and 0001 still says the old "Find assets" | Find open, everything else closed, mid-replace so the count is visible |
+| **Romanian, after the unit fix** | 0026 is the language still and predates Task 521 — its status strip and colour key disagree about pressure units, which is fixed | Same view as 0026, retaken. Any of the 27 languages; Romanian is proven to fit |
+| **The Nominatim consent prompt** | 0011–0014 all have the browser's bookmarks bar and profile picture in frame | Just the dialog and the map. The consent wording is one of the most honest things in the suite and nothing shows it |
+| **"Place the model here permanently?"** | 0021, same browser chrome | The confirm on its own. It is the plainest one-way-door warning we have written |
+| **The Settings box, not covering the menu bar** | 0029 is the best picture of label control, but the box is dragged over the title and tab strip, so the frame stops saying what application it is | Same content, box parked clear of the top chrome |
+| **Saving to a file** | 0025 shows a real folder listing and a real path | The browser's own permission prompt, over a network, in a folder whose name says nothing about you |
+
+**The one habit that fixes most of this:** capture the page region, not the browser window. Six of
+the eight unpublishable frames fail for that alone, and nothing on the page itself disqualified a
+single image.
