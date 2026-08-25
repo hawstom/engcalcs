@@ -14,7 +14,15 @@
 //   * It is not a wizard. No interface, no strings, no wiring into the map editor. A result here
 //     carries machine-readable codes and numbers; the wording is somebody else's job.
 //   * It does not choose an engine. The solve is INJECTED (options.solve) -- see below.
-//   * It never touches the user's document. The hydrant assembly is built onto a COPY.
+//   * It never touches the user's document. The hydrant assembly is built onto a COPY. That IS the
+//     "inject the hydrant into the physical model" design -- two junctions and two pipes in series,
+//     every number of them an input a person can read and change.
+//   * It does NOT carry a pre-computed flow-versus-loss table, and that was measured rather than
+//     assumed: the assembly costs 0.03 ms of a 0.61 ms solve at 49 junctions and nothing measurable
+//     at 225, while the bisection's ~16 NETWORK solves are the cost and no table can remove them.
+//     EPANET would accept such a table (a GPV), but a GPV is EPANET-only, so it would take the
+//     built-in solver away from this search to save nothing. Full record, and the one case that
+//     would justify storing points: dev/fireflow-loss-table.md.
 //
 // SOURCES for every number below: the utility-planning-engineer's Task 530 research, 2026-08-25
 // (dev/agents/utility-planning-engineer/journal.md, entries "Task 530 research" and its same-day
@@ -126,8 +134,23 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 
 	// ---- the k, in two labelled pieces, each derived rather than typed ----------
 	//
+	// **A MINOR-LOSS COEFFICIENT IS MEANINGLESS WITHOUT THE VELOCITY IT IS REFERENCED TO**, and
+	// this assembly has TWO diameters -- a 6 in lateral and a 4.5 in waterway. h = k V^2/2g, and
+	// V goes as 1/D^2, so the SAME k applied at the barrel's velocity instead of the lateral's
+	// develops (D_lateral/D_barrel)^4 = (6/4.5)^4 = 3.16 times the head loss. Tom, 2026-08-25:
+	// *"We must be crystal clear on which velocity any k belongs to. I see this as critical in
+	// the hydrant model."*
+	//
+	// SO THE REFERENCE VELOCITY IS IN THE NAME OF EVERY k IN THIS FILE, in the comment beside it,
+	// and in the result record -- never merely implied by which link the number happens to sit
+	// on. `K_REFERENCE_LINK` below names the one link the assembly's k may ride, the build puts
+	// it there and pins the other link's k to zero, and
+	// dev/lpn-spike/fireflow-harness.js asserts the 3.16x separation so that moving the k to the
+	// barrel fails loudly instead of quietly reporting a hydrant 12% weaker than it is.
+	//
 	// NEVER PRESENT THE SUM AS ONE MEASURED NUMBER. The two halves have completely different
-	// provenance and a user must be able to see that:
+	// provenance and a user must be able to see that (they may be ADDED only because both are
+	// referenced to the same velocity -- that is what makes the sum arithmetic and not a fudge):
 	//
 	// PIECE 1 -- the hydrant barrel, main valve and nozzle. AWWA C502's QA clause, quoted
 	// word-for-word and independently in the Bryan/College Station TX joint municipal water design
@@ -139,33 +162,50 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	// so using the ceiling understates available flow, which is the right direction to be wrong in
 	// a fire-flow tool.
 	//
-	// Referenced to the velocity in the 6 in lateral, that ceiling is K = h / (V^2/2g). Derived
+	// Referenced to the velocity IN THE 6 IN LATERAL -- note that the loss it describes happens in
+	// the 4.5 in waterway, which is exactly why the reference has to be stated rather than
+	// inferred from where the loss occurs. That ceiling is K = h / (V_lateral^2/2g). Derived
 	// below so the trace back to "3.0 psi at 1000 gpm" stays visible; it comes out ~3.46.
 	var K_QA_PSI = 3.0,
 		K_QA_GPM = 1000,
 		K_QA_AREA = Math.PI * DEFAULTS.lateralDiameter * DEFAULTS.lateralDiameter / 4,
 		K_QA_V = gpmToSI(K_QA_GPM) / K_QA_AREA,
-		K_BARREL = psiToHead(K_QA_PSI) / (K_QA_V * K_QA_V / (2 * EngCalcs.G));
+		K_BARREL_AT_LATERAL_V = psiToHead(K_QA_PSI) / (K_QA_V * K_QA_V / (2 * EngCalcs.G));
 
 	// PIECE 2 -- the rest of the run, by Crane Technical Paper 410's standard fitting values:
 	// tee, flow through the branch, into the lateral ~1.0; fully open gate valve ~0.15; one
 	// flanged 90 degree elbow into the riser ~0.35 (published 0.3-0.5). Widely tabulated -- unlike
-	// the barrel term, this half was never the gap. Subtotal ~1.5.
+	// the barrel term, this half was never the gap. Subtotal ~1.5. These fittings ARE in the
+	// lateral, so Crane's own reference velocity and ours are the same one here; the suffix is
+	// kept on the name anyway, because a reader must not have to know that to trust the sum.
 	var K_TEE = 1.0,
 		K_GATE = 0.15,
 		K_ELBOW = 0.35,
-		K_FITTINGS = K_TEE + K_GATE + K_ELBOW;
+		K_FITTINGS_AT_LATERAL_V = K_TEE + K_GATE + K_ELBOW;
 
-	// Recommended total K ~ 5, research range 3-6. It is applied to the LATERAL link, so the
-	// solver references it to the lateral's own velocity -- which is what the derivation above
-	// assumed. A caller that overrides `lateralDiameter` moves that reference velocity; the
-	// result record says so, and a caller who wants the barrel term re-referenced should supply
-	// its own `k`.
+	// Recommended total K ~ 5, research range 3-6.
+	//
+	// **IT RIDES ON THE LATERAL LINK BECAUSE THAT IS THE VELOCITY IT IS REFERENCED TO** -- the
+	// solver reads a link's k against that link's own diameter (EngCalcs.lpnLinkK, then
+	// k/(2 g A^2) in the iteration), so the link a k sits on IS the reference velocity, and the
+	// two must be chosen together. Moving this k to the barrel without re-deriving it would
+	// inflate its head loss 3.16x and understate the hydrant by ~12%.
+	//
+	// A caller that overrides `lateralDiameter` moves that reference velocity with it: the k is
+	// still referenced to the lateral, but to a lateral of a different size than the one the
+	// derivation above assumed. The result record reports the diameter actually in force
+	// (assembly.k.referencedTo.diameter) beside the one the derivation used
+	// (assembly.k.derivedAtDiameter), so the two can be compared without reading this file.
 	//
 	// NOT IMPORTED, and worth naming so nobody imports it later: the NFPA 291 pitot coefficients
 	// (0.90 / 0.80). They convert a field pitot reading to gpm. They are a different quantity that
 	// merely sounds adjacent, and using one as a k would be nonsense.
-	var K_TOTAL = K_BARREL + K_FITTINGS;
+	var K_TOTAL_AT_LATERAL_V = K_BARREL_AT_LATERAL_V + K_FITTINGS_AT_LATERAL_V;
+
+	// The one link of the assembly a k may ride, stated once. The build reads it, the result
+	// record reports it, and the harness asserts against it -- so "which velocity does the k
+	// belong to" has exactly one answer in this file and it is a value, not a convention.
+	var K_REFERENCE_LINK = 'lateral';
 
 	// ISO caps the credit given to a single hydrant at 1,500 gpm whatever the hydraulics say.
 	// REPORTED AS A NOTE BESIDE THE COMPUTED NUMBER, NEVER SILENTLY CLAMPED: a clamped number is a
@@ -177,8 +217,13 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	// ---------------------------------------------------------------------------
 	//
 	// The edge cases are the deliverable. In particular "there is no available fire flow" must
-	// never come back as 0 gpm: a zero invites the reader to conclude the hydrant is fine at
-	// 1 gpm, when in fact the critical node is already under the residual with the hydrant shut.
+	// never come back as 0 gpm, because THE QUESTION HAS NO ANSWER RATHER THAN AN ANSWER OF ZERO.
+	// Available fire flow is DEFINED as the flow at which the critical node still holds the
+	// residual; if the residual is already unmet with the hydrant shut, no flow satisfies the
+	// definition and there is nothing to report. The system fails the criterion before the
+	// hydrant is opened. That is a different fact from "the answer is zero", and the caller has
+	// to be told which one it is -- so the case is NAMED (below-residual-at-rest) and carries the
+	// static pressure that failed, with no `flow` field at all.
 	var CODES = {
 		OK: 'ok',
 		NO_LATERAL_LENGTH: 'lateral-length-required',
@@ -264,10 +309,12 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			barrelLength = chose(opts, 'barrelLength', DEFAULTS.barrelLength),
 			barrelRoughness = chose(opts, 'barrelRoughness', DEFAULTS.barrelRoughness),
 			outletRise = chose(opts, 'outletRise', DEFAULTS.outletRise),
-			k = chose(opts, 'k', K_TOTAL),
+			k = chose(opts, 'k', K_TOTAL_AT_LATERAL_V),
 			hydrant = null,
 			baseId,
 			outletId,
+			lateralLink,
+			barrelLink,
 			elev;
 
 		for (i = 0; i < m.nodes.length; i++) {
@@ -292,27 +339,36 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		m.nodes.push({ id: baseId, type: 'junction', elev: elev, demand: 0 });
 		m.nodes.push({ id: outletId, type: 'junction', elev: elev + outletRise.value, demand: 0 });
 
-		// The k rides on the LATERAL, which is the velocity the research referenced it to.
-		m.links.push({
+		// **THE ENTIRE k GOES ON THE LATERAL, AND THE BARREL'S k IS PINNED TO ZERO.** The link a k
+		// sits on is the velocity it is referenced to (see K_REFERENCE_LINK above), so these two
+		// lines are the reference declaration, not a placement detail. Splitting the k across the
+		// two links, or moving it to the barrel, changes what the number MEANS -- the barrel's
+		// velocity is (6/4.5)^2 = 1.78x the lateral's, so the same k there is 3.16x the head loss.
+		lateralLink = {
 			id: freeId(taken, opts.hydrantNode + '~lateral'), type: 'pipe',
 			from: hydrant.id, to: baseId,
 			length: lateralLength.value, diameter: lateralDiameter.value,
 			roughness: lateralRoughness.value, k: k.value, status: 'open'
-		});
-		m.links.push({
+		};
+		barrelLink = {
 			id: freeId(taken, opts.hydrantNode + '~barrel'), type: 'pipe',
 			from: baseId, to: outletId,
 			length: barrelLength.value, diameter: barrelDiameter.value,
 			roughness: barrelRoughness.value, k: 0, status: 'open'
-		});
+		};
+		m.links.push(lateralLink);
+		m.links.push(barrelLink);
 
 		return {
 			model: m,
 			elements: {
 				baseNode: baseId,
 				outletNode: outletId,
-				lateralLink: m.links[m.links.length - 2].id,
-				barrelLink: m.links[m.links.length - 1].id
+				lateralLink: lateralLink.id,
+				barrelLink: barrelLink.id,
+				// WHICH LINK CARRIES THE k, reported rather than assumed. A caller drawing the
+				// assembly, and the harness, both read this instead of guessing from the ids.
+				kOnLink: lateralLink.id
 			},
 			// WHAT WAS USED AND WHERE IT CAME FROM. An interface reads this to ask or to disclose;
 			// a report reads it to state its assumptions.
@@ -327,19 +383,45 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 				k: {
 					total: k,
 					// Two pieces, never one number -- the provenance of each half is different.
+					// Both are referenced to the same velocity, which is the only reason they can
+					// be added; each says so on its own so neither can be lifted out alone.
 					parts: k.source === 'supplied' ? [] : [
 						{
-							name: 'barrel-valve-nozzle', value: K_BARREL,
+							name: 'barrel-valve-nozzle', value: K_BARREL_AT_LATERAL_V,
+							referencedTo: K_REFERENCE_LINK,
 							basis: 'AWWA C502 QA ceiling, 3.0 psi at 1000 gpm through the 4.5 in ' +
-								'pumper nozzle, referenced to the 6 in lateral velocity'
+								'pumper nozzle, referenced to the velocity in the 6 in lateral ' +
+								'(the loss occurs in the 4.5 in waterway; the reference does not)'
 						},
 						{
-							name: 'lateral-fittings', value: K_FITTINGS,
+							name: 'lateral-fittings', value: K_FITTINGS_AT_LATERAL_V,
+							referencedTo: K_REFERENCE_LINK,
 							basis: 'Crane TP-410: tee through branch 1.0, open gate valve 0.15, ' +
-								'flanged 90 elbow 0.35'
+								'flanged 90 elbow 0.35, referenced to the lateral velocity'
 						}
 					],
-					referenceDiameter: DEFAULTS.lateralDiameter,
+					// **WHICH VELOCITY THIS k BELONGS TO.** Stated as data, in the result, so an
+					// interface can say it out loud and a report can print it. `diameter` is the
+					// lateral diameter ACTUALLY IN FORCE -- override the lateral and the reference
+					// velocity moves with it -- while `derivedAtDiameter` is the 6 in the research
+					// derivation assumed. When they differ, a disclosed k is being used at a
+					// velocity it was not derived at, and the reader is the one who must decide
+					// whether that is acceptable.
+					referencedTo: {
+						link: K_REFERENCE_LINK,
+						linkId: lateralLink.id,
+						diameter: lateralDiameter.value,
+						basis: k.source === 'supplied'
+							? 'YOUR k IS TAKEN TO BE REFERENCED TO THE VELOCITY IN THE LATERAL, ' +
+								'at the lateral diameter above. A coefficient referenced to any ' +
+								'other velocity -- the hydrant waterway, a nozzle, a table whose ' +
+								'reference is not stated -- must be re-referenced by multiplying ' +
+								'it by (its own diameter / the lateral diameter) to the fourth ' +
+								'power before it is supplied here.'
+							: 'Both pieces are referenced to the velocity in the lateral, at the ' +
+								'lateral diameter above.'
+					},
+					derivedAtDiameter: DEFAULTS.lateralDiameter,
 					range: { low: 3, high: 6 }
 				}
 			}
@@ -377,7 +459,11 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	 *   residual         metres of head; omit for 20 psi
 	 *   maxFlow, flowTol search ceiling and bracket tolerance (SI, see DEFAULTS)
 	 *   lateralDiameter, lateralRoughness, barrelDiameter, barrelLength, barrelRoughness,
-	 *   outletRise, k    every assumption is overridable, and the result says which were supplied
+	 *   outletRise, k    every assumption is overridable, and the result says which were supplied.
+	 *                    A SUPPLIED `k` IS TAKEN TO BE REFERENCED TO THE LATERAL'S VELOCITY, at
+	 *                    whatever lateralDiameter is in force; the result states that in
+	 *                    assembly.k.referencedTo so a caller can repeat it to the user rather
+	 *                    than letting them paste a coefficient that meant another velocity.
 	 *
 	 * result always carries { ok, code, assembly, elements, criticalNode, solves }, and on ok
 	 * also { flow, residual, residualAt, staticPressure, notes }.
@@ -470,13 +556,22 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			return null;
 		}
 
-		// Step 1: the hydrant SHUT. If the critical node is already under the residual there is no
-		// available fire flow at all, and that is a different statement from "0 gpm".
+		// Step 1: the hydrant SHUT. Available fire flow is the flow at which the critical node
+		// still holds the residual. If the residual is already unmet with nothing flowing, NO
+		// SUCH FLOW EXISTS -- the network fails the criterion before the hydrant is opened, so
+		// the question has no answer rather than an answer of zero. Reported by name, with no
+		// flow field, and with the reason in the record so a caller can say it without knowing it.
 		return probe(0).then(function (rest) {
 			var bad = check(rest);
 			if (bad) { return bad; }
 			if (rest.pressure < residual) {
-				return fail(CODES.BELOW_AT_REST, { staticPressure: rest.pressure });
+				return fail(CODES.BELOW_AT_REST, {
+					staticPressure: rest.pressure,
+					basis: 'Available fire flow is the flow at which the critical node still ' +
+						'holds the residual. With the hydrant shut the residual is already not ' +
+						'held, so there is no such flow: the question has no answer here. This ' +
+						'is not an available fire flow of zero.'
+				});
 			}
 
 			// Step 2: the ceiling. If the residual still holds there, the network is not telling
@@ -538,8 +633,14 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	EngCalcs.lpnFireFlowBuild = build;
 	EngCalcs.lpnFireFlowDefaults = DEFAULTS;
 	EngCalcs.lpnFireFlowCodes = CODES;
+	// EVERY NAME HERE CARRIES ITS REFERENCE VELOCITY. A bare `total` would be a number a caller
+	// could put on any link it liked; `totalAtLateralVelocity` cannot be misread that way, and the
+	// two fields under it say at which lateral diameter and on which link.
 	EngCalcs.lpnFireFlowK = {
-		barrel: K_BARREL, fittings: K_FITTINGS, total: K_TOTAL,
+		barrelAtLateralVelocity: K_BARREL_AT_LATERAL_V,
+		fittingsAtLateralVelocity: K_FITTINGS_AT_LATERAL_V,
+		totalAtLateralVelocity: K_TOTAL_AT_LATERAL_V,
+		referenceLink: K_REFERENCE_LINK,
 		referenceDiameter: DEFAULTS.lateralDiameter
 	};
 	EngCalcs.lpnFireFlowIsoCap = ISO_SINGLE_HYDRANT_CAP;
