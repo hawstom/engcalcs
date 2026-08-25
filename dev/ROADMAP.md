@@ -213,41 +213,6 @@ the block.
     for the lateral length and discloses the rest, the flow readout in the project's own units, and
     the saved-with-the-project hydrant type (fields listed above). Wording is Tom's.
 
-- 25|515| **The Settings category index breaks two English labels mid-word.**
-  **MEASURED AND DECIDED 2026-08-25 — hyphenation is NOT the answer** (`dev/hyphenation-finding.md`,
-  all measured in the shipped Chromium against the real page, not argued from spec). Tom asked
-  whether a hyphenation system applies across many languages. Three findings kill it:
-  - **`hyphens: auto` changes literally nothing here.** 14 of 14 index rows identical. The column
-    already has `overflow-wrap: anywhere`, and where that allows an in-word break Chromium takes it
-    and never consults the dictionary. The two properties do not add up.
-  - **Removing `overflow-wrap` so hyphenation CAN work makes it worse** — "Visualization" then
-    overflows the pane, restoring the sideways scrollbar the pane was narrowed to be rid of.
-  - **Chromium does not hyphenate a CAPITALISED English word at all.** Measured; the same words
-    lowercase do hyphenate. Every index label is sentence case, so in the language Tom saw the
-    defect in, hyphenation cannot reach the offending word.
-  - Coverage, for the record: of 52 Chromium pattern files, 14 of our languages hyphenate and 13 do
-    not — and **tr is one of the four anchor languages and one of the real gaps** (with ro, id, sr,
-    sw). The rest (ar, fa, he, ps, ur, zh, km, my) do not hyphenate as a matter of orthography,
-    which is an answer rather than a gap.
-  - **And a suite-wide `hyphens: auto` would be actively wrong:** an absent key falls back to
-    English by design and nothing marks which strings fell back, so a Spanish page carries English
-    words under `lang="es"` — and Spanish patterns hyphenate English words happily (measured). It
-    would print visibly wrong hyphens where no check can see them.
-  - **[H] WHAT IS LEFT IS A WIDTH-VERSUS-WORDING CHOICE AND IT IS TOM'S.** Two of fourteen English
-    rows break: "Visualization" and "appearance". The index is 6.6rem leaving 90.6px of text;
-    **"Visualization" measures 104.2px**, so ending the break needs ~7.45rem — essentially the width
-    he narrowed twice on purpose. He cannot have both. Three ways out: a shorter English word for
-    `lpn_settings_sec_visualization` (the only label no width can help; **wording is his**), accept
-    it and close this on the evidence (his own current position), or widen back and give up 24px.
-- 25|516| **The colour key stacks onto the label legend and covers it.**
-  Screenshot 0030: with nodes coloured by pressure AND links by velocity, two colour keys stack at
-  the right edge and print over the node/link label legend, which becomes unreadable. Both default
-  to the right and nothing separates them or gives way.
-  - One key is the common case and is fine. The defect appears only when both groups are coloured,
-    which is also when the map is carrying the most information.
-  - **It is screenshot 0030**, which is what Tom asked for so he can look at it himself. He is not
-    worried about it (2026-08-24), hence Maybe rather than Soon.
-
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
   more than one means rewrite"*, both waves writing to `dev/english-friction/<sprint>.json`, with
@@ -297,27 +262,29 @@ the block.
   - **Against it:** the current fly-out ASKS FOR NOTHING — the choice is which row you click, and a
     wizard puts a form in front of the commonest action. Weigh that before building.
 
-- 75|479| **LibreWaterNet.org needs a landing page, and this account needs a hosting decision.**
-  Options, the measured facts and the recommendation: `dev/hosting-layout.md`. Positioning is settled
-  in `dev/positioning.md` — lead with the invitation, not the comparison.
-  - **LibreWaterNet.org IS THE FRONT DOOR, and LibreEPANET.org is silent** (Tom, 2026-08-24: *"Keep
-    both, but EPANET is silent."*). Both domains stay bought; only this one gets a page. Reason and
-    the reasoning it came from: `dev/positioning.md` §6, and Task 523.
-  - **DONE 2026-08-23, the whole code half.** `CANONICAL_ORIGIN` is now a host → origin whitelist
-    (`lib/config.inc.php`), so the same checkout served at librewaternet.org stops asking Google to
-    index hawsedc.com. Blocking guard: `dev/scripts/canonical_origin_check.php`. **Nothing else in
-    the suite needs changing to serve a second domain** — the 210 absolute `/engcalcs/…` paths all
-    resolve under `<newdomain>/engcalcs/`, which is why the symlink beats the refactor.
-  - **DONE 2026-08-23, the landing draft** (moved 2026-08-24 to the librewaternet.org repository;
-    see `dev/librewaternet-landing.md`): titled
-    `LibreWaterNet.org`, leading with a Start-a-model button to `Looped-Network.php`, phone gate
-    lifted on Tom's own pass.
-  - **[H] WHAT IS LEFT IS TOM'S, and it is all server work, none of it a `git pull`:** the 301 for
-    the broken `constructionnotesmanager.com/hawsedc/engcalcs` route (one `RedirectMatch` in
-    `~/public_html/.htaccess`, outside this repo); `ln -s ~/public_html/hawsedc/engcalcs
-    ~/librewaternet.org/engcalcs` after testing `Options +FollowSymLinks` on this host; and the
-    landing page's own repository at `~/librewaternet.org/index.html`. Move the local working
-    directory in that same pass and not before (`dev/hosting-layout.md` §5).
+- 75|479| **[H] One question left: should the suite answer at librewaternet.org/engcalcs/ ?**
+  **The landing page and the code half are DONE and LIVE** — `https://librewaternet.org` and
+  `/features.html` both serve, `libreepanet.org` 302s to it (Tom, 2026-08-24: *"Keep both, but
+  EPANET is silent."*), and `CANONICAL_ORIGIN` became a host→origin whitelist on 2026-08-23 with
+  `canonical_origin_check.php` guarding it. The landing page's own repository is
+  `~/webdev/librewaternet.org`; see `dev/librewaternet-landing.md`.
+  - **DROPPED 2026-08-25 on Tom's ruling:** the `constructionnotesmanager.com/hawsedc/engcalcs`
+    redirect. *"It has never been canonical. No redirect is required."*
+  - **THE ONE OPEN QUESTION, and it is his.** `librewaternet.org/engcalcs/Looped-Network.php`
+    currently 404s, because the planned symlink was never made. Tom, 2026-08-25: *"I forgot what our
+    goal was. We wanted lpn to appear at lwn?"*
+    - **The recorded goal was yes**, and the reasoning is in `dev/hosting-layout.md`: the 210
+      absolute `/engcalcs/…` paths all resolve under `<newdomain>/engcalcs/`, so one symlink serves
+      the whole suite under the new domain and **no code changes at all** — which is why the symlink
+      beat the refactor.
+    - **Nothing is broken while it is absent.** The landing page's buttons point at
+      `https://hawsedc.com/engcalcs/…` and work. So this is a positioning choice, not a defect: does
+      a visitor who arrives at LibreWaterNet stay on that domain when they start a model, or get
+      handed to hawsedc.com?
+    - If yes, it is `ln -s ~/public_html/hawsedc/engcalcs ~/librewaternet.org/engcalcs` after
+      testing `Options +FollowSymLinks` on that host, plus a decision about which origin is canonical
+      for the suite's pages — **`canonical_origin_check.php` exists precisely so that is a lookup
+      and not a guess**, and getting it wrong points search engines at the wrong domain.
 
 - 100|502| **A Text object anchored to a LINK, not only to a node.**
   Extracted from Task 483 on close. A Text already follows a node (`anchorNode`, an offset plus a
@@ -584,14 +551,6 @@ the block.
   and marked rather than discarded, and only a fully understood one reaches the engine.
   - Deliberately parked: rule-based is a language, and it can wait for evidence that a user has one.
 
-- 25|248.04| **Curves (Task 248 child) — probably NEVER a separate interface.** Tom, 2026-08-17:
-  *"We may be able to avoid curves as a separate interface indefinitely by reporting them and
-  referring to them by the name of their owner node."* A pump curve is already edited on the pump
-  (`curvePoints`, `curveRef`), and a tank volume curve belongs to its tank.
-  - So this task is a REPORT and a NAME, not an editor: a curve is named for the element that owns
-    it, and a `[CURVES]` section is read and written under that name. Reopen the editor question
-    only if a real file arrives whose curve is shared in a way an owner name cannot express.
-
 - 25|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
   for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
   where it explains why "Select all" is absent. Wants a rubber-band select and one property sheet
@@ -614,7 +573,7 @@ the block.
   - **Flow direction arrows stay.** epanet-js has none; Tom: *"I like that we do."* Recorded so a
     future tidy-up does not quietly remove them in the name of matching.
 
-- 25|284| **Settings box follow-ups, after the two-pane box shipped (Task 441).** The paradigm is in
+- 100|284| **Settings box follow-ups, after the two-pane box shipped (Task 441).** The paradigm is in
   place; what is left is the part that needs a second design.
   - **The sticky heading is the SECTION only.** Tom asked for the current heading *and sub-heading*
     to stick. Sub-headings scroll away today, which needs a second sticky level and a rule for what
@@ -625,7 +584,7 @@ the block.
     still writes it so old and new project files keep one shape. Drop it only alongside a storage
     version bump, the way `fileAutosaveSeconds` was left.
 
-- 25|285| **We do not know what devices anybody uses this on.**
+- 50|285| **We do not know what devices anybody uses this on.**
   Several decisions have quietly assumed an answer. Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."*
   `log-human-view.php` and `log-calc-event.php` record **page and language and nothing else**, so
   there is no device signal anywhere in this project's instrumentation — every touch-target,
@@ -643,12 +602,23 @@ the block.
     than a disappointment; "a third of them" makes several open tasks much more urgent.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 
-- 75|322| **Standing advisories worth converting rather than re-reading.** `check_all.sh` reports
-  these every run and nobody can act on them.
-  - **`js/looped-network.js` is 20,374 lines**, with `rebuildSettingsFields()` and
+- 75|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
+  Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
+  recommendations."* `check_all.sh` reports these every run and nobody can act on them — and
+  CLAUDE.md's own argument is that **a rule a machine enforces is worth roughly ten a human must
+  remember.** Every rule here that became a script stopped being violated; every rule that stayed
+  prose kept being violated by people who had read it.
+  - **The survey is the new half and it is the bigger one.** Read the whole of `CLAUDE.md` and the
+    `dev/*.md` set and list every rule stated as prose that a script COULD enforce, with the cost of
+    each. That file says outright that its unexecutable half is decoration; nobody has ever gone
+    through and counted which half that is.
+  - **`js/looped-network.js` is over 20,000 lines**, with `rebuildSettingsFields()` and
     `drawExampleNetwork()` the two obvious extractions. Task 293 established the split-by-PURITY
-    pattern and it worked. *(The 9,740 recorded here through 2026-08-23 was less than half the truth —
-    an advisory nobody acts on is also an advisory nobody re-reads.)*
+    pattern and it worked. *(The 9,740 recorded here through 2026-08-23 was less than half the truth
+    — an advisory nobody acts on is also an advisory nobody re-reads.)*
+  - **DONE 2026-08-25:** `key_hygiene_check.php` learned two more dynamic-key shapes (an interpolated
+    build and a prefix test), dropping 14 false orphans from its list — 35 → 21, then → 16 after
+    Task 294's deletions. A check that is 40% noise is a check people learn to skip.
   - **DONE 2026-08-23:** `mpf_spreadheet_notice` renamed to `mpf_spreadsheet_notice` across all 27
     lang files in one `rename_lang_key.php` pass.
   - **DONE 2026-08-14:** the js syntax check globs `sw.js` and `js/vendor/` too.
@@ -689,11 +659,22 @@ the block.
     (shedding) · 6 labels hidden because the zoom is too far out · 7 leader lines drawn.
   - Stopping at N answers "did my change help?" — the answer is two drawings at the same step.
 
-- 75|417| **Long-press on an element should enter Edit mode.** Exactly as a click does. Tom,
-  2026-08-17. The guard that switches to Edit mode on click does not fire when a long press begins a
-  drag, so a touch user who presses and drags is editing an element the page does not think is
-  selected for editing. Same guard, second trigger. See Task 192 for why long-press is the touch
-  equivalent generally.
+- 75|417| **Long-press enters Edit mode, and the phone's touch radius is too mean.**
+  Two things, and Tom added the second on 2026-08-25: *"417 phone radius needs to be larger more
+  forgiving for the switch-to-edit-mode decision on tapping an asset (I assume any asset, not just a
+  new asset)."* **Read that as ANY asset** — his own parenthesis, and it is the scope.
+  - **The original:** the guard that switches to Edit mode on click does not fire when a long press
+    begins a drag, so a touch user who presses and drags is editing an element the page does not
+    think is selected for editing. Same guard, second trigger. Task 192 has why long-press is the
+    touch equivalent generally.
+  - **The new half:** the hit radius that decides "you tapped an asset" is tuned for a pointer, and a
+    finger is not a pointer. CLAUDE.md's rule stands — *say "pointer slop" when you mean
+    hand-and-mouse tolerance, and a 44px touch target is not an argument here* — but that rule is
+    about not letting phone ergonomics drive the DESKTOP design, not about being stingy on a phone.
+    **A touch-derived radius is a different number from a mouse-derived one and should be one.**
+  - `hitConfirmed()` is where the float32 half of this was already fixed, so it is the place to look
+    first. Whatever number is chosen must be asserted at 360px, where every other phone fix is
+    guarded.
 
 - 75|468| **Demand categories on a junction — the breakdown the importer already flattens.**
   EPANET stacks (base demand, pattern, category) triples on one node and sums them; `js/lpn-inp.js`
@@ -776,7 +757,18 @@ the block.
     efficiencies must cite WHO/EAWAG/CAWST primary sources before shipping, never placeholders — a
     wrong default could tell someone unsafe water is safe.
 
-- 50|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
+- 50|146.09| **A key map: the whole project as a thumbnail, with a box round where you are.**
+  Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
+  *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
+  as a thumbnail with the current window box placed on it for 'Where am I?'"*
+  - **The question it answers is orientation, not detail** — "where am I in this drawing", asked by
+    somebody zoomed in far enough to have lost the shape of the whole. That is a different question
+    from the old version of this task, which was insets that MAGNIFY congested areas.
+  - The pieces exist: `bbox()` gives the whole extent, `currentView()` gives the visible rectangle in
+    world units, and the drawing is already a `<g>` that can be rendered at another scale. The work
+    is a small always-on overlay, a viewport box, and — probably — click-to-go-there.
+  - **It is a natural companion to the phone work**, where the screen is small enough that being lost
+    is easy, and it is exactly the moment the label passes are already hiding text.
 
 - 5|155|[H] **The Task 149 search-index fix awaits Search Console confirmation.**
   Deployed already. Steps 1–5 (sitemap uploaded, `robots.txt` Sitemap line, sitemap submitted in
@@ -819,10 +811,18 @@ the block.
   should figure out what "printable" should even mean per calculator type (a two-column input/
   result form vs. a map/canvas page are different problems) before building anything.
 
-- 75|178| **Build a real filmstrip-GIF Help asset from `dev/filmstrip-gif-recipe.md`** (e.g. the
-  add-pipe / add-junction workflow). A 2026-07-30 proof of concept showed this is cheap once set up;
-  the recipe records the ~30 minutes of trial and error, of which the hard part is precise SVG click
-  targeting, not GIF assembly. The POC GIFs were never committed.
+- 75|178| **A moving Help asset, now that there is a real screenshots page to point at.**
+  Reworked by Tom 2026-08-25: *"178 reworked to link to lwn screenshots page."* The original was a
+  filmstrip GIF built from `dev/filmstrip-gif-recipe.md`; a 2026-07-30 proof of concept showed it is
+  cheap once set up (the hard part is precise SVG click targeting, not GIF assembly) and the POC
+  GIFs were never committed.
+  - **What changed is that the pictures now exist somewhere public.**
+    `https://librewaternet.org/screenshots.html` is live and carries the annotated plates, so Help
+    can LINK rather than carry its own asset — no GIF to build, host, cache-bust or keep in step
+    with an interface that moves.
+  - **Decide which before building either**: a link costs nothing and goes stale only when the page
+    does; a GIF shows a GESTURE, which a still cannot, and is the only one that answers "how do I
+    draw a pipe". They are not substitutes, and the recipe survives if the answer is both.
 
 - 5|181| **Per-element symbol sizing (originated during Task 146).** Task 180 shipped one overall
   `settings.symbolScale` multiplier ("Symbol size (relative to text)") covering node radius, pipe
@@ -832,15 +832,21 @@ the block.
   give more fine-grained control and right now just a two-dimensional control." Build it when
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
 
-- 50|186| **Table-paradigm editor with spreadsheet copy/paste (originated during Task 146).** Tom, 2026-07-30:
-  "For the future a table-paradigm editor with spreadsheet-like copy and paste would be very cool."
-  A grid of nodes and a grid of links, editable in place, with clipboard paste from a spreadsheet —
-  what EPANET's own Data Browser tables and every serious package's tabular view provide, and the
-  fastest way to build or bulk-correct a model that already exists in a spreadsheet. Distinct from
-  Task 146.04 (node/link report tables), which is read-only reporting: this one is an editor and
-  needs paste parsing, per-column unit handling, undo integration, and validation of every pasted
-  cell. Large; parked deliberately behind Task 185, which gets most of the practical benefit for a
-  fraction of the work.
+- 50|186| **Make the Tables pane spreadsheet-interoperable.**
+  Reworked by Tom 2026-08-25: *"186 reworked to make our Tables spreadsheet-interoperable."* The
+  original asked for a whole table-paradigm EDITOR (*"For the future a table-paradigm editor with
+  spreadsheet-like copy and paste would be very cool"*, 2026-07-30). **The rework is smaller and
+  better aimed: we already HAVE tables — make them talk to a spreadsheet.**
+  - **Out means copy and paste that lands correctly**, with the headers, in the units on the strip.
+    The pane already builds the rows; what a spreadsheet needs is tab-separated text on the
+    clipboard, which is a formatter, not an editor.
+  - **In is the harder half and is where the old task's real content survives**: paste parsing,
+    per-column unit handling, undo integration, and validation of every pasted cell. **A paste is
+    the user typing, so every rule about the user's own numbers applies to it.**
+  - **Do the OUT direction first and separately.** It is most of the value — a model that already
+    exists in a spreadsheet is the case Tom named, and getting a report out is what a submittal
+    needs — and it cannot corrupt anything.
+  - Distinct from Task 146.04 (node/link report tables), which is read-only reporting.
 
 - 5|191| **Junction emitters: surface the pressure-dependent demand already solved.**
   Originated during Task 146. Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"
@@ -875,22 +881,6 @@ the block.
   - **Do not hijack right-click inside form fields**; the popup's text inputs must keep native
     copy/paste. **Disable-with-reason rather than hide**, so the vocabulary stays learnable.
 
-- 5|194| **Touch gestures: one finger scrolls the page, two pan the map.**
-  Originated during Task 146. Raised by Tom, 2026-07-31, after the canvas-fills-the-phone lock-up: *"It didn't occur
-  to me to try to scroll with two fingers. That's just an idea. It looks like it occurred to you
-  too."* The height cap in `applyMapHeight()` already prevents the trap, so this is an improvement,
-  not a fix — it removes the underlying conflict instead of bounding it.
-  - **The gesture is the inverse of the first phrasing.** Two-finger *scroll* is a trackpad idiom;
-    on a touchscreen two fingers means pinch-zoom. The convention to copy is Google Maps embeds and
-    Leaflet: **one finger scrolls the page, two fingers pan the map**, with a "use two fingers to
-    move the map" hint on the first one-finger background drag.
-  - **Shape:** `touch-action: pan-y` on `#lpn_canvas` instead of `none`; the app keeps claiming (and
-    `preventDefault()`ing) touches that START on an element, so node/vertex drags, taps and the
-    drawing modes are untouched; only BACKGROUND panning moves to two fingers.
-  - **Risk to respect:** every drawing gesture on this page is a one-finger touch, so this reworks
-    the layer they all sit on. Not a tweak. If it lands, keep the height cap anyway — it costs
-    nothing and is the belt to this braces.
-
 - 5|202| **`zh` converts at ~15% where its peers convert at 50–75%.**
   PARKED until n=30, with a pre-registered threshold. Everything cheap has been eliminated: **not bots** (arrival pattern is
   more human-shaped than `es`), **not missing strings** (`lang_parity_check` reports only `lpn_`
@@ -922,17 +912,20 @@ the block.
     `[BACKDROP] DIMENSIONS` record places the image in the model's own coordinates exactly, which
     is strictly better than the two-point scale gesture a human would otherwise perform by eye.
 
-- 5|303| **Usage logging: the remaining lower-value questions.** Extracted from Task 200 when it
-  closed 2026-08-14, so they survive the close rather than being buried in a DONE block nobody
-  re-reads. All three are cheap and none of them decides anything on its own; take one when a
-  specific question makes it worth the wiring.
+- 25|303| **Usage logging: the remaining lower-value questions.**
+  **NOT obsolete, and 50 overstates it** — Tom asked which on 2026-08-25. The questions are still
+  real and still cheap; what is true is that **none of them decides anything on its own**, which is
+  the definition of Maybe rather than Someday. Take one when a specific question makes it worth the
+  wiring. Extracted from Task 200 when it closed 2026-08-14 so they survive the close.
   - **Time-to-first-calc** — separates a page that is confusing from one that is merely long.
-  - **Print / copy-link use**, as a proxy for work somebody intends to keep. Note this overlaps
-    Task 215's named-calculation signal, which already measures intent-to-share more directly, so
-    check whether the title log has already answered the question before building it.
+  - **Print / copy-link use**, as a proxy for work somebody intends to keep. Overlaps Task 215's
+    named-calculation signal, which measures intent-to-share more directly — check whether the title
+    log has already answered the question before building it.
   - **Intra-site path** — which calculator is the entry point and where people go next. The most
     expensive of the three, because a path needs an ordering the logs deliberately cannot express
     without a per-visit identifier we will not store.
+  - **Whatever is added is analytics and is gated on `ecAnalyticsConsented()`**, and a new log writer
+    must call `ecLogBucketSuffix()`.
 
 - 5|391| **[H] Evaluate `// @ts-check` with JSDoc branded types — a joint decision, not a
   proposal.** Tom, 2026-08-16, on the unit paradigm work: *"this would be a little easier if JS were

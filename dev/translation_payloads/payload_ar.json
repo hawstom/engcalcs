@@ -469,12 +469,12 @@
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_georef_done",
-                    "value": "هذا الآن مشروع على خط العرض\/خط الطول. اسحب أي عنصر لتقريبه من موقعه الحقيقي.",
+                    "value": "هذا الآن مشروع على خط العرض وخط الطول. اسحب أي عنصر لتقريبه من موقعه الحقيقي.",
                     "english": "This is a lat\/lon project now. Drag any asset to move it closer to where it really is."
                 },
                 "next_translated": {
                     "key": "lpn_georef_on_map",
-                    "value": "هذا المشروع على خط العرض\/خط الطول بالفعل.",
+                    "value": "هذا المشروع على خط العرض وخط الطول بالفعل.",
                     "english": "This project is already on lat\/lon."
                 }
             }

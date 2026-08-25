@@ -1,5 +1,14 @@
 # Merge proposal: the two `ponding` entries in `glossary.json`
 
+> **ACCEPTED AND APPLIED, 2026-08-25.** Tom: *"I accept the glossary merge."* Entry `46` is gone and
+> entry `34` now carries the merged term in `dev/scripts/glossary.json`. **One change from the
+> proposal below, on his ruling:** the first `avoid` item no longer forbids the word *flooding*
+> outright — *"I'm really soft on 'don't say flooding'. Maybe flooding is the right word in some
+> languages."* It now says the caution is about the SENSE (this is a design goal, not damage) and
+> that a language whose natural term for held-back water is also its flooding word should use it and
+> say so. **The rest of this document is the proposal as written, kept as the record of the
+> evidence.** §6's two follow-ups are NOT applied and are still open.
+
 **Status: PROPOSAL. Nothing in `dev/scripts/glossary.json` has been changed.** Written 2026-08-25
 for ROADMAP Task 513's third leftover. Tom rules; the orchestrating session reviews first.
 
