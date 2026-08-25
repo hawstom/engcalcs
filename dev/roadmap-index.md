@@ -7,18 +7,17 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**76 open tasks.** Next (100): 6 · Soon (75): 12 · Someday (50): 4 · Maybe (25): 27 · Parked (5): 27
+**76 open tasks.** Next (100): 5 · Soon (75): 13 · Someday (50): 4 · Maybe (25): 27 · Parked (5): 27
 
-## 100 — Next (6)
+## 100 — Next (5)
 
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 439 — The lat/lon drawing comes apart at 64,000 px/degree, not 600,000.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - Task 511 — Three georeferencing checks disagree with Mercator, and one of them is right.
 - Task 513 — What sprint 459 did not finish: three named jobs, all small.
-- ! Task 527 — The phone map is all chrome and no drawing, and four more small-screen defects.
 
-## 75 — Soon (12)
+## 75 — Soon (13)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 408 — Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.
@@ -32,6 +31,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 520 — Go to… sets the map scale from the wrong latitude, so the model jumps size.
 - ! Task 522 — One set of units, not an input set and a results set — reverses Task 422.
 - Task 526 — An EPANET warning is cached against a signature that cannot see it.
+- ! Task 527 — What is left on a phone after Tom's own rulings: three small-screen defects.
 
 ## 50 — Someday (4)
 

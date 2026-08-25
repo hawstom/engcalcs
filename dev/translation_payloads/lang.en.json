@@ -1184,6 +1184,7 @@
         "lpn_settings_map_height_px": "Map height (screen pixels)",
         "lpn_settings_map_height_tip": "On a small screen the map is drawn shorter than this, so that part of the page is always left to scroll.",
         "lpn_settings_legend_position": "Labels legend position",
+        "lpn_settings_legend_off": "Off",
         "lpn_settings_legend_top_left": "Top left",
         "lpn_settings_legend_top_right": "Top right",
         "lpn_settings_legend_middle_left": "Middle left",
@@ -1347,7 +1348,7 @@
         "lpn_terrain_missed": "{m} could not be read and are still blank.",
         "lpn_terrain_partial": "{f} terrain tile(s) did not answer."
     },
-    "count": 1345,
+    "count": 1346,
     "active_prefixes": [
         "about",
         "bpn",

@@ -3921,11 +3921,12 @@ var EngCalcs = EngCalcs || {};
 			// the boxes where anybody can read it. A note saying otherwise would be the only
 			// untrue thing on the key.
 		});
-		box.style.display = any ? '' : 'none';
+		box.style.display = (any && !legendIsOff(settings.colorLegendPosition)) ? '' : 'none';
 		applyColorLegendPosition();
 	}
 	function applyColorLegendPosition() {
 		var box = colorLegendBox; if (!box) { return; }
+		if (legendIsOff(settings.colorLegendPosition)) { box.style.display = 'none'; return; }
 		var pos = LEGEND_POSITIONS[settings.colorLegendPosition] || LEGEND_POSITIONS['bottom-right'];
 		box.style.top = pos.top; box.style.bottom = pos.bottom;
 		box.style.left = pos.left; box.style.right = pos.right;
@@ -8314,14 +8315,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		function positionSelect(current, onPick) {
 			var sel = document.createElement('select');
-			[
-				['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
-				['top-right', pc.lpn_settings_legend_top_right || 'Top right'],
-				['middle-left', pc.lpn_settings_legend_middle_left || 'Middle left'],
-				['middle-right', pc.lpn_settings_legend_middle_right || 'Middle right'],
-				['bottom-left', pc.lpn_settings_legend_bottom_left || 'Bottom left'],
-				['bottom-right', pc.lpn_settings_legend_bottom_right || 'Bottom right']
-			].forEach(function (o) {
+			legendPositionOptions(pc).forEach(function (o) {
 				var opt = document.createElement('option');
 				opt.value = o[0]; opt.textContent = o[1];
 				if (o[0] === current) { opt.selected = true; }
@@ -8612,7 +8606,9 @@ var EngCalcs = EngCalcs || {};
 		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			positionSelect(settings.colorLegendPosition, function (v) {
 				settings.colorLegendPosition = v;
-				applyColorLegendPosition(); saveToStorage();
+				// The RENDER, for the same reason the labels legend's dropdown calls its own: only the
+				// render knows whether there is a key to bring back after Off.
+				renderColorLegend(); saveToStorage();
 			}));
 		// **THE ACKNOWLEDGEMENT IS A LICENCE OBLIGATION, NOT A CREDIT WE CHOSE TO GIVE.** Apache-2.0
 		// clause 2 fixes its WORDING, so it is rendered verbatim out of EngCalcs.lpnRamps.CREDITS,
@@ -16989,7 +16985,8 @@ var EngCalcs = EngCalcs || {};
 		// (colorLegendBox), so this hides without touching that one.
 		// The georef case is not here -- it is a transient gesture, not a mode, and the legend is
 		// chrome the placement never touches.
-		box.style.display = (any && !settings.colorThematic) ? '' : 'none';
+		box.style.display = (any && !settings.colorThematic && !legendIsOff(settings.legendPosition))
+			? '' : 'none';
 		applyLegendPosition();
 	}
 	// There is no toggleLabelsPopup() any more. Labels moved to the Visibility panel (Task 427) and
@@ -17009,6 +17006,31 @@ var EngCalcs = EngCalcs || {};
 	// applyMapOverlayInset(), so a legend gets out of the panel's way by arithmetic rather than by
 	// anybody remembering to reposition it -- and it is 0px whenever the panel is shut.
 	var LEGEND_RIGHT = 'calc(4px + var(--lpn-overlay-right, 0px))';
+	// **"OFF" IS A PLACEMENT** (Tom, 2026-08-25, after using the page on his phone): *"one of the
+	// legend placement options must be 'Off'... Especially the labels legend. With all the control we
+	// have given the user, the legend is of less value now compared to when we were distinguishing
+	// coloured numbers."*
+	//
+	// It rides in the same dropdown rather than arriving as a separate checkbox because it IS the
+	// same decision -- where does this box go, and one of the answers is nowhere. A checkbox beside
+	// the dropdown would be two controls for one choice, and the user would have to work out which
+	// one wins.
+	//
+	// ONE LIST FOR BOTH LEGENDS. The six positions were written out twice -- once in positionSelect()
+	// for the colour key and once inline for the labels legend -- so this option would have had to be
+	// added in two places, which is the shape of the next drift.
+	function legendPositionOptions(pc) {
+		return [
+			['off', pc.lpn_settings_legend_off || 'Off'],
+			['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
+			['top-right', pc.lpn_settings_legend_top_right || 'Top right'],
+			['middle-left', pc.lpn_settings_legend_middle_left || 'Middle left'],
+			['middle-right', pc.lpn_settings_legend_middle_right || 'Middle right'],
+			['bottom-left', pc.lpn_settings_legend_bottom_left || 'Bottom left'],
+			['bottom-right', pc.lpn_settings_legend_bottom_right || 'Bottom right']
+		];
+	}
+	function legendIsOff(pos) { return pos === 'off'; }
 	var LEGEND_POSITIONS = {
 		'top-left': { top: '4px', bottom: '', left: '4px', right: '', transform: '' },
 		'top-right': { top: '4px', bottom: '', left: '', right: LEGEND_RIGHT, transform: '' },
@@ -17239,8 +17261,13 @@ var EngCalcs = EngCalcs || {};
 		// fit that was waiting for one can have its answer.
 		noteMapSized();
 	}
+	// **THIS ONLY EVER HIDES; IT NEVER SHOWS.** renderLabelsLegend() owns the other two reasons the
+	// box can be absent -- nothing to show, and thematic mode -- so a function that also un-hid would
+	// be a second opinion about display and would put the legend back on a thematic map. The dropdown
+	// therefore calls the RENDER rather than this, and the render calls this last.
 	function applyLegendPosition() {
 		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }
+		if (legendIsOff(settings.legendPosition)) { box.style.display = 'none'; return; }
 		var pos = LEGEND_POSITIONS[settings.legendPosition] || LEGEND_POSITIONS['top-right'];
 		box.style.top = pos.top; box.style.bottom = pos.bottom;
 		box.style.left = pos.left; box.style.right = pos.right;
@@ -17809,21 +17836,16 @@ var EngCalcs = EngCalcs || {};
 		});
 		row(mapBody, pc.lpn_settings_backdrop_opacity || 'Background image opacity (0 to 1)', backdropOpacityInput);
 		var legendSelect = document.createElement('select');
-		[
-			['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
-			['top-right', pc.lpn_settings_legend_top_right || 'Top right'],
-			['middle-left', pc.lpn_settings_legend_middle_left || 'Middle left'],
-			['middle-right', pc.lpn_settings_legend_middle_right || 'Middle right'],
-			['bottom-left', pc.lpn_settings_legend_bottom_left || 'Bottom left'],
-			['bottom-right', pc.lpn_settings_legend_bottom_right || 'Bottom right']
-		].forEach(function (o) {
+		legendPositionOptions(pc).forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === settings.legendPosition) { opt.selected = true; }
 			legendSelect.appendChild(opt);
 		});
 		legendSelect.addEventListener('change', function () {
 			settings.legendPosition = legendSelect.value;
-			applyLegendPosition();
+			// The RENDER, not applyLegendPosition(): picking a corner again after Off has to bring the
+			// box back, and only the render knows whether there is anything to bring back.
+			renderLabelsLegend();
 			saveToStorage();
 		});
 		// Legend position lives INSIDE Map display (Tom, 2026-07-30), not loose above it: it is a

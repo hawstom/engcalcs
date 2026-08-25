@@ -1567,6 +1567,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_backdrop_opacity: <?=json_encode($ec_lang['lpn_settings_backdrop_opacity'])?>,
 	lpn_settings_map_display: <?=json_encode($ec_lang['lpn_settings_map_display'])?>,
 	lpn_settings_legend_position: <?=json_encode($ec_lang['lpn_settings_legend_position'])?>,
+	lpn_settings_legend_off: <?=json_encode($ec_lang['lpn_settings_legend_off'])?>,
 	lpn_settings_legend_top_left: <?=json_encode($ec_lang['lpn_settings_legend_top_left'])?>,
 	lpn_settings_legend_top_right: <?=json_encode($ec_lang['lpn_settings_legend_top_right'])?>,
 	lpn_settings_legend_middle_left: <?=json_encode($ec_lang['lpn_settings_legend_middle_left'])?>,

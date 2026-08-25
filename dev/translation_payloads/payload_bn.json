@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1345,
-        "delta_key_count": 4,
+        "expected_key_count": 1346,
+        "delta_key_count": 5,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -447,12 +447,14 @@
         "lpn_geomap": "lat\/lon",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "keys": {
         "lpn_geomap": "lat\/lon",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "key_context": {
@@ -501,6 +503,22 @@
                     "key": "lpn_scenario_menu",
                     "value": "দৃশ্যকল্প",
                     "english": "Scenarios"
+                }
+            }
+        },
+        "lpn_settings_legend_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "কী-টেবিলের অবস্থান",
+                    "english": "Labels legend position"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_top_left",
+                    "value": "উপরে বামে",
+                    "english": "Top left"
                 }
             }
         },

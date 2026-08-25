@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 1345,
-        "delta_key_count": 3,
+        "expected_key_count": 1346,
+        "delta_key_count": 4,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -447,12 +447,14 @@
     "keys_to_translate": {
         "lpn_geomap": "lat\/lon",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
-        "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them."
+        "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_legend_off": "Off"
     },
     "keys": {
         "lpn_geomap": "lat\/lon",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
-        "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them."
+        "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_legend_off": "Off"
     },
     "key_context": {
         "lpn_geomap": {
@@ -500,6 +502,22 @@
                     "key": "lpn_scenario_menu",
                     "value": "Scénáře",
                     "english": "Scenarios"
+                }
+            }
+        },
+        "lpn_settings_legend_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Umístění legendy",
+                    "english": "Labels legend position"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_top_left",
+                    "value": "Vlevo nahoře",
+                    "english": "Top left"
                 }
             }
         }

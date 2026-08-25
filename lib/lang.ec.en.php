@@ -2363,6 +2363,12 @@ $ec_lang['lpn_settings_map_height_px']='Map height (screen pixels)';
 $ec_lang['lpn_settings_map_height_tip']='On a small screen the map is drawn shorter than this, so that part of the page is always left to scroll.';
 $ec_lang['lpn_settings_legend_position']='Labels legend position';
 $ec_lang_syn['lpn_settings_legend_position']='The position where the key table (legend, map key — the box explaining the symbols) for node and link labels sits on the map. | avoid: legend as a myth or folk tale';
+// ROADMAP Task 529. Tom, 2026-08-25, after a phone session: *"one of the legend placement options
+// must be 'Off'... Especially the labels legend. With all the control we have given the user, the
+// legend is of less value now compared to when we were distinguishing coloured numbers."*
+// It sits in the placement dropdown, not beside it as a checkbox, because where the box goes and
+// whether it goes anywhere are one decision.
+$ec_lang['lpn_settings_legend_off']='Off';
 $ec_lang['lpn_settings_legend_top_left']='Top left';
 $ec_lang['lpn_settings_legend_top_right']='Top right';
 $ec_lang['lpn_settings_legend_middle_left']='Middle left';

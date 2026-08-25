@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 1345,
-        "delta_key_count": 3,
+        "expected_key_count": 1346,
+        "delta_key_count": 4,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -439,11 +439,13 @@
     "keys_to_translate": {
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "keys": {
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "key_context": {
@@ -476,6 +478,22 @@
                     "key": "lpn_scenario_menu",
                     "value": "情景",
                     "english": "Scenarios"
+                }
+            }
+        },
+        "lpn_settings_legend_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "图例位置",
+                    "english": "Labels legend position"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_top_left",
+                    "value": "左上",
+                    "english": "Top left"
                 }
             }
         },
