@@ -66,7 +66,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 515 — The Settings category index breaks its own labels mid-word.
 - Task 516 — The colour key stacks onto the label legend and covers it.
-- Task 523 — Rename the Project menu to "Water" — Tom's alternate-reality idea.
+- Task 523 — Rename the Project menu to "Water" — DECIDED, not yet built.
 
 ## 5 — Parked (27)
 

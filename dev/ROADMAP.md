@@ -289,10 +289,12 @@ the block.
   it touches label placement, the leader, collision avoidance and the Text popup. **Task 247's meter
   needs the same `linkAnchor {link, t}`** — whichever ships first builds it for both.
 
-- 25|523| **Rename the Project menu to "Water" — Tom's alternate-reality idea.**
-  Tom, 2026-08-24: *"my big idea for what it ideally should be called instead of Project in an
-  alternate reality: Water. It's the Water modeling menu."* Floated, not decided; recorded so it is
-  not re-proposed from scratch.
+- 25|523| **Rename the Project menu to "Water" — DECIDED, not yet built.**
+  Tom, 2026-08-24, arriving at it in three moves: *"instead of Project ... Water. It's the Water
+  modeling menu"*, then *"this menu is all about business logic. And the business is Waterworks"*,
+  then back to Water and staying there: *"'Water' is just better all around. Fun to use, fun to
+  teach, fun to own, fun to share. It's why we chose our careers. Mni wiconi. Water is life."*
+  **The word is Water.** Waterworks was the sharper description and the weaker name.
   - **The menu's own tip is already the argument for it.** `lpn_menu_project_tip` reads *"Everything
     about water network modeling is here in one place, except the animation play controls."* The
     label is weaker than its own description, and the description is already in Tom's words.
@@ -307,20 +309,21 @@ the block.
     DOCUMENT — the tab strip, the project menu on a tab, `serializeProject()`, project units. A menu
     named Water beside a document called a project is clearer; a menu named Project beside them is
     ambiguous in the other direction. Worth checking which confusion is cheaper before acting.
-  - **"WATERWORKS" IS THE SHARPER WORD, and Tom reached it second** (2026-08-24): *"this menu is all
-    about business logic. And the business is Waterworks."* Water is a substance; waterworks is the
-    SYSTEM — pipes, pumps, tanks, the thing actually being modelled. It also answers the objection
-    that Settings and Libraries do not fit: units, friction method, default sizes and the pipe and
-    pump libraries are not setup, they are the business rules, and business logic is exactly the
-    category that holds all of it.
-  - **The one thing to check before it is printed anywhere: "waterworks" carries two informal senses
-    in English** — crying ("turn on the waterworks") and, in British usage, the urinary tract. It is
-    at the same time the standard American term for a municipal system (Des Moines Water Works,
-    Louisville Water Works), so it is respectable and in real use; the two readings simply coexist.
-    A menu label is low risk. A public organisation name is not, and is where to weigh it.
-  - **Floated in the same breath as an organisation name — "Waterworks Foundation"** — which is a
-    different and much larger decision than a menu label, and belongs with `dev/positioning.md` and
-    Task 479 rather than here. Recorded so the idea is not lost, not as a proposal.
+  - **"Business logic" is what answers the Settings-and-Libraries objection.** Units, friction
+    method, default sizes and the pipe and pump libraries are not setup — they are the business
+    rules, and that is one category, not two. The menu is not holding two kinds of thing.
+  - **Waterworks was considered and dropped.** It names the SYSTEM rather than the substance and is
+    the more precise description, but it is longer, it is harder in 27 languages, and in English it
+    also means crying and (in British usage) the urinary tract. It survives in real utility names
+    (Des Moines Water Works), so the risk is manageable — but a name that needs that paragraph is
+    beaten by one that needs none. "Waterworks Foundation" was floated as an organisation name in
+    the same breath; that is a `dev/positioning.md` question, not this one.
+  - **THE REASONING GOES WIDER THAN THIS MENU: it is a reason to keep EPANET's names off our
+    surfaces.** Tom: *"They were always unclear, and we don't want to inherit any of those
+    assumptions or associations."* That is the same rule CLAUDE.md already states for the element
+    vocabulary (Task 482), now stated as a positioning principle. **It has one live consequence
+    nobody has ruled on: `LibreEPANET.org` inherits precisely the name and the associations this
+    sentence says to avoid.** `LibreWaterNet.org` does not. See Task 479 and `dev/positioning.md`.
 
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
