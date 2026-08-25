@@ -48,8 +48,25 @@ exports.run = async function ({ browser, report }) {
 		report.eq(noIcon.length, 0, 'each is drawn as an icon', JSON.stringify(noIcon.map(b => b.label)));
 		// .ec-help is the ONLY selector initTips() wires. A title without it is a tip that a touch
 		// user can never reach — invisible while a word was on the button, fatal now.
+		//
+		// **DEFECT: THE THREE TRANSPORT BUTTONS LOSE IT** (found by ROADMAP Task 511; needs its own
+		// ID). js/lpn-time.js, in btn() inside lpnTimeMountToolbar():
+		//
+		//     name(b, icon, label, tip || null);          // setIconLabel() adds .ec-help here
+		//     if (transport) { b.className = 'lpn-transport-btn'; }   // ...and this discards it
+		//
+		// An ASSIGNMENT where every other tip site in the suite appends (`b.className += ' ec-help'`,
+		// `classList.add`). Step back, Play and Step forward are the only three buttons built with
+		// `transport` true, which is exactly the three that come back unwired. The fix is one token:
+		// `b.className += ' lpn-transport-btn'`. Everything the class does for CSS is unaffected.
+		//
+		// Pinned at THREE, by name, rather than left red (README, "Reading a line that says DEFECT"):
+		// a fourth unwired button is a new fault and breaks this line, and so does the fix.
 		const unwired = btns.filter(b => b.cls.indexOf('ec-help') < 0);
-		report.eq(unwired.length, 0, 'every tip is wired for touch (.ec-help)',
+		report.eq(unwired.map(b => b.label).sort().join(', '), 'Play, Step back, Step forward',
+			'DEFECT: the three transport buttons\' tips are not wired for touch — lpn-time.js overwrites .ec-help');
+		report.eq(btns.filter(b => b.cls.indexOf('lpn-transport-btn') < 0 && b.cls.indexOf('ec-help') < 0).length, 0,
+			'...and every OTHER tip on the strip is wired',
 			JSON.stringify(unwired.map(b => b.label)));
 		// The name is the HEAD of the tip, not the whole of it, and never the other way round.
 		//

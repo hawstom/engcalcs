@@ -36,8 +36,12 @@ exports.title = '30. The Settings box, one design';
 // separate -- so they are measured on their own terms below, at half the width, and are read out of
 // .lpn-color-breaks rather than out of a .lpn-set-row.
 const NUM_MAX = 80;
-// Half of --lpn-set-num (4.5rem = 72 px), which is 2.5rem = 40 px.
-const BAND_BOX_MAX = 44;
+// **--lpn-set-numsm, WHICH IS 3.125rem = 50 px, NOT HALF OF --lpn-set-num** (Task 511). Tom's
+// 2026-08-20 "they could be about half as wide" took it to 2.5rem; his 2026-08-21 re-read widened it
+// 25% again, because half was a shade too tight for a five-digit head in metres (commit 0df11c95).
+// The claim that survives a re-tune is the COMPARISON — a boundary box is materially narrower than a
+// setting's own number box — so that is what is asserted, with the current token as the ceiling.
+const BAND_BOX_MAX = 52;
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -45,7 +49,21 @@ exports.run = async function ({ browser, report }) {
 		await a.goto();
 		await a.dismissGallery();
 		await a.makeEdit();
-		await a.menuClick('Labels', 'view');
+		// **OPENED ON THE TOOLBAR BUTTON.** This used to be View > Labels, a row Tom removed on
+		// 2026-08-21 — the box is reached from its own gear, from Project > Settings and from a click
+		// on the colour key, and a third menu door to a button that is always on the strip was one
+		// too many. The stale row THREW out of menuClick(), which took this whole spec and the five
+		// after it out of the pass (Task 511); nothing below cares which section is showing, only
+		// that the box is open and laid out.
+		await a.toolbarClick('Settings');
+		await a.settle(300);
+		// ...and jumped to the Labels section through the box's OWN INDEX, which is the door that
+		// replaced the menu row. The labels rows are what several checks below measure.
+		await a.page.evaluate(() => {
+			const row = [...document.querySelectorAll('#lpn_setbox_index button')]
+				.find(b => /^\s*labels\s*$/i.test(b.textContent));
+			if (row) { row.click(); }
+		});
 		await a.settle(500);
 
 		// ---- THE CONTROL COLUMN --------------------------------------------------------------
@@ -115,20 +133,32 @@ exports.run = async function ({ browser, report }) {
 
 		// ---- THE FIRST LINE (Tom: "checkbox even with inputs") --------------------------------
 		//
-		// **MEASURED UNDER A SQUEEZE, and that is the point.** At the shipped 34rem no name wraps at
-		// all, so measuring only there would assert nothing about the case Tom reported -- the same
-		// trap labelcols.js names. 27rem is the narrowest the box gets while the rows still have two
-		// columns (below ~26rem the container query stacks them, which is a different layout).
+		// **MEASURED UNDER A SQUEEZE, and that is the point.** Measuring only at the shipped width
+		// would assert nothing about the case Tom reported -- the same trap labelcols.js names.
+		//
+		// **THE SQUEEZE IS 33rem, NOT 27rem** (Task 511). The container query that stacks the two
+		// columns is on `.lpn-setbox-content` at 24rem = 384 px, and the content pane is NOT the box:
+		// the box carries the index pane beside it, so the pane runs ~134 px narrower than the box.
+		// 27rem of box is 298 px of pane, well past the stack, and every check below was quietly
+		// measuring a ONE-column layout -- reporting no wrapped names at all and a control 31 px
+		// "below its first line" when the control was simply on the next row, which is what stacking
+		// means. Measured across the range: 33rem -> 394 px pane, two columns, ten names wrapped;
+		// 32rem -> 378 px, stacked. So 33rem is the narrowest two-column width, and the pane is
+		// asserted rather than assumed so this cannot silently slide across the threshold again.
+		const STACK_PX = 384;   // the @container lpnset (max-width: 24rem) rule, in pixels
 		const at = async (w) => {
 			await a.page.evaluate((width) => { document.getElementById('lpn_settings_box').style.width = width; }, w);
 			await a.settle(200);
 			return measure();
 		};
-		const squeezed = await at('27rem');
+		const squeezed = await at('33rem');
+		report.ok(squeezed.pane > STACK_PX,
+			'squeezed to 33rem, the rows still have their two columns — below this the layout stacks',
+			`pane ${squeezed.pane} px against the ${STACK_PX} px container query`);
 		const wrapped = squeezed.rows.filter(r => r.lines > 1);
-		report.ok(wrapped.length > 2, 'squeezed to 27rem, several names really do wrap to a second line',
+		report.ok(wrapped.length > 2, 'and several names really do wrap to a second line',
 			`pane ${squeezed.pane} px: ` + wrapped.map(r => r.name).join('; '));
-		for (const set of [{ what: 'at the shipped width', d: seen }, { what: 'and squeezed to 27rem', d: squeezed }]) {
+		for (const set of [{ what: 'at the shipped width', d: seen }, { what: 'and squeezed to 33rem', d: squeezed }]) {
 			const worst = set.d.rows.reduce((acc, r) => Math.abs(r.offFirstLine) > Math.abs(acc.offFirstLine) ? r : acc, set.d.rows[0]);
 			report.ok(Math.abs(worst.offFirstLine) < 3,
 				`every control sits on the FIRST line of its name — ${set.what}`,
@@ -159,17 +189,31 @@ exports.run = async function ({ browser, report }) {
 			}
 			return out;
 		});
+		// **NO LABELS-LIST NAME WRAPS ANY MORE, at any width that keeps two columns** (Task 511).
+		// These are field names -- ID, Head, Flow, Roughness C -- and the widest of them measures
+		// 165 px in a 184 px cell at the 33rem squeeze; below that the list stacks and the name gets
+		// the whole pane, so it cannot wrap there either. The setting rows above still wrap ten
+		// names, so the first-line rule IS exercised; it is only this list that has nothing long
+		// enough left in it.
+		//
+		// **SKIPPED, NOT ASSERTED AWAY.** This check used to reduce() over the wrapped rows and
+		// therefore THREW on an empty list, which took the whole spec down. A condition this
+		// environment cannot produce is what report.skip() is for; if a long field name is ever
+		// added the assertion comes back by itself.
 		const wrap2 = lab.filter(r => r.lines > 1);
-		report.ok(wrap2.length > 0, 'a labels row with a name long enough to wrap is on screen (still at 27rem)',
-			wrap2.map(r => r.name).join('; '));
 		const badBox = lab.reduce((acc, r) => Math.abs(r.cbVsBox) > Math.abs(acc.cbVsBox) ? r : acc, lab[0]);
 		report.ok(Math.abs(badBox.cbVsBox) < 3,
 			'a labels checkbox is even with the boxes on its row',
 			`worst is ${badBox.cbVsBox} px on "${badBox.name}"`);
-		const badLine = wrap2.reduce((acc, r) => Math.abs(r.boxVsLine) > Math.abs(acc.boxVsLine) ? r : acc, wrap2[0]);
-		report.ok(Math.abs(badLine.boxVsLine) < 3,
-			'...and a name that wrapped does not drag either of them below its first line',
-			`worst is ${badLine.boxVsLine} px on "${badLine.name}"`);
+		if (wrap2.length) {
+			const badLine = wrap2.reduce((acc, r) => Math.abs(r.boxVsLine) > Math.abs(acc.boxVsLine) ? r : acc, wrap2[0]);
+			report.ok(Math.abs(badLine.boxVsLine) < 3,
+				'...and a name that wrapped does not drag either of them below its first line',
+				`worst is ${badLine.boxVsLine} px on "${badLine.name}"`);
+		} else {
+			report.skip('...and a name that wrapped does not drag either of them below its first line',
+				'no field name in either labels list is long enough to wrap at a two-column width');
+		}
 		report.ok(new Set(lab.map(r => r.cbLeft)).size === 1, 'and every checkbox in a list shares one x',
 			[...new Set(lab.map(r => r.cbLeft))].join(', '));
 
@@ -261,9 +305,9 @@ exports.run = async function ({ browser, report }) {
 		report.ok(bands && bands.straddle.every(d => Math.abs(d) < 1.5),
 			'...with each box centred on the JOIN between the two bands it separates — nothing to count out',
 			bands && bands.straddle.map(d => d + ' px').join(', '));
-		report.ok(bands && bands.boxW <= BAND_BOX_MAX && bands.boxW < NUM_MAX / 1.5,
-			'a boundary box is about half a setting box — Tom: "about half as wide"',
-			bands && `${bands.boxW} px, against 72 px for a setting's own number box`);
+		report.ok(bands && bands.boxW <= BAND_BOX_MAX && bands.boxW < numW[0] * 0.8,
+			'a boundary box is materially narrower than a setting box — Tom: "about half as wide"',
+			bands && `${bands.boxW} px against ${numW[0]} px for a setting's own number box`);
 		report.ok(bands && bands.widest < bands.pane && bands.scroll <= bands.pane + 0.5,
 			'...and the whole legend fits the pane it is in, which is what it did not do',
 			bands && `${bands.widest} px in ${bands.pane} px, scrollWidth ${bands.scroll}`);

@@ -40,21 +40,33 @@ exports.run = async function ({ browser, report }) {
 		report.ok(!!net, 'there is a group holding Libraries',
 			JSON.stringify(strip.map((g) => g.items)));
 		if (net) {
-			// **TOM'S ORDER, EXACTLY.** Libraries, Settings, Simulate (the Run button), the three
-			// transport buttons and the two time selectors. Written out rather than checked for
-			// membership: the order IS the request, and a set comparison would pass on a group
-			// holding the right controls in the wrong sequence.
-			report.eq(net.items.join(' | '),
-				'Libraries | Settings | Run | Step back | Play | Step forward | Time | Speed',
-				'and it holds exactly Libraries, Settings, Simulate, Transport and the time selectors, in that order');
+			// **TOM'S ORDER, EXACTLY — AND IT IS THREE GROUPS, NOT ONE** (Task 511). He gave both
+			// surfaces in one line on 2026-08-21: *"Settings Libraries | Profile Tables | Run"*, and
+			// the separators are the request as much as the order is — what the project IS, what you
+			// READ beside it, what you RUN on it. This check asserted a single group in an older
+			// sequence (Libraries first, the transport folded in with it), which is the shape the
+			// strip had before it was made to mirror the Project menu.
+			//
+			// Written out rather than checked for membership: the order IS the request, and a set
+			// comparison would pass on a group holding the right controls in the wrong sequence.
+			report.eq(net.items.join(' | '), 'Settings | Libraries',
+				'the water-network group is Settings then Libraries, mirroring the Project menu');
 			report.ok(!net.end, 'it is not the right-aligned end group', String(net.end));
+			const after = strip.slice(net.i + 1).filter((g) => !g.end).map((g) => g.items.join(' | '));
+			report.eq(after[0], 'Profile | Tables',
+				'...followed by what you READ beside the project, in its own group');
+			report.ok(/^Calculate \| Step back \| Play \| Step forward \| Time \| Speed$/.test(after[1] || ''),
+				'...and then what you RUN on it: Calculate and the transport, again in their own group',
+				after[1]);
 		}
 		// **THE GEAR LEFT THE END GROUP, AND FIND AND THE PANE TOGGLE DID NOT.** Tom moved one
 		// control, and a spec that only checked where Settings landed would not notice the other two
 		// being dragged along with it.
 		const end = strip.find((g) => g.end);
-		report.ok(!!end && end.items.join(' | ') === 'Find | Bottom panel',
-			'the right-hand end keeps Find and the bottom-panel toggle, and nothing else',
+		// The button is named "Find and replace" (Task 420's row name, which the strip took); this
+		// check still said "Find" until Task 511.
+		report.ok(!!end && end.items.join(' | ') === 'Find and replace | Bottom panel',
+			'the right-hand end keeps Find and replace and the bottom-panel toggle, and nothing else',
 			end && end.items.join(' | '));
 		report.ok(!!end && end.items.indexOf('Settings') < 0,
 			'Settings is no longer at the right-hand end', end && end.items.join(' | '));

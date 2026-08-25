@@ -45,8 +45,13 @@ async function centre(a) {
 	await a.page.mouse.move(r.x + r.w / 2, r.y + r.h / 2);
 	await a.settle(150);
 	const text = await a.page.evaluate(() => document.getElementById('lpn_coords').textContent);
-	const m = text.match(/Longitude:\s*(-?[\d.]+)\s+Latitude:\s*(-?[\d.]+)/);
-	return m ? { lon: +m[1], lat: +m[2], text } : { text };
+	// **LATITUDE FIRST, because the readout is PUBLIC ORDER** (Tom, 2026-08-24: *"It should be
+	// lat/lon everywhere... history says Lat/Lon"*; coord_order_check.php enforces it). This regex
+	// read longitude first until Task 511 and therefore matched nothing, so every check below got
+	// `{lat: undefined, lon: undefined}` — which made the three centring checks fail and made
+	// "the map did not move" pass by comparing undefined with undefined. A check that cannot fail.
+	const m = text.match(/Latitude:\s*(-?[\d.]+)\s+Longitude:\s*(-?[\d.]+)/);
+	return m ? { lat: +m[1], lon: +m[2], text } : { text };
 }
 async function cookie(a) {
 	return a.page.evaluate(() => {
@@ -292,7 +297,7 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();
 		await a.makeEdit();
 		// The wizard starts from a FILE now (Task 447): the drawing on screen is written out and
-		// opened again through File > Import XY to lat/lon…, which lands it in a new tab, in step 1.
+		// opened again through File > Import xy to lat/lon…, which lands it in a new tab, in step 1.
 		{
 			const text = await a.page.evaluate(() => {
 				const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}');
@@ -300,7 +305,7 @@ exports.run = async function ({ browser, report }) {
 			});
 			const [chooser] = await Promise.all([
 				a.page.waitForEvent('filechooser'),
-				a.menuClick('Import XY to lat/lon…')
+				a.menuClick('Import xy to lat/lon…')
 			]);
 			await chooser.setFiles({ name: 'search.json', mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
 		}

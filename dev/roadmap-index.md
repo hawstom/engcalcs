@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**74 open tasks.** Next (100): 6 · Soon (75): 13 · Someday (50): 4 · Maybe (25): 24 · Parked (5): 27
+**77 open tasks.** Next (100): 9 · Soon (75): 13 · Someday (50): 4 · Maybe (25): 24 · Parked (5): 27
 
-## 100 — Next (6)
+## 100 — Next (9)
 
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 439 — The lat/lon drawing comes apart at 64,000 px/degree, not 600,000.
@@ -17,6 +17,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 511 — Three georeferencing checks disagree with Mercator, and one of them is right.
 - ! Task 512 — The amber override ring reads as a stuck highlight nobody can turn off.
 - Task 513 — What sprint 459 did not finish: three named jobs, all small.
+- Task 517 — The georeference settle scales on latitude, so the ground scale drifts.
+- Task 518 — Three transport buttons lose their tips to a className assignment.
+- ! Task 519 — A throwing spec truncates the browser pass and it reports the subset as a run.
 
 ## 75 — Soon (13)
 
@@ -100,5 +103,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-73 of 74 titles are within 4–12 words. `!` marks the rest;
+75 of 77 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

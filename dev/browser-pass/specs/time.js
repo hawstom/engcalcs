@@ -70,7 +70,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(inert.offSel, '...and so is the step selector');
 		report.ok(/no time period/i.test(inert.why) && /Settings/.test(inert.why),
 			'...and they say why, and where to fix it', inert.why);
-		report.ok(inert.runLive, 'but Run stays live — with no duration it is an ordinary recalculate');
+		report.ok(inert.runLive, 'but Calculate stays live — with no duration it is an ordinary recalculate');
 
 		// Net3 is the network with a duration, patterns, controls and three tanks in it.
 		// **MATCHED ON THE WHOLE TITLE, NOT ON "Net3" ANYWHERE IN THE CARD.** Publishing
@@ -169,18 +169,21 @@ exports.run = async function ({ browser, report }) {
 				return { clock: out ? out.textContent : '', tanks, labels };
 			});
 		}
-		// **FRAMES AT t=0 ARE NOT PROMISED, AND ASSERTING THEM MADE THIS SPEC FLAKY.** A network
-		// that costs more than the auto-run budget deliberately does NOT run itself -- the page
-		// says so and waits to be told. Whether Net3 lands over that budget depends on how busy
-		// the machine is, so this check passed and failed on alternate runs of the SAME commit
-		// (measured 2026-08-19: two of four). The real contract is a disjunction, so assert the
-		// disjunction: either the frames are there, or the page says to press Run -- and if it
-		// says so, PRESS IT, which is how the Run button gets exercised on the path that needs it.
+		// **THE FRAMES ARRIVE, AND THE OLD DISJUNCTION IS DEAD** (Task 467, re-read by Task 511).
+		// This used to read "either the frames are there, or the page says to press Run", because a
+		// network costing more than LPN_TIME_AUTO.budgetMs did not run itself and whether Net3 landed
+		// over that budget depended on how busy the machine was -- the check passed and failed on
+		// alternate runs of the same commit. **That veto is gone: `budgetMs` no longer gates
+		// anything**, automatic means automatic, and the cost measurement became advice the status
+		// bar gives (EC.LPN_TIME_SLOW_MS) rather than a decision taken behind the user. The manual
+		// path is now the Recalculate-automatically checkbox, which section 5 below drives.
+		// The branch is kept only as a guard: if it ever fires again, something has re-introduced a
+		// silent veto, and the check inside it says so by name.
 		await a.waitFor(async () => (await readState()).tanks.length > 0, 'the first frame', 8000);
 		let t0 = await readState();
 		if (!t0.tanks.length) {
 			const said = await a.status();
-			report.has(said, 'Press Run', 'a network over the auto-run budget says to press Run', said);
+			report.ok(false, 'a silent auto-run veto is back — Task 467 removed budgetMs as a gate', said);
 			await a.page.evaluate(() => window.EngCalcs.lpnTimeRunNow());
 			await a.waitFor(async () => (await readState()).tanks.length > 0, 'the run', 30000);
 			t0 = await readState();
@@ -406,36 +409,85 @@ exports.run = async function ({ browser, report }) {
 			settled.frames + ' frames, last run ' + settled.ms + ' ms');
 		report.eq(settled.note, '', 'and the page says nothing, because there is nothing out of date');
 
-		// **AN EXPENSIVE NETWORK STOPS VOLUNTEERING.** The budget is dropped to zero rather than a
-		// 1-minute report step being typed in, so the check takes a second instead of a minute and
-		// tests the branch rather than the arithmetic that reaches it (which time-harness.js owns).
+		// **THE MEASUREMENT IS ADVICE, NOT A VETO — AND THE USER OWNS THE SWITCH** (Task 467, Tom
+		// 2026-08-20). Until Task 511 this section dropped `LPN_TIME_AUTO.budgetMs` to zero and
+		// asserted that the page then stopped volunteering. **`budgetMs` no longer gates anything**,
+		// so those three checks had been asserting a mechanism that was deliberately deleted: a
+		// checkbox reading "Recalculate automatically" that silently stopped obeying above 400 ms was
+		// two states pretending to be one, with the only evidence a run that never happened.
+		//
+		// So the first thing asserted here is the RULING — an expensive network still runs itself —
+		// and the manual path is then reached the way a user reaches it, through the checkbox.
 		await a.page.evaluate(() => {
 			window.EngCalcs.LPN_TIME_AUTO.budgetMs = 0;
 			window.__runs = 0;
 		});
 		await editDuration('9:00');
 		await a.settle(2500);
+		const noVeto = await a.page.evaluate(() => ({
+			runs: window.__runs,
+			frame: !!window.EngCalcs.lpnTimeCurrentFrame(),
+			note: window.EngCalcs.lpnTimeStatusNote()
+		}));
+		report.eq(noVeto.runs, 1,
+			'a network over the old cost budget STILL runs itself — automatic means automatic');
+		report.ok(noVeto.frame, '...and the frames are there, unasked');
+		report.eq(noVeto.note, '', '...with nothing to warn about, because nothing is out of date');
+
+		// **TURNING THE CHECKBOX OFF IS THE MANUAL PATH.** Found by its own label rather than by a
+		// selector: it is a row of the Settings box under Calculation, and the box's rows are built
+		// as <label> + <span> + input, so the sentence a user reads is what this looks for.
+		async function setAutoRun(on) {
+			await a.toolbarClick('Settings');
+			await a.settle(400);
+			const hit = await a.page.evaluate((want) => {
+				const row = [...document.querySelectorAll('#lpn_settings_box label.lpn-set-row')]
+					.find(l => /recalculate automatically/i.test(l.textContent));
+				const cb = row && row.querySelector('input[type="checkbox"]');
+				if (!cb) { return false; }
+				if (cb.checked !== want) { cb.click(); }
+				return true;
+			}, on);
+			await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
+			await a.settle(400);
+			return hit;
+		}
+		report.ok(await setAutoRun(false),
+			'"Recalculate automatically" is a row of the Settings box, under Calculation');
+		await a.page.evaluate(() => { window.__runs = 0; });
+		await editDuration('8:00');
+		await a.settle(2500);
 		const manual = await a.page.evaluate(() => ({
 			runs: window.__runs,
 			frame: !!window.EngCalcs.lpnTimeCurrentFrame(),
 			note: window.EngCalcs.lpnTimeStatusNote(),
-			status: (document.getElementById('lpn_status') || {}).textContent || ''
+			status: (document.getElementById('lpn_status') || {}).textContent || '',
+			btn: (function () {
+				const b = [...document.querySelectorAll('#lpn_toolbar button')]
+					.find(x => x.getAttribute('data-icon') === 'run');
+				return !!b && b.style.display !== 'none';
+			}())
 		}));
-		report.eq(manual.runs, 0, 'a network that costs more than the budget does not re-run itself at all');
+		report.eq(manual.runs, 0, 'with it OFF, an edit does not re-run the period at all');
 		report.ok(!manual.frame, 'and still never leaves a stale frame behind');
 		report.ok(manual.note.length > 0 && manual.status.indexOf(manual.note) >= 0,
 			'the status bar SAYS the later times are not being kept up to date', manual.status);
+		report.ok(manual.btn, '...and the Calculate button is back on the strip to answer it');
 
 		// ...and the button is what brings them back. It is on the toolbar, in the transport's own
-		// group, named Run because EPANET's own command is Run Analysis.
-		await a.toolbarClick('Run');
+		// group. **NAMED "Calculate", NOT "Run"**: `lpn_time_run` reads Calculate, and every string
+		// that pointed at it followed (lpn_time_run_note now says "Press Calculate"). Task 511 found
+		// this spec still clicking "Run", which THREW out of Session.toolbarClick() and took the
+		// seven specs listed after `time` in run.js down with it — they were neither passing nor
+		// failing, they were unrun.
+		await a.toolbarClick('Calculate');
 		await a.settle(2500);
 		const ran = await a.page.evaluate(() => ({
 			runs: window.__runs,
 			frames: window.EngCalcs.lpnTimeRunState().frames,
 			note: window.EngCalcs.lpnTimeStatusNote()
 		}));
-		report.eq(ran.runs, 1, 'Run works the whole period out');
+		report.eq(ran.runs, 1, 'Calculate works the whole period out');
 		report.ok(ran.frames > 0, 'the frames are back', String(ran.frames));
 		report.eq(ran.note, '', 'and the page stops warning about them');
 
@@ -443,8 +495,9 @@ exports.run = async function ({ browser, report }) {
 		//
 		// Tom, 2026-08-19: "The Run button does nothing... It needs a box with a progress bar and
 		// completion report." The wiring was live; what was missing was any sign of it. This is the
-		// state it was missing from -- over the budget, so Run has real work to do and takes
-		// seconds over it -- which is why the check is here rather than on the cheap path.
+		// state it was missing from -- automatic recalculation OFF (left that way by the section
+		// above), so Calculate has real work to do and takes seconds over it, which is why the check
+		// is here rather than on the cheap path.
 		//
 		// **THE BOX IS SAMPLED WHILE THE RUN IS IN FLIGHT, NOT AFTER IT.** A poll is installed in
 		// the page BEFORE the button is pressed, because everything this claims is about the
@@ -486,7 +539,7 @@ exports.run = async function ({ browser, report }) {
 				});
 			}, 10);
 		});
-		await a.toolbarClick('Run');
+		await a.toolbarClick('Calculate');
 		await a.settle(3000);
 		const seen = await a.page.evaluate(() => {
 			clearInterval(window.__boxPoll);

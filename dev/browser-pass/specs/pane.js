@@ -23,7 +23,15 @@ const { Session } = require('../lib/session');
 
 exports.title = '17. Bottom pane: the asset tables';
 
-const TABS = ['profile', 'junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves'];
+// **PROFILE IS LAST** (Tom, 2026-08-21: *"making Profile the last tab"*; this spec still had it
+// first until Task 511). It is the odd one out — a drawing where the other six are tables — and the
+// end of the strip is where an odd one out belongs rather than the front, standing between the
+// reader and the six things that are alike. It is also what lets the Print button hold the leading
+// edge, since print acts on a TABLE.
+const TABS = ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'profile'];
+// The six that are tables, which is TABS without its last entry. Named rather than sliced at each
+// use, so "which tabs share the one tip" is stated once.
+const TABLE_TABS = TABS.slice(0, 6);
 // What Elm Street Center holds. Read off the example file, not off the page, so a table that
 // listed every element would fail rather than agree with itself.
 const ROWS = { junctions: 17, reservoirs: 1, tanks: 0, pipes: 16, pumps: 1, valves: 2 };
@@ -87,14 +95,20 @@ exports.run = async function ({ browser, report }) {
 
 		// ---- 1. SEVEN TABS, in the toolbar's own Add order -------------------------------------
 		const s0 = await strip(a.page);
-		report.eq(s0.ids.join(','), TABS.join(','), 'seven tabs, Profile first and then the six assets in Add order');
+		report.eq(s0.ids.join(','), TABS.join(','), 'seven tabs, the six assets in Add order and then Profile');
 		report.eq(s0.labels.join(' | '),
-			'Profile | Junctions | Reservoirs | Tanks | Pipes | Pumps | Valves',
+			'Junctions | Reservoirs | Tanks | Pipes | Pumps | Valves | Profile',
 			'...and each is named by its own plural');
-		report.ok(s0.panels.join(',') === TABS.join(','),
-			'there is exactly one panel per tab, in the same order', s0.panels.join(','));
+		// **ONE PANEL PER TAB, NOT ONE ORDER.** The panels are in the MARKUP's order and the tabs are
+		// in the strip's, and since Task 511's re-read those two genuinely differ: the profile panel
+		// is written first in Looped-Network.php and its tab is drawn last. Ordering the panels would
+		// assert nothing a user can see — nothing is stacked, one shows at a time — so what is
+		// asserted is the pairing, which is the fact a missing panel breaks.
+		report.eq([...s0.panels].sort().join(','), [...TABS].sort().join(','),
+			'there is exactly one panel per tab', s0.panels.join(','));
 		// One tip serves all six tables — the translation budget was the design decision (Task 455).
-		const tableTips = new Set(s0.tips.slice(1));
+		// Profile is excluded by NAME rather than by position: it is a drawing, and its tip says so.
+		const tableTips = new Set(TABLE_TABS.map(id => s0.tips[s0.ids.indexOf(id)]));
 		report.ok(tableTips.size === 1, 'one tip is shared by all six table tabs', [...tableTips].join(' / '));
 		report.ok([...tableTips][0] && [...tableTips][0].length > 10, '...and it is a real sentence', [...tableTips][0]);
 
@@ -176,14 +190,19 @@ exports.run = async function ({ browser, report }) {
 		// in either direction, and the map still has a canvas worth looking at.
 		await a.page.click('#lpn_pane_tab_junctions');
 		await a.settle(250);
-		const wide = await a.page.evaluate(() => {
-			const strip = document.getElementById('lpn_pane_tabs');
-			return strip.getBoundingClientRect().height;
-		});
+		// **THE STRIP'S BOX IS `#lpn_pane_strip`, NOT `#lpn_pane_tabs`** (Task 488, re-found by Task
+		// 511). The tablist keeps its own element so it owns tabs and nothing else, but it is
+		// `display: contents` and therefore has NO BOX AT ALL — its tabs are laid out as items of the
+		// wrapper they share with the Print button, which is what lets them wrap alongside it instead
+		// of inside a column of their own. Measuring the tablist read 0 px at every width, which made
+		// "the strip really is taller" unfalsifiable and made "the strip has not eaten the pane's
+		// body" fail by subtracting a strip height of nothing.
+		const wide = await a.page.evaluate(() =>
+			document.getElementById('lpn_pane_strip').getBoundingClientRect().height);
 		await a.page.setViewportSize({ width: 520, height: 900 });
 		await a.settle(700);
 		const narrow = await a.page.evaluate(() => {
-			const stripEl = document.getElementById('lpn_pane_tabs'),
+			const stripEl = document.getElementById('lpn_pane_strip'),
 				pane = document.getElementById('lpn_pane'),
 				body = document.getElementById('lpn_pane_body'),
 				panel = document.getElementById('lpn_pane_junctions'),
@@ -240,7 +259,7 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(700);
 		const back = await a.page.evaluate(() => ({
 			body: document.getElementById('lpn_pane_body').getBoundingClientRect().height,
-			strip: document.getElementById('lpn_pane_tabs').getBoundingClientRect().height,
+			strip: document.getElementById('lpn_pane_strip').getBoundingClientRect().height,
 			bodyBottom: document.body.getBoundingClientRect().bottom, vh: window.innerHeight
 		}));
 		report.ok(Math.abs(back.body - narrow.bodyH) < 1 || back.body > narrow.bodyH,

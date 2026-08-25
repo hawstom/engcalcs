@@ -134,7 +134,14 @@ the block.
   - **Glossary write-back has NOT been done, and the SOP calls it mandatory before close.** The 26
     agents each reported the terms they used and several justified them against their own file's
     incumbents (Pashto counted `والو` 46 to `سوپاپ` 7 and kept the incumbent). That reasoning is in
-    the transcript and nowhere else; `glossary.json`'s `preferred_translation` is where it belongs.
+    the transcript and nowhere else.
+    - **CORRECTION, 2026-08-24: `preferred_translation` DOES NOT EXIST.** Zero of `glossary.json`'s
+      118 terms carry such a field; the decisions live in `translation_notes`, per language, in
+      prose. Do not add a second mechanism — write there.
+    - **And the transcript is not the only evidence.** What each language SHIPPED is on disk and is
+      countable, which is what the Pashto agent actually did. A script reporting, per glossary term
+      and per language, which rendering the lang files really use and how often would recover most
+      of this without anybody's memory — and would keep recovering it.
   - **Nine mode-name disagreements survive in ru, sr and tr** (27 before the sprint). bg/bn/cs were
     fixed mechanically by reverting `lpn_geomap` to `lat/lon`, which is what all six of their own
     sibling strings already said. These three are different: anchor and siblings are both
@@ -143,6 +150,41 @@ the block.
     English is now `lat/lon` (Tom, 2026-08-24) and the eleven carrying the literal `lon/lat` were
     swapped; the rest translated the two words and need them reordered by someone who reads the
     script. They are on the drift list, so the next sprint picks them up by itself.
+
+- 100|517| **The georeference settle scales on latitude, so the ground scale drifts.**
+  Found 2026-08-24 by Task 511's browser pass, then derived rather than baselined.
+  `georefReproject()` (`js/looped-network.js:5957`) settles a detached model with
+  `metersPerUnit: t0.metersPerUnit * r * (mpd1.lat / mpd0.lat)`, which preserves the model's
+  LATITUDE SPAN. That held the screen box only while the display was unprojected and screen y WAS
+  the latitude; under Task 145's Mercator frame y is `mercY(lat)`, so the model changes size every
+  time it settles at a new latitude — **199.7 → 210.4 px in the spec's own gesture**, with the width
+  sliding by the same factor.
+  - **It contradicts step 1's own promise to the user** — *nothing you do to the map moves the
+    model* — and it means a ground scale the user deliberately set does not stay set.
+  - Scaling on `mpd.lon` holds the width exactly and the height to within Mercator's own
+    conformality. Mechanism verified numerically to 0.05%: 210.51 px predicted against 210.4
+    measured, computed from `mercY` on the predicted span.
+  - `dev/browser-pass/specs/georef.js` now predicts the correct aspect from the page's own
+    `lpnGeorefMetersPerDegree` (1.916 predicted against 1.916 measured), so it will catch the fix.
+
+- 100|518| **Three transport buttons lose their tips to a className assignment.**
+  `js/lpn-time.js:1294`. `setIconLabel()` appends `.ec-help`; the next line is
+  `b.className = 'lpn-transport-btn'`, an ASSIGNMENT, which wipes it. `initTips()` only wires
+  `.ec-help[title]`, so Step back, Play and Step forward carry tips no touch user can reach —
+  exactly the three built with `transport: true`. The fix is one token, `+=`.
+  - Worth a moment before typing it: this is the third `className =` that has quietly discarded a
+    class the helper had just added. If there is a fourth, the check is cheaper than the fix.
+
+- 100|519| **A throwing spec truncates the browser pass and it reports the subset as a run.**
+  `dev/browser-pass/run.js` catches a throw OUTSIDE the spec loop, so the first spec that throws
+  ends the whole run. Measured 2026-08-24: `time.js` threw on a renamed button and
+  **7 of 35 specs never ran** — `search`, `setbox`, `crossproject`, `pane`, `library`,
+  `projectmenu`, `tabcolumn` — holding 12 further failures and 2 more throws of their own.
+  - **The baseline read "704/716 over 26 sections" and looked like twelve stragglers.** It was
+    26 sections out of 35, and nothing in the output said so. A truncated pass that looks like a
+    clean one is the trap Task 511 was written about; this is the mechanism behind it.
+  - Catch per spec, keep going, and **print the section count against the expected one** so a short
+    run cannot be mistaken for a passing one.
 
 - 75|514| **Two different units both labelled "Pressure", both on screen at once.**
   Found 2026-08-24 in screenshot 0026 while narrating the drop, and it is an ENGLISH defect, not a

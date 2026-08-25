@@ -12,9 +12,11 @@
 // What can be quietly wrong about a box like this is never arithmetic; it is a layout or a door.
 // So this measures the doors and the geometry:
 //   1. the three categories exist and the index is derived from them, not hand-written;
-//   2. every door Tom already knows still opens it — the toolbar Settings button, the menu bar's
-//      Settings, the toolbar Labels button, View > Labels, and a click on the colour legend — and
-//      each lands on the section it names;
+//   2. every door that survives still opens it — the toolbar Settings button and Project > Settings
+//      here, a click on the colour key in specs/color.js — and each lands on the section it names.
+//      **THREE OF THE DOORS THIS LIST ONCE NAMED HAVE BEEN REMOVED ON PURPOSE**: the toolbar Labels
+//      button, View > Labels, and the menu bar's bare Settings item. Their absence is asserted, not
+//      their behaviour — a door that has gone is exactly what makes a click-it check stop checking;
 //   3. the search matches TIPS as well as titles, which is the part that makes a long index usable;
 //   4. it is a BOX: it drags, it RESIZES, it has an X, and clicking away does NOT close it;
 //   5. it opens at the right edge the first time, and remembers where it was left and how big it
@@ -147,8 +149,17 @@ exports.run = async function ({ browser, report }) {
 			document.querySelector('#lpn_set_colors_nodelink input[type="checkbox"]').click();
 		});
 		await a.settle(400);
+		// **THE MODE'S CLASS IS `lpn-labels-hidden`, NOT `lpn-thematic`** (Task 428, re-found by
+		// Task 511). `.lpn-thematic` was deleted on purpose: it hid labels through the CSS selector
+		// `.lpn-thematic .lpn-lbl`, and `.lpn-lbl` is worn by generated annotation AND by the Text
+		// the user typed, so switching mode deleted somebody's own notes from view (Tom, 2026-08-18:
+		// *"Turning off Text on 'no labels' is unexpected"*). The repair was to remove the second
+		// path entirely — every suppressor now goes through applyLabelVisibility(), which puts
+		// `lpn-labels-hidden` on the <svg> and hides `.lpn-annotation`, a membership declared at the
+		// build site where authored content and generated annotation are actually distinguishable.
+		// So this reads the seam that survived rather than the mechanism that was the defect.
 		const onState = await a.page.evaluate(() => ({
-			thematic: document.getElementById('lpn_canvas').classList.contains('lpn-thematic'),
+			thematic: document.getElementById('lpn_canvas').classList.contains('lpn-labels-hidden'),
 			boxes: [...document.querySelectorAll('#lpn_labels_node_fields input[type="checkbox"], ' +
 				'#lpn_labels_link_fields input[type="checkbox"]')].map(c => c.checked).join(',')
 		}));
@@ -160,7 +171,7 @@ exports.run = async function ({ browser, report }) {
 		});
 		await a.settle(400);
 		const offState = await a.page.evaluate(() => ({
-			thematic: document.getElementById('lpn_canvas').classList.contains('lpn-thematic'),
+			thematic: document.getElementById('lpn_canvas').classList.contains('lpn-labels-hidden'),
 			boxes: [...document.querySelectorAll('#lpn_labels_node_fields input[type="checkbox"], ' +
 				'#lpn_labels_link_fields input[type="checkbox"]')].map(c => c.checked).join(',')
 		}));
@@ -605,8 +616,8 @@ exports.run = async function ({ browser, report }) {
 		// ---- 4. every door, and each lands on the section it names --------------------------
 		// **THE TOOLBAR LABELS BUTTON IS GONE** (Tom, 2026-08-18: "We can remove this button now.
 		// Everything is simpler than EPANET or epanetjs because all project settings are in (tada!)
-		// Settings"). Its two surviving doors are both still checked below: View > Labels, and the
-		// colour legend. The Settings button opens the box itself.
+		// Settings"), and so is View > Labels (Tom, 2026-08-21). What is left is the Settings button
+		// itself, Project > Settings below, and a click on the colour key in specs/color.js.
 		//
 		// Every door names a SUBJECT and the box resolves it, so a door does not go stale when a
 		// control moves category: the labels live under Map and page now, and no caller was touched.
@@ -623,19 +634,21 @@ exports.run = async function ({ browser, report }) {
 				`${what} opens the box`);
 			if (want) { report.eq(await shownSection(a), want, `...on the ${want} section`); }
 		}
-		// View > Labels, the menu row Tom already knows.
+		// **VIEW > LABELS IS GONE TOO** (Tom, 2026-08-21; this check outlived it until Task 511).
+		// It was a THIRD door to a box whose button is on the toolbar, and the View menu is now the
+		// drawing itself — how it is framed, how much furniture is over it, where on Earth it is.
+		// The surviving doors are the toolbar Settings button (above), Project > Settings (below)
+		// and a click on the colour key, which specs/color.js drives.
+		//
+		// Asserted as the ABSENCE of the row, because a stale door is what this whole section keeps
+		// catching: a check that clicks a row it cannot find silently stops checking anything.
 		await closeBox(a);
 		await a.settle(200);
-		await a.page.evaluate(() => {
-			document.getElementById('lpn_menu_view').click();
-			const row = [...document.querySelectorAll('#lpn_menu_list button')].find(b => /label/i.test(b.textContent));
-			if (row) { row.click(); }
-		});
-		await a.settle(400);
-		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_settings_box').style.display === 'flex'),
-			'View > Labels opens it too');
-		report.eq(await shownSection(a), 'visual', '...on the category the labels are in');
+		const viewRows = (await a.menuRows('view')).map(r => r.label);
+		report.ok(!viewRows.some(r => /label/i.test(r)),
+			'no Labels row on the View menu — the box has its own button and its own index',
+			viewRows.join(' | '));
+		await a.settle(200);
 		// Project > Settings. The menu bar's own bare Settings item is GONE (Tom, 2026-08-21), so this
 		// row is the bar's only door to the box; that it is the SAME box is the thing worth checking.
 		await closeBox(a);
@@ -694,13 +707,22 @@ exports.run = async function ({ browser, report }) {
 			document.getElementById('lpn_rpane').style.display === 'none'),
 			'...and the pane it opened stays closed');
 
-		// **THE GEAR IS THE LAST CONTROL ON THE STRIP** (Tom, 2026-08-19: "The standard location of
-		// the settings gear icon is near the top-right corner"). Asserted as a POSITION, not as
-		// presence: it was already on the toolbar before, just in the middle, so only the index says
-		// the move happened.
-		report.ok(/Settings/i.test(strip[strip.length - 1] || ''),
-			'and Settings is the last control on the strip, at the right-hand end',
-			strip.slice(-3).join(' | '));
+		// **THE GEAR LEADS THE WATER-NETWORK GROUP, and it is no longer at the right-hand end**
+		// (Task 462, Tom 2026-08-20; this check asserted the older ruling until Task 511). His
+		// 2026-08-19 "the standard location of the settings gear icon is near the top-right corner"
+		// was superseded by his own row order of 2026-08-21, given for both surfaces in one line:
+		// *"Settings Libraries | Profile Tables | Run"*. The strip mirrors the Project menu from
+		// there on, so that two lists of the same commands do not have to be learned twice.
+		//
+		// Still asserted as a POSITION rather than as presence — the gear has been on this toolbar
+		// throughout and only its index says either move happened.
+		report.ok(/Settings/i.test(strip[strip.indexOf('Settings')] || '') &&
+			/Libraries/i.test(strip[strip.indexOf('Settings') + 1] || ''),
+			'Settings leads the water-network group, with Libraries beside it — the Project menu\'s own order',
+			strip.join(' | '));
+		// What is at the right-hand end instead (Task 434): go somewhere, and show something.
+		report.eq(strip.slice(-2).join(' | '), 'Find and replace | Bottom panel',
+			'...and the strip ends where Tom put the two view controls');
 
 		// **THEMATIC MODE HIDES THE LABELS KEY** (Tom, 2026-08-20). Thematic already switches the
 		// data labels off, so a key naming label fields is a key to lettering that is not drawn.

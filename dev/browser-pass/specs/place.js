@@ -36,9 +36,10 @@ exports.title = '17. The placement tool';
 // same reason dev/lpn-spike/georef-harness.js uses one.
 //
 // **IT IS ALSO HUNDREDS OF UNITS ACROSS, WHICH MATTERS SINCE Task 447.** Coordinates that could be
-// read as degrees arm the wizard ATTACHED, on the numbers as they stand; this drawing runs past 180
-// and therefore takes the place-it-on-the-world path every section below is written for. §14 checks
-// the other path on purpose.
+// read as degrees put a "read these as degrees" button on the placement bar; this drawing runs past
+// 180 and therefore gets no such offer, taking the place-it-on-the-world path every section below is
+// written for. §14 presses the button on purpose. (The range test used to arm the wizard ATTACHED by
+// itself, which is what Tom's Net3 import landed in North Darfur; it decides only the offer now.)
 const L = [[0.25, 0.20], [0.65, 0.20], [0.65, 0.55]];
 
 async function canvasRect(a) {
@@ -83,13 +84,27 @@ async function modelBox(a) {
 		return { x: x0, y: y0, w: x1 - x0, h: y1 - y0, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
 	});
 }
-// The latitude the model is drawn at. In a lat/lon project a node's `cy` attribute IS its latitude,
-// negated by the document's own y-down frame — so this reads the map's own numbers rather than
-// asking the page for a variable inside a closure.
-async function modelLat(a) {
+// The latitudes the model is drawn at, read off the map's own numbers rather than out of a closure.
+//
+// **`cy` IS NOT A LATITUDE ANY MORE, and this helper used to say it was** (Task 511, found while
+// working out why the two checks below disagreed with the page). Since Task 145 drew geographic
+// projects in Web Mercator, `cy` is inwardY(lat) = −mercY(lat): a y in DEGREES OF LONGITUDE, not
+// degrees of latitude. Reading it as a latitude was ~2° out at 30° and grows without bound toward
+// the poles, and it was feeding the width prediction below.
+//
+//   `mid` is the transform's own origin latitude, exactly. The tangent plane in js/lpn-georef.js is
+//   linear in lat (lat = origin.lat + north/mpd.lat) and the anchor is the source bounding box's
+//   centre, so the midpoint of the drawn LATITUDE range is the anchor's latitude — which is the
+//   latitude every mpd() in georefReproject() is evaluated at. The midpoint of the mercY range is
+//   NOT that latitude, which is the trap this replaces.
+async function modelLatSpan(a) {
 	return a.page.evaluate(() => {
 		const ys = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')].map(e => +e.getAttribute('cy'));
-		return -(Math.min(...ys) + Math.max(...ys)) / 2;
+		const G = window.EngCalcs.lpnGeom;
+		const top = G.mercLat(-Math.min(...ys)), bot = G.mercLat(-Math.max(...ys));
+		return { top, bot, mid: (top + bot) / 2, span: top - bot,
+			// The DRAWING frame's own span, which is what the screen height is s times.
+			merc: Math.max(...ys) - Math.min(...ys) };
 	});
 }
 // The map's own transform, as the page wrote it. `s` is pixels per degree in a lat/lon project.
@@ -308,32 +323,71 @@ exports.run = async function ({ browser, report }) {
 
 		// **THE MODEL DOES NOT MOVE. AT ALL.** This is the fatal one: every pan used to re-pin it to
 		// the middle of the view, so a placement perfected in step 1 was discarded by Drop.
-		const m0 = await modelBox(a), lat0 = await modelLat(a);
+		const m0 = await modelBox(a), ls0 = await modelLatSpan(a);
 		await wheelIn(a, 8);
 		await panBy(a, 140, 90);
-		const m1 = await modelBox(a), v1 = await viewTransform(a), lat1 = await modelLat(a);
+		const m1 = await modelBox(a), v1 = await viewTransform(a), ls1 = await modelLatSpan(a);
 		report.ok(Math.abs(m1.cx - m0.cx) < 2 && Math.abs(m1.cy - m0.cy) < 2,
 			'the model stays exactly where it is on the screen while the map is panned and zoomed',
 			`centre moved ${(m1.cx - m0.cx).toFixed(2)}, ${(m1.cy - m0.cy).toFixed(2)} px`);
-		// **THE HEIGHT IS HELD EXACTLY, AND THE WIDTH FOLLOWS THE MAP'S OWN STRETCH.** A degree of
-		// latitude is the honest axis and is what the settle preserves; east-west, this unprojected
-		// display draws a metre 1/cos(lat) times as wide, and the model has just travelled in
-		// latitude — so its width must change by exactly the ratio of that stretch at the two
-		// latitudes, and by nothing else. The tiles carry the identical stretch, so the model still
-		// matches the ground it is sitting on. This is Task 145's remaining projection seam.
+
+		// **WHAT THE SETTLE ACTUALLY HOLDS IS THE MODEL'S LATITUDE SPAN**, scaled by the zoom.
+		// georefReproject() sets metersPerUnit = mpu·(s0/s1)·(mpd1.lat/mpd0.lat), and a tangent
+		// plane's latitude extent is (north metres)/mpd.lat, so the two mpd.lat cancel and the
+		// span comes out multiplied by s0/s1 and by nothing else. That is the invariant, stated
+		// as arithmetic rather than as a screen measurement, so it says which axis the code holds.
+		const zoomRatio = v0.s / v1.s;
+		report.ok(Math.abs((ls1.span / ls0.span) / zoomRatio - 1) < 0.01,
+			'...holding the model\'s LATITUDE span, scaled by the zoom — the settle\'s real invariant',
+			`${ls0.span.toFixed(4)}° -> ${ls1.span.toFixed(4)}° for a predicted ${(ls0.span * zoomRatio).toFixed(4)}°`);
+
+		// **DEFECT (found by ROADMAP Task 511; the fix is a one-token change and needs its own ID).**
+		//
+		// Holding the LATITUDE span held the SCREEN box only while the display was unprojected —
+		// screen y was the latitude, so span×s was the height and the two invariants were the same
+		// sentence. Since Task 145 the drawing frame is Web Mercator: y is mercY(lat), in degrees of
+		// LONGITUDE. Holding Δlat therefore no longer holds the height, and the model changes size
+		// at every settle as it travels north or south — 199.7 → 210.4 px in this very gesture,
+		// which is the step's own promise ("nothing the user does to the map moves the model")
+		// failing on the axis the centre check cannot see.
+		//
+		// The right invariant under a conformal projection is the model's SCREEN box, and x is
+		// exactly linear in longitude, so it is reached by scaling on mpd.lon instead:
+		//   js/looped-network.js georefReproject() -- `mpd1.lat / mpd0.lat` should be
+		//   `mpd1.lon / mpd0.lon`. That holds the width exactly and the height to within Mercator's
+		//   own conformality, and it is what makes the ground the user aimed at stay under the model.
+		//
+		// Pinned rather than left red (README, "Reading a line that says DEFECT"), and pinned as a
+		// DERIVATION rather than as the observed number: the predicted height ratio is computed from
+		// the PREDICTED latitude span, so a fix to georefReproject() breaks this line.
+		const predH = await a.page.evaluate(([mid0, sp0, mid1, sp1, s0, s1]) => {
+			const G = window.EngCalcs.lpnGeom;
+			const merc = (mid, sp) => G.mercY(mid + sp / 2) - G.mercY(mid - sp / 2);
+			return (merc(mid1, sp1) * s1) / (merc(mid0, sp0) * s0);
+		}, [ls0.mid, ls0.span, ls1.mid, ls0.span * zoomRatio, v0.s, v1.s]);
+		report.ok(Math.abs((m1.h / m0.h) / predH - 1) < 0.01,
+			'DEFECT: it does NOT hold at one screen height — Mercator makes those two different things',
+			`${m0.h.toFixed(1)} -> ${m1.h.toFixed(1)} px, x${(m1.h / m0.h).toFixed(4)} for a predicted x${predH.toFixed(4)}`);
+
+		// **DEFECT, the same one on the other axis.** The width changes by the ratio of the map's
+		// east-west stretch at the two ANCHOR latitudes — mpd.lat/mpd.lon, evaluated where
+		// georefReproject() evaluates it. Under the mpd.lon settle above this ratio would be
+		// exactly 1 and the model would not change width at all.
+		//
+		// The latitudes are the transform's own (modelLatSpan().mid). Read as raw `cy` — which is
+		// what this check did until Task 511 — they were mercY values, 22.3 and 31.8 standing in for
+		// real latitudes of 19.9 and 29.7, and the prediction came out 1.090 against a true 1.083.
+		// It passed on a 2% tolerance while being wrong about which two latitudes it was naming.
 		const stretch = await a.page.evaluate(([p, q]) => {
 			const r = (lat) => {
 				const m = EngCalcs.lpnGeorefMetersPerDegree(lat);
 				return m.lat / m.lon;
 			};
 			return r(q) / r(p);
-		}, [lat0, lat1]);
-		report.ok(Math.abs(m1.h - m0.h) < 2,
-			'...at exactly the same height on the screen, which is how its ground scale gets set',
-			`${m0.h.toFixed(1)} -> ${m1.h.toFixed(1)} px`);
-		report.ok(Math.abs((m1.w / m0.w) / stretch - 1) < 0.02,
-			'...and its width follows the map\'s own east-west stretch, at the latitude it travelled to',
-			`x${(m1.w / m0.w).toFixed(4)} for a predicted x${stretch.toFixed(4)} from ${lat0.toFixed(1)}° to ${lat1.toFixed(1)}°`);
+		}, [ls0.mid, ls1.mid]);
+		report.ok(Math.abs((m1.w / m0.w) / stretch - 1) < 0.01,
+			'DEFECT: and its width slides by the east-west stretch, which a Mercator settle would hold at 1',
+			`x${(m1.w / m0.w).toFixed(4)} for a predicted x${stretch.toFixed(4)} from ${ls0.mid.toFixed(2)}° to ${ls1.mid.toFixed(2)}°`);
 		report.ok(v1 && v1.s > v0.s * 2 && (v1.tx !== v0.tx || v1.ty !== v0.ty),
 			'...and the MAP really did move underneath it — that is the point of the step',
 			v1 && `${v0.s.toFixed(2)} -> ${v1.s.toFixed(2)} px/deg`);
@@ -527,15 +581,31 @@ exports.run = async function ({ browser, report }) {
 		await a.page.dispatchEvent('#lpn_georef_rot_in', 'change');
 		await a.settle(400);
 		const nb4 = await body(a);
-		// A quarter turn swaps the model's GROUND extents, and the screen does not simply swap with
-		// them: the display is unprojected, so a degree of longitude and a degree of latitude are the
-		// same number of pixels while a metre east-west is 1/cos(latitude) degrees. Turning therefore
-		// takes the aspect w/h to cos²(lat) · h/w. The tiles carry the identical stretch, so this is
-		// the picture the user is meant to see — it is Task 145's remaining projection seam, on screen.
-		const cos2 = Math.pow(Math.cos(SITE_LAT * Math.PI / 180), 2);
-		report.ok(nb4.h > nb4.w && Math.abs((nb4.h / nb4.w) / (cos2 * nb3.w / nb3.h) - 1) < 0.05,
-			'turning 90 degrees stands the model on end, stretched east-west as everything on this map is',
-			`${nb4.w.toFixed(0)} x ${nb4.h.toFixed(0)} px, aspect ${(nb4.h / nb4.w).toFixed(3)} for a predicted ${(cos2 * nb3.w / nb3.h).toFixed(3)}`);
+		// **A QUARTER TURN SWAPS THE SCREEN EXTENTS, because Web Mercator is CONFORMAL** (Task 511).
+		//
+		// This check used to predict cos²(lat) · h/w — 1.177 against a measured 1.916 — and that
+		// factor was pre-Mercator arithmetic. It was written when the display was unprojected: screen
+		// y was the latitude, so a ground metre east-west drew 1/cos(lat) times as wide as one
+		// north-south and turning the model reshaped it by cos² . Since Task 145 the frame is
+		// Mercator, which removes exactly that stretch: px per ground metre east is s/mpd.lon and px
+		// per ground metre north is s·(dmercY/dlat)/mpd.lat, and those are equal by construction.
+		// So the ground extents swap and the screen extents swap with them.
+		//
+		// **NOT quite exactly, and the residual is derived rather than absorbed into a tolerance.**
+		// mercY() is the SPHERICAL Mercator formula (as Web Mercator's definition requires) while
+		// metersPerDegree() is WGS84 ellipsoidal, so the two axes differ by k = N/M, the ratio of the
+		// prime-vertical to the meridional radius. The turn applies it twice, hence k². Read out of
+		// the page's own numbers: mpd.lon = N·cos(lat)·DEG and mpd.lat = M·DEG.
+		// At 38.106067° k² = 1.00836, which is the whole of the gap between 1.9014 and 1.916.
+		const k2 = await a.page.evaluate((lat) => {
+			const m = EngCalcs.lpnGeorefMetersPerDegree(lat);
+			const k = m.lon / (m.lat * Math.cos(lat * Math.PI / 180));
+			return k * k;
+		}, SITE_LAT);
+		const wantAspect = k2 * nb3.w / nb3.h;
+		report.ok(nb4.h > nb4.w && Math.abs((nb4.h / nb4.w) / wantAspect - 1) < 0.01,
+			'turning 90 degrees stands the model on end, swapping its extents as a conformal map must',
+			`${nb4.w.toFixed(0)} x ${nb4.h.toFixed(0)} px, aspect ${(nb4.h / nb4.w).toFixed(3)} for a predicted ${wantAspect.toFixed(3)} (k² = ${k2.toFixed(5)})`);
 		report.ok(Math.abs(nb4.cx - nb3.cx) < 3 && Math.abs(nb4.cy - nb3.cy) < 3,
 			'...about its centre as well');
 
@@ -647,13 +717,28 @@ exports.run = async function ({ browser, report }) {
 			// screen" rather than a node tally: two nodes and a pipe cannot draw fewer than three.
 			report.ok(await a.nodeCount() >= 3, 'an EPANET file opens through Import xy to lat/lon… too',
 				(await a.nodeCount()) + ' symbols drawn');
-			// **REINTERPRET, NOT PLACE.** These coordinates can be read as degrees, so the wizard opens
-			// ATTACHED with the numbers taken as they are: the network appears on its own streets and
-			// the user has only to agree. Dropping it at the centre of the world would ask them to drag
-			// a correct network back to a precision no hand can reach.
+			// **REINTERPRET, NOT PLACE — BUT IT IS A BUTTON NOW, NOT A GUESS** (Tom, 2026-08-21,
+			// importing EPA's own Net3: *"it put me at Step 2 in North Darfur"*). The range test used
+			// to open the wizard ATTACHED whenever every coordinate fell inside ±180/±90, and nearly
+			// every drawing made on a plain grid does — Net3's own x 8..45, y 0..31 read as a
+			// perfectly good lon/lat box and dropped the model at 26E 15N. So the wizard always opens
+			// at step 1, which is what the menu row the user chose promised, and the range test only
+			// decides whether to OFFER the reinterpret. Nothing is lost by waiting: georefArmAsDegrees()
+			// rebuilds every point from the numbers the document arrived with.
+			//
+			// This spec asserted the old guess until Task 511. It now walks the door: step 1, the
+			// offer, the press, step 2 — and the coordinates untouched at the end of it, which is the
+			// promise that never changed.
 			const b14 = await bar(a);
 			report.ok(b14.visible, '...and the placement bar is up');
-			report.has(b14.step, 'Step 2', '...at step 2, because the numbers were read as degrees');
+			report.has(b14.step, 'Step 1', '...at step 1, because no range test may place a network by itself');
+			report.ok(await a.page.evaluate(() => {
+				const e = document.getElementById('lpn_georef_asdeg');
+				return !!e && getComputedStyle(e).display !== 'none';
+			}), '...offering to read the numbers as degrees, since these ones could be');
+			await a.page.click('#lpn_georef_asdeg');
+			await a.settle(700);
+			report.has((await bar(a)).step, 'Step 2', '...and pressing it lands attached, on the model\'s own streets');
 			report.ok(await a.page.evaluate(() =>
 				[...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')]
 					.some(e => e.getAttribute('cx') === '-122.5686103')),
@@ -671,6 +756,11 @@ exports.run = async function ({ browser, report }) {
 			const b14b = await bar(a);
 			report.has(b14b.step, 'Step 1',
 				'a State Plane drawing cannot be degrees, so it opens detached, to be aimed');
+			// The half the range test still decides: it picks whether the offer is on the bar at all.
+			report.ok(await a.page.evaluate(() => {
+				const e = document.getElementById('lpn_georef_asdeg');
+				return !e || getComputedStyle(e).display === 'none';
+			}), '...with no offer to read half a million as a longitude');
 			await a.page.click('#lpn_georef_cancel');
 			await a.settle(700);
 
