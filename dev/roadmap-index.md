@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**60 open tasks.** Next (100): 8 · Soon (75): 14 · Someday (50): 10 · Maybe (25): 12 · Parked (5): 16
+**61 open tasks.** Next (100): 8 · Soon (75): 15 · Someday (50): 10 · Maybe (25): 12 · Parked (5): 16
 
 ## 100 — Next (8)
 
@@ -15,12 +15,12 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 477 — New blank project startup wizard: xy/lat-lon, units, head loss.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
-- Task 509 — The profile lost two operations; give them a door.
-- Task 510 — Named profiles: New, Rename, Delete, and a list to pick from.
+- ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
+- Task 510 — Saved paths work; the arrow that opens them is not discoverable.
 - Task 513 — Sprint 459's leftovers: two named strings nobody here can read.
 - Task 530 — Available fire flow at a hydrant, with the hydrant assembly modelled.
 
-## 75 — Soon (14)
+## 75 — Soon (15)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -36,6 +36,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 531 — Tag the examples: US/SI, design/maintenance, xy/lat-lon.
 - ! Task 532 — An English style guide for label wording — Tom says he is writing one by intuition.
 - Task 533 — Renaming a link leaves `incidentLinks` pointing at the old id.
+- ! Task 534 — Social cards: a link to this suite should show a picture, not a bare URL.
 
 ## 50 — Someday (10)
 
@@ -86,5 +87,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-57 of 60 titles are within 4–12 words. `!` marks the rest;
+56 of 61 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

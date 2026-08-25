@@ -1618,12 +1618,9 @@ $ec_lang['lpn_profile_title']='Profile along a path';
 $ec_lang_syn['lpn_profile_title']='Profile or cross section along a path, route, or way';
 $ec_lang['lpn_profile_from']='From';
 $ec_lang['lpn_profile_to']='To';
-$ec_lang['lpn_profile_pick']='Add nodes to the route by clicking them on the map';
 $ec_lang['lpn_profile_through']='Nodes on the way';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
-$ec_lang['lpn_profile_draw']='Choose the path on the map';
-$ec_lang['lpn_profile_draw_stop']='Stop choosing';
 $ec_lang['lpn_profile_draw_start']='Click the node where the path starts.';
 $ec_lang['lpn_profile_draw_more']='Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.';
 $ec_lang['lpn_profile_draw_blocked']='No route from {a} to {b}. Choose another node.';

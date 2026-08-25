@@ -281,8 +281,11 @@ the block.
       `https://hawsedc.com/engcalcs/…` and work. So this is a positioning choice, not a defect: does
       a visitor who arrives at LibreWaterNet stay on that domain when they start a model, or get
       handed to hawsedc.com?
-    - **IS THE MIRROR AN SEO PROBLEM? Tom asked, 2026-08-25. Answer: not a penalty, but AS
-      CONFIGURED TODAY it would split the signal, and the fix is one line.** Google's own position
+    - **PARKED 2026-08-25 ON TOM'S RULING:** *"Since I don't have clarity, let's leave it as it is
+      for now."* So the suite is NOT mirrored, the landing page keeps handing visitors to
+      hawsedc.com, and nothing is broken. The analysis below stands for whenever clarity arrives.
+    - **IS THE MIRROR AN SEO PROBLEM? Answer: not a penalty, but AS CONFIGURED TODAY it would split
+      the signal, and the fix is one line.** Google's own position
       on duplicate content across domains is that it is not grounds for a penalty, but that
       identical pages must nominate ONE canonical or the engine picks for you and the ranking
       signals divide between the two. **Our whitelist currently maps `librewaternet.org` to
@@ -353,6 +356,28 @@ the block.
   - **Not observed in the wild**, which is why it is 75 and not 100: renaming a link and then
     dragging one of its nodes without an intervening redraw is a narrow path. It is still a throw.
 
+- 75|534| **Social cards: a link to this suite should show a picture, not a bare URL.**
+  Tom, 2026-08-25: *"Add meta keys as necessary for social media thumbnails like Facebook."*
+  Open Graph (`og:title`, `og:description`, `og:image`, `og:url`, `og:type`, `og:site_name`) plus
+  the Twitter/X card tags. Facebook, LinkedIn, Slack, WhatsApp, Discord and iMessage all read OG;
+  it is one vocabulary, not one per network.
+  - **THREE OF THE FIVE ARE ALREADY WRITTEN AND TRANSLATED — do not add new keys for them.**
+    `echoHTMLHead()` already escapes `$html_title` and `$html_desc` (`<prefix>_main_desc`, deliberately
+    reused rather than given a meta key of its own — see CLAUDE.md), and `CANONICAL_ORIGIN` already
+    yields the absolute URL `og:url` needs. This is plumbing, not a writing project.
+  - **`og:image` IS THE WHOLE OF THE WORK**, and it is the one thing this suite has never had. It
+    must be an ABSOLUTE URL, and every network caches it hard. Two candidates and they are not the
+    same decision: one suite-wide image, or a per-page one. **`dev/screenshots/INDEX.md` now carries
+    a publishable judgement per frame**, which is exactly the input this needs — and the plates on
+    `librewaternet.org/screenshots.html` are already cropped and chosen.
+  - **The `.php` pages are the target, not just the landing page.** A person shares a CALCULATOR;
+    that is the link that gets pasted. So it belongs in `lib/HeadersFooters.lib.php` where every
+    page already gets its head, and it inherits multi-domain correctness from the canonical
+    whitelist for free.
+  - **Guard it.** `html_balance_check.php` will see the tags; what it cannot see is an `og:image`
+    that 404s or is relative. A check that the URL is absolute and the file exists is cheap and is
+    exactly the kind of thing that rots silently — nobody looks at a share card on their own site.
+
 - 75|531| **Tag the examples: US/SI, design/maintenance, xy/lat-lon.**
   Tom, 2026-08-25: *"Reference 348. Phase 1 can be adding labels, tags, or keywords to the
   examples."* **Task 348 is sub-categories and paging in the gallery, and is deliberately unbuilt at
@@ -394,48 +419,54 @@ the block.
     nothing else; a frame full of defects can still be safe to publish. Judging the two together
     once retired the best phone frame in the drop as a flat "No". Use **Not as is** for safe-but-stale.
 
-- 100|509| **The profile lost two operations; give them a door.** Task 506 removed
-  the whole left-hand control column and Tom agreed the page is better for it — *"You are right that
-  we lost something"* is about the two operations it took with it: changing ONE end of an existing
-  path, and removing ONE waypoint. Both are "draw it again" today.
-  - **His shape, and it keeps the panel to one line:** an entry-point button reading *"Profile along
-    a path"* with the commentary *"[Edit] or press Profile again to choose a new path on the map."*
-    Edit opens an **overlay box**, not a restored column — the map keeps its full width, and the
-    overlay is where the fiddly per-waypoint editing lives.
-  - Do not re-derive the gesture: the press-cycle and the touch thresholds shipped and are guarded
-    by `dev/lpn-spike/profile-chooser-harness.js`. This adds a door beside them.
-  - Four of the eight lang keys Task 506 left rendered by nothing (`lpn_profile_from`, `_to`,
-    `_through`, `_clear`) are plausibly what this box needs. Check before writing new ones — each
-    new key is 27 strings.
-  - **BUILT.** Those four are reused, and `_choose` as the box's empty-waypoint line. `_draw`,
-    `_draw_stop` and `_pick` are still rendered by nothing: they name a "choose the path on the
-    map" button, and pressing Profile again is that button now. Two new keys await Tom's wording:
-    `lpn_profile_edit` ('Edit') and `lpn_profile_edit_tip`. Guarded by
-    `dev/lpn-spike/profile-saved-harness.js`.
-  - **The one deviation from the shape above, and the argument for it:** the commentary reads
-    `[Edit] Press Profile again to choose a new path on the map.` — the button, then the WHOLE
-    existing sentence — not `[Edit] or press Profile again…`. A lowercase "or press…" is a sentence
-    fragment composed with a control at render time, which is the failure mode CLAUDE.md bans for
-    labels in gendered / word-order / RTL languages. Tom's call if he wants the `or`.
+- 100|509| **Edit mode on the path itself: drag any point, click a waypoint off.**
+  **THE DOOR SHIPPED 2026-08-25 AND THE TASK IS NOT FINISHED.** Tom, the same day: *"Task is not
+  finished."* What exists is an `[Edit]` button opening an overlay box with From, To, a chip per
+  waypoint and Remove all — which restores the two operations Task 506 took away, but through a
+  dialog rather than through the drawing.
+  - **HIS ACTUAL SHAPE, and it is a different feature:** *"The ideal UX would be for pressing the
+    edit button to put the path in Edit mode so that you can drag any waypoint or not-yet-waypoint
+    on the path including the start and end. And you can remove any manual waypoint by clicking.
+    Simple UI, maybe not simple programming."*
+    - **"Not-yet-waypoint" is the interesting half.** Every node the route passes through is a
+      handle: drag one that is already a waypoint and it moves; drag one that is merely *on* the
+      route and it BECOMES a waypoint. That is one gesture for add and move, and it is why the
+      interface is simple even though the implementation is not.
+    - **The ends are handles too**, so "change one end of an existing path" stops being a dialog
+      field and becomes a drag.
+    - **Click removes a MANUAL waypoint** — and only a manual one, since a node that is merely on
+      the route has nothing to remove.
+  - **His own warning is the estimate: simple UI, not simple programming.** The route is recomputed
+    between stops, so dragging a handle re-routes live, and a drag that lands on nothing must do
+    something defined. `dev/lpn-spike/profile-chooser-harness.js` drives the existing gesture on a
+    fake clock and is the model for testing this one.
+  - **The overlay box is NOT wasted and should not be ripped out** until the drag interaction is
+    proved better in his hands: it is the discoverable form, and it is what a pointer-less reader
+    gets. Decide the relationship deliberately rather than by deletion.
+  - **DONE 2026-08-25:** the Edit door, the box, and five of the eight keys Task 506 orphaned
+    (`lpn_profile_from`, `_to`, `_through`, `_clear`, `_choose`). The other three — `_draw`,
+    `_draw_stop`, `_pick` — Tom ruled **lost content, delete**, and they are gone from all 27 files.
 
-- 100|510| **Named profiles: New, Rename, Delete, and a list to pick from.** Tom, 2026-08-24. A path
-  through the network is worth keeping — a client report has the same three or four profiles in it
-  every time — and today it exists only until the next one is drawn.
-  - **His placement: a menu arrow ON the Profile tab**, holding New / Rename / Delete and the list
-    of saved names. That keeps the pane at one line of commentary (Task 506's whole point) and puts
-    the list where the thing it names already lives.
-  - **A saved profile is a list of node IDs, so it belongs in the project file** and inherits every
-    rule there: it is the user's data, an unknown ID is reported rather than dropped, and the `.inp`
-    exporter skips it (EPANET has no such object).
-  - Depends on Task 509 only for where the Edit door goes; the storage question is independent and
-    is the part to settle first.
-  - **BUILT.** `doc.profiles` is `[{id, name, stops}]` — the STOPS the user chose, not the resolved
-    route, so a route through a since-deleted pipe cannot be frozen into the file. It rides in
-    `serializeProject()`, in the undo snapshot and in the dirty signature; which one is SELECTED is
-    not stored, being a fact about a reader. Round trip, the unknown-id report and the `.inp`
-    exporter's silence are all asserted in `dev/lpn-spike/profile-saved-harness.js`.
-  - Nine new keys await Tom's wording: `lpn_profile_saved`, `_new`, `_new_name`, `_rename`,
-    `_delete`, `_prompt_name`, `_delete_confirm`, `_none_saved`, `_missing`.
+- 100|510| **Saved paths work; the arrow that opens them is not discoverable.**
+  **BUILT 2026-08-25** — `doc.profiles = [{id, name, stops}]`, in the project file, in the undo
+  snapshot and in the dirty signature; **the stops the user chose, not the resolved route**, because
+  freezing a node list would preserve a path through pipes since deleted and then disagree with the
+  chart drawn beside it. An unknown id is kept verbatim, marked in the menu and named in a notice,
+  but dropped from the DISPLAY, since a stop with no node routes nowhere. Which path is selected is
+  deliberately NOT stored — that is a fact about a reader, like pane height. Round trip proved at the
+  file boundary in `dev/lpn-spike/profile-saved-harness.js` (54 checks), and `.inp` export carries
+  neither the name nor a section for one.
+  - **WHAT IS LEFT IS THE CONTROL, and Tom ruled on it 2026-08-25:** *"The saved paths arrow is not
+    designed right. It should be similar to the Project arrow and the Google Sheets tab arrow. It's
+    too small and non-conforming to be discoverable."*
+    - **Two existing precedents are named and both are in reach**: this page's own Project menu
+      button, and a spreadsheet tab's arrow. Match one of them rather than inventing a third
+      treatment — the complaint is *non-conforming* as much as it is *small*.
+    - **A touch target is a real argument here**, unlike on the drawing surface: this is chrome, and
+      a phone user has to hit it. Guard whatever size is chosen at 360px with the other phone work.
+  - **One hazard already handled, do not undo it:** the Profile tab's SECOND press is the command
+    that starts drawing a path, so the arrow must never route through `openPane()` when Profile is
+    already showing — otherwise reaching for a saved path arms the chooser every time.
 
 - 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
   reply to outreach, and he has replied gratefully. This is the first real conversation this suite's

@@ -1115,7 +1115,6 @@ $ec_lang['lpn_profile_tip']='គូរផ្ទៃដី និងខ្សែ�
 $ec_lang['lpn_profile_title']='ទម្រង់បណ្ដោយតាមផ្លូវមួយ';
 $ec_lang['lpn_profile_from']='ពី';
 $ec_lang['lpn_profile_to']='ទៅ';
-$ec_lang['lpn_profile_pick']='បន្ថែមថ្នាំងទៅផ្លូវ ដោយចុចលើពួកវានៅលើផែនទី';
 $ec_lang['lpn_profile_through']='ថ្នាំងនៅតាមផ្លូវ';
 $ec_lang['lpn_profile_clear']='លុបទាំងអស់';
 $ec_lang['lpn_profile_choose']='ជ្រើសរើសថ្នាំងចាប់ផ្ដើម និងថ្នាំងបញ្ចប់មួយ។';
@@ -1238,8 +1237,6 @@ $ec_lang['lpn_replace_none']='គ្មានអ្វីនឹងផ្លា�
 $ec_lang['lpn_replace_no_value']='វាយបញ្ចូលតម្លៃថ្មី។';
 $ec_lang['lpn_replace_scope']='ជ្រើសរើសប្រភេទធាតុមួយខាងលើ ដើម្បីប្ដូរតម្លៃលើវា។';
 
-$ec_lang['lpn_profile_draw']='ជ្រើសរើសផ្លូវនៅលើផែនទី';
-$ec_lang['lpn_profile_draw_stop']='បញ្ឈប់ការជ្រើសរើស';
 $ec_lang['lpn_profile_draw_start']='ចុចថ្នាំងកន្លែងផ្លូវចាប់ផ្ដើម។';
 $ec_lang['lpn_profile_draw_more']='អូសកណ្ដុរលើផែនទីដើម្បីមើលផ្លូវ។ ចុចថ្នាំងមួយដើម្បីបន្ថែមវា។ ចុចទ្វេដងដើម្បីបញ្ចប់។ សូមចុច Esc ដើម្បីលុបចោល។';
 $ec_lang['lpn_profile_draw_blocked']='គ្មានផ្លូវពី {a} ទៅ {b} ទេ។ ជ្រើសរើសថ្នាំងផ្សេងទៀត។';

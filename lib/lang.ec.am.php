@@ -1113,7 +1113,6 @@ $ec_lang['lpn_profile_tip']='በመረቡ ውስጥ በተመረጠ መንገድ
 $ec_lang['lpn_profile_title']='በመንገድ ላይ ያለ መገለጫ';
 $ec_lang['lpn_profile_from']='ከ';
 $ec_lang['lpn_profile_to']='ወደ';
-$ec_lang['lpn_profile_pick']='ነጥቦችን በካርታው ላይ በመጫን ወደ መንገዱ ጨምሩ';
 $ec_lang['lpn_profile_through']='በመንገድ ላይ ያሉ ነጥቦች';
 $ec_lang['lpn_profile_clear']='ሁሉንም አስወግድ';
 $ec_lang['lpn_profile_choose']='መነሻ ነጥብና መድረሻ ነጥብ ይምረጡ።';
@@ -1236,8 +1235,6 @@ $ec_lang['lpn_replace_none']='ምንም ነገር አይቀየርም ነበር�
 $ec_lang['lpn_replace_no_value']='አዲሱን ዋጋ ይተይቡ።';
 $ec_lang['lpn_replace_scope']='ዋጋዎችን ለመቀየር ከላይ አንድ ዓይነት አካል ይምረጡ።';
 
-$ec_lang['lpn_profile_draw']='በካርታው ላይ ያለውን መንገድ ይምረጡ';
-$ec_lang['lpn_profile_draw_stop']='መምረጡን አቁም';
 $ec_lang['lpn_profile_draw_start']='መንገዱ የሚጀምርበትን መገናኛ ይጫኑ።';
 $ec_lang['lpn_profile_draw_more']='መንገዱን ለማየት ካርታው ላይ ይንቀሳቀሱ። ወደ መንገዱ ለመጨመር መገናኛ ይጫኑ። ለመጨረስ ሁለቴ ይጫኑ። Esc ይሰርዛል።';
 $ec_lang['lpn_profile_draw_blocked']='ከ{a} ወደ {b} ምንም መንገድ የለም። ሌላ መገናኛ ይምረጡ።';

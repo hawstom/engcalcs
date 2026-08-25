@@ -829,10 +829,7 @@
         "lpn_profile_title": "Profile along a path",
         "lpn_profile_from": "From",
         "lpn_profile_to": "To",
-        "lpn_profile_pick": "Add nodes to the route by clicking them on the map",
         "lpn_profile_through": "Nodes on the way",
-        "lpn_profile_draw": "Choose the path on the map",
-        "lpn_profile_draw_stop": "Stop choosing",
         "lpn_profile_draw_start": "Click the node where the path starts.",
         "lpn_profile_draw_more": "Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.",
         "lpn_profile_draw_blocked": "No route from {a} to {b}. Choose another node.",
@@ -1360,7 +1357,7 @@
         "lpn_terrain_missed": "{m} could not be read and are still blank.",
         "lpn_terrain_partial": "{f} terrain tile(s) did not answer."
     },
-    "count": 1358,
+    "count": 1355,
     "active_prefixes": [
         "about",
         "bpn",

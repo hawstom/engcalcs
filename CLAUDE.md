@@ -60,6 +60,13 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
   particular one.
 - **Subagents commit inside their worktree and never push.** Pushing is the orchestrator's, after
   the merge and after `check_all.sh` passes on the merged tree.
+- **A SUBAGENT NEVER REGENERATES `dev/translation_payloads/`. The orchestrator does, once, before
+  the commit** (Tom, 2026-08-25: *"Regenerate only at the orchestrator sounds like the right
+  answer to me."*). The generator rewrites all 27 files, so two tracks that each add one language
+  key produce a 27-file conflict on every merge — measured on 2026-08-25, twice in one session, and
+  it resolves only by regenerating anyway. **A subagent that adds a key says so in its report and
+  leaves the payloads alone**; if its own `check_all.sh` then reports `payload freshness`, that
+  failure is EXPECTED and is not its to fix.
 
 ---
 
