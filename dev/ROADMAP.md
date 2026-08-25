@@ -298,48 +298,6 @@ the block.
   it touches label placement, the leader, collision avoidance and the Text popup. **Task 247's meter
   needs the same `linkAnchor {link, t}`** — whichever ships first builds it for both.
 
-- 25|523| **Rename the Project menu to "Water" — DECIDED, not yet built.**
-  Tom, 2026-08-24, arriving at it in three moves: *"instead of Project ... Water. It's the Water
-  modeling menu"*, then *"this menu is all about business logic. And the business is Waterworks"*,
-  then back to Water and staying there: *"'Water' is just better all around. Fun to use, fun to
-  teach, fun to own, fun to share. It's why we chose our careers. Mni wiconi. Water is life."*
-  **The word is Water.** Waterworks was the sharper description and the weaker name.
-  - **The menu's own tip is already the argument for it.** `lpn_menu_project_tip` reads *"Everything
-    about water network modeling is here in one place, except the animation play controls."* The
-    label is weaker than its own description, and the description is already in Tom's words.
-  - **It is the one slot on the bar where a domain word is free.** File / Edit / Insert / View / Help
-    are conventions that only pay while they are the conventions everyone knows; Project is the only
-    entry this page invents, so it is the only one a rename cannot cost anything in familiarity.
-    EPANET also calls it Project, and our vocabulary is deliberately not EPANET's.
-  - **It translates better than almost any label in the suite.** "Water" exists in field register in
-    every one of the 27, including the five 0.65-tier languages where engineering vocabulary is
-    usually English. Very few of our strings can say that.
-  - **The real objection is collision, not taste:** `project` is also this app's noun for the
-    DOCUMENT — the tab strip, the project menu on a tab, `serializeProject()`, project units. A menu
-    named Water beside a document called a project is clearer; a menu named Project beside them is
-    ambiguous in the other direction. Worth checking which confusion is cheaper before acting.
-  - **"Business logic" is what answers the Settings-and-Libraries objection.** Units, friction
-    method, default sizes and the pipe and pump libraries are not setup — they are the business
-    rules, and that is one category, not two. The menu is not holding two kinds of thing.
-  - **Waterworks was considered and dropped — on LENGTH AND TRANSLATION, and on nothing else.** It
-    names the SYSTEM rather than the substance and is the more precise description; it is simply
-    longer on a menu bar and harder across 27 languages, where "water" is a word every one of them
-    has in field register.
-  - **The English idioms are NOT a mark against it, and recording them as one was wrong** (AI, then
-    corrected by Tom, 2026-08-24: *"just that: metaphorical references to the pipe and pump physical
-    reality"*). The municipal sense is the OLDER and primary one; *turn on the waterworks* for crying
-    and the British urinary usage are both metaphors borrowed FROM it. That makes the word strong
-    rather than compromised — English reached for it because a waterworks is a vivid image of pipes
-    and pumps under pressure. Do not re-raise the idioms as an objection.
-  - "Waterworks Foundation" was floated as an organisation name in the same breath; that is a
-    `dev/positioning.md` question, not this one.
-  - **THE REASONING GOES WIDER THAN THIS MENU: it is a reason to keep EPANET's names off our
-    surfaces.** Tom: *"They were always unclear, and we don't want to inherit any of those
-    assumptions or associations."* That is the same rule CLAUDE.md already states for the element
-    vocabulary (Task 482), now stated as a positioning principle. **It has one live consequence
-    nobody has ruled on: `LibreEPANET.org` inherits precisely the name and the associations this
-    sentence says to avoid.** `LibreWaterNet.org` does not. See Task 479 and `dev/positioning.md`.
-
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
   `sw.php` and `consent.php`, and three `Redirect 301` rules in `.htaccess` naming it absolutely.
@@ -578,44 +536,6 @@ the block.
     one symbol), and the attachment point is **user-draggable along its pipe** — a handle on the
     `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
     **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
-
-- 25|248| **Extended-period simulation, the GATE on the LibreEPANET.org launch.**
-  Last of the three things the EPANET engine unlocked; Tasks 306/307. Tanks and valves shipped
-  2026-08-14, PBV and GPV 2026-08-17.
-  - **THE RUN SHIPPED 2026-08-18** (`js/lpn-time.js`, `EngCalcs.lpnEpanetRun`): the seven time
-    settings are editable, EPANET's own `runH()/nextH()` loop gives a frame per reporting step, a
-    transport in the bottom pane scrubs through them, and tanks fill and drain. Against all 25 steps
-    of `dev/lpn-spike/reference/Net3.rpt`: head worst 0.005 ft over 2,425 comparisons, flow 0.485 gpm
-    over 2,975, tank level 0.005 ft over 75 (`dev/lpn-spike/eps-net3-harness.js`). **The native
-    solver has no time dimension and is not getting one** — engine unreachable, one instant, said so.
-  - **THE RUN IS STILL LIVE, and the page decides that by TIMING ITSELF** (2026-08-19,
-    `EC.LPN_TIME_AUTO`). Cost is per FRAME: Net3 is 40–250 ms at its own 1 h report step, 736 ms at
-    15 min, 2972 ms at 1 min, 1255 ms over 30 days; 10× Net3 is only 381 ms
-    (`dev/lpn-spike/eps-cost-bench.js`). So an edit re-runs the period after a quiet moment while the
-    last measured run stayed under 400 ms, and above that waits for the **Run** button, which is on
-    the toolbar either way. The biggest saving is separate and risk-free: a solve is skipped entirely
-    when the assembled model is byte-identical to the one the frames came from, so a drag, a
-    recolour or a rename now costs **zero** engine calls where three drags cost three runs.
-  - **Two performance ideas were measured and dropped.** Warm-starting a run from the previous run's
-    flows can only help the FIRST frame — EPANET already carries flows from step to step inside
-    `runH()/nextH()`, so the ceiling is 1/N of the cost and N is largest exactly where it hurts.
-    "Re-solve only the changed path" is wrong in a looped network at any size: the global gradient
-    method moves every flow when one diameter changes.
-  - **The EDITORS shipped too** (Libraries box, 2026-08-20): patterns are created, renamed, edited
-    and deleted with a sparkline, simple controls are added and validated sentence by sentence, and
-    curves are a viewer by design (248.04). **A pattern attaches to a reservoir head and to a pump
-    speed as well as to a junction demand since 2026-08-24 (248.02), so all that is left of this task
-    is rule-based `[RULES]` (248.03)** — the LibreEPANET gate is nearly clear, and 248 is no longer
-    the blocker it was written as.
-  - **A valve has THREE states in EPANET, not two:** closed, fully open, and ACTIVE. `EN_INITSTATUS =
-    OPEN` opens it fully with its setting IGNORED; `EN_INITSETTING` restores active, so status is
-    written BEFORE setting. Written the other way a network solves with the valve wide open — exactly
-    one k V²/2g of missing head, flows still agreeing to 2e-10 m³/s. A PUMP has no status column
-    either, so a closed one needs a `[STATUS]` row or it is written open.
-  - **The gate is about sequencing only, not our right to the name.** No node-count limit; never
-    describe the gate as one (`dev/positioning.md` §6). Tom, 2026-08-14: *"we have no less technical
-    authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
-    all public domain."*
 
 - 75|248.03| **Rule-based controls, EPANET's `[RULES]` (Task 248 child).** Simple `[CONTROLS]` shipped
   2026-08-18 — the Libraries box adds, edits, validates and deletes them, an unreadable sentence is kept
@@ -971,44 +891,6 @@ the block.
   - **Intra-site path** — which calculator is the entry point and where people go next. The most
     expensive of the three, because a path needs an ordering the logs deliberately cannot express
     without a per-visit identifier we will not store.
-
-- 5|306| **LibreEPANET.org: the rebranded site variant. BLOCKED on Task 248.** Tom bought the domain
-  2026-08-14; it 302-redirects to `Looped-Network.php?lang=en` until the gate clears. Priority 1, not
-  0: 0 means completed and this is blocked.
-  - Tom's spec: EPANET engine on by default, a custom navbar without HawsEDC and the Hydraulics menu,
-    no page title or description, Notes moved under More, and navbar + lpn menus + map filling the tab.
-  - **It is a VARIANT, not a fork — do not start by copying the page.** The name ruling and the gate
-    are in `dev/positioning.md` §6; the build costing, including the hosting answer that avoids the
-    112-path refactor and the `CANONICAL_ORIGIN` whitelist trap, is §6.1.
-
-- 5|307|[H] **LibreEPANET.org front-door copy. BLOCKED on Task 248.** Holds the approved register so
-  the wording is not re-derived later. Tom, 2026-08-14: **"Join us in building LibreEPANET, for the
-  community and by the community, today."** Or some such — the *shape* is the ruling, not the exact
-  words: an invitation to build, not a pitch to switch, and no comparison to anyone.
-  - **Do not import the reasoning from `dev/positioning.md` into the copy.** That file exists so the
-    page does not have to make the argument.
-  - The one comparative fact licensed for public use is our own licence (GPL v3+, no tier that can
-    be revoked) — stated as a fact about us, never as a claim about them. `dev/positioning.md` §2.
-  - **[H] Tom approves the final wording.**
-  - **Courtesy note to OpenWaterAnalytics before launch**, in the register of
-    `dev/outreach-owa-post.md` — a real question, not an announcement. The name is legally safe
-    (EPANET is public domain) but names run on community norms, and the note is cheap insurance.
-
-- 5|347| **No project tabs at all until a project is opened.** Tom's strongest form of the examples
-  gallery (*"It's not a map until the first project is started or opened?"*), extracted from Task 314
-  when it closed. Left out there on grounds worth restating: `init()` guarantees an invariant in as
-  many words — *"the library always has exactly one open project, so there is never a state where
-  drawing has nowhere to be saved"* — and a tabless boot breaks it everywhere at once (autosave,
-  `saveToStorage()`, the scenario container, `renderTabs()`). It is a storage-model change wearing a
-  UI change's clothes: it deserves its own `/code-review`. He phrased it as *"possibly"*.
-
-- 5|355| **Long labels and short pipes — WAIT AND TEST.** Tom, 2026-08-15, after the repeat and
-  alignment work landed: *"I think we are good, to tell the truth. Nothing to do, I think."* So
-  nothing is scheduled. `linkLabelTooShort()` still hides a short pipe's label all-or-nothing; if
-  that ever reads wrong in practice Task 399 now covers it — the label sheds values instead of
-  vanishing whole, and `linkLabelTooShort()` becomes the last rung rather than the only one.
-  - **Shedding itself confirmed compact/stingy and liked, 2026-08-17** — Tom's word, reviewing
-    production at commit `22db1f9` after Task 404 closed. See Task 404's close note.
 
 - 5|391| **[H] Evaluate `// @ts-check` with JSDoc branded types — a joint decision, not a
   proposal.** Tom, 2026-08-16, on the unit paradigm work: *"this would be a little easier if JS were

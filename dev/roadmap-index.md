@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**69 open tasks.** Next (100): 9 · Soon (75): 11 · Someday (50): 9 · Maybe (25): 18 · Parked (5): 22
+**63 open tasks.** Next (100): 9 · Soon (75): 11 · Someday (50): 9 · Maybe (25): 16 · Parked (5): 18
 
 ## 100 — Next (9)
 
@@ -47,12 +47,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 
-## 25 — Maybe (18)
+## 25 — Maybe (16)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
-- Task 248 — Extended-period simulation, the GATE on the LibreEPANET.org launch.
 - Task 248.04 — Curves (Task 248 child) — probably NEVER a separate interface.
 - Task 266 — Multi-select (lasso) plus edit-all-selected, as EPANET has.
 - Task 283 — Map label legibility: what remains is the AUTO-HIDE rule.
@@ -66,9 +65,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 515 — The Settings category index breaks its own labels mid-word.
 - Task 516 — The colour key stacks onto the label legend and covers it.
-- Task 523 — Rename the Project menu to "Water" — DECIDED, not yet built.
 
-## 5 — Parked (22)
+## 5 — Parked (18)
 
 - Task 114 — Reservoir / detention routing calculator (Modified Puls) — full scope in `dev/detention-routing-scope.md`.
 - Task 116 — Solar water pumping sizing.
@@ -84,10 +82,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 202 — `zh` converts at ~15% where its peers convert at 50–75%.
 - Task 267 — "Save as" the backdrop image.
 - Task 303 — Usage logging: the remaining lower-value questions.
-- Task 306 — LibreEPANET.org: the rebranded site variant. BLOCKED on Task 248.
-- Task 307 — [H] · LibreEPANET.org front-door copy. BLOCKED on Task 248.
-- Task 347 — No project tabs at all until a project is opened.
-- Task 355 — Long labels and short pipes — WAIT AND TEST.
 - Task 391 — [H] · Evaluate `// @ts-check` with JSDoc branded types — a joint decision, not a proposal.
 - Task 400 — Phase 3: bounded local search on the label residue.
 - Task 482 — EPANET's vocabulary collides with ours, and we are keeping ours.
@@ -95,5 +89,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-69 of 69 titles are within 4–12 words. `!` marks the rest;
+63 of 63 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
