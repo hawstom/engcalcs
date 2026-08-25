@@ -307,8 +307,20 @@ the block.
     DOCUMENT — the tab strip, the project menu on a tab, `serializeProject()`, project units. A menu
     named Water beside a document called a project is clearer; a menu named Project beside them is
     ambiguous in the other direction. Worth checking which confusion is cheaper before acting.
-  - Also worth asking first: Settings and Libraries live in there, and they are setup rather than
-    modelling. If the name does not fit the contents, that is sometimes the menu's fault.
+  - **"WATERWORKS" IS THE SHARPER WORD, and Tom reached it second** (2026-08-24): *"this menu is all
+    about business logic. And the business is Waterworks."* Water is a substance; waterworks is the
+    SYSTEM — pipes, pumps, tanks, the thing actually being modelled. It also answers the objection
+    that Settings and Libraries do not fit: units, friction method, default sizes and the pipe and
+    pump libraries are not setup, they are the business rules, and business logic is exactly the
+    category that holds all of it.
+  - **The one thing to check before it is printed anywhere: "waterworks" carries two informal senses
+    in English** — crying ("turn on the waterworks") and, in British usage, the urinary tract. It is
+    at the same time the standard American term for a municipal system (Des Moines Water Works,
+    Louisville Water Works), so it is respectable and in real use; the two readings simply coexist.
+    A menu label is low risk. A public organisation name is not, and is where to weigh it.
+  - **Floated in the same breath as an organisation name — "Waterworks Foundation"** — which is a
+    different and much larger decision than a menu label, and belongs with `dev/positioning.md` and
+    Task 479 rather than here. Recorded so the idea is not lost, not as a proposal.
 
 - 25|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
