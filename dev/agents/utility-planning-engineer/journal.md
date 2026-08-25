@@ -352,3 +352,116 @@ ANSI store paywall — previews only, same posture as `rc`'s unreachable Robinso
   for the City of Novato. I have designed many Elm Street Center projects, but no Novatos."*
   Consequence: CITED matters more in this journal than in any other, because nobody here can
   catch a fluent invention by recognising it.
+
+---
+
+## 2026-08-25 — Task 465 research: reusable pipe/pump TYPES ("editing one edits 400")
+
+Tom asked this seat to research Task 465 before it moves off Maybe. Findings below, then my
+recommendation: **leave it parked.** The two mechanisms it would provide already exist here in a
+form I judge safer than what the commercial precedent documents.
+
+**1. Does a real utility's model work this way — and is it used, or does it sit idle?**
+**CITED**, and the answer splits into two DIFFERENT features the task conflates:
+- **"Prototype" (WaterCAD/WaterGEMS)** is a stamp-forward template only — it sets starting values
+  for elements drawn AFTER the prototype is set; it is not retroactive
+  (docs.bentley.com "Creating Prototypes"; corroborating YouTube "WaterCAD Hacks: Build Models
+  Quickly Using Prototypes"). This is functionally what this suite already ships as "Apply
+  starting values to all elements" (`js/looped-network.js:18189`, OBSERVED) — Base-only, one
+  click, shows a carriers/changing count before writing.
+- **"Engineering Library" (WaterGEMS)** is the retroactive one, and it is genuinely live-linked:
+  "When you change the properties for an item in an engineering library, those changes affect all
+  hydraulic models that use that library item" (docs.bentley.com, "Engineering Libraries", fetched
+  2026-08-25). It covers **pipe MATERIAL** (roughness) and **pump curve DEFINITIONS** — not a full
+  "pipe type" bundling diameter. A Bentley community thread titled "How can I global edit the pipe
+  material and have the roughness update?" (communities.bentley.com/.../10853, title confirmed,
+  body did not load — flag as thin/secondary) is real evidence a practitioner asked this exact
+  question, which is evidence of DEMAND for the narrow material-roughness case specifically, not
+  for a general type system.
+- I found no documentation describing a confirmation step, a preview, or a change count before an
+  Engineering Library edit propagates. That silence is not proof one doesn't exist, but it is
+  notable next to what this suite already built for its own bulk write (see #3).
+
+**2. What would a type actually carry — shared vs. per-element, checked against real material.**
+- **Roughness/material: shared, but with a wrinkle the commercial docs surfaced that a naive type
+  would get wrong.** C is a function of material AND AGE together — "as metal pipes corrode and
+  tuberculate, the effective roughness rises and C falls... unlined cast iron can drop from about
+  130 when new to 75 or lower after 40 years... for design use the lower, aged C-value" (search
+  synthesis of multiple AWWA-derived roughness tables, cross-checked against
+  hydraulic-calculator.com and calcengineer.com "Hazen-Williams Friction Loss: Pipe Sizing per AWWA
+  M22" — CITED but secondary, no single primary AWWA table read directly). So "PVC" is not one
+  roughness; "PVC installed 1995" is. A type keyed on material alone would need EITHER a type per
+  installation era (defeating the "one definition, 400 pipes" pitch) or an install-year override
+  living beside it anyway — which is most of the complexity of a type system with none of its
+  payoff.
+- **Diameter: NOT shared, confirmed by the commercial tools' own scope.** WaterGEMS' pipe material
+  library documentation covers roughness coefficient and roughness height, not diameter
+  (docs.bentley.com "Engineering Libraries", CITED above) — diameter is a per-link design choice
+  from manufactured sizes, exactly as Tom's own framing in the roadmap entry implies.
+- **Install year: per-element, confirmed by how utilities actually use it.** GIS/CIP material
+  shows utilities track material and installation year as per-pipe asset attributes feeding
+  risk-based replacement scoring, e.g. Boston Water and Sewer Commission's CIP, which bases
+  replacement priority on GIS/hydraulic-model asset data including age and material per segment
+  (bwsc.org CIP documents, CITED). This is exactly Tom's own example in the brief, now confirmed
+  from outside.
+- **Pump curve: the one place real, unambiguous reuse exists.** WaterGEMS lets a saved pump
+  definition (a full curve, not just one property) be assigned to multiple pump elements via
+  "Export to Library" (docs.bentley.com "Pump Definitions Dialog Box", CITED) — many pumps of the
+  same model genuinely share one curve, with no aging wrinkle equivalent to roughness.
+  **OBSERVED, and this is the strongest single finding of this pass:** this suite already has half
+  of that mechanism. `js/looped-network.js:19466-19461` (`buildCurveSection`) is a Curves library
+  VIEWER whose own comment says why it is read-only: *"a pump's points live on the pump
+  (`curvePoints`) and `curveRef` names ANOTHER PUMP whose points it copies, so there is no shared
+  definition for a library to hold... Turning this into an editor means giving the document a
+  curve table first."* So `curveRef` (copy-once from another pump) already exists; a live-linked
+  curve TABLE (edit the definition, every pump referencing it updates) is the one genuinely-missing
+  piece, and it is a much smaller, better-precedented ask than a full pipe+pump type system.
+
+**3. What breaks when a type changes.** This suite's own absolute rule — "only the user touches
+their numbers" (`CLAUDE.md`, OBSERVED) — is in real tension with a live-linked type, because
+editing a type is precisely a system rewriting many elements' stored values from one action, not
+the user editing their own element. **OBSERVED**, this suite already solved the adjacent problem
+correctly for its existing bulk tools, and better than what I found documented for the commercial
+live-linked library: Find-and-Replace (`js/looped-network.js:7658`, "NOTHING IS WRITTEN UNTIL THE
+COUNT HAS BEEN SEEN") previews an exact count of elements that would actually change before writing
+anything, goes through `setProp()` so a scenario gets an override rather than a Base rewrite, and
+is a single undo step. A type-library edit would need the same preview-before-write discipline,
+and Task 465's own text already names the deeper cost: a third resolution layer (override →
+element → type-default) under the one seam the solver, renderer, labels, popups and six pane
+tables all read through (`effective()`), plus a visible detached-vs-inherited state per property —
+that is real, not invented, and it is the correct reason this is `[H]`.
+
+**4. Actual pain today, checked against Find-and-Replace rather than assumed.**
+**OBSERVED**: Find-and-Replace already does "find every 6-inch pipe, make it 8" or "find every PVC
+pipe, set roughness to 150" as a scoped query + preview count + one write
+(`js/looped-network.js:7563-7660`). At this suite's stated target scale — **"~10-20 nodes... a
+design decision, not a shortfall" with 200 as a headroom check, never a sizing target**
+(`dev/looped-network-calculator-scope.md:32-36`, OBSERVED) — the commercial-tool motivating case
+("editing one edits 400 pipes") cannot occur: there is no submittal or master-plan network this
+suite is built to hold that has 400 pipes of one material in the first place. Find-and-Replace
+already answers "I need every pipe currently at C=100 to become C=130" in one operation at this
+scale; a type layer would add value only once the SAME reclassification recurs across many
+projects over years, which is a maintained-utility-model use case, not a one-off design.
+
+**5. Cost of NOT having it, and who feels it — the honest asymmetry.**
+A utility maintaining one growing model for years (Boston-CIP-scale, thousands of segments,
+periodic AWWA-standard updates, new construction added continuously) feels the cost of re-editing
+material properties by hand repeatedly — real, and exactly the case the Bentley community thread
+and the Engineering Library feature both target. **A consultant doing a one-off submittal study,
+or this suite's own stated 10-20-node target user, essentially never does** — the network is drawn
+once, checked once, and Find-and-Replace already covers the rare reclassification that does occur.
+This is the same asymmetry `dev/looped-network-calculator-scope.md` already drew for the whole page
+("EPANET owns the serious end and always will"), now confirmed specifically for this task rather
+than assumed.
+
+**Recommendation:** leave Task 465 parked at Maybe, and I would rank it LOW on my own list — real,
+cited, well-precedented commercial demand, but for a scale this suite has explicitly and repeatedly
+declined to be sized for, against an existing pair of tools (Settings push + Find-and-Replace) that
+already cover both halves of what a type gives (stamp-forward defaults, scoped bulk rewrite) with a
+write-safety discipline (preview-before-write, `setProp()` scenario overrides) I could not confirm
+the commercial live-linked library even has. **The one piece I would NOT rank low is a live-linked
+CURVE TABLE alone** — `curveRef` already exists as copy-once, external precedent for pump-curve
+reuse is unambiguous (no aging wrinkle, no diameter conflation), and the Curves viewer's own code
+comment already names exactly what is missing. That is a narrower, better-justified slice of Task
+465 than the full pipe+pump type system, and I record it as a candidate SPLIT rather than a reason
+to promote 465 whole.
