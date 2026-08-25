@@ -182,6 +182,26 @@ it would age badly, and it would pull the whole posture toward grievance, agains
 
 Tom bought the domain; it 302-redirects to `Looped-Network.php?lang=en` as a placeholder.
 
+### KEEP BOTH DOMAINS, BUT EPANET IS SILENT (Tom, 2026-08-24 — settled)
+
+*"Keep both, but EPANET is silent."* **LibreWaterNet.org is the front door.** LibreEPANET.org is
+held, kept pointing somewhere sensible, and not built out, not promoted, and not led with.
+
+The reason is the same one that renamed the Project menu to **Water** (ROADMAP Task 523). Tom:
+*"we want to avoid the EPANET names. They were always unclear, and we don't want to inherit any of
+those assumptions or associations."* That is already this repository's rule for the ELEMENT
+vocabulary (CLAUDE.md, Task 482); 2026-08-24 generalised it to the whole public surface.
+
+**This does not retract anything in the section below.** The legal, moral and technical standing to
+use the name is unchanged and is still worth having — it is why the domain stays bought. What
+changed is that having the right to a name is not a reason to lead with it: `LibreEPANET` explains
+us in terms of somebody else's software, and `Water` is the word that is *"fun to use, fun to teach,
+fun to own, fun to share."* One is a comparison; the other is an invitation, and §1 already says
+lead with the invitation.
+
+**Consequence for Task 479:** the landing page being built is LibreWaterNet's. The LibreEPANET build
+costing in §6.1 is not cancelled — it is parked, and nothing is waiting on it.
+
 ### Our standing on the name — settled, do not re-argue
 
 **Tom, 2026-08-14:** *"we have no less technical authority to call ourselves EPANET, more moral

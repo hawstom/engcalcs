@@ -265,6 +265,9 @@ the block.
 - 75|479| **LibreWaterNet.org needs a landing page, and this account needs a hosting decision.**
   Options, the measured facts and the recommendation: `dev/hosting-layout.md`. Positioning is settled
   in `dev/positioning.md` — lead with the invitation, not the comparison.
+  - **LibreWaterNet.org IS THE FRONT DOOR, and LibreEPANET.org is silent** (Tom, 2026-08-24: *"Keep
+    both, but EPANET is silent."*). Both domains stay bought; only this one gets a page. Reason and
+    the reasoning it came from: `dev/positioning.md` §6, and Task 523.
   - **DONE 2026-08-23, the whole code half.** `CANONICAL_ORIGIN` is now a host → origin whitelist
     (`lib/config.inc.php`), so the same checkout served at librewaternet.org stops asking Google to
     index hawsedc.com. Blocking guard: `dev/scripts/canonical_origin_check.php`. **Nothing else in

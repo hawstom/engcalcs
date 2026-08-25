@@ -1487,7 +1487,19 @@ $ec_lang['lpn_clean_map_tip']='Take the mode line and the coordinate readout off
 // lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
-$ec_lang['lpn_menu_project']='Project';
+// ROADMAP Task 523, Tom 2026-08-24. **The KEY is still lpn_menu_project and that is deliberate** --
+// renaming it would drag the DOM id, two browser-pass specs and 27 lang files along for no
+// user-visible gain, and `lpn_menu_project` is still what the menu bar's own element is called.
+//
+// "Water", not "Project": Project is a hair's breadth from File, and this menu is not about the
+// document at all -- it is the business logic, and the business is water. It is also the one entry
+// on the bar this page invents (File / Edit / Insert / View / Help are conventions that only pay
+// while they are the conventions everyone knows), so it is the only one a rename costs nothing in
+// familiarity. And it keeps EPANET's vocabulary off our surfaces, which is a standing rule here.
+//
+// NOT to be confused with `lpn_tab_menu` ('Project menu'), which really IS about the document and
+// correctly keeps the word. Those two wearing one label was half the problem.
+$ec_lang['lpn_menu_project']='Water';
 // THE ONE MENU-BAR ITEM WITH A TIP (Task 499.02). The other five are the words every application
 // uses; this one is ours, and the tip says what a person gains by opening it. **The value is TOM'S
 // OWN FINAL WORDING, 2026-08-24, and it is set verbatim** -- an earlier draft added "under the map"

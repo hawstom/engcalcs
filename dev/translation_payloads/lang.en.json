@@ -781,7 +781,7 @@
         "lpn_clean_map": "Reduce map clutter",
         "lpn_clean_map_off": "Show map readouts",
         "lpn_clean_map_tip": "Take the mode line and the coordinate readout off the picture, so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back.",
-        "lpn_menu_project": "Project",
+        "lpn_menu_project": "Water",
         "lpn_menu_project_tip": "Everything about water network modeling is here in one place, except the animation play controls. There is no need to guess where things are.",
         "lpn_tables_menu": "Tables",
         "lpn_tables_menu_tip": "Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.",

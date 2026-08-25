@@ -30,7 +30,7 @@ exports.run = async function ({ browser, report }) {
 		await a.goto();
 		await a.dismissGallery();
 
-		report.ok(await a.page.$('#lpn_menu_project'), 'the menu bar carries a Project item');
+		report.ok(await a.page.$('#lpn_menu_project'), 'the menu bar carries the Water item');
 		const rows = await a.menuRows('project');
 		report.eq(JSON.stringify(rows.map(r => r.label)), JSON.stringify(EXPECTED),
 			'every row is present, in order');
