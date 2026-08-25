@@ -7,14 +7,14 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**73 open tasks.** Next (100): 2 · Soon (75): 12 · Someday (50): 5 · Maybe (25): 27 · Parked (5): 27
+**72 open tasks.** Next (100): 2 · Soon (75): 11 · Someday (50): 5 · Maybe (25): 27 · Parked (5): 27
 
 ## 100 — Next (2)
 
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 
-## 75 — Soon (12)
+## 75 — Soon (11)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 408 — Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.
@@ -22,12 +22,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 479 — LibreWaterNet.org needs a landing page, and this account needs a hosting decision.
 - Task 502 — A Text object anchored to a LINK, not only to a node.
 - Task 503 — AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry
-- Task 504 — A features list, built from the roadmap's own closed ledger.
 - Task 509 — The profile lost two operations; give them a door.
 - Task 510 — Named profiles: New, Rename, Delete, and a list to pick from.
 - ! Task 520 — Go to… sets the map scale from the wrong latitude, so the model jumps size.
-- ! Task 522 — One set of units, not an input set and a results set — reverses Task 422.
 - ! Task 527 — What is left on a phone after Tom's own rulings: three small-screen defects.
+- Task 530 — Available fire flow at a hydrant, with the hydrant assembly modelled.
 
 ## 50 — Someday (5)
 
@@ -99,5 +98,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-70 of 73 titles are within 4–12 words. `!` marks the rest;
+70 of 72 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

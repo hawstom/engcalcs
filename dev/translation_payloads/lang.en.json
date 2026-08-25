@@ -666,8 +666,6 @@
         "lpn_status_reinterpreted": "{n} values now mean {unit}. Nothing was rewritten.",
         "lpn_status_converted": "{n} values were rewritten into {unit}.",
         "lpn_tool_color_tip": "Colour the network by one quantity, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.",
-        "lpn_units_group_inputs": "Input units",
-        "lpn_units_group_results": "Results units",
         "lpn_units_length": "Length and map coordinates",
         "lpn_units_elevhead": "Elevation and head",
         "lpn_units_pressure": "Pressure",
@@ -1348,7 +1346,7 @@
         "lpn_terrain_missed": "{m} could not be read and are still blank.",
         "lpn_terrain_partial": "{f} terrain tile(s) did not answer."
     },
-    "count": 1346,
+    "count": 1344,
     "active_prefixes": [
         "about",
         "bpn",

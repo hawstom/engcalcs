@@ -3089,11 +3089,18 @@ var EngCalcs = EngCalcs || {};
 	// one deliberate exclusion, rather than a second list that could drift from it.
 	// **THE LONGITUDE NEEDS THE SAME CHANNEL AS THE LATITUDE, AND TASK 439 IS WHY.** Before the
 	// origin shift, x passed through untouched -- Mercator x IS longitude -- so it needed no source
-	// record. A shift changes that: `lon - ox` is exact only while lon is NEAR ox (Sterbenz), and a
-	// document is not obliged to be small. dev/lpn-spike/mercator-harness.js caught it on a fixture
-	// spanning latitude 1e-7 to 51 -- a node at 1e-7 came back as 1.0000000116860974e-7, and one at
-	// -0.1 as -0.10000000000000707. Both are the user's numbers, and CLAUDE.md's rule is identical,
-	// not close. So BOTH axes now carry the file's own value beside the drawn one.
+	// record. A shift changes that: `lon - ox` is exact only while lon is NEAR ox (Sterbenz), and
+	// nothing guarantees that. dev/lpn-spike/mercator-harness.js caught it -- a node at latitude
+	// 1e-7 came back as 1.0000000116860974e-7, and one at -0.1 as -0.10000000000000707. Both are
+	// the user's numbers, and CLAUDE.md's rule is identical, not close. So BOTH axes now carry the
+	// file's own value beside the drawn one.
+	//
+	// **AND A BOUNDED SPAN DOES NOT RESCUE THIS, WHICH IS WORTH SAYING** because the obvious reply
+	// is that a water system is small. The declared mission scope is a 300 km span
+	// (dev/geographic-projects.md section 2b) -- but nearness to the ORIGIN is what Sterbenz needs,
+	// not smallness of the model, and an origin floored onto the 1/128 grid can sit a whole degree
+	// from a coordinate that is only a hair from zero. The source record is the fix; the scope is a
+	// different question and protects a different thing (automatic lengths).
 	var LPN_GEO_XSRC = '_xsrc';
 	function projectStoredGeo(o) {
 		eachStoredPoint(o, function (pt, get, set) {

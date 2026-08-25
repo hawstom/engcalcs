@@ -1295,9 +1295,7 @@ $ec_lang['lpn_tool_color_tip']='Colour the network by one quantity, so a large m
 // English you used. While I like that you are thinking simple for translators, this should go in
 // _syn and the more natural in English."*). That is the routing rule stated on a real case: simple
 // English is for when an English reader would stumble, and here one would not.
-$ec_lang['lpn_units_group_inputs']='Input units';
 $ec_lang_syn['lpn_units_group_inputs']='Units of inputs, or Units of what you enter';
-$ec_lang['lpn_units_group_results']='Results units';
 $ec_lang_syn['lpn_units_group_results']='Units of results, or Units of the answers';
 $ec_lang['lpn_units_length']='Length and map coordinates';
 $ec_lang_syn['lpn_units_length']='Pipe lengths and map coordinates';

@@ -106,6 +106,37 @@ the block.
     entry 46 is the one in use — 15 languages ship its rendering, entry 34's appears 0 or 1 times in
     20 of 26 files. Merging them is a glossary-structure call and is left for a human.
 
+- 75|530| **Available fire flow at a hydrant, with the hydrant assembly modelled.**
+  Tom, 2026-08-25, promoting `utility-planning-engineer`'s own first wish: *"Let's do it at least 75
+  priority."* The question is *how much can this hydrant deliver while a critical node holds
+  >= 20 psi?* Flow and pressure trade against each other, so it is found by search: guess a hydrant
+  demand, solve, check the residual, bisect. Today the user does it by hand with scenario overrides,
+  which works and is unautomated only at the search step. AWWA M31 defines the required flow as the
+  rate at 20 psi residual for a stated duration; EPANET has no built-in tool for it, so this is not
+  a gap against EPANET.
+  - **THE HYDRANT ASSEMBLY IS PART OF THE ANSWER, AND THIS IS THE HALF THAT IS TOM'S.** His ruling,
+    2026-08-25, and it is scope rather than method: *"We must either ask or disclose our assumptions
+    about the diameter, roughness, k, and length of a hydrant and lateral assembly. The fire flow
+    wizard must include this add-on to the entered assets of the system, and this is an ad-hoc
+    add-on applied before asserting anything about fire flow."*
+    - So the wizard **adds an element to the network** — a lateral and a hydrant, with a diameter, a
+      roughness, a minor-loss `k` and a length — solves through it, and reports the flow at the
+      hydrant outlet, not at the main. **Ask or disclose: never silently assume.**
+    - **The add-on is AD-HOC and must not become part of the user's document.** It is the same
+      boundary the solve already respects — we compute from a copy — and the reason is stronger
+      here, because a hydrant assembly the user never drew must not appear in their asset list, in
+      their `.inp` export, or in a saved file.
+    - It also answers the failure he raised first: a report that a 150 mm barrel passes an enormous
+      flow. With the assembly in the model that number cannot arise, because the barrel is in the
+      hydraulics rather than in a caveat.
+  - **Research is IN SCOPE and comes first:** what a hydrant and lateral are actually rated to pass,
+    what diameter/roughness/`k`/length a practitioner would assume, and what "standard practice"
+    names them. Cite it. `utility-planning-engineer` holds this seat; its findings go to its hopper.
+  - The search itself is believed small — a loop around the existing sub-second solve, plus naming
+    the hydrant node and the critical node. **Not designed; re-derive that estimate before quoting
+    it.** The agent's own ranking, and its refusal to call this a glaring miss, are in
+    `dev/agents/utility-planning-engineer/wishlist.md`.
+
 - 75|520| **Go to… sets the map scale from the wrong latitude, so the model jumps size.**
   Found by `/code-review` 2026-08-24 while reviewing Task 517; PRE-EXISTING and not introduced by it.
   `georefGoTo()` (`js/looped-network.js`) computes
@@ -123,28 +154,6 @@ the block.
     the model* — which is why it is worth doing rather than tolerating.
   - **Needs a spec of its own first.** `dev/browser-pass/specs/goto.js` drives the dialog but asserts
     nothing about the resulting scale, and the fix is a behaviour change: do not land it bare.
-
-- 75|522| **One set of units, not an input set and a results set — reverses Task 422.**
-  Tom, 2026-08-24: *"I think it's our design mistake, and we shouldn't allow them to be independent
-  or to diverge. We shouldn't have separate input and output units."*
-  - **This DISSOLVES what was filed as Task 514** rather than answering it. That task said the status
-    strip and the colour key showed two legitimately different Pressure settings and asked Tom for
-    two distinguishing words. The screenshot that arrived with this ruling shows both selects reading
-    `psi`, so the premise was false and the disagreement was Task 521's bug all along. **No wording
-    is needed; the second row goes away.** Recorded because the wrong diagnosis was confident and
-    well argued, and the thing that corrected it was a picture.
-  - Tom, on that sequence: the bug *"simply shows us serendipitously how wrong"* the split is. It is
-    the argument for this task — a design where two controls may legitimately disagree gives a defect
-    somewhere to hide, and it hid one from an AI reading the source with the code in front of it.
-  - Scope: `LPN_UNIT_SELECTS`, `LPN_RESULT_TWIN`, `fillResultUnitDefaults()`, the two groups in
-    `Looped-Network.php`, `dev/browser-pass/specs/units.js` (written to assert the split), and the
-    stored `units` map — an old project carrying both must open without asking anything.
-  - **Velocity and gradient are results-only and always were**, so "one set" is not a straight merge:
-    it is the input set plus the two that never had an input twin.
-  - **BUILT.** One strip of eight; `reconcileLegacyUnits()` is the single migration site and **the
-    input unit wins** where an old file's two maps disagree — it says what the stored numbers MEAN.
-    `dev/lpn-spike/unit-set-harness.js`. For Tom: `lpn_units_group_inputs` and
-    `lpn_units_group_results` are now rendered by nothing.
 
 - 25|515| **The Settings category index breaks its own labels mid-word.**
   "Visualizati / on", "Node symbolog / y", "Map appearan / ce" -- visible in screenshots 0022, 0023,
@@ -389,18 +398,6 @@ the block.
     exporter skips it (EPANET has no such object).
   - Depends on Task 509 only for where the Edit door goes; the storage question is independent and
     is the part to settle first.
-
-- 75|504| **A features list, built from the roadmap's own closed ledger.** Tom, 2026-08-24, on the
-  unit-change dialog landing: *"We may need to build a features list from our roadmap completions.
-  This is getting impressive."*
-  - **Generated and blocking:** `dev/scripts/generate_features.php` writes `dev/features.md` from
-    the hand-written `dev/features-source.md` and proves every ID it cites is closed. 53 features
-    citing 87 of 448 closed IDs; the rest are fixes, refactors and rejections, and 135 are ledger
-    stubs with no text at all. Why the sentences are hand-written and not derived: the generator's
-    own docblock, with the three rejected alternatives.
-  - **TWO THINGS ARE TOM'S AND NEITHER IS DONE.** The WORDING is a first pass awaiting his edit.
-    And WHERE it goes is still open — the LibreWaterNet landing page (its own repository since
-    2026-08-24) or the Help menu. Nothing served reads the file; that wiring waits on his call.
 
 - 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
   reply to outreach, and he has replied gratefully. This is the first real conversation this suite's

@@ -38,6 +38,58 @@ degrees is one more meaning. It stops holding at three places, and these are the
 **This is the strongest argument for the standing rule that `len` is STORED and overridable, never
 derived.** A geographic project may OFFER a geodesic length; it may not quietly become the length.
 
+## 2b. MISSION SCOPE: how large a system this page serves
+
+**Tom, 2026-08-25, striking a code comment that said a document "may span the globe":**
+
+> "While it's physically feasible for a technological and social society to be so cosmopolitan as to
+> have a system that spans the globe, that utility would have a budget in trillions of dollars, and
+> our mission is aimed at more modest ventures. We can set a mission scope of 300 km or so for a
+> system/model/project span, and even that is probably highly conservative."
+
+**The declared mission scope is a 300 km span.** It is a statement about who this page is for, not
+about arithmetic — the arithmetic is comfortable well past it, which is what "highly conservative"
+has to mean if it means anything.
+
+*(Superseded, recorded only so it is not re-proposed: his first ruling the same day was "the width
+of a UTM zone or half the width" — 6° or 3°. He narrowed it deliberately, and the reason was budget
+and mission rather than geometry.)*
+
+**What the bound protects, and what it costs, measured.** `geodesicMeters()` in `js/lpn-geom.js` is
+NOT a geodesic: it takes the two WGS84 radii of curvature at the leg's MID-LATITUDE and treats the
+leg as flat in that local frame. That is the flat-earth assumption, and it is what fills every
+`lenAuto` length in a geographic project. Against Vincenty's inverse
+(`dev/lpn-spike/scope-of-service-harness.js`, which writes Vincenty out from the published formula
+rather than calling ours), worst case over latitudes 0–60 and all three leg directions:
+
+| Longest single leg | Ground distance | Departure from a true geodesic |
+|---|---|---|
+| 0.1° | 12 km | **0.3 ppm** |
+| 1° | 124 km | 28 ppm |
+| **2.7° — the 300 km mission scope** | **334 km** | **206 ppm (0.021%)** |
+| 6° — more than double it | 734 km | 1,052 ppm (0.105%) |
+
+At the mission scope an automatic length is far better than the coordinates it is computed from:
+nobody places a node by dragging on a map to a part in ten thousand, and no Hazen-Williams C is
+known to a tenth of that. At more than double the scope it is still a tenth of a percent — which is
+the measured content of "highly conservative", and the reason this is a bound with room rather than
+a cliff.
+
+**Three things the bound does NOT mean.**
+
+- **It is not a limit the code enforces.** Nothing refuses a larger document, and nothing should
+  without Tom saying so — a refusal is a user-facing behaviour, not an arithmetic one.
+- **It is not about the ANTIMERIDIAN.** A system inside the scope may still straddle 180°, which is
+  a wrap rather than a large span; `geodesicMeters()` handles it and the harness pins that so this
+  bound is not read as permission to drop it.
+- **It does not relax the origin work of Task 439.** Sterbenz exactness needs a coordinate NEAR the
+  ORIGIN, and a bounded span does not give that: an origin floored onto the 1/128° grid can sit a
+  whole degree from a coordinate that is itself a hair from zero. That is why both axes carry the
+  file's own value.
+
+Whether a real utility's system fits inside 300 km is a question about water utilities rather than
+about arithmetic, and belongs to `utility-planning-engineer`.
+
 ## 3. The rule that survives from the old scope
 
 **Web Mercator must not become the document's coordinate system.** Georeferencing is a property of
