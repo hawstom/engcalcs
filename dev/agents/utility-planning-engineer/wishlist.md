@@ -337,6 +337,29 @@ same paper does not get re-read from scratch by a later invocation. **Note: syst
 mapping and land-use GIS allocation, formerly listed here, moved out 2026-08-25** — the first is
 now Row 3 above (reconsidered), the second is Parked above (per Tom's instruction), not declined.
 
+- **Reusable pipe/pump TYPES, ROADMAP Task 465 — researched at Tom's request 2026-08-25, and I rank
+  it LOW, not a row to promote.** Full case: journal, 2026-08-25 entry "Task 465 research." Short
+  version: commercial precedent splits into two features the task conflates — a non-retroactive
+  "Prototype" (stamp-forward, which `js/looped-network.js:18189`'s "Apply starting values to all
+  elements" already does) and a retroactive, live-linked "Engineering Library" (`docs.bentley.com`
+  "Engineering Libraries", CITED — narrower than a full pipe type: pipe MATERIAL/roughness and
+  pump curve DEFINITIONS, never diameter, which stays per-link in the commercial tools too).
+  Roughness genuinely needs an install-year qualifier to be honest (aging/tuberculation lowers C —
+  CITED, AWWA-derived roughness tables), which erodes the "one definition, 400 pipes" pitch for
+  the property most people would reach for first. At this suite's own stated target
+  (`dev/looped-network-calculator-scope.md:32`, "~10-20 nodes... a design decision, not a
+  shortfall," 200 as headroom only), the motivating case ("edit one, 400 pipes change") cannot
+  occur, and Find-and-Replace (`js/looped-network.js:7563-7660`, OBSERVED) already does the scoped
+  bulk rewrite with a preview-count-before-write discipline I could not confirm the commercial
+  live-linked library even has. **One narrower slice is NOT low, and is worth a later invocation's
+  attention if this is ever revisited: a live-linked pump CURVE TABLE alone.** `curveRef`
+  (copy-once from another pump) already exists, the Curves library panel is already a read-only
+  viewer of exactly this data and its own comment names the missing piece
+  (`js/looped-network.js:19466`, OBSERVED), and pump-curve reuse is the one place the commercial
+  precedent is unambiguous (no aging wrinkle, no diameter conflation) — CITED,
+  `docs.bentley.com` "Pump Definitions Dialog Box", "Export to Library." That is a candidate split
+  of 465, not a promotion of 465 whole.
+
 - **As-built GIS export meeting a real municipal submittal spec** (State Plane, geodatabase,
   utility-specific attribute schema). See Row 5 above — the narrow WGS84-GeoJSON version is
   proposed; the full version is declined for the GIS-scope reason.
