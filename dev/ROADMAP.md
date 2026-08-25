@@ -383,21 +383,6 @@ the block.
   - Where it goes is open: the LibreWaterNet landing page (`dev/librewaternet-landing/index.html`)
     is the obvious home, and Help is the other. Decide before generating.
 
-- 75|505| **[H] Move the local working directory to a `~/webdev` parent — Tom's proposal.**
-  Tom, 2026-08-24, proposing `~/webdev/engcalcs/` holding `hawsedc.com/engcalcs` and a sibling
-  `dev/`, plus links to `/var/www/hawsedc.local` and `/var/www/librewaternet.local`.
-  - **This is the plan `dev/hosting-layout.md` §5 already records** ("right shape, wrong moment"),
-    now with a concrete layout. Read §5 before acting: it prices the move as a changed primary
-    working directory, a re-rooted `CLAUDE.md`, and every `dev/scripts/*.php` path assumption
-    (`__DIR__ . '/../../lib'`).
-  - **DECIDED (Tom, 2026-08-24): `.git` STAYS WITH THE WORKING TREE, exactly where it is now.** The
-    move is a parent folder and nothing else, so most paths survive and only the few that break get
-    fixed. A reading of his sketch that put `.git` under `dev/` was wrong and is not the plan.
-  - **AND `git init` in `~/webdev/librewaternet.org` — decided in the same breath.** That is its own
-    repository from the start, which is what makes this one move and one set of path fixes.
-  - Do it with no other session live in this directory: Tom keeps concurrent sessions here and does
-    not commit between turns, so a move under a live one strands whatever it is holding.
-
 - 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
   reply to outreach, and he has replied gratefully. This is the first real conversation this suite's
   mission has earned; prepare for the meeting and record what comes of it. Not a search-reach task,

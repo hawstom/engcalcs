@@ -120,11 +120,29 @@ Tom's idea (B1) is to make the CC project a parent folder holding `hawsedc/`,
 `hawsedc/engcalcs/` (this repo), `librewaternet.org/` and `libreepanet.org/` as
 siblings.
 
-**Right shape, wrong moment.** It buys nothing until there is a second repository to
-hold, and it costs a changed primary working directory, a re-rooted CLAUDE.md, and
-every `dev/scripts/*.php` path assumption (`__DIR__ . '/../../lib'`). **Do it in the
-same pass that creates the landing-page repo** — one move, one set of path fixes — and
-not before.
+**DONE 2026-08-24, and it moved NOTHING** — which is why it cost nothing. The tree is:
+
+    ~/webdev/
+      engcalcs/
+        hawsedc.com -> /var/www/cnm/public_html/hawsedc     (symlink)
+      librewaternet.org/                                    (its own git repo, empty)
+
+So the repository is reachable as `~/webdev/engcalcs/hawsedc.com/engcalcs` and is still
+physically at `/var/www/cnm/public_html/hawsedc/engcalcs`, with `.git` beside its own
+working tree exactly as before (Tom, 2026-08-24). No path assumption moved, `CLAUDE.md`
+did not re-root, and `dev/scripts/*.php` still resolves `__DIR__ . '/../../lib'`.
+
+**A PHYSICAL MOVE INTO `~/webdev` WOULD TAKE `hawsedc.local` DOWN, and that is the reason
+the links point the way they do.** `/home/haws` is `drwxr-x---`, so Apache's `www-data`
+cannot traverse it at all; serving the suite from there needs `chmod o+x` on the home
+directory *and* a new `<Directory>` block. `hawsedc.local`'s vhost inherits
+`Options Indexes FollowSymLinks` from `<Directory /var/www/>`, so a symlink is followed
+happily — in this direction. Verified after the change: `/engcalcs/` returns 200 on
+both :80 and :443.
+
+**Launch Claude Code from the repository directory, not from `~/webdev/engcalcs`.**
+`CLAUDE.md` lives in the repo, and a session rooted at the parent would not find it.
+The `~/webdev` tree is for a person navigating projects, not for the agent's root.
 
 Renaming production's `~/public_html/hawsedc` to `~/hawsedc.com` to match the other
 domains is cosmetic and is the one change that can break the live site for a `git pull`
