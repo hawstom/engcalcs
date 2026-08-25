@@ -266,6 +266,49 @@ exports.run = async function ({ browser, report }) {
 			wide.rows + ' rows for ' + wide.count + ' names');
 		report.ok(wide.indexW > 90, '...at the 6.6rem Tom settled on', wide.indexW + 'px');
 
+		// ---- 6. WHERE THE LABELS LEGEND ACTUALLY LANDS, BY SCREEN (Task 527) -------------------
+		// Tom, 2026-08-25: "527 on phone, color legend upper right and label legend upper left."
+		// dev/lpn-spike/small-screen-harness.js asserts the SETTING at both widths and asserts that
+		// a saved project's own placement outranks it; this asserts the INK, which is the only thing
+		// that answers "is the box in the corner he asked for".
+		//
+		// TWO FRESH PROFILES, because that is the whole claim: a placement is decided ONCE, by the
+		// screen the page was OPENED on, and is a first-time default rather than a live response to
+		// the width. Session A above cannot answer it -- it opened at 1400px and was resized, so it
+		// legitimately keeps the desktop corner all the way down.
+		for (const [width, name, corner] of [[360, 'phone', 'left'], [1400, 'desktop', 'right']]) {
+			const s = await Session.open(browser, corner === 'left' ? 'P' : 'D');
+			try {
+				await s.page.setViewportSize({ width, height: 740 });
+				await s.goto();
+				await s.settle(900);
+				const g = await s.page.evaluate(() => {
+					const b = document.getElementById('lpn_labels_legend'),
+						m = document.getElementById('lpn_canvas');
+					if (!b || !m) { return null; }
+					const cs = getComputedStyle(b), r = b.getBoundingClientRect(), mr = m.getBoundingClientRect();
+					return {
+						shown: cs.display !== 'none' && r.width > 0,
+						// Distance from each edge of the MAP, not of the window: the legend rides in
+						// the map wrapper and is inset from it (applyMapOverlayInset).
+						fromLeft: Math.round(r.left - mr.left), fromRight: Math.round(mr.right - r.right),
+						fromTop: Math.round(r.top - mr.top)
+					};
+				});
+				report.ok(!!(g && g.shown), 'the labels legend is drawn on a fresh ' + name + ' profile');
+				if (g && g.shown) {
+					report.ok(g.fromTop < 24, '...at the TOP of the map on a ' + name, g.fromTop + 'px down');
+					report.ok(corner === 'left' ? g.fromLeft < g.fromRight : g.fromRight < g.fromLeft,
+						'...in the upper ' + corner + ' corner, which is the ' + name + "'s default",
+						g.fromLeft + 'px from the left, ' + g.fromRight + 'px from the right');
+				}
+				report.ok(s.errors.length === 0, 'no uncaught page errors on the fresh ' + name + ' profile',
+					s.errors.slice(0, 1).join(''));
+			} finally {
+				await s.context.close();
+			}
+		}
+
 		report.ok(a.errors.length === 0, 'no uncaught page errors', a.errors.slice(0, 1).join(''));
 	} finally {
 		await a.context.close();

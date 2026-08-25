@@ -412,7 +412,22 @@ global.window = {
   localStorage: global.localStorage, document: global.document,
   addEventListener: () => {}, innerWidth: 1200, innerHeight: 900,
   confirm: () => true, prompt: () => 'X', alert: () => {},
-  matchMedia: () => ({ matches: false, addEventListener: () => {} }),
+  // **A WIDTH QUERY IS ANSWERED FROM innerWidth, and that is the one physical relationship this
+  // stub has to keep** (dev/testing-notes.md: a stub that holds constant what the real thing varies
+  // makes a harness pass for the wrong reason). Returning a flat `false` made every viewport look
+  // like a desktop, so a small-screen default could never be observed here at all. Anything that is
+  // not a min-/max-width query -- (hover: none), (display-mode: standalone) -- is still false, which
+  // is what a headless node process honestly is.
+  matchMedia: (q) => {
+    let matches = false;
+    const s = String(q || '');
+    const max = /max-width:\s*([\d.]+)px/.exec(s), min = /min-width:\s*([\d.]+)px/.exec(s);
+    if (max || min) {
+      const w = global.window.innerWidth;
+      matches = (!max || w <= parseFloat(max[1])) && (!min || w >= parseFloat(min[1]));
+    }
+    return { matches, media: s, addEventListener: () => {}, removeEventListener: () => {} };
+  },
   location: { search: '' },   // refreshPageTitle() reads ?name= off it (Task 265)
   devicePixelRatio: 1, getComputedStyle: () => ({ getPropertyValue: () => '' })
 };

@@ -204,8 +204,16 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<?=ecIcon('globe')?><?=$language_settings['LANGNAME']?>
 				</a>
 				<div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lang">
+<?php // **EACH ROW DECLARES ITS OWN LANGUAGE.** The row's text is that language's name written in
+      // that language ("Deutsch", "العربية", "中文"), so it is the one place in the suite where the
+      // page's own <html lang> is wrong about the text inside it. Without lang= a screen reader
+      // pronounces every name with the current page's phonetics, and any language-sensitive
+      // rendering -- hyphenation, font selection, quotation forms -- is asked the wrong question.
+      // One attribute, no new string, and no visual change; `dir` is deliberately NOT set here,
+      // because an RTL name inside an LTR menu row would re-align the whole row (see
+      // dev/hyphenation-finding.md, which is where this came up). ?>
 <?php foreach ($GLOBALS['all_language_settings'] as $key => $lang) : ?>
-					<a class="dropdown-item" href="<?=htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8')?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
+					<a class="dropdown-item" lang="<?=htmlspecialchars($key, ENT_QUOTES, 'UTF-8')?>" href="<?=htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8')?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
 <?php endforeach; ?>
 				</div>
 			</li>
