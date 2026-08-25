@@ -183,15 +183,6 @@ the block.
     the hydrant node and the critical node. **Not designed; re-derive that estimate before quoting
     it.**
 
-- 75|520| **Go to… sets the map scale from the wrong latitude, so the model jumps size.**
-  **FIXED 2026-08-25 — READY TO CLOSE.** `georefGoTo()` read metres-per-degree at the DESTINATION on
-  both sides of one division, so the latitude cancelled out and the model jumped by
-  `mpd.lon(hanging) / mpd.lon(destination)`. It now takes the first at the transform's own origin
-  latitude and the second at the destination, both on `mpd.lon` (Task 517's seam).
-  - **The spec came first, and it was watched failing.** `dev/browser-pass/specs/goto.js` measures
-    the model's screen width across a Go-to: 334px before, 398px after at 38 N, and 626 → 314px
-    between 60 N and the equator — the predicted factor of two. All three are 334px now.
-
 - 25|515| **The Settings category index breaks its own labels mid-word.**
   "Visualizati / on", "Node symbolog / y", "Map appearan / ce" -- visible in screenshots 0022, 0023,
   0026 and 0029 through 0033, so it is the normal state, not a narrow window. The left column is
@@ -212,38 +203,6 @@ the block.
     which is also when the map is carrying the most information.
   - **It is screenshot 0030**, which is what Tom asked for so he can look at it himself. He is not
     worried about it (2026-08-24), hence Maybe rather than Soon.
-
-- 75|527| **What is left on a phone after Tom's own rulings: three small-screen defects.**
-  From his first real phone session, 2026-08-25, screenshots 0034-0042.
-  `dev/screenshots/INDEX.md` has since re-read the drop against master and marks 0038-0041 as
-  showing LIVE defects rather than ones today's fixes superseded, so the frames stand as evidence.
-  - **RULED NOT A DEFECT (Tom, 2026-08-25):** that the map shows nothing while the bottom pane is
-    open. *"Real estate shortages are to be expected. If the Settings, Tables, Profile, or anything
-    else displays at all, that's to be celebrated even if nothing else is visible. I don't think
-    it's realistic to expect to see more than one thing at a time."* The original version of this
-    task called that the headline problem; it was counting pixels instead of asking what the user
-    was looking at. Do not re-raise it.
-  - **ALSO ANSWERED, by Task 529:** the legends covering the drawing. Both now offer **Off** as a
-    placement — Tom's own fix, and a better one than bounding them: *"With all the control we have
-    given the user, the legend is of less value now compared to when we were distinguishing coloured
-    numbers."* What may still be worth checking after a re-shoot is only whether the DEFAULT
-    placement wants to differ on a small screen.
-  - **FIXED 2026-08-25, all three text defects**, at the same 640px breakpoint, and each is measured
-    in a real 360px Chromium by `dev/browser-pass/specs/smallscreen.js` (the rules themselves by
-    `dev/lpn-spike/small-screen-harness.js`). The index is a horizontal strip on a phone instead of a
-    column, so the content pane goes 238 → 320px and no name breaks; the symbology headings got the
-    `overflow-wrap` that makes the wrapping Tom chose actually reachable — their boxes were already
-    exact, "Before" was a 40px word painting out of a 33px box; and the Roughness column keeps its
-    word at a cost of 28px, which is the whole cost and was measured ("Roughness," is 94.4px, so no
-    width between 72 and 100 helps).
-  - **FIXED 2026-08-25, the profile's axes** (0039, 0040). The cause was not the label COUNT but
-    their SIZE: the viewBox was floored at 240x180 in a 344x115 pane, so `preserveAspectRatio` drew
-    everything at 0.64 and a 10px label came out at 6.4 — invisible to a stylesheet, since the
-    font-size was right and the transform was not. One user unit is one CSS pixel now, and a chart
-    with less room drops labels instead. 7 y labels 5.7px apart → 3 at 29px; plot 172x34 → 271x58.
-  - **Checked and NOT a defect:** the phone table's values are correct, verified against
-    `examples/Net3-World-lpn.json`. Rows 40/50/60/101 match exactly; pipe 20's odd numbers are Tom's
-    own edit (k = 12.2), which is what raised the note he photographed. Nothing is clipped.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;

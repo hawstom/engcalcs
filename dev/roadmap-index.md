@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**72 open tasks.** Next (100): 3 · Soon (75): 10 · Someday (50): 5 · Maybe (25): 27 · Parked (5): 27
+**70 open tasks.** Next (100): 3 · Soon (75): 8 · Someday (50): 5 · Maybe (25): 27 · Parked (5): 27
 
 ## 100 — Next (3)
 
@@ -15,7 +15,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - Task 530 — Available fire flow at a hydrant, with the hydrant assembly modelled.
 
-## 75 — Soon (10)
+## 75 — Soon (8)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 408 — Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.
@@ -25,8 +25,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 503 — AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry
 - Task 509 — The profile lost two operations; give them a door.
 - Task 510 — Named profiles: New, Rename, Delete, and a list to pick from.
-- ! Task 520 — Go to… sets the map scale from the wrong latitude, so the model jumps size.
-- ! Task 527 — What is left on a phone after Tom's own rulings: three small-screen defects.
 
 ## 50 — Someday (5)
 
@@ -98,5 +96,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-70 of 72 titles are within 4–12 words. `!` marks the rest;
+70 of 70 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
