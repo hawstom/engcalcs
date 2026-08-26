@@ -295,6 +295,10 @@ function buildSite() {
 	SITE.forEach(function (s) { L.place(s.id, s.lon, s.lat); });
 }
 
+// The status notice is the OTHER half of what this feature says out loud, and until 2026-08-25 no
+// assertion here had ever read it. setNotice() writes it into #lpn_map_notice.
+function noticeText() { return byId.lpn_map_notice.textContent || ''; }
+
 let confirmAnswers = [], confirmTexts = [];
 global.confirm = global.window.confirm = function (m) { confirmTexts.push(m); return confirmAnswers.shift() === true; };
 function runFill(answers) {
@@ -341,6 +345,16 @@ function runFill(answers) {
 	ok('...and counts the nodes it will leave alone',
 		/1 node\(s\) already have an elevation/.test(confirmTexts[1]), confirmTexts[1]);
 	ok('...and counts the requests it is about to make', /request\(s\) to api\.mapbox\.com/.test(confirmTexts[1]));
+	// **AND NAMES THEM, IN BOTH DIRECTIONS** (2026-08-25). Tom: *"Elsewhere in lpn we are careful
+	// to list what we found. Add a way to indicate which nodes were edited or will be edited or
+	// both."* A count is a promise; a list is a promise a person can check against the drawing in
+	// front of them before pressing the button.
+	ok('...and NAMES the nodes it will fill in',
+		/will be filled in: J2, J3/.test(confirmTexts[1]), confirmTexts[1]);
+	ok('...and NAMES the node it will leave alone',
+		/They are: J1/.test(confirmTexts[1]), confirmTexts[1]);
+	ok('...and never names a node on the wrong side of the line',
+		!/will be filled in: [^\n]*J1/.test(confirmTexts[1]));
 
 	// ---- 5c. THE FILL ITSELF -------------------------------------------------------------------
 	await runFill([true]);             // already consented; one confirm, the plan
@@ -366,6 +380,51 @@ function runFill(answers) {
 		String(L.elev('J2')).split('.')[1] === undefined || String(L.elev('J2')).split('.')[1].length <= 2,
 		String(L.elev('J2')));
 
+	// ---- 5c-quater. THE NOTICE AFTERWARDS NAMES WHAT WAS ACTUALLY WRITTEN ------------------------
+	// The other direction of the same promise. It is composed from the ids the DOCUMENT handed back,
+	// not from the ids that were asked for, which is what makes it survive 5c-bis below.
+	ok('the result notice names the nodes that were filled in',
+		/were filled in: J2, J3/.test(noticeText()), noticeText());
+	ok('...and does not name the one it left alone', !/J1/.test(noticeText()), noticeText());
+	ok('...and still carries the accuracy sentence and the Mapbox credit',
+		/30 m/.test(noticeText()) && /Mapbox/.test(noticeText()));
+
+	// ---- 5c-ter. A LONG LIST IS CAPPED, NOT A WALL -----------------------------------------------
+	// These sentences go into a native confirm() and a self-clearing status notice, neither of which
+	// can scroll -- so the list names the first few and then says how many it did not name. The
+	// import report can afford every id because it renders into a dialog with a scrollbar; this
+	// cannot. What must never happen is a count that disagrees with the list beside it.
+	{
+		const N = 40;
+		L.reset(L.GEO);
+		for (let i = 0; i < N; i++) { L.addNode('junction', 0, 0); }
+		for (let i = 0; i < N; i++) {
+			L.place('J' + (i + 1), -122.6367 + i * 0.0004, 38.2323 + i * 0.0004);
+			L.setElev('J' + (i + 1), undefined);
+		}
+		await runFill([true]);
+		const plan = confirmTexts[0];
+		const m = plan.match(/will be filled in: ([^\n]*)/);
+		ok('a 40-node fill does not print 40 names into the confirm',
+			!!m && m[1].split(',').length <= 14, m && m[1]);
+		ok('...it says how many it did not name, and the two add up',
+			!!m && /and (\d+) more/.test(m[1]) &&
+			(m[1].match(/J\d+/g).length + Number(m[1].match(/and (\d+) more/)[1]) === N),
+			m && m[1]);
+		ok('...and the result notice caps the same way',
+			/were filled in: [^\n]*and \d+ more/.test(noticeText()), noticeText());
+		// The pure renderer, on its own, at the boundary. Twelve is the cap; twelve prints whole.
+		const twelve = [];
+		for (let i = 1; i <= 12; i++) { twelve.push('J' + i); }
+		ok('exactly at the cap, every name is printed and nothing is elided',
+			EC.lpnTerrainNameList(twelve) === twelve.join(', ') &&
+			!/more/.test(EC.lpnTerrainNameList(twelve)), EC.lpnTerrainNameList(twelve));
+		ok('...one past it, the elision starts and counts the remainder',
+			/and 1 more/.test(EC.lpnTerrainNameList(twelve.concat(['J13']))),
+			EC.lpnTerrainNameList(twelve.concat(['J13'])));
+		ok('an empty list produces no sentence at all', EC.lpnTerrainNameList([]) === '');
+	}
+
 	// ---- 5c-bis. TYPED WHILE THE REQUEST WAS IN FLIGHT ------------------------------------------
 	// **THE SECOND HALF OF THE PROMISE, AND THE ONLY WAY TO SEE IT.** The plan is built from the
 	// nodes that had no elevation, so in the ordinary path a typed node is never even in the list.
@@ -385,6 +444,13 @@ function runFill(answers) {
 		ok('an elevation typed WHILE the request was in flight is not overwritten',
 			L.elev('J2') === 55.5, String(L.elev('J2')));
 		ok('...and the others are still filled', typeof L.elev('J3') === 'number', String(L.elev('J3')));
+		// **AND THE NOTICE TELLS THE TRUTH ABOUT IT.** J2 was asked for and not written, so it must
+		// be named as still blank and must NOT be named as filled in -- which is only possible
+		// because the list comes back from the document rather than from the request.
+		ok('a node that was asked for but not written is named as still blank',
+			/still blank: [^\n]*J2/.test(noticeText()), noticeText());
+		ok('...and is not also named among the ones that were filled in',
+			!/were filled in: [^.]*J2/.test(noticeText()), noticeText());
 		L.undo();
 	}
 

@@ -1752,7 +1752,12 @@ EngCalcs.pageConfig = {
 	lpn_terrain_failed: <?=json_encode($ec_lang['lpn_terrain_failed'])?>,
 	lpn_terrain_done: <?=json_encode($ec_lang['lpn_terrain_done'])?>,
 	lpn_terrain_missed: <?=json_encode($ec_lang['lpn_terrain_missed'])?>,
-	lpn_terrain_partial: <?=json_encode($ec_lang['lpn_terrain_partial'])?>
+	lpn_terrain_partial: <?=json_encode($ec_lang['lpn_terrain_partial'])?>,
+	lpn_terrain_will_ids: <?=json_encode($ec_lang['lpn_terrain_will_ids'])?>,
+	lpn_terrain_keep_ids: <?=json_encode($ec_lang['lpn_terrain_keep_ids'])?>,
+	lpn_terrain_filled_ids: <?=json_encode($ec_lang['lpn_terrain_filled_ids'])?>,
+	lpn_terrain_blank_ids: <?=json_encode($ec_lang['lpn_terrain_blank_ids'])?>,
+	lpn_terrain_ids_more: <?=json_encode($ec_lang['lpn_terrain_ids_more'])?>
 };
 </script>
 <script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
