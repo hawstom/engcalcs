@@ -351,12 +351,27 @@ exports.run = async function ({ browser, report }) {
 				report.ok(box && box.x >= 0 && box.y >= 0 &&
 					box.x + box.w <= box.vw + 1 && box.y + box.h <= box.vh + 1,
 					'...wholly inside the window', box && JSON.stringify(box));
+				// **AND THE SAME PRESS PUT THE PATH IN EDIT MODE** (Task 509). What the handles DO is
+				// dev/lpn-spike/profile-edit-harness.js's; what only a real page can say is that they
+				// are painted at all -- they go into a layer inserted between two others, and an
+				// insertBefore on the wrong parent throws where a stub shrugs.
+				const grips = await a.page.evaluate(() => ({
+					n: document.querySelectorAll('.lpn-profile-handle').length,
+					pressed: document.getElementById('lpn_profile_edit_btn').getAttribute('aria-pressed')
+				}));
+				report.ok(grips.n > 1, 'the same press puts grab handles on every node of the route',
+					grips.n + ' handles');
+				report.ok(grips.pressed === 'true', '...and the button reads as pressed');
 				// And it closes, because it has to be got rid of: it sits over the drawing.
 				await a.page.click('#lpn_profile_edit_close');
 				await a.settle(200);
-				const shut = await a.page.evaluate(() =>
-					document.getElementById('lpn_profile_edit_popup').style.display === 'none');
-				report.ok(shut, '...and the X shuts it again');
+				const shut = await a.page.evaluate(() => ({
+					box: document.getElementById('lpn_profile_edit_popup').style.display === 'none',
+					grips: document.querySelectorAll('.lpn-profile-handle').length
+				}));
+				report.ok(shut.box, '...and the X shuts it again');
+				report.ok(shut.grips === 0, '...taking edit mode with it, handles and all',
+					shut.grips + ' handles left');
 			}
 
 			// THE ARROW ON THE TAB. Its one hazard is real and invisible in a harness that calls the
@@ -369,6 +384,24 @@ exports.run = async function ({ browser, report }) {
 				return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
 			});
 			report.ok(!!arrow, 'the Profile tab carries a saved-path arrow');
+			// **AND IT IS BIG ENOUGH TO AIM AT** (Task 510). Tom, 2026-08-25: *"It's too small and
+			// non-conforming to be discoverable."* The stylesheet floor is asserted in
+			// dev/lpn-spike/small-screen-harness.js; what only a real page can answer is the box
+			// the browser actually gives it, which is where a font stack or a stray margin shows up.
+			const arrowBox = await a.page.evaluate(() => {
+				const b = document.getElementById('lpn_pane_tab_menu_profile'),
+					t = document.getElementById('lpn_pane_tab_profile');
+				if (!b || !t) { return null; }
+				const r = b.getBoundingClientRect(), rt = t.getBoundingClientRect();
+				return { w: r.width, h: r.height, th: rt.height, gap: Math.abs(r.left - rt.right) };
+			});
+			report.ok(arrowBox && arrowBox.w >= 30, 'the arrow is a real target, not a glyph',
+				arrowBox && (Math.round(arrowBox.w) + 'x' + Math.round(arrowBox.h) + 'px'));
+			// CONFORMING is the other half of the complaint: the caret is the same height as the tab
+			// it belongs to and sits against it, the way .lpn-tab-caret does on the project tabs.
+			report.ok(arrowBox && Math.abs(arrowBox.h - arrowBox.th) <= 1 && arrowBox.gap <= 2,
+				'...and it reads as part of the tab rather than as a button beside it',
+				arrowBox && JSON.stringify(arrowBox));
 			if (arrow) {
 				await a.page.mouse.click(arrow.x, arrow.y);
 				await a.settle(250);

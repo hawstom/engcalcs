@@ -1644,6 +1644,9 @@ $ec_lang['lpn_profile_hgl']='Hydraulic grade line';
 // keys above (`_from`, `_to`, `_through`, `_clear`) are the box's own labels again.
 $ec_lang['lpn_profile_edit']='Edit';
 $ec_lang['lpn_profile_edit_tip']='Change one end of the path, or take one node off it, without drawing the whole path again.';
+$ec_lang['lpn_profile_edit_say']='Drag any point on the path to move it. Click a point you added to take it off.';
+$ec_lang['lpn_profile_edit_tap']='Drag any point on the path to move it. Tap a point you added to take it off.';
+$ec_lang['lpn_profile_edit_nowhere']='A point on the path has to be a node. The path is unchanged.';
 // ---- Task 510: paths kept in the project, by name ---------------------------------------------
 // A client report carries the same three or four profiles every time, so a path is worth keeping.
 // {n} is a count, {name} a name the user typed and {ids} a list of node names; all substituted.

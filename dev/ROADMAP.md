@@ -398,32 +398,31 @@ the block.
     once retired the best phone frame in the drop as a flat "No". Use **Not as is** for safe-but-stale.
 
 - 100|509| **Edit mode on the path itself: drag any point, click a waypoint off.**
-  **THE DOOR SHIPPED 2026-08-25 AND THE TASK IS NOT FINISHED.** Tom, the same day: *"Task is not
-  finished."* What exists is an `[Edit]` button opening an overlay box with From, To, a chip per
-  waypoint and Remove all — which restores the two operations Task 506 took away, but through a
-  dialog rather than through the drawing.
-  - **HIS ACTUAL SHAPE, and it is a different feature:** *"The ideal UX would be for pressing the
-    edit button to put the path in Edit mode so that you can drag any waypoint or not-yet-waypoint
-    on the path including the start and end. And you can remove any manual waypoint by clicking.
-    Simple UI, maybe not simple programming."*
-    - **"Not-yet-waypoint" is the interesting half.** Every node the route passes through is a
-      handle: drag one that is already a waypoint and it moves; drag one that is merely *on* the
-      route and it BECOMES a waypoint. That is one gesture for add and move, and it is why the
-      interface is simple even though the implementation is not.
-    - **The ends are handles too**, so "change one end of an existing path" stops being a dialog
-      field and becomes a drag.
-    - **Click removes a MANUAL waypoint** — and only a manual one, since a node that is merely on
-      the route has nothing to remove.
-  - **His own warning is the estimate: simple UI, not simple programming.** The route is recomputed
-    between stops, so dragging a handle re-routes live, and a drag that lands on nothing must do
-    something defined. `dev/lpn-spike/profile-chooser-harness.js` drives the existing gesture on a
-    fake clock and is the model for testing this one.
-  - **The overlay box is NOT wasted and should not be ripped out** until the drag interaction is
-    proved better in his hands: it is the discoverable form, and it is what a pointer-less reader
-    gets. Decide the relationship deliberately rather than by deletion.
-  - **DONE 2026-08-25:** the Edit door, the box, and five of the eight keys Task 506 orphaned
-    (`lpn_profile_from`, `_to`, `_through`, `_clear`, `_choose`). The other three — `_draw`,
-    `_draw_stop`, `_pick` — Tom ruled **lost content, delete**, and they are gone from all 27 files.
+  **BUILT 2026-08-25.** The Edit button puts the PATH in edit mode: every node the route passes
+  through wears a grab handle, and one gesture carries both operations Tom named —
+  *"drag any waypoint or not-yet-waypoint on the path including the start and end."*
+  - **The difference between "move" and "add" is a NUMBER, not a second gesture.**
+    `EngCalcs.lpnProfile.pathHandles()` labels each route node with the stop it is, or −1 and the LEG
+    it lies on. A labelled handle's stop is replaced; a −1 is inserted after the stop that begins its
+    own leg — deliberately NOT `insertStop()`'s least-added-length, which could put the new stop on a
+    different leg from the one under the hand. The ends are handles too, so "change one end" stopped
+    being a pull-down.
+  - **A DRAG THAT LANDS ON NOTHING PUTS THE PATH BACK AND SAYS SO.** A stop IS a node id, so bare map
+    has no commit to make. Dropping the stop was rejected — a slip would be destructive where a click
+    already removes deliberately — and so was snapping to the nearest node, which commits a stop
+    nobody aimed at. A drop with no route is refused and names both nodes, the chooser's own refusal
+    reached by the other gesture.
+  - **THE BOX IS NOT SUPERSEDED, and both are entered by the same press.** It is the discoverable
+    form, it is what a pointer-less reader gets, and it names the waypoints, which the drawing
+    cannot. Edit mode and the box are ONE state: the button toggles it, its X and Escape leave it,
+    and arming the chooser puts it away (the chooser writes a stop list `profileStops()` reads
+    instead of from/to/waypoints).
+  - **While it is on, the map drags nothing but a handle** — a handle sits exactly on a junction, so
+    without that rule re-routing a path would also move the pipework.
+    `dev/lpn-spike/profile-edit-harness.js` (48 checks, fake clock) asserts that one from the drag
+    type and from the coordinate.
+  - **Open: Tom's own pass.** Three new English keys await his wording — `lpn_profile_edit_say`,
+    `_edit_tap`, `_edit_nowhere`.
 
 - 100|510| **Saved paths work; the arrow that opens them is not discoverable.**
   **BUILT 2026-08-25** — `doc.profiles = [{id, name, stops}]`, in the project file, in the undo
@@ -434,14 +433,16 @@ the block.
   deliberately NOT stored — that is a fact about a reader, like pane height. Round trip proved at the
   file boundary in `dev/lpn-spike/profile-saved-harness.js` (54 checks), and `.inp` export carries
   neither the name nor a section for one.
-  - **WHAT IS LEFT IS THE CONTROL, and Tom ruled on it 2026-08-25:** *"The saved paths arrow is not
-    designed right. It should be similar to the Project arrow and the Google Sheets tab arrow. It's
-    too small and non-conforming to be discoverable."*
-    - **Two existing precedents are named and both are in reach**: this page's own Project menu
-      button, and a spreadsheet tab's arrow. Match one of them rather than inventing a third
-      treatment — the complaint is *non-conforming* as much as it is *small*.
-    - **A touch target is a real argument here**, unlike on the drawing surface: this is chrome, and
-      a phone user has to hit it. Guard whatever size is chosen at 360px with the other phone work.
+  - **THE CONTROL WAS REDRAWN 2026-08-25**, on Tom's ruling: *"The saved paths arrow is not designed
+    right. It should be similar to the Project arrow and the Google Sheets tab arrow. It's too small
+    and non-conforming to be discoverable."* It now takes `.lpn-tab-caret`'s numbers — this page's
+    OWN answer to the same problem on the project tabs, and the spreadsheet arrow he named: full
+    type, the tab's own vertical padding, a hairline rule instead of an 8px overlap into the word,
+    and the tab's selected background so the two read as one tab with a caret.
+  - **A touch target IS a legitimate argument here** — this is chrome, not the drawing surface — so
+    the width floor is 2rem, rising to 2.75rem (44px) below 40rem. It grows SIDEWAYS only: the strip
+    sits above a chart with the least height to spare on a phone (Task 527). Guarded at 360px in
+    `dev/lpn-spike/small-screen-harness.js` and against the rendered box in `dev/browser-pass`.
   - **One hazard already handled, do not undo it:** the Profile tab's SECOND press is the command
     that starts drawing a path, so the arrow must never route through `openPane()` when Profile is
     already showing — otherwise reaching for a saved path arms the chooser every time.
