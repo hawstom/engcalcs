@@ -47,36 +47,46 @@ the block.
 
 # Tasks
 
-- 100|537| **[H] A phone cannot reach a PC's model, and that may be the field operator's whole blocker.**
-  Tom, 2026-08-25, thinking about the seat he had just hired: *"I don't want to do their job, but it
-  seems to me that the deepest issue against their even beginning to use lpn is file access. The most
-  obvious solution is to institute logins and keep models on the cloud, but this is a huge change in
-  paradigm. Without that, I don't know how a phone user can possibly have access to a PC user's
-  model. As far as I know, this is just a big, hard blocker for the field operator. Maybe somebody
-  can chew on that. Maybe it can be a high-priority planning task."*
-  - **HE IS DESCRIBING A REAL PROPERTY OF THE DESIGN, NOT AN OVERSIGHT.** A project lives in
-    `localStorage` under one browser on one device, and the ONLY ways out are a file the user saves
-    and an `.inp` they export. There is no server, no account, and nothing is uploaded. Every one of
-    those is a deliberate, load-bearing decision — they are why the privacy claim is true, why the
-    suite works offline, and why it costs nothing to run.
-  - **SO THE TENSION IS THE TASK.** *"Nothing you draw is uploaded"* is the sentence the whole public
-    position rests on (`dev/positioning.md`), and an account with models in the cloud contradicts it
-    in one move. **Anybody who proposes cloud storage must say what happens to that sentence** — not
-    as an afterthought, as the first paragraph.
-  - **DO NOT JUMP TO LOGINS.** That is the obvious answer and Tom named it as obvious himself; the
-    question is whether it is the only one. Cheaper shapes exist and each has a real cost to state:
-    a file handed over by whatever the phone already has (a share sheet, a messaging app, a
-    workplace drive); a URL that carries a whole small model, the way `?name=` already carries a
-    calculation; an export the operator READS but cannot edit; a one-way publish from the desk to a
-    link. **Some of those need no server at all**, and one of them may be enough for a person whose
-    job is to read a map rather than draw one.
-  - **THE PRIOR QUESTION IS WHETHER THE OPERATOR EVEN WANTS THE DESIGNER'S MODEL.** Their world may
-    be a work-order system and a separate GIS that nobody has asked us to join — that is exactly the
-    open question their seat was created to answer (`.claude/agents/utility-field-operator.md`).
-    **Answer that before designing anything**, because a sharing mechanism nobody's employer permits
-    is a sharing mechanism nobody uses.
-  - **This is research first and code much later**, which is why it is `[H]` and why it is priority
-    100: it is the kind of question that decides what the next year of this page is for.
+- 100|537| **[H] RESEARCHED, AND BOTH SEATS SAY THE PREMISE IS WRONG. Tom's call on what follows.**
+  He raised it 2026-08-25: *"the deepest issue against their even beginning to use lpn is file
+  access... the most obvious solution is to institute logins and keep models on the cloud, but this
+  is a huge change in paradigm... Maybe somebody can chew on that."* Both agents chewed, separately,
+  and neither was shown the other's answer. **They converged.**
+  - **THE FIELD OPERATOR: the file-access problem is DOWNSTREAM OF A WANT THAT MOSTLY IS NOT THERE.**
+    Every field-facing tool they could source runs on a **GIS asset graph plus a work-order system**,
+    never a hydraulic solver — Esri's Utility Isolation Trace answers "what does closing this valve
+    isolate" already, Field Maps and Cityworks carry valve exercising, and asset CONDITION is a
+    GIS/CMMS record by construction. **Nobody in the sourced literature opens EPANET-class software
+    in the street.** Solving file transfer well would build a mechanism nobody in that seat would
+    reach for, because the model is not the class of document their role opens.
+    - **The exception is real but narrow, and it is OUR kind of utility:** the smallest agencies in
+      the 300 km scope still running paper "curb stop tie cards" with no digital asset map at all
+      (CITED, rcap.org). For them `lpn_`'s map competes with nothing better.
+    - Their own summary of what we would have got wrong: we assumed they wanted the file at all.
+  - **THE PLANNING ENGINEER: "cloud behind a login" is one a UTILITY'S COUNSEL COULD NOT APPROVE**,
+    and the reason is theirs rather than an architect's. A complete network topology is the document
+    type several states have legislated as sensitive infrastructure information — AWIA (2018) risk
+    assessments are exempt from federal FOIA but carry **no automatic state or local exemption**
+    (epa.gov), and state statutes exempt "detailed drawings, schematics, maps... of utility systems"
+    whose disclosure could expose vulnerabilities. **No rule against third-party custody was found,
+    and the agent says so rather than inventing one** — but a small public agency's risk-averse legal
+    review has no way to approve handing that document to a volunteer project with no SOC2, no
+    incident-response contract and no DPA. **The nothing-uploaded design is not merely a privacy
+    nicety: it is the one posture that never asks a utility's counsel a question they must refuse.**
+    - Also measured: even the top commercial tier still moves a FILE. ProjectWise checks a WaterGEMS
+      file out and back with a single-editor lock — governance on top of a file, not a live shared
+      database.
+  - **BOTH RANK THE SAME SHAPE FIRST, and the planning engineer adds the caveat that decides it:** a
+    **read-only, one-way link or export**, with storage the UTILITY already controls. *"The moment
+    'the link' is something we host, it has become the cloud-login proposal in a smaller costume."*
+    A file via the phone's own share sheet ranks alongside it, with the operator's warning that
+    BYOD/MDM policy often forbids moving work files through personal cloud storage — so a plain URL
+    has less policy surface than a file does.
+  - **WHAT IS LEFT IS A SCOPE DECISION AND IT IS TOM'S**, not more research: build the cheapest
+    read-only publish sized honestly to the paper-records utility that genuinely lacks an
+    alternative, or accept that the operator is not our user and spend the effort where the design
+    engineer already is. **Do not build a general answer to "how does a phone reach a PC's model" —
+    both seats say that question is bigger than its audience.**
 
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**

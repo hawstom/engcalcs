@@ -19,7 +19,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 510 — Saved paths work; the arrow that opens them is not discoverable.
 - Task 513 — Sprint 459's leftovers: two named strings nobody here can read.
 - Task 530 — Available fire flow at a hydrant, with the hydrant assembly modelled.
-- ! Task 537 — [H] · A phone cannot reach a PC's model, and that may be the field operator's whole blocker.
+- ! Task 537 — [H] · RESEARCHED, AND BOTH SEATS SAY THE PREMISE IS WRONG. Tom's call on what follows.
 
 ## 75 — Soon (15)
 
