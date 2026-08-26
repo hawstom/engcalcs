@@ -2535,3 +2535,22 @@ html:has(#lpn_canvas) { overflow: hidden; }
    two stop the other half. On the canvas rather than on the chooser, because there is nothing on
    this drawing a visitor selects as text in any mode. */
 #lpn_canvas { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+
+/* The fire-flow box (ROADMAP Task 530). It ASKS four things and DISCLOSES six more, all in one
+   dialog, because "ask or disclose" is only kept if the disclosure is on the page rather than
+   behind a twisty nobody opens. That makes it the tallest dialog on this page, so it scrolls
+   inside itself: the dialog is fixed at 20% from the top and a body taller than the window would
+   otherwise push its own buttons off the bottom of the screen.
+   Scoped to .lpn-ff. css/engcalcs.css is app-wide and fifteen other calculators are a form and an
+   answer; nothing here may reach them. */
+.lpn-ff { max-height: 60vh; overflow-y: auto; }
+.lpn-ff-head { font-weight: bold; margin: 10px 0 4px; }
+.lpn-ff-head:first-child { margin-top: 0; }
+.lpn-ff-note { margin: 0 0 8px; font-size: .9em; }
+.lpn-ff-flow { margin: 0 0 8px; font-size: 1.25em; font-weight: bold; }
+/* BASELINE, NOT CENTRE, and the name takes the slack -- the same two rules .lpn-set-row is under.
+   A label long enough to wrap must not drag its box down to the middle of both its lines. */
+.lpn-ff-row { display: flex; align-items: baseline; gap: 6px; margin: 0 0 6px; }
+.lpn-ff-row > :first-child { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
+.lpn-ff-row input, .lpn-ff-row select { flex: 0 0 auto; width: 8em; max-width: 40%; }
+.lpn-ff-unit { flex: 0 0 3.5em; font-size: .85em; opacity: .8; }
