@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 1355,
-        "delta_key_count": 23,
+        "expected_key_count": 1358,
+        "delta_key_count": 26,
         "exempt_key_count": 37,
         "exempt_keys": [
             "u_imgd",
@@ -467,6 +467,9 @@
         "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
+        "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
+        "lpn_profile_edit_tap": "Drag any point on the path to move it. Tap a point you added to take it off.",
+        "lpn_profile_edit_nowhere": "A point on the path has to be a node. The path is unchanged.",
         "lpn_profile_saved": "Saved paths",
         "lpn_profile_new": "New saved path…",
         "lpn_profile_new_name": "Path {n}",
@@ -492,6 +495,9 @@
         "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
+        "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
+        "lpn_profile_edit_tap": "Drag any point on the path to move it. Tap a point you added to take it off.",
+        "lpn_profile_edit_nowhere": "A point on the path has to be a node. The path is unchanged.",
         "lpn_profile_saved": "Saved paths",
         "lpn_profile_new": "New saved path…",
         "lpn_profile_new_name": "Path {n}",
@@ -667,6 +673,54 @@
             }
         },
         "lpn_profile_edit_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_edit_say": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_edit_tap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_hgl",
+                    "value": "Linha piezométrica",
+                    "english": "Hydraulic grade line"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unidades",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_edit_nowhere": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
