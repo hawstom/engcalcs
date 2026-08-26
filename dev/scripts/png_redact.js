@@ -3,6 +3,7 @@
 //   node dev/scripts/png_redact.js crop   in.png out.png X Y W H
 //   node dev/scripts/png_redact.js redact in.png out.png X,Y,W,H [X,Y,W,H ...]
 //   node dev/scripts/png_redact.js scale  in.png out.png W H
+//   node dev/scripts/png_redact.js pad    in.png out.png W H
 //
 // WHY THIS EXISTS. There is no ImageMagick, no Pillow, no PHP GD and no sharp on this machine, and
 // dev/screenshots/README.md says so. But a PNG is zlib plus five row filters, and node ships zlib,
@@ -126,6 +127,24 @@ function scale(img, dw, dh) {
 	return { w: dw, h: dh, bpp, colour: img.colour, pix: out };
 }
 
+// Extend the canvas to W x H with WHITE, content anchored top-left. The share-card pass (Task 534)
+// needed it: a card is 1200x630 and `scale` shrinks only, so a capture shorter than 630 rows had no
+// route to a card at all. Padding beats upscaling here because these pages END in white -- the
+// added rows are indistinguishable from the page's own margin, whereas an upscale blurs every
+// glyph in the frame. White rather than transparent on purpose: a social card is composited onto
+// whatever background the network chose, and a transparent one goes dark on half of them.
+function pad(img, dw, dh) {
+	if (dw < img.w || dh < img.h) {
+		throw new Error('pad only grows; ' + img.w + 'x' + img.h + ' cannot become ' + dw + 'x' + dh);
+	}
+	const bpp = img.bpp;
+	const out = Buffer.alloc(dw * dh * bpp, 0xff);
+	for (let y = 0; y < img.h; y++) {
+		img.pix.copy(out, y * dw * bpp, y * img.w * bpp, (y + 1) * img.w * bpp);
+	}
+	return { w: dw, h: dh, bpp, colour: img.colour, pix: out };
+}
+
 // An opaque RGBA image is a quarter bigger than it needs to be, and every screen grab is opaque.
 // Dropping a channel that carries no information is not a quality decision, so it is automatic --
 // but only when EVERY pixel is opaque, because a single transparent one makes it a lie.
@@ -174,7 +193,8 @@ const [mode, inFile, outFile, ...rest] = process.argv.slice(2);
 if (!mode || !inFile || !outFile) {
 	console.error('usage:\n  png_redact.js crop   in.png out.png X Y W H\n' +
 		'  png_redact.js redact in.png out.png X,Y,W,H [X,Y,W,H ...]\n' +
-		'  png_redact.js scale  in.png out.png W H');
+		'  png_redact.js scale  in.png out.png W H\n' +
+		'  png_redact.js pad    in.png out.png W H');
 	process.exit(2);
 }
 guardOutput(inFile, outFile);
@@ -198,6 +218,11 @@ if (mode === 'crop') {
 	if (w > img.w || h > img.h) { throw new Error('scale only shrinks; ' + img.w + 'x' + img.h + ' cannot become ' + w + 'x' + h); }
 	save(outFile, dropOpaqueAlpha(scale(img, w, h)));
 	console.log('scaled ' + img.w + 'x' + img.h + ' -> ' + w + 'x' + h + ' -> ' + outFile);
+} else if (mode === 'pad') {
+	const [w, h] = rest.map(Number);
+	if (![w, h].every(Number.isFinite) || w <= 0 || h <= 0) { throw new Error('pad needs W H'); }
+	save(outFile, dropOpaqueAlpha(pad(img, w, h)));
+	console.log('padded ' + img.w + 'x' + img.h + ' -> ' + w + 'x' + h + ' with white -> ' + outFile);
 } else if (mode === 'redact') {
 	let painted = 0;
 	rest.forEach(spec => {

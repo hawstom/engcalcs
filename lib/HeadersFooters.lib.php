@@ -101,12 +101,58 @@ $ec_canonical = ec_canonical_url($html_lang);
 // keeps the file behind it real -- a 404 here is invisible to us, because nobody looks at a share
 // card for their own site.
 //
-// The image is 1200x576, which is the recommended 1200-wide card at this screenshot's own aspect
-// ratio; width and height are declared so a network can lay the card out before it has fetched the
-// picture. og:locale is deliberately absent: it wants a language_TERRITORY pair and this suite
-// carries a bare language code, and the hreflang alternates above already say what languages exist.
+// Width and height are declared so a network can lay the card out before it has fetched the picture,
+// which is why they are carried in variables beside the file rather than typed into the tags: the
+// suite card is 1200x576 (a 1200-wide card at that screenshot's own aspect) and a per-page card is
+// 1200x630 (the 1.91:1 every network documents). A declaration that disagrees with the file lays
+// out wrong on every network that trusts it, so social_card_check.php re-measures the real pixels.
+// og:locale is deliberately absent: it wants a language_TERRITORY pair and this suite carries a
+// bare language code, and the hreflang alternates above already say what languages exist.
+//
+// A CARD PER CALCULATOR -- the per-page half of ROADMAP Task 534, which shipped the suite card and
+// recorded that per-page was blocked only for want of pictures. It is resolved by FILE PRESENCE and
+// nothing else, so there is no list to keep in step and a card starts being used the moment somebody
+// drops it in:
+//
+//     icons/cards/<Page>-<lang>.png   this page in this language
+//     icons/cards/<Page>.png          this page, whatever language is being served
+//     icons/social-card.png           the suite card
+//
+// **THE LANGUAGE STEP IS NOT A FLOURISH: the canonical URL carries ?lang=, so every language is a
+// separate URL with its own hreflang alternates, and every network caches a card per URL.** A
+// Spanish frame therefore has somewhere real to live, and English stays the default because one
+// picture has to serve the other 25 URLs until a matching one exists -- a Chinese card on the
+// English URL reads as a mistake rather than as a translation.
+//
+// The default cards are ENGLISH captures for that reason. Where the only frame we have is in
+// another language it is filed under its -<lang> name alone, so it is right where it is used and
+// absent everywhere else; dev/screenshots/INDEX.md names which calculators are still waiting for an
+// English shot. Both parts of the name are constrained before they touch the filesystem: the page
+// is basename()d and matched against [A-Za-z0-9-], the language against [a-z]{2}.
 $og_title = trim(strip_tags((string)($calc_name !== '' ? $calc_name . ' — ' . $html_title : $html_title)));
-$og_image = CANONICAL_ORIGIN . '/engcalcs/icons/social-card.png';
+$og_card   = 'icons/social-card.png';
+$og_card_h = 576;
+// English on purpose, both of these, and the only strings here that are not language keys. They
+// describe pictures of an English interface, they are surfaced only by screen readers on X, and a
+// key for either would be one more cell in a 27-language grid for a sentence nobody reads in either
+// language. Named as a follow-up in Task 534 rather than left implicit.
+$og_card_alt = 'A water distribution network drawn on a street map and coloured by pressure, with a hydraulic profile in the pane beneath it.';
+$og_page = preg_replace('/\.php$/', '', basename((string)($_SERVER['SCRIPT_NAME'] ?? '')));
+if (preg_match('/^[A-Za-z0-9-]+$/', $og_page)) {
+	$og_tries = array();
+	if (preg_match('/^[a-z]{2}$/', $html_lang)) { $og_tries[] = 'icons/cards/' . $og_page . '-' . $html_lang . '.png'; }
+	$og_tries[] = 'icons/cards/' . $og_page . '.png';
+	foreach ($og_tries as $og_try) {
+		if (is_file(__DIR__ . '/../' . $og_try)) {
+			$og_card   = $og_try;
+			$og_card_h = 630;
+			$og_card_alt = 'A screenshot of this calculator: its input form on the left and the computed results beside it.';
+			break;
+		}
+	}
+	unset($og_tries, $og_try);
+}
+$og_image = CANONICAL_ORIGIN . '/engcalcs/' . $og_card;
 ?>
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="<?=htmlspecialchars(strip_tags((string)$ec_lang['menu_brand']), ENT_QUOTES, 'UTF-8')?>" />
@@ -118,14 +164,10 @@ $og_image = CANONICAL_ORIGIN . '/engcalcs/icons/social-card.png';
 	<meta property="og:image" content="<?=htmlspecialchars($og_image, ENT_QUOTES, 'UTF-8')?>" />
 	<meta property="og:image:type" content="image/png" />
 	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="576" />
-	<?php // English on purpose, and the one string here that is not a language key. It describes a
-	      // picture of an English interface, it is surfaced only by screen readers on X, and adding
-	      // a key for it would be one more cell in a 27-language grid for a sentence nobody reads
-	      // in either language. Named as a follow-up in Task 534 rather than left implicit. ?>
-	<meta property="og:image:alt" content="A water distribution network drawn on a street map and coloured by pressure, with a hydraulic profile in the pane beneath it." />
+	<meta property="og:image:height" content="<?=(int)$og_card_h?>" />
+	<meta property="og:image:alt" content="<?=htmlspecialchars($og_card_alt, ENT_QUOTES, 'UTF-8')?>" />
 	<meta name="twitter:card" content="summary_large_image" />
-<?php unset($og_title, $og_image); ?>
+<?php unset($og_title, $og_image, $og_card, $og_card_h, $og_card_alt, $og_page); ?>
 	<link rel="manifest" href="/engcalcs/manifest.json">
 	<meta name="theme-color" content="#1a6faf">
 	<?php // Both spellings, deliberately. `mobile-web-app-capable` is the standard one and the only

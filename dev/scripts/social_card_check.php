@@ -33,6 +33,13 @@
  *      so a busted card URL would change on every deploy and orphan every card already scraped.
  *   6. The file is under 5 MB, which is the smallest of the networks' published limits (X's; media
  *      Facebook accepts to 8 MB). Over it, some networks show no picture at all.
+ *   7. **EVERY FILE IN icons/cards/ IS A REAL 1200x630 PNG THAT ITS OWN PAGE ACTUALLY DECLARES**
+ *      (the per-page half of Task 534). The per-calculator cards are wired by FILENAME alone -- echoHTMLHead() tries
+ *      icons/cards/<Page>-<lang>.png, then icons/cards/<Page>.png, then the suite card -- so a name
+ *      that is wrong by one character is simply never served, and there is no list anywhere that
+ *      would disagree with it. The loop over pages cannot see this on its own: it renders in
+ *      English, so a card for the Burmese URL is invisible to it. Each card is therefore rendered
+ *      in the language its own name claims and the og:image it produces is compared back.
  *
  * Blocking. Every finding here is a card that is already broken or about to be.
  *
@@ -107,10 +114,11 @@ function image_size($path)
 }
 
 /** One subprocess per page -- the only correct way to render outside a web request. */
-function render_page($path)
+function render_page($path, $lang = null)
 {
     $cmd = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg(__DIR__ . '/render_page.php')
-         . ' ' . escapeshellarg(basename($path)) . ' 2>/dev/null';
+         . ' ' . escapeshellarg(basename($path))
+         . ($lang === null ? '' : ' ' . escapeshellarg('--lang=' . $lang)) . ' 2>/dev/null';
     $html = shell_exec($cmd);
     return ($html === null || trim($html) === '') ? null : $html;
 }
@@ -239,6 +247,78 @@ foreach ($pages as $page) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------
+// THE PER-CALCULATOR CARDS (the per-page half of Task 534). The loop above sees only what an ENGLISH render
+// declares, so it can never reach icons/cards/<Page>-<lang>.png -- and a language card is exactly
+// the kind of file that would sit there for a year being wrong, because nobody browses in Burmese
+// and then pastes the link into Facebook. So every file in the directory is checked on its own
+// terms, and then PROVEN TO BE REACHED by rendering the page in the language it names.
+//
+// The name is the whole wiring: there is no list, so a card is used iff its filename resolves.
+// That makes a typo silent by construction -- `Manning-Trap-idd.png` simply never appears -- which
+// is why a card naming no page of this suite is a failure here rather than a shrug.
+$cardDir = $root . '/icons/cards';
+$knownLangs = array();
+foreach (glob($root . '/lib/lang.ec.??.php') as $lf) {
+    if (preg_match('/lang\.ec\.([a-z]{2})\.php$/', $lf, $lm)) { $knownLangs[] = $lm[1]; }
+}
+$cards = is_dir($cardDir) ? glob($cardDir . '/*') : array();
+foreach ($cards as $card) {
+    $base = basename($card);
+    $rel  = 'icons/cards/' . $base;
+    if (substr($base, -4) !== '.png') {
+        bad("$rel is not a .png. echoHTMLHead() declares og:image:type image/png for everything in\n"
+          . "        this directory, so a file of another type would be advertised as a lie. Convert it\n"
+          . "        or move it out.");
+        continue;
+    }
+    $stem = substr($base, 0, -4);
+    $lang = null;
+    $page = $stem;
+    if (preg_match('/^(.*)-([a-z]{2})$/', $stem, $sm) && in_array($sm[2], $knownLangs, true)) {
+        $page = $sm[1];
+        $lang = $sm[2];
+    }
+    if (!is_file($root . '/' . $page . '.php')) {
+        bad("$rel names no page of this suite -- there is no $page.php.\n"
+          . "        Nothing reads a list; echoHTMLHead() looks the filename up, so a card whose name is\n"
+          . "        wrong by one character is never served and nothing else would ever say so.");
+        continue;
+    }
+
+    $bytes = filesize($card);
+    if ($bytes < 1) { bad("$rel is empty."); continue; }
+    if ($bytes > 5 * 1024 * 1024) {
+        bad("$rel is " . round($bytes / 1048576, 1) . " MB; 5 MB is the smallest published limit\n"
+          . "        among the networks. Shrink it -- dev/scripts/png_redact.js scale.");
+        continue;
+    }
+    $size = image_size($card);
+    if ($size === null) { bad("$rel is not a PNG this script can read a size out of."); continue; }
+    list($cw, $ch, $cmime) = $size;
+    if ($cmime !== 'image/png' || $cw !== 1200 || $ch !== 630) {
+        bad("$rel is {$cw}x{$ch} $cmime, but echoHTMLHead() declares every card in this directory\n"
+          . "        as 1200x630 image/png -- the 1.91:1 every network documents. It does not measure the\n"
+          . "        file, so a card of another size lays out wrong wherever the declaration is trusted.\n"
+          . "        Rebuild it: png_redact.js crop to a 40:21 box, then scale 1200 630.");
+        continue;
+    }
+
+    // Proven reached, in the language the name claims. This is the only assertion that exercises the
+    // lookup's ORDER -- a -<lang> card must beat the page's default card, and the page's default card
+    // must beat the suite card.
+    $html = render_page($root . '/' . $page . '.php', $lang);
+    $got = $html === null ? array() : meta_values($html, 'og:image');
+    if (!$got || substr($got[0], -strlen('/' . $rel)) !== '/' . $rel) {
+        bad("$rel exists but $page.php" . ($lang === null ? '' : " in $lang") . " does not declare it.\n"
+          . "        og:image came back as '" . ($got ? $got[0] : '(none)') . "'. The lookup in\n"
+          . "        echoHTMLHead() prefers icons/cards/<Page>-<lang>.png, then icons/cards/<Page>.png,\n"
+          . "        then the suite card; a card that is never reached is a card nobody will ever see.");
+        continue;
+    }
+    if ($verbose) { echo "  $rel: reached by $page.php" . ($lang === null ? '' : " --lang=$lang") . ", {$cw}x{$ch}\n"; }
+}
+
 if ($pagesWithCard === 0) {
     bad("no page declared a share card at all. Either every page failed to render -- run\n"
       . "        html_balance_check.php, which would also be failing -- or the tag block has been\n"
@@ -249,5 +329,6 @@ if ($fail) {
     echo "\nFAIL: social card ($fail finding" . ($fail === 1 ? '' : 's') . ")\n";
     exit(1);
 }
-echo "ok: $pagesWithCard pages declare a share card; " . count($checkedFiles) . " image file(s) checked and real.\n";
+echo "ok: $pagesWithCard pages declare a share card; " . count($checkedFiles) . " image file(s) checked and real;\n"
+   . "    " . count($cards) . " per-calculator card(s) in icons/cards/, each 1200x630 and each reached by its own page.\n";
 exit(0);
