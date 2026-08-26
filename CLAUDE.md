@@ -316,8 +316,14 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   gain — a free fix that is 80% as good beat a paid one. Weigh any future proposal against that.
 - **Never point `$html_desc` at `$html_title` or a `*_main_title` key.** Google discards a
   duplicate-of-title description and auto-generates a snippet from a page whose content is a form.
-- A page with no `*_main_desc` sets nothing (`index.php`, `contact.php`, `Compare-Languages.php`,
-  `formmailsuccess.php`).
+- A page with no `*_main_desc` sets nothing — **`contact.php`, `Compare-Languages.php`,
+  `formmailsuccess.php`, `privacy.php`, `terms.php`.** *(Corrected 2026-08-25: `index.php` has
+  its own description and no longer belongs on this list; `privacy.php` and `terms.php` were
+  missing from it. Found while wiring the share cards, which read the same global.)*
+- **`$html_desc` now feeds `og:description` as well as `<meta name="Description">`** (Task 534),
+  so a page that sets nothing emits no `og:description` either — a card with a title and a
+  picture and no subtitle, which is a normal card. Never a placeholder: "undefined" on a share
+  card is a defect that only strangers see.
 - Whatever key you point at becomes plain-text-constrained automatically —
   `plainTextBoundKeys()` derives it from the assignment.
 

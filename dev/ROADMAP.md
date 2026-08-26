@@ -356,24 +356,6 @@ the block.
   - **Not observed in the wild**, which is why it is 75 and not 100: renaming a link and then
     dragging one of its nodes without an intervening redraw is a narrow path. It is still a throw.
 
-- 75|534| **Social cards: a per-page picture, not one screenshot for the whole suite.**
-  The vocabulary SHIPPED 2026-08-25 — `og:type`/`site_name`/`title`/`url`/`description`/`image`
-  with `image:type`/`width`/`height`/`alt`, plus `twitter:card`, in `echoHTMLHead()` on all 25
-  pages, guarded blocking by `dev/scripts/social_card_check.php`. What is left is the picture.
-  - **One suite-wide image is what shipped, deliberately, and it is a compromise.**
-    `icons/social-card.png` is plate 0028 (the landing page's own hero) at 1200x576. It is a
-    picture of the LOOPED-NETWORK page, so it is exactly right on `Looped-Network.php` and merely
-    generic on Manning Pipe Flow — and there is no other choice available, because every
-    publishable frame in `dev/screenshots/INDEX.md` is an lpn frame. **A per-page or per-family
-    card is worth much more** (a person shares a CALCULATOR), and the plumbing is ready for it:
-    make `$og_image` a per-page override with the suite-wide one as the default.
-  - **The shipped plate is dated in one respect:** its status readout reads `Longitude:` first,
-    from before the 2026-08-24 latitude-first fix. Illegible at card size, but a re-shoot of 0028
-    on today's master is the cheapest single improvement here and fixes it.
-  - `og:image:alt` is an English literal in `lib/HeadersFooters.lib.php`, not a language key —
-    one sentence describing a picture of an English interface, surfaced only by screen readers on
-    X. Give it a key if per-page cards land, since then there are many of them.
-
 - 75|531| **Tag the examples: US/SI, design/maintenance, xy/lat-lon.**
   Tom, 2026-08-25: *"Reference 348. Phase 1 can be adding labels, tags, or keywords to the
   examples."* **Task 348 is sub-categories and paging in the gallery, and is deliberately unbuilt at
