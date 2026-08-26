@@ -21,8 +21,10 @@ exports.title = '35. The Project menu';
 // moved in as the Project menu became the one place every command lives (2026-08-24). The list is
 // asserted in ORDER rather than as a set: a menu is read top to bottom, and the report row staying
 // last is what keeps the four everyday commands above the one that reports on a run.
+// 'Fire flow at a hydrant…' joined 2026-08-25 (Task 530). It sits with Calculate rather than in
+// Insert, because it is an ANALYSIS of this project and nothing it builds enters the document.
 const EXPECTED = ['Settings', 'Libraries', 'Profile', 'Tables', 'Scenarios', 'Calculate',
-	'EPANET run report'];
+	'Fire flow at a hydrant…', 'EPANET run report'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');

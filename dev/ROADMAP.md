@@ -233,9 +233,27 @@ the block.
     constriction (4½ in vs 6 in over 5 ft) is worth **1.06%**, while the k is worth **11.6%**. Both
     are needed, but the barrel earns its place mostly by being where the QA-derived k is measured,
     not by its own friction. Do not quote the constriction as the big term.
-  - **STILL TO BUILD: the wizard, and the hydrant library.** Language keys, the dialog that asks
-    for the lateral length and discloses the rest, the flow readout in the project's own units, and
-    the saved-with-the-project hydrant type (fields listed above). Wording is Tom's.
+  - **THE BOX SHIPPED 2026-08-25 — Project ▸ Fire flow at a hydrant…** One dialog: it asks the
+    hydrant junction, the lateral length (empty, and refused when absent), the residual and the
+    critical point, and it DISCLOSES the other six assumptions in editable boxes with the k's
+    reference velocity read off the lateral-diameter box beside them. An untouched box passes
+    nothing to the engine, which is what keeps the engine's own `supplied`/`default` honest and what
+    keeps the k's two labelled halves. The answer restates every assumption with `assumed` /
+    `you gave this`. 54 new `lpn_ff_*` keys; `dev/lpn-spike/fireflow-wizard-harness.js` drives the
+    real listeners (64 checks) and snapshots the document around the whole exchange.
+    - **The hydrant's own junction is NOT offered as a critical point, deliberately.** Demand-driven
+      solve: the assembly hangs downstream of the tee, so nothing in it can move that node's
+      pressure. Offering it beside the outlet would quietly hand back a larger number that is not an
+      available fire flow. The tip says so.
+    - **Roughness is the one knob the page must supply rather than disclose** when the project's
+      friction method is not Hazen-Williams — the engine's 130 is a C, and under Darcy-Weisbach it
+      would be a 130 m roughness height. It is still shown and still editable; it is just not called
+      the user's.
+  - **STILL TO BUILD: the hydrant library.** The saved-with-the-project hydrant type (fields listed
+    above). It did NOT fall out of the wizard cheaply: the wizard's inputs are per-run and live for
+    one page load, while a library entry is user data in the project file with a name, an editor, an
+    index and a document version behind it — every rule `dev/looped-network-calculator-scope.md`
+    puts on stored data. Wording is Tom's.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;

@@ -2656,3 +2656,69 @@ $ec_lang['lpn_terrain_failed']='We could not reach the terrain service, so no el
 $ec_lang['lpn_terrain_done']='{n} elevation(s) filled in.';
 $ec_lang['lpn_terrain_missed']='{m} could not be read and are still blank.';
 $ec_lang['lpn_terrain_partial']='{f} terrain tile(s) did not answer.';
+
+// ---- Available fire flow at a hydrant (ROADMAP Task 530) ----------------------------------------
+// The wizard's whole job is Tom's rule: "we must either ask or disclose our assumptions about the
+// diameter, roughness, k, and length of a hydrant and lateral assembly." So the lateral LENGTH is
+// asked (five agency standards span 25-100 ft and there is no honest default), and every other
+// assumption is shown on the page with the number in force and where it came from.
+$ec_lang['lpn_ff_menu']='Fire flow at a hydrant…';
+$ec_lang['lpn_ff_menu_tip']='How much can a hydrant deliver while a chosen point still holds its residual pressure? The hydrant and its lateral are built for the calculation only and never enter your project.';
+$ec_lang['lpn_ff_title']='Available fire flow at a hydrant';
+$ec_lang['lpn_ff_intro']='A hydrant, its lateral and their minor losses are added to a copy of this network for this calculation only. Your project is not changed by it.';
+$ec_lang['lpn_ff_hydrant_node']='Hydrant is on this junction';
+$ec_lang['lpn_ff_hydrant_node_tip']='A hydrant hangs off a junction of the distribution system. The lateral runs from there to the hydrant.';
+$ec_lang['lpn_ff_no_junctions']='This project has no junctions yet, so there is nowhere to put a hydrant.';
+$ec_lang['lpn_ff_lateral_length']='Length of the hydrant lateral';
+$ec_lang['lpn_ff_lateral_length_tip']='Asked, never assumed. Agency standards run from 25 ft to 100 ft for this one pipe and the answer moves with it, so there is no honest default to offer you.';
+$ec_lang['lpn_ff_residual']='Residual pressure to hold';
+$ec_lang['lpn_ff_residual_tip']='20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.';
+$ec_lang['lpn_ff_critical']='Point that must hold the residual';
+$ec_lang['lpn_ff_critical_outlet']='The hydrant outlet';
+$ec_lang['lpn_ff_critical_tip']='The hydrant outlet is where AWWA M31 and NFPA 291 define what a hydrant delivers, so it is the usual answer. The hydrant’s own junction is deliberately not offered: it sits upstream of the lateral, so the lateral and the hydrant cannot change the pressure there, and the number would come out larger and would not be an available fire flow.';
+$ec_lang['lpn_ff_assumptions']='What is assumed about the hydrant and lateral';
+$ec_lang['lpn_ff_assumptions_intro']='Every number below is our assumption, shown so that you can change it. It is used for this calculation only.';
+$ec_lang['lpn_ff_lateral_diameter']='Lateral diameter';
+$ec_lang['lpn_ff_lateral_diameter_tip']='6 in is the usual hydrant lateral, and the usual size of the shoe the hydrant bolts onto.';
+$ec_lang['lpn_ff_lateral_roughness']='Lateral roughness';
+$ec_lang['lpn_ff_lateral_roughness_tip']='Cement-lined ductile iron. The defensible band is C = 120 to 140, and this is the middle of it.';
+$ec_lang['lpn_ff_barrel_diameter']='Hydrant waterway diameter';
+$ec_lang['lpn_ff_barrel_diameter_tip']='The opening through the hydrant’s own main valve, which AWWA C502 sets at 4 1/2 or 5 1/4 inches. This is not the 6 in shoe the hydrant bolts on with, and leaving the narrower waterway out overstates what the hydrant can deliver.';
+$ec_lang['lpn_ff_barrel_length']='Hydrant waterway length';
+$ec_lang['lpn_ff_barrel_length_tip']='About a 3 1/2 ft bury plus the rise to the pumper nozzle. Only friction is read from this length; the larger part of the hydrant’s loss is in the coefficient below.';
+$ec_lang['lpn_ff_barrel_roughness']='Hydrant waterway roughness';
+$ec_lang['lpn_ff_barrel_roughness_tip']='The same lining as the lateral. The waterway is a short run of coated iron.';
+$ec_lang['lpn_ff_k_tip']='The tee off the main, the gate valve, the elbow, the hydrant barrel, its main valve and its nozzle, all together. Zero is not an option here: over a run this short the minor loss is larger than the pipe friction. The reasonable range is 3 to 6.';
+// {diameter} is a diameter with its unit. Substituted, never concatenated.
+$ec_lang['lpn_ff_k_reference']='This coefficient belongs to the velocity in the lateral, at a lateral diameter of {diameter}.';
+$ec_lang['lpn_ff_k_reference_supplied']='Your coefficient will be used at the velocity in the lateral, at a lateral diameter of {diameter}. A coefficient taken from a table that means some other velocity must be restated first: multiply it by its own diameter divided by the lateral diameter, to the fourth power.';
+// {value} is a coefficient. Substituted, never concatenated.
+$ec_lang['lpn_ff_k_part_awwa']='{value} of it is the AWWA C502 test ceiling — friction through the hydrant may not exceed 3.0 psi at 1000 gpm at the 4 1/2 in pumper nozzle — which covers the barrel, the main valve and the nozzle. A hydrant that passes that test does at least this well, so the number errs on the safe side.';
+$ec_lang['lpn_ff_k_part_fittings']='{value} of it is the fittings in the lateral, by Crane TP-410: tee through the branch 1.0, open gate valve 0.15, flanged 90 degree elbow 0.35.';
+$ec_lang['lpn_ff_calculate']='Work out the fire flow';
+$ec_lang['lpn_ff_back']='Change something';
+$ec_lang['lpn_ff_engine_epanet']='This will be worked out with the EPANET engine.';
+$ec_lang['lpn_ff_engine_native']='This will be worked out with the built-in solver.';
+$ec_lang['lpn_ff_engine_cost']='The answer is a search, so the whole network is solved about sixteen times over.';
+// {flow} is a flow with its unit, {node} a point in the network, {residual} and {pressure} are
+// pressures with their units, {n} a whole number. Substituted, never concatenated.
+$ec_lang['lpn_ff_result_flow']='Available fire flow: {flow}';
+$ec_lang['lpn_ff_result_at']='That is the flow out of the hydrant outlet while {node} still holds {residual}.';
+$ec_lang['lpn_ff_result_static']='With the hydrant shut, {node} holds {pressure}.';
+$ec_lang['lpn_ff_result_solves']='The network was solved {n} times to find it.';
+$ec_lang['lpn_ff_iso']='ISO credits a single hydrant with at most {limit}. That credit limit has not been applied to the number above.';
+$ec_lang['lpn_ff_iso_exceeded']='This hydrant works out above that credit limit.';
+$ec_lang['lpn_ff_used']='What was used';
+$ec_lang['lpn_ff_source_supplied']='you gave this';
+$ec_lang['lpn_ff_source_default']='assumed';
+// Every way this can fail to produce a number is named and says why. None of them is ever shown
+// as a flow of zero.
+$ec_lang['lpn_ff_err_length']='How long is the hydrant lateral? There is no honest default: agency standards run from 25 ft to 100 ft for this one pipe and the answer moves with it. Give a length and ask again.';
+$ec_lang['lpn_ff_err_at_rest']='There is no available fire flow here, and that is not the same as an answer of zero. Available fire flow is the flow at which the chosen point still holds the residual pressure. With the hydrant shut, {node} is already below it, at {pressure}, so no flow can satisfy that at all. This network fails the test before the hydrant is opened.';
+$ec_lang['lpn_ff_err_ceiling']='The residual is still held at {ceiling}, which is past any real hydrant. This network loses almost no head, so there is no fire flow to report here. Look at the network before reading anything into it.';
+$ec_lang['lpn_ff_err_converge']='The network did not settle at {flow}, so there is no answer to give. That is about the network, not about the hydrant.';
+$ec_lang['lpn_ff_err_solve']='The network could not be worked out, so there is no fire flow to report.';
+$ec_lang['lpn_ff_err_no_hydrant']='There is no junction named {id} in this project.';
+$ec_lang['lpn_ff_err_no_critical']='There is no point named {id} in this project.';
+$ec_lang['lpn_ff_err_not_junction']='A hydrant hangs off a junction. {id} is a {type}, which already fixes the water level there, so the answer would be set by that level alone.';
+$ec_lang['lpn_ff_err_unknown']='This did not work out. The reason given is {code}.';
