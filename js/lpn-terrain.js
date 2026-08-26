@@ -268,6 +268,55 @@
 	};
 
 	// ============================================================================================
+	// NAMING WHAT WAS TOUCHED. Pure: ids and counts in, a sentence out. No DOM, no network.
+	// dev/lpn-spike/terrain-harness.js drives all of this in Node.
+	// ============================================================================================
+	//
+	// **A COUNT IS A PROMISE; A LIST IS A PROMISE YOU CAN CHECK** (2026-08-25). The confirm counted
+	// the nodes it would leave alone and the notice counted the ones it filled, and neither said
+	// WHICH. Tom: *"Elsewhere in lpn we are careful to list what we found. Add a way to indicate
+	// which nodes were edited or will be edited or both."* Both, and this is the whole of it: the
+	// plan names what it is about to write and what it is about to leave; the result names what it
+	// wrote and what it could not read.
+	//
+	// **THE PATTERN IS THE .inp IMPORT REPORT'S, DELIBERATELY** (js/lpn-inp.js, showInpReport()).
+	// That report is this suite's settled answer to "here is what we did and did not do": one whole
+	// SENTENCE per finding with its ids in brackets after it, never a bare column of names and
+	// never a sentence composed from fragments at render time. Same shape here, so a reader who has
+	// opened a file already knows how to read this.
+	//
+	// **THE ONE THING THAT HAD TO BE ADDED IS THE CAP.** The import report renders into a dialog
+	// with a scrollbar, so it can afford every id. These sentences go into a native confirm() and
+	// into a status notice that clears itself after a few seconds, and neither can scroll: a
+	// four-hundred-node network would put a wall of names in front of the button a person has to
+	// press, which does not inform them, it hides the question. So the list names the first
+	// MAX_NAMED and then says how many it did not name -- the count and the list together, rather
+	// than either alone.
+	var MAX_NAMED = 12;
+
+	/**
+	 * The ids as one readable run of text, capped. Never returns an empty string for a non-empty
+	 * list, and never claims a number it did not print.
+	 */
+	EC.lpnTerrainNameList = function (ids) {
+		var list = (ids || []).map(function (v) { return (v && v.id !== undefined) ? v.id : v; });
+		if (!list.length) { return ''; }
+		if (list.length <= MAX_NAMED) { return list.join(', '); }
+		var shown = list.slice(0, MAX_NAMED).join(', ');
+		var rest = list.length - MAX_NAMED;
+		// Substituted, never concatenated, for the reason logged against lpn_terrain_requests below:
+		// a language that wants the count before the names must be able to put it there.
+		return t('lpn_terrain_ids_more', '{ids}, and {n} more')
+			.replace('{ids}', shown).replace(/\{n\}/g, rest);
+	};
+
+	/** One finding: a whole sentence with its named ids substituted in, or nothing at all. */
+	function named(key, english, ids) {
+		var list = EC.lpnTerrainNameList(ids);
+		return list ? t(key, english).replace('{ids}', list) : '';
+	}
+
+	// ============================================================================================
 	// THE COMMAND. Everything below needs a page.
 	// ============================================================================================
 
@@ -289,8 +338,8 @@
 	// claims about the same data.
 	function accuracy() {
 		return t('lpn_terrain_accuracy',
-			'Terrain data is about 30 m across the ground and is commonly several metres out ' +
-			'vertically. Treat it as a contour map, not a survey: check anything you rely on.');
+			'Terrain data has about 30 m horizontal resolution and several meters vertical ' +
+			'accuracy. Treat it as a contour map, not a survey: check anything you rely on.');
 	}
 
 	// THE VIEW-MENU ROW'S OWN WORDS, exported rather than read by js/looped-network.js, so every
@@ -359,7 +408,8 @@
 	// `replacing` is the starting elevation, when this run is the SECOND question -- the one about
 	// nodes that still hold the number a new node is born with. Naming that number is the whole
 	// point of asking separately, so it is never summarised away.
-	function planText(fillCount, keepCount, tileCount, replacing) {
+	EC.lpnTerrainPlanText = function (want, keep, tileCount, replacing) {
+		var fillCount = (want || []).length, keepCount = (keep || []).length;
 		var s = (replacing === undefined)
 			? t('lpn_terrain_confirm',
 				'Fill in the elevation of {n} node(s) from the land surface?').replace('{n}', fillCount)
@@ -370,9 +420,15 @@
 				t('lpn_terrain_confirm_default_2', 'Replace those {n} with the land surface?')
 			].join('\n\n')
 				.replace(/\{n\}/g, fillCount).replace('{v}', replacing);
+		// **WHICH ONES, BEFORE ANYTHING IS WRITTEN.** This is the half of the answer a person can
+		// still act on -- they are looking at the drawing and at the button at the same time, and
+		// the only way to catch "that one is surveyed, do not touch it" is to see the name here.
+		s += '\n\n' + named('lpn_terrain_will_ids',
+			'These are the nodes that will be filled in: {ids}', want);
 		if (keepCount > 0 && replacing === undefined) {
 			s += '\n\n' + t('lpn_terrain_keep',
-				'{k} node(s) already have an elevation and will not be touched.').replace('{k}', keepCount);
+				'{k} node(s) already have an elevation and will not be touched.').replace('{k}', keepCount)
+				+ ' ' + named('lpn_terrain_keep_ids', 'They are: {ids}', keep);
 		}
 		s += '\n\n' + accuracy();
 		s += '\n\n' + t('lpn_terrain_undo', 'One Undo (Ctrl-Z) puts every one of them back.');
@@ -391,7 +447,34 @@
 			? req.replace(/\{n\}/g, tileCount)
 			: tileCount + ' ' + req);
 		return s;
-	}
+	};
+
+	/**
+	 * **AND THE SAME ANSWER AFTERWARDS, which is a different list.** What was planned and what was
+	 * written are not the same set: a pixel that would not decode and a node somebody typed into
+	 * while the tiles were in flight both drop out. So this is composed from the ids the document
+	 * actually returned, and the ones it did not are named too -- "still blank" is a thing a person
+	 * has to go and finish by hand, and they cannot start until they know which.
+	 */
+	EC.lpnTerrainDoneText = function (filledIds, blankIds, failedTiles) {
+		var parts = [
+			t('lpn_terrain_done', '{n} elevation(s) filled in.').replace('{n}', (filledIds || []).length),
+			named('lpn_terrain_filled_ids', 'These nodes were filled in: {ids}', filledIds)
+		];
+		if ((blankIds || []).length) {
+			parts.push(t('lpn_terrain_missed',
+				'{m} could not be read and are still blank.').replace('{m}', blankIds.length));
+			parts.push(named('lpn_terrain_blank_ids',
+				'These nodes are still blank: {ids}', blankIds));
+		}
+		if (failedTiles > 0) {
+			parts.push(t('lpn_terrain_partial',
+				'{f} terrain tile(s) did not answer.').replace('{f}', failedTiles));
+		}
+		parts.push(accuracy());
+		parts.push(CREDIT);
+		return parts.filter(function (x) { return !!x; }).join(' ');
+	};
 
 	/**
 	 * ONE TILE, AS PIXELS. **This is the only function in this file that touches the network**, and
@@ -467,11 +550,15 @@
 			if (atDefault.points.length) {
 				want = atDefault.points;
 				replacing = atDefault.value;
-				keep = keep - want.length;
+				// `keep` is a list of ids now, not a count, so the nodes that just moved OUT of it
+				// and into `want` are removed by name rather than by subtracting a number.
+				var moving = {};
+				want.forEach(function (p) { moving[p.id] = true; });
+				keep = keep.filter(function (id) { return !moving[id]; });
 			}
 		}
 		if (!want.length) {
-			notice(keep > 0
+			notice(keep.length > 0
 				? t('lpn_terrain_none_needed',
 					'Every node already has an elevation you have set. Nothing was changed, and ' +
 					'nothing was sent — we never overwrite an elevation that is already there.')
@@ -491,7 +578,7 @@
 				'requests). Nothing was sent.').replace('{n}', plan.tiles.length));
 			return;
 		}
-		if (!root.confirm || !root.confirm(planText(want.length, keep, plan.tiles.length, replacing))) {
+		if (!root.confirm || !root.confirm(EC.lpnTerrainPlanText(want, keep, plan.tiles.length, replacing))) {
 			notice(t('lpn_terrain_cancelled', 'Nothing was changed and nothing was sent.'));
 			return;
 		}
@@ -499,10 +586,10 @@
 			notice(t('lpn_terrain_nofetch', 'This browser cannot reach the terrain service.'));
 			return;
 		}
-		run(plan, token, want.length, replacing);
+		run(plan, token, want, replacing);
 	};
 
-	function run(plan, token, wanted, replacing) {
+	function run(plan, token, want, replacing) {
 		running = true;
 		notice(t('lpn_terrain_working', 'Reading the land surface…'));
 		var heights = [], failed = 0;
@@ -527,26 +614,27 @@
 			}
 			// **ONE CALL, ONE UNDO SNAPSHOT, ONE EVENT.** The seam takes the whole list, not a node
 			// at a time -- see js/looped-network.js, where the snapshot is taken before the first
-			// write and the redraw happens after the last.
-			var filled = seam.fill(heights, replacing);
-			var missed = wanted - filled;
-			var msg = t('lpn_terrain_done', '{n} elevation(s) filled in.').replace('{n}', filled);
-			if (missed > 0) {
-				msg += ' ' + t('lpn_terrain_missed',
-					'{m} could not be read and are still blank.').replace('{m}', missed);
-			}
-			if (failed > 0) {
-				msg += ' ' + t('lpn_terrain_partial',
-					'{f} terrain tile(s) did not answer.').replace('{f}', failed);
-			}
-			notice(msg + ' ' + accuracy() + ' ' + CREDIT);
+			// write and the redraw happens after the last. It hands back the ids it WROTE, which
+			// is what lets the notice below name them.
+			var filled = seam.fill(heights, replacing) || [];
+			var wrote = {};
+			filled.forEach(function (id) { wrote[id] = true; });
+			// **THE STILL-BLANK LIST IS THE ASKED-FOR LIST MINUS THE WRITTEN ONE.** Derived here
+			// rather than counted anywhere, so a node that dropped out for ANY reason -- an
+			// undecodable pixel, a tile that never answered, a number the user typed while the
+			// request was in flight -- is named exactly once and named correctly.
+			var blank = want.map(function (p) { return p.id; })
+				.filter(function (id) { return !wrote[id]; });
+			notice(EC.lpnTerrainDoneText(filled, blank, failed));
 		});
 	}
 
 	/**
-	 * The whole seam from js/looped-network.js. Five functions: what a geographic project is, the
-	 * token, which nodes need an elevation, how many already have one, how to write a batch, and
-	 * where to speak. Nothing about the tile scheme, the decode, the consent gate or any string in
+	 * The whole seam from js/looped-network.js. Six functions: what a geographic project is, the
+	 * token, which nodes need an elevation, WHICH already have one, which are still on the starting
+	 * elevation, how to write a batch (returning the ids it wrote), and where to speak. The two
+	 * "which" answers are lists of ids and not counts, because this file names the nodes in both
+	 * directions and cannot invent a name it was never given. Nothing about the tile scheme, the decode, the consent gate or any string in
 	 * them is visible from that file.
 	 */
 	EC.lpnTerrainInit = function (api) {

@@ -2656,6 +2656,11 @@ $ec_lang['lpn_terrain_failed']='We could not reach the terrain service, so no el
 $ec_lang['lpn_terrain_done']='{n} elevation(s) filled in.';
 $ec_lang['lpn_terrain_missed']='{m} could not be read and are still blank.';
 $ec_lang['lpn_terrain_partial']='{f} terrain tile(s) did not answer.';
+$ec_lang['lpn_terrain_will_ids']='These are the nodes that will be filled in: {ids}';
+$ec_lang['lpn_terrain_keep_ids']='They are: {ids}';
+$ec_lang['lpn_terrain_filled_ids']='These nodes were filled in: {ids}';
+$ec_lang['lpn_terrain_blank_ids']='These nodes are still blank: {ids}';
+$ec_lang['lpn_terrain_ids_more']='{ids}, and {n} more';
 
 // ---- Available fire flow at a hydrant (ROADMAP Task 530) ----------------------------------------
 // The wizard's whole job is Tom's rule: "we must either ask or disclose our assumptions about the

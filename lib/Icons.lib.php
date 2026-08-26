@@ -361,7 +361,7 @@ $ec_icons = array(
 	// A rolled set of plan sheets was the right drawing for a menu meaning "the document" and says
 	// nothing about water, so the glyph followed the name.
 	//
-	// **A M12 3.2C9.5 7.5 5.8 11.3 5.8 14.8C5.8 18.22 8.58 21 12 21C15.42 21 18.2 18.22 18.2 14.8C18.2 11.3 14.5 7.5 12 3.2Z, WHICH WAS REJECTED ONCE AND IS NOT SNEAKING PAST THAT RULING.** The rejection below
+	// **A DROP, WHICH WAS REJECTED ONCE AND IS NOT SNEAKING PAST THAT RULING.** The rejection below
 	// is real and stands — for an icon that had to mean PROJECT. A menu called Water is a different
 	// question, and Tom chose the drop from six candidates drawn at true menu size (a water tower, a
 	// fire hydrant, and four drops).
@@ -393,12 +393,59 @@ $ec_icons = array(
 	// Not left in the array as a second entry, because an icon nothing draws is an icon nobody
 	// maintains. His neutral sketch was a round bulb with a finial; his minus was the flat top.
 	//
-	// **THE FAUCET WAS DRAWN AND LOST ON A MEASUREMENT.** He liked one, and it needs a handle, a
-	// spout and a falling drip -- three fine features in one glyph -- which at 17px with a 2px
-	// stroke merge into a smudge (`php dev/scripts/icon_ascii_preview.php water --size=17`). If it
-	// is ever wanted it needs a heavier, simpler drawing, not a retouch of that one.
+	// **THE FAUCET LOST A DRAWING ATTEMPT, NOT AN ARGUMENT** (corrected 2026-08-25). What stood
+	// here read as a settled measurement: that a faucet needs a handle, a spout and a falling drip,
+	// "three fine features in one glyph", and therefore smudges at 17 px. Tom, asking for the
+	// hydrant below: *"I can't believe you summarily rejected the idea of a faucet. A fire hydrant
+	// will be more intricate than a faucet."* He is right, and the hydrant settles it from the
+	// other side -- bonnet, barrel, two side nozzles, a pumper nozzle and a base flange is FIVE
+	// features to the faucet's three, and it measures clean at 17 px with every gap open.
+	//
+	// So the honest record is that ONE faucet was drawn and THAT DRAWING smudged. Feature count was
+	// never the reason and must not be quoted as one again. **What decides legibility at 17 px is
+	// CLEAR GAP, not feature count**: 17/24 of a unit is 0.71 px, and a 2-unit stroke eats one unit
+	// either side of every line, so any gap left under about 2.5 units closes. Give a feature that
+	// room and it survives; deny it and one feature is enough to fail. A faucet redrawn to the
+	// hydrant's gap budget -- a heavier spout, a drip with 2.5 units of air under it -- would be
+	// worth another look, and nothing here rules it out.
 	'water'      => '<path d="M12 2.5L7.5 7H16.5Z"/><path d="M8.6 7V13H15.4V7"/>'
 		. '<path d="M9.2 13L6.5 20.5"/><path d="M14.8 13L17.5 20.5"/>',
+
+	// FIRE HYDRANT -- Water > Fire flow at a hydrant... (ROADMAP Task 530). That row wore the
+	// `valve` icon because no hydrant glyph existed, which put a bowtie beside a menu entry whose
+	// whole subject is the one asset in a distribution system every reader can already picture.
+	//
+	// Drawn from Tom's five sketches, 2026-08-25, all front elevations standing on a ground line.
+	// What is COMMON to all five is what is drawn here, because that is what he was consistent
+	// about: a cap on top, a body, two side nozzles as small blocks at mid height, and a large
+	// round pumper nozzle on the face. What varied between them -- narrow or squat, straight-sided
+	// or domed -- is the part left to this drawing. As with every icon in this file he referenced
+	// commercial line icons for the SHAPE only; nothing here is traced.
+	//
+	// **THE GAP BUDGET IS THE WHOLE DESIGN, and it is what the faucet note above got wrong.** The
+	// body walls sit at x = 7.5 and 16.5, so the 2-unit stroke leaves 8.5..15.5 clear inside. The
+	// pumper is a filled disc of r = 1.8 about (12, 12.75), which spans 10.2..13.8 and therefore
+	// keeps 1.7 units of air to each wall; the side nozzles start OUTSIDE those walls, so nothing
+	// on the face has to share room with anything else. Measured, not judged by eye:
+	//     php dev/scripts/icon_ascii_preview.php hydrant --size=17
+	// At 17 px the two nozzle blocks, the two body walls and the pumper read as five separate
+	// marks with open gaps between them.
+	//
+	// **THE PUMPER IS A SOLID DISC AND NOT A RING**, which is the one thing that was drawn, tried
+	// and lost. Tom's sketches show a ring with a filled centre. Measured at 17 px, a ring of
+	// r = 2.6 with a 2-unit stroke paints from radius 1.6 to 3.6 -- wider than the 3.5 units of
+	// clear wall the body has to give -- so the ring fuses to both walls and to both nozzles and
+	// the entire middle of the icon becomes one block. The disc keeps the ring's SILHOUETTE (a big
+	// round thing centred on the face) and spends none of the gap. If the box ever grows, the ring
+	// is the thing to restore.
+	//
+	// Cubics, never an `A` arc, for the bonnet dome: icon_ascii_preview.php models M/L/H/V/C/Z
+	// only, so an arc renders as nonsense there and the one tool that can measure this goes blind.
+	'hydrant'    => '<path d="M3 21.5H21"/><path d="M8.5 19.5L7 21.5H17L15.5 19.5"/>'
+		. '<path d="M7.5 19.5V8.5"/><path d="M16.5 19.5V8.5"/><path d="M6.5 8.5H17.5"/>'
+		. '<path d="M9 8.5C9 6 10.3 4.5 12 4.5C13.7 4.5 15 6 15 8.5"/>'
+		. '<path d="M7.5 11.5H5V14H7.5"/><path d="M16.5 11.5H19V14H16.5"/>'
+		. '<circle cx="12" cy="12.75" r="1.8" fill="currentColor" stroke="none"/>',
 
 	// CANDIDATES for the Water menu, drawn 2026-08-25. Tom: the drop and the eye *"don't look
 	// different enough, especially with the association of tears and eyes"*. He named a water tower

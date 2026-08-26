@@ -6587,10 +6587,18 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
+	/**
+	 * **THE NODES THAT WILL BE LEFT ALONE, BY NAME** (2026-08-25). This returned a COUNT until Tom
+	 * asked for the lists: *"Elsewhere in lpn we are careful to list what we found. Add a way to
+	 * indicate which nodes were edited or will be edited or both."* A count is a promise you have
+	 * to take on trust; a list is one you can check against the drawing in front of you, which is
+	 * the same reason the .inp import report names every id it dropped. The caller still gets the
+	 * count from `.length`, so nothing was lost by widening it.
+	 */
 	function terrainNodesWithElevation() {
-		var c = 0;
-		doc.nodes.forEach(function (n) { if (terrainHasElev(n)) { c++; } });
-		return c;
+		var out = [];
+		doc.nodes.forEach(function (n) { if (terrainHasElev(n)) { out.push(n.id); } });
+		return out;
 	}
 	/**
 	 * **THE NODES STILL SITTING ON THE STARTING ELEVATION, and why they are a SEPARATE question.**
@@ -6646,13 +6654,18 @@ var EngCalcs = EngCalcs || {};
 			if (!isFinite(v)) { return; }
 			pending.push({ n: n, v: v });
 		});
-		if (!pending.length) { return 0; }
+		if (!pending.length) { return []; }
 		saveUndoSnapshot();
 		pending.forEach(function (p) { p.n.elev = p.v; });
 		buildDom();
 		refreshPopupIfOpen();
 		scheduleSolve();
-		return pending.length;
+		// **THE IDS ACTUALLY WRITTEN, not the count** (2026-08-25). The list the caller planned and
+		// the list it got are not the same list -- a node whose pixel would not decode, and a node
+		// somebody typed into while the tiles were on the wire, both drop out of `pending` above --
+		// so the notice afterwards can only name what happened if this says what happened. Deriving
+		// it from the request list instead would name nodes that were never touched.
+		return pending.map(function (p) { return p.n.id; });
 	}
 
 	// The default is the one Tom named: 3000 ft or 1000 m, whichever the project's own length unit
@@ -15822,11 +15835,13 @@ var EngCalcs = EngCalcs || {};
 				}
 			},
 			// **AN ANALYSIS OF THIS PROJECT, SO IT SITS WITH CALCULATE** (Task 530). It is not an
-			// Insert -- nothing it builds enters the document -- and it is not a View. The icon is
-			// the valve, because a hydrant IS a valve assembly on a lateral and this menu's icon
-			// column is for recognition rather than taxonomy; there is no hydrant glyph to draw on.
+			// Insert -- nothing it builds enters the document -- and it is not a View.
+			// It wore the `valve` icon until 2026-08-25, on the reasoning that a hydrant IS a valve
+			// assembly and there was no hydrant glyph to draw on. There is one now
+			// (lib/Icons.lib.php, 'hydrant'), and the taxonomy argument was only ever a stand-in:
+			// the reader recognises the object, not the assembly class it belongs to.
 			{
-				icon: 'valve', label: pc.lpn_ff_menu || 'Fire flow at a hydrant…',
+				icon: 'hydrant', label: pc.lpn_ff_menu || 'Fire flow at a hydrant…',
 				tip: pc.lpn_ff_menu_tip,
 				fn: function () { closeMenu(); openFireFlowDialog(); }
 			},
@@ -23666,7 +23681,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). Six functions: what a geographic project
 	// is, the token that decides whether the feature exists at all, which nodes have no elevation,
-	// how many already have one, how to write a batch of them under one undo, and where to speak.
+	// WHICH already have one, how to write a batch of them under one undo (returning WHICH it
+	// wrote), and where to speak. The two "which" answers are lists of ids rather than counts
+	// because that file names the nodes in both directions; see terrainNodesWithElevation().
 	// The tile scheme, the Terrain-RGB decode, the request budget, the consent gate and every
 	// string live in that file.
 	if (EngCalcs.lpnTerrainInit) {
