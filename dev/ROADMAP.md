@@ -810,7 +810,15 @@ the block.
     first. Whatever number is chosen must be asserted at 360px, where every other phone fix is
     guarded.
 
-- 75|468| **Demand categories on a junction — the breakdown the importer already flattens.**
+- 100|468| **Demand categories on a junction — the breakdown the importer already flattens.**
+  - **PROMOTED TO 100 BY TOM, 2026-08-26, because it is presenting as a bug:** *"Since it's
+    presenting as a bug, we better promote it to 100. I verified that it's solely a presentation
+    problem. We are tracking and presenting Base Demand, but calculating based on Categories and
+    Patterns."* The PATTERN half of that is fixed — a resolved Demand now exists beside Base demand
+    in labels, tables and the property box (2026-08-26). **The CATEGORY half is this task**: a
+    junction's base becomes a LIST, and `resolvedDemand()` is the single function that has to learn
+    to iterate — everything else already reads it. The importer still flattens categories on the way
+    in and that flattening has never been tested against a real multi-category file.
   EPANET stacks (base demand, pattern, category) triples on one node and sums them; `js/lpn-inp.js`
   reads them, sums them into this page's single `demand`, and reports `demand-categories` on every
   import that had one. So the data arrives and is thrown away today.

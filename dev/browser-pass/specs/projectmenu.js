@@ -21,10 +21,14 @@ exports.title = '35. The Project menu';
 // moved in as the Project menu became the one place every command lives (2026-08-24). The list is
 // asserted in ORDER rather than as a set: a menu is read top to bottom, and the report row staying
 // last is what keeps the four everyday commands above the one that reports on a run.
-// 'Fire flow at a hydrant…' joined 2026-08-25 (Task 530). It sits with Calculate rather than in
-// Insert, because it is an ANALYSIS of this project and nothing it builds enters the document.
+//
+// **'Fire flow at a hydrant…' was here between 2026-08-25 and 2026-08-26 and is now on the
+// `fire-flow` branch** — Tom held the whole feature back for research (ROADMAP Task 530). It sat
+// between Calculate and the report, for the reason that outlives the removal: it is an ANALYSIS of
+// this project, not an Insert, because nothing it builds enters the document. When it returns it
+// returns to that slot, and this list is where that is recorded.
 const EXPECTED = ['Settings', 'Libraries', 'Profile', 'Tables', 'Scenarios', 'Calculate',
-	'Fire flow at a hydrant…', 'EPANET run report'];
+	'EPANET run report'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');

@@ -7,12 +7,13 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**61 open tasks.** Next (100): 8 · Soon (75): 15 · Someday (50): 10 · Maybe (25): 12 · Parked (5): 16
+**61 open tasks.** Next (100): 9 · Soon (75): 14 · Someday (50): 10 · Maybe (25): 12 · Parked (5): 16
 
-## 100 — Next (8)
+## 100 — Next (9)
 
 - Task 408 — Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
+- Task 468 — Demand categories on a junction — the breakdown the importer already flattens.
 - Task 477 — New blank project startup wizard: xy/lat-lon, units, head loss.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
@@ -20,7 +21,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 530 — Available fire flow at a hydrant, with the hydrant assembly modelled.
 - ! Task 537 — [H] · RESEARCHED, AND BOTH SEATS SAY THE PREMISE IS WRONG. Tom's call on what follows.
 
-## 75 — Soon (15)
+## 75 — Soon (14)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -30,7 +31,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 417 — Long-press enters Edit mode, and the phone's touch radius is too mean.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
-- Task 468 — Demand categories on a junction — the breakdown the importer already flattens.
 - Task 479 — [H] · One question left: should the suite answer at librewaternet.org/engcalcs/ ?
 - Task 503 — AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry
 - Task 531 — Tag the examples: US/SI, design/maintenance, xy/lat-lon.
