@@ -2577,6 +2577,14 @@ $ec_lang['lpn_library_control_missing']='⚠ This network has nothing called {id
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
+// TWO DIFFERENT QUANTITIES, and the page shows both (Tom, 2026-08-25). The BASE demand is the
+// number the user typed or the file stated; the DEMAND is that number with its pattern applied at
+// the moment on the clock, which is what the pipes around the node actually carry. Reading Net3's
+// junctions as "Demand" while the pipes carried 1.34 times as much made a labelling defect look
+// like a solver defect. 'Demand' itself stays bpn_demand -- the concept-level label reuse this page
+// already makes for it.
+$ec_lang['lpn_field_base_demand']='Base demand';
+$ec_lang['lpn_result_demand_tip']='The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.';
 $ec_lang['lpn_field_demand_pattern']='Demand pattern';
 $ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is.';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the

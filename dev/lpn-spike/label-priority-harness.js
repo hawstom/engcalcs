@@ -132,8 +132,11 @@ ok(def.priority.link.flow === Math.max.apply(null, Object.keys(def.priority.link
 
 // Tom's node list read LAST FIRST, which is how he wrote it: "use last first if on". Reversed here
 // for the same reason as the link list.
-eq(dropOrderOf(def.priority.node), ['head', 'elev', 'pressure', 'demand'],
-	'node drop order is head, elevation, pressure, demand -- demand decides last and so wins');
+// Demand joined the top of it on 2026-08-25, when Base demand and Demand became two fields: the
+// RESOLVED demand is the one worth the last space on a crowded drawing, and the base is recoverable
+// from it and the pattern.
+eq(dropOrderOf(def.priority.node), ['head', 'elev', 'pressure', 'demand', 'demandActual'],
+	'node drop order is head, elevation, pressure, base demand, demand -- demand decides last and so wins');
 
 // The two columns are not the same axis and must not converge on one list.
 ok(dropOrderOf(def.priority.node).length !== dropOrderOf(def.priority.link).length,
@@ -160,8 +163,8 @@ Object.keys(def.decimals.link).forEach(function (k) {
 
 // The compiled directions. Asserted by name because they are not user-settable and because
 // elevation's was corrected on the day it was written.
-eq(L.dropRule(), { demand: 'low', pressure: 'extreme', elev: 'like', head: 'like' },
-	'drop directions: demand lowest, pressure least extreme, elevation and head most like neighbours');
+eq(L.dropRule(), { demandActual: 'low', demand: 'low', pressure: 'extreme', elev: 'like', head: 'like' },
+	'drop directions: both demands lowest, pressure least extreme, elevation and head most like neighbours');
 Object.keys(L.dropRule()).forEach(function (k) {
 	ok(def.priority.node[k] !== undefined, 'every drop rule ' + k + ' has a rank to be consulted in');
 });

@@ -833,6 +833,16 @@ the block.
     own rows plus its customers' — placing a meter never edits a row the user typed. And the
     exporter writes `[DEMANDS]` **itemized**, one row per demand: any lumping for readability is a
     presentation decision in the pane and the popup, never a change to the file.
+  - **The Base demand / Demand split shipped 2026-08-25 and is the field this builds on, not a
+    duplicate of it.** A junction now shows the typed base and the pattern-resolved draw as two
+    fields. Categories turn the base into a LIST of (base, pattern, category) rows; the resolved
+    Demand is then their SUM at the moment on the clock, so `resolvedDemand()` in
+    `js/looped-network.js` is the one function that has to learn to iterate. Nothing else does —
+    the labels, the colour ramp, the Tables column and the popup row all read it.
+  - **Measured while doing that: Net3's `[DEMANDS]` section is EMPTY**, so the flattening never runs
+    on it and was NOT the cause of the demands-do-not-match-pipe-flows report. The flattening is
+    still untested against a real multi-category file; `dev/lpn-spike/demand-resolved-harness.js`
+    asserts only that Net3 has none.
 
 - 25|484| **Log which unhandled EPANET features actually arrive in real imports.**
   A server-side count of the import features we do not handle, so Task 483 and its siblings are

@@ -168,7 +168,9 @@ exports.run = async function ({ browser, report }) {
 		report.ok(/Cancel/.test(asked.buttons[2]),
 			'...and Cancel, so the question can be left unanswered', asked.buttons[2]);
 		// The fields it decides are NAMED, because that is what makes the question answerable.
-		report.ok(/Demand/.test(asked.text), '...naming the fields that unit decides',
+		// "Base demand" since 2026-08-25: the list is the TYPED fields a unit decides the meaning
+		// of, and the resolved Demand beside it is not typed anywhere.
+		report.ok(/Base demand/.test(asked.text), '...naming the fields that unit decides',
 			asked.text.replace(/\s+/g, ' ').slice(0, 110));
 		// **AND THE SELECT IS PUT BACK UNTIL IT IS ANSWERED.** Nothing acts on the new unit before
 		// the choice, which is what makes cancelling possible at all.
