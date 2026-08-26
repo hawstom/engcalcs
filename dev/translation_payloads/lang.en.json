@@ -1359,6 +1359,11 @@
         "lpn_terrain_done": "{n} elevation(s) filled in.",
         "lpn_terrain_missed": "{m} could not be read and are still blank.",
         "lpn_terrain_partial": "{f} terrain tile(s) did not answer.",
+        "lpn_terrain_will_ids": "These are the nodes that will be filled in: {ids}",
+        "lpn_terrain_keep_ids": "They are: {ids}",
+        "lpn_terrain_filled_ids": "These nodes were filled in: {ids}",
+        "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
+        "lpn_terrain_ids_more": "{ids}, and {n} more",
         "lpn_ff_menu": "Fire flow at a hydrant…",
         "lpn_ff_menu_tip": "How much can a hydrant deliver while a chosen point still holds its residual pressure? The hydrant and its lateral are built for the calculation only and never enter your project.",
         "lpn_ff_title": "Available fire flow at a hydrant",
@@ -1415,7 +1420,7 @@
         "lpn_ff_err_not_junction": "A hydrant hangs off a junction. {id} is a {type}, which already fixes the water level there, so the answer would be set by that level alone.",
         "lpn_ff_err_unknown": "This did not work out. The reason given is {code}."
     },
-    "count": 1413,
+    "count": 1418,
     "active_prefixes": [
         "about",
         "bpn",

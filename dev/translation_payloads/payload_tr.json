@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 1413,
-        "delta_key_count": 80,
+        "expected_key_count": 1418,
+        "delta_key_count": 85,
         "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
@@ -467,6 +467,11 @@
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off",
+        "lpn_terrain_will_ids": "These are the nodes that will be filled in: {ids}",
+        "lpn_terrain_keep_ids": "They are: {ids}",
+        "lpn_terrain_filled_ids": "These nodes were filled in: {ids}",
+        "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
+        "lpn_terrain_ids_more": "{ids}, and {n} more",
         "lpn_ff_menu": "Fire flow at a hydrant…",
         "lpn_ff_menu_tip": "How much can a hydrant deliver while a chosen point still holds its residual pressure? The hydrant and its lateral are built for the calculation only and never enter your project.",
         "lpn_ff_title": "Available fire flow at a hydrant",
@@ -549,6 +554,11 @@
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off",
+        "lpn_terrain_will_ids": "These are the nodes that will be filled in: {ids}",
+        "lpn_terrain_keep_ids": "They are: {ids}",
+        "lpn_terrain_filled_ids": "These nodes were filled in: {ids}",
+        "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
+        "lpn_terrain_ids_more": "{ids}, and {n} more",
         "lpn_ff_menu": "Fire flow at a hydrant…",
         "lpn_ff_menu_tip": "How much can a hydrant deliver while a chosen point still holds its residual pressure? The hydrant and its lateral are built for the calculation only and never enter your project.",
         "lpn_ff_title": "Available fire flow at a hydrant",
@@ -1004,6 +1014,66 @@
                     "value": "Sol üst",
                     "english": "Top left"
                 }
+            }
+        },
+        "lpn_terrain_will_ids": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_keep_ids": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_filled_ids": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_blank_ids": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_terrain_ids_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
             }
         },
         "lpn_ff_menu": {
