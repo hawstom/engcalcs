@@ -105,6 +105,12 @@ run_check "service worker precache"      blocking php dev/scripts/sw_manifest_ch
 # LibreEPANET.org (Task 306) is by definition a standalone deploy and would have hit the same wall.
 run_check "suite ships its own assets"   blocking php dev/scripts/standalone_assets_check.php
 run_check "canonical origin whitelist"   blocking php dev/scripts/canonical_origin_check.php
+# Task 534. A share card fails where nobody on this side ever looks: you do not paste links to your
+# own site into Facebook, so a relative og:image (which every network drops silently) or a card file
+# renamed out from under the tag stays broken until a stranger mentions it. This renders every page
+# and checks the URL is absolute, on an origin we serve, and backed by a real file of the pixel size
+# the tags declare.
+run_check "social card image"            blocking php dev/scripts/social_card_check.php
 # The vendored third-party files are what the manifest says they are, nothing ships undeclared, and
 # package.json agrees with what is committed. js/vendor/README.md documented all this in prose and
 # nothing checked it, so the record and the bytes were free to drift apart in silence (Task 413).

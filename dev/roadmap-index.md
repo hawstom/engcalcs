@@ -36,7 +36,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 531 — Tag the examples: US/SI, design/maintenance, xy/lat-lon.
 - ! Task 532 — An English style guide for label wording — Tom says he is writing one by intuition.
 - Task 533 — Renaming a link leaves `incidentLinks` pointing at the old id.
-- ! Task 534 — Social cards: a link to this suite should show a picture, not a bare URL.
+- Task 534 — Social cards: a per-page picture, not one screenshot for the whole suite.
 
 ## 50 — Someday (10)
 
@@ -87,5 +87,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-56 of 61 titles are within 4–12 words. `!` marks the rest;
+57 of 61 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
