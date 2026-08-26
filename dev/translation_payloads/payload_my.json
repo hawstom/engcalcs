@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1412,
-        "delta_key_count": 81,
+        "expected_key_count": 1413,
+        "delta_key_count": 82,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -498,7 +498,8 @@
         "lpn_ff_barrel_roughness": "Hydrant waterway roughness",
         "lpn_ff_barrel_roughness_tip": "The same lining as the lateral. The waterway is a short run of coated iron.",
         "lpn_ff_k_tip": "The tee off the main, the gate valve, the elbow, the hydrant barrel, its main valve and its nozzle, all together. Zero is not an option here: over a run this short the minor loss is larger than the pipe friction. The reasonable range is 3 to 6.",
-        "lpn_ff_k_reference": "This coefficient belongs to the velocity in the lateral, at a lateral diameter of {diameter}.",
+        "lpn_ff_k_label": "Lateral minor (local) loss coefficient, k (see note below)",
+        "lpn_ff_k_default": "Our default Lateral k is {value}.",
         "lpn_ff_k_reference_supplied": "Your coefficient will be used at the velocity in the lateral, at a lateral diameter of {diameter}. A coefficient taken from a table that means some other velocity must be restated first: multiply it by its own diameter divided by the lateral diameter, to the fourth power.",
         "lpn_ff_k_part_awwa": "{value} of it is the AWWA C502 test ceiling — friction through the hydrant may not exceed 3.0 psi at 1000 gpm at the 4 1\/2 in pumper nozzle — which covers the barrel, the main valve and the nozzle. A hydrant that passes that test does at least this well, so the number errs on the safe side.",
         "lpn_ff_k_part_fittings": "{value} of it is the fittings in the lateral, by Crane TP-410: tee through the branch 1.0, open gate valve 0.15, flanged 90 degree elbow 0.35.",
@@ -581,7 +582,8 @@
         "lpn_ff_barrel_roughness": "Hydrant waterway roughness",
         "lpn_ff_barrel_roughness_tip": "The same lining as the lateral. The waterway is a short run of coated iron.",
         "lpn_ff_k_tip": "The tee off the main, the gate valve, the elbow, the hydrant barrel, its main valve and its nozzle, all together. Zero is not an option here: over a run this short the minor loss is larger than the pipe friction. The reasonable range is 3 to 6.",
-        "lpn_ff_k_reference": "This coefficient belongs to the velocity in the lateral, at a lateral diameter of {diameter}.",
+        "lpn_ff_k_label": "Lateral minor (local) loss coefficient, k (see note below)",
+        "lpn_ff_k_default": "Our default Lateral k is {value}.",
         "lpn_ff_k_reference_supplied": "Your coefficient will be used at the velocity in the lateral, at a lateral diameter of {diameter}. A coefficient taken from a table that means some other velocity must be restated first: multiply it by its own diameter divided by the lateral diameter, to the fourth power.",
         "lpn_ff_k_part_awwa": "{value} of it is the AWWA C502 test ceiling — friction through the hydrant may not exceed 3.0 psi at 1000 gpm at the 4 1\/2 in pumper nozzle — which covers the barrel, the main valve and the nozzle. A hydrant that passes that test does at least this well, so the number errs on the safe side.",
         "lpn_ff_k_part_fittings": "{value} of it is the fittings in the lateral, by Crane TP-410: tee through the branch 1.0, open gate valve 0.15, flanged 90 degree elbow 0.35.",
@@ -1366,7 +1368,19 @@
                 "next_translated": null
             }
         },
-        "lpn_ff_k_reference": {
+        "lpn_ff_k_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "terrain tile {f} ခု ပြန်မဖြေခဲ့ပါ။",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_k_default": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

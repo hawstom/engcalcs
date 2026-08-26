@@ -331,7 +331,11 @@ function runFill(answers) {
 		EC.lpnTerrainConsented() === true, jar.value);
 	// **THE ACCURACY IS IN THE INTERFACE, NOT IN A COMMENT.** This is the confirm a person reads
 	// immediately before the numbers change.
-	ok('the plan states the ground resolution', /about 30 m across the ground/.test(confirmTexts[1]));
+	// Asserted on the NUMBER and the caveat, not on the sentence. Tom rewrote this wording on
+	// 2026-08-25 ("about 30 m horizontal resolution and several meters vertical accuracy") and a
+	// check pinned to his old phrasing failed for no reason anybody cared about. What must never
+	// go missing is the resolution itself and the sentence that stops a reader trusting it.
+	ok('the plan states the ground resolution', /30 m/.test(confirmTexts[1]), confirmTexts[1]);
 	ok('...and that it is not a survey', /not a survey/.test(confirmTexts[1]));
 	ok('...and promises the one-step undo', /One Undo/.test(confirmTexts[1]));
 	ok('...and counts the nodes it will leave alone',

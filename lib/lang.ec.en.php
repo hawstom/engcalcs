@@ -1511,7 +1511,7 @@ $ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the 
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
-$ec_lang['lpn_run_menu_tip']='Recalculate this network now. Looking for a Run button? While this project recalculates after every change, the toolbar has no Run button. Turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics, and the button comes back.';
+$ec_lang['lpn_run_menu_tip']='Recalculate this network now. Looking for a Run button? It is hidden when “Recalculate automatically” is on. To restore it, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.';
 // ---- automatic recalculation (Task 467) ----
 // "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
 // out over time, and this switch is about the run, not about the drawing.
@@ -2630,7 +2630,7 @@ $ec_lang['lpn_terrain_menu']='Fill in elevations from the land…';
 $ec_lang['lpn_terrain_tip']='Read the ground elevation under each node that has none, and type it in for you. A node that already has an elevation is left alone, and one Undo puts it all back. The first use asks your permission, because the positions of your nodes go to Mapbox.';
 // Shown three times -- the menu tip, the confirm and the result notice -- so that the three cannot
 // drift into three different claims about the same data. One sentence, translated once.
-$ec_lang['lpn_terrain_accuracy']='Terrain data is about 30 m across the ground and is commonly several metres out vertically. Treat it as a contour map, not a survey: check anything you rely on.';
+$ec_lang['lpn_terrain_accuracy']='Terrain data has about 30 m horizontal resolution and several meters vertical accuracy. Treat it as a contour map, not a survey: check anything you rely on.';
 $ec_lang['lpn_terrain_consent_1']='Filling in elevations sends the position of each node that needs one — its latitude and longitude — to api.mapbox.com, to look up the height of the ground there.';
 $ec_lang['lpn_terrain_consent_2']='This is a different question from the map pictures behind your project. The pictures only say where you are looking. These positions are your network itself. Mapbox will receive those coordinates and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.';
 $ec_lang['lpn_terrain_consent_3']='May we send your node positions to Mapbox?';
@@ -2689,8 +2689,9 @@ $ec_lang['lpn_ff_barrel_length_tip']='About a 3 1/2 ft bury plus the rise to the
 $ec_lang['lpn_ff_barrel_roughness']='Hydrant waterway roughness';
 $ec_lang['lpn_ff_barrel_roughness_tip']='The same lining as the lateral. The waterway is a short run of coated iron.';
 $ec_lang['lpn_ff_k_tip']='The tee off the main, the gate valve, the elbow, the hydrant barrel, its main valve and its nozzle, all together. Zero is not an option here: over a run this short the minor loss is larger than the pipe friction. The reasonable range is 3 to 6.';
+$ec_lang['lpn_ff_k_label']='Lateral minor (local) loss coefficient, k (see note below)';
+$ec_lang['lpn_ff_k_default']='Our default Lateral k is {value}.';
 // {diameter} is a diameter with its unit. Substituted, never concatenated.
-$ec_lang['lpn_ff_k_reference']='This coefficient belongs to the velocity in the lateral, at a lateral diameter of {diameter}.';
 $ec_lang['lpn_ff_k_reference_supplied']='Your coefficient will be used at the velocity in the lateral, at a lateral diameter of {diameter}. A coefficient taken from a table that means some other velocity must be restated first: multiply it by its own diameter divided by the lateral diameter, to the fourth power.';
 // {value} is a coefficient. Substituted, never concatenated.
 $ec_lang['lpn_ff_k_part_awwa']='{value} of it is the AWWA C502 test ceiling — friction through the hydrant may not exceed 3.0 psi at 1000 gpm at the 4 1/2 in pumper nozzle — which covers the barrel, the main valve and the nozzle. A hydrant that passes that test does at least this well, so the number errs on the safe side.';

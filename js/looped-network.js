@@ -15802,7 +15802,14 @@ var EngCalcs = EngCalcs || {};
 			{
 				icon: 'scenarios', label: pc.lpn_scenario_menu || 'Scenarios',
 				tip: pc.lpn_scenario_tip,
-				fn: function () { openScenarioMenu(anchor); }
+				// **closeMenu() FIRST, OR THIS ROW DOES NOTHING AT ALL.** Tom, 2026-08-25: *"The
+				// Water.Scenarios button does nothing."* openMenu() treats a second call carrying
+				// the SAME anchor as a toggle -- `if (openMenuAnchor === anchor && displayed)
+				// { closeMenu(); return; }` -- and this row hands it the Water button's own anchor,
+				// so it shut the menu and opened nothing. Closing first clears `openMenuAnchor`, so
+				// the scenario list opens fresh under the same button. The Run row below already
+				// had to do this; the status-strip door never hit it because its anchor differs.
+				fn: function () { closeMenu(); openScenarioMenu(anchor); }
 			},
 			{
 				icon: 'run', label: pc.lpn_time_run || 'Run', tip: pc.lpn_run_menu_tip,
@@ -23216,6 +23223,21 @@ var EngCalcs = EngCalcs || {};
 			ffRow(wrap, pc.lpn_ff_lateral_roughness || 'Lateral roughness',
 				pc.lpn_ff_lateral_roughness_tip, boxes.lateralRoughness,
 				frictionMethod() === 'dw' ? unitLabel('lpn_u_roughness') : '');
+			// **THE k SITS WITH THE LATERAL, BECAUSE IT IS REFERENCED TO THE LATERAL'S VELOCITY.**
+			// Tom, 2026-08-25: *"If the k is associated with the lateral, it should be listed
+			// immediately after Lateral roughness. And it should be labeled 'Lateral minor ...
+			// (see note below)'."* The ORDER is the argument: a reader who meets the coefficient
+			// between the two lateral rows reads it as the lateral's, which is what it is.
+			//
+			// **AND THE LABEL CARRIES THE REFERENCE, WHICH REPLACES A SENTENCE THAT COULD GO STALE.**
+			// The previous version stated the reference in prose, naming the diameter currently in
+			// the box — correct, but a sentence a reader can skip about a fact they must not miss.
+			// The word "Lateral" in the name does the same work and cannot be skipped, which is the
+			// same move Task 530 made in the engine when `K_BARREL` became
+			// `K_BARREL_AT_LATERAL_V`.
+			boxes.k = ffInput(ask.k);
+			ffRow(wrap, pc.lpn_ff_k_label || 'Lateral minor (local) loss coefficient, k (see note below)',
+				pc.lpn_ff_k_tip, boxes.k, '');
 			boxes.barrelDiameter = ffInput(ask.barrelDiameter);
 			ffRow(wrap, pc.lpn_ff_barrel_diameter || 'Hydrant waterway diameter',
 				pc.lpn_ff_barrel_diameter_tip, boxes.barrelDiameter, unitLabel('lpn_u_diameter'));
@@ -23226,20 +23248,23 @@ var EngCalcs = EngCalcs || {};
 			ffRow(wrap, pc.lpn_ff_barrel_roughness || 'Hydrant waterway roughness',
 				pc.lpn_ff_barrel_roughness_tip, boxes.barrelRoughness,
 				frictionMethod() === 'dw' ? unitLabel('lpn_u_roughness') : '');
-			boxes.k = ffInput(ask.k);
-			ffRow(wrap, pc.lpn_field_km || 'Minor (local) loss coefficient, k',
-				pc.lpn_ff_k_tip, boxes.k, '');
-			// **WHICH VELOCITY THE k BELONGS TO, SAID BEFORE IT IS USED AND AGAIN IN THE ANSWER.**
-			// Read off the box the user is looking at, not off the module's derivation, because the
-			// lateral diameter is one of the boxes: change it and the reference velocity moves with
-			// it. That is exactly what a person pasting a coefficient needs to be told.
-			ffPara(wrap, (pc.lpn_ff_k_reference ||
-				'This coefficient belongs to the velocity in the lateral, at a lateral diameter of {diameter}.')
-				.replace('{diameter}', boxes.lateralDiameter.value + ' ' + unitLabel('lpn_u_diameter')));
+			// **THE TOTAL IS COMPUTED, NEVER TYPED.** Tom's own draft of this note read "Our default
+			// Lateral k is 3.96"; the two parts below are 3.4583 and 1.5, which add to 4.9583. The
+			// number is substituted from `lpnFireFlowK` so the lead sentence and the two parts under
+			// it can never disagree with each other or with the engine.
+			ffPara(wrap, (pc.lpn_ff_k_default || 'Our default Lateral k is {value}.')
+				.replace('{value}', ffNum(K.totalAtLateralVelocity)));
 			ffPara(wrap, (pc.lpn_ff_k_part_awwa || '{value}').replace('{value}',
 				ffNum(K.barrelAtLateralVelocity)));
 			ffPara(wrap, (pc.lpn_ff_k_part_fittings || '{value}').replace('{value}',
 				ffNum(K.fittingsAtLateralVelocity)));
+			// **THE ONE CASE THE LABEL CANNOT COVER: a coefficient the user pasted from a table.**
+			// Their number may mean another velocity entirely, and only they can know. Shown only
+			// when they have actually replaced ours.
+			if (boxes.k.value !== '' && ffNum(K.totalAtLateralVelocity) !== boxes.k.value) {
+				ffPara(wrap, (pc.lpn_ff_k_reference_supplied || '')
+					.replace('{diameter}', boxes.lateralDiameter.value + ' ' + unitLabel('lpn_u_diameter')));
+			}
 
 			ffPara(wrap, engine.epanet
 				? (pc.lpn_ff_engine_epanet || 'This will be worked out with the EPANET engine.')
@@ -23389,18 +23414,25 @@ var EngCalcs = EngCalcs || {};
 			['barrelDiameter', pc.lpn_ff_barrel_diameter, a.barrel.diameter.value, 'lpn_u_diameter'],
 			['barrelLength', pc.lpn_ff_barrel_length, a.barrel.length.value, 'lpn_u_length'],
 			['barrelRoughness', pc.lpn_ff_barrel_roughness, a.barrel.roughness.value, rough],
-			['k', pc.lpn_field_km, a.k.total.value, null]
+			// The SAME label the ask face uses, so the reference velocity travels with the number
+			// into the report rather than living in a sentence beside it.
+			['k', pc.lpn_ff_k_label, a.k.total.value, null]
 		].forEach(function (r) {
 			var word = given[r[0]] ? (pc.lpn_ff_source_supplied || 'you gave this')
 				: (pc.lpn_ff_source_default || 'assumed');
 			ffPara(parent, (r[1] || r[0]) + ': ' +
 				(r[3] ? ffQty(r[2], r[3]) : ffNum(r[2])) + ' (' + word + ')');
 		});
-		// And the reference velocity again, from the result rather than from the box, so the answer
-		// carries it even if the box has since been changed.
-		ffPara(parent, ((a.k.total.source === 'supplied'
-			? pc.lpn_ff_k_reference_supplied : pc.lpn_ff_k_reference) || '{diameter}')
-			.replace('{diameter}', ffQty(a.k.referencedTo.diameter, 'lpn_u_diameter')));
+		// **THE REFERENCE IS RESTATED ONLY FOR A COEFFICIENT THE USER SUPPLIED**, and from the
+		// RESULT rather than from the box, so the answer carries it even if the box has since been
+		// changed. For our own default the row above is already named "Lateral minor (local) loss
+		// coefficient" — the reference is in the name, which is Tom's 2026-08-25 design and is
+		// stronger than a sentence a reader can skip. A pasted coefficient is the one case a name
+		// cannot cover, because only the user knows what velocity theirs meant.
+		if (a.k.total.source === 'supplied') {
+			ffPara(parent, (pc.lpn_ff_k_reference_supplied || '{diameter}')
+				.replace('{diameter}', ffQty(a.k.referencedTo.diameter, 'lpn_u_diameter')));
+		}
 		// **NEVER THE SUM AS ONE MEASURED NUMBER.** The two halves have completely different
 		// provenance -- a procurement test ceiling and a fittings table -- and a reader has to be
 		// able to see that. The engine hands them over only for a k it supplied itself; a k the user

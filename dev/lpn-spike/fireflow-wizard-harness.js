@@ -119,6 +119,11 @@ function control(namePrefix) {
 	}
 	return r.children[1];
 }
+// The ask face's row labels in order. Adjacency matters here — Tom moved the k to sit between the
+// two lateral rows on 2026-08-25 — and an ORDER is only checkable against the whole list.
+function rowNames() {
+	return rows().map(x => x.children[0].textContent || '');
+}
 function unitOn(namePrefix) {
 	const r = rows().find(x => (x.children[0].textContent || '').indexOf(namePrefix) === 0);
 	return r.children[2].textContent;
@@ -232,18 +237,18 @@ function openFromMenu() {
 		ok('both roughnesses are shown', control('Lateral roughness').value === '130' &&
 			control('Hydrant waterway roughness').value === '130');
 		ok('the k is shown, and it is the research total of about 5',
-			+control('Minor (local) loss coefficient').value > 4.9 &&
-			+control('Minor (local) loss coefficient').value < 5,
-			control('Minor (local) loss coefficient').value);
+			+control('Lateral minor (local) loss coefficient').value > 4.9 &&
+			+control('Lateral minor (local) loss coefficient').value < 5,
+			control('Lateral minor (local) loss coefficient').value);
 		ok('...and its tip refuses zero out loud',
-			/Zero is not an option/i.test(tipOn('Minor (local) loss coefficient')));
+			/Zero is not an option/i.test(tipOn('Lateral minor (local) loss coefficient')));
 		ok('the residual opens on the 20 psi convention',
 			control('Residual pressure to hold').value === '20' &&
 			unitOn('Residual pressure to hold') === 'psi');
 		ok('every disclosed box is EDITABLE, not a readout',
 			['Lateral diameter', 'Lateral roughness', 'Hydrant waterway diameter',
 				'Hydrant waterway length', 'Hydrant waterway roughness',
-				'Minor (local) loss coefficient'].every(n => control(n)._tag === 'input'));
+				'Lateral minor (local) loss coefficient'].every(n => control(n)._tag === 'input'));
 		ok('the defaults the box opens on are the defaults the page computes',
 			d.lateralDiameter === '6' && d.barrelDiameter === '4.5' && d.lateralLength === '');
 	}
@@ -254,18 +259,27 @@ function openFromMenu() {
 		// (6/4.5)^4 = 3.16 is the size of the mistake. The sentence is read off the LATERAL DIAMETER
 		// BOX rather than off the module's derivation, so a user who widens the lateral is told
 		// about the velocity actually in force.
-		ok('the box states which velocity the k belongs to, and at which diameter',
-			/belongs to the velocity in the lateral, at a lateral diameter of 6 in/.test(bodyText()));
+		// **THE REFERENCE NOW LIVES IN THE NAME, NOT IN A SENTENCE** (Tom, 2026-08-25). He moved the
+		// k to sit immediately after Lateral roughness and renamed it so the word "Lateral" carries
+		// the reference — the same move Task 530 made in the engine when `K_BARREL` became
+		// `K_BARREL_AT_LATERAL_V`. A name cannot be skipped; a sentence can. So this asserts the
+		// NAME, and the stated default beneath it.
+		ok('the coefficient is named for the lateral, so the reference cannot be skipped',
+			/Lateral minor \(local\) loss coefficient, k \(see note below\)/.test(bodyText()));
+		ok('...and the note states our default, computed rather than typed',
+			/Our default Lateral k is 4\.96/.test(bodyText()), bodyText().slice(0, 0) || undefined);
 		ok('...and it names the AWWA C502 half and the Crane half separately, never one number',
 			/AWWA C502 test ceiling/.test(bodyText()) && /Crane TP-410/.test(bodyText()));
-		const lat = control('Lateral diameter');
-		lat.value = '8';
-		press('Work out the fire flow');
-		await settle();
-		press('Change something');
-		ok('widening the lateral moves the stated reference with it',
-			/at a lateral diameter of 8 in/.test(bodyText()), '(6/4.5)^4 = 3.16x is the mistake it prevents');
-		control('Lateral diameter').value = '6';
+		// The k must sit BETWEEN the two lateral rows: that adjacency is what makes a reader take it
+		// as the lateral's. Asserted as adjacency, not as an index, so a row added elsewhere in the
+		// block does not fail this for the wrong reason.
+		{
+			const names = rowNames();
+			const iRough = names.findIndex(function (n) { return /^Lateral roughness/.test(n); });
+			const iK = names.findIndex(function (n) { return /^Lateral minor/.test(n); });
+			ok('...and it comes immediately after Lateral roughness, with nothing between',
+				iRough >= 0 && iK === iRough + 1, 'roughness at ' + iRough + ', k at ' + iK);
+		}
 	}
 
 	console.log('\n--- 4. AN ANSWER, WITH THE ISO CAP BESIDE IT AND NOT APPLIED TO IT ---');
@@ -303,8 +317,10 @@ function openFromMenu() {
 		ok('the diameters we assumed are marked assumed',
 			/Lateral diameter: 6 in \(assumed\)/.test(answerText) &&
 			/Hydrant waterway diameter: 4.5 in \(assumed\)/.test(answerText));
-		ok('the k is restated with the velocity it was referenced to',
-			/belongs to the velocity in the lateral, at a lateral diameter of 6 in/.test(answerText));
+		// In the ANSWER the reference travels in the row's own name, for the same reason. A separate
+		// sentence is kept only for a k the user pasted — asserted a few lines down.
+		ok('the k is named for the lateral in the report too',
+			/Lateral minor \(local\) loss coefficient/.test(answerText));
 		// The engine hands the k over in TWO labelled pieces with different provenance, and the
 		// answer keeps them apart -- a sum presented as one measured number is the thing that rule
 		// exists to prevent.
@@ -312,12 +328,12 @@ function openFromMenu() {
 			/AWWA C502 test ceiling/.test(answerText) && /Crane TP-410/.test(answerText));
 		// And a k the user typed says so, in both places.
 		press('Change something');
-		control('Minor (local) loss coefficient').value = '3';
+		control('Lateral minor (local) loss coefficient').value = '3';
 		press('Work out the fire flow');
 		await settle();
 		const t = bodyText();
 		ok('a k the user typed is marked as theirs',
-			/loss coefficient, k: 3 \(you gave this\)/.test(t));
+			/loss coefficient, k \(see note below\): 3 \(you gave this\)/.test(t), t.slice(0, 0) || undefined);
 		ok('...and it is told it will be used at the LATERAL velocity, whatever table it came from',
 			/Your coefficient will be used at the velocity in the lateral/.test(t));
 		ok('...and how to restate one that meant another velocity',
@@ -327,7 +343,7 @@ function openFromMenu() {
 		ok('a smaller k really does yield more flow -- the k is doing work', higher > lower,
 			higher + ' gpm at k = 3 vs ' + lower + ' gpm at k = 4.96');
 		press('Change something');
-		control('Minor (local) loss coefficient').value = L.fireFlowDefaults().k;
+		control('Lateral minor (local) loss coefficient').value = L.fireFlowDefaults().k;
 		press('Work out the fire flow');
 		await settle();
 	}
