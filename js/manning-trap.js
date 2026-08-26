@@ -207,11 +207,36 @@ EngCalcs.solveForY = function() {
 	EngCalcs.submitForm();
 };
 
+// **TYPING A NUMBER TURNS ITS BUTTON OFF -- AND MUST DO SO BEFORE THE PAGE RECALCULATES.**
+//
+// Tom, 2026-08-25: *"It eats the first digit typed when the buttons are on, using the first digit
+// typed to blank the button."* Exactly right, and the cause is EVENT ORDER, not the logic:
+//
+//   * `n_in` carries `oninput="EngCalcs.submitForm();"` as an INLINE ATTRIBUTE, so that listener is
+//     registered when the element is parsed.
+//   * This file added its un-checking listener at DOMContentLoaded -- LATER.
+//   * Both fire on `input`, in registration order, so the inline one won: the calculator ran while
+//     the radio was still checked, saw `n_radio !== ''`, and overwrote the box with the computed n.
+//     The digit was gone before the radio ever un-checked.
+//
+// `beforeinput` fires BEFORE the value changes and therefore before `input` and before the inline
+// handler, whatever order those two were registered in. So by the time the calculator runs, the
+// radio is already off and it leaves the user's own number alone -- which is the rule this page is
+// built on: a calculator stores what the user typed.
+//
+// The `input` listener is KEPT as well, and deliberately: `beforeinput` is not dispatched for every
+// programmatic or assistive-technology edit, and un-checking twice is harmless. Belt and braces on
+// a control whose failure ate keystrokes.
 document.addEventListener('DOMContentLoaded', function() {
-	document.getElementById('n_in').addEventListener('input', function() {
-		document.querySelectorAll('[id^="n_radio_"]').forEach(function(el) { el.checked = false; });
-	});
-	document.getElementById('d50_in').addEventListener('input', function() {
-		document.querySelectorAll('[id^="d50_radio_"]').forEach(function(el) { el.checked = false; });
-	});
+	function clears(inputId, radioPrefix) {
+		var el = document.getElementById(inputId);
+		if (!el) { return; }
+		function off() {
+			document.querySelectorAll('[id^="' + radioPrefix + '"]').forEach(function(r) { r.checked = false; });
+		}
+		el.addEventListener('beforeinput', off);
+		el.addEventListener('input', off);
+	}
+	clears('n_in', 'n_radio_');
+	clears('d50_in', 'd50_radio_');
 });

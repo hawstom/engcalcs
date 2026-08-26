@@ -365,6 +365,20 @@ the block.
   - **Not observed in the wild**, which is why it is 75 and not 100: renaming a link and then
     dragging one of its nodes without an intervening redraw is a narrow path. It is still a throw.
 
+- 75|536| **[H] Did the Manning button fix also cure the second symptom?**
+  Tom reported two things on 2026-08-25. The first — the eaten first digit — is **fixed and guarded**
+  (closed Task 535). The second was: *"Clicking the design rock size radio buttons and the Manning
+  Roughness buttons together blanks them both."*
+  - **I could not reproduce that one by clicking**, in either order, with every combination of the
+    two button groups, headless and in a real Chromium. Both buttons stay chosen and every box stays
+    numeric. `dev/browser-pass/specs/mtcbuttons.js` now asserts exactly that, so if it ever starts
+    happening the pass says so.
+  - **The strong hypothesis is that it WAS the eaten-digit defect, met while typing** — that bug both
+    un-checked the button and destroyed the number, which is what "blanks them both" describes.
+  - **So this task is one question for Tom and nothing else: is it still there?** If yes, the thing
+    to capture is the exact order of clicks and keystrokes, because that is the only part still
+    missing. If no, close this.
+
 - 75|531| **Tag the examples: US/SI, design/maintenance, xy/lat-lon.**
   Tom, 2026-08-25: *"Reference 348. Phase 1 can be adding labels, tags, or keywords to the
   examples."* **Task 348 is sub-categories and paging in the gallery, and is deliberately unbuilt at
