@@ -1,5 +1,16 @@
 # What is in the screenshot drop
 
+> **DELETED FRAMES STILL HAVE ROWS, AND THAT IS THE POINT.** Tom, 2026-08-25: *"You can delete all
+> the unusable ones, and I will just keep dropping them in forever."* So on that date the 18 frames
+> this index marked **No** or **Not as is** were deleted from disk — 0011–0014, 0021, 0025, 0034,
+> 0035, 0037–0042, 0044–0046, 0048 — and **their rows stay here.** That is Task 508's whole
+> principle working as intended: *the pictures do not survive a clone; what we learned from them
+> does.* A row whose file is gone is a record of a judgement already made, so nobody re-makes it,
+> and it names what a re-shoot would need to fix.
+>
+> **0049–0060 arrived on 2026-08-25 and are NOT YET INDEXED.** Reading them is the next pass.
+
+
 One line per file: what it shows, and whether it could go on a public page. Written by AI from
 looking at each image; the images themselves are not in git. See `README.md` for the convention.
 

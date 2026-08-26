@@ -433,3 +433,12 @@ stops meaning anything in all five.
 **If he ever wants "ministry" public, the narrowest form is first-person singular** — *"I build it as
 a ministry"* — because that reads as a person's reason, where *"a free ministry"* reads as a
 description of the software and invites every ambiguity above.
+
+**And here is the sentence itself, in his own words, 2026-08-25, which is the thing this section
+exists to hold:**
+
+> "Building it is a ministry of Tom Haws to tell the world 'You are loved and cherished forever, you
+> have nothing to fear, and you are not ruining everything.'"
+
+That is the motive under the whole project. It is not on the public page for the audience reasons
+above — **not because it is unwelcome, and nobody should read the decision that way.**

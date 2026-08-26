@@ -342,6 +342,15 @@ the block.
     Sort them into those two piles as you go — that sorting is most of the value.
   - **[H] The voice is his and the guide must quote him rather than paraphrase.** Where a ruling was
     a one-off with no principle behind it, say so instead of inventing the principle.
+  - **ONE PRINCIPLE HE HAS ALREADY GIVEN, and it cuts against a plausible-sounding opposite.** Tom,
+    2026-08-25, on a claim that abstractions survive machine translation badly so a word should be
+    placed where its sentence works without it: *"I would argue the opposite with some nuance, that
+    direct, ancient, and earthy metaphors (like 'run') are the most translatable things of all. But
+    to know them when you see them may be an art."* **So the rule is not "avoid metaphor" — it is
+    that an OLD, CONCRETE, BODILY metaphor travels and an abstract or modern one does not.** Water
+    runs; a zone runs; a machine's "runtime" does not travel the same way. His own caveat is part of
+    the rule and must survive into the guide: telling them apart is a judgement, so this is one for
+    the human pile, not the checkable one.
 
 - 75|533| **Renaming a link leaves `incidentLinks` pointing at the old id.**
   Found 2026-08-25 by the Task 502 agent while building Text-on-a-link, and **left unfixed on
