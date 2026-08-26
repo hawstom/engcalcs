@@ -101,8 +101,24 @@ EngCalcs.orDrawSketch = function() {
 	// HWE water surface line (upstream)
 	s += '<line x1="0" y1="' + hweY + '" x2="' + wallX + '" y2="' + hweY + '" stroke="blue" stroke-width="2"/>';
 
-	// TWE water surface line (downstream, only when submerged)
-	if (v.submerged && tweY < gndY) {
+	// **THE TAILWATER IS DRAWN WHENEVER IT FITS, NOT ONLY WHEN IT SUBMERGES THE OPENING.**
+	//
+	// Tom, 2026-08-25, from a screenshot of the shipped defaults: *"Can you see the bug that is
+	// revealed? The tailwater elevation is not plotted on the sketch."* It was guarded by
+	// `v.submerged`, so a free outfall drew no downstream water at all.
+	//
+	// Three reasons that was wrong, and the third is the one that matters:
+	//   1. The user TYPED it. A sketch that silently omits one of its own inputs is hiding the
+	//      user's number, and this suite's rule is that their numbers are theirs.
+	//   2. It drew a dry channel downstream, which is a different physical picture from the one
+	//      the numbers describe.
+	//   3. **It hid the reason for the verdict.** "Free outfall" is true BECAUSE the tailwater is
+	//      below the opening — draw both and the reader can see why, which is the whole job of a
+	//      definition sketch.
+	//
+	// `tweY < gndY` stays, and is the only condition: below the ground line there is nowhere to
+	// draw it and no channel for it to be the surface of.
+	if (tweY < gndY) {
 		s += '<line x1="' + (wallX + wallW) + '" y1="' + tweY + '" x2="' + svgW + '" y2="' + tweY + '" stroke="blue" stroke-width="2"/>';
 	}
 
@@ -110,8 +126,8 @@ EngCalcs.orDrawSketch = function() {
 	var hweTextY = (hweY < 15) ? hweY + 13 : hweY - 4;
 	s += '<text x="4" y="' + hweTextY + '" fill="blue">HWE</text>';
 
-	// TWE label (only when submerged)
-	if (v.submerged && tweY < gndY) {
+	// The label follows the line, on the same one condition.
+	if (tweY < gndY) {
 		var tweTextY = (tweY < 15) ? tweY + 13 : tweY - 4;
 		s += '<text x="' + (wallX + wallW + 4) + '" y="' + tweTextY + '" fill="blue">TWE</text>';
 	}

@@ -360,4 +360,42 @@ for (const [preset, lang] of [['us', 'en'], ['si', 'es']]) {
 		`V = ${fresh.num('vol')}, Q = ${fresh.num('q_max')}`);
 }
 
+// ---- the definition sketch draws every elevation the user typed --------------------------------
+//
+// Tom, 2026-08-25, reading a screenshot of the SHIPPED DEFAULTS: *"Can you see the bug that is
+// revealed? The tailwater elevation is not plotted on the sketch."* The TWE line and its label were
+// guarded by `v.submerged`, so on a free outfall the downstream side was drawn dry — hiding an input
+// the user had typed, and hiding the very thing that MAKES it a free outfall.
+//
+// Asserted on the sketch's own markup rather than on pixels: this is a headless page, nothing
+// rasterises, and what can honestly be checked is that the line and the label are emitted.
+r.section('the sketch plots the tailwater in both regimes');
+{
+	// Free outfall on the shipped defaults: TWE below the invert, so the old code drew nothing.
+	const free = loadCalculator('Orifice.php');
+	free.run();
+	const freeSvg = free.html('sketch');
+	r.ok(/✓/.test(free.html('regime')), 'the defaults really are a free outfall', free.html('regime'));
+	r.ok(/>HWE</.test(freeSvg), 'free outfall: the headwater is labelled');
+	r.ok(/>TWE</.test(freeSvg), 'free outfall: THE TAILWATER IS LABELLED TOO -- the defect Tom found');
+	r.eq((freeSvg.match(/<line /g) || []).length, 2,
+		'free outfall: two water surfaces are drawn, not one');
+
+	// Submerged: TWE above the centroid. This always worked; asserted so a fix cannot break it.
+	const sub = loadCalculator('Orifice.php');
+	sub.set({ twe: 104 });
+	sub.run();
+	const subSvg = sub.html('sketch');
+	r.ok(/>TWE</.test(subSvg), 'submerged: the tailwater is still labelled');
+	r.eq((subSvg.match(/<line /g) || []).length, 2,
+		'submerged: still two water surfaces');
+
+	// And the one condition that remains: below the ground line there is nowhere to draw it.
+	const deep = loadCalculator('Orifice.php');
+	deep.set({ hwe: 105, zinv: 101, twe: 90 });
+	deep.run();
+	r.ok(!/>TWE</.test(deep.html('sketch')),
+		'a tailwater below the ground line is not drawn, because there is nowhere to put it');
+}
+
 r.finish();
