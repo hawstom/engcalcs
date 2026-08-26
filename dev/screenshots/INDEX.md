@@ -17,6 +17,16 @@
 > privacy-clean by the test below: no browser chrome at all, no real project name (the two typed
 > title fields that carry anything read `SECTION C-C` / `NORTH OF HOUSE`, which name no client and
 > no place), no file path, no consent banner.
+>
+> **0067–0081 arrived the same day and are the ENGLISH half.** Tom: *"I added the specified
+> English/fallback screenshots."* Thirteen became the no-suffix cards a `?lang=` URL falls back to,
+> and two of those REPLACED a weaker English card already in the directory (Manning-Pipe-Flow and
+> Manning-Trap, both now on shipped defaults with the printable title fields empty). All fifteen are
+> ~1905x920, so none needed padding. **Eleven of the twelve wanted are satisfied; Orifice is not** —
+> see its row. **A frame's privacy is not the only test a CARD has to pass:** a card should show the
+> page as a first-time visitor meets it, so a ⚠ from a typed-in experiment, a typed printable title,
+> or a results column that never computed all make a frame a weaker card than a clean one. That is
+> why 0074 and 0071 are indexed but unused.
 
 
 One line per file: what it shows, and whether it could go on a public page. Written by AI from
@@ -165,7 +175,8 @@ Shoot these deliberately rather than at random, and crop to the PAGE, not the wi
 | **The Nominatim consent prompt** | 0011–0014 all have the browser's bookmarks bar and profile picture in frame | Just the dialog and the map. The consent wording is one of the most honest things in the suite and nothing shows it |
 | **"Place the model here permanently?"** | 0021, same browser chrome | The confirm on its own. It is the plainest one-way-door warning we have written |
 | **The Settings box, not covering the menu bar** | 0029 is the best picture of label control, but the box is dragged over the title and tab strip, so the frame stops saying what application it is | Same content, box parked clear of the top chrome |
-| **Twelve calculators, in ENGLISH, on their own defaults** | 0049–0066 gave every calculator a frame, but only three are in English (0062, 0063, 0066), and an English capture is what a calculator's DEFAULT share card has to be — see the calculator table above for the list and the reasoning | The same shot Tom already took in another language: 1920 wide, page region only, English, nothing typed into the printable title, the page on its shipped defaults so no ⚠ is in frame |
+| ~~Twelve calculators, in ENGLISH, on their own defaults~~ **ELEVEN DONE 2026-08-25** | 0067–0081 are the English re-shoot and closed eleven of the twelve. They also replaced the two weak English cards this queue had flagged separately, so Manning-Pipe-Flow and Manning-Trap now open on their shipped defaults with the printable title fields empty | -- |
+| **ORIFICE, in English, with its results computed** | The one of the twelve still open. 0071 is the English Orifice frame and it is privacy-clean, but its whole results column still reads the placeholder labels the page ships in the HTML — `Centroid elevation`, `Effective head, h`, `Flow, Q` — because the on-load calculation had not run when the shutter fired. A card advertising a calculator that shows no answers is worse than the suite card, so `Orifice.png` was not made and the English URL still falls back | The same frame taken a moment later, with 105 / 100 / 101 / 18 in and Cd 0.61 producing numbers and the free-or-submerged verdict, exactly as `Orifice-pt.png` (0056) already shows in Portuguese |
 | **Saving to a file** | 0025 shows a real folder listing and a real path | The browser's own permission prompt, over a network, in a folder whose name says nothing about you |
 
 ## The calculator frames, 0049–0066
@@ -193,18 +204,41 @@ wasted, and nothing is used where it would look wrong.**
 | 0060 | Manning-Trap | id | **Yes** | `Manning-Trap-id.png` | Indonesian. Carries a ⚠ "Di luar rentang" and a negative rock size, because the capture has `sg` typed as `.001` — a user's experiment, not the shipped defaults. Fine as a picture of the page; a re-shoot on defaults would be a better advert |
 | 0061 | Branched-Network | he | **Yes** | `Branched-Network-he.png` | Hebrew, RTL, cropped from the right like 0051. The pipe table below the form is left-aligned and only partly in frame, which is the one untidy edge in the set |
 | 0062 | Darcy-Weisbach | **en** | **Yes** | `Darcy-Weisbach.png` | One of only three English frames, so one of only three DEFAULT cards. Clean, on the shipped defaults, every check passing |
-| 0063 | Manning-Trap | **en** | **Yes** | `Manning-Trap.png` | English default card. Same `sg = .001` state as 0060, so the same ⚠ and the same negative rock sizes are on the card. Worth re-shooting on defaults |
+| 0063 | Manning-Trap | **en** | **Yes** | *(superseded by 0079)* | Was the English default card. Same `sg = .001` state as 0060, so the same ⚠ and the same negative rock sizes were on the card. 0079 is the re-shoot on defaults and took the name |
 | 0064 | Hazen-Williams | uk | **Yes** | `Hazen-Williams-uk.png` | Ukrainian. Cropped 1440 wide so the navbar's Copy-link button is not cut in half |
 | 0065 | Manning-Pipe-Head-Loss | hr | **Yes** | `Manning-Pipe-Head-Loss-hr.png` | Croatian. Clean, complete, nothing to explain away |
-| 0066 | Manning-Pipe-Flow | **en** | **Yes** | `Manning-Pipe-Flow.png` | English default card for the suite's most-used calculator. Two things date it as an advert rather than as evidence: the printable title fields carry `SECTION C-C` / `NORTH OF HOUSE`, and the state is a 6 m pipe with a ⚠ High velocity check. Nothing identifying — but this is the first calculator to re-shoot in English on defaults |
+| 0066 | Manning-Pipe-Flow | **en** | **Yes** | *(superseded by 0078)* | Was the English default card for the suite's most-used calculator. Two things made it an advert rather than evidence: the printable title fields carried `SECTION C-C` / `NORTH OF HOUSE`, and the state was a 6 m pipe with a ⚠ High velocity check. Nothing identifying — and 0078 is the re-shoot that took the name |
+
+## The English calculator frames, 0067–0081
+
+All fifteen are English, all ~1905x920, all page-region captures with no browser chrome, no file
+path and no consent banner. The **Crop** column is the native box taken from the top-left before the
+scale to 1200x630: **1280x672 unless the navbar's Copy-link button ran past 1280**, which was
+measured on every frame rather than eyeballed — it does on the nine marked 1440.
+
+| # | Page | Publishable | Crop | Card | Notes |
+|---|---|---|---|---|---|
+| 0067 | Canal-Seepage | **Yes** | 1440x756 | `Canal-Seepage.png` | The only frame here that is not on bare shipped defaults, and deliberately so: the four OPTIONAL economics inputs (wetted perimeter, water value, lining cost, target efficiency) ship blank, and Tom filled them, so the card shows the payback period and the annual value the page exists to produce. No ⚠ — the verdict is ✓ Good |
+| 0068 | Weir-Flow-Irregular | **Yes** | 1440x756 | `Weir-Flow-Irregular.png` | The four weir points and their cumulative flow all read. Longest title in the English set, which is what needed the 1440 |
+| 0069 | Weir-Flow-Simple | **Yes** | 1440x756 | `Weir-Flow-Simple.png` | Exact defaults, 1/1/3. The suite's shortest calculator, so the card carries the whole page including the weir equation and the footer — a picture of a small tool, which is what it is |
+| 0070 | Orifice-Drain-Time | **Yes** | 1440x756 | `Orifice-Drain-Time.png` | Exact defaults. Seconds, minutes, hours and days all in frame, and the ✓ ending-elevation check |
+| 0071 | Orifice | **Yes** | -- | *(none)* | **The one frame in this drop that is clean and still unusable as a card.** Its whole results column reads the placeholder labels the page ships in the HTML — `Centroid elevation`, `Effective head, h`, `Opening area, A`, `Flow, Q`, `Orifice regime check` — with no numbers anywhere, because the on-load calculation had not run when the shutter fired. Not a page defect: every other frame here shows the same page type computing normally. But a card advertising a calculator that produces no answers is worse than the generic suite card, so the English Orifice URL still falls back. This is the remake queue's one open row |
+| 0072 | Micro-Hydro-Power | **Yes** | 1440x756 | `Micro-Hydro-Power.png` | Exact defaults. Power output, annual energy and both ✓ checks on the card; the gross/net head sketch begins just at its lower edge |
+| 0073 | Rock-Chute | **Yes** | 1280x672 | `Rock-Chute.png` | Exact defaults including the deliberately blank optional normal depth. The Robinson equation-selection row and both ✓ range checks read |
+| 0074 | Manning-Irregular | **Yes** | -- | *(superseded by 0081)* | An earlier Manning Irregular capture, in SI, taken while Tom had CHANGED the page's defaults trying for a better example. He then restored them. Rejected for the card on that ground alone — it is privacy-clean and correct, it just is not the page a first-time visitor meets |
+| 0075 | Branched-Network | **Yes** | 1280x672 | `Branched-Network.png` | Exact defaults. Three pipe lines with their flows, losses and downstream pressures, and the network diagram just below the crop |
+| 0076 | Hazen-Williams | **Yes** | 1440x756 | `Hazen-Williams.png` | Exact defaults. The fullest results column in the English set — twenty rows, both ✓ checks, HGL and EGL at both ends |
+| 0077 | Manning-Pipe-Head-Loss | **Yes** | 1440x756 | `Manning-Pipe-Head-Loss.png` | Exact defaults. Complete: every input and every result on one card |
+| 0078 | Manning-Pipe-Flow | **Yes** | 1440x756 | `Manning-Pipe-Flow.png` | **The re-shoot 0066 was flagged for, and strictly better than it**: printable title fields empty, exact shipped defaults, ✓ OK velocity, no ⚠. The suite's most-used calculator finally has an advert rather than evidence |
+| 0079 | Manning-Trap | **Yes** | 1280x672 | `Manning-Trap.png` | **The re-shoot 0063 was flagged for, and strictly better than it**: `sg` back at 2.65, so the ⚠ and the negative rock sizes are gone and every rock-size method reports a real number |
+| 0080 | Irrigation-Pressure | **Yes** | 1280x672 | `Irrigation-Pressure.png` | Exact defaults. The orange advice line under the form ("Pressure at test emitter ≥ supply pressure") is the SHIPPED default state, not a typed experiment — the same line is on `Irrigation-Pressure-sw.png` |
+| 0081 | Manning-Irregular | **Yes** | 1280x672 | `Manning-Irregular.png` | Tom, having restored the defaults: *"The defaults are great. As soon as I restored them, the new screenshot 0081.PNG is good enough."* US units, ✓ OK, five section points with both bank boundaries checked, and a cross-section sketch that actually looks like a natural channel |
 
 **The calculators still waiting for an ENGLISH frame**, and therefore still showing the suite card
-when their English URL is shared: Weir-Flow-Simple, Weir-Flow-Irregular, Orifice, Orifice-Drain-Time,
-Hazen-Williams, Manning-Pipe-Head-Loss, Manning-Irregular, Branched-Network, Irrigation-Pressure,
-Canal-Seepage, Micro-Hydro-Power, Rock-Chute. Twelve. Each needs one capture of the page in English on
-its own defaults, 1920 wide, no browser chrome — the same shot Tom already took in another language.
-Looped-Network is the thirteenth and is a different job: its card is the suite card, which is already
-an lpn frame.
+when their English URL is shared: **Orifice. One.** It needs one capture of the page in English on
+its own defaults with the results computed, 1920 wide, no browser chrome. The other eleven of the
+twelve closed on 2026-08-25 with 0067–0081. Looped-Network was never one of them and is a different
+job: its card is the suite card, which is already an lpn frame.
 
 **The one habit that fixes most of this:** capture the page region, not the browser window. Six of
 the eight unpublishable frames fail for that alone — 0011–0014, 0021, and now 0040 — and nothing on
