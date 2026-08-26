@@ -151,7 +151,9 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	const fieldLines = lines.slice(2, lines.indexOf(global.EngCalcs.pageConfig.lpn_units_options_head));
 	ok('the fields it decides are listed', fieldLines.length >= 2, JSON.stringify(fieldLines));
 	ok('...one name per line', fieldLines.every(l => l.indexOf(',') < 0), JSON.stringify(fieldLines));
-	ok('...and Demand is one of them', fieldLines.indexOf('Demand') >= 0, JSON.stringify(fieldLines));
+	// "Base demand" since 2026-08-25: this list is the TYPED fields a unit decides the meaning of,
+	// and the resolved Demand beside it is not typed anywhere.
+	ok('...and Base demand is one of them', fieldLines.indexOf('Base demand') >= 0, JSON.stringify(fieldLines));
 	// Reworded by sprint 459's Wave 0 (2026-08-24): 'Options for units change:' is a noun pile that
 	// parses two ways -- [options for units] [change] or [options for] [units change]. The heading is
 	// read from the key rather than retyped here, so the next rewording is not a second failure.

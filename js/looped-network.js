@@ -1034,7 +1034,7 @@ var EngCalcs = EngCalcs || {};
 	//              against the neighbours' mean, which is why the local feature context has to know
 	//              the topology and not just this node (§3.3). Elevation is 'like', NOT 'extreme';
 	//              the two disagree most on a flat network with one hill, the case the rule is for.
-	var LPN_NODE_DROP_RULE = { demand: 'low', pressure: 'extreme', elev: 'like', head: 'like' };
+	var LPN_NODE_DROP_RULE = { demandActual: 'low', demand: 'low', pressure: 'extreme', elev: 'like', head: 'like' };
 	// The two directions a node label may take, as bearings, DERIVED from the resting offset rather
 	// than restated as numbers: -45 degrees is up-and-right, where DEFAULT_LABEL_OFFSET already puts
 	// an untouched label and Imhof's first choice for a left-to-right script. The other is its
@@ -1133,6 +1133,7 @@ var EngCalcs = EngCalcs || {};
 				// record exists to avoid.
 				openSide: Geom.mostOpenDirection(bearings, sides, LPN_SIDE_SWITCH_MARGIN),
 				demand: nodeVal.demand.by[n.id],
+				demandActual: nodeVal.demandActual.by[n.id],
 				pressure: nodeVal.pressure.by[n.id],
 				elev: nodeVal.elev.by[n.id],
 				head: nodeVal.head.by[n.id],
@@ -2597,7 +2598,11 @@ var EngCalcs = EngCalcs || {};
 				// it has no `prop` and the scenario push skips it. It stays in the Settings push,
 				// which writes Base.
 				applies: function () { return true; }, get: function (n) { return n.elev; }, set: function (n, v) { n.elev = v; } },
-			{ key: 'demand', group: 'node', field: 'demand', prop: 'demand', label: pc.bpn_demand || 'Demand',
+			// `altField` exists for this one row and says why it has to: a push is scoped by the
+			// labels on screen, and since 2026-08-25 a map showing a junction's demand is normally
+			// showing the RESOLVED one. Both labels describe the same stored number, so either being
+			// on means the user can see what a push would change.
+			{ key: 'demand', group: 'node', field: 'demand', altField: 'demandActual', prop: 'demand', label: pc.lpn_field_base_demand || 'Base demand',
 				applies: function (n) { return !isFixedHeadNode(n); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'diameter', group: 'link', field: 'diameter', prop: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
@@ -2608,6 +2613,12 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'k', group: 'link', field: 'km', prop: 'k', label: pc.lpn_field_km || 'Minor (local) loss coefficient, k',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 		];
+	}
+	// Is this push spec's property visible on the map right now? The one place that question is
+	// asked, so the Settings push and the scenario push cannot come to different answers about the
+	// same checkbox -- and the one place `altField` is honoured.
+	function pushFieldShown(s) {
+		return !!(labelSettings[s.group][s.field] || (s.altField && labelSettings[s.group][s.altField]));
 	}
 	// **THE DANGEROUS ACTION** (Task 184). Base-side, it forces the displayed properties onto every
 	// scenario, ignoring their markers. In the delta model "forcing Base's value onto a scenario" IS
@@ -2630,7 +2641,7 @@ var EngCalcs = EngCalcs || {};
 		// Scoped to ONE element, the other group's properties are nonsense: a node has no diameter,
 		// so counting one produces a confirm naming properties this element cannot hold.
 		var active = pushSpecList().filter(function (s) {
-			return s.prop && labelSettings[s.group][s.field] && (!group || s.group === group);
+			return s.prop && pushFieldShown(s) && (!group || s.group === group);
 		});
 		if (!active.length) {
 			alert(pc.lpn_push_none_displayed || 'No default input is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
@@ -2679,7 +2690,13 @@ var EngCalcs = EngCalcs || {};
 	// the undo-snapshotted `doc` and is untouched by clearNetwork()/undo().
 	function defaultLabelSettings() {
 		return {
-			node: { id: true, elev: true, demand: true, head: false, pressure: true },
+			// **DEMAND ON, BASE DEMAND OFF** (Tom, 2026-08-25). The map's job is to be readable
+			// against itself: the number beside a junction should be the one the pipes into it add
+			// up to, and on a patterned network the base is not that number. Both remain one tick
+			// away. A project saved before this existed carries `demand: true` and keeps showing
+			// exactly the number it always showed -- now under the honest heading -- because the
+			// boolean maps are merged key by key and nothing reinterprets a stored toggle.
+			node: { id: true, elev: true, demand: false, demandActual: true, head: false, pressure: true },
 			// Every INPUT property a link carries is offered, not just the ones a result depends on:
 			// roughness and the minor-loss coefficient are typed per pipe and are exactly the numbers
 			// you want spread across a drawing when checking someone's model. Off by default --
@@ -2703,7 +2720,7 @@ var EngCalcs = EngCalcs || {};
 			//     pipe gradient is 0.0043; 4 covers both.
 
 			decimals: {
-				node: { demand: 2, head: 2, pressure: 2, elev: 2 },
+				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2 },
 				link: { diameter: 0, length: 2, roughness: 0, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 4 }
 			},
 			// Per-field PREFIX and SUFFIX text (Task 333), plus one blanket separator between either
@@ -2750,7 +2767,9 @@ var EngCalcs = EngCalcs || {};
 			// job the label's own position is doing. That argument does NOT carry to node labels,
 			// which is why no node ID rank exists.
 			priority: {
-				node: { demand: 4, pressure: 3, elev: 2, head: 1 },
+				// Demand outranks Base demand: on a crowded drawing the resolved number is the one
+				// worth the last space, and the base is recoverable from it and the pattern.
+				node: { demandActual: 5, demand: 4, pressure: 3, elev: 2, head: 1 },
 				link: { flow: 9, velocity: 8, headloss: 7, gradient: 6,
 					diameter: 5, length: 4, roughness: 3, km: 2, id: 1 }
 			},
@@ -3596,7 +3615,14 @@ var EngCalcs = EngCalcs || {};
 	// colour key and a label key can never disagree about what a field is called.
 	// ONE SET OF UNITS (Task 522): a typed elevation and a solved head are read in the same unit,
 	// so `elev` and `head` name the same selector and cannot drift apart.
-	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow',
+	// **BASE DEMAND AND DEMAND ARE TWO FIELDS BECAUSE THEY ARE TWO QUANTITIES** (Tom, 2026-08-25).
+	// `demand` is the number the user typed or the file stated. `demandActual` is that number with
+	// its pattern applied at the moment on the clock -- what the pipes around the node carry, and
+	// therefore the one that reconciles with the flows printed beside it. Net3 at t=0 draws 1.34x
+	// its base demands, so a map printing the base under the word "Demand" makes a labelling defect
+	// read as a solver defect: add up the pipes into junction 101 and you get 254.53 gpm beside a
+	// label saying 189.95.
+	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', demandActual: 'lpn_u_flow',
 		head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure' };
 	var COLOR_LINK_FIELDS = { diameter: 'lpn_u_diameter', roughness: '', flow: 'lpn_u_flow',
 		velocity: 'lpn_u_velocity', headloss: 'lpn_u_elevhead', gradient: 'lpn_u_gradient' };
@@ -3609,6 +3635,13 @@ var EngCalcs = EngCalcs || {};
 	function colorNodeValue(n, field) {
 		if (field === 'elev') { return typeof n.elev === 'number' ? n.elev : undefined; }
 		if (field === 'demand') { return isFixedHeadNode(n) ? undefined : effective(n, 'demand'); }
+		// **NOT A SOLVE RESULT AND NOT AN INPUT EITHER**, which is why it stays in the INPUT flow
+		// unit rather than crossing through SI: it is a typed number times a dimensionless
+		// multiplier, so nothing here has a conversion to spoil (they are the same selector anyway --
+		// LPN_RESULT_UNIT.flow is lpn_u_flow). It is a RESULT in the sense that matters: nothing
+		// writes it, it moves with the clock and with the scenario, and it never reaches the
+		// document.
+		if (field === 'demandActual') { return isFixedHeadNode(n) ? undefined : resolvedDemand(n); }
 		if (field === 'head') {
 			// Derived from typed numbers, so it crosses into the RESULT unit like every other head.
 			if (isFixedHeadNode(n)) { return toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead')); }
@@ -3643,7 +3676,9 @@ var EngCalcs = EngCalcs || {};
 	// EPANET's own View menu lists them, so nobody has to learn a second vocabulary. Anything the
 	// maps gain later still appears, without this list having to be maintained twice.
 	var COLOR_FIELD_ORDER = {
-		node: ['pressure', 'head', 'elev', 'demand'],
+		// Demand before Base demand: the resolved one is the question a reader is actually asking
+		// ("what is being drawn here"), and the base is the input behind it.
+		node: ['pressure', 'head', 'elev', 'demandActual', 'demand'],
 		link: ['velocity', 'flow', 'headloss', 'gradient', 'diameter', 'roughness']
 	};
 	function colorFieldOptions(group) {
@@ -9188,9 +9223,14 @@ var EngCalcs = EngCalcs || {};
 				group: 'node', type: 'junction',
 				cols: [
 					paneColId(), paneColElev(),
-					{ key: 'demand', label: 'bpn_demand', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
+					// **THE TYPED ONE IS THE EDITABLE ONE, AND IT IS THE ONLY EDITABLE ONE** -- see
+					// resolvedDemand(). The Demand column beside it is a plain cell with no control
+					// in it at all, so there is no path by which the resolved number could be typed
+					// into and no path by which it could reach the document.
+					{ key: 'demand', label: 'lpn_field_base_demand', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
 						prop: 'demand', get: function (n) { return effective(n, 'demand'); },
 						set: function (n, v) { setProp(n, 'demand', v); } },
+					paneColNodeResult('demandActual', 'bpn_demand', paneUnitFlow),
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
 					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure)
 				]
@@ -17414,7 +17454,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (name === 'lpn_u_pressure') { return [pc.lpn_field_valve_setting_pressure || 'Pressure setting']; }
 		if (name === 'lpn_u_flow') {
-			return [pc.bpn_demand || 'Demand', pc.lpn_field_valve_setting_flow || 'Flow setting',
+			return [pc.lpn_field_base_demand || 'Base demand', pc.lpn_field_valve_setting_flow || 'Flow setting',
 				(pc.lpn_result_flow || 'Flow') + ' (pump curve)'];
 		}
 		return [];
@@ -18003,12 +18043,16 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Shared with renderLabelsLegend() below -- one place naming which fields exist and what their
 	// checkbox/legend text says, so the popover and the legend can never drift out of sync.
-	// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Head, Pressure, Elevation -- matches
-	// the same reordering in refreshLabelText()'s node loop above, so the checkbox list, the
-	// on-map label, and the legend all agree.
+	// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Base demand, Head, Pressure,
+	// Elevation -- matches the same reordering in refreshLabelText()'s node loop above, so the
+	// checkbox list, the on-map label, and the legend all agree.
 	function nodeFieldDefs(pc) {
 		return [
-			['id', pc.lpn_field_id || 'ID'], ['demand', pc.bpn_demand || 'Demand'],
+			['id', pc.lpn_field_id || 'ID'],
+			// Two rows, two quantities: the typed BASE and the DEMAND that base resolves to under
+			// its pattern at the moment on the clock. See resolvedDemand().
+			['demandActual', pc.bpn_demand || 'Demand'],
+			['demand', pc.lpn_field_base_demand || 'Base demand'],
 			['head', pc.lpn_result_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
 			['elev', pc.lpn_field_elev || 'Elevation']
 		];
@@ -18934,9 +18978,9 @@ var EngCalcs = EngCalcs || {};
 		// One elevation for BOTH junctions and reservoirs (Tom, 2026-07-30). A reservoir's head is
 		// absent by design and follows this elevation -- see reservoirHead() and addNode().
 		defaultRow(defBody, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead', 'nodeElev', any);
-		// bpn_demand, not an lpn_ key of its own -- CLAUDE.md's concept-level label reuse rule, and
-		// the same borrow the junction popup and the Labels panel already make for this concept.
-		defaultRow(defBody, pc.bpn_demand || 'Demand', 'lpn_u_flow', 'demand', any);
+		// The BASE demand, because a starting value is a typed number: a resolved demand is worked
+		// out from one and cannot be seeded (see resolvedDemand()).
+		defaultRow(defBody, pc.lpn_field_base_demand || 'Base demand', 'lpn_u_flow', 'demand', any);
 		defaultRow(defBody, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter', 'diameter', positive);
 		// Roughness and K are dimensionless, so no unit factor and no unit in the label -- same
 		// reasoning as refreshLabelText()'s plainRound() treatment of these two fields.
@@ -18975,7 +19019,7 @@ var EngCalcs = EngCalcs || {};
 					.replace(/\{base\}/g, pc.lpn_scenario_base || 'Base'));
 				return;
 			}
-			var active = pushSpecs.filter(function (s) { return labelSettings[s.group][s.field]; });
+			var active = pushSpecs.filter(pushFieldShown);
 			// An empty intersection SAYS SO rather than silently doing nothing: with no input labels
 			// displayed this button would otherwise look broken, and the reason is off-screen in
 			// another panel. Naming that panel is the whole value of the message.
@@ -21284,10 +21328,10 @@ var EngCalcs = EngCalcs || {};
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); },
 				pc.lpn_field_elev_tip);
-			// Label borrowed from bpn_demand (concept-level reuse), but the TIP is lpn_'s own:
+			// **THE TYPED NUMBER, AND THE ONLY EDITABLE ONE OF THE PAIR.** The tip is lpn_'s own:
 			// bpn_demand_tip says "at this line's downstream end", which is branched-network
 			// wording and false here, where a demand sits on a node.
-			unitNumberField(fields, pc.bpn_demand || 'Demand', 'lpn_u_flow',
+			unitNumberField(fields, pc.lpn_field_base_demand || 'Base demand', 'lpn_u_flow',
 				function () { return effective(n, 'demand'); },
 				function (v) { setProp(n, 'demand', v); updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_demand_tip, { el: n, prop: 'demand' });
@@ -21303,6 +21347,18 @@ var EngCalcs = EngCalcs || {};
 				function () { return n.demandPattern; },
 				function (v) { n.demandPattern = v || null; updateNode(nodeId); scheduleSolve(); saveToStorage(); },
 				pc.lpn_field_demand_pattern_tip);
+			// **WHAT THAT BASE RESOLVES TO AT THE MOMENT ON THE CLOCK**, read-only, directly under
+			// the pattern that produces it -- the base, the pattern, the answer, in that order.
+			// **SHOWN ONLY WHERE A PATTERN ACTUALLY ACTS ON THIS JUNCTION.** With no pattern the two
+			// numbers are equal, and a popup that said the same thing twice would be noise on the
+			// common case (see demandPatternActs()). readonlyField() rather than
+			// readonlyUnitField(): the value is already in the displayed flow unit and has never
+			// been in SI, so multiplying it by a factor here would be a conversion of an input --
+			// the very thing CLAUDE.md's unit rule bans.
+			if (demandPatternActs(n)) {
+				readonlyField(fields, (pc.bpn_demand || 'Demand') + ' (' + unitLabel('lpn_u_flow') + ')',
+					resolvedDemand(n), pc.lpn_result_demand_tip);
+			}
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
 				readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
 					pc.lpn_result_head_tip);
@@ -22136,6 +22192,39 @@ var EngCalcs = EngCalcs || {};
 	function demandMultiplier(n, t) {
 		return patternMultiplier(n.demandPattern || doc.defaultPattern, t);
 	}
+	// **THE DEMAND THIS JUNCTION IS ACTUALLY DRAWING AT THE MOMENT ON THE CLOCK**, in the displayed
+	// flow unit -- base times the multiplier, which is the same product assembleModel() hands the
+	// solver two screens down. ONE expression, so the number on the label and the number in the
+	// equations cannot describe different networks; that identity is the whole point of the field
+	// and is what dev/lpn-spike/demand-resolved-harness.js asserts against Net3's own pipe flows.
+	//
+	// **IT IS NEVER STORED AND NEVER WRITTEN BACK.** The base is the user's number; this is ours.
+	// Nothing in this file has a setter for it, which is the structural half of that rule rather
+	// than a discipline (CLAUDE.md, "ONLY THE USER TOUCHES A FILE'S NUMBERS").
+	//
+	// **AN EMITTER'S EXTRA DRAW IS NOT IN IT.** An emitter is a pressure-dependent outflow the
+	// solver computes and does not report back, so a junction with one draws more than this says
+	// and its pipes will not reconcile with it. That is a gap, named rather than papered over --
+	// EPANET's own reports fold emitter flow into Demand and this cannot until the solvers hand it
+	// back.
+	function resolvedDemand(n) {
+		var base = effective(n, 'demand');
+		if (typeof base !== 'number' || !isFinite(base)) { return base; }
+		return base * demandMultiplier(n, modelTimeSeconds());
+	}
+	// Does a pattern act on this junction at all? A junction naming none still follows the
+	// project's own default ([OPTIONS] Pattern), which is exactly the resolution demandMultiplier()
+	// makes -- so this asks the same question and must be read beside it.
+	//
+	// **WHERE THE ANSWER IS NO, THE TWO NUMBERS ARE EQUAL AND THE PAGE DOES NOT SAY IT TWICE.**
+	// That is the common case -- a hand-drawn network with no clock -- and it must not look noisy.
+	// The property popup drops the read-only row entirely there. The Tables pane and the Labels
+	// popover keep both entries, because a column and a checkbox are properties of the whole
+	// network rather than of one junction, and a list that appeared and vanished under the reader
+	// would be worse than a column that occasionally agrees with its neighbour.
+	function demandPatternActs(n) {
+		return !isFixedHeadNode(n) && !!(n.demandPattern || doc.defaultPattern);
+	}
 	// **THE SAME ARITHMETIC FOR EVERY ATTACHMENT POINT** (Task 248.02). A pattern does not know what
 	// it is for -- js/lpn-patterns.js says so in its own header -- so a demand, a reservoir head and
 	// a pump speed read the multiplier through one function and cannot come to different
@@ -22557,6 +22646,9 @@ var EngCalcs = EngCalcs || {};
 		var nodeVal = {
 			elev: nodeValueMap(function (n) { return plainRound(n.elev, nd.elev); }),
 			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(effective(n, 'demand'), nd.demand) : undefined; }),
+			// plainRound(), not displayRound(): a resolved demand is a typed number times a
+			// dimensionless multiplier, so it is already in the displayed unit and never crossed SI.
+			demandActual: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(resolvedDemand(n), nd.demandActual) : undefined; }),
 			head: nodeValueMap(function (n) {
 				// Head is DERIVED on a reservoir or tank and SOLVED on a junction, so the two halves
 				// of this one field reach the RESULT unit by different roads -- one across the input
@@ -22588,6 +22680,7 @@ var EngCalcs = EngCalcs || {};
 		var extrema = {
 			elev: fieldExtrema(nodeVal.elev.list),
 			demand: fieldExtrema(nodeVal.demand.list),
+			demandActual: fieldExtrema(nodeVal.demandActual.list),
 			head: fieldExtrema(nodeVal.head.list),
 			pressure: fieldExtrema(nodeVal.pressure.list),
 			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'diameter'), ld.diameter) : undefined; })),
@@ -22632,6 +22725,9 @@ var EngCalcs = EngCalcs || {};
 			// demand is the thing the user set as a design target, head/pressure are what the solve
 			// produced from it, and elevation (the input least likely to change page to page) trails.
 			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
+			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
+			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
+			if (!isFixedHeadNode(n) && ls.node.demandActual) { lines.push(affix('node', 'demandActual', rawLine(resolvedDemand(n), extrema.demandActual, nd.demandActual))); }
 			if (!isFixedHeadNode(n) && ls.node.demand) { lines.push(affix('node', 'demand', rawLine(effective(n, 'demand'), extrema.demand, nd.demand))); }
 			// Both are already IN Elevation/Head and Pressure units by the time they get here -- the
 			// fixed-head branch because those are declared inputs, the junction branch because the
@@ -22775,13 +22871,18 @@ var EngCalcs = EngCalcs || {};
 	// A property with no Labels checkbox (status, active, a tank's level) is ALWAYS shown: the filter
 	// can only hide what it can name, and dropping an override the panel has no row for would make
 	// the halos quietly incomplete rather than filtered.
+	// **A LIST, BECAUSE ONE STORED PROPERTY CAN BE SHOWN UNDER MORE THAN ONE LABEL.** A demand
+	// override changes both the Base demand printed on the map and the Demand resolved from it
+	// (2026-08-25), so either label being on means the ring has something visible to explain. null
+	// means "no label shows this at all", and such an override rings unconditionally.
 	var LPN_OVERRIDE_LABEL_FIELD = {
-		node: { demand: 'demand', head: null, level: null, emitter: null, active: null },
-		link: { diameter: 'diameter', roughness: 'roughness', k: 'km', length: 'length', status: null, active: null }
+		node: { demand: ['demand', 'demandActual'], head: null, level: null, emitter: null, active: null },
+		link: { diameter: ['diameter'], roughness: ['roughness'], k: ['km'], length: ['length'], status: null, active: null }
 	};
 	function overrideIsDisplayed(el, prop) {
-		var group = elGroup(el), field = (LPN_OVERRIDE_LABEL_FIELD[group] || {})[prop];
-		return field ? !!labelSettings[group][field] : true;
+		var group = elGroup(el), fields = (LPN_OVERRIDE_LABEL_FIELD[group] || {})[prop];
+		if (!fields) { return true; }
+		return fields.some(function (f) { return !!labelSettings[group][f]; });
 	}
 	function hasDisplayedOverride(el) {
 		var ov = activeScenario().overrides[ovKey(el)];

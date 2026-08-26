@@ -571,8 +571,10 @@ console.log('\n--- the push, scoped to one element ---');
 	// The confirm names the properties of THIS element's kind only. Diameter is on screen and is
 	// unreachable from a node either way, so listing it would be a promise about something that
 	// cannot happen -- the one part of the group filter a user actually sees.
-	ok('...and named Demand without naming Diameter',
-		/Demand/.test(confirmText || '') && !/Diameter/.test(confirmText || ''), JSON.stringify(confirmText));
+	// "Base demand" since 2026-08-25: the push writes the STORED number, and the page now has a
+	// second, resolved Demand it cannot write.
+	ok('...and named Base demand without naming Diameter',
+		/Base demand/.test(confirmText || '') && !/Diameter/.test(confirmText || ''), JSON.stringify(confirmText));
 	ok('...and STILL left the pipe alone', !!scn.overrides[L.ovKey(E.l2)], JSON.stringify(scn.overrides));
 
 	// Scope does not weaken the Base-only guard.
