@@ -338,14 +338,14 @@
 	// claims about the same data.
 	function accuracy() {
 		return t('lpn_terrain_accuracy',
-			'Terrain data has about 30 m horizontal resolution and several meters vertical ' +
+			'Mapbox assembles this from many public elevation datasets, so how good it is depends entirely on where you are. Where a national lidar survey exists \u2014 USGS 3DEP in much of the United States, and its equivalents elsewhere \u2014 it can be better than a metre across the ground and a few tenths of a metre up and down. Where only global data exists it is about 30 m across the ground and several metres up and down. Mapbox does not tell us which one you got. Treat it as a contour map, not a survey: check anything you rely on.' +
 			'accuracy. Treat it as a contour map, not a survey: check anything you rely on.');
 	}
 
 	// THE VIEW-MENU ROW'S OWN WORDS, exported rather than read by js/looped-network.js, so every
 	// string this feature shows lives in one file.
 	EC.lpnTerrainMenuLabel = function () {
-		return t('lpn_terrain_menu', 'Fill in elevations from the land…');
+		return t('lpn_terrain_menu', 'Fill in elevations from Mapbox DEM…');
 	};
 	EC.lpnTerrainMenuTip = function () {
 		return t('lpn_terrain_tip',
@@ -412,7 +412,7 @@
 		var fillCount = (want || []).length, keepCount = (keep || []).length;
 		var s = (replacing === undefined)
 			? t('lpn_terrain_confirm',
-				'Fill in the elevation of {n} node(s) from the land surface?').replace('{n}', fillCount)
+				'Fill in the elevation of {n} node(s) from Mapbox DEM?').replace('{n}', fillCount)
 			: [
 				t('lpn_terrain_confirm_default_1',
 					'Every node already has an elevation, and {n} of them are still at {v}, which is ' +

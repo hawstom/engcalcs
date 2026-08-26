@@ -2696,7 +2696,15 @@ var EngCalcs = EngCalcs || {};
 			// away. A project saved before this existed carries `demand: true` and keeps showing
 			// exactly the number it always showed -- now under the honest heading -- because the
 			// boolean maps are merged key by key and nothing reinterprets a stored toggle.
-			node: { id: true, elev: true, demand: false, demandActual: true, head: false, pressure: true },
+			// **BASE DEMAND STAYS THE DEFAULT, AND DEMAND IS THE ONE TICK AWAY** (Tom, 2026-08-26).
+			// A previous pass flipped this to show the resolved Demand by default, reasoning that a
+			// fresh map should show the number the pipes add up to. He reversed it: *"no options, no
+			// demand: true. It's just showing Base Demand as user requested (without sufficient
+			// advice) in Settings."* The bug was never the CHOICE, it was the LABEL — a base demand
+			// printed under the word "Demand". Relabelled, the default is honest, every project that
+			// ever existed keeps showing the number it always showed, and nobody's map changes under
+			// them for a reason they did not ask for.
+			node: { id: true, elev: true, demand: true, demandActual: false, head: false, pressure: true },
 			// Every INPUT property a link carries is offered, not just the ones a result depends on:
 			// roughness and the minor-loss coefficient are typed per pipe and are exactly the numbers
 			// you want spread across a drawing when checking someone's model. Off by default --
@@ -21364,16 +21372,19 @@ var EngCalcs = EngCalcs || {};
 				pc.lpn_field_demand_pattern_tip);
 			// **WHAT THAT BASE RESOLVES TO AT THE MOMENT ON THE CLOCK**, read-only, directly under
 			// the pattern that produces it -- the base, the pattern, the answer, in that order.
-			// **SHOWN ONLY WHERE A PATTERN ACTUALLY ACTS ON THIS JUNCTION.** With no pattern the two
-			// numbers are equal, and a popup that said the same thing twice would be noise on the
-			// common case (see demandPatternActs()). readonlyField() rather than
-			// readonlyUnitField(): the value is already in the displayed flow unit and has never
-			// been in SI, so multiplying it by a factor here would be a conversion of an input --
-			// the very thing CLAUDE.md's unit rule bans.
-			if (demandPatternActs(n)) {
-				readonlyField(fields, (pc.bpn_demand || 'Demand') + ' (' + unitLabel('lpn_u_flow') + ')',
-					resolvedDemand(n), pc.lpn_result_demand_tip);
-			}
+			// **ALWAYS SHOWN, EVEN WHEN IT EQUALS THE BASE** (Tom, 2026-08-26). A previous pass hid
+			// this row wherever no pattern acted, to avoid saying the same thing twice. He ruled the
+			// other way: *"It's okay for the Properties box to say the same value twice, and it has
+			// a meaning, that Demand is the same as Base Demand. We want this."* And he is right —
+			// two equal numbers under two different headings is an ANSWER to the question the
+			// heading raises, where a missing row leaves the reader to wonder which one they are
+			// looking at. A row that appears and vanishes is also the thing hardest to learn.
+			//
+			// readonlyField() rather than readonlyUnitField(): the value is already in the displayed
+			// flow unit and has never been in SI, so multiplying it by a factor here would be a
+			// conversion of an input -- the very thing CLAUDE.md's unit rule bans.
+			readonlyField(fields, (pc.bpn_demand || 'Demand') + ' (' + unitLabel('lpn_u_flow') + ')',
+				resolvedDemand(n), pc.lpn_result_demand_tip);
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
 				readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
 					pc.lpn_result_head_tip);
@@ -22231,12 +22242,12 @@ var EngCalcs = EngCalcs || {};
 	// project's own default ([OPTIONS] Pattern), which is exactly the resolution demandMultiplier()
 	// makes -- so this asks the same question and must be read beside it.
 	//
-	// **WHERE THE ANSWER IS NO, THE TWO NUMBERS ARE EQUAL AND THE PAGE DOES NOT SAY IT TWICE.**
-	// That is the common case -- a hand-drawn network with no clock -- and it must not look noisy.
-	// The property popup drops the read-only row entirely there. The Tables pane and the Labels
-	// popover keep both entries, because a column and a checkbox are properties of the whole
-	// network rather than of one junction, and a list that appeared and vanished under the reader
-	// would be worse than a column that occasionally agrees with its neighbour.
+	// **KEPT, THOUGH NOTHING CALLS IT TODAY** (2026-08-26). It existed to hide the popup's resolved
+	// Demand row wherever the two numbers were equal; Tom reversed that -- *"It's okay for the
+	// Properties box to say the same value twice, and it has a meaning, that Demand is the same as
+	// Base Demand. We want this."* The QUESTION it answers is still a real one and is cheap to ask,
+	// and Task 468's categories work will want it: a junction with categories resolves through the
+	// same door. Delete it if that turns out not to be true, but do not re-wire the popup to it.
 	function demandPatternActs(n) {
 		return !isFixedHeadNode(n) && !!(n.demandPattern || doc.defaultPattern);
 	}

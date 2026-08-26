@@ -2634,11 +2634,11 @@ $ec_lang['lpn_search_unreadable']='The place-name service answered with somethin
 $ec_lang['lpn_search_offline']='We could not reach the place-name service. You may be offline. Everything else on this page works without it, including Go to a latitude and longitude.';
 $ec_lang['lpn_search_toofast']='One search a second — that is what the place-name service allows. Try again in a moment.';
 $ec_lang['lpn_search_nofetch']='This browser cannot reach the place-name service.';
-$ec_lang['lpn_terrain_menu']='Fill in elevations from the land…';
+$ec_lang['lpn_terrain_menu']='Fill in elevations from Mapbox DEM…';
 $ec_lang['lpn_terrain_tip']='Read the ground elevation under each node that has none, and type it in for you. A node that already has an elevation is left alone, and one Undo puts it all back. The first use asks your permission, because the positions of your nodes go to Mapbox.';
 // Shown three times -- the menu tip, the confirm and the result notice -- so that the three cannot
 // drift into three different claims about the same data. One sentence, translated once.
-$ec_lang['lpn_terrain_accuracy']='Terrain data has about 30 m horizontal resolution and several meters vertical accuracy. Treat it as a contour map, not a survey: check anything you rely on.';
+$ec_lang['lpn_terrain_accuracy']='Mapbox assembles this from many public elevation datasets, so how good it is depends entirely on where you are. Where a national lidar survey exists — USGS 3DEP in much of the United States, and its equivalents elsewhere — it can be better than a metre across the ground and a few tenths of a metre up and down. Where only global data exists it is about 30 m across the ground and several metres up and down. Mapbox does not tell us which one you got. Treat it as a contour map, not a survey: check anything you rely on.';
 $ec_lang['lpn_terrain_consent_1']='Filling in elevations sends the position of each node that needs one — its latitude and longitude — to api.mapbox.com, to look up the height of the ground there.';
 $ec_lang['lpn_terrain_consent_2']='This is a different question from the map pictures behind your project. The pictures only say where you are looking. These positions are your network itself. Mapbox will receive those coordinates and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.';
 $ec_lang['lpn_terrain_consent_3']='May we send your node positions to Mapbox?';
@@ -2646,9 +2646,9 @@ $ec_lang['lpn_terrain_consent_4']='If you say no, everything else on this page k
 $ec_lang['lpn_terrain_refused']='Elevations were not filled in, and nothing was sent. You can type them in as before.';
 // {n} is a whole number, {k} a whole number, {v} an elevation with its unit, {m} and {f} whole
 // numbers. Substituted, never concatenated.
-$ec_lang['lpn_terrain_confirm']='Fill in the elevation of {n} node(s) from the land surface?';
+$ec_lang['lpn_terrain_confirm']='Fill in the elevation of {n} node(s) from Mapbox DEM?';
 $ec_lang['lpn_terrain_confirm_default_1']='Every node already has an elevation, and {n} of them are still at {v}, which is the elevation a new node starts with rather than one you typed.';
-$ec_lang['lpn_terrain_confirm_default_2']='Replace those {n} with the land surface?';
+$ec_lang['lpn_terrain_confirm_default_2']='Replace those {n} with Mapbox DEM?';
 $ec_lang['lpn_terrain_keep']='{k} node(s) already have an elevation and will not be touched.';
 $ec_lang['lpn_terrain_undo']='One Undo (Ctrl-Z) puts every one of them back.';
 $ec_lang['lpn_terrain_requests']='{n} request(s) to api.mapbox.com.';
