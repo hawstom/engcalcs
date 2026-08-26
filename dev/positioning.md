@@ -403,3 +403,33 @@ Costed 2026-08-14. **It is a VARIANT, not a fork — do not start by copying the
   than the viewport swallows every touch. Answer that trap; do not delete the cap.
 - **Treat any parent-site dependency as this task's problem by default** — a different domain is
   exactly the condition that exposes them, as `/hawsedc.css` did.
+
+## "Ministry" — his word, and why it stays here rather than on the page
+
+Tom, 2026-08-25, reaching for a word for why the software is free:
+
+> "How about 'free ministry'? How about the words 'mission' and 'ministry' wherever appropriate as
+> clarifications of why this is available to everybody?"
+
+**"Ministry" is his own sense of what he is doing, and it belongs on the record.** It is not on the
+public page, and he accepted that the same day — *"Fair enough"* — on an argument about AUDIENCE
+rather than about sentiment. Both halves are worth keeping, because the reasoning is what stops the
+question being re-opened from scratch:
+
+- **In the water sector the word first means a government department.** Ministry of Water Resources,
+  Ministry of Water and Sanitation. That ambiguity lands hardest exactly where the aim is strongest —
+  a reader in a country whose water is run by a ministry.
+- **Elsewhere it reads as Christian service**, on a site published in Arabic, Farsi, Urdu, Pashto,
+  Hebrew, Amharic and Khmer. For some readers that is warmth; for others it is a reason the tool does
+  not go on a work machine. **That cost falls hardest on the low-resource languages this project has
+  spent the most on**, which is the opposite of what the word is for.
+
+**"Mission" survives where "ministry" does not**, and the distinction is not squeamishness: there is
+no governmental sense of *mission* in this field, and the religious echo runs through *missionary*
+rather than *mission*. It is ordinary register in non-profit and open-source writing. It appears
+**once** on the public site, in the `Why` section, under the rule that a word used in five places
+stops meaning anything in all five.
+
+**If he ever wants "ministry" public, the narrowest form is first-person singular** — *"I build it as
+a ministry"* — because that reads as a person's reason, where *"a free ministry"* reads as a
+description of the software and invites every ambiguity above.

@@ -113,7 +113,7 @@ have something to generate; the wording is his call, not ours.
 
 ## Language, licence, and privacy
 
-- 7, 15, 22, 34| Twenty-seven languages, across the whole suite and not only its menus.
+- 7, 15, 22, 34| Twenty-seven languages, and every word is evaluated for translation: the network model and the two Manning calculators go into all of them, the rest of the suite into Spanish, Portuguese, French, and Turkish, and every calculator is findable by name in every language while it waits its turn.
 - 244| Free software under the GNU GPL, source in the open.
 - 4, 37| It installs on a desktop or a phone as an app of its own, icon and all.
 - 286, 288| No account, no visitor identifier, and nothing counted about you unless you say yes.
