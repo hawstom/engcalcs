@@ -300,6 +300,22 @@ it, and defer to whatever that seat actually reports once hired.**
 
 ---
 
+## Not a row — an answer against a task, not a want
+
+### Task 537 (field-access sharing): my ranking of the no-server shapes, and my one flat refusal
+
+This is not something I am asking to build for my own seat's sake — it answers Tom's Task 537
+question from the utility-holding-the-model side. Full citations: journal, 2026-08-25. **Order, my
+own:** (1) a file via the phone's own share sheet, (2) a read-only export, (3) a URL carrying a
+small model (fine at subdivision scale, name the browser/SMS-cache exposure at full-system scale),
+(4) a one-way "publish to a link" **only if the link is the utility's own storage.** **I would
+refuse:** any shape, including a "publish" link, where the storage is OURS rather than the
+utility's own — that is the cloud-login proposal in a smaller costume, and the reason is the
+utility's own legal exposure (state FOIA infrastructure-record exemptions naming water systems
+explicitly), not this project's architecture preference.
+
+---
+
 ## Promoted
 
 ### Automated available-fire-flow search at a hydrant — PROMOTED to ROADMAP Task 530, 2026-08-25

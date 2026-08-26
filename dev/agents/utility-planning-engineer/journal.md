@@ -14,6 +14,81 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-08-25 — Task 537: my half — how a model moves today, and who may legally hold it
+
+Tom split Task 537 across two seats: the field operator answers whether they even want the file;
+this seat answers how sharing actually works and whether "put it on the cloud" clears a utility's
+own legal/organizational bar. Full findings below; the short answer is **no, and not for an
+architecture reason — for a legal-exposure reason a utility's own counsel would give.**
+
+- **CITED, how the market's own answer works, and what it actually is underneath.** Bentley's
+  ProjectWise integration for WaterGEMS is check-out/check-in of a **file** (`*.wtg` +
+  `*.wtg.sqlite`), one editor locked at a time, with document history
+  (docs.bentley.com, "Working with ProjectWise"). Even the enterprise answer is a governed FILE, not
+  a live shared database — ProjectWise is a purchased, administered add-on product, which is itself
+  evidence of scale: it exists for utilities and consulting firms large enough to buy and run
+  document management, not for a modest system. **I found no citation of ordinary small-utility
+  practice below that tier** (a direct "engineers just email the `.inp`" source did not turn up),
+  so I say plainly: the file-by-email/shared-drive practice below ProjectWise's tier is my own
+  inference from the shape of the market (nothing below the enterprise product, and CAD/GIS
+  deliverables at this scale are conventionally exchanged as files) — **flag as SPECULATION, not
+  found directly**, though it is consistent with how this suite's own submittal deliverables move
+  (a `.inp` or a saved project, attached).
+- **CITED — a utility's network model is not hypothetically sensitive; multiple states have already
+  legislated that it is.** A summary of state FOIA carve-outs (search synthesis of Kentucky
+  §61.878, Pennsylvania's Right-to-Know Law, and a Washington statute, cross-corroborated across
+  three independent search results — I could not directly fetch the primary statutory text, Kentucky's
+  site returned 403 and the PDF at awwaneb.org, "State FOIA Laws: A Guide to Protecting Sensitive
+  Water Security Information," is image-only and did not OCR — **flag as secondary, not read
+  primary-source**) states that multiple states exempt from public disclosure "detailed drawings,
+  schematics, maps, or specifications of... utility... systems" and infrastructure records that
+  "expose vulnerabilities through disclosure of the location, configuration, or security of critical
+  systems, including public utility critical systems," **naming water and wastewater explicitly**.
+  **CITED, federal layer:** AWIA (2018) risk and resilience assessments are excluded from federal
+  FOIA (epa.gov AWIA §2013 material), but **has no automatic exemption from a STATE or local FOIA**
+  — so protection is real but jurisdiction-dependent, and a utility's own counsel, not a general
+  federal rule, is what actually decides whether a given document may leave the premises.
+- **What this means for the cloud-login proposal, stated as the utility's own reason, not an
+  architect's:** a small utility's IT/legal review is not being asked "is this vendor's encryption
+  good enough" — it is being asked to hand a **complete network topology of a system already
+  identified by name in state law as the kind of record whose disclosure could "expose
+  vulnerabilities"** to a volunteer project with no SOC 2, no incident-response contract, no data
+  processing agreement, and no institutional accountability if it is breached or simply disappears.
+  **That is not a close call for a risk-averse public agency, and it is the utility's reason, not
+  ours: they would be creating a NEW disclosure/breach liability where none exists today**, because
+  today the model lives on one employee's machine and is covered by whatever records-retention and
+  device policy already governs that machine — nothing new to defend in an audit. A free, no-login,
+  local-only tool is the one shape that never has to answer this question, because it never holds
+  the fact pattern the exemption law is written about.
+- **The honest scale caveat, so this is not overstated:** the sensitivity above scales with what the
+  file actually shows. A subdivision-scale Elm Street Center model (a hydrant, three homes) is not
+  the fact pattern any FOIA exemption was written for; a whole-system master-plan model with every
+  valve and main is closer to it. **This project's stated mission scope (300 km span,
+  `CLAUDE.md`, OBSERVED) sits on the side of the line where the concern is real for at least the
+  larger end of its own declared audience**, so the caveat does not make the concern go away, it
+  just says it is not uniform across every file this suite will ever hold.
+- **Ranking Task 537's no-server shapes from this seat, honestly, and what I would refuse.** (1) **A
+  file via the phone's own share sheet** — ranks highest: it is exactly the CAD/GIS deliverable
+  pattern utilities already run today under their existing device and records policy, adds no new
+  risk surface, and needs nothing built beyond what a browser's native share/save already does.
+  (2) **A read-only export** — close second, and arguably the RIGHT default for this specific
+  seat: "only the user touches a file's numbers" (`CLAUDE.md`, OBSERVED) already treats an imported
+  file as untouchable by us, and an operator who can view but not corrupt the designer's live
+  numbers is a smaller failure mode than handing over an editable project. (3) **A URL carrying a
+  small model** — ranked third, with a real caveat named rather than glossed: a URL is copyable,
+  gets cached in browser/SMS history, and can sync to a personal cloud account (iCloud/Google) the
+  utility never vetted — fine for a subdivision-scale extract, a live version of the same exposure
+  named above for a full system. (4) **A one-way "publish from the desk to a link"** — the one I
+  would flag hardest, and the one to watch for scope creep: it is fine ONLY if "the link" points at
+  storage the UTILITY already controls (their own intranet, their own file share); the moment
+  "publish" implies a link WE host, it has quietly become the cloud-login proposal in a smaller
+  costume, and Task 537's own instruction — say what happens to "nothing you draw is uploaded" as
+  the first paragraph — would apply to it exactly as it would to logins. **I would refuse that
+  version outright**, for the same reason as logins: it is this project, not the utility, deciding
+  to hold the utility's sensitive record.
+
+---
+
 ## 2026-08-25 — correction: coefficient availability is not a demand criterion; wish list re-ranked
 
 **CITED — Tom, replying point-by-point to the prior wish-list pass:** *"Lack of coefficients is not
