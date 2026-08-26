@@ -137,23 +137,6 @@ the block.
     map's own 1/cos(latitude) — 9% from 20° to 31°. Unavoidable on an unprojected display without an
     anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.
 
-- 100|513| **Sprint 459's leftovers: two named strings nobody here can read.**
-  The three jobs this task carried are done (2026-08-25). The glossary write-back was done from the
-  SHIPPED STRINGS, not from the lost transcript — `dev/scripts/glossary_rendering_census.php` counts
-  which rendering each language really uses and how often, and its findings are written into the
-  `translation_notes` of flow, head, emitter, slope, ponding, elevation, link, tank and valve.
-  `mode_name_check.php` went from 21 findings to 1. What is left needs a reader of the script:
-  - **`ar` calls the lat/lon mode `جغرافي` ("geographic"), which is not a pair at all.** Its
-    `lpn_georef_asdeg_btn` now names latitude first, but it names the PAIR while every other `ar`
-    string names the mode, so the two still disagree. Resolving it means choosing an Arabic mode
-    name, which is a translation decision, not an ordering one.
-  - **`zh` renders the pair `经纬度`, longitude-first, and that is the lexicalized compound.**
-    `纬经度` is not Chinese. Either the compound stands as an exception or zh gets a different
-    phrasing; a non-reader must not choose.
-  - **THERE ARE TWO `ponding` ENTRIES IN `glossary.json` (ids 34 and 46)** and the strings say
-    entry 46 is the one in use — 15 languages ship its rendering, entry 34's appears 0 or 1 times in
-    20 of 26 files. Merging them is a glossary-structure call and is left for a human.
-
 - 100|530| **Available fire flow at a hydrant, with the hydrant assembly modelled.**
   Promoted from the `utility-planning-engineer`'s own wish list (Tom, 2026-08-25). *How much can
   this hydrant deliver while a critical node holds >= 20 psi?* Flow and pressure trade, so it is a
