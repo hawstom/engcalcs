@@ -2475,6 +2475,16 @@ html:has(#lpn_canvas) { overflow: hidden; }
 	border: 1px solid #bbb; border-radius: 3px; background: #f6f6f6; cursor: pointer;
 }
 .lpn-profile-edit:hover, .lpn-profile-edit:focus { background: #eaeaea; border-color: #888; }
+/* **PRESSED MEANS THE PATH IS IN EDIT MODE** (Task 509) -- the drawing is now carrying handles, and
+   a mode whose only evidence is on the map is a mode somebody gets stuck in. The toolbar's own
+   pressed colours, not a new pair, because it is the same fact wearing the same clothes. */
+.lpn-profile-edit[aria-pressed="true"] { background: #cfe3f7; border-color: #6aa6d8; }
+/* The grab handles themselves. A SOLID dot is a stop the reader chose -- drag it to move it, click
+   it to take it off; a HOLLOW one is a node the route merely passes through, and dragging it makes
+   it a stop. Told apart by fill rather than by hue, so the distinction survives a colour-blind
+   reader and a grey print. Sized in the drawing's own units by the code, which is why nothing here
+   sets a radius. */
+.lpn-profile-handle { pointer-events: none; }
 /* A waypoint, and the Remove-all beside it. Each chip removes ITSELF -- the × is part of the label
    rather than a second control inside the chip, so the whole chip is the target a hand can hit. */
 .lpn-profile-chip {
@@ -2484,13 +2494,35 @@ html:has(#lpn_canvas) { overflow: hidden; }
 .lpn-profile-chip:hover, .lpn-profile-chip:focus { background: #eaeaea; border-color: #888; }
 /* ---- The saved-path menu on the Profile tab (Task 510) ---------------------------------------
    An arrow ON the tab, not a second tab and not a toolbar button: Tom's placement, 2026-08-24, and
-   it puts the list of names where the thing they name already lives. Flat and narrow, so the tab
-   still reads as one tab with a marker on it rather than as two controls jammed together. */
+   it puts the list of names where the thing they name already lives.
+
+   **IT IS THE PROJECT TAB'S CARET, NOT A THIRD TREATMENT** (Tom, 2026-08-25: *"The saved paths
+   arrow is not designed right. It should be similar to the Project arrow and the Google Sheets tab
+   arrow. It's too small and non-conforming to be discoverable."*). The first cut was .8em type in
+   5px of padding, pulled 8px back INTO the tab's own padding -- a 17px mark that read as part of
+   the word rather than as a control. .lpn-tab-caret above is this page's existing answer to
+   exactly this problem on the project tabs, and it is the spreadsheet arrow Tom named, so the
+   numbers here are its numbers: full type, the tab's own vertical padding, and a hairline rule
+   separating it from the word instead of an overlap.
+
+   **AND IT IS A TOUCH TARGET, which on THIS page needs saying.** The drawing surface is designed
+   for a pointer and a 44px rule has no standing there; this is chrome, and a phone user has to hit
+   it -- so the width floor rises to 44px below 40rem while the tabs beside it are giving padding
+   up. It grows sideways rather than downward on purpose: the strip sits above a chart that has the
+   least height to spare on a phone (Task 527), and a taller row would be paid for out of that. */
 .lpn-pane-tab-menu {
-	background: none; border: 1px solid transparent; border-bottom: 0; font: inherit;
-	font-size: .8em; padding: 3px 5px; margin-inline-start: -8px; cursor: pointer; color: #333;
+	background: none; border: 1px solid transparent; border-bottom: 0;
+	border-inline-start: 1px solid #ccc; font: inherit;
+	padding: 3px 8px; margin-inline-start: -2px; min-width: 2rem;
+	cursor: pointer; color: #333;
 }
-.lpn-pane-tab-menu:hover { background: #f2f2f2; }
+.lpn-pane-tab-menu:hover, .lpn-pane-tab-menu:focus { background: #ddd; }
+/* Joined to the tab it belongs to, the way .lpn-tab-caret is joined to .lpn-tab-current: one
+   selected tab carrying a caret, not a selected tab beside an unselected button. */
+.lpn-pane-tab-menu-current { background: #fff; border-color: #bbb; border-inline-start-color: #ccc; }
+@media (max-width: 40rem) {
+	.lpn-pane-tab-menu { min-width: 2.75rem; padding: 3px 12px; }
+}
 @media (max-width: 40rem) {
 	/* The stacked layout already scrolls the panel; the header row must not also become a column
 	   of four lines on a phone, where the chart has the least height to spare. */

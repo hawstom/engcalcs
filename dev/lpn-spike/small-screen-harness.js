@@ -840,6 +840,20 @@ console.log('\n--- a box on a short screen, and the pane tables (Tom\'s items 5 
 		winning(RULES, cell, WIDE, DOC_IDS, false, 'width') === 'var(--lpn-pane-col-w, 7em)',
 		'got ' + winning(RULES, cell, WIDE, DOC_IDS, false, 'width'));
 
+	// **THE SAVED-PATHS ARROW IS A TOUCH TARGET, and this is the one place on this page where that
+	// is a legitimate argument** (Task 510). Tom, 2026-08-25: *"It's too small and non-conforming
+	// to be discoverable."* The drawing surface is designed for a pointer and a 44px rule has no
+	// standing there; the tab strip is CHROME, and a phone user has to hit this. It grows SIDEWAYS
+	// rather than downward, because the strip sits above a chart with the least height to spare.
+	const paneCaret = node('button', 'lpn_pane_tab_menu_profile', ['lpn-pane-tab-menu'],
+		node('div', 'lpn_pane_tabs', ['lpn-pane-tabs'], node('div', 'lpn_pane', [], body)));
+	ok('the saved-paths arrow is at least 44px wide on a phone',
+		winning(RULES, paneCaret, SMALL, DOC_IDS, false, 'min-width') === '2.75rem',
+		'got ' + winning(RULES, paneCaret, SMALL, DOC_IDS, false, 'min-width'));
+	ok('...and keeps a floor of its own on the desktop, rather than shrinking to the glyph',
+		winning(RULES, paneCaret, WIDE, DOC_IDS, false, 'min-width') === '2rem',
+		'got ' + winning(RULES, paneCaret, WIDE, DOC_IDS, false, 'min-width'));
+
 	// **AND THE ROUGHNESS HEADING KEEPS ITS WORD** (ROADMAP Task 527). Tom, 2026-08-25, read
 	// "Roughnes/s, C" on a phone. `overflow-wrap: anywhere` is what lets a column be narrower than
 	// its own longest word, and "Roughness," measures 94.4px against the 66 that round 3's 5em

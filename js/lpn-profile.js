@@ -112,6 +112,11 @@ EngCalcs.lpnProfile = (function () {
 		return { nodes: nodes, links: links, length: dist[toId] };
 	}
 
+	// A blank stop is not a stop, and a stop repeated back to back is one stop. Its own function
+	// because pathHandles() indexes into the CLEANED list and would be off by every blank otherwise.
+	function cleanStops(stops) {
+		return (stops || []).filter(function (s, k, all) { return s !== undefined && s !== null && s !== '' && s !== all[k - 1]; });
+	}
 	// The whole of path EDITING: a list of stops, each leg the shortest path between consecutive
 	// ones. That is Google Directions' own gesture — drop a waypoint and the route bends through it
 	// — and it is deliberately not a path-editing language. Two stops is the suggested path; more
@@ -121,7 +126,7 @@ EngCalcs.lpnProfile = (function () {
 	// waypoints given, and hiding it would misreport the route. Consecutive duplicate stops collapse.
 	function pathThrough(graph, stops) {
 		var out = { nodes: [], links: [], length: 0 }, i, leg;
-		stops = (stops || []).filter(function (s, k, all) { return s !== undefined && s !== null && s !== '' && s !== all[k - 1]; });
+		stops = cleanStops(stops);
 		if (stops.length === 0) { return null; }
 		if (stops.length === 1) { return graph && graph.adj[stops[0]] ? { nodes: [stops[0]], links: [], length: 0 } : null; }
 		for (i = 0; i + 1 < stops.length; i++) {
@@ -154,6 +159,50 @@ EngCalcs.lpnProfile = (function () {
 			best = stops.slice(0, stops.length - 1).concat([id], [stops[stops.length - 1]]);
 		}
 		return best;
+	}
+
+	// **EVERY NODE ON THE ROUTE IS A HANDLE** (ROADMAP Task 509). Tom, 2026-08-25: *"drag any
+	// waypoint or not-yet-waypoint on the path including the start and end."* That is one gesture
+	// for two operations, and this function is the whole of what makes them one: it labels each
+	// node of the resolved route with the STOP it is, or with -1 and the LEG it lies on when it is
+	// merely passed through. Drag a labelled one and its stop is replaced; drag a -1 and a stop is
+	// inserted after the stop that begins its leg -- so "move a waypoint" and "add a waypoint" are
+	// the same drag, decided by a number that is already known before the pointer goes down.
+	//
+	// **THE LEG, NOT insertStop()'s LEAST-ADDED-LENGTH.** A node clicked out of nowhere has no
+	// position on the route and has to be given one; a node the user GRABBED has one already, and
+	// re-deriving it by trial insertion could put the new stop on a different leg from the one under
+	// the hand. insertStop() stays exactly as it is, for the gesture that really has no position.
+	//
+	// Returns { stops, handles } -- `stops` is the CLEANED list the handle indices are indices into,
+	// because a caller that indexed the raw list would be off by every blank and every repeat.
+	// Handles are in route order, and a node the route visits twice appears twice; the caller
+	// resolving a pointer to a handle prefers a stop over a pass-through, since a doubled-back route
+	// whose fold IS a waypoint must let go of the waypoint rather than of the fold.
+	function pathHandles(graph, stops) {
+		var clean = cleanStops(stops), out = [], i, j, leg, last;
+		if (!clean.length) { return { stops: clean, handles: [] }; }
+		if (clean.length === 1) {
+			return {
+				stops: clean,
+				handles: (graph && graph.adj[clean[0]]) ? [{ node: clean[0], stop: 0, leg: 0 }] : []
+			};
+		}
+		for (i = 0; i + 1 < clean.length; i++) {
+			leg = shortestPath(graph, clean[i], clean[i + 1]);
+			// One unroutable leg makes every later handle's leg number a lie, so there are no
+			// handles at all rather than a plausible-looking partial set.
+			if (!leg) { return { stops: clean, handles: [] }; }
+			last = leg.nodes.length - 1;
+			for (j = (i === 0 ? 0 : 1); j <= last; j++) {
+				out.push({
+					node: leg.nodes[j],
+					stop: j === 0 ? i : (j === last ? i + 1 : -1),
+					leg: i
+				});
+			}
+		}
+		return { stops: clean, handles: out };
 	}
 
 	// ---- the series -------------------------------------------------------
@@ -411,6 +460,7 @@ EngCalcs.lpnProfile = (function () {
 		buildGraph: buildGraph,
 		shortestPath: shortestPath,
 		pathThrough: pathThrough,
+		pathHandles: pathHandles,
 		insertStop: insertStop,
 		profileSeries: profileSeries,
 		niceStep: niceStep,

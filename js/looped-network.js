@@ -8045,6 +8045,9 @@ var EngCalcs = EngCalcs || {};
 		// belonging to something nobody can see.
 		hide: function () {
 			profileShown = false; profileHover = false;
+			// EDIT MODE GOES WITH IT for the same reason the box does: handles on a route nobody
+			// can see are a gesture armed behind a closed panel.
+			profileState.editing = false; profileState.editDrag = null;
 			// AND THE EDIT BOX GOES WITH IT (Task 509): it edits the path this tab draws, and left
 			// standing over a closed panel it would be a control for something nobody can see.
 			closeProfileEditPopup();
@@ -8164,6 +8167,11 @@ var EngCalcs = EngCalcs || {};
 			if (panel) { panel.classList.toggle('on', on); }
 			tab = document.getElementById('lpn_pane_tab_' + t.id);
 			if (tab) { tab.setAttribute('aria-selected', on ? 'true' : 'false'); }
+			// A tab's menu caret wears the tab's own selected state, so the two read as ONE tab
+			// with an arrow on it rather than as a tab beside a button (Task 510, Tom's
+			// "non-conforming"). Same relationship .lpn-tab-caret has to .lpn-tab-current.
+			tab = document.getElementById('lpn_pane_tab_menu_' + t.id);
+			if (tab && tab.classList) { tab.classList.toggle('lpn-pane-tab-menu-current', on); }
 		});
 		btn = document.getElementById('lpn_pane_btn');
 		if (btn) { btn.setAttribute('aria-pressed', paneState.open ? 'true' : 'false'); }
@@ -9661,7 +9669,11 @@ var EngCalcs = EngCalcs || {};
 	// gesture started, so Escape can put it back.
 	// `activeId` names the SAVED path on show (Task 510), or is empty for a path that has only
 	// been drawn. It is not in the file: see the saved-path note below for why.
-	var profileState = { from: '', to: '', waypoints: [], draw: null, activeId: '' };
+	// `editing` is EDIT MODE (Task 509): the path itself is the interface, every node on it is a
+	// handle, and `editDrag` is the one being dragged right now. Both are facts about the panel, not
+	// about the document -- nothing here is saved, and nothing here needs an undo snapshot, because
+	// a path is a list of stops the reader chose and not a thing in the drawing.
+	var profileState = { from: '', to: '', waypoints: [], draw: null, activeId: '', editing: false, editDrag: null };
 	function profileIsOpen() { return paneIsOpen() && paneState.tab === 'profile'; }
 
 	// ---- THE ROUTE, ON THE MAP (ROADMAP Task 433) -----------------------------------------------
@@ -9718,7 +9730,7 @@ var EngCalcs = EngCalcs || {};
 		// 2026-08-24) marks the route only while the reader is thinking about it; somebody with the
 		// box open is doing nothing else, and the box sits OVER the map, so a pointer inside it can
 		// never be inside the panel that the hover listener is on.
-		if (!profileHover && !choosing && !profileEditIsOpen()) { return; }
+		if (!profileHover && !choosing && !profileEditIsOpen() && !profileState.editing) { return; }
 		if ((!path && !choosing) || !world) { return; }
 		var sc = state.s || 1;
 		profilePathLayer = el('g', { 'class': 'lpn-profile-path', 'pointer-events': 'none' });
@@ -9760,6 +9772,23 @@ var EngCalcs = EngCalcs || {};
 				stroke: '#f60', 'stroke-opacity': 0.9, 'stroke-width': 2 / sc
 			}, profilePathLayer);
 		});
+		// **EDIT MODE PUTS A GRAB HANDLE ON EVERY NODE OF THE ROUTE** (Task 509). Two kinds, told
+		// apart by FILL rather than by colour so the distinction survives a colour-blind reader and a
+		// grey print: a solid dot is a stop the user chose and a click will take it off; a hollow one
+		// is a node the route merely passes through, and dragging it makes it a stop. Drawn from the
+		// COMMITTED route, so the handle in the hand keeps its place while a trial route moves under
+		// it.
+		if (profileEditActive()) {
+			profileHandleSet().handles.forEach(function (h) {
+				var hn = nodeById(h.node);
+				if (!hn) { return; }
+				el('circle', {
+					cx: hn.x, cy: hn.y, r: (h.stop >= 0 ? 6 : 4) / sc,
+					fill: h.stop >= 0 ? '#f60' : '#fff', stroke: '#f60', 'stroke-width': 2 / sc,
+					'class': 'lpn-profile-handle'
+				}, profilePathLayer);
+			});
+		}
 		// The node under the pointer wears a dashed ring of its own even when NO route reaches it,
 		// which is the case the reader most needs told apart from "the pointer is over nothing".
 		if (dr && dr.hover && dr.stops.indexOf(dr.hover) < 0) {
@@ -9831,9 +9860,27 @@ var EngCalcs = EngCalcs || {};
 	// **WHILE THE CHOOSER IS RUNNING, THE STOPS ARE THE ONES BEING DRAWN**, and every consumer --
 	// the chart, the map highlight, the rings, the summary -- reads them here. One switch, so the
 	// half-drawn route can never be shown on the map while the chart still draws the old one.
+	// The stops as COMMITTED -- what the from/to/waypoints actually say, with no gesture over them.
+	function profileBaseStops() {
+		return [profileState.from].concat(profileState.waypoints, [profileState.to]);
+	}
+	// The stops as DISPLAYED. A gesture in flight substitutes its own list here and nowhere else,
+	// which is what makes the chart, the map mark and the summary follow a drag live without any of
+	// them knowing a drag exists.
 	function profileStops() {
 		if (profileState.draw) { return profileState.draw.stops.slice(); }
-		return [profileState.from].concat(profileState.waypoints, [profileState.to]);
+		if (profileState.editDrag && profileState.editDrag.trial) { return profileState.editDrag.trial.slice(); }
+		return profileBaseStops();
+	}
+	// The one place from/to/waypoints are written from a stop LIST. Fewer than two stops is not a
+	// path, so it is refused rather than committed as a path with one end.
+	function profileSetStops(stops) {
+		var clean = (stops || []).filter(function (id) { return !!id; });
+		if (clean.length < 2) { return false; }
+		profileState.from = clean[0];
+		profileState.to = clean[clean.length - 1];
+		profileState.waypoints = clean.slice(1, -1);
+		return true;
 	}
 	function profilePath() {
 		var stops = profileStops();
@@ -9941,7 +9988,12 @@ var EngCalcs = EngCalcs || {};
 			btn.textContent = pc.lpn_profile_edit || 'Edit';
 			btn.title = pc.lpn_profile_edit_tip ||
 				'Change one end of the path, or take one node off it, without drawing the whole path again.';
-			btn.addEventListener('click', function () { toggleProfileEditPopup(btn); });
+			// **PRESSED IS A REAL STATE NOW** (Task 509): the button no longer only opens a box, it
+			// puts the PATH in edit mode, and a mode with no visible sign of being on is a mode
+			// people get stuck in. aria-pressed carries it to the accessibility tree and the
+			// stylesheet draws it.
+			btn.setAttribute('aria-pressed', profileState.editing ? 'true' : 'false');
+			btn.addEventListener('click', function () { toggleProfileEdit(btn); });
 			box.appendChild(btn);
 		} else if (profileEditIsOpen()) {
 			// A gesture started while the box was open takes the box with it: it edits the very
@@ -9952,7 +10004,9 @@ var EngCalcs = EngCalcs || {};
 		profileSayEl.id = 'lpn_profile_say';
 		profileSayEl.className = 'lpn-profile-say';
 		box.appendChild(profileSayEl);
-		profileDrawSay(profileState.draw ? (profileState.draw.stops.length ? 'more' : 'start') : 'idle');
+		profileDrawSay(profileState.draw
+			? (profileState.draw.stops.length ? 'more' : 'start')
+			: (profileState.editing ? 'edit' : 'idle'));
 		// Built after init()'s own pass, so the tip needs arming or a tap on it does nothing
 		// (ROADMAP Task 173's gap, the same one the pane tabs hit).
 		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
@@ -9990,10 +10044,9 @@ var EngCalcs = EngCalcs || {};
 		// box is one of the two places that can be true. Closing it withdraws that attention.
 		drawProfilePath(profilePath());
 	}
-	function toggleProfileEditPopup(anchorEl) {
+	function openProfileEditPopup(anchorEl) {
 		var box = profileEditEl(), at, r;
 		if (!box) { return; }
-		if (profileEditIsOpen()) { closeProfileEditPopup(); return; }
 		rebuildProfileEditForm();
 		if (profileEditUserPos) {
 			// Re-clamped rather than restored blindly, for #lpn_find_popup's own reason: the window
@@ -10069,8 +10122,149 @@ var EngCalcs = EngCalcs || {};
 	function wireProfileEditPopup() {
 		var box = profileEditEl(), x = document.getElementById('lpn_profile_edit_close');
 		if (!box) { return; }
-		if (x) { x.addEventListener('click', closeProfileEditPopup); }
+		// The X leaves EDIT MODE, not just the box. One state, one way out of it -- a box that
+		// closed while the path stayed draggable would leave the reader in a mode with no visible
+		// control that turns it off.
+		if (x) { x.addEventListener('click', function () { exitProfileEdit(); }); }
 		makePanelDraggable(box, function (pos) { profileEditUserPos = pos; });
+	}
+	// ---- EDIT MODE: THE PATH ITSELF IS THE INTERFACE (ROADMAP Task 509) --------------------------
+	//
+	// Tom, 2026-08-25: *"The ideal UX would be for pressing the edit button to put the path in Edit
+	// mode so that you can drag any waypoint or not-yet-waypoint on the path including the start and
+	// end. And you can remove any manual waypoint by clicking. Simple UI, maybe not simple
+	// programming."*
+	//
+	// **ONE GESTURE FOR ADD AND FOR MOVE, and that is the whole design.** Every node the route passes
+	// through wears a handle. Drag one that is already a stop and the stop moves; drag one that is
+	// merely ON the route and a stop is BORN there. The user does not have to know which kind they
+	// grabbed, which is why an interface with two operations in it has one gesture in it.
+	// EngCalcs.lpnProfile.pathHandles() is where a node learns which kind it is.
+	//
+	// **THE TWO ENDS ARE HANDLES TOO**, so "change one end of an existing path" -- the operation Task
+	// 506 took away and the box gave back as a pull-down -- is now a drag on the drawing.
+	//
+	// **A CLICK REMOVES A MANUAL WAYPOINT, and only that.** An end is not removable (a path with one
+	// end is not a path, and profileSetStops() refuses it), and a node merely on the route has
+	// nothing to remove. A click on either is consumed and says nothing new, rather than doing
+	// something surprising.
+	//
+	// **WHAT A DRAG THAT LANDS ON NOTHING DOES: NOTHING, OUT LOUD.** A stop IS a node id -- there is
+	// nowhere else on the map for one to be -- so bare canvas has no commit to make. The route
+	// springs back to exactly what it was and the commentary line says why. The two alternatives
+	// were both worse: dropping the stop would make an accidental slip destructive when a click
+	// already removes deliberately, and pinning the stop to the nearest node would commit a stop the
+	// user never aimed at. A drop on a node with NO ROUTE from its neighbours is refused the same
+	// way the chooser refuses one, and names the two nodes.
+	//
+	// **THE BOX AND THE MODE ARE ONE STATE, ENTERED TOGETHER.** The box is not superseded: it is the
+	// discoverable form and the only way through this feature without a pointer, and it lists the
+	// waypoints by name, which the drawing cannot. So the Edit button arms both -- handles on the
+	// map, box over it -- and every change made in either is the same change, because both go through
+	// profileSetStops()/profileEditChanged() and the box is rebuilt from the stops on every one.
+	function profileEditActive() { return !!profileState.editing && profileIsOpen() && !profileState.draw; }
+	function enterProfileEdit(anchorEl) {
+		profileState.editing = true;
+		profileState.editDrag = null;
+		openProfileEditPopup(anchorEl);
+		rebuildProfileForm();
+		renderProfile();
+	}
+	function exitProfileEdit() {
+		if (!profileState.editing) { return false; }
+		profileState.editing = false;
+		profileState.editDrag = null;
+		closeProfileEditPopup();
+		rebuildProfileForm();
+		renderProfile();
+		return true;
+	}
+	function toggleProfileEdit(anchorEl) {
+		if (profileState.editing) { exitProfileEdit(); } else { enterProfileEdit(anchorEl); }
+	}
+	// The handles of the COMMITTED route, never of a trial one: a handle keeps its identity for the
+	// whole of the drag that is moving it, and re-deriving it from the route under the pointer would
+	// make the thing in the user's hand change shape as they moved.
+	function profileHandleSet() {
+		return EngCalcs.lpnProfile.pathHandles(profileGraph(), profileBaseStops());
+	}
+	// The handle under the pointer, with the same pointer slop every other node-picking gesture on
+	// this page uses. **A STOP BEATS A PASS-THROUGH** where a doubled-back route visits one node
+	// twice: the fold is there because the waypoint is, so the waypoint is what the hand gets.
+	function profileHandleAt(cx, cy) {
+		var n = nearestNodeNearScreen(cx, cy, NODE_SNAP_PX), hs, i, passing = null;
+		if (!n || !profileNodeUsable(n)) { return null; }
+		hs = profileHandleSet().handles;
+		for (i = 0; i < hs.length; i++) {
+			if (hs[i].node !== n.id) { continue; }
+			if (hs[i].stop >= 0) { return hs[i]; }
+			if (!passing) { passing = hs[i]; }
+		}
+		return passing;
+	}
+	// What the stop list would be with this handle dropped on `id`. A stop MOVES; a pass-through is
+	// INSERTED after the stop that begins its own leg -- not at insertStop()'s least-added-length
+	// position, because a grabbed node already has a place on the route and re-deriving it could
+	// move the new stop onto a different leg from the one under the hand.
+	function profileHandleStops(h, id) {
+		var stops = profileHandleSet().stops.slice();
+		if (h.stop >= 0) { stops[h.stop] = id; } else { stops.splice(h.leg + 1, 0, id); }
+		return stops;
+	}
+	function profileHandleDown(cx, cy) {
+		var h = profileEditActive() ? profileHandleAt(cx, cy) : null;
+		if (!h) { return null; }
+		profileDrawSay('edit');
+		return { type: 'profilehandle', handle: h, over: h.node, trial: null };
+	}
+	// The drag, at NODE rate rather than at pointer rate: nothing is recomputed until the node under
+	// the pointer actually changes, so sweeping across bare map costs one distance loop and no
+	// Dijkstra -- the same cheapness rule the chooser's hover follows.
+	function profileHandleMove(cx, cy) {
+		var d = profileState.editDrag, id, stops;
+		if (!d) { return; }
+		id = profileDrawNodeAt(cx, cy);
+		if (id === d.over) { return; }
+		d.over = id;
+		if (!id || id === d.handle.node) {
+			d.trial = null;
+			profileDrawSay(id ? 'edit' : 'nowhere');
+		} else {
+			stops = profileHandleStops(d.handle, id);
+			if (EngCalcs.lpnProfile.pathThrough(profileGraph(), stops)) {
+				d.trial = stops;
+				profileDrawSay('edit');
+			} else {
+				d.trial = null;
+				profileDrawSay('blocked', [d.handle.node, id]);
+			}
+		}
+		renderProfile();
+	}
+	// THE DROP. `trial` is null for every landing that could not be committed -- bare map, an
+	// unroutable node, the handle's own node -- so "commit what is shown" and "put back what was
+	// there" are the same line of code and there is no snapshot to keep in step.
+	function profileHandleDrop() {
+		var d = profileState.editDrag;
+		if (!d) { return; }
+		profileState.editDrag = null;
+		if (d.trial) { profileSetStops(d.trial); }
+		profileEditChanged();
+	}
+	// A PRESS THAT DID NOT MOVE. In edit mode every press on the map is consumed, exactly as it is
+	// while the chooser runs: the reader is editing a route, and a property sheet over the drawing
+	// is the opposite of what they asked for.
+	function profileEditTap(cx, cy) {
+		var h = profileHandleAt(cx, cy), stops;
+		if (h && h.stop > 0) {
+			stops = profileHandleSet().stops;
+			if (h.stop < stops.length - 1 && profileSetStops(stops.slice(0, h.stop).concat(stops.slice(h.stop + 1)))) {
+				profileEditChanged();
+				return;
+			}
+		}
+		profileDrawSay('edit');
+		drawProfilePath(profilePath());
 	}
 	// ---- SAVED PATHS (ROADMAP Task 510) ----------------------------------------------------------
 	//
@@ -10288,12 +10482,19 @@ var EngCalcs = EngCalcs || {};
 		if (profileTouch === on) { return; }
 		profileTouch = on;
 		if (profileState.draw) { profileDrawSay(profileState.draw.stops.length ? 'more' : 'start'); }
+		else if (profileState.editing) { profileDrawSay('edit'); }
 	}
 	function profileTookDblclick() {
 		return (Date.now() - profileTouchEnded) < 700;
 	}
 	function profileDrawActive() { return !!profileState.draw && profileIsOpen(); }
 	function profileDrawStart() {
+		// **THE CHOOSER AND EDIT MODE ARE NEVER BOTH ON.** The chooser writes a stop list
+		// profileStops() reads INSTEAD of from/to/waypoints, so a handle dragged while it ran would
+		// edit a route nobody can see. Arming one puts the other away.
+		profileState.editing = false;
+		profileState.editDrag = null;
+		closeProfileEditPopup();
 		profileState.draw = {
 			stops: [],
 			hover: null,
@@ -10313,15 +10514,27 @@ var EngCalcs = EngCalcs || {};
 	// path, and the only place they can find that out.
 	function profileDrawSay(which, detail) {
 		var pc = EngCalcs.pageConfig || {}, d = profileState.draw, txt;
-		if (which === 'idle' || !d) {
+		// **THE EDIT STATES COME FIRST, because they have no `draw` to hang off** (Task 509). Edit
+		// mode is the other thing this line has to be able to explain, and the refusals below are
+		// shared: 'blocked' is the same sentence whether the unroutable node was clicked by the
+		// chooser or dropped by a handle drag.
+		if (which === 'edit') {
+			txt = profileTouch
+				? (pc.lpn_profile_edit_tap ||
+					'Drag any point on the path to move it. Tap a point you added to take it off.')
+				: (pc.lpn_profile_edit_say ||
+					'Drag any point on the path to move it. Click a point you added to take it off.');
+		} else if (which === 'nowhere') {
+			txt = pc.lpn_profile_edit_nowhere || 'A point on the path has to be a node. The path is unchanged.';
+		} else if (which === 'blocked') {
+			txt = (pc.lpn_profile_draw_blocked || 'No route from {a} to {b}. Choose another node.')
+				.replace('{a}', detail[0]).replace('{b}', detail[1]);
+		} else if (which === 'idle' || !d) {
 			txt = pc.lpn_profile_say_idle || 'Press Profile again to choose a new path on the map.';
 		} else if (which === 'start') {
 			txt = profileTouch
 				? (pc.lpn_profile_tap_start || 'Tap the node where the path starts.')
 				: (pc.lpn_profile_draw_start || 'Click the node where the path starts.');
-		} else if (which === 'blocked') {
-			txt = (pc.lpn_profile_draw_blocked || 'No route from {a} to {b}. Choose another node.')
-				.replace('{a}', detail[0]).replace('{b}', detail[1]);
 		} else {
 			txt = profileTouch
 				? (pc.lpn_profile_tap_more ||
@@ -10476,9 +10689,10 @@ var EngCalcs = EngCalcs || {};
 	// for the same reason the Settings box's filter field takes its own Escape first.
 	document.addEventListener('keydown', function (e) {
 		if (e.key !== 'Escape' && e.key !== 'Esc') { return; }
-		if (!profileState.draw) { return; }
-		profileDrawCancel();
-		e.stopPropagation();
+		if (profileState.draw) { profileDrawCancel(); e.stopPropagation(); return; }
+		// Edit mode is the next-innermost thing Escape can cost, and leaving it changes nothing
+		// about the path -- every edit made in it was committed as it was made.
+		if (profileEditActive() && exitProfileEdit()) { e.stopPropagation(); }
 	}, true);
 
 	// ---- the drawing -------------------------------------------------------
@@ -16584,6 +16798,18 @@ var EngCalcs = EngCalcs || {};
 				drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; Object.assign(drag, common);
 				return;
 			}
+			// **AND WHILE THE PATH IS IN EDIT MODE, THE ONLY THING ON THE MAP THAT DRAGS IS A PATH
+			// HANDLE** (Task 509). Same rule and the same reason as the chooser above: a handle sits
+			// exactly on a junction, so without this the gesture that re-routes the path would also
+			// move the pipework. A press that is not on a handle pans, which is how a node off the
+			// edge of the screen is reached.
+			if (profileEditActive()) {
+				var hDrag = profileHandleDown(e.clientX, e.clientY);
+				if (hDrag) { drag = hDrag; profileState.editDrag = drag; }
+				else { drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; }
+				Object.assign(drag, common);
+				return;
+			}
 			// **TOUCHING SOMETHING SELECTS IT, DOWN-STROKE, BEFORE ANY DRAG DECISION** (Task 415),
 			// and touching nothing clears. DOWN, not on the tap: a drag never becomes a tap (it fails
 			// the 4px threshold), so a user who nudged J2 and then pressed Delete would otherwise
@@ -16641,6 +16867,9 @@ var EngCalcs = EngCalcs || {};
 			// full view-span of margin on every side, so a pan shorter than a screen never reaches
 			// a stretch that has not been labelled yet, and a longer one fills in on release.
 			var wasPan = drag && drag.type === 'pan';
+			// **THE PATH HANDLE COMMITS ON RELEASE**, before `drag` is dropped -- it is the one drag
+			// type whose whole result is decided by where the pointer let go (Task 509).
+			if (drag && drag.type === 'profilehandle' && drag.pointerId === e.pointerId) { profileHandleDrop(); }
 			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
 			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
 			if (wasPan && !drag) { relayoutLabels(); }
@@ -16783,6 +17012,12 @@ var EngCalcs = EngCalcs || {};
 				else if (t.classList.contains('lpn-vhandle')) { saveUndoSnapshot(); removeVertex(t.dataset.link, +t.dataset.vidx); }
 				else if (t.dataset.link !== undefined) { deleteElement('link', t.dataset.link); }
 				else if (t.dataset.lbl !== undefined) { deleteElement('label', t.dataset.lbl); }
+			} else if (mode === 'select' && profileEditActive()) {
+				// **EDIT MODE TAKES EVERY PRESS ON THE MAP** (Task 509), exactly as the chooser does
+				// two branches below: a click on a manual waypoint takes it off the path, and every
+				// other press is consumed rather than opening a property sheet over the route the
+				// reader is editing.
+				profileEditTap(e.clientX, e.clientY);
 			} else if (mode === 'select' && profilePickHit(e.clientX, e.clientY, t, tapKind)) {
 				// The profile's path chooser is running and it took this click (Task 433). The
 				// property popup deliberately does NOT also open: the user is drawing a route, and
@@ -16895,6 +17130,10 @@ var EngCalcs = EngCalcs || {};
 		// drawing rather than one element of it, and because nothing below it applies while the model
 		// is locked.
 		if (drag.type === 'georef') { georefApplyDrag(p); return; }
+		// The path handle (Task 509). Early, beside georef, because it edits no element at all -- it
+		// re-routes a reader's path -- so none of the snapshot, label or element machinery below
+		// applies to it.
+		if (drag.type === 'profilehandle') { profileHandleMove(p.x, p.y); return; }
 		// **A LABEL DRAG NEEDS A REAL MOVEMENT BEFORE IT COMMITS.** If the first pixel makes a label
 		// MANUAL for good, a stray jiggle on a crowded label freezes it at wherever the automatic
 		// pass happened to have put it -- the stored offset is `nodeLabelPos()`, the base PLUS the
