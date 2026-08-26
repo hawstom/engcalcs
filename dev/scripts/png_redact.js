@@ -2,6 +2,7 @@
 //
 //   node dev/scripts/png_redact.js crop   in.png out.png X Y W H
 //   node dev/scripts/png_redact.js redact in.png out.png X,Y,W,H [X,Y,W,H ...]
+//   node dev/scripts/png_redact.js scale  in.png out.png W H
 //
 // WHY THIS EXISTS. There is no ImageMagick, no Pillow, no PHP GD and no sharp on this machine, and
 // dev/screenshots/README.md says so. But a PNG is zlib plus five row filters, and node ships zlib,
@@ -98,6 +99,46 @@ function refilter(pix, w, h, bpp) {
 	return out;
 }
 
+// Area-average downscale. A box filter over the exact source rectangle each destination pixel
+// covers -- so it is a true resample, not nearest-neighbour, and a screenshot's one-pixel rules
+// and text stems survive it legibly instead of dropping out at random. Downscale only: enlarging
+// a raster is not something this tool should pretend to do well, so it is refused by name.
+function scale(img, dw, dh) {
+	const bpp = img.bpp;
+	const out = Buffer.alloc(dw * dh * bpp);
+	const sx = img.w / dw, sy = img.h / dh;
+	for (let dy = 0; dy < dh; dy++) {
+		const y0 = Math.floor(dy * sy), y1 = Math.max(y0 + 1, Math.ceil((dy + 1) * sy));
+		for (let dx = 0; dx < dw; dx++) {
+			const x0 = Math.floor(dx * sx), x1 = Math.max(x0 + 1, Math.ceil((dx + 1) * sx));
+			let n = 0; const acc = [0, 0, 0, 0];
+			for (let y = y0; y < Math.min(y1, img.h); y++) {
+				for (let x = x0; x < Math.min(x1, img.w); x++) {
+					const i = (y * img.w + x) * bpp;
+					for (let c = 0; c < bpp; c++) { acc[c] += img.pix[i + c]; }
+					n++;
+				}
+			}
+			const o = (dy * dw + dx) * bpp;
+			for (let c = 0; c < bpp; c++) { out[o + c] = Math.round(acc[c] / n); }
+		}
+	}
+	return { w: dw, h: dh, bpp, colour: img.colour, pix: out };
+}
+
+// An opaque RGBA image is a quarter bigger than it needs to be, and every screen grab is opaque.
+// Dropping a channel that carries no information is not a quality decision, so it is automatic --
+// but only when EVERY pixel is opaque, because a single transparent one makes it a lie.
+function dropOpaqueAlpha(img) {
+	if (img.bpp !== 4) { return img; }
+	for (let i = 3; i < img.pix.length; i += 4) { if (img.pix[i] !== 255) { return img; } }
+	const out = Buffer.alloc(img.w * img.h * 3);
+	for (let p = 0, q = 0; p < img.pix.length; p += 4, q += 3) {
+		out[q] = img.pix[p]; out[q + 1] = img.pix[p + 1]; out[q + 2] = img.pix[p + 2];
+	}
+	return { w: img.w, h: img.h, bpp: 3, colour: 2, pix: out };
+}
+
 function load(file) {
 	const chunks = readChunks(fs.readFileSync(file));
 	const ihdr = chunks.find(c => c.type === 'IHDR');
@@ -132,7 +173,8 @@ function guardOutput(inFile, outFile) {
 const [mode, inFile, outFile, ...rest] = process.argv.slice(2);
 if (!mode || !inFile || !outFile) {
 	console.error('usage:\n  png_redact.js crop   in.png out.png X Y W H\n' +
-		'  png_redact.js redact in.png out.png X,Y,W,H [X,Y,W,H ...]');
+		'  png_redact.js redact in.png out.png X,Y,W,H [X,Y,W,H ...]\n' +
+		'  png_redact.js scale  in.png out.png W H');
 	process.exit(2);
 }
 guardOutput(inFile, outFile);
@@ -150,6 +192,12 @@ if (mode === 'crop') {
 	}
 	save(outFile, out);
 	console.log('cropped ' + cw + 'x' + ch + ' from ' + x + ',' + y + ' -> ' + outFile);
+} else if (mode === 'scale') {
+	const [w, h] = rest.map(Number);
+	if (![w, h].every(Number.isFinite) || w <= 0 || h <= 0) { throw new Error('scale needs W H'); }
+	if (w > img.w || h > img.h) { throw new Error('scale only shrinks; ' + img.w + 'x' + img.h + ' cannot become ' + w + 'x' + h); }
+	save(outFile, dropOpaqueAlpha(scale(img, w, h)));
+	console.log('scaled ' + img.w + 'x' + img.h + ' -> ' + w + 'x' + h + ' -> ' + outFile);
 } else if (mode === 'redact') {
 	let painted = 0;
 	rest.forEach(spec => {

@@ -69,6 +69,63 @@ $ec_canonical = ec_canonical_url($html_lang);
 <?php endforeach; ?>
 	<link rel="alternate" hreflang="x-default" href="<?=htmlspecialchars(ec_canonical_url('en'), ENT_QUOTES, 'UTF-8')?>" />
 <?php unset($ec_alt_lang, $ec_alt_settings); ?>
+<?php
+// SOCIAL SHARE CARDS -- Open Graph, plus the one X/Twitter tag that has no Open Graph equivalent
+// (ROADMAP Task 534). Emitted here for the same reason the canonical block above is: one place,
+// every page, and a new calculator gets it for free. **A person shares a CALCULATOR** -- that is
+// the link that gets pasted -- so this was never a landing-page-only feature.
+//
+// ONE VOCABULARY, NOT ONE PER NETWORK. Facebook, LinkedIn, Slack, WhatsApp, Discord, Signal and
+// iMessage all read og:*. X reads og:title, og:description and og:image too, and falls back to them
+// whenever the twitter:* twin is absent -- so twitter:card is the ONLY twitter tag here, because
+// the card TYPE is the one thing Open Graph cannot express. Duplicating the other three would be
+// three more strings to keep in step with no behaviour to show for it.
+//
+// THREE OF THE FOUR REQUIRED PROPERTIES WERE ALREADY WRITTEN AND ALREADY TRANSLATED, which is why
+// this is plumbing and not a writing project. ogp.me requires og:title, og:type, og:image and
+// og:url. og:title is the <title> this function just built; og:description is the same $html_desc
+// that <meta name="Description"> above uses -- the page's own *_main_desc, deliberately reused
+// rather than given a meta key of its own (CLAUDE.md); og:url is $ec_canonical, so it inherits the
+// host -> origin WHITELIST and is correct on every domain this one checkout serves.
+//
+// A PAGE WITH NO DESCRIPTION EMITS NO og:description, on purpose, and the same four pages are
+// affected as above (index, contact, Compare-Languages, formmailsuccess). A card with a title, a
+// picture and no subtitle is a normal card; a card reading "undefined" is a defect. The tag is
+// simply absent rather than filled with the title, for exactly the Task 150 reason.
+//
+// og:image IS ABSOLUTE and that is not a style choice: a relative og:image is the commonest mistake
+// in this whole vocabulary and every network drops it silently. It also carries NO ?v=filemtime,
+// unlike every other asset in this head. Networks cache a card image hard and key it by URL; `git
+// pull` does not preserve mtimes, so a busted URL would change on every deploy and orphan every
+// card already scraped. The URL is meant to be STABLE. dev/scripts/social_card_check.php is what
+// keeps the file behind it real -- a 404 here is invisible to us, because nobody looks at a share
+// card for their own site.
+//
+// The image is 1200x576, which is the recommended 1200-wide card at this screenshot's own aspect
+// ratio; width and height are declared so a network can lay the card out before it has fetched the
+// picture. og:locale is deliberately absent: it wants a language_TERRITORY pair and this suite
+// carries a bare language code, and the hreflang alternates above already say what languages exist.
+$og_title = trim(strip_tags((string)($calc_name !== '' ? $calc_name . ' — ' . $html_title : $html_title)));
+$og_image = CANONICAL_ORIGIN . '/engcalcs/icons/social-card.png';
+?>
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="<?=htmlspecialchars(strip_tags((string)$ec_lang['menu_brand']), ENT_QUOTES, 'UTF-8')?>" />
+	<meta property="og:title" content="<?=htmlspecialchars($og_title, ENT_QUOTES, 'UTF-8')?>" />
+	<meta property="og:url" content="<?=htmlspecialchars($ec_canonical, ENT_QUOTES, 'UTF-8')?>" />
+<?php if (isset($html_desc) && trim((string)$html_desc) !== '') : ?>
+	<meta property="og:description" content="<?=htmlspecialchars(trim((string)$html_desc), ENT_QUOTES, 'UTF-8')?>" />
+<?php endif; ?>
+	<meta property="og:image" content="<?=htmlspecialchars($og_image, ENT_QUOTES, 'UTF-8')?>" />
+	<meta property="og:image:type" content="image/png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="576" />
+	<?php // English on purpose, and the one string here that is not a language key. It describes a
+	      // picture of an English interface, it is surfaced only by screen readers on X, and adding
+	      // a key for it would be one more cell in a 27-language grid for a sentence nobody reads
+	      // in either language. Named as a follow-up in Task 534 rather than left implicit. ?>
+	<meta property="og:image:alt" content="A water distribution network drawn on a street map and coloured by pressure, with a hydraulic profile in the pane beneath it." />
+	<meta name="twitter:card" content="summary_large_image" />
+<?php unset($og_title, $og_image); ?>
 	<link rel="manifest" href="/engcalcs/manifest.json">
 	<meta name="theme-color" content="#1a6faf">
 	<?php // Both spellings, deliberately. `mobile-web-app-capable` is the standard one and the only
