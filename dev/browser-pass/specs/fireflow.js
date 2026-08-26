@@ -118,8 +118,14 @@ exports.run = async function ({ browser, report }) {
 			m ? m[0] : ans.text.slice(0, 140));
 		const flow = m ? +m[1] : 0;
 		report.ok(flow > 100 && flow < 10000, 'and it is a hydrant-sized number', String(flow));
-		report.has(ans.text, 'belongs to the velocity in the lateral',
-			'**the k states the velocity it is referenced to** (Tom: “critical in the hydrant model”)');
+		// **THE REFERENCE MOVED FROM A SENTENCE INTO THE NAME** (Tom, 2026-08-25). He put the k
+		// immediately after Lateral roughness and renamed it, so the word "Lateral" carries the
+		// reference where a reader cannot skip it — the same move the engine made when `K_BARREL`
+		// became `K_BARREL_AT_LATERAL_V`. The prose sentence it replaced survives for one case only:
+		// a coefficient the user PASTED, which a name cannot cover because only they know what
+		// velocity theirs meant. So this asserts the name, in the report where the number travels.
+		report.has(ans.text, 'Lateral minor (local) loss coefficient',
+			'**the k is named for the velocity it is referenced to** (Tom: “critical in the hydrant model”)');
 		report.has(ans.text, 'ISO credits a single hydrant with at most 1500 gpm',
 			'the ISO credit limit is stated beside the number');
 		report.has(ans.text, 'has not been applied to the number above',

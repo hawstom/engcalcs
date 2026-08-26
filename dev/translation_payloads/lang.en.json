@@ -1302,6 +1302,8 @@
         "lpn_library_control_ok": "✓ Understood",
         "lpn_library_control_bad": "⚠ Not understood",
         "lpn_library_control_missing": "⚠ This network has nothing called {id}",
+        "lpn_field_base_demand": "Base demand",
+        "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
         "lpn_field_demand_pattern": "Demand pattern",
         "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is.",
         "lpn_field_head_pattern": "Head pattern",
@@ -1420,7 +1422,7 @@
         "lpn_ff_err_not_junction": "A hydrant hangs off a junction. {id} is a {type}, which already fixes the water level there, so the answer would be set by that level alone.",
         "lpn_ff_err_unknown": "This did not work out. The reason given is {code}."
     },
-    "count": 1418,
+    "count": 1420,
     "active_prefixes": [
         "about",
         "bpn",

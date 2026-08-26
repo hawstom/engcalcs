@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 1418,
-        "delta_key_count": 87,
+        "expected_key_count": 1420,
+        "delta_key_count": 89,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -471,6 +471,8 @@
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000",
+        "lpn_field_base_demand": "Base demand",
+        "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
         "lpn_terrain_will_ids": "These are the nodes that will be filled in: {ids}",
         "lpn_terrain_keep_ids": "They are: {ids}",
         "lpn_terrain_filled_ids": "These nodes were filled in: {ids}",
@@ -560,6 +562,8 @@
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000",
+        "lpn_field_base_demand": "Base demand",
+        "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
         "lpn_terrain_will_ids": "These are the nodes that will be filled in: {ids}",
         "lpn_terrain_keep_ids": "They are: {ids}",
         "lpn_terrain_filled_ids": "These nodes were filled in: {ids}",
@@ -1051,6 +1055,38 @@
                     "key": "lpn_labels_col_rank",
                     "value": "क्रम",
                     "english": "Rank"
+                }
+            }
+        },
+        "lpn_field_base_demand": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_control_missing",
+                    "value": "⚠ इस नेटवर्क में {id} नाम की कोई चीज़ नहीं है",
+                    "english": "⚠ This network has nothing called {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_field_demand_pattern",
+                    "value": "डिमांड पैटर्न",
+                    "english": "Demand pattern"
+                }
+            }
+        },
+        "lpn_result_demand_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_control_missing",
+                    "value": "⚠ इस नेटवर्क में {id} नाम की कोई चीज़ नहीं है",
+                    "english": "⚠ This network has nothing called {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_field_demand_pattern",
+                    "value": "डिमांड पैटर्न",
+                    "english": "Demand pattern"
                 }
             }
         },
