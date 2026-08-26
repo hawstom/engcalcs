@@ -8,7 +8,15 @@
 > does.* A row whose file is gone is a record of a judgement already made, so nobody re-makes it,
 > and it names what a re-shoot would need to fix.
 >
-> **0049–0060 arrived on 2026-08-25 and are NOT YET INDEXED.** Reading them is the next pass.
+> **0049–0066 arrived on 2026-08-25 — one CALCULATOR page each, which is what nothing else in this
+> drop had.** Tom: *"I dropped in images for every calculator."* They were read and indexed the same
+> day, and they unblocked the per-calculator share cards (the per-page half of Task 534): seventeen of them are now cropped
+> into `icons/cards/`. **They are full-window captures at 1920 wide, so a card is the top-left
+> 1280x672 (or 1440x756 where a longer title needed the room) scaled to 1200x630** — the title, the
+> form and the first results, which is the whole page's identity in one frame. Every one is
+> privacy-clean by the test below: no browser chrome at all, no real project name (the two typed
+> title fields that carry anything read `SECTION C-C` / `NORTH OF HOUSE`, which name no client and
+> no place), no file path, no consent banner.
 
 
 One line per file: what it shows, and whether it could go on a public page. Written by AI from
@@ -157,7 +165,46 @@ Shoot these deliberately rather than at random, and crop to the PAGE, not the wi
 | **The Nominatim consent prompt** | 0011–0014 all have the browser's bookmarks bar and profile picture in frame | Just the dialog and the map. The consent wording is one of the most honest things in the suite and nothing shows it |
 | **"Place the model here permanently?"** | 0021, same browser chrome | The confirm on its own. It is the plainest one-way-door warning we have written |
 | **The Settings box, not covering the menu bar** | 0029 is the best picture of label control, but the box is dragged over the title and tab strip, so the frame stops saying what application it is | Same content, box parked clear of the top chrome |
+| **Twelve calculators, in ENGLISH, on their own defaults** | 0049–0066 gave every calculator a frame, but only three are in English (0062, 0063, 0066), and an English capture is what a calculator's DEFAULT share card has to be — see the calculator table above for the list and the reasoning | The same shot Tom already took in another language: 1920 wide, page region only, English, nothing typed into the printable title, the page on its shipped defaults so no ⚠ is in frame |
 | **Saving to a file** | 0025 shows a real folder listing and a real path | The browser's own permission prompt, over a network, in a folder whose name says nothing about you |
+
+## The calculator frames, 0049–0066
+
+The Publishable column is the same privacy test as above. The **Card** column is what the per-page card pass did
+with the frame — the default card for a calculator is the ENGLISH one, because one picture has to
+serve all 26 other `?lang=` URLs until a matching one exists, and a Chinese card on the English URL
+reads as a mistake rather than as a translation. A non-English frame is therefore filed under its own
+`-<lang>` name, where it is used on that language's URL and nowhere else. **Nothing Tom shot is
+wasted, and nothing is used where it would look wrong.**
+
+| # | Page | Lang | Publishable | Card | Notes |
+|---|---|---|---|---|---|
+| 0049 | Weir-Flow-Simple | zh | **Yes** | `Weir-Flow-Simple-zh.png` | Chinese throughout including the notes and the weir equation. Clean, short page; the whole calculator fits the card |
+| 0050 | Irrigation-Pressure | sw | **Yes** | `Irrigation-Pressure-sw.png` | Swahili. The widest results table in the suite; the card catches the inputs, the results and the ⚠ advice line under them |
+| 0051 | Canal-Seepage | fa | **Yes** | `Canal-Seepage-fa.png` | Persian, and the drop's first RTL calculator frame. Content is right-aligned, so the card is cropped from the RIGHT edge — a left crop of an RTL page is a picture of the margin |
+| 0052 | Weir-Flow-Irregular | my | **Yes** | `Weir-Flow-Irregular-my.png` | Burmese. Its title is the longest in the drop and ran past a 1280 crop, so this card is cropped 1440 wide. The capture is only 563 rows tall and the card is padded with white below, which is invisible because the page ends in white |
+| 0053 | Weir-Flow-Irregular | my | **Yes** | *(none)* | The scrolled REMAINDER of 0052 — the section-point table, the cross-section sketch and the notes, with no title and no navbar anywhere in frame. Privacy-clean, but a card needs the page's identity in it, so this one is not one |
+| 0054 | Weir-Flow-Simple | es | **Yes** | `Weir-Flow-Simple-es.png` | Spanish, an anchor language. Same short page as 0049; also padded below |
+| 0055 | Orifice-Drain-Time | ro | **Yes** | `Orifice-Drain-Time-ro.png` | Romanian, and the conic-volume method's whole result set — seconds, minutes, hours and days — reads on the card |
+| 0056 | Orifice | pt | **Yes** | `Orifice-pt.png` | Portuguese, an anchor language. Shows the free/submerged verdict row |
+| 0057 | Micro-Hydro-Power | am | **Yes** | `Micro-Hydro-Power-am.png` | Amharic, a low-resource-tier language and the only frame we have of one. The gross/net head sketch is just below the card's edge |
+| 0058 | Rock-Chute | tr | **Yes** | `Rock-Chute-tr.png` | Turkish, an anchor language. The Robinson equation-selection row and both range checks read on the card |
+| 0059 | Manning-Irregular | bn | **Yes** | `Manning-Irregular-bn.png` | Bengali. A row-table calculator with all five section points in frame; cropped 1440 wide so the navbar is not cut |
+| 0060 | Manning-Trap | id | **Yes** | `Manning-Trap-id.png` | Indonesian. Carries a ⚠ "Di luar rentang" and a negative rock size, because the capture has `sg` typed as `.001` — a user's experiment, not the shipped defaults. Fine as a picture of the page; a re-shoot on defaults would be a better advert |
+| 0061 | Branched-Network | he | **Yes** | `Branched-Network-he.png` | Hebrew, RTL, cropped from the right like 0051. The pipe table below the form is left-aligned and only partly in frame, which is the one untidy edge in the set |
+| 0062 | Darcy-Weisbach | **en** | **Yes** | `Darcy-Weisbach.png` | One of only three English frames, so one of only three DEFAULT cards. Clean, on the shipped defaults, every check passing |
+| 0063 | Manning-Trap | **en** | **Yes** | `Manning-Trap.png` | English default card. Same `sg = .001` state as 0060, so the same ⚠ and the same negative rock sizes are on the card. Worth re-shooting on defaults |
+| 0064 | Hazen-Williams | uk | **Yes** | `Hazen-Williams-uk.png` | Ukrainian. Cropped 1440 wide so the navbar's Copy-link button is not cut in half |
+| 0065 | Manning-Pipe-Head-Loss | hr | **Yes** | `Manning-Pipe-Head-Loss-hr.png` | Croatian. Clean, complete, nothing to explain away |
+| 0066 | Manning-Pipe-Flow | **en** | **Yes** | `Manning-Pipe-Flow.png` | English default card for the suite's most-used calculator. Two things date it as an advert rather than as evidence: the printable title fields carry `SECTION C-C` / `NORTH OF HOUSE`, and the state is a 6 m pipe with a ⚠ High velocity check. Nothing identifying — but this is the first calculator to re-shoot in English on defaults |
+
+**The calculators still waiting for an ENGLISH frame**, and therefore still showing the suite card
+when their English URL is shared: Weir-Flow-Simple, Weir-Flow-Irregular, Orifice, Orifice-Drain-Time,
+Hazen-Williams, Manning-Pipe-Head-Loss, Manning-Irregular, Branched-Network, Irrigation-Pressure,
+Canal-Seepage, Micro-Hydro-Power, Rock-Chute. Twelve. Each needs one capture of the page in English on
+its own defaults, 1920 wide, no browser chrome — the same shot Tom already took in another language.
+Looped-Network is the thirteenth and is a different job: its card is the suite card, which is already
+an lpn frame.
 
 **The one habit that fixes most of this:** capture the page region, not the browser window. Six of
 the eight unpublishable frames fail for that alone — 0011–0014, 0021, and now 0040 — and nothing on
