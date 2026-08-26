@@ -252,8 +252,16 @@ console.log('\n--- label display, Tables pane, Properties editor ---');
 		colour.join(', '));
 
 	const ls = L.defaultLabelSettings();
-	ok('a new map labels Demand, not Base demand',
-		ls.node.demandActual === true && ls.node.demand === false);
+	// **BASE DEMAND IS THE DEFAULT, AND THAT IS TOM'S REVERSAL OF THIS FILE'S FIRST ANSWER**
+	// (2026-08-26): *"no options, no demand: true. It's just showing Base Demand as user requested
+	// (without sufficient advice) in Settings."* The bug he reported was never the CHOICE of number,
+	// it was the LABEL — a base demand printed under the word "Demand". Relabelled, the old default
+	// is honest, and no existing project's map changes under its owner for a reason they did not ask
+	// for. Demand remains one tick away in the same popover, which is what the two checks above
+	// prove.
+	ok('a new map labels Base demand, and Demand is one tick away',
+		ls.node.demand === true && ls.node.demandActual === false,
+		'demand=' + ls.node.demand + ' demandActual=' + ls.node.demandActual);
 	ok('the new field is numeric, so it gets a decimals and a priority spinner',
 		typeof ls.decimals.node.demandActual === 'number' &&
 		typeof ls.priority.node.demandActual === 'number');
