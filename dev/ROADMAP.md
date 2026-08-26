@@ -47,6 +47,37 @@ the block.
 
 # Tasks
 
+- 100|537| **[H] A phone cannot reach a PC's model, and that may be the field operator's whole blocker.**
+  Tom, 2026-08-25, thinking about the seat he had just hired: *"I don't want to do their job, but it
+  seems to me that the deepest issue against their even beginning to use lpn is file access. The most
+  obvious solution is to institute logins and keep models on the cloud, but this is a huge change in
+  paradigm. Without that, I don't know how a phone user can possibly have access to a PC user's
+  model. As far as I know, this is just a big, hard blocker for the field operator. Maybe somebody
+  can chew on that. Maybe it can be a high-priority planning task."*
+  - **HE IS DESCRIBING A REAL PROPERTY OF THE DESIGN, NOT AN OVERSIGHT.** A project lives in
+    `localStorage` under one browser on one device, and the ONLY ways out are a file the user saves
+    and an `.inp` they export. There is no server, no account, and nothing is uploaded. Every one of
+    those is a deliberate, load-bearing decision — they are why the privacy claim is true, why the
+    suite works offline, and why it costs nothing to run.
+  - **SO THE TENSION IS THE TASK.** *"Nothing you draw is uploaded"* is the sentence the whole public
+    position rests on (`dev/positioning.md`), and an account with models in the cloud contradicts it
+    in one move. **Anybody who proposes cloud storage must say what happens to that sentence** — not
+    as an afterthought, as the first paragraph.
+  - **DO NOT JUMP TO LOGINS.** That is the obvious answer and Tom named it as obvious himself; the
+    question is whether it is the only one. Cheaper shapes exist and each has a real cost to state:
+    a file handed over by whatever the phone already has (a share sheet, a messaging app, a
+    workplace drive); a URL that carries a whole small model, the way `?name=` already carries a
+    calculation; an export the operator READS but cannot edit; a one-way publish from the desk to a
+    link. **Some of those need no server at all**, and one of them may be enough for a person whose
+    job is to read a map rather than draw one.
+  - **THE PRIOR QUESTION IS WHETHER THE OPERATOR EVEN WANTS THE DESIGNER'S MODEL.** Their world may
+    be a work-order system and a separate GIS that nobody has asked us to join — that is exactly the
+    open question their seat was created to answer (`.claude/agents/utility-field-operator.md`).
+    **Answer that before designing anything**, because a sharing mechanism nobody's employer permits
+    is a sharing mechanism nobody uses.
+  - **This is research first and code much later**, which is why it is `[H]` and why it is priority
+    100: it is the kind of question that decides what the next year of this page is for.
+
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
   What that one pass costs, in Chromium on the 480-pipe grid `specs/perf.js` builds: 1.3–7.3 s in
