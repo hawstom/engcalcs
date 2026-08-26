@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 1358,
-        "delta_key_count": 26,
+        "expected_key_count": 1412,
+        "delta_key_count": 80,
         "exempt_key_count": 20,
         "exempt_keys": [
             "calc_units_us",
@@ -464,7 +464,61 @@
         "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
-        "lpn_settings_legend_off": "Off"
+        "lpn_settings_legend_off": "Off",
+        "lpn_ff_menu": "Fire flow at a hydrant…",
+        "lpn_ff_menu_tip": "How much can a hydrant deliver while a chosen point still holds its residual pressure? The hydrant and its lateral are built for the calculation only and never enter your project.",
+        "lpn_ff_title": "Available fire flow at a hydrant",
+        "lpn_ff_intro": "A hydrant, its lateral and their minor losses are added to a copy of this network for this calculation only. Your project is not changed by it.",
+        "lpn_ff_hydrant_node": "Hydrant is on this junction",
+        "lpn_ff_hydrant_node_tip": "A hydrant hangs off a junction of the distribution system. The lateral runs from there to the hydrant.",
+        "lpn_ff_no_junctions": "This project has no junctions yet, so there is nowhere to put a hydrant.",
+        "lpn_ff_lateral_length": "Length of the hydrant lateral",
+        "lpn_ff_lateral_length_tip": "Asked, never assumed. Agency standards run from 25 ft to 100 ft for this one pipe and the answer moves with it, so there is no honest default to offer you.",
+        "lpn_ff_residual": "Residual pressure to hold",
+        "lpn_ff_residual_tip": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
+        "lpn_ff_critical": "Point that must hold the residual",
+        "lpn_ff_critical_outlet": "The hydrant outlet",
+        "lpn_ff_critical_tip": "The hydrant outlet is where AWWA M31 and NFPA 291 define what a hydrant delivers, so it is the usual answer. The hydrant’s own junction is deliberately not offered: it sits upstream of the lateral, so the lateral and the hydrant cannot change the pressure there, and the number would come out larger and would not be an available fire flow.",
+        "lpn_ff_assumptions": "What is assumed about the hydrant and lateral",
+        "lpn_ff_assumptions_intro": "Every number below is our assumption, shown so that you can change it. It is used for this calculation only.",
+        "lpn_ff_lateral_diameter": "Lateral diameter",
+        "lpn_ff_lateral_diameter_tip": "6 in is the usual hydrant lateral, and the usual size of the shoe the hydrant bolts onto.",
+        "lpn_ff_lateral_roughness": "Lateral roughness",
+        "lpn_ff_lateral_roughness_tip": "Cement-lined ductile iron. The defensible band is C = 120 to 140, and this is the middle of it.",
+        "lpn_ff_barrel_diameter": "Hydrant waterway diameter",
+        "lpn_ff_barrel_diameter_tip": "The opening through the hydrant’s own main valve, which AWWA C502 sets at 4 1\/2 or 5 1\/4 inches. This is not the 6 in shoe the hydrant bolts on with, and leaving the narrower waterway out overstates what the hydrant can deliver.",
+        "lpn_ff_barrel_length": "Hydrant waterway length",
+        "lpn_ff_barrel_length_tip": "About a 3 1\/2 ft bury plus the rise to the pumper nozzle. Only friction is read from this length; the larger part of the hydrant’s loss is in the coefficient below.",
+        "lpn_ff_barrel_roughness": "Hydrant waterway roughness",
+        "lpn_ff_barrel_roughness_tip": "The same lining as the lateral. The waterway is a short run of coated iron.",
+        "lpn_ff_k_tip": "The tee off the main, the gate valve, the elbow, the hydrant barrel, its main valve and its nozzle, all together. Zero is not an option here: over a run this short the minor loss is larger than the pipe friction. The reasonable range is 3 to 6.",
+        "lpn_ff_k_reference": "This coefficient belongs to the velocity in the lateral, at a lateral diameter of {diameter}.",
+        "lpn_ff_k_reference_supplied": "Your coefficient will be used at the velocity in the lateral, at a lateral diameter of {diameter}. A coefficient taken from a table that means some other velocity must be restated first: multiply it by its own diameter divided by the lateral diameter, to the fourth power.",
+        "lpn_ff_k_part_awwa": "{value} of it is the AWWA C502 test ceiling — friction through the hydrant may not exceed 3.0 psi at 1000 gpm at the 4 1\/2 in pumper nozzle — which covers the barrel, the main valve and the nozzle. A hydrant that passes that test does at least this well, so the number errs on the safe side.",
+        "lpn_ff_k_part_fittings": "{value} of it is the fittings in the lateral, by Crane TP-410: tee through the branch 1.0, open gate valve 0.15, flanged 90 degree elbow 0.35.",
+        "lpn_ff_calculate": "Work out the fire flow",
+        "lpn_ff_back": "Change something",
+        "lpn_ff_engine_epanet": "This will be worked out with the EPANET engine.",
+        "lpn_ff_engine_native": "This will be worked out with the built-in solver.",
+        "lpn_ff_engine_cost": "The answer is a search, so the whole network is solved about sixteen times over.",
+        "lpn_ff_result_flow": "Available fire flow: {flow}",
+        "lpn_ff_result_at": "That is the flow out of the hydrant outlet while {node} still holds {residual}.",
+        "lpn_ff_result_static": "With the hydrant shut, {node} holds {pressure}.",
+        "lpn_ff_result_solves": "The network was solved {n} times to find it.",
+        "lpn_ff_iso": "ISO credits a single hydrant with at most {limit}. That credit limit has not been applied to the number above.",
+        "lpn_ff_iso_exceeded": "This hydrant works out above that credit limit.",
+        "lpn_ff_used": "What was used",
+        "lpn_ff_source_supplied": "you gave this",
+        "lpn_ff_source_default": "assumed",
+        "lpn_ff_err_length": "How long is the hydrant lateral? There is no honest default: agency standards run from 25 ft to 100 ft for this one pipe and the answer moves with it. Give a length and ask again.",
+        "lpn_ff_err_at_rest": "There is no available fire flow here, and that is not the same as an answer of zero. Available fire flow is the flow at which the chosen point still holds the residual pressure. With the hydrant shut, {node} is already below it, at {pressure}, so no flow can satisfy that at all. This network fails the test before the hydrant is opened.",
+        "lpn_ff_err_ceiling": "The residual is still held at {ceiling}, which is past any real hydrant. This network loses almost no head, so there is no fire flow to report here. Look at the network before reading anything into it.",
+        "lpn_ff_err_converge": "The network did not settle at {flow}, so there is no answer to give. That is about the network, not about the hydrant.",
+        "lpn_ff_err_solve": "The network could not be worked out, so there is no fire flow to report.",
+        "lpn_ff_err_no_hydrant": "There is no junction named {id} in this project.",
+        "lpn_ff_err_no_critical": "There is no point named {id} in this project.",
+        "lpn_ff_err_not_junction": "A hydrant hangs off a junction. {id} is a {type}, which already fixes the water level there, so the answer would be set by that level alone.",
+        "lpn_ff_err_unknown": "This did not work out. The reason given is {code}."
     },
     "keys": {
         "lpn_field_text_attached": "Attached to",
@@ -492,7 +546,61 @@
         "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
-        "lpn_settings_legend_off": "Off"
+        "lpn_settings_legend_off": "Off",
+        "lpn_ff_menu": "Fire flow at a hydrant…",
+        "lpn_ff_menu_tip": "How much can a hydrant deliver while a chosen point still holds its residual pressure? The hydrant and its lateral are built for the calculation only and never enter your project.",
+        "lpn_ff_title": "Available fire flow at a hydrant",
+        "lpn_ff_intro": "A hydrant, its lateral and their minor losses are added to a copy of this network for this calculation only. Your project is not changed by it.",
+        "lpn_ff_hydrant_node": "Hydrant is on this junction",
+        "lpn_ff_hydrant_node_tip": "A hydrant hangs off a junction of the distribution system. The lateral runs from there to the hydrant.",
+        "lpn_ff_no_junctions": "This project has no junctions yet, so there is nowhere to put a hydrant.",
+        "lpn_ff_lateral_length": "Length of the hydrant lateral",
+        "lpn_ff_lateral_length_tip": "Asked, never assumed. Agency standards run from 25 ft to 100 ft for this one pipe and the answer moves with it, so there is no honest default to offer you.",
+        "lpn_ff_residual": "Residual pressure to hold",
+        "lpn_ff_residual_tip": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
+        "lpn_ff_critical": "Point that must hold the residual",
+        "lpn_ff_critical_outlet": "The hydrant outlet",
+        "lpn_ff_critical_tip": "The hydrant outlet is where AWWA M31 and NFPA 291 define what a hydrant delivers, so it is the usual answer. The hydrant’s own junction is deliberately not offered: it sits upstream of the lateral, so the lateral and the hydrant cannot change the pressure there, and the number would come out larger and would not be an available fire flow.",
+        "lpn_ff_assumptions": "What is assumed about the hydrant and lateral",
+        "lpn_ff_assumptions_intro": "Every number below is our assumption, shown so that you can change it. It is used for this calculation only.",
+        "lpn_ff_lateral_diameter": "Lateral diameter",
+        "lpn_ff_lateral_diameter_tip": "6 in is the usual hydrant lateral, and the usual size of the shoe the hydrant bolts onto.",
+        "lpn_ff_lateral_roughness": "Lateral roughness",
+        "lpn_ff_lateral_roughness_tip": "Cement-lined ductile iron. The defensible band is C = 120 to 140, and this is the middle of it.",
+        "lpn_ff_barrel_diameter": "Hydrant waterway diameter",
+        "lpn_ff_barrel_diameter_tip": "The opening through the hydrant’s own main valve, which AWWA C502 sets at 4 1\/2 or 5 1\/4 inches. This is not the 6 in shoe the hydrant bolts on with, and leaving the narrower waterway out overstates what the hydrant can deliver.",
+        "lpn_ff_barrel_length": "Hydrant waterway length",
+        "lpn_ff_barrel_length_tip": "About a 3 1\/2 ft bury plus the rise to the pumper nozzle. Only friction is read from this length; the larger part of the hydrant’s loss is in the coefficient below.",
+        "lpn_ff_barrel_roughness": "Hydrant waterway roughness",
+        "lpn_ff_barrel_roughness_tip": "The same lining as the lateral. The waterway is a short run of coated iron.",
+        "lpn_ff_k_tip": "The tee off the main, the gate valve, the elbow, the hydrant barrel, its main valve and its nozzle, all together. Zero is not an option here: over a run this short the minor loss is larger than the pipe friction. The reasonable range is 3 to 6.",
+        "lpn_ff_k_reference": "This coefficient belongs to the velocity in the lateral, at a lateral diameter of {diameter}.",
+        "lpn_ff_k_reference_supplied": "Your coefficient will be used at the velocity in the lateral, at a lateral diameter of {diameter}. A coefficient taken from a table that means some other velocity must be restated first: multiply it by its own diameter divided by the lateral diameter, to the fourth power.",
+        "lpn_ff_k_part_awwa": "{value} of it is the AWWA C502 test ceiling — friction through the hydrant may not exceed 3.0 psi at 1000 gpm at the 4 1\/2 in pumper nozzle — which covers the barrel, the main valve and the nozzle. A hydrant that passes that test does at least this well, so the number errs on the safe side.",
+        "lpn_ff_k_part_fittings": "{value} of it is the fittings in the lateral, by Crane TP-410: tee through the branch 1.0, open gate valve 0.15, flanged 90 degree elbow 0.35.",
+        "lpn_ff_calculate": "Work out the fire flow",
+        "lpn_ff_back": "Change something",
+        "lpn_ff_engine_epanet": "This will be worked out with the EPANET engine.",
+        "lpn_ff_engine_native": "This will be worked out with the built-in solver.",
+        "lpn_ff_engine_cost": "The answer is a search, so the whole network is solved about sixteen times over.",
+        "lpn_ff_result_flow": "Available fire flow: {flow}",
+        "lpn_ff_result_at": "That is the flow out of the hydrant outlet while {node} still holds {residual}.",
+        "lpn_ff_result_static": "With the hydrant shut, {node} holds {pressure}.",
+        "lpn_ff_result_solves": "The network was solved {n} times to find it.",
+        "lpn_ff_iso": "ISO credits a single hydrant with at most {limit}. That credit limit has not been applied to the number above.",
+        "lpn_ff_iso_exceeded": "This hydrant works out above that credit limit.",
+        "lpn_ff_used": "What was used",
+        "lpn_ff_source_supplied": "you gave this",
+        "lpn_ff_source_default": "assumed",
+        "lpn_ff_err_length": "How long is the hydrant lateral? There is no honest default: agency standards run from 25 ft to 100 ft for this one pipe and the answer moves with it. Give a length and ask again.",
+        "lpn_ff_err_at_rest": "There is no available fire flow here, and that is not the same as an answer of zero. Available fire flow is the flow at which the chosen point still holds the residual pressure. With the hydrant shut, {node} is already below it, at {pressure}, so no flow can satisfy that at all. This network fails the test before the hydrant is opened.",
+        "lpn_ff_err_ceiling": "The residual is still held at {ceiling}, which is past any real hydrant. This network loses almost no head, so there is no fire flow to report here. Look at the network before reading anything into it.",
+        "lpn_ff_err_converge": "The network did not settle at {flow}, so there is no answer to give. That is about the network, not about the hydrant.",
+        "lpn_ff_err_solve": "The network could not be worked out, so there is no fire flow to report.",
+        "lpn_ff_err_no_hydrant": "There is no junction named {id} in this project.",
+        "lpn_ff_err_no_critical": "There is no point named {id} in this project.",
+        "lpn_ff_err_not_junction": "A hydrant hangs off a junction. {id} is a {type}, which already fixes the water level there, so the answer would be set by that level alone.",
+        "lpn_ff_err_unknown": "This did not work out. The reason given is {code}."
     },
     "key_context": {
         "lpn_field_text_attached": {
@@ -909,6 +1017,654 @@
                     "value": "Горе вляво",
                     "english": "Top left"
                 }
+            }
+        },
+        "lpn_ff_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_hydrant_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_hydrant_node_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_no_junctions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_lateral_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_lateral_length_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_residual": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_residual_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_critical": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_critical_outlet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_critical_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_assumptions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_assumptions_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_lateral_diameter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_lateral_diameter_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_lateral_roughness": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_lateral_roughness_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_barrel_diameter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_barrel_diameter_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_barrel_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_barrel_length_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_barrel_roughness": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_barrel_roughness_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_k_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_k_reference": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_k_reference_supplied": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_k_part_awwa": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_k_part_fittings": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_calculate": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_back": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_engine_epanet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_engine_native": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_engine_cost": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_result_flow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_result_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_result_static": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_result_solves": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_iso": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_iso_exceeded": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_used": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_source_supplied": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_source_default": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_at_rest": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_ceiling": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_converge": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_solve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_no_hydrant": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_no_critical": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_not_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочка(и) на терена не отговориха.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
             }
         }
     },
