@@ -896,6 +896,47 @@ the block.
 
 
 - 100|468| **Demand categories on a junction — the breakdown the importer already flattens.**
+  - **BUILT 2026-08-26. WHAT IS LEFT IS TOM'S WORDING AND ONE UNVERIFIED THING.** A junction's
+    demands are an ordered list: **row 0 is the junction's own `_demand`/`demandPattern`/
+    `demandCategory` and `extraDemands` is every row after it** — EPANET's own asymmetry, its
+    property sheet showing category 1 as the Base Demand. That is what makes a one-demand junction
+    byte-for-byte the object it always was: no format churn, no new keys, no behaviour change.
+    `resolvedDemand()` iterates and nothing else had to learn anything.
+    - **THE CATEGORY IS A `;comment`, NOT A FOURTH COLUMN**, which is exactly why the old reader
+      never saw one — it stripped comments before splitting. That single fact is the whole import bug.
+    - **NO PER-CATEGORY OVERRIDE, and the reason is the seam:** an override is keyed by element and
+      PROPERTY NAME, and a category has no name, only a POSITION — which moves when a row above it
+      is deleted. A scenario overriding "row 2" would silently follow whatever later occupied the
+      slot. That is `dev/scenario-seam-repair.md`'s failure with a subscript instead of a field.
+      A scenario asks its question of row 0 through `setProp()`, as it always has.
+    - **Base demand now means the SUM of the rows' bases** in the label, the colour ramp and the
+      Tables column. Showing one category's base under "Base demand" beside a Demand that summed
+      them all would rebuild the exact disagreement Tom reported. The popup's editable field still
+      edits row 0, as EPANET's does. No reorder control: the totals are additive and nothing reads
+      the order, so arrows would be four more tap targets to permute a sum.
+    - **ONE DELIBERATE NON-IDENTITY:** the `[JUNCTIONS]` demand column of a junction that also has
+      `[DEMANDS]` rows is not written back, because EPANET DISCARDS that number — carrying it would
+      write a value the engine ignores into a column claiming to be the demand. The `[DEMANDS]` rows
+      themselves are byte-identical. Asserted as intentional in the harness.
+    - **Guarded by `dev/lpn-spike/demand-category-harness.js`** against an authored fixture
+      (`reference/multi-category.inp`: three categories across two patterns, one with a category and
+      NO pattern, an itemized single, an ordinary junction that must not change, and a junction whose
+      `[JUNCTIONS]` demand EPANET discards; number texts `50.0`, `12.50`, `0.750` so a writer that
+      formats rather than remembers is caught). It asserts import → resolve → export → re-import,
+      14 demand tokens byte-identical, **and the vendored EPANET engine reading the same file the
+      same way** — which is what settles what the FORMAT means rather than what our code does.
+    - **[H] FIVE NEW ENGLISH STRINGS AWAIT TOM'S WORDING** (in `lang.ec.en.php` only, so the
+      untranslated state is correct): `lpn_field_demand_category` *Category*;
+      `lpn_field_demand_category_tip` *Name or description of the user or users using this
+      pattern.*; `lpn_demand_add` *Add demand category*; `lpn_demand_add_tip` *Add another demand at
+      this junction, with its own base demand, pattern and category. The demands add up.*;
+      `lpn_demand_remove` *Remove this demand*.
+    - **[H] AND ONE ALREADY-TRANSLATED STRING IS NOW IMPRECISE:** `lpn_result_demand_tip` still says
+      "the base demand multiplied by its pattern", which is wrong for a multi-category junction.
+      **Rewording costs 26 retranslations, so it is Tom's call, not an AI's.**
+    - **NOT VERIFIED: no browser pass.** The popup table's 640 px behaviour is by construction
+      (narrow boxes, `overflow-x: auto`); `small-screen-harness.js` does not cover popups, so
+      nothing asserts it. That is the one honest gap.
   - **PROMOTED TO 100 BY TOM, 2026-08-26, because it is presenting as a bug:** *"Since it's
     presenting as a bug, we better promote it to 100. I verified that it's solely a presentation
     problem. We are tracking and presenting Base Demand, but calculating based on Categories and

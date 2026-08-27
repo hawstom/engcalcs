@@ -1338,6 +1338,11 @@
         "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
         "lpn_field_demand_pattern": "Demand pattern",
         "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is.",
+        "lpn_field_demand_category": "Category",
+        "lpn_field_demand_category_tip": "Name or description of the user or users using this pattern.",
+        "lpn_demand_add": "Add demand category",
+        "lpn_demand_add_tip": "Add another demand at this junction, with its own base demand, pattern and category. The demands add up.",
+        "lpn_demand_remove": "Remove this demand",
         "lpn_field_head_pattern": "Head pattern",
         "lpn_field_head_pattern_tip": "How this reservoir’s water level rises and falls through the run. The head above is multiplied by the pattern.",
         "lpn_field_pump_speed": "Relative speed",
@@ -1399,7 +1404,7 @@
         "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
         "lpn_terrain_ids_more": "{ids}, and {n} more"
     },
-    "count": 1397,
+    "count": 1402,
     "active_prefixes": [
         "about",
         "bpn",

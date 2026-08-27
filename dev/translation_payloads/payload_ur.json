@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 1397,
-        "delta_key_count": 65,
+        "expected_key_count": 1402,
+        "delta_key_count": 70,
         "exempt_key_count": 21,
         "exempt_keys": [
             "u_imgd",
@@ -500,6 +500,11 @@
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_field_base_demand": "Base demand",
         "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
+        "lpn_field_demand_category": "Category",
+        "lpn_field_demand_category_tip": "Name or description of the user or users using this pattern.",
+        "lpn_demand_add": "Add demand category",
+        "lpn_demand_add_tip": "Add another demand at this junction, with its own base demand, pattern and category. The demands add up.",
+        "lpn_demand_remove": "Remove this demand",
         "lpn_terrain_will_ids": "These are the nodes that will be filled in: {ids}",
         "lpn_terrain_keep_ids": "They are: {ids}",
         "lpn_terrain_filled_ids": "These nodes were filled in: {ids}",
@@ -567,6 +572,11 @@
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_field_base_demand": "Base demand",
         "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
+        "lpn_field_demand_category": "Category",
+        "lpn_field_demand_category_tip": "Name or description of the user or users using this pattern.",
+        "lpn_demand_add": "Add demand category",
+        "lpn_demand_add_tip": "Add another demand at this junction, with its own base demand, pattern and category. The demands add up.",
+        "lpn_demand_remove": "Remove this demand",
         "lpn_terrain_will_ids": "These are the nodes that will be filled in: {ids}",
         "lpn_terrain_keep_ids": "They are: {ids}",
         "lpn_terrain_filled_ids": "These nodes were filled in: {ids}",
@@ -1531,6 +1541,86 @@
                     "key": "lpn_field_demand_pattern",
                     "value": "طلب پیٹرن",
                     "english": "Demand pattern"
+                }
+            }
+        },
+        "lpn_field_demand_category": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_demand_pattern_tip",
+                    "value": "رن کے دوران اس جنکشن کی طلب کیسے بلند اور پست ہوتی ہے۔ پراجیکٹ کے اپنے پیٹرن کی پیروی کرنے کے لیے اسے \"کوئی پیٹرن نہیں\" پر چھوڑ دیں۔",
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                },
+                "next_translated": {
+                    "key": "lpn_field_head_pattern",
+                    "value": "ہیڈ پیٹرن",
+                    "english": "Head pattern"
+                }
+            }
+        },
+        "lpn_field_demand_category_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_demand_pattern_tip",
+                    "value": "رن کے دوران اس جنکشن کی طلب کیسے بلند اور پست ہوتی ہے۔ پراجیکٹ کے اپنے پیٹرن کی پیروی کرنے کے لیے اسے \"کوئی پیٹرن نہیں\" پر چھوڑ دیں۔",
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                },
+                "next_translated": {
+                    "key": "lpn_field_head_pattern",
+                    "value": "ہیڈ پیٹرن",
+                    "english": "Head pattern"
+                }
+            }
+        },
+        "lpn_demand_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_demand_pattern_tip",
+                    "value": "رن کے دوران اس جنکشن کی طلب کیسے بلند اور پست ہوتی ہے۔ پراجیکٹ کے اپنے پیٹرن کی پیروی کرنے کے لیے اسے \"کوئی پیٹرن نہیں\" پر چھوڑ دیں۔",
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                },
+                "next_translated": {
+                    "key": "lpn_field_head_pattern",
+                    "value": "ہیڈ پیٹرن",
+                    "english": "Head pattern"
+                }
+            }
+        },
+        "lpn_demand_add_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_demand_pattern_tip",
+                    "value": "رن کے دوران اس جنکشن کی طلب کیسے بلند اور پست ہوتی ہے۔ پراجیکٹ کے اپنے پیٹرن کی پیروی کرنے کے لیے اسے \"کوئی پیٹرن نہیں\" پر چھوڑ دیں۔",
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                },
+                "next_translated": {
+                    "key": "lpn_field_head_pattern",
+                    "value": "ہیڈ پیٹرن",
+                    "english": "Head pattern"
+                }
+            }
+        },
+        "lpn_demand_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_demand_pattern_tip",
+                    "value": "رن کے دوران اس جنکشن کی طلب کیسے بلند اور پست ہوتی ہے۔ پراجیکٹ کے اپنے پیٹرن کی پیروی کرنے کے لیے اسے \"کوئی پیٹرن نہیں\" پر چھوڑ دیں۔",
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                },
+                "next_translated": {
+                    "key": "lpn_field_head_pattern",
+                    "value": "ہیڈ پیٹرن",
+                    "english": "Head pattern"
                 }
             }
         },
