@@ -22497,8 +22497,20 @@ var EngCalcs = EngCalcs || {};
 	// THE '=' IS PART OF THE PREFIX STRING, NOT A SEPARATOR THE PAGE ADDS. The prefix is printed
 	// exactly as typed, hard against the number. The blanket separator is a different thing: it goes
 	// BETWEEN values, not between a prefix and its value.
+	//
+	// **A PREFIX IS A SYMBOL, NOT A STRING TO TRANSLATE.** Q, H, P, Z, V, S, C, n, e are the same
+	// characters in every one of this suite's 27 languages -- they are the hydraulics notation, the
+	// same reasoning that keeps h_f and H_gross out of $ec_lang. So these are bare tokens here and
+	// no lang key exists for them; a user who wants something else types it into the prefix box.
+	//
+	// **BASE DEMAND IS 'Qb=' AND RESOLVED DEMAND IS 'Q='** (Tom, 2026-08-26: "Maybe the labeling
+	// default Before in English can be 'Qb='"). The pair is the point: since the field split on
+	// 2026-08-25 a junction can show BOTH numbers at once -- the one the user typed and that number
+	// after its pattern and demand multiplier -- and before this they were 'Q=' and nothing at all,
+	// so the resolved value printed bare and the two were unreadable side by side. Q is the demand
+	// the network actually draws; the b says base.
 	var LPN_DEFAULT_LABEL_PREFIX = {
-		node: { id: '', demand: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=' },
+		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=' },
 		link: { id: '', diameter: '', length: '', km: 'km=', flow: 'Q=', velocity: 'V=', headloss: 'Hl=', gradient: 'S=' }
 	};
 	// Roughness is the one dynamic default: the symbol IS the friction method (C, n or e), so it
