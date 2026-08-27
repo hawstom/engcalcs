@@ -14,6 +14,132 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-08-26 — Task 530 held to a branch: the emitter question, and whether "model the assembly" is the standard at all
+
+Tom pulled the fire-flow work to branch `fire-flow` pending research, and asked four questions.
+Full findings below, in his stated order of how much they decide.
+
+### Q1 — THE EMITTER QUESTION, from EPANET's own docs, not a forum summary
+
+**CITED**, EPANET 2.2 manual/toolkit (usepa.github.io/EPANET2.2/3_network_model.html;
+epanet22.readthedocs.io mirrors the same text): an emitter's flow is `q = C·p^γ` — genuinely
+**pressure-driven** (γ≈0.5 for a nozzle), and its flow is **ADDITIVE to the junction's normal
+demand**, not a substitute for it — confirmed by the results-field definitions themselves: "Actual
+Demand" at a junction sums normal demand plus emitter flow, and `SumDemand` sums consumer demand +
+emitter flow + leakage (search synthesis of the toolkit's own parameter list; I could not fetch the
+toolkit PDF page directly, flag as secondary-but-consistent across three independent mirrors of the
+same text). **Tom's doubt is correct on the physics**: an emitter cannot represent a fixed fire-flow
+demand, because it is not a demand at all — it is a pressure-dependent orifice. But the same manual
+names **fire-flow analysis explicitly as one of three intended emitter uses** (alongside
+sprinklers/irrigation and leak simulation), via a specific trick: give the junction a very large
+discharge coefficient (documented example: "100 times the maximum flow expected") and raise its
+**elevation** by the target residual head, so the emitter equation returns zero flow exactly at the
+target pressure and effectively unlimited flow above it — the emitter is not modelling a fixed
+demand, it is using its own pressure-sensitivity to let the solver find "how much flow drives this
+node down to exactly 20 psi" in one solve instead of an external bisection loop. **Both things Tom
+suspected can be true at once, and the practitioner literature says so directly**: an OpenEPANET
+forum thread (`openepanet.org/Topic/22362`) has one practitioner asking exactly the emitter question
+and a named respondent (Istvan Lippai, who reappears making the same argument in the `/22142` thread
+Tom found) answering **"Emitters have many good uses but I do not believe that fire flow computation
+is one of them,"** and recommending instead modelling the tee/reducer/valve/nozzle with their own
+minor-loss coefficients — component-by-component, the same shape our branch already took. A second
+practitioner in the same forum (Arnold Strassers, `/22142`) uses a computed emitter coefficient (543
+for a 4½ in nozzle in gpm units) routinely and without caveat. **Read together: the emitter trick is
+real, documented in EPANET's own manual, and used by some practitioners as a fast way to get "flow
+at 20 psi" in one solve — and a second, credentialed voice in the same community explicitly prefers
+modelling the assembly instead, for the same reason our branch already chose it: a component built
+from real fittings is auditable and reusable across hydrants; a fitted emitter coefficient is a
+black box calibrated to one target pressure.** Neither is wrong; they are different products,
+exactly as the task brief guessed. **This project should not present an emitter as "the" way to do
+fire flow — it is a legitimate documented shortcut, contested inside the profession itself, and the
+branch's assembly approach is the more defensible of the two by at least one named practitioner's
+own stated preference**, not merely by nobody-here's rediscovery of component hydraulics.
+
+### Q2 — is raw-node analysis the standard, and does the 20 psi criterion "absorb" the hydrant?
+
+**Partially confirmed, partially not.** **CITED** WaterCAD's own Fire Flow Analysis
+(docs.bentley.com, GUID-C6BF82B2) computes fire flow **"at junction locations"** directly — it does
+not model a hydrant/lateral assembly as a separate element inside that analysis. That is real
+evidence for "raw-node is the market-leading tool's default." But **CITED**, WaterCAD/WaterGEMS's
+own separate Hydrant *element* (docs.bentley.com "Hydrant Attributes"/"Hydrants," found in last
+pass) DOES carry an optional lateral length/diameter/minor-loss toggle — so the same vendor ships
+BOTH a raw-junction fire-flow tool and an optional hydrant-assembly element, and leaves the choice
+to the user with no published default for either. **The "20 psi is a fat factor for the unmodelled
+hydrant" claim does not hold up against what I found.** **CITED**, the sourced rationale for 20 psi
+(National Board of Fire Underwriters origin, carried into NFPA/AWWA) is stated as a
+**backflow/negative-pressure safety margin** — preventing sub-atmospheric pressure that could
+collapse pipe or draw contamination into the main — not as an allowance for unmodelled hydrant
+hardware (industrialmonitordirect.com NFPA/fire-hydraulics summaries; secondary, not the NFPA
+primary text, which I could not reach). I found nothing tying the number itself to hydrant-loss
+absorption; that piece of Gemini's synthesis looks like a plausible-sounding but uncorroborated
+inference, and I say so rather than repeating it. **Independent corroboration of our own K≈5 (3–6
+psi) hydrant-loss number, found by a different route than Task 530's AWWA C502 search:** the same
+OpenEPANET fire-flow thread (`/22083`) has practitioner Charlie Moore stating **"By allowing 5 psi
+loss through the hydrant you are being conservative"** — a working professional's own number lands
+inside the range Task 530 derived independently from AWWA C502 QA specs. That is real, if
+secondary, confirmation the branch's number is in the right neighborhood.
+
+### Q3 — the whole-system output, and is it one analysis or two
+
+**CITED**, WaterCAD's Fire Flow Analysis does BOTH of Tom's questions **in one run, not two**: it
+reports the compliance number (available flow at the target residual) at the tested node/nodes AND
+evaluates side effects — "residual pressure at that node, the Minimum Zone Pressure, and, if
+applicable, the Minimum System Pressure and maximum velocity" — flagging constraint violations
+elsewhere for the user to review, and it runs a baseline no-fire steady state for comparison. **So
+Tom's instinct that these are two questions is right in substance (available/required vs.
+does-it-break-something-else are conceptually distinct checks with distinct pass/fail criteria), but
+the market leader answers both from one solve per tested node**, not two separate analyses/runs —
+worth correcting before this becomes "two analyses" in a design doc. Output shapes, all CITED from
+the same page: a per-junction results tab, a **tabular report** across selected/all nodes, and a
+**colour-coded results-browser map**. That is direct evidence for what a user expects to be handed:
+a table AND a map, not one or the other. **On "required fire flow": CITED**, WaterCAD does not
+supply an ISO/code-derived number automatically — the user types "needed fire flow" per node/zone.
+That matches this project's own standing posture (ask-or-disclose, never invent); a system default
+by land-use or ISO table would be new work with its own citation trail, not something the market
+leader ships for free either.
+
+### Q4 — the time question: which demand condition, and steady vs. extended-period
+
+**CITED**, convergent across an independent forum synthesis (calichi.com; a compiled OpenEPANET
+thread, `/22083`) and general design-standard search results: **US practice adds fire flow to
+maximum-day demand, not average-day (too generous) or peak-hour alone (too pessimistic/unrealistic
+on top of fire)** — a design-standards search phrase converged on the same "max day + fire" framing
+independently of the forum. **CITED**, the same forum thread names real jurisdictional variance:
+Germany uses peak-hour demand at the average day of the year; the Netherlands uses maximum hourly
+demand of the year; one US practitioner (Kevin Williams) runs "max day peak hour" **as an
+extended-period simulation** ("a little conservative, but not unrealistic"), while another treats
+fire flow as inherently a **steady-state check at max day** because "fire events require specific
+control sets... making it more sensible to simulate fire under steady state condition." **My read:
+there is no single settled answer, but max-day-demand-plus-fire is the dominant US convention,
+evaluated as a single steady condition by most sources I found, with EPS-at-max-day-peak-hour as a
+named, acknowledged-conservative alternative some practitioners run.** Tom's question ("don't we
+need to let the user choose the peak hour or time step for an EPS run?") is answered **yes, if fire
+flow is offered against an EPS run at all** — the literature is explicit that fire is loaded onto a
+*specific, user-chosen* demand condition, never "the EPS as a whole." Given `lpn_`'s EPS already
+lets a user scrub to a frame and set a scenario, the natural fit is: fire flow is evaluated at a
+frame the user has navigated to (or a named "max day" scenario), not as its own time-stepped
+simulation.
+
+### Verdict on the branch's premise, asked for directly
+
+**The branch is not built on a false premise, but it is built on the LESS common of two legitimate
+approaches, and Tom's instinct to hold it for a selectable/transparent design was correct.** The
+market-leading paid tool defaults to raw-junction fire flow and treats the hydrant assembly as an
+optional add-on element with no default coefficients of its own — closer to "the fat factor absorbs
+it" in *practice* even though I could not confirm that reasoning in the 20 psi standard's own
+history. Our branch's choice to model the barrel/lateral as real pipe segments is the position
+argued for by name by at least one credentialed practitioner over the emitter shortcut, and it is
+what WaterCAD's own optional Hydrant element also does when a user turns lateral-loss modelling on.
+**Recommendation: ship BOTH postures, and say which one a given result used.** Raw-node (fast,
+matches the market-leading default, defensible under "20 psi already carries margin") should be the
+zero-configuration path; the modelled-assembly path (already built) should be the disclosed,
+selectable upgrade Tom asked for — not the only path, and not silently applied. That also resolves
+Q3's report cleanly: a single fire-flow run per node, reporting compliance AND system-wide side
+effects together (as WaterCAD does), with a visible flag for which hydrant-loss posture produced the
+number.
+
+---
+
 ## 2026-08-25 — Task 537: my half — how a model moves today, and who may legally hold it
 
 Tom split Task 537 across two seats: the field operator answers whether they even want the file;

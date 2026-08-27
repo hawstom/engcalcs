@@ -148,6 +148,18 @@ quick to decline it.** Here is the honest case both ways.
   top of a task that has not landed yet, not a same-day companion to it.
 - **Size:** believed small-to-medium given Task 530 exists first — a loop, a table, and reuse of
   the existing colour-by-value map mechanism (Task 327) rather than new hydraulics. Not designed.
+- **UPDATE 2026-08-26, and it changes the shape of this row, not the rank.** Tom held Task 530 to
+  branch `fire-flow` pending research (journal, 2026-08-26). **CITED**, WaterCAD's own Fire Flow
+  Analysis (docs.bentley.com GUID-C6BF82B2) already does most of what this row asks for, in one
+  pass: it runs at a single node, a selection, or **all nodes**, reports available flow at the
+  target residual AND flags system-wide side effects (other node pressures, max velocity) in the
+  same solve, and outputs both a tabular report and a colour-coded map. That is direct market
+  evidence this row is real and shaped correctly (table + map, one run per node, compliance and
+  side-effect together) — but also that the market leader defaults to **raw-node** fire flow, not
+  a modelled hydrant assembly (full finding: journal, 2026-08-26 Q2). If Task 530 ships with a
+  raw-node option, this row's "run Task 530 N times" plan is unaffected either way — a raw-node
+  bisection is the same loop, just against the junction directly instead of through a modelled
+  lateral.
 
 ### 4. Water quality — split into small, separable pieces, per Tom's instruction
 
