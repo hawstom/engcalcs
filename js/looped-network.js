@@ -7408,24 +7408,30 @@ var EngCalcs = EngCalcs || {};
 	// Searchable, but not colourable -- see findPropDefs(). Read straight off the element through
 	// effective(), in the unit it is stored and displayed in, like everything else here.
 	var FIND_EXTRA_LINK_FIELDS = { length: true, km: true };
-	// ---- DISCONNECTED NODES: three different faults, never one word (ROADMAP Task 540) ----------
+	// ---- DISCONNECTED NODES: TWO POINTS, TWO KINDS OF BREAK (ROADMAP Task 540) ------------------
 	//
-	// **"Disconnected" is not one condition, and a report that blurs them is worthless.**
-	// EngCalcs.lpnDiagnose() walks the network from its fixed heads and returns ONE code,
-	// 'unreachable', for all of them. That is the right answer to "can this be solved?" and the
-	// wrong answer to "what is wrong with this node?", so the walk is done twice here and the
-	// answers are separated:
+	// **TOM'S FRAME, 2026-08-26, AND IT IS THE ONE TO KEEP:** *"I see two points, sources and this
+	// node. And I see either no connection (missing link) or no open connection."* Two points x two
+	// kinds of break is four questions, and adding his original local one makes the menu:
 	//
-	//   'unlinked'  -- nothing meets this node at all. True whatever the statuses are, and the ONLY
-	//                  one of the three that can be answered in a network with no source.
-	//   'closed'    -- the drawing is whole, but every path back to a source runs through a CLOSED
-	//                  link. This is the case lpnDiagnose's message names out loud.
-	//   'nosource'  -- open links the whole way and still no reservoir or tank: a separate piece of
-	//                  network, which is the one that actually stops a solve.
+	//   'no links'                   -- nothing meets this node at all.
+	//   'no open links'              -- links meet it, none of them open.
+	//   'no link to a source'        -- no route to any reservoir or tank even counting CLOSED
+	//                                   links. A separate island; the fix is to build a connection.
+	//   'no open path to a source'   -- no route using OPEN links only. The umbrella: every node
+	//                                   above is one of these, plus the node whose route home exists
+	//                                   and crosses somebody else's closed valve.
 	//
-	// Tested in that order, so they are mutually exclusive, and their union is exactly
-	// lpnDiagnose's 'unreachable' list -- this panel splits that list rather than recomputing it
-	// differently.
+	// **THEY NEST, AND THAT IS DELIBERATE.** 1 is inside 2, 1 and 2 and 3 are inside 4. An earlier
+	// pass made them a PARTITION -- mutually exclusive buckets -- and presented Tom with four cases
+	// he did not recognise. He was right and the partition was the mistake: for a SEARCH, the useful
+	// thing is to pick how wide to cast, not to be handed a taxonomy. So each condition is its own
+	// predicate and they overlap freely.
+	//
+	// **THE FIRST TWO ARE LOCAL AND ALWAYS ANSWERABLE**; the last two need somewhere to walk to. In
+	// a network with no reservoir and no tank, reporting every node as source-less would be true and
+	// useless -- one fault of the network, not N faults of the nodes, and lpnDiagnose() already says
+	// it as 'no-fixed-head'. So only the last two are refused there, and the panel says why.
 	//
 	// **THE MODEL COMES FROM assembleModel(), so this is the SOLVER'S view of the drawing** -- the
 	// active scenario's overrides, its inactive elements and its link statuses, not a second
@@ -7434,7 +7440,7 @@ var EngCalcs = EngCalcs || {};
 	function findConnectionMap() {
 		if (findConnCache) { return findConnCache; }
 		var model = assembleModel(), nodeById2 = {}, fixed = [], adjAll = {}, adjOpen = {},
-			state = {}, seenAll, seenOpen, i, link, n;
+			facts = {}, seenAll, seenOpen, i, link, n;
 		for (i = 0; i < model.nodes.length; i++) {
 			n = model.nodes[i];
 			nodeById2[n.id] = n; adjAll[n.id] = []; adjOpen[n.id] = [];
@@ -7464,51 +7470,84 @@ var EngCalcs = EngCalcs || {};
 		seenAll = reach(adjAll); seenOpen = reach(adjOpen);
 		for (i = 0; i < model.nodes.length; i++) {
 			n = model.nodes[i];
-			if (adjAll[n.id].length === 0) { state[n.id] = 'unlinked'; }
-			// **WITH NO RESERVOIR AND NO TANK, ONLY THE FIRST QUESTION HAS AN ANSWER.** Reporting
-			// every node as source-less would be true and useless -- it is one fault of the
-			// network, not N faults of the nodes, and lpnDiagnose already says it as
-			// 'no-fixed-head'. So the other two go unjudged and the panel says why.
-			else if (!fixed.length) { state[n.id] = 'ok'; }
-			else if (!seenAll[n.id]) { state[n.id] = 'nosource'; }
-			else if (!seenOpen[n.id]) { state[n.id] = 'closed'; }
-			else { state[n.id] = 'ok'; }
+			// A source is never reported as cut off from itself.
+			facts[n.id] = {
+				source: EngCalcs.lpnIsFixedHead(n),
+				links: adjAll[n.id].length,
+				openLinks: adjOpen[n.id].length,
+				reachAll: !!seenAll[n.id],
+				reachOpen: !!seenOpen[n.id]
+			};
 		}
-		findConnCache = { state: state, hasSource: fixed.length > 0 };
+		findConnCache = { facts: facts, hasSource: fixed.length > 0 };
 		return findConnCache;
 	}
-	function findConnStateOf(id) { return findConnectionMap().state[id]; }
+	function findConnFactsOf(id) { return findConnectionMap().facts[id]; }
 	function findPropIsConnection(prop) { return prop === 'connection'; }
-	// The three faults are CONDITIONS, on the same footing as "is greater than" -- the precedent is
-	// Top n and Bottom n above, which are conditions rather than a second box for the same reason:
-	// the panel already asks "which elements?" three ways, and a fourth control would be a fourth
-	// thing to learn. Each needs no Value, and the all-kinds condition first is the report Tom asked
-	// for -- one press, every kind.
+	// **THE FOUR CONDITIONS, IN TOM'S ORDER AND HIS WORDS** (2026-08-26): local first, then the two
+	// that walk to a source, widening as they go. They are conditions on the same footing as "is
+	// greater than" -- the precedent is `highest n`, a condition rather than a second control, for
+	// the same reason: the panel already asks "which elements?" three ways and a fourth box would
+	// be a fourth thing to learn. None of them uses the Value box.
 	//
-	// **"is cut off for any reason" IS TOM'S OWN WORDING** (2026-08-26), replacing "is broken",
-	// which he could not read: *"I don't know what 'is broken' means. Ahh. I just guessed. 'Is cut
-	// off for any reason'. Nice."* The test it passes and the old one failed is that a reader who
-	// has never seen our source can tell what it asks.
+	// The third element is the English spelling the query parser also accepts in every language.
+	//
+	// **THE ORDER IS THE ARGUMENT.** Reading down the list, each row is the one above it plus one
+	// more way to be cut off, which is what makes a nested set legible as a menu.
+	var FIND_CONN_OPS = ['conn-unlinked', 'conn-noopen', 'conn-nolinksource', 'conn-noopensource'];
 	function findConnOpDefs() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			['conn-any', pc.lpn_find_op_conn_any || 'is cut off for any reason', 'is cut off for any reason'],
-			['conn-unlinked', pc.lpn_find_op_conn_unlinked || 'has no links', 'has no links'],
-			['conn-closed', pc.lpn_find_op_conn_closed || 'is behind closed links', 'is behind closed links'],
-			['conn-nosource', pc.lpn_find_op_conn_nosource || 'reaches no source', 'reaches no source']
+			['conn-unlinked', pc.lpn_find_op_conn_unlinked || 'no links', 'no links'],
+			['conn-noopen', pc.lpn_find_op_conn_noopen || 'no open links', 'no open links'],
+			['conn-nolinksource', pc.lpn_find_op_conn_nolinksource || 'no link to a source',
+				'no link to a source'],
+			['conn-noopensource', pc.lpn_find_op_conn_noopensource || 'no open path to a source',
+				'no open path to a source']
 		];
 	}
-	function findConnMatchesOp(op, st) {
-		if (op === 'conn-any') { return st !== 'ok'; }
-		return op === 'conn-' + st;
+	// Do the last two need a reservoir or tank to mean anything? Yes, and the first two do not --
+	// they are facts about this node's own links and are answerable on a half-drawn network.
+	function findConnOpNeedsSource(op) {
+		return op === 'conn-nolinksource' || op === 'conn-noopensource';
 	}
-	// What a result row prints beside the id. Never called for 'ok' -- an element that matched is by
-	// definition one of the three.
+	// **EACH CONDITION IS ITS OWN PREDICATE AND THEY OVERLAP.** A node with no links matches all
+	// four. That is the nesting Tom asked for, and it is why this is not a lookup on one state.
+	// A SOURCE never matches: a reservoir is not cut off from itself, and reporting one would be
+	// noise on every search.
+	function findConnMatchesOp(op, f) {
+		if (!f || f.source) { return false; }
+		// **WITH NOWHERE TO WALK TO, THE TWO SOURCE CONDITIONS MATCH NOTHING RATHER THAN EVERYTHING.**
+		// In a network with no reservoir and no tank, "no open path to a source" is literally true
+		// of every node -- true and useless. It is ONE fault of the network, which lpnDiagnose
+		// already reports as 'no-fixed-head', not N faults of the nodes. The panel says so in a
+		// note; this is where the emptiness comes from.
+		if (findConnOpNeedsSource(op) && !findConnectionMap().hasSource) { return false; }
+		if (op === 'conn-unlinked') { return f.links === 0; }
+		if (op === 'conn-noopen') { return f.openLinks === 0; }
+		if (op === 'conn-nolinksource') { return !f.reachAll; }
+		if (op === 'conn-noopensource') { return !f.reachOpen; }
+		return false;
+	}
+	// The NARROWEST true condition, which is what a result row prints beside the id -- "no links"
+	// says more than "no open path to a source", and both are true of the same node. Returns 'ok'
+	// for a node that is fine, which is what keeps it out of a blank search.
+	function findConnStateOf(id) {
+		var f = findConnFactsOf(id), i;
+		if (!f || f.source) { return 'ok'; }
+		for (i = 0; i < FIND_CONN_OPS.length; i++) {
+			if (findConnMatchesOp(FIND_CONN_OPS[i], f)) { return FIND_CONN_OPS[i]; }
+		}
+		return 'ok';
+	}
 	function findConnLabel(st) {
 		var pc = EngCalcs.pageConfig || {};
-		if (st === 'unlinked') { return pc.lpn_find_conn_unlinked || 'No links'; }
-		if (st === 'closed') { return pc.lpn_find_conn_closed || 'Behind closed links'; }
-		if (st === 'nosource') { return pc.lpn_find_conn_nosource || 'No path to a source'; }
+		if (st === 'conn-unlinked') { return pc.lpn_find_conn_unlinked || 'No links'; }
+		if (st === 'conn-noopen') { return pc.lpn_find_conn_noopen || 'No open links'; }
+		if (st === 'conn-nolinksource') { return pc.lpn_find_conn_nolinksource || 'No link to a source'; }
+		if (st === 'conn-noopensource') {
+			return pc.lpn_find_conn_noopensource || 'No open path to a source';
+		}
 		return '';
 	}
 	function findPropIsText(prop) { return prop === 'id' || prop === 'text' || prop === 'demandCategory'; }
@@ -7620,7 +7659,7 @@ var EngCalcs = EngCalcs || {};
 		if (findPropIsConnection(findState.prop)) {
 			findCandidates().forEach(function (c) {
 				var st = findValueOf(c, 'connection');
-				if (st && findConnMatchesOp(findState.op, st)) { out.push(c); }
+				if (findConnMatchesOp(findState.op, findConnFactsOf(c.el.id))) { out.push(c); }
 			});
 			return findSortMatches(out);
 		}
@@ -8110,6 +8149,15 @@ var EngCalcs = EngCalcs || {};
 		if (ast.t === 'cond') { return findPropIsConnection(ast.prop); }
 		return findAstHasConnection(ast.a) || findAstHasConnection(ast.b);
 	}
+	// Does the typed query ask a question that needs somewhere to walk TO? Only then is the
+	// no-source note true -- a query of nothing but "no links" is answerable on a bare drawing.
+	function findAstNeedsSource(ast) {
+		if (!ast) { return false; }
+		if (ast.t === 'cond') {
+			return findPropIsConnection(ast.prop) && findConnOpNeedsSource(ast.op);
+		}
+		return findAstNeedsSource(ast.a) || findAstNeedsSource(ast.b);
+	}
 	function findKeyOf(c) { return c.group + ':' + c.el.id; }
 	function findUnion(a, b) {
 		var seen = {}, out = [];
@@ -8331,9 +8379,9 @@ var EngCalcs = EngCalcs || {};
 			run = findRunQuery();
 			if (!run.ok) { findResults = []; renderFindResults(run.msg); return; }
 			findResults = run.list;
-			if (findAstHasConnection(findQueryAst) && !findConnectionMap().hasSource) {
+			if (findAstNeedsSource(findQueryAst) && !findConnectionMap().hasSource) {
 				findConnNote = pc.lpn_find_conn_no_fixed ||
-					'This network has no reservoir or tank, so only "has no links" can be answered.';
+					'This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be answered.';
 			}
 			renderFindResults(null);
 			if (findResults.length === 1) { findGoTo(findResults[0].group, findResults[0].el.id); }
@@ -8350,12 +8398,14 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		findResults = findMatches();
-		// **SAY WHEN TWO OF THE THREE QUESTIONS COULD NOT BE ASKED.** A network with no reservoir
-		// and no tank has no source to reach, so "reaches no source" and "is behind closed links"
-		// are unanswerable -- and a silent empty report would read as a clean bill of health.
-		if (findPropIsConnection(findState.prop) && !findConnectionMap().hasSource) {
+		// **SAY WHEN THE QUESTION COULD NOT BE ASKED AT ALL.** A network with no reservoir and no
+		// tank has no source to walk to, so the two source conditions are unanswerable -- and a
+		// silent empty report would read as a clean bill of health. The two LOCAL conditions are
+		// answerable on a half-drawn network and are not warned about.
+		if (findPropIsConnection(findState.prop) && findConnOpNeedsSource(findState.op)
+				&& !findConnectionMap().hasSource) {
 			findConnNote = pc.lpn_find_conn_no_fixed ||
-				'This network has no reservoir or tank, so only "has no links" can be answered.';
+				'This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be answered.';
 		}
 		renderFindResults(null);
 		// ONE HIT GOES STRAIGHT THERE. Typing a node's ID and being shown a list of one, to click,

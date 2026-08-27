@@ -195,6 +195,15 @@ the block.
       decisive engineering question and is therefore open. One named hazard: the emitter's
       discharge coefficient is a GUESSED, INVISIBLE CEILING — a bisection sweep can report "I hit
       my ceiling" and a naive emitter run has no equivalent tell.
+    - **TOM'S DECISION, 2026-08-26: PROCEED WITH BISECTION** — *"(1) We can proceed with
+      bisection."* The emitter trick stays recorded as an option and is not being built.
+    - **AND RAW NODES FIRST, WHICH THE EVIDENCE SUPPORTS.** His reasoning: *"we will be doing
+      something blanket for full-system analysis, and it's not obvious that a blanket hydrant model
+      is better than raw nodes."* **Both inspectable tools do raw nodes** — WaterCAD's default, and
+      OptiWater's `FireFlow` steps demand at the node itself. A blanket assembly model imposes one
+      guessed hydrant on every junction in the system uniformly; getting it wrong is then wrong
+      everywhere at once, and it is not what a reviewer would expect to see. The modelled assembly
+      stays available and OFFERED, which is the transparency he asked for.
     - **THE SIDE-EFFECT ANALYSIS NEEDS NEITHER METHOD.** A single ordinary fixed-demand solve per
       node, at the code-required flow, answers "does drawing this break something else" directly.
       Only the *available vs required* half needs a search at all. (The agent's own inference,
@@ -812,35 +821,26 @@ the block.
   - **"Disconnected" is THREE faults and `lpnDiagnose()` distinguishes none of them** — it returns
     one code, `unreachable`, for all three. The panel splits it into no links / behind a closed link
     / no path to a source, and the harness asserts the three together are exactly `unreachable`.
-  - **[H] Three condition wordings still fail Tom's own test** — can a reader who has never seen our
-    source tell what it asks? `is broken` failed it and is now his wording, *"is cut off for any
-    reason"*. `has no links`, `is behind closed links` and `reaches no source` are unjudged.
-    - **[H] AND TOM READ THE LAST TWO AS THE SAME THING, 2026-08-26:** *"It sounds to me like
-      options (c) and (d) are equivalent."* **In the code they are mutually exclusive; in the
-      words they are not.** `reaches no source` is literally true of a node behind closed links
-      too, so it reads as the umbrella rather than as the sibling — which is `is cut off for any
-      reason`'s job. The two differ by REMEDY, and that is the thing to name:
-      **`is behind closed links` → open a valve** (a whole path of pipe exists);
-      **`reaches no source` → build a connection** (this node is on a separate island).
-      Proposed for the second, awaiting his wording: `is on a separate network`. His call.
-    - **[H] HE IS REORDERING AND REWORDING ALL FOUR, 2026-08-26** — *"I will try to translate the
-      intent to good English. It's confusing because I am also reordering them."* His draft, with
-      the current position in brackets: **(1)** [2] `no links`, **(2)** [3] `no open links`,
-      **(3)** [4] `no link path to a source`, **(4)** [1] `no open path to a source`.
-    - **THAT IS NOT ONLY A RENAME, AND HE MAY NOT HAVE MEANT THE SECOND HALF OF IT.** Two
-      structural consequences to settle before anyone builds it:
-      - **`no open links` is a LOCAL test; `is behind closed links` was a GLOBAL one.** Today a
-        node qualifies when EVERY path back to a source crosses a closed link. "No open links"
-        reads as: none of this node's OWN links is open. A node with one open link to a neighbour
-        that is itself cut off passes the local test and fails the global one.
-      - **THE FOUR STOP BEING A PARTITION AND BECOME NESTED.** Read plainly, 1 ⊆ 2 ⊆ 4 and
-        1 ⊆ 3 ⊆ 4 — four questions of increasing breadth rather than four exclusive buckets. That
-        is arguably the better mental model for a SEARCH, where a user picks how wide to cast.
-        But `find-harness.js` currently asserts the three are exactly `lpnDiagnose`'s `unreachable`
-        with no overlap, and `findConnectionMap()` tests them in order so they cannot overlap. Both
-        would change. **Ask him whether nested-and-overlapping is what he wants**; if it is, the
-        panel's report needs a different shape from its search conditions.
-    Renaming stays cheap: the parser reads the def lists, so a changed word changes what it accepts.
+  - **THE FOUR CONDITIONS ARE SETTLED AND BUILT, 2026-08-26, IN TOM'S WORDS AND HIS ORDER:**
+    `no links`, `no open links`, `no link to a source`, `no open path to a source`.
+    - **HIS FRAME IS THE ONE TO KEEP:** *"I see two points, sources and this node. And I see either
+      no connection (missing link) or no open connection."* Two points x two kinds of break, plus
+      his original local question, is exactly this menu. **They NEST** — each row is the one above
+      plus one more way to be cut off — which is what a searcher wants: pick how wide to cast.
+    - **THE PARTITION WAS THE MISTAKE, AND IT WAS MINE.** The first build made them mutually
+      exclusive buckets and presented him with four cases he did not recognise: *"you are
+      continually presenting four cases that I do not see."* `is behind closed links` also never
+      said behind them RELATIVE TO WHAT. Do not restore either.
+    - **THE FIRST TWO ARE LOCAL AND ANSWER ON A HALF-DRAWN NETWORK** — an improvement the split
+      bought. Only the last two need a reservoir or tank, and with none they match **nothing**
+      rather than everything: source-lessness is one fault of the NETWORK (`lpnDiagnose`'s
+      `no-fixed-head`), not N faults of the nodes. The panel says so.
+    - A result row prints the **narrowest** condition true of that node — "No links" says more than
+      "No open path to a source" and both are true of the same node. The umbrella is still exactly
+      `lpnDiagnose`'s `unreachable`, asserted in `find-harness.js`.
+    - **[H] ONE WORDING TO CHECK:** `no link to a source` breaks the parallel with `no open path to
+      a source`. Read strictly it could mean "not directly linked to a source". His earlier draft
+      said `no link path to a source`, which parallels. His call.
   - **When the typed query outruns the controls, the controls LEAVE**, and one button brings them
     back to the last query they did express. The rejected alternatives were showing the first
     condition of a compound query, and greying the pull-downs out with their stale words still on
@@ -966,8 +966,9 @@ the block.
     - **NET3 HAS NO CATEGORIES TO LOOK AT** — its `[DEMANDS]` section is present and EMPTY, which
       is why none can be found there. `dev/lpn-spike/reference/multi-category.inp` is the file that
       has them.
-    - **[H] FIVE NEW ENGLISH STRINGS AWAIT TOM'S WORDING** — they are in `lib/lang.ec.en.php`
-      at lines 2650-2654, and nowhere else, which is the correct untranslated state: `lpn_field_demand_category` *Category*;
+    - **THE FIVE NEW ENGLISH STRINGS ARE APPROVED** (Tom, 2026-08-26: *"The strings look fine."*),
+      so they are sprint-ready rather than blocking one. They are in `lib/lang.ec.en.php` around
+      lines 2650-2654 and nowhere else, which is the correct untranslated state: `lpn_field_demand_category` *Category*;
       `lpn_field_demand_category_tip` *Name or description of the user or users using this
       pattern.*; `lpn_demand_add` *Add demand category*; `lpn_demand_add_tip` *Add another demand at
       this junction, with its own base demand, pattern and category. The demands add up.*;

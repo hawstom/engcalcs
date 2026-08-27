@@ -444,45 +444,71 @@ function panelLines(box) {
 	const e = L.addNode('junction', 500, 400).id;
 	L.addLink('pipe', d, e);
 	const lone = L.addNode('junction', 600, 600).id;
+	// **F EXISTS TO EXERCISE THE FOURTH CONDITION AS A NARROWEST LABEL.** Without it nothing in this
+	// drawing is cut off ONLY by somebody else's closed valve: c itself has no open link, so it is
+	// caught by the narrower "no open links". f hangs off c on an open pipe, so its own links are
+	// fine, a pipe route home exists, and the closure is the only thing in the way.
+	const f = L.addNode('junction', 350, 60).id;
+	L.addLink('pipe', c, f);
+	// **AND g EXERCISES "no open links" AS A NARROWEST LABEL**, which c cannot once f hangs off it
+	// on an open pipe. g's single link is shut, so its own connection is the fault -- a LOCAL fact,
+	// and the one Tom's original question was about.
+	const g = L.addNode('junction', 100, 120).id;
+	const shut2 = L.addLink('pipe', a, g);
+	L.setProp(shut2, 'status', 'closed');
 	L.buildDom();
 
-	ok('a node nothing meets is reported as having no links',
+	// **THE FOUR NEST** (Tom, 2026-08-26). Each condition is its own predicate; a node matches
+	// every one that is true of it, and the lists below overlap on purpose.
+	ok('"no links" is the node nothing meets',
 		same(L.find('all', 'connection', 'conn-unlinked', ''), ['node:' + lone]),
 		JSON.stringify(L.find('all', 'connection', 'conn-unlinked', '')));
-	// **THE DISTINCTION IS THE WHOLE POINT.** C is joined to the network by a pipe that exists; it
+	// **THE DISTINCTION IS THE WHOLE POINT.** c is joined to the network by a pipe that exists; it
 	// is the CLOSURE that cuts it off. Reporting it as "no links" would send somebody hunting for a
-	// missing pipe that is right there on the map.
-	ok('a node behind a closed link is reported, and separately',
-		same(L.find('all', 'connection', 'conn-closed', ''), ['node:' + c]),
-		JSON.stringify(L.find('all', 'connection', 'conn-closed', '')));
-	ok('an island with open pipes and no source is its own kind again',
-		same(L.find('all', 'connection', 'conn-nosource', ''), ['node:' + d, 'node:' + e]),
-		JSON.stringify(L.find('all', 'connection', 'conn-nosource', '')));
-	ok('"is broken" is all three at once, and nothing else',
-		same(L.find('all', 'connection', 'conn-any', ''),
-			['node:' + c, 'node:' + d, 'node:' + e, 'node:' + lone]),
-		JSON.stringify(L.find('all', 'connection', 'conn-any', '')));
+	// missing pipe that is right there on the map. And "no open links" is LOCAL -- it is about c's
+	// own pipe, not about anything downstream.
+	ok('"no open links" holds the node whose own links are all shut -- and the lone node too',
+		same(L.find('all', 'connection', 'conn-noopen', ''), ['node:' + g, 'node:' + lone]),
+		JSON.stringify(L.find('all', 'connection', 'conn-noopen', '')));
+	ok('"no link to a source" is the island and the lone node, and NOT the node behind the valve',
+		same(L.find('all', 'connection', 'conn-nolinksource', ''),
+			['node:' + d, 'node:' + e, 'node:' + lone]),
+		JSON.stringify(L.find('all', 'connection', 'conn-nolinksource', '')));
+	ok('"no open path to a source" is the umbrella: every one of them',
+		same(L.find('all', 'connection', 'conn-noopensource', ''),
+			['node:' + c, 'node:' + d, 'node:' + e, 'node:' + f, 'node:' + g, 'node:' + lone]),
+		JSON.stringify(L.find('all', 'connection', 'conn-noopensource', '')));
 	ok('...and the fed nodes are in none of them',
-		L.find('all', 'connection', 'conn-any', '').indexOf('node:' + a) < 0 &&
-		L.find('all', 'connection', 'conn-any', '').indexOf('node:' + r) < 0);
-	// The union check: the three kinds together ARE lpnDiagnose's one 'unreachable' list. This is
-	// what keeps the report honest -- a split that drifted from the solver's own walk would report
-	// nodes the solve is happy with, or miss the ones it refuses.
+		L.find('all', 'connection', 'conn-noopensource', '').indexOf('node:' + a) < 0 &&
+		L.find('all', 'connection', 'conn-noopensource', '').indexOf('node:' + r) < 0);
+	// **THE NESTING, ASSERTED RATHER THAN ASSUMED**: 1 inside 2, and 1, 2 and 3 all inside 4.
+	const inside = (small, big) => L.find('all', 'connection', small, '')
+		.every(x => L.find('all', 'connection', big, '').indexOf(x) >= 0);
+	ok('the conditions nest: no links is inside no open links',
+		inside('conn-unlinked', 'conn-noopen'));
+	ok('...and all three are inside no open path to a source',
+		inside('conn-unlinked', 'conn-noopensource') && inside('conn-noopen', 'conn-noopensource') &&
+		inside('conn-nolinksource', 'conn-noopensource'));
+	// The union check: the umbrella IS lpnDiagnose's one 'unreachable' list. This is what keeps the
+	// report honest -- a condition that drifted from the solver's own walk would report nodes the
+	// solve is happy with, or miss the ones it refuses.
 	const unreachable = (L.diagnose().filter(function (i) { return i.code === 'unreachable'; })[0] || { ids: [] }).ids;
-	ok('the three kinds together are exactly what the solver calls unreachable',
-		same(unreachable, [c, d, e, lone]), JSON.stringify(unreachable));
+	ok('the umbrella is exactly what the solver calls unreachable',
+		same(unreachable, [c, d, e, f, g, lone]), JSON.stringify(unreachable));
 	// A pipe has no connection state of its own; a link that goes nowhere is lpnDiagnose's
 	// dangling-link, a fault of the LINK, and is reported elsewhere.
 	ok('the report returns nodes only, whatever the scope says',
-		L.find('all', 'connection', 'conn-any', '').every(function (x) { return x.indexOf('node:') === 0; }));
-	// The row has to say WHICH fault, or the three kinds are separated in the code and merged again
-	// on screen.
-	L.setState('all', 'connection', 'conn-any', '');
+		L.find('all', 'connection', 'conn-noopensource', '').every(function (x) { return x.indexOf('node:') === 0; }));
+	// A row prints the NARROWEST condition true of that node: "No links" says more than "No open
+	// path to a source", and both are true of the lone node. All four must be reachable as labels,
+	// or the distinctions are made in the code and merged again on screen.
+	L.setState('all', 'connection', 'conn-noopensource', '');
 	L.pressFind();
 	const rows = panelLines(L.resultsBox()).join(' | ');
-	ok('each row names the fault it found beside the node',
-		rows.indexOf('No links') >= 0 && rows.indexOf('Behind closed links') >= 0 &&
-		rows.indexOf('No path to a source') >= 0, rows);
+	ok('each row names the NARROWEST fault true of it',
+		rows.indexOf('No links') >= 0 && rows.indexOf('No open links') >= 0 &&
+		rows.indexOf('No link to a source') >= 0 && rows.indexOf('No open path to a source') >= 0,
+		rows);
 
 	// A whole network, cleanly fed: the answer is none, and "none" is the good news the report was
 	// run for.
@@ -494,18 +520,18 @@ function panelLines(box) {
 	L.addLink('pipe', r2, a2); L.addLink('pipe', a2, b2); L.addLink('pipe', b2, r2);
 	L.buildDom();
 	ok('a fully connected network reports nothing at all',
-		L.find('all', 'connection', 'conn-any', '').length === 0,
-		JSON.stringify(L.find('all', 'connection', 'conn-any', '')));
-	L.setState('all', 'connection', 'conn-any', '');
+		L.find('all', 'connection', 'conn-noopensource', '').length === 0,
+		JSON.stringify(L.find('all', 'connection', 'conn-noopensource', '')));
+	L.setState('all', 'connection', 'conn-noopensource', '');
 	L.pressFind();
 	ok('...and says so in the panel rather than leaving a blank box',
 		panelLines(L.resultsBox()).join(' ').indexOf('Every node is connected.') >= 0,
 		JSON.stringify(panelLines(L.resultsBox())));
 
-	// **WITH NO RESERVOIR AND NO TANK, TWO OF THE THREE QUESTIONS HAVE NO ANSWER.** Calling every
-	// node source-less would be true and useless: it is one fault of the network, not N faults of
-	// the nodes, and lpnDiagnose says it already as 'no-fixed-head'. So they go unjudged, only "no
-	// links" is answered, and the panel says why.
+	// **WITH NO RESERVOIR AND NO TANK, THE TWO SOURCE QUESTIONS HAVE NO ANSWER.** Calling every node
+	// source-less would be true and useless: it is one fault of the network, not N faults of the
+	// nodes, and lpnDiagnose says it already as 'no-fixed-head'. So they match NOTHING -- not
+	// everything -- and the panel says why. The two LOCAL conditions still answer perfectly well.
 	L.reset();
 	L.setCanvas(800, 600);
 	const p1 = L.addNode('junction', 0, 0).id;
@@ -513,10 +539,16 @@ function panelLines(box) {
 	L.addLink('pipe', p1, p2);
 	const p3 = L.addNode('junction', 300, 300).id;
 	L.buildDom();
-	ok('with no source, only the no-links kind is reported',
-		same(L.find('all', 'connection', 'conn-any', ''), ['node:' + p3]),
-		JSON.stringify(L.find('all', 'connection', 'conn-any', '')));
-	L.setState('all', 'connection', 'conn-any', '');
+	ok('with no source, the source conditions match NOTHING rather than everything',
+		L.find('all', 'connection', 'conn-noopensource', '').length === 0 &&
+		L.find('all', 'connection', 'conn-nolinksource', '').length === 0,
+		JSON.stringify(L.find('all', 'connection', 'conn-noopensource', '')));
+	// The local pair is unaffected -- this is the improvement the split bought, and it is exactly
+	// the question Tom originally asked ("nodes with no links (local)").
+	ok('...but "no links" still answers, because it needs nowhere to walk',
+		same(L.find('all', 'connection', 'conn-unlinked', ''), ['node:' + p3]),
+		JSON.stringify(L.find('all', 'connection', 'conn-unlinked', '')));
+	L.setState('all', 'connection', 'conn-noopensource', '');
 	L.pressFind();
 	ok('...and the panel says which questions it could not ask',
 		panelLines(L.resultsBox()).join(' ').indexOf('no reservoir or tank') >= 0,
@@ -565,11 +597,17 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	ok('...and the typed count when there is one',
 		lineFor('pipe', 'velocity', 'bottom', '3') === 'Pipe.Velocity lowest 3', JSON.stringify(L.queryText()));
 	ok('a connection condition is the whole sentence, with no value',
-		lineFor('junction', 'connection', 'conn-unlinked', '') === 'Junction.Connection has no links',
+		lineFor('junction', 'connection', 'conn-unlinked', '') === 'Junction.Connection no links',
 		JSON.stringify(L.queryText()));
-	// **TOM'S OWN WORDING FOR THE ALL-KINDS CONDITION** (2026-08-26). He could not read "is broken".
-	ok('the all-kinds connection condition says what it asks',
-		lineFor('junction', 'connection', 'conn-any', '') === 'Junction.Connection is cut off for any reason',
+	// **ALL FOUR WORDINGS ARE TOM'S OWN** (2026-08-26), and so is the widening order.
+	ok('the local pair reads as a fact about this node\'s own links',
+		lineFor('junction', 'connection', 'conn-noopen', '') === 'Junction.Connection no open links',
+		JSON.stringify(L.queryText()));
+	ok('the island condition names the missing LINK',
+		lineFor('junction', 'connection', 'conn-nolinksource', '') === 'Junction.Connection no link to a source',
+		JSON.stringify(L.queryText()));
+	ok('the umbrella condition names the missing OPEN PATH',
+		lineFor('junction', 'connection', 'conn-noopensource', '') === 'Junction.Connection no open path to a source',
 		JSON.stringify(L.queryText()));
 	// An empty box with "contains" matches everything, and the quotes are what make that readable
 	// rather than a sentence that stops in the middle.
@@ -819,7 +857,8 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	L.buildDom();
 	[['all', 'id', 'contains', '223'], ['all', 'id', 'equals', 'J1'], ['pipe', 'diameter', 'gt', '8'],
 		['pipe', 'diameter', 'lt', '2.5'], ['pipe', 'velocity', 'top', '3'], ['pipe', 'velocity', 'bottom', ''],
-		['junction', 'connection', 'conn-any', ''], ['junction', 'connection', 'conn-closed', ''],
+		['junction', 'connection', 'conn-unlinked', ''], ['junction', 'connection', 'conn-noopen', ''],
+		['junction', 'connection', 'conn-nolinksource', ''], ['junction', 'connection', 'conn-noopensource', ''],
 		['junction', 'pressure', 'equals', '-12.5'], ['text', 'text', 'contains', 'pump house'],
 		['all', 'id', 'contains', '']].forEach(function (q) {
 		L.setState(q[0], q[1], q[2], q[3]);

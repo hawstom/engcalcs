@@ -1596,21 +1596,28 @@ $ec_lang['lpn_find_no_value']='Type what to look for.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Connection';
-// "is cut off for any reason" is Tom's own wording, 2026-08-26, replacing "is broken", which he
-// could not read: the test a condition has to pass is that a reader who has never seen our source
-// can tell what it asks.
-$ec_lang['lpn_find_op_conn_any']='is cut off for any reason';
-$ec_lang['lpn_find_op_conn_unlinked']='has no links';
-$ec_lang['lpn_find_op_conn_closed']='is behind closed links';
-$ec_lang['lpn_find_op_conn_nosource']='reaches no source';
+// **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
+// points, sources and this node. And I see either no connection (missing link) or no open
+// connection."* Two points x two kinds of break, plus his original local question, is this menu.
+// They NEST -- each row is the one above plus one more way to be cut off -- which is what a
+// searcher wants: pick how wide to cast. Earlier wordings ("is cut off for any reason", "is
+// behind closed links", "reaches no source") presented four mutually exclusive cases he did not
+// recognise, and "is behind closed links" never said behind them RELATIVE TO WHAT. Do not restore.
+$ec_lang['lpn_find_op_conn_unlinked']='no links';
+$ec_lang['lpn_find_op_conn_noopen']='no open links';
+$ec_lang['lpn_find_op_conn_nolinksource']='no link to a source';
+$ec_lang['lpn_find_op_conn_noopensource']='no open path to a source';
 // What a result row prints beside the node id: the fault it has, in three words.
+// What a result row prints beside the id: the NARROWEST condition true of that node, because "no
+// links" says more than "no open path to a source" and both are true of the same node.
 $ec_lang['lpn_find_conn_unlinked']='No links';
-$ec_lang['lpn_find_conn_closed']='Behind closed links';
-$ec_lang['lpn_find_conn_nosource']='No path to a source';
+$ec_lang['lpn_find_conn_noopen']='No open links';
+$ec_lang['lpn_find_conn_nolinksource']='No link to a source';
+$ec_lang['lpn_find_conn_noopensource']='No open path to a source';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Every node is connected.';
-$ec_lang['lpn_find_conn_no_fixed']='This network has no reservoir or tank. Only nodes with no links can be reported.';
+$ec_lang['lpn_find_conn_no_fixed']='This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be answered.';
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.

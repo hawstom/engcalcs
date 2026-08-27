@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 1402,
-        "delta_key_count": 69,
+        "expected_key_count": 1403,
+        "delta_key_count": 70,
         "exempt_key_count": 19,
         "exempt_keys": [
             "calc_units_us",
@@ -447,15 +447,16 @@
         "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
         "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
         "lpn_find_prop_connection": "Connection",
-        "lpn_find_op_conn_any": "is cut off for any reason",
-        "lpn_find_op_conn_unlinked": "has no links",
-        "lpn_find_op_conn_closed": "is behind closed links",
-        "lpn_find_op_conn_nosource": "reaches no source",
+        "lpn_find_op_conn_unlinked": "no links",
+        "lpn_find_op_conn_noopen": "no open links",
+        "lpn_find_op_conn_nolinksource": "no link to a source",
+        "lpn_find_op_conn_noopensource": "no open path to a source",
         "lpn_find_conn_unlinked": "No links",
-        "lpn_find_conn_closed": "Behind closed links",
-        "lpn_find_conn_nosource": "No path to a source",
+        "lpn_find_conn_noopen": "No open links",
+        "lpn_find_conn_nolinksource": "No link to a source",
+        "lpn_find_conn_noopensource": "No open path to a source",
         "lpn_find_conn_none": "Every node is connected.",
-        "lpn_find_conn_no_fixed": "This network has no reservoir or tank. Only nodes with no links can be reported.",
+        "lpn_find_conn_no_fixed": "This network has no reservoir or tank, so it has no source to reach. Only \"no links\" and \"no open links\" can be answered.",
         "lpn_find_query_tip": "The same search, written as one line. Change the controls and it rewrites itself, or type in it and the controls follow.",
         "lpn_find_query_label": "Query",
         "lpn_find_query_hint": "Expandable with AND, OR, and ()",
@@ -518,15 +519,16 @@
         "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
         "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
         "lpn_find_prop_connection": "Connection",
-        "lpn_find_op_conn_any": "is cut off for any reason",
-        "lpn_find_op_conn_unlinked": "has no links",
-        "lpn_find_op_conn_closed": "is behind closed links",
-        "lpn_find_op_conn_nosource": "reaches no source",
+        "lpn_find_op_conn_unlinked": "no links",
+        "lpn_find_op_conn_noopen": "no open links",
+        "lpn_find_op_conn_nolinksource": "no link to a source",
+        "lpn_find_op_conn_noopensource": "no open path to a source",
         "lpn_find_conn_unlinked": "No links",
-        "lpn_find_conn_closed": "Behind closed links",
-        "lpn_find_conn_nosource": "No path to a source",
+        "lpn_find_conn_noopen": "No open links",
+        "lpn_find_conn_nolinksource": "No link to a source",
+        "lpn_find_conn_noopensource": "No open path to a source",
         "lpn_find_conn_none": "Every node is connected.",
-        "lpn_find_conn_no_fixed": "This network has no reservoir or tank. Only nodes with no links can be reported.",
+        "lpn_find_conn_no_fixed": "This network has no reservoir or tank, so it has no source to reach. Only \"no links\" and \"no open links\" can be answered.",
         "lpn_find_query_tip": "The same search, written as one line. Change the controls and it rewrites itself, or type in it and the controls follow.",
         "lpn_find_query_label": "Query",
         "lpn_find_query_hint": "Expandable with AND, OR, and ()",
@@ -724,22 +726,6 @@
                 }
             }
         },
-        "lpn_find_op_conn_any": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_find_no_value",
-                    "value": "Введите, что искать.",
-                    "english": "Type what to look for."
-                },
-                "next_translated": {
-                    "key": "lpn_replace_title",
-                    "value": "Изменить найденное",
-                    "english": "Change what was found"
-                }
-            }
-        },
         "lpn_find_op_conn_unlinked": {
             "reason": "missing",
             "current_value": null,
@@ -756,7 +742,7 @@
                 }
             }
         },
-        "lpn_find_op_conn_closed": {
+        "lpn_find_op_conn_noopen": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -772,7 +758,23 @@
                 }
             }
         },
-        "lpn_find_op_conn_nosource": {
+        "lpn_find_op_conn_nolinksource": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Введите, что искать.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Изменить найденное",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_op_conn_noopensource": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -804,7 +806,7 @@
                 }
             }
         },
-        "lpn_find_conn_closed": {
+        "lpn_find_conn_noopen": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -820,7 +822,23 @@
                 }
             }
         },
-        "lpn_find_conn_nosource": {
+        "lpn_find_conn_nolinksource": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Введите, что искать.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Изменить найденное",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_conn_noopensource": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
