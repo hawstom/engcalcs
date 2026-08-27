@@ -572,6 +572,21 @@ console.log('\n--- patterns and scenarios ---');
 			L.find('junction', 'demandCategory', 'equals', 'Nowhere Ranch').length === 0);
 		// J4 has a demand and no category. It must not turn up in a blank "contains", which is the
 		// panel's "show me everything that has this property" query.
+		// **THE EXTREMES RANK TEXT ALPHABETICALLY** (Tom, 2026-08-26). The categories in the fixture
+		// are Elm Acres / Elm Acres Park / Taco Bell 354 (all on J1), Rio Vista Apartments (J2),
+		// Mesa Elementary School (J3) and Sunset Estates (J5). The joined value is what ranks, so
+		// J1 sorts on "Elm Acres, Elm Acres Park, Taco Bell 354".
+		ok('"n lowest" on a text property takes the alphabetical start',
+			L.find('junction', 'demandCategory', 'bottom', '2').join(',') === 'J1,J3',
+			L.find('junction', 'demandCategory', 'bottom', '2').join(','));
+		ok('"n highest" takes the alphabetical end',
+			L.find('junction', 'demandCategory', 'top', '2').join(',') === 'J5,J2',
+			L.find('junction', 'demandCategory', 'top', '2').join(','));
+		// A junction nobody named a category on has no value to rank, so it is left out rather
+		// than sorted as a blank -- it is not "the lowest category".
+		ok('...and a junction with no category is in neither end',
+			L.find('junction', 'demandCategory', 'bottom', '10').indexOf('J4') < 0 &&
+			L.find('junction', 'demandCategory', 'top', '10').indexOf('J4') < 0);
 		ok('a junction with no category is absent from the property entirely',
 			names(L.find('junction', 'demandCategory', 'contains', '')) === 'J1,J2,J3,J5',
 			names(L.find('junction', 'demandCategory', 'contains', '')));

@@ -227,14 +227,23 @@ function build(unitSet) {
 		JSON.stringify(L.propKeys('all')));
 	ok('a Text scope offers its words', L.propKeys('text').indexOf('text') > 0);
 	ok('a text property gets contains/equals and no number comparisons',
-		JSON.stringify(L.opKeys('all', 'id')) === JSON.stringify(['contains', 'equals']));
+		JSON.stringify(L.opKeys('all', 'id')) === JSON.stringify(['contains', 'equals', 'top', 'bottom']),
+		JSON.stringify(L.opKeys('all', 'id')));
 	ok('a numeric property gets the number comparisons and no "contains"',
 		JSON.stringify(L.opKeys('pipe', 'diameter')) === JSON.stringify(['equals', 'gt', 'lt', 'top', 'bottom']),
 		JSON.stringify(L.opKeys('pipe', 'diameter')));
-	ok('...including Top n and Bottom n, which are conditions and not a second input',
-		L.opKeys('pipe', 'diameter').indexOf('top') > 0 && L.opKeys('pipe', 'diameter').indexOf('bottom') > 0);
-	ok('a text property has no extremes -- there is no end to a list of words',
-		L.opKeys('all', 'id').indexOf('top') < 0, JSON.stringify(L.opKeys('all', 'id')));
+	// **THE EXTREMES ARE A STANDARD CONDITION ON EVERYTHING WITH AN ORDER** (Tom, 2026-08-26:
+	// *"it should be a standard condition, but it's not"*). They were numbers-only, which is what
+	// made them read as a special mode. On text they rank alphabetically.
+	ok('...and the extremes are offered on a NUMBER and on TEXT alike',
+		L.opKeys('pipe', 'diameter').indexOf('top') > 0 && L.opKeys('all', 'id').indexOf('top') > 0 &&
+		L.opKeys('text', 'text').indexOf('bottom') > 0,
+		JSON.stringify(L.opKeys('text', 'text')));
+	// Connection is not an exception to that rule: its values are four conditions, not a value
+	// with an order, so there is no end of the list to take.
+	ok('...but NOT on Connection, whose values are conditions rather than an ordered value',
+		L.opKeys('junction', 'connection').indexOf('top') < 0,
+		JSON.stringify(L.opKeys('junction', 'connection')));
 	ok('a Text label can be searched by its SIZE as well as its words',
 		L.propKeys('text').indexOf('sizeMult') > 0, JSON.stringify(L.propKeys('text')));
 
@@ -507,7 +516,7 @@ function panelLines(box) {
 	const rows = panelLines(L.resultsBox()).join(' | ');
 	ok('each row names the NARROWEST fault true of it',
 		rows.indexOf('No links') >= 0 && rows.indexOf('No open links') >= 0 &&
-		rows.indexOf('No link to a source') >= 0 && rows.indexOf('No open path to a source') >= 0,
+		rows.indexOf('No link path to a source') >= 0 && rows.indexOf('No open path to a source') >= 0,
 		rows);
 
 	// A whole network, cleanly fed: the answer is none, and "none" is the good news the report was
@@ -604,7 +613,7 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 		lineFor('junction', 'connection', 'conn-noopen', '') === 'Junction.Connection no open links',
 		JSON.stringify(L.queryText()));
 	ok('the island condition names the missing LINK',
-		lineFor('junction', 'connection', 'conn-nolinksource', '') === 'Junction.Connection no link to a source',
+		lineFor('junction', 'connection', 'conn-nolinksource', '') === 'Junction.Connection no link path to a source',
 		JSON.stringify(L.queryText()));
 	ok('the umbrella condition names the missing OPEN PATH',
 		lineFor('junction', 'connection', 'conn-noopensource', '') === 'Junction.Connection no open path to a source',

@@ -814,6 +814,22 @@ the block.
 
 
 - 75|540| **[H] BUILT, including the parser. What stays open is WORDING.**
+  - **THE EXTREMES BECAME A STANDARD CONDITION, 2026-08-26**, on Tom's ruling: *"One reason it's
+    confusing is that it should be a standard condition, but it's not. Make it a condition for all
+    assets and numerical or alphanumerical properties."* They were numbers-only, which is what made
+    them read as a special mode rather than a condition — **a control that appears for some
+    properties and not others teaches nobody what it is.** On text they rank ALPHABETICALLY, so
+    "the first ten ids" and "the last ten category names" are now askable.
+    - **AND `Highest n` BECAME `n highest`** — his wording, and the better English: "n highest"
+      says what the Value box holds, where "highest n" asks the reader to work out that n is a
+      count and not a rank. (It was also capitalised against a rule stated a dozen lines above it
+      in `lang.ec.en.php`; that is fixed too.)
+    - **Connection is the one property that still does not offer them, and it is not an exception:**
+      its values are four conditions, not a value with an order.
+    - **The printed query line still reads `Pipe.Velocity highest 10`** — word then count — because
+      that is the form the parser reads back. The pull-down and the line have deliberately differed
+      since the extremes shipped. Flipping the line to `10 highest` is a parser change, not a
+      string change; ask before doing it.
   A `Connection` property whose conditions are the three faults, and the query as an INPUT above the
   Find button that parses back — `AND`, `OR` and brackets, translated operators with the English
   words accepted as aliases in every language, case-insensitive. `find-harness.js` drives the real
@@ -838,9 +854,9 @@ the block.
     - A result row prints the **narrowest** condition true of that node — "No links" says more than
       "No open path to a source" and both are true of the same node. The umbrella is still exactly
       `lpnDiagnose`'s `unreachable`, asserted in `find-harness.js`.
-    - **[H] ONE WORDING TO CHECK:** `no link to a source` breaks the parallel with `no open path to
-      a source`. Read strictly it could mean "not directly linked to a source". His earlier draft
-      said `no link path to a source`, which parallels. His call.
+    - **SETTLED: `no link path to a source`** (Tom, 2026-08-26: *"Go with the older parallel
+      wording."*). `no link to a source` reads as "not directly linked to a source" and breaks the
+      parallel with `no open path to a source`. The four are now parallel by construction.
   - **When the typed query outruns the controls, the controls LEAVE**, and one button brings them
     back to the last query they did express. The rejected alternatives were showing the first
     condition of a compound query, and greying the pull-downs out with their stale words still on

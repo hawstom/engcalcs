@@ -7416,7 +7416,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	//   'no links'                   -- nothing meets this node at all.
 	//   'no open links'              -- links meet it, none of them open.
-	//   'no link to a source'        -- no route to any reservoir or tank even counting CLOSED
+	//   'no link path to a source'   -- no route to any reservoir or tank even counting CLOSED
 	//                                   links. A separate island; the fix is to build a connection.
 	//   'no open path to a source'   -- no route using OPEN links only. The umbrella: every node
 	//                                   above is one of these, plus the node whose route home exists
@@ -7486,7 +7486,7 @@ var EngCalcs = EngCalcs || {};
 	function findPropIsConnection(prop) { return prop === 'connection'; }
 	// **THE FOUR CONDITIONS, IN TOM'S ORDER AND HIS WORDS** (2026-08-26): local first, then the two
 	// that walk to a source, widening as they go. They are conditions on the same footing as "is
-	// greater than" -- the precedent is `highest n`, a condition rather than a second control, for
+	// greater than" -- the precedent is `n highest`, a condition rather than a second control, for
 	// the same reason: the panel already asks "which elements?" three ways and a fourth box would
 	// be a fourth thing to learn. None of them uses the Value box.
 	//
@@ -7500,8 +7500,8 @@ var EngCalcs = EngCalcs || {};
 		return [
 			['conn-unlinked', pc.lpn_find_op_conn_unlinked || 'no links', 'no links'],
 			['conn-noopen', pc.lpn_find_op_conn_noopen || 'no open links', 'no open links'],
-			['conn-nolinksource', pc.lpn_find_op_conn_nolinksource || 'no link to a source',
-				'no link to a source'],
+			['conn-nolinksource', pc.lpn_find_op_conn_nolinksource || 'no link path to a source',
+				'no link path to a source'],
 			['conn-noopensource', pc.lpn_find_op_conn_noopensource || 'no open path to a source',
 				'no open path to a source']
 		];
@@ -7544,7 +7544,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (st === 'conn-unlinked') { return pc.lpn_find_conn_unlinked || 'No links'; }
 		if (st === 'conn-noopen') { return pc.lpn_find_conn_noopen || 'No open links'; }
-		if (st === 'conn-nolinksource') { return pc.lpn_find_conn_nolinksource || 'No link to a source'; }
+		if (st === 'conn-nolinksource') { return pc.lpn_find_conn_nolinksource || 'No link path to a source'; }
 		if (st === 'conn-noopensource') {
 			return pc.lpn_find_conn_noopensource || 'No open path to a source';
 		}
@@ -7563,15 +7563,27 @@ var EngCalcs = EngCalcs || {};
 	function findOpDefs() {
 		var pc = EngCalcs.pageConfig || {};
 		if (findPropIsConnection(findState.prop)) { return findConnOpDefs(); }
+		// **THE EXTREMES ARE A STANDARD CONDITION ON EVERY PROPERTY THAT HAS AN ORDER** (Tom,
+		// 2026-08-26: *"One reason it's confusing is that it should be a standard condition, but
+		// it's not. Make it a condition for all assets and numerical or alphanumerical
+		// properties."*). They were numbers-only, which is what made them read as a special mode
+		// rather than a condition -- a control that appears for some properties and not others
+		// teaches nobody what it is. On text they rank ALPHABETICALLY, which answers "the first
+		// ten ids" and "the last ten category names".
+		//
+		// Connection is the one property that still does not offer them, and it is not an
+		// exception to the rule: its values are four conditions, not a value with an order.
 		if (findPropIsText(findState.prop)) {
 			return [['contains', pc.lpn_find_op_contains || 'contains', 'contains'],
-				['equals', pc.lpn_find_op_equals || 'equal to', 'equal to']];
+				['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'],
+				['top', pc.lpn_find_op_top || 'n highest', 'n highest'],
+				['bottom', pc.lpn_find_op_bottom || 'n lowest', 'n lowest']];
 		}
 		return [['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'],
 			['gt', pc.lpn_find_op_gt || 'greater than', 'greater than'],
 			['lt', pc.lpn_find_op_lt || 'less than', 'less than'],
-			['top', pc.lpn_find_op_top || 'highest n', 'highest n'],
-			['bottom', pc.lpn_find_op_bottom || 'lowest n', 'lowest n']];
+			['top', pc.lpn_find_op_top || 'n highest', 'n highest'],
+			['bottom', pc.lpn_find_op_bottom || 'n lowest', 'n lowest']];
 	}
 	function findOpIsExtreme(op) { return op === 'top' || op === 'bottom'; }
 	// How many an extremes query returns. The Value box holds it, and a blank or nonsense entry
@@ -7681,7 +7693,13 @@ var EngCalcs = EngCalcs || {};
 		if (findOpIsExtreme(findState.op)) {
 			findCandidates().forEach(function (c) {
 				var val = findValueOf(c, findState.prop);
-				if (typeof val === 'number' && isFinite(val)) { out.push(c); }
+				// A TEXT property ranks alphabetically, so a non-empty string counts as having a
+				// value. Anything with no value at all is left out rather than sorted as a blank --
+				// a junction nobody named a demand category on is not "the lowest category".
+				if (typeof val === 'number' ? isFinite(val)
+						: (typeof val === 'string' && val !== '')) {
+					out.push(c);
+				}
 			});
 			return findSortMatches(out).slice(0, findExtremeCount());
 		}
@@ -7746,6 +7764,15 @@ var EngCalcs = EngCalcs || {};
 				va = findValueOf(a, prop); vb = findValueOf(b, prop);
 				if (typeof va === 'number' && typeof vb === 'number' && va !== vb) {
 					return desc ? vb - va : va - vb;
+				}
+				// **ALPHABETICAL IS THE ORDER A TEXT PROPERTY HAS**, lowercased so `Elm` and `elm`
+				// rank together rather than by their code points. Plain `<`, like every other text
+				// comparison on this page: "J10 before J2" is that convention's known wart and
+				// inventing a natural sort here alone would make this one list obey a rule no
+				// other list on the page does.
+				if (typeof va === 'string' && typeof vb === 'string') {
+					va = va.toLowerCase(); vb = vb.toLowerCase();
+					if (va !== vb) { return desc ? (va < vb ? 1 : -1) : (va < vb ? -1 : 1); }
 				}
 			} else if (text) {
 				va = String(findValueOf(a, prop) === undefined ? '' : findValueOf(a, prop)).toLowerCase();
@@ -7867,8 +7894,8 @@ var EngCalcs = EngCalcs || {};
 	// of the two. The cost is stated and accepted: a query string is not portable between
 	// languages, which is why the parser below ALSO accepts the English spelling of every word.
 	//
-	// Two operators do not compose into a sentence and get their own word here: "highest n" and
-	// "lowest n" name a control, not a comparison, so the line says `highest 10` with the count the
+	// Two operators do not compose into a sentence and get their own word here: "n highest" and
+	// "n lowest" name a control, not a comparison, so the line says `highest 10` with the count the
 	// search will actually use. Everything else reuses the label as it stands.
 	function findLabelOf(defs, key) {
 		var i;
@@ -7946,7 +7973,7 @@ var EngCalcs = EngCalcs || {};
 			return { key: d[0], label: d[1], words: words };
 		});
 	}
-	// LONGEST WINS, always: "greater than" must not be taken as "greater" would be, and "highest n"
+	// LONGEST WINS, always: "greater than" must not be taken as "greater" would be, and "n highest"
 	// must be tried before "highest".
 	function findMatchAlt(text, at, alts) {
 		var best = null, i, j, n;
@@ -8049,7 +8076,7 @@ var EngCalcs = EngCalcs || {};
 			prop = m.key; i += m.len;
 			opDefs = findDefsFor(scope, prop).ops;
 			opAlts = findAlts(opDefs);
-			// The extremes are written `highest 10` on the printed line and `highest n` in the
+			// The extremes are written `highest 10` on the printed line and `n highest` in the
 			// pull-down, so both spellings answer, plus the English of each.
 			opAlts = opAlts.concat(findAlts([
 				['top', (EngCalcs.pageConfig || {}).lpn_find_q_top || 'highest', 'highest'],
