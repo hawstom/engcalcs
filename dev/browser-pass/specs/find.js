@@ -138,7 +138,35 @@ exports.run = async function ({ browser, report }) {
 			p.querySelector('#lpn_find_form button').click();
 			return p.querySelector('#lpn_find_results').textContent.trim();
 		});
-		report.eq(missed, '', 'a search that matches nothing leaves the list empty');
+		// **A SEARCH THAT MATCHES NOTHING SAYS SO** (Task 540). It used to leave a blank box, which
+		// reads as the button having done nothing -- harmless for a lookup and actively misleading
+		// for the disconnected report, where "none" is the good news the user pressed Find for.
+		report.eq(missed, 'Nothing matched.', 'a search that matches nothing says so');
+
+		// **THE QUERY, WRITTEN OUT ABOVE THE BUTTON** (Task 540 phase 1, Tom 2026-08-26). Read in a
+		// browser for the one thing no harness can see: that the line is actually visible, above the
+		// Find button, and not clipped out of a 22rem popover.
+		{
+			const q = await a.page.evaluate(() => {
+				const p = document.getElementById('lpn_find_popup');
+				const line = p.querySelector('.lpn-find-query');
+				if (!line) { return null; }
+				const btn = p.querySelector('#lpn_find_form button');
+				const lr = line.getBoundingClientRect(), br = btn.getBoundingClientRect();
+				const pr = p.getBoundingClientRect();
+				return { text: line.textContent.trim(), aboveButton: lr.bottom <= br.top + 2,
+					inside: lr.left >= pr.left - 1 && lr.right <= pr.right + 1,
+					visible: lr.width > 0 && lr.height > 0,
+					inputs: p.querySelectorAll('.lpn-find-query input').length };
+			});
+			report.ok(q && q.visible && q.inside, 'the query line is drawn inside the panel',
+				q && JSON.stringify(q));
+			report.ok(q && q.aboveButton, '...right above the Find button, where Tom asked for it');
+			report.ok(q && /NOSUCHTHING/.test(q.text), '...and it says what the controls just expressed',
+				q && q.text);
+			// Phase 1 is a teaching device, not a parser: nothing to type into.
+			report.eq(q && q.inputs, 0, 'and it is read-only -- no input inside it');
+		}
 
 		// **TOP n AND BOTTOM n ARE CONDITIONS, AND THE VALUE BOX HOLDS n** (Tom, 2026-08-18). Checked
 		// in a browser because what is being verified is the control surface a person operates:

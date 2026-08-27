@@ -53,6 +53,19 @@ const L = loadLoopedNetwork(
 	"\t\t\treturn findContextLength(group, e); },\n" +
 
 	"\t\tadjacent: function (id) { return incidentLinks[id] || []; },\n" +
+	// THE PANEL ITSELF -- built by the page's own rebuildFindForm() into the real
+	// #lpn_find_form, so what is read below is the markup a visitor gets, not a re-implementation
+	// of it. Task 540's query line and its report are asserted through these.
+	"\t\tbuildPanel: function () { rebuildFindForm(); },\n" +
+	"\t\tpressFind: function () { runFind(); },\n" +
+	"\t\tformBox: function () { return document.getElementById('lpn_find_form'); },\n" +
+	"\t\tresultsBox: function () { return document.getElementById('lpn_find_results'); },\n" +
+	// The solver's OWN structural verdict, so the report can be checked against it rather than
+	// against itself.
+	"\t\tdiagnose: function () { return EngCalcs.lpnDiagnose(assembleModel()); },\n" +
+	"\t\tsetState: function (scope, prop, op, value) {\n" +
+	"\t\t\tfindState.scope = scope; findState.prop = prop; findState.op = op;\n" +
+	"\t\t\tfindState.value = value === undefined ? '' : value; findNormalize(); },\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
 	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 };\n" +
@@ -188,8 +201,12 @@ function build(unitSet) {
 	ok('...including the inputs a colour ramp has no use for',
 		L.propKeys('pipe').indexOf('length') > 0 && L.propKeys('pipe').indexOf('km') > 0,
 		JSON.stringify(L.propKeys('pipe')));
-	ok('the all-elements scope offers ID alone, the only property every kind has',
-		JSON.stringify(L.propKeys('all')) === JSON.stringify(['id']));
+	// ID plus Connection, and nothing else. ID is the only property a junction, a pipe and a Text
+	// label all carry; Connection is the Task 540 exception, and it earns it by matching every NODE
+	// and saying so in each row rather than silently matching nothing.
+	ok('the all-elements scope offers ID and the connection report, and nothing else',
+		JSON.stringify(L.propKeys('all')) === JSON.stringify(['id', 'connection']),
+		JSON.stringify(L.propKeys('all')));
 	ok('a Text scope offers its words', L.propKeys('text').indexOf('text') > 0);
 	ok('a text property gets contains/equals and no number comparisons',
 		JSON.stringify(L.opKeys('all', 'id')) === JSON.stringify(['contains', 'equals']));
@@ -372,6 +389,182 @@ function build(unitSet) {
 		L.view().cx === stale.cx && L.view().cy === stale.cy &&
 		JSON.stringify(L.selectedRef()) !== JSON.stringify({ kind: 'node', id: n.b }),
 		JSON.stringify(L.selectedRef()));
+}
+
+// ---- 6. THE DISCONNECTED REPORT: three faults, never one word (ROADMAP Task 540) ---------------
+//
+// EngCalcs.lpnDiagnose() already walks this network and calls all three 'unreachable', which is the
+// right answer to "can this be solved?" and useless as a report. The panel splits that one list in
+// three, so the assertions below are (a) each kind on its own and (b) that the three together are
+// exactly what the solver refuses -- if they ever stop adding up, the panel has started answering a
+// different question from the one the solve asks.
+function walk(el, fn) {
+	(el.children || []).forEach(function (c) { fn(c); walk(c, fn); });
+}
+function panelLines(box) {
+	var out = [];
+	walk(box, function (el) { if (!(el.children || []).length) { out.push(el.textContent); } });
+	return out;
+}
+{
+	console.log('\n--- the disconnected report ---');
+	setUnitSet('us');
+	L.reset();
+	L.setCanvas(800, 600);
+	// A fed chain, a branch behind a closed link, an island with no source, and a node nothing
+	// meets. One drawing holding all three faults at once, which is also the only way to prove they
+	// are told apart rather than merely counted.
+	const r = L.addNode('reservoir', 0, 0).id;
+	const a = L.addNode('junction', 100, 0).id;
+	const b = L.addNode('junction', 200, 0).id;
+	const c = L.addNode('junction', 300, 0).id;
+	L.addLink('pipe', r, a);
+	L.addLink('pipe', a, b);
+	const shut = L.addLink('pipe', b, c);
+	L.setProp(shut, 'status', 'closed');
+	const d = L.addNode('junction', 400, 400).id;
+	const e = L.addNode('junction', 500, 400).id;
+	L.addLink('pipe', d, e);
+	const lone = L.addNode('junction', 600, 600).id;
+	L.buildDom();
+
+	ok('a node nothing meets is reported as having no links',
+		same(L.find('all', 'connection', 'conn-unlinked', ''), ['node:' + lone]),
+		JSON.stringify(L.find('all', 'connection', 'conn-unlinked', '')));
+	// **THE DISTINCTION IS THE WHOLE POINT.** C is joined to the network by a pipe that exists; it
+	// is the CLOSURE that cuts it off. Reporting it as "no links" would send somebody hunting for a
+	// missing pipe that is right there on the map.
+	ok('a node behind a closed link is reported, and separately',
+		same(L.find('all', 'connection', 'conn-closed', ''), ['node:' + c]),
+		JSON.stringify(L.find('all', 'connection', 'conn-closed', '')));
+	ok('an island with open pipes and no source is its own kind again',
+		same(L.find('all', 'connection', 'conn-nosource', ''), ['node:' + d, 'node:' + e]),
+		JSON.stringify(L.find('all', 'connection', 'conn-nosource', '')));
+	ok('"is broken" is all three at once, and nothing else',
+		same(L.find('all', 'connection', 'conn-any', ''),
+			['node:' + c, 'node:' + d, 'node:' + e, 'node:' + lone]),
+		JSON.stringify(L.find('all', 'connection', 'conn-any', '')));
+	ok('...and the fed nodes are in none of them',
+		L.find('all', 'connection', 'conn-any', '').indexOf('node:' + a) < 0 &&
+		L.find('all', 'connection', 'conn-any', '').indexOf('node:' + r) < 0);
+	// The union check: the three kinds together ARE lpnDiagnose's one 'unreachable' list. This is
+	// what keeps the report honest -- a split that drifted from the solver's own walk would report
+	// nodes the solve is happy with, or miss the ones it refuses.
+	const unreachable = (L.diagnose().filter(function (i) { return i.code === 'unreachable'; })[0] || { ids: [] }).ids;
+	ok('the three kinds together are exactly what the solver calls unreachable',
+		same(unreachable, [c, d, e, lone]), JSON.stringify(unreachable));
+	// A pipe has no connection state of its own; a link that goes nowhere is lpnDiagnose's
+	// dangling-link, a fault of the LINK, and is reported elsewhere.
+	ok('the report returns nodes only, whatever the scope says',
+		L.find('all', 'connection', 'conn-any', '').every(function (x) { return x.indexOf('node:') === 0; }));
+	// The row has to say WHICH fault, or the three kinds are separated in the code and merged again
+	// on screen.
+	L.setState('all', 'connection', 'conn-any', '');
+	L.pressFind();
+	const rows = panelLines(L.resultsBox()).join(' | ');
+	ok('each row names the fault it found beside the node',
+		rows.indexOf('No links') >= 0 && rows.indexOf('Behind closed links') >= 0 &&
+		rows.indexOf('No path to a source') >= 0, rows);
+
+	// A whole network, cleanly fed: the answer is none, and "none" is the good news the report was
+	// run for.
+	L.reset();
+	L.setCanvas(800, 600);
+	const r2 = L.addNode('reservoir', 0, 0).id;
+	const a2 = L.addNode('junction', 100, 0).id;
+	const b2 = L.addNode('junction', 200, 0).id;
+	L.addLink('pipe', r2, a2); L.addLink('pipe', a2, b2); L.addLink('pipe', b2, r2);
+	L.buildDom();
+	ok('a fully connected network reports nothing at all',
+		L.find('all', 'connection', 'conn-any', '').length === 0,
+		JSON.stringify(L.find('all', 'connection', 'conn-any', '')));
+	L.setState('all', 'connection', 'conn-any', '');
+	L.pressFind();
+	ok('...and says so in the panel rather than leaving a blank box',
+		panelLines(L.resultsBox()).join(' ').indexOf('Every node is connected.') >= 0,
+		JSON.stringify(panelLines(L.resultsBox())));
+
+	// **WITH NO RESERVOIR AND NO TANK, TWO OF THE THREE QUESTIONS HAVE NO ANSWER.** Calling every
+	// node source-less would be true and useless: it is one fault of the network, not N faults of
+	// the nodes, and lpnDiagnose says it already as 'no-fixed-head'. So they go unjudged, only "no
+	// links" is answered, and the panel says why.
+	L.reset();
+	L.setCanvas(800, 600);
+	const p1 = L.addNode('junction', 0, 0).id;
+	const p2 = L.addNode('junction', 100, 0).id;
+	L.addLink('pipe', p1, p2);
+	const p3 = L.addNode('junction', 300, 300).id;
+	L.buildDom();
+	ok('with no source, only the no-links kind is reported',
+		same(L.find('all', 'connection', 'conn-any', ''), ['node:' + p3]),
+		JSON.stringify(L.find('all', 'connection', 'conn-any', '')));
+	L.setState('all', 'connection', 'conn-any', '');
+	L.pressFind();
+	ok('...and the panel says which questions it could not ask',
+		panelLines(L.resultsBox()).join(' ').indexOf('no reservoir or tank') >= 0,
+		JSON.stringify(panelLines(L.resultsBox())));
+}
+
+// ---- 7. THE QUERY, WRITTEN OUT AS ONE LINE (ROADMAP Task 540, phase 1) -------------------------
+//
+// Read out of the REAL panel: rebuildFindForm() builds it into #lpn_find_form, and the line under
+// test is the div a visitor sees above the Find button. Phase 1 is read-only on purpose, so there
+// is one further assertion at the end -- the panel offers no input to type it into.
+{
+	console.log('\n--- the query line ---');
+	setUnitSet('us');
+	L.reset();
+	L.setCanvas(800, 600);
+	const r = L.addNode('reservoir', 0, 0).id;
+	const a = L.addNode('junction', 100, 0).id;
+	L.addLink('pipe', r, a);
+	L.buildDom();
+	function line() {
+		let out = null;
+		walk(L.formBox(), function (el) { if (el.className === 'lpn-find-query') { out = el.textContent; } });
+		return out;
+	}
+	function lineFor(scope, prop, op, value) { L.setState(scope, prop, op, value); L.buildPanel(); return line(); }
+
+	ok('an ID search reads as the scope, the property, the condition and the quoted text',
+		lineFor('all', 'id', 'contains', '223') === "Everything.ID contains '223'", JSON.stringify(line()));
+	ok('a numeric condition prints the number bare',
+		lineFor('pipe', 'diameter', 'gt', '8') === 'Pipe.Diameter greater than 8', JSON.stringify(line()));
+	// "Highest n" names a control, not a comparison, so the line says the word and the count the
+	// search will ACTUALLY use -- ten, when the box is empty.
+	ok('an extremes condition prints the count it will really use',
+		lineFor('pipe', 'velocity', 'top', '') === 'Pipe.Velocity highest 10', JSON.stringify(line()));
+	ok('...and the typed count when there is one',
+		lineFor('pipe', 'velocity', 'bottom', '3') === 'Pipe.Velocity lowest 3', JSON.stringify(line()));
+	ok('a connection condition is the whole sentence, with no value',
+		lineFor('junction', 'connection', 'conn-unlinked', '') === 'Junction.Connection has no links',
+		JSON.stringify(line()));
+	// An empty box with "contains" matches everything, and the quotes are what make that readable
+	// rather than a sentence that stops in the middle.
+	ok('an empty text value reads as the empty string it is matched as',
+		lineFor('all', 'id', 'contains', '') === "Everything.ID contains ''", JSON.stringify(line()));
+
+	// **THE PULL-DOWN IS STILL THE WAY IN.** Changing the real select rewrites the line, which is
+	// the whole teaching mechanism: a person operates the control and watches the sentence change.
+	L.setState('pipe', 'diameter', 'gt', '8');
+	L.buildPanel();
+	const selects = [];
+	walk(L.formBox(), function (el) { if (el._tag === 'select') { selects.push(el); } });
+	ok('the panel still has its three pull-downs', selects.length >= 3, String(selects.length));
+	selects[2].value = 'lt';
+	(selects[2]._listeners.change || []).forEach(function (f) { f({}); });
+	ok('changing the condition pull-down rewrites the line at once',
+		line() === 'Pipe.Diameter less than 8', JSON.stringify(line()));
+
+	// **PHASE 1 IS READ-ONLY** and that has to be asserted, not merely intended: the one input on
+	// this panel is the Value box the search has always had. A second one would be a grammar and a
+	// parser nobody has designed yet.
+	let queryEl = null;
+	walk(L.formBox(), function (el) { if (el.className === 'lpn-find-query') { queryEl = el; } });
+	ok('the query line is printed, not typed into: it is a div and holds no control',
+		!!queryEl && queryEl._tag === 'div' && (queryEl.children || []).length === 0 &&
+		String(queryEl.textContent).length > 0,
+		queryEl ? queryEl._tag + '/' + (queryEl.children || []).length : 'missing');
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

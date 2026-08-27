@@ -753,24 +753,25 @@ the block.
   - Tom, in the same breath: *"I don't want to be forever tweaking this."* So a phase that measures
     before it tunes is the honest opening.
 
-- 75|540| **A Find that reports disconnected nodes, and the beginning of a query language.**
-  Tom, 2026-08-26: *"It would be nice to see a report (under find) of disconnected nodes."* Then the
-  larger idea: *"Maybe we can move toward and start teaching users a simple query language by
-  printing right above the Find button a string or maybe even better, an input that represents the
-  query as a string like 'Junction.ID contains 223' or 'Junction.Links is empty' or something
-  better."*
-  - **The disconnected report is the useful half and it is nearly free.** `lpnDiagnose()` already
-    finds isolated nodes — it is what produces *"node J7 is isolated behind a closed link"* — so
-    this is a door onto an answer the page already computes, not a new analysis.
-  - **The query string is the interesting half and it is a TEACHING device**, which is why he wants
-    it shown even before it is editable: the controls stay the way in, and the string above the
-    button says what the controls just expressed. **Phase 1 is read-only** — build the string from
-    the existing Find controls and print it. Nobody has to parse anything.
-  - **Phase 2, making it an input, is a parser and a grammar and is a different task.** Do not start
-    there. The value of phase 1 is that it tells us whether anybody looks at the string at all.
-  - **[H] The grammar is naming and is Tom's.** `Junction.Links is empty` versus `no links` versus
-    something else is a wording decision with a long tail, since every operator becomes a translated
-    string or a deliberately untranslated token. Propose, do not choose.
+- 75|540| **[H] Both halves are BUILT; the wording and phase 2 stay open.**
+  Shipped for Tom's 2026-08-26 request: a `Connection` property whose conditions are the three
+  faults, and the query printed read-only above the Find button.
+  - **"Disconnected" is THREE faults and `lpnDiagnose()` distinguishes none of them** — it returns
+    one code, `unreachable`, for all three: the right answer to "can this be solved?" and useless
+    as a report. The panel splits it into no links / behind a closed link / no path to a source,
+    and `find-harness.js` asserts the three together are exactly `unreachable`, so the report
+    cannot drift from what the solve refuses.
+  - **[H] The grammar is naming, so what shipped is a PROPOSAL.** `Junction.Connection has no
+    links`, `Everything.ID contains '223'`, `Pipe.Velocity highest 10`. His own examples were
+    `Junction.ID contains 223` and `Junction.Links is empty`; `Links` was not used because
+    reachability is not a property of a node's link list. Renaming is cheap now and expensive once
+    phase 2 parses these words.
+  - **[H] The line is TRANSLATED, built from the labels the pull-downs show.** The identifier half
+    is localized whatever we do, so English operators would make it half-and-half. Cost accepted: a
+    query string is not portable between languages, and a phase-2 parser must take the localized
+    words, with the English ones as aliases.
+  - **Phase 2, the editable input, is a parser and a separate task.** Phase 1 exists to tell us
+    whether anybody reads the line at all; do not make it editable before that.
 
 - 50|541| **Clicking a label: should it select the asset for editing?**
   Tom's question, 2026-08-26: *"Node insert and auto-edit mode: When you click on a label, should it

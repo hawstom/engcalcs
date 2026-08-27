@@ -1586,6 +1586,29 @@ $ec_lang['lpn_find_op_bottom']='Lowest n';
 // that meet at the node you found.
 $ec_lang['lpn_find_adjacent']='Connected';
 $ec_lang['lpn_find_no_value']='Type what to look for.';
+// Task 540: the disconnected-node report. "Disconnected" is three different faults and each is
+// said as a CONDITION on one property, so the report is the Find panel with a different condition
+// rather than a second tool. Each op completes the sentence "Junction.Connection ___".
+$ec_lang['lpn_find_prop_connection']='Connection';
+$ec_lang['lpn_find_op_conn_any']='is broken';
+$ec_lang['lpn_find_op_conn_unlinked']='has no links';
+$ec_lang['lpn_find_op_conn_closed']='is behind closed links';
+$ec_lang['lpn_find_op_conn_nosource']='reaches no source';
+// What a result row prints beside the node id: the fault it has, in three words.
+$ec_lang['lpn_find_conn_unlinked']='No links';
+$ec_lang['lpn_find_conn_closed']='Behind closed links';
+$ec_lang['lpn_find_conn_nosource']='No path to a source';
+// "None" is the good news a report is run for, so it is said out loud rather than left as a blank
+// box.
+$ec_lang['lpn_find_conn_none']='Every node is connected.';
+$ec_lang['lpn_find_conn_no_fixed']='This network has no reservoir or tank. Only nodes with no links can be reported.';
+// Task 540: the query written as one line, above the Find button. It teaches the shape of a search;
+// nothing types it in yet, and the tip says so rather than inviting an edit that does nothing.
+$ec_lang['lpn_find_query_tip']='The same search, written as one line. It is here to read, not to type in.';
+// The two conditions that name a control rather than a comparison, said as words the line can use:
+// "Pipe.Velocity highest 10".
+$ec_lang['lpn_find_q_top']='highest';
+$ec_lang['lpn_find_q_bottom']='lowest';
 // Replace (Task 389): the same search, plus a write. It sits inside the Find panel, so the heading
 // says what the section does to the list above it rather than naming a second tool. "Assets" is the
 // word this page already uses for its nodes and pipes.
