@@ -146,17 +146,40 @@ the block.
     compliance question about one node. *Does drawing it break something else* is a design question
     about the whole network — other nodes falling below their minimum, links running at excessive
     velocity. They need different reports and probably different runs.
-  - **[H] THE TIME QUESTION IS OPEN:** *"for an extended (time) simulation, don't we need to let/make
-    the user choose the peak hour or desired time step for the analysis?"* Almost certainly yes, and
-    it changes the interface before it changes the engine.
-  - **THE EMITTER QUESTION DECIDES THE SHAPE AND IS UNRESOLVED.** Tom asked Gemini and got that
-    analysis is normally done on RAW NODES against the pumper nozzle, that the 20 psi rule is partly
-    a fat factor covering the unmodelled hydrant, and that an emitter coefficient is sometimes used
-    to represent the hydrant. **He doubts that last part and his reason is good:** an EPANET emitter
-    is PRESSURE-driven, and a fire flow demand is not — so an emitter may not be able to represent
-    a hydrant at all. Reference he found: `openepanet.org/Topic/22142`. **Settle this from EPANET's
-    own documentation before designing anything**, because "model the assembly" and "use an emitter"
-    are different products.
+    - **[H] THE MARKET DOES IT IN ONE RUN, and that is evidence against the split, not a ruling.**
+      WaterCAD's Fire Flow Analysis reports the residual at the tested node AND the violations it
+      caused elsewhere from the SAME per-node solve, as one table and one colour map. So the second
+      analysis may be free once the first has run. **Whether we still present them as two is Tom's
+      call**; the cost argument for separating them is weaker than it looked.
+  - **[H] THE TIME QUESTION: he was right.** *"for an extended (time) simulation, don't we need to
+    let/make the user choose the peak hour or desired time step for the analysis?"* US practice
+    loads fire flow onto MAXIMUM-DAY demand and evaluates it as one steady-state condition; EPS at
+    the max-day peak hour is a named, explicitly conservative alternative. **Nobody targets "the EPS
+    as a whole"**, so if it is ever run against one, the user picks the frame. Interface before
+    engine, as he said.
+  - **THE EMITTER QUESTION IS SETTLED, 2026-08-26, from the primary EPANET 2.2 manual.** Tom's
+    physics doubt was right: an emitter computes `q = C·p^γ`, is pressure-driven, and its flow is
+    ADDITIVE to the junction's ordinary demand — it is not a fixed demand. **But the manual
+    documents a deliberate fire-flow trick anyway** — an enormous discharge coefficient with the
+    junction elevation raised by the target residual head, so one solve returns the flow that drives
+    the node to exactly 20 psi. It is EPANET-sanctioned and it is contested by practitioners who
+    prefer modelling the assembly. So it is a real choice, not a myth.
+    - **THE HONEST MENU IS THREE, and the default is not ours:** raw-node bisection (WaterCAD's
+      default, so the market's), modelled-assembly bisection (what the branch built), and the
+      emitter trick (one solve per node instead of ~16). **Offer, never impose** — which is the
+      selectable accounting Tom already asked for below.
+    - **DO NOT REACH FOR EPANET 2.2's PRESSURE-DRIVEN ANALYSIS as a shortcut.** It is real and it is
+      vendored here, but nobody in the industry uses it for this job and its pressure targets are
+      set once GLOBALLY, not per node. (Corroborated from two secondary sources, not read from the
+      primary manual — the emitter finding above was.)
+    - **CORRECTION: the "20 psi is partly a fat factor for the unmodelled hydrant" claim does not
+      hold up.** The sourced rationale for the 20 psi floor is a backflow / negative-pressure safety
+      margin. It came from the Gemini answer and it should not be quoted again. NFPA's primary text
+      was not reached, so this is *unsupported*, not *disproved*.
+    - **MEASURED COST OF A FULL SWEEP: ~112 s for 225 junctions** — 16 solves per hydrant at 498 ms,
+      from `dev/fireflow-loss-table.md`. That lands on Tom's own "minutes for a big system".
+      **It does NOT extrapolate:** 49→225 junctions grew worse than linear, so a 1,000–2,000 node
+      number has to be measured before anyone quotes one.
   - **HOWEVER WE ACCOUNT FOR HYDRANT LOSSES, IT MUST BE VISIBLE AND PROBABLY SELECTABLE.** Tom:
     *"I want to be very explicit and transparent, maybe even selectable, about how we account if at
     all for hydrant losses beyond the node."* If the profession's default is raw-node analysis, then
