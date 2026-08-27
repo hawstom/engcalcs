@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1365,
-        "delta_key_count": 33,
+        "expected_key_count": 1378,
+        "delta_key_count": 46,
         "exempt_key_count": 34,
         "exempt_keys": [
             "u_imgd",
@@ -462,6 +462,19 @@
         "lpn_georef_twopt_pick2": "Now click a second known point, as far from the first one as you can.",
         "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
         "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
+        "lpn_find_prop_connection": "Connection",
+        "lpn_find_op_conn_any": "is broken",
+        "lpn_find_op_conn_unlinked": "has no links",
+        "lpn_find_op_conn_closed": "is behind closed links",
+        "lpn_find_op_conn_nosource": "reaches no source",
+        "lpn_find_conn_unlinked": "No links",
+        "lpn_find_conn_closed": "Behind closed links",
+        "lpn_find_conn_nosource": "No path to a source",
+        "lpn_find_conn_none": "Every node is connected.",
+        "lpn_find_conn_no_fixed": "This network has no reservoir or tank. Only nodes with no links can be reported.",
+        "lpn_find_query_tip": "The same search, written as one line. It is here to read, not to type in.",
+        "lpn_find_q_top": "highest",
+        "lpn_find_q_bottom": "lowest",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
         "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
@@ -497,6 +510,19 @@
         "lpn_georef_twopt_pick2": "Now click a second known point, as far from the first one as you can.",
         "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
         "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
+        "lpn_find_prop_connection": "Connection",
+        "lpn_find_op_conn_any": "is broken",
+        "lpn_find_op_conn_unlinked": "has no links",
+        "lpn_find_op_conn_closed": "is behind closed links",
+        "lpn_find_op_conn_nosource": "reaches no source",
+        "lpn_find_conn_unlinked": "No links",
+        "lpn_find_conn_closed": "Behind closed links",
+        "lpn_find_conn_nosource": "No path to a source",
+        "lpn_find_conn_none": "Every node is connected.",
+        "lpn_find_conn_no_fixed": "This network has no reservoir or tank. Only nodes with no links can be reported.",
+        "lpn_find_query_tip": "The same search, written as one line. It is here to read, not to type in.",
+        "lpn_find_q_top": "highest",
+        "lpn_find_q_bottom": "lowest",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
         "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
@@ -664,6 +690,214 @@
                     "key": "lpn_pane_toggle",
                     "value": "Panel bawah",
                     "english": "Bottom panel"
+                }
+            }
+        },
+        "lpn_find_prop_connection": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_op_conn_any": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_op_conn_unlinked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_op_conn_closed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_op_conn_nosource": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_conn_unlinked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_conn_closed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_conn_nosource": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_conn_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_conn_no_fixed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_query_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_top": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_bottom": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Ketik apa yang dicari.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Ubah yang ditemukan",
+                    "english": "Change what was found"
                 }
             }
         },
