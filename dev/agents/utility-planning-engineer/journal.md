@@ -909,3 +909,112 @@ node instead of ~16, still O(N) either way — remains genuinely true and worth 
 exactly as the prior pass concluded**; what does not hold up is the leap from "1 is cheaper than 16"
 to "so that is presumably why the tools that exist do full sweeps," because the tools I could
 actually inspect did not take that route.
+
+---
+
+## 2026-08-27 — Task 530, round 4: Tom's five questions, all sourced this pass
+
+Tom read the branch's own `dev/fireflow-analysis-plan.md` and asked five things: is "EPS" the
+industry word, is Run Manager real and what does it own that a scenario doesn't, is "Design
+Fireflow" a real term with a real colour convention, what actually limits a collateral-effect
+search, and how would this seat scope development phases. Nothing below reopens anything already
+settled on the branch (bisection, raw-node-first, one-run/two-report shape) — those stand.
+
+### Q1 — is "EPS" the industry word for what we call Time? YES, confirmed.
+
+**CITED**, EPANET's own manual (fetched via search synthesis of `epa.gov`/`microimages.com` PDF
+mirrors, not the primary PDF directly this pass — flag as secondary though multiple independent
+mirrors agree word for word): *"EPANET performs extended period simulation of hydraulic and water
+quality behavior... during a simulation period comprised of multiple time steps."* **CITED**,
+Bentley's own page title, fetched directly: `docs.bentley.com` "**EPS Fire Flow Analysis Tool**" —
+the vendor names the time-stepped mode "EPS" in the UI itself, not merely in prose. Tom is right:
+**EPS is the standard term, industry-wide, for a multi-time-step hydraulic run**, distinct from
+"steady-state." Our UI calls the same concept "Time" — a plainer, non-jargon word for the same
+mechanism (`js/lpn-time.js`, OBSERVED, `CLAUDE.md`). **Not proposing a rename** — that is Tom's
+call, and there is a real argument on the other side worth naming so he weighs both: "Time" is
+already Simple-English per this suite's own house style (`dev/language-strings.md`, OBSERVED
+convention, not re-read this pass), and "EPS" is a three-letter acronym that means nothing to a
+first-time visitor outside the trade. If he ever wants the jargon word visible anywhere, the natural
+place is a **tooltip/synonym** ("Extended Period Simulation"), not necessarily the label itself.
+
+### Q2 — the Run Manager paradigm: real, and it is a genuinely different axis from a scenario.
+
+**CITED**, InfoWater Pro's own Run Manager documentation (`help-innovyze.atlassian.net`, fetched
+directly): the tabs are **Standard, Break, Fireflow, Multi-Fire, SCADA, Hydrant Curve, System
+Curve** — Tom's list was accurate, not a guess. Each is a different *simulation type*, not a
+different *network configuration*. **CITED, same page, the load-bearing distinction:** *"a scenario
+contains modeling data that a simulation uses... a run generates an output source — the stored
+results after execution... the most recent simulation run results are referred to as the active
+output source."* Runs can be **saved, loaded, and compared independently of scenarios.**
+**Answering Tom's structural question directly: a Run Manager is a different axis from our
+Scenario concept, not the same one renamed.** A Scenario (`dev/ROADMAP.md` Task 184, OBSERVED) is
+network configuration — what demand, what status, what override. A Run, in this paradigm, is a
+*compute event and its stored output* — which simulation TYPE ran against that configuration, and
+what it produced. One scenario can have many runs against it over time (a Standard run today, a
+Fireflow run next week, both against the same "Existing System" scenario) and a run's own results
+persist independently of whether the scenario is later edited. **This project has no equivalent of
+the second axis at all** — every solve is transient and re-derived on edit (`settings.autoRun`,
+OBSERVED, `CLAUDE.md`), nothing is a stored, named, comparable output distinct from "whatever the
+live solve currently shows." A fire-flow sweep is the first feature this suite would build for
+which that distinction actually matters: it is slow enough (measured ~112 s at 225 junctions,
+prior entry) that auto-solve-on-edit is the wrong trigger, and its own result needs to persist and
+be browseable after the network is edited again — which the market's answer is a Run object, not a
+faster scenario system.
+
+### Q3 — "Design Fireflow" is InfoWater's own real term, confirmed; the colour scheme is NOT confirmed.
+
+**CITED**, Autodesk's own support-article title, fetched via search and corroborated by the phrase
+appearing verbatim in a second independent Autodesk article: *"Design Fireflow is excluding some
+nodes from the search range in InfoWater Pro."* **"Design Fireflow" is a real, named InfoWater
+feature**, not Tom's own coinage or a Gemini paraphrase — this corrects nothing (he used the term
+correctly) but is worth having on record since our own branch doc uses the plainer "does it break
+something else." **CITED**, the same search surfaced the report's actual verdict language:
+*"Capacity Assessment provides 'PASS' or 'FAIL' based on a comparison of the Hydrant Design Flow and
+the Total Demand."* **What I could NOT confirm, and say so rather than guessing: no documentation
+found describes a three-way green/red/orange colour scheme distinguishing an ordinary FAIL from a
+DESIGN FAIL** (collateral damage elsewhere while the tested node itself still passes). I fetched
+WaterGEMS's own Fire Flow Analysis page directly for this specifically and it states only that
+"elements... will be color coded" in a results browser, with no colour key given in the fetched
+text. **Tom's specific three-colour claim (green/red/orange) is plausible and matches how this
+suite's own verdict convention already works** (`CLAUDE.md`, OBSERVED, "leading verdict glyph, ✓
+pass ⚠ caution") but I did not find it stated in either vendor's documentation — **flag as
+unconfirmed, not corrected**, and do not let a later invocation cite this pass as having sourced it.
+
+### Q4 — the collateral-effect search limit: NOT a topological radius or a pressure-drop stop rule. It is a named, user-chosen SCOPE.
+
+**This is the one Tom most wanted sourced, and the finding corrects the shape of his own guess.**
+**CITED**, InfoWater Pro's Fireflow help page (`help.autodesk.com`, fetched directly, primary
+text): the control is called **"Critical Node Searching Range"**, and it is a **choice among four
+named sets**, not an automatic radius or a "stop when drawdown < X" rule: **"Fire Nodes, Entire
+Network, Selection Nodes, and Domain Nodes."** *"Fire Nodes"* limits the collateral check to the
+node(s) actually being tested; *"Entire Network"* checks everything, every trial; *"Selection
+Nodes"* and *"Domain Nodes"* are user-drawn/predefined subsets. **The same shape repeats for
+velocity, under a separate control:** *"Velocity Limit... constrains pipes with options for 'No
+Pipes, Connecting Pipes (adjacent to each hydrant), or Entire Network.'"* **"Connecting Pipes" is
+real and is Tom's own phrase** — but it is one of three fixed choices offered to the user, not a
+computed topological radius (not "N pipes away") and not a computed pressure-drop threshold
+("stop when drop is less than X"). **I searched specifically for a numeric default (a search-range
+distance or node count) and found none published** — the tool asks the user to pick a SET, it does
+not compute or default a radius. **What this means for a limiting mechanism here, if this seat's
+own inference is wanted: the market's actual cost control is not an algorithm that prunes the
+search automatically — it is scope selection handed to the user before the run starts** (test 3
+nodes vs. test the whole network), which is a cheaper design problem than an automatic stopping
+rule and matches this suite's own instinct toward disclosure over invented cleverness. **SPECULATION**,
+mine, re-derive before relying on it: this also explains why nobody publishes a solve-count number
+for the collateral half (§3 of the branch doc, "16 is ours, not Bentley's") — if the scope is
+user-chosen rather than computed, there is no fixed algorithmic cost to publish, only "however many
+nodes you picked times however many are in your search range."
+
+### Q5 — phased development plan, my own scoping, in my order
+
+See the returned report body for the ranked phases; recorded here only what does not fit there.
+**Where I would sequence differently from what a market-precedent read might suggest:** I would
+NOT build a tabbed Run Manager surface as this project's answer to Q2's real gap. At this suite's
+own stated ~10–20 node target scale (`dev/looped-network-calculator-scope.md`, OBSERVED) a 7-tab
+run-type chooser is the subdivision-vs-Novato mismatch this seat exists to catch — the actual gap
+(a slow analysis needs an explicit trigger and a persisted, named result, not auto-solve) can be
+answered by one new concept (a stored, named "Fire Flow Run" result object, browsable after the
+network is edited again) attached to the EXISTING Scenario mechanism, not a second top-level UI
+paradigm sitting beside it. This is a direct disagreement with treating the Run Manager finding as
+"go build one" — it is evidence the STORAGE model needs a new axis, not evidence the INTERFACE
+needs seven tabs.

@@ -363,6 +363,39 @@ times," now with an own-measured cost (≈112 s at 225 junctions, 16 solves/hydr
 same order of magnitude Tom predicted, and an unmeasured gap at this seat's own 1,000–2,000-node
 scale that a later invocation should close before quoting a number that large to him.
 
+**2026-08-27, my own phased scoping, my order, superseding "run N times" as a single lump.** Full
+research: journal, 2026-08-27. Five phases, cheapest and most-used first:
+
+1. **Single-hydrant compliance, raw-node, no assembly, no side effects.** Answers the single most
+   common real question this seat's own audience asks: "will this proposed hydrant meet code at
+   20 psi." Cheapest to build (bisection already exists), cheapest to run (~16 solves, sub-second
+   at this suite's target scale), and matches WaterCAD's own default posture (raw-node,
+   CITED, journal 2026-08-26).
+2. **Add the modelled-assembly toggle**, offered not imposed, exactly as Tom ruled — already built
+   on the branch, this phase is turning it back on as an option beside Phase 1's default.
+3. **Add the "does it break something else" report for that SAME tested node** — one extra
+   fixed-demand solve at the required flow (~6% more cost, `dev/ROADMAP.md` Task 530, OBSERVED),
+   the cheap half of what InfoWater calls Design Fireflow (CITED, journal 2026-08-27 Q3).
+4. **The whole-system sweep, scoped by a user-chosen SET, not an automatic radius.** **CITED**,
+   InfoWater's own "Critical Node Searching Range" is a choice among named sets (Fire Nodes /
+   Entire Network / Selection Nodes / Domain Nodes, journal 2026-08-27 Q4) — that is the shape I
+   would copy, not a computed topological radius. Needs an explicit "run" trigger, never
+   `autoRun` — the whole reason this phase is slow is the reason it must not fire on every edit.
+5. **A persisted, named result the network can be edited past** — the real structural gap
+   Q2's Run Manager research surfaces (journal 2026-08-27): a scenario is config, a run is a
+   stored output, and this suite currently has no second concept at all — every solve is live and
+   re-derived. **I would build this as ONE new field on the existing Scenario mechanism, not a
+   tabbed Run Manager UI** — a 7-tab run-type chooser is built for InfoWater's own scale, not ours.
+   This is a place I disagree with copying the market shape whole, and I say so once here.
+
+**Ship-first recommendation, stated plainly:** Phase 1. It is the smallest phase, it is the
+question a design-and-planning engineer is actually asked most often (reviewing one developer's
+proposed hydrant against one required flow), and every later phase is additive work on top of it
+rather than a redesign. Phase 4 (the "big analysis, minutes for a big system" Tom described) is
+real and worth having, but it is the phase furthest from a normal Tuesday's work and the one most
+likely to need a UI trigger this project has never needed before (explicit run, not autoRun) — I
+would not let it gate Phase 1 shipping.
+
 ---
 
 ## Parked (not declined) — value granted, not building it now
