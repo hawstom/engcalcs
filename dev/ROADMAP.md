@@ -216,6 +216,15 @@ the block.
   - Everything already researched and built is on the branch and in
     `dev/agents/utility-planning-engineer/journal.md` — the AWWA C502 k, the ISO 1,500 gpm cap, the
     lateral standards, `dev/fireflow-loss-table.md`. **None of it needs redoing.**
+  - **THE CONCLUSIONS ARE WRITTEN ON THE BRANCH, beside the code they govern**, at Tom's
+    instruction, 2026-08-26: `dev/fireflow-analysis-plan.md` on `fire-flow`
+    (`58795278`). It carries all of the above at length plus what is still undecided. **This block
+    is the short form; that file is the long one.** If they ever disagree, the transcript and the
+    planning engineer's journal are the record, not either summary.
+    - **The branch is an ANCESTOR of master, which makes `git diff master...fire-flow` empty and
+      misleading.** The fire-flow files were removed from master by `4ae6cf89` after the branch
+      point, so the branch holds them by being older, not by diverging. Compare with
+      `git diff fire-flow master` or list with `git ls-tree -r --name-only fire-flow`.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
