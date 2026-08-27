@@ -159,7 +159,7 @@ console.log('\n--- resizing the canvas keeps the view centre, and tiny changes a
 			// The canvas box as of the previous call. Seeded to the starting box, which is what the
 			// page's own boot does: the first applyMapHeight() records it and re-centres nothing.
 			lastMapBox = env.lastBox === undefined ? { w: 1400, h: env.h0 } : env.lastBox;
-		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'state', 'setTransform', 'pageSettled', 'LPN_MAP_HEIGHT_DEADBAND', 'lastMapBox', 'noteMapSized',
+		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'state', 'setTransform', 'pageSettled', 'LPN_MAP_HEIGHT_DEADBAND', 'lastMapBox', 'noteMapSized', 'placeLegends',
 			extract('viewportHeight') + '\n' +
 			extract('flowBelowMap') + '\n' + extract('effectiveMapHeight') + '\n' +
 			extract('applyMapHeight') +
@@ -168,7 +168,10 @@ console.log('\n--- resizing the canvas keeps the view centre, and tiny changes a
 			{ documentElement: { scrollTop: 0 }, body: { getBoundingClientRect: function () { return { bottom: env.bodyBottom }; } } },
 			svg, MIN, state, function () { transforms++; }, function () { return true; },
 			Number((src.match(/var LPN_MAP_HEIGHT_DEADBAND = (\d+);/) || [])[1]), lastMapBox,
-			function () { /* the deferred-fit hook; nothing to defer in here */ });
+			function () { /* the deferred-fit hook; nothing to defer in here */ },
+			// A resize moves the edges the legends dodge, so applyMapHeight() re-places them. Nothing
+			// here has a legend; the stub exists so the call has something to be.
+			function () { /* placeLegends */ });
 		return { h: svg._h, state: state, transforms: transforms };
 	}
 	// The canvas is 600 tall and the window has room for 682. Growing it by 82 must show 41 more at

@@ -810,8 +810,8 @@
         "lpn_find_op_lt": "less than",
         "lpn_find_count": "{n} found. Click one to go to it.",
         "lpn_find_none": "Nothing matched.",
-        "lpn_find_op_top": "n highest",
-        "lpn_find_op_bottom": "n lowest",
+        "lpn_find_op_top": "{n} highest",
+        "lpn_find_op_bottom": "{n} lowest",
         "lpn_find_adjacent": "Connected",
         "lpn_find_no_value": "Type what to look for.",
         "lpn_find_prop_connection": "Connection",
@@ -845,8 +845,6 @@
         "lpn_find_q_err_close": "This bracket ( was opened and never closed.",
         "lpn_find_q_err_open": "This bracket ) closes nothing.",
         "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
-        "lpn_find_q_top": "highest",
-        "lpn_find_q_bottom": "lowest",
         "lpn_replace_title": "Change what was found",
         "lpn_replace_prop": "Property to change",
         "lpn_replace_value": "New value",
@@ -1405,7 +1403,7 @@
         "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
         "lpn_terrain_ids_more": "{ids}, and {n} more"
     },
-    "count": 1403,
+    "count": 1401,
     "active_prefixes": [
         "about",
         "bpn",

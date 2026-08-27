@@ -3,7 +3,7 @@
     "generated": "dev/scripts/generate_examples.php",
     "examples": [
         {
-            "file": "Net3-World-lpn.json",
+            "file": "Net3-Novato-CA-World.lwn",
             "order": -40,
             "titleKey": "lpn_ex_net3_world_title",
             "descKey": "lpn_ex_net3_world_desc",
@@ -13,7 +13,7 @@
             "flow": "gpm",
             "nodes": 97,
             "links": 119,
-            "thumb": "Net3-World-lpn.svg"
+            "thumb": "Net3-Novato-CA-World.svg"
         },
         {
             "file": "Elm-Street-Center-lpn.json",

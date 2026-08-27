@@ -945,6 +945,7 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 				"\t\tdefaultSettings: defaultSettings, applySaved: applySaved,\n" +
 				"\t\tapplyLegendPosition: applyLegendPosition,\n" +
 				"\t\tapplyColorLegendPosition: applyColorLegendPosition,\n" +
+				"\t\tlegendInsetFor: legendInsetFor,\n" +
 				"\t\tsetLegendPos: function (a, b) { settings.legendPosition = a; settings.colorLegendPosition = b; },\n" +
 				"\t\tmapWrap: function () { return svg && svg.parentNode; },\n" +
 				"\t\tserializeProject: serializeProject,\n" +
@@ -996,60 +997,89 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 	ok('...and keeps its labels-legend corner too -- a default is not an override',
 		reopened.legendPosition === 'top-right', 'got ' + reopened.legendPosition);
 
-// ---- 11. A TOP-LEFT LEGEND AND THE STATUS STACK DO NOT SHARE THE CORNER -------------------------
+// ---- 11. THE LEGENDS GIVE WAY TO THE READOUTS, NOT THE OTHER WAY ROUND -------------------------
 //
-// Task 527's phone ruling put the labels legend upper left. `#lpn_map_overlay_tl` -- the mode hint
-// and the solver's standing diagnostic -- is ALSO at top-left, so the two landed on each other.
-// Screenshot 0046 is the evidence: the labels legend printing through the orange engine note.
-// **This is a regression the ruling introduced**, not a pre-existing defect; nothing collided while
-// both legends defaulted to the right.
+// Task 527's phone ruling put the labels legend upper left, where `#lpn_map_overlay_tl` -- the mode
+// hint and the solver's standing diagnostic -- already was, and the two landed on each other.
 //
-// The fix follows `--lpn-overlay-right` exactly: a published custom property that the stack reads as
-// extra `top`, so a second top-left overlay added later inherits the behaviour instead of somebody
-// having to remember. **Asserted on the PROPERTY, not on pixels** -- nothing here rasterises, and
-// what a harness can honestly prove is that the number is published when a legend is in that corner
-// and withdrawn when it is not.
+// **THE FIRST FIX PUSHED THE STACK DOWN and Tom rejected it** (2026-08-27: *"Top left pushes the
+// mode string down below the legend. This looks bad. Bottom left covers the Scenario status. The
+// answer is for the legends to adjust their positioning so that they don't disturb these other
+// denizens of the map."*). So the direction is now the assertion: a corner a user cannot change
+// wins, and the legend -- whose corner IS a setting -- moves.
+//
+// **ASSERTED ON THE PURE FUNCTION**, because nothing in this stub rasterises: every element returns
+// the same 1000x500 rect, so driving the placer would prove nothing about pixels. legendInsetFor()
+// takes rects and returns a number, which is the whole rule, and it is fed hand-written boxes here.
 {
-	// The stub's canvas has no parent until something appends it, and applyOverlayTopInset() writes
-	// the property onto `svg.parentNode` — the real page's `#lpn_map_wrap`. Give it one, or the
-	// function returns early and all four assertions below pass for the wrong reason.
-	const inset = (labels, colour) => atWidth(SMALL, (M) => {
-		M.buildLayers();
-		const canvas = global.document.getElementById('lpn_canvas');
-		if (canvas && !canvas.parentNode) {
-			const wrap = global.document.createElement('div');
-			wrap.appendChild(canvas);
-		}
-		M.setLegendPos(labels, colour);
-		M.applyLegendPosition();
-		M.applyColorLegendPosition();
-		const wrap = M.mapWrap();
-		return wrap && wrap.style ? (wrap.style.getPropertyValue('--lpn-overlay-top') || '') : '(no wrap)';
-	});
-	const away = inset('top-right', 'bottom-right');
-    ok('with no legend in the top-left corner the stack is not pushed down at all',
-		away === '0px' || away === '', 'got "' + away + '"');
-	const under = inset('top-left', 'bottom-right');
-	ok('a labels legend in the top-left corner publishes an inset for the status stack',
-		/^\d+px$/.test(under) && parseInt(under, 10) > 0, 'got "' + under + '"');
-	const off = inset('off', 'bottom-right');
-	ok('...and turning that legend Off withdraws the inset again',
-		off === '0px' || off === '', 'got "' + off + '"');
-	// **The colour key is asserted at the SOURCE, not by driving it, and the difference is worth
-	// stating.** `colorLegendBox` is a module variable set only when the colour legend is actually
-	// built, which this stub does not do — so driving it here would return early and pass for the
-	// wrong reason, which is the exact trap `dev/testing-notes.md` warns about. What IS checkable is
-	// the wiring question: both placers must call the inset, or a user who puts the colour key in
-	// that corner by hand gets the collision back. The pixels are the browser pass's job.
+	const M = atWidth(SMALL, (mod) => mod);
+	const inset = M.legendInsetFor;
+	// The map, and the two readouts that own its corners by right: the mode hint at the top left,
+	// the scenario button at the bottom left. Both are SHORT here -- a wide map.
+	const wrap = { top: 0, bottom: 500, left: 0, right: 1000 };
+	const hint = { anchor: 'top', rect: { top: 4, bottom: 20, left: 4, right: 200 } };
+	const foot = { anchor: 'bottom', rect: { top: 470, bottom: 490, left: 4, right: 300 } };
+	const occ = [hint, foot];
+	const box = (l, r) => ({ left: l, right: r });
+
+	ok('a top-right legend on a wide map sits in the corner, undisturbed',
+		inset('top', wrap, box(800, 996), occ) === 4, String(inset('top', wrap, box(800, 996), occ)));
+	// 20 (the hint's bottom, in the map's frame) + 4 of air.
+	ok('a top-LEFT legend clears the mode hint by dropping below it -- the hint does not move',
+		inset('top', wrap, box(4, 200), occ) === 24, String(inset('top', wrap, box(4, 200), occ)));
+	// 500 - 470 + 4.
+	ok('a bottom-left legend clears the Scenario button by rising above it',
+		inset('bottom', wrap, box(4, 200), occ) === 34, String(inset('bottom', wrap, box(4, 200), occ)));
+	ok('a bottom-RIGHT legend on a wide map is left alone',
+		inset('bottom', wrap, box(800, 996), occ) === 4);
+
+	// **TOM'S NARROW-MAP CASE**: *"If the map were narrow, this observation would apply to the right
+	// side like the left side."* Nothing about the corner changed -- the readout got wider.
+	const wideHint = [{ anchor: 'top', rect: { top: 4, bottom: 20, left: 4, right: 900 } }, foot];
+	ok('a mode hint long enough to reach the right side pushes a top-RIGHT legend down too',
+		inset('top', wrap, box(800, 996), wideHint) === 24,
+		String(inset('top', wrap, box(800, 996), wideHint)));
+	ok('...and the same legend is untouched when the hint stops short of it',
+		inset('top', wrap, box(800, 996), occ) === 4);
+	// Abutting is not overlapping, or two boxes that merely touch would each shove the other.
+	ok('a readout that stops exactly where the legend starts does not push it',
+		inset('top', wrap, box(200, 400), occ) === 4, String(inset('top', wrap, box(200, 400), occ)));
+	// The band matters as much as the overlap: a bottom readout is no reason to move a top legend.
+	ok('a top legend ignores what is happening along the bottom edge',
+		inset('top', wrap, box(4, 200), [foot]) === 4);
+	// The tallest wins, so a two-line stack is cleared rather than half-cleared.
+	const twoLine = occ.concat([{ anchor: 'top', rect: { top: 24, bottom: 60, left: 4, right: 400 } }]);
+	ok('a stack of two readouts is cleared by the LOWER of them',
+		inset('top', wrap, box(4, 200), twoLine) === 64, String(inset('top', wrap, box(4, 200), twoLine)));
+
+	// A middle position touches neither band, and the placer's guard for that is the corner table
+	// itself: it dodges only a position anchored 4px from an edge.
 	const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-	const placers = src.match(/function applyColorLegendPosition\(\)[\s\S]*?\n\t\}/);
-	ok('the colour key placer calls the inset too, so the corner is not phone-only',
-		!!placers && /applyOverlayTopInset\(\)/.test(placers[0]),
-		placers ? 'found ' + (placers[0].match(/applyOverlayTopInset/g) || []).length + ' call(s)' : 'placer not found');
-	// The consumer half: the markup must actually READ the property, or publishing it is theatre.
+	const table = src.match(/var LEGEND_POSITIONS = \{[\s\S]*?\n\t\};/)[0];
+	ok('a middle position is anchored at 50%, so the placer leaves it alone',
+		/'middle-left': \{ top: '50%'/.test(table) && /'middle-right': \{ top: '50%'/.test(table));
+
+	// **THE WRONG DIRECTION MUST NOT COME BACK.** The rejected fix was a `--lpn-overlay-top` custom
+	// property that the status stack read as extra `top`. Both halves of it are asserted gone: no
+	// publisher in the code, no consumer in the markup.
+	ok('nothing publishes --lpn-overlay-top any more', src.indexOf('--lpn-overlay-top') < 0);
 	const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
-	ok('and #lpn_map_overlay_tl really reads it, so publishing it is not theatre',
-		/id="lpn_map_overlay_tl"[^>]*top:calc\(4px \+ var\(--lpn-overlay-top, 0px\)\)/.test(php));
+	ok('and the status stack is back at a plain top: 4px, not a calc() that a legend can push',
+		/id="lpn_map_overlay_tl"[^>]*top:4px/.test(php) && php.indexOf('--lpn-overlay-top') < 0);
+	// The wiring question the pure function cannot answer: both corner settings must arrive at the
+	// one placer, or a user who moves the colour key by hand gets the collision back.
+	ok('both legend placers go through placeLegends()',
+		/function applyLegendPosition\(\) \{ placeLegends\(\); \}/.test(src) &&
+		/function applyColorLegendPosition\(\) \{ placeLegends\(\); \}/.test(src));
+	// And the readouts themselves must re-trigger it: each of these changes how wide or how tall a
+	// denizen is, and a dodge computed against the previous text is stale.
+	['function updateModeHint', 'function setStatus', 'function refreshMapStatus',
+		'function refreshScenarioStatus', 'function applyMapOverlayInset'].forEach((fn) => {
+		const at = src.indexOf(fn);
+		const body = src.substring(at, src.indexOf('\n\t}', at));
+		ok(fn + '() re-places the legends after changing what they dodge',
+			at > 0 && body.indexOf('placeLegends()') > 0);
+	});
 }
 }
 

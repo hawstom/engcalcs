@@ -218,7 +218,7 @@ console.log('\n-- layout: a deliberate order, not an accident of equal size --')
 	// an SI example led -- that was Tom's 2026-08-14 ruling when the basics were the head, and it is
 	// superseded, not broken. What survives of it is checked just below: SI still precedes US among
 	// the two basics, which is what he actually cared about and what a size sort cannot express.
-	report(examples[0].file === 'Net3-World-lpn.json', 'Net3-World leads the wall', examples[0].file);
+	report(examples[0].file === 'Net3-Novato-CA-World.lwn', 'Net3-World leads the wall', examples[0].file);
 	report(examples[1].file === 'Elm-Street-Center-lpn.json', 'and Elm Street Center is second',
 		examples[1].file);
 	let sorted = true;

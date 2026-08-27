@@ -77,7 +77,7 @@ const L = loadLoopedNetwork(
 L.buildLayers();
 L.setCanvas(1400, 900);
 L.applySaved(JSON.parse(fsmod.readFileSync(
-	ROOT + 'dev/water-network-examples/Net3-World-lpn.json', 'utf8')));
+	ROOT + 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'utf8')));
 L.buildDom();
 L.setView(L.geoHome());
 L.noteMapSized();

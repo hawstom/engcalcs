@@ -203,6 +203,38 @@ console.log('\n-- a panel with no .lpn-popover-body scrolls itself (the menus) -
 		'and is capped to the room it has', p.style.maxHeight);
 }
 
+console.log('\n-- A FLY-OUT OPENS BESIDE THE ROW THAT OPENED IT, LEVEL WITH IT --');
+{
+	// Tom, 2026-08-27, of File > New project: the fly-out *"is too low"* -- it opened four rows
+	// down, level with "Import EPANET file…" rather than with the row carrying the arrow.
+	//
+	// The cause was the chrome floor. File's pull-down hangs from the MENU BAR and is deliberately
+	// allowed to cover the toolbar and tab strip below it (a menu row has no top band to protect),
+	// so its first row is ABOVE chromeFloor() -- and clamping the fly-out to that floor pushed it
+	// down by the whole height of the toolbar.
+	window.innerHeight = 900;
+	CHROME_FLOOR = 180;            // menu bar + toolbar + tab strip, as on a real desktop window
+	const row = rect(20, 92, 200, 24);   // the first row of an open File menu, under the menu bar
+	const p = fakePanel(240, 200, 8, false);
+	openPanelAtAnchor(p, row, true);
+	report(px(p.style.top) === row.top,
+		'the fly-out is level with its row, not with the bottom of the toolbar', p.style.top);
+	report(px(p.style.left) === row.right, '...and beside it, on the right', p.style.left);
+	// The clamps it DOES keep: the bottom of the window, and the flip to the left when there is no
+	// room on the right.
+	window.innerHeight = 240;
+	const low = fakePanel(240, 200, 8, false);
+	openPanelAtAnchor(low, rect(20, 200, 200, 24), true);
+	report(px(low.style.top) + low.getBoundingClientRect().height <= 240 - EDGE,
+		'a fly-out near the bottom of a short window is still pulled into view', low.style.top);
+	window.innerHeight = 900;
+	const flip = fakePanel(240, 200, 8, false);
+	openPanelAtAnchor(flip, rect(1050, 92, 130, 24), true);
+	report(px(flip.style.left) === 1050 - 240,
+		'and one with no room on the right flips to the left of its row', flip.style.left);
+	CHROME_FLOOR = 0;
+}
+
 console.log('\n-- fitPanelToViewport: for the panels with no anchor to avoid --');
 {
 	for (const vh of [1000, 500, 220]) {

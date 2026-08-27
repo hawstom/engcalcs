@@ -1578,17 +1578,21 @@ $ec_lang['lpn_find_op_lt']='less than';
 $ec_lang['lpn_find_count']='{n} found. Click one to go to it.';
 $ec_lang['lpn_find_none']='Nothing matched.';
 // The two extremes, as conditions on the same footing as "greater than" -- the Value box holds how
-// many. The literal n is Tom's own wording and is the shortest way to say that the number goes in
-// the box beside it; it is NOT a placeholder and nothing substitutes it. "Top"/"Bottom" were
-// changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the top is an edge.
-// **LOWERCASED, AND THE n MOVED IN FRONT, 2026-08-26 -- both Tom's** (*"'n highest' and 'n lowest'
-// will be better"*). The capital broke the rule stated a dozen lines above and nowhere else: every
-// other operator is lowercase so the three pull-downs read as one sentence left to right. It was
-// inherited from "Top"/"Bottom" and survived the rename that made them ordinary adjectives. The
-// order is the bigger fix: "n highest" is the English for what the box holds, where "highest n"
-// asks the reader to work out that n is a count and not a rank.
-$ec_lang['lpn_find_op_top']='n highest';
-$ec_lang['lpn_find_op_bottom']='n lowest';
+// many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
+// top is an edge, and lowercased with the count moved in FRONT on 2026-08-26 -- both Tom's ("'n
+// highest' and 'n lowest' will be better"). Every other operator is lowercase so the three
+// pull-downs read as one sentence left to right, and "{n} highest" is the English for what the box
+// holds where "highest {n}" asks the reader to work out that the number is a count and not a rank.
+//
+// **{n} IS A REAL PLACEHOLDER, AND THIS ONE STRING SERVES BOTH THE PULL-DOWN AND THE QUERY LINE**
+// (Tom, 2026-08-27: *"What needs to match are the selector and the string, both per the lang
+// file."*). The pull-down prints the letter n in the slot, because the number is not chosen yet;
+// the query line above the Find button prints the count the search will actually use, so it reads
+// "Pipe.Velocity 10 highest". Keep the placeholder: the query PARSER is built from this same value
+// and reads a number wherever {n} stands, so a translation that dropped it would take the count
+// off the line as well.
+$ec_lang['lpn_find_op_top']='{n} highest';
+$ec_lang['lpn_find_op_bottom']='{n} lowest';
 // EPANET's Map Finder calls this "Adjacent Links". Said plainly here: the pipes, pumps and valves
 // that meet at the node you found.
 $ec_lang['lpn_find_adjacent']='Connected';
@@ -1652,10 +1656,6 @@ $ec_lang['lpn_find_q_err_quote_end']='This quoted text has no closing quote.';
 $ec_lang['lpn_find_q_err_close']='This bracket ( was opened and never closed.';
 $ec_lang['lpn_find_q_err_open']='This bracket ) closes nothing.';
 $ec_lang['lpn_find_q_err_end']='Nothing was expected after this. Join two searches with {and} or {or}.';
-// The two conditions that name a control rather than a comparison, said as words the line can use:
-// "Pipe.Velocity highest 10".
-$ec_lang['lpn_find_q_top']='highest';
-$ec_lang['lpn_find_q_bottom']='lowest';
 // Replace (Task 389): the same search, plus a write. It sits inside the Find panel, so the heading
 // says what the section does to the list above it rather than naming a second tool. "Assets" is the
 // word this page already uses for its nodes and pipes.

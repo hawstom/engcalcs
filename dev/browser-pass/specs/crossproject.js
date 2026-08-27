@@ -53,7 +53,7 @@ exports.run = async function ({ browser, report }) {
 		await a.goto();
 		await a.makeEdit();
 		await a.settle(400);
-		await openFile(a, 'Net3-World-lpn.json');
+		await openFile(a, 'Net3-Novato-CA-World.lwn');
 		await openFile(a, 'Net3-lpn.json');
 
 		// The switch is synchronous inside the click handler, so the evaluate does not return until

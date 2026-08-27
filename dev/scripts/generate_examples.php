@@ -54,6 +54,19 @@ $check = in_array('--check', $argv, true);
  * was answering a question about the GALLERY, and the answer went away when the file did. One list,
  * in the file whose whole purpose is per-example metadata. `dev/scripts/example_folder_check.php`
  * is the watch that replaced the deny. */
+/* **BOTH EXTENSIONS, BECAUSE THE FOLDER HOLDS BOTH.** `.lwn` is what the page writes now (Task
+ * 246) and what Tom saves from it; `-lpn.json` is what the older sources in here are still called.
+ * The published copy keeps whatever the source was called, so the two can be renamed one at a time
+ * -- or never, since the manifest carries the name and nothing derives it. */
+function exampleIsProjectFile($name) {
+	return substr($name, -5) === '.json' || substr($name, -4) === '.lwn';
+}
+/* The thumbnail sits beside its project and is named after it, whichever extension that project
+ * has. Derived here rather than by a `.json` replace, which silently produced no `.svg` at all for
+ * a `.lwn` source and left the card with a hole where the picture goes. */
+function exampleThumbName($name) {
+	return preg_replace('/\.(json|lwn)$/', '', $name) . '.svg';
+}
 function publishedExamples($srcDir, $metaFile) {
 	$out = array();
 	if (!is_file($metaFile)) { return $out; }
@@ -61,7 +74,7 @@ function publishedExamples($srcDir, $metaFile) {
 	if (!is_array($meta)) { return $out; }
 	foreach ($meta as $name => $rec) {
 		if ($name === '' || $name[0] === '_' || !is_array($rec)) { continue; }   // _note, _order
-		if (substr($name, -5) !== '.json') { continue; }
+		if (!exampleIsProjectFile($name)) { continue; }
 		if (is_file($srcDir . '/' . $name)) { $out[] = $name; }
 	}
 	sort($out);
@@ -200,7 +213,7 @@ foreach ($files as $name) {
 	$desc = $en[$descKey] ?? '';
 
 	$svg = thumbnailSvg($doc);
-	$thumbName = preg_replace('/\.json$/', '.svg', $name);
+	$thumbName = exampleThumbName($name);
 	if ($svg === null) { $problems[] = "$name: nothing drawable, no thumbnail"; }
 
 	$manifest[] = array(

@@ -2448,6 +2448,9 @@ var EngCalcs = EngCalcs || {};
 			(pc.lpn_scenario_label || 'Scenario') + ': ' + scenarioDisplayName(scn)
 			+ ' | ' + (pc.lpn_scenario_overrides || 'Overrides') + ': ' + overrideCount(scn));
 		refreshScenarioTip(btn);
+		// The scenario name is user-typed and can be long, so the bottom band's width is not knowable
+		// in advance -- a bottom legend re-dodges around whatever it now measures.
+		placeLegends();
 	}
 	// **THE COUNT HAS TO SAY WHAT IT IS COUNTING** (ROADMAP Task 512). "Custom values: 3" and three
 	// amber rings on the map are the same fact, and nothing said so: Tom and Mary each read the rings
@@ -4054,15 +4057,9 @@ var EngCalcs = EngCalcs || {};
 		box.style.display = (any && !legendIsOff(settings.colorLegendPosition)) ? '' : 'none';
 		applyColorLegendPosition();
 	}
-	function applyColorLegendPosition() {
-		var box = colorLegendBox; if (!box) { return; }
-		if (legendIsOff(settings.colorLegendPosition)) { box.style.display = 'none'; applyOverlayTopInset(); return; }
-		var pos = LEGEND_POSITIONS[settings.colorLegendPosition] || LEGEND_POSITIONS['bottom-right'];
-		box.style.top = pos.top; box.style.bottom = pos.bottom;
-		box.style.left = pos.left; box.style.right = pos.right;
-		box.style.transform = pos.transform;
-		applyOverlayTopInset();
-	}
+	// Both legends are placed by one function, so neither can be positioned without the other's
+	// box being taken into account -- see placeLegends().
+	function applyColorLegendPosition() { placeLegends(); }
 	function buildNodeEls(n) {
 		var circle = el('circle', {
 			cx: n.x, cy: n.y, r: nodeRadius(n),
@@ -7576,14 +7573,40 @@ var EngCalcs = EngCalcs || {};
 		if (findPropIsText(findState.prop)) {
 			return [['contains', pc.lpn_find_op_contains || 'contains', 'contains'],
 				['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'],
-				['top', pc.lpn_find_op_top || 'n highest', 'n highest'],
-				['bottom', pc.lpn_find_op_bottom || 'n lowest', 'n lowest']];
+				findExtremeDef('top'), findExtremeDef('bottom')];
 		}
 		return [['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'],
 			['gt', pc.lpn_find_op_gt || 'greater than', 'greater than'],
 			['lt', pc.lpn_find_op_lt || 'less than', 'less than'],
-			['top', pc.lpn_find_op_top || 'n highest', 'n highest'],
-			['bottom', pc.lpn_find_op_bottom || 'n lowest', 'n lowest']];
+			findExtremeDef('top'), findExtremeDef('bottom')];
+	}
+	// **ONE STRING SERVES THE PULL-DOWN, THE QUERY LINE AND THE PARSER** (Tom, 2026-08-27: *"the
+	// parser needs to read the lang keys instead of doing IO on its internal strings... What needs
+	// to match are the selector and the string, both per the lang file."*).
+	//
+	// `lpn_find_op_top` is a TEMPLATE with an {n} in it. The pull-down prints the letter n there,
+	// because no count has been chosen when a menu is drawn; the query line prints the count the
+	// search will actually use. There were two keys for this until today -- `n highest` for the
+	// menu and `highest` for the line -- and the parser then had to be taught a word that was on no
+	// control, which is exactly the internal string Tom is naming. There is now nothing to keep in
+	// step: findExtremeText() renders the one value both ways and findExtremeRegex() reads it back.
+	function findExtremeTemplate(key) {
+		var pc = EngCalcs.pageConfig || {};
+		return key === 'top' ? (pc.lpn_find_op_top || '{n} highest')
+			: (pc.lpn_find_op_bottom || '{n} lowest');
+	}
+	// A template whose translation has LOST the placeholder still has to say the count, or the line
+	// would read "Pipe.Velocity highest" and mean ten without saying so. Appended rather than
+	// dropped: this is the failure of a translation, and the reader is owed the number either way.
+	function findExtremeText(key, n) {
+		var t = findExtremeTemplate(key), v = String(n);
+		return t.indexOf('{n}') >= 0 ? t.split('{n}').join(v) : (t + ' ' + v);
+	}
+	// The def the pull-down and the parser share: the localized template with the letter n standing
+	// in the slot, plus the English one, which is accepted in every language like every other word
+	// of the query language.
+	function findExtremeDef(key) {
+		return [key, findExtremeText(key, 'n'), key === 'top' ? 'n highest' : 'n lowest'];
 	}
 	function findOpIsExtreme(op) { return op === 'top' || op === 'bottom'; }
 	// How many an extremes query returns. The Value box holds it, and a blank or nonsense entry
@@ -7894,9 +7917,9 @@ var EngCalcs = EngCalcs || {};
 	// of the two. The cost is stated and accepted: a query string is not portable between
 	// languages, which is why the parser below ALSO accepts the English spelling of every word.
 	//
-	// Two operators do not compose into a sentence and get their own word here: "n highest" and
-	// "n lowest" name a control, not a comparison, so the line says `highest 10` with the count the
-	// search will actually use. Everything else reuses the label as it stands.
+	// The two extremes name a control rather than a comparison, so the line renders their own
+	// template with the count in it -- `Pipe.Velocity 10 highest`, from the same string the
+	// pull-down is showing as `n highest`. Everything else reuses the label as it stands.
 	function findLabelOf(defs, key) {
 		var i;
 		for (i = 0; i < defs.length; i++) { if (defs[i][0] === key) { return defs[i][1]; } }
@@ -7911,9 +7934,7 @@ var EngCalcs = EngCalcs || {};
 			v = String(findState.value).trim();
 		if (findPropIsConnection(findState.prop)) { return head + ' ' + op; }
 		if (findOpIsExtreme(findState.op)) {
-			return head + ' ' + (findState.op === 'top'
-				? (pc.lpn_find_q_top || 'highest')
-				: (pc.lpn_find_q_bottom || 'lowest')) + ' ' + findExtremeCount();
+			return head + ' ' + findExtremeText(findState.op, findExtremeCount());
 		}
 		// A text value is QUOTED, so that an empty box reads as the empty string it is matched as
 		// rather than as a sentence that stops in the middle -- `Everything.ID contains ''` is the
@@ -7983,6 +8004,41 @@ var EngCalcs = EngCalcs || {};
 				if (n && (!best || n > best.len)) { best = { key: alts[i].key, len: n }; }
 			}
 		}
+		return best;
+	}
+	// **THE PATTERN IS BUILT FROM THE LANG VALUE, so a translator cannot break parsing.** The
+	// template is split at {n} and each literal half is escaped, with every run of whitespace
+	// relaxed to `\s+` -- a person typing the line back is not going to reproduce our spacing, and
+	// in several languages the count sits between two words rather than at an end.
+	//
+	// The slot itself accepts a NUMBER or the letter n: the pull-down shows n, so somebody reading
+	// the menu and typing what they see gets the same ten the line would have printed.
+	function findExtremeRegex(tpl) {
+		var src = String(tpl).split('{n}').map(function (part) {
+			return part.split(/\s+/).map(function (t) {
+				return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			}).join('\\s+');
+		}).join('(\\d+|[nN])');
+		return new RegExp('^(?:' + src + ')', 'i');
+	}
+	// { key, len, count } for an extreme condition starting at `at`, or null. `count` is '' when the
+	// slot held the letter n, which findExtremeCount() reads as ten -- the same answer an empty
+	// Value box gives.
+	function findMatchExtreme(text, at, opDefs) {
+		var best = null, rest = text.substring(at);
+		['top', 'bottom'].forEach(function (key) {
+			if (!opDefs.some(function (d) { return d[0] === key; })) { return; }
+			[findExtremeTemplate(key), key === 'top' ? '{n} highest' : '{n} lowest'].forEach(function (tpl) {
+				var m = findExtremeRegex(tpl).exec(rest), after;
+				if (!m || !m[0].length) { return; }
+				after = rest.charAt(m[0].length);
+				// The same word boundary findWordAt() applies: "10 highest" must not match inside
+				// "10 highestish".
+				if (after && FIND_WORDCH.test(after) && FIND_WORDCH.test(m[0].charAt(m[0].length - 1))) { return; }
+				if (best && best.len >= m[0].length) { return; }
+				best = { key: key, len: m[0].length, count: /^\d+$/.test(m[1] || '') ? m[1] : '' };
+			});
+		});
 		return best;
 	}
 	function findAltList(alts) {
@@ -8076,16 +8132,17 @@ var EngCalcs = EngCalcs || {};
 			prop = m.key; i += m.len;
 			opDefs = findDefsFor(scope, prop).ops;
 			opAlts = findAlts(opDefs);
-			// The extremes are written `highest 10` on the printed line and `n highest` in the
-			// pull-down, so both spellings answer, plus the English of each.
-			opAlts = opAlts.concat(findAlts([
-				['top', (EngCalcs.pageConfig || {}).lpn_find_q_top || 'highest', 'highest'],
-				['bottom', (EngCalcs.pageConfig || {}).lpn_find_q_bottom || 'lowest', 'lowest']
-			]).filter(function (a) {
-				return opDefs.some(function (d) { return d[0] === a.key; });
-			}));
 			ws();
 			at = i;
+			// **AN EXTREME IS MATCHED AS A WHOLE PHRASE, COUNT INCLUDED**, because its count is
+			// INSIDE the words rather than after them -- `10 highest` in English, `最高 10 个` in
+			// Chinese. Tried first, and only where that op is on offer: `10 highest` must not be
+			// read as a bare value that happens to be followed by a word.
+			m = findMatchExtreme(s, i, opDefs);
+			if (m) {
+				i += m.len;
+				return { t: 'cond', scope: scope, prop: prop, op: m.key, value: m.count };
+			}
 			m = findMatchAlt(s, i, opAlts);
 			if (!m) {
 				return fail('lpn_find_q_err_op', 'Not a condition for {prop}: {w}. Try one of: {list}',
@@ -9261,6 +9318,9 @@ var EngCalcs = EngCalcs || {};
 		// The consumers read `calc(4px + var(--lpn-overlay-right, 0px))`, so this carries the extra
 		// inset only -- the 4px edge gap stays where it is written, in the overlay's own style.
 		wrap.style.setProperty('--lpn-overlay-right', w + 'px');
+		// A narrower map is exactly the case where a readout starts to reach under a right-hand
+		// legend, so the dodge is recomputed whenever the panel changes the room there is.
+		placeLegends();
 	}
 	function applyRPaneLayout() {
 		var pane = rpaneEl(), btn = document.getElementById('lpn_rpane_btn');
@@ -11822,6 +11882,9 @@ var EngCalcs = EngCalcs || {};
 		var el = document.getElementById('lpn_mode_hint'); if (!el) { return; }
 		var pc = EngCalcs.pageConfig || {}, key = MODE_HINT_KEYS[mode];
 		el.textContent = key ? (pc[key] || '') : '';
+		// The hint's width and line count change with the mode and with the language, and a legend
+		// dodges the box that is there NOW -- see placeLegends().
+		placeLegends();
 	}
 	// ---- CLEAN MAP (ROADMAP Task 253) ----------------------------------------------------------
 	//
@@ -18702,6 +18765,7 @@ var EngCalcs = EngCalcs || {};
 			(pc.lpn_units_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
 			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
 		].join(' | ');
+		placeLegends();
 	}
 	// "US Units" / "SI Units", for the example network's title block. `system` is the preset the
 	// caller just committed the project to, never a reading of the live strip: an example FORCES the
@@ -19410,50 +19474,110 @@ var EngCalcs = EngCalcs || {};
 		// The canvas now has a height derived from the window rather than from the markup, so any
 		// fit that was waiting for one can have its answer.
 		noteMapSized();
+		// A resize moves both the bottom edge the legends measure from and the width at which the
+		// footer wraps, so the dodge is recomputed here rather than left until the next render.
+		placeLegends();
 	}
 	// **THIS ONLY EVER HIDES; IT NEVER SHOWS.** renderLabelsLegend() owns the other two reasons the
 	// box can be absent -- nothing to show, and thematic mode -- so a function that also un-hid would
 	// be a second opinion about display and would put the legend back on a thematic map. The dropdown
 	// therefore calls the RENDER rather than this, and the render calls this last.
-	// **A LEGEND IN THE TOP-LEFT CORNER SHARES THAT CORNER WITH THE STATUS STACK, so the stack moves
-	// down.** `#lpn_map_overlay_tl` holds the mode hint and the solver's standing diagnostic at
-	// top: 4px, left: 4px. Nothing collided while both legends defaulted to the right; Task 527's
-	// phone ruling put the labels legend upper left (Tom, 2026-08-25) and they landed on each other
-	// — visible in screenshot 0046, the labels legend printing through the orange engine note.
+	// **THE LEGEND MOVES; THE READOUTS DO NOT** (Tom, 2026-08-27: *"the answer is for the legends to
+	// adjust their positioning so that they don't disturb these other denizens of the map"*).
 	//
-	// Published as a CUSTOM PROPERTY for the same reason `--lpn-overlay-right` is: the consumer reads
-	// `calc(4px + var(--lpn-overlay-top, 0px))`, so a second top-left overlay added later inherits
-	// the behaviour by using the variable rather than by somebody remembering this function exists.
-	// It carries the extra inset only; the 4px edge gap stays in the overlay's own style.
+	// The map's corners already belong to things a user cannot reposition: `#lpn_map_overlay_tl` (the
+	// mode hint and the solver's standing diagnostic) at the top, `#lpn_map_footer` (the scenario
+	// button, the units readout and the coordinate tracker) and the tile credit at the bottom. A
+	// legend is the one box here whose corner IS a setting, so it is the one that gives way.
 	//
-	// NOT phone-only, deliberately. A user may put either legend top-left at any width, and the
-	// collision is the same one there.
-	function applyOverlayTopInset() {
-		var wrap = svg && svg.parentNode, h = 0, i, box;
-		if (!wrap || !wrap.style) { return; }
-		var boxes = [
+	// **THE FIRST ANSWER PUSHED THE STACK DOWN INSTEAD, and it was the wrong way round.** A custom
+	// property (the top-inset twin of `--lpn-overlay-right`) moved the mode hint below a legend, which put the
+	// page's most-read line an inch down the map and left a gap above it whenever the legend was tall
+	// (Tom: *"Top left pushes the mode string down below the legend. This looks bad."*). It also said
+	// nothing at all about the bottom corners, where a bottom-left legend simply covered the Scenario
+	// button. Do not reinstate that property; the markup no longer reads it, and the small-screen
+	// harness asserts that neither half of it has come back.
+	//
+	// **THE TEST IS OVERLAP, NOT A CORNER NAME.** Tom, same day: *"If the map were narrow, this
+	// observation would apply to the right side like the left side."* The two readout rows span
+	// whatever their text needs, so on a narrow map they reach under a RIGHT-hand legend exactly as
+	// they do a left-hand one. So a legend clears any occupant whose horizontal span meets its own,
+	// wherever both of them are, and a wide window costs nothing because nothing overlaps.
+	//
+	// A middle-left or middle-right legend clears both bands by construction and is never moved.
+	var LEGEND_GAP = 4;
+	// **PURE, so the rule is testable without a layout engine.** Given the map's own box, the
+	// legend's box and the boxes already spoken for, how far in from the `anchor` edge this legend
+	// has to sit. Everything here is a rect; nothing here reads the DOM.
+	function legendInsetFor(anchor, wrap, legend, occupants) {
+		var inset = LEGEND_GAP, i, o, v;
+		for (i = 0; i < occupants.length; i++) {
+			o = occupants[i];
+			if (o.anchor !== anchor) { continue; }
+			// Touching edges are not an overlap: `<` and `>`, so two boxes that merely abut do not
+			// each push the other.
+			if (!(o.rect.left < legend.right && o.rect.right > legend.left)) { continue; }
+			v = (anchor === 'top' ? (o.rect.bottom - wrap.top) : (wrap.bottom - o.rect.top)) + LEGEND_GAP;
+			if (v > inset) { inset = v; }
+		}
+		return Math.round(inset);
+	}
+	// The boxes a legend gives way to, measured as they actually are. **The CHILDREN, not the two
+	// containers**: both containers are full-width by design (`left: 4px; right: 4px`), so measuring
+	// them would say every legend overlaps everything at every window size. A child is the readout
+	// itself, which is what a reader sees and what the overlap test is about -- and measuring
+	// children is also what makes a footer wrapped onto two lines reserve two lines.
+	function overlayOccupants(wrap) {
+		var out = [], mid = (wrap.top + wrap.bottom) / 2;
+		function add(el) {
+			if (!el || !el.getBoundingClientRect) { return; }
+			if (el.style && el.style.display === 'none') { return; }
+			var r = el.getBoundingClientRect();
+			if (!r || !(r.width > 0) || !(r.height > 0)) { return; }
+			out.push({ anchor: (r.top + r.bottom) / 2 < mid ? 'top' : 'bottom', rect: r });
+		}
+		['lpn_map_overlay_tl', 'lpn_map_footer'].forEach(function (id) {
+			var host = document.getElementById(id), i;
+			if (!host || !host.childNodes) { return; }
+			for (i = 0; i < host.childNodes.length; i++) { add(host.childNodes[i]); }
+		});
+		add(document.getElementById('lpn_basemap_credit'));
+		return out;
+	}
+	// **ONE FUNCTION PLACES BOTH LEGENDS**, in a fixed order, and each one placed becomes an occupant
+	// of the next. That is also the answer to the older question of what happens when a user parks
+	// both in the same corner: the colour key lands under the labels legend rather than on it.
+	function placeLegends() {
+		var wrap = svg && svg.parentNode, boxes, wr, occ;
+		if (!wrap || !wrap.getBoundingClientRect) { return; }
+		wr = wrap.getBoundingClientRect();
+		boxes = [
 			{ el: document.getElementById('lpn_labels_legend'), pos: settings.legendPosition },
 			{ el: colorLegendBox, pos: settings.colorLegendPosition }
 		];
-		for (i = 0; i < boxes.length; i++) {
-			box = boxes[i];
-			if (!box.el || box.pos !== 'top-left' || legendIsOff(box.pos)) { continue; }
-			if (box.el.style.display === 'none') { continue; }
-			h = Math.max(h, Math.round(box.el.getBoundingClientRect().height) || 0);
-		}
-		// 4px of air between the legend and whatever the stack puts under it, and only when there is
-		// something to clear.
-		wrap.style.setProperty('--lpn-overlay-top', h ? (h + 4) + 'px' : '0px');
+		// Before first layout the wrapper has no box, and a dodge computed from a zero-height map
+		// would be arithmetic on nothing. The corners are still applied; only the dodge waits.
+		occ = (wr.width > 0 && wr.height > 0) ? overlayOccupants(wr) : null;
+		boxes.forEach(function (b) {
+			if (!b.el) { return; }
+			// **THIS PLACER ONLY EVER HIDES; IT NEVER SHOWS.** The two renderers own the other reasons
+			// a legend can be absent -- nothing to show, and thematic mode -- so un-hiding here would
+			// be a second opinion about display and would put the labels legend back on a thematic map.
+			if (legendIsOff(b.pos)) { b.el.style.display = 'none'; return; }
+			var pos = LEGEND_POSITIONS[b.pos] || LEGEND_POSITIONS['top-right'];
+			b.el.style.top = pos.top; b.el.style.bottom = pos.bottom;
+			b.el.style.left = pos.left; b.el.style.right = pos.right;
+			b.el.style.transform = pos.transform;
+			if (!occ || b.el.style.display === 'none') { return; }
+			var anchor = pos.top === '4px' ? 'top' : (pos.bottom === '4px' ? 'bottom' : '');
+			if (!anchor) { return; }
+			var r = b.el.getBoundingClientRect(), inset = legendInsetFor(anchor, wr, r, occ);
+			if (anchor === 'top') { b.el.style.top = inset + 'px'; }
+			else { b.el.style.bottom = inset + 'px'; }
+			occ.push({ anchor: anchor, rect: b.el.getBoundingClientRect() });
+		});
 	}
-	function applyLegendPosition() {
-		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }
-		if (legendIsOff(settings.legendPosition)) { box.style.display = 'none'; applyOverlayTopInset(); return; }
-		var pos = LEGEND_POSITIONS[settings.legendPosition] || LEGEND_POSITIONS['top-right'];
-		box.style.top = pos.top; box.style.bottom = pos.bottom;
-		box.style.left = pos.left; box.style.right = pos.right;
-		box.style.transform = pos.transform;
-		applyOverlayTopInset();
-	}
+	function applyLegendPosition() { placeLegends(); }
 	// Re-applies the current effectiveFontSize() to every already-built text element and reflows what
 	// depends on it -- needed when the user edits Text size and whenever state.s changes, since a
 	// pixel size is state.s-dependent while every other geometry here is left to the SVG's transform.
@@ -21884,7 +22008,13 @@ var EngCalcs = EngCalcs || {};
 			var h = fitPanelToViewport(panel);
 			var wantLeft = (ar.right + r.width > window.innerWidth - POPUP_EDGE) ? ar.left - r.width : ar.right;
 			panel.style.left = Math.max(POPUP_EDGE, Math.min(wantLeft, window.innerWidth - r.width - POPUP_EDGE)) + 'px';
-			panel.style.top = Math.max(chromeFloor(), Math.min(ar.top, window.innerHeight - h - POPUP_EDGE)) + 'px';
+			// **A FLY-OUT'S FLOOR IS THE VIEWPORT, NOT chromeFloor()** (Tom, 2026-08-27: File > New
+			// project's fly-out *"is too low"*). The chrome floor is the bottom of the menu bar,
+			// toolbar and tab strip, and File's own pull-down is deliberately allowed to hang over
+			// all three -- so its FIRST row sits well above that floor, and clamping the fly-out to
+			// it dropped the branch four rows below the row it branches from. A fly-out is beside a
+			// row of a menu that is already there: whatever the parent may cover, so may it.
+			panel.style.top = Math.max(POPUP_EDGE, Math.min(ar.top, window.innerHeight - h - POPUP_EDGE)) + 'px';
 			return null;
 		}
 		at = panelPlacement(ar, r.width, r.height, window.innerWidth, window.innerHeight);
@@ -23590,6 +23720,9 @@ var EngCalcs = EngCalcs || {};
 		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
 		// overlay now, so this changes what is COVERED, never what is laid out.
 		el.style.display = text ? 'block' : 'none';
+		// It appears and disappears under a top corner, so the legends re-dodge around it. This is
+		// NOT applyMapHeight() -- see the note above; the map's own height still ignores the model.
+		placeLegends();
 	}
 	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
 	// extrema and decoration MUST compare on this, not the raw SI value. Two series links carrying

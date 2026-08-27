@@ -241,11 +241,15 @@ echoHeader("EngCalcs", $html_title, "", false);
 		      // hint wraps to two lines in several languages, so any second overlay placed at a
 		      // fixed `top` would sit on top of it there and nowhere else. Flex column, so each row
 		      // is placed by the one above it having been measured.
+		      // **THIS STACK NEVER MOVES FOR A LEGEND; THE LEGEND MOVES FOR IT** (Tom, 2026-08-27).
+		      // A top-inset custom property used to push this column down under a top-left
+		      // legend, which put the mode line an inch down the map. placeLegends() in
+		      // looped-network.js now dodges the legends around whatever is measured here instead.
 		      // Only the mode hint is reserved against by zoomExtent() (overlayReserve). The
 		      // diagnostic is deliberately NOT, because a diagnostic appears BECAUSE OF THE MODEL
 		      // and the fit must not depend on the model -- the same rule that keeps
 		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js). ?>
-		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:calc(4px + var(--lpn-overlay-top, 0px));left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));display:flex;flex-direction:column;align-items:flex-start;gap:4px;pointer-events:none">
+		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));display:flex;flex-direction:column;align-items:flex-start;gap:4px;pointer-events:none">
 			<div id="lpn_mode_hint" style="font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px"></div>
 			<?php // The solver's standing diagnostic ("Add a reservoir"), true until the model
 			      // changes. Deliberately NOT d-print-none: if the drawing on screen has no answers,
@@ -974,8 +978,6 @@ EngCalcs.pageConfig = {
 	lpn_find_conn_none: <?=json_encode($ec_lang['lpn_find_conn_none'])?>,
 	lpn_find_conn_no_fixed: <?=json_encode($ec_lang['lpn_find_conn_no_fixed'])?>,
 	lpn_find_query_tip: <?=json_encode($ec_lang['lpn_find_query_tip'])?>,
-	lpn_find_q_top: <?=json_encode($ec_lang['lpn_find_q_top'])?>,
-	lpn_find_q_bottom: <?=json_encode($ec_lang['lpn_find_q_bottom'])?>,
 	<?php // Task 540 phase 2: the query INPUT, its grammar words and its parse errors. The parser
 	// reads these through a dynamic lookup (findMsg()), which pageconfig_check.php cannot see, so
 	// this block is the one place that guarantees they arrive -- keep it complete by hand. ?>

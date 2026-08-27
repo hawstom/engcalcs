@@ -106,7 +106,7 @@ const L = loadLoopedNetwork(
 L.buildLayers();
 L.setCanvas(1400, 900);
 L.applySaved(JSON.parse(fsmod.readFileSync(
-	ROOT + 'dev/water-network-examples/Net3-World-lpn.json', 'utf8')));
+	ROOT + 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'utf8')));
 L.buildDom();
 L.setView(L.geoHome());
 L.noteMapSized();
@@ -160,9 +160,12 @@ function contentDump() {
 		}).join('\n');
 }
 
-// **ASYNC BECAUSE THE ENGINE IS** (Task 496). `Net3-World-lpn.json` carries
-// `"settings": {"engine": "epanet"}`, so runSolve() hands the network to the real EPANET engine and
-// returns BEFORE any answer exists -- which is what a visitor's browser does too. Until the stub
+// **ASYNC BECAUSE THE ENGINE IS** (Task 496). The engine is set below rather than taken from the
+// file: a saved `settings.engine` is the PREFERENCE of whoever saved it, and this harness needs the
+// EPANET one whatever that says. It read the document's own until 2026-08-27, when Tom's re-saved
+// copy arrived carrying `native` and two checks failed for a reason that has nothing to do with
+// labels. With `epanet` set, runSolve() hands the network to the real engine and returns BEFORE any
+// answer exists -- which is what a visitor's browser does too. Until the stub
 // gained that engine this harness silently fell through to the native solver and solved
 // synchronously; measured on the merged tree without the settle below, every node label was built
 // from `[id,demand,elev]` with head and pressure simply absent, because refreshLabelTextPass()
@@ -175,6 +178,7 @@ function contentDump() {
 async function main() {
 
 await warmEpanet();
+L.settings().engine = 'epanet';
 L.runSolve();
 await settleEpanet();
 if (process.argv[2] === '--dump') {
@@ -193,11 +197,12 @@ report(doc.nodes.some(function (n) {
 
 // ---- 1. it fires at all -------------------------------------------------------------------------
 console.log('\n--- Net3-World: node labels give up properties rather than vanish ---');
-let sawShed = 0;
+let sawShed = 0, sawHidden = 0;
 ZOOMS.forEach(function (s) {
 	zoomTo(s);
 	const drawn = drawnNodes(), shed = shedders();
 	sawShed += shed.length;
+	sawHidden += doc.nodes.length - drawn.length;
 	const gave = shed.reduce(function (t, n) {
 		const ne = nodeEls[n.id];
 		return t + (ne.allLines.length - ne.lines.length);
@@ -212,6 +217,14 @@ ZOOMS.forEach(function (s) {
 });
 report(sawShed > 0, 'the cascade really fires, so nothing below is vacuous',
 	sawShed + ' shedding labels across the four zooms');
+// **THE TERMINAL RUNG IS STILL REACHED**: some labels are hidden whole, or the drop key below would
+// have nothing left to decide. Asked here, across the whole sweep, rather than at one zoom -- it
+// used to be asked at s=30,000, where 96 of 97 were drawn and the 97th WAS this rung, and Tom's
+// re-saved Net3 (2026-08-27) nudged the coordinates a few metres until all 97 fitted. A check whose
+// truth turned on one label was measuring the fixture. At s=5,000 half of them cannot fit by any
+// amount of shedding, so the rung is reached by construction.
+report(sawHidden > 0, 'the hide is still the terminal rung, and it is still reached',
+	sawHidden + ' labels hidden whole across the four zooms');
 
 // ---- 2. it buys labels --------------------------------------------------------------------------
 // **THE CONTROL IS THE SAME CODE WITH NOTHING LEFT TO SHED**, not a second implementation: switch
@@ -305,13 +318,9 @@ console.log('\n--- a label sheds down to its name and one number, and then goes 
 	});
 	report(stripped.length === 0, 'no label is left with no ranked value at all',
 		stripped.map(function (n) { return n.id; }).join(', ') || 'none was');
-	// And the terminal rung is still reachable: some labels are hidden whole on this crowded view,
-	// or the drop key would have nothing left to decide.
-	const hidden = doc.nodes.filter(function (n) {
-		const ne = nodeEls[n.id]; return ne && ne.hiddenDropped;
-	});
-	report(hidden.length > 0, 'the hide is still the terminal rung, and it is still reached',
-		hidden.length + ' labels hidden whole after shedding everything they could');
+	// The terminal rung -- a label hidden whole once it has nothing left to shed -- is asserted in
+	// section 1, across the whole zoom sweep, because at THIS zoom whether any label is hidden turns
+	// on a metre of coordinate.
 }
 
 // ---- 5. both sides of the pair pay --------------------------------------------------------------
@@ -486,7 +495,7 @@ console.log('\n--- and on the 480-pipe grid specs/perf.js uses ---');
 	// Opened the way a project is opened -- applySaved() then buildDom() -- rather than by writing
 	// into `doc` behind the page's back, which leaves the element maps holding the previous network.
 	const saved = JSON.parse(fsmod.readFileSync(
-		ROOT + 'dev/water-network-examples/Net3-World-lpn.json', 'utf8'));
+		ROOT + 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'utf8'));
 	saved.nodes = nodes; saved.links = links; saved.labels = [];
 	saved.nextId = nodes.length + links.length + 10;
 	delete saved.view; delete saved.origin; delete saved.controls;

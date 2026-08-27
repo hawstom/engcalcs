@@ -22,6 +22,8 @@
 // would throw away the zoom he set to read the drawing.
 
 const { byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const fs = require('fs');
+const ROOT = require('path').join(__dirname, '../../');
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
@@ -48,6 +50,8 @@ const L = loadLoopedNetwork(
 	"\t\tpropKeys: function (scope) { findState.scope = scope; return findPropDefs().map(function (p) { return p[0]; }); },\n" +
 	"\t\topKeys: function (scope, prop) { findState.scope = scope; findState.prop = prop;\n" +
 	"\t\t\treturn findOpDefs().map(function (o) { return o[0]; }); },\n" +
+	"\t\topLabels: function (scope, prop) { findState.scope = scope; findState.prop = prop;\n" +
+	"\t\t\treturn findOpDefs().map(function (o) { return o[1]; }); },\n" +
 	"\t\tgoTo: findGoTo, selectedRef: selectedRef,\n" +
 	"\t\tcontextLength: function (group, id) { var e = group === 'node' ? nodeById(id) : linkById(id);\n" +
 	"\t\t\treturn findContextLength(group, e); },\n" +
@@ -599,12 +603,21 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 		lineFor('all', 'id', 'contains', '223') === "Everything.ID contains '223'", JSON.stringify(L.queryText()));
 	ok('a numeric condition prints the number bare',
 		lineFor('pipe', 'diameter', 'gt', '8') === 'Pipe.Diameter greater than 8', JSON.stringify(L.queryText()));
-	// "highest n" names a control, not a comparison, so the line says the word and the count the
-	// search will ACTUALLY use -- ten, when the box is empty.
-	ok('an extremes condition prints the count it will really use',
-		lineFor('pipe', 'velocity', 'top', '') === 'Pipe.Velocity highest 10', JSON.stringify(L.queryText()));
+	// **THE LINE AND THE PULL-DOWN ARE ONE STRING** (Tom, 2026-08-27: *"What needs to match are the
+	// selector and the string, both per the lang file."*). `lpn_find_op_top` is `{n} highest`; the
+	// menu prints the letter n in the slot because no count has been chosen, and the line prints the
+	// count the search will ACTUALLY use -- ten, when the box is empty. There is no second key for
+	// the line's wording any more, which is what stopped the two from being able to disagree.
+	ok('an extremes condition prints the count it will really use, in the pull-down\'s own wording',
+		lineFor('pipe', 'velocity', 'top', '') === 'Pipe.Velocity 10 highest', JSON.stringify(L.queryText()));
 	ok('...and the typed count when there is one',
-		lineFor('pipe', 'velocity', 'bottom', '3') === 'Pipe.Velocity lowest 3', JSON.stringify(L.queryText()));
+		lineFor('pipe', 'velocity', 'bottom', '3') === 'Pipe.Velocity 3 lowest', JSON.stringify(L.queryText()));
+	// The menu's own text, from that same value: the slot holds the letter, not a number.
+	ok('...while the condition pull-down still offers it as "n highest"',
+		L.opLabels('pipe', 'velocity').indexOf('n highest') >= 0,
+		JSON.stringify(L.opLabels('pipe', 'velocity')));
+	ok('and neither wording is a separate language key any more',
+		!/lpn_find_q_top|lpn_find_q_bottom/.test(fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8')));
 	ok('a connection condition is the whole sentence, with no value',
 		lineFor('junction', 'connection', 'conn-unlinked', '') === 'Junction.Connection no links',
 		JSON.stringify(L.queryText()));
@@ -698,6 +711,34 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 		JSON.stringify(run('(' + A + ' OR ' + B + ') AND ' + C)));
 	ok('lower-case operators are the same operators',
 		same(run(A + ' or ' + B), [p6, p12]), JSON.stringify(run(A + ' or ' + B)));
+
+	// **THE LINE THE PANEL PRINTS MUST BE A LINE THE PANEL CAN READ.** This is the round trip that
+	// the two-key arrangement could not make: the parser was taught `highest`, a word on no control,
+	// while the pull-down said `n highest`. One template, `{n} highest`, is now both.
+	function lineFor2(scope, prop, op, value) { L.setState(scope, prop, op, value); L.buildPanel(); return L.queryText(); }
+	ok('the extremes query the panel writes parses back to the same search',
+		same(run('Pipe.Diameter 1 highest'), [p12]) && same(run('Pipe.Diameter 1 lowest'), [p6]),
+		JSON.stringify(run('Pipe.Diameter 1 highest')));
+	ok('...and the count really is read, not assumed',
+		run('Pipe.Diameter 2 highest').length === 2 && run('Pipe.Diameter 1 highest').length === 1);
+	// The pull-down shows the letter n, so somebody typing what the menu says gets the ten the line
+	// would have printed. Two pipes here, so ten is both of them.
+	ok('the letter n, as the pull-down spells it, means the same ten an empty box does',
+		run('Pipe.Diameter n highest').length === 2, JSON.stringify(run('Pipe.Diameter n highest')));
+	// **A TRANSLATED TEMPLATE PARSES ITSELF**, count in whatever position that language puts it --
+	// this is the whole reason the pattern is built from the lang value rather than from a word list.
+	// Chinese's is `\u6700\u9ad8 {n} \u4e2a`, with the number in the middle.
+	L.setWord('lpn_find_op_top', '\u6700\u9ad8 {n} \u4e2a');
+	ok('a template with the count in the MIDDLE prints that way',
+		lineFor2('pipe', 'diameter', 'top', '1') === 'Pipe.Diameter \u6700\u9ad8 1 \u4e2a',
+		JSON.stringify(L.queryText()));
+	ok('...and parses back, so a reader of that language has a working query line',
+		same(run('Pipe.Diameter \u6700\u9ad8 1 \u4e2a'), [p12]),
+		JSON.stringify(run('Pipe.Diameter \u6700\u9ad8 1 \u4e2a')));
+	ok('...and the ENGLISH spelling still answers there too, as every other word of the query does',
+		same(run('Pipe.Diameter 1 highest'), [p12]));
+	L.setWord('lpn_find_op_top', '{n} highest');
+	L.buildPanel();
 
 	// **A COMPOUND ANSWER PRINTS THE ID ALONE.** Two conditions name two properties, and choosing one
 	// to print beside the id would answer a question nobody asked.

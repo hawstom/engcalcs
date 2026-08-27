@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1403,
-        "delta_key_count": 72,
+        "expected_key_count": 1401,
+        "delta_key_count": 70,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -484,8 +484,6 @@
         "lpn_find_q_err_close": "This bracket ( was opened and never closed.",
         "lpn_find_q_err_open": "This bracket ) closes nothing.",
         "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
-        "lpn_find_q_top": "highest",
-        "lpn_find_q_bottom": "lowest",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
         "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
@@ -558,8 +556,6 @@
         "lpn_find_q_err_close": "This bracket ( was opened and never closed.",
         "lpn_find_q_err_open": "This bracket ) closes nothing.",
         "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
-        "lpn_find_q_top": "highest",
-        "lpn_find_q_bottom": "lowest",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
         "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
@@ -1217,38 +1213,6 @@
             }
         },
         "lpn_find_q_err_end": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_find_no_value",
-                    "value": "কী খুঁজছেন তা লিখুন।",
-                    "english": "Type what to look for."
-                },
-                "next_translated": {
-                    "key": "lpn_replace_title",
-                    "value": "যা পাওয়া গেছে তা পরিবর্তন করুন",
-                    "english": "Change what was found"
-                }
-            }
-        },
-        "lpn_find_q_top": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_find_no_value",
-                    "value": "কী খুঁজছেন তা লিখুন।",
-                    "english": "Type what to look for."
-                },
-                "next_translated": {
-                    "key": "lpn_replace_title",
-                    "value": "যা পাওয়া গেছে তা পরিবর্তন করুন",
-                    "english": "Change what was found"
-                }
-            }
-        },
-        "lpn_find_q_bottom": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

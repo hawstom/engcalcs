@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 1403,
-        "delta_key_count": 70,
+        "expected_key_count": 1401,
+        "delta_key_count": 68,
         "exempt_key_count": 19,
         "exempt_keys": [
             "calc_units_us",
@@ -477,8 +477,6 @@
         "lpn_find_q_err_close": "This bracket ( was opened and never closed.",
         "lpn_find_q_err_open": "This bracket ) closes nothing.",
         "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
-        "lpn_find_q_top": "highest",
-        "lpn_find_q_bottom": "lowest",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
         "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
@@ -549,8 +547,6 @@
         "lpn_find_q_err_close": "This bracket ( was opened and never closed.",
         "lpn_find_q_err_open": "This bracket ) closes nothing.",
         "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
-        "lpn_find_q_top": "highest",
-        "lpn_find_q_bottom": "lowest",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
         "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
@@ -1191,38 +1187,6 @@
             }
         },
         "lpn_find_q_err_end": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_find_no_value",
-                    "value": "Введите, что искать.",
-                    "english": "Type what to look for."
-                },
-                "next_translated": {
-                    "key": "lpn_replace_title",
-                    "value": "Изменить найденное",
-                    "english": "Change what was found"
-                }
-            }
-        },
-        "lpn_find_q_top": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_find_no_value",
-                    "value": "Введите, что искать.",
-                    "english": "Type what to look for."
-                },
-                "next_translated": {
-                    "key": "lpn_replace_title",
-                    "value": "Изменить найденное",
-                    "english": "Change what was found"
-                }
-            }
-        },
-        "lpn_find_q_bottom": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

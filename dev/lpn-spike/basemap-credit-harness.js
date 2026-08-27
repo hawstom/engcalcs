@@ -149,7 +149,7 @@ global.EngCalcs.pageConfig.lpn_mapbox_token = 'pk.harness.token';
 L.buildLayers();
 L.setCanvas(1000, 500);
 const NET3W = JSON.parse(fs.readFileSync(
-	ROOT + 'dev/water-network-examples/Net3-World-lpn.json', 'utf8'));
+	ROOT + 'dev/water-network-examples/Net3-Novato-CA-World.lwn', 'utf8'));
 
 async function main() {
 	console.log('\n--- a saved geographic project, opened the way a page load opens one ---');
