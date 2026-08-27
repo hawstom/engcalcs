@@ -32,9 +32,9 @@ const APPLY = process.argv.indexOf('--apply') >= 0;
 
 // name -> [committed example JSON, the .inp it came from]
 const PAIRS = [
-	['Net1', 'dev/water-network-examples/Net1-lpn.json', 'dev/lpn-spike/reference/Net1.inp'],
-	['Net2', 'dev/water-network-examples/Net2-lpn.json', 'dev/lpn-spike/reference/Net2.inp'],
-	['Net3', 'dev/water-network-examples/Net3-lpn.json', 'dev/lpn-spike/reference/Net3.inp']
+	['Net1', 'dev/water-network-examples/Net1.lwn', 'dev/lpn-spike/reference/Net1.inp'],
+	['Net2', 'dev/water-network-examples/Net2.lwn', 'dev/lpn-spike/reference/Net2.inp'],
+	['Net3', 'dev/water-network-examples/Net3.lwn', 'dev/lpn-spike/reference/Net3.inp']
 ];
 
 const { byId, setUnitSet, loadLoopedNetwork } = require('../lpn-spike/lpn-dom-stub.js');

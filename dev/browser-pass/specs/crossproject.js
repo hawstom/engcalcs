@@ -54,7 +54,7 @@ exports.run = async function ({ browser, report }) {
 		await a.makeEdit();
 		await a.settle(400);
 		await openFile(a, 'Net3-Novato-CA-World.lwn');
-		await openFile(a, 'Net3-lpn.json');
+		await openFile(a, 'Net3.lwn');
 
 		// The switch is synchronous inside the click handler, so the evaluate does not return until
 		// it is done; the layout read after it adds the paint the user actually waits for.

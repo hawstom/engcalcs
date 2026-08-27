@@ -83,7 +83,7 @@ examples.forEach(function (ex) {
 // Nothing derives this list; it is a DECLARATION that these three examples are drawn over a plan and
 // must arrive with it. An example that gains a backdrop adds itself here, which is the moment to
 // think about the megabytes; one that loses it fails loudly instead of quietly looking plainer.
-const WANT_BACKDROP = ['Net2-lpn.json', 'Net3-lpn.json', 'Elm-Street-Center-lpn.json'];
+const WANT_BACKDROP = ['Net2.lwn', 'Net3.lwn', 'Elm-Street-Center.lwn'];
 console.log('\n-- the examples drawn over a site plan still carry it --');
 WANT_BACKDROP.forEach(function (file) {
 	[srcDir, outDir].forEach(function (dir) {
@@ -219,7 +219,7 @@ console.log('\n-- layout: a deliberate order, not an accident of equal size --')
 	// superseded, not broken. What survives of it is checked just below: SI still precedes US among
 	// the two basics, which is what he actually cared about and what a size sort cannot express.
 	report(examples[0].file === 'Net3-Novato-CA-World.lwn', 'Net3-World leads the wall', examples[0].file);
-	report(examples[1].file === 'Elm-Street-Center-lpn.json', 'and Elm Street Center is second',
+	report(examples[1].file === 'Elm-Street-Center.lwn', 'and Elm Street Center is second',
 		examples[1].file);
 	let sorted = true;
 	for (let i = 1; i < examples.length; i++) {

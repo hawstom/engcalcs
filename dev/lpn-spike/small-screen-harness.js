@@ -343,7 +343,7 @@ L.buildLayers();
 L.seedDefaultInputs();
 
 const NET3 = JSON.parse(fs.readFileSync(
-	path.join(ROOT, 'dev', 'water-network-examples', 'Net3-lpn.json'), 'utf8'));
+	path.join(ROOT, 'dev', 'water-network-examples', 'Net3.lwn'), 'utf8'));
 L.setDoc(NET3);
 L.buildMenuBar();
 L.wireToolbar();

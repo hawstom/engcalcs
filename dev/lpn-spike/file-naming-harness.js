@@ -101,7 +101,7 @@ console.log('\n-- round trip: name -> filename -> name --');
 console.log('\n-- everything ever written still opens (Task 246 strands nobody) --');
 eq(projectNameFromFileName('Elm-Street-Center' + LEGACY + EXT_LEGACY), 'Elm-Street-Center', 'a file saved before 2026-08-14 still opens with its name intact');
 eq(projectNameFromFileName('Elm-Street-Center' + LEGACY + '.JSON'), 'Elm-Street-Center', 'and the extension match is case-insensitive');
-eq(projectNameFromFileName('Elm-Street-Center' + SUFFIX + EXT_LEGACY), 'Elm-Street-Center', 'and so does a `-lpn.json` file, which is what most of them are');
+eq(projectNameFromFileName('Elm-Street-Center' + SUFFIX + EXT_LEGACY), 'Elm-Street-Center', 'and so does a `-lpn.json` file, which is what an older save is');
 eq(projectNameFromFileName('Elm-Street-Center' + EXT), 'Elm-Street-Center', 'while a new `.lwn` gives its name back plainly');
 eq(projectNameFromFileName('Elm-Street-Center' + EXT.toUpperCase()), 'Elm-Street-Center', '...case-insensitively too');
 // An unescaped `.` in the extension pattern would eat the last letter of a name ending in `alwn`.

@@ -3,11 +3,11 @@
 
 	"_order": "Lower sorts earlier. Omit it (0) to let node+link count decide, which is the normal case: the tail of the wall runs small to large so a visitor grows into Net3 rather than opening on the densest thing we ship. Set it where size cannot express the intent. The head of the wall is set on purpose and is not size-ordered at all -- Net3-World leads because it is the real geographic project, Elm Street Center follows, and the two basics are the same size, so without a key their sequence would be whatever the filesystem returned.",
 
-	"Basic-example-SI-units-lpn.json": { "key": "basic_si", "order": -20 },
-	"Basic-example-US-units-lpn.json": { "key": "basic_us", "order": -10 },
-	"Net1-lpn.json": { "key": "net1" },
-	"Net2-lpn.json": { "key": "net2" },
-	"Net3-lpn.json": { "key": "net3" },
+	"Basic-example-SI-units.lwn": { "key": "basic_si", "order": -20 },
+	"Basic-example-US-units.lwn": { "key": "basic_us", "order": -10 },
+	"Net1.lwn": { "key": "net1" },
+	"Net2.lwn": { "key": "net2" },
+	"Net3.lwn": { "key": "net3" },
 	"Net3-Novato-CA-World.lwn": { "key": "net3_world", "order": -40 },
-	"Elm-Street-Center-lpn.json": { "key": "elm_street", "order": -30 }
+	"Elm-Street-Center.lwn": { "key": "elm_street", "order": -30 }
 }

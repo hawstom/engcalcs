@@ -24,7 +24,7 @@ that failed is the *token* pass-through, not the *factor* pass-through, and it f
 that has nothing to do with units: **the Net3 the gallery ships was generated before the file's own
 text was kept, so it carries no `tok` bags at all.**
 
-    examples/Net3-lpn.json   elements carrying the file's text:   0 of 216
+    examples/Net3.lwn   elements carrying the file's text:   0 of 216
     reference/Net3.inp imported with today's reader:             27 of 216
 
 `EngCalcs.lpnNumText()` (js/lpn-inp.js:164) hands back the file's characters only when the element
@@ -34,7 +34,7 @@ has a token for that field; with no token it falls back to `String(value)`, and 
 ## 1. Which of the seven project selectors did not match the file's unit
 
 **None of them.** The writer compares FACTORS, not names, and every comparison is equal for
-`examples/Net3-lpn.json` (whose `units` block is the standard EPANET US set, and which
+`examples/Net3.lwn` (whose `units` block is the standard EPANET US set, and which
 `applySaved()` restores before anything renders):
 
 | converter | project selector | project unit (factor) | file unit (factor) | result |
@@ -105,7 +105,7 @@ js/lpn-inp.js
 ```
 
 `c.same` was true for all five quantities, so line 979 ran for every number. It then found no token,
-because `examples/Net3-lpn.json` — a byte copy of `dev/water-network-examples/Net3-lpn.json`, made
+because `examples/Net3.lwn` — a byte copy of `dev/water-network-examples/Net3.lwn`, made
 by `dev/scripts/generate_examples.php` — was authored by an import that predates Task 390 step 3.
 The document has no `tok` anywhere. Nothing in the writer can recover text the document never held.
 
@@ -133,9 +133,9 @@ const fresh = L.docFromInp(parsed, 'Net3.inp');
 const tok = {};
 fresh.nodes.concat(fresh.links).forEach((e) => { if (e.tok) { tok[e.type + '|' + e.id] = e.tok; } });
 
-const ex = JSON.parse(fs.readFileSync('dev/water-network-examples/Net3-lpn.json', 'utf8'));
+const ex = JSON.parse(fs.readFileSync('dev/water-network-examples/Net3.lwn', 'utf8'));
 ex.nodes.concat(ex.links).forEach((e) => { const t = tok[e.type + '|' + e.id]; if (t) { e.tok = t; } });
-fs.writeFileSync('dev/water-network-examples/Net3-lpn.json', JSON.stringify(ex, null, 1));
+fs.writeFileSync('dev/water-network-examples/Net3.lwn', JSON.stringify(ex, null, 1));
 // then: php dev/scripts/generate_examples.php
 ```
 
@@ -188,7 +188,7 @@ quantity is a length (EPANET: millifeet US, mm SI).
 
 ## 4. Every value that changes on a Net3 round trip
 
-`examples/Net3-lpn.json` opened via `applySaved()`, exported, diffed against
+`examples/Net3.lwn` opened via `applySaved()`, exported, diffed against
 `dev/lpn-spike/reference/Net3.inp`. 1,225 tokens compared, 1,191 byte-identical, **34 different, 0
 with a different value.**
 

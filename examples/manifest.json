@@ -16,7 +16,7 @@
             "thumb": "Net3-Novato-CA-World.svg"
         },
         {
-            "file": "Elm-Street-Center-lpn.json",
+            "file": "Elm-Street-Center.lwn",
             "order": -30,
             "titleKey": "lpn_ex_elm_street_title",
             "descKey": "lpn_ex_elm_street_desc",
@@ -26,10 +26,10 @@
             "flow": "gpm",
             "nodes": 18,
             "links": 19,
-            "thumb": "Elm-Street-Center-lpn.svg"
+            "thumb": "Elm-Street-Center.svg"
         },
         {
-            "file": "Basic-example-SI-units-lpn.json",
+            "file": "Basic-example-SI-units.lwn",
             "order": -20,
             "titleKey": "lpn_ex_basic_si_title",
             "descKey": "lpn_ex_basic_si_desc",
@@ -39,10 +39,10 @@
             "flow": "lps",
             "nodes": 8,
             "links": 7,
-            "thumb": "Basic-example-SI-units-lpn.svg"
+            "thumb": "Basic-example-SI-units.svg"
         },
         {
-            "file": "Basic-example-US-units-lpn.json",
+            "file": "Basic-example-US-units.lwn",
             "order": -10,
             "titleKey": "lpn_ex_basic_us_title",
             "descKey": "lpn_ex_basic_us_desc",
@@ -52,10 +52,10 @@
             "flow": "gpm",
             "nodes": 8,
             "links": 7,
-            "thumb": "Basic-example-US-units-lpn.svg"
+            "thumb": "Basic-example-US-units.svg"
         },
         {
-            "file": "Net1-lpn.json",
+            "file": "Net1.lwn",
             "order": 0,
             "titleKey": "lpn_ex_net1_title",
             "descKey": "lpn_ex_net1_desc",
@@ -65,10 +65,10 @@
             "flow": "gpm",
             "nodes": 11,
             "links": 13,
-            "thumb": "Net1-lpn.svg"
+            "thumb": "Net1.svg"
         },
         {
-            "file": "Net2-lpn.json",
+            "file": "Net2.lwn",
             "order": 0,
             "titleKey": "lpn_ex_net2_title",
             "descKey": "lpn_ex_net2_desc",
@@ -78,10 +78,10 @@
             "flow": "gpm",
             "nodes": 36,
             "links": 40,
-            "thumb": "Net2-lpn.svg"
+            "thumb": "Net2.svg"
         },
         {
-            "file": "Net3-lpn.json",
+            "file": "Net3.lwn",
             "order": 0,
             "titleKey": "lpn_ex_net3_title",
             "descKey": "lpn_ex_net3_desc",
@@ -91,7 +91,7 @@
             "flow": "gpm",
             "nodes": 97,
             "links": 119,
-            "thumb": "Net3-lpn.svg"
+            "thumb": "Net3.svg"
         }
     ]
 }

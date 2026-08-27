@@ -100,7 +100,7 @@ positions us against it.
 Open these when they bear on the question, not by reflex:
 
 - `dev/water-network-examples/README.md` — the shipped models and their sizes, including
-  `Elm-Street-Center-lpn.json`, real work of Tom's, anonymised. Note what the largest is.
+  `Elm-Street-Center.lwn`, real work of Tom's, anonymised. Note what the largest is.
 - `dev/looped-network-calculator-scope.md` — what the map calculator is and is not.
 - `dev/positioning.md` — how this project talks about itself in public.
 - `dev/ROADMAP.md` — open work, so you do not propose what is already queued.

@@ -8,7 +8,7 @@
 //
 // THIS HARNESS TAKES THE USER'S PATH, not the developer's. inp-export-harness.js imports
 // dev/lpn-spike/reference/Net3.inp with the CURRENT importer and re-exports it, and passes: 1,280
-// tokens byte-identical. What a visitor actually opens is examples/Net3-lpn.json off the gallery
+// tokens byte-identical. What a visitor actually opens is examples/Net3.lwn off the gallery
 // wall, and that is a different document -- generated once, committed, and served ever since. So the
 // comparison here is: the SHIPPED gallery Net3, opened the way applySaved() opens it, exported, and
 // diffed token by token against EPA's own Net3.inp.
@@ -140,8 +140,8 @@ const REF = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Ne
 
 // ---- 1. the reproducible case: the Net3 the gallery ships --------------------------------------
 console.log('\n1. The shipped gallery Net3, opened and exported');
-const shipped = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net3-lpn.json'), 'utf8'));
-console.log('  examples/Net3-lpn.json units: ' + JSON.stringify(shipped.units));
+const shipped = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net3.lwn'), 'utf8'));
+console.log('  examples/Net3.lwn units: ' + JSON.stringify(shipped.units));
 console.log('  elements carrying the file\'s own text (tok): ' +
 	(shipped.nodes.concat(shipped.links).filter((e) => e && e.tok).length) +
 	' of ' + (shipped.nodes.length + shipped.links.length));
@@ -152,7 +152,7 @@ if (!galleryOut.ok) { console.log('  EXPORT REFUSED: ' + JSON.stringify(galleryO
 console.log('  the seven selectors the writer compared: ' + JSON.stringify(galleryDoc.units));
 console.log('  units the writer reports converting: ' +
 	JSON.stringify(galleryOut.differences.filter((d) => d.code === 'unit-converted' || d.code === 'flow-units-not-epanet')));
-const gallery = compare('examples/Net3-lpn.json  ->  .inp   vs   EPA Net3.inp', REF, galleryOut.inp);
+const gallery = compare('examples/Net3.lwn  ->  .inp   vs   EPA Net3.inp', REF, galleryOut.inp);
 report(gallery);
 
 // ---- 2. the control: the same model imported from the .inp today -------------------------------

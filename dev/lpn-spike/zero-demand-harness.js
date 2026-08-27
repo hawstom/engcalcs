@@ -44,7 +44,7 @@ function ok(name, cond, extra) {
 
 L.buildLayers();
 setUnitSet('us');
-L.applySaved(JSON.parse(fs.readFileSync(ROOT + 'examples/Elm-Street-Center-lpn.json', 'utf8')));
+L.applySaved(JSON.parse(fs.readFileSync(ROOT + 'examples/Elm-Street-Center.lwn', 'utf8')));
 setUnitSet('us');
 
 // The project's own settings, so this is the tolerance the page really solves at, not a loose one

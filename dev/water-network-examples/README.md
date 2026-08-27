@@ -11,10 +11,10 @@ and a function cannot carry a description, cannot be authored by anyone who is n
 
 | File | Nodes | Links | Units | Notes |
 |------|------:|------:|-------|-------|
-| `Net1-lpn.json` | 11 | 13 | gpm | EPANET's Net1. Public domain, ships with EPANET, every water engineer recognises it. |
-| `Net2-lpn.json` | 36 | 40 | gpm | EPANET's Net2. |
-| `Net3-lpn.json` | 97 | 119 | gpm | EPANET's Net3. The large-model case — this is the one that exercises label clutter and the sizing paradigm. |
-| `Elm-Street-Center-lpn.json` | 18 | 19 | gpm | Tom's own design snapshot, anonymised, with a CAD site plan as its backdrop. The first example drawn from real work rather than invented. |
+| `Net1.lwn` | 11 | 13 | gpm | EPANET's Net1. Public domain, ships with EPANET, every water engineer recognises it. |
+| `Net2.lwn` | 36 | 40 | gpm | EPANET's Net2. |
+| `Net3.lwn` | 97 | 119 | gpm | EPANET's Net3. The large-model case — this is the one that exercises label clutter and the sizing paradigm. |
+| `Elm-Street-Center.lwn` | 18 | 19 | gpm | Tom's own design snapshot, anonymised, with a CAD site plan as its backdrop. The first example drawn from real work rather than invented. |
 
 **All four are US/gpm.** The gap is an SI example and it CANNOT be made by converting one of these:
 this suite reinterprets rather than converts when a unit changes (CLAUDE.md, "Unit Sets"), so
@@ -68,8 +68,17 @@ So: keep both, edit here, regenerate. Deleting either side loses something that 
 
 ## Filename convention
 
-`<Name>-lpn.json`, and each file carries `format: 'hawsedc-lpn'` plus an `app` URL as its first two
-keys (ROADMAP Task 315, ratified 2026-08-14). The marker is inside the document on purpose: a
-filename is exactly the thing a person renames, so it was never the durable identifier — which is
-what let the suffix shrink from 30 characters to four. `dev/lpn-spike/file-naming-harness.js` pins
-both halves.
+**`<Name>.lwn`** — the extension this page writes (ROADMAP Task 246), and every source here now
+carries it. Each file also carries `format: 'hawsedc-lpn'` plus an `app` URL as its first two keys
+(ROADMAP Task 315, ratified 2026-08-14). The marker is inside the document on purpose: a filename is
+exactly the thing a person renames, so it was never the durable identifier — which is what let the
+suffix shrink from 30 characters, to `-lpn.json`, to nothing at all beside the extension.
+`dev/lpn-spike/file-naming-harness.js` pins both halves.
+
+**Renamed 2026-08-27**, on Tom's word (*"Renaming all to lwn would be nice. I like that idea."*).
+The six sources were `<Name>-lpn.json` until then — `Net3-lpn.json`, `Elm-Street-Center-lpn.json`
+and so on — and any older note, screenshot row or commit naming one of those is naming the same
+file. `Elm-Street-Center.lwn` is JSON inside, as every `.lwn` is; the extension names the
+application, not the syntax. The generator publishes whatever name it finds
+(`exampleIsProjectFile()` accepts both), so a `-lpn.json` source dropped in here still works —
+nothing about the format changed, only what the six files are called.

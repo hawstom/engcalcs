@@ -46,7 +46,7 @@
 	// like a survey or state-plane grid. Extent 1400 x 700, centre exactly 5000,5000.
 	//
 	// **NOTHING IN THE APP CALLS THIS, AND NOTHING SHIPS IT.** The gallery ships the same ring main
-	// as Basic-example-US/SI-units-lpn.json, which is what a visitor opens. This is the fixture the
+	// as Basic-example-US/SI-units.lwn, which is what a visitor opens. This is the fixture the
 	// three harnesses named in the file header build their network from; see them for why they hold
 	// it rather than the gallery file.
 	function drawExampleNetwork(system) {

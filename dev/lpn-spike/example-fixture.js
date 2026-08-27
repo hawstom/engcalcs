@@ -22,7 +22,7 @@ const EXAMPLE_EXPORTS =
 	"\t\tapplyMethodUI: applyMethodUI,\n";
 
 function examplePath(system) {
-	return ROOT + 'examples/Basic-example-' + (system === 'si' ? 'SI' : 'US') + '-units-lpn.json';
+	return ROOT + 'examples/Basic-example-' + (system === 'si' ? 'SI' : 'US') + '-units.lwn';
 }
 
 function exampleText(system) { return fs.readFileSync(examplePath(system), 'utf8'); }

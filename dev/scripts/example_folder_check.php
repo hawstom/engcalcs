@@ -20,8 +20,8 @@ $dir = __DIR__ . '/../water-network-examples';
 $known = array(
 	'.gitignore', 'README.md', 'examples.json',
 	// The published gallery, and the EPA sources two of them were built from. Anything else is new.
-	'Basic-example-US-units-lpn.json', 'Basic-example-SI-units-lpn.json',
-	'Net1-lpn.json', 'Net2-lpn.json', 'Net3-lpn.json', 'Net3-Novato-CA-World.lwn', 'Elm-Street-Center-lpn.json',
+	'Basic-example-US-units.lwn', 'Basic-example-SI-units.lwn',
+	'Net1.lwn', 'Net2.lwn', 'Net3.lwn', 'Net3-Novato-CA-World.lwn', 'Elm-Street-Center.lwn',
 	'Net1.inp', 'Net2.inp', 'Net3.inp', 'Net3.rpt'
 );
 $strays = array();

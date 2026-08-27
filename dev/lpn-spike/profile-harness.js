@@ -249,13 +249,13 @@ console.log('\n--- the vertical axis ---');
 
 // ---- 5. Net3: the real thing ------------------------------------------
 //
-// Elevations from examples/Net3-lpn.json (the shipped example) and heads from the REAL EPANET
+// Elevations from examples/Net3.lwn (the shipped example) and heads from the REAL EPANET
 // engine's t=0 solution (dev/lpn-spike/reference/ref_Net3.json). Both are in feet, which is what
 // makes them comparable here; the page's own unit crossing is looped-network.js's job and is
 // asserted by the browser spec, not by this file.
 console.log('\n--- Net3, with EPANET\'s own heads ---');
 {
-	const doc = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net3-lpn.json'), 'utf8'));
+	const doc = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net3.lwn'), 'utf8'));
 	const ref = JSON.parse(fs.readFileSync(path.join(__dirname, 'reference', 'ref_Net3.json'), 'utf8'));
 	const elev = {}, head = {}, length = {}, type = {};
 	doc.nodes.forEach(n => { if (typeof n.elev === 'number') { elev[n.id] = n.elev; } });
@@ -305,7 +305,7 @@ console.log('\n--- Net3, with EPANET\'s own heads ---');
 // 700 ft above the datum — which is the ordinary case, not an unusual one.
 console.log('\n--- Net1: the truncation payoff ---');
 {
-	const doc = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net1-lpn.json'), 'utf8'));
+	const doc = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net1.lwn'), 'utf8'));
 	const ref = JSON.parse(fs.readFileSync(path.join(__dirname, 'reference', 'ref_Net1.json'), 'utf8'));
 	const elev = {}, head = {}, length = {}, type = {};
 	doc.nodes.forEach(n => { if (typeof n.elev === 'number') { elev[n.id] = n.elev; } });

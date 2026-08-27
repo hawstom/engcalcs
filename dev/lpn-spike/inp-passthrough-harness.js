@@ -152,7 +152,7 @@ console.log('\n2. Regression against dev/water-network-examples/');
 // on top of the import, so only the quantities an import decides are compared -- a whole-file
 // diff would report every deliberate edit as a failure.
 const before = fails;
-[['Net1.inp', 'Net1-lpn.json'], ['Net2.inp', 'Net2-lpn.json'], ['Net3.inp', 'Net3-lpn.json']].forEach(([inp, json]) => {
+[['Net1.inp', 'Net1.lwn'], ['Net2.inp', 'Net2.lwn'], ['Net3.inp', 'Net3.lwn']].forEach(([inp, json]) => {
 	const jsonPath = path.join(ROOT, 'dev', 'water-network-examples', json);
 	if (!fs.existsSync(jsonPath)) { console.log('  skip  ' + json + ' is not here'); return; }
 	const want = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
