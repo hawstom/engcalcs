@@ -237,6 +237,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions', 'lpn_pane_reservoirs',
   'lpn_pane_tanks', 'lpn_pane_pipes', 'lpn_pane_pumps', 'lpn_pane_valves',
   'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note',
+  // The Find panel's two hosts (ROADMAP Tasks 353/420, and the disconnected report of 540). Absent
+  // from this list, rebuildFindForm() and renderFindResults() return at their first line and every
+  // control on that panel -- the pull-downs, the query line, the result rows -- is invisible to
+  // every harness, which could then only test findMatches() and never the panel itself.
+  'lpn_find_form', 'lpn_find_results',
   // The profile's path EDIT box (ROADMAP Task 509) -- the overlay that carries the two
   // operations Task 506's clean-out took with it. Absent from this list, profileEditEl()
   // returns null and the whole door is invisible to every harness.

@@ -38,7 +38,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 533 — Renaming a link leaves `incidentLinks` pointing at the old id.
 - Task 536 — [H] · Did the Manning button fix also cure the second symptom?
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
-- ! Task 540 — A Find that reports disconnected nodes, and the beginning of a query language.
+- Task 540 — [H] · Both halves are BUILT; the wording and phase 2 stay open.
 - Task 542 — Terrain elevations: the button did more than a curious user expected.
 - ! Task 543 — [H] · The menus are outgrowing their names: View is really Map, and Insert is really Water.
 
@@ -93,5 +93,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-58 of 67 titles are within 4–12 words. `!` marks the rest;
+59 of 67 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

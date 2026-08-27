@@ -788,6 +788,17 @@ html[lang="zh"] .ec-welcome {
    overstates the room actually available. */
 .lpn-popover { box-sizing: border-box; max-width: calc(100vw - 8px); max-height: calc(100vh - 8px); }
 .lpn-popover-body { overflow: auto; max-height: calc(100vh - 56px); }
+/* The Find panel's query line (ROADMAP Task 540): the three pull-downs written out as one
+   sentence, directly above the Find button. Monospaced and quiet -- it is there to be read, not
+   pressed, and it must not compete with the button under it. It wraps rather than scrolls, because
+   a query that runs off the edge of a 22rem popover would teach nothing. */
+.lpn-find-query {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: .85em;
+	color: #555;
+	margin: 6px 0 4px;
+	overflow-wrap: break-word;
+}
 /* The property popup is DRAGGABLE by its chrome -- the padded band around the body, which is the
    only part of it where the event target is the popup element itself (see wirePopup()). The cursor
    says so there, and the body puts it back, so a text input never shows a move cursor. Only

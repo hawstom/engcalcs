@@ -7356,6 +7356,14 @@ var EngCalcs = EngCalcs || {};
 			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier']);
 			return out;
 		}
+		// **CONNECTION IS OFFERED UNDER "Everything" TOO, and it is the one property that earns the
+		// exception above.** The rule there is honesty -- do not list a property that silently
+		// matches nothing -- and this one matches every NODE and says so in every row it returns.
+		// It is also inherently a question about the network rather than about a class of element,
+		// so restricting it to the node scopes would mean running the same report three times.
+		if (d.key === 'all' || d.group === 'node') {
+			out.push(['connection', pc.lpn_find_prop_connection || 'Connection']);
+		}
 		if (d.key === 'all') { return out; }
 		defs = d.group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc);
 		allowed = d.group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS;
@@ -7372,6 +7380,104 @@ var EngCalcs = EngCalcs || {};
 	// Searchable, but not colourable -- see findPropDefs(). Read straight off the element through
 	// effective(), in the unit it is stored and displayed in, like everything else here.
 	var FIND_EXTRA_LINK_FIELDS = { length: true, km: true };
+	// ---- DISCONNECTED NODES: three different faults, never one word (ROADMAP Task 540) ----------
+	//
+	// **"Disconnected" is not one condition, and a report that blurs them is worthless.**
+	// EngCalcs.lpnDiagnose() walks the network from its fixed heads and returns ONE code,
+	// 'unreachable', for all of them. That is the right answer to "can this be solved?" and the
+	// wrong answer to "what is wrong with this node?", so the walk is done twice here and the
+	// answers are separated:
+	//
+	//   'unlinked'  -- nothing meets this node at all. True whatever the statuses are, and the ONLY
+	//                  one of the three that can be answered in a network with no source.
+	//   'closed'    -- the drawing is whole, but every path back to a source runs through a CLOSED
+	//                  link. This is the case lpnDiagnose's message names out loud.
+	//   'nosource'  -- open links the whole way and still no reservoir or tank: a separate piece of
+	//                  network, which is the one that actually stops a solve.
+	//
+	// Tested in that order, so they are mutually exclusive, and their union is exactly
+	// lpnDiagnose's 'unreachable' list -- this panel splits that list rather than recomputing it
+	// differently.
+	//
+	// **THE MODEL COMES FROM assembleModel(), so this is the SOLVER'S view of the drawing** -- the
+	// active scenario's overrides, its inactive elements and its link statuses, not a second
+	// reading of the document that could disagree with the one the answer will be compared against.
+	var findConnCache = null;
+	function findConnectionMap() {
+		if (findConnCache) { return findConnCache; }
+		var model = assembleModel(), nodeById2 = {}, fixed = [], adjAll = {}, adjOpen = {},
+			state = {}, seenAll, seenOpen, i, link, n;
+		for (i = 0; i < model.nodes.length; i++) {
+			n = model.nodes[i];
+			nodeById2[n.id] = n; adjAll[n.id] = []; adjOpen[n.id] = [];
+			if (EngCalcs.lpnIsFixedHead(n)) { fixed.push(n.id); }
+		}
+		for (i = 0; i < model.links.length; i++) {
+			link = model.links[i];
+			// A link with an end that is not in the model is lpnDiagnose's 'dangling-link' and is
+			// its report to make, not this one's -- it is a fault of the LINK. Skipped here so it
+			// cannot make the node at the other end look connected.
+			if (!nodeById2[link.from] || !nodeById2[link.to]) { continue; }
+			adjAll[link.from].push(link.to); adjAll[link.to].push(link.from);
+			if (link.status === 'closed') { continue; }
+			adjOpen[link.from].push(link.to); adjOpen[link.to].push(link.from);
+		}
+		function reach(adj) {
+			var seen = {}, queue = fixed.slice(), j, id;
+			for (j = 0; j < queue.length; j++) { seen[queue[j]] = true; }
+			while (queue.length > 0) {
+				id = queue.shift();
+				for (j = 0; j < adj[id].length; j++) {
+					if (!seen[adj[id][j]]) { seen[adj[id][j]] = true; queue.push(adj[id][j]); }
+				}
+			}
+			return seen;
+		}
+		seenAll = reach(adjAll); seenOpen = reach(adjOpen);
+		for (i = 0; i < model.nodes.length; i++) {
+			n = model.nodes[i];
+			if (adjAll[n.id].length === 0) { state[n.id] = 'unlinked'; }
+			// **WITH NO RESERVOIR AND NO TANK, ONLY THE FIRST QUESTION HAS AN ANSWER.** Reporting
+			// every node as source-less would be true and useless -- it is one fault of the
+			// network, not N faults of the nodes, and lpnDiagnose already says it as
+			// 'no-fixed-head'. So the other two go unjudged and the panel says why.
+			else if (!fixed.length) { state[n.id] = 'ok'; }
+			else if (!seenAll[n.id]) { state[n.id] = 'nosource'; }
+			else if (!seenOpen[n.id]) { state[n.id] = 'closed'; }
+			else { state[n.id] = 'ok'; }
+		}
+		findConnCache = { state: state, hasSource: fixed.length > 0 };
+		return findConnCache;
+	}
+	function findConnStateOf(id) { return findConnectionMap().state[id]; }
+	function findPropIsConnection(prop) { return prop === 'connection'; }
+	// The three faults are CONDITIONS, on the same footing as "is greater than" -- the precedent is
+	// Top n and Bottom n above, which are conditions rather than a second box for the same reason:
+	// the panel already asks "which elements?" three ways, and a fourth control would be a fourth
+	// thing to learn. Each needs no Value, and "is broken" first is the report Tom asked for --
+	// one press, every kind.
+	function findConnOpDefs() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			['conn-any', pc.lpn_find_op_conn_any || 'is broken'],
+			['conn-unlinked', pc.lpn_find_op_conn_unlinked || 'has no links'],
+			['conn-closed', pc.lpn_find_op_conn_closed || 'is behind closed links'],
+			['conn-nosource', pc.lpn_find_op_conn_nosource || 'reaches no source']
+		];
+	}
+	function findConnMatchesOp(op, st) {
+		if (op === 'conn-any') { return st !== 'ok'; }
+		return op === 'conn-' + st;
+	}
+	// What a result row prints beside the id. Never called for 'ok' -- an element that matched is by
+	// definition one of the three.
+	function findConnLabel(st) {
+		var pc = EngCalcs.pageConfig || {};
+		if (st === 'unlinked') { return pc.lpn_find_conn_unlinked || 'No links'; }
+		if (st === 'closed') { return pc.lpn_find_conn_closed || 'Behind closed links'; }
+		if (st === 'nosource') { return pc.lpn_find_conn_nosource || 'No path to a source'; }
+		return '';
+	}
 	function findPropIsText(prop) { return prop === 'id' || prop === 'text'; }
 	// Text gets contains/equals, a number gets equals/greater/less. Offering all four for both would
 	// mean "Pressure contains 2", which matches on the digits of a number and is never what anybody
@@ -7384,6 +7490,7 @@ var EngCalcs = EngCalcs || {};
 	// CONDITION on the same footing as "is greater than", and it reuses the box already there.
 	function findOpDefs() {
 		var pc = EngCalcs.pageConfig || {};
+		if (findPropIsConnection(findState.prop)) { return findConnOpDefs(); }
 		if (findPropIsText(findState.prop)) {
 			return [['contains', pc.lpn_find_op_contains || 'contains'], ['equals', pc.lpn_find_op_equals || 'is exactly']];
 		}
@@ -7426,6 +7533,9 @@ var EngCalcs = EngCalcs || {};
 		if (prop === 'id') { return findLabelHasNoId(cand) ? undefined : cand.el.id; }
 		if (prop === 'text') { return effective(cand.el, 'text'); }
 		if (prop === 'sizeMult') { return cand.el.sizeMult || 1; }
+		if (prop === 'connection') {
+			return cand.group === 'node' ? findConnStateOf(cand.el.id) : undefined;
+		}
 		if (cand.group === 'label') { return undefined; }
 		if (FIND_EXTRA_LINK_FIELDS[prop]) {
 			// `km` is stored as `k`; the label calls it km because that is the symbol on the page.
@@ -7443,6 +7553,21 @@ var EngCalcs = EngCalcs || {};
 	function findMatches() {
 		var v = String(findState.value).trim(), lc = v.toLowerCase(), num = parseFloat(v), out = [];
 		findNormalize();
+		// **THE CONNECTION WALK IS REDONE ON EVERY SEARCH and cached for that search alone.** The
+		// panel stays open across edits, an undo and a project switch, so a kept answer would be a
+		// report about a drawing that is no longer on screen. Dropped HERE rather than in runFind()
+		// because this is the one function every search passes through.
+		findConnCache = null;
+		// **A CONNECTION QUERY HAS NO VALUE TO MATCH AGAINST** -- the condition IS the whole
+		// question. It returns nodes only, whatever the scope; a pipe has no connection state of
+		// its own, and a link that goes nowhere is lpnDiagnose's dangling-link.
+		if (findPropIsConnection(findState.prop)) {
+			findCandidates().forEach(function (c) {
+				var st = findValueOf(c, 'connection');
+				if (st && findConnMatchesOp(findState.op, st)) { out.push(c); }
+			});
+			return findSortMatches(out);
+		}
 		// **AN EMPTY BOX WITH "contains" IS EVERY ELEMENT** (Tom, 2026-08-18: *"Find on contains
 		// empty value should return all... 'All when empty' is intuitive."*). It is also how the
 		// question "what valves are in this network?" gets asked -- pick the scope, press Find. A
@@ -7618,6 +7743,58 @@ var EngCalcs = EngCalcs || {};
 		parent.appendChild(wrap);
 		return sel;
 	}
+	// ---- THE QUERY, WRITTEN OUT AS ONE LINE (ROADMAP Task 540, phase 1) -------------------------
+	//
+	// Tom, 2026-08-26: *"start teaching users a simple query language by printing right above the
+	// Find button a string ... like 'Junction.ID contains 223' or 'Junction.Links is empty'"*.
+	//
+	// **PHASE 1 IS READ-ONLY AND THAT IS THE WHOLE DESIGN.** The pull-downs stay the way in; this
+	// line only says what they just expressed. Nothing parses it, and there is deliberately no
+	// input to type it into: making it editable is a grammar and a parser, and the one thing phase
+	// 1 is for is finding out whether anybody reads the line at all. An input would answer a
+	// different question and could not be withdrawn.
+	//
+	// **IT IS BUILT FROM THE LABELS THE PULL-DOWNS ARE SHOWING, so it is in the reader's own
+	// language.** A teaching device that a reader cannot read teaches nothing, and the identifier
+	// half is localized whatever we do -- the scope is the Insert tool's own word for a Junction.
+	// Keeping the operators in English would produce a half-and-half sentence, which is the worst
+	// of the two. The cost is stated and accepted: a query string is not portable between
+	// languages, so a phase-2 parser must accept the localized words (and should accept the English
+	// ones as aliases).
+	//
+	// Two operators do not compose into a sentence and get their own word here: "Highest n" and
+	// "Lowest n" name a control, not a comparison, so the line says `highest 10` with the count the
+	// search will actually use. Everything else reuses the label as it stands.
+	function findLabelOf(defs, key) {
+		var i;
+		for (i = 0; i < defs.length; i++) { if (defs[i][0] === key) { return defs[i][1]; } }
+		return key;
+	}
+	function findQueryString() {
+		var pc = EngCalcs.pageConfig || {};
+		findNormalize();
+		var head = findScopeDef(findState.scope).label + '.' +
+				findLabelOf(findPropDefs(), findState.prop),
+			op = findLabelOf(findOpDefs(), findState.op),
+			v = String(findState.value).trim();
+		if (findPropIsConnection(findState.prop)) { return head + ' ' + op; }
+		if (findOpIsExtreme(findState.op)) {
+			return head + ' ' + (findState.op === 'top'
+				? (pc.lpn_find_q_top || 'highest')
+				: (pc.lpn_find_q_bottom || 'lowest')) + ' ' + findExtremeCount();
+		}
+		// A text value is QUOTED, so that an empty box reads as the empty string it is matched as
+		// rather than as a sentence that stops in the middle -- `Everything.ID contains ''` is the
+		// honest rendering of the query that returns everything.
+		if (findPropIsText(findState.prop)) { return head + ' ' + op + " '" + v + "'"; }
+		return v === '' ? head + ' ' + op : head + ' ' + op + ' ' + v;
+	}
+	// Held rather than looked up by id, for buildReplaceForm()'s reason: rebuildFindForm() is the
+	// only thing that ever creates it, and Looped-Network.php does not declare it.
+	var findQueryEl = null;
+	function updateFindQuery() {
+		if (findQueryEl) { findQueryEl.textContent = findQueryString(); }
+	}
 	function rebuildFindForm() {
 		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_find_form'),
 			props, ops, valWrap, valLab, input, btn;
@@ -7638,7 +7815,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		ops = findOpDefs();
 		findSelect(box, pc.lpn_find_condition || 'Condition', ops, findState.op, function (v) {
-			findState.op = v; renderFindResults(null);
+			findState.op = v; updateFindQuery(); renderFindResults(null);
 		});
 		valWrap = document.createElement('div');
 		valWrap.style.margin = '4px 0';
@@ -7649,7 +7826,7 @@ var EngCalcs = EngCalcs || {};
 		input.type = 'text';
 		input.value = findState.value;
 		input.style.width = '100%';
-		input.addEventListener('input', function () { findState.value = input.value; });
+		input.addEventListener('input', function () { findState.value = input.value; updateFindQuery(); });
 		// Enter is what a person presses in a search box, and this panel has no other use for it.
 		input.addEventListener('keydown', function (e) {
 			if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } runFind(); }
@@ -7657,6 +7834,13 @@ var EngCalcs = EngCalcs || {};
 		valLab.appendChild(input);
 		valWrap.appendChild(valLab);
 		box.appendChild(valWrap);
+		// Right above the button, which is where Tom asked for it: the last thing read before the
+		// search is pressed.
+		findQueryEl = document.createElement('div');
+		findQueryEl.className = 'lpn-find-query';
+		findQueryEl.title = pc.lpn_find_query_tip || 'The same search written as one line.';
+		box.appendChild(findQueryEl);
+		updateFindQuery();
 		btn = document.createElement('button');
 		btn.type = 'button';
 		setLabel(btn, 'find', pc.lpn_find_button || 'Find');
@@ -7670,16 +7854,26 @@ var EngCalcs = EngCalcs || {};
 	}
 	function runFind() {
 		var pc = EngCalcs.pageConfig || {};
+		findConnNote = '';
+		findHasRun = true;
 		// An empty box is only a mistake when the query needs something to match against. Top n and
-		// Bottom n rank what is there, and "contains" nothing matches everything -- neither needs a
-		// value, so neither is scolded for having none.
-		if (String(findState.value).trim() === '' &&
+		// Bottom n rank what is there, "contains" nothing matches everything, and a connection
+		// condition asks the whole question by itself -- none of them needs a value, so none of
+		// them is scolded for having none.
+		if (String(findState.value).trim() === '' && !findPropIsConnection(findState.prop) &&
 				!findOpIsExtreme(findState.op) && findState.op !== 'contains') {
 			findResults = [];
 			renderFindResults(pc.lpn_find_no_value || 'Type what to look for.');
 			return;
 		}
 		findResults = findMatches();
+		// **SAY WHEN TWO OF THE THREE QUESTIONS COULD NOT BE ASKED.** A network with no reservoir
+		// and no tank has no source to reach, so "reaches no source" and "is behind closed links"
+		// are unanswerable -- and a silent empty report would read as a clean bill of health.
+		if (findPropIsConnection(findState.prop) && !findConnectionMap().hasSource) {
+			findConnNote = pc.lpn_find_conn_no_fixed ||
+				'This network has no reservoir or tank, so only "has no links" can be answered.';
+		}
 		renderFindResults(null);
 		// ONE HIT GOES STRAIGHT THERE. Typing a node's ID and being shown a list of one, to click,
 		// is EPANET's Map Finder with an extra step -- and an exact ID lookup is the commonest thing
@@ -7698,7 +7892,8 @@ var EngCalcs = EngCalcs || {};
 		// A Text label is named by its words, not by an id nobody can see.
 		row.textContent = findLabelHasNoId(c)
 			? findFmt(effective(c.el, 'text'))
-			: c.el.id + (findState.prop === 'id' ? '' : '  ' + findFmt(val));
+			: c.el.id + (findState.prop === 'id' ? ''
+				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val) : findFmt(val)));
 		// The Map Finder's "Adjacent Links" pane, said in one line under the node it belongs to:
 		// finding a junction and immediately wanting to know what meets there is the whole reason
 		// EPANET's dialog has that box.
@@ -7711,6 +7906,12 @@ var EngCalcs = EngCalcs || {};
 		row.addEventListener('click', function () { findGoTo(c.group, c.el.id); });
 		return row;
 	}
+	// Whether a search has been pressed at all, so an empty panel can be silent while an empty
+	// ANSWER says so out loud. Before Task 540 a search that matched nothing rendered a blank box,
+	// which reads as the button having done nothing -- harmless for a lookup, actively misleading
+	// for a report, where "none" is the good news the user came for.
+	var findHasRun = false;
+	var findConnNote = '';
 	function renderFindResults(message) {
 		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_find_results'), head;
 		if (!box) { return; }
@@ -7721,7 +7922,23 @@ var EngCalcs = EngCalcs || {};
 			box.appendChild(head);
 			return;
 		}
-		if (!findResults.length) { return; }
+		if (findConnNote) {
+			head = document.createElement('div');
+			head.style.margin = '6px 0 2px';
+			head.textContent = findConnNote;
+			box.appendChild(head);
+		}
+		if (!findResults.length) {
+			if (findHasRun) {
+				head = document.createElement('div');
+				head.style.margin = '6px 0 2px';
+				head.textContent = findPropIsConnection(findState.prop)
+					? (pc.lpn_find_conn_none || 'Every node is connected.')
+					: (pc.lpn_find_none || 'Nothing matched.');
+				box.appendChild(head);
+			}
+			return;
+		}
 		head = document.createElement('div');
 		head.style.margin = '6px 0 2px';
 		head.textContent = String(pc.lpn_find_count || '{n} found. Click one to go to it.')
