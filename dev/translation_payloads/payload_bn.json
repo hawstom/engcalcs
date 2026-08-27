@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1401,
-        "delta_key_count": 70,
+        "expected_key_count": 1403,
+        "delta_key_count": 72,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -500,6 +500,8 @@
         "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_leader_snap": "Snap leader lines to angle",
+        "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_field_base_demand": "Base demand",
@@ -572,6 +574,8 @@
         "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_leader_snap": "Snap leader lines to angle",
+        "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_field_base_demand": "Base demand",
@@ -1481,6 +1485,38 @@
                     "key": "lpn_scenario_menu",
                     "value": "দৃশ্যকল্প",
                     "english": "Scenarios"
+                }
+            }
+        },
+        "lpn_settings_leader_snap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_mask_labels",
+                    "value": "লেবেলের পেছনে নিরেট পটভূমি",
+                    "english": "Solid background behind labels"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "প্রতীকের অস্বচ্ছতা (0 থেকে 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_leader_snap_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_mask_labels",
+                    "value": "লেবেলের পেছনে নিরেট পটভূমি",
+                    "english": "Solid background behind labels"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "প্রতীকের অস্বচ্ছতা (0 থেকে 1)",
+                    "english": "Symbol opacity (0 to 1)"
                 }
             }
         },

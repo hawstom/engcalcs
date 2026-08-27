@@ -503,19 +503,6 @@ the block.
   mission has earned; prepare for the meeting and record what comes of it. Not a search-reach task,
   but it lives here because it is the same goal reached by a better road.
 
-- 100|408| **Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.**
-  Tom, 2026-08-17. A toggle or picker for the increment, not a forced snap — free dragging must stay
-  available for whoever wants it.
-  - **Open question, same day: magnet-style (soft pull toward the nearest increment, override-able by
-    continuing to drag past it) instead of constrained (hard-locks to the grid of angles) snapping.**
-    Tom named this as the more modern UX but flagged he does not know what's available to build it
-    with. Not researched yet — this repo has no drag/snap library today (`js/looped-network.js`'s own
-    pointer handlers do all dragging by hand), so the real choice is between a small hand-rolled
-    magnet threshold (a few lines: snap only within N° of an increment, free otherwise) versus pulling
-    in a library, which needs its own evaluation against this codebase's no-dependencies-shipped-to-
-    visitors norm (`js/vendor/` today holds only the EPANET engine). Decide the mechanism before
-    scoping the toggle above.
-
 - 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.

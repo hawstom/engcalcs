@@ -144,5 +144,49 @@ CASES.forEach(function (c) {
 		angles.map(function (v) { return v.toFixed(4); }).join(' / '));
 }
 
+// ---- THE OPTIONAL ANGLE SNAP IS WIRED TO EVERY LABEL DRAG (ROADMAP Task 408) -------------------
+//
+// The magnet itself is arithmetic and is asserted in dev/lpn-spike/geom-harness.js, where it can be
+// fed angles directly. What CANNOT be asserted there is the thing that would actually ship broken:
+// **three separate drag branches store a label offset**, and a snap wired into two of them is a
+// feature that works on node labels and silently does nothing on link labels.
+{
+	const fs = require('fs');
+	const src = fs.readFileSync(require('path').join(__dirname, '../../js/looped-network.js'), 'utf8');
+	// Anchored on the `else if` of applyDrag()'s chain, not on the bare comparison: `nodelbl` is
+	// also named in markJustDragged() a few lines above, and matching that instead would read a
+	// branch with no offset arithmetic in it at all.
+	function branch(name) {
+		const at = src.indexOf("} else if (drag.type === '" + name + "')");
+		if (at < 0) { return ''; }
+		const end = src.indexOf('} else if', at + 4);
+		return src.substring(at, end < 0 ? at + 2000 : end);
+	}
+	['nodelbl', 'linklbl', 'label'].forEach(function (kind) {
+		const body = branch(kind);
+		ok('the ' + kind + ' drag stores its offset through the snap', /snapLeaderOffset\(/.test(body),
+			body ? 'branch found, no call' : 'branch not found at all');
+	});
+	// ONE reader of the setting, so "what step is in force?" has one answer.
+	ok('there is exactly one place the setting is read',
+		(src.match(/settings\.leaderSnapDeg/g) || []).length === 2,   // the reader, and the picker writing it
+		JSON.stringify((src.match(/.{0,30}settings\.leaderSnapDeg.{0,20}/g) || [])));
+	// **OFF BY DEFAULT.** A snap that arrives switched on has made the user's choice for them, and
+	// Tom's ruling was that free dragging must stay available.
+	ok('a new project drags freely until somebody asks otherwise',
+		/leaderSnapDeg: 0,/.test(src));
+	// An unknown step from some future version reads as Off rather than as a grid this page has no
+	// control for.
+	ok('only the increments the picker offers are honoured',
+		/var LEADER_SNAP_STEPS = \[0, 15, 30, 45\];/.test(src) &&
+		/LEADER_SNAP_STEPS\.indexOf\(d\) > 0 \? d : 0/.test(src));
+	// **NOTHING ALREADY DRAWN IS RE-SNAPPED.** The picker writes the setting and saves; if it also
+	// relaid the labels out, changing the setting would rewrite offsets the user put there by hand.
+	const at = src.indexOf('settings.leaderSnapDeg = +snapSelect.value;');
+	const handler = src.substring(at, src.indexOf('});', at));
+	ok('changing the setting moves nothing that is already on the drawing',
+		at > 0 && !/relayoutLabels|refreshLabelText/.test(handler), handler.trim());
+}
+
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);

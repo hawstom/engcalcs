@@ -389,5 +389,76 @@ report(c5 && near(c5.t1 - c5.t0, 100 / 120), 'a line along the top edge is kept,
 		'dist: a repeated vertex does not produce NaN');
 }
 
+// ---- THE LEADER ANGLE SNAP (ROADMAP Task 408) --------------------------------------------------
+//
+// A MAGNET, not a grid. Tom asked for "an optional snap to 15/30/45 degree angle increments, user's
+// choice", **never forced**, and named the magnet feel -- a soft pull you override by dragging past
+// it -- as the modern one. So the two failure modes worth measuring are opposite: a snap that
+// NEVER lets go (a grid wearing a magnet's name) and a snap that never catches.
+console.log('\n-- the leader angle snap: a magnet, not a grid --');
+{
+	const at = (dx, dy, step) => Geom.snapLeaderOffset(dx, dy, step);
+	const deg = (p) => Math.atan2(p.y, p.x) * 180 / Math.PI;
+	const len = (p) => Math.hypot(p.x, p.y);
+
+	// OFF IS THE DEFAULT AND OFF MEANS UNTOUCHED. A pass-through here is the whole promise that free
+	// dragging stays available.
+	const free = at(37.5, 12.25, 0);
+	report(free.x === 37.5 && free.y === 12.25, 'snap: step 0 is Off and returns the drag exactly',
+		JSON.stringify(free));
+	report(at(37.5, 12.25, -15).x === 37.5, 'snap: a nonsense step is Off too, not a crash');
+
+	// CATCHES: 2 degrees off an increment, well inside the band.
+	const caught = at(100 * Math.cos(17 * Math.PI / 180), 100 * Math.sin(17 * Math.PI / 180), 15);
+	report(near(deg(caught), 15), 'snap: a drag 2 degrees off an increment is pulled onto it',
+		deg(caught).toFixed(3) + ' degrees');
+	report(near(len(caught), 100), '...and the label stays exactly as far out as it was dragged',
+		len(caught).toFixed(6));
+
+	// LETS GO: the capture is a QUARTER of the step on each side, so 15-degree snapping is free past
+	// 3.75 degrees. This is the assertion a half-step band -- which snaps every angle in the circle
+	// -- fails.
+	const loose = at(100 * Math.cos(24 * Math.PI / 180), 100 * Math.sin(24 * Math.PI / 180), 15);
+	report(near(deg(loose), 24), 'snap: 9 degrees off an increment is left alone -- you can drag past it',
+		deg(loose).toFixed(3) + ' degrees');
+	// The boundary from both sides, at each offered step. Just inside catches, just outside is free.
+	[15, 30, 45].forEach((step) => {
+		const band = step / 4;
+		const inside = at(Math.cos((band - 0.5) * Math.PI / 180), Math.sin((band - 0.5) * Math.PI / 180), step);
+		const outside = at(Math.cos((band + 0.5) * Math.PI / 180), Math.sin((band + 0.5) * Math.PI / 180), step);
+		report(near(deg(inside), 0), `snap ${step}: just inside the band is pulled to the increment`,
+			deg(inside).toFixed(3));
+		report(near(deg(outside), band + 0.5), `snap ${step}: just outside it is free`,
+			deg(outside).toFixed(3));
+	});
+	// **MOST OF THE CIRCLE MUST STAY FREE, or this is a constrained snap.** Swept a degree at a
+	// time: exactly the third of it inside a band should move.
+	[15, 30, 45].forEach((step) => {
+		let held = 0;
+		// **COUNTED AS "ENDED ON AN INCREMENT", not as "moved"**: an angle that was already exactly on
+		// one does not move, and calling that free would under-count the band by every increment in
+		// the circle.
+		for (let a = 0; a < 360; a++) {
+			const p = at(Math.cos(a * Math.PI / 180), Math.sin(a * Math.PI / 180), step);
+			if (Math.abs(Geom.angularGap(deg(p), Math.round(deg(p) / step) * step)) < 1e-9) { held++; }
+		}
+		report(held > 360 * 0.42 && held < 360 * 0.58,
+			`snap ${step}: about half the circle snaps and the other half is free`, held + ' of 360 degrees');
+	});
+
+	// Every increment on the compass, not just the ones near zero -- a `%` that forgot negative
+	// angles would pass on the right half of the drawing and fail on the left.
+	[-165, -90, -45, 0, 45, 90, 165, 180].forEach((target) => {
+		const p = at(50 * Math.cos((target + 1) * Math.PI / 180), 50 * Math.sin((target + 1) * Math.PI / 180), 15);
+		report(Math.abs(Geom.angularGap(deg(p), target)) < 1e-9,
+			`snap: an increment at ${target} degrees catches like every other`, deg(p).toFixed(3));
+	});
+
+	// A label sitting exactly on its anchor has no direction, and atan2(0, 0) is 0 -- which would
+	// fling it along the x axis before the drag has moved anywhere.
+	const zero = at(0, 0, 15);
+	report(zero.x === 0 && zero.y === 0, 'snap: a zero offset has no angle and is left alone');
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);

@@ -1221,6 +1221,8 @@
         "lpn_settings_readability_bias": "Label flip angle adjustment (degrees)",
         "lpn_settings_readability_bias_tip": "Flip a label to keep it right side up when it leans more than this many degrees left of vertical.",
         "lpn_settings_mask_labels": "Solid background behind labels",
+        "lpn_settings_leader_snap": "Snap leader lines to angle",
+        "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_symbol_opacity": "Symbol opacity (0 to 1)",
         "lpn_settings_backdrop_opacity": "Background image opacity (0 to 1)",
         "lpn_settings_map_display": "Map appearance",
@@ -1403,7 +1405,7 @@
         "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
         "lpn_terrain_ids_more": "{ids}, and {n} more"
     },
-    "count": 1401,
+    "count": 1403,
     "active_prefixes": [
         "about",
         "bpn",

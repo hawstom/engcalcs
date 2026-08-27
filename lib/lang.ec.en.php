@@ -2426,6 +2426,13 @@ $ec_lang['lpn_settings_align_labels']='Draw link labels along the link line';
 $ec_lang['lpn_settings_readability_bias']='Label flip angle adjustment (degrees)';
 $ec_lang['lpn_settings_readability_bias_tip']='Flip a label to keep it right side up when it leans more than this many degrees left of vertical.';
 $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
+// Task 408: dragging a label away from its node draws a leader line, and this pulls that line onto
+// a round angle when the drag comes close to one. The values are numbers and the degree sign, which
+// need no translation; "Off" borrows lpn_settings_legend_off, the same word for the same idea.
+// **NOT "snap to grid"** -- nothing here snaps to a grid of positions, and a reader who has used a
+// drawing program would expect exactly that from those words.
+$ec_lang['lpn_settings_leader_snap']='Snap leader lines to angle';
+$ec_lang['lpn_settings_leader_snap_tip']='When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';

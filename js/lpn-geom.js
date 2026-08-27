@@ -428,6 +428,55 @@ EngCalcs.lpnGeom = (function () {
 	}
 
 
+	// ---- LEADER ANGLE SNAP (ROADMAP Task 408) ---------------------------------------------------
+	//
+	// Tom, 2026-08-17: *"an optional snap to 15/30/45 degree angle increments, user's choice"* -- a
+	// toggle or picker, **never a forced snap**, because free dragging has to stay available for
+	// whoever wants it. And, the same day, the mechanism question: MAGNET (a soft pull toward the
+	// nearest increment that you can override by dragging past it) rather than CONSTRAINED (hard
+	// locked to the grid of angles), which he named as the more modern feel while flagging that he
+	// did not know what it would be built with.
+	//
+	// **IT IS BUILT WITH ARITHMETIC, AND THAT IS THE WHOLE ANSWER.** The alternative was a drag/snap
+	// library, which would be the first dependency shipped to a visitor for anything but the EPANET
+	// engine -- for a rule that is one modulo and one comparison. `js/looped-network.js` already does
+	// every drag by hand with its own pointer handlers, so there was nothing for a library to plug
+	// into either.
+	//
+	// **THE CAPTURE IS A QUARTER OF THE STEP ON EACH SIDE, so half the circle snaps and half of it
+	// is free.** That is what makes it a magnet rather than a grid: at 15 degrees you are pulled
+	// only within 3.75 of an increment, and keeping the pointer moving carries you out of the band
+	// and back to free dragging -- no modifier key to discover, no gesture to learn. **HALF THE
+	// STEP WOULD SNAP EVERYWHERE**, since every angle is within half a step of some increment; that
+	// is the constrained behaviour wearing a magnet's name, and it is the mistake to check for.
+	//
+	// **THE RADIUS IS UNTOUCHED.** The user is choosing how far the label sits from its anchor at
+	// the same time as choosing the direction, and a snap that also moved the label in or out would
+	// be answering a question nobody asked.
+	//
+	// Y-DOWN, like everything else in this file, so the angles are the ones a reader sees on the
+	// drawing rather than the ones a mathematician would draw on paper.
+	var LEADER_SNAP_BAND = 1 / 4;
+	// {x, y} for the offset (dx, dy), pulled onto the nearest multiple of `stepDeg` when it is
+	// already close to one. `stepDeg` of 0 (or anything not positive) is OFF and returns the offset
+	// unchanged -- the free dragging that must stay available.
+	function snapLeaderOffset(dx, dy, stepDeg) {
+		var step = Number(stepDeg), r, deg, nearest, band;
+		if (!(step > 0) || !isFinite(dx) || !isFinite(dy)) { return { x: dx, y: dy }; }
+		r = Math.hypot(dx, dy);
+		// A label sitting exactly on its anchor has no direction to snap, and atan2(0, 0) is 0 --
+		// which would fling it along the x axis for a drag that has not started moving yet.
+		if (!(r > 0)) { return { x: dx, y: dy }; }
+		deg = Math.atan2(dy, dx) * 180 / Math.PI;
+		nearest = Math.round(deg / step) * step;
+		band = step * LEADER_SNAP_BAND;
+		if (Math.abs(angularGap(deg, nearest)) > band) { return { x: dx, y: dy }; }
+		return {
+			x: r * Math.cos(nearest * Math.PI / 180),
+			y: r * Math.sin(nearest * Math.PI / 180)
+		};
+	}
+
 	// ---- local feature context: which way is open (ROADMAP Task 397) --------------------------
 	//
 	// **BEARINGS ARE SCALE-INVARIANT. DISTANCES ARE NOT. THAT IS THE WHOLE REASON THIS IS ANGLES.**
@@ -680,6 +729,7 @@ EngCalcs.lpnGeom = (function () {
 		pointToPolylineDistance: pointToPolylineDistance,
 		buildSegmentIndex: buildSegmentIndex,
 		nearestSegmentDistance: nearestSegmentDistance,
+		snapLeaderOffset: snapLeaderOffset,
 		angularGap: angularGap,
 		directionOpenness: directionOpenness,
 		mostOpenDirection: mostOpenDirection,

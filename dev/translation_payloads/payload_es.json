@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 1401,
-        "delta_key_count": 69,
+        "expected_key_count": 1403,
+        "delta_key_count": 71,
         "exempt_key_count": 31,
         "exempt_keys": [
             "calc_units_us",
@@ -506,6 +506,8 @@
         "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_leader_snap": "Snap leader lines to angle",
+        "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
         "lpn_field_base_demand": "Base demand",
         "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
@@ -577,6 +579,8 @@
         "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_leader_snap": "Snap leader lines to angle",
+        "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
         "lpn_field_base_demand": "Base demand",
         "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
@@ -1485,6 +1489,38 @@
                     "key": "lpn_scenario_menu",
                     "value": "Escenarios",
                     "english": "Scenarios"
+                }
+            }
+        },
+        "lpn_settings_leader_snap": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_mask_labels",
+                    "value": "Fondo sólido detrás de las etiquetas",
+                    "english": "Solid background behind labels"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Opacidad del símbolo (0 a 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_leader_snap_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_mask_labels",
+                    "value": "Fondo sólido detrás de las etiquetas",
+                    "english": "Solid background behind labels"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Opacidad del símbolo (0 a 1)",
+                    "english": "Symbol opacity (0 to 1)"
                 }
             }
         },

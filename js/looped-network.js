@@ -396,6 +396,23 @@ var EngCalcs = EngCalcs || {};
 	// positive d moves the doorway the other way.
 
 	function labelReadabilityBias() { return 90 - labelFlipLeftOfVertical(); }
+	// **ONE PLACE THE SNAP IS READ, and one place a label drag is put through it** (Task 408). The
+	// three draggable label kinds -- a node's data label, a link's, and a Text attached to an
+	// element -- all store an OFFSET from an anchor, so they all snap by the same arithmetic and
+	// none of them may grow its own copy of it.
+	//
+	// Anything that is not one of the offered increments reads as Off, so a document from a future
+	// version that carries a step we do not offer drags freely rather than pulling to a grid this
+	// page cannot name in its own control.
+	var LEADER_SNAP_STEPS = [0, 15, 30, 45];
+	function leaderSnapDeg() {
+		var d = +settings.leaderSnapDeg;
+		return LEADER_SNAP_STEPS.indexOf(d) > 0 ? d : 0;
+	}
+	// (dx, dy) -> the offset to store. Pass-through when the snap is off, which is the default.
+	function snapLeaderOffset(dx, dy) {
+		return Geom.snapLeaderOffset(dx, dy, leaderSnapDeg());
+	}
 	function linkLabelAligned(l) {
 		return !!settings.alignPipeLabels && l.lx === undefined && l.ly === undefined;
 	}
@@ -2910,6 +2927,12 @@ var EngCalcs = EngCalcs || {};
 			// the control exists because a clean drawing with no backdrop reads better without the
 			// patches, which is a judgement about the sheet and therefore the user's to make.
 			maskLabels: true,
+			// **THE LEADER ANGLE SNAP IS OFF UNTIL SOMEBODY ASKS FOR IT** (ROADMAP Task 408). Tom
+			// asked for a snap that is the user's choice and never forced, and a feature that
+			// arrives switched on has made the choice for them -- every existing drawing would have
+			// its next label drag pulled somewhere the user did not put it. 0 is Off; 15, 30 and 45
+			// are the increments he named. See EngCalcs.lpnGeom.snapLeaderOffset() for the magnet.
+			leaderSnapDeg: 0,
 			// One of LEGEND_POSITIONS' keys below. On a pointer the corner is the original hardcoded
 			// CSS's, top right; **ON A PHONE THE TWO LEGENDS SWAP INTO THE TOP CORNERS** -- Tom,
 			// 2026-08-25: "527 on phone, color legend upper right and label legend upper left."
@@ -18140,7 +18163,13 @@ var EngCalcs = EngCalcs || {};
 			// means `anchorT` is untouched here: the leader keeps landing where the user put it and
 			// only the note swings around it. Task 247 wants a separate handle for the station.
 			var w3 = screenToWorld(p.x, p.y), lb = labelById(drag.id), an = textAnchorPoint(lb);
-			if (an) { lb.x = (w3.x + drag.offX) - an.x; lb.y = (w3.y + drag.offY) - an.y; }
+			// **AN UNATTACHED TEXT IS NOT SNAPPED**, and the difference is not a special case: with
+			// no anchor `lb.x/lb.y` are a POSITION on the map rather than an offset from anything,
+			// and there is no leader and so no angle to snap. Task 408 is about leader angles.
+			if (an) {
+				var t3 = snapLeaderOffset((w3.x + drag.offX) - an.x, (w3.y + drag.offY) - an.y);
+				lb.x = t3.x; lb.y = t3.y;
+			}
 			else { lb.x = w3.x + drag.offX; lb.y = w3.y + drag.offY; }
 			updateLabelGeometry(drag.id);
 			// Every label drag ends in relayoutLabels(), not just a layout of the one being dragged:
@@ -18155,15 +18184,17 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 		} else if (drag.type === 'nodelbl') {
 			snapshotDragOnce();
-			var w6 = screenToWorld(p.x, p.y), nn2 = nodeById(drag.id);
-			nn2.lx = (w6.x + drag.offX) - nn2.x; nn2.ly = (w6.y + drag.offY) - nn2.y;
+			var w6 = screenToWorld(p.x, p.y), nn2 = nodeById(drag.id),
+				t6 = snapLeaderOffset((w6.x + drag.offX) - nn2.x, (w6.y + drag.offY) - nn2.y);
+			nn2.lx = t6.x; nn2.ly = t6.y;
 			layoutNodeLabel(drag.id);
 			relayoutLabels();
 			scheduleSolve();
 		} else if (drag.type === 'linklbl') {
 			snapshotDragOnce();
-			var w7 = screenToWorld(p.x, p.y), ll2 = linkById(drag.id), mid2 = linkLabelMid(ll2);
-			ll2.lx = (w7.x + drag.offX) - mid2.x; ll2.ly = (w7.y + drag.offY) - mid2.y;
+			var w7 = screenToWorld(p.x, p.y), ll2 = linkById(drag.id), mid2 = linkLabelMid(ll2),
+				t7 = snapLeaderOffset((w7.x + drag.offX) - mid2.x, (w7.y + drag.offY) - mid2.y);
+			ll2.lx = t7.x; ll2.ly = t7.y;
 			layoutLinkLabel(drag.id);
 			relayoutLabels();
 			scheduleSolve();
@@ -20118,6 +20149,30 @@ var EngCalcs = EngCalcs || {};
 			applyMaskLabels(); saveToStorage();
 		});
 		row(mapBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput);
+		// **ONE CONTROL, NOT A CHECKBOX AND A PICKER** (ROADMAP Task 408). Tom asked for "a toggle
+		// or picker for the increment"; Off is one of the increments, exactly as it is one of the
+		// legend placements, so there is one decision and no question of which control wins.
+		//
+		// The degree sign is the label, in every language: the increments are numbers and ° is the
+		// same mark in all 27, so only the word Off is a key -- and `lpn_settings_legend_off` is
+		// already that word, already translated, and means the same thing here.
+		var snapSelect = document.createElement('select');
+		LEADER_SNAP_STEPS.forEach(function (d) {
+			var opt = document.createElement('option');
+			opt.value = String(d);
+			opt.textContent = d ? d + '\u00b0' : (pc.lpn_settings_legend_off || 'Off');
+			if (d === leaderSnapDeg()) { opt.selected = true; }
+			snapSelect.appendChild(opt);
+		});
+		snapSelect.addEventListener('change', function () {
+			// **NOTHING ALREADY ON THE DRAWING MOVES.** A stored offset is where the user put that
+			// label, and re-snapping the drawing on a settings change would rewrite work nobody
+			// asked to have rewritten. The setting decides what the NEXT drag does.
+			settings.leaderSnapDeg = +snapSelect.value;
+			saveToStorage();
+		});
+		row(mapBody, pc.lpn_settings_leader_snap || 'Snap leader lines to angle', snapSelect,
+			pc.lpn_settings_leader_snap_tip);
 		// **NO SCALE-DEPENDENT LABEL VISIBILITY ROW HERE.** A "Widest view that shows labels" number
 		// with a "Use current view" capture button used to sit at this point and is gone (Tom,
 		// 2026-08-19); the Labels section and Thematic mode are where labels are turned off now.
