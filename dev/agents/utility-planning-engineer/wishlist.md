@@ -339,6 +339,15 @@ Ranking this against the rest of the list is now moot; kept here so a later invo
 re-propose it as new. **Row 3 above (system-wide fire-flow mapping) is its natural sequel and
 depends on it.**
 
+**2026-08-26, held to branch `fire-flow` for research (Tom's call, not a decline):** the emitter
+question, the whole-system-sweep shape, and the time question are answered in the journal,
+2026-08-26 entries (two passes — the second upgrades the first pass's citations to primary EPANET/
+WaterCAD text and adds PDA as a fourth, EPANET-native mechanism the market leader does not actually
+use for this job). Nothing here changes my rank of Row 3 — the sweep is still "Task 530 run N
+times," now with an own-measured cost (≈112 s at 225 junctions, 16 solves/hydrant) that lands in the
+same order of magnitude Tom predicted, and an unmeasured gap at this seat's own 1,000–2,000-node
+scale that a later invocation should close before quoting a number that large to him.
+
 ---
 
 ## Parked (not declined) — value granted, not building it now

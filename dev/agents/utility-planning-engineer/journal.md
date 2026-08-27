@@ -14,6 +14,79 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-08-26 — Task 530 follow-up: emitter citations upgraded to primary text, and a fourth mechanism (PDA) found and weighed
+
+Same-day re-pass at the orchestrator's request. The prior entry below answered all three of Tom's
+questions but flagged several load-bearing claims as "search synthesis, could not fetch the primary
+page directly." This pass went back and fetched the primary pages directly. Nothing below overturns
+the prior verdict; it hardens the citations and adds one option the prior pass did not surface.
+
+- **CITED, upgraded from secondary to primary — fetched `usepa.github.io/EPANET2.2/3_network_model.html`
+  directly this pass.** Verbatim: *"The flow rate through the emitter varies as a function of the
+  pressure available at the node: q = C·p^γ."* And, on fire flow specifically: emitters *"can also
+  be used to... compute a fire flow at the junction (the flow available at some minimum residual
+  pressure). In the latter case one would use a very high value of the discharge coefficient (e.g.,
+  100 times the maximum flow expected) and modify the junction's elevation to include the equivalent
+  head of the pressure target."* This is now a direct read of the primary EPANET 2.2 manual page, not
+  a forum summary — it matches the prior entry's finding word for word and removes the "secondary"
+  flag from that claim.
+- **CITED, additivity confirmed from the primary toolkit reference — `wateranalytics.org/EPANET`
+  (OWA-EPANET Toolkit 2.3, the successor reference to the 2.2 manual, same organization that now
+  maintains EPANET).** *"Actual demand reported in the program's results includes both the normal
+  demand at the junction plus flow through the emitter,"* and *"Sum of Demand equals the sum of the
+  node's consumer demand, emitter flow, and leakage flow."* Also found there, worth carrying forward
+  as its own caution: *"The pressure-flow relation at a junction defined by an emitter should not be
+  confused with the pressure-demand relation when performing a pressure dependent analysis (PDA)"* —
+  the manual itself treats these as two different mechanisms, which is the next finding.
+- **CITED, a fourth, EPANET-native mechanism the prior pass did not surface: Pressure Driven Analysis
+  (PDA), built into EPANET 2.2 itself** (`codedocs.xyz/OpenWaterAnalytics/EPANET/md_ReleaseNotes2_2.html`;
+  `wateranalytics.org/EPANET/_options_page.html`) — an `[OPTIONS]` line, `DEMAND MODEL PDA`, with
+  `MINIMUM PRESSURE`, `REQUIRED PRESSURE` and `PRESSURE EXPONENT`: below minimum pressure a node gets
+  zero demand, above required pressure it gets full demand, in between demand scales as a power
+  function of available pressure — solved as one coupled system, not per-node. **This project already
+  runs EPS through this exact engine** (`js/lpn-epanet.js`, `CLAUDE.md` OBSERVED), so PDA is not a
+  hypothetical add-on, it is a mode of the vendored solver. **The important limit, also CITED from the
+  same page: `MINIMUM PRESSURE`/`REQUIRED PRESSURE`/`PRESSURE EXPONENT` are set once, globally for the
+  whole network, not per node** in EPANET 2.2's native implementation — so PDA cannot natively express
+  "this node's required fire flow is 1,500 gpm, that one's is 500 gpm" as a pressure target; it can
+  only say "every node's target residual is 20 psi," with per-node fire demand still supplied as an
+  ordinary per-node demand value (which EPANET already allows per node).
+- **CITED, and this closes the question of whether PDA is actually how a full sweep is done today —
+  it is not, at least not in the market leader.** Fetched the same WaterCAD Fire Flow Analysis page
+  directly this pass (`docs.bentley.com`, GUID-C6BF82B2): *"A complete fire flow analysis can
+  comprise hundreds or thousands of individual flow solutions — one for each junction selected for
+  the fire flow analysis,"* and *"the program will iteratively assign lesser demands until it finds
+  the maximum flow that can be provided while maintaining the pressure constraints."* That is
+  per-node bisection under ordinary demand-driven analysis (DDA) — **the page makes no mention of PDA
+  anywhere.** So the market-leading tool answers "available flow at every node" the same way our
+  branch does (repeated bisection, one full network solve per trial per node), not with one PDA solve
+  for the whole system. I raised PDA as a candidate shortcut before finding this; the citation says
+  the shortcut is not what the industry actually ships, so I am not recommending it as the sweep
+  mechanism — it is worth naming in a design doc as a known alternative with a real limitation (global,
+  not per-node, pressure targets), not as the answer.
+- **OBSERVED, and this is a real, cheap answer to "what does a full sweep cost," from this repo's own
+  measured numbers, not extrapolation.** `dev/fireflow-loss-table.md` (OBSERVED, read this pass)
+  already benchmarked one hydrant's bisection search (16 solves) on this branch's own solver: **9
+  junctions → 17 ms; 49 junctions → 42 ms; 225 junctions → 498 ms, all at 16 solves per hydrant.**
+  A full sweep is that number times the node count: at 225 junctions, 225 × 498 ms ≈ **112 seconds**
+  — almost exactly Tom's own expectation, *"a big analysis that could take minutes to run for a big
+  system"* (ROADMAP Task 530), independently landing on the same order of magnitude he predicted
+  before I found this number. **What I could NOT do:** measure or safely extrapolate to a genuinely
+  large system (1,000–2,000 junctions, this seat's own stated scale) — growth from 49→225 junctions
+  was worse than linear (12× junctions, only ~5× time... actually 12x time for 4.6x junctions, i.e.
+  worse-than-linear), so a straight-line extrapolation to 2,000 nodes would be a guess dressed as a
+  number. **Flag as SPECULATION if anyone extrapolates past 225** — re-measure at the actual scale
+  before quoting a "minutes at 2,000 nodes" figure to Tom.
+- **Net effect on Q1 (the emitter question) and Q2 (the sweep):** no reversal. The emitter mechanism
+  is real, documented, and distinct from a fixed demand exactly as Tom suspected; the honest three-way
+  menu (raw-node bisection / modelled-assembly bisection / emitter-trick single-solve-per-node) from
+  the prior entry stands, now on primary citations rather than search summaries, with PDA added as a
+  fourth, real, EPANET-native option that the market leader itself does not use for this job and that
+  this project should therefore not reach for as a shortcut either — worth one sentence in a future
+  design doc, not a fourth product to build.
+
+---
+
 ## 2026-08-26 — Task 530 held to a branch: the emitter question, and whether "model the assembly" is the standard at all
 
 Tom pulled the fire-flow work to branch `fire-flow` pending research, and asked four questions.
