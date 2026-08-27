@@ -2602,8 +2602,14 @@ var EngCalcs = EngCalcs || {};
 			// labels on screen, and since 2026-08-25 a map showing a junction's demand is normally
 			// showing the RESOLVED one. Both labels describe the same stored number, so either being
 			// on means the user can see what a push would change.
+			//
+			// **AND A JUNCTION WHOSE DEMAND IS A LIST IS NOT PUSHABLE** (Task 468). Both callers --
+			// the Settings push and Find and Replace -- write ONE number, and one number cannot state
+			// a breakdown: writing it would set the first category and leave the rest standing, so
+			// the junction would quietly draw the default PLUS its other categories. Excluded here
+			// rather than in either caller, which is also what keeps it out of their counts.
 			{ key: 'demand', group: 'node', field: 'demand', altField: 'demandActual', prop: 'demand', label: pc.lpn_field_base_demand || 'Base demand',
-				applies: function (n) { return !isFixedHeadNode(n); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (n) { return !isFixedHeadNode(n) && !(n.extraDemands && n.extraDemands.length); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'diameter', group: 'link', field: 'diameter', prop: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// PIPE-ONLY, not merely not-a-pump: a valve is a zero-length link, so no friction formula
@@ -3642,7 +3648,10 @@ var EngCalcs = EngCalcs || {};
 	// low one.
 	function colorNodeValue(n, field) {
 		if (field === 'elev') { return typeof n.elev === 'number' ? n.elev : undefined; }
-		if (field === 'demand') { return isFixedHeadNode(n) ? undefined : effective(n, 'demand'); }
+		// baseDemandTotal(), NOT the junction's own field: with demand CATEGORIES the typed number is
+		// a list, and one row's base under the heading "Base demand" beside a Demand that sums them all
+		// is the disagreement Task 468 exists to end. Identical for a one-demand junction.
+		if (field === 'demand') { return isFixedHeadNode(n) ? undefined : baseDemandTotal(n); }
 		// **NOT A SOLVE RESULT AND NOT AN INPUT EITHER**, which is why it stays in the INPUT flow
 		// unit rather than crossing through SI: it is a typed number times a dimensionless
 		// multiplier, so nothing here has a conversion to spoil (they are the same selector anyway --
@@ -9904,8 +9913,12 @@ var EngCalcs = EngCalcs || {};
 					// resolvedDemand(). The Demand column beside it is a plain cell with no control
 					// in it at all, so there is no path by which the resolved number could be typed
 					// into and no path by which it could reach the document.
+					// baseDemandTotal(), so this column and the map label and the popup all say the
+					// same number about the same junction. A junction with demand CATEGORIES shows
+					// their total and is not editable HERE -- see paneCellIsPlain().
 					{ key: 'demand', label: 'lpn_field_base_demand', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
-						prop: 'demand', get: function (n) { return effective(n, 'demand'); },
+						prop: 'demand', get: baseDemandTotal,
+						plainFor: function (n) { return demandRowsOf(n, effective(n, 'demand')).length > 1; },
 						set: function (n, v) { setProp(n, 'demand', v); } },
 					paneColNodeResult('demandActual', 'bpn_demand', paneUnitFlow),
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
@@ -10089,6 +10102,16 @@ var EngCalcs = EngCalcs || {};
 	function paneNumText(v) {
 		return (typeof v === 'number' && isFinite(v)) ? String(+v.toFixed(6)) : '';
 	}
+	// **IS THIS CELL A PLAIN VALUE RATHER THAN A BOX?** A result and an identity always are, and
+	// from Task 468 a column may say so PER ROW: a junction whose demand is a list of categories
+	// shows the total, and a total is not a thing anybody can type into -- typing 100 over a 75 that
+	// is 50 + 25 has no defensible meaning, and inventing one is how a computed number gets written
+	// into a field of the user's. The breakdown is edited in the property popup, one row at a time.
+	// Asked in BOTH places a cell is written (built once, refilled on every solve), because a cell
+	// built as a value and refilled as a box would throw the user's input away on the next tick.
+	function paneCellIsPlain(c, el) {
+		return !!(c.result || !c.set || (c.plainFor && c.plainFor(el)));
+	}
 	// **ONE FUNCTION DECIDES WHAT A CELL SAYS**, and the screen and the printed sheet both read it.
 	// A result rounds to 2 decimals; a typed number reads back exactly as it is stored; an
 	// identity reads verbatim. Two of these written separately is how a sheet in somebody's hand
@@ -10213,7 +10236,7 @@ var EngCalcs = EngCalcs || {};
 				btn.textContent = el.id;
 				btn.addEventListener('click', function () { findGoTo(spec.group, el.id); });
 				td.appendChild(btn);
-			} else if (c.result || !c.set) {
+			} else if (paneCellIsPlain(c, el)) {
 				// **A RESULT IS NEVER AN INPUT**, and neither is an identity the drawing owns. Both
 				// are plain cells with no control in them at all, so there is no path by which
 				// either could be typed into.
@@ -10251,7 +10274,7 @@ var EngCalcs = EngCalcs || {};
 			spec.cols.forEach(function (c) {
 				var target = cells[c.key];
 				if (!target) { return; }
-				if (c.result || !c.set) {
+				if (paneCellIsPlain(c, el)) {
 					target.textContent = paneCellText(c, el);
 				} else if (target !== activeElementSafe()) {
 					target.value = paneCellText(c, el);
@@ -13724,7 +13747,12 @@ var EngCalcs = EngCalcs || {};
 			length: '_length', diameter: '_diameter', roughness: '_roughness', k: '_k',
 			setting: '_setting', speed: 'speed'
 		},
-		LPN_INP_TOK_POINT = { x: 'x', y: 'y' };
+		LPN_INP_TOK_POINT = { x: 'x', y: 'y' },
+		// A demand category's own base (Task 468). The parser and the document spell this one the
+		// same, which is why it is a one-entry map rather than nothing: carryInpTokens() is the only
+		// place a token is allowed to cross, and an exception for "the names happen to match" would
+		// be a second path.
+		LPN_INP_TOK_DEMAND = { base: 'base' };
 
 	function docFromInp(parsed, name) {
 		// **WHICH KIND OF PROJECT THIS IS, READ OUT OF THE FILE** (Task 447). EPANET writes its Map
@@ -13809,6 +13837,21 @@ var EngCalcs = EngCalcs || {};
 			// the junction here would put a name the file never wrote at this row into a field
 			// labelled as the file's.
 			if (n.demandPattern) { j.demandPattern = n.demandPattern; }
+			// **THE DEMAND CATEGORIES, ONE ROW EACH** (Task 468). Row 0 is the three fields above;
+			// these are the rest, in the file's order, each with its own token bag so a category's
+			// base comes back out as the characters it came in as. WRITTEN ONLY WHEN THERE ARE
+			// ANY -- a one-demand junction is the object it has always been, which is what keeps
+			// every existing project and every Net1/2/3 round trip unchanged.
+			if (n.demandCategory) { j.demandCategory = n.demandCategory; }
+			if (n.demandItemized) { j.demandItemized = true; }
+			if (n.extraDemands && n.extraDemands.length) {
+				j.extraDemands = n.extraDemands.map(function (d) {
+					var row = { base: inpFlow(d.base) };
+					if (d.pattern) { row.pattern = d.pattern; }
+					if (d.category) { row.category = d.category; }
+					return carryInpTokens(d, row, LPN_INP_TOK_DEMAND);
+				});
+			}
 			return withInpNotes(carryInpTokens(n, j, LPN_INP_TOK_JUNCTION), inpNodeNotes[n.id]);
 		});
 		var links = parsed.links.map(function (l) {
@@ -13970,6 +14013,10 @@ var EngCalcs = EngCalcs || {};
 			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves are described by a curve or by a fixed pressure drop, and this page has no such element. They came in as open pipes, so the network is still connected but nothing is controlling it.';
 			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
 			case 'check-valve': return pc.lpn_inp_drop_cv || 'These pipes only let water flow one way in EPANET. They came in as ordinary pipes, so water may now flow either way through them.';
+			// 'demand-categories' IS NO LONGER EMITTED (Task 468): a junction holds its demands as a
+			// LIST, so nothing is added together and there is no difference to report. Kept, like
+			// 'valve-dropped' above, so a project imported before that still renders the sentence
+			// its own note records rather than a blank.
 			case 'demand-categories': return pc.lpn_inp_drop_demands || 'These junctions had more than one demand. The demands were added together into the one demand this page holds.';
 			// A DEMAND PATTERN IS NOW APPLIED at the one moment this page solves (Task 423), so it
 			// is no longer the same report as a head pattern, which still is not. It stays in the
@@ -20601,8 +20648,9 @@ var EngCalcs = EngCalcs || {};
 			.replace('{step}', fmt(step))
 			.replace('{span}', fmt(step * n));
 	}
-	// **EVERY PLACE A PATTERN ID IS WRITTEN, IN ONE FUNCTION** (Task 248.02). There are four now --
-	// a junction's demand, a reservoir's head, a pump's speed and the project's own default -- and
+	// **EVERY PLACE A PATTERN ID IS WRITTEN, IN ONE FUNCTION** (Task 248.02). There are five now --
+	// a junction's demand, one of its demand CATEGORIES, a reservoir's head, a pump's speed and the
+	// project's own default -- and
 	// a rename or a delete that misses one leaves a reference to a name nothing answers to. None is
 	// a scenario-overridable property, so all of them are plain writes.
 	//
@@ -20612,6 +20660,9 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) {
 			if (n.demandPattern === was) { n.demandPattern = to; }
 			if (n.headPattern === was) { n.headPattern = to; }
+			// A DEMAND CATEGORY IS A FIFTH ATTACHMENT POINT (Task 468), and it is the one that
+			// would have been missed: it is not a field on the node but a field on a row of a list.
+			(n.extraDemands || []).forEach(function (d) { if (d.pattern === was) { d.pattern = to; } });
 		});
 		doc.links.forEach(function (l) { if (l.speedPattern === was) { l.speedPattern = to; } });
 		if (doc.defaultPattern === was) { doc.defaultPattern = to; }
@@ -21445,6 +21496,19 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 		if (ov) { overrideMarker(fields, ov.el, ov.prop); }   // and see completeEdit() on the setter
 	}
+	// A line of TEXT the user types -- a name, not a quantity, so no unit and no `type=number`.
+	// Stores null for an empty box rather than an empty string: the document says "this junction has
+	// no category" by not having the key, exactly as it says "no pattern" by not having that one.
+	function textField(fields, labelText, get, set, tip) {
+		var label = document.createElement('label'), input = document.createElement('input');
+		input.type = 'text';
+		input.value = get() || '';
+		input.addEventListener('change', function () { set(input.value.trim()); });
+		setFieldLabel(label, labelText, tip);
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
 	// A pattern chooser, in the popup's own row shape. The OPTIONS come from libFillPatternOptions(),
 	// which the Libraries box's own default-pattern row also uses, so the two can never disagree
 	// about what patterns exist or about what the blank entry is called.
@@ -22033,6 +22097,9 @@ var EngCalcs = EngCalcs || {};
 			// readonlyField() rather than readonlyUnitField(): the value is already in the displayed
 			// flow unit and has never been in SI, so multiplying it by a factor here would be a
 			// conversion of an input -- the very thing CLAUDE.md's unit rule bans.
+			// **AND WHO IS DRAWING IT** (Task 468). The demand above is row 0 of a LIST; these are
+			// the rest of it, and this is the only place a person adds, names or removes one.
+			demandCategoryFields(fields, n, nodeId);
 			readonlyField(fields, (pc.bpn_demand || 'Demand') + ' (' + unitLabel('lpn_u_flow') + ')',
 				resolvedDemand(n), pc.lpn_result_demand_tip);
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
@@ -22046,6 +22113,126 @@ var EngCalcs = EngCalcs || {};
 		coordFields(fields, outwardX(n.x), outwardY(n.y));
 		importNotesField(fields, n);
 		tipsIn(fields);
+	}
+	// **THE DEMAND CATEGORIES EDITOR** (ROADMAP Task 468).
+	//
+	// EPANET stacks (base demand, pattern, category) triples on one junction and adds them up;
+	// `50 gpm residential + 20 gpm irrigation` is how a demand is actually assembled, and until this
+	// existed the importer read those rows and threw the breakdown away.
+	//
+	// **THE PATTERN IS THE TYPE OF USER; THE CATEGORY IS WHO** (Tom, 2026-08-21) -- "residential"
+	// against "Elm Acres" or "Taco Bell 354". That is why nothing here validates the category and
+	// there is no registry of them: it is a NAME, not a key, and EPANET itself runs happily with
+	// varying descriptions on one pattern.
+	//
+	// **ROW 0 IS THE Base demand AND Demand pattern ROWS ABOVE, NOT A ROW IN THIS TABLE.** That
+	// keeps one control per number -- two boxes editing `_demand` would be a synchronisation bug
+	// waiting for a slow refresh -- it keeps the scenario override marker exactly where it has
+	// always been, and it means a junction with one demand (which is nearly all of them, and every
+	// junction in Net1, Net2 and Net3) sees no change at all beyond one button.
+	//
+	// SO THERE IS NO DELETE FOR ROW 0: a junction always has a demand, even a zero one. Removing a
+	// category means removing one of these.
+	//
+	// **NO REORDER CONTROL**, deliberately: the order is the file's own and nothing reads it -- the
+	// totals are additive (Tom, 2026-08-24) and the exporter writes the rows as they stand. A pair
+	// of arrows per row would be four more tap targets in a floating popup to permute a sum.
+	function demandCategoryFields(fields, n, nodeId) {
+		var pc = EngCalcs.pageConfig || {}, extras = n.extraDemands || [],
+			table, thead, hrow, tbody, addBtn;
+		// Row 0's own name. Shown once this junction HAS a breakdown -- before that there is nothing
+		// to distinguish it from, and a lone "Category" box on every junction in the network would
+		// be a field asking a question almost nobody has.
+		if (extras.length || n.demandCategory) {
+			textField(fields, pc.lpn_field_demand_category || 'Category',
+				function () { return n.demandCategory; },
+				function (v) { n.demandCategory = v || null; afterPropertyEdit(n); },
+				pc.lpn_field_demand_category_tip);
+		}
+		if (extras.length) {
+			table = document.createElement('table');
+			table.className = 'lpn-demand-table';
+			thead = document.createElement('thead');
+			hrow = document.createElement('tr');
+			tbody = document.createElement('tbody');
+			[(pc.lpn_field_base_demand || 'Base demand') + ' (' + unitLabel('lpn_u_flow') + ')',
+				pc.lpn_field_demand_pattern || 'Demand pattern',
+				pc.lpn_field_demand_category || 'Category', ''].forEach(function (t) {
+				var th = document.createElement('th');
+				th.textContent = t;
+				hrow.appendChild(th);
+			});
+			thead.appendChild(hrow);
+			table.appendChild(thead);
+			table.appendChild(tbody);
+			fields.appendChild(table);
+			extras.forEach(function (d, di) {
+				var tr = document.createElement('tr'),
+					bCell = document.createElement('td'), pCell = document.createElement('td'),
+					cCell = document.createElement('td'), xCell = document.createElement('td'),
+					bInput = document.createElement('input'), sel = document.createElement('select'),
+					cInput = document.createElement('input'), del = document.createElement('button');
+				bInput.type = 'number'; bInput.step = 'any';
+				bInput.value = (typeof d.base === 'number') ? String(+d.base.toFixed(6)) : '';
+				bInput.setAttribute('aria-label', (pc.lpn_field_base_demand || 'Base demand') + ' ' + (di + 2));
+				// **THE TYPED NUMBER, STORED AS TYPED.** No factor here in either direction: a
+				// category's base is in the flow unit the heading names, exactly like the Base
+				// demand box above it, and the solver does its own converting at its own boundary.
+				bInput.addEventListener('change', function () {
+					d.base = +bInput.value;
+					afterPropertyEdit(n);
+				});
+				libFillPatternOptions(sel, d.pattern);
+				sel.setAttribute('aria-label', (pc.lpn_field_demand_pattern || 'Demand pattern') + ' ' + (di + 2));
+				sel.addEventListener('change', function () {
+					d.pattern = sel.value || null;
+					afterPropertyEdit(n);
+				});
+				cInput.type = 'text';
+				cInput.value = d.category || '';
+				cInput.setAttribute('aria-label', (pc.lpn_field_demand_category || 'Category') + ' ' + (di + 2));
+				cInput.addEventListener('change', function () {
+					d.category = cInput.value.trim() || null;
+					afterPropertyEdit(n);
+				});
+				del.type = 'button';
+				del.className = 'lpn-demand-del';
+				// The glyph is the control and the words are its tip -- the same reason the verdict
+				// strings lead with a mark: it is language-free, it is RTL-safe, and it costs no
+				// key in 27 languages to say "remove".
+				del.textContent = '×';
+				helpTip(del, pc.lpn_demand_remove || 'Remove this demand');
+				del.addEventListener('click', function () {
+					saveUndoSnapshot();
+					extras.splice(di, 1);
+					if (!extras.length) { delete n.extraDemands; }
+					afterPropertyEdit(n);
+					refreshPopupIfOpen();
+				});
+				bCell.appendChild(bInput); pCell.appendChild(sel);
+				cCell.appendChild(cInput); xCell.appendChild(del);
+				tr.appendChild(bCell); tr.appendChild(pCell);
+				tr.appendChild(cCell); tr.appendChild(xCell);
+				tbody.appendChild(tr);
+			});
+		}
+		addBtn = document.createElement('button');
+		addBtn.type = 'button';
+		addBtn.className = 'lpn-demand-add';
+		addBtn.textContent = pc.lpn_demand_add || 'Add demand category';
+		helpTip(addBtn, pc.lpn_demand_add_tip);
+		addBtn.addEventListener('click', function () {
+			saveUndoSnapshot();
+			// ZERO AND BLANK, not a copy of row 0. A new row is a question to the user, and seeding
+			// it with somebody else's number is the same mistake as filling in a blank reservoir
+			// head: it puts a number nobody typed into a field labelled as theirs.
+			if (!n.extraDemands) { n.extraDemands = []; }
+			n.extraDemands.push({ base: 0, pattern: null, category: null });
+			afterPropertyEdit(n);
+			refreshPopupIfOpen();
+		});
+		fields.appendChild(addBtn);
+		fields.appendChild(document.createElement('br'));
 	}
 	function openPopup(nodeId, sx, sy) {
 		var n = nodeById(nodeId), ne = nodeEls[nodeId];
@@ -22868,6 +23055,38 @@ var EngCalcs = EngCalcs || {};
 	function demandMultiplier(n, t) {
 		return patternMultiplier(n.demandPattern || doc.defaultPattern, t);
 	}
+	// **A JUNCTION'S DEMANDS ARE A LIST** (Task 468), and this is the page's one door to it.
+	// EngCalcs.lpnDemandRows() owns the shape -- row 0 is `_demand`/`demandPattern`/`demandCategory`
+	// and `extraDemands` is the rest -- because the `.inp` writer needs exactly the same answer and
+	// two implementations of "where is row 0" is how a demand goes missing on export.
+	//
+	// **ROW 0'S BASE COMES THROUGH effective(), AND THE OTHERS DO NOT.** That is the settled answer
+	// to the per-category override question: an override is keyed by an element and a PROPERTY NAME
+	// (LPN_OVERRIDABLE, setProp), and a category has no name -- only a position, which moves the
+	// moment a row above it is deleted. A scenario that overrode "row 2" would silently follow
+	// whatever category later occupied that slot, which is the scenario-seam failure
+	// (dev/scenario-seam-repair.md) with a subscript instead of a field. So a scenario asks its
+	// "what if this junction draws more" question of the junction's demand, as it always has, and
+	// the breakdown is Base-document structure -- the same standing as `demandPattern` beside it.
+	// Returns the pre-Task-468 single row if js/lpn-inp.js failed to load, like every other helper here.
+	function demandRowsOf(n, base) {
+		if (EngCalcs.lpnDemandRows) { return EngCalcs.lpnDemandRows(n, base); }
+		return [{ base: base, pattern: n.demandPattern || null, category: n.demandCategory || null }];
+	}
+	// **WHAT THE USER TYPED, ADDED UP** -- every category's base, unmultiplied. For the 99% of
+	// junctions with one demand this IS `effective(n, 'demand')` and the same double, so no label,
+	// column or colour ramp moves. For a junction with categories it is the honest reading of "Base
+	// demand": the bug Tom reported was a base demand and a resolved demand disagreeing under two
+	// headings, and showing one category's base under the same heading would rebuild it.
+	function baseDemandTotal(n) {
+		var rows = demandRowsOf(n, effective(n, 'demand')), total, i;
+		if (rows.length === 1) { return rows[0].base; }
+		total = 0;
+		for (i = 0; i < rows.length; i++) {
+			if (typeof rows[i].base === 'number' && isFinite(rows[i].base)) { total += rows[i].base; }
+		}
+		return total;
+	}
 	// **THE DEMAND THIS JUNCTION IS ACTUALLY DRAWING AT THE MOMENT ON THE CLOCK**, in the displayed
 	// flow unit -- base times the multiplier, which is the same product assembleModel() hands the
 	// solver two screens down. ONE expression, so the number on the label and the number in the
@@ -22883,10 +23102,40 @@ var EngCalcs = EngCalcs || {};
 	// and its pipes will not reconcile with it. That is a gap, named rather than papered over --
 	// EPANET's own reports fold emitter flow into Demand and this cannot until the solvers hand it
 	// back.
+	//
+	// **AND IT IS THE ONE FUNCTION THAT ITERATES THE CATEGORIES** (Task 468). Each row resolves
+	// through its OWN pattern -- a blank one meaning [OPTIONS] Pattern, exactly as a junction's
+	// blank column does -- and the sum is the draw. Everything else on this page reads the answer:
+	// the labels, the colour ramp, the Tables column and the popup row all call this or the field
+	// it feeds, so none of them knows a category exists.
 	function resolvedDemand(n) {
-		var base = effective(n, 'demand');
-		if (typeof base !== 'number' || !isFinite(base)) { return base; }
-		return base * demandMultiplier(n, modelTimeSeconds());
+		var rows = demandRowsOf(n, effective(n, 'demand')), t, total, i, b;
+		if (typeof rows[0].base !== 'number' || !isFinite(rows[0].base)) { return rows[0].base; }
+		t = modelTimeSeconds();
+		if (rows.length === 1) { return rows[0].base * demandMultiplier(n, t); }
+		total = 0;
+		for (i = 0; i < rows.length; i++) {
+			b = rows[i].base;
+			if (typeof b !== 'number' || !isFinite(b)) { continue; }
+			total += b * patternMultiplier(rows[i].pattern || doc.defaultPattern, t);
+		}
+		return total;
+	}
+	// The demand rows an extended-period run needs, in SI, or null for the ordinary junction that
+	// has one. NULL AND NOT A ONE-ROW ARRAY: the writer downstream must be able to tell "this
+	// junction is the shape it has always been" from "this junction has categories" without
+	// counting, and an empty-handed caller then behaves exactly as it did before Task 468.
+	function demandModelRows(n) {
+		var rows = demandRowsOf(n, effective(n, 'demand')), i, out;
+		if (rows.length < 2) { return null; }
+		out = [];
+		for (i = 0; i < rows.length; i++) {
+			out.push({
+				base: toSI(rows[i].base || 0, 'lpn_u_flow'),
+				pattern: rows[i].pattern || doc.defaultPattern || null
+			});
+		}
+		return out;
 	}
 	// Does a pattern act on this junction at all? A junction naming none still follows the
 	// project's own default ([OPTIONS] Pattern), which is exactly the resolution demandMultiplier()
@@ -22983,13 +23232,23 @@ var EngCalcs = EngCalcs || {};
 				// was stated, and the solver is handed what it needs.
 				: {
 					id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'),
-					demand: toSI((effective(n, 'demand') || 0) * demandMultiplier(n, modelTimeSeconds()), 'lpn_u_flow'),
+					// resolvedDemand() and nothing else, so the number the solver is handed and the
+					// number on the label are ONE expression -- with demand categories (Task 468) it
+					// is the sum of every row at its own pattern, which is exactly what EPANET's own
+					// engine computes for the same file.
+					demand: toSI(resolvedDemand(n) || 0, 'lpn_u_flow'),
 					// **THE UNSCALED DEMAND AND THE PATTERN'S NAME RIDE ALONG** for an extended-period
 					// run (Task 248), where EPANET applies the multipliers on its own clock. `demand`
 					// above is still what every one-instant solve reads; js/lpn-epanet.js takes one or
 					// the other and never both, or the multiplier would be applied twice.
 					demandBase: toSI(effective(n, 'demand') || 0, 'lpn_u_flow'),
 					demandPattern: n.demandPattern || doc.defaultPattern || null,
+					// **AND THE WHOLE BREAKDOWN RIDES ALONG WITH THEM, for the same reason and only
+					// when there is one** (Task 468). An extended-period run has EPANET doing the
+					// multiplying, and two categories on two patterns are two daily shapes that
+					// `demandBase` x `demandPattern` cannot state at all. Absent on a one-demand
+					// junction, so js/lpn-epanet.js writes exactly the file it always wrote.
+					demands: demandModelRows(n),
 					emitter: effective(n, 'emitter')
 				};
 		});
@@ -23333,7 +23592,7 @@ var EngCalcs = EngCalcs || {};
 		// solver in SI and go through displayRound().
 		var nodeVal = {
 			elev: nodeValueMap(function (n) { return plainRound(n.elev, nd.elev); }),
-			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(effective(n, 'demand'), nd.demand) : undefined; }),
+			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(baseDemandTotal(n), nd.demand) : undefined; }),
 			// plainRound(), not displayRound(): a resolved demand is a typed number times a
 			// dimensionless multiplier, so it is already in the displayed unit and never crossed SI.
 			demandActual: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(resolvedDemand(n), nd.demandActual) : undefined; }),
@@ -23416,7 +23675,7 @@ var EngCalcs = EngCalcs || {};
 			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
 			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
 			if (!isFixedHeadNode(n) && ls.node.demandActual) { lines.push(affix('node', 'demandActual', rawLine(resolvedDemand(n), extrema.demandActual, nd.demandActual))); }
-			if (!isFixedHeadNode(n) && ls.node.demand) { lines.push(affix('node', 'demand', rawLine(effective(n, 'demand'), extrema.demand, nd.demand))); }
+			if (!isFixedHeadNode(n) && ls.node.demand) { lines.push(affix('node', 'demand', rawLine(baseDemandTotal(n), extrema.demand, nd.demand))); }
 			// Both are already IN Elevation/Head and Pressure units by the time they get here -- the
 			// fixed-head branch because those are declared inputs, the junction branch because the
 			// solve result is converted on the spot. rawLine() then prints what it is given, so the

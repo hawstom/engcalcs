@@ -67,7 +67,15 @@ function toSolverModel(parsed) {
 			? { id: n.id, type: 'reservoir', elev: n.elev * S.head, head: n.head * S.head }
 			// `emitter` is the one quantity the parser already returns in SI -- it is derived, has
 			// no display unit, and is documented as the exception at [EMITTERS].
-			: { id: n.id, type: 'junction', elev: n.elev * S.head, demand: n.demand * S.flow,
+			// **EVERY DEMAND CATEGORY, ADDED UP** (Task 468). The parser hands back a junction's
+			// demands as a LIST -- row 0 on the junction itself and the rest in `extraDemands` --
+			// so a reader that took `n.demand` alone would compare a network holding one category
+			// of J3's demand against the engine's network holding all of them, which is precisely
+			// the silent class of failure this file exists to catch. No multipliers here: a file
+			// with patterns is SKIPPED below, so the base IS the demand.
+			: { id: n.id, type: 'junction', elev: n.elev * S.head,
+				demand: ((n.demand || 0) + (n.extraDemands || []).reduce(
+					(sum, d) => sum + (d.base || 0), 0)) * S.flow,
 				emitter: n.emitter };
 	});
 	const links = parsed.links.map((l) => {

@@ -173,12 +173,24 @@ importText(usInp, 'import-cases.inp');
 	ok('elevation is the file number EXACTLY, in the file units', j2.elev === 95, j2.elev + ' ft');
 	ok('demand is the file number EXACTLY, in the file units', j2._demand === 120, j2._demand + ' gpm');
 
-	// [DEMANDS] REPLACES the [JUNCTIONS] column and its categories sum: J3 is 0 in [JUNCTIONS] with
-	// rows of 40 and 35, so 75 -- not 0, and not 75 + 0. Measured against the real engine; see the
-	// note in js/lpn-inp.js.
+	// [DEMANDS] REPLACES the [JUNCTIONS] column -- J3 is 0 there with rows of 40 and 35, and the
+	// engine reports 75, not 0 and not 75 + 0. Measured against the real one; see js/lpn-inp.js.
+	//
+	// **AND SINCE TASK 468 THE ROWS ARRIVE AS ROWS.** They used to be summed into one field and the
+	// breakdown reported as lost. Row 0 is the junction's own `_demand`; the rest are
+	// `extraDemands`, which is the shape EngCalcs.lpnDemandRows() states and every reader asks it
+	// for. The TOTAL is asserted by dev/lpn-spike/demand-category-harness.js, against a fixture
+	// with patterns and category names on the rows; here the question is only that nothing was
+	// flattened on the way in.
 	const j3 = nodes.find(n => n.id === 'J3');
-	ok('several demand categories add up into the one demand this page holds',
-		j3._demand === 75, j3._demand + ' gpm');
+	ok('the first demand category is the junction\'s own demand',
+		j3._demand === 40, j3._demand + ' gpm');
+	ok('...and the second arrived as a second row rather than being added into it',
+		!!j3.extraDemands && j3.extraDemands.length === 1 && j3.extraDemands[0].base === 35,
+		JSON.stringify(j3.extraDemands));
+	// The ordinary junction is untouched by any of it: no list, no flag, no new keys.
+	ok('a junction with one demand grows nothing',
+		j2.extraDemands === undefined && j2.demandCategory === undefined);
 
 	const p1 = links.find(l => l.id === 'P1');
 	ok('diameter arrives in inches EXACTLY, not metres', p1._diameter === 12, p1._diameter + ' in');
@@ -313,8 +325,12 @@ console.log('\n--- the report ---');
 	ok('the report names the file', t.indexOf('import-cases.inp') >= 0);
 	ok('it says the throttle valves came in whole, and names them',
 		t.indexOf('throttle valves') >= 0 && t.indexOf('V1') >= 0);
-	ok('it says the demand categories were added together, and names the junction',
-		t.indexOf('more than one demand') >= 0 && t.indexOf('J3') >= 0);
+	// **AND IT NO LONGER SAYS THE CATEGORIES WERE THROWN AWAY**, because they no longer are
+	// (Task 468). The importer's contract is to report every DIFFERENCE; a breakdown that arrives
+	// whole is not one, and a report that still claimed the loss would be the page describing an
+	// older version of itself.
+	ok('it does NOT say the demands were added together -- they were not',
+		t.indexOf('more than one demand') < 0);
 	ok('it says the emitter is being solved but cannot be edited',
 		t.indexOf('sprinkler or leak coefficient') >= 0 && t.indexOf('J6') >= 0);
 	ok('no sentence is left as a bare code name', t.indexOf('valve-tcv') < 0);
