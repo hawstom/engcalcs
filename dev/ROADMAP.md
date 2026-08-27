@@ -423,14 +423,30 @@ the block.
     cheaper than a per-row check: the Water glyph (plan sheet → drop 02:13 → tower 04:13, all on
     2026-08-25) and lat-before-lon (2026-08-24 12:48). A frame's capture time against those two
     decides whether it is current.
-  - **[H] THREE PUBLISHED PLATES ON `screenshots.html` ARE STALE, and one contradicts a shipped
-    ruling.** `img/0028.png`, `img/0043.png` and `img/0047.png` all show a glyph that lived two
-    hours; **0028 additionally reads `Longitude:` before `Latitude:`**, which `coord_order_check.php`
-    has since made a blocking error in our own source. A public picture is arguing against a rule we
-    enforce. 0028's replacement is already in the drop and wants only its two colour keys and the
-    labels legend moved off the top-right corner — that is a placement saved in Tom's own `.lwn`,
-    not a defect. **Swapping a published image is Tom's call; the sibling repo is not ours to edit
-    from here** (`~/webdev/librewaternet.org`, and read its own `CLAUDE.md` first).
+  - **[H] THREE PUBLISHED PLATES ON `screenshots.html` ARE STALE, AND ALL THREE NEED TOM'S CAMERA.**
+    `img/0028.png`, `img/0043.png`, `img/0047.png` all show the Water menu's two-hour-old drop glyph
+    instead of the tower. **0028 additionally reads `Longitude:` before `Latitude:`** — a public
+    picture arguing against the rule `coord_order_check.php` now blocks on in our own source.
+    - **VERIFIED FROM THE PIXELS 2026-08-27, not inferred from capture times.** Of the twelve
+      desktop plates published, **0028 is the ONLY one with the status strip in view at all**, so
+      it is the only one that can show the coordinate order. That closes the "needs an eye on each
+      of ten frames" question the reconciliation left open.
+    - **0043 and 0047 are BYTE-IDENTICAL to the drop copies** (md5 `355d70d1`, `dabea425`), so no
+      replacement exists for either. They need re-shooting.
+    - **AND NEITHER DOES 0028, THOUGH A NEWER FRAME EXISTS.** The re-shot 0028 in the drop is
+      current in both respects — tower glyph, latitude first — but **its Pressure and Velocity
+      colour keys are painted over the node/link labels legend**: `H= Head` is cut off mid-row and
+      `Elevation` shows through the swatches. The index had recorded that as "a placement, not a
+      defect"; that was wrong and is corrected. The picture is unreadable in that corner whatever
+      caused it.
+    - **So this is not a swap anybody can do from here — it is three re-shoots.** The frames want
+      the colour keys and the labels legend moved apart, or set **Off** (Task 529).
+    - **[H] AND IT MAY BE A LIVE DEFECT, WHICH IS TOM'S TO SCOPE.** Task 516 closed by giving the
+      two legends different DEFAULT corners; nothing makes them avoid each other when a user puts
+      them in the same one. They overlap rather than stack. Whether that earns its own task is his
+      call.
+    - The sibling repo IS drivable from here (`~/webdev/librewaternet.org` — read its own
+      `CLAUDE.md` first); the reason not to act is that there is nothing good to publish yet.
 
 - 100|509| **Edit mode on the path itself: drag any point, click a waypoint off.**
   **BUILT 2026-08-25.** The Edit button puts the PATH in edit mode: every node the route passes
