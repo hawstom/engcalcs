@@ -64,6 +64,24 @@ the block.
     with storage the UTILITY controls — *"the moment 'the link' is something we host, it has become
     the cloud-login proposal in a smaller costume."* Full record in both agents' journals.
 
+- 100|545| **[H] 64 English strings are waiting on Tom's wording, and they were recorded nowhere.**
+  He asked on 2026-08-26, of a list I had told him was written down: *"19 new keys are listed:
+  Where?"* **They were not.** Four batches of new English had been reported to him in conversation
+  with the words "listed in the task for your ruling", and exactly one batch had actually reached
+  `dev/ROADMAP.md`. The rest existed only inside an agent's report, which he never sees.
+  - **THE FIX IS A SCRIPT, NOT A BETTER PROMISE.** `dev/scripts/new_english_keys.php` lists every
+    key that is in `lang.ec.en.php` and in none of the other 26 files — which is, by construction,
+    every string nobody has ruled on and no sprint has carried. **64 today, all `lpn_`.** It is
+    advisory and never exits non-zero, because an absent key is the correct untranslated state.
+  - **[H] What is left is the reading.** The list is one command; the rulings are Tom's, and the
+    honest way to take them is a sitting rather than a trickle. `--prefix=` narrows it to one
+    feature at a time (`lpn_find_q`, `lpn_terrain`, `lpn_profile`).
+  - **AND THE SPRINT IS DOWNSTREAM OF IT.** Translating a string he then rewords is paid work
+    thrown away — the mistake sprint 459 recorded when nine agents read a payload that disagreed
+    with the source. So the order is: rule, then sprint.
+  - Its own docblock carries the failure it came from, so the next person to promise a list in
+    conversation reads why that is not enough.
+
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
   What that one pass costs, in Chromium on the 480-pipe grid `specs/perf.js` builds: 1.3–7.3 s in
