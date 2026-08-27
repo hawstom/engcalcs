@@ -109,16 +109,20 @@ EPANET has no customer object. Demands lump at junctions, and that is the whole 
 customer breakdown is ours, and CLAUDE.md is emphatic that we neither fake nor silently drop.
 
 What is actually available in the format: `[DEMANDS]` takes multiple rows per junction, and EPANET's
-own header line in `Net1/2/3.inp` names four columns — `Junction  Demand  Pattern  Category`. Our
-importer reads the first three, sums them and reports `demand-categories`; it never sees the fourth,
-because `js/lpn-inp.js` strips `;` comments before splitting a line and the category token is written
-as a comment. **Our three reference networks all have an empty `[DEMANDS]`, so we have no sample of a
-populated one — check the EPANET writer before relying on the comment convention.**
+own header line in `Net1/2/3.inp` names four columns — `Junction  Demand  Pattern  Category`. **All
+four are now read and written (Task 468, 2026-08-26), and the fourth is the one to know about: the
+CATEGORY IS A TRAILING `;comment`, not a column** — EPANET's own writer emits it that way and its
+reader reads it back out of the comment, which is why our reader saw nothing there while it was
+stripping comments before splitting. Our three reference networks all have an EMPTY `[DEMANDS]`, so
+the fixture that exercises it is ours: `dev/lpn-spike/reference/multi-category.inp`, cross-checked
+against the vendored engine in `dev/lpn-spike/demand-category-harness.js`.
 
 Recommended answer, in three parts:
 
-1. **The numbers ride out, one `[DEMANDS]` row per customer**, with the account number in the
-   Category position. A file we write then re-imports with the same total, and the breakdown survives
+1. **The numbers ride out, one `[DEMANDS]` row per customer** — which is the writer Task 468 already
+   ships, one row per demand, so this is a field on a row and not a new section. Note that the
+   Category position is now genuinely occupied by the category (who), so an account number wants its
+   own convention rather than the same slot. A file we write then re-imports with the same total, and the breakdown survives
    as far as the format allows.
 2. **The geometry does not.** The meter position, the pipe attachment and the perpendicular service
    have nowhere to go in an `.inp`. Say so, per customer, in the export report. Task 483 shipped the
@@ -148,6 +152,24 @@ They are **not one task**, and they are **not independent**.
 Build 468 first and let a Customer BE one of its rows, extended. If 247 goes first it invents a second
 demand-breakdown structure, and then two flattening paths reach the importer, the exporter and the
 solver. **468 is a prerequisite of 247, not a sibling.**
+
+**TASK 468 SHIPPED 2026-08-26, and this is the structure Slice 1 extends — do not invent another.**
+
+- A junction's demands are `EngCalcs.lpnDemandRows(node, base)`: **row 0 is the junction's own
+  `_demand` / `demandPattern` / `demandCategory`, and `extraDemands` is every row after it.** That
+  asymmetry is EPANET's own (its property sheet shows category 1 as the junction's Base Demand) and
+  it is what keeps a one-demand junction — nearly all of them — the object it always was, so an
+  account number added to a row costs no format change for anybody who has no customers.
+- An account number therefore belongs on a demand row beside `base`, `pattern` and `category`, and
+  `EngCalcs.lpnDemandItemized()` already decides which junctions must be written as `[DEMANDS]`
+  rows rather than as a demand column. Slice 3's per-customer `[DEMANDS]` rows are that writer with
+  one more field, not a second writer.
+- **A demand row is NOT scenario-overridable and a customer's must not be either.** An override is
+  keyed by an element and a property NAME; a row has only a position, and a position moves when a
+  row above it is deleted, so a scenario would silently follow whatever row later occupied the
+  slot. A scenario asks its question of the junction's demand — row 0 — through `setProp()`.
+- The category is a **trailing `;comment`** in `[DEMANDS]`, not a fourth column. An account number
+  has the same problem and the same one place to solve it (`js/lpn-inp.js`).
 
 ## 4. The gesture, and what it does to the drawing
 
@@ -209,8 +231,8 @@ an error report, and a shared project file now carries it. Anyone building this 
 
 ## 6. Staged plan
 
-- **Slice 0 — Task 468 (prerequisite).** Demand rows on a junction: base demand, pattern, category.
-  Useful on its own and already scoped.
+- **Slice 0 — Task 468 (prerequisite). SHIPPED 2026-08-26** — demand rows on a junction: base
+  demand, pattern, category, itemized both ways through `.inp`. See the structure note in §3.
 - **Slice 1 — the smallest useful customer.** An account-number column on those rows, plus a
   per-junction total. No geometry, no meter, no gesture. It ships the vocabulary and the export story
   (§3) and is testable before a single pixel is drawn — and it is the version that works on a phone.

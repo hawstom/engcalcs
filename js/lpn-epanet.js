@@ -103,6 +103,7 @@
 			statuses = [],
 			curves = [],
 			emitters = [],
+			demands = [],
 			warnings = [],
 			i, n, k, link;
 
@@ -138,9 +139,23 @@
 				// EPANET applies the multiplier on its own clock. Written the ordinary way instead, the
 				// t=0 multiplier would be baked in and then multiplied AGAIN at every step -- 1.34 squared
 				// at the start of Net3, and a run that looks like a run.
-				junctions.push(' ' + n.id + '  ' + (n.elev || 0) + '  ' +
-					(eps && n.demandBase !== undefined ? n.demandBase : (n.demand || 0)) * 1000 +
-					(eps && n.demandPattern ? '  ' + n.demandPattern : ''));
+				// **AND A JUNCTION WITH DEMAND CATEGORIES GOES OUT AS [DEMANDS] ROWS** (Task 468),
+				// under `eps` only, for exactly the reason above: two categories on two patterns are
+				// two daily shapes, and one base times one pattern cannot state them. [DEMANDS]
+				// REPLACES the [JUNCTIONS] column rather than adding to it, so the column is left
+				// off entirely -- EPANET's own writer's layout. A ONE-INSTANT solve needs none of
+				// it: `n.demand` is already the sum at the moment on the clock.
+				if (eps && n.demands && n.demands.length) {
+					junctions.push(' ' + n.id + '  ' + (n.elev || 0));
+					for (var di = 0; di < n.demands.length; di++) {
+						demands.push(' ' + n.id + '  ' + (n.demands[di].base || 0) * 1000 +
+							(n.demands[di].pattern ? '  ' + n.demands[di].pattern : ''));
+					}
+				} else {
+					junctions.push(' ' + n.id + '  ' + (n.elev || 0) + '  ' +
+						(eps && n.demandBase !== undefined ? n.demandBase : (n.demand || 0)) * 1000 +
+						(eps && n.demandPattern ? '  ' + n.demandPattern : ''));
+				}
 				if (n.emitter > 0) {
 					// Our emitter is Q = C (H - z)^gamma with Q in m3/s and head in m.
 					// EPANET's is the same law in FLOW UNITS per (pressure unit)^gamma, and in
@@ -384,6 +399,7 @@
 			(pumps.length ? '[PUMPS]\n' + pumps.join('\n') + '\n\n' : '') +
 			(valves.length ? '[VALVES]\n' + valves.join('\n') + '\n\n' : '') +
 			(curves.length ? '[CURVES]\n' + curves.join('\n') + '\n\n' : '') +
+			(demands.length ? '[DEMANDS]\n' + demands.join('\n') + '\n\n' : '') +
 			(emitters.length ? '[EMITTERS]\n' + emitters.join('\n') + '\n\n' : '') +
 			// After [VALVES] and [PUMPS], because a [STATUS] line names a link that must already
 			// have been declared.

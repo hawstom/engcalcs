@@ -177,6 +177,49 @@
 	};
 
 	/**
+	 * A junction's demands, in order, as one list (ROADMAP Task 468).
+	 *
+	 * **ROW 0 IS THE JUNCTION'S OWN `_demand` / `demandPattern` / `demandCategory`,** and the rest
+	 * are `extraDemands`. One function says so, and the reader, the writer, the solve, the resolved
+	 * Demand and the property popup all ask it -- so a junction with one demand (every junction in
+	 * Net1, Net2 and Net3, and every junction anybody draws) is exactly the object it always was,
+	 * and nothing downstream has a second opinion about where row 0 lives.
+	 *
+	 * `base` is row 0's base demand, passed in rather than read, because inside a scenario it is
+	 * `effective(n, 'demand')` and this file knows nothing of scenarios. Omit it and the Base
+	 * document's own number is used.
+	 *
+	 * `rec`/`key` on each row name WHERE THAT NUMBER'S OWN TEXT IS KEPT, which is what lets the
+	 * writer hand every one of them back character-for-character (EngCalcs.lpnNumText).
+	 */
+	EngCalcs.lpnDemandRows = function (nd, base) {
+		var out = [{
+			base: base === undefined ? nd._demand : base,
+			pattern: nd.demandPattern || null,
+			category: nd.demandCategory || null,
+			rec: nd, key: '_demand'
+		}], extra = nd.extraDemands || [], i;
+		for (i = 0; i < extra.length; i++) {
+			out.push({
+				base: extra[i].base, pattern: extra[i].pattern || null,
+				category: extra[i].category || null, rec: extra[i], key: 'base'
+			});
+		}
+		return out;
+	};
+
+	/**
+	 * Does this junction's demand have to be written in [DEMANDS] rather than in the [JUNCTIONS]
+	 * demand column? Three reasons, and each is a thing the [JUNCTIONS] column cannot say:
+	 * more than one row, a CATEGORY name on row 0 (the column has nowhere to put one), or the file
+	 * it came from having said it there already -- a statement written back where it was made.
+	 */
+	EngCalcs.lpnDemandItemized = function (nd) {
+		return !!(nd && (nd.demandItemized || nd.demandCategory ||
+			(nd.extraDemands && nd.extraDemands.length)));
+	};
+
+	/**
 	 * Read an EPANET `.inp` into an SI model plus a report of everything it could not keep.
 	 *
 	 * Returns null-free: `ok` false with `error` set means the text was not an `.inp` at all.
@@ -188,12 +231,20 @@
 			section = '',
 			rawSections = {},   // name -> array of token arrays, for the sections we read below
 			seen = {},          // name -> row count, for the ones we only count
-			i, line, semi, toks;
+			i, line, semi, toks, cmt;
 
 		for (i = 0; i < lines.length; i++) {
 			line = lines[i];
 			semi = line.indexOf(';');
-			if (semi >= 0) { line = line.slice(0, semi); }
+			cmt = '';
+			// **ONE SECTION'S DATA IS WRITTEN AS A COMMENT, AND IT IS [DEMANDS].** A demand
+			// CATEGORY -- the name of who is drawing this water -- is a trailing `;Elm Acres`, not
+			// a fourth column: EPANET's own writer emits it that way and its reader reads it back
+			// out of the comment. Stripping comments and stopping there is what threw the
+			// categories away before Task 468. Kept on the token array rather than as a fifth
+			// token, so no section that does NOT mean anything by its comments can mistake one for
+			// data.
+			if (semi >= 0) { cmt = line.slice(semi + 1).trim(); line = line.slice(0, semi); }
 			if (!line.trim()) { continue; }
 			if (line.charAt(0) === '[' || /^\s*\[/.test(line)) {
 				section = line.trim().replace(/^\[|\]\s*$/g, '').toUpperCase();
@@ -202,6 +253,7 @@
 			}
 			toks = tokenize(line);
 			if (!toks.length) { continue; }
+			if (cmt) { toks.cmt = cmt; }
 			if (!rawSections[section]) { rawSections[section] = []; }
 			rawSections[section].push(toks);
 			seen[section] = (seen[section] || 0) + 1;
@@ -443,29 +495,67 @@
 		// assumed: a junction with 100 in [JUNCTIONS] and rows of 50 and 25 in [DEMANDS] is reported
 		// by the real engine as 75, not 175 (checked against js/vendor/epanet-js.js). Adding instead
 		// of replacing inflates every multi-category junction in silence.
-		// Categories then SUM into this page's single demand field. That is the same network -- a
-		// junction's total draw is what the solve uses -- and the caller is told the breakdown was
-		// flattened, since nothing here can hold two categories.
-		var multiDemand = [], zeroed = {};
+		// **THE CATEGORIES ARE KEPT, ONE ROW EACH** (Task 468). They used to be SUMMED into this
+		// page's single demand and the loss reported as `demand-categories`; a junction now holds
+		// an ordered LIST of (base, pattern, category) rows, so there is nothing to report and
+		// nothing thrown away. `50 gpm residential + 20 gpm irrigation` is how a demand is actually
+		// assembled, and two categories on two patterns are two daily shapes no single row can say.
+		//
+		// ROW 0 LANDS ON THE JUNCTION'S OWN `demand` / `demandPattern` FIELDS and the rest ride in
+		// `extraDemands`. That asymmetry is deliberate and is EPANET's own: its property sheet
+		// shows category 1 as the junction's Base Demand and the rest behind a categories editor.
+		// It is what makes a one-category junction -- every junction in Net1, Net2 and Net3 -- come
+		// out of here byte-for-byte the shape it always did.
+		var demandNodes = [], started = {};
 		rows = rawSections.DEMANDS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			var dn = nodeIndex[r[0]];
 			if (!dn || dn.type !== 'junction') { continue; }
-			if (!zeroed[r[0]]) {
-				dn.demand = 0; zeroed[r[0]] = true; multiDemand.push(r[0]);
+			if (!started[r[0]]) {
+				started[r[0]] = true;
+				demandNodes.push(dn);
+				// **[DEMANDS] REPLACES THE [JUNCTIONS] DEMAND rather than adding to it** -- measured,
+				// not assumed: a junction with 100 there and rows of 50 and 25 here is reported by
+				// the real engine as 75 (checked against js/vendor/epanet-js.js). Adding instead of
+				// replacing inflates every multi-category junction in silence. EPANET's own writer
+				// makes the same statement from the other end -- it writes [JUNCTIONS] with an
+				// elevation and NO demand column whenever [DEMANDS] carries one -- which is the
+				// shape the exporter writes back and why no copy of the discarded column is kept.
+				dn.demandItemized = true;
+				dn.demands = [];
 			}
-			dn.demand += num(r[1]) * demandMultiplier;
-			// A single category that survives the sum keeps its own text. A second one lands on a
-			// total no single token states, and mergeTok drops it.
-			mergeTok(dn, 'demand', r[1], dn.demand);
-			// The LAST category's pattern wins, because this page holds one demand and therefore
-			// one pattern. Two categories on different patterns are two different daily shapes and
-			// no single one of them describes the sum -- which is what 'demand-categories' below
-			// already tells the user about the demand itself.
-			if (r[2]) { dn.demandPattern = r[2]; drop('demand-pattern', [r[0]], r[2], 'node'); }
+			// A row is its own record with its own token bag, so mergeTok()'s three conditions
+			// apply to a category's base exactly as they apply to a junction's elevation.
+			var drow = {
+				base: num(r[1]) * demandMultiplier,
+				// null means the column was blank, which is NOT "no pattern" -- [OPTIONS] Pattern
+				// applies, exactly as it does for the [JUNCTIONS] column. Same resolution, made by
+				// the same caller.
+				pattern: r[2] || null,
+				// **WHO, NOT WHAT KIND** (Tom, 2026-08-21). The pattern is the type of user
+				// ("residential"); the category is the user ("Elm Acres", "Taco Bell 354"). Nothing
+				// validates it and nothing indexes it, because it is a name and not a key -- EPANET
+				// validates nothing here either and runs happily with varying text on one pattern.
+				category: r.cmt || null
+			};
+			mergeTok(drow, 'base', r[1], drow.base);
+			dn.demands.push(drow);
+			if (r[2]) { drop('demand-pattern', [r[0]], r[2], 'node'); }
 		}
-		if (multiDemand.length) { drop('demand-categories', multiDemand, null, 'node'); }
+		for (i = 0; i < demandNodes.length; i++) {
+			var dnode = demandNodes[i], first = dnode.demands[0] || { base: 0, pattern: null, category: null };
+			dnode.demand = first.base;
+			// mergeTok SETS OR REMOVES: handing it the row's kept token restores the file's own
+			// text, and handing it nothing (because String(value) already said it) clears the
+			// [JUNCTIONS] column's stale token off this field. Neither case needs a caller to know
+			// which one it is in.
+			mergeTok(dnode, 'demand', first.tok ? first.tok.base : null, dnode.demand);
+			dnode.demandPattern = first.pattern;
+			dnode.demandCategory = first.category;
+			dnode.extraDemands = dnode.demands.slice(1);
+			delete dnode.demands;
+		}
 
 		// ---- emitters ----
 		// THE ONE QUANTITY STILL CONVERTED TO SI, and it is the exception that proves the rule: an
@@ -1086,6 +1176,7 @@
 
 		var junctions = [], reservoirs = [], tanks = [], pipes = [], pumps = [], valves = [],
 			curves = [], emitters = [], statuses = [], coords = [], verts = [], labelRows = [],
+			demandRows = [],
 			nodeById = {}, linkById = {}, omitted = {}, i, j, nd, lk, lb;
 
 		// ---- nodes ----
@@ -1124,10 +1215,32 @@
 				// means [OPTIONS] Pattern applies, which is written once below -- so writing the
 				// document-wide default into every row here would be putting a name the file never
 				// stated at this row into a column that says the file did.
-				junctions.push(row([nd.id,
-					n(cHead, nd, 'elev', nd.elev || 0),
-					n(cFlow, nd, '_demand', eff(nd, 'demand') || 0)].concat(
-					nd.demandPattern ? [String(nd.demandPattern)] : [])));
+				//
+				// **A JUNCTION WITH DEMAND CATEGORIES GOES OUT ITEMIZED** (Task 468), one [DEMANDS]
+				// row each and NO demand column here at all -- which is EPANET's own writer's
+				// layout, and the only unambiguous one, since [DEMANDS] REPLACES this column. Any
+				// lumping for readability is a decision the property popup and the Tables pane get
+				// to make; the file states the rows.
+				var drows = EngCalcs.lpnDemandRows(nd, eff(nd, 'demand') || 0);
+				if (EngCalcs.lpnDemandItemized(nd)) {
+					junctions.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)]));
+					for (j = 0; j < drows.length; j++) {
+						// The CATEGORY is a trailing comment, not a column -- see the reader's note
+						// at [DEMANDS]. Written verbatim, with anything that would start a second
+						// comment or break the line taken out, because it is a name the user typed.
+						demandRows.push(row([nd.id,
+							n(cFlow, drows[j].rec, drows[j].key, drows[j].base || 0)].concat(
+							drows[j].pattern ? [String(drows[j].pattern)] : [])) +
+							(drows[j].category
+								? '\t;' + String(drows[j].category).replace(/[;\r\n]+/g, ' ')
+								: ''));
+					}
+				} else {
+					junctions.push(row([nd.id,
+						n(cHead, nd, 'elev', nd.elev || 0),
+						n(cFlow, nd, '_demand', drows[0].base || 0)].concat(
+						nd.demandPattern ? [String(nd.demandPattern)] : [])));
+				}
 				var em = eff(nd, 'emitter');
 				if (em > 0) {
 					// THE ONE QUANTITY THAT CANNOT COME BACK AS TEXT, and it is the same exception the
@@ -1414,6 +1527,9 @@
 			section('PIPES', pipes) +
 			section('PUMPS', pumps) +
 			section('VALVES', valves) +
+			// After [JUNCTIONS], whose rows it replaces, and beside [EMITTERS], the other section
+			// that says something extra about a node this page draws once (Task 468).
+			section('DEMANDS', demandRows) +
 			section('EMITTERS', emitters) +
 			section('CURVES', curves) +
 			// After the links, because a [STATUS] row names a link that must already be declared.

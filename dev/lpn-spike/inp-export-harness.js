@@ -23,8 +23,11 @@
 //   2. a CURVE point, because the reader deliberately keeps no token for one and docFromInp() maps
 //      the points through a new array, so there is nowhere for the text to survive. The VALUE is
 //      still asserted;
-//   3. a junction whose demand [DEMANDS] states in more than one category -- the field holds a sum
-//      no single token in the file states, which is exactly why mergeTok() drops the token.
+//   3. the [JUNCTIONS] demand COLUMN of a junction whose demands [DEMANDS] states. EPANET DISCARDS
+//      that column when [DEMANDS] carries rows for the node, so it is not part of the model at all
+//      and this writer leaves it off entirely, exactly as EPANET's own writer does. The rows
+//      themselves DO come back character for character since Task 468 -- asserted, with categories
+//      and patterns on them, by dev/lpn-spike/demand-category-harness.js.
 
 const fs = require('fs');
 const path = require('path');

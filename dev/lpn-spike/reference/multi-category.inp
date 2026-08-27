@@ -1,0 +1,75 @@
+[TITLE]
+Demand categories fixture (ROADMAP Task 468). AUTHORED HERE, not an EPA file.
+Net1, Net2 and Net3 all have an EMPTY [DEMANDS] section, so none of them exercises a
+demand category at all -- which is why the importer's flattening went untested for so
+long. This is the smallest network that does exercise one, and every row of [DEMANDS]
+below is here to make one statement the [JUNCTIONS] column cannot make:
+  J1  three categories, two patterns, and a third row with a category and NO pattern
+  J2  one category, one pattern -- itemized even though the column could have held it
+  J3  one category and no pattern
+  J4  no [DEMANDS] row at all: the ordinary junction, which must not change
+  J5  a [JUNCTIONS] demand AND [DEMANDS] rows, the case where EPANET DISCARDS the column
+The number TEXTS are deliberately not what String(parseFloat(x)) returns -- 50.0, 12.50,
+0.750 -- so a writer that formats rather than remembering is caught.
+
+[JUNCTIONS]
+;ID              	Elev        	Demand      	Pattern
+ J1              	100
+ J2              	95
+ J3              	90.5
+ J4              	88          	33.0        	Pat2
+ J5              	86          	100
+
+[RESERVOIRS]
+;ID              	Head        	Pattern
+ R1              	200
+
+[PIPES]
+;ID              	Node1           	Node2           	Length      	Diameter    	Roughness   	MinorLoss   	Status
+ P1              	R1              	J1              	1000        	12          	130         	0           	Open
+ P2              	J1              	J2              	800         	10          	130         	0           	Open
+ P3              	J2              	J3              	800         	8           	130         	0           	Open
+ P4              	J3              	J4              	600         	8           	130         	0           	Open
+ P5              	J4              	J5              	600         	8           	130         	0           	Open
+ P6              	J5              	J1              	1200        	8           	130         	0           	Open
+
+[DEMANDS]
+;Junction        	Demand      	Pattern         	Category
+ J1              	50.0        	Pat1            	;Elm Acres
+ J1              	20          	Pat2            	;Elm Acres Park
+ J1              	12.50       	                	;Taco Bell 354
+ J2              	18          	Pat1            	;Rio Vista Apartments
+ J3              	7.5         	                	;Mesa Elementary School
+ J5              	40          	Pat1            	;Sunset Estates
+ J5              	0.750       	Pat2            	;Sunset Estates common area
+
+[PATTERNS]
+;ID              	Multipliers
+ Pat1            	0.6         	1.0         	1.4         	1.0
+ Pat2            	0.2         	0.5         	2.3         	1.0
+
+[TIMES]
+ Duration        	24:00
+ Hydraulic Timestep	1:00
+ Pattern Timestep	6:00
+ Pattern Start   	0:00
+ Report Timestep	1:00
+ Report Start    	0:00
+ Start ClockTime	12 am
+
+[OPTIONS]
+ Units           	GPM
+ Headloss        	H-W
+ Pattern         	Pat1
+ Emitter Exponent	0.5
+
+[COORDINATES]
+;Node            	X-Coord         	Y-Coord
+ R1              	0               	0
+ J1              	100             	0
+ J2              	200             	0
+ J3              	300             	0
+ J4              	300             	100
+ J5              	200             	100
+
+[END]

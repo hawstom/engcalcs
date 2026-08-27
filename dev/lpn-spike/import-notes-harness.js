@@ -2,7 +2,7 @@
 //   node dev/lpn-spike/import-notes-harness.js
 //
 // WHAT THIS DEFENDS. The import report is one dialog, read once and dismissed; after that the fact
-// that THIS pump lost its curve, or THIS junction's three demand categories were added together,
+// that THIS pump lost its curve, or THIS reservoir arrived with a head and no ground elevation,
 // was gone from the model entirely. Task 483 files a copy of each difference on the element it
 // names, so the user meets it again at the moment it matters -- standing in that element's own
 // property popup, weeks later.

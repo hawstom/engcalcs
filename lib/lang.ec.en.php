@@ -2644,6 +2644,14 @@ $ec_lang['lpn_field_base_demand']='Base demand';
 $ec_lang['lpn_result_demand_tip']='The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.';
 $ec_lang['lpn_field_demand_pattern']='Demand pattern';
 $ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is.';
+// A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
+// (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
+// is no list to choose one from, which is why the tip describes it rather than instructing.
+$ec_lang['lpn_field_demand_category']='Category';
+$ec_lang['lpn_field_demand_category_tip']='Name or description of the user or users using this pattern.';
+$ec_lang['lpn_demand_add']='Add demand category';
+$ec_lang['lpn_demand_add_tip']='Add another demand at this junction, with its own base demand, pattern and category. The demands add up.';
+$ec_lang['lpn_demand_remove']='Remove this demand';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
 $ec_lang['lpn_field_head_pattern']='Head pattern';
