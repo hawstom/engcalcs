@@ -739,3 +739,173 @@ reuse is unambiguous (no aging wrinkle, no diameter conflation), and the Curves 
 comment already names exactly what is missing. That is a narrower, better-justified slice of Task
 465 than the full pipe+pump type system, and I record it as a candidate SPLIT rather than a reason
 to promote 465 whole.
+
+---
+
+## 2026-08-26 — Task 530, round 3: Tom's economics hypothesis ("emitter trick makes the sweep
+affordable") tested against what real bulk-sweep tools actually do
+
+Tom's framing: if the market's real product is a one-button whole-system sweep, maybe the
+emitter's 1-solve-per-node is *why* that sweep is affordable, and our own choice should follow the
+same economics. Went looking for anyone who actually built the sweep, read what they built, and
+came back with a clear answer: **the tools that exist did not take that path.**
+
+### Q1 — does anyone run the system-wide sweep with the emitter method?
+
+- **CITED, primary document read directly (not search-summarized) —
+  `optiwater.com/wp-content/uploads/2014/03/FireFlow.pdf`, "FireFlow" v2.10, author Elad Salomons,
+  7 April 2004, freeware, built specifically as an EPANET-based bulk sweep tool.** This is the
+  actual artifact Tom's hypothesis predicts should use emitters — a purpose-built, one-button,
+  every-junction fire-flow tool. **It does not use the emitter trick.** Its mechanism, read straight
+  off the dialog and manual text: the user sets a `Minimal pressure`, a `Maximal flow`, and a `Flow
+  interval` (e.g. 10 gpm), and for every selected junction it steps demand upward by that interval
+  from zero, running a full network solve at each step, until either a downstream node violates the
+  minimum pressure (reports `Violating_Node` and its pressure) or `Maximal flow` is reached
+  ("Maximal flow was reached"). That is a **linear scan, not bisection and not one-shot** — for a
+  1,000 gpm ceiling at a 10 gpm interval, up to 100 solves per node, materially MORE expensive than
+  either WaterCAD's bisection (~16, per our own measured branch analogy) or the emitter trick (1).
+  A real practitioner, building exactly the tool Tom is describing, in 2004, chose the LEAST
+  efficient of the three options. That is direct, primary evidence against "the economics push
+  toward the emitter trick" as a general law — at least one person who had every reason to care
+  about run time did not reach for it.
+- **CITED, WNTR's own fire-flow example is not a sweep at all.** `USEPA/WNTR`
+  `examples/fire_flow.py` (fetched via GitHub raw, WebFetch-summarized — I read the fetched summary,
+  not the raw diff line-by-line, so flag this one notch below the FireFlow.pdf read) adds a **fixed**
+  4,000 gpm demand at **one named node** for a time window and compares pressures with/without it,
+  using `demand_model = 'PDD'` (WNTR's own pressure-dependent-demand mode, a global exponent curve
+  like EPANET's native PDA, not an emitter). It is a single-hydrant demonstration script, not a
+  system sweep, and it does not use emitters at all for the fire demand itself.
+- **CITED, a real academic precedent for network-wide emitter use exists, but it answers a different
+  question from Tom's.** Dhote & Ingle (or similar authors — page did not surface author names to
+  me), *"Analysis of water distribution network under pressure-deficient conditions through emitter
+  setting,"* Drinking Water Engineering and Science (DWES), Copernicus, 2019
+  (`dwes.copernicus.org/articles/12/1/2019/`, fetched directly). Assigns emitter coefficients only
+  to nodes a prior demand-driven run flagged as pressure-deficient, then **iterates** (their own
+  words: *"Though the proposed approach is an iterative one..."*) — 5 solves in their own worked
+  example, versus a competing single-iteration method (SIPDA, Mahmoud et al. 2017) at 3. **This is
+  whole-network pressure-deficiency screening under one demand pattern (Tom's Class C below), not
+  "how much fire flow is available at this specific hydrant"** — a structurally different question,
+  answered with emitters used as a numerical device for PDA, not as a fire-flow-at-a-node search.
+  Worth citing because it is the one place in the literature I found emitters actually deployed
+  across many nodes in the same solve, and it still needed 5 solves, not 1.
+- **Secondary, could not reach the primary source, flag accordingly.** An eng-tips.com thread and
+  its search-engine paraphrase describe an H2Onet (Innovyze/Bentley predecessor) bulk run —
+  "over 50,000 fire flow analyses... 3 to 4 seconds per analysis on a 136,000-pipe model," verified
+  against 900 field tests, using **"an equivalent minor loss in branch lines"** (i.e., a modelled
+  nozzle/tee/reducer assembly with a K value, same shape as this branch's own approach) rather than
+  the raw elevation-and-huge-C emitter trick. The primary page (eng-tips.com) returned 403 to a
+  direct fetch; I have only the search engine's synthesis of it, not the thread text. If true, it is
+  a SECOND real-world large-scale tool that reached for the assembly/K-value model rather than the
+  emitter trick — but I could not verify wording or method precisely and this is not load-bearing on
+  its own.
+- **Net finding on Q1: no case found, primary or secondary, of a real tool doing the whole-system
+  sweep via the pure emitter (elevation-raise, huge-C) trick.** The two purpose-built bulk tools I
+  could examine (FireFlow.pdf primary; H2Onet secondary) both chose more expensive per-node search
+  strategies over the cheaper emitter option that was equally available to them (EPANET's emitter
+  mechanism predates both). That is evidence the emitter trick's 1-solve saving has not, in practice,
+  been the thing that made a sweep affordable for people who actually built one.
+
+### Q2 — is "16 solves per node" a real WaterCAD number, or ours?
+
+**Ours, and I should have been clearer about that the first time.** Re-fetched
+`docs.bentley.com` GUID-C6BF82B2 directly this pass: it describes the shape of the search
+("iteratively assign lesser demands until it finds the maximum flow... maintaining the pressure
+constraints") but **publishes no iteration count**. A `Trials` field does exist in WaterGEMS's
+Calculation Options (found by search, not fetched directly this pass — one more notch of caution)
+described as *"the maximum number of iterations... for each hydraulic solution"* — that is each
+individual steady-state solve's own internal convergence cap (the Newton-type loop inside ONE flow
+solution), analogous to our own solver's `tol`/iteration cap, **not** the count of demand-adjustment
+trials across a per-node bisection search. **"16" is this branch's own measured bisection count**
+(`dev/fireflow-loss-table.md`, OBSERVED), applied by analogy to WaterCAD because the two algorithms'
+*shape* matches (start above the answer, iteratively narrow), not because Bentley published 16 or
+any other number. Nobody should cite "16" as a WaterCAD figure; it is ours, extrapolated across a
+qualitatively similar published shape.
+
+### Q3 — where would the emitter answer actually differ from bisection?
+
+Reasoned from the governing equations (EPANET FAQ language, `q = C·p^γ`, γ≈0.5, elevation raised by
+the target head), not measured — **SPECULATION, to be re-derived, not quoted as settled**:
+
+1. **In the converged limit, the two methods answer the same question for ONE node tested alone.**
+   As C grows, the residual δh needed to pass any given flow shrinks toward zero, so the converged
+   HGL at the tested node approaches the target pressure from above by an amount that vanishes as
+   C→∞ — the same physical state a bisection search converges to when it holds the rest of the
+   network at normal demand and searches only the tested node's added flow. This is why EPANET's own
+   manual can recommend it at all.
+2. **The finite discharge coefficient is an INVISIBLE ceiling, and this is the real, nameable
+   divergence risk.** EPANET's own worked recommendation is "100× the maximum expected flow," which
+   means the practitioner must guess the node's capacity *before* running the analysis meant to
+   discover it. Guess low, and the emitter answer silently caps below the true available flow with
+   no flag — compare FireFlow.pdf's own dialog (page 3 of the manual, read this pass), which has an
+   explicit `Maximal flow` field AND an explicit `"Maximal flow was reached"` message precisely
+   because a bisection-style search needs, and states, its own ceiling. **A bisection sweep can say
+   out loud "I hit my ceiling, this node is stronger than I checked"; a naive one-shot emitter run
+   has no equivalent tell** unless someone separately checks the returned flow against the assumed
+   coefficient scale. This is a real, structural cost of the "one solve" design, not a rounding
+   error, and it is exactly the kind of finding this seat exists to catch before it ships.
+3. **Running every candidate node's emitter SIMULTANEOUSLY, in one single solve for the whole
+   system, is a DIFFERENT physical scenario from N separate single-node tests, and would silently
+   understate every node's available flow.** Standard fire-flow practice tests one hydrant (or a
+   small design-fire group) at a time against background demand, not every hydrant in the system
+   flowing at once. Tom's own quote asks for "one solve at every hydrant" (i.e., N solves, one each
+   — the 16x-not-16-to-1 reading), so this trap does not apply to what he asked for; but it is the
+   natural over-reach of the technique (true O(1) total instead of O(N) at 1-each) and I flag it so
+   nobody reaches for it later believing it is the same analysis.
+4. **Numerical robustness near pumps, PRVs/PSVs/FCVs and check valves is a real but unmeasured
+   risk.** A huge discharge coefficient makes the node's local q-vs-h relation extremely steep;
+   during the solver's intermediate iterations (before convergence) this can push trial flows and
+   heads outside a pump curve's defined range or cause a control valve to flip state repeatedly. I
+   could not find or run a test of this — it is inference from the shape of the equations, flagged
+   as a thing to test empirically before trusting an all-node emitter sweep near this branch's own
+   valve-routes-to-EPANET-only carve-out (`CLAUDE.md`, OBSERVED, the PRV/PSV/FCV section).
+
+**Net on Q3: no published quantitative comparison found.** This is the one question I could not
+settle with a citation, and Tom should be told exactly that rather than given a fabricated number
+for how far apart the two methods land.
+
+### Q4 — the failure classes, and one finding of my own worth naming as SPECULATION
+
+Tom's own two: **(A) Isolated/compliance** — can this node deliver its required fire flow at the
+minimum residual, holding everything else at normal demand; **(B) System/design** — does drawing
+that flow break something else (another node's minimum pressure, a link's design/max velocity).
+The literature search (criticality-analysis papers, general search synthesis, not a single
+authoritative table I could cite) supports adding a third, genuinely different question that should
+not be filed under "fire flow" at all: **(C) baseline service adequacy** — nodes already below their
+own minimum service pressure under ordinary (non-fire) demand, which is what the DWES emitter/PDA
+paper above is actually screening for, at network-wide scale, in a handful of solves, with no fire
+demand involved.
+
+- **(A) needs a per-node search** (bisection today, or a per-node emitter, or FireFlow.pdf's
+  stepped scan) — no way around solving repeatedly per node if the deliverable is "how much can
+  THIS node take."
+- **(C) is cheap and already answered by ordinary hydraulic modelling practice** — one solve (or a
+  handful, per the DWES paper) at normal demand, flagging anyone below minimum pressure. Not a fire-
+  flow product at all, and should not be priced against fire-flow's per-node cost.
+- **(B), reasoned from the mechanics rather than found in the literature — SPECULATION, worth
+  flagging because it changes the economics Tom is weighing:** once you know a node's REQUIRED fire
+  flow (a stated number, not the "achievable" flow (A) discovers), checking what it breaks elsewhere
+  does not need bisection OR an emitter at all — it needs exactly **one ordinary fixed-demand solve**
+  per candidate node, adding the required flow as a plain demand at that node and reading every other
+  node's pressure and every link's velocity off that same solve. No artificial elements, no
+  discharge-coefficient guess, no elevation trick, and it is unambiguous about which flow level is
+  being tested (the code-required one, not whatever an emitter happens to settle at). **This makes
+  (B) cheaper than either alternative under discussion for (A)**, and decouples the "does this break
+  something else" report from the method chosen for "can this node meet its own target" — they can
+  ship on different schedules and different mechanisms without one blocking the other. I did not
+  find this stated anywhere; it follows directly from EPANET mechanics already cited in this file and
+  should be re-derived, not quoted, before it is relied on.
+
+### Verdict on Tom's hypothesis
+
+**It does not survive contact with the evidence, on the narrow claim that the emitter trick is what
+makes real bulk sweeps affordable.** The one purpose-built, one-button, every-junction EPANET tool
+I could read in full (FireFlow.pdf, 2004) chose a MORE expensive method than either bisection or the
+emitter trick, not the cheapest one. The one whole-network emitter application I found in the
+literature (DWES 2019) still iterated five times and was answering a different question (baseline
+deficiency, not per-node fire-flow capacity). WaterCAD's own documentation, read directly, names
+neither emitters nor a solve count, so the "16" this project has been citing is our own branch's
+number, not the market leader's. **The narrower, honest version of Tom's economics — 1 solve per
+node instead of ~16, still O(N) either way — remains genuinely true and worth having as an option,
+exactly as the prior pass concluded**; what does not hold up is the leap from "1 is cheaper than 16"
+to "so that is presumably why the tools that exist do full sweeps," because the tools I could
+actually inspect did not take that route.

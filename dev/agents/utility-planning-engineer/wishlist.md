@@ -160,6 +160,21 @@ quick to decline it.** Here is the honest case both ways.
   raw-node option, this row's "run Task 530 N times" plan is unaffected either way — a raw-node
   bisection is the same loop, just against the junction directly instead of through a modelled
   lateral.
+- **UPDATE 2026-08-26, round 3 — Tom's "the emitter trick is why one-button sweeps are affordable"
+  hypothesis tested directly, does not hold as a general law (full findings: journal, 2026-08-26,
+  "round 3").** The one purpose-built bulk EPANET fire-flow tool I could read in full — OptiWater's
+  FireFlow.pdf (2004, primary, fetched directly) — uses a linear stepped-demand scan (up to
+  ~`Maximal flow / Flow interval` solves per node), MORE expensive than either bisection or the
+  emitter trick, not less. The one network-wide emitter application found in the literature (DWES
+  2019, Copernicus, peer-reviewed) still iterated 5 times and was screening baseline pressure
+  deficiency, not per-node fire-flow capacity. **This does not kill the emitter trick as an option**
+  — the narrower "1 solve per node instead of ~16, same O(N) shape" saving is still real — but it
+  removes the specific argument that the market's sweeps are shaped the way they are BECAUSE of that
+  saving; the one tool I could inspect chose the opposite. Also surfaced, worth carrying into any
+  future design doc regardless of which method(s) ship: the "does this break something else" report
+  (Tom's Class B) does not need bisection or an emitter at all — a single ordinary fixed-demand
+  solve per node, at the node's stated required fire flow, answers it directly and more simply
+  (SPECULATION, reasoned from EPANET mechanics, not found in the literature — flag for re-derivation).
 
 ### 4. Water quality — split into small, separable pieces, per Tom's instruction
 
