@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 1378,
-        "delta_key_count": 46,
+        "expected_key_count": 1397,
+        "delta_key_count": 65,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -455,7 +455,7 @@
         "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
         "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
         "lpn_find_prop_connection": "Connection",
-        "lpn_find_op_conn_any": "is broken",
+        "lpn_find_op_conn_any": "is cut off for any reason",
         "lpn_find_op_conn_unlinked": "has no links",
         "lpn_find_op_conn_closed": "is behind closed links",
         "lpn_find_op_conn_nosource": "reaches no source",
@@ -464,7 +464,26 @@
         "lpn_find_conn_nosource": "No path to a source",
         "lpn_find_conn_none": "Every node is connected.",
         "lpn_find_conn_no_fixed": "This network has no reservoir or tank. Only nodes with no links can be reported.",
-        "lpn_find_query_tip": "The same search, written as one line. It is here to read, not to type in.",
+        "lpn_find_query_tip": "The same search, written as one line. Change the controls and it rewrites itself, or type in it and the controls follow.",
+        "lpn_find_query_label": "Query",
+        "lpn_find_query_hint": "Expandable with AND, OR, and ()",
+        "lpn_find_q_and": "AND",
+        "lpn_find_q_or": "OR",
+        "lpn_find_q_aside": "These controls cannot write the query below, so they are set aside rather than saying something untrue.",
+        "lpn_find_q_restore": "Use the controls instead",
+        "lpn_replace_q_aside": "Replace cannot use a query joined with AND, OR or brackets. Use the controls to choose one set of elements.",
+        "lpn_find_q_err_pos": "(at character {n})",
+        "lpn_find_q_err_empty": "The query is empty, so nothing will be searched.",
+        "lpn_find_q_err_scope": "Not something to search: {w}. Try one of: {list}",
+        "lpn_find_q_err_dot": "Put a dot between what to search and its property, like Junction.ID",
+        "lpn_find_q_err_prop": "Not a property of {scope}: {w}. Try one of: {list}",
+        "lpn_find_q_err_op": "Not a condition for {prop}: {w}. Try one of: {list}",
+        "lpn_find_q_err_value": "This condition needs a value after it: {op}",
+        "lpn_find_q_err_quote": "Put quotes around a text value: {w} is not a number.",
+        "lpn_find_q_err_quote_end": "This quoted text has no closing quote.",
+        "lpn_find_q_err_close": "This bracket ( was opened and never closed.",
+        "lpn_find_q_err_open": "This bracket ) closes nothing.",
+        "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
         "lpn_find_q_top": "highest",
         "lpn_find_q_bottom": "lowest",
         "lpn_profile_edit": "Edit",
@@ -503,7 +522,7 @@
         "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
         "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
         "lpn_find_prop_connection": "Connection",
-        "lpn_find_op_conn_any": "is broken",
+        "lpn_find_op_conn_any": "is cut off for any reason",
         "lpn_find_op_conn_unlinked": "has no links",
         "lpn_find_op_conn_closed": "is behind closed links",
         "lpn_find_op_conn_nosource": "reaches no source",
@@ -512,7 +531,26 @@
         "lpn_find_conn_nosource": "No path to a source",
         "lpn_find_conn_none": "Every node is connected.",
         "lpn_find_conn_no_fixed": "This network has no reservoir or tank. Only nodes with no links can be reported.",
-        "lpn_find_query_tip": "The same search, written as one line. It is here to read, not to type in.",
+        "lpn_find_query_tip": "The same search, written as one line. Change the controls and it rewrites itself, or type in it and the controls follow.",
+        "lpn_find_query_label": "Query",
+        "lpn_find_query_hint": "Expandable with AND, OR, and ()",
+        "lpn_find_q_and": "AND",
+        "lpn_find_q_or": "OR",
+        "lpn_find_q_aside": "These controls cannot write the query below, so they are set aside rather than saying something untrue.",
+        "lpn_find_q_restore": "Use the controls instead",
+        "lpn_replace_q_aside": "Replace cannot use a query joined with AND, OR or brackets. Use the controls to choose one set of elements.",
+        "lpn_find_q_err_pos": "(at character {n})",
+        "lpn_find_q_err_empty": "The query is empty, so nothing will be searched.",
+        "lpn_find_q_err_scope": "Not something to search: {w}. Try one of: {list}",
+        "lpn_find_q_err_dot": "Put a dot between what to search and its property, like Junction.ID",
+        "lpn_find_q_err_prop": "Not a property of {scope}: {w}. Try one of: {list}",
+        "lpn_find_q_err_op": "Not a condition for {prop}: {w}. Try one of: {list}",
+        "lpn_find_q_err_value": "This condition needs a value after it: {op}",
+        "lpn_find_q_err_quote": "Put quotes around a text value: {w} is not a number.",
+        "lpn_find_q_err_quote_end": "This quoted text has no closing quote.",
+        "lpn_find_q_err_close": "This bracket ( was opened and never closed.",
+        "lpn_find_q_err_open": "This bracket ) closes nothing.",
+        "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
         "lpn_find_q_top": "highest",
         "lpn_find_q_bottom": "lowest",
         "lpn_profile_edit": "Edit",
@@ -846,6 +884,310 @@
             }
         },
         "lpn_find_query_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_query_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_query_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_and": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_or": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_aside": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_restore": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_replace_q_aside": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_pos": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_scope": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_dot": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_prop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_op": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_value": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_quote": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_quote_end": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_close": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_open": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_no_value",
+                    "value": "Napište, co hledáte.",
+                    "english": "Type what to look for."
+                },
+                "next_translated": {
+                    "key": "lpn_replace_title",
+                    "value": "Změnit nalezené",
+                    "english": "Change what was found"
+                }
+            }
+        },
+        "lpn_find_q_err_end": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
