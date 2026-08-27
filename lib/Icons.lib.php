@@ -446,10 +446,17 @@ $ec_icons = array(
 	//       directly above the springing, so it leaves the collar on a VERTICAL tangent and
 	//       continues the barrel line rather than meeting it at an angle. Move the springing and
 	//       that alignment is what breaks; it is the note he made twice.
-	//   F  **it rises from the ground; it does not float.** The foot flange (painted to y 20.4) now
-	//       meets the ground line (painted from 20.4). The gap under it was the whole of this note.
-	//   G  **the white centre of the front cap IS the nut** -- literally a square, though *"a circle
-	//       is acceptable for an icon"*, which is why it stays a circle.
+	//   F  **it rises from the ground; it does not float**, and then, once it did: *"It's pleasing
+	//       and natural for the bottom flange to be FLUSH with the ground... This makes the icon
+	//       less busy."* So the foot and the ground share a bottom edge (both painted to y 21.2)
+	//       and the ground is the thinner, wider one. Two stacked bars with air between them was
+	//       the busyness; touching them was not enough. **It is the BOTTOM edges that are flush**,
+	//       and what the shape is meant to read as is a PLINTH -- his word, and the way the public
+	//       sees a hydrant's base.
+	//   G  **the front cap is a solid disc with a SQUARE hole, and the hole is the nut.** He allowed
+	//       a circle -- *"a circle is acceptable for an icon"* -- and then sent the drawing, which
+	//       is square, so square it is: `fill-rule="evenodd"` with the square as a second subpath.
+	//       An outlined RING was the earlier reading and it is wrong: the cap is solid.
 	//
 	// **A CORRECTION, BECAUSE IT WAS WRITTEN HERE AS A MEASUREMENT AND WAS NOT ONE.** This file
 	// claimed there was no nut inside the pumper ring because "a third concentric feature has
@@ -472,8 +479,8 @@ $ec_icons = array(
 	// a 2-unit stroke eats one unit either side of every line, so a gap under about 2.5 units
 	// closes). Feature count has never been the constraint here:
 	//   walls painted to x = 8 and 16, so 8 units of clear barrel face
-	//   front cap ring r = 2.5 at (12, 13.2), painted 8.5..15.5 -- 0.5 units of air to each wall
-	//   its white centre is 3 units across: open to 96 px, closing below that into a solid cap,
+	//   front cap disc r = 3.5 at (12, 13.2), painted 8.5..15.5 -- 0.5 units of air to each wall
+	//   its square nut hole is 3 units across: open to 96 px, closing below that into a solid cap,
 	//     which degrades to a plausible reading rather than to noise
 	//   all three caps span y 10.7..15.7 painted; collar painted bottom is 8 and flange painted top
 	//     is 18.4, so 2.7 units of air above and below the whole nozzle band
@@ -488,18 +495,20 @@ $ec_icons = array(
 	//
 	// Cubics, never an `A` arc, for the bonnet dome and the ring: icon_ascii_preview.php models
 	// M/L/H/V/C/Z only, so an arc renders as nonsense there and that tool goes blind.
-	'hydrant'    => '<path stroke-width="1.6" d="M2 21.2H22"/>'
-		. '<path d="M5 19.4H19"/>'
-		. '<path d="M7 19.4V7"/><path d="M17 19.4V7"/>'
+	'hydrant'    => '<path stroke-width="1.6" d="M2 20.4H22"/>'
+		. '<path d="M5 20.2H19"/>'
+		. '<path d="M7 20.2V7"/><path d="M17 20.2V7"/>'
 		. '<path d="M5.5 7H18.5"/>'
 		. '<path d="M7 7C7 4.9 9.24 3.2 12 3.2C14.76 3.2 17 4.9 17 7"/>'
-		. '<path d="M10.8 3.2V1.7H13.2V3.2"/>'
+		. '<path d="M10.8 3.2V1.4H13.2V3.2"/>'
 		. '<path fill="currentColor" d="M5.6 11.7H7V14.7H5.6Z"/>'
 		. '<path stroke-width="2.6" d="M4.6 13.2H3.9"/>'
 		. '<path fill="currentColor" d="M18.4 11.7H17V14.7H18.4Z"/>'
 		. '<path stroke-width="2.6" d="M19.4 13.2H20.1"/>'
-		. '<path d="M12 10.7C13.38 10.7 14.5 11.82 14.5 13.2C14.5 14.58 13.38 15.7 12 15.7'
-		. 'C10.62 15.7 9.5 14.58 9.5 13.2C9.5 11.82 10.62 10.7 12 10.7Z"/>',
+		. '<path fill="currentColor" stroke="none" fill-rule="evenodd"'
+		. ' d="M12 9.7C13.933 9.7 15.5 11.267 15.5 13.2C15.5 15.133 13.933 16.7 12 16.7'
+		. 'C10.067 16.7 8.5 15.133 8.5 13.2C8.5 11.267 10.067 9.7 12 9.7Z'
+		. 'M10.5 11.7H13.5V14.7H10.5Z"/>',
 
 	// CANDIDATES for the Water menu, drawn 2026-08-25. Tom: the drop and the eye *"don't look
 	// different enough, especially with the association of tears and eyes"*. He named a water tower
