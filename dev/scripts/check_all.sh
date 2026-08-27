@@ -147,6 +147,11 @@ run_check "examples library fresh"       blocking php dev/scripts/generate_examp
 # reference ambiguous. And priority 0 is the file's only signal for "closed", so a blocked task
 # parked at 0, or a done one never moved under `## Completed`, both read as finished from outside.
 run_check "roadmap ids and closure"      blocking php dev/scripts/roadmap_id_check.php
+# The stale-claim ADVISORY below is a judgement call and never blocks. Its DEMOTIONS are not: each
+# one buys a shorter worklist by giving up coverage, and the tool prints fewer lines either way
+# whether it got smarter or went blind. This asserts the three false claims that actually shipped
+# still rank HIGH.
+run_check "stale claim selftest"         blocking php dev/scripts/stale_claim_selftest.php
 # Task 504. dev/features.md is generated from the hand-written dev/features-source.md, and this
 # also proves every ID a feature cites is genuinely closed -- so the list cannot claim something
 # that never shipped, and cannot go quietly stale after somebody edits the source.

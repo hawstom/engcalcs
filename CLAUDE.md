@@ -498,6 +498,7 @@ own failure; this table is an index, not a duplicate of that text.
 | `run_harnesses.sh` | The lpn solver and editor harnesses (count derived from the glob, never typed) |
 | `run_calc_harnesses.sh` | Every calculator's own `pageCalculator` against its own rendered HTML |
 | `stale_claim_check.php` | *Advisory.* A `Task N` cited in `CLAUDE.md` or a `dev/*.md` whose task is CLOSED, ranked by whether a negation sits beside it — the shape of the three false "not built yet" claims that shipped in one day. A worklist, never a verdict |
+| `stale_claim_selftest.php` | The DEMOTIONS in the check above, against fixtures. Blocking, because the check it guards is not: a demotion trades coverage for a shorter list and the tool looks identical either way. The three real false claims must keep ranking HIGH |
 | *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php` | Judgement calls that must not block a commit |
 
 **When you are about to write a new rule in this file, first ask whether it can be a check.** Every

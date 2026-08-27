@@ -673,6 +673,20 @@ the block.
     `drawExampleNetwork()` the two obvious extractions. Task 293 established the split-by-PURITY
     pattern and it worked. *(The 9,740 recorded here through 2026-08-23 was less than half the truth
     — an advisory nobody acts on is also an advisory nobody re-reads.)*
+  - **DONE 2026-08-26: the stale-claim advisory was 9-for-9 FALSE POSITIVES, and now it is 2.**
+    All nine high-ranked lines were legitimate records. **This is the second time it has drifted
+    there** — on 2026-08-23 all eleven were, two demotions cut it to seven, and it climbed back.
+    Two more demotions (the task is the AGENT of a completed action; a POINTER is not a claim) take
+    it to 2. **The standing obligation is not "read the nine", it is demote whatever legitimate
+    SHAPE the nine share** — an advisory that is all false positives teaches its reader to skip it,
+    which is the prose failure the tool exists to catch, arriving in the tool.
+    - **AND THE DEMOTIONS THEMSELVES ARE NOW GUARDED, BLOCKING**
+      (`dev/scripts/stale_claim_selftest.php`, 13 fixtures). A demotion trades coverage for a
+      shorter list and the tool prints fewer lines either way, whether it got smarter or went
+      blind — so the three false claims that actually shipped are pinned as HIGH forever. That
+      caught a real hole while being written: `not built yet — see Task 146` is ordinary prose and
+      the pointer demotion would have excused it, so the pointer rule is guarded by a
+      hard-builtness test and the record rule is not.
   - **DONE 2026-08-25:** `key_hygiene_check.php` learned two more dynamic-key shapes (an interpolated
     build and a prefix test), dropping 14 false orphans from its list — 35 → 21, then → 16 after
     Task 294's deletions. A check that is 40% noise is a check people learn to skip.
@@ -790,6 +804,23 @@ the block.
       **`is behind closed links` → open a valve** (a whole path of pipe exists);
       **`reaches no source` → build a connection** (this node is on a separate island).
       Proposed for the second, awaiting his wording: `is on a separate network`. His call.
+    - **[H] HE IS REORDERING AND REWORDING ALL FOUR, 2026-08-26** — *"I will try to translate the
+      intent to good English. It's confusing because I am also reordering them."* His draft, with
+      the current position in brackets: **(1)** [2] `no links`, **(2)** [3] `no open links`,
+      **(3)** [4] `no link path to a source`, **(4)** [1] `no open path to a source`.
+    - **THAT IS NOT ONLY A RENAME, AND HE MAY NOT HAVE MEANT THE SECOND HALF OF IT.** Two
+      structural consequences to settle before anyone builds it:
+      - **`no open links` is a LOCAL test; `is behind closed links` was a GLOBAL one.** Today a
+        node qualifies when EVERY path back to a source crosses a closed link. "No open links"
+        reads as: none of this node's OWN links is open. A node with one open link to a neighbour
+        that is itself cut off passes the local test and fails the global one.
+      - **THE FOUR STOP BEING A PARTITION AND BECOME NESTED.** Read plainly, 1 ⊆ 2 ⊆ 4 and
+        1 ⊆ 3 ⊆ 4 — four questions of increasing breadth rather than four exclusive buckets. That
+        is arguably the better mental model for a SEARCH, where a user picks how wide to cast.
+        But `find-harness.js` currently asserts the three are exactly `lpnDiagnose`'s `unreachable`
+        with no overlap, and `findConnectionMap()` tests them in order so they cannot overlap. Both
+        would change. **Ask him whether nested-and-overlapping is what he wants**; if it is, the
+        panel's report needs a different shape from its search conditions.
     Renaming stays cheap: the parser reads the def lists, so a changed word changes what it accepts.
   - **When the typed query outruns the controls, the controls LEAVE**, and one button brings them
     back to the last query they did express. The rejected alternatives were showing the first

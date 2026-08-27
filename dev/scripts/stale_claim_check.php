@@ -31,11 +31,16 @@
  *   php dev/scripts/stale_claim_check.php --all    # every citation of a closed task
  *   php dev/scripts/stale_claim_check.php --quiet   # summary line only
  *
- * MEASURED 2026-08-23: the two demotions below took HIGH from 11 lines to 7. **All 7 that remain
+ * MEASURED 2026-08-26: the FOUR demotions below take HIGH from 9 lines to 2. **Both that remain
  * are still legitimate records**, and that is the expected steady state — there is no known stale
- * claim in the repo today, so a true positive would be a NEW defect, not a backlog item. What the
- * demotions bought is that the list no longer leads with a correction of a false claim, which is
- * the one finding a reader would most likely act on backwards.
+ * claim in the repo today, so a true positive would be a NEW defect, not a backlog item.
+ *
+ * **THE FAILURE THIS TOOL KEEPS HAVING IS ITS OWN.** On 2026-08-23 all ELEVEN high lines were
+ * legitimate; two demotions cut it to 7; by 2026-08-26 it had drifted back to 9, all nine
+ * legitimate. An advisory whose worklist is 100% false positives teaches its reader to skip it —
+ * which is exactly the prose failure this file exists to catch, arriving in the tool itself. So
+ * the standing obligation is not "read the nine", it is **demote whatever legitimate SHAPE the
+ * nine share** and leave the list short enough that a reader still trusts it.
  *
  * Exit 0 = nothing ranked high. Exit 1 = at least one high-ranked line to skim. Advisory either
  * way: check_all.sh runs it in the advisory group, where a non-zero exit prints and does not block.
@@ -102,6 +107,49 @@ const CORRECTION = [
     '/\bcorrected\b/i',
 ];
 
+/* THE THIRD DEMOTION: **THE TASK IS THE AGENT OF A COMPLETED ACTION.** "what closed Task 442",
+ * "Task 232 removed `Irrigation.php`", "the language tag until Task 288" — the sentence is about
+ * something the task DID, so the negation beside it is describing the world the task left behind,
+ * not claiming the task is unbuilt. This is the single largest legitimate shape: 5 of the 9 high
+ * lines on 2026-08-26.
+ *
+ * The verb must sit NEXT TO the citation, not merely somewhere on the line: a long roadmap line
+ * mentioning "closed" about a different task would otherwise excuse a real claim. 20 characters
+ * before, 40 after — enough for "Extracted from Task 388 on close" and for "Task 232 removed
+ * `Irrigation.php`", and not enough to reach across a sentence boundary. */
+const RECORD_VERB = '(?:closed?|closes|removed?|removes|deleted?|fixed|fixes|shipped|ships'
+    . '|landed|lands|replaced|replaces|superseded|supersedes|retired|retires|extracted|extracts'
+    . '|until|since)';
+const RECORD_CITE = [
+    '/\b' . RECORD_VERB . '\b[^.;]{0,20}?\bTask \d+/i',
+    '/\bTask \d+\b[^.;]{0,40}?\b' . RECORD_VERB . '\b/i',
+];
+
+/* THE FOURTH: **A POINTER IS NOT A CLAIM.** "see ROADMAP Task 161 for why that count cannot reach
+ * zero" cites a task to send the reader somewhere. The negation belongs to the sentence the
+ * pointer introduces, and the pointer itself asserts nothing about what is built.
+ *
+ * **THIS ONE IS GUARDED, AND THE RECORD DEMOTION IS NOT.** "not built yet — see Task 146" is
+ * perfectly ordinary prose and is exactly the defect this tool exists to find, so a pointer must
+ * not excuse a HARD builtness marker. A record verb sitting next to the citation is much stronger
+ * evidence — the sentence is about what the task DID — so that one needs no guard. */
+const HARD_BUILTNESS = [
+    '/\bnot yet\b/i',
+    '/\byet to\b/i',
+    '/\bnot (?:built|implemented|shipped|supported|done)\b/i',
+    '/\bunbuilt\b/i',
+    '/\bstill (?:no|has no|lacks|missing|unbuilt|pending)\b/i',
+];
+const POINTER_CITE = [
+    '/\b(?:see|per|cf\.|full (?:record|design|scope) in|record in|detail in)\b[^.;]{0,30}?\bTask \d+/i',
+];
+
+// Included by stale_claim_selftest.php, which wants rankCitation() and not the scan. Function
+// declarations here are unconditional, so they are compiled and available across this return.
+if (defined('STALE_CLAIM_LIB_ONLY')) {
+    return;
+}
+
 $opts = ['all' => false, 'quiet' => false];
 foreach (array_slice($argv, 1) as $arg) {
     if ($arg === '--all') {
@@ -159,26 +207,7 @@ foreach ($files as $file) {
         }
         $closedCitations += count($closedIds);
 
-        $own = markerIn($line);
-        $near = $own ?? markerIn(($lines[$i - 1] ?? '') . ' ' . ($lines[$i + 1] ?? ''));
-        $rank = $own !== null ? 'high' : ($near !== null ? 'medium' : 'low');
-        $why = $own !== null
-            ? 'negation/future marker "' . $own . '" on the same line'
-            : ($near !== null ? 'negation/future marker "' . $near . '" on an adjacent line'
-                              : 'closed task cited, no state-claim marker nearby');
-        // The two demotions. Checked only when the marker is on the citation's OWN line: a
-        // neighbouring line's tense says nothing about this one's.
-        if ($rank === 'high') {
-            $correction = matchIn(CORRECTION, $line);
-            $past = matchIn(PAST_TENSE, $own);
-            if ($correction !== null) {
-                $rank = 'medium';
-                $why = 'a correction, not a claim — the line marks it "' . $correction . '"';
-            } elseif ($past !== null) {
-                $rank = 'medium';
-                $why = 'past tense "' . $past . '" — a record of what happened, not a claim about now';
-            }
-        }
+        [$rank, $why] = rankCitation($line, $lines[$i - 1] ?? '', $lines[$i + 1] ?? '');
 
         $findings[$rank][] = [
             'file' => $rel,
@@ -188,6 +217,42 @@ foreach ($files as $file) {
             'text' => trim($line),
         ];
     }
+}
+
+/* **THE RANKING, EXTRACTED SO IT CAN BE TESTED.** `stale_claim_selftest.php` drives this function
+ * with the three false claims that actually shipped and with one line of every legitimate shape.
+ * It lives out here rather than inline in the scan because the demotions are the delicate part:
+ * each one buys a shorter worklist by giving up some coverage, and the only way to know a demotion
+ * did not blind the tool is to assert, against fixtures, that the real defects still rank HIGH.
+ * Returns [rank, why]. */
+function rankCitation(string $line, string $prev = '', string $next = ''): array
+{
+    $own = markerIn($line);
+    $near = $own ?? markerIn($prev . ' ' . $next);
+    $rank = $own !== null ? 'high' : ($near !== null ? 'medium' : 'low');
+    $why = $own !== null
+        ? 'negation/future marker "' . $own . '" on the same line'
+        : ($near !== null ? 'negation/future marker "' . $near . '" on an adjacent line'
+                          : 'closed task cited, no state-claim marker nearby');
+    // The demotions. Checked only when the marker is on the citation's OWN line: a neighbouring
+    // line's tense says nothing about this one's.
+    if ($rank !== 'high') {
+        return [$rank, $why];
+    }
+    if (($correction = matchIn(CORRECTION, $line)) !== null) {
+        return ['medium', 'a correction, not a claim — the line marks it "' . $correction . '"'];
+    }
+    if (($past = matchIn(PAST_TENSE, $own)) !== null) {
+        return ['medium', 'past tense "' . $past . '" — a record of what happened, not a claim about now'];
+    }
+    if (($record = matchIn(RECORD_CITE, $line)) !== null) {
+        return ['medium', 'the task is the agent of a completed action — "' . $record . '"'];
+    }
+    if (matchIn(HARD_BUILTNESS, $line) === null
+        && ($pointer = matchIn(POINTER_CITE, $line)) !== null) {
+        return ['medium', 'a pointer to the task, not a claim about it — "' . $pointer . '"'];
+    }
+    return [$rank, $why];
 }
 
 function matchIn(array $patterns, ?string $text): ?string
