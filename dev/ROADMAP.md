@@ -381,6 +381,19 @@ the block.
   - **Publishable and useful are separate axes.** Publishable is the privacy test in the README and
     nothing else; a frame full of defects can still be safe to publish. Judging the two together
     once retired the best phone frame in the drop as a flat "No". Use **Not as is** for safe-but-stale.
+  - **RECONCILED 2026-08-26: 63 files, every one indexed, nothing un-indexed.** The 18 orphan rows
+    are the deliberate deletions. **Two date lines now carry the whole currency judgement** and are
+    cheaper than a per-row check: the Water glyph (plan sheet → drop 02:13 → tower 04:13, all on
+    2026-08-25) and lat-before-lon (2026-08-24 12:48). A frame's capture time against those two
+    decides whether it is current.
+  - **[H] THREE PUBLISHED PLATES ON `screenshots.html` ARE STALE, and one contradicts a shipped
+    ruling.** `img/0028.png`, `img/0043.png` and `img/0047.png` all show a glyph that lived two
+    hours; **0028 additionally reads `Longitude:` before `Latitude:`**, which `coord_order_check.php`
+    has since made a blocking error in our own source. A public picture is arguing against a rule we
+    enforce. 0028's replacement is already in the drop and wants only its two colour keys and the
+    labels legend moved off the top-right corner — that is a placement saved in Tom's own `.lwn`,
+    not a defect. **Swapping a published image is Tom's call; the sibling repo is not ours to edit
+    from here** (`~/webdev/librewaternet.org`, and read its own `CLAUDE.md` first).
 
 - 100|509| **Edit mode on the path itself: drag any point, click a waypoint off.**
   **BUILT 2026-08-25.** The Edit button puts the PATH in edit mode: every node the route passes
