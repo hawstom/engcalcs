@@ -148,9 +148,20 @@ the block.
     velocity. They need different reports and probably different runs.
     - **[H] THE MARKET DOES IT IN ONE RUN, and that is evidence against the split, not a ruling.**
       WaterCAD's Fire Flow Analysis reports the residual at the tested node AND the violations it
-      caused elsewhere from the SAME per-node solve, as one table and one colour map. So the second
-      analysis may be free once the first has run. **Whether we still present them as two is Tom's
-      call**; the cost argument for separating them is weaker than it looked.
+      caused elsewhere from the SAME per-node solve, as one table and one colour map.
+      **Whether we still present them as two is Tom's call**; the cost argument for separating them
+      is weaker than it looked.
+      - **CORRECTION: the second analysis is CHEAP, not free, and the difference is one solve per
+        node.** "Free once the first has run" assumed the side-effect readings could be taken from
+        the bisection's last iterate — but that iterate is at the AVAILABLE flow, and the design
+        question is asked at the REQUIRED one. Where available > required they are different flows,
+        so an honest side-effect answer costs one ordinary fixed-demand solve per node on top of the
+        ~16, about 6%. Where available < required the node already fails and the required flow
+        cannot be drawn at all, so there is nothing to solve. **Recommendation: ONE run, ONE stored
+        result set, TWO reports** — which is also the only way the three-state map colouring Tom
+        asked for (Passing / Failing / Design issue) can exist, since it needs both answers for
+        every junction at once. Two BUTTONS would ask the user to choose between them before they
+        can see what either says.
   - **[H] THE TIME QUESTION: he was right.** *"for an extended (time) simulation, don't we need to
     let/make the user choose the peak hour or desired time step for the analysis?"* US practice
     loads fire flow onto MAXIMUM-DAY demand and evaluates it as one steady-state condition; EPS at
