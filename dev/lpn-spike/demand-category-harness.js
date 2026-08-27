@@ -56,6 +56,12 @@ const L = loadLoopedNetwork(
 	"\t\trenderNodeFields: renderNodeFields,\n" +
 	"\t\tlibRenamePattern: libRenamePattern, libPatterns: libPatterns,\n" +
 	"\t\tpushSpecs: pushSpecList,\n" +
+	// The Find panel, driven the way its three pull-downs drive it.
+	"\t\tfindProps: function (scope) { findState.scope = scope; return findPropDefs(); },\n" +
+	"\t\tfind: function (scope, prop, op, value) {\n" +
+	"\t\t\tfindState.scope = scope; findState.prop = prop; findState.op = op; findState.value = value;\n" +
+	"\t\t\treturn findMatches().map(function (c) { return c.el.id; });\n" +
+	"\t\t},\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -326,14 +332,24 @@ function findAll(kids, tag) {
 {
 	const kids = popupFor('J1');
 	const labels = kids.filter(c => c.tagName === 'LABEL').map(c => c.textContent);
-	ok('a junction with categories offers row 0\'s Category',
-		labels.some(t => /^Category/.test(t)), labels.join(' | '));
+	// **ROW 0 IS IN THE TABLE, SO IT IS NOT A FIELD** (Tom, 2026-08-26: of the two shown together,
+	// *"I think this is a mistake"*). The popup must NOT carry a standalone Base demand, Demand
+	// pattern or Category label once a breakdown exists -- that duplicated heading is the defect.
+	ok('a junction with categories has NO standalone Base demand field',
+		!labels.some(t => /^Base demand/.test(t)), labels.join(' | '));
+	ok('...nor a standalone Demand pattern or Category field',
+		!labels.some(t => /^Demand pattern/.test(t)) && !labels.some(t => /^Category/.test(t)));
 	const table = kids.filter(c => c.tagName === 'TABLE')[0];
-	ok('...and a table of the rest', !!table);
-	ok('...one row per extra demand, and no more',
-		!!table && findAll(table.children, 'TR').length === 3, 'header + 2');
+	ok('...but a table holding EVERY demand', !!table);
+	ok('...one row per demand, row 0 included',
+		!!table && findAll(table.children, 'TR').length === 4, 'header + 3');
 	ok('...each row a number, a pattern and a name',
-		findAll([table], 'INPUT').length === 4 && findAll([table], 'SELECT').length === 2);
+		findAll([table], 'INPUT').length === 6 && findAll([table], 'SELECT').length === 3);
+	// The headings are the only labels these columns have, so they carry the tips the vanished
+	// fields used to (Tom: *"Maybe you can put the tip here"*).
+	ok('...and the column headings carry the tips',
+		findAll([table], 'TH').filter(th => /\?/.test(th.textContent)).length === 3,
+		findAll([table], 'TH').map(th => th.textContent).join(' | '));
 	ok('the resolved Demand row is still there and still says the total',
 		labels.some(t => /^Demand \(/.test(t)));
 
@@ -367,10 +383,14 @@ console.log('\n--- editing, undo-safe and write-safe ---');
 	const table = rows.filter(c => c.tagName === 'TABLE')[0];
 	const nums = findAll([table], 'INPUT').filter(i => i.type === 'number');
 	const texts = findAll([table], 'INPUT').filter(i => i.type === 'text');
-	nums[0].value = '12.5';
-	nums[0]._listeners.change[0]();
-	texts[0].value = '  Hilltop Water Users  ';
-	texts[0]._listeners.change[0]();
+	// **INDEX 1, NOT 0: ROW 0 IS THE JUNCTION'S OWN DEMAND** and it is now the table's first row.
+	// Typing into nums[0] edits J4's 33 gpm, which is how this harness first "proved" a regression
+	// that was only its own stale indexing -- worth leaving said, because the symptom was a
+	// 1,000,000 ppm disagreement with the EPANET engine four sections later.
+	nums[1].value = '12.5';
+	nums[1]._listeners.change[0]();
+	texts[1].value = '  Hilltop Water Users  ';
+	texts[1]._listeners.change[0]();
 	ok('typing into the row stores the number as typed', J('J4').extraDemands[0].base === 12.5);
 	ok('...and the name trimmed', J('J4').extraDemands[0].category === 'Hilltop Water Users');
 	// Each row at its own pattern: the junction's own Pat2 (0.2) and the new row's blank column,
@@ -387,12 +407,41 @@ console.log('\n--- editing, undo-safe and write-safe ---');
 
 	// Removing the last row must leave the junction the object it was, key for key -- an empty
 	// array left behind would change every future export and every saved file.
-	const del = findAll([table], 'BUTTON')[0];
+	const del = findAll([table], 'BUTTON')[1];
 	del._listeners.click[0]();
 	ok('Remove takes the row away entirely, leaving no empty list',
 		J('J4').extraDemands === undefined, JSON.stringify(J('J4')));
 	ok('THE DOCUMENT IS BYTE-IDENTICAL AGAIN after add, edit and remove',
 		JSON.stringify(L.serialize()) === before);
+
+	// **DELETING ROW 0 PROMOTES ROW 1 INTO IT.** With every demand in one table, a row you cannot
+	// remove is the anomaly -- but a junction always has a demand, so the delete on row 0 is a
+	// promotion rather than a deletion. J1 carries three demands; removing the first must leave two
+	// and must move the second one's number, pattern and name onto the junction itself.
+	// **SNAPSHOT AND PUT IT BACK.** This is the only assertion here that mutates a junction the
+	// later sections read, and the first attempt silently poisoned the EPANET comparison four
+	// sections down -- the same failure mode as the stale row index above, from the other end.
+	// Restored in place so every reference held elsewhere still points at the same object.
+	const j1snap = JSON.parse(JSON.stringify(J('J1')));
+	const wasRow1 = JSON.stringify(J('J1').extraDemands[0]);
+	const wasCount = J('J1').extraDemands.length;
+	const t1 = popupFor('J1').filter(c => c.tagName === 'TABLE')[0];
+	findAll([t1], 'BUTTON')[0]._listeners.click[0]();
+	ok('deleting row 0 promotes row 1 rather than dropping a demand',
+		(J('J1').extraDemands || []).length === wasCount - 1, JSON.stringify(J('J1').extraDemands));
+	ok('...and the promoted row IS the old row 1, number, pattern and name',
+		JSON.stringify({ base: J('J1')._demand, pattern: J('J1').demandPattern,
+			category: J('J1').demandCategory }) === wasRow1,
+		JSON.stringify({ base: J('J1')._demand, pattern: J('J1').demandPattern,
+			category: J('J1').demandCategory }) + ' vs ' + wasRow1);
+	ok('...and the junction still has a demand rather than an empty one',
+		typeof J('J1')._demand === 'number');
+	// Hold the object: the restore deletes every key including `id`, and J() looks up BY id.
+	const j1ref = J('J1');
+	Object.keys(j1ref).forEach(function (k) { delete j1ref[k]; });
+	Object.assign(j1ref, j1snap);
+	ok('...and J1 is put back exactly as it was, for the sections below',
+		JSON.stringify(J('J1')) === JSON.stringify(j1snap));
 }
 
 // ---------------------------------------------------------------------------
@@ -488,6 +537,46 @@ console.log('\n--- patterns and scenarios ---');
 		// the page: everything above this line ran without it.
 		console.log('  skip  the EPANET cross-check   engine unavailable: ' + err.message);
 	}
+	// -----------------------------------------------------------------------
+	// Searching for a category (Tom, 2026-08-26: *"is it feasible to search for
+	// categories or nodes with something about categories?"*).
+	// -----------------------------------------------------------------------
+	console.log('\n--- finding a demand category ---');
+	{
+		const names = (list) => list.slice().sort().join(',');
+		ok('Category is offered on junctions',
+			L.findProps('junction').some(d => d[0] === 'demandCategory'),
+			L.findProps('junction').map(d => d[0]).join(' '));
+		// The rule in findPropDefs() is that a property which silently matches nothing does not go
+		// in the menu, and a reservoir has no demand at all.
+		ok('...and NOT on reservoirs or tanks',
+			!L.findProps('reservoir').some(d => d[0] === 'demandCategory') &&
+			!L.findProps('tank').some(d => d[0] === 'demandCategory'));
+
+		// **ANY ROW MATCHES.** J1 carries three names; each one must find it.
+		ok('an exact name on ROW 0 finds the junction',
+			names(L.find('junction', 'demandCategory', 'equals', 'Elm Acres')) === 'J1');
+		ok('...and an exact name on a LATER row finds it just the same',
+			names(L.find('junction', 'demandCategory', 'equals', 'Taco Bell 354')) === 'J1');
+		ok('...which is the whole point: a join could not answer "equal to" for J1 at all',
+			names(L.find('junction', 'demandCategory', 'equals', 'Elm Acres Park')) === 'J1');
+		// `contains` spans rows AND junctions: two different junctions carry a "Sunset"/"Elm".
+		ok('contains spans every row of every junction',
+			names(L.find('junction', 'demandCategory', 'contains', 'Elm')) === 'J1');
+		ok('...and gathers different junctions under one word',
+			names(L.find('junction', 'demandCategory', 'contains', 'a')) === 'J1,J2,J3,J5',
+			names(L.find('junction', 'demandCategory', 'contains', 'a')));
+		ok('...case-insensitively, like every other text search here',
+			names(L.find('junction', 'demandCategory', 'contains', 'SUNSET')) === 'J5');
+		ok('a name nobody used matches nothing',
+			L.find('junction', 'demandCategory', 'equals', 'Nowhere Ranch').length === 0);
+		// J4 has a demand and no category. It must not turn up in a blank "contains", which is the
+		// panel's "show me everything that has this property" query.
+		ok('a junction with no category is absent from the property entirely',
+			names(L.find('junction', 'demandCategory', 'contains', '')) === 'J1,J2,J3,J5',
+			names(L.find('junction', 'demandCategory', 'contains', '')));
+	}
+
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 	process.exit(fails ? 1 : 0);
 }());

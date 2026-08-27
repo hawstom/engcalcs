@@ -1581,8 +1581,13 @@ $ec_lang['lpn_find_none']='Nothing matched.';
 // many. The literal n is Tom's own wording and is the shortest way to say that the number goes in
 // the box beside it; it is NOT a placeholder and nothing substitutes it. "Top"/"Bottom" were
 // changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the top is an edge.
-$ec_lang['lpn_find_op_top']='Highest n';
-$ec_lang['lpn_find_op_bottom']='Lowest n';
+// **LOWERCASED 2026-08-26.** They shipped capitalised, which broke the rule stated a dozen lines
+// above them and nowhere else: every other operator here is lowercase so the three pull-downs read
+// as one sentence left to right. Tom found it by reading -- *"why are they capitalized unlike the
+// other conditions?"* -- and there was no reason. The capital was inherited from "Top"/"Bottom",
+// which were proper-noun-ish, and it survived the rename that made them ordinary adjectives.
+$ec_lang['lpn_find_op_top']='highest n';
+$ec_lang['lpn_find_op_bottom']='lowest n';
 // EPANET's Map Finder calls this "Adjacent Links". Said plainly here: the pipes, pumps and valves
 // that meet at the node you found.
 $ec_lang['lpn_find_adjacent']='Connected';

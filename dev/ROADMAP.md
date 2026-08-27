@@ -180,6 +180,25 @@ the block.
       from `dev/fireflow-loss-table.md`. That lands on Tom's own "minutes for a big system".
       **It does NOT extrapolate:** 49→225 junctions grew worse than linear, so a 1,000–2,000 node
       number has to be measured before anyone quotes one.
+      - **THE 16 IS OURS, NOT BENTLEY'S.** WaterCAD's page describes the search's SHAPE and
+        publishes no solve count. The number is this branch's own measured bisection cost, carried
+        across by analogy because the algorithm matches. Do not cite it as a WaterCAD figure.
+    - **[H] TOM'S ECONOMICS HYPOTHESIS DOES NOT SURVIVE, 2026-08-26.** He proposed that the emitter
+      trick is what makes the market's one-button sweeps affordable at all. **No case of a sweep
+      built on emitters was found, primary or secondary.** The one purpose-built every-junction
+      EPANET tool readable in full — OptiWater's `FireFlow` (Salomons, 2004, manual read directly)
+      — steps demand up by a fixed interval per node, which is MORE solves than bisection, not
+      fewer. WNTR's own fire-flow example is one fixed demand at one node under PDD, not a sweep.
+      The narrower claim stands and is worth keeping: **1 solve per node beats ~16, and the shape
+      is O(N) either way.** It is the leap to "that is why sweeps are feasible" that fails.
+    - **NO PUBLISHED ACCURACY COMPARISON of emitter against bisection was found**, which is the
+      decisive engineering question and is therefore open. One named hazard: the emitter's
+      discharge coefficient is a GUESSED, INVISIBLE CEILING — a bisection sweep can report "I hit
+      my ceiling" and a naive emitter run has no equivalent tell.
+    - **THE SIDE-EFFECT ANALYSIS NEEDS NEITHER METHOD.** A single ordinary fixed-demand solve per
+      node, at the code-required flow, answers "does drawing this break something else" directly.
+      Only the *available vs required* half needs a search at all. (The agent's own inference,
+      tagged SPECULATION in its journal — re-derive it before building on it.)
   - **HOWEVER WE ACCOUNT FOR HYDRANT LOSSES, IT MUST BE VISIBLE AND PROBABLY SELECTABLE.** Tom:
     *"I want to be very explicit and transparent, maybe even selectable, about how we account if at
     all for hydrant losses beyond the node."* If the profession's default is raw-node analysis, then
@@ -925,8 +944,30 @@ the block.
       formats rather than remembers is caught). It asserts import → resolve → export → re-import,
       14 demand tokens byte-identical, **and the vendored EPANET engine reading the same file the
       same way** — which is what settles what the FORMAT means rather than what our code does.
-    - **[H] FIVE NEW ENGLISH STRINGS AWAIT TOM'S WORDING** (in `lang.ec.en.php` only, so the
-      untranslated state is correct): `lpn_field_demand_category` *Category*;
+    - **THE POPUP PUTS EVERY DEMAND IN ONE TABLE, ROW 0 INCLUDED** (Tom, 2026-08-26, of a
+      screenshot showing row 0 as fields ABOVE the table: *"I think this is a mistake"*, and then
+      of the leftover Category field: *"A. This is not needed."*). The popup had carried the
+      heading "Base demand (gpm)" twice, once as a field and once as a column, with nothing saying
+      the field was the table's first row. **The document did not change, only the drawing of it.**
+      Row 0 keeps two jobs the others do not: its base is written through `setProp()` so a scenario
+      override still lands, and deleting it PROMOTES row 1 rather than removing a demand, because a
+      junction always has one. **The column headings now carry the tips** — *"Maybe you can put the
+      tip here"* — since the fields that carried them are gone. A one-demand junction is unchanged.
+    - **A DEMAND CATEGORY IS SEARCHABLE, on junctions only** (his ask: *"is it feasible to search
+      for categories or nodes with something about categories?"*). It is **the one property a
+      single element holds SEVERAL of**, so `contains` and `equal to` ask their question of every
+      row and match if any answers — a joined string could not answer "equal to" for a junction
+      with two names, which is exactly the junction being searched for. Not offered on reservoirs
+      or tanks, which have no demand.
+    - **`highest n` / `lowest n` LOWERCASED** (his reading: *"why are they capitalized unlike the
+      other conditions?"*). No reason — the capital was inherited from "Top"/"Bottom" and survived
+      the rename that made them ordinary adjectives, breaking a rule stated a dozen lines above
+      them in `lang.ec.en.php`.
+    - **NET3 HAS NO CATEGORIES TO LOOK AT** — its `[DEMANDS]` section is present and EMPTY, which
+      is why none can be found there. `dev/lpn-spike/reference/multi-category.inp` is the file that
+      has them.
+    - **[H] FIVE NEW ENGLISH STRINGS AWAIT TOM'S WORDING** — they are in `lib/lang.ec.en.php`
+      at lines 2650-2654, and nowhere else, which is the correct untranslated state: `lpn_field_demand_category` *Category*;
       `lpn_field_demand_category_tip` *Name or description of the user or users using this
       pattern.*; `lpn_demand_add` *Add demand category*; `lpn_demand_add_tip` *Add another demand at
       this junction, with its own base demand, pattern and category. The demands add up.*;

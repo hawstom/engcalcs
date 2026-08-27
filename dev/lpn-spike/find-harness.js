@@ -558,7 +558,7 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 		lineFor('all', 'id', 'contains', '223') === "Everything.ID contains '223'", JSON.stringify(L.queryText()));
 	ok('a numeric condition prints the number bare',
 		lineFor('pipe', 'diameter', 'gt', '8') === 'Pipe.Diameter greater than 8', JSON.stringify(L.queryText()));
-	// "Highest n" names a control, not a comparison, so the line says the word and the count the
+	// "highest n" names a control, not a comparison, so the line says the word and the count the
 	// search will ACTUALLY use -- ten, when the box is empty.
 	ok('an extremes condition prints the count it will really use',
 		lineFor('pipe', 'velocity', 'top', '') === 'Pipe.Velocity highest 10', JSON.stringify(L.queryText()));

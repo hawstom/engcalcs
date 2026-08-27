@@ -7379,6 +7379,19 @@ var EngCalcs = EngCalcs || {};
 		if (d.key === 'all' || d.group === 'node') {
 			out.push(['connection', pc.lpn_find_prop_connection || 'Connection', 'Connection']);
 		}
+		// **DEMAND CATEGORY, ON JUNCTIONS ONLY** (Tom, 2026-08-26: *"is it feasible to search for
+		// categories or nodes with something about categories?"*). It is offered where it can
+		// match: a reservoir and a tank have no demand at all, and the rule a few lines up is that
+		// a property which silently matches nothing does not go in the menu.
+		//
+		// **A JUNCTION HAS SEVERAL OF THEM, WHICH NO OTHER SEARCHABLE PROPERTY DOES.** That is why
+		// findCategoriesOf() exists and why findMatches() has a branch for it: `contains` and
+		// `equal to` ask their question of EVERY row and match if ANY row answers. Folding them
+		// into one joined string instead would make `equal to` false for every junction that has
+		// more than one category, which is exactly the junction somebody is searching for.
+		if (d.group === 'node' && (!d.type || d.type === 'junction')) {
+			out.push(['demandCategory', pc.lpn_field_demand_category || 'Category', 'Category']);
+		}
 		if (d.key === 'all') { return out; }
 		defs = d.group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc);
 		allowed = d.group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS;
@@ -7498,7 +7511,7 @@ var EngCalcs = EngCalcs || {};
 		if (st === 'nosource') { return pc.lpn_find_conn_nosource || 'No path to a source'; }
 		return '';
 	}
-	function findPropIsText(prop) { return prop === 'id' || prop === 'text'; }
+	function findPropIsText(prop) { return prop === 'id' || prop === 'text' || prop === 'demandCategory'; }
 	// Text gets contains/equals, a number gets equals/greater/less. Offering all four for both would
 	// mean "Pressure contains 2", which matches on the digits of a number and is never what anybody
 	// means.
@@ -7518,8 +7531,8 @@ var EngCalcs = EngCalcs || {};
 		return [['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'],
 			['gt', pc.lpn_find_op_gt || 'greater than', 'greater than'],
 			['lt', pc.lpn_find_op_lt || 'less than', 'less than'],
-			['top', pc.lpn_find_op_top || 'Highest n', 'Highest n'],
-			['bottom', pc.lpn_find_op_bottom || 'Lowest n', 'Lowest n']];
+			['top', pc.lpn_find_op_top || 'highest n', 'highest n'],
+			['bottom', pc.lpn_find_op_bottom || 'lowest n', 'lowest n']];
 	}
 	function findOpIsExtreme(op) { return op === 'top' || op === 'bottom'; }
 	// How many an extremes query returns. The Value box holds it, and a blank or nonsense entry
@@ -7552,8 +7565,28 @@ var EngCalcs = EngCalcs || {};
 	// REMOVE** -- see the closed Task 146.05 entry, which carries the same question for the Settings
 	// ID-prefix list.
 	function findLabelHasNoId(cand) { return cand.group === 'label'; }
+	// EVERY category name on this junction, in row order, blanks dropped. Empty array for anything
+	// that is not a junction, and for a junction nobody has named a demand on -- which findValueOf()
+	// turns into undefined, so such a node never appears in a Category search at all.
+	function findCategoriesOf(cand) {
+		var out = [], rows, i, c;
+		if (cand.group !== 'node' || cand.el.type !== 'junction') { return out; }
+		rows = demandRowsOf(cand.el, effective(cand.el, 'demand'));
+		for (i = 0; i < rows.length; i++) {
+			c = rows[i].category;
+			if (typeof c === 'string' && c !== '') { out.push(c); }
+		}
+		return out;
+	}
 	function findValueOf(cand, prop) {
 		if (prop === 'id') { return findLabelHasNoId(cand) ? undefined : cand.el.id; }
+		// The JOINED names, for the result row and for alphabetical sorting. Matching does NOT go
+		// through here -- see the branch in findMatches() -- because a join cannot answer
+		// "equal to" for a junction carrying two names.
+		if (prop === 'demandCategory') {
+			var cats = findCategoriesOf(cand);
+			return cats.length ? cats.join(', ') : undefined;
+		}
 		if (prop === 'text') { return effective(cand.el, 'text'); }
 		if (prop === 'sizeMult') { return cand.el.sizeMult || 1; }
 		if (prop === 'connection') {
@@ -7614,6 +7647,21 @@ var EngCalcs = EngCalcs || {};
 			return findSortMatches(out).slice(0, findExtremeCount());
 		}
 		if (v === '') { return out; }
+		// **ANY ROW MATCHES.** The one property a single element holds several of; see the note in
+		// findPropDefs(). Both text conditions ask their question of each name in turn.
+		if (findState.prop === 'demandCategory') {
+			findCandidates().forEach(function (c) {
+				var cats = findCategoriesOf(c), i;
+				for (i = 0; i < cats.length; i++) {
+					if (findState.op === 'contains' ? cats[i].toLowerCase().indexOf(lc) >= 0
+							: cats[i].toLowerCase() === lc) {
+						out.push(c);
+						return;
+					}
+				}
+			});
+			return findSortMatches(out);
+		}
 		findCandidates().forEach(function (c) {
 			var val = findValueOf(c, findState.prop), s;
 			if (val === undefined || val === null || val === '') { return; }
@@ -7780,8 +7828,8 @@ var EngCalcs = EngCalcs || {};
 	// of the two. The cost is stated and accepted: a query string is not portable between
 	// languages, which is why the parser below ALSO accepts the English spelling of every word.
 	//
-	// Two operators do not compose into a sentence and get their own word here: "Highest n" and
-	// "Lowest n" name a control, not a comparison, so the line says `highest 10` with the count the
+	// Two operators do not compose into a sentence and get their own word here: "highest n" and
+	// "lowest n" name a control, not a comparison, so the line says `highest 10` with the count the
 	// search will actually use. Everything else reuses the label as it stands.
 	function findLabelOf(defs, key) {
 		var i;
@@ -7859,7 +7907,7 @@ var EngCalcs = EngCalcs || {};
 			return { key: d[0], label: d[1], words: words };
 		});
 	}
-	// LONGEST WINS, always: "greater than" must not be taken as "greater" would be, and "Highest n"
+	// LONGEST WINS, always: "greater than" must not be taken as "greater" would be, and "highest n"
 	// must be tried before "highest".
 	function findMatchAlt(text, at, alts) {
 		var best = null, i, j, n;
@@ -7962,7 +8010,7 @@ var EngCalcs = EngCalcs || {};
 			prop = m.key; i += m.len;
 			opDefs = findDefsFor(scope, prop).ops;
 			opAlts = findAlts(opDefs);
-			// The extremes are written `highest 10` on the printed line and `Highest n` in the
+			// The extremes are written `highest 10` on the printed line and `highest n` in the
 			// pull-down, so both spellings answer, plus the English of each.
 			opAlts = opAlts.concat(findAlts([
 				['top', (EngCalcs.pageConfig || {}).lpn_find_q_top || 'highest', 'highest'],
@@ -22068,10 +22116,19 @@ var EngCalcs = EngCalcs || {};
 			// **THE TYPED NUMBER, AND THE ONLY EDITABLE ONE OF THE PAIR.** The tip is lpn_'s own:
 			// bpn_demand_tip says "at this line's downstream end", which is branched-network
 			// wording and false here, where a demand sits on a node.
-			unitNumberField(fields, pc.lpn_field_base_demand || 'Base demand', 'lpn_u_flow',
-				function () { return effective(n, 'demand'); },
-				function (v) { setProp(n, 'demand', v); updateNode(nodeId); refreshPopupIfOpen(); },
-				pc.lpn_demand_tip, { el: n, prop: 'demand' });
+			//
+			// **THESE TWO ROWS GO AWAY THE MOMENT THIS JUNCTION HAS A BREAKDOWN** (Tom, 2026-08-26,
+			// of a screenshot showing them above the table: *"I think this is a mistake"*). They
+			// were row 0 shown outside the list it belongs to, and the popup then carried the
+			// heading "Base demand (gpm)" TWICE, once as a field and once as a column, with nothing
+			// saying the field was the table's first row. demandCategoryFields() draws row 0 inside
+			// the table instead. A junction with one demand -- nearly all of them, and every
+			// junction in Net1, Net2 and Net3 -- still sees exactly these fields and no table.
+			if (!hasDemandBreakdown(n)) {
+				unitNumberField(fields, pc.lpn_field_base_demand || 'Base demand', 'lpn_u_flow',
+					function () { return effective(n, 'demand'); },
+					function (v) { setProp(n, 'demand', v); updateNode(nodeId); refreshPopupIfOpen(); },
+					pc.lpn_demand_tip, { el: n, prop: 'demand' });
 			// **HOW THAT DEMAND MOVES THROUGH THE RUN** (Task 460). PER JUNCTION, so it is here and
 			// not in the Libraries box -- the same line the Settings rule draws, from the other
 			// side: whole-project in the box, one element in the popup. Without it a pattern the
@@ -22080,10 +22137,11 @@ var EngCalcs = EngCalcs || {};
 			// **NOT AN OVERRIDABLE PROPERTY, so it is a plain write and carries no marker.** Which
 			// pattern a junction follows is a statement about the system, like its elevation;
 			// LPN_OVERRIDABLE holds the design variables a scenario asks "what if" about.
-			patternField(fields, pc.lpn_field_demand_pattern || 'Demand pattern',
-				function () { return n.demandPattern; },
-				function (v) { n.demandPattern = v || null; updateNode(nodeId); scheduleSolve(); saveToStorage(); },
-				pc.lpn_field_demand_pattern_tip);
+				patternField(fields, pc.lpn_field_demand_pattern || 'Demand pattern',
+					function () { return n.demandPattern; },
+					function (v) { n.demandPattern = v || null; updateNode(nodeId); scheduleSolve(); saveToStorage(); },
+					pc.lpn_field_demand_pattern_tip);
+			}
 			// **WHAT THAT BASE RESOLVES TO AT THE MOMENT ON THE CLOCK**, read-only, directly under
 			// the pattern that produces it -- the base, the pattern, the answer, in that order.
 			// **ALWAYS SHOWN, EVEN WHEN IT EQUALS THE BASE** (Tom, 2026-08-26). A previous pass hid
@@ -22125,14 +22183,28 @@ var EngCalcs = EngCalcs || {};
 	// there is no registry of them: it is a NAME, not a key, and EPANET itself runs happily with
 	// varying descriptions on one pattern.
 	//
-	// **ROW 0 IS THE Base demand AND Demand pattern ROWS ABOVE, NOT A ROW IN THIS TABLE.** That
-	// keeps one control per number -- two boxes editing `_demand` would be a synchronisation bug
-	// waiting for a slow refresh -- it keeps the scenario override marker exactly where it has
-	// always been, and it means a junction with one demand (which is nearly all of them, and every
-	// junction in Net1, Net2 and Net3) sees no change at all beyond one button.
+	// **EVERY DEMAND IS A ROW IN THIS TABLE, ROW 0 INCLUDED** (Tom, 2026-08-26). It was built the
+	// other way first -- row 0 left as the Base demand and Demand pattern fields above -- and he
+	// rejected that from a screenshot: *"I think this is a mistake."* He is right, and the reason
+	// is visible in the picture. The popup carried the heading "Base demand (gpm)" twice, once as
+	// a field and once as a column, and nothing on screen said the field was the table's first row.
+	// A reader could only conclude the two were different quantities.
 	//
-	// SO THERE IS NO DELETE FOR ROW 0: a junction always has a demand, even a zero one. Removing a
-	// category means removing one of these.
+	// **THE DOCUMENT DID NOT CHANGE, ONLY THE DRAWING OF IT.** Row 0 is still `_demand` /
+	// `demandPattern` / `demandCategory` and the rest are still `extraDemands`; the exporter and
+	// EngCalcs.lpnDemandRows() are untouched. This is a presentation decision about the pane, which
+	// is exactly the freedom Tom reserved when he ruled the exporter writes `[DEMANDS]` itemized.
+	//
+	// **TWO THINGS ROW 0 STILL DOES THAT THE OTHERS DO NOT, and both are load-bearing:**
+	//   its base is written through setProp(), so a scenario override lands where it always did --
+	//     a category has no name to key an override by, only a position, which moves when a row
+	//     above it is deleted (dev/scenario-seam-repair.md with a subscript instead of a field);
+	//   deleting it PROMOTES the next row into it rather than removing a demand outright, because a
+	//     junction always has a demand, even a zero one. That is why there is a delete on every row
+	//     now: with all the rows in one table, a row you cannot remove is the anomaly, not a rule.
+	//
+	// A junction with ONE demand gets no table at all -- the plain Base demand and Demand pattern
+	// fields, exactly as before Task 468, which is nearly every junction and all of Net1/2/3.
 	//
 	// **NO REORDER CONTROL**, deliberately: the order is the file's own and nothing reads it -- the
 	// totals are additive (Tom, 2026-08-24) and the exporter writes the rows as they stand. A pair
@@ -22140,10 +22212,9 @@ var EngCalcs = EngCalcs || {};
 	function demandCategoryFields(fields, n, nodeId) {
 		var pc = EngCalcs.pageConfig || {}, extras = n.extraDemands || [],
 			table, thead, hrow, tbody, addBtn;
-		// Row 0's own name. Shown once this junction HAS a breakdown -- before that there is nothing
-		// to distinguish it from, and a lone "Category" box on every junction in the network would
-		// be a field asking a question almost nobody has.
-		if (extras.length || n.demandCategory) {
+		// A junction that has a category but no extra rows still has only ONE demand, so it keeps
+		// the plain fields above and gets its name here rather than a one-row table.
+		if (!extras.length && n.demandCategory) {
 			textField(fields, pc.lpn_field_demand_category || 'Category',
 				function () { return n.demandCategory; },
 				function (v) { n.demandCategory = v || null; afterPropertyEdit(n); },
@@ -22155,67 +22226,65 @@ var EngCalcs = EngCalcs || {};
 			thead = document.createElement('thead');
 			hrow = document.createElement('tr');
 			tbody = document.createElement('tbody');
-			[(pc.lpn_field_base_demand || 'Base demand') + ' (' + unitLabel('lpn_u_flow') + ')',
-				pc.lpn_field_demand_pattern || 'Demand pattern',
-				pc.lpn_field_demand_category || 'Category', ''].forEach(function (t) {
+			// **THE COLUMN HEADINGS CARRY THE TIPS** (Tom, 2026-08-26: *"Maybe you can put the tip
+			// here"*). They have to: the standalone Base demand, Demand pattern and Category fields
+			// are what carried them, and those are gone the moment this table appears. A heading is
+			// the only label a column has, so it is where its `?` belongs -- and it is one `?` per
+			// label, which is the suite's rule.
+			[[(pc.lpn_field_base_demand || 'Base demand') + ' (' + unitLabel('lpn_u_flow') + ')', pc.lpn_demand_tip],
+				[pc.lpn_field_demand_pattern || 'Demand pattern', pc.lpn_field_demand_pattern_tip],
+				[pc.lpn_field_demand_category || 'Category', pc.lpn_field_demand_category_tip],
+				['', null]].forEach(function (pair) {
 				var th = document.createElement('th');
-				th.textContent = t;
+				if (pair[1]) { setFieldLabel(th, pair[0], pair[1]); }
+				else { th.textContent = pair[0]; }
 				hrow.appendChild(th);
 			});
 			thead.appendChild(hrow);
 			table.appendChild(thead);
 			table.appendChild(tbody);
 			fields.appendChild(table);
-			extras.forEach(function (d, di) {
-				var tr = document.createElement('tr'),
-					bCell = document.createElement('td'), pCell = document.createElement('td'),
-					cCell = document.createElement('td'), xCell = document.createElement('td'),
-					bInput = document.createElement('input'), sel = document.createElement('select'),
-					cInput = document.createElement('input'), del = document.createElement('button');
-				bInput.type = 'number'; bInput.step = 'any';
-				bInput.value = (typeof d.base === 'number') ? String(+d.base.toFixed(6)) : '';
-				bInput.setAttribute('aria-label', (pc.lpn_field_base_demand || 'Base demand') + ' ' + (di + 2));
-				// **THE TYPED NUMBER, STORED AS TYPED.** No factor here in either direction: a
-				// category's base is in the flow unit the heading names, exactly like the Base
-				// demand box above it, and the solver does its own converting at its own boundary.
-				bInput.addEventListener('change', function () {
-					d.base = +bInput.value;
-					afterPropertyEdit(n);
-				});
-				libFillPatternOptions(sel, d.pattern);
-				sel.setAttribute('aria-label', (pc.lpn_field_demand_pattern || 'Demand pattern') + ' ' + (di + 2));
-				sel.addEventListener('change', function () {
-					d.pattern = sel.value || null;
-					afterPropertyEdit(n);
-				});
-				cInput.type = 'text';
-				cInput.value = d.category || '';
-				cInput.setAttribute('aria-label', (pc.lpn_field_demand_category || 'Category') + ' ' + (di + 2));
-				cInput.addEventListener('change', function () {
-					d.category = cInput.value.trim() || null;
-					afterPropertyEdit(n);
-				});
-				del.type = 'button';
-				del.className = 'lpn-demand-del';
-				// The glyph is the control and the words are its tip -- the same reason the verdict
-				// strings lead with a mark: it is language-free, it is RTL-safe, and it costs no
-				// key in 27 languages to say "remove".
-				del.textContent = '×';
-				helpTip(del, pc.lpn_demand_remove || 'Remove this demand');
-				del.addEventListener('click', function () {
-					saveUndoSnapshot();
-					extras.splice(di, 1);
+			// **ROW 0 FIRST, READING AND WRITING THE JUNCTION'S OWN FIELDS.** The accessors are the
+			// only difference between it and a category row: `_demand` through setProp() so a
+			// scenario override still lands, `demandPattern` and `demandCategory` as plain writes.
+			demandRowInto(tbody, n, 0, {
+				getBase: function () { return effective(n, 'demand'); },
+				setBase: function (v) { setProp(n, 'demand', v); },
+				getPattern: function () { return n.demandPattern; },
+				setPattern: function (v) { n.demandPattern = v || null; },
+				getCategory: function () { return n.demandCategory; },
+				setCategory: function (v) { n.demandCategory = v || null; },
+				// **DELETING ROW 0 PROMOTES ROW 1 INTO IT**, so the junction keeps a demand and the
+				// list simply gets shorter. Writing the base through setProp() keeps the promoted
+				// number on the same seam every other write to it uses.
+				remove: function () {
+					var next = extras.shift();
+					setProp(n, 'demand', next.base);
+					n.demandPattern = next.pattern || null;
+					n.demandCategory = next.category || null;
 					if (!extras.length) { delete n.extraDemands; }
-					afterPropertyEdit(n);
-					refreshPopupIfOpen();
+				}
+			});
+			extras.forEach(function (d, di) {
+				demandRowInto(tbody, n, di + 1, {
+					getBase: function () { return d.base; },
+					setBase: function (v) { d.base = v; },
+					getPattern: function () { return d.pattern; },
+					setPattern: function (v) { d.pattern = v || null; },
+					getCategory: function () { return d.category; },
+					setCategory: function (v) { d.category = v || null; },
+					remove: function () {
+						extras.splice(di, 1);
+						if (!extras.length) { delete n.extraDemands; }
+					}
 				});
-				bCell.appendChild(bInput); pCell.appendChild(sel);
-				cCell.appendChild(cInput); xCell.appendChild(del);
-				tr.appendChild(bCell); tr.appendChild(pCell);
-				tr.appendChild(cCell); tr.appendChild(xCell);
-				tbody.appendChild(tr);
 			});
 		}
+		// **THE OVERRIDE MARKER FOLLOWS ROW 0, WHICH IS NOW INSIDE THE TABLE.** It is drawn under
+		// the table rather than in a cell: it is a checkbox with a sentence beside it and there is
+		// no column for that. Only row 0's base is overridable at all -- see the note above on why
+		// a category cannot key an override -- so one marker is the whole truth here.
+		if (hasDemandBreakdown(n)) { overrideMarker(fields, n, 'demand'); }
 		addBtn = document.createElement('button');
 		addBtn.type = 'button';
 		addBtn.className = 'lpn-demand-add';
@@ -22233,6 +22302,64 @@ var EngCalcs = EngCalcs || {};
 		});
 		fields.appendChild(addBtn);
 		fields.appendChild(document.createElement('br'));
+	}
+	// ONE ROW OF THE DEMAND TABLE, whichever kind it is. `acc` is six accessors and a remove; the
+	// caller supplies row 0's (which go through setProp and promote on delete) or a category row's
+	// (plain writes on the object itself). Drawing them from one place is the point: two builders
+	// is how the first column of one row silently stops matching the first column of the next.
+	//
+	// `index` is 0-based and only ever reaches the aria-label, where it is printed 1-based -- a
+	// screen reader saying "Base demand 1" for the first row is the only numbering a user meets,
+	// because the table itself does not number its rows.
+	function demandRowInto(tbody, n, index, acc) {
+		var pc = EngCalcs.pageConfig || {},
+			tr = document.createElement('tr'),
+			bCell = document.createElement('td'), pCell = document.createElement('td'),
+			cCell = document.createElement('td'), xCell = document.createElement('td'),
+			bInput = document.createElement('input'), sel = document.createElement('select'),
+			cInput = document.createElement('input'), del = document.createElement('button'),
+			b0 = acc.getBase();
+		bInput.type = 'number'; bInput.step = 'any';
+		bInput.value = (typeof b0 === 'number') ? String(+b0.toFixed(6)) : '';
+		bInput.setAttribute('aria-label', (pc.lpn_field_base_demand || 'Base demand') + ' ' + (index + 1));
+		// **THE TYPED NUMBER, STORED AS TYPED.** No factor here in either direction: a demand's
+		// base is in the flow unit the column heading names, exactly like the Base demand box on a
+		// junction that has only one, and the solver does its own converting at its own boundary.
+		bInput.addEventListener('change', function () {
+			acc.setBase(+bInput.value);
+			afterPropertyEdit(n);
+		});
+		libFillPatternOptions(sel, acc.getPattern());
+		sel.setAttribute('aria-label', (pc.lpn_field_demand_pattern || 'Demand pattern') + ' ' + (index + 1));
+		sel.addEventListener('change', function () {
+			acc.setPattern(sel.value);
+			afterPropertyEdit(n);
+		});
+		cInput.type = 'text';
+		cInput.value = acc.getCategory() || '';
+		cInput.setAttribute('aria-label', (pc.lpn_field_demand_category || 'Category') + ' ' + (index + 1));
+		cInput.addEventListener('change', function () {
+			acc.setCategory(cInput.value.trim());
+			afterPropertyEdit(n);
+		});
+		del.type = 'button';
+		del.className = 'lpn-demand-del';
+		// The glyph is the control and the words are its tip -- the same reason the verdict strings
+		// lead with a mark: it is language-free, it is RTL-safe, and it costs no key in 27
+		// languages to say "remove".
+		del.textContent = '×';
+		helpTip(del, pc.lpn_demand_remove || 'Remove this demand');
+		del.addEventListener('click', function () {
+			saveUndoSnapshot();
+			acc.remove();
+			afterPropertyEdit(n);
+			refreshPopupIfOpen();
+		});
+		bCell.appendChild(bInput); pCell.appendChild(sel);
+		cCell.appendChild(cInput); xCell.appendChild(del);
+		tr.appendChild(bCell); tr.appendChild(pCell);
+		tr.appendChild(cCell); tr.appendChild(xCell);
+		tbody.appendChild(tr);
 	}
 	function openPopup(nodeId, sx, sy) {
 		var n = nodeById(nodeId), ne = nodeEls[nodeId];
@@ -23069,6 +23196,12 @@ var EngCalcs = EngCalcs || {};
 	// "what if this junction draws more" question of the junction's demand, as it always has, and
 	// the breakdown is Base-document structure -- the same standing as `demandPattern` beside it.
 	// Returns the pre-Task-468 single row if js/lpn-inp.js failed to load, like every other helper here.
+	// Does this junction show a TABLE rather than the two plain fields? One demand is not a
+	// breakdown, however it is named -- a junction can carry a category with a single demand and is
+	// still the ordinary shape.
+	function hasDemandBreakdown(n) {
+		return !!(n && n.extraDemands && n.extraDemands.length);
+	}
 	function demandRowsOf(n, base) {
 		if (EngCalcs.lpnDemandRows) { return EngCalcs.lpnDemandRows(n, base); }
 		return [{ base: base, pattern: n.demandPattern || null, category: n.demandCategory || null }];
