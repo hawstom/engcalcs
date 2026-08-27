@@ -153,6 +153,7 @@ $ec_lang['index_meta_desc_plain']='Free hydraulic engineering calculators for pi
 $ec_lang['calc_set_units']='Set units:';
 $ec_lang_syn['calc_set_units']='';
 $ec_lang['calc_set_units_tip']='Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.';
+$ec_lang_syn['calc_set_units_tip']='Changes the unit shown on every field at once (switches the whole page to that unit system). Does not change the input data.';
 $ec_lang['calc_units_us']='US';
 $ec_lang_syn['calc_units_us']='';
 $ec_lang['calc_units_si']='SI';

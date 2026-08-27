@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**67 open tasks.** Next (100): 9 · Soon (75): 18 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 16
+**65 open tasks.** Next (100): 8 · Soon (75): 16 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
 
-## 100 — Next (9)
+## 100 — Next (8)
 
 - Task 408 — Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
@@ -19,9 +19,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
 - Task 510 — Saved paths work; the arrow that opens them is not discoverable.
 - ! Task 530 — [H] · Fire flow: what shipped answers ONE hydrant. The real question is the whole system.
-- ! Task 537 — [H] · RESEARCHED, AND BOTH SEATS SAY THE PREMISE IS WRONG. Tom's call on what follows.
 
-## 75 — Soon (18)
+## 75 — Soon (16)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -32,11 +31,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 417 — Long-press enters Edit mode, and the phone's touch radius is too mean.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 479 — [H] · One question left: should the suite answer at librewaternet.org/engcalcs/ ?
-- Task 503 — AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry
 - Task 531 — Tag the examples: US/SI, design/maintenance, xy/lat-lon.
 - ! Task 532 — An English style guide for label wording — Tom says he is writing one by intuition.
 - Task 533 — Renaming a link leaves `incidentLinks` pointing at the old id.
-- Task 536 — [H] · Did the Manning button fix also cure the second symptom?
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 540 — [H] · Both halves are BUILT; the wording and phase 2 stay open.
 - Task 542 — Terrain elevations: the button did more than a curious user expected.
@@ -72,7 +69,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 
-## 5 — Parked (16)
+## 5 — Parked (17)
 
 - Task 114 — Reservoir / detention routing calculator (Modified Puls) — full scope in `dev/detention-routing-scope.md`.
 - Task 116 — Solar water pumping sizing.
@@ -90,8 +87,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 400 — Phase 3: bounded local search on the label residue.
 - Task 482 — EPANET's vocabulary collides with ours, and we are keeping ours.
 - Task 492 — [H] · Rewriting the 986 existing commit messages is NOT recommended.
+- ! Task 537 — [H] · PARKED. Both seats say a phone reaching a PC's model is a want that mostly is not there.
 
 ---
 
-59 of 67 titles are within 4–12 words. `!` marks the rest;
+57 of 65 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

@@ -47,46 +47,22 @@ the block.
 
 # Tasks
 
-- 100|537| **[H] RESEARCHED, AND BOTH SEATS SAY THE PREMISE IS WRONG. Tom's call on what follows.**
-  He raised it 2026-08-25: *"the deepest issue against their even beginning to use lpn is file
-  access... the most obvious solution is to institute logins and keep models on the cloud, but this
-  is a huge change in paradigm... Maybe somebody can chew on that."* Both agents chewed, separately,
-  and neither was shown the other's answer. **They converged.**
-  - **THE FIELD OPERATOR: the file-access problem is DOWNSTREAM OF A WANT THAT MOSTLY IS NOT THERE.**
-    Every field-facing tool they could source runs on a **GIS asset graph plus a work-order system**,
-    never a hydraulic solver — Esri's Utility Isolation Trace answers "what does closing this valve
-    isolate" already, Field Maps and Cityworks carry valve exercising, and asset CONDITION is a
-    GIS/CMMS record by construction. **Nobody in the sourced literature opens EPANET-class software
-    in the street.** Solving file transfer well would build a mechanism nobody in that seat would
-    reach for, because the model is not the class of document their role opens.
-    - **The exception is real but narrow, and it is OUR kind of utility:** the smallest agencies in
-      the 300 km scope still running paper "curb stop tie cards" with no digital asset map at all
-      (CITED, rcap.org). For them `lpn_`'s map competes with nothing better.
-    - Their own summary of what we would have got wrong: we assumed they wanted the file at all.
-  - **THE PLANNING ENGINEER: "cloud behind a login" is one a UTILITY'S COUNSEL COULD NOT APPROVE**,
-    and the reason is theirs rather than an architect's. A complete network topology is the document
-    type several states have legislated as sensitive infrastructure information — AWIA (2018) risk
-    assessments are exempt from federal FOIA but carry **no automatic state or local exemption**
-    (epa.gov), and state statutes exempt "detailed drawings, schematics, maps... of utility systems"
-    whose disclosure could expose vulnerabilities. **No rule against third-party custody was found,
-    and the agent says so rather than inventing one** — but a small public agency's risk-averse legal
-    review has no way to approve handing that document to a volunteer project with no SOC2, no
-    incident-response contract and no DPA. **The nothing-uploaded design is not merely a privacy
-    nicety: it is the one posture that never asks a utility's counsel a question they must refuse.**
-    - Also measured: even the top commercial tier still moves a FILE. ProjectWise checks a WaterGEMS
-      file out and back with a single-editor lock — governance on top of a file, not a live shared
-      database.
-  - **BOTH RANK THE SAME SHAPE FIRST, and the planning engineer adds the caveat that decides it:** a
-    **read-only, one-way link or export**, with storage the UTILITY already controls. *"The moment
-    'the link' is something we host, it has become the cloud-login proposal in a smaller costume."*
-    A file via the phone's own share sheet ranks alongside it, with the operator's warning that
-    BYOD/MDM policy often forbids moving work files through personal cloud storage — so a plain URL
-    has less policy surface than a file does.
-  - **WHAT IS LEFT IS A SCOPE DECISION AND IT IS TOM'S**, not more research: build the cheapest
-    read-only publish sized honestly to the paper-records utility that genuinely lacks an
-    alternative, or accept that the operator is not our user and spend the effort where the design
-    engineer already is. **Do not build a general answer to "how does a phone reach a PC's model" —
-    both seats say that question is bigger than its audience.**
+- 5|537| **[H] PARKED. Both seats say a phone reaching a PC's model is a want that mostly is not there.**
+  Tom parked it 2026-08-26 (*"Compact and park. 5"*) after asking whether file access was the field
+  operator's blocker. Researched from both seats, separately, and they converged.
+  - **The field operator:** every field-facing tool they could source runs on a **GIS asset graph
+    plus a work-order system**, never a hydraulic solver — Esri's Utility Isolation Trace already
+    answers "what does closing this valve isolate", and asset CONDITION is a GIS/CMMS record. The
+    exception is real but narrow: the smallest agencies still on paper tie cards, for whom our map
+    competes with nothing.
+  - **The planning engineer:** "cloud behind a login" is a thing a small agency's counsel cannot
+    approve — a complete network topology is the document type several states legislate as sensitive
+    infrastructure information, and a volunteer project has no SOC2, no incident-response contract
+    and no DPA. **So "nothing you draw is uploaded" is not merely a privacy nicety: it is the one
+    posture that never asks a utility's lawyer a question they must refuse.**
+  - **If it is ever revived, the shape both ranked first** is a read-only, one-way link or export
+    with storage the UTILITY controls — *"the moment 'the link' is something we host, it has become
+    the cloud-login proposal in a smaller costume."* Full record in both agents' journals.
 
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
@@ -324,20 +300,6 @@ the block.
   - **Not observed in the wild**, which is why it is 75 and not 100: renaming a link and then
     dragging one of its nodes without an intervening redraw is a narrow path. It is still a throw.
 
-- 75|536| **[H] Did the Manning button fix also cure the second symptom?**
-  Tom reported two things on 2026-08-25. The first — the eaten first digit — is **fixed and guarded**
-  (closed Task 535). The second was: *"Clicking the design rock size radio buttons and the Manning
-  Roughness buttons together blanks them both."*
-  - **I could not reproduce that one by clicking**, in either order, with every combination of the
-    two button groups, headless and in a real Chromium. Both buttons stay chosen and every box stays
-    numeric. `dev/browser-pass/specs/mtcbuttons.js` now asserts exactly that, so if it ever starts
-    happening the pass says so.
-  - **The strong hypothesis is that it WAS the eaten-digit defect, met while typing** — that bug both
-    un-checked the button and destroyed the number, which is what "blanks them both" describes.
-  - **So this task is one question for Tom and nothing else: is it still there?** If yes, the thing
-    to capture is the exact order of clicks and keystrokes, because that is the only part still
-    missing. If no, close this.
-
 - 75|531| **Tag the examples: US/SI, design/maintenance, xy/lat-lon.**
   Tom, 2026-08-25: *"Reference 348. Phase 1 can be adding labels, tags, or keywords to the
   examples."* **Task 348 is sub-categories and paging in the gallery, and is deliberately unbuilt at
@@ -446,16 +408,6 @@ the block.
     in a library, which needs its own evaluation against this codebase's no-dependencies-shipped-to-
     visitors norm (`js/vendor/` today holds only the EPANET engine). Decide the mechanism before
     scoping the toggle above.
-
-- 75|503| **AWAITING TOM'S WRITTEN OK — a `$ec_lang_syn` entry**, proposed while Task 426 borrowed the
-  word *Non-destructive* for the shared units row and extracted from Task 425 on its close so the
-  proposal does not vanish into a closed block. A translator cannot recover the term of art from the
-  words, so: `$ec_lang_syn['calc_set_units_tip']='Changes the unit shown on every field at once
-  (switches the whole page to that unit system); safe, harmless, does not overwrite anything, leaves
-  your entries untouched, keeps the numbers you typed.'` **AI proposes; only Tom writes it.**
-  - While here: Task 425 left three keys in the 26 non-English files that English no longer defines
-    (`lpn_units_warn_body`, `lpn_units_reinterpret`, `lpn_units_convert`). Unreachable, so not a
-    defect — retire them with `rename_lang_key.php`'s 27-file pass, or in the next lpn sprint.
 
 - 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
@@ -752,6 +704,18 @@ the block.
     problem actually is before anybody optimises anything.
   - Tom, in the same breath: *"I don't want to be forever tweaking this."* So a phase that measures
     before it tunes is the honest opening.
+  - **HIS OWN RULE, 2026-08-26, and it is small enough to build:** *"Maybe it's as simple as, if two
+    leaders cross or if a label crosses a leader, try stacking their labels."* Two triggers, one
+    remedy. **Note the second trigger is the one the first would miss** — a label lying across
+    somebody else's leader is just as ugly and is not a crossing of two leaders.
+  - **He marked FIVE gangs on one screenshot of Net3-World** (A–E, 2026-08-26), which is the sample
+    to build against and the count to beat. Four of the five are pairs of near neighbours whose
+    leaders splay apart; one (D) is a cluster near the reservoir where three labels compete for the
+    same open sector.
+  - So the honest phases are: **count the crossings** (a segment-intersection test, cheap), **try
+    the stack on each crossing pair**, and **measure whether the count went down** on that same
+    drawing. If it does not, the strategy is wrong and no amount of tuning saves it.
+
 
 - 75|540| **[H] Both halves are BUILT; the wording and phase 2 stay open.**
   Shipped for Tom's 2026-08-26 request: a `Connection` property whose conditions are the three
@@ -831,6 +795,12 @@ the block.
     block: *"Semi-retired senior water engineer with a body of established software and online
     calculators seeks radical volunteer engagement."* That is a personals ad, it is honest, it says
     who is asking and what for, and it does not mention anybody else's product.
+  - **HE HAS STARTED, 2026-08-26:** *"I started using that appeal today, and I joined the
+    EPANET-USERS listserv to ask about hydrant modeling and more later."* So the sentence is in use
+    and there is now a channel to real practitioners. **That listserv is also the place the fire-flow
+    questions in Task 530 could be answered by people rather than by search** — the emitter posture,
+    and whether anyone models the assembly at all.
+
 
 - 100|468| **Demand categories on a junction — the breakdown the importer already flattens.**
   - **PROMOTED TO 100 BY TOM, 2026-08-26, because it is presenting as a bug:** *"Since it's
