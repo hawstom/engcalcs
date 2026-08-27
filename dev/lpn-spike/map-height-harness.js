@@ -261,9 +261,22 @@ console.log('\n--- opening a project does not resize the canvas ---');
 	const paneApply = stripComments(extract('applyPaneLayout'));
 	report(/applyMapHeight\(\);/.test(paneApply) && !/svg\.setAttribute/.test(paneApply),
 		'the bottom pane re-measures the map and never sizes it');
+	// **THE LOCK BANNER IS THE THIRD PIECE OF CHROME IN FLOW ABOVE THE CANVAS**, beside the tab
+	// strip and the page titles, and it joined this list on 2026-08-27 for a defect Tom found: the
+	// banner appears after the canvas has been sized, so the whole page sits one banner lower with a
+	// map still sized for a page without one -- the footer, the legends and the tile credit off the
+	// bottom. It is allowed here for the same reason `stripHeightBefore` is, and under the same
+	// discipline: it re-measures only when its own height CHANGED, so a banner that merely rewords
+	// itself moves nothing. Named tokens rather than a loose `heightBefore`, so the allowance stays
+	// as narrow as the two things it allows.
+	const bannerFn = stripComments(extract('renderBanner'));
+	report(/bannerHeightBefore/.test(bannerFn) && /applyMapHeight\(\)/.test(bannerFn),
+		'the lock banner re-measures the map when it appears or goes away');
+	report(/!== bannerHeightBefore/.test(bannerFn),
+		'...and only when its own height changed, so rewording it moves nothing');
 	const callers = stripComments(src).split('\n')
 		.filter(l => /applyMapHeight/.test(l) && !/function applyMapHeight/.test(l));
-	report(callers.every(l => /resize|orientationchange|document\.hidden|'load'|fonts|requestAnimationFrame|stripHeightBefore|applyMapHeight\(true\)|^\s*applyMapHeight\(\);$/.test(l)),
+	report(callers.every(l => /resize|orientationchange|document\.hidden|'load'|fonts|requestAnimationFrame|stripHeightBefore|bannerHeightBefore|applyMapHeight\(true\)|^\s*applyMapHeight\(\);$/.test(l)),
 		'every caller is a window/chrome event, never a document one',
 		callers.length + ' call sites');
 }

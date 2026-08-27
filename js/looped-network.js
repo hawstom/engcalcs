@@ -14755,6 +14755,12 @@ var EngCalcs = EngCalcs || {};
 				if (!lockNow || !lockNow.ok) {
 					lockErrorCode = (lockNow && lockNow.error) || '';
 					lockUnavailable = true;
+					// **A DISMISSAL MUST NOT BUY SILENCE AT THE MOMENT OF THE WRITE.** If this
+					// warning was put away, setLockUnavailable() will not raise it again -- so the
+					// save says it once, as a notice that expires. The user is told; they are not
+					// handed back the banner they closed. The message is the banner's own, so there
+					// is no second wording of the same fact.
+					if (lockWarnDismissed === lockWarnKey()) { setNotice(lockUnavailableMessage()); }
 					setLockUnavailable(true);
 				}
 				if (lockNow && lockNow.ok && !lockNow.held) {
@@ -15498,12 +15504,32 @@ var EngCalcs = EngCalcs || {};
 	// read-only wins when both are set: it is the one that changes what the user is allowed to do.
 	var bannerRO = null;   // { message, stealFrom } | null
 	var bannerWarn = null; // { message, actionLabel, action, dismissable } | null
+	// **THE BANNER IS PAGE CHROME IN FLOW ABOVE THE CANVAS, so it re-measures the map when its own
+	// height changes** -- the same rule, and the same three lines, renderTabs() uses for the tab
+	// strip wrapping onto a second line.
+	//
+	// Tom, 2026-08-27: *"There is a file save message that I believe is a culprit pushing the map
+	// off the bottom of the screen... If I reload the page, the message is gone and the map sizes
+	// correctly."* He was right and the diagnosis is exact: the canvas is sized to fill the window
+	// minus what is above and below it, the banner appears AFTER that measurement, and nothing asked
+	// for another. The whole page then sits one banner lower with a canvas still sized for a page
+	// without one -- and #lpn_map_footer, the two legends and the tile credit go off the bottom with
+	// it. A reload has no banner, which is why a reload "fixed" it.
+	//
+	// **THIS IS NOT THE MODEL TELLING THE MAP ITS HEIGHT** (the rule dev/lpn-spike/map-height-harness.js
+	// enforces). A lock banner is a fact about a FILE and a SERVER, arriving as chrome in the page's
+	// own flow, which is the class the tab strip, the page-title toggle and the bottom pane are all
+	// in. MEASURED, never assumed: a banner that merely changes its words re-measures nothing.
 	function renderBanner() {
 		var banner = document.getElementById('lpn_lock_banner');
 		if (!banner) { return; }
 		var pc = EngCalcs.pageConfig || {}, state = bannerRO || bannerWarn;
+		var bannerHeightBefore = banner.getBoundingClientRect().height;
+		function settle() {
+			if (banner.getBoundingClientRect().height !== bannerHeightBefore) { applyMapHeight(); }
+		}
 		banner.innerHTML = '';
-		if (!state) { banner.style.display = 'none'; return; }
+		if (!state) { banner.style.display = 'none'; settle(); return; }
 		// Amber for a warning you may work through, red for a state that has taken editing away.
 		banner.style.borderColor = bannerRO ? '#a00' : '#a80';
 		banner.style.background = bannerRO ? '#fff0f0' : '#fffbe6';
@@ -15542,11 +15568,30 @@ var EngCalcs = EngCalcs || {};
 			// unsure which way this should go). Undismissable in the ordinary online case, because
 			// there the warning describes a real, fixable risk to a colleague's work; permanently
 			// undismissable in the offline case would be noise nobody can ever act on.
-			if (bannerWarn.dismissable) {
+			// **EVERY WARNING BANNER IS DISMISSABLE** (Tom, 2026-08-27: *"I also don't like that this
+			// message is permanent and undismissable."*). It was dismissable only when the missing
+			// server was a standing condition -- offline, or installed as an app -- on the argument
+			// that an ordinary online failure is a real, fixable risk to a colleague's work and
+			// should stay on screen. The argument is sound and it is still not worth a banner
+			// nobody can put away: the one it actually punishes is the person on a site whose lock
+			// folder is not writable, who is told a true thing about somebody else's server on every
+			// screen for as long as the page is open, with nothing to do about it.
+			//
+			// What replaces the permanence is `lockWarnDismissed`: the dismissal is remembered for
+			// THIS project and THIS fault only, so a different fault, a different project, or
+			// locking starting to work all bring the banner back on their own.
+			if (bannerWarn.kind === 'lock') {
+				action(pc.lpn_lock_dismiss || 'Dismiss', function () {
+					lockWarnDismissed = lockWarnKey();
+					bannerWarn = null;
+					renderBanner();
+				});
+			} else if (bannerWarn.dismissable) {
 				action(pc.lpn_lock_dismiss || 'Dismiss', function () { bannerWarn = null; renderBanner(); });
 			}
 		}
 		banner.style.display = 'block';
+		settle();
 	}
 	// Recomputes read-only from the CURRENT tab and nothing else. Called on every tab switch and
 	// whenever a lock answer changes: the banner describes the project you are looking at, and a tab
@@ -15605,38 +15650,46 @@ var EngCalcs = EngCalcs || {};
 		heldLocks.delete(id);
 		syncReadOnlyToOpenProject();
 	}
-	// True where having no server is a standing condition of this session rather than a fault.
-	function lockWarningDismissable() {
-		try {
-			if (navigator.onLine === false) { return true; }
-			if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) { return true; }
-		} catch (err) { /* older browsers: treat as ordinary online use */ }
-		return false;
-	}
+	// **WHAT A DISMISSAL DISMISSES: this fault, on this project, and nothing else.** Held in a
+	// variable and never stored -- it is a fact about this sitting, not a preference, and writing it
+	// to the device would be new storage answering a question that expires when the tab does
+	// (dev/cookie-storage-inventory.md's exemption test).
+	//
+	// The key carries the error CODE as well as the project, so a site whose lock folder is not
+	// writable is said once, while a DIFFERENT failure -- the server going away, the lock table
+	// filling up -- is a new thing to say and says itself.
+	var lockWarnDismissed = '';
+	function lockWarnKey() { return String(library.openId || '') + '|' + String(lockErrorCode || ''); }
 	// The moment of danger is opening a file we could not lock (Tom, 2026-08-03): from then on
 	// nothing is stopping a colleague from editing the same file, and the user has to know. Stated as
 	// a standing banner rather than a modal alert precisely because it PROMISES a follow-up -- a
 	// modal cannot come back later to say the risk has passed, and this one can.
 	function setLockUnavailable(on) {
+		// Locking working again is a state CHANGE, so it also forgets the dismissal: if it stops
+		// working a second time, that is news.
+		if (!on) { lockWarnDismissed = ''; clearWarn('lock'); return; }
+		if (lockWarnDismissed === lockWarnKey()) { return; }
+		bannerWarn = {
+			kind: 'lock',
+			message: lockUnavailableMessage(),
+			action: null,
+			dismissable: true
+		};
+		renderBanner();
+	}
+	// ONE WORDING OF THE FAULT, for the banner and for the save-time notice alike.
+	// A setup fault reads completely differently from an outage, and only one of the two is
+	// somebody's to go and fix. Naming it is the difference between an afternoon of confusion and
+	// one chmod.
+	function lockUnavailableMessage() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!on) { clearWarn('lock'); return; }
-		// A setup fault reads completely differently from an outage, and only one of the two is
-		// somebody's to go and fix. Naming it is the difference between an afternoon of confusion
-		// and one chmod.
-		var msg = lockErrorCode === 'notasked'
+		return lockErrorCode === 'notasked'
 			? (pc.lpn_lock_not_asked || 'Locking is not running for this project, so nothing is stopping a colleague from editing the same file at the same time. This browser has no name recorded for you yet, or the project has no identifier — saving the project to a file sets both.')
 			: lockErrorCode === 'full'
 			? (pc.lpn_lock_full_error || 'Beware: this site has run out of room to record who has which project open, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here.')
 			: lockErrorCode === 'storage'
 			? (pc.lpn_lock_storage_error || 'Beware: this site cannot save lock records, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here — the lock folder is not writable by the web server.')
 			: (pc.lpn_lock_unavailable || 'Beware: could not reach the server to check or create a lock on this project, so nothing is stopping a colleague from editing the same file at the same time. You will be told if locking starts working again.');
-		bannerWarn = {
-			kind: 'lock',
-			message: msg,
-			action: null,
-			dismissable: lockWarningDismissable()
-		};
-		renderBanner();
 	}
 	function setFileMissing(on) {
 		var pc = EngCalcs.pageConfig || {};

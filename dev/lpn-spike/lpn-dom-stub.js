@@ -271,6 +271,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_project_file', 'lpn_inp_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',
   'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2', 'lpn_map_status',
   'lpn_map_footer',
+  // The lock/warning banner (Task 195), which is page chrome in FLOW above the canvas -- so its
+  // appearing changes the map's height (Task 552). A stub without it made renderBanner() return at
+  // its first line and every banner rule untestable.
+  'lpn_lock_banner',
   // The New-project box and its controls (ROADMAP Task 477). #lpn_new_units_fields is the one JS
   // fills, by cloning the strip's own `.lpn-units-item` wrappers into it.
   'lpn_new_panel', 'lpn_new_units_fields', 'lpn_new_method', 'lpn_new_place', 'lpn_new_create',
