@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**61 open tasks.** Next (100): 9 · Soon (75): 14 · Someday (50): 10 · Maybe (25): 12 · Parked (5): 16
+**67 open tasks.** Next (100): 9 · Soon (75): 18 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 16
 
 ## 100 — Next (9)
 
@@ -18,10 +18,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
 - Task 510 — Saved paths work; the arrow that opens them is not discoverable.
-- Task 530 — Available fire flow at a hydrant, with the hydrant assembly modelled.
+- ! Task 530 — [H] · Fire flow: what shipped answers ONE hydrant. The real question is the whole system.
 - ! Task 537 — [H] · RESEARCHED, AND BOTH SEATS SAY THE PREMISE IS WRONG. Tom's call on what follows.
 
-## 75 — Soon (14)
+## 75 — Soon (18)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -37,8 +37,12 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 532 — An English style guide for label wording — Tom says he is writing one by intuition.
 - Task 533 — Renaming a link leaves `incidentLinks` pointing at the old id.
 - Task 536 — [H] · Did the Manning button fix also cure the second symptom?
+- Task 539 — Gang the neighbour labels so their leaders stop crossing.
+- ! Task 540 — A Find that reports disconnected nodes, and the beginning of a query language.
+- Task 542 — Terrain elevations: the button did more than a curious user expected.
+- ! Task 543 — [H] · The menus are outgrowing their names: View is really Map, and Insert is really Water.
 
-## 50 — Someday (10)
+## 50 — Someday (12)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 186 — Make the Tables pane spreadsheet-interoperable.
@@ -50,6 +54,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 285 — We do not know what devices anybody uses this on.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
+- Task 541 — Clicking a label: should it select the asset for editing?
+- ! Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have not decided what to do.
 
 ## 25 — Maybe (12)
 
@@ -87,5 +93,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-56 of 61 titles are within 4–12 words. `!` marks the rest;
+58 of 67 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

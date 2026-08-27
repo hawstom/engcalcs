@@ -137,123 +137,40 @@ the block.
     map's own 1/cos(latitude) — 9% from 20° to 31°. Unavoidable on an unprojected display without an
     anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.
 
-- 100|530| **Available fire flow at a hydrant, with the hydrant assembly modelled.**
-  Promoted from the `utility-planning-engineer`'s own wish list (Tom, 2026-08-25). *How much can
-  this hydrant deliver while a critical node holds >= 20 psi?* Flow and pressure trade, so it is a
-  search: guess a hydrant demand, solve, check the residual, bisect. Today it is done by hand with
-  scenario overrides. AWWA M31 defines the required flow at 20 psi residual; EPANET has no built-in
-  tool for it, so this is not a gap against EPANET.
-  - **THE ASSEMBLY IS PART OF THE ANSWER, AND THE STANDARD IS NON-NEGOTIABLE.** Tom, 2026-08-25:
-    *"including **some** k whatsoever is non-negotiable"*, and *"we must either ask or disclose our
-    assumptions about the diameter, roughness, k, and length of a hydrant and lateral assembly. The
-    fire flow wizard must include this add-on to the entered assets of the system, and this is an
-    ad-hoc add-on applied before asserting anything about fire flow."*
-    - **BARREL + LATERAL + k**, agreeing with the research: model the hydrant's own waterway as a
-      short pipe at its real diameter, in series with the lateral, AND carry a k. Not one or the
-      other — a k of zero is not an option here.
-    - **THE DANGER IS THAT FRICTION IS NOT DOMINANT.** The runs are so short that minor losses
-      carry the answer, so this is *"the one place where we must most necessarily provide k guidance
-      and demand reasonable k."* **Research it to be standard; if the research is thin, be
-      reasonable and do not swallow a camel.**
-    - **The add-on is AD-HOC and never enters the user's document** — not the asset list, not a
-      saved file, not the `.inp` export. Same boundary the solve already keeps.
-    - **A FIRE HYDRANT LIBRARY IS SAVED WITH THE PROJECT** (Tom). So a hydrant type is a reusable
-      named thing, stored in the project file like any other user data, inheriting every rule there.
-  - **Fire hose losses are OUT OF SCOPE and that is deliberate** — *"we can safely leave the fire
-    hose losses to somebody else."* The one alternative he left open: a *"to the building"* analysis
-    including the fountain stream, **if that is standard**. Research decides; do not build it on a
-    hunch.
-  - **RESEARCH ROUND 1 DONE 2026-08-25** (`dev/agents/utility-planning-engineer/journal.md`), and it
-    corrected the premise. The four that change what gets built:
-    1. **150 mm is the hydrant's SHOE, not its waterway.** AWWA C502 sets the main-valve waterway at
-       **4½ or 5¼ in (114–133 mm)** behind a 6 in mechanical-joint inlet. Modelling "a 150 mm
-       hydrant" as one 150 mm pipe leaves the real constriction out and reproduces **exactly the
-       overstatement this task exists to prevent**.
-    2. **THE `k` EXISTS AFTER ALL, and round 2 found it 2026-08-25.** Not in the hydraulics
-       literature — in **AWWA C502's QA clause**, as a maximum-allowable friction loss: *3.0 psi at
-       1000 gpm through the 4½ in pumper nozzle*, quoted word-for-word in a municipal design
-       standard and in a manufacturer's own spec sheet, independently. Referenced to velocity in the
-       6 in lateral that is **K ≈ 3.5** for barrel + main valve + nozzle. Add Crane TP-410 fittings
-       for the rest of the run — tee off the main ≈1.0, gate valve ≈0.15, elbow ≈0.3–0.5 — and the
-       **recommended total is K ≈ 5, range 3–6**, carried as TWO labelled pieces (a QA-derived
-       dominant term plus a Crane-derived remainder), never as one measured number for a whole
-       assembly. It is a worst-case ALLOWABLE, so a real hydrant does at least this well — the
-       conservative direction. **Do NOT import the pitot Cd (0.90/0.80) as a `k`;** it converts a
-       field pitot reading to gpm and is a different quantity that merely sounds adjacent.
-    2b. **Tom's worry is confirmed, moderately.** At 1000 gpm through 6 in C=140 DI, friction is
-       64.5 ft per 1000 ft against the barrel's fixed 6.93 ft. So minor loss is **4.3x friction at
-       25 ft, 2.2x at 50 ft, and about equal at 100 ft** — across every lateral length real agency
-       standards use, minor loss is never the smaller term. (The agent's first pass reported 10-40x
-       from a mis-remembered Hazen-Williams constant and caught it by cross-checking against
-       Darcy-Weisbach. The corrected figures are the ones above.)
-    2c. **"To the building" is CLOSED — the answer is no.** AWWA M31 and NFPA 291 both define
-       performance at the outlet; WaterGEMS's own Hydrant element stops at the same boundary, with
-       the identical three fields and no published default for any of them. Past the nozzle is
-       fire-ground hydraulics, whose inputs a distribution model cannot know at design time because
-       the hose lay is chosen at the scene.
-    2d. **The saved library type carries:** make, model, waterway diameter (4½ or 5¼ in), outlet
-       configuration, and the `k` itself — editable, defaulting to ~5, with its source visible **and
-       with the VELOCITY IT IS REFERENCED TO stated beside it.** Tom, 2026-08-25: *"We must be
-       crystal clear on which velocity any k belongs to. I see this as critical in the hydrant
-       model."* The assembly has two diameters, so `V²/2g` differs by ~3.16x between them and a
-       re-referenced `k` moves the answer 18.9% — measured. `js/lpn-fireflow.js` now names the
-       reference in the constant names, in `assembly.k.referencedTo`, and per part.
-    2e. **A PRE-COMPUTED q-vs-loss TABLE WAS CONSIDERED AND DECLINED — `dev/fireflow-loss-table.md`.**
-       Tom asked whether EPANET takes one and whether the hydrant can be injected into the physical
-       model. **Yes to both, and the second is already what we do** (`lpnFireFlowBuild()` builds the
-       assembly onto a COPY). EPANET takes a loss table as a **GPV**, and `js/lpn-inp.js` already
-       imports and exports one. **But the saving is not real:** the assembly costs **+0.029 ms of a
-       0.613 ms solve** on 49 junctions and nothing measurable at 225, because the bisection's cost
-       is the NETWORK solve, which no table can remove. It would also cost the built-in solver —
-       `lpnValveIsNative` is true only for a TCV, so a GPV would make this search EPANET-only. A
-       stored table is also a cached derived value that can go stale. **Dimensions and a `k`, not a
-       table.** The one case that would justify points is a manufacturer's MEASURED curve, and even
-       then it converts to a `k` at the lateral's velocity for the solve.
-       **Deliberately NOT in the type:** installation year and NFPA 291 colour class, which are
-       per-instance facts that go stale if baked into a reusable type; and the lateral's own
-       diameter, length and roughness, which stay per-instance ad-hoc inputs.
-    3. **Ask or disclose, per quantity.** LENGTH must be asked — five agency standards span 25–100 ft
-       for the same pipe. Diameter carries a disclosed 6 in; roughness a disclosed cement-lined DI
-       C≈120–140, the cheapest of the four to get wrong.
-    4. **A "rated" flow is a SYSTEM measurement, not a hydrant property** — NFPA 291 rates what the
-       system delivered through that hydrant at 20 psi, at that location. Available fire flow is
-       quoted **at the outlet**. **ISO caps single-hydrant credit at 1,500 gpm** whatever the
-       hydraulics say.
-  - **THE ENGINE SHIPPED 2026-08-25: `js/lpn-fireflow.js`, pure, plus
-    `dev/lpn-spike/fireflow-harness.js`.** `EngCalcs.lpnFireFlow(model, options)` always returns a
-    promise and takes **the solve as an injected dependency** — the native engine is synchronous,
-    EPANET's is a promise, an active valve routes to EPANET, and a search costs ~16 solves, so the
-    caller chooses. The assembly is built on a COPY (input byte-identical, asserted), the k is
-    derived from 3.0 psi at 1000 gpm rather than typed, and every assumption is overridable and
-    reported `supplied`/`default`. Every edge case has a name: `below-residual-at-rest`,
-    `search-ceiling-reached`, `solve-did-not-converge`, `hydrant-node-not-found`,
-    `hydrant-node-not-a-junction`, `lateral-length-required`. ISO's 1,500 gpm is a note, never a
-    clamp. Worked example checked against EPANET's own 4.727 equation and an independent root find.
-  - **MEASURED, and the second number is the surprise:** on the harness network the barrel
-    constriction (4½ in vs 6 in over 5 ft) is worth **1.06%**, while the k is worth **11.6%**. Both
-    are needed, but the barrel earns its place mostly by being where the QA-derived k is measured,
-    not by its own friction. Do not quote the constriction as the big term.
-  - **THE BOX SHIPPED 2026-08-25 — Project ▸ Fire flow at a hydrant…** One dialog: it asks the
-    hydrant junction, the lateral length (empty, and refused when absent), the residual and the
-    critical point, and it DISCLOSES the other six assumptions in editable boxes with the k's
-    reference velocity read off the lateral-diameter box beside them. An untouched box passes
-    nothing to the engine, which is what keeps the engine's own `supplied`/`default` honest and what
-    keeps the k's two labelled halves. The answer restates every assumption with `assumed` /
-    `you gave this`. 54 new `lpn_ff_*` keys; `dev/lpn-spike/fireflow-wizard-harness.js` drives the
-    real listeners (64 checks) and snapshots the document around the whole exchange.
-    - **The hydrant's own junction is NOT offered as a critical point, deliberately.** Demand-driven
-      solve: the assembly hangs downstream of the tee, so nothing in it can move that node's
-      pressure. Offering it beside the outlet would quietly hand back a larger number that is not an
-      available fire flow. The tip says so.
-    - **Roughness is the one knob the page must supply rather than disclose** when the project's
-      friction method is not Hazen-Williams — the engine's 130 is a C, and under Darcy-Weisbach it
-      would be a 130 m roughness height. It is still shown and still editable; it is just not called
-      the user's.
-  - **STILL TO BUILD: the hydrant library.** The saved-with-the-project hydrant type (fields listed
-    above). It did NOT fall out of the wizard cheaply: the wizard's inputs are per-run and live for
-    one page load, while a library entry is user data in the project file with a name, an editor, an
-    index and a document version behind it — every rule `dev/looped-network-calculator-scope.md`
-    puts on stored data. Wording is Tom's.
+- 100|530| **[H] Fire flow: what shipped answers ONE hydrant. The real question is the whole system.**
+  **MOVED TO BRANCH `fire-flow` 2026-08-26, on Tom's call**, with the engine, the box, 55 language
+  keys, two harnesses and a browser spec. Master carries none of it. He asked for the hold and gave
+  the reason: *"Isn't this a much bigger task than we've contemplated?... we need more research and
+  planning before putting this on master."*
+  - **THE QUESTION HE WANTS ANSWERED, in his words:** *"Which nodes in my system can provide fire
+    flow (available vs required) or alternatively (separate Design question and analysis) provide it
+    without causing other nodes to fail or links to have excessive velocity (effect on critical
+    other asset at design flow)?"* — **and highlight every junction as Passing, Failing, or causing a
+    Design issue.** That is a whole-system sweep, not one hydrant: *"a big analysis that could take
+    minutes to run for a big system."* What is on the branch is a development step toward it.
+  - **TWO ANALYSES, NOT ONE, and he separates them himself.** *Available vs required* is a
+    compliance question about one node. *Does drawing it break something else* is a design question
+    about the whole network — other nodes falling below their minimum, links running at excessive
+    velocity. They need different reports and probably different runs.
+  - **[H] THE TIME QUESTION IS OPEN:** *"for an extended (time) simulation, don't we need to let/make
+    the user choose the peak hour or desired time step for the analysis?"* Almost certainly yes, and
+    it changes the interface before it changes the engine.
+  - **THE EMITTER QUESTION DECIDES THE SHAPE AND IS UNRESOLVED.** Tom asked Gemini and got that
+    analysis is normally done on RAW NODES against the pumper nozzle, that the 20 psi rule is partly
+    a fat factor covering the unmodelled hydrant, and that an emitter coefficient is sometimes used
+    to represent the hydrant. **He doubts that last part and his reason is good:** an EPANET emitter
+    is PRESSURE-driven, and a fire flow demand is not — so an emitter may not be able to represent
+    a hydrant at all. Reference he found: `openepanet.org/Topic/22142`. **Settle this from EPANET's
+    own documentation before designing anything**, because "model the assembly" and "use an emitter"
+    are different products.
+  - **HOWEVER WE ACCOUNT FOR HYDRANT LOSSES, IT MUST BE VISIBLE AND PROBABLY SELECTABLE.** Tom:
+    *"I want to be very explicit and transparent, maybe even selectable, about how we account if at
+    all for hydrant losses beyond the node."* If the profession's default is raw-node analysis, then
+    OUR modelled assembly is the unusual choice and has to be offered rather than imposed.
+  - **The box must be moveable and resizeable** (Tom, 2026-08-26). It centres, which he liked.
+  - Everything already researched and built is on the branch and in
+    `dev/agents/utility-planning-engineer/journal.md` — the AWWA C502 k, the ISO 1,500 gpm cap, the
+    lateral standards, `dev/fireflow-loss-table.md`. **None of it needs redoing.**
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
@@ -809,6 +726,110 @@ the block.
   - `hitConfirmed()` is where the float32 half of this was already fixed, so it is the place to look
     first. Whatever number is chosen must be asserted at 360px, where every other phone fix is
     guarded.
+
+- 75|539| **Gang the neighbour labels so their leaders stop crossing.**
+  Tom, 2026-08-26, with a screenshot of two node labels whose leaders cross: *"This might be
+  forgiveable if it looked difficult or impossible. But when it looks so easy (to a human) to
+  resolve, it's embarrassing."* **That is the right test and it is the one to build against** — not
+  "are the labels legible" but "would a person looking at this see an obvious fix we missed".
+  - **His strategy, and the name is his:** *"can two nearby nodes be labeled as a gang in a
+    direction that makes their leaders mutually clear each other's nodes? Maybe we call this the
+    gang neighbor nodes strategy."* Three ingredients he lists: **(a)** knowledge of the most-open
+    sectors, **(b)** full awareness of the immediate vicinity of the labels, **(c)** parallel
+    leaders and/or label stacking.
+  - **What makes this different from every previous label pass** is that it optimises a PAIR (or a
+    small cluster) rather than one label at a time. `shedAlignedForConflicts()` places one label,
+    then treats it as an obstacle for the next — which is why two labels can each be locally
+    reasonable and jointly absurd. A gang move has to consider both placements together.
+  - **The pieces exist.** `js/lpn-collide.js` is pure weighted-box relaxation with no DOM;
+    `js/lpn-geom.js` has leader attachment and arc-length. Task 400 (parked) surveyed the
+    optimum-preserving reduction rules and bounded chain search in `dev/label-placement-algorithms.md`
+    — **read that before designing, because a crossing pair is exactly the conflict-graph case it
+    covers**, and Tom parked it only for lack of real-world feedback. This screenshot is that
+    feedback.
+  - **Two leaders crossing is a CHEAP thing to detect** — a segment-intersection test on the placed
+    pairs — so a first phase could simply find them and report a count, which would say how big the
+    problem actually is before anybody optimises anything.
+  - Tom, in the same breath: *"I don't want to be forever tweaking this."* So a phase that measures
+    before it tunes is the honest opening.
+
+- 75|540| **A Find that reports disconnected nodes, and the beginning of a query language.**
+  Tom, 2026-08-26: *"It would be nice to see a report (under find) of disconnected nodes."* Then the
+  larger idea: *"Maybe we can move toward and start teaching users a simple query language by
+  printing right above the Find button a string or maybe even better, an input that represents the
+  query as a string like 'Junction.ID contains 223' or 'Junction.Links is empty' or something
+  better."*
+  - **The disconnected report is the useful half and it is nearly free.** `lpnDiagnose()` already
+    finds isolated nodes — it is what produces *"node J7 is isolated behind a closed link"* — so
+    this is a door onto an answer the page already computes, not a new analysis.
+  - **The query string is the interesting half and it is a TEACHING device**, which is why he wants
+    it shown even before it is editable: the controls stay the way in, and the string above the
+    button says what the controls just expressed. **Phase 1 is read-only** — build the string from
+    the existing Find controls and print it. Nobody has to parse anything.
+  - **Phase 2, making it an input, is a parser and a grammar and is a different task.** Do not start
+    there. The value of phase 1 is that it tells us whether anybody looks at the string at all.
+  - **[H] The grammar is naming and is Tom's.** `Junction.Links is empty` versus `no links` versus
+    something else is a wording decision with a long tail, since every operator becomes a translated
+    string or a deliberately untranslated token. Propose, do not choose.
+
+- 50|541| **Clicking a label: should it select the asset for editing?**
+  Tom's question, 2026-08-26: *"Node insert and auto-edit mode: When you click on a label, should it
+  put you in edit mode?"* **Unanswered on purpose — it is a design question, not a defect.**
+  - The argument for: a label IS its asset as far as a reader is concerned, and clicking the thing
+    you can see is the whole point of a map.
+  - The argument against, and it is the reason this is not obvious: a label is DRAGGABLE, and a
+    click that both selects and begins a drag is the collision Task 417 is already about on touch.
+    A label also often sits over a DIFFERENT asset than the one it names, so "click what is under
+    the pointer" and "click what the label refers to" can disagree.
+  - Related and worth reading together: Task 417 (long-press enters Edit mode; the touch radius).
+
+- 75|542| **Terrain elevations: the button did more than a curious user expected.**
+  Tom, 2026-08-26, after pressing it: *"To be honest, I did not expect nor necessarily welcome what
+  I got. I was just a dilettante pushing a cool new button that I found."* **That sentence is the
+  defect** — the feature is destructive, it is one undo slot, and it offered no way to choose.
+  - **(a) The feature he actually wants first is elevation ON CREATION:** *"the main cool feature to
+    have is assignment of elevations on creation of nodes. And I think that this must be an option
+    at Setting.New assets.Values.Elevation. 'Set from Mapbox DEM'."* That is not destructive at all,
+    which is why it is the better front door.
+  - **(b) Filling EXISTING nodes needs control he does not have:** the planned lasso, or Elevation
+    as an option under Find and replace, or this menu row with a prior selection. *"But this is
+    destructive, and it can only use one undo stack slot."*
+  - **(c) A long list must condense to RANGES** — his form: `nodes 262, 268-276, 302-328`. The
+    current cap names twelve and counts the rest, which is honest but loses the shape.
+  - DONE 2026-08-26: the wording is "from Mapbox DEM", and the accuracy sentence now names
+    3DEP-class data where it exists instead of stating only the global floor.
+
+- 75|543| **[H] The menus are outgrowing their names: View is really Map, and Insert is really Water.**
+  Tom, 2026-08-26, having found the terrain row under View: *"this is evidence that our menu system
+  is getting confusing and complicated with this under View when it really has something to do with
+  mapping, but nothing to do with view."*
+  - **The cheap move he names first: rename View to Map**, *"which would work for the moment."*
+  - **The larger one is a principle he is willing to relax:** every water asset is inserted under
+    Insert, which is *"another exception to 'Everything about Water modeling is under Water'"*. His
+    proposal — **let things live in two places**, with a canonical home that may be less handy than
+    an alternate one. Insert's rows could appear under Water as a submenu; the map rows under a new
+    Map menu; Insert then either stays as the handy alternate (*"especially on a phone, that lacks
+    the toolbar"*) or goes.
+  - **A future power-user idea, recorded so it is not lost:** a mnemonic letter beside each
+    asset-adding row, *"the ultimate power user (data entry person) efficiency UX"*. That is the
+    data-entry-clerk seat's subject and should wait for it.
+
+- 50|544| **[H] epanet-js is implicitly claiming to be EPANET, and we have not decided what to do.**
+  Tom, 2026-08-26, and he calls it socially difficult: *"epanetjs is legally, but unethically,
+  implicitly claiming to be epanet. For example, they have a Youtube video posted with the title
+  'Fire flow analysis with EPANET'. We need to note this because one school of thought says that we
+  should fight fire with fire. Our school of thought may be contrary. But we aren't going anywhere
+  without users, and apparently the name EPANET is gold."*
+  - **This is recorded rather than acted on, deliberately.** `dev/positioning.md` is the authority
+    for every public claim and it leads with the invitation, not the comparison. Nothing here
+    changes that without Tom saying so.
+  - **He is considering help:** *"Maybe I need to get human advisers. But a marketing specialist
+    agent might not hurt."* A marketing seat would have to carry outside evidence, like every other
+    seat (`dev/agents/README.md`), not just an opinion about names.
+  - **AND HE HAS WRITTEN THE POSITIONING SENTENCE HIMSELF**, which is the most useful thing in this
+    block: *"Semi-retired senior water engineer with a body of established software and online
+    calculators seeks radical volunteer engagement."* That is a personals ad, it is honest, it says
+    who is asking and what for, and it does not mention anybody else's product.
 
 - 100|468| **Demand categories on a junction — the breakdown the importer already flattens.**
   - **PROMOTED TO 100 BY TOM, 2026-08-26, because it is presenting as a bug:** *"Since it's
