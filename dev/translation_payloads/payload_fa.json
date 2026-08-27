@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 1403,
-        "delta_key_count": 71,
+        "expected_key_count": 1408,
+        "delta_key_count": 80,
         "exempt_key_count": 18,
         "exempt_keys": [
             "u_imgd",
@@ -490,6 +490,15 @@
         "lpn_profile_delete_confirm": "Delete the saved path {name}? The drawing itself is not changed.",
         "lpn_profile_none_saved": "No saved paths yet",
         "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
+        "lpn_new_title": "New project",
+        "lpn_new_coords": "Coordinates",
+        "lpn_new_coords_xy": "xy grid",
+        "lpn_new_coords_geo": "lat\/lon, on the Earth",
+        "lpn_new_coords_tip": "An xy project is a drawing on a grid, with no place on the Earth. A lat\/lon project sits on real ground, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be put on the ground later with File > Import xy to lat\/lon.",
+        "lpn_new_place": "Start near this place",
+        "lpn_new_place_tip": "Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap's place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world.",
+        "lpn_new_place_hint": "Petaluma, California",
+        "lpn_new_create": "Create",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_leader_snap": "Snap leader lines to angle",
@@ -563,6 +572,15 @@
         "lpn_profile_delete_confirm": "Delete the saved path {name}? The drawing itself is not changed.",
         "lpn_profile_none_saved": "No saved paths yet",
         "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
+        "lpn_new_title": "New project",
+        "lpn_new_coords": "Coordinates",
+        "lpn_new_coords_xy": "xy grid",
+        "lpn_new_coords_geo": "lat\/lon, on the Earth",
+        "lpn_new_coords_tip": "An xy project is a drawing on a grid, with no place on the Earth. A lat\/lon project sits on real ground, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be put on the ground later with File > Import xy to lat\/lon.",
+        "lpn_new_place": "Start near this place",
+        "lpn_new_place_tip": "Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap's place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world.",
+        "lpn_new_place_hint": "Petaluma, California",
+        "lpn_new_create": "Create",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_leader_snap": "Snap leader lines to angle",
@@ -1428,6 +1446,150 @@
                     "key": "lpn_view_units",
                     "value": "واحدها",
                     "english": "Units"
+                }
+            }
+        },
+        "lpn_new_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "پروژه جدید…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "باز کردن…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_coords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "پروژه جدید…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "باز کردن…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_coords_xy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "پروژه جدید…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "باز کردن…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_coords_geo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "پروژه جدید…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "باز کردن…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_coords_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "پروژه جدید…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "باز کردن…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_place": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "پروژه جدید…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "باز کردن…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_place_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "پروژه جدید…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "باز کردن…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_place_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "پروژه جدید…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "باز کردن…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_create": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_new",
+                    "value": "پروژه جدید…",
+                    "english": "New project…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "باز کردن…",
+                    "english": "Open…"
                 }
             }
         },

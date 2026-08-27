@@ -1491,6 +1491,26 @@ html[lang="zh"] .ec-welcome {
 .lpn-setbox-title {
 	position: absolute; top: 10px; left: 12px; font-weight: bold; pointer-events: none;
 }
+
+/* ---- THE NEW-PROJECT BOX (ROADMAP Task 477) --------------------------------------------------
+   Four blocks stacked, each a question. Nothing here sets a width: the box's own max-width in
+   Looped-Network.php does that, and the unit strip inside it wraps on its own (.lpn-units-group),
+   which is the whole reason those eight selects were stacked name-over-control in Task 424. */
+.lpn-new-block { margin: 0 0 10px; padding: 0; border: 0; }
+.lpn-new-block > legend { padding: 0; font-size: 1em; font-weight: bold; }
+.lpn-new-block > label { display: block; }
+/* A radio and its words are one target, and the words are the big half of it. */
+.lpn-new-block label > input[type="radio"] { margin-right: .4em; }
+.lpn-new-block > input[type="text"] { width: 100%; box-sizing: border-box; padding: 3px 6px; }
+/* A disabled place field still has to READ as a question that belongs to the other choice, rather
+   than as a broken control: greyed, and the pointer says so. */
+.lpn-new-block > input[type="text"]:disabled { background: #f2f2f2; color: #777; cursor: not-allowed; }
+.lpn-new-presets { margin: 4px 0 6px; display: flex; gap: 6px; }
+/* Create first, and it is the one with weight -- it is what the box is for, and it is what Enter
+   presses. NOT a coloured button beside a grey one for a consent-style pair; this is a create/cancel
+   pair, where naming the default action is the convention rather than a dark pattern. */
+.lpn-new-actions { display: flex; gap: 8px; align-items: center; }
+.lpn-new-actions > button:first-child { font-weight: bold; }
 .lpn-setbox-body { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
 .lpn-setbox-search { flex: 0 0 auto; padding-bottom: 6px; }
 .lpn-setbox-search input { width: 100%; box-sizing: border-box; padding: 3px 6px; }

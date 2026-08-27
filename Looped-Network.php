@@ -873,6 +873,81 @@ echoHeader("EngCalcs", $html_title, "", false);
       // lives as Help > Fix something (which opens contact.php in a new tab, like every other row
       // in that menu) and the template_feedback prose itself moved onto contact.php, where somebody
       // who followed the invitation actually reads it. ?>
+<?php // ---- THE NEW-PROJECT BOX (ROADMAP Task 477) -------------------------------------------------
+      //
+      // It replaces the four-row File > New fly-out -- xy/US, xy/SI, lat-lon/US, lat-lon/SI -- which
+      // could only ever offer the CROSS of two questions and had no room at all for the third and
+      // fourth (which units exactly, and which head-loss formula). Tom, 2026-08-22, naming the
+      // scope from epanet-js: *"they have a wizard box with xy and lat/lon as the top choices, and
+      // if lat/lon is selected, a search box is enabled. Below it are the units and head loss
+      // formula selectors."*
+      //
+      // **THE ARGUMENT AGAINST IT WAS REAL AND IS ANSWERED BY THE DEFAULTS.** The fly-out ASKED FOR
+      // NOTHING -- the choice was which row you clicked -- and a wizard puts a form in front of the
+      // commonest action. So every control here opens on a working answer (the visitor's own unit
+      // preset, an xy grid, Hazen-Williams), and Create is the first thing the keyboard reaches:
+      // the box can be dismissed with one press by anybody who wanted the old one-click blank.
+      //
+      // **STATIC MARKUP, filled and wired by newProjectBox() in js/looped-network.js**, for the same
+      // reason every other panel on this page is: the strings are language keys and PHP is where
+      // those live. What JS builds here is only the eight unit selects, and those are CLONED from
+      // the page's own strip so nothing about a unit family or an option value is retyped. ?>
+<div id="lpn_new_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem" role="dialog" aria-labelledby="lpn_new_title">
+	<div id="lpn_new_title" class="lpn-setbox-title"><?=$ec_lang['lpn_new_title']?></div>
+	<button type="button" id="lpn_new_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body">
+		<?php // THE TOP CHOICE, and it is top because it is the one that cannot be changed afterwards:
+		      // a project is an xy grid or it is on the Earth, and LPN_COORDS_GEO explains at length
+		      // why that is not a toggle. Radios rather than a dropdown -- two options, both worth
+		      // reading, and the second one enables a control below it. ?>
+		<fieldset class="lpn-new-block">
+			<legend><?=ecTipLabel($ec_lang['lpn_new_coords'], $ec_lang['lpn_new_coords_tip'])?></legend>
+			<label><input type="radio" name="lpn_new_coords" value="xy" checked> <?=$ec_lang['lpn_new_coords_xy']?></label>
+			<label><input type="radio" name="lpn_new_coords" value="geo"> <?=$ec_lang['lpn_new_coords_geo']?></label>
+		</fieldset>
+		<?php // ENABLED ONLY FOR LAT/LON, which is Tom's own wording of the rule. An xy grid has no
+		      // place on the Earth to travel to, so the field is disabled rather than hidden: a
+		      // control that appears and vanishes as you touch the radio above it reads as a glitch,
+		      // where a greyed one says "that question belongs to the other choice".
+		      //
+		      // The text goes to js/lpn-search.js's own runner on Create, consent gate and all --
+		      // never to a second search path built into the box. ?>
+		<div class="lpn-new-block" id="lpn_new_place_block">
+			<label for="lpn_new_place"><?=ecTipLabel($ec_lang['lpn_new_place'], $ec_lang['lpn_new_place_tip'])?></label>
+			<input type="text" id="lpn_new_place" autocomplete="off" placeholder="<?=htmlspecialchars($ec_lang['lpn_new_place_hint'])?>" disabled>
+		</div>
+		<?php // The units, as Tom answered it on 2026-08-24: *"all units are shown ... with the US and
+		      // SI presets to set them."* The selects are built by JS from the page's own strip; the
+		      // two preset buttons are here because they are markup with strings in them. ?>
+		<fieldset class="lpn-new-block">
+			<legend><?=$ec_lang['lpn_view_units']?></legend>
+			<div class="lpn-new-presets">
+				<?php // SI first, US second, the order the page's own preset row uses (Tom, 2026-07-30:
+				      // the suite serves a worldwide audience and most of it is metric). Same two
+				      // strings as that row, so there is one name for each system on this page. ?>
+				<button type="button" id="lpn_new_si"><?=$ec_lang['calc_units_si']?></button>
+				<button type="button" id="lpn_new_us"><?=$ec_lang['calc_units_us']?></button>
+			</div>
+			<div id="lpn_new_units_fields" class="lpn-units-group"></div>
+		</fieldset>
+		<?php // Head loss at CREATION rather than four levels down in Settings -- it is a decision
+		      // about the whole model and it decides what the roughness column of every pipe means.
+		      // Every label is borrowed from bpn_, so this row costs no new key. ?>
+		<div class="lpn-new-block">
+			<label for="lpn_new_method"><?=$ec_lang['bpn_method']?></label>
+			<select id="lpn_new_method">
+				<option value="hw"><?=$ec_lang['bpn_method_hw']?></option>
+				<option value="dw"><?=$ec_lang['bpn_method_dw']?></option>
+				<option value="manning"><?=$ec_lang['bpn_method_manning']?></option>
+			</select>
+		</div>
+		<div class="lpn-new-actions">
+			<button type="button" id="lpn_new_create"><?=$ec_lang['lpn_new_create']?></button>
+			<button type="button" id="lpn_new_cancel"><?=$ec_lang['lpn_cancel']?></button>
+		</div>
+	</div>
+</div>
+
 <div id="lpn_notes_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:44rem">
 	<button type="button" id="lpn_notes_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
@@ -926,8 +1001,6 @@ EngCalcs.pageConfig = {
 	lpn_field_text_valign_middle: <?=json_encode($ec_lang['lpn_field_text_valign_middle'])?>,
 	lpn_field_lon: <?=json_encode($ec_lang['lpn_field_lon'])?>,
 	lpn_field_lat: <?=json_encode($ec_lang['lpn_field_lat'])?>,
-	lpn_new_geo_us: <?=json_encode($ec_lang['lpn_new_geo_us'])?>,
-	lpn_new_geo_si: <?=json_encode($ec_lang['lpn_new_geo_si'])?>,
 	lpn_valve_type_pbv: <?=json_encode($ec_lang['lpn_valve_type_pbv'])?>,
 	lpn_valve_type_gpv: <?=json_encode($ec_lang['lpn_valve_type_gpv'])?>,
 	lpn_field_valve_setting_drop: <?=json_encode($ec_lang['lpn_field_valve_setting_drop'])?>,
@@ -1440,8 +1513,6 @@ EngCalcs.pageConfig = {
 	lpn_project_copy_suffix: <?=json_encode($ec_lang['lpn_project_copy_suffix'])?>,
 	lpn_project_rename: <?=json_encode($ec_lang['lpn_project_rename'])?>,
 	lpn_file_new: <?=json_encode($ec_lang['lpn_file_new'])?>,
-	lpn_new_blank_us: <?=json_encode($ec_lang['lpn_new_blank_us'])?>,
-	lpn_new_blank_si: <?=json_encode($ec_lang['lpn_new_blank_si'])?>,
 	lpn_file_open: <?=json_encode($ec_lang['lpn_file_open'])?>,
 	lpn_file_save: <?=json_encode($ec_lang['lpn_file_save'])?>,
 	lpn_file_saveas: <?=json_encode($ec_lang['lpn_file_saveas'])?>,

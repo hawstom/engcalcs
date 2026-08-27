@@ -16009,7 +16009,8 @@ var EngCalcs = EngCalcs || {};
 		// strip -- the last place on this page where a project's units were decided by accident, and
 		// the very thing Task 264 removed from the File menu. Both doors now ask the same question.
 		// stopPropagation for the reason every menu opener here does it: see buildMenuBar().
-		plus.addEventListener('click', function (e) { e.stopPropagation(); openNewProjectMenu(e.currentTarget); });
+		// The + tab and File > New project are ONE act with two doors, and both open the box.
+		plus.addEventListener('click', function (e) { e.stopPropagation(); openNewProjectBox(); });
 		strip.appendChild(plus);
 		// The vertical list sits second, still left of the tabs (Tom's sketch). On a narrow screen it
 		// is the only way in, because CSS hides the tabs themselves there: this page has no horizontal
@@ -16285,54 +16286,222 @@ var EngCalcs = EngCalcs || {};
 	// example published anywhere, EPANET's included, is a US example or an SI example, never one
 	// drawing that rewrites itself. It also removes the only thing on this page that needed inputs to
 	// convert when a unit changed, which is what unblocks Task 263.
-	function newProjectRows() {
-		var pc = EngCalcs.pageConfig || {};
-		return [
-			// **A BLANK PROJECT COMMITS TO A UNIT SYSTEM TOO.** A single "Blank project" row inherits
-			// whatever units happen to be on the strip, which decides a project's units by accident --
-			// and since Task 263 a project's units are part of the project. The fly-out is a template
-			// list, the shape File > New has in every application that has one.
-			{ icon: 'new', label: pc.lpn_new_blank_us || 'Blank XY project, US units (gpm)', fn: function () { newBlankProject('us'); } },
-			{ icon: 'new', label: pc.lpn_new_blank_si || 'Blank XY project, SI units (l/s)', fn: function () { newBlankProject('si'); } },
-			// **TWO MORE ROWS, NOT A CHECKBOX ON THE FIRST TWO** (Task 145). Grid-or-geographic is
-			// declared at creation for the same reason units are, so it is declared the same way: by
-			// which row you click. See LPN_COORDS_GEO for why it cannot be a toggle afterwards.
-			{ separator: true },
-			{ icon: 'globe', label: pc.lpn_new_geo_us || 'Blank lat/lon project, US units (gpm)',
-				fn: function () { newBlankProject('us', LPN_COORDS_GEO); } },
-			{ icon: 'globe', label: pc.lpn_new_geo_si || 'Blank lat/lon project, SI units (l/s)',
-				fn: function () { newBlankProject('si', LPN_COORDS_GEO); } }
-			// **NO "FROM EXAMPLES" ROWS HERE** (Tom, 2026-08-15: *"Code-drawn: Remove the feature."*).
-			// This fly-out used to carry two more rows that built the basic ring main in code. The
-			// GALLERY ships the identical network as two files, with a description and a thumbnail
-			// the code rows could never have -- so the second route was a duplicate that could only
-			// drift, and it was the last caller of an automatic zoom-to-fit on content the user did
-			// not open.
-		];
+	// ---- THE NEW-PROJECT BOX (ROADMAP Task 477) -------------------------------------------------
+	//
+	// It replaces the four-row File > New fly-out. Tom, 2026-08-22, naming the scope off epanet-js:
+	// *"they have a wizard box with xy and lat/lon as the top choices, and if lat/lon is selected, a
+	// search box is enabled. Below it are the units and head loss formula selectors."*
+	//
+	// **WHY THE FLY-OUT HAD TO GO, and it is not that four rows is too many.** Its rows were the
+	// CROSS of two questions -- xy or lat/lon, US or SI -- so a third question would have made eight
+	// rows and a fourth sixteen. The two questions it could never ask are the two this box exists
+	// for: WHICH units exactly (Tom, 2026-08-24: *"all units are shown ... with the US and SI presets
+	// to set them."*), and which head-loss formula, which today is four levels down in Settings and
+	// decides what the roughness column of every pipe means.
+	//
+	// **THE ARGUMENT AGAINST WAS RECORDED AND IS ANSWERED BY DEFAULTS, NOT DISMISSED.** The fly-out
+	// ASKED FOR NOTHING -- the choice was which row you clicked -- and a form in front of the
+	// commonest action is a real cost. So every control opens on a working answer (the visitor's own
+	// preset, an xy grid, whatever friction method this page is set to), Create is the first control
+	// in the box, and Enter presses it. One keystroke is the old one click.
+	//
+	// **NOTHING IN HERE IS A SECOND COPY OF ANYTHING.** The unit selects are CLONED from the page's
+	// own strip, so no unit family, option list or translated name is retyped; the presets are the
+	// same `EngCalcs.unitSets` table the strip's own buttons read; the place search hands its text to
+	// js/lpn-search.js's runner, consent gate and all, rather than growing a quieter geocoder of its
+	// own.
+	//
+	// **THE PROJECT IS MADE ON Create, NOT ON OPEN.** An alternative design makes the project first
+	// and lets the box edit it live, which would need no cloning at all -- and it cannot answer the
+	// one question that has to come first, because xy-versus-lat/lon is fixed when the project is
+	// created (see LPN_COORDS_GEO). A box that made a project you then had to throw away is worse
+	// than a box that clones eight selects.
+	var newBoxUnits = [];     // [{ name, sel }] -- the clone beside the real select's name
+	var newBoxWired = false;
+	function newBoxEl() { return document.getElementById('lpn_new_panel'); }
+	function newBoxIsGeo() {
+		var r = document.querySelector('#lpn_new_panel input[name="lpn_new_coords"]:checked');
+		return !!r && r.value === 'geo';
 	}
-	// The TOOLBAR route opens these as a pull-down under the button, not as a fly-out: there is no
-	// parent row for it to branch from. Same rows either way, built once.
-	function openNewProjectMenu(anchor) { openMenu(anchor, newProjectRows()); }
-	// Blank project, then the units, then the drawing -- the order is the design. setUnits() moves the
-	// whole strip to the preset and re-enters EngCalcs.pageCalculator; doing it while the project is
-	// still empty means nothing is on screen to be re-rendered against the new units.
-	// This ASKS FOR NOTHING. The choice IS the menu item: the user has already said which system they
-	// want by which row they clicked.
-
-	// Blank project, then the units, then whatever content -- and the order is the design. setUnits()
-	// moves the whole strip to the preset and re-enters EngCalcs.pageCalculator; doing it while the
-	// project is still empty means nothing is on screen to be re-rendered against the new units.
-	function newProjectWithUnits(system, coords) {
-		var id = newProject(coords);
-		if (EngCalcs.setUnits) { EngCalcs.setUnits(system); }
+	// **CLONED, AND THE `name` ATTRIBUTE IS THE THING THAT MUST NOT SURVIVE THE CLONE.**
+	// wireUnitSelects() listens on the DOCUMENT for a change whose target's `name` is one of
+	// LPN_UNIT_SELECTS, so a cloned select that kept its name would put the "reinterpret or convert"
+	// dialog in front of a user changing the units of a project that does not exist yet -- and would
+	// change the units of the one they are looking at. The pairing is kept in newBoxUnits instead of
+	// in an attribute, which also keeps unit_factor_check.php's rule intact: a unit's identity is its
+	// name, and there is no second place here that could disagree about it.
+	// The strip's own `.lpn-units-item` wrapper -- the translated NAME and the select together, so
+	// cloning one carries the label for free and nothing here has to know which lang key names which
+	// unit. Walked by hand rather than through `closest()`, which the headless DOM the harnesses run
+	// against does not implement: a null from there would silently produce a box with no units in it
+	// and a harness passing on an empty list.
+	function unitStripItem(sel) {
+		var el = sel;
+		while (el && el.className !== undefined) {
+			if (String(el.className).indexOf('lpn-units-item') >= 0) { return el; }
+			el = el.parentNode;
+		}
+		return null;
+	}
+	function buildNewBoxUnits() {
+		var host = document.getElementById('lpn_new_units_fields');
+		if (!host) { return; }
+		host.innerHTML = '';
+		newBoxUnits = [];
+		LPN_UNIT_SELECTS.forEach(function (name) {
+			var live = unitEl(name), item = unitStripItem(live), copy, sel;
+			if (!item) { return; }
+			copy = item.cloneNode(true);
+			copy.removeAttribute('id');   // #lpn_u_roughness_row is the strip's, not ours
+			sel = copy.querySelector('select');
+			if (!sel) { return; }
+			sel.removeAttribute('name');
+			sel.value = live.value;
+			host.appendChild(copy);
+			newBoxUnits.push({ name: name, sel: sel, item: copy });
+		});
+	}
+	// Roughness is a LENGTH under Darcy-Weisbach and dimensionless under the other two, so its unit
+	// row is shown by the method -- the same rule applyMethodUI() applies to the real strip, applied
+	// here to the method chosen in this box rather than to the page's current one.
+	function syncNewBoxRoughness() {
+		var m = document.getElementById('lpn_new_method'), i;
+		for (i = 0; i < newBoxUnits.length; i++) {
+			if (newBoxUnits[i].name === 'lpn_u_roughness') {
+				newBoxUnits[i].item.style.display = (m && m.value === 'dw') ? '' : 'none';
+			}
+		}
+	}
+	// A preset is a family => unit-key map and every select declares its family, which is exactly
+	// what EngCalcs.setUnits() does to the real strip. Applied to the clones here, because the real
+	// strip belongs to the project that is currently open.
+	function applyNewBoxPreset(system) {
+		var preset = (EngCalcs.unitSets || {})[system];
+		if (!preset) { return; }
+		newBoxUnits.forEach(function (u) {
+			var fam = (u.sel.dataset && u.sel.dataset.family) ||
+				(u.sel.getAttribute && u.sel.getAttribute('data-family')) || '';
+			var want = preset[fam];
+			if (want !== undefined) { u.sel.value = want; }
+		});
+	}
+	// The place field belongs to the lat/lon choice, so it is DISABLED rather than hidden: a control
+	// that vanishes as you touch the radio above it reads as a glitch, where a greyed one says which
+	// choice the question belongs to.
+	function syncNewBoxPlace() {
+		var box = document.getElementById('lpn_new_place'), geo = newBoxIsGeo();
+		if (!box) { return; }
+		box.disabled = !geo;
+		if (!geo) { box.value = ''; }
+	}
+	function closeNewBox() {
+		var box = newBoxEl();
+		if (box) { box.style.display = 'none'; }
+	}
+	// **THE ANSWERS ARE A VALUE, AND MAKING THE PROJECT IS A FUNCTION OF IT.** Reading the box and
+	// acting on what it says are deliberately two functions: the act is the half with the ordering
+	// that has to be right (units before the baseline, the baseline before the tab, the search
+	// last), and splitting it out is what lets a harness drive it without a browser.
+	// { geo, place, method, units }.
+	function newBoxAnswers() {
+		var placeEl = document.getElementById('lpn_new_place'),
+			methodEl = document.getElementById('lpn_new_method'),
+			geo = newBoxIsGeo(), units = {};
+		newBoxUnits.forEach(function (u) { units[u.name] = u.sel.value; });
+		return {
+			geo: geo,
+			place: (geo && placeEl) ? String(placeEl.value || '').trim() : '',
+			method: methodEl ? methodEl.value : frictionMethod(),
+			units: units
+		};
+	}
+	function newBoxCreate() {
+		var a = newBoxAnswers();
+		closeNewBox();
+		createProjectFrom(a);
+	}
+	function createProjectFrom(a) {
+		var coords = a.geo ? LPN_COORDS_GEO : null,
+			place = a.place || '',
+			method = a.method || frictionMethod(),
+			units = a.units || {}, id;
+		id = newProject(coords);
+		// **THE UNITS GO IN THROUGH applyUnitSelections(), the same door a document's own units come
+		// in through.** Not through a change event on each select: that is the user-gesture path, and
+		// it would ask an empty project whether to reinterpret or convert numbers it does not have.
+		applyUnitSelections(units);
+		// The method, and the default roughness that follows it -- three lines rather than the
+		// Settings row's whole handler, because the warning that handler gives is about pipes whose
+		// roughness was typed for another method, and a project created a line ago has none.
+		settings.method = method;
+		settings.defaults.roughness = defaultRoughnessFor(method);
+		applyMethodUI();
+		afterUnitChange();
+		// stampProjectSaved AFTER all of it: everything above is a change like any other and marks the
+		// project dirty, so stamping first would leave a brand-new empty tab wearing an asterisk --
+		// the very defect the baseline exists to remove (Task 264).
+		stampProjectSaved(id);
+		renderTabs();
+		// LAST, and only for a lat/lon project with something typed. It is the page's one search path:
+		// the consent question, the one-a-second rule and the chooser are all in js/lpn-search.js and
+		// none of them is reimplemented here. It runs after the project exists because moving the map
+		// is what a result DOES.
+		if (coords && place && EngCalcs.lpnSearchRun) { EngCalcs.lpnSearchRun(place); }
 		return id;
 	}
-	function newBlankProject(system, coords) {
-		// stampProjectSaved AFTER setUnits: the unit switch is a change like any other and marks the
-		// project dirty, so stamping first would leave a brand-new empty tab wearing an asterisk --
-		// the very defect the baseline exists to remove.
-		stampProjectSaved(newProjectWithUnits(system, coords));
-		renderTabs();
+	function wireNewBox() {
+		if (newBoxWired) { return; }
+		newBoxWired = true;
+		var box = newBoxEl();
+		if (!box) { return; }
+		var create = document.getElementById('lpn_new_create'),
+			cancel = document.getElementById('lpn_new_cancel'),
+			close = document.getElementById('lpn_new_close'),
+			si = document.getElementById('lpn_new_si'),
+			us = document.getElementById('lpn_new_us'),
+			method = document.getElementById('lpn_new_method');
+		if (create) { create.addEventListener('click', newBoxCreate); }
+		if (cancel) { cancel.addEventListener('click', closeNewBox); }
+		if (close) { close.addEventListener('click', closeNewBox); }
+		if (si) { si.addEventListener('click', function () { applyNewBoxPreset('si'); }); }
+		if (us) { us.addEventListener('click', function () { applyNewBoxPreset('us'); }); }
+		if (method) { method.addEventListener('change', syncNewBoxRoughness); }
+		box.addEventListener('change', function (e) {
+			if (e.target && e.target.name === 'lpn_new_coords') { syncNewBoxPlace(); }
+		});
+		// Enter is Create and Escape is Cancel, which is what makes this box one keystroke for
+		// somebody who only ever wanted a blank sheet. Enter is taken on the BOX, not on the text
+		// field alone, so it works wherever the caret is.
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'Enter') { e.preventDefault(); newBoxCreate(); }
+			else if (e.key === 'Escape') { e.preventDefault(); closeNewBox(); }
+		});
+	}
+	function openNewProjectBox() {
+		var box = newBoxEl(), h, r, method;
+		if (!box) { return; }
+		closeMenu();
+		closeViewPopovers();
+		wireNewBox();
+		// **IT OPENS ON THE PAGE AS IT IS**, every time: the units the strip is showing, the method
+		// this page is set to, an xy grid, and an empty place field. A box that remembered the last
+		// answers would be a fifth kind of stored preference, and this page's own rule is that a
+		// preference is saved as an empty template project rather than as a setting.
+		var xy = document.querySelector('#lpn_new_panel input[name="lpn_new_coords"][value="xy"]');
+		if (xy) { xy.checked = true; }
+		buildNewBoxUnits();
+		method = document.getElementById('lpn_new_method');
+		if (method) { method.value = frictionMethod(); }
+		syncNewBoxRoughness();
+		syncNewBoxPlace();
+		box.style.display = 'block';
+		h = fitPanelToViewport(box);
+		r = box.getBoundingClientRect();
+		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
+		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
+		var create = document.getElementById('lpn_new_create');
+		if (create && create.focus) { create.focus(); }
 	}
 	function openFileMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
@@ -16363,7 +16532,9 @@ var EngCalcs = EngCalcs || {};
 			// New project OPENS A SUBMENU now (Task 264, Tom 2026-08-10) rather than making a blank
 			// one on the spot -- "Blank project" is still the first row of it, so the old act is one
 			// extra click and every other way to start is finally reachable from the same place.
-			{ icon: 'new', label: pc.lpn_file_new || 'New project…', submenu: newProjectRows },
+			// **NO LONGER A SUBMENU.** The fly-out's four rows were the cross of two questions and
+			// could not hold the other two; the box asks all four at once (Task 477).
+			{ icon: 'new', label: pc.lpn_file_new || 'New project…', fn: openNewProjectBox },
 			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile },
 			// **UNDER OPEN, NOT UNDER NEW** (Tasks 305 and 314). New creates something that did not
 			// exist; Open retrieves something that does, and an example exists. Opening one drops a

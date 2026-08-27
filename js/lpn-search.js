@@ -414,11 +414,34 @@
 			'Search for a place by name. A town, a street, a landmark — for example: ' +
 			'Petaluma, California'), '');
 		if (v === null) { return; }
-		var query = String(v).trim();
+		EC.lpnSearchRun(v, true);
+	};
+
+	/**
+	 * The same command with the words already in hand -- **the New-project box's search field**
+	 * (ROADMAP Task 477), where the person has typed the place before the project exists.
+	 *
+	 * **IT IS A SECOND DOOR, NEVER A SECOND ENGINE.** The consent gate, the one-a-second rule, the
+	 * repeated-query memory, the timeout and the chooser are all on this side of it, so the wizard
+	 * cannot acquire a quieter version of any of them by having its own box. What the wizard owns is
+	 * the TEXT; everything that touches the network is here.
+	 *
+	 * `gated` says whether the caller has already been through mayWeSend(). The wizard has not, so
+	 * it passes nothing and is asked here -- still BEFORE anything is sent, which is the order
+	 * lpnSearchOpen() is careful about for the same reason.
+	 */
+	EC.lpnSearchRun = function (text, gated) {
+		if (!seam || (seam.isGeo && !seam.isGeo())) { return; }
+		if (inFlight) {
+			notice(t('lpn_search_busy', 'A search is already running. Wait for it to answer.'));
+			return;
+		}
+		var query = String(text == null ? '' : text).trim();
 		if (!query) {
 			notice(t('lpn_search_empty', 'Type a place name to search for.'));
 			return;
 		}
+		if (!gated && !mayWeSend()) { return; }
 		// THE SAME QUERY TWICE IS ANSWERED WITHOUT A SECOND REQUEST -- the policy's "clients
 		// sending repeatedly the same query may be classified as faulty" clause, honoured in
 		// memory rather than on the device. It is also the common case in real use: you search,

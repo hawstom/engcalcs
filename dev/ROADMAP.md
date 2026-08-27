@@ -258,23 +258,6 @@ the block.
     can decide and comment"*) — one `**Tom:**` line per item, blank meaning not yet decided. Each
     answer goes back into the JSON's `disposition` and `resolution`, which is what re-opens the gate.
 
-- 100|477| **New blank project startup wizard: xy/lat-lon, units, head loss.** Tom, 2026-08-22,
-  naming the scope. It replaces the four-row File > New fly-out; on epanet-js, *"they have a wizard
-  box with xy and lat/lon as the top choices, and if lat/lon is selected, a search box is enabled.
-  Below it are the units and head loss formula selectors."*
-  - It answers three open things at once: the coordinate declaration for the boot project (Task 145's
-    last gap), head-loss formula at creation rather than buried in Settings, and a home for the
-    geocoder that already works — `js/lpn-search.js`, its search box enabled when lat/lon is chosen.
-    **Tom has ruled out a standalone search interface for now** (Task 437, closed into this one):
-    *"There's not a lot of reason for search once you are at your model."*
-  - **UNITS, ANSWERED 2026-08-24.** Tom: *"all units are shown (6 for inputs and 5 for results) with
-    the US and SI presets to set them."* So the wizard shows every unit selector — not one unit-system
-    radio — and the two presets are the fast path that sets them all. That is the same paradigm the
-    calculator pages already use, and it is the reason a project's own units are declarative
-    (`serializeProject().units`) rather than a browser preference.
-  - **Against it:** the current fly-out ASKS FOR NOTHING — the choice is which row you click, and a
-    wizard puts a form in front of the commonest action. Weigh that before building.
-
 - 75|479| **[H] One question left: should the suite answer at librewaternet.org/engcalcs/ ?**
   **The landing page and the code half are DONE and LIVE** — `https://librewaternet.org` and
   `/features.html` both serve, `libreepanet.org` 302s to it (Tom, 2026-08-24: *"Keep both, but

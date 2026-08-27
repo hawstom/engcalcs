@@ -1740,18 +1740,37 @@ $ec_lang['lpn_project_copy_suffix']='(copy)';
 $ec_lang['lpn_project_rename']='Rename';
 // The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='New project…';
-// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
-// with the toolbar button of that name -- an example is a whole network, so it starts a project
-// rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Blank xy project, US units (gpm)';
-$ec_lang['lpn_new_blank_si']='Blank xy project, SI units (L/s)';
-// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
-// engineer recognises at a glance, and this is the moment the choice is being made.
-// The other half of the same fly-out (Task 145): a project is on a grid or on the world, and it says
-// which when it is made, exactly as it says its units. "On a world map" rather than "geographic" --
-// the plain phrase says what the coordinates ARE to somebody who has never met the word.
-$ec_lang['lpn_new_geo_us']='Blank lat/lon project, US units (gpm)';
-$ec_lang['lpn_new_geo_si']='Blank lat/lon project, SI units (L/s)';
+// ---- THE NEW-PROJECT BOX (Task 477) ----------------------------------------------------------
+// It replaced a four-row fly-out whose rows were the cross of two questions -- xy or lat/lon, US or
+// SI -- and which had nowhere to put the two questions that matter just as much: which units
+// exactly, and which head-loss formula. Those four keys (lpn_new_blank_us/si, lpn_new_geo_us/si)
+// were deleted with the fly-out; they are in git if the wording is ever wanted again.
+//
+// **EVERY CONTROL IN THE BOX OPENS ON A WORKING ANSWER**, so nothing here has to be read by
+// somebody who just wants a blank sheet.
+$ec_lang['lpn_new_title']='New project';
+// The first question, and the one the whole box is arranged around.
+$ec_lang['lpn_new_coords']='Coordinates';
+// **THE TWO NAMES ARE `xy` AND `lat/lon`, LOWER CASE** -- Tom's ruling of 2026-08-18, "no caps so
+// as not to imply any proper names", and the same two words the File menu and the georeferencing
+// gesture already use. Do not spell either of them out here; a third wording for the same choice is
+// how a reader stops being sure they are the same choice.
+$ec_lang['lpn_new_coords_xy']='xy grid';
+$ec_lang['lpn_new_coords_geo']='lat/lon, on the Earth';
+// What each choice really means, and the fact that picking xy is not final. Said on the group
+// rather than on each radio: one tip, one "?", and the two options are only meaningful against
+// each other.
+$ec_lang['lpn_new_coords_tip']='An xy project is a drawing on a grid, with no place on the Earth. A lat/lon project sits on real ground, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be put on the ground later with File > Import xy to lat/lon.';
+// The place-name field, enabled only for a latitude-and-longitude project. Optional, always: a
+// blank one makes the project and moves nothing.
+$ec_lang['lpn_new_place']='Start near this place';
+$ec_lang['lpn_new_place_tip']='Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap\'s place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world.';
+// A worked example rather than an instruction, in the placeholder where an instruction would be
+// read as the answer. Petaluma is the example js/lpn-search.js already uses.
+$ec_lang['lpn_new_place_hint']='Petaluma, California';
+// The button that does the thing. "Create", not "OK": a dialog's OK says nothing about what is
+// about to happen, and this one makes a project.
+$ec_lang['lpn_new_create']='Create';
 $ec_lang['lpn_file_open']='Open…';
 $ec_lang['lpn_file_save']='Save';
 $ec_lang['lpn_file_saveas']='Save as…';

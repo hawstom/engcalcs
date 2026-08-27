@@ -30,6 +30,9 @@ function mkEl(tag, svgNS) {
     // harness would have reported a multi-line label moving when the real page leaves its rows
     // behind. A createTextNode() result already carries nodeType 3 below.
     nodeType: 1,
+    // Whether this element was made through createElementNS, so cloneNode() below can make a clone
+    // of the same kind rather than quietly turning an SVG node into an HTML one.
+    _svg: !!svgNS,
     tagName: (tag || 'div').toUpperCase(), _tag: tag, children: [], dataset: {},
     style: { _props: {}, setProperty(k, v) { this._props[k] = v; }, getPropertyValue(k) { return this._props[k] || ''; }, removeProperty(k) { delete this._props[k]; } },
     // **classList AND THE `class` ATTRIBUTE ARE THE SAME THING**, as they are in a browser. They
@@ -65,7 +68,53 @@ function mkEl(tag, svgNS) {
     removeAttribute(k) { delete this[k]; },
     addEventListener(t, f) { (this._listeners[t] = this._listeners[t] || []).push(f); },
     removeEventListener() {},
-    querySelectorAll() { return []; }, querySelector() { return null; }, closest() { return null; },
+    querySelectorAll() { return []; },
+    // **ONE SELECTOR SHAPE, A BARE TAG NAME**, and nothing more -- enough for the New-project box's
+    // `copy.querySelector('select')` (Task 477) and honest about the rest. A stub that answered
+    // every selector with null made that line find nothing, which is a box with no unit controls in
+    // it and a harness asserting over an empty list.
+    querySelector(sel) {
+      if (!/^[a-z]+$/.test(String(sel))) { return null; }
+      const want = String(sel).toLowerCase();
+      const walk = (e) => {
+        for (const c of (e.children || [])) {
+          if (c._tag === want) { return c; }
+          const hit = c.querySelector ? c.querySelector(sel) : null;
+          if (hit) { return hit; }
+        }
+        return null;
+      };
+      return walk(this);
+    },
+    closest() { return null; },
+    // **A DEEP CLONE IS A NEW ELEMENT, NOT A SHARED REFERENCE.** cloneNode(true) is how the
+    // New-project box gets its eight unit selects out of the page's own strip, so a stub without it
+    // could not run that path at all. Every own property is copied; the tree is rebuilt child by
+    // child; and a select's `options`/`selectedIndex` pair is re-established WITH its `value`
+    // getter, or a cloned select would report the value of the one it was cloned from forever.
+    cloneNode(deep) {
+      const c = mkEl(this._tag, this._svg);
+      Object.keys(this).forEach((k) => {
+        if (k === 'children' || k === 'parentNode' || k === '_listeners' ||
+          k === 'classList' || k === 'style' || k === 'dataset' || k === 'options') { return; }
+        const d = Object.getOwnPropertyDescriptor(this, k);
+        if (d && d.get) { return; }   // re-established below where it matters
+        c[k] = this[k];
+      });
+      Object.keys(this.dataset || {}).forEach((k) => { c.dataset[k] = this.dataset[k]; });
+      c.style._props = Object.assign({}, this.style._props);
+      if (this.options) {
+        c.options = this.options.map(o => ({ value: o.value, textContent: o.textContent }));
+        c.selectedIndex = this.selectedIndex;
+        Object.defineProperty(c, 'value', {
+          configurable: true,
+          get() { return this.options[this.selectedIndex] ? this.options[this.selectedIndex].value : ''; },
+          set(v) { const i = this.options.map(o => o.value).indexOf(v); if (i >= 0) { this.selectedIndex = i; } }
+        });
+      }
+      if (deep) { (this.children || []).forEach(k => c.appendChild(k.cloneNode ? k.cloneNode(true) : k)); }
+      return c;
+    },
     // Real containment, walking the stub tree -- the menu-dismissal rule in wireTabs() is written in
     // terms of popup.contains(e.target), so a stub that always said false (or always true) would
     // make the Task 264 regression test below meaningless.
@@ -222,6 +271,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_project_file', 'lpn_inp_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',
   'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2', 'lpn_map_status',
   'lpn_map_footer',
+  // The New-project box and its controls (ROADMAP Task 477). #lpn_new_units_fields is the one JS
+  // fills, by cloning the strip's own `.lpn-units-item` wrappers into it.
+  'lpn_new_panel', 'lpn_new_units_fields', 'lpn_new_method', 'lpn_new_place', 'lpn_new_create',
+  'lpn_new_cancel', 'lpn_new_close', 'lpn_new_us', 'lpn_new_si',
   // The satellite teaser, a cell of that strip (ROADMAP Task 452).
   'lpn_basemap_teaser',
   // The tile attribution (ROADMAP Task 145). It was NOT here, so refreshBasemapCredit() returned at
@@ -311,6 +364,17 @@ function mkUnitSelect(name, family, opts, chosen) {
   s.selectedIndex = opts.indexOf(chosen);
   if (s.selectedIndex < 0) { throw new Error('no such unit ' + chosen + ' on ' + name); }
   Object.defineProperty(s, 'value', { get() { return this.options[this.selectedIndex].value; } });
+  // **EACH SELECT SITS IN A `.lpn-units-item` WITH ITS OWN NAME ABOVE IT**, which is what
+  // Looped-Network.php renders (Task 424) and what the New-project box CLONES (Task 477). A bare
+  // select here would make buildNewBoxUnits() find nothing to clone and produce a box with no unit
+  // controls in it, with every assertion about it passing over an empty list.
+  const item = mkEl('span');
+  item.className = 'lpn-units-item';
+  const label = mkEl('span');
+  label.className = 'lpn-units-name';
+  label.textContent = name;
+  item.appendChild(label);
+  item.appendChild(s);
   unitSelects[name] = s;
   return s;
 }

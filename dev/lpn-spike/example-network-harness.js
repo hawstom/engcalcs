@@ -52,7 +52,10 @@ const L = loadLoopedNetwork(
   "\t\tnewProject: newProject, offerUnitRestore: offerUnitRestore,\n" +
   "\t\ttabAsterisk: tabAsterisk, indexEntry: indexEntry, openId: function () { return library.openId; },\n" +
   "\t\tsaveToStorage: saveToStorage, armMapSizing: armMapSizing,\n" +
-  "\t\tnewBlankProject: newBlankProject, refreshMapStatus: refreshMapStatus,\n" +
+  // Task 477's New-project box: the opener, the value it makes a project out of, and the closer.
+  "\t\topenNewProjectBox: openNewProjectBox, createProjectFrom: createProjectFrom,\n" +
+  "\t\tnewBoxAnswers: newBoxAnswers, closeNewBox: closeNewBox,\n" +
+  "\t\trefreshMapStatus: refreshMapStatus,\n" +
   "\t\tunitSetLabel: unitSetLabel,\n" +
   // Task 277. The gesture is driven through the REAL pointer handlers below; applyDrag() is
   // exported because tick() calls it off requestAnimationFrame, which the stub makes async.
@@ -701,21 +704,19 @@ console.log('\n--- Settings panel stays in sync ---');
 }
 
 
-// ---- ROADMAP Task 264: File > New project actually opens ------------------
-// Tom, 2026-08-10: "264 is broken. File New has no options. And it does nothing."
+// ---- ROADMAP Task 477: File > New project opens the NEW-PROJECT BOX ------------------------
 //
-// The cause was not in the menu contents at all. A row's click bubbles to the document-level
-// dismissal in wireTabs(), and by the time it gets there openMenu() has already run
-// `list.innerHTML = ''` -- so the clicked button is DETACHED, popup.contains(e.target) is false,
-// and the dismissal closes the submenu the row just opened. Every menubar button avoids this by
-// calling stopPropagation(); the row handler and the new toolbar button did not.
+// **THE FLY-OUT IS GONE AND MUST NOT COME BACK.** Task 264's four-row fly-out -- xy/US, xy/SI,
+// lat-lon/US, lat-lon/SI -- was the cross of two questions, with nowhere to put the two that matter
+// as much: which units exactly, and which head-loss formula. Tom, 2026-08-22: *"they have a wizard
+// box with xy and lat/lon as the top choices, and if lat/lon is selected, a search box is enabled.
+// Below it are the units and head loss formula selectors."*
 //
-// This is testable without a browser because the stubs record listeners: drive the real handler,
-// then run the real dismissal predicate against the result. It is worth testing rather than just
-// fixing, because the failure mode is silent -- no error, no menu, and the feature simply looks
-// unbuilt.
+// The section this replaces was about a menu-dismissal bug ("264 is broken. File New has no options.
+// And it does nothing."), and that bug cannot recur here: a row with `fn` and no `submenu` is
+// handled by openMenu()'s ordinary branch, which closes the menu FIRST and then acts.
 {
-  console.log('\n--- Task 264: the New project submenu survives its own click ---');
+  console.log('\n--- Task 477: File > New project opens the box ---');
   const PC = EngCalcs.pageConfig;
   L.buildMenuBar();
   const bar = byId.lpn_menubar;
@@ -726,119 +727,122 @@ console.log('\n--- Settings panel stays in sync ---');
     (el._listeners.click || []).forEach(fn => fn(ev));
     return { stopped, ev };
   }
-  // The document dismissal, transcribed from wireTabs(). If a handler did not stop the click, this
-  // is what would run next -- so asserting against it is asserting against the real rule.
-  function dismissalWouldClose(target) {
-    const popup = byId.lpn_menu_popup;
-    return popup.style.display === 'block' && !popup.contains(target);
-  }
 
-  const openFile = fire(fileBtn);
+  fire(fileBtn);
   ok('the File menu opens', L.menuPopupOpen());
-  ok('...and the menubar button stops its click reaching the dismissal', openFile.stopped);
-
   const rows = byId.lpn_menu_list.children;
   const newRow = rows.find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_file_new);
   ok('File carries a New project row', !!newRow);
-
-  ok('...and it is marked as opening a submenu', !!newRow.children.find(c => c.textContent === '▸'));
-
-  const clicked = fire(newRow);
-  // THE FLY-OUT CONTRACT (Tom, 2026-08-10): the parent stays on screen. The first cut replaced the
-  // File menu's own contents, which reads as having navigated away from File rather than into it.
-  ok('clicking it leaves the PARENT menu open', L.menuPopupOpen());
-  ok('...and opens the fly-out beside it', L.subMenuOpen());
-  const labels = byId.lpn_menu_list2.children
-    .map(c => (c.children && c.children[1] && c.children[1].textContent) || '')
-    .filter(Boolean);
-  // FOUR ROWS: two axes, both declared by WHICH ROW YOU CLICK -- units (Task 264) and grid-versus-
-  // world-map (Task 145). The "From examples" pair that used to make up the other two was removed
-  // 2026-08-15 (Tom: "Code-drawn: Remove the feature.") and must not come back, which is why this is
-  // an EXACT set rather than four present-checks: a present-check cannot see a row return.
-  ok('...carrying the real options, and only those',
-    labels.length === 4 &&
-    [PC.lpn_new_blank_us, PC.lpn_new_blank_si, PC.lpn_new_geo_us, PC.lpn_new_geo_si]
-      .every(x => labels.indexOf(x) >= 0),
-    labels.join(' | '));
-  ok('...and the parent list is untouched, so File is still File',
-    byId.lpn_menu_list.children.length > 3);
-  ok('the row stops its own click, so the dismissal cannot reach past it', clicked.stopped);
-  // The fly-out also removes the ORIGINAL failure mode rather than merely working around it: the
-  // clicked row is still in the parent popup, so the dismissal predicate would not have closed
-  // anything even if the click had got through.
-  ok('...and the clicked row is still inside the parent popup', dismissalWouldClose(newRow) === false);
-
-  // HOVER opens it as well -- both gestures are the convention, and a fly-out that only answers to
-  // clicks is the half-built version of one.
-  fire(fileBtn);              // toggles the whole menu shut, fly-out with it
-  ok('closing the parent takes the fly-out with it', !L.menuPopupOpen() && !L.subMenuOpen());
-  fire(fileBtn);              // and open again, fresh rows
-  const newRow2 = byId.lpn_menu_list.children
-    .find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_file_new);
-  (newRow2._listeners.mouseenter || []).forEach(fn => fn({}));
-  ok('hovering the row opens the fly-out too', L.subMenuOpen());
-  // ...and moving onto a plain row takes it away again.
-  // THE BUG TOM HIT: "it disappears before the mouse can reach it; it honestly seems to disappear
-  // BECAUSE you reach it." The dismiss-on-hover was attached to every plain row at EVERY level, so
-  // entering a row of the fly-out closed the fly-out that row was in. Reaching it was fatal.
-  const blankRow = byId.lpn_menu_list2.children
-    .find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_new_blank_us);
-  ok('the fly-out has a Blank project row to reach', !!blankRow);
-  ok('...and both blank rows name their unit system, as the examples do',
-    labels.filter(l => l.indexOf(PC.lpn_new_blank_us) === 0 || l.indexOf(PC.lpn_new_blank_si) === 0).length === 2,
-    labels.join(' | '));
-  (blankRow._listeners.mouseenter || []).forEach(fn => fn({}));
-  ok('hovering a row INSIDE the fly-out does not close it', L.subMenuOpen());
-
-  // The other half: the path from the parent row to the fly-out is diagonal and crosses the rows
-  // below it, so those must not dismiss on contact either -- they ARM a close that anything inside
-  // the fly-out cancels.
-  const openRow = byId.lpn_menu_list.children
-    .find(r => (r.children[1] && r.children[1].textContent) === PC.lpn_file_open);
-  (openRow._listeners.mouseenter || []).forEach(fn => fn({}));
-  ok('crossing a parent row on the way there does not close it immediately', L.subMenuOpen());
-  ok('...it arms a close instead', L.subClosePending() === true);
-  (blankRow._listeners.mouseenter || []).forEach(fn => fn({}));
-  ok('...which reaching the fly-out cancels', L.subClosePending() === false && L.subMenuOpen());
-
-  // The TOOLBAR route to the same submenu had the identical defect. Building the whole toolbar here
-  // is more scaffolding than the check is worth, so this is a source-level guard instead: any click
-  // handler that opens this menu must stop the click. Crude, and it would not catch a third route
-  // written differently -- but it holds the two that exist, and it costs nothing.
+  // **NOT A SUBMENU ANY MORE.** Asserted as an absence, because the arrow is the one visible thing
+  // that would say the fly-out had come back.
+  ok('...and it no longer opens a fly-out', !newRow.children.find(c => c.textContent === '\u25b8'));
+  fire(newRow);
+  ok('clicking it closes the menu, as an ordinary command row does', !L.menuPopupOpen());
+  ok('...and opens the New-project box', byId.lpn_new_panel.style.display === 'block');
+  // The + tab is the same act by a second door and must arrive at the same box.
   {
     const appSrc = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-    const openers = appSrc.split('\n').filter(l => /addEventListener\('click'/.test(l) && /openNewProjectMenu/.test(l));
-    ok('every click handler that opens the New project menu stops its click',
-      openers.length > 0 && openers.every(l => /stopPropagation\(\)/.test(l)),
-      openers.length + ' handler(s)');
+    ok('the + tab opens the same box, not something of its own',
+      /plus\.addEventListener\('click', function \(e\) \{ e\.stopPropagation\(\); openNewProjectBox\(\); \}\);/.test(appSrc));
+    ok('and no route to the old fly-out is left anywhere',
+      !/newProjectRows|openNewProjectMenu|newBlankProject/.test(appSrc));
   }
+
+  // ---- THE UNIT SELECTS ARE CLONED FROM THE PAGE'S OWN STRIP -----------------------------------
+  //
+  // Not rebuilt: a second list of unit families and option values is a second thing to keep in step
+  // with lib/Units.lib.php, and this page has one already. What the clone MUST lose is the `name`
+  // attribute -- wireUnitSelects() listens on the document for a change whose target's name is a
+  // unit select, so a clone that kept its name would put the reinterpret-or-convert dialog in front
+  // of somebody choosing units for a project that does not exist yet.
+  {
+    const host = byId.lpn_new_units_fields;
+    const items = host.children;
+    ok('the box carries a unit control for every selector on the strip',
+      items.length === 8, items.length + ' of 8');
+    const sels = items.map(i => i.querySelector('select')).filter(Boolean);
+    ok('...each one a real select with its family intact',
+      sels.length === 8 && sels.every(s => !!s.dataset.family), sels.length + ' with families');
+    ok('...and NONE of them carries the name that would reach the unit-change handler',
+      sels.every(s => !s.name), sels.map(s => s.name || '-').join(','));
+    ok('...and they open on what the strip is showing',
+      sels[0].value === L.setUnitEl('lpn_u_length').value, sels[0].value);
+    // The clone is a copy, not a reference: changing one must not move the page's own strip.
+    const was = L.setUnitEl('lpn_u_length').value;
+    sels[0].value = (was === 'ft') ? 'm' : 'ft';
+    ok('...and changing one in the box leaves the open project alone',
+      L.setUnitEl('lpn_u_length').value === was, L.setUnitEl('lpn_u_length').value);
+  }
+  L.closeNewBox();
 }
 
+// ---- Task 477: the answers, and what making a project out of them does -----------------------
+//
+// createProjectFrom() is the half with the ordering that has to be right, and it is a function of a
+// plain value -- so it is driven here directly. What a browser is needed for is only whether the
+// radio and the text field are read correctly, which is newBoxAnswers()' three lines.
+{
+  console.log('\n--- Task 477: creating a project from the answers ---');
+  setUnitSet('si');
+  L.reset();
+  const usUnits = {
+    lpn_u_length: 'ft', lpn_u_diameter: 'in', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi',
+    lpn_u_flow: 'gpm', lpn_u_velocity: 'ftps', lpn_u_gradient: 'gradePercent', lpn_u_roughness: 'ft'
+  };
+  // STARTING IN SI so the move to US is observable: asserting the unit after a run that was already
+  // in US proves nothing, which is how a "does it commit to its units at all" mutation survives.
+  const id = L.createProjectFrom({ geo: false, units: usUnits, method: 'hw' });
+  ok('the project is in the units the box asked for, not the ones the page was in',
+    L.setUnitEl('lpn_u_flow').value === 'gpm', L.setUnitEl('lpn_u_flow').value);
+  ok('...and every other selector went with it',
+    L.setUnitEl('lpn_u_diameter').value === 'in' && L.setUnitEl('lpn_u_pressure').value === 'psi');
+  ok('a new project starts clean -- no asterisk',
+    L.tabAsterisk(L.indexEntry(id)).show === false, 'dirty = ' + L.indexEntry(id).dirty);
+  ok('...and it is an xy project, since that is what was asked for',
+    L.getProject().coords === undefined, String(L.getProject().coords));
 
-// ---- Task 264 follow-up: a brand-new project wears no asterisk ------------
+  // THE HEAD-LOSS FORMULA, which the fly-out could never ask -- and the default roughness that
+  // follows it, or a user who picks Manning and draws a pipe gets Hazen-Williams's C = 130 as an n.
+  const mid = L.createProjectFrom({ geo: false, units: usUnits, method: 'manning' });
+  ok('the method the box asked for is the project\'s method',
+    L.settings().method === 'manning', L.settings().method);
+  ok('...and the default roughness followed it, rather than staying a C',
+    L.settings().defaults.roughness < 1, String(L.settings().defaults.roughness));
+  ok('...on a project that is still clean', L.tabAsterisk(L.indexEntry(mid)).show === false);
+
+  // A lat/lon project, and the place search. The search is js/lpn-search.js's one runner: what is
+  // asserted here is that the box CALLS it, with the words typed, and only for a lat/lon project.
+  let asked = [];
+  const realRun = EngCalcs.lpnSearchRun;
+  EngCalcs.lpnSearchRun = function (q) { asked.push(q); };
+  L.createProjectFrom({ geo: true, units: usUnits, method: 'hw', place: 'Petaluma, California' });
+  ok('a lat/lon project is geographic', L.getProject().coords === 'geo', String(L.getProject().coords));
+  ok('...and the place typed in the box is handed to the search, unchanged',
+    asked.length === 1 && asked[0] === 'Petaluma, California', JSON.stringify(asked));
+  asked = [];
+  L.createProjectFrom({ geo: true, units: usUnits, method: 'hw', place: '' });
+  ok('an empty place field searches for nothing at all', asked.length === 0, JSON.stringify(asked));
+  asked = [];
+  L.createProjectFrom({ geo: false, units: usUnits, method: 'hw', place: 'Petaluma, California' });
+  ok('and an xy project never searches, whatever is in the field',
+    asked.length === 0, JSON.stringify(asked));
+  EngCalcs.lpnSearchRun = realRun;
+}
+
+// ---- Task 264 follow-up: a brand-new project EARNS its asterisk --------------------------------
 // Tom, 2026-08-10: "New blank projects and from template appear with asterisk, which is bad. But a
 // blank project with asterisk closes without confirmation, which is bad." Both halves are the same
 // defect -- the mark claimed unsaved work a second after creation, and closeTab() had to special-
 // case the claim back out again. The fix is a BASELINE at birth, so `dirty` starts false.
+//
+// That a new project starts clean is asserted in the Task 477 section above, where the project is
+// made. What is here is the other direction, which is what makes the mark mean anything.
 {
-  console.log('\n--- Task 264 follow-up: no asterisk on a new project ---');
+  console.log('\n--- Task 264 follow-up: a new project earns its asterisk ---');
   setUnitSet('us');
   L.reset();
-
-  // Through the real menu path (newBlankProject), not newProject() directly -- the unit switch it
-  // performs is itself a change that marks the project dirty, so the baseline has to be stamped
-  // after it. Testing the raw newProject() would miss that ordering entirely.
-  // START IN SI so the switch to US is observable. Asserting the unit AFTER a run that was already
-  // in US proves nothing, which is how the "does it commit to its units at all" mutation survived.
-  setUnitSet('si');
-  L.newBlankProject('us');
-  const blankId = L.openId();
-  ok('a blank project from the menu starts clean -- no asterisk',
-    L.tabAsterisk(L.indexEntry(blankId)).show === false, 'dirty = ' + L.indexEntry(blankId).dirty);
-  ok('...and it is in the unit system its row named',
-    L.setUnitEl('lpn_u_flow').options[L.setUnitEl('lpn_u_flow').selectedIndex].value === 'gpm');
-
-  // ...and it must EARN one. Anything else would make the mark meaningless in the other direction.
+  const blankId = L.createProjectFrom({ geo: false, units: {}, method: 'hw' });
+  ok('a new project starts clean', L.tabAsterisk(L.indexEntry(blankId)).show === false);
   L.addNode('junction', 10, 10);
   L.saveToStorage();
   ok('...and earns one at the first edit', L.tabAsterisk(L.indexEntry(blankId)).show === true);
