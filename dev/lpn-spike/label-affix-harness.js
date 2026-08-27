@@ -128,7 +128,11 @@ function checkAffix(what, field, prefix, text, bare) {
 	ok('...and the number follows the prefix immediately', /^-?[\d.]/.test(text.slice(pair[1].length)), text);
 });
 checkAffix('link', 'id', '', onlyLink('id')[0], pipes[0].id);
-[['demand', 'Q='], ['head', 'H='], ['pressure', 'P='], ['elev', 'Z=']].forEach(function (pair) {
+// BASE DEMAND IS 'Qb=' AND RESOLVED DEMAND IS 'Q=' (Tom, 2026-08-26). Asserted as a PAIR, in one
+// list, because the whole reason base demand is not plain 'Q=' is that a junction can print both
+// numbers at once; either one drifting back to the other's symbol makes the pair unreadable and is
+// exactly the silent revert this line exists to catch.
+[['demand', 'Qb='], ['demandActual', 'Q='], ['head', 'H='], ['pressure', 'P='], ['elev', 'Z=']].forEach(function (pair) {
 	const text = onlyNode(pair[0])[0];
 	checkAffix('node', pair[0], pair[1], text, text.slice(pair[1].length));
 	ok('...and the number follows the prefix immediately', /^-?[\d.]/.test(text.slice(pair[1].length)), text);
@@ -237,10 +241,12 @@ L.refreshLabelText();
 // being answerable at all. That is exactly what this checks: the biggest demand is marked even
 // though a link carries more.
 const nodeQ = doc.nodes.filter(function (n) { return n.type === 'junction'; })
-	.map(function (n) { return { id: n.id, v: parseFloat(L.nodeLabel(n.id)[0].slice(2)), dec: L.nodeDecor(n.id)[0] }; })
+	// Strip whatever prefix the field carries rather than a fixed number of characters -- this read
+	// slice(2) until base demand became 'Qb='.
+	.map(function (n) { return { id: n.id, v: parseFloat(L.nodeLabel(n.id)[0].replace(/^[^-\d.]*/, '')), dec: L.nodeDecor(n.id)[0] }; })
 	.filter(function (e) { return isFinite(e.v); });
 const linkQ = doc.links
-	.map(function (l) { return { id: l.id, v: parseFloat(L.linkLabel(l.id)[0].slice(2)), dec: L.linkDecor(l.id)[0] }; })
+	.map(function (l) { return { id: l.id, v: parseFloat(L.linkLabel(l.id)[0].replace(/^[^-\d.]*/, '')), dec: L.linkDecor(l.id)[0] }; })
 	.filter(function (e) { return isFinite(e.v); });
 ok('both kinds of Q are on the drawing at once', nodeQ.length > 0 && linkQ.length > 0,
 	nodeQ.length + ' demands, ' + linkQ.length + ' flows');
