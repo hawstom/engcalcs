@@ -789,14 +789,37 @@ html[lang="zh"] .ec-welcome {
 .lpn-popover { box-sizing: border-box; max-width: calc(100vw - 8px); max-height: calc(100vh - 8px); }
 .lpn-popover-body { overflow: auto; max-height: calc(100vh - 56px); }
 /* The Find panel's query line (ROADMAP Task 540): the three pull-downs written out as one
-   sentence, directly above the Find button. Monospaced and quiet -- it is there to be read, not
-   pressed, and it must not compete with the button under it. It wraps rather than scrolls, because
-   a query that runs off the edge of a 22rem popover would teach nothing. */
+   sentence, directly above the Find button -- and, since phase 2, the input that writes them back.
+   Monospaced, because it is a query and its brackets and quotes have to be countable. Full width of
+   the 22rem popover, so a query with an AND in it is readable without scrolling the box. */
 .lpn-find-query {
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	font-size: .85em;
+	width: 100%;
+	box-sizing: border-box;
+	margin: 2px 0 2px;
+}
+/* Tom's own tip, under the input: it says the grammar is expandable. Quiet, because it is a
+   standing note rather than an answer to anything the user just did. */
+.lpn-find-hint {
+	font-size: .8em;
+	color: #666;
+	margin: 0 0 4px;
+}
+/* A parse failure. It is the one message on this panel that means NOTHING WILL BE SEARCHED, so it
+   is the one that is allowed to be loud. `display` is set from script -- empty means no error. */
+.lpn-find-msg {
+	font-size: .85em;
+	color: #a00;
+	margin: 0 0 6px;
+	overflow-wrap: break-word;
+}
+/* Where the three pull-downs used to be, when the typed query says more than they can. Indented and
+   quiet: it explains an absence, and the query input under it is what the eye should go to. */
+.lpn-find-aside {
+	font-size: .85em;
 	color: #555;
-	margin: 6px 0 4px;
+	margin: 4px 0;
 	overflow-wrap: break-word;
 }
 /* The property popup is DRAGGABLE by its chrome -- the padded band around the body, which is the

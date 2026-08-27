@@ -58,6 +58,24 @@ const L = loadLoopedNetwork(
 	// of it. Task 540's query line and its report are asserted through these.
 	"\t\tbuildPanel: function () { rebuildFindForm(); },\n" +
 	"\t\tpressFind: function () { runFind(); },\n" +
+	// Phase 2: the query INPUT. Driven exactly as a person drives it -- the real element, the real
+	// `input` event, the real listener -- so nothing here can pass by calling the parser directly
+	// while the panel is wired to something else.
+	"\t\tqueryEl: function () { return findQueryInput; },\n" +
+	"\t\tqueryText: function () { return findQueryInput ? findQueryInput.value : null; },\n" +
+	"\t\ttype: function (text) { findQueryInput.value = text;\n" +
+	"\t\t\t(findQueryInput._listeners.input || []).forEach(function (f) { f({}); }); },\n" +
+	"\t\tcontrolsShown: function () { return findControlsShown(); },\n" +
+	// The pull-downs of the QUERY, not of the Replace form under it -- which has one of its own and
+	// stays put.
+	"\t\tcontrolSelects: function () { var n = 0;\n" +
+	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) { if (c._tag === 'select') { n++; } walk(c); }); })(findControlsBox);\n" +
+	"\t\t\treturn n; },\n" +
+	"\t\tqueryState: function () { return { ast: findQueryAst, error: findQueryError }; },\n" +
+	"\t\tresults: function () { return findResults.map(function (c) { return c.group + ':' + c.el.id; }); },\n" +
+	// One word at a time, so a test can put the panel into another language without a second lang
+	// file. Restoring is the caller's job.
+	"\t\tsetWord: function (key, value) { EngCalcs.pageConfig[key] = value; },\n" +
 	"\t\tformBox: function () { return document.getElementById('lpn_find_form'); },\n" +
 	"\t\tresultsBox: function () { return document.getElementById('lpn_find_results'); },\n" +
 	// The solver's OWN structural verdict, so the report can be checked against it rather than
@@ -505,13 +523,28 @@ function panelLines(box) {
 		JSON.stringify(panelLines(L.resultsBox())));
 }
 
-// ---- 7. THE QUERY, WRITTEN OUT AS ONE LINE (ROADMAP Task 540, phase 1) -------------------------
+// ---- 7. THE QUERY LINE, AND THE INPUT IT BECAME (ROADMAP Task 540) -----------------------------
 //
-// Read out of the REAL panel: rebuildFindForm() builds it into #lpn_find_form, and the line under
-// test is the div a visitor sees above the Find button. Phase 1 is read-only on purpose, so there
-// is one further assertion at the end -- the panel offers no input to type it into.
+// Read out of the REAL panel: rebuildFindForm() builds it into #lpn_find_form, and the element
+// under test is the input a visitor types in above the Find button. Every assertion below drives it
+// the way a person does -- set .value, fire the real `input` listener -- so nothing here can pass by
+// calling the parser while the panel is wired to something else.
+function findQueryLine() {
+	let out = null;
+	walk(L.formBox(), function (el) { if (el.className === 'lpn-find-query') { out = el; } });
+	return out;
+}
+function selectsIn() {
+	const out = [];
+	walk(L.formBox(), function (el) { if (el._tag === 'select') { out.push(el); } });
+	return out;
+}
+// The QUERY's own pull-downs, counted inside the controls box -- the Replace form below has a select
+// of its own and is not part of what is under test here.
+function controlCount() { return L.controlSelects(); }
+function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({}); }); }
 {
-	console.log('\n--- the query line ---');
+	console.log('\n--- the query line, written from the controls ---');
 	setUnitSet('us');
 	L.reset();
 	L.setCanvas(800, 600);
@@ -519,52 +552,288 @@ function panelLines(box) {
 	const a = L.addNode('junction', 100, 0).id;
 	L.addLink('pipe', r, a);
 	L.buildDom();
-	function line() {
-		let out = null;
-		walk(L.formBox(), function (el) { if (el.className === 'lpn-find-query') { out = el.textContent; } });
-		return out;
-	}
-	function lineFor(scope, prop, op, value) { L.setState(scope, prop, op, value); L.buildPanel(); return line(); }
+	function lineFor(scope, prop, op, value) { L.setState(scope, prop, op, value); L.buildPanel(); return L.queryText(); }
 
 	ok('an ID search reads as the scope, the property, the condition and the quoted text',
-		lineFor('all', 'id', 'contains', '223') === "Everything.ID contains '223'", JSON.stringify(line()));
+		lineFor('all', 'id', 'contains', '223') === "Everything.ID contains '223'", JSON.stringify(L.queryText()));
 	ok('a numeric condition prints the number bare',
-		lineFor('pipe', 'diameter', 'gt', '8') === 'Pipe.Diameter greater than 8', JSON.stringify(line()));
+		lineFor('pipe', 'diameter', 'gt', '8') === 'Pipe.Diameter greater than 8', JSON.stringify(L.queryText()));
 	// "Highest n" names a control, not a comparison, so the line says the word and the count the
 	// search will ACTUALLY use -- ten, when the box is empty.
 	ok('an extremes condition prints the count it will really use',
-		lineFor('pipe', 'velocity', 'top', '') === 'Pipe.Velocity highest 10', JSON.stringify(line()));
+		lineFor('pipe', 'velocity', 'top', '') === 'Pipe.Velocity highest 10', JSON.stringify(L.queryText()));
 	ok('...and the typed count when there is one',
-		lineFor('pipe', 'velocity', 'bottom', '3') === 'Pipe.Velocity lowest 3', JSON.stringify(line()));
+		lineFor('pipe', 'velocity', 'bottom', '3') === 'Pipe.Velocity lowest 3', JSON.stringify(L.queryText()));
 	ok('a connection condition is the whole sentence, with no value',
 		lineFor('junction', 'connection', 'conn-unlinked', '') === 'Junction.Connection has no links',
-		JSON.stringify(line()));
+		JSON.stringify(L.queryText()));
+	// **TOM'S OWN WORDING FOR THE ALL-KINDS CONDITION** (2026-08-26). He could not read "is broken".
+	ok('the all-kinds connection condition says what it asks',
+		lineFor('junction', 'connection', 'conn-any', '') === 'Junction.Connection is cut off for any reason',
+		JSON.stringify(L.queryText()));
 	// An empty box with "contains" matches everything, and the quotes are what make that readable
 	// rather than a sentence that stops in the middle.
 	ok('an empty text value reads as the empty string it is matched as',
-		lineFor('all', 'id', 'contains', '') === "Everything.ID contains ''", JSON.stringify(line()));
+		lineFor('all', 'id', 'contains', '') === "Everything.ID contains ''", JSON.stringify(L.queryText()));
 
-	// **THE PULL-DOWN IS STILL THE WAY IN.** Changing the real select rewrites the line, which is
-	// the whole teaching mechanism: a person operates the control and watches the sentence change.
+	// **THE PULL-DOWN IS STILL A WAY IN.** Changing the real select rewrites the input, which is half
+	// the teaching mechanism: operate the control, watch the sentence change.
 	L.setState('pipe', 'diameter', 'gt', '8');
 	L.buildPanel();
-	const selects = [];
-	walk(L.formBox(), function (el) { if (el._tag === 'select') { selects.push(el); } });
+	const selects = selectsIn();
 	ok('the panel still has its three pull-downs', selects.length >= 3, String(selects.length));
 	selects[2].value = 'lt';
-	(selects[2]._listeners.change || []).forEach(function (f) { f({}); });
-	ok('changing the condition pull-down rewrites the line at once',
-		line() === 'Pipe.Diameter less than 8', JSON.stringify(line()));
+	fire(selects[2], 'change');
+	ok('changing the condition pull-down rewrites the query at once',
+		L.queryText() === 'Pipe.Diameter less than 8', JSON.stringify(L.queryText()));
 
-	// **PHASE 1 IS READ-ONLY** and that has to be asserted, not merely intended: the one input on
-	// this panel is the Value box the search has always had. A second one would be a grammar and a
-	// parser nobody has designed yet.
-	let queryEl = null;
-	walk(L.formBox(), function (el) { if (el.className === 'lpn-find-query') { queryEl = el; } });
-	ok('the query line is printed, not typed into: it is a div and holds no control',
-		!!queryEl && queryEl._tag === 'div' && (queryEl.children || []).length === 0 &&
-		String(queryEl.textContent).length > 0,
-		queryEl ? queryEl._tag + '/' + (queryEl.children || []).length : 'missing');
+	// **AND IT IS NOW AN INPUT** (phase 2, Tom 2026-08-26). Asserted rather than intended: the
+	// element carrying the query has to be something a person can put a caret in.
+	const q = findQueryLine();
+	ok('the query line is an input, not a printed div',
+		!!q && q._tag === 'input' && q.type === 'text', q ? q._tag + '/' + q.type : 'missing');
+}
+
+// ---- 8. THE PARSER: what the input does with what is typed into it (Task 540 phase 2) ----------
+//
+// **EVERY QUERY BELOW IS CHECKED AGAINST A HAND-COMPUTED SET**, not against the parser's own idea of
+// itself: the network is two pipes of known diameter, so the answer to each AND, OR and bracket is
+// worked out here in the comment and asserted as a literal.
+{
+	console.log('\n--- typing a query ---');
+	setUnitSet('us');
+	L.reset();
+	L.setCanvas(800, 600);
+	const r = L.addNode('reservoir', 0, 0).id;
+	const a = L.addNode('junction', 100, 0).id;
+	const b = L.addNode('junction', 200, 0).id;
+	const ra = L.addLink('pipe', r, a);
+	const ab = L.addLink('pipe', a, b);
+	L.setProp(ra, 'diameter', 6);
+	L.setProp(ab, 'diameter', 12);
+	L.buildDom();
+	const p6 = 'link:' + ra.id, p12 = 'link:' + ab.id;
+	L.setState('pipe', 'diameter', 'gt', '8');
+	L.buildPanel();
+
+	function run(text) { L.type(text); L.pressFind(); return L.results(); }
+
+	// A typed simple query and the same query built from the pull-downs must be ONE search. If these
+	// two ever diverge, the input is a second query engine and the panel has two answers.
+	ok('a typed simple query runs, and matches what the controls would have found',
+		same(run('Pipe.Diameter greater than 8'), L.find('pipe', 'diameter', 'gt', '8')) &&
+		same(run('Pipe.Diameter greater than 8'), [p12]), JSON.stringify(run('Pipe.Diameter greater than 8')));
+	ok('...and the controls followed it, rather than standing beside it saying something else',
+		L.controlsShown() && L.findState().prop === 'diameter' && L.findState().op === 'gt' &&
+		L.findState().value === '8', JSON.stringify(L.findState()));
+	ok('a quoted text value is read as text', same(run("Everything.ID contains '" + ra.id + "'"), [p6]),
+		JSON.stringify(run("Everything.ID contains '" + ra.id + "'")));
+
+	// AND: 6 is over 4 and under 8; 12 is over 4 and NOT under 8. So the answer is the 6 in pipe.
+	ok('AND is the intersection, hand-computed',
+		same(run('Pipe.Diameter greater than 4 AND Pipe.Diameter less than 8'), [p6]),
+		JSON.stringify(run('Pipe.Diameter greater than 4 AND Pipe.Diameter less than 8')));
+	// OR: under 8 is the 6 in; over 10 is the 12 in. Together, both pipes.
+	ok('OR is the union, hand-computed',
+		same(run('Pipe.Diameter less than 8 OR Pipe.Diameter greater than 10'), [p6, p12]),
+		JSON.stringify(run('Pipe.Diameter less than 8 OR Pipe.Diameter greater than 10')));
+	ok('an AND that nothing satisfies returns nothing, not everything',
+		run('Pipe.Diameter greater than 8 AND Pipe.Diameter less than 8').length === 0);
+	// **THE BRACKETS HAVE TO CHANGE THE ANSWER, or they are decoration.** AND binds tighter, so
+	//   A OR B AND C   is  {6} u ({12} n {12})       = both pipes
+	//   (A OR B) AND C is  ({6} u {12}) n {12}       = the 12 in alone
+	const A = 'Pipe.Diameter equal to 6', B = 'Pipe.Diameter equal to 12',
+		C = "Pipe.ID contains '" + ab.id + "'";
+	ok('AND binds tighter than OR', same(run(A + ' OR ' + B + ' AND ' + C), [p6, p12]),
+		JSON.stringify(run(A + ' OR ' + B + ' AND ' + C)));
+	ok('...and brackets override that, changing the answer',
+		same(run('(' + A + ' OR ' + B + ') AND ' + C), [p12]),
+		JSON.stringify(run('(' + A + ' OR ' + B + ') AND ' + C)));
+	ok('lower-case operators are the same operators',
+		same(run(A + ' or ' + B), [p6, p12]), JSON.stringify(run(A + ' or ' + B)));
+
+	// **A COMPOUND ANSWER PRINTS THE ID ALONE.** Two conditions name two properties, and choosing one
+	// to print beside the id would answer a question nobody asked.
+	run('Pipe.Diameter greater than 4 AND Pipe.Diameter less than 8');
+	const rows = [];
+	walk(L.resultsBox(), function (el) { if (el._tag === 'button') { rows.push(el.textContent); } });
+	ok('a compound result row is the id and nothing invented', rows.length === 1 && rows[0].trim() === ra.id,
+		JSON.stringify(rows));
+}
+
+// ---- 9. A QUERY THAT CANNOT BE READ SEARCHES NOTHING -------------------------------------------
+//
+// **THE HARD RULE OF THIS TASK.** Falling back to "search everything" would be a wrong answer
+// wearing a confident face, so every failure below is asserted twice: that it is reported, and that
+// the result list is EMPTY.
+{
+	console.log('\n--- a query that cannot be read ---');
+	setUnitSet('us');
+	L.reset();
+	L.setCanvas(800, 600);
+	const r = L.addNode('reservoir', 0, 0).id;
+	const a = L.addNode('junction', 100, 0).id;
+	L.setProp(L.addLink('pipe', r, a), 'diameter', 6);
+	L.buildDom();
+	L.setState('pipe', 'diameter', 'gt', '8');
+	L.buildPanel();
+	function refuses(text, wants) {
+		L.type(text); L.pressFind();
+		const msg = panelLines(L.resultsBox()).join(' ');
+		ok('refused: ' + JSON.stringify(text), L.results().length === 0 && msg.indexOf(wants) >= 0, msg);
+	}
+	refuses('Pipe.Diamater greater than 8', 'Diamater');
+	refuses("Sausage.ID contains 'x'", 'Sausage');
+	refuses('Pipe Diameter greater than 8', 'dot');
+	refuses('Pipe.Diameter greater than', 'needs a value');
+	refuses('Pipe.Diameter contains 8', 'Not a condition');
+	refuses('(Pipe.Diameter greater than 8', 'never closed');
+	refuses('Pipe.Diameter greater than 8)', 'Nothing was expected');
+	refuses('Pipe.Diameter greater than 8 AND', 'Not something to search');
+	refuses("Everything.ID contains 'x", 'no closing quote');
+	refuses('Everything.ID contains x', 'quotes');
+	refuses('Pipe.Diameter greater than 8 rubbish', 'Nothing was expected');
+	refuses(') AND Pipe.Diameter greater than 8', 'closes nothing');
+	// **AN EMPTY BOX IS NOT A SEARCH FOR EVERYTHING.** The controls' own empty-value rule ("contains
+	// nothing matches everything") is written `contains ''`, which IS a query. A blank box is not.
+	refuses('', 'empty');
+	refuses('   ', 'empty');
+	// The position is part of the report: "where" is half of what a person needs in order to fix it.
+	L.type('Pipe.Diamater greater than 8'); L.pressFind();
+	ok('...and the message says where', /character 6/.test(panelLines(L.resultsBox()).join(' ')),
+		panelLines(L.resultsBox()).join(' '));
+	// A good query after a bad one clears the failure rather than leaving the panel stuck.
+	L.type('Pipe.Diameter greater than 4'); L.pressFind();
+	ok('a readable query after an unreadable one runs normally', L.results().length === 1,
+		JSON.stringify(L.results()));
+}
+
+// ---- 10. THE CONTROLS ARE HONEST ABOUT A QUERY THEY CANNOT EXPRESS -----------------------------
+//
+// `A AND B` has no pull-down representation. The three ways to handle that are: show the first
+// condition (a lie), grey the controls out still showing stale words (a quieter lie), or take them
+// off the panel and say why. Only the third can be misread by nobody -- and it comes with the way
+// back.
+{
+	console.log('\n--- the controls when the query outruns them ---');
+	setUnitSet('us');
+	L.reset();
+	L.setCanvas(800, 600);
+	const r = L.addNode('reservoir', 0, 0).id;
+	const a = L.addNode('junction', 100, 0).id;
+	L.addLink('pipe', r, a);
+	L.buildDom();
+	L.setState('pipe', 'diameter', 'gt', '8');
+	L.buildPanel();
+	ok('the controls are there for a query they can express', L.controlsShown() && controlCount() === 3,
+		String(controlCount()));
+
+	L.type('Pipe.Diameter greater than 4 AND Pipe.Diameter less than 8');
+	ok('a compound query takes the pull-downs off the panel',
+		!L.controlsShown() && controlCount() === 0, String(controlCount()));
+	const aside = panelLines(L.formBox()).join(' ');
+	ok('...and says why, where they were', aside.indexOf('set aside') >= 0, aside);
+	// The way back. findState still holds the last query the controls DID express, so this is a
+	// return to it rather than a guess at one.
+	let back = null;
+	walk(L.formBox(), function (el) {
+		if (el._tag === 'button' && el.textContent === 'Use the controls instead') { back = el; }
+	});
+	ok('a button offers the way back', !!back);
+	if (back) { (back._listeners.click || []).forEach(function (f) { f({}); }); }
+	ok('...and pressing it restores both the controls and the query they write',
+		L.controlsShown() && controlCount() === 3 && L.queryText() === 'Pipe.Diameter greater than 8',
+		L.queryText());
+
+	// An unreadable query gets the same treatment, for the same reason: three pull-downs standing
+	// beside a query that will not run is the same lie in a quieter voice.
+	L.type('Pipe.Diamater greater than 8');
+	ok('an unreadable query also takes the controls off', !L.controlsShown() && controlCount() === 0);
+}
+
+// ---- 11. THE OPERATORS ARE TRANSLATED, AND ENGLISH STILL WORKS ---------------------------------
+//
+// The whole line is localized -- the identifier half is localized whatever we do, so English
+// operators would make it half-and-half. The cost is that a query is not portable between
+// languages, and the parser pays it back by accepting the ENGLISH spelling in every language: a
+// query pasted from a colleague, from a forum or from our own documentation must not fail.
+{
+	console.log('\n--- another language, and the English aliases ---');
+	setUnitSet('us');
+	L.reset();
+	L.setCanvas(800, 600);
+	const r = L.addNode('reservoir', 0, 0).id;
+	const a = L.addNode('junction', 100, 0).id;
+	const b = L.addNode('junction', 200, 0).id;
+	const ra = L.addLink('pipe', r, a);
+	const ab = L.addLink('pipe', a, b);
+	L.setProp(ra, 'diameter', 6);
+	L.setProp(ab, 'diameter', 12);
+	L.buildDom();
+	const p6 = 'link:' + ra.id, p12 = 'link:' + ab.id;
+	// Spanish words, set one at a time rather than by loading a second lang file -- what is under
+	// test is that the parser reads the words the INTERFACE is showing, whatever they are.
+	const was = {};
+	[['lpn_tool_add_pipe', 'Tubería'], ['lpn_find_op_gt', 'mayor que'], ['lpn_find_op_lt', 'menor que'],
+		['lpn_find_q_and', 'Y'], ['lpn_find_q_or', 'O']].forEach(function (p) {
+		was[p[0]] = EngCalcs.pageConfig[p[0]];
+		L.setWord(p[0], p[1]);
+	});
+	L.setState('pipe', 'diameter', 'gt', '8');
+	L.buildPanel();
+	ok('the line is written in the interface language', L.queryText() === 'Tubería.Diameter mayor que 8',
+		L.queryText());
+	function run(text) { L.type(text); L.pressFind(); return L.results(); }
+	ok('...and the localized words parse',
+		same(run('Tubería.Diameter mayor que 4 Y Tubería.Diameter menor que 8'), [p6]),
+		JSON.stringify(run('Tubería.Diameter mayor que 4 Y Tubería.Diameter menor que 8')));
+	// **THE PASTED QUERY.** Same network, same answer, English words, Spanish interface.
+	ok('the English words still work in another language',
+		same(run('Pipe.Diameter greater than 4 AND Pipe.Diameter less than 8'), [p6]),
+		JSON.stringify(run('Pipe.Diameter greater than 4 AND Pipe.Diameter less than 8')));
+	ok('...including a mixture, which is what a half-edited paste looks like',
+		same(run('Tubería.Diameter greater than 4 AND Tubería.Diameter menor que 8'), [p6]),
+		JSON.stringify(run('Tubería.Diameter greater than 4 AND Tubería.Diameter menor que 8')));
+	ok('and the English OR is the union in Spanish too',
+		same(run('Pipe.Diameter equal to 6 O Pipe.Diameter equal to 12'), [p6, p12]),
+		JSON.stringify(run('Pipe.Diameter equal to 6 O Pipe.Diameter equal to 12')));
+	Object.keys(was).forEach(function (k) { L.setWord(k, was[k]); });
+	L.buildPanel();
+	ok('the words go back', L.queryText() === 'Pipe.Diameter greater than 8', L.queryText());
+}
+
+// ---- 12. EVERY LINE THE PANEL WRITES IS A LINE THE PANEL CAN READ ------------------------------
+//
+// The round trip is what makes this a teaching device rather than two features: whatever the
+// pull-downs print must parse back to the same query, or a user who edits one word of it is on
+// their own.
+{
+	console.log('\n--- the round trip ---');
+	setUnitSet('us');
+	L.reset();
+	L.setCanvas(800, 600);
+	const r = L.addNode('reservoir', 0, 0).id;
+	const a = L.addNode('junction', 100, 0).id;
+	L.addLink('pipe', r, a);
+	L.addText(50, 50, null);
+	L.buildDom();
+	[['all', 'id', 'contains', '223'], ['all', 'id', 'equals', 'J1'], ['pipe', 'diameter', 'gt', '8'],
+		['pipe', 'diameter', 'lt', '2.5'], ['pipe', 'velocity', 'top', '3'], ['pipe', 'velocity', 'bottom', ''],
+		['junction', 'connection', 'conn-any', ''], ['junction', 'connection', 'conn-closed', ''],
+		['junction', 'pressure', 'equals', '-12.5'], ['text', 'text', 'contains', 'pump house'],
+		['all', 'id', 'contains', '']].forEach(function (q) {
+		L.setState(q[0], q[1], q[2], q[3]);
+		L.buildPanel();
+		const line = L.queryText();
+		L.type(line);
+		const st = L.findState();
+		ok('round trip: ' + line,
+			L.controlsShown() && st.scope === q[0] && st.prop === q[1] && st.op === q[2] &&
+			// An extremes count left blank is printed as the ten it will really use, and reads back
+			// as that ten -- the line says what the search will do, not what the box holds.
+			(String(st.value) === String(q[3]) || (q[3] === '' && String(st.value) === '10')),
+			line + ' -> ' + JSON.stringify(st));
+	});
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

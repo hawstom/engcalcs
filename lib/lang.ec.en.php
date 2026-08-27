@@ -1591,7 +1591,10 @@ $ec_lang['lpn_find_no_value']='Type what to look for.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Connection';
-$ec_lang['lpn_find_op_conn_any']='is broken';
+// "is cut off for any reason" is Tom's own wording, 2026-08-26, replacing "is broken", which he
+// could not read: the test a condition has to pass is that a reader who has never seen our source
+// can tell what it asks.
+$ec_lang['lpn_find_op_conn_any']='is cut off for any reason';
 $ec_lang['lpn_find_op_conn_unlinked']='has no links';
 $ec_lang['lpn_find_op_conn_closed']='is behind closed links';
 $ec_lang['lpn_find_op_conn_nosource']='reaches no source';
@@ -1603,9 +1606,39 @@ $ec_lang['lpn_find_conn_nosource']='No path to a source';
 // box.
 $ec_lang['lpn_find_conn_none']='Every node is connected.';
 $ec_lang['lpn_find_conn_no_fixed']='This network has no reservoir or tank. Only nodes with no links can be reported.';
-// Task 540: the query written as one line, above the Find button. It teaches the shape of a search;
-// nothing types it in yet, and the tip says so rather than inviting an edit that does nothing.
-$ec_lang['lpn_find_query_tip']='The same search, written as one line. It is here to read, not to type in.';
+// Task 540: the query written as one line, above the Find button -- and typed into. The controls
+// write it and it writes the controls, so it teaches the shape of a search by being operated from
+// either end.
+$ec_lang['lpn_find_query_tip']='The same search, written as one line. Change the controls and it rewrites itself, or type in it and the controls follow.';
+$ec_lang['lpn_find_query_label']='Query';
+// Tom's own line, 2026-08-26, and "expandable" is his word: it says the grammar will grow.
+$ec_lang['lpn_find_query_hint']='Expandable with AND, OR, and ()';
+// The two joining words. They are TRANSLATED, like every other word in the query line -- but the
+// English spellings are accepted in every language as well, so a query pasted from a colleague or
+// from our documentation still runs.
+$ec_lang['lpn_find_q_and']='AND';
+$ec_lang['lpn_find_q_or']='OR';
+// When the typed query says more than three pull-downs can say, the pull-downs LEAVE rather than
+// stand there describing a search that is not the one about to run.
+$ec_lang['lpn_find_q_aside']='These controls cannot write the query below, so they are set aside rather than saying something untrue.';
+$ec_lang['lpn_find_q_restore']='Use the controls instead';
+$ec_lang['lpn_replace_q_aside']='Replace cannot use a query joined with AND, OR or brackets. Use the controls to choose one set of elements.';
+// The parse errors. Each says what could not be understood and where, and NONE of them is followed
+// by a search: a query that cannot be read searches nothing.
+// {n} is a whole number; {w} is the word the reader typed; {list} is a comma-separated list of the
+// words that would have worked.
+$ec_lang['lpn_find_q_err_pos']='(at character {n})';
+$ec_lang['lpn_find_q_err_empty']='The query is empty, so nothing will be searched.';
+$ec_lang['lpn_find_q_err_scope']='Not something to search: {w}. Try one of: {list}';
+$ec_lang['lpn_find_q_err_dot']='Put a dot between what to search and its property, like Junction.ID';
+$ec_lang['lpn_find_q_err_prop']='Not a property of {scope}: {w}. Try one of: {list}';
+$ec_lang['lpn_find_q_err_op']='Not a condition for {prop}: {w}. Try one of: {list}';
+$ec_lang['lpn_find_q_err_value']='This condition needs a value after it: {op}';
+$ec_lang['lpn_find_q_err_quote']='Put quotes around a text value: {w} is not a number.';
+$ec_lang['lpn_find_q_err_quote_end']='This quoted text has no closing quote.';
+$ec_lang['lpn_find_q_err_close']='This bracket ( was opened and never closed.';
+$ec_lang['lpn_find_q_err_open']='This bracket ) closes nothing.';
+$ec_lang['lpn_find_q_err_end']='Nothing was expected after this. Join two searches with {and} or {or}.';
 // The two conditions that name a control rather than a comparison, said as words the line can use:
 // "Pipe.Velocity highest 10".
 $ec_lang['lpn_find_q_top']='highest';

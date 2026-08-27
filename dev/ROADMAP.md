@@ -717,25 +717,25 @@ the block.
     drawing. If it does not, the strategy is wrong and no amount of tuning saves it.
 
 
-- 75|540| **[H] Both halves are BUILT; the wording and phase 2 stay open.**
-  Shipped for Tom's 2026-08-26 request: a `Connection` property whose conditions are the three
-  faults, and the query printed read-only above the Find button.
+- 75|540| **[H] BUILT, including the parser. What stays open is WORDING.**
+  A `Connection` property whose conditions are the three faults, and the query as an INPUT above the
+  Find button that parses back — `AND`, `OR` and brackets, translated operators with the English
+  words accepted as aliases in every language, case-insensitive. `find-harness.js` drives the real
+  input; 132 assertions.
   - **"Disconnected" is THREE faults and `lpnDiagnose()` distinguishes none of them** — it returns
-    one code, `unreachable`, for all three: the right answer to "can this be solved?" and useless
-    as a report. The panel splits it into no links / behind a closed link / no path to a source,
-    and `find-harness.js` asserts the three together are exactly `unreachable`, so the report
-    cannot drift from what the solve refuses.
-  - **[H] The grammar is naming, so what shipped is a PROPOSAL.** `Junction.Connection has no
-    links`, `Everything.ID contains '223'`, `Pipe.Velocity highest 10`. His own examples were
-    `Junction.ID contains 223` and `Junction.Links is empty`; `Links` was not used because
-    reachability is not a property of a node's link list. Renaming is cheap now and expensive once
-    phase 2 parses these words.
-  - **[H] The line is TRANSLATED, built from the labels the pull-downs show.** The identifier half
-    is localized whatever we do, so English operators would make it half-and-half. Cost accepted: a
-    query string is not portable between languages, and a phase-2 parser must take the localized
-    words, with the English ones as aliases.
-  - **Phase 2, the editable input, is a parser and a separate task.** Phase 1 exists to tell us
-    whether anybody reads the line at all; do not make it editable before that.
+    one code, `unreachable`, for all three. The panel splits it into no links / behind a closed link
+    / no path to a source, and the harness asserts the three together are exactly `unreachable`.
+  - **[H] Three condition wordings still fail Tom's own test** — can a reader who has never seen our
+    source tell what it asks? `is broken` failed it and is now his wording, *"is cut off for any
+    reason"*. `has no links`, `is behind closed links` and `reaches no source` are unjudged.
+    Renaming stays cheap: the parser reads the def lists, so a changed word changes what it accepts.
+  - **When the typed query outruns the controls, the controls LEAVE**, and one button brings them
+    back to the last query they did express. The rejected alternatives were showing the first
+    condition of a compound query, and greying the pull-downs out with their stale words still on
+    them — both claim a search that is not the one about to run. Replace declines a compound query
+    for the same reason: its property list is built from ONE scope.
+  - **Deliberately NOT built:** `NOT`, and comparing one property with another. The note under the
+    input is Tom's own word — *"Expandable"* — and says the grammar will grow.
 
 - 50|541| **Clicking a label: should it select the asset for editing?**
   Tom's question, 2026-08-26: *"Node insert and auto-edit mode: When you click on a label, should it

@@ -111,7 +111,10 @@ exports.run = async function ({ browser, report }) {
 			};
 		});
 		report.eq(controls.selects, 3, 'three pull-downs: what to search, which property, which condition');
-		report.eq(controls.texts, 1, 'one value box');
+		// Two text boxes since Task 540 phase 2: the Value box, and the query input under it. Every
+		// `querySelector('input[type=text]')` below therefore means the VALUE box, which comes first
+		// in the panel exactly as it does on screen.
+		report.eq(controls.texts, 2, 'the value box, and the query input');
 		report.ok(controls.buttons >= 1, 'and a Find button');
 
 		// A search that hits: the junction's own ID. One hit goes straight there, so the assertion is
@@ -154,18 +157,75 @@ exports.run = async function ({ browser, report }) {
 				const btn = p.querySelector('#lpn_find_form button');
 				const lr = line.getBoundingClientRect(), br = btn.getBoundingClientRect();
 				const pr = p.getBoundingClientRect();
-				return { text: line.textContent.trim(), aboveButton: lr.bottom <= br.top + 2,
+				return { text: String(line.value).trim(), aboveButton: lr.bottom <= br.top + 2,
 					inside: lr.left >= pr.left - 1 && lr.right <= pr.right + 1,
 					visible: lr.width > 0 && lr.height > 0,
-					inputs: p.querySelectorAll('.lpn-find-query input').length };
+					tag: line.tagName, type: line.type,
+					hint: (p.querySelector('.lpn-find-hint') || {}).textContent };
 			});
 			report.ok(q && q.visible && q.inside, 'the query line is drawn inside the panel',
 				q && JSON.stringify(q));
 			report.ok(q && q.aboveButton, '...right above the Find button, where Tom asked for it');
 			report.ok(q && /NOSUCHTHING/.test(q.text), '...and it says what the controls just expressed',
 				q && q.text);
-			// Phase 1 is a teaching device, not a parser: nothing to type into.
-			report.eq(q && q.inputs, 0, 'and it is read-only -- no input inside it');
+			// **PHASE 2: IT IS AN INPUT** (Tom, 2026-08-26: *"The query string should be an input so
+			// that eventually the user can try changing it and experimenting with AND, OR, and
+			// parentheses."*). The grammar is proved in dev/lpn-spike/find-harness.js; what a browser
+			// is needed for is that the thing on screen really does take a caret, and that the tip
+			// under it is drawn.
+			report.ok(q && q.tag === 'INPUT' && q.type === 'text', 'and it is an input, not a printed line',
+				q && (q.tag + '/' + q.type));
+			report.eq(q && q.hint, 'Expandable with AND, OR, and ()', 'Tom\'s tip is under it');
+		}
+
+		// **A COMPOUND QUERY, TYPED, IN A REAL BROWSER.** The set arithmetic is asserted against
+		// hand-computed answers in the harness; here the question is whether typing one into the real
+		// input runs it, and whether the pull-downs really do leave -- a control that stayed behind
+		// would be describing a search that is not the one that ran.
+		{
+			const compound = await a.page.evaluate(() => {
+				const p = document.getElementById('lpn_find_popup');
+				const q = p.querySelector('.lpn-find-query');
+				q.value = "Everything.ID contains 'J' OR Everything.ID contains 'L'";
+				q.dispatchEvent(new Event('input', { bubbles: true }));
+				const selects = p.querySelectorAll('#lpn_find_form select').length;
+				const aside = p.querySelector('.lpn-find-aside');
+				// **BY ID, NOT "the first button in the form".** With the controls set aside, the
+				// first button is the one that brings them BACK -- pressing that would restore the
+				// panel and never run the search, which is exactly how this check first failed.
+				p.querySelector('#lpn_find_go').click();
+				return { selects: selects, results: p.querySelector('#lpn_find_results').textContent,
+					aside: aside ? aside.textContent : null };
+			});
+			report.eq(compound.selects, 0, 'a query the controls cannot write takes the pull-downs off');
+			report.ok(compound.aside && /set aside/.test(compound.aside),
+				'...and says why, where they were', compound.aside);
+			report.ok(/found/.test(compound.results), '...and the OR really runs',
+				compound.results.trim().slice(0, 60));
+
+			// A query that cannot be read must report and search NOTHING -- never fall back to
+			// "everything", which is a wrong answer wearing a confident face.
+			const bad = await a.page.evaluate(() => {
+				const p = document.getElementById('lpn_find_popup');
+				const q = p.querySelector('.lpn-find-query');
+				q.value = 'Everything.Nonsense contains 1';
+				q.dispatchEvent(new Event('input', { bubbles: true }));
+				const msg = p.querySelector('.lpn-find-msg').textContent;
+				p.querySelector('#lpn_find_go').click();
+				return { msg: msg, rows: p.querySelectorAll('#lpn_find_results button').length,
+					results: p.querySelector('#lpn_find_results').textContent };
+			});
+			report.ok(/Nonsense/.test(bad.msg), 'an unreadable query says what it could not read', bad.msg);
+			report.eq(bad.rows, 0, '...and searches nothing at all');
+
+			// Back to a query the controls can write, so the rest of this spec runs on the panel it
+			// expects.
+			await a.page.evaluate(() => {
+				const p = document.getElementById('lpn_find_popup');
+				const q = p.querySelector('.lpn-find-query');
+				q.value = "Everything.ID contains 'NOSUCHTHING'";
+				q.dispatchEvent(new Event('input', { bubbles: true }));
+			});
 		}
 
 		// **TOP n AND BOTTOM n ARE CONDITIONS, AND THE VALUE BOX HOLDS n** (Tom, 2026-08-18). Checked
