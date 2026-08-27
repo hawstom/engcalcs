@@ -746,6 +746,14 @@ the block.
   - **[H] Three condition wordings still fail Tom's own test** — can a reader who has never seen our
     source tell what it asks? `is broken` failed it and is now his wording, *"is cut off for any
     reason"*. `has no links`, `is behind closed links` and `reaches no source` are unjudged.
+    - **[H] AND TOM READ THE LAST TWO AS THE SAME THING, 2026-08-26:** *"It sounds to me like
+      options (c) and (d) are equivalent."* **In the code they are mutually exclusive; in the
+      words they are not.** `reaches no source` is literally true of a node behind closed links
+      too, so it reads as the umbrella rather than as the sibling — which is `is cut off for any
+      reason`'s job. The two differ by REMEDY, and that is the thing to name:
+      **`is behind closed links` → open a valve** (a whole path of pipe exists);
+      **`reaches no source` → build a connection** (this node is on a separate island).
+      Proposed for the second, awaiting his wording: `is on a separate network`. His call.
     Renaming stays cheap: the parser reads the def lists, so a changed word changes what it accepts.
   - **When the typed query outruns the controls, the controls LEAVE**, and one button brings them
     back to the last query they did express. The rejected alternatives were showing the first

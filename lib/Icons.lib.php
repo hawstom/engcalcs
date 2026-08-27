@@ -422,46 +422,63 @@ $ec_icons = array(
 	// the `fire-flow` branch, not on master. It is a finished drawing with a Tom-reviewed shape, so
 	// it keeps its entry the way `plan` below does. Do not delete it as dead code.
 	//
-	// **IT IS A VERTICAL CYLINDER -- A PIPE WITH A FEW GOODIES ON IT.** That is Tom's correction of
-	// the first drawing, 2026-08-25, and it is a correction about PROPORTION, not about features:
-	// *"you missed the key physical reality that it's fundamentally a vertical cylinder (your main
-	// failure), meaning a pipe with a few goodies on it."* The first version was 9 units wide and 11
-	// tall and read as a squat box. This barrel is 7 wide and 12.5 tall, and the two flanges it is
-	// bracketed by -- the collar at the bonnet and the splayed foot -- are BOTH wider than it, which
-	// is what makes the eye read the middle as a length of pipe rather than as a body.
+	// **REDRAWN 2026-08-26 AGAINST TOM'S OWN CAD FRONT ELEVATION**, which he supplied twice --
+	// once as a wireframe/filled pair and once beside a commercial line icon -- with the ruling
+	// *"Hydrant PNG: unsuitable. Follow [the images] more closely."* Three things in the previous
+	// drawing were STRUCTURAL errors, not matters of taste, and they are the ones to not reintroduce:
+	//   the bonnet dome sprang from INSIDE the barrel walls with the collar drawn across its legs,
+	//     so it read as an arch cut into the barrel rather than a dome sitting on a flange;
+	//   the pumper nozzle was a solid disc, which at 96 px and above reads as a bolt hole;
+	//   the side nozzles were a stub plus a cross-bar, which reads as a bracket, not a nozzle.
+	// Now: the collar is a bar the dome STANDS ON, the pumper is a ring, and each side nozzle is a
+	// single round-capped stroke -- a pill, which is the shape both references actually show.
 	//
-	// Drawn from his own CAD front elevation, top to bottom: the operating nut (a small square,
-	// turned with a wrench to open the valve), the domed bonnet, the wide flat collar, the barrel,
-	// two side nozzles each with its own smaller nut, the pumper nozzle on the face, and the foot on
-	// a ground line. Every square and knob on a real hydrant is a nut for a wrench; the side and
-	// front ones take the dust caps off, the top one turns the water on.
+	// **THE BARREL IS WIDER THAN THE OLD ONE, AND THAT IS NOT A REVERSAL OF HIS "VERTICAL CYLINDER"
+	// CORRECTION.** He rejected a first drawing that was 9 wide and 11 tall as a squat box, and the
+	// fix taken then was a 7-wide barrel. Measured off his CAD, the barrel there is WIDER than it is
+	// tall; what makes the eye read it as a length of pipe is that the collar and the foot are both
+	// wider still and BRACKET it. So the bracketing carries the reading, not a narrow barrel -- and
+	// the extra width is what finally leaves room for a ring instead of a dot. Barrel walls at
+	// x = 7 and 17; collar and flange both 4.5 to 19.5.
 	//
-	// **WHAT DID NOT SURVIVE 17 px, MEASURED RATHER THAN JUDGED.** The nut inside the pumper circle
-	// is gone, and the pumper is a solid disc rather than a ring: a ring needs r >= 2.6 to hold an
-	// open centre, and the barrel only offers 5 units of clear width between its walls, so the ring
-	// fuses to both. Two other arrangements were drawn and measured first -- a disc sharing the
-	// nozzle band (the middle of the icon became one block) and a ring cut into the barrel walls
-	// with the nozzles above it (the nozzles fused to the ring) -- and both lost to this one, which
-	// separates the two nozzle levels VERTICALLY. Feature count was never the constraint; clear gap
-	// is, and every gap here is budgeted:
-	//   walls at x = 8.5 and 15.5, so 9.5..14.5 is clear inside -- 5 units
-	//   pumper disc r = 1.4 at (12, 17.2), spanning 10.6..13.4, so 1.1 units of air to each wall
-	//   side-nozzle nuts end at y = 14.9 painted; the disc starts at 15.8 -- 0.9 units below them
-	//   collar at y = 7 to the nozzle stubs at y = 12.5: 4.5 units of bare pipe, the cylinder read
+	// Drawn from that elevation, top to bottom: the operating nut (a small square, turned with a
+	// wrench to open the valve), the domed bonnet, the wide flat collar, the barrel, two side
+	// nozzles, the pumper nozzle on the face, the foot flange, and a ground line. Every square and
+	// knob on a real hydrant is a nut for a wrench; the side and front ones take the dust caps off,
+	// the top one turns the water on.
+	//
+	// **THE GAP BUDGET, which is what decides legibility at 17 px** (17/24 of a unit is 0.71 px, and
+	// a 2-unit stroke eats one unit either side of every line, so a gap under about 2.5 units
+	// closes). Feature count has never been the constraint here:
+	//   walls painted to x = 8 and 16, so 8 units of clear barrel face
+	//   ring r = 2.5 at (12, 13.6), painted 8.5..15.5 -- 0.5 units of air to each wall
+	//   ring interior 3 units across: it holds open to 96 px and closes below that, which degrades
+	//     to the old solid disc rather than to noise. That is why there is no nut inside the ring:
+	//     a third concentric feature has nowhere to be.
+	//   nozzle pills at y = 12.3, stroke 3, spanning y 10.8..13.8 -- 2.8 units below the collar
+	//   nozzles deliberately sit ABOVE the ring's centre and overlap its upper half, as the CAD
+	//     does; level with it, the three features read as one horizontal band.
+	//   flange painted to y = 20.5 and the ground line from 21.8 -- 1.3 units, which closes at 48 px
+	//     and below into a single base, an acceptable reading.
 	// The nut, the bonnet and the collar deliberately TOUCH -- a nut sits on a bonnet and a bonnet
-	// sits on a flange, so there is no gap there to spend. Same for the foot on the ground line.
-	// Verify with:
-	//     php dev/scripts/icon_ascii_preview.php hydrant --size=17
+	// sits on a flange, so there is no gap there to spend.
 	//
-	// Cubics, never an `A` arc, for the bonnet dome: icon_ascii_preview.php models M/L/H/V/C/Z
-	// only, so an arc renders as nonsense there and the one tool that can measure this goes blind.
-	'hydrant'    => '<path d="M2 22H22"/><path d="M8.5 19.5L6.5 22H17.5L15.5 19.5"/>'
-		. '<path d="M8.5 19.5V7"/><path d="M15.5 19.5V7"/><path d="M5 7H19"/>'
-		. '<path d="M8.8 7C8.8 4.3 10.2 3.3 12 3.3C13.8 3.3 15.2 4.3 15.2 7"/>'
-		. '<path d="M10.9 3.3V1.6H13.1V3.3"/>'
-		. '<path d="M8.5 12.5H5.6"/><path d="M5.6 11.1V13.9"/>'
-		. '<path d="M15.5 12.5H18.4"/><path d="M18.4 11.1V13.9"/>'
-		. '<circle cx="12" cy="17.2" r="1.4" fill="currentColor" stroke="none"/>',
+	// The ground line is stroke 1.6, lighter than everything else: it is a reference line, not part
+	// of the object. Verify with a real rendering, not ASCII:
+	//     node dev/scripts/icon_png_preview.js hydrant
+	//
+	// Cubics, never an `A` arc, for the bonnet dome and the ring: icon_ascii_preview.php models
+	// M/L/H/V/C/Z only, so an arc renders as nonsense there and that tool goes blind.
+	'hydrant'    => '<path stroke-width="1.6" d="M2.5 22.6H21.5"/>'
+		. '<path d="M4.5 19.5H19.5"/>'
+		. '<path d="M7 19.5V7"/><path d="M17 19.5V7"/>'
+		. '<path d="M4.5 7H19.5"/>'
+		. '<path d="M7.8 7C7.8 4.68 9.68 2.8 12 2.8C14.32 2.8 16.2 4.68 16.2 7"/>'
+		. '<path d="M10.9 2.8V1.5H13.1V2.8"/>'
+		. '<path stroke-width="3" d="M6.4 12.3H4.7"/>'
+		. '<path stroke-width="3" d="M17.6 12.3H19.3"/>'
+		. '<path d="M12 11.1C13.38 11.1 14.5 12.22 14.5 13.6C14.5 14.98 13.38 16.1 12 16.1'
+		. 'C10.62 16.1 9.5 14.98 9.5 13.6C9.5 12.22 10.62 11.1 12 11.1Z"/>',
 
 	// CANDIDATES for the Water menu, drawn 2026-08-25. Tom: the drop and the eye *"don't look
 	// different enough, especially with the association of tears and eyes"*. He named a water tower
