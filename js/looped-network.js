@@ -7306,14 +7306,17 @@ var EngCalcs = EngCalcs || {};
 	function findScopeDefs() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			{ key: 'all', label: pc.lpn_find_scope_all || 'All elements' },
-			{ key: 'junction', label: pc.lpn_tool_add_junction || 'Junction', group: 'node', type: 'junction' },
-			{ key: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', group: 'node', type: 'reservoir' },
-			{ key: 'tank', label: pc.lpn_tool_add_tank || 'Tank', group: 'node', type: 'tank' },
-			{ key: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', group: 'link', type: 'pipe' },
-			{ key: 'pump', label: pc.lpn_tool_add_pump || 'Pump', group: 'link', type: 'pump' },
-			{ key: 'valve', label: pc.lpn_tool_add_valve || 'Valve', group: 'link', type: 'valve' },
-			{ key: 'text', label: pc.lpn_tool_add_text || 'Text', group: 'label' }
+			// `en` is the English spelling, and it is here for the PARSER rather than for the
+			// pull-down: a query pasted from a colleague or from our own documentation must not
+			// fail because the reader's interface is in Portuguese. See findAlts().
+			{ key: 'all', label: pc.lpn_find_scope_all || 'All elements', en: 'Everything' },
+			{ key: 'junction', label: pc.lpn_tool_add_junction || 'Junction', group: 'node', type: 'junction', en: 'Junction' },
+			{ key: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', group: 'node', type: 'reservoir', en: 'Reservoir' },
+			{ key: 'tank', label: pc.lpn_tool_add_tank || 'Tank', group: 'node', type: 'tank', en: 'Tank' },
+			{ key: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', group: 'link', type: 'pipe', en: 'Pipe' },
+			{ key: 'pump', label: pc.lpn_tool_add_pump || 'Pump', group: 'link', type: 'pump', en: 'Pump' },
+			{ key: 'valve', label: pc.lpn_tool_add_valve || 'Valve', group: 'link', type: 'valve', en: 'Valve' },
+			{ key: 'text', label: pc.lpn_tool_add_text || 'Text', group: 'label', en: 'Text' }
 		];
 	}
 	function findScopeDef(key) {
@@ -7346,14 +7349,17 @@ var EngCalcs = EngCalcs || {};
 	// silently match nothing.
 	function findPropDefs() {
 		var pc = EngCalcs.pageConfig || {}, d = findScopeDef(findState.scope),
-			out = [['id', pc.lpn_field_id || 'ID']], defs, allowed;
+			// The third element of every row is the English spelling the parser also accepts. A
+			// property that has no English name of its own carries its INTERNAL name instead
+			// (`diameter`, `velocity`), which is stable, is English, and is always available.
+			out = [['id', pc.lpn_field_id || 'ID', 'ID']], defs, allowed;
 		if (d.group === 'label') {
-			out.push(['text', pc.lpn_tool_add_text || 'Text']);
+			out.push(['text', pc.lpn_tool_add_text || 'Text', 'Text']);
 			// A Text label's own size multiplier, which is the one NUMBER it carries -- and the one
 			// worth a range condition (Tom, 2026-08-18: "Size would be very interesting to search
 			// on using the same Conditions as other range values"). "Which of my notes is set
 			// biggest" has no other answer on this page.
-			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier']);
+			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier', 'Size multiplier']);
 			return out;
 		}
 		// **CONNECTION IS OFFERED UNDER "Everything" TOO, and it is the one property that earns the
@@ -7362,7 +7368,7 @@ var EngCalcs = EngCalcs || {};
 		// It is also inherently a question about the network rather than about a class of element,
 		// so restricting it to the node scopes would mean running the same report three times.
 		if (d.key === 'all' || d.group === 'node') {
-			out.push(['connection', pc.lpn_find_prop_connection || 'Connection']);
+			out.push(['connection', pc.lpn_find_prop_connection || 'Connection', 'Connection']);
 		}
 		if (d.key === 'all') { return out; }
 		defs = d.group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc);
@@ -7373,7 +7379,7 @@ var EngCalcs = EngCalcs || {};
 			// "which pipes are longer than 500 ft" is one of the most natural searches there is,
 			// and the number is right there on the pipe. Searching and colouring are different
 			// questions and this is where they part.
-			if (allowed[f[0]] !== undefined || FIND_EXTRA_LINK_FIELDS[f[0]]) { out.push(f); }
+			if (allowed[f[0]] !== undefined || FIND_EXTRA_LINK_FIELDS[f[0]]) { out.push([f[0], f[1], f[0]]); }
 		});
 		return out;
 	}
@@ -7454,15 +7460,20 @@ var EngCalcs = EngCalcs || {};
 	// The three faults are CONDITIONS, on the same footing as "is greater than" -- the precedent is
 	// Top n and Bottom n above, which are conditions rather than a second box for the same reason:
 	// the panel already asks "which elements?" three ways, and a fourth control would be a fourth
-	// thing to learn. Each needs no Value, and "is broken" first is the report Tom asked for --
-	// one press, every kind.
+	// thing to learn. Each needs no Value, and the all-kinds condition first is the report Tom asked
+	// for -- one press, every kind.
+	//
+	// **"is cut off for any reason" IS TOM'S OWN WORDING** (2026-08-26), replacing "is broken",
+	// which he could not read: *"I don't know what 'is broken' means. Ahh. I just guessed. 'Is cut
+	// off for any reason'. Nice."* The test it passes and the old one failed is that a reader who
+	// has never seen our source can tell what it asks.
 	function findConnOpDefs() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			['conn-any', pc.lpn_find_op_conn_any || 'is broken'],
-			['conn-unlinked', pc.lpn_find_op_conn_unlinked || 'has no links'],
-			['conn-closed', pc.lpn_find_op_conn_closed || 'is behind closed links'],
-			['conn-nosource', pc.lpn_find_op_conn_nosource || 'reaches no source']
+			['conn-any', pc.lpn_find_op_conn_any || 'is cut off for any reason', 'is cut off for any reason'],
+			['conn-unlinked', pc.lpn_find_op_conn_unlinked || 'has no links', 'has no links'],
+			['conn-closed', pc.lpn_find_op_conn_closed || 'is behind closed links', 'is behind closed links'],
+			['conn-nosource', pc.lpn_find_op_conn_nosource || 'reaches no source', 'reaches no source']
 		];
 	}
 	function findConnMatchesOp(op, st) {
@@ -7492,11 +7503,14 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (findPropIsConnection(findState.prop)) { return findConnOpDefs(); }
 		if (findPropIsText(findState.prop)) {
-			return [['contains', pc.lpn_find_op_contains || 'contains'], ['equals', pc.lpn_find_op_equals || 'is exactly']];
+			return [['contains', pc.lpn_find_op_contains || 'contains', 'contains'],
+				['equals', pc.lpn_find_op_equals || 'equal to', 'equal to']];
 		}
-		return [['equals', pc.lpn_find_op_equals || 'is exactly'], ['gt', pc.lpn_find_op_gt || 'is greater than'],
-			['lt', pc.lpn_find_op_lt || 'is less than'],
-			['top', pc.lpn_find_op_top || 'Top n'], ['bottom', pc.lpn_find_op_bottom || 'Bottom n']];
+		return [['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'],
+			['gt', pc.lpn_find_op_gt || 'greater than', 'greater than'],
+			['lt', pc.lpn_find_op_lt || 'less than', 'less than'],
+			['top', pc.lpn_find_op_top || 'Highest n', 'Highest n'],
+			['bottom', pc.lpn_find_op_bottom || 'Lowest n', 'Lowest n']];
 	}
 	function findOpIsExtreme(op) { return op === 'top' || op === 'bottom'; }
 	// How many an extremes query returns. The Value box holds it, and a blank or nonsense entry
@@ -7743,24 +7757,19 @@ var EngCalcs = EngCalcs || {};
 		parent.appendChild(wrap);
 		return sel;
 	}
-	// ---- THE QUERY, WRITTEN OUT AS ONE LINE (ROADMAP Task 540, phase 1) -------------------------
+	// ---- THE QUERY, WRITTEN OUT AS ONE LINE (ROADMAP Task 540) -----------------------------------
 	//
 	// Tom, 2026-08-26: *"start teaching users a simple query language by printing right above the
-	// Find button a string ... like 'Junction.ID contains 223' or 'Junction.Links is empty'"*.
-	//
-	// **PHASE 1 IS READ-ONLY AND THAT IS THE WHOLE DESIGN.** The pull-downs stay the way in; this
-	// line only says what they just expressed. Nothing parses it, and there is deliberately no
-	// input to type it into: making it editable is a grammar and a parser, and the one thing phase
-	// 1 is for is finding out whether anybody reads the line at all. An input would answer a
-	// different question and could not be withdrawn.
+	// Find button a string ... like 'Junction.ID contains 223'"*, and then: *"The query string
+	// should be an input so that eventually the user can try changing it and experimenting with
+	// AND, OR, and parentheses."*
 	//
 	// **IT IS BUILT FROM THE LABELS THE PULL-DOWNS ARE SHOWING, so it is in the reader's own
 	// language.** A teaching device that a reader cannot read teaches nothing, and the identifier
 	// half is localized whatever we do -- the scope is the Insert tool's own word for a Junction.
 	// Keeping the operators in English would produce a half-and-half sentence, which is the worst
 	// of the two. The cost is stated and accepted: a query string is not portable between
-	// languages, so a phase-2 parser must accept the localized words (and should accept the English
-	// ones as aliases).
+	// languages, which is why the parser below ALSO accepts the English spelling of every word.
 	//
 	// Two operators do not compose into a sentence and get their own word here: "Highest n" and
 	// "Lowest n" name a control, not a comparison, so the line says `highest 10` with the count the
@@ -7789,17 +7798,378 @@ var EngCalcs = EngCalcs || {};
 		if (findPropIsText(findState.prop)) { return head + ' ' + op + " '" + v + "'"; }
 		return v === '' ? head + ' ' + op : head + ' ' + op + ' ' + v;
 	}
-	// Held rather than looked up by id, for buildReplaceForm()'s reason: rebuildFindForm() is the
-	// only thing that ever creates it, and Looped-Network.php does not declare it.
-	var findQueryEl = null;
-	function updateFindQuery() {
-		if (findQueryEl) { findQueryEl.textContent = findQueryString(); }
+	// ---- THE PARSER (ROADMAP Task 540, phase 2) --------------------------------------------------
+	//
+	// GRAMMAR, and this is the whole of it:
+	//
+	//   query      := or
+	//   or         := and ( OR and )*
+	//   and        := primary ( AND primary )*
+	//   primary    := '(' or ')' | condition
+	//   condition  := Scope '.' Property Condition [ value ]
+	//   value      := a bare NUMBER, or TEXT inside single or double quotes
+	//
+	// **THE GRAMMAR IS HERE; THE WORDS ARE LOOKED UP.** Every terminal above -- the scopes, the
+	// properties, the conditions, AND and OR -- is read out of the same def lists the pull-downs
+	// are built from, so a translator changing one word changes what the parser accepts and CANNOT
+	// break parsing. There is no second list of words anywhere in this file.
+	//
+	// **THE ENGLISH SPELLING IS ALWAYS ACCEPTED TOO**, in every language, because a query pasted
+	// from a colleague, from a forum or from our own documentation must not fail on a reader whose
+	// interface is in Portuguese. Each def carries its English word beside its localized one; a
+	// property with no English name of its own accepts its internal name (`diameter`, `velocity`).
+	//
+	// **MATCHING IS CASE-INSENSITIVE, deliberately.** `and`, `And` and `AND` are one operator: a
+	// teaching device that rejects the lower-case spelling of the word it printed in capitals is
+	// hostile, and most of the other 26 languages have no capitalisation convention that would make
+	// the distinction mean anything.
+	//
+	// **TEXT IS QUOTED AND NUMBERS ARE BARE.** That one rule is what makes a value unambiguous:
+	// without it `ID contains AND` cannot be told apart from a text value that happens to be the
+	// word AND. It is also exactly what findQueryString() writes.
+	function findFold(a, b) {
+		return String(a).toLowerCase() === String(b).toLowerCase() ||
+			String(a).toUpperCase() === String(b).toUpperCase();
 	}
-	function rebuildFindForm() {
-		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_find_form'),
-			props, ops, valWrap, valLab, input, btn;
+	var FIND_WORDCH = /[0-9A-Za-z\u00c0-\uffff]/;
+	// How many characters `word` takes up at `at`, or 0. The boundary test is what stops "Pipe"
+	// matching inside "Pipeline" -- without it a typo parses as a valid query.
+	function findWordAt(text, at, word) {
+		var w = String(word), after;
+		if (!w.length || at + w.length > text.length) { return 0; }
+		if (!findFold(text.substr(at, w.length), w)) { return 0; }
+		after = text.charAt(at + w.length);
+		if (after && FIND_WORDCH.test(after) && FIND_WORDCH.test(w.charAt(w.length - 1))) { return 0; }
+		return w.length;
+	}
+	// [key, localized, english] -> the spellings this key answers to, deduplicated.
+	function findAlts(defs) {
+		return defs.map(function (d) {
+			var words = [d[1]];
+			if (d[2] && !findFold(d[2], d[1])) { words.push(d[2]); }
+			return { key: d[0], label: d[1], words: words };
+		});
+	}
+	// LONGEST WINS, always: "greater than" must not be taken as "greater" would be, and "Highest n"
+	// must be tried before "highest".
+	function findMatchAlt(text, at, alts) {
+		var best = null, i, j, n;
+		for (i = 0; i < alts.length; i++) {
+			for (j = 0; j < alts[i].words.length; j++) {
+				n = findWordAt(text, at, alts[i].words[j]);
+				if (n && (!best || n > best.len)) { best = { key: alts[i].key, len: n }; }
+			}
+		}
+		return best;
+	}
+	function findAltList(alts) {
+		return alts.map(function (a) { return a.label; }).join(', ');
+	}
+	// The two joining words, as a def list so they go through findAlts() like everything else.
+	function findJoinDefs() {
+		var pc = EngCalcs.pageConfig || {};
+		return [['and', pc.lpn_find_q_and || 'AND', 'AND'], ['or', pc.lpn_find_q_or || 'OR', 'OR']];
+	}
+	// A message with {placeholders}. Looked up dynamically, so every key it can reach is listed in
+	// Looped-Network.php's pageConfig by hand -- see the block of lpn_find_q_err_* keys there.
+	function findMsg(key, fallback, subs) {
+		var t = String((EngCalcs.pageConfig || {})[key] || fallback), k;
+		for (k in subs) {
+			if (Object.prototype.hasOwnProperty.call(subs, k)) { t = t.split('{' + k + '}').join(subs[k]); }
+		}
+		return t;
+	}
+	// The scope and property lists depend on each other, and both are read off findState. Asked for
+	// here without disturbing it: the parser must be able to read a query about Pipes while the
+	// pull-downs are still showing Junctions.
+	function findDefsFor(scope, prop) {
+		var save = { s: findState.scope, p: findState.prop }, out = {};
+		findState.scope = scope;
+		out.props = findPropDefs();
+		if (prop !== undefined) { findState.prop = prop; out.ops = findOpDefs(); }
+		findState.scope = save.s; findState.prop = save.p;
+		return out;
+	}
+	// The word that could not be understood, for the message. Up to the next space, dot or bracket.
+	function findBadWord(text, at) {
+		var m = /^[^\s().]+/.exec(text.substring(at));
+		return m ? m[0] : (text.charAt(at) || '');
+	}
+	// Returns { ok: true, ast: node } or { ok: false, msg: text, pos: character index }.
+	// **NEVER A FALLBACK.** A query that cannot be read returns the failure and the caller searches
+	// nothing: "search everything" would be a wrong answer wearing a confident face.
+	function findParse(text) {
+		var s = String(text), i = 0, err = null, joins = findAlts(findJoinDefs()),
+			scopes = findAlts(findScopeDefs().map(function (d) { return [d.key, d.label, d.en]; }));
+		function ws() { while (i < s.length && /\s/.test(s.charAt(i))) { i += 1; } }
+		function fail(key, fallback, subs, at) {
+			if (!err) { err = { msg: findMsg(key, fallback, subs), pos: (at === undefined ? i : at) }; }
+			return null;
+		}
+		function join() {
+			var m;
+			ws();
+			m = findMatchAlt(s, i, joins);
+			return m;
+		}
+		function value(opKey, opLabel) {
+			var ch, j, m;
+			ws();
+			ch = s.charAt(i);
+			if (ch === "'" || ch === '"') {
+				j = s.indexOf(ch, i + 1);
+				if (j < 0) { return fail('lpn_find_q_err_quote_end', 'This quoted text has no closing quote.'); }
+				m = s.substring(i + 1, j); i = j + 1;
+				return { v: m };
+			}
+			m = /^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?/.exec(s.substring(i));
+			if (m) { i += m[0].length; return { v: m[0] }; }
+			return null;
+		}
+		function condition() {
+			var m, scope, propDefs, propAlts, prop, opDefs, opAlts, op, at, v;
+			ws();
+			at = i;
+			m = findMatchAlt(s, i, scopes);
+			if (!m) {
+				return fail('lpn_find_q_err_scope', 'Not something to search: {w}. Try one of: {list}',
+					{ w: findBadWord(s, i), list: findAltList(scopes) });
+			}
+			scope = m.key; i += m.len;
+			ws();
+			if (s.charAt(i) !== '.') {
+				return fail('lpn_find_q_err_dot',
+					'Put a dot between what to search and its property, like Junction.ID');
+			}
+			i += 1; ws();
+			propDefs = findDefsFor(scope).props;
+			propAlts = findAlts(propDefs);
+			at = i;
+			m = findMatchAlt(s, i, propAlts);
+			if (!m) {
+				return fail('lpn_find_q_err_prop', 'Not a property of {scope}: {w}. Try one of: {list}',
+					{ w: findBadWord(s, i), scope: findScopeDef(scope).label, list: findAltList(propAlts) });
+			}
+			prop = m.key; i += m.len;
+			opDefs = findDefsFor(scope, prop).ops;
+			opAlts = findAlts(opDefs);
+			// The extremes are written `highest 10` on the printed line and `Highest n` in the
+			// pull-down, so both spellings answer, plus the English of each.
+			opAlts = opAlts.concat(findAlts([
+				['top', (EngCalcs.pageConfig || {}).lpn_find_q_top || 'highest', 'highest'],
+				['bottom', (EngCalcs.pageConfig || {}).lpn_find_q_bottom || 'lowest', 'lowest']
+			]).filter(function (a) {
+				return opDefs.some(function (d) { return d[0] === a.key; });
+			}));
+			ws();
+			at = i;
+			m = findMatchAlt(s, i, opAlts);
+			if (!m) {
+				return fail('lpn_find_q_err_op', 'Not a condition for {prop}: {w}. Try one of: {list}',
+					{ w: findBadWord(s, i), prop: findLabelOf(propDefs, prop), list: findAltList(findAlts(opDefs)) });
+			}
+			op = m.key; i += m.len;
+			// A connection condition asks the whole question by itself and takes no value.
+			if (findPropIsConnection(prop)) { return { t: 'cond', scope: scope, prop: prop, op: op, value: '' }; }
+			at = i;
+			v = value(op, findLabelOf(opDefs, op));
+			if (err) { return null; }
+			if (!v) {
+				// The extremes rank what is there, so their count may be left off -- ten, as the
+				// printed line says. Everything else needs something to match against, and a bare
+				// word is the mistake to name: text belongs in quotes.
+				if (findOpIsExtreme(op)) { return { t: 'cond', scope: scope, prop: prop, op: op, value: '' }; }
+				ws();
+				if (FIND_WORDCH.test(s.charAt(i) || '')) {
+					return fail('lpn_find_q_err_quote', 'Put quotes around a text value: {w} is not a number.',
+						{ w: findBadWord(s, i) });
+				}
+				return fail('lpn_find_q_err_value', 'This condition needs a value after it: {op}',
+					{ op: findLabelOf(opDefs, op) }, at);
+			}
+			return { t: 'cond', scope: scope, prop: prop, op: op, value: v.v };
+		}
+		function primary() {
+			var node;
+			ws();
+			if (s.charAt(i) === '(') {
+				var open = i;
+				i += 1;
+				node = orExpr();
+				if (err) { return null; }
+				ws();
+				if (s.charAt(i) !== ')') {
+					return fail('lpn_find_q_err_close', 'This bracket ( was opened and never closed.', {}, open);
+				}
+				i += 1;
+				return node;
+			}
+			if (s.charAt(i) === ')') {
+				return fail('lpn_find_q_err_open', 'This bracket ) closes nothing.');
+			}
+			return condition();
+		}
+		// AND binds tighter than OR, which is what every other query language does and what a reader
+		// assumes without being told.
+		function andExpr() {
+			var node = primary(), m, save;
+			if (err) { return null; }
+			for (;;) {
+				save = i;
+				m = join();
+				if (!m || m.key !== 'and') { i = save; return node; }
+				i += m.len;
+				var rhs = primary();
+				if (err) { return null; }
+				node = { t: 'and', a: node, b: rhs };
+			}
+		}
+		function orExpr() {
+			var node = andExpr(), m, save;
+			if (err) { return null; }
+			for (;;) {
+				save = i;
+				m = join();
+				if (!m || m.key !== 'or') { i = save; return node; }
+				i += m.len;
+				var rhs = andExpr();
+				if (err) { return null; }
+				node = { t: 'or', a: node, b: rhs };
+			}
+		}
+		var ast = orExpr();
+		if (err) { return { ok: false, msg: err.msg, pos: err.pos }; }
+		ws();
+		if (i < s.length) {
+			return { ok: false, pos: i, msg: findMsg('lpn_find_q_err_end',
+				'Nothing was expected after this. Join two searches with {and} or {or}.',
+				{ and: findLabelOf(findJoinDefs(), 'and'), or: findLabelOf(findJoinDefs(), 'or'), w: findBadWord(s, i) }) };
+		}
+		return { ok: true, ast: ast };
+	}
+	function findAstIsCond(ast) { return !!ast && ast.t === 'cond'; }
+	function findAstHasConnection(ast) {
+		if (!ast) { return false; }
+		if (ast.t === 'cond') { return findPropIsConnection(ast.prop); }
+		return findAstHasConnection(ast.a) || findAstHasConnection(ast.b);
+	}
+	function findKeyOf(c) { return c.group + ':' + c.el.id; }
+	function findUnion(a, b) {
+		var seen = {}, out = [];
+		a.concat(b).forEach(function (c) {
+			var k = findKeyOf(c);
+			if (!seen[k]) { seen[k] = true; out.push(c); }
+		});
+		return out;
+	}
+	function findIntersect(a, b) {
+		var inB = {};
+		b.forEach(function (c) { inB[findKeyOf(c)] = true; });
+		return a.filter(function (c) { return inB[findKeyOf(c)]; });
+	}
+	// **EVERY CONDITION RUNS THROUGH findMatches(), the one search there is.** Combining sets is all
+	// this adds -- a second matcher for compound queries would be a second answer to "which pipes
+	// are under 8 inches".
+	function findEvalNode(node) {
+		var save, out;
+		if (node.t === 'or') { return findUnion(findEvalNode(node.a), findEvalNode(node.b)); }
+		if (node.t === 'and') { return findIntersect(findEvalNode(node.a), findEvalNode(node.b)); }
+		save = { s: findState.scope, p: findState.prop, o: findState.op, v: findState.value };
+		findState.scope = node.scope; findState.prop = node.prop;
+		findState.op = node.op; findState.value = node.value;
+		out = findMatches();
+		findState.scope = save.s; findState.prop = save.p; findState.op = save.o; findState.value = save.v;
+		return out;
+	}
+	// A compound answer has no single property to rank by, so it is ordered the way a person reads a
+	// list: nodes, then links, then labels, each by id. Total and stable, like findSortMatches().
+	var FIND_GROUP_ORDER = { node: 0, link: 1, label: 2 };
+	function findSortCompound(list) {
+		return list.sort(function (a, b) {
+			if (FIND_GROUP_ORDER[a.group] !== FIND_GROUP_ORDER[b.group]) {
+				return FIND_GROUP_ORDER[a.group] - FIND_GROUP_ORDER[b.group];
+			}
+			return a.el.id < b.el.id ? -1 : (a.el.id > b.el.id ? 1 : 0);
+		});
+	}
+
+	// ---- THE PANEL: the controls and the input, kept in step BOTH WAYS ---------------------------
+	//
+	// **WHEN THE TYPED QUERY OUTRUNS THE CONTROLS, THE CONTROLS LEAVE.** `A AND B` has no pull-down
+	// representation, and neither has a query that cannot be read at all. The three ways to handle
+	// that are: show the first condition (a lie about what will run), grey them out still showing
+	// stale words (a quieter lie), or take them off the panel and say why. Only the third can be
+	// misread by nobody -- a control that is not there cannot claim anything -- and it comes with
+	// the way back: one button that restores the last query the controls DID express.
+	//
+	// The input is created once and never rebuilt while it is being typed in, or the caret would
+	// jump on every keystroke. Only #lpn_find_controls and the message line are re-rendered.
+	var findQueryInput = null, findQueryMsgEl = null, findControlsBox = null;
+	// The parsed query when it is beyond the controls, and the reason when it cannot be read. Both
+	// null means the controls and the input say the same thing, which is the normal state.
+	var findQueryAst = null, findQueryError = null;
+	// Whether the answer on screen came from a compound query, so a result row does not try to print
+	// "the" property of a query that has several.
+	var findResultsCompound = false;
+	function updateFindQuery() {
+		findQueryAst = null; findQueryError = null;
+		if (findQueryInput) { findQueryInput.value = findQueryString(); }
+		renderFindMessage();
+	}
+	function renderFindMessage() {
+		if (!findQueryMsgEl) { return; }
+		findQueryMsgEl.textContent = findQueryError ? findQueryError.msg : '';
+		findQueryMsgEl.style.display = findQueryError ? '' : 'none';
+	}
+	// The input is what runs. Read on every keystroke so the controls can never stand beside a query
+	// they do not describe.
+	function findSyncFromInput() {
+		var text = findQueryInput ? findQueryInput.value : '', r;
+		findQueryAst = null; findQueryError = null;
+		// A changed query means any pending replace preview counts a set that no longer exists.
+		replacePending = null;
+		if (String(text).trim() === '') {
+			findQueryError = { msg: findMsg('lpn_find_q_err_empty',
+				'The query is empty, so nothing will be searched.', {}) };
+		} else {
+			r = findParse(text);
+			if (!r.ok) {
+				findQueryError = { msg: r.msg + ' ' + findMsg('lpn_find_q_err_pos', '(at character {n})',
+					{ n: String(r.pos + 1) }) };
+			} else if (findAstIsCond(r.ast)) {
+				findState.scope = r.ast.scope; findState.prop = r.ast.prop;
+				findState.op = r.ast.op; findState.value = r.ast.value;
+				findNormalize();
+			} else {
+				findQueryAst = r.ast;
+			}
+		}
+		renderFindControls();
+		renderFindMessage();
+	}
+	function findControlsShown() { return !findQueryAst && !findQueryError; }
+	function renderFindControls() {
+		var pc = EngCalcs.pageConfig || {}, box = findControlsBox, note, back, valWrap, valLab, input;
 		if (!box) { return; }
 		box.innerHTML = '';
+		if (!findControlsShown()) {
+			note = document.createElement('div');
+			note.className = 'lpn-find-aside';
+			note.textContent = pc.lpn_find_q_aside ||
+				'These controls cannot write the query below, so they are set aside rather than saying something untrue.';
+			box.appendChild(note);
+			back = document.createElement('button');
+			back.type = 'button';
+			back.textContent = pc.lpn_find_q_restore || 'Use the controls instead';
+			back.addEventListener('click', function () {
+				// findState still holds the last query the controls DID express, so this is a
+				// return to it rather than a guess at one.
+				updateFindQuery();
+				renderFindControls();
+			});
+			box.appendChild(back);
+			return;
+		}
 		findSelect(box, pc.lpn_find_scope || 'Elements to search', findScopeDefs().map(function (d) {
 			return [d.key, d.label];
 		}), findState.scope, function (v) {
@@ -7807,14 +8177,12 @@ var EngCalcs = EngCalcs || {};
 			findNormalize();
 			rebuildFindForm(); renderFindResults(null);
 		});
-		props = findPropDefs();
-		findSelect(box, pc.lpn_find_property || 'Property', props, findState.prop, function (v) {
+		findSelect(box, pc.lpn_find_property || 'Property', findPropDefs(), findState.prop, function (v) {
 			findState.prop = v;
 			findNormalize();
 			rebuildFindForm(); renderFindResults(null);
 		});
-		ops = findOpDefs();
-		findSelect(box, pc.lpn_find_condition || 'Condition', ops, findState.op, function (v) {
+		findSelect(box, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
 			findState.op = v; updateFindQuery(); renderFindResults(null);
 		});
 		valWrap = document.createElement('div');
@@ -7834,15 +8202,47 @@ var EngCalcs = EngCalcs || {};
 		valLab.appendChild(input);
 		valWrap.appendChild(valLab);
 		box.appendChild(valWrap);
+	}
+	function rebuildFindForm() {
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_find_form'),
+			qLab, hint, btn;
+		if (!box) { return; }
+		box.innerHTML = '';
+		findControlsBox = document.createElement('div');
+		box.appendChild(findControlsBox);
+		findQueryAst = null; findQueryError = null;
+		renderFindControls();
 		// Right above the button, which is where Tom asked for it: the last thing read before the
-		// search is pressed.
-		findQueryEl = document.createElement('div');
-		findQueryEl.className = 'lpn-find-query';
-		findQueryEl.title = pc.lpn_find_query_tip || 'The same search written as one line.';
-		box.appendChild(findQueryEl);
-		updateFindQuery();
+		// search is pressed -- and now the thing that can be edited instead.
+		qLab = document.createElement('label');
+		qLab.style.display = 'block';
+		qLab.textContent = pc.lpn_find_query_label || 'Query';
+		findQueryInput = document.createElement('input');
+		findQueryInput.type = 'text';
+		findQueryInput.className = 'lpn-find-query';
+		findQueryInput.title = pc.lpn_find_query_tip || 'The same search written as one line.';
+		findQueryInput.addEventListener('input', function () { findSyncFromInput(); renderFindResults(null); });
+		findQueryInput.addEventListener('keydown', function (e) {
+			if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } runFind(); }
+		});
+		qLab.appendChild(findQueryInput);
+		box.appendChild(qLab);
+		// Tom's own line, and "expandable" is his word: it says the grammar will grow.
+		hint = document.createElement('div');
+		hint.className = 'lpn-find-hint';
+		hint.textContent = pc.lpn_find_query_hint || 'Expandable with AND, OR, and ()';
+		box.appendChild(hint);
+		findQueryMsgEl = document.createElement('div');
+		findQueryMsgEl.className = 'lpn-find-msg';
+		box.appendChild(findQueryMsgEl);
+		findQueryInput.value = findQueryString();
+		renderFindMessage();
 		btn = document.createElement('button');
 		btn.type = 'button';
+		// Named, because it is no longer the only button in this form: when the controls are set
+		// aside they leave a "use the controls instead" button above it, and "the first button in
+		// #lpn_find_form" then means the wrong one.
+		btn.id = 'lpn_find_go';
 		setLabel(btn, 'find', pc.lpn_find_button || 'Find');
 		btn.addEventListener('click', runFind);
 		box.appendChild(btn);
@@ -7852,10 +8252,36 @@ var EngCalcs = EngCalcs || {};
 		replacePending = null;
 		buildReplaceForm(box);
 	}
+	// **ONE PLACE ANSWERS "WHAT DOES THIS PANEL SELECT?"** Find shows the set and Replace writes to
+	// it, so they must never work it out separately. Returns { ok: false, msg } when the typed query
+	// cannot be read -- and then NOTHING is searched, which is the whole hard rule of this task.
+	function findRunQuery() {
+		findResultsCompound = false;
+		if (findQueryError) { return { ok: false, msg: findQueryError.msg }; }
+		if (findQueryAst) {
+			findConnCache = null;
+			findResultsCompound = true;
+			return { ok: true, list: findSortCompound(findEvalNode(findQueryAst)) };
+		}
+		return { ok: true, list: findMatches() };
+	}
 	function runFind() {
-		var pc = EngCalcs.pageConfig || {};
+		var pc = EngCalcs.pageConfig || {}, run;
 		findConnNote = '';
 		findHasRun = true;
+		// The typed query is the one that runs, and an unreadable one runs nothing at all.
+		if (findQueryAst || findQueryError) {
+			run = findRunQuery();
+			if (!run.ok) { findResults = []; renderFindResults(run.msg); return; }
+			findResults = run.list;
+			if (findAstHasConnection(findQueryAst) && !findConnectionMap().hasSource) {
+				findConnNote = pc.lpn_find_conn_no_fixed ||
+					'This network has no reservoir or tank, so only "has no links" can be answered.';
+			}
+			renderFindResults(null);
+			if (findResults.length === 1) { findGoTo(findResults[0].group, findResults[0].el.id); }
+			return;
+		}
 		// An empty box is only a mistake when the query needs something to match against. Top n and
 		// Bottom n rank what is there, "contains" nothing matches everything, and a connection
 		// condition asks the whole question by itself -- none of them needs a value, so none of
@@ -7890,9 +8316,12 @@ var EngCalcs = EngCalcs || {};
 		row.style.width = '100%';
 		row.style.textAlign = 'left';
 		// A Text label is named by its words, not by an id nobody can see.
+		// **A COMPOUND QUERY HAS NO SINGLE PROPERTY TO PRINT.** `Diameter greater than 8 AND Velocity
+		// greater than 5` names two, and picking one of them to show beside the id would answer a
+		// question the user did not ask. The id alone is the honest row.
 		row.textContent = findLabelHasNoId(c)
 			? findFmt(effective(c.el, 'text'))
-			: c.el.id + (findState.prop === 'id' ? ''
+			: c.el.id + (findResultsCompound || findState.prop === 'id' ? ''
 				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val) : findFmt(val)));
 		// The Map Finder's "Adjacent Links" pane, said in one line under the node it belongs to:
 		// finding a junction and immediately wanting to know what meets there is the whole reason
@@ -7932,7 +8361,7 @@ var EngCalcs = EngCalcs || {};
 			if (findHasRun) {
 				head = document.createElement('div');
 				head.style.margin = '6px 0 2px';
-				head.textContent = findPropIsConnection(findState.prop)
+				head.textContent = !findResultsCompound && findPropIsConnection(findState.prop)
 					? (pc.lpn_find_conn_none || 'Every node is connected.')
 					: (pc.lpn_find_none || 'Nothing matched.');
 				box.appendChild(head);
@@ -8054,6 +8483,16 @@ var EngCalcs = EngCalcs || {};
 	// untouched by construction: this function only measures.
 	function runReplacePreview() {
 		var pc = EngCalcs.pageConfig || {}, refs;
+		// **REPLACE CANNOT USE A QUERY IT CANNOT NAME A SCOPE FOR.** Its property list is built from
+		// one scope (replaceSpecs() reads findState.scope), and `Pipe.Diameter ... OR Junction...`
+		// has two. Rather than write to some plausible subset, it declines and says so -- a bulk
+		// write is the one action here whose blast radius the user cannot see coming.
+		if (findQueryAst || findQueryError) {
+			replacePending = null;
+			renderReplace(pc.lpn_replace_q_aside ||
+				'Replace cannot use a query with AND, OR or brackets. Use the controls to choose one set.');
+			return;
+		}
 		replaceNormalize();
 		if (!replaceState.prop) {
 			replacePending = null;
