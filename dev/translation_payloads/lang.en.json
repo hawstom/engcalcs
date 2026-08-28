@@ -957,6 +957,7 @@
         "lpn_inp_drop_pump_speed": "These pumps run at a speed other than the one their curve was measured at, or change speed through the day. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.",
         "lpn_inp_drop_setting": "These pipes, pumps and valves carry a setting this page cannot hold. They came in open.",
         "lpn_inp_drop_controls": "These controls and rules were left out. The pipes, pumps and valves they name came in at the state written in the file and stay that way.",
+        "lpn_inp_drop_rules": "This file has rule-based controls. They do not change the answers here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_eps": "This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in.",
         "lpn_inp_drop_quality": "Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.",
         "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.",
@@ -1424,7 +1425,7 @@
         "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
         "lpn_terrain_ids_more": "{ids}, and {n} more"
     },
-    "count": 1422,
+    "count": 1423,
     "active_prefixes": [
         "about",
         "bpn",

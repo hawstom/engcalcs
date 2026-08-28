@@ -13022,6 +13022,9 @@ var EngCalcs = EngCalcs || {};
 			// the profile section gives: a path names THIS project's junctions.
 			profiles: doc.profiles || [],
 			times: doc.times || null, controls: doc.controls || [],
+			// The rule text, carried with the drawing so a project saved and reopened still holds
+			// what its `.inp` stated (Task 248.03).
+			rules: doc.rules || [],
 			// Where the reader was looking. Not a reason to SAVE -- panning marks nothing dirty --
 			// but it rides along whenever something else does, so a file reopens where it was left.
 			view: currentView(),
@@ -13433,6 +13436,7 @@ var EngCalcs = EngCalcs || {};
 		doc.defaultPattern = saved.defaultPattern || null;
 		doc.times = saved.times || null;
 		doc.controls = saved.controls || [];
+		doc.rules = saved.rules || [];
 		// Task 510's saved paths, taken VERBATIM. An id naming a node this document does not have
 		// is the user's data and is reported where it is used, never pruned here -- see
 		// profileMissingStops(). A file written before this existed simply has none.
@@ -14479,6 +14483,8 @@ var EngCalcs = EngCalcs || {};
 			defaultPattern: parsed.defaultPattern || null,
 			times: parsed.times || null,
 			controls: parsed.controls || [],
+			// [RULES] as text (Task 248.03). Not modelled, not edited, and no longer thrown away.
+			rules: parsed.rules || [],
 			units: readUnitSelections()
 		});
 	}
@@ -14527,7 +14533,11 @@ var EngCalcs = EngCalcs || {};
 			case 'pump-pattern': return pc.lpn_inp_drop_pump_speed || 'This pump runs at a speed other than the one its curve was measured at, or changes speed through the day. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.';
 			case 'link-setting': return pc.lpn_inp_drop_setting || 'These links carry a setting this page cannot hold. They came in open.';
 			case 'controls':
-			case 'rules': return pc.lpn_inp_drop_controls || 'Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file and stays there.';
+			// **A RULE IS NO LONGER "LEFT OUT", AND SAYING SO WOULD NOW BE FALSE** (Task 248.03).
+			// It shares nothing with the simple-control message any more: a control that cannot be
+			// read is discarded, where a rule is KEPT and written back. Two different fates need two
+			// different sentences, and the old one would have a user believing their rules were lost.
+			case 'rules': return pc.lpn_inp_drop_rules || 'This file has rule-based controls. They do not change the answers here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
 			case 'extended-period': return pc.lpn_inp_drop_eps || 'This file runs over a period of time. This page solves one moment, so only the starting conditions came in.';
 			case 'quality':
 			case 'reactions':
@@ -24561,11 +24571,49 @@ var EngCalcs = EngCalcs || {};
 			emitterExponent: settings.emitterExponent,
 			// Carried whole so js/lpn-epanet.js can write the ones only EPANET acts on -- accuracy,
 			// unbalanced, the head-error limit -- without a second copy of the list.
-			hydraulics: hyd };
+			hydraulics: hyd,
+			// **THE RULE TEXT, FILTERED TO THE RULES THAT STILL NAME REAL ELEMENTS** (Task 248.03).
+			// **NOTHING WRITES THIS INTO AN ENGINE INPUT TODAY, AND js/lpn-epanet.js SAYS WHY** --
+			// a rule's numbers are in the units of the file the user opened, and that writer emits
+			// metric always. It is carried on the model so the reason has one place to be tested
+			// from, and so the day the language lands the filtering is already here.
+			rules: modelRules() };
 		// The clock, the patterns and the controls, converted to SI (js/lpn-time.js). Absent that
 		// file the model is exactly the pre-Task-248 one and the page solves one instant.
 		if (EngCalcs.lpnTimeAttach) { EngCalcs.lpnTimeAttach(model); }
 		return model;
+	}
+	/**
+	 * **THE RULES SAFE TO HAND THE ENGINE, AND THE ONES THAT ARE NOT** (ROADMAP Task 248.03).
+	 *
+	 * This page does not model a rule; the EPANET engine does. So a network whose behaviour depends
+	 * on rules solved WRONG here, silently, whichever engine was chosen -- the import reported the
+	 * section as a difference and then dropped it. Handing the text through is what makes the EPANET
+	 * answer right, and it is the whole of what this phase claims: the native solver still cannot
+	 * read a rule, and the page still cannot edit one.
+	 *
+	 * **A RULE NAMING AN ELEMENT THE MODEL DOES NOT HAVE IS DROPPED, BECAUSE EPANET REJECTS THE
+	 * WHOLE INPUT OVER ONE.** That turns "we do not model your rules" into "your network does not
+	 * solve", which is far worse and would look like our arithmetic failing. An element can go
+	 * missing in ordinary use -- deleted, or made inactive in a scenario -- so this is the normal
+	 * case and not a corrupt file.
+	 *
+	 * The drops ride out on `EngCalcs.lpnRuleDrops` for applySolveResult() to say out loud, the same
+	 * channel the time block's own dropped controls use rather than a second one.
+	 */
+	function modelRules() {
+		var text = doc.rules || [], blocks, out = [], dropped = [];
+		if (!text.length || !EngCalcs.lpnRuleBlocks) { EngCalcs.lpnRuleDrops = []; return []; }
+		blocks = EngCalcs.lpnRuleBlocks(text);
+		blocks.forEach(function (b) {
+			var missing = [];
+			b.nodes.forEach(function (id) { if (!nodeById(id)) { missing.push(id); } });
+			b.links.forEach(function (id) { if (!linkById(id)) { missing.push(id); } });
+			if (missing.length) { dropped.push({ name: b.name, missing: missing }); return; }
+			out = out.concat(b.lines);
+		});
+		EngCalcs.lpnRuleDrops = dropped;
+		return out;
 	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};

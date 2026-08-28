@@ -233,6 +233,7 @@
 			seen = {},          // name -> row count, for the ones we only count
 			i, line, semi, toks, cmt;
 
+		var ruleLines = [];
 		for (i = 0; i < lines.length; i++) {
 			line = lines[i];
 			semi = line.indexOf(';');
@@ -249,6 +250,26 @@
 			if (line.charAt(0) === '[' || /^\s*\[/.test(line)) {
 				section = line.trim().replace(/^\[|\]\s*$/g, '').toUpperCase();
 				if (!rawSections[section]) { rawSections[section] = []; }
+				continue;
+			}
+			// **[RULES] IS KEPT AS TEXT, LINE FOR LINE** (ROADMAP Task 248.03, first phase). A rule
+			// is a small LANGUAGE -- priorities, AND/OR clauses, an ELSE -- and this page does not
+			// model it. What it can do, and until now did not, is stop THROWING IT AWAY: the section
+			// was counted as a difference and then dropped, so a file with rules came back out of
+			// the exporter with none, which is the input-file-is-canonical rule broken exactly as
+			// `[OPTIONS]` was under Task 553.
+			//
+			// The ORIGINAL line, not the tokens: nothing here understands a rule well enough to
+			// write one, so the only honest form is the characters the file stated. A comment-only
+			// line inside the section is lost with the blank lines above -- it is not data, and
+			// keeping it would mean carrying the section's whitespace too.
+			// **AND IT IS STILL COUNTED.** `seen` is what makes REPORTABLE say "this file has rules" at
+			// the end, and the early `continue` below skips the counter every other section reaches --
+			// so keeping the text silently stopped the import REPORTING the text. Caught by
+			// import-notes-harness.js. Carrying a thing and telling the user about it are two jobs.
+			if (section === 'RULES') {
+				ruleLines.push(lines[i].replace(/\s+$/, ''));
+				seen[section] = (seen[section] || 0) + 1;
 				continue;
 			}
 			toks = tokenize(line);
@@ -1019,6 +1040,9 @@
 			// Every [OPTIONS] key this file stated that is not the flow unit, the head-loss formula
 			// or the default pattern -- sparse, so absent is "the file did not say" (Task 553).
 			hydraulics: hydraulics,
+			// [RULES], verbatim, one string per line (Task 248.03). Empty for a file with none, so
+			// no caller has to test for absence.
+			rules: ruleLines,
 			// The clock (ROADMAP Task 248). `times` is null only when js/lpn-patterns.js was not
 			// loaded, which is reported above; `patterns` and `controls` are empty arrays for a
 			// file that states none, so a caller never has to test for absence.
@@ -1119,6 +1143,49 @@
 	var FILE_UNITS = {
 		us: { len: 'ft', dia: 'in', head: 'ft', press: 'psi' },
 		si: { len: 'm', dia: 'mm', head: 'm', press: 'mh2o' }
+	};
+
+	/**
+	 * **WHICH ELEMENTS A [RULES] BLOCK NAMES, WITHOUT UNDERSTANDING A RULE** (ROADMAP Task 248.03).
+	 *
+	 * This page does not model rule-based controls and this function does not pretend to. It reads
+	 * ONE fact out of the text -- the ids -- because that is the only fact needed to decide whether
+	 * a rule can safely be handed to the EPANET engine. **A `[RULES]` line naming a link the file
+	 * does not declare makes EPANET reject the WHOLE input**, so passing rules through blind would
+	 * turn "this network has rules we do not model" into "this network does not solve at all".
+	 *
+	 * The grammar it leans on is one line of EPANET's: after an object keyword the next token is the
+	 * id, and SYSTEM is the one object that has none. That is true in the IF, the AND/OR and the
+	 * THEN/ELSE alike, so no clause has to be told apart from another. Everything else in the rule --
+	 * the attribute, the relation, the value, the priority -- is passed over without being read,
+	 * which is exactly what "we do not model this" should look like in code.
+	 *
+	 * Returns one record per rule: its name, its lines in order, and the ids it names split by kind.
+	 * A line before the first `RULE` keyword is impossible in a valid file and is attached to an
+	 * unnamed leading record rather than dropped, so nothing silently disappears.
+	 */
+	var RULE_NODE_WORDS = { NODE: 1, JUNCTION: 1, RESERVOIR: 1, TANK: 1 };
+	var RULE_LINK_WORDS = { LINK: 1, PIPE: 1, PUMP: 1, VALVE: 1 };
+	EngCalcs.lpnRuleBlocks = function (lines) {
+		var out = [], cur = null, i, j, toks, w;
+		for (i = 0; i < (lines || []).length; i++) {
+			toks = String(lines[i]).replace(/;.*$/, '').trim().split(/\s+/).filter(Boolean);
+			if (!toks.length) { continue; }
+			if (toks[0].toUpperCase() === 'RULE') {
+				cur = { name: toks[1] || '', lines: [], nodes: [], links: [] };
+				out.push(cur);
+			} else if (!cur) {
+				cur = { name: '', lines: [], nodes: [], links: [] };
+				out.push(cur);
+			}
+			cur.lines.push(String(lines[i]));
+			for (j = 0; j < toks.length - 1; j++) {
+				w = toks[j].toUpperCase();
+				if (RULE_NODE_WORDS[w]) { cur.nodes.push(toks[j + 1]); j++; }
+				else if (RULE_LINK_WORDS[w]) { cur.links.push(toks[j + 1]); j++; }
+			}
+		}
+		return out;
 	};
 
 	// The stand-in pipe a curveless pump becomes needs a roughness in the file's own formula, and
@@ -1611,6 +1678,12 @@
 			section('PATTERNS', patternRows) +
 			// After the links a control names, and after the patterns, which is EPANET's own order.
 			section('CONTROLS', controlRows) +
+			// **[RULES] GOES BACK OUT AS THE TEXT IT CAME IN AS** (Task 248.03). Nothing on this
+			// page edits a rule, and nothing here understands one well enough to compose a line, so
+			// the file's own characters are the only honest form. The section is omitted entirely
+			// when the document holds none -- an empty `[RULES]` is a statement the source never
+			// made, the same rule `[OPTIONS] Pattern` follows.
+			((doc.rules && doc.rules.length) ? '[RULES]\n' + doc.rules.join('\n') + '\n\n' : '') +
 			section('TIMES', timeRows) +
 			'[OPTIONS]\n' +
 			row(['Units', flowKey]) + '\n' +

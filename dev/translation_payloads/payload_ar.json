@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ar",
-        "expected_key_count": 1422,
-        "delta_key_count": 96,
+        "expected_key_count": 1423,
+        "delta_key_count": 97,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -502,6 +502,7 @@
         "lpn_new_place_tip": "Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap's place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world.",
         "lpn_new_place_hint": "Petaluma, California",
         "lpn_new_create": "Create",
+        "lpn_inp_drop_rules": "This file has rule-based controls. They do not change the answers here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which today means a network read from an EPANET file.",
@@ -600,6 +601,7 @@
         "lpn_new_place_tip": "Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap's place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world.",
         "lpn_new_place_hint": "Petaluma, California",
         "lpn_new_create": "Create",
+        "lpn_inp_drop_rules": "This file has rule-based controls. They do not change the answers here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which today means a network read from an EPANET file.",
@@ -1670,6 +1672,22 @@
                     "key": "lpn_file_open",
                     "value": "فتح…",
                     "english": "Open…"
+                }
+            }
+        },
+        "lpn_inp_drop_rules": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_controls",
+                    "value": "استُبعدت عناصر التحكم والقواعد هذه. أما الأنابيب والمضخات والصمامات التي تُسمّيها فقد دخلت بالحالة المكتوبة في الملف وبقيت كذلك.",
+                    "english": "These controls and rules were left out. The pipes, pumps and valves they name came in at the state written in the file and stay that way."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_eps",
+                    "value": "يصف هذا الملف محاكاة تمتد على فترة زمنية. لم يُحمَّل جزء هذه الصفحة الذي يشغّل الشبكة عبر الزمن، لذا دخلت الظروف الابتدائية فقط.",
+                    "english": "This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in."
                 }
             }
         },

@@ -410,6 +410,25 @@
 			(patternRows.length ? '[PATTERNS]\n' + patternRows.join('\n') + '\n\n' : '') +
 			// After the links a control names, and after the patterns -- EPANET's own order.
 			(controlRows.length ? '[CONTROLS]\n' + controlRows.join('\n') + '\n\n' : '') +
+			// **[RULES] IS DELIBERATELY NOT WRITTEN HERE, AND THE REASON IS UNITS** (Task 248.03).
+			//
+			// It was, for about an hour, on the reasonable-sounding argument that this page does not
+			// model a rule and the engine does, so handing the text through would make a rule-driven
+			// network solve correctly. `dev/lpn-spike/rules-carry-harness.js` measured it and it is
+			// false: **this writer emits LPS and METRES always**, and a rule's numbers are in the
+			// units of the file the user opened. `IF TANK T1 LEVEL ABOVE 20` means 20 FEET in a GPM
+			// file, and arrives here beside a tank whose level is 7.62 -- so the rule never fires,
+			// and a rule that DID fire would fire at the wrong threshold. Every number on screen
+			// would look reasonable, which is the exact shape of the two worst defects this project
+			// has recorded.
+			//
+			// **CONVERTING THEM REQUIRES THE LANGUAGE**, which is the rest of Task 248.03: you
+			// cannot scale a rule's numbers without knowing, per clause, whether the value is a
+			// level, a pressure, a flow, a setting or a bare time. So this is not an oversight to be
+			// patched with a factor -- it is why the parked half of that task is parked. The rules
+			// are still CARRIED: `js/lpn-inp.js` keeps them and writes them back in the user's own
+			// units, where verbatim text is exactly right.
+			'' +
 			(timeRows.length ? '[TIMES]\n' + timeRows.join('\n') + '\n\n' : '') +
 			'[OPTIONS]\n Units LPS\n Headloss ' + headloss +
 			'\n Emitter Exponent ' + emitterExp +

@@ -11,7 +11,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ## 100 — Next (10)
 
-- Task 248.03 — Rule-based controls, EPANET's `[RULES]` (Task 248 child).
+- Task 248.03 — Rule-based controls: the text is CARRIED now; the language is still parked.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 417 — Long-press enters Edit mode, and the phone's touch radius is too mean.
 - Task 436 — What a wheel notch costs, and the placement leftovers.

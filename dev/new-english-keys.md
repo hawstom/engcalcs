@@ -12,9 +12,9 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**95 of 1422 English keys**, as of the last generation.
+**96 of 1423 English keys**, as of the last generation.
 
-## lpn_  (95)
+## lpn_  (96)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -104,6 +104,8 @@ settled these go into the next translation sprint as a batch.
   > That is the point you picked first. Pick a different one.
 - **`lpn_georef_twopt_tip`**
   > Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.
+- **`lpn_inp_drop_rules`**
+  > This file has rule-based controls. They do not change the answers here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.
 - **`lpn_menu_map`**
   > Map
 - **`lpn_new_coords`**
