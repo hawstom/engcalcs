@@ -526,8 +526,44 @@ if ($mode === '--json') {
     exit($d['changed'] ? 1 : 0);
 }
 
-// human report
 $manifestDate = json_decode(file_get_contents(MANIFEST), true)['updated'] ?? 'unknown';
+
+// --brief: the counts and the ROLE CHANGES, and nothing else. Written for check_all.sh, where the
+// full report is 90 CHANGED plus 79 NEW lines on every single run -- output that long in a
+// pre-commit check is read once and skipped forever, and skipping it is how the advisory came to
+// be worth nothing. Before this flag that line ran the report through `grep -q "^CHANGED"`, which
+// swallowed the output entirely: the operator saw a NOTE with no text under it, which is not an
+// advisory, it is a rumour. The role changes are here because they are the expensive kind and the
+// only part a reader can act on without opening the full list.
+if (in_array('--brief', array_slice($argv, 1), true)) {
+    if (!$d['changed']) {
+        echo "English drift: none — every synced English string is unchanged (last sync $manifestDate).\n";
+        exit(0);
+    }
+    $wasShapes = load_shapes();
+    $nowShapes = current_shapes();
+    $roles = [];
+    foreach ($d['changed'] as $k) {
+        $why = role_change($wasShapes[$k] ?? [], $nowShapes[$k] ?? ['words' => 0, 'ends_sentence' => false]);
+        if ($why) {
+            $roles[$k] = $why;
+        }
+    }
+    printf("English drift: %d key(s) CHANGED since the last sync (%s); %d NEW, %d REMOVED.\n",
+        count($d['changed']), $manifestDate, count($d['new']), count($d['removed']));
+    if ($roles) {
+        printf("ROLE CHANGES (%d) — a key that stopped being a sentence, or doubled in length, reads\n", count($roles));
+        echo "wrong in translation even when the words are right. Resync these first:\n";
+        foreach ($roles as $k => $why) {
+            echo "  ! $k: $why\n";
+        }
+    }
+    echo "Full list: php dev/scripts/detect_english_drift.php    (then a resync sprint, then --update)\n";
+    exit($mode === '--check' ? 1 : 0);
+}
+
+// human report
+
 echo "English drift vs manifest (last synced: $manifestDate)\n";
 echo str_repeat('-', 60) . "\n";
 

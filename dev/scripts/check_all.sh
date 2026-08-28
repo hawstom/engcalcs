@@ -128,9 +128,21 @@ run_check "scenario write seam"          blocking php dev/scripts/scenario_seam_
 # factors and EngCalcs.G use the same gravity.
 run_check "unit conversion factors"      blocking php dev/scripts/unit_factor_check.php
 run_check "coordinate order"             blocking php dev/scripts/coord_order_check.php
+# Task 322. Four absolutes about unit families, all of which fail with a page that renders and
+# looks right: a family missing from a preset means one field ignores the us/si buttons while its
+# neighbours obey them. echoUnitSelect() checks this at render time, i.e. when somebody -- possibly
+# a visitor -- opens the page; this reads the declarations, so the gap is found before it ships.
+run_check "unit families and presets"    blocking php dev/scripts/unit_family_check.php
+run_check "unit family selftest"         blocking php dev/scripts/unit_family_selftest.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php
+# Task 322. The mechanical half of key hygiene, and the only half with no judgement in it: a
+# literal $ec_lang['typo'] renders as the EMPTY STRING in all 27 languages with no warning in
+# production. Its advisory sibling below asks whether a key is debt; this one asks whether it
+# exists, and there is no reading of the repo where the answer may be no.
+run_check "lang keys resolve"            blocking php dev/scripts/lang_key_resolve_check.php
+run_check "lang key resolve selftest"    blocking php dev/scripts/lang_key_resolve_selftest.php
 run_check "lang markup matches English"  blocking php dev/scripts/lang_tag_parity_check.php --strict
 run_check "gloss pointers resolve"       blocking php dev/scripts/gloss_ref_check.php
 run_check "layout tags match widgets" blocking php dev/scripts/layout_tag_check.php
@@ -184,7 +196,14 @@ run_check "size budget"                  advisory php dev/scripts/size_budget_ch
 # keeps it short. Advisory by construction -- citing a closed task as a RECORD is legitimate, so
 # only a human can tell a stale claim from a correct citation.
 run_check "stale claim worklist"        advisory php dev/scripts/stale_claim_check.php
-run_check "english drift"                advisory sh -c 'php dev/scripts/detect_english_drift.php | grep -q "^CHANGED" && exit 1 || exit 0'
+# Task 322. This line used to pipe the report through `grep -q "^CHANGED"`, so the NOTE it printed
+# had NO TEXT UNDER IT -- nine role changes were sitting in a report nobody could see from here,
+# and an advisory whose findings never reach the reader is not an advisory. --brief prints the
+# counts and the role changes; the full 90-plus-line list stays one command away. Still advisory,
+# and it must be: whether a changed English string needs 26 translators is a judgement (a fixed URL
+# does not; a rewritten sentence does), and blocking would push people toward --update, which
+# baselines the drift away.
+run_check "english drift"                advisory php dev/scripts/detect_english_drift.php --check --brief
 
 echo ""
 if [ -n "$FAILED" ]; then
