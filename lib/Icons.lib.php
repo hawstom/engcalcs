@@ -60,26 +60,41 @@ $ec_icons = array(
 	// question — "I forgot that I love what you already have now" (2026-08-08). Recorded so the
 	// camera is not re-proposed: it was drawn, compared, and declined on the merits.
 	'view'       => '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/>',
-	// **THE MAP MENU'S PIN** (Tom, 2026-08-27: *"a nice push pin icon for Map would be good"*, and
-	// 2026-08-28, with a picture of the one he means: *"Replace the Map icon with a standard pushpin.
-	// I would not ask if it were already done."*). **It is the MAP MARKER — the teardrop with a round
-	// hole — not a thumbtack.** That is what "standard pushpin" means to a reader of maps, and it is
-	// the shape every mapping product has trained them on.
+	// **THE MAP MENU'S PIN: A MARKER STANDING ON A FOLDED MAP** (Tom, 2026-08-28, choosing from
+	// four renderings: *"Map icons A, B, and C all look nice"*, then *"I meant B."*)
 	//
-	// **A FILLED SILHOUETTE WITH AN EVEN-ODD HOLE, not a 2-unit outline.** The hole is 5 units
-	// across; drawn as a stroked circle its own stroke would eat 2 of those 5 and close at 17px.
-	// Filled, the hole is exactly its geometry. The hydrant's cap disc is unstroked for the same
-	// reason, and this shape only reads at all because the aperture survives.
+	// **THIS IS THE EXACT GEOMETRY HE APPROVED. DO NOT "IMPROVE" IT.** It was redrawn once between
+	// his choice and the commit -- the map moved down two units so the aperture would hold further
+	// down the size range -- and he stopped it: *"Please oh please don't change it. I said I liked
+	// it."* Quite right. An approval is of a PICTURE, not of a direction, and a redraw after it
+	// hands him something he has never seen while telling him he chose it.
 	//
-	// SUPERSEDED, recorded so it is not redrawn: a front-on THUMBTACK (plate, grip, flange, needle,
-	// stacked vertically to keep a 2px stroke off the diagonal). It was legible and it was not a pin
-	// — at 17px the broad plate over a stem reads as a table or a rubber stamp. The legibility
-	// argument was sound and it was answered by changing the OBJECT, not the drawing of it.
-	// Verify with a real rendering, never ASCII:
+	// **RENDER, NEVER DESCRIBE.** The size the menu bar draws is 17px and that is what decides an
+	// icon here. Four were drawn and rendered at 17/24/48/96/192 before he chose:
 	//     node dev/scripts/icon_png_preview.js pin
-	'pin'        => '<path fill="currentColor" stroke="none" fill-rule="evenodd"'
-		. ' d="M12 2c-3.87 0-7 3.13-7 7 0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z'
-		. 'M12 11.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>',
+	//   A  folded map + compass in the top-right corner. He liked it and it does NOT survive 17px --
+	//      the map goes to a smudge and the compass to a dot. Good from 48px up, so it is the one to
+	//      reach for if this set ever needs a large mark.
+	//   B  **this one.** The marker's aperture closes below about 24px, which is a KNOWN and ACCEPTED
+	//      property of the drawing he picked, not a defect to go and fix.
+	//   C  a marker standing on a trapezoidal map plane. The most legible of the four at 17px, and
+	//      the fallback if this one is ever judged too busy -- by him.
+	//   D  a world map traced inside a square frame, his own later suggestion. **Not shipped and not
+	//      attempted properly:** a freehand "trace" of continents from memory is invented shape, and
+	//      it rendered as blobs twice. A real one needs real coastline coordinates (Natural Earth
+	//      110m is public domain and would be clean; tracing a reference image would not be, per
+	//      this file's provenance rule at the top). It would still leave ~11 units of interior
+	//      inside a 2-unit frame at 17px.
+	//
+	// The white shape is a KNOCKOUT: it fills the marker's body so the map's fold lines do not run
+	// through it, and the stroked outline is drawn over it. It is the one colour in this set that
+	// does not follow currentColor, so this icon assumes a light ground -- which every surface it is
+	// drawn on today is.
+	'pin'        => '<path d="M1.5 8.6V21.5L8 18.6L15.5 21.5L22.5 18.6V5.7L15.5 8.6L8 5.7Z"/>'
+		. '<path d="M8 5.7V18.6"/><path d="M15.5 8.6V21.5"/>'
+		. '<path fill="#fff" stroke="none" d="M12 2.2A4.6 4.6 0 0 1 16.6 6.8C16.6 10 12 15 12 15S7.4 10 7.4 6.8A4.6 4.6 0 0 1 12 2.2Z"/>'
+		. '<path d="M12 15S7.4 10 7.4 6.8A4.6 4.6 0 1 1 16.6 6.8C16.6 10 12 15 12 15Z"/>'
+		. '<circle cx="12" cy="6.8" r="1.7"/>',
 	// SIX TEETH at a 60° pitch. The count is a consequence of the rule, not the point of it: a gear
 	// reads as a gear when TOOTH WIDTH EQUALS GAP WIDTH at the pitch circle, with matching fillets on
 	// the inside and outside corners — which is what the real history of gear refinement converged
