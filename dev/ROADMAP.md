@@ -791,6 +791,17 @@ the block.
       NEW, 33 REMOVED and nine ROLE CHANGES had been invisible.** Still advisory, deliberately: a
       fixed URL and a rewritten sentence produce the same hash mismatch, and blocking would push
       the reader toward `--update`, which baselines the drift away.
+  - **FOUR MORE LANDED THE SAME DAY, rows 6-9: `page_meta_check.php` and `no_session_check.php`,
+    each with a selftest.** Row 6 is the one worth reading, because writing a check found that the
+    RULE was wrong: CLAUDE.md said *"call `ecSessionStart()`"* and **that function does not exist** —
+    Task 288 removed `PHPSESSID` outright and the helper went with it, so the honest number of
+    sessions in this suite is ZERO, not "one, gated". The prose had been sending a future
+    contributor to a helper that is not there. Both CLAUDE.md and `dev/cookie-storage-inventory.md`
+    are corrected. **That is the survey's whole argument arriving as an instance**: the rule was
+    written down, read, and had drifted from the code, and only executing it noticed.
+    - `page_meta_check.php` also takes the exempt list out of prose and into the check, where an
+      entry naming a page that no longer exists is itself a finding. That list had been measurably
+      wrong once already.
   - **DELIBERATELY LEFT ADVISORY, and the reasoning is the useful part:** `size_budget_check.php`
     entirely (both numbers are judgement, and a ratchet fails a legitimate addition, which is the
     fastest way to teach a team `--no-verify`); both `key_hygiene_check.php` findings (whether a key

@@ -111,6 +111,18 @@ run_check "service worker precache"      blocking php dev/scripts/sw_manifest_ch
 # LibreEPANET.org (Task 306) is by definition a standalone deploy and would have hit the same wall.
 run_check "suite ships its own assets"   blocking php dev/scripts/standalone_assets_check.php
 run_check "canonical origin whitelist"   blocking php dev/scripts/canonical_origin_check.php
+# Task 322 rows 7-9. Three page-level rules that break for a SEARCH ENGINE, a share card or a
+# visitor on a stale asset, and for nobody on this side. The exemption list was measurably wrong
+# once already -- it named index.php, which has its own description, and omitted privacy.php and
+# terms.php, which do not -- which is the whole argument for checking it rather than writing it down.
+run_check "page meta and cache busting"  blocking php dev/scripts/page_meta_check.php
+run_check "page meta selftest"           blocking php dev/scripts/page_meta_selftest.php
+# Task 322 row 6, in its strictest TRUE form. CLAUDE.md says "call ecSessionStart()"; that function
+# does not exist -- Task 288 removed PHPSESSID outright and the helper went with it -- so the honest
+# number of sessions here is ZERO, not "one, gated". A session writes an identifier to a visitor's
+# device on the response that starts it, before any banner has asked and with no way to take it back.
+run_check "no PHP sessions"              blocking php dev/scripts/no_session_check.php
+run_check "no-session selftest"          blocking php dev/scripts/no_session_selftest.php
 # Task 534. A share card fails where nobody on this side ever looks: you do not paste links to your
 # own site into Facebook, so a relative og:image (which every network drops silently) or a card file
 # renamed out from under the tag stays broken until a stranger mentions it. This renders every page

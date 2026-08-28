@@ -265,7 +265,11 @@ answering to it.
 
 Read section 5 first: it is the diagnosis, and every item below is a treatment for one line of it.
 
-1. **Sessions are lazy.** `lib/base.inc.php` no longer calls `session_start()` at the top of every
+1. **Sessions are lazy.** *(SUPERSEDED by Task 288, which removed `PHPSESSID` outright — see the
+   table above. `ecSessionStart()` no longer exists, and the number of sessions this suite starts is
+   ZERO, enforced by `dev/scripts/no_session_check.php`. Kept as the dated record of what phase 1
+   shipped, because the reasoning below is why phase 2 was possible.)*
+   `lib/base.inc.php` no longer calls `session_start()` at the top of every
    page load. `ecSessionStart()` (`lib/config.inc.php`) starts one only for a visitor who has said
    yes, and every caller — the bootstrap and all three `log-*.php` — is written to work without
    one. **This was the real work of the phase, not the banner.** A banner cannot fix a cookie that

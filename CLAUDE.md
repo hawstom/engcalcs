@@ -493,6 +493,8 @@ own failure; this table is an index, not a duplicate of that text.
 | `sw_manifest_check.php` | The service worker precaches the URLs pages actually request (`?v=<filemtime>`). 22 of 25 entries were once unreachable and the offline promise was simply false |
 | `standalone_assets_check.php` | The suite ships its own assets — a parent-site CSS dependency broke a standalone deploy |
 | `canonical_origin_check.php` | `CANONICAL_ORIGIN` is a host→origin WHITELIST, never derived from `HTTP_HOST`. Multi-domain serving needs the lookup; a derivation lets a spoofed Host point canonical URLs off-site, and the first symptom would be a search engine indexing somebody else's domain for us |
+| `page_meta_check.php` + selftest | Every page sets `$html_desc` or is on a declared exempt list; it never points at the title (Google discards a duplicate and writes its own snippet from a form); no hardcoded `?v=N`. **The exempt list in prose was wrong until 2026-08-25** — that is why it is a check |
+| `no_session_check.php` + selftest | No shipped PHP starts a session, by token scan. See the storage section: the number is zero |
 | `scenario_seam_check.php` | Overridable properties go through `setProp()`, never a direct write that edits BASE from inside a scenario |
 | `unit_factor_check.php` | Every `$ec_units` factor re-derived from the exact definitions (`ft = 0.3048 m`, `gal = 3.785411784 L`, `lbf = 4.4482216152605 N`), **and factors for one quantity agreeing with each other** — the suite once shipped four different feet, and `ft3`/`ft3ps` were the same conversion 47 ppm apart. Reads `EngCalcs.G` out of the source rather than retyping it. **Also that a unit's identity is its NAME** — no `data-unit`, no `objForm['xu'].value`, no `<option>` valued with a factor (Task 390) |
 | `unit_family_check.php` + selftest | The four unit-family absolutes, each of which fails with a page that RENDERS AND LOOKS RIGHT: a family missing from a preset, a preset picking a unit its family does not offer, an offered unit with no factor, a page naming a family that does not exist. `echoUnitSelect()` catches the first at render time — that is, possibly by a visitor; this reads the declarations before it ships |
@@ -699,10 +701,18 @@ conversion path: `dev/looped-network-calculator-scope.md`.
 
 Full inventory: `dev/cookie-storage-inventory.md`.
 
-- **Never call `session_start()`.** Call `ecSessionStart()` (`lib/config.inc.php`), which starts one
-  only for a visitor who consented, and **write the caller to work when it returns false** — that is
-  the normal case, not the error case. A session started at the top of every page load writes
-  `PHPSESSID` before anybody has been asked anything, and a banner cannot fix that from outside.
+- **THIS SUITE STARTS NO PHP SESSION AT ALL, and the number is zero rather than "one, gated."**
+  Task 288 removed `PHPSESSID` outright — everything it held was "have we already counted this",
+  which needs no identifier to answer. A session writes that identifier to a visitor's device on the
+  response that starts it, before any banner has asked and with no way for one to take it back from
+  outside. `no_session_check.php` blocks on `session_start`, `session_id` and their siblings; it
+  reads tokens, so the comments recording the removal are invisible to it.
+  - *(Corrected 2026-08-28: this rule used to say "call `ecSessionStart()` (`lib/config.inc.php`)".
+    **That function does not exist** — it went with Task 288 — so the rule sent a future contributor
+    to a helper that is not there. Found while turning it into a check, which is the argument the
+    Task 322 survey makes about prose in general.)*
+  - Sessions coming back is a consent-version bump, a rewritten banner and 26 retranslations, plus a
+    deliberate edit to that check. Have that conversation first.
 - **The session is analytics ONLY** — it exists to de-duplicate usage logs. Do not put a
   service-related value in it; that is what makes a mixed-purpose cookie unlawful under a per-purpose
   test. A visitor preference belongs in its own deliberately-set cookie (`ec_language` is the worked
