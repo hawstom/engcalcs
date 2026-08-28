@@ -87,6 +87,25 @@ the block.
   - Its own docblock carries the failure it came from, so the next person to promise a list in
     conversation reads why that is not enough.
 
+- 100|553| **Demands: one table always, and a project default pattern in Settings.**
+  Tom, 2026-08-28, of the junction popup: *"The EPANET UX is confusing by breaking out one demand
+  (the initial) specially. What we need to do is remove the original Base demand and Demand pattern
+  inputs and leave in their place the Demand categories interface."* **This finishes what Task 468
+  started** — 468 put row 0 inside the table only where a junction already had a breakdown, so a
+  one-demand junction still met the two plain fields and the special case survived.
+  - **(1) The table is ALWAYS the interface**, no `hasDemandBreakdown()` branch. **The DOCUMENT does
+    not change** — row 0 is still `_demand`/`demandPattern`/`demandCategory`, `extraDemands` the
+    rest — so the exporter, `EngCalcs.lpnDemandRows()` and the scenario override seam are untouched.
+  - **(2) "Category" becomes "Description"** in the heading. His word.
+  - **(3) NO PATTERN MEANS THE PROJECT DEFAULT, and the default is a Settings row**, with *"other
+    Hydraulics options including Headloss Formula, Specific Gravity, Relative Viscosity, Maximum
+    Trials, Accuracy, If Unbalanced (Continue or Stop), Demand Multiplier, Emitter Exponent, Status
+    Report (Yes or No), Max. Head Error, etc."* `doc.defaultPattern` already exists and already
+    resolves; what is missing is that a person can see it. **Acceptance: import Net3 and the row
+    says Pattern 1** without anybody typing it.
+  - **(4) The table has TWO borders and it looks like a mistake.** It does.
+  - The list ends in "etc.", so the open question is which of the rest of `[OPTIONS]` earn a row.
+
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
   What that one pass costs, in Chromium on the 480-pipe grid `specs/perf.js` builds: 1.3–7.3 s in
@@ -391,7 +410,7 @@ the block.
     the rule and must survive into the guide: telling them apart is a judgement, so this is one for
     the human pile, not the checkable one.
 
-- 75|533| **Renaming a link leaves `incidentLinks` pointing at the old id.**
+- 100|533| **Renaming a link leaves `incidentLinks` pointing at the old id.**
   Found 2026-08-25 by the Task 502 agent while building Text-on-a-link, and **left unfixed on
   purpose** — it was outside that track's territory and is pre-existing, not something 502
   introduced. Its harness says where it declines to assert it, which is the honest form.
@@ -657,7 +676,7 @@ the block.
     `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
     **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
 
-- 75|248.03| **Rule-based controls, EPANET's `[RULES]` (Task 248 child).** Simple `[CONTROLS]` shipped
+- 100|248.03| **Rule-based controls, EPANET's `[RULES]` (Task 248 child).** Simple `[CONTROLS]` shipped
   2026-08-18 — the Libraries box adds, edits, validates and deletes them, an unreadable sentence is kept
   and marked rather than discarded, and only a fully understood one reaches the engine.
   - Deliberately parked: rule-based is a language, and it can wait for evidence that a user has one.
@@ -702,7 +721,7 @@ the block.
     than a disappointment; "a third of them" makes several open tasks much more urgent.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 
-- 75|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
+- 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
   recommendations."* `check_all.sh` reports these every run and nobody can act on them — and
   CLAUDE.md's own argument is that **a rule a machine enforces is worth roughly ten a human must
@@ -773,7 +792,7 @@ the block.
     (shedding) · 6 labels hidden because the zoom is too far out · 7 leader lines drawn.
   - Stopping at N answers "did my change help?" — the answer is two drawings at the same step.
 
-- 75|417| **Long-press enters Edit mode, and the phone's touch radius is too mean.**
+- 100|417| **Long-press enters Edit mode, and the phone's touch radius is too mean.**
   Two things, and Tom added the second on 2026-08-25: *"417 phone radius needs to be larger more
   forgiving for the switch-to-edit-mode decision on tapping an asset (I assume any asset, not just a
   new asset)."* **Read that as ANY asset** — his own parenthesis, and it is the scope.
@@ -828,7 +847,7 @@ the block.
     drawing. If it does not, the strategy is wrong and no amount of tuning saves it.
 
 
-- 75|540| **[H] BUILT, including the parser. What stays open is WORDING.**
+- 100|540| **[H] BUILT, including the parser. What stays open is WORDING.**
   - **THE EXTREMES BECAME A STANDARD CONDITION, 2026-08-26**, on Tom's ruling: *"One reason it's
     confusing is that it should be a standard condition, but it's not. Make it a condition for all
     assets and numerical or alphanumerical properties."* They were numbers-only, which is what made
@@ -891,22 +910,30 @@ the block.
     the pointer" and "click what the label refers to" can disagree.
   - Related and worth reading together: Task 417 (long-press enters Edit mode; the touch radius).
 
-- 75|542| **Terrain elevations: the button did more than a curious user expected.**
-  Tom, 2026-08-26, after pressing it: *"To be honest, I did not expect nor necessarily welcome what
-  I got. I was just a dilettante pushing a cool new button that I found."* **That sentence is the
-  defect** — the feature is destructive, it is one undo slot, and it offered no way to choose.
-  - **(a) The feature he actually wants first is elevation ON CREATION:** *"the main cool feature to
-    have is assignment of elevations on creation of nodes. And I think that this must be an option
-    at Setting.New assets.Values.Elevation. 'Set from Mapbox DEM'."* That is not destructive at all,
-    which is why it is the better front door.
-  - **(b) Filling EXISTING nodes needs control he does not have:** the planned lasso, or Elevation
-    as an option under Find and replace, or this menu row with a prior selection. *"But this is
-    destructive, and it can only use one undo stack slot."*
-  - **(c) A long list must condense to RANGES** — his form: `nodes 262, 268-276, 302-328`. The
-    current cap names twelve and counts the rest, which is honest but loses the shape.
-  - DONE 2026-08-26: the wording is "from Mapbox DEM", and the accuracy sentence now names
-    3DEP-class data where it exists instead of stating only the global floor.
-
+- 100|542| **Terrain elevations become two ordinary controls, and the menu row goes away.**
+  Tom, 2026-08-26, after pressing the button: *"To be honest, I did not expect nor necessarily
+  welcome what I got. I was just a dilettante pushing a cool new button that I found."* **That
+  sentence is the defect** — the feature was destructive, it was one undo slot, and it offered no
+  way to choose.
+  - **TOM'S RULING, 2026-08-28, AND IT IS THE WHOLE TASK NOW:** *"Settings.New assets.Values.
+    Elevation should have an option for 'From DEM'. And Find and Replace could have, when Elevation
+    is selected to change, From DEM as an option for New value. Or Elevation from DEM could be a
+    select option. Then we don't need the rest of the interface or menu item for 542, and it can be
+    removed."*
+    - **(a) On creation** — an option on `Settings > New assets > Values > Elevation`, so a node is
+      born with its ground elevation and nothing existing is touched. Not destructive at all, which
+      is why it is the front door.
+    - **(b) On existing nodes** — `From DEM` as a New-value option in Find and replace, when the
+      property being changed is Elevation. Find already scopes the selection and Replace already
+      owns one undo snapshot, so the control he does not have is a control that already exists.
+    - **(c) The Map-menu row and its own box are DELETED**, with their language keys. Two ordinary
+      controls replace a bespoke interface; keeping the third door is what made it a cool button
+      nobody asked for.
+  - Its ~30 m accuracy still has to be stated in the interface at both new sites, and the fill still
+    never overwrites an elevation without naming the number it would replace.
+  - Superseded and recorded so it is not re-proposed: the lasso-with-prior-selection door, and the
+    range-condensing list form (`nodes 262, 268-276, 302-328`) that the deleted box's report needed.
+    Find's own result list is what reports the affected nodes now.
 - 50|544| **[H] epanet-js is implicitly claiming to be EPANET, and we have not decided what to do.**
   Tom, 2026-08-26, and he calls it socially difficult: *"epanetjs is legally, but unethically,
   implicitly claiming to be epanet. For example, they have a Youtube video posted with the title

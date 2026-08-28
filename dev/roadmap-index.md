@@ -7,33 +7,34 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**61 open tasks.** Next (100): 5 · Soon (75): 15 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
+**62 open tasks.** Next (100): 12 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
 
-## 100 — Next (5)
+## 100 — Next (12)
 
+- Task 248.03 — Rule-based controls, EPANET's `[RULES]` (Task 248 child).
+- ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
+- Task 417 — Long-press enters Edit mode, and the phone's touch radius is too mean.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
 - ! Task 530 — [H] · Fire flow: what shipped answers ONE hydrant. The real question is the whole system.
+- Task 533 — Renaming a link leaves `incidentLinks` pointing at the old id.
+- Task 540 — [H] · BUILT, including the parser. What stays open is WORDING.
+- Task 542 — Terrain elevations become two ordinary controls, and the menu row goes away.
 - ! Task 545 — [H] · 64 English strings are waiting on Tom's wording, and they were recorded nowhere.
+- Task 553 — Demands: one table always, and a project default pattern in Settings.
 
-## 75 — Soon (15)
+## 75 — Soon (9)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
-- Task 248.03 — Rule-based controls, EPANET's `[RULES]` (Task 248 child).
-- ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
-- Task 417 — Long-press enters Edit mode, and the phone's touch radius is too mean.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 479 — [H] · One question left: should the suite answer at librewaternet.org/engcalcs/ ?
 - Task 531 — Tag the examples: US/SI, design/maintenance, xy/lat-lon.
 - ! Task 532 — An English style guide for label wording — Tom says he is writing one by intuition.
-- Task 533 — Renaming a link leaves `incidentLinks` pointing at the old id.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
-- Task 540 — [H] · BUILT, including the parser. What stays open is WORDING.
-- Task 542 — Terrain elevations: the button did more than a curious user expected.
 
 ## 50 — Someday (12)
 
@@ -87,5 +88,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-53 of 61 titles are within 4–12 words. `!` marks the rest;
+54 of 62 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
