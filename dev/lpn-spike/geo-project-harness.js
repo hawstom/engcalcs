@@ -32,7 +32,7 @@ const L = loadLoopedNetwork(
 	"\t\tserialize: serializeProject, applySaved: applySaved,\n" +
 	"\t\tdeleteNetwork: deleteNetwork,\n" +
 	"\t\tgeomLength: function (id) { return linkGeomLength(linkById(id)); },\n" +
-	"\t\tcoordText: coordText,\n" +
+	"\t\tcoordText: coordText, refreshMapStatus: refreshMapStatus,\n" +
 	"\t\tGEO: LPN_COORDS_GEO,\n" +
 	"\t\treset: function (coords) { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
@@ -218,6 +218,47 @@ byId.lpn_toolbar.querySelectorAll = () => [];
 	L.buildDom();
 	ok('a grid project measures the same two points flat, as it always did',
 		Math.abs(L.geomLength(l2) - 0.01) < 1e-9, String(L.geomLength(l2)));
+}
+
+// ---- THE COORDINATE READOUT ANNOUNCES THE PROJECT BEFORE A POINTER MOVES -----------------------
+//
+// The readout is where a geographic project says what it is (Task 145) -- and it was written by
+// `pointermove` and nothing else, so on a TOUCH DEVICE, which has no hover, it stayed at its markup
+// placeholder `X: --  Y: --` for as long as nobody dragged. Screenshot 0047 is a phone on satellite
+// imagery reading X and Y.
+//
+// **THIS IS THE VOCABULARY RULE, not a cosmetic one.** coord_order_check.php blocks a commit over
+// lat-before-lon in our own source; a public picture of our own page saying X and Y over a street
+// map argues the other way in the one place a stranger looks.
+{
+	console.log('\n--- the readout says which kind of coordinates these are ---');
+	L.reset(L.GEO);
+	L.setCanvas(800, 600);
+	L.refreshMapStatus();
+	const geoText = byId.lpn_coords.textContent;
+	ok('a geographic project names latitude and longitude with no pointer at all',
+		/Latitude/.test(geoText) && /Longitude/.test(geoText), JSON.stringify(geoText));
+	// LATITUDE FIRST, which is the half a naive fix gets wrong: the drawing's x IS the longitude, so
+	// emitting the pair in x,y order is the storage order showing through into a line a person reads.
+	ok('...latitude first, as every public pair on this page is',
+		geoText.indexOf('Latitude') < geoText.indexOf('Longitude'), JSON.stringify(geoText));
+	ok('...and it is still a placeholder, not an invented position',
+		/--/.test(geoText), JSON.stringify(geoText));
+
+	L.reset();
+	L.setCanvas(800, 600);
+	L.refreshMapStatus();
+	const xyText = byId.lpn_coords.textContent;
+	ok('a grid project goes back to X and Y', /^X:/.test(xyText) && /Y:/.test(xyText),
+		JSON.stringify(xyText));
+
+	// **IT MUST NOT BLANK A LIVE POSITION.** Every solve and every unit change runs through the same
+	// refresh, so a readout that rewrote itself each time would erase the numbers a pointer had just
+	// put there -- once per second while somebody is moving the mouse.
+	byId.lpn_coords.textContent = 'X: 123.00  Y: 456.00';
+	L.refreshMapStatus();
+	ok('...and a refresh inside one project leaves a live position alone',
+		byId.lpn_coords.textContent === 'X: 123.00  Y: 456.00', byId.lpn_coords.textContent);
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

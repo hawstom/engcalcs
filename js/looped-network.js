@@ -17989,6 +17989,7 @@ var EngCalcs = EngCalcs || {};
 					? (pcc.lpn_field_lat || 'Latitude') + ': ' + coordText(outwardY(w.y)) +
 						'  ' + (pcc.lpn_field_lon || 'Longitude') + ': ' + coordText(outwardX(w.x))
 					: 'X: ' + coordText(outwardX(w.x)) + '  Y: ' + coordText(outwardY(w.y));
+				coordsKind = isGeoProject() ? 'geo' : 'xy';
 			});
 		}
 		// Rubber-band line while drawing a pipe/pump (Tom, 2026-07-30) -- tracks the live pointer
@@ -19050,7 +19051,32 @@ var EngCalcs = EngCalcs || {};
 			(pc.lpn_units_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
 			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
 		].join(' | ');
+		refreshCoordsReadout();
 		placeLegends();
+	}
+	// **THE COORDINATE READOUT SAYS WHAT KIND OF COORDINATES THESE ARE BEFORE THE POINTER MOVES.**
+	//
+	// It was driven by `pointermove` alone, so on a TOUCH device -- which has no hover -- a
+	// geographic project sat under `X: --  Y: --` for as long as nobody dragged: the one readout
+	// whose job is to announce that this project is on the Earth, announcing the opposite. Visible
+	// in screenshot 0047, a phone on satellite imagery reading X and Y.
+	//
+	// **AND IT IS THE VOCABULARY RULE, not a cosmetic one.** `coord_order_check.php` blocks a commit
+	// over lat-before-lon in our own source; a public screenshot of our own page saying X and Y over
+	// a street map argues the other way in the one place a stranger looks.
+	//
+	// Written only when the KIND has changed, so it never blanks live numbers a pointer just put
+	// there: switching between an xy tab and a geographic one is the case it exists for, and staying
+	// in one project is the case it must keep out of.
+	var coordsKind = '';
+	function refreshCoordsReadout() {
+		var el = document.getElementById('lpn_coords'), pc = EngCalcs.pageConfig || {},
+			kind = isGeoProject() ? 'geo' : 'xy';
+		if (!el || kind === coordsKind) { return; }
+		coordsKind = kind;
+		el.textContent = kind === 'geo'
+			? (pc.lpn_field_lat || 'Latitude') + ': --  ' + (pc.lpn_field_lon || 'Longitude') + ': --'
+			: 'X: --  Y: --';
 	}
 	// "US Units" / "SI Units", for the example network's title block. `system` is the preset the
 	// caller just committed the project to, never a reading of the live strip: an example FORCES the
