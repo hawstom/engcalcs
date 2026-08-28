@@ -802,6 +802,20 @@ the block.
     - `page_meta_check.php` also takes the exempt list out of prose and into the check, where an
       entry naming a page that no longer exists is itself a finding. That list had been measurably
       wrong once already.
+  - **AND ROW 27, THE ONE THAT GUARDS WHAT STRANGERS READ.** `public_claim_check.php` denies the
+    four sentences that were written, SHIPPED, and struck by Tom personally — *"your phone"* (it is
+    always *"a phone"*), *"PC application"*, *"the only third-party request"*, *"no extended-period
+    simulation yet"*. Every one reads perfectly reasonably, which is why they come back; two of them
+    he caught by eye where no check could.
+    - **Scoped to `lang.ec.en.php` and blind to `dev/*.md` on purpose**: all four phrases live in
+      `dev/positioning.md` and `CLAUDE.md` inside the rule forbidding them, and a check that reports
+      the rule as a violation of itself is a check somebody deletes.
+    - **The load-bearing fixture is the SANCTIONED sentence** — *"And although you of course prefer
+      working on your PC, it works also on a phone in tall mode."* It holds "your PC" and "a phone",
+      one word from two of the denials, so a check that matched the pronoun instead of the noun
+      would report the sentence Tom wrote and approved.
+    - It is a FLOOR, not a guarantee: it cannot see `~/webdev/librewaternet.org`, which is where
+      three of the four actually shipped. `dev/positioning.md` stays the authority.
   - **DELIBERATELY LEFT ADVISORY, and the reasoning is the useful part:** `size_budget_check.php`
     entirely (both numbers are judgement, and a ratchet fails a legitimate addition, which is the
     fastest way to teach a team `--no-verify`); both `key_hygiene_check.php` findings (whether a key

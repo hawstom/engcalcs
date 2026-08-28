@@ -17,7 +17,7 @@ would land within about ten percent of these numbers.
 | Class | CLAUDE.md rules | What it means |
 |---|---:|---|
 | **Already enforced** by a script in `check_all.sh` | 34 | The executed half — 34 of the 40 registered checks guard a rule this file states; the other 6 guard the language itself (php/js/shell syntax, harness runners). Every one stopped being violated. |
-| **Enforceable and not yet enforced** — the rows below | 27 | The decoration that could stop being decoration. **Seven landed on 2026-08-28**: rows 1-3 with the survey, then 3b (a defect its own row-1 sibling had been blind to) and rows 6-9 the same day. Row 6 is the one worth reading: writing the check is what discovered the rule named a function that does not exist. |
+| **Enforceable and not yet enforced** — the rows below | 27 | The decoration that could stop being decoration. **Eight landed on 2026-08-28**: rows 1-3 with the survey, then 3b (a defect its own row-1 sibling had been blind to) and rows 6-9 the same day. Row 6 is the one worth reading: writing the check is what discovered the rule named a function that does not exist. |
 | **Not mechanically checkable** | 41 | Judgement, identity, positioning, and rules about how to think. Prose is the right home. |
 
 So the file is roughly a third enforced, a quarter reachable, and **two fifths permanently prose** —
@@ -65,7 +65,7 @@ for one of those wherever the row is blocking).
 | 24 | **Every path `CLAUDE.md` cites exists** | implied by the whole file | backtick-quoted paths against the filesystem | 25 | No for `CLAUDE.md` (0 dead pointers today). **Yes for `dev/*.md`**: 31 dead citations, and nearly all are legitimate history in `history.md`, `roadmap-closed-ids.md` and `translation-execution-log.md`, so widening the scope makes it a judgement call |
 | 25 | **Never explanatory text in a link's `title=`** — on touch, a bare `<a title>` just navigates | CLAUDE.md § Labels, Tips | rendered pages: `<a>` with a `title` and no `.ec-help` sibling | 35 | Low |
 | 26 | **A verdict string leads with `✓` or `⚠` and never a translated marker word** | CLAUDE.md § Verdict convention | English verdict values in `lang.ec.en.php` | 30 | Yes — "which strings are verdicts" has to be inferred from the key name |
-| 27 | **Forbidden public claims in shipped strings** — "your phone" (it is always "a phone"), "PC application", "the only third-party request", "no extended-period simulation yet" | CLAUDE.md § `lpn_`; `dev/positioning.md` | `$ec_lang` values, English only | 30 | No inside shipped strings; **yes** the moment the scan is widened to `dev/*.md`, where every one of those phrases appears in the rule that forbids it |
+| 27 | **DONE 2026-08-28** — forbidden public claims in shipped strings — "your phone" (it is always "a phone"), "PC application", "the only third-party request", "no extended-period simulation yet" | CLAUDE.md § `lpn_`; `dev/positioning.md` | `$ec_lang` values, English only | 30 | No inside shipped strings; **yes** the moment the scan is widened to `dev/*.md`, where every one of those phrases appears in the rule that forbids it — so it is scoped to `lang.ec.en.php` and says so. Shipped as `public_claim_check.php` + selftest (12 fixtures). **The load-bearing fixture is the SANCTIONED sentence**, which contains "your PC" and "a phone" and is one word from two of the four denials |
 
 ## What must stay prose, and why it is not decoration
 

@@ -123,6 +123,14 @@ run_check "page meta selftest"           blocking php dev/scripts/page_meta_self
 # device on the response that starts it, before any banner has asked and with no way to take it back.
 run_check "no PHP sessions"              blocking php dev/scripts/no_session_check.php
 run_check "no-session selftest"          blocking php dev/scripts/no_session_selftest.php
+# Task 322 row 27. FOUR SENTENCES THAT SHIPPED AND WERE STRUCK BY TOM PERSONALLY -- "your phone"
+# (it is always "a phone"), "PC application", "the only third-party request", "no extended-period
+# simulation yet". Each reads perfectly reasonably, which is why they come back. Scoped to shipped
+# English strings ONLY: every one of those phrases also appears in dev/positioning.md and CLAUDE.md,
+# inside the rule that forbids it, and a check that reports the rule as a violation of itself gets
+# deleted by whoever hits it first.
+run_check "struck public claims"         blocking php dev/scripts/public_claim_check.php
+run_check "public claim selftest"        blocking php dev/scripts/public_claim_selftest.php
 # Task 534. A share card fails where nobody on this side ever looks: you do not paste links to your
 # own site into Facebook, so a relative og:image (which every network drops silently) or a card file
 # renamed out from under the tag stays broken until a stranger mentions it. This renders every page
