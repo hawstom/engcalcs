@@ -60,38 +60,26 @@ $ec_icons = array(
 	// question — "I forgot that I love what you already have now" (2026-08-08). Recorded so the
 	// camera is not re-proposed: it was drawn, compared, and declined on the merits.
 	'view'       => '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/>',
-	// **THE MAP MENU'S PUSH PIN** (Tom, 2026-08-27: *"a nice push pin icon for Map would be good"*).
-	// A tack stuck through a paper map is the oldest thing in this trade that MEANS "map", which is
-	// why it beats a folded sheet: a folded sheet is a document, and this menu is about the one
-	// drawing you are looking at.
+	// **THE MAP MENU'S PIN** (Tom, 2026-08-27: *"a nice push pin icon for Map would be good"*, and
+	// 2026-08-28, with a picture of the one he means: *"Replace the Map icon with a standard pushpin.
+	// I would not ask if it were already done."*). **It is the MAP MARKER — the teardrop with a round
+	// hole — not a thumbtack.** That is what "standard pushpin" means to a reader of maps, and it is
+	// the shape every mapping product has trained them on.
 	//
-	// **DRAWN FRONT-ON, NOT TILTED.** Every commercial push pin is drawn at 45°, and at 17px a
-	// tilted 2px stroke turns the needle into a smudge running through the barrel — the diagonal
-	// costs about 30% of the length to the same bounding box, and the needle is the thinnest thing
-	// here. Straight on, the four features stack vertically and each gets its own row of pixels.
+	// **A FILLED SILHOUETTE WITH AN EVEN-ODD HOLE, not a 2-unit outline.** The hole is 5 units
+	// across; drawn as a stroked circle its own stroke would eat 2 of those 5 and close at 17px.
+	// Filled, the hole is exactly its geometry. The hydrant's cap disc is unstroked for the same
+	// reason, and this shape only reads at all because the aperture survives.
 	//
-	// Top to bottom: the thumb plate you press, the grip, the flange the fingers stop against, and
-	// the needle.
-	//
-	// **THE PLATE IS THE WIDEST THING AND THE FLANGE IS NARROWER**, which is the object: the disc
-	// you press is broad and the collar the needle comes out of is not. Drawn the other way round
-	// the first time and it read as a table, not a pin.
-	//
-	// **THE NEEDLE IS A FILLED TRIANGLE WITH NO STROKE, and that is the only way it can be sharp.**
-	// Every other path here is stroked at 2 units, which inflates a shape by one unit on each side
-	// — so a 2-unit-wide stroked needle paints 4 units across and comes out a cone. Unstroked, its
-	// width is exactly its geometry: 2.2 at the collar, tapering to a real point. The hydrant's cap
-	// disc is unstroked for the same kind of reason.
-	//
-	// THE GAP BUDGET at 17px (17/24 of a unit is 0.71px, and a 2-unit stroke eats one unit either
-	// side of a line): plate painted 1.6..18.5 with 3 units of interior white, grip 7..11.4 with
-	// 1.6 of white between its two legs, flange at 11.4, needle 12.4..21.8. The four parts TOUCH —
-	// a push pin is one object, and air between its parts would read as four marks. Verify with a
-	// real rendering, never ASCII:
+	// SUPERSEDED, recorded so it is not redrawn: a front-on THUMBTACK (plate, grip, flange, needle,
+	// stacked vertically to keep a 2px stroke off the diagonal). It was legible and it was not a pin
+	// — at 17px the broad plate over a stem reads as a table or a rubber stamp. The legibility
+	// argument was sound and it was answered by changing the OBJECT, not the drawing of it.
+	// Verify with a real rendering, never ASCII:
 	//     node dev/scripts/icon_png_preview.js pin
-	'pin'        => '<path d="M4.4 2.6H19.6V7.6H4.4Z"/><path d="M9.2 7.6V12.2"/><path d="M14.8 7.6V12.2"/>'
-		. '<path d="M7 12.2H17"/>'
-		. '<path fill="currentColor" stroke="none" d="M12 22L10.7 13.2H13.3Z"/>',
+	'pin'        => '<path fill="currentColor" stroke="none" fill-rule="evenodd"'
+		. ' d="M12 2c-3.87 0-7 3.13-7 7 0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z'
+		. 'M12 11.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>',
 	// SIX TEETH at a 60° pitch. The count is a consequence of the rule, not the point of it: a gear
 	// reads as a gear when TOOTH WIDTH EQUALS GAP WIDTH at the pitch circle, with matching fillets on
 	// the inside and outside corners — which is what the real history of gear refinement converged
