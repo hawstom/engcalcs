@@ -12,9 +12,9 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**89 of 1416 English keys**, as of the last generation.
+**95 of 1422 English keys**, as of the last generation.
 
-## lpn_  (89)
+## lpn_  (95)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -152,8 +152,12 @@ settled these go into the next translation sprint as a batch.
   > Rename path…
 - **`lpn_profile_saved`**
   > Saved paths
+- **`lpn_replace_asked`**
+  > Asked for {n}. The answer is on its way.
 - **`lpn_replace_q_aside`**
   > Replace cannot use a query joined with AND, OR or brackets. Use the controls to choose one set of elements.
+- **`lpn_replace_source`**
+  > New value from
 - **`lpn_result_demand_tip`**
   > The flow this node draws at the moment shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.
 - **`lpn_scenario_mark_tip`**
@@ -164,6 +168,14 @@ settled these go into the next translation sprint as a batch.
   > Demand multiplier
 - **`lpn_settings_demand_multiplier_tip`**
   > One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.
+- **`lpn_settings_elev_source`**
+  > Elevation from
+- **`lpn_settings_elev_source_dem`**
+  > From Mapbox DEM
+- **`lpn_settings_elev_source_tip`**
+  > Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.
+- **`lpn_settings_elev_source_typed`**
+  > The number above
 - **`lpn_settings_emitter_exponent_tip`**
   > The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which today means a network read from an EPANET file.
 - **`lpn_settings_leader_snap`**

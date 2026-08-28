@@ -847,6 +847,8 @@
         "lpn_replace_title": "Change what was found",
         "lpn_replace_prop": "Property to change",
         "lpn_replace_value": "New value",
+        "lpn_replace_source": "New value from",
+        "lpn_replace_asked": "Asked for {n}. The answer is on its way.",
         "lpn_replace_button": "Replace",
         "lpn_replace_preview": "Change {n} assets?",
         "lpn_replace_apply": "Change them",
@@ -1203,6 +1205,10 @@
         "lpn_settings_emitter_exponent": "Emitter exponent",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which today means a network read from an EPANET file.",
         "lpn_settings_computation": "Computation",
+        "lpn_settings_elev_source": "Elevation from",
+        "lpn_settings_elev_source_tip": "Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.",
+        "lpn_settings_elev_source_typed": "The number above",
+        "lpn_settings_elev_source_dem": "From Mapbox DEM",
         "lpn_settings_specific_gravity": "Specific gravity",
         "lpn_settings_specific_gravity_tip": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
         "lpn_settings_viscosity": "Relative viscosity",
@@ -1418,7 +1424,7 @@
         "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
         "lpn_terrain_ids_more": "{ids}, and {n} more"
     },
-    "count": 1416,
+    "count": 1422,
     "active_prefixes": [
         "about",
         "bpn",

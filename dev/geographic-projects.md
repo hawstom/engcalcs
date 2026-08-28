@@ -202,16 +202,35 @@ so `(x − ox) + ox === x` and a shifted coordinate returns to the file as the b
 The open decision is where a geographic document's origin is STORED, given that `view.cx/cy` and
 `backdrop.tx/ty` are in the drawing frame — the two candidates are in Task 439.
 
-## 7. Elevations from the land surface (Task 497)
+## 7. Elevations from the land surface (Tasks 497 and 542)
 
 A geographic project knows where every node is, so the one number a designer otherwise types by
-hand — junction by junction, off a contour map — can be read instead. **It is a View-menu row you
-press, never a sweep**, and `js/lpn-terrain.js` holds the whole of it.
+hand — junction by junction, off a contour map — can be read instead. `js/lpn-terrain.js` holds the
+whole of it.
+
+**IT IS TWO ORDINARY CONTROLS AND NOT A MENU ROW, since Task 542.** It shipped in 2026-08 as a row
+under the View menu (which became Map under Task 543), and Tom pressed it and wrote the defect
+himself: *"To be honest, I did not expect nor necessarily welcome what I got. I was just a
+dilettante pushing a cool new button that I found."* One press filled every blank elevation on the
+whole drawing. It is now:
+
+- **`Settings > New assets > Elevation from`** — a node born on a geographic project reads its own
+  ground. Nothing existing is touched, which is why this is the front door. A burst of drawing is
+  ONE batch of tile requests, 600 ms after the last node, never one request per node.
+- **`From Mapbox DEM` as the New-value source in Find and replace**, offered only when the property
+  being changed is Elevation. The user has already chosen the set, and Replace already owns the
+  preview and the single undo step.
+
+**Do not add a third door.** Keeping the menu row beside these is what made the feature a cool
+button nobody asked for. `EngCalcs.lpnTerrainFill()` — the function that decides its OWN list —
+survives with no caller on the page; `lpnTerrainFillFor(points, opts)` is everything from the
+consent gate down, taking the nodes as an argument, so all doors are one behaviour.
 
 - **Mapbox Terrain-RGB, because it is already paid for.** `EC_MAPBOX_TOKEN` already gates satellite;
   terrain is ordinary raster tiles on the same host through the same account, and the height decodes
   client-side from the pixel: `-10000 + ((R·65536 + G·256 + B) · 0.1)` metres. No server of ours and
-  no second account. **No token, no row** — the same state a fork is in for satellite. If that gate
+  no second account. **No token, no CONTROL** — neither the Settings row nor the Replace source is
+  built, the same state a fork is in for satellite. If that gate
   is ever absent the alternatives are USGS 3DEP (US only), Copernicus GLO-30 or SRTM through
   OpenTopoData, and Open-Elevation.
 - **It writes numbers into the document, so it obeys the rule that governs that.** It fills a field

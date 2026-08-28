@@ -565,6 +565,38 @@
 				: t('lpn_terrain_no_nodes', 'There are no nodes to fill in yet.'));
 			return;
 		}
+		EC.lpnTerrainFillFor(want, { keep: keep, replacing: replacing, confirm: true });
+	};
+
+	/**
+	 * **FETCH AND WRITE A LIST SOMEBODY ELSE CHOSE** (ROADMAP Task 542). Everything from the consent
+	 * gate down, taking the nodes as an argument instead of deciding them.
+	 *
+	 * This is the split Task 542 needed. `lpnTerrainFill` above is one CALLER: it decides its own
+	 * list (blank elevations, then the ones still on the starting number) and passes it here. The
+	 * two Task 542 doors are the other two -- a node born on a geographic project, and Find and
+	 * replace with Elevation set to From DEM -- and neither of them decides a list the same way.
+	 * Splitting was the alternative to a third copy of the tile plan, the budget, the consent gate
+	 * and the eight messages, which is how three doors become three behaviours.
+	 *
+	 * `opts.confirm` shows the plan and its counts. **The DOOR decides that, not this file**: a bulk
+	 * fill over a drawing somebody already made is destructive and asks; a node being born has
+	 * nothing to overwrite and must not interrupt the drawing to say so.
+	 *
+	 * **THE CONSENT GATE IS NOT OPTIONAL AND HAS NO opts.** Every door goes through mayWeSend(),
+	 * because what it protects is not "is this destructive" -- it is that a node coordinate says
+	 * where the user's NETWORK IS, and that is true however the fill was started.
+	 */
+	EC.lpnTerrainFillFor = function (want, opts) {
+		opts = opts || {};
+		if (!seam || (seam.isGeo && !seam.isGeo())) { return; }
+		var token = seam.token && seam.token();
+		if (!token) { return; }
+		if (running) {
+			notice(t('lpn_terrain_busy', 'Elevations are already being filled in. Wait for them.'));
+			return;
+		}
+		if (!want || !want.length) { return; }
 		if (!mayWeSend(want.length)) { return; }
 		var plan = EC.lpnTerrainPlan(want);
 		if (!plan || !plan.tiles.length) {
@@ -578,7 +610,8 @@
 				'requests). Nothing was sent.').replace('{n}', plan.tiles.length));
 			return;
 		}
-		if (!root.confirm || !root.confirm(EC.lpnTerrainPlanText(want, keep, plan.tiles.length, replacing))) {
+		if (opts.confirm &&
+			(!root.confirm || !root.confirm(EC.lpnTerrainPlanText(want, opts.keep || [], plan.tiles.length, opts.replacing)))) {
 			notice(t('lpn_terrain_cancelled', 'Nothing was changed and nothing was sent.'));
 			return;
 		}
@@ -586,12 +619,19 @@
 			notice(t('lpn_terrain_nofetch', 'This browser cannot reach the terrain service.'));
 			return;
 		}
-		run(plan, token, want, replacing);
+		// **`replaceAny` AND `replacing` ARE DIFFERENT PERMISSIONS AND ONLY ONE OF THEM IS WORDING.**
+		// `replacing` is a NUMBER the plan text names out loud ("still on 0") and is the menu row's
+		// second question. `replaceAny` is Find and replace's blanket permission, which has no
+		// number to name -- passing it as `replacing` would print `true` where a number goes.
+		run(plan, token, want, opts.replaceAny ? true : opts.replacing, opts.quiet);
 	};
 
-	function run(plan, token, want, replacing) {
+	function run(plan, token, want, replacing, quiet) {
 		running = true;
-		notice(t('lpn_terrain_working', 'Reading the land surface…'));
+		// **A NODE BEING BORN DOES NOT ANNOUNCE ITSELF.** `quiet` suppresses the progress line and
+		// the success line, not the failures: a fill that could not reach the service, or that left
+		// nodes blank, is news whatever started it. Nothing is ever silent about what it did NOT do.
+		if (!quiet) { notice(t('lpn_terrain_working', 'Reading the land surface…')); }
 		var heights = [], failed = 0;
 		var jobs = plan.tiles.map(function (tile) {
 			return EC.lpnTerrainFetchPixels(tile, token).then(function (pixels) {
@@ -625,7 +665,7 @@
 			// request was in flight -- is named exactly once and named correctly.
 			var blank = want.map(function (p) { return p.id; })
 				.filter(function (id) { return !wrote[id]; });
-			notice(EC.lpnTerrainDoneText(filled, blank, failed));
+			if (!quiet || blank.length || failed) { notice(EC.lpnTerrainDoneText(filled, blank, failed)); }
 		});
 	}
 

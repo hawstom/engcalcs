@@ -765,6 +765,18 @@ the block.
     fastest way to teach a team `--no-verify`); both `key_hygiene_check.php` findings (whether a key
     is debt is judgement — whether it EXISTS is not, which is what the new check took); and
     `stale_claim_check.php` (citing a closed task as a record is legitimate).
+  - **A ROW THE SURVEY DOES NOT HAVE YET, FOUND BY HAND 2026-08-28 AND WORTH ADDING:**
+    `pageconfig_check.php` matches literal `EngCalcs.pageConfig.<key>` reads only, and
+    `js/looped-network.js` reads every one of its 838 strings through the one-letter alias `pc` —
+    **so the entire `lpn_` page is invisible to the check that exists to guard it.** Diffing
+    `pc.<key>` against the block by hand found `lpn_labels_col_drop`: translated into all 26
+    languages, never wired, English on every screen. One `pc` alias is ~20 lines of check.
+  - **AND ITS MIRROR, SAME DAY: A DEAD READER HIDES A DEAD KEY.** `key_hygiene_check.php` reports a
+    key "rendered by nothing" by looking for a reference to it. Task 542 deleted the terrain menu
+    ROW but left `EC.lpnTerrainMenuLabel()` and `EC.lpnTerrainMenuTip()` — which read
+    `lpn_terrain_menu` and its tip and are themselves now called by nobody. So two strings live in
+    27 language files, reach no screen, and **do not appear in the orphan list**. A reachability
+    walk from the page's own entry points is the honest version; a reference count is not.
   - **`js/looped-network.js` is over 20,000 lines**, with `rebuildSettingsFields()` and
     `drawExampleNetwork()` the two obvious extractions. Task 293 established the split-by-PURITY
     pattern and it worked. *(The 9,740 recorded here through 2026-08-23 was less than half the truth
@@ -956,30 +968,6 @@ the block.
     the pointer" and "click what the label refers to" can disagree.
   - Related and worth reading together: Task 417 (long-press enters Edit mode; the touch radius).
 
-- 100|542| **Terrain elevations become two ordinary controls, and the menu row goes away.**
-  Tom, 2026-08-26, after pressing the button: *"To be honest, I did not expect nor necessarily
-  welcome what I got. I was just a dilettante pushing a cool new button that I found."* **That
-  sentence is the defect** — the feature was destructive, it was one undo slot, and it offered no
-  way to choose.
-  - **TOM'S RULING, 2026-08-28, AND IT IS THE WHOLE TASK NOW:** *"Settings.New assets.Values.
-    Elevation should have an option for 'From DEM'. And Find and Replace could have, when Elevation
-    is selected to change, From DEM as an option for New value. Or Elevation from DEM could be a
-    select option. Then we don't need the rest of the interface or menu item for 542, and it can be
-    removed."*
-    - **(a) On creation** — an option on `Settings > New assets > Values > Elevation`, so a node is
-      born with its ground elevation and nothing existing is touched. Not destructive at all, which
-      is why it is the front door.
-    - **(b) On existing nodes** — `From DEM` as a New-value option in Find and replace, when the
-      property being changed is Elevation. Find already scopes the selection and Replace already
-      owns one undo snapshot, so the control he does not have is a control that already exists.
-    - **(c) The Map-menu row and its own box are DELETED**, with their language keys. Two ordinary
-      controls replace a bespoke interface; keeping the third door is what made it a cool button
-      nobody asked for.
-  - Its ~30 m accuracy still has to be stated in the interface at both new sites, and the fill still
-    never overwrites an elevation without naming the number it would replace.
-  - Superseded and recorded so it is not re-proposed: the lasso-with-prior-selection door, and the
-    range-condensing list form (`nodes 262, 268-276, 302-328`) that the deleted box's report needed.
-    Find's own result list is what reports the affected nodes now.
 - 50|544| **[H] epanet-js is implicitly claiming to be EPANET, and we have not decided what to do.**
   Tom, 2026-08-26, and he calls it socially difficult: *"epanetjs is legally, but unethically,
   implicitly claiming to be epanet. For example, they have a Youtube video posted with the title

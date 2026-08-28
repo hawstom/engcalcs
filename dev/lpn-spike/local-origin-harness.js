@@ -272,8 +272,14 @@ console.log('\n--- one home for the concept ---');
 	// coordinate like any other -- georefCaptureBackdrop() reads its centre OUTWARD and
 	// georefWriteBackdrop() plants it INWARD. It is the one such point eachStoredPoint() cannot
 	// reach on the LIVE document, so it is also the one that had to be spelled out here.
-	ok('outwardX has one definition and seventeen call sites', count(/outwardX\(/g) === 18, count(/outwardX\(/g));
-	ok('outwardY has one definition and eighteen call sites', count(/outwardY\(/g) === 19, count(/outwardY\(/g));
+	// **TASK 542 ADDED ONE SITE TO EACH PAIR AND IT IS A CONSOLIDATION, NOT A SPREAD.**
+	// terrainPointsForIds() turns a list of node IDS into places on the Earth, for the two doors
+	// that arrive holding ids and nothing else -- a node born on a geographic project, and Find and
+	// replace reading the DEM. It states the outward-x-is-longitude boundary ONCE for both, which is
+	// the alternative to each door stating it again. Task 497's own two sites are unchanged: those
+	// functions decide their own lists from the document.
+	ok('outwardX has one definition and eighteen call sites', count(/outwardX\(/g) === 19, count(/outwardX\(/g));
+	ok('outwardY has one definition and nineteen call sites', count(/outwardY\(/g) === 20, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.

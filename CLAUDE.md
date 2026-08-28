@@ -216,9 +216,16 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   and for Terrain-RGB (all gated on `EC_MAPBOX_TOKEN`; absent means neither option exists). The
   tiles are never cached by us, never in the service worker's manifest, attribution required on the
   map and one credit set per source. It is `project.basemap`, never `backdrop.href`, and an `.inp`
-  exporter must skip it. The elevation fill is a View-menu row that TYPES numbers into the document,
-  so it never overwrites an elevation without naming the number it would replace, it is one undo
-  snapshot, and it states its ~30 m accuracy in the interface, not in a comment.
+  exporter must skip it. **The elevation fill is TWO ORDINARY CONTROLS and NOT a menu row** (Task
+  542, and the row it names was deleted twice over — the menu became Map, not View, under Task 543):
+  `Settings > New assets > Elevation from`, where a node is born reading its own ground and nothing
+  existing is touched, and `From Mapbox DEM` as the New-value source in Find and replace, where the
+  user has already chosen the set. **Do not add a third door** — a menu row that filled the whole
+  drawing in one press is what Tom called *"a cool new button that I found"*, and it is the defect
+  542 exists to have removed. It TYPES numbers into the document, so it never overwrites an
+  elevation the user has without their having asked for exactly that, it is one undo snapshot, and
+  it states its ~30 m accuracy in the interface, not in a comment. A burst of drawing is one batch
+  of requests, never one per node.
 - **THE SUITE MAKES FOUR THIRD-PARTY REQUESTS, ALL ON THIS PAGE, ALL OPT-IN:** OSM tiles, Mapbox
   satellite tiles, Nominatim place-name search (`js/lpn-search.js`), and Mapbox Terrain-RGB elevation
   lookup (`js/lpn-terrain.js`, Task 497). **The last two are the sensitive ones and each has its own

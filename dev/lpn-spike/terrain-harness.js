@@ -251,7 +251,17 @@ const L = loadLoopedNetwork(
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
 	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); },\n" +
-	"\t\tGEO: LPN_COORDS_GEO\n"
+	"\t\tGEO: LPN_COORDS_GEO,\n" +
+	// Task 542's two new doors, and the queue between the first one and the tiles.
+	"\t\tsetElevSource: function (v) { settings.defaults.nodeElevSource = v; },\n" +
+	"\t\tflushNewNodes: flushTerrainForNewNodes,\n" +
+	"\t\tqueueLength: function () { return terrainNewQueue.length; },\n" +
+	"\t\tswitchProject: function () { project = { name: 'other', activeScenario: 'base' }; },\n" +
+	"\t\tmapMenuRows: mapMenuRows,\n" +
+	"\t\treplace: function (prop, source) { findState.scope = 'junction'; findState.prop = 'id';\n" +
+	"\t\t\tfindState.op = 'contains'; findState.value = '';\n" +
+	"\t\t\treplaceState.prop = prop; replaceState.source = source; replaceState.value = '';\n" +
+	"\t\t\trunReplacePreview(); return applyReplace(); }\n"
 );
 byId.lpn_toolbar.querySelectorAll = () => [];
 setUnitSet('us');
@@ -301,13 +311,17 @@ function noticeText() { return byId.lpn_map_notice.textContent || ''; }
 
 let confirmAnswers = [], confirmTexts = [];
 global.confirm = global.window.confirm = function (m) { confirmTexts.push(m); return confirmAnswers.shift() === true; };
+// The fetch stub resolves immediately; two microtask turns settle Promise.all and its .then. Split
+// out of runFill() by Task 542, whose two doors start a fill without going through it.
+function settle() {
+	return new Promise(function (r) { setImmediate(function () { setImmediate(r); }); });
+}
 function runFill(answers) {
 	confirmAnswers = answers.slice();
 	confirmTexts = [];
 	tileRequests = 0;
 	EC.lpnTerrainFill();
-	// The fetch stub resolves immediately; two microtask turns settle Promise.all and its .then.
-	return new Promise(function (r) { setImmediate(function () { setImmediate(r); }); });
+	return settle();
 }
 
 (async function () {
@@ -508,6 +522,162 @@ function runFill(answers) {
 	await runFill([true, true]);
 	ok('a grid project asks nothing and sends nothing',
 		tileRequests === 0 && confirmTexts.length === 0, tileRequests + ' requests');
+
+	// ---- 6. TASK 542: TWO ORDINARY CONTROLS, AND THE MENU ROW GONE ------------------------------
+	//
+	// Tom pressed the menu row and wrote the defect himself: *"To be honest, I did not expect nor
+	// necessarily welcome what I got. I was just a dilettante pushing a cool new button that I
+	// found."* It filled every blank elevation on the drawing in one press. His replacement, in his
+	// words: an option at *"Setting.New assets.Values.Elevation"*, and *"From DEM as an option for
+	// New value"* in Find and replace. **And then the row goes.**
+	section('Task 542: elevation on creation, and on a found set');
+
+	// ---- 6a. THE ROW IS GONE, WHICH IS THE PART THAT IS EASY TO FORGET --------------------------
+	{
+		buildSite();
+		const rows = L.mapMenuRows();
+		const words = rows.map(r => String(r.label || '')).join(' | ');
+		ok('the Map menu no longer offers a terrain-elevations row',
+			!/[Ee]levation/.test(words), words);
+	}
+
+	// ---- 6b. A NODE BORN ON A GEOGRAPHIC PROJECT READS ITS OWN GROUND --------------------------
+	{
+		jar.value = '';
+		L.reset(L.GEO);
+		L.setElevSource('dem');
+		L.addNode('junction', 0, 0);
+		L.place('J1', -122.4, 37.8);
+		// **BORN BLANK, NOT BORN AT THE DEFAULT.** The fill refuses to overwrite a number that is
+		// already there, so seeding settings.defaults.nodeElev first and reading the DEM second
+		// would give every node the default and nothing else. Blank is also the honest interim
+		// state: 0 is sea level, which is a claim.
+		ok('the new node is born with no elevation at all', L.elev('J1') === undefined,
+			String(L.elev('J1')));
+		ok('...and is queued rather than fetched on the spot', L.queueLength() === 1,
+			L.queueLength());
+		// The consent gate applies here exactly as it does to the menu row: what it protects is that
+		// a node coordinate says where the user's network IS, which is true however the fill started.
+		confirmAnswers = [false];
+		confirmTexts = [];
+		tileRequests = 0;
+		L.flushNewNodes();
+		await settle();
+		ok('refusing consent leaves it blank and sends nothing',
+			L.elev('J1') === undefined && tileRequests === 0, tileRequests + ' requests');
+	}
+	{
+		jar.value = '';
+		L.reset(L.GEO);
+		L.setElevSource('dem');
+		// **A BURST OF DRAWING IS ONE BATCH.** Ten junctions in a few seconds is ten addNode() calls
+		// for ten points almost certainly on the same tile; ten requests would be nine spent on
+		// nothing, with the consent-gated third-party call on the critical path of the gesture.
+		for (let i = 0; i < 6; i++) {
+			L.addNode('junction', 0, 0);
+			L.place('J' + (i + 1), -122.4 + i * 0.001, 37.8);
+		}
+		ok('six nodes drawn in a burst are one queue', L.queueLength() === 6, L.queueLength());
+		confirmAnswers = [true];   // the consent question, asked once per browser
+		confirmTexts = [];
+		tileRequests = 0;
+		byId.lpn_map_notice.textContent = '';   // the refusal above is not this block's news
+		L.flushNewNodes();
+		await settle();
+		ok('...answered by ONE tile request, not six', tileRequests === 1, tileRequests + ' requests');
+		ok('...and every one of them has an elevation now',
+			['J1', 'J2', 'J3', 'J4', 'J5', 'J6'].every(id => typeof L.elev(id) === 'number'),
+			JSON.stringify(['J1', 'J2', 'J3', 'J4', 'J5', 'J6'].map(id => L.elev(id))));
+		// **QUIET.** A node being born must not narrate itself; the elevations simply appear. The
+		// menu row's own "Reading the land surface…" and its done-line are what this replaced.
+		ok('...and it said nothing, because nothing went wrong', noticeText() === '',
+			JSON.stringify(noticeText()));
+	}
+	{
+		// The setting is off by default, and off means exactly the old behaviour.
+		jar.value = '';
+		L.reset(L.GEO);
+		tileRequests = 0;
+		L.setElevSource('value');
+		L.addNode('junction', 0, 0);
+		L.place('J1', -122.4, 37.8);
+		ok('with the setting off a node still takes the typed default',
+			L.elev('J1') === 0 && L.queueLength() === 0, String(L.elev('J1')));
+		// And a GRID project cannot read the Earth however the setting is set.
+		L.reset(null);
+		L.setElevSource('dem');
+		L.addNode('junction', 10, 10);
+		ok('a grid project ignores the setting entirely',
+			L.elev('J1') === 0 && L.queueLength() === 0, String(L.elev('J1')));
+	}
+
+	{
+		// **A 600 ms TIMER OUTLIVES A TAB SWITCH.** The queue holds IDS, and an id resolves against
+		// whatever document is open when it fires -- so a node drawn as J1 here, and a switch to a
+		// project with its own J1, would write an elevation into a network nobody was looking at
+		// from a place they never drew. Dropping a MISSING id cannot catch that: the collision is
+		// between two ids that both exist.
+		jar.value = '';
+		L.reset(L.GEO);
+		L.setElevSource('dem');
+		L.addNode('junction', 0, 0);
+		L.place('J1', -122.4, 37.8);
+		ok('the node is queued', L.queueLength() === 1, L.queueLength());
+		L.switchProject();
+		confirmAnswers = [true];
+		tileRequests = 0;
+		L.flushNewNodes();
+		await settle();
+		ok('a project switch before the timer fires sends nothing',
+			tileRequests === 0, tileRequests + ' requests');
+		ok('...and leaves the node it was about untouched', L.elev('J1') === undefined,
+			String(L.elev('J1')));
+	}
+
+	// ---- 6c. FIND AND REPLACE, WITH ELEVATION SET TO FROM DEM -----------------------------------
+	{
+		jar.value = '';
+		L.reset(L.GEO);
+		L.setElevSource('value');
+		L.addNode('junction', 0, 0); L.place('J1', -122.4, 37.80);
+		L.addNode('junction', 0, 0); L.place('J2', -122.4, 37.81);
+		// **NUMBERS A PERSON PUT THERE**, which is the whole difference between this door and the
+		// menu row: Replace exists to change what is already there, the user chose the property and
+		// the set, and the preview says how many before anything happens.
+		L.setElev('J1', 111);
+		L.setElev('J2', 222);
+		tileRequests = 0;
+		confirmAnswers = [true];   // consent; the fill itself asks nothing on this door
+		const asked = L.replace('elev', 'dem');
+		await settle();
+		ok('Replace with From DEM asks for every node the query found', asked === 2, asked);
+		ok('...and overwrites the numbers that were there',
+			L.elev('J1') !== 111 && L.elev('J2') !== 222 &&
+			typeof L.elev('J1') === 'number' && typeof L.elev('J2') === 'number',
+			L.elev('J1') + ', ' + L.elev('J2'));
+		// **AND IT IS ONE UNDO STEP**, taken inside terrainFillElevations() where the numbers
+		// actually arrive -- not one here as well, which would put an empty step on the stack.
+		L.undo();
+		ok('...and one undo puts both back', L.elev('J1') === 111 && L.elev('J2') === 222,
+			L.elev('J1') + ', ' + L.elev('J2'));
+	}
+	{
+		// The source is only ever offered for Elevation, and switching property must not leave it
+		// armed -- a Replace marked 'dem' on Diameter would be a write nobody asked for.
+		jar.value = '';
+		L.reset(L.GEO);
+		L.addNode('junction', 0, 0);
+		L.place('J1', -122.4, 37.8);
+		L.setElev('J1', 55);
+		tileRequests = 0;
+		confirmAnswers = [true];
+		const n = L.replace('demand', 'dem');
+		await settle();
+		ok('a DEM source on a property that is not Elevation sends nothing',
+			tileRequests === 0, tileRequests + ' requests');
+		ok('...and leaves the elevation exactly as it was', L.elev('J1') === 55, String(L.elev('J1')));
+		void n;
+	}
 
 	// ---- 5h. THE ONE STRUCTURAL ASSERTION ABOUT THE NETWORK --------------------------------------
 	ok('NOT ONE REAL REQUEST LEFT THIS PROCESS', realFetches === 0, realFetches + ' real fetches');

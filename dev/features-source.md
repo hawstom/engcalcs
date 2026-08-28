@@ -89,7 +89,7 @@ have something to generate; the wording is his call, not ours.
 - 145| A geographic project is drawn in latitude and longitude over a street map or satellite imagery, with the same drawing tools.
 - 476| An existing x/y network can be placed on the world — moved, scaled and rotated onto its real ground.
 - 437| Type a place name and the map goes there, if you turn that on.
-- 497| Ground elevations read from terrain data and typed into the document, never replacing a number without first showing you the one it would replace.
+- 497| Ground elevations read from terrain data and typed into the document — as each node is drawn, or over a set you found — never replacing a number without your having asked for exactly that.
 
 ## Labels and lettering
 

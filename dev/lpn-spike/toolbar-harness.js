@@ -76,7 +76,10 @@ console.log('--- the toolbar holds the commands you use every few minutes ---');
 	// **IT MOVED TO MAP, 2026-08-27, when the Insert menu was deleted** (Tom, Task 543): a picture
 	// behind the drawing is the map's furniture, not a water asset. The rule this asserts is
 	// unchanged -- a command that leaves the toolbar must not leave the app.
-	ok('...and Background image is still reachable, now from Map', /backdropRows\(/.test(fn('openMapMenu')));
+	// **READ FROM mapMenuRows(), NOT openMapMenu().** Task 542 split the row list out of the opening
+	// of it -- so a harness can ask what the menu OFFERS without driving a popup -- and openMapMenu()
+	// is now one line that delegates. Reading the delegator would assert nothing about the rows.
+	ok('...and Background image is still reachable, now from Map', /backdropRows\(/.test(fn('mapMenuRows')));
 }
 
 console.log('\n--- the background picker is still listening, button or no button ---');

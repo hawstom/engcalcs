@@ -1672,6 +1672,8 @@ $ec_lang['lpn_find_q_err_end']='Nothing was expected after this. Join two search
 $ec_lang['lpn_replace_title']='Change what was found';
 $ec_lang['lpn_replace_prop']='Property to change';
 $ec_lang['lpn_replace_value']='New value';
+$ec_lang['lpn_replace_source']='New value from';
+$ec_lang['lpn_replace_asked']='Asked for {n}. The answer is on its way.';
 $ec_lang['lpn_replace_button']='Replace';
 // The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
 // looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
@@ -2399,6 +2401,10 @@ $ec_lang['lpn_settings_emitter_exponent_tip']='The power in the sprinkler and le
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Computation';
+$ec_lang['lpn_settings_elev_source']='Elevation from';
+$ec_lang['lpn_settings_elev_source_tip']='Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.';
+$ec_lang['lpn_settings_elev_source_typed']='The number above';
+$ec_lang['lpn_settings_elev_source_dem']='From Mapbox DEM';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
 $ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';

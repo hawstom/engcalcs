@@ -8,7 +8,7 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-54 features, citing 87 of the 483 closed task IDs. The other 396 are
+54 features, citing 87 of the 484 closed task IDs. The other 397 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
 call a feature — and 135 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
@@ -69,7 +69,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - A geographic project is drawn in latitude and longitude over a street map or satellite imagery, with the same drawing tools. <!-- 145 -->
 - An existing x/y network can be placed on the world — moved, scaled and rotated onto its real ground. <!-- 476 -->
 - Type a place name and the map goes there, if you turn that on. <!-- 437 -->
-- Ground elevations read from terrain data and typed into the document, never replacing a number without first showing you the one it would replace. <!-- 497 -->
+- Ground elevations read from terrain data and typed into the document — as each node is drawn, or over a set you found — never replacing a number without your having asked for exactly that. <!-- 497 -->
 
 ## Labels and lettering
 

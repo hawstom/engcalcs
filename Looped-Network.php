@@ -1081,6 +1081,8 @@ EngCalcs.pageConfig = {
 	lpn_replace_title: <?=json_encode($ec_lang['lpn_replace_title'])?>,
 	lpn_replace_prop: <?=json_encode($ec_lang['lpn_replace_prop'])?>,
 	lpn_replace_value: <?=json_encode($ec_lang['lpn_replace_value'])?>,
+	lpn_replace_source: <?=json_encode($ec_lang['lpn_replace_source'])?>,
+	lpn_replace_asked: <?=json_encode($ec_lang['lpn_replace_asked'])?>,
 	lpn_replace_button: <?=json_encode($ec_lang['lpn_replace_button'])?>,
 	lpn_replace_preview: <?=json_encode($ec_lang['lpn_replace_preview'])?>,
 	lpn_replace_apply: <?=json_encode($ec_lang['lpn_replace_apply'])?>,
@@ -1323,6 +1325,15 @@ EngCalcs.pageConfig = {
 	lpn_labels_col_decimals: <?=json_encode($ec_lang['lpn_labels_col_decimals'])?>,
 	lpn_labels_col_decimals_example: <?=json_encode($ec_lang['lpn_labels_col_decimals_example'])?>,
 	lpn_labels_col_rank: <?=json_encode($ec_lang['lpn_labels_col_rank'])?>,
+<?php // **A KEY THAT WAS TRANSLATED INTO ALL 26 AND NEVER REACHED THE PAGE.** The Labels panel read
+      // `pc.lpn_labels_col_drop` and this line was not here, so the heading fell through to its
+      // English fallback in every language while `lang.ec.es.php` had carried "Descarte" all along.
+      // Found 2026-08-28 by diffing every `pc.<key>` read in js/looped-network.js against the keys
+      // this block supplies -- which is a check nothing performs: pageconfig_check.php matches
+      // literal `EngCalcs.pageConfig.<key>` reads, and this whole file's JS reads through the
+      // one-letter alias `pc`, so every one of the 838 keys here is invisible to it. That gap is
+      // ROADMAP Task 322's survey material, and it is the reason this was found by hand. ?>
+	lpn_labels_col_drop: <?=json_encode($ec_lang['lpn_labels_col_drop'])?>,
 	lpn_labels_priority_link_tip: <?=json_encode($ec_lang['lpn_labels_priority_link_tip'])?>,
 	lpn_labels_priority_node_tip: <?=json_encode($ec_lang['lpn_labels_priority_node_tip'])?>,
 	lpn_field_id: <?=json_encode($ec_lang['lpn_field_id'])?>,
@@ -1700,9 +1711,28 @@ EngCalcs.pageConfig = {
 	lpn_push_base_only: <?=json_encode($ec_lang['lpn_push_base_only'])?>,
 	lpn_field_active: <?=json_encode($ec_lang['lpn_field_active'])?>,
 	lpn_field_active_tip: <?=json_encode($ec_lang['lpn_field_active_tip'])?>,
-<?php // lpn_settings_emitter_exponent is deliberately NOT wired here: its Settings row was removed
-      // 2026-07-30 because nothing can create an emitter yet (ROADMAP Task 191). The language key
-      // stays in lib/lang.ec.en.php so restoring the control is one line here and one there. ?>
+<?php // **THE HYDRAULICS OPTIONS** (ROADMAP Task 553). lpn_settings_emitter_exponent WAS
+      // deliberately unwired here from 2026-07-30, on the argument that nothing can create an
+      // emitter -- true of a network somebody DRAWS and false of one read from an EPANET file,
+      // which js/lpn-inp.js has imported [EMITTERS] from all along. Its row and these four came
+      // back with Task 553; each one changes an answer in both engines. ?>
+	lpn_settings_emitter_exponent: <?=json_encode($ec_lang['lpn_settings_emitter_exponent'])?>,
+	lpn_settings_emitter_exponent_tip: <?=json_encode($ec_lang['lpn_settings_emitter_exponent_tip'])?>,
+	lpn_settings_specific_gravity: <?=json_encode($ec_lang['lpn_settings_specific_gravity'])?>,
+	lpn_settings_specific_gravity_tip: <?=json_encode($ec_lang['lpn_settings_specific_gravity_tip'])?>,
+	lpn_settings_viscosity: <?=json_encode($ec_lang['lpn_settings_viscosity'])?>,
+	lpn_settings_viscosity_tip: <?=json_encode($ec_lang['lpn_settings_viscosity_tip'])?>,
+	lpn_settings_trials: <?=json_encode($ec_lang['lpn_settings_trials'])?>,
+	lpn_settings_trials_tip: <?=json_encode($ec_lang['lpn_settings_trials_tip'])?>,
+	lpn_settings_demand_multiplier: <?=json_encode($ec_lang['lpn_settings_demand_multiplier'])?>,
+	lpn_settings_demand_multiplier_tip: <?=json_encode($ec_lang['lpn_settings_demand_multiplier_tip'])?>,
+<?php // **ELEVATION ON CREATION** (Task 542). The row is built only on a geographic project with a
+      // Mapbox token, but the STRINGS are supplied unconditionally: pageConfig is assembled once at
+      // render time and the project can change without a reload. ?>
+	lpn_settings_elev_source: <?=json_encode($ec_lang['lpn_settings_elev_source'])?>,
+	lpn_settings_elev_source_tip: <?=json_encode($ec_lang['lpn_settings_elev_source_tip'])?>,
+	lpn_settings_elev_source_typed: <?=json_encode($ec_lang['lpn_settings_elev_source_typed'])?>,
+	lpn_settings_elev_source_dem: <?=json_encode($ec_lang['lpn_settings_elev_source_dem'])?>,
 
 	lpn_settings_page_note: <?=json_encode($ec_lang['lpn_settings_page_note'])?>,
 	lpn_settings_show_titles: <?=json_encode($ec_lang['lpn_settings_show_titles'])?>,
