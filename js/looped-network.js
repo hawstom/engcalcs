@@ -2840,6 +2840,11 @@ var EngCalcs = EngCalcs || {};
 			// Matches js/lpn-solver.js's own default -- see assembleModel(). No UI edits this:
 			// nothing can create an emitter yet, so the control was a no-op (Task 191).
 			emitterExponent: 0.5,
+			// **EPANET'S OTHER [OPTIONS], SPARSE** (Task 553). A key is present only where a file
+			// stated it or a person typed it, so absent means EPANET's own default and the exporter
+			// writes nothing -- the same rule `defaultPattern` has always followed. `settings` is
+			// serialized WITH the project, so this round-trips without a line anywhere else.
+			hydraulics: {},
 			tolerance: 1e-9, // matches js/lpn-solver.js's own default relative-flow-change tol -- see runSolve()
 			// 'native' (js/lpn-solver.js) or 'epanet' (the real EPANET engine as WASM,
 			// js/lpn-epanet.js). The two agree to 1e-5..1e-3 m of head
@@ -14236,7 +14241,16 @@ var EngCalcs = EngCalcs || {};
 			// deletes the problem rather than estimating around it -- 11 px is 11 px whether the file
 			// is in feet, metres or State Plane coordinates. A plausible estimate is the most
 			// expensive kind of workaround: it works well enough that nobody looks for the cause.
-			settings: JSON.parse(JSON.stringify(settings)),
+			// **AND THE FILE'S OWN HYDRAULIC OPTIONS RIDE IN ON THIS CLONE** (Task 553). The clone
+			// is of the CURRENT project's settings -- map appearance, id prefixes, the things a
+			// person sets once -- so the imported file's own [OPTIONS] have to be written onto it
+			// here. Sparse, so a file stating none leaves the new project stating none.
+			settings: (function () {
+				var s = JSON.parse(JSON.stringify(settings));
+				s.hydraulics = parsed.hydraulics || {};
+				if (s.hydraulics.emitterExponent !== undefined) { s.emitterExponent = s.hydraulics.emitterExponent; }
+				return s;
+			}()),
 			// THE CLOCK, CARRIED WHOLE (Task 423). js/lpn-patterns.js has already turned every time
 			// into seconds and every control into a record; nothing is reinterpreted here. Empty
 			// array and null are the states a file that states none produces, so no reader has to
@@ -20670,12 +20684,13 @@ var EngCalcs = EngCalcs || {};
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		pageBody.appendChild(tail);
-		// There is no "Emitter exponent" row. js/lpn-solver.js implements emitters properly
-		// (qe = K*dH^n, with the matching Jacobian term and a guarded derivative at dH -> 0), but
-		// nothing in this app sets a junction's `emitter`, so the exponent adjusts nothing -- and it
-		// is the most technical-looking control here, the one a user assumes matters.
-		// settings.emitterExponent itself STAYS (assembleModel() passes it). Restore the row when
-		// Task 191 lands; lpn_settings_emitter_exponent is left in lib/lang.ec.en.php for that.
+		// **THE EMITTER EXPONENT ROW IS BACK, TASK 553, AND THE OLD ARGUMENT AGAINST IT WAS WRONG BY
+		// THEN.** It was cut because "nothing in this app sets a junction's `emitter`, so the
+		// exponent adjusts nothing" -- true of a network somebody DRAWS, and false of one read from
+		// an EPANET file, which js/lpn-inp.js has imported `[EMITTERS]` from since long before this.
+		// So the control does change an answer, on exactly the networks a person is most likely to
+		// be looking at, and its tip says which ones. Task 191 is still what makes an emitter
+		// editable on the page; it was never what made this number act.
 		var tolInput = document.createElement('input');
 		tolInput.type = 'number'; tolInput.step = 'any'; tolInput.value = settings.tolerance;
 		tolInput.addEventListener('change', function () {
@@ -20683,6 +20698,62 @@ var EngCalcs = EngCalcs || {};
 			else { tolInput.value = settings.tolerance; }
 		});
 		row(compBody, pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput, pc.lpn_settings_tolerance_tip);
+		// ---- EPANET's [OPTIONS], the ones that ACT (ROADMAP Task 553) ----
+		//
+		// Tom, 2026-08-28, naming what a person must be able to see: *"the default pattern must be
+		// specified in Settings along with other Hydraulics options including Headloss Formula,
+		// Specific Gravity, Relative Viscosity, Maximum Trials, Accuracy, If Unbalanced (Continue
+		// or Stop), Demand Multiplier, Emitter Exponent, Status Report (Yes or No), Max. Head
+		// Error, etc."*
+		//
+		// **FOUR OF THE LIST GET A ROW AND THE REST DELIBERATELY DO NOT**, on CLAUDE.md's own
+		// emitter-exponent precedent -- do not ship the most technical-looking control in a box if
+		// it is the one that adjusts nothing. Each of the four below changes an ANSWER in BOTH
+		// engines. Headloss Formula already has its row above, under this suite's own name for it,
+		// Friction method.
+		//
+		// **THE OTHERS ARE CARRIED, EXPORTED AND HONOURED BY EPANET, JUST NOT SHOWN:** Accuracy, If
+		// Unbalanced, Max Head Error, FlowChange, DampLimit, CheckFreq, MaxCheck and Status Report
+		// come in from a file, ride in `settings.hydraulics`, go back out through the exporter
+		// character for character, and reach the EPANET engine when it is the one solving. What
+		// they do NOT have is a control, because:
+		//   Accuracy has no honest place beside Convergence tolerance directly above it -- they are
+		//     two different quantities on two different scales (EPANET's is a relative flow change
+		//     summed over the network; ours is js/lpn-solver.js's own), and two rows a reader
+		//     cannot tell apart is worse than one. **That is a question for Tom, not for us.**
+		//   If Unbalanced, Max Head Error and the four tuning knobs act in EPANET alone, so a
+		//     control for them would do nothing on the page's own default engine.
+		//   Status Report decides what EPANET's `.rpt` holds, and this page has no `.rpt` at all.
+		function hydNumberRow(key, labelKey, fallback, tipKey, dflt) {
+			var input = document.createElement('input');
+			input.type = 'number'; input.step = 'any';
+			// **BLANK MEANS "THE FILE DID NOT SAY", NOT ZERO**, which is the whole sparseness rule
+			// seen from the interface: an empty box exports no line, and typing the default in
+			// exports a line stating the default. Both are legitimate and they are different files.
+			input.value = settings.hydraulics[key] === undefined ? '' : String(settings.hydraulics[key]);
+			input.placeholder = String(dflt);
+			input.addEventListener('change', function () {
+				var t = input.value.trim();
+				if (t === '') { delete settings.hydraulics[key]; }
+				else if (isFinite(+t) && +t > 0) { settings.hydraulics[key] = +t; }
+				else { input.value = settings.hydraulics[key] === undefined ? '' : String(settings.hydraulics[key]); return; }
+				if (key === 'emitterExponent') { settings.emitterExponent = settings.hydraulics[key] === undefined ? 0.5 : settings.hydraulics[key]; }
+				saveToStorage();
+				scheduleSolve();
+			});
+			row(compBody, pc[labelKey] || fallback, input, pc[tipKey]);
+		}
+		if (!settings.hydraulics) { settings.hydraulics = {}; }
+		hydNumberRow('demandMultiplier', 'lpn_settings_demand_multiplier', 'Demand multiplier',
+			'lpn_settings_demand_multiplier_tip', 1);
+		hydNumberRow('specificGravity', 'lpn_settings_specific_gravity', 'Specific gravity',
+			'lpn_settings_specific_gravity_tip', 1);
+		hydNumberRow('viscosity', 'lpn_settings_viscosity', 'Relative viscosity',
+			'lpn_settings_viscosity_tip', 1);
+		hydNumberRow('emitterExponent', 'lpn_settings_emitter_exponent', 'Emitter exponent',
+			'lpn_settings_emitter_exponent_tip', 0.5);
+		hydNumberRow('trials', 'lpn_settings_trials', 'Maximum trials',
+			'lpn_settings_trials_tip', 40);
 		// ---- engine choice (ROADMAP Task 243) ----
 		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
 		// and a select would imply the two are peers when the native path is the one this page
@@ -23919,18 +23990,34 @@ var EngCalcs = EngCalcs || {};
 	// blank column does -- and the sum is the draw. Everything else on this page reads the answer:
 	// the labels, the colour ramp, the Tables column and the popup row all call this or the field
 	// it feeds, so none of them knows a category exists.
+	// **EPANET'S `[OPTIONS] Demand Multiplier`, A SINGLE SCALE ON EVERY DEMAND IN THE NETWORK**
+	// (Task 553). Not a pattern and not per junction: it is how a utility asks "what does this
+	// system do at 1.5x today's use", and EPANET applies it to every base demand it reads.
+	//
+	// **IT USED TO BE FOLDED IN AT IMPORT AND THAT WAS THE DEFECT.** js/lpn-inp.js multiplied every
+	// demand as it read it, so a file stating 189.95 with a multiplier of 2.5 was STORED as 474.875
+	// -- a number nobody typed, in the field labelled as theirs, and the one thing CLAUDE.md's
+	// file rule forbids outright. It is applied here instead, at the same boundary every pattern is,
+	// so the document keeps the file's own characters and the answer is the same.
+	//
+	// Named apart from demandMultiplier() above, which is a PATTERN's multiplier at one instant for
+	// one junction. Two different quantities and the collision would be silent.
+	function docDemandMultiplier() {
+		var m = (settings.hydraulics || {}).demandMultiplier;
+		return (typeof m === 'number' && isFinite(m)) ? m : 1;
+	}
 	function resolvedDemand(n) {
-		var rows = demandRowsOf(n, effective(n, 'demand')), t, total, i, b;
+		var rows = demandRowsOf(n, effective(n, 'demand')), t, total, i, b, dm = docDemandMultiplier();
 		if (typeof rows[0].base !== 'number' || !isFinite(rows[0].base)) { return rows[0].base; }
 		t = modelTimeSeconds();
-		if (rows.length === 1) { return rows[0].base * demandMultiplier(n, t); }
+		if (rows.length === 1) { return rows[0].base * demandMultiplier(n, t) * dm; }
 		total = 0;
 		for (i = 0; i < rows.length; i++) {
 			b = rows[i].base;
 			if (typeof b !== 'number' || !isFinite(b)) { continue; }
 			total += b * patternMultiplier(rows[i].pattern || doc.defaultPattern, t);
 		}
-		return total;
+		return total * dm;
 	}
 	// The demand rows an extended-period run needs, in SI, or null for the ordinary junction that
 	// has one. NULL AND NOT A ONE-ROW ARRAY: the writer downstream must be able to tell "this
@@ -24135,7 +24222,21 @@ var EngCalcs = EngCalcs || {};
 			}
 			return out;
 		});
-		var model = { nodes: nodes, links: links, method: frictionMethod(), visc: 1.007e-6, emitterExponent: settings.emitterExponent };
+		// **THE HYDRAULIC OPTIONS RIDE ON THE MODEL, NOT ON THE SOLVER CALL** (Task 553). They are
+		// facts about the fluid and about how hard to try, and both engines need the same ones, so
+		// they belong beside `method` rather than in one engine's argument list.
+		//
+		// **`visc` IS AN ABSOLUTE VISCOSITY AND THE OPTION IS A RELATIVE ONE.** EPANET's
+		// `Viscosity 1.3` means 1.3 times water at 20 degC, which is the 1.007e-6 m2/s that has been
+		// hard-coded here since the solver was written. Multiplying is the whole conversion, and an
+		// absent option leaves the number exactly as it was.
+		var hyd = settings.hydraulics || {};
+		var model = { nodes: nodes, links: links, method: frictionMethod(),
+			visc: 1.007e-6 * (hyd.viscosity || 1),
+			emitterExponent: settings.emitterExponent,
+			// Carried whole so js/lpn-epanet.js can write the ones only EPANET acts on -- accuracy,
+			// unbalanced, the head-error limit -- without a second copy of the list.
+			hydraulics: hyd };
 		// The clock, the patterns and the controls, converted to SI (js/lpn-time.js). Absent that
 		// file the model is exactly the pre-Task-248 one and the page solves one instant.
 		if (EngCalcs.lpnTimeAttach) { EngCalcs.lpnTimeAttach(model); }

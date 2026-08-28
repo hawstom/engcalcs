@@ -387,7 +387,11 @@ EngCalcs.lpnSolve = function (model, options) {
 		// iterations, because a regular grid puts many links near zero flow where
 		// the gradient floor applies and Newton degrades to linear convergence.
 		// A cap of 60 would have failed that network by one iteration.
-		maxIter = opts.maxIter || 100,
+		// **AND A PROJECT MAY STATE ITS OWN** (Task 553): EPANET's `[OPTIONS] Trials` is exactly this
+		// number, so a file that names one is honoured here rather than only in the other engine.
+		// Absent, the 100 above stands, which is what every project without an `.inp` behind it has
+		// always used.
+		maxIter = opts.maxIter || (model.hydraulics && model.hydraulics.trials) || 100,
 		qMin = EngCalcs.lpnQMin,
 		gradMin = EngCalcs.lpnGradMin,
 		emitterExp = model.emitterExponent || 0.5,
@@ -691,6 +695,14 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		kEff,
 		g = EngCalcs.lpnG;
 
+	// **SPECIFIC GRAVITY TURNS A HEAD INTO A PRESSURE, AND NOTHING ELSE** (Task 553). Every head in
+	// this solver is a head OF THE FLUID -- the energy equation does not care what the fluid weighs,
+	// so a denser one raises no head and changes no flow. It changes what a gauge reads: pressure in
+	// metres of WATER is (H - z) x SG, which is exactly EPANET's own conversion. Applied here, at
+	// the one place a pressure is produced, so the two engines report the same number for the same
+	// file. Absent, it is 1 and every existing answer is bit-identical.
+	var sg = (model.hydraulics && typeof model.hydraulics.specificGravity === 'number'
+		&& isFinite(model.hydraulics.specificGravity)) ? model.hydraulics.specificGravity : 1;
 	for (i = 0; i < model.nodes.length; i++) {
 		if (EngCalcs.lpnIsFixedHead(model.nodes[i])) {
 			// A reservoir now carries an elevation as well as a head, so its pressure is the same
@@ -700,12 +712,12 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			// vessel and its head is the water surface, so the pressure reported here is the depth
 			// of water standing in it -- which is exactly what a reader wants to see at a tank.
 			heads[model.nodes[i].id] = model.nodes[i].head;
-			pressures[model.nodes[i].id] = model.nodes[i].head - (model.nodes[i].elev || 0);
+			pressures[model.nodes[i].id] = (model.nodes[i].head - (model.nodes[i].elev || 0)) * sg;
 		}
 	}
 	for (i = 0; i < junctions.length; i++) {
 		heads[junctions[i].id] = H[i];
-		pressures[junctions[i].id] = H[i] - (junctions[i].elev || 0);
+		pressures[junctions[i].id] = (H[i] - (junctions[i].elev || 0)) * sg;
 	}
 
 	for (k = 0; k < model.links.length; k++) {

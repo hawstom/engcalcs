@@ -12,9 +12,9 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**80 of 1407 English keys**, as of the last generation.
+**89 of 1416 English keys**, as of the last generation.
 
-## lpn_  (80)
+## lpn_  (89)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -160,12 +160,30 @@ settled these go into the next translation sprint as a batch.
   > Ringed: this element holds a value that belongs to the scenario {name} alone.
 - **`lpn_scenario_overrides_tip`**
   > Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.
+- **`lpn_settings_demand_multiplier`**
+  > Demand multiplier
+- **`lpn_settings_demand_multiplier_tip`**
+  > One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.
+- **`lpn_settings_emitter_exponent_tip`**
+  > The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which today means a network read from an EPANET file.
 - **`lpn_settings_leader_snap`**
   > Snap leader lines to angle
 - **`lpn_settings_leader_snap_tip`**
   > When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.
 - **`lpn_settings_legend_off`**
   > Off
+- **`lpn_settings_specific_gravity`**
+  > Specific gravity
+- **`lpn_settings_specific_gravity_tip`**
+  > The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.
+- **`lpn_settings_trials`**
+  > Maximum trials
+- **`lpn_settings_trials_tip`**
+  > How many times the solver may try before it gives up on a network that will not settle.
+- **`lpn_settings_viscosity`**
+  > Relative viscosity
+- **`lpn_settings_viscosity_tip`**
+  > The thickness of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.
 - **`lpn_terrain_blank_ids`**
   > These nodes are still blank: {ids}
 - **`lpn_terrain_filled_ids`**

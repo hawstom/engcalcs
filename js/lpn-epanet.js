@@ -94,6 +94,9 @@
 			method = model.method || 'hw',
 			headloss = HEADLOSS[method] || 'H-W',
 			emitterExp = model.emitterExponent || 0.5,
+			// The project's own [OPTIONS], sparse: a key is here only where a file stated it or a
+			// person typed it, so `undefined` means "leave EPANET's default alone" (Task 553).
+			hyd = model.hydraulics || {},
 			junctions = [],
 			reservoirs = [],
 			tanks = [],
@@ -410,9 +413,38 @@
 			(timeRows.length ? '[TIMES]\n' + timeRows.join('\n') + '\n\n' : '') +
 			'[OPTIONS]\n Units LPS\n Headloss ' + headloss +
 			'\n Emitter Exponent ' + emitterExp +
-			// Match our own convergence, which is far tighter than EPANET's 0.001 default,
-			// so a disagreement between the two engines is never just tolerance.
-			'\n Accuracy 1e-8\n Trials 200\n Unbalanced Continue 10\n\n' +
+			// **THE FLUID, WHERE THE PROJECT NAMES IT** (Task 553). Written only when stated, so a
+			// project that says nothing gets EPANET's own defaults exactly as it always did.
+			// Viscosity here is EPANET's RELATIVE one, which is the form the option is stored in;
+			// the native solver multiplies it into an absolute at assembleModel() instead.
+			(hyd.viscosity !== undefined ? '\n Viscosity ' + hyd.viscosity : '') +
+			(hyd.specificGravity !== undefined ? '\n Specific Gravity ' + hyd.specificGravity : '') +
+			// **THE DEMAND MULTIPLIER IS WRITTEN ONLY ON THE EXTENDED-PERIOD PATH, AND THAT IS NOT AN
+			// OMISSION.** On a one-instant run this bridge hands EPANET `n.demand`, which came out
+			// of resolvedDemand() with the multiplier ALREADY IN IT; stating the option as well
+			// would apply it twice. On an extended-period run it hands `demandBase` and the pattern
+			// name and lets the engine do the multiplying, so there the option is the only thing
+			// that can carry it. The same one-or-the-other rule assembleModel() states for the two
+			// demand fields, seen from this end.
+			(eps && hyd.demandMultiplier !== undefined ? '\n Demand Multiplier ' + hyd.demandMultiplier : '') +
+			// **HOW HARD TO TRY, AND THE DEFAULTS HERE ARE OURS, NOT EPANET'S.** 1e-8 / 200 is far
+			// tighter than EPANET's own 0.001 / 40, deliberately, so that a disagreement between the
+			// two engines is never just tolerance. A project that STATES a value overrules that --
+			// the user asked for their file's number, and comparing engines is our concern, not
+			// theirs. `Unbalanced Continue 10` stays the fallback: refusing to report a network that
+			// did not converge would give this page nothing to draw.
+			'\n Accuracy ' + (hyd.accuracy !== undefined ? hyd.accuracy : '1e-8') +
+			'\n Trials ' + (hyd.trials !== undefined ? hyd.trials : '200') +
+			'\n Unbalanced ' + (hyd.unbalanced === 'stop' ? 'Stop'
+				: hyd.unbalanced === 'continue'
+					? 'Continue ' + (hyd.unbalancedTrials !== undefined ? hyd.unbalancedTrials : 10)
+					: 'Continue 10') +
+			(hyd.headError !== undefined ? '\n HeadError ' + hyd.headError : '') +
+			(hyd.flowChange !== undefined ? '\n FlowChange ' + hyd.flowChange : '') +
+			(hyd.dampLimit !== undefined ? '\n DampLimit ' + hyd.dampLimit : '') +
+			(hyd.checkFreq !== undefined ? '\n CheckFreq ' + hyd.checkFreq : '') +
+			(hyd.maxCheck !== undefined ? '\n MaxCheck ' + hyd.maxCheck : '') +
+			'\n\n' +
 			'[END]\n';
 
 		// **THE TIME BLOCK'S OWN DROPS COME OUT HERE** (Task 466). EngCalcs.lpnTimeModelBlock throws

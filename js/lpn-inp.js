@@ -282,16 +282,52 @@
 		}
 
 		// ---- [OPTIONS], first, because the flow unit fixes every other unit in the file ----
+		//
+		// **`hydraulics` IS SPARSE ON PURPOSE** (Task 553). A key is present only where the FILE
+		// stated it, so absent means "EPANET's own default" and never "we set it to the default".
+		// The exporter writes back exactly the keys that are present, which is the same rule the
+		// `Pattern` line has always followed: writing a line that says the default is a statement
+		// the source file never made, and it would fail the byte-identity test the round trip is
+		// held to.
 		var flowKey = 'GPM', headloss = 'H-W', emitterExponent = 0.5, demandMultiplier = 1,
-			defaultPattern = null, rows, r;
+			defaultPattern = null, hydraulics = {}, rows, r;
 		rows = rawSections.OPTIONS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			var key = (r[0] || '').toUpperCase();
 			if (key === 'UNITS' && r[1]) { flowKey = r[1].toUpperCase(); }
 			else if (key === 'HEADLOSS' && r[1]) { headloss = r[1].toUpperCase(); }
-			else if (key === 'EMITTER' && r[2]) { emitterExponent = num(r[2], 0.5); }
-			else if (key === 'DEMAND' && r[2]) { demandMultiplier = num(r[2], 1); }
+			else if (key === 'EMITTER' && r[2]) { emitterExponent = num(r[2], 0.5); hydraulics.emitterExponent = emitterExponent; }
+			else if (key === 'DEMAND' && r[2]) { demandMultiplier = num(r[2], 1); hydraulics.demandMultiplier = demandMultiplier; }
+			// **THE REST OF EPANET'S HYDRAULIC OPTIONS** (Task 553, Tom's own list). Every one was
+			// read past in silence until now -- not even reported as a difference -- so a file
+			// stating `Viscosity 1.3` came back out of the exporter stating nothing, which is the
+			// input-file-is-canonical rule broken in the quietest possible way.
+			//
+			// The token positions are the file's own two-word keywords: `Specific Gravity 1.0` puts
+			// the number at r[2] exactly as `Demand Multiplier` and `Emitter Exponent` do, while
+			// one-word keywords put it at r[1].
+			else if (key === 'VISCOSITY' && r[1]) { hydraulics.viscosity = num(r[1], 1); }
+			else if (key === 'SPECIFIC' && r[2]) { hydraulics.specificGravity = num(r[2], 1); }
+			else if (key === 'TRIALS' && r[1]) { hydraulics.trials = num(r[1], 40); }
+			else if (key === 'ACCURACY' && r[1]) { hydraulics.accuracy = num(r[1], 0.001); }
+			else if (key === 'HEADERROR' && r[1]) { hydraulics.headError = num(r[1], 0); }
+			else if (key === 'FLOWCHANGE' && r[1]) { hydraulics.flowChange = num(r[1], 0); }
+			else if (key === 'DAMPLIMIT' && r[1]) { hydraulics.dampLimit = num(r[1], 0); }
+			else if (key === 'CHECKFREQ' && r[1]) { hydraulics.checkFreq = num(r[1], 2); }
+			else if (key === 'MAXCHECK' && r[1]) { hydraulics.maxCheck = num(r[1], 10); }
+			// **`Unbalanced Continue 10` IS ONE OPTION IN TWO TOKENS**, and the count is optional:
+			// `Unbalanced Stop`, `Unbalanced Continue` and `Unbalanced Continue 10` are all legal.
+			// Stored as the two fields the exporter needs to write the line back as it came.
+			else if (key === 'UNBALANCED' && r[1]) {
+				hydraulics.unbalanced = r[1].toUpperCase() === 'CONTINUE' ? 'continue' : 'stop';
+				if (r[2] !== undefined && r[2] !== '') { hydraulics.unbalancedTrials = num(r[2], 0); }
+			}
+			// A REPORTING option, not a hydraulic one: it decides what EPANET's own `.rpt` holds,
+			// and this page has no `.rpt`. Carried verbatim so an export does not delete it, and
+			// deliberately given NO control -- CLAUDE.md's emitter-exponent precedent, that the
+			// most technical-looking control in a box must not be one that adjusts nothing.
+			else if (key === 'STATUS' && r[1]) { hydraulics.statusReport = r[1].toUpperCase(); }
 			// **[OPTIONS] Pattern IS THE DEFAULT DEMAND PATTERN, AND IT IS THE EASIEST THING IN
 			// THIS FILE TO MISS.** A junction whose [JUNCTIONS] pattern column is BLANK does not
 			// have "no pattern" -- it has this one. Net3 says `Pattern 1`, and pattern 1 starts at
@@ -407,7 +443,13 @@
 				elev: num(r[1]),
 				// The multiplier is dimensionless, so applying it here keeps the number in the
 				// file's own flow unit.
-				demand: num(r[2]) * demandMultiplier,
+				// **NOT MULTIPLIED BY `Demand Multiplier`** (Task 553). It used to be, and that made
+				// the stored number one nobody typed: a file stating 189.95 with a multiplier of
+				// 2.5 came in as 474.875, and came back out of the exporter as 474.875 -- the
+				// user's own characters spent, which is the one thing CLAUDE.md's file rule forbids
+				// outright. The multiplier is now carried in `hydraulics` and applied where every
+				// other scaling is, at resolvedDemand().
+				demand: num(r[2]),
 				emitter: 0
 			});
 			mergeTok(jn, 'elev', r[1], jn.elev);
@@ -528,7 +570,8 @@
 			// A row is its own record with its own token bag, so mergeTok()'s three conditions
 			// apply to a category's base exactly as they apply to a junction's elevation.
 			var drow = {
-				base: num(r[1]) * demandMultiplier,
+				// Unmultiplied, for the reason given at the [JUNCTIONS] column above.
+				base: num(r[1]),
 				// null means the column was blank, which is NOT "no pattern" -- [OPTIONS] Pattern
 				// applies, exactly as it does for the [JUNCTIONS] column. Same resolution, made by
 				// the same caller.
@@ -973,6 +1016,9 @@
 			scale: { len: lenSI, dia: diaSI, head: headSI, press: pressSI, flow: qSI },
 			headloss: headloss,
 			emitterExponent: emitterExponent,
+			// Every [OPTIONS] key this file stated that is not the flow unit, the head-loss formula
+			// or the default pattern -- sparse, so absent is "the file did not say" (Task 553).
+			hydraulics: hydraulics,
 			// The clock (ROADMAP Task 248). `times` is null only when js/lpn-patterns.js was not
 			// loaded, which is reported above; `patterns` and `controls` are empty arrays for a
 			// file that states none, so a caller never has to test for absence.
@@ -1082,6 +1128,34 @@
 		if (method === 'manning') { return '0.008'; }
 		return '150';
 	}
+
+	// ONE [OPTIONS] LINE PER KEY THE DOCUMENT ACTUALLY HOLDS, in EPANET's own spelling and in the
+	// order its own writer uses. Sparse in, sparse out: this is the export half of the rule stated
+	// at the importer, that a key absent from `hydraulics` means the source file never said it.
+	//
+	// **`Unbalanced` IS THE ONE THAT IS NOT A NUMBER**, and its trailing trial count is optional --
+	// `Stop`, `Continue` and `Continue 10` are all legal and all round-trip as they came.
+	var LPN_OPT_LINES = [
+		['accuracy', 'Accuracy'], ['trials', 'Trials'], ['headError', 'HeadError'],
+		['flowChange', 'FlowChange'], ['dampLimit', 'DampLimit'],
+		['checkFreq', 'CheckFreq'], ['maxCheck', 'MaxCheck'],
+		['viscosity', 'Viscosity'], ['specificGravity', 'Specific Gravity'],
+		['demandMultiplier', 'Demand Multiplier'], ['statusReport', 'Status']
+	];
+	function hydraulicOptionRows(hyd, row) {
+		var h = hyd || {}, out = '';
+		LPN_OPT_LINES.forEach(function (pair) {
+			if (h[pair[0]] === undefined || h[pair[0]] === null) { return; }
+			out += row([pair[1], String(h[pair[0]])]) + '\n';
+		});
+		if (h.unbalanced) {
+			out += row(['Unbalanced', h.unbalanced === 'continue' ? 'Continue' : 'Stop']
+				.concat(h.unbalanced === 'continue' && h.unbalancedTrials !== undefined
+					? [String(h.unbalancedTrials)] : [])) + '\n';
+		}
+		return out;
+	}
+
 
 	/**
 	 * Write an EPANET `.inp` for a saved lpn_ document.
@@ -1545,7 +1619,12 @@
 			// entirely when the document has none: EPANET's own default is "no pattern", and writing
 			// a line that says so is a statement the source file never made.
 			(doc.defaultPattern ? row(['Pattern', String(doc.defaultPattern)]) + '\n' : '') +
-			row(['Emitter Exponent', String(settings.emitterExponent || 0.5)]) + '\n\n' +
+			row(['Emitter Exponent', String(settings.emitterExponent || 0.5)]) + '\n' +
+			// **EVERY OTHER HYDRAULIC OPTION THE DOCUMENT HOLDS, AND ONLY THOSE** (Task 553). The
+			// list is sparse -- see the importer's own note -- so a key absent here means the file
+			// did not state it and neither do we. That is what keeps a round trip byte-identical:
+			// EPANET's defaults written out explicitly would be eleven lines the source never had.
+			hydraulicOptionRows(settings.hydraulics, row) + '\n' +
 			section('COORDINATES', coords) +
 			section('VERTICES', verts) +
 			section('LABELS', labelRows) +

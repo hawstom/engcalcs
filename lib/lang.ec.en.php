@@ -2395,9 +2395,18 @@ $ec_lang['lpn_field_active_tip']='Clear this box to leave the asset on the drawi
 // A scenario is a set of water values; two scenarios of one network must look the same, or you
 // cannot compare them.
 $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
+$ec_lang['lpn_settings_emitter_exponent_tip']='The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which today means a network read from an EPANET file.';
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Computation';
+$ec_lang['lpn_settings_specific_gravity']='Specific gravity';
+$ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
+$ec_lang['lpn_settings_viscosity']='Relative viscosity';
+$ec_lang['lpn_settings_viscosity_tip']='The thickness of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.';
+$ec_lang['lpn_settings_trials']='Maximum trials';
+$ec_lang['lpn_settings_trials_tip']='How many times the solver may try before it gives up on a network that will not settle.';
+$ec_lang['lpn_settings_demand_multiplier']='Demand multiplier';
+$ec_lang['lpn_settings_demand_multiplier_tip']='One scale on every demand in the network at once. Use it to ask what the system does at more or less than today\'s use. It does not change the numbers you typed.';
 $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
 $ec_lang['lpn_settings_tolerance_tip']='How close the solver has to get before it stops. A smaller number is more exact and takes longer.';
 $ec_lang['lpn_settings_engine_epanet']='Solve with the EPANET solver';

@@ -127,6 +127,7 @@ never edits the roadmap; promoting a row is Tom's call.
 | `dev/language-strings.md` | Full rules for writing `$ec_lang` / `$ec_lang_syn` values |
 | `dev/translation-process.md` | Sprint SOP and full mechanics |
 | `dev/testing-notes.md` | What actually catches defects here |
+| `dev/enforceable-rules-survey.md` | Which of this file's rules a script COULD hold, ranked, with the count: 34 enforced, 27 reachable, 41 permanently prose (Task 322) |
 | `dev/cross-platform-planning.md` | Claude Code / Copilot collaboration conventions |
 | `dev/unit-families.md` | Unit-family design record and per-field rationale |
 | `dev/cookie-storage-inventory.md` | Everything stored on a visitor's device, and why |
@@ -487,7 +488,9 @@ own failure; this table is an index, not a duplicate of that text.
 | `canonical_origin_check.php` | `CANONICAL_ORIGIN` is a host→origin WHITELIST, never derived from `HTTP_HOST`. Multi-domain serving needs the lookup; a derivation lets a spoofed Host point canonical URLs off-site, and the first symptom would be a search engine indexing somebody else's domain for us |
 | `scenario_seam_check.php` | Overridable properties go through `setProp()`, never a direct write that edits BASE from inside a scenario |
 | `unit_factor_check.php` | Every `$ec_units` factor re-derived from the exact definitions (`ft = 0.3048 m`, `gal = 3.785411784 L`, `lbf = 4.4482216152605 N`), **and factors for one quantity agreeing with each other** — the suite once shipped four different feet, and `ft3`/`ft3ps` were the same conversion 47 ppm apart. Reads `EngCalcs.G` out of the source rather than retyping it. **Also that a unit's identity is its NAME** — no `data-unit`, no `objForm['xu'].value`, no `<option>` valued with a factor (Task 390) |
+| `unit_family_check.php` + selftest | The four unit-family absolutes, each of which fails with a page that RENDERS AND LOOKS RIGHT: a family missing from a preset, a preset picking a unit its family does not offer, an offered unit with no factor, a page naming a family that does not exist. `echoUnitSelect()` catches the first at render time — that is, possibly by a visitor; this reads the declarations before it ships |
 | `lang_syntax_validate.php` | Rules A–D |
+| `lang_key_resolve_check.php` + selftest | Every literal `$ec_lang['k']` a shipped page READS is a defined key — an undefined one renders as the empty string in all 27 languages with no warning. A token scan, so a concatenated or variable key is invisible to it and a false positive is impossible. Its advisory sibling `key_hygiene_check.php` asks the opposite question, whether a key is debt, which is judgement |
 | `lang_tag_parity_check.php --strict` | Markup matches English |
 | `gloss_ref_check.php` | Every `gloss:` resolves and is wired to its prefix |
 | `layout_tag_check.php` | A layout tag matches the widget it claims to describe |

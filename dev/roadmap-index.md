@@ -22,7 +22,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 540 — [H] · BUILT, including the parser. What stays open is WORDING.
 - Task 542 — Terrain elevations become two ordinary controls, and the menu row goes away.
 - ! Task 545 — [H] · 64 English strings are waiting on Tom's wording, and they were recorded nowhere.
-- Task 553 — Demands: one table always, and a project default pattern in Settings.
+- Task 553 — [H] · Demands and Hydraulics options: BUILT. One wording question is left.
 
 ## 75 — Soon (9)
 

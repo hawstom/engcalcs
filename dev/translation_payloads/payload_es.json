@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 1407,
-        "delta_key_count": 81,
+        "expected_key_count": 1416,
+        "delta_key_count": 90,
         "exempt_key_count": 31,
         "exempt_keys": [
             "calc_units_us",
@@ -516,6 +516,15 @@
         "lpn_new_create": "Create",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which today means a network read from an EPANET file.",
+        "lpn_settings_specific_gravity": "Specific gravity",
+        "lpn_settings_specific_gravity_tip": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
+        "lpn_settings_viscosity": "Relative viscosity",
+        "lpn_settings_viscosity_tip": "The thickness of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.",
+        "lpn_settings_trials": "Maximum trials",
+        "lpn_settings_trials_tip": "How many times the solver may try before it gives up on a network that will not settle.",
+        "lpn_settings_demand_multiplier": "Demand multiplier",
+        "lpn_settings_demand_multiplier_tip": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.",
         "lpn_settings_leader_snap": "Snap leader lines to angle",
         "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
@@ -599,6 +608,15 @@
         "lpn_new_create": "Create",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+        "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which today means a network read from an EPANET file.",
+        "lpn_settings_specific_gravity": "Specific gravity",
+        "lpn_settings_specific_gravity_tip": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
+        "lpn_settings_viscosity": "Relative viscosity",
+        "lpn_settings_viscosity_tip": "The thickness of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.",
+        "lpn_settings_trials": "Maximum trials",
+        "lpn_settings_trials_tip": "How many times the solver may try before it gives up on a network that will not settle.",
+        "lpn_settings_demand_multiplier": "Demand multiplier",
+        "lpn_settings_demand_multiplier_tip": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.",
         "lpn_settings_leader_snap": "Snap leader lines to angle",
         "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
@@ -1669,6 +1687,150 @@
                     "key": "lpn_scenario_menu",
                     "value": "Escenarios",
                     "english": "Scenarios"
+                }
+            }
+        },
+        "lpn_settings_emitter_exponent_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponente del emisor",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                }
+            }
+        },
+        "lpn_settings_specific_gravity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerancia de convergencia",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_specific_gravity_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerancia de convergencia",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_viscosity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerancia de convergencia",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_viscosity_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerancia de convergencia",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_trials": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerancia de convergencia",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_trials_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerancia de convergencia",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_demand_multiplier": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerancia de convergencia",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_demand_multiplier_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerancia de convergencia",
+                    "english": "Convergence tolerance"
                 }
             }
         },

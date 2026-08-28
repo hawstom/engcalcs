@@ -87,24 +87,51 @@ the block.
   - Its own docblock carries the failure it came from, so the next person to promise a list in
     conversation reads why that is not enough.
 
-- 100|553| **Demands: one table always, and a project default pattern in Settings.**
+- 100|553| **[H] Demands and Hydraulics options: BUILT. One wording question is left.**
   Tom, 2026-08-28, of the junction popup: *"The EPANET UX is confusing by breaking out one demand
-  (the initial) specially. What we need to do is remove the original Base demand and Demand pattern
-  inputs and leave in their place the Demand categories interface."* **This finishes what Task 468
-  started** — 468 put row 0 inside the table only where a junction already had a breakdown, so a
-  one-demand junction still met the two plain fields and the special case survived.
-  - **(1) The table is ALWAYS the interface**, no `hasDemandBreakdown()` branch. **The DOCUMENT does
-    not change** — row 0 is still `_demand`/`demandPattern`/`demandCategory`, `extraDemands` the
-    rest — so the exporter, `EngCalcs.lpnDemandRows()` and the scenario override seam are untouched.
-  - **(2) "Category" becomes "Description"** in the heading. His word.
-  - **(3) NO PATTERN MEANS THE PROJECT DEFAULT, and the default is a Settings row**, with *"other
-    Hydraulics options including Headloss Formula, Specific Gravity, Relative Viscosity, Maximum
-    Trials, Accuracy, If Unbalanced (Continue or Stop), Demand Multiplier, Emitter Exponent, Status
-    Report (Yes or No), Max. Head Error, etc."* `doc.defaultPattern` already exists and already
-    resolves; what is missing is that a person can see it. **Acceptance: import Net3 and the row
-    says Pattern 1** without anybody typing it.
-  - **(4) The table has TWO borders and it looks like a mistake.** It does.
-  - The list ends in "etc.", so the open question is which of the rest of `[OPTIONS]` earn a row.
+  (the initial) specially... remove the original Base demand and Demand pattern inputs and leave in
+  their place the Demand categories interface."* All four parts shipped the same day.
+  - **(1) The table is unconditional.** Task 468 had put row 0 inside it only where a junction
+    already had a breakdown, so the commonest junction still met two plain fields — the EPANET
+    asymmetry, surviving in the one case nobody looked at. The DOCUMENT did not change.
+    Consequences that were not obvious: row 0's delete had always had a row 1 to promote and now
+    does not (disabled on a sole row), and the override marker had been carried by the plain field
+    that is gone, so a scenario override on a one-demand junction had nowhere to show itself.
+  - **(2) "Category" became "Description"**, in the popup heading, the Tables pane and the Find
+    property's English alias.
+  - **(3) The default pattern moved from the Libraries box to Settings > Hydraulics**, and the rest
+    of EPANET's `[OPTIONS]` came with it. **Net3 opens saying Pattern 1 with nobody typing it**,
+    which was his acceptance case. **Four options got a row because each changes an ANSWER in both
+    engines** — Demand multiplier, Specific gravity, Relative viscosity, Emitter exponent, Maximum
+    trials. **Eight are carried, exported and honoured by EPANET but have NO control**, on
+    CLAUDE.md's emitter-exponent precedent.
+  - **[H] THE ONE QUESTION FOR TOM: does `Accuracy` earn a row?** It is on his list and it has no
+    honest place beside `Convergence tolerance` directly above it — EPANET's is a relative flow
+    change summed over the network, ours is `js/lpn-solver.js`'s own, and two rows a reader cannot
+    tell apart is worse than one. Options: show both with tips that distinguish them, replace ours
+    with EPANET's, or leave it carried-but-hidden as it is now.
+  - **(4) The two borders were the suite-wide `table, th, tr, td { border: 1px solid blue }`**, which
+    names four elements where these editors reset two. `.lpn-pane-table` has the same unreset frame
+    and is deliberately NOT changed: its blue row rules are a data grid's separators and nobody has
+    called them wrong.
+  - **AND THE IMPORTER STOPPED REWRITING DEMANDS**, which was a standing violation of the
+    file-is-canonical rule nobody had noticed: `[OPTIONS] Demand Multiplier` was folded into every
+    demand as it was read, so a file stating 189.95 with a multiplier of 2.5 was STORED as 474.875 —
+    the user's own characters spent. It is applied at `resolvedDemand()` now, and the engine bridge
+    writes the option only on the extended-period path, where EPANET does the multiplying itself.
+  - Guards: `dev/lpn-spike/default-pattern-harness.js` (24), `hydraulic-options-harness.js` (60),
+    and the two demand harnesses updated. The options harness asserts the PHYSICS, not that a number
+    moved: specific gravity raises pressure and leaves flow alone; viscosity acts under
+    Darcy-Weisbach and not under Hazen-Williams, measured on a roughness and a velocity where it
+    can (the fixture's own 50 gpm sits in the transition zone, where the sign is not a monotone).
+  - **A DEFECT THIS FOUND, worth more than the feature:** `libPatterns()` is a getter that ASSIGNS
+    (`doc.patterns = doc.patterns || []`), which is right for a writer and wrong for a reader. Read
+    from a Settings row — rebuilt on every unit change — it wrote `patterns: []` into a document
+    that stated none, and `unit-change-harness.js` caught it as a non-destructive unit switch that
+    was not byte-identical. `libPatternsRead()` is the pure half. **Look for the other getters
+    shaped like this.**
+  - Not done and not attempted: water-quality `[OPTIONS]` (Quality, Diffusivity, Tolerance) are
+    still dropped on import, exactly as before. Net1 states all three.
 
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
@@ -727,10 +754,30 @@ the block.
   CLAUDE.md's own argument is that **a rule a machine enforces is worth roughly ten a human must
   remember.** Every rule here that became a script stopped being violated; every rule that stayed
   prose kept being violated by people who had read it.
-  - **The survey is the new half and it is the bigger one.** Read the whole of `CLAUDE.md` and the
-    `dev/*.md` set and list every rule stated as prose that a script COULD enforce, with the cost of
-    each. That file says outright that its unexecutable half is decoration; nobody has ever gone
-    through and counted which half that is.
+  - **THE SURVEY IS DONE, 2026-08-28: `dev/enforceable-rules-survey.md`.** The count CLAUDE.md's
+    own "unexecutable half is decoration" line invited and nobody had ever made: **34 rules
+    enforced, 27 enforceable and not, 41 permanently prose** — a third, a quarter, two fifths. Its
+    conclusion is worth more than the arithmetic: *the prose is not decoration where it carries the
+    rules no check can reach; it is decoration where a check was possible and nobody wrote it.* The
+    27 are ranked by value/cost, with the false-positive risk stated per row, and rows 4–27 are the
+    remaining worklist.
+  - **AND THREE LANDED WITH IT, 2026-08-28.** `lang_key_resolve_check.php` (blocking): a literal
+    `$ec_lang['typo']` renders as the empty string in all 27 languages with no warning — a token
+    scan, so a concatenated key, a variable key and a key in a comment are all invisible to it and a
+    false positive is impossible. `unit_family_check.php` (blocking): the four unit-family
+    absolutes, every one of which fails with a page that renders and looks right. Both carry a
+    selftest, following `stale_claim_selftest.php`: a check whose demotions nothing tests looks
+    identical whether it works or has gone blind.
+    - **And the english-drift advisory was printing NOTHING.** `check_all.sh` piped its report
+      through `grep -q "^CHANGED"`, so the NOTE appeared with no text under it. **93 CHANGED, 79
+      NEW, 33 REMOVED and nine ROLE CHANGES had been invisible.** Still advisory, deliberately: a
+      fixed URL and a rewritten sentence produce the same hash mismatch, and blocking would push
+      the reader toward `--update`, which baselines the drift away.
+  - **DELIBERATELY LEFT ADVISORY, and the reasoning is the useful part:** `size_budget_check.php`
+    entirely (both numbers are judgement, and a ratchet fails a legitimate addition, which is the
+    fastest way to teach a team `--no-verify`); both `key_hygiene_check.php` findings (whether a key
+    is debt is judgement — whether it EXISTS is not, which is what the new check took); and
+    `stale_claim_check.php` (citing a closed task as a record is legitimate).
   - **`js/looped-network.js` is over 20,000 lines**, with `rebuildSettingsFields()` and
     `drawExampleNetwork()` the two obvious extractions. Task 293 established the split-by-PURITY
     pattern and it worked. *(The 9,740 recorded here through 2026-08-23 was less than half the truth
