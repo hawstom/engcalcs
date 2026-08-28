@@ -634,7 +634,6 @@ $ec_lang['lpn_storage_too_new']='یہ پراجیکٹ صفحے کے ایک نئے
 $ec_lang['lpn_tool_file']='فائل';
 $ec_lang['lpn_menu_edit']='ترمیم';
 $ec_lang['lpn_menu_insert']='داخل کریں';
-$ec_lang['lpn_menu_view']='منظر';
 $ec_lang['lpn_menu_settings']='ترتیبات';
 $ec_lang['lpn_menu_help']='مدد';
 $ec_lang['lpn_help_walkthroughs']='مرحلہ وار رہنما';

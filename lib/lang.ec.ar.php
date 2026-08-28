@@ -656,7 +656,6 @@ $ec_lang['lpn_storage_too_new']='حُفظ هذا المشروع بإصدار أ�
 $ec_lang['lpn_tool_file']='ملف';
 $ec_lang['lpn_menu_edit']='تحرير';
 $ec_lang['lpn_menu_insert']='إدراج';
-$ec_lang['lpn_menu_view']='عرض';
 $ec_lang['lpn_menu_settings']='الإعدادات';
 $ec_lang['lpn_menu_help']='مساعدة';
 $ec_lang['lpn_help_walkthroughs']='جولات إرشادية';

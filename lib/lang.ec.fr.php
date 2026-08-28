@@ -673,7 +673,6 @@ $ec_lang['lpn_storage_too_new']='Ce projet a été enregistré par une version p
 $ec_lang['lpn_tool_file']='Fichier';
 $ec_lang['lpn_menu_edit']='Édition';
 $ec_lang['lpn_menu_insert']='Insertion';
-$ec_lang['lpn_menu_view']='Affichage';
 $ec_lang['lpn_basemap_show']='Afficher le fond de carte';
 $ec_lang['lpn_basemap_hide']='Masquer le fond de carte';
 $ec_lang['lpn_basemap_tip']='Images de fond de carte issues d\'OpenStreetMap, récupérées sur Internet au fil de vos déplacements et zooms. Votre réseau est dessiné que le fond de carte soit affiché ou non.';

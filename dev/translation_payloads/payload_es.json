@@ -2,7 +2,7 @@
     "meta": {
         "language": "es",
         "expected_key_count": 1408,
-        "delta_key_count": 80,
+        "delta_key_count": 81,
         "exempt_key_count": 31,
         "exempt_keys": [
             "calc_units_us",
@@ -451,6 +451,7 @@
     },
     "keys_to_translate": {
         "lpn_field_text_attached": "Attached to",
+        "lpn_menu_map": "Map",
         "lpn_geomap": "lat\/lon",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
@@ -492,7 +493,7 @@
         "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
-        "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
+        "lpn_profile_edit_click": "Drag any point on the path to move it. Click a point you added to take it off.",
         "lpn_profile_edit_tap": "Drag any point on the path to move it. Tap a point you added to take it off.",
         "lpn_profile_edit_nowhere": "A point on the path has to be a node. The path is unchanged.",
         "lpn_profile_saved": "Saved paths",
@@ -519,7 +520,7 @@
         "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
         "lpn_field_base_demand": "Base demand",
-        "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
+        "lpn_result_demand_tip": "The flow this node draws at the moment shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
         "lpn_field_demand_category": "Category",
         "lpn_field_demand_category_tip": "Name or description of the user or users using this pattern.",
         "lpn_demand_add": "Add demand category",
@@ -533,6 +534,7 @@
     },
     "keys": {
         "lpn_field_text_attached": "Attached to",
+        "lpn_menu_map": "Map",
         "lpn_geomap": "lat\/lon",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
@@ -574,7 +576,7 @@
         "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
-        "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
+        "lpn_profile_edit_click": "Drag any point on the path to move it. Click a point you added to take it off.",
         "lpn_profile_edit_tap": "Drag any point on the path to move it. Tap a point you added to take it off.",
         "lpn_profile_edit_nowhere": "A point on the path has to be a node. The path is unchanged.",
         "lpn_profile_saved": "Saved paths",
@@ -601,7 +603,7 @@
         "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
         "lpn_field_base_demand": "Base demand",
-        "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
+        "lpn_result_demand_tip": "The flow this node draws at the moment shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
         "lpn_field_demand_category": "Category",
         "lpn_field_demand_category_tip": "Name or description of the user or users using this pattern.",
         "lpn_demand_add": "Add demand category",
@@ -627,6 +629,22 @@
                     "key": "lpn_field_elev",
                     "value": "Elevación",
                     "english": "Elevation"
+                }
+            }
+        },
+        "lpn_menu_map": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_insert",
+                    "value": "Insertar",
+                    "english": "Insert"
+                },
+                "next_translated": {
+                    "key": "lpn_basemap_show",
+                    "value": "Mostrar mapa de calles",
+                    "english": "Show street map"
                 }
             }
         },
@@ -1286,7 +1304,7 @@
                 }
             }
         },
-        "lpn_profile_edit_say": {
+        "lpn_profile_edit_click": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

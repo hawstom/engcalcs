@@ -1709,7 +1709,7 @@
         "lpn_menu_project": "f6f4da8d93e88a08220e03b7810451d3ba540a34",
         "lpn_menu_project_tip": "9d9424077c8ae42908abfd87e265d492a46e283f",
         "lpn_menu_settings": "c7f73bb54d928922c3838bb789ee9fb8a5b1eb37",
-        "lpn_menu_view": "69bd4ef9fbd0894a22759c3766b859defbdedbc8",
+        "lpn_menu_map": "69bd4ef9fbd0894a22759c3766b859defbdedbc8",
         "lpn_method_switch_confirm": "aa6867d35bf579e45ac92808126b0a29c92c8b0a",
         "lpn_mode_add_junction": "227d697f0ea10bde6f4edbc9fe6116e96a959639",
         "lpn_mode_add_pipe": "b0c507a90cb8ac61a5f37b35641f7051dc2b3566",
@@ -4914,7 +4914,7 @@
             "words": 1,
             "ends_sentence": false
         },
-        "lpn_menu_view": {
+        "lpn_menu_map": {
             "words": 1,
             "ends_sentence": false
         },

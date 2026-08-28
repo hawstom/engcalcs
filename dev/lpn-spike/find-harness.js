@@ -740,6 +740,20 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	L.setWord('lpn_find_op_top', '{n} highest');
 	L.buildPanel();
 
+	// **NO "Connected: 20, 40, 50" ON A RESULT ROW** (Tom, 2026-08-27: *"I don't know what that
+	// means... I think we should remove it because it feels out of place."*). It was EPANET's
+	// Adjacent Links pane folded into the row, and it answered a question the search did not ask, in
+	// the place a reader scans for the thing they searched FOR. Asserted as an ABSENCE, because a
+	// present-check cannot see a line come back.
+	// Junction `a` carries TWO links, so it is the row that used to grow the list -- searching a
+	// junction with none would pass against the old code too.
+	run("Junction.ID contains '" + a + "'");
+	const nodeRows = [];
+	walk(L.resultsBox(), function (el) { if (el._tag === 'button') { nodeRows.push(el.textContent); } });
+	ok('a node result row names the node and nothing else, though two pipes meet there',
+		nodeRows.length === 1 && nodeRows[0].indexOf(':') < 0 && nodeRows[0].indexOf('\u00b7') < 0,
+		JSON.stringify(nodeRows));
+
 	// **A COMPOUND ANSWER PRINTS THE ID ALONE.** Two conditions name two properties, and choosing one
 	// to print beside the id would answer a question nobody asked.
 	run('Pipe.Diameter greater than 4 AND Pipe.Diameter less than 8');

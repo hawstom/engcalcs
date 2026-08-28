@@ -656,7 +656,6 @@ $ec_lang['lpn_storage_too_new']='यह प्रोजेक्ट पृष्
 $ec_lang['lpn_tool_file']='फ़ाइल';
 $ec_lang['lpn_menu_edit']='संपादन';
 $ec_lang['lpn_menu_insert']='सम्मिलित करें';
-$ec_lang['lpn_menu_view']='देखें';
 $ec_lang['lpn_menu_settings']='सेटिंग्स';
 $ec_lang['lpn_menu_help']='सहायता';
 $ec_lang['lpn_help_walkthroughs']='मार्गदर्शिकाएँ';

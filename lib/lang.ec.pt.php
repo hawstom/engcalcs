@@ -673,7 +673,6 @@ $ec_lang['lpn_storage_too_new']='Este projeto foi salvo por uma versão mais rec
 $ec_lang['lpn_tool_file']='Arquivo';
 $ec_lang['lpn_menu_edit']='Editar';
 $ec_lang['lpn_menu_insert']='Inserir';
-$ec_lang['lpn_menu_view']='Exibir';
 $ec_lang['lpn_clean_map_tip']='Oculta a linha de modo e o indicador de coordenadas para que uma captura de tela mostre apenas o mapa. Seu desenho não é alterado, e essa escolha não é salva — recarregar a página traz os indicadores de volta.';
 $ec_lang['lpn_clean_map_off']='Mostrar indicadores do mapa';
 $ec_lang['lpn_clean_map']='Ocultar indicadores do mapa';

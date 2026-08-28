@@ -685,7 +685,6 @@ $ec_lang['lpn_storage_too_new']='Този проект е записан от п
 $ec_lang['lpn_tool_file']='Файл';
 $ec_lang['lpn_menu_edit']='Редактиране';
 $ec_lang['lpn_menu_insert']='Вмъкване';
-$ec_lang['lpn_menu_view']='Изглед';
 $ec_lang['lpn_basemap_show']='Покажи уличната карта';
 $ec_lang['lpn_basemap_hide']='Скрий уличната карта';
 $ec_lang['lpn_basemap_tip']='Изображения на уличната карта от OpenStreetMap, изтеглени през интернет, докато премествате и мащабирате изгледа. Мрежата ви се чертае независимо дали уличната карта е показана.';

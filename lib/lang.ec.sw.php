@@ -656,7 +656,6 @@ $ec_lang['lpn_storage_too_new']='Mradi huu ulihifadhiwa na toleo jipya zaidi la 
 $ec_lang['lpn_tool_file']='Faili';
 $ec_lang['lpn_menu_edit']='Hariri';
 $ec_lang['lpn_menu_insert']='Ingiza';
-$ec_lang['lpn_menu_view']='Onyesho';
 $ec_lang['lpn_menu_settings']='Mipangilio';
 $ec_lang['lpn_menu_help']='Msaada';
 $ec_lang['lpn_help_walkthroughs']='Mafunzo';

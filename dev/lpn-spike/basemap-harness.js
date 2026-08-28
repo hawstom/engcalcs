@@ -349,7 +349,7 @@ ok('turning it back on says so on the project', L.getProject().basemap === 'osm'
 // Tom, 2026-08-22: *"It's live, but the interface has no way to activate it. Should there be a
 // little 'satellite' teaser tile/button in the corner of the map like at Google Maps?"*
 //
-// There WAS a way -- View > Show satellite images -- and reading openViewMenu() says exactly why he
+// There WAS a way -- Map > Show satellite images -- and reading openMapMenu() says exactly why he
 // could not find it: the row carries `hidden: !isGeoProject() || !satelliteAvailable()`, so on a
 // grid project it is not in the menu at all. The teaser must therefore appear on EXACTLY that
 // condition and no other, or the corner and the menu come to disagree about whether this network

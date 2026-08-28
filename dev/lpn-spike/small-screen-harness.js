@@ -327,7 +327,7 @@ const L = stub.loadLoopedNetwork(
 	// arrays being read out of the source text: a source read would pass on a row that throws, and
 	// would miss a row assembled conditionally (File's Save/Save as, View's basemap pair).
 	"\t\tmenuRows: function (which) {\n" +
-	"\t\t\tvar out = [], real = openMenu, opener = { file: openFileMenu, edit: openEditMenu, insert: openInsertMenu, view: openViewMenu, project: openProjectBarMenu, help: openHelpMenu }[which];\n" +
+	"\t\t\tvar out = [], real = openMenu, opener = { file: openFileMenu, edit: openEditMenu, map: openMapMenu, project: openProjectBarMenu, help: openHelpMenu }[which];\n" +
 	"\t\t\topenMenu = function (a, rows) { out = rows; };\n" +
 	"\t\t\ttry { opener(document.getElementById('lpn_menu_' + which)); } finally { openMenu = real; }\n" +
 	"\t\t\treturn out; },\n" +
@@ -473,7 +473,9 @@ console.log('\n--- 3. the toolbar keeps the transport and nothing else ---');
 console.log('\n--- 4. the menu bar drops to icons ---');
 {
 	const items = menubar.children;
-	ok('the real menu bar was built', items.length === 6, items.length + ' menus');
+	// FIVE since 2026-08-27: File, Edit, Map, Water, Help. Insert was deleted and its asset rows are
+	// a submenu of Water (Task 543).
+	ok('the real menu bar was built', items.length === 5, items.length + ' menus');
 	items.forEach((b) => {
 		const name = b.el.getAttribute('aria-label');
 		const word = b.children.filter((c) => c.cls.indexOf('lpn-menubar-word') >= 0)[0];
@@ -498,7 +500,9 @@ console.log('\n--- 4. the menu bar drops to icons ---');
 console.log('\n--- every hidden toolbar command is still on a menu ---');
 {
 	const labels = new Set();
-	['file', 'edit', 'insert', 'view', 'project', 'help'].forEach((which) => {
+	// Five menus, not six: Insert was deleted 2026-08-27 and its rows are now a submenu of Water,
+	// which this walk reaches through the fly-out branch below (Task 543).
+	['file', 'edit', 'map', 'project', 'help'].forEach((which) => {
 		const rows = L.menuRows(which);
 		ok('the ' + which + ' menu opens and has rows', rows.length > 0);
 		(function flat(rs) {
@@ -1020,7 +1024,9 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 	const hint = { anchor: 'top', rect: { top: 4, bottom: 20, left: 4, right: 200 } };
 	const foot = { anchor: 'bottom', rect: { top: 470, bottom: 490, left: 4, right: 300 } };
 	const occ = [hint, foot];
-	const box = (l, r) => ({ left: l, right: r });
+	// A legend's rect: its column, and its HEIGHT. Both matter now -- the test is a real overlap on
+	// both axes, so a short legend in a busy column may clear what a tall one does not.
+	const box = (l, r, h) => ({ left: l, right: r, top: 0, bottom: h === undefined ? 60 : h });
 
 	ok('a top-right legend on a wide map sits in the corner, undisturbed',
 		inset('top', wrap, box(800, 996), occ) === 4, String(inset('top', wrap, box(800, 996), occ)));
@@ -1044,9 +1050,45 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 	// Abutting is not overlapping, or two boxes that merely touch would each shove the other.
 	ok('a readout that stops exactly where the legend starts does not push it',
 		inset('top', wrap, box(200, 400), occ) === 4, String(inset('top', wrap, box(200, 400), occ)));
-	// The band matters as much as the overlap: a bottom readout is no reason to move a top legend.
+	// A bottom readout is no reason to move a top legend -- and that now falls out of the geometry
+	// rather than out of a band label, which is what lets the middle case below work at all.
 	ok('a top legend ignores what is happening along the bottom edge',
 		inset('top', wrap, box(4, 200), [foot]) === 4);
+	// ...and a legend nearly as tall as the map, which really does overlap the footer, STAYS PUT.
+	// Clearing it would mean pushing it off the bottom -- trading a readable overlap for a legend
+	// nobody can see. Where nothing it can do will help, it does nothing.
+	ok('...and one too tall to clear anything stays put rather than being pushed off the map',
+		inset('top', wrap, box(4, 200, 480), [foot]) === 4,
+		String(inset('top', wrap, box(4, 200, 480), [foot])));
+
+	// **THE COLLISION IN SCREENSHOT 0028**, and the one the first version of this rule could not
+	// see: the labels legend at top-right and the colour key at middle-right are in DIFFERENT bands
+	// and the SAME column, so they printed through each other -- `H= Head` cut off mid-row,
+	// `Elevation` showing through the pressure swatches. A middle position was exempt from dodging
+	// on the argument that a centred box clears both bands, which is true of the READOUTS and says
+	// nothing about the other legend.
+	// A desktop-sized map, because this is the case where both boxes have to FIT after the move --
+	// the 500px fixture above is a phone and the two legends 0028 shows would not both fit on one.
+	const deskWrap = { top: 0, bottom: 900, left: 0, right: 1000 };
+	const labels = { anchor: 'top', rect: { top: 4, bottom: 400, left: 800, right: 996 } };
+	// The colour key, centred on a 900-tall map at 260 tall: its own centring puts it at 320.
+	ok('a middle-right legend under a tall top-right one is pushed clear of it',
+		inset('top', deskWrap, box(800, 996, 260), [labels], 320) === 404,
+		String(inset('top', deskWrap, box(800, 996, 260), [labels], 320)));
+	// And it must not move when there is nothing in the way: a centred box that drifted every time
+	// the map was redrawn would be worse than one that overlapped once.
+	const shortLabels = { anchor: 'top', rect: { top: 4, bottom: 60, left: 800, right: 996 } };
+	ok('...and stays exactly where its own centring put it when nothing is in its way',
+		inset('top', deskWrap, box(800, 996, 260), [shortLabels], 320) === 320,
+		String(inset('top', deskWrap, box(800, 996, 260), [shortLabels], 320)));
+	// The placer has to drop the centring transform when it writes an explicit top, or the box lands
+	// half its own height above where it was put -- which would look like a fix and be a new bug.
+	{
+		const src2 = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+		const fn = src2.substring(src2.indexOf('function placeLegends'), src2.indexOf('function applyLegendPosition'));
+		ok('...and moving a middle legend clears the centring transform that put it there',
+			/b\.el\.style\.top = inset \+ 'px';[\s\S]{0,120}b\.el\.style\.transform = '';/.test(fn));
+	}
 	// The tallest wins, so a two-line stack is cleared rather than half-cleared.
 	const twoLine = occ.concat([{ anchor: 'top', rect: { top: 24, bottom: 60, left: 4, right: 400 } }]);
 	ok('a stack of two readouts is cleared by the LOWER of them',

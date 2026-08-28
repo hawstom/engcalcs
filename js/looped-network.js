@@ -5386,7 +5386,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **THE TEASER APPEARS ON EXACTLY THE CONDITION THE MENU ROW DOES**, by calling the same two
 	// predicates rather than by restating them: a third copy of "geographic, and we have a token"
-	// is a third thing to keep in step with openViewMenu(). It carries the SAME two strings as that
+	// is a third thing to keep in step with openMapMenu(). It carries the SAME two strings as that
 	// row and toggles through the SAME setBasemapStyle() seam, so the corner and the menu cannot
 	// come to mean different things -- including the seam's own rule that asking for the style
 	// already showing turns the basemap off.
@@ -8534,7 +8534,7 @@ var EngCalcs = EngCalcs || {};
 	// built by the same code -- two copies would be two chances for one end to stop being clickable.
 	function findResultRow(c) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('button'),
-			val = findValueOf(c, findState.prop), adj;
+			val = findValueOf(c, findState.prop);
 		row.type = 'button';
 		row.style.display = 'block';
 		row.style.width = '100%';
@@ -8547,15 +8547,19 @@ var EngCalcs = EngCalcs || {};
 			? findFmt(effective(c.el, 'text'))
 			: c.el.id + (findResultsCompound || findState.prop === 'id' ? ''
 				: '  ' + (findPropIsConnection(findState.prop) ? findConnLabel(val) : findFmt(val)));
-		// The Map Finder's "Adjacent Links" pane, said in one line under the node it belongs to:
-		// finding a junction and immediately wanting to know what meets there is the whole reason
-		// EPANET's dialog has that box.
-		if (c.group === 'node') {
-			adj = incidentLinks[c.el.id] || [];
-			if (adj.length) {
-				row.textContent += '  · ' + (pc.lpn_find_adjacent || 'Links here') + ': ' + adj.join(', ');
-			}
-		}
+		// **NO LIST OF THE LINKS THAT MEET HERE** (Tom, 2026-08-27, reading his own result rows:
+		// *"The results say 'Connected: nnn, nnn, nnn', and I don't know what that means... I think
+		// that it arose from tunnel vision on the Connected links task. Even though it's useful, I
+		// think we should remove it because it feels out of place."*).
+		//
+		// It was EPANET's Map Finder "Adjacent Links" pane folded into the row, and two things were
+		// wrong with it. It did not say WHAT was connected -- three bare ids after a word -- and a
+		// row that answers "which pipes meet at this node" is answering a question the search did
+		// not ask, in the one place a reader is scanning for the thing they searched FOR. The
+		// property popup is where a node's links belong.
+		//
+		// `lpn_find_adjacent` is left in lib/lang.ec.en.php and in the 26 translations that carry
+		// it, rendered by nothing. Whether that is debt or lost content is Tom's call, not an AI's.
 		row.addEventListener('click', function () { findGoTo(c.group, c.el.id); });
 		return row;
 	}
@@ -8604,6 +8608,20 @@ var EngCalcs = EngCalcs || {};
 		list.style.overflowY = 'auto';
 		findResults.forEach(function (c) { list.appendChild(findResultRow(c)); });
 		box.appendChild(list);
+		refitFindPopup();
+	}
+	// **THE BOX IS SIZED WHEN IT OPENS AND THE ANSWER ARRIVES AFTERWARDS.** Pressing Find adds a
+	// count and a list of hits to a panel whose height was capped while it was empty, so the box
+	// grows past whatever room it was given and the last results end up below the fold. Every path
+	// that changes what is in the box therefore asks for the cap to be recomputed -- which is one
+	// call here rather than a rule every caller has to remember.
+	//
+	// Cheap: two rects and, only when it is too tall, one style write. It runs on each keystroke in
+	// the query line, which is the same budget the panel already spends re-rendering its results.
+	function refitFindPopup() {
+		var popup = document.getElementById('lpn_find_popup');
+		if (!popup || popup.style.display !== 'block') { return; }
+		capPanelToRoomBelow(popup, popup.getBoundingClientRect().top);
 	}
 	// ---- REPLACE: the same query, plus a write (ROADMAP Task 389) --------------------------------
 	//
@@ -11500,7 +11518,7 @@ var EngCalcs = EngCalcs || {};
 			txt = profileTouch
 				? (pc.lpn_profile_edit_tap ||
 					'Drag any point on the path to move it. Tap a point you added to take it off.')
-				: (pc.lpn_profile_edit_say ||
+				: (pc.lpn_profile_edit_click ||
 					'Drag any point on the path to move it. Click a point you added to take it off.');
 		} else if (which === 'nowhere') {
 			txt = pc.lpn_profile_edit_nowhere || 'A point on the path has to be a node. The path is unchanged.';
@@ -16747,17 +16765,27 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'delnetwork', label: pc.lpn_edit_delete_network || 'Delete network', fn: deleteNetwork }
 		]);
 	}
-	function openInsertMenu(anchor) {
+	// **THERE IS NO INSERT MENU ANY MORE** (Tom, 2026-08-27, deciding Task 543's larger half):
+	// *"(1) Change the View menu to Map. (2) Move the Insert asset group to Water as the first item,
+	// a submenu. (3) Move the Insert Background image group from Insert to Map. (4) Delete the
+	// Insert menu."*
+	//
+	// The principle he was relaxing when he said it: *"Everything about Water modeling is under
+	// Water"* had one standing exception, which was that every water asset was inserted from a menu
+	// of its own. The exception is gone -- the assets are a submenu of Water, first, where the thing
+	// they belong to already is -- and the background image went to Map, because a picture behind
+	// the drawing is the map's furniture and not a water asset.
+	//
+	// **NODES THEN LINKS, EACH IN THE ORDER YOU BUILD THEM**: Junction, Reservoir, Tank, Pipe,
+	// Pump, Valve. It reads as the sentence a person draws in -- junctions, then the sources that
+	// feed them, then the pipe that joins them, then the two things you put ON a pipe. Text stays
+	// last, being the only tool that adds nothing hydraulic.
+	//
+	// THE SAME ORDER APPEARS IN THREE PLACES and they must agree: this list, the toolbar, and the
+	// ID-prefix rows in Settings.
+	function insertAssetRows() {
 		var pc = EngCalcs.pageConfig || {};
-		// **NODES THEN LINKS, EACH IN THE ORDER YOU BUILD THEM**: Junction, Reservoir, Tank, Pipe,
-		// Pump, Valve. It reads as the sentence a person draws in -- junctions, then the sources that
-		// feed them, then the pipe that joins them, then the two things you put ON a pipe. Text stays
-		// last, being the only tool that adds nothing hydraulic.
-		//
-		// THE SAME ORDER APPEARS IN THREE PLACES and they must agree: this menu, the toolbar, and
-		// the ID-prefix rows in Settings.
-
-		openMenu(anchor, [
+		return [
 			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', fn: function () { setMode('add-junction'); } },
 			{ icon: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', fn: function () { setMode('add-reservoir'); } },
 			{ icon: 'tank', label: pc.lpn_tool_add_tank || 'Tank', fn: function () { setMode('add-tank'); } },
@@ -16765,18 +16793,13 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'pump', label: pc.lpn_tool_add_pump || 'Pump', fn: function () { setMode('add-pump'); } },
 			{ icon: 'valve', label: pc.lpn_tool_add_valve || 'Valve', fn: function () { setMode('add-valve'); } },
 			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
-			{ separator: true }
-		].concat(backdropRows(true)).concat([
 			{ separator: true },
-			// "Draw example network" does NOT belong here: Insert adds an element to the drawing you
-			// are in, and an example is a whole network. It is File > New project > From examples,
-			// which is also what lets each example commit to a unit system.
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
 			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
 			// goes when that question is settled -- putting a throwaway through 26 languages would be
 			// worse than leaving it in English.
 			{ icon: 'devtest', label: '[dev] Draw large test network', fn: drawTestGrid }
-		]));
+		];
 	}
 	// The walkthroughs live on Tom's blog, so this is the one menu action in the bar that leaves the
 	// page -- which is why it is in Help and not a sixth menu-bar button beside
@@ -16875,10 +16898,19 @@ var EngCalcs = EngCalcs || {};
 		var x = document.getElementById('lpn_notes_close');
 		if (x) { x.addEventListener('click', function () { document.getElementById('lpn_notes_popup').style.display = 'none'; }); }
 	}
-	function openViewMenu(anchor) {
+	// **THE MAP MENU** -- View until 2026-08-27, renamed on Tom's word. It holds the drawing's frame,
+	// the pictures behind it, where on Earth it is, and the elevations read off that ground. Only
+	// the first of those is a "view", and the elevation row is the one that made him say so.
+	function openMapMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', fn: zoomExtent },
+			// **THE BACKGROUND IMAGE CAME HERE FROM INSERT** (Tom, 2026-08-27). A picture behind the
+			// drawing is not a water asset; it is the same kind of thing as the street map two rows
+			// down, and EPANET files its own Backdrop under this menu for the same reason. A
+			// submenu, so six commands about one picture cost one row.
+			{ icon: 'image', label: pc.lpn_backdrop_menu || 'Background image…',
+				submenu: function () { return backdropRows(false); } },
 			{ separator: true },
 			// **NO LABELS ROW AND NO PROFILE ROW** (Tom, 2026-08-21). Labels is a SECTION of the
 			// Settings box, reachable from the box's own index and from a click on the colour
@@ -16977,6 +17009,15 @@ var EngCalcs = EngCalcs || {};
 	function openProjectBarMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
+			// **FIRST, because it is the one thing here that adds water to the model** (Tom,
+			// 2026-08-27). Everything under it reads, configures or reports on what these rows put
+			// on the map. It keeps `lpn_menu_insert` -- the word is right and it is already
+			// translated into 26 languages; only the menu it was the name of is gone.
+			{
+				icon: 'insert', label: pc.lpn_menu_insert || 'Insert',
+				submenu: insertAssetRows
+			},
+			{ separator: true },
 			{
 				icon: 'settings', label: pc.lpn_menu_settings || 'Settings',
 				tip: pc.lpn_tool_settings_tip,
@@ -17081,8 +17122,7 @@ var EngCalcs = EngCalcs || {};
 		[
 			{ id: 'lpn_menu_file', icon: 'file', label: pc.lpn_tool_file || 'File', open: openFileMenu },
 			{ id: 'lpn_menu_edit', icon: 'edit', label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
-			{ id: 'lpn_menu_insert', icon: 'insert', label: pc.lpn_menu_insert || 'Insert', open: openInsertMenu },
-			{ id: 'lpn_menu_view', icon: 'view', label: pc.lpn_menu_view || 'View', open: openViewMenu },
+			{ id: 'lpn_menu_map', icon: 'view', label: pc.lpn_menu_map || 'Map', open: openMapMenu },
 			// After View: it holds what belongs to THIS PROJECT rather than to the drawing (View).
 			// It is also the menu bar's ONLY door to Settings -- the bare Settings item that used to
 			// sit here is gone (Tom, 2026-08-21). It was the one menu-bar item that opened a panel
@@ -17758,7 +17798,7 @@ var EngCalcs = EngCalcs || {};
 		var addGroup = group();
 		addGroup.dataset.edits = '1';
 		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Text -- the same order as the Insert menu and
-		// the ID-prefix rows. See openInsertMenu() for why that order.
+		// the ID-prefix rows. See insertAssetRows() for why that order.
 		[
 			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction', tip: pc.lpn_tool_add_junction_tip },
 			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir', tip: pc.lpn_tool_add_reservoir_tip },
@@ -17788,7 +17828,7 @@ var EngCalcs = EngCalcs || {};
 		// **THERE IS NO CLEAN-MAP BUTTON** (Tom, 2026-08-20: "Relegate Hide map readouts to the View
 		// menu"). It is a once-before-a-screenshot command, and a toolbar slot is for what you do
 		// often. Its pressed state lives on that menu row, which redraws its own label each time the
-		// menu opens (openViewMenu), so nothing has to be kept in step with a button.
+		// menu opens (openMapMenu), so nothing has to be kept in step with a button.
 		// **THE PROFILE BUTTON IS IN THE PROJECT GROUP**, beside Tables, since the strip was
 		// re-grouped to mirror the Project menu (Tom, 2026-08-21). This group is Zoom to fit alone:
 		// the one command that changes how you are LOOKING at the drawing, which is also all the
@@ -17926,7 +17966,7 @@ var EngCalcs = EngCalcs || {};
 		// The dev-only stress-test button moved OFF the toolbar and to the foot of the Insert menu
 		// (Tom, 2026-08-04). A toolbar is the high-use subset of the menus, and a thing that reads
 		// "[dev]" is by definition not that -- it was taking a permanent slot on the one strip where
-		// space is scarcest. See openInsertMenu().
+		// space is scarcest. See insertAssetRows().
 	}
 
 	// Temporary dev-only stress-test generator (Tom, 2026-07-30: "see how this handles 100
@@ -19820,16 +19860,44 @@ var EngCalcs = EngCalcs || {};
 	// **PURE, so the rule is testable without a layout engine.** Given the map's own box, the
 	// legend's box and the boxes already spoken for, how far in from the `anchor` edge this legend
 	// has to sit. Everything here is a rect; nothing here reads the DOM.
-	function legendInsetFor(anchor, wrap, legend, occupants) {
-		var inset = LEGEND_GAP, i, o, v;
-		for (i = 0; i < occupants.length; i++) {
-			o = occupants[i];
-			if (o.anchor !== anchor) { continue; }
-			// Touching edges are not an overlap: `<` and `>`, so two boxes that merely abut do not
-			// each push the other.
-			if (!(o.rect.left < legend.right && o.rect.right > legend.left)) { continue; }
-			v = (anchor === 'top' ? (o.rect.bottom - wrap.top) : (wrap.bottom - o.rect.top)) + LEGEND_GAP;
-			if (v > inset) { inset = v; }
+	//
+	// **THE TEST IS A REAL OVERLAP, ON BOTH AXES, and it used to be a BAND plus a horizontal
+	// overlap.** A band test can only see boxes anchored to the same edge, so a labels legend at
+	// top-right and a colour key at middle-right — different bands, same column — printed through
+	// each other and the band rule could not tell. That is the collision in screenshot 0028, where
+	// `H= Head` is cut off mid-row and `Elevation` shows through the pressure swatches, and it is
+	// what made a hero frame unpublishable.
+	//
+	// **IT ITERATES, because moving clear of one box can land on another** — the mode hint, then the
+	// legend that was already there. Bounded, never a loop that can run away: six passes is more
+	// than the four boxes this map can stack, and the inset only ever grows, so it converges.
+	//
+	// `base` is where the position itself put the legend, in from the anchor edge. For a corner that
+	// is the 4px gap; for a MIDDLE position it is whatever its own centring produced, so a middle
+	// legend that overlaps nothing stays exactly where the setting put it.
+	function legendInsetFor(anchor, wrap, legend, occupants, base) {
+		var inset = (typeof base === 'number') ? base : LEGEND_GAP,
+			h = legend.bottom - legend.top, guard = 0, moved = true, i, o, r, v;
+		while (moved && guard++ < 6) {
+			moved = false;
+			r = (anchor === 'bottom')
+				? { top: wrap.bottom - inset - h, bottom: wrap.bottom - inset }
+				: { top: wrap.top + inset, bottom: wrap.top + inset + h };
+			for (i = 0; i < occupants.length; i++) {
+				o = occupants[i].rect;
+				// Touching edges are not an overlap: `<` and `>`, so two boxes that merely abut do
+				// not each push the other.
+				if (!(o.left < legend.right && o.right > legend.left)) { continue; }
+				if (!(o.top < r.bottom && o.bottom > r.top)) { continue; }
+				v = (anchor === 'bottom' ? (wrap.bottom - o.top) : (o.bottom - wrap.top)) + LEGEND_GAP;
+				// **IT MOVES ONLY IF IT STILL FITS AFTERWARDS.** A legend nearly as tall as the map
+				// can be pushed clean off the bottom of it in one step, which trades a readable
+				// overlap for a legend nobody can see at all. Where nothing it can do will clear the
+				// box, it stays where the setting put it and overlaps -- and the user has Off and
+				// five other corners. Half a pixel of slack, so sub-pixel rects cannot shuffle for
+				// ever.
+				if (v > inset + 0.5 && v + h <= (wrap.bottom - wrap.top)) { inset = v; moved = true; }
+			}
 		}
 		return Math.round(inset);
 	}
@@ -19880,11 +19948,24 @@ var EngCalcs = EngCalcs || {};
 			b.el.style.left = pos.left; b.el.style.right = pos.right;
 			b.el.style.transform = pos.transform;
 			if (!occ || b.el.style.display === 'none') { return; }
-			var anchor = pos.top === '4px' ? 'top' : (pos.bottom === '4px' ? 'bottom' : '');
-			if (!anchor) { return; }
-			var r = b.el.getBoundingClientRect(), inset = legendInsetFor(anchor, wr, r, occ);
-			if (anchor === 'top') { b.el.style.top = inset + 'px'; }
-			else { b.el.style.bottom = inset + 'px'; }
+			// **A MIDDLE POSITION DODGES TOO, and it is the case screenshot 0028 was lost to.** It
+			// used to be exempt on the argument that a centred box clears both bands by
+			// construction -- true of the READOUTS, and nothing to do with the other legend, which
+			// is centred in the same column. A middle legend that has to move becomes an ordinary
+			// top-anchored one at the height it was already at, so it moves the least it can and
+			// only when something is in its way.
+			var anchor = pos.top === '4px' ? 'top' : (pos.bottom === '4px' ? 'bottom' : 'middle');
+			var r = b.el.getBoundingClientRect();
+			var base = (anchor === 'bottom') ? wr.bottom - r.bottom : r.top - wr.top;
+			var inset = legendInsetFor(anchor === 'bottom' ? 'bottom' : 'top', wr, r, occ, base);
+			if (anchor === 'bottom') { b.el.style.bottom = inset + 'px'; }
+			else if (anchor === 'top' || inset > base + 0.5) {
+				// Writing an explicit top means the centring transform has to go, or the box lands
+				// half its own height above where it was put.
+				b.el.style.top = inset + 'px';
+				b.el.style.bottom = '';
+				b.el.style.transform = '';
+			}
 			occ.push({ anchor: anchor, rect: b.el.getBoundingClientRect() });
 		});
 	}
@@ -22370,7 +22451,20 @@ var EngCalcs = EngCalcs || {};
 		// the band's own control -- so the rule is derived from the thing it exists to protect
 		// rather than from a list of ids that would drift.
 		var hasBand = !!(panel.querySelector && panel.querySelector('.lpn-popover-x'));
-		panel.style.top = (hasBand && at.top >= ar.bottom ? Math.max(chromeFloor(), at.top) : at.top) + 'px';
+		var top = at.top;
+		if (hasBand && at.top >= ar.bottom) {
+			top = Math.max(chromeFloor(), at.top);
+			// **AND IT IS RE-CAPPED FOR THE TOP IT ACTUALLY GOT.** panelPlacement() measured the room
+			// below the ANCHOR; the lift above then moves the panel down to the bottom of the chrome
+			// without telling it. The cap was short by exactly the height of the chrome, so the panel
+			// fitted the viewport, was placed below it, and hung off the bottom by that much -- with
+			// the overflow OUTSIDE the scrolling body, where no finger can reach it.
+			//
+			// That is Tom's report of 2026-08-27, twice: *"it doesn't scroll."* The body was
+			// scrolling the whole time; there was simply more panel than screen below it.
+			if (top > at.top) { capPanelToRoomBelow(panel, top); }
+		}
+		panel.style.top = top + 'px';
 		return at;
 	}
 	// For the panels that are NOT hung off a control -- the property popup (opened at a point on the

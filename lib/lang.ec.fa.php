@@ -668,7 +668,6 @@ $ec_lang['lpn_storage_too_new']='این پروژه با نسخه جدیدتری 
 $ec_lang['lpn_tool_file']='فایل';
 $ec_lang['lpn_menu_edit']='ویرایش';
 $ec_lang['lpn_menu_insert']='درج';
-$ec_lang['lpn_menu_view']='نما';
 $ec_lang['lpn_menu_settings']='تنظیمات';
 $ec_lang['lpn_menu_help']='راهنما';
 $ec_lang['lpn_help_walkthroughs']='راهنماهای گام‌به‌گام';

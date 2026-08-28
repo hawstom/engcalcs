@@ -656,7 +656,6 @@ $ec_lang['lpn_storage_too_new']='ဤပရောဂျက်ကို စာမ�
 $ec_lang['lpn_tool_file']='ဖိုင်';
 $ec_lang['lpn_menu_edit']='တည်းဖြတ်ရန်';
 $ec_lang['lpn_menu_insert']='ထည့်သွင်းရန်';
-$ec_lang['lpn_menu_view']='ကြည့်ရှုရန်';
 $ec_lang['lpn_menu_settings']='ဆက်တင်များ';
 $ec_lang['lpn_menu_help']='အကူအညီ';
 $ec_lang['lpn_help_walkthroughs']='လမ်းညွှန်များ';

@@ -656,7 +656,6 @@ $ec_lang['lpn_storage_too_new']='Tento projekt byl uložen novější verzí str
 $ec_lang['lpn_tool_file']='Soubor';
 $ec_lang['lpn_menu_edit']='Úpravy';
 $ec_lang['lpn_menu_insert']='Vložit';
-$ec_lang['lpn_menu_view']='Zobrazení';
 $ec_lang['lpn_menu_settings']='Nastavení';
 $ec_lang['lpn_menu_help']='Nápověda';
 $ec_lang['lpn_help_walkthroughs']='Návody';

@@ -656,7 +656,6 @@ $ec_lang['lpn_storage_too_new']='Questo progetto è stato salvato da una version
 $ec_lang['lpn_tool_file']='File';
 $ec_lang['lpn_menu_edit']='Modifica';
 $ec_lang['lpn_menu_insert']='Inserisci';
-$ec_lang['lpn_menu_view']='Visualizza';
 $ec_lang['lpn_menu_settings']='Impostazioni';
 $ec_lang['lpn_menu_help']='Guida';
 $ec_lang['lpn_help_walkthroughs']='Esercitazioni';

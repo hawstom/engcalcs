@@ -656,7 +656,6 @@ $ec_lang['lpn_storage_too_new']='Цей проєкт був збережений
 $ec_lang['lpn_tool_file']='Файл';
 $ec_lang['lpn_menu_edit']='Правка';
 $ec_lang['lpn_menu_insert']='Вставка';
-$ec_lang['lpn_menu_view']='Вигляд';
 $ec_lang['lpn_menu_settings']='Налаштування';
 $ec_lang['lpn_menu_help']='Довідка';
 $ec_lang['lpn_help_walkthroughs']='Покрокові посібники';

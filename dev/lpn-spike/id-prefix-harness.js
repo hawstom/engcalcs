@@ -182,11 +182,11 @@ answer = true;
 		while ((m = rx.exec(chunk))) { if (WANT.indexOf(m[1]) >= 0 && out.indexOf(m[1]) < 0) { out.push(m[1]); } }
 		return out;
 	}
-	const menu = orderIn('function openInsertMenu', "icon: '([a-z]+)'");
+	const menu = orderIn('function insertAssetRows', "icon: '([a-z]+)'");
 	const toolbar = orderIn("addGroup.dataset.edits", "mode: 'add-([a-z]+)'");
 	// The prefix rows name their type through the reused Add-tool label key, not through an icon.
 	const prefixes = orderIn("// ---- ID prefixes ----", "lpn_tool_add_([a-z]+)");
-	ok('the Insert menu is in the agreed order: ' + WANT.join(', '),
+	ok('the Insert submenu is in the agreed order: ' + WANT.join(', '),
 		menu.join(',') === WANT.join(','), menu.join(','));
 	ok('the toolbar matches it', toolbar.join(',') === WANT.join(','), toolbar.join(','));
 	ok('and so do the ID-prefix rows in Settings', prefixes.join(',') === WANT.join(','),

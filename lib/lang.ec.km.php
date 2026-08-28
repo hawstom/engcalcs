@@ -622,7 +622,6 @@ $ec_lang['lpn_storage_too_new']='គម្រោងនេះត្រូវប�
 $ec_lang['lpn_tool_file']='ឯកសារ';
 $ec_lang['lpn_menu_edit']='កែសម្រួល';
 $ec_lang['lpn_menu_insert']='បញ្ចូល';
-$ec_lang['lpn_menu_view']='ទិដ្ឋភាព';
 $ec_lang['lpn_menu_settings']='ការកំណត់';
 $ec_lang['lpn_menu_help']='ជំនួយ';
 $ec_lang['lpn_help_walkthroughs']='មគ្គុទ្ទេសក៍';

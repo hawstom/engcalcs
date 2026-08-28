@@ -668,7 +668,6 @@ $ec_lang['lpn_storage_too_new']='Acest proiect a fost salvat de o versiune mai n
 $ec_lang['lpn_tool_file']='Fișier';
 $ec_lang['lpn_menu_edit']='Editare';
 $ec_lang['lpn_menu_insert']='Inserare';
-$ec_lang['lpn_menu_view']='Vizualizare';
 $ec_lang['lpn_menu_settings']='Setări';
 $ec_lang['lpn_menu_help']='Ajutor';
 $ec_lang['lpn_help_walkthroughs']='Tutoriale';

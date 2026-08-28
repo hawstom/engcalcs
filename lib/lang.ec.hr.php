@@ -656,7 +656,6 @@ $ec_lang['lpn_storage_too_new']='Ovaj projekt spremljen je novijom verzijom stra
 $ec_lang['lpn_tool_file']='Datoteka';
 $ec_lang['lpn_menu_edit']='Uredi';
 $ec_lang['lpn_menu_insert']='Umetni';
-$ec_lang['lpn_menu_view']='Prikaz';
 $ec_lang['lpn_menu_settings']='Postavke';
 $ec_lang['lpn_menu_help']='Pomoć';
 $ec_lang['lpn_help_walkthroughs']='Vodiči';

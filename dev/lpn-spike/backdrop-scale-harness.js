@@ -218,9 +218,14 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 	freshBackdrop();
 	report(backdropRows().filter(r => !r.heading).every(r => !r.disabled), 'all five enable once an image is present');
 
-	// ONE definition, two doors. A second literal list is how the toolbar and the Insert menu drifted
-	// apart before, and it is invisible until somebody opens both and compares.
-	report(/\.concat\(backdropRows\(true\)\)/.test(src), 'the Insert menu reuses backdropRows() rather than restating it');
+	// ONE definition, whatever menu it hangs from. A second literal list is how the toolbar and the
+	// menu drifted apart before, and it is invisible until somebody opens both and compares.
+	//
+	// **THE DOOR MOVED 2026-08-27**: Insert was deleted and the background image went to Map, as a
+	// submenu (Tom, Task 543). What is asserted is the reuse, not the address -- the address is a
+	// naming decision and this file has no business pinning one.
+	report(/submenu: function \(\) \{ return backdropRows\(false\); \}/.test(src),
+		'the menu that carries it reuses backdropRows() rather than restating it');
 	report((src.match(/lpn_backdrop_scale_entry \|\|/g) || []).length === 1,
 		'each backdrop label has exactly one call site', (src.match(/lpn_backdrop_scale_entry \|\|/g) || []).length);
 	// The toolbar control is a BUTTON now; a <select> is as wide as its widest option, which is what

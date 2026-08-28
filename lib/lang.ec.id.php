@@ -627,7 +627,6 @@ $ec_lang['lpn_storage_too_new']='Proyek ini disimpan oleh versi halaman yang leb
 $ec_lang['lpn_tool_file']='Berkas';
 $ec_lang['lpn_menu_edit']='Edit';
 $ec_lang['lpn_menu_insert']='Sisipkan';
-$ec_lang['lpn_menu_view']='Tampilan';
 $ec_lang['lpn_menu_settings']='Pengaturan';
 $ec_lang['lpn_menu_help']='Bantuan';
 $ec_lang['lpn_help_walkthroughs']='Tutorial';

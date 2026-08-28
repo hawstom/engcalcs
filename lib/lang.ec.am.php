@@ -656,7 +656,6 @@ $ec_lang['lpn_storage_too_new']='ይህ ፕሮጀክት በገጹ አዲስ እ�
 $ec_lang['lpn_tool_file']='ፋይል';
 $ec_lang['lpn_menu_edit']='አርትዕ';
 $ec_lang['lpn_menu_insert']='አስገባ';
-$ec_lang['lpn_menu_view']='ዕይታ';
 $ec_lang['lpn_menu_settings']='ቅንብሮች';
 $ec_lang['lpn_menu_help']='እገዛ';
 $ec_lang['lpn_help_walkthroughs']='ደረጃ በደረጃ መመሪያ';

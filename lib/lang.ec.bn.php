@@ -622,7 +622,6 @@ $ec_lang['lpn_storage_too_new']='এই প্রকল্পটি পৃষ্
 $ec_lang['lpn_tool_file']='ফাইল';
 $ec_lang['lpn_menu_edit']='সম্পাদনা';
 $ec_lang['lpn_menu_insert']='সন্নিবেশ';
-$ec_lang['lpn_menu_view']='দৃশ্য';
 $ec_lang['lpn_menu_settings']='সেটিংস';
 $ec_lang['lpn_menu_help']='সহায়তা';
 $ec_lang['lpn_help_walkthroughs']='ধাপে ধাপে নির্দেশিকা';

@@ -156,6 +156,7 @@ run_check "stale claim selftest"         blocking php dev/scripts/stale_claim_se
 # also proves every ID a feature cites is genuinely closed -- so the list cannot claim something
 # that never shipped, and cannot go quietly stale after somebody edits the source.
 run_check "features list fresh"          blocking php dev/scripts/generate_features.php --check
+run_check "new english keys listed"     blocking php dev/scripts/new_english_keys.php --check
 
 # --- lpn solver and editor --------------------------------------------------------------------
 # Count derived, not typed: the label said "(12)" while 15 scripts were running, because

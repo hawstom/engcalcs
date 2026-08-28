@@ -673,7 +673,6 @@ $ec_lang['lpn_storage_too_new']='Este proyecto fue guardado por una versión má
 $ec_lang['lpn_tool_file']='Archivo';
 $ec_lang['lpn_menu_edit']='Editar';
 $ec_lang['lpn_menu_insert']='Insertar';
-$ec_lang['lpn_menu_view']='Ver';
 $ec_lang['lpn_color_node_field']='Colorear nodos por';
 $ec_lang['lpn_color_link_field']='Colorear tuberías por';
 $ec_lang['lpn_color_ramp_sequential']='Secuencial';

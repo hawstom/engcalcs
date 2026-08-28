@@ -57,7 +57,8 @@ var CHROME_FLOOR = 0;
 function chromeFloor() { return CHROME_FLOOR; }
 eval(`var POPUP_EDGE = ${EDGE};\n` + [
 	extract('panelPlacement'), extract('capPanelHeight'), extract('resetPanelHeight'),
-	extract('panelBody'), extract('openPanelAtAnchor'), extract('fitPanelToViewport')
+	extract('panelBody'), extract('openPanelAtAnchor'), extract('fitPanelToViewport'),
+	extract('capPanelToRoomBelow')
 ].join('\n'));
 
 // bodyH: how tall the body WANTS to be. chrome: everything else in the panel, which a cap never
@@ -201,6 +202,37 @@ console.log('\n-- a panel with no .lpn-popover-body scrolls itself (the menus) -
 	report(p.style.overflowY === 'auto', 'the panel takes the scrollbar itself');
 	report(px(p.style.maxHeight) > 0 && p.getBoundingClientRect().height <= 400 - EDGE,
 		'and is capped to the room it has', p.style.maxHeight);
+}
+
+console.log('\n-- A PANEL LIFTED CLEAR OF THE CHROME IS RE-CAPPED FOR WHERE IT LANDED --');
+{
+	// **THE DEFECT TOM REPORTED TWICE AS "it doesn't scroll".** A panel with a top band is placed at
+	// its anchor's bottom edge and THEN lifted to clear the whole chrome. panelPlacement() measured
+	// the room below the ANCHOR, so after the lift the cap was short by exactly the height of the
+	// chrome: the panel fitted the viewport, was placed below it, and hung off the bottom by that
+	// much. The body scrolled the whole time; the missing part was outside it.
+	window.innerHeight = 800;
+	CHROME_FLOOR = 300;                       // a phone: menu bar, toolbar, tab strip
+	const anchor = rect(20, 60, 90, 28);      // a toolbar button, well above that floor
+	const p = fakePanel(240, 900, 40, true, true);   // taller than the screen, and it has a band
+	openPanelAtAnchor(p, anchor);
+	report(px(p.style.top) === 300, 'the panel is lifted clear of the chrome', p.style.top);
+	const bottom = px(p.style.top) + p.getBoundingClientRect().height;
+	report(bottom <= 800 - EDGE,
+		'...and its bottom is on the screen, not one chrome-height past it',
+		'bottom ' + bottom + ' of ' + window.innerHeight);
+	// The overflow has to land INSIDE the scrolling body, or capping the panel just clips it.
+	report(px(p._body.style.maxHeight) > 0,
+		'...with the overflow inside the scrolling body, where a finger can reach it',
+		p._body.style.maxHeight);
+	// A panel that already fitted must not be capped for nothing -- that would pin a height and stop
+	// Settings growing back when its sections are collapsed.
+	const small = fakePanel(240, 200, 40, true, true);
+	openPanelAtAnchor(small, anchor);
+	report(!small._body.style.maxHeight,
+		'a panel that already fits is not pinned to a height it did not need',
+		JSON.stringify(small._body.style.maxHeight));
+	CHROME_FLOOR = 0;
 }
 
 console.log('\n-- A FLY-OUT OPENS BESIDE THE ROW THAT OPENED IT, LEVEL WITH IT --');

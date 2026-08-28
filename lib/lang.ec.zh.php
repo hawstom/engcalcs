@@ -656,7 +656,6 @@ $ec_lang['lpn_storage_too_new']='该项目由更新版本的页面保存，此�
 $ec_lang['lpn_tool_file']='文件';
 $ec_lang['lpn_menu_edit']='编辑';
 $ec_lang['lpn_menu_insert']='插入';
-$ec_lang['lpn_menu_view']='视图';
 $ec_lang['lpn_menu_settings']='设置';
 $ec_lang['lpn_menu_help']='帮助';
 $ec_lang['lpn_help_walkthroughs']='教程';

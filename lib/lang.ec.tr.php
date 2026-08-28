@@ -668,7 +668,6 @@ $ec_lang['lpn_storage_too_new']='Bu proje, sayfanın daha yeni bir sürümüyle 
 $ec_lang['lpn_tool_file']='Dosya';
 $ec_lang['lpn_menu_edit']='Düzen';
 $ec_lang['lpn_menu_insert']='Ekle';
-$ec_lang['lpn_menu_view']='Görünüm';
 $ec_lang['lpn_menu_settings']='Ayarlar';
 $ec_lang['lpn_menu_help']='Yardım';
 $ec_lang['lpn_help_walkthroughs']='Rehberler';

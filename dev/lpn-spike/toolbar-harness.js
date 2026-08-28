@@ -73,7 +73,10 @@ console.log('--- the toolbar holds the commands you use every few minutes ---');
 	ok('...and so has Background image', !/lpn_backdrop_menu/.test(bar));
 	// Both are still reachable. A command that leaves the toolbar must not leave the app.
 	ok('New project is still in the File menu', /lpn_file_new/.test(fn('openFileMenu')));
-	ok('...and Background image is still in Insert', /backdropRows\(/.test(fn('openInsertMenu')));
+	// **IT MOVED TO MAP, 2026-08-27, when the Insert menu was deleted** (Tom, Task 543): a picture
+	// behind the drawing is the map's furniture, not a water asset. The rule this asserts is
+	// unchanged -- a command that leaves the toolbar must not leave the app.
+	ok('...and Background image is still reachable, now from Map', /backdropRows\(/.test(fn('openMapMenu')));
 }
 
 console.log('\n--- the background picker is still listening, button or no button ---');

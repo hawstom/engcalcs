@@ -7,19 +7,17 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**64 open tasks.** Next (100): 7 · Soon (75): 16 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
+**61 open tasks.** Next (100): 5 · Soon (75): 15 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
 
-## 100 — Next (7)
+## 100 — Next (5)
 
 - Task 436 — What a wheel notch costs, and the placement leftovers.
-- Task 468 — Demand categories on a junction — the breakdown the importer already flattens.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
-- Task 510 — Saved paths work; the arrow that opens them is not discoverable.
 - ! Task 530 — [H] · Fire flow: what shipped answers ONE hydrant. The real question is the whole system.
 - ! Task 545 — [H] · 64 English strings are waiting on Tom's wording, and they were recorded nowhere.
 
-## 75 — Soon (16)
+## 75 — Soon (15)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -36,7 +34,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 540 — [H] · BUILT, including the parser. What stays open is WORDING.
 - Task 542 — Terrain elevations: the button did more than a curious user expected.
-- ! Task 543 — [H] · The menus are outgrowing their names: View is really Map, and Insert is really Water.
 
 ## 50 — Someday (12)
 
@@ -90,5 +87,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-55 of 64 titles are within 4–12 words. `!` marks the rest;
+53 of 61 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

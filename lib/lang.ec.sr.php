@@ -668,7 +668,6 @@ $ec_lang['lpn_storage_too_new']='Овај пројекат је сачуван �
 $ec_lang['lpn_tool_file']='Датотека';
 $ec_lang['lpn_menu_edit']='Уреди';
 $ec_lang['lpn_menu_insert']='Уметни';
-$ec_lang['lpn_menu_view']='Приказ';
 $ec_lang['lpn_menu_settings']='Подешавања';
 $ec_lang['lpn_menu_help']='Помоћ';
 $ec_lang['lpn_help_walkthroughs']='Водичи';

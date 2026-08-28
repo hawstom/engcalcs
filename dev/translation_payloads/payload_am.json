@@ -2,7 +2,7 @@
     "meta": {
         "language": "am",
         "expected_key_count": 1408,
-        "delta_key_count": 80,
+        "delta_key_count": 81,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -443,6 +443,7 @@
     },
     "keys_to_translate": {
         "lpn_field_text_attached": "Attached to",
+        "lpn_menu_map": "Map",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
         "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
@@ -483,7 +484,7 @@
         "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
-        "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
+        "lpn_profile_edit_click": "Drag any point on the path to move it. Click a point you added to take it off.",
         "lpn_profile_edit_tap": "Drag any point on the path to move it. Tap a point you added to take it off.",
         "lpn_profile_edit_nowhere": "A point on the path has to be a node. The path is unchanged.",
         "lpn_profile_saved": "Saved paths",
@@ -511,7 +512,7 @@
         "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_field_base_demand": "Base demand",
-        "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
+        "lpn_result_demand_tip": "The flow this node draws at the moment shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
         "lpn_field_demand_category": "Category",
         "lpn_field_demand_category_tip": "Name or description of the user or users using this pattern.",
         "lpn_demand_add": "Add demand category",
@@ -525,6 +526,7 @@
     },
     "keys": {
         "lpn_field_text_attached": "Attached to",
+        "lpn_menu_map": "Map",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
         "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
@@ -565,7 +567,7 @@
         "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
-        "lpn_profile_edit_say": "Drag any point on the path to move it. Click a point you added to take it off.",
+        "lpn_profile_edit_click": "Drag any point on the path to move it. Click a point you added to take it off.",
         "lpn_profile_edit_tap": "Drag any point on the path to move it. Tap a point you added to take it off.",
         "lpn_profile_edit_nowhere": "A point on the path has to be a node. The path is unchanged.",
         "lpn_profile_saved": "Saved paths",
@@ -593,7 +595,7 @@
         "lpn_settings_legend_off": "Off",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_field_base_demand": "Base demand",
-        "lpn_result_demand_tip": "The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.",
+        "lpn_result_demand_tip": "The flow this node draws at the moment shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
         "lpn_field_demand_category": "Category",
         "lpn_field_demand_category_tip": "Name or description of the user or users using this pattern.",
         "lpn_demand_add": "Add demand category",
@@ -619,6 +621,22 @@
                     "key": "lpn_field_elev",
                     "value": "ከፍታ",
                     "english": "Elevation"
+                }
+            }
+        },
+        "lpn_menu_map": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_insert",
+                    "value": "አስገባ",
+                    "english": "Insert"
+                },
+                "next_translated": {
+                    "key": "lpn_basemap_show",
+                    "value": "የመንገድ ካርታ አሳይ",
+                    "english": "Show street map"
                 }
             }
         },
@@ -1262,7 +1280,7 @@
                 }
             }
         },
-        "lpn_profile_edit_say": {
+        "lpn_profile_edit_click": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

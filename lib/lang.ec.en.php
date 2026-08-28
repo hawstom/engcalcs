@@ -1343,7 +1343,18 @@ $ec_lang['lpn_storage_too_new']='This project was saved by a newer version of th
 $ec_lang['lpn_tool_file']='File';
 $ec_lang['lpn_menu_edit']='Edit';
 $ec_lang['lpn_menu_insert']='Insert';
-$ec_lang['lpn_menu_view']='View';
+// **VIEW BECAME MAP** (Tom, 2026-08-27). He had found the terrain-elevation row filed under View
+// and said what it cost: *"our menu system is getting confusing and complicated with this under
+// View when it really has something to do with mapping, but nothing to do with view."* The menu now
+// holds the drawing's frame, the pictures behind it, where on Earth it is, and the elevations read
+// off that ground -- and only the first of those is a "view". EPANET files its own Dimensions and
+// Backdrop under View and nobody finds that strange, so this is a choice rather than a correction;
+// Map is simply more literal, and it is the word Tom picked.
+//
+// The 26 translations of this key were DELETED with the rename, not carried across: every one of
+// them was the word "View" in its own language, and a translated "View" under a key drawn as Map
+// would be the one kind of wrong a reader cannot see. Absent is the correct untranslated state.
+$ec_lang['lpn_menu_map']='Map';
 // The street map behind a geographic project (ROADMAP Task 145). Two keys rather than one, because
 // this menu has no checkmark column, so the row has to say what it will DO. "Street map" rather than
 // "basemap": a person who has never used GIS knows what a street map is.
@@ -1714,7 +1725,11 @@ $ec_lang['lpn_profile_hgl']='Hydraulic grade line';
 // keys above (`_from`, `_to`, `_through`, `_clear`) are the box's own labels again.
 $ec_lang['lpn_profile_edit']='Edit';
 $ec_lang['lpn_profile_edit_tip']='Change one end of the path, or take one node off it, without drawing the whole path again.';
-$ec_lang['lpn_profile_edit_say']='Drag any point on the path to move it. Click a point you added to take it off.';
+// **A POINTER/TOUCH PAIR, and the suffix is the VERB each one uses.** `_click` was `_say` until
+// Tom read it (2026-08-27: *"What is '_say' supposed to mean? Don't you mean '_click'?"*). He is
+// right: its twin is `_tap`, so the only thing the two names can honestly differ by is the word
+// inside them, and `_say` named nothing at all.
+$ec_lang['lpn_profile_edit_click']='Drag any point on the path to move it. Click a point you added to take it off.';
 $ec_lang['lpn_profile_edit_tap']='Drag any point on the path to move it. Tap a point you added to take it off.';
 $ec_lang['lpn_profile_edit_nowhere']='A point on the path has to be a node. The path is unchanged.';
 // ---- Task 510: paths kept in the project, by name ---------------------------------------------
@@ -2680,7 +2695,12 @@ $ec_lang['lpn_library_control_missing']='⚠ This network has nothing called {id
 // like a solver defect. 'Demand' itself stays bpn_demand -- the concept-level label reuse this page
 // already makes for it.
 $ec_lang['lpn_field_base_demand']='Base demand';
-$ec_lang['lpn_result_demand_tip']='The flow this node draws at the moment shown: the base demand multiplied by its pattern. Worked out, not typed, so it changes with the clock and cannot be edited.';
+// **REWORDED BY TOM, 2026-08-27**, for demand categories (Task 468): a junction's base demand is a
+// LIST now, so "the base demand multiplied by its pattern" was true only of a one-category
+// junction. The first sentence is his wording verbatim; the second is the one that was already
+// there and is untouched, because it says the other thing this tip exists for -- that the number
+// is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
+$ec_lang['lpn_result_demand_tip']='The flow this node draws at the moment shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.';
 $ec_lang['lpn_field_demand_pattern']='Demand pattern';
 $ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is

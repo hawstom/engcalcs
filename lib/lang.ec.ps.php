@@ -656,7 +656,6 @@ $ec_lang['lpn_storage_too_new']='دا پروژه د پاڼې د یوې نوې ب
 $ec_lang['lpn_tool_file']='فایل';
 $ec_lang['lpn_menu_edit']='سمون';
 $ec_lang['lpn_menu_insert']='ننویستل';
-$ec_lang['lpn_menu_view']='لیدنه';
 $ec_lang['lpn_menu_settings']='تنظیمات';
 $ec_lang['lpn_menu_help']='مرسته';
 $ec_lang['lpn_help_walkthroughs']='لارښودونه';
