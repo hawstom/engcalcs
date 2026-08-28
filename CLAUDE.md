@@ -487,7 +487,7 @@ own failure; this table is an index, not a duplicate of that text.
 |---|---|
 | php + js syntax | Every `.php`, every `js/*.js` and `js/vendor/*.js` (the vendored EPANET engine ships to visitors and was once unchecked) |
 | `html_balance_check.php` | Every page produces well-formed HTML |
-| `pageconfig_check.php` | The PHP→JS pageConfig bridge; an unsupplied key shows the visitor "undefined" |
+| `pageconfig_check.php` + selftest | The PHP→JS pageConfig bridge; an unsupplied key shows the visitor "undefined". **Reads ALIASES since 2026-08-28** (`var pc = EngCalcs.pageConfig`) — before that it saw only the literal form, so `js/looped-network.js` and its 838 keys were invisible to it and it reported OK while a key translated into 26 languages reached no screen |
 | `tip_markup_check.php` | `.ec-help`/`.ec-tip` built by the helpers, not by hand |
 | `browser_lang_tag_check.php` | A stray tab in visitor text cannot forge a log row |
 | `sw_manifest_check.php` | The service worker precaches the URLs pages actually request (`?v=<filemtime>`). 22 of 25 entries were once unreachable and the offline promise was simply false |

@@ -82,6 +82,12 @@ run_check "html balance (every page)"    blocking php dev/scripts/html_balance_c
 # the visitor "undefined", and the wrong .ec-help nesting gives touch users a one-character tap
 # target. Neither is visible to the person who introduced it.
 run_check "pageConfig php->js bridge"    blocking php dev/scripts/pageconfig_check.php
+# Task 322. The check above matched only the literal `pageConfig.<key>` until 2026-08-28, and
+# js/looped-network.js reads all 838 of its strings through `var pc = EngCalcs.pageConfig` -- so the
+# biggest page in the suite was the one it could not see, and it reported OK while a key translated
+# into 26 languages reached no screen. The selftest pins the alias shapes it must find AND the ones
+# it must not take for a key: this check BLOCKS, so a false positive stops a commit.
+run_check "pageConfig selftest"          blocking php dev/scripts/pageconfig_selftest.php
 run_check "tip markup via helpers"       blocking php dev/scripts/tip_markup_check.php
 # Task 478. Tabbing down a calculator walked sideways through thirty one-character "X" links --
 # 35-43% of every keyboard stop on the worst pages, with no keyboard way to bring a line back. This

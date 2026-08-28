@@ -801,7 +801,14 @@ the block.
     `js/looped-network.js` reads every one of its 838 strings through the one-letter alias `pc` —
     **so the entire `lpn_` page is invisible to the check that exists to guard it.** Diffing
     `pc.<key>` against the block by hand found `lpn_labels_col_drop`: translated into all 26
-    languages, never wired, English on every screen. One `pc` alias is ~20 lines of check.
+    languages, never wired, English on every screen. **FIXED THE SAME DAY:** the check reads alias
+    declarations now (`= EngCalcs.pageConfig` whose next non-space character is not a dot) and
+    `<alias>.<lower_snake_key>` reads. **Its coverage went 107 reads → 743.** The key SHAPE is the
+    false-positive defence, and it is load-bearing because this check BLOCKS: an alias's ordinary
+    properties have no underscore and every declared key has one. `pageconfig_selftest.php` pins
+    both directions, including the shape a first draft got wrong (`el.textContent =
+    EngCalcs.pageConfig.x` is a READ, not an alias named `textContent`), and the real defect was
+    re-introduced to prove the check catches it.
   - **AND ITS MIRROR, SAME DAY: A DEAD READER HIDES A DEAD KEY.** `key_hygiene_check.php` reports a
     key "rendered by nothing" by looking for a reference to it. Task 542 deleted the terrain menu
     ROW but left `EC.lpnTerrainMenuLabel()` and `EC.lpnTerrainMenuTip()` — which read
