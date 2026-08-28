@@ -551,9 +551,15 @@ echoHeader("EngCalcs", $html_title, "", false);
 	<?php // The padded band at the top is the DRAG SURFACE, exactly as on #lpn_popup: `e.target` is
 	      // the panel itself there and a child everywhere else, so a drag can never start on a
 	      // control. That is why the padding is 40px on top and 8px elsewhere. ?>
+	<?php // **THE TITLE LIVES IN THE DRAG BAND** (Tom, 2026-08-27: *"Maybe the draggable title area of
+	      // the box can hold the title 'Find and replace'"*). It was a bold line inside the body,
+	      // which spent one of the few lines a phone has on a word the band above it had room for and
+	      // nothing in. Same treatment, same class and the same `pointer-events: none` as the Settings
+	      // box's own title: the band has to stay a drag surface, and a title that swallowed the
+	      // pointer would take the one place this box can be picked up by. ?>
+	<div id="lpn_find_boxtitle" class="lpn-setbox-title"><?=$ec_lang['lpn_find_title']?></div>
 	<button type="button" id="lpn_find_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
-	<div style="font-weight:bold"><?=$ec_lang['lpn_find_title']?></div>
 	<div id="lpn_find_form"></div>
 	<div id="lpn_find_results"></div>
 	</div>

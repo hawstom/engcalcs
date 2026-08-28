@@ -813,6 +813,15 @@ html[lang="zh"] .ec-welcome {
    overstates the room actually available. */
 .lpn-popover { box-sizing: border-box; max-width: calc(100vw - 8px); max-height: calc(100vh - 8px); }
 .lpn-popover-body { overflow: auto; max-height: calc(100vh - 56px); }
+/* **PROPERTY AND CONDITION SHARE ONE LINE** (Tom, 2026-08-27, of the Find box on a phone). Two
+   halves of one phrase -- "Diameter / greater than" -- each narrower than the sentence it belongs
+   to, so pairing them costs nothing and buys back a whole line where lines are scarcest.
+   `min-width: 0` is the load-bearing half: without it a flex item refuses to shrink below its
+   content, and a long condition ("no open path to a source") would push the box wider than the
+   phone instead of ellipsizing inside it. */
+.lpn-find-pair { display: flex; gap: 8px; align-items: flex-end; }
+.lpn-find-pair > div { flex: 1 1 0; min-width: 0; }
+.lpn-find-pair select { max-width: 100%; }
 /* The Find panel's query line (ROADMAP Task 540): the three pull-downs written out as one
    sentence, directly above the Find button -- and, since phase 2, the input that writes them back.
    Monospaced, because it is a query and its brackets and quotes have to be countable. Full width of

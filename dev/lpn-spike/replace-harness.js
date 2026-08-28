@@ -63,6 +63,16 @@ const L = loadLoopedNetwork(
 	// The form, so the sentences a user reads are exercised rather than assumed.
 	"\t\tbuildForm: rebuildFindForm,\n" +
 	"\t\tmessage: function () { return replaceMsgBox ? replaceMsgBox.textContent : null; },\n" +
+	// The Replace heading, and the tip that lives on it since Task 477's phone pass. Read off the
+	// real element rather than off the lang key, so a heading that stopped carrying its "?" fails.
+	"\t\theadingText: function () { var h = null;\n" +
+	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
+	"\t\t\t\tif (!h && c.style && c.style.fontWeight === 'bold') { h = c; } walk(c); }); })(document.getElementById('lpn_find_form'));\n" +
+	"\t\t\treturn h ? h.textContent : null; },\n" +
+	"\t\theadingTip: function () { var h = null;\n" +
+	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
+	"\t\t\t\tif (!h && c.className === 'ec-help' && c.title) { h = c; } walk(c); }); })(document.getElementById('lpn_find_form'));\n" +
+	"\t\t\treturn h ? h.title : null; },\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
 	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 };\n" +
@@ -284,12 +294,27 @@ function nodeOf(id) { return L.getDoc().nodes.filter(n => n.id === id)[0]; }
 	// property change goes through.
 	L.buildForm();
 	ok('rebuilding the form drops the pending set', L.pending() === null);
-	// The mixed scope says the one thing there is to do about it rather than making the section
-	// disappear, which would read as a feature that comes and goes.
+	// **THE MIXED SCOPE STILL EXPLAINS ITSELF -- AS A "?" ON THE HEADING, NOT AS A SENTENCE**
+	// (Tom, 2026-08-27, of the box on a phone). It was two wrapped lines at the narrowest width this
+	// page has, saying a thing worth reading once. What must NOT happen is the section vanishing:
+	// that reads as a feature that comes and goes, and it is why the tip moved rather than being
+	// deleted.
 	L.query('all', 'id', 'contains', '');
 	L.buildForm();
-	ok('the all-elements scope explains itself instead of vanishing',
-		(L.message() || '').length > 0, JSON.stringify(L.message()));
+	ok('the all-elements scope no longer spends two lines of the box on a sentence',
+		(L.message() || '') === '', JSON.stringify(L.message()));
+	ok('...but the section is still there, with its heading',
+		(L.headingText() || '').length > 0, JSON.stringify(L.headingText()));
+	ok('...and the explanation is on it, reachable as a "?" tip',
+		/one kind/i.test(L.headingTip() || ''), JSON.stringify(L.headingTip()));
+	ok('...with the glyph a person can actually see and tap',
+		L.headingText().indexOf('?') >= 0, JSON.stringify(L.headingText()));
+	// And it goes away once the question has been answered: a permanent "choose one kind of asset"
+	// on a box where one is already chosen is a "?" answering a question nobody is in.
+	L.query('pipe', 'diameter', 'equals', '6');
+	L.buildForm();
+	ok('choosing a kind of asset takes the "?" away again',
+		!L.headingTip() && L.headingText().indexOf('?') < 0, JSON.stringify(L.headingText()));
 	L.query('pipe', 'diameter', 'equals', '6');
 	L.setReplace('diameter', '8');
 	L.preview();

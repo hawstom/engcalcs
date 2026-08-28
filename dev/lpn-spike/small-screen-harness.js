@@ -1083,6 +1083,57 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 }
 }
 
+// ---- 12. THE FIND BOX ON A PHONE (ROADMAP Task 549) --------------------------------------------
+//
+// Tom, 2026-08-27, four asks in one sentence: *"Maybe we could compact the find box somehow for
+// phone. Maybe Property and Condition selectors can be on the same line. Maybe the draggable title
+// area of the box can hold the title 'Find and replace'. Maybe the tip 'Choose one kind of asset
+// above to change values on' can be made into a question mark tip. And of course the box needs to be
+// scrollable to reach all possible found results."*
+//
+// **THREE OF THE FOUR ARE ASSERTED WHERE THEY LIVE, NOT HERE.** The "?" tip is behaviour and belongs
+// with the Replace form (`dev/lpn-spike/replace-harness.js`); the pairing is exercised by the Find
+// harness building the real form. What is left for this file is the part that is only true at 360px
+// -- that the rules which make the pairing survive a narrow box are actually in the stylesheet, and
+// that the title moved out of the body and into the band.
+{
+	console.log('\n--- the Find box, compacted for a phone ---');
+	const css = fs.readFileSync(CSS_PATH, 'utf8');
+	const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+	// **`min-width: 0` IS THE LOAD-BEARING HALF AND IT IS INVISIBLE.** A flex item refuses by default
+	// to shrink below its content, so without it a long condition -- "no open path to a source" --
+	// pushes the pair wider than the phone and the box overflows instead of the select ellipsizing.
+	// A pairing that looks right on a desktop and breaks the box on a phone is exactly the defect
+	// this file exists for.
+	ok('the Property/Condition pair is a flex row',
+		/\.lpn-find-pair \{[^}]*display: flex/.test(css));
+	ok('...whose items may shrink below their content, or a long condition widens the whole box',
+		/\.lpn-find-pair > div \{[^}]*min-width: 0/.test(css));
+	// The title is in the DRAG BAND now -- the 40px of padding at the top, which is the only part of
+	// the box where `e.target` is the box itself and therefore the only part that drags. It reuses
+	// the Settings box's own title class, whose `pointer-events: none` is what keeps that true.
+	ok('the box carries its title in the drag band, not as a line of the body',
+		/id="lpn_find_boxtitle" class="lpn-setbox-title"/.test(php));
+	ok('...and the body no longer spends a line on the same word',
+		!/lpn-popover-body">\s*<div style="font-weight:bold"><\?=\$ec_lang\['lpn_find_title'\]/.test(php));
+	ok('...and the band it sits in cannot swallow the drag',
+		/\.lpn-setbox-title \{[^}]*pointer-events: none/.test(css));
+	// **SCROLLABLE MEANS CAPPED TO THE ROOM BELOW WHERE IT LANDS, not to the viewport.** The body
+	// always scrolled; the box was taller than the screen because it was fitted to the window and
+	// then pushed down past the chrome, so the missing part was below the fold rather than below a
+	// scrollbar. Both branches that place it without an anchor now cap against their own top.
+	const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+	const toggle = src.substring(src.indexOf('function toggleFindPopup'),
+		src.indexOf('function wireFindPopup'));
+	ok('the remembered-position branch caps the box to the room below it',
+		(toggle.match(/capPanelToRoomBelow\(popup, /g) || []).length === 2,
+		(toggle.match(/capPanelToRoomBelow/g) || []).length + ' call(s)');
+	ok('...and the cap puts the overflow inside the scrolling body, not on the box',
+		/function capPanelToRoomBelow[\s\S]*?capPanelHeight\(panel, body,/.test(src));
+	ok('...which is the wrapper the stylesheet actually scrolls',
+		/\.lpn-popover-body \{ overflow: auto/.test(css));
+}
+
 // The reader's blind-spot report, scoped to selectors that could possibly reach what this file
 // checks. A rule about print sheets or curve tables is none of this check's business.
 {

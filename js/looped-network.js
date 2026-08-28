@@ -8361,7 +8361,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function findControlsShown() { return !findQueryAst && !findQueryError; }
 	function renderFindControls() {
-		var pc = EngCalcs.pageConfig || {}, box = findControlsBox, note, back, valWrap, valLab, input;
+		var pc = EngCalcs.pageConfig || {}, box = findControlsBox, note, back, valWrap, valLab, input, pair;
 		if (!box) { return; }
 		box.innerHTML = '';
 		if (!findControlsShown()) {
@@ -8389,12 +8389,22 @@ var EngCalcs = EngCalcs || {};
 			findNormalize();
 			rebuildFindForm(); renderFindResults(null);
 		});
-		findSelect(box, pc.lpn_find_property || 'Property', findPropDefs(), findState.prop, function (v) {
+		// **PROPERTY AND CONDITION SHARE ONE LINE** (Tom, 2026-08-27, of the box on a phone). They are
+		// the pair that reads as one phrase -- "Diameter / greater than" -- and each is half as wide
+		// as the sentence it belongs to, so side by side costs nothing and buys back a whole line on
+		// the screen with the fewest of them. NOT behind the 640px breakpoint: this box is 22rem
+		// wide at every size, so the pair fits everywhere and one layout is one thing to keep right.
+		// A long condition ellipsizes rather than wrapping the box, and the query line under it
+		// spells the whole thing out in words either way.
+		pair = document.createElement('div');
+		pair.className = 'lpn-find-pair';
+		box.appendChild(pair);
+		findSelect(pair, pc.lpn_find_property || 'Property', findPropDefs(), findState.prop, function (v) {
 			findState.prop = v;
 			findNormalize();
 			rebuildFindForm(); renderFindResults(null);
 		});
-		findSelect(box, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
+		findSelect(pair, pc.lpn_find_condition || 'Condition', findOpDefs(), findState.op, function (v) {
 			findState.op = v; updateFindQuery(); renderFindResults(null);
 		});
 		valWrap = document.createElement('div');
@@ -8803,16 +8813,26 @@ var EngCalcs = EngCalcs || {};
 		head = document.createElement('div');
 		head.style.margin = '10px 0 2px';
 		head.style.fontWeight = 'bold';
-		head.textContent = pc.lpn_replace_title || 'Change what was found';
-		box.appendChild(head);
 		specs = replaceSpecs();
+		// **THE "CHOOSE ONE KIND OF ASSET" LINE IS A `?` NOW, NOT A SENTENCE IN THE BOX** (Tom,
+		// 2026-08-27, of the box on a phone: *"the tip ... can be made into a question mark tip"*).
+		// It was two full lines of wrapped text at the narrowest width this page has, saying a thing
+		// that is only worth reading once.
+		//
+		// **THE GLYPH APPEARS EXACTLY WHEN THE SENTENCE WOULD HAVE.** A permanent tip on this
+		// heading would still be offering "choose one kind of asset" to somebody who has already
+		// chosen one, which is a "?" that answers a question nobody is in. Still SAID rather than
+		// hidden -- a Replace section that vanished under "Everything" would read as a feature that
+		// comes and goes, and the heading with its "?" is the section still being there.
+		setFieldLabel(head, pc.lpn_replace_title || 'Change what was found',
+			specs.length ? '' : (pc.lpn_replace_scope || 'Choose one kind of element to change.'));
+		box.appendChild(head);
+		tipsIn(head);
 		msg = document.createElement('div');
 		replaceMsgBox = msg;
 		if (!specs.length) {
-			// Said, not hidden: a Replace section that vanishes under "Everything" reads as a
-			// feature that comes and goes. One sentence names the one thing to do about it.
 			box.appendChild(msg);
-			renderReplace(pc.lpn_replace_scope || 'Choose one kind of element to change.');
+			renderReplace(null);
 			return;
 		}
 		findSelect(box, pc.lpn_replace_prop || 'Set', specs.map(function (s) { return [s.field, s.label]; }),
@@ -8865,7 +8885,7 @@ var EngCalcs = EngCalcs || {};
 	// already open re-runs nothing and hides nothing -- it just brings the box back to attention,
 	// which is what every editor's Find command does.
 	function toggleFindPopup(anchorEl) {
-		var popup = document.getElementById('lpn_find_popup'), input, at, h, r;
+		var popup = document.getElementById('lpn_find_popup'), input, at, h, r, top;
 		if (!popup) { return; }
 		closeMenu();
 		rebuildFindForm();
@@ -8873,9 +8893,15 @@ var EngCalcs = EngCalcs || {};
 		if (findUserPos) {
 			// Re-clamped rather than restored blindly: the window may have been resized smaller
 			// since, and a box remembered off-screen is a box that never comes back.
+			//
+			// **CAPPED BEFORE IT IS MEASURED, or the clamp works from a height the box will not
+			// have.** The top comes first because the cap depends on it: how much room there is
+			// below is a fact about where the box is going, not about the window.
 			popup.style.display = 'block';
+			top = Math.max(chromeFloor(), findUserPos.top);
+			capPanelToRoomBelow(popup, top);
 			r = popup.getBoundingClientRect();
-			at = clampPanel(findUserPos.left, findUserPos.top, r.width, r.height,
+			at = clampPanel(findUserPos.left, top, r.width, r.height,
 				window.innerWidth, window.innerHeight, chromeFloor());
 			popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
 		} else if (anchorEl && anchorEl.getBoundingClientRect) {
@@ -8884,7 +8910,11 @@ var EngCalcs = EngCalcs || {};
 			popup.style.display = 'block';
 			h = fitPanelToViewport(popup); r = popup.getBoundingClientRect();
 			popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
-			popup.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+			top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
+			// Centring can only ever move the box DOWN once the chrome floor bites, so the height it
+			// was fitted to is no longer the height that fits.
+			capPanelToRoomBelow(popup, top);
+			popup.style.top = top + 'px';
 		}
 		input = popup.querySelector('input[type=text]');
 		if (input) { input.focus(); input.select(); }
@@ -22323,6 +22353,27 @@ var EngCalcs = EngCalcs || {};
 	// capped one; the caller must use it rather than its own earlier measurement.
 	function fitPanelToViewport(panel) {
 		var body = panelBody(panel), avail = window.innerHeight - 2 * POPUP_EDGE, h;
+		resetPanelHeight(panel, body);
+		h = panel.getBoundingClientRect().height;
+		if (h <= avail) { return h; }
+		capPanelHeight(panel, body, avail, h);
+		return avail;
+	}
+	// **A PANEL IS CAPPED TO THE ROOM BELOW WHERE IT ACTUALLY LANDS, not to the whole viewport.**
+	//
+	// fitPanelToViewport() caps to `innerHeight - 2 * POPUP_EDGE`, which is right for a panel free to
+	// sit anywhere -- and every standing box on this page then chooses a top with `chromeFloor()` as
+	// a floor. A panel taller than the room UNDER that floor therefore fits the viewport, is placed
+	// below the chrome, and hangs off the bottom by the height of the chrome, with the last of its
+	// content unreachable. That is Tom's report of 2026-08-27: *"the box needs to be scrollable to
+	// reach all possible found results."* The body already scrolls; there was simply more box than
+	// screen, and the part that was missing was below the fold rather than below a scrollbar.
+	//
+	// Given the top the caller is about to use, this caps the panel to what is genuinely left, so the
+	// overflow lands inside `.lpn-popover-body` where a finger can reach it. Returns the height to
+	// place with -- callers must use it rather than their own earlier measurement.
+	function capPanelToRoomBelow(panel, top) {
+		var body = panelBody(panel), avail = Math.max(0, (window.innerHeight || 0) - top - POPUP_EDGE), h;
 		resetPanelHeight(panel, body);
 		h = panel.getBoundingClientRect().height;
 		if (h <= avail) { return h; }
