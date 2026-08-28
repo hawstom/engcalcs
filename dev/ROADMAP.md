@@ -903,6 +903,17 @@ the block.
   is getting confusing and complicated with this under View when it really has something to do with
   mapping, but nothing to do with view."*
   - **The cheap move he names first: rename View to Map**, *"which would work for the moment."*
+  - **[H] ASKED AGAIN 2026-08-27, of the elevation row**: *"We need to rename the View menu to the
+    Map menu if we are going to leave elevations there. Otherwise I don't know where the elevations
+    item should be. Do you find any advice?"* **The advice is that EPANET already files the map's
+    own furniture under View and nobody finds it strange.** Its View menu is Dimensions, Backdrop
+    (Load / Unload / Align / Show), Zoom In, Zoom Out, Pan, Find, Legends, Overview Map, Options —
+    so the coordinate system and the picture behind the drawing are both there, and those are the
+    two closest relatives our terrain row has. What EPANET has NO row for anywhere is reading
+    elevations from terrain; it has no such feature, so it settles where the map's furniture lives
+    and not where this row goes. **Both readings therefore survive**: leave it under View with
+    EPANET's own precedent behind it, or rename to Map, which is more literal and which he already
+    prefers. Nothing in the evidence forces the rename; nothing argues against it either.
   - **The larger one is a principle he is willing to relax:** every water asset is inserted under
     Insert, which is *"another exception to 'Everything about Water modeling is under Water'"*. His
     proposal — **let things live in two places**, with a canonical home that may be less handy than
