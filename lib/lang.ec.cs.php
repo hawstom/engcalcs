@@ -1102,7 +1102,6 @@ $ec_lang['lpn_find_count']='Nalezeno: {n}. Kliknutím na jeden z nich na něj p�
 $ec_lang['lpn_find_none']='Nic nevyhovuje.';
 $ec_lang['lpn_find_op_top']='Nejvyšších {n}';
 $ec_lang['lpn_find_op_bottom']='Nejnižších {n}';
-$ec_lang['lpn_find_adjacent']='Připojené';
 $ec_lang['lpn_find_no_value']='Napište, co hledáte.';
 $ec_lang['lpn_profile_menu']='Profil';
 $ec_lang['lpn_profile_tip']='Vykreslí terén a čáru tlakové výšky podél trasy sítí.';

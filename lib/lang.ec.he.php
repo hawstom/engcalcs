@@ -1102,7 +1102,6 @@ $ec_lang['lpn_find_count']='{n} נמצאו. לחצו על אחד כדי לעבו
 $ec_lang['lpn_find_none']='שום דבר לא תאם.';
 $ec_lang['lpn_find_op_top']='{n} הגבוהים ביותר';
 $ec_lang['lpn_find_op_bottom']='{n} הנמוכים ביותר';
-$ec_lang['lpn_find_adjacent']='מחוברים';
 $ec_lang['lpn_find_no_value']='הקלידו מה לחפש.';
 $ec_lang['lpn_profile_menu']='פרופיל';
 $ec_lang['lpn_profile_tip']='ציור פני הקרקע וקו האנרגיה ההידראולי לאורך מסלול ברשת.';

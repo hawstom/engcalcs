@@ -1104,7 +1104,6 @@ $ec_lang['lpn_find_count']='{n} ditemukan. Klik salah satu untuk menuju ke sana.
 $ec_lang['lpn_find_none']='Tidak ada yang cocok.';
 $ec_lang['lpn_find_op_top']='{n} tertinggi';
 $ec_lang['lpn_find_op_bottom']='{n} terendah';
-$ec_lang['lpn_find_adjacent']='Terhubung';
 $ec_lang['lpn_find_no_value']='Ketik apa yang dicari.';
 $ec_lang['lpn_profile_menu']='Profil';
 $ec_lang['lpn_profile_tip']='Gambarkan permukaan tanah dan garis tinggi tekan hidrolik di sepanjang rute melalui jaringan.';

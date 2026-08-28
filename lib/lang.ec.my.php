@@ -1106,7 +1106,6 @@ $ec_lang['lpn_find_count']='{n} ခု တွေ့ရှိသည်။ တစ�
 $ec_lang['lpn_find_none']='မည်သည့်အရာမျှ မကိုက်ညီပါ။';
 $ec_lang['lpn_find_op_top']='အများဆုံး {n}';
 $ec_lang['lpn_find_op_bottom']='အနည်းဆုံး {n}';
-$ec_lang['lpn_find_adjacent']='ချိတ်ဆက်ထားသည်';
 $ec_lang['lpn_find_no_value']='ရှာလိုသည်ကို ရိုက်ထည့်ပါ။';
 $ec_lang['lpn_profile_menu']='ပရိုဖိုင်း';
 $ec_lang['lpn_profile_tip']='ကွန်ရက်ကို ဖြတ်သန်းသော လမ်းကြောင်းတစ်လျှောက် မြေနှင့် HGL ကို ဆွဲပြပါ။';

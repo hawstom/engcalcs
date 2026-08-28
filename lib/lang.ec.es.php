@@ -765,7 +765,6 @@ $ec_lang['lpn_find_count']='{n} encontrados. Haga clic en uno para ir a él.';
 $ec_lang['lpn_find_none']='No hubo coincidencias.';
 $ec_lang['lpn_find_op_top']='Los {n} más altos';
 $ec_lang['lpn_find_op_bottom']='Los {n} más bajos';
-$ec_lang['lpn_find_adjacent']='Conectado';
 $ec_lang['lpn_find_no_value']='Escriba qué buscar.';
 $ec_lang['lpn_profile_menu']='Perfil';
 $ec_lang['lpn_profile_tip']='Dibuja el terreno y la línea piezométrica a lo largo de una ruta por la red.';

@@ -1108,7 +1108,6 @@ $ec_lang['lpn_find_count']='{n} मिले। किसी एक पर ज�
 $ec_lang['lpn_find_none']='कुछ भी मेल नहीं खाया।';
 $ec_lang['lpn_find_op_top']='सबसे ऊपर के {n}';
 $ec_lang['lpn_find_op_bottom']='सबसे नीचे के {n}';
-$ec_lang['lpn_find_adjacent']='जुड़े हुए';
 $ec_lang['lpn_find_no_value']='जो खोजना है वह टाइप करें।';
 $ec_lang['lpn_profile_menu']='प्रोफ़ाइल';
 $ec_lang['lpn_profile_tip']='नेटवर्क से गुज़रने वाले किसी मार्ग के साथ ज़मीन और हाइड्रॉलिक ग्रेड लाइन बनाएँ।';

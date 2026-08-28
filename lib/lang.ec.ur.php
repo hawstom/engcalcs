@@ -1114,7 +1114,6 @@ $ec_lang['lpn_find_count']='{n} ملے۔ کسی پر جانے کے لیے اس �
 $ec_lang['lpn_find_none']='کچھ بھی نہیں ملا۔';
 $ec_lang['lpn_find_op_top']='سب سے زیادہ {n}';
 $ec_lang['lpn_find_op_bottom']='سب سے کم {n}';
-$ec_lang['lpn_find_adjacent']='جڑا ہوا';
 $ec_lang['lpn_find_no_value']='تلاش کرنے کے لیے کچھ ٹائپ کریں۔';
 $ec_lang['lpn_profile_menu']='پروفائل';
 $ec_lang['lpn_profile_tip']='نیٹ ورک کے ذریعے ایک راستے کے ساتھ زمین اور ہائیڈرالک گریڈ لائن دکھائیں۔';

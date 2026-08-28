@@ -1103,7 +1103,6 @@ $ec_lang['lpn_find_count']='{n} ተገኝቷል። ወደ እሱ ለመሄድ �
 $ec_lang['lpn_find_none']='ምንም አልተገኘም።';
 $ec_lang['lpn_find_op_top']='ከፍተኛዎቹ {n}';
 $ec_lang['lpn_find_op_bottom']='ዝቅተኛዎቹ {n}';
-$ec_lang['lpn_find_adjacent']='የተገናኙ';
 $ec_lang['lpn_find_no_value']='የሚፈልጉትን ይተይቡ።';
 $ec_lang['lpn_profile_menu']='መገለጫ';
 $ec_lang['lpn_profile_tip']='በመረቡ ውስጥ በተመረጠ መንገድ ላይ የመሬቱን ገጽታና የሃይድሮሊክ ደረጃ መስመሩን (HGL) ይሳሉ።';

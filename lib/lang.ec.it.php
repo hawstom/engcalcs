@@ -1102,7 +1102,6 @@ $ec_lang['lpn_find_count']='{n} trovati. Fai clic su uno per andarci.';
 $ec_lang['lpn_find_none']='Nessuna corrispondenza.';
 $ec_lang['lpn_find_op_top']='{n} più alti';
 $ec_lang['lpn_find_op_bottom']='{n} più bassi';
-$ec_lang['lpn_find_adjacent']='Collegati';
 $ec_lang['lpn_find_no_value']='Digita che cosa cercare.';
 $ec_lang['lpn_profile_menu']='Profilo';
 $ec_lang['lpn_profile_tip']='Disegna il terreno e la linea dei carichi piezometrici lungo un percorso attraverso la rete.';

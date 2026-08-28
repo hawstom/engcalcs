@@ -1106,7 +1106,6 @@ $ec_lang['lpn_find_count']='{n}টি পাওয়া গেছে। এক�
 $ec_lang['lpn_find_none']='কিছুই মেলেনি।';
 $ec_lang['lpn_find_op_top']='সর্বোচ্চ {n}';
 $ec_lang['lpn_find_op_bottom']='সর্বনিম্ন {n}';
-$ec_lang['lpn_find_adjacent']='সংযুক্ত';
 $ec_lang['lpn_find_no_value']='কী খুঁজছেন তা লিখুন।';
 $ec_lang['lpn_profile_menu']='প্রোফাইল';
 $ec_lang['lpn_profile_tip']='নেটওয়ার্কের মধ্য দিয়ে একটি পথ ধরে ভূমি ও হাইড্রোলিক গ্রেড লাইন আঁকুন।';

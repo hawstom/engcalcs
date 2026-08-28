@@ -1258,7 +1258,7 @@ $ec_lang['lpn_ex_elm_street_desc']='A commercial site solved for fire flow on to
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
-$ec_lang['lpn_demand_tip']='Flow taken out of the network at this node. Enter a negative number for flow put into the network here.';
+$ec_lang['lpn_demand_tip']='Flows taken out of the network at this node. Enter a negative number for flow put into the network here.';
 // **THE UNITS STRIP IS TWO GROUPS** (Task 422). The first decides what the numbers in the document
 // MEAN, so changing one is a model change and the page asks first; the second is how results are
 // read, and changes with no fanfare. Three quantities appear in both because they serve both sides.
@@ -1606,7 +1606,6 @@ $ec_lang['lpn_find_op_top']='{n} highest';
 $ec_lang['lpn_find_op_bottom']='{n} lowest';
 // EPANET's Map Finder calls this "Adjacent Links". Said plainly here: the pipes, pumps and valves
 // that meet at the node you found.
-$ec_lang['lpn_find_adjacent']='Connected';
 $ec_lang['lpn_find_no_value']='Type what to look for.';
 // Task 540: the disconnected-node report. "Disconnected" is three different faults and each is
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
@@ -2702,7 +2701,7 @@ $ec_lang['lpn_field_base_demand']='Base demand';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='The flow this node draws at the moment shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.';
 $ec_lang['lpn_field_demand_pattern']='Demand pattern';
-$ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is.';
+$ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

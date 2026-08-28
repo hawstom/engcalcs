@@ -1043,7 +1043,6 @@ EngCalcs.pageConfig = {
 	lpn_find_op_top: <?=json_encode($ec_lang['lpn_find_op_top'])?>,
 	lpn_find_op_bottom: <?=json_encode($ec_lang['lpn_find_op_bottom'])?>,
 	lpn_find_none: <?=json_encode($ec_lang['lpn_find_none'])?>,
-	lpn_find_adjacent: <?=json_encode($ec_lang['lpn_find_adjacent'])?>,
 	lpn_find_no_value: <?=json_encode($ec_lang['lpn_find_no_value'])?>,
 	lpn_find_prop_connection: <?=json_encode($ec_lang['lpn_find_prop_connection'])?>,
 	lpn_find_op_conn_unlinked: <?=json_encode($ec_lang['lpn_find_op_conn_unlinked'])?>,

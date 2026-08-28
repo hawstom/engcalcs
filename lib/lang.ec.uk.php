@@ -1106,7 +1106,6 @@ $ec_lang['lpn_find_count']='Знайдено: {n}. Клацніть, щоб пе
 $ec_lang['lpn_find_none']='Нічого не знайдено.';
 $ec_lang['lpn_find_op_top']='Найбільші {n}';
 $ec_lang['lpn_find_op_bottom']='Найменші {n}';
-$ec_lang['lpn_find_adjacent']='З\'єднані';
 $ec_lang['lpn_find_no_value']='Введіть, що шукати.';
 $ec_lang['lpn_profile_menu']='Профіль';
 $ec_lang['lpn_profile_tip']='Показати профіль землі та п\'єзометричну лінію вздовж маршруту через мережу.';

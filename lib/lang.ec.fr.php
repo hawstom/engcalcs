@@ -770,7 +770,6 @@ $ec_lang['lpn_find_count']='{n} trouvé(s). Cliquez sur l\'un d\'eux pour y alle
 $ec_lang['lpn_find_none']='Aucune correspondance.';
 $ec_lang['lpn_find_op_top']='Les {n} plus élevés';
 $ec_lang['lpn_find_op_bottom']='Les {n} plus faibles';
-$ec_lang['lpn_find_adjacent']='Connecté';
 $ec_lang['lpn_find_no_value']='Saisissez ce que vous cherchez.';
 $ec_lang['lpn_profile_menu']='Profil';
 $ec_lang['lpn_profile_tip']='Tracer le terrain et la ligne piézométrique le long d\'un trajet dans le réseau.';

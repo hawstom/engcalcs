@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 1408,
+        "expected_key_count": 1407,
         "delta_key_count": 81,
         "exempt_key_count": 26,
         "exempt_keys": [
@@ -1754,7 +1754,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Jak se odběr tohoto uzlu v průběhu výpočtu mění. Ponechte na Žádný vzorec, chcete-li se řídit vzorcem, který má nastavený projekt.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1770,7 +1770,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Jak se odběr tohoto uzlu v průběhu výpočtu mění. Ponechte na Žádný vzorec, chcete-li se řídit vzorcem, který má nastavený projekt.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1786,7 +1786,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Jak se odběr tohoto uzlu v průběhu výpočtu mění. Ponechte na Žádný vzorec, chcete-li se řídit vzorcem, který má nastavený projekt.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1802,7 +1802,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Jak se odběr tohoto uzlu v průběhu výpočtu mění. Ponechte na Žádný vzorec, chcete-li se řídit vzorcem, který má nastavený projekt.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1818,7 +1818,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Jak se odběr tohoto uzlu v průběhu výpočtu mění. Ponechte na Žádný vzorec, chcete-li se řídit vzorcem, který má nastavený projekt.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",

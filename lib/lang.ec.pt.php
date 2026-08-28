@@ -777,7 +777,6 @@ $ec_lang['lpn_profile_title']='Perfil ao longo de uma rota';
 $ec_lang['lpn_profile_tip']='Desenha o terreno e a linha piezométrica ao longo de uma rota pela rede.';
 $ec_lang['lpn_profile_menu']='Perfil';
 $ec_lang['lpn_find_no_value']='Digite o que procurar.';
-$ec_lang['lpn_find_adjacent']='Conectado';
 $ec_lang['lpn_find_op_bottom']='Os {n} menores';
 $ec_lang['lpn_find_op_top']='Os {n} maiores';
 $ec_lang['lpn_find_none']='Nada correspondeu.';

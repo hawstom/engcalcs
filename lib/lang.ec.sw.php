@@ -1110,7 +1110,6 @@ $ec_lang['lpn_find_count']='{n} zimepatikana. Bofya moja ili kuiendea.';
 $ec_lang['lpn_find_none']='Hakuna kilicholingana.';
 $ec_lang['lpn_find_op_top']='{n} za juu zaidi';
 $ec_lang['lpn_find_op_bottom']='{n} za chini zaidi';
-$ec_lang['lpn_find_adjacent']='Zilizounganika';
 $ec_lang['lpn_find_no_value']='Andika unachotafuta.';
 $ec_lang['lpn_profile_menu']='Wasifu';
 $ec_lang['lpn_profile_tip']='Chora ardhi na mstari wa kimo cha maji kwa njia iliyopita kwenye mtandao.';

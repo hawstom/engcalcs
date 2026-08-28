@@ -1110,7 +1110,6 @@ $ec_lang['lpn_find_count']='{n} bulundu. Birine gitmek için tıklayın.';
 $ec_lang['lpn_find_none']='Hiçbir şey eşleşmedi.';
 $ec_lang['lpn_find_op_top']='En yüksek {n}';
 $ec_lang['lpn_find_op_bottom']='En düşük {n}';
-$ec_lang['lpn_find_adjacent']='Bağlı';
 $ec_lang['lpn_find_no_value']='Aranacak şeyi yazın.';
 $ec_lang['lpn_profile_menu']='Profil';
 $ec_lang['lpn_profile_tip']='Şebeke boyunca seçilen bir güzergah üzerinde zemini ve hidrolik gradyan çizgisini çizin.';

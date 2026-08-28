@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 1408,
+        "expected_key_count": 1407,
         "delta_key_count": 81,
         "exempt_key_count": 31,
         "exempt_keys": [
@@ -1759,7 +1759,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Cómo sube y baja la demanda de este nudo durante la ejecución. Déjelo en Sin patrón para seguir el patrón propio del proyecto.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1775,7 +1775,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Cómo sube y baja la demanda de este nudo durante la ejecución. Déjelo en Sin patrón para seguir el patrón propio del proyecto.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1791,7 +1791,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Cómo sube y baja la demanda de este nudo durante la ejecución. Déjelo en Sin patrón para seguir el patrón propio del proyecto.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1807,7 +1807,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Cómo sube y baja la demanda de este nudo durante la ejecución. Déjelo en Sin patrón para seguir el patrón propio del proyecto.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1823,7 +1823,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Cómo sube y baja la demanda de este nudo durante la ejecución. Déjelo en Sin patrón para seguir el patrón propio del proyecto.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",

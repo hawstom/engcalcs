@@ -1105,7 +1105,6 @@ $ec_lang['lpn_find_count']='{n} یافت شد. برای رفتن به آن، ک�
 $ec_lang['lpn_find_none']='چیزی مطابقت نداشت.';
 $ec_lang['lpn_find_op_top']='بیشترین {n}';
 $ec_lang['lpn_find_op_bottom']='کمترین {n}';
-$ec_lang['lpn_find_adjacent']='متصل';
 $ec_lang['lpn_find_no_value']='آنچه را می‌خواهید بیابید تایپ کنید.';
 $ec_lang['lpn_profile_menu']='نیم‌رخ';
 $ec_lang['lpn_profile_tip']='زمین و خط شیب هیدرولیکی را در طول یک مسیر در شبکه رسم کنید.';

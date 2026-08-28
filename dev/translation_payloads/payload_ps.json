@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 1408,
+        "expected_key_count": 1407,
         "delta_key_count": 82,
         "exempt_key_count": 24,
         "exempt_keys": [
@@ -1770,7 +1770,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "دا چې د دې جنکشن غوښتنه د چلولو په اوږدو کې څنګه لوړیږي او ټیټیږي. یې پر \"هیڅ نمونه نشته\" پرېږدئ ترڅو د پروژې خپلې نمونې تعقیب کړي، هره چې وي.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1786,7 +1786,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "دا چې د دې جنکشن غوښتنه د چلولو په اوږدو کې څنګه لوړیږي او ټیټیږي. یې پر \"هیڅ نمونه نشته\" پرېږدئ ترڅو د پروژې خپلې نمونې تعقیب کړي، هره چې وي.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1802,7 +1802,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "دا چې د دې جنکشن غوښتنه د چلولو په اوږدو کې څنګه لوړیږي او ټیټیږي. یې پر \"هیڅ نمونه نشته\" پرېږدئ ترڅو د پروژې خپلې نمونې تعقیب کړي، هره چې وي.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1818,7 +1818,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "دا چې د دې جنکشن غوښتنه د چلولو په اوږدو کې څنګه لوړیږي او ټیټیږي. یې پر \"هیڅ نمونه نشته\" پرېږدئ ترڅو د پروژې خپلې نمونې تعقیب کړي، هره چې وي.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1834,7 +1834,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "دا چې د دې جنکشن غوښتنه د چلولو په اوږدو کې څنګه لوړیږي او ټیټیږي. یې پر \"هیڅ نمونه نشته\" پرېږدئ ترڅو د پروژې خپلې نمونې تعقیب کړي، هره چې وي.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",

@@ -8558,8 +8558,9 @@ var EngCalcs = EngCalcs || {};
 		// not ask, in the one place a reader is scanning for the thing they searched FOR. The
 		// property popup is where a node's links belong.
 		//
-		// `lpn_find_adjacent` is left in lib/lang.ec.en.php and in the 26 translations that carry
-		// it, rendered by nothing. Whether that is debt or lost content is Tom's call, not an AI's.
+		// `lpn_find_adjacent` -- "Connected" -- was DELETED from all 27 language files with it
+		// (Tom, 2026-08-27: *"Remove the keys."*). It named a feature that is gone, so it was debt
+		// rather than lost content; the wording is in git if the pane ever comes back.
 		row.addEventListener('click', function () { findGoTo(c.group, c.el.id); });
 		return row;
 	}
@@ -17122,7 +17123,11 @@ var EngCalcs = EngCalcs || {};
 		[
 			{ id: 'lpn_menu_file', icon: 'file', label: pc.lpn_tool_file || 'File', open: openFileMenu },
 			{ id: 'lpn_menu_edit', icon: 'edit', label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
-			{ id: 'lpn_menu_map', icon: 'view', label: pc.lpn_menu_map || 'Map', open: openMapMenu },
+			// A PUSH PIN, not the eye (Tom, 2026-08-27). The eye said "look at this"; this menu is
+			// about the drawing's frame, the ground under it and where on Earth it sits, and a tack
+			// through a paper map is the oldest mark in this trade that means exactly that. The eye
+			// is untouched and still draws the street-map and satellite rows inside the menu.
+			{ id: 'lpn_menu_map', icon: 'pin', label: pc.lpn_menu_map || 'Map', open: openMapMenu },
 			// After View: it holds what belongs to THIS PROJECT rather than to the drawing (View).
 			// It is also the menu bar's ONLY door to Settings -- the bare Settings item that used to
 			// sit here is gone (Tom, 2026-08-21). It was the one menu-bar item that opened a panel

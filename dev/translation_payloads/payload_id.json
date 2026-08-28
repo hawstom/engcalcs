@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1408,
+        "expected_key_count": 1407,
         "delta_key_count": 81,
         "exempt_key_count": 34,
         "exempt_keys": [
@@ -1762,7 +1762,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Bagaimana kebutuhan simpul ini naik dan turun sepanjang proses. Biarkan pada Tidak ada pola untuk mengikuti pola milik proyek itu sendiri, apa pun itu.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1778,7 +1778,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Bagaimana kebutuhan simpul ini naik dan turun sepanjang proses. Biarkan pada Tidak ada pola untuk mengikuti pola milik proyek itu sendiri, apa pun itu.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1794,7 +1794,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Bagaimana kebutuhan simpul ini naik dan turun sepanjang proses. Biarkan pada Tidak ada pola untuk mengikuti pola milik proyek itu sendiri, apa pun itu.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1810,7 +1810,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Bagaimana kebutuhan simpul ini naik dan turun sepanjang proses. Biarkan pada Tidak ada pola untuk mengikuti pola milik proyek itu sendiri, apa pun itu.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1826,7 +1826,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Bagaimana kebutuhan simpul ini naik dan turun sepanjang proses. Biarkan pada Tidak ada pola untuk mengikuti pola milik proyek itu sendiri, apa pun itu.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",

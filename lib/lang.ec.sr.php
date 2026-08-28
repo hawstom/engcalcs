@@ -1102,7 +1102,6 @@ $ec_lang['lpn_find_count']='Пронађено: {n}. Кликните на је�
 $ec_lang['lpn_find_none']='Ништа се не поклапа.';
 $ec_lang['lpn_find_op_top']='Највећих {n}';
 $ec_lang['lpn_find_op_bottom']='Најмањих {n}';
-$ec_lang['lpn_find_adjacent']='Повезано';
 $ec_lang['lpn_find_no_value']='Упишите шта тражите.';
 $ec_lang['lpn_profile_menu']='Профил';
 $ec_lang['lpn_profile_tip']='Нацртај терен и пијезометарску линију дуж трасе кроз мрежу.';

@@ -1108,7 +1108,6 @@ $ec_lang['lpn_find_count']='تم العثور على {n}. انقر على واح
 $ec_lang['lpn_find_none']='لم يُطابق شيء.';
 $ec_lang['lpn_find_op_top']='أعلى {n}';
 $ec_lang['lpn_find_op_bottom']='أدنى {n}';
-$ec_lang['lpn_find_adjacent']='متصل';
 $ec_lang['lpn_find_no_value']='اكتب ما تريد البحث عنه.';
 $ec_lang['lpn_profile_menu']='المقطع الطولي';
 $ec_lang['lpn_profile_tip']='ارسم خط الأرض وخط المتدرج الهيدروليكي على طول مسار عبر الشبكة.';

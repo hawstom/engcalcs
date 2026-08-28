@@ -1109,7 +1109,6 @@ $ec_lang['lpn_find_count']='找到 {n} 个。点击其中之一即可跳转到�
 $ec_lang['lpn_find_none']='未找到匹配项。';
 $ec_lang['lpn_find_op_top']='最高 {n} 个';
 $ec_lang['lpn_find_op_bottom']='最低 {n} 个';
-$ec_lang['lpn_find_adjacent']='相连';
 $ec_lang['lpn_find_no_value']='请输入要查找的内容。';
 $ec_lang['lpn_profile_menu']='剖面图';
 $ec_lang['lpn_profile_tip']='沿管网中选定的路线，绘制地面高程和水力坡降线。';

@@ -1103,7 +1103,6 @@ $ec_lang['lpn_find_count']='{n} pronađeno. Kliknite jedan da odete do njega.';
 $ec_lang['lpn_find_none']='Ništa ne odgovara.';
 $ec_lang['lpn_find_op_top']='Najvećih {n}';
 $ec_lang['lpn_find_op_bottom']='Najmanjih {n}';
-$ec_lang['lpn_find_adjacent']='Povezano';
 $ec_lang['lpn_find_no_value']='Upišite što tražite.';
 $ec_lang['lpn_profile_menu']='Profil';
 $ec_lang['lpn_profile_tip']='Nacrtaj teren i hidrauličku liniju (HGL) duž rute kroz mrežu.';

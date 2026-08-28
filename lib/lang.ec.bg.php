@@ -782,7 +782,6 @@ $ec_lang['lpn_find_count']='Намерени: {n}. Щракнете върху �
 $ec_lang['lpn_find_none']='Нищо не съвпадна.';
 $ec_lang['lpn_find_op_top']='Най-високите {n}';
 $ec_lang['lpn_find_op_bottom']='Най-ниските {n}';
-$ec_lang['lpn_find_adjacent']='Свързани';
 $ec_lang['lpn_find_no_value']='Въведете какво да се търси.';
 $ec_lang['lpn_profile_menu']='Профил';
 $ec_lang['lpn_profile_tip']='Начертава терена и хидравличната линия на напора по маршрут през мрежата.';

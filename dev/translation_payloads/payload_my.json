@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1408,
+        "expected_key_count": 1407,
         "delta_key_count": 82,
         "exempt_key_count": 25,
         "exempt_keys": [
@@ -1771,7 +1771,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "ဤဆက်စပ်နေရာ၏ လိုအင်သည် လည်ပတ်မှုတစ်လျှောက် မည်သို့ မြင့်တက်ကျဆင်းသည်။ ပရောဂျက်၏ ကိုယ်ပိုင် ပုံစံအတိုင်း လိုက်ရန် ပုံစံ မရှိပါ တွင် ထားပါ။",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1787,7 +1787,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "ဤဆက်စပ်နေရာ၏ လိုအင်သည် လည်ပတ်မှုတစ်လျှောက် မည်သို့ မြင့်တက်ကျဆင်းသည်။ ပရောဂျက်၏ ကိုယ်ပိုင် ပုံစံအတိုင်း လိုက်ရန် ပုံစံ မရှိပါ တွင် ထားပါ။",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1803,7 +1803,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "ဤဆက်စပ်နေရာ၏ လိုအင်သည် လည်ပတ်မှုတစ်လျှောက် မည်သို့ မြင့်တက်ကျဆင်းသည်။ ပရောဂျက်၏ ကိုယ်ပိုင် ပုံစံအတိုင်း လိုက်ရန် ပုံစံ မရှိပါ တွင် ထားပါ။",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1819,7 +1819,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "ဤဆက်စပ်နေရာ၏ လိုအင်သည် လည်ပတ်မှုတစ်လျှောက် မည်သို့ မြင့်တက်ကျဆင်းသည်။ ပရောဂျက်၏ ကိုယ်ပိုင် ပုံစံအတိုင်း လိုက်ရန် ပုံစံ မရှိပါ တွင် ထားပါ။",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -1835,7 +1835,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "ဤဆက်စပ်နေရာ၏ လိုအင်သည် လည်ပတ်မှုတစ်လျှောက် မည်သို့ မြင့်တက်ကျဆင်းသည်။ ပရောဂျက်၏ ကိုယ်ပိုင် ပုံစံအတိုင်း လိုက်ရန် ပုံစံ မရှိပါ တွင် ထားပါ။",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",

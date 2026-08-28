@@ -1104,7 +1104,6 @@ $ec_lang['lpn_find_count']='Найдено: {n}. Щёлкните по элем�
 $ec_lang['lpn_find_none']='Ничего не найдено.';
 $ec_lang['lpn_find_op_top']='Наибольшие {n}';
 $ec_lang['lpn_find_op_bottom']='Наименьшие {n}';
-$ec_lang['lpn_find_adjacent']='Связанные';
 $ec_lang['lpn_find_no_value']='Введите, что искать.';
 $ec_lang['lpn_profile_menu']='Профиль';
 $ec_lang['lpn_profile_tip']='Построить профиль земли и линии гидравлического уклона вдоль маршрута через сеть.';

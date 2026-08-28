@@ -1103,7 +1103,6 @@ $ec_lang['lpn_find_count']='{n} gefunden. Klicken Sie eines an, um dorthin zu sp
 $ec_lang['lpn_find_none']='Keine Übereinstimmung.';
 $ec_lang['lpn_find_op_top']='Höchste {n}';
 $ec_lang['lpn_find_op_bottom']='Niedrigste {n}';
-$ec_lang['lpn_find_adjacent']='Verbunden';
 $ec_lang['lpn_find_no_value']='Geben Sie ein, wonach gesucht werden soll.';
 $ec_lang['lpn_profile_menu']='Profil';
 $ec_lang['lpn_profile_tip']='Zeichnet das Gelände und die Druckhöhenlinie entlang einer Route durch das Netz.';

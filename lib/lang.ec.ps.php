@@ -1103,7 +1103,6 @@ $ec_lang['lpn_find_count']='{n} وموندل شول. یو یې کلیک کړئ �
 $ec_lang['lpn_find_none']='هیڅ شی سره سمون ونه خوړ.';
 $ec_lang['lpn_find_op_top']='لوړ {n}';
 $ec_lang['lpn_find_op_bottom']='ټیټ {n}';
-$ec_lang['lpn_find_adjacent']='وصل شوی';
 $ec_lang['lpn_find_no_value']='هغه څه ولیکئ چې یې لټوئ.';
 $ec_lang['lpn_profile_menu']='پروفایل';
 $ec_lang['lpn_profile_tip']='ځمکه او هایدرولیکي کچې کرښه د شبکې له یوې لارې پورې راکاږئ.';

@@ -1105,7 +1105,6 @@ $ec_lang['lpn_find_count']='{n} ត្រូវបានរកឃើញ។ ច�
 $ec_lang['lpn_find_none']='គ្មានអ្វីត្រូវគ្នាទេ។';
 $ec_lang['lpn_find_op_top']='ខ្ពស់បំផុត {n}';
 $ec_lang['lpn_find_op_bottom']='ទាបបំផុត {n}';
-$ec_lang['lpn_find_adjacent']='ភ្ជាប់គ្នា';
 $ec_lang['lpn_find_no_value']='វាយអ្វីដែលត្រូវរក។';
 $ec_lang['lpn_profile_menu']='ទម្រង់បណ្ដោយ';
 $ec_lang['lpn_profile_tip']='គូរផ្ទៃដី និងខ្សែថ្ពល់ធារាសាស្ត្រ តាមផ្លូវមួយឆ្លងកាត់បណ្ដាញ។';

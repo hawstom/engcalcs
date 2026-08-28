@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**80 of 1408 English keys**, as of the last generation.
+**80 of 1407 English keys**, as of the last generation.
 
 ## lpn_  (80)
 
