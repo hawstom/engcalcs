@@ -607,6 +607,18 @@ html[lang="zh"] .ec-welcome {
    is a compact input grid inside a floating popup, not a page-width results table, so it must not
    stretch or inherit those borders. Headings left-aligned over their own input column; the row
    label column carries the point number. */
+/* **THE TABLE AND ITS ROWS RESET THEIR OWN BORDER, NOT ONLY THEIR CELLS** (Task 553, Tom
+   2026-08-28 of the demand editor: "There are two borders on the Demand Categories table, and it
+   looks like a mistake."). It is: the suite-wide `table, th, tr, td { border: 1px solid blue }` at
+   the top of this file names FOUR elements, and each of these editors reset only two of them. What
+   he saw was the table's own blue frame outside the first row's blue rule -- two lines, 1px apart,
+   round a compact input grid inside a floating popup.
+   Written once for the two popup grids, whose own comments already claimed they "must not inherit
+   those borders" and did. **`.lpn-pane-table` is deliberately NOT in this list**: it has the same
+   unreset frame, but its blue row rules are the separators of a data grid a person reads every
+   day, and nobody has said they are wrong. Removing them is a look, not a defect fix. */
+.lpn-curve-table, .lpn-curve-table tr,
+.lpn-demand-table, .lpn-demand-table tr { border: 0; }
 .lpn-curve-table { border-collapse: collapse; width: auto; margin: 2px 0; }
 .lpn-curve-table th, .lpn-curve-table td { padding: 1px 4px 1px 0; text-align: left; font-weight: normal; border: 0; }
 .lpn-curve-table thead th { font-weight: bold; }

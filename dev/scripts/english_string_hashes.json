@@ -970,8 +970,8 @@
                 "lpn_library_curves",
                 "lpn_library_curves_note",
                 "lpn_library_curves_tip",
-                "lpn_library_default_pattern",
-                "lpn_library_default_pattern_tip",
+                "lpn_settings_default_pattern",
+                "lpn_settings_default_pattern_tip",
                 "lpn_library_menu",
                 "lpn_library_menu_tip",
                 "lpn_library_pattern_add",
@@ -1671,8 +1671,8 @@
         "lpn_library_curves": "07c83b93abf0b3e27a0cdff87660d5bd4d44c60e",
         "lpn_library_curves_note": "3f7a043729bdc808ae4c94cc8303299487b74a9b",
         "lpn_library_curves_tip": "796118d97cc683fa7a7c4868af84d243abeb2a7d",
-        "lpn_library_default_pattern": "c60d9d98af9a12729f19961a0b5ac989aeb6d2b5",
-        "lpn_library_default_pattern_tip": "68a9d27fa351ba3d4e1b23eb99183fcf56f490ff",
+        "lpn_settings_default_pattern": "c60d9d98af9a12729f19961a0b5ac989aeb6d2b5",
+        "lpn_settings_default_pattern_tip": "68a9d27fa351ba3d4e1b23eb99183fcf56f490ff",
         "lpn_library_menu": "27c968e6692b41bf6e1a241b870dc41ff1a51b17",
         "lpn_library_menu_tip": "422a93b74301d2b3208529c72ef025a1c63fd941",
         "lpn_library_pattern_add": "9edf997d207a8cef1d5f11fd2ec46f872210a675",
@@ -4774,11 +4774,11 @@
             "words": 19,
             "ends_sentence": true
         },
-        "lpn_library_default_pattern": {
+        "lpn_settings_default_pattern": {
             "words": 3,
             "ends_sentence": false
         },
-        "lpn_library_default_pattern_tip": {
+        "lpn_settings_default_pattern_tip": {
             "words": 8,
             "ends_sentence": true
         },

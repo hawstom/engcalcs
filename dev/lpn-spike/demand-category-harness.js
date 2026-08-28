@@ -337,8 +337,8 @@ function findAll(kids, tag) {
 	// pattern or Category label once a breakdown exists -- that duplicated heading is the defect.
 	ok('a junction with categories has NO standalone Base demand field',
 		!labels.some(t => /^Base demand/.test(t)), labels.join(' | '));
-	ok('...nor a standalone Demand pattern or Category field',
-		!labels.some(t => /^Demand pattern/.test(t)) && !labels.some(t => /^Category/.test(t)));
+	ok('...nor a standalone Demand pattern or Description field',
+		!labels.some(t => /^Demand pattern/.test(t)) && !labels.some(t => /^Description/.test(t)));
 	const table = kids.filter(c => c.tagName === 'TABLE')[0];
 	ok('...but a table holding EVERY demand', !!table);
 	ok('...one row per demand, row 0 included',
@@ -353,9 +353,39 @@ function findAll(kids, tag) {
 	ok('the resolved Demand row is still there and still says the total',
 		labels.some(t => /^Demand \(/.test(t)));
 
+	// **AND SO DOES A ONE-DEMAND JUNCTION** (Task 553, Tom 2026-08-28: *"remove the original Base
+	// demand and Demand pattern inputs and leave in their place the Demand categories interface"*).
+	// Until then this asserted the OPPOSITE -- an ordinary junction got the two plain fields and no
+	// table -- which left the EPANET asymmetry on screen: the same junction met two different
+	// interfaces depending on a row count nothing reported. J4 is the ordinary case and every
+	// junction in Net1, Net2 and Net3 is one.
 	const plain = popupFor('J4');
-	ok('an ordinary junction gets NO table', !plain.some(c => c.tagName === 'TABLE'));
-	ok('...but can still start one', findAll(plain, 'BUTTON').some(b => /Add demand category/.test(b.textContent)));
+	const ptable = plain.filter(c => c.tagName === 'TABLE')[0];
+	ok('a one-demand junction gets the SAME table', !!ptable);
+	ok('...holding exactly one demand row', !!ptable && findAll(ptable.children, 'TR').length === 2,
+		'header + 1');
+	const plabels = plain.filter(c => c.tagName === 'LABEL').map(c => c.textContent);
+	ok('...and no standalone Base demand or Demand pattern field beside it',
+		!plabels.some(t => /^Base demand/.test(t)) && !plabels.some(t => /^Demand pattern/.test(t)),
+		plabels.join(' | '));
+	// **THE LAST DEMAND CANNOT BE REMOVED.** Before the table was unconditional, row 0's delete
+	// always had a row 1 to promote; now it is drawn on a junction that has no row 1, where
+	// acc.remove() would shift an empty array and read `.base` off undefined.
+	const pdel = findAll([ptable], 'BUTTON').filter(b => b.textContent === '\u00d7');
+	ok('...whose delete is present but DISABLED, there being nothing to promote',
+		pdel.length === 1 && pdel[0].disabled === true, JSON.stringify(pdel.map(b => b.disabled)));
+	ok('...but can still start a second', findAll(plain, 'BUTTON').some(b => /Add demand category/.test(b.textContent)));
+	// The heading is Tom's word as of Task 553, and the Find property answers to it too.
+	ok('the third column is headed Description, not Category',
+		findAll([ptable], 'TH').some(th => /^Description/.test(th.textContent)),
+		findAll([ptable], 'TH').map(th => th.textContent).join(' | '));
+	// A junction WITH a breakdown keeps a live delete on every row, including row 0.
+	// Re-fetched, not reused: popupFor() renders into the ONE popup, so `kids` above now points at
+	// J4's nodes. That is the stub trap dev/testing-notes.md warns about, in miniature.
+	const j1tab = popupFor('J1').filter(c => c.tagName === 'TABLE')[0];
+	const j1del = findAll([j1tab], 'BUTTON').filter(b => b.textContent === '\u00d7');
+	ok('a junction with three demands has three LIVE deletes',
+		j1del.length === 3 && j1del.every(b => !b.disabled), JSON.stringify(j1del.map(b => b.disabled)));
 }
 
 // ---------------------------------------------------------------------------

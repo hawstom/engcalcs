@@ -1277,9 +1277,9 @@ $ec_lang['lpn_library_pattern_values']='តម្គុណ';
 $ec_lang['lpn_library_pattern_values_tip']='តម្គុណនានា បំបែកដោយចន្លោះ ឬសញ្ញាក្បៀស។ បិទភ្ជាប់ជួរឈរពីសៀវភៅបញ្ជីអេឡិចត្រូនិកបើអ្នកមាន។ បញ្ជីនេះធ្វើម្ដងទៀតរហូតដល់ការដំណើរការចប់ ដូច្នេះវាមិនចាំបាច់គ្របដណ្ដប់ពេញការដំណើរការទាំងមូលទេ។';
 $ec_lang['lpn_library_pattern_span']='តម្គុណ {n}, ដាច់ពីគ្នា {step}, គ្របដណ្ដប់ {span}';
 $ec_lang['lpn_library_pattern_none']='គ្មានលំនាំ';
-$ec_lang['lpn_library_default_pattern']='លំនាំតម្រូវការលំនាំដើម';
+$ec_lang['lpn_settings_default_pattern']='លំនាំតម្រូវការលំនាំដើម';
 
-$ec_lang['lpn_library_default_pattern_tip']='ថ្នាំងគ្រប់ដែលគ្មានលំនាំប្រើលំនាំនេះ។';
+$ec_lang['lpn_settings_default_pattern_tip']='ថ្នាំងគ្រប់ដែលគ្មានលំនាំប្រើលំនាំនេះ។';
 $ec_lang['lpn_library_control_add']='បន្ថែមច្បាប់ត្រួតពិនិត្យមួយ';
 $ec_lang['lpn_library_control_tip']='ប្រយោគមួយ ដោយប្រើពាក្យដែល EPANET ប្រើ។ មានទម្រង់បួន៖ LINK 9 OPEN IF NODE 2 BELOW 110, LINK 9 CLOSED IF NODE 2 ABOVE 140, LINK 10 OPEN AT TIME 1, និង LINK 12 CLOSED AT CLOCKTIME 3 AM។ ជំនួសឲ្យ OPEN ឬ CLOSED អ្នកអាចសរសេរជាលេខមួយ ដែលជាការកំណត់វ៉ាល់ ឬល្បឿនម៉ាស៊ីនបូម។ សូមទុកពាក្យគន្លឹះជាភាសាអង់គ្លេស ព្រោះនោះជាអ្វីដែលទំព័រនេះអាន។';
 $ec_lang['lpn_library_control_ok']='✓ បានយល់';

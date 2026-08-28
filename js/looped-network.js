@@ -7410,7 +7410,7 @@ var EngCalcs = EngCalcs || {};
 		// into one joined string instead would make `equal to` false for every junction that has
 		// more than one category, which is exactly the junction somebody is searching for.
 		if (d.group === 'node' && (!d.type || d.type === 'junction')) {
-			out.push(['demandCategory', pc.lpn_field_demand_category || 'Category', 'Category']);
+			out.push(['demandCategory', pc.lpn_field_demand_category || 'Description', 'Description']);
 		}
 		if (d.key === 'all') { return out; }
 		defs = d.group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc);
@@ -20650,6 +20650,9 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 		});
 		row(compBody, pc.bpn_method || 'Friction method', methodSelect, pc.bpn_roughness_tip);
+		// Second, and directly under the method: it is the other row here that is a statement about
+		// the SYSTEM rather than about how hard the arithmetic tries. See settingsDefaultPatternRow().
+		settingsDefaultPatternRow(compBody, row);
 		// ---- PAGE (Task 289, renamed by Tom 2026-08-18: "Change Calculator to Page and make it a
 		// heading") ----
 		// THE ONE SUB-HEADING IN THE BOX THAT IS NOT CARRIED IN THE PROJECT FILE, and the note says
@@ -21203,7 +21206,16 @@ var EngCalcs = EngCalcs || {};
 
 	// ---- what the document holds, and the one place each kind is written --------------------------
 
+	// **libPatterns() MATERIALISES THE LIST; libPatternsRead() DOES NOT.** The assignment is there so
+	// a caller can push onto the result, and that is correct for every WRITER. It is wrong for a
+	// reader, and it stopped being harmless the moment a pattern list was read from a control that
+	// is rebuilt without anybody asking for one: `doc.patterns = []` on a document that stated no
+	// patterns is a change to the document, and `dev/lpn-spike/unit-change-harness.js` catches it as
+	// a non-destructive unit switch that was not byte-identical after all. Task 553 hit it by moving
+	// the default-pattern chooser into Settings, which rebuilds on every unit change.
+	// **Read through libPatternsRead(); write through libPatterns().**
 	function libPatterns() { return (doc.patterns = doc.patterns || []); }
+	function libPatternsRead() { return doc.patterns || []; }
 	function libControls() { return (doc.controls = doc.controls || []); }
 	// Every curve on the page, WHEREVER IT LIVES. A pump's `curvePoints` and a GPV's are the same
 	// shape and are read by the same code (curvePointTable), so they are one list here.
@@ -21483,26 +21495,31 @@ var EngCalcs = EngCalcs || {};
 		content.appendChild(sec);
 		if (EngCalcs.initTips) { EngCalcs.initTips(content); }
 	}
-	// The one row in this box that is about the whole project rather than about one library entry:
-	// which pattern a junction follows when it names none. It is here rather than in Settings because
-	// it is a CHOICE FROM THIS LIST -- it has no meaning without the list beside it, and a select in
-	// Settings offering patterns that can only be created here would be the two-places problem the
-	// Settings rule exists to prevent.
-	function buildDefaultPatternRow(host) {
-		var pc = EngCalcs.pageConfig || {}, row = libEl('div', 'lpn-lib-note'),
-			lab = libEl('span', 'ec-help', pc.lpn_library_default_pattern || 'Default demand pattern'),
-			sel = document.createElement('select');
-		if (pc.lpn_library_default_pattern_tip) { lab.title = pc.lpn_library_default_pattern_tip; }
+	// **THE DEFAULT DEMAND PATTERN IS A SETTINGS ROW, NOT A LIBRARY ROW** (Task 553, Tom
+	// 2026-08-28: *"the default pattern must be specified in Settings along with other Hydraulics
+	// options"*). It lived in the Libraries box until then, on the argument that it is a CHOICE
+	// FROM THAT LIST and has no meaning without the list beside it. He overruled that, and the
+	// argument was answering the wrong question anyway: what a reader looks for in Settings is the
+	// project's own analysis options, and a blank pattern column resolving to something is one.
+	//
+	// It is still built from libPatterns() through the same libFillPatternOptions() the popup uses,
+	// so there is one list and one name for the blank. **Authoring stays in the Libraries box** --
+	// this is a chooser, and rebuildSettingsBox() is what re-reads the list after one is added.
+	//
+	// **IT IS PROJECT STATE, NOT PAGE STATE**: doc.defaultPattern, serialized with the project and
+	// restored with it, which is why it writes through libCommit() rather than saveToStorage()
+	// alone. Nothing else in the Hydraulics section is project state, so the row carries its own
+	// scope marker rather than letting the section's silence imply the wrong one.
+	function settingsDefaultPatternRow(host, rowFn) {
+		var pc = EngCalcs.pageConfig || {}, sel = document.createElement('select');
 		libFillPatternOptions(sel, doc.defaultPattern);
-		sel.setAttribute('aria-label', pc.lpn_library_default_pattern || 'Default demand pattern');
 		sel.addEventListener('change', function () {
 			doc.defaultPattern = sel.value || null;
 			libCommit();
+			refreshPopupIfOpen();
 		});
-		row.appendChild(lab);
-		row.appendChild(document.createTextNode(' '));
-		row.appendChild(sel);
-		host.appendChild(row);
+		rowFn(host, pc.lpn_settings_default_pattern || 'Default demand pattern', sel,
+			pc.lpn_settings_default_pattern_tip);
 	}
 	// Shared by the row above and by the junction popup's own selector, so the two lists cannot
 	// disagree about what patterns exist or about what the blank one is called.
@@ -21512,7 +21529,7 @@ var EngCalcs = EngCalcs || {};
 		none.value = '';
 		none.textContent = pc.lpn_library_pattern_none || 'No pattern';
 		sel.appendChild(none);
-		libPatterns().forEach(function (p) {
+		libPatternsRead().forEach(function (p) {
 			var o = document.createElement('option');
 			o.value = p.id;
 			o.textContent = p.id;
@@ -21522,7 +21539,6 @@ var EngCalcs = EngCalcs || {};
 	}
 	function buildPatternSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libPatterns();
-		buildDefaultPatternRow(host);
 		host.appendChild(libButton(pc.lpn_library_pattern_add || 'Add a pattern', function () {
 			saveUndoSnapshot();
 			// A NEW PATTERN IS A FLAT DAY, not an empty list: 24 ones on the default hourly step is
@@ -22775,35 +22791,21 @@ var EngCalcs = EngCalcs || {};
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); },
 				pc.lpn_field_elev_tip);
-			// **THE TYPED NUMBER, AND THE ONLY EDITABLE ONE OF THE PAIR.** The tip is lpn_'s own:
-			// bpn_demand_tip says "at this line's downstream end", which is branched-network
-			// wording and false here, where a demand sits on a node.
+			// **THERE IS NO PLAIN Base demand / Demand pattern FIELD ANY MORE** (Task 553, Tom
+			// 2026-08-28: *"The EPANET UX is confusing by breaking out one demand (the initial)
+			// specially. What we need to do is remove the original Base demand and Demand pattern
+			// inputs and leave in their place the Demand categories interface."*)
 			//
-			// **THESE TWO ROWS GO AWAY THE MOMENT THIS JUNCTION HAS A BREAKDOWN** (Tom, 2026-08-26,
-			// of a screenshot showing them above the table: *"I think this is a mistake"*). They
-			// were row 0 shown outside the list it belongs to, and the popup then carried the
-			// heading "Base demand (gpm)" TWICE, once as a field and once as a column, with nothing
-			// saying the field was the table's first row. demandCategoryFields() draws row 0 inside
-			// the table instead. A junction with one demand -- nearly all of them, and every
-			// junction in Net1, Net2 and Net3 -- still sees exactly these fields and no table.
-			if (!hasDemandBreakdown(n)) {
-				unitNumberField(fields, pc.lpn_field_base_demand || 'Base demand', 'lpn_u_flow',
-					function () { return effective(n, 'demand'); },
-					function (v) { setProp(n, 'demand', v); updateNode(nodeId); refreshPopupIfOpen(); },
-					pc.lpn_demand_tip, { el: n, prop: 'demand' });
-			// **HOW THAT DEMAND MOVES THROUGH THE RUN** (Task 460). PER JUNCTION, so it is here and
-			// not in the Libraries box -- the same line the Settings rule draws, from the other
-			// side: whole-project in the box, one element in the popup. Without it a pattern the
-			// user authors could only ever be used by making it the project default, which is not
-			// what a library is for.
-			// **NOT AN OVERRIDABLE PROPERTY, so it is a plain write and carries no marker.** Which
-			// pattern a junction follows is a statement about the system, like its elevation;
-			// LPN_OVERRIDABLE holds the design variables a scenario asks "what if" about.
-				patternField(fields, pc.lpn_field_demand_pattern || 'Demand pattern',
-					function () { return n.demandPattern; },
-					function (v) { n.demandPattern = v || null; updateNode(nodeId); scheduleSolve(); saveToStorage(); },
-					pc.lpn_field_demand_pattern_tip);
-			}
+			// Task 468 had already moved row 0 INSIDE the table -- but only for a junction that
+			// already had a breakdown, so the two plain fields survived for the one-demand case,
+			// which is nearly every junction. That left the special first row EPANET has and the
+			// confusion with it: the same junction met two different interfaces depending on a
+			// count it could not see. demandCategoryFields() now draws the table unconditionally,
+			// with at least one row in it, and this branch adds nothing between Elevation and it.
+			//
+			// **THE DOCUMENT IS UNCHANGED**, exactly as in 468: row 0 is still the junction's own
+			// `_demand` / `demandPattern` / `demandCategory` and `extraDemands` is the rest, so the
+			// exporter, EngCalcs.lpnDemandRows() and the setProp() override seam never knew.
 			// **WHAT THAT BASE RESOLVES TO AT THE MOMENT ON THE CLOCK**, read-only, directly under
 			// the pattern that produces it -- the base, the pattern, the answer, in that order.
 			// **ALWAYS SHOWN, EVEN WHEN IT EQUALS THE BASE** (Tom, 2026-08-26). A previous pass hid
@@ -22874,15 +22876,12 @@ var EngCalcs = EngCalcs || {};
 	function demandCategoryFields(fields, n, nodeId) {
 		var pc = EngCalcs.pageConfig || {}, extras = n.extraDemands || [],
 			table, thead, hrow, tbody, addBtn;
-		// A junction that has a category but no extra rows still has only ONE demand, so it keeps
-		// the plain fields above and gets its name here rather than a one-row table.
-		if (!extras.length && n.demandCategory) {
-			textField(fields, pc.lpn_field_demand_category || 'Category',
-				function () { return n.demandCategory; },
-				function (v) { n.demandCategory = v || null; afterPropertyEdit(n); },
-				pc.lpn_field_demand_category_tip);
-		}
-		if (extras.length) {
+		// **THE TABLE IS UNCONDITIONAL** (Task 553). It was drawn only where `extras.length`, so a
+		// one-demand junction -- nearly every junction, and every junction in Net1/2/3 -- met two
+		// plain fields instead and the one-off category got a field of its own here. That is the
+		// EPANET asymmetry Tom asked us to stop drawing: the same junction had two different
+		// interfaces depending on a count nothing on screen reported.
+		{
 			table = document.createElement('table');
 			table.className = 'lpn-demand-table';
 			thead = document.createElement('thead');
@@ -22895,7 +22894,7 @@ var EngCalcs = EngCalcs || {};
 			// label, which is the suite's rule.
 			[[(pc.lpn_field_base_demand || 'Base demand') + ' (' + unitLabel('lpn_u_flow') + ')', pc.lpn_demand_tip],
 				[pc.lpn_field_demand_pattern || 'Demand pattern', pc.lpn_field_demand_pattern_tip],
-				[pc.lpn_field_demand_category || 'Category', pc.lpn_field_demand_category_tip],
+				[pc.lpn_field_demand_category || 'Description', pc.lpn_field_demand_category_tip],
 				['', null]].forEach(function (pair) {
 				var th = document.createElement('th');
 				if (pair[1]) { setFieldLabel(th, pair[0], pair[1]); }
@@ -22919,13 +22918,17 @@ var EngCalcs = EngCalcs || {};
 				// **DELETING ROW 0 PROMOTES ROW 1 INTO IT**, so the junction keeps a demand and the
 				// list simply gets shorter. Writing the base through setProp() keeps the promoted
 				// number on the same seam every other write to it uses.
+				// **DELETING ROW 0 PROMOTES ROW 1 INTO IT**, and where there is no row 1 the
+				// button is disabled instead (see `soleRow` below) -- a junction always has a
+				// demand, even a zero one, so the last row is not removable.
 				remove: function () {
 					var next = extras.shift();
 					setProp(n, 'demand', next.base);
 					n.demandPattern = next.pattern || null;
 					n.demandCategory = next.category || null;
 					if (!extras.length) { delete n.extraDemands; }
-				}
+				},
+				soleRow: !extras.length
 			});
 			extras.forEach(function (d, di) {
 				demandRowInto(tbody, n, di + 1, {
@@ -22946,7 +22949,13 @@ var EngCalcs = EngCalcs || {};
 		// the table rather than in a cell: it is a checkbox with a sentence beside it and there is
 		// no column for that. Only row 0's base is overridable at all -- see the note above on why
 		// a category cannot key an override -- so one marker is the whole truth here.
-		if (hasDemandBreakdown(n)) { overrideMarker(fields, n, 'demand'); }
+		//
+		// **UNCONDITIONAL SINCE TASK 553**, and that is a fix rather than a tidy-up: it used to be
+		// drawn only where there was a breakdown, because on a one-demand junction the plain Base
+		// demand field carried its own marker through unitNumberField()'s `{el, prop}`. That field
+		// is gone. Left as it was, a scenario override on the commonest junction in any network
+		// would have had nowhere to show itself.
+		overrideMarker(fields, n, 'demand');
 		addBtn = document.createElement('button');
 		addBtn.type = 'button';
 		addBtn.className = 'lpn-demand-add';
@@ -22999,7 +23008,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		cInput.type = 'text';
 		cInput.value = acc.getCategory() || '';
-		cInput.setAttribute('aria-label', (pc.lpn_field_demand_category || 'Category') + ' ' + (index + 1));
+		cInput.setAttribute('aria-label', (pc.lpn_field_demand_category || 'Description') + ' ' + (index + 1));
 		cInput.addEventListener('change', function () {
 			acc.setCategory(cInput.value.trim());
 			afterPropertyEdit(n);
@@ -23011,6 +23020,13 @@ var EngCalcs = EngCalcs || {};
 		// languages to say "remove".
 		del.textContent = '×';
 		helpTip(del, pc.lpn_demand_remove || 'Remove this demand');
+		// **THE LAST REMAINING DEMAND CANNOT BE REMOVED** (Task 553). Before the table was
+		// unconditional, row 0's delete always had a row 1 to promote, because the table only
+		// existed where `extras.length`. Now every junction draws it, and on a one-demand junction
+		// acc.remove() would shift an empty array and read `.base` off undefined. Disabled rather
+		// than hidden: a column that loses its control on one row is a table whose rows do not line
+		// up, and the greyed × is the honest statement that this is the floor.
+		if (acc.soleRow) { del.disabled = true; }
 		del.addEventListener('click', function () {
 			saveUndoSnapshot();
 			acc.remove();

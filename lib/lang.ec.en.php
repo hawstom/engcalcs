@@ -2674,8 +2674,8 @@ $ec_lang['lpn_library_pattern_values_tip']='The multipliers, separated by spaces
 // (Task 193): the order of the three differs by language and a sandwich cannot express that.
 $ec_lang['lpn_library_pattern_span']='{n} multipliers, {step} apart, covering {span}';
 $ec_lang['lpn_library_pattern_none']='No pattern';
-$ec_lang['lpn_library_default_pattern']='Default demand pattern';
-$ec_lang['lpn_library_default_pattern_tip']='Every junction with no pattern uses this one.';
+$ec_lang['lpn_settings_default_pattern']='Default demand pattern';
+$ec_lang['lpn_settings_default_pattern_tip']='Every junction with no pattern uses this one.';
 $ec_lang['lpn_library_control_add']='Add a control';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -2705,7 +2705,7 @@ $ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
-$ec_lang['lpn_field_demand_category']='Category';
+$ec_lang['lpn_field_demand_category']='Description';
 $ec_lang['lpn_field_demand_category_tip']='Name or description of the user or users using this pattern.';
 $ec_lang['lpn_demand_add']='Add demand category';
 $ec_lang['lpn_demand_add_tip']='Add another demand at this junction, with its own base demand, pattern and category. The demands add up.';

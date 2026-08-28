@@ -25,7 +25,7 @@ settled these go into the next translation sprint as a batch.
 - **`lpn_field_base_demand`**
   > Base demand
 - **`lpn_field_demand_category`**
-  > Category
+  > Description
 - **`lpn_field_demand_category_tip`**
   > Name or description of the user or users using this pattern.
 - **`lpn_field_text_attached`**
