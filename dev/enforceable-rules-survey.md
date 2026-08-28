@@ -1,0 +1,100 @@
+# Enforceable-rules survey — which half of the prose a machine could hold
+
+**ROADMAP Task 322, half B.** `CLAUDE.md` ends its checks section with the claim that a rule a
+machine enforces is worth roughly ten a human must remember, and that **its unexecutable half is
+decoration**. Nobody had ever counted which half that is. This is the count, and the ranked list of
+what it would cost to move a row from one half to the other.
+
+**Method, stated so the numbers can be argued with.** Every normative statement in `CLAUDE.md` was
+read and classified, then the `dev/*.md` set was swept for rules stated as absolutes (`never`,
+`always`, `must`, `forbidden`) that are not already restatements of a `CLAUDE.md` rule. A normative
+statement is one that tells a future contributor to do or not do something — not a fact, not a
+record, not a positioning claim. The boundary is a judgement call at the margin and another reader
+would land within about ten percent of these numbers.
+
+## The count
+
+| Class | CLAUDE.md rules | What it means |
+|---|---:|---|
+| **Already enforced** by a script in `check_all.sh` | 34 | The executed half — 34 of the 40 registered checks guard a rule this file states; the other 6 guard the language itself (php/js/shell syntax, harness runners). Every one stopped being violated. |
+| **Enforceable and not yet enforced** — the rows below | 27 | The decoration that could stop being decoration. Three landed with this survey. |
+| **Not mechanically checkable** | 41 | Judgement, identity, positioning, and rules about how to think. Prose is the right home. |
+
+So the file is roughly a third enforced, a quarter reachable, and **two fifths permanently prose** —
+which is a better answer than "half decoration" and a worse one than it looks, because the
+unenforceable 41 include the most expensive rules in the file (what may be claimed in public, what
+may be stored on a visitor's device, when to spend Tom's attention). **The prose is not decoration
+where it carries the rules no check can reach; it is decoration where a check was possible and
+nobody wrote it.** The 27 rows below are that second thing.
+
+## Ranked by value / cost
+
+Value is what a violation costs *when it ships*, weighted by whether the defect is SILENT — no
+error, nothing to see on the page — because a loud defect has other finders and a silent one has
+none. Cost is a working PHP check with its own error text, excluding its selftest (add ~50 lines
+for one of those wherever the row is blocking).
+
+| # | Rule | Stated in | A check would read | PHP lines | False positive possible? |
+|---|---|---|---|---:|---|
+| 1 | **DONE** — every literal `$ec_lang['k']` a page reads is a defined key (it renders as the empty string in all 27 languages otherwise) | CLAUDE.md § Language Keys, implied by the fallback design | `lang.ec.en.php` keys; a token scan of root `*.php` and `lib/*.php` | 60 | No — token scan, so a concatenation, a variable and a comment are all invisible to it. Shipped as `lang_key_resolve_check.php` |
+| 2 | **DONE** — every unit family appears in every preset; a preset only picks a unit its family offers; every offered unit has a factor; a page's `'units' => 'x'` names a real family | CLAUDE.md § Unit Sets; `dev/unit-families.md` §presets | `$ec_unit_families`, `$ec_unit_sets`, `$ec_units`, literal `'units' =>` declarations | 70 | No. Shipped as `unit_family_check.php` |
+| 3 | **DONE (advisory made actionable)** — the English-drift NOTE printed no text at all, because `check_all.sh` piped the report through `grep -q`. Nine role changes were invisible | CLAUDE.md § advisory checks | `detect_english_drift.php --check --brief` | 30 | n/a — still advisory, and must stay so |
+| 4 | **Every prefix is wired in `prefixToTermNames()`**; a missing one silently falls back to three default terms and a sprint's whole glossary guard is never delivered | CLAUDE.md § How to Add a New Calculator, step 11 | `prefix_terms.inc.php` against the prefixes actually used by `$ec_lang` keys and by the pages | 40 | Low — a prefix owning no glossary term is legitimate, so the check must compare against prefixes that HAVE glossary-worthy keys, or list the fallbacks rather than fail on them |
+| 5 | **`check_all.sh` and `CLAUDE.md`'s check table say the same thing** — the table is the index everyone reads and nothing ties it to the script | CLAUDE.md § Automated checks (a table that is already stale: it lacks rows 1 and 2 above) | `check_all.sh`'s `run_check` labels vs the table's rows | 40 | No, once the table is brought level. **Cannot land until somebody with write access to `CLAUDE.md` adds the two rows this survey's work created** |
+| 6 | **Never `session_start()`; call `ecSessionStart()`** — a session started before consent writes `PHPSESSID` on every page load and no banner can fix that from outside | CLAUDE.md § What may be stored | a grep of `*.php` outside `lib/config.inc.php`, comments excluded | 20 | No |
+| 7 | **`$html_desc` never points at `$html_title` or a `*_main_title` key** — Google discards a duplicate-of-title description and auto-generates a snippet from a page that is a form | CLAUDE.md § Meta description | each page's `$html_desc = ...` assignment | 30 | No |
+| 8 | **Every page sets `$html_desc` except the five named**, and `$html_desc` now feeds `og:description` too, so an unset one is a share card with no subtitle | CLAUDE.md § Meta description | which pages assign it, against a declared exempt list | 35 | No — and the prose list was wrong until 2026-08-25, which is the argument for the check |
+| 9 | **No hardcoded `?v=N`; cache-bust with `filemtime()`** | CLAUDE.md § How to Add a New Calculator, step 9 | asset URLs in every page's source | 25 | No |
+| 10 | **Tiles never enter the service worker manifest**, and no map host may appear in it — the offline promise and the no-request-until-asked promise both live here | `dev/geographic-projects.md` §tiles | what `sw.php` emits | 15 | No |
+| 11 | **The suite makes exactly four third-party requests, all opt-in** — a fifth is a new paragraph in `privacy.php` and a new consent gate | CLAUDE.md § `lpn_`; `dev/cookie-storage-inventory.md` §5 | request-shaped call sites (`fetch(`, `new Image`, `src =`) in `js/*.js` against the four declared hosts | 50 | Yes, both ways — an `<a href>` and a URL in a comment are not requests (measured: 11 distinct hosts appear in `js/*.js`, and only 3 of them are requests), so the check must match the call shape and will still need an allowlist |
+| 12 | **The cookie/storage inventory is complete** — every cookie and every `localStorage` key a shipped file writes appears in `dev/cookie-storage-inventory.md` | CLAUDE.md § What may be stored; the inventory's own premise | `setcookie(`, `localStorage.setItem(`, `sessionStorage`, IndexedDB names vs the inventory's table | 55 | Yes — `lpn_` builds document keys dynamically, so the check has to compare PREFIXES for that family |
+| 13 | **ROADMAP blocks are 1–3 lines, hard cap ~15** | CLAUDE.md § Writing things down | `dev/ROADMAP.md` block extents | 20 | No — but **34 of 58 open blocks are over the cap today** (Task 530 is 133 lines), so it can only land as a NOTE, or as a ratchet on new blocks, and trimming is Tom's call not a script's |
+| 14 | **Never rename a key by hand** — the tool also updates the drift manifest, the exempt list and the coverage declaration, and every miss fails silently | CLAUDE.md § Language Keys; `dev/language-strings.md` §renaming | `english_string_hashes.json`, `translation_exempt_keys.json` and `translation_coverage.json` for entries naming a key English no longer has | 35 | Yes — a deliberately deleted key leaves the same trace as a hand rename, and 33 such orphans exist today. Advisory, or blocking only after a prune flag exists |
+| 15 | **A `layout`/`avoid`/`gloss`/`symbol`/`runtime` tag never appears LEFT of the pipe** in `$ec_lang_syn`; the left side is translatable payload only | `dev/language-strings.md` §format | `$ec_lang_syn` values, split on the first pipe | 25 | No. `layout_tag_check.php` reads the right side only, so this is the unguarded half of the same rule |
+| 16 | **Anchor languages are `glossary.json`'s `meta.anchor_languages`, read from there and not restated** | CLAUDE.md § Translation Sprints | every doc and script naming an anchor set, against the JSON | 30 | Yes — prose naming the four languages for another reason reads identically |
+| 17 | **Never log a language as "awaiting native review"** | CLAUDE.md § Translation Sprints | `lib/Language.Settings.php` and the `dev/*.md` set | 15 | No |
+| 18 | **Every declared language has a lang file and a `QUALITY` weight, and every lang file is declared** | CLAUDE.md § Language Keys / `Language.Settings.php` | `glob(lang.ec.*.php)` vs `$all_language_settings` | 25 | No |
+| 19 | **A new JS module must be added in THREE places** or the harnesses break confusingly | `dev/testing-notes.md` §refactoring | `js/*.js` vs the page's `<script>` tags, the sw manifest and the harness loader | 40 | Low — a module deliberately loaded on one page only needs an exemption |
+| 20 | **`echoUnitSelect()` is never called with a raw array** — such a select carries no family and is invisible to the preset buttons | CLAUDE.md § Unit Sets; `dev/unit-families.md` §migration | call sites of `echoUnitSelect(` | 25 | No, for literal array arguments; a variable holding one is out of reach |
+| 21 | **A calculator page is in `Menus.lib.php` and owns a documented prefix** | CLAUDE.md § How to Add a New Calculator, steps 2 and 7 | root pages vs the menu builder vs the prefix table | 40 | Yes — non-calculator pages (`About`, `privacy`, `terms`) need a declared exclusion list |
+| 22 | **A commit subject is ≤72 characters with no body**, and carries the `Co-Authored-By` trailer | CLAUDE.md § Git Workflow | `git log` for the commit being made | 25 | No — but it belongs in a `commit-msg` hook, not in `check_all.sh`, which runs BEFORE a message exists. The measured problem is real: a body on 99 of the last 100 commits, median 297 words |
+| 23 | **Never `git add -A`** — it commits a concurrent session's in-progress work | CLAUDE.md § Git Workflow | the command itself | 15 | No, but only reachable as a shell hook; nothing in-repo ever sees the command |
+| 24 | **Every path `CLAUDE.md` cites exists** | implied by the whole file | backtick-quoted paths against the filesystem | 25 | No for `CLAUDE.md` (0 dead pointers today). **Yes for `dev/*.md`**: 31 dead citations, and nearly all are legitimate history in `history.md`, `roadmap-closed-ids.md` and `translation-execution-log.md`, so widening the scope makes it a judgement call |
+| 25 | **Never explanatory text in a link's `title=`** — on touch, a bare `<a title>` just navigates | CLAUDE.md § Labels, Tips | rendered pages: `<a>` with a `title` and no `.ec-help` sibling | 35 | Low |
+| 26 | **A verdict string leads with `✓` or `⚠` and never a translated marker word** | CLAUDE.md § Verdict convention | English verdict values in `lang.ec.en.php` | 30 | Yes — "which strings are verdicts" has to be inferred from the key name |
+| 27 | **Forbidden public claims in shipped strings** — "your phone" (it is always "a phone"), "PC application", "the only third-party request", "no extended-period simulation yet" | CLAUDE.md § `lpn_`; `dev/positioning.md` | `$ec_lang` values, English only | 30 | No inside shipped strings; **yes** the moment the scan is widened to `dev/*.md`, where every one of those phrases appears in the rule that forbids it |
+
+## What must stay prose, and why it is not decoration
+
+The 41 unenforceable rules are not a backlog. They fall into four kinds, and each kind is a reason
+a check would be worse than nothing:
+
+- **Judgement at the margin.** Is a key rendered by nothing debt, or content a page lost? Is a
+  1,900-line file too long? Is a changed English string worth 26 translators? A check here is muted
+  within a month, and a muted check is worse than none because its silence still reads as approval.
+- **Identity and positioning.** "It is a web application, not a PC application." "A phone", never
+  "your phone". These are decisions about what may be said in public, and the only mechanical
+  fragment is row 27 — the literal phrases, inside shipped strings, where quoting is impossible.
+- **Rules about how to think.** Split by purity. Ask what shape of input a harness's fixtures cannot
+  express. Decide what the answer would change before collecting it. Nothing to read.
+- **Rules whose subject is a person.** Reserve Tom's attention for naming and scope; propose before
+  spawning 26 agents. The check is the conversation.
+
+## What was deliberately left advisory in half A, and why
+
+- **`size_budget_check.php` — entirely.** Both numbers in it are judgement calls (1,500 lines,
+  80 lines) and nothing it prints is a defect; its own docblock makes the argument. A ratchet on the
+  high-water mark would be mechanical, and it would fail a commit for a legitimate addition, which is
+  the fastest known way to teach a team to pass `--no-verify`.
+- **`key_hygiene_check.php`'s two findings.** "Rendered by nothing" is explicitly not-automatically
+  debt, and two of the eight listed keys exist precisely so another check can hold every language to
+  them. Suffix drift is a rename, and a rename is a decision. **Their mechanical dual is now
+  blocking** as row 1: whether a key should exist is judgement; whether it does is not.
+- **`detect_english_drift.php`'s CHANGED gate.** A URL fix and a rewritten sentence produce the same
+  hash mismatch, and the script's own `--update=<key>` machinery exists because only a human can tell
+  them apart. Worse, blocking would push the reader toward `--update`, which baselines real drift
+  away — the check would destroy its own signal to stay green. It was made LOUDER instead: it used
+  to print nothing at all.
+- **`stale_claim_check.php`.** Citing a closed task as a record is legitimate prose; the check says so
+  itself. Its demotions were already made blocking by `stale_claim_selftest.php`, which is the model
+  the two new checks follow.
