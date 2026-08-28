@@ -3299,6 +3299,25 @@ var EngCalcs = EngCalcs || {};
 	// constant physical size: a tight world tolerance at 10% zoom is visually huge, a loose one at
 	// 500% zoom invisible.
 	var NODE_SNAP_PX = 14;
+	// **A FINGER IS NOT A POINTER, AND THE TWO GET DIFFERENT NUMBERS** (ROADMAP Task 417). Tom,
+	// 2026-08-25: *"417 phone radius needs to be larger more forgiving for the switch-to-edit-mode
+	// decision on tapping an asset (I assume any asset, not just a new asset)."* Read that
+	// parenthesis as the scope: it is his.
+	//
+	// **THIS DOES NOT CONTRADICT CLAUDE.md's "a 44px touch target is not an argument here".** That
+	// rule stops phone ergonomics driving the DESKTOP design, and nothing here moves the pointer's
+	// number: NODE_SNAP_PX is still 14, and a mouse gesture takes byte-identical paths through every
+	// call site below. What it stops being is stingy on a phone.
+	//
+	// 24 px is the RADIUS, so the target is 48 px across -- the figure both Apple's and Google's
+	// guidelines settle on for a finger, and 1.7x the pointer's. Screen pixels, like its sibling, so
+	// the target is a constant physical size at every zoom.
+	var NODE_SNAP_TOUCH_PX = 24;
+	// The slop this gesture deserves. `pointerType` is the only honest source -- a device with both
+	// a mouse and a screen answers per press, where a media query answers once for the machine.
+	function tapSlopPx(e) {
+		return (e && e.pointerType === 'touch') ? NODE_SNAP_TOUCH_PX : NODE_SNAP_PX;
+	}
 	// The Text-label sibling of nearestNodeNearScreen(). Measured to the label's ANCHOR POINT rather
 	// than its box, and at the same NODE_SNAP_PX: an anchor distance cannot make a large title block
 	// into a no-go zone the way its bounding box would.
@@ -3326,6 +3345,20 @@ var EngCalcs = EngCalcs || {};
 			if (dPx <= bestPx) { best = { link: l, t: hit.f }; bestPx = dPx; }
 		}
 		return best;
+	}
+	// The element a FINGER meant, when the real hit test found bare map (Task 417). Returns the
+	// drawn element so the caller's existing `t.dataset.*` branches read it exactly as they read a
+	// genuine hit -- there is no second dispatch and no second vocabulary.
+	//
+	// A NODE WINS A TIE, deliberately: every link ends at a node, so near a junction both are in
+	// tolerance, and the node is the more specific thing the user can have meant. Same ordering the
+	// add-Text branch uses, for the same reason.
+	function touchAssetNear(cx, cy) {
+		var n = nearestNodeNearScreen(cx, cy, NODE_SNAP_TOUCH_PX), l;
+		if (n && nodeEls[n.id]) { return nodeEls[n.id].circle; }
+		l = nearestLinkNearScreen(cx, cy, NODE_SNAP_TOUCH_PX);
+		if (l && linkEls[l.link.id]) { return linkEls[l.link.id].line; }
+		return null;
 	}
 	function nearestNodeNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, n, dPx;
@@ -18233,6 +18266,22 @@ var EngCalcs = EngCalcs || {};
 			// target to the capturing element (svg itself) on desktop Chrome, so e.target here
 			// is never the actual node/link/label clicked -- see phase0-acceptance.md round 2.
 			var w = screenToWorld(e.clientX, e.clientY), t = mapHitAt(e.clientX, e.clientY);
+			// **AND ON A FINGER, A NEAR MISS ON AN EXISTING ASSET STILL COUNTS** (Task 417, and this
+			// is the half Tom's parenthesis names -- *"any asset, not just a new asset"*). The
+			// add-* branches below have always had a screen-pixel snap; SELECT mode never did. It
+			// asks the browser what is under the point and accepts it within HIT_SLOP_PX, which is
+			// 2 -- so tapping a junction and missing its dot by five pixels opens nothing at all,
+			// and the user cannot tell that from a press the page dropped.
+			//
+			// **TOUCH ONLY, AND THAT IS WHY IT IS SAFE TO ADD AT ALL.** A pointer gesture never
+			// reaches this line, so no desktop behaviour moves; and it only runs where the real hit
+			// test found BARE MAP, so it can never overrule what the browser did find. A node wins a
+			// tie with a link for the reason the Text branch below gives: every link ends at a node,
+			// so near a junction both are in tolerance and the node is the more specific thing the
+			// user can have meant.
+			if (t === svg && e.pointerType === 'touch' && mode === 'select') {
+				t = touchAssetNear(e.clientX, e.clientY) || t;
+			}
 			// No zoomExtent() after placing an element: rescaling the whole view on every click while
 			// building a network is disorienting. Zoom Extent stays user-requested only.
 			// Undo covers Add too, not just Delete -- snapshot before every mutation so "Undo" stays
@@ -18242,7 +18291,7 @@ var EngCalcs = EngCalcs || {};
 			if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
 				// Snap-on-create: a click within NODE_SNAP_PX of an existing node reuses it instead
 				// of creating a new, overlapping one -- see nearestNodeNearScreen()'s comment.
-				var onNode = nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
+				var onNode = nearestNodeNearScreen(e.clientX, e.clientY, tapSlopPx(e));
 				if (onNode) {
 					// **A MISS THAT LANDS ON WHAT YOU JUST PLACED OPENS IT**, and switches to Select.
 					// Refusing to place a second node on top of an existing one and then doing
@@ -18263,7 +18312,7 @@ var EngCalcs = EngCalcs || {};
 				// you had just placed makes a SECOND one directly on top of it -- two labels where
 				// one was wanted, the top one dragging away to reveal the other later. Both tools now
 				// open what is already there; the node branch above has the argument for Select.
-				var onLabel = nearestLabelNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
+				var onLabel = nearestLabelNearScreen(e.clientX, e.clientY, tapSlopPx(e));
 				if (onLabel) {
 					setMode('select');
 					openLabelPopup(onLabel.id, e.clientX, e.clientY);
@@ -18276,12 +18325,12 @@ var EngCalcs = EngCalcs || {};
 				// rendering machinery in buildLabelEls()/updateLabelGeometry() was already there and
 				// ready, waiting on this). A tap within NODE_SNAP_PX anchors the new Text to that
 				// node, so it drags with it and grows a leader; otherwise it's free-floating.
-				var nearNode = nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
+				var nearNode = nearestNodeNearScreen(e.clientX, e.clientY, tapSlopPx(e));
 				// **AND FAILING A NODE, A PIPE** (Task 502). A NODE WINS A TIE, deliberately: every
 				// link ends at a node, so near a junction both are within tolerance, and the node is
 				// the more specific thing the user can have meant. That ordering is also what keeps
 				// every existing drawing's behaviour exactly as it was.
-				var nearLink = nearNode ? null : nearestLinkNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
+				var nearLink = nearNode ? null : nearestLinkNearScreen(e.clientX, e.clientY, tapSlopPx(e));
 				logLpnFirstAction('element');
 				addText(w.x, w.y, nearNode ? nearNode.id : null,
 					nearLink ? { link: nearLink.link.id, t: nearLink.t } : null);
@@ -18292,7 +18341,7 @@ var EngCalcs = EngCalcs || {};
 				// miss is diagnostic #2's dominant cause ("a pipe drawn near a junction but not
 				// snapped to it"). Falling back to the nearest node within screen-pixel tolerance
 				// makes a close tap connect anyway.
-				var hitId = t.dataset.node || (nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX) || {}).id;
+				var hitId = t.dataset.node || (nearestNodeNearScreen(e.clientX, e.clientY, tapSlopPx(e)) || {}).id;
 				if (hitId) {
 					if (!pendingLinkFrom) { setPendingLinkFrom(hitId); }
 					else if (hitId !== pendingLinkFrom) {
@@ -22661,6 +22710,45 @@ var EngCalcs = EngCalcs || {};
 	// The rename itself, with nothing about the popup in it -- so a BULK rename (applyIdPrefixToAll()
 	// below) goes through exactly the same code a hand rename does. A second implementation of this
 	// is how a bulk operation quietly forgets one of the six places an id is written.
+	// **RENAMING AN ELEMENT MEANS CHASING EVERY REFERENCE TO IT, AND THE INDEXES ARE ONLY HALF**
+	// (ROADMAP Task 533). These two helpers are the half nothing else covers: a CONTROL names its
+	// link and may name a node, and both live twice -- once in the parsed record and once in `raw`,
+	// the sentence the file stated or the user typed. `raw` is what the exporter writes, so a rename
+	// that updated only the record would produce an `.inp` naming an element that is not in it, and
+	// EPANET rejects such a file outright. That is a worse failure than the one this task came from.
+	//
+	// **THE TOKEN IS REPLACED IN PLACE, NOT THE SENTENCE REBUILT.** `raw` is the user's own text --
+	// their spacing, their capitalisation, their trailing comment -- and libControlText() only
+	// composes a sentence for a control that never had one. Splitting on `(\s+)` keeps the
+	// whitespace runs as array members, so join() gives the line back character for character with
+	// one token different.
+	function renameControlToken(raw, keyword, oldId, newId) {
+		var parts = String(raw).split(/(\s+)/), i, armed = (keyword === null);
+		for (i = 0; i < parts.length; i++) {
+			if (parts[i] === '' || /^\s+$/.test(parts[i])) { continue; }
+			if (armed) {
+				// The first non-space token after the keyword IS the id, by the grammar
+				// lpnParseControl reads. Compared exactly: an id is case-sensitive here.
+				return parts[i] === oldId ? (parts[i] = newId, parts.join('')) : raw;
+			}
+			if (parts[i].toUpperCase() === keyword) { armed = true; }
+		}
+		return raw;
+	}
+	// Every control that names `oldId` in the given role follows the rename, record and text alike.
+	function renameInControls(role, oldId, newId) {
+		(doc.controls || []).forEach(function (c) {
+			if (!c) { return; }
+			if (role === 'link' && c.link === oldId) {
+				c.link = newId;
+				if (typeof c.raw === 'string') { c.raw = renameControlToken(c.raw, 'LINK', oldId, newId); }
+			}
+			if (role === 'node' && c.condition && c.condition.kind === 'node' && c.condition.node === oldId) {
+				c.condition.node = newId;
+				if (typeof c.raw === 'string') { c.raw = renameControlToken(c.raw, 'NODE', oldId, newId); }
+			}
+		});
+	}
 	function applyNodeRename(oldId, newId) {
 		var n = nodeById(oldId);
 		n.id = newId;
@@ -22675,6 +22763,17 @@ var EngCalcs = EngCalcs || {};
 			if (l.to === oldId) { l.to = newId; }
 		});
 		doc.labels.forEach(function (lb) { if (lb.anchorNode === oldId) { lb.anchorNode = newId; } });
+		// A control's IF NODE condition (Task 533). See renameInControls().
+		renameInControls('node', oldId, newId);
+		// **AND EVERY SAVED PATH THAT STOPS HERE** (Task 510's `doc.profiles`). A path is a list of
+		// NODE IDS -- deliberately the stops the user chose and not the resolved route -- so a
+		// rename that skipped it would turn a working path into one naming a node this document does
+		// not have, which the profile pane reports as missing. Read verbatim is the rule for an id
+		// the user's file states; it is not a reason to ignore an id WE just changed.
+		(doc.profiles || []).forEach(function (pr) {
+			if (!pr || !pr.stops) { return; }
+			pr.stops = pr.stops.map(function (sid) { return sid === oldId ? newId : sid; });
+		});
 	}
 	function renameNode(oldId, newId) {
 		applyNodeRename(oldId, newId);
@@ -22697,6 +22796,20 @@ var EngCalcs = EngCalcs || {};
 		doc.labels.forEach(function (lb) { if (lb.anchorLink === oldId) { lb.anchorLink = newId; } });
 		linkEls[newId].line.setAttribute('data-link', newId);
 		linkEls[newId].handles.forEach(function (h) { h.setAttribute('data-link', newId); });
+		// **THE DEFECT TASK 533 WAS OPENED FOR.** `incidentLinks` is keyed by NODE and holds LINK
+		// ids, so a link rename does not rekey it -- it has to rewrite the ids inside two of its
+		// arrays. Left out, the index still held the old id, and updateNode() walks that list into
+		// `linkEls`: rename a link, then drag one of its nodes, and the drag throws on a missing
+		// entry. Both ends, because `from` and `to` each carry the link in their own list, and a
+		// self-loop would be in one list twice -- so this maps rather than splices.
+		[l.from, l.to].forEach(function (nid) {
+			var arr = incidentLinks[nid];
+			if (!arr) { return; }
+			incidentLinks[nid] = arr.map(function (x) { return x === oldId ? newId : x; });
+		});
+		// A control names its link, in the record AND in the sentence the exporter writes
+		// (Task 533). See renameInControls().
+		renameInControls('link', oldId, newId);
 	}
 	function renameLink(oldId, newId) {
 		applyLinkRename(oldId, newId);

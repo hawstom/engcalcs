@@ -437,19 +437,6 @@ the block.
     the rule and must survive into the guide: telling them apart is a judgement, so this is one for
     the human pile, not the checkable one.
 
-- 100|533| **Renaming a link leaves `incidentLinks` pointing at the old id.**
-  Found 2026-08-25 by the Task 502 agent while building Text-on-a-link, and **left unfixed on
-  purpose** — it was outside that track's territory and is pre-existing, not something 502
-  introduced. Its harness says where it declines to assert it, which is the honest form.
-  - `applyLinkRename()` updates the link but does not remap `incidentLinks`, so the index still
-    holds the OLD id. **Move a node after renaming one of its links and the drag walks into a
-    missing `linkEls` entry.** Rename, then drag: that is the whole reproduction.
-  - It is the same shape as the defect Task 502's own index had to avoid — a second map keyed by id
-    that a rename can desynchronise. **Look for the others while you are in there**: `labelsByAnchor`
-    and the new `labelsByLinkAnchor` are keyed the same way, and a node rename is a real gesture too.
-  - **Not observed in the wild**, which is why it is 75 and not 100: renaming a link and then
-    dragging one of its nodes without an intervening redraw is a narrow path. It is still a throw.
-
 - 75|531| **Tag the examples: US/SI, design/maintenance, xy/lat-lon.**
   Tom, 2026-08-25: *"Reference 348. Phase 1 can be adding labels, tags, or keywords to the
   examples."* **Task 348 is sub-categories and paging in the gallery, and is deliberately unbuilt at
@@ -847,14 +834,26 @@ the block.
     begins a drag, so a touch user who presses and drags is editing an element the page does not
     think is selected for editing. Same guard, second trigger. Task 192 has why long-press is the
     touch equivalent generally.
-  - **The new half:** the hit radius that decides "you tapped an asset" is tuned for a pointer, and a
-    finger is not a pointer. CLAUDE.md's rule stands — *say "pointer slop" when you mean
-    hand-and-mouse tolerance, and a 44px touch target is not an argument here* — but that rule is
-    about not letting phone ergonomics drive the DESKTOP design, not about being stingy on a phone.
-    **A touch-derived radius is a different number from a mouse-derived one and should be one.**
-  - `hitConfirmed()` is where the float32 half of this was already fixed, so it is the place to look
-    first. Whatever number is chosen must be asserted at 360px, where every other phone fix is
-    guarded.
+  - **THE NEW HALF SHIPPED 2026-08-28.** `NODE_SNAP_TOUCH_PX` is 24 — a 48 px target, the figure
+    Apple's and Google's guidelines both settle on — against the pointer's unchanged 14, and
+    `tapSlopPx(e)` picks per press from `e.pointerType`. **A PEN takes the POINTER's number**: it is
+    precise, and it is what a surveyor marking up a tablet is holding.
+    - **The half his parenthesis names was the one nobody had noticed.** The add-* branches have
+      always had a screen-pixel snap; **SELECT mode never did.** It took whatever the browser found
+      under the point, within `HIT_SLOP_PX` = 2 — so tapping an existing junction and missing its
+      dot by five pixels opened nothing, and a user cannot tell that from a press the page dropped.
+      `touchAssetNear()` is the fallback, and it is safe because it is TOUCH ONLY and runs only
+      where the real hit test found bare map: it can add a hit, never overrule one, and a pointer
+      gesture never reaches it. A node wins a tie with a link.
+    - **NOT asserted at 360px, and that is deliberate.** The radius follows the POINTER, not the
+      screen — a touchscreen laptop at 1400px has a finger, a phone with a stylus does not — so a
+      width-keyed assertion would prove something the code does not do.
+      `dev/lpn-spike/touch-radius-harness.js` (14) states that in its own header.
+  - **[H] STILL OPEN: the long-press half, because it is not clear which "Edit mode" it means.**
+    There is no `edit` mode in `setMode()` — the modes are select, add-*, delete — and the only
+    thing called Edit mode is the saved-path editor (Task 509/510), which is entered from a button
+    and never from a press on an element. Task 192 is cited as the background and does not settle
+    it either. **One sentence from Tom naming the mode closes this.**
 
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
   Tom, 2026-08-26, with a screenshot of two node labels whose leaders cross: *"This might be

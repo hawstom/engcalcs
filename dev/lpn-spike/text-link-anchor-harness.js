@@ -190,10 +190,11 @@ console.log('\n--- 5. renaming the link: the note follows the new id ---');
 	L.applyLinkRename('L1', 'MAIN-A');
 	ok('the Text names the renamed link', L.labelById(lb.id).anchorLink === 'MAIN-A');
 	ok('...and still resolves to the same point', at(L.anchorPoint(lb.id), 100, 0), show(L.anchorPoint(lb.id)));
-	// NOT ASSERTED HERE: moving a node after a link rename. `incidentLinks` still holds the OLD
-	// link id -- a pre-existing gap in applyLinkRename() that predates this task and has nothing to
-	// do with a Text -- and updateNode() then walks into an element that is not there. Asserting it
-	// here would make this harness fail for somebody else's reason.
+	// STILL NOT ASSERTED HERE, and the reason changed: the gap this note used to describe --
+	// `incidentLinks` holding the old link id after a rename -- was FIXED under Task 533 and is
+	// asserted, with the other four references a rename has to chase, in
+	// `dev/lpn-spike/rename-references-harness.js`. It stays out of this file because it is still
+	// somebody else's subject; a Text is what this harness is about.
 }
 
 console.log('\n--- 6. creating one: a tap near a pipe attaches, a tap near a node still wins ---');

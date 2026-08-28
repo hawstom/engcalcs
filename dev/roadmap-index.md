@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**62 open tasks.** Next (100): 12 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
+**61 open tasks.** Next (100): 11 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
 
-## 100 — Next (12)
+## 100 — Next (11)
 
 - Task 248.03 — Rule-based controls, EPANET's `[RULES]` (Task 248 child).
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
@@ -18,7 +18,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
 - ! Task 530 — [H] · Fire flow: what shipped answers ONE hydrant. The real question is the whole system.
-- Task 533 — Renaming a link leaves `incidentLinks` pointing at the old id.
 - Task 540 — [H] · BUILT, including the parser. What stays open is WORDING.
 - Task 542 — Terrain elevations become two ordinary controls, and the menu row goes away.
 - ! Task 545 — [H] · 64 English strings are waiting on Tom's wording, and they were recorded nowhere.
@@ -88,5 +87,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-54 of 62 titles are within 4–12 words. `!` marks the rest;
+53 of 61 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
