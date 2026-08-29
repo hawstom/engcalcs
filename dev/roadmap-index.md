@@ -17,9 +17,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
-- ! Task 530 — [H] · Fire flow: what shipped answers ONE hydrant. The real question is the whole system.
-- Task 540 — [H] · BUILT, including the parser. What stays open is WORDING.
-- ! Task 545 — [H] · 64 English strings are waiting on Tom's wording, and they were recorded nowhere.
+- Task 530 — Fire flow: Tom's rulings are recorded; what is left is BUILDING them.
+- Task 540 — BUILT, including the parser. Tom has approved the wording.
+- ! Task 545 — [H] · The list is a file now. Tom read it once and the edits were lost.
 - Task 553 — [H] · Demands and Hydraulics options: BUILT. One wording question is left.
 
 ## 75 — Soon (9)
@@ -86,5 +86,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-52 of 60 titles are within 4–12 words. `!` marks the rest;
+53 of 60 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

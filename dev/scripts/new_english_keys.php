@@ -39,6 +39,7 @@ $root = dirname(__DIR__, 2);
 $argvAll = $argv;
 $namesOnly = in_array('--names', $argvAll, true);
 $write = in_array('--write', $argvAll, true);
+$force = in_array('--force', $argvAll, true);
 $check = in_array('--check', $argvAll, true);
 $prefix = '';
 foreach ($argvAll as $a) {
@@ -137,6 +138,49 @@ if ($write || $check) {
         fwrite(STDERR, "This file is generated, never hand-edited. It is the list Tom reads; a stale one is\n");
         fwrite(STDERR, "the exact failure this script was written for.\n");
         exit(1);
+    }
+    /*
+     * **--write REFUSES TO CLOBBER A FILE SOMEBODY HAS EDITED BY HAND** (2026-08-28).
+     *
+     * WHY, AND IT IS A REAL LOSS, NOT A HYPOTHETICAL. Tom, of this very file: *"545: I did this
+     * task. I believe you overwrote my painstaking edits. Can you restore them?"* They were not
+     * recoverable — not in any commit, not in a dangling blob, not in a stash. The file is
+     * generated, its header says so, and the process is that a ruling is a sentence in
+     * conversation; none of that stops a person from doing the obvious thing, which is to read the
+     * list in the file and mark it up in the file.
+     *
+     * **AND THE REGENERATION IS THE EASIEST COMMAND IN THIS REPO TO RUN INNOCENTLY.** Any session
+     * that adds one English key runs it. So the danger is not carelessness, it is that the safe
+     * routine and the destructive one are the same keystroke.
+     *
+     * **THE TEST IS "WAS THE FILE EDITED", NOT "HAS IT DRIFTED".** Drift is the NORMAL state: any
+     * session that adds one English key leaves this file stale, and refusing there would fire on
+     * every ordinary run and teach everyone to pass --force. So it compares what is ON DISK with
+     * what git last COMMITTED. Equal means nobody has touched the file and the difference from
+     * `$want` is entirely somebody editing `lang.ec.en.php` — regenerate freely. Unequal means a
+     * human has been in here, and that is the case worth stopping for.
+     *
+     * Outside a git checkout it cannot tell, and it writes rather than blocking work it cannot
+     * reason about. check_all.sh always runs in one.
+     */
+    $committed = null;
+    $rc = 1;
+    $outLines = array();
+    @exec('git -C ' . escapeshellarg($root) . ' show HEAD:dev/new-english-keys.md 2>/dev/null', $outLines, $rc);
+    if ($rc === 0) { $committed = implode("\n", $outLines) . "\n"; }
+    $handEdited = ($committed !== null && $have !== '' && rtrim($have) !== rtrim($committed));
+    if ($handEdited && !$force) {
+        fwrite(STDERR, "REFUSING TO WRITE: dev/new-english-keys.md has been edited since it was\n");
+        fwrite(STDERR, "last generated, and regenerating would discard those edits permanently.\n\n");
+        fwrite(STDERR, "This has already happened once, to Tom, and the edits were not recoverable\n");
+        fwrite(STDERR, "from git — the file is only ever committed in its generated form.\n\n");
+        fwrite(STDERR, "    See what changed:   git diff dev/new-english-keys.md\n");
+        fwrite(STDERR, "    Keep the edits:     read them, apply the wording to lib/lang.ec.en.php,\n");
+        fwrite(STDERR, "                        then regenerate — the file will match again by itself\n");
+        fwrite(STDERR, "    Discard them:       php dev/scripts/new_english_keys.php --write --force\n\n");
+        fwrite(STDERR, "Do not reach for --force to get past this. The whole point of the file is that\n");
+        fwrite(STDERR, "somebody reads it, and somebody reading it will write on it.\n");
+        exit(2);
     }
     file_put_contents($file, $want);
     echo "dev/new-english-keys.md written — " . count($new) . " keys awaiting a ruling\n";

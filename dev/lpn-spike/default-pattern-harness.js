@@ -213,5 +213,30 @@ console.log('\n--- and drawing it changes nothing ---');
 		settingsRows().some(r => /Default demand pattern/.test(r.label)));
 }
 
+// ---------------------------------------------------------------------------
+// 6. And the OTHER getters of that shape, resolved on Tom's ask.
+// ---------------------------------------------------------------------------
+console.log('\n--- the same shape, wherever else it lives ---');
+{
+	// **THREE FUNCTIONS IN js/looped-network.js RETURN `(doc.x = doc.x || [])`.** That assignment is
+	// right for a WRITER, which needs something to push onto, and wrong for a READER, where it turns
+	// a look into a document change. libPatterns() was the one that bit (a Settings row rebuilt on
+	// every unit change wrote `patterns: []` into documents that stated none); savedProfiles() and
+	// libControls() have the identical shape and were split the same way on 2026-08-28.
+	//
+	// **ASSERTED ON THE SOURCE, because the defect is structural.** A behavioural test would only
+	// catch the reader that happens to fire today, and the whole point is the one that fires after
+	// the next refactor.
+	const src = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
+	const assigning = (src.match(/return \(doc\.[a-zA-Z]+ = doc\.[a-zA-Z]+ \|\| \[\]\)/g) || []);
+	ok('there are exactly three assigning getters, and no more crept in',
+		assigning.length === 3, assigning.length + ': ' + assigning.join(' | '));
+	// Each one has a pure sibling. Named by convention so a reader can find it without asking.
+	['libPatternsRead', 'savedProfilesRead', 'libControlsRead'].forEach(function (fn) {
+		ok(fn + '() exists as the pure half',
+			new RegExp('function\\s+' + fn + '\\s*\\(\\)\\s*\\{\\s*return doc\\.[a-zA-Z]+ \\|\\| \\[\\];').test(src));
+	});
+}
+
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);

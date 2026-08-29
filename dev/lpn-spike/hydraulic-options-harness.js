@@ -247,16 +247,22 @@ console.log('\n--- four rows, and the rest carried without one ---');
 			const span = (line.children || []).filter(c => c.tagName === 'SPAN')[0];
 			return span ? span.textContent.replace(/\s+/g, ' ').trim() : '';
 		});
-	['Demand multiplier', 'Specific gravity', 'Relative viscosity', 'Emitter exponent',
+	['Accuracy', 'Demand multiplier', 'Specific gravity', 'Relative viscosity', 'Emitter exponent',
 		'Maximum trials'].forEach(function (w) {
 		ok(w + ' has a row', labels.some(t => t.indexOf(w) === 0), labels.join(' | '));
 	});
+	// **AND "CONVERGENCE TOLERANCE" IS GONE** (Tom, 2026-08-28: *"Deprecate our 'Convergence
+	// tolerance' to use the EPANET setting"*). The two measured the same kind of thing — a sum of
+	// absolute flow changes over an iteration, normalised — and two rows a reader cannot tell apart
+	// is worse than one.
+	ok('...and Convergence tolerance is gone, replaced by Accuracy',
+		!labels.some(t => /Convergence/.test(t)), labels.join(' | '));
 	// **AND THE ONES THAT DO NOT, WHICH IS AS DELIBERATE AS THE ONES THAT DO.** CLAUDE.md's
 	// emitter-exponent precedent: never ship the most technical-looking control in a box if it is
 	// the one that adjusts nothing. Accuracy is the interesting exclusion -- it has no honest place
 	// beside Convergence tolerance, which is a different quantity on a different scale, and which
 	// of the two a reader should meet is Tom's call and not a script's.
-	['Accuracy', 'Unbalanced', 'Head error', 'Status report', 'Flow change', 'Damp'].forEach(function (w) {
+	['Unbalanced', 'Head error', 'Status report', 'Flow change', 'Damp'].forEach(function (w) {
 		ok('...and ' + w + ' deliberately has none', !labels.some(t => t.indexOf(w) === 0),
 			labels.join(' | '));
 	});

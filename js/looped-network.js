@@ -2845,7 +2845,9 @@ var EngCalcs = EngCalcs || {};
 			// writes nothing -- the same rule `defaultPattern` has always followed. `settings` is
 			// serialized WITH the project, so this round-trips without a line anywhere else.
 			hydraulics: {},
-			tolerance: 1e-9, // matches js/lpn-solver.js's own default relative-flow-change tol -- see runSolve()
+			// **`tolerance` IS DEPRECATED AND IS NO LONGER SEEDED HERE** (2026-08-28). EPANET's
+			// `Accuracy` replaced it; solveAccuracy() still READS it so a project saved before the
+			// change keeps its own number, but a new project no longer carries the field at all.
 			// 'native' (js/lpn-solver.js) or 'epanet' (the real EPANET engine as WASM,
 			// js/lpn-epanet.js). The two agree to 1e-5..1e-3 m of head
 			// (dev/lpn-spike/validate_epanet.js).
@@ -6774,6 +6776,19 @@ var EngCalcs = EngCalcs || {};
 	 * a parameter rather than a flag inside the loop so that the permission travels with the call
 	 * that was confirmed, and cannot be left switched on for the next one.
 	 */
+	// **WHAT THE LAND SURFACE SAID, PER NODE, FOR THIS SESSION** (Tom, 2026-08-28: *"can we have
+	// some way to know the elevation at a point or at a node? Maybe when we are editing a node, the
+	// button or link above can state the DEM elevation?"*).
+	//
+	// **EVERY READING IS RECORDED, INCLUDING THE ONES NOT WRITTEN.** That is the whole point: a node
+	// whose own elevation we correctly declined to overwrite is exactly the node where a person
+	// wants to see what the DEM thinks, so they can compare it with the number they have. Recording
+	// only the writes would answer the easy half.
+	//
+	// **NOT IN THE DOCUMENT AND NEVER SERIALIZED.** It is a fact about the terrain service, not
+	// about the network -- the same standing as a solve result -- and writing it into the project
+	// would put a number nobody typed into a file they save.
+	var terrainLastRead = {};
 	function terrainFillElevations(list, replaceValue) {
 		// **`replaceValue === true` MEANS "WHATEVER IS THERE", AND ONLY FIND AND REPLACE MAY PASS
 		// IT** (Task 542). That door exists precisely to change numbers a person has: they chose the
@@ -6786,6 +6801,9 @@ var EngCalcs = EngCalcs || {};
 		(list || []).forEach(function (e) {
 			var n = nodeById(e.id);
 			if (!n) { return; }
+			// Recorded BEFORE the write is decided, so a reading is remembered even where the
+			// elevation is left alone -- see terrainLastRead's own note.
+			if (typeof e.meters === 'number' && isFinite(e.meters)) { terrainLastRead[e.id] = e.meters; }
 			if (terrainHasElev(n) && !replaceAny && !(mayReplace && n.elev === replaceValue)) { return; }
 			if (typeof e.meters !== 'number' || !isFinite(e.meters)) { return; }
 			// Two decimals in the displayed unit. The raster's own quantum is 0.1 m, so more digits
@@ -6795,7 +6813,11 @@ var EngCalcs = EngCalcs || {};
 			if (!isFinite(v)) { return; }
 			pending.push({ n: n, v: v });
 		});
-		if (!pending.length) { return []; }
+		// **THE POPUP IS REFRESHED EVEN WHEN NOTHING IS WRITTEN**, and that is not tidiness: a
+		// reading is recorded above whether or not it is used, so the node whose elevation we
+		// correctly declined to overwrite is exactly the one whose popup must now show what the DEM
+		// said. Returning early without this left the button looking like it had done nothing.
+		if (!pending.length) { refreshPopupIfOpen(); return []; }
 		saveUndoSnapshot();
 		pending.forEach(function (p) { p.n.elev = p.v; });
 		buildDom();
@@ -9002,7 +9024,7 @@ var EngCalcs = EngCalcs || {};
 		if (replaceState.prop === 'elev' && isGeoProject() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			findSelect(box, pc.lpn_replace_source || 'From',
 				[['value', pc.lpn_settings_elev_source_typed || 'The number above'],
-					['dem', pc.lpn_settings_elev_source_dem || 'From Mapbox DEM']],
+					['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']],
 				replaceState.source, function (v) {
 					replaceState.source = (v === 'dem') ? 'dem' : 'value';
 					replacePending = null;
@@ -11455,9 +11477,17 @@ var EngCalcs = EngCalcs || {};
 	// **WHICH ONE IS SELECTED IS NOT STORED.** That is a fact about this reader in this session, the
 	// same kind of thing as which pane tab is open, and a colleague opening the file should not
 	// inherit it.
+	// **WRITE THROUGH savedProfiles(); READ THROUGH savedProfilesRead().** The assignment is what
+	// lets a caller push onto the result, and that is right for a writer and wrong for a reader --
+	// the same split libPatterns()/libPatternsRead() carries, and for the same reason: a getter that
+	// materialises `[]` on a document that stated none is a WRITE, and a reader firing on a rebuild
+	// turns it into a document change nobody made. Investigated 2026-08-28 on Tom's ask; this one
+	// was not yet reachable that way (serializeProject writes `profiles: []` unconditionally, so the
+	// SAVED file could not differ), but the shape is the trap and the fix costs one line.
 	function savedProfiles() { return (doc.profiles = doc.profiles || []); }
+	function savedProfilesRead() { return doc.profiles || []; }
 	function savedProfileById(id) {
-		var list = savedProfiles(), i;
+		var list = savedProfilesRead(), i;
 		for (i = 0; i < list.length; i++) { if (list[i].id === id) { return list[i]; } }
 		return null;
 	}
@@ -11473,7 +11503,7 @@ var EngCalcs = EngCalcs || {};
 	// Every saved path with something missing, for a caller that wants to say so once rather than
 	// per path. Nothing is changed by asking.
 	function profileSavedIssues() {
-		return savedProfiles().map(function (p) {
+		return savedProfilesRead().map(function (p) {
 			return { id: p.id, name: p.name, missing: profileMissingStops(p) };
 		}).filter(function (r) { return r.missing.length > 0; });
 	}
@@ -11539,7 +11569,7 @@ var EngCalcs = EngCalcs || {};
 			.replace('{name}', p.name || '');
 		if (!window.confirm(msg)) { return; }
 		saveUndoSnapshot();
-		doc.profiles = savedProfiles().filter(function (x) { return x !== p; });
+		doc.profiles = savedProfilesRead().filter(function (x) { return x !== p; });
 		// The path stays on screen: deleting its NAME is not deleting the drawing, which is what the
 		// confirmation just promised.
 		profileState.activeId = '';
@@ -11552,7 +11582,7 @@ var EngCalcs = EngCalcs || {};
 	// pull-down, so it inherits the dismissal, the placement and the icon column every other menu on
 	// this page has.
 	function openProfileSavedMenu(anchor) {
-		var pc = EngCalcs.pageConfig || {}, rows = [], list = savedProfiles(), active = activeSavedProfile();
+		var pc = EngCalcs.pageConfig || {}, rows = [], list = savedProfilesRead(), active = activeSavedProfile();
 		rows.push({ heading: true, label: pc.lpn_profile_saved || 'Saved paths' });
 		if (!list.length) {
 			rows.push({ label: pc.lpn_profile_none_saved || 'No saved paths yet', disabled: true, fn: function () {} });
@@ -20538,6 +20568,7 @@ var EngCalcs = EngCalcs || {};
 				else { input.value = trimNum(settings.defaults[key]); }
 			});
 			row(target, unitId ? labelText + ' (' + unitLabel(unitId) + ')' : labelText, input, tip, href);
+			return input;
 		}
 		function any() { return true; }
 		function positive(v) { return v > 0; }
@@ -20603,7 +20634,7 @@ var EngCalcs = EngCalcs || {};
 		note(defBody, pc.lpn_settings_defaults_note || 'Used for elements you create from now on. Existing elements are not changed.');
 		// One elevation for BOTH junctions and reservoirs (Tom, 2026-07-30). A reservoir's head is
 		// absent by design and follows this elevation -- see reservoirHead() and addNode().
-		defaultRow(defBody, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead', 'nodeElev', any);
+		var elevInput = defaultRow(defBody, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead', 'nodeElev', any);
 		// **AND WHERE THAT ELEVATION COMES FROM** (Task 542, Tom's own words: *"Settings.New assets.
 		// Values.Elevation should have an option for 'From DEM'"*). A select, not a checkbox, because
 		// it is a choice between two SOURCES and a checkbox beside a number box reads as a modifier
@@ -20616,18 +20647,36 @@ var EngCalcs = EngCalcs || {};
 		if (isGeoProject() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			var elevSrc = document.createElement('select');
 			[['value', pc.lpn_settings_elev_source_typed || 'The number above'],
-				['dem', pc.lpn_settings_elev_source_dem || 'From Mapbox DEM']].forEach(function (o) {
+				['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']].forEach(function (o) {
 				var opt = document.createElement('option');
 				opt.value = o[0]; opt.textContent = o[1];
 				if (o[0] === (settings.defaults.nodeElevSource || 'value')) { opt.selected = true; }
 				elevSrc.appendChild(opt);
 			});
+			// **AND THE NUMBER ABOVE GOES BLANK WHEN IT IS NOT THE SOURCE** (Tom, 2026-08-28: *"It
+			// seems that Settings.New assets.Values.Elevation should be blank, not zero, when
+			// Mapbox DEM is selected."*). Quite right: a `0` sitting in a box that nothing reads is
+			// a number a person will believe. A node born under the DEM setting gets NO elevation
+			// until the tile answers -- see addNode() -- so blank is also exactly what the document
+			// holds in the interval, rather than a display convention laid over something else.
+			//
+			// Disabled as well as blank, because an editable box that is ignored is worse than an
+			// empty one: it invites a number and then drops it.
+			function syncElevSource() {
+				var dem = elevSrc.value === 'dem';
+				if (elevInput) {
+					elevInput.disabled = dem;
+					elevInput.value = dem ? '' : trimNum(settings.defaults.nodeElev);
+				}
+			}
 			elevSrc.addEventListener('change', function () {
 				settings.defaults.nodeElevSource = elevSrc.value === 'dem' ? 'dem' : 'value';
 				saveToStorage();
+				syncElevSource();
 			});
 			row(defBody, pc.lpn_settings_elev_source || 'Elevation from', elevSrc,
 				pc.lpn_settings_elev_source_tip);
+			syncElevSource();   // the box opens in the state the setting already says
 		}
 		// The BASE demand, because a starting value is a typed number: a resolved demand is worked
 		// out from one and cannot be seeded (see resolvedDemand()).
@@ -20962,13 +21011,22 @@ var EngCalcs = EngCalcs || {};
 		// So the control does change an answer, on exactly the networks a person is most likely to
 		// be looking at, and its tip says which ones. Task 191 is still what makes an emitter
 		// editable on the page; it was never what made this number act.
-		var tolInput = document.createElement('input');
-		tolInput.type = 'number'; tolInput.step = 'any'; tolInput.value = settings.tolerance;
-		tolInput.addEventListener('change', function () {
-			if (+tolInput.value > 0) { settings.tolerance = +tolInput.value; scheduleSolve(); }
-			else { tolInput.value = settings.tolerance; }
-		});
-		row(compBody, pc.lpn_settings_tolerance || 'Convergence tolerance', tolInput, pc.lpn_settings_tolerance_tip);
+		// **"CONVERGENCE TOLERANCE" IS GONE; EPANET'S `Accuracy` IS THE ONE SETTING** (Tom,
+		// 2026-08-28: *"Deprecate our 'Convergence tolerance' to use the EPANET setting unless you
+		// find a strong reason not to do that."* There is no such reason, and the row below is built
+		// by hydNumberRow like the rest of `[OPTIONS]`.)
+		//
+		// **THEY MEASURE THE SAME KIND OF THING, WHICH IS WHY ONE CAN REPLACE THE OTHER.**
+		// js/lpn-solver.js's own comment already compares them out loud — *"Relative flow change.
+		// EPANET's default is 1e-3; this is far tighter"* — and both are a sum of absolute flow
+		// changes over an iteration, normalised. The denominators differ (ours by total DEMAND,
+		// EPANET's by total flow) and that is a refinement of the same quantity, not a different
+		// one. Two rows a reader cannot tell apart was the alternative.
+		//
+		// **THE EFFECTIVE DEFAULT DOES NOT MOVE.** Unset still means our own 1e-9 natively, which is
+		// six orders tighter than EPANET's 0.001 and is deliberate: at this page's scale the extra
+		// iterations are free, and it is what keeps a disagreement between the two engines from ever
+		// being just tolerance. Adopting EPANET's NAME is not adopting its default.
 		// ---- EPANET's [OPTIONS], the ones that ACT (ROADMAP Task 553) ----
 		//
 		// Tom, 2026-08-28, naming what a person must be able to see: *"the default pattern must be
@@ -21015,6 +21073,8 @@ var EngCalcs = EngCalcs || {};
 			row(compBody, pc[labelKey] || fallback, input, pc[tipKey]);
 		}
 		if (!settings.hydraulics) { settings.hydraulics = {}; }
+		hydNumberRow('accuracy', 'lpn_settings_accuracy', 'Accuracy',
+			'lpn_settings_accuracy_tip', solveAccuracy());
 		hydNumberRow('demandMultiplier', 'lpn_settings_demand_multiplier', 'Demand multiplier',
 			'lpn_settings_demand_multiplier_tip', 1);
 		hydNumberRow('specificGravity', 'lpn_settings_specific_gravity', 'Specific gravity',
@@ -21558,7 +21618,9 @@ var EngCalcs = EngCalcs || {};
 	// **Read through libPatternsRead(); write through libPatterns().**
 	function libPatterns() { return (doc.patterns = doc.patterns || []); }
 	function libPatternsRead() { return doc.patterns || []; }
+	// Same split, same reason -- see savedProfiles() above.
 	function libControls() { return (doc.controls = doc.controls || []); }
+	function libControlsRead() { return doc.controls || []; }
 	// Every curve on the page, WHEREVER IT LIVES. A pump's `curvePoints` and a GPV's are the same
 	// shape and are read by the same code (curvePointTable), so they are one list here.
 	function libCurves() {
@@ -22101,7 +22163,7 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function buildControlSection(host) {
-		var pc = EngCalcs.pageConfig || {}, list = libControls();
+		var pc = EngCalcs.pageConfig || {}, list = libControlsRead();
 		host.appendChild(libButton(pc.lpn_library_control_add || 'Add a control', function () {
 			// **THE STARTER SENTENCE IS BUILT FROM THIS NETWORK**, so the box opens on something
 			// that is already true rather than on a template with blanks in it. With nothing to
@@ -22567,6 +22629,50 @@ var EngCalcs = EngCalcs || {};
 		}
 		readonlyField(fields, pc.lpn_field_x || 'X', coordText(x));
 		readonlyField(fields, pc.lpn_field_y || 'Y', coordText(y));
+	}
+	/**
+	 * **THE ELEVATION'S OWN DEM CONTROL** (ROADMAP Task 542; Tom, 2026-08-28: *"lpn Node edit: Add a
+	 * button at Elevation to set from Mapbox DEM"* and *"Maybe when we are editing a node, the
+	 * button or link above can state the DEM elevation?"*).
+	 *
+	 * ONE button, and it answers both asks: it reads the land surface under THIS node, writes the
+	 * elevation, and the line beneath it then STATES what the DEM said. Stating it separately is not
+	 * redundant with the field — the field is the user's number, which they may then edit, and the
+	 * line remains what the terrain service reported.
+	 *
+	 * **IT MAY OVERWRITE, BECAUSE THIS IS THE ONE GESTURE THAT ASKS FOR EXACTLY THAT.** The menu row
+	 * that swept the whole drawing is gone precisely because it was destructive without being asked;
+	 * a button on one node, pressed while looking at that node, is the opposite case. `replaceAny`
+	 * is passed for the same reason Find and replace passes it, and the write is one undo step
+	 * inside terrainFillElevations().
+	 *
+	 * **ABSENT WHERE IT CANNOT WORK** — an XY project, or no `EC_MAPBOX_TOKEN` — the same gate every
+	 * other door to this feature uses.
+	 */
+	function elevationDemRow(fields, n, nodeId) {
+		var pc = EngCalcs.pageConfig || {}, wrap, btn, said, m;
+		if (!isGeoProject() || !mapboxToken() || !EngCalcs.lpnTerrainFillFor) { return; }
+		wrap = document.createElement('div');
+		wrap.className = 'lpn-elev-dem';
+		btn = document.createElement('button');
+		btn.type = 'button';
+		setLabel(btn, 'globe', pc.lpn_elev_dem_read || 'Read elevation from Mapbox DEM');
+		helpTip(btn, pc.lpn_elev_dem_read_tip);
+		btn.addEventListener('click', function () {
+			EngCalcs.lpnTerrainFillFor(terrainPointsForIds([nodeId]), { replaceAny: true });
+		});
+		wrap.appendChild(btn);
+		// What it said last time, if it has been asked -- about THIS node, in the displayed unit.
+		m = terrainLastRead[nodeId];
+		if (typeof m === 'number' && isFinite(m)) {
+			said = document.createElement('div');
+			said.className = 'lpn-set-note';
+			said.textContent = (pc.lpn_elev_dem_said || 'Mapbox DEM says {v} {u}.')
+				.replace('{v}', String(+toDisplay(m, 'lpn_u_elevhead').toFixed(2)))
+				.replace('{u}', unitLabel('lpn_u_elevhead'));
+			wrap.appendChild(said);
+		}
+		fields.appendChild(wrap);
 	}
 	function readonlyField(fields, labelText, value, tip) {
 		var label = document.createElement('label'), span = document.createElement('span');
@@ -23135,6 +23241,7 @@ var EngCalcs = EngCalcs || {};
 				function () { return n.elev; },
 				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_tank_elev_tip);
+			elevationDemRow(fields, n, nodeId);
 			unitNumberField(fields, pc.lpn_field_tank_level || 'Water level', 'lpn_u_elevhead',
 				function () { return effective(n, 'level'); },
 				function (v) { setProp(n, 'level', v); updateNode(nodeId); refreshPopupIfOpen(); },
@@ -23161,6 +23268,7 @@ var EngCalcs = EngCalcs || {};
 				function () { return n.elev; },
 				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_field_elev_tip);
+			elevationDemRow(fields, n, nodeId);
 			// Blank = follow the elevation, which is what the placeholder shows -- so the field reads
 			// as already filled in without pretending the user typed it. Clearing it hands the head
 			// back to the elevation. Both setters re-render the popup, because each field feeds the
@@ -23197,6 +23305,7 @@ var EngCalcs = EngCalcs || {};
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); },
 				pc.lpn_field_elev_tip);
+			elevationDemRow(fields, n, nodeId);
 			// **THERE IS NO PLAIN Base demand / Demand pattern FIELD ANY MORE** (Task 553, Tom
 			// 2026-08-28: *"The EPANET UX is confusing by breaking out one demand (the initial)
 			// specially. What we need to do is remove the original Base demand and Demand pattern
@@ -23419,28 +23528,33 @@ var EngCalcs = EngCalcs || {};
 			acc.setCategory(cInput.value.trim());
 			afterPropertyEdit(n);
 		});
-		del.type = 'button';
-		del.className = 'lpn-demand-del';
-		// The glyph is the control and the words are its tip -- the same reason the verdict strings
-		// lead with a mark: it is language-free, it is RTL-safe, and it costs no key in 27
-		// languages to say "remove".
-		del.textContent = '×';
-		helpTip(del, pc.lpn_demand_remove || 'Remove this demand');
-		// **THE LAST REMAINING DEMAND CANNOT BE REMOVED** (Task 553). Before the table was
-		// unconditional, row 0's delete always had a row 1 to promote, because the table only
-		// existed where `extras.length`. Now every junction draws it, and on a one-demand junction
-		// acc.remove() would shift an empty array and read `.base` off undefined. Disabled rather
-		// than hidden: a column that loses its control on one row is a table whose rows do not line
-		// up, and the greyed × is the honest statement that this is the floor.
-		if (acc.soleRow) { del.disabled = true; }
-		del.addEventListener('click', function () {
-			saveUndoSnapshot();
-			acc.remove();
-			afterPropertyEdit(n);
-			refreshPopupIfOpen();
-		});
+		// **THE LAST REMAINING DEMAND HAS NO × AT ALL** (Task 553; Tom, 2026-08-28: *"There is still
+		// an x for Remove on the top Demands row. But it can't be removed, so there should be no
+		// x."*). It was drawn disabled first, on the argument that a column which loses its control
+		// on one row is a table whose rows do not line up. He is right and that argument is wrong: a
+		// junction always has a demand, so on the commonest junction in any network the × is not a
+		// control that happens to be unavailable, it is a control that does not exist. Offering a
+		// greyed one asks the reader to work out why.
+		//
+		// The CELL is still built, so the column still lines up; it is simply empty.
+		if (!acc.soleRow) {
+			del.type = 'button';
+			del.className = 'lpn-demand-del';
+			// The glyph is the control and the words are its tip -- the same reason the verdict
+			// strings lead with a mark: it is language-free, it is RTL-safe, and it costs no key in
+			// 27 languages to say "remove".
+			del.textContent = '×';
+			helpTip(del, pc.lpn_demand_remove || 'Remove this demand');
+			del.addEventListener('click', function () {
+				saveUndoSnapshot();
+				acc.remove();
+				afterPropertyEdit(n);
+				refreshPopupIfOpen();
+			});
+			xCell.appendChild(del);
+		}
 		bCell.appendChild(bInput); pCell.appendChild(sel);
-		cCell.appendChild(cInput); xCell.appendChild(del);
+		cCell.appendChild(cInput);
 		tr.appendChild(bCell); tr.appendChild(pCell);
 		tr.appendChild(cCell); tr.appendChild(xCell);
 		tbody.appendChild(tr);
@@ -24337,6 +24451,28 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Named apart from demandMultiplier() above, which is a PATTERN's multiplier at one instant for
 	// one junction. Two different quantities and the collision would be silent.
+	/**
+	 * **THE CONVERGENCE NUMBER, DECIDED IN ONE PLACE** (Tom, 2026-08-28, deprecating our own
+	 * "Convergence tolerance" in favour of EPANET's `Accuracy`).
+	 *
+	 * `settings.hydraulics.accuracy` is the setting now. `settings.tolerance` is the deprecated one
+	 * and is read ONLY as a fallback, so a project saved before this — including one where somebody
+	 * had deliberately loosened or tightened it — keeps solving to exactly the number it always did.
+	 * Nothing writes `settings.tolerance` any more.
+	 *
+	 * **1e-9 IS OURS AND STAYS OURS.** EPANET's own default for the same option is 0.001; taking its
+	 * NAME is not taking its default. At this page's scale the extra iterations are free, and the
+	 * tight number is what stops a disagreement between the two engines from ever being tolerance —
+	 * see js/lpn-solver.js's note beside `tol`.
+	 */
+	function solveAccuracy() {
+		var a = (settings.hydraulics || {}).accuracy;
+		if (typeof a === 'number' && isFinite(a) && a > 0) { return a; }
+		if (typeof settings.tolerance === 'number' && isFinite(settings.tolerance) && settings.tolerance > 0) {
+			return settings.tolerance;
+		}
+		return 1e-9;
+	}
 	function docDemandMultiplier() {
 		var m = (settings.hydraulics || {}).demandMultiplier;
 		return (typeof m === 'number' && isFinite(m)) ? m : 1;
@@ -25283,7 +25419,7 @@ var EngCalcs = EngCalcs || {};
 			runSolveEpanet(model);
 			return;
 		}
-		applySolveResult(EngCalcs.lpnSolve(model, { tol: settings.tolerance }));
+		applySolveResult(EngCalcs.lpnSolve(model, { tol: solveAccuracy() }));
 	}
 	// Set by runSolve() when a network was routed to EPANET by its own contents rather than by the
 	// user's choice; read by applySolveResult(), which owns the status bar after a successful solve.
@@ -25458,7 +25594,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		var myToken = ++epanetToken;
 		setStatus(pc.lpn_engine_loading || 'Loading the EPANET engine…');
-		EngCalcs.lpnSolveEpanet(model, { tol: settings.tolerance }).then(function (result) {
+		EngCalcs.lpnSolveEpanet(model, { tol: solveAccuracy() }).then(function (result) {
 			if (myToken !== epanetToken) { return; }   // a newer solve already started; drop this one
 			// **EPANET READ THIS NETWORK AND WOULD NOT TAKE IT** (Task 471). Not a load failure --
 			// the engine is here -- and not a failure to converge, which is what applySolveResult()
@@ -25476,7 +25612,7 @@ var EngCalcs = EngCalcs || {};
 				// The native answer is drawn FIRST -- applySolveResult() owns the status bar on its
 				// way out, so a refusal written before it would be overwritten by its own note and
 				// the user would read nothing about the refusal at all.
-				applySolveResult(EngCalcs.lpnSolve(model, { tol: settings.tolerance }));
+				applySolveResult(EngCalcs.lpnSolve(model, { tol: solveAccuracy() }));
 				setStatus(said);
 				if (window.console && console.warn) { console.warn('EPANET refused the network:', result.engineError); }
 				return;
@@ -25489,7 +25625,7 @@ var EngCalcs = EngCalcs || {};
 			// a first use, a blocked module request -- and the native answer is just as correct.
 			lastSolveResult = null;
 			setStatus(pc.lpn_engine_failed || 'The EPANET engine could not be loaded; showing the built-in solver instead.');
-			applySolveResult(EngCalcs.lpnSolve(model, { tol: settings.tolerance }));
+			applySolveResult(EngCalcs.lpnSolve(model, { tol: solveAccuracy() }));
 			if (window.console && console.warn) { console.warn('EPANET engine load/solve failed:', err); }
 		});
 	}
@@ -25507,7 +25643,7 @@ var EngCalcs = EngCalcs || {};
 			// debounce would let a keystroke landing inside that window consume the request, which
 			// is a period run in the middle of typing: the exact thing the change is for.
 			solveNow: runSolve,
-			native: function (m) { return EngCalcs.lpnSolve(m, { tol: settings.tolerance }); },
+			native: function (m) { return EngCalcs.lpnSolve(m, { tol: solveAccuracy() }); },
 			snapshot: saveUndoSnapshot, save: saveToStorage,
 			toSI: toSI, toDisplay: toDisplay, unitLabel: unitLabel,
 			// The one door from the Time TAB (the transport) to the Time SETTINGS, which moved to

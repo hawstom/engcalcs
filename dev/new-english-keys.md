@@ -12,9 +12,9 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**96 of 1423 English keys**, as of the last generation.
+**101 of 1426 English keys**, as of the last generation.
 
-## lpn_  (96)
+## lpn_  (101)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -22,6 +22,12 @@ settled these go into the next translation sprint as a batch.
   > Add another demand at this junction, with its own base demand, pattern and category. The demands add up.
 - **`lpn_demand_remove`**
   > Remove this demand
+- **`lpn_elev_dem_read`**
+  > Read elevation from Mapbox DEM
+- **`lpn_elev_dem_read_tip`**
+  > Reads the height of the land under this node from Mapbox DEM and puts it in the box above, replacing what is there. It is about 30 m across on most of the Earth, and finer where better data exists.
+- **`lpn_elev_dem_said`**
+  > Mapbox DEM says {v} {u}.
 - **`lpn_field_base_demand`**
   > Base demand
 - **`lpn_field_demand_category`**
@@ -166,6 +172,10 @@ settled these go into the next translation sprint as a batch.
   > Ringed: this element holds a value that belongs to the scenario {name} alone.
 - **`lpn_scenario_overrides_tip`**
   > Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.
+- **`lpn_settings_accuracy`**
+  > Accuracy
+- **`lpn_settings_accuracy_tip`**
+  > How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. This is EPANET's own setting, and this page starts far tighter than EPANET does.
 - **`lpn_settings_demand_multiplier`**
   > Demand multiplier
 - **`lpn_settings_demand_multiplier_tip`**
@@ -173,7 +183,7 @@ settled these go into the next translation sprint as a batch.
 - **`lpn_settings_elev_source`**
   > Elevation from
 - **`lpn_settings_elev_source_dem`**
-  > From Mapbox DEM
+  > Mapbox DEM
 - **`lpn_settings_elev_source_tip`**
   > Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.
 - **`lpn_settings_elev_source_typed`**

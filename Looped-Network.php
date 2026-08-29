@@ -1719,6 +1719,8 @@ EngCalcs.pageConfig = {
       // back with Task 553; each one changes an answer in both engines. ?>
 	lpn_settings_emitter_exponent: <?=json_encode($ec_lang['lpn_settings_emitter_exponent'])?>,
 	lpn_settings_emitter_exponent_tip: <?=json_encode($ec_lang['lpn_settings_emitter_exponent_tip'])?>,
+	lpn_settings_accuracy: <?=json_encode($ec_lang['lpn_settings_accuracy'])?>,
+	lpn_settings_accuracy_tip: <?=json_encode($ec_lang['lpn_settings_accuracy_tip'])?>,
 	lpn_settings_specific_gravity: <?=json_encode($ec_lang['lpn_settings_specific_gravity'])?>,
 	lpn_settings_specific_gravity_tip: <?=json_encode($ec_lang['lpn_settings_specific_gravity_tip'])?>,
 	lpn_settings_viscosity: <?=json_encode($ec_lang['lpn_settings_viscosity'])?>,
@@ -1730,6 +1732,9 @@ EngCalcs.pageConfig = {
 <?php // **ELEVATION ON CREATION** (Task 542). The row is built only on a geographic project with a
       // Mapbox token, but the STRINGS are supplied unconditionally: pageConfig is assembled once at
       // render time and the project can change without a reload. ?>
+	lpn_elev_dem_read: <?=json_encode($ec_lang['lpn_elev_dem_read'])?>,
+	lpn_elev_dem_read_tip: <?=json_encode($ec_lang['lpn_elev_dem_read_tip'])?>,
+	lpn_elev_dem_said: <?=json_encode($ec_lang['lpn_elev_dem_said'])?>,
 	lpn_settings_elev_source: <?=json_encode($ec_lang['lpn_settings_elev_source'])?>,
 	lpn_settings_elev_source_tip: <?=json_encode($ec_lang['lpn_settings_elev_source_tip'])?>,
 	lpn_settings_elev_source_typed: <?=json_encode($ec_lang['lpn_settings_elev_source_typed'])?>,
@@ -1826,8 +1831,6 @@ EngCalcs.pageConfig = {
 	lpn_search_offline: <?=json_encode($ec_lang['lpn_search_offline'])?>,
 	lpn_search_toofast: <?=json_encode($ec_lang['lpn_search_toofast'])?>,
 	lpn_search_nofetch: <?=json_encode($ec_lang['lpn_search_nofetch'])?>,
-	lpn_terrain_menu: <?=json_encode($ec_lang['lpn_terrain_menu'])?>,
-	lpn_terrain_tip: <?=json_encode($ec_lang['lpn_terrain_tip'])?>,
 	lpn_terrain_accuracy: <?=json_encode($ec_lang['lpn_terrain_accuracy'])?>,
 	lpn_terrain_consent_1: <?=json_encode($ec_lang['lpn_terrain_consent_1'])?>,
 	lpn_terrain_consent_2: <?=json_encode($ec_lang['lpn_terrain_consent_2'])?>,

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 1423,
-        "delta_key_count": 97,
+        "expected_key_count": 1426,
+        "delta_key_count": 102,
         "exempt_key_count": 37,
         "exempt_keys": [
             "u_imgd",
@@ -526,10 +526,15 @@
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which today means a network read from an EPANET file.",
+        "lpn_elev_dem_read": "Read elevation from Mapbox DEM",
+        "lpn_elev_dem_read_tip": "Reads the height of the land under this node from Mapbox DEM and puts it in the box above, replacing what is there. It is about 30 m across on most of the Earth, and finer where better data exists.",
+        "lpn_elev_dem_said": "Mapbox DEM says {v} {u}.",
         "lpn_settings_elev_source": "Elevation from",
         "lpn_settings_elev_source_tip": "Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.",
         "lpn_settings_elev_source_typed": "The number above",
-        "lpn_settings_elev_source_dem": "From Mapbox DEM",
+        "lpn_settings_elev_source_dem": "Mapbox DEM",
+        "lpn_settings_accuracy": "Accuracy",
+        "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. This is EPANET's own setting, and this page starts far tighter than EPANET does.",
         "lpn_settings_specific_gravity": "Specific gravity",
         "lpn_settings_specific_gravity_tip": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
         "lpn_settings_viscosity": "Relative viscosity",
@@ -625,10 +630,15 @@
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which today means a network read from an EPANET file.",
+        "lpn_elev_dem_read": "Read elevation from Mapbox DEM",
+        "lpn_elev_dem_read_tip": "Reads the height of the land under this node from Mapbox DEM and puts it in the box above, replacing what is there. It is about 30 m across on most of the Earth, and finer where better data exists.",
+        "lpn_elev_dem_said": "Mapbox DEM says {v} {u}.",
         "lpn_settings_elev_source": "Elevation from",
         "lpn_settings_elev_source_tip": "Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.",
         "lpn_settings_elev_source_typed": "The number above",
-        "lpn_settings_elev_source_dem": "From Mapbox DEM",
+        "lpn_settings_elev_source_dem": "Mapbox DEM",
+        "lpn_settings_accuracy": "Accuracy",
+        "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. This is EPANET's own setting, and this page starts far tighter than EPANET does.",
         "lpn_settings_specific_gravity": "Specific gravity",
         "lpn_settings_specific_gravity_tip": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
         "lpn_settings_viscosity": "Relative viscosity",
@@ -1774,6 +1784,54 @@
                 }
             }
         },
+        "lpn_elev_dem_read": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerância de convergência",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_elev_dem_read_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerância de convergência",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_elev_dem_said": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerância de convergência",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
         "lpn_settings_elev_source": {
             "reason": "missing",
             "current_value": null,
@@ -1823,6 +1881,38 @@
             }
         },
         "lpn_settings_elev_source_dem": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerância de convergência",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_accuracy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Cálculo",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerância de convergência",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_accuracy_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

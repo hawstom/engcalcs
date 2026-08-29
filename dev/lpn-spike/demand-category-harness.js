@@ -368,12 +368,18 @@ function findAll(kids, tag) {
 	ok('...and no standalone Base demand or Demand pattern field beside it',
 		!plabels.some(t => /^Base demand/.test(t)) && !plabels.some(t => /^Demand pattern/.test(t)),
 		plabels.join(' | '));
-	// **THE LAST DEMAND CANNOT BE REMOVED.** Before the table was unconditional, row 0's delete
-	// always had a row 1 to promote; now it is drawn on a junction that has no row 1, where
-	// acc.remove() would shift an empty array and read `.base` off undefined.
+	// **THE LAST DEMAND HAS NO × AT ALL** (Tom, 2026-08-28: *"it can't be removed, so there should
+	// be no x"*). It was drawn DISABLED first; he overruled that, and he is right — a junction
+	// always has a demand, so on the commonest junction in any network this is not a control that
+	// happens to be unavailable, it is a control that does not exist.
 	const pdel = findAll([ptable], 'BUTTON').filter(b => b.textContent === '\u00d7');
-	ok('...whose delete is present but DISABLED, there being nothing to promote',
-		pdel.length === 1 && pdel[0].disabled === true, JSON.stringify(pdel.map(b => b.disabled)));
+	ok('...with no remove control on it at all, not even a greyed one',
+		pdel.length === 0, JSON.stringify(pdel.map(b => b.disabled)));
+	// The CELL is still there, so the column still lines up.
+	const prow = findAll(ptable.children, 'TR')[1];
+	ok('...though its cell is still built, so the columns line up',
+		!!prow && findAll([prow], 'TD').length === 4,
+		prow ? findAll([prow], 'TD').length : 'no row');
 	ok('...but can still start a second', findAll(plain, 'BUTTON').some(b => /Add demand category/.test(b.textContent)));
 	// The heading is Tom's word as of Task 553, and the Find property answers to it too.
 	ok('the third column is headed Description, not Category',

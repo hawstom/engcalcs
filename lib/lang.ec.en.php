@@ -2402,10 +2402,15 @@ $ec_lang['lpn_settings_emitter_exponent_tip']='The power in the sprinkler and le
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Computation';
+$ec_lang['lpn_elev_dem_read']='Read elevation from Mapbox DEM';
+$ec_lang['lpn_elev_dem_read_tip']='Reads the height of the land under this node from Mapbox DEM and puts it in the box above, replacing what is there. It is about 30 m across on most of the Earth, and finer where better data exists.';
+$ec_lang['lpn_elev_dem_said']='Mapbox DEM says {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Elevation from';
 $ec_lang['lpn_settings_elev_source_tip']='Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.';
 $ec_lang['lpn_settings_elev_source_typed']='The number above';
-$ec_lang['lpn_settings_elev_source_dem']='From Mapbox DEM';
+$ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM';
+$ec_lang['lpn_settings_accuracy']='Accuracy';
+$ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. This is EPANET\'s own setting, and this page starts far tighter than EPANET does.';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
 $ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';
@@ -2773,8 +2778,6 @@ $ec_lang['lpn_search_unreadable']='The place-name service answered with somethin
 $ec_lang['lpn_search_offline']='We could not reach the place-name service. You may be offline. Everything else on this page works without it, including Go to a latitude and longitude.';
 $ec_lang['lpn_search_toofast']='One search a second — that is what the place-name service allows. Try again in a moment.';
 $ec_lang['lpn_search_nofetch']='This browser cannot reach the place-name service.';
-$ec_lang['lpn_terrain_menu']='Fill in elevations from Mapbox DEM…';
-$ec_lang['lpn_terrain_tip']='Read the ground elevation under each node that has none, and type it in for you. A node that already has an elevation is left alone, and one Undo puts it all back. The first use asks your permission, because the positions of your nodes go to Mapbox.';
 // Shown three times -- the menu tip, the confirm and the result notice -- so that the three cannot
 // drift into three different claims about the same data. One sentence, translated once.
 $ec_lang['lpn_terrain_accuracy']='Mapbox assembles this from many public elevation datasets, so how good it is depends entirely on where you are. Where a national lidar survey exists — USGS 3DEP in much of the United States, and its equivalents elsewhere — it can be better than a metre across the ground and a few tenths of a metre up and down. Where only global data exists it is about 30 m across the ground and several metres up and down. Mapbox does not tell us which one you got. Treat it as a contour map, not a survey: check anything you rely on.';

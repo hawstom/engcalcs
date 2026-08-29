@@ -648,6 +648,12 @@ html[lang="zh"] .ec-welcome {
 }
 .lpn-demand-del:hover { background: #fdd; border-color: #d99; }
 .lpn-demand-add { font: inherit; margin: 2px 0; }
+/* The Elevation field's DEM control in the node popup (Task 542). A button and, once it has been
+   asked, one line saying what the terrain service reported — kept together so the sentence reads as
+   belonging to the button rather than to the field below it. */
+.lpn-elev-dem { margin: 2px 0 6px; }
+.lpn-elev-dem button { font: inherit; }
+.lpn-elev-dem .lpn-set-note { margin-top: 2px; }
 /* **A TOOLBAR HOLDS ICONS, NOT BUTTONS** (Tom, 2026-08-20: "I have used the word 'Buttons'
    consistently. But in reality, toolbars have icons, not buttons. Change the style to be more like
    a normal toolbar; no 'button' paradigm."). So the chrome goes: no border, no background, no

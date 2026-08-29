@@ -342,18 +342,12 @@
 			'accuracy. Treat it as a contour map, not a survey: check anything you rely on.');
 	}
 
-	// THE VIEW-MENU ROW'S OWN WORDS, exported rather than read by js/looped-network.js, so every
-	// string this feature shows lives in one file.
-	EC.lpnTerrainMenuLabel = function () {
-		return t('lpn_terrain_menu', 'Fill in elevations from Mapbox DEM…');
-	};
-	EC.lpnTerrainMenuTip = function () {
-		return t('lpn_terrain_tip',
-			'Read the ground elevation under each node that has none, and type it in for you. ' +
-			'A node that already has an elevation is left alone, and one Undo puts it all back. ' +
-			'The first use asks your permission, because the positions of your nodes go to ' +
-			'Mapbox.') + ' ' + accuracy();
-	};
+	// **THE VIEW-MENU ROW'S OWN WORDS ARE GONE WITH THE ROW** (Task 542, and the key deleted on
+	// Tom's ruling 2026-08-28: *"lpn_terrain_menu: Delete key."*). `lpnTerrainMenuLabel()` and
+	// `lpnTerrainMenuTip()` outlived the menu row by one task and were called by nobody, which is
+	// worse than dead code: a reference from an UNCALLED function is still a reference, so
+	// `key_hygiene_check.php` counted them and the two strings never appeared in its orphan list.
+	// **A dead reader hides a dead key.** Deleting the readers is what let the keys be found.
 
 	// THE ASK ITSELF. Long on purpose -- it is the only thing the visitor decides from, and the
 	// facts that matter are all in it: WHO receives it, WHAT they receive, why that is a different
