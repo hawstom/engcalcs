@@ -69,6 +69,10 @@ const report = {
 	// A truncated pass that looks like a clean one is worse than a failing one, so the count of
 	// sections actually RUN is printed against the count expected, every time, pass or fail.
 	let ran = 0;
+	// **WHICH sections threw, not just how many.** See README: twelve of them threw for two days
+	// behind a summary line that reported only a count, under a cheerful percentage of a shrinking
+	// denominator. A name is what makes it actionable.
+	const threw = [];
 	try {
 		for (const name of specs) {
 			if (!SPECS.includes(name)) { console.log(`(no spec "${name}")`); continue; }
@@ -79,6 +83,7 @@ const report = {
 				ran++;
 			} catch (err) {
 				failures++;
+				threw.push(name);
 				console.log(`\n FAIL  ${current}: threw\n${err && err.stack ? err.stack : err}`);
 			}
 		}
@@ -91,6 +96,17 @@ const report = {
 	// abandoned the rest, and "27 of 35 sections" is the honest way to say that.
 	const short = ran < specs.length;
 	console.log(`\n${checks - failures}/${checks} checks passed${skipped ? `, ${skipped} left to the human list` : ''}.`);
-	console.log(`${ran}/${specs.length} sections completed${short ? '  <-- SHORT RUN: the rest threw and did not finish' : ''}.\n`);
+	console.log(`${ran}/${specs.length} sections completed.`);
+	// **A SHORT RUN IS SHOUTED, AND IT NAMES NAMES.** The percentage above is a fraction of what
+	// actually RAN, so it goes UP as coverage falls -- which is how twelve dead sections sat behind
+	// "849/864 checks passed" for two days. The lines below are the honest headline.
+	if (short) {
+		console.log('');
+		console.log(`  !! ${specs.length - ran} SECTION(S) DID NOT RUN. The percentage above is a`);
+		console.log('     fraction of what ran, so it RISES as coverage falls -- read this line first.');
+		if (threw.length) { console.log(`     Threw: ${threw.join(', ')}`); }
+		console.log('     A spec that throws at its first line is usually driving a control that MOVED.');
+	}
+	console.log('');
 	process.exit(failures ? 1 : 0);
 }());

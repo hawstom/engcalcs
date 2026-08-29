@@ -83,14 +83,14 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();
 
 		// ---- 1. where the row is, and is not ---------------------------------------------------
-		let rows = (await a.menuRows('view')).map(r => r.label);
+		let rows = (await a.menuRows('map')).map(r => r.label);
 		report.ok(!rows.includes(SEARCH_ROW),
 			'an XY project has no Search row — its x and y have no place on the Earth',
 			'hidden rather than greyed, exactly as the Go to… row is');
 
 		await a.newGeoProject();
 		await a.settle(500);
-		rows = (await a.menuRows('view')).map(r => r.label);
+		rows = (await a.menuRows('map')).map(r => r.label);
 		report.ok(rows.includes(SEARCH_ROW), 'a lat/lon project offers it on the View menu');
 		report.ok(rows.includes(GOTO_ROW),
 			'...beside Go to a latitude and longitude, not merged with it',
@@ -103,7 +103,7 @@ exports.run = async function ({ browser, report }) {
 		// was about to go.
 		a.answerConfirmsWith(false);
 		a.answerPromptWith(null);
-		await a.menuClick(SEARCH_ROW, 'view');
+		await a.menuClick(SEARCH_ROW, 'map');
 		await a.settle(400);
 		const ask = a.dialogs.find(d => d.type === 'confirm' && d.message.indexOf(GEOCODER) >= 0);
 		report.ok(!!ask, 'the first use asks its own question before anything is sent');
@@ -125,7 +125,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(at.lat === home.lat && at.lon === home.lon, '...and the map did not move');
 		// Everything else still works, which is the promise the ask itself makes.
 		a.answerPromptWith('51.5 -0.12');
-		await a.menuClick(GOTO_ROW, 'view');
+		await a.menuClick(GOTO_ROW, 'map');
 		await a.settle(400);
 		at = await centre(a);
 		report.ok(Math.abs(at.lat - 51.5) < 0.01 && Math.abs(at.lon + 0.12) < 0.01,
@@ -135,7 +135,7 @@ exports.run = async function ({ browser, report }) {
 		a.answerConfirmsWith(true);
 		a.answerPromptWith('Petaluma, California');
 		const dialogsBefore = a.dialogs.length;
-		await a.menuClick(SEARCH_ROW, 'view');
+		await a.menuClick(SEARCH_ROW, 'map');
 		await a.settle(900);
 		const asked = a.dialogs.slice(dialogsBefore).filter(d => d.type === 'confirm');
 		report.eq(asked.length, 1,
@@ -164,7 +164,7 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(1100); // one search a second, which is the policy
 		const before5 = a.dialogs.length;
 		a.answerPromptWith('Springfield');
-		await a.menuClick(SEARCH_ROW, 'view');
+		await a.menuClick(SEARCH_ROW, 'map');
 		await a.settle(600);
 		report.eq(a.dialogs.slice(before5).filter(d => d.type === 'confirm').length, 0,
 			'a visitor who said yes is never asked again — nagging a yes is the one bad direction');
@@ -196,7 +196,7 @@ exports.run = async function ({ browser, report }) {
 
 		await a.settle(1100);
 		await promptQueue(['Springfield', 'Springfield']); // the second answer is not a number
-		await a.menuClick(SEARCH_ROW, 'view');
+		await a.menuClick(SEARCH_ROW, 'map');
 		await a.settle(900);
 		let asks = await promptsSeen();
 		const chooser = asks.find(d => d.msg.indexOf('Illinois') >= 0);
@@ -210,7 +210,7 @@ exports.run = async function ({ browser, report }) {
 
 		await a.settle(1100);
 		await promptQueue(['Springfield, Massachusetts', '2']);
-		await a.menuClick(SEARCH_ROW, 'view');
+		await a.menuClick(SEARCH_ROW, 'map');
 		await a.settle(900);
 		await promptsSeen();
 		at = await centre(a);
@@ -225,8 +225,8 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(1100);
 		const callsBefore7 = wire.calls.length;
 		await promptQueue(['Sonoma', 'Napa Valley']);
-		await a.menuClick(SEARCH_ROW, 'view');
-		await a.menuClick(SEARCH_ROW, 'view');
+		await a.menuClick(SEARCH_ROW, 'map');
+		await a.menuClick(SEARCH_ROW, 'map');
 		await a.settle(900);
 		await promptsSeen();
 		report.eq(wire.calls.length - callsBefore7, 1,
@@ -241,7 +241,7 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(1100);
 		const stood = await centre(a);
 		a.answerPromptWith('Petaluma, Sonoma');
-		await a.menuClick(SEARCH_ROW, 'view');
+		await a.menuClick(SEARCH_ROW, 'map');
 		await a.settle(1200);
 		report.has(await a.notice(), 'may be offline', 'a dead network says "you may be offline"');
 		report.has(await a.notice(), 'works without it',
@@ -253,7 +253,7 @@ exports.run = async function ({ browser, report }) {
 		wire.answer = { status: 429, raw: 'slow down' };
 		await a.settle(1100);
 		a.answerPromptWith('Napa');
-		await a.menuClick(SEARCH_ROW, 'view');
+		await a.menuClick(SEARCH_ROW, 'map');
 		await a.settle(1200);
 		report.has(await a.notice(), 'slow down',
 			'an HTTP 429 is reported as being asked to slow down, not as "not found"');
@@ -262,7 +262,7 @@ exports.run = async function ({ browser, report }) {
 		wire.answer = { body: [] };
 		await a.settle(1100);
 		a.answerPromptWith('qqzzxx nowhere at all');
-		await a.menuClick(SEARCH_ROW, 'view');
+		await a.menuClick(SEARCH_ROW, 'map');
 		await a.settle(1200);
 		report.has(await a.notice(), 'Nothing found',
 			'an empty result set is "nothing found", and quotes back what was asked for');
@@ -272,7 +272,7 @@ exports.run = async function ({ browser, report }) {
 		wire.answer = { raw: '<html>maintenance</html>' };
 		await a.settle(1100);
 		a.answerPromptWith('Sebastopol');
-		await a.menuClick(SEARCH_ROW, 'view');
+		await a.menuClick(SEARCH_ROW, 'map');
 		await a.settle(1200);
 		report.has(await a.notice(), 'could not read',
 			'an answer that is not JSON is reported as unreadable, not as nothing found');
@@ -283,7 +283,7 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(1100);
 		const kept = await centre(a);
 		a.answerPromptWith('Cotati');
-		await a.menuClick(SEARCH_ROW, 'view');
+		await a.menuClick(SEARCH_ROW, 'map');
 		await a.settle(1200);
 		report.has(await a.notice(), 'Nothing found',
 			'a result with an unusable coordinate is dropped, not flown to');

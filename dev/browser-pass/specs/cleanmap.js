@@ -40,7 +40,7 @@ async function strip(a) {
 	});
 }
 async function viewRow(a, startsWith) {
-	return (await a.menuRows('view')).find(r => r.label.indexOf(startsWith) === 0) || null;
+	return (await a.menuRows('map')).find(r => r.label.indexOf(startsWith) === 0) || null;
 }
 
 exports.run = async function ({ browser, report }) {
@@ -60,7 +60,7 @@ exports.run = async function ({ browser, report }) {
 		// ---- the View menu says what it will DO --------------------------------------------------
 		let row = await viewRow(a, CLEAN_ON);
 		report.ok(!!row, 'the View menu offers it', row && row.label);
-		await a.menuClick(row.label, 'view');
+		await a.menuClick(row.label, 'map');
 		await a.settle(300);
 		const clean = await strip(a);
 		report.ok(GONE.every(id => !clean[id]), 'it takes the mode line and the tracker away',
@@ -77,14 +77,14 @@ exports.run = async function ({ browser, report }) {
 		row = await viewRow(a, 'Show map readouts');
 		report.ok(!!row, 'the row then reads "Show map readouts" — it states what it will do',
 			'this menu has no checkmark column, so the label carries the state');
-		await a.menuClick(row.label, 'view');
+		await a.menuClick(row.label, 'map');
 		await a.settle(300);
 		report.eq(JSON.stringify(await strip(a)), JSON.stringify(before),
 			'pressing it again puts every one of them back, and changes nothing else');
 
 		// ---- it is not stored --------------------------------------------------------------------
 		row = await viewRow(a, CLEAN_ON);
-		await a.menuClick(row.label, 'view');
+		await a.menuClick(row.label, 'map');
 		await a.settle(300);
 		const held = await strip(a);
 		report.ok(GONE.every(id => !held[id]), 'set up: clean map is on');

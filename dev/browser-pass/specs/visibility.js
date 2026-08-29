@@ -650,7 +650,7 @@ exports.run = async function ({ browser, report }) {
 		// catching: a check that clicks a row it cannot find silently stops checking anything.
 		await closeBox(a);
 		await a.settle(200);
-		const viewRows = (await a.menuRows('view')).map(r => r.label);
+		const viewRows = (await a.menuRows('map')).map(r => r.label);
 		report.ok(!viewRows.some(r => /label/i.test(r)),
 			'no Labels row on the View menu — the box has its own button and its own index',
 			viewRows.join(' | '));

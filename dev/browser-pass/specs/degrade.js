@@ -57,18 +57,26 @@ exports.run = async function ({ browser, report }) {
 			b ? (b.text || '').slice(0, 90) : '');
 		await a.unblockBroker();
 
-		// --- Dismiss, and when it is honest to offer one -----------------------------
-		// Undismissable while the site is up and the request is being refused: there the warning
-		// describes a real, fixable risk to a colleague's work. Dismissable when the whole browser is
-		// offline, because that is a standing condition of how the page is being used rather than a
-		// fault anybody can act on (Tom, 2026-08-03, unsure which way this should go — this is the
-		// call as built, so a future change to it is a decision rather than a drift).
+		// --- Dismiss: EVERY warning banner offers one, since Task 546 --------------------
+		//
+		// **THIS ASSERTION USED TO BE ITS OPPOSITE, AND THE CHANGE WAS TOM'S** (2026-08-27: *"I also
+		// don't like that this message is permanent and undismissable."*). The old rule made the
+		// banner undismissable while the site was up and the request was being refused — on the
+		// argument that there it describes a real, fixable risk to a colleague's work — and
+		// dismissable only when the browser was offline. This spec's own note said the call was made
+		// *"unsure which way this should go... so a future change to it is a decision rather than a
+		// drift."* It was a decision, and it went the other way.
+		//
+		// What replaced the undismissable banner is not silence: the dismissal is remembered for ONE
+		// project and ONE error code, so a different fault, a different project, or the lock
+		// recovering each bring it back on their own.
 		await a.blockBroker();
 		await a.makeEdit();
 		await a.menuClick('Save');
 		b = await a.waitBanner();
-		report.ok(b && !(b.buttons || []).includes('Hide this message'),
-			'online but refused: the warning cannot be dismissed', b ? b.buttons.join(' / ') : '');
+		report.ok(b && (b.buttons || []).includes('Hide this message'),
+			'online but refused: the warning can be put away, like every other',
+			b ? b.buttons.join(' / ') : '');
 
 		await a.context.setOffline(true);
 		await a.makeEdit();

@@ -377,27 +377,34 @@ class Session {
 		const btn = await this.page.$('#lpn_examples_pane button.lpn-examples-blank');
 		if (btn) { await btn.click(); await this.settle(200); }
 	}
-	// File ▸ New project… ▸ one of the four templates — the act the single "New project" row used to
-	// be before Task 264 turned it into a fly-out. US units unless a spec says otherwise, because a
-	// project's units are the project's since Task 263 and a spec should not inherit whatever the
-	// strip happened to hold.
+	// File ▸ New project… — which opens the NEW-PROJECT BOX.
 	//
-	// **THE FOUR LABELS LIVE HERE AND NOWHERE ELSE.** Task 145 renamed all four in one commit
-	// (XY and lat/lon are Tom's words) and every spec that had typed one out stopped at its first
-	// menu click — which is precisely the failure this file exists to make impossible.
-	static TEMPLATES = {
-		'xy-us': 'Blank xy project, US units (gpm)',
-		'xy-si': 'Blank xy project, SI units (L/s)',
-		'geo-us': 'Blank lat/lon project, US units (gpm)',
-		'geo-si': 'Blank lat/lon project, SI units (L/s)'
-	};
-	async newProject(system = 'us') { await this._newFromTemplate('xy-' + system); }
+	// **IT WAS A FLY-OUT OF FOUR TEMPLATES UNTIL TASK 477 (2026-08-27), AND THIS DID NOT FOLLOW.**
+	// The consequence was not one failing check: `menuClickSub('New project…', …)` waits thirty
+	// seconds for a fly-out that no longer exists and then THROWS, so every spec that starts by
+	// making a project died at its first line. **Twelve of the thirty-eight sections — a third of
+	// the pass — had been dead for two days**, and the only signal was the "SHORT RUN" note at the
+	// foot, which says how many sections finished and not which ones or why.
+	//
+	// The box asks four questions where the fly-out's rows were the CROSS of two, which is why it
+	// replaced them. Answered here in the order a person meets them: the coordinate kind, then the
+	// unit preset, then Create.
+	//
+	// US units unless a spec says otherwise — a project's units are the project's since Task 263,
+	// and a spec should not inherit whatever the strip happened to hold.
+	async newProject(system = 'us') { await this._newFromBox('xy', system); }
 	// A lat/lon project: longitudes and latitudes, and a street map behind it.
-	async newGeoProject(system = 'us') { await this._newFromTemplate('geo-' + system); }
-	async _newFromTemplate(key) {
-		const label = Session.TEMPLATES[key];
-		if (!label) { throw new Error(`${this.name}: no project template "${key}"`); }
-		await this.menuClickSub('New project…', label);
+	async newGeoProject(system = 'us') { await this._newFromBox('geo', system); }
+	async _newFromBox(coords, system) {
+		await this.menuClick('New project…', 'file');
+		await this.page.waitForSelector('#lpn_new_panel', { state: 'visible' });
+		// The coordinate kind is a radio pair, and it gates the place-name field beside it.
+		await this.page.check(`#lpn_new_panel input[name="lpn_new_coords"][value="${coords}"]`);
+		// The unit preset, which is the fast path the box offers over setting each family by hand.
+		await this.page.click(system === 'si' ? '#lpn_new_si' : '#lpn_new_us');
+		await this.page.click('#lpn_new_create');
+		await this.page.waitForSelector('#lpn_new_panel', { state: 'hidden' });
+		await this.settle();
 	}
 	// Is this project marked as having unsaved changes? The asterisk on its tab is the whole
 	// convention, so the pass reads exactly what the user reads.

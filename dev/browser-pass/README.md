@@ -10,6 +10,34 @@ node run.js locking  # one section
 Exit code 0 means every check passed. `--` lines are checks this environment **cannot** answer and
 that stay on Tom's list; they are never counted as passes.
 
+## A third of this pass was dead for two days, and the foot of the report said so
+
+**2026-08-29.** Twelve of the thirty-eight sections threw at their first line and never ran. The
+cause was one method: `Session._newFromTemplate()` drove `File ▸ New project… ▸ <template>`, a
+FLY-OUT that Task 477 replaced with the New-project BOX on 2026-08-27. `menuClickSub()` then waited
+thirty seconds for a popup that no longer opens and threw — so every spec that begins by making a
+project died before its first assertion. Three more stale references were found in the same sweep:
+`#lpn_menu_insert` (the Insert menu, deleted by Task 543), `#lpn_menu_view` (renamed to Map by the
+same task), and `New project…` still being expected to carry a fly-out arrow.
+
+**The signal was there and nobody read it.** Every run ended with
+
+```
+26/38 sections completed  <-- SHORT RUN: the rest threw and did not finish.
+```
+
+which is honest, and useless as an alarm: it says how many sections finished, not which ones or why,
+and it sits under a cheerful `849/864 checks passed`. **A pass that reports a high percentage of a
+shrinking denominator is worse than one that fails**, because the number goes UP as coverage falls.
+
+Two things follow, and neither is "read the last line more carefully":
+
+- **The count of sections is part of the contract.** `run.js` knows how many specs it was asked for.
+  A short run should be as loud as a failure, and it should NAME the sections that threw.
+- **A helper that drives a menu is a shared seam and belongs in `lib/session.js`,** which
+  `TEMPLATES` already got right for its labels and got wrong for its mechanism. When the UI moves,
+  one file should have to change.
+
 ## Why this exists
 
 Tom, 2026-08-06: *"I am very tired and feeble-minded right now. Is there any way that we can proceed

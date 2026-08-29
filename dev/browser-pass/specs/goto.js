@@ -55,7 +55,7 @@ async function centre(a) {
 // Type something into the Go to… prompt from the View menu and settle.
 async function goTo(a, typed) {
 	a.answerPromptWith(typed);
-	await a.menuClick(GOTO_ROW, 'view');
+	await a.menuClick(GOTO_ROW, 'map');
 	await a.settle(400);
 }
 // The Go to… on the PLACEMENT BAR, which asks two questions in a row — where, and how wide the site
@@ -109,14 +109,14 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();
 
 		// ---- where the row is, and is not -------------------------------------------------------
-		let rows = (await a.menuRows('view')).map(r => r.label);
+		let rows = (await a.menuRows('map')).map(r => r.label);
 		report.ok(!rows.includes(GOTO_ROW),
 			'an XY project has no Go to… row — its x and y have no place on the Earth',
 			'hidden here rather than greyed, because there is no street map a grid could go to');
 
 		await a.newGeoProject();
 		await a.settle(500);
-		rows = (await a.menuRows('view')).map(r => r.label);
+		rows = (await a.menuRows('map')).map(r => r.label);
 		report.ok(rows.includes(GOTO_ROW), 'a lat/lon project offers it on the View menu');
 
 		// ---- it goes there ----------------------------------------------------------------------

@@ -150,9 +150,9 @@ exports.run = async function ({ browser, report }) {
 		report.eq(dismissible.length, 0, '...with nothing on it that closes it');
 
 		// ---- the toggle, and what it leaves behind ---------------------------------------------
-		const viewRows = (await a.menuRows('view')).map(r => r.label);
+		const viewRows = (await a.menuRows('map')).map(r => r.label);
 		report.ok(viewRows.includes('Hide street map'), 'View offers to hide the street map', viewRows.join(' | '));
-		await a.menuClick('Hide street map', 'view');
+		await a.menuClick('Hide street map', 'map');
 		await a.settle(400);
 		const afterHide = await a.page.evaluate(() => ({
 			tiles: document.querySelectorAll('.lpn-basemap image').length,
@@ -164,7 +164,7 @@ exports.run = async function ({ browser, report }) {
 		// ---- a grid project is untouched by all of it -------------------------------------------
 		await a.newProject();
 		await a.settle(500);
-		const gridRows = (await a.menuRows('view')).map(r => r.label);
+		const gridRows = (await a.menuRows('map')).map(r => r.label);
 		report.ok(!gridRows.some(l => /street map/i.test(l)),
 			'a grid project is offered no street map at all', gridRows.join(' | '));
 		const gridState = await a.page.evaluate(() => ({
