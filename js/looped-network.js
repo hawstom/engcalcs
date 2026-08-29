@@ -6789,6 +6789,9 @@ var EngCalcs = EngCalcs || {};
 	// about the network -- the same standing as a solve result -- and writing it into the project
 	// would put a number nobody typed into a file they save.
 	var terrainLastRead = {};
+	// Which nodes this session has already ASKED about, so opening a popup twice does not send a
+	// second request for an answer we have, and a failed read is not retried on every redraw.
+	var terrainAsked = {};
 	/** Remember a batch of readings and nothing else. The document is not touched. */
 	function terrainRecordReadings(list) {
 		(list || []).forEach(function (e) {
@@ -7480,6 +7483,26 @@ var EngCalcs = EngCalcs || {};
 			// (`diameter`, `velocity`), which is stable, is English, and is always available.
 			out = [['id', pc.lpn_field_id || 'ID', 'ID']], defs, allowed;
 		if (d.group === 'label') {
+			// **A TEXT HAS NO ID TO SEARCH, SO IT IS NOT OFFERED ONE** (Tom, 2026-08-29: *"Text.ID
+			// 2 highest finds nothing. And I think maybe Text.ID is not searchable. I know that it
+			// isn't viewable to the user. Is this a UI bug?"* It was.)
+			//
+			// findValueOf() has always returned `undefined` for a label's id -- deliberately, and
+			// findLabelHasNoId() carries the reasoning: a Text's id is unreachable from every screen
+			// in the app, so its WORDS are what a person knows it by and what the search reads. But
+			// the property list was seeded with `id` before this branch and returned it anyway, so
+			// the menu offered a condition that could not match, in any wording, ever.
+			//
+			// **That is the rule stated fifteen lines below this one, broken here**: do not list a
+			// property that silently matches nothing. Rebuilt rather than spliced, so the seeding
+			// above cannot leak back in.
+			//
+			// A typed `Text.ID ...` is now a parse error naming the properties that do exist, which
+			// is a better answer than an empty result: "no such property" and "none matched" are
+			// different facts and only one of them is true here. **If a Text id ever becomes visible
+			// on a screen, this is the second of the two places to change** -- findLabelHasNoId() is
+			// the first.
+			out = [];
 			out.push(['text', pc.lpn_tool_add_text || 'Text', 'Text']);
 			// A Text label's own size multiplier, which is the one NUMBER it carries -- and the one
 			// worth a range condition (Tom, 2026-08-18: "Size would be very interesting to search
@@ -10997,9 +11020,26 @@ var EngCalcs = EngCalcs || {};
 			profileHandleSet().handles.forEach(function (h) {
 				var hn = nodeById(h.node);
 				if (!hn) { return; }
+				// **BIG ENOUGH TO SEE AND TO GRAB** (Tom, 2026-08-29, of edit mode: *"the UI is not
+				// what I have described or where we want to be"*). They were 6 and 4 screen pixels.
+				// A 4 px hollow dot is smaller than the ring around it, invisible over a busy map,
+				// and on a phone it is a target nobody can hit on purpose -- so the feature read as
+				// absent even though every mechanism behind it worked.
+				//
+				// 8 and 6.5, with a white halo under the stroke so both kinds stay legible over a
+				// dark pipe or a satellite tile. The two are still told apart by FILL rather than by
+				// colour, which is what keeps them distinguishable in grey print and to a
+				// colour-blind reader: solid is a stop you chose, hollow is a node the route passes
+				// through and dragging it makes it one.
 				el('circle', {
-					cx: hn.x, cy: hn.y, r: (h.stop >= 0 ? 6 : 4) / sc,
-					fill: h.stop >= 0 ? '#f60' : '#fff', stroke: '#f60', 'stroke-width': 2 / sc,
+					cx: hn.x, cy: hn.y, r: (h.stop >= 0 ? 8 : 6.5) / sc,
+					fill: h.stop >= 0 ? '#f60' : '#fff',
+					stroke: '#fff', 'stroke-width': 4 / sc, 'stroke-opacity': 0.85,
+					'class': 'lpn-profile-handle-halo'
+				}, profilePathLayer);
+				el('circle', {
+					cx: hn.x, cy: hn.y, r: (h.stop >= 0 ? 8 : 6.5) / sc,
+					fill: h.stop >= 0 ? '#f60' : '#fff', stroke: '#f60', 'stroke-width': 2.5 / sc,
 					'class': 'lpn-profile-handle'
 				}, profilePathLayer);
 			});
@@ -11406,8 +11446,11 @@ var EngCalcs = EngCalcs || {};
 	// The handle under the pointer, with the same pointer slop every other node-picking gesture on
 	// this page uses. **A STOP BEATS A PASS-THROUGH** where a doubled-back route visits one node
 	// twice: the fold is there because the waypoint is, so the waypoint is what the hand gets.
-	function profileHandleAt(cx, cy) {
-		var n = nearestNodeNearScreen(cx, cy, NODE_SNAP_PX), hs, i, passing = null;
+	// `slop` is the gesture's own tolerance -- Task 417's `tapSlopPx(e)`, so a finger gets 24 px and
+	// a pointer keeps 14. A path handle is one of the smallest targets on this page, which makes it
+	// the one that suffered most from the pointer's number being used for everything.
+	function profileHandleAt(cx, cy, slop) {
+		var n = nearestNodeNearScreen(cx, cy, slop || NODE_SNAP_PX), hs, i, passing = null;
 		if (!n || !profileNodeUsable(n)) { return null; }
 		hs = profileHandleSet().handles;
 		for (i = 0; i < hs.length; i++) {
@@ -11426,8 +11469,8 @@ var EngCalcs = EngCalcs || {};
 		if (h.stop >= 0) { stops[h.stop] = id; } else { stops.splice(h.leg + 1, 0, id); }
 		return stops;
 	}
-	function profileHandleDown(cx, cy) {
-		var h = profileEditActive() ? profileHandleAt(cx, cy) : null;
+	function profileHandleDown(cx, cy, slop) {
+		var h = profileEditActive() ? profileHandleAt(cx, cy, slop) : null;
 		if (!h) { return null; }
 		profileDrawSay('edit');
 		return { type: 'profilehandle', handle: h, over: h.node, trial: null };
@@ -13040,6 +13083,13 @@ var EngCalcs = EngCalcs || {};
 		if (EngCalcs.lpnSearchForget) { EngCalcs.lpnSearchForget(); }
 		// AND THE TERRAIN LOOKUP'S OWN CONSENT (Task 497), for exactly the same reason.
 		if (EngCalcs.lpnTerrainForget) { EngCalcs.lpnTerrainForget(); }
+		// **AND THE READINGS GO WITH THE DOCUMENT THEY WERE ABOUT.** They are keyed by node ID, and
+		// an ID is only unique WITHIN a project -- so a J2 in the project being opened would have
+		// inherited the elevation of the J2 in the project being closed, and offered it as "Mapbox
+		// DEM says" for a place nobody had sampled. Same shape as the creation queue's own
+		// project guard; found by `dev/lpn-spike/terrain-harness.js` reusing an id across sections.
+		terrainLastRead = {};
+		terrainAsked = {};
 	}
 	// The whole-page reset, behind one confirm. Extracted from the Settings button's inline handler
 	// (Task 211) so the Settings MENU can offer the same act -- one implementation, two doors, which
@@ -18427,7 +18477,7 @@ var EngCalcs = EngCalcs || {};
 			// move the pipework. A press that is not on a handle pans, which is how a node off the
 			// edge of the screen is reached.
 			if (profileEditActive()) {
-				var hDrag = profileHandleDown(e.clientX, e.clientY);
+				var hDrag = profileHandleDown(e.clientX, e.clientY, tapSlopPx(e));
 				if (hDrag) { drag = hDrag; profileState.editDrag = drag; }
 				else { drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; }
 				Object.assign(drag, common);
@@ -22727,11 +22777,32 @@ var EngCalcs = EngCalcs || {};
 		setLabel(sample, 'globe', pc.lpn_elev_dem_sample || 'Sample Mapbox DEM');
 		helpTip(sample, pc.lpn_elev_dem_sample_tip);
 		sample.addEventListener('click', function () {
-			// Reads and reports. It writes NOTHING -- see lpnTerrainSample()'s own note.
+			// Reads and reports. It writes NOTHING -- see lpnTerrainSample()'s own note. The button
+			// stays for the RE-read: the automatic one above happens once, and a person who has
+			// moved the node, or who was offline the first time, needs a way to ask again.
+			terrainAsked[nodeId] = true;
 			EngCalcs.lpnTerrainSample(terrainPointsForIds([nodeId]), function () { refreshPopupIfOpen(); });
 		});
 		wrap.appendChild(sample);
 		m = terrainLastRead[nodeId];
+		// **AND IT SAMPLES ITSELF THE FIRST TIME YOU OPEN A NODE** (Tom, 2026-08-29: *"I wonder why
+		// we can't sample always on opening Node editor. Is that too much overhead?"*).
+		//
+		// It is not too much: one tile serves every node within about a kilometre at the zoom this
+		// reads, the browser caches it, and a node's popup is opened one at a time by a person
+		// looking at it. So the number is simply THERE when the editor opens, and "Use it" is ready
+		// without a press that can fail.
+		//
+		// **ASKED ONCE PER NODE PER SESSION**, which is what `terrainAsked` is for. Without it the
+		// callback's redraw would rebuild this row, find the reading still absent on a failure, and
+		// ask again -- a request loop driven by a popup that is simply open.
+		//
+		// The consent gate still runs, and still asks once per browser. Somebody who says no gets a
+		// popup that never asks again this session, which is the correct reading of "no".
+		if (m === undefined && !terrainAsked[nodeId]) {
+			terrainAsked[nodeId] = true;
+			EngCalcs.lpnTerrainSample(terrainPointsForIds([nodeId]), function () { refreshPopupIfOpen(); });
+		}
 		if (typeof m === 'number' && isFinite(m)) {
 			shown = +toDisplay(m, 'lpn_u_elevhead').toFixed(2);
 			said = document.createElement('div');

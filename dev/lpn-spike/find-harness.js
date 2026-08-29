@@ -229,7 +229,15 @@ function build(unitSet) {
 	ok('the all-elements scope offers ID and the connection report, and nothing else',
 		JSON.stringify(L.propKeys('all')) === JSON.stringify(['id', 'connection']),
 		JSON.stringify(L.propKeys('all')));
-	ok('a Text scope offers its words', L.propKeys('text').indexOf('text') > 0);
+	// **AND NO ID, SINCE 2026-08-29.** Tom: *"Text.ID 2 highest finds nothing. And I think maybe
+	// Text.ID is not searchable."* It never was — findValueOf() returns undefined for a label's id
+	// by design, because a Text's id is unreachable from every screen — but the property list
+	// offered it anyway, so the menu carried a condition that could not match in any wording. The
+	// assertion here used `indexOf('text') > 0`, which was quietly ASSERTING that something came
+	// before it; that something was the id.
+	ok('a Text scope offers its words and its size, and no ID it cannot search',
+		JSON.stringify(L.propKeys('text')) === JSON.stringify(['text', 'sizeMult']),
+		JSON.stringify(L.propKeys('text')));
 	ok('a text property gets contains/equals and no number comparisons',
 		JSON.stringify(L.opKeys('all', 'id')) === JSON.stringify(['contains', 'equals', 'top', 'bottom']),
 		JSON.stringify(L.opKeys('all', 'id')));

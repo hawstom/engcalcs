@@ -42,7 +42,8 @@
 // Licensed under GNU GPL v3.0 or later
 'use strict';
 
-const { byId, setUnitSet, setHitTarget, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const fs = require('fs');
+const { ROOT, byId, setUnitSet, setHitTarget, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 
 const keydownListeners = [];
 global.document.addEventListener = function (type, fn) {
@@ -404,6 +405,31 @@ function pressProfile() {
 	ok('...and the button no longer reads as pressed',
 		L.profileEditBtn().getAttribute('aria-pressed') === 'false');
 }
+
+// ---- THE HANDLES ARE BIG ENOUGH TO SEE AND TO GRAB (Tom, 2026-08-29) --------------------------
+//
+// *"the UI is not what I have described or where we want to be."* The mechanisms all worked; the
+// handles were 6 and 4 SCREEN pixels, so a pass-through node was a dot smaller than the ring around
+// it and, on a phone, a target nobody could hit on purpose. A feature that cannot be grabbed reads
+// as a feature that is not there.
+//
+// Asserted on the SOURCE rather than by measuring a rendered circle: the stub has no layout, and
+// what went wrong was two numbers, which is exactly what a source assertion can hold. The pair is
+// pinned so that shrinking either one has to be a decision somebody writes down.
+{
+	const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+	ok('a stop handle and a pass-through handle are 8 and 6.5 screen px',
+		/r: \(h\.stop >= 0 \? 8 : 6\.5\) \/ sc/.test(src));
+	ok('...both drawn twice, the under-copy a white halo so they read over a dark pipe',
+		/lpn-profile-handle-halo/.test(src));
+	// **AND THE GRAB RADIUS FOLLOWS THE POINTER, NOT A CONSTANT** (Task 417). A path handle is one
+	// of the smallest targets on this page, so the pointer's 14 px hurt it most.
+	ok('the handle hit test takes the gesture\'s own slop',
+		/profileHandleDown\(e\.clientX, e\.clientY, tapSlopPx\(e\)\)/.test(src));
+	ok('...and passes it through to nearestNodeNearScreen',
+		/nearestNodeNearScreen\(cx, cy, slop \|\| NODE_SNAP_PX\)/.test(src));
+}
+
 
 console.log('\n' + (fails ? fails + ' FAILED of ' : 'all ') + checks + ' checks');
 process.exit(fails ? 1 : 0);

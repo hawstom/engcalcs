@@ -235,7 +235,10 @@ exports.run = async function ({ browser, report }) {
 		//
 		// The network comes from the dev-only "Draw large test network" row, which is the only way
 		// to get a hundred pipes onto this page without a hundred clicks.
-		await a.menuClick('[dev] Draw large test network', 'insert');
+		// **THE INSERT MENU IS GONE; ITS ROWS ARE A FLY-OUT OF WATER** (Task 543, 2026-08-27). This
+		// line still clicked `#lpn_menu_insert` and had been throwing ever since — the whole section
+		// after it never ran, which is why nothing noticed.
+		await a.menuClickSub('Insert', '[dev] Draw large test network', 'project');
 		await a.settle(500);
 		await a.menuClick('Find and replace', 'edit');
 		{

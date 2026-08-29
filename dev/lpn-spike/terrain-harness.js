@@ -239,6 +239,12 @@ const L = loadLoopedNetwork(
 	"\t\tsetElev: function (id, v) { var n = nodeById(id); if (v === undefined) { delete n.elev; } else { n.elev = v; } },\n" +
 	"\t\telev: function (id) { return nodeById(id).elev; },\n" +
 	"\t\treset: function (coords) { doc = { nodes: [], links: [], labels: [] };\n" +
+	// **A NEW DOCUMENT FORGETS THE READINGS, as the real open path does** (applySaved calls
+	// lpnTerrainForget() and clears these two). Without it the stub holds a constant the page does
+	// not: node ids restart at J1 on every reset, so section 7's freshly minted J2 inherited the
+	// reading section 6b took for a different J2, on a different continent. That is the
+	// stub-removes-the-coupling failure dev/testing-notes.md leads with, and it cost an hour here.
+	"\t\t\tterrainLastRead = {}; terrainAsked = {};\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
 	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 };\n" +
 	"\t\t\tproject = { name: 'T', activeScenario: 'base' };\n" +
@@ -255,6 +261,11 @@ const L = loadLoopedNetwork(
 	// Task 542's two new doors, and the queue between the first one and the tiles.
 	"\t\tsetElevSource: function (v) { settings.defaults.nodeElevSource = v; },\n" +
 	"\t\tflushNewNodes: flushTerrainForNewNodes,\n" +
+	"\t\tlastRead: function (id) { return terrainLastRead[id]; },\n" +
+	"\t\trenderNode: renderNodeFields,\n" +
+	"\t\tpopupText: function () { return document.getElementById('lpn_popup_fields').textContent || ''; },\n" +
+	"\t\tpopupButtons: function () { var out = []; (function walk(e) { (e.children || []).forEach(function (c) {\n" +
+	"\t\t\tif (c.tagName === 'BUTTON') { out.push(c); } walk(c); }); })(document.getElementById('lpn_popup_fields')); return out; },\n" +
 	"\t\tqueueLength: function () { return terrainNewQueue.length; },\n" +
 	"\t\tswitchProject: function () { project = { name: 'other', activeScenario: 'base' }; },\n" +
 	"\t\tmapMenuRows: mapMenuRows,\n" +
@@ -677,6 +688,84 @@ function runFill(answers) {
 			tileRequests === 0, tileRequests + ' requests');
 		ok('...and leaves the elevation exactly as it was', L.elev('J1') === 55, String(L.elev('J1')));
 		void n;
+	}
+
+	// ---- 7. SAMPLE FIRST, THEN DECIDE (Task 542, Tom 2026-08-29) --------------------------------
+	//
+	// *"I want to see the DEM elevation before I destroy the current elevation. Telling me what the
+	// Mapbox DEM says after putting it in the input is of no value whatsoever."* And then, of the
+	// rebuilt control: *"DEM Sample does nothing."* So this section drives the button the way the
+	// popup does and asserts each link of the chain separately -- "does nothing" can break at the
+	// request, at the recording, or at the redraw, and a harness that only checked the last one
+	// would not say which.
+	section('Task 542: sample, see the number, then decide');
+	{
+		jar.value = '';
+		L.reset(L.GEO);
+		L.addNode('junction', 0, 0);
+		L.place('J1', -122.4, 37.8);
+		L.setElev('J1', 500);          // a number a person put there, which must survive a sample
+		confirmAnswers = [true];       // the consent question, once per browser
+		tileRequests = 0;
+		let got = null;
+		EC.lpnTerrainSample([{ id: 'J1', lon: -122.4, lat: 37.8 }], function (h) { got = h; });
+		await settle();
+		ok('Sample sends one tile request', tileRequests === 1, tileRequests + ' requests');
+		ok('...and calls back with a reading', !!got && got.length === 1, JSON.stringify(got));
+		// **THE READING IS RECORDED WHERE THE POPUP LOOKS FOR IT.** This is the link that "does
+		// nothing" would break silently: the fetch succeeds, the callback fires, and the number
+		// never reaches terrainLastRead because the `record` seam was not wired.
+		ok('...recorded against the node, for the popup to show',
+			typeof L.lastRead('J1') === 'number', String(L.lastRead('J1')));
+		// **AND IT WROTE NOTHING**, which is the whole point of a sample.
+		ok('...while the elevation the person typed is untouched', L.elev('J1') === 500,
+			String(L.elev('J1')));
+	}
+	{
+		// The popup, built after a sample, must SHOW the number and offer to use it.
+		L.renderNode('J1');
+		const text = L.popupText();
+		ok('the popup states what the DEM said', /Mapbox DEM says/.test(text),
+			JSON.stringify(text.slice(0, 200)));
+		const btns = L.popupButtons().map(b => b.textContent);
+		ok('...and offers a Use button carrying the number',
+			btns.some(t => /^Use /.test(t)), JSON.stringify(btns));
+	}
+	{
+		// **OPENING A NODE SAMPLES IT BY ITSELF** (Tom: *"I wonder why we can't sample always on
+		// opening Node editor. Is that too much overhead?"* — it is not: one tile serves every node
+		// within about a kilometre, and the browser caches it). So a node nobody has asked about
+		// gets its reading from the act of being looked at, and "Use it" is ready without a press.
+		// **THE CREATION SETTING IS OFF FOR THIS BLOCK**, or the node would be sampled by being
+		// BORN (section 6b) and the popup would find the reading already there -- measuring nothing.
+		// The two paths are separate features and this one is about opening an editor.
+		L.setElevSource('value');
+		// addNode() MINTS the id -- it takes none. Read it back rather than guessing, the lesson
+		// dev/lpn-spike/rename-references-harness.js records.
+		const nid = L.addNode('junction', 0, 0).id;
+		L.place(nid, -122.5, 37.9);
+		L.setElev(nid, 42);
+		confirmAnswers = [true];
+		tileRequests = 0;
+		L.renderNode(nid);            // opening the editor is the whole gesture
+		await settle();
+		ok('opening a node the DEM has not been asked about sends one request',
+			tileRequests === 1, tileRequests + ' requests');
+		ok('...and records the reading without touching the elevation',
+			typeof L.lastRead(nid) === 'number' && L.elev(nid) === 42,
+			L.lastRead(nid) + ' / ' + L.elev(nid));
+		L.renderNode(nid);
+		const btns2 = L.popupButtons().map(b => b.textContent);
+		ok('...so the redrawn popup offers Use straight away',
+			btns2.some(t => /^Use /.test(t)), JSON.stringify(btns2));
+		// **ASKED ONCE.** Without terrainAsked the callback's redraw would rebuild the row, find the
+		// reading still missing on a failure, and ask again -- a request loop driven by an open popup.
+		tileRequests = 0;
+		L.renderNode(nid);
+		L.renderNode(nid);
+		await settle();
+		ok('...and re-opening it asks for nothing more', tileRequests === 0,
+			tileRequests + ' requests');
 	}
 
 	// ---- 5h. THE ONE STRUCTURAL ASSERTION ABOUT THE NETWORK --------------------------------------
