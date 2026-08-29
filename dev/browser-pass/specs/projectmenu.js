@@ -27,7 +27,11 @@ exports.title = '35. The Project menu';
 // between Calculate and the report, for the reason that outlives the removal: it is an ANALYSIS of
 // this project, not an Insert, because nothing it builds enters the document. When it returns it
 // returns to that slot, and this list is where that is recorded.
-const EXPECTED = ['Settings', 'Libraries', 'Profile', 'Tables', 'Scenarios', 'Calculate',
+// **INSERT IS FIRST, SINCE TASK 543 (2026-08-27).** The Insert MENU was deleted and its seven asset
+// rows became a fly-out at the head of Water — Tom's own decision, and his reasoning was that
+// everything below it reads, configures or reports on what those rows put on the map. This list had
+// not followed, so the section failed on its second check for two days.
+const EXPECTED = ['Insert', 'Settings', 'Libraries', 'Profile', 'Tables', 'Scenarios', 'Calculate',
 	'EPANET run report'];
 
 exports.run = async function ({ browser, report }) {

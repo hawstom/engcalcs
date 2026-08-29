@@ -825,6 +825,24 @@ the block.
       would report the sentence Tom wrote and approved.
     - It is a FLOOR, not a guarantee: it cannot see `~/webdev/librewaternet.org`, which is where
       three of the four actually shipped. `dev/positioning.md` stays the authority.
+  - **AND THE CLEAREST INSTANCE THE SURVEY HAS PRODUCED, 2026-08-29: A THIRD OF THE BROWSER PASS
+    HAD BEEN DEAD FOR TWO DAYS.** Twelve of thirty-eight sections threw at their first line, because
+    `Session._newFromTemplate()` drove `File > New project… > <template>` — the fly-out Task 477
+    replaced with the New-project BOX on 2026-08-27. Four more stale references rode along:
+    `#lpn_menu_insert` and `#lpn_menu_view` (both retired by Task 543), a row-index into the Water
+    menu that assumed nothing would ever be inserted above it, and two tab labels from before the
+    examples became `.lwn` files.
+    - **THE ALARM EXISTED AND WAS WORSE THAN USELESS.** Every run ended `26/38 sections completed
+      <-- SHORT RUN` under a cheerful `849/864 checks passed` — and **that percentage is a fraction
+      of what RAN, so it rises as coverage falls.** A number that improves as the suite dies is not
+      a metric, it is camouflage. Now a short run is shouted, NAMES the sections that threw, and
+      says outright that the percentage above it cannot be trusted.
+    - **THE GENERAL LESSON, and it is a survey row nobody has written:** a test runner that can
+      SKIP work must report skips as loudly as failures, and its headline must be a fraction of what
+      was ASKED FOR, not of what was reached. `check_all.sh` gets this right by counting from a glob;
+      `run.js` did not. Worth auditing the other runners for the same shape.
+    - Repaired: 38/38 sections, 1059+ checks against 864. `dev/browser-pass/README.md` carries the
+      account.
   - **DELIBERATELY LEFT ADVISORY, and the reasoning is the useful part:** `size_budget_check.php`
     entirely (both numbers are judgement, and a ratchet fails a legitimate addition, which is the
     fastest way to teach a team `--no-verify`); both `key_hygiene_check.php` findings (whether a key

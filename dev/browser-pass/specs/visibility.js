@@ -659,9 +659,14 @@ exports.run = async function ({ browser, report }) {
 		// row is the bar's only door to the box; that it is the SAME box is the thing worth checking.
 		await closeBox(a);
 		await a.settle(200);
+		// **BY NAME, NOT BY INDEX.** This took row [0], which was Settings until Task 543 put the
+		// Insert fly-out at the head of Water (2026-08-27) -- so it had been clicking Insert, and
+		// the Settings box it then asserted was open never opened. An index into a menu is a bet
+		// that nobody will ever add a row above.
 		await a.page.evaluate(() => {
 			document.getElementById('lpn_menu_project').click();
-			const row = [...document.querySelectorAll('#lpn_menu_list button')][0];
+			const row = [...document.querySelectorAll('#lpn_menu_list button')]
+				.find(b => /^\s*Settings/.test(b.textContent));
 			if (row) { row.click(); }
 		});
 		await a.settle(400);

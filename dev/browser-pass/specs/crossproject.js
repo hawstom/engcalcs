@@ -78,11 +78,26 @@ exports.run = async function ({ browser, report }) {
 		// else the machine is doing, and alternating is what makes the PAIR mean anything.
 		let fromBlank = Infinity, fromGeo = Infinity;
 		for (let i = 0; i < 2; i++) {
+			// **A TAB IS NAMED AFTER ITS FILE, NOT AFTER THE PROJECT INSIDE IT.** These read
+			// 'Net3-lpn' and 'Net3-World' — the names the sources carried before they became
+			// `.lwn` files — so `clickTab` found nothing and the whole timing pair was skipped.
+			// `Novato` and `Net3.lwn` are each unique in the strip; a bare `Net3` is not, because it
+			// is a prefix of both.
 			await clickTab('Project1');
-			const b = await clickTab('Net3-lpn');
-			await clickTab('Net3-World');
-			const g = await clickTab('Net3-lpn');
-			if (b === null || g === null) { report.ok(false, 'both tabs are present'); return; }
+			const b = await clickTab('Net3.lwn');
+			await clickTab('Novato');
+			const g = await clickTab('Net3.lwn');
+			if (b === null || g === null) {
+				// **A FAILURE THAT NAMES WHAT IT SAW.** This said only "both tabs are present" and
+				// left the reader to guess which one was missing and what the strip actually held --
+				// on a check whose whole setup is two file opens that can each fail quietly.
+				const seen = await a.page.evaluate(() =>
+					Array.from(document.querySelectorAll('#lpn_tabs .lpn-tab'))
+						.map(e => ((e.querySelector('.lpn-tab-name') || {}).textContent || '').trim()));
+				report.ok(false, 'both tabs are present',
+					'wanted Net3.lwn and Novato; the strip holds ' + JSON.stringify(seen));
+				return;
+			}
 			fromBlank = Math.min(fromBlank, b);
 			fromGeo = Math.min(fromGeo, g);
 		}
