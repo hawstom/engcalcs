@@ -531,17 +531,19 @@ the block.
     already removes deliberately — and so was snapping to the nearest node, which commits a stop
     nobody aimed at. A drop with no route is refused and names both nodes, the chooser's own refusal
     reached by the other gesture.
-  - **THE BOX IS NOT SUPERSEDED, and both are entered by the same press.** It is the discoverable
-    form, it is what a pointer-less reader gets, and it names the waypoints, which the drawing
-    cannot. Edit mode and the box are ONE state: the button toggles it, its X and Escape leave it,
-    and arming the chooser puts it away (the chooser writes a stop list `profileStops()` reads
-    instead of from/to/waypoints).
+  - **THE BOX IS SUPERSEDED AFTER ALL, and it is gone (2026-08-28).** It was kept as the
+    discoverable form and the pointer-less way through the same two operations. Tom, having used it:
+    *"we shouldn't need any interface in the bottom pane other than an Edit button. We have From and
+    To: I can see those in the map. We have Nodes on the way: I can see those on the map."* Its
+    markup, its four language keys and its two predicates went with it; `profileState.editing` is now
+    the whole state, the button toggles it and Escape leaves it, and arming the chooser turns it off
+    (the chooser writes a stop list `profileStops()` reads instead of from/to/waypoints).
   - **While it is on, the map drags nothing but a handle** — a handle sits exactly on a junction, so
     without that rule re-routing a path would also move the pipework.
     `dev/lpn-spike/profile-edit-harness.js` (48 checks, fake clock) asserts that one from the drag
     type and from the coordinate.
-  - **Open: Tom's own pass.** Three new English keys await his wording — `lpn_profile_edit_say`,
-    `_edit_tap`, `_edit_nowhere`.
+  - **Open: Tom's own pass** of the pane with no box in it. Three new English keys await his
+    wording — `lpn_profile_edit_say`, `_edit_tap`, `_edit_nowhere`.
 
 - 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
   reply to outreach, and he has replied gratefully. This is the first real conversation this suite's
