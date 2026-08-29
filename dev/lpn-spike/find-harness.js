@@ -618,13 +618,29 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 		JSON.stringify(L.opLabels('pipe', 'velocity')));
 	ok('and neither wording is a separate language key any more',
 		!/lpn_find_q_top|lpn_find_q_bottom/.test(fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8')));
+	// **THE LOCAL PAIR SAY "AT NODE" SINCE 2026-08-29**, Tom's own edit on the Task 545 pass: the
+	// bare "no links" did not say WHOSE links, where its two siblings both name what is missing and
+	// from where. The other two are unchanged.
 	ok('a connection condition is the whole sentence, with no value',
-		lineFor('junction', 'connection', 'conn-unlinked', '') === 'Junction.Connection no links',
+		lineFor('junction', 'connection', 'conn-unlinked', '') === 'Junction.Connection no links at node',
 		JSON.stringify(L.queryText()));
-	// **ALL FOUR WORDINGS ARE TOM'S OWN** (2026-08-26), and so is the widening order.
+	// **ALL FOUR WORDINGS ARE TOM'S OWN** (2026-08-26, the local pair reworded 2026-08-29), and so
+	// is the widening order.
 	ok('the local pair reads as a fact about this node\'s own links',
-		lineFor('junction', 'connection', 'conn-noopen', '') === 'Junction.Connection no open links',
+		lineFor('junction', 'connection', 'conn-noopen', '') === 'Junction.Connection no open links at node',
 		JSON.stringify(L.queryText()));
+	// **AND THE SHORT SPELLING STILL PARSES.** The third element of findConnOpDefs() is the English
+	// ALIAS, deliberately left as "no links" / "no open links": findAlts() offers the localized text
+	// and the alias as two spellings of one condition, so a query somebody typed or saved before the
+	// rewording still reads back, and longest-wins picks the new form when it is the one typed.
+	// Driven through the REAL input, the way section 7 drives everything: type it, fire the real
+	// `input` listener, and read the state the panel arrived at.
+	L.type('Junction.Connection no links');
+	const shortA = JSON.stringify(L.findState());
+	L.type('Junction.Connection no open links');
+	const shortB = JSON.stringify(L.findState());
+	ok('...while the short English spelling still parses to the same two conditions',
+		/conn-unlinked/.test(shortA) && /conn-noopen/.test(shortB), shortA + ' / ' + shortB);
 	ok('the island condition names the missing LINK',
 		lineFor('junction', 'connection', 'conn-nolinksource', '') === 'Junction.Connection no link path to a source',
 		JSON.stringify(L.queryText()));

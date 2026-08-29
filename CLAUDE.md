@@ -127,6 +127,7 @@ never edits the roadmap; promoting a row is Tom's call.
 | `dev/language-strings.md` | Full rules for writing `$ec_lang` / `$ec_lang_syn` values |
 | `dev/translation-process.md` | Sprint SOP and full mechanics |
 | `dev/testing-notes.md` | What actually catches defects here |
+| `dev/english-key-rulings.json` | Tom's approvals of English strings, keyed on the EXACT text ruled on, so a ruling lapses by itself when the wording changes. `new_english_keys.php` prints them back and leads with the count still to read. **Never hand-edit `dev/new-english-keys.md` expecting it to survive** — `--write` refuses over a hand-edited file, which is the guard that exists because his first pass was lost |
 | `dev/enforceable-rules-survey.md` | Which of this file's rules a script COULD hold, ranked, with the count: 34 enforced, 27 reachable, 41 permanently prose (Task 322) |
 | `dev/cross-platform-planning.md` | Claude Code / Copilot collaboration conventions |
 | `dev/unit-families.md` | Unit-family design record and per-field rationale |

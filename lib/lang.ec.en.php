@@ -1618,21 +1618,21 @@ $ec_lang['lpn_find_prop_connection']='Connection';
 // searcher wants: pick how wide to cast. Earlier wordings ("is cut off for any reason", "is
 // behind closed links", "reaches no source") presented four mutually exclusive cases he did not
 // recognise, and "is behind closed links" never said behind them RELATIVE TO WHAT. Do not restore.
-$ec_lang['lpn_find_op_conn_unlinked']='no links';
-$ec_lang['lpn_find_op_conn_noopen']='no open links';
+$ec_lang['lpn_find_op_conn_unlinked']='no links at node';
+$ec_lang['lpn_find_op_conn_noopen']='no open links at node';
 $ec_lang['lpn_find_op_conn_nolinksource']='no link path to a source';
 $ec_lang['lpn_find_op_conn_noopensource']='no open path to a source';
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
-$ec_lang['lpn_find_conn_unlinked']='No links';
-$ec_lang['lpn_find_conn_noopen']='No open links';
+$ec_lang['lpn_find_conn_unlinked']='No links at node';
+$ec_lang['lpn_find_conn_noopen']='No open links at node';
 $ec_lang['lpn_find_conn_nolinksource']='No link path to a source';
 $ec_lang['lpn_find_conn_noopensource']='No open path to a source';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Every node is connected.';
-$ec_lang['lpn_find_conn_no_fixed']='This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be answered.';
+$ec_lang['lpn_find_conn_no_fixed']='This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be searched.';
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
@@ -1649,7 +1649,7 @@ $ec_lang['lpn_find_q_or']='OR';
 // stand there describing a search that is not the one about to run.
 $ec_lang['lpn_find_q_aside']='These controls cannot write the query below, so they are set aside rather than saying something untrue.';
 $ec_lang['lpn_find_q_restore']='Use the controls instead';
-$ec_lang['lpn_replace_q_aside']='Replace cannot use a query joined with AND, OR or brackets. Use the controls to choose one set of elements.';
+$ec_lang['lpn_replace_q_bad']='This query cannot be read, so there is nothing to change. Fix it above first.';
 // The parse errors. Each says what could not be understood and where, and NONE of them is followed
 // by a search: a query that cannot be read searches nothing.
 // {n} is a whole number; {w} is the word the reader typed; {list} is a comma-separated list of the
@@ -1776,7 +1776,7 @@ $ec_lang['lpn_new_coords_geo']='lat/lon, on the Earth';
 // What each choice really means, and the fact that picking xy is not final. Said on the group
 // rather than on each radio: one tip, one "?", and the two options are only meaningful against
 // each other.
-$ec_lang['lpn_new_coords_tip']='An xy project is a drawing on a grid, with no place on the Earth. A lat/lon project sits on real ground, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be put on the ground later with File > Import xy to lat/lon.';
+$ec_lang['lpn_new_coords_tip']='An xy project is a model on any coordinates other than lat/lon. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File > Import xy to lat/lon.';
 // The place-name field, enabled only for a latitude-and-longitude project. Optional, always: a
 // blank one makes the project and moves nothing.
 $ec_lang['lpn_new_place']='Start near this place';
@@ -1860,7 +1860,7 @@ $ec_lang['lpn_inp_drop_head_pattern']='These reservoirs rise and fall through th
 $ec_lang['lpn_inp_drop_pump_speed']='These pumps run at a speed other than the one their curve was measured at, or change speed through the day. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_setting']='These pipes, pumps and valves carry a setting this page cannot hold. They came in open.';
 $ec_lang['lpn_inp_drop_controls']='These controls and rules were left out. The pipes, pumps and valves they name came in at the state written in the file and stay that way.';
-$ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. They do not change the answers here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_eps']='This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in.';
 $ec_lang['lpn_inp_drop_quality']='Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.';
 $ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
@@ -2398,12 +2398,14 @@ $ec_lang['lpn_field_active_tip']='Clear this box to leave the asset on the drawi
 // A scenario is a set of water values; two scenarios of one network must look the same, or you
 // cannot compare them.
 $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
-$ec_lang['lpn_settings_emitter_exponent_tip']='The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which today means a network read from an EPANET file.';
+$ec_lang['lpn_settings_emitter_exponent_tip']='The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.';
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Computation';
-$ec_lang['lpn_elev_dem_read']='Read elevation from Mapbox DEM';
-$ec_lang['lpn_elev_dem_read_tip']='Reads the height of the land under this node from Mapbox DEM and puts it in the box above, replacing what is there. It is about 30 m across on most of the Earth, and finer where better data exists.';
+$ec_lang['lpn_elev_dem_sample']='Sample Mapbox DEM';
+$ec_lang['lpn_elev_dem_sample_tip']='Reads the height of the land under this node and shows it below. It changes nothing. Mapbox DEM is about 30 m across on most of the Earth, and finer where better data exists.';
+$ec_lang['lpn_elev_dem_use']='Use {v} {u}';
+$ec_lang['lpn_elev_dem_use_tip']='Puts the sampled height into the Elevation box above, replacing what is there. One Undo puts it back.';
 $ec_lang['lpn_elev_dem_said']='Mapbox DEM says {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Elevation from';
 $ec_lang['lpn_settings_elev_source_tip']='Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.';
@@ -2414,7 +2416,7 @@ $ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
 $ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';
-$ec_lang['lpn_settings_viscosity_tip']='The thickness of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.';
+$ec_lang['lpn_settings_viscosity_tip']='The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.';
 $ec_lang['lpn_settings_trials']='Maximum trials';
 $ec_lang['lpn_settings_trials_tip']='How many times the solver may try before it gives up on a network that will not settle.';
 $ec_lang['lpn_settings_demand_multiplier']='Demand multiplier';
@@ -2720,16 +2722,16 @@ $ec_lang['lpn_field_base_demand']='Base demand';
 // junction. The first sentence is his wording verbatim; the second is the one that was already
 // there and is untouched, because it says the other thing this tip exists for -- that the number
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
-$ec_lang['lpn_result_demand_tip']='The flow this node draws at the moment shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.';
+$ec_lang['lpn_result_demand_tip']='The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.';
 $ec_lang['lpn_field_demand_pattern']='Demand pattern';
 $ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_field_demand_category']='Description';
-$ec_lang['lpn_field_demand_category_tip']='Name or description of the user or users using this pattern.';
+$ec_lang['lpn_field_demand_category_tip']='Name or description of the category.';
 $ec_lang['lpn_demand_add']='Add demand category';
-$ec_lang['lpn_demand_add_tip']='Add another demand at this junction, with its own base demand, pattern and category. The demands add up.';
+$ec_lang['lpn_demand_add_tip']='Add another demand at this junction, with its own base demand, pattern and description. The demands add up.';
 $ec_lang['lpn_demand_remove']='Remove this demand';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.

@@ -1,0 +1,373 @@
+{
+ "_note": "See dev/scripts/new_english_keys.php. A ruling is remembered against the EXACT English it was made on; change the string and the ruling lapses.",
+ "rulings": {
+  "lpn_demand_add": {
+   "on": "Add demand category",
+   "ruled": "2026-08-29"
+  },
+  "lpn_demand_add_tip": {
+   "on": "Add another demand at this junction, with its own base demand, pattern and description. The demands add up.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_demand_remove": {
+   "on": "Remove this demand",
+   "ruled": "2026-08-29"
+  },
+  "lpn_field_base_demand": {
+   "on": "Base demand",
+   "ruled": "2026-08-29"
+  },
+  "lpn_field_demand_category": {
+   "on": "Description",
+   "ruled": "2026-08-29"
+  },
+  "lpn_field_demand_category_tip": {
+   "on": "Name or description of the category.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_field_text_attached": {
+   "on": "Attached to",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_conn_no_fixed": {
+   "on": "This network has no reservoir or tank, so it has no source to reach. Only \"no links\" and \"no open links\" can be searched.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_conn_nolinksource": {
+   "on": "No link path to a source",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_conn_none": {
+   "on": "Every node is connected.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_conn_noopen": {
+   "on": "No open links at node",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_conn_unlinked": {
+   "on": "No links at node",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_op_conn_noopen": {
+   "on": "no open links at node",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_op_conn_unlinked": {
+   "on": "no links at node",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_prop_connection": {
+   "on": "Connection",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_and": {
+   "on": "AND",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_aside": {
+   "on": "These controls cannot write the query below, so they are set aside rather than saying something untrue.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_close": {
+   "on": "This bracket ( was opened and never closed.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_dot": {
+   "on": "Put a dot between what to search and its property, like Junction.ID",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_empty": {
+   "on": "The query is empty, so nothing will be searched.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_end": {
+   "on": "Nothing was expected after this. Join two searches with {and} or {or}.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_op": {
+   "on": "Not a condition for {prop}: {w}. Try one of: {list}",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_open": {
+   "on": "This bracket ) closes nothing.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_pos": {
+   "on": "(at character {n})",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_prop": {
+   "on": "Not a property of {scope}: {w}. Try one of: {list}",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_quote": {
+   "on": "Put quotes around a text value: {w} is not a number.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_quote_end": {
+   "on": "This quoted text has no closing quote.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_scope": {
+   "on": "Not something to search: {w}. Try one of: {list}",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_err_value": {
+   "on": "This condition needs a value after it: {op}",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_or": {
+   "on": "OR",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_q_restore": {
+   "on": "Use the controls instead",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_query_hint": {
+   "on": "Expandable with AND, OR, and ()",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_query_label": {
+   "on": "Query",
+   "ruled": "2026-08-29"
+  },
+  "lpn_find_query_tip": {
+   "on": "The same search, written as one line. Change the controls and it rewrites itself, or type in it and the controls follow.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_georef_backdrop_unrotated": {
+   "on": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_georef_twopt": {
+   "on": "Use two known points",
+   "ruled": "2026-08-29"
+  },
+  "lpn_georef_twopt_done": {
+   "on": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_georef_twopt_pick1": {
+   "on": "Click a point on your drawing whose latitude and longitude you know.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_georef_twopt_pick2": {
+   "on": "Now click a second known point, as far from the first one as you can.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_georef_twopt_same": {
+   "on": "That is the point you picked first. Pick a different one.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_georef_twopt_tip": {
+   "on": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_inp_drop_rules": {
+   "on": "This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_menu_map": {
+   "on": "Map",
+   "ruled": "2026-08-29"
+  },
+  "lpn_new_coords": {
+   "on": "Coordinates",
+   "ruled": "2026-08-29"
+  },
+  "lpn_new_coords_geo": {
+   "on": "lat/lon, on the Earth",
+   "ruled": "2026-08-29"
+  },
+  "lpn_new_coords_tip": {
+   "on": "An xy project is a model on any coordinates other than lat/lon. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File > Import xy to lat/lon.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_new_coords_xy": {
+   "on": "xy grid",
+   "ruled": "2026-08-29"
+  },
+  "lpn_new_create": {
+   "on": "Create",
+   "ruled": "2026-08-29"
+  },
+  "lpn_new_place": {
+   "on": "Start near this place",
+   "ruled": "2026-08-29"
+  },
+  "lpn_new_place_hint": {
+   "on": "Petaluma, California",
+   "ruled": "2026-08-29"
+  },
+  "lpn_new_place_tip": {
+   "on": "Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap's place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_new_title": {
+   "on": "New project",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_delete": {
+   "on": "Delete path",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_delete_confirm": {
+   "on": "Delete the saved path {name}? The drawing itself is not changed.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_edit": {
+   "on": "Edit",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_edit_click": {
+   "on": "Drag any point on the path to move it. Click a point you added to take it off.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_edit_nowhere": {
+   "on": "A point on the path has to be a node. The path is unchanged.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_edit_tap": {
+   "on": "Drag any point on the path to move it. Tap a point you added to take it off.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_edit_tip": {
+   "on": "Change one end of the path, or take one node off it, without drawing the whole path again.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_missing": {
+   "on": "{name} names nodes that are not in this project: {ids}",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_new": {
+   "on": "New saved path…",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_new_name": {
+   "on": "Path {n}",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_none_saved": {
+   "on": "No saved paths yet",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_prompt_name": {
+   "on": "Name for this path",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_rename": {
+   "on": "Rename path…",
+   "ruled": "2026-08-29"
+  },
+  "lpn_profile_saved": {
+   "on": "Saved paths",
+   "ruled": "2026-08-29"
+  },
+  "lpn_replace_asked": {
+   "on": "Asked for {n}. The answer is on its way.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_replace_source": {
+   "on": "New value from",
+   "ruled": "2026-08-29"
+  },
+  "lpn_result_demand_tip": {
+   "on": "The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_scenario_mark_tip": {
+   "on": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_scenario_overrides_tip": {
+   "on": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_demand_multiplier": {
+   "on": "Demand multiplier",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_demand_multiplier_tip": {
+   "on": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_elev_source": {
+   "on": "Elevation from",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_elev_source_dem": {
+   "on": "Mapbox DEM",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_elev_source_tip": {
+   "on": "Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_elev_source_typed": {
+   "on": "The number above",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_emitter_exponent_tip": {
+   "on": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_leader_snap": {
+   "on": "Snap leader lines to angle",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_leader_snap_tip": {
+   "on": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_legend_off": {
+   "on": "Off",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_specific_gravity": {
+   "on": "Specific gravity",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_specific_gravity_tip": {
+   "on": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_trials": {
+   "on": "Maximum trials",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_trials_tip": {
+   "on": "How many times the solver may try before it gives up on a network that will not settle.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_viscosity": {
+   "on": "Relative viscosity",
+   "ruled": "2026-08-29"
+  },
+  "lpn_settings_viscosity_tip": {
+   "on": "The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.",
+   "ruled": "2026-08-29"
+  },
+  "lpn_terrain_blank_ids": {
+   "on": "These nodes are still blank: {ids}",
+   "ruled": "2026-08-29"
+  },
+  "lpn_terrain_filled_ids": {
+   "on": "These nodes were filled in: {ids}",
+   "ruled": "2026-08-29"
+  },
+  "lpn_terrain_ids_more": {
+   "on": "{ids}, and {n} more",
+   "ruled": "2026-08-29"
+  },
+  "lpn_terrain_keep_ids": {
+   "on": "They are: {ids}",
+   "ruled": "2026-08-29"
+  },
+  "lpn_terrain_will_ids": {
+   "on": "These are the nodes that will be filled in: {ids}",
+   "ruled": "2026-08-29"
+  }
+ }
+}

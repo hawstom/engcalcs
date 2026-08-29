@@ -581,6 +581,64 @@
 	 * because what it protects is not "is this destructive" -- it is that a node coordinate says
 	 * where the user's NETWORK IS, and that is true however the fill was started.
 	 */
+	/**
+	 * **READ THE LAND SURFACE AND REPORT IT. WRITE NOTHING.** (ROADMAP Task 542; Tom, 2026-08-29:
+	 * *"I want to see the DEM elevation before I destroy the current elevation."*)
+	 *
+	 * This is the half of the feature that had been missing. Every other door here reads AND writes
+	 * in one press, which is right for a bulk fill somebody asked for and wrong for the question
+	 * *what is the elevation here?* — the answer to that has to arrive before anything is
+	 * overwritten, or the number it would have been compared against is already gone.
+	 *
+	 * It shares the plan, the budget, the decode and the consent gate with the fill, and diverges at
+	 * exactly one line: the readings go to `seam.record` and never to `seam.fill`. **The consent
+	 * gate is NOT skipped** — sampling is the step that sends a node's position to Mapbox, so it is
+	 * the step that has to ask, and it asks once per browser rather than once per press.
+	 *
+	 * `done` is called after the readings are recorded, so a caller can redraw.
+	 */
+	EC.lpnTerrainSample = function (want, done) {
+		if (!seam || (seam.isGeo && !seam.isGeo())) { return; }
+		var token = seam.token && seam.token();
+		if (!token) { return; }
+		if (running) {
+			notice(t('lpn_terrain_busy', 'Elevations are already being filled in. Wait for them.'));
+			return;
+		}
+		if (!want || !want.length) { return; }
+		if (!mayWeSend(want.length)) { return; }
+		var plan = EC.lpnTerrainPlan(want);
+		if (!plan || !plan.tiles.length) {
+			notice(t('lpn_terrain_offmap',
+				'These node positions are not on the terrain map, so nothing was sent.'));
+			return;
+		}
+		if (typeof root.fetch !== 'function') {
+			notice(t('lpn_terrain_nofetch', 'This browser cannot reach the terrain service.'));
+			return;
+		}
+		running = true;
+		var heights = [], failed = 0;
+		Promise.all(plan.tiles.map(function (tile) {
+			return EC.lpnTerrainFetchPixels(tile, token).then(function (pixels) {
+				pixels.forEach(function (p) {
+					var m = EC.lpnTerrainDecode(p.r, p.g, p.b);
+					if (m !== undefined && isFinite(m)) { heights.push({ id: p.id, meters: m }); }
+				});
+			}, function () { failed++; });
+		})).then(function () {
+			running = false;
+			if (!heights.length) {
+				notice(t('lpn_terrain_failed',
+					'We could not reach the terrain service, so no elevation was changed. You may ' +
+					'be offline. Everything else on this page works without it.'));
+			} else if (seam.record) {
+				seam.record(heights);
+			}
+			if (typeof done === 'function') { done(heights, failed); }
+		});
+	};
+
 	EC.lpnTerrainFillFor = function (want, opts) {
 		opts = opts || {};
 		if (!seam || (seam.isGeo && !seam.isGeo())) { return; }
@@ -664,7 +722,10 @@
 	}
 
 	/**
-	 * The whole seam from js/looped-network.js. Six functions: what a geographic project is, the
+	 * The whole seam from js/looped-network.js. SEVEN functions now -- `record` joined them with
+	 * Task 542's sample-before-you-write control, and it is the one that writes NOTHING to the
+	 * document: it hands back a reading so the page can show it and let a person decide. Six
+	 * functions: what a geographic project is, the
 	 * token, which nodes need an elevation, WHICH already have one, which are still on the starting
 	 * elevation, how to write a batch (returning the ids it wrote), and where to speak. The two
 	 * "which" answers are lists of ids and not counts, because this file names the nodes in both

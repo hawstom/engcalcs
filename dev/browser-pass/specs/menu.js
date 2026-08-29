@@ -39,8 +39,13 @@ exports.run = async function ({ browser, report }) {
 		// so nothing on screen can make it impossible.
 		report.ok(!by('Import xy to lat/lon…').disabled,
 			'Import xy to lat/lon… is always live — it opens a file, and always into a new tab');
-		report.ok(by('New project…').submenu, 'New project… leads to a fly-out of templates, not straight to a blank one',
-			'Task 264: the row that used to make a project on the spot now offers the ways of starting one');
+		// **NO FLY-OUT ANY MORE, AND THAT IS TASK 477 RATHER THAN A REGRESSION.** Task 264 gave this
+		// row a fly-out of templates; Task 477 replaced it with the New-project BOX, because the
+		// fly-out's rows were the CROSS of two questions and a third would have made eight of them.
+		// This assertion still read `submenu` and had been failing since 2026-08-27.
+		report.ok(!by('New project…').submenu,
+			'New project… opens the New-project box, not a fly-out',
+			'Task 477 retired the fly-out: four questions in one box, not four rows');
 
 		// **HELP > "WHAT THE TOOLBAR ICONS MEAN" ACTUALLY OPENS SOMETHING** (Tom, 2026-08-18: it
 		// "does nothing"). It called openMenu() at level 0 on the Help button — the anchor the menu

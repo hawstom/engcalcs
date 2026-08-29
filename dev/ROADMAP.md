@@ -82,6 +82,13 @@ the block.
     regenerate a file that has been hand-edited** — it compares what is on disk with what git last
     committed, so ordinary drift from a new English key regenerates freely and a human's marks stop
     it dead, naming the recovery. `--force` exists and the message says not to reach for it.
+  - **AND AN APPROVAL IS DATA NOW, WHICH IS THE HALF THAT WAS MISSING** (2026-08-29). He read the
+    whole list and marked 92 keys — 81 `OK.`, 11 `Edited.`. The edits went into `lang.ec.en.php` and
+    were safe; **the 81 approvals were about to be thrown away by the next regeneration**, handing
+    him the same list unmarked. `dev/english-key-rulings.json` keeps them, keyed on the EXACT
+    English ruled on, so a ruling lapses by itself when the wording changes and nobody is ever shown
+    an approval of a sentence that has since moved. The file now opens with **"11 still to read"**
+    rather than a count of everything.
   - **What is left is the reading**, and it is a sitting rather than a trickle. **The sprint is
     downstream of it**: translating a string he then rewords is paid work thrown away, which is the
     mistake sprint 459 recorded when nine agents read a payload that disagreed with the source.

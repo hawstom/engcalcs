@@ -6789,6 +6789,12 @@ var EngCalcs = EngCalcs || {};
 	// about the network -- the same standing as a solve result -- and writing it into the project
 	// would put a number nobody typed into a file they save.
 	var terrainLastRead = {};
+	/** Remember a batch of readings and nothing else. The document is not touched. */
+	function terrainRecordReadings(list) {
+		(list || []).forEach(function (e) {
+			if (e && typeof e.meters === 'number' && isFinite(e.meters)) { terrainLastRead[e.id] = e.meters; }
+		});
+	}
 	function terrainFillElevations(list, replaceValue) {
 		// **`replaceValue === true` MEANS "WHATEVER IS THERE", AND ONLY FIND AND REPLACE MAY PASS
 		// IT** (Task 542). That door exists precisely to change numbers a person has: they chose the
@@ -7609,8 +7615,8 @@ var EngCalcs = EngCalcs || {};
 	function findConnOpDefs() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			['conn-unlinked', pc.lpn_find_op_conn_unlinked || 'no links', 'no links'],
-			['conn-noopen', pc.lpn_find_op_conn_noopen || 'no open links', 'no open links'],
+			['conn-unlinked', pc.lpn_find_op_conn_unlinked || 'no links at node', 'no links'],
+			['conn-noopen', pc.lpn_find_op_conn_noopen || 'no open links at node', 'no open links'],
 			['conn-nolinksource', pc.lpn_find_op_conn_nolinksource || 'no link path to a source',
 				'no link path to a source'],
 			['conn-noopensource', pc.lpn_find_op_conn_noopensource || 'no open path to a source',
@@ -7653,8 +7659,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	function findConnLabel(st) {
 		var pc = EngCalcs.pageConfig || {};
-		if (st === 'conn-unlinked') { return pc.lpn_find_conn_unlinked || 'No links'; }
-		if (st === 'conn-noopen') { return pc.lpn_find_conn_noopen || 'No open links'; }
+		if (st === 'conn-unlinked') { return pc.lpn_find_conn_unlinked || 'No links at node'; }
+		if (st === 'conn-noopen') { return pc.lpn_find_conn_noopen || 'No open links at node'; }
 		if (st === 'conn-nolinksource') { return pc.lpn_find_conn_nolinksource || 'No link path to a source'; }
 		if (st === 'conn-noopensource') {
 			return pc.lpn_find_conn_noopensource || 'No open path to a source';
@@ -8596,7 +8602,7 @@ var EngCalcs = EngCalcs || {};
 			findResults = run.list;
 			if (findAstNeedsSource(findQueryAst) && !findConnectionMap().hasSource) {
 				findConnNote = pc.lpn_find_conn_no_fixed ||
-					'This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be answered.';
+					'This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be searched.';
 			}
 			renderFindResults(null);
 			if (findResults.length === 1) { findGoTo(findResults[0].group, findResults[0].el.id); }
@@ -8620,7 +8626,7 @@ var EngCalcs = EngCalcs || {};
 		if (findPropIsConnection(findState.prop) && findConnOpNeedsSource(findState.op)
 				&& !findConnectionMap().hasSource) {
 			findConnNote = pc.lpn_find_conn_no_fixed ||
-				'This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be answered.';
+				'This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be searched.';
 		}
 		renderFindResults(null);
 		// ONE HIT GOES STRAIGHT THERE. Typing a node's ID and being shown a list of one, to click,
@@ -8764,16 +8770,42 @@ var EngCalcs = EngCalcs || {};
 	// only thing that ever does, so a reference is the honest way to name it -- and an id lookup
 	// would tie this to a div that Looped-Network.php does not declare.
 	var replaceMsgBox = null;
+	/**
+	 * **THE PROPERTIES THIS REPLACE CAN WRITE, DERIVED FROM WHAT WAS FOUND** (Tom, 2026-08-29, of
+	 * the message that used to appear instead: *"This is false. Fix our behavior not to need
+	 * this."*).
+	 *
+	 * It used to read `findState.scope` and refuse outright whenever a typed query used AND, OR or
+	 * a bracket, because such a query has no single scope. **The refusal was never about the WRITE,
+	 * only about this list** — replaceTargets() below has always skipped a candidate whose group
+	 * differs from the chosen property's, so a mixed set was already safe to write to. The list was
+	 * the only thing scope-bound, and a scope is the wrong question: what a Replace can set is
+	 * decided by what the query actually MATCHED.
+	 *
+	 * So the candidates are the matched set when there is a typed query, and the scope's own
+	 * candidates otherwise. A property is offered where at least one MATCHED element can hold it —
+	 * the same honesty findPropDefs() applies on the search side, now measured against the answer
+	 * rather than against the question.
+	 *
+	 * **A MIXED SET IS NOT A PROBLEM, IT IS THE POINT.** `Pipe.Diameter equal to 6 OR Junction.Elev
+	 * greater than 100` offers Diameter (which only the pipes can hold) and Elevation (only the
+	 * junctions), and each writes to its own half. The count in the preview says how many.
+	 *
+	 * A query that does not PARSE still yields nothing, and that stays: there is no matched set to
+	 * derive anything from, and runReplacePreview() says so in its own words.
+	 */
 	function replaceSpecs() {
-		var d = findScopeDef(findState.scope), cands;
-		if (d.key === 'all' || d.group === 'label') { return []; }
-		cands = findCandidates();
+		var cands;
+		if (findQueryError) { return []; }
+		if (findQueryAst) { cands = findMatches(); }
+		else {
+			var d = findScopeDef(findState.scope);
+			if (d.key === 'all' || d.group === 'label') { return []; }
+			cands = findCandidates();
+		}
+		if (!cands.length) { return []; }
 		return pushSpecList().filter(function (s) {
-			if (s.group !== d.group) { return false; }
-			// Offered only where SOMETHING in this scope can hold it -- a pump has no roughness, so
-			// listing it under the Pump scope would be a control with no effect. The same honesty
-			// findPropDefs() applies on the search side.
-			return cands.some(function (c) { return s.applies(c.el); });
+			return cands.some(function (c) { return c.group === s.group && s.applies(c.el); });
 		});
 	}
 	function replaceSpec(field) {
@@ -8860,14 +8892,15 @@ var EngCalcs = EngCalcs || {};
 	// untouched by construction: this function only measures.
 	function runReplacePreview() {
 		var pc = EngCalcs.pageConfig || {}, refs;
-		// **REPLACE CANNOT USE A QUERY IT CANNOT NAME A SCOPE FOR.** Its property list is built from
-		// one scope (replaceSpecs() reads findState.scope), and `Pipe.Diameter ... OR Junction...`
-		// has two. Rather than write to some plausible subset, it declines and says so -- a bulk
-		// write is the one action here whose blast radius the user cannot see coming.
-		if (findQueryAst || findQueryError) {
+		// **A COMPOUND QUERY IS FINE NOW** (Tom, 2026-08-29). It used to be refused here because the
+		// property list was built from one scope; replaceSpecs() derives it from the MATCHED SET
+		// instead, and replaceTargets() has always written only to the elements a property applies
+		// to. What is still refused is a query that does not PARSE — there is no set at all then,
+		// and a bulk write is the one action whose blast radius a user cannot see coming.
+		if (findQueryError) {
 			replacePending = null;
-			renderReplace(pc.lpn_replace_q_aside ||
-				'Replace cannot use a query with AND, OR or brackets. Use the controls to choose one set.');
+			renderReplace(pc.lpn_replace_q_bad ||
+				'This query cannot be read, so there is nothing to change. Fix it above first.');
 			return;
 		}
 		replaceNormalize();
@@ -14567,7 +14600,7 @@ var EngCalcs = EngCalcs || {};
 			// It shares nothing with the simple-control message any more: a control that cannot be
 			// read is discarded, where a rule is KEPT and written back. Two different fates need two
 			// different sentences, and the old one would have a user believing their rules were lost.
-			case 'rules': return pc.lpn_inp_drop_rules || 'This file has rule-based controls. They do not change the answers here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
+			case 'rules': return pc.lpn_inp_drop_rules || 'This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
 			case 'extended-period': return pc.lpn_inp_drop_eps || 'This file runs over a period of time. This page solves one moment, so only the starting conditions came in.';
 			case 'quality':
 			case 'reactions':
@@ -16569,21 +16602,38 @@ var EngCalcs = EngCalcs || {};
 				// popup and would close what was just opened. That was Tom's "File New has no
 				// options. And it does nothing."
 				b.addEventListener('click', function (e) { e.stopPropagation(); openMenu(b, r.submenu(), 1); });
-				b.addEventListener('mouseenter', function () { cancelSubClose(); openMenu(b, r.submenu(), 1); });
+				// **HOVER-TO-OPEN IS FOR POINTERS THAT CAN HOVER, AND ONLY THOSE** (Tom, 2026-08-29:
+				// *"Map.Insert menu is broken on phone. Does nothing."*).
+				//
+				// A touch browser synthesises `mouseenter` before `click`. So a tap on this row
+				// opened the fly-out FIRST, the fly-out landed over the parent popup -- at 360px
+				// there is no room beside it -- and the tap's own `click` then hit a fly-out row
+				// sitting where the finger already was. Playwright names it exactly: *"button from
+				// #lpn_menu_popup2 subtree intercepts pointer events"*. To the person holding the
+				// phone the menu does nothing, or does something they did not choose.
+				//
+				// `(hover: hover)` is the honest question -- not a width, not a user-agent. A
+				// touchscreen laptop answers it correctly for the pointer actually in use, and the
+				// same media query already decides the profile chooser's vocabulary.
+				if (canHover()) {
+					b.addEventListener('mouseenter', function () { cancelSubClose(); openMenu(b, r.submenu(), 1); });
+				}
 			} else if (level) {
 				// A row INSIDE the fly-out keeps it open. This is the whole of Tom's "it disappears
 				// before the mouse can reach it; it honestly seems to disappear BECAUSE you reach
 				// it" (2026-08-10) -- and it did: the dismiss-on-hover below was attached to every
 				// plain row at every level, so entering "Blank project" closed the menu that
 				// "Blank project" was in.
-				b.addEventListener('mouseenter', cancelSubClose);
+				if (canHover()) { b.addEventListener('mouseenter', cancelSubClose); }
 				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); });
 			} else {
 				// Moving onto a plain row in the PARENT dismisses the fly-out, as every desktop menu
 				// does -- otherwise it hangs beside a row it no longer belongs to. On a DELAY, because
 				// the path from "New project…" to its fly-out is diagonal and crosses the rows
 				// underneath: closing on the first of them is the other half of "you can't get to it".
-				b.addEventListener('mouseenter', scheduleSubClose);
+				// Same gate: on touch this fired from the synthesised mouse sequence and armed a
+				// 350 ms close of the fly-out the user had just opened.
+				if (canHover()) { b.addEventListener('mouseenter', scheduleSubClose); }
 				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); });
 			}
 			list.appendChild(b);
@@ -16602,6 +16652,18 @@ var EngCalcs = EngCalcs || {};
 	// move across the rows below, so dismissing on the first row entered makes the submenu
 	// unreachable by pointer -- you can only ever get there in a straight line, and menus are not
 	// laid out for that. Arm a close instead, and let anything inside the fly-out cancel it.
+	/**
+	 * **CAN THIS POINTER HOVER?** Asked of the device rather than of the screen width: a touchscreen
+	 * laptop at 1400px cannot hover and a phone with a mouse can, and neither is a width. Read live
+	 * rather than cached, because a tablet with a keyboard folio changes its answer.
+	 *
+	 * Defaults to TRUE where the query is unavailable, which keeps the desktop behaviour that has
+	 * always been there on any browser too old to answer.
+	 */
+	function canHover() {
+		try { return !window.matchMedia || window.matchMedia('(hover: hover)').matches; }
+		catch (e) { return true; }
+	}
 	var subCloseTimer = null;
 	var SUB_CLOSE_MS = 350;
 	function cancelSubClose() {
@@ -22631,46 +22693,65 @@ var EngCalcs = EngCalcs || {};
 		readonlyField(fields, pc.lpn_field_y || 'Y', coordText(y));
 	}
 	/**
-	 * **THE ELEVATION'S OWN DEM CONTROL** (ROADMAP Task 542; Tom, 2026-08-28: *"lpn Node edit: Add a
-	 * button at Elevation to set from Mapbox DEM"* and *"Maybe when we are editing a node, the
-	 * button or link above can state the DEM elevation?"*).
+	 * **THE ELEVATION'S OWN DEM CONTROL: SAMPLE FIRST, THEN DECIDE** (ROADMAP Task 542).
 	 *
-	 * ONE button, and it answers both asks: it reads the land surface under THIS node, writes the
-	 * elevation, and the line beneath it then STATES what the DEM said. Stating it separately is not
-	 * redundant with the field — the field is the user's number, which they may then edit, and the
-	 * line remains what the terrain service reported.
+	 * **THE FIRST BUILD HAD THIS BACKWARDS AND TOM SAID SO PLAINLY** (2026-08-29): *"I want to see
+	 * the DEM elevation before I destroy the current elevation. Telling me what the Mapbox DEM says
+	 * after putting it in the input is of no value whatsoever."* He is exactly right. A number
+	 * reported after the write is not information, it is a receipt — the elevation it would have
+	 * been compared against is already gone.
 	 *
-	 * **IT MAY OVERWRITE, BECAUSE THIS IS THE ONE GESTURE THAT ASKS FOR EXACTLY THAT.** The menu row
-	 * that swept the whole drawing is gone precisely because it was destructive without being asked;
-	 * a button on one node, pressed while looking at that node, is the opposite case. `replaceAny`
-	 * is passed for the same reason Find and replace passes it, and the write is one undo step
-	 * inside terrainFillElevations().
+	 * So there are TWO steps and the destructive one is second:
+	 *   **Sample** reads the land surface and says what it found, changing nothing.
+	 *   **Use it** appears only once there is a reading, and writes that reading into the field.
+	 *
+	 * **THE SAMPLE IS ALSO THE ANSWER TO "WHAT IS THE ELEVATION HERE?"** — Tom's other ask, *"we
+	 * should have a way to display what they will get before they click the button to use it"*. A
+	 * person who only wants to know presses Sample and stops; nothing is written and nothing is
+	 * asked of them again.
+	 *
+	 * **THE CONSENT GATE IS ON THE SAMPLE, WHICH IS WHERE IT BELONGS.** Sampling is the step that
+	 * sends a node's position to Mapbox; using the answer sends nothing. It is asked once per
+	 * browser, not once per press — see mayWeSend() in js/lpn-terrain.js.
 	 *
 	 * **ABSENT WHERE IT CANNOT WORK** — an XY project, or no `EC_MAPBOX_TOKEN` — the same gate every
 	 * other door to this feature uses.
 	 */
-	function elevationDemRow(fields, n, nodeId) {
-		var pc = EngCalcs.pageConfig || {}, wrap, btn, said, m;
-		if (!isGeoProject() || !mapboxToken() || !EngCalcs.lpnTerrainFillFor) { return; }
+	function elevationDemRow(fields, n, nodeId, setElev) {
+		var pc = EngCalcs.pageConfig || {}, wrap, sample, use, said, m, shown;
+		if (!isGeoProject() || !mapboxToken() || !EngCalcs.lpnTerrainSample) { return; }
 		wrap = document.createElement('div');
 		wrap.className = 'lpn-elev-dem';
-		btn = document.createElement('button');
-		btn.type = 'button';
-		setLabel(btn, 'globe', pc.lpn_elev_dem_read || 'Read elevation from Mapbox DEM');
-		helpTip(btn, pc.lpn_elev_dem_read_tip);
-		btn.addEventListener('click', function () {
-			EngCalcs.lpnTerrainFillFor(terrainPointsForIds([nodeId]), { replaceAny: true });
+		sample = document.createElement('button');
+		sample.type = 'button';
+		setLabel(sample, 'globe', pc.lpn_elev_dem_sample || 'Sample Mapbox DEM');
+		helpTip(sample, pc.lpn_elev_dem_sample_tip);
+		sample.addEventListener('click', function () {
+			// Reads and reports. It writes NOTHING -- see lpnTerrainSample()'s own note.
+			EngCalcs.lpnTerrainSample(terrainPointsForIds([nodeId]), function () { refreshPopupIfOpen(); });
 		});
-		wrap.appendChild(btn);
-		// What it said last time, if it has been asked -- about THIS node, in the displayed unit.
+		wrap.appendChild(sample);
 		m = terrainLastRead[nodeId];
 		if (typeof m === 'number' && isFinite(m)) {
+			shown = +toDisplay(m, 'lpn_u_elevhead').toFixed(2);
 			said = document.createElement('div');
 			said.className = 'lpn-set-note';
 			said.textContent = (pc.lpn_elev_dem_said || 'Mapbox DEM says {v} {u}.')
-				.replace('{v}', String(+toDisplay(m, 'lpn_u_elevhead').toFixed(2)))
-				.replace('{u}', unitLabel('lpn_u_elevhead'));
+				.replace('{v}', String(shown)).replace('{u}', unitLabel('lpn_u_elevhead'));
 			wrap.appendChild(said);
+			// **"Use it" EXISTS ONLY ONCE THERE IS SOMETHING TO USE.** A button that writes a number
+			// nobody has seen is the thing this design was rebuilt to remove.
+			use = document.createElement('button');
+			use.type = 'button';
+			setLabel(use, 'edit', (pc.lpn_elev_dem_use || 'Use {v} {u}')
+				.replace('{v}', String(shown)).replace('{u}', unitLabel('lpn_u_elevhead')));
+			helpTip(use, pc.lpn_elev_dem_use_tip);
+			use.addEventListener('click', function () {
+				saveUndoSnapshot();
+				setElev(shown);
+				refreshPopupIfOpen();
+			});
+			wrap.appendChild(use);
 		}
 		fields.appendChild(wrap);
 	}
@@ -22891,7 +22972,25 @@ var EngCalcs = EngCalcs || {};
 			// being clamped on top of it -- the clamp alone would slide it back over the words it
 			// branches from. Its VERTICAL rule is the viewport, not the anchor.
 			var h = fitPanelToViewport(panel);
-			var wantLeft = (ar.right + r.width > window.innerWidth - POPUP_EDGE) ? ar.left - r.width : ar.right;
+			var roomRight = ar.right + r.width <= window.innerWidth - POPUP_EDGE;
+			var roomLeft = ar.left - r.width >= POPUP_EDGE;
+			// **WHERE THERE IS NO "BESIDE", THE FLY-OUT GOES BELOW THE ROW** (Tom, 2026-08-29:
+			// *"Map.Insert menu is broken on phone. Does nothing."*).
+			//
+			// At a phone's width neither side fits, and the flip-and-clamp above then landed the
+			// fly-out ON TOP OF ITS OWN PARENT ROW -- covering the thing the user had just pressed,
+			// and with a higher z-index, so their finger was already resting on a row of the menu
+			// that had just appeared. Beneath the row instead: it covers the rows BELOW it, which is
+			// what a fly-out with nowhere to go should do, and the row it branches from stays
+			// readable above it. This is the same answer every mobile menu gives.
+			if (!roomRight && !roomLeft) {
+				panel.style.left = Math.max(POPUP_EDGE,
+					Math.min(ar.left, window.innerWidth - r.width - POPUP_EDGE)) + 'px';
+				panel.style.top = Math.max(POPUP_EDGE,
+					Math.min(ar.bottom, window.innerHeight - h - POPUP_EDGE)) + 'px';
+				return null;
+			}
+			var wantLeft = roomRight ? ar.right : ar.left - r.width;
 			panel.style.left = Math.max(POPUP_EDGE, Math.min(wantLeft, window.innerWidth - r.width - POPUP_EDGE)) + 'px';
 			// **A FLY-OUT'S FLOOR IS THE VIEWPORT, NOT chromeFloor()** (Tom, 2026-08-27: File > New
 			// project's fly-out *"is too low"*). The chrome floor is the bottom of the menu bar,
@@ -23241,7 +23340,8 @@ var EngCalcs = EngCalcs || {};
 				function () { return n.elev; },
 				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_tank_elev_tip);
-			elevationDemRow(fields, n, nodeId);
+			elevationDemRow(fields, n, nodeId,
+				function (v) { n.elev = v; updateNode(nodeId); });
 			unitNumberField(fields, pc.lpn_field_tank_level || 'Water level', 'lpn_u_elevhead',
 				function () { return effective(n, 'level'); },
 				function (v) { setProp(n, 'level', v); updateNode(nodeId); refreshPopupIfOpen(); },
@@ -23268,7 +23368,8 @@ var EngCalcs = EngCalcs || {};
 				function () { return n.elev; },
 				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_field_elev_tip);
-			elevationDemRow(fields, n, nodeId);
+			elevationDemRow(fields, n, nodeId,
+				function (v) { n.elev = v; updateNode(nodeId); });
 			// Blank = follow the elevation, which is what the placeholder shows -- so the field reads
 			// as already filled in without pretending the user typed it. Clearing it hands the head
 			// back to the elevation. Both setters re-render the popup, because each field feeds the
@@ -23305,7 +23406,8 @@ var EngCalcs = EngCalcs || {};
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); },
 				pc.lpn_field_elev_tip);
-			elevationDemRow(fields, n, nodeId);
+			elevationDemRow(fields, n, nodeId,
+				function (v) { n.elev = v; updateNode(nodeId); });
 			// **THERE IS NO PLAIN Base demand / Demand pattern FIELD ANY MORE** (Task 553, Tom
 			// 2026-08-28: *"The EPANET UX is confusing by breaking out one demand (the initial)
 			// specially. What we need to do is remove the original Base demand and Demand pattern
@@ -25678,7 +25780,12 @@ var EngCalcs = EngCalcs || {};
 			nodesNeedingElevation: terrainNodesNeedingElevation,
 			nodesWithElevation: terrainNodesWithElevation,
 			nodesAtDefaultElevation: terrainNodesAtDefaultElevation,
-			fill: terrainFillElevations
+			fill: terrainFillElevations,
+			// **RECORD, WHICH IS THE SEAM THAT WRITES NOTHING** (Task 542). lpnTerrainSample() hands
+			// its readings here instead of to `fill`, so the page can SHOW what the DEM says and let
+			// a person decide -- Tom's ruling that a number reported after the write is a receipt,
+			// not information.
+			record: terrainRecordReadings
 		});
 	}
 

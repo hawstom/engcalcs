@@ -98,7 +98,15 @@ files — which is, by construction, every string that has been written and not 
         . "settled these go into the next translation sprint as a batch.
 
 ";
-    $out .= "**" . count($new) . " of " . $total . " English keys**, as of the last generation.
+    // **THE NUMBER THAT MATTERS IS THE UNRULED ONE.** A count of the whole list tells a reader
+    // nothing about the size of the job in front of them; 103 keys of which 92 are already approved
+    // is eleven minutes, not an afternoon, and saying so is the difference between a list somebody
+    // opens and one they put off.
+    $unruled = 0;
+    foreach ($new as $nk => $nv) { if (ecRulingLine($nk, $nv) === '') { $unruled++; } }
+    $out .= "**" . $unruled . " still to read**, of " . count($new) . " untranslated keys, of "
+        . $total . " English keys. A key already marked _Ruled OK_ below needs nothing from you —\n"
+        . "the ruling lapses by itself if the wording changes.
 ";
     if (!$new) { return $out . "
 None. Every English key is present in at least one other language.
@@ -121,10 +129,40 @@ None. Every English key is present in at least one other language.
   > " . str_replace("
 ", "
   > ", $v) . "
-";
+" . ecRulingLine($k, $v);
         }
     }
     return $out;
+}
+
+/**
+ * **A RULING IS REMEMBERED, AND IT IS REMEMBERED AGAINST THE EXACT ENGLISH IT WAS MADE ON.**
+ *
+ * WHY. Tom read this whole list on 2026-08-28 and marked every key `OK.` or `Edited.` — 92 of them.
+ * The `Edited.` ones went into `lang.ec.en.php` and are safe. **The 81 `OK.`s were about to be
+ * thrown away by the next regeneration**, which would have handed him the same 101 keys unmarked
+ * and asked him to read the ones he had just approved. That is precisely the waste he was
+ * complaining about when he said *"I painstakingly edited it again."*
+ *
+ * So an approval is data now, in `dev/english-key-rulings.json`, and this line is how it comes back.
+ *
+ * **KEYED ON THE TEXT, NOT ON THE KEY NAME.** A ruling means "these words are right", so it lapses
+ * the moment the words change: reword a string and it reappears unruled, which is correct — nobody
+ * approved the new sentence. That is also what stops the file from silently going quiet as strings
+ * drift underneath their approvals.
+ */
+function ecRulingLine(string $key, string $value): string
+{
+    static $rulings = null;
+    if ($rulings === null) {
+        $f = dirname(__DIR__) . '/english-key-rulings.json';
+        $j = is_file($f) ? json_decode(file_get_contents($f), true) : null;
+        $rulings = (is_array($j) && isset($j['rulings']) && is_array($j['rulings'])) ? $j['rulings'] : array();
+    }
+    if (!isset($rulings[$key]) || !is_array($rulings[$key])) { return ''; }
+    $r = $rulings[$key];
+    if (!isset($r['on']) || $r['on'] !== $value) { return ''; }
+    return "  _Ruled OK " . (isset($r['ruled']) ? $r['ruled'] : '') . "._\n";
 }
 
 if ($write || $check) {

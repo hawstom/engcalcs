@@ -1065,7 +1065,7 @@ EngCalcs.pageConfig = {
 	lpn_find_q_or: <?=json_encode($ec_lang['lpn_find_q_or'])?>,
 	lpn_find_q_aside: <?=json_encode($ec_lang['lpn_find_q_aside'])?>,
 	lpn_find_q_restore: <?=json_encode($ec_lang['lpn_find_q_restore'])?>,
-	lpn_replace_q_aside: <?=json_encode($ec_lang['lpn_replace_q_aside'])?>,
+	lpn_replace_q_bad: <?=json_encode($ec_lang['lpn_replace_q_bad'])?>,
 	lpn_find_q_err_pos: <?=json_encode($ec_lang['lpn_find_q_err_pos'])?>,
 	lpn_find_q_err_empty: <?=json_encode($ec_lang['lpn_find_q_err_empty'])?>,
 	lpn_find_q_err_scope: <?=json_encode($ec_lang['lpn_find_q_err_scope'])?>,
@@ -1732,8 +1732,10 @@ EngCalcs.pageConfig = {
 <?php // **ELEVATION ON CREATION** (Task 542). The row is built only on a geographic project with a
       // Mapbox token, but the STRINGS are supplied unconditionally: pageConfig is assembled once at
       // render time and the project can change without a reload. ?>
-	lpn_elev_dem_read: <?=json_encode($ec_lang['lpn_elev_dem_read'])?>,
-	lpn_elev_dem_read_tip: <?=json_encode($ec_lang['lpn_elev_dem_read_tip'])?>,
+	lpn_elev_dem_sample: <?=json_encode($ec_lang['lpn_elev_dem_sample'])?>,
+	lpn_elev_dem_sample_tip: <?=json_encode($ec_lang['lpn_elev_dem_sample_tip'])?>,
+	lpn_elev_dem_use: <?=json_encode($ec_lang['lpn_elev_dem_use'])?>,
+	lpn_elev_dem_use_tip: <?=json_encode($ec_lang['lpn_elev_dem_use_tip'])?>,
 	lpn_elev_dem_said: <?=json_encode($ec_lang['lpn_elev_dem_said'])?>,
 	lpn_settings_elev_source: <?=json_encode($ec_lang['lpn_settings_elev_source'])?>,
 	lpn_settings_elev_source_tip: <?=json_encode($ec_lang['lpn_settings_elev_source_tip'])?>,
