@@ -288,6 +288,12 @@ exports.run = async function ({ browser, report }) {
 			try {
 				await s.page.setViewportSize({ width, height: 740 });
 				await s.goto();
+				// **THE WALL IS WAVED AWAY FIRST.** Since 2026-08-29 both legends stand down while the
+				// examples gallery is up (it is `inset: 0`, so there is nowhere to dodge to and it
+				// lay across the welcome line on a phone -- specs/gallery.js). A fresh profile meets
+				// the wall, so without this the legend is legitimately absent and this section would
+				// be measuring the wall rather than the corner it is here to check.
+				await s.dismissGallery();
 				await s.settle(900);
 				const g = await s.page.evaluate(() => {
 					const b = document.getElementById('lpn_labels_legend'),

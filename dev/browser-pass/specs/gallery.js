@@ -119,4 +119,69 @@ exports.run = async function ({ browser, report }) {
 	} finally {
 		await b.close();
 	}
+
+	// ---- THE WALL IS THE WHOLE MAP, SO NO LEGEND STANDS ON IT ----------------------------------
+	// Tom, 2026-08-28: *"The examples gallery on the phone shows the Labels legend in conflict with
+	// the welcome message."* placeLegends() dodges the top-left overlay and the footer, which is no
+	// help here: the wall is `inset: 0`, so there is nowhere on the map to dodge TO. Both legends
+	// stand down while it is up.
+	//
+	// **THE ORDER IS THE REPRODUCTION, and a wall met on a FIRST visit does not reproduce it** --
+	// the legend has never been rendered then, so it is still hiding behind the inline `display:none`
+	// in the markup and a check here would pass for the wrong reason. It takes a drawing first
+	// (which renders the legend, four node fields being on by default) and the wall SECOND, off
+	// File ▸ Open example… -- which is exactly the path Tom was on. 360px, because at desktop width
+	// the legend and the centred welcome line simply miss each other.
+	const c = await Session.open(browser, 'C');
+	try {
+		await c.goto();
+		// The DRAWING is made at desktop width -- makeEdit() aims at a named toolbar button, and the
+		// phone toolbar is icons. What is being checked is the layout, so only the wall has to be
+		// met at 360px.
+		await c.makeEdit();
+		await c.page.setViewportSize({ width: 360, height: 740 });
+		await c.settle(700);
+		const drawn = await c.page.evaluate(() => {
+			const box = document.getElementById('lpn_labels_legend'), r = box.getBoundingClientRect();
+			return { display: box.style.display, w: Math.round(r.width), h: Math.round(r.height) };
+		});
+		report.ok(drawn.display !== 'none' && drawn.w > 0,
+			'set up: a drawing puts the labels legend on the map', JSON.stringify(drawn));
+
+		await c.menuClick('Open example…');
+		await c.settle(800);
+		report.ok(await galleryShowing(c), 'set up: and the wall comes back over it at 360px');
+
+		const under = await c.page.evaluate(() => {
+			const box = document.getElementById('lpn_labels_legend'), r = box.getBoundingClientRect();
+			return { display: box.style.display, w: Math.round(r.width), h: Math.round(r.height) };
+		});
+		report.ok(under.display === 'none', 'THE LABELS LEGEND STANDS DOWN UNDER THE WALL',
+			JSON.stringify(under));
+
+		const welcome = await c.page.evaluate(() => {
+			const w = document.querySelector('.lpn-examples-welcome'),
+				box = document.getElementById('lpn_labels_legend');
+			if (!w) { return null; }
+			const a = w.getBoundingClientRect(), b = box.getBoundingClientRect();
+			return { overlap: a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top,
+				welcome: Math.round(a.width) + 'x' + Math.round(a.height) };
+		});
+		report.ok(welcome && !welcome.overlap, '...so nothing lies across the welcome line',
+			welcome && welcome.welcome);
+
+		// And it comes back with the drawing, or this traded one defect for a worse one.
+		await c.dismissGallery();
+		await c.settle(600);
+		const back = await c.page.evaluate(() => {
+			const box = document.getElementById('lpn_labels_legend'), r = box.getBoundingClientRect();
+			return { display: box.style.display, w: Math.round(r.width) };
+		});
+		report.ok(back.display !== 'none' && back.w > 0, '...and comes straight back when the wall goes',
+			JSON.stringify(back));
+
+		report.eq(c.errors.length, 0, 'no uncaught JavaScript in C', c.errors[0] || '');
+	} finally {
+		await c.close();
+	}
 };

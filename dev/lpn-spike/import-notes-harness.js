@@ -167,7 +167,7 @@ console.log('\n2. The property popup reads the note back as a sentence');
 	const clean = L.getDoc().nodes.filter((x) => !x.importNotes)[0];
 	if (clean) {
 		ok('an element with no note shows no notes block',
-			popupText('node', clean).indexOf('From the EPANET file') < 0, clean.id);
+			popupText('node', clean).indexOf('What the import could not keep') < 0, clean.id);
 	}
 }
 done('the popup composes the sentence');

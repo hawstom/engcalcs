@@ -4122,7 +4122,7 @@ var EngCalcs = EngCalcs || {};
 			// the boxes where anybody can read it. A note saying otherwise would be the only
 			// untrue thing on the key.
 		});
-		box.style.display = (any && !legendIsOff(settings.colorLegendPosition)) ? '' : 'none';
+		box.style.display = (any && !galleryIsUp() && !legendIsOff(settings.colorLegendPosition)) ? '' : 'none';
 		applyColorLegendPosition();
 	}
 	// Both legends are placed by one function, so neither can be positioned without the other's
@@ -12610,6 +12610,9 @@ var EngCalcs = EngCalcs || {};
 		if (!empty) { dismissGalleryForGood(); }
 		var show = galleryForced || (empty && !galleryDismissedHere());
 		hint.style.display = show ? 'block' : 'none';
+		// The wall covers both legends, so putting it up or taking it down is a reason to re-ask.
+		renderLabelsLegend();
+		renderColorLegend();
 		// Fetched only when it is first actually going to be seen. A returning user with a network
 		// on screen never pays for the manifest at all, which is the point of doing this here
 		// rather than at boot.
@@ -19861,7 +19864,7 @@ var EngCalcs = EngCalcs || {};
 		// (colorLegendBox), so this hides without touching that one.
 		// The georef case is not here -- it is a transient gesture, not a mode, and the legend is
 		// chrome the placement never touches.
-		box.style.display = (any && !settings.colorThematic && !legendIsOff(settings.legendPosition))
+		box.style.display = (any && !galleryIsUp() && !settings.colorThematic && !legendIsOff(settings.legendPosition))
 			? '' : 'none';
 		applyLegendPosition();
 	}
@@ -19907,6 +19910,16 @@ var EngCalcs = EngCalcs || {};
 		];
 	}
 	function legendIsOff(pos) { return pos === 'off'; }
+	// **A LEGEND IS A KEY TO A DRAWING, AND THE GALLERY MEANS THERE IS NO DRAWING** (Tom,
+	// 2026-08-28: *"The examples gallery on the phone shows the Labels legend in conflict with the
+	// welcome message."*). The examples wall covers the whole canvas, so it is not a box a legend can
+	// dodge -- there is nowhere on the map to dodge TO, and on a phone the wall is the map. Both
+	// legends stand down while it is up and come back with the first project, which is also the
+	// honest state: the canvas behind the wall is empty, so the key is a key to nothing.
+	function galleryIsUp() {
+		var hint = document.getElementById('lpn_empty_hint');
+		return !!(hint && hint.style.display === 'block');
+	}
 	var LEGEND_POSITIONS = {
 		'top-left': { top: '4px', bottom: '', left: '4px', right: '', transform: '' },
 		'top-right': { top: '4px', bottom: '', left: '', right: LEGEND_RIGHT, transform: '' },
@@ -20253,7 +20266,7 @@ var EngCalcs = EngCalcs || {};
 			// **THIS PLACER ONLY EVER HIDES; IT NEVER SHOWS.** The two renderers own the other reasons
 			// a legend can be absent -- nothing to show, and thematic mode -- so un-hiding here would
 			// be a second opinion about display and would put the labels legend back on a thematic map.
-			if (legendIsOff(b.pos)) { b.el.style.display = 'none'; return; }
+			if (legendIsOff(b.pos) || galleryIsUp()) { b.el.style.display = 'none'; return; }
 			var pos = LEGEND_POSITIONS[b.pos] || LEGEND_POSITIONS['top-right'];
 			b.el.style.top = pos.top; b.el.style.bottom = pos.bottom;
 			b.el.style.left = pos.left; b.el.style.right = pos.right;
@@ -22763,6 +22776,13 @@ var EngCalcs = EngCalcs || {};
 	// field. Deleting the note would be deleting the only surviving statement of the difference, so
 	// there is no control to clear it -- it goes when the element does.
 	//
+	// **THE HEADING NAMES THE CONTENT, NOT THE PROVENANCE** (Tom, 2026-08-28, of the old wording
+	// "From the EPANET file": *"I don't think this is worded right. Patterns can be entered in lpn.
+	// So do we know they came from an EPANET file?"*). We do -- `withInpNotes()` is reached only from
+	// the importer -- but the heading was answering the wrong question: it sat over a list of things
+	// that are NOT in the document and read as a heading over the ones that are. So it says what the
+	// list is instead.
+	//
 	// **THE SENTENCE IS COMPOSED HERE, from the same inpDropText() the import report uses.** The
 	// document stores `{code, detail}` records, so a project imported in one language reads in
 	// whatever language its reader is using, and the popup and the report can never drift apart.
@@ -22772,7 +22792,7 @@ var EngCalcs = EngCalcs || {};
 		var head = document.createElement('div');
 		head.style.marginTop = '8px';
 		head.style.fontWeight = 'bold';
-		head.textContent = pc.lpn_import_notes_heading || 'From the EPANET file';
+		head.textContent = pc.lpn_import_notes_heading || 'What the import could not keep';
 		fields.appendChild(head);
 		var ul = document.createElement('ul');
 		ul.style.margin = '2px 0 0';
