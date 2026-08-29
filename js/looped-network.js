@@ -9264,9 +9264,6 @@ var EngCalcs = EngCalcs || {};
 			// EDIT MODE GOES WITH IT for the same reason the box does: handles on a route nobody
 			// can see are a gesture armed behind a closed panel.
 			profileState.editing = false; profileState.editDrag = null;
-			// AND THE EDIT BOX GOES WITH IT (Task 509): it edits the path this tab draws, and left
-			// standing over a closed panel it would be a control for something nobody can see.
-			closeProfileEditPopup();
 			profileDrawCancel(); drawProfilePath(null);
 		}
 	});
@@ -10965,10 +10962,10 @@ var EngCalcs = EngCalcs || {};
 		var dr = profileState.draw;
 		var choosing = !!(dr && dr.stops.length);
 		// **THE EDIT BOX IS ATTENDING TO THE PROFILE TOO** (Task 509). The hover rule (Tom,
-		// 2026-08-24) marks the route only while the reader is thinking about it; somebody with the
-		// box open is doing nothing else, and the box sits OVER the map, so a pointer inside it can
-		// never be inside the panel that the hover listener is on.
-		if (!profileHover && !choosing && !profileEditIsOpen() && !profileState.editing) { return; }
+		// 2026-08-24) marks the route only while the reader is thinking about it, and somebody in
+		// EDIT MODE is thinking about nothing else -- their pointer is out on the map, nowhere near
+		// the panel the hover listener is on, and the handles they are dragging are on the mark.
+		if (!profileHover && !choosing && !profileState.editing) { return; }
 		if ((!path && !choosing) || !world) { return; }
 		var sc = state.s || 1;
 		profilePathLayer = el('g', { 'class': 'lpn-profile-path', 'pointer-events': 'none' });
@@ -11250,10 +11247,6 @@ var EngCalcs = EngCalcs || {};
 			btn.setAttribute('aria-pressed', profileState.editing ? 'true' : 'false');
 			btn.addEventListener('click', function () { toggleProfileEdit(btn); });
 			box.appendChild(btn);
-		} else if (profileEditIsOpen()) {
-			// A gesture started while the box was open takes the box with it: it edits the very
-			// stops profileStops() has stopped reading.
-			closeProfileEditPopup();
 		}
 		profileSayEl = document.createElement('div');
 		profileSayEl.id = 'lpn_profile_say';
@@ -11267,122 +11260,20 @@ var EngCalcs = EngCalcs || {};
 		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
 		// The box is a view OF the path, so it follows every change to it rather than going stale
 		// behind the panel that changed it.
-		if (profileEditIsOpen()) { rebuildProfileEditForm(); }
 	}
-	// ---- THE EDIT BOX (ROADMAP Task 509) ---------------------------------------------------------
+	// **THE PROFILE EDIT BOX IS GONE, 2026-08-29** (Tom, having used it: *"we shouldn't need any
+	// interface in the bottom pane other than an Edit button. We have From and To: I can see those
+	// in the map. We have Nodes on the way: I can see those on the map."*).
 	//
-	// **WHAT IT IS FOR, and it is exactly two things.** Task 506 removed the profile's left-hand
-	// control column and the page is better for it -- but it took with it the only way to change ONE
-	// end of an existing path and the only way to take ONE node off it, and both became "draw the
-	// whole path again". This box is those two operations and nothing else: two pull-downs and a row
-	// of waypoint chips. Pressing Profile again is still how a path is DRAWN, and this box never
-	// claims otherwise.
-	//
-	// **AN OVERLAY, NOT A COLUMN.** The column cost 15rem of the pane's width for the life of the
-	// pane, to carry controls touched once a session. An overlay costs that width only while
-	// somebody is using it, and it is over the MAP rather than over the chart, so the drawing it is
-	// editing stays visible beside it.
-	//
-	// It reuses the four keys Task 506 left rendered by nothing -- `_from`, `_to`, `_through`,
-	// `_clear` -- because they are the same four controls, wearing the same four labels.
-	var profileEditUserPos = null;
-	function profileEditEl() { return document.getElementById('lpn_profile_edit_popup'); }
-	function profileEditIsOpen() {
-		var box = profileEditEl();
-		return !!box && box.style.display === 'block';
-	}
-	function closeProfileEditPopup() {
-		var box = profileEditEl();
-		if (!box) { return; }
-		box.style.display = 'none';
-		// The route mark on the map is drawn while the reader is ATTENDING to the profile, and the
-		// box is one of the two places that can be true. Closing it withdraws that attention.
-		drawProfilePath(profilePath());
-	}
-	function openProfileEditPopup(anchorEl) {
-		var box = profileEditEl(), at, r;
-		if (!box) { return; }
-		rebuildProfileEditForm();
-		if (profileEditUserPos) {
-			// Re-clamped rather than restored blindly, for #lpn_find_popup's own reason: the window
-			// may have been resized smaller since, and a box remembered off-screen never comes back.
-			box.style.display = 'block';
-			r = box.getBoundingClientRect();
-			at = clampPanel(profileEditUserPos.left, profileEditUserPos.top, r.width, r.height,
-				window.innerWidth, window.innerHeight, chromeFloor());
-			box.style.left = at.left + 'px'; box.style.top = at.top + 'px';
-		} else if (anchorEl && anchorEl.getBoundingClientRect) {
-			openPanelAtAnchor(box, anchorEl.getBoundingClientRect());
-		} else {
-			box.style.display = 'block';
-		}
-		drawProfilePath(profilePath());
-	}
-	function rebuildProfileEditForm() {
-		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_profile_edit_form'),
-			opts = profileNodeOptions(), chips, clr;
-		if (!box) { return; }
-		box.innerHTML = '';
-		// **THE TWO ENDS, EACH ON ITS OWN.** This is the first of the two lost operations: the
-		// gesture always redraws the whole route, and these two change one end of it and leave
-		// everything else -- including the waypoints -- exactly where it was.
-		findSelect(box, pc.lpn_profile_from || 'From', opts, profileState.from, function (v) {
-			profileState.from = v; profileEditChanged();
-		});
-		findSelect(box, pc.lpn_profile_to || 'To', opts, profileState.to, function (v) {
-			profileState.to = v; profileEditChanged();
-		});
-		// **THE WAYPOINTS, ONE CHIP EACH.** The second lost operation. A chip removes ITSELF, which
-		// is the whole point -- Remove all was never the missing thing.
-		chips = document.createElement('div');
-		chips.style.margin = '4px 0';
-		if (profileState.waypoints.length) {
-			chips.appendChild(document.createTextNode((pc.lpn_profile_through || 'Nodes on the way') + ' '));
-			profileState.waypoints.forEach(function (id) {
-				var b = document.createElement('button');
-				b.type = 'button';
-				b.className = 'lpn-profile-chip';
-				b.textContent = id + ' ×';
-				b.addEventListener('click', function () {
-					profileState.waypoints = profileState.waypoints.filter(function (w) { return w !== id; });
-					profileEditChanged();
-				});
-				chips.appendChild(b);
-			});
-			clr = document.createElement('button');
-			clr.type = 'button';
-			clr.className = 'lpn-profile-chip';
-			clr.textContent = pc.lpn_profile_clear || 'Remove all';
-			clr.addEventListener('click', function () {
-				profileState.waypoints = []; profileEditChanged();
-			});
-			chips.appendChild(clr);
-		} else {
-			// Never empty: a box that says nothing about waypoints reads as a box that has lost
-			// them. `lpn_profile_choose` is the sentence the panel used to say in this state.
-			chips.appendChild(document.createTextNode(pc.lpn_profile_choose || 'Choose a start node and an end node.'));
-		}
-		box.appendChild(chips);
-	}
-	// Every edit in the box goes through here, so there is ONE answer to "what happens when the path
-	// changes": the box redraws, the chart redraws, and the map's route mark follows the same path
-	// the chart is drawn from (renderProfile() calls drawProfilePath()).
-	function profileEditChanged() {
-		rebuildProfileEditForm();
-		renderProfile();
-	}
-	function profileNodeOptions() {
-		return doc.nodes.filter(profileNodeUsable).map(function (n) { return [n.id, n.id]; });
-	}
-	function wireProfileEditPopup() {
-		var box = profileEditEl(), x = document.getElementById('lpn_profile_edit_close');
-		if (!box) { return; }
-		// The X leaves EDIT MODE, not just the box. One state, one way out of it -- a box that
-		// closed while the path stayed draggable would leave the reader in a mode with no visible
-		// control that turns it off.
-		if (x) { x.addEventListener('click', function () { exitProfileEdit(); }); }
-		makePanelDraggable(box, function (pos) { profileEditUserPos = pos; });
-	}
+	// It carried the two ends as pull-downs and the waypoints as removable chips. All three are
+	// handles on the drawing now -- see enterProfileEdit() -- so the box was a second statement of
+	// facts the map already makes, standing in the width the chart needs. Its markup, its four
+	// language keys, its drag-position memory and its two open/close predicates went with it, and
+	// `profileState.editing` is now the whole of "is anybody editing this path".
+	// Every edit to the path goes through here, so there is ONE answer to "what happens when the
+	// path changes": the chart redraws, and the map's route mark follows the same path the chart is
+	// drawn from (renderProfile() calls drawProfilePath()).
+	function profileEditChanged() { renderProfile(); }
 	// ---- EDIT MODE: THE PATH ITSELF IS THE INTERFACE (ROADMAP Task 509) --------------------------
 	//
 	// Tom, 2026-08-25: *"The ideal UX would be for pressing the edit button to put the path in Edit
@@ -11418,18 +11309,32 @@ var EngCalcs = EngCalcs || {};
 	// map, box over it -- and every change made in either is the same change, because both go through
 	// profileSetStops()/profileEditChanged() and the box is rebuilt from the stops on every one.
 	function profileEditActive() { return !!profileState.editing && profileIsOpen() && !profileState.draw; }
+	/**
+	 * **EDIT MODE IS THE MAP, AND NOTHING ELSE** (Tom, 2026-08-29: *"we shouldn't need any interface
+	 * in the bottom pane other than an Edit button. We have From and To: I can see those in the map.
+	 * We have Nodes on the way: I can see those on the map. I say remove the box and all its
+	 * keys."*)
+	 *
+	 * The box listed the two ends in pull-downs and the waypoints as removable chips. Every one of
+	 * those is now a handle on the drawing: the ends are handles, a waypoint is a solid handle that a
+	 * click takes off, and a node merely on the route is a hollow one. **A second interface for the
+	 * same facts is a second place for them to disagree**, and it was costing the bottom pane its
+	 * width to say what the map was already saying.
+	 *
+	 * `anchorEl` is kept in the signature and ignored: the Edit button still passes its own rect,
+	 * and a caller that stops doing so is a change nobody needs to make.
+	 */
 	function enterProfileEdit(anchorEl) {
 		profileState.editing = true;
 		profileState.editDrag = null;
-		openProfileEditPopup(anchorEl);
 		rebuildProfileForm();
 		renderProfile();
+		void anchorEl;
 	}
 	function exitProfileEdit() {
 		if (!profileState.editing) { return false; }
 		profileState.editing = false;
 		profileState.editDrag = null;
-		closeProfileEditPopup();
 		rebuildProfileForm();
 		renderProfile();
 		return true;
@@ -11760,7 +11665,7 @@ var EngCalcs = EngCalcs || {};
 		// edit a route nobody can see. Arming one puts the other away.
 		profileState.editing = false;
 		profileState.editDrag = null;
-		closeProfileEditPopup();
+		drawProfilePath(profilePath());
 		profileState.draw = {
 			stops: [],
 			hover: null,
@@ -17908,7 +17813,6 @@ var EngCalcs = EngCalcs || {};
 		wirePointerEvents();
 		wirePopup();
 		wireFindPopup();
-		wireProfileEditPopup();
 		wirePane();
 		wireRightPane();
 		// After wirePane(), because the observer needs the chart's host to be in its final place in
@@ -22743,28 +22647,34 @@ var EngCalcs = EngCalcs || {};
 		readonlyField(fields, pc.lpn_field_y || 'Y', coordText(y));
 	}
 	/**
-	 * **THE ELEVATION'S OWN DEM CONTROL: SAMPLE FIRST, THEN DECIDE** (ROADMAP Task 542).
+	 * **TWO BUTTONS UNDER ELEVATION: Sample DEM, and Use DEM** (ROADMAP Task 542).
 	 *
-	 * **THE FIRST BUILD HAD THIS BACKWARDS AND TOM SAID SO PLAINLY** (2026-08-29): *"I want to see
-	 * the DEM elevation before I destroy the current elevation. Telling me what the Mapbox DEM says
-	 * after putting it in the input is of no value whatsoever."* He is exactly right. A number
-	 * reported after the write is not information, it is a receipt — the elevation it would have
-	 * been compared against is already gone.
+	 * **THIS IS THE THIRD SHAPE AND TOM SPECIFIED IT** (2026-08-29): *"Since we have (a)
+	 * Find.Elevations replace with DEM and (b) DEM on insert in Settings, the remaining need for DEM
+	 * can probably be considered a corner case. As such, I think that we should deprecate sampling
+	 * the DEM on opening the node editor, and we should instead have buttons under Elevation for
+	 * Sample DEM and Use DEM."*
 	 *
-	 * So there are TWO steps and the destructive one is second:
-	 *   **Sample** reads the land surface and says what it found, changing nothing.
-	 *   **Use it** appears only once there is a reading, and writes that reading into the field.
+	 * The two shapes it replaces, recorded so neither is re-proposed:
+	 *   1. ONE button that read and wrote, then reported the number. He rejected it outright —
+	 *      *"Telling me what the Mapbox DEM says after putting it in the input is of no value
+	 *      whatsoever"* — and he is right: a number reported after the write is a receipt, because
+	 *      the value it would have been compared against is already gone.
+	 *   2. SAMPLING AUTOMATICALLY when the popup opened, with Use appearing once there was a
+	 *      reading. It made the row's controls come and go, put a consent-gated third-party request
+	 *      behind the act of merely LOOKING at a node, and left `running` able to strand the button
+	 *      if a read never came back. Deprecated on his instruction above.
 	 *
-	 * **THE SAMPLE IS ALSO THE ANSWER TO "WHAT IS THE ELEVATION HERE?"** — Tom's other ask, *"we
-	 * should have a way to display what they will get before they click the button to use it"*. A
-	 * person who only wants to know presses Sample and stops; nothing is written and nothing is
-	 * asked of them again.
+	 * **BOTH BUTTONS ARE ALWAYS THERE.** A control that appears only once some invisible state
+	 * exists is the thing that made shape 2 unreadable — you press Sample, nothing you can see
+	 * changes, and there is no second button to tell you whether that is because it failed or
+	 * because it has not run.
 	 *
-	 * **THE CONSENT GATE IS ON THE SAMPLE, WHICH IS WHERE IT BELONGS.** Sampling is the step that
-	 * sends a node's position to Mapbox; using the answer sends nothing. It is asked once per
-	 * browser, not once per press — see mayWeSend() in js/lpn-terrain.js.
+	 * **AND A READ THAT PRODUCES NOTHING SAYS SO HERE**, not only in the map notice at the far side
+	 * of the screen. "It does nothing" was Tom's report of shape 2 twice, and an unread notice is
+	 * indistinguishable from silence.
 	 *
-	 * **ABSENT WHERE IT CANNOT WORK** — an XY project, or no `EC_MAPBOX_TOKEN` — the same gate every
+	 * ABSENT WHERE IT CANNOT WORK — an XY project, or no `EC_MAPBOX_TOKEN` — the same gate every
 	 * other door to this feature uses.
 	 */
 	function elevationDemRow(fields, n, nodeId, setElev) {
@@ -22772,59 +22682,71 @@ var EngCalcs = EngCalcs || {};
 		if (!isGeoProject() || !mapboxToken() || !EngCalcs.lpnTerrainSample) { return; }
 		wrap = document.createElement('div');
 		wrap.className = 'lpn-elev-dem';
+
+		m = terrainLastRead[nodeId];
+		shown = (typeof m === 'number' && isFinite(m))
+			? +toDisplay(m, 'lpn_u_elevhead').toFixed(2) : null;
+
 		sample = document.createElement('button');
 		sample.type = 'button';
-		setLabel(sample, 'globe', pc.lpn_elev_dem_sample || 'Sample Mapbox DEM');
+		setLabel(sample, 'globe', pc.lpn_elev_dem_sample || 'Sample DEM');
 		helpTip(sample, pc.lpn_elev_dem_sample_tip);
 		sample.addEventListener('click', function () {
-			// Reads and reports. It writes NOTHING -- see lpnTerrainSample()'s own note. The button
-			// stays for the RE-read: the automatic one above happens once, and a person who has
-			// moved the node, or who was offline the first time, needs a way to ask again.
-			terrainAsked[nodeId] = true;
-			EngCalcs.lpnTerrainSample(terrainPointsForIds([nodeId]), function () { refreshPopupIfOpen(); });
+			demSample(nodeId, null);
 		});
 		wrap.appendChild(sample);
-		m = terrainLastRead[nodeId];
-		// **AND IT SAMPLES ITSELF THE FIRST TIME YOU OPEN A NODE** (Tom, 2026-08-29: *"I wonder why
-		// we can't sample always on opening Node editor. Is that too much overhead?"*).
-		//
-		// It is not too much: one tile serves every node within about a kilometre at the zoom this
-		// reads, the browser caches it, and a node's popup is opened one at a time by a person
-		// looking at it. So the number is simply THERE when the editor opens, and "Use it" is ready
-		// without a press that can fail.
-		//
-		// **ASKED ONCE PER NODE PER SESSION**, which is what `terrainAsked` is for. Without it the
-		// callback's redraw would rebuild this row, find the reading still absent on a failure, and
-		// ask again -- a request loop driven by a popup that is simply open.
-		//
-		// The consent gate still runs, and still asks once per browser. Somebody who says no gets a
-		// popup that never asks again this session, which is the correct reading of "no".
-		if (m === undefined && !terrainAsked[nodeId]) {
-			terrainAsked[nodeId] = true;
-			EngCalcs.lpnTerrainSample(terrainPointsForIds([nodeId]), function () { refreshPopupIfOpen(); });
-		}
-		if (typeof m === 'number' && isFinite(m)) {
-			shown = +toDisplay(m, 'lpn_u_elevhead').toFixed(2);
-			said = document.createElement('div');
-			said.className = 'lpn-set-note';
-			said.textContent = (pc.lpn_elev_dem_said || 'Mapbox DEM says {v} {u}.')
-				.replace('{v}', String(shown)).replace('{u}', unitLabel('lpn_u_elevhead'));
-			wrap.appendChild(said);
-			// **"Use it" EXISTS ONLY ONCE THERE IS SOMETHING TO USE.** A button that writes a number
-			// nobody has seen is the thing this design was rebuilt to remove.
-			use = document.createElement('button');
-			use.type = 'button';
-			setLabel(use, 'edit', (pc.lpn_elev_dem_use || 'Use {v} {u}')
-				.replace('{v}', String(shown)).replace('{u}', unitLabel('lpn_u_elevhead')));
-			helpTip(use, pc.lpn_elev_dem_use_tip);
-			use.addEventListener('click', function () {
+
+		use = document.createElement('button');
+		use.type = 'button';
+		setLabel(use, 'edit', pc.lpn_elev_dem_use || 'Use DEM');
+		helpTip(use, pc.lpn_elev_dem_use_tip);
+		use.addEventListener('click', function () {
+			// With a reading in hand this writes it. Without one it reads FIRST and then writes,
+			// which is what the button's own words promise -- pressing "Use DEM" is asking for
+			// exactly that, and the number it used is stated underneath afterwards.
+			if (shown !== null) {
 				saveUndoSnapshot();
 				setElev(shown);
 				refreshPopupIfOpen();
-			});
-			wrap.appendChild(use);
+				return;
+			}
+			demSample(nodeId, setElev);
+		});
+		wrap.appendChild(use);
+
+		// What the DEM said, or what went wrong. One line, under the two buttons, about THIS node.
+		said = document.createElement('div');
+		said.className = 'lpn-set-note';
+		if (shown !== null) {
+			said.textContent = (pc.lpn_elev_dem_said || 'Mapbox DEM says {v} {u}.')
+				.replace('{v}', String(shown)).replace('{u}', unitLabel('lpn_u_elevhead'));
+		} else if (terrainAsked[nodeId]) {
+			// Asked and got nothing. The map notice carries the reason; this says the press landed.
+			said.textContent = pc.lpn_elev_dem_none || 'The DEM gave no height for this node.';
+		} else {
+			said.textContent = '';
 		}
+		wrap.appendChild(said);
 		fields.appendChild(wrap);
+	}
+	/**
+	 * One sample of one node, and the redraw that shows it. `andSet`, when given, writes the reading
+	 * into the elevation as well -- that is the "Use DEM" path, where the user asked for the write in
+	 * the same press.
+	 *
+	 * `terrainAsked` is set BEFORE the request, so the row can tell "asked and got nothing" from
+	 * "not asked yet" even when the request fails.
+	 */
+	function demSample(nodeId, andSet) {
+		terrainAsked[nodeId] = true;
+		EngCalcs.lpnTerrainSample(terrainPointsForIds([nodeId]), function (heights) {
+			var m = (heights && heights.length) ? heights[0].meters : null;
+			if (andSet && typeof m === 'number' && isFinite(m)) {
+				saveUndoSnapshot();
+				andSet(+toDisplay(m, 'lpn_u_elevhead').toFixed(2));
+			}
+			refreshPopupIfOpen();
+		});
 	}
 	function readonlyField(fields, labelText, value, tip) {
 		var label = document.createElement('label'), span = document.createElement('span');

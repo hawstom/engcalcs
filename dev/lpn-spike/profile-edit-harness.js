@@ -58,7 +58,7 @@ const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
 	"\t\taddNode: addNode, addLink: addLink,\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode,\n" +
-	"\t\twirePane: wirePane, wireProfileEditPopup: wireProfileEditPopup,\n" +
+	"\t\twirePane: wirePane,\n" +
 	"\t\topenPane: openPane,\n" +
 	"\t\tprofileTabBtn: function () {\n" +
 	"\t\t\tvar strip = document.getElementById('lpn_pane_tabs');\n" +
@@ -82,7 +82,7 @@ const L = loadLoopedNetwork(
 	"\t\tprofilePath: profilePath,\n" +
 	"\t\tprofileHandles: function () { return profileHandleSet().handles; },\n" +
 	"\t\teditActive: function () { return profileEditActive(); },\n" +
-	"\t\teditBoxOpen: function () { return profileEditIsOpen(); },\n" +
+	
 	"\t\tdragType: function () { return drag ? drag.type : null; },\n" +
 	"\t\tpopupPending: function () { return !!pendingLinkPopupTimer; },\n" +
 	"\t\tnodeXY: function (id) { var n = nodeById(id); return n ? [n.x, n.y] : null; },\n" +
@@ -145,7 +145,6 @@ byId.lpn_toolbar.querySelectorAll = () => [];
 setUnitSet('us');
 const svg = byId.lpn_canvas;
 L.wirePane();
-L.wireProfileEditPopup();
 let wired = false;
 
 function hit(dataset) { return { dataset: dataset, classList: { contains: () => false } }; }
@@ -233,10 +232,12 @@ function pressProfile() {
 	pressEdit();
 	ok('pressing Edit puts the path in edit mode', L.editActive());
 	ok('...and the button says so', L.profileEditBtn().getAttribute('aria-pressed') === 'true');
-	// **THE BOX IS NOT SUPERSEDED.** It is the discoverable form and the pointer-less way through
-	// the same two operations, so the same press opens it and it keeps its two pull-downs.
-	ok('...and the overlay box opens with it', L.editBoxOpen());
-	ok('...still carrying the two ends as pull-downs', L.boxEls('select').length === 2,
+	// **THE BOX IS GONE, 2026-08-29.** Tom, having used it: *"we shouldn't need any interface in the
+	// bottom pane other than an Edit button. We have From and To: I can see those in the map. We have
+	// Nodes on the way: I can see those on the map."* Its two pull-downs and its waypoint chips said
+	// what the handles below already say, in the width the chart needs. So the press has exactly ONE
+	// visible consequence now, and the rest of this file is it.
+	ok('...and it opens no box -- the drawing is the interface', L.boxEls('select').length === 0,
 		L.boxEls('select').length + ' selects');
 	ok('...and the commentary line explains the gesture',
 		/[Dd]rag/.test(L.sayText() || ''), JSON.stringify(L.sayText()));
@@ -252,7 +253,6 @@ function pressProfile() {
 
 	pressEdit();
 	ok('a second press leaves edit mode', !L.editActive());
-	ok('...and takes the box with it', !L.editBoxOpen());
 	same(L.mapHandles(), { stop: 0, passing: 0 }, '...and the handles come off the drawing');
 }
 
@@ -291,6 +291,16 @@ function pressProfile() {
 	same(L.profilePath().links, [m.links.AC], '...and the route follows it');
 	dragTo(at('A'), at('B'), hit({ node: m.id.A }), hit({ node: m.id.B }));
 	same(L.profileStops(), [m.id.B, m.id.C], '...and the near end drags the same way');
+
+	// **AND THE WAYPOINTS SURVIVE IT**, which is the operation the retired edit box's From pull-down
+	// guarded (profile-saved-harness.js §2, deleted with the box). Get one end wrong and moving the
+	// other becomes "draw the whole path again", which is the thing Task 509 exists to prevent.
+	const w = build();
+	pressEdit();
+	dragTo(at('B2'), at('C'), hit({ node: w.id.B2 }), hit({ node: w.id.C }));
+	dragTo(at('A'), at('B'), hit({ node: w.id.A }), hit({ node: w.id.B }));
+	same(L.profileState().waypoints, [w.id.C], 'moving ONE end leaves the waypoints alone');
+	same(L.profileStops(), [w.id.B, w.id.C, w.id.D], '...and the far end alone too');
 }
 
 // ---- 3. a click takes a manual waypoint off, and NOTHING else ---------------------------------
@@ -391,7 +401,6 @@ function pressProfile() {
 	// edit mode away: the chooser's stop list is what profileStops() reads while it runs.
 	pressProfile();
 	ok('arming the chooser turns edit mode off', !L.editActive() && !!L.profileState().draw);
-	ok('...and closes the box, which edits stops nothing is reading', !L.editBoxOpen());
 	pressProfile();   // cancel the chooser
 
 	const m = build();

@@ -5,20 +5,16 @@
 // Two features, one harness, because they are one seam: the box edits the path and the saved list
 // stores it, and both write through `profileState`.
 //
-// ---- WHAT TASK 509 EXISTS TO CATCH ------------------------------------------------------------
+// ---- WHAT IS LEFT OF TASK 509 HERE ------------------------------------------------------------
 //
-// Task 506 removed the profile's left-hand control column and the page is better for it, but it
-// took two operations with it -- Tom, 2026-08-25: *"You are right that we lost something."* They
-// are back in an overlay box, and the way to get them wrong is to give them back in name only:
-//
-//   1. **Changing ONE end redraws the whole route.** Then it is the gesture wearing a pull-down,
-//      and the waypoints the user placed are gone. Asserted as: set `From`, and the waypoints and
-//      the far end are still exactly what they were.
-//   2. **Removing ONE waypoint removes all of them, or the wrong one.** The chips were the only way
-//      to drop a single stop, and a chip that clears the list is Remove-all with a different label.
-//   3. **The box stands open over a gesture it is not editing.** While the chooser runs,
-//      profileStops() ignores `from`/`to`/`waypoints` entirely -- so a box left open there is a set
-//      of controls that appear to do nothing, which is worse than no controls.
+// **THE EDIT BOX IS GONE, 2026-08-29** -- Tom, having used it: *"we shouldn't need any interface in
+// the bottom pane other than an Edit button. We have From and To: I can see those in the map. We
+// have Nodes on the way: I can see those on the map."* Its two pull-downs and its waypoint chips
+// are handles on the drawing now, so the three hazards this file used to hold -- changing one end
+// redrawing the whole route, a chip clearing the list, and controls left standing over a gesture
+// they are not editing -- moved with them to dev/lpn-spike/profile-edit-harness.js, which drives
+// the handles. What stays here is the DOOR and the INTERLOCK: the button exists, it toggles edit
+// mode, and the chooser turns edit mode off rather than running beside it.
 //
 // ---- WHAT TASK 510 EXISTS TO CATCH, AT THE FILE BOUNDARY ---------------------------------------
 //
@@ -47,7 +43,6 @@ const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
 	"\t\taddNode: addNode, addLink: addLink,\n" +
 	"\t\twirePane: wirePane, openPane: openPane, setMode: setMode,\n" +
-	"\t\twireProfileEditPopup: wireProfileEditPopup,\n" +
 	"\t\tprofileState: function () { return profileState; },\n" +
 	"\t\tprofileStops: profileStops,\n" +
 	"\t\tprofilePath: profilePath,\n" +
@@ -74,17 +69,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tvar box = document.getElementById('lpn_profile_form');\n" +
 	"\t\t\treturn (box.children || []).filter(function (c) { return c.id === 'lpn_profile_edit_btn'; })[0] || null;\n" +
 	"\t\t},\n" +
-	"\t\teditIsOpen: profileEditIsOpen, closeEdit: closeProfileEditPopup,\n" +
-	// The box's own controls, by tag, walking the tree the page really built.
-	"\t\teditEls: function (tag) {\n" +
-	"\t\t\tvar out = [], box = document.getElementById('lpn_profile_edit_form');\n" +
-	"\t\t\t(function walk(e) {\n" +
-	"\t\t\t\tif (!e) { return; }\n" +
-	"\t\t\t\tif (e._tag === tag) { out.push(e); }\n" +
-	"\t\t\t\t(e.children || []).forEach(walk);\n" +
-	"\t\t\t}(box));\n" +
-	"\t\t\treturn out;\n" +
-	"\t\t},\n" +
+	"\t\teditIsOpen: function () { return !!profileState.editing; },\n" +
 	"\t\tnoticeText: function () {\n" +
 	"\t\t\tvar n = document.getElementById('lpn_map_notice'); return n ? n._text : null; },\n" +
 	"\t\tprofileDrawStart: profileDrawStart, profileDrawCancel: profileDrawCancel,\n" +
@@ -123,7 +108,6 @@ function same(actual, expected, name) {
 byId.lpn_toolbar.querySelectorAll = () => [];
 setUnitSet('us');
 L.wirePane();
-L.wireProfileEditPopup();
 
 // A CHAIN with one branch, so a waypoint is a real choice and dropping it is a visible one:
 //
@@ -142,97 +126,38 @@ function build() {
 		return l.id;
 	}
 	mk('A', 'B', 100); mk('B', 'C', 100); mk('C', 'D', 100); mk('B', 'E', 100);
-	// The box is closed between fixtures the way the tab's own hide() closes it: a section that
-	// inherited an open box from the one before would toggle it SHUT on its first press.
-	L.closeEdit();
+	// Edit mode is turned off between fixtures the way the tab's own hide() turns it off: a section
+	// that inherited it from the one before would toggle it OFF on its first press.
 	L.openPane('profile');
 	return id;
 }
 function click(el) { (el._listeners.click || []).forEach((fn) => fn({ preventDefault() {}, stopPropagation() {} })); }
-function selects() { return L.editEls('select'); }
-function chips() { return L.editEls('button'); }
-function pickSelect(sel, value) {
-	sel.value = value;
-	(sel._listeners.change || []).forEach((fn) => fn({}));
-}
 
-// ---- 1. the door -----------------------------------------------------------------------------
+// ---- 1. the door, and the interlock ------------------------------------------------------------
 {
-	console.log('\n--- the Edit button is the door, and it opens a box (Task 509) ---');
-	build();
+	console.log('\n--- the Edit button is the door, and it arms the path (Task 509) ---');
+	const id = build();
 	const btn = L.editBtn();
 	ok('the panel carries an Edit button', !!btn);
-	ok('...and the box is shut until it is pressed', !L.editIsOpen());
+	ok('...and the path is not in edit mode until it is pressed', !L.editIsOpen());
 	click(btn);
-	ok('pressing it opens the box', L.editIsOpen());
-	ok('...with the two ends, one pull-down each', selects().length === 2, selects().length + ' selects');
+	ok('pressing it puts the path in edit mode', L.editIsOpen());
 	click(btn);
-	ok('pressing it again shuts the box', !L.editIsOpen());
-	click(btn);
+	ok('pressing it again takes it back out', !L.editIsOpen());
 
-	// **THE BOX IS OVER THE MAP, NOT IN THE PANEL.** Task 506's ruling is that the panel has no
-	// control column, and an overlay that had crept back into #lpn_profile_form would be one.
+	// **NOTHING OPENS IN THE PANEL.** Task 506's ruling is that the panel has no control column, and
+	// the retired overlay's pull-downs creeping back into #lpn_profile_form would be one.
+	click(btn);
 	let inPanel = 0;
 	(function walk(e) { if (!e) { return; } if (e._tag === 'select') { inPanel++; } (e.children || []).forEach(walk); }(byId.lpn_profile_form));
-	ok('...and no pull-down has crept back into the panel itself', inPanel === 0, inPanel + ' selects');
-}
+	ok('...and no pull-down has appeared in the panel', inPanel === 0, inPanel + ' selects');
 
-// ---- 2. changing ONE end, which is the first operation Task 506 took --------------------------
-{
-	console.log('\n--- one end moves; the waypoints and the far end do not ---');
-	const id = build();
-	// A route with a waypoint on it, set the way the gesture would leave it.
+	// THE INTERLOCK: profileStops() ignores from/to/waypoints while the chooser runs, so edit mode
+	// left on there would be a set of handles that appear to do nothing.
 	L.profileState().from = id.A;
 	L.profileState().to = id.D;
-	L.profileState().waypoints = [id.E];
-	click(L.editBtn());
-	same(L.profileStops(), [id.A, id.E, id.D], 'the box opens on the route that is on screen');
-
-	pickSelect(selects()[0], id.C);
-	ok('changing From moves that end', L.profileState().from === id.C, L.profileState().from);
-	same(L.profileState().waypoints, [id.E], '...AND THE WAYPOINTS ARE STILL THERE');
-	ok('...and the far end is untouched', L.profileState().to === id.D, L.profileState().to);
-
-	pickSelect(selects()[1], id.A);
-	ok('changing To moves the other end', L.profileState().to === id.A);
-	same(L.profileState().waypoints, [id.E], '...and again the waypoints survive');
-	ok('...and the near end is untouched', L.profileState().from === id.C);
-}
-
-// ---- 3. removing ONE waypoint, which is the second ---------------------------------------------
-{
-	console.log('\n--- a chip removes itself, and only itself ---');
-	const id = build();
-	L.profileState().from = id.A;
-	L.profileState().to = id.D;
-	L.profileState().waypoints = [id.E, id.C];
-	click(L.editBtn());
-	// Two waypoint chips plus the Remove-all beside them.
-	ok('a chip per waypoint, plus Remove all', chips().length === 3, chips().length + ' buttons');
-
-	click(chips()[0]);
-	same(L.profileState().waypoints, [id.C], 'THE CHIP REMOVES ONE WAYPOINT, NOT THE LIST');
-	ok('...and the two ends are untouched',
-		L.profileState().from === id.A && L.profileState().to === id.D);
-	ok('...and the box redraws with one chip left', chips().length === 2, chips().length + ' buttons');
-
-	// Remove all is still there, and is still a different act.
-	click(chips()[chips().length - 1]);
-	same(L.profileState().waypoints, [], 'Remove all clears every waypoint');
-	ok('...and the ends still survive that too',
-		L.profileState().from === id.A && L.profileState().to === id.D);
-}
-
-// ---- 4. the box and the gesture never edit the same thing at once ------------------------------
-{
-	console.log('\n--- the chooser takes the box with it ---');
-	const id = build();
-	L.profileState().from = id.A;
-	L.profileState().to = id.D;
-	click(L.editBtn());
-	ok('the box is open', L.editIsOpen());
 	L.profileDrawStart();
-	ok('starting the chooser SHUTS the box', !L.editIsOpen());
+	ok('starting the chooser turns edit mode OFF', !L.editIsOpen());
 	ok('...and withdraws the Edit door while the gesture runs', !L.editBtn());
 	L.profileDrawCancel();
 	ok('cancelling the gesture puts the door back', !!L.editBtn());

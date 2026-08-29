@@ -87,15 +87,20 @@ exports.run = async function ({ browser, report }) {
 
 		const idx = await words(a.page, '#lpn_setbox_index .lpn-setbox-link');
 		report.ok(idx.length > 8, 'the category index has its rows', idx.length + ' rows');
-		const split = idx.filter(r => r.broken.length);
-		report.ok(split.length === 0, 'no category name is broken mid-word',
-			split.map(r => r.text + ' (' + r.broken.join(',') + ')').join(', '));
-		// **ONE LINE IS THE WHOLE DESIGN.** The names fit because the index stopped being a column;
-		// if it ever becomes a column again these rows land on different rows and this fails before
-		// anybody reads a word of it.
-		report.ok(new Set(idx.map(r => r.top)).size === 1,
-			'...because the index is one horizontal strip, not a narrow column',
+		// **THE INDEX IS A NARROW COLUMN AGAIN, RESTORED 2026-08-29.** Task 527 made it a horizontal
+		// strip so that no name would break mid-word; Tom used that and reversed it — *"It was good
+		// before with the right pane index. It's bad with top tabs."* An index you scroll sideways
+		// is an index you cannot see.
+		report.ok(new Set(idx.map(r => r.top)).size > 1,
+			'the index is a column of rows, not one horizontal strip',
 			new Set(idx.map(r => r.top)).size + ' row(s)');
+		// **THE MID-WORD BREAKS ARE ACCEPTED, NOT OUTSTANDING** (Tom, 2026-08-29: *"We already
+		// accepted broken words."*). Counted so a future rewording can be measured against the
+		// number, and so nobody re-derives "eight names break, therefore the layout is wrong" —
+		// which is exactly the reasoning that produced the tab strip he had never been shown.
+		const split = idx.filter(r => r.broken.length);
+		report.note(`${split.length} of ${idx.length} index names break mid-word at 360px` +
+			(split.length ? ': ' + split.map(r => r.text).join(', ') : ''));
 
 		const pane = await a.page.evaluate(() => {
 			const c = document.getElementById('lpn_setbox_content'),
@@ -111,9 +116,11 @@ exports.run = async function ({ browser, report }) {
 				docSideways: document.documentElement.scrollWidth > window.innerWidth + 1
 			};
 		});
-		// As a 4.5rem column the content pane measured 238px against the 230 the node symbology list
-		// needs — eight pixels of headroom. The strip hands it the whole box.
-		report.ok(pane.content > 290, 'the content pane gets the box\'s full width, not 238px of it',
+		// **238 px AGAINST THE 230 THE NODE SYMBOLOGY LIST NEEDS — eight pixels of headroom**, which
+		// is the whole reason the column is 4.5rem and not wider. The strip briefly handed the
+		// content pane the full box; with the column restored, this is the number that matters and
+		// the one that must not shrink.
+		report.ok(pane.content > 230, 'the content pane still clears the widest control in the box',
 			pane.content + 'px of a ' + pane.boxW + 'px box');
 		report.ok(!pane.contentSideways,
 			'...and still has no sideways scrollbar, which is what the pane was narrowed twice to avoid');

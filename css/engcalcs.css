@@ -2256,47 +2256,33 @@ html:has(#lpn_canvas) { overflow: hidden; }
 	/* An icon alone in a box padded for a word reads as a gap with a drawing in it. */
 	html:has(#lpn_canvas) .lpn-menubar-item { padding: 3px 6px; }
 
-	/* 5. THE SETTINGS INDEX IS A ROW ON A PHONE, NOT A COLUMN (ROADMAP Task 527). Tom, 2026-08-25,
-	   from a phone: every label in it breaks mid-word -- "Visualiz/ation", "Node symbo/logy", "Map
-	   appear/ance". Measured at 360 px before the fix: the rows were 65 px wide and EIGHT of the
-	   fourteen split a word, which is not the "a name on two lines is still a name" trade the
-	   desktop pane makes. The house rule that mid-word wrap is acceptable is about a RESULTS column;
-	   this is a navigation index a reader scans to find a section.
+	/* **5. THE SETTINGS INDEX STAYS A NARROW SIDE COLUMN ON A PHONE, RESTORED 2026-08-29.**
+	   4.5rem, measured at 360 px rather than scaled from the desktop's 6.6rem: it is the width at
+	   which the CONTENT pane stops being the constraint. At 4.5rem the content pane is 238 px and
+	   the node symbology list, the widest thing in the box, needs 230 -- so the box opens on a phone
+	   with no sideways scrollbar anywhere in it.
 
-	   A NARROW COLUMN CANNOT BE FIXED BY WIDENING IT. "Visualization" needs ~91 px at this size and
-	   the pane had 65, but the pane is narrow because the CONTENT pane is the one that needs the
-	   width -- at the old 4.5rem it had 238 px against the 230 the node symbology list needs. Every
-	   pixel given to the index comes off that. So the index stops being a column: the panes stack,
-	   the index becomes one horizontally-scrolling strip of whole names above the content, and the
-	   content pane gets the box's full width instead of 238 px of it.
+	   **IT WAS TURNED INTO A HORIZONTAL TAB STRIP ON 2026-08-25 AND TOM REVERSED THAT** (2026-08-29:
+	   *"It was good before with the right pane index. It's bad with top tabs."*). The strip was
+	   argued for on the grounds that a phone should read whole words rather than wrapped ones; his
+	   answer is that a scrolling row of tabs costs more than a wrapped word, because an index you
+	   scroll sideways is an index you cannot see. **Do not re-propose the strip** -- it was built,
+	   shipped, used and rejected.
 
-	   It costs ~26 px of height, which is the one thing a phone has least of, and it buys back
-	   ~70 px of width for every control in the box. Rejected: abbreviating the section names (new
-	   English strings and 26 translations of each, for a phone-only cosmetic gain) and shrinking the
-	   index font until "Visualization" fits, which needs ~9 px type.
+	   **THE PROBLEM THE STRIP WAS SOLVING WAS NOT AN OPEN PROBLEM** (Tom, 2026-08-29: *"We already
+	   accepted broken words. And we never discussed tabs across the top."*). Eight of the fourteen
+	   labels split mid-word at 65 px -- "Visualiz/ation", "Node symbo/logy" -- and that had already
+	   been weighed and accepted. Task 527 reopened a settled question, answered it with a layout
+	   nobody had proposed to him, and shipped it. **The cost of a wrapped word was known; the cost of
+	   a sideways-scrolling index was not, and it was worse.**
 
-	   SETTINGS ONLY. `.lpn-libbox` borrows this shell and its three names -- Patterns, Curves,
-	   Controls -- already fit 65 px unbroken, so it keeps the column and the 4.5rem phone width it
-	   has had since Task 486. The desktop pane above the breakpoint is untouched in both boxes; its
-	   figure is 6.6rem, in .lpn-setbox-index. */
-	html:has(#lpn_canvas) .lpn-libbox .lpn-setbox-index { flex-basis: 4.5rem; }
-	html:has(#lpn_canvas) #lpn_settings_box .lpn-setbox-panes { flex-direction: column; gap: 4px; }
-	html:has(#lpn_canvas) #lpn_setbox_index {
-		flex: 0 0 auto; display: flex; gap: 2px;
-		overflow-x: auto; overflow-y: hidden;
-		border-right: 0; border-bottom: 1px solid #ddd;
-		padding-right: 0; padding-bottom: 3px;
-	}
-	/* A strip row is a whole name or it is not worth the strip: no wrap, and no mid-word break to
-	   wrap into. The width rule that made it a block row goes with the column. */
-	html:has(#lpn_canvas) #lpn_setbox_index .lpn-setbox-link {
-		flex: 0 0 auto; width: auto; white-space: nowrap; overflow-wrap: normal;
-	}
-	/* The two levels are still two levels: a section is bold and opens a group, its sub-headings
-	   follow it. The indent that said so down a column becomes the gap that says so along a row. */
-	html:has(#lpn_canvas) #lpn_setbox_index .lpn-setbox-link-sub { padding-left: 4px; }
-	html:has(#lpn_canvas) #lpn_setbox_index .lpn-setbox-link-sec { margin-top: 0; }
-	html:has(#lpn_canvas) #lpn_setbox_index .lpn-setbox-link-sec:not(:first-child) { margin-left: 8px; }
+	   Recorded because the failure was one of PROCESS, not of taste: the alternatives are still on
+	   file (abbreviating the section names -- new English strings and 26 translations each; or ~9 px
+	   type so "Visualization" fits) and either would be a change to the WORDS, which is Tom's, not
+	   to the layout, which is settled.
+
+	   One rule for both boxes: `.lpn-libbox` borrows this shell and its three names already fit. */
+	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: 4.5rem; }
 
 	/* 5b. THE BOTTOM-PANE TABLES' NUMBER BOXES (Tom, 2026-08-22: "The Tables in the bottom pane have
 	   some columns, inputs I think, with artificially limited shrink that can in general be about

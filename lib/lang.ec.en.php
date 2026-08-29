@@ -1698,9 +1698,6 @@ $ec_lang['lpn_profile_tip']='Draw the ground and the hydraulic grade line along 
 $ec_lang_syn['lpn_profile_tip']='Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.';
 $ec_lang['lpn_profile_title']='Profile along a path';
 $ec_lang_syn['lpn_profile_title']='Profile or cross section along a path, route, or way';
-$ec_lang['lpn_profile_from']='From';
-$ec_lang['lpn_profile_to']='To';
-$ec_lang['lpn_profile_through']='Nodes on the way';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
 $ec_lang['lpn_profile_draw_start']='Click the node where the path starts.';
@@ -1710,7 +1707,6 @@ $ec_lang['lpn_profile_tap_start']='Tap the node where the path starts.';
 $ec_lang['lpn_profile_tap_more']='Tap a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.';
 $ec_lang['lpn_profile_say_idle']='Press Profile again to choose a new path on the map.';
 $ec_lang['lpn_profile_none']='No path yet. Press Profile again to choose one on the map.';
-$ec_lang['lpn_profile_clear']='Remove all';
 $ec_lang['lpn_profile_choose']='Choose a start node and an end node.';
 $ec_lang['lpn_profile_no_path']='These two nodes are not connected by any route.';
 $ec_lang['lpn_profile_no_solve']='No results yet, so only the ground line is drawn.';
@@ -2402,10 +2398,11 @@ $ec_lang['lpn_settings_emitter_exponent_tip']='The power in the sprinkler and le
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Computation';
-$ec_lang['lpn_elev_dem_sample']='Sample Mapbox DEM';
-$ec_lang['lpn_elev_dem_sample_tip']='Reads the height of the land under this node and shows it below. It changes nothing. Mapbox DEM is about 30 m across on most of the Earth, and finer where better data exists.';
-$ec_lang['lpn_elev_dem_use']='Use {v} {u}';
-$ec_lang['lpn_elev_dem_use_tip']='Puts the sampled height into the Elevation box above, replacing what is there. One Undo puts it back.';
+$ec_lang['lpn_elev_dem_sample']='Sample DEM';
+$ec_lang['lpn_elev_dem_sample_tip']='Reads the height of the land under this node from Mapbox DEM and shows it below. It changes nothing. The data is about 30 m across on most of the Earth, and finer where better data exists.';
+$ec_lang['lpn_elev_dem_use']='Use DEM';
+$ec_lang['lpn_elev_dem_use_tip']='Puts the height of the land under this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.';
+$ec_lang['lpn_elev_dem_none']='The DEM gave no height for this node.';
 $ec_lang['lpn_elev_dem_said']='Mapbox DEM says {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Elevation from';
 $ec_lang['lpn_settings_elev_source_tip']='Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.';

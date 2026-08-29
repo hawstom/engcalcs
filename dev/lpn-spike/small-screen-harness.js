@@ -738,7 +738,7 @@ const TOUCH = true;
 		winning(RULES, list, WIDE, DOC_IDS, TOUCH, 'min-width') === '13rem');
 });
 
-console.log('\n--- the Settings index pane (a column on the PC, a strip on a phone) ---');
+console.log('\n--- the Settings index pane, a narrow COLUMN at both widths ---');
 {
 	const setboxHost = node('div', 'lpn_settings_box', ['lpn-popover', 'lpn-setbox'], body);
 	const panes = node('div', '', ['lpn-setbox-panes'], setboxHost);
@@ -746,45 +746,47 @@ console.log('\n--- the Settings index pane (a column on the PC, a strip on a pho
 	// 6.6rem: 0.8 x the 7.5rem it shipped at, then 1.1 x that once Tom had used it (2026-08-23).
 	ok('the index pane is 6.6rem on the desktop',
 		winning(RULES, index, WIDE, DOC_IDS, false, 'flex') === '0 0 6.6rem');
-	// **AND ON A PHONE IT IS NOT A PANE AT ALL** (ROADMAP Task 527). Tom, 2026-08-25: every label in
-	// it broke mid-word. No column narrow enough to leave the CONTENT pane its 230px can hold
-	// "Visualization", so the panes stack and the index becomes a strip of whole names. The three
-	// facts that make it that, rather than a column with different numbers.
-	ok('...and on a phone the panes stack, so the content pane gets the whole width',
-		winning(RULES, panes, SMALL, DOC_IDS, false, 'flex-direction') === 'column',
+	// **AND 4.5rem ON A PHONE -- STILL A COLUMN** (restored 2026-08-29). Task 527 turned it into a
+	// horizontal strip of whole names, on the argument that mid-word breaks in a navigation index
+	// are worse than the height a strip costs. **Tom used it and reversed it**: *"It was good before
+	// with the right pane index. It's bad with top tabs."* An index you scroll sideways is an index
+	// you cannot see. The strip was built, shipped, used and rejected -- do not re-propose it.
+	ok('...and 4.5rem on a phone, which is the width that leaves the CONTENT pane its 230 px',
+		winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis') === '4.5rem',
+		'got ' + winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis'));
+	// The three facts that MADE it a strip, each asserted absent, so a revival is a deliberate act
+	// rather than a rule creeping back in.
+	ok('...the panes do not stack',
+		winning(RULES, panes, SMALL, DOC_IDS, false, 'flex-direction') === null,
 		'got ' + winning(RULES, panes, SMALL, DOC_IDS, false, 'flex-direction'));
-	ok('...the index sizes itself to its own row rather than to a basis',
-		winning(RULES, index, SMALL, DOC_IDS, false, 'flex') === '0 0 auto');
-	ok('...and it scrolls sideways inside itself, never widening the box',
-		winning(RULES, index, SMALL, DOC_IDS, false, 'overflow-x') === 'auto');
-	ok('...with nothing of the sort above the breakpoint',
-		winning(RULES, panes, WIDE, DOC_IDS, false, 'flex-direction') === null &&
-		winning(RULES, index, WIDE, DOC_IDS, false, 'flex-basis') === null);
-	// A <button> does not wrap its text by itself, so without this the narrower pane answers with a
+	// `flex` still resolves to the desktop shorthand `0 0 6.6rem` here -- the phone rule sets
+	// flex-basis alone, which overrides only the basis. What must NOT be true is the strip's own
+	// `0 0 auto`, which is how it sized itself to its content instead of to a column.
+	ok('...the index does not size itself to a row',
+		winning(RULES, index, SMALL, DOC_IDS, false, 'flex') !== '0 0 auto',
+		'got ' + winning(RULES, index, SMALL, DOC_IDS, false, 'flex'));
+	ok('...and it does not scroll sideways inside itself',
+		winning(RULES, index, SMALL, DOC_IDS, false, 'overflow-x') === null);
+	// A <button> does not wrap its text by itself, so without this the narrow pane answers with a
 	// sideways scrollbar instead of a second line -- measured at 94px of "Node symbology" in a 65px
-	// box before the rule was added.
+	// box before the rule was added. **Eight of the fourteen names split mid-word at this width, and
+	// that was ALREADY ACCEPTED** (Tom, 2026-08-29: *"We already accepted broken words."*) -- so it
+	// is not a defect waiting for a layout answer, and re-deriving one from it is what produced the
+	// tab strip he had never been shown.
 	const link = node('button', '', ['lpn-setbox-link'], index);
-	ok('an index row may wrap, and may break a long word',
+	ok('an index row may wrap, and may break a long word, at BOTH widths',
 		winning(RULES, link, WIDE, DOC_IDS, false, 'white-space') === 'normal' &&
-		winning(RULES, link, WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere');
-	// **AND ON THE STRIP IT MAY DO NEITHER.** A row that wrapped in a horizontal strip would be a
-	// name on two lines beside a name on one; a row that broke mid-word would be the defect this
-	// task is about, moved sideways. Both are turned off, and only here.
-	ok('...and on the phone strip it does neither -- a whole name or nothing',
-		winning(RULES, link, SMALL, DOC_IDS, false, 'white-space') === 'nowrap' &&
-		winning(RULES, link, SMALL, DOC_IDS, false, 'overflow-wrap') === 'normal',
-		'got ' + winning(RULES, link, SMALL, DOC_IDS, false, 'white-space') + ' / ' +
-		winning(RULES, link, SMALL, DOC_IDS, false, 'overflow-wrap'));
+		winning(RULES, link, WIDE, DOC_IDS, false, 'overflow-wrap') === 'anywhere' &&
+		winning(RULES, link, SMALL, DOC_IDS, false, 'white-space') !== 'nowrap',
+		'small: ' + winning(RULES, link, SMALL, DOC_IDS, false, 'white-space'));
 	// The Libraries box borrows the whole Settings shell, so its own narrower index is an override
 	// on the same class rather than a second pane design (Tom's item 9).
 	const libpanes = node('div', '', ['lpn-setbox-panes'], node('div', 'lpn_library_box', ['lpn-popover', 'lpn-setbox', 'lpn-libbox'], body));
 	const libindex = node('nav', 'lpn_libbox_index', ['lpn-setbox-index'], libpanes);
 	ok('the Libraries index pane is 5.25rem -- 0.70 x the 7.5rem it shipped at',
 		winning(RULES, libindex, WIDE, DOC_IDS, false, 'flex-basis') === '5.25rem');
-	// **AND IT KEEPS THE COLUMN THE SETTINGS INDEX GAVE UP.** Task 527 turned that one into a strip
-	// because its names do not fit 65px; Patterns, Curves and Controls do, so this box pays neither
-	// the height nor the redesign and keeps the 4.5rem it has had since Task 486.
-	ok('...and it keeps its narrow COLUMN below the breakpoint, where Settings became a strip',
+	// One rule serves both boxes again, which is what it was before Task 527 split them.
+	ok('...and it takes the same 4.5rem on a phone, from the same rule',
 		winning(RULES, libindex, SMALL, DOC_IDS, false, 'flex-basis') === '4.5rem');
 }
 

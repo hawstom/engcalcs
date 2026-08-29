@@ -36,6 +36,12 @@ const report = {
 	eq(actual, expected, label) {
 		this.ok(actual === expected, label, actual === expected ? '' : `got ${JSON.stringify(actual)}, wanted ${JSON.stringify(expected)}`);
 	},
+	// **A MEASUREMENT THAT IS NOT A VERDICT.** Some numbers are worth putting on the record without
+	// anybody having decided what they should be -- the count of index names that break mid-word at
+	// 360px is one, because the fix for it is shorter WORDS, which is Tom's call and not a layout's.
+	// Asserting a bound nobody has agreed would fail on his own decision and get the check deleted;
+	// printing nothing loses the number. So: printed, counted as neither pass nor fail.
+	note(text) { console.log(`  ..   ${text}`); },
 	has(haystack, needle, label) {
 		const hit = String(haystack || '').indexOf(needle) >= 0;
 		this.ok(hit, label, hit ? '' : `"${needle}" not in ${JSON.stringify(String(haystack).slice(0, 160))}`);

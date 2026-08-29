@@ -263,6 +263,9 @@ const L = loadLoopedNetwork(
 	"\t\tflushNewNodes: flushTerrainForNewNodes,\n" +
 	"\t\tlastRead: function (id) { return terrainLastRead[id]; },\n" +
 	"\t\trenderNode: renderNodeFields,\n" +
+	"\t\topenPopupFor: function (id) { currentPopup = { kind: 'node', id: id };\n" +
+	"\t\t\tdocument.getElementById('lpn_popup').style.display = 'block';\n" +
+	"\t\t\trenderNodeFields(id); },\n" +
 	"\t\tpopupText: function () { return document.getElementById('lpn_popup_fields').textContent || ''; },\n" +
 	"\t\tpopupButtons: function () { var out = []; (function walk(e) { (e.children || []).forEach(function (c) {\n" +
 	"\t\t\tif (c.tagName === 'BUTTON') { out.push(c); } walk(c); }); })(document.getElementById('lpn_popup_fields')); return out; },\n" +
@@ -732,40 +735,64 @@ function runFill(answers) {
 			btns.some(t => /^Use /.test(t)), JSON.stringify(btns));
 	}
 	{
-		// **OPENING A NODE SAMPLES IT BY ITSELF** (Tom: *"I wonder why we can't sample always on
-		// opening Node editor. Is that too much overhead?"* — it is not: one tile serves every node
-		// within about a kilometre, and the browser caches it). So a node nobody has asked about
-		// gets its reading from the act of being looked at, and "Use it" is ready without a press.
-		// **THE CREATION SETTING IS OFF FOR THIS BLOCK**, or the node would be sampled by being
-		// BORN (section 6b) and the popup would find the reading already there -- measuring nothing.
-		// The two paths are separate features and this one is about opening an editor.
+		// **OPENING A NODE SAMPLES NOTHING** (Tom, 2026-08-29, deprecating the automatic read:
+		// *"we should instead have buttons under Elevation for Sample DEM and Use DEM"*). Merely
+		// LOOKING at a node must not send a consent-gated third-party request, and a control that
+		// only appears once some invisible state exists is what made the previous shape unreadable.
 		L.setElevSource('value');
-		// addNode() MINTS the id -- it takes none. Read it back rather than guessing, the lesson
-		// dev/lpn-spike/rename-references-harness.js records.
 		const nid = L.addNode('junction', 0, 0).id;
 		L.place(nid, -122.5, 37.9);
 		L.setElev(nid, 42);
 		confirmAnswers = [true];
 		tileRequests = 0;
-		L.renderNode(nid);            // opening the editor is the whole gesture
+		L.openPopupFor(nid);
 		await settle();
-		ok('opening a node the DEM has not been asked about sends one request',
-			tileRequests === 1, tileRequests + ' requests');
-		ok('...and records the reading without touching the elevation',
-			typeof L.lastRead(nid) === 'number' && L.elev(nid) === 42,
-			L.lastRead(nid) + ' / ' + L.elev(nid));
-		L.renderNode(nid);
-		const btns2 = L.popupButtons().map(b => b.textContent);
-		ok('...so the redrawn popup offers Use straight away',
-			btns2.some(t => /^Use /.test(t)), JSON.stringify(btns2));
-		// **ASKED ONCE.** Without terrainAsked the callback's redraw would rebuild the row, find the
-		// reading still missing on a failure, and ask again -- a request loop driven by an open popup.
-		tileRequests = 0;
-		L.renderNode(nid);
-		L.renderNode(nid);
-		await settle();
-		ok('...and re-opening it asks for nothing more', tileRequests === 0,
+		ok('opening a node editor sends nothing at all', tileRequests === 0,
 			tileRequests + ' requests');
+		ok('...and leaves the elevation alone', L.elev(nid) === 42, String(L.elev(nid)));
+		// **BOTH BUTTONS ARE THERE BEFORE ANYTHING HAS BEEN READ.** That is the whole of what makes
+		// a press legible: press Sample, and if nothing you can see changes, the second button is
+		// still there to tell you the row exists and the press was heard.
+		const b0 = L.popupButtons().map(b => b.textContent);
+		ok('...but both buttons are already offered',
+			b0.some(t => /Sample DEM/.test(t)) && b0.some(t => /Use DEM/.test(t)),
+			JSON.stringify(b0));
+		// Sample reads and shows, and writes nothing.
+		const sampleBtn = L.popupButtons().filter(b => /Sample DEM/.test(b.textContent))[0];
+		tileRequests = 0;
+		sampleBtn._listeners.click[0]();
+		await settle();
+		ok('pressing Sample DEM sends one request', tileRequests === 1, tileRequests + ' requests');
+		// **READ WITHOUT RE-RENDERING BY HAND.** The line must appear because the sample's own
+		// callback called refreshPopupIfOpen(), which is the link a "does nothing" report is about.
+		ok('...and states the height without touching the elevation',
+			/Mapbox DEM says/.test(L.popupText()) && L.elev(nid) === 42,
+			L.elev(nid) + ' / ' + JSON.stringify(L.popupText().slice(0, 90)));
+		// Use writes it.
+		const useBtn = L.popupButtons().filter(b => /Use DEM/.test(b.textContent))[0];
+		useBtn._listeners.click[0]();
+		await settle();
+		ok('...and Use DEM then writes that height into the elevation',
+			typeof L.elev(nid) === 'number' && L.elev(nid) !== 42, String(L.elev(nid)));
+	}
+	{
+		// **Use DEM WITH NOTHING SAMPLED READS FIRST, THEN WRITES.** Pressing a button that says
+		// "Use DEM" is asking for exactly that, and the number it used is stated underneath after.
+		L.setElevSource('value');
+		const nid2 = L.addNode('junction', 0, 0).id;
+		L.place(nid2, -122.6, 38.0);
+		L.setElev(nid2, 77);
+		confirmAnswers = [true];
+		tileRequests = 0;
+		L.openPopupFor(nid2);
+		const use2 = L.popupButtons().filter(b => /Use DEM/.test(b.textContent))[0];
+		use2._listeners.click[0]();
+		await settle();
+		ok('Use DEM with nothing sampled reads and then writes', tileRequests === 1 &&
+			typeof L.elev(nid2) === 'number' && L.elev(nid2) !== 77,
+			tileRequests + ' requests, elev ' + L.elev(nid2));
+		ok('...and says which height it used', /Mapbox DEM says/.test(L.popupText()),
+			JSON.stringify(L.popupText().slice(0, 90)));
 	}
 
 	// ---- 5h. THE ONE STRUCTURAL ASSERTION ABOUT THE NETWORK --------------------------------------

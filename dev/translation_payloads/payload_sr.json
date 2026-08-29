@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 1428,
-        "delta_key_count": 103,
+        "expected_key_count": 1425,
+        "delta_key_count": 104,
         "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
@@ -511,10 +511,11 @@
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
-        "lpn_elev_dem_sample": "Sample Mapbox DEM",
-        "lpn_elev_dem_sample_tip": "Reads the height of the land under this node and shows it below. It changes nothing. Mapbox DEM is about 30 m across on most of the Earth, and finer where better data exists.",
-        "lpn_elev_dem_use": "Use {v} {u}",
-        "lpn_elev_dem_use_tip": "Puts the sampled height into the Elevation box above, replacing what is there. One Undo puts it back.",
+        "lpn_elev_dem_sample": "Sample DEM",
+        "lpn_elev_dem_sample_tip": "Reads the height of the land under this node from Mapbox DEM and shows it below. It changes nothing. The data is about 30 m across on most of the Earth, and finer where better data exists.",
+        "lpn_elev_dem_use": "Use DEM",
+        "lpn_elev_dem_use_tip": "Puts the height of the land under this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.",
+        "lpn_elev_dem_none": "The DEM gave no height for this node.",
         "lpn_elev_dem_said": "Mapbox DEM says {v} {u}.",
         "lpn_settings_elev_source": "Elevation from",
         "lpn_settings_elev_source_tip": "Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.",
@@ -616,10 +617,11 @@
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
-        "lpn_elev_dem_sample": "Sample Mapbox DEM",
-        "lpn_elev_dem_sample_tip": "Reads the height of the land under this node and shows it below. It changes nothing. Mapbox DEM is about 30 m across on most of the Earth, and finer where better data exists.",
-        "lpn_elev_dem_use": "Use {v} {u}",
-        "lpn_elev_dem_use_tip": "Puts the sampled height into the Elevation box above, replacing what is there. One Undo puts it back.",
+        "lpn_elev_dem_sample": "Sample DEM",
+        "lpn_elev_dem_sample_tip": "Reads the height of the land under this node from Mapbox DEM and shows it below. It changes nothing. The data is about 30 m across on most of the Earth, and finer where better data exists.",
+        "lpn_elev_dem_use": "Use DEM",
+        "lpn_elev_dem_use_tip": "Puts the height of the land under this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.",
+        "lpn_elev_dem_none": "The DEM gave no height for this node.",
         "lpn_elev_dem_said": "Mapbox DEM says {v} {u}.",
         "lpn_settings_elev_source": "Elevation from",
         "lpn_settings_elev_source_tip": "Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.",
@@ -1805,6 +1807,22 @@
             }
         },
         "lpn_elev_dem_use_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_computation",
+                    "value": "Прорачун",
+                    "english": "Computation"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Толеранција конвергенције",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_elev_dem_none": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

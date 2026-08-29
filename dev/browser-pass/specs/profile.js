@@ -337,20 +337,12 @@ exports.run = async function ({ browser, report }) {
 			if (door) {
 				await a.page.mouse.click(door.x, door.y);
 				await a.settle(300);
-				const box = await a.page.evaluate(() => {
-					const p = document.getElementById('lpn_profile_edit_popup');
-					if (!p || p.style.display !== 'block') { return null; }
-					const r = p.getBoundingClientRect();
-					return { x: r.x, y: r.y, w: r.width, h: r.height,
-						selects: p.querySelectorAll('select').length,
-						vw: window.innerWidth, vh: window.innerHeight };
-				});
-				report.ok(!!box, 'pressing it opens the overlay box');
-				report.ok(box && box.selects === 2, '...carrying the two ends, one pull-down each',
-					box && (box.selects + ' selects'));
-				report.ok(box && box.x >= 0 && box.y >= 0 &&
-					box.x + box.w <= box.vw + 1 && box.y + box.h <= box.vh + 1,
-					'...wholly inside the window', box && JSON.stringify(box));
+				// **THE BOX IS GONE, 2026-08-29** (Tom: *"we shouldn't need any interface in the
+				// bottom pane other than an Edit button"*). The overlay that used to open here
+				// carried From, To and the waypoint chips; the drawing carries all three now, so the
+				// press has exactly one visible consequence and it is the handles below.
+				const gone = await a.page.evaluate(() => !document.getElementById('lpn_profile_edit_popup'));
+				report.ok(gone, 'pressing it opens no box -- the path itself is the interface');
 				// **AND THE SAME PRESS PUT THE PATH IN EDIT MODE** (Task 509). What the handles DO is
 				// dev/lpn-spike/profile-edit-harness.js's; what only a real page can say is that they
 				// are painted at all -- they go into a layer inserted between two others, and an
@@ -362,16 +354,16 @@ exports.run = async function ({ browser, report }) {
 				report.ok(grips.n > 1, 'the same press puts grab handles on every node of the route',
 					grips.n + ' handles');
 				report.ok(grips.pressed === 'true', '...and the button reads as pressed');
-				// And it closes, because it has to be got rid of: it sits over the drawing.
-				await a.page.click('#lpn_profile_edit_close');
+				// And it turns off, because edit mode changes what a press on the map MEANS.
+				await a.page.mouse.click(door.x, door.y);
 				await a.settle(200);
 				const shut = await a.page.evaluate(() => ({
-					box: document.getElementById('lpn_profile_edit_popup').style.display === 'none',
-					grips: document.querySelectorAll('.lpn-profile-handle').length
+					grips: document.querySelectorAll('.lpn-profile-handle').length,
+					pressed: document.getElementById('lpn_profile_edit_btn').getAttribute('aria-pressed')
 				}));
-				report.ok(shut.box, '...and the X shuts it again');
-				report.ok(shut.grips === 0, '...taking edit mode with it, handles and all',
+				report.ok(shut.grips === 0, '...and pressing it again takes the handles away',
 					shut.grips + ' handles left');
+				report.ok(shut.pressed !== 'true', '...and the button stops reading as pressed');
 			}
 
 			// THE ARROW ON THE TAB. Its one hazard is real and invisible in a harness that calls the

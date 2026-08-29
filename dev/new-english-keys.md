@@ -12,10 +12,10 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**11 still to read**, of 103 untranslated keys, of 1428 English keys. A key already marked _Ruled OK_ below needs nothing from you —
+**12 still to read**, of 104 untranslated keys, of 1425 English keys. A key already marked _Ruled OK_ below needs nothing from you —
 the ruling lapses by itself if the wording changes.
 
-## lpn_  (103)
+## lpn_  (104)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -26,16 +26,18 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_demand_remove`**
   > Remove this demand
   _Ruled OK 2026-08-29._
+- **`lpn_elev_dem_none`**
+  > The DEM gave no height for this node.
 - **`lpn_elev_dem_said`**
   > Mapbox DEM says {v} {u}.
 - **`lpn_elev_dem_sample`**
-  > Sample Mapbox DEM
+  > Sample DEM
 - **`lpn_elev_dem_sample_tip`**
-  > Reads the height of the land under this node and shows it below. It changes nothing. Mapbox DEM is about 30 m across on most of the Earth, and finer where better data exists.
+  > Reads the height of the land under this node from Mapbox DEM and shows it below. It changes nothing. The data is about 30 m across on most of the Earth, and finer where better data exists.
 - **`lpn_elev_dem_use`**
-  > Use {v} {u}
+  > Use DEM
 - **`lpn_elev_dem_use_tip`**
-  > Puts the sampled height into the Elevation box above, replacing what is there. One Undo puts it back.
+  > Puts the height of the land under this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.
 - **`lpn_field_base_demand`**
   > Base demand
   _Ruled OK 2026-08-29._
