@@ -135,8 +135,26 @@ the block.
     that stated none, and `unit-change-harness.js` caught it as a non-destructive unit switch that
     was not byte-identical. `libPatternsRead()` is the pure half. **Look for the other getters
     shaped like this.**
-  - Not done and not attempted: water-quality `[OPTIONS]` (Quality, Diffusivity, Tolerance) are
-    still dropped on import, exactly as before. Net1 states all three.
+  - **THE WATER-QUALITY `[OPTIONS]` ARE CARRIED NOW (2026-08-29), and verbatim was the only
+    workable shape rather than merely the cheap one.** Net3 states `Quality Trace Lake` and Net1
+    `Quality Chlorine mg/L` — not numbers at all — and `String(parseFloat('1.0'))` is `'1'`, so a
+    parsed carry could not return the file's own token. They live in their own `qualityOptions`
+    bag, NOT in `settings.hydraulics`: that bag is numeric, is read by the Settings rows and by
+    the engine bridge, and already has a `tolerance` nearby — a water-quality `tolerance` beside
+    it is a trap for the next reader. No Settings row, on the emitter-exponent precedent.
+    `dev/lpn-spike/quality-options-harness.js` (24) round-trips Net1/2/3 byte-identically through
+    a deliberately dumber second reader, with the original `.inp` as the expectation.
+    - `lpn_inp_drop_quality` said the settings *"were left out"* and that went false the moment
+      they were carried — the `lpn_inp_drop_rules` regression again, one release later. It now
+      describes the SECTIONS, which genuinely are dropped. **Its 26 translations still carry the
+      old, false claim** and are a resync item. `lpn_inp_drop_quality_options` is the new
+      sentence and awaits Tom's wording.
+    - **The getter sweep this task asked for found two live call sites**, not none:
+      `buildPatternSection()` read through `libPatterns()` purely to test `.length` — and that is
+      a RENDER, so opening the Libraries box wrote `patterns: []` into a document stating none,
+      exactly the defect 553 fixed one call site short. `newSavedProfile()` was the second. Both
+      now read the pure twin. `fillBreaks()` matches the shape and is deliberately left: storing
+      the derived breaks is documented design.
 
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
@@ -778,6 +796,36 @@ the block.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
+  - **NINE MORE CHECKS LANDED 2026-08-29, taking the enforced count from 34 to 43** — survey rows
+    4, 5, 10, 15, 17, 18, 20, 24 and 25, each with a selftest, each blocking, each green on the
+    tree it landed on. Two found the same thing row 6 found: **the RULE was wrong.**
+    `lib/Language.Settings.php` told a contributor to register a language in a
+    `VALID_LANGUAGES` constant that does not exist anywhere in the suite; `$all_language_settings`
+    is the sole registry. **That is three prose rules in two sessions found to name a thing that
+    is not there, every one of them only by trying to execute it.**
+    - **Row 5 is the one that stops the drift recurring.** `check_all.sh` is what RUNS and this
+      file's table is what everybody READS, and nothing tied them: **eight checks ran unlisted**,
+      and the `php + js syntax` row had silently covered a third pass since the shell check was
+      added. Matched on script FILENAME, not on labels, so neither file has to be reworded to
+      please the other.
+    - Row 25 judges by PROVENANCE rather than by guessing what reads as explanatory: a title
+      equal to a tip-shaped `$ec_lang` value blocks, a title that NAMES its destination passes.
+      That is what lets `*_main_desc` on the main menu and `LANGNAME` in the switcher through
+      while catching the thing that is unreachable on touch.
+  - **AND THE RUNNER AUDIT THIS BLOCK ASKED FOR IS DONE — six of seven runners had the shape,
+    and TWO were real coverage holes rather than reporting weaknesses.** `social_card_check.php`
+    `continue`d silently past a page that renders no `<head>`, so **`consent.php` had never been
+    examined at all**; and `validate_epanet.js` ran `.filter(Boolean)` over a typed list of case
+    objects, so a case renamed in `cases.js` arrived as `undefined`, was dropped, and the run
+    simply got shorter with everything left passing. Neither would ever have shown up as a
+    failing run. Both harness runners also died on the FIRST failure under `set -e` and reported
+    no total; an empty glob now fails instead of reporting a clean run of nothing. Recorded as
+    row 3d and a per-runner table in `dev/enforceable-rules-survey.md`.
+  - **DONE 2026-08-29: the six orphan keys were deleted**, 162 strings across 27 files —
+    `lpn_settings_scope_project`, `_scope_calculator`, `_computation`, `_map_height_px`,
+    `_map_height_tip`, `_colors`. The orphan list is 2 now, and both are the canonical mode names
+    `mode_name_check.php` holds every other string to. **Row 3c's reachability walk is still
+    unwritten**, so the two dead terrain strings behind a dead reader are still invisible.
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
   recommendations."* `check_all.sh` reports these every run and nobody can act on them — and
   CLAUDE.md's own argument is that **a rule a machine enforces is worth roughly ten a human must
