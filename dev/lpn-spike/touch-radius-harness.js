@@ -18,10 +18,16 @@
 // ergonomics out of the DESKTOP design, so section 1 asserts the pointer's number is untouched, and
 // section 3 asserts a pointer press takes the same path it always did. The finger's number moving
 // is not a violation of that rule; the pointer's number moving would be.
+//
+// **SECTION 4 IS THE OTHER HALF OF THE SAME TASK.** Tom, 2026-08-30: *"dragging a node can be very
+// difficult"* on a phone. A TAP got the fallback above; a PRESS did not -- touchAssetNear() has one
+// call site and it is the pointerUP handler -- so a finger could OPEN a node it could not GRAB. It
+// asserts the GESTURE, driven through the real pointerdown/move/up handlers, because every number
+// section 1 checks was already right while the drag was still broken.
 
 'use strict';
 
-const { ROOT, loadLoopedNetwork, setUnitSet } = require('./lpn-dom-stub.js');
+const { ROOT, byId, loadLoopedNetwork, setUnitSet, setHitTarget } = require('./lpn-dom-stub.js');
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
@@ -30,6 +36,12 @@ const L = loadLoopedNetwork(
 	"\t\ttouchSlop: function () { return NODE_SNAP_TOUCH_PX; },\n" +
 	"\t\tslopFor: tapSlopPx,\n" +
 	"\t\ttouchAssetNear: touchAssetNear,\n" +
+	"\t\tgrabSlop: function () { return NODE_GRAB_TOUCH_PX; },\n" +
+	"\t\ttouchNodeGrabNear: touchNodeGrabNear,\n" +
+	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode,\n" +
+	"\t\tapplyDrag: function () { if (drag) { applyDrag(); } },\n" +
+	"\t\tselectedRef: selectedRef,\n" +
+	"\t\tdragNow: function () { return drag ? { type: drag.type, id: drag.id } : null; },\n" +
 	"\t\tnearNode: nearestNodeNearScreen,\n" +
 	"\t\tworldToScreen: worldToScreen,\n" +
 	"\t\tsetScale: function (s) { state.s = s; state.tx = 0; state.ty = 0; },\n" +
@@ -128,6 +140,85 @@ console.log('\n--- "any asset, not just a new asset" ---');
 	// nothing; it must never invent one out in the open, or panning becomes impossible on a phone.
 	const far = L.worldToScreen(350, 500);
 	ok('a press in open space still finds nothing', !L.touchAssetNear(far.x, far.y));
+}
+
+// ---------------------------------------------------------------------------
+// 4. THE GESTURE, not the number: a finger must be able to GRAB a node, and a
+//    pan must survive. Driven through the real pointerdown/move/up handlers,
+//    because the defect lived in the wiring -- touchAssetNear() was already
+//    correct and reachable, from the pointerUP path alone.
+// ---------------------------------------------------------------------------
+console.log('\n--- a press, not a tap: grabbing a node with a finger ---');
+{
+	ok('the grab radius is smaller than the tap radius', L.grabSlop() < L.touchSlop(),
+		L.grabSlop() + ' < ' + L.touchSlop());
+
+	byId.lpn_toolbar.querySelectorAll = function () { return []; };
+	L.seedDefaultInputs();
+	const doc = L.getDoc();
+	doc.nodes.length = 0; doc.links.length = 0; doc.labels.length = 0;
+	L.buildDom();
+	L.buildLayers();
+	L.setScale(1);
+	L.wirePointerEvents();
+	L.setMode('select');
+	const svg = byId.lpn_canvas;
+	const a = L.addNode('junction', 200, 200).id;
+	L.addNode('junction', 500, 200);
+	const at = L.worldToScreen(200, 200);
+
+	// BARE MAP under the pointer, every time. That is the whole premise: the browser's own hit test
+	// finds nothing (a junction is drawn 7px across), and the question is what the page does next.
+	function fire(type, ev) { setHitTarget(null); (svg._listeners[type] || []).forEach(function (fn) { fn(ev); }); }
+	function press(kind, x, y) {
+		fire('pointerdown', { pointerId: 9, clientX: x, clientY: y, pointerType: kind, button: 0 });
+		return L.dragNow();
+	}
+	function release(x, y) { fire('pointerup', { pointerId: 9, clientX: x, clientY: y, pointerType: 'touch' }); }
+
+	const near = press('touch', at.x + 12, at.y);
+	ok('a finger pressing 12px from a junction begins a NODE drag',
+		!!near && near.type === 'node' && near.id === a, near && (near.type + ' ' + near.id));
+	// **AND THE PROMOTED NODE IS THE SELECTED ONE** -- the Task 415 rule, on a touch near-miss drag.
+	const selDuring = L.selectedRef();
+	ok('...and that node is selected on the DOWN stroke, before any movement',
+		!!selDuring && selDuring.kind === 'node' && selDuring.id === a,
+		selDuring && (selDuring.kind + ' ' + selDuring.id));
+	// It really moves the node, through the page's own applyDrag -- not just a record that says so.
+	fire('pointermove', { pointerId: 9, clientX: at.x + 62, clientY: at.y, pointerType: 'touch' });
+	L.applyDrag();
+	const moved = doc.nodes.filter(function (n) { return n.id === a; })[0];
+	ok('...and moving the finger 50px moves the node 50 world units', Math.round(moved.x) === 250,
+		moved.x);
+	release(at.x + 62, at.y);
+	ok('the drag ends on release', L.dragNow() === null);
+
+	// THE POINTER PATH IS UNTOUCHED. The identical press from a mouse still pans, which is what
+	// makes this a touch fix rather than a change to the desktop map.
+	const byMouse = press('mouse', at.x + 12, at.y);
+	ok('the IDENTICAL press from a mouse still pans',
+		!!byMouse && byMouse.type === 'pan', byMouse && byMouse.type);
+	release(at.x + 12, at.y);
+
+	// **A PAN INSIDE THE TAP RADIUS BUT OUTSIDE THE GRAB RADIUS STILL PANS.** This is the price of
+	// the two numbers being different and it is the assertion that records it: 20px from a junction
+	// a TAP opens that junction (section 3) and a PRESS pans.
+	const between = press('touch', at.x + 20, at.y);
+	ok('a finger pressing 20px away -- inside the tap radius, outside the grab -- PANS',
+		!!between && between.type === 'pan', between && between.type);
+	release(at.x + 20, at.y);
+
+	// And out in the open, nothing has changed at all: panning is how an off-screen part of the
+	// network is reached, and it must stay reachable from anywhere that is not a node.
+	const far = press('touch', at.x, at.y + 120);
+	ok('a finger pressing far from every node still pans',
+		!!far && far.type === 'pan', far && far.type);
+	release(at.x, at.y + 120);
+
+	// The helper itself is nodes-only: a pipe is a stroke with a halo and is already finger-sized,
+	// and a grab corridor down every pipe is exactly where a pan most needs to start.
+	const mid = L.worldToScreen(350, 200);
+	ok('the grab fallback offers no LINK, only nodes', !L.touchNodeGrabNear(mid.x, mid.y));
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');

@@ -3326,6 +3326,25 @@ var EngCalcs = EngCalcs || {};
 	// guidelines settle on for a finger, and 1.7x the pointer's. Screen pixels, like its sibling, so
 	// the target is a constant physical size at every zoom.
 	var NODE_SNAP_TOUCH_PX = 24;
+	// **A FINGER GRABS A NODE TO DRAG IT AT THE POINTER'S RADIUS, NOT THE TAP'S** (Task 417). Tom,
+	// 2026-08-30: *"dragging a node can be very difficult"* on a phone -- and the measurement is that
+	// a junction is drawn `settings.symbolSize` = 7 screen pixels across, so with HIT_SLOP_PX = 2 the
+	// whole target was a disc about 11 px wide. A tap already escaped that through touchAssetNear();
+	// a PRESS never did, because the pointerdown handler below reads mapHitAt() alone.
+	//
+	// **A GRAB AND A TAP GET DIFFERENT NUMBERS BECAUSE ONLY A GRAB HAS A RIVAL.** A tap on bare map
+	// does nothing, so a near miss promoted to a hit costs nothing and takes the full 24. A PRESS on
+	// bare map starts a PAN -- how an off-screen part of the network is reached -- so every pixel of
+	// this radius is a pixel where panning becomes impossible, and the two failures are not equal: a
+	// grab that misses just pans and is retried, while a pan that steals a node moves the document.
+	// So the grab takes the pointer's own 14, separately named because it is answering its own
+	// question and will be re-tuned on its own.
+	//
+	// Rejected: deciding on MOVEMENT instead of at press time. A pan and a node drag are the same
+	// gesture -- press, then travel -- so there is no later moment at which they can be told apart;
+	// any threshold would be a guess dressed up as a measurement. Rejected too: long press, which
+	// Tom struck (*"we don't want non-parallel UX"*) and which PROFILE_HOLD_MS already spends.
+	var NODE_GRAB_TOUCH_PX = 14;
 	// The slop this gesture deserves. `pointerType` is the only honest source -- a device with both
 	// a mouse and a screen answers per press, where a media query answers once for the machine.
 	function tapSlopPx(e) {
@@ -3372,6 +3391,22 @@ var EngCalcs = EngCalcs || {};
 		l = nearestLinkNearScreen(cx, cy, NODE_SNAP_TOUCH_PX);
 		if (l && linkEls[l.link.id]) { return linkEls[l.link.id].line; }
 		return null;
+	}
+	// The node a FINGER meant to GRAB, when the real hit test found bare map (Task 417). Same shape
+	// and same safety property as touchAssetNear() above -- touch only, and only where the browser
+	// found nothing, so it can add a hit and never overrule one -- and two deliberate narrowings.
+	//
+	// NODES ONLY. Tom's scope is his own (*"A long press starts a node drag. Nothing else."*), and
+	// the measurement agrees: a label and a link label are drawn TEXT, a pipe is a stroke with a
+	// halo, and all of them are already fat enough for a finger -- he dragged a label on a phone
+	// and it worked. A node is a 7 px dot and is the only thing here that is too small. Widening
+	// this to links would also lay a grab corridor down every pipe on the map, which is where a pan
+	// most needs to start.
+	//
+	// AND AT NODE_GRAB_TOUCH_PX, not the tap's radius -- see that constant for why.
+	function touchNodeGrabNear(cx, cy) {
+		var n = nearestNodeNearScreen(cx, cy, NODE_GRAB_TOUCH_PX);
+		return (n && nodeEls[n.id]) ? nodeEls[n.id].circle : null;
 	}
 	function nearestNodeNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, n, dPx;
@@ -18433,6 +18468,14 @@ var EngCalcs = EngCalcs || {};
 			// and touching nothing clears. DOWN, not on the tap: a drag never becomes a tap (it fails
 			// the 4px threshold), so a user who nudged J2 and then pressed Delete would otherwise
 			// delete whatever was selected before -- an element they were not looking at.
+			// **AND ON A FINGER, A NEAR MISS ON A NODE GRABS IT** (Task 417): a touch press that the
+			// browser answered with bare map, within NODE_GRAB_TOUCH_PX of a node, drags that node
+			// instead of panning. Touch only, so no pointer gesture changes at all; and ABOVE
+			// selectFromHit(), so the promoted node is what gets selected -- the pointerdown-selects
+			// rule of Task 415 stays true of a near-miss drag exactly as it is of a direct one.
+			if (t === svg && e.pointerType === 'touch') {
+				t = touchNodeGrabNear(e.clientX, e.clientY) || t;
+			}
 			selectFromHit(t);
 			if (t.dataset.node) {
 				var n = nodeById(t.dataset.node), w0 = screenToWorld(e.clientX, e.clientY);
