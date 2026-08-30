@@ -468,7 +468,12 @@
 		"legendPosition": "top-right",
 		"labelReadabilityBias": 110,
 		"mapHeight": 900,
-		"method": "hw"
+		"method": "hw",
+		"qualityOptions": {
+			"quality": "Chlorine mg/L",
+			"diffusivity": "1.0",
+			"tolerance": "0.01"
+		}
 	},
 	"view": {
 		"cx": 37.91264639576522,
@@ -561,5 +566,39 @@
 				"value": "140"
 			}
 		}
-	]
+	],
+	"inpSections": {
+		"ENERGY": [
+			" Global Efficiency  \t75",
+			" Global Price       \t0.0",
+			" Demand Charge      \t0.0"
+		],
+		"QUALITY": [
+			" 10              \t0.5",
+			" 11              \t0.5",
+			" 12              \t0.5",
+			" 13              \t0.5",
+			" 21              \t0.5",
+			" 22              \t0.5",
+			" 23              \t0.5",
+			" 31              \t0.5",
+			" 32              \t0.5",
+			" 9               \t1.0",
+			" 2               \t1.0"
+		],
+		"REACTIONS": [
+			" Order Bulk            \t1",
+			" Order Tank            \t1",
+			" Order Wall            \t1",
+			" Global Bulk           \t-.5",
+			" Global Wall           \t-1",
+			" Limiting Potential    \t0.0",
+			" Roughness Correlation \t0.0"
+		],
+		"REPORT": [
+			" Status             \tYes",
+			" Summary            \tNo",
+			" Page               \t0"
+		]
+	}
 }

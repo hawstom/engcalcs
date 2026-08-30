@@ -2640,7 +2640,12 @@
 		"colorBreaks": {},
 		"labelReadabilityBias": 110,
 		"mapHeight": 500,
-		"method": "hw"
+		"method": "hw",
+		"qualityOptions": {
+			"quality": "Trace Lake",
+			"diffusivity": "1.0",
+			"tolerance": "0.01"
+		}
 	},
 	"view": {
 		"cx": 24.950587253973133,
@@ -2933,5 +2938,26 @@
 				"value": "19.1"
 			}
 		}
-	]
+	],
+	"inpSections": {
+		"ENERGY": [
+			" Global Efficiency  \t75",
+			" Global Price       \t0.0",
+			" Demand Charge      \t0.0"
+		],
+		"REACTIONS": [
+			" Order Bulk            \t1",
+			" Order Tank            \t1",
+			" Order Wall            \t1",
+			" Global Bulk           \t0.0",
+			" Global Wall           \t0.0",
+			" Limiting Potential    \t0.0",
+			" Roughness Correlation \t0.0"
+		],
+		"REPORT": [
+			" Status             \tYes",
+			" Summary            \tNo",
+			" Page               \t0"
+		]
+	}
 }

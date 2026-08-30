@@ -32,6 +32,21 @@ names, real coordinates, base maps and fire-flow results. `Estrellas-*` and
 The whitelist line you add IS the publication decision, and it shows up in the diff where someone
 can see it.
 
+**The EPA three carry what their own `.inp` states, and are REFRESHED SURGICALLY.** `Net1`, `Net2`
+and `Net3` are stored projects, so they do not gain a feature the day the importer does — they
+carried no `Quality` option for as long as that carry existed, and the first person to notice was
+Tom exporting one. They were topped up in place on 2026-08-29 with `settings.qualityOptions` and the
+`inpSections` bag (`[ENERGY]`, `[QUALITY]`, `[SOURCES]`, `[REACTIONS]`, `[REPORT]` as each file
+states them), and `dev/lpn-spike/section-carry-harness.js` §6 now asserts a shipped example against
+its own source `.inp` so the gap cannot reopen quietly.
+
+**Do NOT close that gap by regenerating from the `.inp`.** `Net2` and `Net3` carry a backdrop an
+`.inp` cannot hold at all, and `Net1` carries hand-placed label offsets; an import would drop both.
+**What is still missing on purpose is `settings.hydraulics`** — the eight `[OPTIONS]` Task 553 added.
+Adding `Accuracy 0.001` there would loosen these examples' solve from our own 1e-9
+(`solveAccuracy()`), which is a change to what the gallery COMPUTES and is Tom's call, not a
+drive-by.
+
 **Version drift is expected and harmless.** `Net2` and `Net3` are `v: 4`; `Net1` and Elm Street
 are `v: 6`. `applySaved()` merges an older document onto current defaults, so all four open
 correctly. Re-saving one from the page will float it to the current version — fine, but do it
