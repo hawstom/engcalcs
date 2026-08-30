@@ -1143,6 +1143,27 @@ the block.
       screen — a touchscreen laptop at 1400px has a finger, a phone with a stylus does not — so a
       width-keyed assertion would prove something the code does not do.
       `dev/lpn-spike/touch-radius-harness.js` (14) states that in its own header.
+  - **[H] AND THEN WITHDRAWN THE SAME DAY — THE LONG-PRESS HALF HAS NO SYMPTOM.** Tom, 2026-08-30:
+    *"To be honest, I am confused. (1) we don't want non-parallel UX about. (2) I can't remember
+    exactly why I identified that we might want long press. I just tried dragging a label and a
+    node on my phone, and they both worked, and I suppose that's without long press."*
+    **Direct drag already works for both, so there is nothing for a long press to enable.**
+    - **AND HIS (1) IS THE ARGUMENT AGAINST BUILDING IT AT ALL, not merely a preference.** Adding
+      long-press-to-drag would give ONE action TWO gestures. Worse, **long press already means
+      something else on this page**: `PROFILE_HOLD_MS` (450 ms) commits a stop while the path
+      chooser is running (`js/looped-network.js:11645`), and that comment already records Task
+      417 as a collision that only avoids happening because the chooser suppresses element
+      drags. A second meaning for the same press is the non-parallel UX he is objecting to,
+      arriving by the door he was trying to close.
+    - **The half that was real SHIPPED 2026-08-28** — the touch radius, which is what his own
+      2026-08-25 note actually asked for.
+    - **[H] ONE TESTABLE RESIDUE, and it is NOT parked — it is unverified.** The original 2026
+      framing was never about enabling the drag; it was that the guard which switches to Edit
+      mode on a click does not fire when a press BEGINS A DRAG, so a touch user who drags an
+      element is editing one the page does not think is selected. **Nobody has checked whether
+      that is still true now that the drag works.** Do not close this task on the assumption that
+      it is fine — that is the shape of the Net3 mistake made on 2026-08-30, where a diagnosis
+      was asserted without being run. Test it, then close or split it.
   - **NARROWED FURTHER 2026-08-30, and this is the whole scope:** *"The only testing I did on
     long-press was an attempt to drag a node. Long press doesn't factor into anything else."*
     **A long press starts a node drag. Nothing else.** Do not generalise it to links, to labels,
