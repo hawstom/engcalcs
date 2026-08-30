@@ -317,7 +317,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
   'lpn_set_hydraulics_fields', 'lpn_set_page_fields', 'lpn_set_time_fields',
   // The credits footer, below every section rather than inside one (Tom, 2026-08-19).
-  'lpn_set_ramp_credits'
+  'lpn_set_ramp_credits',
+  // The fire flow box and its two hosts (ROADMAP Task 530). Absent from this list,
+  // buildFireFlowControls() and rebuildFireFlowReport() return at their first line and the whole
+  // box -- the criteria, the Run button, both reports -- is invisible to every harness.
+  'lpn_ff_box', 'lpn_ff_close', 'lpn_ff_controls', 'lpn_ff_report'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the
@@ -606,6 +610,11 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-profile.js'));
 // degrade to the five fallback stops and every assertion about a 7-class ramp would pass on the
 // wrong thing.
 require(ROOT + 'js/lpn-ramps.js');
+// The fire flow sweep (ROADMAP Task 530). Same argument as lpn-ramps.js above: it installs itself
+// on globalThis.EngCalcs exactly as its <script> tag does, and without it every fire-flow path in
+// looped-network.js falls through its `EngCalcs.lpnFireFlow*` guards and a harness would pass on a
+// feature that had quietly turned itself off.
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-fireflow.js'));
 
 // ---- the REAL EPANET engine (ROADMAP Task 496) ---------------------------
 //
