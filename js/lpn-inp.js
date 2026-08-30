@@ -311,7 +311,7 @@
 		// the source file never made, and it would fail the byte-identity test the round trip is
 		// held to.
 		var flowKey = 'GPM', headloss = 'H-W', emitterExponent = 0.5, demandMultiplier = 1,
-			defaultPattern = null, hydraulics = {}, rows, r;
+			defaultPattern = null, hydraulics = {}, qualityOptions = {}, rows, r;
 		rows = rawSections.OPTIONS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
@@ -357,7 +357,35 @@
 			// the second of the two bugs recorded in dev/lpn-spike/net3-vs-epanet-report.js's
 			// header, and it cost 13% of flow.
 			else if (key === 'PATTERN' && r[1]) { defaultPattern = r[1]; }
+			// **THE THREE WATER-QUALITY OPTIONS, CARRIED AS THE FILE'S OWN CHARACTERS.** Net1 states
+			// `Quality Chlorine mg/L`, `Diffusivity 1.0` and `Tolerance 0.01`, and every one of them
+			// was read past in silence until now -- so a file stating them came back out of the
+			// exporter stating none, which is the input-file-is-canonical rule broken in exactly the
+			// way the rest of `[OPTIONS]` was under Task 553.
+			//
+			// **VERBATIM, NOT PARSED, AND THAT IS THE CHEAP CORRECT ANSWER.** CLAUDE.md's rule is
+			// that a unit is a LABEL and a MAGNITUDE with different requirements: a magnitude is
+			// only needed by a SOLVE, and no solve on this page reads any of these three. So they
+			// are carried as text and never as numbers, which also happens to be the only form that
+			// round-trips -- `Quality Trace Lake` (Net3) is not a number at all, and `String(1.0)`
+			// is `'1'`, so a parsed `Diffusivity` could not come back as the file wrote it.
+			// One value, one string: `Quality` takes the rest of the line because its value is two
+			// tokens (a chemical and its unit, or TRACE and a node id) and the pair is one fact.
+			else if (key === 'QUALITY' && r[1]) { qualityOptions.quality = r.slice(1).join(' '); }
+			else if (key === 'DIFFUSIVITY' && r[1]) { qualityOptions.diffusivity = r[1]; }
+			else if (key === 'TOLERANCE' && r[1]) { qualityOptions.tolerance = r[1]; }
 		}
+		// **CARRYING A THING AND TELLING THE USER ABOUT IT ARE TWO JOBS** (Task 248.03's lesson,
+		// recorded there after `[RULES]` stopped being reported the moment it started being kept).
+		// These three are kept and written back, and they are still a difference: nothing on this
+		// page acts on them, so a network whose chlorine decays is not being modelled here. The
+		// sentence says both halves, and it is a different sentence from the one about the
+		// water-quality SECTIONS -- [QUALITY], [REACTIONS], [SOURCES], [MIXING] -- which really are
+		// dropped.
+		if (Object.keys(qualityOptions).length) {
+			drop('quality-options', [], Object.keys(qualityOptions).length);
+		}
+
 		var fu = FLOW_UNITS[flowKey];
 		if (!fu) { drop('unknown-flow-units', [], flowKey); fu = FLOW_UNITS.GPM; flowKey = 'GPM'; }
 		var us = fu.system === 'us',
@@ -1040,6 +1068,9 @@
 			// Every [OPTIONS] key this file stated that is not the flow unit, the head-loss formula
 			// or the default pattern -- sparse, so absent is "the file did not say" (Task 553).
 			hydraulics: hydraulics,
+			// The three water-quality `[OPTIONS]`, as the file's own text. Sparse on the same rule
+			// as `hydraulics`: absent means the file did not say it, so the exporter writes nothing.
+			qualityOptions: qualityOptions,
 			// [RULES], verbatim, one string per line (Task 248.03). Empty for a file with none, so
 			// no caller has to test for absence.
 			rules: ruleLines,
@@ -1244,6 +1275,22 @@
 		['viscosity', 'Viscosity'], ['specificGravity', 'Specific Gravity'],
 		['demandMultiplier', 'Demand Multiplier'], ['statusReport', 'Status']
 	];
+	// The water-quality half of the same list, in EPANET's own spelling and order, and STRINGS all
+	// the way through: these are carried, never computed with, so nothing ever turns one into a
+	// number and back (`Diffusivity 1.0` would come back as `1`, and `Quality Trace Lake` is not a
+	// number at all).
+	var LPN_QUAL_LINES = [
+		['quality', 'Quality'], ['diffusivity', 'Diffusivity'], ['tolerance', 'Tolerance']
+	];
+	function qualityOptionRows(qual, row) {
+		var q = qual || {}, out = '';
+		LPN_QUAL_LINES.forEach(function (pair) {
+			if (q[pair[0]] === undefined || q[pair[0]] === null || q[pair[0]] === '') { return; }
+			out += row([pair[1], String(q[pair[0]])]) + '\n';
+		});
+		return out;
+	}
+
 	function hydraulicOptionRows(hyd, row) {
 		var h = hyd || {}, out = '';
 		LPN_OPT_LINES.forEach(function (pair) {
@@ -1732,7 +1779,12 @@
 			// list is sparse -- see the importer's own note -- so a key absent here means the file
 			// did not state it and neither do we. That is what keeps a round trip byte-identical:
 			// EPANET's defaults written out explicitly would be eleven lines the source never had.
-			hydraulicOptionRows(settings.hydraulics, row) + '\n' +
+			hydraulicOptionRows(settings.hydraulics, row) +
+			// **THE WATER-QUALITY OPTIONS GO BACK OUT AS THE TEXT THEY CAME IN AS**, last, which is
+			// where EPANET's own writer puts them. Nothing here computes with them, so the file's
+			// own characters are the only honest form -- see the importer's note. Sparse in, sparse
+			// out: a document holding none writes none.
+			qualityOptionRows(settings.qualityOptions, row) + '\n' +
 			section('COORDINATES', coords) +
 			section('VERTICES', verts) +
 			section('LABELS', labelRows) +

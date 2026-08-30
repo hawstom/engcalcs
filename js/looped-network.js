@@ -2845,6 +2845,12 @@ var EngCalcs = EngCalcs || {};
 			// writes nothing -- the same rule `defaultPattern` has always followed. `settings` is
 			// serialized WITH the project, so this round-trips without a line anywhere else.
 			hydraulics: {},
+			// **THE THREE WATER-QUALITY `[OPTIONS]`, AS THE FILE'S OWN TEXT** -- Quality,
+			// Diffusivity and Tolerance. Sparse exactly as `hydraulics` is, and STRINGS rather than
+			// numbers: nothing here solves with them, so they are carried and written back
+			// verbatim, which is the only form `Diffusivity 1.0` and `Quality Trace Lake` both
+			// survive. No control, on the emitter-exponent precedent.
+			qualityOptions: {},
 			// **`tolerance` IS DEPRECATED AND IS NO LONGER SEEDED HERE** (2026-08-28). EPANET's
 			// `Accuracy` replaced it; solveAccuracy() still READS it so a project saved before the
 			// change keeps its own number, but a new project no longer carries the field at all.
@@ -11513,7 +11519,9 @@ var EngCalcs = EngCalcs || {};
 		renderProfile();
 	}
 	function newSavedProfile() {
-		var pc = EngCalcs.pageConfig || {}, list = savedProfiles(), stops, suggested, v, p;
+		// READ through savedProfilesRead(): the only thing wanted here is the count for the
+		// suggested name, and this function can still return without saving anything.
+		var pc = EngCalcs.pageConfig || {}, list = savedProfilesRead(), stops, suggested, v, p;
 		// The path now on the drawing is what gets a name, so there has to be one. Said out loud
 		// rather than offered and then silently saving nothing.
 		stops = profileStops().filter(function (id) { return !!id; });
@@ -14490,6 +14498,7 @@ var EngCalcs = EngCalcs || {};
 			settings: (function () {
 				var s = JSON.parse(JSON.stringify(settings));
 				s.hydraulics = parsed.hydraulics || {};
+				s.qualityOptions = parsed.qualityOptions || {};
 				if (s.hydraulics.emitterExponent !== undefined) { s.emitterExponent = s.hydraulics.emitterExponent; }
 				return s;
 			}()),
@@ -14564,7 +14573,10 @@ var EngCalcs = EngCalcs || {};
 			case 'reactions':
 			case 'sources':
 			case 'mixing':
-			case 'energy': return pc.lpn_inp_drop_quality || 'Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.';
+			case 'energy': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels, or what the pumps cost to run. That part was left out. This page solves flow and pressure only.';
+			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
+			// trip, and nothing on this page acts on them.
+			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.';
 			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain it. Add the picture yourself with Map, Backdrop.';
 			case 'dangling-link': return pc.lpn_inp_drop_dangling || 'These pipes name a junction that is not in the file, so they were left out.';
 			// OUR VOCABULARY, NOT EPANET'S: what EPANET calls a Label is our Text object, so the
@@ -21971,7 +21983,10 @@ var EngCalcs = EngCalcs || {};
 		sel.value = value || '';
 	}
 	function buildPatternSection(host) {
-		var pc = EngCalcs.pageConfig || {}, list = libPatterns();
+		// READ through libPatternsRead(). This is a RENDER -- the Libraries box rebuilds whenever it
+		// is opened -- and the materialising getter here wrote `patterns: []` into a document that
+		// stated none, which is the defect Task 553 found and fixed one call site short.
+		var pc = EngCalcs.pageConfig || {}, list = libPatternsRead();
 		host.appendChild(libButton(pc.lpn_library_pattern_add || 'Add a pattern', function () {
 			saveUndoSnapshot();
 			// A NEW PATTERN IS A FLAT DAY, not an empty list: 24 ones on the default hourly step is
