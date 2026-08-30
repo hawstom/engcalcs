@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 1483,
-        "delta_key_count": 168,
+        "expected_key_count": 1491,
+        "delta_key_count": 176,
         "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
@@ -574,11 +574,12 @@
         "lpn_ff_minpressure_tip": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
         "lpn_ff_maxvelocity": "Highest velocity allowed",
         "lpn_ff_maxvelocity_tip": "A pipe running above this while a fire flow is drawn is reported as a design issue.",
-        "lpn_ff_accounting": "The flow is drawn at the junction itself. No hydrant, lateral or fitting loss is included, so a real hydrant on a real lateral delivers less than these numbers say.",
-        "lpn_ff_engine_native": "This will be worked out with the built-in solver.",
-        "lpn_ff_engine_epanet": "This will be worked out with the EPANET engine.",
+        "lpn_ff_accounting": "Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.",
+        "lpn_ff_engine_native": "This is worked out with the built-in solver.",
+        "lpn_ff_engine_epanet": "This is worked out with the EPANET engine.",
         "lpn_ff_engine_cost": "Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.",
-        "lpn_ff_steady": "One condition is tested, the one now on the clock. Fire flow is normally loaded onto maximum day demand and read as a single steady condition.",
+        "lpn_ff_steady": "Only the current time step is tested. Fire flow is normally added to maximum day demand.",
+        "lpn_ff_run_title": "Fire flow run",
         "lpn_ff_calculate": "Run",
         "lpn_ff_stop": "Stop",
         "lpn_ff_working": "Working: {done} of {total} junctions.",
@@ -587,13 +588,20 @@
         "lpn_ff_stale": "The drawing changed, so the fire flow results were cleared. Run it again.",
         "lpn_ff_summary": "{pass} passing, {fail} failing, {design} with a design issue.",
         "lpn_ff_summary_error": "{n} could not be answered.",
-        "lpn_ff_report_available": "Available against required",
-        "lpn_ff_report_design": "Effect on the rest of the system",
+        "lpn_ff_report_all": "Every junction tested",
         "lpn_ff_col_junction": "Junction",
+        "lpn_ff_col_static": "Rest pressure",
         "lpn_ff_col_available": "Available",
         "lpn_ff_col_required": "Required",
+        "lpn_ff_col_residual": "Residual held",
+        "lpn_ff_col_atrequired": "Pressure at required",
+        "lpn_ff_col_affected": "Pulled down",
+        "lpn_ff_col_limit": "Design limit",
+        "lpn_ff_col_solves": "Solves",
         "lpn_ff_col_result": "Result",
-        "lpn_ff_col_affected": "What it pulls down",
+        "lpn_ff_limit_pressure": "Pressure",
+        "lpn_ff_limit_velocity": "Velocity",
+        "lpn_ff_limit_both": "Pressure and velocity",
         "lpn_ff_state_pass": "Passing",
         "lpn_ff_state_fail": "Failing",
         "lpn_ff_state_design": "Design issue",
@@ -744,11 +752,12 @@
         "lpn_ff_minpressure_tip": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
         "lpn_ff_maxvelocity": "Highest velocity allowed",
         "lpn_ff_maxvelocity_tip": "A pipe running above this while a fire flow is drawn is reported as a design issue.",
-        "lpn_ff_accounting": "The flow is drawn at the junction itself. No hydrant, lateral or fitting loss is included, so a real hydrant on a real lateral delivers less than these numbers say.",
-        "lpn_ff_engine_native": "This will be worked out with the built-in solver.",
-        "lpn_ff_engine_epanet": "This will be worked out with the EPANET engine.",
+        "lpn_ff_accounting": "Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.",
+        "lpn_ff_engine_native": "This is worked out with the built-in solver.",
+        "lpn_ff_engine_epanet": "This is worked out with the EPANET engine.",
         "lpn_ff_engine_cost": "Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.",
-        "lpn_ff_steady": "One condition is tested, the one now on the clock. Fire flow is normally loaded onto maximum day demand and read as a single steady condition.",
+        "lpn_ff_steady": "Only the current time step is tested. Fire flow is normally added to maximum day demand.",
+        "lpn_ff_run_title": "Fire flow run",
         "lpn_ff_calculate": "Run",
         "lpn_ff_stop": "Stop",
         "lpn_ff_working": "Working: {done} of {total} junctions.",
@@ -757,13 +766,20 @@
         "lpn_ff_stale": "The drawing changed, so the fire flow results were cleared. Run it again.",
         "lpn_ff_summary": "{pass} passing, {fail} failing, {design} with a design issue.",
         "lpn_ff_summary_error": "{n} could not be answered.",
-        "lpn_ff_report_available": "Available against required",
-        "lpn_ff_report_design": "Effect on the rest of the system",
+        "lpn_ff_report_all": "Every junction tested",
         "lpn_ff_col_junction": "Junction",
+        "lpn_ff_col_static": "Rest pressure",
         "lpn_ff_col_available": "Available",
         "lpn_ff_col_required": "Required",
+        "lpn_ff_col_residual": "Residual held",
+        "lpn_ff_col_atrequired": "Pressure at required",
+        "lpn_ff_col_affected": "Pulled down",
+        "lpn_ff_col_limit": "Design limit",
+        "lpn_ff_col_solves": "Solves",
         "lpn_ff_col_result": "Result",
-        "lpn_ff_col_affected": "What it pulls down",
+        "lpn_ff_limit_pressure": "Pressure",
+        "lpn_ff_limit_velocity": "Velocity",
+        "lpn_ff_limit_both": "Pressure and velocity",
         "lpn_ff_state_pass": "Passing",
         "lpn_ff_state_fail": "Failing",
         "lpn_ff_state_design": "Design issue",
@@ -2842,6 +2858,18 @@
                 "next_translated": null
             }
         },
+        "lpn_ff_run_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочица(е) терена није одговорило.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
         "lpn_ff_calculate": {
             "reason": "missing",
             "current_value": null,
@@ -2938,19 +2966,7 @@
                 "next_translated": null
             }
         },
-        "lpn_ff_report_available": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_terrain_partial",
-                    "value": "{f} плочица(е) терена није одговорило.",
-                    "english": "{f} terrain tile(s) did not answer."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_ff_report_design": {
+        "lpn_ff_report_all": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2963,6 +2979,18 @@
             }
         },
         "lpn_ff_col_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочица(е) терена није одговорило.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_col_static": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2998,7 +3026,19 @@
                 "next_translated": null
             }
         },
-        "lpn_ff_col_result": {
+        "lpn_ff_col_residual": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочица(е) терена није одговорило.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_col_atrequired": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3011,6 +3051,78 @@
             }
         },
         "lpn_ff_col_affected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочица(е) терена није одговорило.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_col_limit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочица(е) терена није одговорило.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_col_solves": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочица(е) терена није одговорило.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_col_result": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочица(е) терена није одговорило.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_limit_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочица(е) терена није одговорило.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_limit_velocity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} плочица(е) терена није одговорило.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_limit_both": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

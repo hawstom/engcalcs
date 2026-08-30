@@ -12,10 +12,10 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**76 still to read**, of 168 untranslated keys, of 1483 English keys. A key already marked _Ruled OK_ below needs nothing from you —
+**84 still to read**, of 176 untranslated keys, of 1491 English keys. A key already marked _Ruled OK_ below needs nothing from you —
 the ruling lapses by itself if the wording changes.
 
-## lpn_  (168)
+## lpn_  (176)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -39,7 +39,7 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_elev_dem_use_tip`**
   > Puts the height of the land under this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.
 - **`lpn_ff_accounting`**
-  > The flow is drawn at the junction itself. No hydrant, lateral or fitting loss is included, so a real hydrant on a real lateral delivers less than these numbers say.
+  > Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.
 - **`lpn_ff_affect_link`**
   > {id} at {velocity}
 - **`lpn_ff_affect_node`**
@@ -49,15 +49,25 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_ff_calculate`**
   > Run
 - **`lpn_ff_col_affected`**
-  > What it pulls down
+  > Pulled down
+- **`lpn_ff_col_atrequired`**
+  > Pressure at required
 - **`lpn_ff_col_available`**
   > Available
 - **`lpn_ff_col_junction`**
   > Junction
+- **`lpn_ff_col_limit`**
+  > Design limit
 - **`lpn_ff_col_required`**
   > Required
+- **`lpn_ff_col_residual`**
+  > Residual held
 - **`lpn_ff_col_result`**
   > Result
+- **`lpn_ff_col_solves`**
+  > Solves
+- **`lpn_ff_col_static`**
+  > Rest pressure
 - **`lpn_ff_cost`**
   > {solves} network solves.
 - **`lpn_ff_design`**
@@ -77,9 +87,9 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_ff_engine_cost`**
   > Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.
 - **`lpn_ff_engine_epanet`**
-  > This will be worked out with the EPANET engine.
+  > This is worked out with the EPANET engine.
 - **`lpn_ff_engine_native`**
-  > This will be worked out with the built-in solver.
+  > This is worked out with the built-in solver.
 - **`lpn_ff_err_at_rest`**
   > Already below the residual with nothing drawn
 - **`lpn_ff_err_converge`**
@@ -94,6 +104,12 @@ the ruling lapses by itself if the wording changes.
   > Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.
 - **`lpn_ff_iso`**
   > ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.
+- **`lpn_ff_limit_both`**
+  > Pressure and velocity
+- **`lpn_ff_limit_pressure`**
+  > Pressure
+- **`lpn_ff_limit_velocity`**
+  > Velocity
 - **`lpn_ff_maxvelocity`**
   > Highest velocity allowed
 - **`lpn_ff_maxvelocity_tip`**
@@ -112,10 +128,8 @@ the ruling lapses by itself if the wording changes.
   > This project has no junctions yet, so there is nothing to test.
 - **`lpn_ff_no_selection`**
   > No junction is selected. Choose one on the map, or test every junction.
-- **`lpn_ff_report_available`**
-  > Available against required
-- **`lpn_ff_report_design`**
-  > Effect on the rest of the system
+- **`lpn_ff_report_all`**
+  > Every junction tested
 - **`lpn_ff_required`**
   > Required fire flow
 - **`lpn_ff_required_tip`**
@@ -124,6 +138,8 @@ the ruling lapses by itself if the wording changes.
   > Residual pressure to hold
 - **`lpn_ff_residual_tip`**
   > 20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.
+- **`lpn_ff_run_title`**
+  > Fire flow run
 - **`lpn_ff_scope`**
   > Junctions to test
 - **`lpn_ff_scope_all`**
@@ -143,7 +159,7 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_ff_state_pass`**
   > Passing
 - **`lpn_ff_steady`**
-  > One condition is tested, the one now on the clock. Fire flow is normally loaded onto maximum day demand and read as a single steady condition.
+  > Only the current time step is tested. Fire flow is normally added to maximum day demand.
 - **`lpn_ff_stop`**
   > Stop
 - **`lpn_ff_stopped`**
