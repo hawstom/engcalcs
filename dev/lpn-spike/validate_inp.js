@@ -35,6 +35,12 @@ const HEAD_TOL = 3e-3;   // m -- EPANET reports through a float API; see validat
 const FLOW_TOL = 3e-6;   // m3/s == 0.003 L/s
 
 let failures = 0, checks = 0;
+// **WHAT WAS ASKED FOR, BESIDE WHAT WAS REACHED** (Task 322). A file whose import loses something
+// has its numeric comparison skipped -- correctly, since it is no longer the same network -- but
+// "N/N checks passed" is a fraction of what RAN, so it goes UP as files drop out of the numeric
+// half. Both counts are printed, and a run where nothing was compared says so in its own line.
+const skipped = [];
+let compared = 0;
 function report(ok, label, detail) {
 	checks++;
 	if (!ok) { failures++; }
@@ -134,7 +140,7 @@ async function checkFile(file) {
 	const text = fs.readFileSync(file, 'utf8');
 	const name = path.basename(file);
 	const parsed = EngCalcs.lpnInpParse(text);
-	if (!parsed.ok) { report(false, `${name} parses`, parsed.error); return; }
+	if (!parsed.ok) { report(false, `${name} parses`, parsed.error); skipped.push(`${name}: does not parse`); return; }
 
 	report(true, `${name} parses`,
 		`${parsed.nodes.length} nodes, ${parsed.links.length} links, ${parsed.flowUnits}, ${parsed.headloss}`);
@@ -156,13 +162,15 @@ async function checkFile(file) {
 		d.code === 'headloss-formula' || d.code === 'pump-curve-reduced' || d.code === 'link-setting');
 	if (structural.length) {
 		console.log(`  skip  ${name} numbers   not the same network after import: ${structural.map((d) => d.code).join(', ')}`);
+		skipped.push(`${name}: ${structural.map((d) => d.code).join(', ')}`);
 		return;
 	}
 
 	const ours = EngCalcs.lpnSolve(toSolverModel(parsed));
-	if (!ours.ok) { report(false, `${name} solves`, JSON.stringify(ours.issues)); return; }
+	if (!ours.ok) { report(false, `${name} solves`, JSON.stringify(ours.issues)); skipped.push(`${name}: our solver refused it`); return; }
 
 	const ref = await epanetSolve(text);
+	compared++;
 
 	let worstH = 0, worstHId = null;
 	for (const n of parsed.nodes) {
@@ -199,6 +207,15 @@ async function main() {
 	const files = extra.length ? extra : [path.join(__dirname, 'reference', 'import-cases.inp')];
 	for (const f of files) { await checkFile(f); }
 	console.log(`\n${checks - failures}/${checks} checks passed`);
+	// The honest headline: how many of the files asked for were actually held to the two engines
+	// agreeing. The line above is a fraction of what ran, so it RISES as files fall out.
+	console.log(`${compared}/${files.length} file(s) compared against EPANET.`);
+	if (skipped.length) {
+		console.log('');
+		console.log(`  !! ${skipped.length} FILE(S) WERE NOT COMPARED. Read this before the percentage above,`);
+		console.log('     which counts only the checks that ran:');
+		for (const s of skipped) { console.log(`     - ${s}`); }
+	}
 	process.exit(failures ? 1 : 0);
 }
 

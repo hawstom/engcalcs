@@ -63,21 +63,24 @@ function maxDiff(a, b, keys) {
 }
 
 async function run() {
-	const suite = [
-		cases.twoLoopAnalytic,
-		cases.twoLoopGrid,
-		cases.twoLoopManning,
-		cases.twoLoopDw,
-		cases.twoLoopMinorLosses,
-		cases.pumpCase,
-		cases.emitterCase,
-		cases.closedLinkCase,
-		cases.tankCase,
-		cases.valveTcvCase,
-		cases.zeroDemandCase,
-	].filter(Boolean);
-
+	// **NAMED, AND A MISSING ONE IS A FAILURE** (Task 322). This list used to hold the case objects
+	// themselves with a `.filter(Boolean)` on the end, so a case renamed or removed from cases.js
+	// arrived here as `undefined` and was silently dropped: the run got shorter, every remaining
+	// case passed, and the last line said so. The headline has to be a fraction of what was ASKED
+	// for -- the same rule that dev/browser-pass/run.js learned the hard way, where twelve dead
+	// sections hid behind a percentage of a shrinking denominator for two days.
+	const WANTED = [
+		'twoLoopAnalytic', 'twoLoopGrid', 'twoLoopManning', 'twoLoopDw', 'twoLoopMinorLosses',
+		'pumpCase', 'emitterCase', 'closedLinkCase', 'tankCase', 'valveTcvCase', 'zeroDemandCase',
+	];
 	let pass = 0, fail = 0;
+	const missing = WANTED.filter(n => !cases[n]);
+	for (const name of missing) {
+		console.log(`FAIL ${name}: no such case in cases.js -- it was renamed or removed, and this`);
+		console.log('     harness asked for it. Fix the name here, or drop it deliberately.');
+		fail++;
+	}
+	const suite = WANTED.filter(n => cases[n]).map(n => cases[n]);
 
 	for (const model of suite) {
 		const native = EngCalcs.lpnSolve(model);
@@ -127,7 +130,7 @@ async function run() {
 		ok ? pass++ : fail++;
 	}
 
-	console.log(`\n${pass} passed, ${fail} failed`);
+	console.log(`\n${pass} passed, ${fail} failed, of ${WANTED.length} asked for`);
 	process.exit(fail ? 1 : 0);
 }
 

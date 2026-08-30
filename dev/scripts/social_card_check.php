@@ -134,18 +134,30 @@ function meta_values($html, $key)
 
 $pages = array_filter(glob($root . '/*.php'), function ($p) {
     // Endpoints and includes render no page of their own; sw.php emits JavaScript.
+    // consent.php was added 2026-08-29: it records the answer and sends a 303 back where the
+    // visitor was, so it emits no <head> at all. It used to fall through the silent skip below
+    // rather than being declared here, which is the difference between a decision and an accident.
     $skip = array('lpn-lock.php', 'log-calc-event.php', 'log-human-view.php', 'log-signal-event.php',
-                  'log-title-event.php', 'formmail.php', 'sw.php');
+                  'log-title-event.php', 'formmail.php', 'sw.php', 'consent.php');
     return !in_array(basename($p), $skip, true);
 });
 
 $checkedFiles = array();
 $pagesWithCard = 0;
+// **A PAGE THAT WOULD NOT RENDER USED TO BE SKIPPED IN SILENCE** (Task 322), and the closing line
+// counts the pages that DID declare a card -- a fraction of what was reached, with no denominator
+// beside it, so the number reads exactly the same whether every page was examined or half of them
+// died on a fatal. A page in the ask that produces no <head> is now a finding: either it renders
+// and is checked, or it is named in the skip list above with a reason.
+$unrendered = array();
 
 foreach ($pages as $page) {
     $name = basename($page);
     $html = render_page($page);
-    if ($html === null || stripos($html, '<head') === false) { continue; }
+    if ($html === null || stripos($html, '<head') === false) {
+        $unrendered[] = $name;
+        continue;
+    }
 
     $images = array_merge(meta_values($html, 'og:image'), meta_values($html, 'twitter:image'));
     if (!$images) {
@@ -319,6 +331,20 @@ foreach ($cards as $card) {
     if ($verbose) { echo "  $rel: reached by $page.php" . ($lang === null ? '' : " --lang=$lang") . ", {$cw}x{$ch}\n"; }
 }
 
+if ($unrendered) {
+    bad("these pages were asked for and produced no <head>, so nothing below is a statement about
+"
+      . "        them: " . implode(', ', $unrendered) . "
+"
+      . "        A page that will not render is a defect in its own right (php -l cannot see a
+"
+      . "        runtime fatal). If one deliberately renders no page, name it in the \$skip list at
+"
+      . "        the top of this script with the reason -- silence made the count above a fraction
+"
+      . "        of what was reached rather than of what was asked for.");
+}
+
 if ($pagesWithCard === 0) {
     bad("no page declared a share card at all. Either every page failed to render -- run\n"
       . "        html_balance_check.php, which would also be failing -- or the tag block has been\n"
@@ -329,6 +355,6 @@ if ($fail) {
     echo "\nFAIL: social card ($fail finding" . ($fail === 1 ? '' : 's') . ")\n";
     exit(1);
 }
-echo "ok: $pagesWithCard pages declare a share card; " . count($checkedFiles) . " image file(s) checked and real;\n"
+echo "ok: $pagesWithCard of " . count($pages) . " pages asked for declare a share card; " . count($checkedFiles) . " image file(s) checked and real;\n"
    . "    " . count($cards) . " per-calculator card(s) in icons/cards/, each 1200x630 and each reached by its own page.\n";
 exit(0);

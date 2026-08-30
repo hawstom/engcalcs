@@ -95,7 +95,7 @@ foreach ($argv as $i => $a) {
     if ($a === '--one' && isset($argv[$i + 1])) { $single = $argv[$i + 1]; }
 }
 if ($single === null) {
-    $failures = 0; $checked = 0;
+    $failures = 0; $checked = 0; $skippedPages = array();
     foreach ($pages as $page) {
         $cmd = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg(__FILE__) . ' --one ' . escapeshellarg($page)
              . ($verbose ? ' -v' : '') . ' 2>/dev/null';
@@ -106,15 +106,22 @@ if ($single === null) {
         // say so plainly rather than reporting a page we never actually measured.
         if ($text === '' || strpos($text, 'ok ') === false && strpos($text, 'FAIL') === false && strpos($text, 'SKIP') === false) {
             echo "SKIP     " . basename($page) . " (could not be rendered in isolation)\n";
+            $skippedPages[] = basename($page);
             continue;
         }
         echo $text . "\n";
         // A page the child skipped was not measured, so it must not be counted as measured --
         // otherwise the closing tally quietly overstates the coverage of this check.
-        if (strpos($text, 'SKIP') === false) { $checked++; }
+        if (strpos($text, 'SKIP') === false) { $checked++; } else { $skippedPages[] = basename($page); }
         if ($rc !== 0) { $failures++; }
     }
-    echo "\n$checked page(s) checked, $failures failing.\n";
+    // **THE DENOMINATOR IS WHAT WAS ASKED FOR** (Task 322). "$checked page(s) checked" is a
+    // fraction of what was REACHED, so it reads identically whether every page was measured or a
+    // third of them died on a fatal and were skipped. The four skips today are endpoints that
+    // redirect or log and emit no page; a fifth appearing is worth noticing.
+    $askedFor = count($pages);
+    echo "\n$checked of $askedFor page(s) checked, $failures failing";
+    echo $skippedPages ? ', ' . count($skippedPages) . " skipped: " . implode(', ', array_unique($skippedPages)) . ".\n" : ".\n";
     exit($failures ? 1 : 0);
 }
 $pages = array($single);
