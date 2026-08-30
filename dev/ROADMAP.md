@@ -206,6 +206,44 @@ the block.
     anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.
 
 - 100|530| **Fire flow: Tom's rulings are recorded; what is left is BUILDING them.**
+  - **THE WHOLE-SYSTEM SWEEP SHIPPED TO MASTER 2026-08-29** — `js/lpn-fireflow.js`, pure and DOM-free,
+    raw-node bisection over a chosen set of junctions, ONE run producing ONE result set holding both
+    answers per junction, four states assigned exactly once (`pass`, `fail`, `design`, `error`), and
+    the three-state colouring on the map. `LOSS_ACCOUNTING = 'raw-node'` is carried on the result set
+    AS A VALUE, so the interface cannot fail to state it. The modelled assembly, the emitter trick and
+    any time dimension are absent by construction. Guards: `fireflow-harness.js` (39),
+    `fireflow-box-harness.js` (24) driving the real page, `fireflow-bench.js`.
+    - **THE DESIGN HALF COSTS ZERO EXTRA SOLVES, which corrects the ~6% costed above.** Probing
+      `0 -> required -> ceiling -> bisect` takes the design readings AT the required flow on the way
+      past, where the plan assumed a separate solve because the bisection's last iterate is at the
+      AVAILABLE flow. It also settles the compliance verdict after three solves. Asserted.
+    - **MEASURED, and it still does not extrapolate:** 49 junctions 0.9 s / 819 solves; 121 junctions
+      11.3 s / 2,043; 225 junctions **114.9 s** / 3,707. Growth exponent 1.9 -> 3.16, and the 225
+      figure agrees with the branch's 112 s. Per-solve cost rises 1.1 -> 31.0 ms, which is the real
+      story: the sweep is not paying for more solves, it is paying for slower ones.
+    - **The bisection is anchored against EPANET's own published 4.727 US Hazen-Williams equation,
+      not against our resistance function** — a harness that checks our solver with our solver proves
+      nothing. The fire flow is ADDED to the base demand, and the fixture carries one, so a
+      substituting sweep lands 120 gpm out and fails. The tested junction is checked under a minimum
+      it genuinely cannot hold, so "never its own casualty" is not vacuous.
+    - **It writes no element property at all.** It solves from a copy whose NODE OBJECTS are copies,
+      a probe demand is put back, and results live in a module variable beside the document — not on
+      `doc`, not in `settings`, not on disk. `setProp()` is not involved rather than obeyed. Both
+      harnesses assert the document is byte-identical across a whole run.
+    - Interruptible: it yields a macrotask between junctions, so the progress line paints and Stop
+      answers; closing the box stops a run and a stopped sweep keeps what it had.
+  - **59 new `lpn_ff_*` keys await Tom's wording**, nine reused verbatim from the branch. Two want his
+    eye first: `lpn_ff_accounting`, the sentence that discharges the transparency ruling, and the
+    three `state_*` words the map legend and both reports all share.
+  - **LEFT OUT DELIBERATELY, each with its reason:** loss accounting is VISIBLE but not SELECTABLE,
+    because there is exactly one shipping method and a one-item menu is not a choice (the second is
+    the modelled assembly, which stays on the branch); a per-junction requirement — real practice
+    varies it by land use, and that is a table of criteria; picking an EPS frame, and no run/scenario
+    record was invented; and the branch's `dev/browser-pass/specs/fireflow.js`, whose ground the box
+    harness covers headlessly.
+  - **STILL ON THE BRANCH AND NOT PORTED: `dev/fireflow-analysis-plan.md` and
+    `dev/fireflow-loss-table.md`.** Master now has the feature and no research record beside it. The
+    code comments carry the conclusions; the plan carries what is still undecided.
   *(The `[H]` came off the title 2026-08-29. Tom: *"Once again, I think I answered this. Did you
   fail to update the roadmap?"* He did answer, at length, on 2026-08-27 — the rulings are in this
   block and they changed the order and cut a phase. The marker stayed on the title and made a
@@ -796,6 +834,38 @@ the block.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
+  - **SIX MORE LANDED THE SAME DAY — rows 3c, 3d, 11, 12, 16 and 19 — and ROW 12 IS THE ONE TO READ.**
+    `storage_inventory_check.php` found **two things on visitors' devices that the inventory whose
+    only claim is completeness did not list**: `bpn_sketch_toggles` (`localStorage`, which of five
+    fields the Branched-Network sketch shows) and `engcalcs-lpn` (IndexedDB, the `handles` store of
+    Task 212 and the `recent` store of Task 258). **Nothing about what is stored was changed** — both
+    are now documented on the exemption limbs the file already argues for their siblings, and
+    **those two exemption claims are AI's and want Tom's eye**, because that is the legal-flavoured
+    judgement the check deliberately never makes.
+    - **AND A GAP IT FOUND AND DID NOT CLOSE: `engcalcs-lpn` is not erased by `wipeAllStorage()`**,
+      so "all settings" in that button's confirm is not quite true. Changing it is a behaviour
+      change, so it is recorded and not done.
+    - Cache Storage (`sw.php`'s `engcalcs-assets`) is OUT of the check's scope and its docblock says
+      so. Widening it is a scope decision with a legal flavour.
+  - **Row 16 found that NO SCRIPT READ `meta.anchor_languages` AT ALL** — the rule that anchors are
+    read from the JSON and not restated was, in its entirety, prose. It blocks now, scoped to the two
+    current-state documents: 15 lines elsewhere in `dev/*.md` name an anchor set and every one is
+    correct as history.
+  - **Row 3c's walk finds 0 candidates today and that is the honest number.** The case it was written
+    for — `lpn_terrain_menu` and its tip behind two uncalled functions — had already been deleted on
+    Tom's ruling. It was verified against a RECONSTRUCTION of that tree, and fixture 1 of
+    `key_hygiene_selftest.php` is that shape verbatim: it is the only thing standing between an
+    advisory walk and a silent zero. Two conservatisms were measured, not guessed — the dev harnesses
+    count as root text (without that, 18 test seams read as corpses) and keys are sought in
+    comment-STRIPPED source (a file's own comment naming its deleted key had suppressed a candidate).
+  - **AND THE FALSE ALARM THAT COST FOUR AGENTS A DETOUR IS GONE.** `payload freshness` judged by
+    MTIME, and neither `git pull` nor a worktree checkout preserves those, so it called all 26
+    payloads stale in any freshly checked-out tree. It compares CONTENT now — building the payload IS
+    the input list, which also retires an eight-path list that had already missed an include once.
+    `touch lib/lang.ec.en.php` no longer fails it, and that is a fixture.
+    - Behaviour change worth knowing: `--check --prefix=X` now reports stale, because it builds a
+      prefix-filtered `lang.en.json` that does not match the unfiltered one on disk. The mtime
+      version ignored the prefix. Unused by `check_all.sh`.
   - **NINE MORE CHECKS LANDED 2026-08-29, taking the enforced count from 34 to 43** — survey rows
     4, 5, 10, 15, 17, 18, 20, 24 and 25, each with a selftest, each blocking, each green on the
     tree it landed on. Two found the same thing row 6 found: **the RULE was wrong.**

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 1420,
-        "delta_key_count": 105,
+        "expected_key_count": 1479,
+        "delta_key_count": 164,
         "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
@@ -546,7 +546,66 @@
         "lpn_terrain_keep_ids": "They are: {ids}",
         "lpn_terrain_filled_ids": "These nodes were filled in: {ids}",
         "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
-        "lpn_terrain_ids_more": "{ids}, and {n} more"
+        "lpn_terrain_ids_more": "{ids}, and {n} more",
+        "lpn_ff_menu": "Fire flow…",
+        "lpn_ff_menu_tip": "Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there pull anything else down?",
+        "lpn_ff_title": "Fire flow",
+        "lpn_ff_intro": "Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.",
+        "lpn_ff_scope": "Junctions to test",
+        "lpn_ff_scope_tip": "Choose the set before you run. Testing every junction in a large system can take minutes.",
+        "lpn_ff_scope_all": "Every junction",
+        "lpn_ff_scope_selected": "The selected junction only",
+        "lpn_ff_no_junctions": "This project has no junctions yet, so there is nothing to test.",
+        "lpn_ff_no_selection": "No junction is selected. Choose one on the map, or test every junction.",
+        "lpn_ff_required": "Required fire flow",
+        "lpn_ff_required_tip": "The flow your code or your fire authority asks for at a hydrant. Every junction is tested against this same number.",
+        "lpn_ff_residual": "Residual pressure to hold",
+        "lpn_ff_residual_tip": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
+        "lpn_ff_design": "Effect on the rest of the system",
+        "lpn_ff_design_tip": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.",
+        "lpn_ff_design_off": "Do not check",
+        "lpn_ff_design_nodes": "Every other junction",
+        "lpn_ff_design_all": "Every other junction and every pipe",
+        "lpn_ff_minpressure": "Lowest pressure allowed elsewhere",
+        "lpn_ff_minpressure_tip": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
+        "lpn_ff_maxvelocity": "Highest velocity allowed",
+        "lpn_ff_maxvelocity_tip": "A pipe running above this while a fire flow is drawn is reported as a design issue.",
+        "lpn_ff_accounting": "The flow is drawn at the junction itself. No hydrant, lateral or fitting loss is included, so a real hydrant on a real lateral delivers less than these numbers say.",
+        "lpn_ff_engine_native": "This will be worked out with the built-in solver.",
+        "lpn_ff_engine_epanet": "This will be worked out with the EPANET engine.",
+        "lpn_ff_engine_cost": "Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.",
+        "lpn_ff_steady": "One condition is tested, the one now on the clock. Fire flow is normally loaded onto maximum day demand and read as a single steady condition.",
+        "lpn_ff_calculate": "Run",
+        "lpn_ff_stop": "Stop",
+        "lpn_ff_working": "Working: {done} of {total} junctions.",
+        "lpn_ff_stopped": "Stopped after {done} of {total} junctions. What is below is what had already been worked out.",
+        "lpn_ff_cost": "{solves} network solves.",
+        "lpn_ff_stale": "The drawing changed, so the fire flow results were cleared. Run it again.",
+        "lpn_ff_summary": "{pass} passing, {fail} failing, {design} with a design issue.",
+        "lpn_ff_summary_error": "{n} could not be answered.",
+        "lpn_ff_report_available": "Available against required",
+        "lpn_ff_report_design": "Effect on the rest of the system",
+        "lpn_ff_col_junction": "Junction",
+        "lpn_ff_col_available": "Available",
+        "lpn_ff_col_required": "Required",
+        "lpn_ff_col_result": "Result",
+        "lpn_ff_col_affected": "What it pulls down",
+        "lpn_ff_state_pass": "Passing",
+        "lpn_ff_state_fail": "Failing",
+        "lpn_ff_state_design": "Design issue",
+        "lpn_ff_state_error": "No answer",
+        "lpn_ff_atleast": "over {flow}",
+        "lpn_ff_affect_node": "{id} down to {pressure}",
+        "lpn_ff_affect_link": "{id} at {velocity}",
+        "lpn_ff_more": "and {n} more",
+        "lpn_ff_design_none": "Nothing in the chosen set was pulled down by any junction tested.",
+        "lpn_ff_design_off_note": "The effect on the rest of the system was not checked in this run.",
+        "lpn_ff_iso": "ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.",
+        "lpn_ff_err_at_rest": "Already below the residual with nothing drawn",
+        "lpn_ff_err_converge": "The network did not settle",
+        "lpn_ff_err_solve": "The network could not be worked out",
+        "lpn_ff_err_not_junction": "Not a junction",
+        "lpn_ff_err_unknown": "No answer, and the reason given is {id}"
     },
     "keys": {
         "lpn_field_text_attached": "Attached to",
@@ -653,7 +712,66 @@
         "lpn_terrain_keep_ids": "They are: {ids}",
         "lpn_terrain_filled_ids": "These nodes were filled in: {ids}",
         "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
-        "lpn_terrain_ids_more": "{ids}, and {n} more"
+        "lpn_terrain_ids_more": "{ids}, and {n} more",
+        "lpn_ff_menu": "Fire flow…",
+        "lpn_ff_menu_tip": "Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there pull anything else down?",
+        "lpn_ff_title": "Fire flow",
+        "lpn_ff_intro": "Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.",
+        "lpn_ff_scope": "Junctions to test",
+        "lpn_ff_scope_tip": "Choose the set before you run. Testing every junction in a large system can take minutes.",
+        "lpn_ff_scope_all": "Every junction",
+        "lpn_ff_scope_selected": "The selected junction only",
+        "lpn_ff_no_junctions": "This project has no junctions yet, so there is nothing to test.",
+        "lpn_ff_no_selection": "No junction is selected. Choose one on the map, or test every junction.",
+        "lpn_ff_required": "Required fire flow",
+        "lpn_ff_required_tip": "The flow your code or your fire authority asks for at a hydrant. Every junction is tested against this same number.",
+        "lpn_ff_residual": "Residual pressure to hold",
+        "lpn_ff_residual_tip": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
+        "lpn_ff_design": "Effect on the rest of the system",
+        "lpn_ff_design_tip": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.",
+        "lpn_ff_design_off": "Do not check",
+        "lpn_ff_design_nodes": "Every other junction",
+        "lpn_ff_design_all": "Every other junction and every pipe",
+        "lpn_ff_minpressure": "Lowest pressure allowed elsewhere",
+        "lpn_ff_minpressure_tip": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
+        "lpn_ff_maxvelocity": "Highest velocity allowed",
+        "lpn_ff_maxvelocity_tip": "A pipe running above this while a fire flow is drawn is reported as a design issue.",
+        "lpn_ff_accounting": "The flow is drawn at the junction itself. No hydrant, lateral or fitting loss is included, so a real hydrant on a real lateral delivers less than these numbers say.",
+        "lpn_ff_engine_native": "This will be worked out with the built-in solver.",
+        "lpn_ff_engine_epanet": "This will be worked out with the EPANET engine.",
+        "lpn_ff_engine_cost": "Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.",
+        "lpn_ff_steady": "One condition is tested, the one now on the clock. Fire flow is normally loaded onto maximum day demand and read as a single steady condition.",
+        "lpn_ff_calculate": "Run",
+        "lpn_ff_stop": "Stop",
+        "lpn_ff_working": "Working: {done} of {total} junctions.",
+        "lpn_ff_stopped": "Stopped after {done} of {total} junctions. What is below is what had already been worked out.",
+        "lpn_ff_cost": "{solves} network solves.",
+        "lpn_ff_stale": "The drawing changed, so the fire flow results were cleared. Run it again.",
+        "lpn_ff_summary": "{pass} passing, {fail} failing, {design} with a design issue.",
+        "lpn_ff_summary_error": "{n} could not be answered.",
+        "lpn_ff_report_available": "Available against required",
+        "lpn_ff_report_design": "Effect on the rest of the system",
+        "lpn_ff_col_junction": "Junction",
+        "lpn_ff_col_available": "Available",
+        "lpn_ff_col_required": "Required",
+        "lpn_ff_col_result": "Result",
+        "lpn_ff_col_affected": "What it pulls down",
+        "lpn_ff_state_pass": "Passing",
+        "lpn_ff_state_fail": "Failing",
+        "lpn_ff_state_design": "Design issue",
+        "lpn_ff_state_error": "No answer",
+        "lpn_ff_atleast": "over {flow}",
+        "lpn_ff_affect_node": "{id} down to {pressure}",
+        "lpn_ff_affect_link": "{id} at {velocity}",
+        "lpn_ff_more": "and {n} more",
+        "lpn_ff_design_none": "Nothing in the chosen set was pulled down by any junction tested.",
+        "lpn_ff_design_off_note": "The effect on the rest of the system was not checked in this run.",
+        "lpn_ff_iso": "ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.",
+        "lpn_ff_err_at_rest": "Already below the residual with nothing drawn",
+        "lpn_ff_err_converge": "The network did not settle",
+        "lpn_ff_err_solve": "The network could not be worked out",
+        "lpn_ff_err_not_junction": "Not a junction",
+        "lpn_ff_err_unknown": "No answer, and the reason given is {id}"
     },
     "key_context": {
         "lpn_field_text_attached": {
@@ -2305,6 +2423,714 @@
             }
         },
         "lpn_terrain_ids_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_scope": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_scope_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_scope_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_scope_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_no_junctions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_no_selection": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_required": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_required_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_residual": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_residual_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_design": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_design_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_design_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_design_nodes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_design_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_minpressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_minpressure_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_maxvelocity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_maxvelocity_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_accounting": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_engine_native": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_engine_epanet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_engine_cost": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_steady": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_calculate": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_stop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_working": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_cost": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_stale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_summary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_summary_error": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_report_available": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_report_design": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_col_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_col_available": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_col_required": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_col_result": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_col_affected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_state_pass": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_state_fail": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_state_design": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_state_error": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_atleast": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_affect_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_affect_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_design_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_design_off_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_iso": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_at_rest": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_converge": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_solve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_not_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} arazi karosu yanıt vermedi.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_err_unknown": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

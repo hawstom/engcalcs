@@ -123,6 +123,14 @@ run_check "sw map host selftest"         blocking php dev/scripts/sw_map_host_se
 # LibreEPANET.org (Task 306) is by definition a standalone deploy and would have hit the same wall.
 run_check "suite ships its own assets"   blocking php dev/scripts/standalone_assets_check.php
 run_check "canonical origin whitelist"   blocking php dev/scripts/canonical_origin_check.php
+# Task 322 rows 11 and 12. FOUR third-party requests, all opt-in, each behind its own gate -- and
+# every cookie, localStorage key and IndexedDB store a shipped file writes is written down. The
+# second found two that were not, in the file whose only claim is that it is complete. Neither
+# check asks whether something SHOULD be stored or requested: that is a person's question.
+run_check "third-party requests"         blocking php dev/scripts/third_party_request_check.php
+run_check "third-party selftest"         blocking php dev/scripts/third_party_request_selftest.php
+run_check "storage inventory"            blocking php dev/scripts/storage_inventory_check.php
+run_check "storage inventory selftest"   blocking php dev/scripts/storage_inventory_selftest.php
 # Task 322 rows 7-9. Three page-level rules that break for a SEARCH ENGINE, a share card or a
 # visitor on a stale asset, and for nobody on this side. The exemption list was measurably wrong
 # once already -- it named index.php, which has its own description, and omitted privacy.php and
@@ -188,6 +196,13 @@ run_check "lang keys resolve"            blocking php dev/scripts/lang_key_resol
 run_check "lang key resolve selftest"    blocking php dev/scripts/lang_key_resolve_selftest.php
 run_check "lang markup matches English"  blocking php dev/scripts/lang_tag_parity_check.php --strict
 run_check "gloss pointers resolve"       blocking php dev/scripts/gloss_ref_check.php
+# Task 322 rows 16 and 19. The anchor languages are glossary.json's meta.anchor_languages and the
+# prose restating them agrees; and a new JS module is on a page and in the harness DOM stub, or
+# declared. No script reads meta.anchor_languages at all today, so that rule was entirely prose.
+run_check "anchor languages"             blocking php dev/scripts/anchor_language_check.php
+run_check "anchor language selftest"     blocking php dev/scripts/anchor_language_selftest.php
+run_check "js module wiring"             blocking php dev/scripts/js_module_wiring_check.php
+run_check "js module wiring selftest"    blocking php dev/scripts/js_module_wiring_selftest.php
 run_check "layout tags match widgets" blocking php dev/scripts/layout_tag_check.php
 # Task 322 row 15. The unguarded half of the same rule: layout_tag_check.php reads the RIGHT
 # side of the pipe, and the generator strips commentary by POSITION, so a tag written on the

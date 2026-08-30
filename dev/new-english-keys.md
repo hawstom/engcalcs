@@ -12,10 +12,10 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**13 still to read**, of 105 untranslated keys, of 1420 English keys. A key already marked _Ruled OK_ below needs nothing from you —
+**72 still to read**, of 164 untranslated keys, of 1479 English keys. A key already marked _Ruled OK_ below needs nothing from you —
 the ruling lapses by itself if the wording changes.
 
-## lpn_  (105)
+## lpn_  (164)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -38,6 +38,124 @@ the ruling lapses by itself if the wording changes.
   > Use DEM
 - **`lpn_elev_dem_use_tip`**
   > Puts the height of the land under this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.
+- **`lpn_ff_accounting`**
+  > The flow is drawn at the junction itself. No hydrant, lateral or fitting loss is included, so a real hydrant on a real lateral delivers less than these numbers say.
+- **`lpn_ff_affect_link`**
+  > {id} at {velocity}
+- **`lpn_ff_affect_node`**
+  > {id} down to {pressure}
+- **`lpn_ff_atleast`**
+  > over {flow}
+- **`lpn_ff_calculate`**
+  > Run
+- **`lpn_ff_col_affected`**
+  > What it pulls down
+- **`lpn_ff_col_available`**
+  > Available
+- **`lpn_ff_col_junction`**
+  > Junction
+- **`lpn_ff_col_required`**
+  > Required
+- **`lpn_ff_col_result`**
+  > Result
+- **`lpn_ff_cost`**
+  > {solves} network solves.
+- **`lpn_ff_design`**
+  > Effect on the rest of the system
+- **`lpn_ff_design_all`**
+  > Every other junction and every pipe
+- **`lpn_ff_design_nodes`**
+  > Every other junction
+- **`lpn_ff_design_none`**
+  > Nothing in the chosen set was pulled down by any junction tested.
+- **`lpn_ff_design_off`**
+  > Do not check
+- **`lpn_ff_design_off_note`**
+  > The effect on the rest of the system was not checked in this run.
+- **`lpn_ff_design_tip`**
+  > A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.
+- **`lpn_ff_engine_cost`**
+  > Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.
+- **`lpn_ff_engine_epanet`**
+  > This will be worked out with the EPANET engine.
+- **`lpn_ff_engine_native`**
+  > This will be worked out with the built-in solver.
+- **`lpn_ff_err_at_rest`**
+  > Already below the residual with nothing drawn
+- **`lpn_ff_err_converge`**
+  > The network did not settle
+- **`lpn_ff_err_not_junction`**
+  > Not a junction
+- **`lpn_ff_err_solve`**
+  > The network could not be worked out
+- **`lpn_ff_err_unknown`**
+  > No answer, and the reason given is {id}
+- **`lpn_ff_intro`**
+  > Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.
+- **`lpn_ff_iso`**
+  > ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.
+- **`lpn_ff_maxvelocity`**
+  > Highest velocity allowed
+- **`lpn_ff_maxvelocity_tip`**
+  > A pipe running above this while a fire flow is drawn is reported as a design issue.
+- **`lpn_ff_menu`**
+  > Fire flow…
+- **`lpn_ff_menu_tip`**
+  > Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there pull anything else down?
+- **`lpn_ff_minpressure`**
+  > Lowest pressure allowed elsewhere
+- **`lpn_ff_minpressure_tip`**
+  > A junction that falls below this while another one is drawing its fire flow is reported as a design issue.
+- **`lpn_ff_more`**
+  > and {n} more
+- **`lpn_ff_no_junctions`**
+  > This project has no junctions yet, so there is nothing to test.
+- **`lpn_ff_no_selection`**
+  > No junction is selected. Choose one on the map, or test every junction.
+- **`lpn_ff_report_available`**
+  > Available against required
+- **`lpn_ff_report_design`**
+  > Effect on the rest of the system
+- **`lpn_ff_required`**
+  > Required fire flow
+- **`lpn_ff_required_tip`**
+  > The flow your code or your fire authority asks for at a hydrant. Every junction is tested against this same number.
+- **`lpn_ff_residual`**
+  > Residual pressure to hold
+- **`lpn_ff_residual_tip`**
+  > 20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.
+- **`lpn_ff_scope`**
+  > Junctions to test
+- **`lpn_ff_scope_all`**
+  > Every junction
+- **`lpn_ff_scope_selected`**
+  > The selected junction only
+- **`lpn_ff_scope_tip`**
+  > Choose the set before you run. Testing every junction in a large system can take minutes.
+- **`lpn_ff_stale`**
+  > The drawing changed, so the fire flow results were cleared. Run it again.
+- **`lpn_ff_state_design`**
+  > Design issue
+- **`lpn_ff_state_error`**
+  > No answer
+- **`lpn_ff_state_fail`**
+  > Failing
+- **`lpn_ff_state_pass`**
+  > Passing
+- **`lpn_ff_steady`**
+  > One condition is tested, the one now on the clock. Fire flow is normally loaded onto maximum day demand and read as a single steady condition.
+- **`lpn_ff_stop`**
+  > Stop
+- **`lpn_ff_stopped`**
+  > Stopped after {done} of {total} junctions. What is below is what had already been worked out.
+- **`lpn_ff_summary`**
+  > {pass} passing, {fail} failing, {design} with a design issue.
+- **`lpn_ff_summary_error`**
+  > {n} could not be answered.
+- **`lpn_ff_title`**
+  > Fire flow
+- **`lpn_ff_working`**
+  > Working: {done} of {total} junctions.
 - **`lpn_field_base_demand`**
   > Base demand
   _Ruled OK 2026-08-29._
