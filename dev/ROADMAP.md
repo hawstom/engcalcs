@@ -1143,6 +1143,12 @@ the block.
       screen — a touchscreen laptop at 1400px has a finger, a phone with a stylus does not — so a
       width-keyed assertion would prove something the code does not do.
       `dev/lpn-spike/touch-radius-harness.js` (14) states that in its own header.
+  - **NARROWED FURTHER 2026-08-30, and this is the whole scope:** *"The only testing I did on
+    long-press was an attempt to drag a node. Long press doesn't factor into anything else."*
+    **A long press starts a node drag. Nothing else.** Do not generalise it to links, to labels,
+    to a context menu (Task 192 is parked at 5 and stays there), or to any second meaning — the
+    task is one gesture on one kind of element, and it is finished when a finger can drag a node
+    the way a mouse already can.
   - **ANSWERED 2026-08-29, AND THE ANSWER IS THAT IT IS NOT A MODE AT ALL.** Tom: *"It seems to me
     that long-press should initiate a drag for a node."* So the question below was malformed — it
     asked which of the page's modes a long press enters, and his answer is that a long press starts
