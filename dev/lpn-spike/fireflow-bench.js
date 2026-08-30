@@ -7,6 +7,20 @@
 // two sizes and prints the growth exponent it actually saw; nobody may quote a figure for a size
 // that is not in the table.
 //
+// WHAT CHANGED SINCE, and what did not. The per-solve half was the fixable half: the solver's
+// linear algebra was a dense Cholesky, and it is an envelope factorization now, which measured
+// ~19x on one solve at 225 junctions with every reported number bit-identical
+// (dev/lpn-spike/spd-envelope-harness.js, dev/lpn-spike/fireflow-answer-harness.js).
+//
+// THE EXPONENT IS STILL ABOVE 1 AND THE RULE ABOVE STILL STANDS. The sweep's SOLVE COUNT grows
+// linearly with junctions -- 819 / 2,043 / 3,707 -- and one solve still costs more on a bigger
+// network, so the product still grows faster than the network does. A big constant factor is not
+// a change of shape, and a figure for a size not in this table is still not quotable.
+//
+// AND DO NOT COMPARE THE SECONDS IN TWO RUNS OF THIS FILE. The same code on the same machine gave
+// 114.9 s and 428.3 s for the 225-junction sweep, three days apart, because the box was busy the
+// second time. The solve COUNTS are deterministic and are the only figures here that reproduce.
+//
 // NOT a harness: it asserts nothing and dev/scripts/run_harnesses.sh does not pick it up (its glob
 // is *harness*.js). A timing number is not a pass/fail.
 //

@@ -205,11 +205,14 @@ async function main() {
 			(nativeMs / valueMs).toFixed(2).padStart(15) + 'x');
 	}
 
-	console.log('\n  native/value > 1 means the EPANET path is the faster one. It crosses over');
-	console.log('  somewhere between 21 and 201 nodes: below that the engine is far faster than');
-	console.log('  ours but the round trip is dominated by OUR glue -- lpnDiagnose, a few hundred');
-	console.log('  small WASM calls to push values in and read results back -- while above it the');
-	console.log('  native O(n^3) Cholesky runs away and nothing else matters.\n');
+	console.log('\n  native/value > 1 means the EPANET path is the faster one. At the small sizes');
+	console.log('  the engine is far faster at the arithmetic, and the round trip is dominated by');
+	console.log('  OUR glue -- lpnDiagnose, a few hundred small WASM calls to push values in and');
+	console.log('  read results back.');
+	console.log('  AT 201 NODES THE TWO ARE NOW COMPARABLE. This column used to end in a rout --');
+	console.log('  the native side ran an n^3/6 dense Cholesky and lost by ~46x on the solve');
+	console.log('  itself. It is an envelope factorization now (see js/lpn-solver.js), and the');
+	console.log('  numbers above are what that left. Read them; do not quote the old ratio.\n');
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
