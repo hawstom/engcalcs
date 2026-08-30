@@ -10,8 +10,15 @@ clears the legal bar is a judgement for someone qualified; **what** each item is
 exists**, is a fact, and that is what this file pins down.
 
 Re-run the inventory after touching any of: `lib/config.inc.php`, `lib/Language.lib.php`,
-`lib/Consent.lib.php`, `js/Cookies.lib.js`, `lib/Calculators.lib.php`, `js/looped-network.js`, or
-any `log-*.php`.
+`lib/Consent.lib.php`, `js/Cookies.lib.js`, `lib/Calculators.lib.php`, `js/looped-network.js`,
+`js/branched-network.js`, or any `log-*.php`.
+
+**Sections 2 and 3 are now held by `dev/scripts/storage_inventory_check.php`** (ROADMAP Task 322),
+which reads every `setcookie(`, `document.cookie =`, `localStorage.setItem(` and `indexedDB.open(`
+in shipped code and fails the build on a name that is not in this file. It found two that were
+not — `bpn_sketch_toggles` and the `engcalcs-lpn` handle store — which is the whole argument for a
+check over a re-read. It never asks whether something *should* be stored: that is §1's exemption
+test and it belongs to a person.
 
 > **UPDATED 2026-08-12: Task 286 phase 1 has SHIPPED, and sections 2, 3, 5 and 6 below now describe
 > the state after it.** Each row of the tables says whether it needs consent. The original §6 —
@@ -83,6 +90,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_rpane` | same | Whether the right panel is open and how wide it is (Task 441) |
 | `lpn_setbox` | same | Where the Settings box was left and how big it was made (Task 441) |
 | `lpn_show_titles` | same | Whether the page-title row is shown |
+| `bpn_sketch_toggles` | `js/branched-network.js` | Which of the five data fields (length, diameter, flow, elevation, pressure) the Branched-Network topology sketch shows. The checkboxes live outside the form, so the page's own input cookie never captures them |
 
 The first three are **exempt** — they hold the document the user made in order to give it back to
 them. So are the rest, on the second limb of the same test: `lpn_identity` is strictly necessary for
@@ -90,14 +98,25 @@ a service the visitor explicitly requested (you cannot take a lock on a shared f
 who is holding it), and the last four are preferences the visitor set deliberately — three panel
 layouts and a page-title toggle. **A panel layout is the same purpose at a finer grain, so it rides
 this declaration rather than earning a new one: no new sentence in `consent_body`, no
-`EC_CONSENT_VERSION` bump, nothing re-asked.** **None of the eight is analytics, and none carries an
-identifier of a person** — `lpn_identity`'s token is opaque and its initials are typed by the user,
-for other humans to read in the lock notice.
+`EC_CONSENT_VERSION` bump, nothing re-asked.** `bpn_sketch_toggles` is the same kind of thing one
+page over: five checkboxes the visitor ticked, remembered because they sit outside the form the
+input cookie captures. **None of the nine is analytics, and none carries an identifier of a
+person** — `lpn_identity`'s token is opaque and its initials are typed by the user, for other humans
+to read in the lock notice.
 
-**All eight are removed by Settings > Erase everything** (`wipeAllStorage()`), which is what makes that
-button's own sentence — "every project, every background image, all settings, and your unit choices"
-— literally true. A key added here that is not in that list quietly makes it false. The same
-function also expires the suite unit cookie and, since Task 437, the `ec_geosearch` consent record.
+**All eight `lpn_` keys are removed by Settings > Erase everything** (`wipeAllStorage()`), which is
+what makes that button's own sentence — "every project, every background image, all settings, and
+your unit choices" — literally true. A `lpn_` key added here that is not in that list quietly makes
+it false. The same function also expires the suite unit cookie and, since Task 437, the
+`ec_geosearch` consent record. `bpn_sketch_toggles` belongs to Branched-Network.php, which has no
+such button and is not reached by this one.
+
+### IndexedDB
+
+| Store | Where | What it holds |
+|---|---|---|
+| `engcalcs-offline-queue` | `js/Calculators.lib.js`, `sw.php` | Beacon rows that could not be sent while offline. **Analytics, and the one piece of client-side storage here that is NOT exempt** — written only with consent, emptied by `EngCalcs.flushQueue()` on withdrawal |
+| `engcalcs-lpn` | `js/looped-network.js` | Two stores: `handles`, a `FileSystemFileHandle` per open project so a reload can reconnect to the file the user chose (Task 212), and `recent`, the recent-files list (Task 258). **Exempt** — a handle is the document the user linked, kept so it can be given back; it is structured-cloneable, where `localStorage` holds strings alone, which is why this is a second store rather than more rows in `lpn_index`. The browser re-grants PERMISSION separately, so a returning visitor is asked again by the browser itself. **Outside `wipeAllStorage()`'s reach** — a known gap in that button's sentence, logged here rather than quietly changed |
 
 ### Place-name search stores nothing but the answer
 
