@@ -218,48 +218,34 @@ EngCalcs.lpnSolveSPDDense = function (A, b) {
 // user's own node numbering, which for anything drawn or imported in geographic order is already
 // narrow.
 //
-// Returns null on a non-positive-definite A, exactly as the dense one does.
-EngCalcs.lpnSolveSPD = function (A, b) {
+// THE ENVELOPE ITSELF -- the row bands, the packed offsets, and the column occupancy the back
+// substitution needs. Built from a `first[]` array, whatever produced it.
+//
+// It depends only on WHICH ENTRIES CAN BE NONZERO, so for one network it is the same on every
+// Newton iteration and on every one of a fire-flow sweep's thousands of solves. That is why it is
+// a value rather than something recomputed inside the factorization: lpnSolve builds it once from
+// the link list and hands the same object back for each iteration.
+EngCalcs.lpnEnvelope = function (first, n) {
 	'use strict';
-	var n = b.length,
-		first = new Int32Array(n),
-		rowStart = new Int32Array(n + 1),
+	var rowStart = new Int32Array(n + 1),
+		diag = new Int32Array(n),
 		colStart = new Int32Array(n + 2),
-		L,
 		colRow,
-		x = new Array(n),
-		y = new Array(n),
-		Ai,
+		total = 0,
 		i,
-		j,
-		k,
-		kk,
-		f,
-		fi,
-		fj,
-		si,
-		sj,
-		sum,
-		lii,
-		total = 0;
+		j;
 
-	// Row envelopes, and the packed offsets they imply. Row i occupies columns f[i]..i.
 	for (i = 0; i < n; i++) {
-		Ai = A[i];
-		f = i;
-		for (j = 0; j < i; j++) {
-			if (Ai[j] !== 0) { f = j; break; }
-		}
-		first[i] = f;
 		rowStart[i] = total;
-		total += i - f + 1;
+		diag[i] = total + i - first[i];
+		total += i - first[i] + 1;
 	}
 	rowStart[n] = total;
-	L = new Float64Array(total);
 
-	// Column occupancy, for the back substitution alone. Counting sort, so the rows in each
-	// column come out in increasing order -- which is the order the dense loop visited them in,
-	// and therefore the order the sum has to be accumulated in.
+	// Column occupancy, for the back substitution alone -- it walks a COLUMN of L, which packed
+	// by rows is a scatter. A counting sort, so the rows within each column come out in increasing
+	// order, which is the order the dense loop visited them in and therefore the order the sum
+	// has to be accumulated in for the arithmetic to be unchanged.
 	for (i = 0; i < n; i++) {
 		for (j = first[i]; j < i; j++) { colStart[j + 2]++; }
 	}
@@ -269,20 +255,49 @@ EngCalcs.lpnSolveSPD = function (A, b) {
 		for (j = first[i]; j < i; j++) { colRow[colStart[j + 1]++] = i; }
 	}
 
+	return { n: n, first: first, rowStart: rowStart, diag: diag, colStart: colStart,
+		colRow: colRow, total: total };
+};
+
+// Solve for a matrix already PACKED into an envelope: M holds row i's columns first[i]..i at
+// rowStart[i]..diag[i]. **M IS FACTORED IN PLACE and is destroyed**, which is not a compromise --
+// the caller rebuilds it from scratch on the next Newton iteration anyway, and it is what keeps a
+// solve from allocating a second matrix on every iteration.
+//
+// Returns null on a non-positive-definite matrix, exactly as the dense reference does.
+EngCalcs.lpnSolvePacked = function (env, M, b) {
+	'use strict';
+	var n = env.n,
+		first = env.first,
+		rowStart = env.rowStart,
+		diag = env.diag,
+		colStart = env.colStart,
+		colRow = env.colRow,
+		x = new Array(n),
+		y = new Array(n),
+		i,
+		j,
+		k,
+		kk,
+		fi,
+		fj,
+		si,
+		sj,
+		sum;
+
 	for (i = 0; i < n; i++) {
-		Ai = A[i];
 		fi = first[i];
 		si = rowStart[i] - fi;
 		for (j = fi; j <= i; j++) {
-			sum = Ai[j];
+			sum = M[si + j];
 			fj = first[j];
 			sj = rowStart[j] - fj;
-			for (k = (fi > fj ? fi : fj); k < j; k++) { sum -= L[si + k] * L[sj + k]; }
+			for (k = (fi > fj ? fi : fj); k < j; k++) { sum -= M[si + k] * M[sj + k]; }
 			if (i === j) {
 				if (!(sum > 0)) { return null; }
-				L[si + i] = Math.sqrt(sum);
+				M[si + i] = Math.sqrt(sum);
 			} else {
-				L[si + j] = sum / L[rowStart[j] + j - fj];
+				M[si + j] = sum / M[diag[j]];
 			}
 		}
 	}
@@ -291,19 +306,60 @@ EngCalcs.lpnSolveSPD = function (A, b) {
 		fi = first[i];
 		si = rowStart[i] - fi;
 		sum = b[i];
-		for (k = fi; k < i; k++) { sum -= L[si + k] * y[k]; }
-		y[i] = sum / L[si + i];
+		for (k = fi; k < i; k++) { sum -= M[si + k] * y[k]; }
+		y[i] = sum / M[diag[i]];
 	}
 	for (i = n - 1; i >= 0; i--) {
 		sum = y[i];
 		for (kk = colStart[i]; kk < colStart[i + 1]; kk++) {
 			k = colRow[kk];
-			sum -= L[rowStart[k] - first[k] + i] * x[k];
+			sum -= M[rowStart[k] - first[k] + i] * x[k];
 		}
-		x[i] = sum / L[rowStart[i] - first[i] + i];
+		x[i] = sum / M[diag[i]];
 	}
 
 	return x;
+};
+
+// The DENSE-IN adapter, with the dense reference's exact signature.
+//
+// A solve does not call this -- it assembles straight into the packed form. What this is for is
+// the PROOF: dev/lpn-spike/spd-envelope-harness.js hands the same dense A to this and to
+// lpnSolveSPDDense and requires the two answers to match bit for bit, which is a comparison that
+// only exists if both take the same argument. Keeping it also means anything outside this file
+// that ever held a dense matrix still works.
+//
+// The envelope here is read from A'S OWN ZEROS rather than from a link list. A numerically-zero
+// entry inside the structural pattern only makes first[i] later, which the theorem allows -- its
+// induction needs the zeros to BE zero, not to be structural.
+//
+// Returns null on a non-positive-definite A, exactly as the dense one does. A is not modified.
+EngCalcs.lpnSolveSPD = function (A, b) {
+	'use strict';
+	var n = b.length,
+		first = new Int32Array(n),
+		env,
+		M,
+		Ai,
+		i,
+		j,
+		f;
+
+	for (i = 0; i < n; i++) {
+		Ai = A[i];
+		f = i;
+		for (j = 0; j < i; j++) {
+			if (Ai[j] !== 0) { f = j; break; }
+		}
+		first[i] = f;
+	}
+	env = EngCalcs.lpnEnvelope(first, n);
+	M = new Float64Array(env.total);
+	for (i = 0; i < n; i++) {
+		Ai = A[i];
+		for (j = first[i]; j <= i; j++) { M[env.rowStart[i] - first[i] + j] = Ai[j]; }
+	}
+	return EngCalcs.lpnSolvePacked(env, M, b);
 };
 
 // A FIXED-HEAD node: one whose head is boundary data rather than an unknown.
@@ -530,6 +586,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		stall = 0,
 		demandScale = 0,
 		i,
+		j2,
 		k;
 
 	// 'native' names THIS file, so lpnDiagnose adds the one check that is about this engine's
@@ -574,18 +631,50 @@ EngCalcs.lpnSolve = function (model, options) {
 	// writes +0.0, which is what a fresh Float64Array holds, so nothing about the arithmetic
 	// changes -- and that is asserted, not assumed (dev/lpn-spike/spd-envelope-harness.js compares
 	// every reported number against the dense reference).
-	var A = [],
-		F = new Float64Array(nn),
+	//
+	// AND THE MATRIX IS THE ENVELOPE ITSELF, not a square filled mostly with zeros. Once the
+	// factorization stopped touching the zeros, the two things still SIZED by nn squared were
+	// zeroing the square each iteration and re-deriving the envelope from it -- at 961 junctions
+	// that is 924,000 writes and 460,000 comparisons per iteration against 462,000 useful
+	// multiply-adds, so the overhead had become bigger than the work. Assembling straight into
+	// the packed band makes both proportional to the network's own connectivity instead.
+	//
+	// THE PATTERN COMES FROM THE LINK LIST, which is where it actually lives: junction i's row can
+	// only be nonzero at itself and at the junctions it shares a link with. A CLOSED link is
+	// counted too. Its conductance is zero so it contributes nothing numerically, but leaving it
+	// in keeps the pattern the same whatever a valve is doing, and a WIDER envelope is always safe
+	// -- the extra entries are exactly the zeros the dense reference also computes.
+	var F = new Float64Array(nn),
 		G = new Float64Array(links.length),
 		y = new Float64Array(links.length),
 		linkR = new Float64Array(links.length),
 		linkN = new Float64Array(links.length),
 		linkM = new Float64Array(links.length),
 		resFixed = method !== 'dw',
+		envFirst = new Int32Array(nn),
+		env,
+		M,
+		envDiag,
+		envRowStart,
 		resK,
 		aKm,
-		aArea;
-	for (i = 0; i < nn; i++) { A.push(new Float64Array(nn)); }
+		aArea,
+		lo,
+		hi;
+
+	for (i = 0; i < nn; i++) { envFirst[i] = i; }
+	for (k = 0; k < links.length; k++) {
+		i = junctionIndex[links[k].from];
+		j2 = junctionIndex[links[k].to];
+		if (i === undefined || j2 === undefined) { continue; }
+		lo = i < j2 ? i : j2;
+		hi = i < j2 ? j2 : i;
+		if (lo < envFirst[hi]) { envFirst[hi] = lo; }
+	}
+	env = EngCalcs.lpnEnvelope(envFirst, nn);
+	envDiag = env.diag;
+	envRowStart = env.rowStart;
+	M = new Float64Array(env.total);
 
 	// WHAT DOES NOT DEPEND ON THE FLOW IS COMPUTED ONCE, not once per Newton iteration.
 	//
@@ -630,7 +719,7 @@ EngCalcs.lpnSolve = function (model, options) {
 			dq,
 			sumAbsDq = 0;
 
-		for (i = 0; i < nn; i++) { A[i].fill(0); }
+		M.fill(0);
 		F.fill(0);
 
 		for (k = 0; k < links.length; k++) {
@@ -709,16 +798,30 @@ EngCalcs.lpnSolve = function (model, options) {
 			jIdx = junctionIndex[link.to];
 
 			if (iIdx !== undefined) {
-				A[iIdx][iIdx] += G[k];
+				M[envDiag[iIdx]] += G[k];
 				F[iIdx] -= (Q[k] - y[k]);
 			}
 			if (jIdx !== undefined) {
-				A[jIdx][jIdx] += G[k];
+				M[envDiag[jIdx]] += G[k];
 				F[jIdx] += (Q[k] - y[k]);
 			}
 			if (iIdx !== undefined && jIdx !== undefined) {
-				A[iIdx][jIdx] -= G[k];
-				A[jIdx][iIdx] -= G[k];
+				// ONE write, not two: the factorization reads only the lower triangle, and the
+				// upper half of a symmetric matrix was never anything but storage.
+				//
+				// UNLESS THE LINK IS A SELF-LOOP, in which case the two writes the dense form made
+				// were to the SAME cell and both have to survive. A pipe drawn from a junction
+				// back to itself is nonsense hydraulically and cancels to nothing either way, but
+				// "either way" is the claim being made here, and it is only true if this branch
+				// exists. Nothing rejects such a link upstream.
+				if (iIdx === jIdx) {
+					M[envDiag[iIdx]] -= G[k];
+					M[envDiag[iIdx]] -= G[k];
+				} else {
+					lo = iIdx < jIdx ? iIdx : jIdx;
+					hi = iIdx < jIdx ? jIdx : iIdx;
+					M[envRowStart[hi] - envFirst[hi] + lo] -= G[k];
+				}
 			} else if (iIdx !== undefined) {
 				F[iIdx] += G[k] * byId[link.to].head;
 			} else if (jIdx !== undefined) {
@@ -735,12 +838,12 @@ EngCalcs.lpnSolve = function (model, options) {
 					ge = dh > qMin
 						? emitterExp * junctions[i].emitter * Math.pow(dh, emitterExp - 1)
 						: junctions[i].emitter;
-				A[i][i] += ge;
+				M[envDiag[i]] += ge;
 				F[i] += ge * H[i] - qe;
 			}
 		}
 
-		Hnew = EngCalcs.lpnSolveSPD(A, F);
+		Hnew = EngCalcs.lpnSolvePacked(env, M, F);
 		if (Hnew === null) {
 			return {
 				ok: false,

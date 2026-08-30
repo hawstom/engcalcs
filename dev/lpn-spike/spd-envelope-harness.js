@@ -123,20 +123,37 @@ const corpus = Object.keys(cases).map(k => Object.assign({ name: k }, cases[k]))
 // -------------------------------------------------------------------------------------------
 // 2. Every matrix a real solve forms
 // -------------------------------------------------------------------------------------------
+//
+// This one also covers the ASSEMBLY, not only the factorization. lpnSolve now builds its matrix
+// straight into the packed band, so the packed matrix is UNPACKED back into a square here and the
+// dense reference is run on that. If a link were being added into the wrong cell, or the lower
+// triangle were losing a contribution the dense form used to make twice, the two answers would
+// part company right here.
 console.log('\n--- every matrix a real solve forms ---');
 {
-	const envelope = EC.lpnSolveSPD, dense = EC.lpnSolveSPDDense;
+	const packed = EC.lpnSolvePacked, dense = EC.lpnSolveSPDDense;
 	let matrices = 0, bad = null;
-	EC.lpnSolveSPD = function (A, b) {
-		// The dense reference goes FIRST and its result is what the solve continues from, so a
-		// divergence cannot hide by steering the two runs onto different iterates.
-		const d = dense(A, b), e = envelope(A, b);
+	EC.lpnSolvePacked = function (env, M, b) {
+		const n = env.n;
+		const A = [];
+		for (let i = 0; i < n; i++) { A.push(new Float64Array(n)); }
+		for (let i = 0; i < n; i++) {
+			for (let j = env.first[i]; j <= i; j++) {
+				const v = M[env.rowStart[i] - env.first[i] + j];
+				A[i][j] = v;
+				A[j][i] = v;
+			}
+		}
+		// The dense reference goes FIRST, and its result is what the solve continues from, so a
+		// divergence cannot hide by steering the two runs onto different iterates. (M is factored
+		// in place, so the packed call has to come second.)
+		const d = dense(A, b), e = packed(env, M, b);
 		matrices++;
 		if (!sameVector(d, e) && !bad) { bad = 'n=' + b.length; }
 		return d;
 	};
 	corpus.forEach(m => { EC.lpnSolve(m, { tol: 1e-9, maxIter: 200 }); });
-	EC.lpnSolveSPD = envelope;
+	EC.lpnSolvePacked = packed;
 	ok(matrices + ' matrices from ' + corpus.length + ' networks factor bit-identically', bad === null, bad);
 }
 
@@ -145,7 +162,23 @@ console.log('\n--- every matrix a real solve forms ---');
 // -------------------------------------------------------------------------------------------
 console.log('\n--- reported answers, dense against envelope ---');
 {
-	const envelope = EC.lpnSolveSPD, dense = EC.lpnSolveSPDDense;
+	const packed = EC.lpnSolvePacked, dense = EC.lpnSolveSPDDense;
+	// "Dense" here means: let the solve assemble exactly as it does, then unpack the band into a
+	// square and factor THAT with the untouched reference. It is the old numerics driven by the
+	// new code, which is the only way left to run them against the same networks.
+	const viaDense = function (env, M, b) {
+		const n = env.n;
+		const A = [];
+		for (let i = 0; i < n; i++) { A.push(new Float64Array(n)); }
+		for (let i = 0; i < n; i++) {
+			for (let j = env.first[i]; j <= i; j++) {
+				const v = M[env.rowStart[i] - env.first[i] + j];
+				A[i][j] = v;
+				A[j][i] = v;
+			}
+		}
+		return dense(A, b);
+	};
 	function run(m) {
 		const r = EC.lpnSolve(m, { tol: 1e-9, maxIter: 200 });
 		return { ok: r.ok, converged: r.converged, iterations: r.iterations,
@@ -165,15 +198,15 @@ console.log('\n--- reported answers, dense against envelope ---');
 		return null;
 	}
 	corpus.forEach(m => {
-		EC.lpnSolveSPD = dense;
+		EC.lpnSolvePacked = viaDense;
 		const d = run(m);
-		EC.lpnSolveSPD = envelope;
+		EC.lpnSolvePacked = packed;
 		const e = run(m);
 		const diff = compare(d, e);
 		const n = m.nodes.filter(x => !EC.lpnIsFixedHead(x)).length;
 		ok(m.name + ' (' + n + ' junctions) reports identical numbers', diff === null, diff);
 	});
-	EC.lpnSolveSPD = envelope;
+	EC.lpnSolvePacked = packed;
 }
 
 // -------------------------------------------------------------------------------------------
@@ -185,13 +218,7 @@ console.log('\n--- reported answers, dense against envelope ---');
 // it is asserted as a RATIO on the grid the fire-flow bench uses, at that bench's three sizes.
 console.log('\n--- factorization work, counted (a count travels between machines; a time does not) ---');
 {
-	function flops(A, n) {
-		const first = new Int32Array(n);
-		for (let i = 0; i < n; i++) {
-			let f = i;
-			for (let j = 0; j < i; j++) { if (A[i][j] !== 0) { f = j; break; } }
-			first[i] = f;
-		}
+	function flops(first, n) {
 		let env = 0, den = 0;
 		for (let i = 0; i < n; i++) {
 			for (let j = 0; j <= i; j++) {
@@ -201,13 +228,13 @@ console.log('\n--- factorization work, counted (a count travels between machines
 		}
 		return { env, den };
 	}
-	const envelope = EC.lpnSolveSPD;
+	const packed = EC.lpnSolvePacked;
 	const rows = [];
 	[grid(7), grid(11), grid(15)].forEach(m => {
 		let f = null;
-		EC.lpnSolveSPD = function (A, b) { if (!f) { f = flops(A, b.length); } return envelope(A, b); };
+		EC.lpnSolvePacked = function (env, M, b) { if (!f) { f = flops(env.first, env.n); } return packed(env, M, b); };
 		EC.lpnSolve(m, { tol: 1e-9, maxIter: 200 });
-		EC.lpnSolveSPD = envelope;
+		EC.lpnSolvePacked = packed;
 		const n = m.nodes.length - 1;
 		rows.push({ n, env: f.env, den: f.den });
 		console.log('  ' + n + ' junctions: dense ' + f.den.toLocaleString() + ' multiply-adds, envelope ' +
