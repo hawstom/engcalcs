@@ -832,6 +832,17 @@ echoHeader("EngCalcs", $html_title, "", false);
 		<div id="lpn_ff_report" class="lpn-ff-report"></div>
 	</div>
 </div>
+<?php /* THE RUN'S OWN DIALOG (ROADMAP Task 530). Progress, a Stop button and nothing else, on
+   Tom's ruling of 2026-08-30. No close X: closing it would have to mean stopping the run, which is
+   what the Stop button already says in words, and two controls for one act is how a user learns to
+   distrust both. It sits above the fire flow box (z-index 23 against 22) because it is the modal
+   half of the same act, and its body is built by openFireFlowRunBox(). */ ?>
+<div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;z-index:23;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffrun_title">
+	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
+	<div class="lpn-popover-body">
+		<div id="lpn_ff_run_body"></div>
+	</div>
+</div>
 <?php // ONE menu popover, reused by all three menus (ROADMAP Task 211): the File menu, a tab's own
       // menu, and the tab-strip overflow list. They differ only in their rows, and openMenu() in
       // js/looped-network.js builds those, so three popovers would have been three copies of the
@@ -1541,6 +1552,7 @@ EngCalcs.pageConfig = {
 	lpn_ff_engine_epanet: <?=json_encode($ec_lang['lpn_ff_engine_epanet'])?>,
 	lpn_ff_engine_cost: <?=json_encode($ec_lang['lpn_ff_engine_cost'])?>,
 	lpn_ff_steady: <?=json_encode($ec_lang['lpn_ff_steady'])?>,
+	lpn_ff_run_title: <?=json_encode($ec_lang['lpn_ff_run_title'])?>,
 	lpn_ff_calculate: <?=json_encode($ec_lang['lpn_ff_calculate'])?>,
 	lpn_ff_stop: <?=json_encode($ec_lang['lpn_ff_stop'])?>,
 	lpn_ff_working: <?=json_encode($ec_lang['lpn_ff_working'])?>,
@@ -1549,13 +1561,20 @@ EngCalcs.pageConfig = {
 	lpn_ff_stale: <?=json_encode($ec_lang['lpn_ff_stale'])?>,
 	lpn_ff_summary: <?=json_encode($ec_lang['lpn_ff_summary'])?>,
 	lpn_ff_summary_error: <?=json_encode($ec_lang['lpn_ff_summary_error'])?>,
-	lpn_ff_report_available: <?=json_encode($ec_lang['lpn_ff_report_available'])?>,
-	lpn_ff_report_design: <?=json_encode($ec_lang['lpn_ff_report_design'])?>,
+	lpn_ff_report_all: <?=json_encode($ec_lang['lpn_ff_report_all'])?>,
 	lpn_ff_col_junction: <?=json_encode($ec_lang['lpn_ff_col_junction'])?>,
+	lpn_ff_col_static: <?=json_encode($ec_lang['lpn_ff_col_static'])?>,
 	lpn_ff_col_available: <?=json_encode($ec_lang['lpn_ff_col_available'])?>,
 	lpn_ff_col_required: <?=json_encode($ec_lang['lpn_ff_col_required'])?>,
-	lpn_ff_col_result: <?=json_encode($ec_lang['lpn_ff_col_result'])?>,
+	lpn_ff_col_residual: <?=json_encode($ec_lang['lpn_ff_col_residual'])?>,
+	lpn_ff_col_atrequired: <?=json_encode($ec_lang['lpn_ff_col_atrequired'])?>,
 	lpn_ff_col_affected: <?=json_encode($ec_lang['lpn_ff_col_affected'])?>,
+	lpn_ff_col_limit: <?=json_encode($ec_lang['lpn_ff_col_limit'])?>,
+	lpn_ff_col_solves: <?=json_encode($ec_lang['lpn_ff_col_solves'])?>,
+	lpn_ff_col_result: <?=json_encode($ec_lang['lpn_ff_col_result'])?>,
+	lpn_ff_limit_pressure: <?=json_encode($ec_lang['lpn_ff_limit_pressure'])?>,
+	lpn_ff_limit_velocity: <?=json_encode($ec_lang['lpn_ff_limit_velocity'])?>,
+	lpn_ff_limit_both: <?=json_encode($ec_lang['lpn_ff_limit_both'])?>,
 	lpn_ff_state_pass: <?=json_encode($ec_lang['lpn_ff_state_pass'])?>,
 	lpn_ff_state_fail: <?=json_encode($ec_lang['lpn_ff_state_fail'])?>,
 	lpn_ff_state_design: <?=json_encode($ec_lang['lpn_ff_state_design'])?>,

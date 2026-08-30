@@ -2847,15 +2847,26 @@ $ec_lang['lpn_ff_maxvelocity']='Highest velocity allowed';
 $ec_lang['lpn_ff_maxvelocity_tip']='A pipe running above this while a fire flow is drawn is reported as a design issue.';
 // HOW HYDRANT LOSSES ARE ACCOUNTED FOR, STATED IN THE INTERFACE rather than left to be assumed
 // (Tom, 2026-08-25: "I want to be very explicit and transparent... about how we account if at all
-// for hydrant losses beyond the node."). The answer here is: not at all, which is the profession's
-// default and what both inspectable tools do.
-$ec_lang['lpn_ff_accounting']='The flow is drawn at the junction itself. No hydrant, lateral or fitting loss is included, so a real hydrant on a real lateral delivers less than these numbers say.';
-$ec_lang['lpn_ff_engine_native']='This will be worked out with the built-in solver.';
-$ec_lang['lpn_ff_engine_epanet']='This will be worked out with the EPANET engine.';
+// for hydrant losses beyond the node."). IT LEADS WITH THE METHOD, NOT WITH THE ABSENCE: Tom read
+// the first wording as "no losses are accounted for at the raw node", which is a hole in the tool
+// rather than the deliberate and standard choice it actually is.
+$ec_lang['lpn_ff_accounting']='Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.';
+$ec_lang['lpn_ff_engine_native']='This is worked out with the built-in solver.';
+$ec_lang['lpn_ff_engine_epanet']='This is worked out with the EPANET engine.';
 $ec_lang['lpn_ff_engine_cost']='Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
-$ec_lang['lpn_ff_steady']='One condition is tested, the one now on the clock. Fire flow is normally loaded onto maximum day demand and read as a single steady condition.';
+//
+// IT ENDS AT "maximum day demand". The old tail, "and read as a single steady condition", said the
+// first sentence over again in other words -- Tom: "I don't know what this means. Are we just
+// repeating what we said above?" It was. What the practice half carries that the first sentence
+// does not is the DEMAND the fire flow is added to, and that survives.
+$ec_lang['lpn_ff_steady']='Only the current time step is tested. Fire flow is normally added to maximum day demand.';
+// THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
+// applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
+// other progress stats."). It says how far along it is and never how long is left: per-solve cost
+// RISES through a run, so a time left over would be optimistic and get worse as the run went on.
+$ec_lang['lpn_ff_run_title']='Fire flow run';
 $ec_lang['lpn_ff_calculate']='Run';
 $ec_lang['lpn_ff_stop']='Stop';
 $ec_lang['lpn_ff_working']='Working: {done} of {total} junctions.';
@@ -2866,13 +2877,30 @@ $ec_lang['lpn_ff_cost']='{solves} network solves.';
 $ec_lang['lpn_ff_stale']='The drawing changed, so the fire flow results were cleared. Run it again.';
 $ec_lang['lpn_ff_summary']='{pass} passing, {fail} failing, {design} with a design issue.';
 $ec_lang['lpn_ff_summary_error']='{n} could not be answered.';
-$ec_lang['lpn_ff_report_available']='Available against required';
-$ec_lang['lpn_ff_report_design']='Effect on the rest of the system';
+// ONE WIDE TABLE, NOT TWO REPORTS (Tom, 2026-08-30, with a competitor's own table in front of him:
+// "Normally they are kind of wide and they include the information from both tables in one table.")
+// One run has always produced one result set holding both answers per junction, so two headings
+// were this page showing its own architecture rather than the answer.
+//
+// THE HEADINGS ARE OURS, NOT THE COMPETITOR'S. Every column below is the MEANING of one of theirs
+// written in this page's own words, and each is kept as narrow as the meaning allows: column width
+// is king, and mid-word wrap is cheaper than a wide column.
+$ec_lang['lpn_ff_report_all']='Every junction tested';
 $ec_lang['lpn_ff_col_junction']='Junction';
+$ec_lang['lpn_ff_col_static']='Rest pressure';
 $ec_lang['lpn_ff_col_available']='Available';
 $ec_lang['lpn_ff_col_required']='Required';
+$ec_lang['lpn_ff_col_residual']='Residual held';
+$ec_lang['lpn_ff_col_atrequired']='Pressure at required';
+$ec_lang['lpn_ff_col_affected']='Pulled down';
+$ec_lang['lpn_ff_col_limit']='Design limit';
+$ec_lang['lpn_ff_col_solves']='Solves';
 $ec_lang['lpn_ff_col_result']='Result';
-$ec_lang['lpn_ff_col_affected']='What it pulls down';
+// Which criterion the junction broke while drawing the required flow. A junction that broke nothing
+// shows a dash, never one of these words.
+$ec_lang['lpn_ff_limit_pressure']='Pressure';
+$ec_lang['lpn_ff_limit_velocity']='Velocity';
+$ec_lang['lpn_ff_limit_both']='Pressure and velocity';
 $ec_lang['lpn_ff_state_pass']='Passing';
 $ec_lang['lpn_ff_state_fail']='Failing';
 $ec_lang['lpn_ff_state_design']='Design issue';
