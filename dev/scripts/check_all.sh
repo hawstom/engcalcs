@@ -203,6 +203,11 @@ run_check "languages declared and filed" blocking php dev/scripts/language_decla
 run_check "lang declaration selftest"    blocking php dev/scripts/language_declaration_selftest.php
 run_check "coverage declaration"         blocking php dev/scripts/coverage_selftest.php
 run_check "payload freshness"            blocking php dev/scripts/generate_translation_payloads.php --check
+# Task 322. Freshness is decided by CONTENT since 2026-08-29: it judged by MTIME before that and
+# so called all 26 payloads stale in any freshly checked-out tree, because git pull does not
+# preserve mtimes and neither does a worktree. A blocking check that cries wolf on a clean
+# checkout is the shape that teaches people to ignore it.
+run_check "payload freshness selftest"   blocking php dev/scripts/payload_freshness_selftest.php
 # Task 322 row 4. A prefix missing from prefixToTermNames() does not fail -- it silently falls back
 # to three default terms, and every definition, preferred translation and avoid array written for
 # that calculator reaches no agent. gloss_ref_check.php can only see a prefix somebody already
@@ -259,6 +264,10 @@ run_check "example folder"               advisory php dev/scripts/example_folder
 # with are pre-existing translation work, not a regression anybody just caused.
 run_check "mode names"                   advisory php dev/scripts/mode_name_check.php
 run_check "key hygiene"                  advisory php dev/scripts/key_hygiene_check.php --strict
+# Blocking, though the check it guards is advisory and finds nothing today: the case the walk was
+# written for was already deleted, so fixture 1 is that shape verbatim and is the only thing
+# standing between the reachability walk and a silent zero.
+run_check "key hygiene selftest"         blocking php dev/scripts/key_hygiene_selftest.php
 run_check "size budget"                  advisory php dev/scripts/size_budget_check.php --strict
 # Task 481. Three false "not built yet" claims shipped in one day, two found by Tom and none by any
 # check. This cites-a-closed-task scan is the mechanical half of that shape; the ranking is what

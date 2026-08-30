@@ -432,6 +432,10 @@ must pass the **substitution test**: it could stand on the control as the label 
 lang files, `$ec_lang_syn`, every call site, the drift manifest, the exempt list and the coverage
 declaration in one pass. A hand rename is ~40 edits and every miss fails **silently**.
 `key_hygiene_check.php` reports keys rendered by nothing and names that drifted from their siblings;
+It also reports keys whose only reader is itself unreachable — a reference from an uncalled function
+is still a reference, which is why a reference count alone could not see the two terrain strings
+Task 542 stranded. That walk is advisory and lists CANDIDATES: reachability through a dynamic
+dispatch is undecidable, so it is deliberately conservative and prints what it turned away.
 a key rendered by nothing is not automatically debt, so decide per key and never bulk-delete.
 **Keep sibling keys parallel in NAME and in VALUE across all 27 files.**
 
@@ -517,6 +521,8 @@ own failure; this table is an index, not a duplicate of that text.
 | `language_declaration_check.php` + selftest | `$all_language_settings` lists exactly the `lib/lang.ec.??.php` files that exist, each with a `QUALITY` in (0,1] and a `LANGNAME`. Declared-with-no-file is a fatal for the one visitor whose browser asked for that language, and we advertise it in `hreflang`; a file nobody declared is a paid-for translation nothing can reach. Not the tier VALUES — which tier a language is in is judgement |
 | `coverage_selftest.php` | The coverage cross, the identity floor, exempt/out-of-scope separation |
 | `generate_translation_payloads.php --check` | Payload freshness |
+| `payload_freshness_selftest.php` | Both directions of the freshness gate. It judged by MTIME until 2026-08-29 and so reported all 26 payloads stale in any freshly checked-out tree — `git pull` does not preserve mtimes and neither does a worktree, and four subagents in one session each had to work out whether the failure was theirs. Freshness is decided by CONTENT now, and building the payload IS the input list, which retires an eight-path list that had already missed an include once |
+| `key_hygiene_selftest.php` | The reachability walk (finding 1b of `key_hygiene_check.php`) still sees a dead reader, and still turns away the shapes that only look like one. Blocking, though the check it guards is advisory and finds nothing today: the case it was written for was already deleted, so fixture 1 is that shape verbatim and is the only thing standing between the walk and a silent zero |
 | `prefix_map_check.php` + selftest | Every calculator prefix is wired to glossary terms or declared to own none. A prefix missing from `prefixToTermNames()` does not fail — it silently gets three default terms, and the calculator's definitions, preferred translations and `avoid` arrays reach no translation agent. `lpn`/`bpn` were missing for months |
 | `new_english_keys.php --check` | `dev/new-english-keys.md` is fresh, so the list Tom rules on cannot go stale between the day a key is written and the day he reads it |
 | `generate_examples.php --check` | The served `examples/` matches its source |
