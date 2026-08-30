@@ -214,19 +214,21 @@ console.log('\n--- EPA\'s own Net1, which states eight of them ---');
 		return out;
 	}
 	const src = optsOf(net1), got = optsOf(L.export().inp);
-	// **QUALITY, DIFFUSIVITY AND TOLERANCE ARE WATER-QUALITY OPTIONS AND ARE NOT MODELLED**, so
-	// they are lost -- as they were before Task 553, which changed nothing about them. Named here so
-	// the exclusion is a statement rather than a gap somebody finds later.
-	const quality = ['QUALITY', 'DIFFUSIVITY', 'TOLERANCE'];
+	// **QUALITY, DIFFUSIVITY AND TOLERANCE ARE NOT MODELLED AND ARE STILL CARRIED**, since the
+	// water-quality half of Task 553 landed. Nothing solves with them, so they ride as the file's
+	// own characters; dev/lpn-spike/quality-options-harness.js is where that is proved in full.
+	// They are asserted here on the SAME footing as every other option -- byte-identical, not
+	// numerically equal -- because `Diffusivity 1.0` is exactly the token a parse-and-reformat
+	// writer would return as `1`.
 	Object.keys(src).forEach(function (k) {
-		if (quality.indexOf(k) >= 0) { return; }
 		ok('Net1\'s ' + k + ' survives the round trip',
 			got[k] !== undefined && parseFloat(got[k]) === parseFloat(src[k]) || got[k] === src[k],
 			JSON.stringify(src[k]) + ' -> ' + JSON.stringify(got[k]));
 	});
-	ok('the three water-quality options are still dropped, as they always were',
-		quality.every(function (k) { return got[k] === undefined; }),
-		quality.map(function (k) { return k + '=' + got[k]; }).join(' '));
+	['QUALITY', 'DIFFUSIVITY', 'TOLERANCE'].forEach(function (k) {
+		ok('Net1\'s ' + k + ' comes back character for character', got[k] === src[k],
+			JSON.stringify(src[k]) + ' -> ' + JSON.stringify(got[k]));
+	});
 }
 
 // ---------------------------------------------------------------------------

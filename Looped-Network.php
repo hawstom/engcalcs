@@ -1553,6 +1553,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_drop_rules: <?=json_encode($ec_lang['lpn_inp_drop_rules'])?>,
 	lpn_inp_drop_eps: <?=json_encode($ec_lang['lpn_inp_drop_eps'])?>,
 	lpn_inp_drop_quality: <?=json_encode($ec_lang['lpn_inp_drop_quality'])?>,
+	lpn_inp_drop_quality_options: <?=json_encode($ec_lang['lpn_inp_drop_quality_options'])?>,
 	lpn_inp_drop_backdrop: <?=json_encode($ec_lang['lpn_inp_drop_backdrop'])?>,
 	lpn_inp_drop_dangling: <?=json_encode($ec_lang['lpn_inp_drop_dangling'])?>,
 	lpn_inp_drop_units: <?=json_encode($ec_lang['lpn_inp_drop_units'])?>,
