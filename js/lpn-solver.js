@@ -132,23 +132,19 @@ EngCalcs.lpnResistance = function (link, method, visc) {
 	return { r: link.f * L / (d * 2 * EngCalcs.lpnG * a * a), n: 2 };
 };
 
-// Dense Cholesky (LL^T) solve of A x = b for symmetric positive definite A.
+// DENSE Cholesky (LL^T) solve of A x = b for symmetric positive definite A.
 //
-// Dense on purpose. Measured (dev/lpn-spike):
-//   21 nodes  / 32 links   0.4 ms per solve,  5 iterations
-//   97 nodes  / 119 links  (EPANET Net3)     16 iterations
-//   201 nodes / 371 links  30 ms per solve,  11 iterations
-// The 200-node figure is headroom, not a target, and is comfortably inside a
-// debounced edit.
-//
-// The sparse machinery this replaces (CSR, conjugate gradient, fill-reducing
-// ordering, cached symbolic factorization) is cut, not deferred. Everything routes
-// through this one function so that decision stays reversible.
+// **This is the REFERENCE implementation and is no longer what a solve calls** --
+// lpnSolveSPD below is an ENVELOPE factorization that computes the same numbers by
+// skipping terms that are exactly zero. This one is kept, exported and tested
+// against, because "the fast one agrees with the simple one BIT FOR BIT on every
+// matrix a real solve forms" is the whole proof that the answers did not move
+// (dev/lpn-spike/spd-envelope-harness.js).
 //
 // Returns null if A is not positive definite, which for this matrix means the
 // network is not properly grounded -- the caller should have caught that already
 // with a structural check, so null here is a bug, not a user error.
-EngCalcs.lpnSolveSPD = function (A, b) {
+EngCalcs.lpnSolveSPDDense = function (A, b) {
 	'use strict';
 	var n = b.length,
 		L = [],
@@ -183,6 +179,128 @@ EngCalcs.lpnSolveSPD = function (A, b) {
 		sum = y[i];
 		for (k = i + 1; k < n; k++) { sum -= L[k][i] * x[k]; }
 		x[i] = sum / L[i][i];
+	}
+
+	return x;
+};
+
+// ENVELOPE (profile) Cholesky -- the one a solve actually calls.
+//
+// WHY THIS EXISTS, in one measurement. The fire-flow sweep (Task 530) runs 3,707 solves on a
+// 225-junction grid, and its solve COUNT grows linearly with junctions -- that half is fine. Its
+// cost per solve does not: profiled at 49 / 121 / 225 junctions, the linear solve went from 24%
+// of a solve to 90% of it, because a dense Cholesky is n^3/6 multiply-adds and 225^3/6 is 1.9
+// million of them PER NEWTON ITERATION. The sweep's problem was never the sweep.
+//
+// WHAT IT DOES. In this matrix A[i][j] is nonzero only when junctions i and j share a link, so
+// most of each row is zero, and the classical envelope theorem says Cholesky's fill-in cannot
+// escape the band between each row's FIRST nonzero and its diagonal. So for each row i take
+//   f[i] = the first column where A[i][.] is not zero
+// and store and factor only columns f[i]..i. Everything skipped is a term whose value is exactly
+// 0.0, which is why this is not an approximation of the dense answer but the same arithmetic with
+// the `sum -= 0` steps left out.
+//
+// **BIT-IDENTICAL, AND THAT IS THE POINT** -- not "within tolerance". Every term dropped is a
+// product with an exactly-zero factor, and the surviving terms are accumulated in the same order
+// as before, so no rounding changes. A tolerance-grade speedup would have moved every number this
+// suite reports; this one moves none, which is what let it ship without asking Tom to re-approve
+// an answer. Proof, on every matrix real solves form: dev/lpn-spike/spd-envelope-harness.js.
+//
+// f[] IS READ FROM A'S OWN ZEROS, not from the link list. A numerically-zero entry inside the
+// structural pattern only makes f[i] later, which the theorem allows (its induction needs the
+// zeros to be zero, not to be structural), and it keeps this function's signature exactly what it
+// was -- so the dense reference above can be handed the same argument and compared against.
+//
+// WHAT IS NOT DONE HERE, deliberately: no fill-reducing ORDERING (RCM, minimum degree). An
+// ordering is what turns a badly-numbered network into a narrow envelope, and it would help --
+// but permuting the matrix changes the order of the arithmetic, and therefore changes the answer
+// in its last bits. That needs Tom, not a comment. Unordered, the envelope is as good as the
+// user's own node numbering, which for anything drawn or imported in geographic order is already
+// narrow.
+//
+// Returns null on a non-positive-definite A, exactly as the dense one does.
+EngCalcs.lpnSolveSPD = function (A, b) {
+	'use strict';
+	var n = b.length,
+		first = new Int32Array(n),
+		rowStart = new Int32Array(n + 1),
+		colStart = new Int32Array(n + 2),
+		L,
+		colRow,
+		x = new Array(n),
+		y = new Array(n),
+		Ai,
+		i,
+		j,
+		k,
+		kk,
+		f,
+		fi,
+		fj,
+		si,
+		sj,
+		sum,
+		lii,
+		total = 0;
+
+	// Row envelopes, and the packed offsets they imply. Row i occupies columns f[i]..i.
+	for (i = 0; i < n; i++) {
+		Ai = A[i];
+		f = i;
+		for (j = 0; j < i; j++) {
+			if (Ai[j] !== 0) { f = j; break; }
+		}
+		first[i] = f;
+		rowStart[i] = total;
+		total += i - f + 1;
+	}
+	rowStart[n] = total;
+	L = new Float64Array(total);
+
+	// Column occupancy, for the back substitution alone. Counting sort, so the rows in each
+	// column come out in increasing order -- which is the order the dense loop visited them in,
+	// and therefore the order the sum has to be accumulated in.
+	for (i = 0; i < n; i++) {
+		for (j = first[i]; j < i; j++) { colStart[j + 2]++; }
+	}
+	for (j = 0; j < n; j++) { colStart[j + 2] += colStart[j + 1]; }
+	colRow = new Int32Array(total - n);
+	for (i = 0; i < n; i++) {
+		for (j = first[i]; j < i; j++) { colRow[colStart[j + 1]++] = i; }
+	}
+
+	for (i = 0; i < n; i++) {
+		Ai = A[i];
+		fi = first[i];
+		si = rowStart[i] - fi;
+		for (j = fi; j <= i; j++) {
+			sum = Ai[j];
+			fj = first[j];
+			sj = rowStart[j] - fj;
+			for (k = (fi > fj ? fi : fj); k < j; k++) { sum -= L[si + k] * L[sj + k]; }
+			if (i === j) {
+				if (!(sum > 0)) { return null; }
+				L[si + i] = Math.sqrt(sum);
+			} else {
+				L[si + j] = sum / L[rowStart[j] + j - fj];
+			}
+		}
+	}
+
+	for (i = 0; i < n; i++) {
+		fi = first[i];
+		si = rowStart[i] - fi;
+		sum = b[i];
+		for (k = fi; k < i; k++) { sum -= L[si + k] * y[k]; }
+		y[i] = sum / L[si + i];
+	}
+	for (i = n - 1; i >= 0; i--) {
+		sum = y[i];
+		for (kk = colStart[i]; kk < colStart[i + 1]; kk++) {
+			k = colRow[kk];
+			sum -= L[rowStart[k] - first[k] + i] * x[k];
+		}
+		x[i] = sum / L[rowStart[i] - first[i] + i];
 	}
 
 	return x;
@@ -443,12 +561,27 @@ EngCalcs.lpnSolve = function (model, options) {
 	// first solve, and they need something physical rather than zero.
 	for (i = 0; i < nn; i++) { H[i] = junctions[i].elev || 0; }
 
+	// THE SYSTEM'S SHAPE DOES NOT CHANGE BETWEEN NEWTON ITERATIONS, so its storage is allocated
+	// once per solve and reused. This used to be four fresh typed arrays per iteration, of which A
+	// is nn x nn -- 225 allocations totalling 405 KB on every one of a 225-junction network's 13
+	// iterations, which is 2,925 allocations per solve and 3,707 solves in one fire-flow sweep.
+	// Measured on its own at 225 junctions: 0.65 ms to allocate the matrix against 0.018 ms to
+	// zero the reused one, a 35x difference, and after the envelope factorization landed this
+	// allocation was two thirds of a solve.
+	//
+	// A is zeroed each iteration because it is ACCUMULATED into (`+=` per link); F likewise. G and
+	// y are not, because every link writes both on every iteration in both branches. `fill(0)`
+	// writes +0.0, which is what a fresh Float64Array holds, so nothing about the arithmetic
+	// changes -- and that is asserted, not assumed (dev/lpn-spike/spd-envelope-harness.js compares
+	// every reported number against the dense reference).
+	var A = [],
+		F = new Float64Array(nn),
+		G = new Float64Array(links.length),
+		y = new Float64Array(links.length);
+	for (i = 0; i < nn; i++) { A.push(new Float64Array(nn)); }
+
 	for (iter = 1; iter <= maxIter; iter++) {
-		var A = [],
-			F = new Float64Array(nn),
-			G = new Float64Array(links.length),
-			y = new Float64Array(links.length),
-			link,
+		var link,
 			res,
 			q,
 			aq,
@@ -460,7 +593,8 @@ EngCalcs.lpnSolve = function (model, options) {
 			dq,
 			sumAbsDq = 0;
 
-		for (i = 0; i < nn; i++) { A.push(new Float64Array(nn)); }
+		for (i = 0; i < nn; i++) { A[i].fill(0); }
+		F.fill(0);
 
 		for (k = 0; k < links.length; k++) {
 			link = links[k];
