@@ -54,6 +54,32 @@ EngCalcs.initTips = function (root) {
 			el.dataset.ecTipClickWired = '1';
 			el.addEventListener('click', function () { tip.hide(); });
 		}
+		// **A TAP ON THE "?" ASKS A QUESTION; IT DOES NOT START TYPING** (Tom, 2026-08-29, from a
+		// phone: *"The only problem is that it puts me in the input field, bringing up my input
+		// keyboard when I am not ready for any input."*). The glyph sits inside a <label>, and a
+		// label's activation behaviour is to focus the control it names -- so the tap that opened
+		// the tip also opened the keyboard, over the tip.
+		//
+		// CANCELLED ON THE GLYPH ALONE, never on `.ec-help`. The two nestings are opposite
+		// (lib/Calculators.lib.php): with a link `.ec-help` wraps the glyph, without one it wraps
+		// the label TEXT and the glyph. Cancelling on `.ec-help` would therefore take the label
+		// text's own tap with it in the second case, and a tap on a field's name is meant to reach
+		// the field. `.ec-tip` is the glyph in both nestings and in the ones js/looped-network.js
+		// builds by hand, so it is the one honest handle.
+		//
+		// preventDefault() only: the click still bubbles, so Bootstrap's own 'click' trigger -- the
+		// only way a tip opens on a device that cannot hover -- still sees it and shows the tip.
+		//
+		// TOUCH ONLY. A mouse reaches the tip by hovering and never taps the glyph to read it, so
+		// the pointer behaviour is left exactly as it was.
+		if (!canHover && !control) {
+			var glyph = (el.classList && el.classList.contains('ec-tip')) ? el :
+				(el.querySelector ? el.querySelector('.ec-tip') : null);
+			if (glyph && !glyph.dataset.ecTipNoFocus) {
+				glyph.dataset.ecTipNoFocus = '1';
+				glyph.addEventListener('click', function (e) { e.preventDefault(); });
+			}
+		}
 		if (longPress && !el.dataset.ecTipHoldWired) {
 			el.dataset.ecTipHoldWired = '1';
 			var timer = null;
