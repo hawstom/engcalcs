@@ -22,6 +22,10 @@ const GPM = 6.309019640343977e-5, FT = 0.3048, IN = 0.0254;
 // and page code that walks childNodes looking for a particular SVG child (the <title> on a
 // scenario override ring, ROADMAP Task 512) tests exactly that. A stub that reported one casing
 // for both would make such a walk pass here and find nothing in a browser, or the reverse.
+// `data-my-thing` <-> `dataset.myThing`, the DOM's own spelling rule, in one place.
+function dataKey(attr) {
+  return attr.slice(5).replace(/-([a-z])/g, (m, c) => c.toUpperCase());
+}
 function mkEl(tag, svgNS) {
   const el = {
     nodeName: svgNS ? String(tag) : String(tag || 'div').toUpperCase(),
@@ -63,9 +67,19 @@ function mkEl(tag, svgNS) {
     },
     // 'style' must not clobber the style OBJECT -- el() passes style as an attribute string, and
     // the layout code then writes .style.display on the same element.
-    setAttribute(k, v) { if (k === 'style') { this._styleAttr = v; return; } this[k] = v; },
+    // **A `data-*` ATTRIBUTE AND `dataset` ARE THE SAME STORAGE, and that is a relationship the
+    // real DOM keeps and this stub has to keep too** (dev/testing-notes.md). buildNodeEls() writes
+    // `'data-node': n.id` through setAttribute, while every pointer handler reads `t.dataset.node`
+    // -- so without this a drawn node is a hit to getAttribute() and BARE MAP to the code deciding
+    // what a press grabbed, and a harness driving the real handlers fails for a reason that does not
+    // exist in a browser. Found by exactly that, wiring Task 417's grab test.
+    setAttribute(k, v) {
+      if (k === 'style') { this._styleAttr = v; return; }
+      this[k] = v;
+      if (k.indexOf('data-') === 0) { this.dataset[dataKey(k)] = String(v); }
+    },
     getAttribute(k) { return k === 'style' ? this._styleAttr : this[k]; },
-    removeAttribute(k) { delete this[k]; },
+    removeAttribute(k) { delete this[k]; if (k.indexOf('data-') === 0) { delete this.dataset[dataKey(k)]; } },
     addEventListener(t, f) { (this._listeners[t] = this._listeners[t] || []).push(f); },
     removeEventListener() {},
     querySelectorAll() { return []; },
