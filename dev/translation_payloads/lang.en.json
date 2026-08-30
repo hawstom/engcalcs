@@ -955,7 +955,8 @@
         "lpn_inp_drop_controls": "These controls and rules were left out. The pipes, pumps and valves they name came in at the state written in the file and stay that way.",
         "lpn_inp_drop_rules": "This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_eps": "This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in.",
-        "lpn_inp_drop_quality": "Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.",
+        "lpn_inp_drop_quality": "This file describes how the water quality changes as it travels, or what the pumps cost to run. That part was left out. This page solves flow and pressure only.",
+        "lpn_inp_drop_quality_options": "This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.",
         "lpn_inp_drop_dangling": "These pipes name a junction that is not in the file, so they were left out.",
         "lpn_inp_drop_units": "The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.",
@@ -1427,7 +1428,7 @@
         "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
         "lpn_terrain_ids_more": "{ids}, and {n} more"
     },
-    "count": 1425,
+    "count": 1426,
     "active_prefixes": [
         "about",
         "bpn",

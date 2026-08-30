@@ -105,6 +105,12 @@ run_check "log columns cannot be forged" blocking php dev/scripts/browser_lang_t
 # wrong, nothing errored, and the only place the defect existed was the GAP between two files. This
 # renders real pages and diffs their asset URLs against what the worker will really cache.
 run_check "service worker precache"      blocking php dev/scripts/sw_manifest_check.php
+# Task 322 row 10. The offline promise and the no-request-until-asked promise both live in the
+# worker. A precached tile is fetched at install, on a page the visitor merely OPENED, which
+# walks straight past that service's own consent gate. Read out of what sw.php EMITS, so a
+# hand-written fetch route counts exactly as much as a manifest entry.
+run_check "service worker map hosts"     blocking php dev/scripts/sw_map_host_check.php
+run_check "sw map host selftest"         blocking php dev/scripts/sw_map_host_selftest.php
 # Can this suite stand up ALONE? dev.hawsedc.com's first deploy came up with no blue form
 # backgrounds and no table borders, because /hawsedc.css lives in the PARENT site and is not in this
 # repo -- present on every machine anyone looks at, absent exactly where nobody looks until a deploy.
@@ -172,6 +178,18 @@ run_check "lang key resolve selftest"    blocking php dev/scripts/lang_key_resol
 run_check "lang markup matches English"  blocking php dev/scripts/lang_tag_parity_check.php --strict
 run_check "gloss pointers resolve"       blocking php dev/scripts/gloss_ref_check.php
 run_check "layout tags match widgets" blocking php dev/scripts/layout_tag_check.php
+# Task 322 row 15. The unguarded half of the same rule: layout_tag_check.php reads the RIGHT
+# side of the pipe, and the generator strips commentary by POSITION, so a tag written on the
+# left is shipped to 26 agents as though it were a synonym.
+run_check "syn tags right of the pipe"   blocking php dev/scripts/syn_tag_side_check.php
+run_check "syn tag side selftest"        blocking php dev/scripts/syn_tag_side_selftest.php
+# Task 322 rows 17 and 18. "Awaiting native review" promises a resolution that is not coming;
+# and a language declared with no file is a fatal for the one visitor whose browser asked for
+# it, while a file nobody declared is a paid-for translation the suite cannot reach.
+run_check "no pending review flags"      blocking php dev/scripts/native_review_flag_check.php
+run_check "native review flag selftest"  blocking php dev/scripts/native_review_flag_selftest.php
+run_check "languages declared and filed" blocking php dev/scripts/language_declaration_check.php
+run_check "lang declaration selftest"    blocking php dev/scripts/language_declaration_selftest.php
 run_check "coverage declaration"         blocking php dev/scripts/coverage_selftest.php
 run_check "payload freshness"            blocking php dev/scripts/generate_translation_payloads.php --check
 # Task 314. The served examples/ directory is GENERATED from dev/water-network-examples/, so it can

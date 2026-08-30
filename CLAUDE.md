@@ -492,6 +492,7 @@ own failure; this table is an index, not a duplicate of that text.
 | `tip_markup_check.php` | `.ec-help`/`.ec-tip` built by the helpers, not by hand |
 | `browser_lang_tag_check.php` | A stray tab in visitor text cannot forge a log row |
 | `sw_manifest_check.php` | The service worker precaches the URLs pages actually request (`?v=<filemtime>`). 22 of 25 entries were once unreachable and the offline promise was simply false |
+| `sw_map_host_check.php` + selftest | No map host, and nothing tile-shaped, in the service worker — read out of what `sw.php` EMITS, so a hand-written fetch route counts as much as a manifest entry. A precached tile is fetched at install, on a page the visitor merely opened, which walks past that service's own consent gate; and every precache entry must be a same-origin absolute path, because `activate` deletes cross-origin ones on every load |
 | `standalone_assets_check.php` | The suite ships its own assets — a parent-site CSS dependency broke a standalone deploy |
 | `canonical_origin_check.php` | `CANONICAL_ORIGIN` is a host→origin WHITELIST, never derived from `HTTP_HOST`. Multi-domain serving needs the lookup; a derivation lets a spoofed Host point canonical URLs off-site, and the first symptom would be a search engine indexing somebody else's domain for us |
 | `page_meta_check.php` + selftest | Every page sets `$html_desc` or is on a declared exempt list; it never points at the title (Google discards a duplicate and writes its own snippet from a form); no hardcoded `?v=N`. **The exempt list in prose was wrong until 2026-08-25** — that is why it is a check |
@@ -505,6 +506,9 @@ own failure; this table is an index, not a duplicate of that text.
 | `lang_tag_parity_check.php --strict` | Markup matches English |
 | `gloss_ref_check.php` | Every `gloss:` resolves and is wired to its prefix |
 | `layout_tag_check.php` | A layout tag matches the widget it claims to describe |
+| `syn_tag_side_check.php` + selftest | No `layout`/`avoid`/`gloss`/`symbol`/`runtime` tag LEFT of the pipe in `$ec_lang_syn`. The generator strips commentary by POSITION, so a tag on the wrong side — or a value with no pipe at all — ships to 26 agents as a synonym and nothing warns anybody. The unguarded half of `layout_tag_check.php`'s rule, taking its vocabulary from that file rather than keeping a second copy |
+| `native_review_flag_check.php` + selftest | No language logged as "awaiting native review" — the framing promises a resolution that is not coming and makes an honest `QUALITY` tier look provisional. It must READ the documents that state its own rule, so a quoted phrase and a line carrying a prohibition marker are demoted as mentions; the tree's four real mentions are fixtures |
+| `language_declaration_check.php` + selftest | `$all_language_settings` lists exactly the `lib/lang.ec.??.php` files that exist, each with a `QUALITY` in (0,1] and a `LANGNAME`. Declared-with-no-file is a fatal for the one visitor whose browser asked for that language, and we advertise it in `hreflang`; a file nobody declared is a paid-for translation nothing can reach. Not the tier VALUES — which tier a language is in is judgement |
 | `coverage_selftest.php` | The coverage cross, the identity floor, exempt/out-of-scope separation |
 | `generate_translation_payloads.php --check` | Payload freshness |
 | `generate_examples.php --check` | The served `examples/` matches its source |

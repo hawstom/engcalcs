@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 1425,
-        "delta_key_count": 105,
+        "expected_key_count": 1426,
+        "delta_key_count": 106,
         "exempt_key_count": 18,
         "exempt_keys": [
             "u_imgd",
@@ -503,6 +503,7 @@
         "lpn_new_place_hint": "Petaluma, California",
         "lpn_new_create": "Create",
         "lpn_inp_drop_rules": "This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_quality_options": "This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
@@ -610,6 +611,7 @@
         "lpn_new_place_hint": "Petaluma, California",
         "lpn_new_create": "Create",
         "lpn_inp_drop_rules": "This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_quality_options": "This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
@@ -1704,6 +1706,22 @@
                     "key": "lpn_inp_drop_eps",
                     "value": "این فایل شبیه‌سازی‌ای را توصیف می‌کند که در یک بازهٔ زمانی اجرا می‌شود. بخشی از این صفحه که شبکه را در طول زمان اجرا می‌کند بارگذاری نشد، پس فقط شرایط آغازین وارد شدند.",
                     "english": "This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in."
+                }
+            }
+        },
+        "lpn_inp_drop_quality_options": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_quality",
+                    "value": "کیفیت آب، واکنش شیمیایی و تنظیمات انرژی پمپ حذف شدند. این صفحه فقط دبی و فشار را حل می‌کند.",
+                    "english": "This file describes how the water quality changes as it travels, or what the pumps cost to run. That part was left out. This page solves flow and pressure only."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_backdrop",
+                    "value": "این فایل نام یک تصویر پس‌زمینه را می‌برد اما خود تصویر را ندارد. آن را خودتان با فایل، تصویر پس‌زمینه، افزودن تصویر اضافه کنید.",
+                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
                 }
             }
         },
