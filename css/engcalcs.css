@@ -470,6 +470,22 @@ html[lang="zh"] .ec-welcome {
    survives to 3x the map width, exactly the way sheet lettering works. Per label, so it cannot be
    a descendant selector; applyLabelVisibility() adds this class to the ones that are over it. */
 .lpn-lbl-hidden { visibility: hidden; }
+/* ---- THE FIRE FLOW RING (ROADMAP Task 530) ----------------------------------------------------
+   The result of the last fire flow sweep, on the junction's own circle. It paints a STROKE while
+   the colour ramp paints the FILL, so a run and a pressure colouring can be read at the same time
+   and neither has to be turned off to see the other.
+
+   **THE DASH PATTERN CARRIES THE READING AS WELL AS THE COLOUR**, so Passing, Failing and Design
+   issue are told apart without telling green from red -- and so a printed page in greyscale still
+   says which is which. The three are: solid, dotted, dashed.
+
+   FIRST of the four ring rules that follow, deliberately: override, selection and the pending mark
+   are all statements about what you are DOING and each of them overrides this, which is a statement
+   about what was calculated. */
+.lpn-node.lpn-ff-pass { stroke: #2e7d32; stroke-width: calc(0.5 * var(--lpn-sym, 1)); }
+.lpn-node.lpn-ff-fail { stroke: #d32f2f; stroke-width: calc(0.5 * var(--lpn-sym, 1)); stroke-dasharray: 0.6 0.6; }
+.lpn-node.lpn-ff-design { stroke: #ef6c00; stroke-width: calc(0.5 * var(--lpn-sym, 1)); stroke-dasharray: 1.6 0.8; }
+.lpn-node.lpn-ff-error { stroke: #888; stroke-width: calc(0.5 * var(--lpn-sym, 1)); stroke-dasharray: 0.3 0.9; }
 .lpn-link-halo.lpn-override { stroke: #e8a33d; stroke-width: calc(2.857 * var(--lpn-lw, 0.7)); }
 /* A node's own circle carries its halo as a ring: it already draws as a filled disc, so a stroke
    around it IS an outline. Placed BEFORE .lpn-node-pending below, so a node that is both
@@ -2132,6 +2148,32 @@ html:has(#lpn_canvas) { overflow: hidden; }
    44rem against Settings' 34. Everything else -- the height, the minimums, the resize -- is
    inherited deliberately. */
 .lpn-libbox { width: min(44rem, 94vw); }
+/* ---- THE FIRE FLOW BOX (ROADMAP Task 530) -----------------------------------------------------
+   It borrows .lpn-setbox's whole shell -- moveable by its chrome, resizeable by `resize: both` and
+   by the touch grabber, capped to the viewport, body scrolling inside itself. Only the width is its
+   own: two report tables side by side in the reading want more room than the Settings index needs,
+   and less than the Library's three editors. */
+.lpn-ffbox { width: min(38rem, 94vw); }
+.lpn-ff-controls, .lpn-ff-report { flex: 0 0 auto; }
+.lpn-ff-report { overflow: auto; min-height: 0; }
+.lpn-ff-row { display: flex; align-items: baseline; gap: .5em; margin: .25em 0; }
+.lpn-ff-row > span:first-child { flex: 1 1 auto; }
+.lpn-ff-row > input, .lpn-ff-row > select { flex: 0 0 8rem; min-width: 0; }
+.lpn-ff-unit { flex: 0 0 4rem; color: #555; font-size: .9em; }
+.lpn-ff-head { font-weight: bold; margin: .8em 0 .3em; }
+.lpn-ff-note { margin: .3em 0; font-size: .9em; color: #444; }
+.lpn-ff-summary { margin: .4em 0; font-weight: bold; }
+.lpn-ff-buttons { margin: .6em 0; display: flex; gap: .5em; }
+/* Column width is king (CLAUDE.md): the table is read in a box a reader may have made narrow, so
+   the id column wraps rather than pushing the numbers off the edge. */
+.lpn-ff-table { width: 100%; border-collapse: collapse; font-size: .9em; }
+.lpn-ff-table th, .lpn-ff-table td { text-align: left; padding: .15em .4em; border-bottom: 1px solid #ddd; overflow-wrap: anywhere; }
+/* The same three states as the rings, as a quiet tint on the row rather than as text colour: the
+   verdict is already spelled out in the Result column, so this is a second channel and not the
+   only one. */
+tr.lpn-ff-fail { background: #fdecea; }
+tr.lpn-ff-design { background: #fff4e5; }
+tr.lpn-ff-error { background: #f2f2f2; }
 /* **AND A NARROWER INDEX AGAIN** (Tom, 2026-08-22: "The Libraries box can have an Index pane width
    0.70 * current, at least in English"). 0.7 x the 7.5rem both boxes shipped at. It is a shorter
    list of shorter names than Settings' -- Patterns, Curves, Controls -- so it can give up more, and

@@ -4730,6 +4730,9 @@ var EngCalcs = EngCalcs || {};
 		// has to be re-applied to it (the per-Text-label half in particular -- the one class on the
 		// <svg> would survive a rebuild, a class on a discarded <text> does not).
 		applyLabelVisibility();
+		// The fire-flow ring rides on the circle this function has just replaced, for the same
+		// reason and by the same argument as the selection mark above (Task 530).
+		refreshFireFlowMarks();
 	}
 	// Every Text attached to this link, redrawn where the link's new shape puts it (Task 502).
 	function updateTextOnLink(id) {
@@ -17398,11 +17401,14 @@ var EngCalcs = EngCalcs || {};
 					else { runSolve(); }
 				}
 			},
-			// **THE FIRE FLOW ROW LIVES ON THE `fire-flow` BRANCH, NOT HERE** (Tom, 2026-08-26).
-			// It sat between Calculate and the run report, wearing the 'hydrant' glyph, until he
-			// asked for the whole feature to be held back for research -- see the block near
-			// applySolveResult() for why, and ROADMAP Task 530 for what is still open. The row is
-			// four lines when it returns; nothing about its placement is in doubt.
+			// **FIRE FLOW SITS WITH CALCULATE**, between Run and the run report, wearing the
+			// hydrant glyph (lib/Icons.lib.php). It is a kind of run: it names the criteria and
+			// solves the network, many times over. ROADMAP Task 530.
+			{
+				icon: 'hydrant', label: pc.lpn_ff_menu || 'Fire flow\u2026',
+				tip: pc.lpn_ff_menu_tip,
+				fn: function () { closeMenu(); openFireFlowBox(); }
+			},
 			{
 				icon: 'info', label: pc.lpn_time_run_report || 'EPANET run report',
 				tip: pc.lpn_time_run_report_tip,
@@ -17911,6 +17917,7 @@ var EngCalcs = EngCalcs || {};
 		// rebuildLabelsFields(), which rebuildSettingsBox() now runs alongside its three siblings.
 		wireSettingsBox();
 		wireLibraryBox();
+		wireFireFlowBox();
 		buildMenuBar();
 		wireScenarioButton();
 		wireBasemapTeaser();
@@ -25614,21 +25621,556 @@ var EngCalcs = EngCalcs || {};
 		} catch (e) { /* a half-built document is not a reason to shout */ }
 	}
 
-	// ---- Available fire flow at a hydrant: ON THE `fire-flow` BRANCH, NOT ON MASTER -------------
+	// ---- Fire flow: the whole-system sweep (ROADMAP Task 530) -----------------------------------
 	//
-	// Tom, 2026-08-26, after using the box: *"Isn't this a much bigger task than we've contemplated?"*
-	// and *"we need more research and planning before putting this on master. Can we move it to a
-	// branch for now?"* He is right, and the question he named is the reason: the useful analysis is
-	// **which nodes in my system can provide fire flow, and which fail or cause a design problem
-	// elsewhere** — a whole-system sweep that colours every junction, that has to pick a time in an
-	// extended run, and that may take minutes on a real network. What was built here answers one
-	// hydrant at one instant, which is a step toward that rather than the thing itself.
+	// THE QUESTION, in Tom's words, 2026-08-27: *"Which nodes in my system can provide fire flow
+	// (available vs required) or alternatively (separate Design question and analysis) provide it
+	// without causing other nodes to fail or links to have excessive velocity?"* -- and every
+	// junction is highlighted Passing, Failing, or causing a Design issue.
 	//
-	// **THE WORK IS NOT LOST AND MUST NOT BE REBUILT.** Branch `fire-flow` carries all of it: the
-	// engine (`js/lpn-fireflow.js`, mutation-proved), this box, the 54 language keys, the two
-	// harnesses and the browser spec. ROADMAP Task 530 holds the open research questions, including
-	// the one that decides the shape — whether an EPANET emitter can represent a hydrant at all,
-	// given that an emitter is pressure-driven and a fire flow demand is not.
+	// The arithmetic is js/lpn-fireflow.js and none of it is here. What IS here is the box, the two
+	// reports, the marks on the map, and the four decisions Tom made about all of them:
+	//
+	//   * **ONE RUN, ONE STORED RESULT SET, TWO REPORTS.** Two buttons would ask the user to choose
+	//     between the compliance question and the design question before they can see what either
+	//     says, and the three-state colouring needs both answers for every junction at once.
+	//   * **THE DESIGN HALF IS OPTIONAL, AND ITS SCOPE IS A NAMED SET PICKED BEFORE THE RUN** --
+	//     never an automatic radius and never a stop-when-the-drawdown-is-small rule.
+	//   * **THE LOSS ACCOUNTING IS STATED IN THE INTERFACE.** The demand goes on the junction
+	//     itself, which is the profession's default and what both inspectable tools do, so the box
+	//     says out loud that no hydrant, lateral or fitting loss is in these numbers.
+	//   * **ONE STEADY CONDITION.** US practice loads fire flow onto maximum-day demand and reads
+	//     one steady state. Where this project has a clock, the box says which condition it tested;
+	//     picking a frame is a later increment and nothing here pretends to do it.
+	//
+	// AND IT NEVER TOUCHES THE DOCUMENT. The engine solves from a copy whose nodes are copies, and
+	// the answers live in `fireFlowRun` beside the document -- not on an element, so setProp() and
+	// the scenario write seam are not involved at all. `fireFlowMarks()` reads that record to put a
+	// ring on each tested junction and writes no property either.
+	var fireFlowAsk = null;      // what is in the boxes, for this page load only
+	var fireFlowRun = null;      // the last run's result set, or null
+	var fireFlowBusy = false;    // a run is in progress
+	var fireFlowStop = false;    // the Stop button was pressed
+
+	// A number for a box or a readout. Not the label machinery's fieldDecimals(): these are single
+	// values in a sentence or a narrow column, and a fire-flow number quoted to two decimals of a
+	// gpm would claim a precision the search does not have.
+	function ffNum(v) {
+		if (typeof v !== 'number' || !isFinite(v)) { return ''; }
+		var a = Math.abs(v);
+		if (a >= 100) { return String(Math.round(v)); }
+		if (a >= 1) { return String(+v.toFixed(2)); }
+		return String(+v.toPrecision(3));
+	}
+	// A quantity with its unit, converted at the boundary and nowhere else. `si` is what the engine
+	// speaks; `unitId` is one of this project's own unit selects.
+	function ffQty(si, unitId) {
+		return ffNum(toDisplay(si, unitId)) + ' ' + unitLabel(unitId);
+	}
+	// What the boxes open on. Every one is a DISPLAY value in this project's units, because that is
+	// what a person reads and types; the conversion back to SI happens once, at the engine call.
+	// The four SI numbers behind them are the conventions this feature is built on -- 1,000 gpm is
+	// the IFC's smallest tabulated requirement, 20 psi is the AWWA M31 and NFPA 291 residual, and
+	// 5 ft/s is the velocity most agencies write into a fire-flow criterion.
+	function fireFlowDefaults() {
+		var psi20 = EngCalcs.lpnFireFlowPsiToHead(EngCalcs.lpnFireFlowDefaults.residualPsi);
+		return {
+			scope: 'all',
+			design: 'all',
+			required: ffNum(toDisplay(EngCalcs.lpnFireFlowGpmToSI(1000), 'lpn_u_flow')),
+			residual: ffNum(toDisplay(psi20, 'lpn_u_pressure')),
+			minPressure: ffNum(toDisplay(psi20, 'lpn_u_pressure')),
+			maxVelocity: ffNum(toDisplay(5 * 0.3048, 'lpn_u_velocity'))
+		};
+	}
+	// The junctions this scenario actually has. A reservoir or a tank is not one: its head is fixed,
+	// so the answer would be set by that level alone and the engine names it rather than answering.
+	function fireFlowJunctions() {
+		return doc.nodes.filter(function (n) { return n.type === 'junction' && isActive(n); });
+	}
+	// **THE ENGINE IS THE CALLER'S CHOICE AND THE COST IS THE USER'S** (js/lpn-fireflow.js takes
+	// `solve` injected for exactly this reason). The rule is runSolve()'s own: a network holding a
+	// PRV, PSV or FCV goes to EPANET whatever the preference says, because our own solver does not
+	// switch a valve's state inside the iteration.
+	function fireFlowEngine(model) {
+		var only = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [],
+			useEpanet = (settings.engine === 'epanet' || only.length > 0) && !!EngCalcs.lpnSolveEpanet;
+		return {
+			epanet: useEpanet,
+			solve: useEpanet
+				? function (m) { return EngCalcs.lpnSolveEpanet(m, { tol: solveAccuracy() }); }
+				: function (m) { return EngCalcs.lpnSolve(m, { tol: solveAccuracy() }); }
+		};
+	}
+
+	// ---- the marks on the map -------------------------------------------------------------------
+	//
+	// **A CLASS ON THE JUNCTION'S OWN CIRCLE, NOT A SECOND ELEMENT AND NOT THE COLOUR RAMP.** The
+	// ramp paints `style.fill`; this paints a stroke through a class, so a fire-flow run and a
+	// pressure colouring can be read at the same time and neither has to be turned off to see the
+	// other. It also follows every drag, zoom and rebuild for free, because it is the element that
+	// was already there.
+	//
+	// **AND THE THREE STATES DIFFER BY DASH PATTERN AS WELL AS BY COLOUR** (css/engcalcs.css), so
+	// the reading does not depend on telling green from red.
+	var FF_MARK_CLASSES = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
+	function fireFlowMarkClass(state) {
+		var S = EngCalcs.lpnFireFlowStates;
+		if (!S) { return ''; }
+		if (state === S.PASS) { return 'lpn-ff-pass'; }
+		if (state === S.FAIL) { return 'lpn-ff-fail'; }
+		if (state === S.DESIGN) { return 'lpn-ff-design'; }
+		if (state === S.ERROR) { return 'lpn-ff-error'; }
+		return '';
+	}
+	function refreshFireFlowMarks() {
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id], rec, want;
+			if (!ne || !ne.circle) { return; }
+			rec = fireFlowRun ? fireFlowRun.byId[n.id] : null;
+			want = rec ? fireFlowMarkClass(rec.state) : '';
+			FF_MARK_CLASSES.forEach(function (c) { ne.circle.classList.toggle(c, c === want); });
+		});
+	}
+	// **A RESULT SET DESCRIBES THE NETWORK IT WAS RUN ON.** One edit and it describes a network that
+	// no longer exists, so an edit clears it rather than leaving a picture that is quietly wrong.
+	// Called from scheduleSolve(), which is the one thing every edit on this page goes through.
+	function clearFireFlowRun(quiet) {
+		if (!fireFlowRun) { return; }
+		fireFlowRun = null;
+		refreshFireFlowMarks();
+		if (ffBoxIsOpen()) { rebuildFireFlowReport(); }
+		if (!quiet) {
+			setNotice((EngCalcs.pageConfig || {}).lpn_ff_stale ||
+				'The drawing changed, so the fire flow results were cleared. Run it again.');
+		}
+	}
+
+	// ---- the box --------------------------------------------------------------------------------
+	function ffBoxEl() { return document.getElementById('lpn_ff_box'); }
+	function ffBoxIsOpen() {
+		var box = ffBoxEl();
+		return !!box && box.style.display !== 'none';
+	}
+	function ffEl(tag, cls, text, parent) {
+		var e = document.createElement(tag);
+		if (cls) { e.className = cls; }
+		if (text !== undefined && text !== null) { e.textContent = text; }
+		if (parent) { parent.appendChild(e); }
+		return e;
+	}
+	// One labelled row. The whole label text is the tip's target and not a one-character glyph --
+	// CLAUDE.md's tip-only nesting rule.
+	function ffRow(parent, labelText, tip, control, unitText) {
+		var row = ffEl('div', 'lpn-ff-row', null, parent),
+			name = ffEl('span', null, labelText || '', row);
+		if (tip) { name.title = tip; name.className = 'ec-help'; }
+		row.appendChild(control);
+		ffEl('span', 'lpn-ff-unit', unitText || '', row);
+		return row;
+	}
+	function ffInput(value) {
+		var i = document.createElement('input');
+		i.type = 'text';
+		i.inputMode = 'decimal';
+		i.value = value === undefined || value === null ? '' : String(value);
+		return i;
+	}
+	function ffSelect(options, value) {
+		var sel = document.createElement('select');
+		options.forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0];
+			opt.textContent = o[1];
+			sel.appendChild(opt);
+		});
+		sel.value = value;
+		if (sel.value !== value && options.length) { sel.value = options[0][0]; }
+		return sel;
+	}
+	// A box's value as a number in SI, or undefined for an empty or unreadable one.
+	function ffValue(text, unitId) {
+		var s = String(text === undefined || text === null ? '' : text).trim();
+		if (s === '' || !isFinite(+s)) { return undefined; }
+		return unitId ? toSI(+s, unitId) : +s;
+	}
+
+	function buildFireFlowControls() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_ff_controls'),
+			ask = fireFlowAsk,
+			boxes = {},
+			engine,
+			run,
+			stop;
+		if (!host) { return; }
+		host.innerHTML = '';
+		ffEl('p', 'lpn-ff-note', pc.lpn_ff_intro, host);
+
+		boxes.scope = ffSelect([
+			['all', pc.lpn_ff_scope_all || 'Every junction'],
+			['selected', pc.lpn_ff_scope_selected || 'The selected junction only']
+		], ask.scope);
+		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
+
+		boxes.required = ffInput(ask.required);
+		ffRow(host, pc.lpn_ff_required || 'Required fire flow', pc.lpn_ff_required_tip,
+			boxes.required, unitLabel('lpn_u_flow'));
+
+		boxes.residual = ffInput(ask.residual);
+		ffRow(host, pc.lpn_ff_residual || 'Residual pressure to hold', pc.lpn_ff_residual_tip,
+			boxes.residual, unitLabel('lpn_u_pressure'));
+
+		// **THE SCOPE OF THE DESIGN SEARCH IS A NAMED SET, CHOSEN BEFORE THE RUN.** Three values,
+		// in this page's own vocabulary rather than EPANET's or Innovyze's, and the middle one
+		// exists because a system with thousands of pipes may want the pressures without the
+		// velocities.
+		boxes.design = ffSelect([
+			['off', pc.lpn_ff_design_off || 'Do not check'],
+			['nodes', pc.lpn_ff_design_nodes || 'Every other junction'],
+			['all', pc.lpn_ff_design_all || 'Every other junction and every pipe']
+		], ask.design);
+		ffRow(host, pc.lpn_ff_design || 'Effect on the rest of the system', pc.lpn_ff_design_tip,
+			boxes.design, '');
+
+		boxes.minPressure = ffInput(ask.minPressure);
+		ffRow(host, pc.lpn_ff_minpressure || 'Lowest pressure allowed elsewhere',
+			pc.lpn_ff_minpressure_tip, boxes.minPressure, unitLabel('lpn_u_pressure'));
+
+		boxes.maxVelocity = ffInput(ask.maxVelocity);
+		ffRow(host, pc.lpn_ff_maxvelocity || 'Highest velocity allowed', pc.lpn_ff_maxvelocity_tip,
+			boxes.maxVelocity, unitLabel('lpn_u_velocity'));
+
+		// **HOW HYDRANT LOSSES ARE ACCOUNTED FOR, ON THE SCREEN** (Tom, 2026-08-25: *"I want to be
+		// very explicit and transparent... about how we account if at all for hydrant losses beyond
+		// the node."*). Read off the engine's own declared accounting rather than restated here, so
+		// the sentence cannot survive a change in the method it describes.
+		if (EngCalcs.lpnFireFlowLossAccounting === 'raw-node') {
+			ffEl('p', 'lpn-ff-note', pc.lpn_ff_accounting, host);
+		}
+		engine = fireFlowEngine(assembleModel());
+		ffEl('p', 'lpn-ff-note', engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native, host);
+		ffEl('p', 'lpn-ff-note', pc.lpn_ff_engine_cost, host);
+		// Said only where there is a clock to be confused by. A project with no run schedule has
+		// only ever had one condition, and a sentence about which one would be noise.
+		if (EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(doc.times)) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_ff_steady, host);
+		}
+
+		var buttons = ffEl('div', 'lpn-ff-buttons', null, host);
+		run = ffEl('button', 'lpn-ff-run', pc.lpn_ff_calculate || 'Run', buttons);
+		run.type = 'button';
+		run.disabled = fireFlowBusy;
+		run.addEventListener('click', function () {
+			Object.keys(boxes).forEach(function (k) { ask[k] = boxes[k].value; });
+			runFireFlowSweep();
+		});
+		stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
+		stop.type = 'button';
+		stop.disabled = !fireFlowBusy;
+		stop.addEventListener('click', function () { fireFlowStop = true; });
+		// Remembered as it is typed, so closing the box and reopening it does not throw the
+		// criteria away.
+		Object.keys(boxes).forEach(function (k) {
+			boxes[k].addEventListener('change', function () { ask[k] = boxes[k].value; });
+		});
+		if (EngCalcs.initTips) { EngCalcs.initTips(host); }
+	}
+
+	// ---- the two reports ------------------------------------------------------------------------
+	//
+	// One result set, read twice. The first report answers "can this junction deliver what the code
+	// asks for"; the second answers "and what did drawing it do to everything else". They are two
+	// headings in one box rather than two runs, because they come from the same solves and because
+	// the map's three states need both.
+	//
+	// **A REPORT NEVER PRINTS MORE ROWS THAN A PERSON CAN USE.** A 2,000-junction sweep is a real
+	// case; the table names how many it did not print rather than building them all.
+	var FF_MAX_ROWS = 200;
+	function ffStateText(state) {
+		var pc = EngCalcs.pageConfig || {}, S = EngCalcs.lpnFireFlowStates || {};
+		if (state === S.PASS) { return pc.lpn_ff_state_pass || 'Passing'; }
+		if (state === S.FAIL) { return pc.lpn_ff_state_fail || 'Failing'; }
+		if (state === S.DESIGN) { return pc.lpn_ff_state_design || 'Design issue'; }
+		return pc.lpn_ff_state_error || 'No answer';
+	}
+	// Every outcome that is not a flow, in this project's own words. None of them is ever rendered
+	// as a number, and `below-residual-at-rest` in particular is not an available fire flow of zero:
+	// the question has no answer there, which is a different fact.
+	function ffReasonText(rec) {
+		var pc = EngCalcs.pageConfig || {}, C = EngCalcs.lpnFireFlowCodes || {};
+		if (rec.code === C.BELOW_AT_REST) {
+			return pc.lpn_ff_err_at_rest || 'Already below the residual with nothing drawn';
+		}
+		if (rec.code === C.NO_CONVERGENCE) { return pc.lpn_ff_err_converge || 'The network did not settle'; }
+		if (rec.code === C.SOLVE_FAILED) { return pc.lpn_ff_err_solve || 'The network could not be worked out'; }
+		if (rec.code === C.NOT_A_JUNCTION) { return pc.lpn_ff_err_not_junction || 'Not a junction'; }
+		if (rec.code === C.UNKNOWN_NODE) { return pc.lpn_ff_err_not_junction || 'Not a junction'; }
+		return (pc.lpn_ff_err_unknown || 'No answer, and the reason given is {id}')
+			.replace('{id}', rec.code || '');
+	}
+	// The available flow as a person should read it. A junction that held the residual at the search
+	// ceiling is reported as delivering MORE than the ceiling; the ceiling is never printed as
+	// though the search had found it. A junction with no answer prints its reason, never a zero.
+	function ffAvailableText(rec) {
+		var pc = EngCalcs.pageConfig || {};
+		if (rec.available === undefined) { return ffReasonText(rec); }
+		if (rec.atLeast) {
+			return (pc.lpn_ff_atleast || 'over {flow}').replace('{flow}', ffQty(rec.available, 'lpn_u_flow'));
+		}
+		return ffQty(rec.available, 'lpn_u_flow');
+	}
+	function ffCell(row, text, cls) {
+		var td = ffEl('td', cls || null, text, row);
+		return td;
+	}
+	function ffTable(parent, headings) {
+		var table = ffEl('table', 'lpn-ff-table', null, parent),
+			head = ffEl('thead', null, null, table),
+			hr = ffEl('tr', null, null, head);
+		headings.forEach(function (h) { ffEl('th', null, h, hr); });
+		return ffEl('tbody', null, null, table);
+	}
+	// The reading order: what is wrong first. Failing, then design issues, then the junctions with
+	// no answer, then the passes -- and inside each group the smallest available flow first, which
+	// is the worst one.
+	function ffSorted(results) {
+		var S = EngCalcs.lpnFireFlowStates || {},
+			rank = {};
+		rank[S.FAIL] = 0; rank[S.DESIGN] = 1; rank[S.ERROR] = 2; rank[S.PASS] = 3;
+		return results.slice().sort(function (a, b) {
+			var ra = rank[a.state], rb = rank[b.state];
+			if (ra !== rb) { return ra - rb; }
+			return (a.available === undefined ? -1 : a.available) -
+				(b.available === undefined ? -1 : b.available);
+		});
+	}
+	function ffMoreLine(parent, hidden) {
+		var pc = EngCalcs.pageConfig || {};
+		if (hidden <= 0) { return; }
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_more || 'and {n} more').replace('{n}', String(hidden)), parent);
+	}
+	function rebuildFireFlowReport() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_ff_report'),
+			set = fireFlowRun,
+			body,
+			shown,
+			sorted,
+			withEffects;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (!set) { return; }
+
+		if (set.stopped) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_stopped || 'Stopped after {done} of {total} junctions.')
+				.replace('{done}', String(set.results.length)).replace('{total}', String(set.requested)), host);
+		}
+		ffEl('p', 'lpn-ff-summary', (pc.lpn_ff_summary || '{pass} passing, {fail} failing, {design} with a design issue.')
+			.replace('{pass}', String(set.counts.pass))
+			.replace('{fail}', String(set.counts.fail))
+			.replace('{design}', String(set.counts.design)), host);
+		if (set.counts.error) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || '{n} could not be answered.')
+				.replace('{n}', String(set.counts.error)), host);
+		}
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || '{solves} network solves.')
+			.replace('{solves}', String(set.solves)), host);
+		// **THE ISO CREDIT LIMIT TRAVELS WITH THE NUMBERS AND IS NEVER APPLIED TO THEM.** Said once
+		// for the run rather than on every row: it is a fact about how a rating is credited, not
+		// about any one junction's hydraulics.
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_iso || 'ISO credits a single hydrant with at most {flow}.')
+			.replace('{flow}', ffQty(set.isoCap, 'lpn_u_flow')), host);
+
+		// ---- report one: available against required ----
+		ffEl('div', 'lpn-ff-head', pc.lpn_ff_report_available || 'Available against required', host);
+		sorted = ffSorted(set.results);
+		shown = sorted.slice(0, FF_MAX_ROWS);
+		body = ffTable(host, [
+			pc.lpn_ff_col_junction || 'Junction',
+			pc.lpn_ff_col_available || 'Available',
+			pc.lpn_ff_col_required || 'Required',
+			pc.lpn_ff_col_result || 'Result'
+		]);
+		shown.forEach(function (rec) {
+			var tr = ffEl('tr', 'lpn-ff-' + rec.state, null, body);
+			ffCell(tr, rec.id);
+			ffCell(tr, ffAvailableText(rec));
+			ffCell(tr, rec.required === undefined ? '' : ffQty(rec.required, 'lpn_u_flow'));
+			ffCell(tr, ffStateText(rec.state));
+		});
+		ffMoreLine(host, sorted.length - shown.length);
+
+		// ---- report two: what drawing the required flow did to everything else ----
+		ffEl('div', 'lpn-ff-head', pc.lpn_ff_report_design || 'Effect on the rest of the system', host);
+		if (!set.design) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_ff_design_off_note ||
+				'The effect on the rest of the system was not checked in this run.', host);
+			return;
+		}
+		withEffects = set.results.filter(function (r) {
+			return r.effects && (r.effects.nodes.length || r.effects.links.length);
+		});
+		if (!withEffects.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_ff_design_none ||
+				'Nothing in the chosen set was pulled down by any junction tested.', host);
+			return;
+		}
+		body = ffTable(host, [
+			pc.lpn_ff_col_junction || 'Junction',
+			pc.lpn_ff_col_affected || 'What it pulls down'
+		]);
+		withEffects.slice(0, FF_MAX_ROWS).forEach(function (rec) {
+			var tr = ffEl('tr', 'lpn-ff-design', null, body), parts = [];
+			// The three worst of each kind, then a count. A junction that starves half a town does
+			// not need half a town listed against its name to make the point.
+			rec.effects.nodes.slice(0, 3).forEach(function (h) {
+				parts.push((pc.lpn_ff_affect_node || '{id} down to {pressure}')
+					.replace('{id}', h.id).replace('{pressure}', ffQty(h.pressure, 'lpn_u_pressure')));
+			});
+			rec.effects.links.slice(0, 3).forEach(function (h) {
+				parts.push((pc.lpn_ff_affect_link || '{id} at {velocity}')
+					.replace('{id}', h.id).replace('{velocity}', ffQty(h.velocity, 'lpn_u_velocity')));
+			});
+			var extra = Math.max(0, rec.effects.nodes.length - 3) + Math.max(0, rec.effects.links.length - 3);
+			if (extra > 0) {
+				parts.push((pc.lpn_ff_more || 'and {n} more').replace('{n}', String(extra)));
+			}
+			ffCell(tr, rec.id);
+			ffCell(tr, parts.join('; '));
+		});
+		ffMoreLine(host, withEffects.length - Math.min(withEffects.length, FF_MAX_ROWS));
+	}
+
+	// ---- the run --------------------------------------------------------------------------------
+	function runFireFlowSweep() {
+		var pc = EngCalcs.pageConfig || {},
+			ask = fireFlowAsk,
+			junctions = fireFlowJunctions(),
+			model,
+			engine,
+			ids,
+			required = ffValue(ask.required, 'lpn_u_flow'),
+			residual = ffValue(ask.residual, 'lpn_u_pressure'),
+			minPressure = ffValue(ask.minPressure, 'lpn_u_pressure'),
+			maxVelocity = ffValue(ask.maxVelocity, 'lpn_u_velocity'),
+			design = null,
+			before;
+		if (fireFlowBusy) { return; }
+		if (!junctions.length) {
+			setNotice(pc.lpn_ff_no_junctions || 'This project has no junctions yet, so there is nothing to test.');
+			return;
+		}
+		if (ask.scope === 'selected') {
+			if (!selection || selection.kind !== 'node' ||
+				!junctions.some(function (n) { return n.id === selection.id; })) {
+				setNotice(pc.lpn_ff_no_selection ||
+					'No junction is selected. Choose one on the map, or test every junction.');
+				return;
+			}
+			ids = [selection.id];
+		} else {
+			ids = junctions.map(function (n) { return n.id; });
+		}
+		if (!(required > 0)) {
+			setNotice(pc.lpn_ff_required_tip || '');
+			return;
+		}
+		model = assembleModel();
+		engine = fireFlowEngine(model);
+		if (ask.design !== 'off') {
+			design = {
+				nodes: model.nodes.filter(function (n) { return n.type === 'junction'; })
+					.map(function (n) { return n.id; }),
+				links: ask.design === 'all' ? model.links.map(function (l) { return l.id; }) : [],
+				minPressure: minPressure > 0 ? minPressure : 0,
+				maxVelocity: maxVelocity > 0 ? maxVelocity : Infinity
+			};
+		}
+		// **THE DOCUMENT IS NOT PART OF THIS RUN.** The engine solves from a copy; this is a
+		// belt-and-braces assertion rather than a repair, and if it ever fires the fix is in
+		// whatever wrote to `doc`, not here.
+		before = JSON.stringify(doc);
+		fireFlowBusy = true;
+		fireFlowStop = false;
+		fireFlowRun = null;
+		refreshFireFlowMarks();
+		rebuildFireFlowReport();
+		buildFireFlowControls();
+		setStatus((pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
+			.replace('{done}', '0').replace('{total}', String(ids.length)));
+
+		return EngCalcs.lpnFireFlowSweep(model, {
+			solve: engine.solve,
+			junctions: ids,
+			required: required,
+			residual: residual,
+			design: design,
+			// The progress line is the whole reason the sweep yields between junctions: a
+			// synchronous solver in a promise chain never gives the browser a frame, so without it
+			// this text would appear once, at the end, saying it had finished.
+			onProgress: function (p) {
+				setStatus((pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
+					.replace('{done}', String(p.done)).replace('{total}', String(p.total)));
+			},
+			shouldStop: function () { return fireFlowStop; }
+		}).then(function (set) {
+			fireFlowBusy = false;
+			fireFlowRun = set;
+			fireFlowDocGuard = (JSON.stringify(doc) === before);
+			refreshFireFlowMarks();
+			rebuildFireFlowReport();
+			buildFireFlowControls();
+			setStatus('');
+			return set;
+		}, function (err) {
+			fireFlowBusy = false;
+			buildFireFlowControls();
+			setStatus(pc.lpn_ff_err_solve || 'The network could not be worked out');
+			if (window.console && console.warn) { console.warn('fire flow sweep failed:', err); }
+		});
+	}
+	// Read by dev/browser-pass. Set by the run above, never by a user action -- a false here is a
+	// defect in whatever wrote to `doc`, not in this box.
+	var fireFlowDocGuard = true;
+
+	function openFireFlowBox() {
+		var box = ffBoxEl(), h, r, top;
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		if (!fireFlowAsk) { fireFlowAsk = fireFlowDefaults(); }
+		box.style.display = 'flex';
+		buildFireFlowControls();
+		rebuildFireFlowReport();
+		// **IT CENTRES** (Tom, 2026-08-27, of this box: he liked that it does). Re-measured on every
+		// open rather than remembered: the box is resizeable and the window may have changed, and a
+		// box remembered off-screen is a box that never comes back.
+		h = fitPanelToViewport(box);
+		r = box.getBoundingClientRect();
+		box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
+		top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
+		capPanelToRoomBelow(box, top);
+		box.style.top = top + 'px';
+		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
+	}
+	function closeFireFlowBox() {
+		var box = ffBoxEl();
+		if (box) { box.style.display = 'none'; }
+		// **A RUN IN PROGRESS IS STOPPED BY CLOSING ITS BOX.** Otherwise a sweep of minutes goes on
+		// eating the machine with nothing on screen that can call it off.
+		if (fireFlowBusy) { fireFlowStop = true; }
+	}
+	function wireFireFlowBox() {
+		var box = ffBoxEl(), x = document.getElementById('lpn_ff_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeFireFlowBox); }
+		// Moveable and resizeable, through the same seam the property popup, Find, Settings and the
+		// Library box all use. It borrows .lpn-setbox's shell, `resize: both` included, so it
+		// borrows the touch grabber that makes that property mean anything on a phone.
+		makePanelDraggable(box, null);
+		addPanelResizeGrip(box);
+	}
 
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
@@ -25834,6 +26376,11 @@ var EngCalcs = EngCalcs || {};
 	// work and would fight the drag for the main thread.
 	var solveTimer = null;
 	function scheduleSolve() {
+		// **A FIRE FLOW RUN DESCRIBES THE NETWORK IT WAS RUN ON** (Task 530). This is the one thing
+		// every edit on this page goes through, so it is the one place the stale result set can be
+		// dropped -- leaving the rings on a drawing that has since changed would be a picture that
+		// is quietly wrong, which is worse than no picture.
+		clearFireFlowRun(false);
 		if (solveTimer) { clearTimeout(solveTimer); }
 		solveTimer = setTimeout(runSolve, 300);
 	}
