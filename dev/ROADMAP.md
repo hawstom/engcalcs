@@ -1195,6 +1195,11 @@ the block.
       screen — a touchscreen laptop at 1400px has a finger, a phone with a stylus does not — so a
       width-keyed assertion would prove something the code does not do.
       `dev/lpn-spike/touch-radius-harness.js` (14) states that in its own header.
+  - **CLOSED 2026-08-30 — and the long press was reaching for a real defect after all, see closed
+    Task 558.** A finger could TAP a node at 24 px but had to grab one at 2 px plus a 7 px symbol
+    to drag it. Tom could not reconstruct why he had wanted a long press; **a long press is what
+    you ask for when you cannot say *this one* by pointing.** The grab is fixed, the want
+    dissolved, and Task 415's selection guard was verified rather than assumed.
   - **[H] AND THEN WITHDRAWN THE SAME DAY — THE LONG-PRESS HALF HAS NO SYMPTOM.** Tom, 2026-08-30:
     *"To be honest, I am confused. (1) we don't want non-parallel UX about. (2) I can't remember
     exactly why I identified that we might want long press. I just tried dragging a label and a
