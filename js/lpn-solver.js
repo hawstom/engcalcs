@@ -14,8 +14,11 @@
 // EVERYTHING HERE IS SI: Q in m3/s, H and lengths in m, d in m. Callers convert at
 // the edges. The document format is SI for the same reason (see the scope doc).
 //
-// Target scale is ~10-20 nodes, which is why the linear solve is a dense Cholesky
-// rather than anything sparse -- see solveSPD().
+// THE LINEAR SOLVE IS AN ENVELOPE CHOLESKY, NOT A DENSE ONE. It used to be dense, on the argument
+// that the target scale was ~10-20 nodes; the whole-system fire flow sweep (Task 530) is 3,707
+// solves of a network two orders of magnitude bigger than that, and a dense factorization is
+// n^3/6 multiply-adds. See lpnSolveSPDDense, which is kept as the reference the fast path is
+// proved bit-identical against, and lpnSolvePacked, which is what a solve calls.
 
 // The browser gets js/PipeHydraulics.lib.js from its own <script> tag ahead of this
 // one; Node (dev/lpn-spike/validate.js) has no script tags, so ask for it directly.
@@ -132,23 +135,19 @@ EngCalcs.lpnResistance = function (link, method, visc) {
 	return { r: link.f * L / (d * 2 * EngCalcs.lpnG * a * a), n: 2 };
 };
 
-// Dense Cholesky (LL^T) solve of A x = b for symmetric positive definite A.
+// DENSE Cholesky (LL^T) solve of A x = b for symmetric positive definite A.
 //
-// Dense on purpose. Measured (dev/lpn-spike):
-//   21 nodes  / 32 links   0.4 ms per solve,  5 iterations
-//   97 nodes  / 119 links  (EPANET Net3)     16 iterations
-//   201 nodes / 371 links  30 ms per solve,  11 iterations
-// The 200-node figure is headroom, not a target, and is comfortably inside a
-// debounced edit.
-//
-// The sparse machinery this replaces (CSR, conjugate gradient, fill-reducing
-// ordering, cached symbolic factorization) is cut, not deferred. Everything routes
-// through this one function so that decision stays reversible.
+// **This is the REFERENCE implementation and is no longer what a solve calls** --
+// lpnSolveSPD below is an ENVELOPE factorization that computes the same numbers by
+// skipping terms that are exactly zero. This one is kept, exported and tested
+// against, because "the fast one agrees with the simple one BIT FOR BIT on every
+// matrix a real solve forms" is the whole proof that the answers did not move
+// (dev/lpn-spike/spd-envelope-harness.js).
 //
 // Returns null if A is not positive definite, which for this matrix means the
 // network is not properly grounded -- the caller should have caught that already
 // with a structural check, so null here is a bug, not a user error.
-EngCalcs.lpnSolveSPD = function (A, b) {
+EngCalcs.lpnSolveSPDDense = function (A, b) {
 	'use strict';
 	var n = b.length,
 		L = [],
@@ -186,6 +185,184 @@ EngCalcs.lpnSolveSPD = function (A, b) {
 	}
 
 	return x;
+};
+
+// ENVELOPE (profile) Cholesky -- the one a solve actually calls.
+//
+// WHY THIS EXISTS, in one measurement. The fire-flow sweep (Task 530) runs 3,707 solves on a
+// 225-junction grid, and its solve COUNT grows linearly with junctions -- that half is fine. Its
+// cost per solve does not: profiled at 49 / 121 / 225 junctions, the linear solve went from 24%
+// of a solve to 90% of it, because a dense Cholesky is n^3/6 multiply-adds and 225^3/6 is 1.9
+// million of them PER NEWTON ITERATION. The sweep's problem was never the sweep.
+//
+// WHAT IT DOES. In this matrix A[i][j] is nonzero only when junctions i and j share a link, so
+// most of each row is zero, and the classical envelope theorem says Cholesky's fill-in cannot
+// escape the band between each row's FIRST nonzero and its diagonal. So for each row i take
+//   f[i] = the first column where A[i][.] is not zero
+// and store and factor only columns f[i]..i. Everything skipped is a term whose value is exactly
+// 0.0, which is why this is not an approximation of the dense answer but the same arithmetic with
+// the `sum -= 0` steps left out.
+//
+// **BIT-IDENTICAL, AND THAT IS THE POINT** -- not "within tolerance". Every term dropped is a
+// product with an exactly-zero factor, and the surviving terms are accumulated in the same order
+// as before, so no rounding changes. A tolerance-grade speedup would have moved every number this
+// suite reports; this one moves none, which is what let it ship without asking Tom to re-approve
+// an answer. Proof, on every matrix real solves form: dev/lpn-spike/spd-envelope-harness.js.
+//
+// f[] IS READ FROM A'S OWN ZEROS, not from the link list. A numerically-zero entry inside the
+// structural pattern only makes f[i] later, which the theorem allows (its induction needs the
+// zeros to be zero, not to be structural), and it keeps this function's signature exactly what it
+// was -- so the dense reference above can be handed the same argument and compared against.
+//
+// WHAT IS NOT DONE HERE, deliberately: no fill-reducing ORDERING (RCM, minimum degree). An
+// ordering is what turns a badly-numbered network into a narrow envelope, and it would help --
+// but permuting the matrix changes the order of the arithmetic, and therefore changes the answer
+// in its last bits. That needs Tom, not a comment. Unordered, the envelope is as good as the
+// user's own node numbering, which for anything drawn or imported in geographic order is already
+// narrow.
+//
+// THE ENVELOPE ITSELF -- the row bands, the packed offsets, and the column occupancy the back
+// substitution needs. Built from a `first[]` array, whatever produced it.
+//
+// It depends only on WHICH ENTRIES CAN BE NONZERO, so for one network it is the same on every
+// Newton iteration and on every one of a fire-flow sweep's thousands of solves. That is why it is
+// a value rather than something recomputed inside the factorization: lpnSolve builds it once from
+// the link list and hands the same object back for each iteration.
+EngCalcs.lpnEnvelope = function (first, n) {
+	'use strict';
+	var rowStart = new Int32Array(n + 1),
+		diag = new Int32Array(n),
+		colStart = new Int32Array(n + 2),
+		colRow,
+		total = 0,
+		i,
+		j;
+
+	for (i = 0; i < n; i++) {
+		rowStart[i] = total;
+		diag[i] = total + i - first[i];
+		total += i - first[i] + 1;
+	}
+	rowStart[n] = total;
+
+	// Column occupancy, for the back substitution alone -- it walks a COLUMN of L, which packed
+	// by rows is a scatter. A counting sort, so the rows within each column come out in increasing
+	// order, which is the order the dense loop visited them in and therefore the order the sum
+	// has to be accumulated in for the arithmetic to be unchanged.
+	for (i = 0; i < n; i++) {
+		for (j = first[i]; j < i; j++) { colStart[j + 2]++; }
+	}
+	for (j = 0; j < n; j++) { colStart[j + 2] += colStart[j + 1]; }
+	colRow = new Int32Array(total - n);
+	for (i = 0; i < n; i++) {
+		for (j = first[i]; j < i; j++) { colRow[colStart[j + 1]++] = i; }
+	}
+
+	return { n: n, first: first, rowStart: rowStart, diag: diag, colStart: colStart,
+		colRow: colRow, total: total };
+};
+
+// Solve for a matrix already PACKED into an envelope: M holds row i's columns first[i]..i at
+// rowStart[i]..diag[i]. **M IS FACTORED IN PLACE and is destroyed**, which is not a compromise --
+// the caller rebuilds it from scratch on the next Newton iteration anyway, and it is what keeps a
+// solve from allocating a second matrix on every iteration.
+//
+// Returns null on a non-positive-definite matrix, exactly as the dense reference does.
+EngCalcs.lpnSolvePacked = function (env, M, b) {
+	'use strict';
+	var n = env.n,
+		first = env.first,
+		rowStart = env.rowStart,
+		diag = env.diag,
+		colStart = env.colStart,
+		colRow = env.colRow,
+		x = new Array(n),
+		y = new Array(n),
+		i,
+		j,
+		k,
+		kk,
+		fi,
+		fj,
+		si,
+		sj,
+		sum;
+
+	for (i = 0; i < n; i++) {
+		fi = first[i];
+		si = rowStart[i] - fi;
+		for (j = fi; j <= i; j++) {
+			sum = M[si + j];
+			fj = first[j];
+			sj = rowStart[j] - fj;
+			for (k = (fi > fj ? fi : fj); k < j; k++) { sum -= M[si + k] * M[sj + k]; }
+			if (i === j) {
+				if (!(sum > 0)) { return null; }
+				M[si + i] = Math.sqrt(sum);
+			} else {
+				M[si + j] = sum / M[diag[j]];
+			}
+		}
+	}
+
+	for (i = 0; i < n; i++) {
+		fi = first[i];
+		si = rowStart[i] - fi;
+		sum = b[i];
+		for (k = fi; k < i; k++) { sum -= M[si + k] * y[k]; }
+		y[i] = sum / M[diag[i]];
+	}
+	for (i = n - 1; i >= 0; i--) {
+		sum = y[i];
+		for (kk = colStart[i]; kk < colStart[i + 1]; kk++) {
+			k = colRow[kk];
+			sum -= M[rowStart[k] - first[k] + i] * x[k];
+		}
+		x[i] = sum / M[diag[i]];
+	}
+
+	return x;
+};
+
+// The DENSE-IN adapter, with the dense reference's exact signature.
+//
+// A solve does not call this -- it assembles straight into the packed form. What this is for is
+// the PROOF: dev/lpn-spike/spd-envelope-harness.js hands the same dense A to this and to
+// lpnSolveSPDDense and requires the two answers to match bit for bit, which is a comparison that
+// only exists if both take the same argument. Keeping it also means anything outside this file
+// that ever held a dense matrix still works.
+//
+// The envelope here is read from A'S OWN ZEROS rather than from a link list. A numerically-zero
+// entry inside the structural pattern only makes first[i] later, which the theorem allows -- its
+// induction needs the zeros to BE zero, not to be structural.
+//
+// Returns null on a non-positive-definite A, exactly as the dense one does. A is not modified.
+EngCalcs.lpnSolveSPD = function (A, b) {
+	'use strict';
+	var n = b.length,
+		first = new Int32Array(n),
+		env,
+		M,
+		Ai,
+		i,
+		j,
+		f;
+
+	for (i = 0; i < n; i++) {
+		Ai = A[i];
+		f = i;
+		for (j = 0; j < i; j++) {
+			if (Ai[j] !== 0) { f = j; break; }
+		}
+		first[i] = f;
+	}
+	env = EngCalcs.lpnEnvelope(first, n);
+	M = new Float64Array(env.total);
+	for (i = 0; i < n; i++) {
+		Ai = A[i];
+		for (j = first[i]; j <= i; j++) { M[env.rowStart[i] - first[i] + j] = Ai[j]; }
+	}
+	return EngCalcs.lpnSolvePacked(env, M, b);
 };
 
 // A FIXED-HEAD node: one whose head is boundary data rather than an unknown.
@@ -412,6 +589,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		stall = 0,
 		demandScale = 0,
 		i,
+		j2,
 		k;
 
 	// 'native' names THIS file, so lpnDiagnose adds the one check that is about this engine's
@@ -443,12 +621,96 @@ EngCalcs.lpnSolve = function (model, options) {
 	// first solve, and they need something physical rather than zero.
 	for (i = 0; i < nn; i++) { H[i] = junctions[i].elev || 0; }
 
+	// THE SYSTEM'S SHAPE DOES NOT CHANGE BETWEEN NEWTON ITERATIONS, so its storage is allocated
+	// once per solve and reused. This used to be four fresh typed arrays per iteration, of which A
+	// is nn x nn -- 225 allocations totalling 405 KB on every one of a 225-junction network's 13
+	// iterations, which is 2,925 allocations per solve and 3,707 solves in one fire-flow sweep.
+	// Measured on its own at 225 junctions: 0.65 ms to allocate the matrix against 0.018 ms to
+	// zero the reused one, a 35x difference, and after the envelope factorization landed this
+	// allocation was two thirds of a solve.
+	//
+	// A is zeroed each iteration because it is ACCUMULATED into (`+=` per link); F likewise. G and
+	// y are not, because every link writes both on every iteration in both branches. `fill(0)`
+	// writes +0.0, which is what a fresh Float64Array holds, so nothing about the arithmetic
+	// changes -- and that is asserted, not assumed (dev/lpn-spike/spd-envelope-harness.js compares
+	// every reported number against the dense reference).
+	//
+	// AND THE MATRIX IS THE ENVELOPE ITSELF, not a square filled mostly with zeros. Once the
+	// factorization stopped touching the zeros, the two things still SIZED by nn squared were
+	// zeroing the square each iteration and re-deriving the envelope from it -- at 961 junctions
+	// that is 924,000 writes and 460,000 comparisons per iteration against 462,000 useful
+	// multiply-adds, so the overhead had become bigger than the work. Assembling straight into
+	// the packed band makes both proportional to the network's own connectivity instead.
+	//
+	// THE PATTERN COMES FROM THE LINK LIST, which is where it actually lives: junction i's row can
+	// only be nonzero at itself and at the junctions it shares a link with. A CLOSED link is
+	// counted too. Its conductance is zero so it contributes nothing numerically, but leaving it
+	// in keeps the pattern the same whatever a valve is doing, and a WIDER envelope is always safe
+	// -- the extra entries are exactly the zeros the dense reference also computes.
+	var F = new Float64Array(nn),
+		G = new Float64Array(links.length),
+		y = new Float64Array(links.length),
+		linkR = new Float64Array(links.length),
+		linkN = new Float64Array(links.length),
+		linkM = new Float64Array(links.length),
+		resFixed = method !== 'dw',
+		envFirst = new Int32Array(nn),
+		env,
+		M,
+		envDiag,
+		envRowStart,
+		resK,
+		aKm,
+		aArea,
+		lo,
+		hi;
+
+	for (i = 0; i < nn; i++) { envFirst[i] = i; }
+	for (k = 0; k < links.length; k++) {
+		i = junctionIndex[links[k].from];
+		j2 = junctionIndex[links[k].to];
+		if (i === undefined || j2 === undefined) { continue; }
+		lo = i < j2 ? i : j2;
+		hi = i < j2 ? j2 : i;
+		if (lo < envFirst[hi]) { envFirst[hi] = lo; }
+	}
+	env = EngCalcs.lpnEnvelope(envFirst, nn);
+	envDiag = env.diag;
+	envRowStart = env.rowStart;
+	M = new Float64Array(env.total);
+
+	// WHAT DOES NOT DEPEND ON THE FLOW IS COMPUTED ONCE, not once per Newton iteration.
+	//
+	// A link's resistance r and its minor-loss coefficient m are functions of its GEOMETRY --
+	// length, diameter, roughness -- and the flow appears nowhere in either. Under Hazen-Williams
+	// each one costs two Math.pow calls and an object allocation, and the old code paid all of
+	// that for every link on every iteration: 421 links x 13 iterations is 5,473 repeats of an
+	// answer that never changed, on each of a sweep's 3,707 solves.
+	//
+	// DARCY-WEISBACH IS THE EXCEPTION AND IT IS NOT AN OVERSIGHT. Its friction factor f is a
+	// function of the Reynolds number, so r genuinely moves with the flow and has to be re-formed
+	// each iteration -- see the note on lpnResistance. `resFixed` is that distinction, stated
+	// once, so it cannot be half-applied.
+	//
+	// Identical arithmetic, so identical bits: the same expressions on the same inputs, evaluated
+	// fewer times. dev/lpn-spike/spd-envelope-harness.js compares every reported number against
+	// the unmodified reference and would see any drift.
+	for (k = 0; k < links.length; k++) {
+		aKm = EngCalcs.lpnLinkK(links[k]);
+		aArea = Math.PI * links[k].diameter * links[k].diameter / 4;
+		// Written with the same operations in the same order as the line it replaces, Math.pow
+		// and all. `aArea * aArea` would be one rounding away, which is exactly the kind of
+		// "obviously the same" edit that turns a bit-identical change into a tolerance-grade one.
+		linkM[k] = aKm > 0 ? aKm / (2 * g * Math.pow(aArea, 2)) : 0;
+		if (resFixed) {
+			resK = EngCalcs.lpnResistance(links[k], method, visc);
+			linkR[k] = resK.r;
+			linkN[k] = resK.n;
+		}
+	}
+
 	for (iter = 1; iter <= maxIter; iter++) {
-		var A = [],
-			F = new Float64Array(nn),
-			G = new Float64Array(links.length),
-			y = new Float64Array(links.length),
-			link,
+		var link,
 			res,
 			q,
 			aq,
@@ -460,7 +722,8 @@ EngCalcs.lpnSolve = function (model, options) {
 			dq,
 			sumAbsDq = 0;
 
-		for (i = 0; i < nn; i++) { A.push(new Float64Array(nn)); }
+		M.fill(0);
+		F.fill(0);
 
 		for (k = 0; k < links.length; k++) {
 			link = links[k];
@@ -500,21 +763,26 @@ EngCalcs.lpnSolve = function (model, options) {
 					y[k] = h / p;
 				}
 			} else {
-				if (method === 'dw') {
+				if (!resFixed) {
 					link.f = EngCalcs.lpnDwFriction(Math.max(aq, qMin), link.diameter, link.roughness, visc);
+					res = EngCalcs.lpnResistance(link, method, visc);
+					linkR[k] = res.r;
+					linkN[k] = res.n;
 				}
-				res = EngCalcs.lpnResistance(link, method, visc);
 				// A VALVE ARRIVES HERE, and needs no branch of its own: lpnResistance returns
 				// r = 0 for a zero-length link, so the friction term vanishes and what is left is
 				// exactly the minor loss -- which is what a throttle valve IS. lpnLinkK() is the
-				// one place that reads a TCV's loss out of its setting rather than out of k.
-				var km = EngCalcs.lpnLinkK(link),
-					m = km > 0
-						? km / (2 * g * Math.pow(Math.PI * link.diameter * link.diameter / 4, 2))
-						: 0;
+				// one place that reads a TCV's loss out of its setting rather than out of k, and
+				// it is read above the loop now because a setting does not change during a solve.
+				var rk = linkR[k],
+					nk = linkN[k],
+					m = linkM[k],
+					// Q^(n-1) appears in both the head loss and its derivative and was raised
+					// twice. One Math.pow, two uses, same value.
+					pw = Math.pow(aq, nk - 1);
 
-				h = res.r * Math.pow(aq, res.n - 1) * q + m * aq * q;
-				p = res.n * res.r * Math.pow(aq, res.n - 1) + 2 * m * aq;
+				h = rk * pw * q + m * aq * q;
+				p = nk * rk * pw + 2 * m * aq;
 				if (!(p > gradMin)) {
 					// Below the gradient floor the relation is replaced by a straight
 					// line of that slope through the origin, so h and p stay
@@ -533,16 +801,30 @@ EngCalcs.lpnSolve = function (model, options) {
 			jIdx = junctionIndex[link.to];
 
 			if (iIdx !== undefined) {
-				A[iIdx][iIdx] += G[k];
+				M[envDiag[iIdx]] += G[k];
 				F[iIdx] -= (Q[k] - y[k]);
 			}
 			if (jIdx !== undefined) {
-				A[jIdx][jIdx] += G[k];
+				M[envDiag[jIdx]] += G[k];
 				F[jIdx] += (Q[k] - y[k]);
 			}
 			if (iIdx !== undefined && jIdx !== undefined) {
-				A[iIdx][jIdx] -= G[k];
-				A[jIdx][iIdx] -= G[k];
+				// ONE write, not two: the factorization reads only the lower triangle, and the
+				// upper half of a symmetric matrix was never anything but storage.
+				//
+				// UNLESS THE LINK IS A SELF-LOOP, in which case the two writes the dense form made
+				// were to the SAME cell and both have to survive. A pipe drawn from a junction
+				// back to itself is nonsense hydraulically and cancels to nothing either way, but
+				// "either way" is the claim being made here, and it is only true if this branch
+				// exists. Nothing rejects such a link upstream.
+				if (iIdx === jIdx) {
+					M[envDiag[iIdx]] -= G[k];
+					M[envDiag[iIdx]] -= G[k];
+				} else {
+					lo = iIdx < jIdx ? iIdx : jIdx;
+					hi = iIdx < jIdx ? jIdx : iIdx;
+					M[envRowStart[hi] - envFirst[hi] + lo] -= G[k];
+				}
 			} else if (iIdx !== undefined) {
 				F[iIdx] += G[k] * byId[link.to].head;
 			} else if (jIdx !== undefined) {
@@ -559,12 +841,12 @@ EngCalcs.lpnSolve = function (model, options) {
 					ge = dh > qMin
 						? emitterExp * junctions[i].emitter * Math.pow(dh, emitterExp - 1)
 						: junctions[i].emitter;
-				A[i][i] += ge;
+				M[envDiag[i]] += ge;
 				F[i] += ge * H[i] - qe;
 			}
 		}
 
-		Hnew = EngCalcs.lpnSolveSPD(A, F);
+		Hnew = EngCalcs.lpnSolvePacked(env, M, F);
 		if (Hnew === null) {
 			return {
 				ok: false,
@@ -604,7 +886,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		if (maxFlowChange < tol || sumAbsDq < absTol) { converged = true; break; }
 
 		// Stagnation. Newton converges quadratically until it reaches the roundoff
-		// floor of the dense factorization, then stops improving -- measured on a
+		// floor of the factorization, then stops improving -- measured on a
 		// 201-node grid: 8e-1, 8e-2, 4e-3, 3e-5, 2e-7, 2e-8, then a plateau at ~5e-8
 		// forever. Without this the solver would spend 100 iterations and 330 ms
 		// reaching the answer it already had at iteration 6, on every keystroke.
@@ -631,7 +913,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		// broke it: it lowered demandScale by 4x, which is a 4x rise in every RELATIVE measure,
 		// and 1e-6 happened to sit between the old plateau and the new one.
 		//
-		// The floor is roundoff in the dense factorization and is network-dependent -- ill
+		// The floor is roundoff in the factorization and is network-dependent -- ill
 		// conditioning from the zero-flow links' clamped gradient (lpnGradMin), which EPANET has
 		// too. So no fixed number is right, and the honest test is a COMPARISON: we have stopped
 		// improving, and we are already at least as converged as EPANET's own default Accuracy
