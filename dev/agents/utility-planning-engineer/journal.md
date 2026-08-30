@@ -14,6 +14,127 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-08-29 — Wish-list Row 1 designed: the undesigned piece (override × multiplier) answered
+
+Row 1's own honest gap — "not designed: the UI decision of how it interacts with a node's own
+per-node override" — was called in to be built this session. Four questions answered, source and
+repo both read.
+
+### Q1 — override then multiply, or multiply then override escapes it?
+
+**CITED — EPANET's own OWA-EPANET Toolkit 2.3 `[OPTIONS]` reference and independent corroboration
+(`wateranalytics.org/EPANET/_options_page.html`, and a WebFetch summary of the same toolkit text via
+search) state Demand Multiplier scales EVERY node's demand unconditionally: "adjust the values of
+baseline demands for all junctions and all demand categories... actual demand = multiplier × base
+demand," with no per-node opt-out mechanism named anywhere in the option's own description.** EPANET
+itself has no per-node "override that skips the multiplier" concept to test against, because EPANET
+has no scenario layer at all — a junction's `[JUNCTIONS]` base demand is just whatever number is in
+the file, and the multiplier always acts on it.
+**CITED — WNTR's `options.hydraulic.demand_multiplier` behaves identically** (search synthesis of
+`usepa.github.io/WNTR/options.html` and the `wntr.metrics.hydraulic` source, not fetched primary this
+pass — flag secondary): it scales `junc.demand_timeseries_list` when computing expected demand, a
+single scalar in `WaterNetworkOptions`, applied uniformly with no per-junction escape.
+**I could not reach WaterGEMS/WaterCAD's own Alternative-vs-peak-factor documentation directly**
+(two WebFetch attempts on `docs.bentley.com` and a Bentley community thread both returned only
+navigation chrome, no body text) — **flag this half of Q1 as NOT FOUND, not confirmed either way**,
+rather than papering over it with the EPANET/WNTR answer by assumption.
+**OBSERVED, and this is the load-bearing finding for THIS repo specifically:**
+`resolvedDemand()` (`js/looped-network.js:24621-24633`) already answers this exact question for the
+override this suite already has. A scenario's per-node `demand` override (`LPN_OVERRIDABLE.node.demand`,
+`js/looped-network.js:2315`) is read through `effective(n, 'demand')` — REPLACING Base's row(s) — and
+the result is THEN multiplied by both `demandMultiplier(n, t)` (the pattern) and `docDemandMultiplier()`
+(the document-wide `[OPTIONS]` multiplier, Task 553): `total * dm` at line 24632, `rows[0].base *
+demandMultiplier(n, t) * dm` at line 24625. **There is no escape hatch today. An overridden demand is
+multiplied exactly like a Base demand is.** That is precedent already built and shipped, and it agrees
+with EPANET's and WNTR's own convention: **override replaces the base value that then gets multiplied,
+never the final value that escapes the multiplier.** I found no third convention anywhere in the three
+sources I could actually inspect. **A reviewer reading a submittal built on this suite would expect
+the multiplier to apply to a scenario's own overridden hydrant demand too** — that is what "max day is
+avg-day × 1.8" means as a sentence: everything scales, including the one node someone typed a number
+into by hand, unless that number was deliberately typed AS the max-day value already (which is a
+different, ordinary case — the user just doesn't ALSO apply the multiplier there, by not creating an
+override at all, or by setting a scenario multiplier of 1 and living with the rest hand-edited — not a
+mechanism the software needs to build).
+
+### Q2 — is a scenario multiplier a fourth multiplier too many, and should the existing global one become scenario-overridable instead?
+
+**Yes, and yes.** Counted the stack that already exists: (1) base demand, (2) demand-category rows
+summed (Task 468), (3) pattern multiplier at time t (per-category, defaulting to the project pattern),
+(4) `settings.hydraulics.demandMultiplier` — the EPANET `[OPTIONS]` one, Task 553, **document-global,
+one number for the whole project, not scenario-scoped** (confirmed by reading `docDemandMultiplier()`
+itself, `js/looped-network.js:24617-24620`, which reads `settings.hydraulics`, never `activeScenario()`).
+Adding a NEW, separately-named "scenario demand multiplier" field would be a fifth concept doing work
+functionally identical to the fourth. **The honest fix is not a new field — it is making Task 553's
+existing multiplier scenario-overridable**, because that is also the more EPANET-faithful shape: EPANET
+itself has exactly ONE demand multiplier, one per file, and this suite's own scenario mechanism is
+already the tool for "what if this file's numbers were different" (Task 184's whole premise). A
+"max day" scenario IS, in EPANET's own terms, a different value of the SAME option in a differently-
+configured export — not a second, unrelated knob.
+**OBSERVED, and this is the good news: the mechanism this needs already exists, just not wired to this
+field.** A scenario is a plain object `{id, name, isBase, overrides}` (`js/looped-network.js:2236`,
+`:2511`). `LPN_OVERRIDABLE`/`effective()`/`setOverride()` (`js/looped-network.js:2314-2420`) is the seam
+for ELEMENT properties (node/link/label, keyed `ovKey()`) and is the wrong seam for this — a demand
+multiplier is not a property of a node or a link, it is a property of the SCENARIO ITSELF. **The clean
+design is a scalar field directly on the scenario object** (`scn.demandMultiplier`, alongside
+`overrides`), read as: scenario's own value if set, else `settings.hydraulics.demandMultiplier` (today's
+document default, effectively what Base already means), else 1. This sidesteps the
+`scenario_seam_check.php` write-seam rule entirely rather than fighting it — that guard exists to stop
+a scenario write from silently corrupting Base's ELEMENT data, and a scenario-only scalar with its own
+storage slot never touches Base at all, cleaner than routing it through `setProp()`. **SPECULATION, my
+own design, not yet built or reviewed — re-derive before quoting as decided.**
+
+### Q3 — what must the popup show
+
+**A per-node breakdown of every multiplicative factor is noise, not clarity**, by this suite's own
+already-ruled precedent: Tom decided the popup MAY show Base Demand and Demand as the same number
+twice on purpose (journal, 2026-08-26 entry on `demandPatternActs`, OBSERVED) because repetition
+that carries a meaning is welcome and a synthesized "why these differ" explanation is not needed
+per-field. Applying that same instinct here: the node popup needs exactly what it already shows —
+**Base Demand** (what's typed, or the override typed in this scenario) and **Demand** (fully
+resolved, pattern and multiplier folded in, matching what the solver actually used) — and does NOT
+need a third line decomposing "×pattern ×multiplier" per node, which would repeat the SAME scenario-
+wide number on every junction's popup for no new information. **What DOES need to be visible, and is
+not a node-level fact:** the scenario's own multiplier value, once, somewhere a person reads the
+scenario as a whole — the natural home is wherever the scenario is named/selected (a scenario
+properties row, parallel to how `settings.hydraulics.demandMultiplier` already has its own Settings
+row today, `js/looped-network.js:21119`), not injected into every popup. **SPECULATION, mine, not
+reviewed** — the guiding rule I am applying (repetition of the SAME fact across many nodes is noise;
+a scenario-level fact belongs at the scenario, not smeared across every element that happens to be
+affected by it) is my own inference from the popup precedent, not a separately-sourced UX finding.
+
+### Q4 — Scenario or Run?
+
+**Scenario, cleanly, and Tom's own Task 530 correction settles it rather than leaving it open.**
+**CITED, Tom, Task 530 follow-up (recorded in this journal 2026-08-27, Q2):** *"a scenario contains
+modeling data that a simulation uses... a run generates an output source"* (paraphrasing InfoWater's
+own distinction, which Tom adopted). A demand multiplier is exactly "modeling data a simulation
+uses" — it changes WHAT the network's demand configuration is, the same category as a per-node
+demand override, which is already scenario data (`LPN_OVERRIDABLE.node.demand`, OBSERVED). It is not
+an output, not a solve method, not a time step — it has no business on a not-yet-built Run object,
+whose whole job (per the same entry) is to be "a compute event and its stored output," a different
+axis entirely. **Cost of guessing wrong, stated plainly:** if this were built against the not-yet-
+existing Run concept, it would have nothing to attach to today and would block on unrelated,
+unscoped work (Run Manager, ranked by this seat's own wish list as the LAST of five fire-flow phases,
+`wishlist.md`, OBSERVED) that Tom has not asked for. Building it on Scenario costs nothing extra now
+and is the same shape a future Run would read FROM (a Run names a scenario among its parameters,
+per the same quote) — so building it on Scenario is not a guess that a later Run redesign would have
+to undo; it is the layer a Run is defined to sit on top of.
+
+### Net answer to row 1
+
+**Do not add a new "scenario demand multiplier" field.** Make the existing Task 553
+`settings.hydraulics.demandMultiplier` scenario-overridable via a scalar directly on the scenario
+object (not the node/link/label `effective()` seam, which is the wrong door for a document-level
+option). Resolution order: node's effective demand (override if the scenario set one, else Base) ×
+pattern multiplier × the scenario's own demand multiplier (or the document default if the scenario
+did not set one) — exactly the order `resolvedDemand()` already uses for the document-wide multiplier
+today, extended by one more level of "does the scenario override this," which is the same pattern
+every other overridable quantity on this page already follows. Interface: no per-node breakdown row;
+show the scenario's multiplier once, at the scenario, the same way the document default already gets
+one Settings row.
+
+---
+
 ## 2026-08-26 — Task 530 follow-up: emitter citations upgraded to primary text, and a fourth mechanism (PDA) found and weighed
 
 Same-day re-pass at the orchestrator's request. The prior entry below answered all three of Tom's

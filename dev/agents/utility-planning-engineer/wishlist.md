@@ -77,8 +77,26 @@ Tom: *"Nice."* Unchanged from the prior pass.
   second, independent reason.
 - **Size:** believed small-to-medium — the multiplier arithmetic already exists
   (`patternMultiplier`/`demandMultiplier`), so this is mainly a new scenario-level input field and
-  the UI decision of how it interacts with a node's own per-node override in that scenario. Not
-  designed; re-derive before quoting.
+  the UI decision of how it interacts with a node's own per-node override in that scenario.
+- **DESIGNED 2026-08-29 — full case: journal, 2026-08-29 "Wish-list Row 1 designed."** Short form:
+  (1) an overridden node demand is NOT an escape from the multiplier — it is multiplied exactly like
+  Base, matching EPANET's and WNTR's own `[OPTIONS]`/`options.hydraulic.demand_multiplier` behaviour
+  (CITED) and matching what this suite's `resolvedDemand()` already does to the document-wide
+  multiplier today (OBSERVED, `js/looped-network.js:24621-24633`) — no third convention found. (2) **Do
+  not add a new field.** Task 553's existing `settings.hydraulics.demandMultiplier` should become
+  scenario-overridable instead — a fourth multiplier concept doing the same job as the existing third
+  one is one too many, and EPANET itself has exactly one demand multiplier per file, which is what a
+  scenario already stands in for. The right storage is a scalar directly on the scenario object
+  (`scn.demandMultiplier`), NOT routed through the node/link/label `effective()`/`setProp()` seam,
+  which is the wrong door for a document-level option and would fight `scenario_seam_check.php` for no
+  reason. (3) The popup needs no new per-node breakdown row (noise, given the popup's own precedent
+  that a repeated fact needs no synthesized explanation) — the multiplier's own value belongs once, at
+  the scenario, the same way the document default already has one Settings row. (4) Belongs to
+  Scenario, not the not-yet-built Run — it is modelling data a simulation uses, the same category as
+  the per-node override that is already scenario data, and Tom's own Task 530 Run/Scenario distinction
+  says so directly. **All four points marked SPECULATION in the journal entry except the EPANET/WNTR
+  citations and the `resolvedDemand()` reading — re-derive the design choices before building from them
+  as settled, they have not been reviewed.**
 
 ### 2. A scenario comparison table — run every scenario, one summary row each
 
