@@ -2303,8 +2303,6 @@ $ec_lang['lpn_backdrop_target_coords']='Coordinates you type';
 $ec_lang['lpn_backdrop_coords_prompt']='Type the X,Y that point should move to';
 $ec_lang['lpn_backdrop_continue']='Continue';
 $ec_lang['lpn_tool_settings']='Settings';
-$ec_lang['lpn_settings_scope_project']='Project settings';
-$ec_lang['lpn_settings_scope_calculator']='Calculator settings';
 $ec_lang['lpn_settings_show_titles']='Show page titles';
 $ec_lang['lpn_settings_show_titles_tip']='Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
@@ -2398,7 +2396,6 @@ $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
 $ec_lang['lpn_settings_emitter_exponent_tip']='The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.';
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
-$ec_lang['lpn_settings_computation']='Computation';
 $ec_lang['lpn_elev_dem_sample']='Sample DEM';
 $ec_lang['lpn_elev_dem_sample_tip']='Reads the height of the land under this node from Mapbox DEM and shows it below. It changes nothing. The data is about 30 m across on most of the Earth, and finer where better data exists.';
 $ec_lang['lpn_elev_dem_use']='Use DEM';
@@ -2505,10 +2502,8 @@ $ec_lang_syn['lpn_settings_map_display']='How the map looks (appearance, style, 
 // promises "part of the page is always left to scroll", which is the exact behaviour the fit-the-
 // window change removed. Reusing it as-is would ship a confident wrong explanation everywhere at
 // once, which is worse than having no tip at all.
-$ec_lang['lpn_settings_map_height_px']='Map height (screen pixels)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
 // own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
-$ec_lang['lpn_settings_map_height_tip']='On a small screen the map is drawn shorter than this, so that part of the page is always left to scroll.';
 $ec_lang['lpn_settings_legend_position']='Labels legend position';
 $ec_lang_syn['lpn_settings_legend_position']='The position where the key table (legend, map key — the box explaining the symbols) for node and link labels sits on the map. | avoid: legend as a myth or folk tale';
 // ROADMAP Task 529. Tom, 2026-08-25, after a phone session: *"one of the legend placement options
@@ -2523,7 +2518,6 @@ $ec_lang['lpn_settings_legend_middle_left']='Middle left';
 $ec_lang['lpn_settings_legend_middle_right']='Middle right';
 $ec_lang['lpn_settings_legend_bottom_left']='Bottom left';
 $ec_lang['lpn_settings_legend_bottom_right']='Bottom right';
-$ec_lang['lpn_settings_colors']='Color by value';
 $ec_lang['lpn_settings_color_node_field']='Node color';
 $ec_lang['lpn_settings_color_link_field']='Pipe color';
 $ec_lang['lpn_settings_color_ramp']='Color scheme';

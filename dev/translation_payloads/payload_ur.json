@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 1426,
+        "expected_key_count": 1420,
         "delta_key_count": 106,
         "exempt_key_count": 21,
         "exempt_keys": [
@@ -1770,9 +1770,9 @@
                     "english": "Emitter exponent"
                 },
                 "next_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_tolerance",
+                    "value": "ہم آہنگی کی رواداری",
+                    "english": "Convergence tolerance"
                 }
             }
         },
@@ -1781,9 +1781,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1797,9 +1797,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1813,9 +1813,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1829,9 +1829,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1845,9 +1845,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1861,9 +1861,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1877,9 +1877,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1893,9 +1893,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1909,9 +1909,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1925,9 +1925,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1941,9 +1941,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1957,9 +1957,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1973,9 +1973,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1989,9 +1989,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2005,9 +2005,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2021,9 +2021,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2037,9 +2037,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2053,9 +2053,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2069,9 +2069,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2085,9 +2085,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "حساب کتاب",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",

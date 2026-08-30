@@ -1899,8 +1899,6 @@
         "lpn_settings_color_reverse": "7958ae65e734c4a1caeb622830a6af88042bfd5d",
         "lpn_settings_color_thematic": "67f1ce5226c2216050799365fa587e7add8d8ca0",
         "lpn_settings_color_thematic_tip": "4b6b6dae12d1cdf851633cc8025c72ddfa8bb66f",
-        "lpn_settings_colors": "50ee959738f81d997d2fdd579d22c9caebdb17fd",
-        "lpn_settings_computation": "cd260770f98f9ac256c0d151419fd05e77f6fc69",
         "lpn_settings_defaults": "b1564f6b1512cbfa3cfcebc9a5badb6b239954f1",
         "lpn_settings_defaults_note": "990606b34087faf589658448074aa7621295f825",
         "lpn_settings_emitter_exponent": "1d8660383db35f7b4b2754b1f2451fddc60c0a03",
@@ -1921,8 +1919,6 @@
         "lpn_settings_link_symbology": "890f2ff6ed8ab35922b0257e4511f547d16e9138",
         "lpn_settings_link_width": "3bc2bdae2e870971298fbd0f0485edc1967526c9",
         "lpn_settings_map_display": "986ff567ff2c4fc5523453c2180dd843d731c11a",
-        "lpn_settings_map_height_px": "57bc82a0e9381166f06c7cc0ff2547459fb3fe62",
-        "lpn_settings_map_height_tip": "d445f7f5d0c615e13f228181822cce73569c1ade",
         "lpn_settings_mask_labels": "801615742e22b285a1838d6184c72544ec28a96b",
         "lpn_settings_no_match": "f323e88618d328cf97d644f8e7e27c817528dd4d",
         "lpn_settings_node_link": "1d9001337c8660d173b9d7081a44d11a88b6237a",
@@ -1934,8 +1930,6 @@
         "lpn_settings_readability_bias": "fb21995c0657055329fed8983178c2c29694196e",
         "lpn_settings_readability_bias_tip": "fc8523993c004fda435aaa365efbd052973429c7",
         "lpn_settings_restore_tip": "723cebec7f1a48471ff9b324d75ed21e6a2aa7ec",
-        "lpn_settings_scope_calculator": "00dfef22ecb2664741976fcf9fcd2bf6ff5c6167",
-        "lpn_settings_scope_project": "95590645e1aac6068a614f2f94ed6e4a7b9f3192",
         "lpn_settings_search": "9a6f37a7bf9c2e64efe7d7374dda5f7ae051bd8b",
         "lpn_settings_search_tip": "eb6af12fb4dbea319a6924ce0b890cfaf8ee368d",
         "lpn_settings_sec_assets": "3d6a7a7cedeede15fa63358493d0150b024a7c02",
@@ -5670,14 +5664,6 @@
             "words": 25,
             "ends_sentence": true
         },
-        "lpn_settings_colors": {
-            "words": 3,
-            "ends_sentence": false
-        },
-        "lpn_settings_computation": {
-            "words": 1,
-            "ends_sentence": false
-        },
         "lpn_settings_defaults": {
             "words": 2,
             "ends_sentence": false
@@ -5758,14 +5744,6 @@
             "words": 2,
             "ends_sentence": false
         },
-        "lpn_settings_map_height_px": {
-            "words": 4,
-            "ends_sentence": false
-        },
-        "lpn_settings_map_height_tip": {
-            "words": 22,
-            "ends_sentence": true
-        },
         "lpn_settings_mask_labels": {
             "words": 4,
             "ends_sentence": false
@@ -5805,14 +5783,6 @@
         "lpn_settings_readability_bias_tip": {
             "words": 20,
             "ends_sentence": true
-        },
-        "lpn_settings_scope_calculator": {
-            "words": 2,
-            "ends_sentence": false
-        },
-        "lpn_settings_scope_project": {
-            "words": 2,
-            "ends_sentence": false
         },
         "lpn_settings_search": {
             "words": 2,

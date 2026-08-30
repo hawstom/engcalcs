@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 1426,
+        "expected_key_count": 1420,
         "delta_key_count": 106,
         "exempt_key_count": 18,
         "exempt_keys": [
@@ -1767,9 +1767,9 @@
                     "english": "Emitter exponent"
                 },
                 "next_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_tolerance",
+                    "value": "收敛容差",
+                    "english": "Convergence tolerance"
                 }
             }
         },
@@ -1778,9 +1778,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1794,9 +1794,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1810,9 +1810,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1826,9 +1826,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1842,9 +1842,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1858,9 +1858,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1874,9 +1874,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1890,9 +1890,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1906,9 +1906,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1922,9 +1922,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1938,9 +1938,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1954,9 +1954,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1970,9 +1970,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1986,9 +1986,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2002,9 +2002,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2018,9 +2018,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2034,9 +2034,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2050,9 +2050,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2066,9 +2066,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2082,9 +2082,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "计算",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "喷射（漏损）指数",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",

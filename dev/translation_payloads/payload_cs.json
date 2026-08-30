@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 1426,
+        "expected_key_count": 1420,
         "delta_key_count": 106,
         "exempt_key_count": 26,
         "exempt_keys": [
@@ -1791,9 +1791,9 @@
                     "english": "Emitter exponent"
                 },
                 "next_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolerance konvergence",
+                    "english": "Convergence tolerance"
                 }
             }
         },
@@ -1802,9 +1802,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1818,9 +1818,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1834,9 +1834,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1850,9 +1850,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1866,9 +1866,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1882,9 +1882,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1898,9 +1898,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1914,9 +1914,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1930,9 +1930,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1946,9 +1946,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1962,9 +1962,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1978,9 +1978,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1994,9 +1994,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2010,9 +2010,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2026,9 +2026,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2042,9 +2042,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2058,9 +2058,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2074,9 +2074,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2090,9 +2090,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2106,9 +2106,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Výpočet",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Exponent emitoru",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",

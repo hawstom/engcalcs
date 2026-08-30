@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1426,
+        "expected_key_count": 1420,
         "delta_key_count": 106,
         "exempt_key_count": 30,
         "exempt_keys": [
@@ -1795,9 +1795,9 @@
                     "english": "Emitter exponent"
                 },
                 "next_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_tolerance",
+                    "value": "Tolleranza di convergenza",
+                    "english": "Convergence tolerance"
                 }
             }
         },
@@ -1806,9 +1806,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1822,9 +1822,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1838,9 +1838,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1854,9 +1854,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1870,9 +1870,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1886,9 +1886,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1902,9 +1902,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1918,9 +1918,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1934,9 +1934,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1950,9 +1950,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1966,9 +1966,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1982,9 +1982,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -1998,9 +1998,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2014,9 +2014,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2030,9 +2030,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2046,9 +2046,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2062,9 +2062,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2078,9 +2078,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2094,9 +2094,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
@@ -2110,9 +2110,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_computation",
-                    "value": "Calcolo",
-                    "english": "Computation"
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Esponente dell'erogatore",
+                    "english": "Emitter exponent"
                 },
                 "next_translated": {
                     "key": "lpn_settings_tolerance",
