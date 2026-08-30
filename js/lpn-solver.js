@@ -577,8 +577,45 @@ EngCalcs.lpnSolve = function (model, options) {
 	var A = [],
 		F = new Float64Array(nn),
 		G = new Float64Array(links.length),
-		y = new Float64Array(links.length);
+		y = new Float64Array(links.length),
+		linkR = new Float64Array(links.length),
+		linkN = new Float64Array(links.length),
+		linkM = new Float64Array(links.length),
+		resFixed = method !== 'dw',
+		resK,
+		aKm,
+		aArea;
 	for (i = 0; i < nn; i++) { A.push(new Float64Array(nn)); }
+
+	// WHAT DOES NOT DEPEND ON THE FLOW IS COMPUTED ONCE, not once per Newton iteration.
+	//
+	// A link's resistance r and its minor-loss coefficient m are functions of its GEOMETRY --
+	// length, diameter, roughness -- and the flow appears nowhere in either. Under Hazen-Williams
+	// each one costs two Math.pow calls and an object allocation, and the old code paid all of
+	// that for every link on every iteration: 421 links x 13 iterations is 5,473 repeats of an
+	// answer that never changed, on each of a sweep's 3,707 solves.
+	//
+	// DARCY-WEISBACH IS THE EXCEPTION AND IT IS NOT AN OVERSIGHT. Its friction factor f is a
+	// function of the Reynolds number, so r genuinely moves with the flow and has to be re-formed
+	// each iteration -- see the note on lpnResistance. `resFixed` is that distinction, stated
+	// once, so it cannot be half-applied.
+	//
+	// Identical arithmetic, so identical bits: the same expressions on the same inputs, evaluated
+	// fewer times. dev/lpn-spike/spd-envelope-harness.js compares every reported number against
+	// the unmodified reference and would see any drift.
+	for (k = 0; k < links.length; k++) {
+		aKm = EngCalcs.lpnLinkK(links[k]);
+		aArea = Math.PI * links[k].diameter * links[k].diameter / 4;
+		// Written with the same operations in the same order as the line it replaces, Math.pow
+		// and all. `aArea * aArea` would be one rounding away, which is exactly the kind of
+		// "obviously the same" edit that turns a bit-identical change into a tolerance-grade one.
+		linkM[k] = aKm > 0 ? aKm / (2 * g * Math.pow(aArea, 2)) : 0;
+		if (resFixed) {
+			resK = EngCalcs.lpnResistance(links[k], method, visc);
+			linkR[k] = resK.r;
+			linkN[k] = resK.n;
+		}
+	}
 
 	for (iter = 1; iter <= maxIter; iter++) {
 		var link,
@@ -634,21 +671,26 @@ EngCalcs.lpnSolve = function (model, options) {
 					y[k] = h / p;
 				}
 			} else {
-				if (method === 'dw') {
+				if (!resFixed) {
 					link.f = EngCalcs.lpnDwFriction(Math.max(aq, qMin), link.diameter, link.roughness, visc);
+					res = EngCalcs.lpnResistance(link, method, visc);
+					linkR[k] = res.r;
+					linkN[k] = res.n;
 				}
-				res = EngCalcs.lpnResistance(link, method, visc);
 				// A VALVE ARRIVES HERE, and needs no branch of its own: lpnResistance returns
 				// r = 0 for a zero-length link, so the friction term vanishes and what is left is
 				// exactly the minor loss -- which is what a throttle valve IS. lpnLinkK() is the
-				// one place that reads a TCV's loss out of its setting rather than out of k.
-				var km = EngCalcs.lpnLinkK(link),
-					m = km > 0
-						? km / (2 * g * Math.pow(Math.PI * link.diameter * link.diameter / 4, 2))
-						: 0;
+				// one place that reads a TCV's loss out of its setting rather than out of k, and
+				// it is read above the loop now because a setting does not change during a solve.
+				var rk = linkR[k],
+					nk = linkN[k],
+					m = linkM[k],
+					// Q^(n-1) appears in both the head loss and its derivative and was raised
+					// twice. One Math.pow, two uses, same value.
+					pw = Math.pow(aq, nk - 1);
 
-				h = res.r * Math.pow(aq, res.n - 1) * q + m * aq * q;
-				p = res.n * res.r * Math.pow(aq, res.n - 1) + 2 * m * aq;
+				h = rk * pw * q + m * aq * q;
+				p = nk * rk * pw + 2 * m * aq;
 				if (!(p > gradMin)) {
 					// Below the gradient floor the relation is replaced by a straight
 					// line of that slope through the origin, so h and p stay
