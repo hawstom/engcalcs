@@ -1178,6 +1178,136 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 		/\.lpn-popover-body \{ overflow: auto/.test(css));
 }
 
+// ============================================================================================
+// 12. THE SETTINGS BOX FITS THE PHONE, ITS OWN GRIP INCLUDED (Tom, 2026-08-29)
+// ============================================================================================
+// *"on a phone the index is narrower than before, the main pane is wider than it needs to be, and
+//  the box runs off the screen, impossible to resize because the control is inaccessible."*
+//
+// **THE LAST TWO ARE ONE DEFECT AND IT IS THE DANGEROUS SHAPE: the escape hatch and the trap are
+// the same corner.** .lpn-resize-grip sits at the box's bottom-right, so a box whose bottom is off
+// the screen has taken its own way out with it. An off-screen box with a reachable grip is a
+// nuisance; this is a box the reader cannot get back.
+//
+// WHAT WENT WRONG, in arithmetic rather than in prose. clampPanel() gained a `topMin` on
+// 2026-08-24 (chromeFloor(), so no panel can hide under the menu bar) and its top became
+// `max(floor, min(top, vh - h - EDGE))`. The moment the box is taller than the room UNDER that
+// floor, the floor wins and every pixel past it hangs below the fold -- and the ResizeObserver in
+// wireSettingsBox() cannot slide it back, because it re-runs the SAME clamp and gets the same
+// answer. The box on a phone is `min(46rem, 92dvh)`, which is 92% of the screen, so the room below
+// the chrome is never enough and the overflow is exactly the height of the chrome.
+//
+// The fix is the one this page already had for the same shape (the Find box, and the fire flow
+// box): cap the box to the room below the floor BEFORE placing it, so the overflow lands inside
+// `.lpn-popover-body`, which scrolls. Section 8 above asserts the other two symptoms -- the index
+// is 4.5rem on a phone and 6.6rem on the desktop, which is what shipped 2026-08-23 and has not
+// moved since.
+//
+// A BROWSER IS NOT AVAILABLE HERE, so the chrome's real height cannot be measured. The assertions
+// are therefore made over a RANGE of floors rather than against an invented number: whatever the
+// menu bar, toolbar and tab strip come to, the box must end up inside the screen.
+{
+	console.log('\n--- the Settings box, and the grip it must never put out of reach ---');
+	const jsSrc = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+	const EDGE = +(/var POPUP_EDGE = (\d+);/.exec(jsSrc) || [])[1];
+	ok('the viewport margin is read out of the page, not typed here', EDGE > 0, String(EDGE));
+	function fn(name) {
+		const at = jsSrc.search(new RegExp('(?:async )?function ' + name + '\\s*\\('));
+		let i = jsSrc.indexOf('{', at), depth = 0, end = i;
+		for (; end < jsSrc.length; end++) {
+			if (jsSrc[end] === '{') { depth++; }
+			else if (jsSrc[end] === '}') { depth--; if (depth === 0) { end++; break; } }
+		}
+		return jsSrc.slice(at, end);
+	}
+	// **THE SOURCE-SHAPE TESTS READ CODE, NOT PROSE.** These functions carry a paragraph explaining
+	// the very call being asserted, and a plain search finds the word in the comment -- which is a
+	// check that passes on its own documentation. Comments are blanked first.
+	function code(name) { return fn(name).replace(/\/\/[^\n]*/g, ''); }
+	// The REAL clampPanel, not a restatement of it: a copy here would pass while the page's own
+	// arithmetic changed underneath.
+	const clampPanel = new Function('POPUP_EDGE', fn('clampPanel') + '\nreturn clampPanel;')(EDGE);
+
+	// The box's own geometry, read off the stylesheet at 360px rather than typed.
+	const setbox = node('div', 'lpn_settings_box', ['lpn-popover', 'lpn-setbox'], body);
+	const REM = 16, VH = 640, VW = SMALL;
+	function css(prop, w) { return winning(RULES, setbox, w === undefined ? SMALL : w, DOC_IDS, false, prop); }
+	function resolve(expr, vw, vh) {
+		// Only the two shapes this stylesheet uses: `min(a, b)` and a bare length.
+		const one = (t) => {
+			t = t.trim();
+			let m = /^([\d.]+)rem$/.exec(t); if (m) { return parseFloat(m[1]) * REM; }
+			m = /^([\d.]+)(?:dvh|vh)$/.exec(t); if (m) { return parseFloat(m[1]) / 100 * vh; }
+			m = /^([\d.]+)vw$/.exec(t); if (m) { return parseFloat(m[1]) / 100 * vw; }
+			m = /^([\d.]+)px$/.exec(t); if (m) { return parseFloat(m[1]); }
+			return NaN;
+		};
+		const mm = /^min\(([^,]+),([^)]+)\)$/.exec(String(expr).trim());
+		return mm ? Math.min(one(mm[1]), one(mm[2])) : one(expr);
+	}
+	const boxW = Math.min(resolve(css('width'), VW, VH), resolve(css('max-width'), VW, VH));
+	const boxH = Math.min(resolve(css('height'), VW, VH), resolve(css('max-height'), VW, VH));
+	ok('the box’s opening size resolves at 360x640', isFinite(boxW) && isFinite(boxH),
+		boxW + ' x ' + boxH);
+	// Sideways it has always fitted, and that is worth holding: 94vw inside a 98vw cap.
+	ok('the box fits the phone’s WIDTH with both margins', boxW + 2 * EDGE <= VW, String(boxW));
+
+	// The floors a phone can plausibly produce: three stacked strips of chrome, none of them
+	// measurable outside a browser. The assertion has to hold for every one of them.
+	const FLOORS = [40, 60, 80, 100, 120, 160, 200];
+	// **THE TRAP, STATED SO IT CANNOT BE FIXED BY ACCIDENT.** With no cap, the box is taller than
+	// the room under the chrome at every one of these floors, and the clamp answers with the floor
+	// -- so the bottom, and the grip on it, is off the screen. If this ever stops being true the
+	// premise of the fix below has changed and somebody must look again.
+	// The threshold is arithmetic, not a guess: past `vh - h - EDGE` of chrome there is no top left
+	// that keeps the box on screen. It comes out at ~47px on this phone, and the menu bar alone is
+	// most of that -- three stacked strips are far past it.
+	const THRESH = VH - boxH - EDGE;
+	const trapped = FLOORS.filter((f) => clampPanel(0, 0, boxW, boxH, VW, VH, f).top + boxH > VH - EDGE);
+	ok('uncapped, the box hangs off the bottom for any chrome taller than the room it leaves',
+		trapped.length === FLOORS.filter(f => f > THRESH).length && trapped.length > 0 &&
+		trapped.every(f => f > THRESH),
+		'threshold ' + THRESH.toFixed(1) + 'px; trapped at ' + trapped.join(', '));
+	// **AND CAPPED, IT NEVER DOES.** `capPanelToRoomBelow(box, top)` caps to `vh - top - EDGE`,
+	// which is what this repeats -- against the real clamp, at every floor.
+	FLOORS.forEach((f) => {
+		const h = Math.min(boxH, VH - f - EDGE);
+		const at = clampPanel(0, 0, boxW, h, VW, VH, f);
+		ok(`capped to the room under a ${f}px chrome, the whole box is on screen`,
+			at.top >= f && at.top + h <= VH - EDGE,
+			`top ${at.top}, bottom ${at.top + h}, viewport ${VH}`);
+		// The grip is the last 28px of that bottom edge (the coarse-pointer rule above), so the
+		// box fitting IS the grip being reachable -- said out loud because it is the assertion that
+		// matters and it would otherwise be an inference from the line before it.
+		ok(`...and its 28px grabber is below the chrome and above the fold`,
+			at.top + h - 28 >= f, String(at.top + h - 28));
+	});
+
+	// The wiring, so the arithmetic above is actually reached. Both boxes that wear the
+	// .lpn-setbox shell measure the floor ONCE and hand the same number to the cap and to the clamp
+	// -- two calls to chromeFloor() around a style write are two layouts and two chances to differ.
+	['openSettingsBox', 'openLibraryBox', 'openFireFlowBox'].forEach((name) => {
+		const b = code(name);
+		ok(`${name}() caps its box to the room below the chrome`, /capPanelToRoomBelow\(/.test(b));
+	});
+	['openSettingsBox', 'openLibraryBox'].forEach((name) => {
+		const b = code(name);
+		const capAt = b.indexOf('capPanelToRoomBelow(');
+		// `at = clampPanel(`, not the bare name: the note above the cap explains the clamp's own
+		// arithmetic, and a plain indexOf would find the word in that sentence.
+		const clampAt = b.indexOf('at = clampPanel(');
+		ok(`...${name}() caps BEFORE it measures and places`, capAt > 0 && clampAt > capAt);
+		ok(`...and one measured floor serves both the cap and the clamp (${name})`,
+			/floor = chromeFloor\(\)/.test(b) && /capPanelToRoomBelow\(box, floor\)/.test(b) &&
+			/window\.innerHeight, floor\)/.test(b));
+	});
+	// **A HEIGHT THE CAP PRODUCED IS NOT A HEIGHT THE USER CHOSE.** The ResizeObserver stores every
+	// size change, and the cap is one -- so without this guard, opening the box once on a phone
+	// would shrink the remembered desktop height and never give it back.
+	ok('a capped height is not stored as the user’s remembered box height',
+		/capped = parseFloat\(box\.style\.maxHeight\)[\s\S]{0,240}setboxLayout\.h = Math\.round/.test(code('wireSettingsBox')));
+}
+
 // The reader's blind-spot report, scoped to selectors that could possibly reach what this file
 // checks. A rule about print sheets or curve tables is none of this check's business.
 {

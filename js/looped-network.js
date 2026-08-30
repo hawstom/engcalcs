@@ -9148,7 +9148,7 @@ var EngCalcs = EngCalcs || {};
 	var findUserPos = null;
 	function closeFindPopup() {
 		var popup = document.getElementById('lpn_find_popup');
-		if (popup) { popup.style.display = 'none'; }
+		if (popup) { hideTipsIn(popup); popup.style.display = 'none'; }
 	}
 	// **OPEN, NOT TOGGLE.** The menu row shows the box; the X closes it. Choosing Find while it is
 	// already open re-runs nothing and hides nothing -- it just brings the box back to attention,
@@ -16804,7 +16804,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeNewBox() {
 		var box = newBoxEl();
-		if (box) { box.style.display = 'none'; }
+		if (box) { hideTipsIn(box); box.style.display = 'none'; }
 	}
 	// **THE ANSWERS ARE A VALUE, AND MAKING THE PROJECT IS A FUNCTION OF IT.** Reading the box and
 	// acting on what it says are deliberately two functions: the act is the half with the ordering
@@ -21498,21 +21498,48 @@ var EngCalcs = EngCalcs || {};
 	// onto the trigger by Bootstrap only while its tip is on screen, so it names exactly the tips
 	// that are up -- where a class list names every control that COULD have one, and misses any
 	// whose tip was wired through a different selector (initTips() has two).
-	function hideOpenTips() {
-		if (!window.bootstrap || !bootstrap.Tooltip) { return; }
-		[].forEach.call(document.querySelectorAll('[aria-describedby^="tooltip"]'), function (el) {
+	// **AND A BOX TAKES ITS OWN TIPS WITH IT WHEN IT CLOSES** (Tom, 2026-08-29: *"Tips (? glyphs)
+	// in the Node editor survive the editor box on close on a phone."*). A tip is rendered into
+	// document.body, not into the box that raised it, so hiding the box leaves the tip standing over
+	// the map with nothing under it and nothing to dismiss it -- on touch there is no pointer to
+	// leave, and the trigger it belonged to is now display:none, so its own outside-tap listener can
+	// never fire either.
+	//
+	// Scoped to the closing box rather than the document: closing one panel must not take down a tip
+	// somebody is reading over another one. `hideOpenTips()` keeps the whole-document sweep, which is
+	// the OPENING rule (a tip must not hang over the panel its own button just opened).
+	function hideTipsIn(root) {
+		if (!root || !root.querySelectorAll || !window.bootstrap || !bootstrap.Tooltip) { return; }
+		[].forEach.call(root.querySelectorAll('[aria-describedby^="tooltip"]'), function (el) {
 			var t = bootstrap.Tooltip.getInstance(el);
 			if (t) { t.hide(); }
 		});
 	}
+	function hideOpenTips() { hideTipsIn(document); }
 	function openSettingsBox(section) {
-		var box = setboxEl(), r, at, target, home;
+		var box = setboxEl(), r, at, target, home, floor;
 		if (!box) { return; }
 		closeMenu();
 		hideOpenTips();
 		box.style.display = 'flex';
 		applySetboxSize(box);
 		rebuildSettingsBox();
+		// **CAPPED TO THE ROOM UNDER THE CHROME BEFORE IT IS PLACED, OR ITS OWN RESIZE GRABBER GOES
+		// OFF THE BOTTOM OF THE PHONE.** clampPanel()'s `top` is `max(floor, min(top, vh - h - 4))`,
+		// so once the box is taller than `vh - floor` the floor wins and every pixel past it hangs
+		// below the fold -- and the last 28 of them are .lpn-resize-grip, the ONE thing a finger has
+		// to reach to make the box smaller again. On a 640 px phone the box is `min(46rem, 92dvh)`
+		// = 589 px against the ~47 px the far-edge clamp wanted and a chrome floor of ~90, so it hung
+		// off by ~40 px and the grabber was unreachable. That is the regression Tom reported on
+		// 2026-08-29; it arrived with chromeFloor() on 2026-08-24 and it took the whole of the touch
+		// resize with it.
+		//
+		// capPanelToRoomBelow() is the fix that already exists for exactly this shape (the Find box,
+		// 2026-08-27, and the fire flow box) -- the overflow moves inside `.lpn-popover-body`, where
+		// it scrolls. The floor is measured ONCE and reused by the clamp: measuring it twice around a
+		// style write is two layouts and two chances to disagree.
+		floor = chromeFloor();
+		capPanelToRoomBelow(box, floor);
 		// Placed, then clamped: the window may have shrunk since the last drag, and a box
 		// remembered off-screen is a box that never comes back.
 		r = box.getBoundingClientRect();
@@ -21520,7 +21547,7 @@ var EngCalcs = EngCalcs || {};
 		at = clampPanel(
 			setboxLayout.left === null ? home.left : setboxLayout.left,
 			setboxLayout.top === null ? home.top : setboxLayout.top,
-			r.width, r.height, window.innerWidth, window.innerHeight, chromeFloor());
+			r.width, r.height, window.innerWidth, window.innerHeight, floor);
 		box.style.left = at.left + 'px';
 		box.style.top = at.top + 'px';
 		if (section && SETBOX_TARGETS[section]) {
@@ -21541,7 +21568,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeSettingsBox() {
 		var box = setboxEl();
-		if (box) { box.style.display = 'none'; }
+		if (box) { hideTipsIn(box); box.style.display = 'none'; }
 	}
 	function toggleSettingsBox(evt) {
 		if (setboxIsOpen()) { closeSettingsBox(); return; }
@@ -21571,12 +21598,20 @@ var EngCalcs = EngCalcs || {};
 		// Guarded on display, so closing the box (display:none, 0x0) cannot store a zero size.
 		if (window.ResizeObserver) {
 			new window.ResizeObserver(function () {
-				var r, at;
+				var r, at, capped;
 				if (!setboxIsOpen()) { return; }
 				r = box.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
 				setboxLayout.w = Math.round(r.width);
-				setboxLayout.h = Math.round(r.height);
+				// **A HEIGHT THE CAP PRODUCED IS THE VIEWPORT'S, NOT THE USER'S.** openSettingsBox()
+				// caps the box to the room under the chrome, and that cap is a resize this observer
+				// sees exactly like a dragged one. Storing it would ratchet: open the box once on a
+				// phone and the desktop never gets its height back. The width is stored either way --
+				// nothing caps that.
+				capped = parseFloat(box.style.maxHeight);
+				if (!(isFinite(capped) && r.height >= capped - 1)) {
+					setboxLayout.h = Math.round(r.height);
+				}
 				// **A BOX THAT GREW OFF THE SCREEN CANNOT BE SHRUNK AGAIN**, because the grabber it
 				// grew by is the corner that just left the window. The browser's widget only ever
 				// pushes the right and bottom edges out, so growing a box that already sits near the
@@ -22295,22 +22330,25 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function openLibraryBox() {
-		var box = libBoxEl(), r, at, home;
+		var box = libBoxEl(), r, at, home, floor;
 		if (!box) { return; }
 		closeMenu();
 		hideOpenTips();
 		box.style.display = 'flex';
 		rebuildLibraryBox();
+		// It borrows .lpn-setbox's shell, so it borrows the shell's failure: see openSettingsBox().
+		floor = chromeFloor();
+		capPanelToRoomBelow(box, floor);
 		r = box.getBoundingClientRect();
 		home = setboxHomeCorner(r.width, r.height);
-		at = clampPanel(home.left, home.top, r.width, r.height, window.innerWidth, window.innerHeight, chromeFloor());
+		at = clampPanel(home.left, home.top, r.width, r.height, window.innerWidth, window.innerHeight, floor);
 		box.style.left = at.left + 'px';
 		box.style.top = at.top + 'px';
 		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
 	}
 	function closeLibraryBox() {
 		var box = libBoxEl();
-		if (box) { box.style.display = 'none'; }
+		if (box) { hideTipsIn(box); box.style.display = 'none'; }
 	}
 	function toggleLibraryBox() {
 		if (libBoxIsOpen()) { closeLibraryBox(); return; }
@@ -22334,7 +22372,11 @@ var EngCalcs = EngCalcs || {};
 	// for a pipe). Pump curve entry isn't implemented -- see the scope doc's design note.
 	var currentPopup = null; // {kind:'node'|'link', id} -- lets a unit-strip change refresh the open popup in place
 	function closePopup() {
-		document.getElementById('lpn_popup').style.display = 'none';
+		var popup = document.getElementById('lpn_popup');
+		// The box Tom reported: every field in the Node editor carries a "?", and each one's tip is
+		// a sibling of the popup in document.body rather than a child of it.
+		hideTipsIn(popup);
+		popup.style.display = 'none';
 		currentPopup = null;
 	}
 	// DRAGGING THE PROPERTY POPUP. The grab surface is the popup's own CHROME -- the padded band
@@ -26156,7 +26198,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeFireFlowBox() {
 		var box = ffBoxEl();
-		if (box) { box.style.display = 'none'; }
+		if (box) { hideTipsIn(box); box.style.display = 'none'; }
 		// **A RUN IN PROGRESS IS STOPPED BY CLOSING ITS BOX.** Otherwise a sweep of minutes goes on
 		// eating the machine with nothing on screen that can call it off.
 		if (fireFlowBusy) { fireFlowStop = true; }
