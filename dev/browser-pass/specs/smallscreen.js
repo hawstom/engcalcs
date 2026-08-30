@@ -116,12 +116,16 @@ exports.run = async function ({ browser, report }) {
 				docSideways: document.documentElement.scrollWidth > window.innerWidth + 1
 			};
 		});
-		// **238 px AGAINST THE 230 THE NODE SYMBOLOGY LIST NEEDS — eight pixels of headroom**, which
-		// is the whole reason the column is 4.5rem and not wider. The strip briefly handed the
-		// content pane the full box; with the column restored, this is the number that matters and
-		// the one that must not shrink.
-		report.ok(pane.content > 230, 'the content pane still clears the widest control in the box',
-			pane.content + 'px of a ' + pane.boxW + 'px box');
+		// **THE 230px FLOOR WAS A PROXY, AND TOM SPENT IT DELIBERATELY ON 2026-08-30**: *"I meant for
+		// you to rob 20% of the then-present width of the main pane and give that to the index
+		// pane."* The content pane is 190.7px now, and 238-against-230 is no longer the standing
+		// number. What that floor was ever FOR is the line below — no sideways scrollbar in the pane
+		// — so that is what is asserted, and the width is recorded rather than judged. Re-measured
+		// at the new width: every settings row still fits, including the node symbology list that
+		// set the old floor; the one thing that did not was the colour-ramp attribution footer,
+		// whose credit lines end in a bare URL, and it is given `overflow-wrap` in the phone block.
+		report.note('the content pane is ' + pane.content + 'px of a ' + pane.boxW +
+			'px box, and the index ' + pane.index + 'px');
 		report.ok(!pane.contentSideways,
 			'...and still has no sideways scrollbar, which is what the pane was narrowed twice to avoid');
 		report.ok(!pane.docSideways, 'the page itself has gained no horizontal scrollbar');

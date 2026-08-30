@@ -23046,10 +23046,22 @@ var EngCalcs = EngCalcs || {};
 	// panel with no body wrapper (the menus) scrolls itself, being nothing but rows.
 	// `naturalH` is passed in rather than re-measured: measuring again after a style write turns one
 	// layout pass into three.
+	//
+	// **THE BODY IS MEASURED BEFORE THE PANEL IS CAPPED, AND THE ORDER IS THE WHOLE FUNCTION**
+	// (Tom, 2026-08-30: *"The phone settings has a limit to the amount of box height it will use.
+	// This leaves a blank area at the bottom if the box is expanded taller."*). `chrome` is the
+	// panel's own furniture -- padding, border, and anything outside the scrolling body -- and it is
+	// derived by subtraction, so it is only correct while the two heights being subtracted describe
+	// the SAME layout. Writing the panel's cap first re-lays the panel out, the body (flex: 1 1 auto)
+	// shrinks with it, and the difference then counts the overflow the cap just removed as though it
+	// were furniture. Measured on a 360x640 phone: natural 588.8, avail 482.4, real chrome 50 -- and
+	// the body was pinned to 326 instead of 432.4, leaving a 106.4 px blank strip inside the box that
+	// no later resize could fill, because the wrong number was already stored on the body.
+	// One measurement, then both writes.
 	function capPanelHeight(panel, body, avail, naturalH) {
+		var chrome = body ? naturalH - body.getBoundingClientRect().height : 0;
 		panel.style.maxHeight = avail + 'px';
 		if (body) {
-			var chrome = naturalH - body.getBoundingClientRect().height;
 			body.style.maxHeight = Math.max(0, avail - chrome) + 'px';
 		} else {
 			panel.style.overflowY = 'auto';
