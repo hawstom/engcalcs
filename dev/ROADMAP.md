@@ -271,6 +271,58 @@ the block.
       harnesses assert the document is byte-identical across a whole run.
     - Interruptible: it yields a macrotask between junctions, so the progress line paints and Stop
       answers; closing the box stops a run and a stopped sweep keeps what it had.
+  - **THE SWEEP GOT ~20x FASTER BY FIXING THE SOLVER, NOT BY SCOPING THE QUESTION (2026-08-30).**
+    Tom was brainstorming Autodesk's Domain concept to avoid long runs; the bench said the sweep's
+    ALGORITHM was already fine — solve COUNT grows linearly (819 -> 3,707 for 49 -> 225 junctions)
+    while cost PER SOLVE grew ~10x for 4.6x the junctions. **The linear solve was a dense Cholesky
+    and `js/lpn-solver.js`'s own header said so**, written for a stated target of 10-20 nodes: at
+    225 junctions that is 1,898,400 multiply-adds per Newton iteration on a matrix with ~5
+    nonzeros a row. An envelope factorization makes it **24,759 — 76.7x** — and the exponent of one
+    solve falls **2.41 -> ~1.0**. The 225-junction sweep: ~115 s -> **7-11 s**.
+    - **Every answer is BIT-IDENTICAL**, asserted with `Object.is` so -0 is not 0: 400 random SPD
+      matrices, 108 matrices taken from 16 real networks (so the ASSEMBLY is covered too), and the
+      whole sweep against the pre-change solver loaded from git. Factorization work is asserted as
+      a COUNT, never a time. `spd-envelope-harness.js`, `fireflow-answer-harness.js`.
+    - **WARM STARTING DOES NOT PAY, measured, and it is not currently done.** Carrying the previous
+      iterate saves only 23% of Newton iterations (8.3 -> 6.4 per solve at 225), because the sweep's
+      probes move one demand by a LOT and Newton is quadratic. Not worth changing answer semantics.
+    - **[H] ORDERING IS THE REMAINING LIMIT AND IT NEEDS TOM.** An envelope is only as narrow as the
+      node numbering: the same 225-junction network SHUFFLED costs 778,368 multiply-adds, 31x worse.
+      RCM recovers all of it (52x at 225, 100x at 441) — **but permuting reorders the arithmetic, so
+      every number moves in its last bits.** That is a different algorithm, not an optimisation.
+    - **The exponent is ~2 now, not 1**, so scoping is not dead: at 961 junctions a solve is still
+      ~66 ms. A true sparse Cholesky with nested dissection would reach ~O(n^1.5) and is the
+      rewrite. **Tom's Domain idea remains the right conversation past a few thousand junctions**,
+      and the planning engineer ranks building one LOW here because the Find panel's query language
+      and the sweep's explicit node list are already most of it — the real gap is naming and
+      reusing a selection across runs. His own assumption that everything starts in Domain1 is NOT
+      supported: InfoWater offers the Domain option only once a user has built one.
+  - **THE DIALOG, THE TABLE AND 10 ft/s SHIPPED 2026-08-30.** A separate `#lpn_ff_run_box` above the
+    fire-flow box holding a determinate bar on `done/total` JUNCTIONS (a solve count moves its own
+    finish line), the running tally, and Stop — **and no close X, because closing would have to mean
+    stopping and the Stop button already says that in words.** `#lpn_status` is a model diagnostic
+    again. It borrows `.lpn-popover` and `.lpn-setbox-title` but deliberately NOT `.lpn-setbox`,
+    whose fixed `min(46rem, 92vh)` would make a bar-and-a-button cover the drawing.
+    - **One wide table replaced the two reports**, on the planning engineer's finding that
+      InfoWater Pro's own Design Fireflow Report is already one: our engine computes both halves in
+      one run at zero extra cost, so two reports presented our ARCHITECTURE rather than the answer.
+      Ten columns in our words, not Bentley's. A cell with no answer prints an en dash, never a
+      zero, and the design columns stay drawn as dashes when that half was off, so two runs of one
+      network do not look like two different reports.
+    - **Two columns are NOT computable and were not invented.** Their *fire flow design* (the
+      largest flow still satisfying the criteria) is a SECOND bisection on a different predicate;
+      and *design constraint* as the ACTIVE constraint at the answer is unknown, because we read
+      the criteria once, at the REQUIRED flow. `Design limit` says what broke there, which is
+      honest. Critical Asset IS computable and is there. Filter and Download were not built.
+    - **5 ft/s -> 10 ft/s**, a criterion and not a constraint. The 5 had no fire-flow-specific
+      source at all and reads like a normal-operation design velocity mis-carried into a fire-flow
+      test. Sourced: San Bernardino County 8 ft/s general design **read primary, and it exempts
+      hydrant branch lines**; Vacaville 10 and Rancho California 15 as search synthesis only.
+    - **A dead second `.lpn-ff*` CSS block from the branch's unshipped modelled-assembly box was
+      silently overriding four live rules.** Deleted.
+    - *"and read as a single steady condition"* is DELETED as a repeat of the time-step sentence;
+      what it uniquely carried — which demand the fire flow is added to — survives in Tom's own
+      *"normally added to maximum day demand"*.
   - **THE RUN NEEDS A PROGRESS DIALOG OF ITS OWN — Tom, 2026-08-30**, overruling the field
     operator's recommendation that it live inside the fire-flow box: *"The run progress bar is so
     important that all applications put it in a new dialog with nothing but the progress, a stop

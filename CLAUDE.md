@@ -202,8 +202,12 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   Do not restore it.
 - **Valves are the one place the two engines deliberately differ.** A throttle valve (TCV) is a minor
   loss on a zero-length link and solves in either engine. PRV/PSV/FCV switch their own state inside
-  the iteration and solve through **EPANET only** — measured ~9x faster than our own solver, so a
-  second implementation was not written. A network holding one is routed to EPANET automatically and
+  the iteration and solve through **EPANET only** — a second implementation was not written.
+  *(Corrected 2026-08-30: this used to say EPANET is "measured ~9x faster than our own solver".
+  It is not, any more. Task 322's solver work replaced a dense Cholesky with an envelope one and
+  a re-run puts native at 3.93 ms against EPANET's 3.31 ms at 201 nodes — ratio 0.8x, ours
+  marginally faster. **Speed is no longer a reason to prefer either engine**; the reason valves
+  route to EPANET is that it implements their state switching and we do not.)* A network holding one is routed to EPANET automatically and
   the status bar says so, **without rewriting the user's stored `engine` setting** (the setting is a
   preference; the routing is a fact about this network). The native solver refuses such a network by
   name if the engine is unreachable. `EngCalcs.lpnValveIsNative` is the one place that line is drawn;
