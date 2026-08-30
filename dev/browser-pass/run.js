@@ -16,10 +16,22 @@
 // (The stray scrollbar was on that list and has come off it: specs/noscroll.js measures the geometry
 //  under it, which is a number rather than a picture.)
 
+const fs = require('fs');
 const path = require('path');
 const { REPO, startServer, stopServer, launchBrowser, clearLockRecords } = require('./lib/env');
 
 const SPECS = ['boot', 'menu', 'files', 'reload', 'locking', 'missing', 'fallback', 'degrade', 'saveas', 'find', 'boxes', 'geo', 'basemap', 'units', 'color', 'profile', 'place', 'goto', 'gallery', 'cleanmap', 'noscroll', 'labelcols', 'share', 'geohit', 'toolbar', 'visibility', 'perf', 'time', 'search', 'setbox', 'crossproject', 'pane', 'library', 'projectmenu', 'tabcolumn', 'smallscreen', 'mtcbuttons', 'phonemenu'];
+
+// **A SPEC FILE THAT IS NOT IN THE LIST ABOVE NEVER RUNS, AND NOTHING SAID SO** (Task 322). The
+// order of SPECS is the run order and is worth keeping by hand, but a typed list is a second place
+// to remember, and forgetting it produces exactly the failure this runner already learned once: a
+// section that is silently not part of the ask, behind a headline that counts only what ran. So the
+// list is checked against the directory, and an unlisted file is shouted about and fails the run.
+const SPEC_DIR = path.join(__dirname, 'specs');
+const unlisted = fs.readdirSync(SPEC_DIR)
+	.filter(f => f.endsWith('.js'))
+	.map(f => f.slice(0, -3))
+	.filter(n => !SPECS.includes(n));
 
 let checks = 0, failures = 0, skipped = 0, current = '';
 const report = {
@@ -103,6 +115,12 @@ const report = {
 	const short = ran < specs.length;
 	console.log(`\n${checks - failures}/${checks} checks passed${skipped ? `, ${skipped} left to the human list` : ''}.`);
 	console.log(`${ran}/${specs.length} sections completed.`);
+	if (unlisted.length) {
+		console.log('');
+		console.log(`  !! ${unlisted.length} SPEC FILE(S) EXIST AND WERE NEVER ASKED FOR: ${unlisted.join(', ')}`);
+		console.log('     They are in dev/browser-pass/specs/ and not in SPECS at the top of run.js,');
+		console.log('     so nothing above says anything about them. Add them, or delete the files.');
+	}
 	// **A SHORT RUN IS SHOUTED, AND IT NAMES NAMES.** The percentage above is a fraction of what
 	// actually RAN, so it goes UP as coverage falls -- which is how twelve dead sections sat behind
 	// "849/864 checks passed" for two days. The lines below are the honest headline.
@@ -114,5 +132,5 @@ const report = {
 		console.log('     A spec that throws at its first line is usually driving a control that MOVED.');
 	}
 	console.log('');
-	process.exit(failures ? 1 : 0);
+	process.exit(failures || unlisted.length ? 1 : 0);
 }());
