@@ -812,6 +812,26 @@ echoHeader("EngCalcs", $html_title, "", false);
 		</div>
 	</div>
 </div>
+<?php // ---- THE FIRE FLOW BOX (ROADMAP Task 530) ----
+      //
+      // ONE RUN, ONE STORED RESULT SET, TWO REPORTS -- which is why this is one box and not two
+      // buttons. Two buttons would ask the user to choose between "can this junction deliver the
+      // flow" and "does drawing it break something else" before they can see what either says, and
+      // the three-state map colouring Tom asked for needs both answers for every junction at once.
+      //
+      // A BOX, MOVEABLE AND RESIZEABLE, AND IT CENTRES (Tom, 2026-08-27). It borrows the Settings
+      // box's whole shell -- `resize: both`, the touch grabber, the title in the drag band, the
+      // scrolling body -- so there is one set of box mechanics on this page rather than a third.
+      // The controls and both reports are built in JS (buildFireFlowBox), because what is in them
+      // depends entirely on the document and on what the last run found. ?>
+<div id="lpn_ff_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;z-index:22;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffbox_title">
+	<div id="lpn_ffbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_title']?></div>
+	<button type="button" id="lpn_ff_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_ff_controls" class="lpn-ff-controls"></div>
+		<div id="lpn_ff_report" class="lpn-ff-report"></div>
+	</div>
+</div>
 <?php // ONE menu popover, reused by all three menus (ROADMAP Task 211): the File menu, a tab's own
       // menu, and the tab-strip overflow list. They differ only in their rows, and openMenu() in
       // js/looped-network.js builds those, so three popovers would have been three copies of the
@@ -1490,8 +1510,68 @@ EngCalcs.pageConfig = {
 	lpn_settings_auto_run: <?=json_encode($ec_lang['lpn_settings_auto_run'])?>,
 	lpn_settings_auto_run_tip: <?=json_encode($ec_lang['lpn_settings_auto_run_tip'])?>,
 	lpn_time_run_slow: <?=json_encode($ec_lang['lpn_time_run_slow'])?>,
-	<?php // Available fire flow at a hydrant (ROADMAP Task 530). js/looped-network.js owns every
-	      // string of the box; js/lpn-fireflow.js has none of its own by design. ?>
+	<?php // Fire flow, the whole-system sweep (Task 530). js/looped-network.js reads every one of
+	      // these through its `pc` alias, so dev/scripts/pageconfig_check.php holds this list
+	      // against the file. Each site also carries its English literal as the fallback. ?>
+	lpn_ff_menu: <?=json_encode($ec_lang['lpn_ff_menu'])?>,
+	lpn_ff_menu_tip: <?=json_encode($ec_lang['lpn_ff_menu_tip'])?>,
+	lpn_ff_title: <?=json_encode($ec_lang['lpn_ff_title'])?>,
+	lpn_ff_intro: <?=json_encode($ec_lang['lpn_ff_intro'])?>,
+	lpn_ff_scope: <?=json_encode($ec_lang['lpn_ff_scope'])?>,
+	lpn_ff_scope_tip: <?=json_encode($ec_lang['lpn_ff_scope_tip'])?>,
+	lpn_ff_scope_all: <?=json_encode($ec_lang['lpn_ff_scope_all'])?>,
+	lpn_ff_scope_selected: <?=json_encode($ec_lang['lpn_ff_scope_selected'])?>,
+	lpn_ff_no_junctions: <?=json_encode($ec_lang['lpn_ff_no_junctions'])?>,
+	lpn_ff_no_selection: <?=json_encode($ec_lang['lpn_ff_no_selection'])?>,
+	lpn_ff_required: <?=json_encode($ec_lang['lpn_ff_required'])?>,
+	lpn_ff_required_tip: <?=json_encode($ec_lang['lpn_ff_required_tip'])?>,
+	lpn_ff_residual: <?=json_encode($ec_lang['lpn_ff_residual'])?>,
+	lpn_ff_residual_tip: <?=json_encode($ec_lang['lpn_ff_residual_tip'])?>,
+	lpn_ff_design: <?=json_encode($ec_lang['lpn_ff_design'])?>,
+	lpn_ff_design_tip: <?=json_encode($ec_lang['lpn_ff_design_tip'])?>,
+	lpn_ff_design_off: <?=json_encode($ec_lang['lpn_ff_design_off'])?>,
+	lpn_ff_design_nodes: <?=json_encode($ec_lang['lpn_ff_design_nodes'])?>,
+	lpn_ff_design_all: <?=json_encode($ec_lang['lpn_ff_design_all'])?>,
+	lpn_ff_minpressure: <?=json_encode($ec_lang['lpn_ff_minpressure'])?>,
+	lpn_ff_minpressure_tip: <?=json_encode($ec_lang['lpn_ff_minpressure_tip'])?>,
+	lpn_ff_maxvelocity: <?=json_encode($ec_lang['lpn_ff_maxvelocity'])?>,
+	lpn_ff_maxvelocity_tip: <?=json_encode($ec_lang['lpn_ff_maxvelocity_tip'])?>,
+	lpn_ff_accounting: <?=json_encode($ec_lang['lpn_ff_accounting'])?>,
+	lpn_ff_engine_native: <?=json_encode($ec_lang['lpn_ff_engine_native'])?>,
+	lpn_ff_engine_epanet: <?=json_encode($ec_lang['lpn_ff_engine_epanet'])?>,
+	lpn_ff_engine_cost: <?=json_encode($ec_lang['lpn_ff_engine_cost'])?>,
+	lpn_ff_steady: <?=json_encode($ec_lang['lpn_ff_steady'])?>,
+	lpn_ff_calculate: <?=json_encode($ec_lang['lpn_ff_calculate'])?>,
+	lpn_ff_stop: <?=json_encode($ec_lang['lpn_ff_stop'])?>,
+	lpn_ff_working: <?=json_encode($ec_lang['lpn_ff_working'])?>,
+	lpn_ff_stopped: <?=json_encode($ec_lang['lpn_ff_stopped'])?>,
+	lpn_ff_cost: <?=json_encode($ec_lang['lpn_ff_cost'])?>,
+	lpn_ff_stale: <?=json_encode($ec_lang['lpn_ff_stale'])?>,
+	lpn_ff_summary: <?=json_encode($ec_lang['lpn_ff_summary'])?>,
+	lpn_ff_summary_error: <?=json_encode($ec_lang['lpn_ff_summary_error'])?>,
+	lpn_ff_report_available: <?=json_encode($ec_lang['lpn_ff_report_available'])?>,
+	lpn_ff_report_design: <?=json_encode($ec_lang['lpn_ff_report_design'])?>,
+	lpn_ff_col_junction: <?=json_encode($ec_lang['lpn_ff_col_junction'])?>,
+	lpn_ff_col_available: <?=json_encode($ec_lang['lpn_ff_col_available'])?>,
+	lpn_ff_col_required: <?=json_encode($ec_lang['lpn_ff_col_required'])?>,
+	lpn_ff_col_result: <?=json_encode($ec_lang['lpn_ff_col_result'])?>,
+	lpn_ff_col_affected: <?=json_encode($ec_lang['lpn_ff_col_affected'])?>,
+	lpn_ff_state_pass: <?=json_encode($ec_lang['lpn_ff_state_pass'])?>,
+	lpn_ff_state_fail: <?=json_encode($ec_lang['lpn_ff_state_fail'])?>,
+	lpn_ff_state_design: <?=json_encode($ec_lang['lpn_ff_state_design'])?>,
+	lpn_ff_state_error: <?=json_encode($ec_lang['lpn_ff_state_error'])?>,
+	lpn_ff_atleast: <?=json_encode($ec_lang['lpn_ff_atleast'])?>,
+	lpn_ff_affect_node: <?=json_encode($ec_lang['lpn_ff_affect_node'])?>,
+	lpn_ff_affect_link: <?=json_encode($ec_lang['lpn_ff_affect_link'])?>,
+	lpn_ff_more: <?=json_encode($ec_lang['lpn_ff_more'])?>,
+	lpn_ff_design_none: <?=json_encode($ec_lang['lpn_ff_design_none'])?>,
+	lpn_ff_design_off_note: <?=json_encode($ec_lang['lpn_ff_design_off_note'])?>,
+	lpn_ff_iso: <?=json_encode($ec_lang['lpn_ff_iso'])?>,
+	lpn_ff_err_at_rest: <?=json_encode($ec_lang['lpn_ff_err_at_rest'])?>,
+	lpn_ff_err_converge: <?=json_encode($ec_lang['lpn_ff_err_converge'])?>,
+	lpn_ff_err_solve: <?=json_encode($ec_lang['lpn_ff_err_solve'])?>,
+	lpn_ff_err_not_junction: <?=json_encode($ec_lang['lpn_ff_err_not_junction'])?>,
+	lpn_ff_err_unknown: <?=json_encode($ec_lang['lpn_ff_err_unknown'])?>,
 	lpn_menu_help: <?=json_encode($ec_lang['lpn_menu_help'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
 	<?php // Reused verbatim from the suite navbar, not re-keyed: same words, same two pages, already
@@ -1878,9 +1958,11 @@ EngCalcs.pageConfig = {
       // rule as lpn-search.js above, same silent failure if it is broken: the View row simply
       // never appears. ?>
 <script src="/engcalcs/js/lpn-terrain.js?v=<?=filemtime(__DIR__.'/js/lpn-terrain.js')?>"></script>
-<?php // Available fire flow at a hydrant (ROADMAP Task 530). Pure arithmetic, no DOM and no
+<?php // The whole-system fire flow sweep (ROADMAP Task 530). Pure arithmetic, no DOM and no
       // strings of its own; it reads EngCalcs.G through js/lpn-solver.js, so it must follow that
-      // tag, and looped-network.js reads EngCalcs.lpnFireFlowDefaults when the box is opened. ?>
+      // tag, and BEFORE looped-network.js, which reads EngCalcs.lpnFireFlowDefaults when the box
+      // is opened. ?>
+<script src="/engcalcs/js/lpn-fireflow.js?v=<?=filemtime(__DIR__.'/js/lpn-fireflow.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

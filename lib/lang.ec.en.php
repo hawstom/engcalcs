@@ -2806,14 +2806,88 @@ $ec_lang['lpn_terrain_filled_ids']='These nodes were filled in: {ids}';
 $ec_lang['lpn_terrain_blank_ids']='These nodes are still blank: {ids}';
 $ec_lang['lpn_terrain_ids_more']='{ids}, and {n} more';
 
-// ---- Available fire flow at a hydrant (ROADMAP Task 530) ----------------------------------------
-// The wizard's whole job is Tom's rule: "we must either ask or disclose our assumptions about the
-// diameter, roughness, k, and length of a hydrant and lateral assembly." So the lateral LENGTH is
-// asked (five agency standards span 25-100 ft and there is no honest default), and every other
-// assumption is shown on the page with the number in force and where it came from.
-// {diameter} is a diameter with its unit. Substituted, never concatenated.
-// {value} is a coefficient. Substituted, never concatenated.
-// {flow} is a flow with its unit, {node} a point in the network, {residual} and {pressure} are
-// pressures with their units, {n} a whole number. Substituted, never concatenated.
-// Every way this can fail to produce a number is named and says why. None of them is ever shown
-// as a flow of zero.
+// ---- Fire flow: the whole-system sweep (ROADMAP Task 530) ---------------------------------------
+// Tom's question, 2026-08-27: which junctions can provide the fire flow their code asks for, and
+// which of them break something else in the system while doing it. So there is ONE run and TWO
+// reports, and every junction comes back Passing, Failing, or with a Design issue.
+//
+// THE DEMAND GOES ON THE JUNCTION ITSELF and no hydrant is modelled. That is what both inspectable
+// tools do, and it is why lpn_ff_accounting exists: how hydrant losses are accounted for has to be
+// said out loud rather than assumed by the reader.
+//
+// {flow} and {velocity} are quantities with their units, {pressure} a pressure with its unit,
+// {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
+// are whole numbers. Every one is substituted, never concatenated.
+$ec_lang['lpn_ff_menu']='Fire flow…';
+$ec_lang['lpn_ff_menu_tip']='Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there pull anything else down?';
+$ec_lang['lpn_ff_title']='Fire flow';
+$ec_lang['lpn_ff_intro']='Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.';
+$ec_lang['lpn_ff_scope']='Junctions to test';
+$ec_lang['lpn_ff_scope_tip']='Choose the set before you run. Testing every junction in a large system can take minutes.';
+$ec_lang['lpn_ff_scope_all']='Every junction';
+$ec_lang['lpn_ff_scope_selected']='The selected junction only';
+$ec_lang['lpn_ff_no_junctions']='This project has no junctions yet, so there is nothing to test.';
+$ec_lang['lpn_ff_no_selection']='No junction is selected. Choose one on the map, or test every junction.';
+$ec_lang['lpn_ff_required']='Required fire flow';
+$ec_lang['lpn_ff_required_tip']='The flow your code or your fire authority asks for at a hydrant. Every junction is tested against this same number.';
+$ec_lang['lpn_ff_residual']='Residual pressure to hold';
+$ec_lang['lpn_ff_residual_tip']='20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.';
+$ec_lang['lpn_ff_design']='Effect on the rest of the system';
+$ec_lang['lpn_ff_design_tip']='A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.';
+$ec_lang['lpn_ff_design_off']='Do not check';
+$ec_lang['lpn_ff_design_nodes']='Every other junction';
+$ec_lang['lpn_ff_design_all']='Every other junction and every pipe';
+$ec_lang['lpn_ff_minpressure']='Lowest pressure allowed elsewhere';
+$ec_lang['lpn_ff_minpressure_tip']='A junction that falls below this while another one is drawing its fire flow is reported as a design issue.';
+$ec_lang['lpn_ff_maxvelocity']='Highest velocity allowed';
+$ec_lang['lpn_ff_maxvelocity_tip']='A pipe running above this while a fire flow is drawn is reported as a design issue.';
+// HOW HYDRANT LOSSES ARE ACCOUNTED FOR, STATED IN THE INTERFACE rather than left to be assumed
+// (Tom, 2026-08-25: "I want to be very explicit and transparent... about how we account if at all
+// for hydrant losses beyond the node."). The answer here is: not at all, which is the profession's
+// default and what both inspectable tools do.
+$ec_lang['lpn_ff_accounting']='The flow is drawn at the junction itself. No hydrant, lateral or fitting loss is included, so a real hydrant on a real lateral delivers less than these numbers say.';
+$ec_lang['lpn_ff_engine_native']='This will be worked out with the built-in solver.';
+$ec_lang['lpn_ff_engine_epanet']='This will be worked out with the EPANET engine.';
+$ec_lang['lpn_ff_engine_cost']='Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.';
+// The one-condition sentence. Shown only where this project has a run clock, because that is the
+// only place a reader could reasonably expect a fire flow to follow it.
+$ec_lang['lpn_ff_steady']='One condition is tested, the one now on the clock. Fire flow is normally loaded onto maximum day demand and read as a single steady condition.';
+$ec_lang['lpn_ff_calculate']='Run';
+$ec_lang['lpn_ff_stop']='Stop';
+$ec_lang['lpn_ff_working']='Working: {done} of {total} junctions.';
+$ec_lang['lpn_ff_stopped']='Stopped after {done} of {total} junctions. What is below is what had already been worked out.';
+$ec_lang['lpn_ff_cost']='{solves} network solves.';
+// The results are about the network as it stood when the run finished, so an edit clears them
+// rather than leaving a picture of a system that no longer exists.
+$ec_lang['lpn_ff_stale']='The drawing changed, so the fire flow results were cleared. Run it again.';
+$ec_lang['lpn_ff_summary']='{pass} passing, {fail} failing, {design} with a design issue.';
+$ec_lang['lpn_ff_summary_error']='{n} could not be answered.';
+$ec_lang['lpn_ff_report_available']='Available against required';
+$ec_lang['lpn_ff_report_design']='Effect on the rest of the system';
+$ec_lang['lpn_ff_col_junction']='Junction';
+$ec_lang['lpn_ff_col_available']='Available';
+$ec_lang['lpn_ff_col_required']='Required';
+$ec_lang['lpn_ff_col_result']='Result';
+$ec_lang['lpn_ff_col_affected']='What it pulls down';
+$ec_lang['lpn_ff_state_pass']='Passing';
+$ec_lang['lpn_ff_state_fail']='Failing';
+$ec_lang['lpn_ff_state_design']='Design issue';
+$ec_lang['lpn_ff_state_error']='No answer';
+$ec_lang['lpn_ff_atleast']='over {flow}';
+$ec_lang['lpn_ff_affect_node']='{id} down to {pressure}';
+$ec_lang['lpn_ff_affect_link']='{id} at {velocity}';
+$ec_lang['lpn_ff_more']='and {n} more';
+$ec_lang['lpn_ff_design_none']='Nothing in the chosen set was pulled down by any junction tested.';
+$ec_lang['lpn_ff_design_off_note']='The effect on the rest of the system was not checked in this run.';
+// ISO credits a single hydrant with at most 1,500 gpm whatever the hydraulics say. Said beside the
+// numbers and never applied to them: a number quietly cut down to a credit limit is a lie with a
+// tidy face.
+$ec_lang['lpn_ff_iso']='ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.';
+// Every way a junction can fail to produce a number is named. None of them is ever shown as a flow
+// of zero: "there is no available fire flow" and "the available fire flow is zero" are different
+// facts, and only the first one is ever true.
+$ec_lang['lpn_ff_err_at_rest']='Already below the residual with nothing drawn';
+$ec_lang['lpn_ff_err_converge']='The network did not settle';
+$ec_lang['lpn_ff_err_solve']='The network could not be worked out';
+$ec_lang['lpn_ff_err_not_junction']='Not a junction';
+$ec_lang['lpn_ff_err_unknown']='No answer, and the reason given is {id}';
