@@ -110,6 +110,34 @@ the block.
     engines** — Demand multiplier, Specific gravity, Relative viscosity, Emitter exponent, Maximum
     trials. **Eight are carried, exported and honoured by EPANET but have NO control**, on
     CLAUDE.md's emitter-exponent precedent.
+  - **NOTHING IN AN `.inp` IS DISCARDED ANY MORE, 2026-08-30**, which is the third and last time this
+    defect had to be fixed. `js/lpn-inp.js` no longer keeps a list of what to CARRY; it keeps
+    `INP_SECTIONS_READ`, the list of what it takes APART, and **everything else is carried verbatim
+    by default.** That is the safe direction for the case nobody can enumerate — a section another
+    program invented now survives a round trip too. `[ENERGY]`, `[QUALITY]`, `[SOURCES]`,
+    `[REACTIONS]`, `[MIXING]`, `[TAGS]` and `[REPORT]` live on `doc.inpSections`, beside
+    `doc.rules` — which keeps its own field, because one section in two places is two answers.
+    - **`[TAGS]` and `[REPORT]` were not even in `REPORTABLE`, so they were dropped in SILENCE.**
+      Everything else at least said it was going.
+    - None of them reaches the EPANET engine, on the `[RULES]` reason: `lpnToInp` writes LPS and
+      METRES always, and EPANET rejects a whole input over one line naming an element it was not
+      given. The harness asserts the absence.
+    - **THE GALLERY EXAMPLES WERE THE THING TOM ACTUALLY HIT, and they are a category nobody had
+      thought about: a STORED PROJECT does not gain a feature the day the importer does.**
+      `examples/Net1|2|3.lwn` carried no `qualityOptions` at all. Refreshed **surgically, not by
+      regeneration** — Net2 and Net3 carry a backdrop an `.inp` cannot hold and Net1 carries
+      hand-placed label offsets, so a re-import would have destroyed both.
+    - **[H] AND ONE GAP LEFT OPEN ON PURPOSE, WHICH IS TOM'S CALL:** `settings.hydraulics` was NOT
+      added to those examples. Adding `Accuracy 0.001` would loosen the gallery's solve from our
+      own `1e-9` — a change to what the examples COMPUTE, not to what they carry.
+    - Guards: `dev/lpn-spike/section-carry-harness.js` (130), whose expectation is always the
+      original `.inp` and whose read-list is PARSED OUT of `js/lpn-inp.js` rather than restated, so
+      it cannot pass after somebody teaches the importer a new section. §6 opens the shipped
+      gallery `.lwn` against its own source and was verified to fail on the pre-refresh file.
+    - **Four new keys and two rewritten ones; `lpn_inp_drop_quality` and `lpn_inp_report_lead` are
+      now FALSE in 26 languages each** and are the resync item. The lead no longer says "here is
+      what changed on the way in" — it says nothing is thrown away, and separates kept-but-unused
+      from genuinely changed, which is the distinction Tom could not read off the old sentence.
   - **TOM'S RULING, 2026-08-29, AND IT IS BROADER THAN THE QUESTION ASKED:** *"I think that every
     setting from EPANET must be added and implemented unless research says otherwise."* **That
     reverses the emitter-exponent precedent as a default.** The standing shape was carry-and-hide
