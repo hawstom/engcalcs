@@ -321,7 +321,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // The fire flow box and its two hosts (ROADMAP Task 530). Absent from this list,
   // buildFireFlowControls() and rebuildFireFlowReport() return at their first line and the whole
   // box -- the criteria, the Run button, both reports -- is invisible to every harness.
-  'lpn_ff_box', 'lpn_ff_close', 'lpn_ff_controls', 'lpn_ff_report'
+  'lpn_ff_box', 'lpn_ff_close', 'lpn_ff_controls', 'lpn_ff_report',
+  // And the RUN's own dialog, which is a second box rather than a region of the first (Tom,
+  // 2026-08-30). Absent from this list, openFireFlowRunBox() returns before it builds anything and
+  // a sweep runs with no progress on screen at all -- which is exactly the state it exists to end.
+  'lpn_ff_run_box', 'lpn_ff_run_body'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the
