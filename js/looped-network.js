@@ -22776,12 +22776,14 @@ var EngCalcs = EngCalcs || {};
 	// field. Deleting the note would be deleting the only surviving statement of the difference, so
 	// there is no control to clear it -- it goes when the element does.
 	//
-	// **THE HEADING NAMES THE CONTENT, NOT THE PROVENANCE** (Tom, 2026-08-28, of the old wording
-	// "From the EPANET file": *"I don't think this is worded right. Patterns can be entered in lpn.
-	// So do we know they came from an EPANET file?"*). We do -- `withInpNotes()` is reached only from
-	// the importer -- but the heading was answering the wrong question: it sat over a list of things
-	// that are NOT in the document and read as a heading over the ones that are. So it says what the
-	// list is instead.
+	// **THE HEADING STATES THE TWO FACTS, IN TOM'S OWN WORDS** (2026-08-29): *"State the facts. 'This
+	// file was imported from EPANET. Some information at this node was not imported.'"* It replaced
+	// "From the EPANET file", which read as a heading over the values that ARE in the document, and
+	// then "What the import could not keep", which named the list but not why it exists.
+	//
+	// **"here", not "at this node"** -- the same block appears on a pipe and on a Text object, so his
+	// sentence is kept whole and only the noun is made to fit all three. Three per-kind keys would be
+	// three sentences to translate 26 times to say one thing.
 	//
 	// **THE SENTENCE IS COMPOSED HERE, from the same inpDropText() the import report uses.** The
 	// document stores `{code, detail}` records, so a project imported in one language reads in
@@ -22791,8 +22793,11 @@ var EngCalcs = EngCalcs || {};
 		if (!notes || !notes.length) { return; }
 		var head = document.createElement('div');
 		head.style.marginTop = '8px';
-		head.style.fontWeight = 'bold';
-		head.textContent = pc.lpn_import_notes_heading || 'What the import could not keep';
+		// A SENTENCE, so it is not bolded: two bold lines over a bulleted list reads as an alarm, and
+		// this is a statement of record about a file that imported correctly apart from these items.
+		head.style.opacity = '.85';
+		head.textContent = pc.lpn_import_notes_heading ||
+			'This file was imported from EPANET. Some information here was not imported.';
 		fields.appendChild(head);
 		var ul = document.createElement('ul');
 		ul.style.margin = '2px 0 0';

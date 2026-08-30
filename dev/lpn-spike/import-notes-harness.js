@@ -93,18 +93,41 @@ console.log('\n1. EPA Net1/Net2/Net3: the notes on an element are exactly the dr
 		// KEYED BY KIND AS WELL AS BY ID, because Net3 holds a junction 123 and a pipe 123 -- 3 of
 		// its 4 element-naming differences name an id that exists twice, and a bare-id expectation
 		// here would agree with a bare-id implementation and both would be wrong.
-		const want = {};
+		// **AND A NOTE IS A LOSS, so a code that reports GOOD NEWS is expected to be absent from the
+		// element and present in the report.** Tom, 2026-08-29, of Net3's junction 15 wearing a
+		// `demand-pattern` note reading "their patterns came in whole": *"The detail does not seem
+		// like something we can't handle. So I don't understand why I get the note."* The list is
+		// retyped here rather than read off js/lpn-inp.js for the usual reason -- reading the
+		// defendant's own list would make this section agree with any list at all, including an
+		// empty one.
+		const NOT_A_LOSS = { 'demand-pattern': 1, 'head-pattern': 1, 'pump-speed': 1,
+			'pump-pattern': 1, 'valve-tcv': 1, 'valve-active': 1 };
+		const want = {}, goodNews = {};
 		parsed.dropped.forEach((d) => {
 			if (!d.group) { return; }
+			if (NOT_A_LOSS[d.code]) {
+				(d.ids || []).forEach((id) => { goodNews[d.group + ':' + id] = d.code; });
+				return;
+			}
 			(d.ids || []).forEach((id) => {
 				const k = d.group + ':' + id;
 				(want[k] = want[k] || []).push(d.code + '|' + (d.detail === null || d.detail === undefined ? '' : d.detail));
 			});
 		});
+		// The good news is still in the REPORT -- this is a split, not a deletion, and a filter that
+		// quietly stopped the parser emitting these would break the import dialog instead.
+		Object.keys(goodNews).forEach((k) => {
+			ok(f + ' ' + k + ': ' + goodNews[k] + ' is still in the report', true);
+		});
 		const seenKeys = {};
 		[['node', doc.nodes], ['link', doc.links]].forEach(([group, list]) => list.forEach((el) => {
 			const k = group + ':' + el.id;
 			seenKeys[k] = 1;
+			if (goodNews[k]) {
+				ok(f + ' ' + k + ': good news is NOT filed on the element',
+					!(el.importNotes || []).some((n) => NOT_A_LOSS[n.code]),
+					JSON.stringify(el.importNotes || []));
+			}
 			const got = (el.importNotes || []).map((n) => n.code + '|' + (n.detail === null || n.detail === undefined ? '' : n.detail));
 			const expect = want[k] || [];
 			ok(f + ' ' + k + ': notes match the report',
@@ -125,15 +148,30 @@ console.log('\n1. EPA Net1/Net2/Net3: the notes on an element are exactly the dr
 }
 done('notes are filed per element');
 
+// **A FILE THAT REALLY LOSES SOMETHING, on a node AND on a link.** Sections 2-4 used to read
+// Net3, whose only element notes were `demand-pattern` -- and those stopped being notes on
+// 2026-08-29 when good news moved out of the popup (see section 1). EPA's three models now file
+// nothing on an element at all, which is the correct outcome and leaves these sections with nothing
+// to render. So the losses are written here: a pump naming a curve the file does not contain, and a
+// pipe EPANET would let flow one way only.
+const LOSSES_INP = [
+	'[JUNCTIONS]', ' J1 100 50', ' J2 90 25', '',
+	'[RESERVOIRS]', ' R1 200', '',
+	'[PIPES]', ' P1 R1 J1 1000 12 130 0 Open', ' P2 J1 J2 800 10 130 0 CV', '',
+	'[PUMPS]', ' PU1 J2 J1 HEAD CNOPE', '',
+	'[EMITTERS]', ' J2 1.5', '',
+	'[COORDINATES]', ' J1 10 10', ' J2 20 10', ' R1 0 10', '',
+	'[END]', ''
+].join('\n');
+
 // ---------------------------------------------------------------------------
 // 2. The popup shows them as sentences, in the reader's language, not as codes
 // ---------------------------------------------------------------------------
 console.log('\n2. The property popup reads the note back as a sentence');
 {
-	// Net3's pump 335 names a curve and its junctions carry demand patterns; Net1's pump 9 does
-	// too. Rather than naming one, this walks the models for the first element of each kind that
-	// has a note, so the section keeps working when the reader learns a new difference.
-	const { doc } = importFile('Net3.inp');
+	// Walked rather than named: the first element of each kind that has a note, so the section keeps
+	// working when the reader learns a new difference or loses an old one.
+	const { doc } = importDoc(LOSSES_INP, 'losses.inp');
 	L.applySaved(L.migrateSaved(JSON.parse(JSON.stringify(doc))));
 	L.buildDom();
 	const fields = L.popupFields();
@@ -167,7 +205,7 @@ console.log('\n2. The property popup reads the note back as a sentence');
 	const clean = L.getDoc().nodes.filter((x) => !x.importNotes)[0];
 	if (clean) {
 		ok('an element with no note shows no notes block',
-			popupText('node', clean).indexOf('What the import could not keep') < 0, clean.id);
+			popupText('node', clean).indexOf('This file was imported from EPANET. Some information here was not imported.') < 0, clean.id);
 	}
 }
 done('the popup composes the sentence');
@@ -177,7 +215,7 @@ done('the popup composes the sentence');
 // ---------------------------------------------------------------------------
 console.log('\n3. Save then open keeps every note');
 {
-	const { doc } = importFile('Net3.inp');
+	const { doc } = importDoc(LOSSES_INP, 'losses.inp');
 	L.applySaved(L.migrateSaved(JSON.parse(JSON.stringify(doc))));
 	L.buildDom();
 	function fingerprint(d) {
@@ -214,9 +252,12 @@ const GHOST_INP = [
 // ---------------------------------------------------------------------------
 console.log('\n4. .inp export is byte-identical with the notes on the document');
 {
-	// The ghost fixture is in this list on purpose: EPA's three models put notes on NODES only, so
-	// without it the label writer -- the one place a Text's own note could leak -- is never covered.
-	[['Net1.inp'], ['Net2.inp'], ['Net3.inp'], ['ghost.inp', GHOST_INP]].forEach(([f, text]) => {
+	// The two hand-written fixtures are in this list on purpose: since good news left the popup,
+	// EPA's three models file no element notes at all, so on their own they would assert that an
+	// exporter ignores notes that are not there. The ghost file covers the LABEL writer -- the one
+	// place a Text's own note could leak -- and the losses file covers a node and a link.
+	[['Net1.inp'], ['Net2.inp'], ['Net3.inp'], ['ghost.inp', GHOST_INP],
+		['losses.inp', LOSSES_INP]].forEach(([f, text]) => {
 		const { doc } = text ? importDoc(text, f) : importFile(f);
 		const withNotes = EngCalcs.lpnExportInp(doc);
 		ok(f + ' exports', withNotes.ok === true, JSON.stringify(withNotes.error));

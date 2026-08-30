@@ -1083,6 +1083,33 @@
 	 * element; it stays in the report alone. A drop naming a dangling link names something that is
 	 * deliberately NOT in the document, so it simply matches nothing here.
 	 */
+	// **A NOTE ON AN ELEMENT IS A LOSS; A LINE IN THE REPORT CAN BE GOOD NEWS.** The two readers are
+	// different people asking different questions. The report answers "what happened to my file",
+	// and "these valves came in whole and are solved by the EPANET engine" is exactly the kind of
+	// thing it should say. The popup answers "what is missing from THIS element", and the same
+	// sentence there is a note about nothing.
+	//
+	// Tom, 2026-08-29, of a `demand-pattern` note on Net3's junction 15 — *"These junctions change
+	// their demand through the day. Their patterns came in whole, and the demand you see is the one
+	// for the moment the clock is showing."*: *"The detail does not seem like something we can't
+	// handle. So I don't understand why I get the note."* He is right, and it is a leftover: every
+	// code below described a real loss when it was written, and each stopped doing so as the feature
+	// that closed the gap shipped -- patterns and the clock with Task 423 and 248.02, the two live
+	// valve fates with 248's phase 2. The SENTENCES were rewritten each time; nobody asked whether
+	// the element still deserved a note at all.
+	//
+	// So the list is here rather than in a filter at the call site: this is a fact about the code,
+	// and the next feature that closes a gap adds its code here in the same commit that rewrites its
+	// sentence. `dev/lpn-spike/import-notes-harness.js` asserts both halves -- in the report, absent
+	// from the element.
+	var LPN_INP_NOT_A_LOSS = {
+		'demand-pattern': 1,   // Task 423: applied at the solved moment, and the clock runs (248.02).
+		'head-pattern': 1,     // Task 248.02: a reservoir rises and falls.
+		'pump-speed': 1,       // Task 248.02: the speed and its pattern are kept and solved.
+		'pump-pattern': 1,
+		'valve-tcv': 1,        // Task 248 phase 2: a throttle valve is a throttle valve; either solver.
+		'valve-active': 1      // ...and PRV/PSV/FCV come in whole and route to the EPANET engine.
+	};
 	EngCalcs.lpnInpNotes = function (dropped, group) {
 		var byId = {};
 		(dropped || []).forEach(function (d) {
@@ -1092,6 +1119,7 @@
 			// that named no kind belongs to no element and is skipped here; it is still in the
 			// report, which is where a network-wide statement belongs.
 			if (!d.group || (group && d.group !== group)) { return; }
+			if (LPN_INP_NOT_A_LOSS[d.code]) { return; }
 			d.ids.forEach(function (id) {
 				if (!byId[id]) { byId[id] = []; }
 				byId[id].push({ code: d.code, detail: d.detail === undefined ? null : d.detail });
