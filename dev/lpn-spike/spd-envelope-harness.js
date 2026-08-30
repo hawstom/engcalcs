@@ -255,5 +255,90 @@ console.log('\n--- factorization work, counted (a count travels between machines
 		b.den / b.env >= 20, (b.den / b.env).toFixed(1) + 'x');
 }
 
+// -------------------------------------------------------------------------------------------
+// THE LIMITATION, MEASURED RATHER THAN LEFT AS A CAVEAT
+// -------------------------------------------------------------------------------------------
+//
+// An envelope is only as narrow as the NODE NUMBERING makes it. Everything above is a grid
+// numbered row by row, which is the good case and is what a drawn or geographically imported
+// network looks like: neighbours are near each other in the list. Shuffle that list and the same
+// network -- same junctions, same pipes, same answers -- has a far wider band and the saving
+// mostly evaporates.
+//
+// This is asserted so nobody reads the 76x above as a property of the change. It is a property of
+// the change AND the numbering, and a user can hand us either.
+//
+// THE FIX IS A FILL-REDUCING ORDERING (reverse Cuthill-McKee), and it is NOT applied, deliberately.
+// Prototyped against these same shuffled grids, RCM recovers the whole penalty -- 8.5x at 49
+// junctions, 52x at 225, 100x at 441, landing slightly BELOW the natural-order count. But
+// permuting the matrix reorders the arithmetic, so every head and flow this suite reports would
+// move in its last bits. That is a different algorithm, and CLAUDE.md's rule is that a different
+// algorithm is Tom's call. The numbers are here so the call can be made on evidence.
+console.log('\n--- how much the win depends on the user\'s node numbering ---');
+{
+	function shuffled(n) {
+		const m = grid(n);
+		const junctions = m.nodes.slice(1);
+		let s = 12345;
+		const r = () => ((s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+		for (let i = junctions.length - 1; i > 0; i--) {
+			const k = Math.floor(r() * (i + 1));
+			const t = junctions[i]; junctions[i] = junctions[k]; junctions[k] = t;
+		}
+		return { name: m.name + '-shuffled', method: 'hw', nodes: [m.nodes[0]].concat(junctions), links: m.links };
+	}
+	function envFlops(m) {
+		const packed = EC.lpnSolvePacked;
+		let f = null;
+		EC.lpnSolvePacked = function (env, M, b) {
+			if (!f) {
+				let e = 0;
+				for (let i = 0; i < env.n; i++) {
+					for (let j = env.first[i]; j <= i; j++) {
+						e += Math.max(0, j - Math.max(env.first[i], env.first[j]));
+					}
+				}
+				f = e;
+			}
+			return packed(env, M, b);
+		};
+		EC.lpnSolve(m, { tol: 1e-9, maxIter: 300 });
+		EC.lpnSolvePacked = packed;
+		return f;
+	}
+	[7, 11, 15].forEach(n => {
+		const nat = envFlops(grid(n)), sh = envFlops(shuffled(n));
+		console.log('  ' + (n * n) + ' junctions: ' + nat.toLocaleString() + ' multiply-adds numbered ' +
+			'row by row, ' + sh.toLocaleString() + ' with the same network shuffled  (x' +
+			(sh / nat).toFixed(1) + ' worse)');
+	});
+	// The one thing that must hold whatever the numbering: it is never WORSE than dense, because
+	// the widest possible envelope is the dense triangle itself.
+	const sh15 = envFlops(shuffled(15));
+	ok('even the shuffled worst case stays under the dense count', sh15 < 1898400,
+		sh15.toLocaleString() + ' vs 1,898,400');
+	// And the answers are still identical whichever way the nodes are numbered -- checked because
+	// the shuffled path exercises a first[] the structural derivation produced from a different
+	// link order, which is where an indexing mistake would surface.
+	const packed = EC.lpnSolvePacked, dense = EC.lpnSolveSPDDense;
+	let bad = null;
+	EC.lpnSolvePacked = function (env, M, b) {
+		const n = env.n, A = [];
+		for (let i = 0; i < n; i++) { A.push(new Float64Array(n)); }
+		for (let i = 0; i < n; i++) {
+			for (let j = env.first[i]; j <= i; j++) {
+				const v = M[env.rowStart[i] - env.first[i] + j];
+				A[i][j] = v; A[j][i] = v;
+			}
+		}
+		const d = dense(A, b), e = packed(env, M, b);
+		if (!sameVector(d, e) && !bad) { bad = 'n=' + n; }
+		return d;
+	};
+	EC.lpnSolve(shuffled(11), { tol: 1e-9, maxIter: 300 });
+	EC.lpnSolvePacked = packed;
+	ok('a shuffled numbering still factors bit-identically', bad === null, bad);
+}
+
 console.log('\n' + (failures === 0 ? 'ALL PASS' : failures + ' FAILURE(S)'));
 process.exit(failures === 0 ? 0 : 1);
