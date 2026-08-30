@@ -486,10 +486,15 @@ own failure; this table is an index, not a duplicate of that text.
 
 | Check | Guards |
 |---|---|
-| php + js syntax | Every `.php`, every `js/*.js` and `js/vendor/*.js` (the vendored EPANET engine ships to visitors and was once unchecked) |
+| php + js + shell syntax | Every `.php`, every `js/*.js` and `js/vendor/*.js` (the vendored EPANET engine ships to visitors and was once unchecked) |
 | `html_balance_check.php` | Every page produces well-formed HTML |
 | `pageconfig_check.php` + selftest | The PHP→JS pageConfig bridge; an unsupplied key shows the visitor "undefined". **Reads ALIASES since 2026-08-28** (`var pc = EngCalcs.pageConfig`) — before that it saw only the literal form, so `js/looped-network.js` and its 838 keys were invisible to it and it reported OK while a key translated into 26 languages reached no screen |
 | `tip_markup_check.php` | `.ec-help`/`.ec-tip` built by the helpers, not by hand |
+| `link_title_check.php` + selftest | No tip parked on an `<a title=>`. `js/Calculators.lib.js` wires tap tooltips on `.ec-help[title]` alone, so on touch the tap navigates and the explanation is simply gone. Reads RENDERED pages and judges by PROVENANCE — a tip-shaped `$ec_lang` value blocks; a title that NAMES its destination (`*_main_desc`, `LANGNAME`, `view_hide_line`) is correct and passes |
+| `focus_order_check.php` | The per-line hide control costs at most ONE keyboard stop; thirty one-character "X" links were 35-43% of every stop on the worst pages (Task 478) |
+| `social_card_check.php` | Every page's `og:image` is absolute, on an origin we serve, and backed by a real file of the size the tags declare — a share card only fails where nobody on this side looks (Task 534) |
+| `vendor_integrity_check.php` | The vendored third-party files are what the manifest says they are, nothing ships undeclared, and `package.json` agrees with what is committed (Task 413) |
+| `coord_order_check.php` | System order is lon,lat; PUBLIC order is lat,lon — and it knows the one sentence that pairs them with x and y |
 | `browser_lang_tag_check.php` | A stray tab in visitor text cannot forge a log row |
 | `sw_manifest_check.php` | The service worker precaches the URLs pages actually request (`?v=<filemtime>`). 22 of 25 entries were once unreachable and the offline promise was simply false |
 | `sw_map_host_check.php` + selftest | No map host, and nothing tile-shaped, in the service worker — read out of what `sw.php` EMITS, so a hand-written fetch route counts as much as a manifest entry. A precached tile is fetched at install, on a page the visitor merely opened, which walks past that service's own consent gate; and every precache entry must be a same-origin absolute path, because `activate` deletes cross-origin ones on every load |
@@ -501,6 +506,7 @@ own failure; this table is an index, not a duplicate of that text.
 | `scenario_seam_check.php` | Overridable properties go through `setProp()`, never a direct write that edits BASE from inside a scenario |
 | `unit_factor_check.php` | Every `$ec_units` factor re-derived from the exact definitions (`ft = 0.3048 m`, `gal = 3.785411784 L`, `lbf = 4.4482216152605 N`), **and factors for one quantity agreeing with each other** — the suite once shipped four different feet, and `ft3`/`ft3ps` were the same conversion 47 ppm apart. Reads `EngCalcs.G` out of the source rather than retyping it. **Also that a unit's identity is its NAME** — no `data-unit`, no `objForm['xu'].value`, no `<option>` valued with a factor (Task 390) |
 | `unit_family_check.php` + selftest | The four unit-family absolutes, each of which fails with a page that RENDERS AND LOOKS RIGHT: a family missing from a preset, a preset picking a unit its family does not offer, an offered unit with no factor, a page naming a family that does not exist. `echoUnitSelect()` catches the first at render time — that is, possibly by a visitor; this reads the declarations before it ships |
+| `unit_select_family_check.php` + selftest | A unit `<select>` names a FAMILY, never a raw array — such a select carries no family and is invisible to the US/SI buttons, so the page converts every field but that one. Reads both doors: the `echoUnitSelect()` call and the `'units' => array(...)` declaration `unit_family_check.php` cannot see. A non-literal argument is out of reach and is printed as a count, not a silence |
 | `lang_syntax_validate.php` | Rules A–D |
 | `lang_key_resolve_check.php` + selftest | Every literal `$ec_lang['k']` a shipped page READS is a defined key — an undefined one renders as the empty string in all 27 languages with no warning. A token scan, so a concatenated or variable key is invisible to it and a false positive is impossible. Its advisory sibling `key_hygiene_check.php` asks the opposite question, whether a key is debt, which is judgement |
 | `lang_tag_parity_check.php --strict` | Markup matches English |
@@ -511,13 +517,18 @@ own failure; this table is an index, not a duplicate of that text.
 | `language_declaration_check.php` + selftest | `$all_language_settings` lists exactly the `lib/lang.ec.??.php` files that exist, each with a `QUALITY` in (0,1] and a `LANGNAME`. Declared-with-no-file is a fatal for the one visitor whose browser asked for that language, and we advertise it in `hreflang`; a file nobody declared is a paid-for translation nothing can reach. Not the tier VALUES — which tier a language is in is judgement |
 | `coverage_selftest.php` | The coverage cross, the identity floor, exempt/out-of-scope separation |
 | `generate_translation_payloads.php --check` | Payload freshness |
+| `prefix_map_check.php` + selftest | Every calculator prefix is wired to glossary terms or declared to own none. A prefix missing from `prefixToTermNames()` does not fail — it silently gets three default terms, and the calculator's definitions, preferred translations and `avoid` arrays reach no translation agent. `lpn`/`bpn` were missing for months |
+| `new_english_keys.php --check` | `dev/new-english-keys.md` is fresh, so the list Tom rules on cannot go stale between the day a key is written and the day he reads it |
 | `generate_examples.php --check` | The served `examples/` matches its source |
+| `generate_features.php --check` | `dev/features.md` matches its hand-written source, and every ID a feature cites is genuinely closed |
 | `roadmap_id_check.php` | ID uniqueness across ROADMAP + closed ledger; priority 0 means closed and nothing else |
+| `check_table_parity_check.php` + selftest | This table and `check_all.sh` name the same checks. Matched on script filename, not on labels — the two files may word a check differently. Eight checks ran unlisted when it was written |
+| `doc_path_check.php` + selftest | Every path `CLAUDE.md` cites exists. Scoped to that file: `dev/*.md` has 31 dead citations and nearly all are legitimate history, which would make it a judgement call. Deliberately timid about what looks like a path, and prints how much it turned away. `~/webdev/...` and `../sitemap.xml` are outside this tree, so their absence proves nothing |
 | `run_harnesses.sh` | The lpn solver and editor harnesses (count derived from the glob, never typed) |
 | `run_calc_harnesses.sh` | Every calculator's own `pageCalculator` against its own rendered HTML |
 | `stale_claim_check.php` | *Advisory.* A `Task N` cited in `CLAUDE.md` or a `dev/*.md` whose task is CLOSED, ranked by whether a negation sits beside it — the shape of the three false "not built yet" claims that shipped in one day. A worklist, never a verdict |
 | `stale_claim_selftest.php` | The DEMOTIONS in the check above, against fixtures. Blocking, because the check it guards is not: a demotion trades coverage for a shorter list and the tool looks identical either way. The three real false claims must keep ranking HIGH |
-| *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php` | Judgement calls that must not block a commit |
+| *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php`, `example_folder_check.php`, `mode_name_check.php` | Judgement calls that must not block a commit |
 
 **When you are about to write a new rule in this file, first ask whether it can be a check.** Every
 rule here that became a script stopped being violated. Every rule that stayed prose kept being

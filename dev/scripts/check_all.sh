@@ -89,6 +89,12 @@ run_check "pageConfig php->js bridge"    blocking php dev/scripts/pageconfig_che
 # it must not take for a key: this check BLOCKS, so a false positive stops a commit.
 run_check "pageConfig selftest"          blocking php dev/scripts/pageconfig_selftest.php
 run_check "tip markup via helpers"       blocking php dev/scripts/tip_markup_check.php
+# Task 322 row 25. js/Calculators.lib.js wires tap tooltips on .ec-help[title] alone, so a tip
+# parked on a bare <a title=> just navigates on touch and the explanation is simply gone. Judges by
+# PROVENANCE on rendered pages: a tip-shaped $ec_lang value blocks, a title that NAMES its
+# destination passes.
+run_check "link titles reachable"        blocking php dev/scripts/link_title_check.php
+run_check "link title selftest"          blocking php dev/scripts/link_title_selftest.php
 # Task 478. Tabbing down a calculator walked sideways through thirty one-character "X" links --
 # 35-43% of every keyboard stop on the worst pages, with no keyboard way to bring a line back. This
 # renders each page and asserts, blocking, that the per-line hide control costs at most ONE stop;
@@ -166,6 +172,11 @@ run_check "coordinate order"             blocking php dev/scripts/coord_order_ch
 # a visitor -- opens the page; this reads the declarations, so the gap is found before it ships.
 run_check "unit families and presets"    blocking php dev/scripts/unit_family_check.php
 run_check "unit family selftest"         blocking php dev/scripts/unit_family_selftest.php
+# Task 322 row 20. A unit <select> built from a raw array carries no family and is INVISIBLE to the
+# US/SI buttons, so the page converts every field but that one. Reads both doors: the
+# echoUnitSelect() call and the 'units' => array(...) declaration unit_family_check.php cannot see.
+run_check "unit select families"         blocking php dev/scripts/unit_select_family_check.php
+run_check "unit select selftest"         blocking php dev/scripts/unit_select_family_selftest.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php
@@ -192,6 +203,12 @@ run_check "languages declared and filed" blocking php dev/scripts/language_decla
 run_check "lang declaration selftest"    blocking php dev/scripts/language_declaration_selftest.php
 run_check "coverage declaration"         blocking php dev/scripts/coverage_selftest.php
 run_check "payload freshness"            blocking php dev/scripts/generate_translation_payloads.php --check
+# Task 322 row 4. A prefix missing from prefixToTermNames() does not fail -- it silently falls back
+# to three default terms, and every definition, preferred translation and avoid array written for
+# that calculator reaches no agent. gloss_ref_check.php can only see a prefix somebody already
+# wrote a gloss: pointer for, which a brand-new calculator has not.
+run_check "prefix glossary map"          blocking php dev/scripts/prefix_map_check.php
+run_check "prefix map selftest"          blocking php dev/scripts/prefix_map_selftest.php
 # Task 314. The served examples/ directory is GENERATED from dev/water-network-examples/, so it can
 # go stale exactly the way the translation payloads can: someone edits an example, and the gallery
 # keeps serving the old one with no symptom until a visitor opens it. Also catches a whitelisted
@@ -203,6 +220,14 @@ run_check "examples library fresh"       blocking php dev/scripts/generate_examp
 # reference ambiguous. And priority 0 is the file's only signal for "closed", so a blocked task
 # parked at 0, or a done one never moved under `## Completed`, both read as finished from outside.
 run_check "roadmap ids and closure"      blocking php dev/scripts/roadmap_id_check.php
+# Task 322 rows 5 and 24. check_all.sh is what RUNS; CLAUDE.md's table is what everybody READS,
+# and nothing tied them together -- eight checks ran unlisted. Matched on script filename, so the
+# two files stay free to word a check differently. And every path CLAUDE.md cites exists: scoped
+# to that file, because dev/*.md's 31 dead citations are nearly all legitimate history.
+run_check "check table parity"           blocking php dev/scripts/check_table_parity_check.php
+run_check "check table selftest"         blocking php dev/scripts/check_table_parity_selftest.php
+run_check "CLAUDE.md paths resolve"      blocking php dev/scripts/doc_path_check.php
+run_check "doc path selftest"            blocking php dev/scripts/doc_path_selftest.php
 # The stale-claim ADVISORY below is a judgement call and never blocks. Its DEMOTIONS are not: each
 # one buys a shorter worklist by giving up coverage, and the tool prints fewer lines either way
 # whether it got smarter or went blind. This asserts the three false claims that actually shipped
