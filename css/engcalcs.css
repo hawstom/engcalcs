@@ -2299,10 +2299,35 @@ tr.lpn-ff-error { background: #f2f2f2; }
 	html:has(#lpn_canvas) .lpn-menubar-item { padding: 3px 6px; }
 
 	/* **5. THE SETTINGS INDEX STAYS A NARROW SIDE COLUMN ON A PHONE, RESTORED 2026-08-29.**
-	   4.5rem, measured at 360 px rather than scaled from the desktop's 6.6rem: it is the width at
-	   which the CONTENT pane stops being the constraint. At 4.5rem the content pane is 238 px and
-	   the node symbology list, the widest thing in the box, needs 230 -- so the box opens on a phone
-	   with no sideways scrollbar anywhere in it.
+
+	   **AND SINCE 2026-08-30 IT IS A TRANSFER, WHICH IS NOT THE SAME THING AS A RATIO** (Tom, having
+	   used the box once the overrun was fixed: *"the main (left) pane only needs 75-80 percent of the
+	   width it has... I think we should try giving the index pane 20% of the main pane's width"*, and
+	   then, on being shown the other reading: *"No. I meant for you to rob 20% of the then-present
+	   width of the main pane and give that to the index pane."*). **The index does not REACH 20% of
+	   anything.** It keeps the width it already had and gains a fifth of the main pane on top; the
+	   main pane keeps four fifths of what it had. Do not "simplify" this to a flat percentage -- a
+	   flat 20% is the reading he rejected in those words.
+
+	   The arithmetic, with P the panes' inner width and g the 10px gap:
+	       index_now   = 4.5rem                        (the figure this rule carried before)
+	       content_now = P - g - 4.5rem
+	       index_new   = 4.5rem + 0.20 x content_now
+	                   = 4.5rem + 0.2P - 0.2g - 0.9rem
+	                   = 3.6rem + 0.2P - 2px
+	   which is the calc below. A percentage flex-basis resolves against the flex container's inner
+	   main size, and the gap is NOT deducted from it -- so the `- 2px` is 20% of the gap and is
+	   exact rather than a fudge. `content_new = 0.8 x content_now` then falls out of the content
+	   pane's own `flex: 1 1 auto`; it is not restated anywhere.
+
+	   Measured in Chromium at 360x640, where P is 320.4 (94vw less 16px of padding and 2 of border):
+	   the index goes 72 -> 119.7 and the main pane 238.4 -> 190.7, which is 0.800 of what it had.
+	   **THE CONSEQUENCE, MEASURED RATHER THAN FEARED:** 4.5rem was chosen as the width at which the
+	   CONTENT pane stopped being the constraint, and 190.7 is below it -- so the pane was re-measured
+	   at the new width instead of being argued about. Exactly ONE thing in it overflows, by 17px, and
+	   it is not a setting: it is the colour-ramp attribution footer, whose lines carry a bare URL
+	   that no amount of pane width would have broken. It is given `overflow-wrap` at 5a below. Every
+	   settings row, and the node symbology list that set the old floor, still fits.
 
 	   **IT WAS TURNED INTO A HORIZONTAL TAB STRIP ON 2026-08-25 AND TOM REVERSED THAT** (2026-08-29:
 	   *"It was good before with the right pane index. It's bad with top tabs."*). The strip was
@@ -2323,8 +2348,33 @@ tr.lpn-ff-error { background: #f2f2f2; }
 	   type so "Visualization" fits) and either would be a change to the WORDS, which is Tom's, not
 	   to the layout, which is settled.
 
-	   One rule for both boxes: `.lpn-libbox` borrows this shell and its three names already fit. */
-	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: 4.5rem; }
+	   ONE RULE FOR BOTH BOXES, and it reaches the Libraries box's own `#lpn_library_box` override by
+	   specificity rather than by accident: `:has()` takes the specificity of its argument, so
+	   `html:has(#lpn_canvas) .lpn-setbox-index` is (1,1,1) against that rule's (1,1,0). Kept
+	   deliberately -- the Libraries index is a SHORTER list of shorter names (Patterns, Curves,
+	   Controls) than Settings', its box is the same 94vw on a phone, and what it gives up goes to the
+	   pattern series and the control sentence, which are the two things that box exists to show
+	   whole. A second phone figure there would be a second pane design.
+
+	   **AND THE TRANSFER IS THE SAME EXPRESSION FOR BOTH, WHICH IS NOT A COINCIDENCE AND IS NOT AN
+	   OVERSIGHT.** A transfer is derived from the pane's PRESENT width, and the Libraries index's
+	   present width on a phone is this rule's 4.5rem -- its own 5.25rem is a DESKTOP figure, already
+	   overridden here. So "a fifth of the main pane, moved across" is one calculation for both boxes,
+	   and deriving a second one from 5.25rem would be transferring from a width that box does not
+	   have at this size.
+
+	   The 3.6rem and the 2px are the arithmetic above, already reduced; the 2px is a fifth of
+	   `.lpn-setbox-panes`'s own 10px `gap`, restated because `calc()` cannot ask for it. */
+	html:has(#lpn_canvas) .lpn-setbox-index { flex-basis: calc(3.6rem + 20% - 2px); }
+
+	/* 5a. AND THE ONE THING THE NARROWER MAIN PANE NO LONGER FITS. Measured at 360px after the
+	   transfer above: the content pane overflows by exactly 17px, and every pixel of it is the
+	   colour-ramp attribution footer, whose credit lines end in a bare URL -- 208px of unbreakable
+	   token in a 191px pane. The same answer the index rows got, and for the same reason: a broken
+	   address is still an address, and the licence asks for the text to be readable, not unwrapped.
+	   PHONE ONLY -- at every wider width it has always fitted on one line, which is how it reads
+	   best. */
+	html:has(#lpn_canvas) .lpn-rp-credit { overflow-wrap: anywhere; }
 
 	/* 5b. THE BOTTOM-PANE TABLES' NUMBER BOXES (Tom, 2026-08-22: "The Tables in the bottom pane have
 	   some columns, inputs I think, with artificially limited shrink that can in general be about

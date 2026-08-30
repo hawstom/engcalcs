@@ -746,14 +746,70 @@ console.log('\n--- the Settings index pane, a narrow COLUMN at both widths ---')
 	// 6.6rem: 0.8 x the 7.5rem it shipped at, then 1.1 x that once Tom had used it (2026-08-23).
 	ok('the index pane is 6.6rem on the desktop',
 		winning(RULES, index, WIDE, DOC_IDS, false, 'flex') === '0 0 6.6rem');
-	// **AND 4.5rem ON A PHONE -- STILL A COLUMN** (restored 2026-08-29). Task 527 turned it into a
+	// **AND STILL A SIDE COLUMN ON A PHONE** (restored 2026-08-29). Task 527 turned it into a
 	// horizontal strip of whole names, on the argument that mid-word breaks in a navigation index
 	// are worse than the height a strip costs. **Tom used it and reversed it**: *"It was good before
 	// with the right pane index. It's bad with top tabs."* An index you scroll sideways is an index
 	// you cannot see. The strip was built, shipped, used and rejected -- do not re-propose it.
-	ok('...and 4.5rem on a phone, which is the width that leaves the CONTENT pane its 230 px',
-		winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis') === '4.5rem',
-		'got ' + winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis'));
+	//
+	// **AND ON A PHONE IT IS A TRANSFER, NOT A TARGET** (Tom, 2026-08-30: *"No. I meant for you to
+	// rob 20% of the then-present width of the main pane and give that to the index pane."*). The
+	// index does not REACH a fifth of anything -- it keeps 4.5rem and gains a fifth of the main pane
+	// on top, and the main pane keeps four fifths of what it had. That distinction is the whole
+	// assertion below: a flat `index = 0.2 x content` also produces a tidy calc, and is the reading
+	// he rejected in those words, so the property checked here is the one that separates them.
+	const gap = winning(RULES, panes, SMALL, DOC_IDS, false, 'gap');
+	const basis = winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis');
+	ok('...and on a phone it is a calc against the panes, not a fixed width',
+		/^calc\(/.test(String(basis)), 'got ' + basis);
+	// **THE PERCENTAGE RESOLVES AGAINST THE CONTAINER'S INNER WIDTH AND THE GAP IS NOT DEDUCTED FROM
+	// IT** -- confirmed in Chromium at 360px, where the basis lands on 119.7px, which is what the
+	// arithmetic here predicts. That is why the expression carries a `- 2px`: it is a fifth of the
+	// gap, exact rather than a fudge. The gap is a constant in two places, so the one in the calc is
+	// checked against the one the container actually sets.
+	ok('...and the gap it accounts for is the gap the container actually sets',
+		gap === '10px' && /- 2px/.test(String(basis)), 'gap ' + gap + ', basis ' + basis);
+	// Resolved against the box the phone actually gets: 94vw less its 8px padding each side and its
+	// 1px border each side.
+	{
+		const P = 0.94 * SMALL - 16 - 2, g = parseFloat(gap), REM = 16;
+		const m = /^calc\(([\d.]+)rem \+ ([\d.]+)% - ([\d.]+)px\)$/.exec(String(basis));
+		const idx = m ? parseFloat(m[1]) * REM + parseFloat(m[2]) / 100 * P - parseFloat(m[3]) : NaN;
+		const wasIdx = 4.5 * REM, wasContent = P - g - wasIdx, content = P - g - idx;
+		// THE TRANSFER, from both ends: the main pane keeps 80% of what it had, and every pixel it
+		// gave up is a pixel the index gained. Either alone would pass on a coincidence.
+		ok('...the main pane keeps 80% of the width it had at 360px',
+			Math.abs(content / wasContent - 0.80) < 0.001,
+			'was ' + wasContent.toFixed(1) + ', now ' + content.toFixed(1) +
+			' (' + (content / wasContent).toFixed(4) + ')');
+		// **AND THE ALGEBRA IS PINNED TO A REAL BROWSER, or this file is only checking itself.**
+		// "The index gained what the main pane gave up" is an identity here -- it falls out of
+		// `content = P - g - index` and can never fail -- so what is asserted instead is the number
+		// Chromium actually resolved the basis to at 360x640, which is what proves the percentage
+		// resolves against P with the gap NOT deducted from it. If a browser ever changed that, this
+		// is the line that would say so.
+		ok('...and the basis resolves to the 119.7px Chromium measured at 360x640',
+			Math.abs(idx - 119.68) < 0.05, 'computes to ' + idx.toFixed(2) +
+			' (index was ' + wasIdx.toFixed(1) + ')');
+		// The reading NOT taken, named so a re-read of his sentence is a decision rather than a
+		// rediscovery. `index = 0.2 x content` would have put the index at 51.7px -- NARROWER than
+		// it was -- which is the opposite of what he asked for.
+		ok('...and it is not the index REACHING 20%, which is the reading Tom rejected',
+			Math.abs(idx - (P - g) / 6) > 1,
+			'the target reading would give ' + ((P - g) / 6).toFixed(1) + 'px');
+		// **THE ONE THING THE NARROWER MAIN PANE STOPPED FITTING**, measured in Chromium rather
+		// than predicted: 17px of overflow, all of it the colour-ramp attribution footer, whose
+		// credit lines end in a bare URL. A URL is one unbreakable token, so no pane width would
+		// have fixed it -- it needs the same answer the index rows got. Asserted at the phone width
+		// only; wider, the footer has always fitted on one line and reads best that way.
+		const contentPane = node('div', '', ['lpn-setbox-content'], panes);
+		const credit = node('div', 'lpn_set_ramp_credits', ['lpn-rp-credit'], contentPane);
+		ok('...and the attribution footer may break its URL rather than scroll the pane sideways',
+			winning(RULES, credit, SMALL, DOC_IDS, false, 'overflow-wrap') === 'anywhere',
+			'got ' + winning(RULES, credit, SMALL, DOC_IDS, false, 'overflow-wrap'));
+		ok('...at the phone width only -- on a desktop the credit is one line',
+			winning(RULES, credit, WIDE, DOC_IDS, false, 'overflow-wrap') === null);
+	}
 	// The three facts that MADE it a strip, each asserted absent, so a revival is a deliberate act
 	// rather than a rule creeping back in.
 	ok('...the panes do not stack',
@@ -785,9 +841,15 @@ console.log('\n--- the Settings index pane, a narrow COLUMN at both widths ---')
 	const libindex = node('nav', 'lpn_libbox_index', ['lpn-setbox-index'], libpanes);
 	ok('the Libraries index pane is 5.25rem -- 0.70 x the 7.5rem it shipped at',
 		winning(RULES, libindex, WIDE, DOC_IDS, false, 'flex-basis') === '5.25rem');
-	// One rule serves both boxes again, which is what it was before Task 527 split them.
-	ok('...and it takes the same 4.5rem on a phone, from the same rule',
-		winning(RULES, libindex, SMALL, DOC_IDS, false, 'flex-basis') === '4.5rem');
+	// One rule serves both boxes again, which is what it was before Task 527 split them -- and it
+	// reaches this box's own `#lpn_library_box` override on specificity, `:has()` taking the
+	// specificity of its argument. That is load-bearing rather than incidental: without it the
+	// Libraries index would keep its desktop 5.25rem on a phone and the two boxes would be two
+	// designs again.
+	ok('...and it takes the same phone ratio, from the same rule',
+		winning(RULES, libindex, SMALL, DOC_IDS, false, 'flex-basis') ===
+		winning(RULES, index, SMALL, DOC_IDS, false, 'flex-basis'),
+		'got ' + winning(RULES, libindex, SMALL, DOC_IDS, false, 'flex-basis'));
 }
 
 // ============================================================================================
@@ -1306,6 +1368,46 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 	// would shrink the remembered desktop height and never give it back.
 	ok('a capped height is not stored as the user’s remembered box height',
 		/capped = parseFloat\(box\.style\.maxHeight\)[\s\S]{0,240}setboxLayout\.h = Math\.round/.test(code('wireSettingsBox')));
+
+	// **AND THE CAP MUST NOT PIN THE BODY SHORTER THAN THE BOX** (Tom, 2026-08-30: *"The phone
+	// settings has a limit to the amount of box height it will use. This leaves a blank area at the
+	// bottom if the box is expanded taller."*). The limit is correct -- it is the room under the
+	// chrome, and Task 554 put it there. The blank was not: `capPanelHeight()` derives the panel's
+	// furniture by subtracting the body's height from the panel's, and it wrote the panel's cap
+	// BEFORE taking that measurement. The body is `flex: 1 1 auto`, so it had already shrunk with the
+	// capped panel, and the difference then counted the overflow the cap had just removed as though
+	// it were furniture. Measured in Chromium at 360x640: natural 588.8, avail 482.4, real chrome 50
+	// -- the body was pinned to 326 instead of 432.4 and a 106.4px strip of the box was empty.
+	//
+	// **A STUB THAT DROPS THE COUPLING WOULD PASS EITHER WAY** (dev/testing-notes.md). The one
+	// physical relationship this defect lives in is that the BODY'S HEIGHT DEPENDS ON THE PANEL'S
+	// CAP, so the stub below models exactly that and nothing else. Assert it against the page's real
+	// capPanelHeight; with the two statements swapped back it fails.
+	{
+		const capPanelHeight = new Function(fn('capPanelHeight') + '\nreturn capPanelHeight;')();
+		const CHROME = 50, NATURAL = 588.8, AVAIL = 482.4;
+		const panel = { style: {} };
+		panel.getBoundingClientRect = function () {
+			const cap = parseFloat(panel.style.maxHeight);
+			return { height: isFinite(cap) ? Math.min(NATURAL, cap) : NATURAL };
+		};
+		const body = { style: {} };
+		body.getBoundingClientRect = function () {
+			return { height: panel.getBoundingClientRect().height - CHROME };
+		};
+		capPanelHeight(panel, body, AVAIL, NATURAL);
+		const bodyMax = parseFloat(body.style.maxHeight);
+		ok('the capped panel gives its body every pixel that is not the panel’s own furniture',
+			Math.abs(bodyMax - (AVAIL - CHROME)) < 0.01,
+			'body pinned to ' + bodyMax + ', room is ' + (AVAIL - CHROME));
+		ok('...so a box dragged to the cap has no blank strip under its content',
+			Math.abs(AVAIL - (CHROME + bodyMax)) < 0.01,
+			(AVAIL - (CHROME + bodyMax)).toFixed(1) + 'px of blank');
+		// The panel itself is still capped -- the fix must not have bought the body its room by
+		// letting the box grow off the screen again, which is the whole of Task 554.
+		ok('...and the panel is still capped to the room it was given',
+			parseFloat(panel.style.maxHeight) === AVAIL, panel.style.maxHeight);
+	}
 }
 
 // The reader's blind-spot report, scoped to selectors that could possibly reach what this file
