@@ -24,6 +24,8 @@
  *   php dev/scripts/key_hygiene_check.php
  *   php dev/scripts/key_hygiene_check.php --strict
  */
+require_once __DIR__ . '/key_hygiene_walk.inc.php';
+
 const HYGIENE_LANG_FILE = __DIR__ . '/../../lib/lang.ec.en.php';
 
 $strict = in_array('--strict', $argv, true);
@@ -34,11 +36,14 @@ include HYGIENE_LANG_FILE;
 $keys = array_keys($ec_lang);
 
 $root = dirname(__DIR__, 2);
-$code = '';
+$phpSources = [];
+$jsSources = [];
 foreach (array_merge(glob($root . '/*.php'), glob($root . '/lib/*.php'), glob($root . '/js/*.js')) as $f) {
     if (strpos($f, 'lang.ec.') !== false) continue;   // a lang file defining a key is not a use of it
-    $code .= "\n" . file_get_contents($f);
+    if (substr($f, -3) === '.js') { $jsSources[$f] = file_get_contents($f); }
+    else                          { $phpSources[$f] = file_get_contents($f); }
 }
+$code = "\n" . implode("\n", $phpSources) . "\n" . implode("\n", $jsSources);
 
 // ---------------------------------------------------------------------------------------------
 // 1. Keys nothing renders
@@ -78,6 +83,23 @@ foreach ($keys as $k) {
         $dead[] = $k;
     }
 }
+
+// ---------------------------------------------------------------------------------------------
+// 1b. Keys whose only reader is itself unreachable — the walk (survey row 3c)
+// ---------------------------------------------------------------------------------------------
+// Finding 1 cannot see these BY CONSTRUCTION: a reference from an uncalled function is still a
+// reference. Rationale, and every conservatism the walk trades coverage for, is in the include.
+// The harnesses go in as ROOT text, not as analysed code: a function `dev/lpn-spike` calls is a
+// test seam, not a corpse, and listing it as dead is exactly the noise this walk exists to avoid.
+$rootSources = $phpSources;
+foreach (array_merge(
+    glob($root . '/dev/lpn-spike/*.js'), glob($root . '/dev/calc-spike/*.js'),
+    glob($root . '/dev/browser-pass/*.js'), glob($root . '/dev/browser-pass/specs/*.js')) as $f) {
+    // NOT dev/scripts: this check and its own include NAME the dead functions in their comments, so
+    // reading themselves would root the very corpse they were written to find.
+    $rootSources[$f] = file_get_contents($f);
+}
+$walk = ecReachabilityCandidates($jsSources, $rootSources, $keys, $dynamicPrefixes);
 
 // ---------------------------------------------------------------------------------------------
 // 2. Suffix vocabulary that has drifted
@@ -168,6 +190,21 @@ if ($dead) {
 }
 echo "\n";
 
+printf("1b. READ ONLY BY UNREACHABLE CODE: %d\n", count($walk['candidates']));
+echo "   A DEAD READER HIDES A DEAD KEY. Finding 1 counts references, and a reference from an\n";
+echo "   UNCALLED function is still a reference — so a string whose only reader is itself never\n";
+echo "   called reaches no screen and never appears above. This walks from the page's own entry\n";
+echo "   points instead. CANDIDATES, not a verdict: confirm the reader really is unreachable\n";
+echo "   before deleting anything.\n";
+printf("   %d function(s) reached from nothing; %d turned away as undecidable:\n",
+    count($walk['dead']), array_sum($walk['turned']));
+foreach ($walk['turned'] as $why => $n) { printf("     %5d  %s\n", $n, $why); }
+if ($walk['candidates']) {
+    echo "\n";
+    foreach ($walk['candidates'] as [$k, $readers]) { printf("   %-42s read only by %s\n", $k, $readers); }
+}
+echo "\n";
+
 printf("2. SUFFIX DRIFT: %d key(s) spell a suffix differently from their siblings\n", count($strays));
 if ($strays) {
     echo "   Not cosmetic. A reader guessing a key name guesses the common form, so a stray is a key\n";
@@ -181,7 +218,7 @@ if ($strays) {
 }
 echo "\n";
 
-if (!$dead && !$strays) {
+if (!$dead && !$strays && !$walk['candidates']) {
     echo "Nothing to report.\n";
     exit(0);
 }
