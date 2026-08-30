@@ -25732,8 +25732,16 @@ var EngCalcs = EngCalcs || {};
 	// What the boxes open on. Every one is a DISPLAY value in this project's units, because that is
 	// what a person reads and types; the conversion back to SI happens once, at the engine call.
 	// The four SI numbers behind them are the conventions this feature is built on -- 1,000 gpm is
-	// the IFC's smallest tabulated requirement, 20 psi is the AWWA M31 and NFPA 291 residual, and
-	// 5 ft/s is the velocity most agencies write into a fire-flow criterion.
+	// the IFC's smallest tabulated requirement and 20 psi is the AWWA M31 and NFPA 291 residual.
+	//
+	// **THE VELOCITY CRITERION IS 10 ft/s (3 m/s), NOT 5** (Tom, 2026-08-30: *"I would have used 10
+	// (3 m/s)."*). It shipped at 5, and the planning engineer could find no fire-flow source for
+	// that number at all: 5 ft/s is an ordinary normal-operation design velocity that had been
+	// carried into a test where the system is deliberately being pushed. The fire-flow figures that
+	// do exist are higher -- San Bernardino County's 8 ft/s general design limit, read primary, and
+	// it exempts hydrant branch lines outright; Vacaville CA at 10 and Rancho California at 15 are
+	// search synthesis and were not read at source. A CRITERION, NOT A CONSTRAINT: the box asks for
+	// this number and the user may type any other.
 	function fireFlowDefaults() {
 		var psi20 = EngCalcs.lpnFireFlowPsiToHead(EngCalcs.lpnFireFlowDefaults.residualPsi);
 		return {
@@ -25742,7 +25750,7 @@ var EngCalcs = EngCalcs || {};
 			required: ffNum(toDisplay(EngCalcs.lpnFireFlowGpmToSI(1000), 'lpn_u_flow')),
 			residual: ffNum(toDisplay(psi20, 'lpn_u_pressure')),
 			minPressure: ffNum(toDisplay(psi20, 'lpn_u_pressure')),
-			maxVelocity: ffNum(toDisplay(5 * 0.3048, 'lpn_u_velocity'))
+			maxVelocity: ffNum(toDisplay(10 * 0.3048, 'lpn_u_velocity'))
 		};
 	}
 	// The junctions this scenario actually has. A reservoir or a tank is not one: its head is fixed,
@@ -25939,16 +25947,27 @@ var EngCalcs = EngCalcs || {};
 		if (EngCalcs.initTips) { EngCalcs.initTips(host); }
 	}
 
-	// ---- the two reports ------------------------------------------------------------------------
+	// ---- ONE WIDE TABLE ---------------------------------------------------------------------------
 	//
-	// One result set, read twice. The first report answers "can this junction deliver what the code
-	// asks for"; the second answers "and what did drawing it do to everything else". They are two
-	// headings in one box rather than two runs, because they come from the same solves and because
-	// the map's three states need both.
+	// **ONE RUN, ONE RESULT SET, ONE TABLE** (Tom, 2026-08-30, with a competitor's report in front of
+	// him: *"Normally they are kind of wide and they include the information from both tables in one
+	// table."*). It was two tables under two headings, which was this page showing its own
+	// architecture: the compliance half and the design half come out of the SAME solves, so a reader
+	// who wanted to know what junction J-12 did had to find J-12 twice.
+	//
+	// **THE COLUMNS ARE THE COMPETITOR'S MEANINGS IN OUR OWN WORDS.** Their "Critical Asset" is what
+	// we call what a junction pulled down; their "Iterations" is our count of network solves, which
+	// is honest here because the bisection really does report the number it used. Two of their
+	// columns are NOT here because we do not compute them: see the note above ffLimitText().
 	//
 	// **A REPORT NEVER PRINTS MORE ROWS THAN A PERSON CAN USE.** A 2,000-junction sweep is a real
 	// case; the table names how many it did not print rather than building them all.
 	var FF_MAX_ROWS = 200;
+	// **A CELL WITH NO NUMBER SHOWS A DASH, NEVER A ZERO.** A junction whose available flow could not
+	// be found has no residual to report and no pressure at the required flow; printing 0 there would
+	// be a measurement we never made. Punctuation, not language: it says the same thing in 27
+	// languages and needs no key.
+	var FF_DASH = '–';
 	function ffStateText(state) {
 		var pc = EngCalcs.pageConfig || {}, S = EngCalcs.lpnFireFlowStates || {};
 		if (state === S.PASS) { return pc.lpn_ff_state_pass || 'Passing'; }
@@ -25982,12 +26001,71 @@ var EngCalcs = EngCalcs || {};
 		}
 		return ffQty(rec.available, 'lpn_u_flow');
 	}
+	// A pressure, a flow or a velocity that may not exist. The dash is the whole point of this
+	// helper: every "we did not measure that" in the table goes through one place.
+	function ffMaybeQty(si, unitId) {
+		return (typeof si === 'number' && isFinite(si)) ? ffQty(si, unitId) : FF_DASH;
+	}
+	// **THE WORST THING THIS JUNCTION PULLED DOWN** -- the competitor's "Critical Asset". Their
+	// column names one element, so ours does too, and the rest are counted rather than listed: a
+	// junction that starves half a town does not need half a town printed against its name.
+	//
+	// A STARVED JUNCTION OUTRANKS A FAST PIPE, and that is a judgement rather than an arithmetic:
+	// the two cannot be compared numerically (a pressure against a velocity), and a customer with no
+	// water is the more serious of the two. Within a kind it is the lowest pressure, or the highest
+	// velocity.
+	function ffCriticalText(rec) {
+		var pc = EngCalcs.pageConfig || {}, worst = null, kind = '', total, extra, text, j, e;
+		if (!rec.effects) { return FF_DASH; }
+		for (j = 0; j < rec.effects.nodes.length; j++) {
+			e = rec.effects.nodes[j];
+			if (!worst || e.pressure < worst.pressure) { worst = e; kind = 'node'; }
+		}
+		if (!worst) {
+			for (j = 0; j < rec.effects.links.length; j++) {
+				e = rec.effects.links[j];
+				if (!worst || e.velocity > worst.velocity) { worst = e; kind = 'link'; }
+			}
+		}
+		if (!worst) { return FF_DASH; }
+		text = kind === 'node'
+			? (pc.lpn_ff_affect_node || '{id} down to {pressure}')
+				.replace('{id}', worst.id).replace('{pressure}', ffQty(worst.pressure, 'lpn_u_pressure'))
+			: (pc.lpn_ff_affect_link || '{id} at {velocity}')
+				.replace('{id}', worst.id).replace('{velocity}', ffQty(worst.velocity, 'lpn_u_velocity'));
+		total = rec.effects.nodes.length + rec.effects.links.length;
+		extra = total - 1;
+		if (extra > 0) {
+			text += ' ' + (pc.lpn_ff_more || 'and {n} more').replace('{n}', String(extra));
+		}
+		return text;
+	}
+	// **WHICH CRITERION THE JUNCTION BROKE**, which is as far as we can honestly go towards the
+	// competitor's "Design constraint". Two of their columns have no answer in this result set and
+	// are deliberately absent rather than invented:
+	//   * their "Fire flow design" is the largest flow that still satisfies the DESIGN criteria. Our
+	//     sweep reads those criteria once, at the required flow; finding that flow is a second
+	//     bisection on a different predicate, which is engine work and not a column.
+	//   * their notion of a constraint being ACTIVE at the answer is not ours: we know what broke at
+	//     the required flow, not what was binding at the available one.
+	function ffLimitText(rec) {
+		var pc = EngCalcs.pageConfig || {}, n, l;
+		if (!rec.effects) { return FF_DASH; }
+		n = rec.effects.nodes.length; l = rec.effects.links.length;
+		if (n && l) { return pc.lpn_ff_limit_both || 'Pressure and velocity'; }
+		if (n) { return pc.lpn_ff_limit_pressure || 'Pressure'; }
+		if (l) { return pc.lpn_ff_limit_velocity || 'Velocity'; }
+		return FF_DASH;
+	}
 	function ffCell(row, text, cls) {
 		var td = ffEl('td', cls || null, text, row);
 		return td;
 	}
 	function ffTable(parent, headings) {
-		var table = ffEl('table', 'lpn-ff-table', null, parent),
+		// **THE WIDE TABLE SCROLLS SIDEWAYS INSIDE ITS OWN BOX**, so ten columns can never push the
+		// dialog's own edges off the screen (CLAUDE.md: wide content scrolls in its own container).
+		var wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
+			table = ffEl('table', 'lpn-ff-table', null, wrap),
 			head = ffEl('thead', null, null, table),
 			hr = ffEl('tr', null, null, head);
 		headings.forEach(function (h) { ffEl('th', null, h, hr); });
@@ -26019,7 +26097,7 @@ var EngCalcs = EngCalcs || {};
 			body,
 			shown,
 			sorted,
-			withEffects;
+			anyEffect;
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (!set) { return; }
@@ -26043,65 +26121,146 @@ var EngCalcs = EngCalcs || {};
 		// about any one junction's hydraulics.
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_iso || 'ISO credits a single hydrant with at most {flow}.')
 			.replace('{flow}', ffQty(set.isoCap, 'lpn_u_flow')), host);
+		// The two design columns are still drawn when the design half was turned off -- as dashes,
+		// with the reason said above the table. A column that appears and disappears makes two runs
+		// of the same network look like two different reports.
+		if (!set.design) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_ff_design_off_note ||
+				'The effect on the rest of the system was not checked in this run.', host);
+		} else {
+			anyEffect = set.results.some(function (r) {
+				return r.effects && (r.effects.nodes.length || r.effects.links.length);
+			});
+			if (!anyEffect) {
+				ffEl('p', 'lpn-ff-note', pc.lpn_ff_design_none ||
+					'Nothing in the chosen set was pulled down by any junction tested.', host);
+			}
+		}
 
-		// ---- report one: available against required ----
-		ffEl('div', 'lpn-ff-head', pc.lpn_ff_report_available || 'Available against required', host);
+		ffEl('div', 'lpn-ff-head', pc.lpn_ff_report_all || 'Every junction tested', host);
 		sorted = ffSorted(set.results);
 		shown = sorted.slice(0, FF_MAX_ROWS);
 		body = ffTable(host, [
 			pc.lpn_ff_col_junction || 'Junction',
+			pc.lpn_ff_col_static || 'Rest pressure',
 			pc.lpn_ff_col_available || 'Available',
 			pc.lpn_ff_col_required || 'Required',
+			pc.lpn_ff_col_residual || 'Residual held',
+			pc.lpn_ff_col_atrequired || 'Pressure at required',
+			pc.lpn_ff_col_affected || 'Pulled down',
+			pc.lpn_ff_col_limit || 'Design limit',
+			pc.lpn_ff_col_solves || 'Solves',
 			pc.lpn_ff_col_result || 'Result'
 		]);
 		shown.forEach(function (rec) {
 			var tr = ffEl('tr', 'lpn-ff-' + rec.state, null, body);
 			ffCell(tr, rec.id);
+			ffCell(tr, ffMaybeQty(rec.staticPressure, 'lpn_u_pressure'));
 			ffCell(tr, ffAvailableText(rec));
-			ffCell(tr, rec.required === undefined ? '' : ffQty(rec.required, 'lpn_u_flow'));
+			ffCell(tr, rec.required === undefined ? FF_DASH : ffQty(rec.required, 'lpn_u_flow'));
+			ffCell(tr, ffMaybeQty(rec.residualAt, 'lpn_u_pressure'));
+			ffCell(tr, ffMaybeQty(rec.pressureAtRequired, 'lpn_u_pressure'));
+			ffCell(tr, ffCriticalText(rec));
+			ffCell(tr, ffLimitText(rec));
+			ffCell(tr, rec.solves === undefined ? FF_DASH : String(rec.solves));
 			ffCell(tr, ffStateText(rec.state));
 		});
 		ffMoreLine(host, sorted.length - shown.length);
+	}
 
-		// ---- report two: what drawing the required flow did to everything else ----
-		ffEl('div', 'lpn-ff-head', pc.lpn_ff_report_design || 'Effect on the rest of the system', host);
-		if (!set.design) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_ff_design_off_note ||
-				'The effect on the rest of the system was not checked in this run.', host);
-			return;
+	// ---- THE RUN'S OWN DIALOG ---------------------------------------------------------------------
+	//
+	// **A SEPARATE DIALOG HOLDING THE PROGRESS, A STOP BUTTON AND NOTHING ELSE** (Tom, 2026-08-30:
+	// *"The run progress bar is so important that all applications put it in a new dialog with
+	// nothing but the progress, a stop button, and maybe some other progress stats."*). It replaces
+	// a count written into `#lpn_status`, which is the map's STANDING model-diagnostic overlay and
+	// was doing a progress dialog's job it was never built for. Tom, having used it: *"I finally
+	// noticed a yellow counter in the upper left of the map. But that is not an idiomatic run
+	// progress box."*
+	//
+	// **DETERMINATE, BECAUSE THE TOTAL IS KNOWN EXACTLY BEFORE THE FIRST SOLVE.** It counts
+	// JUNCTIONS, not solves: how many solves a junction needs is not known until it has had them,
+	// so a bar on solves would keep moving its own finish line.
+	//
+	// **AND IT NEVER SAYS HOW LONG IS LEFT.** Per-solve cost RISES through a run -- 1.1 ms a solve
+	// at 49 junctions against 31.0 ms at 225 -- so a time extrapolated from the early, cheap
+	// junctions is optimistic and gets WORSE as the run continues, which is backwards from what an
+	// estimate is for. `47 of 225` is an enumeration and is honest; a derived time is a forecast and
+	// is not. There is deliberately no hook for one.
+	//
+	// **BUILT ONCE PER RUN AND THEN ONLY UPDATED.** Rebuilding it on every junction would replace
+	// the Stop button under the user's finger, and Stop being reachable at every moment of a run
+	// that lasts minutes is the whole reason this dialog exists.
+	//
+	// It does not cover the map's answers: `onProgress` does not colour the marks in, so every mark
+	// still appears at the end and a centred dialog covers nothing that is being drawn. Nothing here
+	// forbids live colouring later -- the dialog would simply need to be smaller than the map, which
+	// it is.
+	var ffRunUi = null;
+	function ffRunBoxEl() { return document.getElementById('lpn_ff_run_box'); }
+	function openFireFlowRunBox(total) {
+		var pc = EngCalcs.pageConfig || {},
+			box = ffRunBoxEl(), host, track, buttons, h, r, top;
+		if (!box) { return; }
+		host = document.getElementById('lpn_ff_run_body');
+		if (!host) { return; }
+		host.innerHTML = '';
+		track = ffEl('div', 'lpn-ff-bar', null, host);
+		track.setAttribute('role', 'progressbar');
+		track.setAttribute('aria-valuemin', '0');
+		track.setAttribute('aria-valuemax', String(total));
+		track.setAttribute('aria-label', pc.lpn_ff_run_title || 'Fire flow run');
+		ffRunUi = {
+			total: total,
+			track: track,
+			fill: ffEl('div', 'lpn-ff-bar-fill', null, track),
+			count: ffEl('p', 'lpn-ff-summary', '', host),
+			tally: ffEl('p', 'lpn-ff-note', '', host),
+			stop: null
+		};
+		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
+		ffRunUi.stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
+		ffRunUi.stop.type = 'button';
+		ffRunUi.stop.addEventListener('click', function () { fireFlowStop = true; });
+		updateFireFlowRunBox(0, { pass: 0, fail: 0, design: 0, error: 0 });
+		box.style.display = 'block';
+		// **CENTRED THROUGH THE SAME SEAM EVERY STANDING BOX ON THIS PAGE USES** -- measured on
+		// every open rather than remembered, because the window may have changed and a box
+		// remembered off-screen is a box that never comes back. Nothing new was written for this
+		// dialog: fitPanelToViewport(), chromeFloor() and capPanelToRoomBelow() are the property
+		// popup's, Settings' and the fire flow box's own placement.
+		h = fitPanelToViewport(box);
+		r = box.getBoundingClientRect();
+		box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
+		top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
+		capPanelToRoomBelow(box, top);
+		box.style.top = top + 'px';
+	}
+	// The running tally is the sweep's own four states, counted as the records arrive. It is the
+	// "maybe some other progress stats" half of the ruling and it is the same three sentences the
+	// finished report opens with, so a reader is not learning a second vocabulary mid-run.
+	function updateFireFlowRunBox(done, counts) {
+		var pc = EngCalcs.pageConfig || {}, text;
+		if (!ffRunUi) { return; }
+		ffRunUi.fill.style.width =
+			(ffRunUi.total > 0 ? Math.round(1000 * done / ffRunUi.total) / 10 : 0) + '%';
+		ffRunUi.track.setAttribute('aria-valuenow', String(done));
+		ffRunUi.count.textContent = (pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
+			.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
+		text = (pc.lpn_ff_summary || '{pass} passing, {fail} failing, {design} with a design issue.')
+			.replace('{pass}', String(counts.pass))
+			.replace('{fail}', String(counts.fail))
+			.replace('{design}', String(counts.design));
+		if (counts.error) {
+			text += ' ' + (pc.lpn_ff_summary_error || '{n} could not be answered.')
+				.replace('{n}', String(counts.error));
 		}
-		withEffects = set.results.filter(function (r) {
-			return r.effects && (r.effects.nodes.length || r.effects.links.length);
-		});
-		if (!withEffects.length) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_ff_design_none ||
-				'Nothing in the chosen set was pulled down by any junction tested.', host);
-			return;
-		}
-		body = ffTable(host, [
-			pc.lpn_ff_col_junction || 'Junction',
-			pc.lpn_ff_col_affected || 'What it pulls down'
-		]);
-		withEffects.slice(0, FF_MAX_ROWS).forEach(function (rec) {
-			var tr = ffEl('tr', 'lpn-ff-design', null, body), parts = [];
-			// The three worst of each kind, then a count. A junction that starves half a town does
-			// not need half a town listed against its name to make the point.
-			rec.effects.nodes.slice(0, 3).forEach(function (h) {
-				parts.push((pc.lpn_ff_affect_node || '{id} down to {pressure}')
-					.replace('{id}', h.id).replace('{pressure}', ffQty(h.pressure, 'lpn_u_pressure')));
-			});
-			rec.effects.links.slice(0, 3).forEach(function (h) {
-				parts.push((pc.lpn_ff_affect_link || '{id} at {velocity}')
-					.replace('{id}', h.id).replace('{velocity}', ffQty(h.velocity, 'lpn_u_velocity')));
-			});
-			var extra = Math.max(0, rec.effects.nodes.length - 3) + Math.max(0, rec.effects.links.length - 3);
-			if (extra > 0) {
-				parts.push((pc.lpn_ff_more || 'and {n} more').replace('{n}', String(extra)));
-			}
-			ffCell(tr, rec.id);
-			ffCell(tr, parts.join('; '));
-		});
-		ffMoreLine(host, withEffects.length - Math.min(withEffects.length, FF_MAX_ROWS));
+		ffRunUi.tally.textContent = text;
+	}
+	function closeFireFlowRunBox() {
+		var box = ffRunBoxEl();
+		if (box) { box.style.display = 'none'; }
+		ffRunUi = null;
 	}
 
 	// ---- the run --------------------------------------------------------------------------------
@@ -26117,6 +26276,7 @@ var EngCalcs = EngCalcs || {};
 			minPressure = ffValue(ask.minPressure, 'lpn_u_pressure'),
 			maxVelocity = ffValue(ask.maxVelocity, 'lpn_u_velocity'),
 			design = null,
+			tally,
 			before;
 		if (fireFlowBusy) { return; }
 		if (!junctions.length) {
@@ -26156,11 +26316,14 @@ var EngCalcs = EngCalcs || {};
 		fireFlowBusy = true;
 		fireFlowStop = false;
 		fireFlowRun = null;
+		tally = { pass: 0, fail: 0, design: 0, error: 0 };
 		refreshFireFlowMarks();
 		rebuildFireFlowReport();
 		buildFireFlowControls();
-		setStatus((pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
-			.replace('{done}', '0').replace('{total}', String(ids.length)));
+		// **THE PROGRESS IS THE DIALOG'S, AND #lpn_status IS LEFT ALONE.** That box is the map's
+		// standing model diagnostic, true until the model changes; a count that ticked inside it
+		// made it look like a run indicator for as long as a sweep lasted.
+		openFireFlowRunBox(ids.length);
 
 		return EngCalcs.lpnFireFlowSweep(model, {
 			solve: engine.solve,
@@ -26172,21 +26335,22 @@ var EngCalcs = EngCalcs || {};
 			// synchronous solver in a promise chain never gives the browser a frame, so without it
 			// this text would appear once, at the end, saying it had finished.
 			onProgress: function (p) {
-				setStatus((pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
-					.replace('{done}', String(p.done)).replace('{total}', String(p.total)));
+				if (p.result && tally[p.result.state] !== undefined) { tally[p.result.state]++; }
+				updateFireFlowRunBox(p.done, tally);
 			},
 			shouldStop: function () { return fireFlowStop; }
 		}).then(function (set) {
 			fireFlowBusy = false;
 			fireFlowRun = set;
 			fireFlowDocGuard = (JSON.stringify(doc) === before);
+			closeFireFlowRunBox();
 			refreshFireFlowMarks();
 			rebuildFireFlowReport();
 			buildFireFlowControls();
-			setStatus('');
 			return set;
 		}, function (err) {
 			fireFlowBusy = false;
+			closeFireFlowRunBox();
 			buildFireFlowControls();
 			setStatus(pc.lpn_ff_err_solve || 'The network could not be worked out');
 			if (window.console && console.warn) { console.warn('fire flow sweep failed:', err); }
@@ -26224,7 +26388,7 @@ var EngCalcs = EngCalcs || {};
 		if (fireFlowBusy) { fireFlowStop = true; }
 	}
 	function wireFireFlowBox() {
-		var box = ffBoxEl(), x = document.getElementById('lpn_ff_close');
+		var box = ffBoxEl(), x = document.getElementById('lpn_ff_close'), run;
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeFireFlowBox); }
 		// Moveable and resizeable, through the same seam the property popup, Find, Settings and the
@@ -26232,6 +26396,11 @@ var EngCalcs = EngCalcs || {};
 		// borrows the touch grabber that makes that property mean anything on a phone.
 		makePanelDraggable(box, null);
 		addPanelResizeGrip(box);
+		// The run dialog is moveable and NOT resizeable: it holds a bar, two lines and a button, so
+		// there is nothing in it a reader could want more room for -- but a dialog they cannot push
+		// aside is one they cannot see the map through.
+		run = document.getElementById('lpn_ff_run_box');
+		if (run) { makePanelDraggable(run, null); }
 	}
 
 	function applySolveResult(result) {
