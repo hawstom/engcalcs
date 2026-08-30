@@ -110,6 +110,17 @@ the block.
     engines** — Demand multiplier, Specific gravity, Relative viscosity, Emitter exponent, Maximum
     trials. **Eight are carried, exported and honoured by EPANET but have NO control**, on
     CLAUDE.md's emitter-exponent precedent.
+  - **TOM'S RULING, 2026-08-29, AND IT IS BROADER THAN THE QUESTION ASKED:** *"I think that every
+    setting from EPANET must be added and implemented unless research says otherwise."* **That
+    reverses the emitter-exponent precedent as a default.** The standing shape was carry-and-hide
+    unless a setting earns a row; his shape is give-it-a-row unless research says not to. So the
+    eight carried-but-controlless `[OPTIONS]` each need either a control or a written reason, and
+    the burden of proof has moved. `Accuracy` is no longer the question — it is one instance of it.
+    - The reason NOT to give `Accuracy` a row still has to be answered rather than assumed: ours is
+      `js/lpn-solver.js`'s own convergence tolerance and EPANET's is a relative flow change summed
+      over the network, and **two rows a reader cannot tell apart is worse than one**. Under his
+      ruling that is now an argument to make in the tips, not a reason to hide the row.
+  - *(the question that ruling answers, kept for its reasoning)*
   - **[H] THE ONE QUESTION FOR TOM: does `Accuracy` earn a row?** It is on his list and it has no
     honest place beside `Convergence tolerance` directly above it — EPANET's is a relative flow
     change summed over the network, ours is `js/lpn-solver.js`'s own, and two rows a reader cannot
@@ -547,6 +558,20 @@ the block.
     cheaper than a per-row check: the Water glyph (plan sheet → drop 02:13 → tower 04:13, all on
     2026-08-25) and lat-before-lon (2026-08-24 12:48). A frame's capture time against those two
     decides whether it is current.
+  - **[H] SUPERSEDED 2026-08-29 — TOM HAS REPLACED THEM, AND HE HAD SAID SO ONCE ALREADY.** *"The
+    roadmap is stale. I told you that already. But I replaced them just for the map menu icon,
+    though that's insufficient reason, I think."* **Two things follow and they point opposite ways.**
+    (1) The glyph half of the account below is spent — do not re-report it. (2) He does not think the
+    icon alone justified the swap, so the plates were replaced on a thinner reason than the one
+    written here, and **the coordinate-order and colour-key-overlap findings below were NOT what he
+    acted on**. Somebody has to look at the current `img/0028.png`, `0043.png`, `0047.png` and say
+    which of the findings still stand against the frames now published. Until that is done, treat
+    everything under this bullet as a claim about frames that may no longer be there.
+    - **AND THE PROCESS FAILURE IS THE PART WORTH KEEPING.** This is the second time in one week
+      Tom has had to say *"I think I answered this"* about a roadmap block — Task 530 was the first,
+      on 2026-08-29. **A reply that lands in conversation and not in the file is a reply that gets
+      asked for again**, and asking a person the same question twice is the most expensive mistake
+      this project can make with the one resource it cannot buy more of.
   - **[H] THREE PUBLISHED PLATES ON `screenshots.html` ARE STALE, AND ALL THREE NEED TOM'S CAMERA.**
     `img/0028.png`, `img/0043.png`, `img/0047.png` all show the Water menu's two-hour-old drop glyph
     instead of the tower. **0028 additionally reads `Longitude:` before `Latitude:`** — a public
@@ -1071,11 +1096,19 @@ the block.
       screen — a touchscreen laptop at 1400px has a finger, a phone with a stylus does not — so a
       width-keyed assertion would prove something the code does not do.
       `dev/lpn-spike/touch-radius-harness.js` (14) states that in its own header.
-  - **[H] STILL OPEN: the long-press half, because it is not clear which "Edit mode" it means.**
-    There is no `edit` mode in `setMode()` — the modes are select, add-*, delete — and the only
-    thing called Edit mode is the saved-path editor (Task 509/510), which is entered from a button
-    and never from a press on an element. Task 192 is cited as the background and does not settle
-    it either. **One sentence from Tom naming the mode closes this.**
+  - **ANSWERED 2026-08-29, AND THE ANSWER IS THAT IT IS NOT A MODE AT ALL.** Tom: *"It seems to me
+    that long-press should initiate a drag for a node."* So the question below was malformed — it
+    asked which of the page's modes a long press enters, and his answer is that a long press starts
+    a DRAG, the same gesture a pointer gets from press-and-move. That is a touch-parity fix, not a
+    mode change, and it needs no `edit` in `setMode()`.
+    - What it must not break: the touch radius work that shipped 2026-08-28 (`NODE_SNAP_TOUCH_PX`
+      24, `tapSlopPx(e)` per `e.pointerType`, `touchAssetNear()` as a TOUCH-ONLY fallback that can
+      add a hit and never overrule one). A long press that begins a drag has to agree with the tap
+      that would have selected the same node, or a finger gets two different answers from one dot.
+    - And it must not collide with the path editor's own handles (Task 509), where a drag on a
+      handle re-routes and the map deliberately drags nothing else while that is on.
+  - *(Superseded: the block used to say this was blocked because no `edit` mode exists in
+    `setMode()`. True, and beside the point — it was blocked on a question with a false premise.)*
 
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
   Tom, 2026-08-26, with a screenshot of two node labels whose leaders cross: *"This might be
