@@ -33,7 +33,12 @@ if (stristr($_SERVER["SCRIPT_NAME"], basename(__FILE__))!==false) {
 
 // Array definition of language_settings
 $all_language_settings = array();
-// You have to add each language to Language.Settings.php, and config.inc.php VALID_LANGUAGES constant.
+// A language is added HERE and nowhere else. (Corrected: this line used to send you on to a
+// "config.inc.php VALID_LANGUAGES constant", which does not exist and is referred to nowhere else
+// in the suite -- so the one thing it told you to do could not be done. This array IS the registry:
+// chooseLanguage() accepts a code iff it is a key of it, and the language menu, the hreflang
+// alternates and the sitemap are all built by iterating it.) It must list exactly the
+// lib/lang.ec.??.php files that exist; dev/scripts/language_declaration_check.php holds that.
 //
 // QUALITY is this app's own preference weight for a language, multiplied against the browser's q-value
 // when choosing the best language match from Accept-Language. 1.0 = fully translated, well-maintained.
