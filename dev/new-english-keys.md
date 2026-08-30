@@ -12,10 +12,10 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**72 still to read**, of 164 untranslated keys, of 1479 English keys. A key already marked _Ruled OK_ below needs nothing from you —
+**76 still to read**, of 168 untranslated keys, of 1483 English keys. A key already marked _Ruled OK_ below needs nothing from you —
 the ruling lapses by itself if the wording changes.
 
-## lpn_  (164)
+## lpn_  (168)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -276,11 +276,19 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_georef_twopt_tip`**
   > Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.
   _Ruled OK 2026-08-29._
+- **`lpn_inp_drop_energy`**
+  > This file says what the pumps cost to run. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.
 - **`lpn_inp_drop_quality_options`**
   > This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.
+- **`lpn_inp_drop_report`**
+  > This file holds EPANET's own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.
 - **`lpn_inp_drop_rules`**
   > This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.
   _Ruled OK 2026-08-29._
+- **`lpn_inp_drop_sections`**
+  > This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.
+- **`lpn_inp_drop_tags`**
+  > This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.
 - **`lpn_menu_map`**
   > Map
   _Ruled OK 2026-08-29._

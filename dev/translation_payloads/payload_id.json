@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1479,
-        "delta_key_count": 165,
+        "expected_key_count": 1483,
+        "delta_key_count": 169,
         "exempt_key_count": 34,
         "exempt_keys": [
             "u_imgd",
@@ -520,6 +520,10 @@
         "lpn_new_place_hint": "Petaluma, California",
         "lpn_new_create": "Create",
         "lpn_inp_drop_rules": "This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_energy": "This file says what the pumps cost to run. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_tags": "This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_report": "This file holds EPANET's own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
         "lpn_inp_drop_quality_options": "This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
@@ -687,6 +691,10 @@
         "lpn_new_place_hint": "Petaluma, California",
         "lpn_new_create": "Create",
         "lpn_inp_drop_rules": "This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_energy": "This file says what the pumps cost to run. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_tags": "This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_report": "This file holds EPANET's own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
         "lpn_inp_drop_quality_options": "This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
@@ -1859,6 +1867,70 @@
                 }
             }
         },
+        "lpn_inp_drop_energy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_quality",
+                    "value": "Pengaturan kualitas air, reaksi kimia, dan energi pompa tidak disertakan. Halaman ini hanya menyelesaikan debit dan tekanan.",
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_backdrop",
+                    "value": "Berkas ini menyebut sebuah gambar latar tetapi tidak berisi gambar itu sendiri. Tambahkan sendiri melalui File, Gambar latar, Tambah gambar.",
+                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                }
+            }
+        },
+        "lpn_inp_drop_tags": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_quality",
+                    "value": "Pengaturan kualitas air, reaksi kimia, dan energi pompa tidak disertakan. Halaman ini hanya menyelesaikan debit dan tekanan.",
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_backdrop",
+                    "value": "Berkas ini menyebut sebuah gambar latar tetapi tidak berisi gambar itu sendiri. Tambahkan sendiri melalui File, Gambar latar, Tambah gambar.",
+                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                }
+            }
+        },
+        "lpn_inp_drop_report": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_quality",
+                    "value": "Pengaturan kualitas air, reaksi kimia, dan energi pompa tidak disertakan. Halaman ini hanya menyelesaikan debit dan tekanan.",
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_backdrop",
+                    "value": "Berkas ini menyebut sebuah gambar latar tetapi tidak berisi gambar itu sendiri. Tambahkan sendiri melalui File, Gambar latar, Tambah gambar.",
+                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                }
+            }
+        },
+        "lpn_inp_drop_sections": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_quality",
+                    "value": "Pengaturan kualitas air, reaksi kimia, dan energi pompa tidak disertakan. Halaman ini hanya menyelesaikan debit dan tekanan.",
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_backdrop",
+                    "value": "Berkas ini menyebut sebuah gambar latar tetapi tidak berisi gambar itu sendiri. Tambahkan sendiri melalui File, Gambar latar, Tambah gambar.",
+                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                }
+            }
+        },
         "lpn_inp_drop_quality_options": {
             "reason": "missing",
             "current_value": null,
@@ -1866,7 +1938,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "Pengaturan kualitas air, reaksi kimia, dan energi pompa tidak disertakan. Halaman ini hanya menyelesaikan debit dan tekanan.",
-                    "english": "This file describes how the water quality changes as it travels, or what the pumps cost to run. That part was left out. This page solves flow and pressure only."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
