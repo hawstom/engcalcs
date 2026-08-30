@@ -301,3 +301,26 @@ Reasoning, from this seat:
   the fix that is being made — stop it stealing focus, stop it outliving its own box — is the whole
   fix. **This is a case of "it is fine, just stop it doing the wrong extra thing," not a case for a
   new mechanism** (per my brief's own instruction that this is as valid a finding as a new want).
+
+## 2026-08-30 — Tom overruled my progress-box placement, and the shape of the error
+
+**CITED (Tom, 2026-08-30):** *"The utility engineer is wrong. The run progress bar is so important
+that all applications put it in a new dialog with nothing but the progress, a stop button, and maybe
+some other progress stats."*
+
+I had recommended putting the fire-flow sweep's progress inside `#lpn_ff_box` — the box the user had
+already opened — because it is already centred, already draggable, and already nearly full-screen on
+a phone. Every one of those observations is true and none of them was the question.
+
+**The reasoning error, stated so a later invocation can recognise it in itself:** I asked *where can
+this go with the least change* and presented the answer as though I had asked *what kind of object is
+this*. A run-progress indicator for a wait of minutes is its own dialog in nearly every application
+that has one, and that convention is stronger evidence than the convenience of a box that happened to
+be open. **I had EPANET's own separate Run Status window in my own citations** and read it only as
+evidence against the map corner, when it was equally evidence for a dialog of its own. A citation
+that supports two conclusions and is quoted for one of them is a citation half read.
+
+**What survives, untouched by the ruling:** no time estimate on this run, ever. That argument is from
+Task 530's measured per-solve cost RISING through a run (1.1 -> 31.0 ms, 49 to 225 junctions), so an
+ETA from the early junctions is optimistic and gets worse as the run continues. It is an argument
+about the numbers, not about placement, and Tom did not touch it.

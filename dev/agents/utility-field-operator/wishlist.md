@@ -79,8 +79,31 @@ building `lpn_` toward being a field tool it structurally is not, and I disagree
   row exists to record that I checked, rather than assumed, and found the existing tool adequate
   for the narrow slice of my job a hydraulic model could ever serve.
 
-### 4. The fire-flow sweep's progress belongs inside the box the user already opened, not the map's
-   standing diagnostic corner — count and pass/fail tally, never a time estimate
+### 4. The fire-flow sweep needs a real run-progress DIALOG — Tom overruled the placement I proposed
+
+- **TOM'S RULING, 2026-08-30, and it goes against this row's own recommendation:** *"The utility
+  engineer is wrong. The run progress bar is so important that all applications put it in a new
+  dialog with nothing but the progress, a stop button, and maybe some other progress stats."*
+  **A SEPARATE DIALOG, holding progress, Stop, and nothing else.** This row had argued for putting
+  the progress inside `#lpn_ff_box`, the box the user already opened, on the reasoning that it is
+  already centred, already draggable, and already nearly full-screen on a phone. That reasoning is
+  not wrong about the box; it is wrong about what a run-progress indicator IS. It is its own thing,
+  and the convention is near-universal — which this seat should have weighted far more heavily than
+  the convenience of reusing a box that happened to be open.
+- **The error worth carrying forward, so a later invocation does not repeat its SHAPE:** I reasoned
+  from what already existed on screen toward the cheapest place to put a thing, and called that a
+  design answer. **"Where can this go with least change" is not the same question as "what is this
+  object."** EPANET's own Run Status window was in my own citations as a separate non-modal dialog
+  and I read it as precedent for "not the map corner" when it was equally precedent for "a dialog
+  of its own".
+- **WHAT SURVIVES, and Tom did not touch it: NO TIME ESTIMATE, EVER, on this run.** See the bullet
+  below — it is an argument from Task 530's own measured numbers, not from placement, so the ruling
+  above leaves it standing. The dialog carries a determinate bar on `done/total` junctions and the
+  running pass/fail/error tally, and no forecast.
+- *(Superseded, recorded so the reasoning is not re-derived: this row used to propose
+  `#lpn_ff_box`'s own body as the home for the progress, with Stop kept above the criteria form.)*
+
+#### The original case, kept for the parts that still hold
 
 - **What:** move the whole-system fire-flow sweep's progress (Task 530) out of `#lpn_status`
   (`js/looped-network.js:24945-24957`), the map's standing model-diagnostic overlay, and into

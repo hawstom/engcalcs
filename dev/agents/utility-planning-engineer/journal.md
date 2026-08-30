@@ -14,6 +14,164 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-08-30 — Task 530 shipped: Tom's three post-ship questions, sourced
+
+`js/looped-network.js:25674` ships `maxVelocity` default 5 ft/s with the comment *"5 ft/s is the
+velocity most agencies write into a fire-flow criterion"* (OBSERVED). Tom asked whether that
+number is right and whether 10 ft/s (his own guess) would be better. Went and checked.
+
+### Q1 — the 5 ft/s default is low against every FIRE-FLOW-SPECIFIC number I could source; recommend 10 ft/s
+
+**CITED — City of Vacaville, CA, "Fire Flow Information"** (cityofvacaville.gov, search-synthesis
+only — the page 403'd on direct fetch, so treat as secondary though the same figure recurred
+verbatim across two independent search passes): *"all fire flows are based on a required minimum
+residual pressure of 20 psi and a maximum pipe velocity of 10 feet per second."* This is a
+fire-flow-condition velocity, stated beside the pressure criterion the way ours is.
+**CITED — Rancho California Water District's own design specifications PDF** (pacificpipeline.com
+mirror, search-synthesis only, the PDF would not render through either WebFetch or a local reader):
+*"during maximum day demand plus fire flow conditions, velocity in distribution pipelines and
+service laterals shall be no more than 15 feet per second."*
+**CITED, primary text, fetched directly and read in full — San Bernardino County Special
+Districts, "Standards for Domestic Water Systems," §1.7.01 (2020 revision,
+`specialdistricts.sbcounty.gov`):** *"The velocity of the water in the pipe shall be limited to
+8-feet per second maximum, except in hydrant branch lines."* This is the one primary document I
+could actually read end to end. Two things matter about it: (a) it is 8 ft/s, not 5 — still above
+our shipped default — and (b) it governs sizing for THREE conditions at once (peak hour, peak day
++ fire flow, nighttime replenishment), i.e. it is a general design velocity, not fire-flow-specific,
+**and it explicitly EXEMPTS hydrant branch lines from the limit** — the one place a pipe is
+expected to carry a fire flow, the standard declines to cap velocity at all. That is direct
+evidence the general "5-8 ft/s for normal operation" number and the "what's tolerable for the
+duration of a fire" number are different questions, and conflating them is very likely how a 5
+ft/s got written into our own comment — 5 ft/s is squarely a NORMAL-operation number (Crane
+Technical Paper 410's "reasonable velocities... up to 7 ft/sec," WMWD's 5.0 fps for minimum-hour
+demand per search synthesis), not one I found any fire-flow-specific source using.
+**CITED — NFPA 14 (standpipes), search-synthesized via a secondary blog, not fetched primary:**
+"permits velocities up to 20 ft/s... a mandatory requirement," offered only as the outer bound of
+what fire-protection piping standards (as opposed to distribution-main standards) tolerate; NFPA 24
+(fire mains) itself carries no mandatory ft/s limit in this same secondary source, only a
+non-binding 10 psig velocity-pressure annex note.
+**NOT FOUND: a published numeric default for WaterCAD's or InfoWater's fire-flow velocity
+constraint.** Both vendors' own help pages (`docs.bentley.com`, `help.autodesk.com`, both fetched
+directly) confirm the CONTROL exists — "Velocity Limit... constrains pipes with options for No
+Pipes, Connecting Pipes, or Entire Network" (round 4 entry, already on file) — but neither publishes
+a shipped default value in the pages I could reach. Say plainly: I did not find it, not "it doesn't
+exist."
+
+**Recommendation: raise the default from 5 to 10 ft/s.** Every fire-flow-specific number I could
+source clusters 8–15 ft/s (Vacaville 10, Rancho 15, San Bernardino's general-but-branch-exempt 8),
+and Tom's own guess sits in the middle of that range rather than at either end. 5 ft/s is not
+supported by any fire-flow-specific citation found this pass; it reads like the ordinary
+normal-operation design velocity, mis-carried into the fire-flow test. This is a one-constant
+change (`js/looped-network.js:25683`) — not proposing it myself, since the code and its comment
+are Tom's/the project's to change, but the sourcing supports his instinct over the shipped number.
+
+### Q2 — the one-wide-table market convention is real and confirmed at the vocabulary level, not the pixel level; recommend collapsing our two reports
+
+**CITED, primary text fetched directly, `help.autodesk.com` "Fireflow Run Results" (InfoWater
+Pro):** the vendor ships (at least) FOUR separate predefined report shapes — Standard, **Design**,
+Extended Time, and Conditions — and the **Design Fireflow Report is already the wide, one-run,
+both-halves table** Tom's screenshot resembles: `ID, Capacity Assessment (PASS/FAIL), Total
+Demand, Hydrant Available Flow, Critical Node ID for Design Run, Critical Node Pressure at
+Available Flow, Critical Node Pressure at Fire Demand, Critical Pressure for Design Run, Hydrant
+Design Flow, Hydrant Pressure at Design Flow, Critical Node Pressure at Design Flow, [optional]
+Critical Pipe ID / Velocity for Design Run`. That is available-flow AND design-flow, one row, one
+run — exactly what our own round-3 finding already recorded the market doing, now with the actual
+column list behind it.
+**What "Critical Asset" and "Design constraint" MEAN, sourced:** "Critical Node ID for Design Run"
+is *"the node within the Critical Node Searching Range with the lowest pressure when the current
+nodal junction is loaded with the total demand"* — i.e. not the hydrant under test, but whichever
+OTHER junction the fire flow hurts worst. That is our own "collateral effect" concept
+(`dev/fireflow-analysis-plan.md`, still on the `fire-flow` branch per Task 530's block) with a
+name. "Design constraint" I could not find as a literal InfoWater column header — the nearest is
+"Critical Pressure for Design Run" (the minimum pressure the constraint enforces) alongside a
+`Capacity Assessment` PASS/FAIL that is itself silent on WHICH constraint bound (pressure vs.
+velocity vs. minimum-system-pressure) — so if Tom's screenshot literally reads "Design constraint"
+as a named column, **that is likely a newer or third-party UI I could not independently source**;
+flag as unconfirmed rather than claim InfoWater's own pages showed it to me.
+**CITED — Autodesk's own "One Water Blog," 9 Jan 2026, "Make smarter asset decisions and get
+better fire flow insights in InfoWater Pro 2026.2"** (title and existence confirmed by two
+independent search passes; the page itself 403'd on direct fetch, so the column-level detail below
+is search-synthesis, not primary-read): a **"Criticality Analysis module"** shipped as a technical
+preview in January 2026, tied to *"Asset Impact Reporting"* — *"reports that summarize the impact
+of each asset in the system, as experienced across all simulated hydrant fire flow conditions."*
+This is very likely the actual source of Tom's screenshot — it is recent enough (this month, by
+this suite's own clock) that it postdates every InfoWater page this seat had already read as of
+the 2026-08-27 round-4 entry, which explains why "Critical Asset" as a literal column wasn't found
+in the older help pages. **Not fully confirmed — the exact column layout in the 2026.2 UI is not
+something I could read directly** — but the concept (asset-level criticality rolled up across a
+whole sweep, not just per-junction) is real, named, and shipped this year.
+**Iterations — worth showing, cautiously.** WaterGEMS's own help (search-synthesis via a secondary
+mirror of Bentley's Automated Fire Flow Results wiki page) defines it plainly: *"the number of
+iterations required to hone in on the fire flow result"* via *"a series of steady-state
+analyses."* Ours (`js/lpn-fireflow.js`, `LOSS_ACCOUNTING = 'raw-node'`, OBSERVED, Task 530 block)
+is a bisection with a known, bounded solve count per junction — showing it is honest and cheap,
+and it is exactly the kind of number an engineer reading a submittal would use to sanity-check
+that a run actually converged rather than hit a solver's iteration cap. It is not noise if it is
+labelled as "how many trial flows this junction took," which is a fact about the SOLVE, not a
+result the engineer is meant to act on directly — same status as our own transparency ruling on
+`LOSS_ACCOUNTING` (Task 530 block, OBSERVED).
+**A row that fails before an available flow is found:** none of the vendor pages I read describe
+this explicitly, but the shape of `Capacity Assessment: FAIL` plus a populated `Total Demand` and
+an EMPTY or zeroed `Hydrant Available Flow`/`Hydrant Design Flow` is the only internally
+consistent reading of a PASS/FAIL column sitting beside flow columns that can be null — worth
+naming as SPECULATION, mine, re-derive before relying on it: a table row should show what WAS
+computed (pressure at the tested demand) and blank, not zero, whatever bisection never reached.
+
+**Say plainly: yes, collapse the two reports into one wide table.** The market's own convention
+(InfoWater's "Design Fireflow Report") is a single row per junction carrying both halves — exactly
+what Task 530's round-3 entry already recorded and what our own engine already computes in one run
+at zero extra cost (Task 530 block, "THE DESIGN HALF COSTS ZERO EXTRA SOLVES"). Splitting into two
+reports when the underlying computation is already unified is presenting our own architecture to
+the reader instead of the answer they came for. **Vocabulary is ours to write, not theirs**
+(CLAUDE.md `lpn_` section) — "Critical Asset" reads as ours already under a different name (the
+junction the design half most affects), and the constraint that bound (pressure vs. velocity) is
+already a value we compute and could simply state in a column rather than name after a market
+term I could not confirm at the pixel level.
+
+### Q3 — InfoWater's Domain is real, user-created, and NOT a default "everything starts here" bucket; Tom's Domain1 assumption is not supported by what I could read
+
+**CITED, primary text fetched directly, `help.autodesk.com` Fireflow page (already on file from
+round 4):** the Critical Node Searching Range control's fourth choice is literally named "Domain
+Nodes," with the note *"The domain option will be available only when a domain has already been
+created."* That sentence is the whole finding: a Domain does not pre-exist. There is no
+"Domain1" a network starts in — the option is grayed out/absent until the user has made one.
+**CITED, search-synthesis of Innovyze's own forum + help pages (`forums.innovyze.com`,
+`help.innovyze.com`, both blocked on direct fetch — Confluence/JS-rendered pages returned no text
+to WebFetch, so this is secondary):** a Domain is a **user-named, user-created subset of network
+elements**, built from one of six sources — *"Map Selection, DB Query, Query Set, Selection Set,
+Special Query and/or Network"* — and used for two things: **bulk Group Editing** ("assigning
+values globally on the fly") and **scoping an analysis** (the fireflow searching-range option
+above, plus a separate "Run Fireflow on Domain Only" checkbox that limits which hydrants get
+TESTED, not just which nodes get checked for collateral damage). A **Selection Set** is a flatter,
+static sibling — *"essentially just a list of element IDs"* — that a Domain can be built FROM.
+**Tom's assumption is corrected, gently: everything is NOT initially in a Domain1.** The
+documented behavior is the opposite — nothing is in any domain until a user deliberately builds
+one, and the UI's own domain-scoped options are simply unavailable (not "select all," not a
+default) in the meantime. This is a meaningful difference from his mental model and worth
+recording exactly because he can't check it himself (standing brief).
+
+**My own judgment on whether to build this, ranked LOW, willing to say so plainly:** a Domain is
+two things bundled — (1) a NAMED, SAVED selection, and (2) that selection used as a SCOPE for an
+analysis or a bulk edit. This suite already has half of (1) — `js/looped-network.js`'s Find panel
+has a live query language (OBSERVED, referenced in prior wishlist entries on this page) — and all
+of (2) informally, since a fire-flow sweep already takes an explicit node list rather than always
+running on the whole document (`js/lpn-fireflow.js`, OBSERVED, "a chosen set of junctions"). What
+InfoWater's Domain adds beyond that is exactly the piece Task 530 deliberately left out and named
+its reason for leaving out: **"a per-junction requirement... is a table of criteria"** and no named,
+reusable, SAVED selection object exists yet to hang such a table off of. So the real gap a Domain
+concept would answer here is not "how do I run fire flow on a subset" (already possible) but "how
+do I NAME and REUSE a subset across runs, group edits, and reports without re-selecting it every
+time" — which is a much smaller, more honest ask than "build Domains." **At this suite's own
+stated ~10-20 node target scope** (`dev/looped-network-calculator-scope.md`, OBSERVED, cited
+before), a saved-selection-as-a-named-set is a real, if modest, want; a full multi-method
+Domain-builder (six creation paths, a Domain Manager dialog, group-edit wiring) is InfoWater-scale
+tooling for InfoWater-scale models, and I would not build the general version here. **Ranking my
+own find low relative to Task 530's own open items** — it is a nice-to-have that would make a
+future named-selection feature (if one is ever wanted) slightly better scoped, not something I'd
+put ahead of anything already queued.
+
+---
+
 ## 2026-08-29 — Wish-list Row 1 designed: the undesigned piece (override × multiplier) answered
 
 Row 1's own honest gap — "not designed: the UI decision of how it interacts with a node's own

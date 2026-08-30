@@ -292,6 +292,31 @@ declined to become) than the rows above answer of theirs.
 - **Size:** believed small — the data already exists in the document's own coordinate system; this
   is serialization, not new geometry. Not designed.
 
+### 6. Collapse the fire-flow box's two reports into one wide table — added 2026-08-30
+
+Tom's own competitor screenshot, and my own research answering it: `dev/agents/utility-planning-engineer/journal.md`,
+2026-08-30 entry, Q2. **CITED, `help.autodesk.com` "Fireflow Run Results" (InfoWater Pro), fetched
+directly:** the vendor's own "Design Fireflow Report" is already a single wide table carrying both
+available-flow and design-flow columns per junction, in one row. **OBSERVED,** our own engine
+(`js/lpn-fireflow.js`, Task 530 block) already computes both halves in one run at zero extra
+solves — so presenting them as two reports is showing the reader our architecture rather than the
+answer they came for.
+
+- **What:** one results table per sweep, columns roughly: junction ID, initial pressure, fire flow
+  available, fire flow needed, pressure at available flow, fire flow at design, pressure at design,
+  the collateral-effect junction and its bound (our own words for InfoWater's "Critical Node"/
+  "Critical Pressure for Design Run" concepts — CLAUDE.md `lpn_` vocabulary rule), solve count (our
+  bisection's own iteration count, honest and cheap to show), and the four-state verdict
+  (`pass`/`fail`/`design`/`error`) already computed by the engine.
+  A row that never reached an available flow shows what WAS computed and blanks what wasn't,
+  rather than a misleading zero — **SPECULATION, mine**, no vendor page described this case
+  explicitly; re-derive before relying on it.
+- **Size:** believed SMALL relative to Task 530 itself — the computation already exists
+  (`LOSS_ACCOUNTING`, both result halves per junction, Task 530 block, OBSERVED); this is a results
+  presentation change, not a new solve. Not designed at the pixel level.
+- **Rank:** above item 5, below items 1-2 — it responds to something Tom is actively looking at
+  (his own screenshot), and it is cheap because the hard part (the unified solve) already shipped.
+
 ---
 
 ## Rule-based controls — a fair challenge answered, not proposed as a row
@@ -430,6 +455,18 @@ it; a parked row is one Tom already grants has some value but is not prioritizin
   which `dev/looped-network-calculator-scope.md` cuts outright for reasons (no CRS, no shapefile
   import) that apply here word for word. If that scope cut is ever revisited, this is the row that
   would follow it.
+
+- **A named, saved, reusable selection ("Domain-lite") — researched 2026-08-30 answering Tom's
+  Autodesk-domain question, and I rank it LOW myself.** Full case: journal, 2026-08-30 entry, Q3.
+  InfoWater's Domain is two things bundled: a saved subset of elements, and that subset used to
+  scope an analysis or bulk edit. This suite already has the query half (the Find panel's live
+  query language) and already lets a fire-flow sweep take an explicit node list — what is missing
+  is only naming and REUSING a selection across runs without re-picking it. That is a small,
+  honest want next to the six-method Domain Manager InfoWater actually ships, which is
+  InfoWater-scale tooling for InfoWater-scale models and not something I'd build at this suite's
+  own ~10-20 node target scope. Parking rather than declining because Task 530's own per-junction
+  criteria table (deliberately left out, per the round-4 block) would be a natural first consumer
+  of a named set, if that table is ever built.
 
 ---
 
