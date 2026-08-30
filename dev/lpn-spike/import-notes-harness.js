@@ -208,6 +208,41 @@ console.log('\n2. The property popup reads the note back as a sentence');
 			popupText('node', clean).indexOf('This file was imported from EPANET. Some information here was not imported.') < 0, clean.id);
 	}
 }
+// **AND A PROJECT THAT ALREADY HAS THE NOTE STOPS SHOWING IT.** This is the half section 1 cannot
+// reach: it imports fresh every time, so a filter that ran only at import passed there while every
+// network already on disk kept its note. Tom, 2026-08-29, after the import-time filter shipped:
+// *"Node 15 has not changed. It still has the note."*
+//
+// So the note is put on the element BY HAND, the way an older document carries it, and the popup is
+// rendered. The record must survive -- it is the document's -- and the sentence must not appear.
+{
+	console.log('\n2b. A document saved with good news on it stops showing it');
+	const { doc } = importDoc(LOSSES_INP, 'losses.inp');
+	const target = doc.nodes[0];
+	target.importNotes = [{ code: 'demand-pattern', detail: '3' }];
+	L.applySaved(L.migrateSaved(JSON.parse(JSON.stringify(doc))));
+	L.buildDom();
+	const fields = L.popupFields();
+	fields.innerHTML = '';
+	L.renderNodeFields(target.id);
+	const text = fields.textContent;
+	ok('the stored note is still on the element', (L.nodeById(target.id).importNotes || []).length === 1,
+		JSON.stringify(L.nodeById(target.id).importNotes));
+	ok('...and the popup shows no sentence for it',
+		text.indexOf(L.inpDropText('demand-pattern')) < 0, JSON.stringify(text.slice(-200)));
+	ok('...and grows no empty heading over nothing',
+		text.indexOf('This file was imported from EPANET') < 0, JSON.stringify(text.slice(-200)));
+	// The other half of the same rule: a REAL loss on the same element still shows.
+	L.nodeById(target.id).importNotes = [{ code: 'demand-pattern', detail: '3' },
+		{ code: 'emitters-not-editable', detail: null }];
+	fields.innerHTML = '';
+	L.renderNodeFields(target.id);
+	const both = fields.textContent;
+	ok('a real loss beside it is still shown',
+		both.indexOf(L.inpDropText('emitters-not-editable')) >= 0, JSON.stringify(both.slice(-200)));
+	ok('...and the good news beside THAT is still not',
+		both.indexOf(L.inpDropText('demand-pattern')) < 0);
+}
 done('the popup composes the sentence');
 
 // ---------------------------------------------------------------------------

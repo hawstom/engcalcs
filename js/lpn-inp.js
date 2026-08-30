@@ -1110,6 +1110,13 @@
 		'valve-tcv': 1,        // Task 248 phase 2: a throttle valve is a throttle valve; either solver.
 		'valve-active': 1      // ...and PRV/PSV/FCV come in whole and route to the EPANET engine.
 	};
+	// **THE FILTER RUNS AT DISPLAY TIME AS WELL, and that is the half that matters to anybody who
+	// already has a project.** A note is written into the document at import, so filtering only here
+	// fixes the next import and leaves every network already on disk wearing the note it was given.
+	// Tom, 2026-08-29, having reloaded: *"Node 15 has not changed. It still has the note."* The
+	// record is kept -- it is the document's, and a later feature may make it a loss again or make
+	// it good news -- and the popup simply does not compose a sentence for it.
+	EngCalcs.lpnInpNoteIsLoss = function (code) { return !LPN_INP_NOT_A_LOSS[code]; };
 	EngCalcs.lpnInpNotes = function (dropped, group) {
 		var byId = {};
 		(dropped || []).forEach(function (d) {

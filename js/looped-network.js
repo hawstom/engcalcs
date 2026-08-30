@@ -22790,6 +22790,12 @@ var EngCalcs = EngCalcs || {};
 	// whatever language its reader is using, and the popup and the report can never drift apart.
 	function importNotesField(fields, el) {
 		var pc = EngCalcs.pageConfig || {}, notes = el && el.importNotes;
+		// **FILTERED HERE TOO, NOT ONLY AT IMPORT.** A document already on disk carries whatever
+		// notes it was given, so a code that has stopped being a loss has to stop being SHOWN, not
+		// merely stop being written. One list, in js/lpn-inp.js, asked at both ends.
+		if (notes && notes.length && EngCalcs.lpnInpNoteIsLoss) {
+			notes = notes.filter(function (nt) { return EngCalcs.lpnInpNoteIsLoss(nt.code); });
+		}
 		if (!notes || !notes.length) { return; }
 		var head = document.createElement('div');
 		head.style.marginTop = '8px';
