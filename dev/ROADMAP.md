@@ -243,6 +243,25 @@ the block.
       harnesses assert the document is byte-identical across a whole run.
     - Interruptible: it yields a macrotask between junctions, so the progress line paints and Stop
       answers; closing the box stops a run and a stopped sweep keeps what it had.
+  - **THE RUN NEEDS A PROGRESS DIALOG OF ITS OWN — Tom, 2026-08-30**, overruling the field
+    operator's recommendation that it live inside the fire-flow box: *"The run progress bar is so
+    important that all applications put it in a new dialog with nothing but the progress, a stop
+    button, and maybe some other progress stats."* **A separate dialog: progress, Stop, nothing
+    else.** What ships today is a count in `#lpn_status`, the map's STANDING model-diagnostic
+    overlay — a box documented in its own code as true-until-the-model-changes, doing a progress
+    dialog's job it was never built for. Tom, having used it: *"I finally noticed a yellow counter
+    in the upper left of the map. But that is not an idiomatic run progress box."*
+    - **NO TIME ESTIMATE, EVER, and this survives the ruling because it is an argument about the
+      numbers rather than about placement.** Per-solve cost RISES through a run — 1.1 ms at 49
+      junctions, 31.0 ms at 225 — so an ETA extrapolated from the early, cheap junctions is
+      optimistic and gets WORSE as the run continues, which is backwards from what an estimate is
+      for. `47 of 225` is an enumeration and is honest; a derived time is a forecast and is not.
+      Do not add one later as an improvement.
+    - Determinate bar on `done/total` (known exactly before the first solve), plus the running
+      pass/fail/error tally the sweep already holds.
+    - **AND THE MAP DOES NOT COLOUR IN LIVE TODAY** — `onProgress` never calls
+      `refreshFireFlowMarks()`, so every mark appears at the end. Worth knowing before anyone
+      argues about what a centred dialog would cover up: today it would cover nothing.
   - **59 new `lpn_ff_*` keys await Tom's wording**, nine reused verbatim from the branch. Two want his
     eye first: `lpn_ff_accounting`, the sentence that discharges the transparency ruling, and the
     three `state_*` words the map legend and both reports all share.
