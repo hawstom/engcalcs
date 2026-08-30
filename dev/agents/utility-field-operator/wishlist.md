@@ -79,6 +79,30 @@ building `lpn_` toward being a field tool it structurally is not, and I disagree
   row exists to record that I checked, rather than assumed, and found the existing tool adequate
   for the narrow slice of my job a hydraulic model could ever serve.
 
+### 4. The fire-flow sweep's progress belongs inside the box the user already opened, not the map's
+   standing diagnostic corner — count and pass/fail tally, never a time estimate
+
+- **What:** move the whole-system fire-flow sweep's progress (Task 530) out of `#lpn_status`
+  (`js/looped-network.js:24945-24957`), the map's standing model-diagnostic overlay, and into
+  `#lpn_ff_box` itself — a determinate bar on `done/total` junctions, the running pass/fail/error
+  tally, Stop kept visible above the criteria form. Full reasoning and citations: journal,
+  2026-08-30.
+- **Why I rank it, and why not higher:** this is Tom's own report from using the page
+  (*"they should appear in the middle of the current task with a progress bar"*), on a feature that
+  shipped 2026-08-29 and is already measured to run nearly two minutes at 225 junctions — a wait
+  long enough that NN/g's own 10-second threshold for showing progress is not a close call here.
+  It is narrow in scope (one box, one run) and cheap relative to most of this suite's other open
+  work, which is why it sits at #4 rather than above my existing #1–3 — those concern whether this
+  project should build for my seat at all; this one is a small, concrete UI fix inside a feature
+  that already exists and that Tom already used and reported on directly.
+- **The one non-negotiable part of the fix, from this seat: no time estimate, ever, on this run.**
+  Task 530's own measured numbers show per-solve cost RISING through the run (1.1 → 31.0 ms, 49 to
+  225 junctions) — an ETA extrapolated from the early, cheap junctions would be optimistic and get
+  WORSE as the run continued, which is backwards from every user's expectation of a progress
+  estimate and would teach them to distrust the box. A plain junction count (`47 of 225`) is honest
+  because it is an enumeration, not a forecast; a derived time is not, and should not be added even
+  as a later "improvement."
+
 ## Parked
 
 *(none yet)*

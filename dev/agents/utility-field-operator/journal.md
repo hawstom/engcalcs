@@ -165,3 +165,139 @@ suite's own 300 km scope — the ones still on paper tie cards — where `lpn_`'
 reached a phone, would not be competing with anything better. That is a real but narrow case, and
 it argues for the cheapest possible shape (a read-only link) sized honestly to it, not for solving
 the general "phone reaches PC's model" problem Task 537's title states.
+
+## 2026-08-30 — Q1: the fire-flow run-progress box, from someone who has to wait for it
+
+Tom, using the whole-system sweep (Task 530, `js/lpn-fireflow.js`) on 2026-08-29: *"There is no
+progress line... I finally noticed a yellow counter in the upper left of the map. But that is not
+an idiomatic run progress box. They should appear in the middle of the current task with a progress
+bar."*
+
+**OBSERVED, what he saw:** the progress text is written by `setStatus()`
+(`js/looped-network.js:24945-24957`) into `#lpn_status`, an overlay CSS-pinned "under a top
+corner" (`js/looped-network.js:24956`, comment). That element's OWN authored purpose is a
+*standing* diagnostic — "true until the model changes" (`js/looped-network.js:24915-24917`) — not
+a transient task's progress, and Task 524's own comment already flags it as marginal on a phone:
+*"harmless in a desktop corner and is a quarter of the canvas on a phone, sitting on the network"*
+(`css/engcalcs.css:2537-2539`). The sweep's `onProgress` callback
+(`js/looped-network.js:26103-26112`) drives this same corner box with `{done} of {total}` text and
+nothing else — no bar element, no percentage, no visual weight proportional to how much is left.
+**Tom is right that this is a diagnostic banner doing a progress dialog's job, not an idiomatic
+progress box**, and the CSS comment shows the project already knew that shape strains on a phone
+before this reuse ever happened.
+
+**OBSERVED, where "the current task" already lives:** the fire-flow box itself
+(`#lpn_ff_box`, opened by `openFireFlowBox()`, `js/looped-network.js:26137-26155`) is the thing the
+user deliberately opened to set criteria and press Run — Run and Stop already live inside it
+(`js/looped-network.js:25860-25871`), it is user-positioned (centred on open, then draggable/
+resizable — the box borrows `.lpn-setbox`'s chrome, `js/looped-network.js:26149-26154` and
+comment above `closePopup()`), and on a phone it is already close to full-screen by the shared
+`.lpn-setbox` breakpoint rule (`height: min(46rem, 92dvh)`, `css/engcalcs.css:1532`). **"In the
+middle of the current task" IS this box** — not the map underneath it, and not a new dialog.
+
+**CITED, what an idiomatic one contains.** Nielsen Norman Group: percent-done or step-based
+progress should be shown for any wait over ~10 seconds, both to reassure the user the system has
+not crashed and to make the wait itself less painful; where an accurate percent/time cannot be
+given, show relative progress as a list of completed/remaining steps rather than a number that
+will be wrong (nngroup.com, "Progress Indicators Make a Slow System Less Insufferable").
+Material Design's own rule: a *determinate* indicator (fills 0→100%, a plain fraction) is for a
+completion rate that CAN be detected; an *indeterminate* one (a bar with no fixed endpoint) is for
+when it cannot (material.io, "Progress indicators"). EPANET's own Run Status window is a separate,
+non-modal dialog that appears while the engine computes and reports status as it goes (epanet22
+readthedocs, "8. Analyzing a Network") — evidence that "a dedicated box over the workspace, not a
+corner note," is already the desktop hydraulic-tool norm, not a novelty being proposed here.
+
+**My recommendation, concrete:**
+
+- **Position:** inside `#lpn_ff_box`, in the space the report currently occupies while idle — not
+  the map corner, not a new modal. The box is already "the current task"; nothing new needs to be
+  built to put progress there, only re-routed.
+- **Determinate, and honestly so.** The bar's fraction is `done / total` **junctions**, which is a
+  plain count known exactly before the first solve — it needs no assumption about cost per
+  junction, so it stays honest even though the per-solve cost is not flat.
+- **NO time estimate, and this is not a UI nicety — the data forbids it.** Task 530's own measured
+  numbers (`dev/ROADMAP.md:216-218`): per-solve cost rises **1.1 → 31.0 ms** from 49 to 225
+  junctions, and growth exponent climbs 1.9 → 3.16. An ETA built from the early, cheap junctions
+  would be optimistic and get WORSE as the run continued — the reverse of the normal case where an
+  estimate sharpens near the end. That is exactly the failure NN/g's guidance warns against: a
+  number implies a promise the data cannot back. **Recommendation: state the junction count only
+  ("47 of 225 junctions checked"), never a derived time.** A bar filling on the honest fraction is
+  not a time claim and needs no such caveat.
+- **Say more than a bare count while the person waits.** The sweep already knows pass/fail/error
+  per junction as it goes (`fireFlowRun`/results structure, `js/looped-network.js:25726-25742` for
+  the reading pattern used after a run). A running tally under the bar — passing / failing / no
+  answer, updated at the same cadence as the count — gives a person something to actually read
+  instead of a climbing number, at zero extra solve cost.
+- **Non-blocking, unconditionally.** Stop stays where it already is, in the button row
+  (`js/looped-network.js:25868-25871`), reachable the whole run; nothing about moving the progress
+  text into the box's body should turn it modal or trap focus. The box is draggable today and
+  should stay so — SPECULATION, to be re-derived: if live per-junction map colouring is ever added
+  (it is not built today — `onProgress` calls only `setStatus()`, never
+  `refreshFireFlowMarks()`, `js/looped-network.js:26103-26112`, so nothing on the map currently
+  changes mid-run), a non-modal box a desktop user can drag aside is the only shape that survives
+  that addition without a redesign.
+- **On a phone, this box is already most of the screen (92dvh) the moment it is open** — so the
+  practical requirement is ORDER, not size: put the bar, the count, and Stop directly under the
+  header, above the criteria inputs, so a person does not have to scroll a form of fire-flow
+  settings to find the one button they need mid-run. Do not switch to a spinner/indeterminate look
+  on the small screen — a plain "47 of 225" number is exactly as legible at 92dvh as at desktop
+  size, and it survives sun glare and a gloved thumb better than judging a moving bar's fill level
+  by eye.
+
+## 2026-08-30 — Q2: the tooltip mechanism, and the two defects Tom hit on a phone
+
+Two reports from Tom, both about the Node editor's `?` tips on a phone: tapping one "brings up my
+input keyboard when I am not ready," and a tip "survive[s] the editor box on close."
+
+**OBSERVED, defect 1 — the mechanical cause, and it is not the tooltip code at all.**
+`unitNumberField()` (`js/looped-network.js:22600-22614`) builds a native `<label>` element,
+appends the `?`-carrying `.ec-help` span to it via `setFieldLabel()`
+(`js/looped-network.js:22471-22496`), and then appends the `<input>` itself as the label's own
+child. That is the browser's own label/control PAIRING — clicking anywhere inside a `<label>`,
+including a plain child `<span>`, fires the browser's native "activate the associated control"
+behaviour unless something stops it. `js/Calculators.lib.js:35-77`'s tap-triggered tooltip code
+(`trigger: 'click'` for a non-control label, since `ecTipIsControl()` — `js/Calculators.lib.js:27-29`
+— does not recognize a `<label>` as a control) opens the Bootstrap tip on that same tap, but nothing
+in it calls `preventDefault()`, so the native label behaviour fires alongside it and focuses the
+number input, which is what raises the keyboard. **This is a placement defect (the tip lives inside
+the very `<label>` it is describing), not a defect in the long-press/click-trigger design itself.**
+
+**OBSERVED, defect 2 — the survive-on-close.** `closePopup()`
+(`js/looped-network.js:22336-22339`) only hides `#lpn_popup` and clears `currentPopup`; it never
+calls `hideOpenTips()` (`js/looped-network.js:21501-21507`) or disposes the Bootstrap instance. A
+Bootstrap tooltip renders into `document.body`, independent of the triggering element's own subtree
+— the code's own comment on `clearFields()` says this explicitly for a different call site
+(`js/looped-network.js:22508-22512`: *"A tooltip that is OPEN at that moment lives in document.body,
+not in the popup, so wiping innerHTML would strand it"*). `closePopup()` is exactly that unguarded
+case: a tip left open when the box closes is simply never told to close, because nothing tells
+it to. `openSettingsBox()` (`js/looped-network.js:16905` area) already calls `hideOpenTips()`
+before showing itself, which suggests the fix pattern already exists in the codebase and was
+just not applied to `closePopup()`.
+
+**My verdict: both are the right, obvious fixes — call `hideOpenTips()`/dispose from
+`closePopup()`, and stop the tip's own tap from also firing the label's native click (move the `?`
+outside the `<label>`, or `preventDefault()` on it). I do not want a different tooltip mechanism.**
+Reasoning, from this seat:
+
+- A definition read once and never again is exactly what tap/long-press-reveal is for. Printing
+  every field's explanation permanently on a form already tight on a phone screen would cost more
+  (a cluttered one-handed form, CLAUDE.md's own "column width is king" instinct extended to forms)
+  than it saves — I would not trade a form I can scan in one glance for one padded with text I
+  already know after the first read.
+  - **A candidate worth naming, not insisting on:** the collision exists because a PLAIN label
+    gets `trigger: 'click'` while a CONTROL gets long-press (`js/Calculators.lib.js:39-48`,
+    reasoning at :19-26). Long-press was chosen for controls for exactly the reasons that matter to
+    me outdoors — a tap must still do the button's job, glare and gloves make a precise short tap
+    unreliable. **A node-editor field label sits directly on top of an input the same way a button
+    sits on top of its own action**, so the same argument that justified long-press for a control
+    plausibly applies here too, and would remove this whole class of "click also did something
+    native" collision by construction rather than by a `preventDefault()` patched on afterward.
+    I am NOT asking for this — it is a bigger, more consistent redesign than the two bugs need, and
+    whoever owns `js/Calculators.lib.js`'s trigger rule should weigh it, not me. Flagging so it is
+    not silently lost.
+- **Where I would push back if asked, and nobody has: don't build a "richer" tooltip** (an
+  always-expandable info panel, a persistent glossary drawer). A tip that must be summoned once and
+  then get out of the way is the correct shape for someone who is not going to consult it twice;
+  the fix that is being made — stop it stealing focus, stop it outliving its own box — is the whole
+  fix. **This is a case of "it is fine, just stop it doing the wrong extra thing," not a case for a
+  new mechanism** (per my brief's own instruction that this is as valid a finding as a new want).
