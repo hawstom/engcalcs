@@ -14,8 +14,11 @@
 // EVERYTHING HERE IS SI: Q in m3/s, H and lengths in m, d in m. Callers convert at
 // the edges. The document format is SI for the same reason (see the scope doc).
 //
-// Target scale is ~10-20 nodes, which is why the linear solve is a dense Cholesky
-// rather than anything sparse -- see solveSPD().
+// THE LINEAR SOLVE IS AN ENVELOPE CHOLESKY, NOT A DENSE ONE. It used to be dense, on the argument
+// that the target scale was ~10-20 nodes; the whole-system fire flow sweep (Task 530) is 3,707
+// solves of a network two orders of magnitude bigger than that, and a dense factorization is
+// n^3/6 multiply-adds. See lpnSolveSPDDense, which is kept as the reference the fast path is
+// proved bit-identical against, and lpnSolvePacked, which is what a solve calls.
 
 // The browser gets js/PipeHydraulics.lib.js from its own <script> tag ahead of this
 // one; Node (dev/lpn-spike/validate.js) has no script tags, so ask for it directly.
@@ -883,7 +886,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		if (maxFlowChange < tol || sumAbsDq < absTol) { converged = true; break; }
 
 		// Stagnation. Newton converges quadratically until it reaches the roundoff
-		// floor of the dense factorization, then stops improving -- measured on a
+		// floor of the factorization, then stops improving -- measured on a
 		// 201-node grid: 8e-1, 8e-2, 4e-3, 3e-5, 2e-7, 2e-8, then a plateau at ~5e-8
 		// forever. Without this the solver would spend 100 iterations and 330 ms
 		// reaching the answer it already had at iteration 6, on every keystroke.
@@ -910,7 +913,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		// broke it: it lowered demandScale by 4x, which is a 4x rise in every RELATIVE measure,
 		// and 1e-6 happened to sit between the old plateau and the new one.
 		//
-		// The floor is roundoff in the dense factorization and is network-dependent -- ill
+		// The floor is roundoff in the factorization and is network-dependent -- ill
 		// conditioning from the zero-flow links' clamped gradient (lpnGradMin), which EPANET has
 		// too. So no fixed number is right, and the honest test is a COMPARISON: we have stopped
 		// improving, and we are already at least as converged as EPANET's own default Accuracy
