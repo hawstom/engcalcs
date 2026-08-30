@@ -13057,6 +13057,9 @@ var EngCalcs = EngCalcs || {};
 			// The rule text, carried with the drawing so a project saved and reopened still holds
 			// what its `.inp` stated (Task 248.03).
 			rules: doc.rules || [],
+			// The carried EPANET sections, saved with the drawing for the same reason the rule text is:
+			// a project saved and reopened still holds everything its `.inp` stated.
+			inpSections: doc.inpSections || {},
 			// Where the reader was looking. Not a reason to SAVE -- panning marks nothing dirty --
 			// but it rides along whenever something else does, so a file reopens where it was left.
 			view: currentView(),
@@ -13469,6 +13472,7 @@ var EngCalcs = EngCalcs || {};
 		doc.times = saved.times || null;
 		doc.controls = saved.controls || [];
 		doc.rules = saved.rules || [];
+		doc.inpSections = saved.inpSections || {};
 		// Task 510's saved paths, taken VERBATIM. An id naming a node this document does not have
 		// is the user's data and is reported where it is used, never pruned here -- see
 		// profileMissingStops(). A file written before this existed simply has none.
@@ -14518,6 +14522,10 @@ var EngCalcs = EngCalcs || {};
 			controls: parsed.controls || [],
 			// [RULES] as text (Task 248.03). Not modelled, not edited, and no longer thrown away.
 			rules: parsed.rules || [],
+			// EVERY OTHER SECTION THE FILE STATED AND THIS PAGE DOES NOT READ, VERBATIM -- [ENERGY],
+			// [QUALITY], [SOURCES], [REACTIONS], [MIXING], [TAGS], [REPORT], and any section another
+			// program invented. Kept whole and written back; nothing here acts on one.
+			inpSections: parsed.inpSections || {},
 			units: readUnitSelections()
 		});
 	}
@@ -14572,11 +14580,23 @@ var EngCalcs = EngCalcs || {};
 			// different sentences, and the old one would have a user believing their rules were lost.
 			case 'rules': return pc.lpn_inp_drop_rules || 'This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
 			case 'extended-period': return pc.lpn_inp_drop_eps || 'This file runs over a period of time. This page solves one moment, so only the starting conditions came in.';
+			// **NOTHING IS DISCARDED ANY MORE, AND THE SENTENCES SAY SO** (Tom, 2026-08-29, reading
+			// the old one: *"It seems to be saying that quality and pump energy cost info is
+			// discarded"*). Every section this page does not read is carried verbatim and written
+			// back, so the report's job here is to say what is KEPT BUT UNUSED, which is a
+			// different sentence from a loss. Energy left the water-quality sentence with it: one
+			// message for two unrelated subjects is what made the old one read as a list of
+			// casualties.
 			case 'quality':
 			case 'reactions':
 			case 'sources':
-			case 'mixing':
-			case 'energy': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels, or what the pumps cost to run. That part was left out. This page solves flow and pressure only.';
+			case 'mixing': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file.';
+			case 'energy': return pc.lpn_inp_drop_energy || 'This file says what the pumps cost to run. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.';
+			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.';
+			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET\'s own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
+			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
+			// about a part of the format nobody here has read.
+			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
 			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.';
@@ -14635,7 +14655,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			var lead = document.createElement('p');
 			lead.style.margin = '0 0 6px';
-			lead.textContent = pc.lpn_inp_report_lead || 'This page does not hold everything EPANET does. Here is what changed on the way in:';
+			lead.textContent = pc.lpn_inp_report_lead || 'This page does not use everything EPANET does, but nothing in your file is thrown away. Here is what it holds that this page keeps without using, and what changed on the way in:';
 			body.appendChild(lead);
 			var ul = document.createElement('ul');
 			ul.style.margin = '0';

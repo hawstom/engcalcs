@@ -93,7 +93,32 @@
 	var REPORTABLE = {
 		VALVES: 'valves',
 		RULES: 'rules', ENERGY: 'energy', QUALITY: 'quality', REACTIONS: 'reactions',
-		SOURCES: 'sources', MIXING: 'mixing'
+		SOURCES: 'sources', MIXING: 'mixing', TAGS: 'tags', REPORT: 'report'
+	};
+
+	// **EVERY SECTION THIS READER TAKES APART.** Anything else in the file -- [ENERGY], [QUALITY],
+	// [SOURCES], [REACTIONS], [MIXING], [TAGS], [REPORT], [RULES], and any section some other
+	// program invented -- is CARRIED VERBATIM (Tom, 2026-08-29: *"every setting from EPANET must be
+	// added and implemented unless research says otherwise"*). Carrying is the [RULES] answer of
+	// Task 248.03 generalised: the file's own characters, kept line for line, written back
+	// unchanged, and never handed to a solver. It is the only form that can be right for a section
+	// nothing here understands, and it is what the input-file-is-canonical rule requires -- a value
+	// this page cannot use is still the user's, and reading past it spent it.
+	//
+	// **THE LIST IS OF WHAT IS READ, NOT OF WHAT IS CARRIED**, deliberately: a section nobody here
+	// has heard of then carries by default rather than vanishing, which is the safe direction for
+	// the one case we cannot enumerate.
+	var INP_SECTIONS_READ = {
+		TITLE: 1, JUNCTIONS: 1, RESERVOIRS: 1, TANKS: 1, PIPES: 1, PUMPS: 1, VALVES: 1,
+		DEMANDS: 1, STATUS: 1, PATTERNS: 1, CURVES: 1, CONTROLS: 1, EMITTERS: 1,
+		TIMES: 1, OPTIONS: 1, COORDINATES: 1, VERTICES: 1, LABELS: 1, BACKDROP: 1, END: 1
+	};
+
+	// The carried sections EPANET's own writer has a place for, and therefore the ones the exporter
+	// puts back where they belong. A section NOT here is still carried; it simply has no home in
+	// EPANET's order, so it is written after the options, in the order the source stated it.
+	var LPN_CARRIED_PLACED = {
+		TAGS: 1, ENERGY: 1, QUALITY: 1, SOURCES: 1, REACTIONS: 1, MIXING: 1, REPORT: 1
 	};
 
 	/**
@@ -233,7 +258,7 @@
 			seen = {},          // name -> row count, for the ones we only count
 			i, line, semi, toks, cmt;
 
-		var ruleLines = [];
+		var carried = {};   // section name -> the file's own lines, for every section not read below
 		for (i = 0; i < lines.length; i++) {
 			line = lines[i];
 			semi = line.indexOf(';');
@@ -252,23 +277,26 @@
 				if (!rawSections[section]) { rawSections[section] = []; }
 				continue;
 			}
-			// **[RULES] IS KEPT AS TEXT, LINE FOR LINE** (ROADMAP Task 248.03, first phase). A rule
-			// is a small LANGUAGE -- priorities, AND/OR clauses, an ELSE -- and this page does not
-			// model it. What it can do, and until now did not, is stop THROWING IT AWAY: the section
-			// was counted as a difference and then dropped, so a file with rules came back out of
-			// the exporter with none, which is the input-file-is-canonical rule broken exactly as
-			// `[OPTIONS]` was under Task 553.
+			// **EVERY SECTION THIS READER DOES NOT TAKE APART IS KEPT AS TEXT, LINE FOR LINE.**
+			// [RULES] was the first (Task 248.03): a rule is a small LANGUAGE -- priorities, AND/OR
+			// clauses, an ELSE -- and this page does not model it. What it could do, and until that
+			// task did not, is stop THROWING IT AWAY: the section was counted as a difference and
+			// then dropped, so a file with rules came back out of the exporter with none, which is
+			// the input-file-is-canonical rule broken exactly as `[OPTIONS]` was under Task 553.
+			// [ENERGY], [QUALITY], [SOURCES], [REACTIONS], [MIXING], [TAGS] and [REPORT] were the
+			// same defect a third time, and they are kept here on the same terms.
 			//
-			// The ORIGINAL line, not the tokens: nothing here understands a rule well enough to
-			// write one, so the only honest form is the characters the file stated. A comment-only
-			// line inside the section is lost with the blank lines above -- it is not data, and
-			// keeping it would mean carrying the section's whitespace too.
+			// The ORIGINAL line, not the tokens: nothing here understands these sections well enough
+			// to write one, so the only honest form is the characters the file stated. A
+			// comment-only line inside such a section is lost with the blank lines above -- it is
+			// not data, and keeping it would mean carrying the section's whitespace too.
 			// **AND IT IS STILL COUNTED.** `seen` is what makes REPORTABLE say "this file has rules" at
 			// the end, and the early `continue` below skips the counter every other section reaches --
 			// so keeping the text silently stopped the import REPORTING the text. Caught by
 			// import-notes-harness.js. Carrying a thing and telling the user about it are two jobs.
-			if (section === 'RULES') {
-				ruleLines.push(lines[i].replace(/\s+$/, ''));
+			if (section && !INP_SECTIONS_READ[section]) {
+				if (!carried[section]) { carried[section] = []; }
+				carried[section].push(lines[i].replace(/\s+$/, ''));
 				seen[section] = (seen[section] || 0) + 1;
 				continue;
 			}
@@ -1019,6 +1047,14 @@
 			if (name === 'VALVES') { return; }
 			if (seen[name]) { drop(REPORTABLE[name], [], seen[name]); }
 		});
+		// **A SECTION NO VERSION OF EPANET DOCUMENTS, AND THEREFORE NO SENTENCE CAN DESCRIBE.** It is
+		// carried like the rest and reported BY NAME, because the only true thing we can say about it
+		// is what the file called it. A file stating none produces no line, which is why this is
+		// inside the test rather than a sentence that always shows.
+		var otherSections = Object.keys(carried).filter(function (name) {
+			return name !== 'RULES' && !REPORTABLE[name];
+		});
+		if (otherSections.length) { drop('other-sections', otherSections, null); }
 		// **NO LONGER REPORTED: the run landed** (Task 248, 2026-08-18). The sentence said a file with
 		// a duration describes more than this page shows, and it was true for exactly as long as a
 		// solve was one moment. `js/lpn-time.js` now runs the whole period through the EPANET engine
@@ -1073,7 +1109,18 @@
 			qualityOptions: qualityOptions,
 			// [RULES], verbatim, one string per line (Task 248.03). Empty for a file with none, so
 			// no caller has to test for absence.
-			rules: ruleLines,
+			rules: carried.RULES || [],
+			// **EVERY OTHER SECTION THIS READER DOES NOT TAKE APART, VERBATIM** -- name -> the
+			// file's own lines. [RULES] is NOT in here: it has had its own field since Task 248.03
+			// and `EngCalcs.lpnRuleBlocks()` reads it, so one section in two places would be two
+			// answers to the same question. Empty object for a file with none.
+			inpSections: (function () {
+				var out = {}, k;
+				for (k in carried) {
+					if (k !== 'RULES' && carried[k].length) { out[k] = carried[k]; }
+				}
+				return out;
+			}()),
 			// The clock (ROADMAP Task 248). `times` is null only when js/lpn-patterns.js was not
 			// loaded, which is reported above; `patterns` and `controls` are empty arrays for a
 			// file that states none, so a caller never has to test for absence.
@@ -1731,6 +1778,25 @@
 
 		// ---- assembly ----
 		function section(name, rows) { return rows.length ? '[' + name + ']\n' + rows.join('\n') + '\n\n' : ''; }
+		// **A CARRIED SECTION GOES BACK OUT AS THE TEXT IT CAME IN AS**, on the [RULES] rule: nothing
+		// on this page edits one and nothing here understands one well enough to compose a line. The
+		// section is omitted entirely when the document holds none, so an empty [ENERGY] is never a
+		// statement the source did not make.
+		var carriedOut = doc.inpSections || {};
+		function carriedSection(name) {
+			var lines = carriedOut[name];
+			return (lines && lines.length) ? '[' + name + ']\n' + lines.join('\n') + '\n\n' : '';
+		}
+		// Everything carried that EPANET's own writer has no place for -- a section some other
+		// program invented. Written last, before the drawing, in the order the source stated them.
+		function carriedRest() {
+			var out = '';
+			Object.keys(carriedOut).forEach(function (name) {
+				if (LPN_CARRIED_PLACED[name] || !carriedOut[name] || !carriedOut[name].length) { return; }
+				out += '[' + name + ']\n' + carriedOut[name].join('\n') + '\n\n';
+			});
+			return out;
+		}
 		var method = settings.method || 'hw',
 			headloss = { hw: 'H-W', dw: 'D-W', manning: 'C-M' }[method] || 'H-W';
 		if (method !== 'hw') {
@@ -1750,6 +1816,8 @@
 			section('PIPES', pipes) +
 			section('PUMPS', pumps) +
 			section('VALVES', valves) +
+			// [TAGS], where EPANET's own writer puts it. Carried, never read.
+			carriedSection('TAGS') +
 			// After [JUNCTIONS], whose rows it replaces, and beside [EMITTERS], the other section
 			// that says something extra about a node this page draws once (Task 468).
 			section('DEMANDS', demandRows) +
@@ -1766,7 +1834,18 @@
 			// when the document holds none -- an empty `[RULES]` is a statement the source never
 			// made, the same rule `[OPTIONS] Pattern` follows.
 			((doc.rules && doc.rules.length) ? '[RULES]\n' + doc.rules.join('\n') + '\n\n' : '') +
+			// **THE ENERGY AND WATER-QUALITY SECTIONS, CARRIED**, in EPANET's own writer order.
+			// This page works out neither, and that is exactly why they have to be written back
+			// untouched: a value we cannot use is still the user's.
+			carriedSection('ENERGY') +
+			carriedSection('QUALITY') +
+			carriedSection('SOURCES') +
+			carriedSection('REACTIONS') +
+			carriedSection('MIXING') +
 			section('TIMES', timeRows) +
+			// EPANET's own report settings. This page has its own way of showing answers and reads
+			// none of these; they go back out as they came in.
+			carriedSection('REPORT') +
 			'[OPTIONS]\n' +
 			row(['Units', flowKey]) + '\n' +
 			row(['Headloss', headloss]) + '\n' +
@@ -1785,6 +1864,7 @@
 			// own characters are the only honest form -- see the importer's note. Sparse in, sparse
 			// out: a document holding none writes none.
 			qualityOptionRows(settings.qualityOptions, row) + '\n' +
+			carriedRest() +
 			section('COORDINATES', coords) +
 			section('VERTICES', verts) +
 			section('LABELS', labelRows) +
