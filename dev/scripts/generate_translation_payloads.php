@@ -72,6 +72,30 @@ function main(array $argv): void
         fail('Unable to create output directory: ' . $opts['output_dir']);
     }
 
+    $built = buildPayloads($opts);
+    foreach ($built['files'] as $name => $content) {
+        file_put_contents($opts['output_dir'] . '/' . $name, $content);
+    }
+
+    echo 'Generated ' . $built['generated_count'] . " payload files in: {$opts['output_dir']}\n";
+    echo 'Active prefixes: ' . implode(', ', $built['active_prefixes']) . "\n";
+    echo "Exempt (correctly identical to English, not counted as delta): {$built['exempt_total']} across all languages.\n";
+    echo "Out of scope (deliberately untranslated per the coverage declaration): {$built['out_of_scope_total']} across all languages.\n";
+    echo $built['coverage_summary'] . "\n";
+}
+
+/**
+ * Build every payload IN MEMORY, keyed by the filename it belongs in.
+ *
+ * Pulled out of main() so `--check` can decide freshness by CONTENT: it builds the same bytes and
+ * compares them with what is on disk. Nothing here writes output, so the two callers cannot drift
+ * into disagreeing about what a payload should say.
+ *
+ * @param bool $quiet Suppress the missing-lang-file warning, which a freshness check must not emit.
+ * @return array{files:array<string,string>,generated_count:int,exempt_total:int,out_of_scope_total:int,active_prefixes:array,coverage_summary:string}
+ */
+function buildPayloads(array $opts, bool $quiet = false): array
+{
     $enKeys = loadLangArray(EN_FILE);
     if (count($enKeys) === 0) {
         fail('No keys parsed from English language file.');
@@ -101,16 +125,14 @@ function main(array $argv): void
         }
     }
 
-    file_put_contents(
-        $opts['output_dir'] . '/lang.en.json',
-        json_encode([
-            'language' => 'en',
-            'keys' => $enKeys,
-            'count' => count($enKeys),
-            'active_prefixes' => $activePrefixes,
-            'requested_prefix' => $opts['requested_prefix'],
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-    );
+    $files = [];
+    $files['lang.en.json'] = json_encode([
+        'language' => 'en',
+        'keys' => $enKeys,
+        'count' => count($enKeys),
+        'active_prefixes' => $activePrefixes,
+        'requested_prefix' => $opts['requested_prefix'],
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
     $langs = resolveTargetLanguages($opts['languages']);
     $generatedCount = 0;
@@ -120,7 +142,7 @@ function main(array $argv): void
     foreach ($langs as $lang) {
         $targetFile = DEFAULT_LANG_DIR . "/lang.ec.{$lang}.php";
         if (!file_exists($targetFile)) {
-            fwrite(STDERR, "WARN: target language file missing, skipping: {$targetFile}\n");
+            if (!$quiet) { fwrite(STDERR, "WARN: target language file missing, skipping: {$targetFile}\n"); }
             continue;
         }
 
@@ -184,18 +206,18 @@ function main(array $argv): void
             'key_syn' => $keySyn,
         ];
 
-        file_put_contents(
-            $opts['output_dir'] . "/payload_{$lang}.json",
-            json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-        );
+        $files["payload_{$lang}.json"] = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         $generatedCount++;
     }
 
-    echo "Generated {$generatedCount} payload files in: {$opts['output_dir']}\n";
-    echo 'Active prefixes: ' . implode(', ', $activePrefixes) . "\n";
-    echo "Exempt (correctly identical to English, not counted as delta): {$exemptTotal} across all languages.\n";
-    echo "Out of scope (deliberately untranslated per the coverage declaration): {$outOfScopeTotal} across all languages.\n";
-    echo ecCoverageSummary($coverage) . "\n";
+    return [
+        'files' => $files,
+        'generated_count' => $generatedCount,
+        'exempt_total' => $exemptTotal,
+        'out_of_scope_total' => $outOfScopeTotal,
+        'active_prefixes' => $activePrefixes,
+        'coverage_summary' => ecCoverageSummary($coverage),
+    ];
 }
 
 function parseArgs(array $argv): array
@@ -254,87 +276,64 @@ function printHelpAndExit(): void
 }
 
 /**
- * Freshness gate for sprint launchers. A payload is stale if it is older than any
- * of its inputs: the English source, that language's lang file, the glossary, or
- * this generator itself, or the exempt-key list (which changes what counts as delta).
- * Prints a FRESH/STALE verdict and returns a shell exit
- * code (0 = fresh, 1 = stale/missing) so a sprint cannot launch on an old delta
- * without a human ever having to remember to regenerate.
+ * Freshness gate for sprint launchers. A payload is stale when the bytes it would be generated as
+ * today differ from the bytes on disk. Prints a FRESH/STALE verdict and returns a shell exit code
+ * (0 = fresh, 1 = stale/missing) so a sprint cannot launch on an old delta without a human ever
+ * having to remember to regenerate.
+ *
+ * IT DECIDES BY CONTENT, NOT BY MTIME, and that is a correction rather than a refinement.
+ *
+ * The old version compared `filemtime(payload)` against the newest of its inputs, which made it
+ * report every one of the 26 payloads stale in any tree where nothing had actually changed — and
+ * this project produces such trees routinely. **`git pull` does not preserve mtimes** (CLAUDE.md
+ * says so under Deploying, for the service worker's sake), and neither does a fresh worktree
+ * checkout, which is how every parallel subagent starts. Four subagents in one session hit the
+ * false alarm and each had to work out whether the failure was theirs. A BLOCKING check that cries
+ * wolf on a clean checkout is precisely the shape dev/enforceable-rules-survey.md warns about: it
+ * teaches people that a red line is nothing to worry about, which is the one thing a blocking check
+ * must never teach.
+ *
+ * Content comparison also happens to be STRICTLY MORE ACCURATE in both directions. A touched file
+ * whose content did not change is not stale, and an edit that lands with an older mtime — a
+ * checkout, a restored backup — used to be invisible and now is not. And the list of inputs stops
+ * being a thing anybody has to maintain: it was eight paths long, had already missed
+ * `prefix_terms.inc.php` once when that include was split out, and would miss the next one the same
+ * silent way. Building the payload IS the list of inputs.
+ *
+ * The cost is a full generation run per check, measured at about a second for all 26. That is the
+ * whole price, and it buys a check that is right.
  */
 function runFreshnessCheck(array $opts): int
 {
-    $commonInputs = [
-        EN_FILE, GLOSSARY_PATH, EC_EXEMPT_KEYS_PATH, __DIR__ . '/exempt_keys.inc.php',
-        // The coverage declaration changes what counts as delta just as surely as the
-        // exempt list does, so editing it must make every payload stale.
-        EC_COVERAGE_PATH, __DIR__ . '/coverage.inc.php',
-        // The prefix->terms map decides which glossary entries reach an agent at all, so editing
-        // it changes every payload's content. It lives in its own include as of 2026-08-12 and
-        // therefore has to be named here -- __FILE__ alone stopped covering it that day.
-        __DIR__ . '/prefix_terms.inc.php',
-        // Every payload carries the suggestion-box block copied out of the SOP, so editing that
-        // block changes every payload's content and must make them stale.
-        SUGGESTION_BOX_SOURCE,
-        __FILE__,
-    ];
-    $commonNewest = 0;
-    foreach ($commonInputs as $f) {
-        $commonNewest = max($commonNewest, (int) @filemtime($f));
-    }
+    $built = buildPayloads($opts, true);
 
-    $langs = resolveTargetLanguages($opts['languages']);
     $stale = [];
     $checked = 0;
-
-    foreach ($langs as $lang) {
-        $targetFile = DEFAULT_LANG_DIR . "/lang.ec.{$lang}.php";
-        if (!file_exists($targetFile)) {
-            continue; // no source to translate; generation would skip it too
-        }
+    foreach ($built['files'] as $name => $content) {
         $checked++;
-
-        $payloadFile = $opts['output_dir'] . "/payload_{$lang}.json";
-        if (!file_exists($payloadFile)) {
-            $stale[] = "{$lang}: payload missing";
+        $onDisk = $opts['output_dir'] . '/' . $name;
+        if (!file_exists($onDisk)) {
+            $stale[] = "{$name}: missing";
             continue;
         }
-
-        $inputs = array_merge($commonInputs, [$targetFile]);
-        $newestInput = max($commonNewest, (int) @filemtime($targetFile));
-        if ((int) filemtime($payloadFile) < $newestInput) {
-            $stale[] = "{$lang}: " . newestInputName((int) filemtime($payloadFile), $inputs);
+        $have = file_get_contents($onDisk);
+        if ($have !== $content) {
+            $stale[] = "{$name}: content differs (" . strlen($have) . ' bytes on disk, '
+                . strlen($content) . ' as generated today)';
         }
     }
 
     if (count($stale) === 0) {
-        echo "FRESH: all {$checked} payload(s) are current with lang files, glossary, and generator.\n";
+        echo "FRESH: all {$checked} payload file(s) match what the generator produces today.\n";
         return 0;
     }
 
-    fwrite(STDERR, 'STALE: ' . count($stale) . " of {$checked} payload(s) are out of date:\n");
+    fwrite(STDERR, 'STALE: ' . count($stale) . " of {$checked} payload file(s) are out of date:\n");
     foreach ($stale as $s) {
         fwrite(STDERR, "  - {$s}\n");
     }
     fwrite(STDERR, 'Fix before launching a sprint: php ' . basename(__FILE__) . "\n");
     return 1;
-}
-
-/**
- * Names the newest input file that post-dates the payload, for an actionable
- * stale message (e.g. "lang.ec.en.php is newer").
- */
-function newestInputName(int $payloadMtime, array $inputs): string
-{
-    $name = '';
-    $best = $payloadMtime;
-    foreach ($inputs as $f) {
-        $m = (int) @filemtime($f);
-        if ($m > $best) {
-            $best = $m;
-            $name = basename($f);
-        }
-    }
-    return $name !== '' ? "{$name} is newer" : 'stale';
 }
 
 function splitCsv(string $value): array
