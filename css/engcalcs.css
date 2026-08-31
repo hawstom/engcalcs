@@ -2066,6 +2066,34 @@ html[lang="zh"] .ec-welcome {
 	#lpn_labels_link_fields > div > label { flex-basis: 100% !important; max-width: 100%; }
 	#lpn_labels_node_fields > div > span:first-child,
 	#lpn_labels_link_fields > div > span:first-child { display: none; }
+	/* **AND THE WHITE SPACE GOES ABOVE THE NAME, NEVER BELOW IT** (Tom, 2026-08-31, from a phone:
+	   "the toggles and labels ... have a little gap below them from the row they belong with, but no
+	   gap above them from the row they don't belong with. This would be good to reverse.").
+
+	   Measured in Chromium at 360x740 before the fix: 6.00px between a name and its OWN four
+	   columns, 0.00px between those columns and the NEXT row's name. Once a row wraps, the inline
+	   `gap: 6px` labelCheckbox() writes becomes a row-gap as well as a column-gap, and the rows
+	   themselves carry no margin -- so every pixel of separation in the list was sitting inside a
+	   group and none of it between groups. Proximity then says the checkbox belongs to the boxes
+	   ABOVE it, which is the opposite of what it controls.
+
+	   The 6px is moved rather than added to: row-gap 0 inside the group, 6px margin between rows.
+	   `!important` because the gap is an INLINE shorthand and a stylesheet longhand cannot outrank
+	   one -- the same reason the flex and the widths in this block carry it. `column-gap` is
+	   untouched, so nothing horizontal moves and no column widens.
+
+	   Scoped to the two blocks where the row WRAPS. Where it does not -- the desktop box at its
+	   normal width -- the name shares its line with its columns, there is no row-gap to reverse,
+	   and the layout does not move. Measured at 1280x900 before and after: identical to the pixel.
+
+	   `:not(:first-child)` rather than `div + div`, which is the same set of rows here and would
+	   read better: the sibling combinator is the one selector shape
+	   dev/lpn-spike/small-screen-harness.js cannot parse, so it would land in that file's
+	   blind-spot report and this rule would go unasserted. */
+	#lpn_labels_node_fields > div,
+	#lpn_labels_link_fields > div { row-gap: 0 !important; }
+	#lpn_labels_node_fields > div:not(:first-child),
+	#lpn_labels_link_fields > div:not(:first-child) { margin-top: 6px; }
 }
 
 /* ==== No window scrollbar on the map page (ROADMAP Task 432) =================================
@@ -2494,6 +2522,19 @@ tr.lpn-ff-error { background: #f2f2f2; }
 	html:has(#lpn_canvas) #lpn_labels_link_fields > div > label { flex: 1 1 100% !important; max-width: none; }
 	html:has(#lpn_canvas) #lpn_labels_node_fields > div > span:first-child,
 	html:has(#lpn_canvas) #lpn_labels_link_fields > div > span:first-child { display: none; }
+
+	/* 6a. **AND THE WHITE SPACE GOES ABOVE THE NAME, NEVER BELOW IT** (Tom, 2026-08-31, on a phone:
+	   "the toggles and labels ... have a little gap below them from the row they belong with, but no
+	   gap above them from the row they don't belong with. This would be good to reverse.").
+
+	   Stated once beside the container-query copy of item 6 above, which carries the measurement and
+	   the reasoning; it is repeated here for the same reason every other rule in item 6 is -- a
+	   browser without container queries must still get the phone layout. Same declarations, so the
+	   two firing together is idempotent. */
+	html:has(#lpn_canvas) #lpn_labels_node_fields > div,
+	html:has(#lpn_canvas) #lpn_labels_link_fields > div { row-gap: 0 !important; }
+	html:has(#lpn_canvas) #lpn_labels_node_fields > div:not(:first-child),
+	html:has(#lpn_canvas) #lpn_labels_link_fields > div:not(:first-child) { margin-top: 6px; }
 
 	/* 7. AND THE COLUMNS THEMSELVES SHRINK (Tom: "Let's get brave and use these shrink factors on
 	   the column inputs: Before 0.8, After 0.4, Decimal 0.8"). Against the shipped 2.6rem affix and

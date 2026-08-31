@@ -651,6 +651,46 @@ const TOUCH = true;
 		winning(RULES, field.children[0], WIDE, DOC_IDS, false, 'max-width') === '11.5rem');
 	ok('...and the desktop row does not wrap',
 		winning(RULES, field, WIDE, DOC_IDS, false, 'flex-wrap') === null);
+
+	// **AND ONCE IT WRAPS, THE WHITE SPACE GOES ABOVE THE TOGGLE AND NOT BELOW IT** (Tom,
+	// 2026-08-31, on a phone: "the toggles and labels ... have a little gap below them from the row
+	// they belong with, but no gap above them from the row they don't belong with. This would be
+	// good to reverse.").
+	//
+	// It is proximity, and the whole defect is a consequence of the line above. labelCheckbox()
+	// writes ONE inline `gap`, which a nowrap row spends entirely between columns; the moment the
+	// row wraps, the same number is also a ROW-gap and lands between the name and its own four
+	// boxes. The rows themselves carry no margin, so every pixel of separation in the list was
+	// inside a group and none of it between groups -- measured in Chromium at 360x740 before the
+	// fix, 6.00px below a name and 0.00px above it.
+	//
+	// **THE ASSERTION IS THE COMPARISON, not either number**, because either one alone can be
+	// right while the reading is wrong: 6px below and 6px above groups nothing, and that is the
+	// state a later tidy-up would most plausibly drift back to.
+	const inlineGap = /row\.style\.gap = '(\d+)px'/.exec(fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8'));
+	ok(group + ': labelCheckbox() still writes one inline gap, which a wrapped row spends BOTH ways',
+		!!inlineGap, inlineGap ? inlineGap[1] + 'px' : 'no inline gap found -- this check is vacuous');
+	if (inlineGap) {
+		const rg = winning(RULES, field, SMALL, DOC_IDS, false, 'row-gap');
+		const mt = winning(RULES, field, SMALL, DOC_IDS, false, 'margin-top');
+		// A stylesheet row-gap must be `!important` to beat the inline shorthand; with none, what a
+		// phone actually paints below the name is the inline number.
+		const below = rg === null ? parseFloat(inlineGap[1]) : parseFloat(rg);
+		const above = mt === null ? 0 : parseFloat(mt);
+		ok('...so on a phone the space ABOVE the toggles and labels exceeds the space below them',
+			above > below, 'above ' + above + 'px, below ' + below + 'px');
+		// And the desktop is not paying for it. The row does not wrap there, so there is no row-gap
+		// to reverse and no margin is added -- the layout Tom did not ask to move does not move.
+		ok('...while the desktop row, which never wraps, is left exactly as it was',
+			winning(RULES, field, WIDE, DOC_IDS, false, 'row-gap') === null &&
+			winning(RULES, field, WIDE, DOC_IDS, false, 'margin-top') === null,
+			'row-gap ' + winning(RULES, field, WIDE, DOC_IDS, false, 'row-gap') +
+			', margin-top ' + winning(RULES, field, WIDE, DOC_IDS, false, 'margin-top'));
+		// The heading row is the one row that owns nothing below it, so it takes no margin of its
+		// own -- it is `:first-child`, and that is what keeps the list from opening on a blank strip.
+		ok('...and the heading row takes no margin, being the one row with nothing above it',
+			winning(RULES, heading, SMALL, DOC_IDS, false, 'margin-top') === null);
+	}
 	// **AND THE NAME ON THAT LINE NEVER BREAKS MID-WORD** (Tom, 2026-08-23, drawing `Dem/and`,
 	// `Hea/d`, `Pres/sure`, `Elev/ation` as the thing to stop). `overflow-wrap: anywhere` is what
 	// does it, and it is correct on the desktop, where the name shares its line with four columns
