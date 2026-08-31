@@ -3350,6 +3350,30 @@ var EngCalcs = EngCalcs || {};
 	function tapSlopPx(e) {
 		return (e && e.pointerType === 'touch') ? NODE_SNAP_TOUCH_PX : NODE_SNAP_PX;
 	}
+	// **HOW FAR A PRESS MAY TRAVEL AND STILL BE A TAP. Past it the gesture is a drag and can never
+	// also be a tap; short of it NOTHING MOVES.** (Tom, 2026-08-31, on a phone: *"sometimes the node
+	// editor comes up when I am trying to drag, sometime after a successful drag."*)
+	//
+	// This is the number the two halves of a press have to agree on, and they did not. The tap test
+	// was a bare `>= 4` on the final displacement, blind to pointer type, while `applyDrag()` moved a
+	// node on the FIRST pixel -- so a finger that grabbed a junction and slid it three pixels moved
+	// the node AND opened its editor, which is Tom's second sentence exactly. Reproduced through the
+	// real handlers before it was touched: `{drag:'node', popup:true, nodeX:203}`.
+	//
+	// **A FINGER GETS A BIGGER NUMBER FOR THE SAME REASON IT GETS A BIGGER TAP RADIUS**: 4 px is
+	// inside a fingertip's own wobble on a press meant to stand still, and 8 dp is the touch slop
+	// Android's own ViewConfiguration has used for years. The pointer's 4 is untouched, so no mouse
+	// gesture on this map changes.
+	//
+	// **THIS IS NOT THE ARGUMENT TASK 417 REJECTED.** That one was deciding a pan from a node drag on
+	// movement, which is undecidable because both are press-then-travel. This decides a TAP from a
+	// DRAG, where the travel is the whole difference and the only question is how much of it a hand
+	// contributes by accident.
+	var TAP_MOVE_PX = 4;
+	var TAP_MOVE_TOUCH_PX = 10;
+	function tapMovePx(e) {
+		return (e && e.pointerType === 'touch') ? TAP_MOVE_TOUCH_PX : TAP_MOVE_PX;
+	}
 	// The Text-label sibling of nearestNodeNearScreen(). Measured to the label's ANCHOR POINT rather
 	// than its box, and at the same NODE_SNAP_PX: an anchor distance cannot make a large title block
 	// into a no-go zone the way its bounding box would.
@@ -18438,7 +18462,14 @@ var EngCalcs = EngCalcs || {};
 			profileDrawHover(e.clientX, e.clientY);
 		});
 
+		// **HAS THIS PRESS BECOME A DRAG?** One flag for the whole gesture, set once the pointer has
+		// travelled past `tapMovePx(e)` and never cleared until the next press. It is what makes
+		// "a drag is never also a tap" exact rather than a second distance test: a finger that
+		// travels out and comes back would end where it started and read as a tap, having moved the
+		// document the whole way there.
+		var gestureMoved = false;
 		svg.addEventListener('pointerdown', function (e) {
+			gestureMoved = false;
 			if (regMode) { return; } // a Scale/Position registration click sequence is pending -- see wireBackdropMenu()
 			svg.setPointerCapture(e.pointerId);
 			pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -18536,7 +18567,17 @@ var EngCalcs = EngCalcs || {};
 		svg.addEventListener('pointermove', function (e) {
 			if (!pointers.has(e.pointerId)) { return; }
 			pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-			if (drag) { dragDirty = true; }
+			if (!drag) { return; }
+			// **NOTHING MOVES UNTIL THE PRESS HAS TRAVELLED PAST ITS OWN SLOP** -- see TAP_MOVE_PX.
+			// The offsets seeded on the press are kept, so the element does not jump when the drag
+			// does arm: it simply starts following a finger that is already where it is.
+			// A pinch carries no start point (it is two of them); it is a drag from its first frame.
+			if (!gestureMoved) {
+				if (typeof drag.startX === 'number' &&
+					Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < tapMovePx(e)) { return; }
+				gestureMoved = true;
+			}
+			dragDirty = true;
 		});
 		function endPointer(e) {
 			pointers.delete(e.pointerId);
@@ -18599,7 +18640,13 @@ var EngCalcs = EngCalcs || {};
 		});
 		svg.addEventListener('pointerup', function (e) {
 			if (regMode || georefActive()) { downPt = null; return; } // a pending registration sequence, or a placement in progress
-			if (!downPt || Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) >= 4) { downPt = null; return; }
+			// **A DRAG IS NEVER ALSO A TAP.** `gestureMoved` is the fact -- this press armed a drag
+			// and moved the document -- and the distance test is what covers the modes that set no
+			// `drag` at all (add-*, delete), where nothing arms anything but a travelling press is
+			// still not a tap. Both, because neither alone is the whole question. See TAP_MOVE_PX
+			// for why the number is now the gesture's own rather than a flat 4.
+			if (!downPt || gestureMoved ||
+				Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) >= tapMovePx(e)) { downPt = null; return; }
 			// WHAT KIND OF PRESS THIS WAS, decided here because this is where both halves of it
 			// are known. A pointer is always a plain 'click'; a finger is a 'tap' or, past the
 			// long-press threshold, a 'hold'. Nothing but the profile chooser reads it today.
@@ -18727,6 +18774,10 @@ var EngCalcs = EngCalcs || {};
 				// and the commentary line is still telling them what will.
 				void 0;
 			} else if (mode === 'select' && t.dataset.node) {
+				// The one popup that opens SYNCHRONOUSLY inside the gesture that asked for it --
+				// the link and label popups below are on a 300 ms debounce and are already past
+				// the compat-click window. See ghostClickShield().
+				popupOpenedByFinger = (tapKind !== 'click');
 				openPopup(t.dataset.node, e.clientX, e.clientY);
 			} else if (mode === 'select' && t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')) {
 				// Delayed, not immediate: gives the native dblclick listener above a chance to
@@ -22456,6 +22507,13 @@ var EngCalcs = EngCalcs || {};
 		// The box Tom reported: every field in the Node editor carries a "?", and each one's tip is
 		// a sibling of the popup in document.body rather than a child of it.
 		hideTipsIn(popup);
+		// AND THE GHOST-CLICK SHIELD COMES DOWN WITH THE BOX. A pending timer would otherwise
+		// restore `pointerEvents` on a popup that has since been reopened by a mouse, and a box
+		// closed inside the shield window would come back inert -- the same class of leak as the
+		// tooltip on the line above, which is why it is fixed on the same line.
+		if (ghostShieldTimer) { clearTimeout(ghostShieldTimer); ghostShieldTimer = null; }
+		popupOpenedByFinger = false;
+		popup.style.pointerEvents = '';
 		popup.style.display = 'none';
 		currentPopup = null;
 	}
@@ -23254,6 +23312,43 @@ var EngCalcs = EngCalcs || {};
 	// transient view choice, not a project setting -- in the document, a colleague opening your file
 	// would inherit where your screen's popup sat.
 	var popupUserPos = null;
+	// **A BOX THAT OPENS UNDER A FINGER MUST NOT ANSWER THAT FINGER'S OWN CLICK** (Tom, 2026-08-31:
+	// *"the node editor open with the pattern selector open"*).
+	//
+	// A tap on a touchscreen is a pointerdown/pointerup pair AND, right behind it, a compatibility
+	// `mousedown`/`mouseup`/`click` at the same screen point -- the "click-through" or ghost click
+	// that FastClick was famous for. The node popup opens inside the pointerup, and on a phone it is
+	// nearly the width of the screen and is clamped to sit beside the junction that was tapped, so
+	// the point the finger just left is very often INSIDE it a millisecond later. Whatever control
+	// is at that point receives the ghost click, and a `<select>` that receives a click opens its
+	// picker -- which is a node editor that arrives with a pattern chooser already down.
+	//
+	// **THIS ONE IS REASONED, NOT REPRODUCED**, and that is worth saying plainly: a compat click is
+	// generated by the browser and no headless stub emits one, so what the harness can hold is that
+	// the shield goes up for a finger, stays down for a mouse, and lifts. Ruled out first, by
+	// reading: nothing in the popup calls focus(); the select carries no `size`/`multiple` and no
+	// CSS that expands it; libFillPatternOptions() rebuilds every option and re-sets the value on
+	// each open; and renderNodeFields() clears the whole field area through clearFields(), so no
+	// state survives from the previously-opened popup.
+	//
+	// Rejected: preventDefault() on the ghost `click`. A `<select>` opens its picker on the
+	// mousedown of that sequence, so cancelling the click arrives one event too late. Rejected too:
+	// moving the popup away from the finger -- on a 390 px screen this box is most of the screen,
+	// so there is no "away" to move it to.
+	var GHOST_CLICK_MS = 350;
+	var ghostShieldTimer = null, popupOpenedByFinger = false;
+	function ghostClickShield(panel) {
+		var byFinger = popupOpenedByFinger;
+		popupOpenedByFinger = false;
+		if (ghostShieldTimer) { clearTimeout(ghostShieldTimer); ghostShieldTimer = null; }
+		panel.style.pointerEvents = '';
+		if (!byFinger) { return; }
+		panel.style.pointerEvents = 'none';
+		ghostShieldTimer = setTimeout(function () {
+			ghostShieldTimer = null;
+			panel.style.pointerEvents = '';
+		}, GHOST_CLICK_MS);
+	}
 	function openPopupAt(sx, sy) {
 		var popup = document.getElementById('lpn_popup'), r, h, at;
 		if (popupUserPos) { sx = popupUserPos.left; sy = popupUserPos.top; }
@@ -23267,6 +23362,7 @@ var EngCalcs = EngCalcs || {};
 		r = popup.getBoundingClientRect();
 		at = clampPanel(sx, sy, r.width, h, window.innerWidth, window.innerHeight, chromeFloor());
 		popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
+		ghostClickShield(popup);
 		EngCalcs.initTips(popup);
 	}
 	// ---- rename (Tom: EPANET allows editing an element's ID, so must this) ----
