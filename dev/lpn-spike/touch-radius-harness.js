@@ -24,6 +24,12 @@
 // call site and it is the pointerUP handler -- so a finger could OPEN a node it could not GRAB. It
 // asserts the GESTURE, driven through the real pointerdown/move/up handlers, because every number
 // section 1 checks was already right while the drag was still broken.
+//
+// **SECTIONS 5 AND 6 ARE THE BILL THAT CAME WITH SECTION 4.** Once a finger could grab a node, every
+// short finger drag also opened that node's editor -- the tap test was a flat 4 px on the final
+// displacement while the drag moved the node on the first pixel, so one press was both. Section 5
+// holds the rule that settles it; section 6 holds the shield over the popup that a touch tap's own
+// compatibility click would otherwise land in.
 
 'use strict';
 
@@ -39,7 +45,16 @@ const L = loadLoopedNetwork(
 	"\t\tgrabSlop: function () { return NODE_GRAB_TOUCH_PX; },\n" +
 	"\t\ttouchNodeGrabNear: touchNodeGrabNear,\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode,\n" +
-	"\t\tapplyDrag: function () { if (drag) { applyDrag(); } },\n" +
+	// **THE FRAME, NOT applyDrag().** This used to be `if (drag) { applyDrag(); }`, which is a stub
+	// that removes a coupling: the page never calls applyDrag() on a pointermove -- tick() calls it
+	// only where `dragDirty` is set, and pointermove is what sets that. Section 5's whole subject is
+	// the pointermove that DECLINES to set it, so a harness that applied the drag itself would have
+	// moved the node no matter what the page decided. This is tick()'s body, verbatim.
+	"\t\tapplyDrag: function () { if (drag && dragDirty) { applyDrag(); dragDirty = false; } },\n" +
+	"\t\ttapMove: function (e) { return tapMovePx(e); },\n" +
+	"\t\tpopupIsOpen: function () { return !!currentPopup; },\n" +
+	"\t\tpopupBox: function () { return document.getElementById('lpn_popup'); },\n" +
+	"\t\tclosePopup: closePopup,\n" +
 	"\t\tselectedRef: selectedRef,\n" +
 	"\t\tdragNow: function () { return drag ? { type: drag.type, id: drag.id } : null; },\n" +
 	"\t\tnearNode: nearestNodeNearScreen,\n" +
@@ -221,5 +236,168 @@ console.log('\n--- a press, not a tap: grabbing a node with a finger ---');
 	ok('the grab fallback offers no LINK, only nodes', !L.touchNodeGrabNear(mid.x, mid.y));
 }
 
-console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
-process.exit(fails ? 1 : 0);
+// ---------------------------------------------------------------------------
+// 5. A DRAG IS NEVER ALSO A TAP. Tom, 2026-08-31, on a phone: *"sometimes the
+//    node editor comes up when I am trying to drag, sometime after a successful
+//    drag."* The whole gesture, end to end, through the real handlers and the
+//    real frame loop -- because the defect was the two halves of one press
+//    disagreeing, and either half read alone was already correct.
+//
+//    MEASURED BEFORE THE FIX, with the frame loop coupled as it is above: a
+//    touch press 12 px from a junction, a 3 px slide and a lift gave
+//    `{drag:'node', popup:true, nodeX:203}` -- the node moved AND the editor
+//    opened, which is Tom's second sentence exactly.
+// ---------------------------------------------------------------------------
+console.log('\n--- a short slide is a drag; a still press is a tap ---');
+{
+	ok('a finger may travel further than a pointer before it stops being a tap',
+		L.tapMove({ pointerType: 'touch' }) > L.tapMove({ pointerType: 'mouse' }),
+		L.tapMove({ pointerType: 'touch' }) + ' > ' + L.tapMove({ pointerType: 'mouse' }));
+	// The pointer's own number is the one that must not move -- CLAUDE.md's rule that phone
+	// ergonomics stay out of the desktop design, the same guard section 1 keeps on the tap radius.
+	ok('...and the pointer\'s is still 4, exactly as before', L.tapMove({ pointerType: 'mouse' }) === 4,
+		L.tapMove({ pointerType: 'mouse' }));
+
+	L.seedDefaultInputs();
+	const doc = L.getDoc();
+	doc.nodes.length = 0; doc.links.length = 0; doc.labels.length = 0;
+	L.buildDom();
+	L.buildLayers();
+	L.setScale(1);
+	L.wirePointerEvents();
+	L.setMode('select');
+	const svg = byId.lpn_canvas;
+	const a = L.addNode('junction', 200, 200).id;
+	L.addNode('junction', 500, 200);
+	const at = L.worldToScreen(200, 200);
+
+	function fire(type, ev) { setHitTarget(null); (svg._listeners[type] || []).forEach(function (fn) { fn(ev); }); }
+	// One whole gesture: press, (optionally) travel, let go -- with the frame loop run after the
+	// move exactly as requestAnimationFrame would run it.
+	function gesture(kind, x0, y0, dx, dy) {
+		L.closePopup();
+		// Back to a known view AND a known node position. A gesture that pans leaves the map
+		// shifted, and the next gesture's screen coordinates would then mean a different place --
+		// which is how the pan assertion below first failed for a reason that was the harness's.
+		L.setScale(1);
+		doc.nodes.filter(function (n) { return n.id === a; })[0].x = 200;
+		fire('pointerdown', { pointerId: 9, clientX: x0, clientY: y0, pointerType: kind, button: 0 });
+		const began = L.dragNow();
+		if (dx || dy) {
+			fire('pointermove', { pointerId: 9, clientX: x0 + dx, clientY: y0 + dy, pointerType: kind });
+			L.applyDrag();
+		}
+		fire('pointerup', { pointerId: 9, clientX: x0 + dx, clientY: y0 + dy, pointerType: kind });
+		return {
+			began: began && began.type,
+			popup: L.popupIsOpen(),
+			nodeX: doc.nodes.filter(function (n) { return n.id === a; })[0].x
+		};
+	}
+
+	// **THE DEFECT, IN ONE LINE.** A finger grabs a junction (Task 417's 14 px promotion) and slides
+	// it a short way. Under the fix that slide is inside the touch slop, so it is still a TAP: the
+	// node does not move at all and the editor opens, which is one unambiguous outcome instead of
+	// both at once.
+	const small = gesture('touch', at.x + 12, at.y, 3, 0);
+	ok('a 3px finger slide on a grabbed node moves NOTHING', small.nodeX === 200, small.nodeX);
+	ok('...and is therefore a tap, so the editor opens', small.popup === true);
+
+	// Past the slop it is a drag, and the editor stays shut. THIS is the sentence Tom wrote:
+	// "the node editor comes up ... after a successful drag."
+	const big = gesture('touch', at.x + 12, at.y, 20, 0);
+	ok('a 20px finger slide MOVES the node', big.nodeX === 220, big.nodeX);
+	ok('...and the editor does NOT open after it', big.popup === false);
+	// **AND IT MOVES BY THE WHOLE 20, NOT BY 20 MINUS THE SLOP.** The offsets seeded on the press
+	// are kept, so an armed drag starts following a finger already where it is -- no jump, and no
+	// silently-swallowed ten pixels either.
+	ok('...by the full travel: the element does not jump when the drag arms', big.nodeX - 200 === 20);
+
+	// A PRESS THAT DOES NOT MOVE AT ALL IS THE PLAIN CASE and must keep working, or the fix has
+	// traded one defect for a page where a junction cannot be opened.
+	const still = gesture('touch', at.x + 12, at.y, 0, 0);
+	ok('a still finger press opens the editor and moves nothing',
+		still.popup === true && still.nodeX === 200, still.nodeX);
+
+	// THE POINTER PATH IS UNCHANGED, section 3's guard applied to this number: a mouse still
+	// becomes a drag at 4 px, so a 5 px mouse drag is a drag and a 2 px one is a click.
+	const mouseSmall = gesture('mouse', at.x, at.y, 2, 0);
+	ok('a 2px mouse movement is still a click, and still moves nothing', mouseSmall.nodeX === 200,
+		mouseSmall.nodeX);
+	const mousePan = gesture('mouse', at.x, at.y, 6, 0);
+	ok('a 6px mouse movement is a drag -- it pans, since a mouse gets no node promotion',
+		mousePan.began === 'pan' && mousePan.popup === false);
+
+	// **A PAN THAT PANNED IS NOT A TAP EITHER.** 20 px from the junction a press pans (section 4);
+	// travel it far enough to arm and the editor must not open on the lift, even though the lift
+	// lands inside the 24 px tap radius of that junction.
+	const panned = gesture('touch', at.x + 20, at.y, 40, 0);
+	ok('a finger that panned the map does not also open the nearest junction',
+		panned.began === 'pan' && panned.popup === false);
+	L.closePopup();
+}
+
+// ---------------------------------------------------------------------------
+// 6. THE GHOST CLICK. Tom, the same day: *"the node editor open with the pattern
+//    selector open."* A touch tap is followed by a compatibility mousedown/click
+//    at the same point, and the popup that opened inside the pointerup is now
+//    sitting there -- so the pattern <select> in the demand table gets clicked
+//    and opens its picker.
+//
+//    **NO STUB EMITS A COMPAT CLICK, so this section does NOT reproduce the
+//    defect and does not pretend to.** What it holds is the shield: up for a
+//    finger, never for a mouse, and gone again a moment later.
+// ---------------------------------------------------------------------------
+console.log('\n--- a popup opened by a finger ignores that finger\'s ghost click ---');
+{
+	const doc = L.getDoc();
+	const svg = byId.lpn_canvas;
+	const a = doc.nodes[0].id;
+	L.setScale(1);
+	const at = L.worldToScreen(doc.nodes[0].x, doc.nodes[0].y);
+	function fire(type, ev) { setHitTarget(null); (svg._listeners[type] || []).forEach(function (fn) { fn(ev); }); }
+	function tap(kind, x, y) {
+		L.closePopup();
+		fire('pointerdown', { pointerId: 9, clientX: x, clientY: y, pointerType: kind, button: 0 });
+		fire('pointerup', { pointerId: 9, clientX: x, clientY: y, pointerType: kind });
+	}
+
+	tap('touch', at.x, at.y);
+	ok('the editor opened', L.popupIsOpen());
+	ok('...and it is deaf for a moment, so the ghost click reaches no control in it',
+		L.popupBox().style.pointerEvents === 'none', L.popupBox().style.pointerEvents);
+
+	// A MOUSE GENERATES NO GHOST CLICK, so a desktop popup is live the instant it appears. Shielding
+	// it would be a fix for one machine that broke the other.
+	tap('mouse', at.x, at.y);
+	ok('a popup opened by a mouse is live immediately',
+		L.popupBox().style.pointerEvents === '', L.popupBox().style.pointerEvents);
+
+	// **AND CLOSING TAKES THE SHIELD WITH IT** -- the leak that 0|555| found in this same function,
+	// where closePopup() hid the box and left something of it behind.
+	tap('touch', at.x, at.y);
+	L.closePopup();
+	ok('closing the box takes the shield down with it',
+		L.popupBox().style.pointerEvents === '', L.popupBox().style.pointerEvents);
+}
+
+setTimeout(function () {
+	// The shield LIFTS. A box that stayed deaf would be a worse defect than the one being fixed,
+	// and a timer is the only thing standing between the two -- so the last assertion is that it
+	// really fired.
+	console.log('\n--- ...and it lifts ---');
+	const svg = byId.lpn_canvas;
+	const doc = L.getDoc();
+	L.setScale(1);
+	const at = L.worldToScreen(doc.nodes[0].x, doc.nodes[0].y);
+	function fire(type, ev) { setHitTarget(null); (svg._listeners[type] || []).forEach(function (fn) { fn(ev); }); }
+	L.closePopup();
+	fire('pointerdown', { pointerId: 9, clientX: at.x, clientY: at.y, pointerType: 'touch', button: 0 });
+	fire('pointerup', { pointerId: 9, clientX: at.x, clientY: at.y, pointerType: 'touch' });
+	setTimeout(function () {
+		ok('the popup answers the user again once the ghost click window has passed',
+			L.popupBox().style.pointerEvents === '', L.popupBox().style.pointerEvents);
+		console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
+		process.exit(fails ? 1 : 0);
+	}, 500);
+}, 0);

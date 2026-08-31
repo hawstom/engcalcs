@@ -286,7 +286,12 @@ function extract(name) {
 	}
 	return lpnSrc.slice(at, end);
 }
-vm.runInContext('var currentPopup = null;\n' + extract('hideTipsIn') + '\n' + extract('closePopup') +
+// The module-scope variables closePopup() reads, re-declared here because this section evals that
+// one function on its own rather than the whole file. `ghostShieldTimer` and `popupOpenedByFinger`
+// joined `currentPopup` on 2026-08-31 (the ghost-click shield): closePopup() lowers the shield on
+// the same line it hides the tips, which is the same class of leak and therefore the same fix site.
+vm.runInContext('var currentPopup = null, ghostShieldTimer = null, popupOpenedByFinger = false;\n' +
+	extract('hideTipsIn') + '\n' + extract('closePopup') +
 	'\nthis.lpnClosePopup = closePopup;', ctx, { filename: 'looped-network.js:closePopup' });
 
 console.log('\n--- closing the Node editor takes its tips with it ---');
