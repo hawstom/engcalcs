@@ -13044,6 +13044,23 @@ var EngCalcs = EngCalcs || {};
 		// project guard; found by `dev/lpn-spike/terrain-harness.js` reusing an id across sections.
 		terrainLastRead = {};
 		terrainAsked = {};
+		// **AND THE INDEXEDDB, WHICH WAS THE LAST THING THIS BUTTON DID NOT KEEP ITS WORD ABOUT.**
+		// `engcalcs-lpn` holds `handles` (a FileSystemFileHandle per open project, Task 212) and
+		// `recent` (Task 258). Both survive a wipe today, so a user who asks to come back as a
+		// brand-new visitor still finds their recent files listed and their file handles live --
+		// which is the confirm's own sentence being false, the fourth time in this function's life.
+		// Found by storage_inventory_check.php, which is a Task 322 row: the inventory whose only
+		// claim is completeness did not list this store either.
+		//
+		// deleteDatabase, not a store-by-store clear: the promise is 'as a brand-new visitor would
+		// see it', and a brand-new visitor has no database at all. It is fire-and-forget because the
+		// caller reloads immediately -- a blocked delete (another tab holding the connection) resolves
+		// once that tab goes, and waiting on it would hang the reload behind a window we do not own.
+		try {
+			if (window.indexedDB && window.indexedDB.deleteDatabase) {
+				window.indexedDB.deleteDatabase(LPN_IDB_NAME);
+			}
+		} catch (err) { /* private mode, or a browser refusing the delete -- nothing to remove */ }
 	}
 	// The whole-page reset, behind one confirm. Extracted from the Settings button's inline handler
 	// (Task 211) so the Settings MENU can offer the same act -- one implementation, two doors, which
