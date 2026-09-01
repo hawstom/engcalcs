@@ -4913,6 +4913,28 @@ var EngCalcs = EngCalcs || {};
 	// elementsFromPoint() confirms each in turn and stops at the canvas, which carries no dataset and
 	// reads as bare map to every caller.
 	//
+	// **A THING THE USER CANNOT SEE CANNOT BE GRABBED.** (Tom, 2026-09-01: *"a node label is present
+	// but not (yet?) visible, and when I go to pan, the label that I did not see drags off the
+	// screen."*) The cure is one word in css/engcalcs.css -- `.lpn-draglbl` wore
+	// `pointer-events: all`, which in SVG hit-tests an element REGARDLESS of its visibility, so all
+	// four label-hiding mechanisms left a fully grabbable invisible word on the map. This is the
+	// second half of the same fact rather than a second fact: it reads `visibility` too, so nothing
+	// here has to be kept in step with anything there.
+	//
+	// getComputedStyle() answers for every hiding mechanism at once, class-driven or inline, and it
+	// already resolves the inheritance -- `visibility` inherits, so a hidden <g> hides its children.
+	// The inline walk below it is for a DOM with no cascade (the harness stub), where a class means
+	// nothing but setLabelAssemblyHidden()'s own `style.visibility` is still on the element.
+	function hitIsVisible(t) {
+		if (!t || t.nodeType !== 1) { return true; }
+		var cs = window.getComputedStyle ? window.getComputedStyle(t) : null;
+		if (cs && (cs.visibility === 'hidden' || cs.visibility === 'collapse')) { return false; }
+		for (var e = t; e && e.nodeType === 1; e = e.parentNode) {
+			if (e.style && e.style.visibility === 'hidden') { return false; }
+			if (e === svg) { break; }
+		}
+		return true;
+	}
 	// Not e.target on a pointerdown either: elementsFromPoint() is a document query and is unaffected
 	// by the setPointerCapture() retargeting that made pointerup use elementFromPoint() in the first
 	// place, so one call serves every gesture.
@@ -4922,6 +4944,10 @@ var EngCalcs = EngCalcs || {};
 			if (list[i] === svg) { break; }
 			if (!svg.contains(list[i])) { break; }   // page furniture over the map -- not a map hit
 			t = resolveLabelHit(list[i]);
+			// SKIPPED, not returned as a miss: something visible may be under the invisible thing,
+			// and the walk is here precisely so a rejected candidate does not take the real hit
+			// beneath it away with it.
+			if (!hitIsVisible(t)) { continue; }
 			if (hitConfirmed(t, cx, cy)) { return t; }
 		}
 		return svg;
