@@ -187,8 +187,24 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
 - **Element types:** junction, reservoir, tank, pipe, pump, valve, text. **Our vocabulary is NOT
   EPANET's and stays that way** (Tom, 2026-08-21, ROADMAP Task 482): what we call a **Label**
   EPANET calls Notation/Annotation, and what EPANET calls a **Label** is our **Text** object.
-  There is no industry standard to defer to, so write new strings in OUR vocabulary — every one
-  written in EPANET's adds to a rename we have already declined.
+  For THOSE TWO OBJECTS there is no industry standard to defer to, so write new strings in our
+  vocabulary — every one written in EPANET's adds to a rename we have already declined.
+  - **THAT RULE IS ABOUT ONE COLLISION AND IS NOT A LICENCE TO INVENT PLAIN ENGLISH** (corrected
+    2026-09-01). It was read far too widely and the result was strings a hydraulic engineer does
+    not recognise: `Rest pressure` for static pressure, `Pulled down` for drawdown, `settle` for
+    converge, `Solves` for runs. Tom, twice in one reading: *"why are we inventing language that
+    engineers will not recognize?"* and *"we should default... to the EPANET terminology."*
+  - **WHERE THE PROFESSION ALREADY OWNS A WORD, USE THE PROFESSION'S WORD** — static pressure,
+    residual, drawdown, converge, emitter, trace — and where an EPANET file's own option or
+    analysis is being described, name it as EPANET names it. **Simple English governs the
+    EXPLAINING, never the NAMING**: `dev/language-strings.md`'s rule was written against opaque
+    loanwords, not against standard terms, and **a plain-English substitute for a standard term is
+    HARDER to translate, not easier, because the translator has no term to look up.**
+  - **AND WHEN ONE NAME IS DOING TWO JOBS, SPLIT IT RATHER THAN CHOOSE** (Tom, 2026-09-01: *"Source
+    trace mystifies me if it's intended to mean Share from source"*). It did: `lpn_quality_trace`
+    named the ANALYSIS and `lpn_result_source_share` named the NUMBER, and both said "Source
+    share". The analysis is EPANET's **Source trace** on EPANET's **Trace node**; the number it
+    reports is a **Source share**, a percentage. Two things, two words, and the tip ties them.
 - **EXTENDED-PERIOD SIMULATION SHIPPED 2026-08-18, THROUGH THE EPANET ENGINE ONLY** (`js/lpn-time.js`).
   Tanks fill and drain, demands follow patterns, the bottom pane scrubs the frames; checked against
   all 25 steps of EPA's own `Net3.rpt` to 0.005 ft over 2,425 head comparisons

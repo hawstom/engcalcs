@@ -213,17 +213,17 @@ console.log('\n--- saved with the project, and shown nowhere ---');
 		qRows.length >= 1 && !labels.some(t => /^Track$/i.test(t)), qRows.join(' | '));
 	ok('...the first of which is what to track', /Track/i.test(qRows[0] || ''), qRows.join(' | '));
 	// **THE SOURCE ROW APPEARS ONLY WHERE IT MEANS ANYTHING.** Net1 names a chemical, so nothing on
-	// this page is tracing a source, and a "Water from" selector beside it would be a control with
+	// this page is tracing a source, and a "Trace node" selector beside it would be a control with
 	// no analysis behind it.
 	ok('...and no source row while nothing is being traced',
-		!qRows.some(t => /Water from/i.test(t)), qRows.join(' | '));
+		!qRows.some(t => /Trace node/i.test(t)), qRows.join(' | '));
 
 	// Switch it to a source share the way the control does, and the second row arrives.
 	L.getSettings().quality = { mode: 'trace', traceNode: '10' };
 	L.rebuildSettings();
 	const traced = rowsIn(byId.lpn_set_quality_fields);
 	ok('tracing a source adds the row that names it',
-		traced.some(t => /Water from/i.test(t)), traced.join(' | '));
+		traced.some(t => /Trace node/i.test(t)), traced.join(' | '));
 	// **THE CHEMICAL THE FILE NAMED IS STILL REACHABLE**, or an open-and-save could not put it back.
 	L.getSettings().quality = { mode: 'chemical', traceNode: '', src: 'Chlorine mg/L' };
 	L.rebuildSettings();

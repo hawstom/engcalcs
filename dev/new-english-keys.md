@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**13 still to read**, of 206 untranslated keys, of 1521 English keys. A key already marked _Ruled OK_ below needs nothing from you —
+**16 still to read**, of 206 untranslated keys, of 1521 English keys. A key already marked _Ruled OK_ below needs nothing from you —
 the ruling lapses by itself if the wording changes.
 
 ## lpn_  (204)
@@ -463,8 +463,7 @@ the ruling lapses by itself if the wording changes.
   > Nothing
   _Ruled OK 2026-09-01._
 - **`lpn_quality_trace`**
-  > Source share
-  _Ruled OK 2026-09-01._
+  > Source trace
 - **`lpn_replace_asked`**
   > Asked for {n}. The answer is on its way.
   _Ruled OK 2026-08-29._
@@ -481,8 +480,7 @@ the ruling lapses by itself if the wording changes.
   > Source share
   _Ruled OK 2026-09-01._
 - **`lpn_result_source_share_tip`**
-  > Of the water reaching this point, the share that came from the source you chose.
-  _Ruled OK 2026-09-01._
+  > A source trace reports this share: of the water reaching this point, how much of it came from the trace node.
 - **`lpn_result_water_age`**
   > Water age
   _Ruled OK 2026-09-01._
@@ -554,8 +552,7 @@ the ruling lapses by itself if the wording changes.
   > Water quality
   _Ruled OK 2026-09-01._
 - **`lpn_settings_quality_source`**
-  > Water from
-  _Ruled OK 2026-09-01._
+  > Trace node
 - **`lpn_settings_quality_source_tip`**
   > The point whose water is followed. Every other point then shows the share of its water that came from here.
   _Ruled OK 2026-09-01._
