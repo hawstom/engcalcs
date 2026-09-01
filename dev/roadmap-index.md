@@ -7,18 +7,16 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**63 open tasks.** Next (100): 13 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
+**61 open tasks.** Next (100): 11 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
 
-## 100 — Next (13)
+## 100 — Next (11)
 
 - Task 248.03 — Rule-based controls: the text is CARRIED now; the language is still parked.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
-- Task 417 — Long-press enters Edit mode, and the phone's touch radius is too mean.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
 - Task 530 — Fire flow: Tom's rulings are recorded; what is left is BUILDING them.
-- Task 540 — BUILT, including the parser. Tom has approved the wording.
 - ! Task 545 — [H] · The list is a file now. Tom read it once and the edits were lost.
 - Task 553 — [H] · Demands and Hydraulics options: BUILT. One wording question is left.
 - Task 562 — One touch radius for every object, and a node always wins.
@@ -89,5 +87,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-55 of 63 titles are within 4–12 words. `!` marks the rest;
+53 of 61 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
