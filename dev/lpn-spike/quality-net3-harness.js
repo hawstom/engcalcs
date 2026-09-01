@@ -83,6 +83,15 @@ function check(ok, msg) {
 		'a chemical is carried, never composed');
 	check(EngCalcs.lpnQualityText({ mode: 'none' }) === '',
 		'a document stating nothing writes nothing');
+	// **THE LEGACY CASE, AND IT IS THE ONE THAT COULD DELETE SOMEBODY'S LINE.** A project saved
+	// while `Quality` was still carried text has a token and no interpreted setting; read as a
+	// deliberate "no analysis" it would export a file missing a line its source stated. The
+	// interpretation is derived from the token on open (js/looped-network.js), and the exporter
+	// treats a setting with no `src` as never having met the token at all.
+	check(EngCalcs.lpnQualityParse('Trace Lake').mode === 'trace',
+		'an old project\'s token still parses to its analysis on open');
+	check(EngCalcs.lpnQualityText({ mode: 'none' }) === '' && EngCalcs.lpnQualityText({}) === '',
+		'and a setting that never met a token composes nothing of its own');
 	// **THE WHOLE EXPORTER IS CHECKED WHERE THE PAGE IS LOADED**, not here:
 	// dev/lpn-spike/inp-export-harness.js already imports Net1/Net2/Net3 through the page's own
 	// docFromInp() and asserts every token comes back character for character, and it is where the

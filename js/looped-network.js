@@ -13737,6 +13737,17 @@ var EngCalcs = EngCalcs || {};
 		var savedPrefixes = savedSettings.idPrefixes || {};
 		delete savedSettings.defaults; delete savedSettings.sectionsOpen; delete savedSettings.idPrefixes;
 		settings = Object.assign(defaultSettings(), savedSettings);
+		// **A PROJECT SAVED BEFORE `Quality` WAS INTERPRETED STILL CARRIES ONLY THE TOKEN**, and it
+		// must not come back as "no analysis": it would then export a file missing a line its source
+		// stated, which is the one thing the carry existed to prevent. So the token is interpreted
+		// once, here, exactly as an import does it -- and the ABSENCE of `src` is what identifies a
+		// setting that has never met its own token, which is why `src` is stored rather than being
+		// re-derived on demand.
+		if (settings.quality && settings.quality.src === undefined
+			&& (settings.qualityOptions || {}).quality && EngCalcs.lpnQualityParse) {
+			settings.quality = EngCalcs.lpnQualityParse(settings.qualityOptions.quality);
+			settings.quality.src = settings.qualityOptions.quality;
+		}
 		// **A PROJECT SAVED UNDER THE TWO-FIELD DESIGN KEEPS ITS NUMBERS.** That design froze the
 		// method's answer into a second field, `colorFrozenBreaks`, and was rejected (Task 448).
 		// Those numbers are the ones that project was drawn in, so

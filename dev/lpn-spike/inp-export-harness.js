@@ -584,6 +584,14 @@ console.log('\n7. the water-quality option round-trips, and changes only when th
 	const one = importDoc(refPath('Net1.inp'));
 	ok('Net1 reads as a carried chemical', one.doc.settings.quality.mode === 'chemical',
 		JSON.stringify(one.doc.settings.quality));
+	// **A PROJECT SAVED BEFORE THE OPTION WAS INTERPRETED**: it has the token and a setting that
+	// has never met it. Read as a deliberate "no analysis", the export would delete a line the
+	// source stated -- which is the whole reason `src` is stored rather than re-derived.
+	const legacy = importDoc(refPath('Net3.inp')).doc;
+	legacy.settings.quality = { mode: 'none', traceNode: '' };
+	ok('an un-interpreted setting does not delete the carried line',
+		qualityLine(EngCalcs.lpnExportInp(legacy).inp) === 'Trace Lake',
+		qualityLine(EngCalcs.lpnExportInp(legacy).inp));
 	ok('and its own words come back out', qualityLine(EngCalcs.lpnExportInp(one.doc).inp) === 'Chlorine mg/L',
 		qualityLine(EngCalcs.lpnExportInp(one.doc).inp));
 }

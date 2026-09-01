@@ -1399,9 +1399,13 @@
 		var q = qual || {}, out = '', text;
 		LPN_QUAL_LINES.forEach(function (pair) {
 			if (pair[0] === 'quality') {
-				// The live setting decides, and it falls back to the carried token when the document
-				// has no interpreted setting at all (a project saved before this existed).
-				text = live ? EngCalcs.lpnQualityText(live)
+				// **THE LIVE SETTING DECIDES ONLY ONCE IT HAS MET THE TOKEN.** A setting carrying no
+				// `src` has never been derived from this document's own text -- a project saved
+				// before the option was interpreted at all -- and reading its default 'none' as a
+				// decision would delete a line the source stated. `src` present, or a mode the user
+				// can only have chosen, is what makes it a decision.
+				var decided = live && (live.src !== undefined || (live.mode && live.mode !== 'none'));
+				text = decided ? EngCalcs.lpnQualityText(live)
 					: (q.quality === undefined || q.quality === null ? '' : String(q.quality));
 				if (text !== '') { out += row([pair[1], text]) + '\n'; }
 				return;
