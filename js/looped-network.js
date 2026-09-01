@@ -26796,19 +26796,19 @@ var EngCalcs = EngCalcs || {};
 		shown = sorted.slice(0, FF_MAX_ROWS);
 		body = ffTable(host, [
 			pc.lpn_ff_col_junction || 'Junction',
-			pc.lpn_ff_col_static || 'Rest pressure',
-			pc.lpn_ff_col_available || 'Available',
+			pc.lpn_ff_col_static || 'Static pressure',
+			pc.lpn_ff_col_available || 'Available flow',
 			// **RESIDUAL SITS BESIDE AVAILABLE, NOT BESIDE REQUIRED** (Tom, 2026-09-01: *"the
 			// Residual held column should immediately follow Available flow"*). The two are ONE
 			// reading -- a flow and the pressure the junction still held while delivering it -- and
 			// an available flow with no residual beside it is a number without its condition.
 			// Required is the code's demand and belongs after the pair it is compared against.
 			pc.lpn_ff_col_residual || 'Residual held',
-			pc.lpn_ff_col_required || 'Required',
+			pc.lpn_ff_col_required || 'Required flow',
 			pc.lpn_ff_col_atrequired || 'Pressure at required',
-			pc.lpn_ff_col_affected || 'Pulled down',
+			pc.lpn_ff_col_affected || 'Drawdowns',
 			pc.lpn_ff_col_limit || 'Design limit',
-			pc.lpn_ff_col_solves || 'Solves',
+			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_result || 'Result'
 		]);
 		shown.forEach(function (rec) {

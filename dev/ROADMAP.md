@@ -717,16 +717,21 @@ the block.
     0047"*** — so the Water-glyph and lat-before-lon findings that filled this block are spent, and
     they are deleted rather than archived here. **He also said the icon alone was an insufficient
     reason to re-shoot**, so the frames may still carry other faults.
-  - **[H] WHAT IS ACTUALLY NEEDED NOW, and it is one job: LOOK AT THE THREE NEW FRAMES.** Compare
-    `img/0028.png`, `img/0043.png` and `img/0047.png` on `screenshots.html` against the current
-    page, update their INDEX rows, and answer the one open question they were re-shot for:
-    **0028 was the only published desktop plate with the status strip in view**, so it is the only
-    one that can contradict `coord_order_check.php`'s lat-before-lon rule in public — does it still?
-    And the previous re-shot 0028 had its **Pressure and Velocity colour keys painted over the
-    node/link labels legend** (`H= Head` cut off mid-row): check whether that recurs, because
-    nothing makes the two legends avoid each other when a user puts them in one corner — Task 516
-    only gave them different DEFAULT corners. **Whether that overlap earns its own task is Tom's
-    call.**
+  - **DONE 2026-09-01, AND THE LESSON IS THE PROCESS, NOT THE PICTURES.** All three were read
+    FROM THE PIXELS by AI — `Read` opens a PNG, so nobody had to ask Tom what his own screenshots
+    showed. 0028: latitude first, colour keys top-right against the labels legend top-left, nothing
+    printing through. 0047: latitude first, and the `--` placeholder is CORRECT rather than a defect
+    (a phone has no hover and nothing has been pointed at — Task 550). 0043: the Task 549 fixes are
+    visible, and the cut-off result list that AI could not judge is, in Tom's words, *"all that
+    would fit"*. Swapped into `librewaternet.org` on his word, commit `10eda9e`.
+  - **[H] THE REAL FAILURE THIS EXPOSED: A RE-SHOOT IS NOT PUBLISHED BY BEING TAKEN.** The index had
+    already recorded re-shoots on 2026-08-27 and 2026-08-28 that were never carried across, and the
+    published plates sat at their 25 August versions for a week while three separate blocks of this
+    file described them as stale. **The gap was never Tom's camera; it was that copying the file to
+    the sibling repository is a separate act of memory.** Closing a re-shoot means publishing it, or
+    saying in the row why it stays unpublished. **Worth a check** — the sibling repo is drivable
+    from here, so an INDEX row claiming a frame replaces a published plate can be compared with the
+    plate's actual md5.
   - Feeds Task 504's features list, the LibreWaterNet landing page and its `graphics-plan.md`. The
     sibling repo IS drivable from here (`~/webdev/librewaternet.org` — read its own `CLAUDE.md`
     first).

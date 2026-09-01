@@ -206,7 +206,25 @@ if ($write || $check) {
     $outLines = array();
     @exec('git -C ' . escapeshellarg($root) . ' show HEAD:dev/new-english-keys.md 2>/dev/null', $outLines, $rc);
     if ($rc === 0) { $committed = implode("\n", $outLines) . "\n"; }
-    $handEdited = ($committed !== null && $have !== '' && rtrim($have) !== rtrim($committed));
+    /*
+     * **COMPARE LINE BY LINE WITH TRAILING SPACE STRIPPED, because exec() ALREADY DID THAT to one
+     * side and not the other.** PHP's exec() trims trailing whitespace from every line it returns,
+     * so a committed file holding ONE line that ends in a space can never equal what is on disk --
+     * and this guard then reports 'hand edited' for ever, on a file nobody has touched. It is not
+     * hypothetical: Tom's 2026-09-01 rulings included the line `..."No. of passes" or "No. of runs" `
+     * and that single space made the list unregenerable, which is the one thing this script exists
+     * to make routine. A human writing on this file is EXACTLY the case that leaves trailing
+     * spaces, so the false positive fires precisely when the guard matters most.
+     *
+     * Normalising both sides the same way keeps the guard's real question -- has a human written
+     * anything here -- and drops the one difference that is an artefact of how we read the file.
+     */
+    $normalise = function ($text) {
+        $lines = preg_split('/\r\n|\n|\r/', (string) $text);
+        foreach ($lines as $i => $line) { $lines[$i] = rtrim($line); }
+        return rtrim(implode("\n", $lines));
+    };
+    $handEdited = ($committed !== null && $have !== '' && $normalise($have) !== $normalise($committed));
     if ($handEdited && !$force) {
         fwrite(STDERR, "REFUSING TO WRITE: dev/new-english-keys.md has been edited since it was\n");
         fwrite(STDERR, "last generated, and regenerating would discard those edits permanently.\n\n");

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**114 still to read**, of 206 untranslated keys, of 1521 English keys. A key already marked _Ruled OK_ below needs nothing from you —
+**13 still to read**, of 206 untranslated keys, of 1521 English keys. A key already marked _Ruled OK_ below needs nothing from you —
 the ruling lapses by itself if the wording changes.
 
 ## lpn_  (204)
@@ -28,220 +28,215 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_elev_dem_none`**
   > The DEM gave no height for this node.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_elev_dem_said`**
   > Mapbox DEM says {v} {u}.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_elev_dem_sample`**
   > Sample DEM
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_elev_dem_sample_tip`**
   > Reads the elevation of the DEM at this node and shows it below for review before changing the current entry. The horizontal DEM resolution is about 30 m for most of the Earth, and finer where better data exists.
-  Edited.
+  _Ruled OK 2026-09-01._
 - **`lpn_elev_dem_use`**
   > Use DEM
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_elev_dem_use_tip`**
-  > Puts the the elevation of the DEM at this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.
-  Edited.
+  > Puts the elevation of the DEM at this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.
 - **`lpn_ff_accounting`**
   > Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral, and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.
-  Edited.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_affect_link`**
   > {id} at {velocity}
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_affect_node`**
   > {id} down to {pressure}
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_atleast`**
   > over {flow}
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_calculate`**
   > Run
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_col_affected`**
   > Drawdowns
-  Edited. As in other places, why are we inventing language that engineers will not recognize? This is a column of drawdowns? Isn't that what research found?
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_col_atrequired`**
   > Pressure at required
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_col_available`**
   > Available flow
-  Edited
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_col_junction`**
   > Junction
 - **`lpn_ff_col_limit`**
   > Design limit
 - **`lpn_ff_col_required`**
   > Required flow
-  Edited
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_col_residual`**
   > Residual held
-  OK
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_col_result`**
   > Result
 - **`lpn_ff_col_solves`**
-  > Solves
-  Would this be better (in all languages) as "No. of passes" or "No. of runs" 
+  > Runs
 - **`lpn_ff_col_static`**
-  > Rest pressure
-  Shouldn't this be "Static Pressure"? Why are we inventing language that engineers will not recognize?
+  > Static pressure
 - **`lpn_ff_cost`**
-  > {solves} network solves.
-  Change "solves" to "passes" or "runs".
+  > {solves} network runs.
 - **`lpn_ff_design`**
   > Effect on the rest of the system
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_design_all`**
   > Every other junction and every pipe
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_design_nodes`**
   > Every other junction
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_design_none`**
   > Nothing in the chosen set was drawn down by any junction tested.
-  Edited.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_design_off`**
   > Do not check
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_design_off_note`**
   > The effect on the rest of the system was not checked in this run.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_design_tip`**
   > A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_engine_cost`**
   > Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_engine_epanet`**
   > This is worked out with the EPANET engine.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_engine_native`**
   > This is worked out with the built-in solver.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_err_at_rest`**
   > Already below the residual with nothing drawn
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_err_converge`**
   > The network did not converge.
-  Edited.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_err_not_junction`**
   > Not a junction
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_err_solve`**
-  > The network could not be worked out
-  We need better clarity about the difference between this and lpn_ff_err_converge.
+  > The solver reported an error and gave no answer.
 - **`lpn_ff_err_unknown`**
   > No answer, and the reason given is {id}
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_intro`**
   > Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_iso`**
   > ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_limit_both`**
   > Pressure and velocity
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_limit_pressure`**
   > Pressure
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_limit_velocity`**
   > Velocity
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_maxvelocity`**
   > Highest velocity allowed
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_maxvelocity_tip`**
   > A pipe running above this while a fire flow is drawn is reported as a design issue.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_menu`**
   > Fire flow…
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_menu_tip`**
   > Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there create unacceptable drawdown anywhere else?
-  Edited.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_minpressure`**
   > Lowest pressure allowed elsewhere
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_minpressure_tip`**
   > A junction that falls below this while another one is drawing its fire flow is reported as a design issue.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_more`**
   > and {n} more
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_no_junctions`**
   > This project has no junctions yet, so there is nothing to test.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_no_selection`**
   > No junction is selected. Choose one on the map, or test every junction.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_report_all`**
   > Every junction tested
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_required`**
   > Required fire flow
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_required_tip`**
   > The flow required by your code or your fire authority at a hydrant. One junction at a time is tested against this same number.
-  Edited.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_residual`**
   > Residual pressure to hold
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_residual_tip`**
   > 20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_run_title`**
   > Fire flow run
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_scope`**
   > Junctions to test
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_scope_all`**
   > Every junction
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_scope_selected`**
   > The selected junction only
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_scope_tip`**
   > Choose the set before you run. Testing every junction in a large system can take minutes.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_stale`**
   > The drawing changed, so the fire flow results were cleared. Run it again.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_state_design`**
   > Design issue
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_state_error`**
   > No answer
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_state_fail`**
   > Failing
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_state_pass`**
   > Passing
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_steady`**
   > Only the current time step is tested. Fire flow is normally added to maximum day demand.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_stop`**
   > Stop
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_stopped`**
   > Stopped after {done} of {total} junctions. What is below is what had already been worked out.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_summary`**
   > {pass} passing, {fail} failing, {design} with a design issue.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_summary_error`**
   > {n} could not be answered.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_title`**
   > Fire flow
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_ff_working`**
   > Working: {done} of {total} junctions.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_field_base_demand`**
   > Base demand
   _Ruled OK 2026-08-29._
@@ -268,19 +263,19 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_find_conn_noopensource`**
   > No open path to a source
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_find_conn_unlinked`**
   > No links at node
   _Ruled OK 2026-08-29._
 - **`lpn_find_op_conn_nolinksource`**
   > no link path to a source
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_find_op_conn_noopen`**
   > no open links at node
   _Ruled OK 2026-08-29._
 - **`lpn_find_op_conn_noopensource`**
   > no open path to a source
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_find_op_conn_unlinked`**
   > no links at node
   _Ruled OK 2026-08-29._
@@ -292,7 +287,7 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_find_q_aside`**
   > These controls cannot write the query below, so they are hidden.
-  Edited
+  _Ruled OK 2026-09-01._
 - **`lpn_find_q_err_close`**
   > This bracket ( was opened and never closed.
   _Ruled OK 2026-08-29._
@@ -367,25 +362,22 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_inp_drop_energy`**
   > This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.
-  Edited
+  _Ruled OK 2026-09-01._
 - **`lpn_inp_drop_file_options`**
-  > This file contains an external reference for backdrop image or calibration file. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.
-  I need to know more about this to review it. What files specifically might be involved other than backdrop?
+  > This file names another file beside it: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.
 - **`lpn_inp_drop_quality_options`**
-  > This file says what to follow through the pipes, and two settings that go with a chemical: how fast it spreads, and how close the answer has to be. Water age and source share are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.
-  As elsewhere, don't make up terms. Use the standard engineering terms straight from EPANET: trace, quality tolerance, Relative diffusivity, etc. When we are getting things with fixed and clear names, it only obfuscates things to circumlocute them. Of course this may be different when explaining an input.
+  > This file states EPANET water quality options: Quality, which names what to follow through the pipes, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.
 - **`lpn_inp_drop_report`**
   > This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.
-  OK for now. But there may be some wisdom in the EPANET options that we may learn from eventually. Recurring reviews of the EPANET offerings may be wise.
+  _Ruled OK 2026-09-01._
 - **`lpn_inp_drop_rules`**
   > This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.
-  Is there a good reason not to handle rule-based controls? Deprecated in the industry?
+  _Ruled OK 2026-08-29._
 - **`lpn_inp_drop_sections`**
   > This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.
-  OK as wording goes, but we are aggressively working on narrowing the cases where we would say this.
+  _Ruled OK 2026-09-01._
 - **`lpn_inp_drop_tags`**
   > This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.
-  Tag may be like Autodesk Domain. As elsewhere I say here that we ought not be satisfied to ignore or discard these features without good evidence.
 - **`lpn_menu_map`**
   > Map
   _Ruled OK 2026-08-29._
@@ -394,7 +386,7 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_new_coords_geo`**
   > lat/lon
-  Edited
+  _Ruled OK 2026-09-01._
 - **`lpn_new_coords_tip`**
   > An xy project is a model on any coordinates other than lat/lon. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File > Import xy to lat/lon.
   _Ruled OK 2026-08-29._
@@ -460,26 +452,25 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_quality_age`**
   > Water age
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_quality_chemical`**
   > A chemical this file names (kept, not worked out)
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_quality_needs_run`**
   > Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_quality_none`**
   > Nothing
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_quality_trace`**
   > Source share
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_replace_asked`**
   > Asked for {n}. The answer is on its way.
   _Ruled OK 2026-08-29._
 - **`lpn_replace_q_bad`**
   > This query cannot be read, so there is nothing to change. Fix it above first.
-  OK.
-
+  _Ruled OK 2026-09-01._
 - **`lpn_replace_source`**
   > New value from
   _Ruled OK 2026-08-29._
@@ -488,16 +479,16 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_result_source_share`**
   > Source share
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_result_source_share_tip`**
   > Of the water reaching this point, the share that came from the source you chose.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_result_water_age`**
   > Water age
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_result_water_age_tip`**
   > How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_scenario_mark_tip`**
   > Ringed: this element holds a value that belongs to the scenario {name} alone.
   _Ruled OK 2026-08-29._
@@ -506,16 +497,15 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_settings_accuracy`**
   > Accuracy
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_accuracy_tip`**
-  > How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and they weigh the change slightly differently: the built-in solver against the water the network delivers, EPANET against the water it carries. Left empty, this page tries far harder than EPANET does on its own.
-  Delivers vs carries is not clear. Please clarify. Is it demands vs link flows?
+  > How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.
 - **`lpn_settings_damp_limit`**
   > Damping starts at
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_damp_limit_tip`**
   > The accuracy at which the solver begins taking smaller steps, which can settle a network that is swinging back and forth. Zero, the usual value, means it never does. Only the EPANET solver reads this box.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_demand_multiplier`**
   > Demand multiplier
   _Ruled OK 2026-08-29._
@@ -541,13 +531,13 @@ the ruling lapses by itself if the wording changes.
   > Flow change limit
 - **`lpn_settings_flow_change_tip`**
   > An additional test the solver must pass before it stops: the maximum change in any one pipe's flow from one try to the next. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.
-  Edited.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_head_error`**
   > Head error limit
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_head_error_tip`**
   > An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.
-  Edited.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_leader_snap`**
   > Snap leader lines to angle
   _Ruled OK 2026-08-29._
@@ -559,22 +549,22 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_settings_option_unset`**
   > Not stated
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_quality`**
   > Water quality
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_quality_source`**
   > Water from
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_quality_source_tip`**
   > The point whose water is followed. Every other point then shows the share of its water that came from here.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_quality_track`**
   > Track
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_quality_track_tip`**
   > Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_specific_gravity`**
   > Specific gravity
   _Ruled OK 2026-08-29._
@@ -589,22 +579,22 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_settings_unbalanced`**
   > If it will not settle
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_unbalanced_continue`**
   > Keep trying
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_unbalanced_stop`**
   > Stop there
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_unbalanced_tip`**
   > What to do with a network that has used up its trials and still has not settled. Keeping on allows the extra trials below, which often settles it; stopping reports the last try as it stands, which is close but not solved. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as unsettled.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_unbalanced_trials`**
   > Extra trials first
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_unbalanced_trials_tip`**
   > How many further trials to allow after the maximum above is used up, before the last try is reported. Only the EPANET solver reads this box.
-  OK.
+  _Ruled OK 2026-09-01._
 - **`lpn_settings_viscosity`**
   > Relative viscosity
   _Ruled OK 2026-08-29._
@@ -631,7 +621,7 @@ the ruling lapses by itself if the wording changes.
 
 - **`u_day`**
   > day
-  OK.
+  _Ruled OK 2026-09-01._
 - **`u_hr`**
   > hr
-  OK.
+  _Ruled OK 2026-09-01._
