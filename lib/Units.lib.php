@@ -96,6 +96,13 @@ $ec_unit_families = Array(
     'energy'           => Array('kwh_yr', 'mwh_yr'),
     'fraction'         => $u_fraction,                          // shown as a ratio by default (y/d0)
     'percentage'       => $u_fraction,                          // shown as a percent by default (% loss, efficiency)
+    // --- Elapsed time. ---
+    // A water AGE is the only quantity in this suite measured in time, and it is a RESULT: how long
+    // the water reaching a node has been in the system. Hours in both presets, deliberately -- an
+    // hour is an hour on both sides of the Atlantic, so this is one of the rare families whose two
+    // presets agree. Days is offered because a dead-end at the far edge of a system reaches three
+    // figures of hours and stops being readable.
+    'elapsed_time'     => Array('hr', 'day'),
 );
 
 /**
@@ -135,6 +142,7 @@ $ec_unit_sets['us'] = Array(
     'energy'           => 'kwh_yr',
     'fraction'         => 'depthFrac',
     'percentage'       => 'depthPercent',
+    'elapsed_time'     => 'hr',
 );
 
 $ec_unit_sets['si'] = Array(
@@ -167,6 +175,7 @@ $ec_unit_sets['si'] = Array(
     'energy'           => 'kwh_yr',
     'fraction'         => 'depthFrac',
     'percentage'       => 'depthPercent',
+    'elapsed_time'     => 'hr',
 );
 
 /**
@@ -323,6 +332,12 @@ $ec_units['lph']=3600000;                       // L/hr per m3/s -- exact
 $ec_units['gph']=951019.38848933426;            // 3600/0.003785411784
 $ec_units['mmph']=3600000;                      // mm/hr per m/s -- exact
 $ec_units['inph']=141732.28346456692;           // 3600/0.0254
+
+// TIME. The SI base is the SECOND, so these are "number of that unit per second" like every other
+// factor here. Both are exact by definition -- an hour is 3600 s and a day is 86400 s -- and there
+// is no coherence group because there is no other constant to disagree with.
+$ec_units['hr']=0.00027777777777777778;         // 1/3600 -- exact
+$ec_units['day']=0.000011574074074074074;       // 1/86400 -- exact
 
 $ec_units['m2ps']=1;                            // m2/s (unit discharge, SI base)
 $ec_units['ft2ps']=10.763910416709722;          // 1/0.3048^2 -- same conversion as ft2

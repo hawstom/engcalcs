@@ -12,7 +12,7 @@ function parseReport(text) {
 		const h = /^\s*(Node|Link) Results at (\d+):(\d+) Hrs:/.exec(line);
 		if (h) {
 			const t = parseInt(h[2], 10) * 3600 + parseInt(h[3], 10) * 60;
-			frames[t] = frames[t] || { t, head: {}, demand: {}, flow: {}, status: {} };
+			frames[t] = frames[t] || { t, head: {}, demand: {}, flow: {}, status: {}, quality: {} };
 			cur = frames[t];
 			kind = h[1];
 			continue;
@@ -26,6 +26,11 @@ function parseReport(text) {
 		if (kind === 'Node' && p.length >= 4 && /^-?[.\d]+$/.test(p[1]) && /^-?[.\d]+$/.test(p[2])) {
 			cur.demand[p[0]] = parseFloat(p[1]);
 			cur.head[p[0]] = parseFloat(p[2]);
+			// Column 5 is the QUALITY column, whatever [OPTIONS] Quality asked for -- percent for
+			// Net3's source trace. Absent in a report written with quality off, and a row can carry
+			// a trailing type word ('Tank', 'Reservoir') after it, so it is read positionally and
+			// only when it is a number.
+			if (p.length >= 5 && /^-?[.\d]+$/.test(p[4])) { cur.quality[p[0]] = parseFloat(p[4]); }
 		} else if (kind === 'Link' && p.length >= 4 && /^-?[.\d]+$/.test(p[1]) && /^-?[.\d]+$/.test(p[2])) {
 			cur.flow[p[0]] = parseFloat(p[1]);
 			cur.status[p[0]] = p[4] || p[3];

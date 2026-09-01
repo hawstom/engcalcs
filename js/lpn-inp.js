@@ -1329,9 +1329,63 @@
 	var LPN_QUAL_LINES = [
 		['quality', 'Quality'], ['diffusivity', 'Diffusivity'], ['tolerance', 'Tolerance']
 	];
-	function qualityOptionRows(qual, row) {
-		var q = qual || {}, out = '';
+	// **`Quality` IS THE ONE OF THE THREE THAT IS NOW A LIVE INPUT** (water age and source share).
+	// The other two, Diffusivity and Tolerance, only mean anything to a reacting chemical, which
+	// this page still does not work out, so they stay carried text and nothing below touches them.
+	//
+	// **HOW THE FILE'S OWN TOKEN SURVIVES BEING INTERPRETED.** The importer keeps `Quality`'s
+	// characters verbatim on `settings.qualityOptions.quality` and NEVER writes to that field
+	// again; the interpreted setting lives beside it on `settings.quality`, carrying the token it
+	// was derived from as `src`. The exporter writes the token back byte for byte while the
+	// interpreted setting still parses out of it, and composes its own line only once the user has
+	// actually chosen something else. That is the `_xsrc`/`_ysrc` rule from CLAUDE.md's coordinate
+	// note applied to a word instead of a number: believe the source text while the derived value
+	// is still the one derived from it.
+	//
+	// A CHEMICAL IS NEVER COMPOSED. `Quality Chlorine mg/L` parses to mode 'chemical', which means
+	// "carried, not worked out" -- so it can only ever go back out as its own token, and the moment
+	// a user picks age or source share instead, the file stops claiming a chemical it no longer has.
+	EngCalcs.lpnQualityParse = function (text) {
+		var t = String(text === undefined || text === null ? '' : text).trim(), w;
+		if (!t) { return { mode: 'none', traceNode: '' }; }
+		w = t.split(/\s+/);
+		if (/^none$/i.test(w[0])) { return { mode: 'none', traceNode: '' }; }
+		if (/^age$/i.test(w[0])) { return { mode: 'age', traceNode: '' }; }
+		if (/^trace$/i.test(w[0])) { return { mode: 'trace', traceNode: w[1] || '' }; }
+		// Everything else names a chemical -- `Chlorine mg/L`, or EPANET's own longer
+		// `CHEMICAL Chlorine mg/L`. Kept whole, because the name and its units are the user's.
+		return { mode: 'chemical', traceNode: '' };
+	};
+	/**
+	 * The `[OPTIONS] Quality` value this document now states, or '' where it states none.
+	 * `src` wins whenever it still parses to the same thing, so an untouched file round-trips.
+	 */
+	EngCalcs.lpnQualityText = function (q) {
+		var mode = (q && q.mode) || 'none', src = q && q.src, was;
+		if (src !== undefined && src !== null && src !== '') {
+			was = EngCalcs.lpnQualityParse(src);
+			if (was.mode === mode && (mode !== 'trace' || was.traceNode === ((q && q.traceNode) || ''))) {
+				return String(src);
+			}
+		}
+		if (mode === 'age') { return 'Age'; }
+		if (mode === 'trace') { return 'Trace ' + ((q && q.traceNode) || ''); }
+		// 'chemical' with no source token is not a state anything can produce -- the mode exists
+		// only to name a token we did not interpret -- so it falls through with 'none' to the one
+		// honest answer: say nothing, and let EPANET's own default stand.
+		return '';
+	};
+	function qualityOptionRows(qual, row, live) {
+		var q = qual || {}, out = '', text;
 		LPN_QUAL_LINES.forEach(function (pair) {
+			if (pair[0] === 'quality') {
+				// The live setting decides, and it falls back to the carried token when the document
+				// has no interpreted setting at all (a project saved before this existed).
+				text = live ? EngCalcs.lpnQualityText(live)
+					: (q.quality === undefined || q.quality === null ? '' : String(q.quality));
+				if (text !== '') { out += row([pair[1], text]) + '\n'; }
+				return;
+			}
 			if (q[pair[0]] === undefined || q[pair[0]] === null || q[pair[0]] === '') { return; }
 			out += row([pair[1], String(q[pair[0]])]) + '\n';
 		});
@@ -1863,7 +1917,7 @@
 			// where EPANET's own writer puts them. Nothing here computes with them, so the file's
 			// own characters are the only honest form -- see the importer's note. Sparse in, sparse
 			// out: a document holding none writes none.
-			qualityOptionRows(settings.qualityOptions, row) + '\n' +
+			qualityOptionRows(settings.qualityOptions, row, settings.quality) + '\n' +
 			carriedRest() +
 			section('COORDINATES', coords) +
 			section('VERTICES', verts) +
