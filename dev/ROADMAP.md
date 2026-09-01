@@ -287,6 +287,36 @@ the block.
     anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.
 
 - 100|530| **Fire flow: Tom's rulings are recorded; what is left is BUILDING them.**
+  - **[H] WHAT IS NEEDED FROM TOM, asked 2026-09-01 and answered here so nobody asks again:**
+    **nothing is blocked on him.** Every ruling this task waited on is recorded below and was
+    given on 2026-08-26/27. What remains is BUILD work: the per-junction requirement table (real
+    practice varies the required flow by land use, and one number for a whole run is the current
+    simplification), picking an EPS frame where a project has a clock, and the Run concept he
+    sketched (*"a Run names a scenario among its parameters"*) — none of which needs another
+    sentence from him to start. **The two questions he MAY still want to answer are wording
+    ones**, and they are in the new-English list rather than here.
+  - **HIS 2026-09-01 QUESTIONS ABOUT THE SWEEP, ANSWERED FROM THE CODE:**
+    - *"How is it possible to test every junction against every junction?"* — **it is N solves,
+      not N².** Each junction's design check is ONE ordinary fixed-demand solve at that
+      junction's required flow; reading every OTHER node's pressure out of that solve is free,
+      because the solve already computed them. So the WORK is linear in junctions and only the
+      READINGS are N×N.
+    - *"doesn't the report need to list the set of nodes against which every design failure
+      fails?... potentially huge unless we specify that we are listing only the worst case"* —
+      **that is already what it does.** `ffCriticalText()` prints the single worst affected
+      element plus `and {n} more`, so the table is one row per tested junction and never N².
+      - **BUT THE RANKING IS A JUDGEMENT AND HE SHOULD KNOW IT:** a node always outranks a link,
+        because a pressure and a velocity cannot be compared numerically. **So a severe velocity
+        problem is hidden behind ANY pressure problem**, however slight. Stated in the code; not
+        obviously right.
+      - **AND THE FULL N×N EFFECT LIST IS HELD IN MEMORY** (`rec.effects.nodes/links`) even though
+        one line of it is printed — ~50,000 records on a 225-junction sweep, and it is the
+        quantity that grows quadratically. Fine today; the first thing to look at if a large
+        system runs out of room.
+  - **DONE 2026-09-01:** the `Residual held` column moved to sit immediately after `Available`,
+    on his instruction — the two are one reading, a flow and the pressure the junction still
+    held while delivering it, and an available flow with no residual beside it is a number
+    without its condition.
   - **THE WHOLE-SYSTEM SWEEP SHIPPED TO MASTER 2026-08-29** — `js/lpn-fireflow.js`, pure and DOM-free,
     raw-node bisection over a chosen set of junctions, ONE run producing ONE result set holding both
     answers per junction, four states assigned exactly once (`pass`, `fail`, `design`, `error`), and
@@ -673,70 +703,33 @@ the block.
     not be. Decide which before writing any key — this is the difference between a cheap task and a
     sprint.
 
-- 100|508| **Tom's screenshot drop: dozens of captures, indexed and reused.** His idea,
-  2026-08-24: *"a folder in this project, not in git, where I can prolifically put screenshots by
-  the dozens."* `dev/screenshots/` exists and is gitignored; the convention is in its README —
-  ordinal names (`0001.png`), PNG, no describing in the filename.
-  - **The value is that describing them is AI's job.** He captures; AI reads, writes one line per
-    file in the tracked `dev/screenshots/INDEX.md`, and says which are publishable. The pictures do
-    not survive a clone; what we learned from them does.
-  - **No thumbnailer exists on this machine** — no ImageMagick, no Pillow, no PHP GD. Not worth
-    installing one: a contact sheet is an untracked `sheet.html` with every image at 200 px wide,
-    which is a thumbnail a browser makes for free.
-  - Feeds Task 504 (a features list wants pictures), the LibreWaterNet landing page and its
-    `graphics-plan.md`, and Task 459's sense of what the interface actually looks like in each
-    language. **A screenshot is a screen** — the publishable/not judgement is made once, in the
-    index, not every time somebody reaches for an image.
-  - **A row must name the task that superseded it.** The 2026-08-25 phone session shot nine frames
-    and five fixes landed the same day, so eight of the nine now show a bug that is gone. Without
-    that note the next reader re-diagnoses a fixed defect from a stale picture — which is the whole
-    cost the index exists to avoid.
-  - **Publishable and useful are separate axes.** Publishable is the privacy test in the README and
-    nothing else; a frame full of defects can still be safe to publish. Judging the two together
-    once retired the best phone frame in the drop as a flat "No". Use **Not as is** for safe-but-stale.
-  - **RECONCILED 2026-08-26: 63 files, every one indexed, nothing un-indexed.** The 18 orphan rows
-    are the deliberate deletions. **Two date lines now carry the whole currency judgement** and are
-    cheaper than a per-row check: the Water glyph (plan sheet → drop 02:13 → tower 04:13, all on
-    2026-08-25) and lat-before-lon (2026-08-24 12:48). A frame's capture time against those two
-    decides whether it is current.
-  - **[H] SUPERSEDED 2026-08-29 — TOM HAS REPLACED THEM, AND HE HAD SAID SO ONCE ALREADY.** *"The
-    roadmap is stale. I told you that already. But I replaced them just for the map menu icon,
-    though that's insufficient reason, I think."* **Two things follow and they point opposite ways.**
-    (1) The glyph half of the account below is spent — do not re-report it. (2) He does not think the
-    icon alone justified the swap, so the plates were replaced on a thinner reason than the one
-    written here, and **the coordinate-order and colour-key-overlap findings below were NOT what he
-    acted on**. Somebody has to look at the current `img/0028.png`, `0043.png`, `0047.png` and say
-    which of the findings still stand against the frames now published. Until that is done, treat
-    everything under this bullet as a claim about frames that may no longer be there.
-    - **AND THE PROCESS FAILURE IS THE PART WORTH KEEPING.** This is the second time in one week
-      Tom has had to say *"I think I answered this"* about a roadmap block — Task 530 was the first,
-      on 2026-08-29. **A reply that lands in conversation and not in the file is a reply that gets
-      asked for again**, and asking a person the same question twice is the most expensive mistake
-      this project can make with the one resource it cannot buy more of.
-  - **[H] THREE PUBLISHED PLATES ON `screenshots.html` ARE STALE, AND ALL THREE NEED TOM'S CAMERA.**
-    `img/0028.png`, `img/0043.png`, `img/0047.png` all show the Water menu's two-hour-old drop glyph
-    instead of the tower. **0028 additionally reads `Longitude:` before `Latitude:`** — a public
-    picture arguing against the rule `coord_order_check.php` now blocks on in our own source.
-    - **VERIFIED FROM THE PIXELS 2026-08-27, not inferred from capture times.** Of the twelve
-      desktop plates published, **0028 is the ONLY one with the status strip in view at all**, so
-      it is the only one that can show the coordinate order. That closes the "needs an eye on each
-      of ten frames" question the reconciliation left open.
-    - **0043 and 0047 are BYTE-IDENTICAL to the drop copies** (md5 `355d70d1`, `dabea425`), so no
-      replacement exists for either. They need re-shooting.
-    - **AND NEITHER DOES 0028, THOUGH A NEWER FRAME EXISTS.** The re-shot 0028 in the drop is
-      current in both respects — tower glyph, latitude first — but **its Pressure and Velocity
-      colour keys are painted over the node/link labels legend**: `H= Head` is cut off mid-row and
-      `Elevation` shows through the swatches. The index had recorded that as "a placement, not a
-      defect"; that was wrong and is corrected. The picture is unreadable in that corner whatever
-      caused it.
-    - **So this is not a swap anybody can do from here — it is three re-shoots.** The frames want
-      the colour keys and the labels legend moved apart, or set **Off** (Task 529).
-    - **[H] AND IT MAY BE A LIVE DEFECT, WHICH IS TOM'S TO SCOPE.** Task 516 closed by giving the
-      two legends different DEFAULT corners; nothing makes them avoid each other when a user puts
-      them in the same one. They overlap rather than stack. Whether that earns its own task is his
-      call.
-    - The sibling repo IS drivable from here (`~/webdev/librewaternet.org` — read its own
-      `CLAUDE.md` first); the reason not to act is that there is nothing good to publish yet.
+- 100|508| **Tom's screenshot drop: dozens of captures, indexed and reused.**
+  `dev/screenshots/` is gitignored and holds his captures under ordinal names (`0001.png`); the
+  convention is in its README. **He captures; AI describes.** One line per file in the tracked
+  `dev/screenshots/INDEX.md`, which says what each shows and whether it is publishable — the
+  pictures do not survive a clone, what we learned from them does.
+  - **Publishable and useful are separate axes.** Publishable is the README's privacy test and
+    nothing else; a frame full of defects can still be safe to publish. Use **Not as is** for
+    safe-but-stale, or the best phone frame in the drop gets retired as a flat No, which happened.
+  - **A row must name the task that superseded it**, or the next reader re-diagnoses a fixed defect
+    from a stale picture. Nine frames from one phone session were obsolete by that evening.
+  - **THE THREE STALE PLATES ARE RE-SHOT. Tom, 2026-09-01: *"I recently did 0028, 0043, and
+    0047"*** — so the Water-glyph and lat-before-lon findings that filled this block are spent, and
+    they are deleted rather than archived here. **He also said the icon alone was an insufficient
+    reason to re-shoot**, so the frames may still carry other faults.
+  - **[H] WHAT IS ACTUALLY NEEDED NOW, and it is one job: LOOK AT THE THREE NEW FRAMES.** Compare
+    `img/0028.png`, `img/0043.png` and `img/0047.png` on `screenshots.html` against the current
+    page, update their INDEX rows, and answer the one open question they were re-shot for:
+    **0028 was the only published desktop plate with the status strip in view**, so it is the only
+    one that can contradict `coord_order_check.php`'s lat-before-lon rule in public — does it still?
+    And the previous re-shot 0028 had its **Pressure and Velocity colour keys painted over the
+    node/link labels legend** (`H= Head` cut off mid-row): check whether that recurs, because
+    nothing makes the two legends avoid each other when a user puts them in one corner — Task 516
+    only gave them different DEFAULT corners. **Whether that overlap earns its own task is Tom's
+    call.**
+  - Feeds Task 504's features list, the LibreWaterNet landing page and its `graphics-plan.md`. The
+    sibling repo IS drivable from here (`~/webdev/librewaternet.org` — read its own `CLAUDE.md`
+    first).
 
 - 100|509| **Edit mode on the path itself: drag any point, click a waypoint off.**
   **BUILT 2026-08-25.** The Edit button puts the PATH in edit mode: every node the route passes

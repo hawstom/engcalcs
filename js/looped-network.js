@@ -26798,8 +26798,13 @@ var EngCalcs = EngCalcs || {};
 			pc.lpn_ff_col_junction || 'Junction',
 			pc.lpn_ff_col_static || 'Rest pressure',
 			pc.lpn_ff_col_available || 'Available',
-			pc.lpn_ff_col_required || 'Required',
+			// **RESIDUAL SITS BESIDE AVAILABLE, NOT BESIDE REQUIRED** (Tom, 2026-09-01: *"the
+			// Residual held column should immediately follow Available flow"*). The two are ONE
+			// reading -- a flow and the pressure the junction still held while delivering it -- and
+			// an available flow with no residual beside it is a number without its condition.
+			// Required is the code's demand and belongs after the pair it is compared against.
 			pc.lpn_ff_col_residual || 'Residual held',
+			pc.lpn_ff_col_required || 'Required',
 			pc.lpn_ff_col_atrequired || 'Pressure at required',
 			pc.lpn_ff_col_affected || 'Pulled down',
 			pc.lpn_ff_col_limit || 'Design limit',
@@ -26811,8 +26816,8 @@ var EngCalcs = EngCalcs || {};
 			ffCell(tr, rec.id);
 			ffCell(tr, ffMaybeQty(rec.staticPressure, 'lpn_u_pressure'));
 			ffCell(tr, ffAvailableText(rec));
-			ffCell(tr, rec.required === undefined ? FF_DASH : ffQty(rec.required, 'lpn_u_flow'));
 			ffCell(tr, ffMaybeQty(rec.residualAt, 'lpn_u_pressure'));
+			ffCell(tr, rec.required === undefined ? FF_DASH : ffQty(rec.required, 'lpn_u_flow'));
 			ffCell(tr, ffMaybeQty(rec.pressureAtRequired, 'lpn_u_pressure'));
 			ffCell(tr, ffCriticalText(rec));
 			ffCell(tr, ffLimitText(rec));
