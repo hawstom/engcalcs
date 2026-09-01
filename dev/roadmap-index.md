@@ -17,8 +17,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
 - Task 530 — Fire flow: Tom's rulings are recorded; what is left is BUILDING them.
-- ! Task 545 — [H] · The list is a file now. Tom read it once and the edits were lost.
-- Task 553 — [H] · Demands and Hydraulics options: BUILT. One wording question is left.
+- ! Task 545 — The list is a file, the marks are data, and both survived a reading.
+- Task 553 — Demands and Hydraulics options: BUILT, and every option now has a control.
 - Task 562 — One touch radius for every object, and a node always wins.
 - ! Task 565 — The EPANET bridge never asks whether the run converged. It says it did.
 - Task 566 — Close the EPANET gap: eight sections are carried but not understood.
