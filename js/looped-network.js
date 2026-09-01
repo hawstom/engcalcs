@@ -19411,6 +19411,14 @@ var EngCalcs = EngCalcs || {};
 		var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : '';
 	}
 	function unitKey(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].value : null; }
+	// The SYMBOL a person reads, as opposed to the unit's internal name unitKey() returns. Same
+	// option, its other half: the value is 'fth2o' and the text is what $ec_lang['u_fth2o'] says in
+	// the visitor's own language. Falls back to the name, because a label reading '()' is worse
+	// than one reading a machine word.
+	function unitSymbol(name) {
+		var s = unitEl(name), o = s ? s.options[s.selectedIndex] : null;
+		return (o && (o.textContent || o.text)) || unitKey(name) || '';
+	}
 	// The map label's one unit token -- see numLine()'s `suffix` for why the gradient gets one and
 	// nothing else does. Not translated: '%' is the same mark in all 27 languages, including RTL.
 	function gradientSuffix() { return unitKey('lpn_u_gradient') === 'gradePercent' ? '%' : ''; }
@@ -21220,20 +21228,40 @@ var EngCalcs = EngCalcs || {};
 		// engines. Headloss Formula already has its row above, under this suite's own name for it,
 		// Friction method.
 		//
-		// **THE OTHERS ARE CARRIED, EXPORTED AND HONOURED BY EPANET, JUST NOT SHOWN:** Accuracy, If
-		// Unbalanced, Max Head Error, FlowChange, DampLimit, CheckFreq, MaxCheck and Status Report
-		// come in from a file, ride in `settings.hydraulics`, go back out through the exporter
-		// character for character, and reach the EPANET engine when it is the one solving. What
-		// they do NOT have is a control, because:
-		//   Accuracy has no honest place beside Convergence tolerance directly above it -- they are
-		//     two different quantities on two different scales (EPANET's is a relative flow change
-		//     summed over the network; ours is js/lpn-solver.js's own), and two rows a reader
-		//     cannot tell apart is worse than one. **That is a question for Tom, not for us.**
-		//   If Unbalanced, Max Head Error and the four tuning knobs act in EPANET alone, so a
-		//     control for them would do nothing on the page's own default engine.
-		//   Status Report decides what EPANET's `.rpt` holds, and this page has no `.rpt` at all.
-		function hydNumberRow(key, labelKey, fallback, tipKey, dflt) {
-			var input = document.createElement('input');
+		// **AND TOM REVERSED THAT BURDEN OF PROOF ON 2026-08-29:** *"I think that every setting from
+		// EPANET must be added and implemented unless research says otherwise."* So the eight that
+		// were carried-but-controlless are now five rows and three stated exceptions, and the
+		// exceptions are MEASURED rather than asserted:
+		//
+		//   **Status report** -- no row, and this one needs no measurement. It decides what EPANET's
+		//     own `.rpt` holds, and this page has no `.rpt`: nothing in the suite reads it, ever.
+		//     A report-formatting key, carried and exported so an export does not delete it.
+		//   **Trials between status checks (CheckFreq)** and **last trial that checks status
+		//     (MaxCheck)** -- no row, because they are measurably not settings a person can decide
+		//     anything with. Measured against the EPANET engine on EPA's own Net3 at Accuracy 1e-9:
+		//     CheckFreq 1, 2 and 100 and MaxCheck 1, 10 and 200 all return heads IDENTICAL TO THE
+		//     LAST BIT at all 92 nodes, and so do all six on a four-pipe loop with a check valve in
+		//     it, the network shape where status checking is supposed to matter most. They steer the
+		//     path to a converged answer, not the answer. The one value that IS visible is 0, which
+		//     EPANET refuses the whole input over. That is a knob whose only reachable effect is a
+		//     refusal, which is CLAUDE.md's emitter-exponent precedent exactly.
+		//     **They are still carried, exported and honoured**, so a file that states them keeps
+		//     them; what they do not get is a box implying a person should have an opinion.
+		//
+		// **THE FIVE THAT DID EARN A ROW ACT IN EPANET AND NOT IN THE BUILT-IN SOLVER, AND THAT IS
+		// NOT A REASON TO HIDE THEM ANY MORE -- IT IS A SENTENCE IN THE TIP.** Measured on the same
+		// four-pipe loop, EPANET answering: `Trials 1` with the last try reported gives 96.214 m at
+		// one junction and with nothing reported gives no answer at all; a tight head-error or
+		// flow-change limit under a deliberately loose Accuracy pulls the answer back from 94.8067
+		// to 94.8063; damping moves Net3's worst head by 3.0e-7 ft. Each one changes an answer, and
+		// each tip names the solver that reads it, because a user who cannot tell which engine
+		// answered cannot tell a dead control from a setting with no effect.
+		//
+		// **AND THE ENGINE HAD TO BE TAUGHT TO NOTICE** -- see signatureOf() in js/lpn-epanet.js.
+		// None of these is pushed through a setter, so before that fix a changed option reached a
+		// REUSED session and did nothing at all, silently, for as long as the network's shape held.
+		function hydNumberRow(key, labelKey, fallback, tipKey, dflt, opt) {
+			var o = opt || {}, input = document.createElement('input');
 			input.type = 'number'; input.step = 'any';
 			// **BLANK MEANS "THE FILE DID NOT SAY", NOT ZERO**, which is the whole sparseness rule
 			// seen from the interface: an empty box exports no line, and typing the default in
@@ -21243,13 +21271,26 @@ var EngCalcs = EngCalcs || {};
 			input.addEventListener('change', function () {
 				var t = input.value.trim();
 				if (t === '') { delete settings.hydraulics[key]; }
-				else if (isFinite(+t) && +t > 0) { settings.hydraulics[key] = +t; }
+				// **ZERO IS A LEGAL VALUE FOR THREE OF THESE AND IS EPANET'S OWN DEFAULT FOR ALL
+				// THREE.** `HeadError 0`, `FlowChange 0` and `DampLimit 0` each mean "do not apply
+				// this test", which is a statement a file can make and a person can want back. The
+				// original >0 guard was right for a multiplier and an exponent and would have made
+				// these three rows unable to express their own default.
+				else if (isFinite(+t) && (o.allowZero ? +t >= 0 : +t > 0)) { settings.hydraulics[key] = +t; }
 				else { input.value = settings.hydraulics[key] === undefined ? '' : String(settings.hydraulics[key]); return; }
 				if (key === 'emitterExponent') { settings.emitterExponent = settings.hydraulics[key] === undefined ? 0.5 : settings.hydraulics[key]; }
 				saveToStorage();
 				scheduleSolve();
 			});
-			row(compBody, pc[labelKey] || fallback, input, pc[tipKey]);
+			// **A UNIT-BEARING LIMIT NAMES ITS UNIT IN THE LABEL.** Head error is a head and flow
+			// change is a flow, so a bare number is ambiguous the moment the project is not in the
+			// units the reader assumed. Read off the unit strip's own selected option, so it cannot
+			// drift from what every other number on the page is being shown in -- and off its TEXT,
+			// which is the translated symbol a person reads, rather than its value, which is the
+			// unit's internal name ('fth2o').
+			var labelText = pc[labelKey] || fallback;
+			if (o.unitOf) { labelText += ' (' + unitSymbol(o.unitOf) + ')'; }
+			row(compBody, labelText, input, pc[tipKey]);
 		}
 		if (!settings.hydraulics) { settings.hydraulics = {}; }
 		hydNumberRow('accuracy', 'lpn_settings_accuracy', 'Accuracy',
@@ -21264,6 +21305,16 @@ var EngCalcs = EngCalcs || {};
 			'lpn_settings_emitter_exponent_tip', 0.5);
 		hydNumberRow('trials', 'lpn_settings_trials', 'Maximum trials',
 			'lpn_settings_trials_tip', 40);
+		// **DIRECTLY UNDER Maximum trials, BECAUSE IT IS THE SENTENCE THAT FINISHES IT.** "Try forty
+		// times" is half a rule; the other half is what happens on the forty-first. Reading them
+		// apart is what made "If Unbalanced" look like a separate obscure knob.
+		settingsUnbalancedRows(compBody, row, hydNumberRow);
+		hydNumberRow('headError', 'lpn_settings_head_error', 'Head error limit',
+			'lpn_settings_head_error_tip', 0, { allowZero: true, unitOf: 'lpn_u_elevhead' });
+		hydNumberRow('flowChange', 'lpn_settings_flow_change', 'Flow change limit',
+			'lpn_settings_flow_change_tip', 0, { allowZero: true, unitOf: 'lpn_u_flow' });
+		hydNumberRow('dampLimit', 'lpn_settings_damp_limit', 'Damping starts at',
+			'lpn_settings_damp_limit_tip', 0, { allowZero: true });
 		// ---- engine choice (ROADMAP Task 243) ----
 		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
 		// and a select would imply the two are peers when the native path is the one this page
@@ -22139,8 +22190,56 @@ var EngCalcs = EngCalcs || {};
 		rowFn(host, pc.lpn_settings_default_pattern || 'Default demand pattern', sel,
 			pc.lpn_settings_default_pattern_tip);
 	}
-	// Shared by the row above and by the junction popup's own selector, so the two lists cannot
-	// disagree about what patterns exist or about what the blank one is called.
+	/**
+	 * **WHAT TO DO WITH A NETWORK THAT WILL NOT SETTLE** -- EPANET's `Unbalanced`, in our words
+	 * (Task 553, under Tom's 2026-08-29 ruling). Two rows, because the option is two facts: the
+	 * choice, and the extra trials that only the "report the last try" choice has.
+	 *
+	 * **THE TRIAL-COUNT ROW APPEARS ONLY UNDER THAT CHOICE, AND THE WHOLE BOX IS REBUILT TO DO IT.**
+	 * A count beside "report nothing" is a box that cannot be exported -- `Unbalanced Stop 10` is
+	 * not a line EPANET writes -- and disabling it instead leaves a greyed number stating a value
+	 * the file does not hold. Same rebuild-don't-patch rule the friction-method row states.
+	 *
+	 * **BLANK IS A THIRD STATE AND NOT A SYNONYM FOR EITHER**, exactly as an empty number box is:
+	 * a project that never stated the option exports no line, and the engine bridge's own fallback
+	 * (`Continue 10`) applies. Choosing "report the last try" explicitly is a different file.
+	 */
+	function settingsUnbalancedRows(host, rowFn, numberRow) {
+		var pc = EngCalcs.pageConfig || {}, hyd = settings.hydraulics || {},
+			sel = document.createElement('select');
+		[['', pc.lpn_settings_option_unset || 'Not stated'],
+			['continue', pc.lpn_settings_unbalanced_continue || 'Report the last try'],
+			['stop', pc.lpn_settings_unbalanced_stop || 'Report nothing']
+		].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			if (o[0] === (hyd.unbalanced || '')) { opt.selected = true; }
+			sel.appendChild(opt);
+		});
+		sel.addEventListener('change', function () {
+			if (!settings.hydraulics) { settings.hydraulics = {}; }
+			if (sel.value === '') {
+				delete settings.hydraulics.unbalanced;
+				delete settings.hydraulics.unbalancedTrials;
+			} else {
+				settings.hydraulics.unbalanced = sel.value;
+				// The count belongs to `Continue` alone, so leaving it behind on a switch to `Stop`
+				// would have the document holding a number no writer can put in a file.
+				if (sel.value === 'stop') { delete settings.hydraulics.unbalancedTrials; }
+			}
+			saveToStorage();
+			rebuildSettingsBox();
+			scheduleSolve();
+		});
+		rowFn(host, pc.lpn_settings_unbalanced || 'If it will not settle', sel,
+			pc.lpn_settings_unbalanced_tip);
+		if (hyd.unbalanced === 'continue') {
+			numberRow('unbalancedTrials', 'lpn_settings_unbalanced_trials', 'Extra trials first',
+				'lpn_settings_unbalanced_trials_tip', 10, { allowZero: true });
+		}
+	}
+	// Shared by settingsDefaultPatternRow() above and by the junction popup's own selector, so the
+	// two lists cannot disagree about what patterns exist or about what the blank one is called.
 	function libFillPatternOptions(sel, value) {
 		var pc = EngCalcs.pageConfig || {}, none = document.createElement('option');
 		sel.textContent = '';
@@ -24851,6 +24950,22 @@ var EngCalcs = EngCalcs || {};
 		}
 		return 1e-9;
 	}
+	/**
+	 * The hydraulic options as an ENGINE wants them: a shallow clone, with the two unit-bearing
+	 * limits converted to SI. Everything else on the list is a ratio, an exponent or a count, and
+	 * is the same number in every unit system.
+	 *
+	 * Pure: it never writes to `settings.hydraulics`, which is the document's own copy and must
+	 * stay in the units the file stated (the `libPatterns()` lesson -- a getter that assigns is a
+	 * writer wearing a reader's name).
+	 */
+	function engineHydraulics(hyd) {
+		var out = {}, k;
+		for (k in hyd) { if (Object.prototype.hasOwnProperty.call(hyd, k)) { out[k] = hyd[k]; } }
+		if (typeof out.headError === 'number') { out.headError = toSI(out.headError, 'lpn_u_elevhead'); }
+		if (typeof out.flowChange === 'number') { out.flowChange = toSI(out.flowChange, 'lpn_u_flow'); }
+		return out;
+	}
 	function docDemandMultiplier() {
 		var m = (settings.hydraulics || {}).demandMultiplier;
 		return (typeof m === 'number' && isFinite(m)) ? m : 1;
@@ -25085,7 +25200,16 @@ var EngCalcs = EngCalcs || {};
 			emitterExponent: settings.emitterExponent,
 			// Carried whole so js/lpn-epanet.js can write the ones only EPANET acts on -- accuracy,
 			// unbalanced, the head-error limit -- without a second copy of the list.
-			hydraulics: hyd,
+			//
+			// **EXCEPT THAT TWO OF THEM CARRY UNITS, AND EVERY OTHER NUMBER ON THIS MODEL IS SI.**
+			// `HeadError` is a head and `FlowChange` is a flow, stated in whatever units the
+			// project is in; js/lpn-epanet.js writes an LPS-and-metres file always. Passed through
+			// raw, a US project's `HeadError 0.001` (feet) reached the engine as a millimetre --
+			// off by 3.28, quietly, in the one term whose whole job is to decide when to stop.
+			// Converted HERE because this is the only place that knows the project's units, and on
+			// a CLONE because `settings.hydraulics` is the document's own copy in the document's
+			// own units, which the exporter must keep character for character.
+			hydraulics: engineHydraulics(hyd),
 			// **THE RULE TEXT, FILTERED TO THE RULES THAT STILL NAME REAL ELEMENTS** (Task 248.03).
 			// **NOTHING WRITES THIS INTO AN ENGINE INPUT TODAY, AND js/lpn-epanet.js SAYS WHY** --
 			// a rule's numbers are in the units of the file the user opened, and that writer emits
