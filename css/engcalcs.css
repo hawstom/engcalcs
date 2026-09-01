@@ -602,8 +602,41 @@ html[lang="zh"] .ec-welcome {
 	16%  { fill: #d40000; animation-timing-function: linear; }
 	100% { fill: #000; }
 }
+/* **THE SAME MARK, ON A NODE THAT MOVED** (Tom, 2026-09-01: *"we have no way of knowing when a
+   junction moves. Some sort of a fading highlight like the labels have when they are moved would
+   help. And this doesn't apply only to the phone, of course."*). ONE mechanism -- the same class,
+   written by the same markJustDragged() -- with a second painting, because a dot is not a word.
+
+   NOT `fill`, which is the label version's property and is wrong here twice over: the fill is where
+   the colour ramp paints (paintNodeColor() writes it inline), so a 45-second red dot would be a
+   pressure reading that is not true, and a reservoir's and a tank's own disc is `fill: none` with
+   the symbol drawn over it, so a fill change would show nothing at all. A ring is what every other
+   per-node condition on this map already draws -- selection, fire flow, an override, a pending link
+   -- and it composes with the ramp instead of overwriting it.
+
+   THE STROKE WIDTH IS IN KEYFRAMES, NOT IN THE RULE, and that is deliberate: nothing removes the
+   class, so a width declared in the rule would stay on the node for ever, while an ANIMATED
+   property reverts the moment the animation ends. Same reason the label version has no `forwards`.
+   `--lpn-sym` for the same reason `.lpn-selected` uses it: this map's user units are metres in one
+   project and DEGREES in another, so a bare `0.7` is a mark bigger than the screen on a lat/lon map.
+   0.7 against everyone else's 0.5 so it reads over whichever ring it is standing in for.
+
+   Fading to a TRANSPARENT red rather than to black: the ring has to end at nothing, or the last
+   frame of the fade would be a black ring that then vanishes when the animation lets go. */
+.lpn-node.lpn-just-dragged { animation-name: lpn-just-moved-node; }
+@keyframes lpn-just-moved-node {
+	0%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(0.7 * var(--lpn-sym, 1)); }
+	4%   { stroke: rgba(212, 0, 0, 0); stroke-width: calc(0.7 * var(--lpn-sym, 1)); }
+	8%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(0.7 * var(--lpn-sym, 1)); }
+	12%  { stroke: rgba(212, 0, 0, 0); stroke-width: calc(0.7 * var(--lpn-sym, 1)); }
+	16%  { stroke: rgba(212, 0, 0, 1); stroke-width: calc(0.7 * var(--lpn-sym, 1)); animation-timing-function: linear; }
+	100% { stroke: rgba(212, 0, 0, 0); stroke-width: calc(0.7 * var(--lpn-sym, 1)); }
+}
+/* BOTH of them, and the node one by name: `.lpn-node.lpn-just-dragged` above outranks the shorthand
+   reset below, so a reader who honours prefers-reduced-motion would still get the blinking ring. */
 @media (prefers-reduced-motion: reduce) {
 	.lpn-just-dragged { animation: none; }
+	.lpn-node.lpn-just-dragged { animation: none; }
 }
 /* The "you are in the middle of placing the background image" bar (ROADMAP Task 145 follow-up, Tom
    2026-08-16). Fixed to the bottom of the viewport rather than placed near the canvas: while a

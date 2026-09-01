@@ -18616,6 +18616,17 @@ var EngCalcs = EngCalcs || {};
 			// **THE PATH HANDLE COMMITS ON RELEASE**, before `drag` is dropped -- it is the one drag
 			// type whose whole result is decided by where the pointer let go (Task 509).
 			if (drag && drag.type === 'profilehandle' && drag.pointerId === e.pointerId) { profileHandleDrop(); }
+			// **AT THE END OF THE GESTURE, AND ONLY IF THE DOCUMENT ACTUALLY CHANGED.** The mark
+			// says a move HAPPENED, so it belongs where the move is finished rather than on each of
+			// the sixty frames that got there -- and `drag.snapped` is already exactly "this drag
+			// wrote to the document": snapshotDragOnce() sets it on the first frame that moves
+			// anything, so a tap, a press that never travelled past its slop, and a pan can none of
+			// them reach this line. A vertex drag is deliberately not marked: bending a pipe leaves
+			// the bend under the pointer where you can see it, and the complaint was about the
+			// junction whose new position is the only evidence it moved.
+			if (drag && drag.pointerId === e.pointerId && drag.type === 'node' && drag.snapped) {
+				markNodeMoved(drag.id);
+			}
 			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
 			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
 			if (wasPan && !drag) { relayoutLabels(); }
@@ -18881,6 +18892,25 @@ var EngCalcs = EngCalcs || {};
 		el2.classList.remove('lpn-just-dragged');
 		if (el2.getBoundingClientRect) { el2.getBoundingClientRect(); }
 		el2.classList.add('lpn-just-dragged');
+	}
+	// **A JUNCTION THAT MOVED SAYS SO, THE WAY A LABEL THAT MOVED ALREADY DID** (Tom, 2026-09-01:
+	// *"we have no way of knowing when a junction moves. Some sort of a fading highlight like the
+	// labels have when they are moved would help. And this doesn't apply only to the phone, of
+	// course."*). The mechanism is markJustDragged() above and nothing new: one class, one CSS
+	// animation that clears itself, no timer and no object. A node paints differently from a word,
+	// so css/engcalcs.css gives `.lpn-node.lpn-just-dragged` its own keyframes -- a ring rather than
+	// a recolour, because the fill is where the colour ramp lives and a 45-second red dot would be a
+	// pressure reading that is not true.
+	//
+	// THE CIRCLE, for every node type. A reservoir and a tank draw a symbol over an unpainted disc
+	// of the same radius, so the ring lands round the symbol and there is no branch here.
+	//
+	// It is a VIEW fact and never a document one: a class on an element, absent from
+	// serializeProject(), from every undo snapshot and from every scenario. Nothing is written
+	// through setProp() because nothing is written at all.
+	function markNodeMoved(id) {
+		var ne = nodeEls[id];
+		if (ne) { markJustDragged(ne.circle); }
 	}
 	function snapshotDragOnce() {
 		if (drag.snapped) { return; }
@@ -24669,6 +24699,14 @@ var EngCalcs = EngCalcs || {};
 	function undo() {
 		if (undoStack.length === 0) { return; }
 		var snap = undoStack.pop();
+		// **UNDOING A MOVE IS ALSO A MOVE THE USER CANNOT SEE**, and it is the one other place a
+		// junction changes position without the pointer being on it -- so it gets the same mark the
+		// drag gets. Read BEFORE the document is replaced, compared AFTER buildDom() has rebuilt the
+		// elements, because a class put on an element now would be thrown away with that element.
+		// Only ids present on both sides: a node the undo brought back or took away has not MOVED,
+		// and marking a resurrection would say the wrong thing about it.
+		var wasAt = {};
+		doc.nodes.forEach(function (n) { wasAt[n.id] = n.x + ',' + n.y; });
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
 		// **THE FRAME COMES BACK BEFORE ANYTHING READS A COORDINATE** (Task 436). outwardX/outwardY
@@ -24707,6 +24745,9 @@ var EngCalcs = EngCalcs || {};
 			refreshMapStatus();
 		}
 		buildDom();
+		doc.nodes.forEach(function (n) {
+			if (wasAt[n.id] !== undefined && wasAt[n.id] !== n.x + ',' + n.y) { markNodeMoved(n.id); }
+		});
 		updateEmptyHint();
 		refreshScenarioStatus();
 		// **AND THE CAMERA, ONLY THEN.** A view is a point in one frame and means nothing in the
