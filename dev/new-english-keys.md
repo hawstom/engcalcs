@@ -12,10 +12,10 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**84 still to read**, of 176 untranslated keys, of 1491 English keys. A key already marked _Ruled OK_ below needs nothing from you —
+**97 still to read**, of 189 untranslated keys, of 1504 English keys. A key already marked _Ruled OK_ below needs nothing from you —
 the ruling lapses by itself if the wording changes.
 
-## lpn_  (176)
+## lpn_  (189)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -397,7 +397,11 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_settings_accuracy`**
   > Accuracy
 - **`lpn_settings_accuracy_tip`**
-  > How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. This is EPANET's own setting, and this page starts far tighter than EPANET does.
+  > How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and they weigh the change slightly differently: the built-in solver against the water the network delivers, EPANET against the water it carries. Left empty, this page tries far harder than EPANET does on its own.
+- **`lpn_settings_damp_limit`**
+  > Damping starts at
+- **`lpn_settings_damp_limit_tip`**
+  > The accuracy at which the solver begins taking smaller steps, which can settle a network that is swinging back and forth. Zero, the usual value, means it never does. Only the EPANET solver reads this box.
 - **`lpn_settings_demand_multiplier`**
   > Demand multiplier
   _Ruled OK 2026-08-29._
@@ -419,6 +423,14 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_settings_emitter_exponent_tip`**
   > The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.
   _Ruled OK 2026-08-29._
+- **`lpn_settings_flow_change`**
+  > Flow change limit
+- **`lpn_settings_flow_change_tip`**
+  > A further test the solver must pass before it stops: the largest amount any one pipe's flow is still moving by from one try to the next. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.
+- **`lpn_settings_head_error`**
+  > Head error limit
+- **`lpn_settings_head_error_tip`**
+  > A second test the solver must pass before it stops: the largest head any one pipe is still out by. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.
 - **`lpn_settings_leader_snap`**
   > Snap leader lines to angle
   _Ruled OK 2026-08-29._
@@ -428,6 +440,8 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_settings_legend_off`**
   > Off
   _Ruled OK 2026-08-29._
+- **`lpn_settings_option_unset`**
+  > Not stated
 - **`lpn_settings_specific_gravity`**
   > Specific gravity
   _Ruled OK 2026-08-29._
@@ -440,6 +454,18 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_settings_trials_tip`**
   > How many times the solver may try before it gives up on a network that will not settle.
   _Ruled OK 2026-08-29._
+- **`lpn_settings_unbalanced`**
+  > If it will not settle
+- **`lpn_settings_unbalanced_continue`**
+  > Keep trying
+- **`lpn_settings_unbalanced_stop`**
+  > Stop there
+- **`lpn_settings_unbalanced_tip`**
+  > What to do with a network that has used up its trials and still has not settled. Keeping on allows the extra trials below, which often settles it; stopping reports the last try as it stands, which is close but not solved. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as unsettled.
+- **`lpn_settings_unbalanced_trials`**
+  > Extra trials first
+- **`lpn_settings_unbalanced_trials_tip`**
+  > How many further trials to allow after the maximum above is used up, before the last try is reported. Only the EPANET solver reads this box.
 - **`lpn_settings_viscosity`**
   > Relative viscosity
   _Ruled OK 2026-08-29._

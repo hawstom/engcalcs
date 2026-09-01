@@ -138,6 +138,40 @@ the block.
       now FALSE in 26 languages each** and are the resync item. The lead no longer says "here is
       what changed on the way in" — it says nothing is thrown away, and separates kept-but-unused
       from genuinely changed, which is the distinction Tom could not read off the old sentence.
+  - **THE RULING IS DISCHARGED, 2026-09-01: every `[OPTIONS]` key now has a control or a MEASURED
+    reason not to.** Rows added for Unbalanced (with its conditional trial count), HeadError,
+    FlowChange and DampLimit. Three keep no row and the reason is a measurement rather than an
+    opinion: **CheckFreq and MaxCheck are inert** — on Net3 at a tight accuracy, values 1/2/100 and
+    1/10/200 return heads identical TO THE LAST BIT at all 92 nodes, and likewise on a four-pipe
+    loop holding a check valve, which is the shape where status checking is supposed to matter;
+    and Status selects what EPANET writes into a `.rpt` this page never asks for. **All three are
+    asserted inert, so if one ever stops being inert it has earned its row.**
+  - **`Accuracy` was already answered and the answer was Tom's**, 2026-08-28: *"Deprecate our
+    'Convergence tolerance' to use the EPANET setting unless you find a strong reason not to."*
+    There is ONE row; `solveAccuracy()` reads it for both engines, and the distinction the two-row
+    proposal wanted lives in the tip instead — the built-in solver weighs the change against the
+    water the network delivers, EPANET against the water it carries.
+  - **A SHIPPED DEFECT THIS FOUND, WORTH MORE THAN THE ROWS.** `signatureOf()` in
+    `js/lpn-epanet.js` did not include `model.hydraulics`, and nothing pushes an option through a
+    setter — so **ANY option change reached a REUSED EPANET session and did nothing, silently, for
+    as long as the network's shape held.** That includes rows that had already shipped. Measured:
+    fourteen different option sets on one network returning one identical head. Fixed and
+    asserted with a line that reproduces the regression.
+  - **AND A UNIT BUG OF THE KIND THIS SUITE EXISTS TO PREVENT:** `HeadError` is a head and
+    `FlowChange` a flow, both passed to the LPS/metres engine writer UNCONVERTED — a US project's
+    `HeadError 0.001` ft reached EPANET as 1 mm. Converted through a new PURE `engineHydraulics()`
+    clone that never writes `settings.hydraulics`.
+  - **The gallery examples carry `settings.hydraulics` now**, added by hand to Net1/2/3 and Novato
+    — the eleven values each `.inp` states. **Measured movement: worst head change 2.5e-7 m, worst
+    relative flow change 0.00224%**, the two non-EPA examples exactly zero, every example still
+    converging. Below any decimal the page displays, so it was committed rather than escalated.
+  - **A wording correction driven by measurement, not by the manual:** the Unbalanced stop choice
+    was first labelled from EPANET's documentation, which says it refuses. **Through the toolkit
+    it does not refuse — it hands back the last iterate**, so the label says "Stop there" and the
+    tip says what actually happens.
+  - **[H] STILL BROKEN AND NOW ASSIGNED: `Map` and `Hydraulics USE/SAVE` are read past without
+    being kept**, so import then export DELETES a line the source stated — the file-is-canonical
+    rule broken for the fourth time, in the same loop as the three before it.
   - **TOM'S RULING, 2026-08-29, AND IT IS BROADER THAN THE QUESTION ASKED:** *"I think that every
     setting from EPANET must be added and implemented unless research says otherwise."* **That
     reverses the emitter-exponent precedent as a default.** The standing shape was carry-and-hide

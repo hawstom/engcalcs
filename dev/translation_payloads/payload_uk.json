@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 1491,
-        "delta_key_count": 177,
+        "expected_key_count": 1504,
+        "delta_key_count": 190,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -530,13 +530,26 @@
         "lpn_settings_elev_source_typed": "The number above",
         "lpn_settings_elev_source_dem": "Mapbox DEM",
         "lpn_settings_accuracy": "Accuracy",
-        "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. This is EPANET's own setting, and this page starts far tighter than EPANET does.",
+        "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and they weigh the change slightly differently: the built-in solver against the water the network delivers, EPANET against the water it carries. Left empty, this page tries far harder than EPANET does on its own.",
         "lpn_settings_specific_gravity": "Specific gravity",
         "lpn_settings_specific_gravity_tip": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
         "lpn_settings_viscosity": "Relative viscosity",
         "lpn_settings_viscosity_tip": "The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_settings_trials": "Maximum trials",
         "lpn_settings_trials_tip": "How many times the solver may try before it gives up on a network that will not settle.",
+        "lpn_settings_unbalanced": "If it will not settle",
+        "lpn_settings_unbalanced_tip": "What to do with a network that has used up its trials and still has not settled. Keeping on allows the extra trials below, which often settles it; stopping reports the last try as it stands, which is close but not solved. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as unsettled.",
+        "lpn_settings_unbalanced_continue": "Keep trying",
+        "lpn_settings_unbalanced_stop": "Stop there",
+        "lpn_settings_unbalanced_trials": "Extra trials first",
+        "lpn_settings_unbalanced_trials_tip": "How many further trials to allow after the maximum above is used up, before the last try is reported. Only the EPANET solver reads this box.",
+        "lpn_settings_head_error": "Head error limit",
+        "lpn_settings_head_error_tip": "A second test the solver must pass before it stops: the largest head any one pipe is still out by. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.",
+        "lpn_settings_flow_change": "Flow change limit",
+        "lpn_settings_flow_change_tip": "A further test the solver must pass before it stops: the largest amount any one pipe's flow is still moving by from one try to the next. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.",
+        "lpn_settings_damp_limit": "Damping starts at",
+        "lpn_settings_damp_limit_tip": "The accuracy at which the solver begins taking smaller steps, which can settle a network that is swinging back and forth. Zero, the usual value, means it never does. Only the EPANET solver reads this box.",
+        "lpn_settings_option_unset": "Not stated",
         "lpn_settings_demand_multiplier": "Demand multiplier",
         "lpn_settings_demand_multiplier_tip": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.",
         "lpn_settings_leader_snap": "Snap leader lines to angle",
@@ -709,13 +722,26 @@
         "lpn_settings_elev_source_typed": "The number above",
         "lpn_settings_elev_source_dem": "Mapbox DEM",
         "lpn_settings_accuracy": "Accuracy",
-        "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. This is EPANET's own setting, and this page starts far tighter than EPANET does.",
+        "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and they weigh the change slightly differently: the built-in solver against the water the network delivers, EPANET against the water it carries. Left empty, this page tries far harder than EPANET does on its own.",
         "lpn_settings_specific_gravity": "Specific gravity",
         "lpn_settings_specific_gravity_tip": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
         "lpn_settings_viscosity": "Relative viscosity",
         "lpn_settings_viscosity_tip": "The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.",
         "lpn_settings_trials": "Maximum trials",
         "lpn_settings_trials_tip": "How many times the solver may try before it gives up on a network that will not settle.",
+        "lpn_settings_unbalanced": "If it will not settle",
+        "lpn_settings_unbalanced_tip": "What to do with a network that has used up its trials and still has not settled. Keeping on allows the extra trials below, which often settles it; stopping reports the last try as it stands, which is close but not solved. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as unsettled.",
+        "lpn_settings_unbalanced_continue": "Keep trying",
+        "lpn_settings_unbalanced_stop": "Stop there",
+        "lpn_settings_unbalanced_trials": "Extra trials first",
+        "lpn_settings_unbalanced_trials_tip": "How many further trials to allow after the maximum above is used up, before the last try is reported. Only the EPANET solver reads this box.",
+        "lpn_settings_head_error": "Head error limit",
+        "lpn_settings_head_error_tip": "A second test the solver must pass before it stops: the largest head any one pipe is still out by. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.",
+        "lpn_settings_flow_change": "Flow change limit",
+        "lpn_settings_flow_change_tip": "A further test the solver must pass before it stops: the largest amount any one pipe's flow is still moving by from one try to the next. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.",
+        "lpn_settings_damp_limit": "Damping starts at",
+        "lpn_settings_damp_limit_tip": "The accuracy at which the solver begins taking smaller steps, which can settle a network that is swinging back and forth. Zero, the usual value, means it never does. Only the EPANET solver reads this box.",
+        "lpn_settings_option_unset": "Not stated",
         "lpn_settings_demand_multiplier": "Demand multiplier",
         "lpn_settings_demand_multiplier_tip": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.",
         "lpn_settings_leader_snap": "Snap leader lines to angle",
@@ -2275,6 +2301,214 @@
             }
         },
         "lpn_settings_trials_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_unbalanced": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_unbalanced_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_unbalanced_continue": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_unbalanced_stop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_unbalanced_trials": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_unbalanced_trials_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_head_error": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_head_error_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_flow_change": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_flow_change_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_damp_limit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_damp_limit_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Показник степеня розбризкувача",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "Точність збіжності",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_option_unset": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
