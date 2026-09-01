@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 1504,
-        "delta_key_count": 190,
+        "expected_key_count": 1521,
+        "delta_key_count": 207,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -32,7 +32,8 @@
         "out_of_scope_key_count": 9,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
-            "lpn"
+            "lpn",
+            "u"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -43,7 +44,8 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "prompt_context_by_prefix": {
-        "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- velocity (v): ፍጥነት\n- head (H): ሄድ\n    DO NOT render as: a lazy anatomical calque that is NOT the language's natural hydraulic term — but an anatomically-derived word that IS the dominant local standard is correct (English 'head' is itself the body-part word repurposed); defer to the cultural standard, do not 'fix' a natural term for containing a body-part morpheme; treating it as the gauge pressure at a point. Head is energy per unit weight -- it can legitimately be READ in either height units or pressure units (the suite offers both, and defaults to psi for head loss under the US preset), so a pressure-flavoured term or a psi reading is not itself an error. The real constraint: TOTAL head (EGL, HGL) is offered in water-column units ONLY, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28, encoded in the total_head unit family).; source\/origin of a stream\n- head loss (h_L): ሄድ ኪሳራ\n    DO NOT render as: calquing the English word \"head\" into a language whose engineers do not use a height word here. Defer to the term the language's own engineers actually use: German Druckverlust, French perte de charge, Urdu دباؤ نقصان all read literally as \"pressure loss\" and are all correct, dominant professional usage. NOTE ON UNITS -- this concept is legitimately read in EITHER height or pressure units, so a pressure-flavoured term is not a units error: the suite's own partial_head family (h_f, h_m, h_L) offers psi\/kPa\/bar\/kgfcm2 and DEFAULTS to psi in the US preset. The one real constraint is on TOTAL head (EGL\/HGL), which the total_head family deliberately offers in water-column units only, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28) -- see the 'head' root entry.; a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction loss (h_f): ግጭት ኪሳራ\n- minor loss (h_m): ጥቃቅን (አካባቢያዊ) ኪሳራ\n- pressure (p): ግፊት\n    DO NOT render as: the HEAD term (a height of water column) — pressure here is what a gauge reads; atmospheric or meteorological pressure senses; a stress or material-strength sense; figurative 'pressure' (urgency, coercion)\n- elevation (z): ከፍታ\n    DO NOT render as: the HEAD term — an elevation is a position above a datum, not an energy; a generic 'tall\/high' adjective where the language has a surveying term; altitude in the aviation or geographic sense where a levelled survey term exists\n- demand: ፍላጎት\n    DO NOT render as: economic or market demand; a legal demand\/claim; a request in the everyday sense\n- static head (H): የማይንቀሳቀስ የአቅርቦት ሄድ\n    DO NOT render as: electrostatic \/ static electricity; 'stationary\/motionless' in a non-hydraulic sense\n- maximum allowable head (H): ከፍ. የተፈቀደ የቧንቧ ግፊት\n    DO NOT render as: the operating \/ computed head (this is a fixed design limit, not the pressure the network actually develops)\n- supply head (H): የአቅርቦት ሄድ\n    DO NOT render as: an economic 'supply'; confusing supply (source) head with the delivered\/residual head at a demand point\n- supply curve: [needs translation sprint]\n    DO NOT render as: an economic supply curve; a demand curve\n- looped network: ቀለበታዊ የቧንቧ መረብ\n    DO NOT render as: a control-flow \/ programming loop; a physical loop, knot, or coil\n- branched network: ቅርንጫፍ ያለው የቧንቧ መረብ\n    DO NOT render as: a literal botanical 'tree' where the language has a proper network\/graph term; a looped or meshed network (branched means no loops)\n- pipe line: የቧንቧ መስመሮች\n    DO NOT render as: a queue or line of people; a rope, cord, or cable; a line of text; a purely geometric line\/segment\n- pressure rating: ከፍ. የተፈቀደ የቧንቧ ግፊት\n    DO NOT render as: a stress or material strength rather than a water pressure; blood-pressure or tyre-pressure senses; a general word for strong or high\n- pressure reduction: የግፊት መቀነስ\n    DO NOT render as: naming a specific device (break pressure tank, BPT, pressure-reducing valve) as if the tool recommends one; depressurizing in the sense of emptying or draining the pipe\n- energy grade line (EGL): የኃይል መስመር\n- Manning roughness (n): የማኒንግ ሻካሪነት\n- friction factor (f): ግጭት ፋክተር\n- draw (a diagram): [needs translation sprint]\n    DO NOT render as: draw water (abstract, pump, or take water from a source) -- the wrong sense here, and PLAUSIBLE in a hydraulics context, which is what makes it dangerous; pull, drag, or haul; draw as in a lottery or a tie\/stalemate; withdraw money\n- junction: [needs translation sprint]\n    DO NOT render as: a road junction, crossroads, or intersection; a physical pipe fitting (tee, cross, elbow) -- a junction here is a point in the model, not a part you buy; a railway junction; an electrical junction box\n- reservoir: [needs translation sprint]\n    DO NOT render as: a TANK -- a vessel whose water level rises and falls as it fills and empties. Since ROADMAP Task 248 (2026-08-14) lpn_ models BOTH, as two separate node types, so the two must have two different words in every language. A reservoir's level is fixed and never runs down; a tank's does.; a natural lake specifically, where the language has a general storage\/supply term; a reserve or reservation in the non-physical sense\n- node: [needs translation sprint]\n    DO NOT render as: a computing\/server node (a transliterated loanword where the language has a real graph or network-diagram term); a knot, lump, or swelling (the anatomical\/botanical sense of the Latin root); a node in the wave-physics sense (a point of zero amplitude)\n- link: [needs translation sprint]\n    DO NOT render as: a hyperlink or web link -- the dominant modern sense of the English word, and the wrong one here; a chain link (the physical object); a connection in the social or logistical sense\n- vertex: [needs translation sprint]\n    DO NOT render as: a mathematical vertex of a polygon or a parabola apex, where the language has a plainer word for a bend or corner point in a drawn line; a peak or summit; a vertex in the anatomical sense (crown of the head)\n- colour ramp: [needs translation sprint]\n    DO NOT render as: the word for a GRADIENT (es gradiente, fr gradient, de Gefaelle, it gradiente, pt gradiente). In this suite 'gradient' is a HYDRAULIC QUANTITY -- lpn_result_gradient is the head loss gradient, a label field printed on every pipe -- so a colour 'gradient' collides with a number on the same map.; the word for SCALE (es escala, fr echelle, de Massstab). 'Scale' is taken twice on this page already: the map's own scale, and the Scale tool that resizes a background image.; the word for a physical RAMP or slope. A rock chute in this suite really is a ramp (the rc_ calculator), so the physical sense is live in the product.\n- colour band limit: [needs translation sprint]\n    DO NOT render as: the word for a BREAK, BREAKAGE or BURST (es rotura, fr rupture, de Bruch, pt ruptura, ru razryv). A pipe break is a real event in water distribution and this control has nothing to do with one. The English label was 'Break values' and Wave 0 rewrote it for this reason.; the word for a PAUSE or an INTERVAL IN TIME.\n- equal intervals \/ equal counts: [needs translation sprint]\n    DO NOT render as: translating 'counts' as a TALLY OF EVENTS -- it means how many elements fall in each colour band.; translating 'intervals' as intervals IN TIME.\n- fire flow: [needs translation sprint]\n    DO NOT render as: a term meaning the flow OF a fire, or a firefighting operation. This is a DESIGN REQUIREMENT, not an event.\n- background image: [needs translation sprint]\n    DO NOT render as: a backdrop in the theatrical\/stage sense (the English source word was CHANGED to \"background image\" in Task 193 precisely to remove this transliteration lure); a wallpaper or decorative background; an online\/satellite map layer -- this is a plain image file the user already has\n- world file: ወርልድ ፋይል\n    DO NOT render as: any reading of \"world\" as the PLANET, the globe, or the earth. The word names a coordinate space, not a place -- \"planet file\", \"earth file\", \"global file\" are all wrong.; a phonetic transliteration of the English words where the language's GIS community already has a real term (fr \"fichier de géoréférencement\", es \"archivo de georreferenciación\" are the kind of thing wanted). Transliterate only where nothing established exists.; confusing it with the IMAGE file itself, or calling it a \"map file\" or \"project file\" -- it is a tiny six-line plain-text SIDECAR that travels beside the picture.; translating the file EXTENSIONS that carry it (.wld, .jgw, .tfw, .pgw). Those are literal filename suffixes.\n- pump curve: [needs translation sprint]\n    DO NOT render as: a curve in the geometric\/road sense; a pump characteristic confused with an efficiency or power curve -- this one is head against flow\n- project (saved network): [needs translation sprint]\n    DO NOT render as: an engineering project or job in the contractual sense (a scheme, a works, a contract) -- this is a saved document; a projection (optical or cartographic); to project or forecast\n- scenario: [needs translation sprint]\n    DO NOT render as: a scene or setting in the dramatic\/film sense; a scenario in the \"worst case story\" narrative sense, where the language has a modelling or variant-case term; a copy or duplicate of the network -- a scenario is a set of differences, not a second network; a native Swahili word for scenario: hali, mfano and toleo are all already taken inside lib\/lang.ec.sw.php by Mode, example and file version respectively, so reusing one gives that file two meanings for one word.; an eigenvalue-adjacent word for the sibling string \"own values\".\n- zoom to extents: [needs translation sprint]\n    DO NOT render as: a general \"adjust\/change the zoom\" — this is the trap. es \"Ajustar zoom\" and pt \"Zoom para ajustar\" both shipped meaning ADJUST THE ZOOM, which describes the zoom slider, not this button. A verb meaning adjust\/regulate\/set is wrong unless the label also says WHAT is fitted; zoom in \/ zoom out \/ a zoom level or percentage — this command has no direction and no amount; a transliterated \"zoom\" loanword standing alone, where the language has a real word for showing the whole drawing; the photographic or camera sense of zoom (a lens movement)\n- default (setting): ነባሪ\n    DO NOT render as: the financial sense — failure to pay a debt, defaulting on a loan. This is the dominant everyday sense of the English word in many languages and the single most dangerous confusion here; the legal sense — failure to appear or to act, a default judgment; a bare \"reset\" or \"restore\" with the default concept dropped entirely. ro shipped calc_defaults as just \"Reseteaza\" (Reset) while its own calc_defaults_confirm used \"valorile implicite\" correctly — the button must say WHAT is restored; a word meaning normal\/usual\/ordinary where the language has a real settings term. sw shipped \"maadili ya kawaida\" (normal values) instead of \"chaguo-msingi\"; \"kawaida\" describes what is typical, not what the software ships with; the sports sense — winning or losing by default, by forfeit\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]\n- tank: ታንክ\n    DO NOT render as: the word this file already uses for RESERVOIR. The page offers both tools side by side in the same toolbar, and a language that renders them with one word makes the two tools indistinguishable.; a military tank, a tracked vehicle; a fish tank or an aquarium; a fuel tank or a gas cylinder, where the language has a separate word for a WATER vessel; a transliteration of English \"tank\" where the language has a real word for a water storage vessel that engineers already use\n- valve: ቫልቭ\n    DO NOT render as: a heart valve or any anatomical valve; a vacuum tube \/ electron tube (British English \"valve\"); a tap or faucet -- the fitting a person opens by hand at a sink, where the language distinguishes that from a pipeline valve; a transliteration of English \"valve\" where the language has an established pipeline term\n- valve setting: [needs translation sprint]\n    DO NOT render as: a settings\/preferences sense -- this is not an option a user configures in a panel, it is the duty point the valve maintains; a placement or installation sense (\"setting\" a valve into a line); giving the TCV coefficient any units: it is a bare multiple of the velocity head\n- override (scenario value): የራሱ ዋጋዎች\n    DO NOT render as: the mathematical eigenvalue sense. This is the live trap: a literal \"own values\" renders as es \"valores propios\" \/ pt \"valores proprios\" \/ de \"Eigenwerte\", which every engineer reads as EIGENVALUES. Say \"values of its own\" \/ \"values set in this scenario\", never the eigen- word.; an override in the authority or veto sense (overruling a person or a permission); a manual override switch on a machine; a copy or a duplicate -- an override is a single differing value, not a second network\n- solver: ፈታች\n    DO NOT render as: the word for a physical MOTOR or ENGINE (es\/pt motor, fr moteur, it motore, de Motor, ro motor, id mesin, sw injini, zh 引擎, ar محرك, he מנוע, fa موتور, uk рушій). This calculator models PUMPS, which have real motors, so the software sense collides with a hydraulic component on the same page. This is the specific defect sprint 252 existed to repair.; a transliteration of English \"engine\" (ur انجن, bn ইঞ্জিন, my အင်ဂျင်, hi इंजन) -- same collision, plus it is a loanword where a real term exists.; reusing the word your file already uses for CALCULATOR (sw kikokotoo, am ማስያ, km ម៉ាស៊ីនគណនា). The page names both a calculator and a solver, and they are different things.\n- profile (long section): [needs translation sprint]\n    DO NOT render as: the USER ACCOUNT sense of \"profile\" -- the page holding a person's name and settings. This is the dominant sense of the English word in web software and it is the wrong one here; many languages use a different word for each (zh 剖面圖 section vs 個人資料 account).; the CONFIGURATION PRESET sense (a \"colour profile\", a \"power profile\", a saved set of settings). Nothing is saved or selected by this menu.; the SIDE VIEW OF A FACE sense, where the language has a word specific to portraiture.\n- hydraulic grade line (HGL): [needs translation sprint]\n    DO NOT render as: dropping the head noun, so the label names the SLOPE (\"hydraulic grade\", \"hydraulic gradient\") rather than the LINE. What is plotted is an elevation, on an elevation axis.; the school-mark, quality-class or ground-levelling senses of \"grade\".; the energy grade line, which is a different line -- the HGL sits below it by the velocity head.\n- demand pattern: [needs translation sprint]\n    DO NOT render as: the ordinary senses of \"pattern\" -- a repeating decoration, a template to cut from, a habit of behaviour. This is a NAMED SERIES OF NUMBERS indexed by time step.; translating it as \"demand curve\", which in economics means something else entirely.; a word implying the pattern IS the demand; it is a list of multipliers applied to a base demand.\n- imperial gallon (IMGD): [needs translation sprint]\n    DO NOT render as: treating IMGD and MGD as the same unit or as spellings of each other. The imperial gallon is 4.54609 L, the US gallon 3.785411784 L -- a 20% difference in a token that differs by one letter.; translating or transliterating the tokens MGD and IMGD themselves. They are unit symbols and stay as they are, exactly like m^3\/s.; calling the imperial gallon \"British\" in a way that implies it is obsolete; it is still the working unit in parts of the Commonwealth.\n- pressure breaker valve (PBV): [needs translation sprint]\n    DO NOT render as: the ELECTRICAL circuit-breaker word. This valve breaks a PRESSURE, not a circuit, and the electrical term is the one a translator will reach for first.; the breaking-wave sense of \"breaker\".; translating the three-letter code PBV, which is EPANET's own element name and is the same in every language, exactly as PRV, PSV, FCV, TCV and GPV are.\n- project mode name: [needs translation sprint]\n    DO NOT render as: giving one mode TWO names inside one language. That is the only real defect here, and dev\/scripts\/mode_name_check.php now catches it: whatever your file calls the mode in lpn_geomap \/ lpn_xymap, every other string that names the mode uses that same rendering.; expanding \"XY\" into words in some strings and leaving it as letters in others -- the same defect, on the other mode.; reading \"XY\" as a placeholder for something to be filled in. It is the name of the flat-grid mode.; assuming the mode names must stay English. THIS ENTRY USED TO SAY SO and it was FALSE: 10 of the 26 language files already translate lpn_geomap (am, ar, de, fa, he, ru, sr, tr, ur, zh) and 16 keep it literal. Both are fine. Translate it or keep it, but then be consistent.\n- alignment (text): [needs translation sprint]\n    DO NOT render as: JUSTIFICATION, which in typography is the different operation of stretching a line to reach both margins. Left \/ Centre \/ Right is alignment.; the everyday sense of justification -- a reason, a ground, an excuse (es justificación, fr justification, ru обоснование). A label reading \"Horizontal reason\" is the failure this entry exists to prevent.; the alliance \/ taking-sides sense of \"alignment\".\n- drop (a label): [needs translation sprint]\n    DO NOT render as: the HYDRAULIC senses of \"drop\": a drop in elevation, a pressure drop, a head drop, a drop structure. This page prints all of those as numbers, so the wrong choice makes the column heading look like a quantity.; a DROPLET of water.; a DROP-DOWN list, or the act of dropping something you are dragging with the pointer.; a word meaning \"delete\" or \"erase\". Nothing is removed from the drawing; only the printing of the label on the map is given up when there is no room.\n- run (a simulation): [needs translation sprint]\n    DO NOT render as: a RUN OF PIPE -- a straight length of main between two points. That sense is live on this very page and is the trap to guard against.; the sense of MOVING FAST on foot.; the sense of MANAGING something (running a company, running a system).; a run of a machine in the sense of a production batch.\n- work out (compute): [needs translation sprint]\n    DO NOT render as: the PHYSICAL EXERCISE sense of \"work out\".; the sense of TURNING OUT WELL (\"it worked out in the end\").; the sense of NEGOTIATING or resolving a disagreement.; a word implying guessing or estimating. This is exact computation by a solver.\n- decimal separator: [needs translation sprint]\n    DO NOT render as: changing the COLON in a time such as 17:30. The colon is not a decimal separator and the field accepts nothing else in its place; only the mark between the whole and fractional parts of a number is a locale fact.; adding a thousands separator to an example. The field refuses a comma that is not <digits>,<digits>, so 1,000 would be rejected as a time.; leaving a dot in an example where your language writes a comma. The example is there to be copied, and an example the reader cannot copy teaches the wrong format."
+        "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- velocity (v): ፍጥነት\n- head (H): ሄድ\n    DO NOT render as: a lazy anatomical calque that is NOT the language's natural hydraulic term — but an anatomically-derived word that IS the dominant local standard is correct (English 'head' is itself the body-part word repurposed); defer to the cultural standard, do not 'fix' a natural term for containing a body-part morpheme; treating it as the gauge pressure at a point. Head is energy per unit weight -- it can legitimately be READ in either height units or pressure units (the suite offers both, and defaults to psi for head loss under the US preset), so a pressure-flavoured term or a psi reading is not itself an error. The real constraint: TOTAL head (EGL, HGL) is offered in water-column units ONLY, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28, encoded in the total_head unit family).; source\/origin of a stream\n- head loss (h_L): ሄድ ኪሳራ\n    DO NOT render as: calquing the English word \"head\" into a language whose engineers do not use a height word here. Defer to the term the language's own engineers actually use: German Druckverlust, French perte de charge, Urdu دباؤ نقصان all read literally as \"pressure loss\" and are all correct, dominant professional usage. NOTE ON UNITS -- this concept is legitimately read in EITHER height or pressure units, so a pressure-flavoured term is not a units error: the suite's own partial_head family (h_f, h_m, h_L) offers psi\/kPa\/bar\/kgfcm2 and DEFAULTS to psi in the US preset. The one real constraint is on TOTAL head (EGL\/HGL), which the total_head family deliberately offers in water-column units only, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28) -- see the 'head' root entry.; a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction loss (h_f): ግጭት ኪሳራ\n- minor loss (h_m): ጥቃቅን (አካባቢያዊ) ኪሳራ\n- pressure (p): ግፊት\n    DO NOT render as: the HEAD term (a height of water column) — pressure here is what a gauge reads; atmospheric or meteorological pressure senses; a stress or material-strength sense; figurative 'pressure' (urgency, coercion)\n- elevation (z): ከፍታ\n    DO NOT render as: the HEAD term — an elevation is a position above a datum, not an energy; a generic 'tall\/high' adjective where the language has a surveying term; altitude in the aviation or geographic sense where a levelled survey term exists\n- demand: ፍላጎት\n    DO NOT render as: economic or market demand; a legal demand\/claim; a request in the everyday sense\n- static head (H): የማይንቀሳቀስ የአቅርቦት ሄድ\n    DO NOT render as: electrostatic \/ static electricity; 'stationary\/motionless' in a non-hydraulic sense\n- maximum allowable head (H): ከፍ. የተፈቀደ የቧንቧ ግፊት\n    DO NOT render as: the operating \/ computed head (this is a fixed design limit, not the pressure the network actually develops)\n- supply head (H): የአቅርቦት ሄድ\n    DO NOT render as: an economic 'supply'; confusing supply (source) head with the delivered\/residual head at a demand point\n- supply curve: [needs translation sprint]\n    DO NOT render as: an economic supply curve; a demand curve\n- looped network: ቀለበታዊ የቧንቧ መረብ\n    DO NOT render as: a control-flow \/ programming loop; a physical loop, knot, or coil\n- branched network: ቅርንጫፍ ያለው የቧንቧ መረብ\n    DO NOT render as: a literal botanical 'tree' where the language has a proper network\/graph term; a looped or meshed network (branched means no loops)\n- pipe line: የቧንቧ መስመሮች\n    DO NOT render as: a queue or line of people; a rope, cord, or cable; a line of text; a purely geometric line\/segment\n- pressure rating: ከፍ. የተፈቀደ የቧንቧ ግፊት\n    DO NOT render as: a stress or material strength rather than a water pressure; blood-pressure or tyre-pressure senses; a general word for strong or high\n- pressure reduction: የግፊት መቀነስ\n    DO NOT render as: naming a specific device (break pressure tank, BPT, pressure-reducing valve) as if the tool recommends one; depressurizing in the sense of emptying or draining the pipe\n- energy grade line (EGL): የኃይል መስመር\n- Manning roughness (n): የማኒንግ ሻካሪነት\n- friction factor (f): ግጭት ፋክተር\n- draw (a diagram): [needs translation sprint]\n    DO NOT render as: draw water (abstract, pump, or take water from a source) -- the wrong sense here, and PLAUSIBLE in a hydraulics context, which is what makes it dangerous; pull, drag, or haul; draw as in a lottery or a tie\/stalemate; withdraw money\n- junction: [needs translation sprint]\n    DO NOT render as: a road junction, crossroads, or intersection; a physical pipe fitting (tee, cross, elbow) -- a junction here is a point in the model, not a part you buy; a railway junction; an electrical junction box\n- reservoir: [needs translation sprint]\n    DO NOT render as: a TANK -- a vessel whose water level rises and falls as it fills and empties. Since ROADMAP Task 248 (2026-08-14) lpn_ models BOTH, as two separate node types, so the two must have two different words in every language. A reservoir's level is fixed and never runs down; a tank's does.; a natural lake specifically, where the language has a general storage\/supply term; a reserve or reservation in the non-physical sense\n- node: [needs translation sprint]\n    DO NOT render as: a computing\/server node (a transliterated loanword where the language has a real graph or network-diagram term); a knot, lump, or swelling (the anatomical\/botanical sense of the Latin root); a node in the wave-physics sense (a point of zero amplitude)\n- link: [needs translation sprint]\n    DO NOT render as: a hyperlink or web link -- the dominant modern sense of the English word, and the wrong one here; a chain link (the physical object); a connection in the social or logistical sense\n- vertex: [needs translation sprint]\n    DO NOT render as: a mathematical vertex of a polygon or a parabola apex, where the language has a plainer word for a bend or corner point in a drawn line; a peak or summit; a vertex in the anatomical sense (crown of the head)\n- colour ramp: [needs translation sprint]\n    DO NOT render as: the word for a GRADIENT (es gradiente, fr gradient, de Gefaelle, it gradiente, pt gradiente). In this suite 'gradient' is a HYDRAULIC QUANTITY -- lpn_result_gradient is the head loss gradient, a label field printed on every pipe -- so a colour 'gradient' collides with a number on the same map.; the word for SCALE (es escala, fr echelle, de Massstab). 'Scale' is taken twice on this page already: the map's own scale, and the Scale tool that resizes a background image.; the word for a physical RAMP or slope. A rock chute in this suite really is a ramp (the rc_ calculator), so the physical sense is live in the product.\n- colour band limit: [needs translation sprint]\n    DO NOT render as: the word for a BREAK, BREAKAGE or BURST (es rotura, fr rupture, de Bruch, pt ruptura, ru razryv). A pipe break is a real event in water distribution and this control has nothing to do with one. The English label was 'Break values' and Wave 0 rewrote it for this reason.; the word for a PAUSE or an INTERVAL IN TIME.\n- equal intervals \/ equal counts: [needs translation sprint]\n    DO NOT render as: translating 'counts' as a TALLY OF EVENTS -- it means how many elements fall in each colour band.; translating 'intervals' as intervals IN TIME.\n- fire flow: [needs translation sprint]\n    DO NOT render as: a term meaning the flow OF a fire, or a firefighting operation. This is a DESIGN REQUIREMENT, not an event.\n- background image: [needs translation sprint]\n    DO NOT render as: a backdrop in the theatrical\/stage sense (the English source word was CHANGED to \"background image\" in Task 193 precisely to remove this transliteration lure); a wallpaper or decorative background; an online\/satellite map layer -- this is a plain image file the user already has\n- world file: ወርልድ ፋይል\n    DO NOT render as: any reading of \"world\" as the PLANET, the globe, or the earth. The word names a coordinate space, not a place -- \"planet file\", \"earth file\", \"global file\" are all wrong.; a phonetic transliteration of the English words where the language's GIS community already has a real term (fr \"fichier de géoréférencement\", es \"archivo de georreferenciación\" are the kind of thing wanted). Transliterate only where nothing established exists.; confusing it with the IMAGE file itself, or calling it a \"map file\" or \"project file\" -- it is a tiny six-line plain-text SIDECAR that travels beside the picture.; translating the file EXTENSIONS that carry it (.wld, .jgw, .tfw, .pgw). Those are literal filename suffixes.\n- pump curve: [needs translation sprint]\n    DO NOT render as: a curve in the geometric\/road sense; a pump characteristic confused with an efficiency or power curve -- this one is head against flow\n- project (saved network): [needs translation sprint]\n    DO NOT render as: an engineering project or job in the contractual sense (a scheme, a works, a contract) -- this is a saved document; a projection (optical or cartographic); to project or forecast\n- scenario: [needs translation sprint]\n    DO NOT render as: a scene or setting in the dramatic\/film sense; a scenario in the \"worst case story\" narrative sense, where the language has a modelling or variant-case term; a copy or duplicate of the network -- a scenario is a set of differences, not a second network; a native Swahili word for scenario: hali, mfano and toleo are all already taken inside lib\/lang.ec.sw.php by Mode, example and file version respectively, so reusing one gives that file two meanings for one word.; an eigenvalue-adjacent word for the sibling string \"own values\".\n- zoom to extents: [needs translation sprint]\n    DO NOT render as: a general \"adjust\/change the zoom\" — this is the trap. es \"Ajustar zoom\" and pt \"Zoom para ajustar\" both shipped meaning ADJUST THE ZOOM, which describes the zoom slider, not this button. A verb meaning adjust\/regulate\/set is wrong unless the label also says WHAT is fitted; zoom in \/ zoom out \/ a zoom level or percentage — this command has no direction and no amount; a transliterated \"zoom\" loanword standing alone, where the language has a real word for showing the whole drawing; the photographic or camera sense of zoom (a lens movement)\n- default (setting): ነባሪ\n    DO NOT render as: the financial sense — failure to pay a debt, defaulting on a loan. This is the dominant everyday sense of the English word in many languages and the single most dangerous confusion here; the legal sense — failure to appear or to act, a default judgment; a bare \"reset\" or \"restore\" with the default concept dropped entirely. ro shipped calc_defaults as just \"Reseteaza\" (Reset) while its own calc_defaults_confirm used \"valorile implicite\" correctly — the button must say WHAT is restored; a word meaning normal\/usual\/ordinary where the language has a real settings term. sw shipped \"maadili ya kawaida\" (normal values) instead of \"chaguo-msingi\"; \"kawaida\" describes what is typical, not what the software ships with; the sports sense — winning or losing by default, by forfeit\n- upstream: [needs translation sprint]\n- downstream: [needs translation sprint]\n- tank: ታንክ\n    DO NOT render as: the word this file already uses for RESERVOIR. The page offers both tools side by side in the same toolbar, and a language that renders them with one word makes the two tools indistinguishable.; a military tank, a tracked vehicle; a fish tank or an aquarium; a fuel tank or a gas cylinder, where the language has a separate word for a WATER vessel; a transliteration of English \"tank\" where the language has a real word for a water storage vessel that engineers already use\n- valve: ቫልቭ\n    DO NOT render as: a heart valve or any anatomical valve; a vacuum tube \/ electron tube (British English \"valve\"); a tap or faucet -- the fitting a person opens by hand at a sink, where the language distinguishes that from a pipeline valve; a transliteration of English \"valve\" where the language has an established pipeline term\n- valve setting: [needs translation sprint]\n    DO NOT render as: a settings\/preferences sense -- this is not an option a user configures in a panel, it is the duty point the valve maintains; a placement or installation sense (\"setting\" a valve into a line); giving the TCV coefficient any units: it is a bare multiple of the velocity head\n- override (scenario value): የራሱ ዋጋዎች\n    DO NOT render as: the mathematical eigenvalue sense. This is the live trap: a literal \"own values\" renders as es \"valores propios\" \/ pt \"valores proprios\" \/ de \"Eigenwerte\", which every engineer reads as EIGENVALUES. Say \"values of its own\" \/ \"values set in this scenario\", never the eigen- word.; an override in the authority or veto sense (overruling a person or a permission); a manual override switch on a machine; a copy or a duplicate -- an override is a single differing value, not a second network\n- solver: ፈታች\n    DO NOT render as: the word for a physical MOTOR or ENGINE (es\/pt motor, fr moteur, it motore, de Motor, ro motor, id mesin, sw injini, zh 引擎, ar محرك, he מנוע, fa موتور, uk рушій). This calculator models PUMPS, which have real motors, so the software sense collides with a hydraulic component on the same page. This is the specific defect sprint 252 existed to repair.; a transliteration of English \"engine\" (ur انجن, bn ইঞ্জিন, my အင်ဂျင်, hi इंजन) -- same collision, plus it is a loanword where a real term exists.; reusing the word your file already uses for CALCULATOR (sw kikokotoo, am ማስያ, km ម៉ាស៊ីនគណនា). The page names both a calculator and a solver, and they are different things.\n- profile (long section): [needs translation sprint]\n    DO NOT render as: the USER ACCOUNT sense of \"profile\" -- the page holding a person's name and settings. This is the dominant sense of the English word in web software and it is the wrong one here; many languages use a different word for each (zh 剖面圖 section vs 個人資料 account).; the CONFIGURATION PRESET sense (a \"colour profile\", a \"power profile\", a saved set of settings). Nothing is saved or selected by this menu.; the SIDE VIEW OF A FACE sense, where the language has a word specific to portraiture.\n- hydraulic grade line (HGL): [needs translation sprint]\n    DO NOT render as: dropping the head noun, so the label names the SLOPE (\"hydraulic grade\", \"hydraulic gradient\") rather than the LINE. What is plotted is an elevation, on an elevation axis.; the school-mark, quality-class or ground-levelling senses of \"grade\".; the energy grade line, which is a different line -- the HGL sits below it by the velocity head.\n- demand pattern: [needs translation sprint]\n    DO NOT render as: the ordinary senses of \"pattern\" -- a repeating decoration, a template to cut from, a habit of behaviour. This is a NAMED SERIES OF NUMBERS indexed by time step.; translating it as \"demand curve\", which in economics means something else entirely.; a word implying the pattern IS the demand; it is a list of multipliers applied to a base demand.\n- imperial gallon (IMGD): [needs translation sprint]\n    DO NOT render as: treating IMGD and MGD as the same unit or as spellings of each other. The imperial gallon is 4.54609 L, the US gallon 3.785411784 L -- a 20% difference in a token that differs by one letter.; translating or transliterating the tokens MGD and IMGD themselves. They are unit symbols and stay as they are, exactly like m^3\/s.; calling the imperial gallon \"British\" in a way that implies it is obsolete; it is still the working unit in parts of the Commonwealth.\n- pressure breaker valve (PBV): [needs translation sprint]\n    DO NOT render as: the ELECTRICAL circuit-breaker word. This valve breaks a PRESSURE, not a circuit, and the electrical term is the one a translator will reach for first.; the breaking-wave sense of \"breaker\".; translating the three-letter code PBV, which is EPANET's own element name and is the same in every language, exactly as PRV, PSV, FCV, TCV and GPV are.\n- project mode name: [needs translation sprint]\n    DO NOT render as: giving one mode TWO names inside one language. That is the only real defect here, and dev\/scripts\/mode_name_check.php now catches it: whatever your file calls the mode in lpn_geomap \/ lpn_xymap, every other string that names the mode uses that same rendering.; expanding \"XY\" into words in some strings and leaving it as letters in others -- the same defect, on the other mode.; reading \"XY\" as a placeholder for something to be filled in. It is the name of the flat-grid mode.; assuming the mode names must stay English. THIS ENTRY USED TO SAY SO and it was FALSE: 10 of the 26 language files already translate lpn_geomap (am, ar, de, fa, he, ru, sr, tr, ur, zh) and 16 keep it literal. Both are fine. Translate it or keep it, but then be consistent.\n- alignment (text): [needs translation sprint]\n    DO NOT render as: JUSTIFICATION, which in typography is the different operation of stretching a line to reach both margins. Left \/ Centre \/ Right is alignment.; the everyday sense of justification -- a reason, a ground, an excuse (es justificación, fr justification, ru обоснование). A label reading \"Horizontal reason\" is the failure this entry exists to prevent.; the alliance \/ taking-sides sense of \"alignment\".\n- drop (a label): [needs translation sprint]\n    DO NOT render as: the HYDRAULIC senses of \"drop\": a drop in elevation, a pressure drop, a head drop, a drop structure. This page prints all of those as numbers, so the wrong choice makes the column heading look like a quantity.; a DROPLET of water.; a DROP-DOWN list, or the act of dropping something you are dragging with the pointer.; a word meaning \"delete\" or \"erase\". Nothing is removed from the drawing; only the printing of the label on the map is given up when there is no room.\n- run (a simulation): [needs translation sprint]\n    DO NOT render as: a RUN OF PIPE -- a straight length of main between two points. That sense is live on this very page and is the trap to guard against.; the sense of MOVING FAST on foot.; the sense of MANAGING something (running a company, running a system).; a run of a machine in the sense of a production batch.\n- work out (compute): [needs translation sprint]\n    DO NOT render as: the PHYSICAL EXERCISE sense of \"work out\".; the sense of TURNING OUT WELL (\"it worked out in the end\").; the sense of NEGOTIATING or resolving a disagreement.; a word implying guessing or estimating. This is exact computation by a solver.\n- decimal separator: [needs translation sprint]\n    DO NOT render as: changing the COLON in a time such as 17:30. The colon is not a decimal separator and the field accepts nothing else in its place; only the mark between the whole and fractional parts of a number is a locale fact.; adding a thousands separator to an example. The field refuses a comma that is not <digits>,<digits>, so 1,000 would be rejected as a time.; leaving a dot in an example where your language writes a comma. The example is there to be copied, and an example the reader cannot copy teaches the wrong format.",
+        "u": "Use these preferred technical term translations when relevant:\n- flow (Q): ፍሰት\n- velocity (v): ፍጥነት\n- slope (S): ቁልቁለት\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark"
     },
     "glossary_terms_by_prefix": {
         "lpn": [
@@ -439,10 +441,39 @@
                 "translation_notes": "[2026-08-19, sprint 438 Wave 0] Precedent set for lpn_labels_col_decimals_example, whose whole value is the example 0.000 and which Tom said may become 0,000 where needed. lpn_time_format_tip carries four such examples and nothing in the English says they are localisable.",
                 "preferred_translation": ""
             }
+        ],
+        "u": [
+            {
+                "term": "flow",
+                "symbol": "Q",
+                "context": "Volumetric flow rate. Appears in every calculator. Use the hydraulic\/civil engineering term for discharge volume per unit time, not a general word for 'water flowing'.",
+                "translation_notes": "Spanish has two common terms: 'caudal' (Spain, South America) and 'gasto' (Mexico). Lead with 'caudal'. Portuguese: 'vazão' (Brazil) or 'caudal' (Portugal) — lead with 'vazão'. Pre-2026 sr\/hr human translations used 'protok\/protoka' — consistent with current glossary entries (confirmed match). bg RESOLVED (Tom, 2026-07-13): native engineer's 2026-07-06 clarification confirmed both 'дебит' (colloquial\/general register) and 'водно количество' (academic\/hydraulic-engineering register, used at university for Q) are acceptable. Tom decided suite-wide standardization on 'водно количество' — \"I would put водно количество everywhere\" — applied across all bg calculator categories (pipes\/irrigation included, not just the hydraulic-structure\/open-channel strings the engineer originally corrected). 'дебит' fully replaced in lib\/lang.ec.bg.php 2026-07-13. Task 109 stages 3-5 (2026-07-19): bg standardized on водно количество (дебит drift removed from or_\/mpf_\/cs_ per Bulgarian-engineer-feedback.md); sr standardized on проток (stage 4); it confirmed on portata (flusso drift removed). | [2026-08-25, glossary_rendering_census.php] Counted in the shipped strings, 100 English sites. The glossary rendering is the majority in every language that has one: hr protok 85, sr проток 84, cs průtok 79, ru расход 76, fr débit 75, pt vazão 73, zh 流量 72, bg водно количество 70, km លំហូរ 70, es caudal 69, it portata 69, ar تدفق 69, id debit 69, de Durchfluss 68, tr debi 64, fa دبی 58, he ספיקה 43, uk витрата 43 sites of 99. A second, general water-flowing word still stands at some of the rest: fa جریان 37, id aliran 27, es flujo 25, he זרימה 21, tr akış 20, fr écoulement 15, ar جريان 15, pt escoamento 14, it deflusso 12. NOT ALL OF THOSE ARE DEFECTS -- some English sites really do describe water flowing rather than naming Q, and a count cannot tell the two apart. A worklist for a term-centric sweep, not a correction list.",
+                "preferred_translation": "ፍሰት"
+            },
+            {
+                "term": "velocity",
+                "symbol": "v",
+                "context": "Flow velocity (speed of water). Appears in all calculators.",
+                "translation_notes": "Most languages use a direct cognate of 'velocity'. Do not use a word meaning 'speed' in a general sense if a more precise hydraulic term exists. Pre-2026 sr\/hr human translations used 'tečenja' (= flowing, a verbal noun from 'teći' = to flow) — this is less precise than the current 'brzina\/брзина' (= speed\/velocity) and the current AI-generated term is preferred.",
+                "preferred_translation": "ፍጥነት"
+            },
+            {
+                "term": "slope",
+                "symbol": "S",
+                "context": "Dimensionless ratio of vertical drop to horizontal distance (rise\/run). Used as channel slope (S_0) and friction slope in Manning and Darcy-Weisbach calculators. English aliases 'slope' and 'grade' (u_grade\/u_gradePercent) both point here.",
+                "translation_notes": "WMO No. 385 entry 477 ('energy gradient') confirms Russian: 'энергетический уклон' (energy slope) — the base term 'уклон' is WMO-verified. In open-channel hydraulics, 'slope' is the energy gradient — not a geometric angle. Use the civil engineering term for gradient\/grade, not a geographic or topographic term. [2026-07-21] Centralized the grade activity-sense guard here (was living only as u_grade\/u_gradePercent label commentary): the 'avoid' array now carries the running\/walking\/jogging exercise-incline trap, so the slope entry is the single home for the grade→energy-gradient concept and its wrong senses. | [2026-08-25, glossary_rendering_census.php] 16 English sites. Most of what a census reports as a rival here is the SIDE SLOPE of a channel, a different concept and correct where it stands: fr talus 5, zh 边坡 5, de böschung 4, ru откос 4, it scarpata 4, ar الجانبي 4. Three are genuine splits inside one language: ur ships ڈھلان at 14 sites while this entry holds ڈھلوان, used at 1; hi ships ढलान 10 against ढाल 5; ps ships میل 9 against شیب 6. ro is a diacritic split only -- pantă here, panta at 4 sites.",
+                "preferred_translation": "ቁልቁለት"
+            }
         ]
     },
     "keys_to_translate": {
+        "u_hr": "hr",
+        "u_day": "day",
         "lpn_field_text_attached": "Attached to",
+        "lpn_result_water_age": "Water age",
+        "lpn_result_water_age_tip": "How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.",
+        "lpn_result_source_share": "Source share",
+        "lpn_result_source_share_tip": "Of the water reaching this point, the share that came from the source you chose.",
         "lpn_menu_map": "Map",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
@@ -512,7 +543,8 @@
         "lpn_inp_drop_tags": "This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_report": "This file holds EPANET's own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
-        "lpn_inp_drop_quality_options": "This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_quality_options": "This file says what to follow through the pipes, and two settings that go with a chemical: how fast it spreads, and how close the answer has to be. Water age and source share are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
+        "lpn_inp_drop_file_options": "This file points at another file beside it, for the map or for hydraulics already worked out. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
@@ -552,6 +584,16 @@
         "lpn_settings_leader_snap": "Snap leader lines to angle",
         "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
+        "lpn_settings_quality": "Water quality",
+        "lpn_settings_quality_track": "Track",
+        "lpn_settings_quality_track_tip": "Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
+        "lpn_settings_quality_source": "Water from",
+        "lpn_settings_quality_source_tip": "The point whose water is followed. Every other point then shows the share of its water that came from here.",
+        "lpn_quality_none": "Nothing",
+        "lpn_quality_age": "Water age",
+        "lpn_quality_trace": "Source share",
+        "lpn_quality_chemical": "A chemical this file names (kept, not worked out)",
+        "lpn_quality_needs_run": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_field_base_demand": "Base demand",
         "lpn_result_demand_tip": "The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
@@ -634,7 +676,13 @@
         "lpn_ff_err_unknown": "No answer, and the reason given is {id}"
     },
     "keys": {
+        "u_hr": "hr",
+        "u_day": "day",
         "lpn_field_text_attached": "Attached to",
+        "lpn_result_water_age": "Water age",
+        "lpn_result_water_age_tip": "How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.",
+        "lpn_result_source_share": "Source share",
+        "lpn_result_source_share_tip": "Of the water reaching this point, the share that came from the source you chose.",
         "lpn_menu_map": "Map",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
@@ -704,7 +752,8 @@
         "lpn_inp_drop_tags": "This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_report": "This file holds EPANET's own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
-        "lpn_inp_drop_quality_options": "This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_quality_options": "This file says what to follow through the pipes, and two settings that go with a chemical: how fast it spreads, and how close the answer has to be. Water age and source share are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
+        "lpn_inp_drop_file_options": "This file points at another file beside it, for the map or for hydraulics already worked out. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
@@ -744,6 +793,16 @@
         "lpn_settings_leader_snap": "Snap leader lines to angle",
         "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
+        "lpn_settings_quality": "Water quality",
+        "lpn_settings_quality_track": "Track",
+        "lpn_settings_quality_track_tip": "Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
+        "lpn_settings_quality_source": "Water from",
+        "lpn_settings_quality_source_tip": "The point whose water is followed. Every other point then shows the share of its water that came from here.",
+        "lpn_quality_none": "Nothing",
+        "lpn_quality_age": "Water age",
+        "lpn_quality_trace": "Source share",
+        "lpn_quality_chemical": "A chemical this file names (kept, not worked out)",
+        "lpn_quality_needs_run": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_field_base_demand": "Base demand",
         "lpn_result_demand_tip": "The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
@@ -826,6 +885,38 @@
         "lpn_ff_err_unknown": "No answer, and the reason given is {id}"
     },
     "key_context": {
+        "u_hr": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "u_in2",
+                    "value": "in^2",
+                    "english": "sq. in."
+                },
+                "next_translated": {
+                    "key": "menu_brand",
+                    "value": "HawsEDC ካልኩሌተሮች",
+                    "english": "HawsEDC Calculators"
+                }
+            }
+        },
+        "u_day": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "u_in2",
+                    "value": "in^2",
+                    "english": "sq. in."
+                },
+                "next_translated": {
+                    "key": "menu_brand",
+                    "value": "HawsEDC ካልኩሌተሮች",
+                    "english": "HawsEDC Calculators"
+                }
+            }
+        },
         "lpn_field_text_attached": {
             "reason": "missing",
             "current_value": null,
@@ -839,6 +930,70 @@
                     "key": "lpn_field_elev",
                     "value": "ከፍታ",
                     "english": "Elevation"
+                }
+            }
+        },
+        "lpn_result_water_age": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_gradient_tip",
+                    "value": "የሄድ ኪሳራ በቧንቧው ርዝመት ተካፍሎ የሚገኝ ውጤት። የተለያየ ርዝመት ያላቸውን ቧንቧዎች ከአንድ የንድፍ ገደብ ጋር ለማወዳደር ይጠቀሙበት።",
+                    "english": "Head loss divided by the length of the pipe. Use it to compare pipes of different lengths against one design limit."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "ሄድ",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_water_age_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_gradient_tip",
+                    "value": "የሄድ ኪሳራ በቧንቧው ርዝመት ተካፍሎ የሚገኝ ውጤት። የተለያየ ርዝመት ያላቸውን ቧንቧዎች ከአንድ የንድፍ ገደብ ጋር ለማወዳደር ይጠቀሙበት።",
+                    "english": "Head loss divided by the length of the pipe. Use it to compare pipes of different lengths against one design limit."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "ሄድ",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_source_share": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_gradient_tip",
+                    "value": "የሄድ ኪሳራ በቧንቧው ርዝመት ተካፍሎ የሚገኝ ውጤት። የተለያየ ርዝመት ያላቸውን ቧንቧዎች ከአንድ የንድፍ ገደብ ጋር ለማወዳደር ይጠቀሙበት።",
+                    "english": "Head loss divided by the length of the pipe. Use it to compare pipes of different lengths against one design limit."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "ሄድ",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_source_share_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_gradient_tip",
+                    "value": "የሄድ ኪሳራ በቧንቧው ርዝመት ተካፍሎ የሚገኝ ውጤት። የተለያየ ርዝመት ያላቸውን ቧንቧዎች ከአንድ የንድፍ ገደብ ጋር ለማወዳደር ይጠቀሙበት።",
+                    "english": "Head loss divided by the length of the pipe. Use it to compare pipes of different lengths against one design limit."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "ሄድ",
+                    "english": "Head"
                 }
             }
         },
@@ -1962,6 +2117,22 @@
                 }
             }
         },
+        "lpn_inp_drop_file_options": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_quality",
+                    "value": "የውሃ ጥራት፣ የኬሚካል ግብረ-መልስና የፓምፕ ኃይል ቅንብሮች ቀርተዋል። ይህ ገጽ ፍሰትና ግፊት ብቻ ይፈታል።",
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_backdrop",
+                    "value": "ይህ ፋይል የበስተጀርባ ምስል ይጠቅሳል ነገር ግን ራሱን ምስሉን አልያዘም። እርስዎ ራስዎ ፋይል፣ የበስተጀርባ ምስል፣ ምስል ጨምር ተጠቅመው ይጨምሩት።",
+                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                }
+            }
+        },
         "lpn_scenario_mark_tip": {
             "reason": "missing",
             "current_value": null,
@@ -2583,6 +2754,166 @@
                     "key": "lpn_settings_legend_top_left",
                     "value": "ከላይ ግራ",
                     "english": "Top left"
+                }
+            }
+        },
+        "lpn_settings_quality": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "ሃይድሮሊክስ",
+                    "english": "Hydraulics"
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ደረጃ",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_settings_quality_track": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "ሃይድሮሊክስ",
+                    "english": "Hydraulics"
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ደረጃ",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_settings_quality_track_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "ሃይድሮሊክስ",
+                    "english": "Hydraulics"
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ደረጃ",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_settings_quality_source": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "ሃይድሮሊክስ",
+                    "english": "Hydraulics"
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ደረጃ",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_settings_quality_source_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "ሃይድሮሊክስ",
+                    "english": "Hydraulics"
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ደረጃ",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_quality_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "ሃይድሮሊክስ",
+                    "english": "Hydraulics"
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ደረጃ",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_quality_age": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "ሃይድሮሊክስ",
+                    "english": "Hydraulics"
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ደረጃ",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_quality_trace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "ሃይድሮሊክስ",
+                    "english": "Hydraulics"
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ደረጃ",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_quality_chemical": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "ሃይድሮሊክስ",
+                    "english": "Hydraulics"
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ደረጃ",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_quality_needs_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "ሃይድሮሊክስ",
+                    "english": "Hydraulics"
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ደረጃ",
+                    "english": "Rank"
                 }
             }
         },

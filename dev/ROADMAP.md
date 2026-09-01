@@ -138,6 +138,14 @@ the block.
       now FALSE in 26 languages each** and are the resync item. The lead no longer says "here is
       what changed on the way in" — it says nothing is thrown away, and separates kept-but-unused
       from genuinely changed, which is the distinction Tom could not read off the old sentence.
+  - **TWO KINDS OF "RESEARCH SAYS OTHERWISE", AND THEY ARE NOT EQUALLY STRONG** (Tom agreed,
+    2026-09-01). *"We measured it and it changes nothing"* is a fact about OUR engine — it is what
+    justified leaving CheckFreq, MaxCheck and Status without rows. *"The profession has moved on
+    from it"* is a fact about PRACTICE, and it is the only one that justifies omitting a control a
+    user expects to find. Tom: *"If 'everybody' has deprecated some part of EPANET (probably not
+    likely), we shouldn't be a maverick."* **We have no evidence of the second for anything, and
+    the day we think we do it is a question for the planning engineer with a citation, not a
+    judgement call in a commit message.**
   - **THE RULING IS DISCHARGED, 2026-09-01: every `[OPTIONS]` key now has a control or a MEASURED
     reason not to.** Rows added for Unbalanced (with its conditional trial count), HeadError,
     FlowChange and DampLimit. Three keep no row and the reason is a measurement rather than an
@@ -992,6 +1000,13 @@ the block.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 
 - 100|565| **The EPANET bridge never asks whether the run converged. It says it did.**
+  - **THE GENERAL STANCE IT CAME FROM, in Tom's words, 2026-09-01: *"we definitely want to give
+    good signals about anything unexpected."*** That is a rule about the whole suite and not
+    about this bridge — it is the same instinct behind the import report naming every difference,
+    the status bar saying when a network routed to EPANET, and the refusal to invent a hydrant
+    coefficient. **A page that quietly does something other than what the user asked, and looks
+    normal doing it, is the failure mode this project is least able to detect and most able to
+    cause.**
   **Found 2026-09-01 from Tom's own principle**, stated the same day: *"we definitely want to give
   good signals about anything unexpected."* `js/lpn-epanet.js` returns **`converged: true`
   hardcoded** at both of its success sites (the steady solve and the extended-period run), and the

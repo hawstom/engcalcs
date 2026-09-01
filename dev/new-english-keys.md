@@ -12,10 +12,10 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**97 still to read**, of 189 untranslated keys, of 1504 English keys. A key already marked _Ruled OK_ below needs nothing from you —
+**114 still to read**, of 206 untranslated keys, of 1521 English keys. A key already marked _Ruled OK_ below needs nothing from you —
 the ruling lapses by itself if the wording changes.
 
-## lpn_  (189)
+## lpn_  (204)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -294,8 +294,10 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_inp_drop_energy`**
   > This file says what the pumps cost to run. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.
+- **`lpn_inp_drop_file_options`**
+  > This file points at another file beside it, for the map or for hydraulics already worked out. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.
 - **`lpn_inp_drop_quality_options`**
-  > This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.
+  > This file says what to follow through the pipes, and two settings that go with a chemical: how fast it spreads, and how close the answer has to be. Water age and source share are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.
 - **`lpn_inp_drop_report`**
   > This file holds EPANET's own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.
 - **`lpn_inp_drop_rules`**
@@ -377,6 +379,16 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_profile_saved`**
   > Saved paths
   _Ruled OK 2026-08-29._
+- **`lpn_quality_age`**
+  > Water age
+- **`lpn_quality_chemical`**
+  > A chemical this file names (kept, not worked out)
+- **`lpn_quality_needs_run`**
+  > Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.
+- **`lpn_quality_none`**
+  > Nothing
+- **`lpn_quality_trace`**
+  > Source share
 - **`lpn_replace_asked`**
   > Asked for {n}. The answer is on its way.
   _Ruled OK 2026-08-29._
@@ -388,6 +400,14 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_result_demand_tip`**
   > The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.
   _Ruled OK 2026-08-29._
+- **`lpn_result_source_share`**
+  > Source share
+- **`lpn_result_source_share_tip`**
+  > Of the water reaching this point, the share that came from the source you chose.
+- **`lpn_result_water_age`**
+  > Water age
+- **`lpn_result_water_age_tip`**
+  > How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.
 - **`lpn_scenario_mark_tip`**
   > Ringed: this element holds a value that belongs to the scenario {name} alone.
   _Ruled OK 2026-08-29._
@@ -442,6 +462,16 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_settings_option_unset`**
   > Not stated
+- **`lpn_settings_quality`**
+  > Water quality
+- **`lpn_settings_quality_source`**
+  > Water from
+- **`lpn_settings_quality_source_tip`**
+  > The point whose water is followed. Every other point then shows the share of its water that came from here.
+- **`lpn_settings_quality_track`**
+  > Track
+- **`lpn_settings_quality_track_tip`**
+  > Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.
 - **`lpn_settings_specific_gravity`**
   > Specific gravity
   _Ruled OK 2026-08-29._
@@ -487,3 +517,10 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_terrain_will_ids`**
   > These are the nodes that will be filled in: {ids}
   _Ruled OK 2026-08-29._
+
+## u_  (2)
+
+- **`u_day`**
+  > day
+- **`u_hr`**
+  > hr
