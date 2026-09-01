@@ -2865,6 +2865,11 @@ var EngCalcs = EngCalcs || {};
 			// 'chemical' means CARRIED, NOT WORKED OUT: this page has no reaction coefficients, so
 			// naming a chemical is a fact about the file and never an analysis we ran.
 			quality: { mode: 'none', traceNode: '' },
+			// **THE TWO `[OPTIONS]` KEYS THAT NAME A FILE BESIDE THE `.inp`** -- `Map` and
+			// `Hydraulics USE/SAVE`. Carried text, no control, sparse like the rest: this page
+			// cannot open either file and does not act on either line, and reading past them was
+			// deleting a line the source stated on every save.
+			fileOptions: {},
 			// **`tolerance` IS DEPRECATED AND IS NO LONGER SEEDED HERE** (2026-08-28). EPANET's
 			// `Accuracy` replaced it; solveAccuracy() still READS it so a project saved before the
 			// change keeps its own number, but a new project no longer carries the field at all.
@@ -14691,6 +14696,7 @@ var EngCalcs = EngCalcs || {};
 				var s = JSON.parse(JSON.stringify(settings));
 				s.hydraulics = parsed.hydraulics || {};
 				s.qualityOptions = parsed.qualityOptions || {};
+				s.fileOptions = parsed.fileOptions || {};
 				// The token is interpreted ONCE, here, and the token itself is never written to
 				// again. `src` is what lets the exporter hand the file's own characters back while
 				// the setting is still the one they parse to.
@@ -14794,7 +14800,8 @@ var EngCalcs = EngCalcs || {};
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
-			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.';
+			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file says what to follow through the pipes, and two settings that go with a chemical: how fast it spreads, and how close the answer has to be. Water age and source share are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.';
+			case 'file-options': return pc.lpn_inp_drop_file_options || 'This file points at another file beside it, for the map or for hydraulics already worked out. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.';
 			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain it. Add the picture yourself with Map, Backdrop.';
 			case 'dangling-link': return pc.lpn_inp_drop_dangling || 'These pipes name a junction that is not in the file, so they were left out.';
 			// OUR VOCABULARY, NOT EPANET'S: what EPANET calls a Label is our Text object, so the

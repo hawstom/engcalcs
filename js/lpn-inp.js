@@ -339,7 +339,7 @@
 		// the source file never made, and it would fail the byte-identity test the round trip is
 		// held to.
 		var flowKey = 'GPM', headloss = 'H-W', emitterExponent = 0.5, demandMultiplier = 1,
-			defaultPattern = null, hydraulics = {}, qualityOptions = {}, rows, r;
+			defaultPattern = null, hydraulics = {}, qualityOptions = {}, fileOptions = {}, rows, r;
 		rows = rawSections.OPTIONS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
@@ -402,6 +402,18 @@
 			else if (key === 'QUALITY' && r[1]) { qualityOptions.quality = r.slice(1).join(' '); }
 			else if (key === 'DIFFUSIVITY' && r[1]) { qualityOptions.diffusivity = r[1]; }
 			else if (key === 'TOLERANCE' && r[1]) { qualityOptions.tolerance = r[1]; }
+			// **THE TWO `[OPTIONS]` KEYS THAT NAME A FILE**, carried for exactly the reason the
+			// three above are: an import that reads past a line the source stated and then writes
+			// the file back without it has DELETED the user's data, which is the one thing this
+			// reader may never do. Neither is a number a person could type on this page -- `Map`
+			// names a `.map` of coordinates beside the `.inp`, and `Hydraulics USE/SAVE` names a
+			// `.hyd` of already-solved hydraulics -- and neither changes an answer here, so they
+			// are a CARRY and not a control. Verbatim and never parsed, on the same argument the
+			// quality three carry: nothing solves with them, so their text is the only form that
+			// can round-trip. The value takes the rest of the line because both are two tokens
+			// (`USE net.hyd`) or one path with no fixed shape.
+			else if (key === 'MAP' && r[1]) { fileOptions.map = r.slice(1).join(' '); }
+			else if (key === 'HYDRAULICS' && r[1]) { fileOptions.hydraulics = r.slice(1).join(' '); }
 		}
 		// **CARRYING A THING AND TELLING THE USER ABOUT IT ARE TWO JOBS** (Task 248.03's lesson,
 		// recorded there after `[RULES]` stopped being reported the moment it started being kept).
@@ -412,6 +424,12 @@
 		// dropped.
 		if (Object.keys(qualityOptions).length) {
 			drop('quality-options', [], Object.keys(qualityOptions).length);
+		}
+		// **CARRIED AND STILL REPORTED**, the same two jobs. Both name a file this page cannot
+		// open, and a user who saves an `.inp` from here and moves it will find those lines
+		// pointing at nothing -- which is a fact about their file worth one sentence.
+		if (Object.keys(fileOptions).length) {
+			drop('file-options', [], Object.keys(fileOptions).length);
 		}
 
 		var fu = FLOW_UNITS[flowKey];
@@ -1107,6 +1125,8 @@
 			// The three water-quality `[OPTIONS]`, as the file's own text. Sparse on the same rule
 			// as `hydraulics`: absent means the file did not say it, so the exporter writes nothing.
 			qualityOptions: qualityOptions,
+			// The two `[OPTIONS]` keys naming a file beside the `.inp`. Sparse on the same rule.
+			fileOptions: fileOptions,
 			// [RULES], verbatim, one string per line (Task 248.03). Empty for a file with none, so
 			// no caller has to test for absence.
 			rules: carried.RULES || [],
@@ -1388,6 +1408,19 @@
 			}
 			if (q[pair[0]] === undefined || q[pair[0]] === null || q[pair[0]] === '') { return; }
 			out += row([pair[1], String(q[pair[0]])]) + '\n';
+		});
+		return out;
+	}
+
+	// `Map` and `Hydraulics USE/SAVE`, as the file's own characters. The value is split back into
+	// its own tokens so `Hydraulics USE net.hyd` comes out as three columns the way it went in,
+	// rather than as a keyword and one long string.
+	var LPN_FILE_LINES = [['map', 'Map'], ['hydraulics', 'Hydraulics']];
+	function fileOptionRows(files, row) {
+		var f = files || {}, out = '';
+		LPN_FILE_LINES.forEach(function (pair) {
+			if (f[pair[0]] === undefined || f[pair[0]] === null || f[pair[0]] === '') { return; }
+			out += row([pair[1]].concat(String(f[pair[0]]).split(/\s+/))) + '\n';
 		});
 		return out;
 	}
@@ -1917,7 +1950,11 @@
 			// where EPANET's own writer puts them. Nothing here computes with them, so the file's
 			// own characters are the only honest form -- see the importer's note. Sparse in, sparse
 			// out: a document holding none writes none.
-			qualityOptionRows(settings.qualityOptions, row, settings.quality) + '\n' +
+			qualityOptionRows(settings.qualityOptions, row, settings.quality) +
+			// **AND THE TWO THAT NAME A FILE, LAST**, because EPANET's own writer emits neither and
+			// there is therefore no order of its to follow. Written only where the source stated
+			// one; a project holding none writes none, exactly as every other option here.
+			fileOptionRows(settings.fileOptions, row) + '\n' +
 			carriedRest() +
 			section('COORDINATES', coords) +
 			section('VERTICES', verts) +

@@ -199,6 +199,44 @@ function check(ok, msg) {
 	check(plain.ok && plain.frames.every((f) => f.qualities === undefined),
 		'with the analysis off, no frame claims a quality value');
 
+	// ---- 6. THE SETTING REALLY REACHES THE ENGINE, AND CHANGING IT REALLY CHANGES THE ANSWER -----
+	//
+	// **THIS IS THE CHECK THE OPTIONS TRACK'S OWN DEFECT ARGUES FOR.** `signatureOf()` did not carry
+	// `model.hydraulics`, so fourteen different option sets on one network came back as one
+	// identical head -- a change that reached a REUSED EPANET session and did nothing, silently,
+	// while every harness that asserted only "the value is in the .inp we wrote" passed.
+	//
+	// Quality cannot fail that way and this says why out loud rather than trusting it:
+	// EngCalcs.lpnEpanetRun opens a FRESH Project on every call and never touches the warm session
+	// signatureOf() guards, so there is nothing here for a signature to carry. What is asserted is
+	// the property that matters either way -- change the analysis, get a different answer -- on ONE
+	// unchanged network, which is exactly the shape of the case that went undetected there.
+	const traceRiver = await EngCalcs.lpnEpanetRun(
+		Object.assign({}, model, { quality: { mode: 'trace', traceNode: 'River' } }));
+	const ageNet3 = await EngCalcs.lpnEpanetRun(
+		Object.assign({}, model, { quality: { mode: 'age' } }));
+	check(traceRiver.ok && ageNet3.ok, 'the same network runs under two other analyses');
+	if (traceRiver.ok && ageNet3.ok) {
+		const at = (r) => r.frames[r.frames.length - 1].qualities['203'];
+		check(Math.abs(at(traceRiver) - at(run)) > 1,
+			`tracing the other source gives another answer: ${at(run).toFixed(2)} against ${at(traceRiver).toFixed(2)} percent`);
+		// The two sources are complements only where the network has no third water, so the test is
+		// that they DIFFER, not that they sum -- but a share is still a share and must stay in range.
+		check(at(traceRiver) >= 0 && at(traceRiver) <= 100.01,
+			`and it is still a percentage: ${at(traceRiver).toFixed(2)}`);
+		check(at(ageNet3) > 3600,
+			`and water age is a length of time in seconds, not a percentage: ${at(ageNet3).toFixed(0)} s`);
+	}
+	// The page's own re-run trigger. js/lpn-time.js decides whether an edit is worth a fresh run by
+	// fingerprinting the model, so the analysis has to be ON the model or a user could switch it and
+	// keep looking at the previous run's numbers under the new heading.
+	const fp = (q) => JSON.stringify(Object.assign({}, model, { quality: q }),
+		(k, v) => (k === 'demand' ? undefined : v));
+	check(fp({ mode: 'age' }) !== fp({ mode: 'trace', traceNode: 'Lake' }),
+		"the page's own re-run fingerprint moves when the analysis changes");
+	check(fp({ mode: 'trace', traceNode: 'Lake' }) !== fp({ mode: 'trace', traceNode: 'River' }),
+		'and when only the source changes');
+
 	console.log(failures === 0 ? '\nquality harness: all checks passed'
 		: `\nquality harness: ${failures} FAILED`);
 	process.exit(failures === 0 ? 0 : 1);

@@ -589,6 +589,53 @@ console.log('\n7. the water-quality option round-trips, and changes only when th
 }
 done('the quality option survives being interpreted');
 
+// ---- 8. the two [OPTIONS] keys that name a FILE come back out ----------------------------------
+//
+// `Map` and `Hydraulics USE/SAVE` name a file beside the `.inp` -- a `.map` of coordinates, a `.hyd`
+// of already-solved hydraulics. This page can open neither and acts on neither, and it read past
+// both without keeping them, so an import and re-export DELETED a line the source stated. That is
+// the input-is-canonical rule broken in the same way [RULES] and the rest of [OPTIONS] each broke it
+// in turn. Carried now, and asserted here, because none of EPA's three models states either one.
+console.log('\n8. Map and Hydraulics USE/SAVE are carried, not deleted');
+{
+	const text = [
+		'[TITLE]', 'carries a map and a hydraulics file', '',
+		'[JUNCTIONS]', ' J1\t100\t0', '',
+		'[RESERVOIRS]', ' R1\t220.0', '',
+		'[PIPES]', ' P1\tR1\tJ1\t1200\t12\t130\t0\tOpen', '',
+		'[OPTIONS]', ' Units\tGPM', ' Headloss\tH-W', ' Map\tnetwork.map',
+		' Hydraulics\tUSE\tsaved.hyd', '',
+		'[COORDINATES]', ' J1\t10.0\t10.0', ' R1\t0.0\t0.0', '',
+		'[END]', ''
+	].join('\n');
+	const parsed = EngCalcs.lpnInpParse(text);
+	ok('the map file is read', parsed.fileOptions.map === 'network.map', JSON.stringify(parsed.fileOptions.map));
+	ok('and the hydraulics file with its keyword',
+		parsed.fileOptions.hydraulics === 'USE saved.hyd', JSON.stringify(parsed.fileOptions.hydraulics));
+	ok('and both are reported rather than kept quietly',
+		(parsed.dropped || []).some((d) => d.code === 'file-options'),
+		JSON.stringify((parsed.dropped || []).map((d) => d.code)));
+	L.applyUnitSelections(L.inpUnitSelections(parsed));
+	const doc = L.docFromInp(parsed, 'carries');
+	const out = EngCalcs.lpnExportInp(doc);
+	ok('it exports', out.ok === true, JSON.stringify(out.error));
+	const got = tokensBySection(out.inp).OPTIONS || [];
+	const rowFor = (kw) => got.find((r) => r[0].toUpperCase() === kw);
+	ok('Map comes back naming the same file',
+		rowFor('MAP') && rowFor('MAP')[1] === 'network.map', JSON.stringify(rowFor('MAP')));
+	ok('Hydraulics comes back as three tokens, not one string',
+		rowFor('HYDRAULICS') && rowFor('HYDRAULICS').length === 3
+			&& rowFor('HYDRAULICS')[1] === 'USE' && rowFor('HYDRAULICS')[2] === 'saved.hyd',
+		JSON.stringify(rowFor('HYDRAULICS')));
+	// The other half of sparseness: a file that stated neither must not gain either.
+	const bare = EngCalcs.lpnExportInp(importDoc(refPath('Net1.inp')).doc);
+	const bareOpts = tokensBySection(bare.inp).OPTIONS || [];
+	ok('a file that stated neither gains neither',
+		!bareOpts.some((r) => ['MAP', 'HYDRAULICS'].indexOf(r[0].toUpperCase()) >= 0),
+		JSON.stringify(bareOpts.map((r) => r[0])));
+}
+done('a line naming another file is not deleted');
+
 console.log('');
 if (fails) { console.log(fails + ' FAILED of ' + checks); process.exit(1); }
 console.log('all ' + checks + ' export checks passed');
