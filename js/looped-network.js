@@ -2809,7 +2809,12 @@ var EngCalcs = EngCalcs || {};
 			priority: {
 				// Demand outranks Base demand: on a crowded drawing the resolved number is the one
 				// worth the last space, and the base is recoverable from it and the pattern.
-				node: { demandActual: 5, demand: 4, pressure: 3, elev: 2, head: 1 },
+				// **QUALITY OUTRANKS EVERYTHING AND SHEDS LAST**, because unlike the five below it is
+				// never on unless somebody switched the analysis on and re-ran: a field a user asked for
+				// by name is the last one to give up its space. It carries a rank and NO entry in
+				// LPN_NODE_DROP_RULE, which is the pair of statements "order this row inside the column"
+				// and "do not make this a criterion for which whole label wins a contested spot".
+				node: { quality: 6, demandActual: 5, demand: 4, pressure: 3, elev: 2, head: 1 },
 				link: { flow: 9, velocity: 8, headloss: 7, gradient: 6,
 					diameter: 5, length: 4, roughness: 3, km: 2, id: 1 }
 			},

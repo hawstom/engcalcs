@@ -135,8 +135,11 @@ ok(def.priority.link.flow === Math.max.apply(null, Object.keys(def.priority.link
 // Demand joined the top of it on 2026-08-25, when Base demand and Demand became two fields: the
 // RESOLVED demand is the one worth the last space on a crowded drawing, and the base is recoverable
 // from it and the pattern.
-eq(dropOrderOf(def.priority.node), ['head', 'elev', 'pressure', 'demand', 'demandActual'],
-	'node drop order is head, elevation, pressure, base demand, demand -- demand decides last and so wins');
+// Water quality joined the TOP of it on 2026-09-01. It is the one node field that is never on
+// unless somebody switched the analysis on and re-ran, so a field asked for by name is the last
+// to give up its space.
+eq(dropOrderOf(def.priority.node), ['head', 'elev', 'pressure', 'demand', 'demandActual', 'quality'],
+	'node drop order is head, elevation, pressure, base demand, demand, water quality -- quality decides last and so wins');
 
 // The two columns are not the same axis and must not converge on one list.
 ok(dropOrderOf(def.priority.node).length !== dropOrderOf(def.priority.link).length,

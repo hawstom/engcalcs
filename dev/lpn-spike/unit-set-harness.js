@@ -59,14 +59,18 @@ function ok(name, cond, extra) {
 byId.lpn_toolbar.querySelectorAll = () => [];
 setUnitSet('us');
 
-// ---- 1. one set, and it is the input set plus the two that were results-only --------------------
+// ---- 1. one set, and it is the input set plus the results-only ones -----------------------------
+//
+// Three of the nine are results-only and always were -- velocity, head-loss gradient, and the water
+// age a quality run answers with. Nothing on this page is typed in any of them, which is the whole
+// of why "one set" is the old input set PLUS those rather than a straight merge.
 {
 	console.log('\n--- one set ---');
 	const all = L.ALL;
 	['lpn_u_length', 'lpn_u_diameter', 'lpn_u_roughness', 'lpn_u_elevhead', 'lpn_u_pressure',
-		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient']
+		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_age']
 		.forEach(n => ok('the set holds ' + n, all.indexOf(n) >= 0));
-	ok('and holds nothing else', all.length === 8, JSON.stringify(all));
+	ok('and holds nothing else', all.length === 9, JSON.stringify(all));
 	// **NO `lpn_u_r_*` SURVIVES ANYWHERE IN THE SET.** Named as a pattern rather than as three
 	// strings, so a fourth one invented later is caught too.
 	ok('no result-only twin is left in the set', all.every(n => n.indexOf('lpn_u_r_') !== 0),

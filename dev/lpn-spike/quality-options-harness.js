@@ -214,7 +214,16 @@ console.log('\n--- the report tells the user, and tells the truth ---');
 
 	const kept = L.dropText('quality-options');
 	ok('the new sentence says they are kept', /kept/i.test(kept), JSON.stringify(kept));
-	ok('...and that nothing here uses them', /Nothing on this page uses/i.test(kept), JSON.stringify(kept));
+	// **THIS ASSERTION WAS INVERTED ON 2026-09-01, AND THE INVERSION IS THE POINT.** It used to
+	// require the words "Nothing on this page uses" -- true while all three options were carried
+	// text, and FALSE the moment `Quality` became a live input driving a water-age or source-share
+	// run. That is exactly the failure the block below is about: a sentence that was honest when it
+	// was written and quietly became an over-claim in the other direction. So the sentence must now
+	// say that a chemical is not worked out here, and must NOT claim that none of them is used.
+	ok('...and no longer claims the page uses none of them',
+		!/Nothing on this page uses/i.test(kept), JSON.stringify(kept));
+	ok('...and still says a chemical is not worked out here',
+		/chemical is not/i.test(kept), JSON.stringify(kept));
 	// **THE HALF THAT WENT WRONG LAST TIME.** `lpn_inp_drop_rules` had to be rewritten the moment
 	// rules started being carried, because "left out" had become false and a user reading it would
 	// believe theirs were lost. The same sentence covered these settings until now.
