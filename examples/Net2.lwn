@@ -1122,6 +1122,19 @@
 			"X": "X"
 		},
 		"emitterExponent": 0.5,
+		"hydraulics": {
+			"specificGravity": 1,
+			"viscosity": 1,
+			"trials": 40,
+			"accuracy": 0.001,
+			"checkFreq": 2,
+			"maxCheck": 10,
+			"dampLimit": 0,
+			"unbalanced": "continue",
+			"unbalancedTrials": 10,
+			"demandMultiplier": 1,
+			"emitterExponent": 0.5
+		},
 		"tolerance": 1e-9,
 		"engine": "epanet",
 		"defaults": {

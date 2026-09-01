@@ -250,7 +250,8 @@ console.log('\n--- four rows, and the rest carried without one ---');
 			return span ? span.textContent.replace(/\s+/g, ' ').trim() : '';
 		});
 	['Accuracy', 'Demand multiplier', 'Specific gravity', 'Relative viscosity', 'Emitter exponent',
-		'Maximum trials'].forEach(function (w) {
+		'Maximum trials', 'If it will not settle', 'Extra trials first', 'Head error limit',
+		'Flow change limit', 'Damping starts at'].forEach(function (w) {
 		ok(w + ' has a row', labels.some(t => t.indexOf(w) === 0), labels.join(' | '));
 	});
 	// **AND "CONVERGENCE TOLERANCE" IS GONE** (Tom, 2026-08-28: *"Deprecate our 'Convergence
@@ -259,15 +260,39 @@ console.log('\n--- four rows, and the rest carried without one ---');
 	// is worse than one.
 	ok('...and Convergence tolerance is gone, replaced by Accuracy',
 		!labels.some(t => /Convergence/.test(t)), labels.join(' | '));
-	// **AND THE ONES THAT DO NOT, WHICH IS AS DELIBERATE AS THE ONES THAT DO.** CLAUDE.md's
-	// emitter-exponent precedent: never ship the most technical-looking control in a box if it is
-	// the one that adjusts nothing. Accuracy is the interesting exclusion -- it has no honest place
-	// beside Convergence tolerance, which is a different quantity on a different scale, and which
-	// of the two a reader should meet is Tom's call and not a script's.
-	['Unbalanced', 'Head error', 'Status report', 'Flow change', 'Damp'].forEach(function (w) {
+	// **AND THE THREE THAT STILL DO NOT, WHICH IS AS DELIBERATE AS THE ELEVEN THAT DO.** Tom's
+	// 2026-08-29 ruling reversed the burden of proof -- a setting now needs a reason NOT to have a
+	// row -- so each of these three has one, and two of the three are MEASURED rather than argued
+	// (section 7 below is the measurement):
+	//   Status report decides what EPANET's own `.rpt` holds and this page has no `.rpt`. It is a
+	//     report-formatting key: no answer anywhere depends on it.
+	//   Trials between status checks (CheckFreq) and the last trial that checks status (MaxCheck)
+	//     steer the PATH to a converged answer and not the answer. Their only reachable effect on
+	//     an answer is at 0, which EPANET refuses the whole input over.
+	// All three are still carried, exported and honoured -- sections 1 to 4 hold that.
+	['Status report', 'Trials between', 'Last trial'].forEach(function (w) {
 		ok('...and ' + w + ' deliberately has none', !labels.some(t => t.indexOf(w) === 0),
 			labels.join(' | '));
 	});
+	// **THE UNBALANCED TRIAL COUNT IS THE ONE ROW THAT COMES AND GOES.** `Unbalanced Stop 10` is
+	// not a line EPANET writes, so the count exists only under "report the last try"; the fixture
+	// states Continue 12, which is why the row is there two assertions above.
+	{
+		const set = L.getSettings();
+		set.hydraulics.unbalanced = 'stop';
+		delete set.hydraulics.unbalancedTrials;
+		L.rebuildSettings();
+		const after = all(byId.lpn_set_hydraulics_fields, [])
+			.filter(n => n.tagName === 'LABEL' && /lpn-set-row/.test(n.className || ''))
+			.map(function (line) {
+				const span = (line.children || []).filter(c => c.tagName === 'SPAN')[0];
+				return span ? span.textContent.replace(/\s+/g, ' ').trim() : '';
+			});
+		ok('...and the extra-trial count disappears under "report nothing"',
+			!after.some(t => t.indexOf('Extra trials first') === 0), after.join(' | '));
+		set.hydraulics.unbalanced = 'continue';
+		set.hydraulics.unbalancedTrials = 12;
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -365,5 +390,176 @@ console.log('\n--- and each one acts, rather than merely being stored ---');
 			free.converged + ' (' + free.iterations + ')');
 }
 
-console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
-process.exit(fails ? 1 : 0);
+// ---------------------------------------------------------------------------
+// 7. THE FIVE EPANET-ONLY ROWS, AND THE TWO THAT WERE MEASURED INTO SILENCE.
+// ---------------------------------------------------------------------------
+// **THIS SECTION EXISTS BECAUSE A ROW THAT RENDERS AND CHANGES NOTHING IS THE DEFECT.** Tom's
+// 2026-08-29 ruling ("every setting from EPANET must be added and implemented unless research says
+// otherwise") reversed the burden of proof but not the standard: a control still has to act. So each
+// row added here is asserted through the ENGINE THAT READS IT, and the two options that got no row
+// are asserted to be genuinely inert rather than merely obscure.
+//
+// **A DELIBERATELY UNCONVERGEABLE NETWORK IS THE INSTRUMENT.** Four of these five options only show
+// themselves where a solve is struggling; on a network that converges in three trials, a stopping
+// rule is invisible whatever it says. `Trials 1` is what makes the rule observable.
+//
+// The model is built by hand rather than through assembleModel(), so this section says nothing about
+// the Settings box (section 5 does) and everything about the option reaching the engine.
+const solverEC = require(ROOT + 'js/lpn-solver.js');
+Object.keys(solverEC).forEach(function (k) { global.EngCalcs[k] = solverEC[k]; });
+require(ROOT + 'js/lpn-epanet.js');
+
+function optModel(hyd) {
+	return {
+		method: 'hw', hydraulics: hyd,
+		nodes: [
+			{ id: 'R', type: 'reservoir', elev: 0, head: 100 },
+			{ id: 'A', type: 'junction', elev: 0, demand: 0.02 },
+			{ id: 'B', type: 'junction', elev: 0, demand: 0.03 },
+			{ id: 'C', type: 'junction', elev: 10, demand: 0.01 }
+		],
+		// **THE CHECK VALVE IS NOT DECORATION.** CheckFreq and MaxCheck govern how often EPANET
+		// re-examines a check valve's open/shut state, so a network without one could not possibly
+		// show them acting, and "no effect" measured on it would prove nothing at all.
+		links: [
+			{ id: 'P1', type: 'pipe', from: 'R', to: 'A', length: 500, diameter: 0.3, roughness: 130, k: 0, status: 'open' },
+			{ id: 'P2', type: 'pipe', from: 'A', to: 'B', length: 800, diameter: 0.2, roughness: 120, k: 0, status: 'open' },
+			{ id: 'P3', type: 'pipe', from: 'B', to: 'C', length: 600, diameter: 0.15, roughness: 110, k: 0, status: 'open' },
+			{ id: 'P4', type: 'pipe', from: 'C', to: 'A', length: 700, diameter: 0.15, roughness: 110, k: 0, status: 'cv' }
+		]
+	};
+}
+
+(async function () {
+	await EngCalcs.lpnEpanetLoad('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'));
+	async function headB(hyd) {
+		const r = await EngCalcs.lpnSolveEpanet(optModel(hyd));
+		return r.ok ? r.heads.B : null;
+	}
+
+	console.log('\n--- the five EPANET-only rows each move an answer ---');
+	const solved = await headB({ accuracy: 1e-9, trials: 200 });
+
+	// **ACCURACY.** The one row both engines read, and the only one of the six whose native half is
+	// asserted above (section 6's `trials`). Here it is the EPANET half: a loose tolerance stops
+	// short of the answer a tight one reaches.
+	const loose = await headB({ accuracy: 1, trials: 200 });
+	ok('accuracy 1 stops EPANET short of where 1e-9 gets to',
+		loose !== null && Math.abs(loose - solved) > 1e-6, solved + ' -> ' + loose);
+
+	// **HEAD ERROR AND FLOW CHANGE ARE EXTRA STOPPING TESTS, SO THE FLOW TEST HAS TO BE DISARMED TO
+	// SEE THEM.** Under EPANET's own rule the solve stops when ANY satisfied criterion is met, so
+	// with Accuracy at its usual value the answer is already exact and a second criterion can only
+	// be invisible. Accuracy 1 hands the decision to the criterion under test, which is the only
+	// arrangement in which "it changed the answer" is attributable.
+	const byHead = await headB({ accuracy: 1, trials: 200, headError: 1e-6 });
+	ok('a tight head-error limit pulls the answer back to the solved one',
+		byHead !== null && Math.abs(byHead - solved) < 1e-6 && Math.abs(byHead - loose) > 1e-6,
+		loose + ' -> ' + byHead + '  (solved ' + solved + ')');
+	ok('...and a slack one leaves the loose answer where it was',
+		Math.abs(await headB({ accuracy: 1, trials: 200, headError: 100 }) - loose) < 1e-12);
+
+	const byFlow = await headB({ accuracy: 1, trials: 200, flowChange: 1e-12 });
+	ok('a tight flow-change limit does the same, through its own criterion',
+		byFlow !== null && Math.abs(byFlow - solved) < 1e-6 && Math.abs(byFlow - loose) > 1e-6,
+		loose + ' -> ' + byFlow);
+	ok('...and a slack one leaves the loose answer where it was',
+		Math.abs(await headB({ accuracy: 1, trials: 200, flowChange: 1 }) - loose) < 1e-12);
+
+	// **IF IT WILL NOT SETTLE, AND WHAT IT ACTUALLY DOES WAS MEASURED BEFORE THE STRINGS WERE
+	// WRITTEN.** EPANET's `Unbalanced Stop` is documented as halting with an error; through the
+	// TOOLKIT, which is what this page uses, it halts and hands back the last iterate rather than
+	// refusing -- measured here, and the first draft of this row said "Report nothing" on the
+	// strength of the documentation. The label says "Stop there" because that is what happens.
+	// The pair still changes the answer, decisively: given one trial on a network that needs more,
+	// keeping on settles it and stopping there does not.
+	const keepTrying = await headB({ trials: 1, unbalanced: 'continue', unbalancedTrials: 200 });
+	const stopThere = await headB({ trials: 1, unbalanced: 'stop' });
+	ok('one trial and "keep trying" reaches the settled answer anyway',
+		keepTrying !== null && Math.abs(keepTrying - solved) < 1e-9, solved + ' vs ' + keepTrying);
+	ok('...and "stop there" does not, which is the whole difference',
+		stopThere !== null && Math.abs(stopThere - solved) > 1e-6, solved + ' vs ' + stopThere);
+	// **AND THE COUNT IS PART OF THE OPTION, NOT DECORATION.** Keeping on with no extra trials is
+	// stopping there by another name, which is why the count row appears with that choice and only
+	// with it.
+	ok('...and "keep trying" with no extra trials is the same as stopping',
+		Math.abs(await headB({ trials: 1, unbalanced: 'continue', unbalancedTrials: 0 }) - stopThere) < 1e-12);
+
+	// **DAMPING.** The smallest of the five, and asserted as a difference rather than a direction:
+	// damping changes the route the iteration takes, so where it lands differs in the last digits
+	// the tolerance was ever going to guarantee. A sign test here would be asserting noise.
+	const damped = await headB({ accuracy: 1e-9, trials: 200, dampLimit: 0.5 });
+	ok('damping moves where the iteration lands', damped !== null && damped !== solved,
+		solved + ' -> ' + damped);
+
+	// -----------------------------------------------------------------------
+	// **AND THE TWO THAT WERE MEASURED INTO SILENCE, WHICH IS THE OTHER HALF OF THE RULING.**
+	// "Research says otherwise" has to be a measurement or it is an opinion. CheckFreq and MaxCheck
+	// return heads identical TO THE LAST BIT across their whole useful range on the network shape
+	// they are supposed to matter on -- so they steer the path and not the destination, and a box
+	// for them would be the emitter-exponent mistake with a different name. If this ever fails,
+	// they have earned their rows and this comment is the thing that is wrong.
+	// -----------------------------------------------------------------------
+	console.log('\n--- and the two with no row change no answer, measured ---');
+	for (const v of [1, 2, 100]) {
+		ok('CheckFreq ' + v + ' returns the identical head',
+			(await headB({ accuracy: 1e-9, trials: 200, checkFreq: v })) === solved);
+	}
+	for (const v of [1, 10, 200]) {
+		ok('MaxCheck ' + v + ' returns the identical head',
+			(await headB({ accuracy: 1e-9, trials: 200, maxCheck: v })) === solved);
+	}
+	// Their one reachable effect: 0 is not a legal value and EPANET refuses the input over it.
+	// A control whose only visible outcome is a refusal is not a control.
+	ok('...and 0, their only visible value, is a refusal', (await headB({ checkFreq: 0 })) === null);
+
+	// **STATUS REPORT CHANGES NO ANSWER, EITHER, AND FOR A REASON NEEDING NO MEASUREMENT** -- it
+	// selects what EPANET writes into a `.rpt` this page never asks for. Asserted anyway, because
+	// "it only affects a report" is exactly the kind of claim that is true until somebody wires the
+	// value into the wrong writer.
+	ok('Status Full changes no answer either',
+		(await headB({ accuracy: 1e-9, trials: 200, statusReport: 'FULL' })) === solved);
+
+	// **AND THE REASON ANY OF THIS IS OBSERVABLE AT ALL** (js/lpn-epanet.js signatureOf): the engine
+	// keeps an open Project between solves and reuses it whenever the network's SHAPE is unchanged.
+	// The options live in the `.inp` text and no setter pushes them, so before they were put in the
+	// signature every assertion above passed the FIRST value and silently reused it for the rest --
+	// fourteen option sets, one identical head. This is that regression, as one line.
+	ok('a changed option is not answered from the previous solve\'s session',
+		(await headB({ accuracy: 1e-9, trials: 200 })) === solved &&
+		(await headB({ accuracy: 1, trials: 200 })) === loose && solved !== loose);
+
+	// -----------------------------------------------------------------------
+	// 8. THE SHIPPED GALLERY STATES WHAT ITS OWN `.inp` STATES.
+	// -----------------------------------------------------------------------
+	// **A STORED PROJECT DOES NOT GAIN A FEATURE THE DAY THE IMPORTER DOES**, which is the lesson
+	// the water-quality half of Task 553 paid for: `examples/Net1.lwn` carried no `qualityOptions`
+	// for as long as that carry existed, and the first person to notice was Tom exporting one.
+	// `settings.hydraulics` was the same gap, left open on purpose because filling it moves what the
+	// gallery COMPUTES -- Net1 states `Accuracy 0.001` and this page's own default is 1e-9.
+	//
+	// **MEASURED BEFORE IT WAS FILLED, ON ALL FOUR EPA EXAMPLES:** worst head change 2.5e-7 m
+	// (Net3, node 231), worst relative flow change 0.00224% (Net3, link 285), and every one still
+	// converges. Below any decimal place the page displays, so the gallery's answers do not visibly
+	// move -- but the file is now stating its own source's number, which is the rule.
+	//
+	// Read off the SHIPPED file, not the source folder: `examples/` is generated, and a gallery that
+	// silently regenerated without this would be the gap reopening exactly as it did before.
+	console.log('\n--- and the shipped gallery states its own source\'s options ---');
+	{
+		const shipped = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net1.lwn'), 'utf8'));
+		const hyd = (shipped.settings || {}).hydraulics || {};
+		const want = {
+			specificGravity: 1, viscosity: 1, trials: 40, accuracy: 0.001, checkFreq: 2,
+			maxCheck: 10, dampLimit: 0, unbalanced: 'continue', unbalancedTrials: 10,
+			demandMultiplier: 1, emitterExponent: 0.5
+		};
+		Object.keys(want).forEach(function (k) {
+			ok('Net1.lwn states ' + k + ' as Net1.inp does', hyd[k] === want[k],
+				JSON.stringify(hyd[k]) + ' (wanted ' + JSON.stringify(want[k]) + ')');
+		});
+	}
+
+	console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
+	process.exit(fails ? 1 : 0);
+})();

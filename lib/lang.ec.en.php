@@ -2411,13 +2411,35 @@ $ec_lang['lpn_settings_elev_source_tip']='Where a new node gets its elevation. T
 $ec_lang['lpn_settings_elev_source_typed']='The number above';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM';
 $ec_lang['lpn_settings_accuracy']='Accuracy';
-$ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. This is EPANET\'s own setting, and this page starts far tighter than EPANET does.';
+$ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and they weigh the change slightly differently: the built-in solver against the water the network delivers, EPANET against the water it carries. Left empty, this page tries far harder than EPANET does on its own.';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
 $ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';
 $ec_lang['lpn_settings_viscosity_tip']='The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.';
 $ec_lang['lpn_settings_trials']='Maximum trials';
 $ec_lang['lpn_settings_trials_tip']='How many times the solver may try before it gives up on a network that will not settle.';
+// **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
+// EPANET must be added and implemented unless research says otherwise"*). Written in OUR words and
+// not EPANET's -- there is no "Unbalanced" or "DampLimit" on the page, because a name only a person
+// who already reads .inp files can parse teaches nobody anything.
+//
+// **EACH TIP SAYS WHICH SOLVER READS THE BOX, AND THAT IS THE LOAD-BEARING SENTENCE.** These five
+// act inside EPANET's iteration and the built-in solver has no equivalent term, so a user who does
+// not know which engine is answering cannot tell a control that did nothing from a setting that had
+// no effect. Saying it in the tip is cheaper than a second Settings section, and honest.
+$ec_lang['lpn_settings_unbalanced']='If it will not settle';
+$ec_lang['lpn_settings_unbalanced_tip']='What to do with a network that has used up its trials and still has not settled. Keeping on allows the extra trials below, which often settles it; stopping reports the last try as it stands, which is close but not solved. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as unsettled.';
+$ec_lang['lpn_settings_unbalanced_continue']='Keep trying';
+$ec_lang['lpn_settings_unbalanced_stop']='Stop there';
+$ec_lang['lpn_settings_unbalanced_trials']='Extra trials first';
+$ec_lang['lpn_settings_unbalanced_trials_tip']='How many further trials to allow after the maximum above is used up, before the last try is reported. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_head_error']='Head error limit';
+$ec_lang['lpn_settings_head_error_tip']='A second test the solver must pass before it stops: the largest head any one pipe is still out by. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_flow_change']='Flow change limit';
+$ec_lang['lpn_settings_flow_change_tip']='A further test the solver must pass before it stops: the largest amount any one pipe\'s flow is still moving by from one try to the next. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_damp_limit']='Damping starts at';
+$ec_lang['lpn_settings_damp_limit_tip']='The accuracy at which the solver begins taking smaller steps, which can settle a network that is swinging back and forth. Zero, the usual value, means it never does. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_option_unset']='Not stated';
 $ec_lang['lpn_settings_demand_multiplier']='Demand multiplier';
 $ec_lang['lpn_settings_demand_multiplier_tip']='One scale on every demand in the network at once. Use it to ask what the system does at more or less than today\'s use. It does not change the numbers you typed.';
 $ec_lang['lpn_settings_tolerance']='Convergence tolerance';

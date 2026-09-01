@@ -1810,6 +1810,23 @@ EngCalcs.pageConfig = {
 	lpn_settings_trials_tip: <?=json_encode($ec_lang['lpn_settings_trials_tip'])?>,
 	lpn_settings_demand_multiplier: <?=json_encode($ec_lang['lpn_settings_demand_multiplier'])?>,
 	lpn_settings_demand_multiplier_tip: <?=json_encode($ec_lang['lpn_settings_demand_multiplier_tip'])?>,
+<?php // **AND THE FIVE THAT ACT INSIDE EPANET ALONE** (Task 553, under Tom's 2026-08-29 ruling that
+      // a setting now needs a REASON not to have a row rather than a reason to have one). Each tip
+      // names the solver that reads it, which is the whole difference between an honest control and
+      // one a person cannot tell from a dead one. ?>
+	lpn_settings_unbalanced: <?=json_encode($ec_lang['lpn_settings_unbalanced'])?>,
+	lpn_settings_unbalanced_tip: <?=json_encode($ec_lang['lpn_settings_unbalanced_tip'])?>,
+	lpn_settings_unbalanced_continue: <?=json_encode($ec_lang['lpn_settings_unbalanced_continue'])?>,
+	lpn_settings_unbalanced_stop: <?=json_encode($ec_lang['lpn_settings_unbalanced_stop'])?>,
+	lpn_settings_unbalanced_trials: <?=json_encode($ec_lang['lpn_settings_unbalanced_trials'])?>,
+	lpn_settings_unbalanced_trials_tip: <?=json_encode($ec_lang['lpn_settings_unbalanced_trials_tip'])?>,
+	lpn_settings_head_error: <?=json_encode($ec_lang['lpn_settings_head_error'])?>,
+	lpn_settings_head_error_tip: <?=json_encode($ec_lang['lpn_settings_head_error_tip'])?>,
+	lpn_settings_flow_change: <?=json_encode($ec_lang['lpn_settings_flow_change'])?>,
+	lpn_settings_flow_change_tip: <?=json_encode($ec_lang['lpn_settings_flow_change_tip'])?>,
+	lpn_settings_damp_limit: <?=json_encode($ec_lang['lpn_settings_damp_limit'])?>,
+	lpn_settings_damp_limit_tip: <?=json_encode($ec_lang['lpn_settings_damp_limit_tip'])?>,
+	lpn_settings_option_unset: <?=json_encode($ec_lang['lpn_settings_option_unset'])?>,
 <?php // **ELEVATION ON CREATION** (Task 542). The row is built only on a geographic project with a
       // Mapbox token, but the STRINGS are supplied unconditionally: pageConfig is assembled once at
       // render time and the project can change without a reload. ?>
