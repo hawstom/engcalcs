@@ -957,6 +957,44 @@ the block.
     than a disappointment; "a third of them" makes several open tasks much more urgent.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 
+- 100|562| **One touch radius for every object, and a node always wins.**
+  **Tom's ruling, 2026-09-01**, closing the whole family of touch numbers: *"Match nodes so that we
+  have fewer numbers. Then when I report 'too hard to pan', we just reduce the number, and when I
+  report 'too hard to drag', we just increase the number agnostic of the object. There is no reason
+  why the number can't apply across the board to labels and pipes also. But note that nodes need to
+  get precedence always, because they are hardest to aim at."*
+  - **ONE KNOB.** `dev/phone-interaction-model.md` found five radii and thresholds, each individually
+    argued, and one flat contradiction: a path handle is grabbed at 24 px on touch against the same
+    pan rival that forced node grabs down to 14. His answer is not to argue the exception but to
+    delete the family — one number for nodes, labels, pipes and path handles alike, so a report of
+    *too hard to pan* or *too hard to drag* moves ONE constant and needs no per-object judgement.
+  - **AND THE PERSISTENT DEFECT UNDERNEATH IT, which he named and which is verified:** *"many times
+    pipes would edit when I was trying to edit nodes... maybe we also can just make the nodes a
+    little easier to get. That's the persistent issue through it all, I think."*
+    - **Why it happens.** `mapHitAt()` asks `elementsFromPoint` and returns the topmost CONFIRMED
+      hit. Nodes paint after links so a node is above a pipe — but the node's target is only its
+      drawn disc, `symbolSize` 7, about 11 px across, while a pipe carries a wide stroke halo. Land
+      a finger 8 px off a junction and the point is off the node disc and ON the pipe, so the pipe
+      wins outright. **`touchAssetNear()` never runs**, because it is reached only where the real hit
+      test found BARE MAP.
+    - **So node precedence has to OVERRULE a link hit, not merely fill in bare map.** That reverses
+      the deliberate constraint the touch fallback shipped under (*"it can add a hit, never overrule
+      one"*) — the constraint was right when it was written and Tom's ruling supersedes it. Say so at
+      the call site rather than silently contradicting the old comment.
+  - **The unification worklist is `dev/phone-interaction-model.md`**, ranked. Two of its findings are
+    live holes rather than tidiness: `openPopup()` opens the property box inside a touch pointerup
+    with **no ghost-click shield** (a second door to Task 561), and `hideTipsIn` is on six closers
+    and absent from six more (five siblings of Task 555 waiting). Two more want checks: every panel
+    passed to `makePanelDraggable()` has `touch-action: none` — three of six do today, and that CSS
+    rule's own comment names *Find* while its selector names *Library* — and every container given
+    to `initTips()` is hidden through a closer that sweeps its tips.
+  - **Deferred deliberately: merging the SVG's two `pointerdown` and two `pointerup` listeners.**
+    Structurally the best of the seven and about a day, and Task 560 was precisely those two halves
+    disagreeing about what a press is — but not worth a day of risk on a platform Tom calls a
+    novelty. It stays named so it is not re-derived.
+  - **`HIT_SLOP_PX` (2) should stop being counted as a touch number at all** — it is a rasterising
+    guard a finger never sees.
+
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   - **SIX MORE LANDED THE SAME DAY — rows 3c, 3d, 11, 12, 16 and 19 — and ROW 12 IS THE ONE TO READ.**
     `storage_inventory_check.php` found **two things on visitors' devices that the inventory whose
