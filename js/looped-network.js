@@ -21236,6 +21236,14 @@ var EngCalcs = EngCalcs || {};
 		//   **Status report** -- no row, and this one needs no measurement. It decides what EPANET's
 		//     own `.rpt` holds, and this page has no `.rpt`: nothing in the suite reads it, ever.
 		//     A report-formatting key, carried and exported so an export does not delete it.
+		//   **`Map` and `Hydraulics USE/SAVE` -- no row, and a REAL GAP rather than a decision.**
+		//     Both name a FILE beside the `.inp` (a `.map` of coordinates, a `.hyd` of saved
+		//     hydraulics), so neither is a number a person could type here and neither changes an
+		//     answer. But js/lpn-inp.js reads past them without keeping them, which means an import
+		//     and re-export DELETES a line the source stated -- the input-is-canonical violation
+		//     Task 553 fixed for every other `[OPTIONS]` key and did not fix for these two. Not
+		//     repaired here because the fix belongs in that file's OPTIONS loop, which a concurrent
+		//     track is also editing. It is a carry, not a control.
 		//   **Trials between status checks (CheckFreq)** and **last trial that checks status
 		//     (MaxCheck)** -- no row, because they are measurably not settings a person can decide
 		//     anything with. Measured against the EPANET engine on EPA's own Net3 at Accuracy 1e-9:
