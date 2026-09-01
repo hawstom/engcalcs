@@ -27064,7 +27064,7 @@ var EngCalcs = EngCalcs || {};
 
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
-		if (!result.ok || !result.converged) {
+		if (!result.ok) {
 			lastSolveResult = null;
 			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS. The native solver can refuse
 			// a perfectly sound network (an active valve, when EPANET could not be loaded), and
@@ -27078,8 +27078,9 @@ var EngCalcs = EngCalcs || {};
 				refreshPaneIfOpen();    // Task 409: and so did the grade line and the result columns
 					return;
 			}
-			// Not one of lpnDiagnose()'s pre-solve codes -- this is the solver itself giving up, and
-			// it belongs in the same histogram because to the user it is the same kind of dead end.
+			// Not one of lpnDiagnose()'s pre-solve codes -- this is the solver itself giving up with
+			// nothing to hand back, and it belongs in the same histogram because to the user it is
+			// the same kind of dead end.
 			logLpnDiag('not-converged');
 			setStatus(pc.lpn_diag_not_converged || 'Did not converge.');
 			refreshLabelText();
@@ -27087,6 +27088,18 @@ var EngCalcs = EngCalcs || {};
 			refreshPaneIfOpen();
 			return;
 		}
+		// **A SOLVE THAT DID NOT CONVERGE IS DRAWN AND MARKED, NOT DISCARDED** (ROADMAP Task 565).
+		// It used to share the branch above and the page went blank with "No solution was found",
+		// which is untrue of an unconverged run: the solver has the last iterate and that is every
+		// number in existence for this network. Drawing nothing tells the user less than drawing
+		// something and saying what it is.
+		//
+		// **THE HALF THAT MADE THIS URGENT is that no EPANET run could ever reach the branch at
+		// all**, because js/lpn-epanet.js swore `converged: true` at both of its success sites. It
+		// asks the engine now. So this is reachable from both engines for the first time, and from
+		// EPANET it is reachable through a control -- `Unbalanced: Stop` and a trials limit are
+		// both Settings rows, and neither makes the engine refuse: it hands back the last iterate.
+		var notConverged = result.converged === false;
 		lastSolveResult = result;
 		// The only case where the two engines knowingly disagree, so say so rather than let a
 		// user discover a 0.6% shift by switching the checkbox. See js/lpn-epanet.js.
@@ -27133,7 +27146,32 @@ var EngCalcs = EngCalcs || {};
 		}
 		var manningNote = noteOnce('manning-constant-differs'),
 			minorNote = noteOnce('minor-loss-gravity-differs');
-		setStatus([valveRouteNote,
+		// LEADS the status bar, ahead of every other note, because everything after it is a remark
+		// about numbers this sentence says not to trust. Logged under the same diagnostic code the
+		// discard path uses: to a user it is the same dead end, reached with something on screen.
+		var notConvergedNote = '';
+		if (notConverged) {
+			logLpnDiag('not-converged');
+			notConvergedNote = [
+				(pc.lpn_diag_not_converged_drawn
+					|| 'The solve did not converge. These numbers are the last try, not an answer. Do not use them.'),
+				// The measured detail where the engine gave one. EPANET reports a relative error
+				// and the accuracy it actually used; the built-in solver reports neither, so it
+				// gets the trials-only sentence rather than a number invented to fill the slot.
+				(typeof result.iterations === 'number' && result.iterations > 0
+					&& typeof result.relativeError === 'number' && typeof result.accuracy === 'number'
+					? (pc.lpn_diag_not_converged_error
+						|| 'It stopped after {trials} trials at a relative error of {error}, against an accuracy of {accuracy}.')
+						.replace('{trials}', String(result.iterations))
+						.replace('{error}', result.relativeError.toPrecision(3))
+						.replace('{accuracy}', result.accuracy.toPrecision(3))
+					: (typeof result.iterations === 'number' && result.iterations > 0
+						? (pc.lpn_diag_not_converged_trials || 'It stopped after {trials} trials.')
+							.replace('{trials}', String(result.iterations))
+						: ''))
+			].filter(function (t) { return !!t; }).join(' ');
+		}
+		setStatus([notConvergedNote, valveRouteNote,
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',

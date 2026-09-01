@@ -1053,42 +1053,6 @@ the block.
   - **NOT a gap, recorded so it is not re-proposed:** PRV/PSV/FCV solve through EPANET only, by
     design and by measurement; the native solver refuses such a network by name.
 
-- 100|565| **The EPANET bridge never asks whether the run converged. It says it did.**
-  - **THE GENERAL STANCE IT CAME FROM, in Tom's words, 2026-09-01: *"we definitely want to give
-    good signals about anything unexpected."*** That is a rule about the whole suite and not
-    about this bridge — it is the same instinct behind the import report naming every difference,
-    the status bar saying when a network routed to EPANET, and the refusal to invent a hydrant
-    coefficient. **A page that quietly does something other than what the user asked, and looks
-    normal doing it, is the failure mode this project is least able to detect and most able to
-    cause.**
-  **Found 2026-09-01 from Tom's own principle**, stated the same day: *"we definitely want to give
-  good signals about anything unexpected."* `js/lpn-epanet.js` returns **`converged: true`
-  hardcoded** at both of its success sites (the steady solve and the extended-period run), and the
-  steady site **discards `p.runH()`'s return value entirely**. EPANET's toolkit reports an unbalanced
-  system as a WARNING, not an error — the run completes and hands back the last iterate.
-  - **So `applySolveResult()`'s whole non-convergence branch is unreachable on the EPANET path.**
-    That branch exists, is written carefully, and distinguishes a refusal from a failure to
-    converge — and no EPANET run can ever enter it, because the bridge has already sworn the answer
-    converged. The native solver computes `converged` honestly; the two engines disagree about
-    whether the question is even asked.
-  - **THE OPTIONS WORK OF 2026-09-01 MADE THIS REACHABLE THROUGH A CONTROL.** `Unbalanced` now has a
-    Settings row, and the agent that built it MEASURED that *"through the toolkit it does not refuse
-    — it hands back the last iterate"*, and could not surface error 110. So a user who chooses
-    *Stop there*, or whose network runs out of trials, is shown an unconverged iterate **as an
-    answer, with no mark on it**. Pressures, velocities, colours, labels and reports all drawn from
-    numbers nobody has said are wrong.
-  - **This is the worst shape of defect this suite can ship**: not a wrong answer a user can see, but
-    a plausible one they cannot. It is the same class as the four false public claims and the
-    silently-ignored options — quiet, reasonable-looking, and only visible to somebody who goes
-    looking.
-  - **The fix is to read the return code and carry it**, not to refuse the run: CLAUDE.md's own
-    reasoning at that call site is that *"refusing to report a network that did not converge would
-    give this page nothing to draw"*, and that stands. Draw it and SAY SO. `applySolveResult()`
-    already knows how to say it and already has the string.
-  - **And then ask the general question**, because it is the one Tom's principle actually poses:
-    where else does this bridge assert something it did not check? `issues: []` is hardcoded beside
-    both `converged: true`.
-
 - 100|562| **One touch radius for every object, and a node always wins.**
   **Tom's ruling, 2026-09-01**, closing the whole family of touch numbers: *"Match nodes so that we
   have fewer numbers. Then when I report 'too hard to pan', we just reduce the number, and when I

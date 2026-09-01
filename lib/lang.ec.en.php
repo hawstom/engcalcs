@@ -2100,6 +2100,17 @@ $ec_lang['lpn_engine_unavailable']='Could not get the EPANET solver, which is wh
 $ec_lang['lpn_diag_valve_needs_epanet']='These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for values that are impossible in real life, such as a diameter of zero.';
+// **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
+// converge still produced the last iterate, and that is every number this page has -- refusing to
+// draw it leaves nothing on screen and tells the user less, not more. So it is drawn and the status
+// bar leads with this. `lpn_diag_not_converged` above is still the message for a solve that gave us
+// nothing at all; these are for one that gave us something we do not vouch for.
+// "Converge" is the profession's word and EPANET's own, and is deliberately not simplified.
+$ec_lang['lpn_diag_not_converged_drawn']='The solve did not converge. These numbers are the last try, not an answer. Do not use them.';
+$ec_lang['lpn_diag_not_converged_trials']='It stopped after {trials} trials.';
+// Both numbers are EPANET's own, read back from the engine after the run. The accuracy is the one
+// the engine actually used, which is not always the one the project asked for.
+$ec_lang['lpn_diag_not_converged_error']='It stopped after {trials} trials at a relative error of {error}, against an accuracy of {accuracy}.';
 $ec_lang['lpn_field_roughness']='Roughness';
 // Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
 // typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method

@@ -110,7 +110,16 @@
 		f = run.frames[i];
 		return {
 			ok: true, engine: 'epanet', engineVersion: run.engineVersion, issues: [],
-			warnings: run.warnings || [], converged: true, iterations: null,
+			warnings: run.warnings || [],
+			// **THIS SAID `converged: true` AND NOBODY HAD ASKED** (ROADMAP Task 565, its general
+			// half). It was the third hardcoded assertion of the same shape -- js/lpn-epanet.js had
+			// the other two -- and it is the one the SCRUBBER goes through, so an unconverged step
+			// arrived at applySolveResult() sworn to and drawn like any other frame. The frame
+			// carries its own answer now, stamped by the run that produced it. `!== false` keeps an
+			// "engine could not be asked" (null) out of the warning path: unknown is not a no.
+			converged: f.converged !== false,
+			relativeError: f.relativeError, accuracy: f.accuracy,
+			iterations: typeof f.iterations === 'number' ? f.iterations : null,
 			heads: f.heads, pressures: f.pressures, flows: f.flows,
 			headlosses: f.headlosses, velocities: f.velocities,
 			// **THE WATER-QUALITY VALUE, WHICH ONLY A RUN CAN HAVE** -- water age in seconds, or a

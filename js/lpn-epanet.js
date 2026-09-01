@@ -73,6 +73,69 @@
 		EN_DIAMETER = 0,
 		EN_INITSETTING = 5;
 
+	// **THE STATISTICS AND OPTIONS THAT SAY WHETHER THE RUN CONVERGED** (ROADMAP Task 565).
+	// EN_AnalysisStatistic on the left, EN_Option on the right; both are the toolkit's own enum
+	// values and both were verified against the vendored engine before this code was written.
+	var EN_STAT_ITERATIONS = 0,
+		EN_STAT_RELATIVEERROR = 1,
+		EN_STAT_MAXHEADERROR = 2,
+		EN_STAT_MAXFLOWCHANGE = 3,
+		EN_OPT_ACCURACY = 1,
+		EN_OPT_HEADERROR = 5,
+		EN_OPT_FLOWCHANGE = 6;
+
+	/**
+	 * **DID THIS HYDRAULIC STEP ACTUALLY CONVERGE?** ROADMAP Task 565.
+	 *
+	 * Until this existed, both success sites in this file returned `converged: true` HARDCODED and
+	 * the steady site threw `runH()`'s return away. EPANET reports an unbalanced system as a
+	 * WARNING, not an error: the run completes and hands back the last iterate. The vendored
+	 * wrapper's `_checkError()` prints any code under 100 to `console.warn` and returns, so
+	 * nothing throws, nothing rejects, and the page drew a plausible answer nobody had checked.
+	 * Measured on Net3 with `Trials 1`: node 10's head came back 47.05 m against the converged
+	 * 50.35 m, and the page said it converged.
+	 *
+	 * **THE TEST IS EPANET'S OWN, not a tolerance of ours.** The engine stops when the relative
+	 * flow-change error is within Accuracy AND, where a limit is set, the maximum head error and
+	 * maximum flow change are within theirs. All six numbers are readable after `runH()` through
+	 * `EN_getstatistic`/`EN_getoption`, which is the documented way to ask and the only one the
+	 * wrapper exposes -- it swallows the warning code itself.
+	 *
+	 * **READ THE ACCURACY BACK FROM THE ENGINE RATHER THAN FROM `model.hydraulics`**, because
+	 * EPANET CLAMPS IT to [1e-5, 1e-1] on input. Comparing against what we asked for would call
+	 * every run unconverged the moment somebody asked for 1e-8. Measured: we wrote `Accuracy 1e-8`
+	 * and `getOption(EN_OPT_ACCURACY)` answered 1e-5.
+	 *
+	 * A build too old for a statistic is the one case that must not turn into a false alarm: an
+	 * engine that cannot answer the question has not said no, so it is reported as UNKNOWN
+	 * (`converged: null`) and the caller decides. Nothing in the vendored build takes that path.
+	 */
+	function convergenceOf(p) {
+		var relErr, iterations, maxHeadErr, maxFlowChg, accuracy, headLimit, flowLimit;
+		try {
+			iterations = p.getStatistic(EN_STAT_ITERATIONS);
+			relErr = p.getStatistic(EN_STAT_RELATIVEERROR);
+			maxHeadErr = p.getStatistic(EN_STAT_MAXHEADERROR);
+			maxFlowChg = p.getStatistic(EN_STAT_MAXFLOWCHANGE);
+			accuracy = p.getOption(EN_OPT_ACCURACY);
+			headLimit = p.getOption(EN_OPT_HEADERROR);
+			flowLimit = p.getOption(EN_OPT_FLOWCHANGE);
+		} catch (e) {
+			return { converged: null, iterations: null, relativeError: null, accuracy: null };
+		}
+		var ok = relErr <= accuracy
+			&& (!(headLimit > 0) || maxHeadErr <= headLimit)
+			&& (!(flowLimit > 0) || maxFlowChg <= flowLimit);
+		return {
+			converged: ok,
+			iterations: iterations,
+			relativeError: relErr,
+			accuracy: accuracy,
+			maxHeadError: maxHeadErr,
+			maxFlowChange: maxFlowChg
+		};
+	}
+
 	/**
 	 * Roughness as EPANET wants it for the chosen formula.
 	 *   H-W  -> Hazen-Williams C, dimensionless, same number we hold.
@@ -474,13 +537,24 @@
 			// that can carry it. The same one-or-the-other rule assembleModel() states for the two
 			// demand fields, seen from this end.
 			(eps && hyd.demandMultiplier !== undefined ? '\n Demand Multiplier ' + hyd.demandMultiplier : '') +
-			// **HOW HARD TO TRY, AND THE DEFAULTS HERE ARE OURS, NOT EPANET'S.** 1e-8 / 200 is far
+			// **HOW HARD TO TRY, AND THE DEFAULTS HERE ARE OURS, NOT EPANET'S.** 1e-5 / 200 is
 			// tighter than EPANET's own 0.001 / 40, deliberately, so that a disagreement between the
 			// two engines is never just tolerance. A project that STATES a value overrules that --
 			// the user asked for their file's number, and comparing engines is our concern, not
-			// theirs. `Unbalanced Continue 10` stays the fallback: refusing to report a network that
-			// did not converge would give this page nothing to draw.
-			'\n Accuracy ' + (hyd.accuracy !== undefined ? hyd.accuracy : '1e-8') +
+			// theirs.
+			//
+			// **THE DEFAULT WAS 1e-8 AND THAT WAS A FICTION** (Task 565): EPANET CLAMPS Accuracy to
+			// [1e-5, 1e-1] as it reads the file, so every run this bridge has ever made was solved
+			// at 1e-5 while this line claimed three more decades. Measured -- we wrote 1e-8,
+			// `getOption(EN_OPT_ACCURACY)` answered 1e-5. Writing the number the engine will
+			// actually honour changes no result and stops the comment being false. It is also why
+			// convergenceOf() reads the accuracy back out of the engine rather than off `hyd`.
+			//
+			// `Unbalanced Continue 10` stays the fallback: refusing to report a network that did
+			// not converge would give this page nothing to draw. **What changed is that the page
+			// no longer PRETENDS it converged** -- convergenceOf() asks, applySolveResult() says so,
+			// and the numbers are still drawn.
+			'\n Accuracy ' + (hyd.accuracy !== undefined ? hyd.accuracy : '1e-5') +
 			'\n Trials ' + (hyd.trials !== undefined ? hyd.trials : '200') +
 			'\n Unbalanced ' + (hyd.unbalanced === 'stop' ? 'Stop'
 				: hyd.unbalanced === 'continue'
@@ -909,6 +983,10 @@
 				p.openH();
 				p.initH(0);
 				p.runH();
+				// **ASKED, NOT ASSUMED** (Task 565). `runH()`'s own return is the current TIME, not
+				// a status -- the wrapper eats the warning code -- so the question is put to the
+				// engine's statistics instead. See convergenceOf().
+				var conv = convergenceOf(p);
 
 				var heads = {}, pressures = {}, flows = {}, headlosses = {}, velocities = {},
 					i, n, k, link, idx;
@@ -936,10 +1014,21 @@
 					ok: true,
 					engine: 'epanet',
 					engineVersion: s.ws.version,
+					// **EMPTY BECAUSE IT WAS EARNED, NOT BECAUSE NOBODY LOOKED** (Task 565's second
+					// half). `issues` is lpnDiagnose()'s vocabulary -- our own structural findings,
+					// each naming an offending id -- and lpnSolveEpanet() returns early above when
+					// it has any, so reaching here means it found none. EPANET has no second list
+					// of its own to merge in here: what it can say about a completed run is the
+					// convergence state, which is now read and carried, and its refusals, which
+					// arrive as a throw and become engineRefusal(). The two statistics that WOULD
+					// belong here, deficient nodes and demand reduction, exist only under
+					// pressure-driven analysis, which this bridge never asks for.
 					issues: [],
 					warnings: s.warnings.concat(valueWarnings(model)),
-					converged: true,
-					iterations: null,
+					converged: conv.converged,
+					iterations: conv.iterations,
+					relativeError: conv.relativeError,
+					accuracy: conv.accuracy,
 					heads: heads,
 					pressures: pressures,
 					flows: flows,
@@ -1140,13 +1229,42 @@
 					// The frames, by their own reporting time, so the quality pass can find the one
 					// it is standing on without searching the array at every step.
 					var frameAt = {};
+					// **CONVERGENCE OVER A WHOLE RUN IS A CONJUNCTION** (Task 565). Every hydraulic
+					// step is a separate solve with its own answer, so a run converged only if all
+					// of them did, and the first step that did not is the one worth naming -- after
+					// it, tank levels carry the error forward and every later step is downstream of
+					// a number nobody checked. `worst` is the largest relative error seen, which is
+					// what a user comparing two runs actually wants.
+					var stepsRun = 0, stepsUnconverged = 0, firstBadT = null, worstRelErr = 0,
+						convAccuracy = null, convUnknown = false;
+					function noteStep(tNow, c) {
+						stepsRun++;
+						if (c.converged === null) { convUnknown = true; return; }
+						if (convAccuracy === null) { convAccuracy = c.accuracy; }
+						if (c.relativeError > worstRelErr) { worstRelErr = c.relativeError; }
+						if (!c.converged) {
+							stepsUnconverged++;
+							if (firstBadT === null) { firstBadT = tNow; }
+						}
+					}
 					function done() {
 						var report = shutdown();
 						seen = 1;
 						tell(1);
 						resolve({
-							ok: true, engine: 'epanet', engineVersion: ws.version, issues: [],
-							warnings: built.warnings, converged: true, frames: frames,
+							ok: true, engine: 'epanet', engineVersion: ws.version,
+							// See the steady site's note: empty because lpnDiagnose() found none,
+							// not because nothing was asked.
+							issues: [],
+							warnings: built.warnings,
+							converged: convUnknown ? null : (stepsUnconverged === 0),
+							iterations: null,
+							steps: stepsRun,
+							stepsUnconverged: stepsUnconverged,
+							firstUnconvergedTime: firstBadT,
+							relativeError: worstRelErr,
+							accuracy: convAccuracy,
+							frames: frames,
 							duration: duration, reportStart: reportStart, reportStep: reportStep,
 							quality: qualOn ? (model.quality || null) : null,
 							report: report
@@ -1206,10 +1324,12 @@
 						qslice();
 					}
 					function slice() {
-						var slice0 = nowMs(), finished = false, f;
+						var slice0 = nowMs(), finished = false, f, stepConv;
 						try {
 							for (;;) {
 								t = p.runH();
+								stepConv = convergenceOf(p);
+								noteStep(t, stepConv);
 								// The reporting grid, and nothing else. `>= reportStart` because a run
 								// may be asked to report only its second half; the modulo because
 								// runH() lands on tank and control events that belong to nobody's
@@ -1217,7 +1337,17 @@
 								if (isReportTime(t)) {
 									f = {
 										t: t, heads: {}, pressures: {}, demands: {}, levels: {},
-										flows: {}, velocities: {}, headlosses: {}, statuses: {}
+										flows: {}, velocities: {}, headlosses: {}, statuses: {},
+										// **PER FRAME, BECAUSE THE SCRUBBER IS PER FRAME** (Task 565).
+										// A run of 25 steps where step 14 did not converge is one bad
+										// frame and 24 good ones; marking the whole run would put the
+										// warning on every frame, and marking none would put it on the
+										// frame that needs it. `null` means the engine could not be
+										// asked, which is neither a yes nor a no.
+										converged: stepConv.converged,
+										relativeError: stepConv.relativeError,
+										accuracy: stepConv.accuracy,
+										iterations: stepConv.iterations
 									};
 									for (i = 0; i < model.nodes.length; i++) {
 										n = model.nodes[i];

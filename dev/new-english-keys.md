@@ -12,10 +12,10 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**16 still to read**, of 206 untranslated keys, of 1521 English keys. A key already marked _Ruled OK_ below needs nothing from you —
+**19 still to read**, of 209 untranslated keys, of 1524 English keys. A key already marked _Ruled OK_ below needs nothing from you —
 the ruling lapses by itself if the wording changes.
 
-## lpn_  (204)
+## lpn_  (207)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -26,6 +26,12 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_demand_remove`**
   > Remove this demand
   _Ruled OK 2026-08-29._
+- **`lpn_diag_not_converged_drawn`**
+  > The solve did not converge. These numbers are the last try, not an answer. Do not use them.
+- **`lpn_diag_not_converged_error`**
+  > It stopped after {trials} trials at a relative error of {error}, against an accuracy of {accuracy}.
+- **`lpn_diag_not_converged_trials`**
+  > It stopped after {trials} trials.
 - **`lpn_elev_dem_none`**
   > The DEM gave no height for this node.
   _Ruled OK 2026-09-01._

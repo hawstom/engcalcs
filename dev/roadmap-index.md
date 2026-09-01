@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**61 open tasks.** Next (100): 11 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
+**60 open tasks.** Next (100): 10 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
 
-## 100 — Next (11)
+## 100 — Next (10)
 
 - Task 248.03 — Rule-based controls: the text is CARRIED now; the language is still parked.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
@@ -20,7 +20,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 545 — The list is a file, the marks are data, and both survived a reading.
 - Task 553 — Demands and Hydraulics options: BUILT, and every option now has a control.
 - Task 562 — One touch radius for every object, and a node always wins.
-- ! Task 565 — The EPANET bridge never asks whether the run converged. It says it did.
 - Task 566 — Close the EPANET gap: eight sections are carried but not understood.
 
 ## 75 — Soon (9)
@@ -87,5 +86,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-53 of 61 titles are within 4–12 words. `!` marks the rest;
+53 of 60 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
