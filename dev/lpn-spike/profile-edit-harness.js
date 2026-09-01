@@ -434,9 +434,9 @@ function pressProfile() {
 	// **AND THE GRAB RADIUS FOLLOWS THE POINTER, NOT A CONSTANT** (Task 417). A path handle is one
 	// of the smallest targets on this page, so the pointer's 14 px hurt it most.
 	ok('the handle hit test takes the gesture\'s own slop',
-		/profileHandleDown\(e\.clientX, e\.clientY, tapSlopPx\(e\)\)/.test(src));
+		/profileHandleDown\(e\.clientX, e\.clientY, reachPx\(e\)\)/.test(src));
 	ok('...and passes it through to nearestNodeNearScreen',
-		/nearestNodeNearScreen\(cx, cy, slop \|\| NODE_SNAP_PX\)/.test(src));
+		/nearestNodeNearScreen\(cx, cy, slop \|\| POINTER_REACH_PX\)/.test(src));
 }
 
 

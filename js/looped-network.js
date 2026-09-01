@@ -3330,49 +3330,56 @@ var EngCalcs = EngCalcs || {};
 		return hit === undefined ? null : hit;
 	}
 	function nodeById(id) { return byId('node', id); }
-	// Snap-on-create: a click within N SCREEN pixels of an existing node reuses it rather than
-	// creating a new one -- the real fix for "a pipe drawn near a junction but not snapped to it",
-	// the dominant map-editor user error. Screen pixels, not world units, so the tap target stays a
-	// constant physical size: a tight world tolerance at 10% zoom is visually huge, a loose one at
-	// 500% zoom invisible.
-	var NODE_SNAP_PX = 14;
-	// **A FINGER IS NOT A POINTER, AND THE TWO GET DIFFERENT NUMBERS** (ROADMAP Task 417). Tom,
-	// 2026-08-25: *"417 phone radius needs to be larger more forgiving for the switch-to-edit-mode
-	// decision on tapping an asset (I assume any asset, not just a new asset)."* Read that
-	// parenthesis as the scope: it is his.
+	// ---- HOW NEAR A PRESS MAY LAND AND STILL MEAN THE THING: TWO NUMBERS, ONE PER HAND ----------
 	//
-	// **THIS DOES NOT CONTRADICT CLAUDE.md's "a 44px touch target is not an argument here".** That
-	// rule stops phone ergonomics driving the DESKTOP design, and nothing here moves the pointer's
-	// number: NODE_SNAP_PX is still 14, and a mouse gesture takes byte-identical paths through every
-	// call site below. What it stops being is stingy on a phone.
+	// **ONE KNOB PER HAND, AND THE FINGER'S IS THE KNOB** (ROADMAP Task 562). Tom, 2026-09-01,
+	// closing the whole family of touch numbers: *"Match nodes so that we have fewer numbers. Then
+	// when I report 'too hard to pan', we just reduce the number, and when I report 'too hard to
+	// drag', we just increase the number agnostic of the object. There is no reason why the number
+	// can't apply across the board to labels and pipes also."*
 	//
-	// 24 px is the RADIUS, so the target is 48 px across -- the figure both Apple's and Google's
-	// guidelines settle on for a finger, and 1.7x the pointer's. Screen pixels, like its sibling, so
-	// the target is a constant physical size at every zoom.
-	var NODE_SNAP_TOUCH_PX = 24;
-	// **A FINGER GRABS A NODE TO DRAG IT AT THE POINTER'S RADIUS, NOT THE TAP'S** (Task 417). Tom,
-	// 2026-08-30: *"dragging a node can be very difficult"* on a phone -- and the measurement is that
-	// a junction is drawn `settings.symbolSize` = 7 screen pixels across, so with HIT_SLOP_PX = 2 the
-	// whole target was a disc about 11 px wide. A tap already escaped that through touchAssetNear();
-	// a PRESS never did, because the pointerdown handler below reads mapHitAt() alone.
+	// **SO THERE IS EXACTLY ONE NUMBER FOR A FINGER AND IT GOVERNS EVERY OBJECT** -- nodes, Text
+	// labels, node and link labels, pipes, and the path handles of a profile route -- and every
+	// question a press can ask: grab-to-drag, tap-to-open, snap-on-create, anchor-a-Text. Every
+	// call site reads reachPx(e) or one of the two constants below and NOTHING else. A report of
+	// "too hard to pan" moves TOUCH_REACH_PX down; a report of "too hard to drag" moves it up; and
+	// there is no per-object judgement left to make in between, which is the whole point.
 	//
-	// **A GRAB AND A TAP GET DIFFERENT NUMBERS BECAUSE ONLY A GRAB HAS A RIVAL.** A tap on bare map
-	// does nothing, so a near miss promoted to a hit costs nothing and takes the full 24. A PRESS on
-	// bare map starts a PAN -- how an off-screen part of the network is reached -- so every pixel of
-	// this radius is a pixel where panning becomes impossible, and the two failures are not equal: a
-	// grab that misses just pans and is retried, while a pan that steals a node moves the document.
-	// So the grab takes the pointer's own 14, separately named because it is answering its own
-	// question and will be re-tuned on its own.
+	// It replaced three constants that were individually argued and collectively a mess: a tap
+	// radius of 24, a grab radius of 14, and a path handle grabbed at the FINGER's 24 against the
+	// same pan rival that had forced node grabs down to 14. The 14/24 split rested on "only a grab
+	// has a rival, and every pixel of grab radius is a pixel where panning becomes impossible".
+	// That argument was true and is superseded: Tom has reported *too hard to drag* and *too hard
+	// to get nodes* and has never once reported *too hard to pan*, so the family collapses UP, to
+	// the number that already existed and was already argued from a guideline. If panning does get
+	// hard he says so and this one line moves.
 	//
-	// Rejected: deciding on MOVEMENT instead of at press time. A pan and a node drag are the same
-	// gesture -- press, then travel -- so there is no later moment at which they can be told apart;
-	// any threshold would be a guess dressed up as a measurement. Rejected too: long press, which
-	// Tom struck (*"we don't want non-parallel UX"*) and which PROFILE_HOLD_MS already spends.
-	var NODE_GRAB_TOUCH_PX = 14;
-	// The slop this gesture deserves. `pointerType` is the only honest source -- a device with both
-	// a mouse and a screen answers per press, where a media query answers once for the machine.
-	function tapSlopPx(e) {
-		return (e && e.pointerType === 'touch') ? NODE_SNAP_TOUCH_PX : NODE_SNAP_PX;
+	// **24 px is the RADIUS, so the target is 48 px across** -- the figure both Apple's and
+	// Google's guidelines settle on for a fingertip. Screen pixels, never world units, so the
+	// target is a constant physical size at every zoom; that is also the escape hatch when two
+	// things are within reach of each other, since zooming in separates them in screen pixels
+	// while this number stands still.
+	var TOUCH_REACH_PX = 24;
+	// **THE POINTER'S NUMBER IS NOT PART OF THAT FAMILY AND DOES NOT MOVE.** CLAUDE.md: a 44 px
+	// touch target is not an argument here -- phone ergonomics must not drive the desktop design.
+	// A mouse has a visible cursor, a hover readout and sub-pixel aim, and 14 px is the slop it has
+	// always had. Every mouse gesture on this map takes byte-identical paths through every call
+	// site below.
+	//
+	// It is the same question for a hand that is simply steadier, which is why it is named in the
+	// same shape: the ONE pointer number, across every object and every question, exactly as
+	// TOUCH_REACH_PX is the one finger number. Snap-on-create is the oldest of those questions --
+	// a click within this many screen pixels of an existing node reuses it rather than creating a
+	// second one on top of it, which is the real fix for "a pipe drawn near a junction but not
+	// snapped to it", the dominant map-editor user error.
+	var POINTER_REACH_PX = 14;
+	// The reach this gesture deserves. `pointerType` is the only honest source -- a device with
+	// both a mouse and a screen answers per press, where a media query answers once for the
+	// machine. A PEN is a pointer: it is precise, and it is what a surveyor marking up a map on a
+	// tablet is holding. An event carrying no pointerType at all takes the pointer's number, which
+	// is the conservative answer rather than an error case.
+	function reachPx(e) {
+		return (e && e.pointerType === 'touch') ? TOUCH_REACH_PX : POINTER_REACH_PX;
 	}
 	// **HOW FAR A PRESS MAY TRAVEL AND STILL BE A TAP. Past it the gesture is a drag and can never
 	// also be a tap; short of it NOTHING MOVES.** (Tom, 2026-08-31, on a phone: *"sometimes the node
@@ -3399,8 +3406,8 @@ var EngCalcs = EngCalcs || {};
 		return (e && e.pointerType === 'touch') ? TAP_MOVE_TOUCH_PX : TAP_MOVE_PX;
 	}
 	// The Text-label sibling of nearestNodeNearScreen(). Measured to the label's ANCHOR POINT rather
-	// than its box, and at the same NODE_SNAP_PX: an anchor distance cannot make a large title block
-	// into a no-go zone the way its bounding box would.
+	// than its box, and at whatever reach the caller's gesture earned: an anchor distance cannot
+	// make a large title block into a no-go zone the way its bounding box would.
 	function nearestLabelNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, lb, pt, dPx;
 		for (i = 0; i < doc.labels.length; i++) {
@@ -3434,27 +3441,65 @@ var EngCalcs = EngCalcs || {};
 	// tolerance, and the node is the more specific thing the user can have meant. Same ordering the
 	// add-Text branch uses, for the same reason.
 	function touchAssetNear(cx, cy) {
-		var n = nearestNodeNearScreen(cx, cy, NODE_SNAP_TOUCH_PX), l;
+		var n = nearestNodeNearScreen(cx, cy, TOUCH_REACH_PX), l;
 		if (n && nodeEls[n.id]) { return nodeEls[n.id].circle; }
-		l = nearestLinkNearScreen(cx, cy, NODE_SNAP_TOUCH_PX);
+		l = nearestLinkNearScreen(cx, cy, TOUCH_REACH_PX);
 		if (l && linkEls[l.link.id]) { return linkEls[l.link.id].line; }
 		return null;
 	}
-	// The node a FINGER meant to GRAB, when the real hit test found bare map (Task 417). Same shape
-	// and same safety property as touchAssetNear() above -- touch only, and only where the browser
-	// found nothing, so it can add a hit and never overrule one -- and two deliberate narrowings.
+	// **WHAT A NEARBY NODE OUTRANKS.** (ROADMAP Task 562. Tom, 2026-09-01: *"nodes need to get
+	// precedence always, because they are hardest to aim at"*, and the defect underneath it:
+	// *"many times pipes would edit when I was trying to edit nodes."*)
 	//
-	// NODES ONLY. Tom's scope is his own (*"A long press starts a node drag. Nothing else."*), and
-	// the measurement agrees: a label and a link label are drawn TEXT, a pipe is a stroke with a
-	// halo, and all of them are already fat enough for a finger -- he dragged a label on a phone
-	// and it worked. A node is a 7 px dot and is the only thing here that is too small. Widening
-	// this to links would also lay a grab corridor down every pipe on the map, which is where a pan
-	// most needs to start.
+	// A pipe is a stroke with a wide invisible halo; a junction is `settings.symbolSize` = 7 screen
+	// pixels of drawn disc. Nodes paint over links, so the browser answers with the node whenever
+	// the point is actually ON the dot -- and a finger 8 px off a junction is off that dot and
+	// inside the halo, so the pipe wins outright and the pipe editor opens. That is the report.
 	//
-	// AND AT NODE_GRAB_TOUCH_PX, not the tap's radius -- see that constant for why.
-	function touchNodeGrabNear(cx, cy) {
-		var n = nearestNodeNearScreen(cx, cy, NODE_GRAB_TOUCH_PX);
-		return (n && nodeEls[n.id]) ? nodeEls[n.id].circle : null;
+	// **THIS REVERSES THE RULE THE TOUCH FALLBACK SHIPPED UNDER**, which was *"it can add a hit,
+	// never overrule one"* -- reached only where the browser found BARE MAP. That constraint was
+	// right when it was written and Tom's ruling supersedes it: filling in bare map cannot fix a
+	// case where the browser confidently returned the wrong element, and this is that case.
+	//
+	// **A NODE OUTRANKS A LINK, A LINK LABEL AND BARE MAP -- AND NOTHING ELSE.** The three things
+	// it yields to are worth naming, because each would be a new defect:
+	//   * another NODE. The browser already resolved it; a nearest-node search cannot improve on
+	//     a point that is literally on the dot.
+	//   * a LABEL of any kind -- a Text, or a node's own data label. A node's label is drawn a few
+	//     pixels from the node, always inside this reach, so promoting over it would make a node
+	//     label undraggable and unopenable by finger. It is drawn TEXT, already finger-sized, and
+	//     the user aimed at it.
+	//   * a VERTEX HANDLE (`.lpn-vhandle`). It is a deliberate small target the user asked to see,
+	//     and a bend near a junction is exactly where one is placed.
+	// Tom's sentence names pipes, and pipes are what this takes precedence over.
+	//
+	// **THE COST, SAID OUT LOUD:** a pipe drawn shorter on screen than twice the reach is entirely
+	// inside its own end nodes' reach and cannot be tapped. The reach is in SCREEN pixels, so
+	// zooming in separates them and the pipe comes back -- which is the same escape hatch every
+	// other number here has.
+	function nodeOutranks(t) {
+		if (!t || t === svg) { return true; }
+		if (t.classList && t.classList.contains('lpn-vhandle')) { return false; }
+		var d = t.dataset || {};
+		return d.link !== undefined || d.linklbl !== undefined;
+	}
+	// The hit a FINGER meant, given what the browser answered. Touch only -- see below for why the
+	// pointer is left alone -- and it is the one door: a press and a tap both come through here, so
+	// there is no second place for the rule to be forgotten.
+	//
+	// **TOUCH ONLY, AND THAT IS A DECISION RATHER THAN AN OVERSIGHT.** The geometry that causes the
+	// defect is the same for a mouse -- a 7 px dot beside a fat halo -- but the hand is not: a
+	// pointer has a visible cursor, a hover readout naming what is under it, and sub-pixel aim, so
+	// the user SEES that they are on the pipe before they press and moves 3 px. A finger sees
+	// nothing, covers the target, and cannot correct. Applying this to the mouse would also make
+	// every pipe within 14 px of a junction unclickable on the desktop for a defect nobody has
+	// reported there, which is exactly the trade CLAUDE.md forbids: phone ergonomics must not drive
+	// the desktop design. The ONE KNOB is still one knob -- reachPx(e) answers per press for both
+	// hands at every call site -- it is the PRECEDENCE that a finger gets and a pointer does not.
+	function touchNodeOver(cx, cy, hit) {
+		if (!nodeOutranks(hit)) { return hit; }
+		var n = nearestNodeNearScreen(cx, cy, TOUCH_REACH_PX);
+		return (n && nodeEls[n.id]) ? nodeEls[n.id].circle : hit;
 	}
 	function nearestNodeNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, n, dPx;
@@ -4982,6 +5027,13 @@ var EngCalcs = EngCalcs || {};
 	// Task 354's problem in degrees and wants the same medicine: coordinates local to an origin, so
 	// that nothing downstream ever sees a number whose float32 spacing is bigger than a symbol.
 	// LPN_ORIGIN_THRESHOLD is 1e4 and a longitude is 122, so no geographic document is ever rebased.
+	//
+	// **AND IT IS NOT ONE OF THE TOUCH NUMBERS. Do not fold it into TOUCH_REACH_PX** (Task 562).
+	// It has been counted as a fifth member of that family and it is not one: TOUCH_REACH_PX asks
+	// how near a HAND may land and still mean the thing, while this asks whether the browser's own
+	// hit answer is believable given how the drawing was rasterised. A finger never sees it, it is
+	// the same 2 for every hand, and widening it would not make anything easier to hit -- it would
+	// make a bogus hit believable.
 	var HIT_SLOP_PX = 2;
 	function hitConfirmed(t, cx, cy) {
 		if (!t || !t.getBoundingClientRect) { return false; }
@@ -6083,10 +6135,10 @@ var EngCalcs = EngCalcs || {};
 		// Placed and height-fitted by the one shared placer (Task 372), like every other panel that
 		// hangs off a control.
 		openPanelAtAnchor(panel, anchorRect);
-		activeCancel = function () { panel.style.display = 'none'; setRegMode(false); };
+		activeCancel = function () { hidePanel(panel); setRegMode(false); };
 		document.getElementById('lpn_backdrop_target_continue').onclick = function () {
 			var mode = document.getElementById('lpn_backdrop_target_mode').value, pc = EngCalcs.pageConfig || {};
-			panel.style.display = 'none';
+			hidePanel(panel);
 			if (mode === 'coords') {
 				activeCancel = null; setRegMode(false);
 				var txt = prompt((pc.lpn_backdrop_coords_prompt || 'Type the X,Y that point should move to') + ' (' + unitLabel('lpn_u_length') + '):', '');
@@ -9317,7 +9369,7 @@ var EngCalcs = EngCalcs || {};
 	var findUserPos = null;
 	function closeFindPopup() {
 		var popup = document.getElementById('lpn_find_popup');
-		if (popup) { hideTipsIn(popup); popup.style.display = 'none'; }
+		hidePanel(popup);
 	}
 	// **OPEN, NOT TOGGLE.** The menu row shows the box; the X closes it. Choosing Find while it is
 	// already open re-runs nothing and hides nothing -- it just brings the box back to attention,
@@ -11538,11 +11590,11 @@ var EngCalcs = EngCalcs || {};
 	// The handle under the pointer, with the same pointer slop every other node-picking gesture on
 	// this page uses. **A STOP BEATS A PASS-THROUGH** where a doubled-back route visits one node
 	// twice: the fold is there because the waypoint is, so the waypoint is what the hand gets.
-	// `slop` is the gesture's own tolerance -- Task 417's `tapSlopPx(e)`, so a finger gets 24 px and
-	// a pointer keeps 14. A path handle is one of the smallest targets on this page, which makes it
-	// the one that suffered most from the pointer's number being used for everything.
+	// `slop` is the gesture's own tolerance -- `reachPx(e)`, THE one knob (Task 562), so a handle is
+	// grabbed at exactly the reach a node, a label and a pipe are. Until then it took the finger's
+	// 24 while a node grab took 14, which was the one flat contradiction in the whole family.
 	function profileHandleAt(cx, cy, slop) {
-		var n = nearestNodeNearScreen(cx, cy, slop || NODE_SNAP_PX), hs, i, passing = null;
+		var n = nearestNodeNearScreen(cx, cy, slop || POINTER_REACH_PX), hs, i, passing = null;
 		if (!n || !profileNodeUsable(n)) { return null; }
 		hs = profileHandleSet().handles;
 		for (i = 0; i < hs.length; i++) {
@@ -11909,10 +11961,10 @@ var EngCalcs = EngCalcs || {};
 		// getElementById() on every move.
 		if (profileSayEl) { profileSayEl.textContent = txt; }
 	}
-	// The node the pointer is over, with pointer slop -- the same NODE_SNAP_PX every other node-
+	// The node the pointer is over, with pointer slop -- the same POINTER_REACH_PX every other node-
 	// picking gesture on this page uses, so a route is no harder to aim than a pipe is to draw.
 	function profileDrawNodeAt(cx, cy) {
-		var n = nearestNodeNearScreen(cx, cy, NODE_SNAP_PX);
+		var n = nearestNodeNearScreen(cx, cy, POINTER_REACH_PX);
 		return (n && profileNodeUsable(n)) ? n.id : null;
 	}
 	// HOVER. Cheap by construction: it recomputes nothing unless the node under the pointer actually
@@ -16685,8 +16737,7 @@ var EngCalcs = EngCalcs || {};
 	function closeViewPopovers(except) {
 		VIEW_POPOVERS.forEach(function (id) {
 			if (id === except) { return; }
-			var el = document.getElementById(id);
-			if (el) { el.style.display = 'none'; }
+			hidePanel(document.getElementById(id));
 		});
 		if (!except) { viewPopoverAnchor = null; }
 	}
@@ -16886,12 +16937,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeSubMenu() {
 		cancelSubClose();
-		var p = document.getElementById('lpn_menu_popup2');
-		if (p) { p.style.display = 'none'; }
+		hidePanel(document.getElementById('lpn_menu_popup2'));
 	}
 	function closeMenu() {
-		var p = document.getElementById('lpn_menu_popup');
-		if (p) { p.style.display = 'none'; }
+		hidePanel(document.getElementById('lpn_menu_popup'));
 		closeSubMenu();   // the fly-out belongs to the pull-down; it cannot outlive it
 		openMenuAnchor = null;
 	}
@@ -17042,7 +17091,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeNewBox() {
 		var box = newBoxEl();
-		if (box) { hideTipsIn(box); box.style.display = 'none'; }
+		hidePanel(box);
 	}
 	// **THE ANSWERS ARE A VALUE, AND MAKING THE PROJECT IS A FUNCTION OF IT.** Reading the box and
 	// acting on what it says are deliberately two functions: the act is the half with the ordering
@@ -17430,7 +17479,7 @@ var EngCalcs = EngCalcs || {};
 	function toggleNotesPopup() {
 		var popup = document.getElementById('lpn_notes_popup');
 		if (!popup) { return; }
-		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+		if (popup.style.display === 'block') { closeNotesPopup(); return; }
 		closeMenu();
 		closeViewPopovers();
 		popup.style.display = 'block';
@@ -17439,9 +17488,10 @@ var EngCalcs = EngCalcs || {};
 		popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - pr.width) / 2) + 'px';
 		popup.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
 	}
+	function closeNotesPopup() { hidePanel(document.getElementById('lpn_notes_popup')); }
 	function wireNotesPopup() {
 		var x = document.getElementById('lpn_notes_close');
-		if (x) { x.addEventListener('click', function () { document.getElementById('lpn_notes_popup').style.display = 'none'; }); }
+		if (x) { x.addEventListener('click', closeNotesPopup); }
 	}
 	// **THE MAP MENU** -- View until 2026-08-27, renamed on Tom's word. It holds the drawing's frame,
 	// the pictures behind it, where on Earth it is, and the elevations read off that ground. Only
@@ -17874,9 +17924,11 @@ var EngCalcs = EngCalcs || {};
 		if (first) { first.focus(); }
 	}
 	function closeDialog() {
-		var d = document.getElementById('lpn_dialog');
-		if (d) { d.style.display = 'none'; }
+		hidePanel(document.getElementById('lpn_dialog'));
 		var back = document.getElementById('lpn_dialog_backdrop');
+		// NOT hidePanel(): the backdrop is an empty scrim. It holds no control, so it can hold no
+		// tip -- declared in panel-touch-harness.js rather than routed, so the list of things that
+		// are not panels is written down somewhere.
 		if (back) { back.style.display = 'none'; }
 	}
 	function wireTabs() {
@@ -18648,7 +18700,7 @@ var EngCalcs = EngCalcs || {};
 			// move the pipework. A press that is not on a handle pans, which is how a node off the
 			// edge of the screen is reached.
 			if (profileEditActive()) {
-				var hDrag = profileHandleDown(e.clientX, e.clientY, tapSlopPx(e));
+				var hDrag = profileHandleDown(e.clientX, e.clientY, reachPx(e));
 				if (hDrag) { drag = hDrag; profileState.editDrag = drag; }
 				else { drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; }
 				Object.assign(drag, common);
@@ -18658,13 +18710,20 @@ var EngCalcs = EngCalcs || {};
 			// and touching nothing clears. DOWN, not on the tap: a drag never becomes a tap (it fails
 			// the 4px threshold), so a user who nudged J2 and then pressed Delete would otherwise
 			// delete whatever was selected before -- an element they were not looking at.
-			// **AND ON A FINGER, A NEAR MISS ON A NODE GRABS IT** (Task 417): a touch press that the
-			// browser answered with bare map, within NODE_GRAB_TOUCH_PX of a node, drags that node
-			// instead of panning. Touch only, so no pointer gesture changes at all; and ABOVE
-			// selectFromHit(), so the promoted node is what gets selected -- the pointerdown-selects
-			// rule of Task 415 stays true of a near-miss drag exactly as it is of a direct one.
-			if (t === svg && e.pointerType === 'touch') {
-				t = touchNodeGrabNear(e.clientX, e.clientY) || t;
+			// **AND ON A FINGER, A NODE WITHIN REACH GRABS THE PRESS -- FROM BARE MAP *AND* FROM A
+			// PIPE** (Task 562; Task 417 did the bare-map half). This used to read `if (t === svg
+			// ...)`, under the rule that the touch fallback *"can add a hit, never overrule one"*.
+			// **That rule is superseded here** and the note it stood in has been rewritten rather
+			// than annotated: Tom, 2026-09-01, *"nodes need to get precedence always, because they
+			// are hardest to aim at"*, against the report *"many times pipes would edit when I was
+			// trying to edit nodes."* A press 8 px off a junction is not bare map -- it is on the
+			// pipe's halo -- so a fallback that only fills in bare map could never reach it.
+			// touchNodeOver() carries the full rule and the list of what a node does NOT outrank.
+			// Touch only, so no pointer gesture changes at all; and ABOVE selectFromHit(), so the
+			// promoted node is what gets selected -- the pointerdown-selects rule of Task 415 stays
+			// true of a near-miss drag exactly as it is of a direct one.
+			if (e.pointerType === 'touch') {
+				t = touchNodeOver(e.clientX, e.clientY, t);
 			}
 			selectFromHit(t);
 			if (t.dataset.node) {
@@ -18806,6 +18865,11 @@ var EngCalcs = EngCalcs || {};
 			var tapKind = downPt.touch
 				? ((Date.now() - downPt.t) >= PROFILE_HOLD_MS ? 'hold' : 'tap')
 				: 'click';
+			// **THE ONE PLACE THE GHOST-CLICK SHIELD LEARNS WHAT KIND OF PRESS THIS WAS** (Task
+			// 562). It is recorded, not applied: every function that opens a box under this press
+			// asks ghostClickShield(), and none of them has to remember to set a flag first. See
+			// noteMapTap().
+			noteMapTap(downPt.touch);
 			downPt = null;
 			// elementFromPoint, not e.target: setPointerCapture(svg) retargets pointerup's
 			// target to the capturing element (svg itself) on desktop Chrome, so e.target here
@@ -18818,14 +18882,22 @@ var EngCalcs = EngCalcs || {};
 			// 2 -- so tapping a junction and missing its dot by five pixels opens nothing at all,
 			// and the user cannot tell that from a press the page dropped.
 			//
-			// **TOUCH ONLY, AND THAT IS WHY IT IS SAFE TO ADD AT ALL.** A pointer gesture never
-			// reaches this line, so no desktop behaviour moves; and it only runs where the real hit
-			// test found BARE MAP, so it can never overrule what the browser did find. A node wins a
-			// tie with a link for the reason the Text branch below gives: every link ends at a node,
-			// so near a junction both are in tolerance and the node is the more specific thing the
-			// user can have meant.
-			if (t === svg && e.pointerType === 'touch' && mode === 'select') {
-				t = touchAssetNear(e.clientX, e.clientY) || t;
+			// **TOUCH ONLY, WHICH IS WHY IT IS SAFE TO ADD AT ALL.** A pointer gesture never reaches
+			// these two lines, so no desktop behaviour moves.
+			//
+			// **AND SINCE TASK 562 THE SECOND LINE OVERRULES THE BROWSER RATHER THAN MERELY FILLING
+			// IN FOR IT.** The note here used to say the fallback *"only runs where the real hit
+			// test found BARE MAP, so it can never overrule what the browser did find"*; that was a
+			// deliberate safety property and Tom's ruling supersedes it (*"nodes need to get
+			// precedence always, because they are hardest to aim at"*). Filling in bare map cannot
+			// fix a tap 8 px off a junction, because that tap is not on bare map -- it is on the
+			// pipe's halo, and the pipe editor is what opened. So: the first line still fills in
+			// bare map with the nearest ASSET of any kind, and the second then lets a node within
+			// reach outrank a link. touchNodeOver() carries the rule and names what a node does not
+			// outrank.
+			if (e.pointerType === 'touch' && mode === 'select') {
+				if (t === svg) { t = touchAssetNear(e.clientX, e.clientY) || t; }
+				t = touchNodeOver(e.clientX, e.clientY, t);
 			}
 			// No zoomExtent() after placing an element: rescaling the whole view on every click while
 			// building a network is disorienting. Zoom Extent stays user-requested only.
@@ -18834,9 +18906,9 @@ var EngCalcs = EngCalcs || {};
 			// Selection is NOT set here (Task 415) -- the pointerDOWN handler already did it, for
 			// every select-mode press, tap and drag alike.
 			if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
-				// Snap-on-create: a click within NODE_SNAP_PX of an existing node reuses it instead
-				// of creating a new, overlapping one -- see nearestNodeNearScreen()'s comment.
-				var onNode = nearestNodeNearScreen(e.clientX, e.clientY, tapSlopPx(e));
+				// Snap-on-create: a click within this gesture's own reach of an existing node reuses
+				// it instead of creating a new, overlapping one -- see TOUCH_REACH_PX.
+				var onNode = nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e));
 				if (onNode) {
 					// **A MISS THAT LANDS ON WHAT YOU JUST PLACED OPENS IT**, and switches to Select.
 					// Refusing to place a second node on top of an existing one and then doing
@@ -18857,7 +18929,7 @@ var EngCalcs = EngCalcs || {};
 				// you had just placed makes a SECOND one directly on top of it -- two labels where
 				// one was wanted, the top one dragging away to reveal the other later. Both tools now
 				// open what is already there; the node branch above has the argument for Select.
-				var onLabel = nearestLabelNearScreen(e.clientX, e.clientY, tapSlopPx(e));
+				var onLabel = nearestLabelNearScreen(e.clientX, e.clientY, reachPx(e));
 				if (onLabel) {
 					setMode('select');
 					openLabelPopup(onLabel.id, e.clientX, e.clientY);
@@ -18868,14 +18940,14 @@ var EngCalcs = EngCalcs || {};
 				// thought we programmed a leader for it if placed near a node... now it's gone" --
 				// it turns out this creation-time snap was never actually wired up; the leader-
 				// rendering machinery in buildLabelEls()/updateLabelGeometry() was already there and
-				// ready, waiting on this). A tap within NODE_SNAP_PX anchors the new Text to that
-				// node, so it drags with it and grows a leader; otherwise it's free-floating.
-				var nearNode = nearestNodeNearScreen(e.clientX, e.clientY, tapSlopPx(e));
+				// ready, waiting on this). A tap within this gesture's own reach anchors the new Text
+				// to that node, so it drags with it and grows a leader; otherwise it's free-floating.
+				var nearNode = nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e));
 				// **AND FAILING A NODE, A PIPE** (Task 502). A NODE WINS A TIE, deliberately: every
 				// link ends at a node, so near a junction both are within tolerance, and the node is
 				// the more specific thing the user can have meant. That ordering is also what keeps
 				// every existing drawing's behaviour exactly as it was.
-				var nearLink = nearNode ? null : nearestLinkNearScreen(e.clientX, e.clientY, tapSlopPx(e));
+				var nearLink = nearNode ? null : nearestLinkNearScreen(e.clientX, e.clientY, reachPx(e));
 				logLpnFirstAction('element');
 				addText(w.x, w.y, nearNode ? nearNode.id : null,
 					nearLink ? { link: nearLink.link.id, t: nearLink.t } : null);
@@ -18886,7 +18958,7 @@ var EngCalcs = EngCalcs || {};
 				// miss is diagnostic #2's dominant cause ("a pipe drawn near a junction but not
 				// snapped to it"). Falling back to the nearest node within screen-pixel tolerance
 				// makes a close tap connect anyway.
-				var hitId = t.dataset.node || (nearestNodeNearScreen(e.clientX, e.clientY, tapSlopPx(e)) || {}).id;
+				var hitId = t.dataset.node || (nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)) || {}).id;
 				if (hitId) {
 					if (!pendingLinkFrom) { setPendingLinkFrom(hitId); }
 					else if (hitId !== pendingLinkFrom) {
@@ -18928,9 +19000,11 @@ var EngCalcs = EngCalcs || {};
 				void 0;
 			} else if (mode === 'select' && t.dataset.node) {
 				// The one popup that opens SYNCHRONOUSLY inside the gesture that asked for it --
-				// the link and label popups below are on a 300 ms debounce and are already past
-				// the compat-click window. See ghostClickShield().
-				popupOpenedByFinger = (tapKind !== 'click');
+				// the link and label popups below are on a 300 ms debounce. Neither fact is stated
+				// HERE any more (Task 562): openPopupAt() works out how much of the compat-click
+				// window is left from the press itself, so a synchronous open, a debounced one and
+				// the add-junction door two hundred lines above all get the right answer without
+				// anyone setting a flag. See ghostClickShield().
 				openPopup(t.dataset.node, e.clientX, e.clientY);
 			} else if (mode === 'select' && t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')) {
 				// Delayed, not immediate: gives the native dblclick listener above a chance to
@@ -21894,6 +21968,29 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function hideOpenTips() { hideTipsIn(document); }
+	// **ONE FUNCTION HIDES A PANEL, AND SWEEPING ITS TIPS IS PART OF HIDING IT** (ROADMAP Task 562).
+	// Every standing box, pull-down and popover on this page closes through here.
+	//
+	// It replaces twelve hand-written closers, six of which remembered `hideTipsIn()` and six of
+	// which did not -- and the six that did not are the shape of Tom's own report (2026-08-29:
+	// *"Tips (? glyphs) in the Node editor survive the editor box on close on a phone"*), because a
+	// tip is rendered into document.body rather than into the box that raised it. Hide the box and
+	// the tip stands over the map with nothing under it: on touch there is no pointer to move away,
+	// and the trigger it belonged to is now display:none, so its own outside-tap listener can never
+	// fire either. The user is left tapping a word that will not go away.
+	//
+	// Scoped to the closing panel, never the document: closing one box must not take down a tip
+	// somebody is reading over another. hideOpenTips() above keeps the whole-document sweep, which
+	// answers the OPENING question instead (a tip must not hang over the panel its own button just
+	// opened).
+	//
+	// `dev/lpn-spike/panel-touch-harness.js` reads this file back and fails on any
+	// `style.display = 'none'` that is not either this line or a declared non-panel.
+	function hidePanel(el) {
+		if (!el) { return; }
+		hideTipsIn(el);
+		el.style.display = 'none';
+	}
 	function openSettingsBox(section) {
 		var box = setboxEl(), r, at, target, home, floor;
 		if (!box) { return; }
@@ -21946,7 +22043,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeSettingsBox() {
 		var box = setboxEl();
-		if (box) { hideTipsIn(box); box.style.display = 'none'; }
+		hidePanel(box);
 	}
 	function toggleSettingsBox(evt) {
 		if (setboxIsOpen()) { closeSettingsBox(); return; }
@@ -22878,7 +22975,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeLibraryBox() {
 		var box = libBoxEl();
-		if (box) { hideTipsIn(box); box.style.display = 'none'; }
+		hidePanel(box);
 	}
 	function toggleLibraryBox() {
 		if (libBoxIsOpen()) { closeLibraryBox(); return; }
@@ -22903,17 +23000,16 @@ var EngCalcs = EngCalcs || {};
 	var currentPopup = null; // {kind:'node'|'link', id} -- lets a unit-strip change refresh the open popup in place
 	function closePopup() {
 		var popup = document.getElementById('lpn_popup');
-		// The box Tom reported: every field in the Node editor carries a "?", and each one's tip is
-		// a sibling of the popup in document.body rather than a child of it.
-		hideTipsIn(popup);
 		// AND THE GHOST-CLICK SHIELD COMES DOWN WITH THE BOX. A pending timer would otherwise
 		// restore `pointerEvents` on a popup that has since been reopened by a mouse, and a box
 		// closed inside the shield window would come back inert -- the same class of leak as the
 		// tooltip on the line above, which is why it is fixed on the same line.
 		if (ghostShieldTimer) { clearTimeout(ghostShieldTimer); ghostShieldTimer = null; }
-		popupOpenedByFinger = false;
+		lastMapTapFinger = false;
 		popup.style.pointerEvents = '';
-		popup.style.display = 'none';
+		// The box Tom reported: every field in the Node editor carries a "?", and each one's tip is
+		// a sibling of the popup in document.body rather than a child of it. hidePanel() sweeps.
+		hidePanel(popup);
 		currentPopup = null;
 	}
 	// DRAGGING THE PROPERTY POPUP. The grab surface is the popup's own CHROME -- the padded band
@@ -22980,6 +23076,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	function makePanelDraggable(popup, onMove) {
 		var drag = null;
+		// **MADE DRAGGABLE AND TOUCH-DRAGGABLE IN THE SAME PLACE** (ROADMAP Task 562). The class
+		// carries `cursor: move` and, the half that actually matters on a phone, `touch-action:
+		// none` -- without which the browser claims the gesture for scrolling before pointermove
+		// ever fires, so the box simply cannot be dragged by a finger. The stylesheet listed three
+		// ids while six panels were made draggable by this function, so Find and the two fire-flow
+		// boxes dragged by mouse and not by finger. Adding it here is what makes a seventh panel
+		// impossible to half-wire.
+		popup.classList.add('lpn-dragpanel');
 		popup.addEventListener('pointerdown', function (e) {
 			if (e.target !== popup) { return; }   // a child is a control; only the chrome drags
 			var r = popup.getBoundingClientRect();
@@ -23734,19 +23838,32 @@ var EngCalcs = EngCalcs || {};
 	// mousedown of that sequence, so cancelling the click arrives one event too late. Rejected too:
 	// moving the popup away from the finger -- on a 390 px screen this box is most of the screen,
 	// so there is no "away" to move it to.
+	// **DECIDED INSIDE THE FUNCTION THAT OPENS THE BOX, FROM THE PRESS THAT OPENED IT** (Task 562).
+	// It used to be a flag the CALLER set, and the caller that set it was the node-tap branch of
+	// pointerup -- one of THREE doors that open this same box under a finger. The add-junction tool
+	// landing on an existing junction opens it and set nothing; so did a tap on a node's own data
+	// label. Those were not judgement calls anyone made; they were a line somebody had to remember,
+	// at doors written months apart. Now the map records what kind of press it was, once, and this
+	// function answers the question -- so a fourth door is shielded the day it is written.
+	//
+	// **AND THE SHIELD IS ONLY EVER AS LONG AS THE WINDOW HAS LEFT TO RUN.** A compat click arrives
+	// within GHOST_CLICK_MS of the press, so a box that opens 300 ms after the tap (the link and
+	// label popups are on that debounce, to leave room for a double-tap) needs the remaining 50 ms
+	// and not a fresh 350, and a box opened from a menu long afterwards needs none at all. That is
+	// what makes one rule serve every door instead of a list of exceptions.
 	var GHOST_CLICK_MS = 350;
-	var ghostShieldTimer = null, popupOpenedByFinger = false;
+	var ghostShieldTimer = null, lastMapTapFinger = false, lastMapTapAt = 0;
+	function noteMapTap(byFinger) { lastMapTapFinger = !!byFinger; lastMapTapAt = Date.now(); }
 	function ghostClickShield(panel) {
-		var byFinger = popupOpenedByFinger;
-		popupOpenedByFinger = false;
+		var left = lastMapTapFinger ? GHOST_CLICK_MS - (Date.now() - lastMapTapAt) : 0;
 		if (ghostShieldTimer) { clearTimeout(ghostShieldTimer); ghostShieldTimer = null; }
 		panel.style.pointerEvents = '';
-		if (!byFinger) { return; }
+		if (!(left > 0)) { return; }
 		panel.style.pointerEvents = 'none';
 		ghostShieldTimer = setTimeout(function () {
 			ghostShieldTimer = null;
 			panel.style.pointerEvents = '';
-		}, GHOST_CLICK_MS);
+		}, left);
 	}
 	function openPopupAt(sx, sy) {
 		var popup = document.getElementById('lpn_popup'), r, h, at;
@@ -26917,8 +27034,7 @@ var EngCalcs = EngCalcs || {};
 		ffRunUi.tally.textContent = text;
 	}
 	function closeFireFlowRunBox() {
-		var box = ffRunBoxEl();
-		if (box) { box.style.display = 'none'; }
+		hidePanel(ffRunBoxEl());
 		ffRunUi = null;
 	}
 
@@ -27041,7 +27157,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeFireFlowBox() {
 		var box = ffBoxEl();
-		if (box) { hideTipsIn(box); box.style.display = 'none'; }
+		hidePanel(box);
 		// **A RUN IN PROGRESS IS STOPPED BY CLOSING ITS BOX.** Otherwise a sweep of minutes goes on
 		// eating the machine with nothing on screen that can call it off.
 		if (fireFlowBusy) { fireFlowStop = true; }

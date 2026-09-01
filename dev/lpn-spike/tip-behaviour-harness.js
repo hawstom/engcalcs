@@ -286,12 +286,13 @@ function extract(name) {
 	}
 	return lpnSrc.slice(at, end);
 }
-// The module-scope variables closePopup() reads, re-declared here because this section evals that
-// one function on its own rather than the whole file. `ghostShieldTimer` and `popupOpenedByFinger`
-// joined `currentPopup` on 2026-08-31 (the ghost-click shield): closePopup() lowers the shield on
-// the same line it hides the tips, which is the same class of leak and therefore the same fix site.
-vm.runInContext('var currentPopup = null, ghostShieldTimer = null, popupOpenedByFinger = false;\n' +
-	extract('hideTipsIn') + '\n' + extract('closePopup') +
+// The module-scope variables closePopup() reads, re-declared here because this section evals those
+// functions on their own rather than the whole file. `ghostShieldTimer` and `lastMapTapFinger` are
+// the ghost-click shield, which closePopup() lowers on the same line it hides the box -- the same
+// class of leak as a stranded tooltip and therefore the same fix site. hidePanel() comes with it
+// because closing a box now goes through that one seam (Task 562).
+vm.runInContext('var currentPopup = null, ghostShieldTimer = null, lastMapTapFinger = false;\n' +
+	extract('hideTipsIn') + '\n' + extract('hidePanel') + '\n' + extract('closePopup') +
 	'\nthis.lpnClosePopup = closePopup;', ctx, { filename: 'looped-network.js:closePopup' });
 
 console.log('\n--- closing the Node editor takes its tips with it ---');
@@ -323,12 +324,18 @@ console.log('\n--- closing the Node editor takes its tips with it ---');
 		'...while a tip belonging to something else is left alone');
 }
 
-// EVERY BOX THAT RAISES TIPS CLOSES THROUGH THE SAME SWEEP. The behaviour above is proved on the
-// popup Tom reported; this is the cheap guard that the next box does not get its own closer without
-// one -- the fire flow box borrowed the Settings shell and would have inherited the defect.
+// EVERY BOX THAT RAISES TIPS CLOSES THROUGH THE SAME SWEEP -- and since Task 562 that is one
+// function rather than a habit each closer has to be taught. The behaviour above is proved on the
+// popup Tom reported; this is the cheap guard that the next box cannot get a closer of its own
+// without it. The last five here are the ones that did NOT sweep: the pull-down menu and its
+// fly-out, the Notes column, the modal dialog, the view popovers and the fire-flow run box.
+// `dev/lpn-spike/panel-touch-harness.js` holds the other direction -- that nothing hides a panel by
+// any route but this one.
 console.log('\n--- ...and so does every other box that carries "?" glyphs ---');
-['closeSettingsBox', 'closeLibraryBox', 'closeFireFlowBox', 'closeFindPopup', 'closeNewBox'].forEach((fn) => {
-	ok(/hideTipsIn\(/.test(extract(fn)), `${fn}() sweeps its own tips before it hides`);
+['closeSettingsBox', 'closeLibraryBox', 'closeFireFlowBox', 'closeFindPopup', 'closeNewBox',
+	'closeMenu', 'closeSubMenu', 'closeNotesPopup', 'closeDialog', 'closeViewPopovers',
+	'closeFireFlowRunBox'].forEach((fn) => {
+	ok(/hidePanel\(/.test(extract(fn)), `${fn}() closes through the one seam that sweeps its tips`);
 });
 
 console.log(`\n${failures ? 'FAILURES: ' + failures : 'all ' + checks + ' checks pass'}`);
