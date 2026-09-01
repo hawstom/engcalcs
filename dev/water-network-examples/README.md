@@ -42,10 +42,19 @@ its own source `.inp` so the gap cannot reopen quietly.
 
 **Do NOT close that gap by regenerating from the `.inp`.** `Net2` and `Net3` carry a backdrop an
 `.inp` cannot hold at all, and `Net1` carries hand-placed label offsets; an import would drop both.
-**What is still missing on purpose is `settings.hydraulics`** — the eight `[OPTIONS]` Task 553 added.
-Adding `Accuracy 0.001` there would loosen these examples' solve from our own 1e-9
-(`solveAccuracy()`), which is a change to what the gallery COMPUTES and is Tom's call, not a
-drive-by.
+
+**`settings.hydraulics` was the last piece and it is in now** — all four EPA files (`Net1`, `Net2`,
+`Net3`, `Net3-Novato-CA-World`) state the eleven `[OPTIONS]` their own `.inp` states, added by hand
+in place. It does change what the gallery COMPUTES, because these files say `Accuracy 0.001` and
+this page's own default is `1e-9` (`solveAccuracy()`), so that was measured before it was done:
+**worst head change 2.5e-7 m (Net3, node 231), worst relative flow change 0.00224% (Net3, link
+285), and every example still converges.** Every one of those is below any decimal place the page
+shows. `dev/lpn-spike/hydraulic-options-harness.js` §8 reads `examples/Net1.lwn` — the SHIPPED file,
+not this folder — against `Net1.inp`'s own numbers, so the gap cannot reopen through a regeneration.
+
+Note that the four still carry `settings.tolerance: 1e-9`, the deprecated key `Accuracy` replaced.
+Left alone deliberately: `solveAccuracy()` reads it only as a fallback, so it changes nothing, and
+rewriting a stored document to tidy a field is the thing this section exists to warn against.
 
 **Version drift is expected and harmless.** `Net2` and `Net3` are `v: 4`; `Net1` and Elm Street
 are `v: 6`. `applySaved()` merges an older document onto current defaults, so all four open
