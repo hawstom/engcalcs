@@ -14,6 +14,123 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-09-01 — Task 566's `[H]` anchor question: no EPA-published Net1 chlorine table exists; the hand-integrable single pipe is the answer, worked out in full
+
+Asked to decide the anchor before Task 566's chlorine code is written. Searched hard for a
+published, reproducible EPANET chlorine result with stated inputs and outputs; did not find one.
+Full worked single-pipe case below is the recommendation.
+
+- **Route 1 (find EPA's own report) — searched, NOT FOUND, and the near-misses are worth recording
+  so a later invocation does not re-search from scratch.** **CITED**, `usepa.github.io/EPANET2.2/2_quickstart.html`
+  §2.9 walks a chlorine run (Global Bulk `-1.0`, reservoir quality `1.0`) on the manual's own
+  QUICKSTART tutorial network — but that network is **not Net1** (8 nodes/9 links vs. Net1's 13
+  nodes/13 links, confirmed against `dev/lpn-spike/reference/Net1.inp`, OBSERVED) and the manual
+  presents its results as a map-colour animation and a screenshot figure, never a numeric table —
+  fetched directly, confirmed no table exists on that page. **CITED**, a search-only hit on the
+  EPANET 2.2 manual's own Net1 "Node Results at 0:00:00 hrs" table gives Chlorine `0.5 mg/L` at
+  junctions, `1.0 mg/L` at the reservoir/tank — but that is t=0, i.e. the file's own `[QUALITY]`
+  section (`dev/lpn-spike/reference/Net1.inp:87-99`, OBSERVED) echoed back verbatim with zero
+  transport or reaction computed; it cannot anchor a decay curve because no decay has happened yet.
+  **Searched WNTR's own GitHub test fixtures** (`USEPA/WNTR/wntr/tests/networks_for_testing`) for a
+  Net1 `.rpt` or reference chlorine CSV — none found; WNTR's shipped test networks for water quality
+  use Net3, not Net1. **I did not find a paywalled-but-real AWWA/journal worked example either in
+  this pass** — several papers surfaced (`academia.edu`/`ResearchGate` chlorine-decay-in-EPANET
+  case studies) but none were fetchable to verify a numeric table primary-source; not citing them.
+- **Route 2 (generate from the vendored engine, disclosed) is available and legitimate as a
+  WIRING check, but is not a substitute for an independent anchor** — the vendored engine is EPA's
+  own C code, so running it checks that our harness calls it correctly (units, section wiring,
+  the `× `-factor points `dev/water-quality.md` already worries about) but cannot catch a bug in
+  EPANET's own chlorine transport, which is exactly the class of error an anchor exists to catch.
+  Recommend it as a SECOND, disclosed check ("checked against the vendored engine's own output,
+  not an independent source" — stated in the harness comment, never silently), not the anchor.
+- **Route 3 — the hand-integrable single pipe, worked out in full, is the recommendation.**
+  Reservoir → one pipe → one junction, steady flow, **bulk decay only, wall coefficient = 0**
+  (isolates the term EPANET itself implements as pure Lagrangian advection with no dispersion —
+  **CITED**, `tbn2net.com/help/SOLIDOSen/EpanetQualityAnalisys.html`, a close mirror of the EPANET
+  manual's own water-quality chapter, fetched directly: *"Epanet water quality simulator uses a
+  Lagrange time-based approach to track the fate of discrete parcels of water as they move along
+  the pipes and mix at the junctions between time steps of fixed length"* — no dispersion term
+  anywhere in that description, so a plug-flow closed form is not an approximation of what EPANET
+  computes, it is the same physics). **CITED**, EPANET's own first-order bulk reaction is
+  `R = Kb·C`, coefficient units 1/day (search-synthesis of the OWA-EPANET Toolkit `[REACTIONS]`
+  reference and a second independent mirror, both converging on the same formula and units —
+  flag secondary, the primary PDF would not render through this session's tools). **OBSERVED**,
+  `dev/lpn-spike/reference/Net1.inp:118-125` states `Order Bulk 1`, `Global Bulk -.5` — first-order,
+  matching the formula above, so the test case below reuses Net1's own real coefficient rather than
+  inventing one.
+
+  **The case, numbers exact:**
+  - Pipe: D = 1 ft (12 in), L = 5280 ft (1 mile), wall coefficient kw = 0.
+  - A = πD²/4 = 0.7853981634 ft². V = A·L = 4146.9023 ft³.
+  - Reservoir C₀ = 1.0 mg/L (matches Net1's own reservoir/tank `InitQual`, OBSERVED above).
+  - kb = −0.5 /day = −0.0208333 /hr (Net1's own `Global Bulk`, OBSERVED above).
+  - **Run 1: Q = 1 cfs.** v = Q/A = 1.27324 ft/s. τ = V/Q = 4146.9023 s = 1.152473 hr.
+    Closed form C(τ) = C₀·exp(kb·τ) = exp(−0.024010) = **0.97628 mg/L** at the downstream junction,
+    once elapsed time ≥ τ (steady state after the first parcel arrives).
+  - **Run 2: Q = 2 cfs** (checks the exponential *dependence* on travel time, not just one number —
+    the same discipline `dev/water-quality.md`'s own age anchor uses, "run at two flows, assert the
+    ratio," guarding the exact stub-removes-the-coupling failure `dev/testing-notes.md` warns
+    about). v = 2.54648 ft/s. τ = 2073.4512 s = 0.576236 hr.
+    C(τ) = exp(−0.012005) = **0.98807 mg/L**.
+  - **Tolerance:** recommend ≤0.01 mg/L absolute — **OBSERVED**, that is literally Net1's own
+    `[OPTIONS] Tolerance 0.01` (`dev/lpn-spike/reference/Net1.inp:139`), a non-arbitrary number
+    already in the reference file rather than one I invented — **SPECULATION, mine: as an
+    ACCEPTANCE bar for a correct implementation** rather than as EPANET's own solver-tolerance
+    concept; re-derive before treating it as settled. A single non-mixing pipe should track this
+    tighter than the Net3 trace anchor's worst case (0.105% at a mixing front,
+    `dev/water-quality.md:77`, OBSERVED) — there is no mixing front here to be sensitive to.
+  - **A natural second-phase case, not worked here:** add the wall term back in (Net1's own
+    `Global Wall -1`, OBSERVED) — the wall-reaction rate depends on the pipe's surface-to-volume
+    ratio (4/D for a cylinder), a real but slightly more involved hand derivation than the bulk-only
+    case above; worth doing before shipping the wall-coefficient half of the feature, flagged here
+    so a later invocation does not have to rediscover that the bulk-only case alone under-tests it.
+
+- **Coefficient posture, from this seat, sourced.** **CITED**, a search-synthesis converging
+  across `academia.edu`/EPA guidance on "hold studies": the number comes from a **bottle (hold)
+  test** — plant finished water held at distribution-system temperature in the dark, sampled for
+  residual decay over time, to fit kb — not from a textbook or a default. **CITED**, EPANET's own
+  quickstart tutorial's suggested value, `-1.0`/day, is presented as a **teaching placeholder for a
+  network with no bottle-test data**, not a physically-derived default (`usepa.github.io/EPANET2.2/2_quickstart.html`
+  §2.9, fetched directly). **CITED**, the manual's own stated "typical" bulk range is 0.1–1.0/day —
+  a full order of magnitude, confirming the roadmap's own framing. **What a design-and-planning
+  engineer actually has in hand, reasoned from this seat, SPECULATION but grounded in the above:** a
+  utility that treats its own water (has a plant) can run a bottle test cheaply and has a real
+  number; a utility that PURCHASES treated water wholesale (common at the subdivision/small-utility
+  end this suite also serves) usually does not have one and inherits whatever residual its supplier
+  hands off at the interconnection, decaying from there — meaning "I have no coefficient" is not an
+  edge case at this suite's own small-system end, it is close to the median case. **What the page
+  should put in the field on day one: nothing pre-filled, and beside it, in the interface, not a
+  tooltip: "No standard value exists; published values span 0.1 to 1.0 per day depending on source
+  water. Run a bottle (hold) test on your own finished water, or leave blank."** That is Task 530's
+  own ask-or-disclose shape, restated for this coefficient specifically rather than left generic.
+  This does not change the ranking argument already on file (`wishlist.md` row 4c, standing rule
+  2026-08-25) — it is the design answer the roadmap block already called for, now with the actual
+  field-copy sourced rather than gestured at.
+
+- **Scale judgment, willing to rank honestly.** Chlorine residual is not a large-utility-only
+  concern the way valve-isolation criticality analysis is — **CITED**, every US public water system
+  on chlorine or chloramine disinfection is bound by the Revised Total Coliform Rule / Stage 1&2
+  Disinfectants and Disinfection Byproducts Rule to maintain a detectable residual throughout the
+  distribution system regardless of system size (general EPA SDWA framing, not independently
+  re-verified this pass against the primary CFR text — flag secondary), so the underlying QUESTION
+  ("will my new main keep an adequate residual to the far end of this loop") is asked at every
+  scale this suite serves, including the single-subdivision case. **But the MODELLED, per-pipe
+  version specifically is mid-to-large-utility work, not universal** — it needs a bottle test (lab
+  access, staff time) and, for the wall term, ideally a tracer-study calibration, which is real
+  utility-engineering capacity a small system or a lone consulting-firm submittal usually does not
+  have. **My honest read: build it, because Tom has already ruled it the priority and the roadmap's
+  own ask-or-disclose design keeps an uncalibrated run from lying** — a page that reports "modeled
+  with your own coefficient, or none supplied" is useful even to a utility with no bottle test,
+  the same way an uncalibrated fire-flow number already is (wishlist row 3, OBSERVED precedent).
+  **Where I would NOT over-claim:** do not expect heavy day-to-day USE of the wall-reaction half at
+  this suite's own stated scale — new-pipe submittals (this suite's actual client per
+  `js/lpn-ramps.js:904`, journal 2026-08-24) mostly install new, low-wall-demand pipe, so bulk decay
+  on the new main plus whatever residual the interconnection or plant hands off is the case that
+  will actually get used; wall reaction matters most on OLD, tuberculated pipe a master-plan
+  rehabilitation study would model, which is real but a smaller slice of who opens this page.
+
+---
+
 ## 2026-08-30 — Task 530 shipped: Tom's three post-ship questions, sourced
 
 `js/looped-network.js:25674` ships `maxVelocity` default 5 ft/s with the comment *"5 ft/s is the

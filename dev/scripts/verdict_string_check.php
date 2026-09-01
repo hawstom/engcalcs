@@ -63,6 +63,29 @@ require_once __DIR__ . '/lang_parse.inc.php';
 /** The two verdict glyphs, and the near neighbours a well-meaning author reaches for. */
 const EC_VERDICT_GLYPHS = ['✓', '⚠', '✔', '✗', '✘', '❌', '⛔', '❗', 'ℹ'];
 
+/**
+ * **THE HAND-BUILT VERDICTS, DECLARED BY NAME, BECAUSE NOTHING CAN DERIVE THEM.**
+ *
+ * The 32 keys above are found by reading the RENDERER, which is what keeps the check free of
+ * guessing-by-key-name. That works precisely because `writeCheckHTML()` supplies the glyph itself,
+ * and it buys a blind spot with it: for a verdict assembled by hand the glyph lives IN the string,
+ * so it can be deleted, and leg 3 has nothing left to look at. Found by mutation — replacing
+ * `'✓ Understood'` with `'OK: Understood'` removed a glyph AND added a marker word, and the check
+ * passed.
+ *
+ * There is no honest way to derive this set: "which hand-built string is a verdict" is exactly the
+ * inference by key name the rest of this check exists to avoid. So it is a DECLARED list, with the
+ * same limit `prefix_map_check.php` accepts — a new hand-built verdict nobody declares stays
+ * invisible, and that is the price of not guessing. Adding one costs a line here.
+ */
+const EC_HANDBUILT_VERDICT_KEYS = [
+    // The Library panel's own three answers, built in js/looped-network.js rather than through
+    // writeCheckHTML(). Their glyph is part of the translated value in all 27 files.
+    'lpn_library_control_ok',
+    'lpn_library_control_bad',
+    'lpn_library_control_missing',
+];
+
 /** English marker words. The convention exists to delete these; the glyph already says it. */
 const EC_MARKER_WORDS = ['warning', 'warn', 'caution', 'note', 'notice', 'alert', 'error',
     'attention', 'danger', 'ok', 'okay', 'pass', 'fail', 'failed', 'invalid'];
@@ -195,7 +218,8 @@ function ecPageConfigLangKeys(string $php): array
  * @param bool $isEnglish Whether the marker-WORD list applies (it is an English list).
  * @return array<int,array{0:string,1:string}> [code, what] pairs.
  */
-function ecVerdictValueFindings(string $value, bool $isVerdictKey, bool $isEnglish): array
+function ecVerdictValueFindings(string $value, bool $isVerdictKey, bool $isEnglish,
+    bool $isHandBuilt = false): array
 {
     $out = [];
     $trimmed = ltrim($value);
@@ -210,6 +234,21 @@ function ecVerdictValueFindings(string $value, bool $isVerdictKey, bool $isEngli
             "carries '$carries', but EngCalcs.writeCheckHTML() already prepends one — this ships two"];
     } elseif ($carries !== null && strpos($trimmed, $carries) !== 0) {
         $out[] = ['glyph-not-leading', "carries '$carries' somewhere other than the front"];
+    }
+
+    // ---- leg 4: a hand-built verdict must still HAVE its glyph ---------------------------------
+    // Leg 3 asks where a glyph sits; only this one asks whether it is there at all. It applies to
+    // the declared hand-built keys alone, because for a renderer-built verdict the glyph comes from
+    // code and cannot go missing -- there, carrying one is the defect, which is leg 3's first arm.
+    if ($isHandBuilt && $carries === null) {
+        $out[] = ['glyph-missing',
+            'is a hand-built verdict and carries no ✓ or ⚠; the renderer does not supply one here'];
+    }
+    if ($isHandBuilt && !$isVerdictKey) {
+        $words = implode('|', EC_MARKER_WORDS);
+        if ($isEnglish && preg_match('/^\s*(?:[' . implode('', EC_VERDICT_GLYPHS) . ']\s*)?(' . $words . ')\b\s*(?:[:：]|[-–—]\s)/iu', $value, $m)) {
+            $out[] = ['marker-word', "leads with the marker word '{$m[1]}'; the glyph already says it"];
+        }
     }
 
     if (!$isVerdictKey) { return $out; }
@@ -268,11 +307,31 @@ foreach ($files as $file) {
     $vals = ecLangValues(file_get_contents($file));
     foreach ($vals as $key => $value) {
         $isVerdict = isset($verdictKeys[$key]);
-        if ($isVerdict) { $values++; }
-        foreach (ecVerdictValueFindings($value, $isVerdict, $code === 'en') as [$codeName, $what]) {
+        $isHandBuilt = in_array($key, EC_HANDBUILT_VERDICT_KEYS, true);
+        if ($isVerdict || $isHandBuilt) { $values++; }
+        foreach (ecVerdictValueFindings($value, $isVerdict, $code === 'en', $isHandBuilt) as [$codeName, $what]) {
             $problems[] = ["lang.ec.$code.php  \$ec_lang['$key']", $codeName, $what, $value];
         }
     }
+}
+
+// A DECLARATION THAT OUTLIVED ITS KEY IS ITSELF A FINDING. The list above is hand-written, which
+// is the one thing about this check that can rot silently -- a renamed or deleted key would leave a
+// line here guarding nothing while the report still counted it. Caught on the first draft, which
+// declared `lpn_library_control_warn`: there is no such key, and the check reported OK.
+$declaredMissing = [];
+$enValues = ecLangValues(file_get_contents($root . '/lib/lang.ec.en.php'));
+foreach (EC_HANDBUILT_VERDICT_KEYS as $k) {
+    if (!array_key_exists($k, $enValues)) { $declaredMissing[] = $k; }
+}
+if ($declaredMissing) {
+    echo 'Verdict strings: ' . count($declaredMissing) . " declared hand-built verdict key(s) do not exist\n\n";
+    foreach ($declaredMissing as $k) { echo "  \$ec_lang['$k']\n"; }
+    echo "\nEC_HANDBUILT_VERDICT_KEYS in this script names them, so this check believes it is\n";
+    echo "guarding a string that lib/lang.ec.en.php does not have. Either the key was renamed --\n";
+    echo "use dev/scripts/rename_lang_key.php, which would have updated call sites but not this\n";
+    echo "list -- or the verdict is gone and the line here should go with it.\n";
+    exit(1);
 }
 
 if ($unresolved) {

@@ -133,6 +133,49 @@ foreach ($cases as [$name, $value, $isVerdict, $isEnglish, $want]) {
     ecVerdictAssert($name, $got, $want);
 }
 
+// ================================================================================================
+// LEG 4 -- A HAND-BUILT VERDICT MUST STILL HAVE ITS GLYPH
+// ================================================================================================
+// **FIXTURE 1 IS THE MUTATION THAT ESCAPED THE FIRST DRAFT AND IS THE ONLY THING HOLDING THIS LEG
+// OPEN.** Legs 1-3 all reason about a glyph that is PRESENT: leg 1 says a renderer-built verdict
+// must not carry one, leg 3 says a glyph anywhere must lead. Nothing asked whether it was there at
+// all -- and for a verdict assembled by hand rather than through writeCheckHTML(), the glyph is
+// part of the translated value and can simply be deleted. Replacing '✓ Understood' with
+// 'OK: Understood' removed the glyph AND added a marker word, and the check reported OK.
+//
+// The last two fixtures are the reason the leg is scoped to a DECLARED list: an ordinary label with
+// no glyph is not a defect, and there is no way to tell one from a stripped verdict except by
+// having been told which keys are verdicts.
+$handCases = [
+    ['THE ESCAPED MUTATION: glyph deleted and a marker word put in its place',
+        'OK: Understood', true, ['glyph-missing', 'marker-word']],
+    ['a glyph deleted with no marker word -- still a defect, the glyph is the convention',
+        'Understood', true, ['glyph-missing']],
+    ['the same in a language this side cannot read: the leg needs no words',
+        'לא מובן', false, ['glyph-missing']],
+    ['the shipped English value passes',
+        '✓ Understood', true, []],
+    ['the shipped warning value passes',
+        '⚠ Not understood', true, []],
+    ['a placeholder after the glyph is still glyph-led',
+        '⚠ This network has nothing called {id}', true, []],
+    ['a glyph pushed off the front is leg 3\'s finding, not leg 4\'s',
+        'Understood ✓', true, ['glyph-not-leading']],
+];
+foreach ($handCases as [$name, $value, $isEnglish, $want]) {
+    $got = array_map(fn($f) => $f[0], ecVerdictValueFindings($value, false, $isEnglish, true));
+    sort($got);
+    sort($want);
+    ecVerdictAssert($name, $got, $want);
+}
+
+// AND THE OTHER DIRECTION, which is what keeps leg 4 from becoming "every string needs a glyph":
+// the identical values, NOT declared hand-built, must produce nothing.
+foreach ([['OK: Understood', true], ['Understood', true], ['Pipe diameter', true]] as [$v, $en]) {
+    $got = array_map(fn($f) => $f[0], ecVerdictValueFindings($v, false, $en, false));
+    ecVerdictAssert("undeclared, so leg 4 stays silent: " . $v, $got, []);
+}
+
 if ($fails) {
     echo "\nverdict_string_selftest: $fails failing case(s) of " . ($fails + $ok) . ".\n";
     echo "verdict_string_check.php can no longer see the defect named above, and it prints\n";

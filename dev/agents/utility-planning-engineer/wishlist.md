@@ -278,6 +278,21 @@ one "quality" row:
 - **Size:** medium-to-large, the largest of the three quality rows — a genuinely new class of input
   (per-pipe or global reaction coefficients, quality units, a wall-reaction toggle) plus the same
   new results dimension age needs. Believed larger than 4a and 4b combined; not designed.
+- **UPDATE 2026-09-01, ROADMAP Task 566's `[H]` anchor question answered — full case: journal,
+  2026-09-01.** Searched for EPA's own published Net1 chlorine result table; NOT FOUND (the
+  manual's own Net1 numbers are t=0, i.e. the input echoed back, not a decay result; WNTR's test
+  fixtures use Net3 for quality, not Net1). **Recommend the hand-integrable single pipe**, worked
+  out exactly: 1 ft × 5280 ft pipe, wall coefficient 0, Net1's own `Global Bulk -0.5`/day, reservoir
+  quality 1.0 mg/L, two flows (1 cfs → 0.97628 mg/L, 2 cfs → 0.98807 mg/L) so the exponential
+  travel-time dependence is asserted, not one magic number. Coefficient posture: field ships
+  blank, with stated text that no standard value exists, published range is 0.1-1.0/day, and the
+  real source is a bottle (hold) test on the utility's own finished water — sourced in the journal,
+  not gestured at. Scale judgment, stated plainly: the underlying QUESTION (residual to the far
+  end of a new main) is asked at every scale this suite serves because it is a Total Coliform
+  Rule/DBP Rule obligation regardless of system size; the MODELLED per-pipe version, especially the
+  wall term, is real but will get lighter use at this suite's own new-pipe-submittal scale than the
+  bulk term will. Does not change this row's rank — it answers the blocker Task 566 named, it does
+  not argue for a different priority.
 
 ### 5. GeoJSON export of a geographic project
 
