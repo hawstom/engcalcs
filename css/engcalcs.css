@@ -614,23 +614,34 @@ html[lang="zh"] .ec-welcome {
    per-node condition on this map already draws -- selection, fire flow, an override, a pending link
    -- and it composes with the ramp instead of overwriting it.
 
-   THE STROKE WIDTH IS IN KEYFRAMES, NOT IN THE RULE, and that is deliberate: nothing removes the
-   class, so a width declared in the rule would stay on the node for ever, while an ANIMATED
+   EVERY DECLARATION IS IN THE KEYFRAMES, NOTHING IN THE RULE, and that is deliberate: nothing ever
+   removes the class, so a width or a paint-order declared in the rule would stay on the node for
+   ever -- and it would then be the SELECTION ring, months later, that looked wrong. An animated
    property reverts the moment the animation ends. Same reason the label version has no `forwards`.
-   `--lpn-sym` for the same reason `.lpn-selected` uses it: this map's user units are metres in one
-   project and DEGREES in another, so a bare `0.7` is a mark bigger than the screen on a lat/lon map.
-   0.7 against everyone else's 0.5 so it reads over whichever ring it is standing in for.
+
+   `paint-order: stroke fill` is what makes it a HALO instead of a blot: a stroke is centred on the
+   circle's edge, so half of a wide one is drawn over the dot. Painting the stroke first and the fill
+   over it leaves only the outer half showing, and the node keeps its own colour -- the colour ramp,
+   a reservoir's symbol, all of it -- while a red ring stands off it. `.lpn-lbl` uses the same
+   property for the same reason, one paragraph up.
+
+   3x, where every other ring on this map is 0.5x. Those say "this is selected", "this failed";
+   this one has to be seen by somebody whose finger was ON it a second ago -- Tom, the same day:
+   *"the blindness of tapping on a phone is dire."* A junction is drawn at radius 0.9, so a 3-wide
+   ring stands 1.5 clear of it: about three times the dot, which is the point. `--lpn-sym` for the
+   reason `.lpn-selected` uses it -- this map's user units are metres in one project and DEGREES in
+   another, so a bare 3 is a mark bigger than the screen on a lat/lon map.
 
    Fading to a TRANSPARENT red rather than to black: the ring has to end at nothing, or the last
    frame of the fade would be a black ring that then vanishes when the animation lets go. */
 .lpn-node.lpn-just-dragged { animation-name: lpn-just-moved-node; }
 @keyframes lpn-just-moved-node {
-	0%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(0.7 * var(--lpn-sym, 1)); }
-	4%   { stroke: rgba(212, 0, 0, 0); stroke-width: calc(0.7 * var(--lpn-sym, 1)); }
-	8%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(0.7 * var(--lpn-sym, 1)); }
-	12%  { stroke: rgba(212, 0, 0, 0); stroke-width: calc(0.7 * var(--lpn-sym, 1)); }
-	16%  { stroke: rgba(212, 0, 0, 1); stroke-width: calc(0.7 * var(--lpn-sym, 1)); animation-timing-function: linear; }
-	100% { stroke: rgba(212, 0, 0, 0); stroke-width: calc(0.7 * var(--lpn-sym, 1)); }
+	0%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
+	4%   { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
+	8%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
+	12%  { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
+	16%  { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; animation-timing-function: linear; }
+	100% { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
 }
 /* BOTH of them, and the node one by name: `.lpn-node.lpn-just-dragged` above outranks the shorthand
    reset below, so a reader who honours prefers-reduced-motion would still get the blinking ring. */
