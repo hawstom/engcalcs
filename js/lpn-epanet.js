@@ -486,8 +486,13 @@
 				: hyd.unbalanced === 'continue'
 					? 'Continue ' + (hyd.unbalancedTrials !== undefined ? hyd.unbalancedTrials : 10)
 					: 'Continue 10') +
+			// **THE TWO THAT CARRY UNITS.** This writer emits LPS and metres always, and the model
+			// reaching it is already in SI -- so a head error goes out as it stands and a flow
+			// change is scaled the same 1000 every other flow on this page is. The document's own
+			// copy is in the project's units; assembleModel()'s engineHydraulics() is where the
+			// conversion happens, for the same reason every other unit conversion is there.
 			(hyd.headError !== undefined ? '\n HeadError ' + hyd.headError : '') +
-			(hyd.flowChange !== undefined ? '\n FlowChange ' + hyd.flowChange : '') +
+			(hyd.flowChange !== undefined ? '\n FlowChange ' + hyd.flowChange * 1000 : '') +
 			(hyd.dampLimit !== undefined ? '\n DampLimit ' + hyd.dampLimit : '') +
 			(hyd.checkFreq !== undefined ? '\n CheckFreq ' + hyd.checkFreq : '') +
 			(hyd.maxCheck !== undefined ? '\n MaxCheck ' + hyd.maxCheck : '') +
@@ -637,6 +642,21 @@
 	 */
 	function signatureOf(model) {
 		var parts = [model.method || 'hw', model.emitterExponent || 0.5], i, n, l;
+		// **EVERY `[OPTIONS]` VALUE IS IN THE SIGNATURE, AND IT HAS TO BE** (Task 553). These are
+		// written into the `.inp` text and nothing pushes them afterwards -- there is no setter for
+		// Accuracy or Viscosity the warm path could use. Left out, a person who changed Accuracy or
+		// Specific gravity in Settings and pressed solve got the PREVIOUS session's options back,
+		// silently and forever, because the network's SHAPE had not changed. Measured before this
+		// line existed: fourteen different option sets on one four-pipe network returned the
+		// identical head to the last bit, including `Trials 1 Unbalanced Stop`, which cannot
+		// converge and must refuse.
+		//
+		// Sorted, because `hydraulics` is built by two different writers (the importer's own scan
+		// order and the Settings box's) and key ORDER is not a fact about the network.
+		var hyd = model.hydraulics || {};
+		parts.push(Object.keys(hyd).sort().map(function (k) {
+			return k + '=' + hyd[k];
+		}).join(''));
 		for (i = 0; i < model.nodes.length; i++) {
 			n = model.nodes[i];
 			parts.push('n' + n.id + '\u0001' + n.type);

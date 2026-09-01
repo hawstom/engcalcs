@@ -4987,6 +4987,28 @@ var EngCalcs = EngCalcs || {};
 	// elementsFromPoint() confirms each in turn and stops at the canvas, which carries no dataset and
 	// reads as bare map to every caller.
 	//
+	// **A THING THE USER CANNOT SEE CANNOT BE GRABBED.** (Tom, 2026-09-01: *"a node label is present
+	// but not (yet?) visible, and when I go to pan, the label that I did not see drags off the
+	// screen."*) The cure is one word in css/engcalcs.css -- `.lpn-draglbl` wore
+	// `pointer-events: all`, which in SVG hit-tests an element REGARDLESS of its visibility, so all
+	// four label-hiding mechanisms left a fully grabbable invisible word on the map. This is the
+	// second half of the same fact rather than a second fact: it reads `visibility` too, so nothing
+	// here has to be kept in step with anything there.
+	//
+	// getComputedStyle() answers for every hiding mechanism at once, class-driven or inline, and it
+	// already resolves the inheritance -- `visibility` inherits, so a hidden <g> hides its children.
+	// The inline walk below it is for a DOM with no cascade (the harness stub), where a class means
+	// nothing but setLabelAssemblyHidden()'s own `style.visibility` is still on the element.
+	function hitIsVisible(t) {
+		if (!t || t.nodeType !== 1) { return true; }
+		var cs = window.getComputedStyle ? window.getComputedStyle(t) : null;
+		if (cs && (cs.visibility === 'hidden' || cs.visibility === 'collapse')) { return false; }
+		for (var e = t; e && e.nodeType === 1; e = e.parentNode) {
+			if (e.style && e.style.visibility === 'hidden') { return false; }
+			if (e === svg) { break; }
+		}
+		return true;
+	}
 	// Not e.target on a pointerdown either: elementsFromPoint() is a document query and is unaffected
 	// by the setPointerCapture() retargeting that made pointerup use elementFromPoint() in the first
 	// place, so one call serves every gesture.
@@ -4996,6 +5018,10 @@ var EngCalcs = EngCalcs || {};
 			if (list[i] === svg) { break; }
 			if (!svg.contains(list[i])) { break; }   // page furniture over the map -- not a map hit
 			t = resolveLabelHit(list[i]);
+			// SKIPPED, not returned as a miss: something visible may be under the invisible thing,
+			// and the walk is here precisely so a rejected candidate does not take the real hit
+			// beneath it away with it.
+			if (!hitIsVisible(t)) { continue; }
 			if (hitConfirmed(t, cx, cy)) { return t; }
 		}
 		return svg;
@@ -18683,6 +18709,17 @@ var EngCalcs = EngCalcs || {};
 			// **THE PATH HANDLE COMMITS ON RELEASE**, before `drag` is dropped -- it is the one drag
 			// type whose whole result is decided by where the pointer let go (Task 509).
 			if (drag && drag.type === 'profilehandle' && drag.pointerId === e.pointerId) { profileHandleDrop(); }
+			// **AT THE END OF THE GESTURE, AND ONLY IF THE DOCUMENT ACTUALLY CHANGED.** The mark
+			// says a move HAPPENED, so it belongs where the move is finished rather than on each of
+			// the sixty frames that got there -- and `drag.snapped` is already exactly "this drag
+			// wrote to the document": snapshotDragOnce() sets it on the first frame that moves
+			// anything, so a tap, a press that never travelled past its slop, and a pan can none of
+			// them reach this line. A vertex drag is deliberately not marked: bending a pipe leaves
+			// the bend under the pointer where you can see it, and the complaint was about the
+			// junction whose new position is the only evidence it moved.
+			if (drag && drag.pointerId === e.pointerId && drag.type === 'node' && drag.snapped) {
+				markNodeMoved(drag.id);
+			}
 			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
 			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
 			if (wasPan && !drag) { relayoutLabels(); }
@@ -18948,6 +18985,25 @@ var EngCalcs = EngCalcs || {};
 		el2.classList.remove('lpn-just-dragged');
 		if (el2.getBoundingClientRect) { el2.getBoundingClientRect(); }
 		el2.classList.add('lpn-just-dragged');
+	}
+	// **A JUNCTION THAT MOVED SAYS SO, THE WAY A LABEL THAT MOVED ALREADY DID** (Tom, 2026-09-01:
+	// *"we have no way of knowing when a junction moves. Some sort of a fading highlight like the
+	// labels have when they are moved would help. And this doesn't apply only to the phone, of
+	// course."*). The mechanism is markJustDragged() above and nothing new: one class, one CSS
+	// animation that clears itself, no timer and no object. A node paints differently from a word,
+	// so css/engcalcs.css gives `.lpn-node.lpn-just-dragged` its own keyframes -- a ring rather than
+	// a recolour, because the fill is where the colour ramp lives and a 45-second red dot would be a
+	// pressure reading that is not true.
+	//
+	// THE CIRCLE, for every node type. A reservoir and a tank draw a symbol over an unpainted disc
+	// of the same radius, so the ring lands round the symbol and there is no branch here.
+	//
+	// It is a VIEW fact and never a document one: a class on an element, absent from
+	// serializeProject(), from every undo snapshot and from every scenario. Nothing is written
+	// through setProp() because nothing is written at all.
+	function markNodeMoved(id) {
+		var ne = nodeEls[id];
+		if (ne) { markJustDragged(ne.circle); }
 	}
 	function snapshotDragOnce() {
 		if (drag.snapped) { return; }
@@ -19509,6 +19565,14 @@ var EngCalcs = EngCalcs || {};
 		var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : '';
 	}
 	function unitKey(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].value : null; }
+	// The SYMBOL a person reads, as opposed to the unit's internal name unitKey() returns. Same
+	// option, its other half: the value is 'fth2o' and the text is what $ec_lang['u_fth2o'] says in
+	// the visitor's own language. Falls back to the name, because a label reading '()' is worse
+	// than one reading a machine word.
+	function unitSymbol(name) {
+		var s = unitEl(name), o = s ? s.options[s.selectedIndex] : null;
+		return (o && (o.textContent || o.text)) || unitKey(name) || '';
+	}
 	// The map label's one unit token -- see numLine()'s `suffix` for why the gradient gets one and
 	// nothing else does. Not translated: '%' is the same mark in all 27 languages, including RTL.
 	function gradientSuffix() { return unitKey('lpn_u_gradient') === 'gradePercent' ? '%' : ''; }
@@ -21322,20 +21386,48 @@ var EngCalcs = EngCalcs || {};
 		// engines. Headloss Formula already has its row above, under this suite's own name for it,
 		// Friction method.
 		//
-		// **THE OTHERS ARE CARRIED, EXPORTED AND HONOURED BY EPANET, JUST NOT SHOWN:** Accuracy, If
-		// Unbalanced, Max Head Error, FlowChange, DampLimit, CheckFreq, MaxCheck and Status Report
-		// come in from a file, ride in `settings.hydraulics`, go back out through the exporter
-		// character for character, and reach the EPANET engine when it is the one solving. What
-		// they do NOT have is a control, because:
-		//   Accuracy has no honest place beside Convergence tolerance directly above it -- they are
-		//     two different quantities on two different scales (EPANET's is a relative flow change
-		//     summed over the network; ours is js/lpn-solver.js's own), and two rows a reader
-		//     cannot tell apart is worse than one. **That is a question for Tom, not for us.**
-		//   If Unbalanced, Max Head Error and the four tuning knobs act in EPANET alone, so a
-		//     control for them would do nothing on the page's own default engine.
-		//   Status Report decides what EPANET's `.rpt` holds, and this page has no `.rpt` at all.
-		function hydNumberRow(key, labelKey, fallback, tipKey, dflt) {
-			var input = document.createElement('input');
+		// **AND TOM REVERSED THAT BURDEN OF PROOF ON 2026-08-29:** *"I think that every setting from
+		// EPANET must be added and implemented unless research says otherwise."* So the eight that
+		// were carried-but-controlless are now five rows and three stated exceptions, and the
+		// exceptions are MEASURED rather than asserted:
+		//
+		//   **Status report** -- no row, and this one needs no measurement. It decides what EPANET's
+		//     own `.rpt` holds, and this page has no `.rpt`: nothing in the suite reads it, ever.
+		//     A report-formatting key, carried and exported so an export does not delete it.
+		//   **`Map` and `Hydraulics USE/SAVE` -- no row, and a REAL GAP rather than a decision.**
+		//     Both name a FILE beside the `.inp` (a `.map` of coordinates, a `.hyd` of saved
+		//     hydraulics), so neither is a number a person could type here and neither changes an
+		//     answer. But js/lpn-inp.js reads past them without keeping them, which means an import
+		//     and re-export DELETES a line the source stated -- the input-is-canonical violation
+		//     Task 553 fixed for every other `[OPTIONS]` key and did not fix for these two. Not
+		//     repaired here because the fix belongs in that file's OPTIONS loop, which a concurrent
+		//     track is also editing. It is a carry, not a control.
+		//   **Trials between status checks (CheckFreq)** and **last trial that checks status
+		//     (MaxCheck)** -- no row, because they are measurably not settings a person can decide
+		//     anything with. Measured against the EPANET engine on EPA's own Net3 at Accuracy 1e-9:
+		//     CheckFreq 1, 2 and 100 and MaxCheck 1, 10 and 200 all return heads IDENTICAL TO THE
+		//     LAST BIT at all 92 nodes, and so do all six on a four-pipe loop with a check valve in
+		//     it, the network shape where status checking is supposed to matter most. They steer the
+		//     path to a converged answer, not the answer. The one value that IS visible is 0, which
+		//     EPANET refuses the whole input over. That is a knob whose only reachable effect is a
+		//     refusal, which is CLAUDE.md's emitter-exponent precedent exactly.
+		//     **They are still carried, exported and honoured**, so a file that states them keeps
+		//     them; what they do not get is a box implying a person should have an opinion.
+		//
+		// **THE FIVE THAT DID EARN A ROW ACT IN EPANET AND NOT IN THE BUILT-IN SOLVER, AND THAT IS
+		// NOT A REASON TO HIDE THEM ANY MORE -- IT IS A SENTENCE IN THE TIP.** Measured on the same
+		// four-pipe loop, EPANET answering: `Trials 1` with the last try reported gives 96.214 m at
+		// one junction and with nothing reported gives no answer at all; a tight head-error or
+		// flow-change limit under a deliberately loose Accuracy pulls the answer back from 94.8067
+		// to 94.8063; damping moves Net3's worst head by 3.0e-7 ft. Each one changes an answer, and
+		// each tip names the solver that reads it, because a user who cannot tell which engine
+		// answered cannot tell a dead control from a setting with no effect.
+		//
+		// **AND THE ENGINE HAD TO BE TAUGHT TO NOTICE** -- see signatureOf() in js/lpn-epanet.js.
+		// None of these is pushed through a setter, so before that fix a changed option reached a
+		// REUSED session and did nothing at all, silently, for as long as the network's shape held.
+		function hydNumberRow(key, labelKey, fallback, tipKey, dflt, opt) {
+			var o = opt || {}, input = document.createElement('input');
 			input.type = 'number'; input.step = 'any';
 			// **BLANK MEANS "THE FILE DID NOT SAY", NOT ZERO**, which is the whole sparseness rule
 			// seen from the interface: an empty box exports no line, and typing the default in
@@ -21345,13 +21437,26 @@ var EngCalcs = EngCalcs || {};
 			input.addEventListener('change', function () {
 				var t = input.value.trim();
 				if (t === '') { delete settings.hydraulics[key]; }
-				else if (isFinite(+t) && +t > 0) { settings.hydraulics[key] = +t; }
+				// **ZERO IS A LEGAL VALUE FOR THREE OF THESE AND IS EPANET'S OWN DEFAULT FOR ALL
+				// THREE.** `HeadError 0`, `FlowChange 0` and `DampLimit 0` each mean "do not apply
+				// this test", which is a statement a file can make and a person can want back. The
+				// original >0 guard was right for a multiplier and an exponent and would have made
+				// these three rows unable to express their own default.
+				else if (isFinite(+t) && (o.allowZero ? +t >= 0 : +t > 0)) { settings.hydraulics[key] = +t; }
 				else { input.value = settings.hydraulics[key] === undefined ? '' : String(settings.hydraulics[key]); return; }
 				if (key === 'emitterExponent') { settings.emitterExponent = settings.hydraulics[key] === undefined ? 0.5 : settings.hydraulics[key]; }
 				saveToStorage();
 				scheduleSolve();
 			});
-			row(compBody, pc[labelKey] || fallback, input, pc[tipKey]);
+			// **A UNIT-BEARING LIMIT NAMES ITS UNIT IN THE LABEL.** Head error is a head and flow
+			// change is a flow, so a bare number is ambiguous the moment the project is not in the
+			// units the reader assumed. Read off the unit strip's own selected option, so it cannot
+			// drift from what every other number on the page is being shown in -- and off its TEXT,
+			// which is the translated symbol a person reads, rather than its value, which is the
+			// unit's internal name ('fth2o').
+			var labelText = pc[labelKey] || fallback;
+			if (o.unitOf) { labelText += ' (' + unitSymbol(o.unitOf) + ')'; }
+			row(compBody, labelText, input, pc[tipKey]);
 		}
 		if (!settings.hydraulics) { settings.hydraulics = {}; }
 		hydNumberRow('accuracy', 'lpn_settings_accuracy', 'Accuracy',
@@ -21366,6 +21471,16 @@ var EngCalcs = EngCalcs || {};
 			'lpn_settings_emitter_exponent_tip', 0.5);
 		hydNumberRow('trials', 'lpn_settings_trials', 'Maximum trials',
 			'lpn_settings_trials_tip', 40);
+		// **DIRECTLY UNDER Maximum trials, BECAUSE IT IS THE SENTENCE THAT FINISHES IT.** "Try forty
+		// times" is half a rule; the other half is what happens on the forty-first. Reading them
+		// apart is what made "If Unbalanced" look like a separate obscure knob.
+		settingsUnbalancedRows(compBody, row, hydNumberRow);
+		hydNumberRow('headError', 'lpn_settings_head_error', 'Head error limit',
+			'lpn_settings_head_error_tip', 0, { allowZero: true, unitOf: 'lpn_u_elevhead' });
+		hydNumberRow('flowChange', 'lpn_settings_flow_change', 'Flow change limit',
+			'lpn_settings_flow_change_tip', 0, { allowZero: true, unitOf: 'lpn_u_flow' });
+		hydNumberRow('dampLimit', 'lpn_settings_damp_limit', 'Damping starts at',
+			'lpn_settings_damp_limit_tip', 0, { allowZero: true });
 		// ---- engine choice (ROADMAP Task 243) ----
 		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
 		// and a select would imply the two are peers when the native path is the one this page
@@ -22348,8 +22463,56 @@ var EngCalcs = EngCalcs || {};
 		});
 		return fixed.concat(rest);
 	}
-	// Shared by the row above and by the junction popup's own selector, so the two lists cannot
-	// disagree about what patterns exist or about what the blank one is called.
+	/**
+	 * **WHAT TO DO WITH A NETWORK THAT WILL NOT SETTLE** -- EPANET's `Unbalanced`, in our words
+	 * (Task 553, under Tom's 2026-08-29 ruling). Two rows, because the option is two facts: the
+	 * choice, and the extra trials that only the "report the last try" choice has.
+	 *
+	 * **THE TRIAL-COUNT ROW APPEARS ONLY UNDER THAT CHOICE, AND THE WHOLE BOX IS REBUILT TO DO IT.**
+	 * A count beside "report nothing" is a box that cannot be exported -- `Unbalanced Stop 10` is
+	 * not a line EPANET writes -- and disabling it instead leaves a greyed number stating a value
+	 * the file does not hold. Same rebuild-don't-patch rule the friction-method row states.
+	 *
+	 * **BLANK IS A THIRD STATE AND NOT A SYNONYM FOR EITHER**, exactly as an empty number box is:
+	 * a project that never stated the option exports no line, and the engine bridge's own fallback
+	 * (`Continue 10`) applies. Choosing "report the last try" explicitly is a different file.
+	 */
+	function settingsUnbalancedRows(host, rowFn, numberRow) {
+		var pc = EngCalcs.pageConfig || {}, hyd = settings.hydraulics || {},
+			sel = document.createElement('select');
+		[['', pc.lpn_settings_option_unset || 'Not stated'],
+			['continue', pc.lpn_settings_unbalanced_continue || 'Report the last try'],
+			['stop', pc.lpn_settings_unbalanced_stop || 'Report nothing']
+		].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			if (o[0] === (hyd.unbalanced || '')) { opt.selected = true; }
+			sel.appendChild(opt);
+		});
+		sel.addEventListener('change', function () {
+			if (!settings.hydraulics) { settings.hydraulics = {}; }
+			if (sel.value === '') {
+				delete settings.hydraulics.unbalanced;
+				delete settings.hydraulics.unbalancedTrials;
+			} else {
+				settings.hydraulics.unbalanced = sel.value;
+				// The count belongs to `Continue` alone, so leaving it behind on a switch to `Stop`
+				// would have the document holding a number no writer can put in a file.
+				if (sel.value === 'stop') { delete settings.hydraulics.unbalancedTrials; }
+			}
+			saveToStorage();
+			rebuildSettingsBox();
+			scheduleSolve();
+		});
+		rowFn(host, pc.lpn_settings_unbalanced || 'If it will not settle', sel,
+			pc.lpn_settings_unbalanced_tip);
+		if (hyd.unbalanced === 'continue') {
+			numberRow('unbalancedTrials', 'lpn_settings_unbalanced_trials', 'Extra trials first',
+				'lpn_settings_unbalanced_trials_tip', 10, { allowZero: true });
+		}
+	}
+	// Shared by settingsDefaultPatternRow() above and by the junction popup's own selector, so the
+	// two lists cannot disagree about what patterns exist or about what the blank one is called.
 	function libFillPatternOptions(sel, value) {
 		var pc = EngCalcs.pageConfig || {}, none = document.createElement('option');
 		sel.textContent = '';
@@ -24876,6 +25039,14 @@ var EngCalcs = EngCalcs || {};
 	function undo() {
 		if (undoStack.length === 0) { return; }
 		var snap = undoStack.pop();
+		// **UNDOING A MOVE IS ALSO A MOVE THE USER CANNOT SEE**, and it is the one other place a
+		// junction changes position without the pointer being on it -- so it gets the same mark the
+		// drag gets. Read BEFORE the document is replaced, compared AFTER buildDom() has rebuilt the
+		// elements, because a class put on an element now would be thrown away with that element.
+		// Only ids present on both sides: a node the undo brought back or took away has not MOVED,
+		// and marking a resurrection would say the wrong thing about it.
+		var wasAt = {};
+		doc.nodes.forEach(function (n) { wasAt[n.id] = n.x + ',' + n.y; });
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
 		// **THE FRAME COMES BACK BEFORE ANYTHING READS A COORDINATE** (Task 436). outwardX/outwardY
@@ -24914,6 +25085,9 @@ var EngCalcs = EngCalcs || {};
 			refreshMapStatus();
 		}
 		buildDom();
+		doc.nodes.forEach(function (n) {
+			if (wasAt[n.id] !== undefined && wasAt[n.id] !== n.x + ',' + n.y) { markNodeMoved(n.id); }
+		});
 		updateEmptyHint();
 		refreshScenarioStatus();
 		// **AND THE CAMERA, ONLY THEN.** A view is a point in one frame and means nothing in the
@@ -25083,6 +25257,22 @@ var EngCalcs = EngCalcs || {};
 			return settings.tolerance;
 		}
 		return 1e-9;
+	}
+	/**
+	 * The hydraulic options as an ENGINE wants them: a shallow clone, with the two unit-bearing
+	 * limits converted to SI. Everything else on the list is a ratio, an exponent or a count, and
+	 * is the same number in every unit system.
+	 *
+	 * Pure: it never writes to `settings.hydraulics`, which is the document's own copy and must
+	 * stay in the units the file stated (the `libPatterns()` lesson -- a getter that assigns is a
+	 * writer wearing a reader's name).
+	 */
+	function engineHydraulics(hyd) {
+		var out = {}, k;
+		for (k in hyd) { if (Object.prototype.hasOwnProperty.call(hyd, k)) { out[k] = hyd[k]; } }
+		if (typeof out.headError === 'number') { out.headError = toSI(out.headError, 'lpn_u_elevhead'); }
+		if (typeof out.flowChange === 'number') { out.flowChange = toSI(out.flowChange, 'lpn_u_flow'); }
+		return out;
 	}
 	function docDemandMultiplier() {
 		var m = (settings.hydraulics || {}).demandMultiplier;
@@ -25318,10 +25508,26 @@ var EngCalcs = EngCalcs || {};
 			emitterExponent: settings.emitterExponent,
 			// Carried whole so js/lpn-epanet.js can write the ones only EPANET acts on -- accuracy,
 			// unbalanced, the head-error limit -- without a second copy of the list.
-			hydraulics: hyd,
+			//
+			// **EXCEPT THAT TWO OF THEM CARRY UNITS, AND EVERY OTHER NUMBER ON THIS MODEL IS SI.**
+			// `HeadError` is a head and `FlowChange` is a flow, stated in whatever units the
+			// project is in; js/lpn-epanet.js writes an LPS-and-metres file always. Passed through
+			// raw, a US project's `HeadError 0.001` (feet) reached the engine as a millimetre --
+			// off by 3.28, quietly, in the one term whose whole job is to decide when to stop.
+			// Converted HERE because this is the only place that knows the project's units, and on
+			// a CLONE because `settings.hydraulics` is the document's own copy in the document's
+			// own units, which the exporter must keep character for character.
+			hydraulics: engineHydraulics(hyd),
 			// **THE WATER-QUALITY ANALYSIS THE DOCUMENT ASKS FOR** -- read by js/lpn-epanet.js and
-			// by nothing else, because quality is time-dependent by nature and only a run can
+			// by nothing else, because quality is time-dependent by nature and only a RUN can
 			// produce one. js/lpn-solver.js has no time dimension and is not being given one.
+			//
+			// **NOTHING HERE CARRIES A UNIT, WHICH IS WHY IT IS NOT CLONED AND CONVERTED THE WAY
+			// `hydraulics` DIRECTLY ABOVE NOW IS.** A mode is a keyword and a source is an id; the
+			// one dimensioned quantity in this whole feature is the ANSWER, a water age, and it
+			// crosses from EPANET's hours to seconds inside the bridge with every other result.
+			// Diffusivity and Tolerance are not sent to the engine at all -- they mean something
+			// only to a reacting chemical, which this page carries and does not work out.
 			quality: qualitySetting(),
 			// **THE RULE TEXT, FILTERED TO THE RULES THAT STILL NAME REAL ELEMENTS** (Task 248.03).
 			// **NOTHING WRITES THIS INTO AN ENGINE INPUT TODAY, AND js/lpn-epanet.js SAYS WHY** --

@@ -336,11 +336,14 @@ html[lang="zh"] .ec-welcome {
    The one existing conditional style, .lpn-node-pending's red ring, still overrides stroke below
    and is unaffected -- which is exactly the point: condition still reads, now against nothing. */.lpn-node { fill: #000; stroke: none; cursor: pointer; }
 /* A reservoir now draws as a tank symbol, not this circle (ROADMAP Task 146.10) -- fill:none/
-   stroke:none hides the circle itself; pointer-events:all keeps its full disc clickable/draggable
-   anyway (data-node, drag, hit-testing all still read THIS element, unchanged), same trick used
-   for any invisible-but-clickable hit target. `.lpn-node-pending`'s ring below still overrides
-   stroke, so the pending-link indicator still shows on a reservoir mid-pipe-draw. */
-.lpn-node-reservoir, .lpn-node-tank { fill: none; stroke: none; pointer-events: all; }
+   stroke:none hides the circle itself; `pointer-events: visible` keeps its full disc
+   clickable/draggable anyway (data-node, drag, hit-testing all still read THIS element, unchanged),
+   same trick used for any UNPAINTED-but-clickable hit target. `.lpn-node-pending`'s ring below still
+   overrides stroke, so the pending-link indicator still shows on a reservoir mid-pipe-draw.
+   `visible`, not `all`: unpainted is not the same as invisible -- what the user sees here is the
+   tank symbol drawn over this disc -- and `all` would also make the disc grabbable if anything ever
+   set `visibility: hidden` on it. See the note on `.lpn-draglbl` for the defect that produced. */
+.lpn-node-reservoir, .lpn-node-tank { fill: none; stroke: none; pointer-events: visible; }
 /* The tank/pump overlay symbols themselves (looped-network.js buildMapIconSvg()) -- purely
    visual, never a click target; the interactive element is always the plain node circle or link
    polyline underneath. `color` is the currentColor the icon paths read for both stroke and the
@@ -452,8 +455,13 @@ html[lang="zh"] .ec-welcome {
 
    `visibility`, not `display`: a leader and an arrow each have their own show/hide logic and this
    must compose with them rather than overwrite them -- something already hidden for its own reasons
-   stays hidden, and something visible is merely made invisible. visibility:hidden also drops
-   pointer events, so nothing suppressed here is still clickable.
+   stays hidden, and something visible is merely made invisible.
+
+   **AND visibility:hidden ONLY DROPS POINTER EVENTS IF THE ELEMENT ASKED IT TO.** This paragraph
+   used to end "so nothing suppressed here is still clickable", and that was false for two years'
+   worth of SVG: `pointer-events` has two families, and the four names without a `visible` prefix
+   (`painted`, `fill`, `stroke`, `all`) hit-test the element REGARDLESS of its visibility. See
+   `.lpn-draglbl` below, which wore `all`.
 
    ONE CLASS, DECLARED AT THE BUILD SITE (Task 334, 2026-08-15). This used to be a list of four
    selectors naming each kind of annotation, and the extrema badge was missed out of it -- Tom
@@ -594,8 +602,52 @@ html[lang="zh"] .ec-welcome {
 	16%  { fill: #d40000; animation-timing-function: linear; }
 	100% { fill: #000; }
 }
+/* **THE SAME MARK, ON A NODE THAT MOVED** (Tom, 2026-09-01: *"we have no way of knowing when a
+   junction moves. Some sort of a fading highlight like the labels have when they are moved would
+   help. And this doesn't apply only to the phone, of course."*). ONE mechanism -- the same class,
+   written by the same markJustDragged() -- with a second painting, because a dot is not a word.
+
+   NOT `fill`, which is the label version's property and is wrong here twice over: the fill is where
+   the colour ramp paints (paintNodeColor() writes it inline), so a 45-second red dot would be a
+   pressure reading that is not true, and a reservoir's and a tank's own disc is `fill: none` with
+   the symbol drawn over it, so a fill change would show nothing at all. A ring is what every other
+   per-node condition on this map already draws -- selection, fire flow, an override, a pending link
+   -- and it composes with the ramp instead of overwriting it.
+
+   EVERY DECLARATION IS IN THE KEYFRAMES, NOTHING IN THE RULE, and that is deliberate: nothing ever
+   removes the class, so a width or a paint-order declared in the rule would stay on the node for
+   ever -- and it would then be the SELECTION ring, months later, that looked wrong. An animated
+   property reverts the moment the animation ends. Same reason the label version has no `forwards`.
+
+   `paint-order: stroke fill` is what makes it a HALO instead of a blot: a stroke is centred on the
+   circle's edge, so half of a wide one is drawn over the dot. Painting the stroke first and the fill
+   over it leaves only the outer half showing, and the node keeps its own colour -- the colour ramp,
+   a reservoir's symbol, all of it -- while a red ring stands off it. `.lpn-lbl` uses the same
+   property for the same reason, one paragraph up.
+
+   3x, where every other ring on this map is 0.5x. Those say "this is selected", "this failed";
+   this one has to be seen by somebody whose finger was ON it a second ago -- Tom, the same day:
+   *"the blindness of tapping on a phone is dire."* A junction is drawn at radius 0.9, so a 3-wide
+   ring stands 1.5 clear of it: about three times the dot, which is the point. `--lpn-sym` for the
+   reason `.lpn-selected` uses it -- this map's user units are metres in one project and DEGREES in
+   another, so a bare 3 is a mark bigger than the screen on a lat/lon map.
+
+   Fading to a TRANSPARENT red rather than to black: the ring has to end at nothing, or the last
+   frame of the fade would be a black ring that then vanishes when the animation lets go. */
+.lpn-node.lpn-just-dragged { animation-name: lpn-just-moved-node; }
+@keyframes lpn-just-moved-node {
+	0%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
+	4%   { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
+	8%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
+	12%  { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
+	16%  { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; animation-timing-function: linear; }
+	100% { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
+}
+/* BOTH of them, and the node one by name: `.lpn-node.lpn-just-dragged` above outranks the shorthand
+   reset below, so a reader who honours prefers-reduced-motion would still get the blinking ring. */
 @media (prefers-reduced-motion: reduce) {
 	.lpn-just-dragged { animation: none; }
+	.lpn-node.lpn-just-dragged { animation: none; }
 }
 /* The "you are in the middle of placing the background image" bar (ROADMAP Task 145 follow-up, Tom
    2026-08-16). Fixed to the bottom of the viewport rather than placed near the canvas: while a
@@ -611,7 +663,25 @@ html[lang="zh"] .ec-welcome {
 }
 .lpn-regmode-bar button { font: inherit; padding: 0.15em 0.7em; cursor: pointer; }
 @media print { .lpn-regmode-bar { display: none; } }
-.lpn-draglbl { cursor: move; pointer-events: all; }
+/* **A THING THE USER CANNOT SEE CANNOT BE GRABBED**, and this one keyword is what makes invisibility
+   and un-grabbability the same fact instead of two facts that can disagree (Tom, 2026-09-01: *"a
+   node label is present but not (yet?) visible, and when I go to pan, the label that I did not see
+   drags off the screen."*).
+
+   This rule said `pointer-events: all` and that is the whole defect. SVG's `pointer-events` has two
+   families: `visiblePainted`/`visibleFill`/`visibleStroke`/`visible` require `visibility: visible`,
+   while `painted`/`fill`/`stroke`/`all` deliberately IGNORE visibility. Four separate mechanisms
+   hide a label -- `.lpn-labels-hidden` (thematic colouring and the georeferencing wizard),
+   `.lpn-lbl-hidden` (a Text not in this scenario), `setLabelAssemblyHidden()`'s inline style (a node
+   label dropped by the collision pass, a link label too short, crowded out or yielded) -- and every
+   one of them left a fully grabbable, completely unpainted word lying on the map. MEASURED in
+   Chromium: 100% of a hidden label's box still answered `elementsFromPoint()` under `all`, 0% under
+   `visible`, and a SHOWN label's grabbable area is identical either way, so nothing is harder to
+   pick up than it was.
+
+   `visible` rather than `visiblePainted` because the two are not the same promise: `visiblePainted`
+   would also drop the gaps between the glyphs, and a finger is not aimed at the inside of an "8". */
+.lpn-draglbl { cursor: move; pointer-events: visible; }
 /* Masking is switchable (Task 330, Tom 2026-08-14: "We want to be able to turn off and on
    background masking"). One class on the <svg>, written by applyMaskLabels() from the PROJECT's own
    setting -- masking is a property of how the sheet is meant to be read, not of the browser, so per
