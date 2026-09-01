@@ -20,7 +20,7 @@ const fs = require('fs');
 const path = require('path');
 const { REPO, startServer, stopServer, launchBrowser, clearLockRecords } = require('./lib/env');
 
-const SPECS = ['boot', 'menu', 'files', 'reload', 'locking', 'missing', 'fallback', 'degrade', 'saveas', 'find', 'boxes', 'geo', 'basemap', 'units', 'color', 'profile', 'place', 'goto', 'gallery', 'cleanmap', 'noscroll', 'labelcols', 'share', 'geohit', 'toolbar', 'visibility', 'perf', 'time', 'search', 'setbox', 'crossproject', 'pane', 'library', 'projectmenu', 'tabcolumn', 'smallscreen', 'mtcbuttons', 'phonemenu'];
+const SPECS = ['boot', 'menu', 'files', 'reload', 'locking', 'missing', 'fallback', 'degrade', 'saveas', 'find', 'boxes', 'geo', 'basemap', 'units', 'color', 'profile', 'place', 'goto', 'gallery', 'cleanmap', 'noscroll', 'labelcols', 'share', 'geohit', 'toolbar', 'visibility', 'perf', 'time', 'search', 'setbox', 'crossproject', 'pane', 'library', 'projectmenu', 'tabcolumn', 'smallscreen', 'mtcbuttons', 'phonemenu', 'hiddenlbl'];
 
 // **A SPEC FILE THAT IS NOT IN THE LIST ABOVE NEVER RUNS, AND NOTHING SAID SO** (Task 322). The
 // order of SPECS is the run order and is worth keeping by hand, but a typed list is a second place

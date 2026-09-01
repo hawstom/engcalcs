@@ -487,18 +487,20 @@ global.document = {
   // The pointerUP handlers hit-test with this rather than trusting e.target (a real tap moves a few
   // pixels between down and up). Tests set `hitTarget` to whatever they are pretending is under the
   // pointer; null means bare canvas, which is what a pan or an empty-space click lands on.
-  elementFromPoint: () => hitTarget,
-  // **THE PLURAL CALL HAS TO KEEP THE STUB'S ONE PHYSICAL CLAIM: exactly one thing is under the
-  // pointer.** mapHitAt() walks elementsFromPoint() so that a bogus hit can be rejected without
-  // taking the real element under it away too (see hitConfirmed()); the stub's model of a pointer is
-  // still "hitTarget, or bare canvas", so the stack is that one element or nothing. Answering with a
-  // longer list would invent a layering no test has asked for.
-  elementsFromPoint: () => (hitTarget ? [hitTarget] : []),
+  elementFromPoint: () => hitStack[0] || null,
+  // **THE PLURAL CALL ANSWERS WITH A STACK, BECAUSE ON THIS MAP THERE REALLY IS ONE.** mapHitAt()
+  // walks elementsFromPoint() so that a bogus hit can be rejected without taking the real element
+  // under it away too (see hitConfirmed()), and a node's own data label is drawn OVER the node --
+  // the ordinary case, not a corner, and the reason that walk is plural in the first place. This
+  // used to answer `[hitTarget]` and nothing else, which held the second element constant at
+  // "absent": the whole question of whether rejecting the top of the stack reaches the thing beneath
+  // it was unaskable. setHitTarget() still takes one element and means a stack of one.
+  elementsFromPoint: () => hitStack.slice(),
   body: mkEl('body'),
   documentElement: mkEl('html'),
   title: ''   // Task 265 writes here; a stub without it would let document.title = ... pass unseen
 };
-let hitTarget = null;
+let hitStack = [];
 const store = {};
 global.localStorage = {
   getItem: k => (k in store ? store[k] : null),
@@ -700,7 +702,13 @@ async function settleEpanet() {
 // real tap moves a few pixels between down and up). A test sets this to whatever it is pretending
 // is under the pointer; null means bare canvas.
 function setHitTarget(el) {
-	hitTarget = el;
+	// One element, or a STACK given topmost-first. A stack is how a harness says what mapHitAt()'s
+	// plural walk exists for: a node's own label lying over the node it belongs to.
+	hitStack = el ? (Array.isArray(el) ? el.slice() : [el]) : [];
+	hitStack.forEach(fillHitFacts);
+	patchHitContains();
+}
+function fillHitFacts(el) {
 	if (!el) { return; }
 	// **WHAT IS UNDER THE POINTER IS ON THE CANVAS AND HAS A BOX.** Both are part of the sentence a
 	// harness writes when it sets a hit target, and mapHitAt() reads both -- it confirms a hit
@@ -712,11 +720,13 @@ function setHitTarget(el) {
 	if (!el.getBoundingClientRect) {
 		el.getBoundingClientRect = () => ({ left: 0, top: 0, right: 1000, bottom: 500, width: 1000, height: 500 });
 	}
+}
+function patchHitContains() {
 	const canvas = byId.lpn_canvas;
 	if (canvas && !canvas._hitContainsPatched) {
 		const real = canvas.contains.bind(canvas);
 		canvas._hitContainsPatched = true;
-		canvas.contains = n => (!!n && n === hitTarget) || real(n);
+		canvas.contains = n => (!!n && hitStack.indexOf(n) >= 0) || real(n);
 	}
 }
 
