@@ -1092,6 +1092,28 @@ the block.
     guard a finger never sees.
 
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
+  - **TWO MORE LANDED 2026-09-01 — rows 21 and 26 — and THE ENFORCED COUNT IS 57, not 34.** The
+    survey's own table was the stale thing: rows 10, 15, 17, 18 and 20 had shipped on 2026-08-29 and
+    still read as "reachable and not yet enforced". Each was re-read against its script before being
+    marked; three enforce MORE than their row claimed. What is left is four rows (13, 14, 22, 23),
+    and every one states in its own text why it cannot be a blocking `check_all.sh` entry — two are
+    advisory at best, two are git hooks, which `check_all.sh` runs before a commit message exists.
+    **So the reachable-and-unreached column is effectively empty**, which retires half of what this
+    task was.
+  - **ROW 26 IS THE ONE TO READ, because reading the RENDERER bought a blind spot.** The row's
+    stated risk was that "which strings are verdicts has to be inferred from the key name". It need
+    not be: a verdict is what `EngCalcs.writeCheckHTML()` renders as one, which yields 32 keys and
+    864 values across 27 files with nothing chosen by name. **But that seam works because the
+    renderer supplies the glyph — so for a verdict built BY HAND the glyph is part of the translated
+    value and can simply be deleted, and all three original legs reason about a glyph that is
+    present.** Found by mutation, not by reading: `'✓ Understood'` → `'OK: Understood'` removed the
+    glyph AND added a marker word, and the check said OK. Leg 4 holds the three declared hand-built
+    keys, and the declaration is itself guarded — its first draft named `lpn_library_control_warn`,
+    which does not exist, and reported OK while guarding nothing.
+  - **Row 21 (`calculator_page_check.php`) found nothing on today's tree** — 16 calculators, 16
+    documented prefixes, the same 16 — and that is the honest result for a rule nobody had broken.
+    It holds four things beyond the row: menu `title=` key ≡ page `$html_desc` key, no duplicate
+    prefix, no dead menu link, no unclaimed documented prefix.
   - **SIX MORE LANDED THE SAME DAY — rows 3c, 3d, 11, 12, 16 and 19 — and ROW 12 IS THE ONE TO READ.**
     `storage_inventory_check.php` found **two things on visitors' devices that the inventory whose
     only claim is completeness did not list**: `bpn_sketch_toggles` (`localStorage`, which of five
