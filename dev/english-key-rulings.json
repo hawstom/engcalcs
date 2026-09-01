@@ -13,6 +13,266 @@
    "on": "Remove this demand",
    "ruled": "2026-08-29"
   },
+  "lpn_elev_dem_none": {
+   "on": "The DEM gave no height for this node.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_elev_dem_said": {
+   "on": "Mapbox DEM says {v} {u}.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_elev_dem_sample": {
+   "on": "Sample DEM",
+   "ruled": "2026-09-01"
+  },
+  "lpn_elev_dem_sample_tip": {
+   "on": "Reads the elevation of the DEM at this node and shows it below for review before changing the current entry. The horizontal DEM resolution is about 30 m for most of the Earth, and finer where better data exists.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_elev_dem_use": {
+   "on": "Use DEM",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_accounting": {
+   "on": "Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral, and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_affect_link": {
+   "on": "{id} at {velocity}",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_affect_node": {
+   "on": "{id} down to {pressure}",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_atleast": {
+   "on": "over {flow}",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_calculate": {
+   "on": "Run",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_col_affected": {
+   "on": "Drawdowns",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_col_atrequired": {
+   "on": "Pressure at required",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_col_available": {
+   "on": "Available flow",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_col_required": {
+   "on": "Required flow",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_col_residual": {
+   "on": "Residual held",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_design": {
+   "on": "Effect on the rest of the system",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_design_all": {
+   "on": "Every other junction and every pipe",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_design_nodes": {
+   "on": "Every other junction",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_design_none": {
+   "on": "Nothing in the chosen set was drawn down by any junction tested.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_design_off": {
+   "on": "Do not check",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_design_off_note": {
+   "on": "The effect on the rest of the system was not checked in this run.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_design_tip": {
+   "on": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_engine_cost": {
+   "on": "Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_engine_epanet": {
+   "on": "This is worked out with the EPANET engine.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_engine_native": {
+   "on": "This is worked out with the built-in solver.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_err_at_rest": {
+   "on": "Already below the residual with nothing drawn",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_err_converge": {
+   "on": "The network did not converge.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_err_not_junction": {
+   "on": "Not a junction",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_err_unknown": {
+   "on": "No answer, and the reason given is {id}",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_intro": {
+   "on": "Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_iso": {
+   "on": "ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_limit_both": {
+   "on": "Pressure and velocity",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_limit_pressure": {
+   "on": "Pressure",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_limit_velocity": {
+   "on": "Velocity",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_maxvelocity": {
+   "on": "Highest velocity allowed",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_maxvelocity_tip": {
+   "on": "A pipe running above this while a fire flow is drawn is reported as a design issue.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_menu": {
+   "on": "Fire flow…",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_menu_tip": {
+   "on": "Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there create unacceptable drawdown anywhere else?",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_minpressure": {
+   "on": "Lowest pressure allowed elsewhere",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_minpressure_tip": {
+   "on": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_more": {
+   "on": "and {n} more",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_no_junctions": {
+   "on": "This project has no junctions yet, so there is nothing to test.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_no_selection": {
+   "on": "No junction is selected. Choose one on the map, or test every junction.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_report_all": {
+   "on": "Every junction tested",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_required": {
+   "on": "Required fire flow",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_required_tip": {
+   "on": "The flow required by your code or your fire authority at a hydrant. One junction at a time is tested against this same number.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_residual": {
+   "on": "Residual pressure to hold",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_residual_tip": {
+   "on": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_run_title": {
+   "on": "Fire flow run",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_scope": {
+   "on": "Junctions to test",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_scope_all": {
+   "on": "Every junction",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_scope_selected": {
+   "on": "The selected junction only",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_scope_tip": {
+   "on": "Choose the set before you run. Testing every junction in a large system can take minutes.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_stale": {
+   "on": "The drawing changed, so the fire flow results were cleared. Run it again.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_state_design": {
+   "on": "Design issue",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_state_error": {
+   "on": "No answer",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_state_fail": {
+   "on": "Failing",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_state_pass": {
+   "on": "Passing",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_steady": {
+   "on": "Only the current time step is tested. Fire flow is normally added to maximum day demand.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_stop": {
+   "on": "Stop",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_stopped": {
+   "on": "Stopped after {done} of {total} junctions. What is below is what had already been worked out.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_summary": {
+   "on": "{pass} passing, {fail} failing, {design} with a design issue.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_summary_error": {
+   "on": "{n} could not be answered.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_title": {
+   "on": "Fire flow",
+   "ruled": "2026-09-01"
+  },
+  "lpn_ff_working": {
+   "on": "Working: {done} of {total} junctions.",
+   "ruled": "2026-09-01"
+  },
   "lpn_field_base_demand": {
    "on": "Base demand",
    "ruled": "2026-08-29"
@@ -45,13 +305,25 @@
    "on": "No open links at node",
    "ruled": "2026-08-29"
   },
+  "lpn_find_conn_noopensource": {
+   "on": "No open path to a source",
+   "ruled": "2026-09-01"
+  },
   "lpn_find_conn_unlinked": {
    "on": "No links at node",
    "ruled": "2026-08-29"
   },
+  "lpn_find_op_conn_nolinksource": {
+   "on": "no link path to a source",
+   "ruled": "2026-09-01"
+  },
   "lpn_find_op_conn_noopen": {
    "on": "no open links at node",
    "ruled": "2026-08-29"
+  },
+  "lpn_find_op_conn_noopensource": {
+   "on": "no open path to a source",
+   "ruled": "2026-09-01"
   },
   "lpn_find_op_conn_unlinked": {
    "on": "no links at node",
@@ -66,8 +338,8 @@
    "ruled": "2026-08-29"
   },
   "lpn_find_q_aside": {
-   "on": "These controls cannot write the query below, so they are set aside rather than saying something untrue.",
-   "ruled": "2026-08-29"
+   "on": "These controls cannot write the query below, so they are hidden.",
+   "ruled": "2026-09-01"
   },
   "lpn_find_q_err_close": {
    "on": "This bracket ( was opened and never closed.",
@@ -165,9 +437,21 @@
    "on": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
    "ruled": "2026-08-29"
   },
+  "lpn_inp_drop_energy": {
+   "on": "This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_inp_drop_report": {
+   "on": "This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.",
+   "ruled": "2026-09-01"
+  },
   "lpn_inp_drop_rules": {
    "on": "This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.",
    "ruled": "2026-08-29"
+  },
+  "lpn_inp_drop_sections": {
+   "on": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
+   "ruled": "2026-09-01"
   },
   "lpn_menu_map": {
    "on": "Map",
@@ -178,8 +462,8 @@
    "ruled": "2026-08-29"
   },
   "lpn_new_coords_geo": {
-   "on": "lat/lon, on the Earth",
-   "ruled": "2026-08-29"
+   "on": "lat/lon",
+   "ruled": "2026-09-01"
   },
   "lpn_new_coords_tip": {
    "on": "An xy project is a model on any coordinates other than lat/lon. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File > Import xy to lat/lon.",
@@ -265,9 +549,33 @@
    "on": "Saved paths",
    "ruled": "2026-08-29"
   },
+  "lpn_quality_age": {
+   "on": "Water age",
+   "ruled": "2026-09-01"
+  },
+  "lpn_quality_chemical": {
+   "on": "A chemical this file names (kept, not worked out)",
+   "ruled": "2026-09-01"
+  },
+  "lpn_quality_needs_run": {
+   "on": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_quality_none": {
+   "on": "Nothing",
+   "ruled": "2026-09-01"
+  },
+  "lpn_quality_trace": {
+   "on": "Source share",
+   "ruled": "2026-09-01"
+  },
   "lpn_replace_asked": {
    "on": "Asked for {n}. The answer is on its way.",
    "ruled": "2026-08-29"
+  },
+  "lpn_replace_q_bad": {
+   "on": "This query cannot be read, so there is nothing to change. Fix it above first.",
+   "ruled": "2026-09-01"
   },
   "lpn_replace_source": {
    "on": "New value from",
@@ -277,6 +585,22 @@
    "on": "The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
    "ruled": "2026-08-29"
   },
+  "lpn_result_source_share": {
+   "on": "Source share",
+   "ruled": "2026-09-01"
+  },
+  "lpn_result_source_share_tip": {
+   "on": "Of the water reaching this point, the share that came from the source you chose.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_result_water_age": {
+   "on": "Water age",
+   "ruled": "2026-09-01"
+  },
+  "lpn_result_water_age_tip": {
+   "on": "How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.",
+   "ruled": "2026-09-01"
+  },
   "lpn_scenario_mark_tip": {
    "on": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
    "ruled": "2026-08-29"
@@ -284,6 +608,18 @@
   "lpn_scenario_overrides_tip": {
    "on": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
    "ruled": "2026-08-29"
+  },
+  "lpn_settings_accuracy": {
+   "on": "Accuracy",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_damp_limit": {
+   "on": "Damping starts at",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_damp_limit_tip": {
+   "on": "The accuracy at which the solver begins taking smaller steps, which can settle a network that is swinging back and forth. Zero, the usual value, means it never does. Only the EPANET solver reads this box.",
+   "ruled": "2026-09-01"
   },
   "lpn_settings_demand_multiplier": {
    "on": "Demand multiplier",
@@ -313,6 +649,18 @@
    "on": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
    "ruled": "2026-08-29"
   },
+  "lpn_settings_flow_change_tip": {
+   "on": "An additional test the solver must pass before it stops: the maximum change in any one pipe's flow from one try to the next. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_head_error": {
+   "on": "Head error limit",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_head_error_tip": {
+   "on": "An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.",
+   "ruled": "2026-09-01"
+  },
   "lpn_settings_leader_snap": {
    "on": "Snap leader lines to angle",
    "ruled": "2026-08-29"
@@ -324,6 +672,30 @@
   "lpn_settings_legend_off": {
    "on": "Off",
    "ruled": "2026-08-29"
+  },
+  "lpn_settings_option_unset": {
+   "on": "Not stated",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_quality": {
+   "on": "Water quality",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_quality_source": {
+   "on": "Water from",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_quality_source_tip": {
+   "on": "The point whose water is followed. Every other point then shows the share of its water that came from here.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_quality_track": {
+   "on": "Track",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_quality_track_tip": {
+   "on": "Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
+   "ruled": "2026-09-01"
   },
   "lpn_settings_specific_gravity": {
    "on": "Specific gravity",
@@ -340,6 +712,30 @@
   "lpn_settings_trials_tip": {
    "on": "How many times the solver may try before it gives up on a network that will not settle.",
    "ruled": "2026-08-29"
+  },
+  "lpn_settings_unbalanced": {
+   "on": "If it will not settle",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_unbalanced_continue": {
+   "on": "Keep trying",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_unbalanced_stop": {
+   "on": "Stop there",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_unbalanced_tip": {
+   "on": "What to do with a network that has used up its trials and still has not settled. Keeping on allows the extra trials below, which often settles it; stopping reports the last try as it stands, which is close but not solved. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as unsettled.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_unbalanced_trials": {
+   "on": "Extra trials first",
+   "ruled": "2026-09-01"
+  },
+  "lpn_settings_unbalanced_trials_tip": {
+   "on": "How many further trials to allow after the maximum above is used up, before the last try is reported. Only the EPANET solver reads this box.",
+   "ruled": "2026-09-01"
   },
   "lpn_settings_viscosity": {
    "on": "Relative viscosity",
@@ -368,6 +764,14 @@
   "lpn_terrain_will_ids": {
    "on": "These are the nodes that will be filled in: {ids}",
    "ruled": "2026-08-29"
+  },
+  "u_day": {
+   "on": "day",
+   "ruled": "2026-09-01"
+  },
+  "u_hr": {
+   "on": "hr",
+   "ruled": "2026-09-01"
   }
  }
 }
