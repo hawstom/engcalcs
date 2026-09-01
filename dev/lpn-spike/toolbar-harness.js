@@ -31,7 +31,7 @@ const { setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, addNode: addNode, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\tnearest: nearestNodeNearScreen, nearestLabel: nearestLabelNearScreen,\n" +
-	"\t\tsnapPx: function () { return NODE_SNAP_PX; }, addText: addText,\n" +
+	"\t\tsnapPx: function () { return POINTER_REACH_PX; }, addText: addText,\n" +
 	"\t\tsetZoom: function (s) { state.s = s; },\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h;\n" +
 	"\t\t\tsvg.getBoundingClientRect = function () { return { left: 0, top: 0, right: w, bottom: h, width: w, height: h }; }; },\n" +

@@ -1,5 +1,12 @@
-// A FINGER GETS A BIGGER TAP RADIUS THAN A POINTER -- ROADMAP Task 417. Run with:
+// ONE REACH FOR EVERY OBJECT, AND A NODE ALWAYS WINS -- ROADMAP Tasks 417 and 562. Run with:
 //   node dev/lpn-spike/touch-radius-harness.js
+//
+// **SECTION 0 IS TASK 562's WHOLE POINT AND IS THE REASON THIS FILE IS NOT A LIST OF NUMBERS.**
+// Tom, 2026-09-01: *"Match nodes so that we have fewer numbers... There is no reason why the number
+// can't apply across the board to labels and pipes also. But note that nodes need to get precedence
+// always, because they are hardest to aim at."* So the assertions are (a) there is ONE finger
+// number and every object's grab is measured with it, read out of the source rather than out of a
+// stub, and (b) a node beats a link at a point where the link used to win outright.
 //
 // Tom, 2026-08-25: *"417 phone radius needs to be larger more forgiving for the switch-to-edit-mode
 // decision on tapping an asset (I assume any asset, not just a new asset)."* The parenthesis is the
@@ -38,12 +45,15 @@ const { ROOT, byId, loadLoopedNetwork, setUnitSet, setHitTarget } = require('./l
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\taddNode: addNode, addLink: addLink, buildDom: buildDom,\n" +
-	"\t\tpointerSlop: function () { return NODE_SNAP_PX; },\n" +
-	"\t\ttouchSlop: function () { return NODE_SNAP_TOUCH_PX; },\n" +
-	"\t\tslopFor: tapSlopPx,\n" +
+	"\t\tpointerSlop: function () { return POINTER_REACH_PX; },\n" +
+	"\t\ttouchSlop: function () { return TOUCH_REACH_PX; },\n" +
+	"\t\tslopFor: reachPx,\n" +
 	"\t\ttouchAssetNear: touchAssetNear,\n" +
-	"\t\tgrabSlop: function () { return NODE_GRAB_TOUCH_PX; },\n" +
-	"\t\ttouchNodeGrabNear: touchNodeGrabNear,\n" +
+	"\t\ttouchNodeOver: touchNodeOver,\n" +
+	"\t\tnodeOutranks: nodeOutranks,\n" +
+	"\t\thitAt: mapHitAt,\n" +
+	"\t\tnodeCircle: function (id) { return nodeEls[id].circle; },\n" +
+	"\t\tlinkLine: function (id) { return linkEls[id].line; },\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode,\n" +
 	// **THE FRAME, NOT applyDrag().** This used to be `if (drag) { applyDrag(); }`, which is a stub
 	// that removes a coupling: the page never calls applyDrag() on a pointermove -- tick() calls it
@@ -55,6 +65,7 @@ const L = loadLoopedNetwork(
 	"\t\tpopupIsOpen: function () { return !!currentPopup; },\n" +
 	"\t\tpopupBox: function () { return document.getElementById('lpn_popup'); },\n" +
 	"\t\tclosePopup: closePopup,\n" +
+	"\t\tdropPendingPopup: function () { if (pendingLinkPopupTimer) { clearTimeout(pendingLinkPopupTimer); pendingLinkPopupTimer = null; } },\n" +
 	"\t\tselectedRef: selectedRef,\n" +
 	"\t\tdragNow: function () { return drag ? { type: drag.type, id: drag.id } : null; },\n" +
 	"\t\tnearNode: nearestNodeNearScreen,\n" +
@@ -74,6 +85,52 @@ let fails = 0;
 function ok(name, cond, extra) {
 	console.log((cond ? '  ok   ' : '  FAIL ') + name + (extra === undefined ? '' : '   ' + extra));
 	if (!cond) { fails++; }
+}
+
+// ---------------------------------------------------------------------------
+// 0. ONE KNOB (Task 562). Read out of the SOURCE, not out of the stub: the
+//    claim is about how many numbers exist in the file, and an export can only
+//    ever show what somebody chose to export. A stub cannot see a fourth
+//    constant somebody adds next year; a grep can.
+// ---------------------------------------------------------------------------
+console.log('\n--- one number for a finger, one for a pointer, and no others ---');
+{
+	const fs = require('fs');
+	const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+	// Every declaration of a screen-pixel REACH. TAP_MOVE_* is a travel, not a distance from a
+	// thing, and HIT_SLOP_PX is a rasterising guard a finger never sees -- both are deliberately
+	// out of this family and both say so at their own declaration.
+	const decls = (src.match(/^\tvar [A-Z_]*REACH[A-Z_]*_PX = \d+;$/gm) || []);
+	ok('there are exactly TWO reach constants in the whole file, one per hand',
+		decls.length === 2, JSON.stringify(decls));
+	ok('...the finger\'s, which is THE knob', /var TOUCH_REACH_PX = 24;/.test(src));
+	ok('...and the pointer\'s, which CLAUDE.md keeps out of the phone\'s reach',
+		/var POINTER_REACH_PX = 14;/.test(src));
+	// The contradiction the review found: a path handle grabbed at the finger's 24 against the same
+	// pan rival that had forced node grabs down to 14. It cannot come back, because a handle now
+	// reads the one accessor every other object reads.
+	ok('a path handle is grabbed at the one knob, like everything else',
+		/profileHandleDown\(e\.clientX, e\.clientY, reachPx\(e\)\)/.test(src));
+	// Nothing may reach for a number of its own. Every screen-pixel tolerance passed to one of the
+	// three nearest*NearScreen() finders is reachPx(e) or one of the two constants.
+	const args = (src.match(/nearest(?:Node|Label|Link)NearScreen\(.*$/gm) || [])
+		.map(function (c) {
+			c = c.slice(c.indexOf('(') + 1);
+			// the third argument, up to the call's own closing paren
+			var parts = c.split(','), rest = parts.slice(2).join(',').trim(), depth = 0, i;
+			for (i = 0; i < rest.length; i++) {
+				if (rest[i] === '(') { depth++; }
+				else if (rest[i] === ')') { if (!depth) { break; } depth--; }
+			}
+			return rest.slice(0, i).trim();
+		})
+		.filter(function (a) { return a && !/^(reachPx\(e\)|TOUCH_REACH_PX|POINTER_REACH_PX|pxTolerance|slop \|\| POINTER_REACH_PX)$/.test(a); });
+	ok('no finder is handed a tolerance of its own invention', args.length === 0,
+		JSON.stringify(args));
+	// HIT_SLOP_PX stays, and stays OUT. Task 562 says so in the roadmap; the declaration has to say
+	// so too, or the next reader counts it as a fifth touch number the way this review did.
+	ok('HIT_SLOP_PX is still 2 and is declared NOT to be one of the touch numbers',
+		/var HIT_SLOP_PX = 2;/.test(src) && /not one of the touch numbers/i.test(src));
 }
 
 // ---------------------------------------------------------------------------
@@ -165,9 +222,6 @@ console.log('\n--- "any asset, not just a new asset" ---');
 // ---------------------------------------------------------------------------
 console.log('\n--- a press, not a tap: grabbing a node with a finger ---');
 {
-	ok('the grab radius is smaller than the tap radius', L.grabSlop() < L.touchSlop(),
-		L.grabSlop() + ' < ' + L.touchSlop());
-
 	byId.lpn_toolbar.querySelectorAll = function () { return []; };
 	L.seedDefaultInputs();
 	const doc = L.getDoc();
@@ -215,12 +269,16 @@ console.log('\n--- a press, not a tap: grabbing a node with a finger ---');
 		!!byMouse && byMouse.type === 'pan', byMouse && byMouse.type);
 	release(at.x + 12, at.y);
 
-	// **A PAN INSIDE THE TAP RADIUS BUT OUTSIDE THE GRAB RADIUS STILL PANS.** This is the price of
-	// the two numbers being different and it is the assertion that records it: 20px from a junction
-	// a TAP opens that junction (section 3) and a PRESS pans.
+	// The drag above left the junction at 250. Put it back, or the next press measures its distance
+	// from somewhere the reader is not looking -- the harness bug this comment exists to have caught.
+	doc.nodes.filter(function (n) { return n.id === a; })[0].x = 200;
+	// **AND 20 px AWAY IT GRABS TOO, WHICH IS THE CHANGE TASK 562 MADE.** Until then a press 20 px
+	// from a junction panned while a TAP at the same point opened that junction -- one number for
+	// the tap and a stingier one for the grab. There is now ONE number, so the two answers agree.
 	const between = press('touch', at.x + 20, at.y);
-	ok('a finger pressing 20px away -- inside the tap radius, outside the grab -- PANS',
-		!!between && between.type === 'pan', between && between.type);
+	ok('a finger pressing 20px away grabs the node, exactly as a tap 20px away opens it',
+		!!between && between.type === 'node' && between.id === a,
+		between && (between.type + ' ' + between.id));
 	release(at.x + 20, at.y);
 
 	// And out in the open, nothing has changed at all: panning is how an off-screen part of the
@@ -230,10 +288,108 @@ console.log('\n--- a press, not a tap: grabbing a node with a finger ---');
 		!!far && far.type === 'pan', far && far.type);
 	release(at.x, at.y + 120);
 
-	// The helper itself is nodes-only: a pipe is a stroke with a halo and is already finger-sized,
-	// and a grab corridor down every pipe is exactly where a pan most needs to start.
+	// The promotion is nodes-only: it never invents a LINK hit out of bare map, because a grab
+	// corridor down every pipe is exactly where a pan most needs to start. (The pointerUP path is
+	// the one that promotes a link, and only from bare map -- section 3.)
 	const mid = L.worldToScreen(350, 200);
-	ok('the grab fallback offers no LINK, only nodes', !L.touchNodeGrabNear(mid.x, mid.y));
+	ok('the grab promotion offers no LINK, only nodes', L.touchNodeOver(mid.x, mid.y, null) === null);
+}
+
+// ---------------------------------------------------------------------------
+// 4b. **A NODE BEATS A PIPE THE BROWSER ALREADY ANSWERED WITH** (Task 562).
+//     Tom: *"many times pipes would edit when I was trying to edit nodes...
+//     maybe we also can just make the nodes a little easier to get. That's the
+//     persistent issue through it all."*
+//
+//     THE STUB THAT WOULD MAKE THIS PASS FOR THE WRONG REASON is a hit test
+//     that answers `svg`. Task 417's fallback was reached only from bare map,
+//     so a harness that always hands it bare map cannot tell the old code from
+//     the new -- both pass. So every assertion here hands the page a CONFIRMED
+//     LINK HIT, which is what the browser really returns 8 px off a junction:
+//     the pipe's stroke halo is wide, the junction's drawn disc is 7 px.
+// ---------------------------------------------------------------------------
+console.log('\n--- a node outranks the pipe that leaves it ---');
+{
+	L.seedDefaultInputs();
+	const doc = L.getDoc();
+	doc.nodes.length = 0; doc.links.length = 0; doc.labels.length = 0;
+	L.buildDom();
+	L.buildLayers();
+	L.setScale(1);
+	L.wirePointerEvents();
+	L.setMode('select');
+	const svg = byId.lpn_canvas;
+	const a = L.addNode('junction', 200, 200).id;
+	L.addNode('junction', 500, 200);
+	const pipe = L.addLink('pipe', a, doc.nodes[1].id).id;
+	const at = L.worldToScreen(200, 200);
+	const mid = L.worldToScreen(350, 200);
+	const line = L.linkLine(pipe);
+
+	// **THE PRESS THE OLD CODE GOT WRONG.** 8 px off the junction, and the browser is confident it
+	// is the pipe. `t === svg` is false, so Task 417's fallback never ran and the pipe was dragged.
+	function pressOn(hit, kind, x, y) {
+		setHitTarget(hit);
+		(svg._listeners.pointerdown || []).forEach(function (fn) {
+			fn({ pointerId: 4, clientX: x, clientY: y, pointerType: kind, button: 0 });
+		});
+		const d = L.dragNow();
+		setHitTarget(null);
+		(svg._listeners.pointerup || []).forEach(function (fn) {
+			fn({ pointerId: 4, clientX: x, clientY: y, pointerType: kind });
+		});
+		L.dropPendingPopup();
+		L.closePopup();
+		return d;
+	}
+	// The premise first, or the assertion below proves nothing: with the pipe under the point, the
+	// page's own hit test really does return the pipe -- which is what a browser returns 8 px off a
+	// junction, and is exactly the case Task 417's bare-map-only fallback could never reach.
+	setHitTarget(line);
+	ok('the page\'s own hit test answers a press 8px off the junction with the PIPE',
+		L.hitAt(at.x + 8, at.y) === line);
+	setHitTarget(null);
+	const grabbed = pressOn(line, 'touch', at.x + 8, at.y);
+	ok('...and a finger there now drags the NODE, not the pipe',
+		!!grabbed && grabbed.type === 'node' && grabbed.id === a,
+		grabbed && (grabbed.type + ' ' + grabbed.id));
+	// Out along the pipe, away from every node, the pipe is still the pipe. Precedence is a rule
+	// about NEARNESS, not a rule that pipes cannot be touched -- and the press SELECTS the pipe,
+	// which is the user-visible half. (No drag arms: a pipe's body is not draggable, so the press
+	// falls through to a pan, exactly as it always did.)
+	pressOn(line, 'touch', mid.x, mid.y);
+	const sel = L.selectedRef();
+	ok('a finger in the middle of the pipe still selects the PIPE',
+		!!sel && sel.kind === 'link' && sel.id === pipe, sel && (sel.kind + ' ' + sel.id));
+	ok('...and the hit itself is handed back untouched there',
+		L.touchNodeOver(mid.x, mid.y, line) === line);
+
+	// **THE POINTER IS DELIBERATELY UNCHANGED.** A mouse has a visible cursor, a hover readout and
+	// sub-pixel aim; it can see it is on the pipe and move 3 px. Giving it this precedence would
+	// make every pipe within 14 px of a junction unclickable on the desktop, for a defect nobody
+	// has reported there -- CLAUDE.md's rule that phone ergonomics stay out of the desktop design.
+	pressOn(line, 'mouse', at.x + 8, at.y);
+	const byMouse = L.selectedRef();
+	ok('the IDENTICAL press from a MOUSE still gets the pipe',
+		!!byMouse && byMouse.kind === 'link' && byMouse.id === pipe,
+		byMouse && (byMouse.kind + ' ' + byMouse.id));
+
+	// **WHAT A NODE DOES *NOT* OUTRANK**, each of which would be a new defect.
+	ok('a node does not outrank another NODE the browser already resolved',
+		L.nodeOutranks(L.nodeCircle(a)) === false);
+	const vh = { dataset: { link: pipe, vidx: '0' }, classList: { contains: function (c) { return c === 'lpn-vhandle'; } } };
+	ok('...nor a VERTEX HANDLE, a small target the user asked to see',
+		L.nodeOutranks(vh) === false);
+	const lbl = { dataset: { nodelbl: a }, classList: { contains: function () { return false; } } };
+	ok('...nor a node\'s own DATA LABEL, which is drawn a few px away and always inside the reach',
+		L.nodeOutranks(lbl) === false);
+	const text = { dataset: { lbl: 'T1' }, classList: { contains: function () { return false; } } };
+	ok('...nor a Text label', L.nodeOutranks(text) === false);
+	// And what it does outrank.
+	ok('a node outranks a LINK', L.nodeOutranks(line) === true);
+	const linklbl = { dataset: { linklbl: pipe }, classList: { contains: function () { return false; } } };
+	ok('...and a link label', L.nodeOutranks(linklbl) === true);
+	ok('...and bare map', L.nodeOutranks(svg) === true && L.nodeOutranks(null) === true);
 }
 
 // ---------------------------------------------------------------------------
@@ -328,10 +484,11 @@ console.log('\n--- a short slide is a drag; a still press is a tap ---');
 	ok('a 6px mouse movement is a drag -- it pans, since a mouse gets no node promotion',
 		mousePan.began === 'pan' && mousePan.popup === false);
 
-	// **A PAN THAT PANNED IS NOT A TAP EITHER.** 20 px from the junction a press pans (section 4);
-	// travel it far enough to arm and the editor must not open on the lift, even though the lift
-	// lands inside the 24 px tap radius of that junction.
-	const panned = gesture('touch', at.x + 20, at.y, 40, 0);
+	// **A PAN THAT PANNED IS NOT A TAP EITHER.** The press starts 60 px from the junction, outside
+	// the one reach, so it pans; travel it far enough to arm and the editor must not open on the
+	// lift, even though the lift lands 20 px from that junction -- well inside the reach that would
+	// have opened it had the gesture been a tap.
+	const panned = gesture('touch', at.x - 60, at.y, 40, 0);
 	ok('a finger that panned the map does not also open the nearest junction',
 		panned.began === 'pan' && panned.popup === false);
 	L.closePopup();

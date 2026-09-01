@@ -960,16 +960,23 @@ html[lang="zh"] .ec-welcome {
 	margin: 4px 0;
 	overflow-wrap: break-word;
 }
-/* The property popup is DRAGGABLE by its chrome -- the padded band around the body, which is the
-   only part of it where the event target is the popup element itself (see wirePopup()). The cursor
-   says so there, and the body puts it back, so a text input never shows a move cursor. Only
+/* A STANDING BOX IS DRAGGABLE by its chrome -- the padded band around the body, which is the only
+   part of it where the event target is the box element itself (see makePanelDraggable()). The
+   cursor says so there, and the body puts it back, so a text input never shows a move cursor.
    THE STANDING BOXES ONLY. The menus share .lpn-popover but hang off a button and are dismissed by
-   clicking away, so dragging one would be a gesture with nothing to return it. The property popup,
-   Find and the Settings box are the three that stay put until closed, so all three drag.
+   clicking away, so dragging one would be a gesture with nothing to return it. A box that stays put
+   until it is closed is the kind that drags.
    `touch-action: none` is what lets a touch drag work at all -- without it the browser claims the
-   gesture for scrolling before pointermove ever fires. */
-#lpn_popup, #lpn_settings_box, #lpn_library_box { cursor: move; touch-action: none; }
-#lpn_popup .lpn-popover-body, #lpn_settings_box .lpn-popover-body, #lpn_library_box .lpn-popover-body { cursor: auto; }
+   gesture for scrolling before pointermove ever fires.
+
+   **THE CLASS IS ADDED BY makePanelDraggable() ITSELF** (ROADMAP Task 562), so a box is made
+   draggable and touch-draggable in ONE place and a seventh box cannot arrive half-wired. It was an
+   id list until then, and the id list had drifted: six boxes were made draggable by script and
+   only three were named here, so Find and the two fire-flow boxes could be dragged by a mouse and
+   not by a finger -- and this comment named *Find* as one of its three while the selector beside it
+   named *Library*. `dev/lpn-spike/panel-touch-harness.js` now asserts the two halves agree. */
+.lpn-dragpanel { cursor: move; touch-action: none; }
+.lpn-dragpanel .lpn-popover-body { cursor: auto; }
 /* ...and the two panes take their touch gestures BACK, or `touch-action: none` above would make
    them unscrollable by finger. The drag surface is the box's own padded band, which these are not
    part of. */
