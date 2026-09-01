@@ -456,6 +456,10 @@ function setUnitSet(which) {
   // back rather than a plausible-looking twin.
   mkUnitSelect('lpn_u_velocity', 'velocity', [u('mps'), u('ftps')], us ? 'ftps' : 'mps');
   mkUnitSelect('lpn_u_gradient', 'gradient', [u('gradePercent'), u('grade')], 'gradePercent');
+  // WATER AGE, results-only like the two above. Its family is the one place in the suite where the
+  // two presets agree -- an hour is an hour on both sides of the Atlantic -- so there is no `us ?`
+  // here and that is not an omission.
+  mkUnitSelect('lpn_u_age', 'elapsed_time', familyUnits('elapsed_time'), 'hr');
   // Darcy-Weisbach roughness height e (ROADMAP Task 271) -- family `roughness`, which lib/Units.lib.php
   // aliases to $u_distance (m/mm/ft/in), us => ft, si => mm. Conditional in the PAGE (shown only
   // under Darcy-Weisbach) but unconditional here: applyMethodUI() hides the row, and a stub that
@@ -469,8 +473,8 @@ function setUnitSet(which) {
 // EngCalcs.unitSets is emitted by echoUnitsRow() in the browser; unitSetName() compares the strip
 // against it, so the harness needs the real mapping, not a placeholder.
 const LPN_UNIT_PRESETS = {
-  us: { distance_site: 'ft', total_head: 'fth2o', partial_head: 'psi', distance_small: 'in', flow_epanet: 'gpm', velocity: 'ftps', gradient: 'gradePercent', roughness: 'ft' },
-  si: { distance_site: 'm', total_head: 'mh2o', partial_head: 'mh2o', distance_small: 'mm', flow_epanet: 'lps', velocity: 'mps', gradient: 'gradePercent', roughness: 'mm' }
+  us: { distance_site: 'ft', total_head: 'fth2o', partial_head: 'psi', distance_small: 'in', flow_epanet: 'gpm', velocity: 'ftps', gradient: 'gradePercent', roughness: 'ft', elapsed_time: 'hr' },
+  si: { distance_site: 'm', total_head: 'mh2o', partial_head: 'mh2o', distance_small: 'mm', flow_epanet: 'lps', velocity: 'mps', gradient: 'gradePercent', roughness: 'mm', elapsed_time: 'hr' }
 };
 
 global.document = {

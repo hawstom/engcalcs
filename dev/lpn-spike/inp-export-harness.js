@@ -552,6 +552,43 @@ console.log('\n6. A model in survey coordinates comes back in survey coordinates
 }
 done('the origin is added back');
 
+// ---- 7. [OPTIONS] Quality: interpreted, and STILL written back as the file's own characters -----
+//
+// `Quality` stopped being carried text and became a live input (water age, source share). The rule
+// it has to keep is the one section 1 keeps for every number: a value the user did not change comes
+// back out exactly as it came in. It is kept by storing the interpretation BESIDE the token rather
+// than over it -- js/lpn-inp.js's lpnQualityParse/lpnQualityText -- and this is where that is
+// asserted through the page's own docFromInp() and exporter rather than through the helpers alone.
+console.log('\n7. the water-quality option round-trips, and changes only when the user changes it');
+{
+	const { doc } = importDoc(refPath('Net3.inp'));
+	ok('docFromInp interpreted it', doc.settings.quality && doc.settings.quality.mode === 'trace',
+		JSON.stringify(doc.settings.quality));
+	ok('and kept the source it names', doc.settings.quality.traceNode === 'Lake', doc.settings.quality.traceNode);
+	ok("and kept the file's own characters beside it", doc.settings.quality.src === 'Trace Lake',
+		JSON.stringify(doc.settings.quality.src));
+	const qualityLine = (inp) => {
+		const m = /^\s*Quality\s+(.*?)\s*$/m.exec(inp || '');
+		return m ? m[1] : null;
+	};
+	const out = EngCalcs.lpnExportInp(doc);
+	ok('it exports', out.ok === true, JSON.stringify(out.error));
+	ok('untouched, the line is byte-identical', qualityLine(out.inp) === 'Trace Lake', qualityLine(out.inp));
+	// And the other half: once the user really has chosen something else, the file must stop
+	// claiming the analysis it no longer describes.
+	doc.settings.quality.mode = 'age';
+	const aged = EngCalcs.lpnExportInp(doc);
+	ok('after the user picks water age, it says so', qualityLine(aged.inp) === 'Age', qualityLine(aged.inp));
+	// Net1 names a CHEMICAL, which this page carries and does not work out. Its token must survive
+	// an open-and-save exactly as it always did.
+	const one = importDoc(refPath('Net1.inp'));
+	ok('Net1 reads as a carried chemical', one.doc.settings.quality.mode === 'chemical',
+		JSON.stringify(one.doc.settings.quality));
+	ok('and its own words come back out', qualityLine(EngCalcs.lpnExportInp(one.doc).inp) === 'Chlorine mg/L',
+		qualityLine(EngCalcs.lpnExportInp(one.doc).inp));
+}
+done('the quality option survives being interpreted');
+
 console.log('');
 if (fails) { console.log(fails + ' FAILED of ' + checks); process.exit(1); }
 console.log('all ' + checks + ' export checks passed');
