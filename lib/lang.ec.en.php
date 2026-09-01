@@ -1653,7 +1653,7 @@ $ec_lang['lpn_find_q_and']='AND';
 $ec_lang['lpn_find_q_or']='OR';
 // When the typed query says more than three pull-downs can say, the pull-downs LEAVE rather than
 // stand there describing a search that is not the one about to run.
-$ec_lang['lpn_find_q_aside']='These controls cannot write the query below, so they are set aside rather than saying something untrue.';
+$ec_lang['lpn_find_q_aside']='These controls cannot write the query below, so they are hidden.';
 $ec_lang['lpn_find_q_restore']='Use the controls instead';
 $ec_lang['lpn_replace_q_bad']='This query cannot be read, so there is nothing to change. Fix it above first.';
 // The parse errors. Each says what could not be understood and where, and NONE of them is followed
@@ -1774,7 +1774,7 @@ $ec_lang['lpn_new_coords']='Coordinates';
 // gesture already use. Do not spell either of them out here; a third wording for the same choice is
 // how a reader stops being sure they are the same choice.
 $ec_lang['lpn_new_coords_xy']='xy grid';
-$ec_lang['lpn_new_coords_geo']='lat/lon, on the Earth';
+$ec_lang['lpn_new_coords_geo']='lat/lon';
 // What each choice really means, and the fact that picking xy is not final. Said on the group
 // rather than on each radio: one tip, one "?", and the two options are only meaningful against
 // each other.
@@ -1865,12 +1865,12 @@ $ec_lang['lpn_inp_drop_controls']='These controls and rules were left out. The p
 $ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_eps']='This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in.';
 $ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_energy']='This file says what the pumps cost to run. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_tags']='This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_report']='This file holds EPANET\'s own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_report']='This file holds EPANET\'s own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sections']='This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_quality_options']='This file says what to follow through the pipes, and two settings that go with a chemical: how fast it spreads, and how close the answer has to be. Water age and source share are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_file_options']='This file points at another file beside it, for the map or for hydraulics already worked out. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: Quality, which names what to follow through the pipes, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_file_options']='This file names another file beside it: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
 $ec_lang['lpn_inp_drop_dangling']='These pipes name a junction that is not in the file, so they were left out.';
 $ec_lang['lpn_inp_drop_units']='The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.';
@@ -2408,9 +2408,9 @@ $ec_lang['lpn_settings_emitter_exponent_tip']='The power in the sprinkler and le
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_elev_dem_sample']='Sample DEM';
-$ec_lang['lpn_elev_dem_sample_tip']='Reads the height of the land under this node from Mapbox DEM and shows it below. It changes nothing. The data is about 30 m across on most of the Earth, and finer where better data exists.';
+$ec_lang['lpn_elev_dem_sample_tip']='Reads the elevation of the DEM at this node and shows it below for review before changing the current entry. The horizontal DEM resolution is about 30 m for most of the Earth, and finer where better data exists.';
 $ec_lang['lpn_elev_dem_use']='Use DEM';
-$ec_lang['lpn_elev_dem_use_tip']='Puts the height of the land under this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.';
+$ec_lang['lpn_elev_dem_use_tip']='Puts the elevation of the DEM at this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.';
 $ec_lang['lpn_elev_dem_none']='The DEM gave no height for this node.';
 $ec_lang['lpn_elev_dem_said']='Mapbox DEM says {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Elevation from';
@@ -2418,7 +2418,7 @@ $ec_lang['lpn_settings_elev_source_tip']='Where a new node gets its elevation. T
 $ec_lang['lpn_settings_elev_source_typed']='The number above';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM';
 $ec_lang['lpn_settings_accuracy']='Accuracy';
-$ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and they weigh the change slightly differently: the built-in solver against the water the network delivers, EPANET against the water it carries. Left empty, this page tries far harder than EPANET does on its own.';
+$ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
 $ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';
@@ -2441,9 +2441,9 @@ $ec_lang['lpn_settings_unbalanced_stop']='Stop there';
 $ec_lang['lpn_settings_unbalanced_trials']='Extra trials first';
 $ec_lang['lpn_settings_unbalanced_trials_tip']='How many further trials to allow after the maximum above is used up, before the last try is reported. Only the EPANET solver reads this box.';
 $ec_lang['lpn_settings_head_error']='Head error limit';
-$ec_lang['lpn_settings_head_error_tip']='A second test the solver must pass before it stops: the largest head any one pipe is still out by. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_head_error_tip']='An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.';
 $ec_lang['lpn_settings_flow_change']='Flow change limit';
-$ec_lang['lpn_settings_flow_change_tip']='A further test the solver must pass before it stops: the largest amount any one pipe\'s flow is still moving by from one try to the next. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_flow_change_tip']='An additional test the solver must pass before it stops: the maximum change in any one pipe\'s flow from one try to the next. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.';
 $ec_lang['lpn_settings_damp_limit']='Damping starts at';
 $ec_lang['lpn_settings_damp_limit_tip']='The accuracy at which the solver begins taking smaller steps, which can settle a network that is swinging back and forth. Zero, the usual value, means it never does. Only the EPANET solver reads this box.';
 $ec_lang['lpn_settings_option_unset']='Not stated';
@@ -2862,7 +2862,7 @@ $ec_lang['lpn_terrain_ids_more']='{ids}, and {n} more';
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
 $ec_lang['lpn_ff_menu']='Fire flow…';
-$ec_lang['lpn_ff_menu_tip']='Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there pull anything else down?';
+$ec_lang['lpn_ff_menu_tip']='Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there create unacceptable drawdown anywhere else?';
 $ec_lang['lpn_ff_title']='Fire flow';
 $ec_lang['lpn_ff_intro']='Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.';
 $ec_lang['lpn_ff_scope']='Junctions to test';
@@ -2872,7 +2872,7 @@ $ec_lang['lpn_ff_scope_selected']='The selected junction only';
 $ec_lang['lpn_ff_no_junctions']='This project has no junctions yet, so there is nothing to test.';
 $ec_lang['lpn_ff_no_selection']='No junction is selected. Choose one on the map, or test every junction.';
 $ec_lang['lpn_ff_required']='Required fire flow';
-$ec_lang['lpn_ff_required_tip']='The flow your code or your fire authority asks for at a hydrant. Every junction is tested against this same number.';
+$ec_lang['lpn_ff_required_tip']='The flow required by your code or your fire authority at a hydrant. One junction at a time is tested against this same number.';
 $ec_lang['lpn_ff_residual']='Residual pressure to hold';
 $ec_lang['lpn_ff_residual_tip']='20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.';
 $ec_lang['lpn_ff_design']='Effect on the rest of the system';
@@ -2889,7 +2889,7 @@ $ec_lang['lpn_ff_maxvelocity_tip']='A pipe running above this while a fire flow 
 // for hydrant losses beyond the node."). IT LEADS WITH THE METHOD, NOT WITH THE ABSENCE: Tom read
 // the first wording as "no losses are accounted for at the raw node", which is a hole in the tool
 // rather than the deliberate and standard choice it actually is.
-$ec_lang['lpn_ff_accounting']='Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.';
+$ec_lang['lpn_ff_accounting']='Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral, and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.';
 $ec_lang['lpn_ff_engine_native']='This is worked out with the built-in solver.';
 $ec_lang['lpn_ff_engine_epanet']='This is worked out with the EPANET engine.';
 $ec_lang['lpn_ff_engine_cost']='Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.';
@@ -2910,7 +2910,7 @@ $ec_lang['lpn_ff_calculate']='Run';
 $ec_lang['lpn_ff_stop']='Stop';
 $ec_lang['lpn_ff_working']='Working: {done} of {total} junctions.';
 $ec_lang['lpn_ff_stopped']='Stopped after {done} of {total} junctions. What is below is what had already been worked out.';
-$ec_lang['lpn_ff_cost']='{solves} network solves.';
+$ec_lang['lpn_ff_cost']='{solves} network runs.';
 // The results are about the network as it stood when the run finished, so an edit clears them
 // rather than leaving a picture of a system that no longer exists.
 $ec_lang['lpn_ff_stale']='The drawing changed, so the fire flow results were cleared. Run it again.';
@@ -2926,14 +2926,14 @@ $ec_lang['lpn_ff_summary_error']='{n} could not be answered.';
 // is king, and mid-word wrap is cheaper than a wide column.
 $ec_lang['lpn_ff_report_all']='Every junction tested';
 $ec_lang['lpn_ff_col_junction']='Junction';
-$ec_lang['lpn_ff_col_static']='Rest pressure';
-$ec_lang['lpn_ff_col_available']='Available';
-$ec_lang['lpn_ff_col_required']='Required';
+$ec_lang['lpn_ff_col_static']='Static pressure';
+$ec_lang['lpn_ff_col_available']='Available flow';
+$ec_lang['lpn_ff_col_required']='Required flow';
 $ec_lang['lpn_ff_col_residual']='Residual held';
 $ec_lang['lpn_ff_col_atrequired']='Pressure at required';
-$ec_lang['lpn_ff_col_affected']='Pulled down';
+$ec_lang['lpn_ff_col_affected']='Drawdowns';
 $ec_lang['lpn_ff_col_limit']='Design limit';
-$ec_lang['lpn_ff_col_solves']='Solves';
+$ec_lang['lpn_ff_col_solves']='Runs';
 $ec_lang['lpn_ff_col_result']='Result';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
 // shows a dash, never one of these words.
@@ -2948,7 +2948,7 @@ $ec_lang['lpn_ff_atleast']='over {flow}';
 $ec_lang['lpn_ff_affect_node']='{id} down to {pressure}';
 $ec_lang['lpn_ff_affect_link']='{id} at {velocity}';
 $ec_lang['lpn_ff_more']='and {n} more';
-$ec_lang['lpn_ff_design_none']='Nothing in the chosen set was pulled down by any junction tested.';
+$ec_lang['lpn_ff_design_none']='Nothing in the chosen set was drawn down by any junction tested.';
 $ec_lang['lpn_ff_design_off_note']='The effect on the rest of the system was not checked in this run.';
 // ISO credits a single hydrant with at most 1,500 gpm whatever the hydraulics say. Said beside the
 // numbers and never applied to them: a number quietly cut down to a credit limit is a lie with a
@@ -2958,7 +2958,7 @@ $ec_lang['lpn_ff_iso']='ISO credits a single hydrant with at most {flow}. That c
 // of zero: "there is no available fire flow" and "the available fire flow is zero" are different
 // facts, and only the first one is ever true.
 $ec_lang['lpn_ff_err_at_rest']='Already below the residual with nothing drawn';
-$ec_lang['lpn_ff_err_converge']='The network did not settle';
-$ec_lang['lpn_ff_err_solve']='The network could not be worked out';
+$ec_lang['lpn_ff_err_converge']='The network did not converge.';
+$ec_lang['lpn_ff_err_solve']='The solver reported an error and gave no answer.';
 $ec_lang['lpn_ff_err_not_junction']='Not a junction';
 $ec_lang['lpn_ff_err_unknown']='No answer, and the reason given is {id}';

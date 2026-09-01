@@ -858,7 +858,7 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	ok('a compound query takes the pull-downs off the panel',
 		!L.controlsShown() && controlCount() === 0, String(controlCount()));
 	const aside = panelLines(L.formBox()).join(' ');
-	ok('...and says why, where they were', aside.indexOf('set aside') >= 0, aside);
+	ok('...and says why, where they were', aside.indexOf('hidden') >= 0, aside);
 	// The way back. findState still holds the last query the controls DID express, so this is a
 	// return to it rather than a guess at one.
 	let back = null;

@@ -207,8 +207,8 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	// junction, in this page's own words rather than the competitor's.
 	ok('there is one table under one heading', report.indexOf('Every junction tested') >= 0 &&
 		report.indexOf('Available against required') < 0);
-	['Junction', 'Rest pressure', 'Available', 'Required', 'Residual held',
-		'Pressure at required', 'Pulled down', 'Design limit', 'Solves', 'Result'
+	['Junction', 'Static pressure', 'Available flow', 'Required flow', 'Residual held',
+		'Pressure at required', 'Drawdowns', 'Design limit', 'Runs', 'Result'
 	].forEach(function (h) {
 		ok('the table has a "' + h + '" column', report.indexOf(h) >= 0);
 	});
