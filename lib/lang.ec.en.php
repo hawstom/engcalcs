@@ -78,6 +78,8 @@ $ec_lang['u_bar']='bar';
 $ec_lang['u_kgfcm2']='kgf/cm^2';
 $ec_lang['u_s']='sec';
 $ec_lang_syn['u_s']='';
+$ec_lang['u_hr']='hr';
+$ec_lang['u_day']='day';
 $ec_lang['u_lph']='L/hr';
 $ec_lang_syn['u_lph']='';
 $ec_lang['u_gph']='gal/hr';
@@ -1303,6 +1305,10 @@ $ec_lang['lpn_units_velocity']='Velocity';
 // mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='Head loss gradient';
 $ec_lang['lpn_result_gradient_tip']='Head loss divided by the length of the pipe. Use it to compare pipes of different lengths against one design limit.';
+$ec_lang['lpn_result_water_age']='Water age';
+$ec_lang['lpn_result_water_age_tip']='How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.';
+$ec_lang['lpn_result_source_share']='Source share';
+$ec_lang['lpn_result_source_share_tip']='Of the water reaching this point, the share that came from the source you chose.';
 $ec_lang['lpn_result_head']='Head';
 $ec_lang['lpn_result_head_tip']='Energy of the water at this node, written as a height of water column. It is a height, not a pressure.';
 $ec_lang['lpn_result_pressure']='Pressure';
@@ -1863,7 +1869,8 @@ $ec_lang['lpn_inp_drop_energy']='This file says what the pumps cost to run. This
 $ec_lang['lpn_inp_drop_tags']='This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_report']='This file holds EPANET\'s own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sections']='This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_quality_options']='This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_quality_options']='This file says what to follow through the pipes, and two settings that go with a chemical: how fast it spreads, and how close the answer has to be. Water age and source share are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_file_options']='This file points at another file beside it, for the map or for hydraulics already worked out. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
 $ec_lang['lpn_inp_drop_dangling']='These pipes name a junction that is not in the file, so they were left out.';
 $ec_lang['lpn_inp_drop_units']='The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.';
@@ -2643,6 +2650,16 @@ $ec_lang['lpn_settings_link_symbology']='Link symbology';
 $ec_lang['lpn_settings_page']='Page';
 $ec_lang['lpn_settings_page_note']='Saved in this calculator, not in the project.';
 $ec_lang['lpn_settings_hydraulics']='Hydraulics';
+$ec_lang['lpn_settings_quality']='Water quality';
+$ec_lang['lpn_settings_quality_track']='Track';
+$ec_lang['lpn_settings_quality_track_tip']='Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.';
+$ec_lang['lpn_settings_quality_source']='Water from';
+$ec_lang['lpn_settings_quality_source_tip']='The point whose water is followed. Every other point then shows the share of its water that came from here.';
+$ec_lang['lpn_quality_none']='Nothing';
+$ec_lang['lpn_quality_age']='Water age';
+$ec_lang['lpn_quality_trace']='Source share';
+$ec_lang['lpn_quality_chemical']='A chemical this file names (kept, not worked out)';
+$ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.';
 // The Labels lists' two narrowest column headings, which are a column three characters wide each.
 // The decimals column is headed by an EXAMPLE of what it does -- and the example is translatable
 // because the DECIMAL SEPARATOR is a locale fact (Tom, 2026-08-18: "We could translate to '0,000'

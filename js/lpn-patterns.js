@@ -174,7 +174,14 @@
 		PATTERNSTART: 'patternStart',
 		REPORTTIMESTEP: 'reportStep',
 		REPORTSTART: 'reportStart',
-		STARTCLOCKTIME: 'startClock'
+		STARTCLOCKTIME: 'startClock',
+		// **READ, BUT NEVER WRITTEN BACK, AND THAT IS DELIBERATE.** A water-quality run wants the
+		// file's own quality time step (Net3 states 0:05), so it is parsed onto `times.qualityStep`
+		// where js/lpn-epanet.js can find it. It is NOT in lpnTimesDefaults() and NOT in the `.inp`
+		// exporter's own [TIMES] list: absent means "EPANET's own default", and writing a line
+		// stating that default into every file that never had one is exactly the round-trip damage
+		// the sparseness rule exists to prevent.
+		QUALITYTIMESTEP: 'qualityStep'
 	};
 	EC.lpnTimesKeys = TIMES_KEYS;
 

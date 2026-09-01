@@ -758,11 +758,15 @@ console.log('\n--- Settings panel stays in sync ---');
   {
     const host = byId.lpn_new_units_fields;
     const items = host.children;
+    // NINE since the water-age selector joined the strip. The count is read from the strip rather
+    // than typed twice, so the next selector to arrive needs no edit here -- the property under test
+    // is that the box mirrors the strip, not that either holds a particular number.
+    const stripCount = Object.keys(L.readUnitSelections()).length;
     ok('the box carries a unit control for every selector on the strip',
-      items.length === 8, items.length + ' of 8');
+      items.length === stripCount, items.length + ' of ' + stripCount);
     const sels = items.map(i => i.querySelector('select')).filter(Boolean);
     ok('...each one a real select with its family intact',
-      sels.length === 8 && sels.every(s => !!s.dataset.family), sels.length + ' with families');
+      sels.length === stripCount && sels.every(s => !!s.dataset.family), sels.length + ' with families');
     ok('...and NONE of them carries the name that would reach the unit-change handler',
       sels.every(s => !s.name), sels.map(s => s.name || '-').join(','));
     ok('...and they open on what the strip is showing',

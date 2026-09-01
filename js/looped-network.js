@@ -2730,7 +2730,9 @@ var EngCalcs = EngCalcs || {};
 			// printed under the word "Demand". Relabelled, the default is honest, every project that
 			// ever existed keeps showing the number it always showed, and nobody's map changes under
 			// them for a reason they did not ask for.
-			node: { id: true, elev: true, demand: true, demandActual: false, head: false, pressure: true },
+			node: { id: true, elev: true, demand: true, demandActual: false, head: false, pressure: true,
+				// OFF, like every other field a network does not have until it is asked for.
+				quality: false },
 			// Every INPUT property a link carries is offered, not just the ones a result depends on:
 			// roughness and the minor-loss coefficient are typed per pipe and are exactly the numbers
 			// you want spread across a drawing when checking someone's model. Off by default --
@@ -2754,7 +2756,11 @@ var EngCalcs = EngCalcs || {};
 			//     pipe gradient is 0.0043; 4 covers both.
 
 			decimals: {
-				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2 },
+				// quality 1 -- a water age in hours reads as a whole number and a first decimal
+				// ("14.3 hr"); two would be a minute and a half of false precision on a quantity
+				// whose own transport step is five minutes. A source share in percent is the same
+				// shape of number.
+				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, quality: 1 },
 				link: { diameter: 0, length: 2, roughness: 0, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 4 }
 			},
 			// Per-field PREFIX and SUFFIX text (Task 333), plus one blanket separator between either
@@ -2803,7 +2809,12 @@ var EngCalcs = EngCalcs || {};
 			priority: {
 				// Demand outranks Base demand: on a crowded drawing the resolved number is the one
 				// worth the last space, and the base is recoverable from it and the pattern.
-				node: { demandActual: 5, demand: 4, pressure: 3, elev: 2, head: 1 },
+				// **QUALITY OUTRANKS EVERYTHING AND SHEDS LAST**, because unlike the five below it is
+				// never on unless somebody switched the analysis on and re-ran: a field a user asked for
+				// by name is the last one to give up its space. It carries a rank and NO entry in
+				// LPN_NODE_DROP_RULE, which is the pair of statements "order this row inside the column"
+				// and "do not make this a criterion for which whole label wins a contested spot".
+				node: { quality: 6, demandActual: 5, demand: 4, pressure: 3, elev: 2, head: 1 },
 				link: { flow: 9, velocity: 8, headloss: 7, gradient: 6,
 					diameter: 5, length: 4, roughness: 3, km: 2, id: 1 }
 			},
@@ -2851,6 +2862,19 @@ var EngCalcs = EngCalcs || {};
 			// verbatim, which is the only form `Diffusivity 1.0` and `Quality Trace Lake` both
 			// survive. No control, on the emitter-exponent precedent.
 			qualityOptions: {},
+			// **THE ONE WATER-QUALITY OPTION THAT IS A LIVE INPUT** (water age, source share). The
+			// three above stay carried text; this is the interpretation of the first of them, kept
+			// BESIDE the token rather than on top of it so an untouched file exports the characters
+			// it came in with -- js/lpn-inp.js's lpnQualityParse/lpnQualityText own that rule and
+			// `src` is the token it was read from. `mode` is one of none/age/trace/chemical, and
+			// 'chemical' means CARRIED, NOT WORKED OUT: this page has no reaction coefficients, so
+			// naming a chemical is a fact about the file and never an analysis we ran.
+			quality: { mode: 'none', traceNode: '' },
+			// **THE TWO `[OPTIONS]` KEYS THAT NAME A FILE BESIDE THE `.inp`** -- `Map` and
+			// `Hydraulics USE/SAVE`. Carried text, no control, sparse like the rest: this page
+			// cannot open either file and does not act on either line, and reading past them was
+			// deleting a line the source stated on every save.
+			fileOptions: {},
 			// **`tolerance` IS DEPRECATED AND IS NO LONGER SEEDED HERE** (2026-08-28). EPANET's
 			// `Accuracy` replaced it; solveAccuracy() still READS it so a project saved before the
 			// change keeps its own number, but a new project no longer carries the field at all.
@@ -3772,8 +3796,63 @@ var EngCalcs = EngCalcs || {};
 	// its base demands, so a map printing the base under the word "Demand" makes a labelling defect
 	// read as a solver defect: add up the pipes into junction 101 and you get 254.53 gpm beside a
 	// label saying 189.95.
+	// ---- WATER QUALITY, THE RESULT DIMENSION (ROADMAP Task 553's quality half) -------------------
+	//
+	// **ONE FIELD, TWO QUANTITIES, AND THE MODE IS WHAT SAYS WHICH.** Water age is a length of TIME
+	// at a node; a source share is a PERCENTAGE of the water arriving there. They are the same
+	// column everywhere the page shows a result, because they are the same question asked two ways
+	// and a network is only ever running one of them at a time. Everything below therefore reads
+	// the mode rather than being written twice.
+	//
+	// **IT IS EPANET-ONLY AND RUN-ONLY, AND NEITHER IS A LIMITATION TO BE WORKED AROUND.** Quality
+	// is transported along flows over time -- a water age at one instant is not a number, it is the
+	// answer to a question nobody asked -- so it rides on the extended-period run (Task 248) and
+	// there is nothing for the native solver to do. With the engine unreachable the page says so
+	// the same way it already does for the run itself, and shows nothing here rather than a zero.
+	//
+	// **THERE IS NO PASS OR FAIL, AND ONE MUST NOT BE INVENTED.** Unlike pressure and fire flow,
+	// water age has no numeric standard to check against -- the published guidance is qualitative.
+	// So this reports the number and stops. No verdict glyph, no threshold, no colour band the page
+	// picked for the user.
+	function qualitySetting() {
+		var q = settings.quality || {};
+		return { mode: q.mode || 'none', traceNode: q.traceNode || '', src: q.src };
+	}
+	function qualityMode() { return qualitySetting().mode; }
+	// The unit the number is read in: a time for an age, nothing at all for a share. Dynamic for
+	// the same reason the roughness unit is -- one control's meaning follows another setting.
+	function qualityUnitId() { return qualityMode() === 'age' ? resultUnit('age') : ''; }
+	// The heading, in OUR vocabulary rather than EPANET's (CLAUDE.md): EPANET says "Source Trace"
+	// and reports a bare "Quality" column, and neither tells a reader what the number is.
+	function qualityLabel() {
+		var pc = EngCalcs.pageConfig || {}, mode = qualityMode();
+		if (mode === 'trace') { return pc.lpn_result_source_share || 'Source share'; }
+		return pc.lpn_result_water_age || 'Water age';
+	}
+	/**
+	 * The quality value at a node, in the displayed unit, or undefined where there is none.
+	 *
+	 * **THE RESULT'S OWN MODE MUST STILL BE THE DOCUMENT'S.** A run answers whatever was asked of
+	 * it, and the setting can be changed without re-running -- so a percentage would otherwise be
+	 * printed for one keystroke under a heading reading Water age. Comparing the two is what makes
+	 * that impossible, and showing nothing is the honest state until the run catches up.
+	 */
+	function nodeQualityValue(n) {
+		var mode = qualityMode(), v;
+		if (mode !== 'age' && mode !== 'trace') { return undefined; }
+		if (!lastSolveResult || !lastSolveResult.qualities) { return undefined; }
+		if (lastSolveResult.qualityMode !== mode) { return undefined; }
+		v = lastSolveResult.qualities[n.id];
+		if (typeof v !== 'number' || !isFinite(v)) { return undefined; }
+		// SECONDS out of the engine, like every other result in SI; a share is a percentage and
+		// crosses nothing.
+		return mode === 'age' ? toDisplay(v, resultUnit('age')) : v;
+	}
 	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', demandActual: 'lpn_u_flow',
-		head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure' };
+		head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure',
+		// Declared with the age unit so the field is offered; colorFieldUnit() overrides it with
+		// qualityUnitId(), which is the one place that knows a source share has no unit.
+		quality: 'lpn_u_age' };
 	var COLOR_LINK_FIELDS = { diameter: 'lpn_u_diameter', roughness: '', flow: 'lpn_u_flow',
 		velocity: 'lpn_u_velocity', headloss: 'lpn_u_elevhead', gradient: 'lpn_u_gradient' };
 	// The value a node/link is coloured by, IN THE DISPLAYED UNIT -- the same expressions
@@ -3804,6 +3883,9 @@ var EngCalcs = EngCalcs || {};
 			if (isFixedHeadNode(n)) { return fixedHeadPressure(n); }
 			return lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined;
 		}
+		// A reservoir and a tank have a water age and a source share like anything else -- they are
+		// where the water comes FROM, so their own value is the most telling one on the map.
+		if (field === 'quality') { return nodeQualityValue(n); }
 		return undefined;
 	}
 	function colorLinkValue(l, field) {
@@ -3831,7 +3913,7 @@ var EngCalcs = EngCalcs || {};
 	var COLOR_FIELD_ORDER = {
 		// Demand before Base demand: the resolved one is the question a reader is actually asking
 		// ("what is being drawn here"), and the base is the input behind it.
-		node: ['pressure', 'head', 'elev', 'demandActual', 'demand'],
+		node: ['pressure', 'head', 'elev', 'demandActual', 'demand', 'quality'],
 		link: ['velocity', 'flow', 'headloss', 'gradient', 'diameter', 'roughness']
 	};
 	function colorFieldOptions(group) {
@@ -3929,6 +4011,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The unit a field's numbers are read in -- the same table the legend heading uses.
 	function colorFieldUnit(group, field) {
+		// One field's unit follows another setting, so it is asked rather than looked up.
+		if (group === 'node' && field === 'quality') { return qualityUnitId(); }
 		return (group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS)[field] || '';
 	}
 	// The breaks a MODE produces for the values presently on the map.
@@ -4157,7 +4241,7 @@ var EngCalcs = EngCalcs || {};
 			var breaks = effectiveBreaks(group, field);
 			if (!breaks.length && colorValues(group, field).length === 0) { return; }
 			any = true;
-			var unitId = (group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS)[field];
+			var unitId = colorFieldUnit(group, field);
 			var unit = unitId ? unitLabel(unitId) : (field === 'gradient' ? gradientSuffix() : '');
 			var h = document.createElement('div');
 			h.style.fontWeight = 'bold';
@@ -10476,6 +10560,12 @@ var EngCalcs = EngCalcs || {};
 	function paneUnitHead() { return resultUnit('elevhead'); }
 	function paneUnitPressure() { return resultUnit('pressure'); }
 	function paneUnitVelocity() { return resultUnit('velocity'); }
+	// Dynamic, like the roughness column's: a water age is read in a time unit and a source share in
+	// no unit at all, and '' is how this table says "this column's heading carries no unit".
+	function paneUnitQuality() { return qualityUnitId(); }
+	// The heading follows the same switch, so the column can never name one quantity over the other
+	// one's numbers.
+	function paneColNodeQuality() { return paneColNodeResult('quality', qualityLabel, paneUnitQuality); }
 	function paneUnitElevHead() { return 'lpn_u_elevhead'; }
 	// The valve's type, as the word the popup's own selector shows. READ-ONLY here on purpose:
 	// changing the type re-seeds the setting and drops every scenario's override on it, which is a
@@ -10511,7 +10601,8 @@ var EngCalcs = EngCalcs || {};
 						set: function (n, v) { setProp(n, 'demand', v); } },
 					paneColNodeResult('demandActual', 'bpn_demand', paneUnitFlow),
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
-					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure)
+					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
+					paneColNodeQuality()
 				]
 			},
 			{
@@ -10528,7 +10619,8 @@ var EngCalcs = EngCalcs || {};
 					// The head ABOVE the ground, which is what a reservoir is worth. Blank where the
 					// ground is unknown -- an imported reservoir states a head and no elevation, and
 					// a 0 there would assert what the file never said (Task 390).
-					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure)
+					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
+					paneColNodeQuality()
 				]
 			},
 			{
@@ -10554,7 +10646,8 @@ var EngCalcs = EngCalcs || {};
 					// The WATER SURFACE, derived and read-only: it is the number the solve uses, so
 					// it must be visible, but a second editable field would be two numbers that have
 					// to agree.
-					paneColNodeResult('head', 'lpn_result_head', paneUnitHead)
+					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
+					paneColNodeQuality()
 				]
 			},
 			{
@@ -13649,6 +13742,17 @@ var EngCalcs = EngCalcs || {};
 		var savedPrefixes = savedSettings.idPrefixes || {};
 		delete savedSettings.defaults; delete savedSettings.sectionsOpen; delete savedSettings.idPrefixes;
 		settings = Object.assign(defaultSettings(), savedSettings);
+		// **A PROJECT SAVED BEFORE `Quality` WAS INTERPRETED STILL CARRIES ONLY THE TOKEN**, and it
+		// must not come back as "no analysis": it would then export a file missing a line its source
+		// stated, which is the one thing the carry existed to prevent. So the token is interpreted
+		// once, here, exactly as an import does it -- and the ABSENCE of `src` is what identifies a
+		// setting that has never met its own token, which is why `src` is stored rather than being
+		// re-derived on demand.
+		if (settings.quality && settings.quality.src === undefined
+			&& (settings.qualityOptions || {}).quality && EngCalcs.lpnQualityParse) {
+			settings.quality = EngCalcs.lpnQualityParse(settings.qualityOptions.quality);
+			settings.quality.src = settings.qualityOptions.quality;
+		}
 		// **A PROJECT SAVED UNDER THE TWO-FIELD DESIGN KEEPS ITS NUMBERS.** That design froze the
 		// method's answer into a second field, `colorFrozenBreaks`, and was rejected (Task 448).
 		// Those numbers are the ones that project was drawn in, so
@@ -14608,6 +14712,17 @@ var EngCalcs = EngCalcs || {};
 				var s = JSON.parse(JSON.stringify(settings));
 				s.hydraulics = parsed.hydraulics || {};
 				s.qualityOptions = parsed.qualityOptions || {};
+				s.fileOptions = parsed.fileOptions || {};
+				// The token is interpreted ONCE, here, and the token itself is never written to
+				// again. `src` is what lets the exporter hand the file's own characters back while
+				// the setting is still the one they parse to.
+				s.quality = EngCalcs.lpnQualityParse
+					? (function () {
+						var q = EngCalcs.lpnQualityParse(s.qualityOptions.quality);
+						q.src = s.qualityOptions.quality;
+						return q;
+					}())
+					: { mode: 'none', traceNode: '' };
 				if (s.hydraulics.emitterExponent !== undefined) { s.emitterExponent = s.hydraulics.emitterExponent; }
 				return s;
 			}()),
@@ -14701,7 +14816,8 @@ var EngCalcs = EngCalcs || {};
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
-			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file sets what water quality means here: the chemical, how fast it spreads, and how close the answer has to be. Nothing on this page uses those settings, but they are kept, and they are written back if you save an EPANET file.';
+			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file says what to follow through the pipes, and two settings that go with a chemical: how fast it spreads, and how close the answer has to be. Water age and source share are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.';
+			case 'file-options': return pc.lpn_inp_drop_file_options || 'This file points at another file beside it, for the map or for hydraulics already worked out. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.';
 			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain it. Add the picture yourself with Map, Backdrop.';
 			case 'dangling-link': return pc.lpn_inp_drop_dangling || 'These pipes name a junction that is not in the file, so they were left out.';
 			// OUR VOCABULARY, NOT EPANET'S: what EPANET calls a Label is our Text object, so the
@@ -19051,7 +19167,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// In strip order, which is Looped-Network.php's order.
 	var LPN_UNIT_SELECTS = ['lpn_u_length', 'lpn_u_diameter', 'lpn_u_elevhead', 'lpn_u_pressure',
-		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_roughness'];
+		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_roughness', 'lpn_u_age'];
 	// **THE OLD RESULT KEYS, KEPT ONLY TO BE READ OUT OF AN OLD FILE.** Written by no code path;
 	// this map exists so reconcileLegacyUnits() below can name them, and for nothing else.
 	var LPN_LEGACY_RESULT_KEYS = {
@@ -19065,7 +19181,12 @@ var EngCalcs = EngCalcs || {};
 	// "which unit is this answer in?" a question with one answer, in one place.
 	var LPN_RESULT_UNIT = {
 		elevhead: 'lpn_u_elevhead', pressure: 'lpn_u_pressure', flow: 'lpn_u_flow',
-		velocity: 'lpn_u_velocity', gradient: 'lpn_u_gradient'
+		velocity: 'lpn_u_velocity', gradient: 'lpn_u_gradient',
+		// **A RESULTS-ONLY SELECTOR, LIKE VELOCITY AND GRADIENT.** Nothing on this page is typed in
+		// hours. It reads a WATER AGE and only a water age -- a source share is a percentage and
+		// has no unit at all, which is why qualityUnitId() below answers '' for that mode rather
+		// than naming this one.
+		age: 'lpn_u_age'
 	};
 	function resultUnit(q) { return LPN_RESULT_UNIT[q]; }
 	// {selectName: unitKey}, e.g. {lpn_u_diameter: 'in'}. Stored by KEY, never by factor: a factor is
@@ -19842,7 +19963,10 @@ var EngCalcs = EngCalcs || {};
 			['demandActual', pc.bpn_demand || 'Demand'],
 			['demand', pc.lpn_field_base_demand || 'Base demand'],
 			['head', pc.lpn_result_head || 'Head'], ['pressure', pc.lpn_result_pressure || 'Pressure'],
-			['elev', pc.lpn_field_elev || 'Elevation']
+			['elev', pc.lpn_field_elev || 'Elevation'],
+			// LAST, and off by default. It is the one field here that no network has until a run
+			// has been made with the analysis switched on, and its heading follows that switch.
+			['quality', qualityLabel()]
 		];
 	}
 	function linkFieldDefs(pc) {
@@ -20762,9 +20886,14 @@ var EngCalcs = EngCalcs || {};
 		var byId = function (id) { return document.getElementById(id); };
 		var idBody = byId('lpn_set_id_fields'), defBody = byId('lpn_set_default_fields'),
 			mapBody = byId('lpn_set_map_fields'), unitsBody = byId('lpn_set_units_fields'),
-			compBody = byId('lpn_set_hydraulics_fields'), pageBody = byId('lpn_set_page_fields');
-		if (!idBody || !defBody || !mapBody || !unitsBody || !compBody || !pageBody) { return; }
-		[idBody, defBody, mapBody, unitsBody, compBody, pageBody].forEach(clearFields);
+			compBody = byId('lpn_set_hydraulics_fields'), qualBody = byId('lpn_set_quality_fields'),
+			pageBody = byId('lpn_set_page_fields');
+		if (!idBody || !defBody || !mapBody || !unitsBody || !compBody || !qualBody || !pageBody) { return; }
+		// **EVERY HOST THIS FUNCTION FILLS MUST ALSO BE CLEARED BY IT**, and a host left out of this
+		// line does not fail: it ACCUMULATES, so the box grows another copy of its rows on every
+		// rebuild, and rebuilding is what a settings change does. Measured on the water-quality host
+		// the day it was added -- seven Track rows after four switches.
+		[idBody, defBody, mapBody, unitsBody, compBody, qualBody, pageBody].forEach(clearFields);
 		// **A ROW IS A FLEX LINE, NOT A LABEL FOLLOWED BY A <br>.** Tom, 2026-08-18: "It can be
 		// longer and narrower ... A few things can wrap. Inputs can be shorter." A label that simply
 		// precedes its control cannot wrap without the control wrapping with it and cannot line its
@@ -21396,6 +21525,9 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 		});
 		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET solver', engInput, pc.lpn_settings_engine_epanet_tip);
+		// EPANET's own Analysis Options order puts Quality directly after Hydraulics, and so does
+		// the Settings box. One call; every row it builds is settingsQualityRows()'s own.
+		settingsQualityRows(qualBody, row, note);
 		// **AUTOMATIC RECALCULATION** (Task 467, Tom 2026-08-20). The switch this page had was a
 		// measurement nobody could see; this is the same decision made out loud. Turning it OFF puts
 		// the Calculate button back on the toolbar -- js/lpn-time.js reads this through the host's
@@ -22253,6 +22385,110 @@ var EngCalcs = EngCalcs || {};
 		});
 		rowFn(host, pc.lpn_settings_default_pattern || 'Default demand pattern', sel,
 			pc.lpn_settings_default_pattern_tip);
+	}
+	// ---- WATER QUALITY, THE TWO CONTROLS (Tom, 2026-09-01: quality is the priority) --------------
+	//
+	// **A SIBLING OF HYDRAULICS, NOT A ROW INSIDE IT.** EPANET's own Analysis Options are Hydraulics,
+	// Quality, Reactions, Times and Energy; the Hydraulics block's own comment already anticipated
+	// this arriving as its own sub-heading rather than as three more rows under a heading that would
+	// then be lying about them. It goes through the SAME row() the hydraulic options use, so there
+	// is one row mechanism in this box and not two.
+	//
+	// **TWO CONTROLS AND NO MORE.** What to track, and -- only when a source share is being tracked
+	// -- which source. A reaction coefficient is not here because nothing works one out yet, on the
+	// emitter-exponent precedent: do not ship the most technical-looking control in the box if it is
+	// the one that adjusts nothing.
+	//
+	// **THE CHEMICAL OPTION IS OFFERED ONLY TO A DOCUMENT THAT ALREADY HAS ONE**, and its own label
+	// says it is carried rather than worked out. A file stating `Quality Chlorine mg/L` must be able
+	// to keep saying so through an open-and-save, which means the mode has to be reachable; but the
+	// page cannot produce that state itself, because it would be offering an analysis it does not run.
+	function settingsQualityRows(host, rowFn, noteFn) {
+		var pc = EngCalcs.pageConfig || {}, q = qualitySetting(),
+			sel = document.createElement('select'), opts = [
+				['none', pc.lpn_quality_none || 'Nothing'],
+				['age', pc.lpn_quality_age || 'Water age'],
+				['trace', pc.lpn_quality_trace || 'Source share']
+			];
+		if (q.mode === 'chemical') {
+			opts.push(['chemical', pc.lpn_quality_chemical || 'A chemical this file names (kept, not worked out)']);
+		}
+		opts.forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			if (o[0] === q.mode) { opt.selected = true; }
+			sel.appendChild(opt);
+		});
+		sel.addEventListener('change', function () {
+			if (!settings.quality) { settings.quality = { mode: 'none', traceNode: '' }; }
+			settings.quality.mode = sel.value;
+			// **THE SOURCE IS SEEDED, NOT DEMANDED.** A source share with nothing named cannot run
+			// at all (js/lpn-epanet.js refuses to write it), so the first fixed-head node in the
+			// drawing is offered as a starting point -- which is what a person picking this almost
+			// always means. They can change it in the row that appears directly below.
+			if (sel.value === 'trace' && !settings.quality.traceNode) {
+				settings.quality.traceNode = qualitySourceCandidates()[0] || '';
+			}
+			saveToStorage();
+			// The whole box: the source row appears or vanishes, and the heading this quantity is
+			// shown under changes in the Labels list, the colour legend and every table.
+			rebuildSettingsBox();
+			refreshLabelText();
+			refreshPopupIfOpen();
+			scheduleSolve();
+		});
+		rowFn(host, pc.lpn_settings_quality_track || 'Track', sel, pc.lpn_settings_quality_track_tip);
+		if (q.mode === 'trace') {
+			var src = document.createElement('select');
+			qualitySourceCandidates().forEach(function (id) {
+				var o = document.createElement('option');
+				o.value = id; o.textContent = id;
+				if (id === q.traceNode) { o.selected = true; }
+				src.appendChild(o);
+			});
+			// **A SOURCE THE DRAWING NO LONGER HAS IS STILL SHOWN**, because deleting the node must
+			// not silently retarget the analysis at some other one. It sits in the list, selected,
+			// and the run declines rather than answering about a node the user did not choose.
+			if (q.traceNode && qualitySourceCandidates().indexOf(q.traceNode) < 0) {
+				var missing = document.createElement('option');
+				missing.value = q.traceNode;
+				missing.textContent = q.traceNode;
+				missing.selected = true;
+				src.appendChild(missing);
+			}
+			src.addEventListener('change', function () {
+				settings.quality.traceNode = src.value;
+				saveToStorage();
+				refreshLabelText();
+				refreshPopupIfOpen();
+				scheduleSolve();
+			});
+			rowFn(host, pc.lpn_settings_quality_source || 'Water from', src,
+				pc.lpn_settings_quality_source_tip);
+		}
+		// **SAID PLAINLY, IN THE BOX, RATHER THAN LEFT TO BE DISCOVERED.** Water quality is carried
+		// along the flows over time, so there is no such thing as a water age at one instant -- it
+		// needs a total run time and it needs the EPANET engine, exactly as the run itself does.
+		// The native solver has no time dimension and is not being given one.
+		if (noteFn && qualitySetting().mode !== 'none') {
+			noteFn(host, pc.lpn_quality_needs_run
+				|| 'Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.');
+		}
+	}
+	/**
+	 * The nodes a source share may be traced from, in drawing order.
+	 *
+	 * **EVERY NODE, NOT ONLY THE RESERVOIRS.** EPANET traces from any node, and the real question
+	 * this answers is often about a junction -- an interconnection with a neighbouring system comes
+	 * into a network at one, and "how much of this water came in there" is exactly the question.
+	 * Fixed-head nodes lead because they are what most people mean by a source.
+	 */
+	function qualitySourceCandidates() {
+		var fixed = [], rest = [];
+		doc.nodes.forEach(function (n) {
+			(isFixedHeadNode(n) ? fixed : rest).push(n.id);
+		});
+		return fixed.concat(rest);
 	}
 	/**
 	 * **WHAT TO DO WITH A NETWORK THAT WILL NOT SETTLE** -- EPANET's `Unbalanced`, in our words
@@ -23764,6 +24000,25 @@ var EngCalcs = EngCalcs || {};
 		setNotice((pc.lpn_prefix_applied || 'Renamed {n} elements. {skipped} others were left alone.')
 			.replace('{n}', String(plan.length)).replace('{skipped}', String(skipped)));
 	}
+	/**
+	 * The read-only water-quality row.
+	 *
+	 * readonlyField() rather than readonlyUnitField(), for the same reason the resolved Demand row
+	 * uses it: nodeQualityValue() has already crossed into the displayed unit, and handing it to a
+	 * converter would convert it a second time.
+	 *
+	 * **NO VERDICT, AND THIS IS THE PLACE IT WOULD BE TEMPTING TO ADD ONE.** Water age has no
+	 * numeric standard -- no Ten States-style bright line exists to check it against -- so there is
+	 * nothing honest for a ✓ or a ⚠ to mean here. The number is reported and the engineer judges it.
+	 */
+	function qualityResultRow(fields, n) {
+		var pc = EngCalcs.pageConfig || {}, v = nodeQualityValue(n), unitId = qualityUnitId();
+		if (v === undefined) { return; }
+		readonlyField(fields,
+			// A percent sign needs no translation and no key; a time unit is named by its selector.
+			qualityLabel() + ' (' + (unitId ? unitLabel(unitId) : '%') + ')', v,
+			qualityMode() === 'age' ? pc.lpn_result_water_age_tip : pc.lpn_result_source_share_tip);
+	}
 	function renderNodeFields(nodeId) {
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(n.id, function (newId) { renameNode(nodeId, newId); });
@@ -23886,6 +24141,11 @@ var EngCalcs = EngCalcs || {};
 				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), lastSolveResult.pressures[nodeId]);
 			}
 		}
+		// **THE WATER-QUALITY ANSWER, FOR EVERY KIND OF NODE, IN ONE PLACE.** A junction, a
+		// reservoir and a tank all have a water age and a source share -- the two that SUPPLY the
+		// network are the most telling ones -- so this is the popup's common tail rather than three
+		// branches. Absent where there is no answer; see nodeQualityValue().
+		qualityResultRow(fields, n);
 		activeField(fields, n);
 		pushHereButton(fields, n);
 		coordFields(fields, outwardX(n.x), outwardY(n.y));
@@ -25285,6 +25545,17 @@ var EngCalcs = EngCalcs || {};
 			// a CLONE because `settings.hydraulics` is the document's own copy in the document's
 			// own units, which the exporter must keep character for character.
 			hydraulics: engineHydraulics(hyd),
+			// **THE WATER-QUALITY ANALYSIS THE DOCUMENT ASKS FOR** -- read by js/lpn-epanet.js and
+			// by nothing else, because quality is time-dependent by nature and only a RUN can
+			// produce one. js/lpn-solver.js has no time dimension and is not being given one.
+			//
+			// **NOTHING HERE CARRIES A UNIT, WHICH IS WHY IT IS NOT CLONED AND CONVERTED THE WAY
+			// `hydraulics` DIRECTLY ABOVE NOW IS.** A mode is a keyword and a source is an id; the
+			// one dimensioned quantity in this whole feature is the ANSWER, a water age, and it
+			// crosses from EPANET's hours to seconds inside the bridge with every other result.
+			// Diffusivity and Tolerance are not sent to the engine at all -- they mean something
+			// only to a reacting chemical, which this page carries and does not work out.
+			quality: qualitySetting(),
 			// **THE RULE TEXT, FILTERED TO THE RULES THAT STILL NAME REAL ELEMENTS** (Task 248.03).
 			// **NOTHING WRITES THIS INTO AN ENGINE INPUT TODAY, AND js/lpn-epanet.js SAYS WHY** --
 			// a rule's numbers are in the units of the file the user opened, and that writer emits
@@ -25426,7 +25697,13 @@ var EngCalcs = EngCalcs || {};
 	// so the resolved value printed bare and the two were unreadable side by side. Q is the demand
 	// the network actually draws; the b says base.
 	var LPN_DEFAULT_LABEL_PREFIX = {
-		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=' },
+		// **WATER QUALITY GETS NO DEFAULT PREFIX, DELIBERATELY.** Every symbol here is standard
+		// hydraulic notation a reader already knows -- Q, H, P, Z -- and neither a water age nor a
+		// source share has one. Inventing an English abbreviation would put untranslated words on
+		// a map in 27 languages to save a legend lookup; a diameter and a length are already
+		// unprefixed on the same argument. The field is off by default, the Labels list names it,
+		// and a user who wants a prefix can type their own.
+		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=', quality: '' },
 		link: { id: '', diameter: '', length: '', km: 'km=', flow: 'Q=', velocity: 'V=', headloss: 'Hl=', gradient: 'S=' }
 	};
 	// Roughness is the one dynamic default: the symbol IS the friction method (C, n or e), so it
@@ -25608,7 +25885,11 @@ var EngCalcs = EngCalcs || {};
 			pressure: nodeValueMap(function (n) {
 				if (isFixedHeadNode(n)) { return displayRound(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), resultUnit('pressure'), nd.pressure); }
 				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], resultUnit('pressure'), nd.pressure) : undefined;
-			})
+			}),
+			// plainRound(), not displayRound(): nodeQualityValue() has already crossed into the
+			// displayed unit, exactly as resolvedDemand() has. Crossing twice is the Task 255 shape
+			// of defect and it looks like a plausible number.
+			quality: nodeValueMap(function (n) { return plainRound(nodeQualityValue(n), nd.quality); })
 		};
 		// **BUILT HERE AND NOWHERE ELSE**, because this is already the one function that runs on every
 		// model change, every solve and every unit switch -- the exact set of events that invalidates
@@ -25631,6 +25912,7 @@ var EngCalcs = EngCalcs || {};
 			demandActual: fieldExtrema(nodeVal.demandActual.list),
 			head: fieldExtrema(nodeVal.head.list),
 			pressure: fieldExtrema(nodeVal.pressure.list),
+			quality: fieldExtrema(nodeVal.quality.list),
 			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'diameter'), ld.diameter) : undefined; })),
 			// PIPE-ONLY, not merely not-a-pump (Task 248 phase 2). A valve has no length by
 			// definition and no roughness to speak of, so including it would drag the low end of
@@ -25699,6 +25981,11 @@ var EngCalcs = EngCalcs || {};
 			// An elevation nobody stated prints nothing, exactly as an unsolved pressure does -- an
 			// imported reservoir has none (Task 390) and rawLine() would have thrown on it.
 			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, extrema.elev, nd.elev))); }
+			// **LAST, AND ONLY WHERE THERE IS ONE.** A network with the analysis off, or one that has
+			// not been run since it was switched on, prints nothing here rather than a zero -- the
+			// same rule an unsolved pressure and an unstated elevation already follow.
+			var qualVal = nodeQualityValue(n);
+			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, extrema.quality, nd.quality))); }
 			// EMPTY IS CAPTURED BEFORE THE PLACEHOLDER BELOW: a label with no fields toggled on still gets
 			// an empty line pushed so getBBox() never throws, and everything downstream (the leader, the
 			// collision box) must know it is really empty rather than really one blank line.

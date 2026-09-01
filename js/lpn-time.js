@@ -113,6 +113,12 @@
 			warnings: run.warnings || [], converged: true, iterations: null,
 			heads: f.heads, pressures: f.pressures, flows: f.flows,
 			headlosses: f.headlosses, velocities: f.velocities,
+			// **THE WATER-QUALITY VALUE, WHICH ONLY A RUN CAN HAVE** -- water age in seconds, or a
+			// source share in percent, per node. `undefined` where the analysis was off, and that
+			// is not the same as a column of zeros: a page that draws nothing is honest about
+			// having nothing, where zeros would read as an answer. `qualityMode` travels with it
+			// because the NUMBER does not say which quantity it is.
+			qualities: f.qualities, qualityMode: (run.quality && run.quality.mode) || null,
 			// Carried but NOT part of the steady-state contract: only this file's own readouts look
 			// at them, and only a run can produce them.
 			demands: f.demands, levels: f.levels, statuses: f.statuses, t: f.t

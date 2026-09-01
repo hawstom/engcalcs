@@ -120,6 +120,9 @@ echoHeader("EngCalcs", $html_title, "", false);
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_flow']?></span><?php echoUnitSelect('lpn_u_flow', 'flow_epanet', ''); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_velocity']?></span><?php echoUnitSelect('lpn_u_velocity', 'velocity', ''); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_gradient']?></span><?php echoUnitSelect('lpn_u_gradient', 'gradient', ''); ?></span>
+		<?php // RESULTS-ONLY, like Velocity and Head loss gradient beside it: nothing on this page is
+		      // typed in hours. A source share is a percentage and has no selector at all. ?>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_water_age']?></span><?php echoUnitSelect('lpn_u_age', 'elapsed_time', ''); ?></span>
 		<span class="lpn-units-item" id="lpn_u_roughness_row"><span class="lpn-units-name"><?=$ec_lang['lpn_field_roughness']?></span><?php echoUnitSelect('lpn_u_roughness', 'roughness', ''); ?></span>
 		</div>
 	</div><?php // #lpn_units_strip ?>
@@ -749,6 +752,11 @@ echoHeader("EngCalcs", $html_title, "", false);
 						<div class="lpn-set-subbody"><div id="lpn_set_time_fields" class="lpn-set-part"></div></div>
 						<div class="lpn-set-sub" id="lpn_set_sub_hydraulics"><?=$ec_lang['lpn_settings_hydraulics']?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_hydraulics_fields" class="lpn-set-part"></div></div>
+						<?php // Quality follows Hydraulics because that is EPANET's own Analysis Options
+						      // order -- Hydraulics, Quality, Reactions, Times, Energy -- so nobody has to
+						      // learn a second arrangement of the same ideas. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_quality"><?=$ec_lang['lpn_settings_quality']?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_quality_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
 				<?php // **THE COLOUR-SCHEME ACKNOWLEDGEMENTS ARE A FOOTER, NOT A SETTING** (Tom, 2026-08-19:
@@ -1407,6 +1415,20 @@ EngCalcs.pageConfig = {
 	lpn_result_headloss: <?=json_encode($ec_lang['lpn_result_headloss'])?>,
 	lpn_result_gradient: <?=json_encode($ec_lang['lpn_result_gradient'])?>,
 	lpn_result_gradient_tip: <?=json_encode($ec_lang['lpn_result_gradient_tip'])?>,
+	lpn_result_water_age: <?=json_encode($ec_lang['lpn_result_water_age'])?>,
+	lpn_result_water_age_tip: <?=json_encode($ec_lang['lpn_result_water_age_tip'])?>,
+	lpn_result_source_share: <?=json_encode($ec_lang['lpn_result_source_share'])?>,
+	lpn_result_source_share_tip: <?=json_encode($ec_lang['lpn_result_source_share_tip'])?>,
+	lpn_settings_quality: <?=json_encode($ec_lang['lpn_settings_quality'])?>,
+	lpn_settings_quality_track: <?=json_encode($ec_lang['lpn_settings_quality_track'])?>,
+	lpn_settings_quality_track_tip: <?=json_encode($ec_lang['lpn_settings_quality_track_tip'])?>,
+	lpn_settings_quality_source: <?=json_encode($ec_lang['lpn_settings_quality_source'])?>,
+	lpn_settings_quality_source_tip: <?=json_encode($ec_lang['lpn_settings_quality_source_tip'])?>,
+	lpn_quality_none: <?=json_encode($ec_lang['lpn_quality_none'])?>,
+	lpn_quality_age: <?=json_encode($ec_lang['lpn_quality_age'])?>,
+	lpn_quality_trace: <?=json_encode($ec_lang['lpn_quality_trace'])?>,
+	lpn_quality_chemical: <?=json_encode($ec_lang['lpn_quality_chemical'])?>,
+	lpn_quality_needs_run: <?=json_encode($ec_lang['lpn_quality_needs_run'])?>,
 	lpn_settings_restore_tip: <?=json_encode($ec_lang['lpn_settings_restore_tip'])?>,
 	lpn_reset_all_tip: <?=json_encode($ec_lang['lpn_reset_all_tip'])?>,
 	lpn_storage_too_new: <?=json_encode($ec_lang['lpn_storage_too_new'])?>,
@@ -1657,6 +1679,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_drop_report: <?=json_encode($ec_lang['lpn_inp_drop_report'])?>,
 	lpn_inp_drop_sections: <?=json_encode($ec_lang['lpn_inp_drop_sections'])?>,
 	lpn_inp_drop_quality_options: <?=json_encode($ec_lang['lpn_inp_drop_quality_options'])?>,
+	lpn_inp_drop_file_options: <?=json_encode($ec_lang['lpn_inp_drop_file_options'])?>,
 	lpn_inp_drop_backdrop: <?=json_encode($ec_lang['lpn_inp_drop_backdrop'])?>,
 	lpn_inp_drop_dangling: <?=json_encode($ec_lang['lpn_inp_drop_dangling'])?>,
 	lpn_inp_drop_units: <?=json_encode($ec_lang['lpn_inp_drop_units'])?>,

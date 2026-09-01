@@ -196,6 +196,48 @@ console.log('\n--- saved with the project, and shown nowhere ---');
 		});
 	ok('Settings offers no Diffusivity row', !labels.some(t => /Diffusiv/i.test(t)), labels.join(' | '));
 	ok('Settings names no chemical', !labels.some(t => /Chlorine|Quality/i.test(t)), labels.join(' | '));
+
+	// **AND THE TWO ROWS THAT DO EXIST**, in their own sub-heading rather than among the hydraulic
+	// ones above -- EPANET's own Analysis Options order, Hydraulics then Quality. Read off the
+	// rendered box for the same reason the absences above are.
+	function rowsIn(host) {
+		return all(host, [])
+			.filter(n => n.tagName === 'LABEL' && /lpn-set-row/.test(n.className || ''))
+			.map(function (line) {
+				const span = (line.children || []).filter(c => c.tagName === 'SPAN')[0];
+				return span ? span.textContent.replace(/\s+/g, ' ').trim() : '';
+			});
+	}
+	const qRows = rowsIn(byId.lpn_set_quality_fields);
+	ok('Water quality has its own rows, and Hydraulics does not carry them',
+		qRows.length >= 1 && !labels.some(t => /^Track$/i.test(t)), qRows.join(' | '));
+	ok('...the first of which is what to track', /Track/i.test(qRows[0] || ''), qRows.join(' | '));
+	// **THE SOURCE ROW APPEARS ONLY WHERE IT MEANS ANYTHING.** Net1 names a chemical, so nothing on
+	// this page is tracing a source, and a "Water from" selector beside it would be a control with
+	// no analysis behind it.
+	ok('...and no source row while nothing is being traced',
+		!qRows.some(t => /Water from/i.test(t)), qRows.join(' | '));
+
+	// Switch it to a source share the way the control does, and the second row arrives.
+	L.getSettings().quality = { mode: 'trace', traceNode: '10' };
+	L.rebuildSettings();
+	const traced = rowsIn(byId.lpn_set_quality_fields);
+	ok('tracing a source adds the row that names it',
+		traced.some(t => /Water from/i.test(t)), traced.join(' | '));
+	// **THE CHEMICAL THE FILE NAMED IS STILL REACHABLE**, or an open-and-save could not put it back.
+	L.getSettings().quality = { mode: 'chemical', traceNode: '', src: 'Chlorine mg/L' };
+	L.rebuildSettings();
+	const chem = all(byId.lpn_set_quality_fields, [])
+		.filter(n => n.tagName === 'SELECT')
+		.map(sel => (sel.children || []).map(o => o.value).join(','))[0] || '';
+	ok('a file that names a chemical can still say so', /chemical/.test(chem), chem);
+	// ...and a document that names none is never offered it, because this page cannot produce one.
+	L.getSettings().quality = { mode: 'none', traceNode: '' };
+	L.rebuildSettings();
+	const plain = all(byId.lpn_set_quality_fields, [])
+		.filter(n => n.tagName === 'SELECT')
+		.map(sel => (sel.children || []).map(o => o.value).join(','))[0] || '';
+	ok('and a document that names none is not offered one', !/chemical/.test(plain), plain);
 }
 
 // ---------------------------------------------------------------------------
@@ -214,7 +256,16 @@ console.log('\n--- the report tells the user, and tells the truth ---');
 
 	const kept = L.dropText('quality-options');
 	ok('the new sentence says they are kept', /kept/i.test(kept), JSON.stringify(kept));
-	ok('...and that nothing here uses them', /Nothing on this page uses/i.test(kept), JSON.stringify(kept));
+	// **THIS ASSERTION WAS INVERTED ON 2026-09-01, AND THE INVERSION IS THE POINT.** It used to
+	// require the words "Nothing on this page uses" -- true while all three options were carried
+	// text, and FALSE the moment `Quality` became a live input driving a water-age or source-share
+	// run. That is exactly the failure the block below is about: a sentence that was honest when it
+	// was written and quietly became an over-claim in the other direction. So the sentence must now
+	// say that a chemical is not worked out here, and must NOT claim that none of them is used.
+	ok('...and no longer claims the page uses none of them',
+		!/Nothing on this page uses/i.test(kept), JSON.stringify(kept));
+	ok('...and still says a chemical is not worked out here',
+		/chemical is not/i.test(kept), JSON.stringify(kept));
 	// **THE HALF THAT WENT WRONG LAST TIME.** `lpn_inp_drop_rules` had to be rewritten the moment
 	// rules started being carried, because "left out" had become false and a user reading it would
 	// believe theirs were lost. The same sentence covered these settings until now.

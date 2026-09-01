@@ -59,6 +59,11 @@
 		EN_EMITTER = 3,
 		EN_HEAD = 10,
 		EN_PRESSURE = 11,
+		// The node's water-quality value at the moment the quality clock is standing on. What it
+		// MEANS is whatever [OPTIONS] Quality asked for: HOURS for water age, PERCENT for a source
+		// share. EPANET reports both through this one property, which is why the caller has to know
+		// which analysis it asked for -- the number carries no unit with it.
+		EN_QUALITY = 12,
 		EN_FLOW = 8,
 		EN_VELOCITY = 9,
 		EN_HEADLOSS = 10,
@@ -392,7 +397,29 @@
 				['Start ClockTime', 'startClock']].forEach(function (pair) {
 				timeRows.push(' ' + pair[0] + '  ' + EngCalcs.lpnFormatTime(time.times[pair[1]] || 0));
 			});
+			// **THE QUALITY TIME STEP, ONLY WHERE THE DOCUMENT STATES ONE.** Absent it, EPANET uses
+			// its own default (a tenth of the hydraulic step), which is the right answer for a
+			// network nobody has said anything about -- and stating a made-up number here would put
+			// this bridge's opinion in front of the engine's. Net3 states 0:05 and its published
+			// report is worked out at that step, which is why reproducing that report needs it.
+			if (time.times.qualityStep > 0) {
+				timeRows.push(' Quality Timestep  ' + EngCalcs.lpnFormatTime(time.times.qualityStep));
+			}
 		}
+
+		// **THE WATER-QUALITY ANALYSIS, AND ONLY THE TWO THIS PAGE ACTUALLY WORKS OUT.**
+		// `model.quality` is the document's interpreted setting (js/lpn-inp.js's lpnQualityParse);
+		// mode 'age' and mode 'trace' are written here and run, and mode 'chemical' is NOT --
+		// a reacting chemical needs [REACTIONS], [SOURCES] and [MIXING], which this bridge does not
+		// write, so stating `Quality Chlorine mg/L` would ask EPANET for an analysis whose inputs
+		// are all missing and get a plausible column of zeros back. Carried text stays carried text.
+		//
+		// A TRACE WITH NO SOURCE NAMED IS NOT WRITTEN either: EPANET rejects the file over an
+		// unknown trace node, and refusing the whole network is a far worse answer than leaving the
+		// quality column empty until the user picks one.
+		var qual = model.quality || {}, qualMode = qual.mode, qualLine = '';
+		if (qualMode === 'age') { qualLine = 'AGE'; }
+		else if (qualMode === 'trace' && qual.traceNode) { qualLine = 'TRACE ' + qual.traceNode; }
 
 		var inp = '[TITLE]\nEngCalcs looped network\n\n' +
 			'[JUNCTIONS]\n' + junctions.join('\n') + '\n\n' +
@@ -432,6 +459,7 @@
 			(timeRows.length ? '[TIMES]\n' + timeRows.join('\n') + '\n\n' : '') +
 			'[OPTIONS]\n Units LPS\n Headloss ' + headloss +
 			'\n Emitter Exponent ' + emitterExp +
+			(qualLine ? '\n Quality ' + qualLine : '') +
 			// **THE FLUID, WHERE THE PROJECT NAMES IT** (Task 553). Written only when stated, so a
 			// project that says nothing gets EPANET's own defaults exactly as it always did.
 			// Viscosity here is EPANET's RELATIVE one, which is the form the option is stored in;
@@ -955,6 +983,28 @@
 	// report does it.
 	var EN_STATUS = 11, EN_DEMAND = 9;
 
+	// initH()'s InitHydOption. 0 runs the hydraulics and throws them away as it goes; 1 SAVES them,
+	// which is the whole precondition for a water-quality analysis -- runQ() transports a species
+	// along flows that have already been worked out, so it reads a saved hydraulics file rather
+	// than re-solving. Asking for the save costs a scratch file inside the engine's own filesystem
+	// and nothing on this side, but it is asked for only when a quality run is actually wanted.
+	var EN_NOSAVE = 0, EN_SAVE = 1;
+
+	/**
+	 * Does this model ask for a water-quality analysis this bridge can actually run?
+	 *
+	 * **THE ONE PLACE THAT LINE IS DRAWN**, the same way EngCalcs.lpnValveIsNative is the one place
+	 * the valve line is. Age needs nothing but the switch. A source share needs a source named, and
+	 * an unnamed one is not a quality run at all -- EPANET rejects the file over a trace node it
+	 * cannot resolve, so it must never reach the writer. A chemical is carried, never run: see the
+	 * note in lpnToInp.
+	 */
+	EngCalcs.lpnQualityRuns = function (quality) {
+		var q = quality || {};
+		if (q.mode === 'age') { return true; }
+		return q.mode === 'trace' && !!q.traceNode;
+	};
+
 	function nowMs() {
 		return (root.performance && root.performance.now) ? root.performance.now() : Date.now();
 	}
@@ -1008,7 +1058,19 @@
 		return EngCalcs.lpnEpanetLoad(url).then(function (mod) {
 			return workspaceFor(mod, url).then(function (ws) {
 				var p = new mod.Project(ws), frames = [], nodeIdx = {}, linkIdx = {},
-					i, n, l, t = 0, tstep, guard = 0, seen = 0, closed = false;
+					i, n, l, t = 0, tstep, guard = 0, seen = 0, closed = false,
+					// **THE QUALITY ANALYSIS IS A SECOND PASS OVER THE SAME CLOCK, NOT A SECOND
+					// COLUMN IN THE FIRST ONE.** EPANET transports a species along flows that have
+					// already been solved, so the order is fixed: run the hydraulics with EN_SAVE,
+					// close them, then open the quality clock and walk it. Interleaving runH() and
+					// runQ() is not a thing the toolkit offers, and doing the quality pass first is
+					// not either.
+					qualOn = EngCalcs.lpnQualityRuns(model.quality),
+					qualityIsAge = qualOn && (model.quality || {}).mode === 'age',
+					// The two passes share one progress bar, so each owns half of it. Both are the
+					// same walk over the same duration, which is the only reason a flat half-and-half
+					// split is honest rather than a guess.
+					phase0 = 0, phaseSpan = qualOn ? 0.5 : 1;
 
 				// ALWAYS closed, on every path out. A Project is a WASM allocation inside a
 				// Workspace that outlives it, so a run that threw would otherwise leak the whole
@@ -1018,6 +1080,7 @@
 					var txt = '';
 					if (closed) { return txt; }
 					closed = true;
+					try { p.closeQ(); } catch (e) { /* no quality pass, or already shut */ }
 					try { p.closeH(); } catch (e) { /* never opened, or already shut */ }
 					try { p.close(); } catch (e) { /* already torn down */ }
 					try { txt = ws.readFile('eps.rpt') || ''; } catch (e) { txt = ''; }
@@ -1035,10 +1098,17 @@
 					var f = duration > 0 ? t / duration : 1;
 					if (!(f >= 0)) { f = 0; }
 					if (f > 1) { f = 1; }
+					f = phase0 + f * phaseSpan;
 					// Monotonic OUT as well as in: nothing downstream should ever have to wonder.
 					if (f < seen) { f = seen; }
 					seen = f;
 					return f;
+				}
+				// Is `t` a moment the report keeps? The hydraulic loop and the quality loop ask the
+				// same question of the same grid, and asking it twice in two places is how the two
+				// passes end up with different frame lists.
+				function isReportTime(now) {
+					return now >= reportStart && ((now - reportStart) % reportStep) === 0 && now <= duration;
 				}
 
 				ws.writeFile('eps.inp', built.inp);
@@ -1053,7 +1123,7 @@
 					for (i = 0; i < model.nodes.length; i++) { nodeIdx[model.nodes[i].id] = p.getNodeIndex(model.nodes[i].id); }
 					for (i = 0; i < model.links.length; i++) { linkIdx[model.links[i].id] = p.getLinkIndex(model.links[i].id); }
 					p.openH();
-					p.initH(0);
+					p.initH(qualOn ? EN_SAVE : EN_NOSAVE);
 				} catch (e) {
 					// **THE REFUSAL** (Task 471). EPANET has our file and will not take it -- a
 					// dangling control, an id it cannot resolve. It resolves rather than rejects,
@@ -1067,8 +1137,76 @@
 				}
 
 				return new Promise(function (resolve) {
+					// The frames, by their own reporting time, so the quality pass can find the one
+					// it is standing on without searching the array at every step.
+					var frameAt = {};
+					function done() {
+						var report = shutdown();
+						seen = 1;
+						tell(1);
+						resolve({
+							ok: true, engine: 'epanet', engineVersion: ws.version, issues: [],
+							warnings: built.warnings, converged: true, frames: frames,
+							duration: duration, reportStart: reportStart, reportStep: reportStep,
+							quality: qualOn ? (model.quality || null) : null,
+							report: report
+						});
+					}
+					function failed(e) {
+						resolve(engineRefusal(e, {
+							warnings: built.warnings, frames: [], report: shutdown(),
+							duration: duration, reportStart: reportStart, reportStep: reportStep
+						}));
+					}
+					/**
+					 * **THE QUALITY WALK.** Same clock, same reporting grid, same slicing -- and a
+					 * frame that already exists rather than a second frame list, so a scrub of the
+					 * transport can never show a head from one moment beside a water age from
+					 * another.
+					 *
+					 * **THE NUMBER IS CONVERTED HERE AND NOWHERE ELSE.** EPANET reports water age in
+					 * HOURS, and every result on this bridge leaves in SI -- so age crosses to
+					 * SECONDS at this one line, exactly as a flow crosses from L/s. A source share
+					 * is a percentage and is nobody's unit, so it crosses nothing. Getting this
+					 * backwards would be silent: 6.5 read as seconds is a plausible small number
+					 * beside a plausible large one.
+					 */
+					function qslice() {
+						var slice0 = nowMs(), finished = false, f, tq, qstep, qi, qn;
+						try {
+							for (;;) {
+								tq = p.runQ();
+								t = tq;
+								f = frameAt[tq];
+								if (f && isReportTime(tq)) {
+									f.qualities = {};
+									for (qi = 0; qi < model.nodes.length; qi++) {
+										qn = model.nodes[qi];
+										f.qualities[qn.id] = p.getNodeValue(nodeIdx[qn.id], EN_QUALITY) *
+											(qualityIsAge ? 3600 : 1);
+									}
+								}
+								qstep = p.nextQ();
+								if (!(qstep > 0) || ++guard >= 200000) { finished = true; break; }
+								if (nowMs() - slice0 >= sliceMs) { break; }
+							}
+						} catch (e) { failed(e); return; }
+						if (!finished) { tell(fractionNow()); setTimeout(qslice, 0); return; }
+						done();
+					}
+					function startQuality() {
+						try {
+							// closeH() flushes the saved hydraulics the quality walk reads. It is
+							// the precondition, not tidying up.
+							p.closeH();
+							p.openQ();
+							p.initQ(EN_NOSAVE);
+						} catch (e) { failed(e); return; }
+						phase0 = 0.5; phaseSpan = 0.5; t = 0; guard = 0;
+						qslice();
+					}
 					function slice() {
-						var slice0 = nowMs(), finished = false, f, report;
+						var slice0 = nowMs(), finished = false, f;
 						try {
 							for (;;) {
 								t = p.runH();
@@ -1076,7 +1214,7 @@
 								// may be asked to report only its second half; the modulo because
 								// runH() lands on tank and control events that belong to nobody's
 								// report.
-								if (t >= reportStart && ((t - reportStart) % reportStep) === 0 && t <= duration) {
+								if (isReportTime(t)) {
 									f = {
 										t: t, heads: {}, pressures: {}, demands: {}, levels: {},
 										flows: {}, velocities: {}, headlosses: {}, statuses: {}
@@ -1108,6 +1246,7 @@
 										f.statuses[l.id] = p.getLinkValue(linkIdx[l.id], EN_STATUS) > 0 ? 'open' : 'closed';
 									}
 									frames.push(f);
+									frameAt[f.t] = f;
 								}
 								tstep = p.nextH();
 								// A guard, not a policy: a network that somehow never advances would hang
@@ -1120,10 +1259,7 @@
 							// when it reaches them. Same condition, same shape, resolved for the
 							// same reason -- and the frames gathered so far go, because a partial
 							// period drawn as a whole one is the silent wrong answer again.
-							resolve(engineRefusal(e, {
-								warnings: built.warnings, frames: [], report: shutdown(),
-								duration: duration, reportStart: reportStart, reportStep: reportStep
-							}));
+							failed(e);
 							return;
 						}
 						if (!finished) {
@@ -1134,15 +1270,8 @@
 							setTimeout(slice, 0);
 							return;
 						}
-						report = shutdown();
-						seen = 1;
-						tell(1);
-						resolve({
-							ok: true, engine: 'epanet', engineVersion: ws.version, issues: [],
-							warnings: built.warnings, converged: true, frames: frames,
-							duration: duration, reportStart: reportStart, reportStep: reportStep,
-							report: report
-						});
+						if (qualOn) { startQuality(); return; }
+						done();
 					}
 					tell(0);
 					slice();

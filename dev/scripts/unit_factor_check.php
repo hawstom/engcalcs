@@ -119,6 +119,8 @@ $expected = array(
     'mmph' => 3.6e6, 'inph' => 3600 / $IN,
     // unit discharge
     'm2ps' => 1.0, 'ft2ps' => 1 / ($FT * $FT),
+    // elapsed time -- SI base is the second, and both are exact by definition.
+    'hr' => 1 / 3600.0, 'day' => 1 / 86400.0,
 );
 
 // ---------------------------------------------------------------------------------------------
