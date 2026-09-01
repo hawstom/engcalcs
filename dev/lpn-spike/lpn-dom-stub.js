@@ -326,10 +326,13 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_set_sub_nodeSym', 'lpn_set_sub_linkSym', 'lpn_set_sub_nodeLink',
   'lpn_set_sub_mapDisplay', 'lpn_set_sub_page',
   'lpn_set_sub_idPrefixes', 'lpn_set_sub_defaults',
-  'lpn_set_sub_units', 'lpn_set_sub_time', 'lpn_set_sub_hydraulics',
+  'lpn_set_sub_units', 'lpn_set_sub_time', 'lpn_set_sub_hydraulics', 'lpn_set_sub_quality',
   'lpn_set_colors_node', 'lpn_set_colors_link', 'lpn_set_colors_nodelink', 'lpn_set_colors_shared',
   'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
-  'lpn_set_hydraulics_fields', 'lpn_set_page_fields', 'lpn_set_time_fields',
+  // Water quality's own host. Absent from this list, settingsQualityRows() returns without
+  // building anything and the Track control is invisible to every harness -- the same silent hole
+  // the fire-flow box's own note below describes.
+  'lpn_set_hydraulics_fields', 'lpn_set_quality_fields', 'lpn_set_page_fields', 'lpn_set_time_fields',
   // The credits footer, below every section rather than inside one (Tom, 2026-08-19).
   'lpn_set_ramp_credits',
   // The fire flow box and its two hosts (ROADMAP Task 530). Absent from this list,

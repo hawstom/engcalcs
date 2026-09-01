@@ -20888,8 +20888,12 @@ var EngCalcs = EngCalcs || {};
 			mapBody = byId('lpn_set_map_fields'), unitsBody = byId('lpn_set_units_fields'),
 			compBody = byId('lpn_set_hydraulics_fields'), qualBody = byId('lpn_set_quality_fields'),
 			pageBody = byId('lpn_set_page_fields');
-		if (!idBody || !defBody || !mapBody || !unitsBody || !compBody || !pageBody) { return; }
-		[idBody, defBody, mapBody, unitsBody, compBody, pageBody].forEach(clearFields);
+		if (!idBody || !defBody || !mapBody || !unitsBody || !compBody || !qualBody || !pageBody) { return; }
+		// **EVERY HOST THIS FUNCTION FILLS MUST ALSO BE CLEARED BY IT**, and a host left out of this
+		// line does not fail: it ACCUMULATES, so the box grows another copy of its rows on every
+		// rebuild, and rebuilding is what a settings change does. Measured on the water-quality host
+		// the day it was added -- seven Track rows after four switches.
+		[idBody, defBody, mapBody, unitsBody, compBody, qualBody, pageBody].forEach(clearFields);
 		// **A ROW IS A FLEX LINE, NOT A LABEL FOLLOWED BY A <br>.** Tom, 2026-08-18: "It can be
 		// longer and narrower ... A few things can wrap. Inputs can be shorter." A label that simply
 		// precedes its control cannot wrap without the control wrapping with it and cannot line its
@@ -21523,7 +21527,7 @@ var EngCalcs = EngCalcs || {};
 		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET solver', engInput, pc.lpn_settings_engine_epanet_tip);
 		// EPANET's own Analysis Options order puts Quality directly after Hydraulics, and so does
 		// the Settings box. One call; every row it builds is settingsQualityRows()'s own.
-		if (qualBody) { settingsQualityRows(qualBody, row, note); }
+		settingsQualityRows(qualBody, row, note);
 		// **AUTOMATIC RECALCULATION** (Task 467, Tom 2026-08-20). The switch this page had was a
 		// measurement nobody could see; this is the same decision made out loud. Turning it OFF puts
 		// the Calculate button back on the toolbar -- js/lpn-time.js reads this through the host's
