@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 1521,
-        "delta_key_count": 208,
+        "expected_key_count": 1524,
+        "delta_key_count": 211,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -548,6 +548,9 @@
         "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: Quality, which names what to follow through the pipes, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
         "lpn_inp_drop_file_options": "This file names another file beside it: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
+        "lpn_diag_not_converged_drawn": "The solve did not converge. These numbers are the last try, not an answer. Do not use them.",
+        "lpn_diag_not_converged_trials": "It stopped after {trials} trials.",
+        "lpn_diag_not_converged_error": "It stopped after {trials} trials at a relative error of {error}, against an accuracy of {accuracy}.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
@@ -758,6 +761,9 @@
         "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: Quality, which names what to follow through the pipes, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
         "lpn_inp_drop_file_options": "This file names another file beside it: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
+        "lpn_diag_not_converged_drawn": "The solve did not converge. These numbers are the last try, not an answer. Do not use them.",
+        "lpn_diag_not_converged_trials": "It stopped after {trials} trials.",
+        "lpn_diag_not_converged_error": "It stopped after {trials} trials at a relative error of {error}, against an accuracy of {accuracy}.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
@@ -2150,6 +2156,54 @@
                     "key": "lpn_inp_drop_backdrop",
                     "value": "यह फ़ाइल एक पृष्ठभूमि चित्र का नाम लेती है पर उसमें चित्र ही नहीं है। इसे स्वयं File, Background image, Add image से जोड़ें।",
                     "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                }
+            }
+        },
+        "lpn_diag_not_converged_drawn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_not_converged",
+                    "value": "कोई हल नहीं मिला। ऐसे मान जाँचें जो वास्तविक जीवन में असंभव हों, जैसे शून्य व्यास।",
+                    "english": "No solution was found. Check for values that are impossible in real life, such as a diameter of zero."
+                },
+                "next_translated": {
+                    "key": "lpn_field_roughness",
+                    "value": "खुरदरापन",
+                    "english": "Roughness"
+                }
+            }
+        },
+        "lpn_diag_not_converged_trials": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_not_converged",
+                    "value": "कोई हल नहीं मिला। ऐसे मान जाँचें जो वास्तविक जीवन में असंभव हों, जैसे शून्य व्यास।",
+                    "english": "No solution was found. Check for values that are impossible in real life, such as a diameter of zero."
+                },
+                "next_translated": {
+                    "key": "lpn_field_roughness",
+                    "value": "खुरदरापन",
+                    "english": "Roughness"
+                }
+            }
+        },
+        "lpn_diag_not_converged_error": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_not_converged",
+                    "value": "कोई हल नहीं मिला। ऐसे मान जाँचें जो वास्तविक जीवन में असंभव हों, जैसे शून्य व्यास।",
+                    "english": "No solution was found. Check for values that are impossible in real life, such as a diameter of zero."
+                },
+                "next_translated": {
+                    "key": "lpn_field_roughness",
+                    "value": "खुरदरापन",
+                    "english": "Roughness"
                 }
             }
         },

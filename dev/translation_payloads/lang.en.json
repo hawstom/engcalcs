@@ -1063,6 +1063,9 @@
         "lpn_diag_valve_needs_epanet": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:",
         "lpn_diag_valve_on_fixed_head": "These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:",
         "lpn_diag_not_converged": "No solution was found. Check for values that are impossible in real life, such as a diameter of zero.",
+        "lpn_diag_not_converged_drawn": "The solve did not converge. These numbers are the last try, not an answer. Do not use them.",
+        "lpn_diag_not_converged_trials": "It stopped after {trials} trials.",
+        "lpn_diag_not_converged_error": "It stopped after {trials} trials at a relative error of {error}, against an accuracy of {accuracy}.",
         "lpn_field_roughness": "Roughness",
         "lpn_field_roughness_tip": "Hazen-Williams C. A higher number means a smoother pipe: about 150 for new plastic, 130 for new steel or iron, and 100 for old pipe.",
         "lpn_field_length": "Length",
@@ -1523,7 +1526,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer, and the reason given is {id}"
     },
-    "count": 1521,
+    "count": 1524,
     "active_prefixes": [
         "about",
         "bpn",
