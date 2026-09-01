@@ -137,6 +137,11 @@ run_check "storage inventory selftest"   blocking php dev/scripts/storage_invent
 # terms.php, which do not -- which is the whole argument for checking it rather than writing it down.
 run_check "page meta and cache busting"  blocking php dev/scripts/page_meta_check.php
 run_check "page meta selftest"           blocking php dev/scripts/page_meta_selftest.php
+# Task 322 row 21. Steps 2 and 7 of "How to Add a New Calculator", both of which fail INVISIBLY
+# from the page: a calculator no menu row links to renders perfectly and no visitor can reach it,
+# and a prefix missing from CLAUDE.md's table is free to be handed to the next calculator.
+run_check "calculator pages wired"       blocking php dev/scripts/calculator_page_check.php
+run_check "calculator page selftest"     blocking php dev/scripts/calculator_page_selftest.php
 # Task 322 row 6, in its strictest TRUE form. CLAUDE.md says "call ecSessionStart()"; that function
 # does not exist -- Task 288 removed PHPSESSID outright and the helper went with it -- so the honest
 # number of sessions here is ZERO, not "one, gated". A session writes an identifier to a visitor's
@@ -209,6 +214,11 @@ run_check "layout tags match widgets" blocking php dev/scripts/layout_tag_check.
 # left is shipped to 26 agents as though it were a synonym.
 run_check "syn tags right of the pipe"   blocking php dev/scripts/syn_tag_side_check.php
 run_check "syn tag side selftest"        blocking php dev/scripts/syn_tag_side_selftest.php
+# Task 322 row 26. A verdict leads with its glyph and never a marker word. WHICH strings are
+# verdicts is read out of the RENDERER -- writeCheckHTML()'s short-text argument and the labels
+# objects -- rather than guessed from key names, which is what the survey said made it risky.
+run_check "verdict strings"              blocking php dev/scripts/verdict_string_check.php
+run_check "verdict string selftest"      blocking php dev/scripts/verdict_string_selftest.php
 # Task 322 rows 17 and 18. "Awaiting native review" promises a resolution that is not coming;
 # and a language declared with no file is a fatal for the one visitor whose browser asked for
 # it, while a file nobody declared is a paid-for translation the suite cannot reach.
