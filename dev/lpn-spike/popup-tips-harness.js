@@ -80,7 +80,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // The Settings box's hosts (Task 441, restructured): rebuildSettingsFields() writes a row into
   // the host that stands under its own sub-heading, and returns early if any of the six is absent.
   'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
-  'lpn_set_hydraulics_fields', 'lpn_set_page_fields'
+  'lpn_set_hydraulics_fields', 'lpn_set_quality_fields', 'lpn_set_page_fields'
 ].forEach(ensure);
 
 global.document = {

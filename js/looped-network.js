@@ -25697,7 +25697,13 @@ var EngCalcs = EngCalcs || {};
 	// so the resolved value printed bare and the two were unreadable side by side. Q is the demand
 	// the network actually draws; the b says base.
 	var LPN_DEFAULT_LABEL_PREFIX = {
-		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=' },
+		// **WATER QUALITY GETS NO DEFAULT PREFIX, DELIBERATELY.** Every symbol here is standard
+		// hydraulic notation a reader already knows -- Q, H, P, Z -- and neither a water age nor a
+		// source share has one. Inventing an English abbreviation would put untranslated words on
+		// a map in 27 languages to save a legend lookup; a diameter and a length are already
+		// unprefixed on the same argument. The field is off by default, the Labels list names it,
+		// and a user who wants a prefix can type their own.
+		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=', quality: '' },
 		link: { id: '', diameter: '', length: '', km: 'km=', flow: 'Q=', velocity: 'V=', headloss: 'Hl=', gradient: 'S=' }
 	};
 	// Roughness is the one dynamic default: the symbol IS the friction method (C, n or e), so it
