@@ -53,7 +53,19 @@ enthusiasm.
 
 ### 1. A scenario-level demand multiplier, so avg-day/max-day/peak-hour is one number, not one edit per node
 
-Tom: *"Nice."* Unchanged from the prior pass.
+Tom: *"Nice."*
+
+**BUILT 2026-09-02 by Claude Code, on Tom's standing instruction to take reasonable rows from these
+lists. Not promoted to `dev/ROADMAP.md` — no agent, and no session acting on an agent's list, edits
+that file.** All four of the designed points shipped as designed: an overridden node demand is
+multiplied like a Base one; `settings.hydraulics.demandMultiplier` became scenario-overridable
+rather than a new field; storage is a scalar on the scenario object, NOT through
+`effective()`/`setProp()`; and it belongs to the Scenario. The row it is edited in is the one that
+was already there — one row, two homes, blank meaning "inherit" in a scenario exactly as it means
+"the file did not say" in Base. It reaches the solve, the engine bridge, the `.inp` export and the
+scenario badge, and it survives a save. `dev/lpn-spike/scenario-demand-multiplier-harness.js`.
+**Un-asserted and left for a browser:** the Settings box rebuilding on a scenario switch while it is
+open, which is the one behaviour a headless harness cannot see.
 
 - **What:** a single scalar a scenario can carry — "all base demands × 1.8" — resolved at solve
   time the same way a demand pattern already is (`demandMultiplier()`, `js/looped-network.js:21157`),
