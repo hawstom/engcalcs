@@ -167,7 +167,8 @@ console.log('\n--- and it really fills the window, inline caps and all ---');
 		"\t\tfillPanelToScreen: fillPanelToScreen,\n" +
 		"\t\tresetPanelFill: resetPanelFill,\n" +
 		"\t\tplacePanelForScreen: placePanelForScreen,\n" +
-		"\t\tsmallScreen: smallScreen,\n"
+		"\t\tsmallScreen: smallScreen,\n" +
+		"\t\tmakePanelDraggable: makePanelDraggable, raisePanel: raisePanel,\n"
 	);
 
 	// THE COUPLING THE STUB IS MISSING. A real box measures what its style says; this one does too,
@@ -307,6 +308,78 @@ console.log('\n--- a box that fills the screen has to be scrollable by finger --
 	// version may break: **blank must keep meaning "the file did not say"**, because an empty box
 	// exports no line and a typed default exports one stating it. Those are two different files and
 	// only the user may choose between them.
+	// ============================================================================================
+	// PANEL STACKING (Tom, 2026-09-02) -- three reports, one missing mechanism
+	// ============================================================================================
+	// *"The boxes that can drag up to the top of the page need to cover the menu icons and the
+	// project tabs. They need to cover everything."* / *"When the Find box is open, the other
+	// moveables need to still move. Fire flow doesn't, and Settings opened behind it, lost."* /
+	// *"The box I am moving now needs to be at the draworder front."*
+	//
+	// **THIS ASSERTS A REVERSAL, which is why it is worth spelling out.** Tom's 2026-08-24 ruling
+	// put the chrome ABOVE the boxes and the stylesheet still carries a z-index of 30 for that
+	// reason; his 2026-09-02 ruling puts every movable box above it. Both are his. A future reader
+	// finding the older sentence in the CSS must not "restore" it.
+	const CHROME_Z = 30;
+	const chromeRule = /#lpn_menubar,\s*#lpn_toolbar,\s*#lpn_tabs\s*\{[^}]*z-index:\s*(\d+)/.exec(css);
+	ok('the chrome still declares a z-index of its own', chromeRule && Number(chromeRule[1]) === CHROME_Z,
+		chromeRule && chromeRule[1]);
+	const panelRule = /\.lpn-dragpanel\s*\{[^}]*z-index:\s*(\d+)/.exec(css);
+	ok('every movable box starts far above it', panelRule && Number(panelRule[1]) >= 1000,
+		panelRule && panelRule[1]);
+	ok('...and above Bootstrap\'s fixed navbar (1030) and the toolbar (1080)',
+		panelRule && Number(panelRule[1]) > 1080, panelRule && panelRule[1]);
+	// The run box is draggable like the rest, and at EQUAL specificity the later rule wins -- so its
+	// own class z-index was quietly beating .lpn-dragpanel's until 2026-09-02. A run in progress must
+	// not be buried by a box opened over it.
+	const runRule = /\.lpn-runbox\s*\{[^}]*z-index:\s*(\d+)/.exec(css);
+	ok('the run box is in the same stack, not under it',
+		runRule && panelRule && Number(runRule[1]) >= Number(panelRule[1]),
+		runRule && runRule[1]);
+	// The registration bar is deliberately over everything while a click sequence is running.
+	ok('and the registration bar still outranks them all',
+		/z-index:\s*3000/.test(css) && panelRule && Number(panelRule[1]) < 3000);
+
+	// **RAISE ON TOUCH IS REGISTERED IN THE CAPTURE PHASE, and that is load-bearing.** The drag
+	// handler returns early unless the press is on the panel's own chrome, so a press on a control
+	// inside the box never reaches it -- and typing in Find must still bring Find forward.
+	ok('a press anywhere in a panel raises it, captured before the drag handler',
+		/popup\.addEventListener\('pointerdown', function \(\) \{ raisePanel\(popup\); \}, true\)/
+			.test(body('makePanelDraggable')));
+	ok('opening a box raises it too, at the one seam every standing box is placed through',
+		/__lpnRaise\(\)/.test(body('placePanelForScreen')));
+	// The counter only counts up. Comparing and swapping would need a registry of every panel.
+	ok('the stack counter never goes down', /lpnPanelZ \+= 1;/.test(js) && !/lpnPanelZ -/.test(js));
+
+	// **AND IT ACTUALLY REORDERS, run rather than read.** Everything above this is source-level and
+	// would pass on a raisePanel() that assigned nothing. Two real panels, raised in turn: the one
+	// raised last must be numerically in front, which is the whole of Tom's third report.
+	const S = require('./lpn-dom-stub.js').loadLoopedNetwork(
+		"\t\traisePanel: raisePanel,\n"
+	);
+	const a = { style: {}, classList: { add: function () {} }, addEventListener: function () {},
+		getBoundingClientRect: function () { return { left: 0, top: 0, width: 10, height: 10 }; } };
+	const b = { style: {}, classList: { add: function () {} }, addEventListener: function () {},
+		getBoundingClientRect: function () { return { left: 0, top: 0, width: 10, height: 10 }; } };
+	S.raisePanel(a);
+	S.raisePanel(b);
+	ok('the box raised last is in front', Number(b.style.zIndex) > Number(a.style.zIndex),
+		a.style.zIndex + ' then ' + b.style.zIndex);
+	ok('...and both are above the chrome, so neither can hide under the menu bar',
+		Number(a.style.zIndex) > CHROME_Z && Number(b.style.zIndex) > CHROME_Z,
+		a.style.zIndex + ', ' + b.style.zIndex);
+	// Tom's second report: with Find open, Fire flow would not move and a new Settings opened behind
+	// it. Raising the older box again must put it back on top -- otherwise "click it to use it"
+	// does not work and the user is stuck reaching for the menu, which is exactly what he did.
+	S.raisePanel(a);
+	ok('raising an older box again brings it back to the front',
+		Number(a.style.zIndex) > Number(b.style.zIndex),
+		a.style.zIndex + ' vs ' + b.style.zIndex);
+	// And a second raise of the box already in front must not burn a number on every pointer press.
+	const held = a.style.zIndex;
+	S.raisePanel(a);
+	ok('...but re-raising the front box is a no-op', a.style.zIndex === held, held);
+
 	ok('nothing disables a hydraulics number row', !/input\.disabled/.test(body('hydNumberRow')));
 	ok('...and blank still means "the file did not say"',
 		/input\.value = settings\.hydraulics\[key\] === undefined \? '' :/.test(body('hydNumberRow')));

@@ -799,17 +799,28 @@ html[lang="zh"] .ec-welcome {
    Above the toolbar, and holding every command on the page; the toolbar below is the high-use
    subset. Flat text buttons, because a menu bar that looks like a row of push-buttons reads as a
    second toolbar. */
-/* **THE CHROME OUTRANKS THE BOXES** (Tom, 2026-08-24: "The menus and toolbars (level 1 menus) need
-   a higher z-index than the boxes (Settings, Libraries, ...)"). The menu bar, the toolbar and the
-   tab strip are in normal flow with no z-index of their own, so a fixed box at z-index 22 painted
-   straight over them: a box dragged up the window swallowed the strip that opened it, and the
-   commands were behind the thing they had produced.
-   30 clears the boxes (22), the property popup (20) and the two menu pop-ups (31/32 are set inline
-   in Looped-Network.php, above this, because a menu must sit over the strip it hangs from). It stays
-   under Bootstrap's fixed navbar (1030), the run box (1085) and the registration bar (3000), which
-   are all deliberately above everything on the page.
+/* **THE MOVABLE BOXES OUTRANK THE CHROME, AND THIS REVERSES A 2026-08-24 RULING ON PURPOSE.**
+   That one was Tom's too -- "The menus and toolbars (level 1 menus) need a higher z-index than the
+   boxes (Settings, Libraries, ...)" -- and it answered a real defect: a box dragged up the window
+   swallowed the strip that had opened it, so the commands sat behind the thing they produced.
+   **His ruling of 2026-09-02 is the opposite and supersedes it:** "The boxes that can drag up to the
+   top of the page need to cover the menu icons and the project tabs. They need to cover everything...
+   these boxes must be sky high, far above everything else, like zindex 1000."
+
+   What changed in between is that a box no longer ARRIVES over the chrome by accident. It is dragged
+   there, and it comes to the front when you touch it (raisePanel(), js/looped-network.js), so the box
+   covering the menu is always the one you are holding. Do not restore the old order.
+
+   The chrome keeps a z-index of its own so it still outranks the MAP and the two menu pop-ups can sit
+   above it (31/32, set inline in Looped-Network.php, because a menu must cover the strip it hangs
+   from). Everything movable now starts at 1200: above Bootstrap's fixed navbar (1030) and the toolbar
+   (1080), below the registration bar (3000), which is deliberately over everything.
    `position: relative` is what makes z-index apply at all to a static block; it changes no layout. */
 #lpn_menubar, #lpn_toolbar, #lpn_tabs { position: relative; z-index: 30; }
+/* The floor for every box makePanelDraggable() wires. raisePanel() writes a higher number inline as
+   boxes are opened and touched; this is only where the stack starts, and it is what puts an untouched
+   box above the chrome. */
+.lpn-dragpanel { z-index: 1200; }
 #lpn_menubar { display: flex; gap: 2px; margin-bottom: 4px; }
 .lpn-menubar-item { background: none; border: 1px solid transparent; font: inherit; padding: 3px 10px; cursor: pointer; }
 .lpn-menubar-item:hover { background: #def; border-color: #9bd; }
@@ -2228,10 +2239,15 @@ html:has(#lpn_canvas) { overflow: hidden; }
    that lands on top of the properties pane covers the numbers the run just produced. Fixed rather
    than placed near the button, because a run takes seconds and the eye will have moved.
 
-   z-index sits above the panes (6) and the toolbar (1080) and below the registration bar (3000),
-   which must outrank everything while a click sequence is in progress. */
+   z-index joins the movable boxes at 1200 rather than sitting at its old 1085 (2026-09-02). It is
+   made draggable by makePanelDraggable() like every other box, so a stack that left it below them
+   meant the one box reporting a run in progress could be buried by a box opened over it -- and at
+   equal specificity the later rule wins, so its own 1085 was quietly beating .lpn-dragpanel's 1200.
+   raisePanel() writes a higher number inline as boxes are touched; this is the floor. Still below
+   the registration bar (3000), which must outrank everything while a click sequence is in
+   progress. */
 .lpn-runbox {
-	position: fixed; left: 1em; bottom: 1em; z-index: 1085;
+	position: fixed; left: 1em; bottom: 1em; z-index: 1200;
 	box-sizing: border-box; width: 26rem; max-width: calc(100vw - 2em);
 	padding: 0.5em 0.75em 0.6em; border: 1px solid #ccc; border-radius: 4px;
 	background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .2); font-size: 0.9em;

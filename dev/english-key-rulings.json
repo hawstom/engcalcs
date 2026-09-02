@@ -89,6 +89,10 @@
    "on": "Design limit",
    "ruled": "2026-09-02"
   },
+  "lpn_ff_col_modes": {
+   "on": "Failure modes",
+   "ruled": "2026-09-02"
+  },
   "lpn_ff_col_required": {
    "on": "Required flow",
    "ruled": "2026-09-01"
@@ -114,8 +118,8 @@
    "ruled": "2026-09-02"
   },
   "lpn_ff_design": {
-   "on": "Effect on the rest of the system",
-   "ruled": "2026-09-01"
+   "on": "Design check (effect on system)",
+   "ruled": "2026-09-02"
   },
   "lpn_ff_design_all": {
    "on": "Every other junction and every pipe",
@@ -178,8 +182,8 @@
    "ruled": "2026-09-01"
   },
   "lpn_ff_iso": {
-   "on": "ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.",
-   "ruled": "2026-09-01"
+   "on": "ISO credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.",
+   "ruled": "2026-09-02"
   },
   "lpn_ff_limit_both": {
    "on": "Pressure and velocity",
@@ -217,6 +221,18 @@
    "on": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
    "ruled": "2026-09-01"
   },
+  "lpn_ff_mode_design": {
+   "on": "Design",
+   "ruled": "2026-09-02"
+  },
+  "lpn_ff_mode_fire": {
+   "on": "Fire",
+   "ruled": "2026-09-02"
+  },
+  "lpn_ff_mode_none": {
+   "on": "None",
+   "ruled": "2026-09-02"
+  },
   "lpn_ff_more": {
    "on": "and {n} more",
    "ruled": "2026-09-01"
@@ -228,6 +244,10 @@
   "lpn_ff_no_selection": {
    "on": "No junction is selected. Choose one on the map, or test every junction.",
    "ruled": "2026-09-01"
+  },
+  "lpn_ff_not_checked": {
+   "on": "Not checked",
+   "ruled": "2026-09-02"
   },
   "lpn_ff_report_all": {
    "on": "Every junction tested",
@@ -289,6 +309,10 @@
    "on": "Passing",
    "ruled": "2026-09-01"
   },
+  "lpn_ff_static_failed": {
+   "on": "Static failed, so not checked",
+   "ruled": "2026-09-02"
+  },
   "lpn_ff_steady": {
    "on": "Only the current time step is tested. Fire flow is normally added to maximum day demand.",
    "ruled": "2026-09-01"
@@ -302,8 +326,8 @@
    "ruled": "2026-09-01"
   },
   "lpn_ff_summary": {
-   "on": "{pass} passing, {fail} failing, {design} with a design issue.",
-   "ruled": "2026-09-01"
+   "on": "{clean} with nothing wrong. {fire} failed the fire flow. {design} affected the rest of the system.",
+   "ruled": "2026-09-02"
   },
   "lpn_ff_summary_error": {
    "on": "{n} could not be answered.",
@@ -487,6 +511,10 @@
   },
   "lpn_inp_drop_file_options": {
    "on": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
+   "ruled": "2026-09-02"
+  },
+  "lpn_inp_drop_quality_options": {
+   "on": "This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
    "ruled": "2026-09-02"
   },
   "lpn_inp_drop_report": {

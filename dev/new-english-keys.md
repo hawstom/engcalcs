@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**10 still to read**, of 218 untranslated keys, of 1533 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read**, of 218 untranslated keys, of 1533 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (216, 10 to read @@ NEEDS RULING)
+## lpn_  (216, all ruled)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -91,7 +91,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-02._
 - **`lpn_ff_col_modes`**
   > Failure modes
-  OK.
+  _Ruled OK 2026-09-02._
 - **`lpn_ff_col_required`**
   > Required flow
   _Ruled OK 2026-09-01._
@@ -112,7 +112,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-02._
 - **`lpn_ff_design`**
   > Design check (effect on system)
-  OK.
+  _Ruled OK 2026-09-02._
 - **`lpn_ff_design_all`**
   > Every other junction and every pipe
   _Ruled OK 2026-09-01._
@@ -160,7 +160,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_iso`**
   > ISO credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.
-  OK.
+  _Ruled OK 2026-09-02._
 - **`lpn_ff_limit_both`**
   > Pressure and velocity
   _Ruled OK 2026-09-01._
@@ -190,13 +190,13 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_mode_design`**
   > Design
-  OK.
+  _Ruled OK 2026-09-02._
 - **`lpn_ff_mode_fire`**
   > Fire
-  OK.
+  _Ruled OK 2026-09-02._
 - **`lpn_ff_mode_none`**
   > None
-  OK.
+  _Ruled OK 2026-09-02._
 - **`lpn_ff_more`**
   > and {n} more
   _Ruled OK 2026-09-01._
@@ -208,7 +208,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_not_checked`**
   > Not checked
-  OK.
+  _Ruled OK 2026-09-02._
 - **`lpn_ff_report_all`**
   > Every junction tested
   _Ruled OK 2026-09-01._
@@ -256,7 +256,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_static_failed`**
   > Static failed, so not checked
-  OK.
+  _Ruled OK 2026-09-02._
 - **`lpn_ff_steady`**
   > Only the current time step is tested. Fire flow is normally added to maximum day demand.
   _Ruled OK 2026-09-01._
@@ -268,7 +268,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_summary`**
   > {clean} with nothing wrong. {fire} failed the fire flow. {design} affected the rest of the system.
-  OK.
+  _Ruled OK 2026-09-02._
 - **`lpn_ff_summary_error`**
   > {n} could not be answered.
   _Ruled OK 2026-09-01._
@@ -409,7 +409,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-02._
 - **`lpn_inp_drop_quality_options`**
   > This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.
-  OK.
+  _Ruled OK 2026-09-02._
 - **`lpn_inp_drop_report`**
   > This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.
   _Ruled OK 2026-09-01._

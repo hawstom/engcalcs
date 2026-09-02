@@ -23266,8 +23266,52 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
+	// ============================================================================================
+	// PANEL STACKING -- ONE MODEL FOR EVERY MOVABLE BOX
+	// ============================================================================================
+	//
+	// **THREE SYMPTOMS TOM REPORTED ON 2026-09-02 WERE ONE MISSING MECHANISM:** a box dragged to the
+	// top of the window slid UNDER the menu bar and the tab strip; with Find open, Fire flow could
+	// not be dragged at all and a newly opened Settings appeared behind Find and was *"lost"*; and
+	// nothing ever brought the box you were touching to the front. There was no stacking model --
+	// every panel sat at one fixed z-index and the chrome sat above all of them.
+	//
+	// **THIS SUPERSEDES TOM'S RULING OF 2026-08-24**, which was *"The menus and toolbars (level 1
+	// menus) need a higher z-index than the boxes"* and put the chrome at 30. That ruling answered a
+	// real defect -- a box dragged up the window swallowed the strip that had opened it, so the
+	// commands were behind the thing they produced. **His new ruling is the opposite and is
+	// deliberate:** *"The boxes that can drag up to the top of the page need to cover the menu icons
+	// and the project tabs. They need to cover everything... these boxes must be sky high, far above
+	// everything else, like zindex 1000."* What changed in between is that a box no longer ARRIVES
+	// over the chrome by accident; it goes there because somebody dragged it, and the thing you are
+	// holding should be the thing you can see. Do not restore the old order.
+	//
+	// **RAISE ON OPEN AND ON TOUCH, WHICH IS WHAT FIXES THE OTHER TWO.** A panel opened or pressed
+	// takes the next number, so the box under your finger is always the front one and a box opened
+	// behind another cannot hide. The counter only ever counts up: comparing and swapping would need
+	// a registry of every panel, and a number that rises has none of that bookkeeping. It is seeded
+	// well above the chrome and below the registration bar, which stays deliberately on top of
+	// everything.
+	var LPN_PANEL_Z_BASE = 1200;
+	var lpnPanelZ = LPN_PANEL_Z_BASE;
+	function raisePanel(el) {
+		if (!el || !el.style) { return; }
+		// Already in front: do not burn a number on every pointerdown of a drag.
+		if (Number(el.style.zIndex) === lpnPanelZ) { return; }
+		lpnPanelZ += 1;
+		el.style.zIndex = String(lpnPanelZ);
+	}
+
 	function makePanelDraggable(popup, onMove) {
 		var drag = null;
+		// **EVERY PRESS RAISES, INCLUDING ONE ON A CONTROL INSIDE THE BOX.** Registered in the
+		// capture phase and separately from the drag handler below, which returns early unless the
+		// press is on the panel's own chrome -- typing in a field or pressing a button must bring
+		// its box forward too, and those presses never reach the drag handler's body.
+		popup.addEventListener('pointerdown', function () { raisePanel(popup); }, true);
+		// Opening a box is the other way it comes to the front. `display` is set by the openers
+		// rather than here, so this is the one seam every panel already passes through.
+		popup.__lpnRaise = function () { raisePanel(popup); };
 		// **MADE DRAGGABLE AND TOUCH-DRAGGABLE IN THE SAME PLACE** (ROADMAP Task 562). The class
 		// carries `cursor: move` and, the half that actually matters on a phone, `touch-action:
 		// none` -- without which the browser claims the gesture for scrolling before pointermove
@@ -24109,6 +24153,11 @@ var EngCalcs = EngCalcs || {};
 	// window would hide the junction the reader is looking at, and it is not resizeable), and the
 	// fire flow run dialog is a bar, two lines and a Stop button over a drawing it is reporting on.
 	function placePanelForScreen(box, place) {
+		// **OPENING A BOX BRINGS IT TO THE FRONT** (Tom, 2026-09-02: with Find open, a newly opened
+		// Settings appeared behind it and was *"lost"*). This is the one seam every standing box is
+		// placed through, so raising here needs no per-opener edit and a seventh box cannot arrive
+		// half-wired -- the same argument that put `touch-action` inside makePanelDraggable().
+		if (box && box.__lpnRaise) { box.__lpnRaise(); }
 		if (smallScreen()) { return fillPanelToScreen(box); }
 		resetPanelFill(box);
 		place();
@@ -27564,6 +27613,10 @@ var EngCalcs = EngCalcs || {};
 		// aside is one they cannot see the map through.
 		run = document.getElementById('lpn_ff_run_box');
 		if (run) { makePanelDraggable(run, null); }
+		// The run box does not go through placePanelForScreen() -- it centres itself -- so it takes
+		// its turn at the front here instead. A run in progress must not be buried by a box opened
+		// over it.
+		if (run && run.__lpnRaise) { run.__lpnRaise(); }
 	}
 
 	function applySolveResult(result) {
