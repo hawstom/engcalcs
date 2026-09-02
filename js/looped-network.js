@@ -7661,7 +7661,20 @@ var EngCalcs = EngCalcs || {};
 	var pendingLinkFrom = null;
 	var setModeUI = null; // wired by wireToolbar(); lets non-toolbar code (Draw Example) reset the UI too
 	var pendingLinkPopupTimer = null; // see wirePointerEvents(): delays a link-tap popup so a double-click (add vertex) can cancel it
-	var rubberBandEl = null; // built in init(); a dashed line from pendingLinkFrom to the live pointer
+	var rubberBandEl = null; // built in init(); a dashed line from the pending link's LAST fixed point to the live pointer
+	// **THE OPEN-SPACE POINTS PICKED SINCE THE FROM-NODE** (Task 567). Tom, 2026-09-02: *"like all
+	// the software we should allow vertices (clicks in open space) on Add pipe. This is essential."*
+	// Both reference tools accept arbitrary points until a second NODE is clicked; we went node to
+	// node and made the user bend the pipe afterwards, through the double-click that is the rest of
+	// that task. Drawing the bend while drawing the pipe removes the need for that door in the
+	// common case.
+	//
+	// It is VIEW state, not document state, exactly like `selection`: nothing here exists in doc
+	// until addLink() is handed it, so an abandoned drawing leaves no trace, takes no undo snapshot
+	// and cannot reach a saved file. World coordinates, because the map may pan or zoom between two
+	// clicks of the same drawing.
+	var pendingLinkVerts = [];
+	var pendingPathEl = null; // built in init(); the dashed polyline through the points already picked
 
 	// Sets/clears pendingLinkFrom AND its visual feedback together (Tom, 2026-07-30: "otherwise
 	// there's no indication that anything is working" between the first and second click of
@@ -7672,9 +7685,51 @@ var EngCalcs = EngCalcs || {};
 	function setPendingLinkFrom(id) {
 		if (pendingLinkFrom && nodeEls[pendingLinkFrom]) { nodeEls[pendingLinkFrom].circle.classList.remove('lpn-node-pending'); }
 		pendingLinkFrom = id;
+		// **THE PICKED POINTS DIE WITH THE FROM-NODE, AND THEY DIE HERE.** Every way out of a
+		// half-drawn link goes through this one function -- committing it, abandoning it, changing
+		// tool, Escape -- so no exit path can leave a stale bend behind to appear on the NEXT pipe
+		// the user draws. That is the same argument the highlight and the rubber band are already
+		// held here for.
+		pendingLinkVerts = [];
 		if (id && nodeEls[id]) { nodeEls[id].circle.classList.add('lpn-node-pending'); }
 		if (rubberBandEl) { rubberBandEl.style.display = id ? '' : 'none'; }
+		drawPendingPath();
 	}
+	// The points already picked, drawn from the from-node through each of them. Between two clicks
+	// the user must be able to see what the next click would commit -- the same reason the rubber
+	// band exists (Tom, 2026-07-30: *"otherwise there's no indication that anything is working"*).
+	function drawPendingPath() {
+		if (!pendingPathEl) { return; }
+		var from = pendingLinkFrom ? nodeById(pendingLinkFrom) : null;
+		if (!from || !pendingLinkVerts.length) { pendingPathEl.style.display = 'none'; return; }
+		pendingPathEl.style.display = '';
+		pendingPathEl.setAttribute('points', [from].concat(pendingLinkVerts).map(function (p) {
+			return p.x + ',' + p.y;
+		}).join(' '));
+	}
+	// Where the rubber band starts: the LAST fixed point of the drawing, which is the from-node
+	// until a bend has been picked and the newest bend afterwards. Without this the band still ran
+	// from the node and the user could not see the segment the next click actually commits.
+	function pendingLinkAnchor() {
+		if (pendingLinkVerts.length) { return pendingLinkVerts[pendingLinkVerts.length - 1]; }
+		return pendingLinkFrom ? nodeById(pendingLinkFrom) : null;
+	}
+
+	// **ESCAPE ABANDONS A HALF-DRAWN LINK** (Task 567). Once a click in open space is a BEND rather
+	// than an abandonment, the gesture that used to cancel a drawing is gone, so the drawing needs a
+	// way out of its own. Capture phase and the same "innermost first" argument the profile
+	// chooser's Escape carries: a half-drawn pipe is the newest thing on screen.
+	//
+	// **IT CONSUMES THE KEY ONLY WHEN THERE IS SOMETHING TO ABANDON.** The boxes on this page are
+	// the non-greedy kind -- Settings can be open while a pipe is being drawn -- and a handler that
+	// swallowed every Escape would leave the box with no keyboard way out for as long as a drawing
+	// was in progress.
+	document.addEventListener('keydown', function (e) {
+		if (e.key !== 'Escape' && e.key !== 'Esc') { return; }
+		if (!pendingLinkFrom) { return; }
+		setPendingLinkFrom(null);
+		e.stopPropagation();
+	}, true);
 
 	// ---- SELECTION: subject, then verb (ROADMAP Task 415) ----
 	// Every CAD and GIS editor is select-first, act-second. Verb-then-subject cannot grow a
@@ -12665,10 +12720,15 @@ var EngCalcs = EngCalcs || {};
 		if (!pts.length) { return; }
 		EngCalcs.lpnTerrainFillFor(pts, { quiet: true });
 	}
-	function addLink(type, fromId, toId) {
+	// `verts`, when given, are the open-space points the user picked while drawing (Task 567), in
+	// world coordinates and in the order they were picked. COPIED rather than adopted: the caller's
+	// array is view state that is emptied on the next drawing, and a link holding a reference to it
+	// would lose its own bends. A link born any other way still gets a fresh empty array.
+	function addLink(type, fromId, toId, verts) {
 		var id = mintId(LPN_ID_KEY[type] || 'L');
 		var l = {
-			id: id, type: type, from: fromId, to: toId, verts: [],
+			id: id, type: type, from: fromId, to: toId,
+			verts: (verts || []).map(function (p) { return { x: p.x, y: p.y }; }),
 			_diameter: settings.defaults.diameter,
 			// No `length` default, deliberately (Tom, 2026-07-30): lenAuto derives length from the
 			// drawn geometry, so a default would be overwritten by linkGeomLength() on the next line.
@@ -18302,6 +18362,10 @@ var EngCalcs = EngCalcs || {};
 		// Topmost layer (after labelsLayer) so the rubber-band is never hidden under a node/link
 		// while drawing a pipe/pump (Tom, 2026-07-30).
 		rubberBandEl = el('line', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
+		// The bends already picked (Task 567), in the same layer and the same red dash as the band:
+		// they are one drawing in progress, not two things, and giving them a second appearance
+		// would read as an object that already exists.
+		pendingPathEl = el('polyline', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
 		// Above everything, and EMPTY unless ?debug=boxes is on the URL -- see drawCollisionBoxes().
 		debugBoxLayer = el('g', {}, world);
 		setTransform();
@@ -18837,7 +18901,7 @@ var EngCalcs = EngCalcs || {};
 		// coords-tracker listener above so it works even if #lpn_coords is ever removed.
 		svg.addEventListener('pointermove', function (e) {
 			if (!pendingLinkFrom) { return; }
-			var from = nodeById(pendingLinkFrom), w = screenToWorld(e.clientX, e.clientY);
+			var from = pendingLinkAnchor(), w = screenToWorld(e.clientX, e.clientY);
 			if (!from) { return; }
 			rubberBandEl.setAttribute('x1', from.x); rubberBandEl.setAttribute('y1', from.y);
 			rubberBandEl.setAttribute('x2', w.x); rubberBandEl.setAttribute('y2', w.y);
@@ -19157,10 +19221,22 @@ var EngCalcs = EngCalcs || {};
 					else if (hitId !== pendingLinkFrom) {
 						saveUndoSnapshot();
 						logLpnFirstAction('element');
-						addLink(mode.slice('add-'.length), pendingLinkFrom, hitId);
+						addLink(mode.slice('add-'.length), pendingLinkFrom, hitId, pendingLinkVerts);
 						setPendingLinkFrom(null);
 					}
-				} else { setPendingLinkFrom(null); }
+					// A second press on the from-node itself is neither a bend nor a link: a
+					// zero-length self-loop is not a thing the solver models, and reading it as a
+					// bend would put a vertex exactly under the node it starts at. Nothing happens,
+					// and the drawing survives -- which is what a user who mis-tapped wanted.
+				} else if (pendingLinkFrom) {
+					// **A CLICK IN OPEN SPACE IS A BEND, NOT AN ABANDONMENT** (Task 567). It used to
+					// clear the whole drawing, which is why a mis-aimed second click cost the first
+					// one. Nothing is written to the document here -- the points are held in view
+					// state until a second NODE arrives, so no undo snapshot is owed and an
+					// abandoned drawing leaves nothing behind.
+					pendingLinkVerts.push({ x: w.x, y: w.y });
+					drawPendingPath();
+				}
 			} else if (mode === 'delete') {
 				// One-step undo: snapshot the whole document just before any destructive action, NOT
 				// inside the delete functions, so a cascade (deleting a node also deletes its links)

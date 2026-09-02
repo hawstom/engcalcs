@@ -2186,9 +2186,9 @@ $ec_lang['lpn_select_first']='Nothing is picked. Click an asset on the map first
 $ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move assets and labels.';
 $ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Click the map to place a reservoir. Switch to Select mode to change or move assets and labels.';
 $ec_lang['lpn_mode_add_tank']='Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move assets and labels.';
-$ec_lang['lpn_mode_add_pipe']='Mode: Add Pipe. Click a node, then another node, to connect them. Switch to Select mode to change or move assets and labels.';
-$ec_lang['lpn_mode_add_pump']='Mode: Add Pump. Click a node, then another node, to connect them. Switch to Select mode to change or move assets and labels.';
-$ec_lang['lpn_mode_add_valve']='Mode: Add Valve. Click a node, then another node, to connect them. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_pipe']='Mode: Add Pipe. Click a node, then another node, to connect them. Click open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_pump']='Mode: Add Pump. Click a node, then another node, to connect them. Click open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_valve']='Mode: Add Valve. Click a node, then another node, to connect them. Click open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets and labels.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a text label. Click near a node to attach the text to that node. Switch to Select mode to change or move assets and labels.';
