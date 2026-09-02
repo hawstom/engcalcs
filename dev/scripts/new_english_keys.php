@@ -73,6 +73,19 @@ ksort($new);
  * be made from this page alone without opening lang.ec.en.php. Grouped by the FEATURE prefix rather
  * than listed flat, because the rulings come feature at a time and a flat list of 79 strings is a
  * list nobody starts. */
+/**
+ * **THE TOKEN TOM SEARCHES FOR.**
+ *
+ * `@@` because it cannot occur in an English string (measured: zero in `lang.ec.en.php`), cannot
+ * occur in a key name, and — the part the first attempt got wrong — **carries no Markdown meaning**.
+ * The first version used `>>>`, which merged into the `>` blockquote holding the string above it and
+ * rendered as though "NEEDS RULING" were the last line of the string being ruled on.
+ *
+ * Written on every unruled key and on the heading of every group that still holds one, so the first
+ * search lands on a section and the next walks its keys.
+ */
+const EC_RULING_FLAG = '@@ NEEDS RULING';
+
 function newKeysMarkdown($new, $total, $langCount) {
     $out = "# English strings nobody has ruled on yet
 
@@ -105,8 +118,21 @@ files — which is, by construction, every string that has been written and not 
     $unruled = 0;
     foreach ($new as $nk => $nv) { if (ecRulingLine($nk, $nv) === '') { $unruled++; } }
     $out .= "**" . $unruled . " still to read**, of " . count($new) . " untranslated keys, of "
-        . $total . " English keys. A key already marked _Ruled OK_ below needs nothing from you —\n"
+        . $total . " English keys. A key already marked _Ruled OK_ below needs nothing from you;\n"
         . "the ruling lapses by itself if the wording changes.
+
+"
+        /* **A LIST YOU CANNOT NAVIGATE IS A LIST THAT DOES NOT GET READ.** Tom, 2026-09-01: *"I
+         * can't easily find where I am needed in dev/new-english-keys.md. You must put a searchable
+         * flag there for me to use in my text editor to jump to where I am needed."* The token is
+         * on every unruled key AND on the heading of every group that still has one, so the first
+         * search lands on a section and the next walks the keys in it. It is deliberately a string
+         * no English sentence and no key name can contain, so a search never lands on prose. */
+        . "**Search for `" . EC_RULING_FLAG . "` to jump to every key that still needs you.** It sits\n"
+        . "under each unread key, and on the heading of each group that still has one — so the first\n"
+        . "hit takes you to a section and the rest walk its keys. A key already ruled does not carry\n"
+        . "it, and a fully ruled group says `all ruled` and can be skipped whole.\n"
+        . "Write your answer on the flag's own line. Anything is fine; \"OK\" is enough.
 ";
     if (!$new) { return $out . "
 None. Every English key is present in at least one other language.
@@ -118,18 +144,27 @@ None. Every English key is present in at least one other language.
     }
     ksort($groups);
     foreach ($groups as $p => $keys) {
+        $groupUnruled = 0;
+        foreach ($keys as $gk => $gv) { if (ecRulingLine($gk, $gv) === '') { $groupUnruled++; } }
+        /* **THE HEADING CARRIES THE FLAG TOO WHEN THE GROUP HAS WORK IN IT**, so a search for the
+         * token lands on the section before it lands on the first key inside it. A group that is
+         * fully ruled says so and can be skipped whole. */
         $out .= "
-## " . $p . "_  (" . count($keys) . ")
+## " . $p . "_  (" . count($keys) . ($groupUnruled > 0
+            ? ", " . $groupUnruled . " to read " . EC_RULING_FLAG
+            : ", all ruled") . ")
 
 ";
         foreach ($keys as $k => $v) {
             /* The value verbatim, in a fenced quote rather than a table cell: several of these are
              * whole paragraphs with commas and pipes in them, and a table would eat both. */
+            $ruled = ecRulingLine($k, $v);
             $out .= "- **`" . $k . "`**
   > " . str_replace("
 ", "
   > ", $v) . "
-" . ecRulingLine($k, $v);
+" . ($ruled !== '' ? $ruled : "  " . EC_RULING_FLAG . "
+");
         }
     }
     return $out;
