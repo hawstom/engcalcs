@@ -347,7 +347,14 @@
 			if (key === 'UNITS' && r[1]) { flowKey = r[1].toUpperCase(); }
 			else if (key === 'HEADLOSS' && r[1]) { headloss = r[1].toUpperCase(); }
 			else if (key === 'EMITTER' && r[2]) { emitterExponent = num(r[2], 0.5); hydraulics.emitterExponent = emitterExponent; }
-			else if (key === 'DEMAND' && r[2]) { demandMultiplier = num(r[2], 1); hydraulics.demandMultiplier = demandMultiplier; }
+			// **`Demand` NAMES TWO DIFFERENT OPTIONS AND ONLY ONE OF THEM IS A NUMBER.**
+			// `Demand Multiplier 1.5` scales every demand; `Demand Model PDA` chooses EPANET 2.2's
+			// pressure-driven analysis. Matching on the first token alone read `Demand Model PDA`
+			// as a multiplier, got `NaN`, fell back to 1, and then WROTE `Demand Multiplier 1` in
+			// place of the line the file stated -- a carried value replaced by an invented one,
+			// which is worse than the dropping this task exists to stop. The keyword is tested, so
+			// `Demand Model` now falls through to the carry at the end of this chain.
+			else if (key === 'DEMAND' && /^MULT/.test((r[1] || '').toUpperCase()) && r[2]) { demandMultiplier = num(r[2], 1); hydraulics.demandMultiplier = demandMultiplier; }
 			// **THE REST OF EPANET'S HYDRAULIC OPTIONS** (Task 553, Tom's own list). Every one was
 			// read past in silence until now -- not even reported as a difference -- so a file
 			// stating `Viscosity 1.3` came back out of the exporter stating nothing, which is the
@@ -414,6 +421,27 @@
 			// (`USE net.hyd`) or one path with no fixed shape.
 			else if (key === 'MAP' && r[1]) { fileOptions.map = r.slice(1).join(' '); }
 			else if (key === 'HYDRAULICS' && r[1]) { fileOptions.hydraulics = r.slice(1).join(' '); }
+			// **AND EVERY OTHER `[OPTIONS]` LINE, WHATEVER IT SAYS.** This is the section-carry of
+			// Task 553 done one level down, and it is what finally makes this class of defect
+			// impossible rather than fixed for the fourth time: the branches above are the list of
+			// what this page READS, and anything else is carried by DEFAULT instead of vanishing --
+			// exactly the rule INP_SECTIONS_READ states for a section nobody here has heard of.
+			//
+			// What it catches today, all of them EPANET 2.2 options this reader never had a branch
+			// for: `Demand Model DDA|PDA` and its three companions `Minimum Pressure`,
+			// `Required Pressure` and `Pressure Exponent`; `Pressure psi|kPa|m`, which names the
+			// pressure unit; and the obsolete `Segments` and `Verify` EPANET itself now ignores.
+			// What it catches tomorrow is whatever EPANET adds next, with no edit here.
+			//
+			// TOKENS, NEVER NUMBERS, on the same argument the quality and file options carry:
+			// nothing on this page solves with any of these, so the file's own characters are the
+			// only form that can round-trip (`Minimum Pressure 0.0` parsed and re-written is `0`).
+			//
+			// **CARRIED, AND NOT YET REPORTED, WHICH IS A REAL GAP AND NOT A DECISION.** A file
+			// asking for pressure-driven analysis is solved here demand-driven, and the user should
+			// be told. The sentence belongs with the others in `js/looped-network.js`'s
+			// `inpDropText()`, and writing one there is the follow-up this note owes.
+			else if (r.length) { fileOptions.other = (fileOptions.other || []).concat([r.slice()]); }
 		}
 		// **CARRYING A THING AND TELLING THE USER ABOUT IT ARE TWO JOBS** (Task 248.03's lesson,
 		// recorded there after `[RULES]` stopped being reported the moment it started being kept).
@@ -428,8 +456,13 @@
 		// **CARRIED AND STILL REPORTED**, the same two jobs. Both name a file this page cannot
 		// open, and a user who saves an `.inp` from here and moves it will find those lines
 		// pointing at nothing -- which is a fact about their file worth one sentence.
-		if (Object.keys(fileOptions).length) {
-			drop('file-options', [], Object.keys(fileOptions).length);
+		// **THE COUNT IS OF THE TWO THAT NAME A FILE, AND `other` IS DELIBERATELY NOT IN IT.** The
+		// sentence this code reaches says "this file points at another file beside it", which is
+		// true of `Map` and `Hydraulics` and false of everything the catch-all above holds. Saying
+		// it about a `Demand Model` line would be a worse report than none.
+		var namedFiles = (fileOptions.map ? 1 : 0) + (fileOptions.hydraulics ? 1 : 0);
+		if (namedFiles) {
+			drop('file-options', [], namedFiles);
 		}
 
 		var fu = FLOW_UNITS[flowKey];
@@ -1125,7 +1158,9 @@
 			// The three water-quality `[OPTIONS]`, as the file's own text. Sparse on the same rule
 			// as `hydraulics`: absent means the file did not say it, so the exporter writes nothing.
 			qualityOptions: qualityOptions,
-			// The two `[OPTIONS]` keys naming a file beside the `.inp`. Sparse on the same rule.
+			// The `[OPTIONS]` this page carries instead of reading: `map` and `hydraulics` name a
+			// file beside the `.inp`, and `other` holds every remaining line as its own tokens.
+			// Sparse on the same rule -- a key is here only where the file stated it.
 			fileOptions: fileOptions,
 			// [RULES], verbatim, one string per line (Task 248.03). Empty for a file with none, so
 			// no caller has to test for absence.
@@ -1425,6 +1460,12 @@
 		LPN_FILE_LINES.forEach(function (pair) {
 			if (f[pair[0]] === undefined || f[pair[0]] === null || f[pair[0]] === '') { return; }
 			out += row([pair[1]].concat(String(f[pair[0]]).split(/\s+/))) + '\n';
+		});
+		// Every other `[OPTIONS]` line the source stated and this page does not read, in the order
+		// it stated them, each token exactly as it came. See the importer's note: this is the
+		// section carry one level down, and it is why a new EPANET option needs no edit here.
+		(f.other || []).forEach(function (toks) {
+			if (toks && toks.length) { out += row(toks) + '\n'; }
 		});
 		return out;
 	}
