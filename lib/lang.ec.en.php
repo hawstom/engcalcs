@@ -2517,6 +2517,12 @@ $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Symbol size (pixels)';
 $ec_lang['lpn_settings_link_width']='Link line thickness (pixels)';
+// Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
+// EPANET's own display option, so it is named rather than explained; the tip carries the two things
+// the label cannot say, which are that the arrows only appear once there are results and that the
+// setting travels with the project.
+$ec_lang['lpn_settings_show_arrows']='Flow direction arrows';
+$ec_lang['lpn_settings_show_arrows_tip']='Draw an arrow on each pipe showing which way the water is running. The arrows appear after a run, and turning them off leaves the results unchanged. This setting is saved with the project.';
 $ec_lang['lpn_settings_align_labels']='Draw link labels along the link line';
 $ec_lang['lpn_settings_readability_bias']='Label flip angle adjustment (degrees)';
 $ec_lang['lpn_settings_readability_bias_tip']='Flip a label to keep it right side up when it leans more than this many degrees left of vertical.';
