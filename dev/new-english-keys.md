@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read**, of 218 untranslated keys, of 1533 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read**, of 218 untranslated keys, of 1533 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (216, all ruled)
+## lpn_  (216, 1 to read @@ NEEDS RULING)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -612,8 +612,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Track
   _Ruled OK 2026-09-01._
 - **`lpn_settings_quality_track_tip`**
-  > Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.
-  _Ruled OK 2026-09-01._
+  > Choose what the run should trace through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.
+  @@ NEEDS RULING
 - **`lpn_settings_show_arrows`**
   > Flow direction arrows
   _Ruled OK 2026-09-02._

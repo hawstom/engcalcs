@@ -29,6 +29,9 @@ const L = loadLoopedNetwork(
 	// believes. `done` comes back out of the rendered count line rather than out of a counter.
 	"\t\trunUi: function () { var b = document.getElementById('lpn_ff_run_box');\n" +
 	"\t\t\treturn { display: b ? b.style.display : null,\n" +
+	"\t\t\t\tzIndex: b ? Number(b.style.zIndex) || 0 : null,\n" +
+	"\t\t\t\tboxZ: (function () { var f = document.getElementById('lpn_ff_box');\n" +
+	"\t\t\t\t\treturn f ? Number(f.style.zIndex) || 0 : 0; }()),\n" +
 	"\t\t\t\ttext: ffRunUi ? ffRunUi.count.textContent : '',\n" +
 	"\t\t\t\ttally: ffRunUi ? ffRunUi.tally.textContent : '',\n" +
 	"\t\t\t\twidth: ffRunUi ? ffRunUi.fill.style.width : '',\n" +
@@ -235,6 +238,13 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 		samples.some(x => /failed the fire flow/.test(x.tally) &&
 			/affected the rest of the system/.test(x.tally)),
 		JSON.stringify(samples.map(x => x.tally)));
+	// **THE DIALOG MUST BE IN FRONT OF THE BOX THAT LAUNCHED IT** (Tom, 2026-09-02: *"Run box: still
+	// invisible"*, after a first fix that raised it in the wrong place). Both boxes centre
+	// themselves, so a run dialog behind the fire flow box is not merely lower -- it is exactly
+	// underneath it and completely hidden. Raising it where it is WIRED (once, at page load) is not
+	// enough: the fire flow box the user opens to press Run is raised afterwards and goes on top.
+	ok('the run dialog opens in front of the fire flow box that launched it',
+		opened.zIndex > opened.boxZ, opened.zIndex + ' over ' + opened.boxZ);
 	ok('the dialog goes when the run ends', L.runUi().display === 'none');
 	if (process.env.FFDUMP) { console.log(JSON.stringify(set.results.map(r=>({id:r.id,state:r.state,code:r.code,avail:r.available,sp:r.staticPressure,req:r.required})),null,1)); }
 	ok('the run finished and was stored', !!set && set.ok === true);

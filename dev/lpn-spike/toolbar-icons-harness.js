@@ -188,7 +188,8 @@ console.log('\n-- the Project menu carries a tip --');
 	report(/tip: pc\.lpn_menu_project_tip/.test(bar), 'the Project item declares a tip');
 	report(/b\.title = m\.tip/.test(bar), '...and buildMenuBar() puts it on the button as a title');
 	report(/ec-help/.test(bar), '...with .ec-help, the only selector initTips() wires');
-	report(/EngCalcs\.initTips\(bar\)/.test(bar),
+	// initTipsIn(), not EngCalcs.initTips(): the seam gained an orphaned-tip sweep on 2026-09-02.
+	report(/initTipsIn\(bar\)/.test(bar),
 		'...and arms it, because the bar is built after page load and a tip built late is dead on touch');
 	report(en.indexOf("$ec_lang['lpn_menu_project_tip']") >= 0,
 		'lpn_menu_project_tip is in lib/lang.ec.en.php');

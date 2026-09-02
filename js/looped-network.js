@@ -9889,7 +9889,7 @@ var EngCalcs = EngCalcs || {};
 		window.addEventListener('resize', function () { if (paneState.open) { applyPaneLayout(); } });
 		// The tabs are built after init()'s own EngCalcs.initTips(document) has run, so their tips
 		// need wiring here or a tap on one does nothing (ROADMAP Task 173's gap, again).
-		if (EngCalcs.initTips) { EngCalcs.initTips(pane); }
+		initTipsIn(pane);
 		loadPaneState();
 		applyPaneLayout();
 		if (paneState.open && activePaneTab().show) { activePaneTab().show(); }
@@ -10056,7 +10056,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		loadRPaneState();
 		applyRPaneLayout();
-		if (EngCalcs.initTips) { EngCalcs.initTips(pane); }
+		initTipsIn(pane);
 	}
 	// ---- THE COLORING SECTION OF THE SETTINGS BOX (Tasks 384, 427, 429, merged by 441) --------
 	//
@@ -10656,7 +10656,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (!credits.parentNode) { host.appendChild(credits); }
 		[nodeHost, linkHost, nlHost, host].forEach(function (h) {
-			if (EngCalcs.initTips) { EngCalcs.initTips(h); }
+			initTipsIn(h);
 		});
 	}
 	// ---- Tabs: THE ASSET TABLES (ROADMAP Task 434; all six types since Task 455) ----------------
@@ -11068,7 +11068,7 @@ var EngCalcs = EngCalcs || {};
 		// paneTableRow() to format is the one-seam fix: a cell's first value and its every later
 		// value are then written by the same line, so they cannot round differently.
 		refillPaneTable(spec, rows);
-		if (EngCalcs.initTips) { EngCalcs.initTips(host); }
+		initTipsIn(host);
 	}
 	function sortPaneTable(spec, col) {
 		spec.sort.dir = (spec.sort.col === col) ? -spec.sort.dir : 1;
@@ -11617,7 +11617,7 @@ var EngCalcs = EngCalcs || {};
 			: (profileState.editing ? 'edit' : 'idle'));
 		// Built after init()'s own pass, so the tip needs arming or a tap on it does nothing
 		// (ROADMAP Task 173's gap, the same one the pane tabs hit).
-		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
+		initTipsIn(box);
 		// The box is a view OF the path, so it follows every change to it rather than going stale
 		// behind the panel that changed it.
 	}
@@ -17020,7 +17020,7 @@ var EngCalcs = EngCalcs || {};
 		// Rows are built fresh on every open, so their tips are new DOM every time and need arming --
 		// this is exactly the case ROADMAP Task 173 added initTips(root) for (a tooltip built after
 		// page load is dead on touch without it).
-		if (EngCalcs.initTips) { EngCalcs.initTips(popup); }
+		initTipsIn(popup);
 	}
 	// The classic fly-out grace period. Travelling from the parent row to its fly-out is a DIAGONAL
 	// move across the rows below, so dismissing on the first row entered makes the submenu
@@ -17306,7 +17306,7 @@ var EngCalcs = EngCalcs || {};
 		r = box.getBoundingClientRect();
 		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
 		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
-		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
+		initTipsIn(box);
 		var create = document.getElementById('lpn_new_create');
 		if (create && create.focus) { create.focus(); }
 	}
@@ -17892,7 +17892,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		// The bar is built after page load, so its tips are new DOM and need arming for touch --
 		// the same call openMenu() makes on a freshly built popup (ROADMAP Task 173).
-		if (EngCalcs.initTips) { EngCalcs.initTips(bar); }
+		initTipsIn(bar);
 	}
 	// Swaps the tab at `id` with its neighbor in the TAB STRIP order (library.projects, which is
 	// display order, not recency -- see the note at renderTabs()). Task 252, Tom 2026-08-09: "Either
@@ -18232,7 +18232,7 @@ var EngCalcs = EngCalcs || {};
 		// first) -- so a button's .ec-help[title] tip (Select, Labels) would otherwise never get
 		// its touch-tap tooltip wired up (ROADMAP Task 173's exact gap). Call it again now that
 		// the buttons actually exist.
-		if (EngCalcs.initTips) { EngCalcs.initTips(document); }
+		initTipsIn(document);
 		wirePointerEvents();
 		wirePopup();
 		wireFindPopup();
@@ -22137,6 +22137,53 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function hideOpenTips() { hideTipsIn(document); }
+	/**
+	 * **A TIP WHOSE TRIGGER NO LONGER EXISTS IS SWEPT FROM THE BODY.**
+	 *
+	 * Tom, 2026-09-02: *"They don't open and close as expected. Some of them linger unclosed even
+	 * after box is gone."* -- and, the part that dates it: *"I can see many of them, not really in
+	 * the right places."*
+	 *
+	 * **THIS DEFECT IS OLDER THAN THE REPORT AND WAS HIDDEN BY THE STACKING BUG IT ARRIVED WITH.**
+	 * Bootstrap renders a tooltip into `document.body`, not into the box that raised it, and this
+	 * page REBUILDS the contents of its boxes constantly -- Settings, the fire flow controls, the
+	 * property popup. A rebuild destroys the trigger and leaves the rendered tooltip behind with
+	 * nothing under it and no listener that can ever close it, because the element its outside-tap
+	 * handler watches is gone. Those orphans were painting at Bootstrap's own z-index of 1080,
+	 * UNDER the boxes; raising tips to 1900 so they could be read over a box is what made a pile of
+	 * them visible at once.
+	 *
+	 * hideTipsIn() cannot reach them: it walks from a root DOWN to triggers, and an orphan has no
+	 * trigger left to be found by. So this walks the other way -- every rendered `.tooltip` in the
+	 * body, kept only if something in the document still points at it by id.
+	 *
+	 * Cheap, and deliberately not clever: it runs where tips are re-initialised, which is after
+	 * every rebuild that could have orphaned one, and it reads a handful of elements.
+	 */
+	function sweepOrphanTips() {
+		if (!document.querySelectorAll) { return; }
+		var live = {};
+		[].forEach.call(document.querySelectorAll('[aria-describedby]'), function (el) {
+			(el.getAttribute('aria-describedby') || '').split(/\s+/).forEach(function (id) {
+				if (id) { live[id] = true; }
+			});
+		});
+		[].forEach.call(document.querySelectorAll('.tooltip'), function (t) {
+			if (!t.id || live[t.id]) { return; }
+			if (t.parentNode) { t.parentNode.removeChild(t); }
+		});
+	}
+	/**
+	 * Re-wire the tips inside a container that has just been rebuilt, sweeping first.
+	 *
+	 * **EVERY initTips() CALL ON THIS PAGE GOES THROUGH HERE**, for the same reason `touch-action`
+	 * and the raise went inside makePanelDraggable(): a rebuild that forgets the sweep leaves a tip
+	 * on screen for ever, and there are eleven rebuild sites.
+	 */
+	function initTipsIn(root) {
+		sweepOrphanTips();
+		if (EngCalcs.initTips) { EngCalcs.initTips(root); }
+	}
 	// **ONE FUNCTION HIDES A PANEL, AND SWEEPING ITS TIPS IS PART OF HIDING IT** (ROADMAP Task 562).
 	// Every standing box, pull-down and popover on this page closes through here.
 	//
@@ -22214,7 +22261,7 @@ var EngCalcs = EngCalcs || {};
 		// caret in a search field for somebody who came to change one known setting; clearing it
 		// would undo the filter of somebody who opened the box, filtered, closed it to look at the
 		// map, and came back. The filter is a view of the box, and the box remembers its view.
-		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
+		initTipsIn(box);
 	}
 	function closeSettingsBox() {
 		var box = setboxEl();
@@ -22644,7 +22691,7 @@ var EngCalcs = EngCalcs || {};
 		else if (libSection === 'curves') { buildCurveSection(sec); }
 		else { buildControlSection(sec); }
 		content.appendChild(sec);
-		if (EngCalcs.initTips) { EngCalcs.initTips(content); }
+		initTipsIn(content);
 	}
 	// **THE DEFAULT DEMAND PATTERN IS A SETTINGS ROW, NOT A LIBRARY ROW** (Task 553, Tom
 	// 2026-08-28: *"the default pattern must be specified in Settings along with other Hydraulics
@@ -23163,7 +23210,7 @@ var EngCalcs = EngCalcs || {};
 			box.style.left = at.left + 'px';
 			box.style.top = at.top + 'px';
 		});
-		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
+		initTipsIn(box);
 	}
 	function closeLibraryBox() {
 		var box = libBoxEl();
@@ -23441,7 +23488,7 @@ var EngCalcs = EngCalcs || {};
 		label.appendChild(document.createTextNode(' '));
 	}
 	function tipsIn(root) {
-		if (EngCalcs && EngCalcs.initTips) { EngCalcs.initTips(root); }
+		initTipsIn(root);
 	}
 	// Hover/tap tip straight on a button: the button is already the click target, so no separate "?"
 	// glyph -- .ec-help is what makes the title reachable on touch.
@@ -24254,7 +24301,7 @@ var EngCalcs = EngCalcs || {};
 		at = clampPanel(sx, sy, r.width, h, window.innerWidth, window.innerHeight, chromeFloor());
 		popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
 		ghostClickShield(popup);
-		EngCalcs.initTips(popup);
+		initTipsIn(popup);
 	}
 	// ---- rename (Tom: EPANET allows editing an element's ID, so must this) ----
 	function allIds() {
@@ -27090,7 +27137,7 @@ var EngCalcs = EngCalcs || {};
 		Object.keys(boxes).forEach(function (k) {
 			boxes[k].addEventListener('change', function () { ask[k] = boxes[k].value; });
 		});
-		if (EngCalcs.initTips) { EngCalcs.initTips(host); }
+		initTipsIn(host);
 	}
 
 	// ---- ONE WIDE TABLE ---------------------------------------------------------------------------
@@ -27452,6 +27499,17 @@ var EngCalcs = EngCalcs || {};
 		ffRunUi.stop.addEventListener('click', function () { fireFlowStop = true; });
 		updateFireFlowRunBox(0, { pass: 0, fail: 0, design: 0, error: 0 }, { fire: 0, design: 0, clean: 0 });
 		box.style.display = 'block';
+		// **RAISED HERE, AT OPEN, AND NOT WHERE IT IS WIRED** (Tom, 2026-09-02: *"Run box: still
+		// invisible"*, twice). The first attempt raised it inside wireFireFlowBox(), which runs once
+		// at page load -- so it took the front before any other box existed, and the fire flow box
+		// the user then opened to press Run was raised ON TOP OF IT. Both boxes centre themselves,
+		// so the dialog opened exactly underneath the larger box that launched it and could not be
+		// seen at all.
+		//
+		// It does not go through placePanelForScreen(), which is where every standing box is raised,
+		// because it centres itself rather than restoring a remembered position. So it raises here,
+		// beside its own display -- the one line that runs every time it opens.
+		if (box.__lpnRaise) { box.__lpnRaise(); }
 		// **CENTRED THROUGH THE SAME SEAM EVERY STANDING BOX ON THIS PAGE USES** -- measured on
 		// every open rather than remembered, because the window may have changed and a box
 		// remembered off-screen is a box that never comes back. Nothing new was written for this
@@ -27611,7 +27669,7 @@ var EngCalcs = EngCalcs || {};
 			capPanelToRoomBelow(box, top);
 			box.style.top = top + 'px';
 		});
-		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
+		initTipsIn(box);
 	}
 	function closeFireFlowBox() {
 		var box = ffBoxEl();
@@ -27634,10 +27692,6 @@ var EngCalcs = EngCalcs || {};
 		// aside is one they cannot see the map through.
 		run = document.getElementById('lpn_ff_run_box');
 		if (run) { makePanelDraggable(run, null); }
-		// The run box does not go through placePanelForScreen() -- it centres itself -- so it takes
-		// its turn at the front here instead. A run in progress must not be buried by a box opened
-		// over it.
-		if (run && run.__lpnRaise) { run.__lpnRaise(); }
 	}
 
 	function applySolveResult(result) {
@@ -27930,7 +27984,7 @@ var EngCalcs = EngCalcs || {};
 	};
 
 	document.addEventListener('DOMContentLoaded', function () {
-		EngCalcs.initTips(document);
+		initTipsIn(document);
 		init();
 	});
 }());

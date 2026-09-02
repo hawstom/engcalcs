@@ -57,7 +57,19 @@ function mkEl(tag) {
 			contains(c) { return this._t.indexOf(c) >= 0; }
 		},
 		appendChild(c) { this.children.push(c); c.parentNode = this; return c; },
-		setAttribute(k, v) { this._attrs[k] = String(v); },
+		// **removeChild IS THE COUPLING THIS SECTION TURNS ON.** sweepOrphanTips() deletes an
+		// orphaned tip by removing it from its parent, so a stub without this would throw rather
+		// than prove anything -- and a stub that no-opped it would report the sweep as working
+		// while nothing left the page.
+		removeChild(c) {
+			const i = this.children.indexOf(c);
+			if (i >= 0) { this.children.splice(i, 1); c.parentNode = null; }
+			return c;
+		},
+		// `id` is a PROPERTY as well as an attribute in a real DOM, and sweepOrphanTips() reads the
+		// property. A stub that only stored the attribute made the sweep skip every element and the
+		// test passed for the wrong reason in the "left alone" direction while failing in the other.
+		setAttribute(k, v) { this._attrs[k] = String(v); if (k === 'id') { this.id = String(v); } },
 		getAttribute(k) { return Object.prototype.hasOwnProperty.call(this._attrs, k) ? this._attrs[k] : null; },
 		removeAttribute(k) { delete this._attrs[k]; },
 		hasAttribute(k) { return Object.prototype.hasOwnProperty.call(this._attrs, k); },
@@ -293,7 +305,10 @@ function extract(name) {
 // because closing a box now goes through that one seam (Task 562).
 vm.runInContext('var currentPopup = null, ghostShieldTimer = null, lastMapTapFinger = false;\n' +
 	extract('hideTipsIn') + '\n' + extract('hidePanel') + '\n' + extract('closePopup') +
-	'\nthis.lpnClosePopup = closePopup;', ctx, { filename: 'looped-network.js:closePopup' });
+	'\n' + extract('sweepOrphanTips') + '\n' + extract('initTipsIn') +
+	'\nthis.lpnClosePopup = closePopup;' +
+	'\nthis.lpnSweepOrphanTips = sweepOrphanTips;' +
+	'\nthis.lpnInitTipsIn = initTipsIn;', ctx, { filename: 'looped-network.js:closePopup' });
 
 console.log('\n--- closing the Node editor takes its tips with it ---');
 {
@@ -322,6 +337,54 @@ console.log('\n--- closing the Node editor takes its tips with it ---');
 	ok(popup.style.display === 'none', '...the popup itself is hidden');
 	ok(bootstrap.Tooltip.getInstance(other).shown === true,
 		'...while a tip belonging to something else is left alone');
+}
+
+// ---------------------------------------------------------------------------------------------
+// AN ORPHANED TIP -- the one hideTipsIn() cannot reach, and the one Tom saw
+// ---------------------------------------------------------------------------------------------
+// Tom, 2026-09-02: *"I can see many of them, not really in the right places... Some of them linger
+// unclosed even after box is gone."*
+//
+// **THIS DEFECT IS OLDER THAN THE REPORT.** Bootstrap renders a tooltip into document.body, and this
+// page rebuilds the contents of its boxes constantly -- so a rebuild destroys the TRIGGER and leaves
+// the rendered tip behind with no listener that could ever close it. hideTipsIn() walks from a root
+// DOWN to triggers and an orphan has no trigger left to be found by, so it could never see them.
+// They were painting at Bootstrap's own 1080, underneath the boxes; raising tips to 1900 so they
+// could be read over a box is what made a pile of them visible at once.
+console.log('\n--- a tip whose trigger was rebuilt away is swept from the body ---');
+{
+	const host = body.appendChild(mkEl('div'));
+	const help = host.appendChild(mkEl('span'));
+	help.classList.add('ec-help');
+	help.title = 'A field that is about to be rebuilt away.';
+	EngCalcs.initTips(host);
+	bootstrap.Tooltip.getInstance(help).show();
+	// What Bootstrap leaves in the body: a rendered .tooltip carrying the id the trigger points at.
+	const rendered = body.appendChild(mkEl('div'));
+	rendered.classList.add('tooltip');
+	rendered.setAttribute('id', help.getAttribute('aria-describedby') || 'tooltip-orphan-1');
+	ok(body.children.indexOf(rendered) >= 0, 'a rendered tip is in the body');
+
+	// THE REBUILD. This is what every one of the eleven rebuild sites does: the trigger goes and
+	// nothing tells the tooltip. Note the tip is NOT hidden first -- that is the whole point.
+	host.removeChild(help);
+	sandbox.lpnSweepOrphanTips();
+	ok(body.children.indexOf(rendered) < 0,
+		'...and once its trigger is gone the sweep removes it from the body');
+
+	// The other direction, which is what stops this becoming "delete every tooltip": a tip whose
+	// trigger is still on the page must survive.
+	const keeper = body.appendChild(mkEl('span'));
+	keeper.classList.add('ec-help');
+	keeper.title = 'Still here.';
+	EngCalcs.initTips(documentEl);
+	bootstrap.Tooltip.getInstance(keeper).show();
+	const live = body.appendChild(mkEl('div'));
+	live.classList.add('tooltip');
+	live.setAttribute('id', keeper.getAttribute('aria-describedby') || 'tooltip-live-1');
+	sandbox.lpnSweepOrphanTips();
+	ok(body.children.indexOf(live) >= 0,
+		'...while a tip whose trigger is still there is left alone');
 }
 
 // EVERY BOX THAT RAISES TIPS CLOSES THROUGH THE SAME SWEEP -- and since Task 562 that is one

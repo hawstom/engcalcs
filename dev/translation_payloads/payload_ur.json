@@ -590,7 +590,7 @@
         "lpn_settings_legend_off": "Off",
         "lpn_settings_quality": "Water quality",
         "lpn_settings_quality_track": "Track",
-        "lpn_settings_quality_track_tip": "Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
+        "lpn_settings_quality_track_tip": "Choose what the run should trace through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
         "lpn_settings_quality_source": "Trace node",
         "lpn_settings_quality_source_tip": "The point whose water is traced. Every other point then shows the share of its water that came from here.",
         "lpn_quality_none": "Nothing",
@@ -811,7 +811,7 @@
         "lpn_settings_legend_off": "Off",
         "lpn_settings_quality": "Water quality",
         "lpn_settings_quality_track": "Track",
-        "lpn_settings_quality_track_tip": "Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
+        "lpn_settings_quality_track_tip": "Choose what the run should trace through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
         "lpn_settings_quality_source": "Trace node",
         "lpn_settings_quality_source_tip": "The point whose water is traced. Every other point then shows the share of its water that came from here.",
         "lpn_quality_none": "Nothing",
@@ -2066,7 +2066,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "پانی کے معیار، کیمیائی رد عمل، اور پمپ توانائی کی ترتیبات شامل نہیں کی گئیں۔ یہ صفحہ صرف بہاؤ اور دباؤ حل کرتا ہے۔",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2082,7 +2082,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "پانی کے معیار، کیمیائی رد عمل، اور پمپ توانائی کی ترتیبات شامل نہیں کی گئیں۔ یہ صفحہ صرف بہاؤ اور دباؤ حل کرتا ہے۔",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2098,7 +2098,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "پانی کے معیار، کیمیائی رد عمل، اور پمپ توانائی کی ترتیبات شامل نہیں کی گئیں۔ یہ صفحہ صرف بہاؤ اور دباؤ حل کرتا ہے۔",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2114,7 +2114,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "پانی کے معیار، کیمیائی رد عمل، اور پمپ توانائی کی ترتیبات شامل نہیں کی گئیں۔ یہ صفحہ صرف بہاؤ اور دباؤ حل کرتا ہے۔",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2130,7 +2130,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "پانی کے معیار، کیمیائی رد عمل، اور پمپ توانائی کی ترتیبات شامل نہیں کی گئیں۔ یہ صفحہ صرف بہاؤ اور دباؤ حل کرتا ہے۔",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2146,7 +2146,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "پانی کے معیار، کیمیائی رد عمل، اور پمپ توانائی کی ترتیبات شامل نہیں کی گئیں۔ یہ صفحہ صرف بہاؤ اور دباؤ حل کرتا ہے۔",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",

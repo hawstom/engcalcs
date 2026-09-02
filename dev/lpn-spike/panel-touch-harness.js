@@ -176,8 +176,16 @@ console.log('\n--- opening and closing are different sweeps ---');
 {
 	ok('hideOpenTips() still sweeps the whole document, for the OPENING rule',
 		/function hideOpenTips\(\) \{ hideTipsIn\(document\); \}/.test(js));
-	const tipped = (code.match(/EngCalcs\.initTips\(([a-zA-Z]+)\)/g) || []);
-	ok('containers are still handed to initTips() by name', tipped.length > 10, tipped.length);
+	// **THE SEAM MOVED ON 2026-09-02 and the old spelling is now a defect, not a synonym.** Every
+	// call goes through initTipsIn(), which sweeps orphaned tips before re-wiring -- a rebuild that
+	// calls EngCalcs.initTips() directly skips the sweep and leaves a tip on screen for ever. So
+	// this counts the new seam AND fails on the old one.
+	const tipped = (code.match(/initTipsIn\(([a-zA-Z]+)\)/g) || []);
+	ok('containers are still handed to the tip seam by name', tipped.length > 10, tipped.length);
+	const direct = (code.match(/EngCalcs\.initTips\(([a-zA-Z]+)\)/g) || [])
+		.filter(function (c) { return !/initTipsIn/.test(c); });
+	ok('...and nothing calls EngCalcs.initTips() around it, which would skip the orphan sweep',
+		direct.length === 1, JSON.stringify(direct));
 	// A container given tips must be one of: the document itself (init), or an element that some
 	// closer hides -- and section 2 has already proved every such hide goes through hidePanel().
 	const named = tipped.map(function (c) { return c.replace(/.*\(|\)/g, ''); });

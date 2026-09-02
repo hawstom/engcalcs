@@ -149,7 +149,19 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 	];
 	// Every panel made draggable is either opened through the seam or declared above. The count is
 	// the guard: a seventh draggable panel makes this fail until somebody decides which it is.
-	const wired = (code.match(/makePanelDraggable\(/g) || []).length - 1;
+	// **COUNTED IN COMMENT-BLANKED SOURCE, which this needed and did not have.** A prose line
+	// mentioning `makePanelDraggable()` -- and there are several, because the function is the seam
+	// three other rules point at -- counted as a seventh wired panel and failed this check on
+	// 2026-09-02. Blanking comments before counting call sites is what every other scanner in this
+	// repo does (see dev/scripts/js_scan.inc.php's own note) and is the fix rather than rewording
+	// the comment, which would leave the trap set for the next person.
+	const codeOnly = code
+		.replace(/\/\*[\s\S]*?\*\//g, ' ')
+		.split('\n').map(function (l) {
+			const at = l.indexOf('//');
+			return at < 0 ? l : l.slice(0, at);
+		}).join('\n');
+	const wired = (codeOnly.match(/makePanelDraggable\(/g) || []).length - 1;
 	ok('every draggable panel is either filled or declared exempt', wired === 4 + EXEMPT.length,
 		wired + ' draggable panels, 4 filled + ' + EXEMPT.length + ' exempt');
 	EXEMPT.forEach(function (e) {
