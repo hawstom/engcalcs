@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read**, of 221 untranslated keys, of 1536 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**8 still to read**, of 223 untranslated keys, of 1538 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (219, 5 to read @@ NEEDS RULING)
+## lpn_  (221, 8 to read @@ NEEDS RULING)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -215,9 +215,15 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_ff_required`**
   > Required fire flow
   _Ruled OK 2026-09-01._
+- **`lpn_ff_required_node_tip`**
+  > The fire flow this junction alone must provide, from your code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Fire flow box.
+  @@ NEEDS RULING
+- **`lpn_ff_required_own`**
+  > Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.
+  @@ NEEDS RULING
 - **`lpn_ff_required_tip`**
-  > The flow required by your code or your fire authority at a hydrant. One junction at a time is tested against this same number.
-  _Ruled OK 2026-09-01._
+  > The flow required by your code or your fire authority at a hydrant. Each junction is tested against this number, unless it carries a required fire flow of its own.
+  @@ NEEDS RULING
 - **`lpn_ff_residual`**
   > Residual pressure to hold
   _Ruled OK 2026-09-01._

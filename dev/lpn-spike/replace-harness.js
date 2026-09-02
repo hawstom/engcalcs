@@ -254,7 +254,9 @@ function nodeOf(id) { return L.getDoc().nodes.filter(n => n.id === id)[0]; }
 		JSON.stringify(L.specFields('pipe')) === JSON.stringify(['diameter', 'roughness', 'km']),
 		JSON.stringify(L.specFields('pipe')));
 	ok('a junction scope offers the node inputs',
-		JSON.stringify(L.specFields('junction')) === JSON.stringify(['elev', 'demand']),
+		// `fireFlow` joined them with Task 530 -- a junction's own required fire flow is an INPUT
+		// this tool can set in bulk, which is the whole point of giving a district one number.
+		JSON.stringify(L.specFields('junction')) === JSON.stringify(['elev', 'demand', 'fireFlow']),
 		JSON.stringify(L.specFields('junction')));
 	// **RESULTS ARE SEARCHABLE AND NOT WRITABLE.** Pressure is printed on the map, so it is a
 	// perfectly good thing to search on; nothing writes it, so it must never appear here.
