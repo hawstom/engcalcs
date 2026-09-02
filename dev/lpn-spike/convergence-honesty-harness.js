@@ -219,11 +219,73 @@ function pageSection() {
 		'`converged: null` (the engine could not be asked) raises no warning');
 }
 
+// ================================================================================================
+// 4. WHICH SETTINGS ACTUALLY REACH THIS, AND THE ONE THAT DOES NOT
+// ================================================================================================
+// **"Maximum trials 1" ON ITS OWN DOES NOT PRODUCE AN UNCONVERGED RUN, and that surprised the
+// person who wrote the fix.** Tom set it on the shipped example, solved, and got no warning; the
+// answer is that it converged, honestly. EPANET's `Unbalanced Continue 10` -- OUR default, written
+// by lpnToInp whenever the project says nothing -- grants ten FURTHER trials after the limit is
+// hit, so `Trials 1` is really eleven, and eleven is plenty for a small network.
+//
+// So the task's own claim that this is "reachable through a control" is true of TWO controls
+// together, not one. This section pins the table down so the next person to write a browser test
+// does not repeat the mistake, and so a change to the `Continue 10` default cannot quietly make the
+// non-convergence branch unreachable again.
+//
+// It also measures what the extra trials are worth: with them the example lands at 1.5e-7, without
+// them at 7.4e-1 -- six orders of magnitude, on the same network at the same stated trial limit.
+async function reachSection() {
+	console.log('\n---- 4. the two settings that reach a non-converged answer, and the one that does not ----');
+	const { loadLoopedNetwork } = require('./lpn-dom-stub.js');
+	const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
+	const L = loadLoopedNetwork(
+		EXAMPLE_EXPORTS +
+		"\t\tassembleModel: assembleModel, getSettings: function () { return settings; },\n" +
+		"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
+		"\t\t\tworld = el('g', {}, svg);\n" +
+		"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
+		"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
+		"\t\t\tlabelsLayer = el('g', {}, world);\n" +
+		"\t\t\trubberBandEl = el('line', {}, world); }\n"
+	);
+	L.buildLayers();
+	openExample(L, 'us');
+
+	async function solveWith(h) {
+		L.getSettings().hydraulics = h;
+		EngCalcs.lpnEpanetReset();
+		return EngCalcs.lpnSolveEpanet(L.assembleModel(), { moduleUrl: ENGINE });
+	}
+
+	const only = await solveWith({ trials: 1 });
+	check(only.converged === true,
+		'`Maximum trials 1` ALONE still converges -- `Unbalanced Continue 10` grants ten more',
+		`iters=${only.iterations}, relErr=${only.relativeError.toExponential(3)}`);
+
+	const stop = await solveWith({ trials: 1, unbalanced: 'stop' });
+	check(stop.converged === false,
+		'...adding `If unbalanced: Stop` reaches the unconverged answer',
+		`iters=${stop.iterations}, relErr=${stop.relativeError.toExponential(3)}`);
+	check(stop.ok === true && stop.refused !== true,
+		'...and Stop is still not a refusal: the numbers come back to be drawn');
+
+	const noExtra = await solveWith({ trials: 1, unbalanced: 'continue', unbalancedTrials: 0 });
+	check(noExtra.converged === false,
+		'...so does `Extra trials first: 0`, which is the other door to the same place',
+		`iters=${noExtra.iterations}`);
+
+	check(stop.relativeError > only.relativeError * 1e5,
+		'and the ten extra trials are worth six orders of magnitude on this network',
+		`${only.relativeError.toExponential(3)} with them, ${stop.relativeError.toExponential(3)} without`);
+}
+
 (async function () {
 	await EngCalcs.lpnEpanetLoad(ENGINE);
 	await steadySection();
 	await epsSection();
 	pageSection();
+	await reachSection();
 	console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILURE(S)`);
 	process.exit(failures === 0 ? 0 : 1);
 })().catch((e) => { console.error(e); process.exit(1); });

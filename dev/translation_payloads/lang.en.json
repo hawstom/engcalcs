@@ -1266,6 +1266,8 @@
         "lpn_settings_text_size": "Text size (pixels)",
         "lpn_settings_symbol_size": "Symbol size (pixels)",
         "lpn_settings_link_width": "Link line thickness (pixels)",
+        "lpn_settings_show_arrows": "Flow direction arrows",
+        "lpn_settings_show_arrows_tip": "Draw an arrow on each pipe showing which way the water is running. The arrows appear after a run, and turning them off leaves the results unchanged. This setting is saved with the project.",
         "lpn_settings_align_labels": "Draw link labels along the link line",
         "lpn_settings_readability_bias": "Label flip angle adjustment (degrees)",
         "lpn_settings_readability_bias_tip": "Flip a label to keep it right side up when it leans more than this many degrees left of vertical.",
@@ -1526,7 +1528,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer, and the reason given is {id}"
     },
-    "count": 1524,
+    "count": 1526,
     "active_prefixes": [
         "about",
         "bpn",

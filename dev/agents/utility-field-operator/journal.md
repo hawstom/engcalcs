@@ -324,3 +324,74 @@ that supports two conclusions and is quoted for one of them is a citation half r
 Task 530's measured per-solve cost RISING through a run (1.1 -> 31.0 ms, 49 to 225 junctions), so an
 ETA from the early junctions is optimistic and gets worse as the run continues. It is an argument
 about the numbers, not about placement, and Tom did not touch it.
+
+## 2026-09-01 — Task 567 (vertices): I found the read-only hazard is already live, not hypothetical
+
+Tom asked me to weigh in on Task 567 (`dev/ROADMAP.md:1056-1076`) from my seat: a reader on a phone,
+not a drafter at a desk. I went to the code before answering, because "is this a real hazard" is a
+question the code can settle and a guess cannot.
+
+**FINDING, OBSERVED: the accidental-edit hazard is not a risk of the proposed vertices MODE — it
+already exists today, in plain `select` mode, with no confirmation and no undo snapshot.**
+
+- `js/looped-network.js:18848-18869` — the map's `dblclick` listener runs on every plain double-tap,
+  in ordinary select mode (the mode a reader is in by default), with no gate: `else if
+  (t.classList.contains('lpn-vhandle')) { removeVertex(...); } else if (t.dataset.link !== undefined)
+  { insertVertex(...); }`.
+- `js/looped-network.js:5162-5176` — `insertVertex()` and `removeVertex()` mutate `l.verts` directly
+  and call `rebuildLink()`. **Neither calls `saveUndoSnapshot()`.** Compare the *tool-based* delete
+  path at `js/looped-network.js:19015`, which does snapshot before calling `removeVertex()` — the
+  double-click path that a reader can trigger by accident is the one path into this function with no
+  undo protection at all.
+- `js/looped-network.js:18848-18851` (comment, Tom's own words quoted in the code): *"Tom caught
+  this: double-click stopped adding vertices entirely."* — i.e. this exact code path has already
+  been the subject of one bug hunt from the other direction (making the gesture WORK reliably), which
+  is evidence nobody has yet looked at it from the "can it fire when nobody meant it to" side.
+- `css/engcalcs.css:299` — `#lpn_canvas { touch-action: none; ... }`, so the browser's native
+  double-tap-to-zoom is disabled on this canvas. That is necessary for the app to own pinch/pan, but
+  it also means a phone user's ordinary "tap it twice, nothing happened yet, tap again" reflex — the
+  gesture that on almost every other map app zooms harmlessly — reaches our own `dblclick` handler
+  instead and edits the pipe.
+- `js/looped-network.js:18862-18869` and `19045-19051` — a single tap on a link opens its property
+  popup only after a **300 ms debounce**, specifically so a following tap can turn the pair into a
+  double-click. That debounce is *itself* the trap: a reader who taps a pipe to read it, sees nothing
+  for a third of a second, and taps again out of impatience has just produced exactly two taps 300 ms
+  apart on the same pipe — the double-click gesture — and silently added a vertex. **The mechanism
+  built to make "read this pipe" fast is the same mechanism that makes "reshape this pipe by
+  accident" easy.**
+
+**So the answer to "is this real" (question 2) is yes, independent of whatever ships for Task 567** —
+today's code, not a hypothetical mode. Whatever ships should fix this existing exposure, not just
+avoid adding a new one.
+
+**On the mode question (question 1):** the codebase already has a working example of the right shape,
+and it did not come from me — `profileDrawActive()` / `profileDrawSay()`
+(`js/looped-network.js:11986-12020`, Task 433/504), the elevation-profile route editor. It is a modal
+state that (a) is entered by a deliberate control, not a bare gesture, (b) consumes every map press
+while active so nothing falls through to the ordinary select-mode meanings, and (c) keeps a live
+commentary line on screen the whole time telling the user what state they're in and what a press will
+do next. That is the template a vertices mode should copy, not invent fresh — same author, already
+proven on this exact map, already phone-tested (Task 506 built its touch equivalent: short tap =
+hover, long press = click, double tap = end).
+
+**CITED, external precedent for the door being an explicit control rather than a gesture:**
+Esri ArcGIS Field Maps shows vertices on a feature only after the user has explicitly started editing
+that feature — a deliberate "start editing" action, not a long-press or double-tap in the ordinary
+browsing view — and its current-generation `ReticleVertexTool` (ArcGIS Maps SDK 200.5+) goes further:
+a fixed crosshair sits at screen centre and the user pans the MAP under it to position a vertex,
+rather than dragging a small handle under a fingertip. That decouples precision entirely from finger
+contact size, which none of Task 567's four candidate answers do.
+Source: Esri, "Edit feature vertices" (ArcGIS Pro/Field Maps documentation) and Esri Community threads
+on `ReticleVertexTool` and "Enable touch to enter vertices" —
+https://doc.esri.com/en/arcgis-pro/latest/help/editing/modify-feature-vertices.html ,
+https://www.esri.com/arcgis-blog/products/sdk-kotlin/developers/implement-custom-geometry-editing-workflows-with-programmatic-reticle-tool ,
+https://community.esri.com/t5/arcgis-field-maps-ideas/enable-touch-to-enter-vertices/idi-p/1044195
+
+**CITED,** OpenStreetMap's Vespucci (Android editor) uses a long-press to enter its own "New" mode
+for adding a node/way, and creating a way-node on an existing line happens only inside that same
+deliberate mode, not from a bare tap in the default browsing view — a second independent field editor
+choosing "enter a named mode first" over "let any gesture on the line reshape it."
+Source: Vespucci, "Creating new objects" — https://vespucci.io/help/en/Creating%20new%20objects/
+
+Full answer with the ranking Tom asked for: `dev/agents/utility-field-operator/wishlist.md`, row
+under 2026-09-01.

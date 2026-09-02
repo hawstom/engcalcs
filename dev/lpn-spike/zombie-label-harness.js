@@ -45,6 +45,7 @@ const L = loadLoopedNetwork(
 	"\t\tlinkEls: function () { return linkEls; },\n" +
 	"\t\tlabelsLayer: function () { return labelsLayer; },\n" +
 	"\t\tinsertVertex: insertVertex, removeVertex: removeVertex, deleteLink: deleteLink,\n" +
+	"\t\tundo: undo, undoDepth: function () { return undoStack.length; },\n" +
 	"\t\tstations: linkLabelStations,\n" +
 	"\t\tzoomTo: function (s) { state.s = s; refreshFontSizes(); },\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
@@ -158,6 +159,42 @@ console.log('\n--- and a deleted pipe still takes its whole chain with it (2026-
 	report(orphans().length === 0, 'deleting the pipe leaves no unowned label element',
 		orphans().length + ' orphans');
 	report(after < before, '...and its elements really are gone', before + ' -> ' + after + ' texts');
+}
+
+// ================================================================================================
+// AND A BEND EDIT IS UNDOABLE -- ROADMAP Task 567's first strand
+// ================================================================================================
+// Found 2026-09-01 by the utility-field-operator agent, reading for a DIFFERENT question: the
+// browser's own `dblclick` bends a pipe or removes a bend in ordinary `select` mode, and neither
+// insertVertex() nor removeVertex() took an undo snapshot -- while the identical edit reached
+// through the Delete TOOL did, because that ONE call site remembered. So the accident was the
+// unrecoverable half and the deliberate act was the safe one, which is backwards.
+//
+// **THIS ASSERTS THE SNAPSHOT, NOT THE HANDLER.** The double-click listener is not reachable from
+// here (the DOM stub dispatches no dblclick), so the assertion is placed where the fix is: on the
+// functions themselves, which is exactly why the fix went there rather than into the handler. A
+// third caller cannot now forget.
+console.log('\n--- a bend edit is undoable, however it was reached (Task 567) ---');
+{
+	const l2 = L.getDoc().links[0];
+	const before = L.undoDepth();
+	L.insertVertex(l2.id, { x: 500, y: 260 });
+	report(L.undoDepth() === before + 1, 'adding a bend pushes exactly one undo snapshot',
+		before + ' -> ' + L.undoDepth());
+	const verts = l2.verts.length;
+	L.undo();
+	report(L.getDoc().links[0].verts.length === verts - 1,
+		'...and it takes the bend back off', 'verts now ' + L.getDoc().links[0].verts.length);
+
+	// Removing one is the other half, and it is the branch a stray double-tap on a HANDLE reaches.
+	L.insertVertex(l2.id, { x: 500, y: 260 });
+	const d2 = L.undoDepth(), v2 = L.getDoc().links[0].verts.length;
+	L.removeVertex(l2.id, 0);
+	report(L.undoDepth() === d2 + 1, 'removing a bend pushes exactly one snapshot, not two',
+		d2 + ' -> ' + L.undoDepth());
+	L.undo();
+	report(L.getDoc().links[0].verts.length === v2, '...and one Undo puts it back',
+		'verts now ' + L.getDoc().links[0].verts.length);
 }
 
 console.log(`\n${failures ? 'FAILURES: ' + failures : 'all ' + checks + ' checks passed'}`);

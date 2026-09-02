@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 1524,
-        "delta_key_count": 210,
+        "expected_key_count": 1526,
+        "delta_key_count": 212,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -579,6 +579,8 @@
         "lpn_settings_option_unset": "Not stated",
         "lpn_settings_demand_multiplier": "Demand multiplier",
         "lpn_settings_demand_multiplier_tip": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.",
+        "lpn_settings_show_arrows": "Flow direction arrows",
+        "lpn_settings_show_arrows_tip": "Draw an arrow on each pipe showing which way the water is running. The arrows appear after a run, and turning them off leaves the results unchanged. This setting is saved with the project.",
         "lpn_settings_leader_snap": "Snap leader lines to angle",
         "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
@@ -791,6 +793,8 @@
         "lpn_settings_option_unset": "Not stated",
         "lpn_settings_demand_multiplier": "Demand multiplier",
         "lpn_settings_demand_multiplier_tip": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.",
+        "lpn_settings_show_arrows": "Flow direction arrows",
+        "lpn_settings_show_arrows_tip": "Draw an arrow on each pipe showing which way the water is running. The arrows appear after a run, and turning them off leaves the results unchanged. This setting is saved with the project.",
         "lpn_settings_leader_snap": "Snap leader lines to angle",
         "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
         "lpn_settings_legend_off": "Off",
@@ -2755,6 +2759,38 @@
                     "key": "lpn_settings_tolerance",
                     "value": "收敛容差",
                     "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_show_arrows": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_link_width",
+                    "value": "管道线宽（像素）",
+                    "english": "Link line thickness (pixels)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_align_labels",
+                    "value": "管道标签与管道对齐",
+                    "english": "Draw link labels along the link line"
+                }
+            }
+        },
+        "lpn_settings_show_arrows_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_link_width",
+                    "value": "管道线宽（像素）",
+                    "english": "Link line thickness (pixels)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_align_labels",
+                    "value": "管道标签与管道对齐",
+                    "english": "Draw link labels along the link line"
                 }
             }
         },

@@ -5213,7 +5213,31 @@ var EngCalcs = EngCalcs || {};
 		updateTextOnLink(l.id);
 		refreshLabelText();
 	}
+	// **BOTH OF THESE SNAPSHOT FOR THEMSELVES, AND THAT IS THE POINT OF PUTTING IT HERE.**
+	// (ROADMAP Task 567's first strand, found 2026-09-01 by the utility-field-operator agent.)
+	// Until now the Delete TOOL called `saveUndoSnapshot(); removeVertex(...)` and the DOUBLE-CLICK
+	// handler called `removeVertex(...)` bare -- two call sites, one of which knew the rule. So a
+	// double-click that reshaped a pipe was **not undoable**, while the identical edit through the
+	// toolbar was.
+	//
+	// **AND IT IS REACHABLE BY ACCIDENT, WHICH IS WHY IT MATTERS MORE THAN A MISSING UNDO STEP.** In
+	// ordinary `select` mode -- the mode a person is in while doing nothing but reading -- the
+	// browser's own `dblclick` bends a pipe or deletes a bend, with no gate. A single tap on a link
+	// opens its popup only after a 300 ms debounce, deliberately, so that a SECOND tap can complete
+	// a double-click; that pause is the trap. Somebody taps a pipe to read it, sees nothing happen,
+	// taps again -- and has silently reshaped somebody else's model with no way back. The canvas
+	// carries `touch-action: none`, so the browser's own harmless double-tap-to-zoom never
+	// intercepts it either.
+	//
+	// The snapshot makes the accident RECOVERABLE. It does not make it unreachable, and the door
+	// itself is Task 567's business.
+	//
+	// The three label-home resets in the same handler already snapshotted; these two were the
+	// exceptions, which is the tell. Same shape as the two link-teardown lists closed the same day:
+	// when one call site knows a rule and another does not, move the rule into the thing being
+	// called.
 	function insertVertex(linkId, pt) {
+		saveUndoSnapshot();
 		var l = linkById(linkId), pts = [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]),
 			bestI = 0, bestD = Infinity, i, d;
 		for (i = 0; i < pts.length - 1; i++) {
@@ -5224,6 +5248,7 @@ var EngCalcs = EngCalcs || {};
 		rebuildLink(l);
 	}
 	function removeVertex(linkId, vidx) {
+		saveUndoSnapshot();
 		var l = linkById(linkId);
 		l.verts.splice(vidx, 1);
 		rebuildLink(l);
@@ -19063,7 +19088,9 @@ var EngCalcs = EngCalcs || {};
 				// gesture is an `active` override rather than a deletion, and in Base it may have to
 				// ask first -- neither of which a snapshot taken out here could know about.
 				if (t.dataset.node) { deleteElement('node', t.dataset.node); }
-				else if (t.classList.contains('lpn-vhandle')) { saveUndoSnapshot(); removeVertex(t.dataset.link, +t.dataset.vidx); }
+				// No saveUndoSnapshot() here any more -- removeVertex() takes its own, so this would
+			// push a second identical snapshot and cost the user a dead press of Undo.
+			else if (t.classList.contains('lpn-vhandle')) { removeVertex(t.dataset.link, +t.dataset.vidx); }
 				else if (t.dataset.link !== undefined) { deleteElement('link', t.dataset.link); }
 				else if (t.dataset.lbl !== undefined) { deleteElement('label', t.dataset.lbl); }
 			} else if (mode === 'select' && profileEditActive()) {

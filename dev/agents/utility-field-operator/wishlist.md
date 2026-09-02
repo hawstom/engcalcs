@@ -126,6 +126,65 @@ building `lpn_` toward being a field tool it structurally is not, and I disagree
   because it is an enumeration, not a forecast; a derived time is not, and should not be added even
   as a later "improvement."
 
+### 5. Task 567 (vertices): fix the accidental double-tap edit FIRST — it is a live read-only hazard today, before any mode ships
+
+- **Rank: above my own #1-3, alongside #4, and I would build it before the vertices mode Tom sketched.**
+  This is the one place my seat's standing worry — a reader silently changing somebody's model — is
+  not speculative. It is already true of the shipped page.
+- **What I found, OBSERVED (full trace in the journal, 2026-09-01):** in ordinary `select` mode — the
+  mode a reader is in by default, doing nothing but looking — a plain browser `dblclick` on a pipe
+  calls `insertVertex()`, and on a vertex handle calls `removeVertex()`
+  (`js/looped-network.js:18848-18869`). Neither function saves an undo snapshot first
+  (`js/looped-network.js:5162-5176`), unlike the tool-based delete path a few hundred lines away,
+  which does. And the page's own 300 ms tap→popup debounce (`js/looped-network.js:18862-18869`,
+  `19045-19051`) is the trap: a reader taps a pipe to read it, nothing visibly happens for a third of
+  a second, taps again out of impatience — and has just fired the double-click gesture instead of
+  getting the popup. `touch-action: none` on the canvas (`css/engcalcs.css:299`) means the browser's
+  own harmless double-tap-zoom never intercepts this; our handler gets every double-tap.
+- **My ranking of Task 567's four strands, for a phone, in order I would build them:**
+  1. **Fix the existing accidental-edit path first** — gate the double-click/double-tap insert-and-
+     remove behind SOMETHING that cannot fire from ordinary browsing (see journal for the shape:
+     require an explicit "editing vertices" state, entered by a control, not by any bare gesture on
+     the map). This is not a new feature; it closes a defect in what already ships. Cheap relative to
+     the mode work, because `saveUndoSnapshot()` alone would at least make the accident recoverable
+     even before a mode exists.
+  2. **The vertices MODE, built to the codebase's OWN existing template** — `profileDrawActive()` /
+     `profileDrawSay()` (`js/looped-network.js:11986-12097`, Task 433/504) already is a modal,
+     phone-tested (Task 506), self-announcing editing state on this exact map, entered deliberately
+     and consuming every press while active with a live on-screen line saying what state you're in.
+     Copying that shape answers Tom's own worry about a mode nobody notices they're in — the existing
+     one does not have that problem, so the new one should inherit its answer rather than invent one.
+     The DOOR into it on touch cannot be a right-click (no such gesture exists) or a bare long-press/
+     double-tap (per the hazard above, those are exactly the gestures already causing trouble) — it
+     should be a button on the pipe's own selected-state UI (property popup or action row), which is
+     also the one door a reader would never hit without first deliberately selecting the pipe.
+  3. **Esri's reticle approach is worth a look, not a rebuild** — CITED, `ReticleVertexTool` fixes a
+     crosshair at screen centre and pans the MAP under it to place a vertex, which removes the "small
+     handle under a fat finger" problem structurally rather than by making the handle bigger. That is
+     a genuinely different answer from "bigger touch targets," and it is the one candidate among the
+     four Tom listed that nobody has yet named for this page. I would not build it now — it is real
+     engineering for a page whose stated phone stance is "survivable," not "optimized" — but I would
+     not want it lost either, since (per my own brief) awkward-to-build is not the same as low-value.
+  4. **"Accept arbitrary points while drawing, until the second node is clicked"** — real, and
+     unrelated to reading; it is a drafting convenience for whoever is BUILDING the network, not for
+     me reading it in the street. I have nothing to add from this seat and would not prioritize it
+     from here; if it ships, it should not be justified by phone-reading.
+  5. **I would NOT build "bigger handles" as a standalone answer.** `dev/phone-interaction-model.md`
+     already treats the vertex handle correctly for a page that is still deliberately in "survivable,"
+     not "optimized" — Task 562 gave `.lpn-vhandle` the SAME reach precedence as everything else and
+     left the visual size alone on purpose, and Tom himself discounted the small-symbol argument as
+     "a lot of stacked mights." Enlarging the grip on top of a mode/gate fix would be solving a
+     problem the mode fix removes: once vertex editing requires a deliberate door, how easy the
+     handle is to graze in ordinary browsing stops mattering, because ordinary browsing can no longer
+     reach it.
+- **The read-only hazard, answered plainly (this is the part I would put first if Tom reads only one
+  line of this row):** yes, it is real, and it does not wait on the vertices mode being built — it is
+  live in the shipped page today. The cheapest guard is not a new UI at all: a `saveUndoSnapshot()`
+  call in front of `insertVertex()`/`removeVertex()`'s dblclick path makes an accident recoverable
+  immediately; requiring a deliberate door (a button, not a gesture) into any future vertices mode is
+  what stops the accident from happening in the first place. I would ship the first as a quick
+  patch regardless of what happens to the rest of Task 567.
+
 ## Parked
 
 *(none yet)*

@@ -1072,6 +1072,37 @@ the block.
     act: vertices are small partly to avoid confusion with other symbols, which *might* be mitigated
     if they were the only hollow symbol on the map — *"Frankly, that's a lot of stacked 'mights' to
     base any decision on."*
+  - **[DONE 2026-09-01] THE FIRST STRAND WAS A LIVE HAZARD, NOT A FEATURE GAP**, found by the
+    `utility-field-operator` agent reading for a different question. In ordinary `select` mode --
+    the mode a person is in while doing nothing but reading -- the browser's own `dblclick` bends a
+    pipe or deletes a bend with **no gate and no undo snapshot**, while the identical edit through
+    the Delete TOOL took one, because that one call site remembered. **The accident was the
+    unrecoverable half and the deliberate act was the safe one**, which is backwards. And it is easy
+    to reach by accident: a single tap on a link opens its popup only after a 300 ms debounce,
+    deliberately, so a SECOND tap can complete a double-click — so somebody taps a pipe to read it,
+    sees nothing happen, taps again, and has silently reshaped somebody else's model. The canvas
+    carries `touch-action: none`, so the browser's own harmless double-tap-to-zoom never intercepts
+    it either. `saveUndoSnapshot()` moved INTO `insertVertex()`/`removeVertex()` so a third caller
+    cannot forget — the same shape as the two link-teardown lists closed the same day. Asserted in
+    `dev/lpn-spike/zombie-label-harness.js`; mutation-tested, 4 of 14 fail with the hazard restored.
+    **This makes the accident recoverable and does not make it unreachable** — the DOOR is the rest
+    of this task.
+  - **THE AGENT'S RANKING, and it disagrees with the order this task was written in:** fix the
+    accidental edit path first (done); then build the mode on the `profileDrawActive()`/
+    `profileDrawSay()` template (Tasks 433/504), which is already a modal, phone-tested editing
+    state that consumes every press and keeps a live on-screen line saying what state you are in —
+    rather than inventing one. It would **not** build "bigger handles" as a standalone fix: once
+    vertex editing needs a deliberate door, how easy a handle is to graze in ordinary browsing stops
+    mattering. Arbitrary points while drawing is real but a drafter's want, not a reader's.
+  - **CITED, and it is the part this repo did not have.** Esri ArcGIS Field Maps shows and edits
+    vertices only after the user explicitly starts editing a feature — never from a gesture in the
+    default browsing view — and its `ReticleVertexTool` (Maps SDK 200.5+) fixes a crosshair at
+    screen centre and pans the map UNDER it, decoupling precision from finger contact size
+    altogether. OpenStreetMap's Vespucci enters a deliberate "New" mode by long-press before any
+    vertex can be added; a bare tap in ordinary browsing never reshapes a way. **So the door being
+    an explicit control rather than a gesture is what the field tools all converged on**, and the
+    reticle is a better long-term answer than bigger handles. Full trace and sources:
+    `dev/agents/utility-field-operator/journal.md`, 2026-09-01.
   - **THE TOUCH-REACH WORK DELIBERATELY LEFT THE VERTEX HANDLE ALONE** (closed Task 562): a node
     outranks a link and a label but still yields to `.lpn-vhandle`, because taking the handle away
     would deepen this defect rather than fix anything. Whatever lands here decides whether that
