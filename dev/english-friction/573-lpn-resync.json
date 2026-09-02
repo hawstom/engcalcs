@@ -12,8 +12,8 @@
     "hide this pipe/line on a drawing",
     "hide this line of text"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Hide this row'. If the related-calculators use makes 'row' wrong there, split the key rather than keep a word that names two things on the same page."
+   "disposition": "dismissed",
+   "resolution": "Dismissed. Every one of the 26 shipped translations already renders the row / line-of-text sense (fr 'ligne', ru 'строку', zh '行', id 'baris'); not one took the pipeline reading. The English works as measured, and 'Hide this row' would buy 26 retranslations of a three-word string to fix a defect nobody has committed."
   },
   {
    "key": "mphl_hgl_egl_tip",
@@ -25,8 +25,8 @@
     "this whole calculation method may not be valid",
     "this input may not be valid"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This result may not be valid where the pipe rises above the hydraulic grade line.' Drop 'See notes.' unless a notes section is added, in which case name it."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'This result may not be valid where the pipe rises above the hydraulic grade line.' The elided subject is supplied and 'See notes.' is dropped, because none of the three pages carrying this tip has a notes section it could point at."
   },
   {
    "key": "mhp_hl_ok_tip",
@@ -38,8 +38,8 @@
     "the head loss is economical",
     "this is the economical case"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Head loss is under 10% of gross head. This pipe size is economical.' Parallel with the two siblings, and the em dash goes with the rewrite."
+   "disposition": "english",
+   "resolution": "English fixed, parallel with its two siblings and one em dash lighter. Now: 'Head loss is under 10% of gross head. This pipe size is economical.'"
   },
   {
    "key": "rc_notes_1_def",
@@ -50,8 +50,8 @@
     "based on channel slope and unit discharge, over a range that includes steep slopes (intended)",
     "based on the slope of steep channels only, which then contradicts the gentle-slope clause"
    ],
-   "disposition": "open",
-   "resolution": "English: '...developed two empirical equations for median rock lining size D<sub>50</sub> from channel slope and unit discharge.' Leave the ranges to state the domain, which they already do."
+   "disposition": "english",
+   "resolution": "English fixed. 'based on steep channel slope and unit discharge' is now 'from channel slope and unit discharge'; the two equations' stated ranges carry the domain, which is where the contradiction was coming from."
   },
   {
    "key": "lpn_tool_vertices",
@@ -63,8 +63,8 @@
     "the nodes of the network graph",
     "corner points of a polygon"
    ],
-   "disposition": "open",
-   "resolution": "Keep the English (EPANET says Vertices). Add a glossary.json term 'vertex (pipe)': a point that shapes a pipe's route on the map, carrying no elevation, no demand and no head loss, with avoid: ['the graph-theory sense, where a vertex is a node', 'a pipe fitting or elbow']. Wire it to the lpn prefix."
+   "disposition": "glossary",
+   "resolution": "Glossary. The term 'vertex' already existed and was already wired to lpn; its avoid array now carries the graph-theory sense in so many words ('a vertex IS a node' is the reading to refuse) and the bend-fitting sense, and its context names the toolbar mode. English 'Vertices' stands: it is EPANET's own word."
   },
   {
    "key": "lpn_tool_vertices_tip",
@@ -75,8 +75,8 @@
     "a geometric bend point in the drawn route of the pipe (intended)",
     "a bend fitting, an elbow, which adds a minor loss"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics.' Plus the glossary term proposed on lpn_tool_vertices."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics.' Four uses of 'bend' are gone; in hydraulics a bend is a fitting with a minor loss coefficient, which this page models, so the old tip claimed the tool added and removed fittings."
   },
   {
    "key": "lpn_field_text_attached",
@@ -88,8 +88,8 @@
     "a fragment awaiting a noun the translator cannot see",
     "a past participle describing the Text: 'attached to ...' as a state"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Anchor' or 'Attached asset'. 'Anchor' matches the code's own anchorNode/anchorLink and is a noun phrase with no dangling preposition."
+   "disposition": "english",
+   "resolution": "English fixed. 'Attached to' is now 'Attached asset': a noun phrase with no dangling preposition, matching how sprint 241 resolved lpn_pump_curve_source. 'Anchor' was rejected because an anchor block is a real water-works object."
   },
   {
    "key": "lpn_ex_net3_world_desc",
@@ -100,8 +100,8 @@
     "put down at an actual place on the globe, chosen for the demonstration (intended)",
     "put back at the true real-world location of the Net3 system"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The same network as EPANET Net3, put down at an arbitrary site on the globe: its coordinates are latitude and longitude, and a street map is drawn behind it.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The same network as EPANET Net3, put down at an arbitrary place on the globe: its coordinates are latitude and longitude, and a street map is drawn behind it.' 'an arbitrary place on the globe' closes the false reading that Net3 has been put back where the real system is."
   },
   {
    "key": "lpn_units_warn_title",
@@ -113,8 +113,8 @@
     "choosing this unit changes how the numbers are converted",
     "choosing this unit is decided by what you have entered"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Changing this unit changes what your numbers mean; it does not convert them.' Says the rule instead of implying it, and no reading is left that describes conversion."
+   "disposition": "dismissed",
+   "resolution": "Dismissed, and the proposed English would have been FALSE. This dialog offers BOTH answers: lpn_units_nondestructive_desc ('leaves every input as it is and reinterprets it in the new unit') and lpn_units_destructive_desc ('rewrites every input with a mathematical conversion'). A title saying 'it does not convert them' contradicts the second option in the same box. The title is Tom's own wording (2026-08-18, Task 425), and the two option descriptions resolve the conversion reading inside the same dialog and the same payload."
   },
   {
    "key": "lpn_result_water_age_tip",
@@ -126,8 +126,8 @@
     "there is no typical value published, so you have nothing to compare with",
     "treat the figure as a field measurement"
    ],
-   "disposition": "open",
-   "resolution": "English: 'How long the water reaching this point has been in the system. There is no regulatory limit to compare it against, so judge the number against your own system.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'How long the water reaching this point has been in the system. There is no regulatory limit to compare it against, so judge the number against your own system.'"
   },
   {
    "key": "lpn_result_source_share_tip",
@@ -139,8 +139,8 @@
     "the share of the source that is being traced",
     "a share belonging to a thing called a source-trace"
    ],
-   "disposition": "open",
-   "resolution": "glossary.json: add 'source trace' (EPANET's water-quality analysis that reports what fraction of the water at each node came from one chosen node) and 'trace node' (the node whose water is traced), both wired to the lpn prefix. English of the tip: 'How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports.'"
+   "disposition": "glossary",
+   "resolution": "English fixed and two glossary terms added. Tip now: 'How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports.' New wired-to-lpn terms 'source trace' (EPANET's analysis) and 'trace node' (the node it follows), each carrying the avoid list for the two other senses of 'source' on this page. The fourth form 'the source trace share' is gone."
   },
   {
    "key": "lpn_menu_map",
@@ -152,8 +152,8 @@
     "the drawing surface, the canvas the network is drawn on",
     "the verb, to map"
    ],
-   "disposition": "open",
-   "resolution": "Keep the English (one word is right for a nav bar) and route it through a $ec_lang_syn proposal: 'Map, Basemap, Background map, Street map | layout: nav item'. Proposal only, since $ec_lang_syn is off limits to AI."
+   "disposition": "dismissed",
+   "resolution": "Dismissed. The menu governs the basemap AND what is drawn over it, so both readings land on the same menu and neither produces a wrong control. One word is right for a nav bar. PROPOSAL LEFT UNWRITTEN (AI may not touch $ec_lang_syn): $ec_lang_syn['lpn_menu_map']='Map, Basemap, Background map, Street map | layout: nav item'."
   },
   {
    "key": "lpn_file_import_geo",
@@ -165,8 +165,8 @@
     "import lat/lon data into the current xy project",
     "import a conversion, an xy-to-lat/lon transform"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Open an xy file on the map...' or 'Place an xy file on the map...'. Both name the object and drop the bare preposition pair."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Open an xy file on the map…' It names the object (a file), says a file is involved, and drops the bare xy/lat-lon preposition pair. The JS fallback at js/looped-network.js was carrying a third spelling ('Import XY to lat/lon…') and now matches. lpn_new_coords_tip's citation of the row was updated in the same pass."
   },
   {
    "key": "lpn_file_import_geo_tip",
@@ -179,8 +179,8 @@
     "there is a button you press to say the coordinates are already lat/lon (intended)",
     "a button appears telling you that the coordinates are lat/lon"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Opens a project file or an EPANET file in a new project tab on this page, on the street map. You place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. If the x and y in the file already are a longitude and a latitude, press These are already lat/lon and the network jumps straight to where it belongs. Every number you typed stays as it is.' Naming the button also makes the cross-key match visible."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Opens a project file or an EPANET file in a new project tab on this page, on the street map. You place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. If the x and y in the file already are a longitude and a latitude, press the These are already lat/lon button and the network jumps straight to where it belongs. Every number you typed stays as it is.' 'a new project tab on this page' kills the browser-tab reading, and the button is named under the new convention instead of 'one button says so'."
   },
   {
    "key": "lpn_georef_intro",
@@ -191,8 +191,8 @@
     "press the button labelled Put the model here (intended, quoted control name)",
     "put the model here, as an instruction phrased freely"
    ],
-   "disposition": "open",
-   "resolution": "English: mark the quotation, e.g. '...then press the Put the model here button.' and change 'the fine one' to 'the precise one' so it matches lpn_georef_step2. Better still, propose a $ec_lang_syn commentary convention for quoted control names so a translator knows to reuse the sibling key's translation verbatim."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button.' The button is named as 'the Put the model here button' per the convention recorded in dev/language-strings.md, 'the fine one' becomes 'the precise one' to match lpn_georef_step2, and 'turning' becomes 'rotation' throughout. lpn_georef_step1_hint and lpn_georef_asdegrees carry the same button in the same shape."
   },
   {
    "key": "lpn_georef_twopt_done",
@@ -203,8 +203,8 @@
     "press the button labelled Keep this placement (intended)",
     "keep this placement, as free advice"
    ],
-   "disposition": "open",
-   "resolution": "English: '...Check it, then press the Keep this placement button.' and require the translator to reuse the lpn_georef_finish translation inside it."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The model now sits on the two points you gave. Check it, then press the Keep this placement button.'"
   },
   {
    "key": "lpn_georef_backdrop_unrotated",
@@ -216,8 +216,8 @@
     "move the background image, as a free instruction",
     "draw a line along it"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The background image was moved and resized with the model, but it could not be rotated. Use Map > Background image > Move to align it.' Plus the quoted-control-name convention: menu labels inside prose must reuse the sibling keys' translations."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.' The menu path is comma-separated (the shipped majority: 19 comma paths against 3 arrow ones), the Map menu is named so the path is complete, and 'line it up' becomes 'align it'."
   },
   {
    "key": "lpn_run_menu_tip",
@@ -229,8 +229,8 @@
     "turn off automatic recalculation by some means, wording free",
     "restore defaults"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Recalculate this network now. Looking for the Run button? It is hidden while Recalculate automatically is on. To bring it back, turn Recalculate automatically off in Settings > Calculation > Hydraulics.' Every quoted phrase must reuse its own key's translation."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Recalculate this network now. Looking for the Run button? It is hidden while the Recalculate automatically setting is on. To bring the button back, turn Recalculate automatically off in Settings, Calculation, Hydraulics.' The curly quotes are gone; the setting and the button are each named with their widget word, and the menu path is comma-separated. 'To restore it' is now 'To bring the button back', so the restore-defaults reading is closed."
   },
   {
    "key": "lpn_georef_adjust",
@@ -242,8 +242,8 @@
     "the act of turning",
     "a turn as in a bend in the route"
    ],
-   "disposition": "open",
-   "resolution": "English: '...drag the round handle above the model to rotate it. Or type the scale and the rotation angle below.' Uses the conventional term and stops inventing a noun."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or type the ground distance and the rotation angle below.' 'the turn' as a noun is gone; 'the scale' becomes 'the ground distance' so it matches its control (lpn_georef_scale, 'Ground distance per drawing unit')."
   },
   {
    "key": "lpn_georef_twopt_tip",
@@ -254,8 +254,8 @@
     "the position, the scale and the rotation are all computed from the two points (intended)",
     "the location, the size of the site, and a turn in the route"
    ],
-   "disposition": "open",
-   "resolution": "English: '...The position, the scale and the rotation all follow from those two points. Press this button again to stop picking.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The position, the scale and the rotation all follow from those two points. Press this button again to stop picking.' Position, scale and rotation are named conventionally and 'those two points' no longer reaches back two sentences."
   },
   {
    "key": "lpn_georef_confirm",
@@ -267,8 +267,8 @@
     "you can still drag assets that are on their own, not connected ones",
     "you can drag a single asset only once"
    ],
-   "disposition": "open",
-   "resolution": "English: '...You can still drag assets one at a time afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'drag single assets' is now 'drag assets one at a time', which is the only reading left. Now: 'Place the model here permanently? You can still drag assets one at a time afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.'"
   },
   {
    "key": "lpn_color_ranges_note",
@@ -280,8 +280,8 @@
     "the boundaries are stored with this project rather than with the browser",
     "the boundaries cannot be changed"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The boundaries below are fixed once set; they do not follow the results as they change. Choosing a data classification method above sets the boundaries from the current state of the system. If you change any value by hand, the method above becomes Manual.' The word Manual must reuse the translation of the key that labels that option."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The boundaries below are fixed once set; they do not follow the results as they change. Choosing a data classification method above sets the boundaries from the current state of the system. If you change any value by hand, the method above becomes Manual.' 'static for this project' is replaced by what it was trying to say, and 'becomes Manual' names the option the method select shows."
   },
   {
    "key": "lpn_color_criterion_note",
@@ -293,8 +293,8 @@
     "the number of colors is temporarily fixed while you are making the choice",
     "while the design standard is chosen"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This method takes its boundaries from a design standard, so the number of colors is fixed while this method is selected.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'This method takes its boundaries from a design standard, so the number of colors is fixed while this method is selected.' 'while it is chosen' becomes 'while this method is selected', which removes both the during-the-act reading and the second antecedent."
   },
   {
    "key": "lpn_pane_tab_tip",
@@ -306,8 +306,8 @@
     "these parts are shown as a table somewhere else",
     "the whole table is read-only"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This tab shows the parts of this kind as a table you can sort and edit. Result columns cannot be edited.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'This tab shows the assets of this kind as a table you can sort and edit. Result columns cannot be edited.' The fragment gains a main verb, 'This tab' supplies the antecedent, and 'Result columns' says which part is read-only, which is what the table actually does."
   },
   {
    "key": "lpn_pane_none",
@@ -318,8 +318,8 @@
     "this network has no parts of this kind yet (intended)",
     "this network has none of the things just listed"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This network has no parts of this kind yet.'"
+   "disposition": "dismissed",
+   "resolution": "Dismissed. The six tab call sites and the four library ones share no true noun: junctions, pipes, patterns, curves and controls are not all 'assets'. Every call site prints this line directly under a heading that names the kind, which is the reason the code comment gives for one message serving all of them, and it holds. Severity was low."
   },
   {
    "key": "lpn_clean_map",
@@ -331,8 +331,8 @@
     "thin out the network labels and annotation on the drawing",
     "simplify the basemap"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Hide map readouts', parallel with its own off state 'Show map readouts'. The screenshot purpose stays in the tip."
+   "disposition": "english",
+   "resolution": "English fixed. 'Reduce map clutter' is now 'Hide map readouts', parallel with its own off state 'Show map readouts' and true about what the control removes. The screenshot purpose stays in the tip."
   },
   {
    "key": "lpn_clean_map_tip",
@@ -344,8 +344,8 @@
     "remove a line drawn on the map",
     "the picture and the map are two separate layers"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.' 'the mode line' becomes 'the status strip', the picture/map split is resolved onto one surface, and the em dash goes with the rewrite."
   },
   {
    "key": "lpn_menu_project",
@@ -357,8 +357,8 @@
     "the project menu",
     "water as a substance or a quality parameter"
    ],
-   "disposition": "open",
-   "resolution": "Keep the English. Propose a $ec_lang_syn entry (write only with permission): 'Water, Water network, Water system, Network | layout: nav item'. Every phrase can stand on the button, so it passes the substitution test."
+   "disposition": "dismissed",
+   "resolution": "Dismissed. 'Water' is the deliberate value under this key (Task 523) and one word is right for a nav bar; the key-name-versus-value tension is a translator reading the key name, which is not the label. PROPOSAL LEFT UNWRITTEN (AI may not touch $ec_lang_syn): $ec_lang_syn['lpn_menu_project']='Water, Water network, Water system, Network | layout: nav item'."
   },
   {
    "key": "lpn_find_menu_tip",
@@ -370,8 +370,8 @@
     "find every asset that passes a test, as in a hydraulic or pressure test",
     "find every part, meaning a component of an asset"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Find an asset by its ID, or find every asset matching a condition, and change them all at once.' Separately: pick ONE of asset/part/element suite-wide for lpn_ and add it to glossary.json; this is a roadmap-sized consistency item, not a single-key fix."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Find an asset by its ID, or find every asset matching a condition, and change them all at once.' 'test' becomes 'condition' and 'part' becomes 'asset'. On the asset/part/element split: ASSET WINS by incumbency, measured at 44 shipped strings against 7 for 'element', and every string this pass touched now says asset."
   },
   {
    "key": "lpn_find_op_top",
@@ -383,8 +383,8 @@
     "the highest of n",
     "n, printed as a literal letter"
    ],
-   "disposition": "open",
-   "resolution": "English can stay. Propose $ec_lang_syn commentary (write only with permission): 'The {n} assets with the largest value; the top {n} | runtime: {n} is replaced by a count typed by the user, and the phrase is also parsed back out of the query box, so keep it short and keep {n}'. Same for lpn_find_op_bottom."
+   "disposition": "intent",
+   "resolution": "Intent. The English stands: '{n} highest' pairs with '{n} lowest' and a longer form would not fit a pull-down row. What was missing was the instruction about the placeholder, and it now reaches every translator in every payload: meta.placeholder_notes in dev/scripts/generate_translation_payloads.php says a braced word is replaced at runtime, must be kept exactly, must never be translated, and MAY be moved to wherever the language needs it."
   },
   {
    "key": "lpn_find_prop_connection",
@@ -396,8 +396,8 @@
     "a service connection, a customer tap",
     "a joint or fitting between two pipes"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Connectivity'. It names the tests underneath it, and it removes the service-connection reading entirely."
+   "disposition": "english",
+   "resolution": "English fixed. 'Connection' is now 'Connectivity'. It names the four tests underneath it and removes the service-connection reading, which is what a utility engineer reads first."
   },
   {
    "key": "lpn_find_op_conn_noopen",
@@ -409,8 +409,8 @@
     "no link at this node that is unobstructed or free",
     "no link at this node that is exposed or above ground"
    ],
-   "disposition": "open",
-   "resolution": "glossary.json: add 'open (link status)' with the EPANET sense and avoid: ['unobstructed', 'available', 'exposed or uncovered'], wired to the lpn prefix. English unchanged; the whole family then inherits it."
+   "disposition": "glossary",
+   "resolution": "Glossary. New term 'open (link status)', wired to the lpn prefix, giving EPANET's OPEN/CLOSED sense and an avoid array against 'unobstructed', 'available' and 'exposed'. The whole conn family inherits it; the English is unchanged because it is EPANET's own word."
   },
   {
    "key": "lpn_find_op_conn_nolinksource",
@@ -422,8 +422,8 @@
     "the trace node of a source trace analysis",
     "the origin of a value"
    ],
-   "disposition": "open",
-   "resolution": "English: 'no link path to a reservoir or tank'. Naming the two asset types removes the ambiguity entirely and matches the wording lpn_find_conn_no_fixed already uses. Same for the three siblings."
+   "disposition": "glossary",
+   "resolution": "Glossary, English unchanged. ALL FOUR connectivity operator wordings are Tom's own (2026-08-26, the local pair reworded by him 2026-08-29; recorded in dev/lpn-spike/find-harness.js), so 'a source' stands. The three-senses-of-source problem is answered by the new wired term 'source trace', whose avoid array names both other senses explicitly: the value-origin sense ('New value source') and 'a source meaning a reservoir or tank, which is the sense the Find connectivity operators use'."
   },
   {
    "key": "lpn_find_conn_no_fixed",
@@ -434,8 +434,8 @@
     "only the two operators named no links at node and no open links at node can be searched (intended)",
     "two differently named options the user must hunt for"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This network has no reservoir or tank, so there is no source to reach. Only no links at node and no open links at node can be searched.' The quoted phrases must reuse the two operator keys' translations verbatim."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'This network has no reservoir or tank, so there is no source to reach. Only no links at node and no open links at node can be searched.' The two quoted short forms are replaced by the operators' actual full labels, so the user is told to look for text that exists."
   },
   {
    "key": "lpn_find_query_tip",
@@ -447,8 +447,8 @@
     "the controls are laid out below the query box",
     "the query rewrites the controls"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The same search, written as one line. Changing the controls rewrites this line, and typing in this line updates the controls.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The same search, written as one line. Changing the controls rewrites this line, and typing in this line updates the controls.' All three pronouns are replaced by their referents."
   },
   {
    "key": "lpn_find_query_hint",
@@ -460,8 +460,8 @@
     "the input box can be expanded",
     "the results can be expanded"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Combine conditions with AND, OR and ().'"
+   "disposition": "english",
+   "resolution": "English fixed. 'Expandable with AND, OR, and ()' is now 'Combine conditions with AND, OR and ()': a verb the reader can act on, and no claim about the box."
   },
   {
    "key": "lpn_find_q_and",
@@ -472,8 +472,8 @@
     "a translatable label for the joining word (intended, and the parser also accepts the translation)",
     "a literal keyword of a query syntax that must stay in English"
    ],
-   "disposition": "open",
-   "resolution": "English unchanged. Propose $ec_lang_syn commentary (write only with permission) on lpn_find_q_and and lpn_find_q_or: '| runtime: this word is both the button label and a word the query box accepts; translating it is safe, and the English AND/OR keeps working either way'. Without that note the decision is unmade for every language."
+   "disposition": "glossary",
+   "resolution": "Glossary. New term 'query keyword (AND, OR)', wired to lpn, which MAKES the decision instead of leaving it to 26 guesses: translate them, the parser accepts both the English token and the translation, and leaving them English is not safer. The English is unchanged."
   },
   {
    "key": "lpn_find_q_aside",
@@ -485,8 +485,8 @@
     "the controls are not allowed to modify the query text",
     "the controls failed to write the query"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The controls cannot express the query below, so they are hidden.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'cannot write the query below' is now 'cannot express the query below', which is the statement about expressive range that was meant."
   },
   {
    "key": "lpn_replace_q_bad",
@@ -498,8 +498,8 @@
     "nothing in the network matched the query",
     "the query text could not be loaded"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This query cannot be understood, so nothing can be changed. Fix it above first.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'This query cannot be understood, so nothing can be changed. Fix it above first.' 'cannot be read' becomes 'cannot be understood' (a parse failure, not a legibility one) and 'there is nothing to change' becomes 'nothing can be changed'."
   },
   {
    "key": "lpn_find_q_err_scope",
@@ -511,8 +511,8 @@
     "{w} is not worth searching",
     "{w} cannot be searched for"
    ],
-   "disposition": "open",
-   "resolution": "English: 'There is nothing called {w} to search. Try one of: {list}'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'There is nothing called {w} to search. Try one of: {list}' The subject is inside the sentence and the judgement reading is gone."
   },
   {
    "key": "lpn_find_q_err_dot",
@@ -523,8 +523,8 @@
     "a literal example of query syntax, keep it as it is",
     "an example using the interface's own words, so translate it to match this language's Junction and ID labels"
    ],
-   "disposition": "open",
-   "resolution": "English can stay. Propose $ec_lang_syn commentary (write only with permission): '| runtime: Junction.ID is an example; translate Junction and ID to match this language's own labels for them, or leave them in English, both are accepted by the query box'. The point is to make the decision instead of leaving it to 26 guesses."
+   "disposition": "glossary",
+   "resolution": "Glossary. Covered by the same new 'query keyword (AND, OR)' term as finding 36, which names the Junction.ID example explicitly: translate Junction and ID to match this language's own labels for them, and the dot stays a dot. English unchanged."
   },
   {
    "key": "lpn_find_q_err_close",
@@ -536,8 +536,8 @@
     "square bracket",
     "any grouping character"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This parenthesis ( was opened and never closed.' and 'This parenthesis ) closes nothing.'"
+   "disposition": "english",
+   "resolution": "English fixed in both siblings: 'This parenthesis ( was opened and never closed.' and 'This parenthesis ) closes nothing.'. 'Bracket' is '[' in US usage and '(' in British; the message's whole job is to name the character shown."
   },
   {
    "key": "lpn_replace_source",
@@ -549,8 +549,8 @@
     "a fragment awaiting a noun the translator cannot see",
     "an instruction, take a new value from ..."
    ],
-   "disposition": "open",
-   "resolution": "English: 'New value source'. Noun phrase, no dangling preposition, and it matches how the sprint-241 finding was resolved."
+   "disposition": "english",
+   "resolution": "English fixed. 'New value from' is now 'New value source', the same resolution four translators demanded of lpn_pump_curve_source in sprint 241. The JS fallback, which said only 'From', now matches."
   },
   {
    "key": "lpn_replace_asked",
@@ -562,8 +562,8 @@
     "{n} things were requested and one answer is coming",
     "a request was made and a reply is expected soon, in general"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Elevations requested for {n} nodes. The results are on their way.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Elevations requested for {n} nodes. The results are on their way.' The elevations, the nodes and the plurality of the pending requests are all named."
   },
   {
    "key": "lpn_profile_saved",
@@ -575,8 +575,8 @@
     "a saved route or itinerary",
     "a file path"
    ],
-   "disposition": "open",
-   "resolution": "Either the English moves to 'Saved profiles' across the family, or every one of these keys gets 'gloss: profile (long section)' commentary so the existing glossary entry reaches the agents. Do not leave 'path' unlinked to the concept; the file-path reading alone is worth the fix."
+   "disposition": "glossary",
+   "resolution": "Glossary. New term 'path (profile route)', wired to lpn, naming what is actually saved (the ordered list of nodes a profile is drawn along) and refusing the file-path reading, the itinerary reading, and confusion with the Find connectivity 'link path'. The English family keeps 'path' because the saved object IS the route, not the drawing; 'profile (long section)' already covers the drawing and is already wired."
   },
   {
    "key": "lpn_profile_missing",
@@ -588,8 +588,8 @@
     "{name} is a list of names of nodes",
     "the names of {name} are not in this project"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The saved path {name} uses nodes that are not in this project: {ids}'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The saved path {name} uses nodes that are not in this project: {ids}' The runtime token is out of subject position, so '{name} names' can no longer read as a noun phrase."
   },
   {
    "key": "lpn_new_coords_xy",
@@ -601,8 +601,8 @@
     "a grid drawn on the canvas, a snap grid",
     "grid coordinates in the surveying sense"
    ],
-   "disposition": "open",
-   "resolution": "English: 'xy coordinates', parallel with 'lat/lon'. lpn_new_coords_tip already defines it as 'a model on any coordinates other than lat/lon', so the label should not say grid."
+   "disposition": "english",
+   "resolution": "English fixed. 'xy grid' is now 'xy coordinates', parallel with 'lat/lon' and matching what lpn_new_coords_tip already says. The mode name itself is still 'xy' (lpn_xymap), so mode_name_check.php is unaffected; verified."
   },
   {
    "key": "lpn_new_coords_tip",
@@ -613,8 +613,8 @@
     "a DEFINITION: an xy project is one whose coordinates are not geographic (intended)",
     "a PERMISSION: an xy project may use whatever coordinates you like"
    ],
-   "disposition": "open",
-   "resolution": "English: 'An xy project uses coordinates that are not latitude and longitude. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File > Import xy to lat/lon.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'An xy project uses coordinates that are not latitude and longitude. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File, Open an xy file on the map.' 'a model on any coordinates other than lat/lon' becomes a definition, and the cited menu row moved with finding 12 and is comma-separated."
   },
   {
    "key": "lpn_new_place_hint",
@@ -625,8 +625,8 @@
     "a sample of the KIND of thing to type, to be replaced with a town the reader will recognise",
     "a fixed proper noun to leave in English, like an eponym"
    ],
-   "disposition": "open",
-   "resolution": "$ec_lang_syn proposal (AI proposes only): $ec_lang_syn['lpn_new_place_hint']='Petaluma, California | layout: unit token' is wrong; propose instead $ec_lang_syn['lpn_new_place_hint']='Paris, France; Nairobi, Kenya; Bogota, Colombia' with commentary after the pipe: 'a placeholder example of a town and region; replace with a place a reader of this language will recognise, in that language's own spelling'. Alternatively fix in English by adding nothing and instead ruling it exempt."
+   "disposition": "dismissed",
+   "resolution": "Dismissed. It is a search-box placeholder: a translator who localizes the town and one who carries Petaluma through both ship a working hint, so the two answers differ visibly and cost nothing. Not worth a permanent instruction. PROPOSAL LEFT UNWRITTEN (AI may not touch $ec_lang_syn): $ec_lang_syn['lpn_new_place_hint']='Paris, France; Nairobi, Kenya; Bogota, Colombia | a placeholder example of a town and its region; use a place a reader of this language will recognise, spelled as that language spells it'."
   },
   {
    "key": "lpn_inp_report_lead",
@@ -638,8 +638,8 @@
     "a list of things the page keeps changing as you work",
     "'on the way in' read as a physical route rather than as 'during import'"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:' The two stacked relative clauses are separated and 'on the way in' is spelled out as 'when the file was read in'."
   },
   {
    "key": "lpn_inp_drop_valve",
@@ -651,8 +651,8 @@
     "nothing CONTAINS or holds back pressure or flow there any more",
     "nothing is holding the pressure or flow steady at a stored value"
    ],
-   "disposition": "open",
-   "resolution": "English: '...They came in as open pipes, so the network is still joined up, but nothing controls pressure or flow there any more.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'nothing is holding pressure or flow there any more' is now 'nothing controls pressure or flow there any more', which is what a PRV/PSV does and cannot be read as containment."
   },
   {
    "key": "lpn_inp_drop_quality",
@@ -664,8 +664,8 @@
     "where more WATER enters the network",
     "where more of the water-quality description appears in the file"
    ],
-   "disposition": "open",
-   "resolution": "English: '...what is in the water to begin with, where more of that substance enters, how it reacts, and how the tanks mix.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'where more of it enters' is now 'where more of that substance enters', naming EPANET's [SOURCES] referent so no gendered language has to guess."
   },
   {
    "key": "lpn_inp_drop_sections",
@@ -677,8 +677,8 @@
     "a PART or fitting belonging to the network",
     "a portion of the network model"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'a part that this page does not read at all' is now 'a section', which is what the key name and the code case both say and removes the fitting reading."
   },
   {
    "key": "lpn_inp_drop_demand_model",
@@ -690,8 +690,8 @@
     "the file states whatever pressure results, and the junction gets that demand",
     "the demand the file states is whatever pressure comes out"
    ],
-   "disposition": "open",
-   "resolution": "English: '...This page solves demand-driven, so every junction here receives the demand the file states, no matter what pressure results. The line is kept and is written back if you save an EPANET file.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states, no matter what pressure results. The line is kept and is written back if you save an EPANET file.' The garden path is blocked with a comma and 'no matter what pressure results'."
   },
   {
    "key": "lpn_import_notes_heading",
@@ -703,8 +703,8 @@
     "some information in the file was dropped during import",
     "some information shown on this page did not come from the file"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This project was read in from an EPANET file. Some of what that file holds is kept but is not used on this page.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'This project was read in from an EPANET file. Some of what that file holds is kept but is not used on this page.' The apparent contradiction is gone and 'here' is replaced by the two things it could have meant."
   },
   {
    "key": "lpn_notes_2_def",
@@ -716,8 +716,8 @@
     "the water quality CHEMISTRY is not modeled, though age and source trace are (intended)",
     "'when your network holds one' = holds one such valve (intended) vs holds one solver"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Water quality chemistry is not modeled; water age and source trace are. Valves: a throttle valve works in either solver, and the valves that set their own position (PRV, PSV, FCV) are solved with the EPANET solver, which this page turns on by itself when your network holds one of those valves.'"
+   "disposition": "english",
+   "resolution": "English fixed, and this was a FALSE claim under a 'Not modeled' heading. Now: 'Water quality chemistry is not modeled; water age and source trace are. Valves: a throttle valve works in either solver, and the valves that set their own position (PRV, PSV, FCV) are solved with the EPANET solver, which this page turns on by itself when your network holds one of those valves.'"
   },
   {
    "key": "lpn_notes_4_def",
@@ -729,8 +729,8 @@
     "every asset that passes an engineering check or acceptance test",
     "'Find' as the ordinary verb rather than as the name of the command"
    ],
-   "disposition": "open",
-   "resolution": "English: '...Assets can be colored by their results, and Find picks out every asset that matches a condition you set.' If Find is a menu row, its own key should be cited in a $ec_lang_syn commentary so the two stay tied."
+   "disposition": "english",
+   "resolution": "English fixed. 'every asset that meets a test' is now 'every asset that matches a condition you set', and Find is left capitalised as the command it names."
   },
   {
    "key": "lpn_notes_color_def",
@@ -742,8 +742,8 @@
     "type your own classification method",
     "type your own colors"
    ],
-   "disposition": "open",
-   "resolution": "English: '...To get new boundaries, choose a method again or type your own boundaries.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'choose a method again or type your own' is now '...or type your own boundaries', so the nearest-noun reading (writing your own classification method) is closed."
   },
   {
    "key": "lpn_diag_not_converged_trials",
@@ -754,8 +754,8 @@
     "iterations = the solver trials the Maximum trials box limits (intended)",
     "iterations = something other than trials, since the settings use a different word"
    ],
-   "disposition": "open",
-   "resolution": "English: 'It stopped after {iterations} trials.' (and keep {iterations} as the placeholder name, which is code-side and not translated). Same change in lpn_diag_not_converged_error."
+   "disposition": "dismissed",
+   "resolution": "Dismissed, and the proposed change would have undone a ruling made the same day. EPANET names the INPUT EN_Option.Trials and the REPORTED COUNT EN_AnalysisStatistic.Iterations; this string prints the reported count. Tom asked on 2026-09-02 whether the two words were standing in for one thing and the toolkit's own enums answered that they are not (dev/lpn-spike/convergence-honesty-harness.js records it). 'iterations' is correct here and 'trials' on the settings is correct there."
   },
   {
    "key": "lpn_diag_not_converged_error",
@@ -767,8 +767,8 @@
     "with an achieved accuracy of {accuracy}",
     "measured against an accuracy target of unspecified origin"
    ],
-   "disposition": "open",
-   "resolution": "English: 'It stopped after {iterations} trials at a relative error of {error}, which did not reach the Accuracy setting of {accuracy}.'"
+   "disposition": "english",
+   "resolution": "English fixed, in the half that was real. Now: 'It stopped after {iterations} iterations at a relative error of {error}, which did not reach the Accuracy setting of {accuracy}.' 'against an accuracy of' named no owner; it now names the Accuracy setting. The iterations/trials half is DISMISSED for the reason on the sibling finding: EPANET reports iterations and limits trials, and they are two quantities."
   },
   {
    "key": "lpn_mode_vertices",
@@ -780,8 +780,8 @@
     "a hold or handle in the physical sense",
     "traction or friction"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Mode: Vertices. The bends in every pipe are shown as small square handles. Click a pipe to add a bend, click a handle to remove it, or drag a handle to move it. Nothing else on the map is changed in this mode.' If 'grip' is kept, it needs a glossary concept, since the word also appears in the vertices toolbar copy."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Mode: Vertices. The vertices of every pipe are shown as small square handles. Click a pipe to add a vertex, click a handle to remove it, or drag a handle to move it. Nothing else on the map is changed in this mode.' 'Grip' is AutoCAD vocabulary and appears in no other visitor-facing string; the mode line now says vertex where the object is a vertex and handle where the object is the thing you drag."
   },
   {
    "key": "lpn_select_first",
@@ -793,8 +793,8 @@
     "nothing has been chosen from a list",
     "nothing has been picked up / collected"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Nothing is selected. Click an asset on the map first, then press Delete.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'Nothing is picked.' is now 'Nothing is selected.', pointing at Select mode (lpn_tool_select). This was the struck pattern exactly: a plainer synonym displacing the shipped term."
   },
   {
    "key": "lpn_mode_add_text",
@@ -806,8 +806,8 @@
     "a Label, the map annotation that prints an asset's properties",
     "a generic textual caption belonging to neither object"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Mode: Add Text. Click the map to place a Text. Click near a node to attach the Text to that node. Switch to Select mode to change or move assets and labels.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Mode: Add Text. Click the map to place a Text. Click near a node to attach the Text to that node. Switch to Select mode to change or move assets and labels.' 'a text label' handed 26 translators the OTHER object's name; Task 482's split is that our Label is EPANET's annotation and our Text is this free-standing object."
   },
   {
    "key": "lpn_labels_mark_extrema_tip",
@@ -819,8 +819,8 @@
     "the two ends of a pipe",
     "'each kind' = each asset type vs each labelled property (the second is intended)"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Draws a line above the highest value of each labelled property on the map (an overline), and a line below the lowest value of that property (an underline), so you can pick out the highest and the lowest without reading the numbers.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Draws a line above the highest value of each labelled property on the map (an overline), and a line below the lowest value of that property (an underline), so you can pick out the highest and the lowest without reading the numbers.' 'each kind' becomes 'each labelled property' (which is what the code marks) and 'the two ends' becomes 'the highest and the lowest', off the pipe-end reading."
   },
   {
    "key": "lpn_labels_priority_node_tip",
@@ -831,8 +831,8 @@
     "the label least worth showing is hidden (intended)",
     "the label carrying the smallest number is hidden"
    ],
-   "disposition": "open",
-   "resolution": "English: replace the clause: '...a whole label is hidden: whichever label's remaining value is the least worth showing, which means the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to the neighbouring nodes.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The order in which properties are given up when two node labels would overlap. The property numbered 1 is given up first, on both labels. When one property is left and the two still overlap, a whole label is hidden: whichever label’s remaining value is the least worth showing, which means the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to the neighbouring nodes.' The superlative can no longer invert, and the em dash went with the rewrite."
   },
   {
    "key": "lpn_settings_push_btn",
@@ -844,8 +844,8 @@
     "the values currently shown in the property popup",
     "the values in whatever settings section is open"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Apply these new-asset values to every existing asset'"
+   "disposition": "english",
+   "resolution": "English fixed. 'Apply these values to all assets' is now 'Apply these new-asset values to every existing asset', so the button says what its own confirm text had to spell out for it."
   },
   {
    "key": "lpn_scenario_mark_tip",
@@ -857,8 +857,8 @@
     "'element' = something narrower than an asset, e.g. a component of one",
     "'Ringed:' as a label for what the amber ring means (intended) vs as an instruction to ring something"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The amber ring means this asset holds a value that belongs to the scenario {name} alone.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The amber ring means this asset holds a value that belongs to the scenario {name} alone.' 'element' becomes 'asset' (the 44-to-7 incumbent) and the bare participle 'Ringed:' becomes a sentence with a subject."
   },
   {
    "key": "lpn_scenario_overrides_tip",
@@ -870,8 +870,8 @@
     "an ordinary English word meaning the underlying or original state",
     "the chemical / foundation senses the glossary already warns about"
    ],
-   "disposition": "open",
-   "resolution": "English: interpolate rather than embed. Either '...Switch to {base} to see the drawing without them.' with the code substituting pc.lpn_scenario_base (the pattern already used at js/looped-network.js:21616), or add commentary to the payload naming lpn_scenario_base as the source of the word."
+   "disposition": "english",
+   "resolution": "English fixed AND the code changed. The string now reads 'Each of those values is marked on the map with an amber ring. Switch to {base} to see the drawing without them.' and js/looped-network.js substitutes pc.lpn_scenario_base into {base}, the pattern lpn_push_base_only already uses. The base scenario's name is now spelled in exactly one key."
   },
   {
    "key": "lpn_field_active_tip",
@@ -883,8 +883,8 @@
     "erase the contents of the box",
     "reset the box to its default"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Uncheck this box to leave the asset on the drawing but out of the network: it is drawn grey and the solver ignores it. In a scenario this is how a proposed pipe is switched on and off.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'Clear this box' is now 'Uncheck this box'. Verified against the call site: the control is input.type='checkbox' and every other field in that popup is a text box, so the erase reading was an instruction that could not be carried out."
   },
   {
    "key": "lpn_settings_emitter_exponent_tip",
@@ -896,8 +896,8 @@
     "power in the energy sense, which is what a pump page primes the reader for",
     "'the sprinkler and leak law' as a citable named law vs as a description of the emitter equation"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The exponent in EPANET's emitter equation for sprinklers and leaks: flow = coefficient x pressure raised to this exponent. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.' The label key (lpn_settings_emitter_exponent) should be checked in the same pass for the same word."
+   "disposition": "english",
+   "resolution": "English fixed and the glossary extended. Tip now: 'The exponent in EPANET's emitter equation for sprinklers and leaks: flow = coefficient x pressure raised to this exponent. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.' 'Power' becomes 'exponent' twice, and 'the sprinkler and leak law' becomes EPANET's emitter equation. The existing 'emitter' term gained the EPANET sense and an avoid array against the watts reading; it is now wired to lpn as well as ip."
   },
   {
    "key": "lpn_elev_dem_sample",
@@ -909,8 +909,8 @@
     "an example DEM, or a demonstration",
     "a specimen or extract of the DEM data"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Read DEM here' or 'Read the DEM'. If 'Sample DEM' is kept, it needs an $ec_lang_syn entry passing the substitution test, e.g. proposed text (AI proposes only): 'Read the DEM here, Take one DEM reading, Check the DEM at this node | avoid: sample meaning an example or a specimen; layout: button'."
+   "disposition": "english",
+   "resolution": "English fixed. 'Sample DEM' is now 'Read DEM', an unambiguous imperative parallel with its sibling 'Use DEM'. The noun and example senses of 'sample' are both gone."
   },
   {
    "key": "lpn_elev_dem_sample_tip",
@@ -922,8 +922,8 @@
     "shows the value, then changes the entry",
     "shows the value so you can review it before it changes the entry for you"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Reads the elevation of the DEM at this node and shows it below. Nothing in the Elevation box is changed. The horizontal DEM resolution is about 30 m for most of the Earth, and finer where better data exists.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Reads the elevation of the DEM at this node and shows it below. Nothing in the Elevation box is changed. The horizontal DEM resolution is about 30 m for most of the Earth, and finer where better data exists.' The tip no longer promises a change the button does not make; that is the Task 542 defect class."
   },
   {
    "key": "lpn_elev_dem_none",
@@ -935,8 +935,8 @@
     "no height above ground came back",
     "the DEM returned a value of zero height"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The DEM has no elevation for this node.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'gave no height' is now 'has no elevation', matching the box it sits under and every other string in the elevation group."
   },
   {
    "key": "lpn_settings_elev_source",
@@ -948,8 +948,8 @@
     "a sentence fragment awaiting a noun the translator cannot see",
     "'from' read as the start of a range (elevation from X to Y)"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Elevation source' - the same fix sprint 241 applied to lpn_pump_curve_source."
+   "disposition": "english",
+   "resolution": "English fixed. 'Elevation from' is now 'Elevation source', the sprint-241 resolution applied to the identical shape. CLAUDE.md and dev/geographic-projects.md both name this control and were updated in the same pass."
   },
   {
    "key": "lpn_settings_elev_source_typed",
@@ -961,8 +961,8 @@
     "the number in the row directly above in the list",
     "a number appearing higher up the Settings panel generally"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The elevation typed above' - parallel with 'Mapbox DEM' in naming its source, and it survives a layout change."
+   "disposition": "english",
+   "resolution": "English fixed. 'The number above' is now 'The elevation typed above': parallel with its sibling 'Mapbox DEM' in naming its source, and it survives a layout change."
   },
   {
    "key": "lpn_settings_accuracy_tip",
@@ -974,8 +974,8 @@
     "runs more trials than EPANET would",
     "makes a greater effort in some unspecified way"
    ],
-   "disposition": "open",
-   "resolution": "English: 'How close the solver has to get before it stops, measured as the amount by which the flows are still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page uses a stricter accuracy than EPANET's own default.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'How close the solver has to get before it stops, measured as the amount by which the flows are still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page uses a stricter accuracy than EPANET's own default.' The bare participle becomes 'the amount by which the flows are still changing', and 'tries far harder' becomes 'uses a stricter accuracy', which cannot be read as running more trials."
   },
   {
    "key": "lpn_settings_unbalanced_stop",
@@ -987,8 +987,8 @@
     "stop and report nothing at all (the code's own fallback wording)",
     "stop the run before it reaches the trial limit"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Stop and report the last trial'. Sibling lpn_settings_unbalanced_continue must move with it so the pair stays parallel."
+   "disposition": "english",
+   "resolution": "English fixed. 'Stop there' is now 'Stop and report the last trial', which is what the toolkit does. The JS fallback beside it still said 'Report nothing', the opposite; it now matches. dev/ROADMAP.md's note on this label was updated too."
   },
   {
    "key": "lpn_settings_unbalanced_continue",
@@ -1000,8 +1000,8 @@
     "go on trying with no limit",
     "retry the whole run from the start"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Allow extra trials', parallel with 'Stop and report the last trial'."
+   "disposition": "english",
+   "resolution": "English fixed. 'Keep trying' is now 'Allow extra trials', parallel with its sibling and bounded, which is what EPANET's CONTINUE n does. Its JS fallback ('Report the last try') was also wrong and now matches."
   },
   {
    "key": "lpn_settings_unbalanced_tip",
@@ -1013,8 +1013,8 @@
     "'which often reaches convergence' - the extra trials do (intended) vs the network does",
     "'close but not a solution' as a guarantee of nearness vs as a caution"
    ],
-   "disposition": "open",
-   "resolution": "English: 'What to do with a network that has used up its trials and still has not converged. Allowing extra trials often reaches convergence. Stopping reports the last trial as it stands, which is not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'What to do with a network that has used up its trials and still has not converged. Allowing extra trials often reaches convergence. Stopping reports the last trial as it stands, which is not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.' The tip now names the two options with the words that are on them."
   },
   {
    "key": "lpn_settings_unbalanced_trials",
@@ -1026,8 +1026,8 @@
     "extra trials run BEFORE the maximum trials, i.e. first in sequence",
     "the first of several extra-trial settings"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Extra trials before reporting'"
+   "disposition": "english",
+   "resolution": "English fixed. 'Extra trials first' is now 'Extra trials before reporting', which names the second element 'first' was floating against."
   },
   {
    "key": "lpn_settings_head_error_tip",
@@ -1039,8 +1039,8 @@
     "the largest head of any pipe that is left out of the solve",
     "'out by' misparsed as a phrasal verb meaning excluded"
    ],
-   "disposition": "open",
-   "resolution": "English: 'An additional test the solver must pass before it stops: the largest head error remaining in any one pipe. Zero means do not apply this test. Only the EPANET solver reads this box.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'the largest head any one pipe is still out by' is now 'the largest head error remaining in any one pipe'. The British idiom is gone, so is the excluded/out-of-service reading, and it is now parallel with its sibling lpn_settings_flow_change_tip."
   },
   {
    "key": "lpn_settings_damp_limit_tip",
@@ -1052,8 +1052,8 @@
     "zero means the network never converges (false, and the setting's default is zero)",
     "zero means the accuracy is never reached"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The accuracy at which the solver begins taking smaller steps, which can help a network that is oscillating to converge. Zero means the solver never damps. Only the EPANET solver reads this box.' ('Swinging back and forth' is also a plain substitute for the conventional 'oscillating'; prefer the term of art.)"
+   "disposition": "english",
+   "resolution": "English fixed. 'Zero means it never does' is now 'Zero means the solver never damps', so it cannot attach to 'converge'. The wrong attachment would have told every default user (the shipped default IS zero) that their network can never converge. 'swinging back and forth' becomes 'oscillating'."
   },
   {
    "key": "lpn_settings_demand_multiplier_tip",
@@ -1065,8 +1065,8 @@
     "a scale in the map-scale or graduated-rule sense",
     "'today's use' = present-day demand (intended) vs demand on the current date"
    ],
-   "disposition": "open",
-   "resolution": "English: 'A single factor applied to every demand in the network at once. Use it to ask what the system does at more or less than present-day use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project's.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'A single factor applied to every demand in the network at once. Use it to ask what the system does at more or less than present-day use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project's.' 'One scale' becomes 'A single factor', matching its own label, and 'today's use' becomes 'present-day use'."
   },
   {
    "key": "lpn_settings_leader_snap_tip",
@@ -1078,8 +1078,8 @@
     "a round angle in the geometric sense, i.e. 360 degrees",
     "a rounded, i.e. curved, corner"
    ],
-   "disposition": "open",
-   "resolution": "English: 'When you drag a label away from what it names, the line back to it is pulled onto the nearest of the set angles if you drag close to one. Keep dragging and the snap lets go, so any angle is still available. Off drags freely, which is what this page has always done.' The label lpn_settings_leader_snap ('Snap leader lines to angle') should become 'Snap leader lines to set angles' in the same pass."
+   "disposition": "english",
+   "resolution": "English fixed in both keys. The label is now 'Snap leader lines to set angles' and the tip says 'the nearest of the set angles'; 'round angle' is a defined geometric term meaning 360 degrees with a standing translation in several languages. 'it lets go' is now 'the snap lets go'."
   },
   {
    "key": "lpn_settings_legend_off",
@@ -1091,8 +1091,8 @@
     "none / nowhere / hidden (the legend-position select)",
     "'off' in the positional sense, i.e. off the edge of the map"
    ],
-   "disposition": "open",
-   "resolution": "English: split the key. Propose lpn_settings_legend_off = 'None' for the legend-position list and a new lpn_settings_snap_off = 'Off' for the angle list. If it stays one key, it needs commentary in the payload naming both call sites, because no synonym can be correct in both."
+   "disposition": "english",
+   "resolution": "English fixed BY SPLITTING THE KEY, in full. lpn_settings_legend_off is now 'None' for the legend-position list; a new lpn_settings_legend-sibling key lpn_settings_snap_off ('Off') serves the leader-snap angle list. Call site moved (js/looped-network.js), pageConfig line added (Looped-Network.php), and the code comment that argued for the reuse now records why it was split. No synonym could have been right in both selects."
   },
   {
    "key": "lpn_time_no_period",
@@ -1103,8 +1103,8 @@
     "there is only one moment to show, so there is nothing to scrub through (intended)",
     "there is a moment available to show"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This project has no time period, so there is only one moment to show. Set a Total run time in Settings to calculate the network over time.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'so there is one moment to show' is now 'so there is only one moment to show', which is the limitation the transport controls are inert for."
   },
   {
    "key": "lpn_quality_needs_run",
@@ -1116,8 +1116,8 @@
     "press the Run button in the Fire flow dialog",
     "run is a generic verb here and names no control at all"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Calculate.' The three capitalised words are control names and each is another key's value (lpn_time_duration, lpn_menu_time, lpn_time_run); if this stays, those keys must travel with it to every agent."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button.' The toolbar control is Calculate (lpn_time_run); the only face reading 'Run' is the fire-flow dialog's own button, so the old sentence pointed at the wrong control."
   },
   {
    "key": "lpn_time_run_note",
@@ -1129,8 +1129,8 @@
     "later times are never computed at all until you press the button",
     "Calculate is an ordinary verb, not the name of a control"
    ],
-   "disposition": "open",
-   "resolution": "Keep the English, and ship lpn_time_run in the same batch as a named dependency so the button word matches. If it must be self-contained: 'Press the Calculate button to bring them up to date.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'Press Calculate' is now 'Press the Calculate button', which is the convention that marks it as a control name; lpn_time_run supplies the word. The stale-results clause is unchanged: it is accurate and the second reading ('never computed at all') is closed by 'not kept up to date'."
   },
   {
    "key": "lpn_time_run_tip",
@@ -1142,8 +1142,8 @@
     "solve for the length of time covered by the hydraulic steps",
     "produce a result at every reporting time"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Solve this network at every hydraulic time step, from the start of the run to the end of it.' Reporting times are what the reader then scrubs through, so if the tip is meant to describe the results rather than the work, say 'reporting time' and match the note."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Solve this network at every hydraulic time step, from the start of the run to the end of it.' It names the hydraulic time step as the WORK and leaves reporting times to the note, so the two strings no longer look like one thing said twice."
   },
   {
    "key": "lpn_settings_sec_assets",
@@ -1155,8 +1155,8 @@
     "a command or link that adds new assets",
     "assets in the file sense: images, tiles, resources"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Defaults for new elements'. The page's own vocabulary for a junction, pipe, tank or valve is 'element' everywhere else, and 'Defaults for' removes the imperative reading."
+   "disposition": "english",
+   "resolution": "English fixed. 'New assets' is now 'Defaults for new assets'. The imperative reading and the software-resource reading are both gone. NOT 'elements' as proposed: asset is the 44-to-7 incumbent and finding 66 in this same pass argued the other way, so the pass had to pick one, and incumbency picks asset."
   },
   {
    "key": "lpn_settings_quality_track",
@@ -1168,8 +1168,8 @@
     "an imperative: track this network",
     "a noun: the track, the path, the route"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Quality parameter', which is EPANET's own name for this selector (Analysis Options, Quality, Parameter) and is a noun phrase parallel with its values. 'What to track' is the second choice if a plainer label is wanted."
+   "disposition": "english",
+   "resolution": "English fixed. 'Track' is now 'Quality parameter', EPANET's own name for this selector and a noun phrase parallel with its values."
   },
   {
    "key": "lpn_settings_quality_track_tip",
@@ -1181,8 +1181,8 @@
     "neither option needs any further input at all, which is false for Source trace",
     "trace here is the same thing as the option called Source trace"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one needs a concentration or a reaction rate.' That says the true thing (no chemistry input) without denying the Trace node."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one needs a concentration or a reaction rate.' 'trace' as an ordinary verb becomes 'follow' so it stops colliding with the Source trace option, and the false-in-one-reading denial is replaced by the true thing: no chemistry input is needed, and the Trace node is not denied."
   },
   {
    "key": "lpn_settings_quality_source_tip",
@@ -1194,8 +1194,8 @@
     "point is any location on the map, not necessarily a node",
     "here means this setting rather than the traced node"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The node whose water is traced. Every other node then shows the share of its water that came from that node.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The node whose water is traced. Every other node then shows the share of its water that came from that node.' 'point' becomes 'node' twice, matching the label above it, and 'here' is replaced."
   },
   {
    "key": "lpn_quality_chemical",
@@ -1207,8 +1207,8 @@
     "the chemical selection is kept but has not been figured out yet",
     "kept refers to the option staying selected"
    ],
-   "disposition": "open",
-   "resolution": "English: 'A chemical this file names (stored, not calculated)'. 'Calculated' is the term this page already uses on its own Calculate button, and it removes the understood reading."
+   "disposition": "english",
+   "resolution": "English fixed. '(kept, not worked out)' is now '(stored, not calculated)'. 'Calculated' is the word on this page's own Calculate button, and the understood/figured-out reading is gone."
   },
   {
    "key": "lpn_result_demand_tip",
@@ -1220,8 +1220,8 @@
     "the total base demand, then multiplied by the patterns",
     "the total of the base demands, and separately the total of their patterns"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The flow this node draws at the time step shown: each base demand multiplied by its own pattern, added together. It is calculated, not typed, so it changes with the clock and cannot be edited.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The flow this node draws at the time step shown: each base demand multiplied by its own pattern, added together. It is calculated, not typed, so it changes with the clock and cannot be edited.' The arithmetic is now unambiguous: each base demand times its own pattern, added together. The two parses give different numbers exactly when a junction has more than one demand category, which is the case the tip exists for."
   },
   {
    "key": "lpn_field_demand_pattern_tip",
@@ -1233,8 +1233,8 @@
     "selecting No pattern means the demand is constant and no pattern applies",
     "specified default pattern means whichever pattern happens to be first"
    ],
-   "disposition": "open",
-   "resolution": "English: 'How this junction's demand rises and falls through the run. Leave it at No pattern and the junction follows the project's Default Pattern instead.' Ship the key that supplies the words 'No pattern' alongside it."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'How this junction’s demand rises and falls through the run. Leave it at No pattern and the junction follows the project’s Default Pattern instead.' The self-contradiction ('select no pattern to get a pattern') is resolved into a fallback statement, and 'specified default pattern' becomes EPANET's named Default Pattern."
   },
   {
    "key": "lpn_field_demand_category",
@@ -1246,8 +1246,8 @@
     "a description of the node itself",
     "a free-text note attached to the row"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Demand description', which survives both call sites, or 'Category' if column width forbids two words. Whichever is chosen, lpn_field_demand_category_tip must name the same noun: 'Name or description of this demand category.'"
+   "disposition": "english",
+   "resolution": "English fixed on the TIP only. The column heading stays 'Description', which is Tom's own word as of Task 553 and answers in Find and replace too. lpn_field_demand_category_tip now reads 'Name or description of this demand category.', so the tip names the category the label leaves to context instead of introducing a word from nowhere."
   },
   {
    "key": "lpn_demand_add",
@@ -1259,8 +1259,8 @@
     "add a classification to an existing demand",
     "add a demand, which the tip calls something else"
    ],
-   "disposition": "open",
-   "resolution": "Keep the English label (EPANET's own term). Align the tip: 'Add another demand category at this junction, with its own base demand, pattern and description. The categories add up.'"
+   "disposition": "english",
+   "resolution": "English fixed on the TIP, not the label: the label keeps EPANET's own 'Add demand category' and lpn_demand_add_tip now reads 'Add another demand category at this junction, with its own base demand, pattern and description. The categories add up.', so the two strings a translator reads side by side name one operation."
   },
   {
    "key": "lpn_terrain_confirm_default_2",
@@ -1272,8 +1272,8 @@
     "replace those n nodes themselves with a DEM layer",
     "replace those n elevation values with the Mapbox DEM as a data source setting"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Replace the elevation of those {n} nodes with values from the Mapbox DEM?'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Replace the elevation of those {n} nodes with values from the Mapbox DEM?' The object of 'Replace' is named, which matters on the one string standing between a user and 30 m data typed into their document."
   },
   {
    "key": "lpn_terrain_will_ids",
@@ -1285,8 +1285,8 @@
     "these nodes will be drawn filled or shaded",
     "these nodes will be completed in some unspecified way"
    ],
-   "disposition": "open",
-   "resolution": "English: 'These nodes will get an elevation: {ids}'. And lpn_terrain_filled_ids: 'These nodes got an elevation: {ids}'."
+   "disposition": "english",
+   "resolution": "English fixed in both siblings: 'These nodes will get an elevation: {ids}' and 'These nodes got an elevation: {ids}'. The elevation, not the node, is what gets filled."
   },
   {
    "key": "lpn_terrain_blank_ids",
@@ -1298,8 +1298,8 @@
     "these nodes are empty or unnamed",
     "these nodes were not drawn"
    ],
-   "disposition": "open",
-   "resolution": "English: 'These nodes still have no elevation: {ids}'"
+   "disposition": "english",
+   "resolution": "English fixed. 'These nodes are still blank' is now 'These nodes still have no elevation', which supplies the noun blankness was attaching to."
   },
   {
    "key": "lpn_terrain_keep_ids",
@@ -1311,8 +1311,8 @@
     "the elevations that will be kept",
     "the nodes that will be filled in, if the reader misattaches the sentence"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Those nodes are: {ids}'"
+   "disposition": "english",
+   "resolution": "English fixed. 'They are: {ids}' is now 'Those nodes are: {ids}', so no gendered language has to choose an antecedent that is in a different key."
   },
   {
    "key": "lpn_terrain_accuracy",
@@ -1324,8 +1324,8 @@
     "1 m ground resolution, i.e. pixel size, with a separate vertical figure",
     "accuracy measured along the ground surface, as opposed to along the line of sight"
    ],
-   "disposition": "open",
-   "resolution": "English: replace both pairs with 'horizontally' and 'vertically': 'it can be better than a metre horizontally and a few tenths of a metre vertically. Where only global data exists it is about 30 m horizontally and several metres vertically.' (This string also carries two em dashes; if it is being edited anyway, the ratchet says drop them.)"
+   "disposition": "english",
+   "resolution": "English fixed. 'across the ground' and 'up and down' are now 'horizontally' and 'vertically' in both pairs. The two em dashes went with the rewrite (the 3DEP clause is now a 'such as ... and ...' aside), so the ratchet baseline falls from 69 to 64 across this pass."
   },
   {
    "key": "lpn_ff_menu_tip",
@@ -1337,8 +1337,8 @@
     "hold the residual pressure that this junction has",
     "every junction is always tested, with no choice of scope"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Test junctions one at a time: how much can each deliver while still holding the residual pressure you set, and does drawing the required flow there push anything else out of limits?'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Test junctions one at a time: how much can each deliver while still holding the residual pressure you set, and does drawing the required flow there push anything else out of limits?' 'Test every junction' becomes 'Test junctions one at a time', which is true under both scopes, and the residual is named as the criterion the user set rather than a property the junction has."
   },
   {
    "key": "lpn_ff_required_tip",
@@ -1350,8 +1350,8 @@
     "a code you wrote, a program",
     "a reference code or number identifying something"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'your code' is now 'your fire code', which closes the software-code and area-code readings in the one place the word appears alone."
   },
   {
    "key": "lpn_ff_required_node_tip",
@@ -1363,8 +1363,8 @@
     "the flow this junction must supply without help from the rest of the system",
     "the flow available at this junction on its own"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The fire flow required at this particular junction, from your fire code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Required fire flow box.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The fire flow required at this particular junction, from your fire code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Required fire flow box.' 'this junction alone must provide' becomes 'required at this particular junction' (the unaided reading was a false claim about the hydraulics), and the box is named by its visible label, Required fire flow."
   },
   {
    "key": "lpn_ff_residual_tip",
@@ -1376,8 +1376,8 @@
     "20 psi is the conventional required fire flow",
     "20 psi is the pressure at which fire flow becomes available"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).' The subject was the wrong quantity: 20 psi is the residual pressure, not a fire flow. The SI equivalent is given beside it because the field's unit selector may be showing kPa or bar."
   },
   {
    "key": "lpn_ff_design",
@@ -1389,8 +1389,8 @@
     "a check of the design of the system as a whole, this junction included",
     "the design check result"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Design check (effect on the rest of the system)'."
+   "disposition": "dismissed",
+   "resolution": "Dismissed. The label is Tom's own, verbatim and dated 2026-09-02: *\"Most software has the word Design, doesn't it? Should we put 'Design check (effect on system)'?\"* -- the profession's word first, the plain gloss in the bracket. Rewriting his bracket the same day is not a Wave 0 finding's call."
   },
   {
    "key": "lpn_ff_design_tip",
@@ -1402,8 +1402,8 @@
     "take too long / execute too quickly, i.e. about the analysis",
     "operate outside its design condition generally"
    ],
-   "disposition": "open",
-   "resolution": "English: '... does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation.'"
+   "disposition": "english",
+   "resolution": "English fixed. 'run too fast' is now 'exceed its velocity limit', off the Run/Runs collision."
   },
   {
    "key": "lpn_ff_design_nodes",
@@ -1414,8 +1414,8 @@
     "all junctions except the one being tested (intended)",
     "every second junction, alternating"
    ],
-   "disposition": "open",
-   "resolution": "English: 'All other junctions'. Same fix in lpn_ff_design_all and in lpn_ff_menu_tip if that wording is reused."
+   "disposition": "english",
+   "resolution": "English fixed. 'Every other junction' is now 'All other junctions', removing the alternating reading."
   },
   {
    "key": "lpn_ff_design_all",
@@ -1426,8 +1426,8 @@
     "all other junctions and all pipes (intended)",
     "every second junction, and every pipe"
    ],
-   "disposition": "open",
-   "resolution": "English: 'All other junctions and all pipes'."
+   "disposition": "english",
+   "resolution": "English fixed. Now 'All other junctions and all pipes', same reason."
   },
   {
    "key": "lpn_ff_accounting",
@@ -1439,8 +1439,8 @@
     "lateral as a direction: sideways losses",
     "the usual one refers to the hydrant rather than to the method"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Fire flow is drawn at the junction itself, which is the usual method. The hydrant, its lateral pipe and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.'"
+   "disposition": "english",
+   "resolution": "English fixed in the half that was a trap. 'its lateral' is now 'its lateral pipe', so the bare adjective has its noun. The two-sentence structure stays: 'That is the method used here, and it is the usual one' is a Tom-driven wording (2026-08-30, after he read a version that led with the absence), and the loss accounting has to lead with what the tool DOES."
   },
   {
    "key": "lpn_ff_steady",
@@ -1452,8 +1452,8 @@
     "this run adds the fire flow to maximum day demand",
     "maximum day demand is normally added on top of the fire flow"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Only the time step now on screen is tested. Fire flow is normally tested on top of maximum day demand, so set the network to that condition before you run.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Only the time step now on screen is tested. Fire flow is normally tested on top of maximum day demand, so set the network to that condition before you run.' The second sentence now plainly instructs rather than describing, so nobody can read it as a claim that the sweep was made at maximum day demand."
   },
   {
    "key": "lpn_ff_stopped",
@@ -1465,8 +1465,8 @@
     "the results under some threshold value are the finished ones",
     "what remains is what had been computed, i.e. the rest was discarded"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Stopped after {done} of {total} junctions. The results below are the ones already finished.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Stopped after {done} of {total} junctions. The results below are the ones already finished.' The two headless relative clauses become one noun phrase, and 'below' is unambiguously the page."
   },
   {
    "key": "lpn_ff_cost",
@@ -1478,8 +1478,8 @@
     "N network runs will be needed",
     "a label meaning number of network runs"
    ],
-   "disposition": "open",
-   "resolution": "English: 'This run solved the whole network {solves} times.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'This run solved the whole network {solves} times.' Verified at the call site (js/looped-network.js, set.solves after the run): it reports what happened, so it is now a sentence that says so."
   },
   {
    "key": "lpn_ff_summary",
@@ -1491,8 +1491,8 @@
     "the three counts partition the junctions tested",
     "the counts are of something other than junctions, e.g. of checks"
    ],
-   "disposition": "open",
-   "resolution": "English: '{clean} junctions had nothing wrong. {fire} junctions failed the fire flow. {design} junctions affected the rest of the system. A junction can appear in more than one of the last two.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: '{clean} junctions had nothing wrong. {fire} junctions failed the fire flow. {design} junctions affected the rest of the system.' The noun is supplied three times, which was the finding. The proposed overlap sentence was NOT added: this same key drives the LIVE PROGRESS TALLY (js/lpn-fireflow.js, once per junction), so a twelve-word caveat would repeat on every step of a sweep."
   },
   {
    "key": "lpn_ff_summary_error",
@@ -1504,8 +1504,8 @@
     "N questions could not be answered",
     "N junctions did not respond, i.e. a network or engine failure"
    ],
-   "disposition": "open",
-   "resolution": "English: '{n} junctions could not be answered.'"
+   "disposition": "english",
+   "resolution": "English fixed. '{n} could not be answered.' is now '{n} junctions could not be answered.'"
   },
   {
    "key": "lpn_ff_report_all",
@@ -1517,8 +1517,8 @@
     "every junction in the project was tested",
     "an instruction: test every junction"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Junctions tested'."
+   "disposition": "dismissed",
+   "resolution": "Dismissed. 'Every junction tested' is the heading of the one-table report Tom settled on 2026-08-30, and the truncation and scope caveats it is charged with are already stated in their own strings (lpn_ff_stopped names done-of-total; the scope selector lpn_ff_scope is set before the run). Renaming his heading to fix a reading the report already answers is not worth the 26 retranslations."
   },
   {
    "key": "lpn_ff_col_static",
@@ -1530,8 +1530,8 @@
     "pressure with no flow anywhere in the system",
     "static as in a static, non time varying result"
    ],
-   "disposition": "open",
-   "resolution": "Keep the heading (AWWA M31 and NFPA 291 both call it static pressure) and route the concept to glossary.json: 'static pressure (fire flow): the pressure at the hydrant or junction before any fire flow is drawn, with the system's other demands still running. Not a zero flow pressure.' Every language then anchors on the fire-test sense."
+   "disposition": "glossary",
+   "resolution": "Glossary. New term 'static pressure (fire flow)', wired to lpn, stating that it is the pressure before any fire flow is drawn WITH the ordinary demands still running, and refusing the no-flow reading, the unchanging reading and the electrical one. The heading stands: AWWA M31 and NFPA 291 both call it static pressure."
   },
   {
    "key": "lpn_ff_col_available",
@@ -1543,8 +1543,8 @@
     "the flow currently available at this junction",
     "spare capacity in the pipes serving it"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Available fire flow' and 'Required fire flow' if the column can take it. If width forbids it, keep the short heads and give both a gloss: pointer to a glossary.json entry for 'available fire flow', so the concept and not the two words is what gets translated."
+   "disposition": "glossary",
+   "resolution": "Glossary. New term 'available fire flow', wired to lpn, which names the concept both short headings stand for and says why they are short (column width is king). The headings 'Available flow' and 'Required flow' stand; widening them to four words each is exactly what the results-table rule forbids."
   },
   {
    "key": "lpn_ff_col_residual",
@@ -1556,8 +1556,8 @@
     "whether the residual criterion was met, i.e. a yes or no",
     "residual as leftover: the flow left over"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Residual at available flow' if the column takes it, otherwise 'Residual pressure' with a $ec_lang_syn entry (proposal only, human approval required): 'Residual pressure held while delivering the available fire flow; pressure still standing at the available flow. | layout: column heading'"
+   "disposition": "dismissed",
+   "resolution": "Dismissed. The fire flow table's column headings AND their order are Tom's, set 2026-09-01 and 2026-09-02, and 'Available flow' and 'Residual held' are deliberately adjacent because they are one reading -- a flow without the pressure it was held at is a number without its condition. That adjacency is what supplies the missing condition, so the participle is not standing alone on the screen the way it stands alone in a key list."
   },
   {
    "key": "lpn_ff_col_atrequired",
@@ -1569,8 +1569,8 @@
     "the pressure required at the junction",
     "pressure measured at the required condition, unspecified"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Pressure at required flow'."
+   "disposition": "english",
+   "resolution": "English fixed. 'Pressure at required' is now 'Pressure at required flow', so it cannot invert into 'required pressure'."
   },
   {
    "key": "lpn_ff_col_affected",
@@ -1582,8 +1582,8 @@
     "the drop in pressure at other junctions only",
     "well drawdown, in the groundwater sense"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Worst effect', which is true of both cells and of the column's own purpose (the competitor's Critical Asset). Second choice: 'Most affected'."
+   "disposition": "english",
+   "resolution": "English fixed. 'Drawdowns' is now 'Worst effect', which is true of both things ffCriticalText() prints: a junction pulled below its minimum pressure OR a pipe above its maximum velocity. A fast pipe is not a drawdown by any reading, and drawdown additionally carries a groundwater sense most target languages have a dedicated wrong word for."
   },
   {
    "key": "lpn_ff_design_none",
@@ -1595,8 +1595,8 @@
     "no pressures were reduced, which says nothing about velocities",
     "drawn down in the groundwater sense"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Nothing in the chosen set went outside its limits while any junction drew its fire flow.'"
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'Nothing in the chosen set went outside its limits while any junction drew its fire flow.' Same error in sentence form: the effects list holds over-velocity pipes too, so the old wording claimed the design check found nothing while saying nothing about velocity."
   },
   {
    "key": "lpn_ff_col_limit",
@@ -1608,8 +1608,8 @@
     "the value of the design limit applied",
     "the limit imposed by the design of the system"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Limit exceeded'."
+   "disposition": "dismissed",
+   "resolution": "Dismissed on the same ground as the Residual held finding: this table's headings are Tom's own, dated 2026-09-02. 'Design limit' over cells naming which limit was broken is a normal table idiom, and the row's Failure modes cell already says Design when one was."
   },
   {
    "key": "lpn_ff_static_failed",
@@ -1621,8 +1621,8 @@
     "a static analysis failed",
     "static as in interference or as in unchanging"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Static pressure already failed, so not checked'. If the cell can take more: 'Below the residual before any fire flow, so not checked'."
+   "disposition": "dismissed",
+   "resolution": "Dismissed. 'Static failed, so not checked' is what Tom asked for on 2026-09-02, choosing a word or two over the bare dash that stood there (*\"I agree that a word or two is better\"*), and it sits under the 'Static pressure' column that supplies the noun. The proposed longer forms spend the cell width he was economising."
   },
   {
    "key": "lpn_ff_col_solves",
@@ -1634,8 +1634,8 @@
     "the number of simulation runs the project has made",
     "runs of pipe serving the junction"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Network runs'. If the column is too narrow for two words, 'Solves' is unambiguous here even though it was struck as a heading elsewhere; 'Network runs' is preferred."
+   "disposition": "dismissed",
+   "resolution": "Dismissed on the same ground: Tom set this table's headings on 2026-09-02, and the glossary already carries 'run (a simulation)' wired to lpn with 'a RUN OF PIPE -- a straight length of main between two points. That sense is live on this very page and is the trap to guard against' at the head of its avoid array. The guard the finding asks for is already delivered."
   },
   {
    "key": "lpn_ff_mode_fire",
@@ -1647,8 +1647,8 @@
     "fire, the thing that burns",
     "a fire condition or fire event"
    ],
-   "disposition": "open",
-   "resolution": "English kept on Tom's ruling. PROPOSED $ec_lang_syn entry (proposal only, AI may not write it): $ec_lang_syn['lpn_ff_mode_fire']='Fire flow, Fire flow failure, Did not deliver the required fire flow. | layout: column heading; avoid: fire as combustion' Same for lpn_ff_mode_design."
+   "disposition": "glossary",
+   "resolution": "Glossary. Tom ruled the one-word English stands (2026-09-02), so the missing half now travels in the wired 'fire flow' term, whose context states that the Failure modes column prints 'Fire' for a junction that did not deliver its required fire flow and 'Design' for one that pushed something else outside its limits, and that both are shortened verdicts to be kept short. PROPOSAL LEFT UNWRITTEN (AI may not touch $ec_lang_syn): $ec_lang_syn['lpn_ff_mode_fire']='Fire flow, Fire flow failure, Did not deliver the required fire flow. | layout: column heading; avoid: fire as combustion'."
   },
   {
    "key": "lpn_ff_mode_design",
@@ -1660,8 +1660,8 @@
     "the design of the network",
     "an imperative or an activity"
    ],
-   "disposition": "open",
-   "resolution": "English kept (Tom's ruling). PROPOSED $ec_lang_syn entry, human approval required: $ec_lang_syn['lpn_ff_mode_design']='Design check, Design limit failure, Pushed another element outside its design limits. | layout: column heading'"
+   "disposition": "glossary",
+   "resolution": "Glossary. Same extended 'fire flow' term as finding 127 carries this cell too. English stands on Tom's ruling. PROPOSAL LEFT UNWRITTEN (AI may not touch $ec_lang_syn): $ec_lang_syn['lpn_ff_mode_design']='Design check, Design limit failure, Pushed another asset outside its design limits. | layout: column heading'."
   },
   {
    "key": "lpn_ff_atleast",
@@ -1673,8 +1673,8 @@
     "over as in during or across a period",
     "over as in finished, the run ended at that flow"
    ],
-   "disposition": "open",
-   "resolution": "English: 'more than {flow}'."
+   "disposition": "english",
+   "resolution": "English fixed. 'over {flow}' is now 'more than {flow}', which is the only sense of 'over' that was meant."
   },
   {
    "key": "lpn_ff_affect_node",
@@ -1686,8 +1686,8 @@
     "the effect goes as far as {id}, at pressure {pressure}",
     "it comes down to {id}, i.e. {id} is the cause"
    ],
-   "disposition": "open",
-   "resolution": "English: '{id} drops to {pressure}', and for the link string '{id} reaches {velocity}'."
+   "disposition": "english",
+   "resolution": "English fixed in both siblings: '{id} drops to {pressure}' and '{id} reaches {velocity}'. Both now carry a verb, and 'down to' is gone with its attributable-to reading."
   },
   {
    "key": "lpn_ff_more",
@@ -1699,8 +1699,8 @@
     "and n more junctions not shown (call site 2)",
     "and n more of whatever the reader last saw"
    ],
-   "disposition": "open",
-   "resolution": "Split the key. Proposal: keep lpn_ff_more for the cell as 'and {n} more affected', and add lpn_ff_rows_more for the table footer as '{n} more junctions are not shown.' A new key costs 26 translations; a wrong agreement costs a wrong report in 26 languages."
+   "disposition": "english",
+   "resolution": "English fixed BY SPLITTING THE KEY, in full. lpn_ff_more is now 'and {n} more affected' for the Worst effect cell; a new lpn_ff_rows_more, '{n} more junctions are not shown.', serves the line under the table. Call site moved (js/looped-network.js ffMoreLine), pageConfig line added (Looped-Network.php), and a comment at the split says why. One string counting two different nouns is what CLAUDE.md forbids by name."
   },
   {
    "key": "lpn_ff_iso",
@@ -1712,8 +1712,8 @@
     "the International Organization for Standardization",
     "an ISO standard number that was omitted"
    ],
-   "disposition": "open",
-   "resolution": "English: 'The Insurance Services Office (ISO) credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.' Consider a glossary.json entry so the expansion, not the acronym, is what travels."
+   "disposition": "english",
+   "resolution": "English fixed. Now: 'The Insurance Services Office (ISO) credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.' The acronym is expanded, so nobody translates the US Insurance Services Office as the International Organization for Standardization on a deliverable."
   },
   {
    "key": "lpn_ff_err_at_rest",
@@ -1725,8 +1725,8 @@
     "already below the residual with no demand at all anywhere",
     "at rest meaning the network is not being simulated"
    ],
-   "disposition": "open",
-   "resolution": "English: 'Already below the residual before any fire flow is drawn'."
+   "disposition": "english",
+   "resolution": "English fixed. 'Already below the residual with nothing drawn' is now 'Already below the residual before any fire flow is drawn'. The old wording was false on its face (the ordinary demands are still running) and produced a far more alarming diagnosis than the true one. The JS fallback moved with it; the key name still says at_rest and is left alone, since renaming it is rename_lang_key.php work with no reader benefit."
   },
   {
    "key": "lpn_ff_err_unknown",
@@ -1738,8 +1738,8 @@
     "no answer, and the element responsible is {id}",
     "no answer, and the reason we gave is {id}"
    ],
-   "disposition": "open",
-   "resolution": "English: 'No answer. The code reported was {id}.' Renaming the placeholder to {code} would be better still, but that is a code change and belongs to the task, not to the sprint."
+   "disposition": "english",
+   "resolution": "English fixed AND the placeholder renamed. The string is now 'No answer. The code reported was {code}.' and js/looped-network.js substitutes into {code}. Every other {id} in this report holds an asset name, which is what a translator reasoning about the token would have written about."
   },
   {
    "key": "lpn_ff_state_pass",
@@ -1751,8 +1751,8 @@
     "passing through, in transit",
     "acceptable or adequate, i.e. only just passing"
    ],
-   "disposition": "open",
-   "resolution": "Decide reachability BEFORE the sprint: either wire ffStateText() and lpn_ff_col_result into the table, or hold the five keys back from this batch. If they ship, propose 'Pass', 'Fail', 'Design issue', 'No answer' as noun-form verdicts parallel with the Failure modes cells."
+   "disposition": "english",
+   "resolution": "Keys DELETED, English-only, nothing paid. Verified: ffStateText() (js/looped-network.js) was defined once and called from nowhere, and lpn_ff_col_result appeared only in Looped-Network.php's pageConfig; the fire-flow table replaced its Result column with Failure modes. Deleted: lpn_ff_col_result, lpn_ff_state_pass, lpn_ff_state_fail, lpn_ff_state_design, lpn_ff_state_error, plus the dead function and the five pageConfig lines. None of the five existed in any of the 26 other language files, so the sprint no longer pays 5 x 26 translations for text that reaches no screen."
   }
  ]
 }

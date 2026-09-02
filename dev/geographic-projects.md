@@ -214,7 +214,7 @@ himself: *"To be honest, I did not expect nor necessarily welcome what I got. I 
 dilettante pushing a cool new button that I found."* One press filled every blank elevation on the
 whole drawing. It is now:
 
-- **`Settings > New assets > Elevation from`** — a node born on a geographic project reads its own
+- **`Settings > New assets > Elevation source`** — a node born on a geographic project reads its own
   ground. Nothing existing is touched, which is why this is the front door. A burst of drawing is
   ONE batch of tile requests, 600 ms after the last node, never one request per node.
 - **`From Mapbox DEM` as the New-value source in Find and replace**, offered only when the property

@@ -98,7 +98,18 @@ function prefixToTermNames(): array
             // simulation)' guards a one-word button whose word is also a run of pipe, and it is
             // quoted by name inside lpn_time_run_note; 'work out (compute)' is the suite's plain
             // verb for solving, opaque word by word to anyone parsing the two words separately.
-            'drop (a label)', 'run (a simulation)', 'work out (compute)', 'decimal separator'],
+            'drop (a label)', 'run (a simulation)', 'work out (compute)', 'decimal separator',
+            // Added 2026-09-02 (Task 573 Wave 0). 'open (link status)' is EPANET's OPEN/CLOSED and
+            // not 'unobstructed', and the whole Find connectivity family rests on it; 'source
+            // trace' and 'trace node' are EPANET's named analysis and named node, and this page
+            // uses the word 'source' in three unrelated senses; 'query keyword (AND, OR)' MAKES a
+            // decision 26 languages would otherwise each make alone; 'path (profile route)' keeps
+            // the saved-path menu off the file-path reading; 'static pressure (fire flow)' and
+            // 'available fire flow' are the two fire-test terms whose short column heads drop the
+            // word that makes them terms of art.
+            'open (link status)', 'source trace', 'trace node', 'query keyword (AND, OR)',
+            'path (profile route)', 'static pressure (fire flow)', 'available fire flow',
+            'emitter'],
         'bpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'branched network', 'branch', 'pipe line', 'pressure rating',

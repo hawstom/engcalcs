@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**10 still to read**, of 225 untranslated keys, of 1540 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**84 still to read**, of 222 untranslated keys, of 1537 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,14 +21,14 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (223, 10 to read @@ NEEDS RULING)
+## lpn_  (220, 84 to read @@ NEEDS RULING)
 
 - **`lpn_demand_add`**
   > Add demand category
   _Ruled OK 2026-08-29._
 - **`lpn_demand_add_tip`**
-  > Add another demand at this junction, with its own base demand, pattern and description. The demands add up.
-  _Ruled OK 2026-08-29._
+  > Add another demand category at this junction, with its own base demand, pattern and description. The categories add up.
+  @@ NEEDS RULING
 - **`lpn_demand_remove`**
   > Remove this demand
   _Ruled OK 2026-08-29._
@@ -36,23 +36,23 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.
   _Ruled OK 2026-09-02._
 - **`lpn_diag_not_converged_error`**
-  > It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.
-  _Ruled OK 2026-09-02._
+  > It stopped after {iterations} iterations at a relative error of {error}, which did not reach the Accuracy setting of {accuracy}.
+  @@ NEEDS RULING
 - **`lpn_diag_not_converged_trials`**
   > It stopped after {iterations} iterations.
   _Ruled OK 2026-09-02._
 - **`lpn_elev_dem_none`**
-  > The DEM gave no height for this node.
-  _Ruled OK 2026-09-01._
+  > The DEM has no elevation for this node.
+  @@ NEEDS RULING
 - **`lpn_elev_dem_said`**
   > Mapbox DEM says {v} {u}.
   _Ruled OK 2026-09-01._
 - **`lpn_elev_dem_sample`**
-  > Sample DEM
-  _Ruled OK 2026-09-01._
+  > Read DEM
+  @@ NEEDS RULING
 - **`lpn_elev_dem_sample_tip`**
-  > Reads the elevation of the DEM at this node and shows it below for review before changing the current entry. The horizontal DEM resolution is about 30 m for most of the Earth, and finer where better data exists.
-  _Ruled OK 2026-09-01._
+  > Reads the elevation of the DEM at this node and shows it below. Nothing in the Elevation box is changed. The horizontal DEM resolution is about 30 m for most of the Earth, and finer where better data exists.
+  @@ NEEDS RULING
 - **`lpn_elev_dem_use`**
   > Use DEM
   _Ruled OK 2026-09-01._
@@ -60,26 +60,26 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Puts the elevation of the DEM at this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.
   _Ruled OK 2026-09-02._
 - **`lpn_ff_accounting`**
-  > Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral, and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.
-  _Ruled OK 2026-09-01._
+  > Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral pipe and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.
+  @@ NEEDS RULING
 - **`lpn_ff_affect_link`**
-  > {id} at {velocity}
-  _Ruled OK 2026-09-01._
+  > {id} reaches {velocity}
+  @@ NEEDS RULING
 - **`lpn_ff_affect_node`**
-  > {id} down to {pressure}
-  _Ruled OK 2026-09-01._
+  > {id} drops to {pressure}
+  @@ NEEDS RULING
 - **`lpn_ff_atleast`**
-  > over {flow}
-  _Ruled OK 2026-09-01._
+  > more than {flow}
+  @@ NEEDS RULING
 - **`lpn_ff_calculate`**
   > Run
   _Ruled OK 2026-09-01._
 - **`lpn_ff_col_affected`**
-  > Drawdowns
-  _Ruled OK 2026-09-01._
+  > Worst effect
+  @@ NEEDS RULING
 - **`lpn_ff_col_atrequired`**
-  > Pressure at required
-  _Ruled OK 2026-09-01._
+  > Pressure at required flow
+  @@ NEEDS RULING
 - **`lpn_ff_col_available`**
   > Available flow
   _Ruled OK 2026-09-01._
@@ -98,9 +98,6 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_ff_col_residual`**
   > Residual held
   _Ruled OK 2026-09-01._
-- **`lpn_ff_col_result`**
-  > Result
-  _Ruled OK 2026-09-02._
 - **`lpn_ff_col_solves`**
   > Runs
   _Ruled OK 2026-09-02._
@@ -108,20 +105,20 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Static pressure
   _Ruled OK 2026-09-02._
 - **`lpn_ff_cost`**
-  > {solves} network runs.
-  _Ruled OK 2026-09-02._
+  > This run solved the whole network {solves} times.
+  @@ NEEDS RULING
 - **`lpn_ff_design`**
   > Design check (effect on system)
   _Ruled OK 2026-09-02._
 - **`lpn_ff_design_all`**
-  > Every other junction and every pipe
-  _Ruled OK 2026-09-01._
+  > All other junctions and all pipes
+  @@ NEEDS RULING
 - **`lpn_ff_design_nodes`**
-  > Every other junction
-  _Ruled OK 2026-09-01._
+  > All other junctions
+  @@ NEEDS RULING
 - **`lpn_ff_design_none`**
-  > Nothing in the chosen set was drawn down by any junction tested.
-  _Ruled OK 2026-09-01._
+  > Nothing in the chosen set went outside its limits while any junction drew its fire flow.
+  @@ NEEDS RULING
 - **`lpn_ff_design_off`**
   > Do not check
   _Ruled OK 2026-09-01._
@@ -129,8 +126,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > The effect on the rest of the system was not checked in this run.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_design_tip`**
-  > A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.
-  _Ruled OK 2026-09-01._
+  > A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation.
+  @@ NEEDS RULING
 - **`lpn_ff_engine_cost`**
   > Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.
   _Ruled OK 2026-09-01._
@@ -141,8 +138,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > This is worked out with the built-in solver.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_err_at_rest`**
-  > Already below the residual with nothing drawn
-  _Ruled OK 2026-09-01._
+  > Already below the residual before any fire flow is drawn
+  @@ NEEDS RULING
 - **`lpn_ff_err_converge`**
   > The network did not converge.
   _Ruled OK 2026-09-01._
@@ -153,14 +150,14 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > The solver reported an error and gave no answer.
   _Ruled OK 2026-09-02._
 - **`lpn_ff_err_unknown`**
-  > No answer, and the reason given is {id}
-  _Ruled OK 2026-09-01._
+  > No answer. The code reported was {code}.
+  @@ NEEDS RULING
 - **`lpn_ff_intro`**
   > Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_iso`**
-  > ISO credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.
-  _Ruled OK 2026-09-02._
+  > The Insurance Services Office (ISO) credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.
+  @@ NEEDS RULING
 - **`lpn_ff_limit_both`**
   > Pressure and velocity
   _Ruled OK 2026-09-01._
@@ -180,8 +177,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Fire flow…
   _Ruled OK 2026-09-01._
 - **`lpn_ff_menu_tip`**
-  > Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there create unacceptable drawdown anywhere else?
-  _Ruled OK 2026-09-01._
+  > Test junctions one at a time: how much can each deliver while still holding the residual pressure you set, and does drawing the required flow there push anything else out of limits?
+  @@ NEEDS RULING
 - **`lpn_ff_minpressure`**
   > Lowest pressure allowed elsewhere
   _Ruled OK 2026-09-01._
@@ -198,8 +195,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > None
   _Ruled OK 2026-09-02._
 - **`lpn_ff_more`**
-  > and {n} more
-  _Ruled OK 2026-09-01._
+  > and {n} more affected
+  @@ NEEDS RULING
 - **`lpn_ff_no_junctions`**
   > This project has no junctions yet, so there is nothing to test.
   _Ruled OK 2026-09-01._
@@ -216,20 +213,23 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Required fire flow
   _Ruled OK 2026-09-01._
 - **`lpn_ff_required_node_tip`**
-  > The fire flow this junction alone must provide, from your code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Fire flow box.
+  > The fire flow required at this particular junction, from your fire code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Required fire flow box.
   @@ NEEDS RULING
 - **`lpn_ff_required_own`**
   > Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.
   @@ NEEDS RULING
 - **`lpn_ff_required_tip`**
-  > The flow required by your code or your fire authority at a hydrant. Each junction is tested against this number, unless it carries a required fire flow of its own.
+  > The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.
   @@ NEEDS RULING
 - **`lpn_ff_residual`**
   > Residual pressure to hold
   _Ruled OK 2026-09-01._
 - **`lpn_ff_residual_tip`**
-  > 20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.
-  _Ruled OK 2026-09-01._
+  > The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).
+  @@ NEEDS RULING
+- **`lpn_ff_rows_more`**
+  > {n} more junctions are not shown.
+  @@ NEEDS RULING
 - **`lpn_ff_run_title`**
   > Fire flow run
   _Ruled OK 2026-09-01._
@@ -248,36 +248,24 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_ff_stale`**
   > The drawing changed, so the fire flow results were cleared. Run it again.
   _Ruled OK 2026-09-01._
-- **`lpn_ff_state_design`**
-  > Design issue
-  _Ruled OK 2026-09-01._
-- **`lpn_ff_state_error`**
-  > No answer
-  _Ruled OK 2026-09-01._
-- **`lpn_ff_state_fail`**
-  > Failing
-  _Ruled OK 2026-09-01._
-- **`lpn_ff_state_pass`**
-  > Passing
-  _Ruled OK 2026-09-01._
 - **`lpn_ff_static_failed`**
   > Static failed, so not checked
   _Ruled OK 2026-09-02._
 - **`lpn_ff_steady`**
-  > Only the current time step is tested. Fire flow is normally added to maximum day demand.
-  _Ruled OK 2026-09-01._
+  > Only the time step now on screen is tested. Fire flow is normally tested on top of maximum day demand, so set the network to that condition before you run.
+  @@ NEEDS RULING
 - **`lpn_ff_stop`**
   > Stop
   _Ruled OK 2026-09-01._
 - **`lpn_ff_stopped`**
-  > Stopped after {done} of {total} junctions. What is below is what had already been worked out.
-  _Ruled OK 2026-09-01._
+  > Stopped after {done} of {total} junctions. The results below are the ones already finished.
+  @@ NEEDS RULING
 - **`lpn_ff_summary`**
-  > {clean} with nothing wrong. {fire} failed the fire flow. {design} affected the rest of the system.
-  _Ruled OK 2026-09-02._
+  > {clean} junctions had nothing wrong. {fire} junctions failed the fire flow. {design} junctions affected the rest of the system.
+  @@ NEEDS RULING
 - **`lpn_ff_summary_error`**
-  > {n} could not be answered.
-  _Ruled OK 2026-09-01._
+  > {n} junctions could not be answered.
+  @@ NEEDS RULING
 - **`lpn_ff_title`**
   > Fire flow
   _Ruled OK 2026-09-01._
@@ -291,14 +279,14 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Description
   _Ruled OK 2026-08-29._
 - **`lpn_field_demand_category_tip`**
-  > Name or description of the category.
-  _Ruled OK 2026-08-29._
+  > Name or description of this demand category.
+  @@ NEEDS RULING
 - **`lpn_field_text_attached`**
-  > Attached to
-  _Ruled OK 2026-08-29._
+  > Attached asset
+  @@ NEEDS RULING
 - **`lpn_find_conn_no_fixed`**
-  > This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be searched.
-  _Ruled OK 2026-08-29._
+  > This network has no reservoir or tank, so there is no source to reach. Only no links at node and no open links at node can be searched.
+  @@ NEEDS RULING
 - **`lpn_find_conn_nolinksource`**
   > No link path to a source
   _Ruled OK 2026-08-29._
@@ -327,17 +315,17 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > no links at node
   _Ruled OK 2026-08-29._
 - **`lpn_find_prop_connection`**
-  > Connection
-  _Ruled OK 2026-08-29._
+  > Connectivity
+  @@ NEEDS RULING
 - **`lpn_find_q_and`**
   > AND
   _Ruled OK 2026-08-29._
 - **`lpn_find_q_aside`**
-  > These controls cannot write the query below, so they are hidden.
-  _Ruled OK 2026-09-01._
+  > The controls cannot express the query below, so they are hidden.
+  @@ NEEDS RULING
 - **`lpn_find_q_err_close`**
-  > This bracket ( was opened and never closed.
-  _Ruled OK 2026-08-29._
+  > This parenthesis ( was opened and never closed.
+  @@ NEEDS RULING
 - **`lpn_find_q_err_dot`**
   > Put a dot between what to search and its property, like Junction.ID
   _Ruled OK 2026-08-29._
@@ -351,8 +339,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Not a condition for {prop}: {w}. Try one of: {list}
   _Ruled OK 2026-08-29._
 - **`lpn_find_q_err_open`**
-  > This bracket ) closes nothing.
-  _Ruled OK 2026-08-29._
+  > This parenthesis ) closes nothing.
+  @@ NEEDS RULING
 - **`lpn_find_q_err_pos`**
   > (at character {n})
   _Ruled OK 2026-08-29._
@@ -366,8 +354,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > This quoted text has no closing quote.
   _Ruled OK 2026-08-29._
 - **`lpn_find_q_err_scope`**
-  > Not something to search: {w}. Try one of: {list}
-  _Ruled OK 2026-08-29._
+  > There is nothing called {w} to search. Try one of: {list}
+  @@ NEEDS RULING
 - **`lpn_find_q_err_value`**
   > This condition needs a value after it: {op}
   _Ruled OK 2026-08-29._
@@ -378,23 +366,23 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Use the controls instead
   _Ruled OK 2026-08-29._
 - **`lpn_find_query_hint`**
-  > Expandable with AND, OR, and ()
-  _Ruled OK 2026-08-29._
+  > Combine conditions with AND, OR and ()
+  @@ NEEDS RULING
 - **`lpn_find_query_label`**
   > Query
   _Ruled OK 2026-08-29._
 - **`lpn_find_query_tip`**
-  > The same search, written as one line. Change the controls and it rewrites itself, or type in it and the controls follow.
-  _Ruled OK 2026-08-29._
+  > The same search, written as one line. Changing the controls rewrites this line, and typing in this line updates the controls.
+  @@ NEEDS RULING
 - **`lpn_georef_backdrop_unrotated`**
-  > The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.
-  _Ruled OK 2026-08-29._
+  > The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.
+  @@ NEEDS RULING
 - **`lpn_georef_twopt`**
   > Use two known points
   _Ruled OK 2026-08-29._
 - **`lpn_georef_twopt_done`**
-  > The model now sits on the two points you gave. Check it, then press Keep this placement.
-  _Ruled OK 2026-08-29._
+  > The model now sits on the two points you gave. Check it, then press the Keep this placement button.
+  @@ NEEDS RULING
 - **`lpn_georef_twopt_pick1`**
   > Click a point on your drawing whose latitude and longitude you know.
   _Ruled OK 2026-08-29._
@@ -405,10 +393,10 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > That is the point you picked first. Pick a different one.
   _Ruled OK 2026-08-29._
 - **`lpn_georef_twopt_tip`**
-  > Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.
-  _Ruled OK 2026-08-29._
+  > Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The position, the scale and the rotation all follow from those two points. Press this button again to stop picking.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_demand_model`**
-  > This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states whatever pressure results. The line is kept and is written back if you save an EPANET file.
+  > This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states, no matter what pressure results. The line is kept and is written back if you save an EPANET file.
   @@ NEEDS RULING
 - **`lpn_inp_drop_energy`**
   > This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.
@@ -429,8 +417,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.
   _Ruled OK 2026-08-29._
 - **`lpn_inp_drop_sections`**
-  > This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.
-  _Ruled OK 2026-09-01._
+  > This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_tags`**
   > This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.
   _Ruled OK 2026-09-02._
@@ -438,7 +426,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Map
   _Ruled OK 2026-08-29._
 - **`lpn_mode_vertices`**
-  > Mode: Vertices. The bends in every pipe are shown as grips. Click a pipe to add a bend, click a grip to remove it, or drag a grip to move it. Nothing else on the map is changed in this mode.
+  > Mode: Vertices. The vertices of every pipe are shown as small square handles. Click a pipe to add a vertex, click a handle to remove it, or drag a handle to move it. Nothing else on the map is changed in this mode.
   @@ NEEDS RULING
 - **`lpn_new_coords`**
   > Coordinates
@@ -447,11 +435,11 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > lat/lon
   _Ruled OK 2026-09-01._
 - **`lpn_new_coords_tip`**
-  > An xy project is a model on any coordinates other than lat/lon. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File > Import xy to lat/lon.
-  _Ruled OK 2026-08-29._
+  > An xy project uses coordinates that are not latitude and longitude. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File, Open an xy file on the map.
+  @@ NEEDS RULING
 - **`lpn_new_coords_xy`**
-  > xy grid
-  _Ruled OK 2026-08-29._
+  > xy coordinates
+  @@ NEEDS RULING
 - **`lpn_new_create`**
   > Create
   _Ruled OK 2026-08-29._
@@ -489,8 +477,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Change one end of the path, or take one node off it, without drawing the whole path again.
   _Ruled OK 2026-08-29._
 - **`lpn_profile_missing`**
-  > {name} names nodes that are not in this project: {ids}
-  _Ruled OK 2026-08-29._
+  > The saved path {name} uses nodes that are not in this project: {ids}
+  @@ NEEDS RULING
 - **`lpn_profile_new`**
   > New saved path…
   _Ruled OK 2026-08-29._
@@ -513,11 +501,11 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Water age
   _Ruled OK 2026-09-01._
 - **`lpn_quality_chemical`**
-  > A chemical this file names (kept, not worked out)
-  _Ruled OK 2026-09-01._
+  > A chemical this file names (stored, not calculated)
+  @@ NEEDS RULING
 - **`lpn_quality_needs_run`**
-  > Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.
-  _Ruled OK 2026-09-01._
+  > Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button.
+  @@ NEEDS RULING
 - **`lpn_quality_none`**
   > Nothing
   _Ruled OK 2026-09-01._
@@ -525,47 +513,47 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Source trace
   _Ruled OK 2026-09-02._
 - **`lpn_replace_asked`**
-  > Asked for {n}. The answer is on its way.
-  _Ruled OK 2026-08-29._
+  > Elevations requested for {n} nodes. The results are on their way.
+  @@ NEEDS RULING
 - **`lpn_replace_q_bad`**
-  > This query cannot be read, so there is nothing to change. Fix it above first.
-  _Ruled OK 2026-09-01._
+  > This query cannot be understood, so nothing can be changed. Fix it above first.
+  @@ NEEDS RULING
 - **`lpn_replace_source`**
-  > New value from
-  _Ruled OK 2026-08-29._
+  > New value source
+  @@ NEEDS RULING
 - **`lpn_result_demand_tip`**
-  > The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.
-  _Ruled OK 2026-08-29._
+  > The flow this node draws at the time step shown: each base demand multiplied by its own pattern, added together. It is calculated, not typed, so it changes with the clock and cannot be edited.
+  @@ NEEDS RULING
 - **`lpn_result_source_share`**
   > Source share
   _Ruled OK 2026-09-01._
 - **`lpn_result_source_share_tip`**
-  > The source trace share reports how much of the water reaching this point came from the trace node.
-  _Ruled OK 2026-09-02._
+  > How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports.
+  @@ NEEDS RULING
 - **`lpn_result_water_age`**
   > Water age
   _Ruled OK 2026-09-01._
 - **`lpn_result_water_age_tip`**
-  > How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.
-  _Ruled OK 2026-09-01._
+  > How long the water reaching this point has been in the system. There is no regulatory limit to compare it against, so judge the number against your own system.
+  @@ NEEDS RULING
 - **`lpn_scenario_mark_tip`**
-  > Ringed: this element holds a value that belongs to the scenario {name} alone.
-  _Ruled OK 2026-08-29._
+  > The amber ring means this asset holds a value that belongs to the scenario {name} alone.
+  @@ NEEDS RULING
 - **`lpn_scenario_overrides_tip`**
-  > Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.
-  _Ruled OK 2026-08-29._
+  > Each of those values is marked on the map with an amber ring. Switch to {base} to see the drawing without them.
+  @@ NEEDS RULING
 - **`lpn_settings_accuracy`**
   > Accuracy
   _Ruled OK 2026-09-01._
 - **`lpn_settings_accuracy_tip`**
-  > How close the solver has to get before it stops, measured as the flow still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.
-  _Ruled OK 2026-09-02._
+  > How close the solver has to get before it stops, measured as the amount by which the flows are still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page uses a stricter accuracy than EPANET's own default.
+  @@ NEEDS RULING
 - **`lpn_settings_damp_limit`**
   > Damping starts at
   _Ruled OK 2026-09-01._
 - **`lpn_settings_damp_limit_tip`**
-  > The accuracy at which the solver begins taking smaller steps, which can help a network that is swinging back and forth to converge. Zero means it never does. Only the EPANET solver reads this box.
-  _Ruled OK 2026-09-02._
+  > The accuracy at which the solver begins taking smaller steps, which can help an oscillating network to converge. Zero means the solver never damps. Only the EPANET solver reads this box.
+  @@ NEEDS RULING
 - **`lpn_settings_default_is`**
   > The default is {n}.
   _Ruled OK 2026-09-02._
@@ -573,11 +561,11 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Demand multiplier
   _Ruled OK 2026-08-29._
 - **`lpn_settings_demand_multiplier_tip`**
-  > One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project's.
+  > A single factor applied to every demand in the network at once. Use it to ask what the system does at more or less than present-day use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project's.
   @@ NEEDS RULING
 - **`lpn_settings_elev_source`**
-  > Elevation from
-  _Ruled OK 2026-08-29._
+  > Elevation source
+  @@ NEEDS RULING
 - **`lpn_settings_elev_source_dem`**
   > Mapbox DEM
   _Ruled OK 2026-08-29._
@@ -585,11 +573,11 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.
   _Ruled OK 2026-08-29._
 - **`lpn_settings_elev_source_typed`**
-  > The number above
-  _Ruled OK 2026-08-29._
+  > The elevation typed above
+  @@ NEEDS RULING
 - **`lpn_settings_emitter_exponent_tip`**
-  > The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.
-  _Ruled OK 2026-08-29._
+  > The exponent in EPANET's emitter equation for sprinklers and leaks: flow = coefficient x pressure raised to this exponent. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.
+  @@ NEEDS RULING
 - **`lpn_settings_flow_change`**
   > Flow change limit
   _Ruled OK 2026-09-02._
@@ -600,17 +588,17 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Head error limit
   _Ruled OK 2026-09-01._
 - **`lpn_settings_head_error_tip`**
-  > An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.
-  _Ruled OK 2026-09-02._
+  > An additional test the solver must pass before it stops: the largest head error remaining in any one pipe. Zero means do not apply this test. Only the EPANET solver reads this box.
+  @@ NEEDS RULING
 - **`lpn_settings_leader_snap`**
-  > Snap leader lines to angle
-  _Ruled OK 2026-08-29._
+  > Snap leader lines to set angles
+  @@ NEEDS RULING
 - **`lpn_settings_leader_snap_tip`**
-  > When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.
-  _Ruled OK 2026-08-29._
+  > When you drag a label away from what it names, the line back to it is pulled onto the nearest of the set angles if you drag close to one. Keep dragging and the snap lets go, so any angle is still available. Off drags freely, which is what this page has always done.
+  @@ NEEDS RULING
 - **`lpn_settings_legend_off`**
-  > Off
-  _Ruled OK 2026-08-29._
+  > None
+  @@ NEEDS RULING
 - **`lpn_settings_option_unset`**
   > Not stated
   _Ruled OK 2026-09-01._
@@ -621,13 +609,13 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Trace node
   _Ruled OK 2026-09-02._
 - **`lpn_settings_quality_source_tip`**
-  > The point whose water is traced. Every other point then shows the share of its water that came from here.
-  _Ruled OK 2026-09-02._
+  > The node whose water is traced. Every other node then shows the share of its water that came from that node.
+  @@ NEEDS RULING
 - **`lpn_settings_quality_track`**
-  > Track
-  _Ruled OK 2026-09-01._
+  > Quality parameter
+  @@ NEEDS RULING
 - **`lpn_settings_quality_track_tip`**
-  > Choose what the run should trace through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.
+  > Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one needs a concentration or a reaction rate.
   @@ NEEDS RULING
 - **`lpn_settings_show_arrows`**
   > Flow direction arrows
@@ -635,6 +623,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_settings_show_arrows_tip`**
   > Draw an arrow on each pipe showing which way the water is running. The arrows appear after a run, and turning them off leaves the results unchanged. This setting is saved with the project.
   _Ruled OK 2026-09-02._
+- **`lpn_settings_snap_off`**
+  > Off
+  @@ NEEDS RULING
 - **`lpn_settings_specific_gravity`**
   > Specific gravity
   _Ruled OK 2026-08-29._
@@ -651,17 +642,17 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > If it does not converge
   _Ruled OK 2026-09-02._
 - **`lpn_settings_unbalanced_continue`**
-  > Keep trying
-  _Ruled OK 2026-09-01._
+  > Allow extra trials
+  @@ NEEDS RULING
 - **`lpn_settings_unbalanced_stop`**
-  > Stop there
-  _Ruled OK 2026-09-01._
+  > Stop and report the last trial
+  @@ NEEDS RULING
 - **`lpn_settings_unbalanced_tip`**
-  > What to do with a network that has used up its trials and still has not converged. Keeping on allows the extra trials below, which often reaches convergence; stopping reports the last trial as it stands, which is close but not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.
-  _Ruled OK 2026-09-02._
+  > What to do with a network that has used up its trials and still has not converged. Allowing extra trials often reaches convergence. Stopping reports the last trial as it stands, which is not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.
+  @@ NEEDS RULING
 - **`lpn_settings_unbalanced_trials`**
-  > Extra trials first
-  _Ruled OK 2026-09-01._
+  > Extra trials before reporting
+  @@ NEEDS RULING
 - **`lpn_settings_unbalanced_trials_tip`**
   > How many further trials to allow after the maximum above is used up, before the last trial is reported. Only the EPANET solver reads this box.
   _Ruled OK 2026-09-02._
@@ -672,25 +663,25 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.
   _Ruled OK 2026-08-29._
 - **`lpn_terrain_blank_ids`**
-  > These nodes are still blank: {ids}
-  _Ruled OK 2026-08-29._
+  > These nodes still have no elevation: {ids}
+  @@ NEEDS RULING
 - **`lpn_terrain_filled_ids`**
-  > These nodes were filled in: {ids}
-  _Ruled OK 2026-08-29._
+  > These nodes got an elevation: {ids}
+  @@ NEEDS RULING
 - **`lpn_terrain_ids_more`**
   > {ids}, and {n} more
   _Ruled OK 2026-08-29._
 - **`lpn_terrain_keep_ids`**
-  > They are: {ids}
-  _Ruled OK 2026-08-29._
+  > Those nodes are: {ids}
+  @@ NEEDS RULING
 - **`lpn_terrain_will_ids`**
-  > These are the nodes that will be filled in: {ids}
-  _Ruled OK 2026-08-29._
+  > These nodes will get an elevation: {ids}
+  @@ NEEDS RULING
 - **`lpn_tool_vertices`**
   > Vertices
   @@ NEEDS RULING
 - **`lpn_tool_vertices_tip`**
-  > Add and remove the bends in a pipe. Click a pipe to put a bend there, click a bend to take it out, and drag a bend to move it.
+  > Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics.
   @@ NEEDS RULING
 
 ## u_  (2, all ruled)

@@ -211,7 +211,11 @@ console.log('\n--- saved with the project, and shown nowhere ---');
 	const qRows = rowsIn(byId.lpn_set_quality_fields);
 	ok('Water quality has its own rows, and Hydraulics does not carry them',
 		qRows.length >= 1 && !labels.some(t => /^Track$/i.test(t)), qRows.join(' | '));
-	ok('...the first of which is what to track', /Track/i.test(qRows[0] || ''), qRows.join(' | '));
+	// The label became EPANET's own name for this selector, `Quality parameter`, on the Task 573
+	// Wave 0 pass: a one-word `Track` is a verb and a noun in English and neither in most target
+	// languages, and its own values (Water age, Source trace) are noun phrases.
+	ok('...the first of which names the quality parameter',
+		/Quality parameter/i.test(qRows[0] || ''), qRows.join(' | '));
 	// **THE SOURCE ROW APPEARS ONLY WHERE IT MEANS ANYTHING.** Net1 names a chemical, so nothing on
 	// this page is tracing a source, and a "Trace node" selector beside it would be a control with
 	// no analysis behind it.

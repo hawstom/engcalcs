@@ -2525,7 +2525,10 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, tip = pc.lpn_scenario_tip || '';
 		if (!btn || !tip) { return; }
 		if (overrideCount(activeScenario()) > 0 && pc.lpn_scenario_overrides_tip) {
-			tip += ' ' + pc.lpn_scenario_overrides_tip;
+			// The base scenario's NAME comes from its own key, never spelled again here: embedded
+			// as a bare word it was translated a second time and named no control. Task 573.
+			tip += ' ' + pc.lpn_scenario_overrides_tip
+				.replace(/\{base\}/g, pc.lpn_scenario_base || 'Base');
 		}
 		btn.title = tip;
 	}
@@ -9601,7 +9604,7 @@ var EngCalcs = EngCalcs || {};
 		// Elevation and only on a project the feature can work on, which is why it is built here
 		// rather than being a permanent row: a source select over Diameter would be nonsense.
 		if (replaceState.prop === 'elev' && isGeoProject() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
-			findSelect(box, pc.lpn_replace_source || 'From',
+			findSelect(box, pc.lpn_replace_source || 'New value source',
 				[['value', pc.lpn_settings_elev_source_typed || 'The number above'],
 					['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']],
 				replaceState.source, function (v) {
@@ -17586,7 +17589,7 @@ var EngCalcs = EngCalcs || {};
 			// nothing about the project on screen makes this impossible, because the result is a new
 			// tab either way. The old "Convert to lat/lon…" row, which converted the OPEN project and
 			// had to be greyed whenever that project was already on the map, is gone with it.
-			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Import XY to lat/lon…',
+			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open an xy file on the map…',
 			  tip: pc.lpn_file_import_geo_tip, fn: pickGeoFile },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
@@ -21763,13 +21766,14 @@ var EngCalcs = EngCalcs || {};
 		// legend placements, so there is one decision and no question of which control wins.
 		//
 		// The degree sign is the label, in every language: the increments are numbers and ° is the
-		// same mark in all 27, so only the word Off is a key -- and `lpn_settings_legend_off` is
-		// already that word, already translated, and means the same thing here.
+		// same mark in all 27, so only the word Off is a key. It gets its OWN key rather than
+		// borrowing the legend list's: English 'Off' covers a switch and an empty position alike,
+		// and Spanish does not (Desactivado here, Ninguno there). Split 2026-09-02, Task 573.
 		var snapSelect = document.createElement('select');
 		LEADER_SNAP_STEPS.forEach(function (d) {
 			var opt = document.createElement('option');
 			opt.value = String(d);
-			opt.textContent = d ? d + '\u00b0' : (pc.lpn_settings_legend_off || 'Off');
+			opt.textContent = d ? d + '\u00b0' : (pc.lpn_settings_snap_off || 'Off');
 			if (d === leaderSnapDeg()) { opt.selected = true; }
 			snapSelect.appendChild(opt);
 		});
@@ -23191,8 +23195,8 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, hyd = settings.hydraulics || {},
 			sel = document.createElement('select');
 		[['', pc.lpn_settings_option_unset || 'Not stated'],
-			['continue', pc.lpn_settings_unbalanced_continue || 'Report the last try'],
-			['stop', pc.lpn_settings_unbalanced_stop || 'Report nothing']
+			['continue', pc.lpn_settings_unbalanced_continue || 'Allow extra trials'],
+			['stop', pc.lpn_settings_unbalanced_stop || 'Stop and report the last trial']
 		].forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
@@ -27616,27 +27620,22 @@ var EngCalcs = EngCalcs || {};
 	// be a measurement we never made. Punctuation, not language: it says the same thing in 27
 	// languages and needs no key.
 	var FF_DASH = '–';
-	function ffStateText(state) {
-		var pc = EngCalcs.pageConfig || {}, S = EngCalcs.lpnFireFlowStates || {};
-		if (state === S.PASS) { return pc.lpn_ff_state_pass || 'Passing'; }
-		if (state === S.FAIL) { return pc.lpn_ff_state_fail || 'Failing'; }
-		if (state === S.DESIGN) { return pc.lpn_ff_state_design || 'Design issue'; }
-		return pc.lpn_ff_state_error || 'No answer';
-	}
 	// Every outcome that is not a flow, in this project's own words. None of them is ever rendered
 	// as a number, and `below-residual-at-rest` in particular is not an available fire flow of zero:
 	// the question has no answer there, which is a different fact.
 	function ffReasonText(rec) {
 		var pc = EngCalcs.pageConfig || {}, C = EngCalcs.lpnFireFlowCodes || {};
 		if (rec.code === C.BELOW_AT_REST) {
-			return pc.lpn_ff_err_at_rest || 'Already below the residual with nothing drawn';
+			return pc.lpn_ff_err_at_rest || 'Already below the residual before any fire flow is drawn';
 		}
 		if (rec.code === C.NO_CONVERGENCE) { return pc.lpn_ff_err_converge || 'The network did not settle'; }
 		if (rec.code === C.SOLVE_FAILED) { return pc.lpn_ff_err_solve || 'The network could not be worked out'; }
 		if (rec.code === C.NOT_A_JUNCTION) { return pc.lpn_ff_err_not_junction || 'Not a junction'; }
 		if (rec.code === C.UNKNOWN_NODE) { return pc.lpn_ff_err_not_junction || 'Not a junction'; }
-		return (pc.lpn_ff_err_unknown || 'No answer, and the reason given is {id}')
-			.replace('{id}', rec.code || '');
+		// **THE PLACEHOLDER IS {code}, NOT {id}.** Every other {id} in this report holds an asset
+		// name, and a translator reasoning about the token wrote about a node. Task 573 Wave 0.
+		return (pc.lpn_ff_err_unknown || 'No answer. The code reported was {code}.')
+			.replace('{code}', rec.code || '');
 	}
 	// The available flow as a person should read it. A junction that held the residual at the search
 	// ceiling is reported as delivering MORE than the ceiling; the ceiling is never printed as
@@ -27753,7 +27752,7 @@ var EngCalcs = EngCalcs || {};
 		total = rec.effects.nodes.length + rec.effects.links.length;
 		extra = total - 1;
 		if (extra > 0) {
-			text += ' ' + (pc.lpn_ff_more || 'and {n} more').replace('{n}', String(extra));
+			text += ' ' + (pc.lpn_ff_more || 'and {n} more affected').replace('{n}', String(extra));
 		}
 		return text;
 	}
@@ -27807,7 +27806,11 @@ var EngCalcs = EngCalcs || {};
 	function ffMoreLine(parent, hidden) {
 		var pc = EngCalcs.pageConfig || {};
 		if (hidden <= 0) { return; }
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_more || 'and {n} more').replace('{n}', String(hidden)), parent);
+		// **ITS OWN KEY, NOT the Worst-effect cell's.** One string counted two different nouns
+		// (affected assets there, undisplayed junctions here), which a gendered language cannot
+		// agree with twice. Split 2026-09-02, Task 573 Wave 0.
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_rows_more || '{n} more junctions are not shown.')
+			.replace('{n}', String(hidden)), parent);
 	}
 	function rebuildFireFlowReport() {
 		var pc = EngCalcs.pageConfig || {},

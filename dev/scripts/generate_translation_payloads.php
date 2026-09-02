@@ -189,6 +189,14 @@ function buildPayloads(array $opts, bool $quiet = false): array
                 'active_prefixes' => $prefixesInDelta,
                 'requested_prefix' => $opts['requested_prefix'],
                 'notes' => 'Translate only keys in keys_to_translate; preserve HTML, units, and symbols.',
+                // ROADMAP Task 573 Wave 0. Two conventions that no per-key channel could carry,
+                // because they are true of every key at once. The first exists because a dropped
+                // {n} breaks a sentence in one language and nothing warns anybody; the second
+                // because 20 of that pass's 136 findings were one defect -- a control's name
+                // written into another string's prose, translated there as free words, naming
+                // nothing the reader can find on the screen.
+                'placeholder_notes' => 'A word in curly braces ({n}, {ids}, {flow}, {iterations}, {name}) is a PLACEHOLDER the page replaces at runtime. Keep every one of them, spelled exactly as in English, braces included. Never translate the word inside the braces. You MAY move a placeholder to wherever your language needs it in the sentence.',
+                'control_name_notes' => 'Where an English string names a control, it names it in one of two shapes. A single control is written as its label followed by the widget word: "press the Calculate button", "the Recalculate automatically setting", "the Required fire flow box". A menu path is written as comma-separated labels: "File, Save as"; "Settings, Calculation, Hydraulics". In BOTH shapes the label is another key\'s value. Translate it with exactly the words you used for that key, so the sentence still names what is on the screen; translate the widget word and the surrounding prose normally.',
                 'glossary_injection_notes' => 'Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.',
                 'context_notes' => 'Use key_context.neighbors to keep register consistent with nearby translated strings.',
                 'syn_notes' => 'Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists.',

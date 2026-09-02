@@ -247,7 +247,7 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   map and one credit set per source. It is `project.basemap`, never `backdrop.href`, and an `.inp`
   exporter must skip it. **The elevation fill is TWO ORDINARY CONTROLS and NOT a menu row** (Task
   542, and the row it names was deleted twice over — the menu became Map, not View, under Task 543):
-  `Settings > New assets > Elevation from`, where a node is born reading its own ground and nothing
+  `Settings > New assets > Elevation source`, where a node is born reading its own ground and nothing
   existing is touched, and `From Mapbox DEM` as the New-value source in Find and replace, where the
   user has already chosen the set. **Do not add a third door** — a menu row that filled the whole
   drawing in one press is what Tom called *"a cool new button that I found"*, and it is the defect

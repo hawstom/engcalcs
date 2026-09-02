@@ -191,8 +191,9 @@ the block.
     converging. Below any decimal the page displays, so it was committed rather than escalated.
   - **A wording correction driven by measurement, not by the manual:** the Unbalanced stop choice
     was first labelled from EPANET's documentation, which says it refuses. **Through the toolkit
-    it does not refuse — it hands back the last iterate**, so the label says "Stop there" and the
-    tip says what actually happens.
+    it does not refuse — it hands back the last iterate**, so the label says "Stop and report the
+    last trial" (Task 573 Wave 0 spelled out what "Stop there" left to inference) and the tip says
+    what actually happens.
   - **AND THE `[OPTIONS]` LOOP STOPPED ENUMERATING, 2026-09-02, WHICH IS THE END OF THIS DEFECT
     CLASS.** `Map` and `Hydraulics USE/SAVE` were carried by `75866b60`; the audit that followed
     found the rest, so the reader's branch chain is now the list of what it READS and a final

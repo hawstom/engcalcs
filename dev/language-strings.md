@@ -100,6 +100,31 @@ the count in shipped English may fall and may not rise.
 
 This governs new calculators from day one, not just retrofits.
 
+### Naming a control from inside another string
+
+**A control's name written into prose is a cross-key match a translator cannot see.** Wave 0 on Task
+573 found 20 of its 136 findings were this one defect: `press Keep this placement`, `Use Background
+image > Move`, `“Recalculate automatically”`, `press Run` for a button whose face reads Calculate.
+Rendered as free prose, each one stops naming anything on the screen.
+
+Two shapes, and nothing else:
+
+| What is being named | Shape | Example |
+|---|---|---|
+| One control | the label, then the widget word | `press the Calculate button`; `the Recalculate automatically setting`; `the number in the Required fire flow box` |
+| A menu path | the labels, comma-separated | `File, Save as`; `Settings, Calculation, Hydraulics` |
+
+**Commas, not `>`.** Measured 2026-09-02 in shipped English: 19 comma paths against 3 arrow ones. The
+comma reads as prose in every language; the arrow is a screenshot convention that a translator will
+copy without knowing whether the words inside it are still words.
+
+**No quotation marks.** They mark the phrase for an English reader and vanish under RTL and CJK
+quoting conventions; the widget word does the same job and survives translation.
+
+`meta.control_name_notes` in every payload tells the translator what to do with the shape: render
+the label with the words already used for that label's own key. The shape is what makes that
+instruction actionable, so it is not optional decoration.
+
 ### `$ec_lang_syn` — synonyms and alternate expressions
 
 **It answers exactly one question, asked by a translator: "what other ways could this be said?" — and

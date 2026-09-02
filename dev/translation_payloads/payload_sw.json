@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 1540,
-        "delta_key_count": 227,
+        "expected_key_count": 1537,
+        "delta_key_count": 224,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -39,6 +39,8 @@
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
+        "placeholder_notes": "A word in curly braces ({n}, {ids}, {flow}, {iterations}, {name}) is a PLACEHOLDER the page replaces at runtime. Keep every one of them, spelled exactly as in English, braces included. Never translate the word inside the braces. You MAY move a placeholder to wherever your language needs it in the sentence.",
+        "control_name_notes": "Where an English string names a control, it names it in one of two shapes. A single control is written as its label followed by the widget word: \"press the Calculate button\", \"the Recalculate automatically setting\", \"the Required fire flow box\". A menu path is written as comma-separated labels: \"File, Save as\"; \"Settings, Calculation, Hydraulics\". In BOTH shapes the label is another key's value. Translate it with exactly the words you used for that key, so the sentence still names what is on the screen; translate the widget word and the surrounding prose normally.",
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "syn_notes": "Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists.",
@@ -46,7 +48,7 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "prompt_context_by_prefix": {
-        "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- head (H): kimo cha maji\n    DO NOT render as: a lazy anatomical calque that is NOT the language's natural hydraulic term — but an anatomically-derived word that IS the dominant local standard is correct (English 'head' is itself the body-part word repurposed); defer to the cultural standard, do not 'fix' a natural term for containing a body-part morpheme; treating it as the gauge pressure at a point. Head is energy per unit weight -- it can legitimately be READ in either height units or pressure units (the suite offers both, and defaults to psi for head loss under the US preset), so a pressure-flavoured term or a psi reading is not itself an error. The real constraint: TOTAL head (EGL, HGL) is offered in water-column units ONLY, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28, encoded in the total_head unit family).; source\/origin of a stream\n- head loss (h_L): upotevu wa kimo\n    DO NOT render as: calquing the English word \"head\" into a language whose engineers do not use a height word here. Defer to the term the language's own engineers actually use: German Druckverlust, French perte de charge, Urdu دباؤ نقصان all read literally as \"pressure loss\" and are all correct, dominant professional usage. NOTE ON UNITS -- this concept is legitimately read in EITHER height or pressure units, so a pressure-flavoured term is not a units error: the suite's own partial_head family (h_f, h_m, h_L) offers psi\/kPa\/bar\/kgfcm2 and DEFAULTS to psi in the US preset. The one real constraint is on TOTAL head (EGL\/HGL), which the total_head family deliberately offers in water-column units only, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28) -- see the 'head' root entry.; a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction loss (h_f): upotevu wa msuguano\n- minor loss (h_m): upotevu wa ndani\n- pressure (p): Shinikizo\n    DO NOT render as: the HEAD term (a height of water column) — pressure here is what a gauge reads; atmospheric or meteorological pressure senses; a stress or material-strength sense; figurative 'pressure' (urgency, coercion)\n- elevation (z): Mwinuko\n    DO NOT render as: the HEAD term — an elevation is a position above a datum, not an energy; a generic 'tall\/high' adjective where the language has a surveying term; altitude in the aviation or geographic sense where a levelled survey term exists\n- demand: Mahitaji\n    DO NOT render as: economic or market demand; a legal demand\/claim; a request in the everyday sense\n- static head (H): Kimo tuli cha usambazaji\n    DO NOT render as: electrostatic \/ static electricity; 'stationary\/motionless' in a non-hydraulic sense\n- maximum allowable head (H): Shinikizo la juu linaloruhusiwa la bomba\n    DO NOT render as: the operating \/ computed head (this is a fixed design limit, not the pressure the network actually develops)\n- supply head (H): Kimo cha usambazaji\n    DO NOT render as: an economic 'supply'; confusing supply (source) head with the delivered\/residual head at a demand point\n- supply curve: [needs translation sprint]\n    DO NOT render as: an economic supply curve; a demand curve\n- looped network: mtandao wa bomba wenye mizunguko\n    DO NOT render as: a control-flow \/ programming loop; a physical loop, knot, or coil\n- branched network: Mtandao wa Bomba wenye Matawi\n    DO NOT render as: a literal botanical 'tree' where the language has a proper network\/graph term; a looped or meshed network (branched means no loops)\n- pipe line: Mistari ya bomba\n    DO NOT render as: a queue or line of people; a rope, cord, or cable; a line of text; a purely geometric line\/segment\n- pressure rating: Shinikizo la juu linaloruhusiwa la bomba\n    DO NOT render as: a stress or material strength rather than a water pressure; blood-pressure or tyre-pressure senses; a general word for strong or high\n- pressure reduction: kupunguza shinikizo\n    DO NOT render as: naming a specific device (break pressure tank, BPT, pressure-reducing valve) as if the tool recommends one; depressurizing in the sense of emptying or draining the pipe\n- energy grade line (EGL): mstari wa nishati\n- Manning roughness (n): mgawo wa usuguo wa Manning\n- friction factor (f): sababu ya msuguano\n- draw (a diagram): [needs translation sprint]\n    DO NOT render as: draw water (abstract, pump, or take water from a source) -- the wrong sense here, and PLAUSIBLE in a hydraulics context, which is what makes it dangerous; pull, drag, or haul; draw as in a lottery or a tie\/stalemate; withdraw money\n- junction: Muunganiko\n    DO NOT render as: a road junction, crossroads, or intersection; a physical pipe fitting (tee, cross, elbow) -- a junction here is a point in the model, not a part you buy; a railway junction; an electrical junction box\n- reservoir: Hifadhi ya Maji\n    DO NOT render as: a TANK -- a vessel whose water level rises and falls as it fills and empties. Since ROADMAP Task 248 (2026-08-14) lpn_ models BOTH, as two separate node types, so the two must have two different words in every language. A reservoir's level is fixed and never runs down; a tank's does.; a natural lake specifically, where the language has a general storage\/supply term; a reserve or reservation in the non-physical sense\n- node: kifundo\n    DO NOT render as: a computing\/server node (a transliterated loanword where the language has a real graph or network-diagram term); a knot, lump, or swelling (the anatomical\/botanical sense of the Latin root); a node in the wave-physics sense (a point of zero amplitude)\n- link: kiungo\n    DO NOT render as: a hyperlink or web link -- the dominant modern sense of the English word, and the wrong one here; a chain link (the physical object); a connection in the social or logistical sense\n- vertex: [needs translation sprint]\n    DO NOT render as: a mathematical vertex of a polygon or a parabola apex, where the language has a plainer word for a bend or corner point in a drawn line; a peak or summit; a vertex in the anatomical sense (crown of the head)\n- colour ramp: [needs translation sprint]\n    DO NOT render as: the word for a GRADIENT (es gradiente, fr gradient, de Gefaelle, it gradiente, pt gradiente). In this suite 'gradient' is a HYDRAULIC QUANTITY -- lpn_result_gradient is the head loss gradient, a label field printed on every pipe -- so a colour 'gradient' collides with a number on the same map.; the word for SCALE (es escala, fr echelle, de Massstab). 'Scale' is taken twice on this page already: the map's own scale, and the Scale tool that resizes a background image.; the word for a physical RAMP or slope. A rock chute in this suite really is a ramp (the rc_ calculator), so the physical sense is live in the product.\n- colour band limit: [needs translation sprint]\n    DO NOT render as: the word for a BREAK, BREAKAGE or BURST (es rotura, fr rupture, de Bruch, pt ruptura, ru razryv). A pipe break is a real event in water distribution and this control has nothing to do with one. The English label was 'Break values' and Wave 0 rewrote it for this reason.; the word for a PAUSE or an INTERVAL IN TIME.\n- equal intervals \/ equal counts: [needs translation sprint]\n    DO NOT render as: translating 'counts' as a TALLY OF EVENTS -- it means how many elements fall in each colour band.; translating 'intervals' as intervals IN TIME.\n- fire flow: [needs translation sprint]\n    DO NOT render as: a term meaning the flow OF a fire, or a firefighting operation. This is a DESIGN REQUIREMENT, not an event.\n- background image: [needs translation sprint]\n    DO NOT render as: a backdrop in the theatrical\/stage sense (the English source word was CHANGED to \"background image\" in Task 193 precisely to remove this transliteration lure); a wallpaper or decorative background; an online\/satellite map layer -- this is a plain image file the user already has\n- world file: faili la kuratibu za picha\n    DO NOT render as: any reading of \"world\" as the PLANET, the globe, or the earth. The word names a coordinate space, not a place -- \"planet file\", \"earth file\", \"global file\" are all wrong.; a phonetic transliteration of the English words where the language's GIS community already has a real term (fr \"fichier de géoréférencement\", es \"archivo de georreferenciación\" are the kind of thing wanted). Transliterate only where nothing established exists.; confusing it with the IMAGE file itself, or calling it a \"map file\" or \"project file\" -- it is a tiny six-line plain-text SIDECAR that travels beside the picture.; translating the file EXTENSIONS that carry it (.wld, .jgw, .tfw, .pgw). Those are literal filename suffixes.\n- pump curve: [needs translation sprint]\n    DO NOT render as: a curve in the geometric\/road sense; a pump characteristic confused with an efficiency or power curve -- this one is head against flow\n- project (saved network): [needs translation sprint]\n    DO NOT render as: an engineering project or job in the contractual sense (a scheme, a works, a contract) -- this is a saved document; a projection (optical or cartographic); to project or forecast\n- scenario: Senario\n    DO NOT render as: a scene or setting in the dramatic\/film sense; a scenario in the \"worst case story\" narrative sense, where the language has a modelling or variant-case term; a copy or duplicate of the network -- a scenario is a set of differences, not a second network; a native Swahili word for scenario: hali, mfano and toleo are all already taken inside lib\/lang.ec.sw.php by Mode, example and file version respectively, so reusing one gives that file two meanings for one word.; an eigenvalue-adjacent word for the sibling string \"own values\".\n- zoom to extents: [needs translation sprint]\n    DO NOT render as: a general \"adjust\/change the zoom\" — this is the trap. es \"Ajustar zoom\" and pt \"Zoom para ajustar\" both shipped meaning ADJUST THE ZOOM, which describes the zoom slider, not this button. A verb meaning adjust\/regulate\/set is wrong unless the label also says WHAT is fitted; zoom in \/ zoom out \/ a zoom level or percentage — this command has no direction and no amount; a transliterated \"zoom\" loanword standing alone, where the language has a real word for showing the whole drawing; the photographic or camera sense of zoom (a lens movement)\n- default (setting): chaguo-msingi\n    DO NOT render as: the financial sense — failure to pay a debt, defaulting on a loan. This is the dominant everyday sense of the English word in many languages and the single most dangerous confusion here; the legal sense — failure to appear or to act, a default judgment; a bare \"reset\" or \"restore\" with the default concept dropped entirely. ro shipped calc_defaults as just \"Reseteaza\" (Reset) while its own calc_defaults_confirm used \"valorile implicite\" correctly — the button must say WHAT is restored; a word meaning normal\/usual\/ordinary where the language has a real settings term. sw shipped \"maadili ya kawaida\" (normal values) instead of \"chaguo-msingi\"; \"kawaida\" describes what is typical, not what the software ships with; the sports sense — winning or losing by default, by forfeit\n- upstream: juu ya mkondo\n- downstream: chini ya mkondo\n- tank: Tanki\n    DO NOT render as: the word this file already uses for RESERVOIR. The page offers both tools side by side in the same toolbar, and a language that renders them with one word makes the two tools indistinguishable.; a military tank, a tracked vehicle; a fish tank or an aquarium; a fuel tank or a gas cylinder, where the language has a separate word for a WATER vessel; a transliteration of English \"tank\" where the language has a real word for a water storage vessel that engineers already use\n- valve: Vali\n    DO NOT render as: a heart valve or any anatomical valve; a vacuum tube \/ electron tube (British English \"valve\"); a tap or faucet -- the fitting a person opens by hand at a sink, where the language distinguishes that from a pipeline valve; a transliteration of English \"valve\" where the language has an established pipeline term\n- valve setting: [needs translation sprint]\n    DO NOT render as: a settings\/preferences sense -- this is not an option a user configures in a panel, it is the duty point the valve maintains; a placement or installation sense (\"setting\" a valve into a line); giving the TCV coefficient any units: it is a bare multiple of the velocity head\n- override (scenario value): Thamani zake mwenyewe\n    DO NOT render as: the mathematical eigenvalue sense. This is the live trap: a literal \"own values\" renders as es \"valores propios\" \/ pt \"valores proprios\" \/ de \"Eigenwerte\", which every engineer reads as EIGENVALUES. Say \"values of its own\" \/ \"values set in this scenario\", never the eigen- word.; an override in the authority or veto sense (overruling a person or a permission); a manual override switch on a machine; a copy or a duplicate -- an override is a single differing value, not a second network\n- solver: kitatuzi\n    DO NOT render as: the word for a physical MOTOR or ENGINE (es\/pt motor, fr moteur, it motore, de Motor, ro motor, id mesin, sw injini, zh 引擎, ar محرك, he מנוע, fa موتور, uk рушій). This calculator models PUMPS, which have real motors, so the software sense collides with a hydraulic component on the same page. This is the specific defect sprint 252 existed to repair.; a transliteration of English \"engine\" (ur انجن, bn ইঞ্জিন, my အင်ဂျင်, hi इंजन) -- same collision, plus it is a loanword where a real term exists.; reusing the word your file already uses for CALCULATOR (sw kikokotoo, am ማስያ, km ម៉ាស៊ីនគណនា). The page names both a calculator and a solver, and they are different things.\n- profile (long section): [needs translation sprint]\n    DO NOT render as: the USER ACCOUNT sense of \"profile\" -- the page holding a person's name and settings. This is the dominant sense of the English word in web software and it is the wrong one here; many languages use a different word for each (zh 剖面圖 section vs 個人資料 account).; the CONFIGURATION PRESET sense (a \"colour profile\", a \"power profile\", a saved set of settings). Nothing is saved or selected by this menu.; the SIDE VIEW OF A FACE sense, where the language has a word specific to portraiture.\n- hydraulic grade line (HGL): [needs translation sprint]\n    DO NOT render as: dropping the head noun, so the label names the SLOPE (\"hydraulic grade\", \"hydraulic gradient\") rather than the LINE. What is plotted is an elevation, on an elevation axis.; the school-mark, quality-class or ground-levelling senses of \"grade\".; the energy grade line, which is a different line -- the HGL sits below it by the velocity head.\n- demand pattern: [needs translation sprint]\n    DO NOT render as: the ordinary senses of \"pattern\" -- a repeating decoration, a template to cut from, a habit of behaviour. This is a NAMED SERIES OF NUMBERS indexed by time step.; translating it as \"demand curve\", which in economics means something else entirely.; a word implying the pattern IS the demand; it is a list of multipliers applied to a base demand.\n- imperial gallon (IMGD): [needs translation sprint]\n    DO NOT render as: treating IMGD and MGD as the same unit or as spellings of each other. The imperial gallon is 4.54609 L, the US gallon 3.785411784 L -- a 20% difference in a token that differs by one letter.; translating or transliterating the tokens MGD and IMGD themselves. They are unit symbols and stay as they are, exactly like m^3\/s.; calling the imperial gallon \"British\" in a way that implies it is obsolete; it is still the working unit in parts of the Commonwealth.\n- pressure breaker valve (PBV): [needs translation sprint]\n    DO NOT render as: the ELECTRICAL circuit-breaker word. This valve breaks a PRESSURE, not a circuit, and the electrical term is the one a translator will reach for first.; the breaking-wave sense of \"breaker\".; translating the three-letter code PBV, which is EPANET's own element name and is the same in every language, exactly as PRV, PSV, FCV, TCV and GPV are.\n- project mode name: [needs translation sprint]\n    DO NOT render as: giving one mode TWO names inside one language. That is the only real defect here, and dev\/scripts\/mode_name_check.php now catches it: whatever your file calls the mode in lpn_geomap \/ lpn_xymap, every other string that names the mode uses that same rendering.; expanding \"XY\" into words in some strings and leaving it as letters in others -- the same defect, on the other mode.; reading \"XY\" as a placeholder for something to be filled in. It is the name of the flat-grid mode.; assuming the mode names must stay English. THIS ENTRY USED TO SAY SO and it was FALSE: 10 of the 26 language files already translate lpn_geomap (am, ar, de, fa, he, ru, sr, tr, ur, zh) and 16 keep it literal. Both are fine. Translate it or keep it, but then be consistent.\n- alignment (text): [needs translation sprint]\n    DO NOT render as: JUSTIFICATION, which in typography is the different operation of stretching a line to reach both margins. Left \/ Centre \/ Right is alignment.; the everyday sense of justification -- a reason, a ground, an excuse (es justificación, fr justification, ru обоснование). A label reading \"Horizontal reason\" is the failure this entry exists to prevent.; the alliance \/ taking-sides sense of \"alignment\".\n- drop (a label): [needs translation sprint]\n    DO NOT render as: the HYDRAULIC senses of \"drop\": a drop in elevation, a pressure drop, a head drop, a drop structure. This page prints all of those as numbers, so the wrong choice makes the column heading look like a quantity.; a DROPLET of water.; a DROP-DOWN list, or the act of dropping something you are dragging with the pointer.; a word meaning \"delete\" or \"erase\". Nothing is removed from the drawing; only the printing of the label on the map is given up when there is no room.\n- run (a simulation): [needs translation sprint]\n    DO NOT render as: a RUN OF PIPE -- a straight length of main between two points. That sense is live on this very page and is the trap to guard against.; the sense of MOVING FAST on foot.; the sense of MANAGING something (running a company, running a system).; a run of a machine in the sense of a production batch.\n- work out (compute): [needs translation sprint]\n    DO NOT render as: the PHYSICAL EXERCISE sense of \"work out\".; the sense of TURNING OUT WELL (\"it worked out in the end\").; the sense of NEGOTIATING or resolving a disagreement.; a word implying guessing or estimating. This is exact computation by a solver.\n- decimal separator: [needs translation sprint]\n    DO NOT render as: changing the COLON in a time such as 17:30. The colon is not a decimal separator and the field accepts nothing else in its place; only the mark between the whole and fractional parts of a number is a locale fact.; adding a thousands separator to an example. The field refuses a comma that is not <digits>,<digits>, so 1,000 would be rejected as a time.; leaving a dot in an example where your language writes a comma. The example is there to be copied, and an example the reader cannot copy teaches the wrong format.",
+        "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- head (H): kimo cha maji\n    DO NOT render as: a lazy anatomical calque that is NOT the language's natural hydraulic term — but an anatomically-derived word that IS the dominant local standard is correct (English 'head' is itself the body-part word repurposed); defer to the cultural standard, do not 'fix' a natural term for containing a body-part morpheme; treating it as the gauge pressure at a point. Head is energy per unit weight -- it can legitimately be READ in either height units or pressure units (the suite offers both, and defaults to psi for head loss under the US preset), so a pressure-flavoured term or a psi reading is not itself an error. The real constraint: TOTAL head (EGL, HGL) is offered in water-column units ONLY, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28, encoded in the total_head unit family).; source\/origin of a stream\n- head loss (h_L): upotevu wa kimo\n    DO NOT render as: calquing the English word \"head\" into a language whose engineers do not use a height word here. Defer to the term the language's own engineers actually use: German Druckverlust, French perte de charge, Urdu دباؤ نقصان all read literally as \"pressure loss\" and are all correct, dominant professional usage. NOTE ON UNITS -- this concept is legitimately read in EITHER height or pressure units, so a pressure-flavoured term is not a units error: the suite's own partial_head family (h_f, h_m, h_L) offers psi\/kPa\/bar\/kgfcm2 and DEFAULTS to psi in the US preset. The one real constraint is on TOTAL head (EGL\/HGL), which the total_head family deliberately offers in water-column units only, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28) -- see the 'head' root entry.; a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction loss (h_f): upotevu wa msuguano\n- minor loss (h_m): upotevu wa ndani\n- pressure (p): Shinikizo\n    DO NOT render as: the HEAD term (a height of water column) — pressure here is what a gauge reads; atmospheric or meteorological pressure senses; a stress or material-strength sense; figurative 'pressure' (urgency, coercion)\n- elevation (z): Mwinuko\n    DO NOT render as: the HEAD term — an elevation is a position above a datum, not an energy; a generic 'tall\/high' adjective where the language has a surveying term; altitude in the aviation or geographic sense where a levelled survey term exists\n- demand: Mahitaji\n    DO NOT render as: economic or market demand; a legal demand\/claim; a request in the everyday sense\n- static head (H): Kimo tuli cha usambazaji\n    DO NOT render as: electrostatic \/ static electricity; 'stationary\/motionless' in a non-hydraulic sense\n- maximum allowable head (H): Shinikizo la juu linaloruhusiwa la bomba\n    DO NOT render as: the operating \/ computed head (this is a fixed design limit, not the pressure the network actually develops)\n- supply head (H): Kimo cha usambazaji\n    DO NOT render as: an economic 'supply'; confusing supply (source) head with the delivered\/residual head at a demand point\n- supply curve: [needs translation sprint]\n    DO NOT render as: an economic supply curve; a demand curve\n- looped network: mtandao wa bomba wenye mizunguko\n    DO NOT render as: a control-flow \/ programming loop; a physical loop, knot, or coil\n- branched network: Mtandao wa Bomba wenye Matawi\n    DO NOT render as: a literal botanical 'tree' where the language has a proper network\/graph term; a looped or meshed network (branched means no loops)\n- pipe line: Mistari ya bomba\n    DO NOT render as: a queue or line of people; a rope, cord, or cable; a line of text; a purely geometric line\/segment\n- pressure rating: Shinikizo la juu linaloruhusiwa la bomba\n    DO NOT render as: a stress or material strength rather than a water pressure; blood-pressure or tyre-pressure senses; a general word for strong or high\n- pressure reduction: kupunguza shinikizo\n    DO NOT render as: naming a specific device (break pressure tank, BPT, pressure-reducing valve) as if the tool recommends one; depressurizing in the sense of emptying or draining the pipe\n- energy grade line (EGL): mstari wa nishati\n- Manning roughness (n): mgawo wa usuguo wa Manning\n- friction factor (f): sababu ya msuguano\n- draw (a diagram): [needs translation sprint]\n    DO NOT render as: draw water (abstract, pump, or take water from a source) -- the wrong sense here, and PLAUSIBLE in a hydraulics context, which is what makes it dangerous; pull, drag, or haul; draw as in a lottery or a tie\/stalemate; withdraw money\n- junction: Muunganiko\n    DO NOT render as: a road junction, crossroads, or intersection; a physical pipe fitting (tee, cross, elbow) -- a junction here is a point in the model, not a part you buy; a railway junction; an electrical junction box\n- reservoir: Hifadhi ya Maji\n    DO NOT render as: a TANK -- a vessel whose water level rises and falls as it fills and empties. Since ROADMAP Task 248 (2026-08-14) lpn_ models BOTH, as two separate node types, so the two must have two different words in every language. A reservoir's level is fixed and never runs down; a tank's does.; a natural lake specifically, where the language has a general storage\/supply term; a reserve or reservation in the non-physical sense\n- node: kifundo\n    DO NOT render as: a computing\/server node (a transliterated loanword where the language has a real graph or network-diagram term); a knot, lump, or swelling (the anatomical\/botanical sense of the Latin root); a node in the wave-physics sense (a point of zero amplitude)\n- link: kiungo\n    DO NOT render as: a hyperlink or web link -- the dominant modern sense of the English word, and the wrong one here; a chain link (the physical object); a connection in the social or logistical sense\n- vertex: [needs translation sprint]\n    DO NOT render as: a mathematical vertex of a polygon or a parabola apex, where the language has a plainer word for a bend or corner point in a drawn line; a peak or summit; a vertex in the anatomical sense (crown of the head); the GRAPH-THEORY sense, where a vertex IS a node. This page's nodes are junctions, reservoirs and tanks; a vertex is none of them, carries no elevation, no demand and no head loss, and changes only the drawn route of a pipe. A toolbar button rendered with the graph-node word claims to add network nodes. Nor is it a BEND FITTING (an elbow with a minor loss coefficient), which this page also models.\n- colour ramp: [needs translation sprint]\n    DO NOT render as: the word for a GRADIENT (es gradiente, fr gradient, de Gefaelle, it gradiente, pt gradiente). In this suite 'gradient' is a HYDRAULIC QUANTITY -- lpn_result_gradient is the head loss gradient, a label field printed on every pipe -- so a colour 'gradient' collides with a number on the same map.; the word for SCALE (es escala, fr echelle, de Massstab). 'Scale' is taken twice on this page already: the map's own scale, and the Scale tool that resizes a background image.; the word for a physical RAMP or slope. A rock chute in this suite really is a ramp (the rc_ calculator), so the physical sense is live in the product.\n- colour band limit: [needs translation sprint]\n    DO NOT render as: the word for a BREAK, BREAKAGE or BURST (es rotura, fr rupture, de Bruch, pt ruptura, ru razryv). A pipe break is a real event in water distribution and this control has nothing to do with one. The English label was 'Break values' and Wave 0 rewrote it for this reason.; the word for a PAUSE or an INTERVAL IN TIME.\n- equal intervals \/ equal counts: [needs translation sprint]\n    DO NOT render as: translating 'counts' as a TALLY OF EVENTS -- it means how many elements fall in each colour band.; translating 'intervals' as intervals IN TIME.\n- fire flow: [needs translation sprint]\n    DO NOT render as: a term meaning the flow OF a fire, or a firefighting operation. This is a DESIGN REQUIREMENT, not an event.\n- background image: [needs translation sprint]\n    DO NOT render as: a backdrop in the theatrical\/stage sense (the English source word was CHANGED to \"background image\" in Task 193 precisely to remove this transliteration lure); a wallpaper or decorative background; an online\/satellite map layer -- this is a plain image file the user already has\n- world file: faili la kuratibu za picha\n    DO NOT render as: any reading of \"world\" as the PLANET, the globe, or the earth. The word names a coordinate space, not a place -- \"planet file\", \"earth file\", \"global file\" are all wrong.; a phonetic transliteration of the English words where the language's GIS community already has a real term (fr \"fichier de géoréférencement\", es \"archivo de georreferenciación\" are the kind of thing wanted). Transliterate only where nothing established exists.; confusing it with the IMAGE file itself, or calling it a \"map file\" or \"project file\" -- it is a tiny six-line plain-text SIDECAR that travels beside the picture.; translating the file EXTENSIONS that carry it (.wld, .jgw, .tfw, .pgw). Those are literal filename suffixes.\n- pump curve: [needs translation sprint]\n    DO NOT render as: a curve in the geometric\/road sense; a pump characteristic confused with an efficiency or power curve -- this one is head against flow\n- project (saved network): [needs translation sprint]\n    DO NOT render as: an engineering project or job in the contractual sense (a scheme, a works, a contract) -- this is a saved document; a projection (optical or cartographic); to project or forecast\n- scenario: Senario\n    DO NOT render as: a scene or setting in the dramatic\/film sense; a scenario in the \"worst case story\" narrative sense, where the language has a modelling or variant-case term; a copy or duplicate of the network -- a scenario is a set of differences, not a second network; a native Swahili word for scenario: hali, mfano and toleo are all already taken inside lib\/lang.ec.sw.php by Mode, example and file version respectively, so reusing one gives that file two meanings for one word.; an eigenvalue-adjacent word for the sibling string \"own values\".\n- zoom to extents: [needs translation sprint]\n    DO NOT render as: a general \"adjust\/change the zoom\" — this is the trap. es \"Ajustar zoom\" and pt \"Zoom para ajustar\" both shipped meaning ADJUST THE ZOOM, which describes the zoom slider, not this button. A verb meaning adjust\/regulate\/set is wrong unless the label also says WHAT is fitted; zoom in \/ zoom out \/ a zoom level or percentage — this command has no direction and no amount; a transliterated \"zoom\" loanword standing alone, where the language has a real word for showing the whole drawing; the photographic or camera sense of zoom (a lens movement)\n- default (setting): chaguo-msingi\n    DO NOT render as: the financial sense — failure to pay a debt, defaulting on a loan. This is the dominant everyday sense of the English word in many languages and the single most dangerous confusion here; the legal sense — failure to appear or to act, a default judgment; a bare \"reset\" or \"restore\" with the default concept dropped entirely. ro shipped calc_defaults as just \"Reseteaza\" (Reset) while its own calc_defaults_confirm used \"valorile implicite\" correctly — the button must say WHAT is restored; a word meaning normal\/usual\/ordinary where the language has a real settings term. sw shipped \"maadili ya kawaida\" (normal values) instead of \"chaguo-msingi\"; \"kawaida\" describes what is typical, not what the software ships with; the sports sense — winning or losing by default, by forfeit\n- upstream: juu ya mkondo\n- downstream: chini ya mkondo\n- tank: Tanki\n    DO NOT render as: the word this file already uses for RESERVOIR. The page offers both tools side by side in the same toolbar, and a language that renders them with one word makes the two tools indistinguishable.; a military tank, a tracked vehicle; a fish tank or an aquarium; a fuel tank or a gas cylinder, where the language has a separate word for a WATER vessel; a transliteration of English \"tank\" where the language has a real word for a water storage vessel that engineers already use\n- valve: Vali\n    DO NOT render as: a heart valve or any anatomical valve; a vacuum tube \/ electron tube (British English \"valve\"); a tap or faucet -- the fitting a person opens by hand at a sink, where the language distinguishes that from a pipeline valve; a transliteration of English \"valve\" where the language has an established pipeline term\n- valve setting: [needs translation sprint]\n    DO NOT render as: a settings\/preferences sense -- this is not an option a user configures in a panel, it is the duty point the valve maintains; a placement or installation sense (\"setting\" a valve into a line); giving the TCV coefficient any units: it is a bare multiple of the velocity head\n- override (scenario value): Thamani zake mwenyewe\n    DO NOT render as: the mathematical eigenvalue sense. This is the live trap: a literal \"own values\" renders as es \"valores propios\" \/ pt \"valores proprios\" \/ de \"Eigenwerte\", which every engineer reads as EIGENVALUES. Say \"values of its own\" \/ \"values set in this scenario\", never the eigen- word.; an override in the authority or veto sense (overruling a person or a permission); a manual override switch on a machine; a copy or a duplicate -- an override is a single differing value, not a second network\n- solver: kitatuzi\n    DO NOT render as: the word for a physical MOTOR or ENGINE (es\/pt motor, fr moteur, it motore, de Motor, ro motor, id mesin, sw injini, zh 引擎, ar محرك, he מנוע, fa موتور, uk рушій). This calculator models PUMPS, which have real motors, so the software sense collides with a hydraulic component on the same page. This is the specific defect sprint 252 existed to repair.; a transliteration of English \"engine\" (ur انجن, bn ইঞ্জিন, my အင်ဂျင်, hi इंजन) -- same collision, plus it is a loanword where a real term exists.; reusing the word your file already uses for CALCULATOR (sw kikokotoo, am ማስያ, km ម៉ាស៊ីនគណនា). The page names both a calculator and a solver, and they are different things.\n- profile (long section): [needs translation sprint]\n    DO NOT render as: the USER ACCOUNT sense of \"profile\" -- the page holding a person's name and settings. This is the dominant sense of the English word in web software and it is the wrong one here; many languages use a different word for each (zh 剖面圖 section vs 個人資料 account).; the CONFIGURATION PRESET sense (a \"colour profile\", a \"power profile\", a saved set of settings). Nothing is saved or selected by this menu.; the SIDE VIEW OF A FACE sense, where the language has a word specific to portraiture.\n- hydraulic grade line (HGL): [needs translation sprint]\n    DO NOT render as: dropping the head noun, so the label names the SLOPE (\"hydraulic grade\", \"hydraulic gradient\") rather than the LINE. What is plotted is an elevation, on an elevation axis.; the school-mark, quality-class or ground-levelling senses of \"grade\".; the energy grade line, which is a different line -- the HGL sits below it by the velocity head.\n- demand pattern: [needs translation sprint]\n    DO NOT render as: the ordinary senses of \"pattern\" -- a repeating decoration, a template to cut from, a habit of behaviour. This is a NAMED SERIES OF NUMBERS indexed by time step.; translating it as \"demand curve\", which in economics means something else entirely.; a word implying the pattern IS the demand; it is a list of multipliers applied to a base demand.\n- imperial gallon (IMGD): [needs translation sprint]\n    DO NOT render as: treating IMGD and MGD as the same unit or as spellings of each other. The imperial gallon is 4.54609 L, the US gallon 3.785411784 L -- a 20% difference in a token that differs by one letter.; translating or transliterating the tokens MGD and IMGD themselves. They are unit symbols and stay as they are, exactly like m^3\/s.; calling the imperial gallon \"British\" in a way that implies it is obsolete; it is still the working unit in parts of the Commonwealth.\n- pressure breaker valve (PBV): [needs translation sprint]\n    DO NOT render as: the ELECTRICAL circuit-breaker word. This valve breaks a PRESSURE, not a circuit, and the electrical term is the one a translator will reach for first.; the breaking-wave sense of \"breaker\".; translating the three-letter code PBV, which is EPANET's own element name and is the same in every language, exactly as PRV, PSV, FCV, TCV and GPV are.\n- project mode name: [needs translation sprint]\n    DO NOT render as: giving one mode TWO names inside one language. That is the only real defect here, and dev\/scripts\/mode_name_check.php now catches it: whatever your file calls the mode in lpn_geomap \/ lpn_xymap, every other string that names the mode uses that same rendering.; expanding \"XY\" into words in some strings and leaving it as letters in others -- the same defect, on the other mode.; reading \"XY\" as a placeholder for something to be filled in. It is the name of the flat-grid mode.; assuming the mode names must stay English. THIS ENTRY USED TO SAY SO and it was FALSE: 10 of the 26 language files already translate lpn_geomap (am, ar, de, fa, he, ru, sr, tr, ur, zh) and 16 keep it literal. Both are fine. Translate it or keep it, but then be consistent.\n- alignment (text): [needs translation sprint]\n    DO NOT render as: JUSTIFICATION, which in typography is the different operation of stretching a line to reach both margins. Left \/ Centre \/ Right is alignment.; the everyday sense of justification -- a reason, a ground, an excuse (es justificación, fr justification, ru обоснование). A label reading \"Horizontal reason\" is the failure this entry exists to prevent.; the alliance \/ taking-sides sense of \"alignment\".\n- drop (a label): [needs translation sprint]\n    DO NOT render as: the HYDRAULIC senses of \"drop\": a drop in elevation, a pressure drop, a head drop, a drop structure. This page prints all of those as numbers, so the wrong choice makes the column heading look like a quantity.; a DROPLET of water.; a DROP-DOWN list, or the act of dropping something you are dragging with the pointer.; a word meaning \"delete\" or \"erase\". Nothing is removed from the drawing; only the printing of the label on the map is given up when there is no room.\n- run (a simulation): [needs translation sprint]\n    DO NOT render as: a RUN OF PIPE -- a straight length of main between two points. That sense is live on this very page and is the trap to guard against.; the sense of MOVING FAST on foot.; the sense of MANAGING something (running a company, running a system).; a run of a machine in the sense of a production batch.\n- work out (compute): [needs translation sprint]\n    DO NOT render as: the PHYSICAL EXERCISE sense of \"work out\".; the sense of TURNING OUT WELL (\"it worked out in the end\").; the sense of NEGOTIATING or resolving a disagreement.; a word implying guessing or estimating. This is exact computation by a solver.\n- decimal separator: [needs translation sprint]\n    DO NOT render as: changing the COLON in a time such as 17:30. The colon is not a decimal separator and the field accepts nothing else in its place; only the mark between the whole and fractional parts of a number is a locale fact.; adding a thousands separator to an example. The field refuses a comma that is not <digits>,<digits>, so 1,000 would be rejected as a time.; leaving a dot in an example where your language writes a comma. The example is there to be copied, and an example the reader cannot copy teaches the wrong format.\n- open (link status): [needs translation sprint]\n    DO NOT render as: 'unobstructed', 'clear' or 'free-flowing' -- a claim about what is inside the pipe, which this is not; 'available' or 'in service' in the operational sense; 'exposed', 'uncovered' or 'open to the air' -- the civil-works sense of an open channel or an open trench\n- source trace: [needs translation sprint]\n    DO NOT render as: translating it as tracing the ORIGIN of a value, a setting or a file -- 'source' on this page also names where a replacement value comes from, and that is a different thing; a 'source' meaning a reservoir or tank, which is the sense the Find connectivity operators use\n- trace node: [needs translation sprint]\n    DO NOT render as: a node that records or logs something (the software-tracing sense); a 'trace' meaning a small residual quantity of a chemical\n- query keyword (AND, OR): [needs translation sprint]\n    DO NOT render as: leaving them in English out of a fear that translating will break the query -- it will not\n- path (profile route): [needs translation sprint]\n    DO NOT render as: a FILE path or directory path -- the dominant sense of the English word in software, and the wrong one here; a flow path or a hydraulic path in the sense the Find connectivity operators use ('no link path to a reservoir or tank'); that is a different concept and a different string; a journey or an itinerary\n- static pressure (fire flow): [needs translation sprint]\n    DO NOT render as: a zero-flow or no-demand pressure -- the general hydraulic reading of 'static', and always a higher number than this column reports; 'static' in the sense of unchanging, fixed or stored; 'static' in the everyday electrical or radio sense\n- available fire flow: [needs translation sprint]\n    DO NOT render as: 'available' in the sense of spare or unused capacity in the pipes; the flow the pipes happen to be carrying now\n- emitter: kituo cha maji\n    DO NOT render as: translating EPANET's emitter exponent with a word for POWER in the energy sense (watts). It is an exponent, an index, the number a quantity is raised to.; naming the emitter equation after an invented law; EPANET calls the device an emitter and the setting an emitter exponent.",
         "u": "Use these preferred technical term translations when relevant:\n- flow (Q): mtiririko\n- velocity (v): kasi\n- slope (S): mteremko\n    DO NOT render as: activity\/fitness sense of 'grade' — the treadmill or trail incline for running\/walking\/jogging; this is the hydraulic energy gradient, not an exercise setting; geographic or topographic landform term; school grade \/ academic mark"
     },
     "glossary_terms_by_prefix": {
@@ -236,7 +238,7 @@
             {
                 "term": "vertex",
                 "symbol": "",
-                "context": "A bend point along a pipe, between its two end nodes. Dragging one re-routes the drawn pipe without changing what it connects; double-clicking a pipe adds or removes one. Appears in lpn_mode_select.",
+                "context": "A bend point along a pipe, between its two end nodes. Dragging one re-routes the drawn pipe without changing what it connects; double-clicking a pipe adds or removes one. Appears in lpn_mode_select. Also the label of a toolbar mode (lpn_tool_vertices, 'Vertices') and of that mode's status line.",
                 "translation_notes": "CAD and GIS tools in most languages already have a word for this (a polyline bend point). Prefer that over a geometry-textbook term. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): a bend point in a drawn polyline. All four chose their CAD\/GIS term rather than a geometry-textbook calque; tr kırılma noktası (break point) is the plainest of the four.",
                 "preferred_translation": ""
             },
@@ -264,7 +266,7 @@
             {
                 "term": "fire flow",
                 "symbol": "",
-                "context": "The flow a water distribution system must be able to supply for firefighting, at a stated residual pressure, usually checked on top of maximum day demand. It is a number a designer sizes pipes against.",
+                "context": "The flow a water distribution system must be able to supply for firefighting, at a stated residual pressure, usually checked on top of maximum day demand. It is a number a designer sizes pipes against. In the fire flow report the Failure modes column prints two single words: 'Fire' means the junction did not deliver its required fire flow, and 'Design' means drawing that flow pushed something else outside its limits. Both are shortened verdicts, not nouns: translate what they stand for, keeping each as short as the column allows.",
                 "translation_notes": "[2026-08-17, sprint 397] Raised by the Bulgarian agent, which found that this suite's standing Bulgarian decision to use vodno kolichestvo for flow collides with the term Bulgarian fire-protection engineers actually use (debit za pozharogasene). Recorded so the choice is made once rather than per string. Where a language's fire-protection field has its own settled term, prefer it: a designer reading a fire-flow figure reads it as a fire-protection engineer.",
                 "preferred_translation": ""
             },
@@ -442,6 +444,62 @@
                 "context": "The mark between the whole and fractional parts of a number: a dot in English (17.5), a comma in most of Europe, Latin America and elsewhere (17,5). Numbers that appear INSIDE a translated string as EXAMPLES carry the locale's own separator -- write 17,5 where your language writes 17,5. The page accepts both when the user types (js\/lpn-patterns.js takes <digits>,<digits> as a decimal), so an example with a comma is a working example, not a broken one. Affects lpn_time_format_tip and lpn_labels_col_decimals_example.",
                 "translation_notes": "[2026-08-19, sprint 438 Wave 0] Precedent set for lpn_labels_col_decimals_example, whose whole value is the example 0.000 and which Tom said may become 0,000 where needed. lpn_time_format_tip carries four such examples and nothing in the English says they are localisable.",
                 "preferred_translation": ""
+            },
+            {
+                "term": "open (link status)",
+                "symbol": "",
+                "context": "EPANET's status of a pipe, pump or valve: OPEN means water may pass, CLOSED means it may not. It is the word behind the Find operators 'no open links at node' and 'no open path to a reservoir or tank', and behind every status column in the tables. A property of the LINK, set by the user or by a control, never a description of the pipe's physical condition.",
+                "translation_notes": "Use the word your language's water utilities put on a valve position or a link status. Where a language distinguishes an open VALVE from an open CHANNEL, this is always the valve sense.",
+                "preferred_translation": ""
+            },
+            {
+                "term": "source trace",
+                "symbol": "",
+                "context": "EPANET's own name for the water-quality analysis that reports, at every node, what fraction of the water arriving there came from one chosen node. The ANALYSIS is the Source trace; the NUMBER it reports at a node is the Source share, a percentage. Two things, two names, deliberately. The node whose water is followed is the trace node.",
+                "translation_notes": "Anchor on EPANET's own interface wording in your language if there is a localized EPANET; otherwise use the water-quality field's term for following water from one supply point.",
+                "preferred_translation": ""
+            },
+            {
+                "term": "trace node",
+                "symbol": "",
+                "context": "The one node whose water a Source trace analysis follows. The user picks it; every other node then reports the share of its water that came from it. EPANET calls it the Trace Node.",
+                "translation_notes": "Keep it tied to the Source trace term: whatever word you use for the analysis, this is its node.",
+                "preferred_translation": ""
+            },
+            {
+                "term": "query keyword (AND, OR)",
+                "symbol": "",
+                "context": "The joining words in the Find query box, and their pull-down labels. They are BOTH: the parser accepts the English token AND the translation, so translating them is safe and leaving them in English also works. Translate them, so the query box reads in the language the controls read in. The same applies to the example 'Junction.ID' in the missing-dot message: translate Junction and ID to match this language's own labels for them, and the dot stays a dot.",
+                "translation_notes": "The decision is made here so 26 languages do not each make it separately.",
+                "preferred_translation": ""
+            },
+            {
+                "term": "path (profile route)",
+                "symbol": "",
+                "context": "The route through the network that a profile is drawn along: an ordered list of nodes the user picks and can save by name. The profile menu's 'Saved paths', 'New saved path', 'Rename path' and 'Delete path' all name this route, not the drawing made from it. Pairs with the 'profile (long section)' term, which names the drawing.",
+                "translation_notes": "Use the word a surveyor or a designer would use for the line a long section is taken along.",
+                "preferred_translation": ""
+            },
+            {
+                "term": "static pressure (fire flow)",
+                "symbol": "",
+                "context": "In a fire flow test, and in this page's fire flow report, the pressure at the hydrant or junction BEFORE any fire flow is drawn, with the system's ordinary demands still running. It is not a no-flow pressure: nothing in the network is shut off to measure it. AWWA M31 and NFPA 291 both use this name.",
+                "translation_notes": "Prefer whatever your language's fire-protection engineers put at the head of a fire flow test form.",
+                "preferred_translation": ""
+            },
+            {
+                "term": "available fire flow",
+                "symbol": "",
+                "context": "The largest fire flow a junction can deliver while still holding the residual pressure the user set. Reported beside the REQUIRED fire flow, which is what a fire code or a fire authority asks for at that point. The report's column headings are shortened to 'Available flow' and 'Required flow' because column width is tight; both mean the fire flow, not the flow presently in the pipes.",
+                "translation_notes": "Translate the CONCEPT the short headings stand for, not the two English words. Pairs with the 'fire flow' term.",
+                "preferred_translation": ""
+            },
+            {
+                "term": "emitter",
+                "symbol": "",
+                "context": "A drip irrigation emitter (dripper\/micro-sprinkler) that delivers water at a controlled low flow rate directly to the soil or plant root zone. Appears in Drip\/Sprinkler calculator. ALSO, on the looped network page, EPANET's EMITTER: a sprinkler or a leak at a junction, whose flow is coefficient x pressure raised to the emitter exponent. Same word, second field. The setting is the Emitter exponent, and 'exponent' is the quantity -- never 'power', which on a page that models pumps is energy per unit time.",
+                "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers. zh CORRECTED (2026-07-10, category-4 wave-2 QA): the wave-2 zh translating agent initially deviated to the generic academic term '灌水器' throughout ip_ keys, reasoning that the calculator's emitter-exponent model (x from ~0 to 0.5) is generic rather than drip-only. Reverted to the established glossary field term '滴头' (dripper) for suite-wide consistency with the ar\/es\/uk pattern above — this glossary's own policy is field-term-over-academic-generality across all languages, and a generic hydraulic model doesn't change what practitioners actually call the part. | [2026-08-25, glossary_rendering_census.php] 22 English sites, and EIGHT FILES NEVER SHIP THE RENDERING THIS ENTRY HOLDS: bg капкоотделител, cs kapač, de Tropfer, km ឧបករណ៍ចំណោចទឹក, ru капельница, uk крапельниця, ur خارج کنندہ occur 0 times in their own file and fr émetteur once. What those files use instead is a transliteration of English \"emitter\" -- ur ایمیٹر 17, cs emitoru 15, de emitter 14, ru эмиттера 14, uk емітера 13, bg емитер 12 -- except fr, whose goutteur 19 is a real field word rather than a loan. The other 18 languages reach 17 to 22 of 22 sites; es emisor, pt emissor and hr emiter reach all of them. So the field-term-over-loanword policy recorded above has NOT in fact been applied in six files, and this entry is out of step with them. Which side moves is a native decision, not a countable one.",
+                "preferred_translation": "kituo cha maji"
             }
         ],
         "u": [
@@ -472,22 +530,22 @@
         "u_hr": "hr",
         "u_day": "day",
         "lpn_tool_vertices": "Vertices",
-        "lpn_field_text_attached": "Attached to",
+        "lpn_field_text_attached": "Attached asset",
         "lpn_result_water_age": "Water age",
-        "lpn_result_water_age_tip": "How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.",
+        "lpn_result_water_age_tip": "How long the water reaching this point has been in the system. There is no regulatory limit to compare it against, so judge the number against your own system.",
         "lpn_result_source_share": "Source share",
-        "lpn_result_source_share_tip": "The source trace share reports how much of the water reaching this point came from the trace node.",
+        "lpn_result_source_share_tip": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports.",
         "lpn_menu_map": "Map",
         "lpn_geomap": "lat\/lon",
-        "lpn_tool_vertices_tip": "Add and remove the bends in a pipe. Click a pipe to put a bend there, click a bend to take it out, and drag a bend to move it.",
-        "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
+        "lpn_tool_vertices_tip": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics.",
+        "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.",
         "lpn_georef_twopt": "Use two known points",
-        "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
+        "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The position, the scale and the rotation all follow from those two points. Press this button again to stop picking.",
         "lpn_georef_twopt_pick1": "Click a point on your drawing whose latitude and longitude you know.",
         "lpn_georef_twopt_pick2": "Now click a second known point, as far from the first one as you can.",
         "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
-        "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
-        "lpn_find_prop_connection": "Connection",
+        "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press the Keep this placement button.",
+        "lpn_find_prop_connection": "Connectivity",
         "lpn_find_op_conn_unlinked": "no links at node",
         "lpn_find_op_conn_noopen": "no open links at node",
         "lpn_find_op_conn_nolinksource": "no link path to a source",
@@ -497,29 +555,29 @@
         "lpn_find_conn_nolinksource": "No link path to a source",
         "lpn_find_conn_noopensource": "No open path to a source",
         "lpn_find_conn_none": "Every node is connected.",
-        "lpn_find_conn_no_fixed": "This network has no reservoir or tank, so it has no source to reach. Only \"no links\" and \"no open links\" can be searched.",
-        "lpn_find_query_tip": "The same search, written as one line. Change the controls and it rewrites itself, or type in it and the controls follow.",
+        "lpn_find_conn_no_fixed": "This network has no reservoir or tank, so there is no source to reach. Only no links at node and no open links at node can be searched.",
+        "lpn_find_query_tip": "The same search, written as one line. Changing the controls rewrites this line, and typing in this line updates the controls.",
         "lpn_find_query_label": "Query",
-        "lpn_find_query_hint": "Expandable with AND, OR, and ()",
+        "lpn_find_query_hint": "Combine conditions with AND, OR and ()",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
-        "lpn_find_q_aside": "These controls cannot write the query below, so they are hidden.",
+        "lpn_find_q_aside": "The controls cannot express the query below, so they are hidden.",
         "lpn_find_q_restore": "Use the controls instead",
-        "lpn_replace_q_bad": "This query cannot be read, so there is nothing to change. Fix it above first.",
+        "lpn_replace_q_bad": "This query cannot be understood, so nothing can be changed. Fix it above first.",
         "lpn_find_q_err_pos": "(at character {n})",
         "lpn_find_q_err_empty": "The query is empty, so nothing will be searched.",
-        "lpn_find_q_err_scope": "Not something to search: {w}. Try one of: {list}",
+        "lpn_find_q_err_scope": "There is nothing called {w} to search. Try one of: {list}",
         "lpn_find_q_err_dot": "Put a dot between what to search and its property, like Junction.ID",
         "lpn_find_q_err_prop": "Not a property of {scope}: {w}. Try one of: {list}",
         "lpn_find_q_err_op": "Not a condition for {prop}: {w}. Try one of: {list}",
         "lpn_find_q_err_value": "This condition needs a value after it: {op}",
         "lpn_find_q_err_quote": "Put quotes around a text value: {w} is not a number.",
         "lpn_find_q_err_quote_end": "This quoted text has no closing quote.",
-        "lpn_find_q_err_close": "This bracket ( was opened and never closed.",
-        "lpn_find_q_err_open": "This bracket ) closes nothing.",
+        "lpn_find_q_err_close": "This parenthesis ( was opened and never closed.",
+        "lpn_find_q_err_open": "This parenthesis ) closes nothing.",
         "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
-        "lpn_replace_source": "New value from",
-        "lpn_replace_asked": "Asked for {n}. The answer is on its way.",
+        "lpn_replace_source": "New value source",
+        "lpn_replace_asked": "Elevations requested for {n} nodes. The results are on their way.",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
         "lpn_profile_edit_click": "Drag any point on the path to move it. Click a point you added to take it off.",
@@ -533,12 +591,12 @@
         "lpn_profile_prompt_name": "Name for this path",
         "lpn_profile_delete_confirm": "Delete the saved path {name}? The drawing itself is not changed.",
         "lpn_profile_none_saved": "No saved paths yet",
-        "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
+        "lpn_profile_missing": "The saved path {name} uses nodes that are not in this project: {ids}",
         "lpn_new_title": "New project",
         "lpn_new_coords": "Coordinates",
-        "lpn_new_coords_xy": "xy grid",
+        "lpn_new_coords_xy": "xy coordinates",
         "lpn_new_coords_geo": "lat\/lon",
-        "lpn_new_coords_tip": "An xy project is a model on any coordinates other than lat\/lon. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File > Import xy to lat\/lon.",
+        "lpn_new_coords_tip": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map.",
         "lpn_new_place": "Start near this place",
         "lpn_new_place_tip": "Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap's place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world.",
         "lpn_new_place_hint": "Petaluma, California",
@@ -547,31 +605,31 @@
         "lpn_inp_drop_energy": "This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_tags": "This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_report": "This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.",
-        "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
+        "lpn_inp_drop_sections": "This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
         "lpn_inp_drop_file_options": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
-        "lpn_inp_drop_demand_model": "This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states whatever pressure results. The line is kept and is written back if you save an EPANET file.",
+        "lpn_inp_drop_demand_model": "This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states, no matter what pressure results. The line is kept and is written back if you save an EPANET file.",
         "lpn_inp_drop_other_options": "This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.",
         "lpn_diag_not_converged_drawn": "The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.",
         "lpn_diag_not_converged_trials": "It stopped after {iterations} iterations.",
-        "lpn_diag_not_converged_error": "It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.",
-        "lpn_mode_vertices": "Mode: Vertices. The bends in every pipe are shown as grips. Click a pipe to add a bend, click a grip to remove it, or drag a grip to move it. Nothing else on the map is changed in this mode.",
-        "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
-        "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
-        "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
-        "lpn_elev_dem_sample": "Sample DEM",
-        "lpn_elev_dem_sample_tip": "Reads the elevation of the DEM at this node and shows it below for review before changing the current entry. The horizontal DEM resolution is about 30 m for most of the Earth, and finer where better data exists.",
+        "lpn_diag_not_converged_error": "It stopped after {iterations} iterations at a relative error of {error}, which did not reach the Accuracy setting of {accuracy}.",
+        "lpn_mode_vertices": "Mode: Vertices. The vertices of every pipe are shown as small square handles. Click a pipe to add a vertex, click a handle to remove it, or drag a handle to move it. Nothing else on the map is changed in this mode.",
+        "lpn_scenario_mark_tip": "The amber ring means this asset holds a value that belongs to the scenario {name} alone.",
+        "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to {base} to see the drawing without them.",
+        "lpn_settings_emitter_exponent_tip": "The exponent in EPANET's emitter equation for sprinklers and leaks: flow = coefficient x pressure raised to this exponent. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
+        "lpn_elev_dem_sample": "Read DEM",
+        "lpn_elev_dem_sample_tip": "Reads the elevation of the DEM at this node and shows it below. Nothing in the Elevation box is changed. The horizontal DEM resolution is about 30 m for most of the Earth, and finer where better data exists.",
         "lpn_elev_dem_use": "Use DEM",
         "lpn_elev_dem_use_tip": "Puts the elevation of the DEM at this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.",
-        "lpn_elev_dem_none": "The DEM gave no height for this node.",
+        "lpn_elev_dem_none": "The DEM has no elevation for this node.",
         "lpn_elev_dem_said": "Mapbox DEM says {v} {u}.",
-        "lpn_settings_elev_source": "Elevation from",
+        "lpn_settings_elev_source": "Elevation source",
         "lpn_settings_elev_source_tip": "Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.",
-        "lpn_settings_elev_source_typed": "The number above",
+        "lpn_settings_elev_source_typed": "The elevation typed above",
         "lpn_settings_elev_source_dem": "Mapbox DEM",
         "lpn_settings_accuracy": "Accuracy",
         "lpn_settings_default_is": "The default is {n}.",
-        "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the flow still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.",
+        "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the amount by which the flows are still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page uses a stricter accuracy than EPANET's own default.",
         "lpn_settings_specific_gravity": "Specific gravity",
         "lpn_settings_specific_gravity_tip": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
         "lpn_settings_viscosity": "Relative viscosity",
@@ -579,50 +637,51 @@
         "lpn_settings_trials": "Maximum trials",
         "lpn_settings_trials_tip": "How many trials are allowed before the solver gives up on a network that will not converge.",
         "lpn_settings_unbalanced": "If it does not converge",
-        "lpn_settings_unbalanced_tip": "What to do with a network that has used up its trials and still has not converged. Keeping on allows the extra trials below, which often reaches convergence; stopping reports the last trial as it stands, which is close but not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.",
-        "lpn_settings_unbalanced_continue": "Keep trying",
-        "lpn_settings_unbalanced_stop": "Stop there",
-        "lpn_settings_unbalanced_trials": "Extra trials first",
+        "lpn_settings_unbalanced_tip": "What to do with a network that has used up its trials and still has not converged. Allowing extra trials often reaches convergence. Stopping reports the last trial as it stands, which is not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.",
+        "lpn_settings_unbalanced_continue": "Allow extra trials",
+        "lpn_settings_unbalanced_stop": "Stop and report the last trial",
+        "lpn_settings_unbalanced_trials": "Extra trials before reporting",
         "lpn_settings_unbalanced_trials_tip": "How many further trials to allow after the maximum above is used up, before the last trial is reported. Only the EPANET solver reads this box.",
         "lpn_settings_head_error": "Head error limit",
-        "lpn_settings_head_error_tip": "An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.",
+        "lpn_settings_head_error_tip": "An additional test the solver must pass before it stops: the largest head error remaining in any one pipe. Zero means do not apply this test. Only the EPANET solver reads this box.",
         "lpn_settings_flow_change": "Flow change limit",
         "lpn_settings_flow_change_tip": "An additional test the solver must pass before it stops: the maximum change in any one pipe's flow from one trial to the next. Zero means do not apply this test. Only the EPANET solver reads this box.",
         "lpn_settings_damp_limit": "Damping starts at",
-        "lpn_settings_damp_limit_tip": "The accuracy at which the solver begins taking smaller steps, which can help a network that is swinging back and forth to converge. Zero means it never does. Only the EPANET solver reads this box.",
+        "lpn_settings_damp_limit_tip": "The accuracy at which the solver begins taking smaller steps, which can help an oscillating network to converge. Zero means the solver never damps. Only the EPANET solver reads this box.",
         "lpn_settings_option_unset": "Not stated",
         "lpn_settings_demand_multiplier": "Demand multiplier",
-        "lpn_settings_demand_multiplier_tip": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project's.",
+        "lpn_settings_demand_multiplier_tip": "A single factor applied to every demand in the network at once. Use it to ask what the system does at more or less than present-day use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project's.",
         "lpn_settings_show_arrows": "Flow direction arrows",
         "lpn_settings_show_arrows_tip": "Draw an arrow on each pipe showing which way the water is running. The arrows appear after a run, and turning them off leaves the results unchanged. This setting is saved with the project.",
-        "lpn_settings_leader_snap": "Snap leader lines to angle",
-        "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
-        "lpn_settings_legend_off": "Off",
+        "lpn_settings_leader_snap": "Snap leader lines to set angles",
+        "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest of the set angles if you drag close to one. Keep dragging and the snap lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
+        "lpn_settings_legend_off": "None",
+        "lpn_settings_snap_off": "Off",
         "lpn_settings_quality": "Water quality",
-        "lpn_settings_quality_track": "Track",
-        "lpn_settings_quality_track_tip": "Choose what the run should trace through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
+        "lpn_settings_quality_track": "Quality parameter",
+        "lpn_settings_quality_track_tip": "Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one needs a concentration or a reaction rate.",
         "lpn_settings_quality_source": "Trace node",
-        "lpn_settings_quality_source_tip": "The point whose water is traced. Every other point then shows the share of its water that came from here.",
+        "lpn_settings_quality_source_tip": "The node whose water is traced. Every other node then shows the share of its water that came from that node.",
         "lpn_quality_none": "Nothing",
         "lpn_quality_age": "Water age",
         "lpn_quality_trace": "Source trace",
-        "lpn_quality_chemical": "A chemical this file names (kept, not worked out)",
-        "lpn_quality_needs_run": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.",
+        "lpn_quality_chemical": "A chemical this file names (stored, not calculated)",
+        "lpn_quality_needs_run": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button.",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_field_base_demand": "Base demand",
-        "lpn_result_demand_tip": "The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
+        "lpn_result_demand_tip": "The flow this node draws at the time step shown: each base demand multiplied by its own pattern, added together. It is calculated, not typed, so it changes with the clock and cannot be edited.",
         "lpn_field_demand_category": "Description",
-        "lpn_field_demand_category_tip": "Name or description of the category.",
+        "lpn_field_demand_category_tip": "Name or description of this demand category.",
         "lpn_demand_add": "Add demand category",
-        "lpn_demand_add_tip": "Add another demand at this junction, with its own base demand, pattern and description. The demands add up.",
+        "lpn_demand_add_tip": "Add another demand category at this junction, with its own base demand, pattern and description. The categories add up.",
         "lpn_demand_remove": "Remove this demand",
-        "lpn_terrain_will_ids": "These are the nodes that will be filled in: {ids}",
-        "lpn_terrain_keep_ids": "They are: {ids}",
-        "lpn_terrain_filled_ids": "These nodes were filled in: {ids}",
-        "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
+        "lpn_terrain_will_ids": "These nodes will get an elevation: {ids}",
+        "lpn_terrain_keep_ids": "Those nodes are: {ids}",
+        "lpn_terrain_filled_ids": "These nodes got an elevation: {ids}",
+        "lpn_terrain_blank_ids": "These nodes still have no elevation: {ids}",
         "lpn_terrain_ids_more": "{ids}, and {n} more",
         "lpn_ff_menu": "Fire flow…",
-        "lpn_ff_menu_tip": "Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there create unacceptable drawdown anywhere else?",
+        "lpn_ff_menu_tip": "Test junctions one at a time: how much can each deliver while still holding the residual pressure you set, and does drawing the required flow there push anything else out of limits?",
         "lpn_ff_title": "Fire flow",
         "lpn_ff_intro": "Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.",
         "lpn_ff_scope": "Junctions to test",
@@ -632,42 +691,42 @@
         "lpn_ff_no_junctions": "This project has no junctions yet, so there is nothing to test.",
         "lpn_ff_no_selection": "No junction is selected. Choose one on the map, or test every junction.",
         "lpn_ff_required": "Required fire flow",
-        "lpn_ff_required_tip": "The flow required by your code or your fire authority at a hydrant. Each junction is tested against this number, unless it carries a required fire flow of its own.",
+        "lpn_ff_required_tip": "The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.",
         "lpn_ff_required_own": "Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.",
-        "lpn_ff_required_node_tip": "The fire flow this junction alone must provide, from your code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Fire flow box.",
+        "lpn_ff_required_node_tip": "The fire flow required at this particular junction, from your fire code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Required fire flow box.",
         "lpn_ff_residual": "Residual pressure to hold",
-        "lpn_ff_residual_tip": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
+        "lpn_ff_residual_tip": "The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).",
         "lpn_ff_design": "Design check (effect on system)",
-        "lpn_ff_design_tip": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.",
+        "lpn_ff_design_tip": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation.",
         "lpn_ff_design_off": "Do not check",
-        "lpn_ff_design_nodes": "Every other junction",
-        "lpn_ff_design_all": "Every other junction and every pipe",
+        "lpn_ff_design_nodes": "All other junctions",
+        "lpn_ff_design_all": "All other junctions and all pipes",
         "lpn_ff_minpressure": "Lowest pressure allowed elsewhere",
         "lpn_ff_minpressure_tip": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
         "lpn_ff_maxvelocity": "Highest velocity allowed",
         "lpn_ff_maxvelocity_tip": "A pipe running above this while a fire flow is drawn is reported as a design issue.",
-        "lpn_ff_accounting": "Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral, and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.",
+        "lpn_ff_accounting": "Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral pipe and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.",
         "lpn_ff_engine_native": "This is worked out with the built-in solver.",
         "lpn_ff_engine_epanet": "This is worked out with the EPANET engine.",
         "lpn_ff_engine_cost": "Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.",
-        "lpn_ff_steady": "Only the current time step is tested. Fire flow is normally added to maximum day demand.",
+        "lpn_ff_steady": "Only the time step now on screen is tested. Fire flow is normally tested on top of maximum day demand, so set the network to that condition before you run.",
         "lpn_ff_run_title": "Fire flow run",
         "lpn_ff_calculate": "Run",
         "lpn_ff_stop": "Stop",
         "lpn_ff_working": "Working: {done} of {total} junctions.",
-        "lpn_ff_stopped": "Stopped after {done} of {total} junctions. What is below is what had already been worked out.",
-        "lpn_ff_cost": "{solves} network runs.",
+        "lpn_ff_stopped": "Stopped after {done} of {total} junctions. The results below are the ones already finished.",
+        "lpn_ff_cost": "This run solved the whole network {solves} times.",
         "lpn_ff_stale": "The drawing changed, so the fire flow results were cleared. Run it again.",
-        "lpn_ff_summary": "{clean} with nothing wrong. {fire} failed the fire flow. {design} affected the rest of the system.",
-        "lpn_ff_summary_error": "{n} could not be answered.",
+        "lpn_ff_summary": "{clean} junctions had nothing wrong. {fire} junctions failed the fire flow. {design} junctions affected the rest of the system.",
+        "lpn_ff_summary_error": "{n} junctions could not be answered.",
         "lpn_ff_report_all": "Every junction tested",
         "lpn_ff_col_junction": "Junction",
         "lpn_ff_col_static": "Static pressure",
         "lpn_ff_col_available": "Available flow",
         "lpn_ff_col_required": "Required flow",
         "lpn_ff_col_residual": "Residual held",
-        "lpn_ff_col_atrequired": "Pressure at required",
-        "lpn_ff_col_affected": "Drawdowns",
+        "lpn_ff_col_atrequired": "Pressure at required flow",
+        "lpn_ff_col_affected": "Worst effect",
         "lpn_ff_col_limit": "Design limit",
         "lpn_ff_not_checked": "Not checked",
         "lpn_ff_static_failed": "Static failed, so not checked",
@@ -676,47 +735,43 @@
         "lpn_ff_mode_design": "Design",
         "lpn_ff_mode_none": "None",
         "lpn_ff_col_solves": "Runs",
-        "lpn_ff_col_result": "Result",
         "lpn_ff_limit_pressure": "Pressure",
         "lpn_ff_limit_velocity": "Velocity",
         "lpn_ff_limit_both": "Pressure and velocity",
-        "lpn_ff_state_pass": "Passing",
-        "lpn_ff_state_fail": "Failing",
-        "lpn_ff_state_design": "Design issue",
-        "lpn_ff_state_error": "No answer",
-        "lpn_ff_atleast": "over {flow}",
-        "lpn_ff_affect_node": "{id} down to {pressure}",
-        "lpn_ff_affect_link": "{id} at {velocity}",
-        "lpn_ff_more": "and {n} more",
-        "lpn_ff_design_none": "Nothing in the chosen set was drawn down by any junction tested.",
+        "lpn_ff_atleast": "more than {flow}",
+        "lpn_ff_affect_node": "{id} drops to {pressure}",
+        "lpn_ff_affect_link": "{id} reaches {velocity}",
+        "lpn_ff_more": "and {n} more affected",
+        "lpn_ff_rows_more": "{n} more junctions are not shown.",
+        "lpn_ff_design_none": "Nothing in the chosen set went outside its limits while any junction drew its fire flow.",
         "lpn_ff_design_off_note": "The effect on the rest of the system was not checked in this run.",
-        "lpn_ff_iso": "ISO credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.",
-        "lpn_ff_err_at_rest": "Already below the residual with nothing drawn",
+        "lpn_ff_iso": "The Insurance Services Office (ISO) credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.",
+        "lpn_ff_err_at_rest": "Already below the residual before any fire flow is drawn",
         "lpn_ff_err_converge": "The network did not converge.",
         "lpn_ff_err_solve": "The solver reported an error and gave no answer.",
         "lpn_ff_err_not_junction": "Not a junction",
-        "lpn_ff_err_unknown": "No answer, and the reason given is {id}"
+        "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
     "keys": {
         "u_hr": "hr",
         "u_day": "day",
         "lpn_tool_vertices": "Vertices",
-        "lpn_field_text_attached": "Attached to",
+        "lpn_field_text_attached": "Attached asset",
         "lpn_result_water_age": "Water age",
-        "lpn_result_water_age_tip": "How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.",
+        "lpn_result_water_age_tip": "How long the water reaching this point has been in the system. There is no regulatory limit to compare it against, so judge the number against your own system.",
         "lpn_result_source_share": "Source share",
-        "lpn_result_source_share_tip": "The source trace share reports how much of the water reaching this point came from the trace node.",
+        "lpn_result_source_share_tip": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports.",
         "lpn_menu_map": "Map",
         "lpn_geomap": "lat\/lon",
-        "lpn_tool_vertices_tip": "Add and remove the bends in a pipe. Click a pipe to put a bend there, click a bend to take it out, and drag a bend to move it.",
-        "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
+        "lpn_tool_vertices_tip": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics.",
+        "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.",
         "lpn_georef_twopt": "Use two known points",
-        "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
+        "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The position, the scale and the rotation all follow from those two points. Press this button again to stop picking.",
         "lpn_georef_twopt_pick1": "Click a point on your drawing whose latitude and longitude you know.",
         "lpn_georef_twopt_pick2": "Now click a second known point, as far from the first one as you can.",
         "lpn_georef_twopt_same": "That is the point you picked first. Pick a different one.",
-        "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press Keep this placement.",
-        "lpn_find_prop_connection": "Connection",
+        "lpn_georef_twopt_done": "The model now sits on the two points you gave. Check it, then press the Keep this placement button.",
+        "lpn_find_prop_connection": "Connectivity",
         "lpn_find_op_conn_unlinked": "no links at node",
         "lpn_find_op_conn_noopen": "no open links at node",
         "lpn_find_op_conn_nolinksource": "no link path to a source",
@@ -726,29 +781,29 @@
         "lpn_find_conn_nolinksource": "No link path to a source",
         "lpn_find_conn_noopensource": "No open path to a source",
         "lpn_find_conn_none": "Every node is connected.",
-        "lpn_find_conn_no_fixed": "This network has no reservoir or tank, so it has no source to reach. Only \"no links\" and \"no open links\" can be searched.",
-        "lpn_find_query_tip": "The same search, written as one line. Change the controls and it rewrites itself, or type in it and the controls follow.",
+        "lpn_find_conn_no_fixed": "This network has no reservoir or tank, so there is no source to reach. Only no links at node and no open links at node can be searched.",
+        "lpn_find_query_tip": "The same search, written as one line. Changing the controls rewrites this line, and typing in this line updates the controls.",
         "lpn_find_query_label": "Query",
-        "lpn_find_query_hint": "Expandable with AND, OR, and ()",
+        "lpn_find_query_hint": "Combine conditions with AND, OR and ()",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
-        "lpn_find_q_aside": "These controls cannot write the query below, so they are hidden.",
+        "lpn_find_q_aside": "The controls cannot express the query below, so they are hidden.",
         "lpn_find_q_restore": "Use the controls instead",
-        "lpn_replace_q_bad": "This query cannot be read, so there is nothing to change. Fix it above first.",
+        "lpn_replace_q_bad": "This query cannot be understood, so nothing can be changed. Fix it above first.",
         "lpn_find_q_err_pos": "(at character {n})",
         "lpn_find_q_err_empty": "The query is empty, so nothing will be searched.",
-        "lpn_find_q_err_scope": "Not something to search: {w}. Try one of: {list}",
+        "lpn_find_q_err_scope": "There is nothing called {w} to search. Try one of: {list}",
         "lpn_find_q_err_dot": "Put a dot between what to search and its property, like Junction.ID",
         "lpn_find_q_err_prop": "Not a property of {scope}: {w}. Try one of: {list}",
         "lpn_find_q_err_op": "Not a condition for {prop}: {w}. Try one of: {list}",
         "lpn_find_q_err_value": "This condition needs a value after it: {op}",
         "lpn_find_q_err_quote": "Put quotes around a text value: {w} is not a number.",
         "lpn_find_q_err_quote_end": "This quoted text has no closing quote.",
-        "lpn_find_q_err_close": "This bracket ( was opened and never closed.",
-        "lpn_find_q_err_open": "This bracket ) closes nothing.",
+        "lpn_find_q_err_close": "This parenthesis ( was opened and never closed.",
+        "lpn_find_q_err_open": "This parenthesis ) closes nothing.",
         "lpn_find_q_err_end": "Nothing was expected after this. Join two searches with {and} or {or}.",
-        "lpn_replace_source": "New value from",
-        "lpn_replace_asked": "Asked for {n}. The answer is on its way.",
+        "lpn_replace_source": "New value source",
+        "lpn_replace_asked": "Elevations requested for {n} nodes. The results are on their way.",
         "lpn_profile_edit": "Edit",
         "lpn_profile_edit_tip": "Change one end of the path, or take one node off it, without drawing the whole path again.",
         "lpn_profile_edit_click": "Drag any point on the path to move it. Click a point you added to take it off.",
@@ -762,12 +817,12 @@
         "lpn_profile_prompt_name": "Name for this path",
         "lpn_profile_delete_confirm": "Delete the saved path {name}? The drawing itself is not changed.",
         "lpn_profile_none_saved": "No saved paths yet",
-        "lpn_profile_missing": "{name} names nodes that are not in this project: {ids}",
+        "lpn_profile_missing": "The saved path {name} uses nodes that are not in this project: {ids}",
         "lpn_new_title": "New project",
         "lpn_new_coords": "Coordinates",
-        "lpn_new_coords_xy": "xy grid",
+        "lpn_new_coords_xy": "xy coordinates",
         "lpn_new_coords_geo": "lat\/lon",
-        "lpn_new_coords_tip": "An xy project is a model on any coordinates other than lat\/lon. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File > Import xy to lat\/lon.",
+        "lpn_new_coords_tip": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map.",
         "lpn_new_place": "Start near this place",
         "lpn_new_place_tip": "Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap's place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world.",
         "lpn_new_place_hint": "Petaluma, California",
@@ -776,31 +831,31 @@
         "lpn_inp_drop_energy": "This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_tags": "This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_report": "This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.",
-        "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
+        "lpn_inp_drop_sections": "This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
         "lpn_inp_drop_file_options": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
-        "lpn_inp_drop_demand_model": "This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states whatever pressure results. The line is kept and is written back if you save an EPANET file.",
+        "lpn_inp_drop_demand_model": "This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states, no matter what pressure results. The line is kept and is written back if you save an EPANET file.",
         "lpn_inp_drop_other_options": "This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.",
         "lpn_diag_not_converged_drawn": "The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.",
         "lpn_diag_not_converged_trials": "It stopped after {iterations} iterations.",
-        "lpn_diag_not_converged_error": "It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.",
-        "lpn_mode_vertices": "Mode: Vertices. The bends in every pipe are shown as grips. Click a pipe to add a bend, click a grip to remove it, or drag a grip to move it. Nothing else on the map is changed in this mode.",
-        "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
-        "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
-        "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
-        "lpn_elev_dem_sample": "Sample DEM",
-        "lpn_elev_dem_sample_tip": "Reads the elevation of the DEM at this node and shows it below for review before changing the current entry. The horizontal DEM resolution is about 30 m for most of the Earth, and finer where better data exists.",
+        "lpn_diag_not_converged_error": "It stopped after {iterations} iterations at a relative error of {error}, which did not reach the Accuracy setting of {accuracy}.",
+        "lpn_mode_vertices": "Mode: Vertices. The vertices of every pipe are shown as small square handles. Click a pipe to add a vertex, click a handle to remove it, or drag a handle to move it. Nothing else on the map is changed in this mode.",
+        "lpn_scenario_mark_tip": "The amber ring means this asset holds a value that belongs to the scenario {name} alone.",
+        "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to {base} to see the drawing without them.",
+        "lpn_settings_emitter_exponent_tip": "The exponent in EPANET's emitter equation for sprinklers and leaks: flow = coefficient x pressure raised to this exponent. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
+        "lpn_elev_dem_sample": "Read DEM",
+        "lpn_elev_dem_sample_tip": "Reads the elevation of the DEM at this node and shows it below. Nothing in the Elevation box is changed. The horizontal DEM resolution is about 30 m for most of the Earth, and finer where better data exists.",
         "lpn_elev_dem_use": "Use DEM",
         "lpn_elev_dem_use_tip": "Puts the elevation of the DEM at this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.",
-        "lpn_elev_dem_none": "The DEM gave no height for this node.",
+        "lpn_elev_dem_none": "The DEM has no elevation for this node.",
         "lpn_elev_dem_said": "Mapbox DEM says {v} {u}.",
-        "lpn_settings_elev_source": "Elevation from",
+        "lpn_settings_elev_source": "Elevation source",
         "lpn_settings_elev_source_tip": "Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.",
-        "lpn_settings_elev_source_typed": "The number above",
+        "lpn_settings_elev_source_typed": "The elevation typed above",
         "lpn_settings_elev_source_dem": "Mapbox DEM",
         "lpn_settings_accuracy": "Accuracy",
         "lpn_settings_default_is": "The default is {n}.",
-        "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the flow still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.",
+        "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the amount by which the flows are still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page uses a stricter accuracy than EPANET's own default.",
         "lpn_settings_specific_gravity": "Specific gravity",
         "lpn_settings_specific_gravity_tip": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
         "lpn_settings_viscosity": "Relative viscosity",
@@ -808,50 +863,51 @@
         "lpn_settings_trials": "Maximum trials",
         "lpn_settings_trials_tip": "How many trials are allowed before the solver gives up on a network that will not converge.",
         "lpn_settings_unbalanced": "If it does not converge",
-        "lpn_settings_unbalanced_tip": "What to do with a network that has used up its trials and still has not converged. Keeping on allows the extra trials below, which often reaches convergence; stopping reports the last trial as it stands, which is close but not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.",
-        "lpn_settings_unbalanced_continue": "Keep trying",
-        "lpn_settings_unbalanced_stop": "Stop there",
-        "lpn_settings_unbalanced_trials": "Extra trials first",
+        "lpn_settings_unbalanced_tip": "What to do with a network that has used up its trials and still has not converged. Allowing extra trials often reaches convergence. Stopping reports the last trial as it stands, which is not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.",
+        "lpn_settings_unbalanced_continue": "Allow extra trials",
+        "lpn_settings_unbalanced_stop": "Stop and report the last trial",
+        "lpn_settings_unbalanced_trials": "Extra trials before reporting",
         "lpn_settings_unbalanced_trials_tip": "How many further trials to allow after the maximum above is used up, before the last trial is reported. Only the EPANET solver reads this box.",
         "lpn_settings_head_error": "Head error limit",
-        "lpn_settings_head_error_tip": "An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.",
+        "lpn_settings_head_error_tip": "An additional test the solver must pass before it stops: the largest head error remaining in any one pipe. Zero means do not apply this test. Only the EPANET solver reads this box.",
         "lpn_settings_flow_change": "Flow change limit",
         "lpn_settings_flow_change_tip": "An additional test the solver must pass before it stops: the maximum change in any one pipe's flow from one trial to the next. Zero means do not apply this test. Only the EPANET solver reads this box.",
         "lpn_settings_damp_limit": "Damping starts at",
-        "lpn_settings_damp_limit_tip": "The accuracy at which the solver begins taking smaller steps, which can help a network that is swinging back and forth to converge. Zero means it never does. Only the EPANET solver reads this box.",
+        "lpn_settings_damp_limit_tip": "The accuracy at which the solver begins taking smaller steps, which can help an oscillating network to converge. Zero means the solver never damps. Only the EPANET solver reads this box.",
         "lpn_settings_option_unset": "Not stated",
         "lpn_settings_demand_multiplier": "Demand multiplier",
-        "lpn_settings_demand_multiplier_tip": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project's.",
+        "lpn_settings_demand_multiplier_tip": "A single factor applied to every demand in the network at once. Use it to ask what the system does at more or less than present-day use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project's.",
         "lpn_settings_show_arrows": "Flow direction arrows",
         "lpn_settings_show_arrows_tip": "Draw an arrow on each pipe showing which way the water is running. The arrows appear after a run, and turning them off leaves the results unchanged. This setting is saved with the project.",
-        "lpn_settings_leader_snap": "Snap leader lines to angle",
-        "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
-        "lpn_settings_legend_off": "Off",
+        "lpn_settings_leader_snap": "Snap leader lines to set angles",
+        "lpn_settings_leader_snap_tip": "When you drag a label away from what it names, the line back to it is pulled onto the nearest of the set angles if you drag close to one. Keep dragging and the snap lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
+        "lpn_settings_legend_off": "None",
+        "lpn_settings_snap_off": "Off",
         "lpn_settings_quality": "Water quality",
-        "lpn_settings_quality_track": "Track",
-        "lpn_settings_quality_track_tip": "Choose what the run should trace through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
+        "lpn_settings_quality_track": "Quality parameter",
+        "lpn_settings_quality_track_tip": "Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one needs a concentration or a reaction rate.",
         "lpn_settings_quality_source": "Trace node",
-        "lpn_settings_quality_source_tip": "The point whose water is traced. Every other point then shows the share of its water that came from here.",
+        "lpn_settings_quality_source_tip": "The node whose water is traced. Every other node then shows the share of its water that came from that node.",
         "lpn_quality_none": "Nothing",
         "lpn_quality_age": "Water age",
         "lpn_quality_trace": "Source trace",
-        "lpn_quality_chemical": "A chemical this file names (kept, not worked out)",
-        "lpn_quality_needs_run": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.",
+        "lpn_quality_chemical": "A chemical this file names (stored, not calculated)",
+        "lpn_quality_needs_run": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button.",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_field_base_demand": "Base demand",
-        "lpn_result_demand_tip": "The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
+        "lpn_result_demand_tip": "The flow this node draws at the time step shown: each base demand multiplied by its own pattern, added together. It is calculated, not typed, so it changes with the clock and cannot be edited.",
         "lpn_field_demand_category": "Description",
-        "lpn_field_demand_category_tip": "Name or description of the category.",
+        "lpn_field_demand_category_tip": "Name or description of this demand category.",
         "lpn_demand_add": "Add demand category",
-        "lpn_demand_add_tip": "Add another demand at this junction, with its own base demand, pattern and description. The demands add up.",
+        "lpn_demand_add_tip": "Add another demand category at this junction, with its own base demand, pattern and description. The categories add up.",
         "lpn_demand_remove": "Remove this demand",
-        "lpn_terrain_will_ids": "These are the nodes that will be filled in: {ids}",
-        "lpn_terrain_keep_ids": "They are: {ids}",
-        "lpn_terrain_filled_ids": "These nodes were filled in: {ids}",
-        "lpn_terrain_blank_ids": "These nodes are still blank: {ids}",
+        "lpn_terrain_will_ids": "These nodes will get an elevation: {ids}",
+        "lpn_terrain_keep_ids": "Those nodes are: {ids}",
+        "lpn_terrain_filled_ids": "These nodes got an elevation: {ids}",
+        "lpn_terrain_blank_ids": "These nodes still have no elevation: {ids}",
         "lpn_terrain_ids_more": "{ids}, and {n} more",
         "lpn_ff_menu": "Fire flow…",
-        "lpn_ff_menu_tip": "Test every junction: how much can it deliver while it still holds its residual pressure, and does drawing the required flow there create unacceptable drawdown anywhere else?",
+        "lpn_ff_menu_tip": "Test junctions one at a time: how much can each deliver while still holding the residual pressure you set, and does drawing the required flow there push anything else out of limits?",
         "lpn_ff_title": "Fire flow",
         "lpn_ff_intro": "Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.",
         "lpn_ff_scope": "Junctions to test",
@@ -861,42 +917,42 @@
         "lpn_ff_no_junctions": "This project has no junctions yet, so there is nothing to test.",
         "lpn_ff_no_selection": "No junction is selected. Choose one on the map, or test every junction.",
         "lpn_ff_required": "Required fire flow",
-        "lpn_ff_required_tip": "The flow required by your code or your fire authority at a hydrant. Each junction is tested against this number, unless it carries a required fire flow of its own.",
+        "lpn_ff_required_tip": "The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.",
         "lpn_ff_required_own": "Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.",
-        "lpn_ff_required_node_tip": "The fire flow this junction alone must provide, from your code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Fire flow box.",
+        "lpn_ff_required_node_tip": "The fire flow required at this particular junction, from your fire code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Required fire flow box.",
         "lpn_ff_residual": "Residual pressure to hold",
-        "lpn_ff_residual_tip": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
+        "lpn_ff_residual_tip": "The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).",
         "lpn_ff_design": "Design check (effect on system)",
-        "lpn_ff_design_tip": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.",
+        "lpn_ff_design_tip": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation.",
         "lpn_ff_design_off": "Do not check",
-        "lpn_ff_design_nodes": "Every other junction",
-        "lpn_ff_design_all": "Every other junction and every pipe",
+        "lpn_ff_design_nodes": "All other junctions",
+        "lpn_ff_design_all": "All other junctions and all pipes",
         "lpn_ff_minpressure": "Lowest pressure allowed elsewhere",
         "lpn_ff_minpressure_tip": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
         "lpn_ff_maxvelocity": "Highest velocity allowed",
         "lpn_ff_maxvelocity_tip": "A pipe running above this while a fire flow is drawn is reported as a design issue.",
-        "lpn_ff_accounting": "Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral, and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.",
+        "lpn_ff_accounting": "Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral pipe and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.",
         "lpn_ff_engine_native": "This is worked out with the built-in solver.",
         "lpn_ff_engine_epanet": "This is worked out with the EPANET engine.",
         "lpn_ff_engine_cost": "Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. You can stop it at any time and keep what it has already worked out.",
-        "lpn_ff_steady": "Only the current time step is tested. Fire flow is normally added to maximum day demand.",
+        "lpn_ff_steady": "Only the time step now on screen is tested. Fire flow is normally tested on top of maximum day demand, so set the network to that condition before you run.",
         "lpn_ff_run_title": "Fire flow run",
         "lpn_ff_calculate": "Run",
         "lpn_ff_stop": "Stop",
         "lpn_ff_working": "Working: {done} of {total} junctions.",
-        "lpn_ff_stopped": "Stopped after {done} of {total} junctions. What is below is what had already been worked out.",
-        "lpn_ff_cost": "{solves} network runs.",
+        "lpn_ff_stopped": "Stopped after {done} of {total} junctions. The results below are the ones already finished.",
+        "lpn_ff_cost": "This run solved the whole network {solves} times.",
         "lpn_ff_stale": "The drawing changed, so the fire flow results were cleared. Run it again.",
-        "lpn_ff_summary": "{clean} with nothing wrong. {fire} failed the fire flow. {design} affected the rest of the system.",
-        "lpn_ff_summary_error": "{n} could not be answered.",
+        "lpn_ff_summary": "{clean} junctions had nothing wrong. {fire} junctions failed the fire flow. {design} junctions affected the rest of the system.",
+        "lpn_ff_summary_error": "{n} junctions could not be answered.",
         "lpn_ff_report_all": "Every junction tested",
         "lpn_ff_col_junction": "Junction",
         "lpn_ff_col_static": "Static pressure",
         "lpn_ff_col_available": "Available flow",
         "lpn_ff_col_required": "Required flow",
         "lpn_ff_col_residual": "Residual held",
-        "lpn_ff_col_atrequired": "Pressure at required",
-        "lpn_ff_col_affected": "Drawdowns",
+        "lpn_ff_col_atrequired": "Pressure at required flow",
+        "lpn_ff_col_affected": "Worst effect",
         "lpn_ff_col_limit": "Design limit",
         "lpn_ff_not_checked": "Not checked",
         "lpn_ff_static_failed": "Static failed, so not checked",
@@ -905,26 +961,22 @@
         "lpn_ff_mode_design": "Design",
         "lpn_ff_mode_none": "None",
         "lpn_ff_col_solves": "Runs",
-        "lpn_ff_col_result": "Result",
         "lpn_ff_limit_pressure": "Pressure",
         "lpn_ff_limit_velocity": "Velocity",
         "lpn_ff_limit_both": "Pressure and velocity",
-        "lpn_ff_state_pass": "Passing",
-        "lpn_ff_state_fail": "Failing",
-        "lpn_ff_state_design": "Design issue",
-        "lpn_ff_state_error": "No answer",
-        "lpn_ff_atleast": "over {flow}",
-        "lpn_ff_affect_node": "{id} down to {pressure}",
-        "lpn_ff_affect_link": "{id} at {velocity}",
-        "lpn_ff_more": "and {n} more",
-        "lpn_ff_design_none": "Nothing in the chosen set was drawn down by any junction tested.",
+        "lpn_ff_atleast": "more than {flow}",
+        "lpn_ff_affect_node": "{id} drops to {pressure}",
+        "lpn_ff_affect_link": "{id} reaches {velocity}",
+        "lpn_ff_more": "and {n} more affected",
+        "lpn_ff_rows_more": "{n} more junctions are not shown.",
+        "lpn_ff_design_none": "Nothing in the chosen set went outside its limits while any junction drew its fire flow.",
         "lpn_ff_design_off_note": "The effect on the rest of the system was not checked in this run.",
-        "lpn_ff_iso": "ISO credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.",
-        "lpn_ff_err_at_rest": "Already below the residual with nothing drawn",
+        "lpn_ff_iso": "The Insurance Services Office (ISO) credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.",
+        "lpn_ff_err_at_rest": "Already below the residual before any fire flow is drawn",
         "lpn_ff_err_converge": "The network did not converge.",
         "lpn_ff_err_solve": "The solver reported an error and gave no answer.",
         "lpn_ff_err_not_junction": "Not a junction",
-        "lpn_ff_err_unknown": "No answer, and the reason given is {id}"
+        "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
     "key_context": {
         "u_hr": {
@@ -1083,7 +1135,7 @@
                 "next_translated": {
                     "key": "lpn_file_import_geo",
                     "value": "Badilisha kuwa lat\/lon…",
-                    "english": "Import xy to lat\/lon…"
+                    "english": "Open an xy file on the map…"
                 }
             }
         },
@@ -2134,7 +2186,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "Ubora wa maji, miitikio ya kemikali, na mipangilio ya nishati ya pampu iliachwa nje. Ukurasa huu unatatua mtiririko na shinikizo tu.",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of that substance enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2150,7 +2202,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "Ubora wa maji, miitikio ya kemikali, na mipangilio ya nishati ya pampu iliachwa nje. Ukurasa huu unatatua mtiririko na shinikizo tu.",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of that substance enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2166,7 +2218,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "Ubora wa maji, miitikio ya kemikali, na mipangilio ya nishati ya pampu iliachwa nje. Ukurasa huu unatatua mtiririko na shinikizo tu.",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of that substance enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2182,7 +2234,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "Ubora wa maji, miitikio ya kemikali, na mipangilio ya nishati ya pampu iliachwa nje. Ukurasa huu unatatua mtiririko na shinikizo tu.",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of that substance enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2198,7 +2250,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "Ubora wa maji, miitikio ya kemikali, na mipangilio ya nishati ya pampu iliachwa nje. Ukurasa huu unatatua mtiririko na shinikizo tu.",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of that substance enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2214,7 +2266,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "Ubora wa maji, miitikio ya kemikali, na mipangilio ya nishati ya pampu iliachwa nje. Ukurasa huu unatatua mtiririko na shinikizo tu.",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of that substance enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2230,7 +2282,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "Ubora wa maji, miitikio ya kemikali, na mipangilio ya nishati ya pampu iliachwa nje. Ukurasa huu unatatua mtiririko na shinikizo tu.",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of that substance enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2246,7 +2298,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "Ubora wa maji, miitikio ya kemikali, na mipangilio ya nishati ya pampu iliachwa nje. Ukurasa huu unatatua mtiririko na shinikizo tu.",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of that substance enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_backdrop",
@@ -2315,7 +2367,7 @@
                 "next_translated": {
                     "key": "lpn_select_first",
                     "value": "Hakuna kilichochaguliwa. Bofya kipengele kwenye ramani kwanza, kisha bonyeza Futa.",
-                    "english": "Nothing is picked. Click an asset on the map first, then press Delete."
+                    "english": "Nothing is selected. Click an asset on the map first, then press Delete."
                 }
             }
         },
@@ -2991,6 +3043,22 @@
                 }
             }
         },
+        "lpn_settings_snap_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Nafasi ya ufunguo wa ramani",
+                    "english": "Labels legend position"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_top_left",
+                    "value": "Juu kushoto",
+                    "english": "Top left"
+                }
+            }
+        },
         "lpn_settings_quality": {
             "reason": "missing",
             "current_value": null,
@@ -3206,7 +3274,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Jinsi mahitaji ya muunganiko huu yanavyopanda na kushuka wakati wa uendeshaji. Acha kwenye Hakuna muundo ili kufuata muundo wa mradi wenyewe.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern and the junction follows the project’s Default Pattern instead."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -3222,7 +3290,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Jinsi mahitaji ya muunganiko huu yanavyopanda na kushuka wakati wa uendeshaji. Acha kwenye Hakuna muundo ili kufuata muundo wa mradi wenyewe.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern and the junction follows the project’s Default Pattern instead."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -3238,7 +3306,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Jinsi mahitaji ya muunganiko huu yanavyopanda na kushuka wakati wa uendeshaji. Acha kwenye Hakuna muundo ili kufuata muundo wa mradi wenyewe.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern and the junction follows the project’s Default Pattern instead."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -3254,7 +3322,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Jinsi mahitaji ya muunganiko huu yanavyopanda na kushuka wakati wa uendeshaji. Acha kwenye Hakuna muundo ili kufuata muundo wa mradi wenyewe.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern and the junction follows the project’s Default Pattern instead."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -3270,7 +3338,7 @@
                 "previous_translated": {
                     "key": "lpn_field_demand_pattern_tip",
                     "value": "Jinsi mahitaji ya muunganiko huu yanavyopanda na kushuka wakati wa uendeshaji. Acha kwenye Hakuna muundo ili kufuata muundo wa mradi wenyewe.",
-                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern to use the project’s specified default pattern."
+                    "english": "How this junction’s demand rises and falls through the run. Leave it at No pattern and the junction follows the project’s Default Pattern instead."
                 },
                 "next_translated": {
                     "key": "lpn_field_head_pattern",
@@ -3999,18 +4067,6 @@
                 "next_translated": null
             }
         },
-        "lpn_ff_col_result": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_terrain_partial",
-                    "value": "Vigae {f} vya ardhi havikujibu.",
-                    "english": "{f} terrain tile(s) did not answer."
-                },
-                "next_translated": null
-            }
-        },
         "lpn_ff_limit_pressure": {
             "reason": "missing",
             "current_value": null,
@@ -4036,54 +4092,6 @@
             }
         },
         "lpn_ff_limit_both": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_terrain_partial",
-                    "value": "Vigae {f} vya ardhi havikujibu.",
-                    "english": "{f} terrain tile(s) did not answer."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_ff_state_pass": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_terrain_partial",
-                    "value": "Vigae {f} vya ardhi havikujibu.",
-                    "english": "{f} terrain tile(s) did not answer."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_ff_state_fail": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_terrain_partial",
-                    "value": "Vigae {f} vya ardhi havikujibu.",
-                    "english": "{f} terrain tile(s) did not answer."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_ff_state_design": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_terrain_partial",
-                    "value": "Vigae {f} vya ardhi havikujibu.",
-                    "english": "{f} terrain tile(s) did not answer."
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_ff_state_error": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -4132,6 +4140,18 @@
             }
         },
         "lpn_ff_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "Vigae {f} vya ardhi havikujibu.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_rows_more": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

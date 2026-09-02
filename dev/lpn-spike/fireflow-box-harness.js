@@ -274,7 +274,7 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	// 2026-09-01 ruling surviving the move: they are one reading, and a flow without the pressure it
 	// was held at is a number without its condition.
 	const wantOrder = ['Junction', 'Static pressure', 'Required flow', 'Pressure at required',
-		'Available flow', 'Residual held', 'Drawdowns', 'Design limit', 'Runs', 'Failure modes'];
+		'Available flow', 'Residual held', 'Worst effect', 'Design limit', 'Runs', 'Failure modes'];
 	let cursor = -1, inOrder = true;
 	wantOrder.forEach(function (h) {
 		const at = report.indexOf(h);
@@ -286,10 +286,10 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	ok('and it is ten columns wide', headCells(byId.lpn_ff_report) === 10,
 		String(headCells(byId.lpn_ff_report)));
 	ok('the summary counts the two failure modes and the clean junctions',
-		report.indexOf('with nothing wrong') >= 0 &&
+		report.indexOf('had nothing wrong') >= 0 &&
 		report.indexOf('failed the fire flow') >= 0 &&
 		report.indexOf('affected the rest of the system') >= 0);
-	ok('the ISO credit limit travels with the numbers', report.indexOf('ISO credits') >= 0);
+	ok('the ISO credit limit travels with the numbers', report.indexOf('(ISO) credits') >= 0);
 	// The table has a heading row plus one row per junction, capped -- the example is well under
 	// the cap, so every junction is printed.
 	ok('the table prints one row per tested junction, plus the heading',

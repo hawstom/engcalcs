@@ -630,12 +630,12 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	// bare "no links" did not say WHOSE links, where its two siblings both name what is missing and
 	// from where. The other two are unchanged.
 	ok('a connection condition is the whole sentence, with no value',
-		lineFor('junction', 'connection', 'conn-unlinked', '') === 'Junction.Connection no links at node',
+		lineFor('junction', 'connection', 'conn-unlinked', '') === 'Junction.Connectivity no links at node',
 		JSON.stringify(L.queryText()));
 	// **ALL FOUR WORDINGS ARE TOM'S OWN** (2026-08-26, the local pair reworded 2026-08-29), and so
 	// is the widening order.
 	ok('the local pair reads as a fact about this node\'s own links',
-		lineFor('junction', 'connection', 'conn-noopen', '') === 'Junction.Connection no open links at node',
+		lineFor('junction', 'connection', 'conn-noopen', '') === 'Junction.Connectivity no open links at node',
 		JSON.stringify(L.queryText()));
 	// **AND THE SHORT SPELLING STILL PARSES.** The third element of findConnOpDefs() is the English
 	// ALIAS, deliberately left as "no links" / "no open links": findAlts() offers the localized text
@@ -650,10 +650,10 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	ok('...while the short English spelling still parses to the same two conditions',
 		/conn-unlinked/.test(shortA) && /conn-noopen/.test(shortB), shortA + ' / ' + shortB);
 	ok('the island condition names the missing LINK',
-		lineFor('junction', 'connection', 'conn-nolinksource', '') === 'Junction.Connection no link path to a source',
+		lineFor('junction', 'connection', 'conn-nolinksource', '') === 'Junction.Connectivity no link path to a source',
 		JSON.stringify(L.queryText()));
 	ok('the umbrella condition names the missing OPEN PATH',
-		lineFor('junction', 'connection', 'conn-noopensource', '') === 'Junction.Connection no open path to a source',
+		lineFor('junction', 'connection', 'conn-noopensource', '') === 'Junction.Connectivity no open path to a source',
 		JSON.stringify(L.queryText()));
 	// An empty box with "contains" matches everything, and the quotes are what make that readable
 	// rather than a sentence that stops in the middle.
@@ -815,7 +815,7 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	refuses('Pipe.Diameter contains 8', 'Not a condition');
 	refuses('(Pipe.Diameter greater than 8', 'never closed');
 	refuses('Pipe.Diameter greater than 8)', 'Nothing was expected');
-	refuses('Pipe.Diameter greater than 8 AND', 'Not something to search');
+	refuses('Pipe.Diameter greater than 8 AND', 'There is nothing called');
 	refuses("Everything.ID contains 'x", 'no closing quote');
 	refuses('Everything.ID contains x', 'quotes');
 	refuses('Pipe.Diameter greater than 8 rubbish', 'Nothing was expected');

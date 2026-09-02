@@ -1,6 +1,6 @@
 {
  "meta": {
-  "version": "1.34",
+  "version": "1.35",
   "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
   "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
   "language_codes": [
@@ -829,7 +829,7 @@
   },
   "20": {
    "term": "emitter",
-   "context": "A drip irrigation emitter (dripper/micro-sprinkler) that delivers water at a controlled low flow rate directly to the soil or plant root zone. Appears in Drip/Sprinkler calculator.",
+   "context": "A drip irrigation emitter (dripper/micro-sprinkler) that delivers water at a controlled low flow rate directly to the soil or plant root zone. Appears in Drip/Sprinkler calculator. ALSO, on the looped network page, EPANET's EMITTER: a sprinkler or a leak at a junction, whose flow is coefficient x pressure raised to the emitter exponent. Same word, second field. The setting is the Emitter exponent, and 'exponent' is the quantity -- never 'power', which on a page that models pumps is energy per unit time.",
    "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers. zh CORRECTED (2026-07-10, category-4 wave-2 QA): the wave-2 zh translating agent initially deviated to the generic academic term '灌水器' throughout ip_ keys, reasoning that the calculator's emitter-exponent model (x from ~0 to 0.5) is generic rather than drip-only. Reverted to the established glossary field term '滴头' (dripper) for suite-wide consistency with the ar/es/uk pattern above — this glossary's own policy is field-term-over-academic-generality across all languages, and a generic hydraulic model doesn't change what practitioners actually call the part. | [2026-08-25, glossary_rendering_census.php] 22 English sites, and EIGHT FILES NEVER SHIP THE RENDERING THIS ENTRY HOLDS: bg капкоотделител, cs kapač, de Tropfer, km ឧបករណ៍ចំណោចទឹក, ru капельница, uk крапельниця, ur خارج کنندہ occur 0 times in their own file and fr émetteur once. What those files use instead is a transliteration of English \"emitter\" -- ur ایمیٹر 17, cs emitoru 15, de emitter 14, ru эмиттера 14, uk емітера 13, bg емитер 12 -- except fr, whose goutteur 19 is a real field word rather than a loan. The other 18 languages reach 17 to 22 of 22 sites; es emisor, pt emissor and hr emiter reach all of them. So the field-term-over-loanword policy recorded above has NOT in fact been applied in six files, and this entry is out of step with them. Which side moves is a native decision, not a countable one.",
    "translations": {
     "am": "ኤሚተር",
@@ -859,7 +859,11 @@
     "ur": "خارج کنندہ",
     "zh": "滴头"
    },
-   "source": "ai-generated"
+   "source": "ai-generated",
+   "avoid": [
+    "translating EPANET's emitter exponent with a word for POWER in the energy sense (watts). It is an exponent, an index, the number a quantity is raised to.",
+    "naming the emitter equation after an invented law; EPANET calls the device an emitter and the setting an emitter exponent."
+   ]
   },
   "21": {
    "term": "headwater elevation",
@@ -2898,11 +2902,12 @@
   "78": {
    "term": "vertex",
    "symbol": "",
-   "context": "A bend point along a pipe, between its two end nodes. Dragging one re-routes the drawn pipe without changing what it connects; double-clicking a pipe adds or removes one. Appears in lpn_mode_select.",
+   "context": "A bend point along a pipe, between its two end nodes. Dragging one re-routes the drawn pipe without changing what it connects; double-clicking a pipe adds or removes one. Appears in lpn_mode_select. Also the label of a toolbar mode (lpn_tool_vertices, 'Vertices') and of that mode's status line.",
    "avoid": [
     "a mathematical vertex of a polygon or a parabola apex, where the language has a plainer word for a bend or corner point in a drawn line",
     "a peak or summit",
-    "a vertex in the anatomical sense (crown of the head)"
+    "a vertex in the anatomical sense (crown of the head)",
+    "the GRAPH-THEORY sense, where a vertex IS a node. This page's nodes are junctions, reservoirs and tanks; a vertex is none of them, carries no elevation, no demand and no head loss, and changes only the drawn route of a pipe. A toolbar button rendered with the graph-node word claims to add network nodes. Nor is it a BEND FITTING (an elbow with a minor loss coefficient), which this page also models."
    ],
    "translation_notes": "CAD and GIS tools in most languages already have a word for this (a polyline bend point). Prefer that over a geometry-textbook term. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): a bend point in a drawn polyline. All four chose their CAD/GIS term rather than a geometry-textbook calque; tr kırılma noktası (break point) is the plainest of the four.",
    "translations": {
@@ -3670,7 +3675,7 @@
    "avoid": [
     "a term meaning the flow OF a fire, or a firefighting operation. This is a DESIGN REQUIREMENT, not an event."
    ],
-   "context": "The flow a water distribution system must be able to supply for firefighting, at a stated residual pressure, usually checked on top of maximum day demand. It is a number a designer sizes pipes against.",
+   "context": "The flow a water distribution system must be able to supply for firefighting, at a stated residual pressure, usually checked on top of maximum day demand. It is a number a designer sizes pipes against. In the fire flow report the Failure modes column prints two single words: 'Fire' means the junction did not deliver its required fire flow, and 'Design' means drawing that flow pushed something else outside its limits. Both are shortened verdicts, not nouns: translate what they stand for, keeping each as short as the column allows.",
    "translation_notes": "[2026-08-17, sprint 397] Raised by the Bulgarian agent, which found that this suite's standing Bulgarian decision to use vodno kolichestvo for flow collides with the term Bulgarian fire-protection engineers actually use (debit za pozharogasene). Recorded so the choice is made once rather than per string. Where a language's fire-protection field has its own settled term, prefer it: a designer reading a fire-flow figure reads it as a fire-protection engineer.",
    "translations": {},
    "source": "sprint 397-labels-colour-units, 2026-08-17"
@@ -3835,6 +3840,92 @@
     "sw": "kina"
    },
    "source": "Rescued 2026-08-20 from a translator comment in lib/lang.ec.sw.php"
+  },
+  "open (link status)": {
+   "term": "open (link status)",
+   "symbol": "",
+   "avoid": [
+    "'unobstructed', 'clear' or 'free-flowing' -- a claim about what is inside the pipe, which this is not",
+    "'available' or 'in service' in the operational sense",
+    "'exposed', 'uncovered' or 'open to the air' -- the civil-works sense of an open channel or an open trench"
+   ],
+   "context": "EPANET's status of a pipe, pump or valve: OPEN means water may pass, CLOSED means it may not. It is the word behind the Find operators 'no open links at node' and 'no open path to a reservoir or tank', and behind every status column in the tables. A property of the LINK, set by the user or by a control, never a description of the pipe's physical condition.",
+   "translation_notes": "Use the word your language's water utilities put on a valve position or a link status. Where a language distinguishes an open VALVE from an open CHANNEL, this is always the valve sense.",
+   "translations": {},
+   "source": "dev/english-friction/573-lpn-resync.json (Task 573 Wave 0)"
+  },
+  "source trace": {
+   "term": "source trace",
+   "symbol": "",
+   "avoid": [
+    "translating it as tracing the ORIGIN of a value, a setting or a file -- 'source' on this page also names where a replacement value comes from, and that is a different thing",
+    "a 'source' meaning a reservoir or tank, which is the sense the Find connectivity operators use"
+   ],
+   "context": "EPANET's own name for the water-quality analysis that reports, at every node, what fraction of the water arriving there came from one chosen node. The ANALYSIS is the Source trace; the NUMBER it reports at a node is the Source share, a percentage. Two things, two names, deliberately. The node whose water is followed is the trace node.",
+   "translation_notes": "Anchor on EPANET's own interface wording in your language if there is a localized EPANET; otherwise use the water-quality field's term for following water from one supply point.",
+   "translations": {},
+   "source": "dev/english-friction/573-lpn-resync.json (Task 573 Wave 0)"
+  },
+  "trace node": {
+   "term": "trace node",
+   "symbol": "",
+   "avoid": [
+    "a node that records or logs something (the software-tracing sense)",
+    "a 'trace' meaning a small residual quantity of a chemical"
+   ],
+   "context": "The one node whose water a Source trace analysis follows. The user picks it; every other node then reports the share of its water that came from it. EPANET calls it the Trace Node.",
+   "translation_notes": "Keep it tied to the Source trace term: whatever word you use for the analysis, this is its node.",
+   "translations": {},
+   "source": "dev/english-friction/573-lpn-resync.json (Task 573 Wave 0)"
+  },
+  "query keyword (AND, OR)": {
+   "term": "query keyword (AND, OR)",
+   "symbol": "",
+   "avoid": [
+    "leaving them in English out of a fear that translating will break the query -- it will not"
+   ],
+   "context": "The joining words in the Find query box, and their pull-down labels. They are BOTH: the parser accepts the English token AND the translation, so translating them is safe and leaving them in English also works. Translate them, so the query box reads in the language the controls read in. The same applies to the example 'Junction.ID' in the missing-dot message: translate Junction and ID to match this language's own labels for them, and the dot stays a dot.",
+   "translation_notes": "The decision is made here so 26 languages do not each make it separately.",
+   "translations": {},
+   "source": "dev/english-friction/573-lpn-resync.json (Task 573 Wave 0)"
+  },
+  "path (profile route)": {
+   "term": "path (profile route)",
+   "symbol": "",
+   "avoid": [
+    "a FILE path or directory path -- the dominant sense of the English word in software, and the wrong one here",
+    "a flow path or a hydraulic path in the sense the Find connectivity operators use ('no link path to a reservoir or tank'); that is a different concept and a different string",
+    "a journey or an itinerary"
+   ],
+   "context": "The route through the network that a profile is drawn along: an ordered list of nodes the user picks and can save by name. The profile menu's 'Saved paths', 'New saved path', 'Rename path' and 'Delete path' all name this route, not the drawing made from it. Pairs with the 'profile (long section)' term, which names the drawing.",
+   "translation_notes": "Use the word a surveyor or a designer would use for the line a long section is taken along.",
+   "translations": {},
+   "source": "dev/english-friction/573-lpn-resync.json (Task 573 Wave 0)"
+  },
+  "static pressure (fire flow)": {
+   "term": "static pressure (fire flow)",
+   "symbol": "",
+   "avoid": [
+    "a zero-flow or no-demand pressure -- the general hydraulic reading of 'static', and always a higher number than this column reports",
+    "'static' in the sense of unchanging, fixed or stored",
+    "'static' in the everyday electrical or radio sense"
+   ],
+   "context": "In a fire flow test, and in this page's fire flow report, the pressure at the hydrant or junction BEFORE any fire flow is drawn, with the system's ordinary demands still running. It is not a no-flow pressure: nothing in the network is shut off to measure it. AWWA M31 and NFPA 291 both use this name.",
+   "translation_notes": "Prefer whatever your language's fire-protection engineers put at the head of a fire flow test form.",
+   "translations": {},
+   "source": "dev/english-friction/573-lpn-resync.json (Task 573 Wave 0)"
+  },
+  "available fire flow": {
+   "term": "available fire flow",
+   "symbol": "",
+   "avoid": [
+    "'available' in the sense of spare or unused capacity in the pipes",
+    "the flow the pipes happen to be carrying now"
+   ],
+   "context": "The largest fire flow a junction can deliver while still holding the residual pressure the user set. Reported beside the REQUIRED fire flow, which is what a fire code or a fire authority asks for at that point. The report's column headings are shortened to 'Available flow' and 'Required flow' because column width is tight; both mean the fire flow, not the flow presently in the pipes.",
+   "translation_notes": "Translate the CONCEPT the short headings stand for, not the two English words. Pairs with the 'fire flow' term.",
+   "translations": {},
+   "source": "dev/english-friction/573-lpn-resync.json (Task 573 Wave 0)"
   }
  }
 }

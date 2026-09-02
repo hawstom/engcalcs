@@ -378,11 +378,11 @@ function runFill(answers) {
 	// both."* A count is a promise; a list is a promise a person can check against the drawing in
 	// front of them before pressing the button.
 	ok('...and NAMES the nodes it will fill in',
-		/will be filled in: J2, J3/.test(confirmTexts[1]), confirmTexts[1]);
+		/will get an elevation: J2, J3/.test(confirmTexts[1]), confirmTexts[1]);
 	ok('...and NAMES the node it will leave alone',
-		/They are: J1/.test(confirmTexts[1]), confirmTexts[1]);
+		/Those nodes are: J1/.test(confirmTexts[1]), confirmTexts[1]);
 	ok('...and never names a node on the wrong side of the line',
-		!/will be filled in: [^\n]*J1/.test(confirmTexts[1]));
+		!/will get an elevation: [^\n]*J1/.test(confirmTexts[1]));
 
 	// ---- 5c. THE FILL ITSELF -------------------------------------------------------------------
 	await runFill([true]);             // already consented; one confirm, the plan
@@ -412,7 +412,7 @@ function runFill(answers) {
 	// The other direction of the same promise. It is composed from the ids the DOCUMENT handed back,
 	// not from the ids that were asked for, which is what makes it survive 5c-bis below.
 	ok('the result notice names the nodes that were filled in',
-		/were filled in: J2, J3/.test(noticeText()), noticeText());
+		/got an elevation: J2, J3/.test(noticeText()), noticeText());
 	ok('...and does not name the one it left alone', !/J1/.test(noticeText()), noticeText());
 	ok('...and still carries the accuracy sentence and the Mapbox credit',
 		/30 m/.test(noticeText()) && /Mapbox/.test(noticeText()));
@@ -432,7 +432,7 @@ function runFill(answers) {
 		}
 		await runFill([true]);
 		const plan = confirmTexts[0];
-		const m = plan.match(/will be filled in: ([^\n]*)/);
+		const m = plan.match(/will get an elevation: ([^\n]*)/);
 		ok('a 40-node fill does not print 40 names into the confirm',
 			!!m && m[1].split(',').length <= 14, m && m[1]);
 		ok('...it says how many it did not name, and the two add up',
@@ -440,7 +440,7 @@ function runFill(answers) {
 			(m[1].match(/J\d+/g).length + Number(m[1].match(/and (\d+) more/)[1]) === N),
 			m && m[1]);
 		ok('...and the result notice caps the same way',
-			/were filled in: [^\n]*and \d+ more/.test(noticeText()), noticeText());
+			/got an elevation: [^\n]*and \d+ more/.test(noticeText()), noticeText());
 		// The pure renderer, on its own, at the boundary. Twelve is the cap; twelve prints whole.
 		const twelve = [];
 		for (let i = 1; i <= 12; i++) { twelve.push('J' + i); }
@@ -476,9 +476,9 @@ function runFill(answers) {
 		// be named as still blank and must NOT be named as filled in -- which is only possible
 		// because the list comes back from the document rather than from the request.
 		ok('a node that was asked for but not written is named as still blank',
-			/still blank: [^\n]*J2/.test(noticeText()), noticeText());
+			/still have no elevation: [^\n]*J2/.test(noticeText()), noticeText());
 		ok('...and is not also named among the ones that were filled in',
-			!/were filled in: [^.]*J2/.test(noticeText()), noticeText());
+			!/got an elevation: [^.]*J2/.test(noticeText()), noticeText());
 		L.undo();
 	}
 
@@ -755,10 +755,10 @@ function runFill(answers) {
 		// still there to tell you the row exists and the press was heard.
 		const b0 = L.popupButtons().map(b => b.textContent);
 		ok('...but both buttons are already offered',
-			b0.some(t => /Sample DEM/.test(t)) && b0.some(t => /Use DEM/.test(t)),
+			b0.some(t => /Read DEM/.test(t)) && b0.some(t => /Use DEM/.test(t)),
 			JSON.stringify(b0));
 		// Sample reads and shows, and writes nothing.
-		const sampleBtn = L.popupButtons().filter(b => /Sample DEM/.test(b.textContent))[0];
+		const sampleBtn = L.popupButtons().filter(b => /Read DEM/.test(b.textContent))[0];
 		tileRequests = 0;
 		sampleBtn._listeners.click[0]();
 		await settle();
