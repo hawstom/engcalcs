@@ -14,16 +14,16 @@
    "ruled": "2026-08-29"
   },
   "lpn_diag_not_converged_drawn": {
-   "on": "The solve did not converge. These numbers are the last try, not an answer. Do not use them.",
-   "ruled": "2026-09-01"
+   "on": "The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.",
+   "ruled": "2026-09-02"
   },
   "lpn_diag_not_converged_error": {
-   "on": "It stopped after {trials} trials at a relative error of {error}, against an accuracy of {accuracy}.",
-   "ruled": "2026-09-01"
+   "on": "It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.",
+   "ruled": "2026-09-02"
   },
   "lpn_diag_not_converged_trials": {
-   "on": "It stopped after {trials} trials.",
-   "ruled": "2026-09-01"
+   "on": "It stopped after {iterations} iterations.",
+   "ruled": "2026-09-02"
   },
   "lpn_elev_dem_none": {
    "on": "The DEM gave no height for this node.",
@@ -83,6 +83,10 @@
   },
   "lpn_ff_col_junction": {
    "on": "Junction",
+   "ruled": "2026-09-02"
+  },
+  "lpn_ff_col_limit": {
+   "on": "Design limit",
    "ruled": "2026-09-02"
   },
   "lpn_ff_col_required": {
@@ -481,6 +485,10 @@
    "on": "This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.",
    "ruled": "2026-09-01"
   },
+  "lpn_inp_drop_file_options": {
+   "on": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
+   "ruled": "2026-09-02"
+  },
   "lpn_inp_drop_report": {
    "on": "This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.",
    "ruled": "2026-09-01"
@@ -610,8 +618,8 @@
    "ruled": "2026-09-01"
   },
   "lpn_quality_trace": {
-   "on": "Source share",
-   "ruled": "2026-09-01"
+   "on": "Source trace",
+   "ruled": "2026-09-02"
   },
   "lpn_replace_asked": {
    "on": "Asked for {n}. The answer is on its way.",
@@ -634,8 +642,8 @@
    "ruled": "2026-09-01"
   },
   "lpn_result_source_share_tip": {
-   "on": "Of the water reaching this point, the share that came from the source you chose.",
-   "ruled": "2026-09-01"
+   "on": "The source trace share reports how much of the water reaching this point came from the trace node.",
+   "ruled": "2026-09-02"
   },
   "lpn_result_water_age": {
    "on": "Water age",
@@ -742,8 +750,8 @@
    "ruled": "2026-09-02"
   },
   "lpn_settings_quality_source_tip": {
-   "on": "The point whose water is followed. Every other point then shows the share of its water that came from here.",
-   "ruled": "2026-09-01"
+   "on": "The point whose water is traced. Every other point then shows the share of its water that came from here.",
+   "ruled": "2026-09-02"
   },
   "lpn_settings_quality_track": {
    "on": "Track",
@@ -798,8 +806,8 @@
    "ruled": "2026-09-01"
   },
   "lpn_settings_unbalanced_trials_tip": {
-   "on": "How many further trials to allow after the maximum above is used up, before the last try is reported. Only the EPANET solver reads this box.",
-   "ruled": "2026-09-01"
+   "on": "How many further trials to allow after the maximum above is used up, before the last trial is reported. Only the EPANET solver reads this box.",
+   "ruled": "2026-09-02"
   },
   "lpn_settings_viscosity": {
    "on": "Relative viscosity",

@@ -282,9 +282,15 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 				rec.holdsAtRequired = (atReq.pressure >= residual);
 				rec.pressureAtRequired = atReq.pressure;
 				// **AND THE DESIGN READINGS, TAKEN AT THE REQUIRED FLOW, WHICH IS THE FLOW THE
-				// DESIGN QUESTION IS ASKED AT.** Read here whether or not the junction passes:
-				// where it fails, `sideEffects` is simply not consulted, and no solve was spent on
-				// it either way.
+				// DESIGN QUESTION IS ASKED AT.** Taken whether or not the junction passes, and no
+				// extra solve is spent either way -- `atReq.result` is the solve that answered the
+				// compliance question, read a second time.
+				//
+				// *(Corrected 2026-09-02. This said "where it fails, `sideEffects` is simply not
+				// consulted", which the line below plainly contradicts: the only condition on it is
+				// `ctx.design`. The false comment nearly cost a reader the right answer to "which
+				// cells should a failing row blank" -- the answer is none, because a failing
+				// junction IS measured for what it would pull down.)*
 				if (ctx.design) { rec.effects = ctx.sideEffects(atReq.result, node.id); }
 
 				return probe(maxFlow).then(function (top) {

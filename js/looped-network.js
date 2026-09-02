@@ -27092,7 +27092,19 @@ var EngCalcs = EngCalcs || {};
 	// velocity.
 	function ffCriticalText(rec) {
 		var pc = EngCalcs.pageConfig || {}, worst = null, kind = '', total, extra, text, j, e;
-		if (!rec.effects) { return FF_DASH; }
+		// **NOT CHECKED AND NOTHING FOUND ARE DIFFERENT FACTS AND USED TO DRAW IDENTICALLY.**
+		// (Found 2026-09-02 from Tom's question about which cells a design row should blank.) A
+		// dash here meant *we looked and found nothing*, which is good news, AND *we never looked*,
+		// which is not news at all. Same shape as the EPANET bridge swearing a run converged: a
+		// plausible cell nobody can tell from a measured one.
+		//
+		// **WHEN `rec.effects` IS ACTUALLY ABSENT, measured rather than reasoned:** when the design
+		// half was not requested for the run, and on a record that errored out before the design
+		// readings were taken. It is NOT absent on a failing junction -- js/lpn-fireflow.js takes
+		// the design readings at the required flow `whether or not the junction passes`, and its own
+		// comment beside that line says the opposite and is wrong. All six junctions in
+		// dev/lpn-spike/fireflow-box-harness.js carry effects, two of them failing.
+		if (!rec.effects) { return pc.lpn_ff_not_checked || 'Not checked'; }
 		for (j = 0; j < rec.effects.nodes.length; j++) {
 			e = rec.effects.nodes[j];
 			if (!worst || e.pressure < worst.pressure) { worst = e; kind = 'node'; }
@@ -27106,9 +27118,11 @@ var EngCalcs = EngCalcs || {};
 		if (!worst) { return FF_DASH; }
 		text = kind === 'node'
 			? (pc.lpn_ff_affect_node || '{id} down to {pressure}')
-				.replace('{id}', worst.id).replace('{pressure}', ffQty(worst.pressure, 'lpn_u_pressure'))
+				.replace('{id}', labelPrefixFor('node', 'id') + worst.id)
+				.replace('{pressure}', ffQty(worst.pressure, 'lpn_u_pressure'))
 			: (pc.lpn_ff_affect_link || '{id} at {velocity}')
-				.replace('{id}', worst.id).replace('{velocity}', ffQty(worst.velocity, 'lpn_u_velocity'));
+				.replace('{id}', labelPrefixFor('link', 'id') + worst.id)
+				.replace('{velocity}', ffQty(worst.velocity, 'lpn_u_velocity'));
 		total = rec.effects.nodes.length + rec.effects.links.length;
 		extra = total - 1;
 		if (extra > 0) {
@@ -27126,7 +27140,9 @@ var EngCalcs = EngCalcs || {};
 	//     the required flow, not what was binding at the available one.
 	function ffLimitText(rec) {
 		var pc = EngCalcs.pageConfig || {}, n, l;
-		if (!rec.effects) { return FF_DASH; }
+		// Same distinction as ffCriticalText(): no effects means the design question was never asked
+		// here, not that it was asked and answered "nothing".
+		if (!rec.effects) { return pc.lpn_ff_not_checked || 'Not checked'; }
 		n = rec.effects.nodes.length; l = rec.effects.links.length;
 		if (n && l) { return pc.lpn_ff_limit_both || 'Pressure and velocity'; }
 		if (n) { return pc.lpn_ff_limit_pressure || 'Pressure'; }
@@ -27216,18 +27232,23 @@ var EngCalcs = EngCalcs || {};
 		ffEl('div', 'lpn-ff-head', pc.lpn_ff_report_all || 'Every junction tested', host);
 		sorted = ffSorted(set.results);
 		shown = sorted.slice(0, FF_MAX_ROWS);
+		// **THE ORDER IS THE ORDER A PERSON READS THE ANSWER IN** (Tom, 2026-09-02, once the
+		// terminology stopped fighting him: *"Now that the terminology is recognizable, more of my
+		// intuition is available, and I would like to try the following results column order"*).
+		// What the code ASKS FOR comes first, then what the system CAN GIVE, then the collateral.
+		//
+		// **THE AVAILABLE/RESIDUAL PAIRING SURVIVES THE MOVE and is the same rule as before.** Tom,
+		// 2026-09-01: *"the Residual held column should immediately follow Available flow"* -- they
+		// are ONE reading, a flow and the pressure the junction still held while delivering it, and
+		// an available flow with no residual beside it is a number without its condition. Required
+		// and its own pressure are the same kind of pair and now sit the same way.
 		body = ffTable(host, [
 			pc.lpn_ff_col_junction || 'Junction',
 			pc.lpn_ff_col_static || 'Static pressure',
-			pc.lpn_ff_col_available || 'Available flow',
-			// **RESIDUAL SITS BESIDE AVAILABLE, NOT BESIDE REQUIRED** (Tom, 2026-09-01: *"the
-			// Residual held column should immediately follow Available flow"*). The two are ONE
-			// reading -- a flow and the pressure the junction still held while delivering it -- and
-			// an available flow with no residual beside it is a number without its condition.
-			// Required is the code's demand and belongs after the pair it is compared against.
-			pc.lpn_ff_col_residual || 'Residual held',
 			pc.lpn_ff_col_required || 'Required flow',
 			pc.lpn_ff_col_atrequired || 'Pressure at required',
+			pc.lpn_ff_col_available || 'Available flow',
+			pc.lpn_ff_col_residual || 'Residual held',
 			pc.lpn_ff_col_affected || 'Drawdowns',
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
@@ -27235,12 +27256,16 @@ var EngCalcs = EngCalcs || {};
 		]);
 		shown.forEach(function (rec) {
 			var tr = ffEl('tr', 'lpn-ff-' + rec.state, null, body);
-			ffCell(tr, rec.id);
+			// **THE ID WEARS THE USER'S OWN LABEL PREFIX** (Tom, 2026-09-02: *"we need to apply here
+			// the Settings.Label prefix for Node IDs"*). Every id drawn on the map goes through
+			// labelPrefixFor(), so an id printed here without it is the same element under a second
+			// name -- and this table exists to send somebody to those elements.
+			ffCell(tr, labelPrefixFor('node', 'id') + rec.id);
 			ffCell(tr, ffMaybeQty(rec.staticPressure, 'lpn_u_pressure'));
-			ffCell(tr, ffAvailableText(rec));
-			ffCell(tr, ffMaybeQty(rec.residualAt, 'lpn_u_pressure'));
 			ffCell(tr, rec.required === undefined ? FF_DASH : ffQty(rec.required, 'lpn_u_flow'));
 			ffCell(tr, ffMaybeQty(rec.pressureAtRequired, 'lpn_u_pressure'));
+			ffCell(tr, ffAvailableText(rec));
+			ffCell(tr, ffMaybeQty(rec.residualAt, 'lpn_u_pressure'));
 			ffCell(tr, ffCriticalText(rec));
 			ffCell(tr, ffLimitText(rec));
 			ffCell(tr, rec.solves === undefined ? FF_DASH : String(rec.solves));

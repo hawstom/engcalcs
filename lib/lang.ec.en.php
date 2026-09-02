@@ -1869,8 +1869,8 @@ $ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modellin
 $ec_lang['lpn_inp_drop_tags']='This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_report']='This file holds EPANET\'s own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sections']='This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: Quality, which names what to follow through the pipes, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_file_options']='This file refers to a support file beside it: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_file_options']='This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
 $ec_lang['lpn_inp_drop_dangling']='These pipes name a junction that is not in the file, so they were left out.';
 $ec_lang['lpn_inp_drop_units']='The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.';
@@ -2963,6 +2963,12 @@ $ec_lang['lpn_ff_col_residual']='Residual held';
 $ec_lang['lpn_ff_col_atrequired']='Pressure at required';
 $ec_lang['lpn_ff_col_affected']='Drawdowns';
 $ec_lang['lpn_ff_col_limit']='Design limit';
+// **THE CELL THAT SAYS THE QUESTION WAS NEVER ASKED.** A junction that cannot deliver the required
+// flow is never checked for what it would pull down, because the design question is not asked at a
+// flow that cannot be drawn (js/lpn-fireflow.js). That cell used to print the same dash a PASSING
+// junction prints, where the dash means "checked, and nothing was pulled down" -- good news drawn
+// as no news.
+$ec_lang['lpn_ff_not_checked']='Not checked';
 $ec_lang['lpn_ff_col_solves']='Runs';
 $ec_lang['lpn_ff_col_result']='Result';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
@@ -2980,10 +2986,21 @@ $ec_lang['lpn_ff_affect_link']='{id} at {velocity}';
 $ec_lang['lpn_ff_more']='and {n} more';
 $ec_lang['lpn_ff_design_none']='Nothing in the chosen set was drawn down by any junction tested.';
 $ec_lang['lpn_ff_design_off_note']='The effect on the rest of the system was not checked in this run.';
+// **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
+// the arithmetic:** *"These models are not always fine-grained. They don't represent every pipe,
+// junction, or fire hydrant. Many things may be ganged at a node including categories and fire
+// hydrants. That is why we don't enforce the credit limit."* A node is not a hydrant. It may stand
+// for one, or for a block of them, and nothing in the file says which -- so a per-hydrant cap
+// cannot be applied to a per-node number without knowing a thing the model does not carry.
+//
+// **"Credit" is ISO's own word and is a RATING term, not a hydraulic one** -- what a hydrant is
+// allowed to count for when a fire-suppression rating is computed, which is why it can sit beside a
+// hydraulic answer without contradicting it.
+//
 // ISO credits a single hydrant with at most 1,500 gpm whatever the hydraulics say. Said beside the
 // numbers and never applied to them: a number quietly cut down to a credit limit is a lie with a
 // tidy face.
-$ec_lang['lpn_ff_iso']='ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.';
+$ec_lang['lpn_ff_iso']='ISO credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.';
 // Every way a junction can fail to produce a number is named. None of them is ever shown as a flow
 // of zero: "there is no available fire flow" and "the available fire flow is zero" are different
 // facts, and only the first one is ever true.

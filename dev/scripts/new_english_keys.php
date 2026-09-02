@@ -273,6 +273,42 @@ if ($write || $check) {
         fwrite(STDERR, "somebody reads it, and somebody reading it will write on it.\n");
         exit(2);
     }
+    // **--force IS NEVER SILENT ANY MORE, AND THAT IS THE HALF THAT WAS MISSING.**
+    //
+    // The refusal above is a good guard against a person typing --force. It is a POOR guard against
+    // a script, and on 2026-09-02 the orchestrating AI wrote
+    // `... --write || ... --write --force` -- a fallback that reaches for --force EXACTLY when the
+    // guard fires, which is exactly when a human has written on the file. It discarded nothing that
+    // day, as far as anyone can tell, and nobody could tell, which is the problem.
+    //
+    // So a forced write now PRINTS what it is discarding, line by line, to stdout. It cannot be
+    // redirected away by a caller that only silenced stderr, and a reader of the run log can
+    // recover the marks by hand. Cheap, and it turns an unrecoverable loss into a noisy one.
+    if ($handEdited && $force) {
+        // **THE WHOLE HAND-EDITED FILE IS SAVED BEFORE IT IS OVERWRITTEN. PRINTING IS NOT ENOUGH.**
+        //
+        // The first version of this only printed the discarded lines, on the argument that a noisy
+        // loss beats a silent one. It was proved insufficient within the hour, by me: I ran a forced
+        // write to DEMONSTRATE the printing, on a live file Tom had just written on, piped the
+        // output through `head -8`, and destroyed the rest of his marks with the evidence scrolling
+        // past. Three approvals and about six other lines were gone, and the printout I had kept
+        // held one of them.
+        //
+        // So the copy is a FILE now. `--force` is survivable rather than merely loud, and the
+        // recovery does not depend on anybody having kept a terminal buffer.
+        $rej = dirname($file) . '/new-english-keys.rejected.md';
+        file_put_contents($rej, $have);
+        $a = explode("\n", $normalise($committed));
+        $b = explode("\n", $normalise($have));
+        $lost = array_values(array_diff($b, $a));
+        echo "--force: DISCARDING " . count($lost) . " hand-edited line(s) from dev/new-english-keys.md.\n";
+        echo "The WHOLE hand-edited file has been copied to:\n";
+        echo "    " . $rej . "\n";
+        echo "Nothing is lost. The discarded lines were:\n\n";
+        foreach ($lost as $line) { echo '    ' . $line . "\n"; }
+        echo "\nIf any of that is a ruling, put it in dev/english-key-rulings.json or in\n";
+        echo "lib/lang.ec.en.php, then delete the .rejected.md copy.\n\n";
+    }
     file_put_contents($file, $want);
     echo "dev/new-english-keys.md written — " . count($new) . " keys awaiting a ruling\n";
     exit(0);

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1527,
-        "delta_key_count": 213,
+        "expected_key_count": 1528,
+        "delta_key_count": 214,
         "exempt_key_count": 30,
         "exempt_keys": [
             "calc_units_us",
@@ -551,8 +551,8 @@
         "lpn_inp_drop_tags": "This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_report": "This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
-        "lpn_inp_drop_quality_options": "This file states EPANET water quality options: Quality, which names what to follow through the pipes, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
-        "lpn_inp_drop_file_options": "This file refers to a support file beside it: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
+        "lpn_inp_drop_quality_options": "This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
+        "lpn_inp_drop_file_options": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
         "lpn_diag_not_converged_drawn": "The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.",
         "lpn_diag_not_converged_trials": "It stopped after {iterations} iterations.",
         "lpn_diag_not_converged_error": "It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.",
@@ -666,6 +666,7 @@
         "lpn_ff_col_atrequired": "Pressure at required",
         "lpn_ff_col_affected": "Drawdowns",
         "lpn_ff_col_limit": "Design limit",
+        "lpn_ff_not_checked": "Not checked",
         "lpn_ff_col_solves": "Runs",
         "lpn_ff_col_result": "Result",
         "lpn_ff_limit_pressure": "Pressure",
@@ -681,7 +682,7 @@
         "lpn_ff_more": "and {n} more",
         "lpn_ff_design_none": "Nothing in the chosen set was drawn down by any junction tested.",
         "lpn_ff_design_off_note": "The effect on the rest of the system was not checked in this run.",
-        "lpn_ff_iso": "ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.",
+        "lpn_ff_iso": "ISO credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.",
         "lpn_ff_err_at_rest": "Already below the residual with nothing drawn",
         "lpn_ff_err_converge": "The network did not converge.",
         "lpn_ff_err_solve": "The solver reported an error and gave no answer.",
@@ -766,8 +767,8 @@
         "lpn_inp_drop_tags": "This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_report": "This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
-        "lpn_inp_drop_quality_options": "This file states EPANET water quality options: Quality, which names what to follow through the pipes, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
-        "lpn_inp_drop_file_options": "This file refers to a support file beside it: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
+        "lpn_inp_drop_quality_options": "This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
+        "lpn_inp_drop_file_options": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
         "lpn_diag_not_converged_drawn": "The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.",
         "lpn_diag_not_converged_trials": "It stopped after {iterations} iterations.",
         "lpn_diag_not_converged_error": "It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.",
@@ -881,6 +882,7 @@
         "lpn_ff_col_atrequired": "Pressure at required",
         "lpn_ff_col_affected": "Drawdowns",
         "lpn_ff_col_limit": "Design limit",
+        "lpn_ff_not_checked": "Not checked",
         "lpn_ff_col_solves": "Runs",
         "lpn_ff_col_result": "Result",
         "lpn_ff_limit_pressure": "Pressure",
@@ -896,7 +898,7 @@
         "lpn_ff_more": "and {n} more",
         "lpn_ff_design_none": "Nothing in the chosen set was drawn down by any junction tested.",
         "lpn_ff_design_off_note": "The effect on the rest of the system was not checked in this run.",
-        "lpn_ff_iso": "ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.",
+        "lpn_ff_iso": "ISO credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.",
         "lpn_ff_err_at_rest": "Already below the residual with nothing drawn",
         "lpn_ff_err_converge": "The network did not converge.",
         "lpn_ff_err_solve": "The solver reported an error and gave no answer.",
@@ -3761,6 +3763,18 @@
             }
         },
         "lpn_ff_col_limit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} tessera\/e del terreno non ha\/hanno risposto.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_not_checked": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

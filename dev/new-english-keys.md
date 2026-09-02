@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**10 still to read**, of 212 untranslated keys, of 1527 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**12 still to read**, of 213 untranslated keys, of 1528 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (210, 10 to read @@ NEEDS RULING)
+## lpn_  (211, 12 to read @@ NEEDS RULING)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -34,13 +34,13 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-08-29._
 - **`lpn_diag_not_converged_drawn`**
   > The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.
-  OK.
+  @@ NEEDS RULING
 - **`lpn_diag_not_converged_error`**
   > It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.
-  OK.
+  @@ NEEDS RULING
 - **`lpn_diag_not_converged_trials`**
   > It stopped after {iterations} iterations.
-  OK.
+  @@ NEEDS RULING
 - **`lpn_elev_dem_none`**
   > The DEM gave no height for this node.
   _Ruled OK 2026-09-01._
@@ -88,7 +88,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-02._
 - **`lpn_ff_col_limit`**
   > Design limit
-  OK.
+  @@ NEEDS RULING
 - **`lpn_ff_col_required`**
   > Required flow
   _Ruled OK 2026-09-01._
@@ -156,8 +156,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_iso`**
-  > ISO credits a single hydrant with at most {flow}. That credit limit has not been applied to any number here.
-  _Ruled OK 2026-09-01._
+  > ISO credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.
+  @@ NEEDS RULING
 - **`lpn_ff_limit_both`**
   > Pressure and velocity
   _Ruled OK 2026-09-01._
@@ -194,6 +194,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_ff_no_selection`**
   > No junction is selected. Choose one on the map, or test every junction.
   _Ruled OK 2026-09-01._
+- **`lpn_ff_not_checked`**
+  > Not checked
+  @@ NEEDS RULING
 - **`lpn_ff_report_all`**
   > Every junction tested
   _Ruled OK 2026-09-01._
@@ -388,10 +391,10 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_inp_drop_file_options`**
   > This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.
-  Edited.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_quality_options`**
-  > This file states EPANET water quality options: Quality, which names what to follow through the pipes, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.
-  Did you avoid the word "trace" here?
+  > This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_report`**
   > This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.
   _Ruled OK 2026-09-01._
@@ -490,7 +493,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_quality_trace`**
   > Source trace
-  OK.
+  @@ NEEDS RULING
 - **`lpn_replace_asked`**
   > Asked for {n}. The answer is on its way.
   _Ruled OK 2026-08-29._
@@ -508,7 +511,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_result_source_share_tip`**
   > The source trace share reports how much of the water reaching this point came from the trace node.
-  OK.
+  @@ NEEDS RULING
 - **`lpn_result_water_age`**
   > Water age
   _Ruled OK 2026-09-01._
@@ -589,7 +592,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-02._
 - **`lpn_settings_quality_source_tip`**
   > The point whose water is traced. Every other point then shows the share of its water that came from here.
-  OK.
+  @@ NEEDS RULING
 - **`lpn_settings_quality_track`**
   > Track
   _Ruled OK 2026-09-01._
@@ -631,7 +634,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_settings_unbalanced_trials_tip`**
   > How many further trials to allow after the maximum above is used up, before the last trial is reported. Only the EPANET solver reads this box.
-  OK.
+  @@ NEEDS RULING
 - **`lpn_settings_viscosity`**
   > Relative viscosity
   _Ruled OK 2026-08-29._

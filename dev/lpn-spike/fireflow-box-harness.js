@@ -44,6 +44,11 @@ const L = loadLoopedNetwork(
 	"\t\tdocGuard: function () { return fireFlowDocGuard; },\n" +
 	"\t\tscheduleSolve: scheduleSolve,\n" +
 	"\t\tnodeClass: function (id) { return nodeEls[id] ? (nodeEls[id].circle.getAttribute('class') || '') : null; },\n" +
+	"\t\tnodeIdPrefix: function () { return labelPrefixFor('node', 'id'); },\n" +
+	"\t\tsetNodeIdPrefix: function (p) { labelSettings.prefix = labelSettings.prefix || {};\n" +
+	"\t\t\tlabelSettings.prefix.node = labelSettings.prefix.node || {};\n" +
+	"\t\t\tlabelSettings.prefix.node.id = p; },\n" +
+	"\t\trebuildFireFlowReport: rebuildFireFlowReport,\n" +
 	"\t\tjunctionIds: function () { return fireFlowJunctions().map(function (n) { return n.id; }); },\n" +
 	// The layers buildDom() writes into, made the way every other harness makes them.
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
@@ -82,6 +87,24 @@ function rowCount(el) {
 }
 // The heading row's width. Column width is king, so how many columns there are is a fact worth
 // asserting rather than counting by eye in a browser.
+// The text of the first cell of every body row -- the Junction column, and nothing else. Needed
+// because the whole-report text cannot distinguish "the id is in column 1" from "the id is
+// mentioned somewhere on some row", which is the difference this file had to be able to see.
+function rowFirstCells(el) {
+	const out = [];
+	(function walk(n) {
+		if (!n) { return; }
+		if (n.tagName === 'tr' || n.tagName === 'TR') {
+			const cells = (n.childNodes || []).filter(function (c) {
+				return String(c.tagName).toLowerCase() === 'td';
+			});
+			if (cells.length) { out.push(textOf(cells[0]).trim()); }
+			return;
+		}
+		(n.childNodes || []).forEach(walk);
+	})(el);
+	return out;
+}
 function headCells(el) {
 	let n = 0;
 	(el.children || []).forEach(c => {
@@ -207,11 +230,23 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	// junction, in this page's own words rather than the competitor's.
 	ok('there is one table under one heading', report.indexOf('Every junction tested') >= 0 &&
 		report.indexOf('Available against required') < 0);
-	['Junction', 'Static pressure', 'Available flow', 'Required flow', 'Residual held',
-		'Pressure at required', 'Drawdowns', 'Design limit', 'Runs', 'Result'
-	].forEach(function (h) {
-		ok('the table has a "' + h + '" column', report.indexOf(h) >= 0);
+	// **THE ORDER IS ASSERTED, NOT JUST THE PRESENCE** (Tom, 2026-09-02, giving the order he wanted
+	// to try once the terminology stopped fighting his intuition). The old version checked only that
+	// each heading appeared SOMEWHERE, so it passed on any permutation -- including a reordering
+	// nobody asked for. What the sequence encodes: what the code ASKS FOR, then what the system CAN
+	// GIVE, then the collateral. `Available flow` and `Residual held` stay adjacent, which is Tom's
+	// 2026-09-01 ruling surviving the move: they are one reading, and a flow without the pressure it
+	// was held at is a number without its condition.
+	const wantOrder = ['Junction', 'Static pressure', 'Required flow', 'Pressure at required',
+		'Available flow', 'Residual held', 'Drawdowns', 'Design limit', 'Runs', 'Result'];
+	let cursor = -1, inOrder = true;
+	wantOrder.forEach(function (h) {
+		const at = report.indexOf(h);
+		ok('the table has a "' + h + '" column', at >= 0);
+		if (at < cursor) { inOrder = false; }
+		cursor = at;
 	});
+	ok('...and they appear in exactly that order', inOrder, wantOrder.join(' | '));
 	ok('and it is ten columns wide', headCells(byId.lpn_ff_report) === 10,
 		String(headCells(byId.lpn_ff_report)));
 	ok('the summary counts all three states',
@@ -230,6 +265,48 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 		pulled.length > 0 && pulled.every(r => report.indexOf(r.id) >= 0) &&
 		(report.indexOf('down to') >= 0 || report.indexOf(' at ') >= 0),
 		pulled.length + ' junctions with an effect');
+
+	// **NOT CHECKED IS NOT THE SAME AS NOTHING FOUND** (found 2026-09-02 from Tom's question about
+	// which cells a design row should blank). A junction that cannot deliver the required flow is
+	// never asked what it would pull down -- js/lpn-fireflow.js does not consult sideEffects() at a
+	// flow that cannot be drawn -- and it used to print the same dash a PASSING junction prints,
+	// where the dash means "asked, and nothing was pulled down". Good news drawn as no news.
+	const failing = set.results.filter(r => r.state === 'fail' && !r.effects);
+	const passingClean = set.results.filter(r => r.state === 'pass');
+	if (failing.length > 0) {
+		ok('a junction that was never checked for drawdowns says so',
+			report.indexOf('Not checked') >= 0, failing.length + ' failing junction(s)');
+	} else {
+		ok('(no failing junction in this network, so the not-checked cell is untested here)', true);
+	}
+	ok('a passing junction does NOT say "Not checked" -- it was checked and found nothing',
+		passingClean.length === 0 || passingClean.every(function (r) { return r.effects; }),
+		passingClean.length + ' passing junction(s), all with effects computed');
+
+	// **THE IDS IN THIS TABLE WEAR THE USER'S OWN PREFIX** (Tom, 2026-09-02). Every id drawn on the
+	// map goes through labelPrefixFor(); an id printed here without it is the same element under a
+	// second name, and this cell's whole job is to send somebody to that element.
+	// **A REAL PREFIX, NOT THE DEFAULT ONE.** The shipped default is the empty string, so asserting
+	// `prefix + id` against a default-configured page compares `'' + id` to `id` and passes on code
+	// that ignores the prefix entirely. The value has to be SET for this assertion to mean anything;
+	// that is the coupling a lazier version of this check silently removed.
+	L.setNodeIdPrefix('NODE-');
+	L.rebuildFireFlowReport();
+	const prefixed = textOf(byId.lpn_ff_report);
+	// **READ THE ROW'S FIRST CELL, NOT THE WHOLE REPORT.** Searching the report text for
+	// `NODE-<id>` passes when the id appears in ANY cell -- and a tested junction is very often
+	// also somebody else's drawdown, so the string is there whether or not the first column has it.
+	// Mutation-proved: removing the prefix from the row id left this assertion passing.
+	const firstCells = rowFirstCells(byId.lpn_ff_report);
+	ok('the tested junction id carries the node label prefix, in its OWN cell',
+		set.results.every(function (r) { return firstCells.indexOf('NODE-' + r.id) >= 0; }),
+		JSON.stringify(firstCells.slice(0, 4)));
+	ok('...and a drawdown id carries it too, since that cell exists to send you to that element',
+		pulled.length === 0 || pulled.every(function (r) {
+			return r.effects.nodes.every(function (e) { return prefixed.indexOf('NODE-' + e.id) >= 0; });
+		}));
+	L.setNodeIdPrefix('');
+	L.rebuildFireFlowReport();
 
 	console.log('\n--- a cell with no number shows a dash, never a zero ---');
 	// A residual no junction in this network can hold with nothing drawn: every record comes back
