@@ -535,7 +535,7 @@ echoHeader("EngCalcs", $html_title, "", false);
       // somewhere other than where it visually appeared, so the tap fell through to the canvas
       // underneath and was read as a background pan). fixed is always viewport-relative, matching
       // clientX/clientY directly with no scroll math needed. ?>
-<div id="lpn_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<div id="lpn_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
 	<div class="lpn-popover-body">
 	<div id="lpn_popup_title"></div>
 	<div id="lpn_popup_fields"></div>
@@ -550,7 +550,7 @@ echoHeader("EngCalcs", $html_title, "", false);
       // modeless for a reason -- you find something, look at the map, and search again without the
       // panel ever taking the map away. Everything inside is built in JS (wireFindPopup()), because
       // the property and condition lists depend on which kind of element you chose. ?>
-<div id="lpn_find_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:22rem">
+<div id="lpn_find_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:22rem">
 	<?php // The padded band at the top is the DRAG SURFACE, exactly as on #lpn_popup: `e.target` is
 	      // the panel itself there and a child everywhere else, so a drag can never start on a
 	      // control. That is why the padding is 40px on top and 8px elsewhere. ?>
@@ -596,7 +596,7 @@ echoHeader("EngCalcs", $html_title, "", false);
       // AutoCAD palette." Nothing here assumes a floating box: the whole thing is one element with
       // one placement function, so a future dock changes where it is put and nothing about what is
       // in it. ?>
-<div id="lpn_settings_box" class="d-print-none lpn-popover lpn-setbox" style="display:none;position:fixed;z-index:22;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_setbox_title">
+<div id="lpn_settings_box" class="d-print-none lpn-popover lpn-setbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_setbox_title">
 	<?php // The padded band at the top is the DRAG SURFACE, exactly as on #lpn_popup and #lpn_find_popup:
 	      // `e.target` is the box itself there and a child everywhere else, so a drag can never start
 	      // on a control. That is why the padding is 40px on top and 8px elsewhere. ?>
@@ -810,7 +810,7 @@ echoHeader("EngCalcs", $html_title, "", false);
       // and scrolls to them; these three are disjoint editors rather than sections of one document,
       // so a click SHOWS one and hides the others. Built in JS (buildLibraryBox), because what is
       // in each depends entirely on the document. ?>
-<div id="lpn_library_box" class="d-print-none lpn-popover lpn-setbox lpn-libbox" style="display:none;position:fixed;z-index:22;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_libbox_title">
+<div id="lpn_library_box" class="d-print-none lpn-popover lpn-setbox lpn-libbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_libbox_title">
 	<div id="lpn_libbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_library_menu']?></div>
 	<button type="button" id="lpn_libbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -832,7 +832,7 @@ echoHeader("EngCalcs", $html_title, "", false);
       // scrolling body -- so there is one set of box mechanics on this page rather than a third.
       // The controls and both reports are built in JS (buildFireFlowBox), because what is in them
       // depends entirely on the document and on what the last run found. ?>
-<div id="lpn_ff_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;z-index:22;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffbox_title">
+<div id="lpn_ff_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffbox_title">
 	<div id="lpn_ffbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_title']?></div>
 	<button type="button" id="lpn_ff_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -845,7 +845,7 @@ echoHeader("EngCalcs", $html_title, "", false);
    what the Stop button already says in words, and two controls for one act is how a user learns to
    distrust both. It sits above the fire flow box (z-index 23 against 22) because it is the modal
    half of the same act, and its body is built by openFireFlowRunBox(). */ ?>
-<div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;z-index:23;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffrun_title">
+<div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">
 		<div id="lpn_ff_run_body"></div>
@@ -856,7 +856,7 @@ echoHeader("EngCalcs", $html_title, "", false);
       // js/looped-network.js builds those, so three popovers would have been three copies of the
       // same positioning and dismissal code. Replaces the Projects panel of Task 146.08 -- the tab
       // strip now answers "which network am I looking at", permanently and without a click. ?>
-<div id="lpn_menu_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:31;background:#fff;border:1px solid #333;padding:4px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<div id="lpn_menu_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1850;background:#fff;border:1px solid #333;padding:4px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
 	<div id="lpn_menu_list"></div>
 </div>
 <?php // The SUBMENU layer (Task 264 rework, Tom 2026-08-10: "the universal convention is for that to
@@ -865,7 +865,7 @@ echoHeader("EngCalcs", $html_title, "", false);
       // PARENT STAYS ON SCREEN -- replacing the list in one popup is what made New read as a menu
       // that had been navigated away from. z-index one above its parent so it paints over it where
       // the clamp has to overlap them on a narrow window. ?>
-<div id="lpn_menu_popup2" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:32;background:#fff;border:1px solid #333;padding:4px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<div id="lpn_menu_popup2" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1851;background:#fff;border:1px solid #333;padding:4px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
 	<div id="lpn_menu_list2"></div>
 </div>
 <?php // ONE dialog, reused for every question that has to be answered before anything else happens:
@@ -876,8 +876,8 @@ echoHeader("EngCalcs", $html_title, "", false);
       // is a fresh click, so it always has an activation of its own. ?>
 <!-- Swallows every click that is not in the dialog, which is what makes aria-modal true.
      z-index sits one below the dialog's 40. -->
-<div id="lpn_dialog_backdrop" class="d-print-none" style="display:none;position:fixed;z-index:39;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.25)"></div>
-<div id="lpn_dialog" class="d-print-none" role="dialog" aria-modal="true" style="display:none;position:fixed;z-index:40;left:50%;top:20%;transform:translateX(-50%);max-width:34em;background:#fff;border:1px solid #333;padding:12px;box-shadow:2px 2px 12px rgba(0,0,0,.4)">
+<div id="lpn_dialog_backdrop" class="d-print-none" style="display:none;position:fixed;z-index:1860;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.25)"></div>
+<div id="lpn_dialog" class="d-print-none" role="dialog" aria-modal="true" style="display:none;position:fixed;z-index:1870;left:50%;top:20%;transform:translateX(-50%);max-width:34em;background:#fff;border:1px solid #333;padding:12px;box-shadow:2px 2px 12px rgba(0,0,0,.4)">
 	<div id="lpn_dialog_body"></div>
 	<div id="lpn_dialog_buttons" style="margin-top:10px;text-align:right"></div>
 </div>

@@ -820,7 +820,32 @@ html[lang="zh"] .ec-welcome {
 /* The floor for every box makePanelDraggable() wires. raisePanel() writes a higher number inline as
    boxes are opened and touched; this is only where the stack starts, and it is what puts an untouched
    box above the chrome. */
+/* **THE WHOLE LADDER, IN ONE PLACE, because it was in five and that is how the tips got buried.**
+   Everything below 1200 is page furniture; everything at or above it is something the user summoned.
+
+     1200-1799  movable boxes. raisePanel() writes a number inline as they are opened and touched,
+                and RENORMALISES at the ceiling -- a counter with no ceiling leaves nothing that can
+                be reliably placed above the boxes, which is precisely how the tooltips were lost.
+     1850/1851  the menu pop-up and its fly-out. Above the boxes: a menu must be readable even when
+                a box has been dragged over the strip it hangs from.
+     1860/1870  the modal dialog's backdrop and the dialog. Above the menus; modal means modal.
+     1900       tooltips. Above everything summoned, which is Bootstrap's own order (its tooltip
+                z-index outranks its modal) and is right: a "?" inside a dialog must be readable.
+     3000       the registration bar, which outranks everything while a click sequence is running.
+
+   These four ids carry their number INLINE in Looped-Network.php, not here. That was true of the
+   boxes too until 2026-09-02, and it is why `.lpn-dragpanel { z-index: 1200 }` did nothing when it
+   was first written: an inline style beats any stylesheet rule, so the boxes were still sitting at
+   the 20/22/23 the markup gave them and only raisePanel()'s own inline write moved them. The boxes'
+   inline values are gone now and this rule is their floor. */
 .lpn-dragpanel { z-index: 1200; }
+/* **AND THE TIPS GO ABOVE THE BOXES THEY BELONG TO** (Tom, 2026-09-02: *"Boxes are now in front of
+   their own tips. Oops."*). Bootstrap paints a tooltip at its own $zindex-tooltip of 1080, which was
+   above every box until the boxes moved to 1200 -- so a "?" inside a box explained itself behind it.
+   1900 clears the panel band, which raisePanel() bounds at 1799 for exactly this reason: a counter
+   with no ceiling leaves nothing that can be reliably placed on top of it. Still under the
+   registration bar (3000). */
+.tooltip { z-index: 1900; }
 #lpn_menubar { display: flex; gap: 2px; margin-bottom: 4px; }
 .lpn-menubar-item { background: none; border: 1px solid transparent; font: inherit; padding: 3px 10px; cursor: pointer; }
 .lpn-menubar-item:hover { background: #def; border-color: #9bd; }

@@ -23292,12 +23292,32 @@ var EngCalcs = EngCalcs || {};
 	// a registry of every panel, and a number that rises has none of that bookkeeping. It is seeded
 	// well above the chrome and below the registration bar, which stays deliberately on top of
 	// everything.
+	// **THE BAND IS BOUNDED, AND THAT IS WHAT LETS ANYTHING SIT ABOVE IT.** A counter that only ever
+	// rises has no ceiling, so nothing can be placed reliably on top of the panels -- which is
+	// exactly what broke the tooltips: Bootstrap paints them at 1080 and the boxes had climbed past
+	// it. Tom, 2026-09-02: *"Boxes are now in front of their own tips. Oops."*
+	//
+	// So the panels live in [1200, 1799] and RENORMALISE when they reach the top: every wired panel
+	// is re-stacked from the base in its current order, which preserves what is in front of what and
+	// costs one pass over six elements. The registry is free -- makePanelDraggable() already sees
+	// every panel exactly once, which is the same seam that made the touch-action and the raise-on-
+	// press impossible to half-wire.
 	var LPN_PANEL_Z_BASE = 1200;
+	var LPN_PANEL_Z_CEILING = 1799;
 	var lpnPanelZ = LPN_PANEL_Z_BASE;
+	var lpnPanels = [];
+	function renormalisePanelStack() {
+		var ordered = lpnPanels.slice().sort(function (a, b) {
+			return (Number(a.style.zIndex) || 0) - (Number(b.style.zIndex) || 0);
+		});
+		lpnPanelZ = LPN_PANEL_Z_BASE;
+		ordered.forEach(function (el) { el.style.zIndex = String(lpnPanelZ++); });
+	}
 	function raisePanel(el) {
 		if (!el || !el.style) { return; }
 		// Already in front: do not burn a number on every pointerdown of a drag.
 		if (Number(el.style.zIndex) === lpnPanelZ) { return; }
+		if (lpnPanelZ + 1 > LPN_PANEL_Z_CEILING) { renormalisePanelStack(); }
 		lpnPanelZ += 1;
 		el.style.zIndex = String(lpnPanelZ);
 	}
@@ -23308,6 +23328,7 @@ var EngCalcs = EngCalcs || {};
 		// capture phase and separately from the drag handler below, which returns early unless the
 		// press is on the panel's own chrome -- typing in a field or pressing a button must bring
 		// its box forward too, and those presses never reach the drag handler's body.
+		if (lpnPanels.indexOf(popup) < 0) { lpnPanels.push(popup); }
 		popup.addEventListener('pointerdown', function () { raisePanel(popup); }, true);
 		// Opening a box is the other way it comes to the front. `display` is set by the openers
 		// rather than here, so this is the one seam every panel already passes through.

@@ -340,6 +340,41 @@ console.log('\n--- a box that fills the screen has to be scrollable by finger --
 	ok('and the registration bar still outranks them all',
 		/z-index:\s*3000/.test(css) && panelRule && Number(panelRule[1]) < 3000);
 
+	// **NO PANEL MAY CARRY AN INLINE z-index IN THE MARKUP** -- the defect that made the first
+	// version of this whole fix a no-op. An inline style beats any stylesheet rule, so six boxes sat
+	// at the 20/22/23 the markup gave them while `.lpn-dragpanel { z-index: 1200 }` sat there
+	// looking correct, and only raisePanel()'s own inline write ever moved them. The fire-flow run
+	// box was the one that showed it: it does not open through placePanelForScreen(), so nothing
+	// raised it and it opened at 23, underneath the chrome. Tom: *"No visible Run box."*
+	const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+	const inlineZ = ['lpn_popup', 'lpn_find_popup', 'lpn_settings_box', 'lpn_library_box',
+		'lpn_ff_box', 'lpn_ff_run_box'].filter(function (id) {
+		const m = new RegExp('id="' + id + '"[^>]*z-index:\\s*(\\d+)').exec(php);
+		return !!m;
+	});
+	ok('no movable box carries an inline z-index in the markup', inlineZ.length === 0,
+		JSON.stringify(inlineZ));
+
+	// **THE LADDER ABOVE THE BOXES.** Menus, the modal dialog and the tooltips all have to clear the
+	// panel band or they are hidden by the thing that summoned them.
+	const band = /LPN_PANEL_Z_CEILING = (\d+)/.exec(js);
+	ok('the panel band declares a ceiling', band, band && band[1]);
+	const above = { lpn_menu_popup: 'a menu over a box dragged across its strip',
+		lpn_dialog: 'a modal dialog' };
+	Object.keys(above).forEach(function (id) {
+		const m = new RegExp('id="' + id + '"[^>]*z-index:\\s*(\\d+)').exec(php);
+		ok(above[id] + ' clears the panel band',
+			m && band && Number(m[1]) > Number(band[1]), m && m[1]);
+	});
+	const tipRule = /\.tooltip\s*\{[^}]*z-index:\s*(\d+)/.exec(css);
+	ok('and a tip clears everything the user summoned, including a box and a dialog',
+		tipRule && band && Number(tipRule[1]) > Number(band[1]) &&
+		Number(tipRule[1]) > 1870, tipRule && tipRule[1]);
+
+	// The band renormalises rather than climbing for ever, which is what makes the line above safe.
+	ok('the stack renormalises at the ceiling instead of climbing past it',
+		/renormalisePanelStack\(\);/.test(js) && /lpnPanels\.indexOf\(popup\) < 0/.test(js));
+
 	// **RAISE ON TOUCH IS REGISTERED IN THE CAPTURE PHASE, and that is load-bearing.** The drag
 	// handler returns early unless the press is on the panel's own chrome, so a press on a control
 	// inside the box never reaches it -- and typing in Find must still bring Find forward.
@@ -355,7 +390,7 @@ console.log('\n--- a box that fills the screen has to be scrollable by finger --
 	// would pass on a raisePanel() that assigned nothing. Two real panels, raised in turn: the one
 	// raised last must be numerically in front, which is the whole of Tom's third report.
 	const S = require('./lpn-dom-stub.js').loadLoopedNetwork(
-		"\t\traisePanel: raisePanel,\n"
+		"\t\traisePanel: raisePanel, makePanelDraggable: makePanelDraggable,\n"
 	);
 	const a = { style: {}, classList: { add: function () {} }, addEventListener: function () {},
 		getBoundingClientRect: function () { return { left: 0, top: 0, width: 10, height: 10 }; } };
@@ -379,6 +414,33 @@ console.log('\n--- a box that fills the screen has to be scrollable by finger --
 	const held = a.style.zIndex;
 	S.raisePanel(a);
 	ok('...but re-raising the front box is a no-op', a.style.zIndex === held, held);
+
+	// **THE RENORMALISATION KEEPS THE ORDER, which is the only thing that makes it safe.** Run, not
+	// read: 700 raises drive the counter past the 1799 ceiling, and afterwards the boxes must still
+	// be stacked the way the user left them and must all be back inside the band -- or a tooltip at
+	// 1900 would be under a box again, which is the defect this bound exists to prevent.
+	const wired = [];
+	function wiredPanel() {
+		const el = { style: {}, classList: { add: function () {} },
+			addEventListener: function () {},
+			getBoundingClientRect: function () { return { left: 0, top: 0, width: 10, height: 10 }; } };
+		S.makePanelDraggable(el, null);   // this is what puts it in the registry
+		wired.push(el);
+		return el;
+	}
+	const p1 = wiredPanel(), p2 = wiredPanel(), p3 = wiredPanel();
+	S.raisePanel(p1); S.raisePanel(p2); S.raisePanel(p3);
+	for (let i = 0; i < 700; i++) { S.raisePanel(i % 2 ? p2 : p3); }
+	// Raise them back into a KNOWN order after the churn, so the assertion below is about the order
+	// surviving renormalisation rather than about which index the loop happened to stop on.
+	S.raisePanel(p1); S.raisePanel(p2); S.raisePanel(p3);
+	const zs = wired.map(function (e) { return Number(e.style.zIndex); });
+	ok('after 700 raises every box is still inside the band',
+		zs.every(function (z) { return z >= 1200 && z <= 1799; }), JSON.stringify(zs));
+	ok('...and the last one raised is still the front one',
+		Number(p3.style.zIndex) > Number(p2.style.zIndex) &&
+		Number(p2.style.zIndex) > Number(p1.style.zIndex),
+		JSON.stringify({ p1: p1.style.zIndex, p2: p2.style.zIndex, p3: p3.style.zIndex }));
 
 	ok('nothing disables a hydraulics number row', !/input\.disabled/.test(body('hydNumberRow')));
 	ok('...and blank still means "the file did not say"',
