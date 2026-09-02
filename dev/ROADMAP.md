@@ -264,21 +264,6 @@ the block.
       now read the pure twin. `fillBreaks()` matches the shape and is deliberately left: storing
       the derived breaks is documented design.
 
-- 100|573| **The lpn_ resync sprint: 320 keys, 26 languages, gated on Wave 0.**
-  `detect_english_drift.php` reports 224 NEW and 96 CHANGED keys since the 2026-08-09 sync, almost
-  all `lpn_`. `lpn_` is a core calculator, so the coverage cross puts every one of them in scope in
-  all 26 languages. **The gate is a Wave 0 friction pass over the 314 keys that do not already
-  carry a `$ec_lang_syn`** (`wave0_keyset.php --new-and-changed`), whose findings become English
-  rewrites before a single agent is paid. Sprint id `573-lpn-resync`.
-  - **The launch is Tom's to authorize and the count is announced before spawning**: 26 agents, 20
-    concurrent and 6 as slots free, Sonnet, one per language, ~50-key batches saved as they go.
-  - **A separate gate is genuinely his and is not this sprint's:** `friction_check.php` with no
-    argument exits 1 on **16 `refer-to-human` entries from `239-wave0-calcs.json`**, the non-`lpn_`
-    calculator keys. He answers in `dev/english-friction/239-refer-to-human.md`, one `**Tom:**`
-    line per item. They block a CALCULATOR-side sprint, not this one, and they are cheap for him.
-  - Closes with the glossary write-back and `detect_english_drift.php --baseline-new`, without
-    which the sprint's keys stay `NEW` for ever and a later English edit is invisible to both tools.
-
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
   What that one pass costs, in Chromium on the 480-pipe grid `specs/perf.js` builds: 1.3–7.3 s in
