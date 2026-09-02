@@ -1104,69 +1104,53 @@ the block.
     padding at all. And a node now outranks a label, which reversed a same-day decision; the residual
     risk named at `nodeOutranks()` is a SHORT label on a far-zoomed-out drawing falling wholly inside
     the reach and becoming ungrabbable until you zoom in. Nobody has seen it.
+  - **Vertices, after Task 567's 2026-09-02 batch — the biggest thing here, and the one that needs
+    a PHONE.** (a) Draw a pipe through two clicks in open space and confirm the dashed line follows
+    the bends and the rubber band starts at the newest one; press Escape mid-drawing and confirm
+    nothing is left behind. (b) Turn on the Vertices tool: every pipe's bends should become hollow
+    grips, one press on a pipe should add one, one press on a grip should remove it, and a finger
+    drag 20 px off a grip should move it — that last is the measured symptom, *"not on phone
+    anywhere."* (c) In Select mode, double-click a pipe and confirm it does NOT bend any more; that
+    is a deliberate removal and the one change here somebody may miss. (d) The specific case that
+    failed before: add a bend where an ALIGNED LABEL lies over the pipe.
   - **Tips (closed Task 571):** open a "?" inside Settings, Find and Fire flow — the tip must sit
     OVER the box; then close the box and confirm nothing lingers.
 
-- 100|567| **Vertices are the worst interaction on the map, and EPANET already solved it.**
-  Tom, 2026-09-01, testing on a phone: *"Vertices are a problem, and this opens a can of worms. Our
-  vertices are hard to add or remove by double-clicking, and the link selection highlighting confuses
-  the procedure."* Two measured symptoms: **(a)** adding a vertex fails repeatably when an aligned
-  label is in the way; **(b)** dragging one is *"fine on PC, even near nodes, but not on phone
-  anywhere."*
-  - **THE ANSWER HE FOUND IS A MODE, NOT A BETTER GUESS.** EPANET puts *Vertices* on a right-click
-    menu: turn it on and the vertices of that one pipe appear as hollow square grips, with Add,
-    Delete and Quit editing on the menu; turn it off and they are invisible and the menu is Copy,
-    Paste, Delete, Reverse, |, Vertices, Properties. epanet-js does the same job with a right-click
-    *Redraw* that puts the asset back newly drawn. **Both are foolproof because they never guess what
-    the user is trying to do** — which is exactly what our double-click does. Tom: *"We could tweak
-    the behavior to enable vertices mode for all pipes if that's efficient."*
-  - **[PROMOTED BY TOM 2026-09-02 FROM A SIDE NOTE TO THE ESSENTIAL PART.** *"I do think that like
-    all the software we should allow vertices (clicks in open space) on Add pipe. This is essential,
-    and I let it slide or didn't see."*] Both reference tools accept arbitrary points for link
-    vertices until a second node is clicked, and we do not: drawing a pipe here goes node to node and
-    a bend has to be added afterwards, through the double-click that is the rest of this task. **Doing
-    it while drawing is the half that removes the need for the other half in the common case**, which
-    is why it moved from "a second, separable want" to the thing to build. It is still separable
-    work; it is no longer optional.
-  - **THE SMALL-SYMBOL ARGUMENT IS RECORDED AND TOM HIMSELF DISCOUNTED IT**, so it is not a reason to
-    act: vertices are small partly to avoid confusion with other symbols, which *might* be mitigated
-    if they were the only hollow symbol on the map — *"Frankly, that's a lot of stacked 'mights' to
-    base any decision on."*
-  - **[DONE 2026-09-01] THE FIRST STRAND WAS A LIVE HAZARD, NOT A FEATURE GAP**, found by the
-    `utility-field-operator` agent reading for a different question. In ordinary `select` mode --
-    the mode a person is in while doing nothing but reading -- the browser's own `dblclick` bends a
-    pipe or deletes a bend with **no gate and no undo snapshot**, while the identical edit through
-    the Delete TOOL took one, because that one call site remembered. **The accident was the
-    unrecoverable half and the deliberate act was the safe one**, which is backwards. And it is easy
-    to reach by accident: a single tap on a link opens its popup only after a 300 ms debounce,
-    deliberately, so a SECOND tap can complete a double-click — so somebody taps a pipe to read it,
-    sees nothing happen, taps again, and has silently reshaped somebody else's model. The canvas
-    carries `touch-action: none`, so the browser's own harmless double-tap-to-zoom never intercepts
-    it either. `saveUndoSnapshot()` moved INTO `insertVertex()`/`removeVertex()` so a third caller
-    cannot forget — the same shape as the two link-teardown lists closed the same day. Asserted in
-    `dev/lpn-spike/zombie-label-harness.js`; mutation-tested, 4 of 14 fail with the hazard restored.
-    **This makes the accident recoverable and does not make it unreachable** — the DOOR is the rest
-    of this task.
-  - **THE AGENT'S RANKING, and it disagrees with the order this task was written in:** fix the
-    accidental edit path first (done); then build the mode on the `profileDrawActive()`/
-    `profileDrawSay()` template (Tasks 433/504), which is already a modal, phone-tested editing
-    state that consumes every press and keeps a live on-screen line saying what state you are in —
-    rather than inventing one. It would **not** build "bigger handles" as a standalone fix: once
-    vertex editing needs a deliberate door, how easy a handle is to graze in ordinary browsing stops
-    mattering. Arbitrary points while drawing is real but a drafter's want, not a reader's.
-  - **CITED, and it is the part this repo did not have.** Esri ArcGIS Field Maps shows and edits
-    vertices only after the user explicitly starts editing a feature — never from a gesture in the
-    default browsing view — and its `ReticleVertexTool` (Maps SDK 200.5+) fixes a crosshair at
-    screen centre and pans the map UNDER it, decoupling precision from finger contact size
-    altogether. OpenStreetMap's Vespucci enters a deliberate "New" mode by long-press before any
-    vertex can be added; a bare tap in ordinary browsing never reshapes a way. **So the door being
-    an explicit control rather than a gesture is what the field tools all converged on**, and the
-    reticle is a better long-term answer than bigger handles. Full trace and sources:
-    `dev/agents/utility-field-operator/journal.md`, 2026-09-01.
-  - **THE TOUCH-REACH WORK DELIBERATELY LEFT THE VERTEX HANDLE ALONE** (closed Task 562): a node
-    outranks a link and a label but still yields to `.lpn-vhandle`, because taking the handle away
-    would deepen this defect rather than fix anything. Whatever lands here decides whether that
-    exception survives.
+- 100|567| **[H] Vertices are a mode now; what is left is Tom looking at it.**
+  Tom, 2026-09-01, on a phone: *"Vertices are a problem... hard to add or remove by double-clicking,
+  and the link selection highlighting confuses the procedure."* Two measured symptoms: adding one
+  failed repeatably with an aligned label in the way, and dragging one was *"fine on PC... but not
+  on phone anywhere."* **Both strands are built, green and harness-guarded** — the remaining work is
+  his pass, listed in Task 572.
+  - **[DONE 2026-09-02] ARBITRARY POINTS WHILE DRAWING**, the half he promoted from a side note to
+    the essential part (*"like all the software we should allow vertices (clicks in open space) on
+    Add pipe. This is essential"*). A click in open space between the two node clicks is a BEND, not
+    the abandonment it used to be, so a mis-aimed second click no longer costs the first. The points
+    are view state until the second node arrives, so an abandoned drawing writes nothing and owes no
+    undo press; Escape is the way out, and every exit goes through `setPendingLinkFrom()` so the
+    next pipe cannot inherit the last one's bends. `dev/lpn-spike/draw-vertex-harness.js`.
+  - **[DONE 2026-09-02] THE MODE, AND IT IS THE DOOR.** A `vertices` mode on the toolbar and the
+    Edit menu, both toggling. Inside it a SINGLE press adds, removes and drags a bend — no
+    double-click, which is the gesture that could not be landed on a phone at all — a grip is found
+    by the same screen reach every other object uses (so a finger gets the finger's 24 px), a grip
+    outranks the pipe it sits on, and a press on a node PANS rather than moving the pipework. The
+    grips are one CSS class on the canvas, so entering the mode creates nothing.
+    `dev/lpn-spike/vertex-mode-harness.js`.
+  - **AND THE DOUBLE-CLICK NO LONGER BENDS A PIPE IN `select`.** That was the accidental edit path
+    closed Task 567's first strand had only made RECOVERABLE. It is now unreachable in the mode a
+    person is in while reading: the three label-home resets in the same handler are untouched, and
+    the gesture still works inside the vertices mode. `lpn_mode_select` stopped promising it.
+  - **THE FIELD TOOLS ALL CONVERGED ON A DOOR RATHER THAN A GESTURE**, which is what settled the
+    shape: Esri Field Maps edits vertices only after the user explicitly starts editing, and its
+    `ReticleVertexTool` fixes a crosshair at screen centre and pans the map under it; Vespucci needs
+    a deliberate long-press "New" mode. **The reticle is the better long-term answer than bigger
+    handles** and is not built. Sources: `dev/agents/utility-field-operator/journal.md`, 2026-09-01.
+  - **Three new English strings await Tom's wording** — `lpn_tool_vertices`, `_tip`, and
+    `lpn_mode_vertices` — and `lpn_mode_select`, `_add_pipe`, `_add_pump` and `_add_valve` were
+    edited. All are in `dev/new-english-keys.md` / the drift list.
+  - **The touch-reach exception survives** (closed Task 562): a node outranks a link and a label but
+    still yields to `.lpn-vhandle`. It costs nothing now — outside the mode a grip is only DRAGGED,
+    never bent, so grazing one is recoverable by the same drag.
 
 - 75|570| **The EPANET report gets a box of its own: draggable, sizeable, and one of the family.**
   Tom, 2026-09-02, having just spent a session on the window model: *"EPANET report: How about we
