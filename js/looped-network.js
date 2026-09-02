@@ -9380,32 +9380,38 @@ var EngCalcs = EngCalcs || {};
 		closeMenu();
 		rebuildFindForm();
 		renderFindResults(null);
-		if (findUserPos) {
-			// Re-clamped rather than restored blindly: the window may have been resized smaller
-			// since, and a box remembered off-screen is a box that never comes back.
-			//
-			// **CAPPED BEFORE IT IS MEASURED, or the clamp works from a height the box will not
-			// have.** The top comes first because the cap depends on it: how much room there is
-			// below is a fact about where the box is going, not about the window.
-			popup.style.display = 'block';
-			top = Math.max(chromeFloor(), findUserPos.top);
-			capPanelToRoomBelow(popup, top);
-			r = popup.getBoundingClientRect();
-			at = clampPanel(findUserPos.left, top, r.width, r.height,
-				window.innerWidth, window.innerHeight, chromeFloor());
-			popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
-		} else if (anchorEl && anchorEl.getBoundingClientRect) {
-			openPanelAtAnchor(popup, anchorEl.getBoundingClientRect());
-		} else {
-			popup.style.display = 'block';
-			h = fitPanelToViewport(popup); r = popup.getBoundingClientRect();
-			popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
-			top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
-			// Centring can only ever move the box DOWN once the chrome floor bites, so the height it
-			// was fitted to is no longer the height that fits.
-			capPanelToRoomBelow(popup, top);
-			popup.style.top = top + 'px';
-		}
+		// **ON A PHONE IT FILLS THE WINDOW, AND ITS 22rem max-width GOES WITH IT** (Tom,
+		// 2026-09-01: *"Find is not resizeable on phone"*, and the leaning he drew from the three
+		// boxes together -- on a phone they should occupy the whole page). placePanelForScreen()
+		// overrides the inline cap; nothing here reads findUserPos at that width, which is the
+		// price of opening in a known state that he named himself and accepted.
+		popup.style.display = 'block';
+		placePanelForScreen(popup, function () {
+			if (findUserPos) {
+				// Re-clamped rather than restored blindly: the window may have been resized smaller
+				// since, and a box remembered off-screen is a box that never comes back.
+				//
+				// **CAPPED BEFORE IT IS MEASURED, or the clamp works from a height the box will not
+				// have.** The top comes first because the cap depends on it: how much room there is
+				// below is a fact about where the box is going, not about the window.
+				top = Math.max(chromeFloor(), findUserPos.top);
+				capPanelToRoomBelow(popup, top);
+				r = popup.getBoundingClientRect();
+				at = clampPanel(findUserPos.left, top, r.width, r.height,
+					window.innerWidth, window.innerHeight, chromeFloor());
+				popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
+			} else if (anchorEl && anchorEl.getBoundingClientRect) {
+				openPanelAtAnchor(popup, anchorEl.getBoundingClientRect());
+			} else {
+				h = fitPanelToViewport(popup); r = popup.getBoundingClientRect();
+				popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
+				top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
+				// Centring can only ever move the box DOWN once the chrome floor bites, so the height
+				// it was fitted to is no longer the height that fits.
+				capPanelToRoomBelow(popup, top);
+				popup.style.top = top + 'px';
+			}
+		});
 		input = popup.querySelector('input[type=text]');
 		if (input) { input.focus(); input.select(); }
 	}
@@ -21997,7 +22003,6 @@ var EngCalcs = EngCalcs || {};
 		closeMenu();
 		hideOpenTips();
 		box.style.display = 'flex';
-		applySetboxSize(box);
 		rebuildSettingsBox();
 		// **CAPPED TO THE ROOM UNDER THE CHROME BEFORE IT IS PLACED, OR ITS OWN RESIZE GRABBER GOES
 		// OFF THE BOTTOM OF THE PHONE.** clampPanel()'s `top` is `max(floor, min(top, vh - h - 4))`,
@@ -22013,18 +22018,25 @@ var EngCalcs = EngCalcs || {};
 		// 2026-08-27, and the fire flow box) -- the overflow moves inside `.lpn-popover-body`, where
 		// it scrolls. The floor is measured ONCE and reused by the clamp: measuring it twice around a
 		// style write is two layouts and two chances to disagree.
-		floor = chromeFloor();
-		capPanelToRoomBelow(box, floor);
-		// Placed, then clamped: the window may have shrunk since the last drag, and a box
-		// remembered off-screen is a box that never comes back.
-		r = box.getBoundingClientRect();
-		home = setboxHomeCorner(r.width, r.height);
-		at = clampPanel(
-			setboxLayout.left === null ? home.left : setboxLayout.left,
-			setboxLayout.top === null ? home.top : setboxLayout.top,
-			r.width, r.height, window.innerWidth, window.innerHeight, floor);
-		box.style.left = at.left + 'px';
-		box.style.top = at.top + 'px';
+		//
+		// **AND ON A PHONE NONE OF THAT RUNS: THE BOX FILLS THE WINDOW** (Tom, 2026-09-01). The
+		// remembered size and the remembered corner are both skipped there, deliberately -- see
+		// placePanelForScreen(), which is where the trade he accepted is written down.
+		placePanelForScreen(box, function () {
+			applySetboxSize(box);
+			floor = chromeFloor();
+			capPanelToRoomBelow(box, floor);
+			// Placed, then clamped: the window may have shrunk since the last drag, and a box
+			// remembered off-screen is a box that never comes back.
+			r = box.getBoundingClientRect();
+			home = setboxHomeCorner(r.width, r.height);
+			at = clampPanel(
+				setboxLayout.left === null ? home.left : setboxLayout.left,
+				setboxLayout.top === null ? home.top : setboxLayout.top,
+				r.width, r.height, window.innerWidth, window.innerHeight, floor);
+			box.style.left = at.left + 'px';
+			box.style.top = at.top + 'px';
+		});
 		if (section && SETBOX_TARGETS[section]) {
 			target = document.getElementById(SETBOX_TARGETS[section]);
 			if (target) {
@@ -22057,6 +22069,11 @@ var EngCalcs = EngCalcs || {};
 		// Dragged by its chrome, exactly like the property popup and Find: `e.target` is the box
 		// itself only in the padded band, so a drag can never start on a control.
 		makePanelDraggable(box, function (pos) {
+			// **A PHONE NEVER WRITES THE REMEMBERED CORNER** (Tom, 2026-09-01). The box opens
+			// filling the window at that width and is not restored to a dragged corner there, so
+			// storing one would only ever be felt on the desktop -- as a box that had moved itself
+			// while the user was on a train.
+			if (smallScreen()) { return; }
 			setboxLayout.left = pos.left;
 			setboxLayout.top = pos.top;
 			saveSetboxLayout();
@@ -22075,6 +22092,11 @@ var EngCalcs = EngCalcs || {};
 			new window.ResizeObserver(function () {
 				var r, at, capped;
 				if (!setboxIsOpen()) { return; }
+				// **AND NOTHING MEASURED ON A PHONE IS STORED**, for the same reason the capped
+				// height below is not: the box fills the window at that width, so every number this
+				// observer sees there is the window's and not the user's, and storing it would
+				// hand the desktop a size chosen by a phone it has never seen.
+				if (smallScreen()) { return; }
 				r = box.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
 				setboxLayout.w = Math.round(r.width);
@@ -22093,7 +22115,11 @@ var EngCalcs = EngCalcs || {};
 				// right edge is a one-way trip -- measured 2026-08-19: left 932 + 554 wide in a 1400
 				// window put the corner 86 px past the edge. Clamping here slides the box back the
 				// way a dragged one is clamped, which is the same promise in the other direction.
-				at = clampPanel(r.left, r.top, r.width, r.height, window.innerWidth, window.innerHeight, chromeFloor());
+				// The floor is the window's own margin rather than chromeFloor(): a box the user
+				// has deliberately dragged up over the page's header (Tom, 2026-09-01) must not be
+				// shoved back under the menu bar the next time it is resized. What this call is
+				// for is the growing case described above, and that is unaffected.
+				at = clampPanel(r.left, r.top, r.width, r.height, window.innerWidth, window.innerHeight, 0);
 				if (at.left !== Math.round(r.left) || at.top !== Math.round(r.top)) {
 					box.style.left = at.left + 'px';
 					box.style.top = at.top + 'px';
@@ -22964,13 +22990,16 @@ var EngCalcs = EngCalcs || {};
 		box.style.display = 'flex';
 		rebuildLibraryBox();
 		// It borrows .lpn-setbox's shell, so it borrows the shell's failure: see openSettingsBox().
-		floor = chromeFloor();
-		capPanelToRoomBelow(box, floor);
-		r = box.getBoundingClientRect();
-		home = setboxHomeCorner(r.width, r.height);
-		at = clampPanel(home.left, home.top, r.width, r.height, window.innerWidth, window.innerHeight, floor);
-		box.style.left = at.left + 'px';
-		box.style.top = at.top + 'px';
+		// And it borrows the phone rule with it -- on a small screen this box fills the window.
+		placePanelForScreen(box, function () {
+			floor = chromeFloor();
+			capPanelToRoomBelow(box, floor);
+			r = box.getBoundingClientRect();
+			home = setboxHomeCorner(r.width, r.height);
+			at = clampPanel(home.left, home.top, r.width, r.height, window.innerWidth, window.innerHeight, floor);
+			box.style.left = at.left + 'px';
+			box.style.top = at.top + 'px';
+		});
 		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
 	}
 	function closeLibraryBox() {
@@ -23103,8 +23132,12 @@ var EngCalcs = EngCalcs || {};
 		});
 		popup.addEventListener('pointermove', function (e) {
 			if (!drag) { return; }
-			var at = clampPanel(e.clientX - drag.dx, e.clientY - drag.dy, drag.w, drag.h,
-				window.innerWidth, window.innerHeight, chromeFloor());
+			// **dragBounds, NOT the opening clamp: once the box is open, where it goes is the user's
+			// business** (Tom, 2026-09-01). The opening clamp still keeps every box fully on screen
+			// and below the chrome; a drag is allowed to park it over the page's own header, or to
+			// push it off an edge until a sliver is left.
+			var at = dragBounds(e.clientX - drag.dx, e.clientY - drag.dy, drag.w, drag.h,
+				window.innerWidth, window.innerHeight);
 			popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
 			// Remembered as it moves rather than on release: a drag that ends off-window, or is
 			// interrupted by the pointer being cancelled, still leaves the popup where it looks.
@@ -23622,6 +23655,33 @@ var EngCalcs = EngCalcs || {};
 			top: Math.max(floor, Math.min(top, vh - h - POPUP_EDGE))
 		};
 	}
+	// **A DELIBERATE MOVE IS THE USER'S, AND ALL WE OWE THEM IS A HANDLE BACK** (Tom, 2026-09-01:
+	// *"If they want to drag or size the box so only a tiny sliver remains or is visible on the
+	// screen, so be it. This is the phone. They are not arranging several boxes artfully on the
+	// screen."* And, of the desktop: *"my only complaint is that I can't drag a box above the map
+	// onto the top area of the page."*).
+	//
+	// clampPanel() above is the OPENING rule and is unchanged: a box is placed fully on screen and
+	// under the chrome every time it is opened. This is the DRAGGING rule, and it is deliberately
+	// weaker on both axes -- the floor is the top of the WINDOW rather than chromeFloor(), which is
+	// the one thing Tom asked for on the desktop, and each edge may leave the window until only
+	// LPN_DRAG_SLIVER px of the box are left.
+	//
+	// **THE SLIVER IS ABOUT REVERSIBILITY, NOT TIDINESS.** The top 40 px of every one of these
+	// boxes is its drag band and it spans the full width, so whatever sliver survives still holds a
+	// piece of the band the box can be picked up by again -- and clampPanel() brings it back the
+	// next time it is opened. `top` is never negative for the same reason: a band dragged off the
+	// TOP of the window is gone, and there is nothing left to grab.
+	//
+	// Pure, and evaluated in isolation by dev/lpn-spike/panel-fill-harness.js, for the same reason
+	// clampPanel() is: this is the arithmetic that decides whether a box can be lost.
+	var LPN_DRAG_SLIVER = 28;
+	function dragBounds(left, top, w, h, vw, vh) {
+		return {
+			left: Math.max(LPN_DRAG_SLIVER - w, Math.min(left, vw - LPN_DRAG_SLIVER)),
+			top: Math.max(0, Math.min(top, vh - LPN_DRAG_SLIVER))
+		};
+	}
 	// The bottom of the page chrome in viewport coordinates -- measured, not typed, because the strip
 	// wraps at narrow widths and is partly hidden below the small-screen breakpoint.
 	function chromeFloor() {
@@ -23808,6 +23868,88 @@ var EngCalcs = EngCalcs || {};
 		if (h <= avail) { return h; }
 		capPanelHeight(panel, body, avail, h);
 		return avail;
+	}
+	// **ON A PHONE A STANDING BOX FILLS THE WINDOW, AND COMES BACK THAT WAY EVERY TIME** (Tom,
+	// 2026-09-01, after using the boxes on a phone: *"when a box opens, it needs to fit entirely on
+	// the screen. And for some of these larger boxes that are resizeable, I would have them maybe
+	// fill the entire browser... I am led to wonder if on phone they all just need to occupy the
+	// entire page and be done with it."*).
+	//
+	// He named the disadvantage in the same breath and accepted it: a phone box does NOT remember
+	// where it was dragged or how it was sized, because the two rules cannot both hold. *"I can't
+	// see any option other than to open it in its initial state."* So nothing here reads
+	// setboxLayout or findUserPos, and the writers that fill them are turned off at this width --
+	// a size measured on a phone must never ratchet the desktop's remembered one.
+	//
+	// **THE INLINE max-width IS THE HALF THAT IS EASY TO MISS.** #lpn_find_popup carries
+	// `max-width: 22rem` in the markup and .lpn-setbox carries min-width/max-width in the
+	// stylesheet, so writing a width alone loses to all three -- which is exactly the
+	// claustrophobic box Tom reported (*"their width is constrained so much that resize feels
+	// claustrophobic and pointless"*). Every one of them is overridden here and cleared by
+	// resetPanelFill() on the way back to a pointer machine.
+	//
+	// The height goes through capPanelHeight() rather than being written directly, so the overflow
+	// lands inside `.lpn-popover-body` where it scrolls -- the same seam every other placement on
+	// this page uses, and the reason the box's furniture is measured BEFORE the cap is written.
+	function fillPanelToScreen(box) {
+		var body = panelBody(box), top = chromeFloor(), w, h, natural, i;
+		if (!box.lpnFillWas) {
+			box.lpnFillWas = {};
+			for (i = 0; i < LPN_FILL_PROPS.length; i++) {
+				box.lpnFillWas[LPN_FILL_PROPS[i]] = box.style[LPN_FILL_PROPS[i]];
+			}
+		}
+		resetPanelFill(box);
+		resetPanelHeight(box, body);
+		w = Math.max(0, (window.innerWidth || 0) - 2 * POPUP_EDGE);
+		h = Math.max(0, (window.innerHeight || 0) - top - POPUP_EDGE);
+		box.style.left = POPUP_EDGE + 'px';
+		box.style.top = top + 'px';
+		box.style.width = w + 'px';
+		box.style.minWidth = '0';
+		box.style.maxWidth = w + 'px';
+		// Measured at the fill WIDTH and before any height is written, so the furniture the cap
+		// subtracts describes the layout the box is about to have.
+		natural = box.getBoundingClientRect().height;
+		box.style.height = h + 'px';
+		box.style.minHeight = '0';
+		capPanelHeight(box, body, h, natural);
+		return h;
+	}
+	// Everything fillPanelToScreen() writes, put back. Called on the way IN on a pointer machine
+	// rather than on the way out on a phone: a window can be resized across the breakpoint, or a
+	// project opened on a phone and continued on a laptop, and the only moment either box is
+	// certain to be looked at again is the moment it opens.
+	//
+	// **RESTORED, NOT BLANKED, AND THE DIFFERENCE IS A DEFECT.** #lpn_find_popup states
+	// `max-width: 22rem` in its own markup, INLINE, which is the only place that box's real width
+	// is written down. Setting `style.maxWidth = ''` would not fall back to a stylesheet rule --
+	// there is none -- it would simply delete the cap, and Find would come back as wide as its
+	// longest result for the rest of the session. So the values the markup had are read once,
+	// before the first fill overwrites them, and handed back.
+	var LPN_FILL_PROPS = ['width', 'height', 'minWidth', 'minHeight', 'maxWidth'];
+	function resetPanelFill(box) {
+		var was = box.lpnFillWas, i, k;
+		for (i = 0; i < LPN_FILL_PROPS.length; i++) {
+			k = LPN_FILL_PROPS[i];
+			box.style[k] = was ? was[k] : '';
+		}
+	}
+	// **THE ONE PLACE A STANDING BOX IS PLACED WHEN IT OPENS.** Four boxes go through it -- Settings,
+	// the Library, Fire flow and Find -- and each hands in its own pointer-machine placement as
+	// `place`, which is left exactly as it was. A fifth box added without this call is a box that
+	// opens claustrophobic on a phone, which is why the harness counts the call sites against the
+	// panels makePanelDraggable() wires rather than trusting a list.
+	//
+	// The two panels that deliberately do NOT fill are declared in dev/lpn-spike/panel-fill-harness.js
+	// with their reasons: the property popup opens BESIDE the element it describes (filling the
+	// window would hide the junction the reader is looking at, and it is not resizeable), and the
+	// fire flow run dialog is a bar, two lines and a Stop button over a drawing it is reporting on.
+	function placePanelForScreen(box, place) {
+		if (smallScreen()) { return fillPanelToScreen(box); }
+		resetPanelFill(box);
+		place();
+		return null;
 	}
 	// WHERE THE PROPERTY POPUP OPENS once the user has moved it: exactly where they left it, as
 	// EPANET's own property window does. Null until the first drag, so a user who has never dragged
@@ -27147,12 +27289,17 @@ var EngCalcs = EngCalcs || {};
 		// **IT CENTRES** (Tom, 2026-08-27, of this box: he liked that it does). Re-measured on every
 		// open rather than remembered: the box is resizeable and the window may have changed, and a
 		// box remembered off-screen is a box that never comes back.
-		h = fitPanelToViewport(box);
-		r = box.getBoundingClientRect();
-		box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
-		top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
-		capPanelToRoomBelow(box, top);
-		box.style.top = top + 'px';
+		// On a phone it fills the window instead -- Tom named this box by name on 2026-09-01, and
+		// two report tables side by side were never going to be read in a 52rem box on a 360px
+		// screen anyway.
+		placePanelForScreen(box, function () {
+			h = fitPanelToViewport(box);
+			r = box.getBoundingClientRect();
+			box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
+			top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
+			capPanelToRoomBelow(box, top);
+			box.style.top = top + 'px';
+		});
 		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
 	}
 	function closeFireFlowBox() {

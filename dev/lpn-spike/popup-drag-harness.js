@@ -83,10 +83,15 @@ console.log('\n-- the case that matters on a phone: a box TALLER than the viewpo
 console.log('\n-- both placement routes go through it --');
 {
 	report(/clampPanel\(/.test(extract('openPopupAt')), 'opening the box at a point on the map clamps');
-	// The drag lives in makePanelDraggable() since 2026-08-18: the Find panel is a standing box too
-	// (Tom: "Like the properties box, we want it to be draggable and have an X to close"), and two
-	// copies of a drag would be two chances for one of them to escape the window.
-	report(/clampPanel\(/.test(extract('makePanelDraggable')), 'and so does the drag');
+	// **AND THE DRAG DELIBERATELY DOES NOT** (Tom, 2026-09-01: *"If they want to drag or size the
+	// box so only a tiny sliver remains or is visible on the screen, so be it"*, and *"I can't drag
+	// a box above the map onto the top area of the page"*). Opening is clamped; dragging goes
+	// through dragBounds(), which is the same arithmetic with both floors relaxed. The pair is
+	// asserted in dev/lpn-spike/panel-fill-harness.js; what is checked here is that the drag has
+	// exactly one of them and it is not this one.
+	report(!/clampPanel\(/.test(extract('makePanelDraggable')) &&
+		/dragBounds\(/.test(extract('makePanelDraggable')),
+		'and the drag goes through dragBounds(), which lets a deliberate move leave the window');
 }
 
 console.log('\n-- the wiring rules that keep a drag out of the controls --');
