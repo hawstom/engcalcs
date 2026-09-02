@@ -976,11 +976,22 @@ html[lang="zh"] .ec-welcome {
    not by a finger -- and this comment named *Find* as one of its three while the selector beside it
    named *Library*. `dev/lpn-spike/panel-touch-harness.js` now asserts the two halves agree. */
 .lpn-dragpanel { cursor: move; touch-action: none; }
-.lpn-dragpanel .lpn-popover-body { cursor: auto; }
-/* ...and the two panes take their touch gestures BACK, or `touch-action: none` above would make
-   them unscrollable by finger. The drag surface is the box's own padded band, which these are not
-   part of. */
+/* **AND THE BODY TAKES ITS TOUCH GESTURES BACK, WHOLESALE** (2026-09-01). The rule above was
+   written for the DRAG BAND -- the padded chrome, which is the only part of the box a drag can
+   start on -- but it is written on the box, so it lands on everything inside it as well. The two
+   Settings panes were given `touch-action` back by name, and the three other scrolling regions
+   inside these boxes were not: the Find results, the fire flow report and its sideways-scrolling
+   table, and the property popup's own body. The whole POINT of `.lpn-popover-body` is that it is
+   the part that scrolls when there is more box than screen, so declaring it here rather than
+   naming panes is the same move `.lpn-dragpanel` itself was: one seam, and a seventh box cannot
+   arrive half-wired.
+   `cursor: auto` on the same line, so a text input never shows a move cursor. */
+.lpn-dragpanel .lpn-popover-body { cursor: auto; touch-action: auto; }
+/* The two Settings panes are nested scrollers INSIDE that body, so they say it for themselves --
+   a nested scroll region is consulted on its own and is not covered by its ancestor's answer. */
 .lpn-setbox-index, .lpn-setbox-content { touch-action: auto; }
+/* ...and so are the fire flow report and the sideways scroll its ten-column table lives in. */
+.lpn-ff-report, .lpn-ff-tablewrap { touch-action: auto; }
 @supports (height: 100dvh) {
 	.lpn-popover { max-height: calc(100dvh - 8px); }
 	.lpn-popover-body { max-height: calc(100dvh - 56px); }
@@ -1860,6 +1871,25 @@ html[lang="zh"] .ec-welcome {
 #lpn_settings_box .lpn-set-secbody input[type="text"]:not([size]),
 #lpn_settings_box .lpn-set-secbody input.lpn-set-num { width: var(--lpn-set-num); box-sizing: border-box; }
 #lpn_settings_box .lpn-set-secbody select { width: 100%; max-width: var(--lpn-set-ctl); box-sizing: border-box; }
+/* **AN UNSET NUMBER IS LIVE, NOT DISABLED** (Tom, 2026-09-01, of Maximum trials: *"On PC it's
+   obviously disabled"* -- it is not, and nothing in this file or in js/looped-network.js ever sets
+   `disabled` on one of these). What he was reading is the only appearance an unset row has: an
+   empty box showing its default as a placeholder, in whatever grey the browser picks -- which in
+   Chrome is the same grey it greys a dead control with. A control that reads as dead IS dead, so
+   the appearance is the defect even though the state is correct.
+
+   **THE FIX IS NOT TO PRE-FILL THE VALUE**, and that is the whole constraint: blank means "the
+   file did not say", an empty box exports no line and a typed default exports one stating the
+   default (see hydNumberRow()). Two different files, and only the user may choose between them.
+   So the placeholder is restyled instead -- darker than the disabled grey, and ITALIC, which is
+   what says "this is the value in force, not a value you typed". Nothing about the row's state
+   changes and no string moves.
+
+   Rejected: putting the word "default" in the placeholder. The number box is 4.5rem wide (Tom's
+   own ruling that these are as wide as the numbers they hold), so a placeholder of "40 (default)"
+   would be clipped to about "40 (def" -- and it would cost a new key in 27 languages to say what
+   the row's tip already says. */
+#lpn_settings_box .lpn-set-secbody input::placeholder { color: #555; opacity: 1; font-style: italic; }
 /* A control that is a BOX PLUS A BUTTON -- the ID prefixes' "Apply to all", the label view width's
    "Use current view" -- stays inside the column and wraps its button under its box, rather than
    growing left out of the column and taking that row's one x with it. */

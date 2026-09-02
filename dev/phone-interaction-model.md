@@ -40,12 +40,21 @@ deliberately undone and item 7 is still open.
 7. **What is hidden and what shrinks is a question about the window**, and it is asked once, at one
    width. Layout narrows; behaviour does not change with width.
 8. **A box is capped to the room it actually has**, and the overflow goes inside its own scrolling
-   area — never off the bottom of the screen, taking its resize grip with it.
+   area — never off the bottom of the screen, taking its resize grip with it. **On a phone it does
+   not merely fit the room, it TAKES it** (Tom, 2026-09-01): Settings, the Library, Fire flow and
+   Find each open filling the window, and open that way again next time, because a phone box that
+   remembered where it was dragged could not also promise to open whole. Rule 10 is the other half.
 9. **A touchscreen fires a phantom mouse click a moment after a tap.** Anything that appears under
    the finger ignores that click for what is left of the window, or it opens something nobody asked
    for. The box works that out from the press; no caller sets a flag.
+10. **Where a box goes once it is open is the user's, and the only thing we owe them is a way to
+    pick it up again.** Opening clamps a box fully on screen and under the chrome; DRAGGING one
+    clamps almost nothing — it may be parked over the page's own header, or pushed off an edge
+    until a 28 px sliver is left. That sliver always contains part of the 40 px drag band, and the
+    next open re-clamps, so nothing can be lost.
 
-Rules 1–5 are the interesting part and the code holds them well. Rules 6–9 are housekeeping.
+Rules 1–5 are the interesting part and the code holds them well. Rules 6–10 are housekeeping, and
+rules 8 and 10 are the pair Tom's 2026-09-01 phone reading rewrote.
 
 ## Where the code departs from it
 
@@ -143,6 +152,20 @@ simplicity.
 - **Whether the Find box and the two fire-flow boxes can now actually be dragged by a finger.** They
   were missing the stylesheet half; they have it now, through the class rather than an id list. The
   fix is reasoned and asserted in both halves, but no headless test can start a real touch drag.
+  **And the class carried a cost nobody had measured:** `touch-action: none` is written on the BOX,
+  so it lands on everything inside it, and only the two Settings panes were given their gestures
+  back by name. The Find results, the fire flow report, its sideways table and the property popup's
+  own body were not. That is now declared on `.lpn-dragpanel .lpn-popover-body` — the part that
+  scrolls when there is more box than screen — rather than on a list of panes. Whether any of them
+  was genuinely unscrollable by finger is unproven: the spec says a nested scroller answers for
+  itself and its ancestors are not consulted, so this may have cost nothing. It is written the safe
+  way round because a box that now FILLS a phone is a box whose entire content is in that region.
+- **Why `Settings > Maximum trials` could not be typed into on a phone.** Not reproduced and not
+  diagnosed. Read out: nothing sets `disabled` or `readOnly` on that input, `touch-action` governs
+  panning and zooming rather than focus, and the drag handler ignores every target that is not the
+  box itself — so none of the three obvious suspects is it. Its PC half WAS explained: the row is
+  empty with its default as a placeholder, which is the appearance of a dead control, and the
+  placeholder is now drawn as live text rather than in the browser's disabled grey.
 - **Whether 24 px is the right single number.** It is the number that already existed for a tap, and
   collapsing UP to it is the direction Tom's reports point. What it costs is panning: a press within
   24 px of any node now grabs that node instead of starting a pan, where the cutoff used to be 14.
