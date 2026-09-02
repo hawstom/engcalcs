@@ -164,6 +164,11 @@ run_check "public claim selftest"        blocking php dev/scripts/public_claim_s
 # was written.
 run_check "plain-English swaps"          blocking php dev/scripts/plain_english_swap_check.php
 run_check "plain-English swap selftest"  blocking php dev/scripts/plain_english_swap_selftest.php
+# The one advisory that survived striking the house style, held as a RATCHET rather than a rule:
+# 69 em dashes are already in shipped English and rewriting them would buy 1,560 retranslations of
+# text whose meaning did not move. The number may fall and may not rise. Code comments and dev/*.md
+# are deliberately out of scope -- Tom, 2026-09-01: *"Use it all you want in private. It's lovely."*
+run_check "em dash ratchet"              blocking php dev/scripts/em_dash_ratchet_check.php
 # Task 534. A share card fails where nobody on this side ever looks: you do not paste links to your
 # own site into Facebook, so a relative og:image (which every network drops silently) or a card file
 # renamed out from under the tag stays broken until a stranger mentions it. This renders every page

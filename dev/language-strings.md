@@ -88,8 +88,15 @@ retranslations of strings whose MEANING did not move, which is a large bill for 
 is a ratchet: write new strings without it, drop it from any string you are editing for another
 reason, and leave the rest until a sprint is touching them anyway.
 
-Scope is visitor-facing English: `$ec_lang` values, page copy, and the LibreWaterNet landing draft.
-Not code comments, not `dev/*.md`.
+**Scope is what the public sees, and nothing else.** `$ec_lang` values, page copy, and the
+LibreWaterNet landing draft. Tom, 2026-09-01, drawing the line himself: *"I don't mind the lovely em
+dash. We just need to keep it swept away from the public's view until further notice. Use it all you
+want in private. It's lovely."* So code comments, `dev/*.md`, roadmap blocks and commit messages are
+**free of this** — use it there as much as you like. Reading the advisory as a general distaste for
+the character is the mistake to avoid; it is a claim about one audience.
+
+`dev/scripts/em_dash_ratchet_check.php` holds the line mechanically, as a ratchet rather than a ban:
+the count in shipped English may fall and may not rise.
 
 This governs new calculators from day one, not just retrofits.
 
