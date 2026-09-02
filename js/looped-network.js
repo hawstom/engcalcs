@@ -2458,7 +2458,12 @@ var EngCalcs = EngCalcs || {};
 		// nowhere near `overrides`. This number is what the scenario menu shows beside a name, and
 		// it is read as "how much does this scenario change" -- a max-day scenario whose whole
 		// content is a 1.8 would otherwise say (0) and read as an empty scenario nobody finished.
-		if (typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier)) { total += 1; }
+		// **AND ONLY WHEN IT DIFFERS FROM THE DOCUMENT'S OWN.** Since a new scenario is seeded with
+		// the project's multiplier, counting the mere presence of the field would badge every
+		// freshly created scenario (1) before anybody had changed anything -- the opposite of the
+		// misreading the count exists to prevent.
+		if (typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier)
+			&& scn.demandMultiplier !== (settings.hydraulics || {}).demandMultiplier) { total += 1; }
 		return total;
 	}
 	// Every scenario's overrides on one element -- what a Base-side deletion is about to destroy,
@@ -2549,8 +2554,25 @@ var EngCalcs = EngCalcs || {};
 		while (used['s' + n]) { n++; }
 		return 's' + n;
 	}
+	// **A NEW SCENARIO IS BORN WITH THE DEMAND MULTIPLIER THE PROJECT ALREADY HAS** (Tom,
+	// 2026-09-02: *"Creating a Scenario blanks the demand multiplier. It should preserve it until
+	// you change it as with all other settings."*). Every other row in Settings > Hydraulics reads
+	// the document in Base and in a scenario alike, so only this one -- the single per-scenario
+	// option -- went blank on the way in, and a blank box beside nine filled ones reads as a
+	// setting that was lost rather than one that is inherited.
+	//
+	// **SEEDED, NOT DISPLAYED-AS-INHERITED.** Drawing the document's number in an empty box is the
+	// placeholder Tom struck on 2026-09-01: a number in the box is a number in the document, and
+	// nothing else. So the value is really written onto the scenario, which is also what makes it
+	// survive a save and a reopen unchanged.
+	//
+	// A document that states no multiplier seeds nothing, so Base blank stays scenario blank; and
+	// the seed comes from the DOCUMENT rather than from whichever scenario happened to be active,
+	// because a new scenario copies no overrides from its predecessor either.
 	function createScenario(name) {
-		var s = { id: newScenarioId(), name: name, overrides: {} };
+		var s = { id: newScenarioId(), name: name, overrides: {} },
+			dm = (settings.hydraulics || {}).demandMultiplier;
+		if (typeof dm === 'number' && isFinite(dm)) { s.demandMultiplier = dm; }
 		scenarios.push(s);
 		project.activeScenario = s.id;
 		applyScenarioChange();

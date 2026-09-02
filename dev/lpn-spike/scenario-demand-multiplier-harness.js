@@ -103,10 +103,18 @@ console.log('\n--- the document-level option is untouched ---');
 console.log('\n--- a scenario carries its own ---');
 {
 	const maxDay = L.createScenario('Maximum day');
-	ok('a new scenario inherits the document\'s', L.docDM() === 1.2, L.docDM());
-	ok('...carrying none of its own', L.scenarioDM() === undefined, L.scenarioDM());
+	// **TOM'S DEFECT, 2026-09-02:** *"Creating a Scenario blanks the demand multiplier. It should
+	// preserve it until you change it as with all other settings."* It is SEEDED rather than left
+	// blank-and-inheriting, because the Settings row draws what the scenario actually holds and an
+	// empty box beside nine filled ones reads as a setting that was lost. Both halves are asserted:
+	// the number the user sees, and the badge that must not claim a change nobody made.
+	ok('a new scenario is born with the document\'s multiplier', L.scenarioDM() === 1.2, L.scenarioDM());
+	ok('...so it resolves unchanged', L.docDM() === 1.2, L.docDM());
+	ok('...and the badge says nothing was overridden', L.overrideCount(maxDay) === 0,
+		L.overrideCount(maxDay));
 
 	maxDay.demandMultiplier = 1.8;
+	ok('...and says one once it differs', L.overrideCount(maxDay) === 1, L.overrideCount(maxDay));
 	ok('setting one resolves to it, not to the document\'s', L.docDM() === 1.8, L.docDM());
 	ok('...and every junction moves at once, with no per-node edit',
 		Math.abs(L.resolvedDemand(j1) - 180) < 1e-9 && Math.abs(L.resolvedDemand(j2) - 180) < 1e-9,
