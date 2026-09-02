@@ -28,10 +28,13 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-08-29._
 - **`lpn_diag_not_converged_drawn`**
   > The solve did not converge. These numbers are the last try, not an answer. Do not use them.
+  OK
 - **`lpn_diag_not_converged_error`**
   > It stopped after {trials} trials at a relative error of {error}, against an accuracy of {accuracy}.
+  OK.
 - **`lpn_diag_not_converged_trials`**
   > It stopped after {trials} trials.
+  OK.
 - **`lpn_elev_dem_none`**
   > The DEM gave no height for this node.
   _Ruled OK 2026-09-01._
