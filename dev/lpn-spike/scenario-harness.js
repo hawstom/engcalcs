@@ -80,6 +80,9 @@ const L = loadLoopedNetwork(
 	"\t\trenameNode: renameNode,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\tscenarioMenu: openScenarioMenu, menuRows: function () { return document.getElementById('lpn_menu_list'); },\n" +
+	"\t\tbuildMenuBar: buildMenuBar, closeMenu: closeMenu, wireTabs: wireTabs,\n" +
+	"\t\tmenuOpen: function () { var p = document.getElementById('lpn_menu_popup');\n" +
+	"\t\t\treturn !!(p && p.style.display === 'block'); },\n" +
 	"\t\twireScenarioButton: wireScenarioButton, statusText: function () { return document.getElementById('lpn_scenario_btn').textContent; },\n" +
 	"\t\tstatusTip: function () { return document.getElementById('lpn_scenario_btn').title || ''; },\n" +
 	"\t\tpushBaseToScenarios: pushBaseToScenarios, labelSettings: function () { return labelSettings; },\n" +
@@ -926,6 +929,69 @@ console.log('\n--- a v4 document migrates its bare override keys ---');
 				modelHas(L.assembleModel(), 'link', id));
 			L.refreshLabelText();
 			ok('...and leaves it unhaloed', !L.linkHalo(id).classList.contains('lpn-override'));
+		}
+	}
+}
+
+// ================================================================================================
+// THE MENU-BAR DOOR TO SCENARIOS, which nothing tested and which has now broken twice
+// ================================================================================================
+// Tom, 2026-08-25: *"The Water.Scenarios button does nothing."* Tom again, 2026-09-02, of the same
+// row: *"Water.Scenarios menu does nothing. Oops."* -- a DIFFERENT cause each time, and neither
+// reachable by any test here, because every one of them opens the scenario menu through the
+// status-strip button (`lpn_scenario_btn`) instead of through the Water menu.
+//
+// **THE SECOND CAUSE.** A row whose job is to open another menu leaves the click that ran it with
+// nowhere to belong: openMenu() clears the list and rebuilds it, so by the time the click reaches
+// the document dismissal the row it started on has been DETACHED, `popup.contains(from)` is false,
+// and the dismissal closes the menu that row just opened. `openMenuAnchor` is the Water BUTTON,
+// which does not contain a row inside the pull-down, so the `onAnchor` exemption could not save it
+// either. The page now records at POINTERDOWN whether the gesture began inside the pull-down, while
+// the row is still in the tree.
+//
+// This drives the real document listener, which needed the stub's `document.addEventListener` to
+// stop being a no-op -- it had been one since the stub was written, and it is why nothing
+// document-level had ever been tested here.
+// A real click carries stopPropagation()/currentTarget; menu rows call both, so a bare
+// `{ target }` throws rather than testing anything.
+function clickEvent(el) {
+	return { type: 'click', target: el, currentTarget: el,
+		stopPropagation: function () {}, preventDefault: function () {} };
+}
+console.log('\n--- Water > Scenarios opens the list, and its own click does not close it ---');
+{
+	L.wireTabs();          // installs the click-away dismissal
+	L.buildMenuBar();
+	const bar = byId('lpn_menubar');
+	const water = (bar.children || []).filter(function (b) {
+		return /water/i.test(String(b.textContent || ''));
+	})[0];
+	ok('the Water menu button exists', !!water, water && water.textContent);
+	if (water) {
+		document.dispatchEvent({ type: 'pointerdown', target: water });
+		(water._listeners.click || []).forEach(function (f) { f(clickEvent(water)); });
+		document.dispatchEvent({ type: 'click', target: water });
+		ok('pressing it opens the pull-down', L.menuOpen());
+
+		const row = L.menuRows().children.filter(function (c) {
+			return c.tagName === 'BUTTON' && /scenario/i.test(String(c.textContent || ''));
+		})[0];
+		ok('...which carries a Scenarios row', !!row, row && String(row.textContent));
+		if (row) {
+			// The gesture in the order a browser delivers it: pointerdown on the row (seen by the
+			// dismissal's capture listener), the row's own click (which rebuilds the list and
+			// detaches `row`), then the click reaching the document.
+			document.dispatchEvent({ type: 'pointerdown', target: row });
+			(row._listeners.click || []).forEach(function (f) { f(clickEvent(row)); });
+			document.dispatchEvent({ type: 'click', target: row });
+			ok('...and choosing it leaves the scenario list OPEN, not closed by its own click',
+				L.menuOpen());
+			const names = L.menuRows().children
+				.filter(function (c) { return c.tagName === 'BUTTON'; })
+				.map(function (c) { return String(c.textContent || ''); });
+			ok('...showing the scenarios themselves',
+				names.some(function (t) { return /Base/i.test(t); }),
+				JSON.stringify(names.slice(0, 3)));
 		}
 	}
 }

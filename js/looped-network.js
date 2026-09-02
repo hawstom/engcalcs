@@ -18071,7 +18071,29 @@ var EngCalcs = EngCalcs || {};
 		// rows and the toolbar buttons all do. Cleared on the click it belongs to, so a stale target
 		// can never keep a box open later.
 		var gestureStart = null;
-		document.addEventListener('pointerdown', function (e) { gestureStart = e.target; }, true);
+		// **AND WHETHER THE GESTURE BEGAN INSIDE THE PULL-DOWN, recorded at pointerdown while that
+		// is still answerable.** (Tom, 2026-09-02: *"Water.Scenarios menu does nothing."* -- the
+		// second time this row has been reported, and a different cause from the first.)
+		//
+		// A row whose job is to open ANOTHER menu leaves the click that ran it with nowhere to
+		// belong: openMenu() clears the list and rebuilds it, so by the time the click reaches this
+		// listener the row it started on has been DETACHED, `popup.contains(from)` is false, and the
+		// dismissal fires on the menu that row just opened. `onAnchor` cannot save it either --
+		// `openMenuAnchor` is the Water button and the click came from a row inside the pull-down,
+		// which the button does not contain.
+		//
+		// Asking the question at pointerdown answers it while the row is still in the tree, and it
+		// is the more correct rule anyway: **a click that BEGAN inside the pull-down is a click in
+		// the pull-down**, whatever the row then did to the DOM. Held here, in the one place, rather
+		// than by teaching every menu-opening row to stop its own propagation -- which is what the
+		// comment below already argues for and what the fly-out rows do by hand.
+		var gestureStartInMenu = false;
+		document.addEventListener('pointerdown', function (e) {
+			gestureStart = e.target;
+			var pop = document.getElementById('lpn_menu_popup');
+			gestureStartInMenu = !!(pop && pop.style.display === 'block' &&
+				pop.contains && pop.contains(e.target));
+		}, true);
 		document.addEventListener('click', function (e) {
 			// The element to reason about: where the gesture began if we saw it, else the click's
 			// own target. Read once, and consumed -- the next click gets its own answer.
@@ -18088,7 +18110,10 @@ var EngCalcs = EngCalcs || {};
 			// A click in the FLY-OUT is a click in the menu. Without this the submenu's own rows
 			// would dismiss the pull-down under them mid-click.
 			var inSub = sub && sub.style.display === 'block' && sub.contains(from);
-			if (popup && popup.style.display === 'block' && !popup.contains(from) && !inSub && !onAnchor) { closeMenu(); }
+			var startedInMenu = gestureStartInMenu;
+			gestureStartInMenu = false;
+			if (popup && popup.style.display === 'block' && !popup.contains(from) && !inSub
+				&& !onAnchor && !startedInMenu) { closeMenu(); }
 			// A click inside ANY of them leaves ALL of them alone: the popovers hold live controls
 			// (unit selects, checkboxes, number fields), and closing one because the pointer went
 			// down in another would be worse than leaving both open.

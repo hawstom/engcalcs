@@ -490,7 +490,18 @@ global.document = {
     return m ? (unitSelects[m[1]] || null) : null;
   },
   querySelectorAll: () => [],
-  addEventListener: () => {},
+  // **DOCUMENT LISTENERS ARE RECORDED AND CAN BE DISPATCHED.** This was `() => {}` until
+  // 2026-09-02, so nothing document-level could be tested at all -- and the click-away dismissal
+  // that closes the pull-down menus lives there. `Water > Scenarios` has now been reported broken
+  // twice, from two different causes, and neither was reachable by any harness because of this one
+  // line. Recording a listener changes nothing on its own; only a test that dispatches sees them.
+  _listeners: {},
+  addEventListener(t, f) { (global.document._listeners[t] = global.document._listeners[t] || []).push(f); },
+  removeEventListener() {},
+  dispatchEvent(e) {
+    (global.document._listeners[e && e.type] || []).slice().forEach(function (f) { f(e); });
+    return true;
+  },
   // The pointerUP handlers hit-test with this rather than trusting e.target (a real tap moves a few
   // pixels between down and up). Tests set `hitTarget` to whatever they are pretending is under the
   // pointer; null means bare canvas, which is what a pan or an empty-space click lands on.

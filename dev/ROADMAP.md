@@ -1066,8 +1066,14 @@ the block.
     *Redraw* that puts the asset back newly drawn. **Both are foolproof because they never guess what
     the user is trying to do** — which is exactly what our double-click does. Tom: *"We could tweak
     the behavior to enable vertices mode for all pipes if that's efficient."*
-  - **AND BOTH ACCEPT ARBITRARY POINTS for link vertices until a second node is clicked**, which we
-    do not. That is a second, separable want and is why this is a can of worms rather than one fix.
+  - **[PROMOTED BY TOM 2026-09-02 FROM A SIDE NOTE TO THE ESSENTIAL PART.** *"I do think that like
+    all the software we should allow vertices (clicks in open space) on Add pipe. This is essential,
+    and I let it slide or didn't see."*] Both reference tools accept arbitrary points for link
+    vertices until a second node is clicked, and we do not: drawing a pipe here goes node to node and
+    a bend has to be added afterwards, through the double-click that is the rest of this task. **Doing
+    it while drawing is the half that removes the need for the other half in the common case**, which
+    is why it moved from "a second, separable want" to the thing to build. It is still separable
+    work; it is no longer optional.
   - **THE SMALL-SYMBOL ARGUMENT IS RECORDED AND TOM HIMSELF DISCOUNTED IT**, so it is not a reason to
     act: vertices are small partly to avoid confusion with other symbols, which *might* be mitigated
     if they were the only hollow symbol on the map — *"Frankly, that's a lot of stacked 'mights' to
@@ -1107,6 +1113,22 @@ the block.
     outranks a link and a label but still yields to `.lpn-vhandle`, because taking the handle away
     would deepen this defect rather than fix anything. Whatever lands here decides whether that
     exception survives.
+
+- 75|570| **The EPANET report gets a box of its own: draggable, sizeable, and one of the family.**
+  Tom, 2026-09-02, having just spent a session on the window model: *"EPANET report: How about we
+  make that another draggable, sizeable, modal box?"* The engine's own `.rpt` text is read through
+  `lpn_time_run_report_tip` today and has no home of its own.
+  - **It is the sixth box, so it costs almost nothing structurally** — `makePanelDraggable()` carries
+    the drag, the touch gesture and the raise; `addPanelResizeGrip()` the corner; `placePanelForScreen()`
+    the opening and the phone fill; `hidePanel()` the close and the tip sweep. A seventh panel cannot
+    arrive half-wired, which is the whole point of those seams.
+  - **"Modal" is Tom's word and is worth checking before it is built.** Every other box on this page
+    is non-modal, and he spent this session establishing that they must all stay movable while
+    another is open (*"When the Find box is open, the other moveables need to still move"*). A modal
+    report would be the one box that stops the map. Likely he means *a proper window* rather than
+    *blocks everything*; ask.
+  - The text is the engine's own and untranslated, which the tip already says. It wants a monospace
+    body and its own scroller, and `.lpn-popover-body` already scrolls.
 
 - 75|568| **Standard hydraulic symbols: Tom's research, recorded, not yet a decision.**
   Tom, 2026-09-01, having gone and looked: *"I don't know if we do anything with all of item 2 at
