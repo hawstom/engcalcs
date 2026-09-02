@@ -2969,6 +2969,18 @@ var EngCalcs = EngCalcs || {};
 			// the control exists because a clean drawing with no backdrop reads better without the
 			// patches, which is a judgement about the sheet and therefore the user's to make.
 			maskLabels: true,
+			// **FLOW-DIRECTION ARROWS, ON** (Tom, 2026-09-01: "it would be nice to have a Settings
+			// option to turn off flow direction arrows"). A switch that takes something away, so the
+			// default is what the page has always drawn -- an upgrade must not restyle anyone's map.
+			//
+			// A VIEW PREFERENCE, and it lives in `settings` with maskLabels and alignPipeLabels
+			// rather than in `doc`: an arrow is decoration on a result, not a property of the
+			// network, so nothing in the model changes when it goes. `settings` is what
+			// serializeProject() writes whole, which is exactly what a project TEMPLATE is for on
+			// this page (there being no browser-level preference store here), and applySaved()
+			// merges a saved object ON TOP of these defaults -- so a project saved before this key
+			// existed comes back with arrows on, with no migration step.
+			showArrows: true,
 			// **THE LEADER ANGLE SNAP IS OFF UNTIL SOMEBODY ASKS FOR IT** (ROADMAP Task 408). Tom
 			// asked for a snap that is the user's choice and never forced, and a feature that
 			// arrives switched on has made the choice for them -- every existing drawing would have
@@ -4453,7 +4465,7 @@ var EngCalcs = EngCalcs || {};
 				// still be visible running through. The pump's thin discharge tail gets no backdrop --
 				// a line crossing a pipe reads as two lines crossing.
 				if (l.type === 'valve') {
-					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M4 5v14l8-7zM20 5v14l-8-7z' }, 'lpn-link-symbol-backdrop');
+					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M3 4v16l9-8zM21 4v16l-9-8z' }, 'lpn-link-symbol-backdrop');
 				} else {
 					prependSymbolBackdrop(symbolSvg, 'circle', { cx: 9.8, cy: 12.5, r: 5 }, 'lpn-link-symbol-backdrop');
 				}
@@ -4554,7 +4566,10 @@ var EngCalcs = EngCalcs || {};
 	function arrowAlongDistances(l) {
 		var mids = segmentMidpoints(l), flow = lastSolveResult ? lastSolveResult.flows[l.id] : undefined,
 			k = arrowFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, out = [], run = 0, i, t;
-		if (flow === undefined) { return out; }
+		// An arrow that is not drawn reserves no space: without this the labels would go on dodging
+		// a chevron nobody can see, which is the "label dodges a phantom" failure the comment inside
+		// the loop warns about, arrived at from the other direction.
+		if (flow === undefined || !showArrows()) { return out; }
 		for (i = 0; i < mids.length; i++) {
 			// Measured within the CLEAR RUN, then shifted back into whole-centerline distance by
 			// insetA -- `run` accumulates full segment lengths because that is the space
@@ -4573,12 +4588,19 @@ var EngCalcs = EngCalcs || {};
 	// actually runs to->from; the same sign applies to every segment of one link, since it's a
 	// single pipe/pump, not a per-segment flow). Called both on geometry changes (drag) and
 	// after every solve.
+	// Arrows drawn at all? `!== false` rather than truthiness, for the same reason maskLabels reads
+	// that way: a project saved before the key existed has no key, and its arrows were on.
+	function showArrows() { return settings.showArrows !== false; }
 	function updateArrow(id) {
 		var le = linkEls[id]; if (!le || !le.arrows) { return; }
 		var mids = segmentMidpoints(linkById(id)), flow = lastSolveResult ? lastSolveResult.flows[id] : undefined,
-			k = arrowFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, i;
+			k = arrowFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, i,
+			// The switch is read HERE, in the one place an arrow is shown or hidden, so turning it
+			// off needs no re-solve and no rebuild: every path that already re-runs this function --
+			// a drag, a zoom, a solve, a toggle -- carries the new answer with it.
+			on = showArrows();
 		for (i = 0; i < le.arrows.length; i++) {
-			if (!mids[i] || flow === undefined) { le.arrows[i].style.display = 'none'; continue; }
+			if (!on || !mids[i] || flow === undefined) { le.arrows[i].style.display = 'none'; continue; }
 			// A segment with no room for the arrow shows none: a chevron longer than its run
 			// overhangs both vertices and reads as a mark on the network rather than on that pipe.
 			// Twice the chevron's own length is the shortest run that still leaves visible pipe on
@@ -20850,6 +20872,15 @@ var EngCalcs = EngCalcs || {};
 	// Task 330. A saved setting that is merely absent (any project written before this) reads as
 	// undefined and must draw the halo -- `=== false` rather than a truthiness test, so an old document is
 	// not silently restyled by an upgrade.
+	// The arrow switch's apply, beside applyMaskLabels() because it is the same kind of thing: a
+	// view preference that redraws and never re-solves. updateArrow() already holds the flow it
+	// needs from the last solve, so turning arrows back on restores them with no engine call; the
+	// relayout is because an arrow that is not drawn no longer reserves space the labels must dodge
+	// (arrowAlongDistances()).
+	function applyShowArrows() {
+		doc.links.forEach(function (l) { updateArrow(l.id); });
+		relayoutLabels();
+	}
 	function applyMaskLabels() {
 		if (svg) { svg.classList.toggle('lpn-masks-off', settings.maskLabels === false); }
 	}
@@ -21274,6 +21305,18 @@ var EngCalcs = EngCalcs || {};
 			else { lwInput.value = settings.linkWidth; }
 		});
 		row(mapBody, pc.lpn_settings_link_width || 'Link line thickness (pixels)', lwInput);
+		// **FLOW-DIRECTION ARROWS** (Tom, 2026-09-01). Built exactly like maskLabels and
+		// alignPipeLabels two rows below -- a bare checkbox through row(), reading `settings`,
+		// writing `settings`, then one apply function and saveToStorage(). It sits with the link
+		// drawing controls rather than in the label cluster because an arrow is drawn on the pipe.
+		var arrowInput = document.createElement('input');
+		arrowInput.type = 'checkbox'; arrowInput.checked = showArrows();
+		arrowInput.addEventListener('change', function () {
+			settings.showArrows = arrowInput.checked;
+			applyShowArrows(); saveToStorage();
+		});
+		row(mapBody, pc.lpn_settings_show_arrows || 'Flow direction arrows', arrowInput,
+			pc.lpn_settings_show_arrows_tip);
 		// Task 329, and it ships OFF: aligned-vs-horizontal is a visual judgement, and turning it on
 		// by default would be making that judgement for the user rather than offering it to them.
 		var alignInput = document.createElement('input');

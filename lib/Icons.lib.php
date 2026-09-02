@@ -192,25 +192,30 @@ $ec_icons = array(
 	'tank'       => '<path d="M5 11h14v9H5z" fill="currentColor" stroke="none" opacity=".18"/><path d="M5 6q7-3.5 14 0v14H5z"/><path d="M5 11h14"/>',
 	// A VALVE (ROADMAP Task 248 phase 2, 2026-08-14). The BOWTIE, and there was never a second
 	// candidate: it is what every P&ID, every hydraulic schematic and EPANET itself draw, so this
-	// is the one icon in the set that a water engineer already knows before arriving. Two solid
-	// triangles meeting point-to-point at the centre of the line, with a stem and handwheel on top.
+	// is the one icon in the set that a water engineer already knows before arriving.
 	//
-	// Three things it has to survive, all of which drove the geometry rather than decorating it:
+	// **THE BOWTIE AND NOTHING ELSE** (Tom, 2026-09-01: the old icon "is embarrassing and overly
+	// complex. It should be a simple bowtie without other decoration (the little T)."). The little T
+	// was a stem and a handwheel bar sitting on the waist -- an operating detail borrowed from a
+	// gate-valve elevation, which at map size was two strokes of noise on top of the one shape that
+	// carries the meaning. It is gone, and so is the temptation to add a circle around the bowtie:
+	// "possibly inside a circle" was research, not the ruling.
+	//
+	// Two things the geometry still has to survive:
 	//   1. IT SITS ON A LINE, not on a page. A valve is a LINK, like the pump, so this mark is
 	//      drawn ON the pipe and rotated along it (positionPumpSymbol() in js/looped-network.js).
 	//      That is why the bowtie is horizontal and centred: rotated to any angle it still reads,
 	//      where an upright symbol would only read on a horizontal run.
-	//   2. GREYSCALE. Against the pump it is angular where the pump is round, and against a pipe
-	//      it has area where a pipe is a stroke. Neither cue is colour, which is the same test the
-	//      tank above had to pass.
-	//   3. THE WAIST MUST NOT CLOSE UP AT 14px. The two triangles meet exactly at x=12 with a
+	//   2. THE WAIST MUST NOT CLOSE UP AT 14px. The two triangles meet exactly at x=12, y=12 with a
 	//      2-unit stroke, so the pinch reads as a pinch rather than blurring into one hexagon.
-	//      Widening the triangles to touch a fuller box was tried and lost the waist.
-	// The stem is short and the wheel is a plain bar -- a circular handwheel at this size adds a
-	// second round shape to an icon whose whole job is to not be the pump.
+	//      Widening the triangles TOWARD each other was tried and lost the waist; growing them
+	//      OUTWARD into the space the T used to occupy (x:4-20,y:5-19 became x:3-21,y:4-20) makes
+	//      the mark bigger at every symbol size and leaves the waist exactly where it was.
+	// Greyscale, and angular where the pump is round -- neither cue is colour, the same test the
+	// tank above had to pass.
 	// Same shared-path rule as the reservoir and the tank: this ONE string draws the toolbar
-	// button and the map symbol both.
-	'valve'      => '<path d="M4 5v14l8-7z" fill="currentColor" stroke="none" opacity=".18"/><path d="M20 5v14l-8-7z" fill="currentColor" stroke="none" opacity=".18"/><path d="M4 5v14l8-7z"/><path d="M20 5v14l-8-7z"/><path d="M12 12V7"/><path d="M8 4h8"/>',
+	// button and the map symbol both, so the map backdrop `d` in buildLinkEls() changes with it.
+	'valve'      => '<path d="M3 4v16l9-8z" fill="currentColor" stroke="none" opacity=".18"/><path d="M21 4v16l-9-8z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 4v16l9-8z"/><path d="M21 4v16l-9-8z"/>',
 	// Casing plus a discharge tail leaving it on the top tangent — the tangency is what makes this
 	// read as a pump rather than as a magnifier.
 	//
