@@ -13,6 +13,18 @@
    "on": "Remove this demand",
    "ruled": "2026-08-29"
   },
+  "lpn_diag_not_converged_drawn": {
+   "on": "The solve did not converge. These numbers are the last try, not an answer. Do not use them.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_diag_not_converged_error": {
+   "on": "It stopped after {trials} trials at a relative error of {error}, against an accuracy of {accuracy}.",
+   "ruled": "2026-09-01"
+  },
+  "lpn_diag_not_converged_trials": {
+   "on": "It stopped after {trials} trials.",
+   "ruled": "2026-09-01"
+  },
   "lpn_elev_dem_none": {
    "on": "The DEM gave no height for this node.",
    "ruled": "2026-09-01"

@@ -153,3 +153,53 @@ simplicity.
 - **Whether the long-press-to-edit request is finished.** The record argues the want dissolves now
   that a finger can grab a node, and Tom could not reconstruct why he had asked. That is his call to
   close, not a code question.
+
+## The 24 px reach, checked against the literature (2026-09-01)
+
+Tom asked for this after settling the number by feel, and it is worth recording because **the
+research agrees with him and puts a figure on how wrong the old number was.** His own route to it,
+from the device:
+
+> "I am handicapped in this discussion by having no point of reference for the scale of a 12px or
+> 24px circle... I set link and node to 1 px and they literally shrink to that size, I grow them by
+> steps and they respond likewise literally. Therefore a 12px node is my 12px circle, and a 24px node
+> is my 24px circle. Using this insight to look at a phone, I can finally confirm intuitively that I
+> am grateful for a 24px radius, and that 12px is a little more precise than I personally would want
+> to have to achieve as a user."
+
+**A reach is a RADIUS; the literature states DIAMETERS**, which is the conversion that makes the two
+comparable, and at 96 dpi one CSS px is 25.4/96 = 0.2646 mm:
+
+| | diameter | in mm |
+|---|---:|---:|
+| the reach Tom found too precise (12 px radius) | 24 px | **6.3 mm** |
+| `POINTER_REACH_PX` = 14, the mouse | 28 px | 7.4 mm |
+| `TOUCH_REACH_PX` = 24, the finger | 48 px | **12.7 mm** |
+
+Against the measured minima:
+
+- **Parhi, Karlson & Bederson (MobileHCI 2006), "Target size study for one-handed thumb use on small
+  touchscreen devices"** — the foundational study, one-handed thumb, which is how Tom holds it:
+  **9.2 mm for discrete tasks and 9.6 mm for serial tasks**, ≈ 35 and 36 CSS px.
+- **Nielsen Norman Group** rounds the same result to a **1 cm × 1 cm** rule, ≈ 38 CSS px, and notes
+  the physical cause: a fingertip is 16–20 mm across and **a thumb's contact patch averages 25 mm**.
+- **WCAG 2.2 AA (SC 2.5.8)** sets its floor at **24 × 24 CSS px**, which is 6.3 mm.
+
+**So the old 12 px reach was 6.3 mm — below every research minimum, and exactly at the WCAG AA
+floor, which is an accessibility MINIMUM and not a target.** The 24 px reach is 12.7 mm, above the
+9.2–10 mm research figures with margin, and it coincides with Material Design's 48 dp touch target,
+which is the same number arrived at independently. **Tom's "12 px is a little more precise than I
+personally would want" is the 6.3 mm figure felt rather than measured, and he is reading it right.**
+
+His own framing of why a phone needs this much slack is also the literature's: a phone keyboard is
+too small for the finger that uses it, and the industry's answer was not smaller fingers but
+**swipe-typing and autocorrect** — accommodations layered over a target nobody can reliably hit. The
+node reach is the same kind of accommodation, and `touchAssetNear()` is where it lives.
+
+**What this does NOT settle** is where the number goes when a report comes in. It is one knob on
+purpose: *too hard to pan* moves `TOUCH_REACH_PX` down, *too hard to drag* moves it up, and the
+literature says there is room to go up and not much to go down.
+
+Sources: [NN/g, "Touch Targets on Touchscreens"](https://www.nngroup.com/articles/touch-target-size/);
+[Parhi, Karlson & Bederson, MobileHCI 2006 (PDF)](https://www.microsoft.com/en-us/research/wp-content/uploads/2006/01/parhi-mobileHCI06.pdf);
+[ACM DL entry](https://dl.acm.org/doi/10.1145/1152215.1152260).

@@ -3440,12 +3440,16 @@ var EngCalcs = EngCalcs || {};
 	// A NODE WINS A TIE, deliberately: every link ends at a node, so near a junction both are in
 	// tolerance, and the node is the more specific thing the user can have meant. Same ordering the
 	// add-Text branch uses, for the same reason.
+	// **ONLY A NODE GETS REACH. Tom, 2026-09-01, after using it:** *"I was wrong. Everything other
+	// than a node is easy to tap. I would be tempted to remove the padding from all objects (text,
+	// label, link) other than nodes."* Measured by him on the device, which is the only place this
+	// question can be answered — a pipe is a long stroke with a wide halo, a label is drawn text,
+	// and a Text object is a whole sentence; all three are already finger-sized and none of them
+	// needed help. **The node is the only small target on the map**, and giving reach to its rivals
+	// was spending the same 24 px on things that never asked for it.
 	function touchAssetNear(cx, cy) {
-		var n = nearestNodeNearScreen(cx, cy, TOUCH_REACH_PX), l;
-		if (n && nodeEls[n.id]) { return nodeEls[n.id].circle; }
-		l = nearestLinkNearScreen(cx, cy, TOUCH_REACH_PX);
-		if (l && linkEls[l.link.id]) { return linkEls[l.link.id].line; }
-		return null;
+		var n = nearestNodeNearScreen(cx, cy, TOUCH_REACH_PX);
+		return (n && nodeEls[n.id]) ? nodeEls[n.id].circle : null;
 	}
 	// **WHAT A NEARBY NODE OUTRANKS.** (ROADMAP Task 562. Tom, 2026-09-01: *"nodes need to get
 	// precedence always, because they are hardest to aim at"*, and the defect underneath it:
@@ -3461,27 +3465,37 @@ var EngCalcs = EngCalcs || {};
 	// right when it was written and Tom's ruling supersedes it: filling in bare map cannot fix a
 	// case where the browser confidently returned the wrong element, and this is that case.
 	//
-	// **A NODE OUTRANKS A LINK, A LINK LABEL AND BARE MAP -- AND NOTHING ELSE.** The three things
-	// it yields to are worth naming, because each would be a new defect:
-	//   * another NODE. The browser already resolved it; a nearest-node search cannot improve on
-	//     a point that is literally on the dot.
-	//   * a LABEL of any kind -- a Text, or a node's own data label. A node's label is drawn a few
-	//     pixels from the node, always inside this reach, so promoting over it would make a node
-	//     label undraggable and unopenable by finger. It is drawn TEXT, already finger-sized, and
-	//     the user aimed at it.
-	//   * a VERTEX HANDLE (`.lpn-vhandle`). It is a deliberate small target the user asked to see,
-	//     and a bend near a junction is exactly where one is placed.
-	// Tom's sentence names pipes, and pipes are what this takes precedence over.
+	// **A NODE ALSO OUTRANKS A LABEL, AND THE ARGUMENT THAT IT SHOULD NOT WAS BACKWARDS.** It stood
+	// here for one review and was this: a node's data label is drawn a few pixels from its node,
+	// always inside this reach, so promoting over it would make node labels undraggable by finger.
+	// **Both halves are wrong.** Tom, 2026-09-01, having used it: *"Labels are long and easy to
+	// drag... it's plain false and almost diametrically false to say that the label sits inside 24px
+	// always; we may be able to say that its label (no part of it even) is never inside 24px."* The
+	// offset is in WORLD units scaled by symbolFactor(), so where it lands in SCREEN pixels is a
+	// question about zoom that the old comment answered with a constant. And a label is a long run
+	// of text: a finger has somewhere else on it to aim, which a 7 px disc does not.
+	//
+	// **THE RESIDUAL RISK, NAMED SO IT IS RECOGNISED IF IT SHOWS UP:** a SHORT label (an id like
+	// "J1") on a drawing zoomed far out could fall entirely inside the reach, and would then be
+	// ungrabbable until you zoom in. Nobody has reported it; the escape is the same one every other
+	// number here has, and it is zoom.
+	//
+	// **THE ONE THING IT STILL YIELDS TO IS A VERTEX HANDLE** (`.lpn-vhandle`) -- a deliberate small
+	// target the user asked to see, and a bend near a junction is exactly where one gets placed.
+	// Kept yielding DESPITE the "precedence always" ruling because vertices are already the worst
+	// interaction on the phone (Tom, 2026-09-01, test 6: *"Dragging is fine on PC, even near nodes,
+	// but not on phone anywhere"*) and taking their handle away would deepen a defect that is
+	// already its own roadmap task rather than fix anything.
 	//
 	// **THE COST, SAID OUT LOUD:** a pipe drawn shorter on screen than twice the reach is entirely
-	// inside its own end nodes' reach and cannot be tapped. The reach is in SCREEN pixels, so
-	// zooming in separates them and the pipe comes back -- which is the same escape hatch every
-	// other number here has.
+	// inside its own end nodes' reach and cannot be tapped. Screen pixels, so zooming in separates
+	// them and the pipe comes back.
 	function nodeOutranks(t) {
 		if (!t || t === svg) { return true; }
 		if (t.classList && t.classList.contains('lpn-vhandle')) { return false; }
 		var d = t.dataset || {};
-		return d.link !== undefined || d.linklbl !== undefined;
+		return d.link !== undefined || d.linklbl !== undefined
+			|| d.nodelbl !== undefined || d.lbl !== undefined;
 	}
 	// The hit a FINGER meant, given what the browser answered. Touch only -- see below for why the
 	// pointer is left alone -- and it is the one door: a press and a tap both come through here, so

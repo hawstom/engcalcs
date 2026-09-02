@@ -202,12 +202,15 @@ console.log('\n--- "any asset, not just a new asset" ---');
 	const onPipe = L.touchAssetNear(at.x + 10, at.y);
 	ok('a press near a junction opens the junction, not the pipe leaving it',
 		!!onPipe && onPipe.getAttribute('data-node') === a, onPipe && onPipe.getAttribute('data-node'));
-	// But out along the pipe, away from both ends, the pipe is what it finds.
+	// **BUT ONLY A NODE GETS REACH AT ALL.** Tom, 2026-09-01, having used it: *"Everything other
+	// than a node is easy to tap. I would be tempted to remove the padding from all objects (text,
+	// label, link) other than nodes."* So 15 px OFF the middle of a pipe finds nothing -- the pipe
+	// is found by the browser's own hit test, on its own wide stroke, which is not this function.
+	// This assertion used to demand the opposite and is the measurement changing, not a regression.
 	const mid = L.worldToScreen(350, 200);
 	const found = L.touchAssetNear(mid.x, mid.y + 15);
-	ok('...and 15px off the middle of a pipe finds the pipe',
-		!!found && found.getAttribute('data-link') === pipe,
-		found && (found.getAttribute('data-link') || found.getAttribute('data-node')));
+	ok('...and 15px off the middle of a pipe finds NOTHING: reach is a node privilege',
+		found === null, found && (found.getAttribute('data-link') || found.getAttribute('data-node')));
 	// Bare map stays bare map. The fallback may only ever ADD a hit where the real test found
 	// nothing; it must never invent one out in the open, or panning becomes impossible on a phone.
 	const far = L.worldToScreen(350, 500);
@@ -380,12 +383,15 @@ console.log('\n--- a node outranks the pipe that leaves it ---');
 	const vh = { dataset: { link: pipe, vidx: '0' }, classList: { contains: function (c) { return c === 'lpn-vhandle'; } } };
 	ok('...nor a VERTEX HANDLE, a small target the user asked to see',
 		L.nodeOutranks(vh) === false);
+	// And what it does outrank. **THE TWO LABEL CASES USED TO ASSERT THE OPPOSITE**, on the argument
+	// that a node's data label is drawn a few px away and always inside the reach. Tom overturned
+	// both halves on the device, 2026-09-01: *"Labels are long and easy to drag... it's plain false
+	// and almost diametrically false to say that the label sits inside 24px always."*
 	const lbl = { dataset: { nodelbl: a }, classList: { contains: function () { return false; } } };
-	ok('...nor a node\'s own DATA LABEL, which is drawn a few px away and always inside the reach',
-		L.nodeOutranks(lbl) === false);
+	ok('...and a node\'s own DATA LABEL: it is a long run of text with somewhere else to aim',
+		L.nodeOutranks(lbl) === true);
 	const text = { dataset: { lbl: 'T1' }, classList: { contains: function () { return false; } } };
-	ok('...nor a Text label', L.nodeOutranks(text) === false);
-	// And what it does outrank.
+	ok('...and a Text label', L.nodeOutranks(text) === true);
 	ok('a node outranks a LINK', L.nodeOutranks(line) === true);
 	const linklbl = { dataset: { linklbl: pipe }, classList: { contains: function () { return false; } } };
 	ok('...and a link label', L.nodeOutranks(linklbl) === true);

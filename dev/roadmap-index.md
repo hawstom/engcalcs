@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**59 open tasks.** Next (100): 9 · Soon (75): 9 · Someday (50): 12 · Maybe (25): 12 · Parked (5): 17
+**62 open tasks.** Next (100): 10 · Soon (75): 10 · Someday (50): 13 · Maybe (25): 12 · Parked (5): 17
 
-## 100 — Next (9)
+## 100 — Next (10)
 
 - Task 248.03 — Rule-based controls: the text is CARRIED now; the language is still parked.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
@@ -20,8 +20,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 545 — The list is a file, the marks are data, and both survived a reading.
 - Task 553 — Demands and Hydraulics options: BUILT, and every option now has a control.
 - Task 566 — Close the EPANET gap: eight sections are carried but not understood.
+- ! Task 567 — Vertices are the worst interaction on the map, and EPANET already solved it.
 
-## 75 — Soon (9)
+## 75 — Soon (10)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -32,8 +33,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 531 — Tag the examples: US/SI, design/maintenance, xy/lat-lon.
 - ! Task 532 — An English style guide for label wording — Tom says he is writing one by intuition.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
+- Task 568 — Standard hydraulic symbols: Tom's research, recorded, not yet a decision.
 
-## 50 — Someday (12)
+## 50 — Someday (13)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 186 — Make the Tables pane spreadsheet-interoperable.
@@ -47,6 +49,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 541 — Clicking a label: should it select the asset for editing?
 - ! Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have not decided what to do.
+- ! Task 569 — The cursor flickers to the default pointer at ~12 px from a node, on a PC.
 
 ## 25 — Maybe (12)
 
@@ -85,5 +88,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-52 of 59 titles are within 4–12 words. `!` marks the rest;
+53 of 62 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

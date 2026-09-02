@@ -1053,6 +1053,52 @@ the block.
   - **NOT a gap, recorded so it is not re-proposed:** PRV/PSV/FCV solve through EPANET only, by
     design and by measurement; the native solver refuses such a network by name.
 
+- 100|567| **Vertices are the worst interaction on the map, and EPANET already solved it.**
+  Tom, 2026-09-01, testing on a phone: *"Vertices are a problem, and this opens a can of worms. Our
+  vertices are hard to add or remove by double-clicking, and the link selection highlighting confuses
+  the procedure."* Two measured symptoms: **(a)** adding a vertex fails repeatably when an aligned
+  label is in the way; **(b)** dragging one is *"fine on PC, even near nodes, but not on phone
+  anywhere."*
+  - **THE ANSWER HE FOUND IS A MODE, NOT A BETTER GUESS.** EPANET puts *Vertices* on a right-click
+    menu: turn it on and the vertices of that one pipe appear as hollow square grips, with Add,
+    Delete and Quit editing on the menu; turn it off and they are invisible and the menu is Copy,
+    Paste, Delete, Reverse, |, Vertices, Properties. epanet-js does the same job with a right-click
+    *Redraw* that puts the asset back newly drawn. **Both are foolproof because they never guess what
+    the user is trying to do** — which is exactly what our double-click does. Tom: *"We could tweak
+    the behavior to enable vertices mode for all pipes if that's efficient."*
+  - **AND BOTH ACCEPT ARBITRARY POINTS for link vertices until a second node is clicked**, which we
+    do not. That is a second, separable want and is why this is a can of worms rather than one fix.
+  - **THE SMALL-SYMBOL ARGUMENT IS RECORDED AND TOM HIMSELF DISCOUNTED IT**, so it is not a reason to
+    act: vertices are small partly to avoid confusion with other symbols, which *might* be mitigated
+    if they were the only hollow symbol on the map — *"Frankly, that's a lot of stacked 'mights' to
+    base any decision on."*
+  - **THE TOUCH-REACH WORK DELIBERATELY LEFT THE VERTEX HANDLE ALONE** (closed Task 562): a node
+    outranks a link and a label but still yields to `.lpn-vhandle`, because taking the handle away
+    would deepen this defect rather than fix anything. Whatever lands here decides whether that
+    exception survives.
+
+- 75|568| **Standard hydraulic symbols: Tom's research, recorded, not yet a decision.**
+  Tom, 2026-09-01, having gone and looked: *"I don't know if we do anything with all of item 2 at
+  this time."* So this is a record, and promoting it is his call. **Reservoir:** inverted equilateral
+  triangle, pointing down. **Tank:** a rectangle — *"I would go with a horizontal 5:4 rectangle."*
+  **Pump:** a circle with an isosceles triangle arrowhead pointing the way the flow goes (upward on a
+  menu icon) — *"I would keep what we have or more closely what EPANET has (we never got very close
+  to their pump housing depiction)."* **Junction:** a circle far smaller than the others, about half a
+  reservoir or tank. The **valve** half of the same research was ruled on immediately and is built —
+  a plain bowtie, no decoration — so it is not part of this row.
+
+- 50|569| **The cursor flickers to the default pointer at ~12 px from a node, on a PC.**
+  Tom, 2026-09-01: *"As I wander the mouse around the map, it occasionally flickers from pan/drag
+  cross to default pointer. If I am painstakingly slow and precise, I can return the mouse to any
+  such flicker point and see it dwell as a default pointer. There is nothing at these points apparent
+  to me that explains the default pointer except that it almost (!) reliably happens at 12px from the
+  point of a node (the 24px diameter)."* Long-recognized, never diagnosed. He rates it *"slightly
+  mystifying and annoying"* rather than harmful — *"Did I see what I thought I saw? Why?"*
+  - **12 px is not one of the touch numbers**, which is what makes it interesting: `POINTER_REACH_PX`
+    is 14 and `TOUCH_REACH_PX` is 24 (closed Task 562), and the default `settings.symbolSize` is 7.
+    Something is drawing or hit-testing a ring at a radius nobody declared. A DOM element with no
+    cursor rule of its own, sitting between the node and its rivals, is the shape to look for.
+
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   - **TWO MORE LANDED 2026-09-01 — rows 21 and 26 — and THE ENFORCED COUNT IS 57, not 34.** The
     survey's own table was the stale thing: rows 10, 15, 17, 18 and 20 had shipped on 2026-08-29 and
