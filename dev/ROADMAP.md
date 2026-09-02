@@ -193,9 +193,19 @@ the block.
     was first labelled from EPANET's documentation, which says it refuses. **Through the toolkit
     it does not refuse — it hands back the last iterate**, so the label says "Stop there" and the
     tip says what actually happens.
-  - **[H] STILL BROKEN AND NOW ASSIGNED: `Map` and `Hydraulics USE/SAVE` are read past without
-    being kept**, so import then export DELETES a line the source stated — the file-is-canonical
-    rule broken for the fourth time, in the same loop as the three before it.
+  - **AND THE `[OPTIONS]` LOOP STOPPED ENUMERATING, 2026-09-02, WHICH IS THE END OF THIS DEFECT
+    CLASS.** `Map` and `Hydraulics USE/SAVE` were carried by `75866b60`; the audit that followed
+    found the rest, so the reader's branch chain is now the list of what it READS and a final
+    `else` carries any remaining line verbatim, `INP_SECTIONS_READ`'s rule one level down. That
+    also caught the worst member of the family: **`Demand Model PDA` was matched by the `DEMAND`
+    branch, parsed to NaN, fell back to 1, and the exporter then wrote `Demand Multiplier 1` over
+    the line the file stated** — an invented value, not a dropped one. `Minimum/Required Pressure`,
+    `Pressure Exponent`, `Pressure <unit>` and the obsolete `Segments`/`Verify` were also read
+    past. `Emitter Exponent` was the mirror defect, written unconditionally so a file stating none
+    gained one; every EPA reference model states it, which is why 1,280 round-tripped tokens never
+    saw it. Carrying is not telling, so `demand-model` and `other-options` are two new report
+    sentences: a pressure-driven file is solved demand-driven here and says so.
+    Guards: `dev/lpn-spike/inp-export-harness.js` §8 and §9 (4,490 checks).
   - **TOM'S RULING, 2026-08-29, AND IT IS BROADER THAN THE QUESTION ASKED:** *"I think that every
     setting from EPANET must be added and implemented unless research says otherwise."* **That
     reverses the emitter-exponent precedent as a default.** The standing shape was carry-and-hide
@@ -252,6 +262,21 @@ the block.
       exactly the defect 553 fixed one call site short. `newSavedProfile()` was the second. Both
       now read the pure twin. `fillBreaks()` matches the shape and is deliberately left: storing
       the derived breaks is documented design.
+
+- 100|573| **The lpn_ resync sprint: 320 keys, 26 languages, gated on Wave 0.**
+  `detect_english_drift.php` reports 224 NEW and 96 CHANGED keys since the 2026-08-09 sync, almost
+  all `lpn_`. `lpn_` is a core calculator, so the coverage cross puts every one of them in scope in
+  all 26 languages. **The gate is a Wave 0 friction pass over the 314 keys that do not already
+  carry a `$ec_lang_syn`** (`wave0_keyset.php --new-and-changed`), whose findings become English
+  rewrites before a single agent is paid. Sprint id `573-lpn-resync`.
+  - **The launch is Tom's to authorize and the count is announced before spawning**: 26 agents, 20
+    concurrent and 6 as slots free, Sonnet, one per language, ~50-key batches saved as they go.
+  - **A separate gate is genuinely his and is not this sprint's:** `friction_check.php` with no
+    argument exits 1 on **16 `refer-to-human` entries from `239-wave0-calcs.json`**, the non-`lpn_`
+    calculator keys. He answers in `dev/english-friction/239-refer-to-human.md`, one `**Tom:**`
+    line per item. They block a CALCULATOR-side sprint, not this one, and they are cheap for him.
+  - Closes with the glossary write-back and `detect_english_drift.php --baseline-new`, without
+    which the sprint's keys stay `NEW` for ever and a later English edit is invisible to both tools.
 
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
@@ -336,12 +361,19 @@ the block.
       (*"we don't know how many hydrants a node may represent"*).
   - **[H] WHAT IS NEEDED FROM TOM, asked 2026-09-01 and answered here so nobody asks again:**
     **nothing is blocked on him.** Every ruling this task waited on is recorded below and was
-    given on 2026-08-26/27. What remains is BUILD work: the per-junction requirement table (real
-    practice varies the required flow by land use, and one number for a whole run is the current
-    simplification), picking an EPS frame where a project has a clock, and the Run concept he
-    sketched (*"a Run names a scenario among its parameters"*) — none of which needs another
-    sentence from him to start. **The two questions he MAY still want to answer are wording
-    ones**, and they are in the new-English list rather than here.
+    given on 2026-08-26/27. What remains is BUILD work: picking an EPS frame where a project has a
+    clock, and the Run concept he sketched (*"a Run names a scenario among its parameters"*) —
+    neither of which needs another sentence from him to start. **The two questions he MAY still
+    want to answer are wording ones**, and they are in the new-English list rather than here.
+  - **THE PER-JUNCTION REQUIREMENT SHIPPED 2026-09-02.** Real practice varies the required flow by
+    land use, so one number for a whole run was the standing simplification. A junction now carries
+    its own `fireFlow`, overridable and blank-means-inherit, written through `setProp()` and wired
+    into the popup, the Junctions tab and Find and replace; the sweep is always handed the FUNCTION
+    form, so there is one code path whether or not anybody typed a number. **It is ours and not
+    EPANET's**, so it is in the `.lwn` and never in an `.inp`, which the harness asserts.
+    `dev/lpn-spike/fireflow-required-harness.js` (30), mutation-tested twice. Deliberately no map
+    label, no colour ramp and no starting-value row: what a junction must deliver comes from what
+    stands on it, which is not a thing to seed from a default.
   - **HIS 2026-09-01 QUESTIONS ABOUT THE SWEEP, ANSWERED FROM THE CODE:**
     - *"How is it possible to test every junction against every junction?"* — **it is N solves,
       not N².** Each junction's design check is ONE ordinary fixed-demand solve at that
