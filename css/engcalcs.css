@@ -431,6 +431,23 @@ html[lang="zh"] .ec-welcome {
    not as a third node type) -- previously a hollow white circle with the pump's #a52 stroke,
    which had no relation to the link it belonged to and could be mistaken for a small pump. */
 .lpn-vhandle { fill: #000; stroke: #223; stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: move; }
+/* VERTICES MODE (Task 567): the bends of every pipe become GRIPS -- hollow, and a good deal bigger
+   than the dot that merely says a bend is there. EPANET's own grip is a hollow square; a circle is
+   what this map already draws, and hollow-plus-large is the half that carries the meaning ("this is
+   a thing to take hold of"). The `r` here is an SVG2 geometry property, so a browser that does not
+   honour it leaves the grip its ordinary size -- degraded, not broken, because the reach that makes
+   a grip grabbable with a finger is nearestVertexNearScreen()'s and not this rule's.
+   The whole mode is one class on the canvas, so nothing is created or destroyed to enter or leave
+   it, and a bend added while it is on is styled by the same rule with no extra code. */
+.lpn-vertexmode .lpn-vhandle {
+	r: calc(1.5 * var(--lpn-sym, 1));
+	fill: var(--lpn-map-bg, #fff);
+	stroke-width: calc(0.4 * var(--lpn-sym, 1));
+}
+/* Every pipe's bends are legible while the mode is on, not only the selected one: Tom, 2026-09-01,
+   *"We could tweak the behavior to enable vertices mode for all pipes if that's efficient."* It is
+   -- they are all drawn already. */
+.lpn-vertexmode .lpn-link { cursor: crosshair; }
 /* ---- Scenarios: the audit halo and the inactive element (ROADMAP Task 184) ----
    AN OUTLINE, NEVER A FILL, and that is the whole reason a link gets a second element rather than
    a restyle: the pipe's own stroke IS the pipe, so recolouring it to mark an override would

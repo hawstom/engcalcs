@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 1533,
-        "delta_key_count": 219,
+        "expected_key_count": 1536,
+        "delta_key_count": 222,
         "exempt_key_count": 18,
         "exempt_keys": [
             "u_imgd",
@@ -464,12 +464,14 @@
     "keys_to_translate": {
         "u_hr": "hr",
         "u_day": "day",
+        "lpn_tool_vertices": "Vertices",
         "lpn_field_text_attached": "Attached to",
         "lpn_result_water_age": "Water age",
         "lpn_result_water_age_tip": "How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.",
         "lpn_result_source_share": "Source share",
         "lpn_result_source_share_tip": "The source trace share reports how much of the water reaching this point came from the trace node.",
         "lpn_menu_map": "Map",
+        "lpn_tool_vertices_tip": "Add and remove the bends in a pipe. Click a pipe to put a bend there, click a bend to take it out, and drag a bend to move it.",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
         "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
@@ -543,6 +545,7 @@
         "lpn_diag_not_converged_drawn": "The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.",
         "lpn_diag_not_converged_trials": "It stopped after {iterations} iterations.",
         "lpn_diag_not_converged_error": "It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.",
+        "lpn_mode_vertices": "Mode: Vertices. The bends in every pipe are shown as grips. Click a pipe to add a bend, click a grip to remove it, or drag a grip to move it. Nothing else on the map is changed in this mode.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
@@ -685,12 +688,14 @@
     "keys": {
         "u_hr": "hr",
         "u_day": "day",
+        "lpn_tool_vertices": "Vertices",
         "lpn_field_text_attached": "Attached to",
         "lpn_result_water_age": "Water age",
         "lpn_result_water_age_tip": "How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.",
         "lpn_result_source_share": "Source share",
         "lpn_result_source_share_tip": "The source trace share reports how much of the water reaching this point came from the trace node.",
         "lpn_menu_map": "Map",
+        "lpn_tool_vertices_tip": "Add and remove the bends in a pipe. Click a pipe to put a bend there, click a bend to take it out, and drag a bend to move it.",
         "lpn_georef_backdrop_unrotated": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
         "lpn_georef_twopt": "Use two known points",
         "lpn_georef_twopt_tip": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
@@ -764,6 +769,7 @@
         "lpn_diag_not_converged_drawn": "The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.",
         "lpn_diag_not_converged_trials": "It stopped after {iterations} iterations.",
         "lpn_diag_not_converged_error": "It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.",
+        "lpn_mode_vertices": "Mode: Vertices. The bends in every pipe are shown as grips. Click a pipe to add a bend, click a grip to remove it, or drag a grip to move it. Nothing else on the map is changed in this mode.",
         "lpn_scenario_mark_tip": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
         "lpn_scenario_overrides_tip": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
         "lpn_settings_emitter_exponent_tip": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
@@ -936,6 +942,22 @@
                 }
             }
         },
+        "lpn_tool_vertices": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_text",
+                    "value": "متن",
+                    "english": "Text"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
         "lpn_field_text_attached": {
             "reason": "missing",
             "current_value": null,
@@ -1029,6 +1051,22 @@
                     "key": "lpn_basemap_show",
                     "value": "نمایش نقشهٔ خیابان",
                     "english": "Show street map"
+                }
+            }
+        },
+        "lpn_tool_vertices_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_text_tip",
+                    "value": "روی نقشه کلیک کنید تا یادداشتی روی ترسیم بنویسید.",
+                    "english": "Click the map to write a note on the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete_tip",
+                    "value": "روی هر چیزی در نقشه کلیک کنید تا حذف شود.",
+                    "english": "Click anything on the map to remove it."
                 }
             }
         },
@@ -2197,6 +2235,22 @@
                     "key": "lpn_field_roughness",
                     "value": "زبری",
                     "english": "Roughness"
+                }
+            }
+        },
+        "lpn_mode_vertices": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_delete",
+                    "value": "حالت: حذف. برای برداشتن یک المان، آن را کلیک کنید.",
+                    "english": "Mode: Delete. Click an asset to remove it."
+                },
+                "next_translated": {
+                    "key": "lpn_select_first",
+                    "value": "چیزی انتخاب نشده است. نخست یک عنصر را روی نقشه کلیک کنید، سپس Delete را بزنید.",
+                    "english": "Nothing is picked. Click an asset on the map first, then press Delete."
                 }
             }
         },

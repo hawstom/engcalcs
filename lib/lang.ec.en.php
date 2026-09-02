@@ -1134,6 +1134,7 @@ $ec_lang['lpn_tool_add_pump']='Pump';
 // alone teach nobody and the words alone are longer than a modeller wants to read every time.
 $ec_lang['lpn_tool_add_valve']='Valve';
 $ec_lang['lpn_tool_add_text']='Text';
+$ec_lang['lpn_tool_vertices']='Vertices';
 $ec_lang['lpn_tool_delete']='Delete';
 $ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
 $ec_lang_syn['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
@@ -1411,6 +1412,7 @@ $ec_lang['lpn_tool_add_pipe_tip']='Click one node and then another to draw a pip
 $ec_lang['lpn_tool_add_pump_tip']='Click one node and then another to put a pump between them.';
 $ec_lang['lpn_tool_add_valve_tip']='Click one node and then another to put a valve between them.';
 $ec_lang['lpn_tool_add_text_tip']='Click the map to write a note on the drawing.';
+$ec_lang['lpn_tool_vertices_tip']='Add and remove the bends in a pipe. Click a pipe to put a bend there, click a bend to take it out, and drag a bend to move it.';
 $ec_lang['lpn_tool_delete_tip']='Click anything on the map to remove it.';
 $ec_lang['lpn_tool_undo_tip']='Undo the last change.';
 $ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network in the window.';
@@ -2178,8 +2180,9 @@ $ec_lang['lpn_pump_point3']='Point 3';
 // Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
-$ec_lang['lpn_mode_select']='Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Double-click a pipe to add or remove a vertex.';
+$ec_lang['lpn_mode_select']='Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe.';
 $ec_lang['lpn_mode_delete']='Mode: Delete. Click an asset to remove it.';
+$ec_lang['lpn_mode_vertices']='Mode: Vertices. The bends in every pipe are shown as grips. Click a pipe to add a bend, click a grip to remove it, or drag a grip to move it. Nothing else on the map is changed in this mode.';
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
 $ec_lang['lpn_select_first']='Nothing is picked. Click an asset on the map first, then press Delete.';

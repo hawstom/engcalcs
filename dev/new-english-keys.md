@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read**, of 218 untranslated keys, of 1533 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**4 still to read**, of 221 untranslated keys, of 1536 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (216, 1 to read @@ NEEDS RULING)
+## lpn_  (219, 4 to read @@ NEEDS RULING)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -425,6 +425,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_menu_map`**
   > Map
   _Ruled OK 2026-08-29._
+- **`lpn_mode_vertices`**
+  > Mode: Vertices. The bends in every pipe are shown as grips. Click a pipe to add a bend, click a grip to remove it, or drag a grip to move it. Nothing else on the map is changed in this mode.
+  @@ NEEDS RULING
 - **`lpn_new_coords`**
   > Coordinates
   _Ruled OK 2026-08-29._
@@ -671,6 +674,12 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_terrain_will_ids`**
   > These are the nodes that will be filled in: {ids}
   _Ruled OK 2026-08-29._
+- **`lpn_tool_vertices`**
+  > Vertices
+  @@ NEEDS RULING
+- **`lpn_tool_vertices_tip`**
+  > Add and remove the bends in a pipe. Click a pipe to put a bend there, click a bend to take it out, and drag a bend to move it.
+  @@ NEEDS RULING
 
 ## u_  (2, all ruled)
 

@@ -3583,6 +3583,27 @@ var EngCalcs = EngCalcs || {};
 		}
 		return best;
 	}
+	// **THE NEAREST VERTEX HANDLE, IN SCREEN PIXELS** (Task 567). The browser's own hit test is the
+	// only way a handle was ever grabbed, and a handle is drawn a couple of world units across --
+	// which is Tom's second measured symptom, 2026-09-01: dragging one is *"fine on PC, even near
+	// nodes, but not on phone anywhere."* Same shape and the same reach as every other finder on
+	// this page, so a finger gets the finger's number and a pointer gets the pointer's.
+	//
+	// It is reached ONLY from vertices mode. In ordinary browsing a handle keeps the small target it
+	// has always had, which is deliberate: reach is what makes a thing easy to graze, and a bend is
+	// the one edit this page has decided you must ask for.
+	function nearestVertexNearScreen(clientX, clientY, pxTolerance) {
+		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, j, l, v, dPx;
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i];
+			for (j = 0; j < l.verts.length; j++) {
+				v = l.verts[j];
+				dPx = Math.hypot(v.x - w.x, v.y - w.y) * state.s;
+				if (dPx <= bestPx) { best = { link: l.id, vidx: j, v: v }; bestPx = dPx; }
+			}
+		}
+		return best;
+	}
 	// A reservoir's effective fixed head: whatever the user typed, or -- when blank -- its own
 	// elevation. Blank is stored as undefined rather than as a copy of the elevation, so the two
 	// stay linked: moving the elevation moves the water surface with it until the user takes control
@@ -12586,7 +12607,8 @@ var EngCalcs = EngCalcs || {};
 		'add-junction': 'lpn_mode_add_junction', 'add-reservoir': 'lpn_mode_add_reservoir',
 		'add-tank': 'lpn_mode_add_tank',
 		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump',
-		'add-valve': 'lpn_mode_add_valve', 'add-text': 'lpn_mode_add_text'
+		'add-valve': 'lpn_mode_add_valve', 'add-text': 'lpn_mode_add_text',
+		'vertices': 'lpn_mode_vertices'
 	};
 	function updateModeHint() {
 		var el = document.getElementById('lpn_mode_hint'); if (!el) { return; }
@@ -12625,6 +12647,12 @@ var EngCalcs = EngCalcs || {};
 		// with it except save it to file. The single enforcement point is writeOpenProjectToFile(),
 		// plus a disabled Save in the File menu; Save as is the way out.
 		mode = newMode; setPendingLinkFrom(null);
+		// **THE GRIPS ARE A CSS STATE, NOT A REDRAW** (Task 567). Every vertex handle already exists
+		// in the drawing -- buildLinkEls() makes one per bend -- so turning the mode on is one class
+		// on the canvas rather than a pass over every link. Nothing is created, so nothing has to be
+		// destroyed when the mode goes off, and a bend added while the mode is on gets the look for
+		// free from the same rule.
+		if (svg) { svg.classList.toggle('lpn-vertexmode', newMode === 'vertices'); }
 		if (setModeUI) { setModeUI(); }
 		updateModeHint();
 	}
@@ -17556,6 +17584,14 @@ var EngCalcs = EngCalcs || {};
 			// which is no answer on the device the concession is for. Same key, same icon, same
 			// call as the toolbar button -- two doors, one implementation.
 			{ icon: 'select', label: pc.lpn_tool_select || 'Select', fn: function () { setMode('select'); } },
+			// **THE DOOR** (Task 567). Beside Select because it is the other thing a press on the
+			// map can mean, and because EPANET puts Vertices on its own right-click menu -- a menu
+			// this page does not have on a phone, which is where the gesture it replaces failed.
+			// It TOGGLES, like the Delete tool row above: the way out of a mode has to be the same
+			// control that got you into it, or the mode is a trap on a screen with no keyboard.
+			{ icon: 'vertices', label: pc.lpn_tool_vertices || 'Vertices', fn: function () {
+				setMode(mode === 'vertices' ? 'select' : 'vertices');
+			} },
 			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', fn: undo },
 			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
 			// menu is about; View holds the things that change how the map is drawn. Every editor
@@ -18676,6 +18712,9 @@ var EngCalcs = EngCalcs || {};
 		var editGroup = group();
 		editGroup.dataset.edits = '1';
 		modeButton({ mode: 'select', key: 'lpn_tool_select', tip: pc.lpn_tip_select, icon: 'select' }, editGroup);
+		// Between Select and Delete, because that is what it is: the third thing a press on the map
+		// can mean. See the Edit menu row for why it is a mode rather than a gesture (Task 567).
+		modeButton({ mode: 'vertices', key: 'lpn_tool_vertices', icon: 'vertices', tip: pc.lpn_tool_vertices_tip }, editGroup);
 		modeButton({ mode: 'delete', key: 'lpn_tool_delete', icon: 'del', tip: pc.lpn_tool_delete_tip }, editGroup);
 		var undoBtn = document.createElement('button');
 		undoBtn.type = 'button';
@@ -18940,6 +18979,30 @@ var EngCalcs = EngCalcs || {};
 			}
 			if (mode.indexOf('add-') === 0) { return; } // handled on click below, not drag
 			if (mode === 'delete') { return; }
+			// **VERTICES MODE DRAGS A HANDLE AND NOTHING ELSE** (Task 567). Same rule and the same
+			// reason as the profile's edit mode below: a bend can sit anywhere, including on top of
+			// a node or a label, and the mode whose whole subject is the bend must not move the
+			// pipework underneath it. A press that is not on a handle pans, which is how a bend off
+			// the edge of the screen is reached.
+			//
+			// The finder, not the browser's hit test: that is the half that makes a handle grabbable
+			// with a finger at all.
+			if (mode === 'vertices') {
+				var vHit = nearestVertexNearScreen(e.clientX, e.clientY, reachPx(e));
+				if (vHit) {
+					var wv = screenToWorld(e.clientX, e.clientY);
+					drag = { type: 'vertex', id: vHit.link, vidx: vHit.vidx,
+						offX: vHit.v.x - wv.x, offY: vHit.v.y - wv.y };
+					// A drag that MOVES a bend is an edit, and the snapshot belongs at the start of
+					// it -- applyDrag() writes the coordinate on every frame, so a snapshot taken
+					// later would restore a half-dragged bend.
+					saveUndoSnapshot();
+				} else {
+					drag = { type: 'pan', tx0: state.tx, ty0: state.ty };
+				}
+				Object.assign(drag, common);
+				return;
+			}
 			// 'select' mode
 			// **WHILE THE PROFILE'S PATH CHOOSER IS RUNNING, NOTHING ON THE MAP IS DRAGGED** (Task
 			// 504). The press that adds a waypoint on touch is a LONG one, and a long press that
@@ -19087,6 +19150,20 @@ var EngCalcs = EngCalcs || {};
 			if (t.dataset.nodelbl !== undefined) { resetNodeLabelHome(t.dataset.nodelbl); }
 			else if (t.dataset.linklbl !== undefined) { resetLinkLabelHome(t.dataset.linklbl); }
 			else if (t.dataset.lbl !== undefined) { resetTextLabelHome(t.dataset.lbl); }
+			// **THE DOUBLE-CLICK NO LONGER BENDS A PIPE** (Task 567). It was the accidental edit
+			// path: in `select` mode -- the mode a person is in while doing nothing but reading --
+			// the browser's own dblclick reshaped somebody else's model, and it is easy to reach by
+			// accident because a single tap on a link opens its popup only after a 300 ms debounce,
+			// so a second tap completes a double-click. Closed Task 567's first strand made that
+			// recoverable by taking an undo snapshot; this is the door, and it is what the field
+			// tools all converged on -- Esri Field Maps edits vertices only after the user
+			// explicitly starts editing, Vespucci needs a deliberate long-press "New" mode.
+			//
+			// It still works INSIDE vertices mode, where a second press on the same bend is a
+			// remove-then-add and harmless, because a mode that has already been asked for is not
+			// an accident. The three label-home resets above are untouched: sending a dragged label
+			// back where it came from is not an edit to the network.
+			else if (mode !== 'vertices') { void 0; }
 			else if (t.classList.contains('lpn-vhandle')) { removeVertex(t.dataset.link, +t.dataset.vidx); }
 			else if (t.dataset.link !== undefined) { insertVertex(t.dataset.link, screenToWorld(e.clientX, e.clientY)); }
 		});
@@ -19236,6 +19313,26 @@ var EngCalcs = EngCalcs || {};
 					// abandoned drawing leaves nothing behind.
 					pendingLinkVerts.push({ x: w.x, y: w.y });
 					drawPendingPath();
+				}
+			} else if (mode === 'vertices') {
+				// **THE DOOR TASK 567 IS ABOUT.** EPANET puts *Vertices* on a right-click menu and
+				// epanet-js has its own deliberate redraw; both are foolproof because they never
+				// guess what the user is trying to do, which is exactly what our double-click did.
+				// Inside this mode the guessing is gone: a press ON a bend removes it, a press on a
+				// pipe adds one there, and a press on anything else is nothing at all.
+				//
+				// **A SINGLE PRESS, NOT A DOUBLE ONE.** A double-click is the gesture Tom could not
+				// land on a phone, and inside a mode that consumes every press there is nothing for
+				// a second click to disambiguate.
+				var vTap = nearestVertexNearScreen(e.clientX, e.clientY, reachPx(e));
+				if (vTap) { removeVertex(vTap.link, vTap.vidx); }
+				else {
+					// The pipe under the press, by the browser's own hit test on its wide stroke,
+					// falling back to the same finder every other tool uses.
+					var lTap = (t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle'))
+						? t.dataset.link
+						: ((nearestLinkNearScreen(e.clientX, e.clientY, reachPx(e)) || {}).link || {}).id;
+					if (lTap) { insertVertex(lTap, w); }
 				}
 			} else if (mode === 'delete') {
 				// One-step undo: snapshot the whole document just before any destructive action, NOT

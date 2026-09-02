@@ -283,6 +283,12 @@ $ec_icons = array(
 	'select'     => '<path d="M6 3v14.5l3.8-3.6 2.9 6.3 2.6-1.2-2.8-6.1 4.5-.5z" fill="currentColor" stroke="none"/><path d="M15.5 4.2a5.5 5.5 0 0 1 4.3 4.4"/>',
 	'duplicate'  => '<path d="M9 9h12v12H9z"/><path d="M5 15H3V3h12v2"/>',
 
+	// Vertices mode (Task 567). A bent line with HOLLOW SQUARE grips on its bends, which is exactly
+	// what the mode puts on the map -- EPANET's own grip shape, and the one symbol on this map that
+	// is a square, so it is not read as any other object. The line bends, because a bend is the
+	// thing the mode is about; a straight line with dots on it would read as a pipe with junctions.
+	'vertices'   => '<path d="M2 20l6.5-9 6.5 4.5L22 4"/><rect x="6.2" y="8.7" width="4.6" height="4.6"/><rect x="12.7" y="13.2" width="4.6" height="4.6"/>',
+
 	// ---- Panes (Task 434) ----
 	// A TWIN PAIR, and they are only ever read against each other, so the pair is the design rather
 	// than either icon (Tom, 2026-08-18: "Bottom pane and right pane can have twin partition-like
