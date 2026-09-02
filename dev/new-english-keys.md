@@ -515,6 +515,7 @@ the ruling lapses by itself if the wording changes.
   _Ruled OK 2026-09-01._
 - **`lpn_settings_default_is`**
   > The usual value is {n}.
+  Bad. Very bad, and see my admonishment in our conversation. The source of this tendency must be found and rooted out.
 - **`lpn_settings_demand_multiplier`**
   > Demand multiplier
   _Ruled OK 2026-08-29._
