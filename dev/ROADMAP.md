@@ -303,6 +303,37 @@ the block.
     anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.
 
 - 100|530| **Fire flow: Tom's rulings are recorded; what is left is BUILDING them.**
+  - **[SHIPPED 2026-09-02, after Tom could finally read the report.** He said so himself: *"I could
+    not review it properly with manglify English unrecognizable to my engineer eyes. Now that the
+    terminology is recognizable, more of my intuition is available."* Every item below came out of
+    that one reading, which is the argument for the terminology purge that preceded it.]
+    - **Column order is his** — Junction, Static pressure, Required flow, Pressure at required,
+      Available flow, Residual held, Drawdowns, Design limit, Runs, Failure modes. What the code ASKS
+      FOR, then what the system CAN GIVE, then the collateral. The Available/Residual pairing from
+      2026-09-01 survives the move. Asserted as an ORDER; the old check only asked that each heading
+      appeared somewhere and passed on any permutation.
+    - **`Failure modes` replaces `Result`, and it fixed an incoherence that was already on screen.**
+      `rec.state` is EXCLUSIVE — `finish()` returns FAIL before it looks at the effects — so a
+      junction that missed its fire flow AND pulled its neighbours down printed as "Failing" beside
+      a Drawdowns cell full of the design failure the verdict never mentioned. The column reads the
+      two answers directly, so both are named: on the shipped example, two junctions read
+      `Fire, Design`. **The summary had to follow** or the screen would contradict itself; it counts
+      the independent modes now and deliberately does not add up to the junction count.
+    - **`Not checked` and `Static failed, so not checked` replace two dashes that meant different
+      things.** A dash meant both *we looked and found nothing* (good news) and *we never looked*.
+      Same shape as the EPANET bridge swearing a run converged.
+    - **A junction that fails AT REST now gets its drawdowns measured**, which Tom would not let go:
+      *"What if I want a full system report, and node 99 doesn't need fire flow or barely fails, but
+      some other nearby demand draws 99 down... Wouldn't I want to know that even though 99 failed
+      its own flow test?"* `js/lpn-fireflow.js` returned before the design readings there, so the one
+      case a system-wide report most wants a reading for was the one case with none. Costs one extra
+      solve per static-failing junction and is guarded, because that is the probe most likely to fail.
+    - **A false comment was corrected on the way:** the design-readings site said *"where it fails,
+      `sideEffects` is simply not consulted"*, which the line below it contradicts. It nearly cost a
+      reader the right answer to which cells a failing row should blank — the answer is none.
+    - Node IDs in the table carry `labelPrefixFor('node','id')`; the input is `Design check (effect
+      on system)`; and `lpn_ff_iso` carries Tom's own reason the ISO credit cap is never applied
+      (*"we don't know how many hydrants a node may represent"*).
   - **[H] WHAT IS NEEDED FROM TOM, asked 2026-09-01 and answered here so nobody asks again:**
     **nothing is blocked on him.** Every ruling this task waited on is recorded below and was
     given on 2026-08-26/27. What remains is BUILD work: the per-junction requirement table (real
@@ -1052,6 +1083,29 @@ the block.
     one); and the colour legend shows no unit for a source share, a percentage having no unit id.
   - **NOT a gap, recorded so it is not re-proposed:** PRV/PSV/FCV solve through EPANET only, by
     design and by measurement; the native solver refuses such a network by name.
+
+- 100|572| **[H] The browser confirmations owed from the 2026-09-01/02 sessions.**
+  Everything below is BUILT, green and harness-guarded; what is missing is a person looking at it.
+  Listed because two sessions' worth of "please check this in a browser" is otherwise carried only in
+  chat, and the next session cannot know what has been seen. **Tom has confirmed the window model
+  itself** (*"I am in windows heaven now... Libraries, Settings, Fire flow, Find, oh, my!"*) and the
+  fire flow language (*"I like it!"*); these are the rest.
+  - **Fire flow, after Task 530's 2026-09-02 batch:** a `Fire, Design` row (the case the old verdict
+    could not report); a run with the residual set high enough that junctions fail at rest, which
+    should show `Static failed, so not checked` in three columns while Drawdowns still reports; the
+    run dialog's live tally matching the finished table; a node ID prefix set in Settings > Labels
+    showing up in the table.
+  - **Convergence (closed Task 565):** Settings > Maximum trials 1 **and** If unbalanced → Stop, then
+    solve. The status bar must lead with the warning, the numbers must still be drawn, and the
+    iteration count, relative error and accuracy must be printed. **Trials alone is not enough** and
+    that is not a defect: `Unbalanced Continue 10` grants ten further trials, measured.
+  - **Touch, after closed Task 562 and its 2026-09-02 correction:** node reach is now a NODE
+    privilege — a tap 8–20 px off a junction opens the junction; a pipe, a Text and a label get no
+    padding at all. And a node now outranks a label, which reversed a same-day decision; the residual
+    risk named at `nodeOutranks()` is a SHORT label on a far-zoomed-out drawing falling wholly inside
+    the reach and becoming ungrabbable until you zoom in. Nobody has seen it.
+  - **Tips (closed Task 571):** open a "?" inside Settings, Find and Fire flow — the tip must sit
+    OVER the box; then close the box and confirm nothing lingers.
 
 - 100|567| **Vertices are the worst interaction on the map, and EPANET already solved it.**
   Tom, 2026-09-01, testing on a phone: *"Vertices are a problem, and this opens a can of worms. Our
