@@ -58,7 +58,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_elev_dem_use_tip`**
   > Puts the elevation of the DEM at this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_ff_accounting`**
   > Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral, and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.
   _Ruled OK 2026-09-01._
@@ -85,7 +85,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_col_junction`**
   > Junction
-  @@ NEEDS RULING
+  OK.
 - **`lpn_ff_col_limit`**
   > Design limit
   @@ NEEDS RULING
@@ -97,16 +97,16 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_col_result`**
   > Result
-  @@ NEEDS RULING
+  OK.
 - **`lpn_ff_col_solves`**
   > Runs
-  @@ NEEDS RULING
+  OK.
 - **`lpn_ff_col_static`**
   > Static pressure
-  @@ NEEDS RULING
+  OK.
 - **`lpn_ff_cost`**
   > {solves} network runs.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_ff_design`**
   > Effect on the rest of the system
   _Ruled OK 2026-09-01._
@@ -148,7 +148,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_err_solve`**
   > The solver reported an error and gave no answer.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_ff_err_unknown`**
   > No answer, and the reason given is {id}
   _Ruled OK 2026-09-01._
@@ -402,8 +402,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.
   _Ruled OK 2026-09-01._
 - **`lpn_inp_drop_tags`**
-  > This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.
-  @@ NEEDS RULING
+  > This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.
+  Edited
 - **`lpn_menu_map`**
   > Map
   _Ruled OK 2026-08-29._
@@ -507,8 +507,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Source share
   _Ruled OK 2026-09-01._
 - **`lpn_result_source_share_tip`**
-  > A source trace reports this share: of the water reaching this point, how much of it came from the trace node.
-  @@ NEEDS RULING
+  > The source trace share reports how much of the water reaching this point came from the trace node.
+  Edited, but please review.
 - **`lpn_result_water_age`**
   > Water age
   _Ruled OK 2026-09-01._
@@ -525,17 +525,17 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Accuracy
   _Ruled OK 2026-09-01._
 - **`lpn_settings_accuracy_tip`**
-  > How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.
-  @@ NEEDS RULING
+  > How close the solver has to get before it stops, measured as the flow still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.
+  OK.
 - **`lpn_settings_damp_limit`**
   > Damping starts at
   _Ruled OK 2026-09-01._
 - **`lpn_settings_damp_limit_tip`**
   > The accuracy at which the solver begins taking smaller steps, which can help a network that is swinging back and forth to converge. Zero means it never does. Only the EPANET solver reads this box.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_default_is`**
   > The default is {n}.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_demand_multiplier`**
   > Demand multiplier
   _Ruled OK 2026-08-29._
@@ -559,16 +559,16 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-08-29._
 - **`lpn_settings_flow_change`**
   > Flow change limit
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_flow_change_tip`**
   > An additional test the solver must pass before it stops: the maximum change in any one pipe's flow from one trial to the next. Zero means do not apply this test. Only the EPANET solver reads this box.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_head_error`**
   > Head error limit
   _Ruled OK 2026-09-01._
 - **`lpn_settings_head_error_tip`**
   > An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_leader_snap`**
   > Snap leader lines to angle
   _Ruled OK 2026-08-29._
@@ -586,7 +586,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_settings_quality_source`**
   > Trace node
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_quality_source_tip`**
   > The point whose water is followed. Every other point then shows the share of its water that came from here.
   _Ruled OK 2026-09-01._
@@ -598,10 +598,10 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_settings_show_arrows`**
   > Flow direction arrows
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_show_arrows_tip`**
   > Draw an arrow on each pipe showing which way the water is running. The arrows appear after a run, and turning them off leaves the results unchanged. This setting is saved with the project.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_specific_gravity`**
   > Specific gravity
   _Ruled OK 2026-08-29._
@@ -612,11 +612,11 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Maximum trials
   _Ruled OK 2026-08-29._
 - **`lpn_settings_trials_tip`**
-  > How many times the solver may try before it gives up on a network that will not converge.
-  @@ NEEDS RULING
+  > How many trials are allowed before the solver gives up on a network that will not converge.
+  OK.
 - **`lpn_settings_unbalanced`**
   > If it does not converge
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_unbalanced_continue`**
   > Keep trying
   _Ruled OK 2026-09-01._
@@ -625,12 +625,12 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_settings_unbalanced_tip`**
   > What to do with a network that has used up its trials and still has not converged. Keeping on allows the extra trials below, which often reaches convergence; stopping reports the last trial as it stands, which is close but not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_unbalanced_trials`**
   > Extra trials first
   _Ruled OK 2026-09-01._
 - **`lpn_settings_unbalanced_trials_tip`**
-  > How many further trials to allow after the maximum above is used up, before the last try is reported. Only the EPANET solver reads this box.
+  > How many further trials to allow after the maximum above is used up, before the last trial is reported. Only the EPANET solver reads this box.
   _Ruled OK 2026-09-01._
 - **`lpn_settings_viscosity`**
   > Relative viscosity
