@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 1536,
-        "delta_key_count": 222,
+        "expected_key_count": 1538,
+        "delta_key_count": 224,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -627,7 +627,9 @@
         "lpn_ff_no_junctions": "This project has no junctions yet, so there is nothing to test.",
         "lpn_ff_no_selection": "No junction is selected. Choose one on the map, or test every junction.",
         "lpn_ff_required": "Required fire flow",
-        "lpn_ff_required_tip": "The flow required by your code or your fire authority at a hydrant. One junction at a time is tested against this same number.",
+        "lpn_ff_required_tip": "The flow required by your code or your fire authority at a hydrant. Each junction is tested against this number, unless it carries a required fire flow of its own.",
+        "lpn_ff_required_own": "Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.",
+        "lpn_ff_required_node_tip": "The fire flow this junction alone must provide, from your code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Fire flow box.",
         "lpn_ff_residual": "Residual pressure to hold",
         "lpn_ff_residual_tip": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
         "lpn_ff_design": "Design check (effect on system)",
@@ -851,7 +853,9 @@
         "lpn_ff_no_junctions": "This project has no junctions yet, so there is nothing to test.",
         "lpn_ff_no_selection": "No junction is selected. Choose one on the map, or test every junction.",
         "lpn_ff_required": "Required fire flow",
-        "lpn_ff_required_tip": "The flow required by your code or your fire authority at a hydrant. One junction at a time is tested against this same number.",
+        "lpn_ff_required_tip": "The flow required by your code or your fire authority at a hydrant. Each junction is tested against this number, unless it carries a required fire flow of its own.",
+        "lpn_ff_required_own": "Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.",
+        "lpn_ff_required_node_tip": "The fire flow this junction alone must provide, from your code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Fire flow box.",
         "lpn_ff_residual": "Residual pressure to hold",
         "lpn_ff_residual_tip": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
         "lpn_ff_design": "Design check (effect on system)",
@@ -3412,6 +3416,30 @@
             }
         },
         "lpn_ff_required_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} የመሬት ንጣፍ(ዎች) አልመለሱም።",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_required_own": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} የመሬት ንጣፍ(ዎች) አልመለሱም።",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_required_node_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
