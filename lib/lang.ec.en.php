@@ -1531,7 +1531,7 @@ $ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the 
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
-$ec_lang['lpn_run_menu_tip']='Recalculate this network now. Looking for the Run button? It is hidden while the Recalculate automatically setting is on. To bring the button back, turn Recalculate automatically off in Settings, Calculation, Hydraulics.';
+$ec_lang['lpn_run_menu_tip']='Recalculate this network now. Looking for the Calculate button? It is hidden while the Recalculate automatically setting is on. To bring the button back, turn Recalculate automatically off in Settings, Calculation, Hydraulics.';
 // ---- automatic recalculation (Task 467) ----
 // "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
 // out over time, and this switch is about the run, not about the drawing.
@@ -2799,7 +2799,7 @@ $ec_lang['lpn_field_base_demand']='Base demand';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='The flow this node draws at the time step shown: each base demand multiplied by its own pattern, added together. It is calculated, not typed, so it changes with the clock and cannot be edited.';
 $ec_lang['lpn_field_demand_pattern']='Demand pattern';
-$ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and falls through the run. Leave it at No pattern and the junction follows the project’s Default Pattern instead.';
+$ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and falls through the run. Leave it at No pattern and the junction follows the project’s Default demand pattern instead.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

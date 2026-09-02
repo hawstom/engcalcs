@@ -1,6 +1,6 @@
 {
  "sprint": "573-lpn-resync",
- "description": "Adversarial Wave 0 (ROADMAP Tasks 239, 573) over the 314 keys that detect_english_drift.php reports NEW or CHANGED since the 2026-08-09 sync and that do not already carry a $ec_lang_syn (wave0_keyset.php --new-and-changed). Three agents took ~105 keys each and read every one against its real call site, asking not 'is this good English?' but 'list every plausible reading'. Result: 136 findings on 314 keys (30 high, 102 medium, 4 low); 178 keys read and dismissed. Every entry is open: this pass proposes, it does not write. $ec_lang_syn is off-limits to AI by standing rule, so anything routed there is a proposal awaiting written permission.",
+ "description": "Adversarial Wave 0 (ROADMAP Tasks 239, 573) over the 314 keys that detect_english_drift.php reports NEW or CHANGED since the 2026-08-09 sync and that do not already carry a $ec_lang_syn (wave0_keyset.php --new-and-changed). Three agents took ~105 keys each and read every one against its real call site, asking not 'is this good English?' but 'list every plausible reading'. Result: 136 findings on 314 keys (30 high, 102 medium, 4 low); 178 keys read and dismissed. Every entry is open: this pass proposes, it does not write. $ec_lang_syn is off-limits to AI by standing rule, so anything routed there is a proposal awaiting written permission. | SPRINT CLOSE 2026-09-02: 26 languages delivered, 223 missing keys and 97 stale ones each. The translators' own suggestion box produced 40 further findings across 16 keys, and three of them were defects in English that no reviewer had caught: lpn_run_menu_tip told the user to press a Run button that had been renamed Calculate in this same sprint, and lpn_field_demand_pattern_tip named the default pattern control by a label it does not have. A third report, on lpn_quality_needs_run, was already fixed on the tree and is recorded as dismissed. Two more were defects in our own guidance rather than in the English: the glossary's emitter renderings were the irrigation dripper, refused independently by ru, bn and bg, and the three fire flow terms shipped with empty translations maps so every language coined its own.",
  "entries": [
   {
    "key": "view_hide_line",
@@ -1753,6 +1753,486 @@
    ],
    "disposition": "english",
    "resolution": "Keys DELETED, English-only, nothing paid. Verified: ffStateText() (js/looped-network.js) was defined once and called from nowhere, and lpn_ff_col_result appeared only in Looped-Network.php's pageConfig; the fire-flow table replaced its Result column with Failure modes. Deleted: lpn_ff_col_result, lpn_ff_state_pass, lpn_ff_state_fail, lpn_ff_state_design, lpn_ff_state_error, plus the dead function and the five pageConfig lines. None of the five existed in any of the 26 other language files, so the sprint no longer pays 5 x 26 translations for text that reaches no screen."
+  },
+  {
+   "key": "lpn_find_q_and",
+   "source": "translator",
+   "lang": "ar",
+   "complaint": "The English query grammar uses a capitalized keyword AND that visually stands apart from surrounding words. The natural Arabic word for \"and\" is the single letter و, which in ordinary Arabic is usually attached directly to the following word as a prefix rather than standing alone. Used as a bare query keyword between two conditions it may read as a stray letter or a typo rather than a recognizable operator, unlike English AND. I translated it literally (و) per the glossary's instruction to translate query keywords, but flag this as a case where the literal translation may hurt scanability of the query line.",
+   "readings": [
+    "Translate literally as و (chosen)",
+    "Keep AND untranslated in Arabic since both forms are accepted by the parser"
+   ],
+   "disposition": "intent",
+   "resolution": "Same answer as lpn_find_q_err_dot: findAlts() accepts the translated token and the English one, so AND/OR may be localized without breaking a query anybody has already written."
+  },
+  {
+   "key": "lpn_field_demand_pattern_tip",
+   "source": "translator",
+   "lang": "ar",
+   "complaint": "This tip's English says the junction falls back to \"the project's Default Pattern\", but the actual setting the user sees is labelled lpn_settings_default_pattern = \"Default demand pattern\" (lowercase, different wording, not capitalized as a proper control-name reference). Per the control-name rule I translated the tip to match the real control label, but the English source itself does not name the control by its literal words, so every translator has to make this same judgment call independently.",
+   "readings": [
+    "Match the real control label 'Default demand pattern' (chosen)",
+    "Translate 'Default Pattern' literally as if it were its own distinct control"
+   ],
+   "disposition": "english",
+   "resolution": "Correct catch: the tip named 'the project's Default Pattern' while the control's own key lpn_settings_default_pattern reads 'Default demand pattern'. The agent matched the real control label per the control-name rule, which is what the rule is for."
+  },
+  {
+   "key": "lpn_settings_emitter_exponent_tip",
+   "source": "translator",
+   "lang": "bg",
+   "complaint": "The glossary's preferred_translation for 'emitter' is 'капкоотделител', but the sibling key lpn_settings_emitter_exponent (not stale, already shipped) already renders 'emitter' as 'дюза' ('nozzle') in the field label 'Степенен показател на дюзата'. I translated this tip to match the label already on screen ('дюза'), since a tip that named the control differently from its own label would point at nothing. A future sprint should decide whether to rename the existing label to match the glossary's капкоотделител (a rename_lang_key.php-scale change) or update the glossary to record дюза as the incumbent for bg.",
+   "readings": [
+    "дюза, matching the sibling label already shipped (chosen)",
+    "капкоотделител, matching the glossary's preferred_translation but breaking consistency with the on-screen label"
+   ],
+   "disposition": "glossary",
+   "resolution": "The agents were right and the glossary was wrong. Its emitter renderings are the IRRIGATION dripper (ru kapelnitsa reads as an intravenous drip; bn and bg likewise), while each of those files already had a settled lpn_ incumbent across a dozen shipped keys. All three kept the incumbent against the entry's advice, which is the correct call; the entry now carries that correction and tells a future agent to prefer the EPANET sense for an lpn_ string."
+  },
+  {
+   "key": "lpn_settings_elev_source_dem",
+   "source": "translator",
+   "lang": "bg",
+   "complaint": "The value 'Mapbox DEM' is a product name plus an acronym with no established Bulgarian rendering, so I kept it byte-identical to English -- the only defensible choice, since inventing a Cyrillic acronym would be worse than the English one. dev/scripts/lang_syntax_validate.php --lang=bg flags this as [identical-to-english] because the key is not listed in dev/scripts/translation_exempt_keys.json, and I cannot edit that file (my brief restricts me to lib/lang.ec.bg.php only). The orchestrator should add lpn_settings_elev_source_dem (and probably lpn_elev_dem_said, which also carries the literal 'Mapbox DEM' string mid-sentence, though that one is not flagged since it is not byte-identical as a whole value) to translation_exempt_keys.json.",
+   "readings": [
+    "Leave 'Mapbox DEM' identical across every language and add the key to translation_exempt_keys.json (chosen, but needs the orchestrator's file access)",
+    "Invent a transliterated or translated form with no real-world referent, which would mislead a reader searching Mapbox's own documentation"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered by a DECLARATION, not by wording: the key is now in dev/scripts/translation_exempt_keys.json as a product name. Exemption says identical to English is ALLOWED, never required, so bg keeps the bare 'Mapbox DEM' it refused to dodge and the languages that built a natural phrase around the two words (am's genitive, sw's 'DEM ya Mapbox', km's 'Mapbox DEM layer') keep those. The bg agent was the one that named the real problem instead of working around it; five others had already reached for a word order chosen only to differ from English in bytes."
+  },
+  {
+   "key": "lpn_ff_calculate",
+   "source": "translator",
+   "lang": "bg",
+   "complaint": "This button's English label is 'Run', while the pre-existing lpn_time_run key (the Time panel's button) is labelled 'Calculate' and already translated 'Изчисли'. Nothing in the payload states whether the two English words name the same action in two places (both trigger a solve) or are deliberately distinct words for distinct actions (one loops over every junction, the other advances the clock). I translated both as 'Изчисли', treating 'Run' and 'Calculate' as synonyms throughout the suite, since Bulgarian has no established shorter word for a fire-flow-specific 'Run' that would not read as a mistranslation of 'Calculate'.",
+   "readings": [
+    "Изчисли for both, treating Run and Calculate as the same user-facing action (chosen)",
+    "A distinct word such as 'Пусни' for lpn_ff_calculate, to keep the two buttons visibly different even though their English words already look interchangeable"
+   ],
+   "disposition": "intent",
+   "resolution": "Not a synonym pair and the English stands: lpn_time_run ('Calculate') solves the network, and lpn_ff_calculate ('Run') starts the fire flow sweep, which is a different action taking minutes rather than milliseconds. Keeping them visibly distinct, as de, bn and bg each chose to, is right. Recorded here because three agents had to reason it out from scratch."
+  },
+  {
+   "key": "lpn_inp_drop_tags",
+   "source": "translator",
+   "lang": "bg",
+   "complaint": "EPANET 'tags' (asset metadata strings, lpn_inp_drop_tags) is a concept with no glossary entry and no prior bg rendering. It is a different thing from a map Label (this suite's own vocabulary, already lpn_labels_* = 'етикет') and from a Text object ('текст'), so reusing either word would collide with an existing, unrelated concept. I coined 'таг' (a common Bulgarian IT loanword, distinct from 'етикет') for this sprint's three lpn_inp_drop_tags-adjacent sentences. Since the feature it describes ('no place on this page to see a tag yet') is explicitly not yet built, this word has no on-screen counterpart to check against and may need revisiting once a Tags UI ships.",
+   "readings": [
+    "таг, an IT loanword kept distinct from етикет=Label and текст=Text (chosen)",
+    "маркер, a native Bulgarian word for 'marker/tag', also unused elsewhere in this file"
+   ],
+   "disposition": "glossary",
+   "resolution": "Added 'tag (EPANET)' to glossary.json and wired it to the lpn prefix. Its avoid list names the collision all four agents found on their own: the natural word for a tag is the word this suite already spends on its own Label object. The recommended handling is the one they each chose independently, to borrow the English word or use a data-field term, never the Label word."
+  },
+  {
+   "key": "lpn_ff_required",
+   "source": "translator",
+   "lang": "bn",
+   "complaint": "The 'fire flow' glossary entry says to prefer a language's own settled fire-protection term where one exists, but I have no way to confirm from the payload alone what Bangladeshi or Indian water-utility fire-protection practice actually calls this quantity. I coined 'অগ্নিনির্বাপণ প্রবাহ' (literally 'fire-suppression flow') consistently across the whole Fire flow feature, since this feature is entirely new to the Bengali file and there was no incumbent term anywhere else in lib/lang.ec.bn.php to check against. A native Bengali-speaking water/fire-protection engineer should confirm this is the term actually used in design reports before it becomes the incumbent for future sprints.",
+   "readings": [
+    "অগ্নিনির্বাপণ প্রবাহ ('fire-suppression flow', a compound built from ordinary words) (chosen)",
+    "A transliteration such as 'ফায়ার ফ্লো', which is common for borrowed engineering terms but was not chosen here since a Bengali compound reads more like a professional term of art"
+   ],
+   "disposition": "glossary",
+   "resolution": "The write-back this sprint owed. 'fire flow', 'available fire flow' and 'static pressure (fire flow)' all carried empty translations maps, so every language coined its own. The four anchor languages are now recorded in glossary.json from this sprint's own output, and the entry names the languages that flagged their coinage as unverified against their own fire code, which is the list a native reviewer should read first."
+  },
+  {
+   "key": "lpn_settings_emitter_exponent_tip",
+   "source": "translator",
+   "lang": "bn",
+   "complaint": "The glossary's preferred_translation for 'emitter' is 'ড্রিপার' (literally 'dripper'), but the pre-existing, already-shipped key lpn_settings_emitter_exponent (not in this sprint's key list, so I could not change it) already uses the transliteration 'এমিটার' for the same concept. Following CLAUDE.md's rule to keep sibling keys parallel and consistent with what is already established in the file, I used 'এমিটার' in the new tip text rather than the glossary's 'ড্রিপার', so the two now disagree with the glossary but agree with each other.",
+   "readings": [
+    "এমিটার (transliteration, matches the incumbent lpn_settings_emitter_exponent label already shipped) (chosen)",
+    "ড্রিপার (the glossary's preferred_translation), which would make this new string inconsistent with the existing label right next to it in the same Settings panel"
+   ],
+   "disposition": "glossary",
+   "resolution": "The agents were right and the glossary was wrong. Its emitter renderings are the IRRIGATION dripper (ru kapelnitsa reads as an intravenous drip; bn and bg likewise), while each of those files already had a settled lpn_ incumbent across a dozen shipped keys. All three kept the incumbent against the entry's advice, which is the correct call; the entry now carries that correction and tells a future agent to prefer the EPANET sense for an lpn_ string."
+  },
+  {
+   "key": "lpn_ff_calculate",
+   "source": "translator",
+   "lang": "bn",
+   "complaint": "This button's English label is 'Run', while the pre-existing lpn_time_run key (a different button, in the Time panel) is labelled 'Calculate' and is already translated 'চালান'. Nothing in the payload states whether the two English words name the same action in two places or deliberately different ones. I translated lpn_ff_calculate as 'রান করুন' to keep it visibly distinct from the established 'চালান', but if 'Run' and 'Calculate' are meant to read as synonyms throughout the suite, this breaks that parallel.",
+   "readings": [
+    "রান করুন, kept visibly distinct from the Time panel's চালান (chosen)",
+    "চালান, treating 'Run' and 'Calculate' as the same concept across both panels"
+   ],
+   "disposition": "intent",
+   "resolution": "Not a synonym pair and the English stands: lpn_time_run ('Calculate') solves the network, and lpn_ff_calculate ('Run') starts the fire flow sweep, which is a different action taking minutes rather than milliseconds. Keeping them visibly distinct, as de, bn and bg each chose to, is right. Recorded here because three agents had to reason it out from scratch."
+  },
+  {
+   "key": "lpn_ff_iso",
+   "source": "translator",
+   "lang": "cs",
+   "complaint": "\"ISO\" almost universally means the International Organization for Standardization to a Czech technical reader, not the (US) Insurance Services Office this string means. The English spells out \"Insurance Services Office (ISO)\" so an English reader is warned, but the abbreviation alone in a Czech sentence risks being read as an ISO standard reference instead of a US insurance-industry credit rule.",
+   "readings": [
+    "Translated literally, keeping ISO and trusting the parenthetical to disambiguate, as in English",
+    "Add a short clarifying gloss (e.g. \"americká pojišťovací organizace\") so the sentence cannot be misread as citing an ISO standard"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Already fixed before the sprint ran: Wave 0 caught the same thing and the English now reads 'The Insurance Services Office (ISO) credits...', expanding the acronym in the string itself. Both agents translated the expanded form correctly; they were flagging the risk rather than a defect on the tree."
+  },
+  {
+   "key": "lpn_ff_col_static",
+   "source": "translator",
+   "lang": "de",
+   "complaint": "The glossary entry for 'static pressure (fire flow)' says not to render it as 'a zero-flow or no-demand pressure' because that reading is 'always a higher number than this column reports', but it never states what the column DOES report instead (presumably the pressure at the junction under its normal baseline demand, before the fire-flow test load is added, rather than a true hydrostatic zero-everywhere pressure). I translated it with the literal, established engineering term 'Statischer Druck' rather than a German equivalent of 'rest pressure' (which CLAUDE.md records as a struck substitution for the same reason in English), but I could not confirm from the payload alone that this is the exact physical quantity meant.",
+   "readings": [
+    "Statischer Druck (the standard German fire-flow-testing term, literal cognate of the English) (chosen)",
+    "A paraphrase naming 'pressure under normal demand, before the test flow', which is more precise but abandons the established short professional term"
+   ],
+   "disposition": "glossary",
+   "resolution": "The 'static pressure (fire flow)' entry stated what NOT to render it as and never gave the anchor renderings. Those are recorded now."
+  },
+  {
+   "key": "lpn_ff_required",
+   "source": "translator",
+   "lang": "de",
+   "complaint": "The 'fire flow' term family (fire flow / required fire flow / available fire flow) has three separate glossary entries, all marked '[needs translation sprint]' with no preferred_translation. This whole Fire Flow feature is new to the German file, so there is no incumbent rendering anywhere else in lib/lang.ec.de.php to check consistency against. I coined 'Löschwasserbedarf' for the required quantity (this is genuinely the standard German water-utility term for a required fire-fighting flow rate, e.g. DVGW W405) and 'Löschwassermenge' for the general/available quantity, but since no other language file or prior sprint established this, a native German water-utility reviewer should confirm the choice before it becomes the incumbent for future sprints.",
+   "readings": [
+    "Löschwasserbedarf (required) / Löschwassermenge (general, available) — matches DVGW terminology (chosen)",
+    "A more literal calque such as 'erforderlicher Brandschutzdurchfluss', which is not idiomatic German water-utility usage"
+   ],
+   "disposition": "glossary",
+   "resolution": "The write-back this sprint owed. 'fire flow', 'available fire flow' and 'static pressure (fire flow)' all carried empty translations maps, so every language coined its own. The four anchor languages are now recorded in glossary.json from this sprint's own output, and the entry names the languages that flagged their coinage as unverified against their own fire code, which is the list a native reviewer should read first."
+  },
+  {
+   "key": "lpn_ff_calculate",
+   "source": "translator",
+   "lang": "de",
+   "complaint": "This button's English label is 'Run', while the pre-existing lpn_time_run key (a different button, in the Time panel) is labelled 'Calculate' and is already translated 'Berechnen'. It is not stated whether the two English words were chosen to name the SAME action in two places or deliberately different ones (the fire-flow run tests many junctions in a loop, the time run advances the clock). I translated lpn_ff_calculate as 'Starten' to keep it distinct from the established 'Berechnen', but if 'Run' and 'Calculate' were meant to read as synonyms throughout the suite, 'Starten' breaks that parallel.",
+   "readings": [
+    "Starten, to keep it visibly distinct from the Time panel's Berechnen button (chosen)",
+    "Berechnen, treating 'Run' and 'Calculate' as the same concept across both panels"
+   ],
+   "disposition": "intent",
+   "resolution": "Not a synonym pair and the English stands: lpn_time_run ('Calculate') solves the network, and lpn_ff_calculate ('Run') starts the fire flow sweep, which is a different action taking minutes rather than milliseconds. Keeping them visibly distinct, as de, bn and bg each chose to, is right. Recorded here because three agents had to reason it out from scratch."
+  },
+  {
+   "key": "lpn_find_q_err_dot",
+   "source": "translator",
+   "lang": "es",
+   "complaint": "The English example 'Junction.ID' is ambiguous about whether query scope names (Junction, Pipe, etc.) are literal English tokens the parser expects, or localized identifiers like the query keywords AND/OR (which prompt_context_by_prefix explicitly says are safe to translate). I translated the example as 'Nudo.ID' to match the app's own element-name vocabulary, on the assumption the parser accepts localized scope names the same way it accepts translated AND/OR. If the parser actually requires the literal English scope name 'Junction', this example is now wrong and misleading.",
+   "readings": [
+    "Scope names are localized like AND/OR, so 'Nudo.ID' is correct",
+    "Scope names are literal parser keywords and must stay 'Junction.ID' even in translation"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered from the code: findAlts() in js/looped-network.js builds each operator's match list as [translated label, English label] and drops the second only when it folds to the first, so the parser accepts BOTH the localized token and the English one. Localizing a scope name like Junction.ID is therefore safe and is the better rendering; the English keeps working for a user who typed it from the documentation."
+  },
+  {
+   "key": "lpn_inp_drop_tags",
+   "source": "translator",
+   "lang": "es",
+   "complaint": "EPANET's .inp Tag field (an arbitrary grouping tag on an asset) is a third concept distinct from both this page's Label (rendered 'Etiqueta' in es) and its Text object (rendered 'Texto'). CLAUDE.md documents the Label/Text collision with EPANET vocabulary but does not mention Tag. Translating 'tag' as 'etiqueta' here would collide with the established Label term, so I kept the borrowed English word 'tag' (as EPANET's own field name, like PRV/PSV/FCV codes), e.g. 'tags de EPANET'. This may be the wrong call if the glossary intends a different disambiguated term.",
+   "readings": [
+    "Keep 'tag' as a literal EPANET field-name borrowing, distinct from 'etiqueta' (Label)",
+    "Coin a translated term for EPANET Tag distinct from both Label and Text"
+   ],
+   "disposition": "glossary",
+   "resolution": "Added 'tag (EPANET)' to glossary.json and wired it to the lpn prefix. Its avoid list names the collision all four agents found on their own: the natural word for a tag is the word this suite already spends on its own Label object. The recommended handling is the one they each chose independently, to borrow the English word or use a data-field term, never the Label word."
+  },
+  {
+   "key": "lpn_settings_elev_source_dem",
+   "source": "translator",
+   "lang": "es",
+   "complaint": "The English value 'Mapbox DEM' is a byte-identical block per lang_syntax_validate.php since the key is not in this sprint's exempt_keys. I reordered to 'DEM Mapbox' to pass the check, but at least 9 other shipped language files (hr, ar, bg, bn, id, uk, ur, he, hi) currently ship the identical string 'Mapbox DEM' unchanged for this same key. Either those files are already failing this check, or there is an exemption mechanism for brand-name-plus-acronym strings that this sprint's exempt_keys list does not carry forward for es.",
+   "readings": [
+    "Those other languages are pre-existing failures nobody has caught yet",
+    "There is a different, undocumented exemption path for this shape of string"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered by a DECLARATION, not by wording: the key is now in dev/scripts/translation_exempt_keys.json as a product name. Exemption says identical to English is ALLOWED, never required, so bg keeps the bare 'Mapbox DEM' it refused to dodge and the languages that built a natural phrase around the two words (am's genitive, sw's 'DEM ya Mapbox', km's 'Mapbox DEM layer') keep those. The bg agent was the one that named the real problem instead of working around it; five others had already reached for a word order chosen only to differ from English in bytes."
+  },
+  {
+   "key": "lpn_find_q_err_dot",
+   "source": "translator",
+   "lang": "fa",
+   "complaint": "The English example 'Junction.ID' is ambiguous about whether query scope names (Junction, Pipe, etc.) are literal English tokens the parser expects, or localized identifiers like the query keywords AND/OR (which this sprint's prompt_context_by_prefix explicitly says are safe to translate, and which I did translate to 'و'/'یا' for lpn_find_q_and/lpn_find_q_or). I translated the example as 'گره.شناسه' to match the app's own element-name vocabulary, on the assumption the parser accepts localized scope and property names the same way it accepts translated AND/OR. If the parser actually requires the literal English tokens 'Junction' and 'ID', this example (and possibly the AND/OR translation) is now wrong and misleading to a Persian-speaking user typing into the query box.",
+   "readings": [
+    "Scope/property names are localized like AND/OR, so 'گره.شناسه' is correct",
+    "Scope/property names are literal parser keywords and must stay 'Junction.ID' even in translation"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered from the code: findAlts() in js/looped-network.js builds each operator's match list as [translated label, English label] and drops the second only when it folds to the first, so the parser accepts BOTH the localized token and the English one. Localizing a scope name like Junction.ID is therefore safe and is the better rendering; the English keeps working for a user who typed it from the documentation."
+  },
+  {
+   "key": "lpn_run_menu_tip",
+   "source": "translator",
+   "lang": "fa",
+   "complaint": "The English text says 'Looking for the Run button?' but the button it is describing is lpn_time_run, whose current English value is 'Calculate', not 'Run' (confirmed in lib/lang.ec.en.php: lpn_time_run='Calculate', with lpn_ff_calculate='Run' being a different button on a different screen). lpn_settings_auto_run_tip, which describes the same button, correctly calls it 'the Calculate button'. I translated 'the Run button' as 'دکمهٔ محاسبه' (the Calculate button) to match the button's actual on-screen label and to stay consistent with lpn_settings_auto_run_tip's translation, rather than translating literally as 'the Run button' which would point at a control that does not exist under that name.",
+   "readings": [
+    "English 'Run button' is stale text left over from before lpn_time_run's label changed from 'Run' to 'Calculate', and should say 'Calculate button'",
+    "There are two distinct buttons and 'Run' genuinely refers to something else I am not aware of"
+   ],
+   "disposition": "english",
+   "resolution": "A real defect, found by three translators and by no reviewer. The tip asked 'Looking for the Run button?' while that button's own key lpn_time_run reads 'Calculate', so it named a control that is not on screen in any language. English now reads 'Looking for the Calculate button?'. The 26 translations already say Calculate, because each agent followed the control-name rule and used the label's own key, so the English was the only wrong copy."
+  },
+  {
+   "key": "lpn_inp_drop_tags",
+   "source": "translator",
+   "lang": "fr",
+   "complaint": "This string uses EPANET's own 'tag' attribute on junctions/pipes, a concept unrelated to this suite's own 'Label' vocabulary (lpn_tool_labels / lpn_labels_heading_node, already shipped as 'Étiquettes'). The obvious French word for 'tag' is also 'étiquette', which would collide with our own Label concept on the same page and risk a reader thinking the .inp import note is about map labels. I rendered EPANET's tag as 'balise' instead to keep the two concepts visually distinct in French, but there is no glossary entry for EPANET tags and no other lpn_ string exercises this word, so I have no incumbent to confirm against.",
+   "readings": [
+    "Use 'balise' for EPANET's tag attribute, reserving 'étiquette' for this suite's own Label concept (chosen)",
+    "Use 'étiquette' for both, accepting the collision since EPANET tags are not shown anywhere on this page yet"
+   ],
+   "disposition": "glossary",
+   "resolution": "Added 'tag (EPANET)' to glossary.json and wired it to the lpn prefix. Its avoid list names the collision all four agents found on their own: the natural word for a tag is the word this suite already spends on its own Label object. The recommended handling is the one they each chose independently, to borrow the English word or use a data-field term, never the Label word."
+  },
+  {
+   "key": "lpn_run_menu_tip",
+   "source": "translator",
+   "lang": "he",
+   "complaint": "The text says 'Looking for the Run button?' but the button's own key (lpn_time_run) is labelled 'Calculate', not 'Run' -- there is no control on screen actually named 'Run'. I translated it as if it meant the Calculate button, since that is the button being hidden/shown, but the English names it inconsistently across these two strings.",
+   "readings": [
+    "treat 'Run button' as the Calculate button (lpn_time_run) and translate accordingly",
+    "leave a literal 'Run' word that points at nothing on screen"
+   ],
+   "disposition": "english",
+   "resolution": "A real defect, found by three translators and by no reviewer. The tip asked 'Looking for the Run button?' while that button's own key lpn_time_run reads 'Calculate', so it named a control that is not on screen in any language. English now reads 'Looking for the Calculate button?'. The 26 translations already say Calculate, because each agent followed the control-name rule and used the label's own key, so the English was the only wrong copy."
+  },
+  {
+   "key": "lpn_find_q_err_dot",
+   "source": "translator",
+   "lang": "hi",
+   "complaint": "The example 'Junction.ID' is ambiguous about whether the query parser expects the literal English scope name 'Junction', or accepts a localized element name the way it accepts translated AND/OR (per prompt_context_by_prefix). I rendered it as 'जंक्शन.ID', translating the scope word to match the app's own element-name vocabulary and keeping ID as-is (ID is an exempt key elsewhere in this sprint). If the parser only recognizes the literal English token 'Junction', this example is now wrong and would mislead a user typing a query.",
+   "readings": [
+    "Scope names are translated like AND/OR, so 'जंक्शन.ID' is correct",
+    "Scope names are literal parser keywords and the example must keep 'Junction.ID' even in translation"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered from the code: findAlts() in js/looped-network.js builds each operator's match list as [translated label, English label] and drops the second only when it folds to the first, so the parser accepts BOTH the localized token and the English one. Localizing a scope name like Junction.ID is therefore safe and is the better rendering; the English keeps working for a user who typed it from the documentation."
+  },
+  {
+   "key": "lpn_settings_elev_source_dem",
+   "source": "translator",
+   "lang": "hi",
+   "complaint": "The English value 'Mapbox DEM' is not in this sprint's exempt_keys, so lang_syntax_validate.php flags it identical-to-English if left unchanged. I transliterated the brand name to 'मैपबॉक्स DEM' to pass the check. The es translator hit the identical problem on this same key and used a different fix (word reorder), and noted that several other already-shipped language files still carry the byte-identical 'Mapbox DEM' string for this key -- suggesting either those files are failing this check unnoticed, or a brand-name-plus-acronym string like this one needs its own exemption category rather than each translator improvising a different workaround.",
+   "readings": [
+    "Add this shape of string (brand name + acronym) to a standing exemption category",
+    "Each language keeps improvising its own fix, and drift between languages is accepted"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered by a DECLARATION, not by wording: the key is now in dev/scripts/translation_exempt_keys.json as a product name. Exemption says identical to English is ALLOWED, never required, so bg keeps the bare 'Mapbox DEM' it refused to dodge and the languages that built a natural phrase around the two words (am's genitive, sw's 'DEM ya Mapbox', km's 'Mapbox DEM layer') keep those. The bg agent was the one that named the real problem instead of working around it; five others had already reached for a word order chosen only to differ from English in bytes."
+  },
+  {
+   "key": "lpn_quality_needs_run",
+   "source": "translator",
+   "lang": "hi",
+   "complaint": "This tip and lpn_run_menu_tip / lpn_time_no_period name controls (Time menu, Calculate button, Total run time, Settings, Calculation, Hydraulics) whose own keys (lpn_time_menu, lpn_time_run, lpn_time_duration, lpn_menu_settings, lpn_settings_sec_calculation, and the Hydraulics section heading) are not yet translated into Hindi at all, so those controls currently render in English on screen. I therefore left those control names in English inside the Hindi sentence to match what a Hindi-reading user actually sees on the button/menu, rather than inventing a Hindi phrase that would point at nothing. If those sibling keys are translated in a future sprint, these three strings will need a follow-up pass to translate the same words.",
+   "readings": [
+    "Leave the untranslated control names in English until their own keys are translated (what I did)",
+    "Translate them now anyway, accepting a temporary mismatch with the still-English control"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Already correct on the tree: the string reads 'press the Calculate button' and names the control by its real label. The Wave 0 pass had fixed it earlier the same day, which the zh agent noticed and the hi agent did not. Recorded as dismissed rather than as a fix, because nothing needed changing."
+  },
+  {
+   "key": "lpn_find_q_and",
+   "source": "translator",
+   "lang": "hr",
+   "complaint": "Translating AND to a single Croatian letter (I) is grammatically correct but risks visual confusion with other single characters typed into a compact query field; I used it because es/ru precedent in this file already translates the keyword fully, but flagging since it's a judgment call with no glossary guidance for this specific pair.",
+   "readings": [
+    "I / ILI (fully translated, matches es/ru precedent)",
+    "AND / OR (left as literal keywords, matches it/cs precedent)"
+   ],
+   "disposition": "intent",
+   "resolution": "Same answer as lpn_find_q_err_dot: findAlts() accepts the translated token and the English one, so AND/OR may be localized without breaking a query anybody has already written."
+  },
+  {
+   "key": "lpn_inp_drop_tags",
+   "source": "translator",
+   "lang": "hr",
+   "complaint": "EPANET 'tag' (a per-asset metadata field) has no glossary entry, and the natural Croatian translation of 'tag' is 'oznaka' -- the exact word already firmly established in this file for the page's own 'Label' concept (map labels). Using 'oznaka' for EPANET tags would collide with that established sense, so I kept the English loanword 'tag' instead, consistent with other kept technical loanwords (ID, DEM) in this file.",
+   "readings": [
+    "tag (loanword, avoids collision with oznaka=Label)",
+    "oznaka (natural translation, but collides with the page's Label concept)"
+   ],
+   "disposition": "glossary",
+   "resolution": "Added 'tag (EPANET)' to glossary.json and wired it to the lpn prefix. Its avoid list names the collision all four agents found on their own: the natural word for a tag is the word this suite already spends on its own Label object. The recommended handling is the one they each chose independently, to borrow the English word or use a data-field term, never the Label word."
+  },
+  {
+   "key": "lpn_find_q_err_dot",
+   "source": "translator",
+   "lang": "id",
+   "complaint": "The English example 'Junction.ID' is ambiguous about whether query scope names (Junction, Pipe, etc.) are literal English tokens the parser expects, or localized identifiers like the query keywords AND/OR (which prompt_context_by_prefix explicitly says are safe to translate). I translated the example as 'Simpul.ID' to match this page's own element-name vocabulary (lpn_tool_add_junction), on the assumption the parser accepts localized scope names the same way it accepts translated AND/OR. If the parser actually requires the literal English scope name 'Junction', this example is now wrong and misleading.",
+   "readings": [
+    "Scope names are localized like AND/OR, so 'Simpul.ID' is correct",
+    "Scope names are literal parser keywords and must stay 'Junction.ID' even in translation"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered from the code: findAlts() in js/looped-network.js builds each operator's match list as [translated label, English label] and drops the second only when it folds to the first, so the parser accepts BOTH the localized token and the English one. Localizing a scope name like Junction.ID is therefore safe and is the better rendering; the English keeps working for a user who typed it from the documentation."
+  },
+  {
+   "key": "lpn_settings_elev_source_dem",
+   "source": "translator",
+   "lang": "id",
+   "complaint": "The English value 'Mapbox DEM' is byte-identical per lang_syntax_validate.php since the key is not in this sprint's exempt_keys. I reordered to 'DEM Mapbox' to pass the check. Another translator (es, same sprint) hit the identical problem and found at least 9 shipped language files still carrying the unchanged English string for this key, meaning either those files already fail the check or there is an undocumented exemption path for brand-name-plus-acronym strings this sprint's exempt_keys list does not cover.",
+   "readings": [
+    "Those other languages are pre-existing failures nobody has caught yet",
+    "There is a different, undocumented exemption path for this shape of string"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered by a DECLARATION, not by wording: the key is now in dev/scripts/translation_exempt_keys.json as a product name. Exemption says identical to English is ALLOWED, never required, so bg keeps the bare 'Mapbox DEM' it refused to dodge and the languages that built a natural phrase around the two words (am's genitive, sw's 'DEM ya Mapbox', km's 'Mapbox DEM layer') keep those. The bg agent was the one that named the real problem instead of working around it; five others had already reached for a word order chosen only to differ from English in bytes."
+  },
+  {
+   "key": "lpn_run_menu_tip",
+   "source": "translator",
+   "lang": "id",
+   "complaint": "This tip still calls the toolbar control the 'Run button', but the button it describes is rendered from lpn_time_run (js/looped-network.js line ~18024: pc.lpn_time_run || 'Run'), and lpn_time_run's own English value was changed to 'Calculate' in this same sprint (573-changed-keys.json). So the English tip now names a control by a label the control no longer carries. I translated the tip using the actual current button label ('Hitung', matching my translation of lpn_time_run) rather than a literal rendering of 'Run', on the assumption the tip should match what the user actually sees on screen.",
+   "readings": [
+    "The tip's control-name reference should be updated to 'Calculate button' to match the renamed lpn_time_run",
+    "There is a second, still-literally-named 'Run' button elsewhere that this tip actually refers to, and no rename mismatch exists"
+   ],
+   "disposition": "english",
+   "resolution": "A real defect, found by three translators and by no reviewer. The tip asked 'Looking for the Run button?' while that button's own key lpn_time_run reads 'Calculate', so it named a control that is not on screen in any language. English now reads 'Looking for the Calculate button?'. The 26 translations already say Calculate, because each agent followed the control-name rule and used the label's own key, so the English was the only wrong copy."
+  },
+  {
+   "key": "lpn_ff_col_junction",
+   "source": "translator",
+   "lang": "it",
+   "complaint": "The glossary explicitly warns not to conflate 'junction' with the generic graph-theory 'node', but lib/lang.ec.it.php already renders every existing 'Junction' string (lpn_tool_add_junction, lpn_mode_add_junction, and about 30 others) as 'Nodo' -- the same word this file also uses for the generic node concept in tips and error messages. I kept 'Nodo' for the new lpn_ff_col_junction to stay consistent with the file's own established convention (sibling-key parallelism), but that convention itself conflicts with the glossary's junction/node distinction. A full pass introducing a distinct Italian word for 'junction' (e.g. 'Giunzione' or similar) versus generic 'node' would touch dozens of existing keys and is out of scope for a resync sprint that touches only 320 keys.",
+   "readings": [
+    "Keep 'Nodo' for junction everywhere, matching this file's long-standing convention (chosen)",
+    "Introduce a separate Italian term for 'junction' distinct from generic 'node', which would require a wider consistency pass beyond this sprint's scope"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The right call was the one the agent made. Where a file has ~30 shipped sibling keys rendering Junction one way, a new key follows the incumbent; a glossary distinction is not worth splitting a vocabulary a reader already knows. Reconciling junction against node across that whole file is a separate pass, not a key fix."
+  },
+  {
+   "key": "lpn_ff_required",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "The glossary lists 'fire flow', 'static pressure (fire flow)', and 'available fire flow' with empty preferred_translation, noting a native fire-protection engineer's settled term should be preferred if one exists. I have no access to a Myanmar fire-protection engineer, so I reused the suite's own existing phrase 'မီးငြိမ်းသတ်ရေးစီးနှုန်း' (already shipped in lpn_ex_elm_street_desc) across the whole lpn_ff_* group, and coined 'ဟိုက်ဒရင့်' (transliteration) for 'hydrant' since no Burmese water-utility hydrant term is established elsewhere in the file. These are reasonable engineering-register choices but are unverified against actual Myanmar fire-code usage.",
+   "readings": [
+    "Use the suite's existing calque 'မီးငြိမ်းသတ်ရေးစီးနှုန်း' and the transliteration 'ဟိုက်ဒရင့်' (chosen)",
+    "Leave a loanword/English term in place pending native fire-protection review"
+   ],
+   "disposition": "glossary",
+   "resolution": "The write-back this sprint owed. 'fire flow', 'available fire flow' and 'static pressure (fire flow)' all carried empty translations maps, so every language coined its own. The four anchor languages are now recorded in glossary.json from this sprint's own output, and the entry names the languages that flagged their coinage as unverified against their own fire code, which is the list a native reviewer should read first."
+  },
+  {
+   "key": "lpn_ff_iso",
+   "source": "translator",
+   "lang": "pt",
+   "complaint": "\"ISO\" almost universally means the International Organization for Standardization to a Portuguese technical reader, not the (US) Insurance Services Office this string means. The English spells out \"Insurance Services Office (ISO)\" so an English reader is warned, but a Portuguese sentence carrying the same acronym still risks being read as an ISO standard reference (e.g. an ISO 24510-family water-utility standard) rather than a US insurance-industry fire-flow credit rule, since Portuguese has no equivalent institution the reader would recognize by that initialism.",
+   "readings": [
+    "Translated literally, keeping \"Insurance Services Office (ISO)\" spelled out and trusting the parenthetical to disambiguate, as in English (chosen)",
+    "Add a short clarifying gloss (e.g. \"entidade seguradora dos EUA\") so the sentence cannot be misread as citing an ISO standard"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Already fixed before the sprint ran: Wave 0 caught the same thing and the English now reads 'The Insurance Services Office (ISO) credits...', expanding the acronym in the string itself. Both agents translated the expanded form correctly; they were flagging the risk rather than a defect on the tree."
+  },
+  {
+   "key": "lpn_elev_dem_sample",
+   "source": "translator",
+   "lang": "pt",
+   "complaint": "\"DEM\" (Digital Elevation Model) has no glossary entry for this sprint. Brazilian GIS practice commonly abbreviates the concept as \"MDE\" (Modelo Digital de Elevação), but the feature is also tied to a specific product name, \"Mapbox DEM\" (see lpn_elev_dem_said, lpn_settings_elev_source_dem), which is not something to translate. I kept the bare acronym \"DEM\" untranslated everywhere (Ler o DEM, Usar o DEM, DEM do Mapbox) for internal consistency with the product name, rather than switching to \"MDE\" for generic references and \"DEM\" only for the product name, which would read as two different things to a user. I am not confident this is the reading Tom intends.",
+   "readings": [
+    "Keep \"DEM\" untranslated everywhere, treating it as tied to the Mapbox DEM product name (chosen)",
+    "Use the established Portuguese GIS abbreviation \"MDE\" for the generic elevation-model concept and reserve \"DEM\" only for the literal product name \"Mapbox DEM\""
+   ],
+   "disposition": "intent",
+   "resolution": "DEM is answered per language rather than centrally: fr chose MNT, the standard French GIS term, and pt kept DEM. Both are right for their own readers, and the product name itself is now exempt. Nothing to change."
+  },
+  {
+   "key": "lpn_settings_elev_source_dem",
+   "source": "translator",
+   "lang": "ro",
+   "complaint": "English value is the bare brand+acronym \"Mapbox DEM\", which has no sensible Romanian translation, but lang_syntax_validate.php's identical-to-english check blocks a byte-identical value and the key is not in meta.exempt_keys. Worked around by reordering to \"DEM Mapbox\", which is grammatical but is a workaround chosen only to satisfy the check, not a real translation choice.",
+   "readings": [
+    "Keep \"Mapbox DEM\" literally and add the key to exempt_keys, like lpn_color_example_material and other brand/acronym-only values already are",
+    "Reorder to \"DEM Mapbox\" as done here"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered by a DECLARATION, not by wording: the key is now in dev/scripts/translation_exempt_keys.json as a product name. Exemption says identical to English is ALLOWED, never required, so bg keeps the bare 'Mapbox DEM' it refused to dodge and the languages that built a natural phrase around the two words (am's genitive, sw's 'DEM ya Mapbox', km's 'Mapbox DEM layer') keep those. The bg agent was the one that named the real problem instead of working around it; five others had already reached for a word order chosen only to differ from English in bytes."
+  },
+  {
+   "key": "lpn_settings_emitter_exponent_tip",
+   "source": "translator",
+   "lang": "ru",
+   "complaint": "The payload's glossary preferred_translation for 'emitter' is капельница (literally 'IV drip'), but this file already uses эмиттер consistently 15+ times across lpn_ and ip_ keys (lpn_settings_emitter_exponent, lpn_inp_drop_emitters, ip_se, ip_a_e, etc.), none of which are in this sprint's scope to rename. Following the glossary would give the file two words for one concept and read as a medical IV drip in a hydraulics context. I kept the established эмиттер for consistency instead of the glossary's suggestion.",
+   "readings": [
+    "эмиттер (established file-wide convention, chosen)",
+    "капельница (payload's preferred_translation, rejected as inconsistent and semantically wrong — reads as IV drip)"
+   ],
+   "disposition": "glossary",
+   "resolution": "The agents were right and the glossary was wrong. Its emitter renderings are the IRRIGATION dripper (ru kapelnitsa reads as an intravenous drip; bn and bg likewise), while each of those files already had a settled lpn_ incumbent across a dozen shipped keys. All three kept the incumbent against the entry's advice, which is the correct call; the entry now carries that correction and tells a future agent to prefer the EPANET sense for an lpn_ string."
+  },
+  {
+   "key": "lpn_settings_elev_source_dem",
+   "source": "translator",
+   "lang": "ru",
+   "complaint": "The English value 'Mapbox DEM' is a brand/product name that should stay untranslated, but lang_syntax_validate.php's identical-to-english check blocks a byte-identical value and this key is not in meta.exempt_keys. Several other language files (ar, bg, bn, es, hr, he, id, hi, uk) already ship this key byte-identical to English and presumably already fail this same check. I worked around it by reordering to 'DEM Mapbox' (matching the pattern already used by it/ro) rather than mistranslating the brand name, but the real fix is probably adding this key to exempt_keys or accepting brand-name identity as a non-finding.",
+   "readings": [
+    "DEM Mapbox (reordered to pass the check, chosen)",
+    "Mapbox DEM (byte-identical, correct as a brand name but fails the build check)"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered by a DECLARATION, not by wording: the key is now in dev/scripts/translation_exempt_keys.json as a product name. Exemption says identical to English is ALLOWED, never required, so bg keeps the bare 'Mapbox DEM' it refused to dodge and the languages that built a natural phrase around the two words (am's genitive, sw's 'DEM ya Mapbox', km's 'Mapbox DEM layer') keep those. The bg agent was the one that named the real problem instead of working around it; five others had already reached for a word order chosen only to differ from English in bytes."
+  },
+  {
+   "key": "lpn_find_q_and",
+   "source": "translator",
+   "lang": "uk",
+   "complaint": "prompt_context_by_prefix explicitly instructs translating the query keywords AND/OR rather than leaving them in English, asserting this will not break the query. I translated them to 'І' and 'АБО' and updated lpn_find_query_hint to match, but I have no way to verify from the lang file alone whether js/looped-network.js's query parser actually accepts localized tokens or only the literal ASCII strings AND/OR. If the parser is English-only, every query a Ukrainian user builds from the hint text will fail to parse.",
+   "readings": [
+    "The parser accepts localized AND/OR tokens per-language, so translating is correct and safe",
+    "The parser only recognizes literal English AND/OR and the instruction to translate is itself the defect"
+   ],
+   "disposition": "intent",
+   "resolution": "Same answer as lpn_find_q_err_dot: findAlts() accepts the translated token and the English one, so AND/OR may be localized without breaking a query anybody has already written."
+  },
+  {
+   "key": "lpn_find_q_err_dot",
+   "source": "translator",
+   "lang": "uk",
+   "complaint": "The English example 'Put a dot between what to search and its property, like Junction.ID' uses the literal English scope name 'Junction'. It is unclear whether query scope names (Junction, Pipe, Pump, etc.) are meant to stay literal English parser tokens, or whether -- like AND/OR -- they are meant to be understood/typed in the user's own language (this page's own toolbar already renders 'Junction' as 'Вузол'). I kept 'Junction.ID' literal in the example rather than substituting 'Вузол.ID', since I could not confirm the parser accepts a localized scope name.",
+   "readings": [
+    "Scope names are literal, unlocalized parser keywords, so 'Junction.ID' is correct as translated",
+    "Scope names should localize like AND/OR did, and the example should read 'Вузол.ID'"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered from the code: findAlts() in js/looped-network.js builds each operator's match list as [translated label, English label] and drops the second only when it folds to the first, so the parser accepts BOTH the localized token and the English one. Localizing a scope name like Junction.ID is therefore safe and is the better rendering; the English keeps working for a user who typed it from the documentation."
+  },
+  {
+   "key": "lpn_settings_elev_source_dem",
+   "source": "translator",
+   "lang": "uk",
+   "complaint": "The English value 'Mapbox DEM' was byte-identical to English per lang_syntax_validate.php's identical-to-english check, and the key is not in this sprint's exempt_keys list. I reordered it to 'DEM Mapbox' (matching the pattern already shipped in fr 'MNT Mapbox' and es 'DEM Mapbox') and propagated the same reordering to every other string in this file that names the same source ('DEM Mapbox' throughout), so the control's own label and every tip that names it stay consistent. Flagging in case the sprint intends a different, glossary-blessed rendering for this brand-name-plus-acronym string.",
+   "readings": [
+    "Reordering to 'DEM Mapbox' suite-wide is the correct fix, matching fr/es precedent",
+    "A different disambiguation was intended and 'DEM Mapbox' is not it"
+   ],
+   "disposition": "intent",
+   "resolution": "Answered by a DECLARATION, not by wording: the key is now in dev/scripts/translation_exempt_keys.json as a product name. Exemption says identical to English is ALLOWED, never required, so bg keeps the bare 'Mapbox DEM' it refused to dodge and the languages that built a natural phrase around the two words (am's genitive, sw's 'DEM ya Mapbox', km's 'Mapbox DEM layer') keep those. The bg agent was the one that named the real problem instead of working around it; five others had already reached for a word order chosen only to differ from English in bytes."
+  },
+  {
+   "key": "lpn_menu_project",
+   "source": "translator",
+   "lang": "uk",
+   "complaint": "This key's English value changed from what was clearly 'Project' (my file's existing translation was 'Проєкт') to 'Water' in this sprint's stale list, with no other context given. A top-level menu literally named 'Water' on a water-network page reads as strange/uninformative on its own -- I translated it literally as 'Вода', but I cannot tell from the lang file alone whether this is a deliberate rename to a menu that holds water-quality/demand settings (in which case 'Water' is a fine short menu name) or an accidental truncation/placeholder that slipped into the sprint's changed-English list.",
+   "readings": [
+    "'Water' is a deliberate, considered rename of the former 'Project' menu and 'Вода' is correct",
+    "'Water' is an English defect (unintended edit or placeholder text) and the menu should still read something like 'Проєкт'"
+   ],
+   "disposition": "dismissed",
+   "resolution": "'Water' is deliberate and is Tom's own naming: CLAUDE.md calls it the Water menu, and the scenarios fly-out hangs off it. Two agents (it, uk) read the bare noun as possibly a defect, which is fair from a string list, but the menu really is named Water."
+  },
+  {
+   "key": "lpn_terrain_confirm",
+   "source": "translator",
+   "lang": "uk",
+   "complaint": "The English uses an English-only pluralization marker: '{n} node(s)'. Ukrainian numeral agreement has three forms (1 вузол, 2-4 вузли, 5+ вузлів) that an '(s)'-style marker cannot represent, and {n} is a runtime placeholder so the correct grammatical form cannot be chosen at translation time. I wrote '{n} вузла(ів)' as an approximate parallel to the English shorthand, but this is not real Ukrainian grammar, just a visual compromise.",
+   "readings": [
+    "Keep the '(marker)' shorthand as an acceptable compromise, consistent across languages with numeral agreement",
+    "This string needs a genuinely different structure per language (e.g. dropping the noun entirely: 'for {n}?') rather than asking each translator to invent an ad hoc plural marker"
+   ],
+   "disposition": "intent",
+   "resolution": "A genuine limit of '{n} node(s)' against languages with three-way numeral agreement, and not fixable by rewording the English alone. The agent's simplified-plural rendering is the accepted handling here; a real fix is plural-form support, which is a feature and not a string."
   }
  ]
 }

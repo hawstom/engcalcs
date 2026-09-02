@@ -1,0 +1,3 @@
+{"lang": "he", "entries": [
+{"key": "lpn_run_menu_tip", "source": "translator", "lang": "he", "complaint": "The text says 'Looking for the Run button?' but the button's own key (lpn_time_run) is labelled 'Calculate', not 'Run' -- there is no control on screen actually named 'Run'. I translated it as if it meant the Calculate button, since that is the button being hidden/shown, but the English names it inconsistently across these two strings.", "readings": ["treat 'Run button' as the Calculate button (lpn_time_run) and translate accordingly", "leave a literal 'Run' word that points at nothing on screen"], "disposition": "open", "resolution": ""}
+]}

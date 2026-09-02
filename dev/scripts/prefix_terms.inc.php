@@ -75,6 +75,11 @@ function prefixToTermNames(): array
             // colour-by-value block, and two of them carry traps this suite creates for itself:
             // 'gradient' is a HYDRAULIC quantity printed on every pipe, so a colour ramp must not
             // become a colour gradient, and a 'break' is something a water main does.
+            // Added 2026-09-02 (sprint 573). EPANET's [TAGS] field, whose natural translation in
+            // most languages is the word this suite already spends on its own Label object. Four
+            // translators found that collision independently and each backed away from it; the
+            // term records the recommended borrow so the fifth does not have to rediscover it.
+            'tag (EPANET)',
             'colour ramp', 'colour band limit', 'equal intervals / equal counts', 'fire flow',
             'background image', 'world file', 'pump curve', 'project (saved network)', 'scenario',
             'zoom to extents', 'default (setting)', 'upstream', 'downstream',
