@@ -1021,6 +1021,12 @@ var EngCalcs = EngCalcs || {};
 	// rings 1 and 2 deliberately share no direction. Editable live under ?debug=labels.
 	var LPN_REACH_TEXT_HEIGHTS = 30, LPN_INNER_TEXT_HEIGHTS = 6,
 		LPN_RING_STEPS = [45, 30, 15];
+	// How far a NODE label's first-fit raster may reach at the very least, in text heights. The rest
+	// of that candidate set is measured in SYMBOLS, which is the whole point of the floor -- see
+	// addNodeFirstFit(). 1.5 is one text height to lift the box clear of a pipe through the node and
+	// half of one for air; it is inactive above symbolSize = 0.32 x textSize, so it changes nothing
+	// at any ordinary setting.
+	var LPN_NODE_MIN_REACH_TEXT_HEIGHTS = 1.5;
 	// **THE NEIGHBOUR CREDIT, `k`.** Goal 11: a candidate is credited for the openness of the
 	// directions AROUND it, so the pass prefers a placement with room beside it to an equally clear
 	// one hemmed in.
@@ -1878,8 +1884,35 @@ var EngCalcs = EngCalcs || {};
 		// `sides` is the whole candidate set; there is no ring and no home.
 		function addNodeFirstFit(n, ne) {
 			var d = defaultLabelOffset(), ctx = nodeContextFor(n.id),
+				// **THE CORNERS ARE THE SYMBOL'S; THE REACH BEHIND THEM HAS A FLOOR IN TEXT
+				// HEIGHTS** (Tom, 2026-09-01: *"When I set symbol size to 1 px, node label
+				// (uncrowded area) disappears."*). Every candidate here is derived from
+				// defaultLabelOffset(), which scales with the SYMBOL alone -- while the box being
+				// placed is sized by the TEXT, which does not. cardinalSides() defaults its polar
+				// reach to three times that offset, so at 1 px symbols the entire search lay within
+				// 4.7 world units of the node while the label it was placing was 11 units tall:
+				// nothing could lift the box off the node's own pipes, first-fit dropped it, and a
+				// label with room all round it vanished. Measured on three uncrowded nodes with
+				// every field on: all three dropped at 1 px, one at 2 px, none from 3 px up; with
+				// the floor, none at any size.
+				//
+				// **A FLOOR ON THE SEARCH, NOT ON THE RESTING OFFSET.** Making defaultLabelOffset()
+				// itself take max(symbolFactor, textFactor) -- the shape leaderThreshold() uses --
+				// would move every label on every drawing at the shipped settings, 7.8 to 11.1 world
+				// units, to fix a case nobody meets there. The four corners still sit exactly where
+				// the symbol puts them and are still tried first, so nothing moves while they fit.
+				//
+				// **AND THE FLOOR IS DELIBERATELY LOW ENOUGH TO BE INACTIVE AT ORDINARY SETTINGS.**
+				// It bites only where 3 x hypot(offset) < the floor, which is symbolSize < 0.32 x
+				// textSize -- 1 to 3 px against the shipped 11 px text. A first draft floored the
+				// reach at the label's own box height instead; that fires for every multi-line
+				// label at the shipped sizes, and on Net3-World it re-placed labels far enough out
+				// that the shed cascade stopped running -- 19 labels shedding where
+				// node-shed-harness.js requires 30. Placing labels further from their nodes rather
+				// than shedding a value is a design change nobody asked for.
+				reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
 				sides = Collide.cardinalSides({ x: n.x, y: n.y }, d,
-					(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true });
+					(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true, outer: reach });
 			ne.nudge = { x: 0, y: 0 };
 			ne.nudgeManual = false;
 			if (ne.empty) { return; }
@@ -5109,14 +5142,35 @@ var EngCalcs = EngCalcs || {};
 		t = Math.max(0, Math.min(1, t));
 		return Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy));
 	}
+	// **EVERY SVG ELEMENT ONE LINK OWNS, TORN DOWN IN ONE PLACE** (Tom, 2026-09-01: *"left zombie
+	// labels on the map on the phone and PC. Their size no longer scales. They don't move. I can't
+	// drag them. But I can use them to edit their pipe. Bad, bad, bad."*).
+	//
+	// A teardown here has to be COMPLETE because buildLinkEls() REPLACES linkEls[l.id] with a fresh
+	// object: anything of the old one left in a shared layer is orphaned the instant it runs -- no
+	// holder points at it any more, so refreshFontSizes() never rescales it, relayoutLabels() never
+	// moves it, refreshLabelTextPass() never empties it and setLabelAssemblyHidden() never hides
+	// it -- while its own `data-linklbl` still routes a click straight to the pipe. Every symptom
+	// above is that one fact.
+	//
+	// There were TWO such lists and only deleteLink()'s knew about the repeat chain, so adding or
+	// removing a bend on a pipe long enough to repeat its label left one permanent stale copy per
+	// repeat station. One list, so a future element on the holder cannot be forgotten by half the
+	// callers -- and the extrema mark needs no line here, being the text's own text-decoration.
+	function removeLinkEls(id) {
+		var le = linkEls[id];
+		if (!le) { return; }
+		le.line.remove();
+		if (le.halo) { le.halo.remove(); }
+		le.handles.forEach(function (h) { h.remove(); });
+		le.arrows.forEach(function (a) { a.remove(); });
+		le.text.remove();
+		le.leader.remove();
+		(le.repeats || []).forEach(function (r) { r.text.remove(); });
+		if (le.symbolG) { le.symbolG.remove(); }
+	}
 	function rebuildLink(l) {
-		linkEls[l.id].line.remove();
-		if (linkEls[l.id].halo) { linkEls[l.id].halo.remove(); }
-		linkEls[l.id].handles.forEach(function (h) { h.remove(); });
-		linkEls[l.id].arrows.forEach(function (a) { a.remove(); });
-		linkEls[l.id].text.remove();
-		linkEls[l.id].leader.remove();
-		if (linkEls[l.id].symbolG) { linkEls[l.id].symbolG.remove(); }
+		removeLinkEls(l.id);
 		buildLinkEls(l);
 		// A BEND ADDED OR REMOVED CHANGES THE ARC LENGTH, so a Text anchored at a fraction of it
 		// resolves to a new point. This path does not run updateLinkGeometry(), so it says so here.
@@ -12862,20 +12916,11 @@ var EngCalcs = EngCalcs || {};
 	function deleteLink(id) {
 		var l = linkById(id);
 		if (isSelected('link', id)) { clearSelection(); }   // Task 415: the subject may be deleted by a cascade, not only by its own verb
-		linkEls[id].line.remove();
-		if (linkEls[id].halo) { linkEls[id].halo.remove(); }
-		linkEls[id].handles.forEach(function (h) { h.remove(); });
-		linkEls[id].arrows.forEach(function (a) { a.remove(); });
-		linkEls[id].text.remove();
-		linkEls[id].leader.remove();
-		// Same reason the arrows are removed one line up: a repeat is a real element in a shared
-		// layer, so a deleted pipe would leave its extra labels floating over the map -- Tom's
-		// 2026-07-30 "when I delete a pipe, its orphaned labels are left behind", one more time.
-		(linkEls[id].repeats || []).forEach(function (r) { r.text.remove(); });
-		if (linkEls[id].symbolG) { linkEls[id].symbolG.remove(); }
-		// The extrema mark needs no line of its own (Task 333): it is the text's own
-		// text-decoration, so removing the text removes it. As separate elements it had to be hunted
-		// down here, and forgetting left orphaned labels behind a deleted pipe.
+		// The ONE teardown list, shared with rebuildLink() -- see removeLinkEls(). A repeat is a real
+		// element in a shared layer, so a deleted pipe forgetting one leaves its extra labels
+		// floating over the map: Tom's 2026-07-30 "when I delete a pipe, its orphaned labels are
+		// left behind".
+		removeLinkEls(id);
 		delete linkEls[id];
 		// **A TEXT ATTACHED TO A DELETED LINK GOES WITH IT**, which is deleteNode()'s rule for a
 		// node-anchored Text, unchanged (Task 502). The alternative -- cut it loose as free text --
