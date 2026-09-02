@@ -83,6 +83,9 @@ const L = loadLoopedNetwork(
 	"\t\tbuildMenuBar: buildMenuBar, closeMenu: closeMenu, wireTabs: wireTabs,\n" +
 	"\t\tmenuOpen: function () { var p = document.getElementById('lpn_menu_popup');\n" +
 	"\t\t\treturn !!(p && p.style.display === 'block'); },\n" +
+	"\t\tflyoutOpen: function () { var p = document.getElementById('lpn_menu_popup2');\n" +
+	"\t\t\treturn !!(p && p.style.display === 'block'); },\n" +
+	"\t\tflyoutRows: function () { return document.getElementById('lpn_menu_list2'); },\n" +
 	"\t\twireScenarioButton: wireScenarioButton, statusText: function () { return document.getElementById('lpn_scenario_btn').textContent; },\n" +
 	"\t\tstatusTip: function () { return document.getElementById('lpn_scenario_btn').title || ''; },\n" +
 	"\t\tpushBaseToScenarios: pushBaseToScenarios, labelSettings: function () { return labelSettings; },\n" +
@@ -977,6 +980,8 @@ console.log('\n--- Water > Scenarios opens the list, and its own click does not 
 			return c.tagName === 'BUTTON' && /scenario/i.test(String(c.textContent || ''));
 		})[0];
 		ok('...which carries a Scenarios row', !!row, row && String(row.textContent));
+		ok('...drawn with the fly-out arrow every other submenu here has',
+			!!row && /\u25B8/.test(String(row.textContent || '')), row && String(row.textContent));
 		if (row) {
 			// The gesture in the order a browser delivers it: pointerdown on the row (seen by the
 			// dismissal's capture listener), the row's own click (which rebuilds the list and
@@ -984,9 +989,21 @@ console.log('\n--- Water > Scenarios opens the list, and its own click does not 
 			document.dispatchEvent({ type: 'pointerdown', target: row });
 			(row._listeners.click || []).forEach(function (f) { f(clickEvent(row)); });
 			document.dispatchEvent({ type: 'click', target: row });
-			ok('...and choosing it leaves the scenario list OPEN, not closed by its own click',
+			ok('...and choosing it leaves the Water pull-down OPEN, not closed by its own click',
 				L.menuOpen());
-			const names = L.menuRows().children
+			// **AND NOT REPLACED BY IT, WHICH IS THE THIRD REPORT** (Tom, 2026-09-02: *"It's a
+			// submenu... Instead, it replaces the Water menu."*). Opening a second menu at the same
+			// anchor reopens the SAME popup with different rows, which overwrites the pull-down the
+			// user is reading. A row that leads somewhere is a submenu.
+			const parentNames = L.menuRows().children
+				.filter(function (c) { return c.tagName === 'BUTTON'; })
+				.map(function (c) { return String(c.textContent || ''); });
+			ok('...and the Water menu still shows its OWN rows, not the scenarios',
+				parentNames.some(function (t) { return /Scenarios/i.test(t); }) &&
+				!parentNames.some(function (t) { return /^\s*✓/.test(t); }),
+				JSON.stringify(parentNames.slice(0, 3)));
+			ok('...the fly-out is what opened', L.flyoutOpen());
+			const names = L.flyoutRows().children
 				.filter(function (c) { return c.tagName === 'BUTTON'; })
 				.map(function (c) { return String(c.textContent || ''); });
 			ok('...showing the scenarios themselves',

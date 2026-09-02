@@ -1122,11 +1122,11 @@ the block.
     the drag, the touch gesture and the raise; `addPanelResizeGrip()` the corner; `placePanelForScreen()`
     the opening and the phone fill; `hidePanel()` the close and the tip sweep. A seventh panel cannot
     arrive half-wired, which is the whole point of those seams.
-  - **"Modal" is Tom's word and is worth checking before it is built.** Every other box on this page
-    is non-modal, and he spent this session establishing that they must all stay movable while
-    another is open (*"When the Find box is open, the other moveables need to still move"*). A modal
-    report would be the one box that stops the map. Likely he means *a proper window* rather than
-    *blocks everything*; ask.
+  - **NON-MODAL, settled 2026-09-02.** He wrote "modal" and corrected it when asked: *"I meant
+    non-modal. Sorry. Not easy to remember."* So it is the sixth ordinary box and stops nothing —
+    which is also what the rest of this session established, that every box must stay movable while
+    another is open. **The word is the trap, not the design**: on this page "modal box" has come to
+    mean "a proper window", and the one genuinely modal thing here is `#lpn_dialog`.
   - The text is the engine's own and untranslated, which the tip already says. It wants a monospace
     body and its own scroller, and `.lpn-popover-body` already scrolls.
 

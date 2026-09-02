@@ -963,5 +963,43 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	});
 }
 
+// **THE QUERY BOX'S TIP IS REACHABLE** (Tom, 2026-09-02: *"Find one-line query tip: Not showing.
+// And there is no ? glyph."*). It was a `title` on the text INPUT, which EngCalcs.initTips() never
+// looks at -- it wires `.ec-help[title]` and nothing else -- so on a phone the tip did not exist and
+// on a pointer it was a native tooltip over the field you were trying to type in.
+//
+// Asserted on the MARKUP, because that is where the rule lives: `.ec-help` carries the title and
+// wraps both the label text and the `.ec-tip` glyph, which is what makes the whole label the tap
+// target instead of one character.
+console.log('\n--- the Query label carries a real, wired tip ---');
+{
+	const form = L.formBox();
+	function walk(n, out) {
+		if (!n) { return out; }
+		if (n.classList && n.classList.contains && n.classList.contains('ec-help')) { out.push(n); }
+		(n.children || []).forEach(function (c) { walk(c, out); });
+		return out;
+	}
+	const helps = walk(form, []);
+	ok('the Find form has at least one .ec-help label', helps.length > 0, helps.length);
+	const q = helps.filter(function (h) { return /query|same search/i.test(String(h.title || '')); })[0];
+	ok('...and one of them carries the query tip', !!q, q && String(q.title).slice(0, 40));
+	if (q) {
+		const glyph = (q.children || []).filter(function (c) {
+			return c.classList && c.classList.contains('ec-tip');
+		})[0];
+		ok('...with a "?" glyph inside it', !!glyph, glyph && glyph.textContent);
+		ok('...and the label text inside the same .ec-help, so the tap target is the whole label',
+			String(q._text || '').trim().length > 0 || (q.children || []).length >= 1);
+	}
+	// The tip must NOT be left on the input as well: two tips for one thing, and the one on the
+	// input is the dead one.
+	// And the tip is NOT also left on the input: two tips for one thing, and the one on the input is
+	// the dead one. Read from the source, because the stub does not serialise markup.
+	const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+	ok('...and the input itself no longer carries a duplicate title',
+		!/findQueryInput\.title\s*=/.test(src));
+}
+
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');
 process.exit(fails === 0 ? 0 : 1);

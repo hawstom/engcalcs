@@ -69,9 +69,17 @@ const L = loadLoopedNetwork(
 	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
 	"\t\t\t\tif (!h && c.style && c.style.fontWeight === 'bold') { h = c; } walk(c); }); })(document.getElementById('lpn_find_form'));\n" +
 	"\t\t\treturn h ? h.textContent : null; },\n" +
-	"\t\theadingTip: function () { var h = null;\n" +
+	// **SCOPED TO THE HEADING, not to the first .ec-help anywhere in the form.** It was the latter
+	// until 2026-09-02, and it started answering with the Query label\'s tip the moment that label
+	// got one -- so this file failed on a change that had nothing to do with it. The heading is
+	// found the same way headingText() finds it, and the tip is looked for INSIDE that.
+	"\t\theadingTip: function () { var head = null, h = null;\n" +
 	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
-	"\t\t\t\tif (!h && c.className === 'ec-help' && c.title) { h = c; } walk(c); }); })(document.getElementById('lpn_find_form'));\n" +
+	"\t\t\t\tif (!head && c.style && c.style.fontWeight === 'bold') { head = c; } walk(c); }); })(document.getElementById('lpn_find_form'));\n" +
+	"\t\t\tif (!head) { return null; }\n" +
+	"\t\t\tif (head.className === 'ec-help' && head.title) { return head.title; }\n" +
+	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
+	"\t\t\t\tif (!h && c.className === 'ec-help' && c.title) { h = c; } walk(c); }); })(head);\n" +
 	"\t\t\treturn h ? h.title : null; },\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +

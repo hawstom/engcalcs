@@ -2557,7 +2557,20 @@ var EngCalcs = EngCalcs || {};
 		for (var i = 0; i < scenarios.length; i++) { if (scenarios[i].id === id) { return scenarios[i]; } }
 		return null;
 	}
-	function openScenarioMenu(anchor) {
+	/**
+	 * The scenario rows, built and returned rather than opened.
+	 *
+	 * **SPLIT OUT 2026-09-02 so the Water menu can hang them as a FLY-OUT.** Tom: *"Scenarios: It's
+	 * a submenu, so it needs flyout placement and arrow like others here and everywhere. Instead, it
+	 * replaces the Water menu."* It did -- the row called openScenarioMenu() with the Water button's
+	 * own anchor, which reopens the SAME popup with different rows, so the pull-down the user was
+	 * reading was overwritten in place. A row that leads somewhere is a submenu, and this file
+	 * already has submenus with an arrow and a fly-out; Scenarios simply was not one.
+	 *
+	 * Both doors read this one list -- the fly-out and the map's bottom status strip -- so the two
+	 * cannot drift.
+	 */
+	function scenarioMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
 		scenarios.forEach(function (s) {
 			rows.push({
@@ -2621,8 +2634,9 @@ var EngCalcs = EngCalcs || {};
 			// push into a push against whatever it happened to hand over.
 			fn: function () { pushBaseToScenarios(); }
 		});
-		openMenu(anchor, rows);
+		return rows;
 	}
+	function openScenarioMenu(anchor) { openMenu(anchor, scenarioMenuRows()); }
 	// THE SELECTOR AND THE READOUT ARE ONE CONTROL, in the map's bottom status strip beside the
 	// units -- where this page already answers continuous questions about the state of the map.
 	function wireScenarioButton() {
@@ -8890,6 +8904,24 @@ var EngCalcs = EngCalcs || {};
 		valWrap.appendChild(valLab);
 		box.appendChild(valWrap);
 	}
+	/**
+	 * A label carrying a tip, as `.ec-help` wrapping the text and a `.ec-tip` "?" glyph.
+	 *
+	 * The JS twin of `ecTipLabel()` in lib/Calculators.lib.php, and the same two rules: `.ec-help`
+	 * holds the title and wraps the TEXT AND THE GLYPH (with no link, the tap target must be the
+	 * whole label, not one character), and only the glyph gets `.ec-tip`. `EngCalcs.initTips()`
+	 * wires `.ec-help[title]` and nothing else, so a title put anywhere else is dead on touch.
+	 */
+	function findHelpLabel(text, tip) {
+		var help = document.createElement('span'), glyph = document.createElement('span');
+		help.className = 'ec-help';
+		help.title = tip;
+		help.appendChild(document.createTextNode(text + ' '));
+		glyph.className = 'ec-tip';
+		glyph.textContent = '?';
+		help.appendChild(glyph);
+		return help;
+	}
 	function rebuildFindForm() {
 		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_find_form'),
 			qLab, hint, btn;
@@ -8903,11 +8935,20 @@ var EngCalcs = EngCalcs || {};
 		// search is pressed -- and now the thing that can be edited instead.
 		qLab = document.createElement('label');
 		qLab.style.display = 'block';
-		qLab.textContent = pc.lpn_find_query_label || 'Query';
+		// **THE TIP GOES ON A "?" GLYPH, NOT ON THE INPUT** (Tom, 2026-09-02: *"Find one-line query
+		// tip: Not showing. And there is no ? glyph."*). It was set as `title` on the text field,
+		// which is invisible to EngCalcs.initTips() -- that wires `.ec-help[title]` and nothing else
+		// -- so on a phone the tip did not exist at all, and on a pointer it was a slow native
+		// tooltip that appeared only if you rested on the field you were trying to type in.
+		//
+		// Built as the same three-part shape ecTipLabel() emits in PHP: `.ec-help` carrying the
+		// title and wrapping BOTH the label text and the glyph, so the tap target is the whole
+		// label rather than one character. CLAUDE.md's rule for a label with no link.
+		qLab.appendChild(findHelpLabel(pc.lpn_find_query_label || 'Query',
+			pc.lpn_find_query_tip || 'The same search written as one line.'));
 		findQueryInput = document.createElement('input');
 		findQueryInput.type = 'text';
 		findQueryInput.className = 'lpn-find-query';
-		findQueryInput.title = pc.lpn_find_query_tip || 'The same search written as one line.';
 		findQueryInput.addEventListener('input', function () { findSyncFromInput(); renderFindResults(null); });
 		findQueryInput.addEventListener('keydown', function (e) {
 			if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } runFind(); }
@@ -8937,6 +8978,12 @@ var EngCalcs = EngCalcs || {};
 		// exists. Dropped here rather than in each pull-down's handler, because this is the one
 		// place every scope and property change passes through.
 		replacePending = null;
+		// **AND THE TIPS ARE ARMED HERE, WHICH NOTHING WAS DOING** (Tom, 2026-09-02: *"Find one-line
+		// query tip: Not showing."*). The Find box never called initTips at all -- its opener does
+		// not, and this form is rebuilt on every scope and property change, so a tip wired once at
+		// open would be thrown away by the first pull-down anyway. This is the one place every
+		// rebuild passes through, which is the same reason `replacePending` is cleared here.
+		initTipsIn(box);
 		// **THE REPLACE HALF GETS ITS OWN CONTAINER** (Task 542). It is built onto the END of the
 		// Find form and used to draw straight into it, which was fine while nothing could rebuild
 		// only the replace half. Task 542 needs exactly that -- choosing Elevation makes a source
@@ -17782,14 +17829,23 @@ var EngCalcs = EngCalcs || {};
 			{
 				icon: 'scenarios', label: pc.lpn_scenario_menu || 'Scenarios',
 				tip: pc.lpn_scenario_tip,
-				// **closeMenu() FIRST, OR THIS ROW DOES NOTHING AT ALL.** Tom, 2026-08-25: *"The
-				// Water.Scenarios button does nothing."* openMenu() treats a second call carrying
-				// the SAME anchor as a toggle -- `if (openMenuAnchor === anchor && displayed)
-				// { closeMenu(); return; }` -- and this row hands it the Water button's own anchor,
-				// so it shut the menu and opened nothing. Closing first clears `openMenuAnchor`, so
-				// the scenario list opens fresh under the same button. The Run row below already
-				// had to do this; the status-strip door never hit it because its anchor differs.
-				fn: function () { closeMenu(); openScenarioMenu(anchor); }
+				// **A FLY-OUT, BECAUSE THAT IS WHAT IT IS** (Tom, 2026-09-02: *"It's a submenu, so
+				// it needs flyout placement and arrow like others here and everywhere. Instead, it
+				// replaces the Water menu."*).
+				//
+				// **THIS ROW HAS BEEN REPORTED BROKEN THREE TIMES AND EVERY FIX BEFORE THIS ONE WAS
+				// TREATING A SYMPTOM.** It was written as a command that opened a second menu at the
+				// Water button's own anchor -- so openMenu() reopened the SAME popup with different
+				// rows, overwriting the pull-down in place. First it toggled shut and opened nothing
+				// (2026-08-25); then, once that was patched with a closeMenu(), the click that ran
+				// it reached the document dismissal, could not find its own row inside the rebuilt
+				// popup, and closed what it had just opened (2026-09-02); and even working, it
+				// replaced the menu rather than hanging beside it, which is what Tom is describing.
+				//
+				// `submenu:` is the machinery that was there the whole time: it draws the arrow,
+				// places the fly-out beside the row, opens on hover for a pointer and on tap for a
+				// finger, and stops its own click -- which is the general form of the second fix.
+				submenu: scenarioMenuRows
 			},
 			{
 				icon: 'run', label: pc.lpn_time_run || 'Run', tip: pc.lpn_run_menu_tip,
