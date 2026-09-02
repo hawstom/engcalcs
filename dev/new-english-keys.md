@@ -394,7 +394,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-02._
 - **`lpn_inp_drop_quality_options`**
   > This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_inp_drop_report`**
   > This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.
   _Ruled OK 2026-09-01._
