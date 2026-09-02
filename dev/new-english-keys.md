@@ -34,13 +34,13 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-08-29._
 - **`lpn_diag_not_converged_drawn`**
   > The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_diag_not_converged_error`**
   > It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_diag_not_converged_trials`**
   > It stopped after {iterations} iterations.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_elev_dem_none`**
   > The DEM gave no height for this node.
   _Ruled OK 2026-09-01._
@@ -88,7 +88,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-02._
 - **`lpn_ff_col_limit`**
   > Design limit
-  @@ NEEDS RULING
+  OK.
 - **`lpn_ff_col_required`**
   > Required flow
   _Ruled OK 2026-09-01._
@@ -387,11 +387,11 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.
   _Ruled OK 2026-09-01._
 - **`lpn_inp_drop_file_options`**
-  > This file refers to a support file beside it: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.
-  @@ NEEDS RULING
+  > This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.
+  Edited.
 - **`lpn_inp_drop_quality_options`**
   > This file states EPANET water quality options: Quality, which names what to follow through the pipes, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.
-  @@ NEEDS RULING
+  Did you avoid the word "trace" here?
 - **`lpn_inp_drop_report`**
   > This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.
   _Ruled OK 2026-09-01._
@@ -490,7 +490,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_quality_trace`**
   > Source trace
-  @@ NEEDS RULING
+  OK.
 - **`lpn_replace_asked`**
   > Asked for {n}. The answer is on its way.
   _Ruled OK 2026-08-29._
@@ -508,7 +508,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_result_source_share_tip`**
   > The source trace share reports how much of the water reaching this point came from the trace node.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_result_water_age`**
   > Water age
   _Ruled OK 2026-09-01._
@@ -589,7 +589,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-02._
 - **`lpn_settings_quality_source_tip`**
   > The point whose water is traced. Every other point then shows the share of its water that came from here.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_quality_track`**
   > Track
   _Ruled OK 2026-09-01._
@@ -631,7 +631,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-01._
 - **`lpn_settings_unbalanced_trials_tip`**
   > How many further trials to allow after the maximum above is used up, before the last trial is reported. Only the EPANET solver reads this box.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_viscosity`**
   > Relative viscosity
   _Ruled OK 2026-08-29._
