@@ -464,6 +464,23 @@
 		if (namedFiles) {
 			drop('file-options', [], namedFiles);
 		}
+		// **AND THE CARRIED OPTIONS GET THEIR SENTENCE AT LAST, WHICH THE CARRY OWED.** Carrying a
+		// line and telling the user about it are two jobs, and this one has a case where the second
+		// job matters more than anywhere else in this section: `Demand Model PDA` asks for EPANET
+		// 2.2's PRESSURE-DRIVEN analysis, and this page solves demand-driven. That is a difference
+		// in the ANSWERS, not in what the file holds, so it gets a sentence of its own rather than
+		// joining the kept-but-unused list. `DDA` is EPANET's own default and is what this page
+		// does, so a file stating it has nothing to be told.
+		var otherOpts = fileOptions.other || [], demandModel = null, otherCount = 0;
+		otherOpts.forEach(function (r) {
+			if (/^DEMAND$/i.test(r[0] || '') && /^MODEL$/i.test(r[1] || '')) {
+				demandModel = (r[2] || '').toUpperCase();
+				return;
+			}
+			otherCount++;
+		});
+		if (demandModel && demandModel !== 'DDA') { drop('demand-model', [], demandModel); }
+		if (otherCount) { drop('other-options', [], otherCount); }
 
 		var fu = FLOW_UNITS[flowKey];
 		if (!fu) { drop('unknown-flow-units', [], flowKey); fu = FLOW_UNITS.GPM; flowKey = 'GPM'; }

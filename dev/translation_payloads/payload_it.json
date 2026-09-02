@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1538,
-        "delta_key_count": 224,
+        "expected_key_count": 1540,
+        "delta_key_count": 226,
         "exempt_key_count": 30,
         "exempt_keys": [
             "calc_units_us",
@@ -555,6 +555,8 @@
         "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
         "lpn_inp_drop_file_options": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
+        "lpn_inp_drop_demand_model": "This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states whatever pressure results. The line is kept and is written back if you save an EPANET file.",
+        "lpn_inp_drop_other_options": "This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.",
         "lpn_diag_not_converged_drawn": "The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.",
         "lpn_diag_not_converged_trials": "It stopped after {iterations} iterations.",
         "lpn_diag_not_converged_error": "It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.",
@@ -781,6 +783,8 @@
         "lpn_inp_drop_sections": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
         "lpn_inp_drop_quality_options": "This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
         "lpn_inp_drop_file_options": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
+        "lpn_inp_drop_demand_model": "This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states whatever pressure results. The line is kept and is written back if you save an EPANET file.",
+        "lpn_inp_drop_other_options": "This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.",
         "lpn_diag_not_converged_drawn": "The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.",
         "lpn_diag_not_converged_trials": "It stopped after {iterations} iterations.",
         "lpn_diag_not_converged_error": "It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.",
@@ -2207,6 +2211,38 @@
             }
         },
         "lpn_inp_drop_file_options": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_quality",
+                    "value": "La qualità dell'acqua, le reazioni chimiche e le impostazioni di energia delle pompe sono state tralasciate. Questa pagina risolve solo portata e pressione.",
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_backdrop",
+                    "value": "Questo file indica un'immagine di sfondo ma non ne contiene i dati. Aggiungila tu stesso con File, Immagine di sfondo, Aggiungi immagine.",
+                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                }
+            }
+        },
+        "lpn_inp_drop_demand_model": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_quality",
+                    "value": "La qualità dell'acqua, le reazioni chimiche e le impostazioni di energia delle pompe sono state tralasciate. Questa pagina risolve solo portata e pressione.",
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page works out water age and source trace, but not the chemistry, so none of that is used here. Those lines are kept, and they are written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_backdrop",
+                    "value": "Questo file indica un'immagine di sfondo ma non ne contiene i dati. Aggiungila tu stesso con File, Immagine di sfondo, Aggiungi immagine.",
+                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                }
+            }
+        },
+        "lpn_inp_drop_other_options": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

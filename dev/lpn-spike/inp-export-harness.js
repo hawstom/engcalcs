@@ -637,6 +637,17 @@ console.log('\n8. Map, Hydraulics USE/SAVE and every unread option are carried, 
 		parsed.hydraulics.demandMultiplier === undefined, JSON.stringify(parsed.hydraulics.demandMultiplier));
 	ok('the six unread options are all carried', (parsed.fileOptions.other || []).length === 6,
 		JSON.stringify(parsed.fileOptions.other));
+	// **CARRYING IS NOT TELLING.** `Demand Model PDA` is the one carried option that changes the
+	// ANSWERS -- pressure-driven where this page is demand-driven -- so it gets its own report code
+	// rather than joining the kept-but-unused list, and the rest get theirs.
+	const codes = (parsed.dropped || []).map((d) => d.code);
+	ok('a pressure-driven file says so', codes.indexOf('demand-model') >= 0, JSON.stringify(codes));
+	ok('and the remaining unread options are reported once',
+		codes.filter((c) => c === 'other-options').length === 1, JSON.stringify(codes));
+	const dda = EngCalcs.lpnInpParse(build([' Units\tGPM', ' Headloss\tH-W', ' Demand Model\tDDA']));
+	ok('DDA is what this page already does, so it is not reported',
+		(dda.dropped || []).every((d) => d.code !== 'demand-model'),
+		JSON.stringify((dda.dropped || []).map((d) => d.code)));
 	L.applyUnitSelections(L.inpUnitSelections(parsed));
 	const doc = L.docFromInp(parsed, 'carries');
 	const out = EngCalcs.lpnExportInp(doc);

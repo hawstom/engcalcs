@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read**, of 223 untranslated keys, of 1538 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**10 still to read**, of 225 untranslated keys, of 1540 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (221, 8 to read @@ NEEDS RULING)
+## lpn_  (223, 10 to read @@ NEEDS RULING)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -407,12 +407,18 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_georef_twopt_tip`**
   > Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.
   _Ruled OK 2026-08-29._
+- **`lpn_inp_drop_demand_model`**
+  > This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states whatever pressure results. The line is kept and is written back if you save an EPANET file.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_energy`**
   > This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.
   _Ruled OK 2026-09-01._
 - **`lpn_inp_drop_file_options`**
   > This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.
   _Ruled OK 2026-09-02._
+- **`lpn_inp_drop_other_options`**
+  > This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_quality_options`**
   > This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.
   _Ruled OK 2026-09-02._

@@ -15183,6 +15183,13 @@ var EngCalcs = EngCalcs || {};
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
 			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file says what to follow through the pipes, and two settings that go with a chemical: how fast it spreads, and how close the answer has to be. Water age and source share are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.';
+			// **A DIFFERENCE IN THE ANSWERS, NOT IN WHAT THE FILE HOLDS**, which is why it is not on
+			// the kept-but-unused limb below it. EPANET 2.2's pressure-driven analysis gives a
+			// junction less water when the pressure is low; this page solves demand-driven, so the
+			// same file answers differently here and the user is entitled to know before reading a
+			// pressure off the map.
+			case 'demand-model': return pc.lpn_inp_drop_demand_model || 'This file asks for a pressure-driven analysis, where a junction is given less water when the pressure there is low. This page solves demand-driven, so every junction here is given the demand the file states whatever the pressure comes out at. The line is kept, and it is written back if you save an EPANET file.';
+			case 'other-options': return pc.lpn_inp_drop_other_options || 'This file states settings this page does not read. Nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
 			case 'file-options': return pc.lpn_inp_drop_file_options || 'This file points at another file beside it, for the map or for hydraulics already worked out. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.';
 			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain it. Add the picture yourself with Map, Backdrop.';
 			case 'dangling-link': return pc.lpn_inp_drop_dangling || 'These pipes name a junction that is not in the file, so they were left out.';
