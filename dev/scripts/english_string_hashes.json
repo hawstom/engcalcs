@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-08-09",
-    "count": 1361,
+    "count": 1576,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -1084,6 +1084,336 @@
                 "mi_notes_3_term"
             ],
             "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
+        },
+        {
+            "date": "2026-09-02",
+            "keys": [
+                "lpn_demand_add",
+                "lpn_demand_add_tip",
+                "lpn_demand_remove",
+                "lpn_diag_not_converged_drawn",
+                "lpn_diag_not_converged_error",
+                "lpn_diag_not_converged_trials",
+                "lpn_elev_dem_none",
+                "lpn_elev_dem_said",
+                "lpn_elev_dem_sample",
+                "lpn_elev_dem_sample_tip",
+                "lpn_elev_dem_use",
+                "lpn_elev_dem_use_tip",
+                "lpn_ff_accounting",
+                "lpn_ff_affect_link",
+                "lpn_ff_affect_node",
+                "lpn_ff_atleast",
+                "lpn_ff_calculate",
+                "lpn_ff_col_affected",
+                "lpn_ff_col_atrequired",
+                "lpn_ff_col_available",
+                "lpn_ff_col_junction",
+                "lpn_ff_col_limit",
+                "lpn_ff_col_modes",
+                "lpn_ff_col_required",
+                "lpn_ff_col_residual",
+                "lpn_ff_col_solves",
+                "lpn_ff_col_static",
+                "lpn_ff_cost",
+                "lpn_ff_design",
+                "lpn_ff_design_all",
+                "lpn_ff_design_nodes",
+                "lpn_ff_design_none",
+                "lpn_ff_design_off",
+                "lpn_ff_design_off_note",
+                "lpn_ff_design_tip",
+                "lpn_ff_engine_cost",
+                "lpn_ff_engine_epanet",
+                "lpn_ff_engine_native",
+                "lpn_ff_err_at_rest",
+                "lpn_ff_err_converge",
+                "lpn_ff_err_not_junction",
+                "lpn_ff_err_solve",
+                "lpn_ff_err_unknown",
+                "lpn_ff_intro",
+                "lpn_ff_iso",
+                "lpn_ff_limit_both",
+                "lpn_ff_limit_pressure",
+                "lpn_ff_limit_velocity",
+                "lpn_ff_maxvelocity",
+                "lpn_ff_maxvelocity_tip",
+                "lpn_ff_menu",
+                "lpn_ff_menu_tip",
+                "lpn_ff_minpressure",
+                "lpn_ff_minpressure_tip",
+                "lpn_ff_mode_design",
+                "lpn_ff_mode_fire",
+                "lpn_ff_mode_none",
+                "lpn_ff_more",
+                "lpn_ff_no_junctions",
+                "lpn_ff_no_selection",
+                "lpn_ff_not_checked",
+                "lpn_ff_report_all",
+                "lpn_ff_required",
+                "lpn_ff_required_node_tip",
+                "lpn_ff_required_own",
+                "lpn_ff_required_tip",
+                "lpn_ff_residual",
+                "lpn_ff_residual_tip",
+                "lpn_ff_rows_more",
+                "lpn_ff_run_title",
+                "lpn_ff_scope",
+                "lpn_ff_scope_all",
+                "lpn_ff_scope_selected",
+                "lpn_ff_scope_tip",
+                "lpn_ff_stale",
+                "lpn_ff_static_failed",
+                "lpn_ff_steady",
+                "lpn_ff_stop",
+                "lpn_ff_stopped",
+                "lpn_ff_summary",
+                "lpn_ff_summary_error",
+                "lpn_ff_title",
+                "lpn_ff_working",
+                "lpn_field_base_demand",
+                "lpn_field_demand_category",
+                "lpn_field_demand_category_tip",
+                "lpn_field_text_attached",
+                "lpn_find_conn_no_fixed",
+                "lpn_find_conn_nolinksource",
+                "lpn_find_conn_none",
+                "lpn_find_conn_noopen",
+                "lpn_find_conn_noopensource",
+                "lpn_find_conn_unlinked",
+                "lpn_find_op_conn_nolinksource",
+                "lpn_find_op_conn_noopen",
+                "lpn_find_op_conn_noopensource",
+                "lpn_find_op_conn_unlinked",
+                "lpn_find_prop_connection",
+                "lpn_find_q_and",
+                "lpn_find_q_aside",
+                "lpn_find_q_err_close",
+                "lpn_find_q_err_dot",
+                "lpn_find_q_err_empty",
+                "lpn_find_q_err_end",
+                "lpn_find_q_err_op",
+                "lpn_find_q_err_open",
+                "lpn_find_q_err_pos",
+                "lpn_find_q_err_prop",
+                "lpn_find_q_err_quote",
+                "lpn_find_q_err_quote_end",
+                "lpn_find_q_err_scope",
+                "lpn_find_q_err_value",
+                "lpn_find_q_or",
+                "lpn_find_q_restore",
+                "lpn_find_query_hint",
+                "lpn_find_query_label",
+                "lpn_find_query_tip",
+                "lpn_georef_backdrop_unrotated",
+                "lpn_georef_twopt",
+                "lpn_georef_twopt_done",
+                "lpn_georef_twopt_pick1",
+                "lpn_georef_twopt_pick2",
+                "lpn_georef_twopt_same",
+                "lpn_georef_twopt_tip",
+                "lpn_inp_drop_demand_model",
+                "lpn_inp_drop_energy",
+                "lpn_inp_drop_file_options",
+                "lpn_inp_drop_other_options",
+                "lpn_inp_drop_quality_options",
+                "lpn_inp_drop_report",
+                "lpn_inp_drop_rules",
+                "lpn_inp_drop_sections",
+                "lpn_inp_drop_tags",
+                "lpn_mode_vertices",
+                "lpn_new_coords",
+                "lpn_new_coords_geo",
+                "lpn_new_coords_tip",
+                "lpn_new_coords_xy",
+                "lpn_new_create",
+                "lpn_new_place",
+                "lpn_new_place_hint",
+                "lpn_new_place_tip",
+                "lpn_new_title",
+                "lpn_profile_delete",
+                "lpn_profile_delete_confirm",
+                "lpn_profile_edit",
+                "lpn_profile_edit_click",
+                "lpn_profile_edit_nowhere",
+                "lpn_profile_edit_tap",
+                "lpn_profile_edit_tip",
+                "lpn_profile_missing",
+                "lpn_profile_new",
+                "lpn_profile_new_name",
+                "lpn_profile_none_saved",
+                "lpn_profile_prompt_name",
+                "lpn_profile_rename",
+                "lpn_profile_saved",
+                "lpn_quality_age",
+                "lpn_quality_chemical",
+                "lpn_quality_needs_run",
+                "lpn_quality_none",
+                "lpn_quality_trace",
+                "lpn_replace_asked",
+                "lpn_replace_q_bad",
+                "lpn_replace_source",
+                "lpn_result_demand_tip",
+                "lpn_result_source_share",
+                "lpn_result_source_share_tip",
+                "lpn_result_water_age",
+                "lpn_result_water_age_tip",
+                "lpn_scenario_mark_tip",
+                "lpn_scenario_overrides_tip",
+                "lpn_settings_accuracy",
+                "lpn_settings_accuracy_tip",
+                "lpn_settings_damp_limit",
+                "lpn_settings_damp_limit_tip",
+                "lpn_settings_default_is",
+                "lpn_settings_demand_multiplier",
+                "lpn_settings_demand_multiplier_tip",
+                "lpn_settings_elev_source",
+                "lpn_settings_elev_source_dem",
+                "lpn_settings_elev_source_tip",
+                "lpn_settings_elev_source_typed",
+                "lpn_settings_emitter_exponent_tip",
+                "lpn_settings_flow_change",
+                "lpn_settings_flow_change_tip",
+                "lpn_settings_head_error",
+                "lpn_settings_head_error_tip",
+                "lpn_settings_leader_snap",
+                "lpn_settings_leader_snap_tip",
+                "lpn_settings_legend_off",
+                "lpn_settings_option_unset",
+                "lpn_settings_quality",
+                "lpn_settings_quality_source",
+                "lpn_settings_quality_source_tip",
+                "lpn_settings_quality_track",
+                "lpn_settings_quality_track_tip",
+                "lpn_settings_show_arrows",
+                "lpn_settings_show_arrows_tip",
+                "lpn_settings_snap_off",
+                "lpn_settings_specific_gravity",
+                "lpn_settings_specific_gravity_tip",
+                "lpn_settings_trials",
+                "lpn_settings_trials_tip",
+                "lpn_settings_unbalanced",
+                "lpn_settings_unbalanced_continue",
+                "lpn_settings_unbalanced_stop",
+                "lpn_settings_unbalanced_tip",
+                "lpn_settings_unbalanced_trials",
+                "lpn_settings_unbalanced_trials_tip",
+                "lpn_settings_viscosity",
+                "lpn_settings_viscosity_tip",
+                "lpn_terrain_blank_ids",
+                "lpn_terrain_filled_ids",
+                "lpn_terrain_ids_more",
+                "lpn_terrain_keep_ids",
+                "lpn_terrain_will_ids",
+                "lpn_tool_vertices",
+                "lpn_tool_vertices_tip",
+                "u_day",
+                "u_hr"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
+        },
+        {
+            "date": "2026-09-02",
+            "keys": [
+                "lpn_clean_map_tip",
+                "lpn_color_break_count",
+                "lpn_color_break_number",
+                "lpn_color_break_order",
+                "lpn_color_criterion_note",
+                "lpn_color_ranges_note",
+                "lpn_confirm_apply_prefix",
+                "lpn_delete_drops_overrides",
+                "lpn_demand_tip",
+                "lpn_ex_net3_world_desc",
+                "lpn_field_active_tip",
+                "lpn_field_demand_pattern_tip",
+                "lpn_file_import_geo",
+                "lpn_file_import_geo_tip",
+                "lpn_file_import_inp_tip",
+                "lpn_find_menu",
+                "lpn_find_menu_tip",
+                "lpn_find_op_bottom",
+                "lpn_find_op_top",
+                "lpn_find_title",
+                "lpn_georef_adjust",
+                "lpn_georef_asdegrees",
+                "lpn_georef_confirm",
+                "lpn_georef_done",
+                "lpn_georef_empty",
+                "lpn_georef_intro",
+                "lpn_georef_step1",
+                "lpn_georef_step1_hint",
+                "lpn_georef_step2",
+                "lpn_import_notes_heading",
+                "lpn_inp_drop_pump_other",
+                "lpn_inp_drop_quality",
+                "lpn_inp_drop_valve",
+                "lpn_inp_report_lead",
+                "lpn_labels_mark_extrema_tip",
+                "lpn_labels_prefix_tip",
+                "lpn_labels_priority_node_tip",
+                "lpn_labels_separator_tip",
+                "lpn_labels_suffix_gradient_tip",
+                "lpn_labels_suffix_tip",
+                "lpn_menu_map",
+                "lpn_menu_project",
+                "lpn_mode_add_junction",
+                "lpn_mode_add_pipe",
+                "lpn_mode_add_pump",
+                "lpn_mode_add_reservoir",
+                "lpn_mode_add_tank",
+                "lpn_mode_add_text",
+                "lpn_mode_add_valve",
+                "lpn_mode_delete",
+                "lpn_mode_select",
+                "lpn_notes_1_def",
+                "lpn_notes_1_term",
+                "lpn_notes_2_def",
+                "lpn_notes_4_def",
+                "lpn_notes_4_term",
+                "lpn_notes_color_def",
+                "lpn_notes_color_term",
+                "lpn_pane_none",
+                "lpn_pane_tab_tip",
+                "lpn_pane_toggle_tip",
+                "lpn_prefix_applied",
+                "lpn_profile_tip",
+                "lpn_profile_title",
+                "lpn_push_confirm",
+                "lpn_push_no_change",
+                "lpn_push_nothing",
+                "lpn_run_menu_tip",
+                "lpn_select_first",
+                "lpn_settings_apply_to_all_tip",
+                "lpn_settings_color_breaks",
+                "lpn_settings_color_thematic_tip",
+                "lpn_settings_defaults_note",
+                "lpn_settings_legend_position",
+                "lpn_settings_push_btn",
+                "lpn_settings_sec_assets",
+                "lpn_terrain_accuracy",
+                "lpn_terrain_confirm",
+                "lpn_terrain_confirm_default_2",
+                "lpn_time_no_engine",
+                "lpn_time_no_period",
+                "lpn_time_run",
+                "lpn_time_run_note",
+                "lpn_time_run_report_tip",
+                "lpn_time_run_tip",
+                "lpn_tip_select",
+                "lpn_tool_add_reservoir_tip",
+                "lpn_tool_add_tank_tip",
+                "lpn_units_warn_title",
+                "lpn_xymap",
+                "mhp_hl_bad_tip",
+                "mhp_hl_ok_tip",
+                "mhp_hl_warn_tip",
+                "mphl_hgl_egl_tip",
+                "mtc_note_1",
+                "rc_notes_1_def",
+                "view_hide_line"
+            ],
+            "reason": "Sprint 573-lpn-resync re-translated every one of these in all 26 languages; presence and overwrite verified per language against dev/english-friction/573-changed-keys.json rather than by agent self-report."
         }
     ],
     "hashes": {
@@ -1361,15 +1691,15 @@
         "lpn_cancel": "77dfd2135f4db726c47299bb55be26f7f4525a46",
         "lpn_clean_map": "f35018bc951ba4c43c7db6f286679b06595740d3",
         "lpn_clean_map_off": "f364f2b03eeaefaa77e97bd8ec2454b387ab48d1",
-        "lpn_clean_map_tip": "d5298489e6e8968a9e8608172b4fc5be96eef9ef",
+        "lpn_clean_map_tip": "da09bff4355c5477f0bb1bc172d12904e938a91e",
         "lpn_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
         "lpn_close_browser_confirm": "62f3b41b1e8e979db82162dc2f37c8e55bc65b80",
         "lpn_close_discard": "e4591957da0d53d53d8ce0766bb7a241a3e05904",
         "lpn_close_save_confirm": "128d1c2703b177c7b05ef44ca0c590d4e796d014",
-        "lpn_color_break_count": "ff4e59940414f4a4203cc92de63b52a1b560f178",
-        "lpn_color_break_number": "a41db22799f27088866775d8f5b7370c59c48e9b",
-        "lpn_color_break_order": "789a32c918927ca207225fec3099aedab1532ae9",
-        "lpn_color_criterion_note": "d8abc290333bf19e2a70342d29575dd57898c1dd",
+        "lpn_color_break_count": "305665b466d03668c4c64814d99689c9424a0e43",
+        "lpn_color_break_number": "b14e81d306d2237a6a65adf87cfddb5b11afc02b",
+        "lpn_color_break_order": "80b331972dae122e6db0f158b19c01164fa4d67d",
+        "lpn_color_criterion_note": "4187287005b88c7b2556388f3b0bdca23b7a2eb5",
         "lpn_color_example_material": "d8169782b57c7a9e9f0104c69acc402891ffee68",
         "lpn_color_example_status": "bae7d5be70820ed56467bd9a63744e23b47bd711",
         "lpn_color_legend_open_tip": "7f2985d223fcd9aaa7890dd9ce5d5ab8efd2770e",
@@ -1395,24 +1725,36 @@
         "lpn_color_ramp_sequential": "0edc0112db95758e96c3f9613104687a95e00afc",
         "lpn_color_ramp_viridis": "6eeff89406ffc95509bde67233c8cac36c743999",
         "lpn_color_ramp_ylgnbu": "776f7669680e9ab9d3b1714ad8b9000e2304b8b3",
-        "lpn_color_ranges_note": "eff0cd36b25e6f3fe3f2254a1af5eed69fd4947d",
-        "lpn_confirm_apply_prefix": "a63a08b95ff616f08f1836ad938fc22451531076",
+        "lpn_color_ranges_note": "b04206a3aebd693800464dbc6697e828aafdb668",
+        "lpn_confirm_apply_prefix": "045f8037558d46cea3b8e36e029eb76370be4735",
         "lpn_confirm_delete_network": "4cf6c58cb637a11d560bbe78024166deaa022e95",
         "lpn_confirm_example": "a37dfb08ed3bcb4faae1781660bedfdd43f2465a",
         "lpn_confirm_restore_defaults": "e55654deccb6f0c5322ce0cf2f2e95dbd5c71437",
         "lpn_confirm_wipe": "511136c29dd93e3d7162c898874d15083153d59f",
         "lpn_control_dangling_note": "946297e868aab8e2434d674f33917d6660276ebb",
         "lpn_control_unreadable_note": "819d5a1cb56933e768e1c0f31118c358d48ffcd5",
-        "lpn_delete_drops_overrides": "fd7bc476eff55d809c96e1f1c13650ce1c9ed7d4",
-        "lpn_demand_tip": "49412527839a82f8d80d81a0d7c70a12a716ecdc",
+        "lpn_delete_drops_overrides": "ee99263a8a1b45e8555f3de131c2400b57ade82e",
+        "lpn_demand_add": "e7e3e31dab088035acb20db5ab242b16d11ddacc",
+        "lpn_demand_add_tip": "2b3c0b2fb3347ff40bc481b4909f074cdbf6ebce",
+        "lpn_demand_remove": "3a3ab5e7f56bca490527a199757d40304e72c5ae",
+        "lpn_demand_tip": "3cfab583e08e6db5103eead1ad9383e8aef773a1",
         "lpn_diag_dangling_link": "3e707f064fe4a646d36fefce9ca038ef743be5f6",
         "lpn_diag_no_fixed_head": "db0f2f80d2029f28447b4f0bfc931dc32e18e8b8",
         "lpn_diag_not_converged": "8a0e0e6c781b06efcfbc5ce272c62b62d2f7f87d",
+        "lpn_diag_not_converged_drawn": "c9af3c1a40344645b34e08540c4eace6a6aab2fd",
+        "lpn_diag_not_converged_error": "a4bca62339886e680d6aedd3c95a072efd4eb90d",
+        "lpn_diag_not_converged_trials": "3dc4d15aacde0500578a4163bfffdb31ae317739",
         "lpn_diag_unreachable": "1cdaa4fbda79821a8ae138af20d55dd0d6ea969f",
         "lpn_diag_valve_needs_epanet": "06a186f7715796b95c7305b142cc47c31c3d5407",
         "lpn_diag_valve_on_fixed_head": "eb866ad71e25b073c8fa4c2192da833a2e7cd08c",
         "lpn_dialog_ok": "9ce3bd4224c8c1780db56b4125ecf3f24bf748b7",
         "lpn_edit_delete_network": "54a5ed21b23a4160bde2d86b22750824c8ee6b16",
+        "lpn_elev_dem_none": "550a10f0d44b34b3f49cc073117b7c4d611bfb70",
+        "lpn_elev_dem_said": "3c115507d9debcde111fdc3e3e1292de97362000",
+        "lpn_elev_dem_sample": "a7898467ff2a1ea8cac1bb94c411974b95caed16",
+        "lpn_elev_dem_sample_tip": "280ecabf2aa514fd6dbd212ab04f9cd13cb86b5d",
+        "lpn_elev_dem_use": "4f2c1f4e16e0d968029840b38e2492d20a1ff43e",
+        "lpn_elev_dem_use_tip": "ab9229f08225efdfabe413866597d31f41772255",
         "lpn_empty_hint": "cd3bcd4a5e9d51c509ada5fdd4a2214ff6cb43fc",
         "lpn_engine_failed": "80527f0a7cecad6338ab900c58c906eee6236d93",
         "lpn_engine_fetching": "4219ca00fcb7da5b160583f5c703b4dba646a768",
@@ -1439,7 +1781,7 @@
         "lpn_ex_net2_title": "15b8b380ea1c68cbe004cd6a188fed57d8ceade3",
         "lpn_ex_net3_desc": "30506e2d33807b89ebcee51ead7d71a66ce46031",
         "lpn_ex_net3_title": "32244fe428de2e2160ba8cd36930dfd0db80da31",
-        "lpn_ex_net3_world_desc": "5fe70f9c56dd64abe8e800b298f41fa4910d9da3",
+        "lpn_ex_net3_world_desc": "efb978c5aff545a33625a126ee653b92d76485e1",
         "lpn_ex_net3_world_title": "b44a6f134cea03516fd2657f62203216738a5527",
         "lpn_examples_blank": "d3904eb925d47bbca7944699b614c8668840afeb",
         "lpn_examples_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
@@ -1451,13 +1793,87 @@
         "lpn_examples_size": "2271a12396ceb1053da48973eef74b771d3d5847",
         "lpn_examples_sub": "404ac942d1e188ef3f745e3f7e3dfa7d1ca58da8",
         "lpn_examples_welcome": "6e56773ed937c63dd58f5076bf9f337cd834b37a",
+        "lpn_ff_accounting": "7581a6e311ae7190cbceab13d5a6c3c4ba99493d",
+        "lpn_ff_affect_link": "86a3e78138eae43ef14ad5fe3c1335a39ba4d200",
+        "lpn_ff_affect_node": "3c2b59a873244d27193e77d64a31dcb0964f3316",
+        "lpn_ff_atleast": "66d8fb7180913c0fbd06d8060e9022e28b68780b",
+        "lpn_ff_calculate": "b1b392607deaf29a7e81453e069b7c07a32a6b18",
+        "lpn_ff_col_affected": "2abe6c4f35efef2f824164be85964223d3fc1dc9",
+        "lpn_ff_col_atrequired": "42176a0b7864cb492ac3226aca71df6fd204be4c",
+        "lpn_ff_col_available": "8398522dd489b334989df953b80f4370bec72b9a",
+        "lpn_ff_col_junction": "e4f6c05840cecf544ec74b542c80584accfbc5ad",
+        "lpn_ff_col_limit": "e9985fc969ce8906cc5b7b99b6d0b8f4858b122a",
+        "lpn_ff_col_modes": "7e129e0a6410eaa78c07f81e89d3494f25bbf467",
+        "lpn_ff_col_required": "54d48bc9ce65e8f36ce40581ae7d744340d357bf",
+        "lpn_ff_col_residual": "ebfac473d5fea7372ff87e6780ced2e207d6b0c6",
+        "lpn_ff_col_solves": "fcde5c325dc9b7dca9e824eac5ff1c72988f66e8",
+        "lpn_ff_col_static": "fb040f8ab9972f0a7c26e0a13ff4d1fe6abd10f6",
+        "lpn_ff_cost": "66a71c4168e7cc8bbefcd582a492c268d145138e",
+        "lpn_ff_design": "b6e5eaf486df1f225d39b98a74607ed7845a97da",
+        "lpn_ff_design_all": "b56ada991fcc364c0667a651346c32485f75e251",
+        "lpn_ff_design_nodes": "3b17acc857107d43c4cb4645f5577dca01127961",
+        "lpn_ff_design_none": "e02543961d3e9ecbfaabd72204ab25316e517374",
+        "lpn_ff_design_off": "bc10277c1e27efbb998067028b1be8d770b95de8",
+        "lpn_ff_design_off_note": "77e938d422b07aca04c053b13772f9ff93f901e8",
+        "lpn_ff_design_tip": "ec2706244f138c3dce9b27c5f5afd772684ed4f6",
+        "lpn_ff_engine_cost": "e9d88459caa58baf4e491b14df39104923787a17",
+        "lpn_ff_engine_epanet": "118fa0301b63dcdd199c5f0487937161dceb54ff",
+        "lpn_ff_engine_native": "fb51b9cee325fd31f52ad8f3dd71358605f84308",
+        "lpn_ff_err_at_rest": "f233ec47d43d5d5f1b293feacf99e0f126ae933f",
+        "lpn_ff_err_converge": "466d8c05a47ac20bfc0587a3f14351558409b4b0",
+        "lpn_ff_err_not_junction": "185079cddbfb42fa6ca36207348706dfce45dbbf",
+        "lpn_ff_err_solve": "ac798073dec59fcd584b77a905e6304d7e768970",
+        "lpn_ff_err_unknown": "4d5d6a097facbbc3b2022152b8ba677010b92e2b",
+        "lpn_ff_intro": "59888a773d1de2a74c61282594f3d4306502b519",
+        "lpn_ff_iso": "025206c7b2a33f9274775215e3f441806b84528e",
+        "lpn_ff_limit_both": "11cc4e744d17d4d891e8f4dd22d6e12911b80bef",
+        "lpn_ff_limit_pressure": "d1222178efa7946ad8940a0b57a0d3cb3856180c",
+        "lpn_ff_limit_velocity": "d80a548eda6c0e81c84db1aa2c1099cc803abddd",
+        "lpn_ff_maxvelocity": "c2ac247f06b17e598f8e055d3d8385cfb13147c2",
+        "lpn_ff_maxvelocity_tip": "3c5a5037c08971992abf3762e2d5e32cb7939d50",
+        "lpn_ff_menu": "ce6ebf84f7ff5b209b5286c986a1c92269fcd01e",
+        "lpn_ff_menu_tip": "558c176c84b1cf288a0b48aad6b58a9c50323975",
+        "lpn_ff_minpressure": "38cb4242436e6e8a4da15c0bd41c995139944e31",
+        "lpn_ff_minpressure_tip": "6df411591066e8cf1f7f55c230c2e228a40418ac",
+        "lpn_ff_mode_design": "59b035367211a9382930b2a4c13637dbc33c4f32",
+        "lpn_ff_mode_fire": "78baebfcb4b52665d7e8a9c7826c47b0fa2439f6",
+        "lpn_ff_mode_none": "6eef6648406c333a4035cd5e60d0bf2ecf2606d7",
+        "lpn_ff_more": "e38929f98513d39f8651b51211b6fa25513cd919",
+        "lpn_ff_no_junctions": "fbc08158d07470605a079277a97ab3d821f0fd49",
+        "lpn_ff_no_selection": "8da522f316f546669f94fad087c2068ae78f0b1a",
+        "lpn_ff_not_checked": "22705e738a7a182dc29cb9c6ad3014a8b166191b",
+        "lpn_ff_report_all": "52b28d6b1306346b3aef71fd2b808af7eaab735d",
+        "lpn_ff_required": "85549ea8f73e12ebd964956baf76765b113ccf6b",
+        "lpn_ff_required_node_tip": "1169447c96b6b105619587b46c4c922dd9c1a375",
+        "lpn_ff_required_own": "7d13036ec61f5c20e0dadcacfd88d450803088eb",
+        "lpn_ff_required_tip": "4b1582b5cb52f9c68b7c0c37451d775bf1311345",
+        "lpn_ff_residual": "a507618ef00e010279e4b229638df38c09010945",
+        "lpn_ff_residual_tip": "0d5a9b310595eef38301f4934a8fd7a5bbe84a0b",
+        "lpn_ff_rows_more": "4b7af83df176d9a2fbbf0493c62757ae136a2ae6",
+        "lpn_ff_run_title": "290d0ca4f32d3759f9834649d259ab1a5044b960",
+        "lpn_ff_scope": "3e6ac1066ba7438ea2fb7ecb0c95eca0f78595bf",
+        "lpn_ff_scope_all": "216decebf8ba73304b9008436c31bfa072209ca7",
+        "lpn_ff_scope_selected": "4b2b175d908e5c7a1990f7f05893746fadffd121",
+        "lpn_ff_scope_tip": "c220976c861bb448cce3c74fd5526aef506ad60f",
+        "lpn_ff_stale": "2a8f7a09662248de84a2ad1f5cabc19f4e127b81",
+        "lpn_ff_static_failed": "8d3961b9e38b39ee986bbefc068180d1124a4998",
+        "lpn_ff_steady": "0b592537f3f4603f48924635156cdb69f1abf7d0",
+        "lpn_ff_stop": "9e253470c876ee6d5c720eb777aeb82d4c26e28f",
+        "lpn_ff_stopped": "858cb38ae5fa706ce0018e8d764d59bd038becc0",
+        "lpn_ff_summary": "fb27646e7d2b991c19a439a1c3a877ace756aade",
+        "lpn_ff_summary_error": "279404ff4c69ad4c639c079ba5175d29fc35bd23",
+        "lpn_ff_title": "8a08cbc499174edce5a23077457fb5a320ed56c8",
+        "lpn_ff_working": "9aa4d6662b347cbcfec5948c3c52b852838ab8f1",
         "lpn_field_active": "555a79af92f33876efcf38d145ca406e4073623c",
-        "lpn_field_active_tip": "d5ed9a6c1ab566d62739be653fb340e37ead8a3c",
+        "lpn_field_active_tip": "a6560d766e01cab1dd5cf1a5afebef7b3631a178",
         "lpn_field_auto": "c614ba7c453cdcd4d21b20e8286c6266c891e0c6",
+        "lpn_field_base_demand": "02156cc25e5117a3ba01ba83b4d29cd569db4336",
         "lpn_field_closed": "9c7dd77a9e0493afbb0f3e84e813e70d26701936",
         "lpn_field_closed_tip": "8ea56358bac56c15ec1a0572174984f26b1fe200",
+        "lpn_field_demand_category": "55f8ebc805e65b5b71ddafdae390e3be2bcd69af",
+        "lpn_field_demand_category_tip": "0034fd702d25dff5b3b842370256169e862b6a52",
         "lpn_field_demand_pattern": "6462eca1e16244ec2bf0210e3fffb44b7d8e5bdc",
-        "lpn_field_demand_pattern_tip": "de2ed03431b6e7d2fba54f4cc3747e1ebaf07617",
+        "lpn_field_demand_pattern_tip": "f2595a7ed5f27b4d93f0805ce9e20bb39473a54f",
         "lpn_field_diameter": "8314fd7f3668393803a7ab4d1434731a5b296c40",
         "lpn_field_elev": "a514da1094ce1bd6b9267e8a0e3df8736da457a5",
         "lpn_field_elev_tip": "7c0c7fa90cc68e7ed58d0cb236adc54dfbdb550c",
@@ -1493,6 +1909,7 @@
         "lpn_field_text_align_center": "16e5447a804601a5ccb31f21e290bd7fc923a177",
         "lpn_field_text_align_left": "8ae1c34bd37fad49cc5f8e02da648a78e89c3ed8",
         "lpn_field_text_align_right": "954daa8b00335c66e262106e01f7dc22b19a4372",
+        "lpn_field_text_attached": "de049f4e65c5f8b7a051a3a51f24fc7640a7639b",
         "lpn_field_text_bold": "18cef04f1003bda9a787a537bcb58f9f35251e9b",
         "lpn_field_text_flip": "c75262b76fc51550b63021d38c8fece80a4a1d32",
         "lpn_field_text_match_pipe": "d0866628c9d7944af92ed7e084f6a0fccbe2e7f1",
@@ -1522,10 +1939,10 @@
         "lpn_file_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
         "lpn_file_export_inp": "f428aa355e86893429222bafcf7efe0be54a2384",
         "lpn_file_export_inp_tip": "55566b08607bac0890966d7c0804683704185f96",
-        "lpn_file_import_geo": "29071096c895ec5c9596b4967ed672a33fccc8b5",
-        "lpn_file_import_geo_tip": "e424ed0c1dc1d22d32e7283f4a465196a55b286d",
+        "lpn_file_import_geo": "4332a91e7bcf28d852fc717f9e728b8dd184185b",
+        "lpn_file_import_geo_tip": "630e00f87066dd0999d9e196c15daac84d842112",
         "lpn_file_import_inp": "422aa12aac66e90544516fbace883e795deba9fd",
-        "lpn_file_import_inp_tip": "c623a26c5f2ddcf490bb0d8a09b6ac49df0c8b8f",
+        "lpn_file_import_inp_tip": "2baa6bb757db0d079fae4defea56157bcb9d3ec1",
         "lpn_file_needs_reopen": "21ae110d61e50bb7a2a02b67937d9dfa7603f601",
         "lpn_file_new": "36594ec2cf9be53b76e6372fb8b164f532838e35",
         "lpn_file_open": "22b676fbcf6ed2eb3339ff94db2f46c8b584fc76",
@@ -1553,45 +1970,82 @@
         "lpn_find_adjacent": "c2f9b7b4897f03f94abf92294c9ca46fea62360b",
         "lpn_find_button": "df251b06eefdaa932e97b54fbe9a74d3e606fa61",
         "lpn_find_condition": "2f4979324e03e4571b1d7eba701226670c2ee2da",
+        "lpn_find_conn_no_fixed": "9544451f23c64e0990f59ee3c369b8efa6a6d33e",
+        "lpn_find_conn_nolinksource": "77500d0de75a4c07e2f0c7595e9410773f20b567",
+        "lpn_find_conn_none": "f3ba0fabd9ca870d1bd9393d5f3448cc3988a88c",
+        "lpn_find_conn_noopen": "ec810105426eb75fede983f6ade508ae687863f2",
+        "lpn_find_conn_noopensource": "cbe1b4d1073e0a1283d7ad8c199c12541d47f5ac",
+        "lpn_find_conn_unlinked": "4f3a9bd735fe7f17df5ab94f1f54b45dccd8de4e",
         "lpn_find_count": "3f5d193fb076e33cdf39836cdfc7099ed26203e0",
-        "lpn_find_menu": "df251b06eefdaa932e97b54fbe9a74d3e606fa61",
-        "lpn_find_menu_tip": "4331bd110b7249acf87ea534f33c4384d6599b15",
+        "lpn_find_menu": "2c6b404bf87fd609eff76db91473c4894761867d",
+        "lpn_find_menu_tip": "23c4f31cfef5ca1629b95369f1f56c5a23698dc1",
         "lpn_find_no_value": "c9696628ee0418cf872702a42d235b5db44538ee",
         "lpn_find_none": "b9d865c85161cd9dd4ec75f613fadaa44b45b87e",
-        "lpn_find_op_bottom": "682ab481b857bf93cc7c0694a053195133c52fd2",
+        "lpn_find_op_bottom": "c2d4688387000806d4edf1332e0e11c93eccadfc",
+        "lpn_find_op_conn_nolinksource": "51387af5a205ac4eb4f15993f807a094920fa33b",
+        "lpn_find_op_conn_noopen": "8faf1d7cadac2ad2c8e6e9c6550b59e3c27fa9ea",
+        "lpn_find_op_conn_noopensource": "94eae254d039e2708ed58d88385cafbb3fb72041",
+        "lpn_find_op_conn_unlinked": "4bd78dadc8d42e57bc27f49073f9ab8ef57f04ba",
         "lpn_find_op_contains": "caeb909ae4ff4ee25a0ff0d476946ed256f2aee1",
         "lpn_find_op_equals": "a1e8770fdaf17ab3d6203d23bb1e2c8efd5a66e8",
         "lpn_find_op_gt": "2fa709f02b0516ccfdcfe5e3158bedc23fbc69c5",
         "lpn_find_op_lt": "6bb2aa987a1cdc7525f5672334ed54a5cee446c5",
-        "lpn_find_op_top": "17c7a5110483f2215e6a55ffa9e422b763635db4",
+        "lpn_find_op_top": "0ca0c667b8c0c8687e1c5103f87f3412b998f3dc",
+        "lpn_find_prop_connection": "d3189975bf41d22e2806613e64a2c5aa803e9922",
         "lpn_find_property": "9ae33a7d0ecb82cae8f04aafab20bf90425b7b8c",
+        "lpn_find_q_and": "c2f934cb8cab6c1b3af0d4f2fdd824eabafb6bf4",
+        "lpn_find_q_aside": "9a8139ea458f10f1dab1ff5b8036d3835356fd68",
+        "lpn_find_q_err_close": "757c6ca3a5b06332f6c46b954bf0ba4ba13e5705",
+        "lpn_find_q_err_dot": "168c823f0c609da842f3498fc3502372e97f4915",
+        "lpn_find_q_err_empty": "df919e4feccdd67e07f686bf2ad37c2e741f858a",
+        "lpn_find_q_err_end": "37f071d71e0b63c5d9929b3a36e6fb8437632f1f",
+        "lpn_find_q_err_op": "349c5bbe223b92feb077370c49f97f17365c25ac",
+        "lpn_find_q_err_open": "a3e0c95a7feae2355131825475c650268d795c66",
+        "lpn_find_q_err_pos": "3f42657e8404f999c8d32d8cc4058128004f4fc0",
+        "lpn_find_q_err_prop": "63137adf7d510399ed2f0b1bd88541029b224485",
+        "lpn_find_q_err_quote": "debe06f95c0c0eaeb7e9f67ad1fa3c656fc8f102",
+        "lpn_find_q_err_quote_end": "f042bb60f01c4f0800c96043279b075b95439f2c",
+        "lpn_find_q_err_scope": "8c8f222ce45497bfc1dc07c9cec5d6afbbb55a78",
+        "lpn_find_q_err_value": "19ac9fff78e6b75c69514f81aaa866e00a87fd19",
+        "lpn_find_q_or": "f579c523960af1aec824c6fdc57af6d4abd76a1f",
+        "lpn_find_q_restore": "e272ac6604c3db0efcdf80cf9cd7e7ddca8a4c0b",
+        "lpn_find_query_hint": "3d53562beceb9b30b9c482a190a32c77f84b7978",
+        "lpn_find_query_label": "a618b4be8d3ac72545f3085fe616d342b7139fba",
+        "lpn_find_query_tip": "7e85e9408e0a1b67976f622d9cb8c6a6e0cd3ecd",
         "lpn_find_scope": "da43ad997fbcf65d8f4bc384def4b79d75f15252",
         "lpn_find_scope_all": "4a66d1480779180159cc25c1c5aa9d760467c6a7",
-        "lpn_find_title": "ee8efc4421aa51b091f66839764f648dc60045f6",
+        "lpn_find_title": "2c6b404bf87fd609eff76db91473c4894761867d",
         "lpn_find_value": "8dce170de238b1feda2ecd9674ea3ca0d068fbcb",
         "lpn_geomap": "bb34cc0232ff0253535e65b7c22b7b1e212094aa",
-        "lpn_georef_adjust": "dcdf39db0bb212ccd18fcf85ac2f0befa1fe5c49",
+        "lpn_georef_adjust": "e5af13bcbd04eebd8e96cb6deded72be4bd6c1ad",
         "lpn_georef_asdeg_btn": "489eb920bda19f826833d49ff77ec3ec77ad50e1",
         "lpn_georef_asdeg_tip": "bd564aa596821aab2d3e372512e1cb6cbb7d093a",
-        "lpn_georef_asdegrees": "616917bc0e60682ddb6a062fc00b6081e6b87c59",
+        "lpn_georef_asdegrees": "c13ac3f8f725066e5adf32eb4ea0155b08a845e9",
+        "lpn_georef_backdrop_unrotated": "044e4077a7af86a4d7da986c8225d3fe47f02980",
         "lpn_georef_cancel": "77dfd2135f4db726c47299bb55be26f7f4525a46",
-        "lpn_georef_confirm": "5b8d02c7cc5271c0eea8c0a4b2229d1b16bce025",
+        "lpn_georef_confirm": "2726726201f9f019478618ff8b60df99b3dcdad9",
         "lpn_georef_detach": "849ff777e6d1abbdeaf7b74a271810c2f14459ef",
-        "lpn_georef_done": "a01dbcae8c0fad1e990b6d6252b2a62bdd58470e",
+        "lpn_georef_done": "ce89645ed4c5abb931b660d27da96aeeb6911903",
         "lpn_georef_drop": "813b9bb6d850da1af212faf27371fe50a5c63ef4",
-        "lpn_georef_empty": "d3eed84359fdc4d9fc00043cd759930e25741e52",
+        "lpn_georef_empty": "7eece701ff16390a670fbdb6f15f51b5ba1896b4",
         "lpn_georef_finish": "a17a8468e04228d05cdbc42542d7f3ab737c5c6b",
         "lpn_georef_goto": "b7d99183c72849085ea09d98cc205c06cd6e0ff6",
-        "lpn_georef_intro": "7edf5177666b63078d686e94d1007d0bafe8f4a1",
+        "lpn_georef_intro": "89a437b550014e989e6f3e32c8d0814e07df4bc9",
         "lpn_georef_on_map": "7843df7be37e3e7d47b4d1e866c797dd8c64328a",
         "lpn_georef_rotation": "7b27d08bdb07249454acd7424d742c40e608fd0c",
         "lpn_georef_rotation_tip": "7a24c3c413288fa6fc73255bda96c60f3cd3a73e",
         "lpn_georef_scale": "d0a6c8b3458c4b480204ac25843027db53e80a56",
         "lpn_georef_scale_tip": "3d52b8a3127792504395b963e03c04f5c65071fe",
         "lpn_georef_size_prompt": "ac34f52227341ad558977360388aefb564c229a7",
-        "lpn_georef_step1": "af78c342db73e54a430a87c3053de6dc4edf64ed",
-        "lpn_georef_step1_hint": "630c7fe74a581544232d70ebf9d2aa4941354627",
-        "lpn_georef_step2": "bf9c2e992dcd4487d631a82cfd104597e341d469",
+        "lpn_georef_step1": "d93049e791432305dee6af869337fa415eaea358",
+        "lpn_georef_step1_hint": "65c0218c3d2d3a457bc89d8e90ae808aab850844",
+        "lpn_georef_step2": "25e0d522d97ee9383952a2407a53153fd0582fa0",
+        "lpn_georef_twopt": "047d0c11755b1f4c8d64f434026b7e3b3f30e1ba",
+        "lpn_georef_twopt_done": "37597ed4d1d4c97fd4f48b4dd34644534f5881fb",
+        "lpn_georef_twopt_pick1": "e56ba709d322b7f5fcb8ef3f6378c8398683fe15",
+        "lpn_georef_twopt_pick2": "4866284b7bc37fd0298b5cc1006a42da9ed722b4",
+        "lpn_georef_twopt_same": "5ffaa7f6c473b3a39155d0134a4272f6ff8c20af",
+        "lpn_georef_twopt_tip": "8a9e413a8b287435672f9a4a3bda33375e3cf6b1",
         "lpn_georef_unavailable": "78baf3cb3ce2802b3fb7efc91e35e7a74181c1f5",
         "lpn_goto_bad": "78a762596550851cf7aa01db870e89a27909232f",
         "lpn_goto_menu": "fba7529c452450a8cbb2303f50ff8b3b0f60082d",
@@ -1606,7 +2060,7 @@
         "lpn_id_taken": "afa411f11b93f86d3e5593aef3404abe3f194817",
         "lpn_import_bad_file": "368d3659c55f93e76105b4c486e32f47fc930508",
         "lpn_import_no_room": "9556ce89b8be4a1eccb0948329905223bd14da09",
-        "lpn_import_notes_heading": "d00cd9033e87d3a71854fd6f41e686ff6fed6315",
+        "lpn_import_notes_heading": "6bb3d0832ebd130244eb40a3fa0dd25a419c9f8d",
         "lpn_inp_bad_file": "4c44d8c2fd5a6162a15695b4f671d271f01cd3c3",
         "lpn_inp_drop_anchor_missing": "be14b494800f5b6b5fca9fad536a5ded0740f958",
         "lpn_inp_drop_backdrop": "94e5a8aa28dfe204309465c4d1fe0c39dd33c6ff",
@@ -1615,24 +2069,33 @@
         "lpn_inp_drop_curve_missing": "9a8d623f4037e3261d8153dba634977c8527d83b",
         "lpn_inp_drop_cv": "df7f7635a0fc09f8d0a6124430366e1a19429062",
         "lpn_inp_drop_dangling": "0ad893dffef80c6ad8297058a6c3c5342495ea43",
+        "lpn_inp_drop_demand_model": "ac58ebeafc5644aa913210f0e6a8f2b5f9f0c62b",
         "lpn_inp_drop_demand_pattern": "d29dca328e7cfd315370b584e89d3a81705538d3",
         "lpn_inp_drop_demands": "cf2f85eab05344924f34a11ae91613cb99403657",
         "lpn_inp_drop_emitters": "cb5e11821f1c11edc0487fa662dfbcce0f963480",
+        "lpn_inp_drop_energy": "6abba4dd2ae2d5bc34bf422aa4fdb3f7f0d8d3a3",
         "lpn_inp_drop_eps": "6188c8ee8cb50dfce620a63d5da7e9b806ad192d",
+        "lpn_inp_drop_file_options": "d65b65f5bb213abf47e3387ed31062722a4e1197",
         "lpn_inp_drop_gpv_curve": "775470738e804b0931b1c3bd6ca5a6ff9e73b0de",
         "lpn_inp_drop_head_pattern": "0f8c51ae1fe96d5b33e8a915f67e6a07aa89a9d3",
         "lpn_inp_drop_headloss": "cc465d1b3227861365056837ff778139615a211b",
+        "lpn_inp_drop_other_options": "ce4331153ea32e205034738833ac9ec5015d09bd",
         "lpn_inp_drop_patterns": "f9df01a8fbb36ef930ecfc506f9b8b4f63f6fb1a",
-        "lpn_inp_drop_pump_other": "9ae4a33dc9693072e607a8697645900d73f2821d",
+        "lpn_inp_drop_pump_other": "850c799fbb958d0165b165a58a66051bcafad131",
         "lpn_inp_drop_pump_speed": "b0db6690603d635b45908c8932c43ae2e5c1f7f3",
-        "lpn_inp_drop_quality": "818ea06fbda03f7c835cf8c6b9aa37463e24e368",
+        "lpn_inp_drop_quality": "92f2333ca211e9faf757dce02cb6682a948ed801",
+        "lpn_inp_drop_quality_options": "bad71cfb723d0e41c1f7b7a3d8fc2c2936690ad2",
+        "lpn_inp_drop_report": "1120b0bedba840fbcea6b941c90f419e488371b4",
+        "lpn_inp_drop_rules": "ab8eea9688e2c1c99c63b07689be36d6d32af06a",
+        "lpn_inp_drop_sections": "9c38cd934dcb158935293754298118af00a45369",
         "lpn_inp_drop_setting": "fd1ae50cac0307d3a4620c8ec88ad91084a39d6d",
+        "lpn_inp_drop_tags": "96ca83eb76a5652bce22110d32176b8ab6a5fc5c",
         "lpn_inp_drop_tank_curve": "cca9bf5223c4e9c65a90e49d604fdd1a6cc0e278",
         "lpn_inp_drop_tank_links": "103bae1c4010b131765f171ccddd17f1023b011f",
         "lpn_inp_drop_tanks": "56235c82e76759c10b8b28cad30e9b2e1b30b804",
         "lpn_inp_drop_tcv": "02558f263c18562e179350eff398e2737da590db",
         "lpn_inp_drop_units": "cd0df6f6a5c944c7520df7a466f6cf0ef4809deb",
-        "lpn_inp_drop_valve": "66aa4dfeca59b13ab80493ed03805a95eb5c7342",
+        "lpn_inp_drop_valve": "dc20e4dbb068db295ce65a457f5a13ac205d1ebf",
         "lpn_inp_drop_valve_active": "4418c2a222c53784b5a7b35ddc7a7aef5582cfed",
         "lpn_inp_export_differences": "2108589cfe330034971d15941a1b875741af9861",
         "lpn_inp_export_refused": "f30c2f0cdf3067c441c158158e361f08c21406b7",
@@ -1640,7 +2103,7 @@
         "lpn_inp_report_counts": "f0dc2d6a8c1bcbda661844843f8c8a02d372d43e",
         "lpn_inp_report_heading": "997509d5dea07c7e08c021ecd446ce4c80515e8c",
         "lpn_inp_report_label_anchor": "a1ba8b39c18f18244b382327ff27fed66e6da447",
-        "lpn_inp_report_lead": "44f8c44833361c87e76515b2dc4c1484615d1fa9",
+        "lpn_inp_report_lead": "f7ff9912919d680fec97b013bb6b99ef571cfb55",
         "lpn_labels_col_after": "79ba5e1b3f99abfd54ef8d839ba12bd2ac4d79cb",
         "lpn_labels_col_before": "74f39697ac328c6325ce068b6aaca626abc0bf63",
         "lpn_labels_col_decimals": "2a4e3cb3c61a05b20a67803c34e108388104bb00",
@@ -1651,16 +2114,16 @@
         "lpn_labels_heading_link": "4fc42eb0a2d30bdf0d4d9a4ad8fea8c9b94a07db",
         "lpn_labels_heading_node": "1aa6d7578bd4ddb3158dd09910b714b3629dbe0c",
         "lpn_labels_mark_extrema": "abe635279c0b23438dfed87917ef216db40e72ca",
-        "lpn_labels_mark_extrema_tip": "4b686e3ca1b439c243c7d8e5edc81fd6850ed4d2",
+        "lpn_labels_mark_extrema_tip": "ea7f18d57268fc1d64d902a1f4deddd9e4d2fb7b",
         "lpn_labels_prefix_id_tip": "6b28e715db6e53eae0fd4742b6c7921f4a5bebca",
-        "lpn_labels_prefix_tip": "37dd1c9692af00beb021b302f0336e4644f1d94d",
+        "lpn_labels_prefix_tip": "3eb906d950c3cd5ef7be913938e5ea9df817c1a3",
         "lpn_labels_priority": "886cbff9d9df761ec642945e519631a23ed173a2",
         "lpn_labels_priority_link_tip": "4d6b32a932bdc7ed82e56d26c769d26522d67812",
-        "lpn_labels_priority_node_tip": "bad1a681fa32c1c8eeedc7da05b467ea6c225508",
+        "lpn_labels_priority_node_tip": "6ede5e4fd3e54deafbc1c1ec044ff1d4ebbcf5e1",
         "lpn_labels_separator": "be7b78f8fc63d418df83bb3a26c45db2f93829a2",
-        "lpn_labels_separator_tip": "2fd3320dceca685d27afd8574bae296010032550",
-        "lpn_labels_suffix_gradient_tip": "16fd20b5732d46932dcb0eed773f4eb7461bd7e1",
-        "lpn_labels_suffix_tip": "52bf29f47a5172bb835a9385a18b47fbb3e09783",
+        "lpn_labels_separator_tip": "552be4e7fd006639dcc9222cd204d2307a83b1d8",
+        "lpn_labels_suffix_gradient_tip": "0884d77c9fc393e295c294e4b9cded71d89ce315",
+        "lpn_labels_suffix_tip": "0d190a5d6e9787287624428ee12319064b16b84e",
         "lpn_library_control_add": "f2e4e66615db27d7980bf30464bf15d954d84057",
         "lpn_library_control_bad": "4f9dd5267cce4c646d42c4f6c63efd80aa6118a8",
         "lpn_library_control_missing": "4d03d3ef64bd9d13d319496c8fdb1a28911becbf",
@@ -1671,8 +2134,6 @@
         "lpn_library_curves": "07c83b93abf0b3e27a0cdff87660d5bd4d44c60e",
         "lpn_library_curves_note": "3f7a043729bdc808ae4c94cc8303299487b74a9b",
         "lpn_library_curves_tip": "796118d97cc683fa7a7c4868af84d243abeb2a7d",
-        "lpn_settings_default_pattern": "c60d9d98af9a12729f19961a0b5ac989aeb6d2b5",
-        "lpn_settings_default_pattern_tip": "68a9d27fa351ba3d4e1b23eb99183fcf56f490ff",
         "lpn_library_menu": "27c968e6692b41bf6e1a241b870dc41ff1a51b17",
         "lpn_library_menu_tip": "422a93b74301d2b3208529c72ef025a1c63fd941",
         "lpn_library_pattern_add": "9edf997d207a8cef1d5f11fd2ec46f872210a675",
@@ -1706,46 +2167,56 @@
         "lpn_menu_edit": "5301648dcf6b53cefc9ed52999aaa92d4603cae0",
         "lpn_menu_help": "c47ae15370cfe1ed2781eedc1dc2547d12d9e972",
         "lpn_menu_insert": "95802daab3a23990338179f72248350c1434cf39",
-        "lpn_menu_project": "f6f4da8d93e88a08220e03b7810451d3ba540a34",
+        "lpn_menu_map": "ab478f3efc840eebab919dff1b9512286f70c10c",
+        "lpn_menu_project": "de9b1be49dae27efd757dc48f1ad55ec95a5e9e5",
         "lpn_menu_project_tip": "9d9424077c8ae42908abfd87e265d492a46e283f",
         "lpn_menu_settings": "c7f73bb54d928922c3838bb789ee9fb8a5b1eb37",
-        "lpn_menu_map": "69bd4ef9fbd0894a22759c3766b859defbdedbc8",
         "lpn_method_switch_confirm": "aa6867d35bf579e45ac92808126b0a29c92c8b0a",
-        "lpn_mode_add_junction": "227d697f0ea10bde6f4edbc9fe6116e96a959639",
-        "lpn_mode_add_pipe": "b0c507a90cb8ac61a5f37b35641f7051dc2b3566",
-        "lpn_mode_add_pump": "e26d5c560b24459a83aef7539494d756585f110c",
-        "lpn_mode_add_reservoir": "6190cfa59f468565f135ff2f07eba9c9d65c0470",
-        "lpn_mode_add_tank": "5704f6f7eb5a9f713d0168638ee98a7f0f69d263",
-        "lpn_mode_add_text": "601e632ff92e50ae2241de1e0612d310a8a6d976",
-        "lpn_mode_add_valve": "782b1a67c2d675cb2c30905a904a855908c369da",
-        "lpn_mode_delete": "4a09e68ab03ef268f609a792c3e8f95adc12e205",
-        "lpn_mode_select": "70c17f33358920ac4b1b46048d22f477ffd20f54",
+        "lpn_mode_add_junction": "b9fea8b7ce43d35d100d2c3029334abb4cc3b730",
+        "lpn_mode_add_pipe": "d2dbce4d23311d35a529e2309b22fd14d97ad1c7",
+        "lpn_mode_add_pump": "930a81b66676faf3c271770450c4b72560d87966",
+        "lpn_mode_add_reservoir": "fdeb2fe353da8e800588a99fb846656883882516",
+        "lpn_mode_add_tank": "a76a6b312417e97da060ac99b77f4a0259ae97f0",
+        "lpn_mode_add_text": "021054f0df3bded6f7d004c2a89c38b9bae58b34",
+        "lpn_mode_add_valve": "7925772babb158cd6b2347870117e82306a3a19f",
+        "lpn_mode_delete": "cf322799f706e87f81cdb986990242a5e3c35be9",
+        "lpn_mode_select": "c1660765b2384692f1b18d237b04e3bdd4ff5c3a",
+        "lpn_mode_vertices": "6d983361027b3226eafe359ce042e35cbb2f0696",
         "lpn_net_bad_file": "e8efd822c75e111af12d170f300b643b1c75daf7",
         "lpn_new_blank_si": "8cf5c23f7e9d198822007e74f3774ed2adc3e02e",
         "lpn_new_blank_us": "2d32d971c8bca04272900447c65273fb3f66befe",
+        "lpn_new_coords": "8ebebca0195929f0e6604560db2d6f829dc20c86",
+        "lpn_new_coords_geo": "bb34cc0232ff0253535e65b7c22b7b1e212094aa",
+        "lpn_new_coords_tip": "b76db7291edb31e260fc4aac8055f6ec96c39c0e",
+        "lpn_new_coords_xy": "23fa90497422bb69a7c4cc3fda5436f437718550",
+        "lpn_new_create": "6e157c5da4410b7e9de85f5c93026b9176e69064",
         "lpn_new_example_si": "2926375ffdb9d4f4b4d3b091a7084e0b9b46d883",
         "lpn_new_example_us": "5022c78ec0553c0d2189b2bd52c0123b3ce5e75d",
         "lpn_new_from_examples": "6412998a89bdd9cb8ad64e3429d6a3e34c0f7745",
         "lpn_new_geo_si": "b36d0144b4ed0439c603c6ffa191d80bc6d806fa",
         "lpn_new_geo_us": "6f0533d0739dce44a73454f192ee4745aa3bb613",
+        "lpn_new_place": "17acdca1bd57b72f292486f19ac4c32588bac8d0",
+        "lpn_new_place_hint": "41856c8b6bada67d66440e6e0d8c6077f490e058",
+        "lpn_new_place_tip": "21552d337cc52eae763c25b8cdef1c796df20437",
         "lpn_new_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
-        "lpn_notes_1_def": "a34f72b64fd479a231b286ad4d04f3760895030b",
-        "lpn_notes_1_term": "8940eaa461ed01deafb4e767bb78d184ec42a156",
-        "lpn_notes_2_def": "ab097861d866d10f54fb60537a925a89d1c35646",
+        "lpn_new_title": "e5bcbe241fab3ba265fd7c73f973cd93072e27d9",
+        "lpn_notes_1_def": "acd68a4452c58551838a2f4fcfe301b8767b00e5",
+        "lpn_notes_1_term": "0f4b4b7bd1c44494d1a14eab95ccbd65ac064ce7",
+        "lpn_notes_2_def": "1ebd5a90ba16300ac491ac1d2ea35e79a422b962",
         "lpn_notes_2_term": "20cecc9c899cf61a3401106b5611f95adce3ad89",
         "lpn_notes_3_def": "92c38e93fc98e6246163b279aedaeaff02ff8ab7",
         "lpn_notes_3_term": "c6bf37fe1cd4249e4de2da6de2a9ba4ee14b45e3",
-        "lpn_notes_4_def": "1328e130d1e614e4ef009228ad7f7a14d6ae6b0b",
-        "lpn_notes_4_term": "6a00f88bd6833072433c1bbd8efdc75001419336",
+        "lpn_notes_4_def": "f486a894d1fcdc67f440e0ad8e383c361bc0d6c4",
+        "lpn_notes_4_term": "907b9f085d2512f3954096d64badbb072c887061",
         "lpn_notes_5_def": "d6b7637a83301bce037c8862c7a7ea13abd0dfd9",
         "lpn_notes_5_term": "04433f7fe8fbf41ae2e5d2354f718f4330e9c5ac",
-        "lpn_notes_color_def": "8419278b7da1c5e674915e7c16440dc71f3d2e81",
-        "lpn_notes_color_term": "8b53e66b696e9b737a151a107083be02d276dbf5",
+        "lpn_notes_color_def": "4a8aab914b966262f3a655b4025db3c236facf18",
+        "lpn_notes_color_term": "67c44c744f65a9a0f9f43f6a39ab3e4d11d382c7",
         "lpn_notes_engine_def": "0394248016cc3569d8f31f28fa5936ee5f8de3d9",
         "lpn_notes_engine_term": "c6f36a42793ded5c4e7f0d5f99b68d7f12063716",
         "lpn_notes_epanet_def": "58224d932181c3c20dfda2d61e6a8bc168d12e6b",
         "lpn_notes_epanet_term": "bf763064f120b082f63d20ec1b5efbcee7003d9e",
-        "lpn_pane_none": "6c467069f551c0e95f0b41aa367dfccc61684fd4",
+        "lpn_pane_none": "8a127c3c35dc5bcfd46a44eb69bc59549ad9e105",
         "lpn_pane_print": "46e18fe132733ab1ff768a8aa616d225bae99f3d",
         "lpn_pane_print_tip": "90a936ee08e84cd564a615de8e6bc16ab1347b74",
         "lpn_pane_resize": "ec7886a3bab174ee59d4ffc0b0bbb1272abafee3",
@@ -1757,35 +2228,49 @@
         "lpn_pane_tab_pumps": "95f9186df66ab0f38fde70f069906889c1dcbdbd",
         "lpn_pane_tab_reservoirs": "b6664968e45b8f879e81cf66ae6e2e61efd0923e",
         "lpn_pane_tab_tanks": "ffdb1d2f5cedf6ba3f9a140334f300e494098eef",
-        "lpn_pane_tab_tip": "feeacc0d5fe73604243814a27eeb83a157ab9956",
+        "lpn_pane_tab_tip": "7bef443a7e49ecc0b4b955a825582a4cd0cf2924",
         "lpn_pane_tab_valves": "076890fea10db924e82e362877a54052081a1769",
         "lpn_pane_toggle": "60f64e2a4af99ca6f78cf4ac18d694573a67cc41",
-        "lpn_pane_toggle_tip": "98d719b29ed66c3afeb455f21135fed42ec9913b",
-        "lpn_prefix_applied": "7671fd83e608738f499fcb730d216c5dd152e0dd",
+        "lpn_pane_toggle_tip": "673d6f442a4e8d094d2ff47e2f64b1e7e3ecb343",
+        "lpn_prefix_applied": "054264a5143dff22728da464c51b16f6948481dc",
         "lpn_profile_axis_elev": "7d1d90562d4adffec18f5da636ce1016c2936bf7",
         "lpn_profile_axis_station": "fc104d39ccc1784de2c1460271884f73e03414de",
         "lpn_profile_choose": "5a194bcb016d95345532932210dba9cfd5c7650e",
         "lpn_profile_clear": "4100ef4df528ba73c142af7f2de8568c48ee7744",
+        "lpn_profile_delete": "c952534bbce723401b139b564676952fd1ea419b",
+        "lpn_profile_delete_confirm": "7951a7e0327f409acff1d593f9514543391d22a7",
         "lpn_profile_draw": "def3c66fd3c46a1c0144c6682c5c5a065ece8690",
         "lpn_profile_draw_blocked": "8d1c816459c9208102b141a762e31213f8392ccf",
         "lpn_profile_draw_more": "506fa9e90c52cef81bae919abf93dda5ffe628d4",
         "lpn_profile_draw_start": "8cf809afb6836def0eac061f8ec9977c16902b5a",
         "lpn_profile_draw_stop": "48704352960245111fd583d2a063fec16a1f0630",
+        "lpn_profile_edit": "5301648dcf6b53cefc9ed52999aaa92d4603cae0",
+        "lpn_profile_edit_click": "db83f1c0f8f18121714664460823177c844e05a2",
+        "lpn_profile_edit_nowhere": "c65b6ad3515b4f999f1bb0562d27a492bdbee434",
+        "lpn_profile_edit_tap": "9ae40706da5de41010c727a30c0f3600817e11c3",
+        "lpn_profile_edit_tip": "0793e28100701b6a0ed2eba39fb08bbb6eae7e96",
         "lpn_profile_from": "3f66052a107eaf9bae7cad0f61fb462f47ec2c47",
         "lpn_profile_ground": "de51b9c9a68c390578fe6091b60ec095e0983cd8",
         "lpn_profile_hgl": "823bb5de5e154d2a0f4e34b2baba90498e4f99d8",
         "lpn_profile_menu": "ff4fc0276e960c348647b647235f68200887c9d2",
+        "lpn_profile_missing": "efea54562234764eb3ffc4166c91e017439525bf",
+        "lpn_profile_new": "2b6efaaac5254cd41818960e5aba43e86e47b331",
+        "lpn_profile_new_name": "4c39d5d2d77123c27bfa9a5c59f60a4a5498ac8f",
         "lpn_profile_no_path": "a409c9c906f398844b0b4550b4a46f3c0be3a9b9",
         "lpn_profile_no_solve": "d93c7c969257a03055b07eb9f1b79bfe44435a87",
         "lpn_profile_none": "ed27aa74205b9781744c4ee791c7d2fca740aa49",
+        "lpn_profile_none_saved": "6bdcacb3813f2605f458dbe70e300fb2af16f48f",
         "lpn_profile_pick": "6db13532a423855de1b28ef4da23911c123deb4e",
+        "lpn_profile_prompt_name": "7aec894a168ca913673842f97de006eb54d901e9",
+        "lpn_profile_rename": "20878bc4dab7580e56e2ff6a52f9c408e1e6a87a",
+        "lpn_profile_saved": "08e30569d2ec9ecbb6bc4e30163b1017c2bbeec1",
         "lpn_profile_say_idle": "9601e509b1ca8cf8a6f71b3536ad3e087d134bdb",
         "lpn_profile_summary": "93121a8772a81876f1509e47b553fbb6c75e6d27",
         "lpn_profile_tap_more": "26d1f8b219ae5086023b02b4c6dfc7fbacfd13fa",
         "lpn_profile_tap_start": "c1b4c9a3f38e1580eb36f913f5a720fe71e77e62",
         "lpn_profile_through": "abe0a2fa942544365e25d12a59cf478741f2bbf7",
-        "lpn_profile_tip": "6c9874c2efdb87cd39d70a96877c3fe2bd211a25",
-        "lpn_profile_title": "922a3b574ca5285059ae09b2474b518451126908",
+        "lpn_profile_tip": "3337fa7490673684542dba0fe9ec8e2149cafa32",
+        "lpn_profile_title": "297f40cfd4544db6d696cdb8891ca46afc9f7b7e",
         "lpn_profile_to": "ae79ea1e9c6391a9ed83a2e18a031b835feec0c9",
         "lpn_project_copy_suffix": "4e7e2b484eeea02389a05f26e577342a5e0a90f0",
         "lpn_project_numbered": "5a76950c12a2818396506e9f60f212c2b31eedca",
@@ -1800,25 +2285,34 @@
         "lpn_pump_point3": "0ddcc506737670ee2d236267c045c6c350bf161a",
         "lpn_push_assets": "affd85585aaa05156085b6b36922a0074ce00a8c",
         "lpn_push_base_only": "799b53da4ce1ca7bc4f89c34eb3f1371cfae69a6",
-        "lpn_push_confirm": "9c2147d01b7df431fa33e0bf3a9ba2121359d7e4",
-        "lpn_push_no_change": "689f4cfc508207bb07a4e150b8bc9d2ed3ae2b67",
+        "lpn_push_confirm": "a19a1ba0dc12699f591418f9f2c6e7a39a07ae16",
+        "lpn_push_no_change": "85d8533b28698087104f7e179db0e69a83c7a8c8",
         "lpn_push_none_displayed": "86ae736ed5731b82efd555a332539d0465596111",
-        "lpn_push_nothing": "79e9a0d336c84a5564847658059c9ef2e9f5c305",
+        "lpn_push_nothing": "d40b605792efb7a29f5b81335efd528d327f2659",
         "lpn_push_properties": "351f56a6fefd5127c90506d3e91990f1d7631787",
+        "lpn_quality_age": "cb6b492862a4f949c0cb6df6d7f32b649f47d45c",
+        "lpn_quality_chemical": "ca65b0e5a8eae583fd32de5fb58016326e0f9f82",
+        "lpn_quality_needs_run": "c48475deb3a0b1024c6792cd19bce654b09c7de8",
+        "lpn_quality_none": "4481948392a8846400c954e77f58d76cdaa73963",
+        "lpn_quality_trace": "6bbbcf4ef1db30a2bf46e639a3bcf8bdac3e806b",
         "lpn_recent_denied": "fa0a139f94256479cbe5eb1d85af96f4b5196f5f",
         "lpn_recent_gone": "0243f7fc2917862176d94fd93e131aaad8dcfc4c",
         "lpn_recent_tip": "190a8d0b5ac5b675a2277e3b006a4c61ec102f34",
         "lpn_replace_apply": "06273f05b2d65f28de634c30d49a41ad5cd56897",
+        "lpn_replace_asked": "59d12df6e09af71c36f38ef3e0262d61c4fce669",
         "lpn_replace_button": "a7cf7b25a703b308887c7f1d100c4326ef20ac46",
         "lpn_replace_done": "898d479c87d8fa85484ac6f5a73ba06d6c621646",
         "lpn_replace_no_value": "d3296e8db3322e49291bcf0ce270c4f4838776b1",
         "lpn_replace_none": "5602dea0220723c268c6e6e2c76c7b43bffe5aec",
         "lpn_replace_preview": "c07cc4d8ce5cdab9de81229157e1540862c47ea2",
         "lpn_replace_prop": "66a7f73a78f3808b3851b38d4496cef69bee9b09",
+        "lpn_replace_q_bad": "1d46e848ccaaec624e2b4515d44455da735197c5",
         "lpn_replace_scope": "24693235b42939b2c7e9bb7a54a6ad2e7e942808",
+        "lpn_replace_source": "bfab2d98edca23467fa5ecb30ee79ae9ddb70021",
         "lpn_replace_title": "fbffb7914056d83b0e2d6fd06f66519995dd7aa0",
         "lpn_replace_value": "520d572d79925b3c142bc37274e943736c2b6902",
         "lpn_reset_all_tip": "ebd2596e8d975f0f2694252ae21ee8e54330d756",
+        "lpn_result_demand_tip": "5bf3ea8880f6a295a1bd4803212e150b7441888c",
         "lpn_result_flow": "86eff8eb789b097ddca83f2c9c4617ed23605105",
         "lpn_result_gradient": "3834e07b8e0207b88e3eab743621f7e9a5db40a5",
         "lpn_result_gradient_tip": "0896a2378e2aae02a813edad5551676a5aa1b7c7",
@@ -1826,10 +2320,14 @@
         "lpn_result_head_tip": "78559e50e20620df63041c6e1983d2a935c9243f",
         "lpn_result_headloss": "e47354a850a637541d620030fad9b6b23aa70bbe",
         "lpn_result_pressure": "d1222178efa7946ad8940a0b57a0d3cb3856180c",
+        "lpn_result_source_share": "da28ccd0712b51bc0451b78c233d245a2b429eef",
+        "lpn_result_source_share_tip": "34b8283b18f6155c1d4690d0eba5de00530c8033",
         "lpn_result_velocity": "d80a548eda6c0e81c84db1aa2c1099cc803abddd",
+        "lpn_result_water_age": "cb6b492862a4f949c0cb6df6d7f32b649f47d45c",
+        "lpn_result_water_age_tip": "a6ae08fc933cefd5dad04317cf28b10606cf45e8",
         "lpn_revert_confirm": "05c3238e0d4a9e956797347029871050d0ae1522",
         "lpn_rpane_empty": "31f4c65fa677aa1ffe257f883996ea5b665480bb",
-        "lpn_run_menu_tip": "96e253c3085f911b3bfb7d35be6b398fe8f7df56",
+        "lpn_run_menu_tip": "93348e0b442f827d0366ae093a2dd29b0493846a",
         "lpn_saveas_overwrites_newer": "af7978ad8540755e839d36461af0fcb4e1532b4e",
         "lpn_saveas_overwrites_project": "5b617ca583782738f2bfd0b8ab6a752defdd46ab",
         "lpn_saveas_same_file": "304ca763bd1a84a61a60dff7eb9921ff571e9953",
@@ -1839,12 +2337,14 @@
         "lpn_scenario_delete": "92f18604ed3875b89df8b049319e29504e03e6d5",
         "lpn_scenario_delete_confirm": "8d2e748cfa713feabec0575452893bd60cc99b68",
         "lpn_scenario_label": "569aae5b47e464b83049959de67717fbf2ff4407",
+        "lpn_scenario_mark_tip": "93c64d1c63848e76df47d630e2720a40355d3e9c",
         "lpn_scenario_menu": "2dd4a83d012acd714fbd600cfb9847611783fea3",
         "lpn_scenario_new": "8c7cb9a76fb6edea4aea3207534aa9893497a61f",
         "lpn_scenario_new_name": "9c11646da10f3a7f45bbcdaa3f46a8e12e9a494c",
         "lpn_scenario_override": "19b0757669b4aee49c5f59cb4033828e161eec74",
         "lpn_scenario_override_tip": "f98cbd26a8c0e964bb21725cfaf9d2e91f2ce485",
         "lpn_scenario_overrides": "c6628eba51b07d84f690d97d4b47d9b3a3d6efaf",
+        "lpn_scenario_overrides_tip": "79c344a0e9d0558b4e893b05c2c796d2d5f7e29d",
         "lpn_scenario_prompt_name": "f05ee5e127dbbf90ad0cde70708c2f2d84110677",
         "lpn_scenario_push_btn": "a6395ef6908a852924ef3e6a960cee547c57bc90",
         "lpn_scenario_push_confirm": "bdd7582969bccda963f993a4c147fa48e3f0af5b",
@@ -1877,15 +2377,17 @@
         "lpn_search_toofast": "873865cbe9206da96b96085dc928111c976f7f07",
         "lpn_search_unreadable": "271b4b68d9a46f9a3df42c6437184beadca2fd8d",
         "lpn_search_working": "1a6a5ba8c23ddb672874a2996abaee1fe933abcd",
-        "lpn_select_first": "7837e7201f4512809528c41d9e121e8e2e37950a",
+        "lpn_select_first": "a802d2167a3bcd3c4c24af07203f47bc756d6dd4",
+        "lpn_settings_accuracy": "12a3a4f498b28cbec01c44aacf0dc5e3a1b828ef",
+        "lpn_settings_accuracy_tip": "4fcdc3ca166946aad3c3da0224c052e3bfe4799b",
         "lpn_settings_align_labels": "e88e4d1b699790774fca69913ff0d2f031ee1218",
         "lpn_settings_apply_to_all": "551bc43f9f74e0103bbb10b47d6d959705c60eaf",
-        "lpn_settings_apply_to_all_tip": "76cb055dc527b818b407f1af3ded32c0e81e497b",
+        "lpn_settings_apply_to_all_tip": "1e6a7e3042dfe3980e7577b4420de1d55c966dcb",
         "lpn_settings_auto_run": "2153db59d26bb7f2080ad73de3913abfa15b6d72",
         "lpn_settings_auto_run_tip": "68c283c2d29fefbc82e3efad9147853337d72d26",
         "lpn_settings_backdrop_opacity": "ae0b083283f290f299d0c96969e0f7b53d4aa536",
         "lpn_settings_color_auto": "ac9041e76816a34aba228a736ec30da6984c5777",
-        "lpn_settings_color_breaks": "4c920ecbed422b763002afdcca5e4eea8c014b7a",
+        "lpn_settings_color_breaks": "38c7871280d8709226dc48ac17b1793751d9ee9c",
         "lpn_settings_color_breaks_note": "8a3af7ca11be84a3664ef32621d407e7de4d6145",
         "lpn_settings_color_classes": "2eaa6e2bd0fd93095dd04c3a1f120cbaed7dc8ae",
         "lpn_settings_color_credits": "bfac50d6424b5166c3ee2808c85ae7c139b5182f",
@@ -1898,22 +2400,41 @@
         "lpn_settings_color_ramp": "9407f901e4875a2c899fc55ea230fa4a17391265",
         "lpn_settings_color_reverse": "7958ae65e734c4a1caeb622830a6af88042bfd5d",
         "lpn_settings_color_thematic": "67f1ce5226c2216050799365fa587e7add8d8ca0",
-        "lpn_settings_color_thematic_tip": "4b6b6dae12d1cdf851633cc8025c72ddfa8bb66f",
+        "lpn_settings_color_thematic_tip": "bce512537d66943a8b3fa83ed4fe357b66265a68",
+        "lpn_settings_damp_limit": "c9ef1ed06c0c523d723024e32788e319afdaa4f6",
+        "lpn_settings_damp_limit_tip": "e74619aff5070bc81c1a95f4a41b7a28260b454f",
+        "lpn_settings_default_is": "d79c630d9c5ce73b8a34db5508cbe3af305e2b6a",
+        "lpn_settings_default_pattern": "c60d9d98af9a12729f19961a0b5ac989aeb6d2b5",
+        "lpn_settings_default_pattern_tip": "68a9d27fa351ba3d4e1b23eb99183fcf56f490ff",
         "lpn_settings_defaults": "b1564f6b1512cbfa3cfcebc9a5badb6b239954f1",
-        "lpn_settings_defaults_note": "990606b34087faf589658448074aa7621295f825",
+        "lpn_settings_defaults_note": "e985c2621a0e5d35a3d6f73022b35d4fc6535483",
+        "lpn_settings_demand_multiplier": "cd059aeb58b53fcff7aaa654e47e83536ef23579",
+        "lpn_settings_demand_multiplier_tip": "1bb51233112906b20e32a62476d9cdac28a83d7d",
+        "lpn_settings_elev_source": "a6184303dc3859332582c3901729eb9d50454f73",
+        "lpn_settings_elev_source_dem": "ab6684562f9284bbacef9f2c2b5a23bef67d54ab",
+        "lpn_settings_elev_source_tip": "af9e33f20e189208a1686a9edb24f1d82d8296e6",
+        "lpn_settings_elev_source_typed": "fb93f613bbb3b3aefeedde89094e11c9f5dadc80",
         "lpn_settings_emitter_exponent": "1d8660383db35f7b4b2754b1f2451fddc60c0a03",
+        "lpn_settings_emitter_exponent_tip": "bca06e447b6920e2a5577cfc9f81fc1da9eff35c",
         "lpn_settings_engine_epanet": "518a1af690a64303884cc20e84489abd5ef44ce3",
         "lpn_settings_engine_epanet_tip": "5e74cee436c482289c85e8bf1802d3dc577f2688",
+        "lpn_settings_flow_change": "0401663a50358abd4c9bca413e2fc3c63aa1d8a4",
+        "lpn_settings_flow_change_tip": "c6b4618634755f6fd6498b7349fea614cb33892c",
+        "lpn_settings_head_error": "8be0d6b0b1ce6b6b74e6172b44585dd09eed2afd",
+        "lpn_settings_head_error_tip": "1126407eeda79807b2abf577bb0a4eca043372aa",
         "lpn_settings_hydraulics": "d6f18fa68583ba0854b0df1a9e753670114f8451",
         "lpn_settings_id_prefixes": "2d1b802116e8a45191c6a614df0e16eddff87671",
         "lpn_settings_label_always": "0b13b19cf58d92b342221832c171bfb61a66d382",
         "lpn_settings_label_max_width": "2f30343adbd859bae8e0bb0d6ffcf555193552d1",
         "lpn_settings_label_use_view": "98af538eda4d53ba95ee4b8ceed8be2708e59886",
+        "lpn_settings_leader_snap": "5676428199b0aa5b636c6f4f14f4150caac89bad",
+        "lpn_settings_leader_snap_tip": "52135fcf4ccc74e31bd9db8580ab8290c810c765",
         "lpn_settings_legend_bottom_left": "1a7ce96fd00912d9386ea02f98f0b8b8e3f7b530",
         "lpn_settings_legend_bottom_right": "c2fc57681a0fac785dae0742b58ab9cae369ce38",
         "lpn_settings_legend_middle_left": "a31a7f4f9a128cca729626915295eb1903683cc9",
         "lpn_settings_legend_middle_right": "2aaed6c6137e4904294cbca67481c99a5fbfae2b",
-        "lpn_settings_legend_position": "36d979d15c7655130e2d88b6f74f688cb74f194f",
+        "lpn_settings_legend_off": "6eef6648406c333a4035cd5e60d0bf2ecf2606d7",
+        "lpn_settings_legend_position": "8a7a163396239afaf5ce1518846ded3a69a992ae",
         "lpn_settings_legend_top_left": "04b38cf935ddb566539a9d8e1cdb43936bd668bb",
         "lpn_settings_legend_top_right": "c1cc898f9464ac2b95be31217a4bf923f156129e",
         "lpn_settings_link_symbology": "890f2ff6ed8ab35922b0257e4511f547d16e9138",
@@ -1923,21 +2444,32 @@
         "lpn_settings_no_match": "f323e88618d328cf97d644f8e7e27c817528dd4d",
         "lpn_settings_node_link": "1d9001337c8660d173b9d7081a44d11a88b6237a",
         "lpn_settings_node_symbology": "ebb5a7f654357f1637ce907072a9645a896cf42d",
+        "lpn_settings_option_unset": "c092c44522aa2bd88c0787297ca60e385c3db155",
         "lpn_settings_page": "fb06270f7c212baabc8749ffc36e49dc8f321548",
         "lpn_settings_page_note": "ecb671010d8f9b8085e93c9cb220790442f768c9",
-        "lpn_settings_push_btn": "012ab49ba254c3329b14c140f26a8a2dcc32deea",
+        "lpn_settings_push_btn": "25d05e799efa13f0d6ef0f936b2b7b2249eb0600",
         "lpn_settings_push_note": "d3754624671985db69287dabd915782065100ae0",
+        "lpn_settings_quality": "0a474887b3001fa7997d32b8ce1edc74517872e7",
+        "lpn_settings_quality_source": "500684e68a5d7893f54f7be0ea6a547b56500c59",
+        "lpn_settings_quality_source_tip": "6a4884d20b6aeb3425676dafdd0e4ba44dd4778f",
+        "lpn_settings_quality_track": "ef29b30d175ba60ab5e25efa5a0c77c8e8295401",
+        "lpn_settings_quality_track_tip": "9642810774e19d1f9859edf70d5b65c5ece8232a",
         "lpn_settings_readability_bias": "fb21995c0657055329fed8983178c2c29694196e",
         "lpn_settings_readability_bias_tip": "fc8523993c004fda435aaa365efbd052973429c7",
         "lpn_settings_restore_tip": "723cebec7f1a48471ff9b324d75ed21e6a2aa7ec",
         "lpn_settings_search": "9a6f37a7bf9c2e64efe7d7374dda5f7ae051bd8b",
         "lpn_settings_search_tip": "eb6af12fb4dbea319a6924ce0b890cfaf8ee368d",
-        "lpn_settings_sec_assets": "3d6a7a7cedeede15fa63358493d0150b024a7c02",
+        "lpn_settings_sec_assets": "72707ec5629a9f5b8a0c80ef18f5fcd96372b11a",
         "lpn_settings_sec_calculation": "dc6751bd6532a841494c31d2cb271a6c23434bcc",
         "lpn_settings_sec_map": "de1c309b44683a001edb720820f80e41779d3f21",
         "lpn_settings_sec_visualization": "d175985b87dd9f620aa960059c730b4a35e3bcb5",
+        "lpn_settings_show_arrows": "506ea0310015efdaaa98a97baa00628f80c7560c",
+        "lpn_settings_show_arrows_tip": "966d391f12da4e541ebbc0eead62ab9df4fe0ca2",
         "lpn_settings_show_titles": "35992d6f38a21a851fe018bde1467dc3a8a875ad",
         "lpn_settings_show_titles_tip": "dd31ce362cd1df8e82d1e17ec6704662aea70c5d",
+        "lpn_settings_snap_off": "e3de5ab0ca4c69dbf00e86d2558843e8d806bb49",
+        "lpn_settings_specific_gravity": "55d91fad4e0bb56a733c123f2eeb0e51bb09ce62",
+        "lpn_settings_specific_gravity_tip": "eed6ab7932184cf594fc0a57d0601fe27b9fe2fd",
         "lpn_settings_symbol_opacity": "60ff3b0e2ee09b63c828a1055c6f7ca7e5a817df",
         "lpn_settings_symbol_size": "ec71574dc2e78f8ebcb52306f70ea195db0f9ed4",
         "lpn_settings_text_size": "919bbf890af8d0fcbae2f6127168ffe7143f82cb",
@@ -1946,6 +2478,16 @@
         "lpn_settings_text_size_units": "606e242d643bf3a1454f69a5e588fd94ff387060",
         "lpn_settings_tolerance": "21af42d2fcf017878991a4b5b02bd5960c7dcaf9",
         "lpn_settings_tolerance_tip": "9a18019e913328e4de5832f1f6e9e4f4f86b39a6",
+        "lpn_settings_trials": "5a8d8be7ae9d54f5ea819d0be94c961001e890e8",
+        "lpn_settings_trials_tip": "34f16b6641a0d0a5c0d715c7d2064457cec53d0c",
+        "lpn_settings_unbalanced": "27ba056f0f765da0566b04fba82aca6962a15b87",
+        "lpn_settings_unbalanced_continue": "b3146ec05bcdbb0b6461a0582aaaffe193ea3a3d",
+        "lpn_settings_unbalanced_stop": "0d3519cc5acdd9220e095441b86dd958240b2e96",
+        "lpn_settings_unbalanced_tip": "d79a1df47e1032e38565a9a0159f3decc22018d5",
+        "lpn_settings_unbalanced_trials": "605e6be42f242e6e123fef27f451c963940818ed",
+        "lpn_settings_unbalanced_trials_tip": "883e04ac9f4f8d2fb834bcb1b8122a48a9c35a0e",
+        "lpn_settings_viscosity": "a9da9923da44821eda11c27c0a26b338937c88f5",
+        "lpn_settings_viscosity_tip": "1bdb5865af5f18efdce1f6ce5449ab9f308b3b5b",
         "lpn_settings_wipe_btn": "bc8cae8ce2ef5ac40928f9f7a5f7709afe4c0ed7",
         "lpn_status_already_open": "f032ac4e9f577a0a653a50394849743abf7ee139",
         "lpn_status_already_open_dirty": "9412f17b043bac255391b2f5c8c1e0dec70bf11c",
@@ -1974,19 +2516,23 @@
         "lpn_tables_menu_tip": "f59ee6b6b39caf073911142cc12f7abbf67619dc",
         "lpn_tank_elev_tip": "42a7e83306be0b782aef40102ccfdd737b078951",
         "lpn_tank_head_tip": "bb7ad4f13aead947290660eccfba2671c8a07cea",
-        "lpn_terrain_accuracy": "0557a30dee38ddeebec8c5973fdced8058b0378e",
+        "lpn_terrain_accuracy": "9df2ca84695b9a0323882c94a4ba7a5159bb3858",
+        "lpn_terrain_blank_ids": "6943b7a080d0dd24235298ec9a23fdabe12c5443",
         "lpn_terrain_busy": "5f9dd198967cdeafad649dbc234f85b6a013740c",
         "lpn_terrain_cancelled": "a3ef86f9aeac2fdc118ed4271780e8f91c4354f6",
-        "lpn_terrain_confirm": "dec1b92ad4a21c16734af00a72a98e0891f11093",
+        "lpn_terrain_confirm": "3459afd78f0875337c598c4b43314fd2b5666318",
         "lpn_terrain_confirm_default_1": "64687d00471b005db1a8837226df1f6243973126",
-        "lpn_terrain_confirm_default_2": "cd2c2edf8ebcab72f70fa194cd44315ef54b13f5",
+        "lpn_terrain_confirm_default_2": "3d78b8c8cb82d303b4e059561157210ebd8db3f5",
         "lpn_terrain_consent_1": "9a06e3a9bfb5b4d8866339479b8fa19b7f656b72",
         "lpn_terrain_consent_2": "a621218dc39cb33b47d1ef7446e6fca6af554eff",
         "lpn_terrain_consent_3": "4f58f1032b490d174dd29dc6dce027e3cc5ac7be",
         "lpn_terrain_consent_4": "2cf7322ab7780e73b4271f3f084166584c832103",
         "lpn_terrain_done": "f60f07363b785631dfd80e66c3d4d8678e504aba",
         "lpn_terrain_failed": "8f5784978e684d999288b44516226d72687bda57",
+        "lpn_terrain_filled_ids": "be577de482ee2a2050ca2039994e31d459bb30d7",
+        "lpn_terrain_ids_more": "9d37c757b7e64043fcd56cbd06922719c4f28592",
         "lpn_terrain_keep": "9b2cb9c3f05b68d64b904ad01fdfeab9e08099d4",
+        "lpn_terrain_keep_ids": "3b2e154e11ed15138cb2a271a7e7505f94492a7f",
         "lpn_terrain_menu": "f685daa4fd0e007bc1918b29fdeba2c8b624813b",
         "lpn_terrain_missed": "0b3b296e71913c44717bcce2dee4357f04e9a964",
         "lpn_terrain_no_nodes": "ed765fb95faa2965f4a18a209ab76366fa6585ae",
@@ -1999,6 +2545,7 @@
         "lpn_terrain_tip": "25c05a82ba5b374ff17dcdc808e80bab267d7798",
         "lpn_terrain_too_wide": "8d2b81279049950c09c4a1b363ba6d5e70b995d3",
         "lpn_terrain_undo": "c1bc60b818a7e49f2c53c7ca354daa6d19dd3dca",
+        "lpn_terrain_will_ids": "edb12e06ed5ba6f3c2975efc095909a75f717fb4",
         "lpn_terrain_working": "722b83849ef42b05927215a3e30eed39163c30d6",
         "lpn_time_clock_start": "945d210e97d180cf4f6dfd951532f90ecff23ebb",
         "lpn_time_duration": "dc379a7661c26b1a2fed2781fcd2f321ac1511b7",
@@ -2010,8 +2557,8 @@
         "lpn_time_menu": "6c82e6dd86807ee3db07e3c82bec1ae1ce00b08b",
         "lpn_time_menu_tip": "7ec818e38354e3d2f1e9002c6349793702783710",
         "lpn_time_next": "aaf8ed898a06fb6844e4de115541eccc70875afc",
-        "lpn_time_no_engine": "bb432e9992397e72a6ee007c2646da2a3f6a967f",
-        "lpn_time_no_period": "a75b9ef38a023bdf93ff433fbf41b33c2c7cfc24",
+        "lpn_time_no_engine": "7695433b7f832c80d5830f3608e62a33d1952671",
+        "lpn_time_no_period": "cef30c42445f2962c02b02b5bca5858409bbce65",
         "lpn_time_no_report": "1b1ae1c794bab1b912d3494665a9b98b7f79d853",
         "lpn_time_pattern_start": "a764bb1e81176ba8a27f7e13e88e965049f85138",
         "lpn_time_pattern_step": "3e1e3dcda0a00dc27a84e0d20f639f5e0250490e",
@@ -2020,15 +2567,15 @@
         "lpn_time_prev": "46752f14ca841d2ffe77e218bd93141a3b258025",
         "lpn_time_report_start": "5202c4e2685527c859c29b6618f641edf984c195",
         "lpn_time_report_step": "a035e8700020dfeb3b4c54dd039a10c58e1a5ecf",
-        "lpn_time_run": "b1b392607deaf29a7e81453e069b7c07a32a6b18",
+        "lpn_time_run": "8e5903a8e4db846e7bd2adbb644be5510902e488",
         "lpn_time_run_done": "c6ff805d0f4035b24aa19e7967aee4371307426a",
         "lpn_time_run_failed": "a51e2acf974ff454acec28b6f7042e477b84c84c",
         "lpn_time_run_fell_back": "2baafda261d7ff84cded3dbbb9c653a9b29d1bb2",
-        "lpn_time_run_note": "85b6a0c03e45c79d00af1febf59b000b24d23fa1",
+        "lpn_time_run_note": "b05cbf33b15b23a07b65bb5a485e982ce0f2b1ba",
         "lpn_time_run_report": "437bc2bba608852c77bbc92904919cb094180322",
-        "lpn_time_run_report_tip": "c5d45aa52795f7bc16e5806b944de3485d14c8a1",
+        "lpn_time_run_report_tip": "a0de21a40c28afba029094da3ccf9e7b98618e07",
         "lpn_time_run_slow": "297f19c53b5ff62f064dc50796b21fbf28cb1d9e",
-        "lpn_time_run_tip": "d49b61aead368516be0cddb1f6ff8df6c83aee30",
+        "lpn_time_run_tip": "c2fe1ab65c564446e4562fc68f4eb63c9cd1b4fc",
         "lpn_time_running": "94ddd17b714db947832a0bf32b5b0a7e9bf9c634",
         "lpn_time_settings_open": "a9730dac163b9d2b91654983e7d07739bd3c54ad",
         "lpn_time_slider": "6c82e6dd86807ee3db07e3c82bec1ae1ce00b08b",
@@ -2037,7 +2584,7 @@
         "lpn_time_tank": "0ba4d1aee6f233efc1f3b78141b4af7d08b86c3c",
         "lpn_tip_join": "7906e3c67fd5b00788167978623fddc0d9ca4920",
         "lpn_tip_labels_draggable": "92f776113028066fb944d2830ea89966bc053369",
-        "lpn_tip_select": "37d09593a45674d7bdda9dc4756e16452007fccb",
+        "lpn_tip_select": "357873c7fbede591ede858845fb59e457ba999f0",
         "lpn_title_units": "75f0b482bd12a3548ccf34447815426657c142dd",
         "lpn_tool_add_junction": "e4f6c05840cecf544ec74b542c80584accfbc5ad",
         "lpn_tool_add_junction_tip": "d1383daac1acda88cefd62aee346e04ca6c2e153",
@@ -2046,9 +2593,9 @@
         "lpn_tool_add_pump": "e8bd8201473a0e0c20662af1aadbccb008935117",
         "lpn_tool_add_pump_tip": "d1384da1fa268726e1b52e30f0bf2e9e68a64876",
         "lpn_tool_add_reservoir": "f19a9f3c642c3432a0ae8f11048615265ce9d630",
-        "lpn_tool_add_reservoir_tip": "2be159bb1b14194db9ab897c61aefb212c2f74b7",
+        "lpn_tool_add_reservoir_tip": "179a9dd5f4913c4828880c2beafa61b105fa1c2a",
         "lpn_tool_add_tank": "0ba4d1aee6f233efc1f3b78141b4af7d08b86c3c",
-        "lpn_tool_add_tank_tip": "695f08eb4d53d7d7a902ee951d1b488e5d929ba6",
+        "lpn_tool_add_tank_tip": "deea598878d3ce94b5bbce2e43afbf5ad06a0b4e",
         "lpn_tool_add_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
         "lpn_tool_add_text_tip": "ba86e29be0f636294500001ca84bb41af3f4832c",
         "lpn_tool_add_valve": "986d2de2ea6df1a0d235545dd8de4dfa8c2d9ae3",
@@ -2063,6 +2610,8 @@
         "lpn_tool_settings_tip": "3888974253ada2bb4b223d065d8b841b429f375d",
         "lpn_tool_undo": "39fc72124884d6573e4f9f89585f071ed0782696",
         "lpn_tool_undo_tip": "196f3895599a8c280951ffb8a06b1931ec79e71d",
+        "lpn_tool_vertices": "b3a015034320657530371b364cd275afb53b69cb",
+        "lpn_tool_vertices_tip": "969d81526e47ee1c4684018952634c407fa9a59c",
         "lpn_tool_zoom_extent": "be866a8e867398648cdf09d8a972d5bbc745c029",
         "lpn_tool_zoom_extent_tip": "64ab26773171d197e02b23634013939b93755a05",
         "lpn_unit_unknown": "cecc5b050706cf145b426d714d212b31074d9743",
@@ -2082,7 +2631,7 @@
         "lpn_units_velocity": "d80a548eda6c0e81c84db1aa2c1099cc803abddd",
         "lpn_units_warn_body": "2660eb5774586a7aedad53e0530ab7fe82287ef9",
         "lpn_units_warn_lead": "d79c196707ff6d95e7d518747ed7bc455da2ee86",
-        "lpn_units_warn_title": "4124c346bd2e65ed8449c69d10aa3f21fe47c942",
+        "lpn_units_warn_title": "dc6c6c757e610c988cbd9dcdf90c011be43cc115",
         "lpn_v2_restore_confirm": "733ec25f6146d8d81f7d88bbe332600bdb967cc4",
         "lpn_v2_restore_never": "f3e5ca94b1f392f437b6fc85bf3f03c306c23e5d",
         "lpn_v2_restore_no": "1f7f368c6d34c41f570dfe461879617ad1c695af",
@@ -2094,7 +2643,7 @@
         "lpn_valve_type_psv": "ab5689d41a171a4274fffdbb12d3cddcd901c05b",
         "lpn_valve_type_tcv": "f9a5006688d1421dd1b5ba5ff5ca8050d79085dc",
         "lpn_view_units": "12748281e0f02357f2a2f65c1c6a7d01ee122506",
-        "lpn_xymap": "034f1965ccdbdf9e642feeb9858da5096b6d1a9a",
+        "lpn_xymap": "5f8459982f9f619f4b0d9af2542a2086e56a4bef",
         "menu_brand": "bf8b00231568173bfc88835a77624be526d4dd96",
         "menu_help": "c47ae15370cfe1ed2781eedc1dc2547d12d9e972",
         "menu_libre": "38f2a5b458b1b859bea3099c904d3eab6c585532",
@@ -2105,10 +2654,10 @@
         "mhp_diameter": "e6343b78b5974690757435f6121bcb0bff473145",
         "mhp_efficiency": "5eff2871f906e5b0cd271c55a4d43fd3e53c31f8",
         "mhp_gross_head": "4df4e642a04021750c73fa689d4cf98018dc662c",
-        "mhp_hl_bad_tip": "704ac542331d44fcace1583cc05844dc21ba4b57",
+        "mhp_hl_bad_tip": "615265cfec7904c91c59dae8703ffba43370f2b2",
         "mhp_hl_check": "9e99464bf597b49b92614ee428376caf0faa612c",
-        "mhp_hl_ok_tip": "0c3250a7d7bcfa2c7e03f0e3be9be60418ca5e10",
-        "mhp_hl_warn_tip": "810cb046a28fd63afeae3c1d4d162b32cf903a76",
+        "mhp_hl_ok_tip": "23ff406ee02ab050cbfec95df2bccf1cc22413c2",
+        "mhp_hl_warn_tip": "b91bccf384dc204a149dea22b0e803c32565150a",
         "mhp_hnet": "cb6df0bac6aebe4eb5874a3eb670923dafe72db0",
         "mhp_length": "cda1348517753c12fc15b30fd8af216100f1796a",
         "mhp_main_desc": "532f1960926a868b5a76fde247dff6f422ae687e",
@@ -2194,7 +2743,7 @@
         "mphl_egl_2": "1ac31fca4015035646079299299e16bbe9470e08",
         "mphl_friction_loss": "6907c2cf5a90302134ef1eeaa1c2420498012acd",
         "mphl_friction_slope": "68d9cdd67c30c4a5954ce17dbac72c8e6dad4328",
-        "mphl_hgl_egl_tip": "134604dfd6f35d16c82ea597e3d50dd369011087",
+        "mphl_hgl_egl_tip": "170fb8ab0ef0a223a3f6999c023d2cab37d26964",
         "mphl_junction_loss": "f90203d9404a82c0c31e8e318e41cfafa850cc5f",
         "mphl_main_desc": "9884243aceb1733f1400c481879101018067213d",
         "mphl_main_menu": "34ede633668dfd06314d6e8394228d60b3bccc61",
@@ -2224,7 +2773,7 @@
         "mtc_n_blodgett": "b80c7765d1fc61406948ee20326ac139643d2db0",
         "mtc_n_pi": "0207ae0b4f18be337014554fd3924ca7f63ef7a0",
         "mtc_n_strickler": "7d828b55d8c2b0608797dca74eba569ab2e2f885",
-        "mtc_note_1": "76eaa1e7cc76eb260003a89ee43009ffddb63126",
+        "mtc_note_1": "c3eef7d1d32787890cfea203bdc8ad935b84eb93",
         "mtc_note_2_def": "cab8709624ad61aeb9e3cc2d2d3dd7ded45c53f0",
         "mtc_note_2_term": "94aa8011360367c647981ddd705902811ebfc552",
         "mtc_pi_ok": "627ce4c6a18d2f23d0119144b2c76dc178f74a3b",
@@ -2328,7 +2877,7 @@
         "rc_main_menu": "f29f93a1d1ad90f7f1a28a4403573a2921acfff9",
         "rc_main_title": "11867a5b41e74cae91506c106a5570e49d7df67e",
         "rc_n_chute": "ad0e7fd0d78a1727102013be5d8e9a84784da541",
-        "rc_notes_1_def": "6b881ffd5bc391fd245cbfe72e8cfd2e1b07c2e1",
+        "rc_notes_1_def": "63cec10f674776277d2dcd80173fc97b6ccbe504",
         "rc_notes_1_term": "ef4a4da2e680233f12126635582b29fd8d31117b",
         "rc_notes_2_def": "c4ab49ca333d76c69ea7af240833a44e8f1a572f",
         "rc_notes_2_term": "3bd84b7dc6653b973df08100c2b16567e73128b5",
@@ -2375,6 +2924,7 @@
         "u_bar": "62cdb7020ff920e5aa642c3d4066950dd1f01f4d",
         "u_cmd": "b603e47fd8c03ecc219fb7d78037a07ace1b3805",
         "u_cmh": "8e89d56763da2e02aa061170d142dccf17ac7305",
+        "u_day": "a2620cbc10f5198dd03e3f5a1569eb5dcf9a6a87",
         "u_depthFrac": "ca3ad46f5661e96d2e1ef3d978d23729f84f2efd",
         "u_depthPercent": "4345cb1fa27885a8fbfe7c0c830a592cc76a552b",
         "u_ft": "d352dbdf6170085acaf7ed62197a4de1452a0073",
@@ -2389,6 +2939,7 @@
         "u_grade": "b82db5f0a739d1a31079093a265b89ce11d69b22",
         "u_gradePercent": "75116027b2c313aae777799d4d9208249ba28fef",
         "u_hp": "e68b072303e1c28c4073630daeb803737a761e06",
+        "u_hr": "51bd95353aeda6615433bea21896c893ef5e62dc",
         "u_imgd": "b5759cbd2ba077c47ffc507d1a221bb91e953cce",
         "u_in": "af10ef20dd9060bbeead0afbc55381a66af442ef",
         "u_in2": "46a0fcadf7bbe3b0cef14554be5c291ebbf37507",
@@ -2423,7 +2974,7 @@
         "u_psf": "4a76512f158c224e9f1caeb75206d3f0d6bbd1ec",
         "u_psi": "7063e748cd1fdd9ec3a0ea19cf602e520c88e7a4",
         "u_s": "920a25ef686c4f7ca6ad23dd109d3ad653161832",
-        "view_hide_line": "1a453099bb841fbee7e0a92eed68492fa1f607e8",
+        "view_hide_line": "b2eba3ab6c23aeb70fd29ba9be432a06240f5998",
         "view_printable": "a49639698466d208684be63c5d80827b01952155",
         "wi_cumulativeFlow": "97ed5195293ccd670e17cf3a7d3fe0f391ff355e",
         "wi_incrementalFlow": "0ed5f2914c7be889e332654425ad34b6bd1ff993",
@@ -3708,6 +4259,18 @@
             "words": 15,
             "ends_sentence": true
         },
+        "lpn_demand_add": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_demand_add_tip": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_demand_remove": {
+            "words": 3,
+            "ends_sentence": false
+        },
         "lpn_demand_tip": {
             "words": 20,
             "ends_sentence": true
@@ -3722,6 +4285,18 @@
         },
         "lpn_diag_not_converged": {
             "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_diag_not_converged_drawn": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_diag_not_converged_error": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_diag_not_converged_trials": {
+            "words": 5,
             "ends_sentence": true
         },
         "lpn_diag_unreachable": {
@@ -3743,6 +4318,30 @@
         "lpn_edit_delete_network": {
             "words": 2,
             "ends_sentence": false
+        },
+        "lpn_elev_dem_none": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_elev_dem_said": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "lpn_elev_dem_sample": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_elev_dem_sample_tip": {
+            "words": 39,
+            "ends_sentence": true
+        },
+        "lpn_elev_dem_use": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_elev_dem_use_tip": {
+            "words": 35,
+            "ends_sentence": true
         },
         "lpn_engine_failed": {
             "words": 12,
@@ -3892,6 +4491,290 @@
             "words": 10,
             "ends_sentence": false
         },
+        "lpn_ff_accounting": {
+            "words": 42,
+            "ends_sentence": true
+        },
+        "lpn_ff_affect_link": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_ff_affect_node": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_ff_atleast": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_ff_calculate": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_ff_col_affected": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ff_col_atrequired": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_ff_col_available": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ff_col_junction": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_ff_col_limit": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ff_col_modes": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ff_col_required": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ff_col_residual": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ff_col_solves": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_ff_col_static": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ff_cost": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_ff_design": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_ff_design_all": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_ff_design_nodes": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_ff_design_none": {
+            "words": 16,
+            "ends_sentence": true
+        },
+        "lpn_ff_design_off": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_ff_design_off_note": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "lpn_ff_design_tip": {
+            "words": 37,
+            "ends_sentence": true
+        },
+        "lpn_ff_engine_cost": {
+            "words": 39,
+            "ends_sentence": true
+        },
+        "lpn_ff_engine_epanet": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_ff_engine_native": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_ff_err_at_rest": {
+            "words": 10,
+            "ends_sentence": false
+        },
+        "lpn_ff_err_converge": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "lpn_ff_err_not_junction": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_ff_err_solve": {
+            "words": 9,
+            "ends_sentence": true
+        },
+        "lpn_ff_err_unknown": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "lpn_ff_intro": {
+            "words": 33,
+            "ends_sentence": true
+        },
+        "lpn_ff_iso": {
+            "words": 33,
+            "ends_sentence": true
+        },
+        "lpn_ff_limit_both": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_ff_limit_pressure": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_ff_limit_velocity": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_ff_maxvelocity": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_ff_maxvelocity_tip": {
+            "words": 17,
+            "ends_sentence": true
+        },
+        "lpn_ff_menu": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ff_menu_tip": {
+            "words": 32,
+            "ends_sentence": true
+        },
+        "lpn_ff_minpressure": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_ff_minpressure_tip": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_ff_mode_design": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_ff_mode_fire": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_ff_mode_none": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_ff_more": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_ff_no_junctions": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_ff_no_selection": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "lpn_ff_not_checked": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ff_report_all": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_ff_required": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_ff_required_node_tip": {
+            "words": 39,
+            "ends_sentence": true
+        },
+        "lpn_ff_required_own": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_ff_required_tip": {
+            "words": 30,
+            "ends_sentence": true
+        },
+        "lpn_ff_residual": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_ff_residual_tip": {
+            "words": 22,
+            "ends_sentence": true
+        },
+        "lpn_ff_rows_more": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "lpn_ff_run_title": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_ff_scope": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_ff_scope_all": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ff_scope_selected": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_ff_scope_tip": {
+            "words": 16,
+            "ends_sentence": true
+        },
+        "lpn_ff_stale": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "lpn_ff_static_failed": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_ff_steady": {
+            "words": 30,
+            "ends_sentence": true
+        },
+        "lpn_ff_stop": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_ff_stopped": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "lpn_ff_summary": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_ff_summary_error": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "lpn_ff_title": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ff_working": {
+            "words": 5,
+            "ends_sentence": true
+        },
         "lpn_field_active": {
             "words": 4,
             "ends_sentence": false
@@ -3904,12 +4787,24 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_field_base_demand": {
+            "words": 2,
+            "ends_sentence": false
+        },
         "lpn_field_closed": {
             "words": 1,
             "ends_sentence": false
         },
         "lpn_field_closed_tip": {
             "words": 30,
+            "ends_sentence": true
+        },
+        "lpn_field_demand_category": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_demand_category_tip": {
+            "words": 7,
             "ends_sentence": true
         },
         "lpn_field_demand_pattern": {
@@ -4058,6 +4953,10 @@
         },
         "lpn_field_text_align_right": {
             "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_text_attached": {
+            "words": 2,
             "ends_sentence": false
         },
         "lpn_field_text_bold": {
@@ -4296,6 +5195,30 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_find_conn_no_fixed": {
+            "words": 28,
+            "ends_sentence": true
+        },
+        "lpn_find_conn_nolinksource": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_find_conn_none": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "lpn_find_conn_noopen": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_find_conn_noopensource": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_find_conn_unlinked": {
+            "words": 4,
+            "ends_sentence": false
+        },
         "lpn_find_count": {
             "words": 8,
             "ends_sentence": true
@@ -4320,6 +5243,22 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_find_op_conn_nolinksource": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_find_op_conn_noopen": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_find_op_conn_noopensource": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_find_op_conn_unlinked": {
+            "words": 4,
+            "ends_sentence": false
+        },
         "lpn_find_op_contains": {
             "words": 1,
             "ends_sentence": false
@@ -4340,9 +5279,89 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_find_prop_connection": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_find_property": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_find_q_and": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_find_q_aside": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_find_q_err_close": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_find_q_err_dot": {
+            "words": 12,
+            "ends_sentence": false
+        },
+        "lpn_find_q_err_empty": {
+            "words": 9,
+            "ends_sentence": true
+        },
+        "lpn_find_q_err_end": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_find_q_err_op": {
+            "words": 10,
+            "ends_sentence": false
+        },
+        "lpn_find_q_err_open": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "lpn_find_q_err_pos": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_find_q_err_prop": {
+            "words": 10,
+            "ends_sentence": false
+        },
+        "lpn_find_q_err_quote": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_find_q_err_quote_end": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "lpn_find_q_err_scope": {
+            "words": 11,
+            "ends_sentence": false
+        },
+        "lpn_find_q_err_value": {
+            "words": 8,
+            "ends_sentence": false
+        },
+        "lpn_find_q_or": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_find_q_restore": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_find_query_hint": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "lpn_find_query_label": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_find_query_tip": {
+            "words": 21,
+            "ends_sentence": true
         },
         "lpn_find_scope": {
             "words": 3,
@@ -4378,6 +5397,10 @@
         },
         "lpn_georef_asdegrees": {
             "words": 41,
+            "ends_sentence": true
+        },
+        "lpn_georef_backdrop_unrotated": {
+            "words": 24,
             "ends_sentence": true
         },
         "lpn_georef_cancel": {
@@ -4451,6 +5474,30 @@
         "lpn_georef_step2": {
             "words": 6,
             "ends_sentence": false
+        },
+        "lpn_georef_twopt": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_georef_twopt_done": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_georef_twopt_pick1": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_georef_twopt_pick2": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "lpn_georef_twopt_same": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_georef_twopt_tip": {
+            "words": 53,
+            "ends_sentence": true
         },
         "lpn_georef_unavailable": {
             "words": 12,
@@ -4544,6 +5591,10 @@
             "words": 16,
             "ends_sentence": true
         },
+        "lpn_inp_drop_demand_model": {
+            "words": 56,
+            "ends_sentence": true
+        },
         "lpn_inp_drop_demand_pattern": {
             "words": 28,
             "ends_sentence": true
@@ -4556,8 +5607,16 @@
             "words": 30,
             "ends_sentence": true
         },
+        "lpn_inp_drop_energy": {
+            "words": 37,
+            "ends_sentence": true
+        },
         "lpn_inp_drop_eps": {
             "words": 24,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_file_options": {
+            "words": 41,
             "ends_sentence": true
         },
         "lpn_inp_drop_gpv_curve": {
@@ -4570,6 +5629,10 @@
         },
         "lpn_inp_drop_headloss": {
             "words": 33,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_other_options": {
+            "words": 26,
             "ends_sentence": true
         },
         "lpn_inp_drop_patterns": {
@@ -4588,8 +5651,28 @@
             "words": 18,
             "ends_sentence": true
         },
+        "lpn_inp_drop_quality_options": {
+            "words": 63,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_report": {
+            "words": 39,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_rules": {
+            "words": 42,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_sections": {
+            "words": 32,
+            "ends_sentence": true
+        },
         "lpn_inp_drop_setting": {
             "words": 16,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_tags": {
+            "words": 43,
             "ends_sentence": true
         },
         "lpn_inp_drop_tank_curve": {
@@ -4768,14 +5851,6 @@
             "words": 19,
             "ends_sentence": true
         },
-        "lpn_settings_default_pattern": {
-            "words": 3,
-            "ends_sentence": false
-        },
-        "lpn_settings_default_pattern_tip": {
-            "words": 8,
-            "ends_sentence": true
-        },
         "lpn_library_menu": {
             "words": 1,
             "ends_sentence": false
@@ -4896,6 +5971,10 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_menu_map": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_menu_project": {
             "words": 1,
             "ends_sentence": false
@@ -4905,10 +5984,6 @@
             "ends_sentence": true
         },
         "lpn_menu_settings": {
-            "words": 1,
-            "ends_sentence": false
-        },
-        "lpn_menu_map": {
             "words": 1,
             "ends_sentence": false
         },
@@ -4952,6 +6027,10 @@
             "words": 32,
             "ends_sentence": true
         },
+        "lpn_mode_vertices": {
+            "words": 43,
+            "ends_sentence": true
+        },
         "lpn_net_bad_file": {
             "words": 36,
             "ends_sentence": true
@@ -4962,6 +6041,26 @@
         },
         "lpn_new_blank_us": {
             "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_new_coords": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_new_coords_geo": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_new_coords_tip": {
+            "words": 55,
+            "ends_sentence": true
+        },
+        "lpn_new_coords_xy": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_new_create": {
+            "words": 1,
             "ends_sentence": false
         },
         "lpn_new_example_si": {
@@ -4984,8 +6083,24 @@
             "words": 6,
             "ends_sentence": false
         },
+        "lpn_new_place": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_new_place_hint": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_new_place_tip": {
+            "words": 42,
+            "ends_sentence": true
+        },
         "lpn_new_text": {
             "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_new_title": {
+            "words": 2,
             "ends_sentence": false
         },
         "lpn_notes_1_def": {
@@ -5132,6 +6247,14 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_profile_delete": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_profile_delete_confirm": {
+            "words": 11,
+            "ends_sentence": true
+        },
         "lpn_profile_draw": {
             "words": 6,
             "ends_sentence": false
@@ -5152,6 +6275,26 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_profile_edit": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_profile_edit_click": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_profile_edit_nowhere": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "lpn_profile_edit_tap": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_profile_edit_tip": {
+            "words": 18,
+            "ends_sentence": true
+        },
         "lpn_profile_from": {
             "words": 1,
             "ends_sentence": false
@@ -5168,6 +6311,18 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_profile_missing": {
+            "words": 13,
+            "ends_sentence": false
+        },
+        "lpn_profile_new": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_profile_new_name": {
+            "words": 2,
+            "ends_sentence": false
+        },
         "lpn_profile_no_path": {
             "words": 9,
             "ends_sentence": true
@@ -5180,8 +6335,24 @@
             "words": 12,
             "ends_sentence": true
         },
+        "lpn_profile_none_saved": {
+            "words": 4,
+            "ends_sentence": false
+        },
         "lpn_profile_pick": {
             "words": 11,
+            "ends_sentence": false
+        },
+        "lpn_profile_prompt_name": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_profile_rename": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_profile_saved": {
+            "words": 2,
             "ends_sentence": false
         },
         "lpn_profile_say_idle": {
@@ -5288,6 +6459,26 @@
             "words": 1,
             "ends_sentence": true
         },
+        "lpn_quality_age": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_quality_chemical": {
+            "words": 8,
+            "ends_sentence": false
+        },
+        "lpn_quality_needs_run": {
+            "words": 32,
+            "ends_sentence": true
+        },
+        "lpn_quality_none": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_quality_trace": {
+            "words": 2,
+            "ends_sentence": false
+        },
         "lpn_recent_denied": {
             "words": 13,
             "ends_sentence": true
@@ -5303,6 +6494,10 @@
         "lpn_replace_apply": {
             "words": 2,
             "ends_sentence": false
+        },
+        "lpn_replace_asked": {
+            "words": 11,
+            "ends_sentence": true
         },
         "lpn_replace_button": {
             "words": 1,
@@ -5328,9 +6523,17 @@
             "words": 3,
             "ends_sentence": false
         },
+        "lpn_replace_q_bad": {
+            "words": 14,
+            "ends_sentence": true
+        },
         "lpn_replace_scope": {
             "words": 10,
             "ends_sentence": true
+        },
+        "lpn_replace_source": {
+            "words": 3,
+            "ends_sentence": false
         },
         "lpn_replace_title": {
             "words": 4,
@@ -5342,6 +6545,10 @@
         },
         "lpn_reset_all_tip": {
             "words": 31,
+            "ends_sentence": true
+        },
+        "lpn_result_demand_tip": {
+            "words": 35,
             "ends_sentence": true
         },
         "lpn_result_flow": {
@@ -5372,9 +6579,25 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_result_source_share": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_result_source_share_tip": {
+            "words": 21,
+            "ends_sentence": true
+        },
         "lpn_result_velocity": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_result_water_age": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_result_water_age_tip": {
+            "words": 29,
+            "ends_sentence": true
         },
         "lpn_revert_confirm": {
             "words": 14,
@@ -5424,6 +6647,10 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_scenario_mark_tip": {
+            "words": 16,
+            "ends_sentence": true
+        },
         "lpn_scenario_menu": {
             "words": 1,
             "ends_sentence": false
@@ -5447,6 +6674,10 @@
         "lpn_scenario_overrides": {
             "words": 2,
             "ends_sentence": false
+        },
+        "lpn_scenario_overrides_tip": {
+            "words": 22,
+            "ends_sentence": true
         },
         "lpn_scenario_prompt_name": {
             "words": 4,
@@ -5580,6 +6811,14 @@
             "words": 13,
             "ends_sentence": true
         },
+        "lpn_settings_accuracy": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_settings_accuracy_tip": {
+            "words": 80,
+            "ends_sentence": true
+        },
         "lpn_settings_align_labels": {
             "words": 5,
             "ends_sentence": false
@@ -5664,6 +6903,26 @@
             "words": 25,
             "ends_sentence": true
         },
+        "lpn_settings_damp_limit": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_settings_damp_limit_tip": {
+            "words": 31,
+            "ends_sentence": true
+        },
+        "lpn_settings_default_is": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "lpn_settings_default_pattern": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_settings_default_pattern_tip": {
+            "words": 8,
+            "ends_sentence": true
+        },
         "lpn_settings_defaults": {
             "words": 2,
             "ends_sentence": false
@@ -5672,9 +6931,37 @@
             "words": 13,
             "ends_sentence": true
         },
+        "lpn_settings_demand_multiplier": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_demand_multiplier_tip": {
+            "words": 63,
+            "ends_sentence": true
+        },
+        "lpn_settings_elev_source": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_elev_source_dem": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_elev_source_tip": {
+            "words": 32,
+            "ends_sentence": true
+        },
+        "lpn_settings_elev_source_typed": {
+            "words": 4,
+            "ends_sentence": false
+        },
         "lpn_settings_emitter_exponent": {
             "words": 2,
             "ends_sentence": false
+        },
+        "lpn_settings_emitter_exponent_tip": {
+            "words": 41,
+            "ends_sentence": true
         },
         "lpn_settings_engine_epanet": {
             "words": 5,
@@ -5682,6 +6969,22 @@
         },
         "lpn_settings_engine_epanet_tip": {
             "words": 31,
+            "ends_sentence": true
+        },
+        "lpn_settings_flow_change": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_settings_flow_change_tip": {
+            "words": 38,
+            "ends_sentence": true
+        },
+        "lpn_settings_head_error": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_settings_head_error_tip": {
+            "words": 33,
             "ends_sentence": true
         },
         "lpn_settings_hydraulics": {
@@ -5704,6 +7007,14 @@
             "words": 3,
             "ends_sentence": false
         },
+        "lpn_settings_leader_snap": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_settings_leader_snap_tip": {
+            "words": 54,
+            "ends_sentence": true
+        },
         "lpn_settings_legend_bottom_left": {
             "words": 2,
             "ends_sentence": false
@@ -5718,6 +7029,10 @@
         },
         "lpn_settings_legend_middle_right": {
             "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_legend_off": {
+            "words": 1,
             "ends_sentence": false
         },
         "lpn_settings_legend_position": {
@@ -5760,6 +7075,10 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_settings_option_unset": {
+            "words": 2,
+            "ends_sentence": false
+        },
         "lpn_settings_page": {
             "words": 1,
             "ends_sentence": false
@@ -5774,6 +7093,26 @@
         },
         "lpn_settings_push_note": {
             "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_settings_quality": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_quality_source": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_quality_source_tip": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_settings_quality_track": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_quality_track_tip": {
+            "words": 32,
             "ends_sentence": true
         },
         "lpn_settings_readability_bias": {
@@ -5808,12 +7147,32 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_settings_show_arrows": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_settings_show_arrows_tip": {
+            "words": 34,
+            "ends_sentence": true
+        },
         "lpn_settings_show_titles": {
             "words": 3,
             "ends_sentence": false
         },
         "lpn_settings_show_titles_tip": {
             "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_settings_snap_off": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_settings_specific_gravity": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_specific_gravity_tip": {
+            "words": 19,
             "ends_sentence": true
         },
         "lpn_settings_symbol_opacity": {
@@ -5846,6 +7205,46 @@
         },
         "lpn_settings_tolerance_tip": {
             "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_settings_trials": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_trials_tip": {
+            "words": 17,
+            "ends_sentence": true
+        },
+        "lpn_settings_unbalanced": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_settings_unbalanced_continue": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_settings_unbalanced_stop": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_settings_unbalanced_tip": {
+            "words": 55,
+            "ends_sentence": true
+        },
+        "lpn_settings_unbalanced_trials": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_settings_unbalanced_trials_tip": {
+            "words": 26,
+            "ends_sentence": true
+        },
+        "lpn_settings_viscosity": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_viscosity_tip": {
+            "words": 21,
             "ends_sentence": true
         },
         "lpn_settings_wipe_btn": {
@@ -5964,6 +7363,10 @@
             "words": 30,
             "ends_sentence": true
         },
+        "lpn_terrain_blank_ids": {
+            "words": 7,
+            "ends_sentence": false
+        },
         "lpn_terrain_busy": {
             "words": 9,
             "ends_sentence": true
@@ -6008,9 +7411,21 @@
             "words": 24,
             "ends_sentence": true
         },
+        "lpn_terrain_filled_ids": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_terrain_ids_more": {
+            "words": 4,
+            "ends_sentence": false
+        },
         "lpn_terrain_keep": {
             "words": 11,
             "ends_sentence": true
+        },
+        "lpn_terrain_keep_ids": {
+            "words": 4,
+            "ends_sentence": false
         },
         "lpn_terrain_menu": {
             "words": 6,
@@ -6059,6 +7474,10 @@
         "lpn_terrain_undo": {
             "words": 9,
             "ends_sentence": true
+        },
+        "lpn_terrain_will_ids": {
+            "words": 7,
+            "ends_sentence": false
         },
         "lpn_terrain_working": {
             "words": 4,
@@ -6314,6 +7733,14 @@
         },
         "lpn_tool_undo_tip": {
             "words": 4,
+            "ends_sentence": true
+        },
+        "lpn_tool_vertices": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_vertices_tip": {
+            "words": 42,
             "ends_sentence": true
         },
         "lpn_tool_zoom_extent": {
@@ -7564,6 +8991,10 @@
             "words": 1,
             "ends_sentence": false
         },
+        "u_day": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "u_depthFrac": {
             "words": 1,
             "ends_sentence": false
@@ -7617,6 +9048,10 @@
             "ends_sentence": false
         },
         "u_hp": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_hr": {
             "words": 1,
             "ends_sentence": false
         },

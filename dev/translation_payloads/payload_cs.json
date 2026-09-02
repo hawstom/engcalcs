@@ -2,7 +2,7 @@
     "meta": {
         "language": "cs",
         "expected_key_count": 1537,
-        "delta_key_count": 2,
+        "delta_key_count": 4,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -510,14 +510,34 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_geomap": "lat\/lon",
         "lpn_find_q_and": "AND",
-        "lpn_find_q_or": "OR"
+        "lpn_find_q_or": "OR",
+        "lpn_new_coords_geo": "lat\/lon"
     },
     "keys": {
+        "lpn_geomap": "lat\/lon",
         "lpn_find_q_and": "AND",
-        "lpn_find_q_or": "OR"
+        "lpn_find_q_or": "OR",
+        "lpn_new_coords_geo": "lat\/lon"
     },
     "key_context": {
+        "lpn_geomap": {
+            "reason": "equal_to_english",
+            "current_value": "lat\/lon",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_tip",
+                    "value": "Snímky terénu od Mapboxu, stahované z internetu při posunu a přiblížení. Užitečné pro zjištění, kudy potrubí ve skutečnosti vede. Vaše síť se vykresluje bez ohledu na to, zda jsou snímky zobrazeny.",
+                    "english": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_geo",
+                    "value": "Otevřít soubor xy na mapě…",
+                    "english": "Open an xy file on the map…"
+                }
+            }
+        },
         "lpn_find_q_and": {
             "reason": "equal_to_english",
             "current_value": "AND",
@@ -549,7 +569,25 @@
                     "english": "The controls cannot express the query below, so they are hidden."
                 }
             }
+        },
+        "lpn_new_coords_geo": {
+            "reason": "equal_to_english",
+            "current_value": "lat\/lon",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_coords_xy",
+                    "value": "souřadnice xy",
+                    "english": "xy coordinates"
+                },
+                "next_translated": {
+                    "key": "lpn_new_coords_tip",
+                    "value": "Projekt xy používá souřadnice, které nejsou zeměpisnou šířkou a délkou. Projekt lat\/lon má zeměpisné souřadnice, takže za ním lze nakreslit mapu ulic nebo satelitní snímek a nadmořské výšky uzlů lze načíst z terénu. Projekt xy lze převést na lat\/lon pomocí Soubor, Otevřít soubor xy na mapě.",
+                    "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
+                }
+            }
         }
     },
-    "key_syn": []
+    "key_syn": {
+        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map"
+    }
 }

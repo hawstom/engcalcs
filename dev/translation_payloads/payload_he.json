@@ -2,8 +2,8 @@
     "meta": {
         "language": "he",
         "expected_key_count": 1537,
-        "delta_key_count": 1,
-        "exempt_key_count": 20,
+        "delta_key_count": 3,
+        "exempt_key_count": 21,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -21,6 +21,7 @@
             "lpn_ex_net1_title",
             "lpn_ex_net2_title",
             "lpn_ex_net3_title",
+            "lpn_ex_net3_world_title",
             "lpn_ex_elm_street_title",
             "lpn_xymap",
             "lpn_field_x",
@@ -504,12 +505,48 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_geomap": "lat\/lon",
+        "lpn_new_coords_geo": "lat\/lon",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "keys": {
+        "lpn_geomap": "lat\/lon",
+        "lpn_new_coords_geo": "lat\/lon",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "key_context": {
+        "lpn_geomap": {
+            "reason": "equal_to_english",
+            "current_value": "lat\/lon",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_tip",
+                    "value": "תצלומי הקרקע מ-Mapbox, הנטענים דרך האינטרנט תוך כדי הזזה והגדלה. שימושי לראות היכן צינור עובר במציאות. הרשת שלכם מצוירת בין אם התצלומים מוצגים ובין אם לא.",
+                    "english": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_geo",
+                    "value": "פתיחת קובץ xy על המפה…",
+                    "english": "Open an xy file on the map…"
+                }
+            }
+        },
+        "lpn_new_coords_geo": {
+            "reason": "equal_to_english",
+            "current_value": "lat\/lon",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_coords_xy",
+                    "value": "קואורדינטות xy",
+                    "english": "xy coordinates"
+                },
+                "next_translated": {
+                    "key": "lpn_new_coords_tip",
+                    "value": "פרויקט xy משתמש בקואורדינטות שאינן קו רוחב וקו אורך. לפרויקט lat\/lon יש קואורדינטות גיאוגרפיות, כך שניתן לצייר מאחוריו מפת רחובות או תמונת לוויין, ואפשר לקרוא רומי צמתים מפני הקרקע. ניתן להמיר פרויקט xy לlat\/lon באמצעות קובץ, פתיחת קובץ xy על המפה.",
+                    "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
+                }
+            }
+        },
         "lpn_labels_col_decimals_example": {
             "reason": "equal_to_english",
             "current_value": "0.000",
@@ -527,5 +564,7 @@
             }
         }
     },
-    "key_syn": []
+    "key_syn": {
+        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map"
+    }
 }

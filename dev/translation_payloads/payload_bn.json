@@ -2,7 +2,7 @@
     "meta": {
         "language": "bn",
         "expected_key_count": 1537,
-        "delta_key_count": 1,
+        "delta_key_count": 3,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -509,12 +509,48 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_geomap": "lat\/lon",
+        "lpn_new_coords_geo": "lat\/lon",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "keys": {
+        "lpn_geomap": "lat\/lon",
+        "lpn_new_coords_geo": "lat\/lon",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "key_context": {
+        "lpn_geomap": {
+            "reason": "equal_to_english",
+            "current_value": "lat\/lon",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_satellite_tip",
+                    "value": "Mapbox থেকে নেওয়া ভূমির আলোকচিত্র, আপনি মানচিত্র সরালে বা জুম করলে ইন্টারনেট থেকে আনা হয়। একটি পাইপ বাস্তবে কোথা দিয়ে যায় তা দেখতে সহায়ক। আপনার নেটওয়ার্ক এই চিত্র দেখানো হোক বা না হোক, একইভাবে আঁকা থাকে।",
+                    "english": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_geo",
+                    "value": "একটি xy ফাইল মানচিত্রে খুলুন…",
+                    "english": "Open an xy file on the map…"
+                }
+            }
+        },
+        "lpn_new_coords_geo": {
+            "reason": "equal_to_english",
+            "current_value": "lat\/lon",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_coords_xy",
+                    "value": "xy স্থানাঙ্ক",
+                    "english": "xy coordinates"
+                },
+                "next_translated": {
+                    "key": "lpn_new_coords_tip",
+                    "value": "একটি xy প্রকল্প এমন স্থানাঙ্ক ব্যবহার করে যা অক্ষাংশ ও দ্রাঘিমাংশ নয়। একটি lat\/lon প্রকল্পে ভৌগোলিক স্থানাঙ্ক থাকে, তাই এর পেছনে একটি রাস্তার মানচিত্র বা স্যাটেলাইট চিত্র আঁকা যায় এবং নোডের উচ্চতা ভূমিরূপ থেকে পড়া যায়। একটি xy প্রকল্পকে ফাইল, একটি xy ফাইল মানচিত্রে খুলুন দিয়ে lat\/lonে রূপান্তর করা যায়।",
+                    "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
+                }
+            }
+        },
         "lpn_labels_col_decimals_example": {
             "reason": "equal_to_english",
             "current_value": "0.000",
@@ -532,5 +568,7 @@
             }
         }
     },
-    "key_syn": []
+    "key_syn": {
+        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map"
+    }
 }
