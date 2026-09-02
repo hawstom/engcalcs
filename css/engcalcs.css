@@ -1871,25 +1871,16 @@ html[lang="zh"] .ec-welcome {
 #lpn_settings_box .lpn-set-secbody input[type="text"]:not([size]),
 #lpn_settings_box .lpn-set-secbody input.lpn-set-num { width: var(--lpn-set-num); box-sizing: border-box; }
 #lpn_settings_box .lpn-set-secbody select { width: 100%; max-width: var(--lpn-set-ctl); box-sizing: border-box; }
-/* **AN UNSET NUMBER IS LIVE, NOT DISABLED** (Tom, 2026-09-01, of Maximum trials: *"On PC it's
-   obviously disabled"* -- it is not, and nothing in this file or in js/looped-network.js ever sets
-   `disabled` on one of these). What he was reading is the only appearance an unset row has: an
-   empty box showing its default as a placeholder, in whatever grey the browser picks -- which in
-   Chrome is the same grey it greys a dead control with. A control that reads as dead IS dead, so
-   the appearance is the defect even though the state is correct.
+/* **AN UNSET HYDRAULICS NUMBER SHOWS NOTHING AT ALL** (Tom, 2026-09-01). This rule used to restyle
+   the placeholder -- darker and italic -- to stop an empty box reading as a DISABLED control, which
+   was a true diagnosis of a real problem and the wrong fix: it made a number that is not in the
+   document look more like one that is. He ruled the number out of the box entirely (*"There's no
+   value, and the tip states the default"*), so there is no placeholder on these rows left to style
+   and the default is appended to the row's tip instead. See hydNumberRow().
 
-   **THE FIX IS NOT TO PRE-FILL THE VALUE**, and that is the whole constraint: blank means "the
-   file did not say", an empty box exports no line and a typed default exports one stating the
-   default (see hydNumberRow()). Two different files, and only the user may choose between them.
-   So the placeholder is restyled instead -- darker than the disabled grey, and ITALIC, which is
-   what says "this is the value in force, not a value you typed". Nothing about the row's state
-   changes and no string moves.
-
-   Rejected: putting the word "default" in the placeholder. The number box is 4.5rem wide (Tom's
-   own ruling that these are as wide as the numbers they hold), so a placeholder of "40 (default)"
-   would be clipped to about "40 (def" -- and it would cost a new key in 27 languages to say what
-   the row's tip already says. */
-#lpn_settings_box .lpn-set-secbody input::placeholder { color: #555; opacity: 1; font-style: italic; }
+   Deliberately NOT a blanket `input::placeholder` rule for the page: the property popup's
+   unitNumberFieldBlank() still shows one, and that one is a different animal -- a live per-node
+   value (a reservoir head follows its own elevation), not a constant a tip could ever state. */
 /* A control that is a BOX PLUS A BUTTON -- the ID prefixes' "Apply to all", the label view width's
    "Use current view" -- stays inside the column and wraps its button under its box, rather than
    growing left out of the column and taking that row's one x with it. */

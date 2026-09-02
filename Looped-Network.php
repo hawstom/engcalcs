@@ -1406,6 +1406,7 @@ EngCalcs.pageConfig = {
 	lpn_engine_unavailable: <?=json_encode($ec_lang['lpn_engine_unavailable'])?>,
 	lpn_diag_valve_needs_epanet: <?=json_encode($ec_lang['lpn_diag_valve_needs_epanet'])?>,
 	lpn_diag_valve_on_fixed_head: <?=json_encode($ec_lang['lpn_diag_valve_on_fixed_head'])?>,
+	lpn_settings_default_is: <?=json_encode($ec_lang['lpn_settings_default_is'])?>,
 	lpn_diag_not_converged: <?=json_encode($ec_lang['lpn_diag_not_converged'])?>,
 	lpn_diag_not_converged_drawn: <?=json_encode($ec_lang['lpn_diag_not_converged_drawn'])?>,
 	lpn_diag_not_converged_trials: <?=json_encode($ec_lang['lpn_diag_not_converged_trials'])?>,

@@ -21668,8 +21668,26 @@ var EngCalcs = EngCalcs || {};
 			// **BLANK MEANS "THE FILE DID NOT SAY", NOT ZERO**, which is the whole sparseness rule
 			// seen from the interface: an empty box exports no line, and typing the default in
 			// exports a line stating the default. Both are legitimate and they are different files.
+			// **NO PLACEHOLDER, AND THAT IS TOM'S RULING** (2026-09-01): *"Why are there numerical
+			// placeholders in empty fields? That gives bad UX. Are there values or not? And what do
+			// the numbers mean if they are not really there?"* -- then, given the alternatives:
+			// *"Option 1 seems obvious to me without question. There's no value, and the tip states
+			// the default."*
+			//
+			// **THE BOX IS EMPTY BECAUSE THE DOCUMENT IS SILENT**, which is a real and load-bearing
+			// state: an empty box exports no line and a typed default exports one stating the
+			// default, and those are two different files (see the sparseness note above). A number
+			// sitting in the box is therefore a number that is NOT in the document, drawn in the one
+			// place a reader is entitled to read what is. It is also the same rule CLAUDE.md already
+			// states for results -- a number the user supplied and a number we did not are different
+			// kinds of thing and must never occupy the same field.
+			//
+			// **SUPERSEDED, recorded because it was shipped for one review and reads plausibly:**
+			// the placeholder was restyled darker and italic to stop it reading as a DISABLED
+			// control, which was a true diagnosis of a different problem and pushed the wrong way --
+			// it made the fake number look more like a real one. The default now lives in the tip,
+			// which is where Tom put it and where it costs nothing to read.
 			input.value = settings.hydraulics[key] === undefined ? '' : String(settings.hydraulics[key]);
-			input.placeholder = String(dflt);
 			input.addEventListener('change', function () {
 				var t = input.value.trim();
 				if (t === '') { delete settings.hydraulics[key]; }
@@ -21692,7 +21710,23 @@ var EngCalcs = EngCalcs || {};
 			// unit's internal name ('fth2o').
 			var labelText = pc[labelKey] || fallback;
 			if (o.unitOf) { labelText += ' (' + unitSymbol(o.unitOf) + ')'; }
-			row(compBody, labelText, input, pc[tipKey]);
+			// **THE OTHER HALF OF TOM'S RULING.** Taking the placeholder out only works if the
+			// default is somewhere, and he named where: *"There's no value, and the tip states the
+			// default."* It did not -- not one of the ten tips gave a number -- so it is appended
+			// here rather than written into ten already-translated strings.
+			//
+			// **ONE KEY, AS A WHOLE SENTENCE WITH A PLACEHOLDER, AND THAT IS THE SANCTIONED SHAPE.**
+			// CLAUDE.md forbids composing a LABEL from fragments, because word order and gender
+			// break it; this is not that. It is one complete sentence, true of every row it is
+			// appended to, joined to another complete sentence -- the same shape every `{n}` status
+			// message on this page already uses. Editing ten tips instead would put ten keys into
+			// English drift and buy a retranslation of each to say one number.
+			var tipText = pc[tipKey] || '';
+			if (dflt !== undefined && dflt !== null && dflt !== '') {
+				tipText = (tipText ? tipText + ' ' : '')
+					+ (pc.lpn_settings_default_is || 'The usual value is {n}.').replace('{n}', String(dflt));
+			}
+			row(compBody, labelText, input, tipText);
 		}
 		if (!settings.hydraulics) { settings.hydraulics = {}; }
 		hydNumberRow('accuracy', 'lpn_settings_accuracy', 'Accuracy',

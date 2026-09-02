@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 1526,
-        "delta_key_count": 212,
+        "expected_key_count": 1527,
+        "delta_key_count": 213,
         "exempt_key_count": 21,
         "exempt_keys": [
             "u_imgd",
@@ -560,6 +560,7 @@
         "lpn_settings_elev_source_typed": "The number above",
         "lpn_settings_elev_source_dem": "Mapbox DEM",
         "lpn_settings_accuracy": "Accuracy",
+        "lpn_settings_default_is": "The usual value is {n}.",
         "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.",
         "lpn_settings_specific_gravity": "Specific gravity",
         "lpn_settings_specific_gravity_tip": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
@@ -774,6 +775,7 @@
         "lpn_settings_elev_source_typed": "The number above",
         "lpn_settings_elev_source_dem": "Mapbox DEM",
         "lpn_settings_accuracy": "Accuracy",
+        "lpn_settings_default_is": "The usual value is {n}.",
         "lpn_settings_accuracy_tip": "How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.",
         "lpn_settings_specific_gravity": "Specific gravity",
         "lpn_settings_specific_gravity_tip": "The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.",
@@ -2398,6 +2400,22 @@
             }
         },
         "lpn_settings_accuracy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "ایمیٹر اظہاریہ",
+                    "english": "Emitter exponent"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_tolerance",
+                    "value": "ہم آہنگی کی رواداری",
+                    "english": "Convergence tolerance"
+                }
+            }
+        },
+        "lpn_settings_default_is": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

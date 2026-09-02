@@ -12,10 +12,10 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**18 still to read**, of 211 untranslated keys, of 1526 English keys. A key already marked _Ruled OK_ below needs nothing from you —
+**19 still to read**, of 212 untranslated keys, of 1527 English keys. A key already marked _Ruled OK_ below needs nothing from you —
 the ruling lapses by itself if the wording changes.
 
-## lpn_  (209)
+## lpn_  (210)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -513,6 +513,8 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_settings_damp_limit_tip`**
   > The accuracy at which the solver begins taking smaller steps, which can settle a network that is swinging back and forth. Zero, the usual value, means it never does. Only the EPANET solver reads this box.
   _Ruled OK 2026-09-01._
+- **`lpn_settings_default_is`**
+  > The usual value is {n}.
 - **`lpn_settings_demand_multiplier`**
   > Demand multiplier
   _Ruled OK 2026-08-29._

@@ -293,15 +293,31 @@ console.log('\n--- a box that fills the screen has to be scrollable by finger --
 	ok('and the box itself still claims the gesture, or no finger could drag it',
 		/\.lpn-dragpanel \{[^}]*touch-action:\s*none/.test(css));
 
-	// **AN UNSET NUMBER IN SETTINGS IS LIVE, NOT DISABLED** (Tom, 2026-09-01, of Maximum trials:
-	// *"On PC it's obviously disabled"*). It never was: nothing sets `disabled` on one of these.
-	// The fix is the placeholder's appearance, and the thing that must NOT happen is the other fix
-	// -- pre-filling the value, which would export a line the source file never had.
+	// **AN UNSET HYDRAULICS NUMBER SHOWS NOTHING AT ALL** (Tom, 2026-09-01).
+	//
+	// The first version of this section asserted the opposite -- that the placeholder carried the
+	// default and was styled as live text -- which was the answer to his FIRST report (*"On PC it's
+	// obviously disabled"*, of Maximum trials; it never was, nothing sets `disabled` on one of
+	// these). He then rejected the premise underneath that fix: *"Why are there numerical
+	// placeholders in empty fields? That gives bad UX. Are there values or not? And what do the
+	// numbers mean if they are not really there?"* -- and ruled: *"There's no value, and the tip
+	// states the default."*
+	//
+	// So the three assertions below are the ruling, and the fourth is the constraint neither
+	// version may break: **blank must keep meaning "the file did not say"**, because an empty box
+	// exports no line and a typed default exports one stating it. Those are two different files and
+	// only the user may choose between them.
 	ok('nothing disables a hydraulics number row', !/input\.disabled/.test(body('hydNumberRow')));
 	ok('...and blank still means "the file did not say"',
 		/input\.value = settings\.hydraulics\[key\] === undefined \? '' :/.test(body('hydNumberRow')));
-	ok('...so the placeholder is what carries the default, and it is drawn as live text',
-		/#lpn_settings_box \.lpn-set-secbody input::placeholder \{[^}]*color: #555/.test(css));
+	ok('an unset hydraulics row shows NO number: no placeholder is set',
+		!/input\.placeholder\s*=/.test(body('hydNumberRow')));
+	ok('...and no stylesheet rule is left dressing one up',
+		!/input::placeholder\s*\{/.test(css));
+	ok('...because the DEFAULT moved into the tip, as one whole sentence with a number in it',
+		/lpn_settings_default_is/.test(body('hydNumberRow'))
+		&& /\$ec_lang\['lpn_settings_default_is'\]='[^']*\{n\}[^']*';/
+			.test(fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8')));
 }
 
 console.log('');

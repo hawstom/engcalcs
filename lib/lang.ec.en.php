@@ -2429,6 +2429,12 @@ $ec_lang['lpn_settings_elev_source_tip']='Where a new node gets its elevation. T
 $ec_lang['lpn_settings_elev_source_typed']='The number above';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM';
 $ec_lang['lpn_settings_accuracy']='Accuracy';
+// **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
+// 2026-09-01: *"There's no value, and the tip states the default."*). A whole sentence with a
+// number in it, joined to the tip's own sentences -- not a fragment composed into a label, which is
+// the thing dev/language-strings.md forbids. It is true of every row it is appended to, which is
+// the test a shared sentence has to pass.
+$ec_lang['lpn_settings_default_is']='The usual value is {n}.';
 $ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
 $ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
