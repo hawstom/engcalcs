@@ -2905,7 +2905,7 @@ $ec_lang['lpn_ff_required']='Required fire flow';
 $ec_lang['lpn_ff_required_tip']='The flow required by your code or your fire authority at a hydrant. One junction at a time is tested against this same number.';
 $ec_lang['lpn_ff_residual']='Residual pressure to hold';
 $ec_lang['lpn_ff_residual_tip']='20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.';
-$ec_lang['lpn_ff_design']='Effect on the rest of the system';
+$ec_lang['lpn_ff_design']='Design check (effect on system)';
 $ec_lang['lpn_ff_design_tip']='A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.';
 $ec_lang['lpn_ff_design_off']='Do not check';
 $ec_lang['lpn_ff_design_nodes']='Every other junction';
@@ -2944,7 +2944,11 @@ $ec_lang['lpn_ff_cost']='{solves} network runs.';
 // The results are about the network as it stood when the run finished, so an edit clears them
 // rather than leaving a picture of a system that no longer exists.
 $ec_lang['lpn_ff_stale']='The drawing changed, so the fire flow results were cleared. Run it again.';
-$ec_lang['lpn_ff_summary']='{pass} passing, {fail} failing, {design} with a design issue.';
+// **COUNTED THE SAME WAY THE ROWS ARE READ, or the summary contradicts the table above it.** The
+// two failure modes are independent -- a junction can miss its fire flow AND pull its neighbours
+// down -- so these three do not add up to the number of junctions, and that is correct rather than
+// a rounding slip. Said as three separate facts for that reason.
+$ec_lang['lpn_ff_summary']='{clean} with nothing wrong. {fire} failed the fire flow. {design} affected the rest of the system.';
 $ec_lang['lpn_ff_summary_error']='{n} could not be answered.';
 // ONE WIDE TABLE, NOT TWO REPORTS (Tom, 2026-08-30, with a competitor's own table in front of him:
 // "Normally they are kind of wide and they include the information from both tables in one table.")
@@ -2969,6 +2973,20 @@ $ec_lang['lpn_ff_col_limit']='Design limit';
 // junction prints, where the dash means "checked, and nothing was pulled down" -- good news drawn
 // as no news.
 $ec_lang['lpn_ff_not_checked']='Not checked';
+// **THE CELL FOR A JUNCTION THAT FAILED BEFORE THE TEST BEGAN.** If the residual is already unmet
+// with nothing drawn, no fire flow test is run at all -- there is no available flow, no residual at
+// it and no pressure at the required flow, because none of those was ever measured. A dash said
+// that in a way nobody could read. Tom, 2026-09-02: *"I agree that a word or two is better."*
+$ec_lang['lpn_ff_static_failed']='Static failed, so not checked';
+// **THE LAST COLUMN NAMES WHAT WENT WRONG RATHER THAN GRADING THE JUNCTION** (Tom, 2026-09-02:
+// *"What if we call it Failure modes and it can have two words, Fire and Design?"*). The two are
+// independent: a junction can fail to deliver its fire flow AND pull its neighbours down, and the
+// old single verdict could only name one of them.
+$ec_lang['lpn_ff_col_modes']='Failure modes';
+$ec_lang['lpn_ff_mode_fire']='Fire';
+$ec_lang['lpn_ff_mode_design']='Design';
+// Nothing went wrong. A word, not a blank: a blank in this column would read as "not tested".
+$ec_lang['lpn_ff_mode_none']='None';
 $ec_lang['lpn_ff_col_solves']='Runs';
 $ec_lang['lpn_ff_col_result']='Result';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 1528,
-        "delta_key_count": 214,
+        "expected_key_count": 1533,
+        "delta_key_count": 219,
         "exempt_key_count": 43,
         "exempt_keys": [
             "u_depthFrac",
@@ -647,7 +647,7 @@
         "lpn_ff_required_tip": "The flow required by your code or your fire authority at a hydrant. One junction at a time is tested against this same number.",
         "lpn_ff_residual": "Residual pressure to hold",
         "lpn_ff_residual_tip": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
-        "lpn_ff_design": "Effect on the rest of the system",
+        "lpn_ff_design": "Design check (effect on system)",
         "lpn_ff_design_tip": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.",
         "lpn_ff_design_off": "Do not check",
         "lpn_ff_design_nodes": "Every other junction",
@@ -668,7 +668,7 @@
         "lpn_ff_stopped": "Stopped after {done} of {total} junctions. What is below is what had already been worked out.",
         "lpn_ff_cost": "{solves} network runs.",
         "lpn_ff_stale": "The drawing changed, so the fire flow results were cleared. Run it again.",
-        "lpn_ff_summary": "{pass} passing, {fail} failing, {design} with a design issue.",
+        "lpn_ff_summary": "{clean} with nothing wrong. {fire} failed the fire flow. {design} affected the rest of the system.",
         "lpn_ff_summary_error": "{n} could not be answered.",
         "lpn_ff_report_all": "Every junction tested",
         "lpn_ff_col_junction": "Junction",
@@ -680,6 +680,11 @@
         "lpn_ff_col_affected": "Drawdowns",
         "lpn_ff_col_limit": "Design limit",
         "lpn_ff_not_checked": "Not checked",
+        "lpn_ff_static_failed": "Static failed, so not checked",
+        "lpn_ff_col_modes": "Failure modes",
+        "lpn_ff_mode_fire": "Fire",
+        "lpn_ff_mode_design": "Design",
+        "lpn_ff_mode_none": "None",
         "lpn_ff_col_solves": "Runs",
         "lpn_ff_col_result": "Result",
         "lpn_ff_limit_pressure": "Pressure",
@@ -863,7 +868,7 @@
         "lpn_ff_required_tip": "The flow required by your code or your fire authority at a hydrant. One junction at a time is tested against this same number.",
         "lpn_ff_residual": "Residual pressure to hold",
         "lpn_ff_residual_tip": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
-        "lpn_ff_design": "Effect on the rest of the system",
+        "lpn_ff_design": "Design check (effect on system)",
         "lpn_ff_design_tip": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.",
         "lpn_ff_design_off": "Do not check",
         "lpn_ff_design_nodes": "Every other junction",
@@ -884,7 +889,7 @@
         "lpn_ff_stopped": "Stopped after {done} of {total} junctions. What is below is what had already been worked out.",
         "lpn_ff_cost": "{solves} network runs.",
         "lpn_ff_stale": "The drawing changed, so the fire flow results were cleared. Run it again.",
-        "lpn_ff_summary": "{pass} passing, {fail} failing, {design} with a design issue.",
+        "lpn_ff_summary": "{clean} with nothing wrong. {fire} failed the fire flow. {design} affected the rest of the system.",
         "lpn_ff_summary_error": "{n} could not be answered.",
         "lpn_ff_report_all": "Every junction tested",
         "lpn_ff_col_junction": "Junction",
@@ -896,6 +901,11 @@
         "lpn_ff_col_affected": "Drawdowns",
         "lpn_ff_col_limit": "Design limit",
         "lpn_ff_not_checked": "Not checked",
+        "lpn_ff_static_failed": "Static failed, so not checked",
+        "lpn_ff_col_modes": "Failure modes",
+        "lpn_ff_mode_fire": "Fire",
+        "lpn_ff_mode_design": "Design",
+        "lpn_ff_mode_none": "None",
         "lpn_ff_col_solves": "Runs",
         "lpn_ff_col_result": "Result",
         "lpn_ff_limit_pressure": "Pressure",
@@ -3788,6 +3798,66 @@
             }
         },
         "lpn_ff_not_checked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} tuile(s) de terrain n'ont pas répondu.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_static_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} tuile(s) de terrain n'ont pas répondu.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_col_modes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} tuile(s) de terrain n'ont pas répondu.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_mode_fire": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} tuile(s) de terrain n'ont pas répondu.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_mode_design": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_partial",
+                    "value": "{f} tuile(s) de terrain n'ont pas répondu.",
+                    "english": "{f} terrain tile(s) did not answer."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_ff_mode_none": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

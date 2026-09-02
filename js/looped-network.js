@@ -27070,7 +27070,13 @@ var EngCalcs = EngCalcs || {};
 	// ceiling is reported as delivering MORE than the ceiling; the ceiling is never printed as
 	// though the search had found it. A junction with no answer prints its reason, never a zero.
 	function ffAvailableText(rec) {
-		var pc = EngCalcs.pageConfig || {};
+		var pc = EngCalcs.pageConfig || {}, C = EngCalcs.lpnFireFlowCodes || {};
+		// The static failure gets the same sentence its two neighbouring columns get, so one row
+		// does not explain the same fact three different ways. Every OTHER no-answer keeps its own
+		// reason, which names something the user can act on.
+		if (rec.available === undefined && rec.code === C.BELOW_AT_REST) {
+			return pc.lpn_ff_static_failed || 'Static failed, so not checked';
+		}
 		if (rec.available === undefined) { return ffReasonText(rec); }
 		if (rec.atLeast) {
 			return (pc.lpn_ff_atleast || 'over {flow}').replace('{flow}', ffQty(rec.available, 'lpn_u_flow'));
@@ -27081,6 +27087,55 @@ var EngCalcs = EngCalcs || {};
 	// helper: every "we did not measure that" in the table goes through one place.
 	function ffMaybeQty(si, unitId) {
 		return (typeof si === 'number' && isFinite(si)) ? ffQty(si, unitId) : FF_DASH;
+	}
+	// **A JUNCTION THAT FAILED BEFORE THE TEST BEGAN SAYS SO, IN WORDS** (Tom, 2026-09-02: *"I agree
+	// that a word or two is better."*). Where the residual is already unmet with nothing drawn,
+	// js/lpn-fireflow.js returns before probing at the required flow -- so the available flow, the
+	// residual at it and the pressure at the required flow were never measured, and a dash was
+	// carrying that fact alone. It is the same distinction the Drawdowns column just learned: not
+	// measured is not the same as measured and empty.
+	function ffQtyOrWhy(rec, si, unitId) {
+		var pc = EngCalcs.pageConfig || {}, C = EngCalcs.lpnFireFlowCodes || {};
+		if (typeof si === 'number' && isFinite(si)) { return ffQty(si, unitId); }
+		if (rec.code === C.BELOW_AT_REST) {
+			return pc.lpn_ff_static_failed || 'Static failed, so not checked';
+		}
+		return FF_DASH;
+	}
+	// **WHAT WENT WRONG, NAMED, AND THE TWO ARE INDEPENDENT** (Tom, 2026-09-02: *"What if we call it
+	// Failure modes and it can have two words, Fire and Design?"*).
+	//
+	// **THIS FIXES AN INCOHERENCE THAT WAS ALREADY VISIBLE IN THE TABLE.** `rec.state` is decided in
+	// one place and is EXCLUSIVE -- js/lpn-fireflow.js returns FAIL before it ever considers the
+	// effects -- so a junction that both missed its fire flow AND pulled its neighbours down was
+	// printed as "Failing" beside a Drawdowns cell full of the design failure the verdict did not
+	// mention. The two questions are separate by construction and this column reports them that way.
+	//
+	// Read off the ANSWERS rather than off the state, deliberately: `available >= required` is the
+	// fire question and a non-empty effects list is the design one, which is what makes them
+	// independent without the state machine having to change underneath the colours and the marks.
+	// The summary, counted the way the Failure modes column is read. `set.modes` is independent of
+	// `set.counts`, so these three deliberately do not add up to the junction count -- see the note
+	// at the increment in js/lpn-fireflow.js.
+	function ffSummaryText(set) {
+		var pc = EngCalcs.pageConfig || {}, m = set.modes || { fire: 0, design: 0, clean: 0 };
+		return (pc.lpn_ff_summary
+			|| '{clean} with nothing wrong. {fire} failed the fire flow. {design} affected the rest of the system.')
+			.replace('{clean}', String(m.clean))
+			.replace('{fire}', String(m.fire))
+			.replace('{design}', String(m.design));
+	}
+	function ffModesText(rec) {
+		var pc = EngCalcs.pageConfig || {}, modes = [];
+		if (rec.available === undefined || !(rec.available >= rec.required)) {
+			modes.push(pc.lpn_ff_mode_fire || 'Fire');
+		}
+		if (rec.effects && (rec.effects.nodes.length || rec.effects.links.length)) {
+			modes.push(pc.lpn_ff_mode_design || 'Design');
+		}
+		// A word rather than a blank: a blank in this column would read as "not tested", which is
+		// the very confusion the rest of this row was just cleaned of.
+		return modes.length ? modes.join(', ') : (pc.lpn_ff_mode_none || 'None');
 	}
 	// **THE WORST THING THIS JUNCTION PULLED DOWN** -- the competitor's "Critical Asset". Their
 	// column names one element, so ours does too, and the rest are counted rather than listed: a
@@ -27198,10 +27253,7 @@ var EngCalcs = EngCalcs || {};
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_stopped || 'Stopped after {done} of {total} junctions.')
 				.replace('{done}', String(set.results.length)).replace('{total}', String(set.requested)), host);
 		}
-		ffEl('p', 'lpn-ff-summary', (pc.lpn_ff_summary || '{pass} passing, {fail} failing, {design} with a design issue.')
-			.replace('{pass}', String(set.counts.pass))
-			.replace('{fail}', String(set.counts.fail))
-			.replace('{design}', String(set.counts.design)), host);
+		ffEl('p', 'lpn-ff-summary', ffSummaryText(set), host);
 		if (set.counts.error) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || '{n} could not be answered.')
 				.replace('{n}', String(set.counts.error)), host);
@@ -27252,7 +27304,7 @@ var EngCalcs = EngCalcs || {};
 			pc.lpn_ff_col_affected || 'Drawdowns',
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
-			pc.lpn_ff_col_result || 'Result'
+			pc.lpn_ff_col_modes || 'Failure modes'
 		]);
 		shown.forEach(function (rec) {
 			var tr = ffEl('tr', 'lpn-ff-' + rec.state, null, body);
@@ -27263,13 +27315,13 @@ var EngCalcs = EngCalcs || {};
 			ffCell(tr, labelPrefixFor('node', 'id') + rec.id);
 			ffCell(tr, ffMaybeQty(rec.staticPressure, 'lpn_u_pressure'));
 			ffCell(tr, rec.required === undefined ? FF_DASH : ffQty(rec.required, 'lpn_u_flow'));
-			ffCell(tr, ffMaybeQty(rec.pressureAtRequired, 'lpn_u_pressure'));
+			ffCell(tr, ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'));
 			ffCell(tr, ffAvailableText(rec));
-			ffCell(tr, ffMaybeQty(rec.residualAt, 'lpn_u_pressure'));
+			ffCell(tr, ffQtyOrWhy(rec, rec.residualAt, 'lpn_u_pressure'));
 			ffCell(tr, ffCriticalText(rec));
 			ffCell(tr, ffLimitText(rec));
 			ffCell(tr, rec.solves === undefined ? FF_DASH : String(rec.solves));
-			ffCell(tr, ffStateText(rec.state));
+			ffCell(tr, ffModesText(rec));
 		});
 		ffMoreLine(host, sorted.length - shown.length);
 	}
@@ -27328,7 +27380,7 @@ var EngCalcs = EngCalcs || {};
 		ffRunUi.stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
 		ffRunUi.stop.type = 'button';
 		ffRunUi.stop.addEventListener('click', function () { fireFlowStop = true; });
-		updateFireFlowRunBox(0, { pass: 0, fail: 0, design: 0, error: 0 });
+		updateFireFlowRunBox(0, { pass: 0, fail: 0, design: 0, error: 0 }, { fire: 0, design: 0, clean: 0 });
 		box.style.display = 'block';
 		// **CENTRED THROUGH THE SAME SEAM EVERY STANDING BOX ON THIS PAGE USES** -- measured on
 		// every open rather than remembered, because the window may have changed and a box
@@ -27345,7 +27397,7 @@ var EngCalcs = EngCalcs || {};
 	// The running tally is the sweep's own four states, counted as the records arrive. It is the
 	// "maybe some other progress stats" half of the ruling and it is the same three sentences the
 	// finished report opens with, so a reader is not learning a second vocabulary mid-run.
-	function updateFireFlowRunBox(done, counts) {
+	function updateFireFlowRunBox(done, counts, modes) {
 		var pc = EngCalcs.pageConfig || {}, text;
 		if (!ffRunUi) { return; }
 		ffRunUi.fill.style.width =
@@ -27353,10 +27405,9 @@ var EngCalcs = EngCalcs || {};
 		ffRunUi.track.setAttribute('aria-valuenow', String(done));
 		ffRunUi.count.textContent = (pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
 			.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
-		text = (pc.lpn_ff_summary || '{pass} passing, {fail} failing, {design} with a design issue.')
-			.replace('{pass}', String(counts.pass))
-			.replace('{fail}', String(counts.fail))
-			.replace('{design}', String(counts.design));
+		// The running tally reads the same independent modes the finished report does, or the
+		// dialog and the table it turns into would count the same run two different ways.
+		text = ffSummaryText({ modes: modes || { fire: 0, design: 0, clean: 0 } });
 		if (counts.error) {
 			text += ' ' + (pc.lpn_ff_summary_error || '{n} could not be answered.')
 				.replace('{n}', String(counts.error));
@@ -27441,7 +27492,9 @@ var EngCalcs = EngCalcs || {};
 			// this text would appear once, at the end, saying it had finished.
 			onProgress: function (p) {
 				if (p.result && tally[p.result.state] !== undefined) { tally[p.result.state]++; }
-				updateFireFlowRunBox(p.done, tally);
+				// `p.modes` is the sweep's own running INDEPENDENT tally; `tally` stays the
+				// exclusive one and is still what carries the error count.
+				updateFireFlowRunBox(p.done, tally, p.modes);
 			},
 			shouldStop: function () { return fireFlowStop; }
 		}).then(function (set) {

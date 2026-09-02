@@ -90,6 +90,23 @@ function rowCount(el) {
 // The text of the first cell of every body row -- the Junction column, and nothing else. Needed
 // because the whole-report text cannot distinguish "the id is in column 1" from "the id is
 // mentioned somewhere on some row", which is the difference this file had to be able to see.
+// The nth (0-based) cell of every body row. rowFirstCells() is this with n = 0 and is kept because
+// the Junction column is asked for by name in several places.
+function rowNthCells(el, n) {
+	const out = [];
+	(function walk(x) {
+		if (!x) { return; }
+		if (String(x.tagName).toLowerCase() === 'tr') {
+			const cells = (x.childNodes || []).filter(function (c) {
+				return String(c.tagName).toLowerCase() === 'td';
+			});
+			if (cells.length > n) { out.push(textOf(cells[n]).trim()); }
+			return;
+		}
+		(x.childNodes || []).forEach(walk);
+	})(el);
+	return out;
+}
 function rowFirstCells(el) {
 	const out = [];
 	(function walk(n) {
@@ -135,8 +152,10 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	const controls = textOf(byId.lpn_ff_controls);
 	ok('it asks for the required fire flow', controls.indexOf('Required fire flow') >= 0);
 	ok('it asks which junctions to test', controls.indexOf('Junctions to test') >= 0);
+	// Tom, 2026-09-02: *"Most software has the word Design, doesn't it? Should we put 'Design check
+	// (effect on system)'?"* -- the profession's word first, the plain gloss in the bracket.
 	ok('it offers the design scope as a set chosen before the run',
-		controls.indexOf('Effect on the rest of the system') >= 0);
+		controls.indexOf('Design check (effect on system)') >= 0);
 	// **THE LOSS ACCOUNTING IS ON THE SCREEN** (Tom, 2026-08-25). Not a comment, not a code
 	// constant: the sentence a reader sees before they press Run.
 	// **THE LOSS ACCOUNTING IS A STATED METHOD, NOT A STATED ABSENCE** (Tom, 2026-08-30, reading the
@@ -207,8 +226,15 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	const runText = textOf(byId.lpn_ff_run_box);
 	ok('and nothing on the dialog forecasts a time',
 		!/(remaining|time left|estimated|eta\b|second|minute|hour)/i.test(runText), runText);
-	ok('the running tally is the same three states the report opens with',
-		samples.some(x => /passing/.test(x.tally) && /failing/.test(x.tally)));
+	// **THE DIALOG AND THE TABLE IT TURNS INTO MUST COUNT THE RUN THE SAME WAY** (2026-09-02). Both
+	// now read the INDEPENDENT modes rather than the exclusive states: a junction that missed its
+	// fire flow AND pulled its neighbours down is in both tallies, so these numbers do not add up to
+	// the junction count and that is correct. Counting the exclusive states here while the rows
+	// below name two modes each would have put a visible disagreement on one screen.
+	ok('the running tally counts the same failure modes the report does',
+		samples.some(x => /failed the fire flow/.test(x.tally) &&
+			/affected the rest of the system/.test(x.tally)),
+		JSON.stringify(samples.map(x => x.tally)));
 	ok('the dialog goes when the run ends', L.runUi().display === 'none');
 	if (process.env.FFDUMP) { console.log(JSON.stringify(set.results.map(r=>({id:r.id,state:r.state,code:r.code,avail:r.available,sp:r.staticPressure,req:r.required})),null,1)); }
 	ok('the run finished and was stored', !!set && set.ok === true);
@@ -238,7 +264,7 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	// 2026-09-01 ruling surviving the move: they are one reading, and a flow without the pressure it
 	// was held at is a number without its condition.
 	const wantOrder = ['Junction', 'Static pressure', 'Required flow', 'Pressure at required',
-		'Available flow', 'Residual held', 'Drawdowns', 'Design limit', 'Runs', 'Result'];
+		'Available flow', 'Residual held', 'Drawdowns', 'Design limit', 'Runs', 'Failure modes'];
 	let cursor = -1, inOrder = true;
 	wantOrder.forEach(function (h) {
 		const at = report.indexOf(h);
@@ -249,9 +275,10 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	ok('...and they appear in exactly that order', inOrder, wantOrder.join(' | '));
 	ok('and it is ten columns wide', headCells(byId.lpn_ff_report) === 10,
 		String(headCells(byId.lpn_ff_report)));
-	ok('the summary counts all three states',
-		report.indexOf('passing') >= 0 && report.indexOf('failing') >= 0 &&
-		report.indexOf('design issue') >= 0);
+	ok('the summary counts the two failure modes and the clean junctions',
+		report.indexOf('with nothing wrong') >= 0 &&
+		report.indexOf('failed the fire flow') >= 0 &&
+		report.indexOf('affected the rest of the system') >= 0);
 	ok('the ISO credit limit travels with the numbers', report.indexOf('ISO credits') >= 0);
 	// The table has a heading row plus one row per junction, capped -- the example is well under
 	// the cap, so every junction is printed.
@@ -308,6 +335,26 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	L.setNodeIdPrefix('');
 	L.rebuildFireFlowReport();
 
+	// **FAILURE MODES ARE INDEPENDENT, WHICH IS WHY THE COLUMN EXISTS** (Tom, 2026-09-02). `rec.state`
+	// is exclusive -- js/lpn-fireflow.js returns FAIL before it looks at the effects -- so a junction
+	// that missed its fire flow AND pulled its neighbours down used to be printed "Failing" beside a
+	// Drawdowns cell full of the design failure the verdict never mentioned.
+	const modeCells = rowNthCells(byId.lpn_ff_report, 9);
+	ok('every row names its failure modes',
+		modeCells.length === set.results.length,
+		modeCells.length + ' cells for ' + set.results.length + ' rows');
+	ok('a junction that passed both says None',
+		set.results.filter(r => r.state === 'pass').length === 0 ||
+		modeCells.indexOf('None') >= 0, JSON.stringify(modeCells));
+	const bothModes = set.results.filter(r =>
+		!(r.available >= r.required) && r.effects && (r.effects.nodes.length || r.effects.links.length));
+	if (bothModes.length) {
+		ok('a junction that failed BOTH names both, which the old single verdict could not',
+			modeCells.indexOf('Fire, Design') >= 0, JSON.stringify(modeCells));
+	} else {
+		ok('(no junction failed both in this network, so the paired cell is untested here)', true);
+	}
+
 	console.log('\n--- a cell with no number shows a dash, never a zero ---');
 	// A residual no junction in this network can hold with nothing drawn: every record comes back
 	// with no available flow at all, which is the state that must never print as a flow of zero.
@@ -319,6 +366,21 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	const blankText = textOf(byId.lpn_ff_report);
 	ok('and the table shows a dash where there is no number', blankText.indexOf('\u2013') >= 0);
 	ok('and never prints a flow of zero', !/\b0(\.0+)? gpm/.test(blankText), blankText.slice(0, 200));
+	// **AND THE THREE COLUMNS THAT WERE NEVER MEASURED SAY WHY** (Tom, 2026-09-02: *"I agree that a
+	// word or two is better."*). This is the BELOW_AT_REST state: the residual is unmet with nothing
+	// drawn, so js/lpn-fireflow.js never probes at the required flow and the available flow, the
+	// residual at it and the pressure at the required flow do not exist. A dash carried that alone.
+	ok('a junction that failed at rest says so instead of showing a bare dash',
+		blankText.indexOf('Static failed, so not checked') >= 0);
+	// **AND ITS DRAWDOWNS ARE STILL CHECKED, which is the thing Tom would not let go** (2026-09-02:
+	// *"What if I want a full system report, and node 99 doesn't need fire flow or barely fails, but
+	// some other nearby demand draws 99 down... Wouldn't I want to know that even though 99 failed
+	// its own flow test?"*). This branch used to return before the design readings, so the one case
+	// a system-wide report most wants a drawdown reading for was the one case with none.
+	ok('...but its drawdowns were still measured, at the cost of one more solve',
+		none.results.some(r => r.effects !== undefined),
+		none.results.filter(r => r.effects !== undefined).length + ' of ' + none.results.length +
+		' static-failing junctions carry an effects list');
 	L.setAsk('residual', '20');
 	await L.runFireFlowSweep();
 

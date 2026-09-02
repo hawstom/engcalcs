@@ -270,6 +270,29 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			if (rest.pressure < residual) {
 				rec.state = STATES.FAIL;
 				rec.code = CODES.BELOW_AT_REST;
+				// **THE DESIGN QUESTION IS STILL WORTH ASKING HERE, AND TOM ASKED FOR IT** (2026-09-02):
+				// *"What if I want a full system report, and node 99 doesn't need fire flow or barely
+				// fails, but some other nearby demand draws 99 down unless a PRV or PSV is installed.
+				// Wouldn't I want to know that even though 99 failed its own flow test?"*
+				//
+				// This branch used to return here, so a junction that failed at rest was the ONE case
+				// with no drawdown reading at all -- and it is the case a system-wide report most wants
+				// one for. Compliance is already decided and nothing below can change it; what the extra
+				// probe buys is the answer to a DIFFERENT question, which is the whole premise of the
+				// design half.
+				//
+				// **IT COSTS ONE MORE SOLVE PER STATIC-FAILING JUNCTION, and only for those.** A network
+				// where nothing fails at rest is unchanged. Guarded, because this is the one probe whose
+				// solve is genuinely likely to fail: drawing a fire flow at a junction that cannot hold
+				// its residual with nothing running can drive the network somewhere the solver will not
+				// follow. If it does fail we say so rather than invent an effect list.
+				if (ctx.design) {
+					return probe(required).then(function (atReq) {
+						if (!bad(atReq)) { rec.effects = ctx.sideEffects(atReq.result, node.id); }
+						rec.solves = solves;
+						return rec;
+					}, function () { rec.solves = solves; return rec; });
+				}
 				rec.solves = solves;
 				return rec;
 			}
@@ -379,7 +402,9 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	 *                { nodes: [ids], links: [ids], minPressure: m, maxVelocity: m/s } -- the SET is
 	 *                the caller's, picked before the run.
 	 *   maxFlow      search ceiling, SI. flowTol: bracket tolerance relative to it.
-	 *   onProgress   function({ done, total, id, result }) after every junction.
+	 *   onProgress   function({ done, total, id, result, modes }) after every junction. `modes`
+	 *                is the running INDEPENDENT tally the report reads; see the note at its
+	 *                increment for why it is not `counts`.
 	 *   shouldStop   function() -> true to abandon the sweep between junctions. The results already
 	 *                taken are returned, and `stopped` says so -- a stopped sweep is a partial
 	 *                answer, never a discarded one.
@@ -403,6 +428,9 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			yieldTo = opts.yield || defaultYield,
 			results = [],
 			counts = { pass: 0, fail: 0, design: 0, error: 0 },
+			// Independent of `counts`: a junction may appear in BOTH fire and design. See the note
+			// at the increment.
+			modes = { fire: 0, design: 0, clean: 0 },
 			totalSolves = 0,
 			stopped = false,
 			ctx,
@@ -462,8 +490,22 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			results.push(rec);
 			totalSolves += rec.solves || 0;
 			counts[rec.state]++;
+			// **THE MODE COUNTS ARE INDEPENDENT AND THE STATE COUNTS ARE NOT** (Tom, 2026-09-02,
+			// asking for a Failure modes column with two words in it). `rec.state` is decided in one
+			// place and is exclusive -- a junction that misses its fire flow is FAIL and is never
+			// also counted as DESIGN, even when it pulled half the town down doing it. That was
+			// invisible while the table printed one verdict; with the two modes side by side in
+			// every row, a summary counting the exclusive states would visibly disagree with the
+			// rows above it. So both are carried, and the report reads the modes.
+			if (rec.available === undefined || !(rec.available >= rec.required)) { modes.fire++; }
+			if (rec.effects && (rec.effects.nodes.length || rec.effects.links.length)) { modes.design++; }
+			if (rec.state !== STATES.ERROR
+				&& rec.available !== undefined && rec.available >= rec.required
+				&& !(rec.effects && (rec.effects.nodes.length || rec.effects.links.length))) {
+				modes.clean++;
+			}
 			if (opts.onProgress) {
-				opts.onProgress({ done: results.length, total: ids.length, id: rec.id, result: rec });
+				opts.onProgress({ done: results.length, total: ids.length, id: rec.id, result: rec, modes: modes });
 			}
 		}
 
@@ -498,6 +540,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 				results: results,
 				byId: index,
 				counts: counts,
+				modes: modes,
 				// What was asked, carried with the answers: a report that does not state its own
 				// criteria is a table of numbers nobody can check.
 				requested: ids.length,

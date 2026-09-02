@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read**, of 213 untranslated keys, of 1528 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**10 still to read**, of 218 untranslated keys, of 1533 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (211, 3 to read @@ NEEDS RULING)
+## lpn_  (216, 10 to read @@ NEEDS RULING)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -89,6 +89,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_ff_col_limit`**
   > Design limit
   _Ruled OK 2026-09-02._
+- **`lpn_ff_col_modes`**
+  > Failure modes
+  @@ NEEDS RULING
 - **`lpn_ff_col_required`**
   > Required flow
   _Ruled OK 2026-09-01._
@@ -108,8 +111,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > {solves} network runs.
   _Ruled OK 2026-09-02._
 - **`lpn_ff_design`**
-  > Effect on the rest of the system
-  _Ruled OK 2026-09-01._
+  > Design check (effect on system)
+  @@ NEEDS RULING
 - **`lpn_ff_design_all`**
   > Every other junction and every pipe
   _Ruled OK 2026-09-01._
@@ -185,6 +188,15 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_ff_minpressure_tip`**
   > A junction that falls below this while another one is drawing its fire flow is reported as a design issue.
   _Ruled OK 2026-09-01._
+- **`lpn_ff_mode_design`**
+  > Design
+  @@ NEEDS RULING
+- **`lpn_ff_mode_fire`**
+  > Fire
+  @@ NEEDS RULING
+- **`lpn_ff_mode_none`**
+  > None
+  @@ NEEDS RULING
 - **`lpn_ff_more`**
   > and {n} more
   _Ruled OK 2026-09-01._
@@ -242,6 +254,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_ff_state_pass`**
   > Passing
   _Ruled OK 2026-09-01._
+- **`lpn_ff_static_failed`**
+  > Static failed, so not checked
+  @@ NEEDS RULING
 - **`lpn_ff_steady`**
   > Only the current time step is tested. Fire flow is normally added to maximum day demand.
   _Ruled OK 2026-09-01._
@@ -252,8 +267,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Stopped after {done} of {total} junctions. What is below is what had already been worked out.
   _Ruled OK 2026-09-01._
 - **`lpn_ff_summary`**
-  > {pass} passing, {fail} failing, {design} with a design issue.
-  _Ruled OK 2026-09-01._
+  > {clean} with nothing wrong. {fire} failed the fire flow. {design} affected the rest of the system.
+  @@ NEEDS RULING
 - **`lpn_ff_summary_error`**
   > {n} could not be answered.
   _Ruled OK 2026-09-01._
@@ -394,7 +409,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-02._
 - **`lpn_inp_drop_quality_options`**
   > This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.
-  OK.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_report`**
   > This file holds EPANET's own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.
   _Ruled OK 2026-09-01._
