@@ -2454,6 +2454,11 @@ var EngCalcs = EngCalcs || {};
 	function overrideCount(scn) {
 		var total = 0;
 		Object.keys(scn.overrides || {}).forEach(function (key) { total += Object.keys(scn.overrides[key]).length; });
+		// **A DEMAND MULTIPLIER COUNTS AS ONE**, though it is not an element override and lives
+		// nowhere near `overrides`. This number is what the scenario menu shows beside a name, and
+		// it is read as "how much does this scenario change" -- a max-day scenario whose whole
+		// content is a 1.8 would otherwise say (0) and read as an empty scenario nobody finished.
+		if (typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier)) { total += 1; }
 		return total;
 	}
 	// Every scenario's overrides on one element -- what a Base-side deletion is about to destroy,
@@ -2525,6 +2530,11 @@ var EngCalcs = EngCalcs || {};
 		refreshSymbolSizes();
 		refreshValueColors();
 		refreshScenarioStatus();
+		// **THE SETTINGS BOX IS A NON-GREEDY BOX AND MAY BE OPEN RIGHT NOW.** Since the demand
+		// multiplier row reads a different home in Base and in a scenario, a switch made while it is
+		// open would leave that field showing the number belonging to the scenario you just left --
+		// and the next keystroke would write it into the wrong place.
+		rebuildSettingsBox();
 		scheduleSolve();
 		saveToStorage();
 	}
@@ -14561,6 +14571,11 @@ var EngCalcs = EngCalcs || {};
 			// The scenario the user is looking at, through the one resolver -- so an export from
 			// inside a scenario writes that scenario's numbers and not Base's.
 			effective: effective,
+			// The same rule for the one DOCUMENT-level option a scenario can carry: the export
+			// writes the scenario the user is looking at, so a max-day export states max day's
+			// multiplier. Undefined where the scenario inherits, which leaves the document's own
+			// line exactly as it was.
+			demandMultiplier: scenarioDemandMultiplier(),
 			// A label's box, so its centre anchor can be shifted to the upper-left corner EPANET
 			// means by a [LABELS] point. Measured, never assumed: see reanchorImportedLabels().
 			labelSize: function (lb) {
@@ -21941,18 +21956,32 @@ var EngCalcs = EngCalcs || {};
 			// control, which was a true diagnosis of a different problem and pushed the wrong way --
 			// it made the fake number look more like a real one. The default now lives in the tip,
 			// which is where Tom put it and where it costs nothing to read.
-			input.value = settings.hydraulics[key] === undefined ? '' : String(settings.hydraulics[key]);
+			// **ONE ROW, TWO HOMES** (planning engineer's wish list, row 1). `o.perScenario` marks an
+			// option a scenario may carry its own value of: inside a scenario the row reads and
+			// writes `activeScenario()[key]`, in Base it reads and writes the document's own
+			// `settings.hydraulics[key]`, and blank means "inherit" in the scenario exactly as it
+			// means "the file did not say" in Base. A second field labelled the same thing, in the
+			// same box, differing only by which scenario you are in, is how a user ends up typing
+			// max-day into the document.
+			var home = function () {
+				return (o.perScenario && !inBaseScenario()) ? activeScenario() : settings.hydraulics;
+			};
+			input.value = home()[key] === undefined ? '' : String(home()[key]);
 			input.addEventListener('change', function () {
-				var t = input.value.trim();
-				if (t === '') { delete settings.hydraulics[key]; }
+				var t = input.value.trim(), h = home();
+				if (t === '') { delete h[key]; }
 				// **ZERO IS A LEGAL VALUE FOR THREE OF THESE AND IS EPANET'S OWN DEFAULT FOR ALL
 				// THREE.** `HeadError 0`, `FlowChange 0` and `DampLimit 0` each mean "do not apply
 				// this test", which is a statement a file can make and a person can want back. The
 				// original >0 guard was right for a multiplier and an exponent and would have made
 				// these three rows unable to express their own default.
-				else if (isFinite(+t) && (o.allowZero ? +t >= 0 : +t > 0)) { settings.hydraulics[key] = +t; }
-				else { input.value = settings.hydraulics[key] === undefined ? '' : String(settings.hydraulics[key]); return; }
+				else if (isFinite(+t) && (o.allowZero ? +t >= 0 : +t > 0)) { h[key] = +t; }
+				else { input.value = h[key] === undefined ? '' : String(h[key]); return; }
 				if (key === 'emitterExponent') { settings.emitterExponent = settings.hydraulics[key] === undefined ? 0.5 : settings.hydraulics[key]; }
+				// The scenario menu shows an override COUNT beside every name, and this row can now
+				// change it. Refreshed here rather than left to the next scenario switch, so the
+				// badge is never one edit behind what the box says.
+				if (o.perScenario) { refreshScenarioStatus(); }
 				saveToStorage();
 				scheduleSolve();
 			});
@@ -21985,8 +22014,16 @@ var EngCalcs = EngCalcs || {};
 		if (!settings.hydraulics) { settings.hydraulics = {}; }
 		hydNumberRow('accuracy', 'lpn_settings_accuracy', 'Accuracy',
 			'lpn_settings_accuracy_tip', solveAccuracy());
+		// **THE ONE OPTION A SCENARIO MAY CARRY ITS OWN VALUE OF**, which is what makes average
+		// day / maximum day / peak hour one number each instead of one edit per junction. The
+		// default quoted in the tip is what BLANK would inherit -- inside a scenario that is the
+		// document's own number, not the bare 1, or the tip would state a default the row does not
+		// have.
 		hydNumberRow('demandMultiplier', 'lpn_settings_demand_multiplier', 'Demand multiplier',
-			'lpn_settings_demand_multiplier_tip', 1);
+			'lpn_settings_demand_multiplier_tip',
+			inBaseScenario() ? 1 : ((settings.hydraulics || {}).demandMultiplier === undefined
+				? 1 : settings.hydraulics.demandMultiplier),
+			{ perScenario: true });
 		hydNumberRow('specificGravity', 'lpn_settings_specific_gravity', 'Specific gravity',
 			'lpn_settings_specific_gravity_tip', 1);
 		hydNumberRow('viscosity', 'lpn_settings_viscosity', 'Relative viscosity',
@@ -26087,15 +26124,43 @@ var EngCalcs = EngCalcs || {};
 	 * stay in the units the file stated (the `libPatterns()` lesson -- a getter that assigns is a
 	 * writer wearing a reader's name).
 	 */
-	function engineHydraulics(hyd) {
+	function engineHydraulics(hyd, scenarioDM) {
 		var out = {}, k;
 		for (k in hyd) { if (Object.prototype.hasOwnProperty.call(hyd, k)) { out[k] = hyd[k]; } }
+		// The active scenario's own demand multiplier replaces the document's, and only when it has
+		// one -- undefined leaves the document's own key exactly as it was, present or absent.
+		if (scenarioDM !== undefined) { out.demandMultiplier = scenarioDM; }
 		if (typeof out.headError === 'number') { out.headError = toSI(out.headError, 'lpn_u_elevhead'); }
 		if (typeof out.flowChange === 'number') { out.flowChange = toSI(out.flowChange, 'lpn_u_flow'); }
 		return out;
 	}
+	// **A SCENARIO MAY CARRY ITS OWN DEMAND MULTIPLIER** (the utility planning engineer's wish list,
+	// row 1; Tom: *"Nice."*). The same three scenario names recur across every published water
+	// master plan the agent read, independently: average day, maximum day, peak hour. Today the only
+	// way to build "max day" as an overlay on "average day" is to hand-edit every junction's demand
+	// in the new scenario -- survivable at ten nodes, real friction at twenty -- because the one
+	// bulk-write tool is Base-only by design.
+	//
+	// **IT IS THE OPTION THAT ALREADY EXISTS, MADE SCENARIO-OVERRIDABLE, NOT A FOURTH MULTIPLIER.**
+	// Task 553's `settings.hydraulics.demandMultiplier` is EPANET's own `[OPTIONS] Demand
+	// Multiplier`, and EPANET has exactly one of them per file -- which is what a scenario already
+	// stands in for. A separate scenario-only field would be a second concept doing the same job.
+	//
+	// **A SCALAR ON THE SCENARIO, NOT A `setProp()` OVERRIDE.** That seam is for node, link and
+	// label properties, keyed by element (`scenario_seam_check.php` guards it); a document-level
+	// option has no element to key on, so routing it through there would mean inventing a fake
+	// one. ABSENT means "inherit", which is the same sparseness rule the option itself already has.
+	//
+	// **AND AN OVERRIDDEN NODE DEMAND IS NOT AN ESCAPE FROM IT** -- it is multiplied exactly like a
+	// Base one. That is EPANET's own behaviour and WNTR's, and it is already what this function's
+	// caller does to the document-wide multiplier; no third convention was found.
+	function scenarioDemandMultiplier() {
+		var m = activeScenario().demandMultiplier;
+		return (typeof m === 'number' && isFinite(m)) ? m : undefined;
+	}
 	function docDemandMultiplier() {
-		var m = (settings.hydraulics || {}).demandMultiplier;
+		var m = scenarioDemandMultiplier();
+		if (m === undefined) { m = (settings.hydraulics || {}).demandMultiplier; }
 		return (typeof m === 'number' && isFinite(m)) ? m : 1;
 	}
 	function resolvedDemand(n) {
@@ -26337,7 +26402,12 @@ var EngCalcs = EngCalcs || {};
 			// Converted HERE because this is the only place that knows the project's units, and on
 			// a CLONE because `settings.hydraulics` is the document's own copy in the document's
 			// own units, which the exporter must keep character for character.
-			hydraulics: engineHydraulics(hyd),
+			// **AND THE SCENARIO'S DEMAND MULTIPLIER, NOT THE DOCUMENT'S.** On a one-instant run
+			// the demands handed over already carry it (resolvedDemand()); on an extended-period
+			// run the engine does the multiplying from this option, so this is the only place it
+			// can arrive. Passed as the resolved value or as undefined, so a document that states
+			// nothing and a scenario that inherits still write no line at all.
+			hydraulics: engineHydraulics(hyd, scenarioDemandMultiplier()),
 			// **THE WATER-QUALITY ANALYSIS THE DOCUMENT ASKS FOR** -- read by js/lpn-epanet.js and
 			// by nothing else, because quality is time-dependent by nature and only a RUN can
 			// produce one. js/lpn-solver.js has no time dimension and is not being given one.

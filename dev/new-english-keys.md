@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read**, of 221 untranslated keys, of 1536 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read**, of 221 untranslated keys, of 1536 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (219, 4 to read @@ NEEDS RULING)
+## lpn_  (219, 5 to read @@ NEEDS RULING)
 
 - **`lpn_demand_add`**
   > Add demand category
@@ -561,8 +561,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Demand multiplier
   _Ruled OK 2026-08-29._
 - **`lpn_settings_demand_multiplier_tip`**
-  > One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.
-  _Ruled OK 2026-08-29._
+  > One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project's.
+  @@ NEEDS RULING
 - **`lpn_settings_elev_source`**
   > Elevation from
   _Ruled OK 2026-08-29._

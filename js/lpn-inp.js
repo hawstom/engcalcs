@@ -1429,8 +1429,15 @@
 		return out;
 	}
 
-	function hydraulicOptionRows(hyd, row) {
+	// `scenarioDM`, when the caller supplies one, REPLACES the document's `Demand Multiplier` --
+	// the export writes the scenario the user is looking at, which is already what `opts.effective`
+	// does to every element property. Undefined leaves the document's own key exactly as it is,
+	// present or absent, so sparse in stays sparse out.
+	function hydraulicOptionRows(hyd, row, scenarioDM) {
 		var h = hyd || {}, out = '';
+		if (scenarioDM !== undefined && scenarioDM !== null) {
+			h = Object.assign({}, h, { demandMultiplier: scenarioDM });
+		}
 		LPN_OPT_LINES.forEach(function (pair) {
 			if (h[pair[0]] === undefined || h[pair[0]] === null) { return; }
 			out += row([pair[1], String(h[pair[0]])]) + '\n';
@@ -1449,6 +1456,7 @@
 	 *
 	 *   doc   the saved document shape (docFromInp / serializeProject)
 	 *   opts  .effective(el, prop)  scenario resolver; default is Base (`el['_' + prop]`)
+	 *         .demandMultiplier      the active scenario's own, if it has one; the document's otherwise
 	 *         .labelSize(label)     {w, h} of the rendered label IN MAP UNITS, for the corner shift
 	 *         .title                [TITLE] text; default doc.project.name
 	 *
@@ -1949,7 +1957,7 @@
 			// list is sparse -- see the importer's own note -- so a key absent here means the file
 			// did not state it and neither do we. That is what keeps a round trip byte-identical:
 			// EPANET's defaults written out explicitly would be eleven lines the source never had.
-			hydraulicOptionRows(settings.hydraulics, row) +
+			hydraulicOptionRows(settings.hydraulics, row, opts.demandMultiplier) +
 			// **THE WATER-QUALITY OPTIONS GO BACK OUT AS THE TEXT THEY CAME IN AS**, last, which is
 			// where EPANET's own writer puts them. Nothing here computes with them, so the file's
 			// own characters are the only honest form -- see the importer's note. Sparse in, sparse

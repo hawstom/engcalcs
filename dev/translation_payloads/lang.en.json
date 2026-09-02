@@ -1250,7 +1250,7 @@
         "lpn_settings_damp_limit_tip": "The accuracy at which the solver begins taking smaller steps, which can help a network that is swinging back and forth to converge. Zero means it never does. Only the EPANET solver reads this box.",
         "lpn_settings_option_unset": "Not stated",
         "lpn_settings_demand_multiplier": "Demand multiplier",
-        "lpn_settings_demand_multiplier_tip": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.",
+        "lpn_settings_demand_multiplier_tip": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project's.",
         "lpn_settings_tolerance": "Convergence tolerance",
         "lpn_settings_tolerance_tip": "How close the solver has to get before it stops. A smaller number is more exact and takes longer.",
         "lpn_settings_engine_epanet": "Solve with the EPANET solver",

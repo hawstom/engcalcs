@@ -455,8 +455,16 @@ console.log('\n--- a box that fills the screen has to be scrollable by finger --
 		JSON.stringify({ p1: p1.style.zIndex, p2: p2.style.zIndex, p3: p3.style.zIndex }));
 
 	ok('nothing disables a hydraulics number row', !/input\.disabled/.test(body('hydNumberRow')));
+	// **THE RULE, NOT THE OLD SPELLING OF IT.** This used to match `settings.hydraulics[key]`
+	// literally. The row grew a second HOME with the scenario demand multiplier (planning
+	// engineer's wish list row 1) -- in a scenario it reads `activeScenario()[key]` -- so the
+	// literal moved while the rule did not: blank is still "not stated", in whichever home, and
+	// still never a zero.
 	ok('...and blank still means "the file did not say"',
-		/input\.value = settings\.hydraulics\[key\] === undefined \? '' :/.test(body('hydNumberRow')));
+		/input\.value = home\(\)\[key\] === undefined \? '' :/.test(body('hydNumberRow')));
+	ok('...in whichever of the row\'s two homes the value lives',
+		/\(o\.perScenario && !inBaseScenario\(\)\) \? activeScenario\(\) : settings\.hydraulics/
+			.test(body('hydNumberRow')));
 	ok('an unset hydraulics row shows NO number: no placeholder is set',
 		!/input\.placeholder\s*=/.test(body('hydNumberRow')));
 	ok('...and no stylesheet rule is left dressing one up',
