@@ -597,25 +597,35 @@ console.log('\n7. the water-quality option round-trips, and changes only when th
 }
 done('the quality option survives being interpreted');
 
-// ---- 8. the two [OPTIONS] keys that name a FILE come back out ----------------------------------
+// ---- 8. every [OPTIONS] line the source stated comes back out ---------------------------------
 //
 // `Map` and `Hydraulics USE/SAVE` name a file beside the `.inp` -- a `.map` of coordinates, a `.hyd`
 // of already-solved hydraulics. This page can open neither and acts on neither, and it read past
 // both without keeping them, so an import and re-export DELETED a line the source stated. That is
 // the input-is-canonical rule broken in the same way [RULES] and the rest of [OPTIONS] each broke it
 // in turn. Carried now, and asserted here, because none of EPA's three models states either one.
-console.log('\n8. Map and Hydraulics USE/SAVE are carried, not deleted');
+//
+// **AND THE SAME ASSERTION FOR THE LINES NOBODY ENUMERATED**, which is the half that stops this
+// being fixed a fifth time: `Demand Model`, the three pressure-driven options that go with it, the
+// `Pressure` unit keyword and EPANET's own obsolete `Segments` are carried by DEFAULT, because the
+// reader now carries anything it has no branch for. `Demand Model PDA` is the worst of them and is
+// asserted by itself below: it used to parse as a MULTIPLIER, fall back to 1, and replace the line
+// with `Demand Multiplier 1` -- a value the file never stated, written over one it did.
+console.log('\n8. Map, Hydraulics USE/SAVE and every unread option are carried, not deleted');
 {
-	const text = [
+	const optionLines = [
+		' Units\tGPM', ' Headloss\tH-W', ' Map\tnetwork.map',
+		' Hydraulics\tUSE\tsaved.hyd',
+		' Demand Model\tPDA', ' Minimum Pressure\t0.0', ' Required Pressure\t20',
+		' Pressure Exponent\t0.5', ' Pressure\tpsi', ' Segments\t2'
+	];
+	const build = (opts) => [
 		'[TITLE]', 'carries a map and a hydraulics file', '',
 		'[JUNCTIONS]', ' J1\t100\t0', '',
 		'[RESERVOIRS]', ' R1\t220.0', '',
-		'[PIPES]', ' P1\tR1\tJ1\t1200\t12\t130\t0\tOpen', '',
-		'[OPTIONS]', ' Units\tGPM', ' Headloss\tH-W', ' Map\tnetwork.map',
-		' Hydraulics\tUSE\tsaved.hyd', '',
-		'[COORDINATES]', ' J1\t10.0\t10.0', ' R1\t0.0\t0.0', '',
-		'[END]', ''
-	].join('\n');
+		'[PIPES]', ' P1\tR1\tJ1\t1200\t12\t130\t0\tOpen', ''
+	].concat(['[OPTIONS]'], opts, ['', '[COORDINATES]', ' J1\t10.0\t10.0', ' R1\t0.0\t0.0', '', '[END]', '']).join('\n');
+	const text = build(optionLines);
 	const parsed = EngCalcs.lpnInpParse(text);
 	ok('the map file is read', parsed.fileOptions.map === 'network.map', JSON.stringify(parsed.fileOptions.map));
 	ok('and the hydraulics file with its keyword',
@@ -623,6 +633,10 @@ console.log('\n8. Map and Hydraulics USE/SAVE are carried, not deleted');
 	ok('and both are reported rather than kept quietly',
 		(parsed.dropped || []).some((d) => d.code === 'file-options'),
 		JSON.stringify((parsed.dropped || []).map((d) => d.code)));
+	ok('Demand Model is NOT read as a multiplier',
+		parsed.hydraulics.demandMultiplier === undefined, JSON.stringify(parsed.hydraulics.demandMultiplier));
+	ok('the six unread options are all carried', (parsed.fileOptions.other || []).length === 6,
+		JSON.stringify(parsed.fileOptions.other));
 	L.applyUnitSelections(L.inpUnitSelections(parsed));
 	const doc = L.docFromInp(parsed, 'carries');
 	const out = EngCalcs.lpnExportInp(doc);
@@ -635,6 +649,31 @@ console.log('\n8. Map and Hydraulics USE/SAVE are carried, not deleted');
 		rowFor('HYDRAULICS') && rowFor('HYDRAULICS').length === 3
 			&& rowFor('HYDRAULICS')[1] === 'USE' && rowFor('HYDRAULICS')[2] === 'saved.hyd',
 		JSON.stringify(rowFor('HYDRAULICS')));
+	// BYTE FOR BYTE, on the tokens themselves: `Minimum Pressure 0.0` must not come back as `0`,
+	// which is exactly what a parse-and-reformat would do to it.
+	const wantLines = [
+		['Demand', 'Model', 'PDA'], ['Minimum', 'Pressure', '0.0'], ['Required', 'Pressure', '20'],
+		['Pressure', 'Exponent', '0.5'], ['Pressure', 'psi'], ['Segments', '2']
+	];
+	wantLines.forEach((want) => {
+		const line = got.find((r) => r.join(' ') === want.join(' '));
+		ok('carried back character for character: ' + want.join(' '), !!line,
+			JSON.stringify(got.map((r) => r.join(' '))));
+	});
+	ok('no line was invented in its place',
+		!got.some((r) => r[0].toUpperCase() === 'DEMAND' && /^MULT/i.test(r[1] || '')),
+		JSON.stringify(got.map((r) => r.join(' '))));
+
+	// `Hydraulics SAVE` is the other half of the same keyword and takes the same path.
+	const saved = EngCalcs.lpnInpParse(build([' Units\tGPM', ' Headloss\tH-W', ' Hydraulics\tSAVE\tout.hyd']));
+	ok('SAVE is read as SAVE', saved.fileOptions.hydraulics === 'SAVE out.hyd',
+		JSON.stringify(saved.fileOptions.hydraulics));
+	L.applyUnitSelections(L.inpUnitSelections(saved));
+	const savedOut = EngCalcs.lpnExportInp(L.docFromInp(saved, 'saves'));
+	const savedRow = (tokensBySection(savedOut.inp).OPTIONS || []).find((r) => r[0].toUpperCase() === 'HYDRAULICS');
+	ok('and SAVE comes back naming the same file',
+		savedRow && savedRow[1] === 'SAVE' && savedRow[2] === 'out.hyd', JSON.stringify(savedRow));
+
 	// The other half of sparseness: a file that stated neither must not gain either.
 	const bare = EngCalcs.lpnExportInp(importDoc(refPath('Net1.inp')).doc);
 	const bareOpts = tokensBySection(bare.inp).OPTIONS || [];
@@ -643,6 +682,54 @@ console.log('\n8. Map and Hydraulics USE/SAVE are carried, not deleted');
 		JSON.stringify(bareOpts.map((r) => r[0])));
 }
 done('a line naming another file is not deleted');
+
+// ---- 9. and NONE of it reaches the engine's own writer -----------------------------------------
+//
+// **THE TWO WRITERS ARE NOT THE SAME WRITER AND MUST NOT DRIFT INTO EACH OTHER.**
+// `EngCalcs.lpnExportInp` writes the file a person keeps, in their own units, carrying everything.
+// `js/lpn-epanet.js`'s `lpnToInp` writes a throwaway input for the engine, in LPS and METRES always,
+// and EPANET REJECTS A WHOLE INPUT OVER ONE LINE IT DOES NOT RECOGNISE -- so a carried
+// `Map network.map`, or a `Segments 2` it no longer supports, would not degrade the run, it would
+// end it. Every [OPTIONS] keyword that writer emits is checked against a list here, so a future
+// carry wired into the wrong writer fails in this harness rather than in a user's browser.
+console.log('\n9. the engine\'s own writer emits only the options it chose');
+{
+	const solverEC = require(ROOT + 'js/lpn-solver.js');
+	Object.keys(solverEC).forEach((k) => { global.EngCalcs[k] = solverEC[k]; });
+	require(ROOT + 'js/lpn-epanet.js');
+	// A model carrying every carried thing, to prove the engine writer looks at none of it.
+	const model = {
+		method: 'hw',
+		hydraulics: { viscosity: 1.1, trials: 40 },
+		fileOptions: { map: 'network.map', hydraulics: 'USE saved.hyd', other: [['Segments', '2']] },
+		qualityOptions: { quality: 'Chlorine mg/L', diffusivity: '1.0', tolerance: '0.01' },
+		nodes: [
+			{ id: 'R', type: 'reservoir', elev: 0, head: 100 },
+			{ id: 'A', type: 'junction', elev: 0, demand: 0.02 }
+		],
+		links: [{ id: 'P1', type: 'pipe', from: 'R', to: 'A', length: 500, diameter: 0.3, roughness: 130, k: 0, status: 'open' }]
+	};
+	const built = EngCalcs.lpnToInp(model);
+	const inp = typeof built === 'string' ? built : (built && (built.inp || built.text));
+	ok('the engine writer produced an input', typeof inp === 'string' && inp.length > 0, JSON.stringify(Object.keys(built || {})));
+	const engineOpts = tokensBySection(inp || '').OPTIONS || [];
+	// EPANET's own keywords, and the FIRST token where the keyword is two words.
+	const ALLOWED = {
+		UNITS: 1, HEADLOSS: 1, EMITTER: 1, QUALITY: 1, VISCOSITY: 1, SPECIFIC: 1,
+		DEMAND: 1, TRIALS: 1, ACCURACY: 1, HEADERROR: 1, FLOWCHANGE: 1, DAMPLIMIT: 1,
+		CHECKFREQ: 1, MAXCHECK: 1, UNBALANCED: 1, PATTERN: 1, TOLERANCE: 1, DIFFUSIVITY: 1
+	};
+	engineOpts.forEach((r) => {
+		ok('the engine writer knows this keyword: ' + r[0], ALLOWED[(r[0] || '').toUpperCase()] === 1,
+			JSON.stringify(r));
+	});
+	ok('it writes LPS whatever the project holds', /Units\s+LPS/.test(inp || ''),
+		engineOpts.map((r) => r.join(' ')).join(' | '));
+	ok('the map file never reaches it', !/network\.map/.test(inp || ''));
+	ok('the hydraulics file never reaches it', !/saved\.hyd/.test(inp || ''));
+	ok('nor does a carried line it could not parse', !/Segments/i.test(inp || ''));
+}
+done('the engine writer carries none of it');
 
 console.log('');
 if (fails) { console.log(fails + ' FAILED of ' + checks); process.exit(1); }
