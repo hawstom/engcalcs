@@ -201,7 +201,10 @@ function pageSection() {
 	check(s.indexOf('The solve did not converge.') === 0,
 		'the status bar LEADS with the warning, ahead of every other note', JSON.stringify(s.slice(0, 60)));
 	check(s.indexOf('Do not use them') >= 0, 'and says plainly not to use them');
-	check(s.indexOf('7 trials') >= 0, 'the trial count is printed', JSON.stringify(s));
+	// **"iterations", NOT "trials"** -- EPANET names the INPUT `EN_Option.Trials` and the REPORTED
+	// COUNT `EN_AnalysisStatistic.Iterations`, and this is the reported count. Tom asked whether the
+	// two words were standing in for it (2026-09-02); the toolkit's own enums answered.
+	check(s.indexOf('7 iterations') >= 0, 'the iteration count is printed', JSON.stringify(s));
 	check(s.indexOf('0.0421') >= 0, 'the relative error is printed');
 	check(s.indexOf('0.0000100') >= 0,
 		'and the accuracy it was measured against', JSON.stringify(s));

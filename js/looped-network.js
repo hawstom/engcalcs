@@ -27586,14 +27586,19 @@ var EngCalcs = EngCalcs || {};
 				// gets the trials-only sentence rather than a number invented to fill the slot.
 				(typeof result.iterations === 'number' && result.iterations > 0
 					&& typeof result.relativeError === 'number' && typeof result.accuracy === 'number'
+					// **`{iterations}`, NOT `{trials}`, AND EPANET'S OWN ENUMS DECIDE IT** (Tom asked,
+					// 2026-09-02: *"I wonder about the words 'try' and 'trial'. Are they possibly
+					// standing in for 'iteration'?"*). They were. The toolkit names the INPUT
+					// `EN_Option.Trials` and the REPORTED COUNT `EN_AnalysisStatistic.Iterations` --
+					// the same passes, named by role -- and this number comes from the statistic.
 					? (pc.lpn_diag_not_converged_error
-						|| 'It stopped after {trials} trials at a relative error of {error}, against an accuracy of {accuracy}.')
-						.replace('{trials}', String(result.iterations))
+						|| 'It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.')
+						.replace('{iterations}', String(result.iterations))
 						.replace('{error}', result.relativeError.toPrecision(3))
 						.replace('{accuracy}', result.accuracy.toPrecision(3))
 					: (typeof result.iterations === 'number' && result.iterations > 0
-						? (pc.lpn_diag_not_converged_trials || 'It stopped after {trials} trials.')
-							.replace('{trials}', String(result.iterations))
+						? (pc.lpn_diag_not_converged_trials || 'It stopped after {iterations} iterations.')
+							.replace('{iterations}', String(result.iterations))
 						: ''))
 			].filter(function (t) { return !!t; }).join(' ');
 		}

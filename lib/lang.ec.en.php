@@ -1308,7 +1308,7 @@ $ec_lang['lpn_result_gradient_tip']='Head loss divided by the length of the pipe
 $ec_lang['lpn_result_water_age']='Water age';
 $ec_lang['lpn_result_water_age_tip']='How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.';
 $ec_lang['lpn_result_source_share']='Source share';
-$ec_lang['lpn_result_source_share_tip']='A source trace reports this share: of the water reaching this point, how much of it came from the trace node.';
+$ec_lang['lpn_result_source_share_tip']='The source trace share reports how much of the water reaching this point came from the trace node.';
 $ec_lang['lpn_result_head']='Head';
 $ec_lang['lpn_result_head_tip']='Energy of the water at this node, written as a height of water column. It is a height, not a pressure.';
 $ec_lang['lpn_result_pressure']='Pressure';
@@ -1866,11 +1866,11 @@ $ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. They are not 
 $ec_lang['lpn_inp_drop_eps']='This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in.';
 $ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_tags']='This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_tags']='This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_report']='This file holds EPANET\'s own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sections']='This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: Quality, which names what to follow through the pipes, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_file_options']='This file names another file beside it: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_file_options']='This file refers to a support file beside it: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
 $ec_lang['lpn_inp_drop_dangling']='These pipes name a junction that is not in the file, so they were left out.';
 $ec_lang['lpn_inp_drop_units']='The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.';
@@ -2106,11 +2106,11 @@ $ec_lang['lpn_diag_not_converged']='No solution was found. Check for values that
 // bar leads with this. `lpn_diag_not_converged` above is still the message for a solve that gave us
 // nothing at all; these are for one that gave us something we do not vouch for.
 // "Converge" is the profession's word and EPANET's own, and is deliberately not simplified.
-$ec_lang['lpn_diag_not_converged_drawn']='The solve did not converge. These numbers are the last try, not an answer. Do not use them.';
-$ec_lang['lpn_diag_not_converged_trials']='It stopped after {trials} trials.';
+$ec_lang['lpn_diag_not_converged_drawn']='The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.';
+$ec_lang['lpn_diag_not_converged_trials']='It stopped after {iterations} iterations.';
 // Both numbers are EPANET's own, read back from the engine after the run. The accuracy is the one
 // the engine actually used, which is not always the one the project asked for.
-$ec_lang['lpn_diag_not_converged_error']='It stopped after {trials} trials at a relative error of {error}, against an accuracy of {accuracy}.';
+$ec_lang['lpn_diag_not_converged_error']='It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.';
 $ec_lang['lpn_field_roughness']='Roughness';
 // Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
 // typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
@@ -2442,13 +2442,13 @@ $ec_lang['lpn_settings_accuracy']='Accuracy';
 // because the translator has no term to look up. See the correction added to
 // dev/language-strings.md and guarded by dev/scripts/plain_english_swap_check.php.
 $ec_lang['lpn_settings_default_is']='The default is {n}.';
-$ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.';
+$ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the flow still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
 $ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';
 $ec_lang['lpn_settings_viscosity_tip']='The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.';
 $ec_lang['lpn_settings_trials']='Maximum trials';
-$ec_lang['lpn_settings_trials_tip']='How many times the solver may try before it gives up on a network that will not converge.';
+$ec_lang['lpn_settings_trials_tip']='How many trials are allowed before the solver gives up on a network that will not converge.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
 // EPANET must be added and implemented unless research says otherwise"*). Written in OUR words and
 // not EPANET's -- there is no "Unbalanced" or "DampLimit" on the page, because a name only a person
@@ -2463,7 +2463,7 @@ $ec_lang['lpn_settings_unbalanced_tip']='What to do with a network that has used
 $ec_lang['lpn_settings_unbalanced_continue']='Keep trying';
 $ec_lang['lpn_settings_unbalanced_stop']='Stop there';
 $ec_lang['lpn_settings_unbalanced_trials']='Extra trials first';
-$ec_lang['lpn_settings_unbalanced_trials_tip']='How many further trials to allow after the maximum above is used up, before the last try is reported. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_unbalanced_trials_tip']='How many further trials to allow after the maximum above is used up, before the last trial is reported. Only the EPANET solver reads this box.';
 $ec_lang['lpn_settings_head_error']='Head error limit';
 $ec_lang['lpn_settings_head_error_tip']='An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.';
 $ec_lang['lpn_settings_flow_change']='Flow change limit';
@@ -2684,7 +2684,7 @@ $ec_lang['lpn_settings_quality']='Water quality';
 $ec_lang['lpn_settings_quality_track']='Track';
 $ec_lang['lpn_settings_quality_track_tip']='Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.';
 $ec_lang['lpn_settings_quality_source']='Trace node';
-$ec_lang['lpn_settings_quality_source_tip']='The point whose water is followed. Every other point then shows the share of its water that came from here.';
+$ec_lang['lpn_settings_quality_source_tip']='The point whose water is traced. Every other point then shows the share of its water that came from here.';
 $ec_lang['lpn_quality_none']='Nothing';
 $ec_lang['lpn_quality_age']='Water age';
 $ec_lang['lpn_quality_trace']='Source trace';

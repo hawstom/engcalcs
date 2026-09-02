@@ -53,6 +53,10 @@ $bad = [
     ['gerund', 'the network is settling nicely', ['converge']],
     ['rest pressure', 'The rest pressure at the hydrant.', ['static pressure']],
     ['pulled down', 'how far the tank is pulled down', ['drawdown']],
+    ['"try" as a countable noun, which is where it stands in for a pass of the solver',
+        'These numbers are the last try, not an answer.', ['trial (a setting) or iteration (a reported count)']],
+    ['and the phrase that carried it in the accuracy tip',
+        'the flow still changing from one try to the next', ['trial (a setting) or iteration (a reported count)']],
     ['two swaps in one string are both reported',
         'Zero, the usual value, means the network never settles.', ['converge', 'default']],
 ];
@@ -74,6 +78,17 @@ $good = [
     ['a word that merely contains the letters', 'The settlement of the tank foundation is not modelled.'],
     ['"static pressure", the term itself', 'Static pressure at the junction.'],
     ['"drawdown", the term itself', 'Drawdown at the tank.'],
+    // **THE EIGHT THAT WOULD HAVE KILLED THE "try" ROW.** Every one of these is a real shipped
+    // string. "try again" is ordinary English and the whole reason that row is anchored to an
+    // article rather than written on the bare word.
+    ['"try again" after a failure', 'Reload the page and try again.'],
+    ['"Try" opening an instruction', 'Try 38 -122, with a space between them.'],
+    ['"Try one of"', 'Not a property of link: xyz. Try one of: id, length'],
+    ['"try again in a moment"', 'One search a second. Try again in a moment.'],
+    ['"tries" as a plain verb', 'Left empty, this page tries far harder than EPANET does on its own.'],
+    ['"Keep trying" as a button label', 'Keep trying'],
+    ['the corrected report', 'It stopped after 7 iterations.'],
+    ['the corrected setting', 'How many trials are allowed before the solver gives up.'],
 ];
 foreach ($good as [$name, $value]) { ecSwapAssert($name, ecSwapHit($value), []); }
 

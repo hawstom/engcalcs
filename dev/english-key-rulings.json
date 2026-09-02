@@ -45,6 +45,10 @@
    "on": "Use DEM",
    "ruled": "2026-09-01"
   },
+  "lpn_elev_dem_use_tip": {
+   "on": "Puts the elevation of the DEM at this node into the Elevation box above, replacing what is there. It reads the DEM first if it has not been read yet. One Undo puts it back.",
+   "ruled": "2026-09-02"
+  },
   "lpn_ff_accounting": {
    "on": "Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral, and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.",
    "ruled": "2026-09-01"
@@ -77,6 +81,10 @@
    "on": "Available flow",
    "ruled": "2026-09-01"
   },
+  "lpn_ff_col_junction": {
+   "on": "Junction",
+   "ruled": "2026-09-02"
+  },
   "lpn_ff_col_required": {
    "on": "Required flow",
    "ruled": "2026-09-01"
@@ -84,6 +92,22 @@
   "lpn_ff_col_residual": {
    "on": "Residual held",
    "ruled": "2026-09-01"
+  },
+  "lpn_ff_col_result": {
+   "on": "Result",
+   "ruled": "2026-09-02"
+  },
+  "lpn_ff_col_solves": {
+   "on": "Runs",
+   "ruled": "2026-09-02"
+  },
+  "lpn_ff_col_static": {
+   "on": "Static pressure",
+   "ruled": "2026-09-02"
+  },
+  "lpn_ff_cost": {
+   "on": "{solves} network runs.",
+   "ruled": "2026-09-02"
   },
   "lpn_ff_design": {
    "on": "Effect on the rest of the system",
@@ -136,6 +160,10 @@
   "lpn_ff_err_not_junction": {
    "on": "Not a junction",
    "ruled": "2026-09-01"
+  },
+  "lpn_ff_err_solve": {
+   "on": "The solver reported an error and gave no answer.",
+   "ruled": "2026-09-02"
   },
   "lpn_ff_err_unknown": {
    "on": "No answer, and the reason given is {id}",
@@ -465,6 +493,10 @@
    "on": "This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.",
    "ruled": "2026-09-01"
   },
+  "lpn_inp_drop_tags": {
+   "on": "This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
+   "ruled": "2026-09-02"
+  },
   "lpn_menu_map": {
    "on": "Map",
    "ruled": "2026-08-29"
@@ -625,13 +657,21 @@
    "on": "Accuracy",
    "ruled": "2026-09-01"
   },
+  "lpn_settings_accuracy_tip": {
+   "on": "How close the solver has to get before it stops, measured as the flow still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.",
+   "ruled": "2026-09-02"
+  },
   "lpn_settings_damp_limit": {
    "on": "Damping starts at",
    "ruled": "2026-09-01"
   },
   "lpn_settings_damp_limit_tip": {
-   "on": "The accuracy at which the solver begins taking smaller steps, which can settle a network that is swinging back and forth. Zero, the usual value, means it never does. Only the EPANET solver reads this box.",
-   "ruled": "2026-09-01"
+   "on": "The accuracy at which the solver begins taking smaller steps, which can help a network that is swinging back and forth to converge. Zero means it never does. Only the EPANET solver reads this box.",
+   "ruled": "2026-09-02"
+  },
+  "lpn_settings_default_is": {
+   "on": "The default is {n}.",
+   "ruled": "2026-09-02"
   },
   "lpn_settings_demand_multiplier": {
    "on": "Demand multiplier",
@@ -661,17 +701,21 @@
    "on": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
    "ruled": "2026-08-29"
   },
+  "lpn_settings_flow_change": {
+   "on": "Flow change limit",
+   "ruled": "2026-09-02"
+  },
   "lpn_settings_flow_change_tip": {
-   "on": "An additional test the solver must pass before it stops: the maximum change in any one pipe's flow from one try to the next. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.",
-   "ruled": "2026-09-01"
+   "on": "An additional test the solver must pass before it stops: the maximum change in any one pipe's flow from one trial to the next. Zero means do not apply this test. Only the EPANET solver reads this box.",
+   "ruled": "2026-09-02"
   },
   "lpn_settings_head_error": {
    "on": "Head error limit",
    "ruled": "2026-09-01"
   },
   "lpn_settings_head_error_tip": {
-   "on": "An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.",
-   "ruled": "2026-09-01"
+   "on": "An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.",
+   "ruled": "2026-09-02"
   },
   "lpn_settings_leader_snap": {
    "on": "Snap leader lines to angle",
@@ -694,8 +738,8 @@
    "ruled": "2026-09-01"
   },
   "lpn_settings_quality_source": {
-   "on": "Water from",
-   "ruled": "2026-09-01"
+   "on": "Trace node",
+   "ruled": "2026-09-02"
   },
   "lpn_settings_quality_source_tip": {
    "on": "The point whose water is followed. Every other point then shows the share of its water that came from here.",
@@ -708,6 +752,14 @@
   "lpn_settings_quality_track_tip": {
    "on": "Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
    "ruled": "2026-09-01"
+  },
+  "lpn_settings_show_arrows": {
+   "on": "Flow direction arrows",
+   "ruled": "2026-09-02"
+  },
+  "lpn_settings_show_arrows_tip": {
+   "on": "Draw an arrow on each pipe showing which way the water is running. The arrows appear after a run, and turning them off leaves the results unchanged. This setting is saved with the project.",
+   "ruled": "2026-09-02"
   },
   "lpn_settings_specific_gravity": {
    "on": "Specific gravity",
@@ -722,12 +774,12 @@
    "ruled": "2026-08-29"
   },
   "lpn_settings_trials_tip": {
-   "on": "How many times the solver may try before it gives up on a network that will not settle.",
-   "ruled": "2026-08-29"
+   "on": "How many trials are allowed before the solver gives up on a network that will not converge.",
+   "ruled": "2026-09-02"
   },
   "lpn_settings_unbalanced": {
-   "on": "If it will not settle",
-   "ruled": "2026-09-01"
+   "on": "If it does not converge",
+   "ruled": "2026-09-02"
   },
   "lpn_settings_unbalanced_continue": {
    "on": "Keep trying",
@@ -738,8 +790,8 @@
    "ruled": "2026-09-01"
   },
   "lpn_settings_unbalanced_tip": {
-   "on": "What to do with a network that has used up its trials and still has not settled. Keeping on allows the extra trials below, which often settles it; stopping reports the last try as it stands, which is close but not solved. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as unsettled.",
-   "ruled": "2026-09-01"
+   "on": "What to do with a network that has used up its trials and still has not converged. Keeping on allows the extra trials below, which often reaches convergence; stopping reports the last trial as it stands, which is close but not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.",
+   "ruled": "2026-09-02"
   },
   "lpn_settings_unbalanced_trials": {
    "on": "Extra trials first",

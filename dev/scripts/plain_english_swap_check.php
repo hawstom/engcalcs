@@ -77,6 +77,24 @@ const EC_PLAIN_SWAPS = [
         'exempt'  => [],
     ],
     [
+        // **NARROW ON PURPOSE.** "try again" is ordinary English and is correct eight times in
+        // lib/lang.ec.en.php; a pattern on the bare word would fire on every one of them and this
+        // check would be switched off inside a week. What is caught is `try` used as a COUNTABLE
+        // NOUN -- "the last try", "from one try to the next" -- which is where it stands in for a
+        // pass of the solver. Tom asked for this one, 2026-09-02: *"I wonder about the words 'try'
+        // and 'trial'. Are they possibly standing in for 'iteration'?"*
+        //
+        // **AND EPANET'S OWN ENUMS SETTLE WHICH WORD REPLACES IT, by role rather than by taste.**
+        // The toolkit names the INPUT `EN_Option.Trials` and the REPORTED COUNT
+        // `EN_AnalysisStatistic.Iterations` -- both verified in js/vendor/epanet-js.js and measured
+        // through the engine. So a SETTING says trials, a COUNT OF WHAT HAPPENED says iterations,
+        // and `try` says neither.
+        'pattern' => '/\b(?:the|a|one|each|every|next|last|first|another)\s+try\b|\btr(?:y|ies)\s+to\s+the\s+next\b/iu',
+        'term'    => 'trial (a setting) or iteration (a reported count)',
+        'why'     => "Tom, 2026-09-02, asking whether these stood in for \"iteration\": they did. EPANET names the input EN_Option.Trials and the reported count EN_AnalysisStatistic.Iterations.",
+        'exempt'  => [],
+    ],
+    [
         'pattern' => '/\brest\s+pressure\b/iu',
         'term'    => 'static pressure',
         'why'     => 'Tom, 2026-09-01. "Static pressure" is the profession\'s term and is what a hydrant test reports.',
