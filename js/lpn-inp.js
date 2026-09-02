@@ -1993,7 +1993,26 @@
 			// entirely when the document has none: EPANET's own default is "no pattern", and writing
 			// a line that says so is a statement the source file never made.
 			(doc.defaultPattern ? row(['Pattern', String(doc.defaultPattern)]) + '\n' : '') +
-			row(['Emitter Exponent', String(settings.emitterExponent || 0.5)]) + '\n' +
+			// **SPARSE, LIKE EVERY OTHER OPTION BESIDE IT.** This line was written unconditionally,
+			// so a source file that stated no exponent came back out of the exporter stating one --
+			// the same invented-line defect as the rest of this section, hidden because every EPA
+			// reference model states it and so the round-trip fixtures never saw it. The document's
+			// own sparse home is `hydraulics.emitterExponent`; `settings.emitterExponent` is the
+			// LIVE value the solver reads and always has a number in it, which is why it cannot be
+			// the test. A pre-Task-553 document that carries only the live copy is honoured too,
+			// but only where it is not EPANET's own default -- an untouched 0.5 there is our
+			// default showing through, not a statement the user made.
+			(function () {
+				var h = settings.hydraulics || {};
+				if (h.emitterExponent !== undefined && h.emitterExponent !== null) {
+					return row(['Emitter Exponent', String(h.emitterExponent)]) + '\n';
+				}
+				if (settings.emitterExponent !== undefined && settings.emitterExponent !== null
+					&& +settings.emitterExponent !== 0.5) {
+					return row(['Emitter Exponent', String(settings.emitterExponent)]) + '\n';
+				}
+				return '';
+			}()) +
 			// **EVERY OTHER HYDRAULIC OPTION THE DOCUMENT HOLDS, AND ONLY THOSE** (Task 553). The
 			// list is sparse -- see the importer's own note -- so a key absent here means the file
 			// did not state it and neither do we. That is what keeps a round trip byte-identical:

@@ -660,6 +660,13 @@ console.log('\n8. Map, Hydraulics USE/SAVE and every unread option are carried, 
 		ok('carried back character for character: ' + want.join(' '), !!line,
 			JSON.stringify(got.map((r) => r.join(' '))));
 	});
+	// **AND THE ONE THIS SECTION ALMOST MISSED.** `Emitter Exponent` was written unconditionally,
+	// so this fixture -- which states none -- would have come back stating EPANET's default. Every
+	// EPA reference model states the line, which is precisely why the Net1/2/3 round trips could
+	// never see it: the sparse case had no fixture until this one.
+	ok('a file stating no emitter exponent gains none',
+		!got.some((r) => r[0].toUpperCase() === 'EMITTER'),
+		JSON.stringify(got.map((r) => r.join(' '))));
 	ok('no line was invented in its place',
 		!got.some((r) => r[0].toUpperCase() === 'DEMAND' && /^MULT/i.test(r[1] || '')),
 		JSON.stringify(got.map((r) => r.join(' '))));
