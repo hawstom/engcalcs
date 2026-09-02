@@ -2344,8 +2344,12 @@ var EngCalcs = EngCalcs || {};
 	// `status` is this file's name for the open/closed state; `length` is the escape valve for "same
 	// drawing, different length", since a drag recomputes Base's auto length for every scenario.
 	// `level` is a design variable in exactly the way a reservoir's head is.
+	// `fireFlow` is the junction's OWN required fire flow (Task 530). It is overridable for the same
+	// reason demand is: "what does this block need once it is rezoned" is an operating question, and
+	// a scenario is where such a question is asked. ABSENT means the junction is tested against the
+	// single number typed in the Fire flow box, which is what every junction did before this existed.
 	var LPN_OVERRIDABLE = {
-		node: { demand: true, emitter: true, head: true, level: true, active: true },
+		node: { demand: true, emitter: true, head: true, level: true, active: true, fireFlow: true },
 		// `setting` is a VALVE's setting (Task 248 phase 2). It belongs here for the same reason
 		// demand does: "what if the pressure reducing valve is set to 50 psi" is an operating
 		// question, which is what a scenario asks, where the valve's diameter is what was built.
@@ -2709,6 +2713,14 @@ var EngCalcs = EngCalcs || {};
 			// rather than in either caller, which is also what keeps it out of their counts.
 			{ key: 'demand', group: 'node', field: 'demand', altField: 'demandActual', prop: 'demand', label: pc.lpn_field_base_demand || 'Base demand',
 				applies: function (n) { return !isFixedHeadNode(n) && !(n.extraDemands && n.extraDemands.length); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **FIND AND REPLACE'S REASON FOR BEING HERE, NOT A STARTING VALUE'S** (Task 530). This
+			// list answers three questions, and a required fire flow answers two of them: what it is
+			// called and how it is written. It has no row in Settings > Starting values and no map
+			// label, so pushFieldShown() is false for it and BOTH pushes skip it -- a junction is
+			// given a fire flow because of what stands on it, which is not a thing to seed from a
+			// default or to force onto every scenario at once.
+			{ key: 'fireFlow', group: 'node', field: 'fireFlow', prop: 'fireFlow', label: pc.lpn_ff_required || 'Required fire flow',
+				applies: function (n) { return n.type === 'junction'; }, get: function (n) { return fireFlowOwn(n); }, set: function (n, v) { n._fireFlow = fireFlowStore(v); } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'diameter', group: 'link', field: 'diameter', prop: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// PIPE-ONLY, not merely not-a-pump: a valve is a zero-length link, so no friction formula
@@ -7998,6 +8010,11 @@ var EngCalcs = EngCalcs || {};
 		// more than one category, which is exactly the junction somebody is searching for.
 		if (d.group === 'node' && (!d.type || d.type === 'junction')) {
 			out.push(['demandCategory', pc.lpn_field_demand_category || 'Description', 'Description']);
+			// **JUNCTIONS ONLY, and only because a junction is the only node that can hold one**
+			// (Task 530) -- the same honesty rule as the row above: a property that silently matches
+			// nothing does not go in the menu. "Which junctions did I give 3,000 gpm" has no other
+			// answer on this page, and it is the query that makes a bulk Replace of it reachable.
+			out.push(['fireFlow', pc.lpn_ff_required || 'Required fire flow', 'Required fire flow']);
 		}
 		if (d.key === 'all') { return out; }
 		defs = d.group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc);
@@ -8277,6 +8294,12 @@ var EngCalcs = EngCalcs || {};
 			return cand.group === 'node' ? findConnStateOf(cand.el.id) : undefined;
 		}
 		if (cand.group === 'label') { return undefined; }
+		// Read as typed, through effective(), like every other input here -- and undefined where the
+		// junction states nothing, so a `contains` with an empty box lists exactly the junctions that
+		// carry one rather than every junction in the drawing.
+		if (prop === 'fireFlow') {
+			return cand.group === 'node' ? fireFlowOwn(cand.el) : undefined;
+		}
 		if (FIND_EXTRA_LINK_FIELDS[prop]) {
 			// `km` is stored as `k`; the label calls it km because that is the symbol on the page.
 			var v = effective(cand.el, prop === 'km' ? 'k' : prop);
@@ -10928,6 +10951,13 @@ var EngCalcs = EngCalcs || {};
 						plainFor: function (n) { return demandRowsOf(n, effective(n, 'demand')).length > 1; },
 						set: function (n, v) { setProp(n, 'demand', v); } },
 					paneColNodeResult('demandActual', 'bpn_demand', paneUnitFlow),
+					// **AN INPUT, AND AN EMPTY CELL IS NOT A ZERO** (Task 530): a junction that
+					// states no fire flow of its own is tested against the number in the Fire flow
+					// box. A pane cell hands back `+'' === 0` for a blank, which fireFlowStore()
+					// reads as "states nothing" -- the same rule the popup and Find go through.
+					{ key: 'fireFlow', label: 'lpn_ff_required', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
+						prop: 'fireFlow', get: function (n) { return fireFlowOwn(n); },
+						set: function (n, v) { setProp(n, 'fireFlow', fireFlowStore(v)); } },
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
 					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
 					paneColNodeQuality()
@@ -23930,7 +23960,10 @@ var EngCalcs = EngCalcs || {};
 			v = get();
 		input.type = 'number';
 		input.value = (v === undefined || v === null || v === '') ? '' : String(+(+v).toFixed(6));
-		input.placeholder = String(+(+placeholder).toFixed(6));
+		// A BLANK PLACEHOLDER STAYS BLANK. `+('')` is 0, so formatting unconditionally would print a
+		// fallback of zero into a field whose fallback is simply not known yet.
+		input.placeholder = (placeholder === undefined || placeholder === null || placeholder === '')
+			? '' : String(+(+placeholder).toFixed(6));
 		input.addEventListener('change', function () {
 			set(input.value === '' ? undefined : +input.value);
 			completeEdit(ov);
@@ -24987,6 +25020,15 @@ var EngCalcs = EngCalcs || {};
 			demandCategoryFields(fields, n, nodeId);
 			readonlyField(fields, (pc.bpn_demand || 'Demand') + ' (' + unitLabel('lpn_u_flow') + ')',
 				resolvedDemand(n), pc.lpn_result_demand_tip);
+			// **THIS JUNCTION'S OWN REQUIRED FIRE FLOW** (Task 530), blank-capable because blank is
+			// the ordinary case and it is not an absence: the placeholder is the number in the Fire
+			// flow box, so an empty field reads as "tested against that". An input, so it sits with
+			// the inputs above the solved results -- and it goes through setProp() like every other
+			// overridable property, which is what keeps a scenario's answer out of Base.
+			unitNumberFieldBlank(fields, pc.lpn_ff_required || 'Required fire flow', 'lpn_u_flow',
+				function () { return fireFlowOwn(n); },
+				function (v) { setProp(n, 'fireFlow', fireFlowStore(v)); },
+				fireFlowRunRequiredText(), pc.lpn_ff_required_node_tip, { el: n, prop: 'fireFlow' });
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
 				readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
 					pc.lpn_result_head_tip);
@@ -27297,6 +27339,58 @@ var EngCalcs = EngCalcs || {};
 	function fireFlowJunctions() {
 		return doc.nodes.filter(function (n) { return n.type === 'junction' && isActive(n); });
 	}
+
+	// ---- the per-junction requirement (ROADMAP Task 530) -----------------------------------------
+	//
+	// **ONE NUMBER FOR A WHOLE RUN IS THE SIMPLIFICATION, AND THIS IS THE END OF IT.** A required
+	// fire flow comes from LAND USE: a residential cul-de-sac and a warehouse district are two
+	// different numbers out of the same code table, and a system-wide sweep against one of them
+	// either overstates the residential half or lets the industrial half pass on a number nobody
+	// would accept. So a junction may state its own, and the box's number is what the rest are
+	// tested against.
+	//
+	// **IT IS A TYPED NUMBER IN THE PROJECT'S FLOW UNIT, LIKE EVERY OTHER INPUT ON THIS PAGE.**
+	// Stored as typed, converted once at the engine call and nowhere else, and never rewritten when
+	// the unit selector moves (CLAUDE.md's unit rules). It is OURS and not EPANET's: nothing in an
+	// `.inp` file says it, so the exporter never writes it -- and it rides in the document, so it
+	// survives a save and reopen the way every other typed number does.
+	//
+	// **BLANK, ZERO AND NEGATIVE ALL MEAN THE SAME THING: this junction states nothing of its own.**
+	// One rule at one seam, because the three doors into this property answer a blank box
+	// differently -- the popup hands back `undefined`, a pane cell hands back `+'' === 0`, and Find
+	// and replace refuses a non-number outright.
+	function fireFlowStore(v) {
+		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : undefined;
+	}
+	// This junction's own requirement, as typed, or undefined. Through effective(), so a scenario's
+	// override is what is read -- the same seam the solver, the labels and the popups read.
+	function fireFlowOwn(n) { return fireFlowStore(effective(n, 'fireFlow')); }
+	// How many of the junctions about to be tested state one. Said in the box, because a criterion
+	// the run does NOT apply everywhere has to say so where the criterion is typed.
+	function fireFlowOwnCount() {
+		return fireFlowJunctions().filter(function (n) { return fireFlowOwn(n) !== undefined; }).length;
+	}
+	// The run's single number as it stands in the box right now, in DISPLAY units -- the placeholder
+	// a blank junction field shows, so an empty box reads as "already answered, by that number"
+	// rather than as a missing input.
+	// **GUARDED LIKE EVERY OTHER FIRE-FLOW PATH IN THIS FILE.** The popup is drawn whether or not
+	// js/lpn-fireflow.js is on the page, and the defaults are the module's conventions -- so with the
+	// module absent there is no run number to point at, and the field shows no placeholder rather
+	// than a fabricated zero.
+	function fireFlowRunRequiredText() {
+		if (fireFlowAsk) { return fireFlowAsk.required; }
+		if (!EngCalcs.lpnFireFlowDefaults) { return ''; }
+		return fireFlowDefaults().required;
+	}
+	// **THE FUNCTION FORM OF options.required** (js/lpn-fireflow.js takes either). SI at the engine
+	// boundary and only there: `fallback` is the box's number already converted, and a junction's own
+	// number crosses here, at the one call, exactly as the box's did.
+	function fireFlowRequiredFor(fallback) {
+		return function (id) {
+			var n = nodeById(id), own = n ? fireFlowOwn(n) : undefined;
+			return own === undefined ? fallback : toSI(own, 'lpn_u_flow');
+		};
+	}
 	// **THE ENGINE IS THE CALLER'S CHOICE AND THE COST IS THE USER'S** (js/lpn-fireflow.js takes
 	// `solve` injected for exactly this reason). The rule is runSolve()'s own: a network holding a
 	// PRV, PSV or FCV goes to EPANET whatever the preference says, because our own solver does not
@@ -27425,6 +27519,14 @@ var EngCalcs = EngCalcs || {};
 		boxes.required = ffInput(ask.required);
 		ffRow(host, pc.lpn_ff_required || 'Required fire flow', pc.lpn_ff_required_tip,
 			boxes.required, unitLabel('lpn_u_flow'));
+		// **A CRITERION THAT DOES NOT APPLY EVERYWHERE SAYS SO WHERE IT IS TYPED.** Only when some
+		// junction actually states its own: a sentence about an exception nobody has made is noise,
+		// and the count is the useful half of it.
+		if (fireFlowOwnCount() > 0) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_required_own ||
+				'Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.')
+				.replace('{n}', String(fireFlowOwnCount())), host);
+		}
 
 		boxes.residual = ffInput(ask.residual);
 		ffRow(host, pc.lpn_ff_residual || 'Residual pressure to hold', pc.lpn_ff_residual_tip,
@@ -27958,7 +28060,10 @@ var EngCalcs = EngCalcs || {};
 		return EngCalcs.lpnFireFlowSweep(model, {
 			solve: engine.solve,
 			junctions: ids,
-			required: required,
+			// **PER JUNCTION, WITH THE BOX'S NUMBER AS THE FALLBACK.** A function rather than a
+			// scalar, always -- one code path, so a project where nobody has typed a per-junction
+			// requirement is answered by the same line as one where everybody has.
+			required: fireFlowRequiredFor(required),
 			residual: residual,
 			design: design,
 			// The progress line is the whole reason the sweep yields between junctions: a
