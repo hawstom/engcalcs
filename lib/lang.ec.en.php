@@ -2434,14 +2434,21 @@ $ec_lang['lpn_settings_accuracy']='Accuracy';
 // number in it, joined to the tip's own sentences -- not a fragment composed into a label, which is
 // the thing dev/language-strings.md forbids. It is true of every row it is appended to, which is
 // the test a shared sentence has to pass.
-$ec_lang['lpn_settings_default_is']='The usual value is {n}.';
+//
+// **IT SAID "The usual value is {n}." FOR ONE REVIEW AND TOM STRUCK IT:** *"'Usual' is not a
+// synonym of 'default'. You are calling it default in our conversation, and yet you put 'usual'."*
+// **Default IS the standard term** -- EPANET's own, every engineering interface's own -- and
+// replacing it with a plain-English near-miss makes the string HARDER to translate, not easier,
+// because the translator has no term to look up. See the correction added to
+// dev/language-strings.md and guarded by dev/scripts/plain_english_swap_check.php.
+$ec_lang['lpn_settings_default_is']='The default is {n}.';
 $ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the flow still changing from one try to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
 $ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';
 $ec_lang['lpn_settings_viscosity_tip']='The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.';
 $ec_lang['lpn_settings_trials']='Maximum trials';
-$ec_lang['lpn_settings_trials_tip']='How many times the solver may try before it gives up on a network that will not settle.';
+$ec_lang['lpn_settings_trials_tip']='How many times the solver may try before it gives up on a network that will not converge.';
 // **THE REST OF EPANET'S HYDRAULIC OPTIONS GET A ROW EACH** (Tom, 2026-08-29: *"every setting from
 // EPANET must be added and implemented unless research says otherwise"*). Written in OUR words and
 // not EPANET's -- there is no "Unbalanced" or "DampLimit" on the page, because a name only a person
@@ -2451,18 +2458,18 @@ $ec_lang['lpn_settings_trials_tip']='How many times the solver may try before it
 // act inside EPANET's iteration and the built-in solver has no equivalent term, so a user who does
 // not know which engine is answering cannot tell a control that did nothing from a setting that had
 // no effect. Saying it in the tip is cheaper than a second Settings section, and honest.
-$ec_lang['lpn_settings_unbalanced']='If it will not settle';
-$ec_lang['lpn_settings_unbalanced_tip']='What to do with a network that has used up its trials and still has not settled. Keeping on allows the extra trials below, which often settles it; stopping reports the last try as it stands, which is close but not solved. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as unsettled.';
+$ec_lang['lpn_settings_unbalanced']='If it does not converge';
+$ec_lang['lpn_settings_unbalanced_tip']='What to do with a network that has used up its trials and still has not converged. Keeping on allows the extra trials below, which often reaches convergence; stopping reports the last trial as it stands, which is close but not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.';
 $ec_lang['lpn_settings_unbalanced_continue']='Keep trying';
 $ec_lang['lpn_settings_unbalanced_stop']='Stop there';
 $ec_lang['lpn_settings_unbalanced_trials']='Extra trials first';
 $ec_lang['lpn_settings_unbalanced_trials_tip']='How many further trials to allow after the maximum above is used up, before the last try is reported. Only the EPANET solver reads this box.';
 $ec_lang['lpn_settings_head_error']='Head error limit';
-$ec_lang['lpn_settings_head_error_tip']='An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_head_error_tip']='An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.';
 $ec_lang['lpn_settings_flow_change']='Flow change limit';
-$ec_lang['lpn_settings_flow_change_tip']='An additional test the solver must pass before it stops: the maximum change in any one pipe\'s flow from one try to the next. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_flow_change_tip']='An additional test the solver must pass before it stops: the maximum change in any one pipe\'s flow from one trial to the next. Zero means do not apply this test. Only the EPANET solver reads this box.';
 $ec_lang['lpn_settings_damp_limit']='Damping starts at';
-$ec_lang['lpn_settings_damp_limit_tip']='The accuracy at which the solver begins taking smaller steps, which can settle a network that is swinging back and forth. Zero, the usual value, means it never does. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_damp_limit_tip']='The accuracy at which the solver begins taking smaller steps, which can help a network that is swinging back and forth to converge. Zero means it never does. Only the EPANET solver reads this box.';
 $ec_lang['lpn_settings_option_unset']='Not stated';
 $ec_lang['lpn_settings_demand_multiplier']='Demand multiplier';
 $ec_lang['lpn_settings_demand_multiplier_tip']='One scale on every demand in the network at once. Use it to ask what the system does at more or less than today\'s use. It does not change the numbers you typed.';
@@ -2639,7 +2646,7 @@ $ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting
 $ec_lang['lpn_time_run_done']='The run finished. Reporting times: {frames}. Time taken: {secs} s.';
 $ec_lang['lpn_time_run_failed']='The run did not finish, so there are no results for the later times.';
 $ec_lang['lpn_time_run_report']='EPANET run report';
-$ec_lang['lpn_time_run_report_tip']='What the EPANET solver itself printed about the last run: how it settled, and anything it warned about. It is the solver’s own text, not ours.';
+$ec_lang['lpn_time_run_report_tip']='What the EPANET solver itself printed about the last run: whether it converged, and anything it warned about. It is the solver’s own text, not ours.';
 
 $ec_lang['lpn_time_speed']='Speed';
 $ec_lang['lpn_time_speed_tip']='How fast the run plays back.';

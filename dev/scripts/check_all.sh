@@ -156,6 +156,14 @@ run_check "no-session selftest"          blocking php dev/scripts/no_session_sel
 # deleted by whoever hits it first.
 run_check "struck public claims"         blocking php dev/scripts/public_claim_check.php
 run_check "public claim selftest"        blocking php dev/scripts/public_claim_selftest.php
+# Tom, 2026-09-01: *"Please search your memory for the source of your avoidance of plain engineering
+# terms to correct this tendency at its source."* The source was a correction that reached CLAUDE.md
+# and never reached dev/language-strings.md, which is the file CLAUDE.md sends a string writer to.
+# The paragraph is there now; this is the half that cannot be forgotten. Its sibling above holds
+# four sentences; this holds four SUBSTITUTIONS, and it found eight shipped strings on the day it
+# was written.
+run_check "plain-English swaps"          blocking php dev/scripts/plain_english_swap_check.php
+run_check "plain-English swap selftest"  blocking php dev/scripts/plain_english_swap_selftest.php
 # Task 534. A share card fails where nobody on this side ever looks: you do not paste links to your
 # own site into Facebook, so a relative og:image (which every network drops silently) or a card file
 # renamed out from under the tag stays broken until a stranger mentions it. This renders every page

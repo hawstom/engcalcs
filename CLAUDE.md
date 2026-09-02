@@ -189,17 +189,20 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   EPANET calls Notation/Annotation, and what EPANET calls a **Label** is our **Text** object.
   For THOSE TWO OBJECTS there is no industry standard to defer to, so write new strings in our
   vocabulary — every one written in EPANET's adds to a rename we have already declined.
-  - **THAT RULE IS ABOUT ONE COLLISION AND IS NOT A LICENCE TO INVENT PLAIN ENGLISH** (corrected
-    2026-09-01). It was read far too widely and the result was strings a hydraulic engineer does
-    not recognise: `Rest pressure` for static pressure, `Pulled down` for drawdown, `settle` for
-    converge, `Solves` for runs. Tom, twice in one reading: *"why are we inventing language that
-    engineers will not recognize?"* and *"we should default... to the EPANET terminology."*
-  - **WHERE THE PROFESSION ALREADY OWNS A WORD, USE THE PROFESSION'S WORD** — static pressure,
-    residual, drawdown, converge, emitter, trace — and where an EPANET file's own option or
-    analysis is being described, name it as EPANET names it. **Simple English governs the
-    EXPLAINING, never the NAMING**: `dev/language-strings.md`'s rule was written against opaque
-    loanwords, not against standard terms, and **a plain-English substitute for a standard term is
-    HARDER to translate, not easier, because the translator has no term to look up.**
+  - **THAT RULE IS ABOUT ONE COLLISION AND NOTHING ELSE.** It was read far more widely and produced
+    strings a hydraulic engineer does not recognise — `Rest pressure` for static pressure, `Pulled
+    down` for drawdown, `settle` for converge, `Solves` for runs. Tom, twice in one reading: *"why
+    are we inventing language that engineers will not recognize?"* and *"we should default... to the
+    EPANET terminology."*
+  - **THERE IS NO HOUSE STYLE FOR ENGLISH STRINGS ANY MORE, and that is deliberate** (Tom,
+    2026-09-01: *"Anywhere you find anything addressing the need for a certain kind of English or
+    language, just strike it. Let's trust our synonyms, glossary, scripts, and feedback
+    procedures."*). `dev/language-strings.md` used to carry a "Simple English" rule; it licensed
+    exactly the inventions above three times, survived two written corrections, and is gone rather
+    than qualified a fourth time. **Do not write a new one.** The mechanisms that carry it are
+    `$ec_lang_syn`, `glossary.json`, `plain_english_swap_check.php`, and Tom reading
+    `dev/new-english-keys.md` — each evidence about a specific string, where a house style is a
+    prediction about every future one.
   - **AND WHEN ONE NAME IS DOING TWO JOBS, SPLIT IT RATHER THAN CHOOSE** (Tom, 2026-09-01: *"Source
     trace mystifies me if it's intended to mean Share from source"*). It did: `lpn_quality_trace`
     named the ANALYSIS and `lpn_result_source_share` named the NUMBER, and both said "Source
@@ -423,7 +426,8 @@ re-flag a `layout: column heading` abbreviation merely for looking terse.
 
 All display strings live in `lib/lang.ec.??.php` (en + 26: am, ar, bg, bn, cs, de, es, fa, fr, he,
 hi, hr, id, it, km, my, ps, pt, ro, ru, sr, sw, tr, uk, ur, zh). Keys follow `prefix_description`.
-**Full rules — Simple English, the synonym channel, the polysemy protocol, the tag vocabulary — are
+**Full rules — universal/conventional/translatable wording, the synonym channel, the polysemy
+protocol, the tag vocabulary — are
 in `dev/language-strings.md`. Read it before editing any string value.** The non-negotiable parts:
 
 | Rule | What it requires | Enforced by |
@@ -531,6 +535,7 @@ own failure; this table is an index, not a duplicate of that text.
 | `verdict_string_check.php` + selftest | A verdict string leads with `✓`/`⚠` and carries no marker word, in all 27 languages. **Which strings are verdicts is read out of the RENDERER**, never guessed from key names: `writeCheckHTML()`'s short-text argument and the labels objects, resolved one hop through `pageConfig` — 32 keys, 864 values. A glyph IN such a string ships two, because the renderer prepends one; and any value carrying a glyph must lead with it, which is the leg that matters in the five RTL languages |
 | `no_session_check.php` + selftest | No shipped PHP starts a session, by token scan. See the storage section: the number is zero |
 | `public_claim_check.php` + selftest | The four sentences that shipped and Tom struck — *"your phone"*, *"PC application"*, *"the only third-party request"*, *"no extended-period simulation yet"* — cannot come back in a shipped English string. Deliberately blind to `dev/*.md`, where all four appear inside the rule forbidding them. A floor, not a guarantee: it cannot see the landing page |
+| `plain_english_swap_check.php` + selftest | Be universal, conventional and translatable — not esoteric (Tom's own wording, which REPLACED the "Simple English" rule after it licensed this three times). Four substitutions Tom struck — *rest pressure* for static pressure, *pulled down* for drawdown, *settle* for converge, *the usual value* for the default — cannot stand in a shipped English string. **Two failure modes, and only one is about register**: `settle` is the right idea in the wrong word; *the usual value* is a DIFFERENT idea (Tom, 2026-09-01: *"'Usual' ... doesn't mean 'What will be done internally if you leave this blank.' No amount of Simple English can make that right."*) — a default is a promise about an empty box, what is usual is a fact about the world, and no plainer synonym fixes the second kind. **It found EIGHT the day it was written**, three years of `lpn_settings_*` tips saying a network would not "settle". A DECLARED table, never a cleverness: "is this word standing in for a term of art" is undecidable, so a row is earned by shipping and being struck. `usually` as an ordinary adverb is correct three times in `lang.ec.en.php` and is deliberately not matched. **The root cause it closes is a documentation one** — the correction was written into this file and NOT into `dev/language-strings.md`, which this file tells a string writer to read first, so the next writer did as instructed and got the uncorrected rule |
 | `scenario_seam_check.php` | Overridable properties go through `setProp()`, never a direct write that edits BASE from inside a scenario |
 | `unit_factor_check.php` | Every `$ec_units` factor re-derived from the exact definitions (`ft = 0.3048 m`, `gal = 3.785411784 L`, `lbf = 4.4482216152605 N`), **and factors for one quantity agreeing with each other** — the suite once shipped four different feet, and `ft3`/`ft3ps` were the same conversion 47 ppm apart. Reads `EngCalcs.G` out of the source rather than retyping it. **Also that a unit's identity is its NAME** — no `data-unit`, no `objForm['xu'].value`, no `<option>` valued with a factor (Task 390) |
 | `unit_family_check.php` + selftest | The four unit-family absolutes, each of which fails with a page that RENDERS AND LOOKS RIGHT: a family missing from a preset, a preset picking a unit its family does not offer, an offered unit with no factor, a page naming a family that does not exist. `echoUnitSelect()` catches the first at render time — that is, possibly by a visitor; this reads the declarations before it ships |

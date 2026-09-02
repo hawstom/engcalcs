@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**19 still to read**, of 212 untranslated keys, of 1527 English keys. A key already marked _Ruled OK_ below needs nothing from you —
+**25 still to read**, of 212 untranslated keys, of 1527 English keys. A key already marked _Ruled OK_ below needs nothing from you —
 the ruling lapses by itself if the wording changes.
 
 ## lpn_  (210)
@@ -511,11 +511,9 @@ the ruling lapses by itself if the wording changes.
   > Damping starts at
   _Ruled OK 2026-09-01._
 - **`lpn_settings_damp_limit_tip`**
-  > The accuracy at which the solver begins taking smaller steps, which can settle a network that is swinging back and forth. Zero, the usual value, means it never does. Only the EPANET solver reads this box.
-  _Ruled OK 2026-09-01._
+  > The accuracy at which the solver begins taking smaller steps, which can help a network that is swinging back and forth to converge. Zero means it never does. Only the EPANET solver reads this box.
 - **`lpn_settings_default_is`**
-  > The usual value is {n}.
-  Bad. Very bad, and see my admonishment in our conversation. The source of this tendency must be found and rooted out.
+  > The default is {n}.
 - **`lpn_settings_demand_multiplier`**
   > Demand multiplier
   _Ruled OK 2026-08-29._
@@ -540,14 +538,12 @@ the ruling lapses by itself if the wording changes.
 - **`lpn_settings_flow_change`**
   > Flow change limit
 - **`lpn_settings_flow_change_tip`**
-  > An additional test the solver must pass before it stops: the maximum change in any one pipe's flow from one try to the next. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.
-  _Ruled OK 2026-09-01._
+  > An additional test the solver must pass before it stops: the maximum change in any one pipe's flow from one trial to the next. Zero means do not apply this test. Only the EPANET solver reads this box.
 - **`lpn_settings_head_error`**
   > Head error limit
   _Ruled OK 2026-09-01._
 - **`lpn_settings_head_error_tip`**
-  > An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero, the usual value, means do not test it. Only the EPANET solver reads this box.
-  _Ruled OK 2026-09-01._
+  > An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.
 - **`lpn_settings_leader_snap`**
   > Snap leader lines to angle
   _Ruled OK 2026-08-29._
@@ -588,11 +584,9 @@ the ruling lapses by itself if the wording changes.
   > Maximum trials
   _Ruled OK 2026-08-29._
 - **`lpn_settings_trials_tip`**
-  > How many times the solver may try before it gives up on a network that will not settle.
-  _Ruled OK 2026-08-29._
+  > How many times the solver may try before it gives up on a network that will not converge.
 - **`lpn_settings_unbalanced`**
-  > If it will not settle
-  _Ruled OK 2026-09-01._
+  > If it does not converge
 - **`lpn_settings_unbalanced_continue`**
   > Keep trying
   _Ruled OK 2026-09-01._
@@ -600,8 +594,7 @@ the ruling lapses by itself if the wording changes.
   > Stop there
   _Ruled OK 2026-09-01._
 - **`lpn_settings_unbalanced_tip`**
-  > What to do with a network that has used up its trials and still has not settled. Keeping on allows the extra trials below, which often settles it; stopping reports the last try as it stands, which is close but not solved. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as unsettled.
-  _Ruled OK 2026-09-01._
+  > What to do with a network that has used up its trials and still has not converged. Keeping on allows the extra trials below, which often reaches convergence; stopping reports the last trial as it stands, which is close but not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.
 - **`lpn_settings_unbalanced_trials`**
   > Extra trials first
   _Ruled OK 2026-09-01._

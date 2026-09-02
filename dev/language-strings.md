@@ -27,34 +27,42 @@ a parser that only understood the standard could not report a violation of it. `
 Not covered: hardcoded entities in `lib/HeadersFooters.lib.php` and per-page SEO meta tags, which are
 not language strings.
 
-### Write English source strings in Simple English
+### No house style for English source strings
 
-Two string roles, two rules:
+**Tom, 2026-09-01: *"Anywhere you find anything addressing the need for a certain kind of English or
+language, just strike it. Let's trust our synonyms, glossary, scripts, and feedback procedures."***
 
-- **Identity strings (menu entry + `<title>`) match the authoritative published source's own
-  terminology.** Robinson's paper is titled "Design of Rock Chutes", so `rc_main_menu` says "Rock
-  Chute Design (Robinson)". These are the calculator's *name* — what a returning user searches for
-  and bookmarks. Do not casually rename them.
-- **Explanatory strings (on-page description, tooltips, notes, body labels) prioritize Simple
-  English.** `rc_main_desc` says "Steep Channel Rock Lining Size", not "Rock Chute Riprap Sizing". A
-  word that *looks* like an opaque loanword invites phonetic transliteration rather than translation,
-  because there is nothing to compositionally parse. Two ordinary words beat one jargon word here.
+**What stood here and is gone.** A rule telling writers to prefer "Simple English" in explanatory
+strings. It was read as a goal in itself and produced strings a hydraulic engineer does not
+recognise — `Rest pressure` for static pressure, `Pulled down` for drawdown, `settle` for converge,
+`Solves` for runs, and, after two rounds of written correction, `The usual value is {n}.` where the
+word is **default**. Tom, on that last one: *"please quit making up things to avoid the obvious
+terms."* Rewording the rule was tried, on the day, and struck too: a third qualification of a rule
+that had already failed twice is not a fix.
+
+**What replaces it: nothing, deliberately.** The mechanisms that were always the real ones carry it
+instead — `$ec_lang_syn` for what a translator cannot recover from the words, `glossary.json` for a
+concept that recurs, `dev/scripts/plain_english_swap_check.php` for substitutions that have actually
+shipped and been struck, and Tom reading `dev/new-english-keys.md`. Each of those is evidence about
+a specific string. A house style is a prediction about every future string, and this one predicted
+wrong every time it was applied.
+
+**So: write the string. Do not reach for a simpler synonym of a word that already names something.**
+There is no register to hit, no word count to hit, and nothing here to cite in defence of replacing
+a conventional term.
+
+**Identity strings (menu entry + `<title>`) match the authoritative published source's own
+terminology.** Robinson's paper is titled "Design of Rock Chutes", so `rc_main_menu` says "Rock
+Chute Design (Robinson)". These are the calculator's *name* — what a returning user searches for and
+bookmarks. Do not casually rename them. *(Kept because it is a rule about SOURCES, not about a kind
+of English: it says whose words to use, not what sort of words to prefer.)*
+
 - **Never force a language into a calque of the English wording**, in either role. An audit found 6
   of 26 languages had transliterated "riprap" and 2 had transliterated "chute" — real defects — but
   5 of those 6 already had natural, non-transliterated identity strings. Let the translator choose
   whatever real phrase native engineers use: match the *concept*, not the English words.
 - **Do not rename eponyms or bibliographic citations** — Manning, Darcy-Weisbach, Robinson and actual
   paper titles stay as published in every role.
-- **Prefer positive phrasing; watch for stacked negatives.**
-- **Spend em-dashes sparingly. A semicolon or a comma usually does the job.** Tom, 2026-08-23,
-  counting seven on one page of visitor-facing prose: *"while I probably was a heavy [Alt]+150
-  emdash user in the pre-AI age, I now find them a little embarrassing... very often a semi-colon or
-  even a comma (\*shudder\*) is a suitable replacement to avoid emdash overuse."* The dash has become
-  a machine-written tell, and a page that leans on it reads as generated whatever it says. Note the
-  measured counterweight he raised himself: epanet-js's own landing page has six, so this is a
-  matter of DENSITY and not a ban. One or two on a long page is fine; seven is the smell. Applies to
-  visitor-facing English everywhere (`$ec_lang` values, page copy, the LibreWaterNet landing draft),
-  and it is a style preference, not a check: there is no threshold a script could pick.
 
 This governs new calculators from day one, not just retrofits.
 

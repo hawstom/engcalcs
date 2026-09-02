@@ -250,7 +250,7 @@ console.log('\n--- four rows, and the rest carried without one ---');
 			return span ? span.textContent.replace(/\s+/g, ' ').trim() : '';
 		});
 	['Accuracy', 'Demand multiplier', 'Specific gravity', 'Relative viscosity', 'Emitter exponent',
-		'Maximum trials', 'If it will not settle', 'Extra trials first', 'Head error limit',
+		'Maximum trials', 'If it does not converge', 'Extra trials first', 'Head error limit',
 		'Flow change limit', 'Damping starts at'].forEach(function (w) {
 		ok(w + ' has a row', labels.some(t => t.indexOf(w) === 0), labels.join(' | '));
 	});
