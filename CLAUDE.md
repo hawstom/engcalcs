@@ -202,7 +202,12 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
     than qualified a fourth time. **Do not write a new one.** The mechanisms that carry it are
     `$ec_lang_syn`, `glossary.json`, `plain_english_swap_check.php`, and Tom reading
     `dev/new-english-keys.md` — each evidence about a specific string, where a house style is a
-    prediction about every future one.
+    prediction about every future one. **One advisory survived the purge and only one: avoid the em
+    dash in visitor-facing English, until further notice.** It survives because it is not a claim
+    about good English — the dash is fine, the reader is not, and a page that leans on it reads as
+    AI-written whatever it says. A ratchet on new and edited strings, not a sweep: 60 shipped
+    strings carry 69 of them and rewriting those would buy 1,560 retranslations of text whose
+    meaning did not move. `dev/language-strings.md` has the scope and Tom's wording.
   - **AND WHEN ONE NAME IS DOING TWO JOBS, SPLIT IT RATHER THAN CHOOSE** (Tom, 2026-09-01: *"Source
     trace mystifies me if it's intended to mean Share from source"*). It did: `lpn_quality_trace`
     named the ANALYSIS and `lpn_result_source_share` named the NUMBER, and both said "Source

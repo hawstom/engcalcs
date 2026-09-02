@@ -64,6 +64,33 @@ of English: it says whose words to use, not what sort of words to prefer.)*
 - **Do not rename eponyms or bibliographic citations** — Manning, Darcy-Weisbach, Robinson and actual
   paper titles stay as published in every role.
 
+**ADVISORY: avoid the em dash in visitor-facing English, until further notice.** Tom, 2026-09-01,
+restoring this one deliberately after the rest of the house style was struck: *"we do need an
+advisory against the lovely em dash; the public has turned against it in the age of AI. That bias is
+thrust upon us. Avoid the lovely em dash until further notice, children."*
+
+**This is not a claim about good English and must not be read as one.** The dash is fine; the reader
+is not. It has become a machine-written tell, so a page that leans on it reads as generated whatever
+it says. That is an external bias with an expiry date, which is what "until further notice" is
+carrying. It is the one survivor of the struck house style, and it survives precisely because it is
+about how a page is RECEIVED rather than about which words are correct.
+
+A semicolon or a comma usually does the job. Tom, 2026-08-23: *"while I probably was a heavy
+[Alt]+150 emdash user in the pre-AI age, I now find them a little embarrassing... very often a
+semi-colon or even a comma (\*shudder\*) is a suitable replacement."*
+
+**It is a matter of DENSITY, not a ban** — epanet-js's own landing page has six, a number Tom raised
+himself as the counterweight. One or two on a long page is fine; seven on one screen is the smell.
+
+**Apply it to new and edited strings only.** Measured 2026-09-01: **69 em dashes across 60 shipped
+English `$ec_lang` values.** Rewriting those would mark all 60 CHANGED and buy 60 x 26 = 1,560
+retranslations of strings whose MEANING did not move, which is a large bill for punctuation. So it
+is a ratchet: write new strings without it, drop it from any string you are editing for another
+reason, and leave the rest until a sprint is touching them anyway.
+
+Scope is visitor-facing English: `$ec_lang` values, page copy, and the LibreWaterNet landing draft.
+Not code comments, not `dev/*.md`.
+
 This governs new calculators from day one, not just retrofits.
 
 ### `$ec_lang_syn` — synonyms and alternate expressions
