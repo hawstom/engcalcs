@@ -15196,7 +15196,7 @@ var EngCalcs = EngCalcs || {};
 			// **THE ONE LOSS ON THE `.net` PATH THAT CANNOT BE CARRIED**, so it is told instead. A
 			// `.net` stores its options as an indexed array with no keywords, so a slot this page
 			// has no name for has nothing it could be called in the file we convert to.
-			case 'net-options': return pc.lpn_inp_drop_net_options || 'This EPANET .net file states settings in places this page has no name for, so they could not be carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.';
+			case 'net-options': return pc.lpn_inp_drop_net_options || 'This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.';
 			case 'file-options': return pc.lpn_inp_drop_file_options || 'This file points at another file beside it, for the map or for hydraulics already worked out. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.';
 			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain it. Add the picture yourself with Map, Backdrop.';
 			case 'dangling-link': return pc.lpn_inp_drop_dangling || 'These pipes name a junction that is not in the file, so they were left out.';
@@ -15357,8 +15357,17 @@ var EngCalcs = EngCalcs || {};
 		// The `.net`-only loss joins the file's own differences, so one report answers "what came
 		// across" whichever of EPANET's two formats the user opened.
 		if (lastNetUnnamed.length) {
+			// **THE VALUES GO IN AS `ids`, WHICH IS WHAT MAKES THE MESSAGE ANSWERABLE** (Tom,
+			// 2026-09-02, reading the first version: *"It discloses a long list of exceptions. But
+			// not PDA. Maybe that includes PDA?"* -- and he could not tell, because the sentence
+			// named nothing). We cannot say what SLOT a value came from, since a `.net` option has
+			// no name in the file at all; we can always say what the value WAS. The report already
+			// prints `ids` in parentheses after the sentence, so `PDA` and `mg/L` appear verbatim
+			// and the reader recognises their own setting instead of guessing.
 			parsed.dropped = parsed.dropped.concat([{
-				code: 'net-options', ids: [], detail: lastNetUnnamed.length, group: null
+				code: 'net-options',
+				ids: lastNetUnnamed.map(function (u) { return u.value; }),
+				detail: lastNetUnnamed.length, group: null
 			}]);
 		}
 		showInpReport(parsed, fileName);

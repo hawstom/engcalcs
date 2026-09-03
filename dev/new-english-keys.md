@@ -27,5 +27,5 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.
   @@ NEEDS RULING
 - **`lpn_inp_drop_net_options`**
-  > This EPANET .net file states settings in places this page has no name for, so they could not be carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.
+  > This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.
   @@ NEEDS RULING
