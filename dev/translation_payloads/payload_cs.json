@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 1538,
-        "delta_key_count": 3,
+        "expected_key_count": 1539,
+        "delta_key_count": 4,
         "exempt_key_count": 28,
         "exempt_keys": [
             "calc_units_us",
@@ -514,11 +514,13 @@
     "keys_to_translate": {
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
+        "lpn_inp_drop_net_options": "This EPANET .net file states settings in places this page has no name for, so they could not be carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
+        "lpn_inp_drop_net_options": "This EPANET .net file states settings in places this page has no name for, so they could not be carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
@@ -551,6 +553,22 @@
                     "key": "lpn_find_q_aside",
                     "value": "Ovládací prvky nedokážou vyjádřit dotaz níže, takže jsou skryté.",
                     "english": "The controls cannot express the query below, so they are hidden."
+                }
+            }
+        },
+        "lpn_inp_drop_net_options": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_other_options",
+                    "value": "Tento soubor uvádí možnosti, které tato stránka nečte. Nic se zde z nich nepoužívá. Jsou zachovány a při uložení souboru EPANET se zapíší zpět.",
+                    "english": "This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_backdrop",
+                    "value": "Tento soubor odkazuje na podkladový obrázek, ale samotný obrázek neobsahuje. Přidejte jej sami pomocí Soubor, Podkladový obrázek, Přidat obrázek.",
+                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
                 }
             }
         },

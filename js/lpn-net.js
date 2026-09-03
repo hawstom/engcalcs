@@ -257,7 +257,10 @@
 		return s;
 	}
 
-	function netToInp(net, sourceName) {
+	// `out` is an optional collector the caller passes in when it wants to know what could NOT be
+	// carried. Kept as an out-parameter rather than a second return value because this function's
+	// job is to produce text and every other caller wants exactly that.
+	function netToInp(net, sourceName, out) {
 		var L = [], sections = { JUNCTIONS: [], RESERVOIRS: [], TANKS: [] },
 			emitters = [], demands = [], coords = [], verts = [],
 			pipes = [], pumps = [], valves = [], statusRows = [];
@@ -363,7 +366,28 @@
 		put('CONTROLS', net.controls.map(function (s) { return ' ' + s; }), 'Simple controls');
 		put('RULES', net.rules.map(function (s) { return ' ' + s; }), 'Rule-based controls');
 
+		// **AN OPTION SLOT WE HAVE NO NAME FOR CANNOT BE CARRIED, SO IT MUST BE TOLD** (Tom,
+		// 2026-09-02, having imported a `.net` stating a demand model: *"The message appears when
+		// importing a .inp, but not a .net with PDA."*). This is the `.inp` reader's old defect one
+		// file over -- a list of what to CARRY rather than a list of what is READ -- but the repair
+		// there does not transfer. In an `.inp` an unread line still carries its own keyword, so it
+		// can go back out verbatim; in a `.net` an option is an INDEXED SLOT with no name in the
+		// file at all, and inventing a keyword for slot 14 would write a setting the user never
+		// made. Measured on the harness fixture: slots 10 (`No`) and 12 (`mg/L`) are populated and
+		// were dropped in silence, and a chlorine unit is exactly the kind of thing that matters.
+		//
+		// So the honest outcome is the third one CLAUDE.md names for an unrecognised unit: read the
+		// file, convert what we can name, and say plainly what could not come across. The caller
+		// turns this into a sentence in the import report.
+		var unnamed = [];
 		L.push('[OPTIONS]');
+		net.options.forEach(function (v, i) {
+			var text = (v === undefined ? '' : v).replace(/^\s+|\s+$/g, '');
+			if (text === '') { return; }
+			if (OPTION_NAME[i] !== undefined || i === OPTION_PATTERN) { return; }
+			unnamed.push({ index: i, value: text });
+		});
+		if (out) { out.unnamedOptions = unnamed; }
 		Object.keys(OPTION_NAME).forEach(function (k) {
 			var i = +k, name = OPTION_NAME[k], v = net.options[i];
 			if (v === undefined || v.replace(/^\s+|\s+$/g, '') === '') { return; }
@@ -432,7 +456,12 @@
 		}
 		var bad = integrityError(net);
 		if (bad) { return { ok: false, error: 'section-mismatch', detail: bad }; }
-		return { ok: true, version: net.version, inp: netToInp(net, sourceName || 'an EPANET .net file') };
+		var out = {};
+		var text = netToInp(net, sourceName || 'an EPANET .net file', out);
+		return { ok: true, version: net.version, inp: text,
+			// Populated option slots this converter has no name for. Empty for every file it fully
+			// understands, which is why the caller may treat a missing array as none.
+			unnamedOptions: out.unnamedOptions || [] };
 	};
 
 	// Node-only, for dev/lpn-spike/net-import-harness.js.

@@ -15193,6 +15193,10 @@ var EngCalcs = EngCalcs || {};
 			// pressure off the map.
 			case 'demand-model': return pc.lpn_inp_drop_demand_model || 'This file asks for a pressure-driven analysis, where a junction is given less water when the pressure there is low. This page solves demand-driven, so every junction here is given the demand the file states whatever the pressure comes out at. The line is kept, and it is written back if you save an EPANET file.';
 			case 'other-options': return pc.lpn_inp_drop_other_options || 'This file states settings this page does not read. Nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
+			// **THE ONE LOSS ON THE `.net` PATH THAT CANNOT BE CARRIED**, so it is told instead. A
+			// `.net` stores its options as an indexed array with no keywords, so a slot this page
+			// has no name for has nothing it could be called in the file we convert to.
+			case 'net-options': return pc.lpn_inp_drop_net_options || 'This EPANET .net file states settings in places this page has no name for, so they could not be carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.';
 			case 'file-options': return pc.lpn_inp_drop_file_options || 'This file points at another file beside it, for the map or for hydraulics already worked out. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.';
 			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain it. Add the picture yourself with Map, Backdrop.';
 			case 'dangling-link': return pc.lpn_inp_drop_dangling || 'These pipes name a junction that is not in the file, so they were left out.';
@@ -15287,13 +15291,21 @@ var EngCalcs = EngCalcs || {};
 	// as text and produce nonsense. Every file is read as BYTES, checked for the `.net` magic,
 	// converted if it has it, decoded as UTF-8 text if not.
 
+	// **WHAT A `.net` COULD NOT BRING WITH IT, held for the report.** A `.net`'s options are an
+	// INDEXED array with no keywords in the file, so a slot this page has no name for cannot be
+	// written into the `.inp` text the rest of the import works from -- there is nothing to call it.
+	// It is therefore the one loss on this path that cannot be repaired by carrying, only by
+	// saying so, and `landInpText()` turns it into a sentence. Reset on every read so a second
+	// import can never inherit the first one's leftovers.
+	var lastNetUnnamed = [];
 	function inpTextFromBytes(buffer, fileName) {
 		var pc = EngCalcs.pageConfig || {}, bytes = new Uint8Array(buffer);
+		lastNetUnnamed = [];
 		if (!EngCalcs.lpnLooksLikeNet || !EngCalcs.lpnLooksLikeNet(bytes)) {
 			return new TextDecoder('utf-8').decode(bytes);
 		}
 		var conv = EngCalcs.lpnNetToInp(bytes, fileName);
-		if (conv.ok) { return conv.inp; }
+		if (conv.ok) { lastNetUnnamed = conv.unnamedOptions || []; return conv.inp; }
 		// A `.net` we cannot read is refused outright, never half-read -- see the integrity check in
 		// js/lpn-net.js. The way out is always available and always works, so the message names it.
 		alert((pc.lpn_net_bad_file || 'This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use File, Export, Network to save it as an .inp file, then import that.') +
@@ -15342,6 +15354,13 @@ var EngCalcs = EngCalcs || {};
 		// edit, and it can only ever go out as one of our own files, via Save as.
 		stampProjectSaved(id);
 		renderTabs();
+		// The `.net`-only loss joins the file's own differences, so one report answers "what came
+		// across" whichever of EPANET's two formats the user opened.
+		if (lastNetUnnamed.length) {
+			parsed.dropped = parsed.dropped.concat([{
+				code: 'net-options', ids: [], detail: lastNetUnnamed.length, group: null
+			}]);
+		}
 		showInpReport(parsed, fileName);
 		// A file that already states DEGREES arrived on the map by itself -- docFromInp() read that
 		// out of the file -- so there is nothing to place, and georefStart() says exactly that

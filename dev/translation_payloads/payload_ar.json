@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ar",
-        "expected_key_count": 1538,
-        "delta_key_count": 1,
+        "expected_key_count": 1539,
+        "delta_key_count": 2,
         "exempt_key_count": 19,
         "exempt_keys": [
             "calc_units_us",
@@ -503,12 +503,30 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_inp_drop_net_options": "This EPANET .net file states settings in places this page has no name for, so they could not be carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
+        "lpn_inp_drop_net_options": "This EPANET .net file states settings in places this page has no name for, so they could not be carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
+        "lpn_inp_drop_net_options": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_other_options",
+                    "value": "يذكر هذا الملف خيارات لا تقرأها هذه الصفحة. لا يُستخدم شيء هنا منها. تُحفظ وتُكتب مرة أخرى إذا حفظت ملف EPANET.",
+                    "english": "This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_backdrop",
+                    "value": "يشير هذا الملف إلى صورة خلفية لكنه لا يحتوي على الصورة نفسها. أضفها بنفسك عبر ملف، صورة خلفية، إضافة صورة.",
+                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                }
+            }
+        },
         "lpn_ff_col_static_tip": {
             "reason": "missing",
             "current_value": null,

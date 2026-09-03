@@ -863,6 +863,21 @@ html[lang="zh"] .ec-welcome {
    with no ceiling leaves nothing that can be reliably placed on top of it. Still under the
    registration bar (3000). */
 .tooltip { z-index: 1900; }
+/* **A DIALOG MAY NOT GROW PAST THE WINDOW, AND ITS BUTTONS MAY NEVER LEAVE IT** (Tom, 2026-09-02:
+   *"When the import message gets too long, the box runs off the screen and is not recoverable
+   without a page reload."*). #lpn_dialog is `position: fixed; top: 20%` with no height bound, so a
+   long import report -- and that report grows with how much of a file this page does not model,
+   which is exactly the file a user most needs to read about -- pushed its own OK button below the
+   viewport. Nothing scrolled: the page itself may not scroll (Task 432), the dialog had no
+   overflow, and the button that dismisses it was the part that went missing. A modal you cannot
+   dismiss is a lost session, which is why this is a defect and not a polish item.
+
+   The BODY scrolls and the button bar does not, so the way out stays on screen no matter how long
+   the message is. 60vh under a top of 20% leaves the buttons and the padding inside the window with
+   room to spare, and a short dialog is unaffected because max-height only binds when it is
+   exceeded. This is the same rule every other overlay here follows: wide and tall content scrolls
+   inside its own container rather than moving the page. */
+#lpn_dialog_body { max-height: 60vh; overflow-y: auto; overscroll-behavior: contain; }
 /* **AND THE SUITE NAVBAR'S OWN DROPDOWNS RISE WHILE THEY ARE OPEN** (Tom, 2026-09-02: *"The
    English selector is behind the non-modal (non-hog) boxes."*). Every menu that hangs off that bar -- the language selector among them -- opened behind them. A child cannot climb out
    of its parent's stacking context, so the bar itself has to rise, and it may only do so WHILE a

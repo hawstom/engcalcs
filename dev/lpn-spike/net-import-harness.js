@@ -321,5 +321,38 @@ console.log('\n--- the two readers on real models ---');
 	}
 }
 
+// ---- AN OPTION SLOT WITH NO NAME IS REPORTED, NOT DROPPED IN SILENCE -------------------------
+//
+// **TOM FOUND THIS BY IMPORTING THE OTHER FORMAT** (2026-09-02: *"The message appears when
+// importing a .inp, but not a .net with PDA."*). `js/lpn-inp.js` had just stopped keeping a list of
+// what to CARRY in favour of a list of what it READS; this file still kept the first kind, and
+// `OPTION_NAME` names 12 of the 45 slots a `.net` can hold. The repair from the other file does not
+// transfer: an `.inp` option carries its own keyword and can go back out verbatim, while a `.net`
+// option is an INDEXED SLOT with no name anywhere in the file, so inventing one would write a
+// setting the user never made. What can be done is to say so, and that is what is asserted here.
+//
+// The fixture already populated two such slots and nobody had noticed: 10 (`No`) and 12 (`mg/L`).
+// A chlorine unit disappearing without a word is the shape of the defect.
+console.log('\n--- an option this reader cannot name is reported ---');
+{
+	const conv = EngCalcs.lpnNetToInp(buildNet(), 'unnamed.net');
+	ok('the file still converts', conv.ok === true, conv.error);
+	const idx = (conv.unnamedOptions || []).map((u) => u.index);
+	ok('the populated slots with no name are handed back', idx.length >= 2, JSON.stringify(idx));
+	ok('...and slot 12 is among them, which is where the fixture puts mg/L',
+		idx.indexOf(12) >= 0, JSON.stringify(conv.unnamedOptions));
+	// The named ones must NOT be reported as losses -- a report that cries about everything is one
+	// nobody reads.
+	ok('a slot this reader does know is not reported as lost',
+		idx.indexOf(0) < 0 && idx.indexOf(8) < 0, JSON.stringify(idx));
+	ok('...nor is the pattern slot, which is written under its own name',
+		idx.indexOf(7) < 0, JSON.stringify(idx));
+	// An empty slot is not a loss either: 45 slots, most of them blank.
+	ok('an empty slot is not reported', idx.indexOf(20) < 0, JSON.stringify(idx));
+	// And the text itself is unchanged by the collection -- this must observe, never edit.
+	ok('the converted file still states the options it can name',
+		conv.inp.indexOf('Demand Multiplier') >= 0 && conv.inp.indexOf('Emitter Exponent') >= 0);
+}
+
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);
