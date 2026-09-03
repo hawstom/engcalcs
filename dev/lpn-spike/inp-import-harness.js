@@ -409,11 +409,16 @@ console.log('\n--- a tank, in an LPS file ---');
 		!!tkEl && /lpn-node-symbol-tank/.test(tkEl.symbol.getAttribute('class') || ''),
 		tkEl && tkEl.symbol && tkEl.symbol.getAttribute('class'));
 	ok('a junction still draws no overlay symbol', !!jEl && !jEl.symbol);
-	// Tall and narrow, where a reservoir is wide and short. nodeRadius() is the circumscribing
-	// half-diagonal every other consumer reads, so this also pins that a tank is bigger than a
-	// junction and every clear-run inset, label leader and hit test follows.
-	ok('the tank reads taller than it is wide',
-		parseFloat(tkEl.symbol.getAttribute('height')) > parseFloat(tkEl.symbol.getAttribute('width')),
+	// **THE TWO ARE TOLD APART BY SHAPE, NOT BY ASPECT** (2026-09-03). This asserted that a tank is
+	// taller than it is wide, against a reservoir that was wider than tall -- true while both were
+	// stretched versions of one generic vessel. They are a rectangle and a triangle now, each drawn
+	// in its own proportions and both 2 junction-widths across by Tom's ratio, so the aspect no
+	// longer carries the distinction and asserting it would freeze the old drawing in place. What
+	// still matters, and is what this ever really guarded, is that a tank is NOT a junction-sized
+	// mark: nodeRadius() is the circumscribing half every clear-run inset, leader and hit test
+	// reads.
+	ok('the tank is drawn in its own square box, undistorted',
+		parseFloat(tkEl.symbol.getAttribute('height')) === parseFloat(tkEl.symbol.getAttribute('width')),
 		tkEl.symbol.getAttribute('width') + ' x ' + tkEl.symbol.getAttribute('height'));
 	ok('...and its hit radius is bigger than a junction\'s', L.nodeRadius('TK1') > L.nodeRadius('J1'),
 		L.nodeRadius('TK1') + ' vs ' + L.nodeRadius('J1'));

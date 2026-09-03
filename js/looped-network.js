@@ -3790,27 +3790,35 @@ var EngCalcs = EngCalcs || {};
 	// **This is the hit target as well as the drawing** (nodeRadius() feeds hit-testing, label
 	// leaders and the obstacle map), so it is deliberately not smaller than half.
 	var JUNCTION_R = 0.704;
-	// The reservoir has its own width and height rather than being a scaled junction box: EPANET's
-	// icon is wide, not tall and square, so a uniform shrink would narrow it too.
+	// **EVERY SYMBOL IS A MULTIPLE OF THE JUNCTION'S WIDTH** (Tom, 2026-09-03, against EPANET's own
+	// map: *"Standardize on symbol width where Junction is the unit width 1, Reservoir=2, Tank=2,
+	// Pump=2.5, and Valve=1.5."*). The junction IS the unit by construction -- symbolFactor() is
+	// (symbolSize/2) / JUNCTION_R -- so U below is 2 x JUNCTION_R and everything else is a ratio of
+	// it. One rule for five symbols, instead of five numbers nobody could re-derive.
 	//
-	// **IF THE SHARED PATH IN lib/Icons.lib.php CHANGES, REDO THE DIVISION BELOW -- DO NOT JUST
-	// SCALE THIS NUMBER BY THE REQUESTED PERCENTAGE.** This map box stretches that path with
-	// preserveAspectRatio="none", so the visible wall width is (path fraction) x (box width), and
-	// changing the path silently changes what a percentage of "this box" means. Worked example, for
-	// 80% of the rendered width after the shared path was widened:
-	//   old wall width    = (path fraction 12/24 = 0.5) x (box width 2 x 3.3 = 6.6) = 3.3
-	//   target            = 3.3 x 0.8 = 2.64
-	//   new path fraction = 18/24 = 0.75
-	//   new box width     = 2.64 / 0.75 = 3.52  ->  half-width 1.76
-	// A naive 3.3 x 0.8 lands 20% WIDER, not narrower.
-	var RESERVOIR_HALF_W = 1.408;
-	var RESERVOIR_HALF_H = 1.1;
-	// A TANK is the reservoir's mirror image in proportion (Task 248): narrower than it is tall,
-	// where the reservoir is wider than it is tall. With the domed roof in lib/Icons.lib.php that is
-	// the second of two cues separating the symbols, and the one that still works in a thumbnail.
-	// Area is kept close to the reservoir's so neither dominates a drawing containing both.
-	var TANK_HALF_W = 1.0;
-	var TANK_HALF_H = 1.45;
+	// **THE NUMBERS ARE BOXES AND THE RATIOS ARE DRAWN WIDTHS, AND THAT DIVISION IS THE WHOLE TRAP.**
+	// A map symbol is the 24-unit icon stretched into this box by preserveAspectRatio="none", so the
+	// visible width is (the path's own fraction of 24) x (box width). Scaling a box by the requested
+	// ratio therefore lands somewhere else entirely. Worked, for each:
+	//
+	//   reservoir  triangle spans x 3.5..20.5 = 17/24   box = 2U / (17/24)   = 3.9755
+	//   tank       rect     spans x 4..20     = 16/24   box = 2U / (16/24)   = 4.2240
+	//   pump       volute   spans x 3..22.5   = 19.5/24 box = 2.5U / (19.5/24) = 4.3323
+	//   valve      bowtie   spans x 3..21     = 18/24   box = 1.5U / (18/24) = 2.8160
+	//
+	// **IF A PATH IN lib/Icons.lib.php CHANGES, REDO THESE FOUR DIVISIONS.** Do not scale the
+	// numbers: the fraction moves with the path and the ratio Tom asked for is about what a reader
+	// SEES, not about the box it is drawn in.
+	//
+	// The boxes are SQUARE now, where the reservoir and tank once had independent width and height.
+	// The old pair existed to stretch a generic icon into a wide vessel and a tall one; the shapes
+	// carry their own proportions since 2026-09-02, so stretching them would distort a triangle
+	// nobody asked to be distorted.
+	var JUNCTION_UNIT_W = 2 * JUNCTION_R;
+	var RESERVOIR_HALF_W = 1.9878;
+	var RESERVOIR_HALF_H = 1.9878;
+	var TANK_HALF_W = 2.1120;
+	var TANK_HALF_H = 2.1120;
 	// The drawn box for a node that has an overlay symbol. Sized per TYPE, not per node -- so the
 	// map reads as a symbol set rather than as a set of scaled circles.
 	function nodeSymbolSize(n) {
@@ -3823,7 +3831,17 @@ var EngCalcs = EngCalcs || {};
 	// visually a circle, so this is the CIRCUMSCRIBING radius (half its longer side): generous
 	// rather than tight, so no consumer clips the wide/short tank on any one side.
 	function nodeRadius(n) {
-		if (n.type === 'reservoir' || n.type === 'tank') { var s = nodeSymbolSize(n); return Math.max(s.w, s.h) / 2; }
+		// **THE DRAWN EXTENT, NOT THE BOX** (2026-09-03). This used to be half the larger side of
+		// nodeSymbolSize(), which was right while the icon filled its box. It no longer does: a
+		// triangle occupies 17/24 of its box and a rectangle 16/24, so the box overstates what the
+		// symbol actually covers by about 40%, and every consumer of this number -- hit-testing,
+		// leader attachment, the obstacle map -- would claim ground the reader can see is empty.
+		// `node-yield-harness.js` caught it as pipe labels with nowhere left to go.
+		//
+		// Both vessels are 2U wide by Tom's ratio and neither is taller than it is wide, so the
+		// circumscribing radius of what is DRAWN is exactly U for both. One number, and it moves
+		// with the junction unit rather than with the boxes.
+		if (n.type === 'reservoir' || n.type === 'tank') { return JUNCTION_UNIT_W * symbolFactor(); }
 		return JUNCTION_R * symbolFactor();
 	}
 	// Positions/sizes a node's overlay symbol -- the reservoir basin and the tank, the only two that
@@ -4588,12 +4606,12 @@ var EngCalcs = EngCalcs || {};
 		var symbolG = null, symbolSvg = null;
 		if (l.type === 'pump' || l.type === 'valve') {
 			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-' + l.type }, nodesLayer);
-			// **THE PUMP IS THE ONE SYMBOL DRAWN DIFFERENTLY HERE THAN IN A MENU** (Tom, 2026-09-02).
-			// EPANET's map pump carries a snout as long as its body is wide, and that proportion is
-			// what a reader recognises on a drawing; it is also the wrong proportion for a menu row,
-			// where a wide symbol shrinks to the row height and loses its body. The valve and both
-			// node symbols still share one drawing with their toolbar icon.
-			symbolSvg = buildMapIconSvg(l.type === 'pump' ? 'pumpmap' : l.type, '');
+			// **ONE DRAWING FOR MENU AND MAP AGAIN** (Tom, 2026-09-03, correcting his own earlier
+			// steer: *"I steered you wrong about the volute. Its snout length is only about 0.6-0.7
+			// * the width of the body, not 1.0, more like the menu icon than I knew."*). A second
+			// map-only pump path existed for one day on the 1.0 figure and is gone; every symbol on
+			// this map is now the toolbar icon's own geometry, and only the SIZE differs by type.
+			symbolSvg = buildMapIconSvg(l.type, '');
 			if (symbolSvg) {
 				symbolG.appendChild(symbolSvg);
 				// The backdrop traces the SYMBOL, never its bounding box: a rectangle would blank out
@@ -4601,14 +4619,14 @@ var EngCalcs = EngCalcs || {};
 				// still be visible running through. The pump's thin discharge tail gets no backdrop --
 				// a line crossing a pipe reads as two lines crossing.
 				if (l.type === 'valve') {
-					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M3 4v16l9-8zM21 4v16l-9-8z' }, 'lpn-link-symbol-backdrop');
+					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M3 3v18l9-9zM21 3v18l-9-9z' }, 'lpn-link-symbol-backdrop');
 				} else {
 					// **THE WHOLE VOLUTE NOW, TAIL INCLUDED.** The old backdrop traced the casing only,
 					// on the argument that a thin discharge line crossing a pipe reads as two lines
 					// crossing. The discharge is a filled body in this drawing rather than a line, so
 					// that argument no longer applies and a pipe showing through it would read as a
 					// hole in the pump.
-					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M7 7H22V12H12A5 5 0 1 1 7 7Z' }, 'lpn-link-symbol-backdrop');
+					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M9 7H22.5V13H15A6 6 0 1 1 9 7Z' }, 'lpn-link-symbol-backdrop');
 				}
 			} else { symbolG.remove(); symbolG = null; }
 		}
@@ -4622,11 +4640,17 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Icon box size for a pump's map symbol, in world units -- same symbolFactor() scaling as every
 	// other symbol. Confirmed right-sized on screen; leave this one alone.
-	function pumpSymbolSize() { return 4 * symbolFactor(); }
+	// **A PUMP AND A VALVE ARE DIFFERENT WIDTHS**, 2.5U and 1.5U of the junction unit, so the one
+	// square box they used to share is now one per type. The divisions are worked in the constants
+	// block above; these are the results.
+	var PUMP_BOX = 4.3323, VALVE_BOX = 2.8160;
+	function pumpSymbolSize(type) {
+		return (type === 'valve' ? VALVE_BOX : PUMP_BOX) * symbolFactor();
+	}
 	function resizePumpSymbol(id) {
-		var le = linkEls[id];
-		if (!le || !le.symbolSvg) { return; }
-		var size = pumpSymbolSize(), half = size / 2;
+		var le = linkEls[id], l = linkById(id);
+		if (!le || !le.symbolSvg || !l) { return; }
+		var size = pumpSymbolSize(l.type), half = size / 2;
 		le.symbolSvg.setAttribute('x', -half); le.symbolSvg.setAttribute('y', -half);
 		le.symbolSvg.setAttribute('width', size); le.symbolSvg.setAttribute('height', size);
 	}

@@ -215,7 +215,7 @@ $ec_icons = array(
 	// tank above had to pass.
 	// Same shared-path rule as the reservoir and the tank: this ONE string draws the toolbar
 	// button and the map symbol both, so the map backdrop `d` in buildLinkEls() changes with it.
-	'valve'      => '<path d="M3 4v16l9-8z"/><path d="M21 4v16l-9-8z"/>',
+	'valve'      => '<path d="M3 3v18l9-9z"/><path d="M21 3v18l-9-9z"/>',
 	// Casing plus a discharge tail leaving it on the top tangent — the tangency is what makes this
 	// read as a pump rather than as a magnifier.
 	//
@@ -234,14 +234,7 @@ $ec_icons = array(
 	// moved right at the same time to keep the whole mark centred in the box, which shortening
 	// alone would have broken. Still 1.4:1 wide, so it keeps the squat proportion that is its
 	// identity; the number is a one-line change if he wants the other 10%.
-	'pump'       => '<path d="M10 7H20.5V13H16A6 6 0 1 1 10 7Z"/>',
-	// **THE MAP PUMP IS THE ONE SYMBOL WITH ITS OWN DRAWING**, and the divergence is Tom's
-	// (2026-09-02): *"In EPANET, which was my pattern, the symbol (not menu) pump snout is as long
-	// as the body diameter. So the pump icon has about a 2:1 aspect ratio... longer snout is better
-	// on the map. But shorter is better in the menu."* Body diameter 10 and snout 10 here against
-	// body 12 and snout 6.5 in 'pump' above. It letterboxes inside the same square 24 box, centred
-	// on y=12, so resizePumpSymbol() needs to know nothing about it.
-	'pumpmap'    => '<path d="M7 7H22V12H12A5 5 0 1 1 7 7Z"/>',
+	'pump'       => '<path d="M9 7H22.5V13H15A6 6 0 1 1 9 7Z"/>',
 	// Solid, because a junction is a node and the canvas draws it solid.
 	'junction'   => '<circle cx="12" cy="12" r="4.25"/>',
 	// A run between two nodes — the thing you are actually about to place.
