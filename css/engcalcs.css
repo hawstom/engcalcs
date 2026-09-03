@@ -863,6 +863,18 @@ html[lang="zh"] .ec-welcome {
    with no ceiling leaves nothing that can be reliably placed on top of it. Still under the
    registration bar (3000). */
 .tooltip { z-index: 1900; }
+/* **AND THE SUITE NAVBAR'S OWN DROPDOWNS RISE WHILE THEY ARE OPEN** (Tom, 2026-09-02: *"The
+   English selector is behind the non-modal (non-hog) boxes."*). Every menu that hangs off that bar -- the language selector among them -- opened behind them. A child cannot climb out
+   of its parent's stacking context, so the bar itself has to rise, and it may only do so WHILE a
+   menu of its own is open: raising it permanently would put the suite chrome back over the boxes
+   and reverse the ruling above. 1852 puts it just over the lpn menu fly-out at 1851, for the same
+   reason that one is over the boxes -- a menu must be readable even when a box covers the strip it
+   hangs from -- and still under the modal at 1860. `:has()` is what makes "while open" expressible
+   in CSS at all; without it this needs a class toggled from JS on every dropdown in the suite.
+   **`position: relative` is half the fix and the half that is easy to leave out:** this navbar
+   carries no `fixed-top`, so it is statically positioned and a z-index on it does NOTHING on its
+   own -- the same trap recorded above for #lpn_menubar. It changes no layout. */
+nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 #lpn_menubar { display: flex; gap: 2px; margin-bottom: 4px; }
 .lpn-menubar-item { background: none; border: 1px solid transparent; font: inherit; padding: 3px 10px; cursor: pointer; }
 .lpn-menubar-item:hover { background: #def; border-color: #9bd; }

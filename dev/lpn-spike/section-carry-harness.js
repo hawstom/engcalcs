@@ -307,5 +307,43 @@ console.log('\n6. A shipped example states what its own source .inp states');
 }
 done('the gallery has not fallen behind its own sources');
 
+// ---- A CARRIED OPTION REACHES THE SCREEN, not just the parse result ---------------------------
+//
+// **THE GAP THIS SHUTS IS THE ONE TOM FELL INTO** (2026-09-02: *"I can't see that the import report
+// mentions PDA."*). Everything about `Demand Model PDA` was asserted at the PARSER -- the code is
+// emitted, the token round-trips -- and nothing asserted that the report a person actually reads
+// says a word about it. A drop code with no sentence behind it renders as the bare code string
+// (`inpDropText`'s own default), which is a defect nobody would call a defect: it looks like a
+// label. So the sentence is read back through the same function the dialog calls.
+console.log('\n10. a carried option has a sentence a person can read');
+{
+	const inp = [
+		'[TITLE]', 'pressure-driven', '',
+		'[JUNCTIONS]', ' J1\t100\t250', '',
+		'[RESERVOIRS]', ' R1\t220.0', '',
+		'[PIPES]', ' P1\tR1\tJ1\t1200\t12\t130\t0\tOpen', '',
+		'[OPTIONS]', ' Units\tGPM', ' Headloss\tH-W', ' Demand Model\tPDA',
+		' Minimum Pressure\t0.0', ' Required Pressure\t20', '',
+		'[COORDINATES]', ' J1\t10.0\t10.0', ' R1\t0.0\t0.0', '', '[END]', ''
+	].join('\n');
+	const parsed = EngCalcs.lpnInpParse(inp);
+	const codes = (parsed.dropped || []).map((d) => d.code);
+	ok('a pressure-driven file is reported at all', codes.indexOf('demand-model') >= 0,
+		JSON.stringify(codes));
+	const said = L.dropText('demand-model');
+	ok('...with a sentence, not the bare code', said !== 'demand-model' && said.length > 40,
+		JSON.stringify(String(said).slice(0, 60)));
+	ok('...that names what changes for the answers', /demand-driven/i.test(said), JSON.stringify(said));
+	const other = L.dropText('other-options');
+	ok('the remaining unread options say so too',
+		other !== 'other-options' && other.length > 20, JSON.stringify(String(other).slice(0, 60)));
+	// DDA is what this page already does, so a file stating it has nothing to be told.
+	const dda = EngCalcs.lpnInpParse(inp.replace('Demand Model\tPDA', 'Demand Model\tDDA'));
+	ok('a demand-driven file is told nothing about it',
+		(dda.dropped || []).every((d) => d.code !== 'demand-model'),
+		JSON.stringify((dda.dropped || []).map((d) => d.code)));
+}
+done('a carried option reaches the report');
+
 console.log(fails ? '\n' + fails + ' FAILED of ' + checks : '\nall ' + checks + ' section-carry checks passed');
 process.exit(fails ? 1 : 0);

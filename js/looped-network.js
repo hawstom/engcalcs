@@ -27786,7 +27786,18 @@ var EngCalcs = EngCalcs || {};
 			table = ffEl('table', 'lpn-ff-table', null, wrap),
 			head = ffEl('thead', null, null, table),
 			hr = ffEl('tr', null, null, head);
-		headings.forEach(function (h) { ffEl('th', null, h, hr); });
+		// **A HEADING MAY CARRY ITS OWN DEFINITION**, as `[text, tip]`. The pane tables already put
+		// a tip on a `th` this way, so this is that pattern and not a second one. It exists because
+		// Static pressure is a term of art whose reading a person cannot guess: Tom, 2026-09-02,
+		// *"I'd like to check against the literature and disclose the meaning of Static Pressure.
+		// Zero flow from this hydrant? Zero flow in the system?"* The answer is the first, and a
+		// column heading that does not say so leaves the reader to pick.
+		headings.forEach(function (h) {
+			var text = h, tip = null, th;
+			if (h && h.length === 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; }
+			th = ffEl('th', null, text, hr);
+			if (tip) { th.title = tip; }
+		});
 		return ffEl('tbody', null, null, table);
 	}
 	// The reading order: what is wrong first. Failing, then design issues, then the junctions with
@@ -27871,7 +27882,8 @@ var EngCalcs = EngCalcs || {};
 		// and its own pressure are the same kind of pair and now sit the same way.
 		body = ffTable(host, [
 			pc.lpn_ff_col_junction || 'Junction',
-			pc.lpn_ff_col_static || 'Static pressure',
+			[pc.lpn_ff_col_static || 'Static pressure',
+				pc.lpn_ff_col_static_tip || 'The pressure at this junction before any fire flow is drawn, with the system\'s ordinary demands still running.'],
 			pc.lpn_ff_col_required || 'Required flow',
 			pc.lpn_ff_col_atrequired || 'Pressure at required',
 			pc.lpn_ff_col_available || 'Available flow',

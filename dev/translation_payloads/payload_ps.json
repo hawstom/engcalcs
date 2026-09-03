@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 1537,
-        "delta_key_count": 3,
+        "expected_key_count": 1538,
+        "delta_key_count": 4,
         "exempt_key_count": 24,
         "exempt_keys": [
             "u_imgd",
@@ -510,12 +510,14 @@
     "keys_to_translate": {
         "lpn_geomap": "lat\/lon",
         "lpn_new_coords_geo": "lat\/lon",
-        "lpn_labels_col_decimals_example": "0.000"
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
         "lpn_geomap": "lat\/lon",
         "lpn_new_coords_geo": "lat\/lon",
-        "lpn_labels_col_decimals_example": "0.000"
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
         "lpn_geomap": {
@@ -563,6 +565,22 @@
                     "key": "lpn_labels_col_rank",
                     "value": "رتبه",
                     "english": "Rank"
+                }
+            }
+        },
+        "lpn_ff_col_static_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_col_static",
+                    "value": "ثابت فشار",
+                    "english": "Static pressure"
+                },
+                "next_translated": {
+                    "key": "lpn_ff_col_available",
+                    "value": "شتون لرونکی بهاو",
+                    "english": "Available flow"
                 }
             }
         }

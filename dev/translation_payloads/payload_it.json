@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1537,
-        "delta_key_count": 4,
+        "expected_key_count": 1538,
+        "delta_key_count": 5,
         "exempt_key_count": 30,
         "exempt_keys": [
             "calc_units_us",
@@ -517,13 +517,15 @@
         "lpn_geomap": "lat\/lon",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
-        "lpn_new_coords_geo": "lat\/lon"
+        "lpn_new_coords_geo": "lat\/lon",
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
         "lpn_geomap": "lat\/lon",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
-        "lpn_new_coords_geo": "lat\/lon"
+        "lpn_new_coords_geo": "lat\/lon",
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
         "lpn_geomap": {
@@ -587,6 +589,22 @@
                     "key": "lpn_new_coords_tip",
                     "value": "Un progetto xy usa coordinate che non sono latitudine e longitudine. Un progetto lat\/lon ha coordinate geografiche, quindi dietro di esso si possono disegnare una mappa stradale o un'immagine satellitare, e le quote dei nodi possono essere lette dal terreno. Un progetto xy può essere convertito in lat\/lon con File, Apri un file xy sulla mappa.",
                     "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
+                }
+            }
+        },
+        "lpn_ff_col_static_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_col_static",
+                    "value": "Pressione statica",
+                    "english": "Static pressure"
+                },
+                "next_translated": {
+                    "key": "lpn_ff_col_available",
+                    "value": "Portata disponibile",
+                    "english": "Available flow"
                 }
             }
         }

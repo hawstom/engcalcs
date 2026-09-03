@@ -2901,9 +2901,9 @@ $ec_lang['lpn_terrain_ids_more']='{ids}, and {n} more';
 // {flow} and {velocity} are quantities with their units, {pressure} a pressure with its unit,
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
-$ec_lang['lpn_ff_menu']='Fire flow…';
+$ec_lang['lpn_ff_menu']='Fire flow analysis…';
 $ec_lang['lpn_ff_menu_tip']='Test junctions one at a time: how much can each deliver while still holding the residual pressure you set, and does drawing the required flow there push anything else out of limits?';
-$ec_lang['lpn_ff_title']='Fire flow';
+$ec_lang['lpn_ff_title']='Fire flow analysis';
 $ec_lang['lpn_ff_intro']='Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.';
 $ec_lang['lpn_ff_scope']='Junctions to test';
 $ec_lang['lpn_ff_scope_tip']='Choose the set before you run. Testing every junction in a large system can take minutes.';
@@ -2914,7 +2914,7 @@ $ec_lang['lpn_ff_no_selection']='No junction is selected. Choose one on the map,
 $ec_lang['lpn_ff_required']='Required fire flow';
 $ec_lang['lpn_ff_required_tip']='The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.';
 $ec_lang['lpn_ff_required_own']='Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.';
-$ec_lang['lpn_ff_required_node_tip']='The fire flow required at this particular junction, from your fire code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Required fire flow box.';
+$ec_lang['lpn_ff_required_node_tip']='The fire flow required at this particular junction, from your fire code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Fire flow analysis box.';
 $ec_lang['lpn_ff_residual']='Residual pressure to hold';
 $ec_lang['lpn_ff_residual_tip']='The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Design check (effect on system)';
@@ -2973,6 +2973,7 @@ $ec_lang['lpn_ff_summary_error']='{n} junctions could not be answered.';
 $ec_lang['lpn_ff_report_all']='Every junction tested';
 $ec_lang['lpn_ff_col_junction']='Junction';
 $ec_lang['lpn_ff_col_static']='Static pressure';
+$ec_lang['lpn_ff_col_static_tip']='The pressure at this junction before any fire flow is drawn, with the system\'s ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.';
 $ec_lang['lpn_ff_col_available']='Available flow';
 $ec_lang['lpn_ff_col_required']='Required flow';
 $ec_lang['lpn_ff_col_residual']='Residual held';

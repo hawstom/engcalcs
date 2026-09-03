@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 1537,
-        "delta_key_count": 5,
+        "expected_key_count": 1538,
+        "delta_key_count": 6,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -511,14 +511,16 @@
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_new_coords_geo": "lat\/lon",
-        "lpn_labels_col_decimals_example": "0.000"
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
         "lpn_geomap": "lat\/lon",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_new_coords_geo": "lat\/lon",
-        "lpn_labels_col_decimals_example": "0.000"
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
         "lpn_geomap": {
@@ -598,6 +600,22 @@
                     "key": "lpn_labels_col_rank",
                     "value": "លំដាប់",
                     "english": "Rank"
+                }
+            }
+        },
+        "lpn_ff_col_static_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_col_static",
+                    "value": "សម្ពាធថេរ",
+                    "english": "Static pressure"
+                },
+                "next_translated": {
+                    "key": "lpn_ff_col_available",
+                    "value": "លំហូរដែលអាចមាន",
+                    "english": "Available flow"
                 }
             }
         }

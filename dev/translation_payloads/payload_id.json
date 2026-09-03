@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1537,
-        "delta_key_count": 2,
+        "expected_key_count": 1538,
+        "delta_key_count": 3,
         "exempt_key_count": 34,
         "exempt_keys": [
             "u_imgd",
@@ -519,11 +519,13 @@
     },
     "keys_to_translate": {
         "lpn_geomap": "lat\/lon",
-        "lpn_new_coords_geo": "lat\/lon"
+        "lpn_new_coords_geo": "lat\/lon",
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
         "lpn_geomap": "lat\/lon",
-        "lpn_new_coords_geo": "lat\/lon"
+        "lpn_new_coords_geo": "lat\/lon",
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
         "lpn_geomap": {
@@ -555,6 +557,22 @@
                     "key": "lpn_new_coords_tip",
                     "value": "Proyek xy menggunakan koordinat yang bukan garis lintang dan garis bujur. Proyek lat\/lon memiliki koordinat geografis, sehingga peta jalan atau gambar satelit dapat digambar di belakangnya dan elevasi simpul dapat dibaca dari medan. Proyek xy dapat diubah menjadi lat\/lon dengan File, Buka berkas xy di peta.",
                     "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
+                }
+            }
+        },
+        "lpn_ff_col_static_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_col_static",
+                    "value": "Tekanan statis",
+                    "english": "Static pressure"
+                },
+                "next_translated": {
+                    "key": "lpn_ff_col_available",
+                    "value": "Debit tersedia",
+                    "english": "Available flow"
                 }
             }
         }

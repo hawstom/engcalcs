@@ -125,6 +125,16 @@ function rowFirstCells(el) {
 	})(el);
 	return out;
 }
+// The `th` whose text is exactly this heading, so a tip can be read off the rendered table rather
+// than off the string that was passed in.
+function headWithText(el, text) {
+	let found = null;
+	(el.children || []).forEach(c => {
+		if (!found && (c._tag === 'th' || c.tagName === 'TH') && (c.textContent || '') === text) { found = c; }
+		if (!found) { found = headWithText(c, text); }
+	});
+	return found;
+}
 function headCells(el) {
 	let n = 0;
 	(el.children || []).forEach(c => {
@@ -285,6 +295,18 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	ok('...and they appear in exactly that order', inOrder, wantOrder.join(' | '));
 	ok('and it is ten columns wide', headCells(byId.lpn_ff_report) === 10,
 		String(headCells(byId.lpn_ff_report)));
+	// **STATIC PRESSURE DISCLOSES WHICH ZERO IT MEANS.** Tom, 2026-09-02: *"Zero flow from this
+	// hydrant? Zero flow in the system?"* -- and he had read the numbers as though it were the
+	// second. It is the first: probe(0) draws no FIRE flow and leaves every ordinary demand
+	// running, which is AWWA M31's and NFPA 291's own definition, and measured on the Elm Street
+	// example the value equals the map's pressure at that junction to the last bit. A heading that
+	// does not say so leaves a reader to guess, so the tip is asserted rather than trusted.
+	const staticTh = headWithText(byId.lpn_ff_report, 'Static pressure');
+	ok('the Static pressure heading carries its definition', !!(staticTh && staticTh.title),
+		staticTh ? String(staticTh.title).slice(0, 40) : 'no such heading');
+	ok('...and it names the ordinary demands as still running',
+		!!(staticTh && staticTh.title.indexOf('ordinary demands still running') >= 0),
+		staticTh ? staticTh.title : '');
 	ok('the summary counts the two failure modes and the clean junctions',
 		report.indexOf('had nothing wrong') >= 0 &&
 		report.indexOf('failed the fire flow') >= 0 &&

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 1537,
-        "delta_key_count": 1,
+        "expected_key_count": 1538,
+        "delta_key_count": 2,
         "exempt_key_count": 30,
         "exempt_keys": [
             "u_imgd",
@@ -514,10 +514,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_geomap": "lat\/lon"
+        "lpn_geomap": "lat\/lon",
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
-        "lpn_geomap": "lat\/lon"
+        "lpn_geomap": "lat\/lon",
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
         "lpn_geomap": {
@@ -533,6 +535,22 @@
                     "key": "lpn_file_import_geo",
                     "value": "Deschide un fișier xy pe hartă…",
                     "english": "Open an xy file on the map…"
+                }
+            }
+        },
+        "lpn_ff_col_static_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_col_static",
+                    "value": "Presiune statică",
+                    "english": "Static pressure"
+                },
+                "next_translated": {
+                    "key": "lpn_ff_col_available",
+                    "value": "Debit disponibil",
+                    "english": "Available flow"
                 }
             }
         }

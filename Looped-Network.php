@@ -1595,6 +1595,7 @@ EngCalcs.pageConfig = {
 	lpn_ff_report_all: <?=json_encode($ec_lang['lpn_ff_report_all'])?>,
 	lpn_ff_col_junction: <?=json_encode($ec_lang['lpn_ff_col_junction'])?>,
 	lpn_ff_col_static: <?=json_encode($ec_lang['lpn_ff_col_static'])?>,
+	lpn_ff_col_static_tip: <?=json_encode($ec_lang['lpn_ff_col_static_tip'])?>,
 	lpn_ff_col_available: <?=json_encode($ec_lang['lpn_ff_col_available'])?>,
 	lpn_ff_col_required: <?=json_encode($ec_lang['lpn_ff_col_required'])?>,
 	lpn_ff_col_residual: <?=json_encode($ec_lang['lpn_ff_col_residual'])?>,
