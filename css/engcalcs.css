@@ -487,7 +487,14 @@ html[lang="zh"] .ec-welcome {
 /* Filled the same color as .lpn-link (Tom, 2026-07-30: vertices should read as "on the pipe",
    not as a third node type) -- previously a hollow white circle with the pump's #a52 stroke,
    which had no relation to the link it belonged to and could be mistaken for a small pump. */
-.lpn-vhandle { fill: #000; stroke: #223; stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: move; }
+/* **THE VERTEX DOT TAKES THE MAP'S OWN INK** (Tom, 2026-09-02: *"Change vertex color too."*). It
+   was black and a near-black stroke while everything around it went blue, which made a bend read as
+   a different KIND of thing from the pipe it sits on. It is a mark on the pipe, so it is the pipe's
+   colour. */
+.lpn-vhandle {
+	fill: var(--lpn-map-ink); stroke: var(--lpn-map-ink);
+	stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: move;
+}
 /* VERTICES MODE (Task 567): the bends of every pipe become GRIPS -- hollow, and a good deal bigger
    than the dot that merely says a bend is there. EPANET's own grip is a hollow square; a circle is
    what this map already draws, and hollow-plus-large is the half that carries the meaning ("this is

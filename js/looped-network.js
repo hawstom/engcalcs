@@ -15252,6 +15252,20 @@ var EngCalcs = EngCalcs || {};
 			h.style.fontWeight = 'bold';
 			h.textContent = (pc.lpn_inp_report_heading || 'Imported {file}').replace('{file}', fileName);
 			body.appendChild(h);
+			// **A `.net` SAYS WHAT IT IS, EVERY TIME, NOT ONLY WHEN SOMETHING IS LOST** (Tom,
+			// 2026-09-02: *"Shouldn't we prominently say that .NET import is provided imperfectly
+			// and only as an emergency option?"*). `.inp` is the format EPANET documents and every
+			// other program reads; `.net` is its own project file with no published description,
+			// read here by inspection. A user who has a choice should take the other road, and the
+			// only moment they can act on that is while looking at what just came in.
+			if (lastWasNet) {
+				var netNote = document.createElement('p');
+				netNote.style.margin = '0 0 8px';
+				netNote.style.fontWeight = 'bold';
+				netNote.textContent = pc.lpn_net_emergency
+					|| 'This was an EPANET .net file. That is EPANET\'s own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.';
+				body.appendChild(netNote);
+			}
 			var sum = document.createElement('p');
 			sum.style.margin = '0 0 8px';
 			sum.textContent = (pc.lpn_inp_report_counts || '{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.')
@@ -15323,13 +15337,15 @@ var EngCalcs = EngCalcs || {};
 	// It is therefore the one loss on this path that cannot be repaired by carrying, only by
 	// saying so, and `landInpText()` turns it into a sentence. Reset on every read so a second
 	// import can never inherit the first one's leftovers.
-	var lastNetUnnamed = [];
+	var lastNetUnnamed = [], lastWasNet = false;
 	function inpTextFromBytes(buffer, fileName) {
 		var pc = EngCalcs.pageConfig || {}, bytes = new Uint8Array(buffer);
 		lastNetUnnamed = [];
+		lastWasNet = false;
 		if (!EngCalcs.lpnLooksLikeNet || !EngCalcs.lpnLooksLikeNet(bytes)) {
 			return new TextDecoder('utf-8').decode(bytes);
 		}
+		lastWasNet = true;
 		var conv = EngCalcs.lpnNetToInp(bytes, fileName);
 		if (conv.ok) { lastNetUnnamed = conv.unnamedOptions || []; return conv.inp; }
 		// A `.net` we cannot read is refused outright, never half-read -- see the integrity check in

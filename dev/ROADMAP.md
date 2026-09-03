@@ -64,30 +64,27 @@ the block.
     with storage the UTILITY controls — *"the moment 'the link' is something we host, it has become
     the cloud-login proposal in a smaller costume."* Full record in both agents' journals.
 
-- 75|574| **The `.net` option slots need CONFIRMED names, not inferred ones.**
-  A `.net` stores its options as an indexed array with no keywords anywhere in the file, so 12 of
-  the 45 slots are named and the rest are carried as values in the import report.
-  - **AN INFERRED MAP WAS BUILT AND REVERTED ON 2026-09-02, AND THE LESSON IS THE POINT.** Tom's own
-    file reported 30 unnamed values; they decoded plausibly against EPANET's written section order,
-    and converting his Net3 with that map produced `Duration 0.0` where the file states 24:00,
-    `Required Pressure PDA`, and `HeadError 10` where EPANET states `CHECKFREQ 2`. **The values were
-    right and the OFFSETS were wrong** -- a run of repeated `0.0`s cannot be counted by eye in a
-    transcribed list, and one miscount shifts every slot after it. This is exactly the failure the
-    task's own text warned about, committed anyway, and caught only because Tom exported the same
-    model from EPANET and put both files side by side in `dev/net-import-study/`.
-  - **THE MECHANISM THAT REPLACES THE GUESS: the report prints `index: value`.** A reader can read a
-    value back but cannot COUNT it back. With the slot number printed beside it, the next real file
-    states its own indices and the map grows one confirmed entry at a time.
-  - **What `dev/net-import-study/Net3-PDA-from-EPANET.inp` proves, independent of any index:** the
-    `[TIMES]` keywords and their order, `Quality Trace Lake` as ONE line whose grammar changes with
-    its first token, `CHECKFREQ`/`MAXCHECK`/`DAMPLIMIT` living in `[OPTIONS]`, `Status` living in
-    `[REPORT]` and not in `[OPTIONS]`, and `Demand Model`/`Minimum Pressure`/`Required Pressure`/
-    `Pressure Exponent` as EPANET 2.2's PDA quartet. Every one of those is a keyword fact and can be
-    implemented the moment the slot it comes from is known.
-  - **AND THE FIND THAT OUTLIVES THE REVERT: nothing writes `[TIMES]` or `[ENERGY]` at all**, so
-    every `.net` this page imports arrives with no clock -- no duration, no timesteps, no start
-    time -- and an extended-period model silently becomes a single instant. That is real and is not
-    fixed; it is waiting on the confirmed indices, and it is the reason this task is worth doing.
+- 25|574| **What is left of the `.net` slot map: nine slots nothing identifies.**
+  **MOSTLY CLOSED 2026-09-03.** The slots were MEASURED, not inferred: the import report prints
+  `index: value`, Tom imported his Net3 and read the indices back, and every name was then checked
+  against what EPANET itself wrote for the same model (`dev/net-import-study/`). Two independent
+  sources agreeing on both index and value is what confirmed it.
+  - **Named now:** `[TIMES]` 23-31 (all nine, in order), `[ENERGY]` 32-35 (34 is the optional
+    `Global Pattern`, which is what explains the gap), `[REPORT] Status` at 10, the water-quality
+    trio 11/12/14 as ONE line, `CheckFreq`/`MaxCheck`/`DampLimit` 36-38, and EPANET 2.2's PDA
+    quartet 41-44.
+  - **THE DEFECT THIS CLOSES: `[TIMES]` was never written**, so every `.net` ever imported arrived
+    with no duration and no timesteps, and an extended-period model silently became a single
+    instant. `[ENERGY]` and `[REPORT]` were lost the same way.
+  - **Still unnamed and still reported: 16-22, 39, 40** -- `1`, `First` and a run of zeros that
+    EPANET's own export of the same model does not state anywhere, so there is nothing to match
+    them against. They cost nothing while they are reported, and naming one from a guess is what
+    the first attempt did.
+  - **THE FIRST ATTEMPT IS WORTH KEEPING IN MIND, because it looked right.** The same values without
+    their indices decoded plausibly against EPANET's section order and were WRONG by one, which
+    wrote `Duration 0.0` and `HeadError 10` into a converted file. The values were right and the
+    offsets were not; a run of repeated zeros cannot be counted by eye. The repair was not more
+    care, it was making the file state its own indices.
 
 - 50|575| **The six element symbols, redrawn from Tom's sketch.**
   Prototype published 2026-09-02 and both open questions answered: the junction becomes a shaded

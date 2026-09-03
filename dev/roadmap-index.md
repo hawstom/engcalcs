@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**66 open tasks.** Next (100): 11 · Soon (75): 12 · Someday (50): 14 · Maybe (25): 12 · Parked (5): 17
+**66 open tasks.** Next (100): 11 · Soon (75): 11 · Someday (50): 14 · Maybe (25): 13 · Parked (5): 17
 
 ## 100 — Next (11)
 
@@ -23,7 +23,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 567 — [H] · Vertices are a mode now; what is left is Tom looking at it.
 - Task 572 — [H] · The browser confirmations owed from the 2026-09-01/02 sessions.
 
-## 75 — Soon (12)
+## 75 — Soon (11)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -36,7 +36,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 568 — Standard hydraulic symbols: Tom's research, recorded, not yet a decision.
 - ! Task 570 — The EPANET report gets a box of its own: draggable, sizeable, and one of the family.
-- Task 574 — The `.net` option slots need CONFIRMED names, not inferred ones.
 
 ## 50 — Someday (14)
 
@@ -55,7 +54,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 569 — The cursor flickers to the default pointer at ~12 px from a node, on a PC.
 - Task 575 — The six element symbols, redrawn from Tom's sketch.
 
-## 25 — Maybe (12)
+## 25 — Maybe (13)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -69,6 +68,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
+- Task 574 — What is left of the `.net` slot map: nine slots nothing identifies.
 
 ## 5 — Parked (17)
 

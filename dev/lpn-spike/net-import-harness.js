@@ -108,6 +108,16 @@ function buildNet(opts) {
 	// A slot this reader cannot name, populated on purpose: without one, the report path below
 	// would assert on an empty list and pass whatever the code did.
 	options[17] = 'First';
+	// **THE SLOTS TOM'S OWN Net3 IDENTIFIED**, at the indices his import report printed, carrying
+	// the values EPANET wrote for the same model. This fixture is the confirmation kept in code:
+	// dev/net-import-study/Net3-PDA-from-EPANET.inp states every one of these lines, so the
+	// expectation below is EPANET's own output rather than ours restated.
+	options[23] = '24:00'; options[24] = '1:00'; options[25] = '0:05'; options[26] = '1:00';
+	options[27] = '0:00'; options[28] = '1:00'; options[29] = '0:00'; options[30] = '12 am';
+	options[31] = 'NONE';
+	options[32] = '75'; options[33] = '0.0'; options[35] = '0.0';   // 34 Global Pattern: empty here
+	options[36] = '2'; options[37] = '10'; options[38] = '0';
+	options[41] = 'PDA'; options[42] = '0'; options[43] = '0.1'; options[44] = '0.5';
 	options.forEach((s) => (s === '' ? w.ws('') : w.str(s)));
 	w.bool(false);
 
@@ -178,6 +188,34 @@ const EXPECTED = [
 	' C1                 500          190',
 	' C1                 1000         120',
 	'',
+	// **THE THREE SECTIONS NOTHING WROTE BEFORE 2026-09-02.** Every line here is one EPANET itself
+	// wrote for the same model (dev/net-import-study/Net3-PDA-from-EPANET.inp), so this expectation
+	// is the other tool's output rather than ours restated. `[TIMES]` is the one that matters: a
+	// `.net` used to arrive with no clock at all, and an extended-period model became one instant.
+	'[ENERGY]',
+	';Global energy settings',
+	' Global Efficiency    75',
+	' Global Price         0.0',
+	' Demand Charge        0.0',
+	'',
+	'[TIMES]',
+	';Clock and reporting',
+	' Duration             24:00',
+	' Hydraulic Timestep   1:00',
+	' Quality Timestep     0:05',
+	' Pattern Timestep     1:00',
+	' Pattern Start        0:00',
+	' Report Timestep      1:00',
+	' Report Start         0:00',
+	' Start ClockTime      12 am',
+	' Statistic            NONE',
+	'',
+	// Status is EPANET's, and it lives in [REPORT] -- not in [OPTIONS], where an inferred map put
+	// it before the indices were measured.
+	'[REPORT]',
+	';EPANET report settings',
+	' Status               No',
+	'',
 	'[OPTIONS]',
 	' Units                GPM',
 	' Headloss             H-W',
@@ -190,6 +228,13 @@ const EXPECTED = [
 	' Emitter Exponent     0.5',
 	' Diffusivity          1',
 	' Tolerance            0.01',
+	' CheckFreq            2',
+	' MaxCheck             10',
+	' DampLimit            0',
+	' Demand Model         PDA',
+	' Minimum Pressure     0',
+	' Required Pressure    0.1',
+	' Pressure Exponent    0.5',
 	'',
 	'[COORDINATES]',
 	';Node               X-Coord          Y-Coord',
@@ -341,7 +386,7 @@ console.log('\n--- an option this reader cannot name is reported ---');
 	const conv = EngCalcs.lpnNetToInp(buildNet(), 'unnamed.net');
 	ok('the file still converts', conv.ok === true, conv.error);
 	const idx = (conv.unnamedOptions || []).map((u) => u.index);
-	ok('the populated slots with no name are handed back', idx.length >= 2, JSON.stringify(idx));
+	ok('the populated slots with no name are handed back', idx.length >= 1, JSON.stringify(idx));
 	ok('...and slot 17 is among them, the one the fixture cannot name',
 		idx.indexOf(17) >= 0, JSON.stringify(conv.unnamedOptions));
 	// **THE INDEX TRAVELS WITH THE VALUE.** An inferred slot map built from a list of values alone

@@ -59,27 +59,59 @@
 	// Report pages. Only the hydraulics/quality head of it is reproduced; the rest is timing and
 	// reporting state that a steady-state solve does not read. `Pattern` (index 7) is handled
 	// separately because EPANET errors on a default pattern no [PATTERNS] section defines.
-	// **THE SLOT MAP, AND WHY IT IS STILL ONLY TWELVE ENTRIES.** A `.net` stores its options as an
-	// INDEXED array with no keywords anywhere in the file, so a name can only come from evidence.
+	// **THE SLOT MAP, CONFIRMED FROM A REAL FILE'S OWN INDICES (2026-09-02).** A `.net` stores its
+	// options as an INDEXED array with no keywords anywhere in the file, so a name can only come
+	// from evidence, and the evidence had to arrive twice.
 	//
-	// **AN INFERRED MAP WAS TRIED ON 2026-09-02 AND REVERTED THE SAME DAY.** Tom's own file reported
-	// 30 unnamed values, they decoded plausibly against EPANET's written section order, and the
-	// decode was WRONG: converting his Net3 wrote `Duration 0.0` where the file says 24:00,
-	// `Required Pressure PDA`, and `HeadError 10` where EPANET states `CHECKFREQ 2`. The values were
-	// right and the OFFSETS were not -- a run of repeated `0.0`s cannot be counted by eye in a
-	// transcribed list, and one miscount shifts every slot after it.
+	// **THE FIRST ATTEMPT WAS INFERRED AND WAS WRONG.** Tom reported the 30 unnamed VALUES, they
+	// decoded plausibly against EPANET's written section order, and converting his Net3 with that
+	// map wrote `Duration 0.0` where the file says 24:00 and `HeadError 10` where EPANET states
+	// `CHECKFREQ 2`. The values were right and the OFFSETS were not: a run of repeated `0.0`s
+	// cannot be counted by eye. The fix was not more care, it was printing `index: value` in the
+	// import report so a file states its own slot numbers. It then did:
 	//
-	// **SO THE RULE ALREADY WRITTEN HERE STANDS, AND IT COST A ROUND TRIP TO RE-LEARN:** naming a
-	// slot from a guess writes a setting the user never made, which is worse than the gap. The way
-	// in is `index: value` in the import report -- the reader prints both now -- so the next file to
-	// arrive says exactly which slot holds what, and the map grows one CONFIRMED entry at a time.
-	// Task 574.
+	//   10 Yes | 12 mg/L | 14 Lake | 17 1 | 18 First | 19-22 0.0 | 23 24:00 | 24 1:00 | 25 0:05
+	//   26 1:00 | 27 0:00 | 28 1:00 | 29 0:00 | 30 12 am | 31 NONE | 32 75 | 33 0.0 | 35 0.0
+	//   36 2 | 37 10 | 38 0 | 39 0 | 40 0 | 41 PDA | 42 0 | 43 0.1 | 44 0.5
+	//
+	// **AND EVERY NAME BELOW IS CHECKED AGAINST WHAT EPANET ITSELF WROTE FOR THE SAME MODEL**,
+	// which Tom exported and kept in `dev/net-import-study/`: `CHECKFREQ 2`, `MAXCHECK 10`,
+	// `DAMPLIMIT 0`, `Demand Model PDA`, `Minimum Pressure 0`, `Required Pressure 0.1`,
+	// `Pressure Exponent 0.5`, `Global Efficiency 75`, `Quality Trace Lake`, `Status Yes`, and the
+	// nine `[TIMES]` lines in order. Two independent sources agreeing on both index and value is
+	// what "confirmed" means here; nothing below rests on a count.
+	//
+	// **SLOTS 16 TO 22, 39 AND 40 ARE STILL UNNAMED AND ARE STILL REPORTED.** `1`, `First` and a run
+	// of zeros that EPANET's own export does not state anywhere, so there is nothing to match them
+	// against. Naming one from a guess is what this comment exists to prevent.
 	var OPTION_NAME = {
 		0: 'Units', 1: 'Headloss', 2: 'Specific Gravity', 3: 'Viscosity', 4: 'Trials',
 		5: 'Accuracy', 6: 'Unbalanced', 8: 'Demand Multiplier', 9: 'Emitter Exponent',
-		11: 'Quality', 13: 'Diffusivity', 15: 'Tolerance'
+		13: 'Diffusivity', 15: 'Tolerance',
+		36: 'CheckFreq', 37: 'MaxCheck', 38: 'DampLimit',
+		41: 'Demand Model', 42: 'Minimum Pressure', 43: 'Required Pressure',
+		44: 'Pressure Exponent'
 	};
 	var OPTION_PATTERN = 7;
+	// **THE WATER-QUALITY OPTION IS THREE SLOTS AND ONE LINE**, and its grammar changes with its own
+	// first token: `Quality Trace <node>` takes a node and no unit, `Quality Age` takes neither, a
+	// chemical takes its unit. Writing `Quality Trace` with the node dropped -- which a one-slot
+	// writer did -- names an analysis EPANET cannot run.
+	var OPT_QUALITY = 11, OPT_QUAL_UNITS = 12, OPT_TRACE_NODE = 14;
+	// `[REPORT]`, which is where EPANET puts Status -- NOT `[OPTIONS]`, where an earlier guess put
+	// it. Only the one slot is identified; Summary and Page are among the unnamed.
+	var REPORT_NAME = { 10: 'Status' };
+	// `[TIMES]`, in EPANET's own written order.
+	var TIME_NAME = {
+		23: 'Duration', 24: 'Hydraulic Timestep', 25: 'Quality Timestep', 26: 'Pattern Timestep',
+		27: 'Pattern Start', 28: 'Report Timestep', 29: 'Report Start', 30: 'Start ClockTime',
+		31: 'Statistic'
+	};
+	// `[ENERGY]`. Slot 34 is `Global Pattern`, empty in the file that identified the others, and it
+	// is what explains the gap between Global Price at 33 and Demand Charge at 35.
+	var ENERGY_NAME = {
+		32: 'Global Efficiency', 33: 'Global Price', 34: 'Global Pattern', 35: 'Demand Charge'
+	};
 
 	function Reader(bytes) {
 		this.d = bytes;      // Uint8Array
@@ -395,20 +427,51 @@
 		// file, convert what we can name, and say plainly what could not come across. The caller
 		// turns this into a sentence in the import report.
 		var unnamed = [];
+		function opt(i) {
+			var v = net.options[i];
+			return (v === undefined ? '' : v).replace(/^\s+|\s+$/g, '');
+		}
+		function rows(map) {
+			var out = [];
+			Object.keys(map).forEach(function (k) {
+				var v = opt(+k);
+				if (v !== '') { out.push(' ' + pad(map[k], 20) + ' ' + v); }
+			});
+			return out;
+		}
+		// **THE CLOCK, THE ENERGY GLOBALS AND THE REPORT SETTINGS, WHICH NOTHING WROTE UNTIL NOW.**
+		// `[TIMES]` is the one that matters: without it every `.net` this page imported arrived with
+		// no duration and no timesteps, so an extended-period model silently became a single
+		// instant. js/lpn-inp.js reads all three when they are present.
+		put('ENERGY', rows(ENERGY_NAME), 'Global energy settings');
+		put('TIMES', rows(TIME_NAME), 'Clock and reporting');
+		put('REPORT', rows(REPORT_NAME), 'EPANET report settings');
+
 		L.push('[OPTIONS]');
 		net.options.forEach(function (v, i) {
 			var text = (v === undefined ? '' : v).replace(/^\s+|\s+$/g, '');
 			if (text === '') { return; }
 			if (OPTION_NAME[i] !== undefined || i === OPTION_PATTERN) { return; }
+			if (TIME_NAME[i] !== undefined || ENERGY_NAME[i] !== undefined) { return; }
+			if (REPORT_NAME[i] !== undefined) { return; }
+			if (i === OPT_QUALITY || i === OPT_QUAL_UNITS || i === OPT_TRACE_NODE) { return; }
 			unnamed.push({ index: i, value: text });
 		});
 		if (out) { out.unnamedOptions = unnamed; }
 		Object.keys(OPTION_NAME).forEach(function (k) {
-			var i = +k, name = OPTION_NAME[k], v = net.options[i];
-			if (v === undefined || v.replace(/^\s+|\s+$/g, '') === '') { return; }
-			if (name === 'Quality' && v.toUpperCase() === 'NONE') { return; }
-			L.push(' ' + pad(name, 20) + ' ' + v.replace(/^\s+|\s+$/g, ''));
+			var i = +k, v = opt(i);
+			if (v !== '') { L.push(' ' + pad(OPTION_NAME[k], 20) + ' ' + v); }
 		});
+		var qual = opt(OPT_QUALITY), qualUnits = opt(OPT_QUAL_UNITS), traceNode = opt(OPT_TRACE_NODE);
+		if (qual !== '' && qual.toUpperCase() !== 'NONE') {
+			if (qual.toUpperCase() === 'TRACE') {
+				if (traceNode !== '') { L.push(' ' + pad('Quality', 20) + ' Trace ' + traceNode); }
+			} else if (qual.toUpperCase() === 'AGE') {
+				L.push(' ' + pad('Quality', 20) + ' Age');
+			} else {
+				L.push(' ' + pad('Quality', 20) + ' ' + qual + (qualUnits !== '' ? ' ' + qualUnits : ''));
+			}
+		}
 		var patName = net.options[OPTION_PATTERN] === undefined ? '' : net.options[OPTION_PATTERN].replace(/^\s+|\s+$/g, '');
 		if (patName !== '' && net.patterns.some(function (p) { return p.id === patName; })) {
 			L.push(' ' + pad('Pattern', 20) + ' ' + patName);
