@@ -64,23 +64,29 @@ the block.
     with storage the UTILITY controls — *"the moment 'the link' is something we host, it has become
     the cloud-login proposal in a smaller costume."* Full record in both agents' journals.
 
-- 75|574| **Name the `.net` option slots instead of only reporting them.**
-  Tom, 2026-09-02, on the import report that lists what a `.net` could not carry: *"we need to work
-  on implementing everything unless the industry has deprecated it."* That is his 2026-08-29 ruling
-  applied to the other format, and it is the right end state.
-  - **What stands today:** `OPTION_NAME` in `js/lpn-net.js` names 12 of the 45 indexed option slots
-    a `.net` can hold. The other 33 are populated in real files and cannot be carried, because a
-    `.net` option has NO keyword anywhere in the file -- only a position -- so there is nothing to
-    call it in the `.inp` we convert to. Since 2026-09-02 their VALUES are listed in the import
-    report rather than dropped in silence, which is the honest interim and not the answer.
-  - **What it needs is EVIDENCE, not a guess:** the slot-to-option map out of EPANET's own source or
-    a file whose settings are known. **Writing `Demand Model` against the wrong index would state a
-    setting the user never made**, which is worse than the current gap and is why this was not done
-    by inference. The fixture in `dev/lpn-spike/net-import-harness.js` already populates two unnamed
-    slots, 10 (`No`) and 12 (`mg/L`), and 12 is almost certainly the quality unit that pairs with
-    slot 11 -- one confirmed pair would be a start.
-  - A user's own file naming its lost values is the cheapest evidence there is: the report prints
-    them, so a reader can say "that is my demand model" and the index follows.
+- 75|574| **The `.net` option slots are named from a real file's own report.**
+  **MOSTLY DONE 2026-09-02, and the evidence was the report itself.** The interim fix -- listing the
+  values a `.net` could not carry -- turned the message into the diagnostic: Tom imported his file
+  and read back 30 values, which decode against EPANET's own section order almost completely.
+  - **What is named now:** `Status` (10); the water-quality trio 11/12/14, which is ONE line whose
+    grammar changes with its own first token (`Trace` takes a node, `Age` takes nothing, a chemical
+    takes its unit); `[TIMES]` at 22-30 in EPANET's written order; `[ENERGY]`'s three globals at
+    31-33; and `CheckFreq`, `MaxCheck`, `DampLimit`, `HeadError`, `FlowChange`, `Demand Model`,
+    `Minimum Pressure`, `Required Pressure`, `Pressure Exponent` at 34-42. Several identify
+    themselves: `PDA` can only be a demand model, `Lake` can only be a trace node, and 40-42 are
+    EPANET 2.2's documented PDA defaults.
+  - **THE FIND THAT MATTERS MORE THAN THE NAMING: nothing ever wrote `[TIMES]`.** Every `.net` this
+    page has imported arrived with NO clock -- no duration, no timesteps, no start time -- so an
+    extended-period model silently became a single instant, and no check could see it because the
+    section simply was not there to be wrong. `[ENERGY]` was lost the same way.
+  - **Slots 16 to 21 are still unnamed and are still reported.** Six values (`1`, `First`, and four
+    zeros) that nothing in the file identifies. Naming one from a guess would write a setting the
+    user never made, which is worse than the gap this task closes.
+  - **Two readers, one format:** `js/lpn-net.js` and `dev/scripts/epanet_net_to_inp.php` each hold
+    the table and the harness compares their output byte for byte, so both were changed together.
+  - **[H] THE ONE CONFIRMATION WORTH ASKING FOR:** open the same model in EPANET, export it as an
+    `.inp`, and diff that against what this page writes from the `.net`. The times block is inferred
+    from one file plus a documented section order; a diff would turn that into a measurement.
 
 - 50|575| **The six element symbols, redrawn from Tom's sketch.**
   Prototype published 2026-09-02 and both open questions answered: the junction becomes a shaded
