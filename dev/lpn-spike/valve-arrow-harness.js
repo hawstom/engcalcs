@@ -48,14 +48,17 @@ const valveDs = ((valveGeom || '').match(/\bd="([^"]*)"/g) || []).map(s => s.sli
 	const tags = (geom.match(/<([a-z]+)\b/g) || []).map(t => t.slice(1));
 	ok('it is drawn from <path> elements only', tags.length > 0 && tags.every(t => t === 'path'),
 		tags.join(','));
-	// Four paths and no more: the two triangles, each drawn twice -- once as the pale fill that
-	// gives the mark area against a pipe's stroke, once as the outline. A fifth is decoration.
-	ok('exactly four paths -- two triangles, each a fill and an outline', tags.length === 4,
+	// **TWO PATHS SINCE 2026-09-02, AND THE FILL MOVED TO THE MAP.** It was four -- each triangle
+	// drawn twice, once as a pale fill and once as an outline -- and that was wrong in the one place
+	// it mattered: a fill baked into the SHARED path is also in the toolbar icon, which Tom wants
+	// open (*"didn't we and the proof sheet have these all open in the menu?"*). The map's own
+	// backdrop carries the fill now, so the menu icon is linework and the map symbol is solid, from
+	// one geometry. A third path here would be decoration, which is what this assertion is for.
+	ok('exactly two paths -- one outline per triangle, no baked fill', tags.length === 2,
 		tags.length + ' element(s)');
-	const outlines = valveDs.slice(2);
-	ok('the fills trace the same two outlines they sit under',
-		valveDs.length === 4 && valveDs[0] === outlines[0] && valveDs[1] === outlines[1],
-		valveDs.join(' | '));
+	const outlines = valveDs;
+	ok('and both are real outlines rather than a repeated pair',
+		valveDs.length === 2 && valveDs[0] !== valveDs[1], valveDs.join(' | '));
 	// THE GEOMETRY ITSELF. Each triangle is "move to a corner, run down the outer edge, cut back to
 	// the apex, close" -- so its three points are recoverable without an SVG engine.
 	function triangle(d) {
@@ -102,9 +105,12 @@ const valveDs = ((valveGeom || '').match(/\bd="([^"]*)"/g) || []).map(s => s.sli
 // ---- 2. THE MAP SYMBOL AND ITS BACKDROP ARE ONE SHAPE ---------------------------------------
 console.log('\n--- the map symbol and its backdrop are one shape ---');
 {
-	const outlines = valveDs.slice(2);
-	// buildLinkEls() prepends ONE opaque path under a valve's icon so a pipe does not show through
-	// the mark. It is written as the two triangles concatenated.
+	const outlines = valveDs;
+	// buildLinkEls() prepends ONE path under a valve's icon. It was an opaque white patch, purely so
+	// a pipe did not show through the mark; since 2026-09-02 it is also the valve's SOLID FILL,
+	// which is why it must trace the icon exactly rather than merely cover it -- a bounding box
+	// would blank the pipe on both sides of the waist and read as a rectangle, not a valve. It is
+	// written as the two triangles concatenated.
 	const bd = editorSrc.match(/prependSymbolBackdrop\(symbolSvg, 'path', \{ d: '([^']*)' \}/);
 	ok('the valve map symbol still gets a backdrop path', !!bd);
 	ok('...tracing exactly the icon\'s own two triangles',

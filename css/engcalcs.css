@@ -349,8 +349,12 @@ html[lang="zh"] .ec-welcome {
    width would thicken as the drawing zooms out. `.lpn-node-pending`'s red ring still overrides
    stroke below, so the pending-link indicator is unaffected. */
 .lpn-node {
-	color: #000; fill: currentColor; fill-opacity: .18;
-	stroke: currentColor; stroke-width: calc(0.35 * var(--lpn-sym, 1));
+	color: var(--lpn-map-ink);
+	/* Fallback first, then the opaque tint -- see the backdrop note below for why a translucent
+	   wash cannot be used here: a pipe passing under a junction would show through it. */
+	fill: var(--lpn-map-bg, #fff);
+	fill: color-mix(in srgb, currentColor 18%, var(--lpn-map-bg, #fff));
+	stroke: currentColor; stroke-width: calc(0.14 * var(--lpn-sym, 1));
 	cursor: pointer;
 }
 /* A reservoir now draws as a tank symbol, not this circle (ROADMAP Task 146.10) -- fill:none/
@@ -377,25 +381,52 @@ html[lang="zh"] .ec-welcome {
    lone blue tank among black reservoirs would read as an oversight rather than a distinction --
    the two are told apart by SHAPE, which is the test every symbol here is held to. Easy to revert
    if that was not the intent. The junction dot is deliberately left blue for now; nobody asked. */
-.lpn-node-symbol-reservoir, .lpn-node-symbol-tank { color: #000; }
+/* **BLUE AGAIN SINCE 2026-09-02, WHICH REVERSES THE BLACK ABOVE ON TOM'S OWN WORD** (*"the icons
+   are very nice. But they are black"*, and *"the map is black too, but should be thematic blue"*).
+   The 2026-08-14 argument is kept above because it is still a good argument and would otherwise be
+   re-made: colour is the budget saved for MEANING, and a watery blue reservoir spends it on
+   decoration. What changed is that the symbols are now a SET drawn to one convention, and the
+   thematic blue is what makes them read as one -- so the hue is carrying the family, not the
+   wateriness. Colour-by-value still overrides all of it through currentColor, so the budget is
+   spent the moment the model has something to say. One token, so a future change is one edit. */
+:root { --lpn-map-ink: #1a6faf; }
+.lpn-node-symbol-reservoir, .lpn-node-symbol-tank { color: var(--lpn-map-ink); }
 /* THE SAME BLUE AS THE RESERVOIR, deliberately (Task 248). A tank and a reservoir are both
    water bodies, and colour here is decoration, not meaning -- the two are told apart by SHAPE
    (closed and tall against open and wide, lib/Icons.lib.php), which is what still works in
    greyscale and for a colour-blind reader. Giving the tank its own hue would spend a colour on
    a distinction the shape already carries, and colour is the budget this map is saving for
    CONDITION -- see the note above. */
-.lpn-link-symbol-pump { color: #000; }
+.lpn-link-symbol-pump { color: var(--lpn-map-ink); }
 /* Black with every other symbol (2026-08-14). It was the PIPE's own colour on the argument that a
    valve is a fitting in the line rather than a separate kind of thing -- that argument still holds
    and is now served better, since a black valve on a pipe stroke is a mark ON the line rather than
    a differently-coloured object sitting in it. Told apart from a pump by SHAPE (an angular bowtie
    against a circle), which is the test every symbol here is held to and the only one that survives
    greyscale, print, and a colour-blind reader. */
-.lpn-link-symbol-valve { color: #000; }
+.lpn-link-symbol-valve { color: var(--lpn-map-ink); }
 /* Opaque patch behind a symbol's own linework (prependSymbolBackdrop() in looped-network.js) so a
    pipe running under a reservoir's open tank or a pump's unfilled casing doesn't show through --
    the icon's own paths are untouched, this only paints underneath them. */
-.lpn-node-symbol-backdrop, .lpn-link-symbol-backdrop { fill: var(--lpn-map-bg, #fff); stroke: none; }
+/* **THE PATCH IS THE SHADING NOW, AND ONE SHAPE DOES BOTH JOBS** (2026-09-02). It was opaque white,
+   which hid the pipe underneath and left the symbol's inside empty. Tom, having looked: *"the nodes
+   don't hide the links"* and *"Node outlines alone are colored. The inside is open, and I see
+   links."* A translucent wash cannot fix that -- anything you can see the tint through, you can see
+   the pipe through. `color-mix()` gives an OPAQUE colour that still reads as an 18% tint of the
+   symbol's own hue, so it occludes exactly as the white patch did and carries the thematic shading
+   at the same time. The plain `fill` before it is the fallback for a browser without color-mix:
+   white and opaque, which is the old behaviour rather than a broken one.
+   **NODES ARE SHADED, PUMP AND VALVE ARE SOLID**, which is Tom's own convention (2026-09-02: *"All
+   the map node symbols are thematic shaded fill. The pump and valve symbols are solid fill."*). */
+.lpn-node-symbol-backdrop, .lpn-link-symbol-backdrop { stroke: none; fill: var(--lpn-map-bg, #fff); }
+.lpn-node-symbol-backdrop { fill: color-mix(in srgb, currentColor 18%, var(--lpn-map-bg, #fff)); }
+.lpn-link-symbol-backdrop { fill: currentColor; }
+/* **THE OUTLINE IS A HAIRLINE** (Tom, 2026-09-02: *"I'd like the ring on all node types to be
+   thinner, like 1px, with the thematic blue shading."*). The icon paths carry stroke-width="2" as a
+   presentation attribute for the toolbar, where the frame is 24px and 2 is right; stretched to a
+   map symbol that same 2 reads as a heavy border round a small shape. A stylesheet rule beats a
+   presentation attribute, so the map thins it without the toolbar noticing. */
+.lpn-node-symbol { stroke-width: 1; }
 /* stroke-width was 2 -- too wide relative to a 1.6-2.2 radius node (Tom, 2026-07-30), and it was
    also why the arrow read as absorbed into the pipe rather than a distinct mark. Then 0.5, which
    that correction overshot: a pipe network's PIPES are its primary content, and at 0.5 they were

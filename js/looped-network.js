@@ -3779,9 +3779,17 @@ var EngCalcs = EngCalcs || {};
 	function linkStrokeWidth() {
 		return settings.linkWidth / (state.s || 1);
 	}
-	// Junction radius. 0.9 puts the WHOLE dot at 1.8 units -- one cap height of the 2.5-unit base
-	// font, which is the "no larger than 1 text height" rule for a stroke-less solid dot.
-	var JUNCTION_R = 0.9;
+	// Junction radius. **HALF THE OTHER NODES SINCE 2026-09-02** (Tom, of the sketch the symbol set
+	// came from: *"The Junction in my rough sketch was 1/2 the size of a reservoir or tank. Make the
+	// Junctions 1/2 the size of the other nodes."*). The reservoir is the widest node at
+	// 2 x RESERVOIR_HALF_W = 2.816 across, so half of it is 1.408 across and the radius is 0.704.
+	//
+	// The old 0.9 came from a different rule -- "no larger than one cap height of the 2.5-unit base
+	// font", which suited a stroke-less SOLID dot. A junction is a hairline ring now, and a ring
+	// reads larger than a filled disc of the same radius, so the two changes pull the same way.
+	// **This is the hit target as well as the drawing** (nodeRadius() feeds hit-testing, label
+	// leaders and the obstacle map), so it is deliberately not smaller than half.
+	var JUNCTION_R = 0.704;
 	// The reservoir has its own width and height rather than being a scaled junction box: EPANET's
 	// icon is wide, not tall and square, so a uniform shrink would narrow it too.
 	//
