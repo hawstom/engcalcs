@@ -18680,6 +18680,7 @@ var EngCalcs = EngCalcs || {};
 		wireFireFlowBox();
 		buildMenuBar();
 		wireScenarioButton();
+		wireWrongButtons();
 		wireBasemapTeaser();
 		refreshBasemapTeaser();
 		wireTabs();
@@ -26680,16 +26681,91 @@ var EngCalcs = EngCalcs || {};
 	// canvas starts, but a diagnostic arrives BECAUSE OF THE MODEL, and the bottom of the map does
 	// not depend on the model (Tom, 2026-08-15). dev/lpn-spike/map-height-harness.js enforces that
 	// every applyMapHeight() caller is an environment event, and it caught this on the first run.
-	function setStatus(text) {
+	// `code` NAMES THE COMPLAINT THAT IS ON SCREEN, and it exists for one reader: the grievance
+	// button inside this box (Task 207), which sends 'wrong:<code>' so a report can say WHICH
+	// message the person was looking at when they pressed it. It is not displayed and it is not
+	// the text -- diagIssueText() already turned the code into the sentence. A caller with no code
+	// gets 'status', which is honest: something was said, and it was not one of the diagnoses.
+	var statusWrongCode = '';
+	function setStatus(text, code) {
 		var el = document.getElementById('lpn_status');
+		var textEl = document.getElementById('lpn_status_text');
 		if (!el) { return; }
-		el.textContent = text || '';
+		// WRITTEN INTO THE INNER SPAN, not into the <p>: the <p> also holds the grievance button,
+		// and textContent on the parent would delete it on the first solve. Falls back to the <p>
+		// where the span is absent, so a harness or a page that has not been updated still works.
+		(textEl || el).textContent = text || '';
+		var next = text ? (code || 'status') : '';
+		// A NEW COMPLAINT IS A NEW THING TO REPORT. The button stays thanked while the same message
+		// stands -- a second press posts nothing -- but a different diagnostic is a different
+		// sentence, and refusing to hear about that one would be the instrument measuring itself.
+		if (next !== statusWrongCode) { resetWrongButton('lpn_wrong_status_btn'); }
+		statusWrongCode = next;
 		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
 		// overlay now, so this changes what is COVERED, never what is laid out.
 		el.style.display = text ? 'block' : 'none';
 		// It appears and disappears under a top corner, so the legends re-dodge around it. This is
 		// NOT applyMapHeight() -- see the note above; the map's own height still ignores the model.
 		placeLegends();
+	}
+
+	// ---- The one-tap grievance link (ROADMAP Task 207, Rung 0; dev/dilettante-path.md) ----
+	//
+	// ONE PRESS, NOTHING TYPED, AND NO NEW CHANNEL. EngCalcs.logSignal already posts, already
+	// dedupes per page load, and already queues to IndexedDB and retries when the visitor is
+	// offline -- which is the requirement that matters most here, because the field users in
+	// low-resource regions this most needs to hear from are the likeliest to be offline. So this
+	// adds a detail slug to the lpn rows that already carry 'first:' and 'diag:', and nothing else.
+	//
+	// WHAT IT SENDS IS FIXED AND SMALL: page, served language, and 'wrong:none' from the standing
+	// cell or 'wrong:<code>' from the diagnostic box. NEVER anything out of the user's document --
+	// not an element id, not a coordinate, not a count of what they drew. A node coordinate says
+	// where their network is.
+	//
+	// NOTHING NEW IS STORED ON THE DEVICE, which is the entire reason the shape is this one: new
+	// storage would make a sentence in the consent banner false and re-ask every visitor. The
+	// dedupe is EngCalcs.logSignal's in-memory map and the button's own disabled flag, both of
+	// which end with the page load.
+	//
+	// THE THANK-YOU REPLACES THE LABEL IN PLACE and promises nothing. There is no reply coming and
+	// the tip says so; a thank-you that implies one is the honesty boundary this task is not
+	// allowed to cross.
+	function resetWrongButton(id) {
+		var btn = document.getElementById(id);
+		if (!btn || !btn.dataset || !btn.dataset.lpnWrongWired) { return; }
+		// Restored as HTML because the label is the tip markup ecTipLabel() built, and the tip has
+		// to come back with the control: a button offering to send something with no way left to
+		// read what it sends is the one shape this feature must not take.
+		if (btn.dataset.lpnWrongLabel) { btn.innerHTML = btn.dataset.lpnWrongLabel; }
+		btn.disabled = false;
+		// initTipsIn(), never EngCalcs.initTips() (Task 562): the direct call skips the orphan
+		// sweep, and a tip left standing over the map has no trigger to dismiss it on touch.
+		initTipsIn(btn);
+	}
+	function wireWrongButton(id, detail) {
+		var btn = document.getElementById(id);
+		if (!btn || btn.dataset.lpnWrongWired) { return; }
+		btn.dataset.lpnWrongWired = '1';
+		// The original label is kept so a later diagnostic can put the control back. It is the
+		// helper-built tip markup from the page, so it is stored and restored as HTML.
+		btn.dataset.lpnWrongLabel = btn.innerHTML;
+		btn.addEventListener('click', function () {
+			if (btn.disabled) { return; }
+			var pcW = EngCalcs.pageConfig || {};
+			if (EngCalcs.logSignal) {
+				EngCalcs.logSignal('lpn', 'wrong:' + (typeof detail === 'function' ? detail() : detail));
+			}
+			// textContent, not the tip markup: the thank-you is a statement and not a control, so
+			// it carries no "?" and no title of its own.
+			btn.textContent = pcW.lpn_wrong_thanks || 'Thank you. We got that.';
+			btn.disabled = true;
+		});
+	}
+	function wireWrongButtons() {
+		// 'none' rather than an empty slug: the endpoint strips the detail to a charset and an
+		// empty one would be indistinguishable in the log from a row whose detail was dropped.
+		wireWrongButton('lpn_wrong_btn', 'none');
+		wireWrongButton('lpn_wrong_status_btn', function () { return statusWrongCode || 'status'; });
 	}
 	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
 	// extrema and decoration MUST compare on this, not the raw SI value. Two series links carrying
@@ -27281,7 +27357,7 @@ var EngCalcs = EngCalcs || {};
 			lastSolveResult = null;
 			setStatus(((EngCalcs.pageConfig || {}).lpn_unit_unknown ||
 				'This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be given until this page knows that unit, because there is no way to tell how big it is.')
-				.replace('{unit}', unknownUnits.join(', ')));
+				.replace('{unit}', unknownUnits.join(', ')), 'unit-unknown');
 			refreshLabelText();
 			return;
 		}
@@ -27289,7 +27365,7 @@ var EngCalcs = EngCalcs || {};
 		if (issues.length > 0) {
 			lastSolveResult = null;
 			issues.forEach(function (issue) { logLpnDiag(issue.code); });
-			setStatus(issues.map(diagIssueText).join(' '));
+			setStatus(issues.map(diagIssueText).join(' '), issues[0].code);
 			refreshLabelText();
 			return;
 		}
@@ -28277,7 +28353,7 @@ var EngCalcs = EngCalcs || {};
 			// diameter that is not there.
 			if (result.issues && result.issues.length > 0) {
 				result.issues.forEach(function (issue) { logLpnDiag(issue.code); });
-				setStatus(result.issues.map(diagIssueText).join(' '));
+				setStatus(result.issues.map(diagIssueText).join(' '), result.issues[0].code);
 				refreshLabelText();
 				refreshValueColors();   // Task 384: the colours came from results that no longer exist
 				refreshPaneIfOpen();    // Task 409: and so did the grade line and the result columns
@@ -28287,7 +28363,7 @@ var EngCalcs = EngCalcs || {};
 			// nothing to hand back, and it belongs in the same histogram because to the user it is
 			// the same kind of dead end.
 			logLpnDiag('not-converged');
-			setStatus(pc.lpn_diag_not_converged || 'Did not converge.');
+			setStatus(pc.lpn_diag_not_converged || 'Did not converge.', 'not-converged');
 			refreshLabelText();
 			refreshValueColors();
 			refreshPaneIfOpen();

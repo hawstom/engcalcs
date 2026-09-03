@@ -655,8 +655,8 @@ if [ -s "$TMP/p-title" ] || [ -s "$TMP/l-title" ]; then
     echo "   Printable Title or Subtitle, so nothing on it can reach this log. On Looped-Network the"
     echo "   equivalent intent would be renaming a tab, saving a project, or placing a Text object."
     echo "   NONE OF THE THREE IS LOGGED TODAY — engcalcs-signal.log's lpn rows carry only"
-    echo "   'first:<example|element|backdrop|import>' and 'diag:<code>'. Adding one is a roadmap"
-    echo "   decision, not something this report can infer."
+    echo "   'first:<example|element|backdrop|import>', 'diag:<code>' and 'wrong:<code>'. Adding one"
+    echo "   is a roadmap decision, not something this report can infer."
 else
     echo "   (nobody has typed a Printable Title in this window)"
 fi
@@ -791,6 +791,22 @@ fi
 echo ""
 echo "--- Diagnostics met ---"
 awk -F'\t' '$5=="lpn" && $6 ~ /^diag:/ {print $6}' "$TMP/signal" | sort | uniq -c | sort -rn
+
+echo ""
+echo "=== Looped-Network: the one-tap grievance link (Task 207) ==="
+echo "    'wrong:none' is the standing cell in the map's bottom strip; 'wrong:<code>' is the same"
+echo "    control inside the solver's amber diagnostic box, and the code names the message that"
+echo "    was on screen when it was pressed. ONE PRESS, NOTHING TYPED, so a row says only that"
+echo "    somebody found something wrong here -- never what, and never who."
+echo "    READ IT AS A COMPLAINT AND NOT AS A RATE. Three rows on one code in one language is a"
+echo "    defect report worth acting on. A low total is not evidence the page is fine: 13 of 26"
+echo "    page loads in the window that sited this did nothing at all, and those people are not"
+echo "    reachable by any instrument here."
+echo ""
+awk -F'\t' '$5=="lpn" && $6 ~ /^wrong:/ {print $6}' "$TMP/signal" | sort | uniq -c | sort -rn
+echo ""
+echo "--- ...and by served language (a language complaining more than its share is a translation lead) ---"
+awk -F'\t' '$5=="lpn" && $6 ~ /^wrong:/ {print ($3==""?"(none)":$3)"\t"$6}' "$TMP/signal" | sort | uniq -c | sort -rn | head -20
 
 echo ""
 echo "=== Sharing a calculation (Task 228) ==="

@@ -1235,6 +1235,16 @@ $ec_lang['lpn_examples_loading']='Loading examples…';
 $ec_lang['lpn_help_fix']='Fix something';
 $ec_lang_syn['lpn_help_fix']='Fix something, Report a mistake, Tell us what is wrong, Send a correction, Suggest a fix | avoid: fix as fasten or attach; avoid: fix as prepare';
 $ec_lang['lpn_help_notes']='Notes on this page';
+// ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
+// The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
+// with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
+// strip, and the same control inside the solver's diagnostic box when one is on screen.
+// THE TIP SAYS EXACTLY WHAT THE TAP SENDS, because a control that posts on one press and does not
+// say what it posts is asking for trust it has not earned. It also says no reply is coming, which
+// is the honesty boundary that document draws: a thank-you must never imply an answer.
+$ec_lang['lpn_wrong_btn']='Something wrong here?';
+$ec_lang['lpn_wrong_tip']='One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.';
+$ec_lang['lpn_wrong_thanks']='Thank you. We got that.';
 $ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it with File, Save as.';
 // Each example's own card text. These live here, and NOT in the examples folder's own JSON, for one
 // reason: a string that is not in a lang file is a string no translator will ever see. The manifest

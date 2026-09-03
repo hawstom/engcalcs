@@ -257,7 +257,19 @@ echoHeader("EngCalcs", $html_title, "", false);
 			<?php // The solver's standing diagnostic ("Add a reservoir"), true until the model
 			      // changes. Deliberately NOT d-print-none: if the drawing on screen has no answers,
 			      // a print of it should say why rather than look like a finished network. ?>
-			<p id="lpn_status" class="ec-status-warn" style="display:none;max-width:60%;margin:0;font-size:11px;padding:2px 6px;background:#fffbe6;border:1px solid #a80"></p>
+			<p id="lpn_status" class="ec-status-warn" style="display:none;max-width:60%;margin:0;font-size:11px;padding:2px 6px;background:#fffbe6;border:1px solid #a80"><?php
+			      // THE TEXT IS ITS OWN ELEMENT NOW, and that is the whole DOM change Task 207 asks
+			      // of this box. setStatus() used to write the <p>'s textContent, which would wipe
+			      // any sibling control on every solve; it writes #lpn_status_text instead, so the
+			      // grievance button beside it survives. setStatus() is still the ONE writer here. ?><span id="lpn_status_text"></span><?php
+			      // THE SECOND SITE OF THE ONE-TAP GRIEVANCE LINK (ROADMAP Task 207). The point of
+			      // NOTICING: a person reading a complaint about their network is the person best
+			      // placed to say the complaint itself is wrong. Rare -- the diagnostic box was met
+			      // three times in ten days on production -- which is exactly why it cannot be the
+			      // only site, and why the standing cell in the bottom strip is the primary one.
+			      // d-print-none although the box around it is not: a printed sheet should carry
+			      // the diagnostic and cannot carry a button. pointer-events:auto because the
+			      // overlay stack it sits in is inert. ?><button type="button" id="lpn_wrong_status_btn" class="lpn-wrong-btn d-print-none"><?=ecTipLabel($ec_lang['lpn_wrong_btn'], $ec_lang['lpn_wrong_tip'])?></button></p>
 		</div>
 		<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
 		      // saving a project put a line of text above the canvas and "moves the map down past the
@@ -386,6 +398,26 @@ echoHeader("EngCalcs", $html_title, "", false);
 			<?php // Monospace, and only this one: the X/Y digits change on every pointer move, and a
 			      // proportional font makes the whole readout jitter as they do. ?>
 			<div id="lpn_coords" style="font-family:monospace;background:rgba(255,255,255,.8);padding:2px 6px">X: --  Y: --</div>
+			<?php // THE STANDING ONE-TAP GRIEVANCE LINK (ROADMAP Task 207, Rung 0 of the cost ladder in
+			      // dev/dilettante-path.md). Today the only invitation on this page is Help > Fix
+			      // something, which opens contact.php in a new tab: the page whose users have the most
+			      // to say has the longest path to saying it, and 15 years say a link-to-a-form
+			      // structurally yields about 0.01%. The lever is the COST of replying, not the
+			      // visibility of the request, so this posts on one press with nothing typed.
+			      //
+			      // A CELL OF THIS STRIP, for the same reasons the satellite teaser is one: the strip is
+			      // already the bottom-left band, already reserved against by zoomExtent(), already
+			      // wraps on a narrow window and is already d-print-none. A corner of its own would have
+			      // nowhere it cannot collide with a legend.
+			      //
+			      // STANDING RATHER THAN CONDITIONAL, which is where the production log moved the
+			      // answer: 17 of 20 opening moves this window were the example network on the map, and
+			      // the diagnostic box was met three times in ten and a half days. The person with
+			      // something to say is almost never the person who is stuck.
+			      //
+			      // LAST IN THE STRIP so it never pushes a live readout, and quiet by design -- it must
+			      // not compete with the drawing. ?>
+			<button type="button" id="lpn_wrong_btn" class="lpn-wrong-btn"><?=ecTipLabel($ec_lang['lpn_wrong_btn'], $ec_lang['lpn_wrong_tip'])?></button>
 		</div>
 		<?php // THE OPENSTREETMAP ATTRIBUTION (ROADMAP Task 145). Required by the OSM tile usage
 		      // policy whenever a tile is on screen, and therefore NOT dismissible: the only thing
@@ -1019,6 +1051,7 @@ EngCalcs.pageConfig = {
 	lpn_examples_failed: <?=json_encode($ec_lang['lpn_examples_failed'])?>,
 	lpn_examples_loading: <?=json_encode($ec_lang['lpn_examples_loading'])?>,
 	lpn_status_example_opened: <?=json_encode($ec_lang['lpn_status_example_opened'])?>,
+	lpn_wrong_thanks: <?=json_encode($ec_lang['lpn_wrong_thanks'])?>,
 	lpn_field_text_align: <?=json_encode($ec_lang['lpn_field_text_align'])?>,
 	lpn_field_text_align_left: <?=json_encode($ec_lang['lpn_field_text_align_left'])?>,
 	lpn_field_text_align_center: <?=json_encode($ec_lang['lpn_field_text_align_center'])?>,

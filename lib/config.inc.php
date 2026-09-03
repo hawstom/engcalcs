@@ -217,7 +217,12 @@ define('TITLE_LOG', dirname(__DIR__) . '/log/engcalcs-title.log');
 //             import>' — which of those a visitor does FIRST, the first evidence bearing on the
 //             empty-canvas decision closed 2026-07-29 with no data — or 'diag:<code>', which of
 //             the solver's pre-solve complaints fires most. Between them they name where the map
-//             interface loses people.
+//             interface loses people. Also 'wrong:<code>' (Task 207), the one-tap grievance link:
+//             'wrong:none' from the standing cell in the map's bottom strip, or the diagnostic code
+//             that was on screen when it was pressed inside the amber box. IT CARRIES NOTHING ELSE
+//             -- no typed text, no address, and nothing out of the drawing. It is a complaint and
+//             not a measurement: three of these on one code in one language is a defect report, and
+//             one is a person who could not tell us any other way.
 //   share     The share control under the Printable Title was used (Task 228). detail = 'copy'
 //             (the clipboard took it) or 'manual' (no clipboard here, so the link was shown for
 //             the visitor to copy). ONE HONEST MEASURE and no more: it says the control was used,

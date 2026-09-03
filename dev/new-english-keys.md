@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read**, of 3 untranslated keys, of 1540 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**6 still to read**, of 6 untranslated keys, of 1543 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (3, 3 to read @@ NEEDS RULING)
+## lpn_  (6, 6 to read @@ NEEDS RULING)
 
 - **`lpn_ff_col_static_tip`**
   > The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.
@@ -31,4 +31,13 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   @@ NEEDS RULING
 - **`lpn_net_emergency`**
   > This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.
+  @@ NEEDS RULING
+- **`lpn_wrong_btn`**
+  > Something wrong here?
+  @@ NEEDS RULING
+- **`lpn_wrong_thanks`**
+  > Thank you. We got that.
+  @@ NEEDS RULING
+- **`lpn_wrong_tip`**
+  > One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.
   @@ NEEDS RULING

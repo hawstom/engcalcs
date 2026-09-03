@@ -2157,6 +2157,34 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	background-repeat: no-repeat;
 }
 .lpn-basemap-teaser:hover, .lpn-basemap-teaser:focus { border-color: #0b57d0; }
+
+/* ==== The one-tap grievance link (ROADMAP Task 207, Rung 0) =================================
+   QUIET IS THE SPECIFICATION, not a taste. This page is a full-window drawing surface, and a
+   standing affordance that competes with the drawing is a worse defect than no affordance at
+   all -- so it reads as one more small readout in the bottom strip until it is pointed at, and
+   only then does it look like a control.
+
+   It is a <button> and never an <a>: nothing navigates, one press posts one row and the label
+   turns into the thank-you in place. Two homes, one class -- the bottom strip and the solver's
+   amber diagnostic box -- so the background is transparent and it takes whatever it is sitting
+   on rather than carrying a colour that is right in one place and wrong in the other.
+
+   pointer-events:auto because both of its homes are inert overlays over the map. */
+.lpn-wrong-btn {
+	pointer-events: auto;
+	background: none;
+	border: 1px solid transparent;
+	border-radius: 3px;
+	padding: 0 4px;
+	font: inherit;
+	font-size: 11px;
+	color: #555;
+	cursor: pointer;
+}
+.lpn-wrong-btn:hover, .lpn-wrong-btn:focus { border-color: #bbb; color: #222; }
+/* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
+   thank-you, so a hover border on it would invite a second press that posts nothing. */
+.lpn-wrong-btn[disabled] { color: #555; cursor: default; border-color: transparent; opacity: 1; }
 /* THE CORNER PEEL, and it is the one part of epanet-js's own switcher worth taking (Tom,
    2026-08-23, pasting two screenshots of it: *"It's acceptable now. But see what I see at
    epanetjs"*). A tile that shows only the destination says what you get and not what you leave;

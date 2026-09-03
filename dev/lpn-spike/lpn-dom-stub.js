@@ -295,6 +295,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_new_cancel', 'lpn_new_close', 'lpn_new_us', 'lpn_new_si',
   // The satellite teaser, a cell of that strip (ROADMAP Task 452).
   'lpn_basemap_teaser',
+  // The one-tap grievance link (ROADMAP Task 207) and the span setStatus() writes into. The span
+  // matters as much as the buttons: without it setStatus() falls back to the <p>, and the fallback
+  // is the shape that deletes the button on every solve -- so a stub missing it would have made
+  // the regression this feature can cause untestable.
+  'lpn_status_text', 'lpn_wrong_btn', 'lpn_wrong_status_btn',
   // The tile attribution (ROADMAP Task 145). It was NOT here, so refreshBasemapCredit() returned at
   // its first line in every harness and the licence credit was the one piece of map chrome no test
   // could see -- which is how it shipped invisible on the boot path (Task 486).
@@ -354,6 +359,13 @@ byId.lpn_menu_popup2.appendChild(byId.lpn_menu_list2);
 // falls back to rendering into the colour host only when it is NOT on the page. A parentless stub
 // would exercise that fallback and never the shipped placement.
 byId.lpn_setbox_content.appendChild(byId.lpn_set_ramp_credits);
+// Same reason again, and this one has already cost six harnesses: Looped-Network.php nests the
+// diagnostic's TEXT SPAN and the grievance button (Task 207) inside #lpn_status, and setStatus()
+// writes the span rather than the <p> so a solve cannot delete the button beside it. Parentless
+// stubs put the text somewhere `lpn_status.textContent` could not see, which is exactly the
+// question every harness asking "what does the diagnostic box say" is asking.
+byId.lpn_status.appendChild(byId.lpn_status_text);
+byId.lpn_status.appendChild(byId.lpn_wrong_status_btn);
 
 // **THE CREDIT'S TWO SOURCE SETS ARE MODELLED, NOT INVENTED.** refreshBasemapCredit() shows one
 // `[data-basemap-credit]` span and hides the other, so a stub with no children would let it "swap"
