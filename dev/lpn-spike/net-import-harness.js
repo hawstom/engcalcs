@@ -105,16 +105,9 @@ function buildNet(opts) {
 	options[4] = '40'; options[5] = '0.001'; options[6] = 'Continue'; options[7] = '1';
 	options[8] = '1.0'; options[9] = '0.5'; options[10] = 'No'; options[11] = 'None';
 	options[12] = 'mg/L'; options[13] = '1'; options[15] = '0.01';
-	// Slot 17 is one of the six this reader still cannot name (16-21). It is populated on
-	// purpose: without a genuinely unnamed slot in the fixture, the report path below would
-	// assert on an empty list and pass whatever the code did.
+	// A slot this reader cannot name, populated on purpose: without one, the report path below
+	// would assert on an empty list and pass whatever the code did.
 	options[17] = 'First';
-	// The clock and the energy globals, in the slots Tom's own file identified. Nothing wrote
-	// these sections before 2026-09-02, so a .net arrived with no duration at all.
-	options[22] = '24:00'; options[23] = '1:00'; options[24] = '0:05'; options[25] = '1:00';
-	options[26] = '0:00'; options[27] = '1:00'; options[28] = '0:00'; options[29] = '12 am';
-	options[30] = 'NONE';
-	options[31] = '75'; options[32] = '0.0'; options[33] = '0.0';
 	options.forEach((s) => (s === '' ? w.ws('') : w.str(s)));
 	w.bool(false);
 
@@ -185,28 +178,6 @@ const EXPECTED = [
 	' C1                 500          190',
 	' C1                 1000         120',
 	'',
-	// **THE CLOCK AND THE ENERGY GLOBALS, WRITTEN SINCE 2026-09-02.** Nothing emitted either
-	// section before, so a `.net` arrived with no duration and no timesteps -- an extended-period
-	// model silently became a single instant. The slot indices come from a real file's own report;
-	// see the OPTION_NAME note in js/lpn-net.js.
-	'[ENERGY]',
-	';Global energy settings',
-	' Global Efficiency    75',
-	' Global Price         0.0',
-	' Demand Charge        0.0',
-	'',
-	'[TIMES]',
-	';Clock and reporting',
-	' Duration             24:00',
-	' Hydraulic Timestep   1:00',
-	' Quality Timestep     0:05',
-	' Pattern Timestep     1:00',
-	' Pattern Start        0:00',
-	' Report Timestep      1:00',
-	' Report Start         0:00',
-	' Start ClockTime      12 am',
-	' Statistic            NONE',
-	'',
 	'[OPTIONS]',
 	' Units                GPM',
 	' Headloss             H-W',
@@ -217,7 +188,6 @@ const EXPECTED = [
 	' Unbalanced           Continue',
 	' Demand Multiplier    1.0',
 	' Emitter Exponent     0.5',
-	' Status               No',
 	' Diffusivity          1',
 	' Tolerance            0.01',
 	'',
@@ -371,12 +341,16 @@ console.log('\n--- an option this reader cannot name is reported ---');
 	const conv = EngCalcs.lpnNetToInp(buildNet(), 'unnamed.net');
 	ok('the file still converts', conv.ok === true, conv.error);
 	const idx = (conv.unnamedOptions || []).map((u) => u.index);
-	ok('the populated slots with no name are handed back', idx.length >= 1, JSON.stringify(idx));
-	// 16-21 are the six this reader still cannot name. Slot 17 stands for them.
-	ok('...and slot 17 is among them, one of the six still undecoded',
+	ok('the populated slots with no name are handed back', idx.length >= 2, JSON.stringify(idx));
+	ok('...and slot 17 is among them, the one the fixture cannot name',
 		idx.indexOf(17) >= 0, JSON.stringify(conv.unnamedOptions));
-	ok('the quality and clock slots are no longer reported as lost',
-		[10, 12, 14, 22, 23, 24, 29, 30, 31, 32, 33].every((n) => idx.indexOf(n) < 0), JSON.stringify(idx));
+	// **THE INDEX TRAVELS WITH THE VALUE.** An inferred slot map built from a list of values alone
+	// went into a converted file on 2026-09-02 and was wrong -- the values were right and the
+	// offsets were not. A reader can read a value back but cannot COUNT it back, so the report
+	// prints `index: value` and the next real file states its own slot numbers.
+	ok('every reported slot carries its index as well as its value',
+		(conv.unnamedOptions || []).every((u) => typeof u.index === 'number' && u.value !== undefined),
+		JSON.stringify(conv.unnamedOptions));
 	// The named ones must NOT be reported as losses -- a report that cries about everything is one
 	// nobody reads.
 	ok('a slot this reader does know is not reported as lost',

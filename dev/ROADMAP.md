@@ -64,29 +64,30 @@ the block.
     with storage the UTILITY controls — *"the moment 'the link' is something we host, it has become
     the cloud-login proposal in a smaller costume."* Full record in both agents' journals.
 
-- 75|574| **The `.net` option slots are named from a real file's own report.**
-  **MOSTLY DONE 2026-09-02, and the evidence was the report itself.** The interim fix -- listing the
-  values a `.net` could not carry -- turned the message into the diagnostic: Tom imported his file
-  and read back 30 values, which decode against EPANET's own section order almost completely.
-  - **What is named now:** `Status` (10); the water-quality trio 11/12/14, which is ONE line whose
-    grammar changes with its own first token (`Trace` takes a node, `Age` takes nothing, a chemical
-    takes its unit); `[TIMES]` at 22-30 in EPANET's written order; `[ENERGY]`'s three globals at
-    31-33; and `CheckFreq`, `MaxCheck`, `DampLimit`, `HeadError`, `FlowChange`, `Demand Model`,
-    `Minimum Pressure`, `Required Pressure`, `Pressure Exponent` at 34-42. Several identify
-    themselves: `PDA` can only be a demand model, `Lake` can only be a trace node, and 40-42 are
-    EPANET 2.2's documented PDA defaults.
-  - **THE FIND THAT MATTERS MORE THAN THE NAMING: nothing ever wrote `[TIMES]`.** Every `.net` this
-    page has imported arrived with NO clock -- no duration, no timesteps, no start time -- so an
-    extended-period model silently became a single instant, and no check could see it because the
-    section simply was not there to be wrong. `[ENERGY]` was lost the same way.
-  - **Slots 16 to 21 are still unnamed and are still reported.** Six values (`1`, `First`, and four
-    zeros) that nothing in the file identifies. Naming one from a guess would write a setting the
-    user never made, which is worse than the gap this task closes.
-  - **Two readers, one format:** `js/lpn-net.js` and `dev/scripts/epanet_net_to_inp.php` each hold
-    the table and the harness compares their output byte for byte, so both were changed together.
-  - **[H] THE ONE CONFIRMATION WORTH ASKING FOR:** open the same model in EPANET, export it as an
-    `.inp`, and diff that against what this page writes from the `.net`. The times block is inferred
-    from one file plus a documented section order; a diff would turn that into a measurement.
+- 75|574| **The `.net` option slots need CONFIRMED names, not inferred ones.**
+  A `.net` stores its options as an indexed array with no keywords anywhere in the file, so 12 of
+  the 45 slots are named and the rest are carried as values in the import report.
+  - **AN INFERRED MAP WAS BUILT AND REVERTED ON 2026-09-02, AND THE LESSON IS THE POINT.** Tom's own
+    file reported 30 unnamed values; they decoded plausibly against EPANET's written section order,
+    and converting his Net3 with that map produced `Duration 0.0` where the file states 24:00,
+    `Required Pressure PDA`, and `HeadError 10` where EPANET states `CHECKFREQ 2`. **The values were
+    right and the OFFSETS were wrong** -- a run of repeated `0.0`s cannot be counted by eye in a
+    transcribed list, and one miscount shifts every slot after it. This is exactly the failure the
+    task's own text warned about, committed anyway, and caught only because Tom exported the same
+    model from EPANET and put both files side by side in `dev/net-import-study/`.
+  - **THE MECHANISM THAT REPLACES THE GUESS: the report prints `index: value`.** A reader can read a
+    value back but cannot COUNT it back. With the slot number printed beside it, the next real file
+    states its own indices and the map grows one confirmed entry at a time.
+  - **What `dev/net-import-study/Net3-PDA-from-EPANET.inp` proves, independent of any index:** the
+    `[TIMES]` keywords and their order, `Quality Trace Lake` as ONE line whose grammar changes with
+    its first token, `CHECKFREQ`/`MAXCHECK`/`DAMPLIMIT` living in `[OPTIONS]`, `Status` living in
+    `[REPORT]` and not in `[OPTIONS]`, and `Demand Model`/`Minimum Pressure`/`Required Pressure`/
+    `Pressure Exponent` as EPANET 2.2's PDA quartet. Every one of those is a keyword fact and can be
+    implemented the moment the slot it comes from is known.
+  - **AND THE FIND THAT OUTLIVES THE REVERT: nothing writes `[TIMES]` or `[ENERGY]` at all**, so
+    every `.net` this page imports arrives with no clock -- no duration, no timesteps, no start
+    time -- and an extended-period model silently becomes a single instant. That is real and is not
+    fixed; it is waiting on the confirmed indices, and it is the reason this task is worth doing.
 
 - 50|575| **The six element symbols, redrawn from Tom's sketch.**
   Prototype published 2026-09-02 and both open questions answered: the junction becomes a shaded

@@ -389,7 +389,15 @@ html[lang="zh"] .ec-welcome {
    thematic blue is what makes them read as one -- so the hue is carrying the family, not the
    wateriness. Colour-by-value still overrides all of it through currentColor, so the budget is
    spent the moment the model has something to say. One token, so a future change is one edit. */
-:root { --lpn-map-ink: #1a6faf; }
+:root {
+	--lpn-map-ink: #1a6faf;
+	/* **THE PIPES TAKE THE SAME INK AS THE NODE OUTLINES** (Tom, 2026-09-02: *"Pipes same as node
+	   outlines."*, settling the "let's try main/dark" of a minute earlier). ONE ink for the whole
+	   drawing, so the network reads as a single object rather than as symbols sitting on a
+	   differently-coloured web. A second weight was tried first and is not kept: the pipes are the
+	   structure, and making them darker than the things they connect made them read as a separate
+	   subject. Colour-by-value still overrides every one of these. */
+}
 .lpn-node-symbol-reservoir, .lpn-node-symbol-tank { color: var(--lpn-map-ink); }
 /* THE SAME BLUE AS THE RESERVOIR, deliberately (Task 248). A tank and a reservoir are both
    water bodies, and colour here is decoration, not meaning -- the two are told apart by SHAPE
@@ -446,9 +454,9 @@ html[lang="zh"] .ec-welcome {
    map from here on means something: condition today (.lpn-node-pending's red, the override amber),
    value tomorrow (Task 327). This is the state Tom named as the thing EPANET makes hard: "a pipe to
    show as black while showing values from the model on the map". */
-.lpn-link { stroke: #000; stroke-width: var(--lpn-lw, 0.7); cursor: pointer; }
+.lpn-link { stroke: var(--lpn-map-ink); stroke-width: var(--lpn-lw, 0.7); cursor: pointer; }
 /* Black with its symbol (2026-08-14) -- the pump's polyline and its circle are one mark. */
-.lpn-link-pump { stroke: #000; }
+.lpn-link-pump { stroke: var(--lpn-map-ink); }
 /* No .lpn-link-valve rule: a valve's polyline is a pipe-coloured line by design -- see
    .lpn-link-symbol-valve above. */
 /* A CLOSED link (ROADMAP Task 146.07). Dashed, because a closed pipe carries no water and would

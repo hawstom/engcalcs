@@ -135,30 +135,12 @@ $LINK_SLOT = array(
 // index 15 is timing and reporting state, and these are steady-state models. `Pattern` is
 // handled separately (see netToInp) because EPANET errors on a default pattern that no
 // [PATTERNS] section defines, which is exactly the state of all three of Tom's files.
-// **KEEP THIS TABLE IDENTICAL TO OPTION_NAME IN js/lpn-net.js.** Two readers, one format: the
-// harness compares their output byte for byte on real models, so a slot named in one and not the
-// other is a divergence the next real file will find. The decode of slots 10, 12, 14, 22-33 and
-// 34-42 came from a real file's own import report on 2026-09-02; the note in the JS file carries
-// the raw list and the reasoning. Slots 16-21 are still unnamed on purpose.
 $OPTION_ORDER = array(
 	0 => 'Units', 1 => 'Headloss', 2 => 'Specific Gravity', 3 => 'Viscosity', 4 => 'Trials',
 	5 => 'Accuracy', 6 => 'Unbalanced', 8 => 'Demand Multiplier', 9 => 'Emitter Exponent',
-	10 => 'Status', 13 => 'Diffusivity', 15 => 'Tolerance',
-	34 => 'CheckFreq', 35 => 'MaxCheck', 36 => 'DampLimit', 37 => 'HeadError',
-	38 => 'FlowChange', 39 => 'Demand Model', 40 => 'Minimum Pressure',
-	41 => 'Required Pressure', 42 => 'Pressure Exponent'
+	11 => 'Quality', 13 => 'Diffusivity', 15 => 'Tolerance'
 );
 $OPTION_PATTERN = 7;
-// The water-quality option is three slots and ONE line, whose grammar depends on its own first
-// token: Trace takes a node, Age takes nothing, a chemical takes its unit.
-$OPT_QUALITY = 11; $OPT_QUAL_UNITS = 12; $OPT_TRACE_NODE = 14;
-// [TIMES] and [ENERGY], in EPANET's own written order. Neither section was emitted before.
-$TIME_ORDER = array(
-	22 => 'Duration', 23 => 'Hydraulic Timestep', 24 => 'Quality Timestep',
-	25 => 'Pattern Timestep', 26 => 'Pattern Start', 27 => 'Report Timestep',
-	28 => 'Report Start', 29 => 'Start ClockTime', 30 => 'Statistic'
-);
-$ENERGY_ORDER = array(31 => 'Global Efficiency', 32 => 'Global Price', 33 => 'Demand Charge');
 
 // ---------------------------------------------------------------- parse
 
@@ -288,8 +270,7 @@ function numOr($s, $default) { return $s === '' ? $default : $s; }
 // ---------------------------------------------------------------- write .inp
 
 function netToInp($net) {
-	global $OPTION_ORDER, $OPTION_PATTERN, $TIME_ORDER, $ENERGY_ORDER,
-		$OPT_QUALITY, $OPT_QUAL_UNITS, $OPT_TRACE_NODE;
+	global $OPTION_ORDER, $OPTION_PATTERN;
 	$L = array();
 	$L[] = '[TITLE]';
 	$L[] = 'Converted from ' . $net['file'] . ' by dev/scripts/epanet_net_to_inp.php';
@@ -393,37 +374,11 @@ function netToInp($net) {
 	$put('CONTROLS', array_map(function ($s) { return ' ' . $s; }, $net['controls']), 'Simple controls');
 	$put('RULES', array_map(function ($s) { return ' ' . $s; }, $net['rules']), 'Rule-based controls');
 
-	$optAt = function ($i) use ($net) {
-		return isset($net['options'][$i]) ? trim($net['options'][$i]) : '';
-	};
-	$rowsFor = function ($map) use ($optAt) {
-		$out = array();
-		foreach ($map as $i => $name) {
-			$v = $optAt($i);
-			if ($v !== '') { $out[] = sprintf(' %-20s %s', $name, $v); }
-		}
-		return $out;
-	};
-	$put('ENERGY', $rowsFor($ENERGY_ORDER), 'Global energy settings');
-	$put('TIMES', $rowsFor($TIME_ORDER), 'Clock and reporting');
-
 	$L[] = '[OPTIONS]';
 	foreach ($OPTION_ORDER as $i => $name) {
-		$v = $optAt($i);
-		if ($v === '') { continue; }
-		$L[] = sprintf(' %-20s %s', $name, $v);
-	}
-	$qual = $optAt($OPT_QUALITY);
-	$qualUnits = $optAt($OPT_QUAL_UNITS);
-	$traceNode = $optAt($OPT_TRACE_NODE);
-	if ($qual !== '' && strcasecmp($qual, 'None') !== 0) {
-		if (strcasecmp($qual, 'Trace') === 0) {
-			if ($traceNode !== '') { $L[] = sprintf(' %-20s Trace  %s', 'Quality', $traceNode); }
-		} elseif (strcasecmp($qual, 'Age') === 0) {
-			$L[] = sprintf(' %-20s Age', 'Quality');
-		} else {
-			$L[] = sprintf(' %-20s %s%s', 'Quality', $qual, $qualUnits !== '' ? '  ' . $qualUnits : '');
-		}
+		if (!isset($net['options'][$i]) || trim($net['options'][$i]) === '') { continue; }
+		if ($name === 'Quality' && strcasecmp($net['options'][$i], 'None') === 0) { continue; }
+		$L[] = sprintf(' %-20s %s', $name, trim($net['options'][$i]));
 	}
 	$pat = isset($net['options'][$OPTION_PATTERN]) ? trim($net['options'][$OPTION_PATTERN]) : '';
 	if ($pat !== '') {

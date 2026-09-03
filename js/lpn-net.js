@@ -59,45 +59,27 @@
 	// Report pages. Only the hydraulics/quality head of it is reproduced; the rest is timing and
 	// reporting state that a steady-state solve does not read. `Pattern` (index 7) is handled
 	// separately because EPANET errors on a default pattern no [PATTERNS] section defines.
-	// **THE SLOT MAP, EXTENDED 2026-09-02 FROM A REAL FILE'S OWN REPORT.** A `.net` stores its
-	// options as an INDEXED array with no keywords anywhere in the file, so for months this table
-	// named 12 of the 45 slots and everything else was dropped -- the whole clock among it. Tom
-	// imported a `.net` and read back the list of values the importer could not name:
+	// **THE SLOT MAP, AND WHY IT IS STILL ONLY TWELVE ENTRIES.** A `.net` stores its options as an
+	// INDEXED array with no keywords anywhere in the file, so a name can only come from evidence.
 	//
-	//   10 Yes | 12 mg/L | 14 Lake | 16 1 | 17 First | 18-21 0.0 | 22 24:00 | 23 1:00 | 24 0:05
-	//   25 1:00 | 26 0:00 | 27 1:00 | 28 0:00 | 29 12 am | 30 NONE | 31 75 | 32-33 0.0 | 34 2
-	//   35 10 | 36-38 0 | 39 PDA | 40 0 | 41 0.1 | 42 0.5
+	// **AN INFERRED MAP WAS TRIED ON 2026-09-02 AND REVERTED THE SAME DAY.** Tom's own file reported
+	// 30 unnamed values, they decoded plausibly against EPANET's written section order, and the
+	// decode was WRONG: converting his Net3 wrote `Duration 0.0` where the file says 24:00,
+	// `Required Pressure PDA`, and `HeadError 10` where EPANET states `CHECKFREQ 2`. The values were
+	// right and the OFFSETS were not -- a run of repeated `0.0`s cannot be counted by eye in a
+	// transcribed list, and one miscount shifts every slot after it.
 	//
-	// Read against EPANET's own section order that decodes almost completely, and several entries
-	// identify themselves: `PDA` can only be the demand model, `Lake` can only be a trace node,
-	// 22-30 are `[TIMES]` in EPANET's exact written order, 31-33 are `[ENERGY]`'s three globals,
-	// and 40-42 are EPANET 2.2's documented PDA defaults (0.0 / 0.1 / 0.5).
-	//
-	// **SLOTS 16 TO 21 ARE STILL UNNAMED AND ARE STILL REPORTED.** Naming a slot from a guess would
-	// write a setting the user never made, which is worse than the gap.
+	// **SO THE RULE ALREADY WRITTEN HERE STANDS, AND IT COST A ROUND TRIP TO RE-LEARN:** naming a
+	// slot from a guess writes a setting the user never made, which is worse than the gap. The way
+	// in is `index: value` in the import report -- the reader prints both now -- so the next file to
+	// arrive says exactly which slot holds what, and the map grows one CONFIRMED entry at a time.
+	// Task 574.
 	var OPTION_NAME = {
 		0: 'Units', 1: 'Headloss', 2: 'Specific Gravity', 3: 'Viscosity', 4: 'Trials',
 		5: 'Accuracy', 6: 'Unbalanced', 8: 'Demand Multiplier', 9: 'Emitter Exponent',
-		10: 'Status', 13: 'Diffusivity', 15: 'Tolerance',
-		34: 'CheckFreq', 35: 'MaxCheck', 36: 'DampLimit', 37: 'HeadError', 38: 'FlowChange',
-		39: 'Demand Model', 40: 'Minimum Pressure', 41: 'Required Pressure',
-		42: 'Pressure Exponent'
+		11: 'Quality', 13: 'Diffusivity', 15: 'Tolerance'
 	};
 	var OPTION_PATTERN = 7;
-	// **THE WATER-QUALITY OPTION IS THREE SLOTS AND ONE LINE.** EPANET writes `Quality Chlorine
-	// mg/L`, `Quality Age` or `Quality Trace <node>` -- one keyword whose grammar changes with its
-	// own first token -- so 11, 12 and 14 cannot each become a line of their own.
-	var OPT_QUALITY = 11, OPT_QUAL_UNITS = 12, OPT_TRACE_NODE = 14;
-	// `[TIMES]`, in EPANET's own written order, which is what makes the run of nine values at 22
-	// identifiable at all. **Nothing wrote this section before**, so every `.net` ever imported
-	// arrived with no clock: no duration, no timesteps, no start time.
-	var TIME_NAME = {
-		22: 'Duration', 23: 'Hydraulic Timestep', 24: 'Quality Timestep', 25: 'Pattern Timestep',
-		26: 'Pattern Start', 27: 'Report Timestep', 28: 'Report Start', 29: 'Start ClockTime',
-		30: 'Statistic'
-	};
-	// `[ENERGY]`'s three globals, which this page does not compute with and carries verbatim.
-	var ENERGY_NAME = { 31: 'Global Efficiency', 32: 'Global Price', 33: 'Demand Charge' };
 
 	function Reader(bytes) {
 		this.d = bytes;      // Uint8Array
@@ -413,54 +395,20 @@
 		// file, convert what we can name, and say plainly what could not come across. The caller
 		// turns this into a sentence in the import report.
 		var unnamed = [];
-		function opt(i) {
-			var v = net.options[i];
-			return (v === undefined ? '' : v).replace(/^\s+|\s+$/g, '');
-		}
-		function rows(map) {
-			var out = [];
-			Object.keys(map).forEach(function (k) {
-				var v = opt(+k);
-				if (v !== '') { out.push(' ' + pad(map[k], 20) + ' ' + v); }
-			});
-			return out;
-		}
-		// **THE CLOCK AND THE ENERGY GLOBALS, WHICH NOTHING WROTE UNTIL 2026-09-02.** Both sections
-		// are read by js/lpn-inp.js when they are present, so a `.net` that states a duration now
-		// arrives with one instead of silently becoming a single-instant model.
-		put('ENERGY', rows(ENERGY_NAME), 'Global energy settings');
-		put('TIMES', rows(TIME_NAME), 'Clock and reporting');
-
 		L.push('[OPTIONS]');
 		net.options.forEach(function (v, i) {
 			var text = (v === undefined ? '' : v).replace(/^\s+|\s+$/g, '');
 			if (text === '') { return; }
 			if (OPTION_NAME[i] !== undefined || i === OPTION_PATTERN) { return; }
-			if (TIME_NAME[i] !== undefined || ENERGY_NAME[i] !== undefined) { return; }
-			if (i === OPT_QUALITY || i === OPT_QUAL_UNITS || i === OPT_TRACE_NODE) { return; }
 			unnamed.push({ index: i, value: text });
 		});
 		if (out) { out.unnamedOptions = unnamed; }
 		Object.keys(OPTION_NAME).forEach(function (k) {
-			var i = +k, name = OPTION_NAME[k], v = opt(i);
-			if (v === '') { return; }
-			L.push(' ' + pad(name, 20) + ' ' + v);
+			var i = +k, name = OPTION_NAME[k], v = net.options[i];
+			if (v === undefined || v.replace(/^\s+|\s+$/g, '') === '') { return; }
+			if (name === 'Quality' && v.toUpperCase() === 'NONE') { return; }
+			L.push(' ' + pad(name, 20) + ' ' + v.replace(/^\s+|\s+$/g, ''));
 		});
-		// **ONE LINE FROM THREE SLOTS, AND ITS GRAMMAR DEPENDS ON ITS OWN FIRST TOKEN.** `Trace`
-		// takes a node id and no unit; `Age` takes neither; a chemical takes its unit. Writing
-		// `Quality Trace` with the node dropped -- which is what a one-slot writer did -- names an
-		// analysis EPANET cannot run, and dropping the unit off a chemical loses the only thing
-		// that says what its numbers mean.
-		var qual = opt(OPT_QUALITY), qualUnits = opt(OPT_QUAL_UNITS), traceNode = opt(OPT_TRACE_NODE);
-		if (qual !== '' && qual.toUpperCase() !== 'NONE') {
-			if (qual.toUpperCase() === 'TRACE') {
-				if (traceNode !== '') { L.push(' ' + pad('Quality', 20) + ' Trace  ' + traceNode); }
-			} else if (qual.toUpperCase() === 'AGE') {
-				L.push(' ' + pad('Quality', 20) + ' Age');
-			} else {
-				L.push(' ' + pad('Quality', 20) + ' ' + qual + (qualUnits !== '' ? '  ' + qualUnits : ''));
-			}
-		}
 		var patName = net.options[OPTION_PATTERN] === undefined ? '' : net.options[OPTION_PATTERN].replace(/^\s+|\s+$/g, '');
 		if (patName !== '' && net.patterns.some(function (p) { return p.id === patName; })) {
 			L.push(' ' + pad('Pattern', 20) + ' ' + patName);

@@ -36,7 +36,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 568 — Standard hydraulic symbols: Tom's research, recorded, not yet a decision.
 - ! Task 570 — The EPANET report gets a box of its own: draggable, sizeable, and one of the family.
-- Task 574 — The `.net` option slots are named from a real file's own report.
+- Task 574 — The `.net` option slots need CONFIRMED names, not inferred ones.
 
 ## 50 — Someday (14)
 

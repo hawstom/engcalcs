@@ -15392,7 +15392,13 @@ var EngCalcs = EngCalcs || {};
 			// and the reader recognises their own setting instead of guessing.
 			parsed.dropped = parsed.dropped.concat([{
 				code: 'net-options',
-				ids: lastNetUnnamed.map(function (u) { return u.value; }),
+				// **INDEX AND VALUE, because the value alone was not enough.** A list of values can be
+				// read back but not COUNTED back: an inferred slot map built from one such list put
+				// `Duration 0.0` and `Required Pressure PDA` into a converted file on 2026-09-02,
+				// because a run of repeated zeros cannot be counted by eye. With the index printed
+				// beside it, the next file to arrive states its own slot numbers and the map grows
+				// from measurement rather than from arithmetic on a transcription.
+				ids: lastNetUnnamed.map(function (u) { return u.index + ': ' + u.value; }),
 				detail: lastNetUnnamed.length, group: null
 			}]);
 		}
