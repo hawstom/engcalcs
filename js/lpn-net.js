@@ -112,6 +112,50 @@
 	var ENERGY_NAME = {
 		32: 'Global Efficiency', 33: 'Global Price', 34: 'Global Pattern', 35: 'Demand Charge'
 	};
+	// `[REACTIONS]`, decoded 2026-09-03 from ALL THREE EPA reference models beside EPANET's own
+	// `.inp` written back from each `.net` (`dev/net-import-study/All-three/`). Two independent
+	// sources agreeing on index AND value is what "confirmed" means in this file; a count is not
+	// evidence, which is the whole lesson of the comment above `OPTION_NAME`.
+	//
+	// **THE COUNT DOES NOT CLOSE, SO IT NAMES NOTHING BY ITSELF.** EPANET states SEVEN keywords for
+	// every one of the three -- Order Bulk, Order Tank, Order Wall, Global Bulk, Global Wall,
+	// Limiting Potential, Roughness Correlation -- and the file populates SIX slots, 17 to 22, with
+	// slot 16 empty in all three. Seven keywords do not fit six slots, and EPANET demonstrably
+	// writes values it did not read from the option array (it writes `Unbalanced Continue 10` where
+	// slot 6 holds `Continue` alone), so a missing keyword proves nothing about slot 16 either.
+	//
+	// **FOUR SLOTS ARE ANCHORED BY VALUE, and Net1 is the model that makes them legible** -- it is
+	// the only one of the three with reaction coefficients at all. Its option array states
+	// `19: -.5` and `20: -1`; EPANET's own export of the same file states `Global Bulk -.5` and
+	// `Global Wall -1`. The same numbers, in the same odd formatting, at indices the file itself
+	// prints. Net2 and Net3 read `0.0` at both and EPANET writes `0.0` at both. Slots 21 and 22 are
+	// then a CLOSED interval rather than a count into open space: 20 is confirmed below them, 23
+	// (`Duration`) is confirmed above, two slots remain and EPANET states exactly two remaining
+	// keywords in exactly that order, and all three models agree on `0.0` for each.
+	//
+	// **SLOT 18 IS THE WALL ORDER, AND IT IS A WORD WHERE THE `.inp` IS A NUMBER.** Wall reaction
+	// order is the one of the three EPANET restricts to zero or first order and the one its
+	// interface therefore offers as that pair rather than as a number; it is also the keyword
+	// EPANET writes immediately before Global Bulk, which is the confirmed slot 19. `First` against
+	// EPANET's `Order Wall 1`, in all three, is the measured pair, so `First` is written as `1`.
+	// `Zero` is written as `0` by the same pairing but has NOT been observed in a file; anything
+	// else is reported as an unnamed slot rather than translated into a setting nobody made.
+	//
+	// **SLOT 17 IS DELIBERATELY UNNAMED, AND IT IS THE ONE THE EVIDENCE CANNOT SETTLE.** It holds
+	// `1` in all three models -- and so do BOTH `Order Bulk` and `Order Tank` in all three of
+	// EPANET's exports. Nothing distinguishes them, and slot 16, empty everywhere, may or may not
+	// be the other of the pair. Two candidates with no discriminating value is exactly the shape
+	// that wrote `Duration 0.0` into a converted file the first time this array was mapped by
+	// inference. One model whose bulk order differs from its tank order would settle it in a
+	// minute; until one exists, slot 17 is reported to the user and named by nobody.
+	//
+	// **SLOTS 39 AND 40 STAY UNNAMED TOO.** `0` in all three, and EPANET's own export states no
+	// keyword anywhere carrying that value at that position, so there is nothing to match against.
+	var REACTION_NAME = {
+		19: 'Global Bulk', 20: 'Global Wall', 21: 'Limiting Potential', 22: 'Roughness Correlation'
+	};
+	var OPT_WALL_ORDER = 18;
+	var WALL_ORDER_NUMBER = { FIRST: '1', ZERO: '0' };
 
 	function Reader(bytes) {
 		this.d = bytes;      // Uint8Array
@@ -444,6 +488,20 @@
 		// no duration and no timesteps, so an extended-period model silently became a single
 		// instant. js/lpn-inp.js reads all three when they are present.
 		put('ENERGY', rows(ENERGY_NAME), 'Global energy settings');
+		// `[REACTIONS]`, in EPANET's own written order and in EPANET's own place, between the
+		// energy globals and the clock. The wall order is the one slot whose stored value is a word
+		// and whose written value is a number; a value that is neither of the observed words nor
+		// already a number is left for the unnamed report below rather than guessed at.
+		var wallOrder = opt(OPT_WALL_ORDER), wallOrderNumber = '';
+		if (wallOrder !== '') {
+			wallOrderNumber =
+				Object.prototype.hasOwnProperty.call(WALL_ORDER_NUMBER, wallOrder.toUpperCase())
+					? WALL_ORDER_NUMBER[wallOrder.toUpperCase()]
+					: (/^[-+]?(\d+\.?\d*|\.\d+)$/.test(wallOrder) ? wallOrder : '');
+		}
+		var reactions = wallOrderNumber === ''
+			? [] : [' ' + pad('Order Wall', 20) + ' ' + wallOrderNumber];
+		put('REACTIONS', reactions.concat(rows(REACTION_NAME)), 'Global reaction settings');
 		put('TIMES', rows(TIME_NAME), 'Clock and reporting');
 		put('REPORT', rows(REPORT_NAME), 'EPANET report settings');
 
@@ -454,6 +512,10 @@
 			if (OPTION_NAME[i] !== undefined || i === OPTION_PATTERN) { return; }
 			if (TIME_NAME[i] !== undefined || ENERGY_NAME[i] !== undefined) { return; }
 			if (REPORT_NAME[i] !== undefined) { return; }
+			// Slot 18 is reported unless it was actually WRITTEN -- a wall order this reader cannot
+			// turn into a number is a slot with no name, whatever the table says.
+			if (REACTION_NAME[i] !== undefined) { return; }
+			if (i === OPT_WALL_ORDER && wallOrderNumber !== '') { return; }
 			if (i === OPT_QUALITY || i === OPT_QUAL_UNITS || i === OPT_TRACE_NODE) { return; }
 			unnamed.push({ index: i, value: text });
 		});

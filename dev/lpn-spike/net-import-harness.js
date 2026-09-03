@@ -10,6 +10,11 @@
 // produced by the code under test -- and it exercises every value type, all six element kinds,
 // vertices, labels and the backdrop record without shipping anybody's model.
 //
+// The THIRD half is the strongest and it is in the repo, because EPA's own Net1, Net2 and Net3 are
+// published examples rather than anybody's client work: `dev/net-import-study/All-three/` holds each
+// model's `.net` beside the `.inp` EPANET ITSELF wrote back out from that `.net`. The second file is
+// the answer key, written by the program that owns the format, and it is what decoded `[REACTIONS]`.
+//
 // The second half runs only when dev/epanet-models/ is present: it converts each real `.net` with
 // BOTH readers, the JS one and dev/scripts/epanet_net_to_inp.php, and requires byte-identical
 // output. Two implementations of an undocumented format agreeing on a real file is the strongest
@@ -105,9 +110,15 @@ function buildNet(opts) {
 	options[4] = '40'; options[5] = '0.001'; options[6] = 'Continue'; options[7] = '1';
 	options[8] = '1.0'; options[9] = '0.5'; options[10] = 'No'; options[11] = 'None';
 	options[12] = 'mg/L'; options[13] = '1'; options[15] = '0.01';
-	// A slot this reader cannot name, populated on purpose: without one, the report path below
-	// would assert on an empty list and pass whatever the code did.
-	options[17] = 'First';
+	// **THE SLOTS THIS READER CANNOT NAME, POPULATED ON PURPOSE.** Without them the report path
+	// below would assert on an empty list and pass whatever the code did. Slot 17 holds `1` and so
+	// do BOTH `Order Bulk` and `Order Tank` in all three reference models, so nothing separates
+	// them; 39 and 40 hold `0` and EPANET's own export states no keyword carrying it.
+	options[17] = '1'; options[39] = '0'; options[40] = '0';
+	// `[REACTIONS]`. The wall order is stored as a WORD and written as a number; the two
+	// coefficients carry Net1's own values, which are what made the slot numbers legible.
+	options[18] = 'First'; options[19] = '-.5'; options[20] = '-1';
+	options[21] = '0.0'; options[22] = '0.0';
 	// **THE SLOTS TOM'S OWN Net3 IDENTIFIED**, at the indices his import report printed, carrying
 	// the values EPANET wrote for the same model. This fixture is the confirmation kept in code:
 	// dev/net-import-study/Net3-PDA-from-EPANET.inp states every one of these lines, so the
@@ -197,6 +208,19 @@ const EXPECTED = [
 	' Global Efficiency    75',
 	' Global Price         0.0',
 	' Demand Charge        0.0',
+	'',
+	// **EVERY LINE HERE IS ONE EPANET ITSELF WROTE**, copied out of
+	// dev/net-import-study/All-three/2-EPANET-NET-back-to-INP/Net1.inp, whose `.net` states `-.5`
+	// at slot 19 and `-1` at slot 20. `Order Bulk 1` and `Order Tank 1` stand in that same file and
+	// are deliberately NOT here: slot 17 holds `1` and nothing in any of the three models
+	// distinguishes the two, so it is reported to the user rather than named.
+	'[REACTIONS]',
+	';Global reaction settings',
+	' Order Wall           1',
+	' Global Bulk          -.5',
+	' Global Wall          -1',
+	' Limiting Potential   0.0',
+	' Roughness Correlation 0.0',
 	'',
 	'[TIMES]',
 	';Clock and reporting',
@@ -387,8 +411,14 @@ console.log('\n--- an option this reader cannot name is reported ---');
 	ok('the file still converts', conv.ok === true, conv.error);
 	const idx = (conv.unnamedOptions || []).map((u) => u.index);
 	ok('the populated slots with no name are handed back', idx.length >= 1, JSON.stringify(idx));
-	ok('...and slot 17 is among them, the one the fixture cannot name',
+	ok('...and slot 17 is among them, the one no evidence separates',
 		idx.indexOf(17) >= 0, JSON.stringify(conv.unnamedOptions));
+	ok('...as are 39 and 40, which EPANET\'s own export matches nowhere',
+		idx.indexOf(39) >= 0 && idx.indexOf(40) >= 0, JSON.stringify(idx));
+	// The other side of the same rule: a slot that IS now written must stop being reported, or the
+	// report cries about a setting that came across intact.
+	ok('the reaction slots that are written are no longer reported',
+		[18, 19, 20, 21, 22].every((i) => idx.indexOf(i) < 0), JSON.stringify(idx));
 	// **THE INDEX TRAVELS WITH THE VALUE.** An inferred slot map built from a list of values alone
 	// went into a converted file on 2026-09-02 and was wrong -- the values were right and the
 	// offsets were not. A reader can read a value back but cannot COUNT it back, so the report
@@ -402,11 +432,105 @@ console.log('\n--- an option this reader cannot name is reported ---');
 		idx.indexOf(0) < 0 && idx.indexOf(8) < 0, JSON.stringify(idx));
 	ok('...nor is the pattern slot, which is written under its own name',
 		idx.indexOf(7) < 0, JSON.stringify(idx));
-	// An empty slot is not a loss either: 45 slots, most of them blank.
-	ok('an empty slot is not reported', idx.indexOf(20) < 0, JSON.stringify(idx));
+	// An empty slot is not a loss either: 45 slots, most of them blank. Slot 16 is empty in the
+	// fixture and in all three reference models, and is the one slot that might or might not belong
+	// to `[REACTIONS]` -- the evidence cannot say, and an empty slot costs nothing either way.
+	ok('an empty slot is not reported', idx.indexOf(16) < 0, JSON.stringify(idx));
 	// And the text itself is unchanged by the collection -- this must observe, never edit.
 	ok('the converted file still states the options it can name',
 		conv.inp.indexOf('Demand Multiplier') >= 0 && conv.inp.indexOf('Emitter Exponent') >= 0);
+}
+
+// ---------------------------------------------------------------------------
+// THE THREE EPA REFERENCE MODELS, AGAINST EPANET'S OWN EXPORT OF THE SAME FILE.
+//
+// These are not client work -- they are EPA's published examples -- so unlike dev/epanet-models/
+// they are IN the repo, and this is the strongest check in the file: EPANET opened each `.inp`,
+// saved a `.net`, and wrote an `.inp` back out from that `.net`. The middle file is our input and
+// the last one is the answer key, written by the program that owns the format.
+//
+// It is deliberately a KEYWORD comparison and not a text one. A keyword we write must carry
+// EPANET's own value for that model; a keyword we do not write must be one we have said we cannot
+// name. Anything else -- a keyword nobody expected, on either side -- is a failure, so a future
+// slot named by a guess cannot slip through by merely looking plausible.
+// ---------------------------------------------------------------------------
+console.log('\n--- the three reference models, against EPANET\'s own export ---');
+{
+	const dir = ROOT + 'dev/net-import-study/All-three';
+	const models = ['Net1', 'Net2', 'Net3-PDA'];
+	const REACTION_KEYWORDS = ['Order Bulk', 'Order Tank', 'Order Wall', 'Global Bulk',
+		'Global Wall', 'Limiting Potential', 'Roughness Correlation'];
+	// The two keywords EPANET writes that this reader will not: they share slot 17, both read `1`
+	// in all three models, and no value anywhere separates them.
+	const NOT_OURS = ['Order Bulk', 'Order Tank'];
+	// Slot 17 is the pair above; 39 and 40 are `0` in all three and match nothing EPANET states.
+	const STILL_UNNAMED = [17, 39, 40];
+
+	// Every line of a named section, split into keyword and value against a known keyword list --
+	// splitting on whitespace would read `Start ClockTime 12 am` as a keyword of three words. A
+	// section name may appear more than once (EPANET writes `[REACTIONS]` twice) and all of them
+	// count.
+	function keyedSection(text, name, keywords) {
+		const out = {};
+		let inside = false;
+		text.split(/\r?\n/).forEach((raw) => {
+			const line = raw.replace(/;.*$/, '').replace(/\s+$/, '');
+			if (/^\s*\[/.test(line)) { inside = new RegExp('^\\s*\\[' + name + '\\]').test(line); return; }
+			if (!inside || line.trim() === '') { return; }
+			const t = line.trim();
+			const kw = keywords.filter((k) => t.toUpperCase().indexOf(k.toUpperCase()) === 0)
+				.sort((a, b) => b.length - a.length)[0];
+			if (kw === undefined) { out['?? ' + t] = t; return; }
+			out[kw] = t.slice(kw.length).trim();
+		});
+		return out;
+	}
+
+	models.forEach((m) => {
+		const netPath = path.join(dir, '1-EPANET-INP-to-NET', m + '.net');
+		const refPath = path.join(dir, '2-EPANET-NET-back-to-INP', m + '.inp');
+		let bytes, ref;
+		try {
+			bytes = new Uint8Array(fs.readFileSync(netPath));
+			ref = fs.readFileSync(refPath, 'utf8');
+		} catch (err) {
+			console.log('  skip  ' + m + ': ' + err.message);
+			return;
+		}
+		const conv = EngCalcs.lpnNetToInp(bytes, m + '.net');
+		ok(m + ': the .net converts', conv.ok === true, conv.ok ? '' : conv.error + ' ' + conv.detail);
+		if (!conv.ok) { return; }
+
+		const theirs = keyedSection(ref, 'REACTIONS', REACTION_KEYWORDS);
+		const ours = keyedSection(conv.inp, 'REACTIONS', REACTION_KEYWORDS);
+		const bad = Object.keys(ours).filter((k) => theirs[k] !== ours[k]);
+		ok(m + ': every [REACTIONS] line matches EPANET\'s own value', bad.length === 0,
+			bad.length ? bad.map((k) => k + ': ours ' + JSON.stringify(ours[k]) +
+				' vs EPANET ' + JSON.stringify(theirs[k])).join('; ')
+				: Object.keys(ours).length + ' keywords');
+		const missing = Object.keys(theirs).filter((k) => ours[k] === undefined);
+		ok(m + ': ...and the only ones we do not write are the pair we cannot name',
+			missing.length === NOT_OURS.length && NOT_OURS.every((k) => missing.indexOf(k) >= 0),
+			JSON.stringify(missing));
+
+		const idx = (conv.unnamedOptions || []).map((u) => u.index);
+		ok(m + ': the slots this reader still cannot name are exactly ' + STILL_UNNAMED.join(', '),
+			idx.length === STILL_UNNAMED.length && STILL_UNNAMED.every((i) => idx.indexOf(i) >= 0),
+			JSON.stringify(conv.unnamedOptions));
+
+		// And the PHP fixture tool must agree byte for byte, as it does for dev/epanet-models/.
+		let php;
+		try {
+			php = execFileSync('php', [ROOT + 'dev/scripts/epanet_net_to_inp.php', netPath],
+				{ encoding: 'utf8', maxBuffer: 1 << 24 });
+		} catch (err) {
+			console.log('  skip  ' + m + ': php not runnable here');
+			return;
+		}
+		const mine = conv.inp.replace('by js/lpn-net.js', 'by dev/scripts/epanet_net_to_inp.php');
+		ok(m + ': the browser reader and the PHP tool produce identical .inp', mine === php,
+			mine === php ? conv.inp.split('\n').length + ' lines' : 'differ');
+	});
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
