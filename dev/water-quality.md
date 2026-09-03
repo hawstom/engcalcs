@@ -7,7 +7,7 @@ Copyright 2009 Thomas Gail Haws. GNU GPL v3 or later.
 
 ---
 
-## The three modes, and which two are built
+## The three modes, and what each one needs
 
 EPANET offers three, and the split is the utility-planning engineer's wish-list row 4:
 
@@ -15,7 +15,7 @@ EPANET offers three, and the split is the utility-planning engineer's wish-list 
 |---|---|---|
 | **Water age** — how long the water reaching a point has been in the system | none at all | **yes** |
 | **Source share** — the percent of the water at a point that came from a chosen source (EPANET's Source Trace) | one node | **yes** |
-| **Chemical / reaction** — a residual that decays | bulk and wall reaction coefficients, per pipe or global | **no** |
+| **Chemical / reaction** — a residual that decays | bulk and wall reaction coefficients, per pipe or global, and somewhere for it to enter | **yes** |
 
 **Our words, not EPANET's** (CLAUDE.md § `lpn_`): EPANET says *Source Trace* and reports an unlabelled
 *Quality* column; we say **Water age** and **Source share**, and the heading follows the mode so a
@@ -52,9 +52,27 @@ bar, half each.
 - **Nothing here needs a place in `signatureOf()`.** That guards the warm Project the *steady* solve
   reuses, and quality never reaches it — `lpnEpanetRun()` opens a fresh Project every time. The
   page's own re-run trigger is `js/lpn-time.js`'s model fingerprint, which carries `model.quality`.
-- **Nothing here carries a unit into the engine**, which is why `model.quality` is not cloned and
-  converted the way `hydraulics` is. Diffusivity and Tolerance are not sent at all: they mean
-  something only to a reacting chemical.
+- **A CHEMICAL RUNS NOW, AND IT CHANGED BOTH HALVES OF THIS PARAGRAPH** (Task 566). What used to
+  stand here — nothing carries a unit into the engine, and Diffusivity and Tolerance are never sent —
+  was true only while a chemical was carried text.
+  - **`model.reactions` IS cloned and converted**, by `engineQuality()` beside `engineHydraulics()`,
+    because a first-order **wall** coefficient is a LENGTH per day and the length is the project's
+    own. Measured against the engine rather than read off a manual: `Global Wall -1` in an LPS file
+    and `-3.2808` in an otherwise identical GPM file agree to 1e-6, and passing the same number
+    across untouched is a 16% error in the concentration
+    (`dev/lpn-spike/reaction-anchor-harness.js` §5). A **bulk** coefficient is a reciprocal time and
+    crosses unchanged; so does a **zero-order** wall coefficient, which carries the concentration
+    unit instead of a length.
+  - **`Tolerance` and `Diffusivity` ARE sent, for a chemical only.** `Tolerance` is EPANET's
+    parcel-merging tolerance and it decides how much of the concentration profile survives the
+    transport: at EPANET's own default of 0.01 the single-pipe analytic case is 0.099% off the
+    exact answer and does not improve as the quality step shrinks; at a tight one it lands inside
+    0.001%. That is EPANET's documented behaviour, not our arithmetic, and it is why the option had
+    to reach the engine before this file could be anchored at all.
+  - **A CONCENTRATION IS STILL CONVERTED BY NOBODY**, EPANET included. Its unit is the free text
+    beside the chemical's name (`Chlorine mg/L`), carried and displayed, never applied — CLAUDE.md's
+    carry-the-label path. So there is no unit family, no factor, and nothing for a factor check to
+    check.
 
 ## `[OPTIONS] Quality` is a live input AND still round-trips
 
@@ -87,35 +105,38 @@ stated.
 
 ---
 
-## What chemical / reaction (mode c) would need next
+## What chemical / reaction (mode c) has, and what it still does not
 
-Not started, deliberately. In rough order of size:
+Built 2026-09-03 (Task 566). Against the six-item list this section used to carry:
 
-1. **`[REACTIONS]` read and written, and interpreted.** Global `Bulk`/`Wall`/`Tank` orders and
-   coefficients, per-pipe `Bulk`/`Wall` overrides, `Limiting Potential`, `Roughness Correlation`.
-   Today the whole section is carried verbatim and never interpreted; interpreting it means the
-   carried text stops being the source of truth and needs the same token-beside-value treatment
-   `Quality` just got.
-2. **Two new per-pipe properties** — bulk and wall reaction coefficients — which is a genuinely new
-   class of input on a link, with a popup row, a table column, a Find-and-replace field, an override
-   through `setProp()`, and a scenario story.
-3. **`[SOURCES]` and `[MIXING]`.** A chemical needs somewhere to enter (a concentration, a mass rate
-   or a flow-paced source at a node, optionally on a pattern) and tanks need a mixing model. Both are
-   carried and uninterpreted today.
-4. **A concentration UNIT, and it is the first dimensioned quantity this feature would have.** The
-   `.inp` states it as free text beside the chemical name (`Chlorine mg/L`), which is not a unit
-   family — so either a new family with the two or three real options, or the honest carry-and-refuse
-   path CLAUDE.md already specifies for a unit we have no factor for. The engine writer would then
-   need the `engineHydraulics()` treatment: convert on a clone, never in the document.
-5. **The coefficient problem, which is a DISCLOSURE task and not a reason to decline** (the
-   utility-planning engineer's standing rule, from Tom, 2026-08-25: *"Lack of coefficients is not the
-   same as lack of demand."*). There is no standard test for a bulk decay coefficient and published
-   field values span an order of magnitude, so the shape is Task 530's ask-or-disclose: an editable
-   field, no invented default presented as fact, and the page saying plainly that it offers none and
-   why.
-6. **An anchor.** Net1 states `Quality Chlorine mg/L` and `dev/lpn-spike/reference/Net3.rpt` is a
-   trace report, so a chemical run needs either an EPA report for Net1 that this repo does not have,
-   or an analytic case of the same kind the age anchor uses — a single pipe where first-order decay
-   over a known travel time is arithmetic. Prefer the published report if one can be obtained.
+1. **`[REACTIONS]` interpreted** — global `Order`/`Global` bulk, wall and tank, `Limiting Potential`,
+   `Roughness Correlation`, and per-element `BULK`/`WALL`/`TANK` rows.
+   `EngCalcs.lpnReactionsParse` / `lpnReactionsText` (`js/lpn-inp.js`) own it, on exactly the
+   `[OPTIONS] Quality` terms: **the interpretation lives beside the carried text, never over it**,
+   and the exporter writes the file's own characters back while the live values still parse out of
+   them. Net1's `Global Bulk -.5` arrives as `-0.5` and goes back out as `-.5`.
+2. **Two per-pipe properties**, `bulkCoeff` and `wallCoeff`, on the overridable whitelist, written
+   through `setProp()`, edited in the pipe popup, and blank-capable — blank means "use the global",
+   which is EPANET's own rule and is a different statement from `0`.
+   **Still missing: a Tables column and a Find-and-replace field.**
+3. **`[QUALITY]` interpreted** — per-node initial quality, as node property `initQuality`, also
+   through `setProp()`. **`[SOURCES]` and `[MIXING]` are still carried and not read**, so a booster
+   dose and a tank mixing model are the next real gap. A reservoir's own initial quality is held for
+   the whole run by EPANET, which is why this alone is enough to state a plant residual and run.
+4. **The concentration unit: carried as a label, never converted.** See the engine section above.
+   The dimensioned quantity turned out to be the WALL coefficient, not the concentration.
+5. **The coefficient disclosure.** Both global boxes open EMPTY, an empty box is EPANET's own zero,
+   and `lpn_reaction_note` says in the box that this page offers no coefficient of its own, why
+   (no standard test; published field values for the same water differ by a factor of ten), and
+   what to do instead. Task 530's ask-or-disclose posture.
+6. **The anchor: `dev/lpn-spike/reaction-anchor-harness.js`, and it is ANALYTIC, not an EPA report.**
+   No EPA chlorine report for Net1 exists in this repository and none was obtained. A reservoir, one
+   pipe, one junction: `C = C0 exp(Kb V / Q)`, which is arithmetic with no free parameter.
+   **Measured: 0.0007% and 0.0004% at two flows, and the coupling asserted** — double the flow and
+   `ln C` halves, to 0.01% — because a case whose answer did not depend on travel time would pass
+   with the transport broken. Re-run at a 10 s quality step so the answer is the physics rather than
+   one lucky discretisation.
 
-Believed larger than water age and source share combined.
+**Still not built, deliberately:** `[SOURCES]`, `[MIXING]`, a link-level quality result, a Tables
+column and a Find-and-replace field for the two coefficients, and a per-tank coefficient control
+(the value is carried on `settings.reactions.tank` and round-trips, but nothing edits it).

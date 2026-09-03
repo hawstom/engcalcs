@@ -198,8 +198,12 @@ function check(ok, msg) {
 	}
 
 	// ---- 5. what the page must NOT do ------------------------------------------------------------
-	check(!EngCalcs.lpnQualityRuns({ mode: 'chemical' }),
-		'a chemical is not run: it has no [REACTIONS] here to run against');
+	// **A CHEMICAL IS A RUN SINCE 2026-09-03** (Task 566), where this line used to assert that it
+	// was not. Its own anchor is dev/lpn-spike/reaction-anchor-harness.js, which is analytic and
+	// says so; what belongs HERE is only that the third mode exists beside the two this file is
+	// about, so a future edit cannot quietly take it back out of lpnQualityRuns().
+	check(EngCalcs.lpnQualityRuns({ mode: 'chemical' }),
+		'a chemical is a run of its own, anchored in reaction-anchor-harness.js');
 	check(!EngCalcs.lpnQualityRuns({ mode: 'trace', traceNode: '' }),
 		'a source share with no source named is not run: EPANET would reject the file');
 	check(!EngCalcs.lpnQualityRuns({ mode: 'none' }), 'and nothing asked for is nothing run');

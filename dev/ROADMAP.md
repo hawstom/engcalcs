@@ -1132,31 +1132,22 @@ the block.
     than a disappointment; "a third of them" makes several open tasks much more urgent.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 
-- 100|566| **Close the EPANET gap: eight sections are carried but not understood.**
+- 100|566| **Close the EPANET gap: six sections are carried but not understood.**
   **Tom, 2026-09-01:** *"Full EPANET interface including all of quality needs to be our priority."*
-  Water age and source tracing shipped that day, anchored on EPA's own `Net3.rpt` (2,425 comparisons,
-  worst 0.105%). **This is the rest, and the list is exact rather than impressionistic** — read it
-  off `INP_SECTIONS_READ` in `js/lpn-inp.js`, which is the one place the line is drawn.
-  - **20 sections are INTERPRETED**: TITLE, JUNCTIONS, RESERVOIRS, TANKS, PIPES, PUMPS, VALVES,
-    DEMANDS, STATUS, PATTERNS, CURVES, CONTROLS, EMITTERS, TIMES, OPTIONS, COORDINATES, VERTICES,
-    LABELS, BACKDROP, END.
-  - **8 are CARRIED VERBATIM AND NOT UNDERSTOOD.** Nothing is lost — they round-trip byte-identically
+  Water age and source tracing shipped that day; **the chemical / reaction mode shipped 2026-09-03**,
+  with `[REACTIONS]` and `[QUALITY]` interpreted, two per-pipe coefficients and a per-node initial
+  quality through `setProp()`, and the ask-or-disclose coefficient design. Record and what is left:
+  `dev/water-quality.md`. **This is the rest, and the list is exact rather than impressionistic** —
+  read it off `INP_SECTIONS_READ` in `js/lpn-inp.js`, which is the one place the line is drawn.
+  - **6 are CARRIED VERBATIM AND NOT UNDERSTOOD.** Nothing is lost — they round-trip byte-identically
     and the import report names them — but the page cannot act on any of them:
-    - **`[REACTIONS]`, `[QUALITY]`, `[SOURCES]`, `[MIXING]` — chlorine, and the biggest piece.**
-      **`dev/water-quality.md` is the design and it is already written**: `[REACTIONS]` interpreted,
-      two new per-pipe properties through `setProp()`, a concentration unit (**the feature's first
-      dimensioned quantity, so it needs the `engineHydraulics()` treatment that just caught
-      `HeadError` reaching EPANET as 1 mm**), and the ask-or-disclose coefficient design. **The
-      coefficient is the real problem, not the plumbing:** published bulk decay rates span an order
-      of magnitude, so a silent default would be dishonest exactly as a silent hydrant `k` would
-      have been — Tom's standing rule that lack of coefficients is not lack of demand applies, and
-      the answer is the Task 530 posture, ask or disclose.
-      - **[H] AND AN ANCHOR PROBLEM THAT MUST BE SOLVED BEFORE THE CODE, NOT AFTER.** Net1 states
-        `Quality Chlorine mg/L` but **this repo holds no EPA report for it** — `Net3.rpt` is a TRACE
-        run. Every quality number so far has been checked against EPA's own output or against
-        arithmetic with no free parameter. **Do not ship a decay curve checked only against
-        ourselves.** Find EPA's Net1 quality report, or generate one from the vendored engine and
-        say plainly that is what it is, or anchor on a hand-integrable single pipe. Decide first.
+    - **`[SOURCES]` and `[MIXING]` — the rest of chlorine.** A booster dose (a concentration, a mass
+      rate or a flow-paced source at a node, optionally on a pattern) and a tank mixing model. The
+      chemical mode runs without them: a reservoir's initial quality is held for the whole run by
+      EPANET, which is enough to state a plant residual. **The anchor is ANALYTIC and stays labelled
+      as such** — no EPA chlorine report for Net1 exists in this repo and none was found, so
+      `dev/lpn-spike/reaction-anchor-harness.js` checks `C = C0 exp(Kb V / Q)` in one pipe (0.0007%
+      at two flows, with the flow/decay coupling asserted). If an EPA report turns up, prefer it.
     - **`[ENERGY]`** — pump energy and cost. Net3 states global efficiency, price and demand charge.
       A real deliverable for a utility, and the one section here whose ANSWER is money.
     - **`[TAGS]`** — a free-text tag per element. Cheap, and it is the natural home for the
@@ -1166,7 +1157,9 @@ the block.
     - **`[RULES]`** — carried since 2026-08-28 and parked ON PURPOSE, Task 248.03. The language
       cannot be skipped (a rule's numbers are in the units of the file, so no factor patches it) and
       Tom's evidence bar stands: it waits for a user who has one.
-  - **Also unbuilt, smaller:** link quality has no UI (the bridge captures node quality only — an
+  - **Also unbuilt, smaller:** the two per-pipe reaction coefficients have a popup row but no Tables
+    column and no Find-and-replace field, and the per-tank coefficient round-trips with no control;
+    link quality has no UI (the bridge captures node quality only — an
     average age in a pipe is real, but a half-symmetric result dimension reads worse than an absent
     one); and the colour legend shows no unit for a source share, a percentage having no unit id.
   - **NOT a gap, recorded so it is not re-proposed:** PRV/PSV/FCV solve through EPANET only, by

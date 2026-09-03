@@ -2348,12 +2348,20 @@ var EngCalcs = EngCalcs || {};
 	// reason demand is: "what does this block need once it is rezoned" is an operating question, and
 	// a scenario is where such a question is asked. ABSENT means the junction is tested against the
 	// single number typed in the Fire flow box, which is what every junction did before this existed.
+	// `initQuality` is the concentration a node starts a chemical run holding, and for a reservoir
+	// the concentration it holds for the whole run (Task 566). Overridable for the same reason
+	// demand is: "what if the plant leaves 1.2 mg/L instead of 0.8" is an operating question.
 	var LPN_OVERRIDABLE = {
-		node: { demand: true, emitter: true, head: true, level: true, active: true, fireFlow: true },
+		node: { demand: true, emitter: true, head: true, level: true, active: true, fireFlow: true,
+			initQuality: true },
 		// `setting` is a VALVE's setting (Task 248 phase 2). It belongs here for the same reason
 		// demand does: "what if the pressure reducing valve is set to 50 psi" is an operating
 		// question, which is what a scenario asks, where the valve's diameter is what was built.
-		link: { diameter: true, roughness: true, k: true, status: true, length: true, setting: true, active: true },
+		// `bulkCoeff` and `wallCoeff` are the pipe's own reaction coefficients, overriding the
+		// global pair (Task 566). A design question -- relining a main changes its wall coefficient
+		// and nothing else about it -- so a scenario is exactly where one belongs.
+		link: { diameter: true, roughness: true, k: true, status: true, length: true, setting: true, active: true,
+			bulkCoeff: true, wallCoeff: true },
 		// A TEXT LABEL IS A THIRD GROUP (Task 407) with exactly two properties: `text` is what the
 		// note SAYS and `active` whether it is there at all, which together answer "this scenario has
 		// its own note" with no second mechanism.
@@ -4027,18 +4035,109 @@ var EngCalcs = EngCalcs || {};
 	// So this reports the number and stops. No verdict glyph, no threshold, no colour band the page
 	// picked for the user.
 	function qualitySetting() {
-		var q = settings.quality || {};
-		return { mode: q.mode || 'none', traceNode: q.traceNode || '', src: q.src };
+		var q = settings.quality || {}, qo = settings.qualityOptions || {},
+			out = { mode: q.mode || 'none', traceNode: q.traceNode || '', src: q.src };
+		if (out.mode === 'chemical') {
+			// **THE CHEMICAL'S NAME AND UNIT LABEL, AS TEXT, AND NEVER AS A UNIT WE CONVERT.**
+			// `Chlorine mg/L` is what the file said, or what the user typed in the box; EPANET
+			// transports and reacts a concentration in whatever units its sources and coefficients
+			// are stated in, and converts none of it -- so there is no factor here, and inventing
+			// one would be the third conversion site CLAUDE.md forbids.
+			out.chemical = (q.chemical !== undefined && q.chemical !== null && q.chemical !== '')
+				? String(q.chemical) : (q.src ? String(q.src) : '');
+			// **AND THE TWO CARRIED OPTIONS THAT ONLY A CHEMICAL MEANS ANYTHING TO.** They stay
+			// carried TEXT on the document (`qualityOptions`, byte-for-byte on export); what
+			// crosses to the engine is a number read off that text. `Tolerance` in particular is
+			// not a nicety: it is EPANET's parcel-merging tolerance and it decides how much of the
+			// concentration profile survives the transport (dev/lpn-spike/reaction-anchor-harness.js).
+			out.tolerance = numOrUndef(qo.tolerance);
+			out.diffusivity = numOrUndef(qo.diffusivity);
+		}
+		return out;
+	}
+	function numOrUndef(t) {
+		var v = parseFloat(t);
+		return isFinite(v) ? v : undefined;
+	}
+	/**
+	 * The reaction record as an ENGINE wants it: a shallow clone with the WALL coefficients
+	 * converted to metres per day, and nothing else touched.
+	 *
+	 * **THIS IS THE `engineHydraulics()` TREATMENT, AND IT IS HERE FOR THE SAME REASON.** A
+	 * first-order wall coefficient is a LENGTH PER DAY, and the length is the project's own -- so a
+	 * US project stating -1 ft/day reached an LPS-and-metres engine input as -1 m/day, wrong by
+	 * 3.28 in the term that decides how much chlorine is left at the far end. Measured against the
+	 * engine in dev/lpn-spike/reaction-anchor-harness.js, which is where the convention itself is
+	 * established rather than assumed.
+	 *
+	 * **A BULK COEFFICIENT CROSSES UNCHANGED, AND SO DOES A ZERO-ORDER WALL ONE.** First-order bulk
+	 * is 1/day and zero-order bulk is a concentration per day; a zero-order wall coefficient is a
+	 * mass per area per day. Every one of those is either dimensionless in length or stated in the
+	 * concentration unit, and a concentration is converted by nobody here, EPANET included. The
+	 * conversion is therefore applied ONLY where the order really makes the coefficient a length,
+	 * which is order 1 -- EPANET's own default, so an unstated order is one.
+	 *
+	 * Pure: it never writes to `settings.reactions`, which is the document's own copy in the
+	 * document's own units and must come back out of the exporter character for character.
+	 */
+	function engineQuality(react) {
+		var out = {}, k, order = react.orderWall;
+		for (k in react) { if (Object.prototype.hasOwnProperty.call(react, k)) { out[k] = react[k]; } }
+		if (order !== undefined && order !== 1) { return out; }
+		if (typeof out.globalWall === 'number' && isFinite(out.globalWall)) {
+			out.globalWall = toSI(out.globalWall, 'lpn_u_length');
+		}
+		out.wall = {};
+		Object.keys(react.wall || {}).forEach(function (id) {
+			out.wall[id] = toSI(react.wall[id], 'lpn_u_length');
+		});
+		return out;
+	}
+	/**
+	 * Every reaction coefficient this document states, gathered from the one place each lives:
+	 * the globals on `settings.reactions`, the per-pipe pair on the links THROUGH `effective()`,
+	 * and the per-tank one carried on the setting (it has no control, and says so).
+	 */
+	function docReactions() {
+		var r = settings.reactions || {}, out = { bulk: {}, wall: {}, tank: {} };
+		['orderBulk', 'orderTank', 'orderWall', 'globalBulk', 'globalWall',
+			'limitingPotential', 'roughnessCorrelation'].forEach(function (k) {
+			if (typeof r[k] === 'number' && isFinite(r[k])) { out[k] = r[k]; }
+		});
+		Object.keys(r.tank || {}).forEach(function (id) { out.tank[id] = r.tank[id]; });
+		(doc.links || []).forEach(function (l) {
+			if (l.type !== 'pipe' || !isActive(l)) { return; }
+			var b = effective(l, 'bulkCoeff'), w = effective(l, 'wallCoeff');
+			if (typeof b === 'number' && isFinite(b)) { out.bulk[l.id] = b; }
+			if (typeof w === 'number' && isFinite(w)) { out.wall[l.id] = w; }
+		});
+		return out;
 	}
 	function qualityMode() { return qualitySetting().mode; }
 	// The unit the number is read in: a time for an age, nothing at all for a share. Dynamic for
 	// the same reason the roughness unit is -- one control's meaning follows another setting.
+	// **A CONCENTRATION HAS NO UNIT ID AND MUST NOT BE GIVEN ONE.** Its unit is the label the
+	// document states beside the chemical's name (`Chlorine mg/L`), which is text the user owns and
+	// not a family with a factor -- so it is shown, never converted. That is CLAUDE.md's
+	// carry-the-label path, and it is the honest one: EPANET converts a concentration nowhere
+	// either, so there is no factor anybody could check ours against.
 	function qualityUnitId() { return qualityMode() === 'age' ? resultUnit('age') : ''; }
+	/** The concentration unit as the document states it, or '' -- a label, shown, never applied. */
+	function concentrationUnitText() {
+		var t = String(qualitySetting().chemical || '').trim(), w;
+		if (!t) { return ''; }
+		w = t.split(/\s+/);
+		// `CHEMICAL Chlorine mg/L` and `Chlorine mg/L` both end in the unit label; a name on its
+		// own states no unit, and an unstated unit is shown as no unit rather than as a guess.
+		return w.length > 1 ? w[w.length - 1] : '';
+	}
 	// The heading, in OUR vocabulary rather than EPANET's (CLAUDE.md): EPANET says "Source Trace"
 	// and reports a bare "Quality" column, and neither tells a reader what the number is.
 	function qualityLabel() {
 		var pc = EngCalcs.pageConfig || {}, mode = qualityMode();
 		if (mode === 'trace') { return pc.lpn_result_source_share || 'Source share'; }
+		// EPANET's own word for the quantity, which is what an engineer reads on a report.
+		if (mode === 'chemical') { return pc.lpn_result_concentration || 'Concentration'; }
 		return pc.lpn_result_water_age || 'Water age';
 	}
 	/**
@@ -4051,13 +4150,13 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function nodeQualityValue(n) {
 		var mode = qualityMode(), v;
-		if (mode !== 'age' && mode !== 'trace') { return undefined; }
+		if (mode !== 'age' && mode !== 'trace' && mode !== 'chemical') { return undefined; }
 		if (!lastSolveResult || !lastSolveResult.qualities) { return undefined; }
 		if (lastSolveResult.qualityMode !== mode) { return undefined; }
 		v = lastSolveResult.qualities[n.id];
 		if (typeof v !== 'number' || !isFinite(v)) { return undefined; }
-		// SECONDS out of the engine, like every other result in SI; a share is a percentage and
-		// crosses nothing.
+		// SECONDS out of the engine, like every other result in SI; a share is a percentage and a
+		// concentration is in the document's own stated unit, so neither crosses anything.
 		return mode === 'age' ? toDisplay(v, resultUnit('age')) : v;
 	}
 	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', demandActual: 'lpn_u_flow',
@@ -14167,6 +14266,14 @@ var EngCalcs = EngCalcs || {};
 			settings.quality = EngCalcs.lpnQualityParse(settings.qualityOptions.quality);
 			settings.quality.src = settings.qualityOptions.quality;
 		}
+		// **AND THE SAME ONCE-ONLY READ FOR THE TWO SECTIONS** (Task 566). A project saved while
+		// `[REACTIONS]` and `[QUALITY]` were carried text has the lines and no record, and the
+		// absence of `settings.reactions` is what identifies it -- exactly as the absence of `src`
+		// identifies a quality option that has never met its own token. Interpreting them here
+		// means a project saved before this gains its coefficients on open rather than never.
+		if (!settings.reactions && EngCalcs.lpnReactionsParse) {
+			readQualitySections(saved.inpSections || {}, settings, saved.nodes || [], saved.links || []);
+		}
 		// **A PROJECT SAVED UNDER THE TWO-FIELD DESIGN KEEPS ITS NUMBERS.** That design froze the
 		// method's answer into a second field, `colorFrozenBreaks`, and was rejected (Task 448).
 		// Those numbers are the ones that project was drawn in, so
@@ -15143,6 +15250,11 @@ var EngCalcs = EngCalcs || {};
 					}())
 					: { mode: 'none', traceNode: '' };
 				if (s.hydraulics.emitterExponent !== undefined) { s.emitterExponent = s.hydraulics.emitterExponent; }
+				// **[REACTIONS] AND [QUALITY], READ RATHER THAN MERELY CARRIED** (Task 566). The
+				// lines stay in `inpSections` and stay what the exporter writes back; this is the
+				// interpretation beside them. Net1's `Global Bulk -.5` arrives as -0.5 and not as a
+				// default, which is the whole point.
+				readQualitySections(parsed.inpSections, s, nodes, links);
 				return s;
 			}()),
 			// THE CLOCK, CARRIED WHOLE (Task 423). js/lpn-patterns.js has already turned every time
@@ -15163,6 +15275,46 @@ var EngCalcs = EngCalcs || {};
 			// program invented. Kept whole and written back; nothing here acts on one.
 			inpSections: parsed.inpSections || {},
 			units: readUnitSelections()
+		});
+	}
+
+	/**
+	 * **`[REACTIONS]` AND `[QUALITY]`, READ ONTO A DOCUMENT** (Task 566). One function, called from
+	 * the two doors a document arrives through -- an `.inp` import and opening a project saved
+	 * before either section was interpreted -- so the two can never disagree about what a file said.
+	 *
+	 * **THE CARRIED TEXT IS NOT TOUCHED AND STAYS THE SOURCE OF TRUTH.** `doc.inpSections` keeps
+	 * the file's own lines, and the exporter writes them back byte for byte while these values
+	 * still parse out of them (js/lpn-inp.js). This is the `[OPTIONS] Quality` rule applied to a
+	 * whole section: interpret beside the token, never over it.
+	 *
+	 * A per-pipe coefficient lands on the LINK and a starting concentration on the NODE, because
+	 * they are element properties and go through the same resolver and the same `setProp()` write
+	 * seam every other one does. What has no element to live on -- the globals, and the per-tank
+	 * coefficient this page offers no control for -- stays on the setting.
+	 */
+	function readQualitySections(sections, settingsObj, nodeList, linkList) {
+		var react = EngCalcs.lpnReactionsParse
+			? EngCalcs.lpnReactionsParse((sections || {}).REACTIONS || []) : { bulk: {}, wall: {}, tank: {} },
+			init = EngCalcs.lpnInitQualityParse
+				? EngCalcs.lpnInitQualityParse((sections || {}).QUALITY || []) : {},
+			kept = {};
+		['orderBulk', 'orderTank', 'orderWall', 'globalBulk', 'globalWall',
+			'limitingPotential', 'roughnessCorrelation'].forEach(function (k) {
+			if (react[k] !== undefined) { kept[k] = react[k]; }
+		});
+		kept.tank = react.tank || {};
+		// PRESENT EVEN WHEN EMPTY. Its presence is what tells the exporter this document's
+		// water-quality sections have been read at all, so a file stating none must still get the
+		// record -- absent, an exporter would fall back to writing carried text that is not there.
+		settingsObj.reactions = kept;
+		(linkList || []).forEach(function (l) {
+			if (l.type !== 'pipe') { return; }
+			if (react.bulk[l.id] !== undefined) { l._bulkCoeff = react.bulk[l.id]; }   // base-write: reading a file onto a document being CONSTRUCTED, before any scenario exists
+			if (react.wall[l.id] !== undefined) { l._wallCoeff = react.wall[l.id]; }   // base-write: same construction pass; the file states one network, which is Base
+		});
+		(nodeList || []).forEach(function (n) {
+			if (init[n.id] !== undefined) { n._initQuality = init[n.id]; }   // base-write: same construction pass; an imported starting concentration is Base's
 		});
 	}
 
@@ -23198,9 +23350,7 @@ var EngCalcs = EngCalcs || {};
 				['age', pc.lpn_quality_age || 'Water age'],
 				['trace', pc.lpn_quality_trace || 'Source share']
 			];
-		if (q.mode === 'chemical') {
-			opts.push(['chemical', pc.lpn_quality_chemical || 'A chemical this file names (kept, not worked out)']);
-		}
+		opts.push(['chemical', pc.lpn_quality_chemical || 'A chemical that decays']);
 		opts.forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
@@ -23217,6 +23367,12 @@ var EngCalcs = EngCalcs || {};
 			if (sel.value === 'trace' && !settings.quality.traceNode) {
 				settings.quality.traceNode = qualitySourceCandidates()[0] || '';
 			}
+			// **NOTHING IS SEEDED FOR A CHEMICAL, AND THAT IS THE WHOLE DESIGN.** There is no
+			// standard test for a bulk decay coefficient and published field values span an order of
+			// magnitude, so a number this page put in the box would be presented as a fact and read
+			// as one. The row below opens empty and the note beside it says why. (Tom's standing
+			// rule, 2026-08-25: lack of coefficients is not the same as lack of demand -- so the
+			// control exists and the number does not.)
 			saveToStorage();
 			// The whole box: the source row appears or vanishes, and the heading this quantity is
 			// shown under changes in the Labels list, the colour legend and every table.
@@ -23254,6 +23410,7 @@ var EngCalcs = EngCalcs || {};
 			rowFn(host, pc.lpn_settings_quality_source || 'Water from', src,
 				pc.lpn_settings_quality_source_tip);
 		}
+		if (q.mode === 'chemical') { settingsChemicalRows(host, rowFn, noteFn); }
 		// **SAID PLAINLY, IN THE BOX, RATHER THAN LEFT TO BE DISCOVERED.** Water quality is carried
 		// along the flows over time, so there is no such thing as a water age at one instant -- it
 		// needs a total run time and it needs the EPANET engine, exactly as the run itself does.
@@ -23262,6 +23419,63 @@ var EngCalcs = EngCalcs || {};
 			noteFn(host, pc.lpn_quality_needs_run
 				|| 'Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.');
 		}
+	}
+	/**
+	 * **WHAT A DECAYING CHEMICAL NEEDS, AND NOTHING MORE** (Task 566): what it is called, and the
+	 * two global coefficients EPANET reacts it with. Per-pipe overrides live on the pipe, where a
+	 * relined main is a fact about that main; a starting concentration lives on the node it enters
+	 * at. This box holds only what belongs to the whole network.
+	 *
+	 * **THE COEFFICIENT IS THE HARD PART AND THIS PAGE OFFERS NONE.** Both boxes open empty, an
+	 * empty box means EPANET's own zero (a chemical that does not react at all), and the note says
+	 * so out loud along with the reason there is no default to offer. That is the ask-or-disclose
+	 * posture Task 530 settled for the fire-flow hydrant coefficient, and it is the same argument:
+	 * a plausible number in a box is read as our recommendation.
+	 */
+	function settingsChemicalRows(host, rowFn, noteFn) {
+		var pc = EngCalcs.pageConfig || {}, q = qualitySetting();
+		var name = document.createElement('input');
+		name.type = 'text'; name.size = 14;
+		name.value = q.chemical || '';
+		name.addEventListener('change', function () {
+			if (!settings.quality) { settings.quality = { mode: 'chemical', traceNode: '' }; }
+			settings.quality.chemical = name.value;
+			saveToStorage();
+			rebuildSettingsBox();
+			refreshLabelText();
+			refreshPopupIfOpen();
+			scheduleSolve();
+		});
+		rowFn(host, pc.lpn_quality_chemical_name || 'Chemical and units', name,
+			pc.lpn_quality_chemical_name_tip);
+		// **A COEFFICIENT ROW: BLANK IS A STATE, NOT A ZERO WE TYPED.** Clearing the box removes the
+		// key, so the exporter writes no line and EPANET's own default stands -- the same sparse
+		// rule every other `[OPTIONS]` on this page follows.
+		function coeffRow(key, labelText, tip) {
+			var input = document.createElement('input');
+			input.type = 'number'; input.step = 'any';
+			var cur = (settings.reactions || {})[key];
+			input.value = (typeof cur === 'number' && isFinite(cur)) ? String(cur) : '';
+			input.addEventListener('change', function () {
+				if (!settings.reactions) { settings.reactions = { tank: {} }; }
+				var v = parseFloat(input.value);
+				if (input.value === '') { delete settings.reactions[key]; }
+				else if (isFinite(v)) { settings.reactions[key] = v; }
+				else { input.value = (typeof settings.reactions[key] === 'number') ? String(settings.reactions[key]) : ''; return; }
+				saveToStorage();
+				scheduleSolve();
+			});
+			rowFn(host, labelText, input, tip);
+		}
+		coeffRow('globalBulk', (pc.lpn_reaction_bulk || 'Bulk reaction coefficient')
+			+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')', pc.lpn_reaction_bulk_tip);
+		// **THE ONE COEFFICIENT WITH A LENGTH IN IT**, so the unit is named on the label the way a
+		// Darcy-Weisbach roughness names its own. engineQuality() converts it at the engine
+		// boundary and nowhere else.
+		coeffRow('globalWall', (pc.lpn_reaction_wall || 'Wall reaction coefficient')
+			+ ' (' + unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day') + ')',
+		pc.lpn_reaction_wall_tip);
+		if (noteFn) { noteFn(host, pc.lpn_reaction_note || ''); }
 	}
 	/**
 	 * The nodes a source share may be traced from, in drawing order.
@@ -25009,12 +25223,19 @@ var EngCalcs = EngCalcs || {};
 	 * nothing honest for a ✓ or a ⚠ to mean here. The number is reported and the engineer judges it.
 	 */
 	function qualityResultRow(fields, n) {
-		var pc = EngCalcs.pageConfig || {}, v = nodeQualityValue(n), unitId = qualityUnitId();
+		var pc = EngCalcs.pageConfig || {}, v = nodeQualityValue(n), unitId = qualityUnitId(),
+			mode = qualityMode(), unitText;
 		if (v === undefined) { return; }
-		readonlyField(fields,
-			// A percent sign needs no translation and no key; a time unit is named by its selector.
-			qualityLabel() + ' (' + (unitId ? unitLabel(unitId) : '%') + ')', v,
-			qualityMode() === 'age' ? pc.lpn_result_water_age_tip : pc.lpn_result_source_share_tip);
+		// A percent sign needs no translation and no key; a time unit is named by its selector; a
+		// CONCENTRATION is named by the document itself, and where the document names none the row
+		// carries no unit rather than a unit this page chose.
+		if (unitId) { unitText = ' (' + unitLabel(unitId) + ')'; }
+		else if (mode === 'chemical') { unitText = concentrationUnitText() ? ' (' + concentrationUnitText() + ')' : ''; }
+		else { unitText = ' (%)'; }
+		readonlyField(fields, qualityLabel() + unitText, v,
+			mode === 'age' ? pc.lpn_result_water_age_tip
+				: mode === 'chemical' ? pc.lpn_result_concentration_tip
+					: pc.lpn_result_source_share_tip);
 	}
 	function renderNodeFields(nodeId) {
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
@@ -25151,6 +25372,22 @@ var EngCalcs = EngCalcs || {};
 		// reservoir and a tank all have a water age and a source share -- the two that SUPPLY the
 		// network are the most telling ones -- so this is the popup's common tail rather than three
 		// branches. Absent where there is no answer; see nodeQualityValue().
+		// **WHERE A CHEMICAL ENTERS THE NETWORK** (Task 566), on every kind of node and only while
+		// one is being tracked. For a junction or a tank it is what that node holds when the run
+		// starts; for a RESERVOIR it is what the reservoir keeps supplying for the whole run, which
+		// is what makes a reservoir the ordinary way to state a plant's residual. Blank means
+		// EPANET's own zero, and the field is blank-capable so nobody has to type one.
+		//
+		// Its unit is the label the document states beside the chemical's name, shown and never
+		// converted -- see concentrationUnitText().
+		if (qualityMode() === 'chemical') {
+			var cu = concentrationUnitText();
+			numberFieldBlank(fields,
+				(pc.lpn_quality_initial || 'Starting concentration') + (cu ? ' (' + cu + ')' : ''),
+				effective(n, 'initQuality'),
+				function (v) { setProp(n, 'initQuality', v); refreshPopupIfOpen(); },
+				pc.lpn_quality_initial_tip, { el: n, prop: 'initQuality' });
+		}
 		qualityResultRow(fields, n);
 		activeField(fields, n);
 		pushHereButton(fields, n);
@@ -25552,6 +25789,26 @@ var EngCalcs = EngCalcs || {};
 				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, pc.lpn_field_km_tip,
 				{ el: l, prop: 'k' }, kmTableUrl());
 			lengthField(fields, l);
+			// **THE PIPE'S OWN REACTION COEFFICIENTS** (Task 566), shown only while a chemical is
+			// being tracked: they change nothing under water age or a source share, and two
+			// permanently inert boxes on every pipe is the clutter the emitter-exponent control was
+			// removed for. Blank means "use the global pair", which is EPANET's own rule, so the
+			// field is deliberately blank-capable rather than seeded with the global number.
+			//
+			// **BOTH WRITE THROUGH setProp()**, like every other property on this popup: inside a
+			// scenario a direct `l._wallCoeff = v` would edit Base under every other scenario at once.
+			if (qualityMode() === 'chemical') {
+				numberFieldBlank(fields, (pc.lpn_reaction_bulk || 'Bulk reaction coefficient')
+					+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')',
+				effective(l, 'bulkCoeff'),
+				function (v) { setProp(l, 'bulkCoeff', v); refreshPopupIfOpen(); },
+				pc.lpn_reaction_pipe_tip, { el: l, prop: 'bulkCoeff' });
+				numberFieldBlank(fields, (pc.lpn_reaction_wall || 'Wall reaction coefficient')
+					+ ' (' + unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day') + ')',
+				effective(l, 'wallCoeff'),
+				function (v) { setProp(l, 'wallCoeff', v); refreshPopupIfOpen(); },
+				pc.lpn_reaction_pipe_tip, { el: l, prop: 'wallCoeff' });
+			}
 		}
 		closedField(fields, l, linkId);
 		activeField(fields, l);
@@ -25947,6 +26204,25 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
+	// **BLANK IS A STATE HERE, NOT A ZERO** -- numberFieldPlain()'s `+input.value` turns an empty
+	// box into 0, and for a reaction coefficient those are two different statements: 0 says "this
+	// pipe does not react", blank says "use the global coefficient", which is EPANET's own rule.
+	// The label carries its own unit text (a bulk coefficient is 1/day and a wall one is a length
+	// per day), so this takes no unit id -- unitNumberFieldBlank() is the sibling that does.
+	function numberFieldBlank(fields, labelText, value, onChange, tip, ov) {
+		var label = document.createElement('label'), input = document.createElement('input');
+		input.type = 'number'; input.step = 'any';
+		input.value = (value === undefined || value === null || value === '') ? '' : String(value);
+		input.addEventListener('change', function () {
+			onChange(input.value === '' ? undefined : +input.value);
+			completeEdit(ov);
+		});
+		setFieldLabel(label, labelText, tip);
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+		if (ov) { overrideMarker(fields, ov.el, ov.prop); }
+	}
 	function numberFieldPlain(fields, labelText, value, onChange, tip, ov, href) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.value = value;
@@ -26300,6 +26576,12 @@ var EngCalcs = EngCalcs || {};
 	 * stay in the units the file stated (the `libPatterns()` lesson -- a getter that assigns is a
 	 * writer wearing a reader's name).
 	 */
+	// The concentration a node starts a chemical run holding, through the resolver seam like every
+	// other element property. Undefined where none is typed, which is EPANET's own zero.
+	function nodeInitQuality(n) {
+		var v = effective(n, 'initQuality');
+		return (typeof v === 'number' && isFinite(v)) ? v : undefined;
+	}
 	function engineHydraulics(hyd, scenarioDM) {
 		var out = {}, k;
 		for (k in hyd) { if (Object.prototype.hasOwnProperty.call(hyd, k)) { out[k] = hyd[k]; } }
@@ -26488,6 +26770,21 @@ var EngCalcs = EngCalcs || {};
 		// is not in this scenario's network at all. The `var out` is Task 248 phase 2: a valve
 		// needs fields added after the common ones, so the object is named rather than returned
 		// inline.
+		// **WHAT EACH NODE STARTS A CHEMICAL RUN HOLDING**, attached after the three node shapes
+		// above rather than inside each of them (Task 566): a junction, a reservoir and a tank all
+		// carry one, and doing it here means a fourth node type cannot quietly arrive without it.
+		// Absent where none is typed, which is EPANET's own zero -- never a zero we wrote, so the
+		// engine input states nothing and the engine's default stands.
+		(function () {
+			var q = {};
+			doc.nodes.forEach(function (n) {
+				var v = nodeInitQuality(n);
+				if (v !== undefined) { q[n.id] = v; }
+			});
+			nodes.forEach(function (m) {
+				if (q[m.id] !== undefined) { m.initQuality = q[m.id]; }
+			});
+		}());
 		var links = doc.links.filter(function (l) {
 			return isActive(l) && live[l.from] && live[l.to];
 		}).map(function (l) {
@@ -26595,6 +26892,12 @@ var EngCalcs = EngCalcs || {};
 			// Diffusivity and Tolerance are not sent to the engine at all -- they mean something
 			// only to a reacting chemical, which this page carries and does not work out.
 			quality: qualitySetting(),
+			// **THE REACTION COEFFICIENTS, AND THE ONE OF THEM THAT CARRIES A UNIT** (Task 566).
+			// Converted here, on a clone, for the same reason `hydraulics` is: this is the only
+			// place that knows the project's units, and `settings.reactions` is the document's own
+			// copy the exporter must hand back character for character. engineQuality() says which
+			// coefficient moves and why.
+			reactions: engineQuality(docReactions()),
 			// **THE RULE TEXT, FILTERED TO THE RULES THAT STILL NAME REAL ELEMENTS** (Task 248.03).
 			// **NOTHING WRITES THIS INTO AN ENGINE INPUT TODAY, AND js/lpn-epanet.js SAYS WHY** --
 			// a rule's numbers are in the units of the file the user opened, and that writer emits

@@ -2704,14 +2704,34 @@ $ec_lang['lpn_settings_page_note']='Saved in this calculator, not in the project
 $ec_lang['lpn_settings_hydraulics']='Hydraulics';
 $ec_lang['lpn_settings_quality']='Water quality';
 $ec_lang['lpn_settings_quality_track']='Quality parameter';
-$ec_lang['lpn_settings_quality_track_tip']='Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one needs a concentration or a reaction rate.';
+$ec_lang['lpn_settings_quality_track_tip']='Choose what the run should follow through the pipes: how long the water has been in the system, where it came from, or a chemical that reacts as it travels. Only the chemical needs coefficients.';
 $ec_lang['lpn_settings_quality_source']='Trace node';
 $ec_lang['lpn_settings_quality_source_tip']='The node whose water is traced. Every other node then shows the share of its water that came from that node.';
 $ec_lang['lpn_quality_none']='Nothing';
 $ec_lang['lpn_quality_age']='Water age';
 $ec_lang['lpn_quality_trace']='Source trace';
-$ec_lang['lpn_quality_chemical']='A chemical this file names (stored, not calculated)';
+$ec_lang['lpn_quality_chemical']='A chemical that reacts';
 $ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button.';
+// **THE CHEMICAL / REACTION MODE** (ROADMAP Task 566, dev/water-quality.md). EPANET's own words
+// throughout: bulk and wall reaction coefficient, initial quality, concentration. The unit of a
+// concentration is TEXT the document states beside the chemical name and is never converted, which
+// is why there is no unit family and no unit key here.
+$ec_lang['lpn_quality_chemical_name']='Chemical and units';
+$ec_lang['lpn_quality_chemical_name_tip']='The name of the chemical and the units its concentrations are written in, for example Chlorine mg/L. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.';
+$ec_lang['lpn_quality_initial']='Initial quality';
+$ec_lang['lpn_quality_initial_tip']='How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty for none.';
+$ec_lang['lpn_result_concentration']='Concentration';
+$ec_lang['lpn_result_concentration_tip']='How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.';
+$ec_lang['lpn_reaction_bulk']='Bulk reaction coefficient';
+$ec_lang['lpn_reaction_bulk_tip']='Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one grows it. First order unless the file says otherwise, so the coefficient is a rate in 1/day. An empty box means no bulk reaction.';
+$ec_lang['lpn_reaction_wall']='Wall reaction coefficient';
+$ec_lang['lpn_reaction_wall_tip']='Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.';
+$ec_lang['lpn_reaction_pipe_tip']='This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.';
+// The two unit words the coefficient labels are built from. Translatable, because the abbreviation
+// for a day is not the same word everywhere.
+$ec_lang['lpn_reaction_per_day']='1/day';
+$ec_lang['lpn_reaction_day']='day';
+$ec_lang['lpn_reaction_note']='This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.';
 // The Labels lists' two narrowest column headings, which are a column three characters wide each.
 // The decimals column is headed by an EXAMPLE of what it does -- and the example is translatable
 // because the DECIMAL SEPARATOR is a locale fact (Tom, 2026-08-18: "We could translate to '0,000'

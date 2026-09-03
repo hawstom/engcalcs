@@ -260,15 +260,34 @@ const ODD = BARE.replace('[OPTIONS]', '[VENDORDATA]\n VDA1            	something
 	const notes = byId.lpn_dialog_body.textContent || '';
 	ok('...and the report names it', /VENDORDATA/.test(notes), JSON.stringify(notes.slice(-200)));
 
-	// **THE ENGINE IS HANDED NONE OF THEM**, on the [RULES] reason: js/lpn-epanet.js writes LPS and
-	// METRES always, EPANET rejects a whole input over one line naming an element it was not given,
-	// and no answer this page shows depends on any of these sections. Silence is the correct input.
+	// **THE ENGINE IS HANDED NONE OF THE SECTIONS THIS PAGE ONLY CARRIES**, on the [RULES] reason:
+	// js/lpn-epanet.js writes LPS and METRES always, EPANET rejects a whole input over one line
+	// naming an element it was not given, and no answer this page shows depends on a section
+	// nothing here reads. Silence is the correct input.
+	//
+	// **[QUALITY] AND [REACTIONS] LEFT THAT LIST 2026-09-03** (Task 566). They are INTERPRETED now,
+	// so a chemical run is handed both, composed from the model's own record with the wall
+	// coefficient converted at the boundary -- which is the opposite of carrying text through. They
+	// are still absent for every other analysis, and that is asserted below rather than assumed.
 	byId.lpn_dialog_body.children.length = 0;
 	L.importInp({ name: 'Net1.inp', _text: fs.readFileSync(refPath('Net1.inp'), 'utf8') });
 	const built = EngCalcs.lpnToInp(L.assembleModel());
-	['ENERGY', 'QUALITY', 'SOURCES', 'REACTIONS', 'MIXING', 'TAGS', 'REPORT'].forEach((name) => {
+	['ENERGY', 'SOURCES', 'MIXING', 'TAGS', 'REPORT'].forEach((name) => {
 		ok('the engine input states no [' + name + ']', !new RegExp('^\\[' + name + '\\]', 'm').test(built.inp));
 	});
+	// Net1 states `Quality Chlorine mg/L`, so this import IS a chemical run and the two interpreted
+	// sections are exactly what it needs.
+	ok('...but a chemical run is handed the two sections it needs',
+		/^\[QUALITY\]/m.test(built.inp) && /^\[REACTIONS\]/m.test(built.inp));
+	ok('...with Net1\'s own bulk coefficient in them', /Global Bulk  -0.5/.test(built.inp),
+		JSON.stringify((built.inp.match(/\[REACTIONS\][\s\S]{0,90}/) || [])[0]));
+	{
+		const notChem = L.assembleModel();
+		notChem.quality = { mode: 'age' };
+		const ageInp = EngCalcs.lpnToInp(notChem).inp;
+		ok('...and a water-age run is handed neither',
+			!/^\[QUALITY\]/m.test(ageInp) && !/^\[REACTIONS\]/m.test(ageInp));
+	}
 	// And carrying them changed nothing about what the engine IS given.
 	ok('the engine input is still a network', /^\[JUNCTIONS\]/m.test(built.inp) && /^\[PIPES\]/m.test(built.inp));
 }

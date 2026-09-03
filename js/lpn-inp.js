@@ -1468,6 +1468,155 @@
 		return out;
 	}
 
+	// ------------------------------------------------------------------------------------------
+	// **[REACTIONS] AND [QUALITY], INTERPRETED** (ROADMAP Task 566; dev/water-quality.md steps 1-3).
+	//
+	// Both sections were carried verbatim and never read, so a file stating `Global Bulk -.5`
+	// arrived with no coefficient at all and a chemical could not be run. They are interpreted
+	// here on EXACTLY the terms `[OPTIONS] Quality` already uses: the interpretation lives BESIDE
+	// the file's own text, never over it. The carried lines stay in `doc.inpSections` and stay the
+	// source of truth; the exporter writes them back character for character while the live values
+	// still parse out of them, and composes its own section only once somebody has really changed
+	// something. That is CLAUDE.md's `_xsrc`/`_ysrc` rule applied to a section instead of a number.
+	//
+	// **WHAT A COEFFICIENT MEANS, AND THE ONE OF THEM THAT CARRIES A UNIT.** A first-order BULK
+	// coefficient is a reciprocal time (1/day) and a zero-order one is a concentration per day, so
+	// neither moves between unit systems -- a concentration is never converted by anybody, EPANET
+	// included. A first-order WALL coefficient is a LENGTH PER DAY, and the length is the one the
+	// file's own flow units imply. Measured against the engine rather than read off a manual:
+	// `Global Wall -1` in an LPS file and `Global Wall -3.2808...` in an otherwise identical GPM
+	// file give the same concentration to 1e-6 (dev/lpn-spike/reaction-anchor-harness.js). That is
+	// the dimensioned quantity this feature has, and js/looped-network.js converts it on a clone at
+	// the engine boundary, never in the document.
+	function reactNum(t) {
+		var v = parseFloat(t);
+		return isFinite(v) ? v : undefined;
+	}
+	function reactSet(out, key, v) { if (v !== undefined) { out[key] = v; } }
+	var LPN_REACT_GLOBALS = ['orderBulk', 'orderTank', 'orderWall', 'globalBulk', 'globalWall',
+		'limitingPotential', 'roughnessCorrelation'];
+	/**
+	 * `[REACTIONS]` as a record. Sparse: a key is present only where the section stated it, so
+	 * absent means "the file said nothing" and the exporter writes nothing -- the same rule
+	 * `hydraulics` and `qualityOptions` follow.
+	 *
+	 * `bulk`/`wall` are keyed by PIPE id and `tank` by tank id; all three are always objects, so no
+	 * caller has to test for absence.
+	 */
+	EngCalcs.lpnReactionsParse = function (lines) {
+		var out = { bulk: {}, wall: {}, tank: {} };
+		(lines || []).forEach(function (raw) {
+			var line = String(raw), semi = line.indexOf(';'), w, k0, k1;
+			if (semi >= 0) { line = line.slice(0, semi); }
+			line = line.trim();
+			if (!line) { return; }
+			w = line.split(/\s+/);
+			k0 = (w[0] || '').toUpperCase();
+			k1 = (w[1] || '').toUpperCase();
+			if (k0 === 'ORDER') {
+				if (k1 === 'BULK') { reactSet(out, 'orderBulk', reactNum(w[2])); }
+				else if (k1 === 'TANK') { reactSet(out, 'orderTank', reactNum(w[2])); }
+				else if (k1 === 'WALL') { reactSet(out, 'orderWall', reactNum(w[2])); }
+				return;
+			}
+			if (k0 === 'GLOBAL') {
+				if (k1 === 'BULK') { reactSet(out, 'globalBulk', reactNum(w[2])); }
+				else if (k1 === 'WALL') { reactSet(out, 'globalWall', reactNum(w[2])); }
+				return;
+			}
+			if (k0 === 'LIMITING') { reactSet(out, 'limitingPotential', reactNum(w[2])); return; }
+			if (k0 === 'ROUGHNESS') { reactSet(out, 'roughnessCorrelation', reactNum(w[2])); return; }
+			// A per-element row. The keyword is the same word the global rows use, told apart by
+			// the SECOND token being an id rather than BULK/WALL -- which is EPANET's own grammar.
+			if ((k0 === 'BULK' || k0 === 'WALL' || k0 === 'TANK') && w[1] && w[2] !== undefined) {
+				reactSet(out[k0.toLowerCase()], w[1], reactNum(w[2]));
+			}
+		});
+		return out;
+	};
+	function reactMapSame(a, b) {
+		var ka = Object.keys(a || {}), kb = Object.keys(b || {}), i;
+		if (ka.length !== kb.length) { return false; }
+		for (i = 0; i < ka.length; i++) {
+			if (!Object.prototype.hasOwnProperty.call(b, ka[i]) || b[ka[i]] !== a[ka[i]]) { return false; }
+		}
+		return true;
+	}
+	function reactSame(a, b) {
+		var i;
+		for (i = 0; i < LPN_REACT_GLOBALS.length; i++) {
+			if (a[LPN_REACT_GLOBALS[i]] !== b[LPN_REACT_GLOBALS[i]]) { return false; }
+		}
+		return reactMapSame(a.bulk, b.bulk) && reactMapSame(a.wall, b.wall)
+			&& reactMapSame(a.tank, b.tank);
+	}
+	function reactRow(cells) {
+		var out = '', i;
+		for (i = 0; i < cells.length; i++) { out += (i ? '\t' : ' ') + String(cells[i]); }
+		return out;
+	}
+	/**
+	 * The `[REACTIONS]` lines this document now states, or [] where it states none.
+	 * `src` wins whenever it still parses to the same record, so an untouched file round-trips
+	 * byte for byte.
+	 */
+	EngCalcs.lpnReactionsText = function (live, src) {
+		var r = live || {}, out = [], k;
+		if (src && src.length && reactSame(EngCalcs.lpnReactionsParse(src), {
+			orderBulk: r.orderBulk, orderTank: r.orderTank, orderWall: r.orderWall,
+			globalBulk: r.globalBulk, globalWall: r.globalWall,
+			limitingPotential: r.limitingPotential, roughnessCorrelation: r.roughnessCorrelation,
+			bulk: r.bulk || {}, wall: r.wall || {}, tank: r.tank || {}
+		})) { return src.slice(); }
+		// EPANET's own writer order, and sparse: nothing is written that the document does not say.
+		[['orderBulk', 'Order Bulk'], ['orderTank', 'Order Tank'], ['orderWall', 'Order Wall'],
+			['globalBulk', 'Global Bulk'], ['globalWall', 'Global Wall'],
+			['limitingPotential', 'Limiting Potential'],
+			['roughnessCorrelation', 'Roughness Correlation']].forEach(function (pair) {
+			if (r[pair[0]] === undefined || r[pair[0]] === null) { return; }
+			out.push(reactRow([pair[1], String(r[pair[0]])]));
+		});
+		[['bulk', 'BULK'], ['wall', 'WALL'], ['tank', 'TANK']].forEach(function (pair) {
+			var m = r[pair[0]] || {};
+			Object.keys(m).forEach(function (id) {
+				if (m[id] === undefined || m[id] === null) { return; }
+				out.push(reactRow([pair[1], id, String(m[id])]));
+			});
+		});
+		return out;
+	};
+	/**
+	 * `[QUALITY]` -- the concentration each node starts the run holding, keyed by node id.
+	 *
+	 * **AND FOR A RESERVOIR IT IS NOT AN INITIAL VALUE AT ALL**: EPANET holds a reservoir at its
+	 * own quality for the whole run, which is what makes this section the simplest way a chemical
+	 * enters a network. `[SOURCES]`, the booster kind, is still carried and not read.
+	 */
+	EngCalcs.lpnInitQualityParse = function (lines) {
+		var out = {};
+		(lines || []).forEach(function (raw) {
+			var line = String(raw), semi = line.indexOf(';'), w, v;
+			if (semi >= 0) { line = line.slice(0, semi); }
+			line = line.trim();
+			if (!line) { return; }
+			w = line.split(/\s+/);
+			if (!w[0] || w[1] === undefined) { return; }
+			v = parseFloat(w[1]);
+			if (isFinite(v)) { out[w[0]] = v; }
+		});
+		return out;
+	};
+	/** The `[QUALITY]` lines this document now states. `src` wins while it still parses to them. */
+	EngCalcs.lpnInitQualityText = function (live, src) {
+		var m = live || {}, out = [];
+		if (src && src.length && reactMapSame(EngCalcs.lpnInitQualityParse(src), m)) { return src.slice(); }
+		Object.keys(m).forEach(function (id) {
+			if (m[id] === undefined || m[id] === null) { return; }
+			out.push(reactRow([id, String(m[id])]));
+		});
+		return out;
+	};
+
 	// `Map` and `Hydraulics USE/SAVE`, as the file's own characters. The value is split back into
 	// its own tokens so `Hydraulics USE net.hyd` comes out as three columns the way it went in,
 	// rather than as a keyword and one long string.
@@ -1944,6 +2093,69 @@
 			var lines = carriedOut[name];
 			return (lines && lines.length) ? '[' + name + ']\n' + lines.join('\n') + '\n\n' : '';
 		}
+		// **THE TWO WATER-QUALITY SECTIONS THAT ARE NO LONGER MERELY CARRIED** (Task 566). The
+		// file's own lines are still in `carriedOut` and are still what goes out while the live
+		// values parse out of them; these compose only once a coefficient or an initial
+		// concentration has really been edited. Same rule, same shape, as `[OPTIONS] Quality`.
+		function liveReactions() {
+			var r = (settings.reactions || {}), out = { bulk: {}, wall: {}, tank: {} }, i, lk2, bv, wv;
+			['orderBulk', 'orderTank', 'orderWall', 'globalBulk', 'globalWall',
+				'limitingPotential', 'roughnessCorrelation'].forEach(function (k) {
+				if (r[k] !== undefined && r[k] !== null) { out[k] = r[k]; }
+			});
+			// A tank coefficient has no per-element control on this page, so it is carried on the
+			// setting rather than on the node. Stated rather than silent: it round-trips and is not
+			// editable, which is the honest half of "interpreted".
+			Object.keys(r.tank || {}).forEach(function (id) { out.tank[id] = r.tank[id]; });
+			for (i = 0; i < (doc.links || []).length; i++) {
+				lk2 = doc.links[i];
+				if (lk2.type !== 'pipe' || omitted[lk2.id]) { continue; }
+				bv = eff(lk2, 'bulkCoeff'); wv = eff(lk2, 'wallCoeff');
+				if (typeof bv === 'number' && isFinite(bv)) { out.bulk[lk2.id] = bv; }
+				if (typeof wv === 'number' && isFinite(wv)) { out.wall[lk2.id] = wv; }
+			}
+			return out;
+		}
+		function liveInitQuality() {
+			var out = {}, i, nd2, v;
+			for (i = 0; i < (doc.nodes || []).length; i++) {
+				nd2 = doc.nodes[i];
+				if (omitted[nd2.id]) { continue; }
+				v = eff(nd2, 'initQuality');
+				if (typeof v === 'number' && isFinite(v)) { out[nd2.id] = v; }
+			}
+			return out;
+		}
+		// **A DOCUMENT THAT HAS NEVER MET THE INTERPRETER STILL WRITES ITS CARRIED TEXT**, which is
+		// the `decided` guard qualityOptionRows() already states one section along. `settings.reactions`
+		// is written by the import pass that reads BOTH of these sections, so its presence is what
+		// says "these lines have been read"; absent, the live record would be empty for the honest
+		// reason that nobody ever filled it, and composing from it would delete a section the source
+		// stated. A project saved before Task 566 is exactly that case.
+		function anyReaction(r) {
+			var i;
+			for (i = 0; i < LPN_REACT_GLOBALS.length; i++) {
+				if (r[LPN_REACT_GLOBALS[i]] !== undefined) { return true; }
+			}
+			return !!(Object.keys(r.bulk).length || Object.keys(r.wall).length
+				|| Object.keys(r.tank).length);
+		}
+		function reactionsSection() {
+			var live = liveReactions();
+			// A document with neither an interpreted record nor one live value has never met the
+			// interpreter, so composing from the empty record would delete a section the source
+			// stated. A value typed on a pipe counts on its own -- a project that never imported an
+			// `.inp` has no `settings.reactions` until somebody edits a global.
+			if (!settings.reactions && !anyReaction(live)) { return carriedSection('REACTIONS'); }
+			var lines = EngCalcs.lpnReactionsText(live, carriedOut.REACTIONS);
+			return lines.length ? '[REACTIONS]\n' + lines.join('\n') + '\n\n' : '';
+		}
+		function initQualitySection() {
+			var live = liveInitQuality();
+			if (!settings.reactions && !Object.keys(live).length) { return carriedSection('QUALITY'); }
+			var lines = EngCalcs.lpnInitQualityText(live, carriedOut.QUALITY);
+			return lines.length ? '[QUALITY]\n' + lines.join('\n') + '\n\n' : '';
+		}
 		// Everything carried that EPANET's own writer has no place for -- a section some other
 		// program invented. Written last, before the drawing, in the order the source stated them.
 		function carriedRest() {
@@ -1995,9 +2207,9 @@
 			// This page works out neither, and that is exactly why they have to be written back
 			// untouched: a value we cannot use is still the user's.
 			carriedSection('ENERGY') +
-			carriedSection('QUALITY') +
+			initQualitySection() +
 			carriedSection('SOURCES') +
-			carriedSection('REACTIONS') +
+			reactionsSection() +
 			carriedSection('MIXING') +
 			section('TIMES', timeRows) +
 			// EPANET's own report settings. This page has its own way of showing answers and reads

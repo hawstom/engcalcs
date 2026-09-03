@@ -235,13 +235,16 @@ console.log('\n--- saved with the project, and shown nowhere ---');
 		.filter(n => n.tagName === 'SELECT')
 		.map(sel => (sel.children || []).map(o => o.value).join(','))[0] || '';
 	ok('a file that names a chemical can still say so', /chemical/.test(chem), chem);
-	// ...and a document that names none is never offered it, because this page cannot produce one.
+	// **AND SO CAN A DOCUMENT THAT NAMES NONE, SINCE 2026-09-03** (Task 566). This line used to
+	// assert the opposite, and it was right while a chemical was carried text the page could not
+	// produce: offering an analysis that never runs is worse than not offering it. A chemical runs
+	// now, so withholding the option would be withholding the feature.
 	L.getSettings().quality = { mode: 'none', traceNode: '' };
 	L.rebuildSettings();
 	const plain = all(byId.lpn_set_quality_fields, [])
 		.filter(n => n.tagName === 'SELECT')
 		.map(sel => (sel.children || []).map(o => o.value).join(','))[0] || '';
-	ok('and a document that names none is not offered one', !/chemical/.test(plain), plain);
+	ok('and a document that names none can now choose one', /chemical/.test(plain), plain);
 }
 
 // ---------------------------------------------------------------------------

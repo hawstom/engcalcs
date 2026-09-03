@@ -175,6 +175,12 @@
 			curves = [],
 			emitters = [],
 			demands = [],
+			// **THE TWO WATER-QUALITY SECTIONS A CHEMICAL RUN NEEDS** (Task 566). Written only for
+			// a chemical: an age or a source-share run has no species to start anywhere and no
+			// reaction to apply, and stating either would be handing EPANET input for an analysis
+			// nobody asked for.
+			initQuality = [],
+			reactionRows = [],
 			warnings = [],
 			i, n, k, link;
 
@@ -483,6 +489,50 @@
 		var qual = model.quality || {}, qualMode = qual.mode, qualLine = '';
 		if (qualMode === 'age') { qualLine = 'AGE'; }
 		else if (qualMode === 'trace' && qual.traceNode) { qualLine = 'TRACE ' + qual.traceNode; }
+		else if (qualMode === 'chemical') {
+			// **THE CHEMICAL'S NAME AND ITS UNITS ARE THE USER'S OWN TEXT, PASSED THROUGH.**
+			// `Chlorine mg/L` is a name and a unit label, and EPANET converts neither -- a
+			// concentration is transported and reacted in whatever units its sources and its
+			// coefficients are stated in, so there is no factor to get wrong and none to invent.
+			// A document that names nothing gets EPANET's own default, exactly as every other
+			// unstated option here does.
+			qualLine = String(qual.chemical || 'CHEMICAL');
+		}
+		// **[QUALITY] -- WHAT EACH NODE STARTS THE RUN HOLDING, AND FOR A RESERVOIR WHAT IT HOLDS
+		// FOR EVER.** This is how a chemical gets into the network at all; the booster kind,
+		// [SOURCES], is still carried and not read (dev/water-quality.md).
+		//
+		// **NOT CONVERTED, AND THAT IS NOT AN OMISSION.** See the note on the Quality line above:
+		// a concentration has no factor on either side of this boundary.
+		if (qualMode === 'chemical') {
+			for (i = 0; i < model.nodes.length; i++) {
+				n = model.nodes[i];
+				if (typeof n.initQuality === 'number' && isFinite(n.initQuality) && n.initQuality !== 0) {
+					initQuality.push(' ' + n.id + '  ' + n.initQuality);
+				}
+			}
+			// **[REACTIONS], FROM THE MODEL'S OWN RECORD.** Every number here is already at the
+			// engine's boundary: js/looped-network.js's engineQuality() has converted the WALL
+			// coefficients out of the project's length unit into metres, on a clone, because this
+			// writer emits an LPS-and-metres file always. That is the same defect `HeadError`
+			// had -- a coefficient stated in ft/day arriving as m/day is wrong by 3.28 in the one
+			// term that decides how much chlorine is left.
+			var react = model.reactions || {};
+			[['orderBulk', 'Order Bulk'], ['orderTank', 'Order Tank'], ['orderWall', 'Order Wall'],
+				['globalBulk', 'Global Bulk'], ['globalWall', 'Global Wall'],
+				['limitingPotential', 'Limiting Potential'],
+				['roughnessCorrelation', 'Roughness Correlation']].forEach(function (pair) {
+				if (typeof react[pair[0]] !== 'number' || !isFinite(react[pair[0]])) { return; }
+				reactionRows.push(' ' + pair[1] + '  ' + react[pair[0]]);
+			});
+			[['bulk', 'BULK'], ['wall', 'WALL'], ['tank', 'TANK']].forEach(function (pair) {
+				var m2 = react[pair[0]] || {};
+				Object.keys(m2).forEach(function (id) {
+					if (typeof m2[id] !== 'number' || !isFinite(m2[id])) { return; }
+					reactionRows.push(' ' + pair[1] + '  ' + id + '  ' + m2[id]);
+				});
+			});
+		}
 
 		var inp = '[TITLE]\nEngCalcs looped network\n\n' +
 			'[JUNCTIONS]\n' + junctions.join('\n') + '\n\n' +
@@ -519,10 +569,26 @@
 			// are still CARRIED: `js/lpn-inp.js` keeps them and writes them back in the user's own
 			// units, where verbatim text is exactly right.
 			'' +
+			(initQuality.length ? '[QUALITY]\n' + initQuality.join('\n') + '\n\n' : '') +
+			(reactionRows.length ? '[REACTIONS]\n' + reactionRows.join('\n') + '\n\n' : '') +
 			(timeRows.length ? '[TIMES]\n' + timeRows.join('\n') + '\n\n' : '') +
 			'[OPTIONS]\n Units LPS\n Headloss ' + headloss +
 			'\n Emitter Exponent ' + emitterExp +
 			(qualLine ? '\n Quality ' + qualLine : '') +
+			// **`Tolerance` IS THE PARCEL-MERGING TOLERANCE AND IT DOMINATES A CHEMICAL RUN'S
+			// ACCURACY.** EPANET merges two adjacent parcels of water whose concentrations differ
+			// by less than this, so a big one smears the whole profile: measured on the single-pipe
+			// analytic case in dev/lpn-spike/reaction-anchor-harness.js, EPANET's own default of
+			// 0.01 puts the answer up to 0.9% off the exact first-order decay and refuses to
+			// converge as the quality step shrinks, where a tight one lands inside 0.01%.
+			//
+			// **THIS FILE USED TO SEND NEITHER**, on the reasoning that they mean something only to
+			// a reacting chemical -- which was true while a chemical was carried and not run, and
+			// is false now. Sent only for a chemical, and only where the document states one.
+			((qualMode === 'chemical' && typeof qual.tolerance === 'number' && isFinite(qual.tolerance))
+				? '\n Tolerance ' + qual.tolerance : '') +
+			((qualMode === 'chemical' && typeof qual.diffusivity === 'number' && isFinite(qual.diffusivity))
+				? '\n Diffusivity ' + qual.diffusivity : '') +
 			// **THE FLUID, WHERE THE PROJECT NAMES IT** (Task 553). Written only when stated, so a
 			// project that says nothing gets EPANET's own defaults exactly as it always did.
 			// Viscosity here is EPANET's RELATIVE one, which is the form the option is stored in;
@@ -1091,6 +1157,11 @@
 	EngCalcs.lpnQualityRuns = function (quality) {
 		var q = quality || {};
 		if (q.mode === 'age') { return true; }
+		// **A CHEMICAL RUNS NOW** (Task 566). It needs nothing named to be legal input -- an
+		// unstated coefficient is EPANET's own zero, which is a chemical that does not react, and
+		// a network with no initial concentration anywhere answers zero everywhere, which is the
+		// true answer to the question asked rather than a failure.
+		if (q.mode === 'chemical') { return true; }
 		return q.mode === 'trace' && !!q.traceNode;
 	};
 
