@@ -2,8 +2,8 @@
     "meta": {
         "language": "ar",
         "expected_key_count": 1538,
-        "delta_key_count": 2,
-        "exempt_key_count": 18,
+        "delta_key_count": 1,
+        "exempt_key_count": 19,
         "exempt_keys": [
             "calc_units_us",
             "calc_units_si",
@@ -22,7 +22,8 @@
             "lpn_xymap",
             "lpn_tip_join",
             "lpn_field_x",
-            "lpn_field_y"
+            "lpn_field_y",
+            "lpn_labels_col_decimals_example"
         ],
         "out_of_scope_key_count": 9,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
@@ -502,30 +503,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_labels_col_decimals_example": "0.000",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
-        "lpn_labels_col_decimals_example": "0.000",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
-        "lpn_labels_col_decimals_example": {
-            "reason": "equal_to_english",
-            "current_value": "0.000",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "تُنقل جودة المياه عبر الأنابيب مع الزمن، لذا تحتاج إلى حلّال EPANET ومدة تشغيل كلية. اضبط مدة التشغيل الكلية تحت الزمن، ثم اضغط زر احسب.",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_rank",
-                    "value": "الترتيب",
-                    "english": "Rank"
-                }
-            }
-        },
         "lpn_ff_col_static_tip": {
             "reason": "missing",
             "current_value": null,

@@ -2,8 +2,8 @@
     "meta": {
         "language": "fa",
         "expected_key_count": 1538,
-        "delta_key_count": 2,
-        "exempt_key_count": 18,
+        "delta_key_count": 1,
+        "exempt_key_count": 19,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -22,7 +22,8 @@
             "lpn_ex_net3_title",
             "lpn_xymap",
             "lpn_field_x",
-            "lpn_field_y"
+            "lpn_field_y",
+            "lpn_labels_col_decimals_example"
         ],
         "out_of_scope_key_count": 9,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
@@ -502,30 +503,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_labels_col_decimals_example": "0.000",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
-        "lpn_labels_col_decimals_example": "0.000",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
-        "lpn_labels_col_decimals_example": {
-            "reason": "equal_to_english",
-            "current_value": "0.000",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "کیفیت آب با گذر زمان در طول لوله‌ها منتقل می‌شود، پس به موتور EPANET و یک کل مدت اجرا نیاز دارد. یک کل مدت اجرا زیر زمان تنظیم کنید، سپس دکمهٔ محاسبه را بزنید.",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_rank",
-                    "value": "رتبه",
-                    "english": "Rank"
-                }
-            }
-        },
         "lpn_ff_col_static_tip": {
             "reason": "missing",
             "current_value": null,

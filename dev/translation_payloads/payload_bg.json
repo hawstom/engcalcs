@@ -2,8 +2,8 @@
     "meta": {
         "language": "bg",
         "expected_key_count": 1538,
-        "delta_key_count": 3,
-        "exempt_key_count": 21,
+        "delta_key_count": 1,
+        "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
             "calc_units_si",
@@ -21,7 +21,9 @@
             "lpn_ex_net3_title",
             "lpn_ex_net3_world_title",
             "lpn_ex_elm_street_title",
+            "lpn_geomap",
             "lpn_xymap",
+            "lpn_new_coords_geo",
             "lpn_field_x",
             "lpn_field_y",
             "lpn_field_id",
@@ -505,48 +507,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_geomap": "lat\/lon",
-        "lpn_new_coords_geo": "lat\/lon",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
-        "lpn_geomap": "lat\/lon",
-        "lpn_new_coords_geo": "lat\/lon",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
-        "lpn_geomap": {
-            "reason": "equal_to_english",
-            "current_value": "lat\/lon",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_basemap_satellite_tip",
-                    "value": "Снимки на земната повърхност от Mapbox, изтеглени през интернет, докато премествате и мащабирате изгледа. Полезни, за да видите къде наистина минава дадена тръба. Мрежата ви се чертае независимо дали изображенията са показани.",
-                    "english": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_geo",
-                    "value": "Отвори xy файл на картата…",
-                    "english": "Open an xy file on the map…"
-                }
-            }
-        },
-        "lpn_new_coords_geo": {
-            "reason": "equal_to_english",
-            "current_value": "lat\/lon",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_new_coords_xy",
-                    "value": "xy координати",
-                    "english": "xy coordinates"
-                },
-                "next_translated": {
-                    "key": "lpn_new_coords_tip",
-                    "value": "Проект от тип xy използва координати, които не са географска ширина и дължина. Проект от тип lat\/lon има географски координати, затова зад него може да се начертае улична карта или сателитна снимка, а котите на възлите могат да се четат от терена. Проект от тип xy може да се преобразува в lat\/lon чрез Файл, Отвори xy файл на картата.",
-                    "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
-                }
-            }
-        },
         "lpn_ff_col_static_tip": {
             "reason": "missing",
             "current_value": null,
@@ -564,7 +530,5 @@
             }
         }
     },
-    "key_syn": {
-        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map"
-    }
+    "key_syn": []
 }

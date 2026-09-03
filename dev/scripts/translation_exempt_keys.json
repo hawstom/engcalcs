@@ -489,6 +489,21 @@
     "bg"
    ],
    "reason": "Mapbox DEM -- a product name plus the standard acronym for a digital elevation model. Listed for bg, whose agent refused to dodge the checker and filed the gap instead, which was the right call. Exemption says identical is ALLOWED, never required: the languages that built a natural phrase around the two words (Amharic's genitive, Swahili's 'DEM ya Mapbox', Khmer's 'Mapbox DEM layer') keep it. What is not acceptable is a word order chosen only to differ from English in bytes, which is what five sprint-573 agents reached for before one of them named the real problem."
+  },
+  "lpn_geomap": {
+   "category": "symbol",
+   "languages": "*",
+   "reason": "lat/lon -- the geographic project mode, and the twin of lpn_xymap ('xy'), which has been exempt for every language all along. It is an abbreviation of the coordinate pair, and 16 of 26 languages keep it as it stands while the rest render it in their own script; exemption says identical is ALLOWED, never required, so both remain correct. Listed 2026-09-02 because every sprint had been re-proposing it as an untranslated key and mode_name_check.php had just taken 28 findings to zero on the same two keys: six languages had translated the anchor while their own sentences kept the Latin abbreviation."
+  },
+  "lpn_new_coords_geo": {
+   "category": "symbol",
+   "languages": "*",
+   "reason": "lat/lon -- the same abbreviation as lpn_geomap, on the new-project coordinate choice, and it must READ the same as the mode name or mode_name_check.php fails the language. Exempt for the same reason and on the same terms: identical is allowed, not required."
+  },
+  "lpn_labels_col_decimals_example": {
+   "category": "number-format",
+   "languages": "*",
+   "reason": "0.000 -- an example of how many decimals a map label shows, so it is a NUMBER FORMAT rather than a phrase. The suite splits 14 to 14 between the decimal point and the decimal comma, and both are right for their own readers, so neither can be the single correct value and identical-to-English is correct wherever the point is used."
   }
  }
 }

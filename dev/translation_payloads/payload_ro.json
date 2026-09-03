@@ -2,8 +2,8 @@
     "meta": {
         "language": "ro",
         "expected_key_count": 1538,
-        "delta_key_count": 2,
-        "exempt_key_count": 30,
+        "delta_key_count": 1,
+        "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -28,6 +28,7 @@
             "lpn_ex_net3_title",
             "lpn_ex_net3_world_title",
             "lpn_ex_elm_street_title",
+            "lpn_geomap",
             "lpn_xymap",
             "lpn_color_example_material",
             "lpn_dialog_ok",
@@ -514,30 +515,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_geomap": "lat\/lon",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
-        "lpn_geomap": "lat\/lon",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
-        "lpn_geomap": {
-            "reason": "equal_to_english",
-            "current_value": "lat\/lon",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_basemap_satellite_tip",
-                    "value": "Fotografii ale terenului de la Mapbox, preluate prin internet pe măsură ce deplasați și măriți harta. Utile pentru a vedea pe unde trece efectiv o conductă. Rețeaua dvs. este desenată indiferent dacă imaginile sunt afișate sau nu.",
-                    "english": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_geo",
-                    "value": "Deschide un fișier xy pe hartă…",
-                    "english": "Open an xy file on the map…"
-                }
-            }
-        },
         "lpn_ff_col_static_tip": {
             "reason": "missing",
             "current_value": null,
@@ -555,7 +538,5 @@
             }
         }
     },
-    "key_syn": {
-        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map"
-    }
+    "key_syn": []
 }

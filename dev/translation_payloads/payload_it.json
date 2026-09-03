@@ -2,8 +2,8 @@
     "meta": {
         "language": "it",
         "expected_key_count": 1538,
-        "delta_key_count": 5,
-        "exempt_key_count": 30,
+        "delta_key_count": 3,
+        "exempt_key_count": 32,
         "exempt_keys": [
             "calc_units_us",
             "calc_units_si",
@@ -26,7 +26,9 @@
             "lpn_ex_net3_world_title",
             "lpn_ex_elm_street_title",
             "lpn_tool_file",
+            "lpn_geomap",
             "lpn_xymap",
+            "lpn_new_coords_geo",
             "lpn_dialog_ok",
             "lpn_field_auto",
             "lpn_field_x",
@@ -514,36 +516,16 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_geomap": "lat\/lon",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
-        "lpn_new_coords_geo": "lat\/lon",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
-        "lpn_geomap": "lat\/lon",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
-        "lpn_new_coords_geo": "lat\/lon",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
-        "lpn_geomap": {
-            "reason": "equal_to_english",
-            "current_value": "lat\/lon",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_basemap_satellite_tip",
-                    "value": "Fotografie del terreno da Mapbox, scaricate da internet mentre sposti e ingrandisci la vista. Utili per vedere dove passa davvero una tubazione. La tua rete viene disegnata sia che le immagini siano visibili sia che non lo siano.",
-                    "english": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_geo",
-                    "value": "Apri un file xy sulla mappa…",
-                    "english": "Open an xy file on the map…"
-                }
-            }
-        },
         "lpn_find_q_and": {
             "reason": "equal_to_english",
             "current_value": "AND",
@@ -576,22 +558,6 @@
                 }
             }
         },
-        "lpn_new_coords_geo": {
-            "reason": "equal_to_english",
-            "current_value": "lat\/lon",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_new_coords_xy",
-                    "value": "coordinate xy",
-                    "english": "xy coordinates"
-                },
-                "next_translated": {
-                    "key": "lpn_new_coords_tip",
-                    "value": "Un progetto xy usa coordinate che non sono latitudine e longitudine. Un progetto lat\/lon ha coordinate geografiche, quindi dietro di esso si possono disegnare una mappa stradale o un'immagine satellitare, e le quote dei nodi possono essere lette dal terreno. Un progetto xy può essere convertito in lat\/lon con File, Apri un file xy sulla mappa.",
-                    "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
-                }
-            }
-        },
         "lpn_ff_col_static_tip": {
             "reason": "missing",
             "current_value": null,
@@ -609,7 +575,5 @@
             }
         }
     },
-    "key_syn": {
-        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map"
-    }
+    "key_syn": []
 }

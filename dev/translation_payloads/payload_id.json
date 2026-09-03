@@ -2,8 +2,8 @@
     "meta": {
         "language": "id",
         "expected_key_count": 1538,
-        "delta_key_count": 3,
-        "exempt_key_count": 34,
+        "delta_key_count": 1,
+        "exempt_key_count": 36,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -30,9 +30,11 @@
             "lpn_ex_elm_street_title",
             "lpn_field_diameter",
             "lpn_menu_edit",
+            "lpn_geomap",
             "lpn_xymap",
             "lpn_color_example_status",
             "lpn_color_example_material",
+            "lpn_new_coords_geo",
             "lpn_dialog_ok",
             "lpn_valve_type_tcv",
             "lpn_field_x",
@@ -518,48 +520,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_geomap": "lat\/lon",
-        "lpn_new_coords_geo": "lat\/lon",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
-        "lpn_geomap": "lat\/lon",
-        "lpn_new_coords_geo": "lat\/lon",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
-        "lpn_geomap": {
-            "reason": "equal_to_english",
-            "current_value": "lat\/lon",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_basemap_satellite_tip",
-                    "value": "Foto permukaan tanah dari Mapbox, diambil lewat internet saat Anda menggeser dan memperbesar peta. Berguna untuk melihat ke mana sebenarnya sebuah pipa berjalan. Jaringan Anda tetap digambar baik citra ditampilkan atau tidak.",
-                    "english": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_geo",
-                    "value": "Buka berkas xy di peta…",
-                    "english": "Open an xy file on the map…"
-                }
-            }
-        },
-        "lpn_new_coords_geo": {
-            "reason": "equal_to_english",
-            "current_value": "lat\/lon",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_new_coords_xy",
-                    "value": "koordinat xy",
-                    "english": "xy coordinates"
-                },
-                "next_translated": {
-                    "key": "lpn_new_coords_tip",
-                    "value": "Proyek xy menggunakan koordinat yang bukan garis lintang dan garis bujur. Proyek lat\/lon memiliki koordinat geografis, sehingga peta jalan atau gambar satelit dapat digambar di belakangnya dan elevasi simpul dapat dibaca dari medan. Proyek xy dapat diubah menjadi lat\/lon dengan File, Buka berkas xy di peta.",
-                    "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
-                }
-            }
-        },
         "lpn_ff_col_static_tip": {
             "reason": "missing",
             "current_value": null,
@@ -577,7 +543,5 @@
             }
         }
     },
-    "key_syn": {
-        "lpn_geomap": "Latitude and Longitude map, Geographic map, or World map"
-    }
+    "key_syn": []
 }
