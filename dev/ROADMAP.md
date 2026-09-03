@@ -64,6 +64,45 @@ the block.
     with storage the UTILITY controls — *"the moment 'the link' is something we host, it has become
     the cloud-login proposal in a smaller costume."* Full record in both agents' journals.
 
+- 75|574| **Name the `.net` option slots instead of only reporting them.**
+  Tom, 2026-09-02, on the import report that lists what a `.net` could not carry: *"we need to work
+  on implementing everything unless the industry has deprecated it."* That is his 2026-08-29 ruling
+  applied to the other format, and it is the right end state.
+  - **What stands today:** `OPTION_NAME` in `js/lpn-net.js` names 12 of the 45 indexed option slots
+    a `.net` can hold. The other 33 are populated in real files and cannot be carried, because a
+    `.net` option has NO keyword anywhere in the file -- only a position -- so there is nothing to
+    call it in the `.inp` we convert to. Since 2026-09-02 their VALUES are listed in the import
+    report rather than dropped in silence, which is the honest interim and not the answer.
+  - **What it needs is EVIDENCE, not a guess:** the slot-to-option map out of EPANET's own source or
+    a file whose settings are known. **Writing `Demand Model` against the wrong index would state a
+    setting the user never made**, which is worse than the current gap and is why this was not done
+    by inference. The fixture in `dev/lpn-spike/net-import-harness.js` already populates two unnamed
+    slots, 10 (`No`) and 12 (`mg/L`), and 12 is almost certainly the quality unit that pairs with
+    slot 11 -- one confirmed pair would be a start.
+  - A user's own file naming its lost values is the cheapest evidence there is: the report prints
+    them, so a reader can say "that is my demand model" and the index follows.
+
+- 50|575| **The six element symbols, redrawn from Tom's sketch.**
+  Prototype published 2026-09-02 and both open questions answered: the junction becomes a shaded
+  RING rather than a solid dot, and the menu pipe keeps its end bars with the line stopping at them
+  rather than crossing.
+  - **The convention Tom stated, which three of six symbols do not follow today:** map NODE symbols
+    carry a thematic shaded fill; PUMP and VALVE are solid. Read out of `lib/Icons.lib.php`, the
+    junction ships solid with no outline, the valve ships shaded rather than solid, and the pump
+    carries no fill at all.
+  - **Two shapes change: reservoir becomes a triangle and tank a rectangle.** The argument is
+    Tom's own correction about colouring -- a coloured asset floods ENTIRELY, fill and stroke in
+    one colour, so no outline survives. Today those two are told apart by a flat top against a
+    domed one, which is an OUTLINE difference and exactly what flooding destroys.
+  - **The pump diverges between menu and map on purpose, and it is the only symbol that does apart
+    from the pipe's bars.** EPANET draws the map pump with a snout as long as the body is wide,
+    about 2:1, which is the proportion a reader recognises on a drawing and the wrong one for a menu
+    row. Body 10 and snout 10 on the map; body 12 and snout 6.5 in the menu.
+  - **Each new silhouette needs its matching opaque backdrop path** (`prependSymbolBackdrop`), or a
+    pipe appears to stop short of the shape instead of running behind it.
+  - **Separate and undecided: the default map colour.** The map draws linework black; the sketch
+    paints it suite blue. That governs every project with colouring OFF, which is most of them.
+
 - 100|545| **The list is a file, the marks are data, and both survived a reading.**
   *(The `[H]` came off 2026-09-01. Tom read the list and marked it; his marks were committed
   VERBATIM before anything touched them (`9a15e248`), then transferred — replacements into

@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**64 open tasks.** Next (100): 11 · Soon (75): 11 · Someday (50): 13 · Maybe (25): 12 · Parked (5): 17
+**66 open tasks.** Next (100): 11 · Soon (75): 12 · Someday (50): 14 · Maybe (25): 12 · Parked (5): 17
 
 ## 100 — Next (11)
 
@@ -23,7 +23,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 567 — [H] · Vertices are a mode now; what is left is Tom looking at it.
 - Task 572 — [H] · The browser confirmations owed from the 2026-09-01/02 sessions.
 
-## 75 — Soon (11)
+## 75 — Soon (12)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -36,8 +36,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 568 — Standard hydraulic symbols: Tom's research, recorded, not yet a decision.
 - ! Task 570 — The EPANET report gets a box of its own: draggable, sizeable, and one of the family.
+- Task 574 — Name the `.net` option slots instead of only reporting them.
 
-## 50 — Someday (13)
+## 50 — Someday (14)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 186 — Make the Tables pane spreadsheet-interoperable.
@@ -52,6 +53,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 541 — Clicking a label: should it select the asset for editing?
 - ! Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have not decided what to do.
 - ! Task 569 — The cursor flickers to the default pointer at ~12 px from a node, on a PC.
+- Task 575 — The six element symbols, redrawn from Tom's sketch.
 
 ## 25 — Maybe (12)
 
@@ -90,5 +92,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-54 of 64 titles are within 4–12 words. `!` marks the rest;
+56 of 66 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
