@@ -1207,8 +1207,9 @@ with nothing to compare it to.
 MAILTO=your-address@example.com
 ENGCALCS=/home/USER/public_html/engcalcs
 
-# Weekly: refresh the aggregate report. Writes files only; publishes nothing while
-# spock/public/.htaccess keeps its grant commented out.
+# Weekly: refresh the aggregate report. THIS IS WHAT PUBLISHES: the grant in
+# spock/public/.htaccess has been ON since 2026-08-23, so each run replaces what the
+# published URL serves. Until it runs on production that URL is a 404 with the door open.
 10 0 * * 1  cd $ENGCALCS && sh dev/scripts/publish_usage_report.sh >/dev/null
 
 # Monthly: snapshot the window that is about to close, THEN rotate. In this order, or the
