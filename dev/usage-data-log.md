@@ -1193,9 +1193,18 @@ carries `<meta name="robots" content="noindex">` instead.
 
 ### Running this on a schedule
 
-**Nothing here is enabled.** Tom asked on 2026-08-23 whether reporting could run on a server cron;
-this is the recipe, not a switch that has been thrown. The repo contains no cron entry and this
-section does not create one.
+**ENABLED ON PRODUCTION 2026-09-03**, in the shape below. The repo still contains no cron entry —
+a crontab lives on the server and not in git — so this section remains the recipe and the server
+remains the authority. What follows is what is actually installed, plus what the install taught.
+
+- **Cron's `PATH` is `/usr/bin:/bin`, and `/usr/local/bin` is NOT on it** — which is where this
+  host's PHP is. `bash`, `awk` and `mktemp` are all found, so the report needs nothing special;
+  the three PHP entries would have failed silently every month had they said a bare `php`. That is
+  why the block below assigns `PHP` and uses `$PHP`. Measured with a one-minute throwaway entry,
+  not assumed.
+- **cPanel's crontab rejects a shell one-liner carrying braces and redirections** (`bad minute`
+  on a line whose minute field is fine). Put anything compound in a script file and call the file.
+- The account's shell is `/usr/local/cpanel/bin/jailshell`; cPanel adds that `SHELL=` line itself.
 
 The whole point of a schedule is that the ROTATION is the part a human forgets, and a forgotten
 rotation is the exact mechanism behind the 40x scale break recorded above — one ever-growing window
@@ -1290,6 +1299,12 @@ would be offered to about one person a week.
 RULING A PLACEMENT OUT rather than by picking one — three diagnostics cannot rank anything. The
 surface every lpn visitor actually meets is the map itself, opened on the example network. Design
 record: `dev/dilettante-path.md`.
+
+**The September rotation was taken by hand the same day**, so every archive from here is a calendar
+month rather than a ragged Aug-23-to-Oct-1 hybrid comparable to nothing. The chain now reads
+2026-07-28 .. 2026-09-03 across three archives, 260,044 rows, contiguous, and **2026-09-03 is the
+first one that is `rotated` rather than `derived`** — it names its own window and its predecessor
+instead of having them inferred from the rows it still holds.
 
 **One number outside lpn, because it is the largest behavioural signal in the report:** 210 outbound
 clicks to Engineering ToolBox's Manning roughness table, against 70 to `hawsedc.com/frictionslope.php`.

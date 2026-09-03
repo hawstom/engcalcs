@@ -95,8 +95,10 @@ retention rather than as a loss.
 
 ## Running it on a schedule
 
-The recommended crontab — cadence, ordering and why — is in `dev/usage-data-log.md`, under
-"Running this on a schedule". Nothing is enabled here.
+The crontab — cadence, ordering, and what the install measured about cron's own environment — is in
+`dev/usage-data-log.md`, under "Running this on a schedule". **It has been installed on production
+since 2026-09-03.** Nothing is enabled *here*, and nothing can be: a crontab lives on the server,
+not in a repository.
 
 ## What is tracked in git
 
