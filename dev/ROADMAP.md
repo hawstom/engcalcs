@@ -760,9 +760,9 @@ the block.
   - **AUTHORIZED 2026-09-02** (Tom: *"I would like that! Use our logs to know where to put a low-cost
     grievance link."*) — **and it lands on `lpn_` first**, which is the only calculator with no
     `echoFeedback()` invitation at all. Placement, what one tap sends, and why this needs no consent
-    bump: the last section of `dev/dilettante-path.md`. **Blocked on one production log reading** —
-    the local logs hold no signal rows, so the diagnostic histogram that picks the spot can only be
-    read on the server.
+    bump: the last section of `dev/dilettante-path.md`. **The log reading came in 2026-09-03 and moved the
+    answer**: the diagnostic box is met ~3 times in 10 days, so the link cannot live only there.
+    Not blocked any more — what is left is Tom's wording of three or four English strings.
 
 - 75|532| **An English style guide for label wording — Tom says he is writing one by intuition.**
   His own words, 2026-08-25, answering a friction question: *"I would be grateful for a style guide,

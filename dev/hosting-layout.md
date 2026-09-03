@@ -8,14 +8,20 @@ LibreWaterNet.org and LibreEPANET.org be organised. ROADMAP Task 479.
 
 | Path | Serves | Works? |
 |---|---|---|
-| `hawsedc.com/engcalcs/` | `~/public_html/hawsedc/engcalcs` | Yes — this is the real site |
+| `hawsedc.com/engcalcs/` | `~/addon_html/hawsedc.com/engcalcs` | Yes — this is the real site |
 | `constructionnotesmanager.com/hawsedc/engcalcs/` | the same files | **No — no CSS, no JS** |
 | `~/librewaternet.org` | librewaternet.org | empty |
 | `~/libreepanet.org` | libreepanet.org | empty |
 
 `hawsedc.com` is a subdomain of constructionnotesmanager.com whose document root is
-`~/public_html/hawsedc`, so both hostnames reach the same directory by different path
-prefixes. Deployment is `git pull` on the production checkout.
+the same directory, so both hostnames reach it by different path prefixes. Deployment is
+`git pull` on the production checkout.
+
+**The production path is `~/addon_html/hawsedc.com/engcalcs`, user `jconstru`, and PHP is
+`/usr/local/bin/php` (8.3).** *(Corrected 2026-09-02 from a production shell. This table said
+`~/public_html/hawsedc/engcalcs`, which does not exist there — a `cd` to it fails. The wrong path
+had never been executed, only written, which is the whole argument for pasting a command instead
+of citing a location.)*
 
 **The second row is not a configuration bug.** The suite emits **210 absolute
 `/engcalcs/…` URLs** across its pages, `js/lpn-epanet.js`, `js/lpn-search.js` and

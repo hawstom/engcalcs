@@ -129,19 +129,25 @@ saying it, and it is also the page with a genuine standing message surface to ha
 Manning-Pipe-Flow has 8x the audience but the visitors there succeed; nobody writes in about a form
 that worked.
 
-**Where the log points, as of the 2026-08-21 reading** (16 opening moves, 14 diagnostics — small,
-and small is fine, because this decides WHERE A LINK GOES rather than establishing a rate):
+**WHERE THE LOG POINTS — read on production 2026-09-03, window 2026-08-23..09-03, and it RULED A
+PLACEMENT OUT rather than picking one.** The earlier plan hung the link on the amber `#lpn_status`
+diagnostic box, on an August reading where `diag:unreachable` was 9 of 14 complaints met. This
+window met **three diagnostics in ten and a half days** (2 no-fixed-head, 1 unreachable). A link
+living only there would be offered to about one person a week, and three events cannot rank
+anything. The August reading is not wrong; it is a different, small window, and no trend may be
+read across the two.
 
-- `#lpn_status`, the amber diagnostic box, is the point of noticing. It appears exactly when
-  somebody is stuck and at no other time, and `diag:unreachable` — *"These nodes have no path to a
-  reservoir"*, which is really *a pipe drawn near a junction and not snapped to it* — was 9 of the
-  14 complaints met. A grievance link belongs on that box before anywhere else.
-- The `.inp` import difference report is second, and it reaches the most qualified population on the
-  page: `first:import` was 3 of 16 opening moves, so **one visitor in five arrives carrying a real
-  EPANET model.** They can judge the answer, which nobody else on the page can.
-- **What the log also says, and it bounds the whole idea: 43 of 48 page loads did NOTHING.** The
-  status box cannot reach a person who left before drawing anything, so Rung 0 is an instrument for
-  the people who tried, not a fix for the people who did not. Do not let it be sold as the latter.
+- **The surface every lpn visitor actually meets is the map on the example network** — 17 of 20
+  opening moves this window, with `first:import` at ZERO. So the link has to be somewhere a person
+  who is NOT stuck will still see it, which is the opposite of the point-of-noticing argument that
+  produced the status-box plan. **Keep both**: standing and quiet on the map, plus the status box
+  when it does appear, which costs almost nothing once the mechanism exists.
+- **Ask the people who came back.** 8 of 23 lpn shoppers returned to a saved project — third in the
+  suite behind Manning-Trap and Manning-Pipe-Flow. A returning user has judgement about the page
+  that a first-minute visitor cannot have, and they are reachable by construction: they open a
+  document.
+- **The bound is unchanged and still the honest part: 13 of 26 page loads did nothing at all.**
+  Rung 0 is an instrument for people who tried, never a fix for the ones who did not.
 
 **What one tap sends:** page, served language, the diagnostic code, and nothing else — no typed
 text, no email, no element data, and never anything out of the user's document. Reuse the

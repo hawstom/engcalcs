@@ -1236,3 +1236,61 @@ Two cautions before pasting. The host may not offer cron at all on a shared plan
 `crontab -l` first. And `archive_logs.php` refuses a second rotation on the same UTC date, so a
 manual rotation on the 1st makes that night's cron entry exit 1 and mail its refusal; that is the
 guard working, not a fault.
+
+---
+
+## 2026-09-03 — the first PUBLISHED run, and it moves the Rung 0 placement
+
+```
+WINDOW        2026-08-23  ..  2026-09-03            (10.5 days)
+FINGERPRINT   src=live win=2026-08-23..2026-09-03 days=10.5
+              rows=82730/3680/2401/155/7079/1 redacted=date
+```
+
+**How this one was obtained, which is new.** `publish_usage_report.sh` ran on production for the
+first time on 2026-09-03 — the script shipped 2026-08-23 with its grant already on, and nobody had
+ever run it there, so the URL had been a 404 with the door open for eleven days. It is now readable
+from a session, which is the point: no snapshot has to be pasted by hand again.
+
+**Two housekeeping facts found in the same pass.** Production is
+`~/addon_html/hawsedc.com/engcalcs` (`dev/hosting-layout.md` said `~/public_html/hawsedc/engcalcs`,
+which does not exist there and is now corrected). And the two archives were sitting in
+`log/<date>/` rather than `spock/<date>/`, where `trim_logs.php` — the only thing enforcing
+`privacy.php`'s 26-month promise — cannot see them. Moved; `--verify` now says every archive is
+accounted for.
+
+### Looped-Network, and the correction it forces
+
+| | 2026-08-21 reading | this window |
+|---|---|---|
+| opening moves | 9 example, 3 import, 3 element, 1 backdrop | **17 example, 3 element, 0 import** |
+| diagnostics met | 9 unreachable, 3 not-converged, 2 no-fixed-head | **2 no-fixed-head, 1 unreachable** |
+| page loads doing nothing | 43 of 48 | **13 of 26** |
+
+**The two windows are different populations and no trend may be read across them.** What survives
+is a statement about THIS window, and it is enough to overturn a placement decision: **the
+diagnostic box was met three times in ten and a half days.** A grievance link that lives only there
+would be offered to about one person a week.
+
+- **`first:import` was ZERO.** The August reading's "one visitor in five arrives with an EPANET
+  model" was 3 of 16 in a small window and did not repeat. Do not build for that population on this
+  evidence.
+- **17 of 20 opening moves are the example network**, which is the first evidence for the
+  empty-canvas decision closed 2026-07-29 with none. It vindicates it.
+- **The strongest lpn number in the report is repeat use: 8 of 23 shoppers came back to a saved
+  project.** That is third behind Manning-Trap's 59% and Manning-Pipe-Flow's 48%, in the one
+  statistic that means somebody left work behind and returned to it. Whatever this page is failing
+  to do, holding the people who commit to it is not it.
+- Rank 4 of 16 by shopping (23 people); 8 of 23 used it; 15% of page loads touched anything.
+- **Still no naming instrument.** 8 confirmed lpn calculations and `n/a — no title field`, because
+  a tab rename, a project save and a Text object are unlogged. The report says so itself and cannot
+  infer it away.
+
+**Where a grievance link goes, given all that: not gated on an error.** The logs did their job by
+RULING A PLACEMENT OUT rather than by picking one — three diagnostics cannot rank anything. The
+surface every lpn visitor actually meets is the map itself, opened on the example network. Design
+record: `dev/dilettante-path.md`.
+
+**One number outside lpn, because it is the largest behavioural signal in the report:** 210 outbound
+clicks to Engineering ToolBox's Manning roughness table, against 70 to `hawsedc.com/frictionslope.php`.
+That is Task 216's instrument answering Task 217's question at a volume nothing else here reaches.
