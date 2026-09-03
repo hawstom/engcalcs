@@ -63,6 +63,15 @@ Committee work is where senior people are actually reachable; conference floors 
 
 ## For proteges, and for mission fit
 
+- **Engineers Without Borders — ANSWERED, both chapters, and this is the one venue on the page with
+  a live human on the other end.** EWB-ASU 2026-08-11 (forming a team; theirs to move) and the **EWB
+  Phoenix PROFESSIONAL chapter** 2026-09-02, whose reply is the most actionable thing this list has
+  produced: Dane Whitmer, PE invited a talk at their 3rd-Thursday monthly meeting (ACEC office,
+  downtown Phoenix, virtual option) and offered an introduction to EWB-USA. **The professional
+  chapter was not on this list and should have been** — it was written as if EWB meant students,
+  and a professional chapter is a protege venue AND an advisor venue in one room, which is the only
+  exception the "no venue serves both" rule has met. Status and next step: ROADMAP Task 269.
+
 - **Engineers Without Borders USA student chapters** — the strongest single match. Students who need
   free tools, work in exactly the low-resource-language regions this suite translates for, and want
   mentoring. Chapters have faculty advisors, so one contact reaches a cohort per year.

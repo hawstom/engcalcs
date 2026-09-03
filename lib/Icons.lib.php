@@ -174,7 +174,7 @@ $ec_icons = array(
 	// ONE shared source for both the toolbar button and the map symbol (js/looped-network.js,
 	// ROADMAP Task 146.10) -- see RESERVOIR_HALF_W there for how the map compensates its own box
 	// width so widening this shared path doesn't also widen the map's rendering.
-	'reservoir'  => '<path d="M3 9h18v11H3z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 4v16h18V4"/><path d="M3 9h18"/>',
+	'reservoir'  => '<path d="M3.5 5.5H20.5L12 20Z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3.5 5.5H20.5L12 20Z"/>',
 	// A STORAGE TANK (ROADMAP Task 248, 2026-08-14), and its whole job is to not be the reservoir
 	// directly above it. Two independent cues, so it survives greyscale and a red-green colour-blind
 	// reader — the same test Task 146.10 was written to pass:
@@ -189,7 +189,7 @@ $ec_icons = array(
 	// as a box before it reads as a tank. Same shared-path rule as the reservoir — this ONE string
 	// draws both the toolbar button and the map symbol, and the map's backdrop patch traces the
 	// identical outline, so a change here needs the matching `d` in buildNodeEls() changed with it.
-	'tank'       => '<path d="M5 11h14v9H5z" fill="currentColor" stroke="none" opacity=".18"/><path d="M5 6q7-3.5 14 0v14H5z"/><path d="M5 11h14"/>',
+	'tank'       => '<path d="M4 6.5h16v11H4z" fill="currentColor" stroke="none" opacity=".18"/><path d="M4 6.5h16v11H4z"/>',
 	// A VALVE (ROADMAP Task 248 phase 2, 2026-08-14). The BOWTIE, and there was never a second
 	// candidate: it is what every P&ID, every hydraulic schematic and EPANET itself draw, so this
 	// is the one icon in the set that a water engineer already knows before arriving.
@@ -215,7 +215,7 @@ $ec_icons = array(
 	// tank above had to pass.
 	// Same shared-path rule as the reservoir and the tank: this ONE string draws the toolbar
 	// button and the map symbol both, so the map backdrop `d` in buildLinkEls() changes with it.
-	'valve'      => '<path d="M3 4v16l9-8z" fill="currentColor" stroke="none" opacity=".18"/><path d="M21 4v16l-9-8z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 4v16l9-8z"/><path d="M21 4v16l-9-8z"/>',
+	'valve'      => '<path d="M3 4v16l9-8z" fill="currentColor" stroke="none"/><path d="M21 4v16l-9-8z" fill="currentColor" stroke="none"/><path d="M3 4v16l9-8z"/><path d="M21 4v16l-9-8z"/>',
 	// Casing plus a discharge tail leaving it on the top tangent — the tangency is what makes this
 	// read as a pump rather than as a magnifier.
 	//
@@ -234,11 +234,18 @@ $ec_icons = array(
 	// moved right at the same time to keep the whole mark centred in the box, which shortening
 	// alone would have broken. Still 1.4:1 wide, so it keeps the squat proportion that is its
 	// identity; the number is a one-line change if he wants the other 10%.
-	'pump'       => '<circle cx="9.8" cy="12.5" r="5"/><path d="M9.8 7.5H19.1"/>',
+	'pump'       => '<path d="M10 7H20.5V13H16A6 6 0 1 1 10 7Z" fill="currentColor" stroke="none"/><path d="M10 7H20.5V13H16A6 6 0 1 1 10 7Z"/>',
+	// **THE MAP PUMP IS THE ONE SYMBOL WITH ITS OWN DRAWING**, and the divergence is Tom's
+	// (2026-09-02): *"In EPANET, which was my pattern, the symbol (not menu) pump snout is as long
+	// as the body diameter. So the pump icon has about a 2:1 aspect ratio... longer snout is better
+	// on the map. But shorter is better in the menu."* Body diameter 10 and snout 10 here against
+	// body 12 and snout 6.5 in 'pump' above. It letterboxes inside the same square 24 box, centred
+	// on y=12, so resizePumpSymbol() needs to know nothing about it.
+	'pumpmap'    => '<path d="M7 7H22V12H12A5 5 0 1 1 7 7Z" fill="currentColor" stroke="none"/><path d="M7 7H22V12H12A5 5 0 1 1 7 7Z"/>',
 	// Solid, because a junction is a node and the canvas draws it solid.
-	'junction'   => '<circle cx="12" cy="12" r="4.5" fill="currentColor" stroke="none"/>',
+	'junction'   => '<circle cx="12" cy="12" r="5" fill="currentColor" stroke="none" opacity=".18"/><circle cx="12" cy="12" r="5"/>',
 	// A run between two nodes — the thing you are actually about to place.
-	'pipe'       => '<path d="M7.4 16.6l9.2-9.2"/><circle cx="5" cy="19" r="2.4"/><circle cx="19" cy="5" r="2.4"/>',
+	'pipe'       => '<path d="M5 12H19" stroke-linecap="butt"/><path d="M5 7.5V16.5M19 7.5V16.5"/>',
 	'text'       => '<path d="M5 6h14"/><path d="M12 6v14"/><path d="M9 20h6"/>',
 
 	// ---- Backdrop ----

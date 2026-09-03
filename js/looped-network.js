@@ -4348,10 +4348,16 @@ var EngCalcs = EngCalcs || {};
 		var field = colorFieldOf('node');
 		if (breaks === undefined) { breaks = field ? effectiveBreaks('node', field) : []; }
 		var col = field ? colorForValue('node', colorNodeValue(n, field), breaks) : '';
+		// **ONE COLOUR CHANNEL FOR EVERY NODE TYPE** (2026-09-02). A junction used to take the ramp
+		// on `fill` while a reservoir and a tank took it on `color`, which was fine while a junction
+		// was a solid dot with no outline. It is a shaded ring now -- a wash plus its own stroke,
+		// the same construction the other two use -- and a ring needs BOTH parts to move together,
+		// or a coloured junction keeps a black outline round a coloured middle. `color` drives both
+		// through currentColor, and clearing it restores the stylesheet's black exactly as before.
 		if (isFixedHeadNode(n)) {
 			if (ne.symbol) { ne.symbol.style.color = col; }
 		} else {
-			ne.circle.style.fill = col;
+			ne.circle.style.color = col;
 		}
 	}
 	function paintLinkColor(id, breaks) {
@@ -4486,9 +4492,11 @@ var EngCalcs = EngCalcs || {};
 			// IT IN SYNC with that path. A rect over a domed tank leaves its corners outside the
 			// outline and a pipe appears to stop short of the tank instead of running behind it.
 			if (n.type === 'tank') {
-				prependSymbolBackdrop(symbol, 'path', { d: 'M5 6q7-3.5 14 0v14H5z' }, 'lpn-node-symbol-backdrop');
+				prependSymbolBackdrop(symbol, 'rect', { x: 4, y: 6.5, width: 16, height: 11 }, 'lpn-node-symbol-backdrop');
 			} else {
-				prependSymbolBackdrop(symbol, 'rect', { x: 3, y: 4, width: 18, height: 16 }, 'lpn-node-symbol-backdrop');
+				// A TRIANGLE, because a rectangle behind one leaves its corners outside the outline
+				// and the pipe appears to stop short of the reservoir instead of running behind it.
+				prependSymbolBackdrop(symbol, 'path', { d: 'M3.5 5.5H20.5L12 20Z' }, 'lpn-node-symbol-backdrop');
 			}
 			nodesLayer.appendChild(symbol);
 		}
@@ -4572,7 +4580,12 @@ var EngCalcs = EngCalcs || {};
 		var symbolG = null, symbolSvg = null;
 		if (l.type === 'pump' || l.type === 'valve') {
 			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-' + l.type }, nodesLayer);
-			symbolSvg = buildMapIconSvg(l.type, '');
+			// **THE PUMP IS THE ONE SYMBOL DRAWN DIFFERENTLY HERE THAN IN A MENU** (Tom, 2026-09-02).
+			// EPANET's map pump carries a snout as long as its body is wide, and that proportion is
+			// what a reader recognises on a drawing; it is also the wrong proportion for a menu row,
+			// where a wide symbol shrinks to the row height and loses its body. The valve and both
+			// node symbols still share one drawing with their toolbar icon.
+			symbolSvg = buildMapIconSvg(l.type === 'pump' ? 'pumpmap' : l.type, '');
 			if (symbolSvg) {
 				symbolG.appendChild(symbolSvg);
 				// The backdrop traces the SYMBOL, never its bounding box: a rectangle would blank out
@@ -4582,7 +4595,12 @@ var EngCalcs = EngCalcs || {};
 				if (l.type === 'valve') {
 					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M3 4v16l9-8zM21 4v16l-9-8z' }, 'lpn-link-symbol-backdrop');
 				} else {
-					prependSymbolBackdrop(symbolSvg, 'circle', { cx: 9.8, cy: 12.5, r: 5 }, 'lpn-link-symbol-backdrop');
+					// **THE WHOLE VOLUTE NOW, TAIL INCLUDED.** The old backdrop traced the casing only,
+					// on the argument that a thin discharge line crossing a pipe reads as two lines
+					// crossing. The discharge is a filled body in this drawing rather than a line, so
+					// that argument no longer applies and a pipe showing through it would read as a
+					// hole in the pump.
+					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M7 7H22V12H12A5 5 0 1 1 7 7Z' }, 'lpn-link-symbol-backdrop');
 				}
 			} else { symbolG.remove(); symbolG = null; }
 		}

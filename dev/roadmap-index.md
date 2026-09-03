@@ -46,7 +46,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 218 — Find advisors and proteges: a standing, nagged commitment.
 - Task 221 — Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.
 - Task 234 — Canal Seepage must prove its worth or go.
-- Task 269 — ASU Engineers Without Borders answered, and asked to meet.
+- Task 269 — Both EWB chapters answered, and Phoenix invited a talk.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 285 — We do not know what devices anybody uses this on.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.

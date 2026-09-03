@@ -334,7 +334,25 @@ html[lang="zh"] .ec-welcome {
    answers Tom's own complaint that EPANET makes it "practically an act of Congress to get a pipe to
    show as black while showing values from the model on the map".
    The one existing conditional style, .lpn-node-pending's red ring, still overrides stroke below
-   and is unaffected -- which is exactly the point: condition still reads, now against nothing. */.lpn-node { fill: #000; stroke: none; cursor: pointer; }
+   and is unaffected -- which is exactly the point: condition still reads, now against nothing. *//* **A JUNCTION IS A SHADED RING, NOT A SOLID DOT** (Tom, 2026-09-02, stating the convention the
+   symbol set follows: *"All the map node symbols are thematic shaded fill. The pump and valve
+   symbols are solid fill."*). It was the one node type that did not follow it, and it is the most
+   numerous thing on any map. The wash plus its own stroke is the same construction the reservoir
+   and tank symbols use, so all three node types now read as one family.
+
+   **BOTH PARTS MOVE ON `currentColor`,** which is why paintNodeColor() writes `color` here rather
+   than `fill`: a ring coloured only on its fill keeps a black outline round a coloured middle, and
+   a coloured asset takes ONE colour throughout. `color: #000` is the uncoloured state, so clearing
+   the inline colour restores it exactly.
+
+   Stroke width scales with `--lpn-sym` like every other world-unit stroke on this map; a fixed
+   width would thicken as the drawing zooms out. `.lpn-node-pending`'s red ring still overrides
+   stroke below, so the pending-link indicator is unaffected. */
+.lpn-node {
+	color: #000; fill: currentColor; fill-opacity: .18;
+	stroke: currentColor; stroke-width: calc(0.35 * var(--lpn-sym, 1));
+	cursor: pointer;
+}
 /* A reservoir now draws as a tank symbol, not this circle (ROADMAP Task 146.10) -- fill:none/
    stroke:none hides the circle itself; `pointer-events: visible` keeps its full disc
    clickable/draggable anyway (data-node, drag, hit-testing all still read THIS element, unchanged),

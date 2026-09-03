@@ -41,7 +41,12 @@ const L = loadLoopedNetwork(
 	"\t\tcolorNodeValue: colorNodeValue, colorLinkValue: colorLinkValue,\n" +
 	"\t\tserializeProject: serializeProject, applySaved: applySaved,\n" +
 	"\t\tcolorValues: colorValues,\n" +
-	"\t\tnodeFill: function (id) { return nodeEls[id] ? (nodeEls[id].circle.style.fill || '') : null; },\n" +
+	// **THE COLOUR CHANNEL IS `color`, NOT `fill`, FOR EVERY NODE TYPE** (2026-09-02). A junction is
+	// a shaded ring now -- a wash plus its own stroke -- so both halves have to take the ramp
+	// together or a coloured junction keeps a black outline round a coloured middle. That is the
+	// same channel the reservoir and tank symbols have always used, so this reads one seam for all
+	// three rather than two.
+	"\t\tnodeFill: function (id) { return nodeEls[id] ? (nodeEls[id].circle.style.color || '') : null; },\n" +
 	"\t\tnodeSymbolColor: function (id) { return (nodeEls[id] && nodeEls[id].symbol) ? (nodeEls[id].symbol.style.color || '') : null; },\n" +
 	"\t\tlinkStroke: function (id) { return linkEls[id] ? (linkEls[id].line.style.stroke || '') : null; },\n" +
 	"\t\tsvgClasses: function () { return svg && svg.classList ? svg.classList : null; },\n" +
@@ -285,7 +290,7 @@ console.log('== painting ==');
 	s.colorNodeField = 'pressure';
 	s.colorLinkField = 'velocity';
 	L.refreshValueColors();
-	ok('a junction takes a fill once nodes are coloured', /^#/.test(L.nodeFill(junction.id)), L.nodeFill(junction.id));
+	ok('a junction takes its colour once nodes are coloured', /^#/.test(L.nodeFill(junction.id)), L.nodeFill(junction.id));
 	ok('a pipe takes a stroke once links are coloured', /^#/.test(L.linkStroke(pipe.id)), L.linkStroke(pipe.id));
 	// A reservoir's circle is invisible by CSS (it is only the hit target), so a fill on it would
 	// paint nothing and the reservoir would stay black while every junction changed.

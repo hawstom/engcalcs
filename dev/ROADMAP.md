@@ -757,6 +757,12 @@ the block.
   **Not blocked, but do not build blind.** Task 206's contact-funnel logging shipped 2026-08-07 and
   starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
+  - **AUTHORIZED 2026-09-02** (Tom: *"I would like that! Use our logs to know where to put a low-cost
+    grievance link."*) — **and it lands on `lpn_` first**, which is the only calculator with no
+    `echoFeedback()` invitation at all. Placement, what one tap sends, and why this needs no consent
+    bump: the last section of `dev/dilettante-path.md`. **Blocked on one production log reading** —
+    the local logs hold no signal rows, so the diagnostic histogram that picks the spot can only be
+    read on the server.
 
 - 75|532| **An English style guide for label wording — Tom says he is writing one by intuition.**
   His own words, 2026-08-25, answering a friction question: *"I would be grateful for a style guide,
@@ -869,10 +875,17 @@ the block.
   - **Open: Tom's own pass** of the pane with no box in it. Three new English keys await his
     wording — `lpn_profile_edit_say`, `_edit_tap`, `_edit_nowhere`.
 
-- 50|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
-  reply to outreach, and he has replied gratefully. This is the first real conversation this suite's
-  mission has earned; prepare for the meeting and record what comes of it. Not a search-reach task,
-  but it lives here because it is the same goal reached by a better road.
+- 50|269| **Both EWB chapters answered, and Phoenix invited a talk.**
+  Tom, 2026-08-10 — human replies to outreach, and he has replied gratefully. This is the first real
+  conversation this suite's mission has earned; prepare and record what comes of it. Not a
+  search-reach task, but it lives here because it is the same goal reached by a better road.
+  - **EWB-ASU is theirs to move.** Ahadu Tsotaselassie Assegued, 2026-08-11: *"we'll keep you posted
+    once we set our team up."* Waiting on a student team forming, so nudge in the fall, do not chase.
+  - **EWB Phoenix Professional is OURS to move, and it has a cadence.** Dane Whitmer, PE, 2026-09-02:
+    *"I would love for you to come to our meetings and share about your software"* — 3rd Thursday
+    monthly, ACEC office downtown Phoenix, virtual option, plus an offered introduction to EWB-USA.
+    **The action is to pick a month and call him**, and the introduction is the larger prize: EWB-USA
+    reaches every chapter at once, which is the same leverage a faculty advisor has over a club.
 
 - 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
@@ -976,6 +989,17 @@ the block.
       then the backstop is email, not a drive: **Jared Schoepf, `jjschoep@asu.edu`**, who directs
       EPICS — a larger and more durable protege pool than one club, and a faculty contact persists
       across years while student officers turn over every May.
+    - 2026-08-11 — EWB-ASU ANSWERED (protege side). The form did submit; the Jared Schoepf backstop
+      was not needed and stays on the shelf. Details and next step in Task 269.
+    - 2026-09-02 — **THREE REPLIES IN ONE DAY, from individual outreach Tom sent himself.** EWB
+      Phoenix Professional invited a talk and offered an EWB-USA introduction (protege side, Task
+      269); EWB-ASU restated it is forming a team (protege side, Task 269); **Francisco Bobadilla
+      answered on the advisor side** — the first one this item has ever produced.
+      **What Francisco asked for is a demand reading, and it lands on shipped features:** scenarios
+      and fire flow *"the same way as WaterCAd does it"*, both of which exist (Task 530's sweep
+      shipped 2026-08-29). He said he will test and send ideas. **Ask for that list if it does not
+      arrive** — a colleague who will answer is worth more than the whole usage instrument on the
+      question of why somebody wanted the page.
 
 - 50|221| **Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.** Delete
   `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,

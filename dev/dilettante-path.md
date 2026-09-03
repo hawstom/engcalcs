@@ -113,3 +113,45 @@ a hypothesis that deserves a measurement rather than another two rounds of rewor
 instrument exists and starts at zero on 2026-08-07: read the "Contact funnel" section of
 `log/lang-log-stats.sh` once both counts are out of single digits, and let the clicks-vs-sends
 split pick which lever this task pulls.
+
+---
+
+## Rung 0 lands on the map page first — authorized 2026-09-02
+
+Tom, 2026-09-02: *"I would like that! Use our logs to know where to put a low-cost grievance link."*
+That is the authorization to build Rung 0, and it names the method: **placement is decided from the
+usage report, not from taste.**
+
+**Why `lpn_` rather than the busiest page.** `Looped-Network.php:859` records that it is the ONLY
+calculator that does not call `echoFeedback()` — its invitation is Help > Fix something, which opens
+`contact.php` in a new tab. So the page whose users have the most to say has the longest path to
+saying it, and it is also the page with a genuine standing message surface to hang a link on.
+Manning-Pipe-Flow has 8x the audience but the visitors there succeed; nobody writes in about a form
+that worked.
+
+**Where the log points, as of the 2026-08-21 reading** (16 opening moves, 14 diagnostics — small,
+and small is fine, because this decides WHERE A LINK GOES rather than establishing a rate):
+
+- `#lpn_status`, the amber diagnostic box, is the point of noticing. It appears exactly when
+  somebody is stuck and at no other time, and `diag:unreachable` — *"These nodes have no path to a
+  reservoir"*, which is really *a pipe drawn near a junction and not snapped to it* — was 9 of the
+  14 complaints met. A grievance link belongs on that box before anywhere else.
+- The `.inp` import difference report is second, and it reaches the most qualified population on the
+  page: `first:import` was 3 of 16 opening moves, so **one visitor in five arrives carrying a real
+  EPANET model.** They can judge the answer, which nobody else on the page can.
+- **What the log also says, and it bounds the whole idea: 43 of 48 page loads did NOTHING.** The
+  status box cannot reach a person who left before drawing anything, so Rung 0 is an instrument for
+  the people who tried, not a fix for the people who did not. Do not let it be sold as the latter.
+
+**What one tap sends:** page, served language, the diagnostic code, and nothing else — no typed
+text, no email, no element data, and never anything out of the user's document. Reuse the
+`log-human-view.php` beacon shape, append `ecLogBucketSuffix()` like every other writer, and queue
+it when offline or the field users this most needs to hear from lose their reports silently.
+
+**No new storage on the visitor's device, therefore no `consent_body` rewrite and no
+`EC_CONSENT_VERSION` bump.** That is the whole reason this shape was chosen over anything that
+remembers who tapped.
+
+**Open, and Tom's alone: the wording.** Three or four English strings at most (every string costs
+x26). They go in `lib/lang.ec.en.php` only and reach him through `dev/new-english-keys.md`.
+
