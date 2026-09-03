@@ -636,6 +636,9 @@
         "lpn_examples_loading": "Loading examples…",
         "lpn_help_fix": "Fix something",
         "lpn_help_notes": "Notes on this page",
+        "lpn_wrong_btn": "Something wrong here?",
+        "lpn_wrong_tip": "One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
+        "lpn_wrong_thanks": "Thank you. We got that.",
         "lpn_status_example_opened": "Opened {name}. It is your copy: save it with File, Save as.",
         "lpn_ex_basic_si_title": "Basic network, L\/s (SI)",
         "lpn_ex_basic_si_desc": "Start here. A reservoir, a pump and a small loop: the smallest arrangement that still works as a water network. Litres per second, with metres and millimetres.",
@@ -1542,7 +1545,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1540,
+    "count": 1543,
     "active_prefixes": [
         "about",
         "bpn",
