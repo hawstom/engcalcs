@@ -1617,6 +1617,103 @@
 		return out;
 	};
 
+	// ------------------------------------------------------------------------------------------
+	// **[ENERGY], INTERPRETED** (ROADMAP Task 566; dev/pump-energy.md).
+	//
+	// The one section on the carried list whose ANSWER IS MONEY. It was carried verbatim and never
+	// read, so a file stating `Global Efficiency 75` arrived with no efficiency at all and the page
+	// could not say what a pump costs to run. Read here on exactly the terms `[REACTIONS]` already
+	// uses: the interpretation lives BESIDE the file's own text, never over it, and the exporter
+	// writes the carried lines back character for character while the live values still parse out
+	// of them.
+	//
+	// **NOTHING IN THIS SECTION CARRIES A UNIT, AND THAT IS WORTH SAYING RATHER THAN ASSUMING.**
+	// An efficiency is a percent; a price is a currency per kWh and a demand charge a currency per
+	// kW, and EPANET states energy in kWh and power in kW whatever the flow units are. A currency
+	// is a LABEL, like the concentration unit beside a chemical's name: carried and shown, never
+	// converted, with no currency family and no factor. So `[ENERGY]` needs no
+	// engineHydraulics()/engineQuality() clone; the numbers cross to the engine as they stand.
+	// **The dimensioned quantity in pump energy is the HEAD**, and it is already SI everywhere past
+	// assembleModel().
+	//
+	// `Global Pattern` and a pump's own `PATTERN` name a price schedule: an id, not a number.
+	// `PUMP <id> EFFIC <curve>` names a [CURVES] entry. It is parsed and written back so a file
+	// that states one round-trips, and it has no control on this page, which keeps no general curve
+	// library (a pump's head curve lives on the pump). js/lpn-epanet.js does not write it into the
+	// engine input for that reason, and the run says which efficiency it used.
+	var LPN_ENERGY_GLOBALS = [['globalEfficiency', 'Global Efficiency'],
+		['globalPrice', 'Global Price'], ['globalPattern', 'Global Pattern'],
+		['demandCharge', 'Demand Charge']];
+	/**
+	 * `[ENERGY]` as a record. Sparse, like `lpnReactionsParse`: a key is present only where the
+	 * section stated it, so absent means "the file said nothing" and the exporter writes nothing.
+	 *
+	 * `effic`, `price` and `pattern` are keyed by PUMP id and are always objects, so no caller has
+	 * to test for absence. `globalPattern`, `pattern` and `effic` hold the id VERBATIM: a pattern
+	 * name is a name, and reading it as a number is how `P1` becomes NaN.
+	 */
+	EngCalcs.lpnEnergyParse = function (lines) {
+		var out = { effic: {}, price: {}, pattern: {} };
+		(lines || []).forEach(function (raw) {
+			var line = String(raw), semi = line.indexOf(';'), w, k0, k1, k2;
+			if (semi >= 0) { line = line.slice(0, semi); }
+			line = line.trim();
+			if (!line) { return; }
+			w = line.split(/\s+/);
+			k0 = (w[0] || '').toUpperCase();
+			k1 = (w[1] || '').toUpperCase();
+			if (k0 === 'GLOBAL') {
+				if (k1 === 'EFFIC' || k1 === 'EFFICIENCY') { reactSet(out, 'globalEfficiency', reactNum(w[2])); }
+				else if (k1 === 'PRICE') { reactSet(out, 'globalPrice', reactNum(w[2])); }
+				else if (k1 === 'PATTERN' && w[2]) { out.globalPattern = w[2]; }
+				return;
+			}
+			if (k0 === 'DEMAND' && k1 === 'CHARGE') { reactSet(out, 'demandCharge', reactNum(w[2])); return; }
+			// A per-pump row. EPANET's own grammar: the keyword PUMP, the pump's id, then which of
+			// the three this line states.
+			if (k0 === 'PUMP' && w[1] && w[2]) {
+				k2 = String(w[2]).toUpperCase();
+				if (k2 === 'EFFIC' && w[3]) { out.effic[w[1]] = w[3]; }
+				else if (k2 === 'PRICE') { reactSet(out.price, w[1], reactNum(w[3])); }
+				else if (k2 === 'PATTERN' && w[3]) { out.pattern[w[1]] = w[3]; }
+			}
+		});
+		return out;
+	};
+	function energySame(a, b) {
+		var i;
+		for (i = 0; i < LPN_ENERGY_GLOBALS.length; i++) {
+			if (a[LPN_ENERGY_GLOBALS[i][0]] !== b[LPN_ENERGY_GLOBALS[i][0]]) { return false; }
+		}
+		return reactMapSame(a.effic, b.effic) && reactMapSame(a.price, b.price)
+			&& reactMapSame(a.pattern, b.pattern);
+	}
+	/**
+	 * The `[ENERGY]` lines this document now states, or [] where it states none.
+	 * `src` wins whenever it still parses to the same record, so an untouched file round-trips
+	 * byte for byte. Net1, Net2 and Net3 all state this section.
+	 */
+	EngCalcs.lpnEnergyText = function (live, src) {
+		var e = live || {}, out = [], now = {
+			effic: e.effic || {}, price: e.price || {}, pattern: e.pattern || {}
+		};
+		LPN_ENERGY_GLOBALS.forEach(function (pair) { now[pair[0]] = e[pair[0]]; });
+		if (src && src.length && energySame(EngCalcs.lpnEnergyParse(src), now)) { return src.slice(); }
+		// EPANET's own writer order: the globals, then every pump that states something of its own.
+		LPN_ENERGY_GLOBALS.forEach(function (pair) {
+			if (e[pair[0]] === undefined || e[pair[0]] === null || e[pair[0]] === '') { return; }
+			out.push(reactRow([pair[1], String(e[pair[0]])]));
+		});
+		[['effic', 'EFFIC'], ['price', 'PRICE'], ['pattern', 'PATTERN']].forEach(function (pair) {
+			var m = now[pair[0]];
+			Object.keys(m).forEach(function (id) {
+				if (m[id] === undefined || m[id] === null || m[id] === '') { return; }
+				out.push(reactRow(['PUMP', id, pair[1], String(m[id])]));
+			});
+		});
+		return out;
+	};
+
 	// `Map` and `Hydraulics USE/SAVE`, as the file's own characters. The value is split back into
 	// its own tokens so `Hydraulics USE net.hyd` comes out as three columns the way it went in,
 	// rather than as a keyword and one long string.
@@ -2159,6 +2256,39 @@
 			var lines = EngCalcs.lpnReactionsText(live, carriedOut.REACTIONS);
 			return lines.length ? '[REACTIONS]\n' + lines.join('\n') + '\n\n' : '';
 		}
+		// **[ENERGY], ON THE SAME TERMS** (Task 566). The globals live on `settings.energy` and the
+		// per-pump price and price pattern on the pumps, through the resolver seam; the efficiency
+		// curve id is carried on the setting, having no control on this page. `settings.energy` is
+		// written by the import pass that reads the section, so its presence is what says "these
+		// lines have been read" -- absent, the carried text is what goes out.
+		function liveEnergy() {
+			var e = (settings.energy || {}), out = { effic: {}, price: {}, pattern: {} }, i, lk3, pv;
+			['globalEfficiency', 'globalPrice', 'globalPattern', 'demandCharge'].forEach(function (k) {
+				if (e[k] !== undefined && e[k] !== null && e[k] !== '') { out[k] = e[k]; }
+			});
+			Object.keys(e.effic || {}).forEach(function (id) { out.effic[id] = e.effic[id]; });
+			for (i = 0; i < (doc.links || []).length; i++) {
+				lk3 = doc.links[i];
+				if (lk3.type !== 'pump' || omitted[lk3.id]) { continue; }
+				pv = eff(lk3, 'energyPrice');
+				if (typeof pv === 'number' && isFinite(pv)) { out.price[lk3.id] = pv; }
+				pv = eff(lk3, 'energyPattern');
+				if (pv) { out.pattern[lk3.id] = pv; }
+			}
+			return out;
+		}
+		function anyEnergy(e) {
+			return e.globalEfficiency !== undefined || e.globalPrice !== undefined
+				|| e.globalPattern !== undefined || e.demandCharge !== undefined
+				|| !!(Object.keys(e.effic).length || Object.keys(e.price).length
+					|| Object.keys(e.pattern).length);
+		}
+		function energySection() {
+			var live = liveEnergy();
+			if (!settings.energy && !anyEnergy(live)) { return carriedSection('ENERGY'); }
+			var lines = EngCalcs.lpnEnergyText(live, carriedOut.ENERGY);
+			return lines.length ? '[ENERGY]\n' + lines.join('\n') + '\n\n' : '';
+		}
 		function initQualitySection() {
 			var live = liveInitQuality();
 			if (!settings.reactions && !Object.keys(live).length) { return carriedSection('QUALITY'); }
@@ -2212,10 +2342,10 @@
 			// when the document holds none -- an empty `[RULES]` is a statement the source never
 			// made, the same rule `[OPTIONS] Pattern` follows.
 			((doc.rules && doc.rules.length) ? '[RULES]\n' + doc.rules.join('\n') + '\n\n' : '') +
-			// **THE ENERGY AND WATER-QUALITY SECTIONS, CARRIED**, in EPANET's own writer order.
-			// This page works out neither, and that is exactly why they have to be written back
-			// untouched: a value we cannot use is still the user's.
-			carriedSection('ENERGY') +
+			// **THE ENERGY AND WATER-QUALITY SECTIONS**, in EPANET's own writer order. What is left
+			// carried here this page really does not work out, and that is exactly why those have
+			// to be written back untouched: a value we cannot use is still the user's.
+			energySection() +
 			initQualitySection() +
 			carriedSection('SOURCES') +
 			reactionsSection() +

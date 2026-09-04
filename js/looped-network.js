@@ -2364,8 +2364,11 @@ var EngCalcs = EngCalcs || {};
 		// `bulkCoeff` and `wallCoeff` are the pipe's own reaction coefficients, overriding the
 		// global pair (Task 566). A design question -- relining a main changes its wall coefficient
 		// and nothing else about it -- so a scenario is exactly where one belongs.
+		// `energyPrice` and `energyPattern` are what this pump pays for power and when (Task 566).
+		// Overridable for the reason demand is: "what does this station cost once the off-peak
+		// tariff ends" is an operating question, and a scenario is where one is asked.
 		link: { diameter: true, roughness: true, k: true, status: true, length: true, setting: true, active: true,
-			bulkCoeff: true, wallCoeff: true },
+			bulkCoeff: true, wallCoeff: true, energyPrice: true, energyPattern: true },
 		// A TEXT LABEL IS A THIRD GROUP (Task 407) with exactly two properties: `text` is what the
 		// note SAYS and `active` whether it is there at all, which together answer "this scenario has
 		// its own note" with no second mechanism.
@@ -4134,6 +4137,38 @@ var EngCalcs = EngCalcs || {};
 			if (typeof w === 'number' && isFinite(w)) { out.wall[l.id] = w; }
 		});
 		return out;
+	}
+	/**
+	 * **EVERY ENERGY INPUT THIS DOCUMENT STATES** (Task 566; dev/pump-energy.md), gathered from the
+	 * one place each lives: the globals and the carried efficiency-curve ids on `settings.energy`,
+	 * and the per-pump price and price pattern on the pumps THROUGH `effective()`.
+	 *
+	 * **THERE IS NO engineEnergy() CLONE BESIDE engineHydraulics() AND engineQuality(), AND THAT IS
+	 * A FINDING RATHER THAN AN OMISSION.** Every number here is unit-free: an efficiency is a
+	 * percent, a price is a currency per kWh, a demand charge a currency per peak kW, and EPANET
+	 * reports kW and kWh whatever the flow units are. The currency itself is a LABEL this page
+	 * carries and shows and never converts, exactly as the concentration unit is. The dimensioned
+	 * quantity in pump energy is the HEAD, and it is SI on the model long before it gets here.
+	 */
+	function docEnergy() {
+		var e = settings.energy || {}, out = { effic: {}, price: {}, pattern: {} };
+		['globalEfficiency', 'globalPrice', 'demandCharge'].forEach(function (k) {
+			if (typeof e[k] === 'number' && isFinite(e[k])) { out[k] = e[k]; }
+		});
+		if (e.globalPattern) { out.globalPattern = e.globalPattern; }
+		Object.keys(e.effic || {}).forEach(function (id) { out.effic[id] = e.effic[id]; });
+		(doc.links || []).forEach(function (l) {
+			if (l.type !== 'pump' || !isActive(l)) { return; }
+			var pr = effective(l, 'energyPrice'), pat = effective(l, 'energyPattern');
+			if (typeof pr === 'number' && isFinite(pr)) { out.price[l.id] = pr; }
+			if (pat) { out.pattern[l.id] = pat; }
+		});
+		return out;
+	}
+	/** The currency the prices are typed in, as the document states it: a label, shown, never applied. */
+	function currencyLabel() {
+		var t = (settings.energy || {}).currency;
+		return t === undefined || t === null ? '' : String(t).trim();
 	}
 	function qualityMode() { return qualitySetting().mode; }
 	// The unit the number is read in: a time for an age, nothing at all for a share. Dynamic for
@@ -14423,6 +14458,11 @@ var EngCalcs = EngCalcs || {};
 			adoptTankCoeffs(settings.reactions.tank, saved.nodes || []);
 			settings.reactions.tank = {};
 		}
+		// `[ENERGY]` on the same terms as the two above: a project saved before it was interpreted
+		// gains its pump prices and efficiencies on open rather than never.
+		if (!settings.energy && EngCalcs.lpnEnergyParse) {
+			readEnergySection(saved.inpSections || {}, settings, saved.links || []);
+		}
 		// **A PROJECT SAVED UNDER THE TWO-FIELD DESIGN KEEPS ITS NUMBERS.** That design froze the
 		// method's answer into a second field, `colorFrozenBreaks`, and was rejected (Task 448).
 		// Those numbers are the ones that project was drawn in, so
@@ -15404,6 +15444,10 @@ var EngCalcs = EngCalcs || {};
 				// interpretation beside them. Net1's `Global Bulk -.5` arrives as -0.5 and not as a
 				// default, which is the whole point.
 				readQualitySections(parsed.inpSections, s, nodes, links);
+				// **AND [ENERGY]** (Task 566), on the same terms: Net3's `Global Efficiency 75`
+				// arrives as 75 rather than as nothing, which is what lets the run say what the
+				// pumping cost.
+				readEnergySection(parsed.inpSections, s, links);
 				return s;
 			}()),
 			// THE CLOCK, CARRIED WHOLE (Task 423). js/lpn-patterns.js has already turned every time
@@ -15484,6 +15528,34 @@ var EngCalcs = EngCalcs || {};
 		(nodeList || []).forEach(function (n) {
 			if (n.type !== 'tank') { return; }
 			if (map[n.id] !== undefined) { n._tankCoeff = map[n.id]; }   // base-write: an imported or reopened coefficient is Base's, and there is no scenario yet to hold it
+		});
+	}
+
+	/**
+	 * **`[ENERGY]`, READ ONTO A DOCUMENT** (Task 566; dev/pump-energy.md). readQualitySections()'s
+	 * sibling, and it follows the same three rules: the carried text is not touched and stays what
+	 * the exporter writes back; a per-element value lands on the ELEMENT and goes through the
+	 * resolver; and what has no element to live on stays on the setting.
+	 *
+	 * The efficiency CURVE id is the one per-pump value that stays on the setting, because this
+	 * page keeps no general curve library and so has nothing to point it at. It round-trips and
+	 * nothing edits it, which is the honest half of "interpreted".
+	 */
+	function readEnergySection(sections, settingsObj, linkList) {
+		var e = EngCalcs.lpnEnergyParse
+			? EngCalcs.lpnEnergyParse((sections || {}).ENERGY || []) : { effic: {}, price: {}, pattern: {} },
+			kept = {};
+		['globalEfficiency', 'globalPrice', 'globalPattern', 'demandCharge'].forEach(function (k) {
+			if (e[k] !== undefined) { kept[k] = e[k]; }
+		});
+		kept.effic = e.effic || {};
+		// PRESENT EVEN WHEN EMPTY, for the reason `settings.reactions` is: its presence is what
+		// tells the exporter this document's `[ENERGY]` has been read at all.
+		settingsObj.energy = kept;
+		(linkList || []).forEach(function (l) {
+			if (l.type !== 'pump') { return; }
+			if (e.price[l.id] !== undefined) { l._energyPrice = e.price[l.id]; }   // base-write: reading a file onto a document being CONSTRUCTED, before any scenario exists
+			if (e.pattern[l.id] !== undefined) { l._energyPattern = e.pattern[l.id]; }   // base-write: same construction pass; the file states one network, which is Base
 		});
 	}
 
@@ -18459,6 +18531,14 @@ var EngCalcs = EngCalcs || {};
 				tip: pc.lpn_ff_menu_tip,
 				fn: function () { closeMenu(); openFireFlowBox(); }
 			},
+			// **ENERGY SITS WITH THE RUN THAT PRODUCES IT** (Task 566). It is not a kind of run of
+			// its own: it is what the extended-period run already worked out on its way past, which
+			// is why the row is here and not beside Settings.
+			{
+				icon: 'pump', label: pc.lpn_energy_menu || 'Pump energy\u2026',
+				tip: pc.lpn_energy_menu_tip,
+				fn: function () { closeMenu(); openEnergyBox(); }
+			},
 			{
 				icon: 'info', label: pc.lpn_time_run_report || 'EPANET run report',
 				tip: pc.lpn_time_run_report_tip,
@@ -18999,6 +19079,7 @@ var EngCalcs = EngCalcs || {};
 		wireSettingsBox();
 		wireLibraryBox();
 		wireFireFlowBox();
+		wireEnergyBox();
 		buildMenuBar();
 		wireScenarioButton();
 		wireWrongButtons();
@@ -21837,13 +21918,14 @@ var EngCalcs = EngCalcs || {};
 		var idBody = byId('lpn_set_id_fields'), defBody = byId('lpn_set_default_fields'),
 			mapBody = byId('lpn_set_map_fields'), unitsBody = byId('lpn_set_units_fields'),
 			compBody = byId('lpn_set_hydraulics_fields'), qualBody = byId('lpn_set_quality_fields'),
+			energyBody = byId('lpn_set_energy_fields'),
 			pageBody = byId('lpn_set_page_fields');
-		if (!idBody || !defBody || !mapBody || !unitsBody || !compBody || !qualBody || !pageBody) { return; }
+		if (!idBody || !defBody || !mapBody || !unitsBody || !compBody || !qualBody || !energyBody || !pageBody) { return; }
 		// **EVERY HOST THIS FUNCTION FILLS MUST ALSO BE CLEARED BY IT**, and a host left out of this
 		// line does not fail: it ACCUMULATES, so the box grows another copy of its rows on every
 		// rebuild, and rebuilding is what a settings change does. Measured on the water-quality host
 		// the day it was added -- seven Track rows after four switches.
-		[idBody, defBody, mapBody, unitsBody, compBody, qualBody, pageBody].forEach(clearFields);
+		[idBody, defBody, mapBody, unitsBody, compBody, qualBody, energyBody, pageBody].forEach(clearFields);
 		// **A ROW IS A FLEX LINE, NOT A LABEL FOLLOWED BY A <br>.** Tom, 2026-08-18: "It can be
 		// longer and narrower ... A few things can wrap. Inputs can be shorter." A label that simply
 		// precedes its control cannot wrap without the control wrapping with it and cannot line its
@@ -22547,6 +22629,9 @@ var EngCalcs = EngCalcs || {};
 		// EPANET's own Analysis Options order puts Quality directly after Hydraulics, and so does
 		// the Settings box. One call; every row it builds is settingsQualityRows()'s own.
 		settingsQualityRows(qualBody, row, note);
+		// Energy last, which is EPANET's own Analysis Options order and this page's: Hydraulics,
+		// Quality, Reactions, Times, Energy.
+		settingsEnergyRows(energyBody, row, note);
 		// **AUTOMATIC RECALCULATION** (Task 467, Tom 2026-08-20). The switch this page had was a
 		// measurement nobody could see; this is the same decision made out loud. Turning it OFF puts
 		// the Calculate button back on the toolbar -- js/lpn-time.js reads this through the host's
@@ -22609,7 +22694,7 @@ var EngCalcs = EngCalcs || {};
 		helpTip(wipeBtn, pc.lpn_reset_all_tip);
 		wipeBtn.addEventListener('click', wipeEverything);
 		tail.appendChild(wipeBtn);
-		[idBody, defBody, mapBody, unitsBody, compBody, pageBody].forEach(tipsIn);
+		[idBody, defBody, mapBody, unitsBody, compBody, energyBody, pageBody].forEach(tipsIn);
 	}
 	// ================================================================================================
 	// THE SETTINGS BOX (ROADMAP Task 441, absorbing 284)
@@ -23645,6 +23730,95 @@ var EngCalcs = EngCalcs || {};
 			+ ' (' + unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day') + ')',
 		pc.lpn_reaction_wall_tip);
 		if (noteFn) { noteFn(host, pc.lpn_reaction_note || ''); }
+	}
+	/**
+	 * **WHAT THE PUMPS COST TO RUN, FOR THE WHOLE NETWORK** (Task 566; dev/pump-energy.md). A price
+	 * that belongs to one pump lives on that pump, where a station on its own meter is a fact about
+	 * that station; this box holds what belongs to everything.
+	 *
+	 * **THERE IS NO DEFAULT PRICE AND THERE MUST NOT BE ONE.** A tariff is a local fact -- it
+	 * differs by utility, by country, by hour and by year -- so a number this page put in the box
+	 * would be presented as a fact and read as one. Both money boxes open empty and the note says
+	 * so: Task 530's ask-or-disclose posture, and the same argument the reaction coefficients make.
+	 *
+	 * **A CURRENCY IS A LABEL, NOT A UNIT.** It is carried, shown beside every money answer, and
+	 * converted by nobody -- the same path the concentration unit beside a chemical's name takes.
+	 * There is no currency family, no factor, and nothing for a factor check to check. An efficiency
+	 * is a percent and a price is per kWh in every unit system, so no row here bears a unit
+	 * selector.
+	 *
+	 * **AN EFFICIENCY OF 75 IS EPANET'S OWN DEFAULT AND IS QUOTED, NOT TYPED.** That is a different
+	 * kind of number from a price: it is the engine's stated behaviour for a document that says
+	 * nothing, so naming it in the tip is reporting what will happen rather than recommending a
+	 * value.
+	 */
+	function settingsEnergyRows(host, rowFn, noteFn) {
+		var pc = EngCalcs.pageConfig || {}, e = settings.energy || {};
+		function ensure() {
+			if (!settings.energy) { settings.energy = { effic: {} }; }
+			if (!settings.energy.effic) { settings.energy.effic = {}; }
+			return settings.energy;
+		}
+		// **BLANK IS A STATE, NOT A ZERO WE TYPED**, exactly as it is on a reaction coefficient:
+		// clearing the box removes the key, the exporter writes no line, and EPANET's own default
+		// stands. Zero is allowed and is a real answer -- a demand charge of 0 is a tariff without
+		// one, which is what all three EPA reference networks state.
+		function numberRow(key, labelText, tip) {
+			var input = document.createElement('input'), cur = (settings.energy || {})[key];
+			input.type = 'number'; input.step = 'any';
+			input.value = (typeof cur === 'number' && isFinite(cur)) ? String(cur) : '';
+			input.addEventListener('change', function () {
+				var g = ensure(), v = parseFloat(input.value);
+				if (input.value === '') { delete g[key]; }
+				else if (isFinite(v) && v >= 0) { g[key] = v; }
+				else { input.value = (typeof g[key] === 'number') ? String(g[key]) : ''; return; }
+				saveToStorage();
+				scheduleSolve();
+			});
+			rowFn(host, labelText, input, tip);
+		}
+		numberRow('globalEfficiency', pc.lpn_energy_efficiency || 'Pump efficiency (percent)',
+			pc.lpn_energy_efficiency_tip);
+		var money = currencyLabel();
+		numberRow('globalPrice', (pc.lpn_energy_price || 'Price of power')
+			+ ' (' + (money ? money + '/' : '') + (pc.lpn_energy_kwh || 'kWh') + ')',
+		pc.lpn_energy_price_tip);
+		// **THE SCHEDULE IS THE POINT OF A TARIFF, NOT A REFINEMENT OF IT.** Off-peak pumping is
+		// how a utility spends less without moving a pipe, so the pattern belongs beside the price
+		// rather than two boxes further down.
+		var pat = document.createElement('select');
+		libFillPatternOptions(pat, e.globalPattern || '');
+		pat.addEventListener('change', function () {
+			var g = ensure();
+			if (pat.value) { g.globalPattern = pat.value; } else { delete g.globalPattern; }
+			saveToStorage();
+			scheduleSolve();
+		});
+		rowFn(host, pc.lpn_energy_price_pattern || 'Price schedule', pat,
+			pc.lpn_energy_price_pattern_tip);
+		numberRow('demandCharge', (pc.lpn_energy_demand_charge || 'Demand charge')
+			+ ' (' + (money ? money + '/' : '') + (pc.lpn_energy_kw || 'kW') + ')',
+		pc.lpn_energy_demand_charge_tip);
+		// **A LABEL, TYPED, AND NEVER A LIST OF CURRENCIES WE CHOSE.** A select would have to be
+		// complete to be right, and the one thing it must never do is fail to hold the reader's own
+		// money. It is not written to an EPANET file either: `[ENERGY]` has no currency field, so
+		// this travels in the project and not in an export.
+		var cur = document.createElement('input');
+		cur.type = 'text'; cur.size = 6;
+		cur.value = money;
+		cur.addEventListener('change', function () {
+			var g = ensure();
+			if (cur.value.trim()) { g.currency = cur.value.trim(); } else { delete g.currency; }
+			saveToStorage();
+			// The whole box: the currency is part of two labels above it.
+			rebuildSettingsBox();
+			refreshPopupIfOpen();
+		});
+		rowFn(host, pc.lpn_energy_currency || 'Currency', cur, pc.lpn_energy_currency_tip);
+		if (noteFn) {
+			noteFn(host, pc.lpn_energy_price_note || '');
+			noteFn(host, pc.lpn_energy_needs_run || '');
+		}
 	}
 	/**
 	 * The nodes a source share may be traced from, in drawing order.
@@ -25867,6 +26041,35 @@ var EngCalcs = EngCalcs || {};
 			function () { return l.speedPattern; },
 			function (v) { l.speedPattern = v || null; afterPropertyEdit(l); },
 			pc.lpn_field_speed_pattern_tip);
+		renderPumpEnergyFields(fields, l);
+	}
+	/**
+	 * **WHAT THIS PUMP PAYS FOR POWER** (Task 566; dev/pump-energy.md). Two rows, and both are
+	 * blank-capable: blank means "the price the whole network pays", which is EPANET's own rule and
+	 * a different statement from a price of zero.
+	 *
+	 * **BOTH WRITE THROUGH setProp()**, like every other overridable property on this popup: inside
+	 * a scenario a direct `l._energyPrice = v` would edit Base under every other scenario at once
+	 * (scenario_seam_check.php guards exactly this). They are in LPN_OVERRIDABLE for the reason
+	 * demand is -- what a station's power costs is an operating question.
+	 *
+	 * **AN EFFICIENCY CURVE HAS NO ROW HERE AND THE REASON IS STRUCTURAL.** EPANET states a
+	 * per-pump efficiency as `PUMP <id> EFFIC <curve>`, a reference into `[CURVES]`, and this page
+	 * keeps no general curve library to point at -- a pump's head curve lives on the pump. A file
+	 * that states one keeps it (it round-trips), and such a pump runs at the network's efficiency,
+	 * which the energy report says out loud rather than leaving to be discovered.
+	 */
+	function renderPumpEnergyFields(fields, l) {
+		var pc = EngCalcs.pageConfig || {}, money = currencyLabel();
+		numberFieldBlank(fields, (pc.lpn_energy_price || 'Price of power')
+			+ ' (' + (money ? money + '/' : '') + (pc.lpn_energy_kwh || 'kWh') + ')',
+		effective(l, 'energyPrice'),
+		function (v) { setProp(l, 'energyPrice', v); refreshPopupIfOpen(); },
+		pc.lpn_energy_pump_price_tip, { el: l, prop: 'energyPrice' });
+		patternField(fields, pc.lpn_energy_price_pattern || 'Price schedule',
+			function () { return effective(l, 'energyPattern'); },
+			function (v) { setProp(l, 'energyPattern', v || null); refreshPopupIfOpen(); },
+			pc.lpn_energy_price_pattern_tip);
 	}
 	// THE THREE-POINT CURVE TABLE, shared by the pump and by the GPV (Task 248). Both hold a curve
 	// that belongs to the element -- a pump's is (flow, head), a general purpose valve's is (flow,
@@ -27088,6 +27291,10 @@ var EngCalcs = EngCalcs || {};
 			// a rule's numbers are in the units of the file the user opened, and that writer emits
 			// metric always. It is carried on the model so the reason has one place to be tested
 			// from, and so the day the language lands the filtering is already here.
+			// **WHAT THE PUMPS COST TO RUN** (Task 566). Read by js/lpn-epanet.js and by nothing
+			// else: energy is power integrated over time, so only a RUN can produce one, exactly as
+			// with water quality. Not cloned and not converted -- docEnergy() says why.
+			energy: docEnergy(),
 			rules: modelRules() };
 		// The clock, the patterns and the controls, converted to SI (js/lpn-time.js). Absent that
 		// file the model is exactly the pre-Task-248 one and the page solves one instant.
@@ -28858,6 +29065,153 @@ var EngCalcs = EngCalcs || {};
 		if (run) { makePanelDraggable(run, null); }
 	}
 
+	// ================================================================================================
+	// THE ENERGY REPORT (ROADMAP Task 566; dev/pump-energy.md)
+	// ================================================================================================
+	//
+	// **THE ONE ANSWER ON THIS PAGE THAT IS MONEY.** What each pump ran, what it drew, and what it
+	// cost -- the report a utility actually files. It borrows the fire flow box's whole shell, so
+	// there is one set of box mechanics on this page rather than a third.
+	//
+	// **IT IS EPANET-ONLY AND RUN-ONLY, and neither is a limitation to route around.** Energy is
+	// power integrated over time: there is no such thing as a day's pumping cost at one instant, so
+	// it rides on the extended-period run exactly as water quality does, and js/lpn-solver.js has
+	// nothing to do. With the engine unreachable, or with no run yet, the box SAYS SO rather than
+	// showing a table of zeros.
+	//
+	// **NO VERDICT AND NO THRESHOLD.** There is no such thing as a pumping cost that passes: what a
+	// kilowatt-hour is worth is a local fact, and a page that coloured a total green would be
+	// inventing a standard. The report states the numbers and stops -- the same ruling water age
+	// carries.
+	function energyBoxEl() { return document.getElementById('lpn_energy_box'); }
+	function energyBoxIsOpen() {
+		var box = energyBoxEl();
+		return !!box && box.style.display !== 'none';
+	}
+	/** The energy summary of the run in hand, or null: js/lpn-time.js owns the frames and this. */
+	function runEnergy() {
+		return EngCalcs.lpnTimeRunEnergy ? EngCalcs.lpnTimeRunEnergy() : null;
+	}
+	function energyPumpCount() {
+		var n = 0;
+		(doc.links || []).forEach(function (l) { if (l.type === 'pump' && isActive(l)) { n++; } });
+		return n;
+	}
+	/** A money figure with the currency the document states, or with none where it states none. */
+	function energyMoney(v) {
+		var money = currencyLabel();
+		return money ? ffNum(v) + ' ' + money : ffNum(v);
+	}
+	function energyPercent(fraction) {
+		return ffNum(fraction * 100) + '%';
+	}
+	function rebuildEnergyReport() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_energy_report'),
+			sum = runEnergy(), body, e = settings.energy || {}, curveNames = [];
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (!energyPumpCount()) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_energy_no_pumps ||
+				'This network has no pumps, so there is nothing drawing power.', host);
+			return;
+		}
+		if (!sum) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_energy_needs_run || '', host);
+			return;
+		}
+		// The run's length as this page states every other time, H:MM through the one formatter,
+		// rather than a bare number of hours that would have to choose a plural.
+		ffEl('p', 'lpn-ff-note', (pc.lpn_energy_over || 'Over a run of {time}.')
+			.replace('{time}', EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(sum.duration)
+				: String(sum.duration)), host);
+		body = ffTable(host, [
+			pc.lpn_energy_col_pump || 'Pump',
+			pc.lpn_energy_col_running || 'Running',
+			pc.lpn_energy_col_effic || 'Effic.',
+			[pc.lpn_energy_col_avg_kw || 'Avg. kW',
+				pc.lpn_energy_col_avg_kw_tip || 'Averaged over the time this pump was running, not over the whole period.'],
+			pc.lpn_energy_col_peak_kw || 'Peak kW',
+			pc.lpn_energy_col_kwh || 'kWh',
+			pc.lpn_energy_col_cost || 'Cost'
+		]);
+		sum.pumps.forEach(function (row) {
+			var tr = ffEl('tr', null, null, body), ran = row.onSeconds > 0;
+			// The user's own label prefix, for the reason the fire flow table wears it: an id
+			// printed here without it is the same element under a second name.
+			ffCell(tr, labelPrefixFor('link', 'id') + row.id);
+			ffCell(tr, energyPercent(row.usage));
+			// **A PUMP THAT NEVER RAN GETS A DASH AND NOT A ZERO.** Its average efficiency is not
+			// 0%, it is nothing at all, and a column of zeros beside a 0% usage factor reads as a
+			// pump that ran badly rather than as one that never started.
+			ffCell(tr, ran ? energyPercent(row.avgEfficiency) : FF_DASH);
+			ffCell(tr, ran ? ffNum(row.avgKw) : FF_DASH);
+			ffCell(tr, ffNum(row.peakKw));
+			ffCell(tr, ffNum(row.kwh));
+			ffCell(tr, energyMoney(row.cost));
+			if (e.effic && e.effic[row.id]) { curveNames.push(row.id); }
+		});
+		// **THE TOTALS, AND THE DEMAND CHARGE IS NOT A SUM OF THE COLUMN ABOVE IT.** It is charged
+		// on the largest total power every pump drew at one moment, so it belongs under the table
+		// with the peak it is charged on beside it, and never in a Cost cell.
+		ffRow(host, pc.lpn_energy_total_kwh || 'Energy used', null,
+			ffEl('span', null, ffNum(sum.kwh), null), pc.lpn_energy_kwh || 'kWh');
+		ffRow(host, pc.lpn_energy_total_energy_cost || 'Cost of energy', null,
+			ffEl('span', null, energyMoney(sum.energyCost), null), '');
+		ffRow(host, pc.lpn_energy_peak_kw || 'Highest power drawn at one moment', null,
+			ffEl('span', null, ffNum(sum.peakKw), null), pc.lpn_energy_kw || 'kW');
+		ffRow(host, pc.lpn_energy_total_demand_charge || 'Demand charge',
+			pc.lpn_energy_demand_charge_tip,
+			ffEl('span', null, energyMoney(sum.demandCharge), null), '');
+		ffRow(host, pc.lpn_energy_total_cost || 'Total cost', null,
+			ffEl('span', null, energyMoney(sum.totalCost), null), '');
+		// **A PRICE OF NOTHING IS A REPORT OF NOTHING, AND IT SAYS SO.** All three EPA reference
+		// networks state a price of zero, so this is the state a first run lands in, and a column
+		// of zeros with no explanation reads as a defect in the arithmetic.
+		if (!sum.energyCost && !sum.demandCharge) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_energy_no_price ||
+				'No price of power is stated, so every cost here is zero. Set one under Settings, Energy.', host);
+		}
+		// **AN EFFICIENCY CURVE THE FILE STATED AND THIS PAGE CANNOT USE IS NAMED, NOT SWALLOWED.**
+		// The alternative is a report whose efficiency column quietly disagrees with EPANET's own.
+		if (curveNames.length) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_energy_curve_note ||
+				'These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.')
+				.replace('{ids}', curveNames.join(', ')), host);
+		}
+	}
+	function openEnergyBox() {
+		var box = energyBoxEl(), h, r, top;
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildEnergyReport();
+		// Centred and re-measured on every open, for the reason the fire flow box is: it is
+		// resizeable, the window may have changed, and a box remembered off-screen never comes back.
+		placePanelForScreen(box, function () {
+			h = fitPanelToViewport(box);
+			r = box.getBoundingClientRect();
+			box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
+			top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
+			capPanelToRoomBelow(box, top);
+			box.style.top = top + 'px';
+		});
+		initTipsIn(box);
+	}
+	function closeEnergyBox() { hidePanel(energyBoxEl()); }
+	function wireEnergyBox() {
+		var box = energyBoxEl(), x = document.getElementById('lpn_energy_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeEnergyBox); }
+		makePanelDraggable(box, null);
+		addPanelResizeGrip(box);
+	}
+	/** A run finished or was dropped, so the report in front of the reader is no longer the answer. */
+	function refreshEnergyBoxIfOpen() {
+		if (energyBoxIsOpen()) { rebuildEnergyReport(); }
+	}
+
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!result.ok) {
@@ -28990,6 +29344,10 @@ var EngCalcs = EngCalcs || {};
 		// **WHERE THE LIVE PANE HANGS** (Tasks 409, 434). Every solve ends here and every edit
 		// schedules a solve, so the open tab follows the document with no listener of its own.
 		refreshPaneIfOpen();
+		// And the energy report, on the same seam and for the same reason: a run that has just
+		// been re-done, or whose frames an edit dropped, must not leave last time's money on
+		// screen with nothing saying it is stale.
+		refreshEnergyBoxIfOpen();
 	}
 
 	// EPANET path. Async, so it needs a guard the synchronous path never did: this page solves

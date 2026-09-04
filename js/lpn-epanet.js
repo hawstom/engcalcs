@@ -71,7 +71,15 @@
 		// Link properties a VALVE needs and a pipe does not. EN_DIAMETER is shared with a pipe
 		// but reached separately here, because setPipeData() is not valid on a valve index.
 		EN_DIAMETER = 0,
-		EN_INITSETTING = 5;
+		EN_INITSETTING = 5,
+		// **WHAT A PUMP IS COSTING AT THIS INSTANT** (ROADMAP Task 566; dev/pump-energy.md).
+		// EN_ENERGY is the pump's power in KILOWATTS at the moment the hydraulic clock is standing
+		// on, and EN_PUMP_EFFIC the percent efficiency the engine worked that power out with --
+		// both of them the toolkit's own enum values, checked against the vendored engine. They are
+		// kW and percent whatever the flow units are, which is the reason `[ENERGY]` needs no
+		// conversion clone: see the note over EngCalcs.lpnEnergyParse.
+		EN_ENERGY = 13,
+		EN_PUMP_EFFIC = 17;
 
 	// **THE STATISTICS AND OPTIONS THAT SAY WHETHER THE RUN CONVERGED** (ROADMAP Task 565).
 	// EN_AnalysisStatistic on the left, EN_Option on the right; both are the toolkit's own enum
@@ -181,6 +189,7 @@
 			// nobody asked for.
 			initQuality = [],
 			reactionRows = [],
+			energyRows = [],
 			warnings = [],
 			i, n, k, link;
 
@@ -534,6 +543,34 @@
 			});
 		}
 
+		// **[ENERGY]: WHAT A PUMP COSTS TO RUN** (Task 566). Written on a hydraulic run and not
+		// only on a quality one -- energy is what the pumps did, so it belongs to every run that
+		// has a clock. Nothing here is converted: an efficiency is a percent, a price is a currency
+		// per kWh and a demand charge a currency per peak kW, and EPANET reports kW and kWh
+		// whatever the flow units are (see the note over EngCalcs.lpnEnergyParse).
+		//
+		// **`PUMP <id> EFFIC <curve>` IS THE ONE ROW NOT WRITTEN, AND IT IS NOT AN OVERSIGHT.**
+		// It names a [CURVES] entry, and the only curves this writer emits are the pump head
+		// curves the document holds; naming a curve that is not in the file is how EPANET comes to
+		// reject a network it would otherwise solve. A file that states one still round-trips
+		// (js/lpn-inp.js keeps it), and such a pump runs here at the global efficiency, which the
+		// run reports rather than leaving to be discovered.
+		var energyIn = model.energy || {};
+		[['globalEfficiency', 'Global Efficiency'], ['globalPrice', 'Global Price'],
+			['globalPattern', 'Global Pattern'], ['demandCharge', 'Demand Charge']
+		].forEach(function (pair) {
+			var v = energyIn[pair[0]];
+			if (v === undefined || v === null || v === '') { return; }
+			energyRows.push(' ' + pair[1] + '  ' + v);
+		});
+		[['price', 'PRICE'], ['pattern', 'PATTERN']].forEach(function (pair) {
+			var m3 = energyIn[pair[0]] || {};
+			Object.keys(m3).forEach(function (id) {
+				if (m3[id] === undefined || m3[id] === null || m3[id] === '') { return; }
+				energyRows.push(' PUMP  ' + id + '  ' + pair[1] + '  ' + m3[id]);
+			});
+		});
+
 		var inp = '[TITLE]\nEngCalcs looped network\n\n' +
 			'[JUNCTIONS]\n' + junctions.join('\n') + '\n\n' +
 			'[RESERVOIRS]\n' + reservoirs.join('\n') + '\n\n' +
@@ -569,6 +606,8 @@
 			// are still CARRIED: `js/lpn-inp.js` keeps them and writes them back in the user's own
 			// units, where verbatim text is exactly right.
 			'' +
+			// EPANET's own section order puts [ENERGY] after the controls and before [QUALITY].
+			(energyRows.length ? '[ENERGY]\n' + energyRows.join('\n') + '\n\n' : '') +
 			(initQuality.length ? '[QUALITY]\n' + initQuality.join('\n') + '\n\n' : '') +
 			(reactionRows.length ? '[REACTIONS]\n' + reactionRows.join('\n') + '\n\n' : '') +
 			(timeRows.length ? '[TIMES]\n' + timeRows.join('\n') + '\n\n' : '') +
@@ -1176,6 +1215,142 @@
 	// and nothing on this side, but it is asked for only when a quality run is actually wanted.
 	var EN_NOSAVE = 0, EN_SAVE = 1;
 
+	// ------------------------------------------------------------------------------------------
+	// **PUMP ENERGY AND WHAT IT COSTS** (ROADMAP Task 566; dev/pump-energy.md).
+	//
+	// **EPANET-ONLY AND RUN-ONLY, for the same reason water quality is.** Energy is power
+	// integrated over time, so there is no such thing as a day's pumping cost at one instant.
+	// js/lpn-solver.js has no time dimension and is not getting one; with the engine unreachable
+	// the page says so rather than showing a column of zeros.
+	//
+	// **THE ARITHMETIC IS OURS AND IT IS EPANET'S OWN, WRITTEN OUT.** EPANET accumulates, at every
+	// hydraulic step and for every pump that is running:
+	//
+	//     time on line += dt          efficiency += e dt        kWh += P dt
+	//     peak kW = max P             cost += price(t) P dt
+	//
+	// and then reports the average power and the average efficiency over the time the pump was ON,
+	// the usage factor over the whole duration, and a demand charge on the peak of the TOTAL power
+	// of every pump at once. Every one of those definitions is checked against EPA's own published
+	// Net3 report in dev/lpn-spike/energy-anchor-harness.js -- the report has an Energy Usage table,
+	// so this is anchored against a published document and not against ourselves.
+	//
+	// **AT EVERY HYDRAULIC STEP, NOT AT EVERY REPORTED FRAME.** nextH() also stops when a tank
+	// fills and when a control fires, and those steps are shorter than the reporting step and are
+	// discarded from the frames. Integrating over the frames instead would weight a five-minute
+	// tank event as an hour. That is the one thing in this file that must not be moved into the
+	// `isReportTime()` branch.
+	//
+	// **THE PRICE IS RESOLVED HERE AND THE SUMMARY IS PURE.** Which price a pump pays at time t is
+	// a question about patterns; what a run cost is arithmetic on numbers already gathered. Keeping
+	// them apart is what lets the money be tested with no engine in the room.
+	/** A fresh accumulator for the pumps named, and nothing else. */
+	EngCalcs.lpnEnergyAccInit = function (ids) {
+		var acc = { ids: (ids || []).slice(), pumps: {}, peakTotalKw: 0, seconds: 0 };
+		acc.ids.forEach(function (id) {
+			acc.pumps[id] = { onSeconds: 0, kwh: 0, effSum: 0, peakKw: 0, cost: 0 };
+		});
+		return acc;
+	};
+	/**
+	 * One hydraulic step, `dt` seconds long, worth of pump power.
+	 *
+	 * `sample` is `{ id: { kw, effic, price } }` -- the power and efficiency the engine just
+	 * reported, and the price ALREADY resolved through whatever pattern applies at this moment.
+	 * A pump that is off reports zero power and contributes no time on line, which is EPANET's own
+	 * rule and the reason a usage factor is a number at all.
+	 */
+	EngCalcs.lpnEnergyAccumulate = function (acc, sample, dt) {
+		var total = 0, hours = dt / 3600;
+		if (!acc || !(dt > 0)) { return acc; }
+		acc.seconds += dt;
+		acc.ids.forEach(function (id) {
+			var s = sample[id], a = acc.pumps[id], kw;
+			if (!s || !a) { return; }
+			kw = (typeof s.kw === 'number' && isFinite(s.kw)) ? s.kw : 0;
+			total += kw;
+			// **ZERO POWER IS A PUMP THAT IS NOT RUNNING, AND IT IS NOT ON LINE.** Counting it
+			// would drag the average efficiency of a pump that ran beautifully for eight hours
+			// towards zero, and would make the usage factor say 100% of every pump in the model.
+			// EPANET's own rule is the pump's STATUS rather than its power, and the two agree
+			// wherever a control switches the pump: Net3's two usage factors come out at EPA's own
+			// 58.33% and 28.74% (dev/lpn-spike/energy-anchor-harness.js). They part on a pump left
+			// OPEN with nothing to deliver, which draws a whisper and reads here as running --
+			// measured, stated, and the honest reading of a pump nobody switched off.
+			if (!(kw > 0)) { return; }
+			a.onSeconds += dt;
+			a.kwh += kw * hours;
+			a.effSum += ((typeof s.effic === 'number' && isFinite(s.effic)) ? s.effic : 0) * dt;
+			if (kw > a.peakKw) { a.peakKw = kw; }
+			a.cost += kw * hours * ((typeof s.price === 'number' && isFinite(s.price)) ? s.price : 0);
+		});
+		// **THE DEMAND CHARGE IS ON THE PEAK OF THE SUM, NOT ON THE SUM OF THE PEAKS.** A utility
+		// is billed for the most it ever drew at one moment, and two pumps whose peaks fall at
+		// different hours never drew both at once. EPANET does it this way and so does the bill.
+		if (total > acc.peakTotalKw) { acc.peakTotalKw = total; }
+		return acc;
+	};
+	/**
+	 * What the run cost, per pump and altogether.
+	 *
+	 * `demandCharge` is a currency per peak kW; absent or zero means the tariff has no such term.
+	 * `duration` is the run's own length in seconds and is what a usage factor is a fraction OF.
+	 *
+	 * **NO CURRENCY ARITHMETIC AND NO ROUNDING.** A currency is a label this page carries and shows
+	 * (see EngCalcs.lpnEnergyParse); the numbers here are in whatever currency the price was typed
+	 * in, and rounding them to two places is a decision for whoever prints them.
+	 */
+	EngCalcs.lpnEnergySummary = function (acc, opts) {
+		var o = opts || {}, dur = (o.duration > 0) ? o.duration : (acc ? acc.seconds : 0),
+			out = { pumps: [], energyCost: 0, kwh: 0, peakKw: 0, demandCharge: 0, totalCost: 0,
+				duration: dur };
+		if (!acc) { return out; }
+		out.peakKw = acc.peakTotalKw;
+		acc.ids.forEach(function (id) {
+			var a = acc.pumps[id], on = a.onSeconds;
+			var row = {
+				id: id,
+				onSeconds: on,
+				// A fraction, never a percent: the reader's own formatter decides that, and a
+				// number that is sometimes 0.58 and sometimes 58 is the defect this avoids.
+				usage: dur > 0 ? on / dur : 0,
+				// **AVERAGED OVER THE TIME IT RAN, WHICH IS EPANET'S OWN DEFINITION.** Net3's pump
+				// 10 reports 62.06 average kW against a 62.76 peak at a 58.33% usage factor: the
+				// average is plainly not over the whole day, and reproducing that report is what
+				// settled this.
+				avgKw: on > 0 ? a.kwh * 3600 / on : 0,
+				peakKw: a.peakKw,
+				avgEfficiency: on > 0 ? a.effSum / on : 0,
+				kwh: a.kwh,
+				cost: a.cost
+			};
+			out.pumps.push(row);
+			out.kwh += a.kwh;
+			out.energyCost += a.cost;
+		});
+		if (typeof o.demandCharge === 'number' && isFinite(o.demandCharge)) {
+			out.demandCharge = o.demandCharge * acc.peakTotalKw;
+		}
+		out.totalCost = out.energyCost + out.demandCharge;
+		return out;
+	};
+	/**
+	 * The price one pump pays at time `t`: its own, or the network's, scaled by whichever price
+	 * pattern applies. Absent everything it is 0, which is the honest answer for a document that
+	 * has never stated a price -- there is no default price on this page and there must not be one.
+	 */
+	function energyPriceAt(model, id, t) {
+		var e = model.energy || {}, price = (e.price || {})[id],
+			pid = (e.pattern || {})[id] || e.globalPattern, times, pat;
+		if (typeof price !== 'number' || !isFinite(price)) { price = e.globalPrice; }
+		if (typeof price !== 'number' || !isFinite(price)) { return 0; }
+		if (!pid || !EngCalcs.lpnPatternById || !model.time) { return price; }
+		pat = EngCalcs.lpnPatternById(model.time.patterns || [], pid);
+		if (!pat) { return price; }
+		times = model.time.times || {};
+		return price * EngCalcs.lpnPatternValue(pat, t, times.patternStep, times.patternStart);
+	}
+
 	/**
 	 * Does this model ask for a water-quality analysis this bridge can actually run?
 	 *
@@ -1331,6 +1506,14 @@
 					// The frames, by their own reporting time, so the quality pass can find the one
 					// it is standing on without searching the array at every step.
 					var frameAt = {};
+					// **THE ENERGY ACCUMULATOR, FILLED AT EVERY HYDRAULIC STEP** (Task 566). The
+					// pumps are named once, here, so the loop below asks the engine only about
+					// links that can consume anything.
+					var pumpIds = [], energyAcc;
+					for (i = 0; i < model.links.length; i++) {
+						if (model.links[i].type === 'pump') { pumpIds.push(model.links[i].id); }
+					}
+					energyAcc = EngCalcs.lpnEnergyAccInit(pumpIds);
 					// **CONVERGENCE OVER A WHOLE RUN IS A CONJUNCTION** (Task 565). Every hydraulic
 					// step is a separate solve with its own answer, so a run converged only if all
 					// of them did, and the first step that did not is the one worth naming -- after
@@ -1369,6 +1552,13 @@
 							frames: frames,
 							duration: duration, reportStart: reportStart, reportStep: reportStep,
 							quality: qualOn ? (model.quality || null) : null,
+							// **WHAT THE PUMPS COST, OR NULL WHERE THERE ARE NO PUMPS** (Task 566).
+							// Null and not an empty table: a network with nothing to pump has no
+							// energy answer, and a table of zeros reads as one.
+							energy: pumpIds.length ? EngCalcs.lpnEnergySummary(energyAcc, {
+								duration: duration,
+								demandCharge: (model.energy || {}).demandCharge
+							}) : null,
 							report: report
 						});
 					}
@@ -1426,7 +1616,7 @@
 						qslice();
 					}
 					function slice() {
-						var slice0 = nowMs(), finished = false, f, stepConv;
+						var slice0 = nowMs(), finished = false, f, stepConv, esample;
 						try {
 							for (;;) {
 								t = p.runH();
@@ -1480,7 +1670,24 @@
 									frames.push(f);
 									frameAt[f.t] = f;
 								}
+								// **READ BEFORE THE CLOCK MOVES, ACCUMULATED WITH THE STEP THE
+								// CLOCK ACTUALLY TOOK.** nextH() returns the length of the interval
+								// this solution holds for, which is what EPANET itself integrates
+								// energy over -- and it is shorter than the reporting step whenever
+								// a tank fills or a control fires, which is exactly why this cannot
+								// live in the isReportTime() branch above.
+								if (pumpIds.length) {
+									esample = {};
+									for (i = 0; i < pumpIds.length; i++) {
+										esample[pumpIds[i]] = {
+											kw: p.getLinkValue(linkIdx[pumpIds[i]], EN_ENERGY),
+											effic: p.getLinkValue(linkIdx[pumpIds[i]], EN_PUMP_EFFIC),
+											price: energyPriceAt(model, pumpIds[i], t)
+										};
+									}
+								}
 								tstep = p.nextH();
+								if (pumpIds.length) { EngCalcs.lpnEnergyAccumulate(energyAcc, esample, tstep); }
 								// A guard, not a policy: a network that somehow never advances would hang
 								// the tab. 100000 steps is far past any real model at any real timestep.
 								if (!(tstep > 0) || ++guard >= 100000) { finished = true; break; }

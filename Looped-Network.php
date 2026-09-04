@@ -789,6 +789,12 @@ echoHeader("EngCalcs", $html_title, "", false);
 						      // learn a second arrangement of the same ideas. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_quality"><?=$ec_lang['lpn_settings_quality']?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_quality_fields" class="lpn-set-part"></div></div>
+						<?php // And Energy last, which is where EPANET's own Analysis Options list ends
+						      // (ROADMAP Task 566). It is the one section on this page whose answer is
+						      // money, and it is read on the extended-period run, so it sits after the
+						      // clock and after the analysis that needs one. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_energy"><?=$ec_lang['lpn_settings_energy']?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_energy_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
 				<?php // **THE COLOUR-SCHEME ACKNOWLEDGEMENTS ARE A FOOTER, NOT A SETTING** (Tom, 2026-08-19:
@@ -877,6 +883,18 @@ echoHeader("EngCalcs", $html_title, "", false);
    what the Stop button already says in words, and two controls for one act is how a user learns to
    distrust both. It sits above the fire flow box (z-index 23 against 22) because it is the modal
    half of the same act, and its body is built by openFireFlowRunBox(). */ ?>
+<?php // THE PUMP ENERGY REPORT (ROADMAP Task 566). What each pump ran, what it drew and what it
+      // cost: the one answer on this page that is money. It borrows the fire flow box's whole
+      // shell -- the drag band, the resize grip, the scrolling body -- so this page has one set of
+      // box mechanics and not a fourth. The report itself is built in JS (rebuildEnergyReport),
+      // because it exists only for as long as the run that produced it. ?>
+<div id="lpn_energy_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_energybox_title">
+	<div id="lpn_energybox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_energy_title']?></div>
+	<button type="button" id="lpn_energy_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_energy_report" class="lpn-ff-report"></div>
+	</div>
+</div>
 <div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">
@@ -1490,6 +1508,41 @@ EngCalcs.pageConfig = {
 	lpn_reaction_per_day: <?=json_encode($ec_lang['lpn_reaction_per_day'])?>,
 	lpn_reaction_day: <?=json_encode($ec_lang['lpn_reaction_day'])?>,
 	lpn_reaction_note: <?=json_encode($ec_lang['lpn_reaction_note'])?>,
+	lpn_energy_title: <?=json_encode($ec_lang['lpn_energy_title'])?>,
+	lpn_energy_menu: <?=json_encode($ec_lang['lpn_energy_menu'])?>,
+	lpn_energy_menu_tip: <?=json_encode($ec_lang['lpn_energy_menu_tip'])?>,
+	lpn_energy_efficiency: <?=json_encode($ec_lang['lpn_energy_efficiency'])?>,
+	lpn_energy_efficiency_tip: <?=json_encode($ec_lang['lpn_energy_efficiency_tip'])?>,
+	lpn_energy_price: <?=json_encode($ec_lang['lpn_energy_price'])?>,
+	lpn_energy_price_tip: <?=json_encode($ec_lang['lpn_energy_price_tip'])?>,
+	lpn_energy_pump_price_tip: <?=json_encode($ec_lang['lpn_energy_pump_price_tip'])?>,
+	lpn_energy_price_pattern: <?=json_encode($ec_lang['lpn_energy_price_pattern'])?>,
+	lpn_energy_price_pattern_tip: <?=json_encode($ec_lang['lpn_energy_price_pattern_tip'])?>,
+	lpn_energy_demand_charge: <?=json_encode($ec_lang['lpn_energy_demand_charge'])?>,
+	lpn_energy_demand_charge_tip: <?=json_encode($ec_lang['lpn_energy_demand_charge_tip'])?>,
+	lpn_energy_currency: <?=json_encode($ec_lang['lpn_energy_currency'])?>,
+	lpn_energy_currency_tip: <?=json_encode($ec_lang['lpn_energy_currency_tip'])?>,
+	lpn_energy_kwh: <?=json_encode($ec_lang['lpn_energy_kwh'])?>,
+	lpn_energy_kw: <?=json_encode($ec_lang['lpn_energy_kw'])?>,
+	lpn_energy_price_note: <?=json_encode($ec_lang['lpn_energy_price_note'])?>,
+	lpn_energy_needs_run: <?=json_encode($ec_lang['lpn_energy_needs_run'])?>,
+	lpn_energy_no_pumps: <?=json_encode($ec_lang['lpn_energy_no_pumps'])?>,
+	lpn_energy_over: <?=json_encode($ec_lang['lpn_energy_over'])?>,
+	lpn_energy_col_pump: <?=json_encode($ec_lang['lpn_energy_col_pump'])?>,
+	lpn_energy_col_running: <?=json_encode($ec_lang['lpn_energy_col_running'])?>,
+	lpn_energy_col_effic: <?=json_encode($ec_lang['lpn_energy_col_effic'])?>,
+	lpn_energy_col_avg_kw: <?=json_encode($ec_lang['lpn_energy_col_avg_kw'])?>,
+	lpn_energy_col_avg_kw_tip: <?=json_encode($ec_lang['lpn_energy_col_avg_kw_tip'])?>,
+	lpn_energy_col_peak_kw: <?=json_encode($ec_lang['lpn_energy_col_peak_kw'])?>,
+	lpn_energy_col_kwh: <?=json_encode($ec_lang['lpn_energy_col_kwh'])?>,
+	lpn_energy_col_cost: <?=json_encode($ec_lang['lpn_energy_col_cost'])?>,
+	lpn_energy_total_kwh: <?=json_encode($ec_lang['lpn_energy_total_kwh'])?>,
+	lpn_energy_total_energy_cost: <?=json_encode($ec_lang['lpn_energy_total_energy_cost'])?>,
+	lpn_energy_peak_kw: <?=json_encode($ec_lang['lpn_energy_peak_kw'])?>,
+	lpn_energy_total_demand_charge: <?=json_encode($ec_lang['lpn_energy_total_demand_charge'])?>,
+	lpn_energy_total_cost: <?=json_encode($ec_lang['lpn_energy_total_cost'])?>,
+	lpn_energy_no_price: <?=json_encode($ec_lang['lpn_energy_no_price'])?>,
+	lpn_energy_curve_note: <?=json_encode($ec_lang['lpn_energy_curve_note'])?>,
 	lpn_settings_restore_tip: <?=json_encode($ec_lang['lpn_settings_restore_tip'])?>,
 	lpn_reset_all_tip: <?=json_encode($ec_lang['lpn_reset_all_tip'])?>,
 	lpn_storage_too_new: <?=json_encode($ec_lang['lpn_storage_too_new'])?>,
