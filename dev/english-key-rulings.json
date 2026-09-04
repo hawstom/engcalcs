@@ -113,6 +113,10 @@
    "on": "Static pressure",
    "ruled": "2026-09-02"
   },
+  "lpn_ff_col_static_tip": {
+   "on": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.",
+   "ruled": "2026-09-04"
+  },
   "lpn_ff_cost": {
    "on": "{solves} network runs.",
    "ruled": "2026-09-02"
@@ -513,6 +517,10 @@
    "on": "This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.",
    "ruled": "2026-09-02"
   },
+  "lpn_inp_drop_net_options": {
+   "on": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
+   "ruled": "2026-09-04"
+  },
   "lpn_inp_drop_quality_options": {
    "on": "This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
    "ruled": "2026-09-02"
@@ -536,6 +544,10 @@
   "lpn_menu_map": {
    "on": "Map",
    "ruled": "2026-08-29"
+  },
+  "lpn_net_emergency": {
+   "on": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
+   "ruled": "2026-09-04"
   },
   "lpn_new_coords": {
    "on": "Coordinates",
@@ -637,6 +649,22 @@
    "on": "A chemical this file names (kept, not worked out)",
    "ruled": "2026-09-01"
   },
+  "lpn_quality_chemical_name": {
+   "on": "Chemical and units",
+   "ruled": "2026-09-04"
+  },
+  "lpn_quality_chemical_name_tip": {
+   "on": "The name of the chemical and the units its concentrations are written in, for example Chlorine mg/L. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.",
+   "ruled": "2026-09-04"
+  },
+  "lpn_quality_initial": {
+   "on": "Initial quality",
+   "ruled": "2026-09-04"
+  },
+  "lpn_quality_initial_tip": {
+   "on": "How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty for none.",
+   "ruled": "2026-09-04"
+  },
   "lpn_quality_needs_run": {
    "on": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.",
    "ruled": "2026-09-01"
@@ -649,6 +677,38 @@
    "on": "Source trace",
    "ruled": "2026-09-02"
   },
+  "lpn_reaction_bulk": {
+   "on": "Bulk reaction coefficient",
+   "ruled": "2026-09-04"
+  },
+  "lpn_reaction_bulk_tip": {
+   "on": "Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one grows it. First order unless the file says otherwise, so the coefficient is a rate in 1/day. An empty box means no bulk reaction.",
+   "ruled": "2026-09-04"
+  },
+  "lpn_reaction_day": {
+   "on": "day",
+   "ruled": "2026-09-04"
+  },
+  "lpn_reaction_note": {
+   "on": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.",
+   "ruled": "2026-09-04"
+  },
+  "lpn_reaction_per_day": {
+   "on": "1/day",
+   "ruled": "2026-09-04"
+  },
+  "lpn_reaction_pipe_tip": {
+   "on": "This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.",
+   "ruled": "2026-09-04"
+  },
+  "lpn_reaction_wall": {
+   "on": "Wall reaction coefficient",
+   "ruled": "2026-09-04"
+  },
+  "lpn_reaction_wall_tip": {
+   "on": "Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.",
+   "ruled": "2026-09-04"
+  },
   "lpn_replace_asked": {
    "on": "Asked for {n}. The answer is on its way.",
    "ruled": "2026-08-29"
@@ -660,6 +720,14 @@
   "lpn_replace_source": {
    "on": "New value from",
    "ruled": "2026-08-29"
+  },
+  "lpn_result_concentration": {
+   "on": "Concentration",
+   "ruled": "2026-09-04"
+  },
+  "lpn_result_concentration_tip": {
+   "on": "How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.",
+   "ruled": "2026-09-04"
   },
   "lpn_result_demand_tip": {
    "on": "The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
@@ -864,6 +932,26 @@
   "lpn_terrain_will_ids": {
    "on": "These are the nodes that will be filled in: {ids}",
    "ruled": "2026-08-29"
+  },
+  "lpn_time_run_report_copied": {
+   "on": "Copied",
+   "ruled": "2026-09-04"
+  },
+  "lpn_time_run_report_copy": {
+   "on": "Copy",
+   "ruled": "2026-09-04"
+  },
+  "lpn_wrong_btn": {
+   "on": "Something wrong here?",
+   "ruled": "2026-09-04"
+  },
+  "lpn_wrong_thanks": {
+   "on": "Thank you. We got that.",
+   "ruled": "2026-09-04"
+  },
+  "lpn_wrong_tip": {
+   "on": "One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
+   "ruled": "2026-09-04"
   },
   "u_day": {
    "on": "day",
