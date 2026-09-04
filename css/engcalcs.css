@@ -2442,6 +2442,15 @@ html:has(#lpn_canvas) { overflow: hidden; }
 .lpn-runbox-report summary { cursor: pointer; }
 /* EPANET'S OWN TEXT, so it is monospaced and it SCROLLS INSIDE ITSELF in both directions: the
    report is column-aligned and reflowing it would destroy the alignment the engine wrote. */
+/* The copy button lives inside the report's own `<summary>`, so it is there the moment the report
+   is open. Quiet by default: it is a convenience beside a heading, not a command competing with the
+   box's close button. */
+.lpn-runbox-copy {
+	float: inline-end; margin-inline-start: 8px; font: inherit; font-size: .85em;
+	padding: 0 6px; cursor: pointer; background: none; border: 1px solid var(--rule, #999);
+	border-radius: 3px; color: inherit;
+}
+.lpn-runbox-copy:hover, .lpn-runbox-copy:focus { background: #eef3fd; }
 .lpn-runbox-pre {
 	margin: 0.4em 0 0; max-height: 40vh; overflow: auto;
 	padding: 0.4em; background: #f7f7f7; border: 1px solid #e0e0e0;

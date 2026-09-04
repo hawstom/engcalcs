@@ -2668,6 +2668,8 @@ $ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting
 $ec_lang['lpn_time_run_done']='The run finished. Reporting times: {frames}. Time taken: {secs} s.';
 $ec_lang['lpn_time_run_failed']='The run did not finish, so there are no results for the later times.';
 $ec_lang['lpn_time_run_report']='EPANET run report';
+$ec_lang['lpn_time_run_report_copy']='Copy';
+$ec_lang['lpn_time_run_report_copied']='Copied';
 $ec_lang['lpn_time_run_report_tip']='What the EPANET solver itself printed about the last run: whether it converged, and anything it warned about. It is the solver’s own text, not ours.';
 
 $ec_lang['lpn_time_speed']='Speed';

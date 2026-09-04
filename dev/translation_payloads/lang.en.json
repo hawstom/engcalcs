@@ -1345,6 +1345,8 @@
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",
+        "lpn_time_run_report_copy": "Copy",
+        "lpn_time_run_report_copied": "Copied",
         "lpn_time_run_report_tip": "What the EPANET solver itself printed about the last run: whether it converged, and anything it warned about. It is the solver’s own text, not ours.",
         "lpn_time_speed": "Speed",
         "lpn_time_speed_tip": "How fast the run plays back.",
@@ -1559,7 +1561,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1557,
+    "count": 1559,
     "active_prefixes": [
         "about",
         "bpn",

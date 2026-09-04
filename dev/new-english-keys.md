@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**20 still to read**, of 20 untranslated keys, of 1557 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**22 still to read**, of 22 untranslated keys, of 1559 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (20, 20 to read @@ NEEDS RULING)
+## lpn_  (22, 22 to read @@ NEEDS RULING)
 
 - **`lpn_ff_col_static_tip`**
   > The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.
@@ -73,6 +73,12 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   @@ NEEDS RULING
 - **`lpn_result_concentration_tip`**
   > How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.
+  @@ NEEDS RULING
+- **`lpn_time_run_report_copied`**
+  > Copied
+  @@ NEEDS RULING
+- **`lpn_time_run_report_copy`**
+  > Copy
   @@ NEEDS RULING
 - **`lpn_wrong_btn`**
   > Something wrong here?

@@ -225,6 +225,9 @@ async function boxSection() {
 		eq(shown.phase, 'done', '...saying the run finished rather than that one is running');
 		eq(shown.reportLength, report.length, '...with the whole report in it');
 		eq(EngCalcs.lpnTimeRunReport(), report, '...unedited');
+		// The copy button is only reachable while a report is open, which is also the only state a
+		// user can press it in -- so it is exercised here rather than after the box is torn down.
+		await copySection();
 	}
 
 	// The automatic case, which is the one the row was built for. A fresh edit, no Calculate, no box
@@ -275,6 +278,70 @@ async function boxSection() {
 	eq(EngCalcs.lpnTimeRunBoxState().phase, 'failed', 'an engine that throws leaves the box saying so, not spinning');
 
 	eq(steadySolves > 0, true, 'the page went on doing its ordinary steady solves throughout');
+}
+
+// ---- THE REPORT COPIES ITSELF OUT --------------------------------------------------------------
+//
+// **THE REPORT IS THE ONE PLACE A REFUSAL NAMES ITS OWN LINE**, which is how the `Error 205` in a
+// reservoir's pattern column was finally found -- by a person reading it and typing it out. Tom
+// asked for a copy button so the next one costs a press instead.
+//
+// A copy button that silently fails looks exactly like one that worked, so both routes are driven
+// here: `navigator.clipboard` when it exists, and the off-screen textarea for a page served over
+// plain http, where the modern API is simply absent. The label change is the only feedback a user
+// gets, so it is asserted too.
+async function copySection() {
+	console.log('\n---- the run report copies itself out ----');
+	const report = EngCalcs.lpnTimeRunReport();
+	eq(typeof report === 'string' && report.length > 0, true, 'there is a report to copy');
+	// A stand-in for the button: the copier only ever reads and writes its label.
+	const btn = { textContent: 'Copy' };
+
+	// 1. The modern route.
+	let wrote = null;
+	// **NODE SHIPS ITS OWN READ-ONLY `navigator`**, so a plain assignment is silently ignored and
+	// every assertion below would pass by taking the fallback route instead of the one under test.
+	const had = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+	const setNav = (v) => Object.defineProperty(globalThis, 'navigator', { value: v, configurable: true, writable: true });
+	setNav({ clipboard: { writeText: function (t) { wrote = t; return Promise.resolve(); } } });
+	EngCalcs.lpnTimeCopyForTest(report, btn);
+	await wait(20);
+	eq(wrote, report, 'the clipboard gets EPANET\'s own report, unedited');
+	eq(btn.textContent !== 'Copy', true, '...and the button says so rather than staying silent');
+
+	// 2. The fallback, which is what a page served over plain http actually uses -- there is no
+	//    navigator.clipboard there at all, and a silent no-op would be indistinguishable from a copy.
+	btn.textContent = 'Copy';
+	setNav({});
+	let selected = false, copied = false;
+	// **THIS HARNESS HAS NO DOM AT ALL** -- it tests the run box's STATE, which is why the button
+	// itself is not reachable here. The fallback route needs just enough of a document to prove it
+	// selects a textarea and asks for a copy, so it gets one for the length of this assertion.
+	const hadDoc = Object.getOwnPropertyDescriptor(globalThis, 'document');
+	Object.defineProperty(globalThis, 'document', {
+		value: {
+			body: { appendChild: function () {}, removeChild: function () {} },
+			execCommand: function (cmd) { copied = (cmd === 'copy'); return true; },
+			createElement: function (tag) {
+				return { value: '', style: {}, tagName: String(tag).toUpperCase(),
+					select: function () { selected = true; } };
+			}
+		},
+		configurable: true, writable: true
+	});
+	EngCalcs.lpnTimeCopyForTest(report, btn);
+	await wait(20);
+	if (hadDoc) { Object.defineProperty(globalThis, 'document', hadDoc); } else { delete globalThis.document; }
+	eq(selected && copied, true, 'with no clipboard API it still copies, through a selected textarea');
+	eq(btn.textContent !== 'Copy', true, '...and still says so');
+
+	// 3. A route that FAILS must put the label back rather than claim success.
+	btn.textContent = 'Copy';
+	setNav({ clipboard: { writeText: function () { return Promise.reject(new Error('denied')); } } });
+	EngCalcs.lpnTimeCopyForTest(report, btn);
+	await wait(20);
+	eq(btn.textContent, 'Copy', 'a refused clipboard leaves the label alone rather than lying');
+	if (had) { Object.defineProperty(globalThis, 'navigator', had); }
 }
 
 (async function () {

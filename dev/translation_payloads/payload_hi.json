@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 1557,
-        "delta_key_count": 20,
+        "expected_key_count": 1559,
+        "delta_key_count": 22,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_imgd",
@@ -517,6 +517,8 @@
         "lpn_wrong_thanks": "Thank you. We got that.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
+        "lpn_time_run_report_copy": "Copy",
+        "lpn_time_run_report_copied": "Copied",
         "lpn_quality_chemical_name": "Chemical and units",
         "lpn_quality_chemical_name_tip": "The name of the chemical and the units its concentrations are written in, for example Chlorine mg\/L. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.",
         "lpn_quality_initial": "Initial quality",
@@ -539,6 +541,8 @@
         "lpn_wrong_thanks": "Thank you. We got that.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
+        "lpn_time_run_report_copy": "Copy",
+        "lpn_time_run_report_copied": "Copied",
         "lpn_quality_chemical_name": "Chemical and units",
         "lpn_quality_chemical_name_tip": "The name of the chemical and the units its concentrations are written in, for example Chlorine mg\/L. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.",
         "lpn_quality_initial": "Initial quality",
@@ -633,6 +637,38 @@
                     "key": "lpn_inp_drop_backdrop",
                     "value": "यह फ़ाइल एक पृष्ठभूमि चित्र का नाम लेती है पर उसमें चित्र ही नहीं है। इसे स्वयं File, Background image, Add image से जोड़ें।",
                     "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                }
+            }
+        },
+        "lpn_time_run_report_copy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_report",
+                    "value": "EPANET रन रिपोर्ट",
+                    "english": "EPANET run report"
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_report_tip",
+                    "value": "EPANET सॉल्वर ने पिछले रन के बारे में स्वयं जो छापा: क्या यह अभिसरित हुआ, और इसने किस बारे में चेतावनी दी। यह सॉल्वर का अपना पाठ है, हमारा नहीं।",
+                    "english": "What the EPANET solver itself printed about the last run: whether it converged, and anything it warned about. It is the solver’s own text, not ours."
+                }
+            }
+        },
+        "lpn_time_run_report_copied": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_report",
+                    "value": "EPANET रन रिपोर्ट",
+                    "english": "EPANET run report"
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_report_tip",
+                    "value": "EPANET सॉल्वर ने पिछले रन के बारे में स्वयं जो छापा: क्या यह अभिसरित हुआ, और इसने किस बारे में चेतावनी दी। यह सॉल्वर का अपना पाठ है, हमारा नहीं।",
+                    "english": "What the EPANET solver itself printed about the last run: whether it converged, and anything it warned about. It is the solver’s own text, not ours."
                 }
             }
         },

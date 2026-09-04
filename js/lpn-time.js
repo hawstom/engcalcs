@@ -431,7 +431,12 @@
 			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.',
 			runReport: pageConfig.lpn_time_run_report || 'EPANET run report',
 			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.',
-			close: pageConfig.lpn_close || 'Close'
+			close: pageConfig.lpn_close || 'Close',
+			// **THE REPORT IS THE ONE PLACE A REFUSAL NAMES ITS OWN LINE**, so getting it out of the
+			// page has to be one press (Tom, 2026-09-04, having just had to retype one by hand: *"A
+			// copy to clipboard button on the report would be nice."*).
+			reportCopy: pageConfig.lpn_time_run_report_copy || 'Copy',
+			reportCopied: pageConfig.lpn_time_run_report_copied || 'Copied'
 			// **FIVE STRINGS LEFT THIS LIST WITH THE PANE TAB**: lpn_time_tank, lpn_time_level and
 			// lpn_time_settings_open named the tank table and the door to the settings, and
 			// lpn_time_menu / lpn_time_menu_tip named the tab itself. lpn_time_menu is still
@@ -1164,19 +1169,70 @@
 			pct = el('span', { 'class': 'lpn-runbox-pct' }),
 			report = el('details', { 'class': 'lpn-runbox-report' }),
 			summary = el('summary', null, S.runReport),
+			// **INSIDE THE `<summary>`, so it is reachable the moment the report is open and never
+			// competes with the box's own close button.** A `<summary>` toggles the `<details>` on
+			// click, so this button stops its event from reaching the parent -- without that, copying
+			// the report also collapses the thing you were reading.
+			copy = el('button', { type: 'button', 'class': 'lpn-runbox-copy' }, S.reportCopy),
 			pre = el('pre', { 'class': 'lpn-runbox-pre' });
+		copy.addEventListener('click', function (ev) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			copyText(pre.textContent || '', copy);
+		});
 		x.addEventListener('click', boxHide);
 		bar.appendChild(fill);
 		head.appendChild(title);
 		head.appendChild(pct);
 		head.appendChild(x);
+		summary.appendChild(copy);
 		report.appendChild(summary);
 		report.appendChild(pre);
 		root.appendChild(head);
 		root.appendChild(msg);
 		root.appendChild(bar);
 		root.appendChild(report);
-		return { root: root, msg: msg, bar: bar, fill: fill, pct: pct, report: report, pre: pre, x: x };
+		return { root: root, msg: msg, bar: bar, fill: fill, pct: pct, report: report, pre: pre, x: x, copy: copy };
+	}
+
+	/**
+	 * Put text on the clipboard and say so on the button that asked.
+	 *
+	 * **TWO ROUTES, BECAUSE THE MODERN ONE IS NOT ALWAYS THERE.** `navigator.clipboard` is absent on
+	 * a page served over plain http and in older browsers, and this suite is deployed by people who
+	 * may not have a certificate. The textarea fallback is the one that still works there. Neither
+	 * is allowed to throw into the caller: a report that will not copy must still be a report you
+	 * can read and select by hand.
+	 *
+	 * The label says what happened and goes back on its own, so nothing has to be dismissed.
+	 */
+	function copyText(text, btn) {
+		var was = btn.textContent;
+		function done(okay) {
+			btn.textContent = okay ? strings().reportCopied : was;
+			if (okay) {
+				setTimeout(function () { btn.textContent = was; }, 1500);
+			}
+		}
+		if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+			navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+			return;
+		}
+		try {
+			var ta = document.createElement('textarea');
+			ta.value = text;
+			// Off-screen rather than hidden: a display:none textarea cannot be selected, so the
+			// copy silently does nothing.
+			ta.style.position = 'fixed';
+			ta.style.left = '-9999px';
+			document.body.appendChild(ta);
+			ta.select();
+			var okay = document.execCommand && document.execCommand('copy');
+			document.body.removeChild(ta);
+			done(!!okay);
+		} catch (e) {
+			done(false);
+		}
 	}
 
 	/**
@@ -1194,6 +1250,11 @@
 	 * **EPANET'S OWN REPORT FOR THE LAST RUN, VERBATIM.** Never composed by us: see the note on
 	 * EngCalcs.lpnEpanetRun. Empty string when there is none.
 	 */
+	// The copier, for dev/lpn-spike/run-box-harness.js. A button that silently fails to copy looks
+	// exactly like one that worked, so both routes and the label change are asserted rather than
+	// trusted to a browser no harness runs in. The BUTTON is not exported: that harness has no
+	// document.body and builds no DOM, so the copier is the part worth reaching.
+	EC.lpnTimeCopyForTest = function (text, btn) { return copyText(text, btn); };
 	EC.lpnTimeRunReport = function () { return boxReport; };
 	/**
 	 * **PROJECT > EPANET RUN REPORT** (Task 467): put the last run's report on screen.
