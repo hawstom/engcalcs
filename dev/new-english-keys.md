@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**63 still to read**, of 63 untranslated keys, of 1600 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**22 still to read**, of 22 untranslated keys, of 1559 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,194 +21,74 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (63, 63 to read @@ NEEDS RULING)
+## lpn_  (22, 22 to read @@ NEEDS RULING)
 
-- **`lpn_energy_col_avg_kw`**
-  > Avg. kW
-  @@ NEEDS RULING
-- **`lpn_energy_col_avg_kw_tip`**
-  > The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.
-  @@ NEEDS RULING
-- **`lpn_energy_col_cost`**
-  > Cost
-  @@ NEEDS RULING
-- **`lpn_energy_col_effic`**
-  > Effic.
-  @@ NEEDS RULING
-- **`lpn_energy_col_kwh`**
-  > kWh
-  @@ NEEDS RULING
-- **`lpn_energy_col_peak_kw`**
-  > Peak kW
-  @@ NEEDS RULING
-- **`lpn_energy_col_pump`**
-  > Pump
-  @@ NEEDS RULING
-- **`lpn_energy_col_running`**
-  > Running
-  @@ NEEDS RULING
-- **`lpn_energy_currency`**
-  > Currency
-  @@ NEEDS RULING
-- **`lpn_energy_currency_tip`**
-  > Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.
-  @@ NEEDS RULING
-- **`lpn_energy_curve_note`**
-  > These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.
-  @@ NEEDS RULING
-- **`lpn_energy_demand_charge`**
-  > Demand charge
-  @@ NEEDS RULING
-- **`lpn_energy_demand_charge_tip`**
-  > What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.
-  @@ NEEDS RULING
-- **`lpn_energy_efficiency`**
-  > Pump efficiency (percent)
-  @@ NEEDS RULING
-- **`lpn_energy_efficiency_tip`**
-  > The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.
-  @@ NEEDS RULING
-- **`lpn_energy_kw`**
-  > kW
-  @@ NEEDS RULING
-- **`lpn_energy_kwh`**
-  > kWh
-  @@ NEEDS RULING
-- **`lpn_energy_menu`**
-  > Pump energy…
-  @@ NEEDS RULING
-- **`lpn_energy_menu_tip`**
-  > What each pump ran, what it drew and what it cost over the last run.
-  @@ NEEDS RULING
-- **`lpn_energy_needs_run`**
-  > Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy under Calculate.
-  @@ NEEDS RULING
-- **`lpn_energy_no_price`**
-  > No price of power is stated, so every cost here is zero. Set one under Settings, Energy.
-  @@ NEEDS RULING
-- **`lpn_energy_no_pumps`**
-  > This network has no pumps, so there is nothing drawing power.
-  @@ NEEDS RULING
-- **`lpn_energy_over`**
-  > Over a run of {time}.
-  @@ NEEDS RULING
-- **`lpn_energy_peak_kw`**
-  > Highest power drawn at one moment
-  @@ NEEDS RULING
-- **`lpn_energy_price`**
-  > Price of power
-  @@ NEEDS RULING
-- **`lpn_energy_price_note`**
-  > This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.
-  @@ NEEDS RULING
-- **`lpn_energy_price_pattern`**
-  > Price schedule
-  @@ NEEDS RULING
-- **`lpn_energy_price_pattern_tip`**
-  > A pattern that multiplies the price hour by hour, which is how an off peak tariff is written. Leave it empty for one price all day.
-  @@ NEEDS RULING
-- **`lpn_energy_price_tip`**
-  > What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.
-  @@ NEEDS RULING
-- **`lpn_energy_pump_price_tip`**
-  > What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.
-  @@ NEEDS RULING
-- **`lpn_energy_title`**
-  > Pump energy
-  @@ NEEDS RULING
-- **`lpn_energy_total_cost`**
-  > Total cost
-  @@ NEEDS RULING
-- **`lpn_energy_total_demand_charge`**
-  > Demand charge
-  @@ NEEDS RULING
-- **`lpn_energy_total_energy_cost`**
-  > Cost of energy
-  @@ NEEDS RULING
-- **`lpn_energy_total_kwh`**
-  > Energy used
-  @@ NEEDS RULING
 - **`lpn_ff_col_static_tip`**
   > The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_inp_drop_net_options`**
   > This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_net_emergency`**
   > This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_quality_chemical_name`**
   > Chemical and units
-  @@ NEEDS RULING
+  OK.
 - **`lpn_quality_chemical_name_tip`**
   > The name of the chemical and the units its concentrations are written in, for example Chlorine mg/L. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.
-  @@ NEEDS RULING
+    OK.
+
 - **`lpn_quality_initial`**
   > Initial quality
-  @@ NEEDS RULING
+  OK.
+
 - **`lpn_quality_initial_tip`**
   > How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty for none.
-  @@ NEEDS RULING
+  OK.
+
 - **`lpn_reaction_bulk`**
   > Bulk reaction coefficient
-  @@ NEEDS RULING
-- **`lpn_reaction_bulk_short`**
-  > Bulk reaction
-  @@ NEEDS RULING
+    OK.
 - **`lpn_reaction_bulk_tip`**
   > Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one grows it. First order unless the file says otherwise, so the coefficient is a rate in 1/day. An empty box means no bulk reaction.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_reaction_day`**
   > day
-  @@ NEEDS RULING
+  OK.
 - **`lpn_reaction_note`**
   > This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_reaction_per_day`**
   > 1/day
-  @@ NEEDS RULING
+  OK.
 - **`lpn_reaction_pipe_tip`**
   > This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.
-  @@ NEEDS RULING
-- **`lpn_reaction_tank`**
-  > Reaction coefficient
-  @@ NEEDS RULING
-- **`lpn_reaction_tank_short`**
-  > Reaction
-  @@ NEEDS RULING
-- **`lpn_reaction_tank_tip`**
-  > Reaction in the water held in this tank, as a rate in 1/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Leave it empty and the tank uses the bulk reaction coefficient set for the whole network under Settings, Water quality.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_reaction_wall`**
   > Wall reaction coefficient
-  @@ NEEDS RULING
-- **`lpn_reaction_wall_short`**
-  > Wall reaction
-  @@ NEEDS RULING
+  OK.
 - **`lpn_reaction_wall_tip`**
   > Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_result_concentration`**
   > Concentration
-  @@ NEEDS RULING
+  OK.
 - **`lpn_result_concentration_tip`**
   > How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.
-  @@ NEEDS RULING
-- **`lpn_settings_energy`**
-  > Energy
-  @@ NEEDS RULING
+  OK.
 - **`lpn_time_run_report_copied`**
   > Copied
-  @@ NEEDS RULING
+  OK.
 - **`lpn_time_run_report_copy`**
   > Copy
-  @@ NEEDS RULING
+  OK.
 - **`lpn_wrong_btn`**
   > Something wrong here?
-  @@ NEEDS RULING
+  OK.
 - **`lpn_wrong_thanks`**
   > Thank you. We got that.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_wrong_tip`**
   > One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.
-  @@ NEEDS RULING
+  OK.
