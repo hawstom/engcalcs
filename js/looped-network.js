@@ -10019,6 +10019,35 @@ var EngCalcs = EngCalcs || {};
 		input = popup.querySelector('input[type=text]');
 		if (input) { input.focus(); input.select(); }
 	}
+	// **FIND IS A VIEW OF THE PROJECT, LIKE EVERY OTHER BOX ON THIS PAGE** (Task 580). Tom,
+	// 2026-09-04: *"note that Find must be closed and reopened to see this when the project is
+	// changed."* The form was built once, by its opener, so the scope list, the property list and
+	// the Replace half all went on describing whichever project was open at that moment -- switch
+	// projects, or turn a chemical analysis on, and the box offers properties that are not there.
+	//
+	// **findNormalize() FIRST, because the selected property may have just stopped existing.** A
+	// select whose value is not among its own options renders BLANK and then searches on a name
+	// nothing answers to; normalising drops the selection back to the first property this project
+	// really has. The results list goes too -- it counted a set measured on the other project.
+	//
+	// **A TYPED QUERY THE CONTROLS CANNOT EXPRESS SURVIVES THE REBUILD.** rebuildFindForm() drops the
+	// parsed query and rewrites the line from the pull-downs, which is right when a pull-down was
+	// just changed and wrong here: nothing the user typed has changed, only the document under it.
+	// So the text is carried across and re-read. The test is findControlsShown() and NOT "is there
+	// an AST", because an unreadable line is the user's text too -- retyping it is exactly what
+	// somebody is in the middle of when a background repaint arrives.
+	function refreshFindForm() {
+		var popup = document.getElementById('lpn_find_popup'), typed = null;
+		if (!popup || popup.style.display === 'none') { return; }
+		if (!findControlsShown() && findQueryInput) { typed = findQueryInput.value; }
+		findNormalize();
+		rebuildFindForm();
+		if (typed !== null && findQueryInput) {
+			findQueryInput.value = typed;
+			findSyncFromInput();
+		}
+		renderFindResults(null);
+	}
 	function wireFindPopup() {
 		var popup = document.getElementById('lpn_find_popup'),
 			x = document.getElementById('lpn_find_close');
@@ -22887,6 +22916,12 @@ var EngCalcs = EngCalcs || {};
 		if (EngCalcs.lpnTimeRenderSettings) { EngCalcs.lpnTimeRenderSettings(); }
 		buildSettingsIndex();
 		applySetboxFilter();
+		// **THE FIND BOX RIDES THIS SEAM RATHER THAN KEEPING ITS OWN** (Task 580). Everything that
+		// can add or remove a Find property -- a project arriving through refreshAllFromDocument(),
+		// a water-quality mode, a friction method -- already repaints the settings here, and a
+		// second list of those call sites is a list somebody will forget to add to. It is a no-op
+		// while the Find box is closed, which is nearly always.
+		refreshFindForm();
 	}
 	// The left pane, read off the right one. A section row and a row per sub-heading inside it;
 	// clicking either scrolls the content pane so that heading is at its top.

@@ -152,14 +152,6 @@ the block.
   - **`[RULES]`** -- parked on purpose, Task 248.03. A rule's numbers are in the units of the file
     so no factor patches it, and Tom's evidence bar stands: it waits for a user who has one.
 
-- 100|580| **Find does not notice a project change until it is closed and reopened.**
-  Tom, 2026-09-04: *"note that Find must be closed and reopened to see this when the project is
-  changed."* The property list is built once when the panel opens, so switching projects, or
-  turning a chemical analysis on, leaves it offering the old project's properties. Every other box
-  on this page rebuilds itself as a VIEW rather than remembering -- `rebuildSettingsBox()` is the
-  worked example, and its own comment says why a writer who has to remember to repaint will forget.
-  Find is the one that still remembers.
-
 - 75|581| **An empty box cannot say "this file states zero" apart from "nothing is set".**
   Found 2026-09-04 while Tom read the refreshed gallery: Net2 states `Fluoride mg/L` with all-zero
   reaction globals, and Net3 states price 0 and demand charge 0, so the examples are faithful and

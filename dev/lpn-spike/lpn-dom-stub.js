@@ -318,6 +318,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // control on that panel -- the pull-downs, the query line, the result rows -- is invisible to
   // every harness, which could then only test findMatches() and never the panel itself.
   'lpn_find_form', 'lpn_find_results',
+  // And the panel that HOLDS them (Task 580). refreshFindForm() asks whether the box is on screen
+  // before it repaints, so a missing #lpn_find_popup makes that repaint invisible to every harness
+  // -- and the box is exactly the thing the task is about.
+  'lpn_find_popup',
   // The profile's path EDIT box (ROADMAP Task 509) -- the overlay that carries the two
   // operations Task 506's clean-out took with it. Absent from this list, profileEditEl()
   // returns null and the whole door is invisible to every harness.
@@ -367,6 +371,10 @@ byId.lpn_menu_popup2.appendChild(byId.lpn_menu_list2);
 // falls back to rendering into the colour host only when it is NOT on the page. A parentless stub
 // would exercise that fallback and never the shipped placement.
 byId.lpn_setbox_content.appendChild(byId.lpn_set_ramp_credits);
+// Looped-Network.php ships #lpn_find_popup with an inline `display:none`, and refreshFindForm()
+// reads exactly that to decide whether the box is on screen. A stub born with display '' is a box
+// every harness would be repainting without ever having opened one.
+byId.lpn_find_popup.style.display = 'none';
 // Same reason again, and this one has already cost six harnesses: Looped-Network.php nests the
 // diagnostic's TEXT SPAN and the grievance button (Task 207) inside #lpn_status, and setStatus()
 // writes the span rather than the <p> so a solve cannot delete the button beside it. Parentless

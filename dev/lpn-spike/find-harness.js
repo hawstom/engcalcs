@@ -70,6 +70,19 @@ const L = loadLoopedNetwork(
 	"\t\ttype: function (text) { findQueryInput.value = text;\n" +
 	"\t\t\t(findQueryInput._listeners.input || []).forEach(function (f) { f({}); }); },\n" +
 	"\t\tcontrolsShown: function () { return findControlsShown(); },\n" +
+	// Task 580: the box is a VIEW of the project, so a harness has to be able to OPEN it (the
+	// repaint is a no-op while it is closed) and then change the document under it.
+	"\t\tsetPopupOpen: function (on) {\n" +
+	"\t\t\tdocument.getElementById('lpn_find_popup').style.display = on ? 'block' : 'none'; },\n" +
+	"\t\tsetQualityMode: function (m) { settings.quality = { mode: m, traceNode: '' }; },\n" +
+	"\t\trebuildSettings: function () { rebuildSettingsBox(); },\n" +
+	// The options of the RENDERED property pull-down, read out of the markup the panel built --
+	// not out of findPropDefs(), which would answer correctly whether or not the box was repainted.
+	"\t\trenderedProps: function () { var out = null, n = 0;\n" +
+	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
+	"\t\t\t\tif (c._tag === 'select') { n++; if (n === 2) { out = (c.children || []).map(function (o) { return o.value; }); } }\n" +
+	"\t\t\t\twalk(c); }); })(findControlsBox);\n" +
+	"\t\t\treturn out; },\n" +
 	// The pull-downs of the QUERY, not of the Replace form under it -- which has one of its own and
 	// stays put.
 	"\t\tcontrolSelects: function () { var n = 0;\n" +
@@ -1036,6 +1049,67 @@ console.log('\n--- the property list reads in bands ---');
 		idx(pipe, 'roughness') < idx(pipe, 'headloss'), pk.join(','));
 }
 
+
+// ---- THE PANEL IS A VIEW OF THE PROJECT, NOT A SNAPSHOT (Task 580) -----------------------------
+//
+// Tom, 2026-09-04: *"note that Find must be closed and reopened to see this when the project is
+// changed."* The form was built once by its opener, so a project switch, or a water-quality mode
+// that adds two pipe properties, left it offering the other project's list.
+//
+// Asserted through rebuildSettingsBox() rather than through refreshFindForm(), because the wiring
+// IS the fix: every path that can add or remove a Find property already repaints the settings, and
+// a test that called the repaint directly would pass with nothing calling it.
+console.log('\n--- Find repaints when the project under it changes ---');
+{
+	build('us');
+	L.setQualityMode('chemical');
+	L.setPopupOpen(true);
+	L.setState('pipe', 'diameter', 'greater', '1');
+	L.buildPanel();
+	const withChem = L.renderedProps();
+	ok('a pipe offers the two reaction coefficients while a chemical is being analysed',
+		withChem.indexOf('bulkCoeff') >= 0 && withChem.indexOf('wallCoeff') >= 0, String(withChem));
+
+	L.setQualityMode('age');
+	L.rebuildSettings();
+	const withAge = L.renderedProps();
+	ok('...and the OPEN box loses them the moment the analysis changes',
+		withAge.indexOf('bulkCoeff') < 0 && withAge.indexOf('wallCoeff') < 0, String(withAge));
+
+	// The selection itself was one of the two that just vanished. Left alone, the pull-down renders
+	// blank and the search runs on a property nothing answers to.
+	L.setQualityMode('chemical');
+	L.rebuildSettings();
+	L.setState('pipe', 'bulkCoeff', 'greater', '1');
+	L.setQualityMode('age');
+	L.rebuildSettings();
+	ok('...and a selection that stopped existing falls back rather than going blank',
+		L.findState().prop !== 'bulkCoeff' &&
+		L.renderedProps().indexOf(L.findState().prop) >= 0, L.findState().prop);
+
+	// A typed compound query is the user's text, and nothing about the document changing makes it
+	// wrong. rebuildFindForm() alone would overwrite it from the pull-downs.
+	L.type('Pipe.Diameter > 6 AND Pipe.Diameter < 24');
+	ok('a typed compound query is what is on screen before the change', L.controlsShown() === false);
+	L.rebuildSettings();
+	ok('...and it is still there afterwards, character for character',
+		L.queryText() === 'Pipe.Diameter > 6 AND Pipe.Diameter < 24', String(L.queryText()));
+	ok('...still parsed as a compound query, not fallen back to the controls',
+		L.controlsShown() === false);
+
+	// The repaint costs nothing while the box is shut, which is nearly always. The controls have to
+	// come back first -- renderedProps() reads the property pull-down, and a set-aside panel has
+	// none to read.
+	L.setQualityMode('age');
+	L.setState('pipe', 'diameter', 'greater', '1');
+	L.buildPanel();
+	L.setPopupOpen(false);
+	L.setQualityMode('chemical');
+	L.rebuildSettings();
+	ok('a closed box is not repainted', L.renderedProps().indexOf('bulkCoeff') < 0,
+		String(L.renderedProps()));
+	L.setPopupOpen(false);
+}
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');
 process.exit(fails === 0 ? 0 : 1);
