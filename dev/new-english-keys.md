@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**41 still to read**, of 63 untranslated keys, of 1600 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**42 still to read**, of 64 untranslated keys, of 1601 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (63, 41 to read @@ NEEDS RULING)
+## lpn_  (64, 42 to read @@ NEEDS RULING)
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
@@ -134,6 +134,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_inp_drop_net_options`**
   > This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.
   _Ruled OK 2026-09-04._
+- **`lpn_inp_drop_sources_mixing`**
+  > This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.
+  @@ NEEDS RULING
 - **`lpn_net_emergency`**
   > This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.
   _Ruled OK 2026-09-04._

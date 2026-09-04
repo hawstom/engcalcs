@@ -22,9 +22,9 @@
 // in a box must not be one that adjusts nothing. Section 4 asserts the absence.
 //
 // **CARRYING A THING AND TELLING THE USER ABOUT IT ARE TWO JOBS** (Task 248.03's lesson). Section 5
-// asserts both halves of the report: the new sentence that says these are kept and unused, and that
-// the OLD sentence -- about the water-quality SECTIONS, which really are dropped -- no longer claims
-// the settings were left out.
+// asserts both halves of the report: the sentence that says these three are kept AND used -- all of
+// them, since Task 566 made a chemical run (2026-09-04) -- and that the sentence about the
+// water-quality SECTIONS no longer claims the settings were left out.
 
 'use strict';
 
@@ -263,16 +263,19 @@ console.log('\n--- the report tells the user, and tells the truth ---');
 
 	const kept = L.dropText('quality-options');
 	ok('the new sentence says they are kept', /kept/i.test(kept), JSON.stringify(kept));
-	// **THIS ASSERTION WAS INVERTED ON 2026-09-01, AND THE INVERSION IS THE POINT.** It used to
-	// require the words "Nothing on this page uses" -- true while all three options were carried
+	// **THIS ASSERTION HAS NOW BEEN INVERTED TWICE, AND THAT IS THE POINT OF KEEPING IT.** It first
+	// required the words "Nothing on this page uses" -- true while all three options were carried
 	// text, and FALSE the moment `Quality` became a live input driving a water-age or source-share
-	// run. That is exactly the failure the block below is about: a sentence that was honest when it
-	// was written and quietly became an over-claim in the other direction. So the sentence must now
-	// say that a chemical is not worked out here, and must NOT claim that none of them is used.
+	// run. It then required "chemical is not", which was true for exactly as long as a chemical was
+	// carried text: Task 566 interprets `[QUALITY]` and `[REACTIONS]`, sends Diffusivity and
+	// Tolerance to the engine, and runs the chemical (2026-09-04). A sentence that describes a
+	// LIMITATION rots the day the limitation lifts, so the assertion is written each time as the
+	// current truth plus a ban on the wording it replaced, and the bans accumulate.
 	ok('...and no longer claims the page uses none of them',
 		!/Nothing on this page uses/i.test(kept), JSON.stringify(kept));
-	ok('...and still says a chemical is not worked out here',
-		/chemical is not/i.test(kept), JSON.stringify(kept));
+	ok('...and no longer says a chemical is not worked out here',
+		!/chemical is not/i.test(kept), JSON.stringify(kept));
+	ok('...and says all three are used', /all three are used/i.test(kept), JSON.stringify(kept));
 	// **THE HALF THAT WENT WRONG LAST TIME.** `lpn_inp_drop_rules` had to be rewritten the moment
 	// rules started being carried, because "left out" had become false and a user reading it would
 	// believe theirs were lost. The same sentence covered these settings until now.
