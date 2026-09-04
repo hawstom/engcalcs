@@ -573,7 +573,7 @@ own failure; this table is an index, not a duplicate of that text.
 | `run_calc_harnesses.sh` | Every calculator's own `pageCalculator` against its own rendered HTML |
 | `stale_claim_check.php` | *Advisory.* A `Task N` cited in `CLAUDE.md` or a `dev/*.md` whose task is CLOSED, ranked by whether a negation sits beside it — the shape of the three false "not built yet" claims that shipped in one day. A worklist, never a verdict |
 | `stale_claim_selftest.php` | The DEMOTIONS in the check above, against fixtures. Blocking, because the check it guards is not: a demotion trades coverage for a shorter list and the tool looks identical either way. The three real false claims must keep ranking HIGH |
-| *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php`, `example_folder_check.php`, `mode_name_check.php` | Judgement calls that must not block a commit |
+| *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php`, `example_folder_check.php`, `mode_name_check.php`, `screenshot_publish_check.php` | Judgement calls that must not block a commit — and one that cannot run everywhere: the screenshot one reads the SIBLING repository, which is outside this tree, and prints that it checked nothing rather than passing in silence |
 
 **When you are about to write a new rule in this file, first ask whether it can be a check.** Every
 rule here that became a script stopped being violated. Every rule that stayed prose kept being

@@ -561,14 +561,17 @@ the block.
     (a phone has no hover and nothing has been pointed at — Task 550). 0043: the Task 549 fixes are
     visible, and the cut-off result list that AI could not judge is, in Tom's words, *"all that
     would fit"*. Swapped into `librewaternet.org` on his word, commit `10eda9e`.
-  - **[H] THE REAL FAILURE THIS EXPOSED: A RE-SHOOT IS NOT PUBLISHED BY BEING TAKEN.** The index had
-    already recorded re-shoots on 2026-08-27 and 2026-08-28 that were never carried across, and the
-    published plates sat at their 25 August versions for a week while three separate blocks of this
-    file described them as stale. **The gap was never Tom's camera; it was that copying the file to
-    the sibling repository is a separate act of memory.** Closing a re-shoot means publishing it, or
-    saying in the row why it stays unpublished. **Worth a check** — the sibling repo is drivable
-    from here, so an INDEX row claiming a frame replaces a published plate can be compared with the
-    plate's actual md5.
+  - **A RE-SHOOT IS NOT PUBLISHED BY BEING TAKEN, AND THAT IS A CHECK NOW** (2026-09-04).
+    `dev/scripts/screenshot_publish_check.php` reads every INDEX row claiming a plate is PUBLISHED
+    and compares the md5 it names with the file actually in the sibling repository. All three claims
+    match today. **The gap was never Tom's camera; it was that copying the file across is a separate
+    act of memory**, and a sentence saying it happened is one nobody re-reads. Advisory by
+    construction: the sibling repo is outside this tree and absent on a fresh clone, so the check
+    prints that it compared nothing rather than passing in silence.
+  - **A THIRD WATER-GLYPH GENERATION LANDED 2026-09-04** — the tower's tank became an elliptical
+    bulb — so every frame in the drop, the three published plates included, is one generation
+    behind. Recorded in the INDEX header, and **not** a worklist: Tom already ruled that the glyph
+    alone does not earn a re-shoot.
   - Feeds Task 504's features list, the LibreWaterNet landing page and its `graphics-plan.md`. The
     sibling repo IS drivable from here (`~/webdev/librewaternet.org` — read its own `CLAUDE.md`
     first).

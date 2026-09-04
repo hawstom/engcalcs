@@ -307,6 +307,12 @@ run_check "key hygiene"                  advisory php dev/scripts/key_hygiene_ch
 # standing between the reachability walk and a silent zero.
 run_check "key hygiene selftest"         blocking php dev/scripts/key_hygiene_selftest.php
 run_check "size budget"                  advisory php dev/scripts/size_budget_check.php --strict
+# Task 508. A re-shoot is not published by being taken -- three plates on librewaternet.org sat at
+# their 25 August versions for a week while three blocks of prose here called them stale. Advisory
+# because the sibling repository is OUTSIDE this tree and absent on a fresh clone, in a worktree,
+# and on any machine that only ever wanted the calculators; it prints that it checked nothing rather
+# than passing in silence.
+run_check "screenshot publication"       advisory php dev/scripts/screenshot_publish_check.php
 # Task 481. Three false "not built yet" claims shipped in one day, two found by Tom and none by any
 # check. This cites-a-closed-task scan is the mechanical half of that shape; the ranking is what
 # keeps it short. Advisory by construction -- citing a closed task as a RECORD is legitimate, so
