@@ -650,9 +650,22 @@ echoHeader("EngCalcs", $html_title, "", false);
 				aria-label="<?=htmlspecialchars($ec_lang['lpn_settings_search'])?>"
 				title="<?=htmlspecialchars($ec_lang['lpn_settings_search_tip'])?>">
 		</div>
-		<div class="lpn-setbox-panes">
+		<div id="lpn_setbox_panes" class="lpn-setbox-panes">
 			<?php // Built by buildSettingsIndex(), from the content pane's own headings. ?>
 			<nav id="lpn_setbox_index" class="lpn-setbox-index" aria-label="<?=htmlspecialchars($ec_lang['lpn_menu_settings'])?>"></nav>
+			<?php // ROADMAP Task 576. A separator, not a decoration: it is what the reader grabs to
+			      // give the index more room, and it is focusable so a keyboard can move it too --
+			      // a drag handle that only answers a mouse is a control half the visitors do not
+			      // have. Wired in wireSetboxDivider(); the visible line stays on the index's own
+			      // border-right, so this element is a grab strip and nothing else.
+			      //
+			      // **NO `title` ON IT, DELIBERATELY.** js/Calculators.lib.js wires tap tooltips on
+			      // the help class alone, so a tip parked here would exist for a pointer and not for
+			      // a finger -- and this control explains itself with a col-resize cursor and a
+			      // separator role. One string instead of two, and no half-reachable tip. ?>
+			<div id="lpn_setbox_divider" class="lpn-setbox-divider" role="separator"
+				aria-orientation="vertical" tabindex="0"
+				aria-label="<?=htmlspecialchars($ec_lang['lpn_setbox_divider'])?>"></div>
 			<div id="lpn_setbox_content" class="lpn-setbox-content">
 				<?php // ---- THE CATEGORIES ----------------------------------------------------------
 				      //

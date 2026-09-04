@@ -107,26 +107,6 @@ the block.
   - **Separate and undecided: the default map colour.** The map draws linework black; the sketch
     paints it suite blue. That governs every project with colouring OFF, which is most of them.
 
-- 100|576| **Drag the divider between the settings panes.**
-  Tom, 2026-09-04: *"It might be nice... to let the user drag the divider between the settings
-  panes."* The Settings box is a two-pane window -- an index on the left, the sections on the
-  right -- and the split is fixed. A long section name in a language with longer words, or a reader
-  who wants more of the index visible, has no way to change it.
-  - **The seams already exist and this is why it is cheap:** `makePanelDraggable()` and
-    `addPanelResizeGrip()` already carry a drag and a corner for every box, and the same pointer
-    rules apply. What is new is a divider that resizes two siblings rather than one panel.
-  - **A stored width is a per-visitor preference and therefore a STORAGE question**, which is Tom's
-    to rule before anything writes one: CLAUDE.md's exemption test asks whether it is strictly
-    necessary for a service the visitor requested. Building it WITHOUT persistence needs no ruling
-    and is most of the value; ask before adding the memory.
-
-- 100|577| **The Pump energy box: name it or move it, with the other reports.**
-  Tom, 2026-09-04, having found it: *"Would it work to either call Pump Energy 'Pump Energy Report'
-  (and it's near EPANET run report) or move it to our 'Tables' area? What do you find might be
-  best?"* Two candidate homes and a naming question, and the answer wants the two seats' vantage
-  rather than a preference: a report a utility hands to somebody else is a different object from a
-  table you read while drawing.
-
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.

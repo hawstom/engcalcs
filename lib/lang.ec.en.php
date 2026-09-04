@@ -2685,6 +2685,9 @@ $ec_lang['lpn_time_speed_tip']='How fast the run plays back.';
 $ec_lang['lpn_settings_search']='Search settings';
 $ec_lang['lpn_settings_search_tip']='Type a word to see only the settings that mention it. The explanations are searched too, not just the names.';
 $ec_lang['lpn_settings_no_match']='No setting mentions that word.';
+// The grab strip between the two panes (ROADMAP Task 576). An aria-label, so it is a NAME rather
+// than an instruction: what the control adjusts, not how to operate it.
+$ec_lang['lpn_setbox_divider']='Settings index width';
 $ec_lang['lpn_rpane_empty']='Nothing is docked here yet. Everything that belongs to the whole project is in Settings.';
 $ec_lang['lpn_time_settings_open']='Time settings';
 
@@ -2750,8 +2753,8 @@ $ec_lang['lpn_reaction_note']='This page offers no reaction coefficient of its o
 // wording has to be careful in two places: there is no default price and the note says why, and the
 // currency is a LABEL the user types, never a unit this page converts.
 $ec_lang['lpn_settings_energy']='Energy';
-$ec_lang['lpn_energy_title']='Pump energy';
-$ec_lang['lpn_energy_menu']='Pump energy…';
+$ec_lang['lpn_energy_title']='Pump energy report';
+$ec_lang['lpn_energy_menu']='Pump energy report';
 $ec_lang['lpn_energy_menu_tip']='What each pump ran, what it drew and what it cost over the last run.';
 $ec_lang['lpn_energy_efficiency']='Pump efficiency (percent)';
 $ec_lang['lpn_energy_efficiency_tip']='The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.';
@@ -2767,7 +2770,7 @@ $ec_lang['lpn_energy_currency_tip']='Whatever you write here is printed beside e
 $ec_lang['lpn_energy_kwh']='kWh';
 $ec_lang['lpn_energy_kw']='kW';
 $ec_lang['lpn_energy_price_note']='This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.';
-$ec_lang['lpn_energy_needs_run']='Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy under Calculate.';
+$ec_lang['lpn_energy_needs_run']='Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.';
 $ec_lang['lpn_energy_no_pumps']='This network has no pumps, so there is nothing drawing power.';
 $ec_lang['lpn_energy_over']='Over a run of {time}.';
 $ec_lang['lpn_energy_col_pump']='Pump';

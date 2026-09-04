@@ -331,6 +331,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // lpn_labels_* boxes are already listed above -- they kept their IDs through the move.
   'lpn_settings_box', 'lpn_setbox_close', 'lpn_setbox_filter', 'lpn_setbox_index',
   'lpn_setbox_content', 'lpn_setbox_none',
+  // The panes row and the grab strip between them (Task 576). setSetboxIndexWidth() clamps the
+  // index against #lpn_setbox_panes's own width, so without the parent there is no ceiling to
+  // assert; and wireSetboxDivider() returns at its first line without the strip.
+  'lpn_setbox_panes', 'lpn_setbox_divider',
   'lpn_set_sec_visual', 'lpn_set_sec_map', 'lpn_set_sec_elements', 'lpn_set_sec_calc',
   'lpn_set_sub_nodeSym', 'lpn_set_sub_linkSym', 'lpn_set_sub_nodeLink',
   'lpn_set_sub_mapDisplay', 'lpn_set_sub_page',
@@ -375,6 +379,12 @@ byId.lpn_setbox_content.appendChild(byId.lpn_set_ramp_credits);
 // reads exactly that to decide whether the box is on screen. A stub born with display '' is a box
 // every harness would be repainting without ever having opened one.
 byId.lpn_find_popup.style.display = 'none';
+// And the same reason once more: Looped-Network.php nests both Settings panes and the divider
+// between them inside .lpn-setbox-panes. The divider's ceiling is a fraction of that parent's
+// width, so a parentless index is an index with no upper clamp at all.
+byId.lpn_setbox_panes.appendChild(byId.lpn_setbox_index);
+byId.lpn_setbox_panes.appendChild(byId.lpn_setbox_divider);
+byId.lpn_setbox_panes.appendChild(byId.lpn_setbox_content);
 // Same reason again, and this one has already cost six harnesses: Looped-Network.php nests the
 // diagnostic's TEXT SPAN and the grievance button (Task 207) inside #lpn_status, and setStatus()
 // writes the span rather than the <p> so a solve cannot delete the button beside it. Parentless

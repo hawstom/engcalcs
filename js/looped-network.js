@@ -18630,8 +18630,20 @@ var EngCalcs = EngCalcs || {};
 			// **ENERGY SITS WITH THE RUN THAT PRODUCES IT** (Task 566). It is not a kind of run of
 			// its own: it is what the extended-period run already worked out on its way past, which
 			// is why the row is here and not beside Settings.
+			//
+			// **AND IT IS NAMED A REPORT RATHER THAN MOVED TO THE TABLES PANE** (Task 577; Tom,
+			// 2026-09-04: *"Would it work to either call Pump Energy 'Pump Energy Report' ... or
+			// move it to our 'Tables' area?"*). Named, and it stays here. The planning-engineer seat
+			// answered from the work: a pump-energy figure is a DELIVERABLE -- it goes into a
+			// preliminary engineering report's operations section and a life-cycle cost, produced
+			// once the demand pattern and the tariff are settled -- not a column watched while
+			// drawing, which is what the Tables pane is for. EPANET's own Report > Energy is a
+			// standalone report for the same reason, and this menu's own two groups already say it:
+			// what you READ beside the map against what you RUN on it. The ellipsis went with the
+			// rename, because nothing opens asking for more input -- the row shows a finished
+			// report, exactly as "EPANET run report" below it does.
 			{
-				icon: 'pump', label: pc.lpn_energy_menu || 'Pump energy\u2026',
+				icon: 'pump', label: pc.lpn_energy_menu || 'Pump energy report',
 				tip: pc.lpn_energy_menu_tip,
 				fn: function () { closeMenu(); openEnergyBox(); }
 			},
@@ -23234,6 +23246,98 @@ var EngCalcs = EngCalcs || {};
 		if (setboxIsOpen()) { closeSettingsBox(); return; }
 		openSettingsBox(evt && evt.section);
 	}
+	// ---- THE DIVIDER BETWEEN THE TWO PANES (ROADMAP Task 576) ------------------------------------
+	//
+	// Tom, 2026-09-04: *"It might be nice... to let the user drag the divider between the settings
+	// panes."* The index is a fixed 6.6rem, chosen against English section names on a PC; a language
+	// with longer words, or a reader who simply wants more of the list visible, had no way to say so.
+	//
+	// **IT RESIZES TWO SIBLINGS, WHICH IS WHAT MAKES IT NEW.** makePanelDraggable() moves one box and
+	// addPanelResizeGrip() sizes one box; this writes the flex-basis of the pane BEFORE it and lets
+	// the pane after it take the rest, so there is one number to clamp and the other side follows by
+	// construction.
+	//
+	// **IT IS NOT REMEMBERED, AND THAT IS DELIBERATE FOR NOW.** A stored pane width is a per-visitor
+	// preference, and this page already stores one for this very box (`lpn_setbox`: left, top, w, h).
+	// Adding a fifth number to that record is the same purpose and the same category the inventory
+	// already declares -- but it is still Tom's call to make, not one to take on his behalf, so the
+	// drag ships and the memory waits. Everything here is one field away from having it.
+	function setboxIsRtl() {
+		var el = document.documentElement;
+		return !!el && (el.dir === 'rtl' || (el.getAttribute && el.getAttribute('dir') === 'rtl'));
+	}
+	// **THE FLOOR IS THE INDEX'S AND THE CEILING IS THE CONTENT PANE'S.** 48px still shows a
+	// truncated word rather than a sliver of nothing, and 60% of the panes leaves the content pane
+	// the larger half -- past that the reader has hidden the thing the index is an index TO. Both
+	// are clamps on the ONE number written, so the two panes cannot disagree about the total.
+	var SETBOX_INDEX_MIN = 48, SETBOX_INDEX_MAX_FRAC = 0.6;
+	function setSetboxIndexWidth(px) {
+		var index = document.getElementById('lpn_setbox_index'),
+			panes = document.getElementById('lpn_setbox_panes'), room, max;
+		if (!index || !panes) { return; }
+		room = panes.clientWidth || 0;
+		max = room > 0 ? Math.max(SETBOX_INDEX_MIN, room * SETBOX_INDEX_MAX_FRAC) : Infinity;
+		px = Math.max(SETBOX_INDEX_MIN, Math.min(px, max));
+		index.style.flexBasis = Math.round(px) + 'px';
+		return px;
+	}
+	// Back to the stylesheet's own figure, which is the one place the default is written -- and it
+	// differs between a PC and a phone, so a number remembered here would be the wrong one at the
+	// other size.
+	function resetSetboxIndexWidth() {
+		var index = document.getElementById('lpn_setbox_index');
+		if (index) { index.style.flexBasis = ''; }
+	}
+	function setboxIndexWidth() {
+		var index = document.getElementById('lpn_setbox_index');
+		return index && index.getBoundingClientRect ? index.getBoundingClientRect().width : 0;
+	}
+	function wireSetboxDivider() {
+		var d = document.getElementById('lpn_setbox_divider'), start = null;
+		if (!d || d._lpnDividerWired) { return; }
+		d._lpnDividerWired = true;
+		function endDrag(e) {
+			if (!start) { return; }
+			start = null;
+			if (d.releasePointerCapture && e && e.pointerId !== undefined) {
+				try { d.releasePointerCapture(e.pointerId); } catch (err) {}
+			}
+		}
+		d.addEventListener('pointerdown', function (e) {
+			start = { x: e.clientX, w: setboxIndexWidth() };
+			// Captured, so a fast drag that outruns the 6px strip keeps arriving here rather than
+			// stopping dead over the pane it just left. Same rule as every other pointer drag on
+			// this page.
+			if (d.setPointerCapture && e.pointerId !== undefined) {
+				try { d.setPointerCapture(e.pointerId); } catch (err) {}
+			}
+			if (e.preventDefault) { e.preventDefault(); }
+		});
+		d.addEventListener('pointermove', function (e) {
+			if (!start) { return; }
+			// **RIGHT IS NOT ALWAYS WIDER.** In the five RTL languages the index sits on the right,
+			// so dragging towards the window's right edge must NARROW it. The sign is the whole of
+			// the difference, which is why it is one negation and not a second code path.
+			var dx = e.clientX - start.x;
+			setSetboxIndexWidth(start.w + (setboxIsRtl() ? -dx : dx));
+		});
+		d.addEventListener('pointerup', endDrag);
+		d.addEventListener('pointercancel', endDrag);
+		// **A DRAG HANDLE THAT ONLY ANSWERS A MOUSE IS A CONTROL SOME VISITORS DO NOT HAVE.** The
+		// arrows move it one step, Home puts it back. Announced by the separator role and the
+		// aria-label the markup carries.
+		d.addEventListener('keydown', function (e) {
+			var step = 12, w = setboxIndexWidth(), toward;
+			if (e.key === 'Home') { resetSetboxIndexWidth(); }
+			else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+				// The key names a DIRECTION ON SCREEN, so it flips with the writing direction for
+				// the same reason the drag does.
+				toward = (e.key === 'ArrowRight') ? 1 : -1;
+				setSetboxIndexWidth(w + step * (setboxIsRtl() ? -toward : toward));
+			} else { return; }
+			if (e.preventDefault) { e.preventDefault(); }
+		});
+	}
 	function wireSettingsBox() {
 		var box = setboxEl(), x = document.getElementById('lpn_setbox_close'),
 			filter = document.getElementById('lpn_setbox_filter');
@@ -23255,6 +23359,7 @@ var EngCalcs = EngCalcs || {};
 		// whatever it produces, so a size dragged by finger is remembered exactly like one dragged
 		// by mouse.
 		addPanelResizeGrip(box);
+		wireSetboxDivider();
 		// **THE SIZE IS OBSERVED, NOT LISTENED FOR.** `resize: both` is the browser's own widget and
 		// it fires no event of its own -- there is no `onresize` for an element -- so a
 		// ResizeObserver is the only way to learn what the user did. It also catches the other

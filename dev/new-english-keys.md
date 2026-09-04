@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**43 still to read**, of 65 untranslated keys, of 1602 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**44 still to read**, of 66 untranslated keys, of 1603 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (65, 43 to read @@ NEEDS RULING)
+## lpn_  (66, 44 to read @@ NEEDS RULING)
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
@@ -75,13 +75,13 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > kWh
   @@ NEEDS RULING
 - **`lpn_energy_menu`**
-  > Pump energy…
+  > Pump energy report
   @@ NEEDS RULING
 - **`lpn_energy_menu_tip`**
   > What each pump ran, what it drew and what it cost over the last run.
   @@ NEEDS RULING
 - **`lpn_energy_needs_run`**
-  > Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy under Calculate.
+  > Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.
   @@ NEEDS RULING
 - **`lpn_energy_no_price`**
   > No price of power is stated, so every cost here is zero. Set one under Settings, Energy.
@@ -114,7 +114,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.
   @@ NEEDS RULING
 - **`lpn_energy_title`**
-  > Pump energy
+  > Pump energy report
   @@ NEEDS RULING
 - **`lpn_energy_total_cost`**
   > Total cost
@@ -200,6 +200,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_result_concentration_tip`**
   > How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.
   _Ruled OK 2026-09-04._
+- **`lpn_setbox_divider`**
+  > Settings index width
+  @@ NEEDS RULING
 - **`lpn_settings_energy`**
   > Energy
   @@ NEEDS RULING

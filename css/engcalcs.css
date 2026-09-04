@@ -1819,6 +1819,31 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	border-right: 1px solid #ddd; padding-right: 6px; font-size: .9em;
 }
 .lpn-setbox-content { flex: 1 1 auto; min-width: 0; overflow: auto; font-size: .9em; }
+/* **THE DIVIDER BETWEEN THE TWO PANES** (ROADMAP Task 576; Tom, 2026-09-04: *"It might be nice...
+   to let the user drag the divider between the settings panes."*). A grab strip, not a line: the
+   visible rule stays on .lpn-setbox-index's own border-right, so the drawing does not change and
+   only the pointer target is new.
+
+   **THE 10px BETWEEN THE PANES IS UNCHANGED, AND IT IS THE NEGATIVE MARGIN THAT KEEPS IT SO.** A
+   third flex child earns a second `gap`, so index-to-content would have gone from 10px to 26px --
+   and .lpn-setbox-panes' `gap` is not this rule's to change: the Libraries box borrows the same
+   class and has no divider, and the phone rule at the foot of this file subtracts `2px` as its
+   share of a 10px gap. `margin: 0 -8px` spends 16 of the 26 back, leaving 2 + 6 + 2 = the same 10,
+   for every box and at every width. dev/lpn-spike/small-screen-harness.js measures that arithmetic
+   and caught the first attempt, which changed the gap instead.
+
+   `touch-action: none`, the rule dev/lpn-spike/panel-touch-harness.js exists to keep: without it
+   the browser claims the drag for scrolling before `pointermove` ever fires, and the divider
+   answers a mouse and not a finger.
+
+   Focusable, so the keyboard can move it (wireSetboxDivider handles the arrows); the focus ring is
+   the browser's own, on a 6px-wide element, which is why it gets a background on :focus-visible --
+   an outline around a hairline is not a visible focus indicator. */
+.lpn-setbox-divider {
+	flex: 0 0 6px; align-self: stretch; cursor: col-resize; margin: 0 -8px;
+	background: transparent; touch-action: none;
+}
+.lpn-setbox-divider:hover, .lpn-setbox-divider:focus-visible { background: #eef4ff; }
 /* **THE LAST SECTION MUST BE ABLE TO REACH THE TOP** (Tom, 2026-09-04: *"We are being bit by the
    bottom of the page when we select the Water Quality bookmark. I believe that the standard answer
    for this is to put a page worth of blank space at the end of the settings."* -- and it is). An

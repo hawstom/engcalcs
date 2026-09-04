@@ -14,6 +14,60 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-09-04 — Task 577: Pump energy is a REPORT, not a table; keep it out of Tables, rename it, and it is already grouped right
+
+Tom found the Pump Energy box and asked whether to rename it "Pump Energy Report" (near the EPANET
+run report) or move it into the Tables pane beside Junctions/Pipes/Pumps. My answer: **rename it,
+do not move it.**
+
+- **What I actually produce with this number.** A pumping-cost/energy figure in my world lives in a
+  Preliminary Engineering Report's operations-and-maintenance section and life-cycle-cost analysis,
+  not in a table I'm rereading while placing pipes. **CITED**, an SRF PER must evaluate O&M costs as
+  "a major part of a Life Cycle Cost Analysis" and, under FWPCA §602(b)(13), certify that energy
+  conservation was considered
+  (search of Indiana/South Carolina SRF PER guidance and mcwaneductile.com's PER summary,
+  2026-09-04 web search, no single stable URL better than the search itself — treat as CITED but
+  re-verify the exact clause before quoting it to a regulator). This is produced once, near the end
+  of a design phase, after demand patterns and a rate are settled — not read continuously like a
+  junction pressure column.
+- **EPANET's own UI already answers the taxonomy question independently of us.** **CITED**,
+  EPANET 2.2's Report menu has a standalone "Energy" item ("Report > Energy") separate from the
+  Status/Summary report, showing per-pump kWh, cost and a bar-chart comparison averaged over the
+  whole run (`epanet22.readthedocs.io/en/latest/9_viewing_results.html`, search summary 2026-09-04).
+  EPANET did not fold it into a per-element browsable table either — it is shaped like a report from
+  the reference implementation itself, independent of any opinion of ours.
+- **This page's OWN stated taxonomy already puts Pump energy in the right group, and it is not the
+  Tables group.** **OBSERVED**, `js/looped-network.js:18502-18513`: the Project menu is deliberately
+  three groups — "what the project IS" (Settings, Libraries), "what you READ beside it" (Profile,
+  Tables — the six per-element asset tables, refreshed on every edit), and "what you RUN on it" (Run,
+  Fire flow, Pump energy, EPANET run report). `js/looped-network.js:18630-18637` states the reasoning
+  for Pump energy's placement in that third group explicitly: "It is not a kind of run of its own: it
+  is what the extended-period run already worked out on its way past" — i.e. already grouped beside
+  "EPANET run report", already NOT in Tables. Tom's two options were framed as alternatives; the
+  repo's own menu order shows they are the same option already chosen once.
+- **The only real change on the table is the name and the ellipsis.** `lpn_energy_menu` currently
+  reads "Pump energy…" (`js/looped-network.js:18634`) — the ellipsis convention on this page marks a
+  row that opens a dialog needing more input before it runs (Fire flow's criteria form). Energy opens
+  straight to a finished table with no criteria to enter, so the ellipsis is arguably already wrong
+  independent of Tom's question, and "Pump energy report" (sentence case, matching "EPANET run
+  report" and "Fire flow" already on that menu — **OBSERVED**, `js/looped-network.js:18626,18639` —
+  not "Pump Energy Report" in title case, which is not this menu's own convention) is both the
+  accurate name and consistent with the sibling row beside it.
+- **What I would NOT do:** move it into the Tables pane. The pane's own six tabs are rebuilt on
+  `show`/`refresh` hooks that fire on every solve and document change (**OBSERVED**,
+  `js/looped-network.js:10089-10105`) — that is a live view of the CURRENT network, and pump energy
+  is not live in that sense: it is a snapshot of one EPS run at one price, held until the next Run.
+  Filing it as a seventh tab beside Junctions/Pipes would imply it updates the way those do, and
+  would separate it from Fire flow, the one other row this page already recognizes as "a kind of run"
+  in the same menu group.
+
+**Recommendation for Tom:** rename `lpn_energy_menu` from "Pump energy…" to "Pump energy report" (no
+ellipsis), leave it exactly where it sits in the Project menu's Run group next to "EPANET run
+report" — the menu's own three-way taxonomy already puts it there for the right reason and moving it
+to Tables would misdescribe what kind of object it is.
+
+---
+
 ## 2026-09-01 — Task 566's `[H]` anchor question: no EPA-published Net1 chlorine table exists; the hand-integrable single pipe is the answer, worked out in full
 
 Asked to decide the anchor before Task 566's chlorine code is written. Searched hard for a

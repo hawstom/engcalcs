@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hr",
-        "expected_key_count": 1602,
-        "delta_key_count": 65,
+        "expected_key_count": 1603,
+        "delta_key_count": 66,
         "exempt_key_count": 27,
         "exempt_keys": [
             "u_imgd",
@@ -520,6 +520,7 @@
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
         "lpn_time_run_report_copy": "Copy",
         "lpn_time_run_report_copied": "Copied",
+        "lpn_setbox_divider": "Settings index width",
         "lpn_quality_chemical_name": "Chemical and units",
         "lpn_quality_chemical_name_tip": "The name of the chemical and the units its concentrations are written in, for example Chlorine mg\/L. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.",
         "lpn_quality_initial": "Initial quality",
@@ -540,8 +541,8 @@
         "lpn_reaction_day": "day",
         "lpn_reaction_note": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.",
         "lpn_settings_energy": "Energy",
-        "lpn_energy_title": "Pump energy",
-        "lpn_energy_menu": "Pump energy…",
+        "lpn_energy_title": "Pump energy report",
+        "lpn_energy_menu": "Pump energy report",
         "lpn_energy_menu_tip": "What each pump ran, what it drew and what it cost over the last run.",
         "lpn_energy_efficiency": "Pump efficiency (percent)",
         "lpn_energy_efficiency_tip": "The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
@@ -557,7 +558,7 @@
         "lpn_energy_kwh": "kWh",
         "lpn_energy_kw": "kW",
         "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
-        "lpn_energy_needs_run": "Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy under Calculate.",
+        "lpn_energy_needs_run": "Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.",
         "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
         "lpn_energy_over": "Over a run of {time}.",
         "lpn_energy_col_pump": "Pump",
@@ -587,6 +588,7 @@
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
         "lpn_time_run_report_copy": "Copy",
         "lpn_time_run_report_copied": "Copied",
+        "lpn_setbox_divider": "Settings index width",
         "lpn_quality_chemical_name": "Chemical and units",
         "lpn_quality_chemical_name_tip": "The name of the chemical and the units its concentrations are written in, for example Chlorine mg\/L. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.",
         "lpn_quality_initial": "Initial quality",
@@ -607,8 +609,8 @@
         "lpn_reaction_day": "day",
         "lpn_reaction_note": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.",
         "lpn_settings_energy": "Energy",
-        "lpn_energy_title": "Pump energy",
-        "lpn_energy_menu": "Pump energy…",
+        "lpn_energy_title": "Pump energy report",
+        "lpn_energy_menu": "Pump energy report",
         "lpn_energy_menu_tip": "What each pump ran, what it drew and what it cost over the last run.",
         "lpn_energy_efficiency": "Pump efficiency (percent)",
         "lpn_energy_efficiency_tip": "The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
@@ -624,7 +626,7 @@
         "lpn_energy_kwh": "kWh",
         "lpn_energy_kw": "kW",
         "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
-        "lpn_energy_needs_run": "Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy under Calculate.",
+        "lpn_energy_needs_run": "Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.",
         "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
         "lpn_energy_over": "Over a run of {time}.",
         "lpn_energy_col_pump": "Pump",
@@ -786,6 +788,22 @@
                     "key": "lpn_time_run_report_tip",
                     "value": "Ono što je sam EPANET rješavač ispisao o posljednjem pokretanju: je li konvergiralo, i na što je upozorio. To je vlastiti tekst rješavača, ne naš.",
                     "english": "What the EPANET solver itself printed about the last run: whether it converged, and anything it warned about. It is the solver’s own text, not ours."
+                }
+            }
+        },
+        "lpn_setbox_divider": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_no_match",
+                    "value": "Nijedna postavka ne spominje tu riječ.",
+                    "english": "No setting mentions that word."
+                },
+                "next_translated": {
+                    "key": "lpn_rpane_empty",
+                    "value": "Ovdje još ništa nije usidreno. Sve što pripada cijelom projektu nalazi se u Postavkama.",
+                    "english": "Nothing is docked here yet. Everything that belongs to the whole project is in Settings."
                 }
             }
         },
