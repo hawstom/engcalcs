@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**66 open tasks.** Next (100): 9 · Soon (75): 13 · Someday (50): 14 · Maybe (25): 13 · Parked (5): 17
+**68 open tasks.** Next (100): 10 · Soon (75): 14 · Someday (50): 14 · Maybe (25): 13 · Parked (5): 17
 
-## 100 — Next (9)
+## 100 — Next (10)
 
 - Task 248.03 — Rule-based controls: the text is CARRIED now; the language is still parked.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
@@ -20,8 +20,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 553 — Demands and Hydraulics options: BUILT, and every option now has a control.
 - Task 576 — Drag the divider between the settings panes.
 - ! Task 577 — The Pump energy box: name it or move it, with the other reports.
+- ! Task 580 — Find does not notice a project change until it is closed and reopened.
 
-## 75 — Soon (13)
+## 75 — Soon (14)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -36,6 +37,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 570 — The EPANET report gets a box of its own: draggable, sizeable, and one of the family.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 579 — The four EPANET sections still carried and not understood, extracted from 566.
+- ! Task 581 — An empty box cannot say "this file states zero" apart from "nothing is set".
 
 ## 50 — Someday (14)
 
@@ -92,5 +94,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-56 of 66 titles are within 4–12 words. `!` marks the rest;
+56 of 68 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
