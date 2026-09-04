@@ -313,11 +313,45 @@ console.log('\n6. A shipped example states what its own source .inp states');
 	// day the importer does -- `examples/Net3.lwn` carried no `Quality` line for as long as the
 	// carry existed, and the first person to notice was Tom exporting one. The source `.inp` is the
 	// expectation here for the same reason it is everywhere else in this file.
+	// **AND CARRYING IS ONLY HALF OF IT** (2026-09-04). A section this page INTERPRETS is not in
+	// `inpSections` at all -- it is taken apart onto the model record -- so a stored project written
+	// before the page learned to interpret it passes every carry check above and still opens with
+	// the information missing from the interface. That is how the gallery came to state
+	// `Quality Trace Lake` in its carried options while `settings.quality` said nothing, so Net3
+	// opened in no analysis at all. The expectation is a FRESH IMPORT of the example's own source:
+	// whatever the importer makes of that file today, the stored copy must already say.
+	//
+	// The named fields are the interpreted record, and naming them is deliberate -- the gallery
+	// differs from a fresh import ON PURPOSE in engine, view, labels and backdrop, so a whole-object
+	// comparison would fail for the wrong reasons. Add a field here when the importer learns one.
+	const INTERPRETED = ['settings.quality', 'settings.reactions', 'settings.energy', 'times.qualityStep'];
+	const dig = (o, p) => p.split('.').reduce((v, k) => (v == null ? v : v[k]), o);
 	['Net1', 'Net2', 'Net3'].forEach((name) => {
-		const src = sectionLines(fs.readFileSync(
-			path.join(ROOT, 'dev', 'water-network-examples', name + '.inp'), 'utf8'));
+		const srcText = fs.readFileSync(
+			path.join(ROOT, 'dev', 'water-network-examples', name + '.inp'), 'utf8');
+		const src = sectionLines(srcText);
 		const carried = Object.keys(src).filter((n) => !SECTIONS_READ[n] && src[n].length);
 		const saved = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', name + '.lwn'), 'utf8'));
+
+		byId.lpn_dialog_body.children.length = 0;
+		L.importInp({ name: name + '.inp', _text: srcText });
+		const fresh = L.serialize();
+		INTERPRETED.forEach((f) => {
+			ok(name + ' gallery copy carries its interpreted ' + f,
+				JSON.stringify(dig(saved, f)) === JSON.stringify(dig(fresh, f)),
+				'stored ' + JSON.stringify(dig(saved, f)) + ' vs source ' + JSON.stringify(dig(fresh, f)));
+		});
+		// [QUALITY]'s initial quality is per NODE, and is the one interpreted field that is not a
+		// single value. Net3 states none, which is itself the expectation.
+		{
+			const want = {}, got = {};
+			(fresh.nodes || []).forEach((n) => { if (n._initQuality != null) { want[n.id] = n._initQuality; } });
+			(saved.nodes || []).forEach((n) => { if (n._initQuality != null) { got[n.id] = n._initQuality; } });
+			ok(name + ' gallery copy carries its ' + Object.keys(want).length + ' initial qualities',
+				JSON.stringify(want) === JSON.stringify(got),
+				Object.keys(got).length + ' stored');
+		}
+
 		L.applySaved(L.migrateSaved(saved));
 		const out = L.export();
 		ok(name + ' exports from the gallery', out.ok === true, out && out.error);
