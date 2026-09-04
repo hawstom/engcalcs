@@ -47,7 +47,16 @@
 		demand: 3, pattern: 4, ndemands: 5, emitter: 6,
 		initqual: 7, srcqual: 8, srcpat: 9, srctype: 10,
 		tank_initlevel: 3, tank_minlevel: 4, tank_maxlevel: 5, tank_diam: 6,
-		tank_minvol: 7, tank_volcurve: 8
+		tank_minvol: 7, tank_volcurve: 8,
+		// **A RESERVOIR'S ARRAY IS SHIFTED FROM A JUNCTION'S, AND READING IT AS A JUNCTION'S WROTE
+		// ITS CHLORINE AS ITS HEAD PATTERN.** A junction holds demand at 3 and its pattern at 4; a
+		// reservoir has no demand, so its head pattern sits at 3 and its initial quality at 4.
+		// Measured on Net1, whose reservoir 9 states an initial quality of 1.0 and NO head pattern:
+		// this reader emitted ` 9  800  1.0`, EPANET's own export of the same `.net` emits ` 9  800`
+		// with the pattern column empty, and the engine then refused the whole file --
+		// `Error 205: undefined time pattern 1.0 in [RESERVOIRS] section`. Tom found it by reading
+		// the EPANET run report, which is the one place the offending line is named.
+		res_pattern: 3, res_initqual: 4
 	};
 	var LINK_SLOT = {
 		desc: 0, tag: 1,
@@ -376,7 +385,7 @@
 				}
 			} else if (n.kind === 'reservoir') {
 				sections.RESERVOIRS.push(' ' + pad(n.id, 18) + ' ' + pad(or0(slot(n, 'node', 'elev'), '0'), 12) +
-					' ' + slot(n, 'node', 'pattern'));
+					' ' + slot(n, 'node', 'res_pattern'));
 			} else {
 				sections.TANKS.push(' ' + pad(n.id, 18) + ' ' + pad(or0(slot(n, 'node', 'elev'), '0'), 10) +
 					' ' + pad(or0(slot(n, 'node', 'tank_initlevel'), '0'), 10) +

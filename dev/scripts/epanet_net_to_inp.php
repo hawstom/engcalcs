@@ -117,6 +117,10 @@ $NODE_SLOT = array(
 	// Junction elevation, reservoir TOTAL HEAD and tank bottom elevation all share slot 2.
 	'elev' => 2,
 	'demand' => 3, 'pattern' => 4, 'ndemands' => 5, 'emitter' => 6,
+	// A RESERVOIR's array is shifted from a junction's: no demand, so the head pattern sits at 3
+	// and the initial quality at 4. Reading it as a junction's wrote Net1's reservoir chlorine as
+	// its head pattern and EPANET refused the file. See the note in js/lpn-net.js.
+	'res_pattern' => 3, 'res_initqual' => 4,
 	'initqual' => 7, 'srcqual' => 8, 'srcpat' => 9, 'srctype' => 10,
 	// Tank-only, and the reason a node array is 27 wide rather than 11.
 	'tank_initlevel' => 3, 'tank_minlevel' => 4, 'tank_maxlevel' => 5, 'tank_diam' => 6,
@@ -327,7 +331,7 @@ function netToInp($net) {
 				$demands[] = sprintf(' %-18s %-12s %s', $n['id'], $d[$i], isset($d[$i + 1]) ? $d[$i + 1] : '');
 			}
 		} elseif ($n['kind'] === 'reservoir') {
-			$sections['RESERVOIRS'][] = sprintf(' %-18s %-12s %s', $n['id'], numOr(slot($n, 'node', 'elev'), '0'), slot($n, 'node', 'pattern'));
+			$sections['RESERVOIRS'][] = sprintf(' %-18s %-12s %s', $n['id'], numOr(slot($n, 'node', 'elev'), '0'), slot($n, 'node', 'res_pattern'));
 		} else {
 			$sections['TANKS'][] = sprintf(' %-18s %-10s %-10s %-10s %-10s %-10s %-10s %s',
 				$n['id'], numOr(slot($n, 'node', 'elev'), '0'),

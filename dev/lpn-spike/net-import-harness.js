@@ -533,5 +533,44 @@ console.log('\n--- the three reference models, against EPANET\'s own export ---'
 	});
 }
 
+// ---- A RESERVOIR'S PATTERN IS ITS OWN SLOT, NOT A JUNCTION'S ---------------------------------
+//
+// **THIS SHIPPED AND EPANET REFUSED THE FILE.** A junction's props hold demand at 3 and its pattern
+// at 4; a reservoir has no demand, so its head pattern is at 3 and its INITIAL QUALITY at 4.
+// Reading it as a junction's wrote Net1's reservoir chlorine (1.0) into the pattern column, and the
+// engine answered `Error 205: undefined time pattern 1.0 in [RESERVOIRS] section` and then refused
+// the whole input. Tom found it by opening the EPANET run report, which is the one place the
+// offending line is named -- no check could see it, because a `.inp` that converts is not a `.inp`
+// that solves.
+//
+// The expectation is EPANET's OWN export of the same `.net`, in 2-EPANET-NET-back-to-INP/: it
+// writes reservoir 9 with an empty pattern column, and it lists node 9's initial quality as 1.0.
+console.log('\n--- a reservoir takes its pattern from its own slot ---');
+{
+	const dir = path.join(ROOT, 'dev', 'net-import-study', 'All-three');
+	const netFile = path.join(dir, '1-EPANET-INP-to-NET', 'Net1.net');
+	if (!fs.existsSync(netFile)) {
+		console.log('  skip  the Net1 corpus is not here');
+	} else {
+		const conv = EngCalcs.lpnNetToInp(new Uint8Array(fs.readFileSync(netFile)), 'Net1.net');
+		ok('Net1 converts', conv.ok === true, conv.error);
+		const rows = (conv.inp.match(/\[RESERVOIRS\][^[]*/) || [''])[0]
+			.split('\n').filter((l) => l.trim() && !/^;|^\[/.test(l));
+		ok('it has the one reservoir', rows.length === 1, JSON.stringify(rows));
+		const toks = (rows[0] || '').trim().split(/\s+/);
+		ok('...whose id and head are right', toks[0] === '9' && toks[1] === '800', JSON.stringify(toks));
+		// The whole of it: a third token here is a pattern name, and 1.0 is a concentration.
+		ok('...and it names NO head pattern, as EPANET does not either',
+			toks.length === 2, JSON.stringify(toks));
+		const epanet = path.join(dir, '2-EPANET-NET-back-to-INP', 'Net1.inp');
+		if (fs.existsSync(epanet)) {
+			const src = fs.readFileSync(epanet, 'utf8');
+			const q = (src.match(/\[QUALITY\][^[]*/) || [''])[0];
+			ok('and EPANET states 1.0 as that node\'s INITIAL QUALITY, which is what was misread',
+				/^\s*9\s+1\.0\s*$/m.test(q), 'node 9 not found in [QUALITY]');
+		}
+	}
+}
+
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);
