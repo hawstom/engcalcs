@@ -8,7 +8,7 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-58 features, citing 91 of the 502 closed task IDs. The other 411 are
+62 features, citing 95 of the 505 closed task IDs. The other 410 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
 call a feature — and 134 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
@@ -40,6 +40,10 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - The File menu remembers your recent projects, and the map remembers where you were looking. <!-- 352, 360 -->
 - One toggle clears the readouts off the map when you want the drawing and nothing else. <!-- 253 -->
 - The menus follow the work: everything about the water system is under Water, and everything drawn behind and around it is under Map, so a control is found by name rather than hunted for. <!-- 543 -->
+- A long Settings box is searchable and indexed: type a word and only the rows that mention it stay, or jump straight to any section from the list beside them. <!-- 557 -->
+- Fire flow analysis for the whole system in one press: every junction tested against the flow your code requires, what it can actually deliver at the residual you set, and what drawing that flow does to everything around it. <!-- 530 -->
+- Water quality over a run: how old the water reaching a point is, how much of it came from a source you name, and how a chemical residual decays as it travels, with the reaction coefficients yours to state rather than ours to guess. <!-- 566 -->
+- What the pumps cost: how long each one ran, the power it drew, the energy it used and the money that came to, including the demand charge on the highest power drawn at any one moment. <!-- 566.01 -->
 - A picture of your own under the drawing, a site plan or an aerial, scaled by picking two points on it or by typing the size of a pixel. <!-- 276 -->
 - A Help menu specific to this calculator. <!-- 250 -->
 - And although you of course prefer working on your PC, it works also on a phone in tall mode. <!-- 486 -->

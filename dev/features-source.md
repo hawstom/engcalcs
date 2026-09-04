@@ -60,6 +60,10 @@ have something to generate; the wording is his call, not ours.
 - 352, 360| The File menu remembers your recent projects, and the map remembers where you were looking.
 - 253| One toggle clears the readouts off the map when you want the drawing and nothing else.
 - 543| The menus follow the work: everything about the water system is under Water, and everything drawn behind and around it is under Map, so a control is found by name rather than hunted for.
+- 557| A long Settings box is searchable and indexed: type a word and only the rows that mention it stay, or jump straight to any section from the list beside them.
+- 530| Fire flow analysis for the whole system in one press: every junction tested against the flow your code requires, what it can actually deliver at the residual you set, and what drawing that flow does to everything around it.
+- 566| Water quality over a run: how old the water reaching a point is, how much of it came from a source you name, and how a chemical residual decays as it travels, with the reaction coefficients yours to state rather than ours to guess.
+- 566.01| What the pumps cost: how long each one ran, the power it drew, the energy it used and the money that came to, including the demand charge on the highest power drawn at any one moment.
 - 276| A picture of your own under the drawing, a site plan or an aerial, scaled by picking two points on it or by typing the size of a pixel.
 - 250| A Help menu specific to this calculator.
 - 486| And although you of course prefer working on your PC, it works also on a phone in tall mode.

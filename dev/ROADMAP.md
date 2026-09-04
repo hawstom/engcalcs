@@ -127,6 +127,31 @@ the block.
   rather than a preference: a report a utility hands to somebody else is a different object from a
   table you read while drawing.
 
+- 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
+  Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
+  kept here so they are not lost in a closed block.
+  - **Picking an EPS frame.** The sweep answers one instant. A project with a clock has many, and
+    the honest question is which one a fire flow is checked at -- maximum day is the convention, and
+    the page has no way to say "run the sweep at hour 14".
+  - **The Run concept, in Tom's own sketch (2026-08-27):** *"a Run names a scenario among its
+    parameters."* A named Run would carry the scenario, the required flow, the residual and the
+    frame together, so a report says what it was a report OF.
+
+- 75|579| **The four EPANET sections still carried and not understood, extracted from 566.**
+  Task 566 is closed: water age, source trace, the chemical mode and pump energy all ship, and
+  `[QUALITY]`, `[REACTIONS]` and `[ENERGY]` are interpreted. Four sections remain carried verbatim,
+  round-tripping byte-identically and named in the import report:
+  - **`[SOURCES]` and `[MIXING]`** -- a booster dose at a node and a tank mixing model. The chemical
+    mode runs without them: a reservoir's initial quality is held for the whole run, which is enough
+    to state a plant residual, and every tank is treated as completely mixed. The import report says
+    exactly that.
+  - **`[TAGS]`** -- a free-text tag per element. Cheap, and the natural home for Task 247's
+    customer/account work.
+  - **`[REPORT]`** -- formatting for a `.rpt` this page never requests. **Probably correct to leave
+    carried for ever**; say so deliberately rather than leaving it on a list.
+  - **`[RULES]`** -- parked on purpose, Task 248.03. A rule's numbers are in the units of the file
+    so no factor patches it, and Tom's evidence bar stands: it waits for a user who has one.
+
 - 100|545| **The list is a file, the marks are data, and both survived a reading.**
   *(The `[H]` came off 2026-09-01. Tom read the list and marked it; his marks were committed
   VERBATIM before anything touched them (`9a15e248`), then transferred — replacements into
@@ -375,320 +400,6 @@ the block.
   - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the
     map's own 1/cos(latitude) — 9% from 20° to 31°. Unavoidable on an unprojected display without an
     anisotropic transform, which `js/lpn-georef.js` refuses by design. `dev/georeferencing.md`.
-
-- 100|530| **Fire flow: Tom's rulings are recorded; what is left is BUILDING them.**
-  - **[SHIPPED 2026-09-02, after Tom could finally read the report.** He said so himself: *"I could
-    not review it properly with manglify English unrecognizable to my engineer eyes. Now that the
-    terminology is recognizable, more of my intuition is available."* Every item below came out of
-    that one reading, which is the argument for the terminology purge that preceded it.]
-    - **Column order is his** — Junction, Static pressure, Required flow, Pressure at required,
-      Available flow, Residual held, Drawdowns, Design limit, Runs, Failure modes. What the code ASKS
-      FOR, then what the system CAN GIVE, then the collateral. The Available/Residual pairing from
-      2026-09-01 survives the move. Asserted as an ORDER; the old check only asked that each heading
-      appeared somewhere and passed on any permutation.
-    - **`Failure modes` replaces `Result`, and it fixed an incoherence that was already on screen.**
-      `rec.state` is EXCLUSIVE — `finish()` returns FAIL before it looks at the effects — so a
-      junction that missed its fire flow AND pulled its neighbours down printed as "Failing" beside
-      a Drawdowns cell full of the design failure the verdict never mentioned. The column reads the
-      two answers directly, so both are named: on the shipped example, two junctions read
-      `Fire, Design`. **The summary had to follow** or the screen would contradict itself; it counts
-      the independent modes now and deliberately does not add up to the junction count.
-    - **`Not checked` and `Static failed, so not checked` replace two dashes that meant different
-      things.** A dash meant both *we looked and found nothing* (good news) and *we never looked*.
-      Same shape as the EPANET bridge swearing a run converged.
-    - **A junction that fails AT REST now gets its drawdowns measured**, which Tom would not let go:
-      *"What if I want a full system report, and node 99 doesn't need fire flow or barely fails, but
-      some other nearby demand draws 99 down... Wouldn't I want to know that even though 99 failed
-      its own flow test?"* `js/lpn-fireflow.js` returned before the design readings there, so the one
-      case a system-wide report most wants a reading for was the one case with none. Costs one extra
-      solve per static-failing junction and is guarded, because that is the probe most likely to fail.
-    - **A false comment was corrected on the way:** the design-readings site said *"where it fails,
-      `sideEffects` is simply not consulted"*, which the line below it contradicts. It nearly cost a
-      reader the right answer to which cells a failing row should blank — the answer is none.
-    - Node IDs in the table carry `labelPrefixFor('node','id')`; the input is `Design check (effect
-      on system)`; and `lpn_ff_iso` carries Tom's own reason the ISO credit cap is never applied
-      (*"we don't know how many hydrants a node may represent"*).
-  - **[H] WHAT IS NEEDED FROM TOM, asked 2026-09-01 and answered here so nobody asks again:**
-    **nothing is blocked on him.** Every ruling this task waited on is recorded below and was
-    given on 2026-08-26/27. What remains is BUILD work: picking an EPS frame where a project has a
-    clock, and the Run concept he sketched (*"a Run names a scenario among its parameters"*) —
-    neither of which needs another sentence from him to start. **The two questions he MAY still
-    want to answer are wording ones**, and they are in the new-English list rather than here.
-  - **THE PER-JUNCTION REQUIREMENT SHIPPED 2026-09-02.** Real practice varies the required flow by
-    land use, so one number for a whole run was the standing simplification. A junction now carries
-    its own `fireFlow`, overridable and blank-means-inherit, written through `setProp()` and wired
-    into the popup, the Junctions tab and Find and replace; the sweep is always handed the FUNCTION
-    form, so there is one code path whether or not anybody typed a number. **It is ours and not
-    EPANET's**, so it is in the `.lwn` and never in an `.inp`, which the harness asserts.
-    `dev/lpn-spike/fireflow-required-harness.js` (30), mutation-tested twice. Deliberately no map
-    label, no colour ramp and no starting-value row: what a junction must deliver comes from what
-    stands on it, which is not a thing to seed from a default.
-  - **HIS 2026-09-01 QUESTIONS ABOUT THE SWEEP, ANSWERED FROM THE CODE:**
-    - *"How is it possible to test every junction against every junction?"* — **it is N solves,
-      not N².** Each junction's design check is ONE ordinary fixed-demand solve at that
-      junction's required flow; reading every OTHER node's pressure out of that solve is free,
-      because the solve already computed them. So the WORK is linear in junctions and only the
-      READINGS are N×N.
-    - *"doesn't the report need to list the set of nodes against which every design failure
-      fails?... potentially huge unless we specify that we are listing only the worst case"* —
-      **that is already what it does.** `ffCriticalText()` prints the single worst affected
-      element plus `and {n} more`, so the table is one row per tested junction and never N².
-      - **BUT THE RANKING IS A JUDGEMENT AND HE SHOULD KNOW IT:** a node always outranks a link,
-        because a pressure and a velocity cannot be compared numerically. **So a severe velocity
-        problem is hidden behind ANY pressure problem**, however slight. Stated in the code; not
-        obviously right.
-      - **AND THE FULL N×N EFFECT LIST IS HELD IN MEMORY** (`rec.effects.nodes/links`) even though
-        one line of it is printed — ~50,000 records on a 225-junction sweep, and it is the
-        quantity that grows quadratically. Fine today; the first thing to look at if a large
-        system runs out of room.
-  - **DONE 2026-09-01:** the `Residual held` column moved to sit immediately after `Available`,
-    on his instruction — the two are one reading, a flow and the pressure the junction still
-    held while delivering it, and an available flow with no residual beside it is a number
-    without its condition.
-  - **THE WHOLE-SYSTEM SWEEP SHIPPED TO MASTER 2026-08-29** — `js/lpn-fireflow.js`, pure and DOM-free,
-    raw-node bisection over a chosen set of junctions, ONE run producing ONE result set holding both
-    answers per junction, four states assigned exactly once (`pass`, `fail`, `design`, `error`), and
-    the three-state colouring on the map. `LOSS_ACCOUNTING = 'raw-node'` is carried on the result set
-    AS A VALUE, so the interface cannot fail to state it. The modelled assembly, the emitter trick and
-    any time dimension are absent by construction. Guards: `fireflow-harness.js` (39),
-    `fireflow-box-harness.js` (24) driving the real page, `fireflow-bench.js`.
-    - **THE DESIGN HALF COSTS ZERO EXTRA SOLVES, which corrects the ~6% costed above.** Probing
-      `0 -> required -> ceiling -> bisect` takes the design readings AT the required flow on the way
-      past, where the plan assumed a separate solve because the bisection's last iterate is at the
-      AVAILABLE flow. It also settles the compliance verdict after three solves. Asserted.
-    - **MEASURED, and it still does not extrapolate:** 49 junctions 0.9 s / 819 solves; 121 junctions
-      11.3 s / 2,043; 225 junctions **114.9 s** / 3,707. Growth exponent 1.9 -> 3.16, and the 225
-      figure agrees with the branch's 112 s. Per-solve cost rises 1.1 -> 31.0 ms, which is the real
-      story: the sweep is not paying for more solves, it is paying for slower ones.
-    - **The bisection is anchored against EPANET's own published 4.727 US Hazen-Williams equation,
-      not against our resistance function** — a harness that checks our solver with our solver proves
-      nothing. The fire flow is ADDED to the base demand, and the fixture carries one, so a
-      substituting sweep lands 120 gpm out and fails. The tested junction is checked under a minimum
-      it genuinely cannot hold, so "never its own casualty" is not vacuous.
-    - **It writes no element property at all.** It solves from a copy whose NODE OBJECTS are copies,
-      a probe demand is put back, and results live in a module variable beside the document — not on
-      `doc`, not in `settings`, not on disk. `setProp()` is not involved rather than obeyed. Both
-      harnesses assert the document is byte-identical across a whole run.
-    - Interruptible: it yields a macrotask between junctions, so the progress line paints and Stop
-      answers; closing the box stops a run and a stopped sweep keeps what it had.
-  - **THE SWEEP GOT ~20x FASTER BY FIXING THE SOLVER, NOT BY SCOPING THE QUESTION (2026-08-30).**
-    Tom was brainstorming Autodesk's Domain concept to avoid long runs; the bench said the sweep's
-    ALGORITHM was already fine — solve COUNT grows linearly (819 -> 3,707 for 49 -> 225 junctions)
-    while cost PER SOLVE grew ~10x for 4.6x the junctions. **The linear solve was a dense Cholesky
-    and `js/lpn-solver.js`'s own header said so**, written for a stated target of 10-20 nodes: at
-    225 junctions that is 1,898,400 multiply-adds per Newton iteration on a matrix with ~5
-    nonzeros a row. An envelope factorization makes it **24,759 — 76.7x** — and the exponent of one
-    solve falls **2.41 -> ~1.0**. The 225-junction sweep: ~115 s -> **7-11 s**.
-    - **Every answer is BIT-IDENTICAL**, asserted with `Object.is` so -0 is not 0: 400 random SPD
-      matrices, 108 matrices taken from 16 real networks (so the ASSEMBLY is covered too), and the
-      whole sweep against the pre-change solver loaded from git. Factorization work is asserted as
-      a COUNT, never a time. `spd-envelope-harness.js`, `fireflow-answer-harness.js`.
-    - **WARM STARTING DOES NOT PAY, measured, and it is not currently done.** Carrying the previous
-      iterate saves only 23% of Newton iterations (8.3 -> 6.4 per solve at 225), because the sweep's
-      probes move one demand by a LOT and Newton is quadratic. Not worth changing answer semantics.
-    - **[H] ORDERING IS THE REMAINING LIMIT AND IT NEEDS TOM.** An envelope is only as narrow as the
-      node numbering: the same 225-junction network SHUFFLED costs 778,368 multiply-adds, 31x worse.
-      RCM recovers all of it (52x at 225, 100x at 441) — **but permuting reorders the arithmetic, so
-      every number moves in its last bits.** That is a different algorithm, not an optimisation.
-    - **The exponent is ~2 now, not 1**, so scoping is not dead: at 961 junctions a solve is still
-      ~66 ms. A true sparse Cholesky with nested dissection would reach ~O(n^1.5) and is the
-      rewrite. **Tom's Domain idea remains the right conversation past a few thousand junctions**,
-      and the planning engineer ranks building one LOW here because the Find panel's query language
-      and the sweep's explicit node list are already most of it — the real gap is naming and
-      reusing a selection across runs. His own assumption that everything starts in Domain1 is NOT
-      supported: InfoWater offers the Domain option only once a user has built one.
-  - **THE DIALOG, THE TABLE AND 10 ft/s SHIPPED 2026-08-30.** A separate `#lpn_ff_run_box` above the
-    fire-flow box holding a determinate bar on `done/total` JUNCTIONS (a solve count moves its own
-    finish line), the running tally, and Stop — **and no close X, because closing would have to mean
-    stopping and the Stop button already says that in words.** `#lpn_status` is a model diagnostic
-    again. It borrows `.lpn-popover` and `.lpn-setbox-title` but deliberately NOT `.lpn-setbox`,
-    whose fixed `min(46rem, 92vh)` would make a bar-and-a-button cover the drawing.
-    - **One wide table replaced the two reports**, on the planning engineer's finding that
-      InfoWater Pro's own Design Fireflow Report is already one: our engine computes both halves in
-      one run at zero extra cost, so two reports presented our ARCHITECTURE rather than the answer.
-      Ten columns in our words, not Bentley's. A cell with no answer prints an en dash, never a
-      zero, and the design columns stay drawn as dashes when that half was off, so two runs of one
-      network do not look like two different reports.
-    - **Two columns are NOT computable and were not invented.** Their *fire flow design* (the
-      largest flow still satisfying the criteria) is a SECOND bisection on a different predicate;
-      and *design constraint* as the ACTIVE constraint at the answer is unknown, because we read
-      the criteria once, at the REQUIRED flow. `Design limit` says what broke there, which is
-      honest. Critical Asset IS computable and is there. Filter and Download were not built.
-    - **5 ft/s -> 10 ft/s**, a criterion and not a constraint. The 5 had no fire-flow-specific
-      source at all and reads like a normal-operation design velocity mis-carried into a fire-flow
-      test. Sourced: San Bernardino County 8 ft/s general design **read primary, and it exempts
-      hydrant branch lines**; Vacaville 10 and Rancho California 15 as search synthesis only.
-    - **A dead second `.lpn-ff*` CSS block from the branch's unshipped modelled-assembly box was
-      silently overriding four live rules.** Deleted.
-    - *"and read as a single steady condition"* is DELETED as a repeat of the time-step sentence;
-      what it uniquely carried — which demand the fire flow is added to — survives in Tom's own
-      *"normally added to maximum day demand"*.
-  - **THE RUN NEEDS A PROGRESS DIALOG OF ITS OWN — Tom, 2026-08-30**, overruling the field
-    operator's recommendation that it live inside the fire-flow box: *"The run progress bar is so
-    important that all applications put it in a new dialog with nothing but the progress, a stop
-    button, and maybe some other progress stats."* **A separate dialog: progress, Stop, nothing
-    else.** What ships today is a count in `#lpn_status`, the map's STANDING model-diagnostic
-    overlay — a box documented in its own code as true-until-the-model-changes, doing a progress
-    dialog's job it was never built for. Tom, having used it: *"I finally noticed a yellow counter
-    in the upper left of the map. But that is not an idiomatic run progress box."*
-    - **NO TIME ESTIMATE, EVER, and this survives the ruling because it is an argument about the
-      numbers rather than about placement.** Per-solve cost RISES through a run — 1.1 ms at 49
-      junctions, 31.0 ms at 225 — so an ETA extrapolated from the early, cheap junctions is
-      optimistic and gets WORSE as the run continues, which is backwards from what an estimate is
-      for. `47 of 225` is an enumeration and is honest; a derived time is a forecast and is not.
-      Do not add one later as an improvement.
-    - Determinate bar on `done/total` (known exactly before the first solve), plus the running
-      pass/fail/error tally the sweep already holds.
-    - **AND THE MAP DOES NOT COLOUR IN LIVE TODAY** — `onProgress` never calls
-      `refreshFireFlowMarks()`, so every mark appears at the end. Worth knowing before anyone
-      argues about what a centred dialog would cover up: today it would cover nothing.
-  - **59 new `lpn_ff_*` keys await Tom's wording**, nine reused verbatim from the branch. Two want his
-    eye first: `lpn_ff_accounting`, the sentence that discharges the transparency ruling, and the
-    three `state_*` words the map legend and both reports all share.
-  - **LEFT OUT DELIBERATELY, each with its reason:** loss accounting is VISIBLE but not SELECTABLE,
-    because there is exactly one shipping method and a one-item menu is not a choice (the second is
-    the modelled assembly, which stays on the branch); a per-junction requirement — real practice
-    varies it by land use, and that is a table of criteria; picking an EPS frame, and no run/scenario
-    record was invented; and the branch's `dev/browser-pass/specs/fireflow.js`, whose ground the box
-    harness covers headlessly.
-  - **STILL ON THE BRANCH AND NOT PORTED: `dev/fireflow-analysis-plan.md` and
-    `dev/fireflow-loss-table.md`.** Master now has the feature and no research record beside it. The
-    code comments carry the conclusions; the plan carries what is still undecided.
-  *(The `[H]` came off the title 2026-08-29. Tom: *"Once again, I think I answered this. Did you
-  fail to update the roadmap?"* He did answer, at length, on 2026-08-27 — the rulings are in this
-  block and they changed the order and cut a phase. The marker stayed on the title and made a
-  reader think the task was still waiting on him. It was not; it is waiting on work.)*
-  **MOVED TO BRANCH `fire-flow` 2026-08-26, on Tom's call**, with the engine, the box, 55 language
-  keys, two harnesses and a browser spec. Master carries none of it. He asked for the hold and gave
-  the reason: *"Isn't this a much bigger task than we've contemplated?... we need more research and
-  planning before putting this on master."*
-  - **[H] TOM'S RULINGS ON THE PHASED PLAN, 2026-08-27**, after reading the planning engineer's
-    research. They change the order and they cut a phase.
-    - **PHASE 1 IS NOT A FEATURE.** *"Single-hydrant compliance doesn't require a tool. All an
-      engineer does is enter the fire flow and read the pressure. If it's lower than 20 psi, it's a
-      failure."* The engineer ranked it first to ship; Tom says the page already does it, and he is
-      right — a demand and a pressure readout is the whole of it. **So the first thing worth
-      building is the whole-system sweep, not the one hydrant.**
-    - **THE MODELLED ASSEMBLY IS NOT SHIPPING.** *"If the modelled assembly is an innovation, I
-      would rather not ship it. We should only innovate where it's a clear benefit. And you and I
-      both talked ourselves pretty well out of this one. Why build something that nobody is asking
-      for? It's just more to maintain and use real estate."* It is built, on the branch, and it
-      stays there. Raw nodes only — which is also what both inspectable tools do.
-    - **THE SIDE-EFFECT (DESIGN) HALF IS "very important, I think."** It moves up, not down.
-    - **AND IT IS OPTIONAL WHEREVER THE MARKET OFFERS IT:** *"for some reason other software lets
-      user choose whether or not to do a design (side-effect) analysis, maybe for simplicity, maybe
-      for computation time. I don't know."* Sourced: InfoWater exposes it as "Critical Node
-      Searching Range" — a choice among NAMED SETS (Fire Nodes, Entire Network, Selection Nodes,
-      Domain Nodes), with velocity under its own No Pipes / Connecting Pipes / Entire Network. So
-      it is a scope the user picks before running, never an automatic radius and never a
-      stop-when-drawdown-is-small rule. **Our own “one run, two reports” note below is not in
-      conflict: one RUN, and whether the design half runs at all is a control.**
-    - **[H] A RUN IS NOT A SCENARIO, AND HE HAS THE RELATIONSHIP:** *"A Scenario is not a Run, I
-      think. I think that a Run names a scenario among its parameters: Scenario, time step, etc."*
-      That is the correction to the engineer's own recommendation, which was to add a field to the
-      Scenario mechanism. A run POINTS AT a scenario and adds what the scenario does not carry —
-      which frame of the EPS, what kind of analysis, the scope of the design search. Nothing is
-      built here yet and the shape is his.
-  - **THE QUESTION HE WANTS ANSWERED, in his words:** *"Which nodes in my system can provide fire
-    flow (available vs required) or alternatively (separate Design question and analysis) provide it
-    without causing other nodes to fail or links to have excessive velocity (effect on critical
-    other asset at design flow)?"* — **and highlight every junction as Passing, Failing, or causing a
-    Design issue.** That is a whole-system sweep, not one hydrant: *"a big analysis that could take
-    minutes to run for a big system."* What is on the branch is a development step toward it.
-  - **TWO ANALYSES, NOT ONE, and he separates them himself.** *Available vs required* is a
-    compliance question about one node. *Does drawing it break something else* is a design question
-    about the whole network — other nodes falling below their minimum, links running at excessive
-    velocity. They need different reports and probably different runs.
-    - **[H] THE MARKET DOES IT IN ONE RUN, and that is evidence against the split, not a ruling.**
-      WaterCAD's Fire Flow Analysis reports the residual at the tested node AND the violations it
-      caused elsewhere from the SAME per-node solve, as one table and one colour map.
-      **Whether we still present them as two is Tom's call**; the cost argument for separating them
-      is weaker than it looked.
-      - **CORRECTION: the second analysis is CHEAP, not free, and the difference is one solve per
-        node.** "Free once the first has run" assumed the side-effect readings could be taken from
-        the bisection's last iterate — but that iterate is at the AVAILABLE flow, and the design
-        question is asked at the REQUIRED one. Where available > required they are different flows,
-        so an honest side-effect answer costs one ordinary fixed-demand solve per node on top of the
-        ~16, about 6%. Where available < required the node already fails and the required flow
-        cannot be drawn at all, so there is nothing to solve. **Recommendation: ONE run, ONE stored
-        result set, TWO reports** — which is also the only way the three-state map colouring Tom
-        asked for (Passing / Failing / Design issue) can exist, since it needs both answers for
-        every junction at once. Two BUTTONS would ask the user to choose between them before they
-        can see what either says.
-  - **[H] THE TIME QUESTION: he was right.** *"for an extended (time) simulation, don't we need to
-    let/make the user choose the peak hour or desired time step for the analysis?"* US practice
-    loads fire flow onto MAXIMUM-DAY demand and evaluates it as one steady-state condition; EPS at
-    the max-day peak hour is a named, explicitly conservative alternative. **Nobody targets "the EPS
-    as a whole"**, so if it is ever run against one, the user picks the frame. Interface before
-    engine, as he said.
-  - **THE EMITTER QUESTION IS SETTLED, 2026-08-26, from the primary EPANET 2.2 manual.** Tom's
-    physics doubt was right: an emitter computes `q = C·p^γ`, is pressure-driven, and its flow is
-    ADDITIVE to the junction's ordinary demand — it is not a fixed demand. **But the manual
-    documents a deliberate fire-flow trick anyway** — an enormous discharge coefficient with the
-    junction elevation raised by the target residual head, so one solve returns the flow that drives
-    the node to exactly 20 psi. It is EPANET-sanctioned and it is contested by practitioners who
-    prefer modelling the assembly. So it is a real choice, not a myth.
-    - **THE HONEST MENU IS THREE, and the default is not ours:** raw-node bisection (WaterCAD's
-      default, so the market's), modelled-assembly bisection (what the branch built), and the
-      emitter trick (one solve per node instead of ~16). **Offer, never impose** — which is the
-      selectable accounting Tom already asked for below.
-    - **DO NOT REACH FOR EPANET 2.2's PRESSURE-DRIVEN ANALYSIS as a shortcut.** It is real and it is
-      vendored here, but nobody in the industry uses it for this job and its pressure targets are
-      set once GLOBALLY, not per node. (Corroborated from two secondary sources, not read from the
-      primary manual — the emitter finding above was.)
-    - **CORRECTION: the "20 psi is partly a fat factor for the unmodelled hydrant" claim does not
-      hold up.** The sourced rationale for the 20 psi floor is a backflow / negative-pressure safety
-      margin. It came from the Gemini answer and it should not be quoted again. NFPA's primary text
-      was not reached, so this is *unsupported*, not *disproved*.
-    - **MEASURED COST OF A FULL SWEEP: ~112 s for 225 junctions** — 16 solves per hydrant at 498 ms,
-      from `dev/fireflow-loss-table.md`. That lands on Tom's own "minutes for a big system".
-      **It does NOT extrapolate:** 49→225 junctions grew worse than linear, so a 1,000–2,000 node
-      number has to be measured before anyone quotes one.
-      - **THE 16 IS OURS, NOT BENTLEY'S.** WaterCAD's page describes the search's SHAPE and
-        publishes no solve count. The number is this branch's own measured bisection cost, carried
-        across by analogy because the algorithm matches. Do not cite it as a WaterCAD figure.
-    - **[H] TOM'S ECONOMICS HYPOTHESIS DOES NOT SURVIVE, 2026-08-26.** He proposed that the emitter
-      trick is what makes the market's one-button sweeps affordable at all. **No case of a sweep
-      built on emitters was found, primary or secondary.** The one purpose-built every-junction
-      EPANET tool readable in full — OptiWater's `FireFlow` (Salomons, 2004, manual read directly)
-      — steps demand up by a fixed interval per node, which is MORE solves than bisection, not
-      fewer. WNTR's own fire-flow example is one fixed demand at one node under PDD, not a sweep.
-      The narrower claim stands and is worth keeping: **1 solve per node beats ~16, and the shape
-      is O(N) either way.** It is the leap to "that is why sweeps are feasible" that fails.
-    - **NO PUBLISHED ACCURACY COMPARISON of emitter against bisection was found**, which is the
-      decisive engineering question and is therefore open. One named hazard: the emitter's
-      discharge coefficient is a GUESSED, INVISIBLE CEILING — a bisection sweep can report "I hit
-      my ceiling" and a naive emitter run has no equivalent tell.
-    - **TOM'S DECISION, 2026-08-26: PROCEED WITH BISECTION** — *"(1) We can proceed with
-      bisection."* The emitter trick stays recorded as an option and is not being built.
-    - **AND RAW NODES FIRST, WHICH THE EVIDENCE SUPPORTS.** His reasoning: *"we will be doing
-      something blanket for full-system analysis, and it's not obvious that a blanket hydrant model
-      is better than raw nodes."* **Both inspectable tools do raw nodes** — WaterCAD's default, and
-      OptiWater's `FireFlow` steps demand at the node itself. A blanket assembly model imposes one
-      guessed hydrant on every junction in the system uniformly; getting it wrong is then wrong
-      everywhere at once, and it is not what a reviewer would expect to see. The modelled assembly
-      stays available and OFFERED, which is the transparency he asked for.
-    - **THE SIDE-EFFECT ANALYSIS NEEDS NEITHER METHOD.** A single ordinary fixed-demand solve per
-      node, at the code-required flow, answers "does drawing this break something else" directly.
-      Only the *available vs required* half needs a search at all. (The agent's own inference,
-      tagged SPECULATION in its journal — re-derive it before building on it.)
-  - **HOWEVER WE ACCOUNT FOR HYDRANT LOSSES, IT MUST BE VISIBLE AND PROBABLY SELECTABLE.** Tom:
-    *"I want to be very explicit and transparent, maybe even selectable, about how we account if at
-    all for hydrant losses beyond the node."* If the profession's default is raw-node analysis, then
-    OUR modelled assembly is the unusual choice and has to be offered rather than imposed.
-  - **The box must be moveable and resizeable** (Tom, 2026-08-26). It centres, which he liked.
-  - Everything already researched and built is on the branch and in
-    `dev/agents/utility-planning-engineer/journal.md` — the AWWA C502 k, the ISO 1,500 gpm cap, the
-    lateral standards, `dev/fireflow-loss-table.md`. **None of it needs redoing.**
-  - **THE CONCLUSIONS ARE WRITTEN ON THE BRANCH, beside the code they govern**, at Tom's
-    instruction, 2026-08-26: `dev/fireflow-analysis-plan.md` on `fire-flow`
-    (`58795278`). It carries all of the above at length plus what is still undecided. **This block
-    is the short form; that file is the long one.** If they ever disagree, the transcript and the
-    planning engineer's journal are the record, not either summary.
-    - **The branch is an ANCESTOR of master, which makes `git diff master...fire-flow` empty and
-      misleading.** The fire-flow files were removed from master by `4ae6cf89` after the branch
-      point, so the branch holds them by being older, not by diverging. Compare with
-      `git diff fire-flow master` or list with `git ls-tree -r --name-only fire-flow`.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
@@ -1151,39 +862,6 @@ the block.
     paying for phone-shaped compromises on `lpn_` specifically, which is a real design freedom rather
     than a disappointment; "a third of them" makes several open tasks much more urgent.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
-
-- 100|566| **Close the EPANET gap: six sections are carried but not understood.**
-  **Tom, 2026-09-01:** *"Full EPANET interface including all of quality needs to be our priority."*
-  Water age and source tracing shipped that day; **the chemical / reaction mode shipped 2026-09-03**,
-  with `[REACTIONS]` and `[QUALITY]` interpreted, two per-pipe coefficients and a per-node initial
-  quality through `setProp()`, and the ask-or-disclose coefficient design. Record and what is left:
-  `dev/water-quality.md`. **This is the rest, and the list is exact rather than impressionistic** —
-  read it off `INP_SECTIONS_READ` in `js/lpn-inp.js`, which is the one place the line is drawn.
-  - **6 are CARRIED VERBATIM AND NOT UNDERSTOOD.** Nothing is lost — they round-trip byte-identically
-    and the import report names them — but the page cannot act on any of them:
-    - **`[SOURCES]` and `[MIXING]` — the rest of chlorine.** A booster dose (a concentration, a mass
-      rate or a flow-paced source at a node, optionally on a pattern) and a tank mixing model. The
-      chemical mode runs without them: a reservoir's initial quality is held for the whole run by
-      EPANET, which is enough to state a plant residual. **The anchor is ANALYTIC and stays labelled
-      as such** — no EPA chlorine report for Net1 exists in this repo and none was found, so
-      `dev/lpn-spike/reaction-anchor-harness.js` checks `C = C0 exp(Kb V / Q)` in one pipe (0.0007%
-      at two flows, with the flow/decay coupling asserted). If an EPA report turns up, prefer it.
-    - **`[ENERGY]`** — pump energy and cost. Net3 states global efficiency, price and demand charge.
-      A real deliverable for a utility, and the one section here whose ANSWER is money.
-    - **`[TAGS]`** — a free-text tag per element. Cheap, and it is the natural home for the
-      customer/account work of Task 247.
-    - **`[REPORT]`** — formatting for a `.rpt` this page never requests. **Probably correct to leave
-      carried for ever**; say so deliberately rather than leaving it on a list.
-    - **`[RULES]`** — carried since 2026-08-28 and parked ON PURPOSE, Task 248.03. The language
-      cannot be skipped (a rule's numbers are in the units of the file, so no factor patches it) and
-      Tom's evidence bar stands: it waits for a user who has one.
-  - **Also unbuilt, smaller:** the two per-pipe reaction coefficients have a popup row but no Tables
-    column and no Find-and-replace field, and the per-tank coefficient round-trips with no control;
-    link quality has no UI (the bridge captures node quality only — an
-    average age in a pipe is real, but a half-symmetric result dimension reads worse than an absent
-    one); and the colour legend shows no unit for a source share, a percentage having no unit id.
-  - **NOT a gap, recorded so it is not re-proposed:** PRV/PSV/FCV solve through EPANET only, by
-    design and by measurement; the native solver refuses such a network by name.
 
 - 75|570| **The EPANET report gets a box of its own: draggable, sizeable, and one of the family.**
   Tom, 2026-09-02, having just spent a session on the window model: *"EPANET report: How about we

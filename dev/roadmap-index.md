@@ -7,23 +7,21 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**66 open tasks.** Next (100): 11 · Soon (75): 11 · Someday (50): 14 · Maybe (25): 13 · Parked (5): 17
+**66 open tasks.** Next (100): 9 · Soon (75): 13 · Someday (50): 14 · Maybe (25): 13 · Parked (5): 17
 
-## 100 — Next (11)
+## 100 — Next (9)
 
 - Task 248.03 — Rule-based controls: the text is CARRIED now; the language is still parked.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - Task 508 — Tom's screenshot drop: dozens of captures, indexed and reused.
 - ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
-- Task 530 — Fire flow: Tom's rulings are recorded; what is left is BUILDING them.
 - ! Task 545 — The list is a file, the marks are data, and both survived a reading.
 - Task 553 — Demands and Hydraulics options: BUILT, and every option now has a control.
-- Task 566 — Close the EPANET gap: six sections are carried but not understood.
 - Task 576 — Drag the divider between the settings panes.
 - ! Task 577 — The Pump energy box: name it or move it, with the other reports.
 
-## 75 — Soon (11)
+## 75 — Soon (13)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -36,6 +34,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 568 — Standard hydraulic symbols: Tom's research, recorded, not yet a decision.
 - ! Task 570 — The EPANET report gets a box of its own: draggable, sizeable, and one of the family.
+- Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
+- Task 579 — The four EPANET sections still carried and not understood, extracted from 566.
 
 ## 50 — Someday (14)
 
