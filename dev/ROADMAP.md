@@ -107,6 +107,26 @@ the block.
   - **Separate and undecided: the default map colour.** The map draws linework black; the sketch
     paints it suite blue. That governs every project with colouring OFF, which is most of them.
 
+- 100|576| **Drag the divider between the settings panes.**
+  Tom, 2026-09-04: *"It might be nice... to let the user drag the divider between the settings
+  panes."* The Settings box is a two-pane window -- an index on the left, the sections on the
+  right -- and the split is fixed. A long section name in a language with longer words, or a reader
+  who wants more of the index visible, has no way to change it.
+  - **The seams already exist and this is why it is cheap:** `makePanelDraggable()` and
+    `addPanelResizeGrip()` already carry a drag and a corner for every box, and the same pointer
+    rules apply. What is new is a divider that resizes two siblings rather than one panel.
+  - **A stored width is a per-visitor preference and therefore a STORAGE question**, which is Tom's
+    to rule before anything writes one: CLAUDE.md's exemption test asks whether it is strictly
+    necessary for a service the visitor requested. Building it WITHOUT persistence needs no ruling
+    and is most of the value; ask before adding the memory.
+
+- 100|577| **The Pump energy box: name it or move it, with the other reports.**
+  Tom, 2026-09-04, having found it: *"Would it work to either call Pump Energy 'Pump Energy Report'
+  (and it's near EPANET run report) or move it to our 'Tables' area? What do you find might be
+  best?"* Two candidate homes and a naming question, and the answer wants the two seats' vantage
+  rather than a preference: a report a utility hands to somebody else is a different object from a
+  table you read while drawing.
+
 - 100|545| **The list is a file, the marks are data, and both survived a reading.**
   *(The `[H]` came off 2026-09-01. Tom read the list and marked it; his marks were committed
   VERBATIM before anything touched them (`9a15e248`), then transferred — replacements into
@@ -1164,74 +1184,6 @@ the block.
     one); and the colour legend shows no unit for a source share, a percentage having no unit id.
   - **NOT a gap, recorded so it is not re-proposed:** PRV/PSV/FCV solve through EPANET only, by
     design and by measurement; the native solver refuses such a network by name.
-
-- 100|572| **[H] The browser confirmations owed from the 2026-09-01/02 sessions.**
-  Everything below is BUILT, green and harness-guarded; what is missing is a person looking at it.
-  Listed because two sessions' worth of "please check this in a browser" is otherwise carried only in
-  chat, and the next session cannot know what has been seen. **Tom has confirmed the window model
-  itself** (*"I am in windows heaven now... Libraries, Settings, Fire flow, Find, oh, my!"*) and the
-  fire flow language (*"I like it!"*); these are the rest.
-  - **Fire flow, after Task 530's 2026-09-02 batch:** a `Fire, Design` row (the case the old verdict
-    could not report); a run with the residual set high enough that junctions fail at rest, which
-    should show `Static failed, so not checked` in three columns while Drawdowns still reports; the
-    run dialog's live tally matching the finished table; a node ID prefix set in Settings > Labels
-    showing up in the table.
-  - **Convergence (closed Task 565):** Settings > Maximum trials 1 **and** If unbalanced → Stop, then
-    solve. The status bar must lead with the warning, the numbers must still be drawn, and the
-    iteration count, relative error and accuracy must be printed. **Trials alone is not enough** and
-    that is not a defect: `Unbalanced Continue 10` grants ten further trials, measured.
-  - **Touch, after closed Task 562 and its 2026-09-02 correction:** node reach is now a NODE
-    privilege — a tap 8–20 px off a junction opens the junction; a pipe, a Text and a label get no
-    padding at all. And a node now outranks a label, which reversed a same-day decision; the residual
-    risk named at `nodeOutranks()` is a SHORT label on a far-zoomed-out drawing falling wholly inside
-    the reach and becoming ungrabbable until you zoom in. Nobody has seen it.
-  - **Vertices, after Task 567's 2026-09-02 batch — the biggest thing here, and the one that needs
-    a PHONE.** (a) Draw a pipe through two clicks in open space and confirm the dashed line follows
-    the bends and the rubber band starts at the newest one; press Escape mid-drawing and confirm
-    nothing is left behind. (b) Turn on the Vertices tool: every pipe's bends should become hollow
-    grips, one press on a pipe should add one, one press on a grip should remove it, and a finger
-    drag 20 px off a grip should move it — that last is the measured symptom, *"not on phone
-    anywhere."* (c) In Select mode, double-click a pipe and confirm it does NOT bend any more; that
-    is a deliberate removal and the one change here somebody may miss. (d) The specific case that
-    failed before: add a bend where an ALIGNED LABEL lies over the pipe.
-  - **Tips (closed Task 571):** open a "?" inside Settings, Find and Fire flow — the tip must sit
-    OVER the box; then close the box and confirm nothing lingers.
-
-- 100|567| **[H] Vertices are a mode now; what is left is Tom looking at it.**
-  Tom, 2026-09-01, on a phone: *"Vertices are a problem... hard to add or remove by double-clicking,
-  and the link selection highlighting confuses the procedure."* Two measured symptoms: adding one
-  failed repeatably with an aligned label in the way, and dragging one was *"fine on PC... but not
-  on phone anywhere."* **Both strands are built, green and harness-guarded** — the remaining work is
-  his pass, listed in Task 572.
-  - **[DONE 2026-09-02] ARBITRARY POINTS WHILE DRAWING**, the half he promoted from a side note to
-    the essential part (*"like all the software we should allow vertices (clicks in open space) on
-    Add pipe. This is essential"*). A click in open space between the two node clicks is a BEND, not
-    the abandonment it used to be, so a mis-aimed second click no longer costs the first. The points
-    are view state until the second node arrives, so an abandoned drawing writes nothing and owes no
-    undo press; Escape is the way out, and every exit goes through `setPendingLinkFrom()` so the
-    next pipe cannot inherit the last one's bends. `dev/lpn-spike/draw-vertex-harness.js`.
-  - **[DONE 2026-09-02] THE MODE, AND IT IS THE DOOR.** A `vertices` mode on the toolbar and the
-    Edit menu, both toggling. Inside it a SINGLE press adds, removes and drags a bend — no
-    double-click, which is the gesture that could not be landed on a phone at all — a grip is found
-    by the same screen reach every other object uses (so a finger gets the finger's 24 px), a grip
-    outranks the pipe it sits on, and a press on a node PANS rather than moving the pipework. The
-    grips are one CSS class on the canvas, so entering the mode creates nothing.
-    `dev/lpn-spike/vertex-mode-harness.js`.
-  - **AND THE DOUBLE-CLICK NO LONGER BENDS A PIPE IN `select`.** That was the accidental edit path
-    closed Task 567's first strand had only made RECOVERABLE. It is now unreachable in the mode a
-    person is in while reading: the three label-home resets in the same handler are untouched, and
-    the gesture still works inside the vertices mode. `lpn_mode_select` stopped promising it.
-  - **THE FIELD TOOLS ALL CONVERGED ON A DOOR RATHER THAN A GESTURE**, which is what settled the
-    shape: Esri Field Maps edits vertices only after the user explicitly starts editing, and its
-    `ReticleVertexTool` fixes a crosshair at screen centre and pans the map under it; Vespucci needs
-    a deliberate long-press "New" mode. **The reticle is the better long-term answer than bigger
-    handles** and is not built. Sources: `dev/agents/utility-field-operator/journal.md`, 2026-09-01.
-  - **Three new English strings await Tom's wording** — `lpn_tool_vertices`, `_tip`, and
-    `lpn_mode_vertices` — and `lpn_mode_select`, `_add_pipe`, `_add_pump` and `_add_valve` were
-    edited. All are in `dev/new-english-keys.md` / the drift list.
-  - **The touch-reach exception survives** (closed Task 562): a node outranks a link and a label but
-    still yields to `.lpn-vhandle`. It costs nothing now — outside the mode a grip is only DRAGGED,
-    never bent, so grazing one is recoverable by the same drag.
 
 - 75|570| **The EPANET report gets a box of its own: draggable, sizeable, and one of the family.**
   Tom, 2026-09-02, having just spent a session on the window model: *"EPANET report: How about we

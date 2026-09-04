@@ -20,8 +20,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 545 — The list is a file, the marks are data, and both survived a reading.
 - Task 553 — Demands and Hydraulics options: BUILT, and every option now has a control.
 - Task 566 — Close the EPANET gap: six sections are carried but not understood.
-- ! Task 567 — [H] · Vertices are a mode now; what is left is Tom looking at it.
-- Task 572 — [H] · The browser confirmations owed from the 2026-09-01/02 sessions.
+- Task 576 — Drag the divider between the settings panes.
+- ! Task 577 — The Pump energy box: name it or move it, with the other reports.
 
 ## 75 — Soon (11)
 
