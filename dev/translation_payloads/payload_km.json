@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 1600,
-        "delta_key_count": 65,
+        "expected_key_count": 1601,
+        "delta_key_count": 66,
         "exempt_key_count": 26,
         "exempt_keys": [
             "u_imgd",
@@ -515,6 +515,7 @@
         "lpn_wrong_thanks": "Thank you. We got that.",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
+        "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
         "lpn_time_run_report_copy": "Copy",
@@ -582,6 +583,7 @@
         "lpn_wrong_thanks": "Thank you. We got that.",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
+        "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
         "lpn_time_run_report_copy": "Copy",
@@ -721,6 +723,22 @@
                     "key": "lpn_find_q_aside",
                     "value": "ប្រដាប់ត្រួតត្រាមិនអាចបង្ហាញសំណួរខាងក្រោមបានទេ ដូច្នេះពួកវាត្រូវបានលាក់។",
                     "english": "The controls cannot express the query below, so they are hidden."
+                }
+            }
+        },
+        "lpn_inp_drop_sources_mixing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_quality",
+                    "value": "ឯកសារនេះពិពណ៌នាពីរបៀបដែលគុណភាពទឹកផ្លាស់ប្ដូរនៅពេលវាធ្វើដំណើរ៖ អ្វីមាននៅក្នុងទឹកតាំងពីដើម កន្លែងណាដែលសារធាតុនោះចូលបន្ថែម វារំសាយបែបណា និងធុងទឹកលាយបែបណា។ ទំព័រនេះគណនាអាយុទឹក និងការតាមដានប្រភព ប៉ុន្តែមិនគណនាគីមីវិទ្យាទេ ដូច្នេះគ្មានអ្វីនោះត្រូវបានប្រើនៅទីនេះទេ។ បន្ទាត់ទាំងនោះត្រូវបានរក្សាទុក ហើយត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។",
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose the chemical analysis under Settings, Calculation, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_energy",
+                    "value": "ឯកសារ EPANET នេះមានទិន្នន័យគំរូចំណាយថាមពលបូម។ ទំព័រនេះមិនគណនាថាមពល ឬចំណាយទេ ដូច្នេះគ្មានអ្វីនៅទីនេះប្រើលេខទាំងនោះទេ។ ពួកវាត្រូវបានរក្សាទុក ហើយត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។",
+                    "english": "This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Pump energy under Calculate to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file."
                 }
             }
         },

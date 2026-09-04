@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 1600,
-        "delta_key_count": 63,
+        "expected_key_count": 1601,
+        "delta_key_count": 64,
         "exempt_key_count": 24,
         "exempt_keys": [
             "u_imgd",
@@ -511,6 +511,7 @@
         "lpn_wrong_btn": "Something wrong here?",
         "lpn_wrong_tip": "One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
         "lpn_wrong_thanks": "Thank you. We got that.",
+        "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
         "lpn_time_run_report_copy": "Copy",
@@ -576,6 +577,7 @@
         "lpn_wrong_btn": "Something wrong here?",
         "lpn_wrong_tip": "One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
         "lpn_wrong_thanks": "Thank you. We got that.",
+        "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
         "lpn_time_run_report_copy": "Copy",
@@ -683,6 +685,22 @@
                     "key": "lpn_status_example_opened",
                     "value": "{name} ተከፍቷል። የእርስዎ ቅጂ ነው፦ በፋይል፣ እንደ አስቀምጥ ያስቀምጡት።",
                     "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_inp_drop_sources_mixing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_quality",
+                    "value": "ይህ ፋይል ውሃው ሲጓዝ ጥራቱ እንዴት እንደሚለወጥ ይገልጻል፦ በውሃው ውስጥ መጀመሪያ ላይ ያለው ምንድን ነው፣ ተጨማሪ ከየት ይገባል፣ እንዴት ይገባባል፣ ታንኮቹም እንዴት ይቀላቀላሉ። ይህ ገጽ የውሃ እድሜንና የምንጭ ፍለጋን ያሰላል፣ ኬሚካልን ግን አይደለም፣ ስለዚህ ከዚያ ውስጥ ምንም እዚህ ጥቅም ላይ አይውልም። እነዚያ መስመሮች ይያዛሉ፣ የEPANET ፋይል ካስቀመጡም ይመለሳሉ።",
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose the chemical analysis under Settings, Calculation, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_energy",
+                    "value": "ይህ የEPANET ፋይል የፓምፕ ወጪ ስሌት መረጃ ይይዛል። ይህ ገጽ ኃይል ወይም ወጪ ስለማያሰላ፣ እነዚያ ቁጥሮች እዚህ ጥቅም ላይ አይውሉም። ይያዛሉ፣ የEPANET ፋይል ካስቀመጡም ይመለሳሉ።",
+                    "english": "This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Pump energy under Calculate to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file."
                 }
             }
         },
