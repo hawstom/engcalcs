@@ -1124,6 +1124,7 @@ EngCalcs.pageConfig = {
 	lpn_find_none: <?=json_encode($ec_lang['lpn_find_none'])?>,
 	lpn_find_no_value: <?=json_encode($ec_lang['lpn_find_no_value'])?>,
 	lpn_find_prop_connection: <?=json_encode($ec_lang['lpn_find_prop_connection'])?>,
+	lpn_find_prop_demand_description: <?=json_encode($ec_lang['lpn_find_prop_demand_description'])?>,
 	lpn_find_op_conn_unlinked: <?=json_encode($ec_lang['lpn_find_op_conn_unlinked'])?>,
 	lpn_find_op_conn_noopen: <?=json_encode($ec_lang['lpn_find_op_conn_noopen'])?>,
 	lpn_find_op_conn_nolinksource: <?=json_encode($ec_lang['lpn_find_op_conn_nolinksource'])?>,

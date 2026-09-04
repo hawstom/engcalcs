@@ -1819,6 +1819,23 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	border-right: 1px solid #ddd; padding-right: 6px; font-size: .9em;
 }
 .lpn-setbox-content { flex: 1 1 auto; min-width: 0; overflow: auto; font-size: .9em; }
+/* **THE LAST SECTION MUST BE ABLE TO REACH THE TOP** (Tom, 2026-09-04: *"We are being bit by the
+   bottom of the page when we select the Water Quality bookmark. I believe that the standard answer
+   for this is to put a page worth of blank space at the end of the settings."* -- and it is). An
+   index row scrolls its heading to the top of this scrollport, which the last heading simply cannot
+   do: there is nothing under it to scroll past, so it stops wherever the content ends and the
+   reader is left looking at a heading in the middle of the pane, wondering whether the click
+   worked. The room is added AFTER the content rather than as padding on it, so nothing inside the
+   box moves and no section gains a gap of its own; and it is `min-height` on an empty
+   pseudo-element, so it costs nothing to a box that is already taller than its content.
+
+   One viewport of the scrollport itself, not a fixed number of pixels: the box is resizable and on
+   a phone it fills the screen, so any constant would be too much on one and too little on the
+   other. `100%` of a flex scrollport resolves against its own height, which is exactly the measure
+   wanted -- scroll the last heading to the top and the blank space is what sits below it. */
+.lpn-setbox-content::after {
+	content: ""; display: block; min-height: 100%;
+}
 /* An index row is flat text, like a menu row: it is a destination, not a command. The SUB rows are
    indented under their section, which is what makes the two levels readable at a glance. */
 /* **AND IT WRAPS, WHICH A <button> DOES NOT DO BY ITSELF.** Measured at the 6rem pane: "Node

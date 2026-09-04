@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1601,
-        "delta_key_count": 64,
+        "expected_key_count": 1602,
+        "delta_key_count": 65,
         "exempt_key_count": 27,
         "exempt_keys": [
             "u_imgd",
@@ -514,6 +514,7 @@
         "lpn_wrong_btn": "Something wrong here?",
         "lpn_wrong_tip": "One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
         "lpn_wrong_thanks": "Thank you. We got that.",
+        "lpn_find_prop_demand_description": "Demand description",
         "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
@@ -580,6 +581,7 @@
         "lpn_wrong_btn": "Something wrong here?",
         "lpn_wrong_tip": "One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
         "lpn_wrong_thanks": "Thank you. We got that.",
+        "lpn_find_prop_demand_description": "Demand description",
         "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
@@ -688,6 +690,22 @@
                     "key": "lpn_status_example_opened",
                     "value": "{name} ကို ဖွင့်ပြီးပါပြီ။ ၎င်းသည် သင့်ကိုယ်ပိုင်မိတ္တူဖြစ်သည် - ဖိုင် > အမည်ပေးသိမ်းရန် ဖြင့် သိမ်းဆည်းပါ။",
                     "english": "Opened {name}. It is your copy: save it with File, Save as."
+                }
+            }
+        },
+        "lpn_find_prop_demand_description": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_prop_connection",
+                    "value": "ဆက်စပ်မှု",
+                    "english": "Connectivity"
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_conn_unlinked",
+                    "value": "နေရာတွင် ဆက်သွယ်မှု မရှိ",
+                    "english": "no links at node"
                 }
             }
         },

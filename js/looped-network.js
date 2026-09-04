@@ -8247,18 +8247,38 @@ var EngCalcs = EngCalcs || {};
 			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier', 'Size multiplier']);
 			return out;
 		}
-		// **CONNECTION IS OFFERED UNDER "Everything" TOO, and it is the one property that earns the
-		// exception above.** The rule there is honesty -- do not list a property that silently
-		// matches nothing -- and this one matches every NODE and says so in every row it returns.
-		// It is also inherently a question about the network rather than about a class of element,
-		// so restricting it to the node scopes would mean running the same report three times.
-		if (d.key === 'all' || d.group === 'node') {
-			out.push(['connection', pc.lpn_find_prop_connection || 'Connection', 'Connection']);
+		// **THE ORDER IS THE READING ORDER, AND IT IS A RULE RATHER THAN AN ACCUMULATION** (Tom,
+		// 2026-09-04, having asked twice: *"First are the asset properties and second are the
+		// results. Within those groups, the most fundamental properties come first and the lesser
+		// used or more advanced properties come last."*). Every specialised property used to be
+		// PUSHED FIRST, simply because each was added at the top of this function as it was built,
+		// so a reader opening Find met two reaction coefficients before they met Diameter. The
+		// ordinary field list carries the inputs-then-results order already; the specialised ones
+		// are appended after it, most-used first, and a new one goes at the END of that tail rather
+		// than at the top of this function.
+		if (d.key !== 'all') {
+			defs = d.group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc);
+			allowed = d.group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS;
+			defs.forEach(function (f) {
+				// **PLUS THE INPUTS A COLOUR RAMP HAS NO USE FOR.** COLOR_LINK_FIELDS is EPANET's View
+				// menu, which has no length in it because nobody colours a network by length -- but
+				// "which pipes are longer than 500 ft" is one of the most natural searches there is,
+				// and the number is right there on the pipe. Searching and colouring are different
+				// questions and this is where they part.
+				if (allowed[f[0]] !== undefined || FIND_EXTRA_LINK_FIELDS[f[0]]) { out.push([f[0], f[1], f[0]]); }
+			});
 		}
-		// **DEMAND CATEGORY, ON JUNCTIONS ONLY** (Tom, 2026-08-26: *"is it feasible to search for
+		// **DEMAND DESCRIPTION, ON JUNCTIONS ONLY** (Tom, 2026-08-26: *"is it feasible to search for
 		// categories or nodes with something about categories?"*). It is offered where it can
-		// match: a reservoir and a tank have no demand at all, and the rule a few lines up is that
-		// a property which silently matches nothing does not go in the menu.
+		// match: a reservoir and a tank have no demand at all, and the standing rule is that a
+		// property which silently matches nothing does not go in the menu.
+		//
+		// **IT IS NAMED "Demand description" HERE AND "Description" IN THE POPUP, ON PURPOSE.**
+		// Inside the popup it sits in the demand table and the column it belongs to is obvious; in
+		// this list it stood alone as "Description" beside Elevation and Pressure, and Tom read it
+		// as a field this page does not have: *"Description is in the Find selector for Junction.
+		// But we don't have a Description field."* Same property, two contexts, and only one of
+		// them supplies the noun.
 		//
 		// **A JUNCTION HAS SEVERAL OF THEM, WHICH NO OTHER SEARCHABLE PROPERTY DOES.** That is why
 		// findCategoriesOf() exists and why findMatches() has a branch for it: `contains` and
@@ -8266,35 +8286,30 @@ var EngCalcs = EngCalcs || {};
 		// into one joined string instead would make `equal to` false for every junction that has
 		// more than one category, which is exactly the junction somebody is searching for.
 		if (d.group === 'node' && (!d.type || d.type === 'junction')) {
-			out.push(['demandCategory', pc.lpn_field_demand_category || 'Description', 'Description']);
+			out.push(['demandCategory', pc.lpn_find_prop_demand_description || 'Demand description',
+				'Demand description']);
 			// **JUNCTIONS ONLY, and only because a junction is the only node that can hold one**
-			// (Task 530) -- the same honesty rule as the row above: a property that silently matches
-			// nothing does not go in the menu. "Which junctions did I give 3,000 gpm" has no other
-			// answer on this page, and it is the query that makes a bulk Replace of it reachable.
+			// (Task 530) -- the same honesty rule as the row above. "Which junctions did I give
+			// 3,000 gpm" has no other answer on this page, and it is the query that makes a bulk
+			// Replace of it reachable.
 			out.push(['fireFlow', pc.lpn_ff_required || 'Required fire flow', 'Required fire flow']);
 		}
-		// **THE PIPE'S TWO REACTION COEFFICIENTS, ON PIPES AND ONLY WHILE ONE IS LIVE** (Task 566).
-		// Two rules meet here and both are already written above: a property that matches nothing
-		// stays out of the menu, and a coefficient is a control only while a chemical is tracked.
-		// The second matters more than it looks -- offering a Replace for a property no popup and
-		// no column will show is a value somebody can write and then never see again.
-		// "Which mains did I leave at the default wall coefficient" has no other answer here, and
-		// it is the query that makes a bulk Replace of them reachable.
+		// **THE PIPE'S TWO REACTION COEFFICIENTS, LAST, ON PIPES AND ONLY WHILE ONE IS LIVE**
+		// (Task 566). Two rules meet here and both are written above: a property that matches
+		// nothing stays out of the menu, and a coefficient is a control only while a chemical is
+		// tracked. They are the most advanced thing in this list, so they end it.
 		if (d.group === 'link' && (!d.type || d.type === 'pipe') && reactionFieldsShown()) {
 			out.push(['bulkCoeff', pc.lpn_reaction_bulk || 'Bulk reaction coefficient', 'Bulk reaction coefficient']);
 			out.push(['wallCoeff', pc.lpn_reaction_wall || 'Wall reaction coefficient', 'Wall reaction coefficient']);
 		}
-		if (d.key === 'all') { return out; }
-		defs = d.group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc);
-		allowed = d.group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS;
-		defs.forEach(function (f) {
-			// **PLUS THE INPUTS A COLOUR RAMP HAS NO USE FOR.** COLOR_LINK_FIELDS is EPANET's View
-			// menu, which has no length in it because nobody colours a network by length -- but
-			// "which pipes are longer than 500 ft" is one of the most natural searches there is,
-			// and the number is right there on the pipe. Searching and colouring are different
-			// questions and this is where they part.
-			if (allowed[f[0]] !== undefined || FIND_EXTRA_LINK_FIELDS[f[0]]) { out.push([f[0], f[1], f[0]]); }
-		});
+		// **CONNECTION IS OFFERED UNDER "Everything" TOO, and it is the one property that earns the
+		// exception to the matches-nothing rule.** It matches every NODE and says so in every row it
+		// returns. It is also inherently a question about the network rather than about a class of
+		// element, so restricting it to the node scopes would mean running the same report three
+		// times. Last, because it asks about the drawing rather than about the element in hand.
+		if (d.key === 'all' || d.group === 'node') {
+			out.push(['connection', pc.lpn_find_prop_connection || 'Connection', 'Connection']);
+		}
 		return out;
 	}
 	// Searchable, but not colourable -- see findPropDefs(). Read straight off the element through

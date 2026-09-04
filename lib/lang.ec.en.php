@@ -1629,6 +1629,7 @@ $ec_lang['lpn_find_no_value']='Type what to look for.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Connectivity';
+$ec_lang['lpn_find_prop_demand_description']='Demand description';
 // **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
 // points, sources and this node. And I see either no connection (missing link) or no open
 // connection."* Two points x two kinds of break, plus his original local question, is this menu.

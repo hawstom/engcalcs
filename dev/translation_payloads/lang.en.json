@@ -825,6 +825,7 @@
         "lpn_find_op_bottom": "{n} lowest",
         "lpn_find_no_value": "Type what to look for.",
         "lpn_find_prop_connection": "Connectivity",
+        "lpn_find_prop_demand_description": "Demand description",
         "lpn_find_op_conn_unlinked": "no links at node",
         "lpn_find_op_conn_noopen": "no open links at node",
         "lpn_find_op_conn_nolinksource": "no link path to a source",
@@ -1603,7 +1604,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1601,
+    "count": 1602,
     "active_prefixes": [
         "about",
         "bpn",
