@@ -103,11 +103,13 @@ anything else → false.
 
 ### Specialist agents (`.claude/agents/`, journals in `dev/agents/`)
 
-Persistent agents with a library, a journal and a research programme. First hire 2026-08-24:
-`utility-planning-engineer` — the design-and-planning engineer inside a water utility, the one seat
-nobody here has worked (Tom: *"Scale is my big and first blind spot... I have designed many Elm
-Street Center projects, but no Novatos."*). **An agent must carry something this repo does not
-already have** — external evidence, or a vantage point nobody occupies; an agent briefed from our
+Persistent agents with a library, a journal and a research programme. **Four seats are filled:**
+`utility-planning-engineer` (2026-08-24, the design-and-planning engineer inside a water utility --
+Tom: *"Scale is my big and first blind spot... I have designed many Elm Street Center projects, but
+no Novatos."*), `utility-field-operator` (2026-08-25, the map read on a phone in the street),
+`market-researcher` and `data-entry-clerk` (both 2026-09-04 -- the world outside this repository,
+and entry at volume by keyboard). **An agent must carry something this repo does not
+already have** -- external evidence, or a vantage point nobody occupies; an agent briefed from our
 own prose is an echo chamber in a second voice. Roster, the provenance rules, and the seats named
 but not filled: `dev/agents/README.md`. **Each agent keeps its own ranked wish list** — its
 priorities, in its order, expected to disagree with `dev/ROADMAP.md` and to say why. An agent
