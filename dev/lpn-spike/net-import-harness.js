@@ -572,5 +572,52 @@ console.log('\n--- a reservoir takes its pattern from its own slot ---');
 	}
 }
 
+// ---- INITIAL QUALITY, FROM THE SLOT EACH NODE KIND KEEPS IT IN -------------------------------
+//
+// **NOTHING WROTE `[QUALITY]` AT ALL**, so a `.net` arrived with no starting concentrations and a
+// chemical run began from zero everywhere (Tom, 2026-09-04: *"Initial quality for the reservoir did
+// not come in. It's 1.0 in EPANET, but nothing in lpn Net1.net."*). The same silent loss `[TIMES]`
+// had, and the same fix: read it from the slot, and check the slot against EPANET.
+//
+// **THREE KINDS, THREE DIFFERENT INDICES**, which is the whole reason this was worth measuring
+// rather than assuming: a junction keeps it at 7, a reservoir at 4 (its array has no demand), and
+// a tank at 12 (its six geometry values and its mixing model come first). Slot 9 on a tank returns
+// the string `Mixed`, which is what a plausible guess would have written into a concentration
+// column. The expectation is EPANET's own `.inp` for the same `.net`, compared as VALUES so column
+// padding cannot make a difference look like agreement.
+console.log('\n--- initial quality comes across, for all three node kinds ---');
+{
+	const dir = path.join(ROOT, 'dev', 'net-import-study', 'All-three');
+	const rowsOf = (text) => ((text.match(/\[QUALITY\][^[]*/) || [''])[0].split('\n')
+		.filter((l) => l.trim() && !/^;|^\[/.test(l))
+		.map((l) => { const t = l.trim().split(/\s+/); return t[0] + ' ' + parseFloat(t[1]); })
+		.sort());
+	['Net1', 'Net2', 'Net3-PDA'].forEach((name) => {
+		const netFile = path.join(dir, '1-EPANET-INP-to-NET', name + '.net');
+		const epanetFile = path.join(dir, '2-EPANET-NET-back-to-INP', name + '.inp');
+		if (!fs.existsSync(netFile) || !fs.existsSync(epanetFile)) {
+			console.log('  skip  ' + name + ' is not in the corpus');
+			return;
+		}
+		const conv = EngCalcs.lpnNetToInp(new Uint8Array(fs.readFileSync(netFile)), name);
+		if (!conv.ok) { ok(name + ' converts', false, conv.error); return; }
+		const mine = rowsOf(conv.inp);
+		const theirs = rowsOf(fs.readFileSync(epanetFile, 'utf8'));
+		ok(name + ': every initial quality matches EPANET, value for value',
+			JSON.stringify(mine) === JSON.stringify(theirs),
+			mine.length + ' rows against ' + theirs.length);
+	});
+	// Net1 is the one that carries all three kinds at once, so it is named explicitly: junction 10
+	// at 0.5, reservoir 9 at 1.0, tank 2 at 1.0. A wrong tank slot writes `Mixed` here.
+	const n1 = path.join(dir, '1-EPANET-INP-to-NET', 'Net1.net');
+	if (fs.existsSync(n1)) {
+		const rows = rowsOf(EngCalcs.lpnNetToInp(new Uint8Array(fs.readFileSync(n1)), 'Net1').inp);
+		ok('the tank\'s own concentration is a number, not its mixing model',
+			rows.indexOf('2 1') >= 0, JSON.stringify(rows.filter((r) => /^2 /.test(r))));
+		ok('the reservoir\'s is there too', rows.indexOf('9 1') >= 0,
+			JSON.stringify(rows.filter((r) => /^9 /.test(r))));
+	}
+}
+
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);

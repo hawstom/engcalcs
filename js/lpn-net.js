@@ -56,7 +56,11 @@
 		// with the pattern column empty, and the engine then refused the whole file --
 		// `Error 205: undefined time pattern 1.0 in [RESERVOIRS] section`. Tom found it by reading
 		// the EPANET run report, which is the one place the offending line is named.
-		res_pattern: 3, res_initqual: 4
+		res_pattern: 3, res_initqual: 4,
+		// A TANK's array is shifted again -- its six geometry values occupy 3 to 8 -- so its own
+		// starting concentration sits at 12, past the mixing model at 9. All three positions are
+		// checked against EPANET's own export of the same `.net` in net-import-harness.js.
+		tank_initqual: 12
 	};
 	var LINK_SLOT = {
 		desc: 0, tag: 1,
@@ -463,6 +467,21 @@
 			});
 			L.push('');
 		}
+		// **WHAT EACH NODE STARTS THE RUN HOLDING** -- read from the slot its own KIND keeps it in,
+		// which is a different index for each of the three (Tom, 2026-09-04: *"Initial quality for
+		// the reservoir did not come in. It's 1.0 in EPANET, but nothing in lpn Net1.net."*). Nothing
+		// wrote this section at all, so a `.net` arrived with no starting concentrations and a
+		// chemical run began from zero everywhere -- the same silent loss `[TIMES]` had.
+		var qualityRows = [];
+		net.nodes.forEach(function (n) {
+			var name = n.kind === 'reservoir' ? 'res_initqual'
+				: n.kind === 'tank' ? 'tank_initqual' : 'initqual';
+			var v = slot(n, 'node', name);
+			// Zero is EPANET's own default and it does not write a row for one either.
+			if (v === '' || +v === 0) { return; }
+			qualityRows.push(' ' + pad(n.id, 18) + ' ' + v);
+		});
+		put('QUALITY', qualityRows, 'Node               InitQual');
 		put('CONTROLS', net.controls.map(function (s) { return ' ' + s; }), 'Simple controls');
 		put('RULES', net.rules.map(function (s) { return ' ' + s; }), 'Rule-based controls');
 

@@ -120,7 +120,7 @@ $NODE_SLOT = array(
 	// A RESERVOIR's array is shifted from a junction's: no demand, so the head pattern sits at 3
 	// and the initial quality at 4. Reading it as a junction's wrote Net1's reservoir chlorine as
 	// its head pattern and EPANET refused the file. See the note in js/lpn-net.js.
-	'res_pattern' => 3, 'res_initqual' => 4,
+	'res_pattern' => 3, 'res_initqual' => 4, 'tank_initqual' => 12,
 	'initqual' => 7, 'srcqual' => 8, 'srcpat' => 9, 'srctype' => 10,
 	// Tank-only, and the reason a node array is 27 wide rather than 11.
 	'tank_initlevel' => 3, 'tank_minlevel' => 4, 'tank_maxlevel' => 5, 'tank_diam' => 6,
@@ -406,6 +406,17 @@ function netToInp($net) {
 		}
 		$L[] = '';
 	}
+	// What each node starts the run holding, from the slot its own KIND keeps it in. See the
+	// matching note in js/lpn-net.js; both readers are compared byte for byte on three real models.
+	$qualityRows = array();
+	foreach ($net['nodes'] as $n) {
+		$name = $n['kind'] === 'reservoir' ? 'res_initqual'
+			: ($n['kind'] === 'tank' ? 'tank_initqual' : 'initqual');
+		$v = slot($n, 'node', $name);
+		if ($v === '' || (float)$v === 0.0) { continue; }
+		$qualityRows[] = sprintf(' %-18s %s', $n['id'], $v);
+	}
+	$put('QUALITY', $qualityRows, 'Node               InitQual');
 	$put('CONTROLS', array_map(function ($s) { return ' ' . $s; }, $net['controls']), 'Simple controls');
 	$put('RULES', array_map(function ($s) { return ' ' . $s; }, $net['rules']), 'Rule-based controls');
 
