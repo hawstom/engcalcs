@@ -8,9 +8,9 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-54 features, citing 87 of the 500 closed task IDs. The other 413 are
+58 features, citing 91 of the 500 closed task IDs. The other 409 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
-call a feature — and 135 of them are ledger entries carrying no text at all, whose
+call a feature — and 134 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
 rather than complete:** a feature is on it because somebody wrote a sentence for it.
 
@@ -36,8 +36,11 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - The property box is a window you can drag out of your way, not a panel that owns an edge of the screen. <!-- 344 -->
 - ID prefixes you choose, with Apply to all for when you change your mind. <!-- 345 -->
 - Find elements by any property, jump straight to one by ID, and set a property across everything the search found. <!-- 353, 420, 389 -->
+- Or type the search out yourself, with AND, OR and brackets, when what you are looking for is more than the pull-downs can say, in the words of your own language. <!-- 540 -->
 - The File menu remembers your recent projects, and the map remembers where you were looking. <!-- 352, 360 -->
 - One toggle clears the readouts off the map when you want the drawing and nothing else. <!-- 253 -->
+- The menus follow the work: everything about the water system is under Water, and everything drawn behind and around it is under Map, so a control is found by name rather than hunted for. <!-- 543 -->
+- A picture of your own under the drawing, a site plan or an aerial, scaled by picking two points on it or by typing the size of a pixel. <!-- 276 -->
 - A Help menu specific to this calculator. <!-- 250 -->
 - And although you of course prefer working on your PC, it works also on a phone in tall mode. <!-- 486 -->
 
@@ -86,6 +89,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - A table for each kind of part in the bottom pane — junctions, reservoirs, tanks, pipes, pumps and valves. <!-- 434, 455 -->
 - Colour the map by any value, from one control: three to seven classes, eight ways of choosing where the breaks fall, and 41 colour ramps. <!-- 384, 327 -->
 - Profiles. Click along the map to choose the path, and see ground, hydraulic grade and the pressure between them. <!-- 409, 433, 506 -->
+- A profile path is saved with the project under a name you give it, and a project holds as many of them as you draw. <!-- 510 -->
 
 ## Scenarios
 

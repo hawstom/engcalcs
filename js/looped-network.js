@@ -15616,11 +15616,24 @@ var EngCalcs = EngCalcs || {};
 			// different sentence from a loss. Energy left the water-quality sentence with it: one
 			// message for two unrelated subjects is what made the old one read as a list of
 			// casualties.
+			//
+			// **AND [QUALITY], [REACTIONS] AND [ENERGY] ARE NO LONGER KEPT-BUT-UNUSED EITHER**
+			// (Task 566, 2026-09-04). They are interpreted: an initial concentration, the reaction
+			// coefficients and the pump energy globals are read out of the carried text and drive a
+			// chemical run and the Pump energy report. Saying they are "kept without being used"
+			// went false the day that shipped, which is the THIRD time a sentence here has outlived
+			// the limitation it described (`lpn_inp_drop_rules`, then `lpn_inp_drop_quality`). The
+			// standing rule: when a carried section starts being READ, its sentence is part of the
+			// change, not a follow-up.
+			//
+			// **[SOURCES] AND [MIXING] SPLIT OFF, because they are still carried and unread** and
+			// one sentence covering all four would claim a chemical is modelled for a file whose
+			// only water-quality section is [MIXING]. One name doing two jobs gets split.
 			case 'quality':
-			case 'reactions':
+			case 'reactions': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose the chemical analysis under Settings, Calculation, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'sources':
-			case 'mixing': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels: what is in the water to begin with, where more of it enters, how it reacts, and how the tanks mix. This page solves flow and pressure only, so none of that is worked out here. Those lines are kept, and they are written back if you save an EPANET file.';
-			case 'energy': return pc.lpn_inp_drop_energy || 'This file says what the pumps cost to run. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.';
+			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.';
+			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Pump energy under Calculate to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.';
 			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET\'s own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
@@ -15628,7 +15641,7 @@ var EngCalcs = EngCalcs || {};
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
-			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file says what to follow through the pipes, and two settings that go with a chemical: how fast it spreads, and how close the answer has to be. Water age and source share are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.';
+			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and all three are used: water age, source trace and a chemical are each worked out here, and the two chemical settings are handed to the EPANET engine when you run one. All of them are written back if you save an EPANET file.';
 			// **A DIFFERENCE IN THE ANSWERS, NOT IN WHAT THE FILE HOLDS**, which is why it is not on
 			// the kept-but-unused limb below it. EPANET 2.2's pressure-driven analysis gives a
 			// junction less water when the pressure is low; this page solves demand-driven, so the

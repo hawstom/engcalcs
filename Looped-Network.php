@@ -1793,6 +1793,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_drop_rules: <?=json_encode($ec_lang['lpn_inp_drop_rules'])?>,
 	lpn_inp_drop_eps: <?=json_encode($ec_lang['lpn_inp_drop_eps'])?>,
 	lpn_inp_drop_quality: <?=json_encode($ec_lang['lpn_inp_drop_quality'])?>,
+	lpn_inp_drop_sources_mixing: <?=json_encode($ec_lang['lpn_inp_drop_sources_mixing'])?>,
 	lpn_inp_drop_energy: <?=json_encode($ec_lang['lpn_inp_drop_energy'])?>,
 	lpn_inp_drop_tags: <?=json_encode($ec_lang['lpn_inp_drop_tags'])?>,
 	lpn_inp_drop_report: <?=json_encode($ec_lang['lpn_inp_drop_report'])?>,

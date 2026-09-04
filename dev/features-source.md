@@ -56,8 +56,11 @@ have something to generate; the wording is his call, not ours.
 - 344| The property box is a window you can drag out of your way, not a panel that owns an edge of the screen.
 - 345| ID prefixes you choose, with Apply to all for when you change your mind.
 - 353, 420, 389| Find elements by any property, jump straight to one by ID, and set a property across everything the search found.
+- 540| Or type the search out yourself, with AND, OR and brackets, when what you are looking for is more than the pull-downs can say, in the words of your own language.
 - 352, 360| The File menu remembers your recent projects, and the map remembers where you were looking.
 - 253| One toggle clears the readouts off the map when you want the drawing and nothing else.
+- 543| The menus follow the work: everything about the water system is under Water, and everything drawn behind and around it is under Map, so a control is found by name rather than hunted for.
+- 276| A picture of your own under the drawing, a site plan or an aerial, scaled by picking two points on it or by typing the size of a pixel.
 - 250| A Help menu specific to this calculator.
 - 486| And although you of course prefer working on your PC, it works also on a phone in tall mode.
 
@@ -106,6 +109,7 @@ have something to generate; the wording is his call, not ours.
 - 434, 455| A table for each kind of part in the bottom pane — junctions, reservoirs, tanks, pipes, pumps and valves.
 - 384, 327| Colour the map by any value, from one control: three to seven classes, eight ways of choosing where the breaks fall, and 41 colour ramps.
 - 409, 433, 506| Profiles. Click along the map to choose the path, and see ground, hydraulic grade and the pressure between them.
+- 510| A profile path is saved with the project under a name you give it, and a project holds as many of them as you draw.
 
 ## Scenarios
 
