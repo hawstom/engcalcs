@@ -432,18 +432,36 @@ $ec_icons = array(
 	// collision, and the fix is a different SILHOUETTE rather than a better drop. He referenced
 	// commercial line icons for the SHAPE only; this is an original drawing, as everything here is.
 	//
-	// **THE ROOF IS PEAKED BECAUSE HE DREW IT THAT WAY.** The first tower drawn here had a flat
-	// trapezoid tank, and he sent back four sketches marking that one MINUS -- twice. What carries
-	// a plus in his hand is a pointed roof over a tank on splayed legs, with no cross brace. So the
-	// distinguishing feature is the ROOF, not the bracing, and a redraw that keeps a flat top is
-	// the same icon again however the legs are arranged.
+	// **AN ELLIPTICAL BULB TANK, FROM TOM'S OWN SKETCH** (2026-09-04, his "Aft. 1"): *"Maybe there
+	// is not enough space for double linework. Maybe Aft. 1 (elliptical tank) would be the best
+	// combination of iconic and easy to draw (few lines)."* What shipped before it was a box with a
+	// peaked roof, and at 17 px the roof line and the body's own top line were two strokes doing
+	// one job -- the double linework he names. An ellipse is ONE closed curve that already reads as
+	// a tank, so the icon lost a line and gained a silhouette. His stated fallback was the same
+	// peaked tower with a VERY LOW peak; it was not needed, and it is not kept as a second entry,
+	// because an icon nothing draws is an icon nobody maintains.
 	//
-	// His other plus was the same tower with a TAPERED body, and swapping to it is one line:
-	//     '<path d="M12 2.5L6.5 7.5H17.5Z"/><path d="M7 7.5L9 13H15L17 7.5"/>'
-	//         . '<path d="M9.4 13L7 20.5"/><path d="M14.6 13L17 20.5"/>'
-	// Not left in the array as a second entry, because an icon nothing draws is an icon nobody
-	// maintains. His neutral sketch was a round bulb with a finial; his minus was the flat top.
+	// **THREE THINGS CARRY OVER FROM THE PEAKED VERSION AND MUST SURVIVE ANY REDRAW:**
+	//   - **NO ROOF OVERHANG** (Tom, 2026-09-04): *"it shouldn't have roof overhangs like a
+	//     house"*. A water tower's roof is the top of the tank, not a gable on a building, and the
+	//     overhang was the one detail that made the old drawing read as a house on stilts. An
+	//     ellipse cannot grow one, which is half of why it wins.
+	//   - **A RISER** (same sketch): *"Most water tanks have a pipeline coming from the middle of
+	//     the tank vertically to the ground. Some are nothing but this and a bulbous tank at the
+	//     top."* It is what makes the silhouette a water tower rather than a hut.
+	//   - **A WATERLINE.** The chord at y = 9.5 is the water surface. It is the one detail saying
+	//     the bulb holds water rather than being a balloon, and it is drawn as a straight chord
+	//     because a second curve inside the first smudges into it at 17 px.
 	//
+	// **THE GAP BUDGET, MEASURED ON THIS DRAWING.** The clear-gap rule stated below -- that a gap
+	// under about 2.5 units closes at 17 px -- is what this drawing had to pass. The tightest gaps here are the waterline to the bulb's underside
+	// (9.5 to 13, so 3.5 units) and the riser at x = 12 against the legs where they leave the bulb
+	// at x = 7.5 and 16.5 (4.5 units, widening all the way to the ground). Both clear it -- which
+	// is what let the ellipse afford a chord the boxed tank could not afford a second horizontal.
+	//
+	// The bulb is an ellipse about (12, 8.5) with rx 7.5 and ry 4.5, written as CUBICS and never an
+	// `A` arc for the reason given above, so the control offsets are Kappa*r = 4.14 in x and 2.49
+	// in y. Verify with `php dev/scripts/icon_ascii_preview.php water --size=17`.
 	// **THE FAUCET LOST A DRAWING ATTEMPT, NOT AN ARGUMENT** (corrected 2026-08-25). What stood
 	// here read as a settled measurement: that a faucet needs a handle, a spout and a falling drip,
 	// "three fine features in one glyph", and therefore smudges at 17 px. Tom, asking for the
@@ -464,27 +482,11 @@ $ec_icons = array(
 	// faucet is not one of the things it models. The gap-budget correction above stands on its own
 	// merits and is the rule every icon here is measured against; it is no longer an invitation to
 	// redraw a faucet.
-	// **TWO CORRECTIONS FROM TOM'S OWN SKETCH, 2026-09-04** (his "Aft. 3"):
-	//
-	// **1. NO ROOF OVERHANG.** The roof ran 7.5 to 16.5 over a body of 8.6 to 15.4, so it jutted
-	//    out on both sides -- *"it shouldn't have roof overhangs like a house"*. A water tower's
-	//    roof is the top of the tank, not a gable on a building, and the overhang was the one
-	//    detail making this read as a house on stilts. The roof now springs from the body's own
-	//    top corners.
-	// **2. A RISER.** *"Most water tanks have a pipeline coming from the middle of the tank
-	//    vertically to the ground. Some are nothing but this and a bulbous tank at the top."*
-	//    It is the feature that makes the silhouette unmistakably a water tower rather than a
-	//    hut, and it was simply missing.
-	//
-	// **THE RISER CLEARS THE GAP BUDGET, WHICH IS WHY IT IS SAFE TO ADD.** The rule above is
-	// that a gap under about 2.5 units closes at 17 px. The riser sits at x = 12 and the legs
-	// leave the tank at 9.2 and 14.8, so the tightest gap on the whole icon is 2.8 units, at
-	// the top where the three verticals are closest; everywhere below that the legs splay away
-	// and the gap only widens. Measured, not assumed -- a third vertical between two others is
-	// exactly the shape that budget exists to police.
-	'water'      => '<path d="M12 2.5L8.6 7H15.4Z"/><path d="M8.6 7V13H15.4V7"/>'
+	'water'      => '<path d="M4.5 8.5C4.5 6.01 7.86 4 12 4C16.14 4 19.5 6.01 19.5 8.5'
+		. 'C19.5 10.99 16.14 13 12 13C7.86 13 4.5 10.99 4.5 8.5Z"/>'
+		. '<path d="M4.69 9.5H19.31"/>'
 		. '<path d="M12 13V20.5"/>'
-		. '<path d="M9.2 13L6.5 20.5"/><path d="M14.8 13L17.5 20.5"/>',
+		. '<path d="M7.5 12.1L5 20.5"/><path d="M16.5 12.1L19 20.5"/>',
 
 	// FIRE HYDRANT -- drawn for Water > Fire flow at a hydrant (ROADMAP Task 530).
 	//
