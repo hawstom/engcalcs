@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1564,
-        "delta_key_count": 27,
+        "expected_key_count": 1600,
+        "delta_key_count": 63,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_imgd",
@@ -538,6 +538,42 @@
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day",
         "lpn_reaction_note": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.",
+        "lpn_settings_energy": "Energy",
+        "lpn_energy_title": "Pump energy",
+        "lpn_energy_menu": "Pump energy…",
+        "lpn_energy_menu_tip": "What each pump ran, what it drew and what it cost over the last run.",
+        "lpn_energy_efficiency": "Pump efficiency (percent)",
+        "lpn_energy_efficiency_tip": "The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
+        "lpn_energy_price": "Price of power",
+        "lpn_energy_price_tip": "What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.",
+        "lpn_energy_pump_price_tip": "What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.",
+        "lpn_energy_price_pattern": "Price schedule",
+        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price hour by hour, which is how an off peak tariff is written. Leave it empty for one price all day.",
+        "lpn_energy_demand_charge": "Demand charge",
+        "lpn_energy_demand_charge_tip": "What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.",
+        "lpn_energy_currency": "Currency",
+        "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.",
+        "lpn_energy_kwh": "kWh",
+        "lpn_energy_kw": "kW",
+        "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
+        "lpn_energy_needs_run": "Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy under Calculate.",
+        "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
+        "lpn_energy_over": "Over a run of {time}.",
+        "lpn_energy_col_pump": "Pump",
+        "lpn_energy_col_running": "Running",
+        "lpn_energy_col_effic": "Effic.",
+        "lpn_energy_col_avg_kw": "Avg. kW",
+        "lpn_energy_col_avg_kw_tip": "The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.",
+        "lpn_energy_col_peak_kw": "Peak kW",
+        "lpn_energy_col_kwh": "kWh",
+        "lpn_energy_col_cost": "Cost",
+        "lpn_energy_total_kwh": "Energy used",
+        "lpn_energy_total_energy_cost": "Cost of energy",
+        "lpn_energy_peak_kw": "Highest power drawn at one moment",
+        "lpn_energy_total_demand_charge": "Demand charge",
+        "lpn_energy_total_cost": "Total cost",
+        "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
+        "lpn_energy_curve_note": "These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
@@ -567,6 +603,42 @@
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day",
         "lpn_reaction_note": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.",
+        "lpn_settings_energy": "Energy",
+        "lpn_energy_title": "Pump energy",
+        "lpn_energy_menu": "Pump energy…",
+        "lpn_energy_menu_tip": "What each pump ran, what it drew and what it cost over the last run.",
+        "lpn_energy_efficiency": "Pump efficiency (percent)",
+        "lpn_energy_efficiency_tip": "The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
+        "lpn_energy_price": "Price of power",
+        "lpn_energy_price_tip": "What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.",
+        "lpn_energy_pump_price_tip": "What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.",
+        "lpn_energy_price_pattern": "Price schedule",
+        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price hour by hour, which is how an off peak tariff is written. Leave it empty for one price all day.",
+        "lpn_energy_demand_charge": "Demand charge",
+        "lpn_energy_demand_charge_tip": "What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.",
+        "lpn_energy_currency": "Currency",
+        "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.",
+        "lpn_energy_kwh": "kWh",
+        "lpn_energy_kw": "kW",
+        "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
+        "lpn_energy_needs_run": "Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy under Calculate.",
+        "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
+        "lpn_energy_over": "Over a run of {time}.",
+        "lpn_energy_col_pump": "Pump",
+        "lpn_energy_col_running": "Running",
+        "lpn_energy_col_effic": "Effic.",
+        "lpn_energy_col_avg_kw": "Avg. kW",
+        "lpn_energy_col_avg_kw_tip": "The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.",
+        "lpn_energy_col_peak_kw": "Peak kW",
+        "lpn_energy_col_kwh": "kWh",
+        "lpn_energy_col_cost": "Cost",
+        "lpn_energy_total_kwh": "Energy used",
+        "lpn_energy_total_energy_cost": "Cost of energy",
+        "lpn_energy_peak_kw": "Highest power drawn at one moment",
+        "lpn_energy_total_demand_charge": "Demand charge",
+        "lpn_energy_total_cost": "Total cost",
+        "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
+        "lpn_energy_curve_note": "These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
@@ -971,6 +1043,582 @@
             }
         },
         "lpn_reaction_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_settings_energy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_efficiency": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_efficiency_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_price": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_price_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_pump_price_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_price_pattern": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_price_pattern_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_demand_charge": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_demand_charge_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_currency": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_currency_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_kwh": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_kw": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_price_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_needs_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_no_pumps": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_over": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_col_pump": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_col_running": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_col_effic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_col_avg_kw": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_col_avg_kw_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_col_peak_kw": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_col_kwh": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_col_cost": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_total_kwh": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_total_energy_cost": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_peak_kw": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_total_demand_charge": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_total_cost": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_no_price": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "পানির গুণমান পাইপগুলোর মধ্য দিয়ে সময়ের সাথে বহন করা হয়, তাই এর জন্য EPANET ইঞ্জিন ও একটি মোট চলার সময় দরকার। সময়-এর অধীনে একটি মোট চলার সময় নির্ধারণ করুন, তারপর চালান বোতাম চাপুন।",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "ক্রম",
+                    "english": "Rank"
+                }
+            }
+        },
+        "lpn_energy_curve_note": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
