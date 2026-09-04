@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 1559,
-        "delta_key_count": 22,
+        "expected_key_count": 1564,
+        "delta_key_count": 27,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -533,6 +533,11 @@
         "lpn_reaction_wall": "Wall reaction coefficient",
         "lpn_reaction_wall_tip": "Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.",
         "lpn_reaction_pipe_tip": "This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.",
+        "lpn_reaction_tank": "Reaction coefficient",
+        "lpn_reaction_tank_tip": "Reaction in the water held in this tank, as a rate in 1\/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Leave it empty and the tank uses the bulk reaction coefficient set for the whole network under Settings, Water quality.",
+        "lpn_reaction_bulk_short": "Bulk reaction",
+        "lpn_reaction_wall_short": "Wall reaction",
+        "lpn_reaction_tank_short": "Reaction",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day",
         "lpn_reaction_note": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.",
@@ -557,6 +562,11 @@
         "lpn_reaction_wall": "Wall reaction coefficient",
         "lpn_reaction_wall_tip": "Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.",
         "lpn_reaction_pipe_tip": "This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.",
+        "lpn_reaction_tank": "Reaction coefficient",
+        "lpn_reaction_tank_tip": "Reaction in the water held in this tank, as a rate in 1\/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Leave it empty and the tank uses the bulk reaction coefficient set for the whole network under Settings, Water quality.",
+        "lpn_reaction_bulk_short": "Bulk reaction",
+        "lpn_reaction_wall_short": "Wall reaction",
+        "lpn_reaction_tank_short": "Reaction",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day",
         "lpn_reaction_note": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.",
@@ -836,6 +846,86 @@
             }
         },
         "lpn_reaction_pipe_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Calitatea apei este purtată de-a lungul conductelor în timp, deci are nevoie de motorul EPANET și de o durată totală de rulare. Stabiliți o Durată totală de rulare la Timp, apoi apăsați butonul Calculează.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_reaction_tank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Calitatea apei este purtată de-a lungul conductelor în timp, deci are nevoie de motorul EPANET și de o durată totală de rulare. Stabiliți o Durată totală de rulare la Timp, apoi apăsați butonul Calculează.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_reaction_tank_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Calitatea apei este purtată de-a lungul conductelor în timp, deci are nevoie de motorul EPANET și de o durată totală de rulare. Stabiliți o Durată totală de rulare la Timp, apoi apăsați butonul Calculează.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_reaction_bulk_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Calitatea apei este purtată de-a lungul conductelor în timp, deci are nevoie de motorul EPANET și de o durată totală de rulare. Stabiliți o Durată totală de rulare la Timp, apoi apăsați butonul Calculează.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_reaction_wall_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Calitatea apei este purtată de-a lungul conductelor în timp, deci are nevoie de motorul EPANET și de o durată totală de rulare. Stabiliți o Durată totală de rulare la Timp, apoi apăsați butonul Calculează.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_reaction_tank_short": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
