@@ -2098,15 +2098,24 @@
 		// values parse out of them; these compose only once a coefficient or an initial
 		// concentration has really been edited. Same rule, same shape, as `[OPTIONS] Quality`.
 		function liveReactions() {
-			var r = (settings.reactions || {}), out = { bulk: {}, wall: {}, tank: {} }, i, lk2, bv, wv;
+			var r = (settings.reactions || {}), out = { bulk: {}, wall: {}, tank: {} }, i, lk2, bv, wv, nd3, tv;
 			['orderBulk', 'orderTank', 'orderWall', 'globalBulk', 'globalWall',
 				'limitingPotential', 'roughnessCorrelation'].forEach(function (k) {
 				if (r[k] !== undefined && r[k] !== null) { out[k] = r[k]; }
 			});
-			// A tank coefficient has no per-element control on this page, so it is carried on the
-			// setting rather than on the node. Stated rather than silent: it round-trips and is not
-			// editable, which is the honest half of "interpreted".
+			// **A TANK COEFFICIENT IS READ OFF THE TANK, like the pipe pair below** (Task 566). It
+			// was carried on the setting while nothing on this page could edit one; the tank popup
+			// and the Tanks table both write it now, so the element is where it lives and
+			// `eff()` is how a scenario's own value reaches the file.
+			// An older project's map is moved onto its tanks when it is opened; see
+			// adoptTankCoeffs() in js/looped-network.js.
 			Object.keys(r.tank || {}).forEach(function (id) { out.tank[id] = r.tank[id]; });
+			for (i = 0; i < (doc.nodes || []).length; i++) {
+				nd3 = doc.nodes[i];
+				if (nd3.type !== 'tank' || omitted[nd3.id]) { continue; }
+				tv = eff(nd3, 'tankCoeff');
+				if (typeof tv === 'number' && isFinite(tv)) { out.tank[nd3.id] = tv; }
+			}
 			for (i = 0; i < (doc.links || []).length; i++) {
 				lk2 = doc.links[i];
 				if (lk2.type !== 'pipe' || omitted[lk2.id]) { continue; }

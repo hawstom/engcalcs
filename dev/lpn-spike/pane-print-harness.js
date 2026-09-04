@@ -82,7 +82,9 @@ const L = loadLoopedNetwork(
 	"\t\tsortTable: function (id, col) { sortPaneTable(paneTableById(id), col); },\n" +
 	"\t\ttableOrder: function (id) { return paneTableRowsInOrder(paneTableById(id)).map(function (e) { return e.id; }); },\n" +
 	"\t\ttableCells: function (id) { return paneTableById(id).cells; },\n" +
-	"\t\ttableHeadings: function (id) { return paneTableById(id).cols.map(paneHeadingText); },\n" +
+	// paneCols(), never `spec.cols` -- a column may stand down; see pane-harness.js.
+	"\t\ttableHeadings: function (id) { return paneCols(paneTableById(id)).map(paneHeadingText); },\n" +
+	"\t\tpaneCols: paneCols,\n" +
 	"\t\tsetProjectName: function (n) { project.name = n; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -232,7 +234,7 @@ console.log('\n--- nothing on the sheet is a control ---');
 	TABLES.forEach((id) => {
 		L.renderTable(id);
 		const sheet = sheetOf(id), rows = L.tableOrder(id), live = L.tableCells(id), mismatch = [];
-		const cols = L.paneTables().filter((t) => t.id === id)[0].cols;
+		const cols = L.paneCols(L.paneTables().filter((t) => t.id === id)[0]);
 		rows.forEach((elId, r) => cols.forEach((c, i) => {
 			const cell = live[elId][c.key];
 			// The ID column is a go-to-the-map button on screen and plain text on paper; its TEXT

@@ -58,8 +58,13 @@ const L = loadLoopedNetwork(
 	"\t\trenderTable: function (id) { renderPaneTable(paneTableById(id)); },\n" +
 	"\t\ttableOrder: function (id) { return paneTableRowsInOrder(paneTableById(id)).map(function (e) { return e.id; }); },\n" +
 	"\t\ttableCells: function (id) { return paneTableById(id).cells; },\n" +
-	"\t\ttableCols: function (id) { return paneTableById(id).cols; },\n" +
-	"\t\ttableHeadings: function (id) { return paneTableById(id).cols.map(paneHeadingText); },\n" +
+	// **paneCols(), NEVER `spec.cols`.** A column may declare `when` and stand down (the reaction
+	// coefficients are inputs to an analysis the document may not be running), and the renderer
+	// reads the filtered list -- so a harness reading the raw one counts columns the table does not
+	// draw and fails on a table that is perfectly correct.
+	"\t\tpaneCols: paneCols,\n" +
+	"\t\ttableCols: function (id) { return paneCols(paneTableById(id)); },\n" +
+	"\t\ttableHeadings: function (id) { return paneCols(paneTableById(id)).map(paneHeadingText); },\n" +
 	// The scenario machinery through its own doors -- createScenario()/switchScenario(), never a
 	// hand-built scenario object, or the seam under test would be tested against a shape the page
 	// does not use.
@@ -567,6 +572,8 @@ console.log('\n--- heading and cells share one alignment ---');
 	// all of the tables" is the claim being checked.
 	L.paneTables().forEach(function (spec) {
 		L.renderTable(spec.id);
+		// The list the RENDERER reads, which is the declaration a rendered table can be held to.
+		const cols = L.paneCols(spec);
 		const host = byId[spec.panel];
 		const table = (host.children || []).filter((c) => c._tag === 'table')[0];
 		if (!table) { report(false, spec.id + ': the panel holds a table'); return; }
@@ -574,28 +581,28 @@ console.log('\n--- heading and cells share one alignment ---');
 		const tbody = table.children.filter((c) => c._tag === 'tbody')[0];
 		const ths = thead.children[0].children;
 		const tds = tbody.children[0].children;
-		report(ths.length === spec.cols.length && tds.length === spec.cols.length,
+		report(ths.length === cols.length && tds.length === cols.length,
 			spec.id + ': one heading and one cell per column', ths.length + ' / ' + tds.length);
-		const disagree = spec.cols.filter((c, i) => ths[i].className !== tds[i].className);
+		const disagree = cols.filter((c, i) => ths[i].className !== tds[i].className);
 		report(disagree.length === 0, spec.id + ': every heading carries its own cells’ classes',
 			disagree.map((c) => c.key).join(','));
 		// And the class is the one the alignment hangs on: a number is a number whether it was typed
 		// or computed, which is the rule the printed sheet has always used.
-		const wrong = spec.cols.filter((c, i) =>
+		const wrong = cols.filter((c, i) =>
 			(ths[i].classList.contains(NUM)) !== !!(c.result || c.set));
 		report(wrong.length === 0, spec.id + ': exactly the number columns are marked as numbers',
 			wrong.map((c) => c.key).join(','));
 		// **AND EXACTLY ONE COLUMN IS THE FIRST ONE**, which is what the alignment now hangs on:
 		// left there, centred everywhere else, heading and cell alike.
-		const firstTh = spec.cols.map((c, i) => i).filter((i) => ths[i].classList.contains(FIRST));
-		const firstTd = spec.cols.map((c, i) => i).filter((i) => tds[i].classList.contains(FIRST));
+		const firstTh = cols.map((c, i) => i).filter((i) => ths[i].classList.contains(FIRST));
+		const firstTd = cols.map((c, i) => i).filter((i) => tds[i].classList.contains(FIRST));
 		report(firstTh.length === 1 && firstTh[0] === 0 && firstTd.length === 1 && firstTd[0] === 0,
 			spec.id + ': one column is marked first, and it is the leftmost',
 			firstTh.join(',') + ' / ' + firstTd.join(','));
 		// **THE BOX WIDTH REACHES THE BOX**, as the custom property the stylesheet reads. A column
 		// that names no width says nothing at all, so CSS's own 7em fallback stands -- assert the
 		// silence too, or a stray default would be invisible here.
-		spec.cols.forEach((c, i) => {
+		cols.forEach((c, i) => {
 			const target = spec.cells[Object.keys(spec.cells)[0]][c.key];
 			if (!target || target._tag !== 'input') { return; }
 			report(target.style.getPropertyValue('--lpn-pane-col-w') === (c.em ? c.em + 'em' : ''),

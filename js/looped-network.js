@@ -2351,9 +2351,13 @@ var EngCalcs = EngCalcs || {};
 	// `initQuality` is the concentration a node starts a chemical run holding, and for a reservoir
 	// the concentration it holds for the whole run (Task 566). Overridable for the same reason
 	// demand is: "what if the plant leaves 1.2 mg/L instead of 0.8" is an operating question.
+	// `tankCoeff` is a TANK's own reaction coefficient (Task 566), the twin of a pipe's pair below.
+	// It was carried on `settings.reactions.tank` while nothing could edit it; a value with a
+	// control on it belongs on the element the control is attached to, and going through this
+	// whitelist is what puts it behind setProp() like everything else a person can type.
 	var LPN_OVERRIDABLE = {
 		node: { demand: true, emitter: true, head: true, level: true, active: true, fireFlow: true,
-			initQuality: true },
+			initQuality: true, tankCoeff: true },
 		// `setting` is a VALVE's setting (Task 248 phase 2). It belongs here for the same reason
 		// demand does: "what if the pressure reducing valve is set to 50 psi" is an operating
 		// question, which is what a scenario asks, where the valve's diameter is what was built.
@@ -2739,7 +2743,21 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'roughness', group: 'link', field: 'roughness', prop: 'roughness', label: roughnessLabel(),
 				applies: function (l) { return l.type === 'pipe'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'k', group: 'link', field: 'km', prop: 'k', label: pc.lpn_field_km || 'Minor (local) loss coefficient, k',
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **THE TWO REACTION COEFFICIENTS, HERE FOR FIND AND REPLACE'S REASON** (Task 566) --
+			// the same standing a required fire flow has in this list. Neither has a row in
+			// Settings > Starting values and neither has a map label, so pushFieldShown() is false
+			// for both and BOTH pushes skip them: relining a run of mains is a fact about those
+			// mains, not a default to seed from or to force onto every scenario at once. What this
+			// list is being asked for here is what the property is called, which pipes carry it,
+			// and how it is written -- and replaceWrite() takes `prop` and goes through setProp().
+			//
+			// PIPE-ONLY, and only while a chemical is tracked: `applies` is what keeps a Replace
+			// physical, and a valve is a zero-length link that no reaction is computed along.
+			{ key: 'bulkCoeff', group: 'link', field: 'bulkCoeff', prop: 'bulkCoeff', label: pc.lpn_reaction_bulk || 'Bulk reaction coefficient',
+				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown(); }, get: function (l) { return effective(l, 'bulkCoeff'); }, set: function (l, v) { l._bulkCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			{ key: 'wallCoeff', group: 'link', field: 'wallCoeff', prop: 'wallCoeff', label: pc.lpn_reaction_wall || 'Wall reaction coefficient',
+				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown(); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 		];
 	}
 	// Is this push spec's property visible on the map right now? The one place that question is
@@ -4095,8 +4113,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	/**
 	 * Every reaction coefficient this document states, gathered from the one place each lives:
-	 * the globals on `settings.reactions`, the per-pipe pair on the links THROUGH `effective()`,
-	 * and the per-tank one carried on the setting (it has no control, and says so).
+	 * the globals on `settings.reactions`, the per-pipe pair on the links and the per-tank one on
+	 * the tanks, all three THROUGH `effective()` so a scenario's own coefficient is the one solved.
 	 */
 	function docReactions() {
 		var r = settings.reactions || {}, out = { bulk: {}, wall: {}, tank: {} };
@@ -4104,7 +4122,11 @@ var EngCalcs = EngCalcs || {};
 			'limitingPotential', 'roughnessCorrelation'].forEach(function (k) {
 			if (typeof r[k] === 'number' && isFinite(r[k])) { out[k] = r[k]; }
 		});
-		Object.keys(r.tank || {}).forEach(function (id) { out.tank[id] = r.tank[id]; });
+		(doc.nodes || []).forEach(function (n) {
+			if (n.type !== 'tank' || !isActive(n)) { return; }
+			var t = effective(n, 'tankCoeff');
+			if (typeof t === 'number' && isFinite(t)) { out.tank[n.id] = t; }
+		});
 		(doc.links || []).forEach(function (l) {
 			if (l.type !== 'pipe' || !isActive(l)) { return; }
 			var b = effective(l, 'bulkCoeff'), w = effective(l, 'wallCoeff');
@@ -4131,6 +4153,39 @@ var EngCalcs = EngCalcs || {};
 		// own states no unit, and an unstated unit is shown as no unit rather than as a guess.
 		return w.length > 1 ? w[w.length - 1] : '';
 	}
+	/**
+	 * **THE TEXT THAT GOES IN BRACKETS AFTER A QUALITY HEADING, in every place one is printed** --
+	 * the property popup's result row, the Tables column heading and the colour legend.
+	 *
+	 * **A SOURCE SHARE IS UNITLESS AND IS NOT DIMENSIONLESS, and the two are different states**
+	 * (Task 566). qualityUnitId() answers '' for it, honestly: there is no unit family, no factor
+	 * and nothing to convert. But '' reaches a heading as "no unit at all", which is what a
+	 * dimensionless number like a minor-loss k says, and a percentage is not that -- a bare 43
+	 * under the word "Source share" reads as a fraction to one engineer and as a percent to the
+	 * next. So the unit SLOT takes a unit id and this takes TEXT, which is the same split the
+	 * gradient's own '%' suffix already lives on (gradientSuffix()).
+	 *
+	 * **'%' NEEDS NO LANGUAGE KEY**, on the legend's own rule for '<', '≥' and the en dash: it is
+	 * the same mark in all 27 languages, and the bidi algorithm places it for an RTL reader.
+	 * A CONCENTRATION's unit is the label the document states beside the chemical's name, shown
+	 * and never applied -- so this returns the document's characters, never a unit of ours.
+	 */
+	function qualityUnitText() {
+		var id = qualityUnitId();
+		if (id) { return unitLabel(id); }
+		if (qualityMode() === 'chemical') { return concentrationUnitText(); }
+		return qualityMode() === 'trace' ? '%' : '';
+	}
+	/**
+	 * **IS A REACTION COEFFICIENT A LIVE CONTROL RIGHT NOW?** One question, asked in five places --
+	 * the pipe popup, the tank popup, the two Tables columns, the Find property list and the
+	 * writable-property list Replace reads. They must agree: a property offered to Find and Replace
+	 * that no popup and no column will show is a value a user can write and then never see.
+	 *
+	 * A coefficient changes nothing under water age or a source share, so two permanently inert
+	 * boxes on every pipe is the clutter the emitter-exponent control was removed for.
+	 */
+	function reactionFieldsShown() { return qualityMode() === 'chemical'; }
 	// The heading, in OUR vocabulary rather than EPANET's (CLAUDE.md): EPANET says "Source Trace"
 	// and reports a bare "Quality" column, and neither tells a reader what the number is.
 	function qualityLabel() {
@@ -4325,6 +4380,17 @@ var EngCalcs = EngCalcs || {};
 		// One field's unit follows another setting, so it is asked rather than looked up.
 		if (group === 'node' && field === 'quality') { return qualityUnitId(); }
 		return (group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS)[field] || '';
+	}
+	// **THE UNIT AS A LEGEND PRINTS IT, WHICH IS NOT ALWAYS A UNIT ID.** A head loss gradient in
+	// per cent and a source share are both quantities whose mark is real and whose unit family does
+	// not exist, so the id above answers '' for them and this answers the mark. Everything else is
+	// its id's own label, so there is still one table behind both.
+	function colorFieldUnitText(group, field) {
+		var id;
+		if (group === 'node' && field === 'quality') { return qualityUnitText(); }
+		id = colorFieldUnit(group, field);
+		if (id) { return unitLabel(id); }
+		return field === 'gradient' ? gradientSuffix() : '';
 	}
 	// The breaks a MODE produces for the values presently on the map.
 	//
@@ -4563,8 +4629,7 @@ var EngCalcs = EngCalcs || {};
 			var breaks = effectiveBreaks(group, field);
 			if (!breaks.length && colorValues(group, field).length === 0) { return; }
 			any = true;
-			var unitId = colorFieldUnit(group, field);
-			var unit = unitId ? unitLabel(unitId) : (field === 'gradient' ? gradientSuffix() : '');
+			var unit = colorFieldUnitText(group, field);
 			var h = document.createElement('div');
 			h.style.fontWeight = 'bold';
 			h.textContent = colorFieldLabel(group, field) + (unit ? ' (' + unit + ')' : '');
@@ -8173,6 +8238,17 @@ var EngCalcs = EngCalcs || {};
 			// answer on this page, and it is the query that makes a bulk Replace of it reachable.
 			out.push(['fireFlow', pc.lpn_ff_required || 'Required fire flow', 'Required fire flow']);
 		}
+		// **THE PIPE'S TWO REACTION COEFFICIENTS, ON PIPES AND ONLY WHILE ONE IS LIVE** (Task 566).
+		// Two rules meet here and both are already written above: a property that matches nothing
+		// stays out of the menu, and a coefficient is a control only while a chemical is tracked.
+		// The second matters more than it looks -- offering a Replace for a property no popup and
+		// no column will show is a value somebody can write and then never see again.
+		// "Which mains did I leave at the default wall coefficient" has no other answer here, and
+		// it is the query that makes a bulk Replace of them reachable.
+		if (d.group === 'link' && (!d.type || d.type === 'pipe') && reactionFieldsShown()) {
+			out.push(['bulkCoeff', pc.lpn_reaction_bulk || 'Bulk reaction coefficient', 'Bulk reaction coefficient']);
+			out.push(['wallCoeff', pc.lpn_reaction_wall || 'Wall reaction coefficient', 'Wall reaction coefficient']);
+		}
 		if (d.key === 'all') { return out; }
 		defs = d.group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc);
 		allowed = d.group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS;
@@ -8188,7 +8264,11 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Searchable, but not colourable -- see findPropDefs(). Read straight off the element through
 	// effective(), in the unit it is stored and displayed in, like everything else here.
-	var FIND_EXTRA_LINK_FIELDS = { length: true, km: true };
+	// The two reaction coefficients (Task 566) are here for a second reason as well: nothing
+	// colours a map by them and nothing prints them beside a pipe, so linkFieldDefs() -- which is
+	// the Labels panel's own list -- is not where they belong. This map is the read path;
+	// findPropDefs() offers them explicitly, gated, the way a required fire flow is offered.
+	var FIND_EXTRA_LINK_FIELDS = { length: true, km: true, bulkCoeff: true, wallCoeff: true };
 	// ---- DISCONNECTED NODES: TWO POINTS, TWO KINDS OF BREAK (ROADMAP Task 540) ------------------
 	//
 	// **TOM'S FRAME, 2026-08-26, AND IT IS THE ONE TO KEEP:** *"I see two points, sources and this
@@ -11068,13 +11148,43 @@ var EngCalcs = EngCalcs || {};
 	function paneUnitHead() { return resultUnit('elevhead'); }
 	function paneUnitPressure() { return resultUnit('pressure'); }
 	function paneUnitVelocity() { return resultUnit('velocity'); }
-	// Dynamic, like the roughness column's: a water age is read in a time unit and a source share in
-	// no unit at all, and '' is how this table says "this column's heading carries no unit".
-	function paneUnitQuality() { return qualityUnitId(); }
+	// Dynamic, like the roughness column's: a water age is read in a time unit, a source share in
+	// per cent and a concentration in whatever the document calls it. It is TEXT rather than a unit
+	// id for the reason qualityUnitText() states -- two of the three have no unit family at all --
+	// so this column declares `unitText` and leaves the id slot empty.
 	// The heading follows the same switch, so the column can never name one quantity over the other
 	// one's numbers.
-	function paneColNodeQuality() { return paneColNodeResult('quality', qualityLabel, paneUnitQuality); }
+	function paneColNodeQuality() {
+		var c = paneColNodeResult('quality', qualityLabel, null);
+		c.unitText = qualityUnitText;
+		return c;
+	}
 	function paneUnitElevHead() { return 'lpn_u_elevhead'; }
+	// **A REACTION COEFFICIENT AS A COLUMN** (Task 566), for the pipe pair and for the tank's own.
+	// It is the popup row's twin and is deliberately built from the same three parts: the same
+	// gate, the same `effective()` read, and the same setProp() write. Two editors of one property
+	// must not have two ideas of what editing it means.
+	//
+	// **BLANK IS A STATE, NOT A ZERO** -- an empty box means "use the global coefficient", which is
+	// EPANET's own rule, and 0 means "this pipe does not react", which is a different statement
+	// about the water. A pane cell hands back `+'' === 0`, so this column declares `blank` and the
+	// cell handler passes `undefined` through exactly as numberFieldBlank() does in the popup.
+	function paneColReaction(key, labelKey, unitTextFn) {
+		return { key: key, label: labelKey, unitText: unitTextFn, em: 4, blank: true,
+			when: reactionFieldsShown, prop: key,
+			get: function (el) { return effective(el, key); },
+			set: function (el, v) { setProp(el, key, v); } };
+	}
+	// A bulk coefficient is a reciprocal time; the wall one is the length per day the project's own
+	// length unit is written in. Both are the labels the Settings box and the popup already print.
+	function paneReactionPerDay() {
+		var pc = EngCalcs.pageConfig || {};
+		return pc.lpn_reaction_per_day || '1/day';
+	}
+	function paneReactionWallUnit() {
+		var pc = EngCalcs.pageConfig || {};
+		return unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day');
+	}
 	// The valve's type, as the word the popup's own selector shows. READ-ONLY here on purpose:
 	// changing the type re-seeds the setting and drops every scenario's override on it, which is a
 	// decision that belongs where its consequences are spelled out.
@@ -11158,6 +11268,10 @@ var EngCalcs = EngCalcs || {};
 					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitElevHead,
 						get: function (n) { return n.tankDiameter; },
 						set: function (n, v) { n.tankDiameter = v; updateNode(n.id); } },
+					// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), the twin of the pipe pair:
+					// water sits in a tank far longer than it sits in any main, so this is where a
+					// residual is actually lost. A bulk rate, in the same 1/day.
+					paneColReaction('tankCoeff', 'lpn_reaction_tank_short', paneReactionPerDay),
 					// The WATER SURFACE, derived and read-only: it is the number the solve uses, so
 					// it must be visible, but a second editable field would be two numbers that have
 					// to agree.
@@ -11194,6 +11308,9 @@ var EngCalcs = EngCalcs || {};
 					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 3,
 						get: function (l) { return effective(l, 'k') || 0; },
 						set: function (l, v) { setProp(l, 'k', v); } },
+					// With the inputs and after them, which is the order this list already follows.
+					paneColReaction('bulkCoeff', 'lpn_reaction_bulk_short', paneReactionPerDay),
+					paneColReaction('wallCoeff', 'lpn_reaction_wall_short', paneReactionWallUnit),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
@@ -11254,9 +11371,19 @@ var EngCalcs = EngCalcs || {};
 		var pool = spec.group === 'link' ? doc.links : doc.nodes;
 		return pool.filter(function (x) { return x.type === spec.type; });
 	}
+	// **A COLUMN MAY DECLARE WHEN IT EXISTS, and every reader of the list goes through here**
+	// (Task 566). The two reaction coefficients are inputs to an analysis the document may not be
+	// running, and two permanently blank columns on every pipe is the clutter their popup rows are
+	// already gated against -- so the gate is one predicate, `when`, rather than a second cached
+	// table built per mode. paneTableSignature() reads this list too, so the table rebuilds itself
+	// the moment the set changes, and a sort left pointing at a column that has gone falls back to
+	// the id ordering paneTableSorted() already uses for a value nothing carries.
+	function paneCols(spec) {
+		return spec.cols.filter(function (c) { return !c.when || c.when(); });
+	}
 	function paneColByKey(spec, key) {
-		var i;
-		for (i = 0; i < spec.cols.length; i++) { if (spec.cols[i].key === key) { return spec.cols[i]; } }
+		var cols = paneCols(spec), i;
+		for (i = 0; i < cols.length; i++) { if (cols[i].key === key) { return cols[i]; } }
 		return null;
 	}
 	function paneCellValue(spec, el, key) {
@@ -11349,8 +11476,13 @@ var EngCalcs = EngCalcs || {};
 	function paneHeadingText(c) {
 		var pc = EngCalcs.pageConfig || {},
 			text = (typeof c.label === 'function') ? c.label() : (pc[c.label] || c.key),
-			u = c.unit ? c.unit() : '';
-		return u ? text + ' (' + unitLabel(u) + ')' : text;
+			u = c.unit ? c.unit() : '',
+			// **A COLUMN MAY NAME ITS UNIT AS TEXT RATHER THAN AS AN ID** -- a source share's '%'
+			// has no unit family to be looked up in, and neither has a concentration, whose unit is
+			// the label the document itself states. `unitText` wins where a column declares one, so
+			// the heading and the property popup's own row cannot disagree.
+			t = c.unitText ? c.unitText() : (u ? unitLabel(u) : '');
+		return t ? text + ' (' + t + ')' : text;
 	}
 	// What the table would have to be REBUILT for, as opposed to merely refilled: which rows are
 	// present, the order they are in, and the headings (which carry the units). A solve changes none
@@ -11358,7 +11490,7 @@ var EngCalcs = EngCalcs || {};
 	// would take the cell the user is typing in out from under them.
 	function paneTableSignature(spec, rows) {
 		return rows.map(function (el) { return el.id; }).join('|') + '||' +
-			spec.cols.map(paneHeadingText).join('|');
+			paneCols(spec).map(paneHeadingText).join('|');
 	}
 	function renderPaneTable(spec) {
 		var host = document.getElementById(spec.panel), pc = EngCalcs.pageConfig || {},
@@ -11381,7 +11513,7 @@ var EngCalcs = EngCalcs || {};
 		table.className = 'lpn-pane-table';
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
-		spec.cols.forEach(function (c, i) {
+		paneCols(spec).forEach(function (c, i) {
 			var th = document.createElement('th'), b = document.createElement('button');
 			th.className = paneCellClass(c, i);
 			b.type = 'button';
@@ -11420,7 +11552,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function paneTableRow(spec, el) {
 		var tr = document.createElement('tr'), cells = {};
-		spec.cols.forEach(function (c, i) {
+		paneCols(spec).forEach(function (c, i) {
 			var td = document.createElement('td'), btn, input;
 			td.className = paneCellClass(c, i);
 			if (c.key === 'id') {
@@ -11448,7 +11580,10 @@ var EngCalcs = EngCalcs || {};
 				input.addEventListener('change', function () {
 					// The popup's own ending, not a second one: set, then completeEdit(), which
 					// marks the override, re-counts the status bar, re-solves and saves.
-					c.set(el, +input.value);
+					// **A BLANK COLUMN PASSES `undefined`, exactly as numberFieldBlank() does** --
+					// `+'' === 0`, and for a reaction coefficient an empty box ("use the global")
+					// and a typed 0 ("does not react") are two different statements about the water.
+					c.set(el, (c.blank && input.value === '') ? undefined : +input.value);
 					completeEdit(c.prop ? { el: el, prop: c.prop } : null);
 					refreshPopupIfOpen();
 				});
@@ -11468,7 +11603,7 @@ var EngCalcs = EngCalcs || {};
 		rows.forEach(function (el) {
 			var cells = spec.cells[el.id];
 			if (!cells) { return; }
-			spec.cols.forEach(function (c) {
+			paneCols(spec).forEach(function (c) {
 				var target = cells[c.key];
 				if (!target) { return; }
 				if (paneCellIsPlain(c, el)) {
@@ -11526,7 +11661,7 @@ var EngCalcs = EngCalcs || {};
 		table.className = 'lpn-pane-table lpn-print-table';
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
-		spec.cols.forEach(function (c, i) {
+		paneCols(spec).forEach(function (c, i) {
 			var th = document.createElement('th');
 			th.className = paneCellClass(c, i);
 			th.textContent = paneHeadingText(c);
@@ -11537,7 +11672,7 @@ var EngCalcs = EngCalcs || {};
 		tbody = document.createElement('tbody');
 		rows.forEach(function (el) {
 			var row = document.createElement('tr');
-			spec.cols.forEach(function (c, i) {
+			paneCols(spec).forEach(function (c, i) {
 				var td = document.createElement('td');
 				td.className = paneCellClass(c, i);
 				td.textContent = paneCellText(c, el);
@@ -14279,6 +14414,15 @@ var EngCalcs = EngCalcs || {};
 		if (!settings.reactions && EngCalcs.lpnReactionsParse) {
 			readQualitySections(saved.inpSections || {}, settings, saved.nodes || [], saved.links || []);
 		}
+		// **AND A PROJECT SAVED WHILE THE TANK COEFFICIENT LIVED ON THE SETTING** keeps its number.
+		// It was carried there for as long as no control could edit one; the control exists now, so
+		// the value moves to the tank it belongs to and the map is emptied. Moved rather than
+		// copied: two homes for one number is a disagreement waiting for the first edit.
+		if (settings.reactions && settings.reactions.tank
+			&& Object.keys(settings.reactions.tank).length) {
+			adoptTankCoeffs(settings.reactions.tank, saved.nodes || []);
+			settings.reactions.tank = {};
+		}
 		// **A PROJECT SAVED UNDER THE TWO-FIELD DESIGN KEEPS ITS NUMBERS.** That design froze the
 		// method's answer into a second field, `colorFrozenBreaks`, and was rejected (Task 448).
 		// Those numbers are the ones that project was drawn in, so
@@ -15293,10 +15437,10 @@ var EngCalcs = EngCalcs || {};
 	 * still parse out of them (js/lpn-inp.js). This is the `[OPTIONS] Quality` rule applied to a
 	 * whole section: interpret beside the token, never over it.
 	 *
-	 * A per-pipe coefficient lands on the LINK and a starting concentration on the NODE, because
-	 * they are element properties and go through the same resolver and the same `setProp()` write
-	 * seam every other one does. What has no element to live on -- the globals, and the per-tank
-	 * coefficient this page offers no control for -- stays on the setting.
+	 * A per-pipe coefficient lands on the LINK, and a starting concentration and a per-tank
+	 * coefficient on the NODE, because they are element properties and go through the same resolver
+	 * and the same `setProp()` write seam every other one does. What has no element to live on --
+	 * the globals -- stays on the setting.
 	 */
 	function readQualitySections(sections, settingsObj, nodeList, linkList) {
 		var react = EngCalcs.lpnReactionsParse
@@ -15308,7 +15452,11 @@ var EngCalcs = EngCalcs || {};
 			'limitingPotential', 'roughnessCorrelation'].forEach(function (k) {
 			if (react[k] !== undefined) { kept[k] = react[k]; }
 		});
-		kept.tank = react.tank || {};
+		// **THE TANK MAP IS NOT KEPT ON THE SETTING** (Task 566). It was, while nothing could edit
+		// it; now a tank carries its own, and one number in two places is the disagreement no
+		// reader can settle. The key stays present and empty so every shape that reads it is
+		// unchanged, and adoptTankCoeffs() below is what moves the file's values onto the tanks.
+		kept.tank = {};
 		// PRESENT EVEN WHEN EMPTY. Its presence is what tells the exporter this document's
 		// water-quality sections have been read at all, so a file stating none must still get the
 		// record -- absent, an exporter would fall back to writing carried text that is not there.
@@ -15320,6 +15468,22 @@ var EngCalcs = EngCalcs || {};
 		});
 		(nodeList || []).forEach(function (n) {
 			if (init[n.id] !== undefined) { n._initQuality = init[n.id]; }   // base-write: same construction pass; an imported starting concentration is Base's
+		});
+		adoptTankCoeffs(react.tank, nodeList);
+	}
+	/**
+	 * Move a `[REACTIONS] TANK <id> <coeff>` map onto the tanks that carry it.
+	 *
+	 * Called from two places and for two reasons that look the same from here: an `.inp` being
+	 * imported, and a project saved while the coefficient still lived on the setting. Both are a
+	 * document being CONSTRUCTED or OPENED, before any scenario can be looking at it, so the
+	 * base-write is the right one -- the file states one network, and one network is Base.
+	 */
+	function adoptTankCoeffs(map, nodeList) {
+		if (!map) { return; }
+		(nodeList || []).forEach(function (n) {
+			if (n.type !== 'tank') { return; }
+			if (map[n.id] !== undefined) { n._tankCoeff = map[n.id]; }   // base-write: an imported or reopened coefficient is Base's, and there is no scenario yet to hold it
 		});
 	}
 
@@ -25228,16 +25392,15 @@ var EngCalcs = EngCalcs || {};
 	 * nothing honest for a ✓ or a ⚠ to mean here. The number is reported and the engineer judges it.
 	 */
 	function qualityResultRow(fields, n) {
-		var pc = EngCalcs.pageConfig || {}, v = nodeQualityValue(n), unitId = qualityUnitId(),
-			mode = qualityMode(), unitText;
+		var pc = EngCalcs.pageConfig || {}, v = nodeQualityValue(n),
+			mode = qualityMode(), u = qualityUnitText();
 		if (v === undefined) { return; }
 		// A percent sign needs no translation and no key; a time unit is named by its selector; a
 		// CONCENTRATION is named by the document itself, and where the document names none the row
-		// carries no unit rather than a unit this page chose.
-		if (unitId) { unitText = ' (' + unitLabel(unitId) + ')'; }
-		else if (mode === 'chemical') { unitText = concentrationUnitText() ? ' (' + concentrationUnitText() + ')' : ''; }
-		else { unitText = ' (%)'; }
-		readonlyField(fields, qualityLabel() + unitText, v,
+		// carries no unit rather than a unit this page chose. All three are qualityUnitText()'s,
+		// which is the ONE place that question is answered -- this row, the Tables heading and the
+		// colour legend printed three different answers to it until they shared one.
+		readonlyField(fields, qualityLabel() + (u ? ' (' + u + ')' : ''), v,
 			mode === 'age' ? pc.lpn_result_water_age_tip
 				: mode === 'chemical' ? pc.lpn_result_concentration_tip
 					: pc.lpn_result_source_share_tip);
@@ -25278,6 +25441,23 @@ var EngCalcs = EngCalcs || {};
 				function () { return n.tankDiameter; },
 				function (v) { n.tankDiameter = v; updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_diameter_tip);
+			// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), shown on the same terms as the
+			// pipe pair: only while a chemical is being tracked, blank-capable because blank means
+			// "use the coefficient set for the whole network", and written through setProp()
+			// because it is overridable -- inside a scenario a direct `n._tankCoeff = v` would edit
+			// Base under every other scenario at once.
+			//
+			// **IT IS HERE BECAUSE WATER SITS IN A TANK.** Storage is where the long residence
+			// times are and where a residual is really lost, so a tank that reacts differently from
+			// the mains is an ordinary thing to model. It round-tripped from `[REACTIONS] TANK` and
+			// back with nothing on any screen able to show it until this row existed.
+			if (reactionFieldsShown()) {
+				numberFieldBlank(fields, (pc.lpn_reaction_tank || 'Tank reaction coefficient')
+					+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')',
+				effective(n, 'tankCoeff'),
+				function (v) { setProp(n, 'tankCoeff', v); refreshPopupIfOpen(); },
+				pc.lpn_reaction_tank_tip, { el: n, prop: 'tankCoeff' });
+			}
 			readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'),
 				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip);
 		} else if (n.type === 'reservoir') {
@@ -25802,7 +25982,7 @@ var EngCalcs = EngCalcs || {};
 			//
 			// **BOTH WRITE THROUGH setProp()**, like every other property on this popup: inside a
 			// scenario a direct `l._wallCoeff = v` would edit Base under every other scenario at once.
-			if (qualityMode() === 'chemical') {
+			if (reactionFieldsShown()) {
 				numberFieldBlank(fields, (pc.lpn_reaction_bulk || 'Bulk reaction coefficient')
 					+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')',
 				effective(l, 'bulkCoeff'),
