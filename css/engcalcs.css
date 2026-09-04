@@ -353,7 +353,7 @@ html[lang="zh"] .ec-welcome {
 	/* Fallback first, then the opaque tint -- see the backdrop note below for why a translucent
 	   wash cannot be used here: a pipe passing under a junction would show through it. */
 	fill: var(--lpn-map-bg, #fff);
-	fill: color-mix(in srgb, currentColor 18%, var(--lpn-map-bg, #fff));
+	fill: color-mix(in srgb, currentColor var(--lpn-shade, 18%), var(--lpn-map-bg, #fff));
 	stroke: currentColor; stroke-width: calc(0.14 * var(--lpn-sym, 1));
 	cursor: pointer;
 }
@@ -427,7 +427,17 @@ html[lang="zh"] .ec-welcome {
    **NODES ARE SHADED, PUMP AND VALVE ARE SOLID**, which is Tom's own convention (2026-09-02: *"All
    the map node symbols are thematic shaded fill. The pump and valve symbols are solid fill."*). */
 .lpn-node-symbol-backdrop, .lpn-link-symbol-backdrop { stroke: none; fill: var(--lpn-map-bg, #fff); }
-.lpn-node-symbol-backdrop { fill: color-mix(in srgb, currentColor 18%, var(--lpn-map-bg, #fff)); }
+/* **THE SHADE IS A VARIABLE, AND COLOUR-BY-VALUE TURNS IT OFF** (Tom, 2026-09-04: *"nodes that are
+   15% from the source are not dark... Maybe the coloring is working, but it's been artistically
+   faded. If so, let's remove that fading."*). He read it exactly right. 18% of a dark ramp colour
+   over a white ground is a pale grey whatever the value is, so the low end of a ramp arrived
+   looking like the middle of nothing -- and only the top of the ramp, where the ring itself is
+   dark, read as coloured at all.
+   The wash is the UNCOLOURED state and nothing else. paintNodeColor() writes --lpn-shade: 100% on a
+   node it has given a value colour, so the fill becomes that colour outright, and clears the
+   property when the colouring is switched off. One inline property beside the one it already
+   writes, and the default here is what an uncoloured map keeps. */
+.lpn-node-symbol-backdrop { fill: color-mix(in srgb, currentColor var(--lpn-shade, 18%), var(--lpn-map-bg, #fff)); }
 .lpn-link-symbol-backdrop { fill: currentColor; }
 /* **THE OUTLINE IS A HAIRLINE** (Tom, 2026-09-02: *"I'd like the ring on all node types to be
    thinner, like 1px, with the thematic blue shading."*). The icon paths carry stroke-width="2" as a

@@ -4479,10 +4479,15 @@ var EngCalcs = EngCalcs || {};
 		// the same construction the other two use -- and a ring needs BOTH parts to move together,
 		// or a coloured junction keeps a black outline round a coloured middle. `color` drives both
 		// through currentColor, and clearing it restores the stylesheet's black exactly as before.
-		if (isFixedHeadNode(n)) {
-			if (ne.symbol) { ne.symbol.style.color = col; }
-		} else {
-			ne.circle.style.color = col;
+		// **AND THE THEMATIC WASH IS TURNED OFF WHILE A VALUE COLOUR IS ON.** The uncoloured state
+		// is an 18% tint of the map's ink; a value colour must be that colour outright, or the low
+		// end of every ramp arrives as the same pale grey and the reader cannot tell 15% from 50%.
+		// See the --lpn-shade note in css/engcalcs.css.
+		var target = isFixedHeadNode(n) ? ne.symbol : ne.circle;
+		if (target) {
+			target.style.color = col;
+			if (col) { target.style.setProperty('--lpn-shade', '100%'); }
+			else { target.style.removeProperty('--lpn-shade'); }
 		}
 	}
 	function paintLinkColor(id, breaks) {
@@ -20813,13 +20818,13 @@ var EngCalcs = EngCalcs || {};
 					value: labelPrefixFor(group, key),
 					title: pc.lpn_labels_prefix_tip ||
 						'Text shown before this value on the map',
-					onChange: function (v) { labelSettings.prefix[group][key] = v; }
+					onChange: function (v) { setLabelAffix('prefix', group, key, v); }
 				},
 				suffix: {
 					value: labelSuffixFor(group, key),
 					title: (key === 'gradient' ? pc.lpn_labels_suffix_gradient_tip : pc.lpn_labels_suffix_tip) ||
 						'Text shown after this value on the map',
-					onChange: function (v) { labelSettings.suffix[group][key] = v; }
+					onChange: function (v) { setLabelAffix('suffix', group, key, v); }
 				}
 			};
 		}
@@ -27132,13 +27137,40 @@ var EngCalcs = EngCalcs || {};
 	}
 	function labelDefaultSuffix() { return ''; }
 	// undefined -> the default; '' -> the user's own answer of "none". See defaultLabelSettings().
+	// **ONE ROW, THREE QUANTITIES, SO THE AFFIXES CANNOT BE ONE SETTING** (Tom, 2026-09-04: *"if I
+	// put mg/L as an 'After' string for Concentration, then change my analysis to Source trace or
+	// Age, the mg/L is still there. Can they remember and change even if they are not present?"*).
+	// They can, and this is the whole of it: the quality row's affixes are keyed by the MODE as
+	// well as the field, so a concentration's unit, a percentage's sign and a time's unit each keep
+	// their own. Everything else keys by field alone, as before.
+	//
+	// **THE LEGACY KEY IS READ BUT NEVER WRITTEN.** A document saved before this holds one plain
+	// `quality` affix and nothing records which mode it was typed under, so it still shows -- the
+	// behaviour that document already had -- until the user types into ANY mode, at which point the
+	// write below retires it and the three modes are independent from then on. Migrating it into a
+	// guessed mode would be inventing an answer, and mutating it inside these readers would make
+	// them the assigning getters CLAUDE.md warns about.
+	function labelAffixKey(field) {
+		return field === 'quality' ? 'quality:' + qualityMode() : field;
+	}
 	function labelPrefixFor(group, field) {
-		var m = (labelSettings.prefix || {})[group] || {};
-		return typeof m[field] === 'string' ? m[field] : labelDefaultPrefix(group, field);
+		var m = (labelSettings.prefix || {})[group] || {}, k = labelAffixKey(field);
+		if (typeof m[k] === 'string') { return m[k]; }
+		if (k !== field && typeof m[field] === 'string') { return m[field]; }
+		return labelDefaultPrefix(group, field);
 	}
 	function labelSuffixFor(group, field) {
-		var m = (labelSettings.suffix || {})[group] || {};
-		return typeof m[field] === 'string' ? m[field] : labelDefaultSuffix();
+		var m = (labelSettings.suffix || {})[group] || {}, k = labelAffixKey(field);
+		if (typeof m[k] === 'string') { return m[k]; }
+		if (k !== field && typeof m[field] === 'string') { return m[field]; }
+		return labelDefaultSuffix();
+	}
+	// The one write seam for both affixes, so the legacy retirement above happens in exactly one
+	// place rather than at each of the two editors.
+	function setLabelAffix(kind, group, field, v) {
+		var k = labelAffixKey(field);
+		labelSettings[kind][group][k] = v;
+		if (k !== field) { delete labelSettings[kind][group][field]; }
 	}
 	// WHAT THE BLANKET SEPARATOR SEPARATES: one value from the NEXT value on the same line (Tom,
 	// 2026-08-15: "Make the blanket separator be what comes between multiple labels on a link.

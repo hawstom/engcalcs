@@ -47,6 +47,7 @@ const L = loadLoopedNetwork(
 	// same channel the reservoir and tank symbols have always used, so this reads one seam for all
 	// three rather than two.
 	"\t\tnodeFill: function (id) { return nodeEls[id] ? (nodeEls[id].circle.style.color || '') : null; },\n" +
+	"\t\tnodeShade: function (id) { return nodeEls[id] ? nodeEls[id].circle.style.getPropertyValue('--lpn-shade') : null; },\n" +
 	"\t\tnodeSymbolColor: function (id) { return (nodeEls[id] && nodeEls[id].symbol) ? (nodeEls[id].symbol.style.color || '') : null; },\n" +
 	"\t\tlinkStroke: function (id) { return linkEls[id] ? (linkEls[id].line.style.stroke || '') : null; },\n" +
 	"\t\tsvgClasses: function () { return svg && svg.classList ? svg.classList : null; },\n" +
@@ -291,6 +292,13 @@ console.log('== painting ==');
 	s.colorLinkField = 'velocity';
 	L.refreshValueColors();
 	ok('a junction takes its colour once nodes are coloured', /^#/.test(L.nodeFill(junction.id)), L.nodeFill(junction.id));
+	// **AND THE WASH IS OFF WHILE IT IS COLOURED.** The uncoloured fill is an 18% tint of the map's
+	// ink; leaving that tint on under a value colour is what made the low end of every ramp arrive
+	// as the same pale grey, which Tom read off the screen before any check could. A ramp is only
+	// legible if the fill is the ramp's own colour, so the shade override is asserted here rather
+	// than left to the eye.
+	ok('...with the thematic wash switched off, so the ramp colour is the fill',
+		L.nodeShade(junction.id) === '100%', JSON.stringify(L.nodeShade(junction.id)));
 	ok('a pipe takes a stroke once links are coloured', /^#/.test(L.linkStroke(pipe.id)), L.linkStroke(pipe.id));
 	// A reservoir's circle is invisible by CSS (it is only the hit target), so a fill on it would
 	// paint nothing and the reservoir would stay black while every junction changed.
