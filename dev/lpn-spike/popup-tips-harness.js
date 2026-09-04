@@ -78,9 +78,12 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close',
   'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar',
   // The Settings box's hosts (Task 441, restructured): rebuildSettingsFields() writes a row into
-  // the host that stands under its own sub-heading, and returns early if any of the six is absent.
+  // the host that stands under its own sub-heading, and returns early if ANY of them is absent --
+  // so a host added to the page and not to this list turns every assertion below into a silent
+  // pass on an empty box. Energy joined them under Task 566.
   'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
-  'lpn_set_hydraulics_fields', 'lpn_set_quality_fields', 'lpn_set_page_fields'
+  'lpn_set_hydraulics_fields', 'lpn_set_quality_fields', 'lpn_set_energy_fields',
+  'lpn_set_page_fields'
 ].forEach(ensure);
 
 global.document = {

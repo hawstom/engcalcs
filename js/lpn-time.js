@@ -710,6 +710,14 @@
 	 */
 	EC.lpnTimeRunNow = function () { requestRun(true); };
 
+	/**
+	 * **WHAT THE PUMPS COST OVER THE RUN IN HAND, OR NULL** (Task 566; dev/pump-energy.md).
+	 * js/lpn-epanet.js works it out while the clock is walking; this is the one door the page reads
+	 * it through, so it can never answer out of a run that has been superseded -- the frames and
+	 * the money are dropped together, by construction, because they are the same object.
+	 */
+	EC.lpnTimeRunEnergy = function () { return state.run ? (state.run.energy || null) : null; };
+
 	// **WHY THE FRAMES ARE JUDGED AT THE SOLVE AND NOT AT THE EDIT.** There was briefly a
 	// lpnTimeInvalidate() on scheduleSolve(), dropping them 300 ms earlier, to close the window in
 	// which lpnTimeCurrentFrame() could answer out of the previous network. It had to go: whether

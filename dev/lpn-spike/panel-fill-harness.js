@@ -130,10 +130,14 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 	ok('...and it clears the fill on the way back to a pointer machine',
 		/resetPanelFill\(box\)/.test(body('placePanelForScreen')));
 
-	// **THE FOUR THAT FILL.** Named by their opener rather than by an id: what has to be true is
+	// **THE FIVE THAT FILL.** Named by their opener rather than by an id: what has to be true is
 	// that the function which PLACES the box goes through the seam.
-	[['openSettingsBox', 'Settings'], ['openLibraryBox', 'the Library box'],
-		['openFireFlowBox', 'Fire flow'], ['toggleFindPopup', 'Find']].forEach(function (p) {
+	const FILLS = [['openSettingsBox', 'Settings'], ['openLibraryBox', 'the Library box'],
+		['openFireFlowBox', 'Fire flow'], ['toggleFindPopup', 'Find'],
+		// Pump energy (Task 566): a report table wide enough to need the whole window on a phone,
+		// which is the case the seam exists for.
+		['openEnergyBox', 'Pump energy']];
+	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});
 
@@ -162,8 +166,8 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 			return at < 0 ? l : l.slice(0, at);
 		}).join('\n');
 	const wired = (codeOnly.match(/makePanelDraggable\(/g) || []).length - 1;
-	ok('every draggable panel is either filled or declared exempt', wired === 4 + EXEMPT.length,
-		wired + ' draggable panels, 4 filled + ' + EXEMPT.length + ' exempt');
+	ok('every draggable panel is either filled or declared exempt', wired === FILLS.length + EXEMPT.length,
+		wired + ' draggable panels, ' + FILLS.length + ' filled + ' + EXEMPT.length + ' exempt');
 	EXEMPT.forEach(function (e) {
 		ok('exempt: ' + e[0], !!body(e[0]), e[1].slice(0, 60) + '...');
 	});

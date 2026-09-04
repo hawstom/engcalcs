@@ -332,12 +332,17 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_set_sub_mapDisplay', 'lpn_set_sub_page',
   'lpn_set_sub_idPrefixes', 'lpn_set_sub_defaults',
   'lpn_set_sub_units', 'lpn_set_sub_time', 'lpn_set_sub_hydraulics', 'lpn_set_sub_quality',
+  'lpn_set_sub_energy',
   'lpn_set_colors_node', 'lpn_set_colors_link', 'lpn_set_colors_nodelink', 'lpn_set_colors_shared',
   'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
   // Water quality's own host. Absent from this list, settingsQualityRows() returns without
   // building anything and the Track control is invisible to every harness -- the same silent hole
   // the fire-flow box's own note below describes.
   'lpn_set_hydraulics_fields', 'lpn_set_quality_fields', 'lpn_set_page_fields', 'lpn_set_time_fields',
+  // Pump energy's own host (ROADMAP Task 566). Same silent hole: absent from this list,
+  // rebuildSettings() returns at its guard and NOTHING in the Settings box is built for any
+  // harness, not just the energy rows.
+  'lpn_set_energy_fields',
   // The credits footer, below every section rather than inside one (Tom, 2026-08-19).
   'lpn_set_ramp_credits',
   // The fire flow box and its two hosts (ROADMAP Task 530). Absent from this list,
@@ -347,7 +352,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // And the RUN's own dialog, which is a second box rather than a region of the first (Tom,
   // 2026-08-30). Absent from this list, openFireFlowRunBox() returns before it builds anything and
   // a sweep runs with no progress on screen at all -- which is exactly the state it exists to end.
-  'lpn_ff_run_box', 'lpn_ff_run_body'
+  'lpn_ff_run_box', 'lpn_ff_run_body',
+  // The pump energy report box (Task 566). Absent from this list, rebuildEnergyReport() returns at
+  // its first line and the report is invisible to every harness.
+  'lpn_energy_box', 'lpn_energy_close', 'lpn_energy_report'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the

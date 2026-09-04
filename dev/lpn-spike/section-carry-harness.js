@@ -265,16 +265,27 @@ const ODD = BARE.replace('[OPTIONS]', '[VENDORDATA]\n VDA1            	something
 	// naming an element it was not given, and no answer this page shows depends on a section
 	// nothing here reads. Silence is the correct input.
 	//
-	// **[QUALITY] AND [REACTIONS] LEFT THAT LIST 2026-09-03** (Task 566). They are INTERPRETED now,
-	// so a chemical run is handed both, composed from the model's own record with the wall
-	// coefficient converted at the boundary -- which is the opposite of carrying text through. They
-	// are still absent for every other analysis, and that is asserted below rather than assumed.
+	// **[QUALITY] AND [REACTIONS] LEFT THAT LIST 2026-09-03, AND [ENERGY] LEFT IT 2026-09-04**
+	// (Task 566). All three are INTERPRETED now, so the engine is handed them composed from the
+	// model's own record rather than as carried text -- which is the opposite of passing a section
+	// through. [QUALITY] and [REACTIONS] are still absent for every analysis that is not a
+	// chemical, and that is asserted below rather than assumed; [ENERGY] rides on every run,
+	// because energy is what the pumps did.
 	byId.lpn_dialog_body.children.length = 0;
 	L.importInp({ name: 'Net1.inp', _text: fs.readFileSync(refPath('Net1.inp'), 'utf8') });
 	const built = EngCalcs.lpnToInp(L.assembleModel());
-	['ENERGY', 'SOURCES', 'MIXING', 'TAGS', 'REPORT'].forEach((name) => {
+	['SOURCES', 'MIXING', 'TAGS', 'REPORT'].forEach((name) => {
 		ok('the engine input states no [' + name + ']', !new RegExp('^\\[' + name + '\\]', 'm').test(built.inp));
 	});
+	// **AND [ENERGY] IS WRITTEN, WITH NET1'S OWN EFFICIENCY IN IT** (Task 566). Net1 states
+	// `Global Efficiency 75`, and handing that to the engine is the whole reason the page can say
+	// what a pump costs. `PUMP <id> EFFIC <curve>` is the one row deliberately not written -- it
+	// names a [CURVES] entry this writer does not emit, and naming a curve the file does not
+	// contain is how EPANET comes to reject a network it would otherwise solve (dev/pump-energy.md).
+	ok('the engine input states [ENERGY], composed from the record', /^\[ENERGY\]/m.test(built.inp),
+		JSON.stringify((built.inp.match(/\[ENERGY\][\s\S]{0,60}/) || [])[0]));
+	ok('...with Net1\'s own global efficiency in it', /Global Efficiency  75/.test(built.inp));
+	ok('...and no EFFIC row naming a curve this writer does not emit', !/EFFIC/.test(built.inp));
 	// Net1 states `Quality Chlorine mg/L`, so this import IS a chemical run and the two interpreted
 	// sections are exactly what it needs.
 	ok('...but a chemical run is handed the two sections it needs',

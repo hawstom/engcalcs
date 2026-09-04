@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**20 still to read**, of 20 untranslated keys, of 1557 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**56 still to read**, of 56 untranslated keys, of 1593 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,8 +21,113 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (20, 20 to read @@ NEEDS RULING)
+## lpn_  (56, 56 to read @@ NEEDS RULING)
 
+- **`lpn_energy_col_avg_kw`**
+  > Avg. kW
+  @@ NEEDS RULING
+- **`lpn_energy_col_avg_kw_tip`**
+  > The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.
+  @@ NEEDS RULING
+- **`lpn_energy_col_cost`**
+  > Cost
+  @@ NEEDS RULING
+- **`lpn_energy_col_effic`**
+  > Effic.
+  @@ NEEDS RULING
+- **`lpn_energy_col_kwh`**
+  > kWh
+  @@ NEEDS RULING
+- **`lpn_energy_col_peak_kw`**
+  > Peak kW
+  @@ NEEDS RULING
+- **`lpn_energy_col_pump`**
+  > Pump
+  @@ NEEDS RULING
+- **`lpn_energy_col_running`**
+  > Running
+  @@ NEEDS RULING
+- **`lpn_energy_currency`**
+  > Currency
+  @@ NEEDS RULING
+- **`lpn_energy_currency_tip`**
+  > Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.
+  @@ NEEDS RULING
+- **`lpn_energy_curve_note`**
+  > These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.
+  @@ NEEDS RULING
+- **`lpn_energy_demand_charge`**
+  > Demand charge
+  @@ NEEDS RULING
+- **`lpn_energy_demand_charge_tip`**
+  > What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.
+  @@ NEEDS RULING
+- **`lpn_energy_efficiency`**
+  > Pump efficiency (percent)
+  @@ NEEDS RULING
+- **`lpn_energy_efficiency_tip`**
+  > The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.
+  @@ NEEDS RULING
+- **`lpn_energy_kw`**
+  > kW
+  @@ NEEDS RULING
+- **`lpn_energy_kwh`**
+  > kWh
+  @@ NEEDS RULING
+- **`lpn_energy_menu`**
+  > Pump energy…
+  @@ NEEDS RULING
+- **`lpn_energy_menu_tip`**
+  > What each pump ran, what it drew and what it cost over the last run.
+  @@ NEEDS RULING
+- **`lpn_energy_needs_run`**
+  > Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy under Calculate.
+  @@ NEEDS RULING
+- **`lpn_energy_no_price`**
+  > No price of power is stated, so every cost here is zero. Set one under Settings, Energy.
+  @@ NEEDS RULING
+- **`lpn_energy_no_pumps`**
+  > This network has no pumps, so there is nothing drawing power.
+  @@ NEEDS RULING
+- **`lpn_energy_over`**
+  > Over a run of {time}.
+  @@ NEEDS RULING
+- **`lpn_energy_peak_kw`**
+  > Highest power drawn at one moment
+  @@ NEEDS RULING
+- **`lpn_energy_price`**
+  > Price of power
+  @@ NEEDS RULING
+- **`lpn_energy_price_note`**
+  > This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.
+  @@ NEEDS RULING
+- **`lpn_energy_price_pattern`**
+  > Price schedule
+  @@ NEEDS RULING
+- **`lpn_energy_price_pattern_tip`**
+  > A pattern that multiplies the price hour by hour, which is how an off peak tariff is written. Leave it empty for one price all day.
+  @@ NEEDS RULING
+- **`lpn_energy_price_tip`**
+  > What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.
+  @@ NEEDS RULING
+- **`lpn_energy_pump_price_tip`**
+  > What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.
+  @@ NEEDS RULING
+- **`lpn_energy_title`**
+  > Pump energy
+  @@ NEEDS RULING
+- **`lpn_energy_total_cost`**
+  > Total cost
+  @@ NEEDS RULING
+- **`lpn_energy_total_demand_charge`**
+  > Demand charge
+  @@ NEEDS RULING
+- **`lpn_energy_total_energy_cost`**
+  > Cost of energy
+  @@ NEEDS RULING
+- **`lpn_energy_total_kwh`**
+  > Energy used
+  @@ NEEDS RULING
 - **`lpn_ff_col_static_tip`**
   > The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.
   @@ NEEDS RULING
@@ -73,6 +178,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   @@ NEEDS RULING
 - **`lpn_result_concentration_tip`**
   > How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.
+  @@ NEEDS RULING
+- **`lpn_settings_energy`**
+  > Energy
   @@ NEEDS RULING
 - **`lpn_wrong_btn`**
   > Something wrong here?

@@ -2732,6 +2732,46 @@ $ec_lang['lpn_reaction_pipe_tip']='This pipe on its own. Leave it empty and the 
 $ec_lang['lpn_reaction_per_day']='1/day';
 $ec_lang['lpn_reaction_day']='day';
 $ec_lang['lpn_reaction_note']='This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.';
+// **PUMP ENERGY AND COST** (ROADMAP Task 566, dev/pump-energy.md). EPANET's own words: efficiency,
+// price, demand charge, energy pattern. The one section of this page whose answer is money, so the
+// wording has to be careful in two places: there is no default price and the note says why, and the
+// currency is a LABEL the user types, never a unit this page converts.
+$ec_lang['lpn_settings_energy']='Energy';
+$ec_lang['lpn_energy_title']='Pump energy';
+$ec_lang['lpn_energy_menu']='Pump energy…';
+$ec_lang['lpn_energy_menu_tip']='What each pump ran, what it drew and what it cost over the last run.';
+$ec_lang['lpn_energy_efficiency']='Pump efficiency (percent)';
+$ec_lang['lpn_energy_efficiency_tip']='The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.';
+$ec_lang['lpn_energy_price']='Price of power';
+$ec_lang['lpn_energy_price_tip']='What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.';
+$ec_lang['lpn_energy_pump_price_tip']='What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.';
+$ec_lang['lpn_energy_price_pattern']='Price schedule';
+$ec_lang['lpn_energy_price_pattern_tip']='A pattern that multiplies the price hour by hour, which is how an off peak tariff is written. Leave it empty for one price all day.';
+$ec_lang['lpn_energy_demand_charge']='Demand charge';
+$ec_lang['lpn_energy_demand_charge_tip']='What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.';
+$ec_lang['lpn_energy_currency']='Currency';
+$ec_lang['lpn_energy_currency_tip']='Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.';
+$ec_lang['lpn_energy_kwh']='kWh';
+$ec_lang['lpn_energy_kw']='kW';
+$ec_lang['lpn_energy_price_note']='This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.';
+$ec_lang['lpn_energy_needs_run']='Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy under Calculate.';
+$ec_lang['lpn_energy_no_pumps']='This network has no pumps, so there is nothing drawing power.';
+$ec_lang['lpn_energy_over']='Over a run of {time}.';
+$ec_lang['lpn_energy_col_pump']='Pump';
+$ec_lang['lpn_energy_col_running']='Running';
+$ec_lang['lpn_energy_col_effic']='Effic.';
+$ec_lang['lpn_energy_col_avg_kw']='Avg. kW';
+$ec_lang['lpn_energy_col_avg_kw_tip']='The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.';
+$ec_lang['lpn_energy_col_peak_kw']='Peak kW';
+$ec_lang['lpn_energy_col_kwh']='kWh';
+$ec_lang['lpn_energy_col_cost']='Cost';
+$ec_lang['lpn_energy_total_kwh']='Energy used';
+$ec_lang['lpn_energy_total_energy_cost']='Cost of energy';
+$ec_lang['lpn_energy_peak_kw']='Highest power drawn at one moment';
+$ec_lang['lpn_energy_total_demand_charge']='Demand charge';
+$ec_lang['lpn_energy_total_cost']='Total cost';
+$ec_lang['lpn_energy_no_price']='No price of power is stated, so every cost here is zero. Set one under Settings, Energy.';
+$ec_lang['lpn_energy_curve_note']='These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.';
 // The Labels lists' two narrowest column headings, which are a column three characters wide each.
 // The decimals column is headed by an EXAMPLE of what it does -- and the example is translatable
 // because the DECIMAL SEPARATOR is a locale fact (Tom, 2026-08-18: "We could translate to '0,000'
