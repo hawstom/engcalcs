@@ -464,7 +464,26 @@ $ec_icons = array(
 	// faucet is not one of the things it models. The gap-budget correction above stands on its own
 	// merits and is the rule every icon here is measured against; it is no longer an invitation to
 	// redraw a faucet.
-	'water'      => '<path d="M12 2.5L7.5 7H16.5Z"/><path d="M8.6 7V13H15.4V7"/>'
+	// **TWO CORRECTIONS FROM TOM'S OWN SKETCH, 2026-09-04** (his "Aft. 3"):
+	//
+	// **1. NO ROOF OVERHANG.** The roof ran 7.5 to 16.5 over a body of 8.6 to 15.4, so it jutted
+	//    out on both sides -- *"it shouldn't have roof overhangs like a house"*. A water tower's
+	//    roof is the top of the tank, not a gable on a building, and the overhang was the one
+	//    detail making this read as a house on stilts. The roof now springs from the body's own
+	//    top corners.
+	// **2. A RISER.** *"Most water tanks have a pipeline coming from the middle of the tank
+	//    vertically to the ground. Some are nothing but this and a bulbous tank at the top."*
+	//    It is the feature that makes the silhouette unmistakably a water tower rather than a
+	//    hut, and it was simply missing.
+	//
+	// **THE RISER CLEARS THE GAP BUDGET, WHICH IS WHY IT IS SAFE TO ADD.** The rule above is
+	// that a gap under about 2.5 units closes at 17 px. The riser sits at x = 12 and the legs
+	// leave the tank at 9.2 and 14.8, so the tightest gap on the whole icon is 2.8 units, at
+	// the top where the three verticals are closest; everywhere below that the legs splay away
+	// and the gap only widens. Measured, not assumed -- a third vertical between two others is
+	// exactly the shape that budget exists to police.
+	'water'      => '<path d="M12 2.5L8.6 7H15.4Z"/><path d="M8.6 7V13H15.4V7"/>'
+		. '<path d="M12 13V20.5"/>'
 		. '<path d="M9.2 13L6.5 20.5"/><path d="M14.8 13L17.5 20.5"/>',
 
 	// FIRE HYDRANT -- drawn for Water > Fire flow at a hydrant (ROADMAP Task 530).

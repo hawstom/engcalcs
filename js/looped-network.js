@@ -8247,66 +8247,90 @@ var EngCalcs = EngCalcs || {};
 			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier', 'Size multiplier']);
 			return out;
 		}
-		// **THE ORDER IS THE READING ORDER, AND IT IS A RULE RATHER THAN AN ACCUMULATION** (Tom,
-		// 2026-09-04, having asked twice: *"First are the asset properties and second are the
-		// results. Within those groups, the most fundamental properties come first and the lesser
-		// used or more advanced properties come last."*). Every specialised property used to be
-		// PUSHED FIRST, simply because each was added at the top of this function as it was built,
-		// so a reader opening Find met two reaction coefficients before they met Diameter. The
-		// ordinary field list carries the inputs-then-results order already; the specialised ones
-		// are appended after it, most-used first, and a new one goes at the END of that tail rather
-		// than at the top of this function.
-		if (d.key !== 'all') {
-			defs = d.group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc);
-			allowed = d.group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS;
-			defs.forEach(function (f) {
-				// **PLUS THE INPUTS A COLOUR RAMP HAS NO USE FOR.** COLOR_LINK_FIELDS is EPANET's View
-				// menu, which has no length in it because nobody colours a network by length -- but
-				// "which pipes are longer than 500 ft" is one of the most natural searches there is,
-				// and the number is right there on the pipe. Searching and colouring are different
-				// questions and this is where they part.
-				if (allowed[f[0]] !== undefined || FIND_EXTRA_LINK_FIELDS[f[0]]) { out.push([f[0], f[1], f[0]]); }
+		// **THE ORDER IS A RULE, AND THIS IS THE SECOND ATTEMPT AT IT** (Tom, 2026-09-04: *"I see
+		// results mixed with asset properties. So you didn't try the rules I gave you. And, for
+		// example, it seems that all the Demand options should be together, no?"*). He was right on
+		// both counts. The first attempt only moved the specialised properties to the end and left
+		// the rest borrowed from nodeFieldDefs()/linkFieldDefs(), which is the LABELS panel's list
+		// and is ordered for its own reasons -- so Head and Pressure still came before Elevation.
+		//
+		// **THE RULE, IN FOUR BANDS, ORDERED BY WHAT A NUMBER IS RATHER THAN WHERE IT CAME FROM:**
+		//   1. IDENTITY   -- what the thing is called.
+		//   2. WHAT YOU TYPED -- the asset's own properties, most fundamental first, and every facet
+		//      of one concept adjacent.
+		//   3. WHAT THE MODEL WORKED OUT -- results, in the order a person reads them off a report.
+		//   4. QUESTIONS ABOUT THE DRAWING rather than about the element in hand.
+		//
+		// **AND THE ANSWER TO "SHOULDN'T ALL THE DEMAND OPTIONS BE TOGETHER":** two of the three are,
+		// and the third cannot be. `Base demand` and `Demand description` are both things you type,
+		// so they are adjacent in band 2. `Demand` is the base resolved under its own pattern at the
+		// moment on the clock -- it is a RESULT, and it changes when nothing about the junction has
+		// changed. Putting it beside the number you typed would be the same conflation this suite
+		// refuses everywhere else: a number the user supplied and a number we computed are different
+		// kinds of thing and must never sit in one field. So it sits with the other results, where
+		// its neighbours also move when the clock does.
+		//
+		// **A NEW PROPERTY GOES INTO ITS BAND, not at the top of this function.** The lists here are
+		// explicit for exactly that reason: the previous order was an accumulation, newest first,
+		// because every addition was pushed before everything already written.
+		var BAND_NODE = [
+			['elev', 'lpn_field_elev', 'Elevation'],
+			['demand', 'lpn_field_base_demand', 'Base demand'],
+			['demandCategory', 'lpn_find_prop_demand_description', 'Demand description'],
+			['fireFlow', 'lpn_ff_required', 'Required fire flow']
+		];
+		var RESULT_NODE = [
+			['demandActual', 'bpn_demand', 'Demand'],
+			['head', 'lpn_result_head', 'Head'],
+			['pressure', 'lpn_result_pressure', 'Pressure'],
+			['quality', null, 'Water age']
+		];
+		var BAND_LINK = [
+			['diameter', 'lpn_field_diameter', 'Diameter'],
+			['length', 'lpn_field_length', 'Length'],
+			['roughness', null, 'Roughness'],
+			['km', 'lpn_field_km_short', 'Minor loss, k'],
+			['bulkCoeff', 'lpn_reaction_bulk', 'Bulk reaction coefficient'],
+			['wallCoeff', 'lpn_reaction_wall', 'Wall reaction coefficient']
+		];
+		var RESULT_LINK = [
+			['flow', 'lpn_result_flow', 'Flow'],
+			['velocity', 'lpn_result_velocity', 'Velocity'],
+			['headloss', 'lpn_result_headloss', 'Head loss'],
+			['gradient', 'lpn_result_gradient', 'Head loss gradient']
+		];
+		// A row is offered only where it can match, which is the standing honesty rule: a property
+		// that silently matches nothing does not go in the menu.
+		function offer(list) {
+			list.forEach(function (f) {
+				var key = f[0];
+				if (key === 'demandCategory' || key === 'fireFlow') {
+					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
+				} else if (key === 'bulkCoeff' || key === 'wallCoeff') {
+					if (d.group !== 'link' || (d.type && d.type !== 'pipe') || !reactionFieldsShown()) { return; }
+				} else {
+					// Everything else is offered where the Labels list and the colour ramp agree it
+					// exists, which is the same test this function has always applied.
+					var allowedMap = d.group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS;
+					if (allowedMap[key] === undefined && !FIND_EXTRA_LINK_FIELDS[key]) { return; }
+				}
+				// The heading follows the quality mode and the friction method, so those two are
+				// asked for rather than stored -- the same reason nodeFieldDefs() calls them.
+				var label = key === 'quality' ? qualityLabel()
+					: key === 'roughness' ? roughnessLabel()
+					: (f[1] && pc[f[1]]) || f[2];
+				out.push([key, label, f[2]]);
 			});
 		}
-		// **DEMAND DESCRIPTION, ON JUNCTIONS ONLY** (Tom, 2026-08-26: *"is it feasible to search for
-		// categories or nodes with something about categories?"*). It is offered where it can
-		// match: a reservoir and a tank have no demand at all, and the standing rule is that a
-		// property which silently matches nothing does not go in the menu.
-		//
-		// **IT IS NAMED "Demand description" HERE AND "Description" IN THE POPUP, ON PURPOSE.**
-		// Inside the popup it sits in the demand table and the column it belongs to is obvious; in
-		// this list it stood alone as "Description" beside Elevation and Pressure, and Tom read it
-		// as a field this page does not have: *"Description is in the Find selector for Junction.
-		// But we don't have a Description field."* Same property, two contexts, and only one of
-		// them supplies the noun.
-		//
-		// **A JUNCTION HAS SEVERAL OF THEM, WHICH NO OTHER SEARCHABLE PROPERTY DOES.** That is why
-		// findCategoriesOf() exists and why findMatches() has a branch for it: `contains` and
-		// `equal to` ask their question of EVERY row and match if ANY row answers. Folding them
-		// into one joined string instead would make `equal to` false for every junction that has
-		// more than one category, which is exactly the junction somebody is searching for.
-		if (d.group === 'node' && (!d.type || d.type === 'junction')) {
-			out.push(['demandCategory', pc.lpn_find_prop_demand_description || 'Demand description',
-				'Demand description']);
-			// **JUNCTIONS ONLY, and only because a junction is the only node that can hold one**
-			// (Task 530) -- the same honesty rule as the row above. "Which junctions did I give
-			// 3,000 gpm" has no other answer on this page, and it is the query that makes a bulk
-			// Replace of it reachable.
-			out.push(['fireFlow', pc.lpn_ff_required || 'Required fire flow', 'Required fire flow']);
-		}
-		// **THE PIPE'S TWO REACTION COEFFICIENTS, LAST, ON PIPES AND ONLY WHILE ONE IS LIVE**
-		// (Task 566). Two rules meet here and both are written above: a property that matches
-		// nothing stays out of the menu, and a coefficient is a control only while a chemical is
-		// tracked. They are the most advanced thing in this list, so they end it.
-		if (d.group === 'link' && (!d.type || d.type === 'pipe') && reactionFieldsShown()) {
-			out.push(['bulkCoeff', pc.lpn_reaction_bulk || 'Bulk reaction coefficient', 'Bulk reaction coefficient']);
-			out.push(['wallCoeff', pc.lpn_reaction_wall || 'Wall reaction coefficient', 'Wall reaction coefficient']);
+		if (d.key !== 'all') {
+			offer(d.group === 'node' ? BAND_NODE : BAND_LINK);
+			offer(d.group === 'node' ? RESULT_NODE : RESULT_LINK);
 		}
 		// **CONNECTION IS OFFERED UNDER "Everything" TOO, and it is the one property that earns the
 		// exception to the matches-nothing rule.** It matches every NODE and says so in every row it
 		// returns. It is also inherently a question about the network rather than about a class of
 		// element, so restricting it to the node scopes would mean running the same report three
-		// times. Last, because it asks about the drawing rather than about the element in hand.
+		// times. Band 4, and alone in it.
 		if (d.key === 'all' || d.group === 'node') {
 			out.push(['connection', pc.lpn_find_prop_connection || 'Connection', 'Connection']);
 		}
@@ -14839,6 +14863,21 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 		flushOutgoingFile();
 		var inheritedSettings = JSON.parse(JSON.stringify(settings));
+		// **THE FRICTION METHOD IS NOT INHERITED, AND IT IS THE ONE SETTING THAT IS NOT** (Tom,
+		// 2026-09-04: *"The default Friction method for a new project is Darcy-Weisbach. It should
+		// be Hazen-Williams."*). Everything else here is carried on purpose -- units, ID prefixes,
+		// map appearance are preferences a person holds across projects, which is the whole reason
+		// this inheritance exists. A friction method is not a preference: it is a modelling choice
+		// that belongs to a particular network, and it arrives through the door of whatever file
+		// was opened last. Open one Darcy-Weisbach file and every blank project afterwards is
+		// Darcy-Weisbach, silently, with a roughness default to match.
+		//
+		// The default roughness follows the method, exactly as the Settings row does when a person
+		// changes it by hand -- otherwise a new project starts on Hazen-Williams with a roughness
+		// meant for a friction factor.
+		delete inheritedSettings.method;
+		inheritedSettings.defaults = inheritedSettings.defaults || {};
+		inheritedSettings.defaults.roughness = defaultRoughnessFor('hw');
 		var inheritedLabels = JSON.parse(JSON.stringify(labelSettings));
 		var id = newProjectId();
 		// Computed BEFORE the push below, or the project would be counted against itself.

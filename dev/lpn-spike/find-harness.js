@@ -1001,5 +1001,41 @@ console.log('\n--- the Query label carries a real, wired tip ---');
 		!/findQueryInput\.title\s*=/.test(src));
 }
 
+// ---- THE PROPERTY LIST IS IN BANDS, AND THE BANDS ARE THE POINT --------------------------------
+//
+// **THIS ORDER WAS WRONG TWICE AND TOM CAUGHT IT BOTH TIMES.** Every specialised property used to be
+// pushed at the top of findPropDefs() as it was written, so the list grew newest-first and a reader
+// met two reaction coefficients before Diameter. The first repair only moved those to the end and
+// left the middle borrowed from the Labels panel's list, so Head and Pressure still came before
+// Elevation -- *"I see results mixed with asset properties."*
+//
+// The rule, asserted rather than described: identity, then WHAT YOU TYPED, then WHAT THE MODEL
+// WORKED OUT, then questions about the drawing. `Demand` is deliberately in the results band even
+// though `Base demand` is an input, because it is the base resolved under its pattern at the moment
+// on the clock -- it moves when nothing about the junction has.
+console.log('\n--- the property list reads in bands ---');
+{
+	const idx = (list, key) => list.indexOf(key);
+	const junction = L.propKeys('junction');
+	const jk = junction;
+	ok('a junction offers what you typed before what was worked out',
+		idx(junction, 'elev') < idx(junction, 'head') &&
+		idx(junction, 'demand') < idx(junction, 'pressure'), jk.join(','));
+	ok('...with the two demand INPUTS adjacent',
+		idx(junction, 'demandCategory') === idx(junction, 'demand') + 1, jk.join(','));
+	ok('...and the resolved demand among the results, not beside the typed one',
+		idx(junction, 'demandActual') > idx(junction, 'fireFlow'), jk.join(','));
+	ok('...and Connection last, because it asks about the drawing',
+		idx(junction, 'connection') === junction.length - 1, jk.join(','));
+
+	const pipe = L.propKeys('pipe');
+	const pk = pipe;
+	ok('a pipe offers Diameter before Flow', idx(pipe, 'diameter') < idx(pipe, 'flow'), pk.join(','));
+	ok('...and Length and Roughness before any result',
+		idx(pipe, 'length') < idx(pipe, 'velocity') &&
+		idx(pipe, 'roughness') < idx(pipe, 'headloss'), pk.join(','));
+}
+
+
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');
 process.exit(fails === 0 ? 0 : 1);
