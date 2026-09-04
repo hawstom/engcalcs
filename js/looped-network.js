@@ -22626,12 +22626,12 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 		});
 		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET solver', engInput, pc.lpn_settings_engine_epanet_tip);
-		// EPANET's own Analysis Options order puts Quality directly after Hydraulics, and so does
-		// the Settings box. One call; every row it builds is settingsQualityRows()'s own.
-		settingsQualityRows(qualBody, row, note);
-		// Energy last, which is EPANET's own Analysis Options order and this page's: Hydraulics,
-		// Quality, Reactions, Times, Energy.
+		// Energy, then Quality LAST -- the reading order the markup sets, and the reasoning is in
+		// Looped-Network.php beside the sections themselves. Build order does not decide what a
+		// reader meets first (the hosts are already in the page), but keeping the two in step means
+		// nobody has to hold two orders in their head.
 		settingsEnergyRows(energyBody, row, note);
+		settingsQualityRows(qualBody, row, note);
 		// **AUTOMATIC RECALCULATION** (Task 467, Tom 2026-08-20). The switch this page had was a
 		// measurement nobody could see; this is the same decision made out loud. Turning it OFF puts
 		// the Calculate button back on the toolbar -- js/lpn-time.js reads this through the host's
@@ -23631,6 +23631,18 @@ var EngCalcs = EngCalcs || {};
 			// The whole box: the source row appears or vanishes, and the heading this quantity is
 			// shown under changes in the Labels list, the colour legend and every table.
 			rebuildSettingsBox();
+			// **AND THE READER IS PUT BACK WHERE THEY WERE LOOKING** (Tom, 2026-09-04: *"When the
+			// Water quality parameter is changed from a chemical, it changes the Settings list, and
+			// Water Quality goes out of the view."*). Changing this one select adds or removes
+			// several rows above and below it, so the box grows or shrinks under the reader and the
+			// section they are working in scrolls off. The rebuild is the right design -- the box is
+			// a VIEW of the settings and repaints wholesale -- so the repair is to restore the
+			// VIEWPORT, not to patch the box in place. Deferred a frame because the rows it must
+			// measure past have only just been built.
+			var backTo = document.getElementById('lpn_set_sub_quality');
+			if (backTo) {
+				requestAnimationFrame(function () { scrollSetboxTo(backTo); });
+			}
 			refreshLabelText();
 			refreshPopupIfOpen();
 			scheduleSolve();

@@ -784,17 +784,23 @@ echoHeader("EngCalcs", $html_title, "", false);
 						<div class="lpn-set-subbody"><div id="lpn_set_time_fields" class="lpn-set-part"></div></div>
 						<div class="lpn-set-sub" id="lpn_set_sub_hydraulics"><?=$ec_lang['lpn_settings_hydraulics']?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_hydraulics_fields" class="lpn-set-part"></div></div>
-						<?php // Quality follows Hydraulics because that is EPANET's own Analysis Options
-						      // order -- Hydraulics, Quality, Reactions, Times, Energy -- so nobody has to
-						      // learn a second arrangement of the same ideas. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_quality"><?=$ec_lang['lpn_settings_quality']?></div>
-						<div class="lpn-set-subbody"><div id="lpn_set_quality_fields" class="lpn-set-part"></div></div>
-						<?php // And Energy last, which is where EPANET's own Analysis Options list ends
-						      // (ROADMAP Task 566). It is the one section on this page whose answer is
-						      // money, and it is read on the extended-period run, so it sits after the
-						      // clock and after the analysis that needs one. ?>
+						<?php // Energy after Hydraulics: it is the one section here whose answer is money,
+						      // and it is read on the extended-period run, so it sits after the clock and
+						      // after the analysis that needs one (ROADMAP Task 566). ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_energy"><?=$ec_lang['lpn_settings_energy']?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_energy_fields" class="lpn-set-part"></div></div>
+						<?php // **WATER QUALITY LAST, AND THIS REVERSES EPANET'S OWN ORDER ON PURPOSE**
+						      // (Tom, 2026-09-04: *"Put the Water Quality stuff at the bottom of the options
+						      // since it's advanced stuff."*). It used to follow Hydraulics because that is
+						      // EPANET's Analysis Options order -- Hydraulics, Quality, Reactions, Times,
+						      // Energy -- and the argument was that nobody should have to learn a second
+						      // arrangement of the same ideas. That argument is kept here because it is a
+						      // good one and would otherwise be re-made; what outranks it is that this is
+						      // the section fewest readers want, and putting it mid-list makes everyone
+						      // scroll past a chemistry question to reach the clock. Depth, not EPANET's
+						      // sequence, decides the order of a list a beginner reads top to bottom. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_quality"><?=$ec_lang['lpn_settings_quality']?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_quality_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
 				<?php // **THE COLOUR-SCHEME ACKNOWLEDGEMENTS ARE A FOOTER, NOT A SETTING** (Tom, 2026-08-19:
