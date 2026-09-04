@@ -2727,6 +2727,15 @@ $ec_lang['lpn_reaction_bulk_tip']='Reaction in the body of the water, used for e
 $ec_lang['lpn_reaction_wall']='Wall reaction coefficient';
 $ec_lang['lpn_reaction_wall_tip']='Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.';
 $ec_lang['lpn_reaction_pipe_tip']='This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.';
+// The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
+// stands in is a tank's, so the word "tank" would only be said twice.
+$ec_lang['lpn_reaction_tank']='Reaction coefficient';
+$ec_lang['lpn_reaction_tank_tip']='Reaction in the water held in this tank, as a rate in 1/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Leave it empty and the tank uses the bulk reaction coefficient set for the whole network under Settings, Water quality.';
+// Three column headings, in tables whose tab already says what the parts are. Column width is king,
+// so each drops the word "coefficient" that the popup label carries in full.
+$ec_lang['lpn_reaction_bulk_short']='Bulk reaction';
+$ec_lang['lpn_reaction_wall_short']='Wall reaction';
+$ec_lang['lpn_reaction_tank_short']='Reaction';
 // The two unit words the coefficient labels are built from. Translatable, because the abbreviation
 // for a day is not the same word everywhere.
 $ec_lang['lpn_reaction_per_day']='1/day';

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**20 still to read**, of 20 untranslated keys, of 1557 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**25 still to read**, of 25 untranslated keys, of 1562 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (20, 20 to read @@ NEEDS RULING)
+## lpn_  (25, 25 to read @@ NEEDS RULING)
 
 - **`lpn_ff_col_static_tip`**
   > The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.
@@ -47,6 +47,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_reaction_bulk`**
   > Bulk reaction coefficient
   @@ NEEDS RULING
+- **`lpn_reaction_bulk_short`**
+  > Bulk reaction
+  @@ NEEDS RULING
 - **`lpn_reaction_bulk_tip`**
   > Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one grows it. First order unless the file says otherwise, so the coefficient is a rate in 1/day. An empty box means no bulk reaction.
   @@ NEEDS RULING
@@ -62,8 +65,20 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_reaction_pipe_tip`**
   > This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.
   @@ NEEDS RULING
+- **`lpn_reaction_tank`**
+  > Reaction coefficient
+  @@ NEEDS RULING
+- **`lpn_reaction_tank_short`**
+  > Reaction
+  @@ NEEDS RULING
+- **`lpn_reaction_tank_tip`**
+  > Reaction in the water held in this tank, as a rate in 1/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Leave it empty and the tank uses the bulk reaction coefficient set for the whole network under Settings, Water quality.
+  @@ NEEDS RULING
 - **`lpn_reaction_wall`**
   > Wall reaction coefficient
+  @@ NEEDS RULING
+- **`lpn_reaction_wall_short`**
+  > Wall reaction
   @@ NEEDS RULING
 - **`lpn_reaction_wall_tip`**
   > Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.

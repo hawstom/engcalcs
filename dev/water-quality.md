@@ -116,9 +116,13 @@ Built 2026-09-03 (Task 566). Against the six-item list this section used to carr
    and the exporter writes the file's own characters back while the live values still parse out of
    them. Net1's `Global Bulk -.5` arrives as `-0.5` and goes back out as `-.5`.
 2. **Two per-pipe properties**, `bulkCoeff` and `wallCoeff`, on the overridable whitelist, written
-   through `setProp()`, edited in the pipe popup, and blank-capable — blank means "use the global",
-   which is EPANET's own rule and is a different statement from `0`.
-   **Still missing: a Tables column and a Find-and-replace field.**
+   through `setProp()`, and blank-capable -- blank means "use the global", which is EPANET's own
+   rule and is a different statement from `0`. **On all three screens since 2026-09-04**: the pipe
+   popup, a Pipes column, and both halves of Find and replace (`findPropDefs()` offers them
+   explicitly the way a required fire flow is offered, because `linkFieldDefs()` is the LABELS
+   panel's list and nothing prints a coefficient beside a pipe; `pushSpecList()` carries the write,
+   so `replaceWrite()` takes its `prop` branch and goes through `setProp()`).
+   A **TANK** carries its own the same way (`tankCoeff`), in the tank popup and the Tanks table.
 3. **`[QUALITY]` interpreted** — per-node initial quality, as node property `initQuality`, also
    through `setProp()`. **`[SOURCES]` and `[MIXING]` are still carried and not read**, so a booster
    dose and a tank mixing model are the next real gap. A reservoir's own initial quality is held for
@@ -137,6 +141,61 @@ Built 2026-09-03 (Task 566). Against the six-item list this section used to carr
    with the transport broken. Re-run at a 10 s quality step so the answer is the physics rather than
    one lucky discretisation.
 
-**Still not built, deliberately:** `[SOURCES]`, `[MIXING]`, a link-level quality result, a Tables
-column and a Find-and-replace field for the two coefficients, and a per-tank coefficient control
-(the value is carried on `settings.reactions.tank` and round-trips, but nothing edits it).
+**Still not built, deliberately:** `[SOURCES]` and `[MIXING]`, and a link-level quality result --
+see the two sections below.
+
+---
+
+## The tank coefficient moved off the setting and onto the tank (2026-09-04)
+
+It was read from `[REACTIONS] TANK <id> <coeff>`, kept on `settings.reactions.tank`, written back
+out, and **no screen in the application could show it or change it**. Water stands in a tank far
+longer than it stands in any main, so it is the coefficient most likely to decide what the residual
+is, and it was the one nobody could touch.
+
+- **It is a node property now**, `tankCoeff`, on `LPN_OVERRIDABLE.node`, with a row in the tank
+  popup and a column in the Tanks table. Both go through `setProp()`, so a scenario's coefficient
+  cannot edit Base -- which is the whole reason it is a property rather than a second settings map.
+- **THE VALUE HAS ONE HOME, and moving it is the point.** `readQualitySections()` lands the file's
+  map on the tanks and leaves `settings.reactions.tank` empty; `adoptTankCoeffs()` does the same for
+  a project saved while it lived on the setting, and empties the map there too. Copied instead of
+  moved, the first edit would produce two numbers and no reader could say which one the engine gets.
+- `docReactions()` and `liveReactions()` (`js/lpn-inp.js`) gather it off the tanks through
+  `effective()`, so the round trip and the engine both see the scenario's own value.
+
+## A source share now states its unit, and that took a second slot (2026-09-04)
+
+`qualityUnitId()` answers `''` for a source share, honestly: a percentage has no unit family, no
+factor and nothing to convert. But `''` reaches a heading as **no unit at all**, which is what a
+dimensionless number like a minor-loss k says -- and a percentage is not that. A bare 43 under the
+word "Source share" is a fraction to one reader and a percent to the next.
+
+**Unitless and dimensionless are different states, so the unit SLOT takes an id and a second slot
+takes TEXT.** `qualityUnitText()` is the one place all three modes are answered -- the time unit for
+an age, `%` for a share, and the document's own characters for a concentration -- and the property
+popup's result row, the Tables heading (`c.unitText`) and the colour legend
+(`colorFieldUnitText()`) all read it. The `%` needs no language key, on the legend's own rule for
+`<`, `≥` and the en dash: the same mark in all 27 languages, placed by the bidi algorithm for an
+RTL reader. The gradient's `gradientSuffix()` was already living on this split; this generalises it
+rather than inventing it.
+
+## Link quality: DECLINED, with the reasons (2026-09-04)
+
+EPANET reports a quality for a LINK as well as for a node, and the bridge captures nodes only. It
+stays that way, and this is the record so it is not re-proposed as an oversight:
+
+- **The dimension would be half-symmetric, which reads worse than an absent one.** A pipe's number
+  is an average over the parcels in it; a PUMP and a VALVE are zero-length links that hold no water,
+  so their average is a fiction. Every screen that carries a link result -- the Pipes, Pumps and
+  Valves tables, the map labels, the colour ramp, the popup -- would then have a column that is real
+  in one table and meaningless in two.
+- **The question is asked at nodes.** "How old is the water at this hydrant", "how much of this
+  service comes from the lake", "what residual reaches the end of the system" are all node
+  questions, and EPA's own `Net3.rpt` reports quality per node for that reason.
+- **There is no anchor for the pipe average.** The two published references in this repository
+  (`Net3.rpt` and the analytic single-pipe case) both answer at a node, so a link column would be
+  the one water-quality number in the page checked against nothing.
+- **It is cheap to add later and expensive to withdraw.** Nothing about the design forecloses it:
+  the engine call is `getLinkValue(..., EN_LINKQUAL)` beside the node loop that already exists.
+- **What it would take to change this ruling:** a user asking for an average age in a main, and an
+  answer for what a pump and a valve show. Not before.
