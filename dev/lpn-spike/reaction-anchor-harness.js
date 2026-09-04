@@ -356,3 +356,41 @@ const EngCalcs = global.EngCalcs;
 		: `\nreaction anchor harness: ${failures} FAILED`);
 	process.exit(failures === 0 ? 0 : 1);
 }()).catch(function (e) { console.error(e); process.exit(1); });
+
+// ---- THE WARM SESSION MUST NOTICE A QUALITY CHANGE -------------------------------------------
+//
+// **THE SAME DEFECT `hydraulics` HAD, ONE FIELD OVER, AND IT SHIPPED WITH THIS FEATURE.** The
+// engine keeps an open Project between runs and reuses it whenever the network's SHAPE is
+// unchanged. `Quality`, `[QUALITY]` and `[REACTIONS]` live in the `.inp` TEXT and no setter pushes
+// them, so with them absent from signatureOf() a person who changed the analysis, the trace node or
+// a coefficient and pressed Run got the previous run's answer back -- silently, for as long as the
+// shape held. js/lpn-epanet.js's own comment makes exactly this argument for the hydraulic options;
+// nobody applied it to the quality ones when the chemical mode landed on 2026-09-03.
+//
+// Asserted on the SIGNATURE rather than on two engine runs, because the signature is the whole of
+// the claim and a run would take seconds to prove one string comparison.
+(function () {
+	var sig = EngCalcs.lpnEpanetSignatureForTest;
+	if (typeof sig !== 'function') {
+		console.log('  FAIL the signature is not reachable for testing');
+		process.exitCode = 1;
+		return;
+	}
+	var base = { nodes: [], links: [], hydraulics: {},
+		quality: { mode: 'chemical', chemical: 'Chlorine mg/L' },
+		reactions: { globalBulk: -0.5, globalWall: 0, bulk: {}, wall: {}, tank: {} } };
+	function withQ(q) { return Object.assign({}, base, { quality: Object.assign({}, base.quality, q) }); }
+	function withR(r) { return Object.assign({}, base, { reactions: Object.assign({}, base.reactions, r) }); }
+	function ok2(name, cond, extra) {
+		console.log((cond ? '  ok   ' : '  FAIL ') + name + (extra === undefined ? '' : '   ' + extra));
+		if (!cond) { process.exitCode = 1; }
+	}
+	var s0 = sig(base);
+	ok2('a changed ANALYSIS moves the session signature', sig(withQ({ mode: 'age' })) !== s0);
+	ok2('a changed TRACE NODE moves it', sig(withQ({ traceNode: 'Lake' })) !== s0);
+	ok2('a changed CHEMICAL NAME or unit moves it', sig(withQ({ chemical: 'Fluoride mg/L' })) !== s0);
+	ok2('a changed GLOBAL coefficient moves it', sig(withR({ globalBulk: -5 })) !== s0);
+	// The per-pipe maps are one level down, which is exactly where a flat join would stop looking.
+	ok2('a PER-PIPE coefficient moves it too', sig(withR({ bulk: { P1: -0.4 } })) !== s0);
+	ok2('...and the same model twice gives the same signature', sig(base) === s0);
+})();

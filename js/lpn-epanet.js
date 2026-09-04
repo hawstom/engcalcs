@@ -780,6 +780,20 @@
 	 * Everything about a model that a setter cannot reach. Same string => the open Project is
 	 * still the right shape and only values need pushing.
 	 */
+	// One flat string for a bag of settings, one level deep: `reactions` carries three id-keyed
+	// maps inside it, and a per-pipe coefficient must move the signature exactly as a global does.
+	function bagSignature(o) {
+		var b = o || {};
+		return Object.keys(b).sort().map(function (k) {
+			var v = b[k];
+			if (v && typeof v === 'object') {
+				return k + '=' + Object.keys(v).sort().map(function (id) {
+					return id + ':' + v[id];
+				}).join(',');
+			}
+			return k + '=' + v;
+		}).join('');
+	}
 	function signatureOf(model) {
 		var parts = [model.method || 'hw', model.emitterExponent || 0.5], i, n, l;
 		// **EVERY `[OPTIONS]` VALUE IS IN THE SIGNATURE, AND IT HAS TO BE** (Task 553). These are
@@ -797,6 +811,19 @@
 		parts.push(Object.keys(hyd).sort().map(function (k) {
 			return k + '=' + hyd[k];
 		}).join(''));
+		// **AND EVERY WATER-QUALITY VALUE, FOR EXACTLY THE SAME REASON** (Task 566, 2026-09-04).
+		// The `Quality` option, `[QUALITY]` and `[REACTIONS]` are written into the `.inp` TEXT and
+		// nothing pushes them into a warm session afterwards -- there is no setter for a bulk
+		// coefficient any more than there is one for Accuracy. Left out, a person who changed the
+		// analysis, the trace node or a reaction coefficient and pressed Run got the previous
+		// session's answer back, silently, for as long as the network's SHAPE held. That is the
+		// defect the paragraph above records for `hydraulics`, one field over, and it was missed when
+		// the chemical mode landed because a mode change usually moves something else as well.
+		//
+		// Sorted for the same reason: these bags are built by the importer's scan order and by the
+		// Settings box, and key order is not a fact about the network.
+		parts.push('q' + bagSignature(model.quality));
+		parts.push('r' + bagSignature(model.reactions));
 		for (i = 0; i < model.nodes.length; i++) {
 			n = model.nodes[i];
 			parts.push('n' + n.id + '\u0001' + n.type);
@@ -1007,6 +1034,10 @@
 	 * a test that wants to time or prove the cold path needs a way back to it, and so does any
 	 * caller that has to release the WASM heap.
 	 */
+	// The session signature, exposed for dev/lpn-spike/reaction-anchor-harness.js. Reusing a warm
+	// session for a model that changed is a SILENT wrong answer, so the one string that decides it
+	// is worth asserting directly rather than inferring from two engine runs.
+	EngCalcs.lpnEpanetSignatureForTest = function (model) { return signatureOf(model); };
 	EngCalcs.lpnEpanetReset = function () { closeSession(); };
 
 	/**
