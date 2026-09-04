@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**44 still to read**, of 66 untranslated keys, of 1603 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**55 still to read**, of 77 untranslated keys, of 1614 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (66, 44 to read @@ NEEDS RULING)
+## lpn_  (77, 55 to read @@ NEEDS RULING)
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
@@ -200,6 +200,39 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_result_concentration_tip`**
   > How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.
   _Ruled OK 2026-09-04._
+- **`lpn_scncmp_at`**
+  > {value} at {id}
+  @@ NEEDS RULING
+- **`lpn_scncmp_col_maxvelocity`**
+  > Highest velocity
+  @@ NEEDS RULING
+- **`lpn_scncmp_col_minpressure`**
+  > Lowest pressure
+  @@ NEEDS RULING
+- **`lpn_scncmp_current`**
+  > (open now)
+  @@ NEEDS RULING
+- **`lpn_scncmp_empty`**
+  > Nothing has been drawn yet, so there is nothing to solve.
+  @@ NEEDS RULING
+- **`lpn_scncmp_go`**
+  > Compare
+  @@ NEEDS RULING
+- **`lpn_scncmp_intro`**
+  > Press Compare to solve every scenario in this project and read them side by side.
+  @@ NEEDS RULING
+- **`lpn_scncmp_menu_tip`**
+  > Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.
+  @@ NEEDS RULING
+- **`lpn_scncmp_note`**
+  > Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.
+  @@ NEEDS RULING
+- **`lpn_scncmp_running`**
+  > Solving every scenario…
+  @@ NEEDS RULING
+- **`lpn_scncmp_title`**
+  > Scenario comparison
+  @@ NEEDS RULING
 - **`lpn_setbox_divider`**
   > Settings index width
   @@ NEEDS RULING

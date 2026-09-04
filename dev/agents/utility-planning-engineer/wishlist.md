@@ -112,7 +112,23 @@ open, which is the one behaviour a headless harness cannot see.
 
 ### 2. A scenario comparison table — run every scenario, one summary row each
 
-Tom: *"Nice."* Unchanged from the prior pass.
+Tom: *"Nice."*
+
+**BUILT 2026-09-04 by Claude Code, on Tom's standing instruction to take reasonable rows from these
+lists. Not promoted to `dev/ROADMAP.md` — no agent, and no session acting on an agent's list, edits
+that file.** Water > Scenario comparison: a Compare button solves every scenario in the project, one
+after another through whichever engine that network needs, and prints one row each — the scenario,
+how many values belong to it alone, the lowest pressure and where, the highest velocity and where.
+Each scenario is assembled by making it active for the length of one `assembleModel()` call and put
+back in a `finally`, because `effective()` reads the active scenario and a second resolver is how
+two answers to "what does this scenario say" would come to disagree. A scenario that will not solve
+carries the reason instead of a number and the other rows still run; an edit drops the table rather
+than leaving a stale answer standing. `dev/lpn-spike/scenario-compare-harness.js`.
+**One thing was designed away rather than built:** the pass/fail column against a stated minimum
+pressure and maximum velocity. Those two numbers already exist as the fire-flow box's design
+criteria, so a second pair here would be a second source of truth for one fact about the utility.
+If a threshold belongs anywhere it belongs to the whole project, in Settings, and then BOTH features
+read it — that is the shape to propose if this is wanted.
 
 - **What:** solve every named scenario in the project (already sub-second each, per
   `dev/looped-network-calculator-scope.md`'s own performance table) and show one row per scenario:

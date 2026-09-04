@@ -136,7 +136,10 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		['openFireFlowBox', 'Fire flow'], ['toggleFindPopup', 'Find'],
 		// Pump energy (Task 566): a report table wide enough to need the whole window on a phone,
 		// which is the case the seam exists for.
-		['openEnergyBox', 'Pump energy']];
+		['openEnergyBox', 'Pump energy'],
+		// The scenario comparison: a table one row per scenario, and the same case as Pump energy
+		// -- wide enough that a phone wants the whole window for it.
+		['openScenarioCompareBox', 'the scenario comparison']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 1603,
-        "delta_key_count": 66,
+        "expected_key_count": 1614,
+        "delta_key_count": 77,
         "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
@@ -556,6 +556,17 @@
         "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
         "lpn_energy_needs_run": "Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.",
         "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
+        "lpn_scncmp_title": "Scenario comparison",
+        "lpn_scncmp_menu_tip": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
+        "lpn_scncmp_go": "Compare",
+        "lpn_scncmp_intro": "Press Compare to solve every scenario in this project and read them side by side.",
+        "lpn_scncmp_running": "Solving every scenario…",
+        "lpn_scncmp_empty": "Nothing has been drawn yet, so there is nothing to solve.",
+        "lpn_scncmp_col_minpressure": "Lowest pressure",
+        "lpn_scncmp_col_maxvelocity": "Highest velocity",
+        "lpn_scncmp_at": "{value} at {id}",
+        "lpn_scncmp_current": "(open now)",
+        "lpn_scncmp_note": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
         "lpn_energy_over": "Over a run of {time}.",
         "lpn_energy_col_pump": "Pump",
         "lpn_energy_col_running": "Running",
@@ -624,6 +635,17 @@
         "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
         "lpn_energy_needs_run": "Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.",
         "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
+        "lpn_scncmp_title": "Scenario comparison",
+        "lpn_scncmp_menu_tip": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
+        "lpn_scncmp_go": "Compare",
+        "lpn_scncmp_intro": "Press Compare to solve every scenario in this project and read them side by side.",
+        "lpn_scncmp_running": "Solving every scenario…",
+        "lpn_scncmp_empty": "Nothing has been drawn yet, so there is nothing to solve.",
+        "lpn_scncmp_col_minpressure": "Lowest pressure",
+        "lpn_scncmp_col_maxvelocity": "Highest velocity",
+        "lpn_scncmp_at": "{value} at {id}",
+        "lpn_scncmp_current": "(open now)",
+        "lpn_scncmp_note": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
         "lpn_energy_over": "Over a run of {time}.",
         "lpn_energy_col_pump": "Pump",
         "lpn_energy_col_running": "Running",
@@ -1412,6 +1434,182 @@
             }
         },
         "lpn_energy_no_pumps": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Квалитет воде се преноси дуж цеви током времена, па је потребан EPANET решавач и укупно време рада. Поставите Укупно време рада под Време, а затим притисните дугме Израчунај.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_scncmp_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Квалитет воде се преноси дуж цеви током времена, па је потребан EPANET решавач и укупно време рада. Поставите Укупно време рада под Време, а затим притисните дугме Израчунај.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_scncmp_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Квалитет воде се преноси дуж цеви током времена, па је потребан EPANET решавач и укупно време рада. Поставите Укупно време рада под Време, а затим притисните дугме Израчунај.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_scncmp_go": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Квалитет воде се преноси дуж цеви током времена, па је потребан EPANET решавач и укупно време рада. Поставите Укупно време рада под Време, а затим притисните дугме Израчунај.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_scncmp_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Квалитет воде се преноси дуж цеви током времена, па је потребан EPANET решавач и укупно време рада. Поставите Укупно време рада под Време, а затим притисните дугме Израчунај.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_scncmp_running": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Квалитет воде се преноси дуж цеви током времена, па је потребан EPANET решавач и укупно време рада. Поставите Укупно време рада под Време, а затим притисните дугме Израчунај.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_scncmp_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Квалитет воде се преноси дуж цеви током времена, па је потребан EPANET решавач и укупно време рада. Поставите Укупно време рада под Време, а затим притисните дугме Израчунај.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_scncmp_col_minpressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Квалитет воде се преноси дуж цеви током времена, па је потребан EPANET решавач и укупно време рада. Поставите Укупно време рада под Време, а затим притисните дугме Израчунај.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_scncmp_col_maxvelocity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Квалитет воде се преноси дуж цеви током времена, па је потребан EPANET решавач и укупно време рада. Поставите Укупно време рада под Време, а затим притисните дугме Израчунај.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_scncmp_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Квалитет воде се преноси дуж цеви током времена, па је потребан EPANET решавач и укупно време рада. Поставите Укупно време рада под Време, а затим притисните дугме Израчунај.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_scncmp_current": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Квалитет воде се преноси дуж цеви током времена, па је потребан EPANET решавач и укупно време рада. Поставите Укупно време рада под Време, а затим притисните дугме Израчунај.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_scncmp_note": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

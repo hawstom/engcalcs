@@ -18647,6 +18647,15 @@ var EngCalcs = EngCalcs || {};
 				tip: pc.lpn_energy_menu_tip,
 				fn: function () { closeMenu(); openEnergyBox(); }
 			},
+			// **AND THE SCENARIO COMPARISON IS A RUN TOO**, for the same reason the two rows above
+			// it are: it solves the network once per scenario. Below them because it is the widest
+			// question of the three -- the whole project, every case -- and a reader working down
+			// this group meets the single answers first.
+			{
+				icon: 'scenarios', label: pc.lpn_scncmp_title || 'Scenario comparison',
+				tip: pc.lpn_scncmp_menu_tip,
+				fn: function () { closeMenu(); openScenarioCompareBox(); }
+			},
 			{
 				icon: 'info', label: pc.lpn_time_run_report || 'EPANET run report',
 				tip: pc.lpn_time_run_report_tip,
@@ -19188,6 +19197,7 @@ var EngCalcs = EngCalcs || {};
 		wireLibraryBox();
 		wireFireFlowBox();
 		wireEnergyBox();
+		wireScenarioCompareBox();
 		buildMenuBar();
 		wireScenarioButton();
 		wireWrongButtons();
@@ -28523,7 +28533,11 @@ var EngCalcs = EngCalcs || {};
 	// `solve` injected for exactly this reason). The rule is runSolve()'s own: a network holding a
 	// PRV, PSV or FCV goes to EPANET whatever the preference says, because our own solver does not
 	// switch a valve's state inside the iteration.
-	function fireFlowEngine(model) {
+	//
+	// **NOT FIRE FLOW'S ANY MORE**, though it was written there and still lives beside it: the
+	// scenario comparison run asks the same question of the same model, and two functions choosing
+	// an engine is two answers to "which engine solves this network" waiting to disagree.
+	function engineFor(model) {
 		var only = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [],
 			useEpanet = (settings.engine === 'epanet' || only.length > 0) && !!EngCalcs.lpnSolveEpanet;
 		return {
@@ -28687,7 +28701,7 @@ var EngCalcs = EngCalcs || {};
 		if (EngCalcs.lpnFireFlowLossAccounting === 'raw-node') {
 			ffEl('p', 'lpn-ff-note', pc.lpn_ff_accounting, host);
 		}
-		engine = fireFlowEngine(assembleModel());
+		engine = engineFor(assembleModel());
 		ffEl('p', 'lpn-ff-note', engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native, host);
 		ffEl('p', 'lpn-ff-note', pc.lpn_ff_engine_cost, host);
 		// Said only where there is a clock to be confused by. A project with no run schedule has
@@ -29170,7 +29184,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		model = assembleModel();
-		engine = fireFlowEngine(model);
+		engine = engineFor(model);
 		if (ask.design !== 'off') {
 			design = {
 				nodes: model.nodes.filter(function (n) { return n.type === 'junction'; })
@@ -29399,6 +29413,229 @@ var EngCalcs = EngCalcs || {};
 				.replace('{ids}', curveNames.join(', ')), host);
 		}
 	}
+	// ---- SCENARIO COMPARISON (the planning engineer's wish-list row 2; Tom: *"Nice."*) ----------
+	//
+	// Solve every scenario in the project and print one row each. The seat's own case, CITED in its
+	// wish list: the same three scenario names recur across every published water master plan it
+	// read -- average day, maximum day, peak hour -- and this page could only ever show one of them
+	// at a time. Bentley's WaterGEMS advertises the same thing as a batch run, which is evidence of
+	// DEMAND rather than of quality.
+	//
+	// **IT IS A RUN, SO IT SITS WITH THE RUNS.** The Water menu's two groups are what you READ
+	// beside the map and what you RUN on it; this solves the network N times, so it is a sibling of
+	// Fire flow and Pump energy report, not a seventh table in the bottom pane. Same reasoning that
+	// settled Task 577 the day before.
+	//
+	// **NO THRESHOLD COLUMN, AND THAT IS A DECISION RATHER THAN AN OMISSION.** The seat asked for
+	// pass/fail against a stated minimum pressure and maximum velocity. Those two numbers already
+	// exist, in the fire-flow box, as its design criteria -- so a second pair here would be a second
+	// source of truth for one fact about the utility, and the two would disagree the first time
+	// somebody edited one. The numbers are printed and the reader judges them; if a threshold ever
+	// belongs here it belongs to the whole project, in Settings, and then BOTH features read it.
+	var scenarioCompareRun = null;
+	var scenarioCompareBusy = false;
+	function scnCmpBoxEl() { return document.getElementById('lpn_scncmp_box'); }
+	function scnCmpBoxIsOpen() {
+		var box = scnCmpBoxEl();
+		return !!box && box.style.display !== 'none';
+	}
+	// **ONE MODEL PER SCENARIO, BUILT BY MAKING EACH ONE ACTIVE IN TURN.** effective() reads
+	// activeScenario(), so this is the only way to assemble a scenario that is not the open one
+	// without writing a second resolver -- and a second resolver is how the two would come to
+	// disagree about an override. The swap is synchronous and restored in a `finally`, so nothing
+	// else can observe it, and the scenario the user is working in is put back whatever happens.
+	//
+	// **assembleModel() ALREADY CONVERTS TO SI AND COPIES**, which is why solving from these is not
+	// a violation of "only the user touches a file's numbers": the document is read, never written.
+	// The guard below is belt and braces, exactly as the fire-flow sweep's is.
+	function scenarioCompareModels() {
+		var was = project.activeScenario, out = [];
+		try {
+			scenarios.forEach(function (s) {
+				project.activeScenario = s.id;
+				out.push({ scn: s, model: assembleModel() });
+			});
+		} finally {
+			project.activeScenario = was;
+		}
+		return out;
+	}
+	// The two numbers a row reports, read off a solved model. SI throughout; the display conversion
+	// happens once, in the cell, exactly as it does everywhere else on this page.
+	//
+	// **A PUMP HAS NO VELOCITY** -- it is a zero-length link and its `velocities` entry is not a
+	// speed through a pipe -- so it is skipped here for the same reason the label machinery skips it.
+	function scenarioCompareExtremes(model, result) {
+		var out = { minPressure: undefined, minAt: '', maxVelocity: undefined, maxAt: '' };
+		model.nodes.forEach(function (n) {
+			var p = result.pressures ? result.pressures[n.id] : undefined;
+			if (typeof p !== 'number' || !isFinite(p)) { return; }
+			if (out.minPressure === undefined || p < out.minPressure) { out.minPressure = p; out.minAt = n.id; }
+		});
+		model.links.forEach(function (l) {
+			var v = result.velocities ? result.velocities[l.id] : undefined;
+			if (l.type === 'pump' || typeof v !== 'number' || !isFinite(v)) { return; }
+			if (out.maxVelocity === undefined || v > out.maxVelocity) { out.maxVelocity = v; out.maxAt = l.id; }
+		});
+		return out;
+	}
+	// **THE SCENARIOS ARE SOLVED ONE AFTER ANOTHER, NEVER ALL AT ONCE.** The EPANET bridge is one
+	// engine instance; two solves in flight through it is a race with a shared session. Chained on
+	// a promise for the same reason the fire-flow sweep is: one engine may answer synchronously and
+	// the other may not, and the caller must not have to know which.
+	function runScenarioCompare() {
+		var pc = EngCalcs.pageConfig || {}, before, chain, rows = [];
+		if (scenarioCompareBusy) { return Promise.resolve(scenarioCompareRun); }
+		if (doc.nodes.length === 0) {
+			scenarioCompareRun = [];
+			rebuildScenarioCompareReport();
+			return Promise.resolve(scenarioCompareRun);
+		}
+		before = JSON.stringify(doc);
+		scenarioCompareBusy = true;
+		scenarioCompareRun = null;
+		rebuildScenarioCompareReport();
+		chain = Promise.resolve();
+		scenarioCompareModels().forEach(function (pair) {
+			chain = chain.then(function () {
+				var issues = EngCalcs.lpnDiagnose(pair.model), engine;
+				// A scenario can be undrawable on its own -- deactivating a link can leave a node
+				// with no path to a source -- and that is an ANSWER about that scenario rather than
+				// a failure of the run. The other rows are still solved.
+				if (issues.length > 0) {
+					rows.push({ scn: pair.scn, ok: false, why: issues.map(diagIssueText).join(' ') });
+					return null;
+				}
+				engine = engineFor(pair.model);
+				return Promise.resolve(engine.solve(pair.model)).then(function (result) {
+					var ext;
+					if (!result || !result.ok) {
+						rows.push({
+							scn: pair.scn, ok: false,
+							why: (result && result.issues && result.issues.length)
+								? result.issues.map(diagIssueText).join(' ')
+								: (pc.lpn_diag_not_converged || 'Did not converge.')
+						});
+						return;
+					}
+					ext = scenarioCompareExtremes(pair.model, result);
+					rows.push({
+						scn: pair.scn, ok: true,
+						// **A RUN THAT DID NOT CONVERGE IS REPORTED AND NOT DISCARDED**, the ruling
+						// Task 565 made for the map: the last iterate is every number in existence
+						// for that scenario, and printing nothing tells the reader less.
+						converged: result.converged !== false,
+						minPressure: ext.minPressure, minAt: ext.minAt,
+						maxVelocity: ext.maxVelocity, maxAt: ext.maxAt
+					});
+				}, function () {
+					rows.push({ scn: pair.scn, ok: false, why: pc.lpn_ff_err_solve || 'The network could not be worked out' });
+				});
+			});
+		});
+		return chain.then(function () {
+			scenarioCompareBusy = false;
+			scenarioCompareRun = rows;
+			// Set by the run, never by a user action. A false here is a defect in whatever wrote to
+			// `doc` during a solve, not in this box -- the same assertion the fire-flow sweep makes.
+			scenarioCompareDocGuard = (JSON.stringify(doc) === before);
+			rebuildScenarioCompareReport();
+			return rows;
+		});
+	}
+	var scenarioCompareDocGuard = true;
+	// One cell: the number and the element it was found at, in the reader's own units.
+	function scnCmpAt(si, unitId, id, group) {
+		var pc = EngCalcs.pageConfig || {};
+		if (typeof si !== 'number' || !isFinite(si)) { return FF_DASH; }
+		return (pc.lpn_scncmp_at || '{value} at {id}')
+			.replace('{value}', ffQty(si, unitId))
+			.replace('{id}', labelPrefixFor(group, 'id') + id);
+	}
+	function rebuildScenarioCompareReport() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_scncmp_report'), body;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (scenarioCompareBusy) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_running || 'Solving every scenario…', host);
+			return;
+		}
+		if (!scenarioCompareRun) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_intro ||
+				'Press Compare to solve every scenario in this project and read them side by side.', host);
+			return;
+		}
+		if (!scenarioCompareRun.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_empty ||
+				'Nothing has been drawn yet, so there is nothing to solve.', host);
+			return;
+		}
+		body = ffTable(host, [
+			pc.lpn_scenario_label || 'Scenario',
+			pc.lpn_scenario_overrides || 'Custom values',
+			pc.lpn_scncmp_col_minpressure || 'Lowest pressure',
+			pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'
+		]);
+		scenarioCompareRun.forEach(function (r) {
+			var tr = ffEl('tr', null, null, body), name = scenarioDisplayName(r.scn);
+			// The scenario the user is working in is marked, because a table of names with no "you
+			// are here" makes the reader go and check the status strip.
+			if (r.scn.id === project.activeScenario) {
+				name += ' ' + (pc.lpn_scncmp_current || '(open now)');
+			}
+			ffCell(tr, name);
+			ffCell(tr, String(overrideCount(r.scn)));
+			if (!r.ok) {
+				// One cell across both number columns: the reason is one sentence and splitting it
+				// would print half of it under "Highest velocity".
+				ffCell(tr, r.why).colSpan = 2;
+				return;
+			}
+			ffCell(tr, scnCmpAt(r.minPressure, 'lpn_u_pressure', r.minAt, 'node'));
+			ffCell(tr, scnCmpAt(r.maxVelocity, 'lpn_u_velocity', r.maxAt, 'link'));
+			if (!r.converged) {
+				ffCell(tr, pc.lpn_diag_not_converged || 'Did not converge.');
+			}
+		});
+		ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_note ||
+			'Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.', host);
+	}
+	function openScenarioCompareBox() {
+		var box = scnCmpBoxEl(), h, r, top;
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildScenarioCompareReport();
+		placePanelForScreen(box, function () {
+			h = fitPanelToViewport(box);
+			r = box.getBoundingClientRect();
+			box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
+			top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
+			capPanelToRoomBelow(box, top);
+			box.style.top = top + 'px';
+		});
+		initTipsIn(box);
+	}
+	function closeScenarioCompareBox() { hidePanel(scnCmpBoxEl()); }
+	function wireScenarioCompareBox() {
+		var box = scnCmpBoxEl(),
+			x = document.getElementById('lpn_scncmp_close'),
+			go = document.getElementById('lpn_scncmp_go');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeScenarioCompareBox); }
+		if (go) { go.addEventListener('click', function () { runScenarioCompare(); }); }
+		makePanelDraggable(box, null);
+		addPanelResizeGrip(box);
+	}
+	// **AN EDIT MAKES THE TABLE IN FRONT OF THE READER STALE**, so it is dropped rather than left
+	// standing as an answer to a network that has changed. The same rule the fire-flow run follows.
+	function dropScenarioCompareRun() {
+		if (!scenarioCompareRun) { return; }
+		scenarioCompareRun = null;
+		if (scnCmpBoxIsOpen()) { rebuildScenarioCompareReport(); }
+	}
 	function openEnergyBox() {
 		var box = energyBoxEl(), h, r, top;
 		if (!box) { return; }
@@ -29567,6 +29804,10 @@ var EngCalcs = EngCalcs || {};
 		// been re-done, or whose frames an edit dropped, must not leave last time's money on
 		// screen with nothing saying it is stale.
 		refreshEnergyBoxIfOpen();
+		// And the scenario comparison, on the same seam and for exactly the same reason: the table
+		// answered a network that has just changed under it, so it is dropped rather than left
+		// standing as though it were still true.
+		dropScenarioCompareRun();
 	}
 
 	// EPANET path. Async, so it needs a guard the synchronous path never did: this page solves

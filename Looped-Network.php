@@ -914,6 +914,22 @@ echoHeader("EngCalcs", $html_title, "", false);
 		<div id="lpn_energy_report" class="lpn-ff-report"></div>
 	</div>
 </div>
+<?php // THE SCENARIO COMPARISON (the planning engineer's wish-list row 2). Solve every scenario in
+      // the project and print one row each: the lowest pressure and the highest velocity, and where
+      // each was found. It borrows the fire flow box's shell for the reason the pump energy report
+      // does -- one set of box mechanics on this page, not a fifth -- and its table is built in JS
+      // (rebuildScenarioCompareReport), because it exists only for as long as the run behind it. ?>
+<div id="lpn_scncmp_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_scncmp_title">
+	<div id="lpn_scncmp_title" class="lpn-setbox-title"><?=$ec_lang['lpn_scncmp_title']?></div>
+	<button type="button" id="lpn_scncmp_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<?php // The run is a BUTTON and not something the box does on opening: it solves the network
+		      // once per scenario, and a box that starts work merely by being looked at is the one
+		      // shape a reader cannot undo. ?>
+		<p><button type="button" id="lpn_scncmp_go"><?=$ec_lang['lpn_scncmp_go']?></button></p>
+		<div id="lpn_scncmp_report" class="lpn-ff-report"></div>
+	</div>
+</div>
 <div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">
@@ -1528,6 +1544,17 @@ EngCalcs.pageConfig = {
 	lpn_reaction_per_day: <?=json_encode($ec_lang['lpn_reaction_per_day'])?>,
 	lpn_reaction_day: <?=json_encode($ec_lang['lpn_reaction_day'])?>,
 	lpn_reaction_note: <?=json_encode($ec_lang['lpn_reaction_note'])?>,
+	lpn_scncmp_title: <?=json_encode($ec_lang['lpn_scncmp_title'])?>,
+	lpn_scncmp_menu_tip: <?=json_encode($ec_lang['lpn_scncmp_menu_tip'])?>,
+	lpn_scncmp_go: <?=json_encode($ec_lang['lpn_scncmp_go'])?>,
+	lpn_scncmp_intro: <?=json_encode($ec_lang['lpn_scncmp_intro'])?>,
+	lpn_scncmp_running: <?=json_encode($ec_lang['lpn_scncmp_running'])?>,
+	lpn_scncmp_empty: <?=json_encode($ec_lang['lpn_scncmp_empty'])?>,
+	lpn_scncmp_col_minpressure: <?=json_encode($ec_lang['lpn_scncmp_col_minpressure'])?>,
+	lpn_scncmp_col_maxvelocity: <?=json_encode($ec_lang['lpn_scncmp_col_maxvelocity'])?>,
+	lpn_scncmp_at: <?=json_encode($ec_lang['lpn_scncmp_at'])?>,
+	lpn_scncmp_current: <?=json_encode($ec_lang['lpn_scncmp_current'])?>,
+	lpn_scncmp_note: <?=json_encode($ec_lang['lpn_scncmp_note'])?>,
 	lpn_energy_title: <?=json_encode($ec_lang['lpn_energy_title'])?>,
 	lpn_energy_menu: <?=json_encode($ec_lang['lpn_energy_menu'])?>,
 	lpn_energy_menu_tip: <?=json_encode($ec_lang['lpn_energy_menu_tip'])?>,

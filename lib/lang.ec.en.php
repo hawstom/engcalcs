@@ -2772,6 +2772,22 @@ $ec_lang['lpn_energy_kw']='kW';
 $ec_lang['lpn_energy_price_note']='This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.';
 $ec_lang['lpn_energy_needs_run']='Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.';
 $ec_lang['lpn_energy_no_pumps']='This network has no pumps, so there is nothing drawing power.';
+
+// ---- The scenario comparison (the planning engineer's wish-list row 2) ------------------------
+// One row per scenario, solved from a copy. The two column headings this borrows rather than
+// re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
+// things in the scenario menu.
+$ec_lang['lpn_scncmp_title']='Scenario comparison';
+$ec_lang['lpn_scncmp_menu_tip']='Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.';
+$ec_lang['lpn_scncmp_go']='Compare';
+$ec_lang['lpn_scncmp_intro']='Press Compare to solve every scenario in this project and read them side by side.';
+$ec_lang['lpn_scncmp_running']='Solving every scenario…';
+$ec_lang['lpn_scncmp_empty']='Nothing has been drawn yet, so there is nothing to solve.';
+$ec_lang['lpn_scncmp_col_minpressure']='Lowest pressure';
+$ec_lang['lpn_scncmp_col_maxvelocity']='Highest velocity';
+$ec_lang['lpn_scncmp_at']='{value} at {id}';
+$ec_lang['lpn_scncmp_current']='(open now)';
+$ec_lang['lpn_scncmp_note']='Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.';
 $ec_lang['lpn_energy_over']='Over a run of {time}.';
 $ec_lang['lpn_energy_col_pump']='Pump';
 $ec_lang['lpn_energy_col_running']='Running';

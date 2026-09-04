@@ -363,7 +363,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_ff_run_box', 'lpn_ff_run_body',
   // The pump energy report box (Task 566). Absent from this list, rebuildEnergyReport() returns at
   // its first line and the report is invisible to every harness.
-  'lpn_energy_box', 'lpn_energy_close', 'lpn_energy_report'
+  'lpn_energy_box', 'lpn_energy_close', 'lpn_energy_report',
+  // The scenario comparison box (planning engineer's wish-list row 2). Absent from this list,
+  // rebuildScenarioCompareReport() returns at its first line and the table is invisible to every
+  // harness -- the same silent hole the two boxes above it describe.
+  'lpn_scncmp_box', 'lpn_scncmp_close', 'lpn_scncmp_go', 'lpn_scncmp_report'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the
@@ -379,6 +383,9 @@ byId.lpn_setbox_content.appendChild(byId.lpn_set_ramp_credits);
 // reads exactly that to decide whether the box is on screen. A stub born with display '' is a box
 // every harness would be repainting without ever having opened one.
 byId.lpn_find_popup.style.display = 'none';
+// Looped-Network.php ships #lpn_scncmp_box with an inline `display:none` too, and
+// scnCmpBoxIsOpen() reads exactly that.
+byId.lpn_scncmp_box.style.display = 'none';
 // And the same reason once more: Looped-Network.php nests both Settings panes and the divider
 // between them inside .lpn-setbox-panes. The divider's ceiling is a fraction of that parent's
 // width, so a parentless index is an index with no upper clamp at all.
