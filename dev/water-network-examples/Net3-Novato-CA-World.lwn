@@ -2703,6 +2703,27 @@
 			"quality": "Trace Lake",
 			"diffusivity": "1.0",
 			"tolerance": "0.01"
+		},
+		"quality": {
+			"mode": "trace",
+			"traceNode": "Lake",
+			"src": "Trace Lake"
+		},
+		"reactions": {
+			"orderBulk": 1,
+			"orderTank": 1,
+			"orderWall": 1,
+			"globalBulk": 0,
+			"globalWall": 0,
+			"limitingPotential": 0,
+			"roughnessCorrelation": 0,
+			"tank": {}
+		},
+		"energy": {
+			"globalEfficiency": 75,
+			"globalPrice": 0,
+			"demandCharge": 0,
+			"effic": {}
 		}
 	},
 	"patterns": [

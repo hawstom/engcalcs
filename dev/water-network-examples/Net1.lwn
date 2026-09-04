@@ -28,7 +28,8 @@
 			"tok": {
 				"x": "20.00",
 				"y": "70.00"
-			}
+			},
+			"_initQuality": 0.5
 		},
 		{
 			"id": "11",
@@ -42,7 +43,8 @@
 			"tok": {
 				"x": "30.00",
 				"y": "70.00"
-			}
+			},
+			"_initQuality": 0.5
 		},
 		{
 			"id": "12",
@@ -54,7 +56,8 @@
 			"tok": {
 				"x": "50.00",
 				"y": "70.00"
-			}
+			},
+			"_initQuality": 0.5
 		},
 		{
 			"id": "13",
@@ -66,7 +69,8 @@
 			"tok": {
 				"x": "70.00",
 				"y": "70.00"
-			}
+			},
+			"_initQuality": 0.5
 		},
 		{
 			"id": "21",
@@ -78,7 +82,8 @@
 			"tok": {
 				"x": "30.00",
 				"y": "40.00"
-			}
+			},
+			"_initQuality": 0.5
 		},
 		{
 			"id": "22",
@@ -90,7 +95,8 @@
 			"tok": {
 				"x": "50.00",
 				"y": "40.00"
-			}
+			},
+			"_initQuality": 0.5
 		},
 		{
 			"id": "23",
@@ -102,7 +108,8 @@
 			"tok": {
 				"x": "70.00",
 				"y": "40.00"
-			}
+			},
+			"_initQuality": 0.5
 		},
 		{
 			"id": "31",
@@ -114,7 +121,8 @@
 			"tok": {
 				"x": "30.00",
 				"y": "10.00"
-			}
+			},
+			"_initQuality": 0.5
 		},
 		{
 			"id": "32",
@@ -126,7 +134,8 @@
 			"tok": {
 				"x": "50.00",
 				"y": "10.00"
-			}
+			},
+			"_initQuality": 0.5
 		},
 		{
 			"id": "9",
@@ -139,7 +148,8 @@
 			"tok": {
 				"x": "10.00",
 				"y": "70.00"
-			}
+			},
+			"_initQuality": 1
 		},
 		{
 			"id": "2",
@@ -154,7 +164,8 @@
 			"tok": {
 				"x": "50.00",
 				"y": "90.00"
-			}
+			},
+			"_initQuality": 1
 		}
 	],
 	"links": [
@@ -486,6 +497,27 @@
 			"quality": "Chlorine mg/L",
 			"diffusivity": "1.0",
 			"tolerance": "0.01"
+		},
+		"quality": {
+			"mode": "chemical",
+			"traceNode": "",
+			"src": "Chlorine mg/L"
+		},
+		"reactions": {
+			"orderBulk": 1,
+			"orderTank": 1,
+			"orderWall": 1,
+			"globalBulk": -0.5,
+			"globalWall": -1,
+			"limitingPotential": 0,
+			"roughnessCorrelation": 0,
+			"tank": {}
+		},
+		"energy": {
+			"globalEfficiency": 75,
+			"globalPrice": 0,
+			"demandCharge": 0,
+			"effic": {}
 		}
 	},
 	"view": {
@@ -541,8 +573,10 @@
 			"patternStart": "0:00",
 			"reportStep": "1:00",
 			"reportStart": "0:00",
-			"startClock": "12 am"
-		}
+			"startClock": "12 am",
+			"qualityStep": "0:05"
+		},
+		"qualityStep": 300
 	},
 	"controls": [
 		{
