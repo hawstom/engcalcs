@@ -86,27 +86,61 @@ happen instead of recommending a value.
 | Global efficiency, price, price pattern, demand charge | `settings.energy` | the Settings rows |
 | Currency label | `settings.energy.currency` | the Settings row (ours, not EPANET's) |
 | A pump's own price and price schedule | the pump, `energyPrice` / `energyPattern` | **`setProp()`**, and both are in `LPN_OVERRIDABLE.link` |
-| A pump's efficiency CURVE id | `settings.energy.effic` | nothing -- carried, round-trips, honoured, no control |
+| A pump's efficiency CURVE, points and name | the pump, `efficPoints` / `efficCurveId` | the **pump popup**, base-write; not `setProp()` |
 
 A document-level option has no element to key on, which is why the globals are a setting and not an
 override -- the same split the reaction globals and the scenario demand multiplier already make.
 
-**The efficiency curve is HONOURED as of Task 582, and this paragraph used to say it was not.**
-`PUMP <id> EFFIC <curve>` references a `[CURVES]` entry, and this page still keeps no general curve
-library (a pump's head curve lives on the pump), so nothing EDITS such a curve. What changed is that
-its points are kept, written back, and put on the engine input beside the `EFFIC` row that names
-them -- renamed `EF_<pumpid>`, because the head curves there are `C_<pumpid>` and a document curve
-called `C_10` would otherwise overwrite pump 10's head. The abscissa is a flow in the project's own
-unit and the engine input is always LPS; that conversion is the whole risk, and it is anchored
-against a hand-computed 62.5% in `dev/lpn-spike/pump-effic-curve-harness.js`.
+**The efficiency curve is HONOURED (Task 582) and EDITABLE (Task 585).** Tom, 2026-09-05, having
+imported a file whose `[ENERGY]` states `PUMP P1 EFFIC E1`: *"The pump has no efficiency of its own,
+and I don't see an interface for that."*
+
+- **It lives ON THE PUMP**, as `efficPoints` in the project's own flow unit and `efficCurveId` for
+  what the file calls it. That is the head curve's own shape. **The rejected alternative was a
+  document-level curve library** keyed by name, which is what EPANET's own file format is: it needs
+  a name space, an editor, a rename rule and an answer to what becomes of a curve nothing
+  references, and every one of those is a second paradigm beside `curvePoints`. Per-pump storage
+  also makes a shared curve honest -- two pumps importing one `E1` each carry its points, and
+  editing one splits it rather than silently redefining the other's.
+- **`EngCalcs.lpnEfficCurveMap()` is the one place a curve gets its NAME**, shared by `docEnergy()`
+  (what the engine runs) and `lpnExportInp()` (what the file says). A pump whose curve is `E1` in
+  one and `E1_P1` in the other is a network that solves one way on screen and another in the file.
+  A curve typed onto a pump that never had one is named `E_<pumpid>`.
+- **A curve nobody touched still exports as the file's own characters.** The carried `[CURVES]`
+  lines stay the source of truth while they parse to exactly what the pumps state
+  (`EngCalcs.lpnEfficCurveText`), which is the `[SOURCES]` / `[MIXING]` / `[TAGS]` pattern and the
+  reason editing could be added without the byte-identical round trip moving. `CURVES` differs from
+  those three in being on `INP_SECTIONS_READ` as well -- the head curves are tokenised out of it --
+  so the efficiency lines keep their own text on `toks.raw` and are the ONE partial carry.
+- **The read onto the pumps has its own guard, `settings.efficCurves`, at BOTH doors.** A project
+  saved between Task 582 and Task 585 already carries `settings.energy`, so folding it into that
+  test would walk past exactly the documents it exists for -- the trap `[TAGS]` hit the day it
+  landed after `[SOURCES]`.
+- **Base-owned, not `setProp()`.** A scenario asks what if this pump ran at a different speed or
+  paid a different tariff, not what if it were a different machine. `curvePoints` is not
+  overridable either.
+- **The table is GROWABLE where the head curve's is three fixed rows**, and the difference is
+  physical: this page FITS `h = h0 - a Q^b` from at most three points, while EPANET reads an
+  efficiency curve directly, so truncating an imported five-point curve would rewrite numbers that
+  are the user's. One blank row always waits at the end.
+- The points are stored in the project's own flow unit, so the popup prints `951.0194` for a file
+  that says `951.0194`. Reading them back out of `docEnergy()`'s m3/s and converting for display
+  printed `951.0194000000001`.
+- On the engine input the curve is renamed `EF_<pumpid>`, because the head curves there are
+  `C_<pumpid>` and a document curve called `C_10` would otherwise overwrite pump 10's head. The
+  abscissa is a flow in the project's own unit and the engine input is always LPS; that conversion
+  is the whole risk, and it is anchored against a hand-computed 62.5% for the file's own curve and
+  52.5% for an edited one in `dev/lpn-spike/pump-effic-curve-harness.js`.
 
 **Writing the `EFFIC` row without its curve was a live export defect**, not merely a missing
 feature: naming a curve the file does not contain is how EPANET comes to reject a network it would
 otherwise solve, so every export of such a document produced a file real EPANET refused.
 
-**One gap is left and the report still names it**: an `[ENERGY]` row naming a curve no `[CURVES]`
-section defines. Such a pump runs at the network efficiency, and the report says which pumps rather
-than letting their efficiency column quietly disagree with EPANET's own.
+**One gap is left and the report still names it**: a pump naming a curve with no points, which is
+what an `[ENERGY]` row referencing a `[CURVES]` section that never defines it becomes. Such a pump
+runs at the network efficiency, and the report says which pumps rather than letting their efficiency
+column quietly disagree with EPANET's own. Since Task 585 the popup offers the table on that pump
+too, so the reader can supply what the file did not.
 
 ## What it is anchored against
 
@@ -144,7 +178,6 @@ The byte-identical round trip of the section itself is asserted in the harness a
 
 ## Still not built, deliberately
 
-- **An efficiency curve control**, and the general curve library it would need.
 - **A Tables column and a Find-and-replace field** for the per-pump price -- the same gap the two
   per-pipe reaction coefficients still have.
 - **kWh per unit volume pumped**, which EPANET's report prints as kWh/Mgal. It needs a volume unit

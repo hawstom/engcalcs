@@ -2213,10 +2213,16 @@ $ec_lang['lpn_pump_curve_note']='One, two, or three points. See "Pump curve" und
 $ec_lang['lpn_field_tag']='Tag';
 $ec_lang['lpn_field_tag_tip']='A tag of your own, carried into and out of the EPANET file. A tag changes no answer. Use it to match this to the number it already has in your asset records, your maps or your work orders. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it.';
 $ec_lang['lpn_pump_effic_curve']='Efficiency curve';
-$ec_lang['lpn_pump_effic_curve_tip']='The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.';
+$ec_lang['lpn_pump_effic_curve_tip']='The name this pump\'s efficiency curve is written under in an EPANET file. Its points are below and you can edit them there. A pump you gave a curve to here is named after the pump.';
 $ec_lang['lpn_pump_effic_col']='Efficiency';
-$ec_lang['lpn_pump_effic_global']='This pump has no efficiency curve, so it runs at the network efficiency of {percent}.';
-$ec_lang['lpn_pump_effic_unstated']='This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}.';
+// The pump's own efficiency curve, editable since Task 585. Growable where the head curve's table
+// is three fixed rows, because this page FITS a head curve from at most three points while EPANET
+// reads an efficiency curve directly: truncating an imported five-point curve would be rewriting
+// numbers that are the user's.
+$ec_lang['lpn_pump_effic_note']='Flow and the percent efficiency at that flow, in the order the pump works through them. With no points the pump runs at the network efficiency.';
+$ec_lang['lpn_pump_effic_remove']='Remove this point';
+$ec_lang['lpn_pump_effic_global']='This pump has no efficiency curve, so it runs at the network efficiency of {percent}. Type points below to give it one.';
+$ec_lang['lpn_pump_effic_unstated']='This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}. Type its points below.';
 $ec_lang['lpn_pump_point1']='Point 1';
 $ec_lang['lpn_pump_point2']='Point 2';
 $ec_lang['lpn_pump_point3']='Point 3';
@@ -2859,7 +2865,7 @@ $ec_lang['lpn_energy_peak_kw']='Peak power usage';
 $ec_lang['lpn_energy_total_demand_charge']='Peak demand charge';
 $ec_lang['lpn_energy_total_cost']='Total cost';
 $ec_lang['lpn_energy_no_price']='No price of power is stated, so every cost here is zero. Set one under Settings, Energy.';
-$ec_lang['lpn_energy_curve_note']='These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.';
+$ec_lang['lpn_energy_curve_note']='These pumps name an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}. Open a pump to type its own points.';
 // The Labels lists' two narrowest column headings, which are a column three characters wide each.
 // The decimals column is headed by an EXAMPLE of what it does -- and the example is translatable
 // because the DECIMAL SEPARATOR is a locale fact (Tom, 2026-08-18: "We could translate to '0,000'

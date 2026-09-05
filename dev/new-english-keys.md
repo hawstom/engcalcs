@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**35 still to read**, of 113 untranslated keys, of 1650 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**38 still to read**, of 115 untranslated keys, of 1652 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (113, 35 to read @@ NEEDS RULING)
+## lpn_  (115, 38 to read @@ NEEDS RULING)
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
@@ -54,8 +54,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.
   _Ruled OK 2026-09-04._
 - **`lpn_energy_curve_note`**
-  > These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.
-  _Ruled OK 2026-09-05._
+  > These pumps name an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}. Open a pump to type its own points.
+  @@ NEEDS RULING
 - **`lpn_energy_demand_charge`**
   > Peak demand charge
   _Ruled OK 2026-09-04._
@@ -204,13 +204,19 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Efficiency curve
   @@ NEEDS RULING
 - **`lpn_pump_effic_curve_tip`**
-  > The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.
+  > The name this pump's efficiency curve is written under in an EPANET file. Its points are below and you can edit them there. A pump you gave a curve to here is named after the pump.
   @@ NEEDS RULING
 - **`lpn_pump_effic_global`**
-  > This pump has no efficiency curve, so it runs at the network efficiency of {percent}.
+  > This pump has no efficiency curve, so it runs at the network efficiency of {percent}. Type points below to give it one.
+  @@ NEEDS RULING
+- **`lpn_pump_effic_note`**
+  > Flow and the percent efficiency at that flow, in the order the pump works through them. With no points the pump runs at the network efficiency.
+  @@ NEEDS RULING
+- **`lpn_pump_effic_remove`**
+  > Remove this point
   @@ NEEDS RULING
 - **`lpn_pump_effic_unstated`**
-  > This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}.
+  > This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}. Type its points below.
   @@ NEEDS RULING
 - **`lpn_quality_chemical_name`**
   > Chemical and units

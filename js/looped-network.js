@@ -4212,23 +4212,32 @@ var EngCalcs = EngCalcs || {};
 			if (typeof e[k] === 'number' && isFinite(e[k])) { out[k] = e[k]; }
 		});
 		if (e.globalPattern) { out.globalPattern = e.globalPattern; }
-		Object.keys(e.effic || {}).forEach(function (id) { out.effic[id] = e.effic[id]; });
-		// **THE EFFICIENCY CURVE'S POINTS, WITHOUT WHICH THE `EFFIC` ROW NAMES NOTHING** (Task 582).
-		// `out.effic` is a map of pump id -> CURVE NAME, carried out of the file's [ENERGY]; the
-		// points behind that name live in the carried [CURVES] text and reach nobody until they are
-		// put on the model. Until this line existed, such a pump ran at the GLOBAL efficiency and
-		// its kW, its kWh and its cost were all wrong by the ratio of the two, silently.
+		// **THE CURVE IS THE PUMP'S OWN, AND ITS POINTS COME OFF THE PUMP** (Task 585). Until then
+		// `out.effic` was a map of pump id -> curve NAME read out of the file's carried [ENERGY],
+		// with the points behind that name in the carried [CURVES] text -- readable, honoured, and
+		// editable by nobody. They live on the link now, as `efficCurveId` and `efficPoints`, on
+		// exactly the limb the head curve's own points live on, and `lpnEfficCurveMap()` is the one
+		// place a pump's curve gets its name so this and the exporter cannot disagree about it.
 		//
 		// The abscissa is a FLOW in the project's own unit, like every other number on the document,
 		// and `lpnToInp` wants m3/s like every other flow on the model -- so this is the pump head
 		// curve's own crossing (see pumpCurveSI above) applied to the same axis, and not a third
 		// conversion site. Getting it wrong moves the money and nothing on screen looks wrong.
-		out.efficCurves = EngCalcs.lpnEfficCurves(doc.inpSections, 1 / unitFactor('lpn_u_flow'));
+		var efficPumps = [], qk = 1 / unitFactor('lpn_u_flow');
 		(doc.links || []).forEach(function (l) {
 			if (l.type !== 'pump' || !isActive(l)) { return; }
 			var pr = effective(l, 'energyPrice'), pat = effective(l, 'energyPattern');
 			if (typeof pr === 'number' && isFinite(pr)) { out.price[l.id] = pr; }
 			if (pat) { out.pattern[l.id] = pat; }
+			if (l.efficCurveId || (l.efficPoints && l.efficPoints.length)) {
+				efficPumps.push({ id: l.id, name: l.efficCurveId, points: l.efficPoints });
+			}
+		});
+		var em = EngCalcs.lpnEfficCurveMap ? EngCalcs.lpnEfficCurveMap(efficPumps) : { effic: {}, curves: {} };
+		out.effic = em.effic;
+		out.efficCurves = {};
+		Object.keys(em.curves).forEach(function (nm) {
+			out.efficCurves[nm] = em.curves[nm].map(function (pt) { return [pt[0] * qk, pt[1]]; });
 		});
 		return out;
 	}
@@ -14846,6 +14855,12 @@ var EngCalcs = EngCalcs || {};
 		if (!settings.energy && EngCalcs.lpnEnergyParse) {
 			readEnergySection(saved.inpSections || {}, settings, saved.links || []);
 		}
+		// **AND THE EFFICIENCY CURVES ONTO THE PUMPS, UNDER A GUARD OF THEIR OWN** (Task 585). A
+		// project saved between Task 582 and this one carries `settings.energy` already, so this
+		// test cannot be folded into the one above without missing every document it is for.
+		if (!settings.efficCurves && EngCalcs.lpnEfficCurves) {
+			readEfficCurves(saved.inpSections || {}, settings, saved.links || []);
+		}
 		// `[SOURCES]` and `[MIXING]` on the same terms as the three above (Task 579): a project
 		// saved while both were carried text gains its booster doses and its tank mixing models on
 		// open rather than never.
@@ -15871,6 +15886,8 @@ var EngCalcs = EngCalcs || {};
 				// arrives as 75 rather than as nothing, which is what lets the run say what the
 				// pumping cost.
 				readEnergySection(parsed.inpSections, s, links);
+				// The other door for the same read (Task 585); see readEfficCurves()'s own note.
+				readEfficCurves(parsed.inpSections, s, links);
 				// **AND [SOURCES] AND [MIXING]** (Task 579): a booster dose arrives as a dose the
 				// engine is told about, and a tank that is not completely mixed arrives saying so.
 				readSourceMixingSections(parsed.inpSections, s, nodes);
@@ -16043,12 +16060,47 @@ var EngCalcs = EngCalcs || {};
 		kept.effic = e.effic || {};
 		// PRESENT EVEN WHEN EMPTY, for the reason `settings.reactions` is: its presence is what
 		// tells the exporter this document's `[ENERGY]` has been read at all.
+		// **`kept.effic` IS A STAGING POST AND NOT A HOME** (Task 585). readEfficCurves() below
+		// moves it onto the pumps and empties it; it is filled here because that read needs the
+		// names the `[ENERGY]` section stated, and this is the one place they are parsed.
 		settingsObj.energy = kept;
 		(linkList || []).forEach(function (l) {
 			if (l.type !== 'pump') { return; }
 			if (e.price[l.id] !== undefined) { l._energyPrice = e.price[l.id]; }   // base-write: reading a file onto a document being CONSTRUCTED, before any scenario exists
 			if (e.pattern[l.id] !== undefined) { l._energyPattern = e.pattern[l.id]; }   // base-write: same construction pass; the file states one network, which is Base
 		});
+	}
+	/**
+	 * **A PUMP'S EFFICIENCY CURVE, MOVED ONTO THE PUMP** (Task 585). `[ENERGY]` names it and
+	 * `[CURVES]` states its points; until this task the name sat on `settings.energy.effic` and
+	 * the points stayed in the carried text, which is why nothing could edit either.
+	 *
+	 * **THE POINTS ARE TAKEN AT FACTOR 1 AND STAY IN THE PROJECT'S OWN FLOW UNIT**, exactly as a
+	 * head curve's points do: a curve point is stored in the unit its column heading names, so
+	 * `951.0194` on the document is the `951.0194` the file wrote. Reading it through m3/s and back
+	 * is what printed `951.0194000000001` on the popup before phase one stopped doing it.
+	 *
+	 * **ITS OWN RECORD AND ITS OWN GUARD, NOT A LINE INSIDE THE `[ENERGY]` ONE.** A project saved
+	 * between Task 582 and this one already carries `settings.energy`, so a read nested under that
+	 * test would walk straight past exactly the documents it exists for -- the trap `[TAGS]` hit
+	 * the day it landed after `[SOURCES]`. `settings.efficCurves` is this read's own record.
+	 */
+	function readEfficCurves(sections, settingsObj, linkList) {
+		var names = ((settingsObj.energy || {}).effic) || {},
+			pts = EngCalcs.lpnEfficCurves ? EngCalcs.lpnEfficCurves(sections || {}, 1) : {};
+		(linkList || []).forEach(function (l) {
+			var nm = names[l.id], p;
+			if (l.type !== 'pump' || !nm) { return; }
+			l.efficCurveId = nm;   // base-write: reading a file onto a document being CONSTRUCTED, and a curve is not overridable
+			p = pts[nm];
+			if (p && p.length) {
+				l.efficPoints = p.map(function (q) { return [q[0], q[1]]; });   // base-write: same construction pass
+			}
+		});
+		// MOVED, NOT COPIED: two homes for one curve name is a disagreement waiting for the first
+		// edit, and the pump is the home from here on.
+		if (settingsObj.energy) { settingsObj.energy.effic = {}; }
+		settingsObj.efficCurves = 1;
 	}
 
 	// One sentence per thing an import could not keep. Written as whole sentences rather than
@@ -27109,27 +27161,35 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 	}
 	/**
-	 * **WHAT EFFICIENCY THIS PUMP IS ACTUALLY RUNNING AT, ON THE PUMP** (Tom, 2026-09-05, having
-	 * imported a file whose [ENERGY] states `PUMP P1 EFFIC E1`: *"The pump has no efficiency of its
-	 * own, and I don't see an interface for that."*). He was right twice over: the number reached
-	 * the engine and reached the energy report, and reached no pump.
+	 * **WHAT EFFICIENCY THIS PUMP IS ACTUALLY RUNNING AT, ON THE PUMP, AND EDITABLE HERE** (Tom,
+	 * 2026-09-05, having imported a file whose [ENERGY] states `PUMP P1 EFFIC E1`: *"The pump has
+	 * no efficiency of its own, and I don't see an interface for that."*). He was right twice over:
+	 * the number reached the engine and reached the energy report, and reached no pump.
 	 *
-	 * **READ-ONLY, AND THAT IS PHASE ONE RATHER THAN A DESIGN.** A pump's efficiency curve arrives
-	 * on `settings.energy.effic` as a NAME, with its points in the carried [CURVES] text, and this
-	 * page keeps no general curve library -- a pump's head curve lives on the pump. Making the
-	 * curve EDITABLE means moving those points onto the pump and teaching the exporter to write
-	 * them back, which is a storage change in `INP_SECTIONS_READ` and `LPN_CARRIED_PLACED`, the two
-	 * seams two other tracks are inside as this is written. Showing what the file said costs none of
-	 * that and answers the half of his sentence that is about not being able to SEE it.
+	 * **THE CURVE LIVES ON THE PUMP** (Task 585), as `efficPoints` in the project's own flow unit
+	 * and `efficCurveId` for what the file calls it. That is the head curve's own shape, and it is
+	 * chosen over a document-level curve library for the reason this page has never had one: a
+	 * library needs a name space, an editor, a rename rule and an answer to what happens to a curve
+	 * nothing references, and every one of those is a second paradigm beside `curvePoints`.
 	 *
-	 * **THREE STATES, AND THE THIRD IS THE ONE WORTH GETTING RIGHT:**
-	 *   - a curve that resolves -- name it and print its points, so the reader can check them;
-	 *   - no curve at all -- say the network efficiency is what is used, and state the number,
-	 *     because "nothing here" and "the global applies" look identical and are not;
-	 *   - a curve NAMED but not STATED by the file -- the pump silently falls back to the global,
-	 *     and that is exactly the case `lpn_energy_curve_note` discloses in the energy report. It
-	 *     is disclosed here too, on the element, because the report is read once and the popup is
-	 *     where somebody is standing when it matters. Same argument as the import notes.
+	 * **A CURVE NOBODY TOUCHED STILL GOES OUT AS THE FILE'S OWN CHARACTERS.** The carried
+	 * `[CURVES]` lines are still the exporter's source of truth while they parse to what the pumps
+	 * now state (`EngCalcs.lpnEfficCurveText`), which is the same rule `[SOURCES]`, `[MIXING]` and
+	 * `[TAGS]` are on and the reason editing could be added without the round trip moving.
+	 *
+	 * **BASE-OWNED, NOT `setProp()`, AND THAT IS A RULING.** Neither `efficPoints` nor
+	 * `efficCurveId` is in LPN_OVERRIDABLE and neither is joining it. A scenario asks what if this
+	 * pump ran at a different speed or paid a different tariff, not what if it were a different
+	 * machine: an efficiency curve is the pump's own characteristic, exactly as its head curve is,
+	 * and `curvePoints` is not overridable either. A `setProp()` here would write an `_efficPoints`
+	 * nothing reads.
+	 *
+	 * **THREE STATES, AND EVERY ONE OF THEM NOW GETS THE TABLE:**
+	 *   - a curve that resolves: name it and show its points;
+	 *   - a curve NAMED but not STATED by the file: say so by name, because that is a defect in the
+	 *     file the reader can act on, and offer the points so they can act on it here;
+	 *   - no curve at all: say the network efficiency is what is used and state the number, because
+	 *     "nothing here" and "the global applies" look identical and are not.
 	 *
 	 * A percentage needs no unit family and gets none: it is not a quantity with a factor, and
 	 * '%' needs no language key on the colour legend's own rule.
@@ -27137,13 +27197,11 @@ var EngCalcs = EngCalcs || {};
 	function renderPumpEfficiencyFields(fields, l) {
 		var pc = EngCalcs.pageConfig || {},
 			e = settings.energy || {},
-			name = (e.effic || {})[l.id],
-			// **FACTOR 1, DELIBERATELY: THESE ARE THE FILE'S OWN NUMBERS AND STAY THEM.**
-			// docEnergy() parses the same lines with the flow factor because the ENGINE wants m3/s;
-			// reading its result back through toDisplay() would print 951.0194000000001 for a file
-			// that says 951.0194, which is this suite's oldest rule broken on a screen instead of in
-			// a file. The points are already in the project's own unit in the carried text.
-			pts = name ? (EngCalcs.lpnEfficCurves(doc.inpSections, 1) || {})[name] : null,
+			pts = (l.efficPoints && l.efficPoints.length) ? l.efficPoints : null,
+			// The name the EXPORTER and the ENGINE will really use, from the one place that decides
+			// it, so the popup cannot print `E1` while the file says `E1_P2`. A pump switched out of
+			// the network is not in that answer at all, and falls back to its own stored name.
+			name = (docEnergy().effic || {})[l.id] || l.efficCurveId || ('E_' + l.id),
 			globalPct = (typeof e.globalEfficiency === 'number' && isFinite(e.globalEfficiency))
 				? e.globalEfficiency : null,
 			// The global's own default lives with the energy settings, not here; where the document
@@ -27151,19 +27209,19 @@ var EngCalcs = EngCalcs || {};
 			// number this page would then have to keep in step.
 			globalText = globalPct === null ? (pc.lpn_energy_efficiency || 'Pump efficiency (percent)')
 				: (globalPct + '%');
-		if (name && pts && pts.length) {
-			readonlyField(fields, pc.lpn_pump_effic_curve || 'Efficiency curve', name,
+		if (pts) {
+			readonlyField(fields, pc.lpn_pump_effic_curve || 'Efficiency curve', name || '',
 				pc.lpn_pump_effic_curve_tip);
-			efficPointTable(fields, pts);
-		} else if (name) {
+		} else if (l.efficCurveId) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_unstated
-				|| 'This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}.')
-				.replace('{name}', name).replace('{percent}', globalText));
+				|| 'This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}. Type its points below.')
+				.replace('{name}', l.efficCurveId).replace('{percent}', globalText));
 		} else {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_global
-				|| 'This pump has no efficiency curve, so it runs at the network efficiency of {percent}.')
+				|| 'This pump has no efficiency curve, so it runs at the network efficiency of {percent}. Type points below to give it one.')
 				.replace('{percent}', globalText));
 		}
+		efficPointTable(fields, l);
 	}
 	function pumpEfficNote(fields, text) {
 		var d = document.createElement('div');
@@ -27172,36 +27230,97 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(d);
 	}
 	/**
-	 * The curve's own points, in the project's flow unit and in percent. Built here rather than
-	 * through curvePointTable() because that one EDITS a pump's `curvePoints` in place and seeds an
-	 * empty row when there are none; this is a reading of what the file said, and it is printed
-	 * unconverted for the reason given at the call site.
+	 * The pump's efficiency curve, as an editable table of flow against percent.
+	 *
+	 * **GROWABLE, WHERE THE HEAD CURVE'S IS THREE FIXED ROWS, AND THE DIFFERENCE IS PHYSICAL.**
+	 * `curvePointTable()` offers exactly three because this page FITS h = h0 - a Q^b from at most
+	 * three points, so a fourth would be thrown away. EPANET reads an efficiency curve directly and
+	 * interpolates it, so a five-point curve is a five-point curve; truncating an imported one to
+	 * three would be rewriting numbers that are the user's. One blank row always sits at the end,
+	 * which is the demand table's own way of growing.
+	 *
+	 * **THE FILE'S OWN TOKENS, UNCONVERTED.** The points are stored in the project's flow unit --
+	 * the file's own unit -- so `951.0194` is printed as `951.0194`. Reading them back out of
+	 * docEnergy()'s m3/s and converting for display is what printed `951.0194000000001` for a file
+	 * that says `951.0194`, which is this suite's oldest rule broken on a screen instead of in a
+	 * file. `String()` and not `toFixed()`, for the same reason.
 	 */
-	function efficPointTable(fields, pts) {
+	function efficPointTable(fields, l) {
 		var pc = EngCalcs.pageConfig || {},
 			table = document.createElement('table'), thead = document.createElement('thead'),
-			hrow = document.createElement('tr'), tbody = document.createElement('tbody'), i, tr;
+			hrow = document.createElement('tr'), tbody = document.createElement('tbody'),
+			rows = (l.efficPoints || []).slice(), i;
 		// Two classes: the shared look, and a name of its own so this table can be told from the head
 		// curve's beside it -- by a reader, by a future stylesheet, and by the harness that asserts
 		// its cells are the file's own tokens.
 		table.className = 'lpn-curve-table lpn-effic-table';
 		[(pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
-			(pc.lpn_pump_effic_col || 'Efficiency') + ' (%)'].forEach(function (t) {
+			(pc.lpn_pump_effic_col || 'Efficiency') + ' (%)', ''].forEach(function (t) {
 			var th = document.createElement('th');
 			th.textContent = t;
 			hrow.appendChild(th);
 		});
 		thead.appendChild(hrow); table.appendChild(thead); table.appendChild(tbody);
-		for (i = 0; i < pts.length; i++) {
-			tr = document.createElement('tr');
-			[pts[i][0], pts[i][1]].forEach(function (v) {
-				var td = document.createElement('td');
-				td.textContent = String(v);
-				tr.appendChild(td);
-			});
-			tbody.appendChild(tr);
+		rows.push(null);   // the blank row that is how a curve grows, and how an empty one starts
+		for (i = 0; i < rows.length; i++) {
+			efficPointRow(tbody, l, rows[i], i);
 		}
 		fields.appendChild(table);
+		var note = document.createElement('div');
+		note.style.fontSize = '0.9em';
+		note.textContent = pc.lpn_pump_effic_note
+			|| 'Flow and the percent efficiency at that flow, in the order the pump works through them. With no points the pump runs at the network efficiency.';
+		fields.appendChild(note);
+	}
+	function efficPointRow(tbody, l, pt, idx) {
+		var pc = EngCalcs.pageConfig || {},
+			tr = document.createElement('tr'),
+			qCell = document.createElement('td'), eCell = document.createElement('td'),
+			xCell = document.createElement('td'),
+			qInput = document.createElement('input'), eInput = document.createElement('input'), del;
+		qInput.type = 'number'; qInput.step = 'any'; qInput.size = 6;
+		eInput.type = 'number'; eInput.step = 'any'; eInput.size = 6;
+		qInput.value = pt ? String(pt[0]) : '';
+		eInput.value = pt ? String(pt[1]) : '';
+		function commit() {
+			var qv = qInput.value === '' ? undefined : +qInput.value,
+				ev = eInput.value === '' ? undefined : +eInput.value,
+				list = (l.efficPoints || []).slice(), before = list.length;
+			saveUndoSnapshot();
+			// Both fields or neither: a lone flow or a lone percent is not a point any curve can use.
+			list[idx] = (qv !== undefined && ev !== undefined && isFinite(qv) && isFinite(ev))
+				? [qv, ev] : undefined;
+			list = list.filter(function (x) { return x; });
+			if (list.length) { l.efficPoints = list; } else { delete l.efficPoints; }   // base-write: a pump's curve is its own characteristic, not an overridable property -- see renderPumpEfficiencyFields()
+			// A pump that never had a curve gets the name the exporter would give it anyway, so the
+			// document says what it means the moment the first point is typed.
+			if (l.efficPoints && !l.efficCurveId) { l.efficCurveId = 'E_' + l.id; }   // base-write: the curve's own name, on the same limb as the element's id
+			afterPropertyEdit(l);
+			// The blank row at the end has just become a real one, or a cleared row has gone: either
+			// way the row count moved and the table has to be rebuilt to offer the next blank.
+			if (before !== list.length) { refreshPopupIfOpen(); }
+		}
+		qInput.addEventListener('change', commit);
+		eInput.addEventListener('change', commit);
+		qCell.appendChild(qInput); eCell.appendChild(eInput);
+		if (pt) {
+			del = document.createElement('button');
+			// The demand table's own remove control: a language-free glyph, its words in the tip,
+			// and the style already written for one. `lpn-demand-del` is where that style lives.
+			del.type = 'button'; del.className = 'lpn-demand-del'; del.textContent = '×';
+			helpTip(del, pc.lpn_pump_effic_remove || 'Remove this point');
+			del.addEventListener('click', function () {
+				saveUndoSnapshot();
+				var list = (l.efficPoints || []).slice();
+				list.splice(idx, 1);
+				if (list.length) { l.efficPoints = list; } else { delete l.efficPoints; }   // base-write: see commit() above
+				afterPropertyEdit(l);
+				refreshPopupIfOpen();
+			});
+			xCell.appendChild(del);
+		}
+		tr.appendChild(qCell); tr.appendChild(eCell); tr.appendChild(xCell);
+		tbody.appendChild(tr);
 	}
 	// **SPEED AND ITS SCHEDULE** (Task 248.02), the pump's twin of the reservoir's head pattern and
 	// the junction's demand pattern. Two rows, and they compose the way EPANET composes them: the
@@ -30415,8 +30534,12 @@ var EngCalcs = EngCalcs || {};
 	function rebuildEnergyReport() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_energy_report'),
-			sum = runEnergy(), body, e = settings.energy || {}, curveNames = [],
-			efficPts = docEnergy().efficCurves || {};
+			sum = runEnergy(), body, curveNames = [],
+			// **THE BRIDGE, NOT THE SETTING** (Task 585). A pump's curve name lives on the pump
+			// now, and docEnergy() is the one place a name is resolved -- reading
+			// `settings.energy.effic` here would report on a map that is emptied at import.
+			bridged = docEnergy(), efficNames = bridged.effic || {},
+			efficPts = bridged.efficCurves || {};
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (!energyPumpCount()) {
@@ -30469,7 +30592,7 @@ var EngCalcs = EngCalcs || {};
 			// disclosure of a defect that no longer exists. What is left is the case a file can
 			// still produce: an [ENERGY] row naming a curve no [CURVES] section defines, where the
 			// pump falls back to the global efficiency and the reader deserves to know.
-			if (e.effic && e.effic[row.id] && !(efficPts[e.effic[row.id]] || []).length) {
+			if (efficNames[row.id] && !(efficPts[efficNames[row.id]] || []).length) {
 				curveNames.push(row.id);
 			}
 		});

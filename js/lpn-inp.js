@@ -1943,6 +1943,86 @@
 		});
 		return out;
 	};
+	/** Two point lists, compared exactly. A curve is [[flow, percent], ...]; nothing here rounds. */
+	function efficPtsSame(a, b) {
+		if (!a || !b || a.length !== b.length) { return false; }
+		for (var i = 0; i < a.length; i++) {
+			if (a[i][0] !== b[i][0] || a[i][1] !== b[i][1]) { return false; }
+		}
+		return true;
+	}
+	/**
+	 * **THE EFFICIENCY CURVES A SET OF PUMPS NOW STATES, AND WHAT EACH ONE IS CALLED** (Task 585).
+	 * `pumps` is `[{ id, name, points }]`, points in the project's own flow unit; the answer is
+	 * `{ effic: { pumpId: curveName }, curves: { curveName: points } }`.
+	 *
+	 * **ONE PLACE, BECAUSE TWO CALLERS ASK THE SAME QUESTION AND MUST NOT ANSWER IT DIFFERENTLY**:
+	 * `docEnergy()` builds what the ENGINE runs, `lpnExportInp()` builds what the FILE says, and a
+	 * pump whose curve is called E1 in one and E1_P2 in the other is a network that solves one way
+	 * on screen and another way in the file.
+	 *
+	 * **A SHARED NAME IS KEPT SHARED WHILE THE POINTS AGREE AND SPLIT THE MOMENT THEY DO NOT.**
+	 * A file may state `PUMP P1 EFFIC E1` and `PUMP P2 EFFIC E1`; both pumps then carry E1's own
+	 * points, and while nobody edits either they still write one E1. Edit one and its points no
+	 * longer describe the other's, so it takes a name of its own rather than silently redefining
+	 * a curve the other pump is still using.
+	 *
+	 * A pump with a NAME and NO POINTS keeps its name and contributes no curve: that is the file
+	 * that names a curve it does not state, and it is disclosed rather than invented.
+	 */
+	EngCalcs.lpnEfficCurveMap = function (pumps) {
+		var out = { effic: {}, curves: {} }, taken = {};
+		(pumps || []).forEach(function (p) {
+			var base, pts, nm, i;
+			if (!p || p.id === undefined || p.id === null || p.id === '') { return; }
+			pts = (p.points || []).filter(function (q) {
+				return q && isFinite(q[0]) && isFinite(q[1]);
+			}).map(function (q) { return [+q[0], +q[1]]; });
+			base = p.name ? String(p.name) : ('E_' + p.id);
+			if (!pts.length) {
+				if (p.name) { out.effic[p.id] = base; }
+				return;
+			}
+			nm = base;
+			if (taken[nm] && !efficPtsSame(taken[nm], pts)) {
+				nm = base + '_' + p.id;
+				i = 2;
+				while (taken[nm] && !efficPtsSame(taken[nm], pts)) { nm = base + '_' + p.id + '_' + i; i++; }
+			}
+			taken[nm] = pts;
+			out.effic[p.id] = nm;
+			out.curves[nm] = pts;
+		});
+		return out;
+	};
+	function efficCurvesSame(a, b) {
+		var ka = Object.keys(a || {}), kb = Object.keys(b || {});
+		if (ka.length !== kb.length) { return false; }
+		return ka.every(function (k) { return efficPtsSame(a[k], (b || {})[k]); });
+	}
+	/**
+	 * **THE EFFICIENCY-CURVE LINES THIS DOCUMENT NOW STATES.** `live` is `{ name: points }` in the
+	 * project's own flow unit; `src` is the carried `[CURVES]` text. `src` WINS while it still
+	 * parses to exactly those curves, which is what keeps an untouched file byte-identical -- the
+	 * same terms `lpnSourcesText`, `lpnMixingText` and `lpnTagsText` are on, and the reason an
+	 * efficiency curve could become editable without the round trip moving.
+	 *
+	 * The comparison is on NUMBERS and is exact: `951.0194` parses to a double that prints back as
+	 * `951.0194`, so a point the user never touched compares equal and its own characters go out.
+	 */
+	EngCalcs.lpnEfficCurveText = function (live, src) {
+		var m = live || {}, out = [];
+		if (src && src.length
+				&& efficCurvesSame(EngCalcs.lpnEfficCurves({ CURVES: src }, 1), m)) {
+			return src.slice();
+		}
+		Object.keys(m).forEach(function (nm) {
+			(m[nm] || []).forEach(function (p) {
+				out.push(reactRow([nm, String(p[0]), String(p[1])]));
+			});
+		});
+		return out;
+	};
 	function energySame(a, b) {
 		var i;
 		for (i = 0; i < LPN_ENERGY_GLOBALS.length; i++) {
@@ -2524,12 +2604,40 @@
 		// curve id is carried on the setting, having no control on this page. `settings.energy` is
 		// written by the import pass that reads the section, so its presence is what says "these
 		// lines have been read" -- absent, the carried text is what goes out.
+		// **A PUMP'S OWN EFFICIENCY CURVE** (Task 585). Base-owned, like the head curve's points:
+		// `efficCurveId` is what the curve is called and `efficPoints` are its points in the
+		// project's own flow unit. Read straight off the link and not through `eff()` -- neither is
+		// in LPN_OVERRIDABLE, for the reason renderPumpEfficiencyFields() states.
+		function liveEfficPumps() {
+			var out = [], i, lk;
+			for (i = 0; i < (doc.links || []).length; i++) {
+				lk = doc.links[i];
+				if (lk.type !== 'pump' || omitted[lk.id]) { continue; }
+				if (!lk.efficCurveId && !(lk.efficPoints && lk.efficPoints.length)) { continue; }
+				out.push({ id: lk.id, name: lk.efficCurveId, points: lk.efficPoints });
+			}
+			return out;
+		}
+		var efficNow = EngCalcs.lpnEfficCurveMap(liveEfficPumps());
+		// **THE SAME GUARD [TAGS] AND [SOURCES] CARRY, AND ITS OWN RECORD.** A project saved before
+		// this task holds the curve lines in `inpSections.CURVES` and nothing on any pump, so
+		// composing from the pumps would write an empty set over what the file said.
+		// `settings.efficCurves` is the record that the lines have been READ onto the pumps at all.
+		function efficCurveLinesOut() {
+			var carriedCurves = (carriedOut.CURVES || []);
+			if (!settings.efficCurves && !Object.keys(efficNow.curves).length) { return carriedCurves.slice(); }
+			return EngCalcs.lpnEfficCurveText(efficNow.curves, carriedCurves);
+		}
 		function liveEnergy() {
 			var e = (settings.energy || {}), out = { effic: {}, price: {}, pattern: {} }, i, lk3, pv;
 			['globalEfficiency', 'globalPrice', 'globalPattern', 'demandCharge'].forEach(function (k) {
 				if (e[k] !== undefined && e[k] !== null && e[k] !== '') { out[k] = e[k]; }
 			});
-			Object.keys(e.effic || {}).forEach(function (id) { out.effic[id] = e.effic[id]; });
+			// **THE EFFIC ROWS ARE COMPOSED FROM THE PUMPS, NOT FROM THE SETTING** (Task 585). The
+			// curve lives on the pump now, so `efficNow` is the one answer and `[CURVES]` below is
+			// built from the same call -- a name here that the section did not define is exactly
+			// the input EPANET refuses.
+			Object.keys(efficNow.effic).forEach(function (id) { out.effic[id] = efficNow.effic[id]; });
 			for (i = 0; i < (doc.links || []).length; i++) {
 				lk3 = doc.links[i];
 				if (lk3.type !== 'pump' || omitted[lk3.id]) { continue; }
@@ -2649,9 +2757,10 @@
 			diff('roughness-method', [], headloss);
 		}
 		// **THE EFFICIENCY CURVES GO BACK INTO [CURVES], AFTER THE CURVES THIS PAGE DREW** (Task
-		// 582). Their own lines, character for character, because nothing here ever fitted or
-		// sampled them -- until this task the section was written without them and the [ENERGY] row
-		// naming one pointed at nothing, which is an input EPANET refuses.
+		// 582). Their own lines, character for character, because until Task 585 nothing here ever
+		// fitted, sampled or edited them -- and the file's own text is STILL what goes out for
+		// every curve nobody has touched, which is what `efficCurveLinesOut()` decides: composed
+		// from the pumps only once the points really differ from the ones the carried lines state.
 		//
 		// **UNLESS THE FLOW UNIT MOVED, AND THEN THE ABSCISSA MOVES WITH IT.** A curve's first
 		// column is a FLOW in the project's own unit, so a project exported under a flow keyword
@@ -2660,7 +2769,7 @@
 		// The efficiency itself is a percent and crosses untouched, which is why its token is kept
 		// while the flow's is not. A converted line loses its trailing comment; a carried one keeps
 		// it, and the carried case is the one the byte-identity test holds.
-		(carriedOut.CURVES || []).forEach(function (ln) {
+		efficCurveLinesOut().forEach(function (ln) {
 			var t, x;
 			if (cFlow.same) { curves.push(ln); return; }
 			t = String(ln).split(';')[0].trim().split(/\s+/);
