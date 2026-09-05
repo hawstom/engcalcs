@@ -14063,10 +14063,12 @@ var EngCalcs = EngCalcs || {};
 		// are settings by any reading, and leaving them behind means the button's own sentence is
 		// false -- which is the whole thing this function exists to keep true.
 		// lpn_rpane and lpn_setbox are the same kind of thing and were being left behind, which made
-		// the confirm's "all settings" false for two keys nobody had noticed. lpn_findbox joined
-		// them the day it was written, rather than a day later for the same reason.
+		// the confirm's "all settings" false for two keys nobody had noticed. lpn_findbox and
+		// lpn_libbox each joined the list the day it was written, rather than a day later for the
+		// same reason.
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
-			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, PAGE_TITLES_KEY];
+			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
+			PAGE_TITLES_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -23427,9 +23429,16 @@ var EngCalcs = EngCalcs || {};
 	// box the reader has no memory of asking for, which is the "cool new button that I found"
 	// failure Task 542 exists to have removed.
 	//
-	//   OPEN AGAIN -- Find and Settings (here), and the bottom pane and right panel, which have
-	//   done this since Tasks 434 and 441. All four are standing boxes and all four already
-	//   remembered their geometry, which is the same sentence Tom's question is about.
+	//   OPEN AGAIN -- Find, Settings and the Library box (here), and the bottom pane and right
+	//   panel, which have done this since Tasks 434 and 441. All five are standing boxes and all
+	//   five remember their geometry, which is the same sentence Tom's question is about.
+	//
+	//   **THE LIBRARY BOX JOINED THEM ON HIS WORD AND IT BROUGHT ITS GEOMETRY WITH IT** (Tom,
+	//   2026-09-04: *"The bottom pane has long remembered its openness. If it should get both, add
+	//   its height or whatever size setting you can save."*). It had been left out here for a
+	//   reason that was true at the time -- it remembered no corner, and half a memory is a box
+	//   coming back open somewhere it was never left. The answer was to give it the other half, not
+	//   to keep it out: see libBoxIsOpen() for the record it now keeps.
 	//
 	//   DELIBERATELY LEFT ALONE, and each for a reason, not by omission:
 	//
@@ -23439,24 +23448,27 @@ var EngCalcs = EngCalcs || {};
 	//     restoring it would spend the machine on work nobody asked for at that moment. None of them
 	//     remembers where it sits either -- they centre on every open, on Tom's own liking of that
 	//     -- so there is no half of this they already had.
-	//   * **The Library box.** A standing box in shape, but it declines position memory on purpose
-	//     (see wireLibraryBox), and reopening a box at a corner it was never left in is half a
-	//     memory. If it is to remember, it should remember both, and that is a separate decision.
 	//   * **The property popup.** It is an answer to a selection, and a selection is not restored.
 	//   * **The New-project box, the confirm dialog, the fire-flow run dialog, the notes popover,
 	//     the backdrop target panel and the two menu popovers.** Modals, transient choosers and
 	//     pull-downs. A modal that survives a reload is a question the reader has already answered.
 	//
 	// **A RESTORED BOX IS PLACED BY ITS OWN OPENER AND BY NOTHING ELSE**, which is what keeps a
-	// corner remembered on a 32-inch monitor from opening off the edge of a laptop: both openers
-	// already re-clamp through clampPanel() and capPanelToRoomBelow() on every open, precisely
+	// corner remembered on a 32-inch monitor from opening off the edge of a laptop: every opener
+	// already re-clamps through clampPanel() and capPanelToRoomBelow() on every open, precisely
 	// because "a box remembered off-screen is a box that never comes back". There is no restore-time
 	// placement here to get wrong.
 	//
-	// Settings first, Find second, so Find -- much the smaller box -- ends up on top: placePanelForScreen()
-	// raises whatever it places, so the order of these two lines IS the stacking.
+	// **AND NO OPENER MAY TAKE THE CARET HERE.** Find is the one that would: a box the reader opened
+	// wants the caret in its field, a box that merely came back with the page must not have it, or
+	// every reload swallows the first keystroke and every map shortcut with it. That is what
+	// `restoring` is for, and it is the only thing it changes.
+	//
+	// The order IS the stacking -- placePanelForScreen() raises whatever it places -- so the two
+	// big boxes go down first and Find, much the smallest, ends up on top.
 	function restoreOpenBoxes() {
 		if (setboxLayout.open) { openSettingsBox(); }
+		if (libboxLayout.open) { openLibraryBox(); }
 		if (findUserOpen) { toggleFindPopup(null, true); }
 	}
 	// ---- THE DIVIDER BETWEEN THE TWO PANES (ROADMAP Task 576) ------------------------------------
@@ -23695,12 +23707,59 @@ var EngCalcs = EngCalcs || {};
 		var b = libBoxEl();
 		return !!b && b.style.display === 'flex';
 	}
-	// **NO REMEMBERED POSITION OR SIZE, and that is a decision rather than an omission.** The
-	// Settings box stores both because it is opened dozens of times in a session to change one known
-	// control, so it is furniture. This box is opened to author a pattern and closed again, and new
-	// storage is never free -- it is a line in dev/cookie-storage-inventory.md and a sentence in the
-	// consent text that has to stay true. It opens at the same corner Settings opens at, which is
-	// the corner the user already knows.
+	// **IT REMEMBERS WHERE IT WAS LEFT, HOW BIG IT WAS MADE, AND WHETHER IT WAS OPEN** (Tom,
+	// 2026-09-04, on being told it had been left out of the openness memory because it kept no
+	// corner: *"The bottom pane has long remembered its openness. If it should get both, add its
+	// height or whatever size setting you can save."*).
+	//
+	// **THAT IS A REVERSAL, AND WHAT IT REPLACES WAS AN ARGUMENT ABOUT COST, NOT ABOUT KIND.** The
+	// box was held to be transient -- opened to author a pattern and closed again -- so a stored
+	// corner was not worth a line in dev/cookie-storage-inventory.md. Tom's own reading is that it
+	// is a standing box like the other three, and a standing box that comes back open at a corner it
+	// was never left in is half a memory. So it gets the whole one, on the mechanism Find and
+	// Settings already use rather than a second one: four numbers and a flag, on one key.
+	//
+	// **A KEY OF ITS OWN, BECAUSE THERE WAS NO EXISTING RECORD TO JOIN.** Openness rode into
+	// `lpn_setbox` and `lpn_findbox` as one more field on records that already existed; this box had
+	// none. It is the same purpose and the same category as its three siblings all the same -- a
+	// panel layout the visitor set deliberately -- so it is the same exemption: no new consent
+	// question, no EC_CONSENT_VERSION bump, one row in the inventory, and wipeAllStorage() dooms it
+	// with the others.
+	//
+	// **A PHONE WRITES THE FLAG AND NOT THE GEOMETRY**, the ruling the other two boxes already
+	// carry: at that width the box fills the window, so every number measured there is the window's
+	// rather than the user's, and storing one would only ever be felt on a desktop that never
+	// chose it. Whether a box is open is a fact about what the reader was DOING, and each browser
+	// answers that only for itself.
+	var LPN_LIBBOX_KEY = 'lpn_libbox';
+	var libboxLayout = { left: null, top: null, w: null, h: null, open: false };
+	function saveLibboxLayout() {
+		try { localStorage.setItem(LPN_LIBBOX_KEY, JSON.stringify(libboxLayout)); } catch (e) {}
+	}
+	function loadLibboxLayout() {
+		var raw = null, v, k;
+		try { raw = localStorage.getItem(LPN_LIBBOX_KEY); } catch (e) { return; }
+		if (!raw) { return; }
+		try { v = JSON.parse(raw); } catch (e) { return; }
+		if (!v || typeof v !== 'object') { return; }
+		for (k in libboxLayout) {
+			// `open` is the one boolean among four numbers, and a loader that types every field as a
+			// number drops it in silence -- the defect the Settings record was written into and the
+			// reason that one is asserted through a real storage round trip. An absent field is the
+			// birth value, so a record written before this existed reads as a closed box at no
+			// remembered corner, and there is no migration to write.
+			if (k === 'open') { libboxLayout.open = !!v.open; }
+			else if (typeof v[k] === 'number' && isFinite(v[k])) { libboxLayout[k] = v[k]; }
+		}
+	}
+	// A REMEMBERED SIZE IS A WISH, NOT A PROMISE -- the same rule and the same shape as
+	// applySetboxSize(): the numbers are applied and then left to the stylesheet's own min/max,
+	// which is the one place those limits are written, and the rect is read back afterwards so the
+	// placement works from the size the box REALLY has.
+	function applyLibboxSize(box) {
+		if (libboxLayout.w) { box.style.width = libboxLayout.w + 'px'; }
+		if (libboxLayout.h) { box.style.height = libboxLayout.h + 'px'; }
+	}
 
 	// ---- what the document holds, and the one place each kind is written --------------------------
 
@@ -24668,18 +24727,38 @@ var EngCalcs = EngCalcs || {};
 		// And it borrows the phone rule with it -- on a small screen this box fills the window.
 		placePanelForScreen(box, function () {
 			floor = chromeFloor();
+			// **THE REMEMBERED SIZE IS RE-APPLIED ON EVERY OPEN**, because placePanelForScreen()
+			// hands every inline size the markup had back on the way in (resetPanelFill) -- the
+			// thing that stops a phone's fill from ratcheting the desktop. Before the cap and
+			// before the rect is read, or both would be measured off a box that is about to change
+			// size. Same order, for the same reason, as applySetboxSize() in openSettingsBox().
+			applyLibboxSize(box);
 			capPanelToRoomBelow(box, floor);
 			r = box.getBoundingClientRect();
-			home = setboxHomeCorner(r.width, r.height);
+			// **A REMEMBERED CORNER, ELSE THE ONE THE USER ALREADY KNOWS.** A null is not zero: it
+			// is "this has never been chosen", which keeps the home corner a FIRST-TIME rule rather
+			// than one that fights somebody who has moved the box. Either way the result goes
+			// through clampPanel(), so a corner left on a 32-inch monitor cannot open off the edge
+			// of a laptop -- and on a phone there is no corner to open at, because the box fills
+			// the window and this callback never runs.
+			home = (libboxLayout.left === null || libboxLayout.top === null)
+				? setboxHomeCorner(r.width, r.height)
+				: { left: libboxLayout.left, top: libboxLayout.top };
 			at = clampPanel(home.left, home.top, r.width, r.height, window.innerWidth, window.innerHeight, floor);
 			box.style.left = at.left + 'px';
 			box.style.top = at.top + 'px';
 		});
 		initTipsIn(box);
+		if (!libboxLayout.open) { libboxLayout.open = true; saveLibboxLayout(); }
 	}
 	function closeLibraryBox() {
 		var box = libBoxEl();
 		hidePanel(box);
+		// **GUARDED, AND HERE THAT IS NOT AN OPTIMISATION.** Escape calls this on every press,
+		// whether or not the box is showing, so an unguarded write would put a storage write on a
+		// key the reader never touched behind every Escape on the page -- and would create the key
+		// for a visitor who has never opened this box at all.
+		if (libboxLayout.open) { libboxLayout.open = false; saveLibboxLayout(); }
 	}
 	function toggleLibraryBox() {
 		if (libBoxIsOpen()) { closeLibraryBox(); return; }
@@ -24690,11 +24769,48 @@ var EngCalcs = EngCalcs || {};
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeLibraryBox); }
 		// Dragged by its chrome, through the same seam the property popup, Find and the Settings box
-		// use. No onMove: nothing here remembers where it was put (see the note at libBoxIsOpen).
-		makePanelDraggable(box, null);
+		// use. `onMove` is how a caller remembers the corner, and this box now does.
+		makePanelDraggable(box, function (pos) {
+			// **A PHONE NEVER WRITES THE REMEMBERED CORNER**, the ruling Find and Settings already
+			// follow: the box fills the window at that width and is not restored to a dragged
+			// corner there, so a number stored from a phone would only ever be felt on the desktop
+			// -- as a box that had moved itself while the user was on a train.
+			if (smallScreen()) { return; }
+			libboxLayout.left = pos.left;
+			libboxLayout.top = pos.top;
+			saveLibboxLayout();
+		});
 		// It borrows .lpn-setbox's whole shell, `resize: both` included, so it borrows the touch
 		// grabber that makes that property mean anything on a phone.
 		addPanelResizeGrip(box);
+		// **BEFORE the observer below is armed.** The observer writes what it measures, so arming it
+		// over a record that has not been read yet is a boot that overwrites the user's numbers with
+		// the box's opening ones before anybody has touched it.
+		loadLibboxLayout();
+		// **THE SIZE IS OBSERVED, NOT LISTENED FOR**: `resize: both` is the browser's own widget and
+		// fires no event of its own. The observer also catches a window that shrank past the cap, so
+		// what is remembered is the size on screen rather than a wish from a bigger window.
+		// Guarded on the box being open, so closing it (display:none, 0x0) cannot store a zero size;
+		// and nothing measured on a phone is stored, for the reason the drag callback gives.
+		if (window.ResizeObserver) {
+			new window.ResizeObserver(function () {
+				var r, capped;
+				if (!libBoxIsOpen() || smallScreen()) { return; }
+				r = box.getBoundingClientRect();
+				if (!(r.width > 0) || !(r.height > 0)) { return; }
+				libboxLayout.w = Math.round(r.width);
+				// **A HEIGHT THE CAP PRODUCED IS THE VIEWPORT'S, NOT THE USER'S.** openLibraryBox()
+				// caps the box to the room under the chrome, and that cap is a resize this observer
+				// sees exactly like a dragged one. Storing it would ratchet: open the box once in a
+				// short window and a tall one never gets its height back. The width is stored either
+				// way -- nothing caps that. Same guard, same reason, as the Settings observer.
+				capped = parseFloat(box.style.maxHeight);
+				if (!(isFinite(capped) && r.height >= capped - 1)) {
+					libboxLayout.h = Math.round(r.height);
+				}
+				saveLibboxLayout();
+			}).observe(box);
+		}
 	}
 
 	// ---- minimal property popup ----
