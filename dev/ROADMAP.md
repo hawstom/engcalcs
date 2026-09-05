@@ -129,6 +129,35 @@ the block.
     ruling being keyed on the exact English it was made on. The audit recommends a RATCHET on new
     writing plus two cheap front-door exceptions at 208 retranslations, and names them.
 
+- 100|584| **[H] One page-wide rule for where a setting lives, and how a new project gets one.**
+  Tom, 2026-09-04, having ruled the divider's memory in: *"we need a page-wide convention for how a
+  new project gets its settings... I have talked myself into maybe a position of 'Least confusion
+  arises if new projects always get the hard-coded defaults, and if you want otherwise, save a
+  template or copy a project.' What do you find for advice about that?"*
+  - **THE ADVICE, IN ONE SENTENCE: adopt his position exactly, and add the clause that keeps it from
+    contradicting what already ships.** *A new project gets the hard-coded defaults, always. If you
+    want otherwise, save a template or copy a project. Window furniture is not project data and
+    follows the browser.*
+  - **THE SPLIT IS ALREADY THERE AND IS ALREADY RIGHT, so this writes it down rather than changing
+    it.** MODELLING data belongs to the project -- units, friction method, new-asset defaults, ID
+    prefixes, colouring, labels, quality -- and CLAUDE.md's *"there are no browser units, only
+    PROJECT units"* is that rule already stated for the hardest case. FURNITURE belongs to the
+    browser -- `lpn_pane`, `lpn_rpane`, `lpn_setbox` -- because where a box sits and how wide its
+    panes are is a fact about the SCREEN somebody is sitting at, and a colleague opening the file on
+    a laptop must not inherit a 32-inch layout.
+  - **WHY A TEMPLATE BEATS A "SAVE CURRENT SETTINGS AS DEFAULT" BUTTON, and it is the same argument
+    this suite already makes about input files:** a button creates an invisible global that makes two
+    people see different behaviour from the same document, and it can never be inspected, shared or
+    versioned. A template is a FILE -- visible, nameable, copyable, emailable, diffable.
+  - **AND THE GAP HE NAMED ANSWERS ITSELF.** *"Opening a project opens all its windows as saved,
+    which is not current behavior"* -- and it should not become current behaviour. Furniture is
+    per-browser and therefore ALREADY where you left it, across every project, so opening a template
+    lands in your own layout without the file ever having carried one. Putting window layout in the
+    document would contradict the split above and would hand a colleague your screen.
+  - **The hard-coded HW default for the friction method (2026-09-03) is this rule working**, not an
+    exception to it. Promoting this task means: write the sentence into `CLAUDE.md` and
+    `dev/looped-network-calculator-scope.md`, and say it in the template tip.
+
 - 75|582| **Pump efficiency curves: the one energy number we still take on faith.**
   Tom, 2026-09-04, reading `lpn_energy_curve_note`: *"Why aren't we implementing this instead of
   shipping without it?"* Fair, and the note is a disclosure rather than an excuse. What it discloses:
