@@ -1111,7 +1111,12 @@
         "lpn_pump_curve_source": "Curve source",
         "lpn_pump_curve_own": "Enter points below",
         "lpn_pump_curve_ref_note": "Using the curve entered for pump {id}.",
-        "lpn_pump_curve_note": "One, two, or three points — see \"Pump curve\" in the Notes below.",
+        "lpn_pump_curve_note": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page.",
+        "lpn_pump_effic_curve": "Efficiency curve",
+        "lpn_pump_effic_curve_tip": "The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.",
+        "lpn_pump_effic_col": "Efficiency",
+        "lpn_pump_effic_global": "This pump has no efficiency curve, so it runs at the network efficiency of {percent}.",
+        "lpn_pump_effic_unstated": "This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}.",
         "lpn_pump_point1": "Point 1",
         "lpn_pump_point2": "Point 2",
         "lpn_pump_point3": "Point 3",
@@ -1618,7 +1623,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1616,
+    "count": 1621,
     "active_prefixes": [
         "about",
         "bpn",

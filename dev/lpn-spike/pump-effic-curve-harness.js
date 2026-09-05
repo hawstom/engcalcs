@@ -21,21 +21,30 @@
 // DIFFERENT NUMBER from the right one, and section 4 states the GPM factor against the file's own
 // tokens.
 //
-// **WHAT IS NOT WIRED YET, AND IT IS SAID HERE RATHER THAN LEFT TO BE DISCOVERED.** The document
-// carries the curve and writes it back (sections 1 and 2), and lpnToInp() emits it and its EFFIC
-// row (sections 3 to 5). The one link still missing is `docEnergy()` in js/looped-network.js, which
-// must put `efficCurves: EngCalcs.lpnEfficCurves(doc.inpSections, <flow unit to m3/s>)` on the
-// model it hands the engine. Until it does, the engine leg here is exercised by this harness and by
-// nothing else, and the page still runs such a pump at the global efficiency.
+// **THE WIRING IS IN, AND SECTION 6 IS WHY THAT SENTENCE IS NOT ENOUGH.** This header used to say
+// `docEnergy()` was still missing, and it was: sections 1 to 5 each hand `lpnToInp()` a model this
+// harness assembled itself, so every one of them passed while the page's only document-to-model
+// bridge put no curve on it. **Five green sections, and the feature did not work.** Section 6 runs
+// the page's own chain -- parse, docFromInp(), install, assembleModel(), the real engine -- so the
+// blind spot is closed rather than described.
 
 const path = require('path');
 const { ROOT, NODE_ENGINE_URL, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 
 require(ROOT + 'js/lpn-inp.js');
+// The clock, for section 6: it attaches the document's own [TIMES] to the model the way the page
+// does, and without a duration an energy figure is 0 kW at 0% and every assertion on it is vacuous.
+require(ROOT + 'js/lpn-time.js');
 
 const L = loadLoopedNetwork(
 	"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections,\n" +
 	"\t\tapplyUnitSelections: applyUnitSelections, seedDefaultInputs: seedDefaultInputs,\n" +
+	// Section 6 drives the page's own chain rather than a model this file built, so it needs the
+	// three seams that chain actually runs through: the document, the settings behind it, and the
+	// bridge that turns them into what lpnToInp() writes.
+	"\t\tsetDoc: function (d) { doc = d; }, setSettings: function (s) { settings = s; },\n" +
+	"\t\tgetDoc: function () { return doc; }, docEnergy: docEnergy,\n" +
+	"\t\tassembleModel: assembleModel, renderLinkFields: renderLinkFields, toSI: toSI,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -294,6 +303,125 @@ const FIXTURE = [
 		check(Math.abs(row.peakKw / plain.energy.pumps[0].peakKw - 75 / 62.5) < 0.005,
 			`and 62.5% draws 1.2x the power 75% does: ${(row.peakKw / plain.energy.pumps[0].peakKw).toFixed(5)}`);
 	}
+
+	// =========================================================================================
+	head('6. THE WHOLE CHAIN, FROM THE IMPORTED FILE AND THROUGH NOTHING THIS FILE BUILT');
+	// =========================================================================================
+	// **THIS SECTION EXISTS BECAUSE TASK 582 SHIPPED HALF DONE FOR A SESSION.** Sections 1 to 5
+	// above are each sound and they share one blind spot: every one of them hands `lpnToInp()` a
+	// model this harness assembled itself, so all five passed while `docEnergy()` -- the page's ONLY
+	// bridge from a document to that model -- put no curve on it at all. The page ran such a pump at
+	// the global efficiency and every assertion here was green.
+	//
+	// So this drives the page's own path end to end: parse, docFromInp(), the document installed the
+	// way opening a file installs it, assembleModel(), and the real engine. Nothing between the file
+	// and the answer is built by this file.
+	const CHAIN = [
+		'[JUNCTIONS]', ' J1\t100\t792.5162',
+		'[RESERVOIRS]', ' R1\t0',
+		'[PUMPS]', ' P1\tR1\tJ1\tHEAD C1',
+		'[CURVES]', ' C1\t0\t300', ' C1\t2000\t200',
+		' E1\t317.0065\t40', ' E1\t634.0129\t70', ' E1\t951.0194\t55',
+		'[ENERGY]', ' Global Efficiency\t75', ' PUMP\tP1\tEFFIC\tE1',
+		'[TIMES]', ' Duration\t24:00', ' Hydraulic Timestep\t1:00',
+		'[COORDINATES]', ' J1\t10\t10', ' R1\t0\t0',
+		'[OPTIONS]', ' Units\tGPM', ' Headloss\tH-W', '[END]', ''
+	].join('\n');
+	// The demand and the curve nodes are the section-3 fixture restated in GPM: 792.5162 gpm is
+	// 0.05 m3/s, and 317.0065 / 634.0129 / 951.0194 gpm are 20 / 40 / 60 L/s. The working point is
+	// again the midpoint of the 40-to-60 leg, so the answer is again 62.5% and no other number --
+	// **and it is 62.5 only if the GPM abscissa really crossed to m3/s on the way through
+	// `docEnergy()`.** A missing factor there leaves the curve 15,850x too wide and EPANET pins the
+	// efficiency at its first node, 40.
+	const chainDoc = L.docFromInp(EngCalcs.lpnInpParse(CHAIN), 'chain');
+	L.setDoc(chainDoc);
+	L.setSettings(chainDoc.settings);
+	L.applyUnitSelections(chainDoc.units);
+	const bridged = L.docEnergy();
+	check(bridged.effic && bridged.effic.P1 === 'E1',
+		'the imported document names the curve on the pump');
+	check(!!(bridged.efficCurves && bridged.efficCurves.E1 && bridged.efficCurves.E1.length === 3),
+		`and docEnergy() -- the one bridge -- carries its points: ${JSON.stringify((bridged.efficCurves || {}).E1)}`);
+	check(!!bridged.efficCurves.E1 && Math.abs(bridged.efficCurves.E1[1][0] - 0.04) < 1e-6,
+		`with the abscissa crossed to m3/s, not left in gpm: ${bridged.efficCurves && bridged.efficCurves.E1 && bridged.efficCurves.E1[1][0]}`);
+	// **THE CLOCK IS ATTACHED EXPLICITLY, AND THAT IS THE ONE THING THIS SECTION BUILDS.** On the
+	// page `assembleModel()` gets its time block from `lpnTimeAttach()`, which returns the model
+	// untouched when there is no transport pane to host it, and a harness has none. So the page's
+	// OWN `lpnTimeModelBlock()` is called on the document that was just imported. An energy figure
+	// is power accumulated over time, so with no duration every pump reports 0 kW at 0% and the
+	// assertion below would be vacuous rather than false, which is the worse of the two.
+	const chainModel = L.assembleModel();
+	chainModel.time = EngCalcs.lpnTimeModelBlock(L.getDoc(), L.toSI);
+	const chainRun = await EngCalcs.lpnEpanetRun(chainModel, { sliceMs: 100000 });
+	check(chainRun.ok && !!chainRun.energy, `the imported network ran: ${JSON.stringify(chainRun.error || '')}`);
+	if (chainRun.ok && chainRun.energy) {
+		const cr = chainRun.energy.pumps[0];
+		check(Math.abs(cr.avgEfficiency * 100 - 62.5) < 0.05,
+			`and the page's own path reports the curve's 62.5%: ${(cr.avgEfficiency * 100).toFixed(4)}%`);
+		check(Math.abs(cr.avgEfficiency * 100 - 75) > 1 && Math.abs(cr.avgEfficiency * 100 - 40) > 1,
+			'which is neither the global 75 nor the 40 an unconverted abscissa pins it at');
+	}
+
+	// =========================================================================================
+	head('7. AND THE PUMP\'S OWN POPUP SAYS SO (Tom, 2026-09-05)');
+	// =========================================================================================
+	// *"The pump has no efficiency of its own, and I don't see an interface for that."* It reached
+	// the engine and the energy report and reached no pump. Read-only for now, so what is asserted
+	// is that the curve is NAMED and its points are ON SCREEN in the file's own unit.
+	L.renderLinkFields('P1');
+	const popup = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
+	check(/E1/.test(popup), `the popup names the curve: ${popup.replace(/\s+/g, ' ').slice(-260)}`);
+	// **THE EXACT TOKEN, NOT A ROUND TRIP.** Reading the points back out of docEnergy()'s m3/s and
+	// converting them for display printed 951.0194000000001 for a file that says 951.0194 -- the
+	// user's own number, rewritten on a screen. Asserted CELL BY CELL rather than on the popup's
+	// textContent, because adjacent cells concatenate there and `634.0129` followed by `70` reads as
+	// `634.012970`, which no boundary can tell from a rewritten number.
+	// Walked rather than selected: the DOM stub's querySelectorAll() returns [] for everything, and
+	// teaching it a selector engine to satisfy one assertion is the stub-that-removes-the-coupling
+	// trap dev/testing-notes.md warns about. `lpn-effic-table` is what tells this table from the
+	// head curve's, which is why the renderer gives it a class of its own.
+	function cellsUnder(node, cls, out) {
+		var kids = (node && node.children) || [], i;
+		for (i = 0; i < kids.length; i++) {
+			if (String(kids[i].className || '').indexOf(cls) >= 0) { collectTd(kids[i], out); }
+			else { cellsUnder(kids[i], cls, out); }
+		}
+		return out;
+	}
+	function collectTd(node, out) {
+		var kids = (node && node.children) || [], i;
+		for (i = 0; i < kids.length; i++) {
+			if (String(kids[i].tagName || '').toLowerCase() === 'td') { out.push(kids[i].textContent); }
+			collectTd(kids[i], out);
+		}
+		return out;
+	}
+	const efficCells = cellsUnder(document.getElementById('lpn_popup_fields'), 'lpn-effic-table', []);
+	check(efficCells.join('|') === '317.0065|40|634.0129|70|951.0194|55',
+		`and prints the file's own gpm tokens, unconverted: ${efficCells.join('|')}`);
+	check(!/network efficiency/.test(popup),
+		'and does not claim the pump falls back to the network efficiency, because it does not');
+
+	// **THE THIRD STATE IS THE ONE WORTH GETTING RIGHT.** "This pump has no curve" and "this pump
+	// names a curve its file never stated" reach the same arithmetic -- the global efficiency -- by
+	// different roads, and only the second is something the reader can act on. A single sentence
+	// covering both would hide a real defect in the file behind a normal-looking one.
+	const noCurveDoc = L.getDoc();
+	delete noCurveDoc.settings.energy.effic.P1;
+	L.setSettings(noCurveDoc.settings);
+	L.renderLinkFields('P1');
+	const noneText = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
+	check(/no efficiency curve/.test(noneText) && /75%/.test(noneText),
+		`with no curve at all it names the network efficiency and its number: ${/no efficiency curve[^]{0,70}/.exec(noneText)}`);
+	check(cellsUnder(document.getElementById('lpn_popup_fields'), 'lpn-effic-table', []).length === 0,
+		'and prints no point table, because there are no points');
+
+	noCurveDoc.settings.energy.effic.P1 = 'GHOST';
+	L.setSettings(noCurveDoc.settings);
+	L.renderLinkFields('P1');
+	const ghostText = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
+	check(/GHOST/.test(ghostText) && /does not state/.test(ghostText),
+		`a curve named but not stated is disclosed by name: ${/This pump names[^]{0,110}/.exec(ghostText)}`);
 
 	console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All checks passed.'));
 	process.exit(failures ? 1 : 0);

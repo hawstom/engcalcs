@@ -18836,7 +18836,11 @@ var EngCalcs = EngCalcs || {};
 			// unique about this application is here in one place except the animation play controls.
 			// There is no need to guess where things are."
 			{
-				id: 'lpn_menu_project', icon: 'water', label: pc.lpn_menu_project || 'Project',
+				// The FALLBACK says Water because the menu says Water (Task 523): the key name is
+				// deliberately still `lpn_menu_project`, and a fallback repeating the old label is
+				// the one place the rename did not reach. It shows only where pageConfig failed to
+				// supply the key, which is precisely when nobody is watching.
+				id: 'lpn_menu_project', icon: 'water', label: pc.lpn_menu_project || 'Water',
 				tip: pc.lpn_menu_project_tip, open: openProjectBarMenu
 			},
 			// Last, where a Help menu goes everywhere else. One row today (Walkthroughs); it is also
@@ -26593,7 +26597,103 @@ var EngCalcs = EngCalcs || {};
 		}
 
 		curvePointTable(fields, l, (pc.lpn_result_head || 'Head'), 'lpn_u_elevhead',
-			pc.lpn_pump_curve_note || 'One, two, or three points — see "Pump curve" in the Notes below.');
+			pc.lpn_pump_curve_note
+				|| 'One, two, or three points. See "Pump curve" under Help, Notes on this page.');
+	}
+	/**
+	 * **WHAT EFFICIENCY THIS PUMP IS ACTUALLY RUNNING AT, ON THE PUMP** (Tom, 2026-09-05, having
+	 * imported a file whose [ENERGY] states `PUMP P1 EFFIC E1`: *"The pump has no efficiency of its
+	 * own, and I don't see an interface for that."*). He was right twice over: the number reached
+	 * the engine and reached the energy report, and reached no pump.
+	 *
+	 * **READ-ONLY, AND THAT IS PHASE ONE RATHER THAN A DESIGN.** A pump's efficiency curve arrives
+	 * on `settings.energy.effic` as a NAME, with its points in the carried [CURVES] text, and this
+	 * page keeps no general curve library -- a pump's head curve lives on the pump. Making the
+	 * curve EDITABLE means moving those points onto the pump and teaching the exporter to write
+	 * them back, which is a storage change in `INP_SECTIONS_READ` and `LPN_CARRIED_PLACED`, the two
+	 * seams two other tracks are inside as this is written. Showing what the file said costs none of
+	 * that and answers the half of his sentence that is about not being able to SEE it.
+	 *
+	 * **THREE STATES, AND THE THIRD IS THE ONE WORTH GETTING RIGHT:**
+	 *   - a curve that resolves -- name it and print its points, so the reader can check them;
+	 *   - no curve at all -- say the network efficiency is what is used, and state the number,
+	 *     because "nothing here" and "the global applies" look identical and are not;
+	 *   - a curve NAMED but not STATED by the file -- the pump silently falls back to the global,
+	 *     and that is exactly the case `lpn_energy_curve_note` discloses in the energy report. It
+	 *     is disclosed here too, on the element, because the report is read once and the popup is
+	 *     where somebody is standing when it matters. Same argument as the import notes.
+	 *
+	 * A percentage needs no unit family and gets none: it is not a quantity with a factor, and
+	 * '%' needs no language key on the colour legend's own rule.
+	 */
+	function renderPumpEfficiencyFields(fields, l) {
+		var pc = EngCalcs.pageConfig || {},
+			e = settings.energy || {},
+			name = (e.effic || {})[l.id],
+			// **FACTOR 1, DELIBERATELY: THESE ARE THE FILE'S OWN NUMBERS AND STAY THEM.**
+			// docEnergy() parses the same lines with the flow factor because the ENGINE wants m3/s;
+			// reading its result back through toDisplay() would print 951.0194000000001 for a file
+			// that says 951.0194, which is this suite's oldest rule broken on a screen instead of in
+			// a file. The points are already in the project's own unit in the carried text.
+			pts = name ? (EngCalcs.lpnEfficCurves(doc.inpSections, 1) || {})[name] : null,
+			globalPct = (typeof e.globalEfficiency === 'number' && isFinite(e.globalEfficiency))
+				? e.globalEfficiency : null,
+			// The global's own default lives with the energy settings, not here; where the document
+			// states none, say so in the same words the Settings row uses rather than inventing a
+			// number this page would then have to keep in step.
+			globalText = globalPct === null ? (pc.lpn_energy_efficiency || 'Pump efficiency (percent)')
+				: (globalPct + '%');
+		if (name && pts && pts.length) {
+			readonlyField(fields, pc.lpn_pump_effic_curve || 'Efficiency curve', name,
+				pc.lpn_pump_effic_curve_tip);
+			efficPointTable(fields, pts);
+		} else if (name) {
+			pumpEfficNote(fields, (pc.lpn_pump_effic_unstated
+				|| 'This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}.')
+				.replace('{name}', name).replace('{percent}', globalText));
+		} else {
+			pumpEfficNote(fields, (pc.lpn_pump_effic_global
+				|| 'This pump has no efficiency curve, so it runs at the network efficiency of {percent}.')
+				.replace('{percent}', globalText));
+		}
+	}
+	function pumpEfficNote(fields, text) {
+		var d = document.createElement('div');
+		d.style.fontSize = '0.9em';
+		d.textContent = text;
+		fields.appendChild(d);
+	}
+	/**
+	 * The curve's own points, in the project's flow unit and in percent. Built here rather than
+	 * through curvePointTable() because that one EDITS a pump's `curvePoints` in place and seeds an
+	 * empty row when there are none; this is a reading of what the file said, and it is printed
+	 * unconverted for the reason given at the call site.
+	 */
+	function efficPointTable(fields, pts) {
+		var pc = EngCalcs.pageConfig || {},
+			table = document.createElement('table'), thead = document.createElement('thead'),
+			hrow = document.createElement('tr'), tbody = document.createElement('tbody'), i, tr;
+		// Two classes: the shared look, and a name of its own so this table can be told from the head
+		// curve's beside it -- by a reader, by a future stylesheet, and by the harness that asserts
+		// its cells are the file's own tokens.
+		table.className = 'lpn-curve-table lpn-effic-table';
+		[(pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
+			(pc.lpn_pump_effic_col || 'Efficiency') + ' (%)'].forEach(function (t) {
+			var th = document.createElement('th');
+			th.textContent = t;
+			hrow.appendChild(th);
+		});
+		thead.appendChild(hrow); table.appendChild(thead); table.appendChild(tbody);
+		for (i = 0; i < pts.length; i++) {
+			tr = document.createElement('tr');
+			[pts[i][0], pts[i][1]].forEach(function (v) {
+				var td = document.createElement('td');
+				td.textContent = String(v);
+				tr.appendChild(td);
+			});
+			tbody.appendChild(tr);
+		}
+		fields.appendChild(table);
 	}
 	// **SPEED AND ITS SCHEDULE** (Task 248.02), the pump's twin of the reservoir's head pattern and
 	// the junction's demand pattern. Two rows, and they compose the way EPANET composes them: the
@@ -26740,6 +26840,7 @@ var EngCalcs = EngCalcs || {};
 		} else if (l.type === 'pump') {
 			renderPumpCurveFields(fields, l, linkId);
 			renderPumpSpeedFields(fields, l);
+			renderPumpEfficiencyFields(fields, l);
 		} else {
 			unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
 				function () { return effective(l, 'diameter'); },

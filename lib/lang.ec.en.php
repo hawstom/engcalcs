@@ -2192,7 +2192,25 @@ $ec_lang['lpn_field_km_short']='Minor loss, k';
 $ec_lang['lpn_pump_curve_source']='Curve source';
 $ec_lang['lpn_pump_curve_own']='Enter points below';
 $ec_lang['lpn_pump_curve_ref_note']='Using the curve entered for pump {id}.';
-$ec_lang['lpn_pump_curve_note']='One, two, or three points — see "Pump curve" in the Notes below.';
+// **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
+// It's in Help, Notes on this page."*). Every other calculator in this suite is a form with its
+// notes printed under it, and this sentence was written in that habit; the map page is a full-window
+// drawing surface and its notes are a Help row. The sentence now names the row the way the menu
+// does. Reworded in English only, so the 26 translations are stale until the next sprint resyncs
+// them -- `detect_english_drift.php` is what carries that.
+$ec_lang['lpn_pump_curve_note']='One, two, or three points. See "Pump curve" under Help, Notes on this page.';
+// **THE PUMP'S OWN EFFICIENCY, ON THE PUMP** (Tom, 2026-09-05: *"The pump has no efficiency of its
+// own, and I don't see an interface for that."*). Three states and three sentences, because "this
+// pump has no curve" and "this pump names a curve the file never stated" reach the same arithmetic
+// by different roads and only one of them is a problem the reader can act on.
+//
+// {name} and {percent} are placeholders and not concatenation (Task 193): a language that puts the
+// curve name first, or wraps a percentage in its own punctuation, cannot express a prefix sandwich.
+$ec_lang['lpn_pump_effic_curve']='Efficiency curve';
+$ec_lang['lpn_pump_effic_curve_tip']='The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.';
+$ec_lang['lpn_pump_effic_col']='Efficiency';
+$ec_lang['lpn_pump_effic_global']='This pump has no efficiency curve, so it runs at the network efficiency of {percent}.';
+$ec_lang['lpn_pump_effic_unstated']='This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}.';
 $ec_lang['lpn_pump_point1']='Point 1';
 $ec_lang['lpn_pump_point2']='Point 2';
 $ec_lang['lpn_pump_point3']='Point 3';

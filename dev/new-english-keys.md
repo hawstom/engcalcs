@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read**, of 79 untranslated keys, of 1616 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read**, of 84 untranslated keys, of 1621 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (79, all ruled)
+## lpn_  (84, 5 to read @@ NEEDS RULING)
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
@@ -146,6 +146,21 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_new_units_tip`**
   > A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.
   _Ruled OK 2026-09-04._
+- **`lpn_pump_effic_col`**
+  > Efficiency
+  @@ NEEDS RULING
+- **`lpn_pump_effic_curve`**
+  > Efficiency curve
+  @@ NEEDS RULING
+- **`lpn_pump_effic_curve_tip`**
+  > The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.
+  @@ NEEDS RULING
+- **`lpn_pump_effic_global`**
+  > This pump has no efficiency curve, so it runs at the network efficiency of {percent}.
+  @@ NEEDS RULING
+- **`lpn_pump_effic_unstated`**
+  > This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}.
+  @@ NEEDS RULING
 - **`lpn_quality_chemical_name`**
   > Chemical and units
   _Ruled OK 2026-09-04._
