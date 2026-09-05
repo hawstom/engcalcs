@@ -10032,12 +10032,25 @@ var EngCalcs = EngCalcs || {};
 	// placement a FIRST-TIME rule rather than one that fights the user afterwards.
 	var findUserPos = null;
 	var findUserSize = null;
+	// **AND WHETHER IT WAS OPEN** (Tom, 2026-09-04: *"Browser remembers its position on reload, but
+	// doesn't remember whether it was open. Can it do that too?"*). A SIXTH FIELD ON A RECORD THAT
+	// ALREADY EXISTS, which is why it needed no new consent and no new key: same purpose, same
+	// category -- furniture the visitor arranged deliberately -- and the row for `lpn_findbox` in
+	// dev/cookie-storage-inventory.md already covers it. A second key would have been a different
+	// question, and wipeAllStorage() already dooms this one.
+	//
+	// **IT IS WRITTEN ON A PHONE, WHERE THE POSITION AND SIZE ARE NOT**, and the difference is the
+	// whole rule: how wide a box is is a fact about the SCREEN, so a number measured on a phone
+	// would be felt on a desktop that never chose it. Whether a box is open is a fact about what the
+	// reader was DOING, and each browser answers only for itself.
+	var findUserOpen = false;
 	function saveFindLayout() {
 		var v = {
 			left: findUserPos ? findUserPos.left : null,
 			top: findUserPos ? findUserPos.top : null,
 			w: findUserSize ? findUserSize.w : null,
-			h: findUserSize ? findUserSize.h : null
+			h: findUserSize ? findUserSize.h : null,
+			open: findUserOpen
 		};
 		try { localStorage.setItem(LPN_FINDBOX_KEY, JSON.stringify(v)); } catch (e) {}
 	}
@@ -10053,15 +10066,25 @@ var EngCalcs = EngCalcs || {};
 		if (typeof v.w === 'number' && typeof v.h === 'number' && v.w > 0 && v.h > 0) {
 			findUserSize = { w: v.w, h: v.h };
 		}
+		findUserOpen = !!v.open;
 	}
 	function closeFindPopup() {
 		var popup = document.getElementById('lpn_find_popup');
 		hidePanel(popup);
+		// Guarded, because closing a box that is already closed is a no-op and must not cost a
+		// storage write -- and this function is reachable from paths that fire whether or not the
+		// box was showing.
+		if (findUserOpen) { findUserOpen = false; saveFindLayout(); }
 	}
 	// **OPEN, NOT TOGGLE.** The menu row shows the box; the X closes it. Choosing Find while it is
 	// already open re-runs nothing and hides nothing -- it just brings the box back to attention,
 	// which is what every editor's Find command does.
-	function toggleFindPopup(anchorEl) {
+	//
+	// **`restoring` IS THE BOOT CALL, AND ALL IT CHANGES IS THE FOCUS.** A box the reader opened
+	// wants the caret in its field; a box that merely came back with the page must not have it, or
+	// every reload swallows the first keystroke and every map shortcut with it. Placement,
+	// rebuilding and the stored flag are identical either way -- there is no second opening path.
+	function toggleFindPopup(anchorEl, restoring) {
 		var popup = document.getElementById('lpn_find_popup'), input, at, h, r, top;
 		if (!popup) { return; }
 		closeMenu();
@@ -10109,6 +10132,8 @@ var EngCalcs = EngCalcs || {};
 				popup.style.top = top + 'px';
 			}
 		});
+		if (!findUserOpen) { findUserOpen = true; saveFindLayout(); }
+		if (restoring) { return; }
 		input = popup.querySelector('input[type=text]');
 		if (input) { input.focus(); input.select(); }
 	}
@@ -19315,6 +19340,12 @@ var EngCalcs = EngCalcs || {};
 		updateEmptyHint();
 		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
 		renderTabs();
+		// **THE STANDING BOXES COME BACK OPEN** -- see restoreOpenBoxes(). Here, and not beside
+		// wireFindPopup()/wireSettingsBox(), because opening either one REBUILDS it from the
+		// document, and at wiring time there is not one yet: the project arrives at initLibrary()
+		// a hundred lines below them. This is the first point at which the drawing, the units and
+		// the tab strip are all the ones the visitor will actually be looking at.
+		restoreOpenBoxes();
 		// **The banner has to be painted on the BOOT path too.** refreshAllFromDocument() ends with
 		// this call but is shared by openProject() and newProject() only, so the one situation the
 		// needs-reopen banner exists for -- a page load that dropped the file handle -- is the one
@@ -22981,7 +23012,14 @@ var EngCalcs = EngCalcs || {};
 	// visitor set deliberately -- and dev/cookie-storage-inventory.md's row for `lpn_setbox` already
 	// covers it. No EC_CONSENT_VERSION bump, no banner rewrite, no sentence in consent_body made
 	// false. A SECOND key would have been a different question.
-	var setboxLayout = { left: null, top: null, w: null, h: null, ix: null };
+	//
+	// **`open` IS THE SIXTH FIELD, AND IT IS A BOOLEAN AMONG FIVE NUMBERS** (Tom, 2026-09-04:
+	// *"Browser remembers its position on reload, but doesn't remember whether it was open. Can it
+	// do that too?"*). Same key, same purpose, same category as the five it joins -- so, exactly as
+	// `ix` was, no new consent, no EC_CONSENT_VERSION bump, no banner rewrite, and the existing
+	// `lpn_setbox` row in dev/cookie-storage-inventory.md covers it. The loader below therefore has
+	// to stop treating every field as a number; that is the one thing this addition costs.
+	var setboxLayout = { left: null, top: null, w: null, h: null, ix: null, open: false };
 	function saveSetboxLayout() {
 		try { localStorage.setItem(LPN_SETBOX_KEY, JSON.stringify(setboxLayout)); } catch (e) {}
 	}
@@ -22992,7 +23030,10 @@ var EngCalcs = EngCalcs || {};
 		try { v = JSON.parse(raw); } catch (e) { return; }
 		if (!v || typeof v !== 'object') { return; }
 		for (k in setboxLayout) {
-			if (typeof v[k] === 'number' && isFinite(v[k])) { setboxLayout[k] = v[k]; }
+			// A record written before this field existed simply has no `open`, and `!!undefined` is
+			// the closed box every such visitor last saw. There is no migration to write.
+			if (k === 'open') { setboxLayout.open = !!v.open; }
+			else if (typeof v[k] === 'number' && isFinite(v[k])) { setboxLayout[k] = v[k]; }
 		}
 	}
 	// A REMEMBERED SIZE IS A WISH, NOT A PROMISE: the window may be smaller than it was, so the
@@ -23358,14 +23399,65 @@ var EngCalcs = EngCalcs || {};
 		// would undo the filter of somebody who opened the box, filtered, closed it to look at the
 		// map, and came back. The filter is a view of the box, and the box remembers its view.
 		initTipsIn(box);
+		if (!setboxLayout.open) { setboxLayout.open = true; saveSetboxLayout(); }
 	}
 	function closeSettingsBox() {
 		var box = setboxEl();
 		hidePanel(box);
+		// **GUARDED, AND HERE THAT IS NOT AN OPTIMISATION.** Escape calls this on every press,
+		// whether or not the box is showing, so an unguarded write would put a storage write on a
+		// key the user never touched behind every Escape on the page.
+		if (setboxLayout.open) { setboxLayout.open = false; saveSetboxLayout(); }
 	}
 	function toggleSettingsBox(evt) {
 		if (setboxIsOpen()) { closeSettingsBox(); return; }
 		openSettingsBox(evt && evt.section);
+	}
+	// ---- WHICH BOXES COME BACK OPEN, AND WHICH DELIBERATELY DO NOT (Tom, 2026-09-04) -------------
+	//
+	// *"lpn Boxes: Browser remembers its position on reload, but doesn't remember whether it was
+	// open. Can it do that too?"* It can, and for the boxes named below it now does -- through the
+	// keys that already carry where those boxes are, because openness is the same fact about the
+	// same furniture and a second key would have been a second consent question about one thing.
+	//
+	// **OPENNESS IS NOT AUTOMATICALLY RIGHT, AND THE LINE IS WHO ASKED.** A box that is a STANDING
+	// REFERENCE -- something you work beside, that says the same thing whenever you look at it --
+	// was left open on purpose, and closing it on the reader's behalf every reload is the page
+	// overruling them. A box that is an ANSWER TO A GESTURE is the opposite: bringing it back is a
+	// box the reader has no memory of asking for, which is the "cool new button that I found"
+	// failure Task 542 exists to have removed.
+	//
+	//   OPEN AGAIN -- Find and Settings (here), and the bottom pane and right panel, which have
+	//   done this since Tasks 434 and 441. All four are standing boxes and all four already
+	//   remembered their geometry, which is the same sentence Tom's question is about.
+	//
+	//   DELIBERATELY LEFT ALONE, and each for a reason, not by omission:
+	//
+	//   * **The three report boxes -- fire flow, energy, scenario compare.** Every one of them is a
+	//     report ABOUT A RUN, and a reload has no run. Two would come back empty, saying they have
+	//     nothing to show; the third (scenario compare) RUNS N SOLVES merely by being opened, so
+	//     restoring it would spend the machine on work nobody asked for at that moment. None of them
+	//     remembers where it sits either -- they centre on every open, on Tom's own liking of that
+	//     -- so there is no half of this they already had.
+	//   * **The Library box.** A standing box in shape, but it declines position memory on purpose
+	//     (see wireLibraryBox), and reopening a box at a corner it was never left in is half a
+	//     memory. If it is to remember, it should remember both, and that is a separate decision.
+	//   * **The property popup.** It is an answer to a selection, and a selection is not restored.
+	//   * **The New-project box, the confirm dialog, the fire-flow run dialog, the notes popover,
+	//     the backdrop target panel and the two menu popovers.** Modals, transient choosers and
+	//     pull-downs. A modal that survives a reload is a question the reader has already answered.
+	//
+	// **A RESTORED BOX IS PLACED BY ITS OWN OPENER AND BY NOTHING ELSE**, which is what keeps a
+	// corner remembered on a 32-inch monitor from opening off the edge of a laptop: both openers
+	// already re-clamp through clampPanel() and capPanelToRoomBelow() on every open, precisely
+	// because "a box remembered off-screen is a box that never comes back". There is no restore-time
+	// placement here to get wrong.
+	//
+	// Settings first, Find second, so Find -- much the smaller box -- ends up on top: placePanelForScreen()
+	// raises whatever it places, so the order of these two lines IS the stacking.
+	function restoreOpenBoxes() {
+		if (setboxLayout.open) { openSettingsBox(); }
+		if (findUserOpen) { toggleFindPopup(null, true); }
 	}
 	// ---- THE DIVIDER BETWEEN THE TWO PANES (ROADMAP Task 576) ------------------------------------
 	//

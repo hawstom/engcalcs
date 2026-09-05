@@ -87,12 +87,24 @@ function mkEl(tag, svgNS) {
     // `copy.querySelector('select')` (Task 477) and honest about the rest. A stub that answered
     // every selector with null made that line find nothing, which is a box with no unit controls in
     // it and a harness asserting over an empty list.
+    // **AND ONE ATTRIBUTE FILTER, `tag[attr=value]`**, because `input[type=text]` is the selector
+    // the Find box uses to reach its own query field -- the field a restored box must NOT focus
+    // (dev/lpn-spike/box-open-memory-harness.js). Answering it with null held constant the one thing
+    // that harness varies: whether anything was focused at all. Anything more elaborate than one
+    // unquoted attribute is still honestly null.
     querySelector(sel) {
-      if (!/^[a-z]+$/.test(String(sel))) { return null; }
-      const want = String(sel).toLowerCase();
+      const m = /^([a-z]+)(?:\[([a-zA-Z-]+)=([^\]"']+)\])?$/.exec(String(sel));
+      if (!m) { return null; }
+      const want = m[1], attr = m[2], val = m[3];
+      const attrOk = (c) => {
+        if (!attr) { return true; }
+        const has = c[attr] !== undefined ? c[attr]
+          : (c.getAttribute ? c.getAttribute(attr) : undefined);
+        return String(has) === val;
+      };
       const walk = (e) => {
         for (const c of (e.children || [])) {
-          if (c._tag === want) { return c; }
+          if (c._tag === want && attrOk(c)) { return c; }
           const hit = c.querySelector ? c.querySelector(sel) : null;
           if (hit) { return hit; }
         }
@@ -379,6 +391,10 @@ byId.lpn_menu_popup2.appendChild(byId.lpn_menu_list2);
 // falls back to rendering into the colour host only when it is NOT on the page. A parentless stub
 // would exercise that fallback and never the shipped placement.
 byId.lpn_setbox_content.appendChild(byId.lpn_set_ramp_credits);
+// And the Find box's form really is INSIDE the Find box. toggleFindPopup() reaches its query field
+// as `popup.querySelector('input[type=text]')`, so a parentless form makes that lookup answer null
+// and every question about the caret -- which the boot restore must not take -- unaskable.
+byId.lpn_find_popup.appendChild(byId.lpn_find_form);
 // Looped-Network.php ships #lpn_find_popup with an inline `display:none`, and refreshFindForm()
 // reads exactly that to decide whether the box is on screen. A stub born with display '' is a box
 // every harness would be repainting without ever having opened one.
