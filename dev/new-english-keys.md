@@ -25,121 +25,121 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_col_avg_kw_tip`**
   > The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_col_cost`**
   > Cost
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_col_effic`**
   > Effic.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_col_kwh`**
   > kWh
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_col_peak_kw`**
   > Peak kW
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_col_pump`**
   > Pump
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_col_running`**
   > Running
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_currency`**
   > Currency
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_currency_tip`**
   > Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_curve_note`**
   > These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_demand_charge`**
   > Demand charge
-  @@ NEEDS RULING
+  Why not "Peak demand charge"?
 - **`lpn_energy_demand_charge_tip`**
   > What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_efficiency`**
   > Pump efficiency (percent)
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_efficiency_tip`**
   > The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_kw`**
   > kW
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_kwh`**
   > kWh
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_menu`**
   > Pump energy report
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_menu_tip`**
   > What each pump ran, what it drew and what it cost over the last run.
-  @@ NEEDS RULING
+  Clarify "What each pump ran". "When?" Delete?
 - **`lpn_energy_needs_run`**
   > Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_no_price`**
   > No price of power is stated, so every cost here is zero. Set one under Settings, Energy.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_no_pumps`**
   > This network has no pumps, so there is nothing drawing power.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_over`**
   > Over a run of {time}.
-  @@ NEEDS RULING
+  Use "extended period simulation" and audit the page for this terminology standardization Time Simulation in all its real variants becomes EPS or extended etc.
 - **`lpn_energy_peak_kw`**
   > Highest power drawn at one moment
-  @@ NEEDS RULING
+  "Peak power usage"
 - **`lpn_energy_price`**
   > Price of power
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_price_note`**
   > This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_price_pattern`**
   > Price schedule
-  @@ NEEDS RULING
+  "Price pattern"
 - **`lpn_energy_price_pattern_tip`**
   > A pattern that multiplies the price hour by hour, which is how an off peak tariff is written. Leave it empty for one price all day.
-  @@ NEEDS RULING
+  Check the word "tariff". Maybe okay, but it's tweaking my antennae.
 - **`lpn_energy_price_tip`**
   > What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_pump_price_tip`**
   > What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_title`**
   > Pump energy report
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_total_cost`**
   > Total cost
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_total_demand_charge`**
   > Demand charge
-  @@ NEEDS RULING
+  "Peak demand charge"
 - **`lpn_energy_total_energy_cost`**
   > Cost of energy
-  @@ NEEDS RULING
+  We are using both "energy" and "power", scientifically, the correct term is energy for kWh and power for kW, but this refers to both. I guess it's okay.
 - **`lpn_energy_total_kwh`**
   > Energy used
-  @@ NEEDS RULING
+  OK.
 - **`lpn_ff_col_static_tip`**
   > The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.
   _Ruled OK 2026-09-04._
 - **`lpn_find_prop_demand_description`**
   > Demand description
-  @@ NEEDS RULING
+  "Demand category description"
 - **`lpn_inp_drop_net_options`**
   > This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.
   _Ruled OK 2026-09-04._
 - **`lpn_inp_drop_sources_mixing`**
   > This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_net_emergency`**
   > This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.
   _Ruled OK 2026-09-04._
@@ -160,7 +160,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_reaction_bulk_short`**
   > Bulk reaction
-  @@ NEEDS RULING
+  OK.
 - **`lpn_reaction_bulk_tip`**
   > Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one grows it. First order unless the file says otherwise, so the coefficient is a rate in 1/day. An empty box means no bulk reaction.
   _Ruled OK 2026-09-04._
@@ -178,19 +178,19 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_reaction_tank`**
   > Reaction coefficient
-  @@ NEEDS RULING
+  OK.
 - **`lpn_reaction_tank_short`**
   > Reaction
-  @@ NEEDS RULING
+  OK.
 - **`lpn_reaction_tank_tip`**
   > Reaction in the water held in this tank, as a rate in 1/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Leave it empty and the tank uses the bulk reaction coefficient set for the whole network under Settings, Water quality.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_reaction_wall`**
   > Wall reaction coefficient
   _Ruled OK 2026-09-04._
 - **`lpn_reaction_wall_short`**
   > Wall reaction
-  @@ NEEDS RULING
+  OK.
 - **`lpn_reaction_wall_tip`**
   > Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.
   _Ruled OK 2026-09-04._
@@ -202,43 +202,43 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_scncmp_at`**
   > {value} at {id}
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scncmp_col_maxvelocity`**
   > Highest velocity
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scncmp_col_minpressure`**
   > Lowest pressure
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scncmp_current`**
   > (open now)
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scncmp_empty`**
   > Nothing has been drawn yet, so there is nothing to solve.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scncmp_go`**
   > Compare
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scncmp_intro`**
   > Press Compare to solve every scenario in this project and read them side by side.
-  @@ NEEDS RULING
+  Not needed. See my comments in my prompt.
 - **`lpn_scncmp_menu_tip`**
   > Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scncmp_note`**
   > Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scncmp_running`**
   > Solving every scenario…
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scncmp_title`**
   > Scenario comparison
-  @@ NEEDS RULING
+  OK.
 - **`lpn_setbox_divider`**
   > Settings index width
-  @@ NEEDS RULING
+  OK.
 - **`lpn_settings_energy`**
   > Energy
-  @@ NEEDS RULING
+  OK.
 - **`lpn_time_run_report_copied`**
   > Copied
   _Ruled OK 2026-09-04._
