@@ -55,7 +55,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_energy_curve_note`**
   > These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_demand_charge`**
   > Peak demand charge
   _Ruled OK 2026-09-04._
