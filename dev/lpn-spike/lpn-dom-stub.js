@@ -379,7 +379,12 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // The scenario comparison box (planning engineer's wish-list row 2). Absent from this list,
   // rebuildScenarioCompareReport() returns at its first line and the table is invisible to every
   // harness -- the same silent hole the two boxes above it describe.
-  'lpn_scncmp_box', 'lpn_scncmp_close', 'lpn_scncmp_report'
+  'lpn_scncmp_box', 'lpn_scncmp_close', 'lpn_scncmp_report',
+  // The Libraries box -- patterns, controls and curves (Tasks 462/460), and since 2026-09-05 the
+  // fourth box that remembers where it was left, how big it was made and whether it was open.
+  // Absent from this list, wireLibraryBox() and openLibraryBox() both return at their first line,
+  // so nothing about that memory could be asked at all.
+  'lpn_library_box', 'lpn_libbox_close', 'lpn_libbox_index', 'lpn_libbox_content'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the
@@ -402,6 +407,10 @@ byId.lpn_find_popup.style.display = 'none';
 // Looped-Network.php ships #lpn_scncmp_box with an inline `display:none` too, and
 // scnCmpBoxIsOpen() reads exactly that.
 byId.lpn_scncmp_box.style.display = 'none';
+// And #lpn_library_box, whose libBoxIsOpen() reads it the same way. A stub born with display ''
+// is a box that answers "not open" by accident rather than because it is shut, which is the
+// difference between a memory that works and one nobody could tell apart from doing nothing.
+byId.lpn_library_box.style.display = 'none';
 // And the same reason once more: Looped-Network.php nests both Settings panes and the divider
 // between them inside .lpn-setbox-panes. The divider's ceiling is a fraction of that parent's
 // width, so a parentless index is an index with no upper clamp at all.
@@ -611,6 +620,43 @@ global.window = {
   location: { search: '' },   // refreshPageTitle() reads ?name= off it (Task 265)
   devicePixelRatio: 1, getComputedStyle: () => ({ getPropertyValue: () => '' })
 };
+// **A ResizeObserver, BECAUSE ITS ABSENCE WAS A HELD-CONSTANT COUPLING** (dev/testing-notes.md: a
+// missing function is one too, and it is the quietest kind). Three standing boxes -- Settings, Find
+// and the Libraries box -- remember their size through `new window.ResizeObserver(...)`, and
+// `if (window.ResizeObserver)` was simply FALSE here. So the observer is the one writer of those
+// records no harness had ever run: every assertion about what a box stores was an assertion about
+// the open/close/drag paths alone, and in a browser the observer writes the same key on every open.
+//
+// It fires when the harness says a layout happened -- flushResizeObservers() -- rather than on its
+// own. A browser also fires once on observe(); at that moment every one of these boxes is
+// display:none and every callback returns at its guard, so reproducing that would only be
+// reproducing a no-op. What the harness needs is the ABILITY to make the observer run while a box
+// is open, which is the state the guards are written for.
+const resizeWatchers = [];
+global.ResizeObserver = class {
+  constructor(cb) { this.cb = cb; }
+  observe(el) { resizeWatchers.push({ cb: this.cb, el }); }
+  unobserve(el) {
+    for (let i = resizeWatchers.length - 1; i >= 0; i--) {
+      if (resizeWatchers[i].el === el && resizeWatchers[i].cb === this.cb) { resizeWatchers.splice(i, 1); }
+    }
+  }
+  disconnect() {
+    for (let i = resizeWatchers.length - 1; i >= 0; i--) {
+      if (resizeWatchers[i].cb === this.cb) { resizeWatchers.splice(i, 1); }
+    }
+  }
+};
+global.window.ResizeObserver = global.ResizeObserver;
+function flushResizeObservers() {
+  resizeWatchers.slice().forEach(w => w.cb([{ target: w.el }], w));
+}
+// **A HARNESS THAT MODELS A RELOAD HAS TO RETIRE THE OLD PAGE'S OBSERVERS.** loadLoopedNetwork()
+// can be called twice to get a second module over the same localStorage -- which is what a reload
+// is -- but the first instance's observers are still watching the same stub elements, and a flush
+// would then run a dead page's callbacks against live storage. That is a two-tab race, not a
+// reload, and the two must not be confused for one another.
+function clearResizeObservers() { resizeWatchers.length = 0; }
 global.alert = global.window.alert;
 global.confirm = global.window.confirm;
 global.prompt = global.window.prompt;
@@ -841,4 +887,4 @@ function loadLoopedNetwork(injectSource, preludeSource) {
 }
 
 module.exports = { ROOT, mkEl, byId, ensure, unitSelects, setUnitSet, setHitTarget, loadLoopedNetwork, LPN_UNIT_PRESETS, GPM, FT, IN,
-	NODE_ENGINE_URL, epanetSolves, warmEpanet, settleEpanet };
+	NODE_ENGINE_URL, epanetSolves, warmEpanet, settleEpanet, flushResizeObservers, clearResizeObservers };
