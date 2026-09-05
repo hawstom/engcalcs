@@ -48,6 +48,13 @@
 > is re-marked over it and it is not on its own a reason to re-shoot: Tom already ruled that once,
 > on 2026-09-01, when the glyph alone did not justify re-shooting these same three. Recorded so the
 > next reader can tell a stale frame from a current one, not as a worklist.
+>
+> **A FOURTH LANDED 2026-09-05 and it is a detail change, not a new silhouette.** Tom marked up a
+> render: the chord across the bulb is a CATWALK and must overhang the ellipse, and the riser must
+> not appear inside the tank because the view is an external elevation. The bulb, the legs and the
+> riser are otherwise the 2026-09-04 drawing, so a frame carrying the elliptical tower is current
+> enough to read; only a frame carrying the PEAKED tower is a generation behind. Still not a reason
+> to re-shoot anything.
 
 
 One line per file: what it shows, and whether it could go on a public page. Written by AI from
