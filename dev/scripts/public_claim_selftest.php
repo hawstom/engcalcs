@@ -34,6 +34,14 @@ $cases = [
      ['k' => 'There is no extended-period simulation yet.'], true],
     ['...and its other phrasing, which says the same thing',
      ['k' => 'This page does not support extended period runs.'], true],
+    // **BOTH LEGS OF THE ONE DEMOTION.** `lpn_time_no_period` was ruled OK by Tom on 2026-09-04 and
+    // is a fact about one open document, not a claim about the suite. The demotion excuses that
+    // exact shape and nothing near it -- these three fixtures are what stops it widening into the
+    // denial it sits beside, which is the failure this whole file exists to prevent.
+    ['the SUITE-level claim still blocks, demotion or no demotion',
+     ['k' => 'There is no extended period simulation in this suite.'], true],
+    ['a near-miss on the demotion still blocks, because blocking is the safe direction',
+     ['k' => 'This project has no extended period simulation configured.'], true],
 
     // ---- what must pass ------------------------------------------------------------------------
     // **THE SANCTIONED SENTENCE, VERBATIM.** See the docblock: it is one word from two denials.
@@ -48,6 +56,10 @@ $cases = [
      ['k' => 'It is a web application and runs everywhere a browser runs.'], false],
     ['extended-period simulation described as PRESENT',
      ['k' => 'Extended-period simulation runs through the EPANET engine.'], false],
+    // Tom's own sentence, verbatim, as it ships in lib/lang.ec.en.php.
+    ['a fact about ONE PROJECT, which is true and which Tom ruled OK 2026-09-04',
+     ['k' => 'This project has no extended period simulation set, so there is only one moment to '
+           . 'show. Set a Total run time in Settings to calculate the network over time.'], false],
     ['four third-party requests, stated correctly',
      ['k' => 'This page makes four third-party requests, and every one is opt-in.'], false],
     ['an empty string, and a value that is not a string at all',

@@ -15815,7 +15815,7 @@ var EngCalcs = EngCalcs || {};
 			// read is discarded, where a rule is KEPT and written back. Two different fates need two
 			// different sentences, and the old one would have a user believing their rules were lost.
 			case 'rules': return pc.lpn_inp_drop_rules || 'This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
-			case 'extended-period': return pc.lpn_inp_drop_eps || 'This file runs over a period of time. This page solves one moment, so only the starting conditions came in.';
+			case 'extended-period': return pc.lpn_inp_drop_eps || 'This file describes an extended period simulation. This page solves one moment, so only the starting conditions came in.';
 			// **NOTHING IS DISCARDED ANY MORE, AND THE SENTENCES SAY SO** (Tom, 2026-08-29, reading
 			// the old one: *"It seems to be saying that quality and pump energy cost info is
 			// discarded"*). Every section this page does not read is carried verbatim and written
@@ -29489,17 +29489,34 @@ var EngCalcs = EngCalcs || {};
 			ffEl('p', 'lpn-ff-note', pc.lpn_energy_needs_run || '', host);
 			return;
 		}
-		// The run's length as this page states every other time, H:MM through the one formatter,
-		// rather than a bare number of hours that would have to choose a plural.
-		ffEl('p', 'lpn-ff-note', (pc.lpn_energy_over || 'Over a run of {time}.')
+		// **THE SENTENCE AND THE DURATION ARE TWO LINES NOW, and that is Tom's ruling plus the
+		// property it would otherwise have taken with it** (2026-09-04). His marked-up wording of
+		// `lpn_energy_over` shortened it to *Over an extended period simulation.*, dropping the
+		// `of {time}` clause -- which left the kWh and the cost below with nothing on screen saying
+		// what span they are over. The audit row was about TERMINOLOGY, so his words stand exactly
+		// as written; the duration comes back beside them as its own labelled fact.
+		//
+		// **The label is `lpn_time_duration`, reused rather than written:** it is already the
+		// literal name of the control in Settings that sets this number, it is already translated
+		// into 26 languages, and Tom has ruled that control's own label correct. A new key here
+		// would have cost 26 retranslations to say the same thing in a second voice.
+		//
+		// The `.replace()` stays. It is a no-op against his text and it is the whole of what a
+		// restored `of {time}` would need, so putting the clause back is a one-string edit.
+		ffEl('p', 'lpn-ff-note', (pc.lpn_energy_over || 'Over an extended period simulation.')
 			.replace('{time}', EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(sum.duration)
+				: String(sum.duration)), host);
+		// H:MM through the one formatter, the way this page states every other time, rather than a
+		// bare number of hours that would have to choose a plural.
+		ffEl('p', 'lpn-ff-note', (pc.lpn_time_duration || 'Total run time') + ': '
+			+ (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(sum.duration)
 				: String(sum.duration)), host);
 		body = ffTable(host, [
 			pc.lpn_energy_col_pump || 'Pump',
 			pc.lpn_energy_col_running || 'Running',
 			pc.lpn_energy_col_effic || 'Effic.',
 			[pc.lpn_energy_col_avg_kw || 'Avg. kW',
-				pc.lpn_energy_col_avg_kw_tip || 'Averaged over the time this pump was running, not over the whole period.'],
+				pc.lpn_energy_col_avg_kw_tip || 'Averaged over the time this pump was running, not over its idle periods.'],
 			pc.lpn_energy_col_peak_kw || 'Peak kW',
 			pc.lpn_energy_col_kwh || 'kWh',
 			pc.lpn_energy_col_cost || 'Cost'

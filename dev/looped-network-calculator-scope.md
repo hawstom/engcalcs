@@ -780,6 +780,47 @@ Task 145's "the core solve never depends on it" is.
 
 ---
 
+## Where a setting lives (Task 584, ruled by Tom 2026-09-04)
+
+**A new project gets the hard-coded defaults, always. If you want otherwise, save a template or copy
+a project. Window furniture is not project data and follows the browser.**
+
+His own words, having talked himself into the position: *"Least confusion arises if new projects
+always get the hard-coded defaults, and if you want otherwise, save a template or copy a project."*
+The clause about furniture is the addition that keeps it from contradicting what already ships.
+
+**The split was already there and was already right**, so this writes it down rather than changing
+it. MODELLING data belongs to the project; FURNITURE belongs to the browser. The full argument, and
+the four `localStorage` keys the second half names, is in `CLAUDE.md`.
+
+### Why a template beats a "save current settings as default" button
+
+A button creates an invisible global. Two people then see different behaviour from the same
+document, and there is no way to inspect, share, diff or version the thing that made them differ. A
+template is a FILE. `openNewProjectBox()` carries the argument in a comment at the one place a
+future contributor would be tempted to add the button.
+
+### The gap Tom named answers itself
+
+*"Opening a project opens all its windows as saved, which is not current behavior"* — and it should
+not become current behaviour. Furniture is per-browser and therefore ALREADY where you left it,
+across every project, so opening a template lands in your own layout without the file ever having
+carried one. Putting window layout in the document would contradict the split and would hand a
+colleague your screen.
+
+### THE ONE CASE THE CODE DOES NOT YET MEET, and it is Tom's call
+
+`buildNewBoxUnits()` fills the New project chooser's unit selects from the OPEN project's strip
+(`sel.value = live.value`), so a new project started from an SI project opens on SI. That is a
+setting inherited from another project, which is what the rule above says should not happen —
+the hard-coded default is `EC_DEFAULT_UNIT_SET`, derived from the language.
+
+It is recorded and NOT changed. Two reasons: the chooser SHOWS the units before Create is pressed,
+so nothing is inherited invisibly and the confusion the rule exists to prevent is largely absent;
+and flipping it changes what every user gets from the commonest control on the page. The friction
+method already complies. Task 584's own text asked for the sentence to be written down, not for
+this behaviour to move.
+
 ## Project units (moved from CLAUDE.md, 2026-08-16)
 
 ### `lpn_` only: there are no browser units, only PROJECT units

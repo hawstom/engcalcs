@@ -117,46 +117,23 @@ the block.
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
 
-- 75|583| **[H] Four EPS sentences left to rule on, and they are the teaching ones.**
-  Tom, 2026-09-04, ruling on `lpn_energy_over`: *"Use 'extended period simulation' and audit the page
-  for this terminology standardization."* Audited, and then he read the audit and **closed the two
-  expensive groups himself**: of the 20 strings that name the analysis with a variant (*Total run
-  time*, *"through the run"*) and the 13 fire-flow ones, *"I think these probably are okay as is."*
-  So the sweep is not happening and its 442 retranslations are not being spent.
-  - **What is left is the eight strings that already reach for the words** -- *"I think some of these
-    need to be changed. Can you give me the full list to audit?"* The full list, in full text, with a
-    recommendation each, is `dev/eps-terminology-audit.md` §4. Four changes recommended, 104
-    retranslations, and three of the four are the sentences that TEACH the distinction: why one
-    moment, why the other engine, what is happening right now.
-
-- 100|584| **[H] One page-wide rule for where a setting lives, and how a new project gets one.**
-  Tom, 2026-09-04, having ruled the divider's memory in: *"we need a page-wide convention for how a
-  new project gets its settings... I have talked myself into maybe a position of 'Least confusion
-  arises if new projects always get the hard-coded defaults, and if you want otherwise, save a
-  template or copy a project.' What do you find for advice about that?"*
-  - **THE ADVICE, IN ONE SENTENCE: adopt his position exactly, and add the clause that keeps it from
-    contradicting what already ships.** *A new project gets the hard-coded defaults, always. If you
-    want otherwise, save a template or copy a project. Window furniture is not project data and
-    follows the browser.*
-  - **THE SPLIT IS ALREADY THERE AND IS ALREADY RIGHT, so this writes it down rather than changing
-    it.** MODELLING data belongs to the project -- units, friction method, new-asset defaults, ID
-    prefixes, colouring, labels, quality -- and CLAUDE.md's *"there are no browser units, only
-    PROJECT units"* is that rule already stated for the hardest case. FURNITURE belongs to the
-    browser -- `lpn_pane`, `lpn_rpane`, `lpn_setbox` -- because where a box sits and how wide its
-    panes are is a fact about the SCREEN somebody is sitting at, and a colleague opening the file on
-    a laptop must not inherit a 32-inch layout.
-  - **WHY A TEMPLATE BEATS A "SAVE CURRENT SETTINGS AS DEFAULT" BUTTON, and it is the same argument
-    this suite already makes about input files:** a button creates an invisible global that makes two
-    people see different behaviour from the same document, and it can never be inspected, shared or
-    versioned. A template is a FILE -- visible, nameable, copyable, emailable, diffable.
-  - **AND THE GAP HE NAMED ANSWERS ITSELF.** *"Opening a project opens all its windows as saved,
-    which is not current behavior"* -- and it should not become current behaviour. Furniture is
-    per-browser and therefore ALREADY where you left it, across every project, so opening a template
-    lands in your own layout without the file ever having carried one. Putting window layout in the
-    document would contradict the split above and would hand a colleague your screen.
-  - **The hard-coded HW default for the friction method (2026-09-03) is this rule working**, not an
-    exception to it. Promoting this task means: write the sentence into `CLAUDE.md` and
-    `dev/looped-network-calculator-scope.md`, and say it in the template tip.
+- 75|583| **Two EPS sentences left, and one states an unmeasured cause.**
+  Tom read `dev/eps-terminology-audit.md` and marked all eight rows; his marks are committed verbatim
+  (`9562285a`) and §4 records what came of each. **Five applied 2026-09-04** -- three translated, so
+  **78 retranslations are owed** (`lpn_inp_drop_eps`, `lpn_time_no_engine`, `lpn_time_no_period`) and
+  two untranslated and free, both in his own words rather than the recommendation.
+  - **`lpn_energy_over` lost its `{time}` on his edit, and that is content rather than wording**: the
+    energy report's kWh and cost no longer state the duration they are over. The call site still
+    calls `.replace('{time}', ...)`, so restoring the clause is a one-string edit if he wants it.
+  - **`lpn_time_running` is the one row of eight he left blank.** Unruled, so unchanged, and the
+    audit rated it the single best place to name the analysis: it is the progress line.
+  - **[H] `lpn_time_run_note` was not a wording question, and answering it found a defect** (§5).
+    The behaviour is sound -- the page computes one instant of an EPS project only when the user has
+    unchecked *Recalculate automatically* themselves, which `autoRunAllowed()` is the whole gate for,
+    and the page only advises it above `LPN_TIME_SLOW_MS`. **But the sentence asserts a speed the
+    code never tests**: `lpnTimeStatusNote()` reads no timing at all, so a user who unchecks the box
+    on a fast network is told their network is slow. The replacement states the setting instead, and
+    is in §5 awaiting his word. Translated: 26.
 
 - 75|582| **Pump efficiency curves: the one energy number we still take on faith.**
   Tom, 2026-09-04, reading `lpn_energy_curve_note`: *"Why aren't we implementing this instead of

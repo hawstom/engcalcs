@@ -1027,7 +1027,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 		      // SI presets to set them."* The selects are built by JS from the page's own strip; the
 		      // two preset buttons are here because they are markup with strings in them. ?>
 		<fieldset class="lpn-new-block">
-			<legend><?=$ec_lang['lpn_view_units']?></legend>
+			<legend><?=ecTipLabel($ec_lang['lpn_view_units'], $ec_lang['lpn_new_units_tip'])?></legend>
 			<div class="lpn-new-presets">
 				<?php // SI first, US second, the order the page's own preset row uses (Tom, 2026-07-30:
 				      // the suite serves a worldwide audience and most of it is metric). Same two

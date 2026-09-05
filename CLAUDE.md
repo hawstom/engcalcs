@@ -748,14 +748,32 @@ behaves the same way we do, so there is no authority on the other side.
 **A calculator stores what the user typed. Conversion happens at the solver, and on results coming
 back from it, and nowhere else.** If a third conversion site seems necessary, the design is wrong.
 
-### `lpn_` only: there are no browser units, only PROJECT units
+### `lpn_` only: a setting belongs to the PROJECT or to the BROWSER, never to both
 
-A project records its own unit selection (`serializeProject().units`) and restores it on open,
-because declarative storage makes a bare number meaningless without them. So there is **no "save
-these units as my defaults"** and no per-browser unit cookie for this page — a user who wants
-preferred settings saves an empty template project and opens it, which also carries ID prefixes,
-default inputs and map appearance. One mechanism instead of two. Detail and the legacy-document
-conversion path: `dev/looped-network-calculator-scope.md`.
+**A new project gets the hard-coded defaults, always. If you want otherwise, save a template or copy
+a project. Window furniture is not project data and follows the browser.** (Tom, 2026-09-04, closing
+Task 584 — his own position, adopted verbatim.)
+
+- **MODELLING data belongs to the PROJECT** and rides in `serializeProject()`: units, friction
+  method, new-asset defaults, ID prefixes, colouring, labels, quality. A project records its own
+  unit selection and restores it on open, because declarative storage makes a bare number
+  meaningless without them — that is this rule stated for its hardest case, and there is
+  therefore **no per-browser unit cookie for this page**.
+- **FURNITURE belongs to the BROWSER** and is a `localStorage` sibling key that
+  `serializeProject()` must never learn about: `lpn_pane`, `lpn_rpane`, `lpn_setbox`,
+  `lpn_findbox`. Where a box sits and how wide a pane is is a fact about the SCREEN somebody is
+  sitting at, and a colleague opening the file on a laptop must not inherit a 32-inch layout.
+  **So opening a project does NOT open its windows as saved, and must not learn to** — furniture
+  is already where you left it, across every project, which is why the gap that name suggests
+  answers itself.
+- **NEVER a "save current settings as default" button.** It creates an invisible global that makes
+  two people see different behaviour from the same document, and it can never be inspected, shared
+  or versioned. A template is a FILE — visible, nameable, copyable, emailable, diffable. It is the
+  same argument this suite already makes about input files. `openNewProjectBox()` states it at the
+  one place it would be tempting.
+- The hard-coded HW default for the friction method (2026-09-03) is this rule working, not an
+  exception to it. Detail, the legacy-document conversion path, and the one case the code does not
+  yet meet: `dev/looped-network-calculator-scope.md`.
 
 ---
 

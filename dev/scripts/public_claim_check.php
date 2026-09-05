@@ -60,7 +60,16 @@ const EC_STRUCK_CLAIMS = [
      . 'geocoder shipped.'],
     ['/\bno\s+extended[-\s]?period\s+simulation\b|\bnot?\s+(?:have|do|support)\s+extended[-\s]?period\b/i',
      'Extended-period simulation shipped 2026-08-18 through the EPANET engine. It was checked '
-     . 'against all 25 steps of EPA\'s own Net3.rpt over 2,425 head comparisons.'],
+     . 'against all 25 steps of EPA\'s own Net3.rpt over 2,425 head comparisons.',
+     // **THE DEMOTION, AND IT IS ABOUT THE SUBJECT OF THE SENTENCE.** The struck claim is about
+     // the SUITE -- "there is no extended-period simulation yet" -- and is false. A sentence whose
+     // subject is THIS PROJECT is a fact about one document the user has open, and is true: a
+     // project with no Total run time has no run to show. Tom ruled that exact sentence OK on
+     // 2026-09-04 (`lpn_time_no_period`, dev/eps-terminology-audit.md §4), which is what earns the
+     // demotion -- the same provenance a denial row needs. Anything else still blocks, including
+     // "no extended period simulation configured": blocking is the safe direction and the message
+     // names the fix.
+     '/\bthis\s+project\s+has\s+no\s+extended[-\s]?period\s+simulation\s+set\b/i'],
 ];
 
 /**
@@ -73,7 +82,16 @@ function ecStruckClaims(array $strings): array
 {
     $out = [];
     foreach ($strings as $key => $value) {
-        foreach (EC_STRUCK_CLAIMS as [$re, $fix]) {
+        foreach (EC_STRUCK_CLAIMS as $row) {
+            [$re, $fix] = $row;
+            $allow = $row[2] ?? null;
+            // A DEMOTION IS DECLARED PER ROW AND IS NEVER A LOOSENED DENIAL. The denial pattern is
+            // left exactly as it was, so every sentence it ever caught it still catches; a value is
+            // only excused by matching a second, far narrower pattern that names the sanctioned
+            // wording. public_claim_selftest.php asserts both legs of every one of these.
+            if ($allow !== null && preg_match($allow, (string) $value)) {
+                continue;
+            }
             if (preg_match($re, (string) $value, $m)) {
                 $out[] = [$key, $m[0], $fix];
             }

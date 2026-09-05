@@ -73,8 +73,62 @@ suggestion and none is applied.
 [TGH: I'm not exactly clear on our behavior here. Do we really in any circumstance calculate only a single time step of an EPS project? Without permission? I am having a hard time swallowing this note. And I need to know what's happening.]
 | `lpn_time_running` | 26 | *Working out the whole time period with the EPANET solver.* | **Change.** This is the progress line — what the page says while it is doing the thing — so it is the single best place to say the thing's name. Suggested: *Working out the extended period simulation with the EPANET solver.* |
 [TGH: ]
-**Four changes recommended, all translated, so 4 x 26 = 104 retranslations.** Three of the four are
-the sentences that TEACH the distinction (why one moment, why the other engine, what is happening
-now), which is the same test §3 arrived at from the cost side.
+**RULED AND APPLIED 2026-09-04.** Tom read the list and marked every row; his marks are committed
+verbatim above (`9562285a`) and are the authority for what follows.
 
-**Not applied. Waiting on Tom.**
+- **Applied, translated, 3 x 26 = 78 retranslations owed:** `lpn_inp_drop_eps`,
+  `lpn_time_no_engine`, `lpn_time_no_period`.
+- **Applied, untranslated, free:** `lpn_energy_col_avg_kw_tip` and `lpn_energy_over`, both in **his
+  own words rather than the recommendation** -- he rewrote the first, which the audit had said to
+  leave, and shortened the second.
+  - **`lpn_energy_over` LOST ITS `{time}`, deliberately, and that is a change of content and not of
+    wording.** The energy report's note read *Over an extended period simulation of 8:00*; it now
+    reads *Over an extended period simulation.* The kWh and the cost in the table beneath it are
+    therefore no longer anchored to a duration anywhere on screen. The `.replace('{time}', ...)`
+    call site is unchanged and harmless, so restoring the clause is a one-string edit if he wants
+    it back.
+- **`lpn_time_running` was left blank** -- the one row of eight carrying no mark. Unruled, so
+  unchanged, and it is the row the audit rated the single best place to name the analysis.
+- **`lpn_time_run_note` is not a wording question and is answered in §5.**
+
+The five JS fallback strings for these keys were brought into line in the same edit, so the sentence
+a visitor sees if the PHP-to-JS bridge ever fails is the sentence Tom ruled on.
+
+## 5. WHAT THAT NOTE IS ACTUALLY SAYING, AND THE PART OF IT THAT IS FALSE
+
+Tom, on `lpn_time_run_note`: *"Do we really in any circumstance calculate only a single time step of
+an EPS project? Without permission? I am having a hard time swallowing this note. And I need to know
+what's happening."*
+
+**Yes, in exactly one circumstance, and never without permission.** The permission is a checkbox he
+owns.
+
+- **The default is automatic.** `settings.autoRun` is true unless set otherwise
+  (`js/looped-network.js:30042`), and every edit schedules a solve which re-runs the whole period.
+- **The single gate is `autoRunAllowed()`** (`js/lpn-time.js:566`), and it asks one question: what
+  did the user ask for. Task 467 put it that way on purpose -- a measurement-based silent veto was
+  removed in favour of the checkbox, so nothing the page measures can stop running the period by
+  itself.
+- **The page only ADVISES.** When a completed run exceeds `EC.LPN_TIME_SLOW_MS` (1000 ms),
+  `adviseIfSlow()` writes `lpn_time_run_slow` to the status bar, which names the control in words:
+  *turn off "Recalculate automatically" in Settings, under Calculation, Hydraulics*. That sentence
+  is advice, and acting on it is a second deliberate act.
+- **Once it is off**, an edit whose model fingerprint has moved drops the frames, puts the clock
+  back to the first reporting time and schedules nothing; what is drawn is the steady solve of that
+  one instant. The Calculate button returns to the toolbar the moment the box is unchecked
+  (`js/lpn-time.js:1363`), and the Project menu's Run row is present either way by design.
+
+**So the behaviour is sound. The SENTENCE is not.**
+
+`EC.lpnTimeStatusNote()` returns this note whenever the project is extended and auto-run is off. It
+performs **no speed test at all** -- `state.lastRunMs` is not consulted. But the note asserts a
+speed: *"This network takes so long to calculate over its whole time period that the results for the
+later times are not kept up to date."* A user who unchecks that box on a small, fast network is told
+their network is slow, and it is not. The page is stating a cause it never measured, in place of the
+cause it knows for certain.
+
+**Recommendation: say the true cause, which is also the one the reader can act on.** Suggested:
+*You are seeing the network at the first reporting time. This project is set not to recalculate
+automatically, so the results for the later times are not kept up to date while you work. Press the
+Calculate button to bring them up to date.* Translated, so 26 retranslations. This is a correctness
+fix rather than a terminology one, and it is why the row could not be closed as *Leave*.

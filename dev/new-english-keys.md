@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**12 still to read**, of 78 untranslated keys, of 1615 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**14 still to read**, of 79 untranslated keys, of 1616 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,14 +21,14 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (78, 12 to read @@ NEEDS RULING)
+## lpn_  (79, 14 to read @@ NEEDS RULING)
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
   _Ruled OK 2026-09-04._
 - **`lpn_energy_col_avg_kw_tip`**
-  > The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.
-  _Ruled OK 2026-09-04._
+  > The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.
+  @@ NEEDS RULING
 - **`lpn_energy_col_cost`**
   > Cost
   _Ruled OK 2026-09-04._
@@ -90,7 +90,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > This network has no pumps, so there is nothing drawing power.
   _Ruled OK 2026-09-04._
 - **`lpn_energy_over`**
-  > Over an extended period simulation of {time}.
+  > Over an extended period simulation.
   @@ NEEDS RULING
 - **`lpn_energy_peak_kw`**
   > Peak power usage
@@ -143,6 +143,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_net_emergency`**
   > This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.
   _Ruled OK 2026-09-04._
+- **`lpn_new_units_tip`**
+  > A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.
+  @@ NEEDS RULING
 - **`lpn_quality_chemical_name`**
   > Chemical and units
   _Ruled OK 2026-09-04._

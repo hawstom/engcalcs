@@ -1796,6 +1796,9 @@ $ec_lang['lpn_new_coords_tip']='An xy project uses coordinates that are not lati
 // blank one makes the project and moves nothing.
 $ec_lang['lpn_new_place']='Start near this place';
 $ec_lang['lpn_new_place_tip']='Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap\'s place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world.';
+// Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded
+// defaults; a preference is a template FILE rather than an invisible saved setting.
+$ec_lang['lpn_new_units_tip']='A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.';
 // A worked example rather than an instruction, in the placeholder where an instruction would be
 // read as the answer. Petaluma is the example js/lpn-search.js already uses.
 $ec_lang['lpn_new_place_hint']='Petaluma, California';
@@ -1876,7 +1879,7 @@ $ec_lang['lpn_inp_drop_pump_speed']='These pumps run at a speed other than the o
 $ec_lang['lpn_inp_drop_setting']='These pipes, pumps and valves carry a setting this page cannot hold. They came in open.';
 $ec_lang['lpn_inp_drop_controls']='These controls and rules were left out. The pipes, pumps and valves they name came in at the state written in the file and stay that way.';
 $ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_eps']='This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in.';
+$ec_lang['lpn_inp_drop_eps']='This file describes an extended period simulation. The part of this page that runs a network through time did not load, so only the starting conditions came in.';
 $ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose the chemical analysis under Settings, Calculation, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sources_mixing']='This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Pump energy under Calculate to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
@@ -2648,9 +2651,9 @@ $ec_lang['lpn_time_report_start']='Report start time';
 $ec_lang['lpn_time_clock_start']='Clock time at the start';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
 $ec_lang['lpn_time_running']='Working out the whole time period with the EPANET solver.';
-$ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs the whole period.';
+$ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs an extended period simulation.';
 $ec_lang['lpn_time_slider']='Time';
-$ec_lang['lpn_time_no_period']='This project has no time period, so there is only one moment to show. Set a Total run time in Settings to calculate the network over time.';
+$ec_lang['lpn_time_no_period']='This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings to calculate the network over time.';
 $ec_lang['lpn_time_first']='Go to the start';
 $ec_lang['lpn_time_prev']='Step back';
 $ec_lang['lpn_time_play']='Play';
@@ -2792,12 +2795,12 @@ $ec_lang['lpn_scncmp_col_maxvelocity']='Highest velocity';
 $ec_lang['lpn_scncmp_at']='{value} at {id}';
 $ec_lang['lpn_scncmp_current']='(open now)';
 $ec_lang['lpn_scncmp_note']='Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.';
-$ec_lang['lpn_energy_over']='Over an extended period simulation of {time}.';
+$ec_lang['lpn_energy_over']='Over an extended period simulation.';
 $ec_lang['lpn_energy_col_pump']='Pump';
 $ec_lang['lpn_energy_col_running']='Running';
 $ec_lang['lpn_energy_col_effic']='Effic.';
 $ec_lang['lpn_energy_col_avg_kw']='Avg. kW';
-$ec_lang['lpn_energy_col_avg_kw_tip']='The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.';
+$ec_lang['lpn_energy_col_avg_kw_tip']='The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.';
 $ec_lang['lpn_energy_col_peak_kw']='Peak kW';
 $ec_lang['lpn_energy_col_kwh']='kWh';
 $ec_lang['lpn_energy_col_cost']='Cost';

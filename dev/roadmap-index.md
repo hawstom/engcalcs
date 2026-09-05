@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**68 open tasks.** Next (100): 8 · Soon (75): 16 · Someday (50): 14 · Maybe (25): 13 · Parked (5): 17
+**67 open tasks.** Next (100): 7 · Soon (75): 16 · Someday (50): 14 · Maybe (25): 13 · Parked (5): 17
 
-## 100 — Next (8)
+## 100 — Next (7)
 
 - Task 248.03 — Rule-based controls: the text is CARRIED now; the language is still parked.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
@@ -18,7 +18,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
 - ! Task 545 — The list is a file, the marks are data, and both survived a reading.
 - Task 553 — Demands and Hydraulics options: BUILT, and every option now has a control.
-- ! Task 584 — [H] · One page-wide rule for where a setting lives, and how a new project gets one.
 
 ## 75 — Soon (16)
 
@@ -37,7 +36,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 579 — The four EPANET sections still carried and not understood, extracted from 566.
 - ! Task 581 — An empty box cannot say "this file states zero" apart from "nothing is set".
 - Task 582 — Pump efficiency curves: the one energy number we still take on faith.
-- ! Task 583 — [H] · Four EPS sentences left to rule on, and they are the teaching ones.
+- Task 583 — Two EPS sentences left, and one states an unmeasured cause.
 
 ## 50 — Someday (14)
 
@@ -94,5 +93,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-56 of 68 titles are within 4–12 words. `!` marks the rest;
+57 of 67 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
