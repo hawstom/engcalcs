@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 1650,
-        "delta_key_count": 115,
+        "expected_key_count": 1652,
+        "delta_key_count": 117,
         "exempt_key_count": 26,
         "exempt_keys": [
             "u_imgd",
@@ -523,10 +523,12 @@
         "lpn_field_tag": "Tag",
         "lpn_field_tag_tip": "A tag of your own, carried into and out of the EPANET file. A tag changes no answer. Use it to match this to the number it already has in your asset records, your maps or your work orders. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it.",
         "lpn_pump_effic_curve": "Efficiency curve",
-        "lpn_pump_effic_curve_tip": "The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.",
+        "lpn_pump_effic_curve_tip": "The name this pump's efficiency curve is written under in an EPANET file. Its points are below and you can edit them there. A pump you gave a curve to here is named after the pump.",
         "lpn_pump_effic_col": "Efficiency",
-        "lpn_pump_effic_global": "This pump has no efficiency curve, so it runs at the network efficiency of {percent}.",
-        "lpn_pump_effic_unstated": "This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}.",
+        "lpn_pump_effic_note": "Flow and the percent efficiency at that flow, in the order the pump works through them. With no points the pump runs at the network efficiency.",
+        "lpn_pump_effic_remove": "Remove this point",
+        "lpn_pump_effic_global": "This pump has no efficiency curve, so it runs at the network efficiency of {percent}. Type points below to give it one.",
+        "lpn_pump_effic_unstated": "This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}. Type its points below.",
         "lpn_rule_dangling_note": "These rules name an element that is no longer in this project, so they were left out: {ids}",
         "lpn_rule_unreadable_note": "These rules could not be read, so they were left out: {ids}",
         "lpn_time_run_report_copy": "Copy",
@@ -616,7 +618,7 @@
         "lpn_energy_total_demand_charge": "Peak demand charge",
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
-        "lpn_energy_curve_note": "These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.",
+        "lpn_energy_curve_note": "These pumps name an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}. Open a pump to type its own points.",
         "lpn_library_rules": "Rules",
         "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.",
         "lpn_library_rule_add": "Add a rule",
@@ -640,10 +642,12 @@
         "lpn_field_tag": "Tag",
         "lpn_field_tag_tip": "A tag of your own, carried into and out of the EPANET file. A tag changes no answer. Use it to match this to the number it already has in your asset records, your maps or your work orders. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it.",
         "lpn_pump_effic_curve": "Efficiency curve",
-        "lpn_pump_effic_curve_tip": "The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.",
+        "lpn_pump_effic_curve_tip": "The name this pump's efficiency curve is written under in an EPANET file. Its points are below and you can edit them there. A pump you gave a curve to here is named after the pump.",
         "lpn_pump_effic_col": "Efficiency",
-        "lpn_pump_effic_global": "This pump has no efficiency curve, so it runs at the network efficiency of {percent}.",
-        "lpn_pump_effic_unstated": "This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}.",
+        "lpn_pump_effic_note": "Flow and the percent efficiency at that flow, in the order the pump works through them. With no points the pump runs at the network efficiency.",
+        "lpn_pump_effic_remove": "Remove this point",
+        "lpn_pump_effic_global": "This pump has no efficiency curve, so it runs at the network efficiency of {percent}. Type points below to give it one.",
+        "lpn_pump_effic_unstated": "This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}. Type its points below.",
         "lpn_rule_dangling_note": "These rules name an element that is no longer in this project, so they were left out: {ids}",
         "lpn_rule_unreadable_note": "These rules could not be read, so they were left out: {ids}",
         "lpn_time_run_report_copy": "Copy",
@@ -733,7 +737,7 @@
         "lpn_energy_total_demand_charge": "Peak demand charge",
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
-        "lpn_energy_curve_note": "These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.",
+        "lpn_energy_curve_note": "These pumps name an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}. Open a pump to type its own points.",
         "lpn_library_rules": "Rules",
         "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.",
         "lpn_library_rule_add": "Add a rule",
@@ -969,6 +973,38 @@
             }
         },
         "lpn_pump_effic_col": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "មួយ ពីរ ឬបីចំណុច — មើល \"ខ្សែកោងម៉ាស៊ីនបូម\" នៅក្នុងកំណត់ចំណាំខាងក្រោម។",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "ចំណុច ១",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_pump_effic_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "មួយ ពីរ ឬបីចំណុច — មើល \"ខ្សែកោងម៉ាស៊ីនបូម\" នៅក្នុងកំណត់ចំណាំខាងក្រោម។",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "ចំណុច ១",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_pump_effic_remove": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
