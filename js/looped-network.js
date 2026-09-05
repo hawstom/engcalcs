@@ -24026,7 +24026,8 @@ var EngCalcs = EngCalcs || {};
 	var LIB_SECTIONS = [
 		{ id: 'patterns', label: 'lpn_library_patterns', tip: 'lpn_library_patterns_tip' },
 		{ id: 'curves', label: 'lpn_library_curves', tip: 'lpn_library_curves_tip' },
-		{ id: 'controls', label: 'lpn_library_controls', tip: 'lpn_library_controls_tip' }
+		{ id: 'controls', label: 'lpn_library_controls', tip: 'lpn_library_controls_tip' },
+		{ id: 'rules', label: 'lpn_library_rules', tip: 'lpn_library_rules_tip' }
 	];
 	function buildLibraryIndex() {
 		var index = document.getElementById('lpn_libbox_index'), pc = EngCalcs.pageConfig || {};
@@ -24061,6 +24062,7 @@ var EngCalcs = EngCalcs || {};
 		sec.appendChild(head);
 		if (libSection === 'patterns') { buildPatternSection(sec); }
 		else if (libSection === 'curves') { buildCurveSection(sec); }
+		else if (libSection === 'rules') { buildRuleSection(sec); }
 		else { buildControlSection(sec); }
 		content.appendChild(sec);
 		initTipsIn(content);
@@ -24727,6 +24729,134 @@ var EngCalcs = EngCalcs || {};
 			host.appendChild(entry);
 		});
 	}
+	// ---- RULES -----------------------------------------------------------------------------------
+	//
+	// **A RULE IS A SMALL PARAGRAPH, AND IT IS EDITED AS THE PARAGRAPH** -- the same argument the
+	// control editor above makes for its one-line box, one size up. js/lpn-rules.js accepts exactly
+	// what EPANET accepts, so a structured editor would have to refuse things the engine takes; and
+	// a rule is the form the user already has in front of them, in every EPANET tutorial, every
+	// existing `.inp` and every colleague's e-mail, so it can be pasted.
+	//
+	// **THE KEYWORDS ARE NOT TRANSLATED**, for the same reason a control's are not: RULE, IF, AND,
+	// OR, THEN, ELSE, PRIORITY and every attribute are what the parser and the engine match on. The
+	// tip says so.
+	//
+	// **EVERY OTHER RULE IN THE FILE IS LEFT BYTE-IDENTICAL WHEN ONE IS EDITED.** lpnRuleSplit()
+	// partitions the text losing nothing -- blank lines and comments included -- so this editor
+	// rewrites one chunk and puts the others back exactly as they came in. The document's rules are
+	// the user's text, and an editor that reflowed the whole section on every keystroke would be
+	// this suite's own "only the user touches a file's numbers" rule broken from the text side.
+
+	// Read through libRulesRead(); write through libRules(). Same split and same reason as the
+	// patterns and the controls above: `doc.rules = []` on a document that stated none is a change
+	// to the document, and dev/lpn-spike/unit-change-harness.js measures exactly that.
+	function libRules() { return (doc.rules = doc.rules || []); }
+	function libRulesRead() { return doc.rules || []; }
+	function libRuleChunks() {
+		return EngCalcs.lpnRuleSplit ? EngCalcs.lpnRuleSplit(libRulesRead()) : [];
+	}
+	// The lines of a chunk a user is meant to SEE -- everything but the blank lines and comments that
+	// have run on at the end of it, which read as the introduction to the next rule and are put back
+	// untouched by libRulesWith(). See lpnRuleSplit's `trailing`.
+	function libRuleBody(chunk) { return chunk.lines.slice(0, chunk.lines.length - (chunk.trailing || 0)); }
+	// The whole `[RULES]` text, with chunk `i`'s body replaced by `lines` -- or the chunk removed
+	// altogether, for `lines` null. One function, because an edit and a delete differ only in what
+	// they put back.
+	function libRulesWith(i, lines) {
+		var out = [];
+		libRuleChunks().forEach(function (chunk, k) {
+			var trail = chunk.lines.slice(chunk.lines.length - (chunk.trailing || 0));
+			if (k !== i) { out = out.concat(chunk.lines); return; }
+			if (lines) { out = out.concat(lines, trail); }
+		});
+		return out;
+	}
+	// What a rule in the box means right now: an { ok, block, missing } verdict, where `missing` is
+	// the id of an element the rule names and this network does not have. The identical three-state
+	// answer libReadControl() gives, and the identical reason for the third state -- EPANET rejects
+	// the WHOLE input over one rule naming a link it was not given.
+	function libReadRule(text) {
+		var blocks = EngCalcs.lpnRuleParse
+				? EngCalcs.lpnRuleParse(String(text || '').split(/\r?\n/)) : [],
+			block = blocks[0], missing = null;
+		if (blocks.length !== 1 || !block || !block.ok) { return { ok: false, block: block || null }; }
+		block.nodes.forEach(function (id) { if (!missing && !nodeById(id)) { missing = id; } });
+		block.links.forEach(function (id) { if (!missing && !linkById(id)) { missing = id; } });
+		if (missing) { return { ok: false, block: block, missing: missing }; }
+		return { ok: true, block: block };
+	}
+	function buildRuleSection(host) {
+		var pc = EngCalcs.pageConfig || {}, chunks = libRuleChunks();
+		host.appendChild(libButton(pc.lpn_library_rule_add || 'Add a rule', function () {
+			// **THE STARTER RULE IS BUILT FROM THIS NETWORK**, exactly as the starter control
+			// sentence is, so the box opens on something already true rather than on a template
+			// with blanks in it.
+			var pump = doc.links.filter(function (l) { return l.type === 'pump'; })[0] || doc.links[0],
+				tank = doc.nodes.filter(function (n) { return n.type === 'tank'; })[0] || doc.nodes[0],
+				used = {}, n = 1, name;
+			chunks.forEach(function (c) { used[String(c.name).toUpperCase()] = true; });
+			while (used['R' + n]) { n++; }
+			name = 'R' + n;
+			saveUndoSnapshot();
+			doc.rules = libRules().concat([
+				'RULE ' + name,
+				'IF TANK ' + (tank ? tank.id : '1') + ' LEVEL ABOVE 0',
+				'THEN ' + (pump && pump.type === 'pump' ? 'PUMP' : 'LINK') + ' ' +
+					(pump ? pump.id : '1') + ' STATUS IS CLOSED'
+			]);
+			libCommit();
+			rebuildLibraryBox();
+		}));
+		if (!chunks.length) {
+			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
+			return;
+		}
+		chunks.forEach(function (chunk, i) {
+			var entry = libEl('div', 'lpn-lib-entry'),
+				box = document.createElement('textarea'),
+				verdict = libEl('div', 'lpn-lib-verdict ec-help'),
+				del;
+			box.className = 'lpn-lib-wide';
+			box.rows = Math.max(3, Math.min(10, libRuleBody(chunk).length));
+			box.value = libRuleBody(chunk).join('\n');
+			box.setAttribute('aria-label', pc.lpn_library_rules || 'Rules');
+			if (pc.lpn_library_rule_tip) { helpTip(box, pc.lpn_library_rule_tip); }
+			// The WHOLE verdict string is the tip target, not the glyph -- the suite's rule, and here
+			// the title carries the grammar, which is the thing that says how to fix it.
+			if (pc.lpn_library_rule_tip) { verdict.title = pc.lpn_library_rule_tip; }
+			function showVerdict(read) {
+				verdict.textContent = read.ok
+					? (pc.lpn_library_rule_ok || '✓ Understood')
+					: read.missing
+						? (pc.lpn_library_rule_missing || '⚠ This network has nothing called {id}').replace('{id}', read.missing)
+						: (pc.lpn_library_rule_bad || '⚠ Not understood');
+			}
+			showVerdict(libReadRule(box.value));
+			box.addEventListener('input', function () { showVerdict(libReadRule(box.value)); });
+			box.addEventListener('change', function () {
+				// **A RULE THE PARSER CANNOT READ IS KEPT, NOT DISCARDED.** It is the user's text and
+				// it is half-way to a rule they are still writing; throwing it away on blur is the
+				// one thing an editor must never do. It stays on the document and goes back into the
+				// file verbatim, and modelRules() is what leaves it out of the engine input -- so it
+				// is visibly there, plainly marked as not understood, and inert.
+				saveUndoSnapshot();
+				doc.rules = libRulesWith(i, String(box.value).split(/\r?\n/));
+				libCommit();
+			});
+			entry.appendChild(box);
+			entry.appendChild(verdict);
+			del = libButton(pc.lpn_tool_delete || 'Delete', function () {
+				saveUndoSnapshot();
+				doc.rules = libRulesWith(i, null);
+				libCommit();
+				rebuildLibraryBox();
+			});
+			del.className = 'lpn-lib-del';
+			entry.appendChild(del);
+			host.appendChild(entry);
+		});
+	}
+
 	function openLibraryBox() {
 		var box = libBoxEl(), r, at, home, floor;
 		if (!box) { return; }
@@ -27879,43 +28009,100 @@ var EngCalcs = EngCalcs || {};
 			// else: energy is power integrated over time, so only a RUN can produce one, exactly as
 			// with water quality. Not cloned and not converted -- docEnergy() says why.
 			energy: docEnergy(),
-			rules: modelRules() };
+			rules: modelRules(),
+			// **AND WHAT WAS LEFT OUT OF THAT LIST, BY NAME.** Read one property after `rules` on
+			// purpose: modelRules() fills it, and a literal's properties are evaluated in order.
+			// js/lpn-epanet.js folds these into the same warnings array a dropped control uses, so
+			// there is one place a reader looks for "what did we ignore" and one message design.
+			ruleWarnings: ruleWarningsOut };
 		// The clock, the patterns and the controls, converted to SI (js/lpn-time.js). Absent that
 		// file the model is exactly the pre-Task-248 one and the page solves one instant.
 		if (EngCalcs.lpnTimeAttach) { EngCalcs.lpnTimeAttach(model); }
 		return model;
 	}
 	/**
-	 * **THE RULES SAFE TO HAND THE ENGINE, AND THE ONES THAT ARE NOT** (ROADMAP Task 248.03).
+	 * **THE RULES SAFE TO HAND THE ENGINE, AND THE NUMBERS IN THEM PUT INTO THE ENGINE'S UNITS**
+	 * (ROADMAP Task 248.03).
 	 *
-	 * This page does not model a rule; the EPANET engine does. So a network whose behaviour depends
+	 * This page does not solve a rule; the EPANET engine does. So a network whose behaviour depends
 	 * on rules solved WRONG here, silently, whichever engine was chosen -- the import reported the
-	 * section as a difference and then dropped it. Handing the text through is what makes the EPANET
-	 * answer right, and it is the whole of what this phase claims: the native solver still cannot
-	 * read a rule, and the page still cannot edit one.
+	 * section as a difference and then dropped it. Handing the rules through is what makes the
+	 * EPANET answer right. The native solver still cannot read one, and says so.
+	 *
+	 * **THE TEXT COULD NOT BE HANDED THROUGH AS TEXT, WHICH IS WHY js/lpn-rules.js EXISTS.** A
+	 * rule's numbers are in the units of the file the user opened and js/lpn-epanet.js writes LPS
+	 * and metres always: `IF TANK T1 LEVEL ABOVE 20` is twenty FEET in a GPM file, and arrives
+	 * beside a tank whose level that writer has already restated as 4.572. So this is the model
+	 * bridge doing what docEnergy() and engineHydraulics() do one screen above -- crossing the unit
+	 * boundary at the one place that knows the project's units -- and it is a PARSE because you
+	 * cannot scale a number without knowing which of six quantities it is.
 	 *
 	 * **A RULE NAMING AN ELEMENT THE MODEL DOES NOT HAVE IS DROPPED, BECAUSE EPANET REJECTS THE
 	 * WHOLE INPUT OVER ONE.** That turns "we do not model your rules" into "your network does not
 	 * solve", which is far worse and would look like our arithmetic failing. An element can go
 	 * missing in ordinary use -- deleted, or made inactive in a scenario -- so this is the normal
-	 * case and not a corrupt file.
+	 * case and not a corrupt file. A rule this page cannot READ is dropped on the same argument and
+	 * kept on the document exactly as it stands, which is the rule the simple-control editor has
+	 * followed since it shipped.
 	 *
-	 * The drops ride out on `EngCalcs.lpnRuleDrops` for applySolveResult() to say out loud, the same
-	 * channel the time block's own dropped controls use rather than a second one.
+	 * Both kinds of drop ride out twice, deliberately: on `EngCalcs.lpnRuleDrops` for the harnesses
+	 * that measure the filter, and as `{code, ids}` warning records on the model for
+	 * applySolveResult() to say out loud -- the same channel the time block's own dropped controls
+	 * use rather than a second one.
 	 */
 	function modelRules() {
-		var text = doc.rules || [], blocks, out = [], dropped = [];
-		if (!text.length || !EngCalcs.lpnRuleBlocks) { EngCalcs.lpnRuleDrops = []; return []; }
-		blocks = EngCalcs.lpnRuleBlocks(text);
+		var text = doc.rules || [], blocks, out = [], dropped = [], warn = [], unread = [];
+		ruleWarningsOut = [];
+		EngCalcs.lpnRuleDrops = [];
+		if (!text.length || !EngCalcs.lpnRuleParse) { return []; }
+		blocks = EngCalcs.lpnRuleParse(text);
 		blocks.forEach(function (b) {
 			var missing = [];
 			b.nodes.forEach(function (id) { if (!nodeById(id)) { missing.push(id); } });
 			b.links.forEach(function (id) { if (!linkById(id)) { missing.push(id); } });
 			if (missing.length) { dropped.push({ name: b.name, missing: missing }); return; }
-			out = out.concat(b.lines);
+			// A chunk with no RULE header is the text before the first rule, which no valid file
+			// states and nothing can be said about. It is carried and it is not reported as a loss.
+			if (!b.ok) { if (b.name) { unread.push(b.name); } return; }
+			out.push(EngCalcs.lpnRuleConvert(b, ruleValueToSI, ruleSettingKind));
 		});
 		EngCalcs.lpnRuleDrops = dropped;
+		if (dropped.length) {
+			warn.push({ code: 'rule-dangling', ids: dropped.map(function (d) { return d.name; }) });
+		}
+		if (unread.length) { warn.push({ code: 'rule-unreadable', ids: unread }); }
+		ruleWarningsOut = warn;
 		return out;
+	}
+	// Set by modelRules() and read one property later in the model literal. A second return value in
+	// all but name, and it is a module-scope var rather than a returned pair because `rules:` is
+	// already what assembleModel() calls the list and renaming it would touch every reader.
+	var ruleWarningsOut = [];
+	// **THE ONE PLACE A RULE'S NUMBER CROSSES INTO SI**, and it is the same toSI() every other
+	// quantity on this page goes through -- the kinds are js/lpn-rules.js's, the unit ids are this
+	// page's, and neither file holds a copy of the other's list.
+	function ruleValueToSI(value, kind) {
+		if (kind === 'flow') { return toSI(value, 'lpn_u_flow'); }
+		if (kind === 'head') { return toSI(value, 'lpn_u_elevhead'); }
+		if (kind === 'pressure') { return toSI(value, 'lpn_u_pressure'); }
+		// Dimensionless for Hazen-Williams and Manning, a length for Darcy-Weisbach: the identical
+		// condition roughnessSI() states for a pipe's own roughness, and read from the same place.
+		if (kind === 'roughness') { return frictionMethod() === 'dw' ? toSI(value, 'lpn_u_roughness') : value; }
+		return value;
+	}
+	// **WHAT A LINK'S SETTING MEASURES**, which is a fact about the document and not about the
+	// language, so js/lpn-rules.js asks rather than guesses. The same answer libAnnotateControl()
+	// gives for a simple control's setting, plus the two a rule can name that a control cannot: a
+	// pump's SPEED is dimensionless, and a pipe's SETTING is its roughness.
+	function ruleSettingKind(clause) {
+		var link = linkById(clause.id), vt;
+		if (!link) { return 'none'; }
+		if (link.type === 'pipe') { return 'roughness'; }
+		if (link.type !== 'valve') { return 'none'; }             // a pump speed is a multiplier
+		vt = (link.valveType || 'TCV').toUpperCase();
+		if (vt === 'PRV' || vt === 'PSV' || vt === 'PBV') { return 'pressure'; }
+		if (vt === 'FCV') { return 'flow'; }
+		return 'none';                                            // TCV loss coefficient, GPV curve
 	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
@@ -30176,6 +30363,13 @@ var EngCalcs = EngCalcs || {};
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',
 				'These controls could not be read, so they were left out: {ids}'),
+			// The same pair of sentences for rule-based controls (Task 248.03). Two messages rather
+			// than one shared with the simple controls above: a user who wrote a sentence and a user
+			// who wrote a rule are looking in two different places for the thing to fix.
+			droppedNote('rule-dangling', 'lpn_rule_dangling_note',
+				'These rules name an element that is no longer in this project, so they were left out: {ids}'),
+			droppedNote('rule-unreadable', 'lpn_rule_unreadable_note',
+				'These rules could not be read, so they were left out: {ids}'),
 			// The same kind of thing as valveRouteNote: a fact about THIS network that has to be
 			// known to read the numbers on screen. Here, that only the first reporting time is
 			// being kept up to date, because working the whole period out costs more than this

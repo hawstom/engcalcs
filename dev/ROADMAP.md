@@ -152,8 +152,10 @@ the block.
     customer/account work.
   - **`[REPORT]`** -- formatting for a `.rpt` this page never requests. **Probably correct to leave
     carried for ever**; say so deliberately rather than leaving it on a list.
-  - **`[RULES]`** -- parked on purpose, Task 248.03. A rule's numbers are in the units of the file
-    so no factor patches it, and Tom's evidence bar stands: it waits for a user who has one.
+  - **`[RULES]`** -- no longer on this list. Task 248.03 closed 2026-09-05: `js/lpn-rules.js` parses
+    a rule, converts every number in it per clause, and the bridge writes the section. Kept here as
+    one line because "a rule's numbers are in the file's own units so no factor patches it" is the
+    argument the rest of this list still has to answer for itself.
 
 - 75|581| **An empty box cannot say "this file states zero" apart from "nothing is set".**
   Found 2026-09-04 while Tom read the refreshed gallery: Net2 states `Fluoride mg/L` with all-zero
@@ -782,42 +784,6 @@ the block.
     one symbol), and the attachment point is **user-draggable along its pipe** — a handle on the
     `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
     **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
-
-- 100|248.03| **Rule-based controls: the text is CARRIED now; the language is still parked.**
-  Simple `[CONTROLS]` shipped 2026-08-18 — the Libraries box adds, edits, validates and deletes them,
-  an unreadable sentence is kept and marked rather than discarded, and only a fully understood one
-  reaches the engine.
-  - **PHASE 1 SHIPPED 2026-08-28: `[RULES]` SURVIVES A ROUND TRIP.** It was in the importer's
-    REPORTABLE list, which means it was counted as a difference and then **dropped** — so a file
-    whose pumps are driven by rules came back out of the exporter with none. Same rule broken as
-    `[OPTIONS]` under Task 553, and the same fix: the lines are kept verbatim on `doc.rules`,
-    serialized with the project, and written back in the user's own units, where verbatim text is
-    exactly right. `EngCalcs.lpnRuleBlocks()` reads ONE fact out of a rule — the element ids, from
-    the single grammar rule that an object keyword is followed by its id — without pretending to
-    understand it. `dev/lpn-spike/rules-carry-harness.js` (19).
-  - **AND THE MEASUREMENT THAT SAYS WHY THE LANGUAGE CANNOT BE SKIPPED.** Handing the text to the
-    EPANET engine was built first, on the obvious argument that this page does not model a rule and
-    the engine does. **It is wrong, and silently so.** `js/lpn-epanet.js` writes LPS and METRES
-    always; a rule's numbers are in the units of the file the user opened. `IF TANK T1 LEVEL ABOVE
-    20` means 20 FEET in a GPM file and arrives beside a tank whose level is 4.572 — so the rule
-    never fires, and one that DID fire would fire at the wrong threshold, with every number on
-    screen looking reasonable.
-    - **Converting them REQUIRES the language**: you cannot scale a rule's numbers without knowing,
-      clause by clause, whether the value is a level, a pressure, a flow, a setting or a time. So
-      this is not a factor somebody can patch in. **No `[RULES]` section is written into the engine
-      input, and the harness asserts the absence and the reason.**
-    - The referential filter is built and unused-by-design: EPANET rejects the WHOLE input over one
-      rule naming a link it was not given, so `modelRules()` drops such a rule and reports it by
-      name. It rides on the model so the day the language lands it is already there.
-  - **TWO REGRESSIONS THE HARNESSES CAUGHT WHILE THIS WAS BEING BUILT, AND THEY ARE ONE SHAPE.**
-    Both were "I added a capability and silently removed a promise": the line that KEEPS the rule
-    text `continue`s past the counter every other section reaches, so `[RULES]` stopped being
-    REPORTED as a difference at all (`import-notes-harness.js`); and the import message still read
-    *"left out"*, which had become false — a rule is kept and written back now, and a user reading
-    that sentence would believe theirs were lost. **Carrying a thing and telling the user about it
-    are two jobs.** `lpn_inp_drop_rules` is the new sentence and awaits Tom's wording.
-  - **What is left is the language and its editor**, and the evidence bar Tom set for it stands: it
-    can wait for a user who has one. The difference is that their file no longer loses it.
 
 - 25|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
   for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so

@@ -40,7 +40,11 @@ const L = loadLoopedNetwork(
 	"\t\tspanText: libSpanText, sparkline: libSparkline, curveChart: libCurveChart,\n" +
 	"\t\treadControl: libReadControl, controlText: libControlText,\n" +
 	"\t\trenamePattern: libRenamePattern, deletePattern: libDeletePattern,\n" +
-	"\t\tcurves: libCurves, freeId: libFreeId\n"
+	"\t\tcurves: libCurves, freeId: libFreeId,\n" +
+	// The Rules section (Task 248.03), by the same seam and for the same reason: these ARE the
+	// functions the box's controls call, so a check here is a check on the code path a click takes.
+	"\t\treadRule: libReadRule, ruleChunks: libRuleChunks, rulesWith: libRulesWith,\n" +
+	"\t\truleBody: libRuleBody\n"
 );
 const EngCalcs = global.EngCalcs;
 require(path.join(ROOT, 'js', 'lpn-inp.js'));
@@ -335,6 +339,41 @@ function check(ok, msg, detail) {
 	const flatCurve = chartOf(L.curveChart([[50, 3]], false));
 	check(flatCurve.d && !/NaN/.test(flatCurve.d),
 		'and a single-point head-loss curve is a zero range that must not divide by zero', flatCurve.d);
+
+	// ---- THE RULES SECTION ---------------------------------------------------------------------
+	//
+	// **A RULE IS EDITED AS ITS OWN PARAGRAPH, AND EVERY OTHER LINE OF THE FILE IS THE USER'S.** The
+	// unit correctness of a rule is measured in dev/lpn-spike/rules-language-harness.js; what is
+	// asserted here is the EDITOR's own contract: what the box shows, what it writes back, and that
+	// a rule it cannot read is kept and marked rather than thrown away.
+	console.log('\n-- the rules section --');
+	{
+		const doc = L.getDoc();
+		const kept = doc.rules;
+		doc.rules = ['RULE A', 'IF TANK 1 LEVEL BELOW 5', 'THEN PUMP 10 STATUS IS OPEN', '',
+			'; a note about B', 'RULE B', 'IF TANK 1 LEVEL ABOVE 30', 'THEN PUMP 10 STATUS IS CLOSED'];
+		const chunks = L.ruleChunks();
+		check(chunks.length === 2 && chunks[0].name === 'A' && chunks[1].name === 'B',
+			'the box shows one entry per rule', chunks.map((c) => c.name).join(','));
+		check(L.ruleBody(chunks[0]).length === 3,
+			'and A\'s box holds A\'s three lines, not the blank and the comment before B',
+			JSON.stringify(L.ruleBody(chunks[0])));
+		const edited = L.rulesWith(0, ['RULE A', 'IF TANK 1 LEVEL BELOW 7', 'THEN PUMP 10 STATUS IS OPEN']);
+		check(edited.slice(3).join('\n') === doc.rules.slice(3).join('\n'),
+			'editing A leaves the blank line, the comment and B byte-identical',
+			JSON.stringify(edited));
+		check(L.rulesWith(1, null).length === 5, 'and deleting B removes B and nothing else',
+			JSON.stringify(L.rulesWith(1, null)));
+
+		// The three-state verdict, the same one a control sentence gets.
+		check(L.readRule(L.ruleBody(chunks[0]).join('\n')).ok === true, 'a rule naming real elements reads as understood');
+		const gone = L.readRule('RULE C\nIF TANK NOSUCH LEVEL BELOW 5\nTHEN PUMP 10 STATUS IS OPEN');
+		check(gone.ok === false && gone.missing === 'NOSUCH',
+			'a rule naming something this network has not is named, not merely refused', JSON.stringify(gone));
+		const bad = L.readRule('RULE D\nIF TANK 1 WOBBLE BELOW 5\nTHEN PUMP 10 STATUS IS OPEN');
+		check(bad.ok === false && !bad.missing, 'a rule we cannot read is marked not understood');
+		doc.rules = kept;
+	}
 
 	console.log(failures ? `\n${failures} FAILED` : '\nall checks passed');
 	process.exit(failures ? 1 : 0);

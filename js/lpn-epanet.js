@@ -437,7 +437,25 @@
 		// multiplier is dimensionless and passes straight through; a control's threshold is a head
 		// or a pressure, both METRES under LPS; a control's setting means whatever the link says it
 		// means, and only an FCV's flow is scaled.
-		var patternRows = [], controlRows = [], timeRows = [];
+		var patternRows = [], controlRows = [], timeRows = [], ruleRows = [];
+		// **[RULES], IN THE ENGINE'S OWN UNITS** (Task 248.03). `model.rules` is not text: it is
+		// the parsed, filtered, SI-valued records assembleModel()'s modelRules() built through
+		// js/lpn-rules.js, so the only thing left to do here is the last leg every other quantity
+		// in this file makes -- m3/s to L/s, and metres to the millimetres a Darcy-Weisbach input
+		// states a roughness in.
+		//
+		// **WRITTEN ON EVERY INPUT, NOT ONLY THE `eps` ONE, AND THAT IS NOT THE SAME AS BEING
+		// APPLIED.** EPANET checks its rule base between time steps (`checkrules()` off the
+		// timestep), so a run of zero duration never reaches one and a rule cannot change a
+		// single-instant answer -- measured, on the GPM fixture in
+		// dev/lpn-spike/rules-language-harness.js, where the pump keeps running at a level the rule
+		// says shuts it. That is EPANET's own behaviour and this bridge copies it rather than
+		// simulating a rule the engine would not have applied. The section is still stated on the
+		// instant input, so the text handed to the engine describes the same network either way.
+		if (EngCalcs.lpnRuleWrite && model.rules && model.rules.length) {
+			ruleRows = EngCalcs.lpnRuleWrite(model.rules,
+				{ flow: 1000, roughness: method === 'dw' ? 1000 : 1 });
+		}
 		if (eps) {
 			(time.patterns || []).forEach(function (pat) {
 				var mults = pat.multipliers || [], q, row;
@@ -613,25 +631,23 @@
 			(patternRows.length ? '[PATTERNS]\n' + patternRows.join('\n') + '\n\n' : '') +
 			// After the links a control names, and after the patterns -- EPANET's own order.
 			(controlRows.length ? '[CONTROLS]\n' + controlRows.join('\n') + '\n\n' : '') +
-			// **[RULES] IS DELIBERATELY NOT WRITTEN HERE, AND THE REASON IS UNITS** (Task 248.03).
+			// **[RULES], AFTER [CONTROLS] AND BEFORE [ENERGY]** -- EPANET's own section order, and it
+			// must follow the links and the patterns a rule names.
 			//
-			// It was, for about an hour, on the reasonable-sounding argument that this page does not
-			// model a rule and the engine does, so handing the text through would make a rule-driven
-			// network solve correctly. `dev/lpn-spike/rules-carry-harness.js` measured it and it is
-			// false: **this writer emits LPS and METRES always**, and a rule's numbers are in the
-			// units of the file the user opened. `IF TANK T1 LEVEL ABOVE 20` means 20 FEET in a GPM
-			// file, and arrives here beside a tank whose level is 7.62 -- so the rule never fires,
-			// and a rule that DID fire would fire at the wrong threshold. Every number on screen
-			// would look reasonable, which is the exact shape of the two worst defects this project
-			// has recorded.
+			// **THIS SECTION WAS DELIBERATELY EMPTY UNTIL Task 248.03's LANGUAGE LANDED, AND THE
+			// REASON WAS UNITS.** Handing the file's own rule text through looked obviously right --
+			// this page does not solve a rule and the engine does -- and it is false: this writer
+			// emits LPS and METRES always, and a rule's numbers are in the units of the file the
+			// user opened. `IF TANK T1 LEVEL ABOVE 20` means 20 FEET in a GPM file and arrived here
+			// beside a tank whose level this writer had restated as 4.572, so the rule never fired,
+			// and one that DID fire would have fired at the wrong threshold with every number on
+			// screen looking reasonable. js/lpn-rules.js is what makes the conversion possible: you
+			// cannot scale a rule's numbers without knowing, clause by clause, whether the value is
+			// a level, a pressure, a flow, a setting, a roughness or a bare count of hours.
 			//
-			// **CONVERTING THEM REQUIRES THE LANGUAGE**, which is the rest of Task 248.03: you
-			// cannot scale a rule's numbers without knowing, per clause, whether the value is a
-			// level, a pressure, a flow, a setting or a bare time. So this is not an oversight to be
-			// patched with a factor -- it is why the parked half of that task is parked. The rules
-			// are still CARRIED: `js/lpn-inp.js` keeps them and writes them back in the user's own
-			// units, where verbatim text is exactly right.
-			'' +
+			// The document is untouched by any of it: `js/lpn-inp.js` still writes the user's own
+			// rule text back verbatim, where verbatim is exactly right.
+			(ruleRows.length ? '[RULES]\n' + ruleRows.join('\n') + '\n\n' : '') +
 			// EPANET's own section order puts [ENERGY] after the controls and before [QUALITY].
 			(energyRows.length ? '[ENERGY]\n' + energyRows.join('\n') + '\n\n' : '') +
 			(initQuality.length ? '[QUALITY]\n' + initQuality.join('\n') + '\n\n' : '') +
@@ -714,6 +730,14 @@
 		// serves both.
 		if (eps && Array.isArray(time.warnings) && time.warnings.length > 0) {
 			warnings = warnings.concat(time.warnings);
+		}
+		// **AND THE RULES LEFT OUT, ON THE SAME CHANNEL AND FOR THE SAME REASON** (Task 248.03).
+		// assembleModel()'s modelRules() drops a rule naming an element that is no longer here --
+		// it must, EPANET rejects the whole input over one of them -- and a rule it cannot read.
+		// Not gated on `eps`: rules are written to every input this file builds, so their drops
+		// have to be reportable on every one of them too.
+		if (Array.isArray(model.ruleWarnings) && model.ruleWarnings.length > 0) {
+			warnings = warnings.concat(model.ruleWarnings);
 		}
 
 		// TWO LISTS, AND THE SPLIT IS THE WHOLE OF TASK 526. `signatureWarnings` are the ones that

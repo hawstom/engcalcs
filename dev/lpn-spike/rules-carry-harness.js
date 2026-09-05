@@ -183,9 +183,12 @@ console.log('\n--- a rule naming something that is gone ---');
 		JSON.stringify(blocks.map(b => ({ n: b.name, nodes: b.nodes, links: b.links }))));
 	ok('...and passes over everything it does not model',
 		blocks[0].lines.length === 4, blocks[0].lines.length);
-	// While everything exists, the model carries the rule.
-	ok('the model hands the engine the rule', (L.assembleModel().rules || []).length === 4,
-		JSON.stringify(L.assembleModel().rules));
+	// While everything exists, the model carries the rule. **ONE PARSED RECORD, NOT FOUR LINES**
+	// since the language landed (Task 248.03): modelRules() hands js/lpn-epanet.js records whose
+	// numbers are already in SI, and what is written from them is measured in
+	// dev/lpn-spike/rules-language-harness.js.
+	ok('the model hands the engine the rule', (L.assembleModel().rules || []).length === 1,
+		JSON.stringify((L.assembleModel().rules || []).map(r => r.name)));
 	ok('...and reports nothing dropped', (EngCalcs.lpnRuleDrops || []).length === 0);
 
 	// **NOW DELETE THE PUMP THE RULE NAMES.** EPANET rejects the whole input over this one line, so
@@ -206,10 +209,17 @@ console.log('\n--- a rule naming something that is gone ---');
 }
 
 // ---------------------------------------------------------------------------
-// 5. WHY THE ENGINE IS *NOT* HANDED THE RULES, MEASURED RATHER THAN ASSERTED.
+// 5. WHY THE TEXT COULD NOT SIMPLY BE HANDED THROUGH, MEASURED RATHER THAN ASSERTED.
 // ---------------------------------------------------------------------------
+//
+// **THIS SECTION USED TO ASSERT THAT NO [RULES] SECTION WAS WRITTEN AT ALL, AND THAT IS NO LONGER
+// TRUE** (Task 248.03's language, js/lpn-rules.js). What it measured is still true and is still the
+// reason the language exists: the bridge writes LPS and metres always, and a rule's numbers are in
+// the units of the file the user opened. So the numbers below are unchanged; the conclusion they
+// support moved from "write nothing" to "parse it, convert it, then write it".
+// dev/lpn-spike/rules-language-harness.js is where the writing is measured.
 (async function () {
-	console.log('\n--- and why the engine is NOT handed them ---');
+	console.log('\n--- and why the text could not simply be handed through ---');
 	await warmEpanet();
 	byId.lpn_dialog_body.children.length = 0;
 	L.importInp({ name: 'rules.inp', _text: FIXTURE });
@@ -235,10 +245,19 @@ console.log('\n--- a rule naming something that is gone ---');
 	ok('...so the tank the rule tests reads 4.572, not 15',
 		/^\s*T1\s+\S+\s+4\.572\b/m.test(built.inp),
 		(built.inp.split(/^\[TANKS\]/m)[1] || '').split(/\n/)[1]);
-	// **AND THEREFORE NO [RULES] SECTION IS WRITTEN AT ALL.** Silence beats a threshold in the wrong
-	// unit: an unmodelled rule is reported as a difference at import, where the user can see it.
-	ok('so the engine input states no rules', !/^\[RULES\]/m.test(built.inp));
+	// **AND THEREFORE THE THRESHOLD THAT REACHES THE ENGINE IS 6.096, NOT 20.** For as long as there
+	// was no language it was neither: no [RULES] section was written at all, because silence beats a
+	// threshold in the wrong unit. Now it is converted, and this is the one line that says so from
+	// the carrying side.
+	ok('so the engine input states the rule in metres',
+		/^IF TANK T1 LEVEL ABOVE 6\.096/m.test(built.inp) && !/ABOVE 20$/m.test(built.inp),
+		(built.inp.split(/^\[RULES\]/m)[1] || '').split(/^\[/m)[0].trim());
 
+	// **AND THE PUMP STILL RUNS AT BOTH LEVELS ON A SINGLE-INSTANT SOLVE, WHICH IS NOW TRUE FOR A
+	// DIFFERENT REASON.** It used to be because no rule was sent. It is now because EPANET checks
+	// its rule base BETWEEN time steps, so a run of zero duration never reaches one -- the engine's
+	// own behaviour, copied rather than simulated. The rule really firing is measured on an
+	// extended-period run in dev/lpn-spike/rules-language-harness.js.
 	// The measurement that settled it: with the level raised past the rule's own 20 (feet), the pump
 	// is unaffected -- because 25 ft is 7.62 m and the metric rule would be comparing against 20 m.
 	tank._level = 15;

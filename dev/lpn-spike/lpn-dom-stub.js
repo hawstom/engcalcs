@@ -760,6 +760,11 @@ require(ROOT + 'js/lpn-ramps.js');
 // looped-network.js falls through its `EngCalcs.lpnFireFlow*` guards and a harness would pass on a
 // feature that had quietly turned itself off.
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-fireflow.js'));
+// The [RULES] grammar (ROADMAP Task 248.03). In the SHARED stub rather than per-harness, because
+// looped-network.js's modelRules() reaches it on EVERY model assembly -- so a harness that merely
+// solves a document holding rules would otherwise send the engine nothing and pass on a page the
+// browser never has, which is the coupling-removing stub dev/testing-notes.md warns about.
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-rules.js'));
 
 // ---- the REAL EPANET engine (ROADMAP Task 496) ---------------------------
 //
