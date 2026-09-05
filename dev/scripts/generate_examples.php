@@ -9,7 +9,7 @@
  * writes, into the web-served examples/ directory:
  *
  *   examples/<Name>-lpn.json   a byte copy of the project, which is what the gallery opens
- *   examples/manifest.json     title, description, units, counts and thumbnail for each
+ *   examples/manifest.json     title, description, units, tags, counts and thumbnail for each
  *   examples/<Name>.svg        a generated line-drawing thumbnail
  *
  * WHY A COPY RATHER THAN SERVING dev/ DIRECTLY. dev/.htaccess is `Require all denied`, so nothing
@@ -79,6 +79,41 @@ function publishedExamples($srcDir, $metaFile) {
 	}
 	sort($out);
 	return $out;
+}
+
+/* THE THREE TAGS (ROADMAP Task 531). Tom's axes: the unit set an example opens in, whether it is a
+ * design exercise or a maintenance one, and whether it is an XY grid or a geographic project.
+ *
+ * TWO OF THE THREE ARE DERIVED FROM THE PROJECT FILE and are never written down: `system` off the
+ * flow unit, `coords` off `project.coords`. A tag nobody has to maintain cannot go stale, and
+ * `--check` re-derives all three from the files rather than comparing the manifest to itself, so a
+ * tag that stops matching its example fails the build.
+ *
+ * THE THIRD IS A HUMAN JUDGEMENT AND SO IT IS DECLARED HERE. Nothing in a network file says whether
+ * it is a thing being designed or a thing being run, and a machine guessing at that would produce a
+ * tag that is confidently wrong. It is the axis that carries real meaning for somebody choosing
+ * where to start, so it is written by hand, in the generator, where the list of examples already
+ * lives -- and an example missing from it is REPORTED rather than silently untagged.
+ *
+ * These values are AI's reading and have not been ruled on: `design` for the two teaching starters
+ * and for Elm Street Center (a commercial site sized for fire flow), `maintenance` for EPANET's own
+ * samples, which are existing distribution systems being operated and analysed. Change any of them
+ * on Tom's word alone.
+ *
+ * NONE OF THE THREE IS DISPLAYED, and that is deliberate: a displayed tag is a string in 27
+ * languages, and the gallery has no grouping or filter to display it in yet (Task 348). This is the
+ * data such a filter would be built on, landed first and guarded, at the cost of no new lang key. */
+function exampleWork($name) {
+	$work = array(
+		'Basic-example-SI-units.lwn' => 'design',
+		'Basic-example-US-units.lwn' => 'design',
+		'Elm-Street-Center.lwn' => 'design',
+		'Net1.lwn' => 'maintenance',
+		'Net2.lwn' => 'maintenance',
+		'Net3.lwn' => 'maintenance',
+		'Net3-Novato-CA-World.lwn' => 'maintenance'
+	);
+	return $work[$name] ?? null;
 }
 
 /* Bounds of everything drawable, in the document's own coordinates. Nodes and link vertices both:
@@ -197,6 +232,14 @@ foreach ($files as $name) {
 	 * the one the New-project menu already puts in its labels. Deriving it beats storing it: a
 	 * stored system could disagree with the file it describes. */
 	$system = in_array($flow, array('gpm', 'mgd', 'cfs', 'gpd'), true) ? 'us' : 'si';
+	/* An XY grid is the absence of a declaration, not a value: `project.coords` is 'geo' or it is
+	 * not there at all, which is what js/looped-network.js's isGeoProject() reads. Derived the same
+	 * way here so the tag cannot disagree with how the page will actually open the file. */
+	$coords = (($doc['project']['coords'] ?? '') === 'geo') ? 'geo' : 'xy';
+	$work = exampleWork($name);
+	if ($work === null) {
+		$problems[] = "$name: no design/maintenance tag -- add it to exampleWork() in this script";
+	}
 	$key = $meta[$name]['key'] ?? '';
 	$titleKey = $key === '' ? '' : "lpn_ex_{$key}_title";
 	$descKey = $key === '' ? '' : "lpn_ex_{$key}_desc";
@@ -224,6 +267,8 @@ foreach ($files as $name) {
 		'title' => $title,
 		'description' => $desc,
 		'system' => $system,
+		'coords' => $coords,
+		'work' => $work,
 		'flow' => $flow,
 		'nodes' => count($doc['nodes'] ?? array()),
 		'links' => count($doc['links'] ?? array()),
@@ -282,7 +327,8 @@ foreach (glob($outDir . '/*') as $p) {
 	if ($base !== '.htaccess' && !isset($written[$base])) { unlink($p); echo "  removed $base\n"; }
 }
 foreach ($manifest as $m) {
-	printf("  %-30s %-3s %3d nodes %3d links  %s\n", $m['file'], $m['system'], $m['nodes'], $m['links'],
+	printf("  %-30s %-2s %-3s %-11s %3d nodes %3d links  %s\n", $m['file'], $m['system'], $m['coords'],
+		$m['work'] ?? '(untagged)', $m['nodes'], $m['links'],
 		$m['description'] === '' ? '(no description)' : $m['title']);
 }
 foreach ($problems as $p) { fwrite(STDERR, "  ! $p\n"); }

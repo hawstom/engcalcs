@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**67 open tasks.** Next (100): 7 · Soon (75): 16 · Someday (50): 14 · Maybe (25): 13 · Parked (5): 17
+**66 open tasks.** Next (100): 7 · Soon (75): 15 · Someday (50): 14 · Maybe (25): 13 · Parked (5): 17
 
 ## 100 — Next (7)
 
@@ -19,7 +19,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 545 — The list is a file, the marks are data, and both survived a reading.
 - Task 553 — Demands and Hydraulics options: BUILT, and every option now has a control.
 
-## 75 — Soon (16)
+## 75 — Soon (15)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -27,7 +27,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 479 — [H] · One question left: should the suite answer at librewaternet.org/engcalcs/ ?
-- Task 531 — Tag the examples: US/SI, design/maintenance, xy/lat-lon.
 - ! Task 532 — An English style guide for label wording — Tom says he is writing one by intuition.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 568 — Standard hydraulic symbols: Tom's research, recorded, not yet a decision.
@@ -93,5 +92,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-57 of 67 titles are within 4–12 words. `!` marks the rest;
+56 of 66 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

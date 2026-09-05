@@ -565,25 +565,6 @@ the block.
     the rule and must survive into the guide: telling them apart is a judgement, so this is one for
     the human pile, not the checkable one.
 
-- 75|531| **Tag the examples: US/SI, design/maintenance, xy/lat-lon.**
-  Tom, 2026-08-25: *"Reference 348. Phase 1 can be adding labels, tags, or keywords to the
-  examples."* **Task 348 is sub-categories and paging in the gallery, and is deliberately unbuilt at
-  seven examples** — the grid is `auto-fit`, so both arrive without a rewrite when the wall stops
-  fitting a screen. This is the half worth doing BEFORE that day, because it is what any grouping or
-  filter would have to be built on.
-  - **The three axes are his**, and each is a fact the example already has rather than an opinion
-    somebody must supply: the unit set it opens in, whether it is a design exercise or a maintenance
-    one, and whether it is an XY grid or a geographic project. **Two of the three are derivable from
-    the file itself** (`units`, and `project.coords`), which is the cheap and non-rotting way to get
-    them — a tag nobody has to maintain cannot go stale.
-  - **Design vs maintenance is the one that needs a human**, and it is the one that carries real
-    meaning for somebody choosing where to start.
-  - `dev/scripts/generate_examples.php` builds the manifest and `generate_examples.php --check`
-    guards it, so a derived tag belongs there rather than hand-written beside each example.
-  - **A tag that is DISPLAYED is a string in 27 languages.** A tag used only to group or filter need
-    not be. Decide which before writing any key — this is the difference between a cheap task and a
-    sprint.
-
 - 100|508| **Tom's screenshot drop: dozens of captures, indexed and reused.**
   `dev/screenshots/` is gitignored and holds his captures under ordinal names (`0001.png`); the
   convention is in its README. **He captures; AI describes.** One line per file in the tracked
