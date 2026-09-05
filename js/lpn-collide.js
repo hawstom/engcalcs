@@ -1240,6 +1240,112 @@ EngCalcs.lpnCollide = (function () {
 		return worst;
 	}
 
+	// ---- ROADMAP Task 539, phase one: COUNT the crossings ---------------------------------------
+	//
+	// **THIS MEASURES; IT DOES NOT MOVE ANYTHING.** Tom, 2026-08-26, on a screenshot of two node
+	// labels whose leaders cross: *"when it looks so easy (to a human) to resolve, it's
+	// embarrassing"*, and in the same breath *"I don't want to be forever tweaking this."* So the
+	// first thing built is the number, not the remedy: how many crossings are there, and where, on
+	// the drawings we already ship.
+	//
+	// **TWO TRIGGERS, AND THE SECOND IS THE ONE THE FIRST WOULD MISS** (his own rule, same day:
+	// *"if two leaders cross or if a label crosses a leader, try stacking their labels"*):
+	//
+	//   1. LEADER x LEADER -- two leaders properly crossing. A segment-intersection test.
+	//   2. LABEL  x LEADER -- somebody else's leader running through this label's box. Not a
+	//      crossing of two leaders, and just as ugly. A label whose own leader is too short to be
+	//      drawn still takes part HERE, on its box alone, which is why the second trigger cannot be
+	//      folded into the first.
+	//
+	// A placement is `{id, box|boxes, leader}` -- exactly what placeLabels() returns, and what a
+	// caller can assemble for a first-fit label whose leader the renderer draws. Boxes are the
+	// STAIRCASE where there is one (Task 406): a leader crosses a label when it crosses any row.
+	//
+	// **A PAIR IS UNORDERED AND COUNTED ONCE, and that is the number to hold against Tom's five
+	// marked gangs.** The ?debug=labels bench counts label-on-leader INCIDENCES (ordered), a
+	// different number that stays as it is; both are returned here so neither has to be recovered
+	// from the other. `gangs` groups the flagged pairs into connected components, because a gang is
+	// what his strategy moves -- his cluster D is three labels competing for one open sector, not
+	// three unrelated pairs.
+	//
+	// O(n^2) over the DRAWN labels, deliberately: a diagnostic run on demand, not a per-frame pass,
+	// and an index here would be a second copy of a structure the placement passes already own. If
+	// it ever moves inside the frame budget, index it then and say so here.
+	function crossingBoxes(p) {
+		return (p.boxes && p.boxes.length) ? p.boxes : (p.box ? [p.box] : []);
+	}
+	function labelCrossings(placements, opts) {
+		opts = opts || {};
+		// A grazed corner is still a crossing by default, so the measurement is the raw one; a
+		// caller raises the bar deliberately rather than inheriting a threshold nobody chose.
+		var minFrac = opts.minLeaderFraction > 0 ? opts.minLeaderFraction : 0,
+			live = [], leaderPairs = [], labelOnLeader = [], i, j, k, b, f;
+		(placements || []).forEach(function (p) {
+			var bs = crossingBoxes(p);
+			if (!bs.length && !p.leader) { return; }
+			live.push({ id: p.id, boxes: bs, leader: p.leader || null });
+		});
+		for (i = 0; i < live.length; i++) {
+			for (j = i + 1; j < live.length; j++) {
+				if (live[i].leader && live[j].leader
+						&& segmentsCross(live[i].leader, live[j].leader)) {
+					leaderPairs.push({ a: live[i].id, b: live[j].id });
+				}
+			}
+			// Its OWN leader is excluded: it stops at the box's near edge by construction, so
+			// counting it would report the same constant on every drawing.
+			for (j = 0; j < live.length; j++) {
+				if (j === i || !live[j].leader) { continue; }
+				for (k = 0; k < live[i].boxes.length; k++) {
+					b = live[i].boxes[k];
+					f = segmentInBoxFraction(live[j].leader, b);
+					if (f > minFrac) {
+						labelOnLeader.push({ label: live[i].id, leader: live[j].id, fraction: f });
+						break;
+					}
+				}
+			}
+		}
+		// The union of the two triggers, unordered and de-duplicated, then grouped. Union-find with
+		// no ranking: the components are tiny by construction and a plain walk is easier to read.
+		var seen = {}, pairs = [], parent = {}, groups = {}, gangs = [];
+		function root(x) { while (parent[x] !== x) { x = parent[x] = parent[parent[x]]; } return x; }
+		function join(x, y) {
+			if (parent[x] === undefined) { parent[x] = x; }
+			if (parent[y] === undefined) { parent[y] = y; }
+			var rx = root(x), ry = root(y);
+			if (rx !== ry) { parent[rx] = ry; }
+		}
+		function note(x, y) {
+			var key = x < y ? x + ' ' + y : y + ' ' + x;
+			if (!seen[key]) { seen[key] = true; pairs.push(x < y ? [x, y] : [y, x]); }
+			join(x, y);
+		}
+		leaderPairs.forEach(function (p) { note(p.a, p.b); });
+		labelOnLeader.forEach(function (p) { note(p.label, p.leader); });
+		Object.keys(parent).forEach(function (id) {
+			var r = root(id);
+			if (!groups[r]) { groups[r] = []; gangs.push(groups[r]); }
+			groups[r].push(id);
+		});
+		gangs.forEach(function (g) { g.sort(); });
+		gangs.sort(function (a, b) { return a[0] < b[0] ? -1 : (a[0] > b[0] ? 1 : 0); });
+		return {
+			leaderPairs: leaderPairs,
+			labelOnLeader: labelOnLeader,
+			pairs: pairs,
+			gangs: gangs,
+			counts: {
+				labels: live.length,
+				leaders: live.filter(function (p) { return !!p.leader; }).length,
+				leaderCross: leaderPairs.length,
+				labelOnLeader: labelOnLeader.length,
+				pairs: pairs.length,
+				gangs: gangs.length
+			}
+		};
+	}
+
 	return {
 		GOAL_WEIGHT: GOAL_WEIGHT,
 		ANGLE_TUNING: ANGLE_TUNING,
@@ -1274,7 +1380,8 @@ EngCalcs.lpnCollide = (function () {
 		boxIndex: boxIndex,
 		rawScore: rawScore,
 		effectiveScores: effectiveScores,
-		placeLabels: placeLabels
+		placeLabels: placeLabels,
+		labelCrossings: labelCrossings
 	};
 }());
 
