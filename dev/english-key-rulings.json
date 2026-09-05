@@ -90,8 +90,8 @@
    "ruled": "2026-09-04"
   },
   "lpn_energy_curve_note": {
-   "on": "These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.",
-   "ruled": "2026-09-04"
+   "on": "These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.",
+   "ruled": "2026-09-05"
   },
   "lpn_energy_demand_charge": {
    "on": "Peak demand charge",

@@ -200,12 +200,21 @@ function ecRulingLine(string $key, string $value): string
     return "  _Ruled OK " . (isset($r['ruled']) ? $r['ruled'] : '') . "._\n";
 }
 
+// **LEAD WITH THE NUMBER THAT NEEDS A HUMAN, NOT THE ONE THAT NEEDS A SPRINT.** These two counts
+// are different questions and reading one as the other has now cost a session: "79 keys awaiting a
+// ruling" was printed on a tree where 78 were already ruled and ONE was outstanding, and it was
+// reported to Tom as 79 keys awaiting his reading. His answer: *"You say 79. But there is one."*
+// The untranslated count is a sprint's size; the unruled count is what a person still owes.
+$ecUnruled = 0;
+foreach ($new as $k => $v) { if (ecRulingLine($k, $v) === '') { $ecUnruled++; } }
+$ecCounts = $ecUnruled . ' still to read, ' . count($new) . ' untranslated';
+
 if ($write || $check) {
     $file = $root . '/dev/new-english-keys.md';
     $want = newKeysMarkdown($new, count($english), $langCount);
     $have = is_file($file) ? file_get_contents($file) : '';
     if ($check) {
-        if ($have === $want) { echo "FRESH (" . count($new) . " keys awaiting a ruling)\n"; exit(0); }
+        if ($have === $want) { echo "FRESH (" . $ecCounts . ")\n"; exit(0); }
         fwrite(STDERR, "STALE: dev/new-english-keys.md does not match lib/lang.ec.en.php.\n\n");
         fwrite(STDERR, "    Regenerate it:  php dev/scripts/new_english_keys.php --write\n\n");
         fwrite(STDERR, "This file is generated, never hand-edited. It is the list Tom reads; a stale one is\n");
@@ -310,7 +319,7 @@ if ($write || $check) {
         echo "lib/lang.ec.en.php, then delete the .rejected.md copy.\n\n";
     }
     file_put_contents($file, $want);
-    echo "dev/new-english-keys.md written — " . count($new) . " keys awaiting a ruling\n";
+    echo "dev/new-english-keys.md written — " . $ecCounts . "\n";
     exit(0);
 }
 
