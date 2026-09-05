@@ -18,8 +18,11 @@ are ordinary English and have nothing to do with naming the analysis.**
 |---|---|---|
 | Ordinary English "run" — nothing to standardise | 21 | *"this site has run out of room"*, *"A search is already running"*, *"Runs the EPANET solver"*, *"pumps run at a speed other than…"*, *"Run the model with the EPANET engine"* |
 | Names the EXTENDED-PERIOD ANALYSIS, using a variant | 20 | *Total run time*, *"the run finished"*, *"through the run"*, *"how long this network runs"*, *"from the start of the run to the end of it"* |
+[TGH: I think these probably are okay as is.]
 | Already says period or simulation | 4 | *"Working out the whole time period"*, *"a simulation that runs over a period of time"*, *"no time period"*, and `lpn_energy_over`, changed today |
+[TGH: I think some of these need to be changed. Can you give me the full list to audit?]
 | Fire flow's own runs — a DIFFERENT thing | 13 | *"Fire flow run"*, *"This run solved the whole network {solves} times"*, *"Runs"* as a column heading |
+[TGH: I think these probably are okay as is.]
 
 **The fire-flow group is the one that must not be swept**, and it is nearly a quarter of the hits. A
 fire-flow run is N steady-state solves, not an extended-period simulation; renaming it would say
