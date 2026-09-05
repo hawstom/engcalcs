@@ -71,9 +71,6 @@ const EC_UNREFERENCED_MODULES = [];
  * the check proves that rather than believing it.
  */
 const EC_HARNESS_LAZY_MODULES = [
-    'lpn-inp.js' => 'the .inp reader and writer. Loaded by the import, export, round-trip, token '
-                  . 'and pass-through harnesses that are about it; the editor reads it only when a '
-                  . 'file is opened or saved, never at boot.',
     'lpn-net.js' => 'the network model helpers. Loaded by the harnesses that build a document '
                   . 'directly; the editor reaches them through its own document, not at IIFE time.',
     'lpn-time.js' => 'extended-period simulation. A whole engine dimension, and booting it for a '

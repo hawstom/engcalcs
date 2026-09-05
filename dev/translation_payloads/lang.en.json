@@ -1444,7 +1444,7 @@
         "lpn_energy_total_demand_charge": "Peak demand charge",
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
-        "lpn_energy_curve_note": "These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.",
+        "lpn_energy_curve_note": "These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_labels_col_rank": "Rank",
         "lpn_labels_col_drop": "Drop",

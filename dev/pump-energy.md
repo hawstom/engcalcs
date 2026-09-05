@@ -86,17 +86,27 @@ happen instead of recommending a value.
 | Global efficiency, price, price pattern, demand charge | `settings.energy` | the Settings rows |
 | Currency label | `settings.energy.currency` | the Settings row (ours, not EPANET's) |
 | A pump's own price and price schedule | the pump, `energyPrice` / `energyPattern` | **`setProp()`**, and both are in `LPN_OVERRIDABLE.link` |
-| A pump's efficiency CURVE id | `settings.energy.effic` | nothing -- carried, round-trips, no control |
+| A pump's efficiency CURVE id | `settings.energy.effic` | nothing -- carried, round-trips, honoured, no control |
 
 A document-level option has no element to key on, which is why the globals are a setting and not an
 override -- the same split the reaction globals and the scenario demand multiplier already make.
 
-**The efficiency curve is the one honest gap.** `PUMP <id> EFFIC <curve>` references a `[CURVES]`
-entry, and this page keeps no general curve library (a pump's head curve lives on the pump). So the
-value round-trips, nothing edits it, the engine input does not state it -- naming a curve the file
-does not contain is how EPANET comes to reject a network it would otherwise solve -- and such a pump
-runs at the network efficiency. **The report names those pumps** rather than letting their
-efficiency column quietly disagree with EPANET's own.
+**The efficiency curve is HONOURED as of Task 582, and this paragraph used to say it was not.**
+`PUMP <id> EFFIC <curve>` references a `[CURVES]` entry, and this page still keeps no general curve
+library (a pump's head curve lives on the pump), so nothing EDITS such a curve. What changed is that
+its points are kept, written back, and put on the engine input beside the `EFFIC` row that names
+them -- renamed `EF_<pumpid>`, because the head curves there are `C_<pumpid>` and a document curve
+called `C_10` would otherwise overwrite pump 10's head. The abscissa is a flow in the project's own
+unit and the engine input is always LPS; that conversion is the whole risk, and it is anchored
+against a hand-computed 62.5% in `dev/lpn-spike/pump-effic-curve-harness.js`.
+
+**Writing the `EFFIC` row without its curve was a live export defect**, not merely a missing
+feature: naming a curve the file does not contain is how EPANET comes to reject a network it would
+otherwise solve, so every export of such a document produced a file real EPANET refused.
+
+**One gap is left and the report still names it**: an `[ENERGY]` row naming a curve no `[CURVES]`
+section defines. Such a pump runs at the network efficiency, and the report says which pumps rather
+than letting their efficiency column quietly disagree with EPANET's own.
 
 ## What it is anchored against
 

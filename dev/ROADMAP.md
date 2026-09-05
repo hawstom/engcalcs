@@ -135,22 +135,6 @@ the block.
     never tests**: `lpnTimeStatusNote()` reads no timing at all, so a user who unchecks the box on a
     fast network is told their network is slow. Replacement in §5, awaiting his word. Translated: 26.
 
-- 75|582| **Pump efficiency curves: the wiring left in `docEnergy()`.**
-  The curve is now KEPT and WRITTEN BACK (`doc.inpSections.CURVES`, carried verbatim), and
-  `lpnToInp()` emits it as `EF_<pumpid>` with its `EFFIC` row. Anchored by
-  `dev/lpn-spike/pump-effic-curve-harness.js`: byte-identical round trip, and EPANET reporting the
-  curve's own 62.5% where the same document's global efficiency says 75.
-  - **WHAT IS LEFT IS THE WIRING, and it was left because the track that built this could not touch
-    `js/looped-network.js`.** `docEnergy()` must add
-    `efficCurves: EngCalcs.lpnEfficCurves(doc.inpSections, <project flow unit to m3/s>)` to the
-    record it returns; that is the only bridge between the document and the engine writer, and the
-    factor is the whole of the flow-axis trap. Until then the page still runs such a pump at the
-    global efficiency, which `lpn_energy_curve_note` still correctly discloses.
-  - **THAT NOTE BECOMES FALSE THE MOMENT THE LINE LANDS**, so the same commit rewrites
-    `lpn_energy_curve_note` in `lib/lang.ec.en.php` (translated: 26) and regenerates the payloads.
-  - Fixed on the way: the exporter used to write an `[ENERGY]` row naming a curve it did not write,
-    which is an `.inp` EPANET refuses at the door.
-
 - 75|579| **The four EPANET sections still carried and not understood, extracted from 566.**
   Task 566 is closed: water age, source trace, the chemical mode and pump energy all ship, and
   `[QUALITY]`, `[REACTIONS]` and `[ENERGY]` are interpreted. Four sections remain carried verbatim,

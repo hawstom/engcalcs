@@ -415,6 +415,46 @@ const EngCalcs = global.EngCalcs;
 	check(/8\b/.test(text), `the money is on screen: 40 kW for 1 h at 0.2 is 8 (${text.replace(/\s+/g, ' ').slice(0, 200)})`);
 	check(/200/.test(text), 'and the demand charge of 5 per kW on a 40 kW peak is 200');
 
+	// =========================================================================================
+	head('10. THE WIRING: the carried curve reaches the model, on the flow axis (Task 582)');
+	// =========================================================================================
+	// **THE ONE BRIDGE BETWEEN THE DOCUMENT AND THE ENGINE WRITER IS `docEnergy()`.** The points of
+	// an efficiency curve ride in the carried [CURVES] text, which nothing solves from; without this
+	// line they reach nobody and the pump silently runs at the GLOBAL efficiency instead, its kW,
+	// its kWh and its cost all wrong by the ratio of the two. Guarded here rather than in
+	// pump-effic-curve-harness.js because that harness hands `lpnToInp` a model it built itself, so
+	// it cannot see a document that never put the curve on one.
+	//
+	// **AND THE ASSERTION IS THE FLOW AXIS, because that is the whole risk.** The abscissa is a flow
+	// in the PROJECT'S OWN unit and the model wants m3/s. A dropped factor moves the money and
+	// nothing on screen looks wrong, so the two unit sets are checked against hand-computed numbers
+	// and not against each other: 500 gpm is 500 / 15850.323141488905, and 500 L/s is 0.5, and no
+	// single factor can satisfy both.
+	const docW = L.getDoc();
+	docW.inpSections = { CURVES: [' E1  200  40', ' E1  500  70', ' E1  800  55',
+		' OTHER  1  2'] };
+	L.getSettings().energy = { globalEfficiency: 75, effic: { '10': 'E1' } };
+
+	setUnitSet('us');
+	const wUs = L.docEnergy().efficCurves || {};
+	check(!!wUs.E1 && wUs.E1.length === 3,
+		`the named curve's three points arrive on the model (${(wUs.E1 || []).length})`);
+	check(Math.abs(wUs.E1[1][0] - 500 / 15850.323141488905) < 1e-12,
+		`500 gpm crosses to m3/s: ${wUs.E1 && wUs.E1[1][0]}`);
+	check(wUs.E1[1][1] === 70, 'and the efficiency is a percent, so it is carried untouched');
+
+	setUnitSet('si');
+	const wSi = L.docEnergy().efficCurves || {};
+	check(Math.abs(wSi.E1[1][0] - 0.5) < 1e-12,
+		`the same 500 read as L/s is 0.5 m3/s, so the factor is really the project's: ${wSi.E1[1][0]}`);
+	check(Math.abs(wSi.E1[1][0] - wUs.E1[1][0]) > 0.4,
+		'the two unit sets genuinely disagree, so a hard-coded factor could not pass both');
+	setUnitSet('us');
+
+	// A curve nothing names still travels: the model carries what the file had, and `lpnToInp`
+	// writes only the ones an EFFIC row asks for. Cheaper than teaching this seam which is which.
+	check(!!wUs.OTHER, 'a curve no pump names is on the model too, and the writer is what selects');
+
 	console.log('\n' + (failures ? failures + ' FAILURES' : 'all checks passed'));
 	process.exit(failures ? 1 : 0);
 }());

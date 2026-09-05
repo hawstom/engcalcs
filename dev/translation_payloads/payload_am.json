@@ -585,7 +585,7 @@
         "lpn_energy_total_demand_charge": "Peak demand charge",
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
-        "lpn_energy_curve_note": "These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.",
+        "lpn_energy_curve_note": "These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
@@ -666,7 +666,7 @@
         "lpn_energy_total_demand_charge": "Peak demand charge",
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
-        "lpn_energy_curve_note": "These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.",
+        "lpn_energy_curve_note": "These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {

@@ -4199,6 +4199,17 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (e.globalPattern) { out.globalPattern = e.globalPattern; }
 		Object.keys(e.effic || {}).forEach(function (id) { out.effic[id] = e.effic[id]; });
+		// **THE EFFICIENCY CURVE'S POINTS, WITHOUT WHICH THE `EFFIC` ROW NAMES NOTHING** (Task 582).
+		// `out.effic` is a map of pump id -> CURVE NAME, carried out of the file's [ENERGY]; the
+		// points behind that name live in the carried [CURVES] text and reach nobody until they are
+		// put on the model. Until this line existed, such a pump ran at the GLOBAL efficiency and
+		// its kW, its kWh and its cost were all wrong by the ratio of the two, silently.
+		//
+		// The abscissa is a FLOW in the project's own unit, like every other number on the document,
+		// and `lpnToInp` wants m3/s like every other flow on the model -- so this is the pump head
+		// curve's own crossing (see pumpCurveSI above) applied to the same axis, and not a third
+		// conversion site. Getting it wrong moves the money and nothing on screen looks wrong.
+		out.efficCurves = EngCalcs.lpnEfficCurves(doc.inpSections, 1 / unitFactor('lpn_u_flow'));
 		(doc.links || []).forEach(function (l) {
 			if (l.type !== 'pump' || !isActive(l)) { return; }
 			var pr = effective(l, 'energyPrice'), pat = effective(l, 'energyPattern');
@@ -29685,7 +29696,8 @@ var EngCalcs = EngCalcs || {};
 	function rebuildEnergyReport() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_energy_report'),
-			sum = runEnergy(), body, e = settings.energy || {}, curveNames = [];
+			sum = runEnergy(), body, e = settings.energy || {}, curveNames = [],
+			efficPts = docEnergy().efficCurves || {};
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (!energyPumpCount()) {
@@ -29733,7 +29745,14 @@ var EngCalcs = EngCalcs || {};
 			ffCell(tr, ffNum(row.peakKw));
 			ffCell(tr, ffNum(row.kwh));
 			ffCell(tr, energyMoney(row.cost));
-			if (e.effic && e.effic[row.id]) { curveNames.push(row.id); }
+			// **NAMED ONLY WHERE THE CURVE IS GENUINELY UNUSABLE** (Task 582). A pump that names a
+			// curve the file also STATES is now run on that curve, so listing it here would be a
+			// disclosure of a defect that no longer exists. What is left is the case a file can
+			// still produce: an [ENERGY] row naming a curve no [CURVES] section defines, where the
+			// pump falls back to the global efficiency and the reader deserves to know.
+			if (e.effic && e.effic[row.id] && !(efficPts[e.effic[row.id]] || []).length) {
+				curveNames.push(row.id);
+			}
 		});
 		// **THE TOTALS, AND THE DEMAND CHARGE IS NOT A SUM OF THE COLUMN ABOVE IT.** It is charged
 		// on the largest total power every pump drew at one moment, so it belongs under the table
@@ -29760,7 +29779,7 @@ var EngCalcs = EngCalcs || {};
 		// The alternative is a report whose efficiency column quietly disagrees with EPANET's own.
 		if (curveNames.length) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_energy_curve_note ||
-				'These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.')
+				'These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.')
 				.replace('{ids}', curveNames.join(', ')), host);
 		}
 	}

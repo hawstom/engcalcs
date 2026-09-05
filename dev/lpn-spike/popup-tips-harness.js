@@ -205,6 +205,10 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-solver.js'));
 // EngCalcs.lpnGeom/lpnCollide as its IIFE runs, so they go in before the eval below, in the
 // same order their <script> tags have in Looped-Network.php.
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-geom.js'), require(ROOT + 'js/lpn-collide.js'));
+// The .inp reader, for the same reason lpn-dom-stub.js loads it eagerly: docEnergy() reads a
+// carried efficiency curve through EngCalcs.lpnEfficCurves() on every model assembly (Task 582),
+// so it is a solve-time dependency of the editor and no longer only an import-time one.
+require(ROOT + 'js/lpn-inp.js');
 
 // ---- the file under test ------------------------------------------------
 let src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');

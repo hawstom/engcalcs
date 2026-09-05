@@ -785,6 +785,14 @@ process.on('warning', function (w) {
 	console.error(w && (w.stack || w.message) || String(w));
 });
 require(ROOT + 'js/lpn-epanet.js');
+// **THE .inp READER IS EAGER SINCE TASK 582, AND IT WAS LAZY BEFORE.** `docEnergy()` reads the
+// points of a carried efficiency curve out of `doc.inpSections.CURVES` through
+// EngCalcs.lpnEfficCurves(), and it does that on every model assembly rather than only when a file
+// is opened -- so the editor now genuinely depends on this module at solve time, not at import
+// time. Six harnesses threw `lpnEfficCurves is not a function` the moment that wiring landed, which
+// is the honest signal that the old declaration ("read only when a file is opened or saved") had
+// stopped being true. Keep it here rather than adding a require to each harness that solves.
+require(ROOT + 'js/lpn-inp.js');
 const NODE_ENGINE_URL = 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js');
 {
 	const browserLoad = global.EngCalcs.lpnEpanetLoad;
