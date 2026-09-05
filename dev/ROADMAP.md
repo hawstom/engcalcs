@@ -135,26 +135,21 @@ the block.
     never tests**: `lpnTimeStatusNote()` reads no timing at all, so a user who unchecks the box on a
     fast network is told their network is slow. Replacement in §5, awaiting his word. Translated: 26.
 
-- 75|582| **Pump efficiency curves: the one energy number we still take on faith.**
-  Tom, 2026-09-04, reading `lpn_energy_curve_note`: *"Why aren't we implementing this instead of
-  shipping without it?"* Fair, and the note is a disclosure rather than an excuse. What it discloses:
-  a file may state `PUMP <id> EFFIC <curve>`, and such a pump runs here at the network's global
-  efficiency instead, so its kW, its kWh and its cost are all wrong by the ratio of the two.
-  - **THE BLOCKER IS ONE LINE AND IT IS NOT A SHRUG.** `js/lpn-epanet.js` writes `[CURVES]` from the
-    pump HEAD curves the document holds, and nothing else; naming a curve that is not in the file is
-    how EPANET rejects a network it would otherwise solve. So the row is deliberately not written.
-  - **AND THE POINTS ARE NOT KEPT.** `js/lpn-inp.js` parses `[CURVES]` into a LOCAL map used only to
-    resolve a pump's head curve. `CURVES` is in `INP_SECTIONS_READ`, so it is not carried verbatim
-    either — an efficiency curve is read and then dropped on the floor.
-  - **THE SHAPE OF THE FIX, in the order the risk rises:** keep the named efficiency curve on the
-    document; emit it into the engine input's `[CURVES]` and write the `EFFIC` row; write it back in
-    `lpnToInp`; then the report needs NO change at all, because it already reads EPANET's own
-    `EN_PUMP_EFFIC` per step.
-  - **THE TRAP IS THE FLOW AXIS.** A curve's abscissa is a flow in the FILE's unit and the engine
-    input is always LPS; getting that wrong moves the money and nothing on screen looks wrong.
-  - **NO REFERENCE NETWORK EXERCISES THIS** — Net1/2/3 state no efficiency curve — so the anchor has
-    to be synthetic plus a byte-identical round trip, and this touches money and `.inp` fidelity at
-    once, which is CLAUDE.md's own description of when to spend a `/code-review`.
+- 75|582| **Pump efficiency curves: the wiring left in `docEnergy()`.**
+  The curve is now KEPT and WRITTEN BACK (`doc.inpSections.CURVES`, carried verbatim), and
+  `lpnToInp()` emits it as `EF_<pumpid>` with its `EFFIC` row. Anchored by
+  `dev/lpn-spike/pump-effic-curve-harness.js`: byte-identical round trip, and EPANET reporting the
+  curve's own 62.5% where the same document's global efficiency says 75.
+  - **WHAT IS LEFT IS THE WIRING, and it was left because the track that built this could not touch
+    `js/looped-network.js`.** `docEnergy()` must add
+    `efficCurves: EngCalcs.lpnEfficCurves(doc.inpSections, <project flow unit to m3/s>)` to the
+    record it returns; that is the only bridge between the document and the engine writer, and the
+    factor is the whole of the flow-axis trap. Until then the page still runs such a pump at the
+    global efficiency, which `lpn_energy_curve_note` still correctly discloses.
+  - **THAT NOTE BECOMES FALSE THE MOMENT THE LINE LANDS**, so the same commit rewrites
+    `lpn_energy_curve_note` in `lib/lang.ec.en.php` (translated: 26) and regenerates the payloads.
+  - Fixed on the way: the exporter used to write an `[ENERGY]` row naming a curve it did not write,
+    which is an `.inp` EPANET refuses at the door.
 
 - 75|579| **The four EPANET sections still carried and not understood, extracted from 566.**
   Task 566 is closed: water age, source trace, the chemical mode and pump energy all ship, and

@@ -279,13 +279,14 @@ const ODD = BARE.replace('[OPTIONS]', '[VENDORDATA]\n VDA1            	something
 	});
 	// **AND [ENERGY] IS WRITTEN, WITH NET1'S OWN EFFICIENCY IN IT** (Task 566). Net1 states
 	// `Global Efficiency 75`, and handing that to the engine is the whole reason the page can say
-	// what a pump costs. `PUMP <id> EFFIC <curve>` is the one row deliberately not written -- it
-	// names a [CURVES] entry this writer does not emit, and naming a curve the file does not
-	// contain is how EPANET comes to reject a network it would otherwise solve (dev/pump-energy.md).
+	// what a pump costs. It states no `PUMP <id> EFFIC <curve>` and neither do Net2 and Net3, so no
+	// EFFIC row is expected here -- and since Task 582 that is a fact about the FILE rather than
+	// about the writer, which now emits the row and its curve together
+	// (dev/lpn-spike/pump-effic-curve-harness.js).
 	ok('the engine input states [ENERGY], composed from the record', /^\[ENERGY\]/m.test(built.inp),
 		JSON.stringify((built.inp.match(/\[ENERGY\][\s\S]{0,60}/) || [])[0]));
 	ok('...with Net1\'s own global efficiency in it', /Global Efficiency  75/.test(built.inp));
-	ok('...and no EFFIC row naming a curve this writer does not emit', !/EFFIC/.test(built.inp));
+	ok('...and no EFFIC row, because Net1 states no efficiency curve', !/EFFIC/.test(built.inp));
 	// Net1 states `Quality Chlorine mg/L`, so this import IS a chemical run and the two interpreted
 	// sections are exactly what it needs.
 	ok('...but a chemical run is handed the two sections it needs',
