@@ -387,9 +387,11 @@ const EngCalcs = global.EngCalcs;
 	const labels = (energyHost.children || []).map(function (c) { return c.textContent || ''; }).join(' | ');
 	check((energyHost.children || []).length >= 5,
 		`the Energy section built its rows: ${(energyHost.children || []).length}`);
+	// "Peak demand charge" since 2026-09-04 (Tom, reading the new-key list: *"Why not 'Peak demand
+	// charge'?"* -- it is charged on the one highest moment, so the name says which moment).
 	check(/Pump efficiency/.test(labels) && /Price of power/.test(labels)
-		&& /Demand charge/.test(labels) && /Currency/.test(labels),
-	'and they are the efficiency, the price, the demand charge and the currency');
+		&& /Peak demand charge/.test(labels) && /Currency/.test(labels),
+	'and they are the efficiency, the price, the peak demand charge and the currency');
 	// **THE DISCLOSURE IS IN THE BOX**, not in a comment: there is no default price on this page.
 	check(/no price of its own/.test(labels), 'with the note that this page offers no price of its own');
 	// A report with no run says so rather than showing zeros.

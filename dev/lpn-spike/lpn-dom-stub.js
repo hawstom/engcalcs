@@ -367,7 +367,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // The scenario comparison box (planning engineer's wish-list row 2). Absent from this list,
   // rebuildScenarioCompareReport() returns at its first line and the table is invisible to every
   // harness -- the same silent hole the two boxes above it describe.
-  'lpn_scncmp_box', 'lpn_scncmp_close', 'lpn_scncmp_go', 'lpn_scncmp_report'
+  'lpn_scncmp_box', 'lpn_scncmp_close', 'lpn_scncmp_report'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the

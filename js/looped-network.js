@@ -18627,6 +18627,11 @@ var EngCalcs = EngCalcs || {};
 				tip: pc.lpn_ff_menu_tip,
 				fn: function () { closeMenu(); openFireFlowBox(); }
 			},
+			// **A DIVIDER, AND THE THREE ROWS UNDER IT ARE REPORTS** (Tom, 2026-09-04: *"We can put
+			// a divider before the reports."*). Above it are the things you SET UP and start -- Run,
+			// and Fire flow, which asks for criteria first. Below it are three finished answers,
+			// each of which opens and is simply there.
+			{ separator: true },
 			// **ENERGY SITS WITH THE RUN THAT PRODUCES IT** (Task 566). It is not a kind of run of
 			// its own: it is what the extended-period run already worked out on its way past, which
 			// is why the row is here and not beside Settings.
@@ -29434,6 +29439,8 @@ var EngCalcs = EngCalcs || {};
 	// belongs here it belongs to the whole project, in Settings, and then BOTH features read it.
 	var scenarioCompareRun = null;
 	var scenarioCompareBusy = false;
+	// A run asked for while another was in flight. See runScenarioCompare().
+	var scenarioCompareAgain = false;
 	function scnCmpBoxEl() { return document.getElementById('lpn_scncmp_box'); }
 	function scnCmpBoxIsOpen() {
 		var box = scnCmpBoxEl();
@@ -29485,7 +29492,11 @@ var EngCalcs = EngCalcs || {};
 	// the other may not, and the caller must not have to know which.
 	function runScenarioCompare() {
 		var pc = EngCalcs.pageConfig || {}, before, chain, rows = [];
-		if (scenarioCompareBusy) { return Promise.resolve(scenarioCompareRun); }
+		// A request that arrives mid-run is REMEMBERED rather than dropped: it is a request about a
+		// network that has changed since the run in flight was assembled, so answering it with that
+		// run's numbers would be answering the wrong question.
+		if (scenarioCompareBusy) { scenarioCompareAgain = true; return Promise.resolve(null); }
+		scenarioCompareAgain = false;
 		if (doc.nodes.length === 0) {
 			scenarioCompareRun = [];
 			rebuildScenarioCompareReport();
@@ -29538,7 +29549,10 @@ var EngCalcs = EngCalcs || {};
 			scenarioCompareRun = rows;
 			// Set by the run, never by a user action. A false here is a defect in whatever wrote to
 			// `doc` during a solve, not in this box -- the same assertion the fire-flow sweep makes.
-			scenarioCompareDocGuard = (JSON.stringify(doc) === before);
+			// Recorded BEFORE any re-run, or a run superseded mid-flight would take its own verdict
+			// with it and the guard would only ever describe the last run of a burst.
+			scenarioCompareDocGuard = scenarioCompareDocGuard && (JSON.stringify(doc) === before);
+			if (scenarioCompareAgain) { scenarioCompareAgain = false; return runScenarioCompare(); }
 			rebuildScenarioCompareReport();
 			return rows;
 		});
@@ -29561,11 +29575,9 @@ var EngCalcs = EngCalcs || {};
 			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_running || 'Solving every scenario…', host);
 			return;
 		}
-		if (!scenarioCompareRun) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_intro ||
-				'Press Compare to solve every scenario in this project and read them side by side.', host);
-			return;
-		}
+		// No run and not busy is only reachable with the box shut -- opening it starts one -- so
+		// there is nothing to say and no invitation to print.
+		if (!scenarioCompareRun) { return; }
 		if (!scenarioCompareRun.length) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_empty ||
 				'Nothing has been drawn yet, so there is nothing to solve.', host);
@@ -29601,13 +29613,20 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_note ||
 			'Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.', host);
 	}
+	// **ASKING FOR THE REPORT IS THE REQUEST; THERE IS NOTHING FURTHER TO PRESS** (Tom, 2026-09-04:
+	// *"I don't think that the Compare button is needed. If you request any of the three reports
+	// (Pump, Scenario, EPANET), you should get them with no further confirmation or interaction."*).
+	// It shipped with a Compare button on the reasoning that a box which starts work merely by being
+	// looked at is one a reader cannot undo -- which is true of a box you land in by accident, and
+	// this is a box you land in by naming it on a menu. The other two reports already behaved this
+	// way, so the button was also the odd one of three.
 	function openScenarioCompareBox() {
 		var box = scnCmpBoxEl(), h, r, top;
 		if (!box) { return; }
 		closeMenu();
 		hideOpenTips();
 		box.style.display = 'flex';
-		rebuildScenarioCompareReport();
+		runScenarioCompare();
 		placePanelForScreen(box, function () {
 			h = fitPanelToViewport(box);
 			r = box.getBoundingClientRect();
@@ -29621,20 +29640,25 @@ var EngCalcs = EngCalcs || {};
 	function closeScenarioCompareBox() { hidePanel(scnCmpBoxEl()); }
 	function wireScenarioCompareBox() {
 		var box = scnCmpBoxEl(),
-			x = document.getElementById('lpn_scncmp_close'),
-			go = document.getElementById('lpn_scncmp_go');
+			x = document.getElementById('lpn_scncmp_close');
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeScenarioCompareBox); }
-		if (go) { go.addEventListener('click', function () { runScenarioCompare(); }); }
 		makePanelDraggable(box, null);
 		addPanelResizeGrip(box);
 	}
 	// **AN EDIT MAKES THE TABLE IN FRONT OF THE READER STALE**, so it is dropped rather than left
 	// standing as an answer to a network that has changed. The same rule the fire-flow run follows.
+	// **AN EDIT MAKES THE TABLE STALE, AND A REPORT WITH NO BUTTON HAS TO ANSWER THAT ITSELF.** With
+	// the box shut the run is simply dropped, which costs nothing. With it OPEN the reader has asked
+	// to be looking at this answer, so it is re-run -- and that is N solves per settled edit, which
+	// is the price of a report that is always true. It hangs off applySolveResult(), so it is
+	// already debounced to one per settled edit rather than one per keystroke, and closing the box
+	// stops it.
 	function dropScenarioCompareRun() {
-		if (!scenarioCompareRun) { return; }
+		if (!scenarioCompareRun && !scenarioCompareBusy) { return; }
 		scenarioCompareRun = null;
-		if (scnCmpBoxIsOpen()) { rebuildScenarioCompareReport(); }
+		if (!scnCmpBoxIsOpen()) { scenarioCompareAgain = false; return; }
+		return runScenarioCompare();
 	}
 	function openEnergyBox() {
 		var box = energyBoxEl(), h, r, top;

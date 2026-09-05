@@ -138,15 +138,27 @@ let run = null;
 		ok('an edit drops it rather than leaving last time\'s answer on screen', L.run() === null);
 	}
 
-	console.log('\n--- the report renders, and says something in every state ---');
+	console.log('\n--- asking for the report IS the request: there is nothing further to press ---');
 	{
 		const host = byId.lpn_scncmp_report;
-		L.openBox();
 		L.drop();
-		L.rebuildReport();
-		ok('with no run, the box invites one rather than showing an empty table',
-			host.children.length === 1 && host.children[0]._tag === 'p', host.children.length);
+		ok('there is no run before the box is opened', L.run() === null);
+		// openScenarioCompareBox() itself is not driven here -- it measures and places a real box --
+		// but the line under test is the one it calls, and the assertion is that OPENING is what
+		// starts the run rather than a button somebody has to find. Tom, 2026-09-04: *"If you
+		// request any of the three reports ... you should get them with no further confirmation or
+		// interaction."*
+		L.openBox();
 		await L.compare();
+		ok('opening it produced the answer, with no second gesture', !!L.run() && L.run().length === 2,
+			L.run() && L.run().length);
+		// **AND AN EDIT UNDER AN OPEN BOX RE-RUNS RATHER THAN GOING BLANK.** With no button there
+		// is nothing for the reader to press to get the table back, so the report has to answer
+		// that itself.
+		const again = L.drop();
+		await again;
+		ok('an edit under an open box re-runs rather than emptying the table',
+			!!L.run() && L.run().length === 2, L.run() && L.run().length);
 		L.rebuildReport();
 		const tables = [];
 		(function walk(e) { (e.children || []).forEach(function (c) {

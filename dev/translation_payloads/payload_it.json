@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1614,
-        "delta_key_count": 79,
+        "expected_key_count": 1612,
+        "delta_key_count": 77,
         "exempt_key_count": 32,
         "exempt_keys": [
             "calc_units_us",
@@ -519,7 +519,7 @@
         "lpn_wrong_btn": "Something wrong here?",
         "lpn_wrong_tip": "One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
         "lpn_wrong_thanks": "Thank you. We got that.",
-        "lpn_find_prop_demand_description": "Demand description",
+        "lpn_find_prop_demand_description": "Demand category description",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
@@ -550,15 +550,15 @@
         "lpn_settings_energy": "Energy",
         "lpn_energy_title": "Pump energy report",
         "lpn_energy_menu": "Pump energy report",
-        "lpn_energy_menu_tip": "What each pump ran, what it drew and what it cost over the last run.",
+        "lpn_energy_menu_tip": "How long each pump ran, what power it drew and what it cost over the last extended period simulation.",
         "lpn_energy_efficiency": "Pump efficiency (percent)",
         "lpn_energy_efficiency_tip": "The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
         "lpn_energy_price": "Price of power",
         "lpn_energy_price_tip": "What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.",
         "lpn_energy_pump_price_tip": "What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.",
-        "lpn_energy_price_pattern": "Price schedule",
-        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price hour by hour, which is how an off peak tariff is written. Leave it empty for one price all day.",
-        "lpn_energy_demand_charge": "Demand charge",
+        "lpn_energy_price_pattern": "Price pattern",
+        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price hour by hour, which is how an off peak rate is written. Leave it empty for one price all day.",
+        "lpn_energy_demand_charge": "Peak demand charge",
         "lpn_energy_demand_charge_tip": "What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.",
         "lpn_energy_currency": "Currency",
         "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.",
@@ -569,8 +569,6 @@
         "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
         "lpn_scncmp_title": "Scenario comparison",
         "lpn_scncmp_menu_tip": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
-        "lpn_scncmp_go": "Compare",
-        "lpn_scncmp_intro": "Press Compare to solve every scenario in this project and read them side by side.",
         "lpn_scncmp_running": "Solving every scenario…",
         "lpn_scncmp_empty": "Nothing has been drawn yet, so there is nothing to solve.",
         "lpn_scncmp_col_minpressure": "Lowest pressure",
@@ -578,7 +576,7 @@
         "lpn_scncmp_at": "{value} at {id}",
         "lpn_scncmp_current": "(open now)",
         "lpn_scncmp_note": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
-        "lpn_energy_over": "Over a run of {time}.",
+        "lpn_energy_over": "Over an extended period simulation of {time}.",
         "lpn_energy_col_pump": "Pump",
         "lpn_energy_col_running": "Running",
         "lpn_energy_col_effic": "Effic.",
@@ -589,8 +587,8 @@
         "lpn_energy_col_cost": "Cost",
         "lpn_energy_total_kwh": "Energy used",
         "lpn_energy_total_energy_cost": "Cost of energy",
-        "lpn_energy_peak_kw": "Highest power drawn at one moment",
-        "lpn_energy_total_demand_charge": "Demand charge",
+        "lpn_energy_peak_kw": "Peak power usage",
+        "lpn_energy_total_demand_charge": "Peak demand charge",
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
         "lpn_energy_curve_note": "These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.",
@@ -600,7 +598,7 @@
         "lpn_wrong_btn": "Something wrong here?",
         "lpn_wrong_tip": "One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
         "lpn_wrong_thanks": "Thank you. We got that.",
-        "lpn_find_prop_demand_description": "Demand description",
+        "lpn_find_prop_demand_description": "Demand category description",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
@@ -631,15 +629,15 @@
         "lpn_settings_energy": "Energy",
         "lpn_energy_title": "Pump energy report",
         "lpn_energy_menu": "Pump energy report",
-        "lpn_energy_menu_tip": "What each pump ran, what it drew and what it cost over the last run.",
+        "lpn_energy_menu_tip": "How long each pump ran, what power it drew and what it cost over the last extended period simulation.",
         "lpn_energy_efficiency": "Pump efficiency (percent)",
         "lpn_energy_efficiency_tip": "The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
         "lpn_energy_price": "Price of power",
         "lpn_energy_price_tip": "What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.",
         "lpn_energy_pump_price_tip": "What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.",
-        "lpn_energy_price_pattern": "Price schedule",
-        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price hour by hour, which is how an off peak tariff is written. Leave it empty for one price all day.",
-        "lpn_energy_demand_charge": "Demand charge",
+        "lpn_energy_price_pattern": "Price pattern",
+        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price hour by hour, which is how an off peak rate is written. Leave it empty for one price all day.",
+        "lpn_energy_demand_charge": "Peak demand charge",
         "lpn_energy_demand_charge_tip": "What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.",
         "lpn_energy_currency": "Currency",
         "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.",
@@ -650,8 +648,6 @@
         "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
         "lpn_scncmp_title": "Scenario comparison",
         "lpn_scncmp_menu_tip": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
-        "lpn_scncmp_go": "Compare",
-        "lpn_scncmp_intro": "Press Compare to solve every scenario in this project and read them side by side.",
         "lpn_scncmp_running": "Solving every scenario…",
         "lpn_scncmp_empty": "Nothing has been drawn yet, so there is nothing to solve.",
         "lpn_scncmp_col_minpressure": "Lowest pressure",
@@ -659,7 +655,7 @@
         "lpn_scncmp_at": "{value} at {id}",
         "lpn_scncmp_current": "(open now)",
         "lpn_scncmp_note": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
-        "lpn_energy_over": "Over a run of {time}.",
+        "lpn_energy_over": "Over an extended period simulation of {time}.",
         "lpn_energy_col_pump": "Pump",
         "lpn_energy_col_running": "Running",
         "lpn_energy_col_effic": "Effic.",
@@ -670,8 +666,8 @@
         "lpn_energy_col_cost": "Cost",
         "lpn_energy_total_kwh": "Energy used",
         "lpn_energy_total_energy_cost": "Cost of energy",
-        "lpn_energy_peak_kw": "Highest power drawn at one moment",
-        "lpn_energy_total_demand_charge": "Demand charge",
+        "lpn_energy_peak_kw": "Peak power usage",
+        "lpn_energy_total_demand_charge": "Peak demand charge",
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
         "lpn_energy_curve_note": "These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.",
@@ -1511,38 +1507,6 @@
             }
         },
         "lpn_scncmp_menu_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "La qualità dell'acqua viene seguita lungo le tubazioni nel tempo, quindi richiede il motore EPANET e una durata totale del calcolo. Imposta una Durata totale del calcolo in Tempo, poi premi il pulsante Calcola.",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_scncmp_go": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "La qualità dell'acqua viene seguita lungo le tubazioni nel tempo, quindi richiede il motore EPANET e una durata totale del calcolo. Imposta una Durata totale del calcolo in Tempo, poi premi il pulsante Calcola.",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_scncmp_intro": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

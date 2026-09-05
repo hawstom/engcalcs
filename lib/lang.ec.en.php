@@ -1629,7 +1629,7 @@ $ec_lang['lpn_find_no_value']='Type what to look for.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Connectivity';
-$ec_lang['lpn_find_prop_demand_description']='Demand description';
+$ec_lang['lpn_find_prop_demand_description']='Demand category description';
 // **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
 // points, sources and this node. And I see either no connection (missing link) or no open
 // connection."* Two points x two kinds of break, plus his original local question, is this menu.
@@ -2388,7 +2388,7 @@ $ec_lang_syn['lpn_scenario_base']='Base case, Baseline, Canonical, Source, Root,
 // routed around, and it says ownership without implying difference. Seven languages had already
 // chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
 // pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
-$ec_lang['lpn_scenario_overrides']='Custom values';
+$ec_lang['lpn_scenario_overrides']='No. of custom values';
 // ROADMAP Task 512. The amber ring was designed, correct, and silent: two independent users read it
 // as a stuck highlight they could not turn off. These two strings are the ring's own explanation and
 // the readout's, so neither requires clicking the element to find out what is going on.
@@ -2755,15 +2755,15 @@ $ec_lang['lpn_reaction_note']='This page offers no reaction coefficient of its o
 $ec_lang['lpn_settings_energy']='Energy';
 $ec_lang['lpn_energy_title']='Pump energy report';
 $ec_lang['lpn_energy_menu']='Pump energy report';
-$ec_lang['lpn_energy_menu_tip']='What each pump ran, what it drew and what it cost over the last run.';
+$ec_lang['lpn_energy_menu_tip']='How long each pump ran, what power it drew and what it cost over the last extended period simulation.';
 $ec_lang['lpn_energy_efficiency']='Pump efficiency (percent)';
 $ec_lang['lpn_energy_efficiency_tip']='The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.';
 $ec_lang['lpn_energy_price']='Price of power';
 $ec_lang['lpn_energy_price_tip']='What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.';
 $ec_lang['lpn_energy_pump_price_tip']='What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.';
-$ec_lang['lpn_energy_price_pattern']='Price schedule';
-$ec_lang['lpn_energy_price_pattern_tip']='A pattern that multiplies the price hour by hour, which is how an off peak tariff is written. Leave it empty for one price all day.';
-$ec_lang['lpn_energy_demand_charge']='Demand charge';
+$ec_lang['lpn_energy_price_pattern']='Price pattern';
+$ec_lang['lpn_energy_price_pattern_tip']='A pattern that multiplies the price hour by hour, which is how an off peak rate is written. Leave it empty for one price all day.';
+$ec_lang['lpn_energy_demand_charge']='Peak demand charge';
 $ec_lang['lpn_energy_demand_charge_tip']='What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.';
 $ec_lang['lpn_energy_currency']='Currency';
 $ec_lang['lpn_energy_currency_tip']='Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.';
@@ -2779,8 +2779,6 @@ $ec_lang['lpn_energy_no_pumps']='This network has no pumps, so there is nothing 
 // things in the scenario menu.
 $ec_lang['lpn_scncmp_title']='Scenario comparison';
 $ec_lang['lpn_scncmp_menu_tip']='Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.';
-$ec_lang['lpn_scncmp_go']='Compare';
-$ec_lang['lpn_scncmp_intro']='Press Compare to solve every scenario in this project and read them side by side.';
 $ec_lang['lpn_scncmp_running']='Solving every scenario…';
 $ec_lang['lpn_scncmp_empty']='Nothing has been drawn yet, so there is nothing to solve.';
 $ec_lang['lpn_scncmp_col_minpressure']='Lowest pressure';
@@ -2788,7 +2786,7 @@ $ec_lang['lpn_scncmp_col_maxvelocity']='Highest velocity';
 $ec_lang['lpn_scncmp_at']='{value} at {id}';
 $ec_lang['lpn_scncmp_current']='(open now)';
 $ec_lang['lpn_scncmp_note']='Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.';
-$ec_lang['lpn_energy_over']='Over a run of {time}.';
+$ec_lang['lpn_energy_over']='Over an extended period simulation of {time}.';
 $ec_lang['lpn_energy_col_pump']='Pump';
 $ec_lang['lpn_energy_col_running']='Running';
 $ec_lang['lpn_energy_col_effic']='Effic.';
@@ -2799,8 +2797,8 @@ $ec_lang['lpn_energy_col_kwh']='kWh';
 $ec_lang['lpn_energy_col_cost']='Cost';
 $ec_lang['lpn_energy_total_kwh']='Energy used';
 $ec_lang['lpn_energy_total_energy_cost']='Cost of energy';
-$ec_lang['lpn_energy_peak_kw']='Highest power drawn at one moment';
-$ec_lang['lpn_energy_total_demand_charge']='Demand charge';
+$ec_lang['lpn_energy_peak_kw']='Peak power usage';
+$ec_lang['lpn_energy_total_demand_charge']='Peak demand charge';
 $ec_lang['lpn_energy_total_cost']='Total cost';
 $ec_lang['lpn_energy_no_price']='No price of power is stated, so every cost here is zero. Set one under Settings, Energy.';
 $ec_lang['lpn_energy_curve_note']='These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.';

@@ -923,10 +923,6 @@ echoHeader("EngCalcs", $html_title, "", false);
 	<div id="lpn_scncmp_title" class="lpn-setbox-title"><?=$ec_lang['lpn_scncmp_title']?></div>
 	<button type="button" id="lpn_scncmp_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
-		<?php // The run is a BUTTON and not something the box does on opening: it solves the network
-		      // once per scenario, and a box that starts work merely by being looked at is the one
-		      // shape a reader cannot undo. ?>
-		<p><button type="button" id="lpn_scncmp_go"><?=$ec_lang['lpn_scncmp_go']?></button></p>
 		<div id="lpn_scncmp_report" class="lpn-ff-report"></div>
 	</div>
 </div>
@@ -1546,8 +1542,6 @@ EngCalcs.pageConfig = {
 	lpn_reaction_note: <?=json_encode($ec_lang['lpn_reaction_note'])?>,
 	lpn_scncmp_title: <?=json_encode($ec_lang['lpn_scncmp_title'])?>,
 	lpn_scncmp_menu_tip: <?=json_encode($ec_lang['lpn_scncmp_menu_tip'])?>,
-	lpn_scncmp_go: <?=json_encode($ec_lang['lpn_scncmp_go'])?>,
-	lpn_scncmp_intro: <?=json_encode($ec_lang['lpn_scncmp_intro'])?>,
 	lpn_scncmp_running: <?=json_encode($ec_lang['lpn_scncmp_running'])?>,
 	lpn_scncmp_empty: <?=json_encode($ec_lang['lpn_scncmp_empty'])?>,
 	lpn_scncmp_col_minpressure: <?=json_encode($ec_lang['lpn_scncmp_col_minpressure'])?>,
