@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1621,
-        "delta_key_count": 84,
+        "expected_key_count": 1648,
+        "delta_key_count": 111,
         "exempt_key_count": 36,
         "exempt_keys": [
             "u_imgd",
@@ -525,7 +525,7 @@
         "lpn_wrong_thanks": "Thank you. We got that.",
         "lpn_find_prop_demand_description": "Demand category description",
         "lpn_new_units_tip": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
-        "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
         "lpn_pump_effic_curve": "Efficiency curve",
@@ -533,6 +533,8 @@
         "lpn_pump_effic_col": "Efficiency",
         "lpn_pump_effic_global": "This pump has no efficiency curve, so it runs at the network efficiency of {percent}.",
         "lpn_pump_effic_unstated": "This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}.",
+        "lpn_rule_dangling_note": "These rules name an element that is no longer in this project, so they were left out: {ids}",
+        "lpn_rule_unreadable_note": "These rules could not be read, so they were left out: {ids}",
         "lpn_time_run_report_copy": "Copy",
         "lpn_time_run_report_copied": "Copied",
         "lpn_setbox_divider": "Settings index width",
@@ -542,6 +544,24 @@
         "lpn_quality_initial_tip": "How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty for none.",
         "lpn_result_concentration": "Concentration",
         "lpn_result_concentration_tip": "How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.",
+        "lpn_source_type": "Source type",
+        "lpn_source_type_tip": "What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the strength below. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the water leaving this node to the strength below and no further. Flow paced booster adds the strength below to whatever is already in the water.",
+        "lpn_source_type_concen": "Concentration",
+        "lpn_source_type_mass": "Mass booster",
+        "lpn_source_type_setpoint": "Setpoint booster",
+        "lpn_source_type_flowpaced": "Flow paced booster",
+        "lpn_source_quality": "Source quality",
+        "lpn_source_quality_tip": "How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.",
+        "lpn_source_pattern": "Source pattern",
+        "lpn_source_pattern_tip": "A time pattern that scales the dose through the day, for a feed that does not run flat out around the clock. Leave it on No pattern and the dose is the same at every hour.",
+        "lpn_mixing_model": "Mixing model",
+        "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
+        "lpn_mixing_mixed": "Complete mixing",
+        "lpn_mixing_2comp": "Two compartment mixing",
+        "lpn_mixing_fifo": "FIFO plug flow",
+        "lpn_mixing_lifo": "LIFO plug flow",
+        "lpn_mixing_fraction": "Mixing fraction",
+        "lpn_mixing_fraction_tip": "The share of the tank volume that the inlet zone takes up, between 0 and 1. Only two compartment mixing uses it. Leave it empty and the whole tank is the inlet zone, which is what EPANET assumes.",
         "lpn_reaction_bulk": "Bulk reaction coefficient",
         "lpn_reaction_bulk_tip": "Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one grows it. First order unless the file says otherwise, so the coefficient is a rate in 1\/day. An empty box means no bulk reaction.",
         "lpn_reaction_wall": "Wall reaction coefficient",
@@ -603,6 +623,13 @@
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
         "lpn_energy_curve_note": "These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.",
+        "lpn_library_rules": "Rules",
+        "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.",
+        "lpn_library_rule_add": "Add a rule",
+        "lpn_library_rule_tip": "One rule, in the words EPANET uses, one clause per line. A first line names it: RULE 1. Then a condition: IF TANK 2 LEVEL BELOW 17.1. Then what to do about it: THEN PUMP 9 STATUS IS OPEN. A last line may rank it: PRIORITY 1. Add AND or OR lines to test more than one thing, and ELSE lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Write the numbers in the units this project is showing; they are converted for you. Leave the keywords in English; they are what the page and EPANET read.",
+        "lpn_library_rule_ok": "✓ Understood",
+        "lpn_library_rule_bad": "⚠ Not understood",
+        "lpn_library_rule_missing": "⚠ This network has nothing called {id}",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "keys": {
@@ -611,7 +638,7 @@
         "lpn_wrong_thanks": "Thank you. We got that.",
         "lpn_find_prop_demand_description": "Demand category description",
         "lpn_new_units_tip": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
-        "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
+        "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
         "lpn_pump_effic_curve": "Efficiency curve",
@@ -619,6 +646,8 @@
         "lpn_pump_effic_col": "Efficiency",
         "lpn_pump_effic_global": "This pump has no efficiency curve, so it runs at the network efficiency of {percent}.",
         "lpn_pump_effic_unstated": "This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}.",
+        "lpn_rule_dangling_note": "These rules name an element that is no longer in this project, so they were left out: {ids}",
+        "lpn_rule_unreadable_note": "These rules could not be read, so they were left out: {ids}",
         "lpn_time_run_report_copy": "Copy",
         "lpn_time_run_report_copied": "Copied",
         "lpn_setbox_divider": "Settings index width",
@@ -628,6 +657,24 @@
         "lpn_quality_initial_tip": "How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty for none.",
         "lpn_result_concentration": "Concentration",
         "lpn_result_concentration_tip": "How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.",
+        "lpn_source_type": "Source type",
+        "lpn_source_type_tip": "What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the strength below. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the water leaving this node to the strength below and no further. Flow paced booster adds the strength below to whatever is already in the water.",
+        "lpn_source_type_concen": "Concentration",
+        "lpn_source_type_mass": "Mass booster",
+        "lpn_source_type_setpoint": "Setpoint booster",
+        "lpn_source_type_flowpaced": "Flow paced booster",
+        "lpn_source_quality": "Source quality",
+        "lpn_source_quality_tip": "How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.",
+        "lpn_source_pattern": "Source pattern",
+        "lpn_source_pattern_tip": "A time pattern that scales the dose through the day, for a feed that does not run flat out around the clock. Leave it on No pattern and the dose is the same at every hour.",
+        "lpn_mixing_model": "Mixing model",
+        "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
+        "lpn_mixing_mixed": "Complete mixing",
+        "lpn_mixing_2comp": "Two compartment mixing",
+        "lpn_mixing_fifo": "FIFO plug flow",
+        "lpn_mixing_lifo": "LIFO plug flow",
+        "lpn_mixing_fraction": "Mixing fraction",
+        "lpn_mixing_fraction_tip": "The share of the tank volume that the inlet zone takes up, between 0 and 1. Only two compartment mixing uses it. Leave it empty and the whole tank is the inlet zone, which is what EPANET assumes.",
         "lpn_reaction_bulk": "Bulk reaction coefficient",
         "lpn_reaction_bulk_tip": "Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one grows it. First order unless the file says otherwise, so the coefficient is a rate in 1\/day. An empty box means no bulk reaction.",
         "lpn_reaction_wall": "Wall reaction coefficient",
@@ -689,6 +736,13 @@
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
         "lpn_energy_curve_note": "These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.",
+        "lpn_library_rules": "Rules",
+        "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.",
+        "lpn_library_rule_add": "Add a rule",
+        "lpn_library_rule_tip": "One rule, in the words EPANET uses, one clause per line. A first line names it: RULE 1. Then a condition: IF TANK 2 LEVEL BELOW 17.1. Then what to do about it: THEN PUMP 9 STATUS IS OPEN. A last line may rank it: PRIORITY 1. Add AND or OR lines to test more than one thing, and ELSE lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Write the numbers in the units this project is showing; they are converted for you. Leave the keywords in English; they are what the page and EPANET read.",
+        "lpn_library_rule_ok": "✓ Understood",
+        "lpn_library_rule_bad": "⚠ Not understood",
+        "lpn_library_rule_missing": "⚠ This network has nothing called {id}",
         "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
     },
     "key_context": {
@@ -900,6 +954,38 @@
                 }
             }
         },
+        "lpn_rule_dangling_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_control_unreadable_note",
+                    "value": "Kendali-kendali ini tidak dapat dibaca, sehingga tidak disertakan: {ids}",
+                    "english": "These controls could not be read, so they were left out: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "Catatan: dengan penyelesai EPANET, kehilangan lokal (minor) muncul sedikit lebih rendah daripada dengan penyelesai bawaan, karena EPANET membulatkan nilai gravitasi yang digunakannya.",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
+        "lpn_rule_unreadable_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_control_unreadable_note",
+                    "value": "Kendali-kendali ini tidak dapat dibaca, sehingga tidak disertakan: {ids}",
+                    "english": "These controls could not be read, so they were left out: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_minor_loss_note",
+                    "value": "Catatan: dengan penyelesai EPANET, kehilangan lokal (minor) muncul sedikit lebih rendah daripada dengan penyelesai bawaan, karena EPANET membulatkan nilai gravitasi yang digunakannya.",
+                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
+                }
+            }
+        },
         "lpn_time_run_report_copy": {
             "reason": "missing",
             "current_value": null,
@@ -1029,6 +1115,294 @@
             }
         },
         "lpn_result_concentration_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_source_type": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_source_type_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_source_type_concen": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_source_type_mass": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_source_type_setpoint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_source_type_flowpaced": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_source_quality": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_source_quality_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_source_pattern": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_source_pattern_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_mixing_model": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_mixing_model_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_mixing_mixed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_mixing_2comp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_mixing_fifo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_mixing_lifo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_mixing_fraction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "Kualitas air dibawa sepanjang pipa seiring waktu, sehingga memerlukan penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_mixing_fraction_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2017,6 +2391,118 @@
                     "key": "lpn_labels_col_decimals_example",
                     "value": "0,000",
                     "english": "0.000"
+                }
+            }
+        },
+        "lpn_library_rules": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_control_missing",
+                    "value": "⚠ Jaringan ini tidak memiliki apa pun bernama {id}",
+                    "english": "⚠ This network has nothing called {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_field_base_demand",
+                    "value": "Kebutuhan dasar",
+                    "english": "Base demand"
+                }
+            }
+        },
+        "lpn_library_rules_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_control_missing",
+                    "value": "⚠ Jaringan ini tidak memiliki apa pun bernama {id}",
+                    "english": "⚠ This network has nothing called {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_field_base_demand",
+                    "value": "Kebutuhan dasar",
+                    "english": "Base demand"
+                }
+            }
+        },
+        "lpn_library_rule_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_control_missing",
+                    "value": "⚠ Jaringan ini tidak memiliki apa pun bernama {id}",
+                    "english": "⚠ This network has nothing called {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_field_base_demand",
+                    "value": "Kebutuhan dasar",
+                    "english": "Base demand"
+                }
+            }
+        },
+        "lpn_library_rule_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_control_missing",
+                    "value": "⚠ Jaringan ini tidak memiliki apa pun bernama {id}",
+                    "english": "⚠ This network has nothing called {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_field_base_demand",
+                    "value": "Kebutuhan dasar",
+                    "english": "Base demand"
+                }
+            }
+        },
+        "lpn_library_rule_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_control_missing",
+                    "value": "⚠ Jaringan ini tidak memiliki apa pun bernama {id}",
+                    "english": "⚠ This network has nothing called {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_field_base_demand",
+                    "value": "Kebutuhan dasar",
+                    "english": "Base demand"
+                }
+            }
+        },
+        "lpn_library_rule_bad": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_control_missing",
+                    "value": "⚠ Jaringan ini tidak memiliki apa pun bernama {id}",
+                    "english": "⚠ This network has nothing called {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_field_base_demand",
+                    "value": "Kebutuhan dasar",
+                    "english": "Base demand"
+                }
+            }
+        },
+        "lpn_library_rule_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_control_missing",
+                    "value": "⚠ Jaringan ini tidak memiliki apa pun bernama {id}",
+                    "english": "⚠ This network has nothing called {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_field_base_demand",
+                    "value": "Kebutuhan dasar",
+                    "english": "Base demand"
                 }
             }
         },

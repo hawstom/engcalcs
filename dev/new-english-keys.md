@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**24 still to read**, of 102 untranslated keys, of 1639 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**33 still to read**, of 111 untranslated keys, of 1648 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (102, 24 to read @@ NEEDS RULING)
+## lpn_  (111, 33 to read @@ NEEDS RULING)
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
@@ -140,6 +140,27 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_inp_drop_sources_mixing`**
   > This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.
   @@ NEEDS RULING
+- **`lpn_library_rule_add`**
+  > Add a rule
+  @@ NEEDS RULING
+- **`lpn_library_rule_bad`**
+  > ⚠ Not understood
+  @@ NEEDS RULING
+- **`lpn_library_rule_missing`**
+  > ⚠ This network has nothing called {id}
+  @@ NEEDS RULING
+- **`lpn_library_rule_ok`**
+  > ✓ Understood
+  @@ NEEDS RULING
+- **`lpn_library_rule_tip`**
+  > One rule, in the words EPANET uses, one clause per line. A first line names it: RULE 1. Then a condition: IF TANK 2 LEVEL BELOW 17.1. Then what to do about it: THEN PUMP 9 STATUS IS OPEN. A last line may rank it: PRIORITY 1. Add AND or OR lines to test more than one thing, and ELSE lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Write the numbers in the units this project is showing; they are converted for you. Leave the keywords in English; they are what the page and EPANET read.
+  @@ NEEDS RULING
+- **`lpn_library_rules`**
+  > Rules
+  @@ NEEDS RULING
+- **`lpn_library_rules_tip`**
+  > A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.
+  @@ NEEDS RULING
 - **`lpn_mixing_2comp`**
   > Two compartment mixing
   @@ NEEDS RULING
@@ -251,6 +272,12 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_result_concentration_tip`**
   > How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.
   _Ruled OK 2026-09-04._
+- **`lpn_rule_dangling_note`**
+  > These rules name an element that is no longer in this project, so they were left out: {ids}
+  @@ NEEDS RULING
+- **`lpn_rule_unreadable_note`**
+  > These rules could not be read, so they were left out: {ids}
+  @@ NEEDS RULING
 - **`lpn_scncmp_at`**
   > {value} at {id}
   _Ruled OK 2026-09-04._
