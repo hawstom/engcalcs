@@ -43,7 +43,7 @@ const L = loadLoopedNetwork(
 	"\t\taddNode: addNode, addLink: addLink, effective: effective, setProp: setProp,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tassembleModel: assembleModel, docEnergy: docEnergy,\n" +
-	"\t\treadEnergySection: readEnergySection,\n" +
+	"\t\treadEnergySection: readEnergySection, readEfficCurves: readEfficCurves,\n" +
 	"\t\trebuildSettingsFields: rebuildSettingsFields,\n" +
 	"\t\trebuildEnergyReport: rebuildEnergyReport, openEnergyBox: openEnergyBox,\n" +
 	"\t\tserializeProject: serializeProject,\n" +
@@ -369,8 +369,18 @@ const EngCalcs = global.EngCalcs;
 	check(s2.energy.globalEfficiency === 75, 'the global lands on the setting');
 	check(links2[0]._energyPrice === 0.04 && links2[1]._energyPattern === 'NIGHT',
 		'a per-pump price and schedule land on the pumps, in Base');
-	check(s2.energy.effic['10'] === 'E1',
-		'and the efficiency CURVE stays on the setting, having no control on this page');
+	// **AND THE CURVE MOVES ONTO THE PUMP** (Task 585). `settings.energy.effic` is a staging post:
+	// the `[ENERGY]` reader fills it because that is where the names are parsed, and the second read
+	// -- under its OWN guard, `settings.efficCurves` -- puts the name and the points on the link and
+	// empties it. Two homes for one curve is a disagreement waiting for the first edit.
+	check(s2.energy.effic['10'] === 'E1', 'the [ENERGY] read parses the curve name');
+	L.readEfficCurves({ CURVES: [' E1  200  40', ' E1  500  70', ' E1  800  55'] }, s2, links2);
+	check(links2[0].efficCurveId === 'E1' && (links2[0].efficPoints || []).length === 3,
+		`and the curve lands on the pump, name and points: ${JSON.stringify(links2[0].efficPoints)}`);
+	check(links2[0].efficPoints[1][0] === 500,
+		'in the project\'s own flow unit, unconverted, so the popup prints the file\'s own token');
+	check(!s2.energy.effic['10'] && s2.efficCurves === 1,
+		'the staging map is emptied and the read has its own record');
 	const empty = {};
 	L.readEnergySection({}, empty, []);
 	check(!!empty.energy, 'a file stating no [ENERGY] still gets the record, which is what tells the exporter the section has been read');
@@ -430,15 +440,20 @@ const EngCalcs = global.EngCalcs;
 	// nothing on screen looks wrong, so the two unit sets are checked against hand-computed numbers
 	// and not against each other: 500 gpm is 500 / 15850.323141488905, and 500 L/s is 0.5, and no
 	// single factor can satisfy both.
+	// **THE CURVE IS ON THE PUMP SINCE TASK 585**, in the project's own flow unit, so this is where
+	// the crossing to m3/s has to happen and this is what asserts it.
 	const docW = L.getDoc();
-	docW.inpSections = { CURVES: [' E1  200  40', ' E1  500  70', ' E1  800  55',
-		' OTHER  1  2'] };
-	L.getSettings().energy = { globalEfficiency: 75, effic: { '10': 'E1' } };
+	docW.inpSections = {};
+	L.getSettings().energy = { globalEfficiency: 75, effic: {} };
+	L.getSettings().efficCurves = 1;
+	const wPump = (docW.links || []).filter(function (l) { return l.type === 'pump'; })[0];
+	wPump.efficCurveId = 'E1';
+	wPump.efficPoints = [[200, 40], [500, 70], [800, 55]];
 
 	setUnitSet('us');
 	const wUs = L.docEnergy().efficCurves || {};
 	check(!!wUs.E1 && wUs.E1.length === 3,
-		`the named curve's three points arrive on the model (${(wUs.E1 || []).length})`);
+		`the pump's three points arrive on the model (${(wUs.E1 || []).length})`);
 	check(Math.abs(wUs.E1[1][0] - 500 / 15850.323141488905) < 1e-12,
 		`500 gpm crosses to m3/s: ${wUs.E1 && wUs.E1[1][0]}`);
 	check(wUs.E1[1][1] === 70, 'and the efficiency is a percent, so it is carried untouched');
@@ -451,9 +466,14 @@ const EngCalcs = global.EngCalcs;
 		'the two unit sets genuinely disagree, so a hard-coded factor could not pass both');
 	setUnitSet('us');
 
-	// A curve nothing names still travels: the model carries what the file had, and `lpnToInp`
-	// writes only the ones an EFFIC row asks for. Cheaper than teaching this seam which is which.
-	check(!!wUs.OTHER, 'a curve no pump names is on the model too, and the writer is what selects');
+	// **AND ONLY THE CURVES PUMPS ACTUALLY CARRY.** Before Task 585 this seam handed over every
+	// curve the carried text held and let `lpnToInp` select by EFFIC row; the points live on the
+	// pumps now, so a curve nothing carries has nothing to arrive from. `lpnEfficCurveMap()` is
+	// what pairs each pump with its name, which is why the two answers cannot drift apart.
+	const wRec = L.docEnergy();
+	check(wRec.effic && wRec.effic[wPump.id] === 'E1',
+		`the EFFIC row is composed from the pump: ${JSON.stringify(wRec.effic)}`);
+	check(Object.keys(wUs).length === 1, 'and nothing else is on the model');
 
 	console.log('\n' + (failures ? failures + ' FAILURES' : 'all checks passed'));
 	process.exit(failures ? 1 : 0);

@@ -36,9 +36,25 @@ require(ROOT + 'js/lpn-inp.js');
 // does, and without a duration an energy figure is 0 kW at 0% and every assertion on it is vacuous.
 require(ROOT + 'js/lpn-time.js');
 
+// The import door and the save door, for sections 8 to 10: an efficiency curve is EDITABLE since
+// Task 585, so the questions are no longer only "did the file's number reach the engine" but "does
+// an edited one reach it", "is it written back", and "does it survive a save". A FileReader stub is
+// what lets importInpFromFile() be driven, exactly as tags-harness.js drives it.
+global.FileReader = function () {
+	this.readAsArrayBuffer = function (file) {
+		const bytes = new TextEncoder().encode(file._text);
+		this.result = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+		if (this.onload) { this.onload({ target: { result: this.result } }); }
+	};
+};
+global.alert = global.window.alert = function () { };
+
 const L = loadLoopedNetwork(
 	"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections,\n" +
 	"\t\tapplyUnitSelections: applyUnitSelections, seedDefaultInputs: seedDefaultInputs,\n" +
+	"\t\timportInp: importInpFromFile, linkById: linkById, getSettings: function () { return settings; },\n" +
+	"\t\tserialize: serializeProject, migrateSaved: migrateSaved, applySaved: applySaved,\n" +
+	"\t\texportInp: function () { return EngCalcs.lpnExportInp(serializeProject(), { effective: effective }); },\n" +
 	// Section 6 drives the page's own chain rather than a model this file built, so it needs the
 	// three seams that chain actually runs through: the document, the settings behind it, and the
 	// bridge that turns them into what lpnToInp() writes.
@@ -363,65 +379,186 @@ const FIXTURE = [
 	}
 
 	// =========================================================================================
-	head('7. AND THE PUMP\'S OWN POPUP SAYS SO (Tom, 2026-09-05)');
+	head('7. THE PUMP\'S OWN POPUP, AND IT IS A CONTROL NOW (Tom, 2026-09-05: "Proceed")');
 	// =========================================================================================
-	// *"The pump has no efficiency of its own, and I don't see an interface for that."* It reached
-	// the engine and the energy report and reached no pump. Read-only for now, so what is asserted
-	// is that the curve is NAMED and its points are ON SCREEN in the file's own unit.
+	// *"The pump has no efficiency of its own, and I don't see an interface for that."* Phase one
+	// put it on screen; Task 585 makes it editable, and the curve lives on the PUMP -- `efficPoints`
+	// in the project's own flow unit and `efficCurveId` for what the file calls it, which is the
+	// head curve's own shape rather than a document-level curve library this page has never had.
 	L.renderLinkFields('P1');
 	const popup = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
 	check(/E1/.test(popup), `the popup names the curve: ${popup.replace(/\s+/g, ' ').slice(-260)}`);
+	check(!!(L.getDoc().links[0].efficPoints || []).length,
+		`and the points are ON THE PUMP, not on the setting: ${JSON.stringify(L.getDoc().links[0].efficPoints)}`);
+	check(!((L.getSettings().energy || {}).effic || {}).P1,
+		'the staging map on settings.energy is emptied, so there is one home for the name');
 	// **THE EXACT TOKEN, NOT A ROUND TRIP.** Reading the points back out of docEnergy()'s m3/s and
 	// converting them for display printed 951.0194000000001 for a file that says 951.0194 -- the
-	// user's own number, rewritten on a screen. Asserted CELL BY CELL rather than on the popup's
-	// textContent, because adjacent cells concatenate there and `634.0129` followed by `70` reads as
-	// `634.012970`, which no boundary can tell from a rewritten number.
+	// user's own number, rewritten on a screen. The points are stored in the project's own flow
+	// unit for exactly that reason, so what is asserted is the INPUT VALUES cell by cell: the boxes
+	// are the control now, and a `textContent` walk would read them all as empty.
 	// Walked rather than selected: the DOM stub's querySelectorAll() returns [] for everything, and
 	// teaching it a selector engine to satisfy one assertion is the stub-that-removes-the-coupling
 	// trap dev/testing-notes.md warns about. `lpn-effic-table` is what tells this table from the
 	// head curve's, which is why the renderer gives it a class of its own.
-	function cellsUnder(node, cls, out) {
+	function under(node, cls, out) {
 		var kids = (node && node.children) || [], i;
 		for (i = 0; i < kids.length; i++) {
-			if (String(kids[i].className || '').indexOf(cls) >= 0) { collectTd(kids[i], out); }
-			else { cellsUnder(kids[i], cls, out); }
+			if (String(kids[i].className || '').indexOf(cls) >= 0) { collectInputs(kids[i], out); }
+			else { under(kids[i], cls, out); }
 		}
 		return out;
 	}
-	function collectTd(node, out) {
+	function collectInputs(node, out) {
 		var kids = (node && node.children) || [], i;
 		for (i = 0; i < kids.length; i++) {
-			if (String(kids[i].tagName || '').toLowerCase() === 'td') { out.push(kids[i].textContent); }
-			collectTd(kids[i], out);
+			if (String(kids[i]._tag || '').toLowerCase() === 'input') { out.push(kids[i]); }
+			collectInputs(kids[i], out);
 		}
 		return out;
 	}
-	const efficCells = cellsUnder(document.getElementById('lpn_popup_fields'), 'lpn-effic-table', []);
-	check(efficCells.join('|') === '317.0065|40|634.0129|70|951.0194|55',
-		`and prints the file's own gpm tokens, unconverted: ${efficCells.join('|')}`);
-	check(!/network efficiency/.test(popup),
-		'and does not claim the pump falls back to the network efficiency, because it does not');
+	function efficInputs() { return under(document.getElementById('lpn_popup_fields'), 'lpn-effic-table', []); }
+	const boxes = efficInputs();
+	check(boxes.map((b) => b.value).join('|') === '317.0065|40|634.0129|70|951.0194|55||',
+		`the boxes hold the file's own gpm tokens, unconverted, plus one blank row: ${boxes.map((b) => b.value).join('|')}`);
+	// **THE BLANK ROW IS HOW A CURVE GROWS AND HOW AN EMPTY ONE STARTS.** Three points and eight
+	// boxes: six filled and a pair waiting. The head curve's table offers exactly three rows because
+	// this page FITS from at most three points; EPANET reads an efficiency curve directly, so
+	// truncating an imported five-point one would be rewriting numbers that are the user's.
+	check(boxes.length === 8, `three points and one blank row: ${boxes.length} boxes`);
 
 	// **THE THIRD STATE IS THE ONE WORTH GETTING RIGHT.** "This pump has no curve" and "this pump
 	// names a curve its file never stated" reach the same arithmetic -- the global efficiency -- by
-	// different roads, and only the second is something the reader can act on. A single sentence
-	// covering both would hide a real defect in the file behind a normal-looking one.
-	const noCurveDoc = L.getDoc();
-	delete noCurveDoc.settings.energy.effic.P1;
-	L.setSettings(noCurveDoc.settings);
+	// different roads, and only the second is something the reader can act on. Both now also get
+	// the table, because the answer to either is to type the points.
+	const chainPump = L.getDoc().links[0];
+	const keptPts = chainPump.efficPoints, keptName = chainPump.efficCurveId;
+	delete chainPump.efficPoints; delete chainPump.efficCurveId;
 	L.renderLinkFields('P1');
 	const noneText = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
 	check(/no efficiency curve/.test(noneText) && /75%/.test(noneText),
 		`with no curve at all it names the network efficiency and its number: ${/no efficiency curve[^]{0,70}/.exec(noneText)}`);
-	check(cellsUnder(document.getElementById('lpn_popup_fields'), 'lpn-effic-table', []).length === 0,
-		'and prints no point table, because there are no points');
+	check(efficInputs().length === 2,
+		`and still offers one blank row to type one into: ${efficInputs().length} boxes`);
 
-	noCurveDoc.settings.energy.effic.P1 = 'GHOST';
-	L.setSettings(noCurveDoc.settings);
+	chainPump.efficCurveId = 'GHOST';
 	L.renderLinkFields('P1');
 	const ghostText = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
 	check(/GHOST/.test(ghostText) && /does not state/.test(ghostText),
 		`a curve named but not stated is disclosed by name: ${/This pump names[^]{0,110}/.exec(ghostText)}`);
+	chainPump.efficCurveId = keptName; chainPump.efficPoints = keptPts;
+
+	// =========================================================================================
+	head('8. AN EDITED CURVE IS COMPOSED, REACHES THE ENGINE, AND MOVES THE ANSWER');
+	// =========================================================================================
+	// Driven through the page's own doors, on section 6's lesson: import the file, edit the box a
+	// person would click, export, and run. Nothing in this section is a model this file assembled.
+	L.importInp({ name: 'chain.inp', _text: CHAIN });
+	const pumpIn = L.linkById('P1');
+	check(!!(pumpIn.efficPoints || []).length,
+		`the imported pump carries its curve: ${JSON.stringify(pumpIn.efficPoints)}`);
+	const clean = L.exportInp();
+	check(clean.ok && /^ E1\t951\.0194\t55$/m.test(clean.inp),
+		'and an untouched export still states the file\'s own last point');
+
+	// **EDITED IN THE BOX, NOT IN THE MODEL.** The last point's efficiency goes from 55 to 35.
+	// 50 L/s is still half way along the 40-to-60 leg, so the answer becomes (70 + 35) / 2 = 52.5%,
+	// which is not the unedited 62.5, not the global 75, and not the 40 a lost flow conversion pins
+	// it at. Four distinguishable numbers.
+	L.renderLinkFields('P1');
+	const editBoxes = efficInputs();
+	editBoxes[5].value = '35';
+	(editBoxes[5]._listeners.change || []).forEach((f) => f());
+	check(JSON.stringify(L.linkById('P1').efficPoints) === '[[317.0065,40],[634.0129,70],[951.0194,35]]',
+		`the edit lands on the pump in the project's own unit: ${JSON.stringify(L.linkById('P1').efficPoints)}`);
+	const edited = L.exportInp();
+	check(edited.ok && /^ E1\t951\.0194\t35$/m.test(edited.inp),
+		`the exported [CURVES] states the edited point: ${(edited.inp.match(/^ E1[^\n]*/gm) || []).join(' / ')}`);
+	// **AND THE TWO POINTS NOBODY TOUCHED STILL READ AS THEIR OWN TOKENS.** Composing a section is
+	// where a 951.0194000000001 would appear if the points had gone round through m3/s.
+	check(/^ E1\t317\.0065\t40$/m.test(edited.inp) && /^ E1\t634\.0129\t70$/m.test(edited.inp),
+		'and the untouched points are still the file\'s own numbers, character for character');
+	check((edited.inp.match(/^\[CURVES\]$/gm) || []).length === 1, '[CURVES] is still written once');
+	check(/ PUMP\s+P1\s+EFFIC\s+E1/.test(edited.inp),
+		'and the [ENERGY] row still names the curve the section defines');
+
+	const editedModel = L.assembleModel();
+	editedModel.time = EngCalcs.lpnTimeModelBlock(L.getDoc(), L.toSI);
+	const editedRun = await EngCalcs.lpnEpanetRun(editedModel, { sliceMs: 100000 });
+	check(editedRun.ok && !!editedRun.energy, `the edited network ran: ${JSON.stringify(editedRun.error || '')}`);
+	if (editedRun.ok && editedRun.energy) {
+		const er = editedRun.energy.pumps[0];
+		check(Math.abs(er.avgEfficiency * 100 - 52.5) < 0.05,
+			`and the engine reports the EDITED curve's 52.5%: ${(er.avgEfficiency * 100).toFixed(4)}%`);
+		check(Math.abs(er.avgEfficiency * 100 - 62.5) > 1 && Math.abs(er.avgEfficiency * 100 - 75) > 1
+			&& Math.abs(er.avgEfficiency * 100 - 40) > 1,
+			'which is none of the unedited 62.5, the global 75, or the 40 a lost conversion gives');
+	}
+
+	// =========================================================================================
+	head('9. A CURVE ON A PUMP THAT NEVER HAD ONE, which is the half phase one could not answer');
+	// =========================================================================================
+	// *"The pump has no efficiency of its own"* is also true of every pump drawn on this page. The
+	// same file with its [ENERGY] EFFIC row and its E1 lines removed: nothing to carry, nothing to
+	// edit, and a user typing three points into an empty table.
+	const BARE = CHAIN.split('\n').filter((ln) => !/^\s*E1\b/.test(ln) && !/EFFIC/.test(ln)).join('\n');
+	L.importInp({ name: 'bare.inp', _text: BARE });
+	check(!L.linkById('P1').efficPoints && !L.linkById('P1').efficCurveId,
+		'the pump opens with no curve of its own');
+	L.renderLinkFields('P1');
+	[['317.0065', '40'], ['634.0129', '70'], ['951.0194', '35']].forEach(function (pt) {
+		const b = efficInputs();
+		b[b.length - 2].value = pt[0];
+		b[b.length - 1].value = pt[1];
+		(b[b.length - 1]._listeners.change || []).forEach((f) => f());
+		L.renderLinkFields('P1');
+	});
+	check(JSON.stringify(L.linkById('P1').efficPoints) === '[[317.0065,40],[634.0129,70],[951.0194,35]]',
+		`three points typed into an empty table: ${JSON.stringify(L.linkById('P1').efficPoints)}`);
+	// **THE CURVE GETS A NAME THE MOMENT IT GETS A POINT**, because an [ENERGY] row naming a curve
+	// no [CURVES] section defines is an input EPANET refuses -- the very defect Task 582 closed.
+	check(L.linkById('P1').efficCurveId === 'E_P1',
+		`and a name of its own, after the pump: ${L.linkById('P1').efficCurveId}`);
+	const madeUp = L.exportInp();
+	check(madeUp.ok && /^ E_P1\t317\.0065\t40$/m.test(madeUp.inp)
+		&& /^ E_P1\t951\.0194\t35$/m.test(madeUp.inp),
+		`the export writes the curve: ${(madeUp.inp.match(/^ E_P1[^\n]*/gm) || []).join(' / ')}`);
+	check(madeUp.ok && /PUMP\s+P1\s+EFFIC\s+E_P1/.test(madeUp.inp),
+		'and the [ENERGY] row that names it, so the file EPANET reads is one it accepts');
+	const madeModel = L.assembleModel();
+	madeModel.time = EngCalcs.lpnTimeModelBlock(L.getDoc(), L.toSI);
+	const madeRun = await EngCalcs.lpnEpanetRun(madeModel, { sliceMs: 100000 });
+	check(madeRun.ok && madeRun.energy
+		&& Math.abs(madeRun.energy.pumps[0].avgEfficiency * 100 - 52.5) < 0.05,
+		`and a curve nobody's file ever stated reaches the engine: ${madeRun.energy
+			? (madeRun.energy.pumps[0].avgEfficiency * 100).toFixed(4) + '%' : JSON.stringify(madeRun.error)}`);
+
+	// =========================================================================================
+	head('10. SAVE AND REOPEN, and the guard that is the reason this read is its own');
+	// =========================================================================================
+	const saved = JSON.parse(JSON.stringify(L.serialize()));
+	L.applySaved(L.migrateSaved(saved));
+	check(JSON.stringify(L.linkById('P1').efficPoints) === '[[317.0065,40],[634.0129,70],[951.0194,35]]',
+		`a saved and reopened project keeps the curve: ${JSON.stringify(L.linkById('P1').efficPoints)}`);
+	check(L.linkById('P1').efficCurveId === 'E_P1', 'and what it is called');
+	// **THE DOCUMENT THIS GUARD EXISTS FOR.** Saved between Task 582 and Task 585: it carries
+	// `settings.energy` with the name still on it, the curve's own lines on `inpSections.CURVES`,
+	// and nothing on any pump. A read nested inside the `!settings.energy` test walks straight past
+	// it -- which is the trap [TAGS] hit the day it landed after [SOURCES] -- and every such project
+	// would open with a pump running at the global efficiency and no way to see why.
+	const legacy = JSON.parse(JSON.stringify(saved));
+	delete legacy.settings.efficCurves;
+	legacy.settings.energy = { globalEfficiency: 75, effic: { P1: 'E1' } };
+	(legacy.links || []).forEach(function (l) { delete l.efficPoints; delete l.efficCurveId; });
+	legacy.inpSections = Object.assign({}, legacy.inpSections, {
+		CURVES: [' E1\t317.0065\t40', ' E1\t634.0129\t70', ' E1\t951.0194\t55']
+	});
+	L.applySaved(L.migrateSaved(legacy));
+	check(JSON.stringify(L.linkById('P1').efficPoints) === '[[317.0065,40],[634.0129,70],[951.0194,55]]',
+		`a project saved between the two tasks gains its curve on open: ${JSON.stringify(L.linkById('P1').efficPoints)}`);
+	check(L.linkById('P1').efficCurveId === 'E1', 'under the name its own file gave it');
+	check(!((L.getSettings().energy || {}).effic || {}).P1,
+		'and the staging map is emptied, so nothing can later disagree with the pump');
 
 	console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All checks passed.'));
 	process.exit(failures ? 1 : 0);
