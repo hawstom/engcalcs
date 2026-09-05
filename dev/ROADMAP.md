@@ -117,6 +117,39 @@ the block.
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
 
+- 75|583| **What this page calls the extended-period simulation, audited and costed.**
+  Tom, 2026-09-04, ruling on `lpn_energy_over`: *"Use 'extended period simulation' and audit the page
+  for this terminology standardization Time Simulation in all its real variants becomes EPS or
+  extended etc."* The string he ruled on is changed; the audit is `dev/eps-terminology-audit.md` and
+  the decision is his.
+  - **58 strings match and only 20 of them are the thing.** 21 are ordinary English ("run out of
+    room", "a search is already running") and 13 are FIRE FLOW's own runs, which are N steady-state
+    solves and would be made false by the rename.
+  - **The sweep is 442 retranslations and would lapse six of his own rulings from that morning**, a
+    ruling being keyed on the exact English it was made on. The audit recommends a RATCHET on new
+    writing plus two cheap front-door exceptions at 208 retranslations, and names them.
+
+- 75|582| **Pump efficiency curves: the one energy number we still take on faith.**
+  Tom, 2026-09-04, reading `lpn_energy_curve_note`: *"Why aren't we implementing this instead of
+  shipping without it?"* Fair, and the note is a disclosure rather than an excuse. What it discloses:
+  a file may state `PUMP <id> EFFIC <curve>`, and such a pump runs here at the network's global
+  efficiency instead, so its kW, its kWh and its cost are all wrong by the ratio of the two.
+  - **THE BLOCKER IS ONE LINE AND IT IS NOT A SHRUG.** `js/lpn-epanet.js` writes `[CURVES]` from the
+    pump HEAD curves the document holds, and nothing else; naming a curve that is not in the file is
+    how EPANET rejects a network it would otherwise solve. So the row is deliberately not written.
+  - **AND THE POINTS ARE NOT KEPT.** `js/lpn-inp.js` parses `[CURVES]` into a LOCAL map used only to
+    resolve a pump's head curve. `CURVES` is in `INP_SECTIONS_READ`, so it is not carried verbatim
+    either — an efficiency curve is read and then dropped on the floor.
+  - **THE SHAPE OF THE FIX, in the order the risk rises:** keep the named efficiency curve on the
+    document; emit it into the engine input's `[CURVES]` and write the `EFFIC` row; write it back in
+    `lpnToInp`; then the report needs NO change at all, because it already reads EPANET's own
+    `EN_PUMP_EFFIC` per step.
+  - **THE TRAP IS THE FLOW AXIS.** A curve's abscissa is a flow in the FILE's unit and the engine
+    input is always LPS; getting that wrong moves the money and nothing on screen looks wrong.
+  - **NO REFERENCE NETWORK EXERCISES THIS** — Net1/2/3 state no efficiency curve — so the anchor has
+    to be synthetic plus a byte-identical round trip, and this touches money and `.inp` fidelity at
+    once, which is CLAUDE.md's own description of when to spend a `/code-review`.
+
 - 75|579| **The four EPANET sections still carried and not understood, extracted from 566.**
   Task 566 is closed: water age, source trace, the chemical mode and pump energy all ship, and
   `[QUALITY]`, `[REACTIONS]` and `[ENERGY]` are interpreted. Four sections remain carried verbatim,
@@ -124,7 +157,12 @@ the block.
   - **`[SOURCES]` and `[MIXING]`** -- a booster dose at a node and a tank mixing model. The chemical
     mode runs without them: a reservoir's initial quality is held for the whole run, which is enough
     to state a plant residual, and every tank is treated as completely mixed. The import report says
-    exactly that.
+    exactly that. **Tom, 2026-09-04, of that note: *"Why aren't we implementing this instead of
+    shipping without it?"*** The honest answer is that neither is blocked -- `[SOURCES]` is four
+    fields on a node and `[MIXING]` is a model name and a fraction on a tank, both of which EPANET
+    would then honour with no arithmetic of ours -- so this is a priority question and not a
+    difficulty one. What is missing is a user who has one, which is the same bar `[RULES]` waits at.
+    A booster station is the commoner of the two by a distance.
   - **`[TAGS]`** -- a free-text tag per element. Cheap, and the natural home for Task 247's
     customer/account work.
   - **`[REPORT]`** -- formatting for a `.rpt` this page never requests. **Probably correct to leave
