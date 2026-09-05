@@ -1881,7 +1881,7 @@ $ec_lang['lpn_inp_drop_controls']='These controls and rules were left out. The p
 $ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_eps']='This file describes an extended period simulation. The part of this page that runs a network through time did not load, so only the starting conditions came in.';
 $ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose the chemical analysis under Settings, Calculation, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_sources_mixing']='This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_sources_mixing']='This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Pump energy under Calculate to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_tags']='This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_report']='This file holds EPANET\'s own settings for the reports it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
@@ -2732,6 +2732,29 @@ $ec_lang['lpn_quality_initial']='Initial quality';
 $ec_lang['lpn_quality_initial_tip']='How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty for none.';
 $ec_lang['lpn_result_concentration']='Concentration';
 $ec_lang['lpn_result_concentration_tip']='How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.';
+// **THE BOOSTER DOSE AND THE TANK MIXING MODEL** (ROADMAP Task 579), EPANET's `[SOURCES]` and
+// `[MIXING]`. EPANET's own words throughout, and its own four source types and four mixing models,
+// because an engineer choosing between them is choosing between real pieces of equipment and real
+// tank behaviour. A source strength has no unit family for the same reason an initial quality has
+// none: it is written in the units named beside the chemical, and nobody converts it.
+$ec_lang['lpn_source_type']='Source type';
+$ec_lang['lpn_source_type_tip']='What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the strength below. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the water leaving this node to the strength below and no further. Flow paced booster adds the strength below to whatever is already in the water.';
+$ec_lang['lpn_source_type_concen']='Concentration';
+$ec_lang['lpn_source_type_mass']='Mass booster';
+$ec_lang['lpn_source_type_setpoint']='Setpoint booster';
+$ec_lang['lpn_source_type_flowpaced']='Flow paced booster';
+$ec_lang['lpn_source_quality']='Source quality';
+$ec_lang['lpn_source_quality_tip']='How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.';
+$ec_lang['lpn_source_pattern']='Source pattern';
+$ec_lang['lpn_source_pattern_tip']='A time pattern that scales the dose through the day, for a feed that does not run flat out around the clock. Leave it on No pattern and the dose is the same at every hour.';
+$ec_lang['lpn_mixing_model']='Mixing model';
+$ec_lang['lpn_mixing_model_tip']='How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.';
+$ec_lang['lpn_mixing_mixed']='Complete mixing';
+$ec_lang['lpn_mixing_2comp']='Two compartment mixing';
+$ec_lang['lpn_mixing_fifo']='FIFO plug flow';
+$ec_lang['lpn_mixing_lifo']='LIFO plug flow';
+$ec_lang['lpn_mixing_fraction']='Mixing fraction';
+$ec_lang['lpn_mixing_fraction_tip']='The share of the tank volume that the inlet zone takes up, between 0 and 1. Only two compartment mixing uses it. Leave it empty and the whole tank is the inlet zone, which is what EPANET assumes.';
 $ec_lang['lpn_reaction_bulk']='Bulk reaction coefficient';
 $ec_lang['lpn_reaction_bulk_tip']='Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one grows it. First order unless the file says otherwise, so the coefficient is a rate in 1/day. An empty box means no bulk reaction.';
 $ec_lang['lpn_reaction_wall']='Wall reaction coefficient';

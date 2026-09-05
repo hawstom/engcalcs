@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read**, of 79 untranslated keys, of 1616 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**20 still to read**, of 97 untranslated keys, of 1634 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (79, 1 to read @@ NEEDS RULING)
+## lpn_  (97, 20 to read @@ NEEDS RULING)
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
@@ -138,8 +138,32 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.
   _Ruled OK 2026-09-04._
 - **`lpn_inp_drop_sources_mixing`**
-  > This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.
-  _Ruled OK 2026-09-04._
+  > This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.
+  @@ NEEDS RULING
+- **`lpn_mixing_2comp`**
+  > Two compartment mixing
+  @@ NEEDS RULING
+- **`lpn_mixing_fifo`**
+  > FIFO plug flow
+  @@ NEEDS RULING
+- **`lpn_mixing_fraction`**
+  > Mixing fraction
+  @@ NEEDS RULING
+- **`lpn_mixing_fraction_tip`**
+  > The share of the tank volume that the inlet zone takes up, between 0 and 1. Only two compartment mixing uses it. Leave it empty and the whole tank is the inlet zone, which is what EPANET assumes.
+  @@ NEEDS RULING
+- **`lpn_mixing_lifo`**
+  > LIFO plug flow
+  @@ NEEDS RULING
+- **`lpn_mixing_mixed`**
+  > Complete mixing
+  @@ NEEDS RULING
+- **`lpn_mixing_model`**
+  > Mixing model
+  @@ NEEDS RULING
+- **`lpn_mixing_model_tip`**
+  > How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.
+  @@ NEEDS RULING
 - **`lpn_net_emergency`**
   > This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.
   _Ruled OK 2026-09-04._
@@ -245,6 +269,36 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_settings_energy`**
   > Energy
   _Ruled OK 2026-09-04._
+- **`lpn_source_pattern`**
+  > Source pattern
+  @@ NEEDS RULING
+- **`lpn_source_pattern_tip`**
+  > A time pattern that scales the dose through the day, for a feed that does not run flat out around the clock. Leave it on No pattern and the dose is the same at every hour.
+  @@ NEEDS RULING
+- **`lpn_source_quality`**
+  > Source quality
+  @@ NEEDS RULING
+- **`lpn_source_quality_tip`**
+  > How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.
+  @@ NEEDS RULING
+- **`lpn_source_type`**
+  > Source type
+  @@ NEEDS RULING
+- **`lpn_source_type_concen`**
+  > Concentration
+  @@ NEEDS RULING
+- **`lpn_source_type_flowpaced`**
+  > Flow paced booster
+  @@ NEEDS RULING
+- **`lpn_source_type_mass`**
+  > Mass booster
+  @@ NEEDS RULING
+- **`lpn_source_type_setpoint`**
+  > Setpoint booster
+  @@ NEEDS RULING
+- **`lpn_source_type_tip`**
+  > What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the strength below. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the water leaving this node to the strength below and no further. Flow paced booster adds the strength below to whatever is already in the water.
+  @@ NEEDS RULING
 - **`lpn_time_run_report_copied`**
   > Copied
   _Ruled OK 2026-09-04._

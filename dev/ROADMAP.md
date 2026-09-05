@@ -135,19 +135,10 @@ the block.
     never tests**: `lpnTimeStatusNote()` reads no timing at all, so a user who unchecks the box on a
     fast network is told their network is slow. Replacement in §5, awaiting his word. Translated: 26.
 
-- 75|579| **The four EPANET sections still carried and not understood, extracted from 566.**
-  Task 566 is closed: water age, source trace, the chemical mode and pump energy all ship, and
-  `[QUALITY]`, `[REACTIONS]` and `[ENERGY]` are interpreted. Four sections remain carried verbatim,
-  round-tripping byte-identically and named in the import report:
-  - **`[SOURCES]` and `[MIXING]`** -- a booster dose at a node and a tank mixing model. The chemical
-    mode runs without them: a reservoir's initial quality is held for the whole run, which is enough
-    to state a plant residual, and every tank is treated as completely mixed. The import report says
-    exactly that. **Tom, 2026-09-04, of that note: *"Why aren't we implementing this instead of
-    shipping without it?"*** The honest answer is that neither is blocked -- `[SOURCES]` is four
-    fields on a node and `[MIXING]` is a model name and a fraction on a tank, both of which EPANET
-    would then honour with no arithmetic of ours -- so this is a priority question and not a
-    difficulty one. What is missing is a user who has one, which is the same bar `[RULES]` waits at.
-    A booster station is the commoner of the two by a distance.
+- 75|579| **The EPANET sections still carried and not understood, extracted from 566.**
+  `[QUALITY]`, `[REACTIONS]`, `[ENERGY]` (566) and now `[SOURCES]` and `[MIXING]` (579) are
+  interpreted -- 579's own half is a booster dose on a node and a mixing model on a tank, in
+  `dev/water-quality.md` and `dev/lpn-spike/source-mixing-harness.js`. What is left of this task:
   - **`[TAGS]`** -- a free-text tag per element. Cheap, and the natural home for Task 247's
     customer/account work.
   - **`[REPORT]`** -- formatting for a `.rpt` this page never requests. **Probably correct to leave

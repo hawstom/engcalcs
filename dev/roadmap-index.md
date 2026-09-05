@@ -32,7 +32,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 568 — Standard hydraulic symbols: Tom's research, recorded, not yet a decision.
 - ! Task 570 — The EPANET report gets a box of its own: draggable, sizeable, and one of the family.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
-- Task 579 — The four EPANET sections still carried and not understood, extracted from 566.
+- Task 579 — The EPANET sections still carried and not understood, extracted from 566.
 - ! Task 581 — An empty box cannot say "this file states zero" apart from "nothing is set".
 - Task 583 — Two EPS sentences left, and one states an unmeasured cause.
 
