@@ -178,6 +178,9 @@
 			tanks = [],
 			pipes = [],
 			pumps = [],
+			// The pumps that really went out as pumps -- a curveless one became a pipe, and an
+			// [ENERGY] row naming a link that is not a pump is an input EPANET refuses (Task 582).
+			pumpsWritten = {},
 			valves = [],
 			statuses = [],
 			curves = [],
@@ -361,6 +364,7 @@
 					// dev/lpn-spike/pattern-attach-harness.js). Writing both would state a number
 					// the engine throws away, which is the same rule as a TCV's minor-loss column
 					// above. Both are dimensionless and cross unconverted.
+					pumpsWritten[link.id] = 1;
 					pumps.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  HEAD ' + cname +
 						(pumpEps && link.speedPattern ? '  PATTERN ' + link.speedPattern :
 							(pumpEps && link.speed !== undefined && link.speed !== 1 ? '  SPEED ' + link.speed : '')));
@@ -549,12 +553,21 @@
 		// per kWh and a demand charge a currency per peak kW, and EPANET reports kW and kWh
 		// whatever the flow units are (see the note over EngCalcs.lpnEnergyParse).
 		//
-		// **`PUMP <id> EFFIC <curve>` IS THE ONE ROW NOT WRITTEN, AND IT IS NOT AN OVERSIGHT.**
-		// It names a [CURVES] entry, and the only curves this writer emits are the pump head
-		// curves the document holds; naming a curve that is not in the file is how EPANET comes to
-		// reject a network it would otherwise solve. A file that states one still round-trips
-		// (js/lpn-inp.js keeps it), and such a pump runs here at the global efficiency, which the
-		// run reports rather than leaving to be discovered.
+		// **`PUMP <id> EFFIC <curve>` IS WRITTEN, AND ITS CURVE IS WRITTEN WITH IT** (Task 582).
+		// It names a [CURVES] entry, and naming one that is not in the file is how EPANET comes to
+		// reject a network it would otherwise solve -- which is why the row went unwritten until
+		// the points were kept. `model.energy.efficCurves` is where they arrive, from
+		// EngCalcs.lpnEfficCurves(), with the abscissa already in m3/s like every other flow on
+		// this model.
+		//
+		// **THE CURVE IS RENAMED `EF_<pumpid>` AND NOT GIVEN THE DOCUMENT'S OWN NAME.** Nothing
+		// reads this file but the engine, and the head curves here are already `C_<pumpid>`, so a
+		// document whose efficiency curve happened to be called `C_10` would collide with pump 10's
+		// own head curve and quietly change its head. One name per pump also means two pumps
+		// sharing a curve need no bookkeeping: the points are simply written twice.
+		//
+		// **AND ONLY FOR A PUMP THAT WENT OUT AS A PUMP.** A curveless one becomes a pipe above, and
+		// an [ENERGY] row naming a link that is not a pump is another input EPANET refuses.
 		var energyIn = model.energy || {};
 		[['globalEfficiency', 'Global Efficiency'], ['globalPrice', 'Global Price'],
 			['globalPattern', 'Global Pattern'], ['demandCharge', 'Demand Charge']
@@ -569,6 +582,19 @@
 				if (m3[id] === undefined || m3[id] === null || m3[id] === '') { return; }
 				energyRows.push(' PUMP  ' + id + '  ' + pair[1] + '  ' + m3[id]);
 			});
+		});
+		var efficCurves = energyIn.efficCurves || {};
+		Object.keys(energyIn.effic || {}).forEach(function (id) {
+			var nm = energyIn.effic[id], pts = nm ? efficCurves[nm] : null, cname, rows = [], ei;
+			if (!pumpsWritten[id] || !pts || !pts.length) { return; }
+			cname = 'EF_' + id;
+			for (ei = 0; ei < pts.length; ei++) {
+				if (!isFinite(pts[ei][0]) || !isFinite(pts[ei][1])) { return; }
+				// m3/s -> L/s on the flow; the efficiency is a percent and is already one.
+				rows.push(' ' + cname + '  ' + (pts[ei][0] * 1000) + '  ' + pts[ei][1]);
+			}
+			curves.push(rows.join('\n'));
+			energyRows.push(' PUMP  ' + id + '  EFFIC  ' + cname);
 		});
 
 		var inp = '[TITLE]\nEngCalcs looped network\n\n' +

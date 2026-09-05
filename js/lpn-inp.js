@@ -117,8 +117,13 @@
 	// The carried sections EPANET's own writer has a place for, and therefore the ones the exporter
 	// puts back where they belong. A section NOT here is still carried; it simply has no home in
 	// EPANET's order, so it is written after the options, in the order the source stated it.
+	// **`CURVES` IS HERE AND IT IS NOT A CARRIED SECTION** (Task 582). The exporter WRITES that
+	// section, from the document's own head and GPV points, and appends the carried efficiency-curve
+	// lines to it -- so what this entry buys is the negative: `carriedRest()` must not write a
+	// second `[CURVES]` after the options with the same lines in it.
 	var LPN_CARRIED_PLACED = {
-		TAGS: 1, ENERGY: 1, QUALITY: 1, SOURCES: 1, REACTIONS: 1, MIXING: 1, REPORT: 1
+		TAGS: 1, ENERGY: 1, QUALITY: 1, SOURCES: 1, REACTIONS: 1, MIXING: 1, REPORT: 1,
+		CURVES: 1
 	};
 
 	/**
@@ -303,6 +308,13 @@
 			toks = tokenize(line);
 			if (!toks.length) { continue; }
 			if (cmt) { toks.cmt = cmt; }
+			// **[CURVES] IS THE ONE READ SECTION THAT ALSO KEEPS ITS OWN TEXT** (Task 582). A pump
+			// head curve does not survive as text and does not want to (see the [CURVES] reader
+			// below); an EFFICIENCY curve is never fitted, never sampled and never edited on this
+			// page, so its own line is the only honest thing to write back. Kept on the token array
+			// beside `cmt` rather than as a parallel list, so a row and its text cannot fall out of
+			// step.
+			if (section === 'CURVES') { toks.raw = lines[i].replace(/\s+$/, ''); }
 			if (!rawSections[section]) { rawSections[section] = []; }
 			rawSections[section].push(toks);
 			seen[section] = (seen[section] || 0) + 1;
@@ -796,6 +808,11 @@
 
 		// ---- curves, needed before pumps can be resolved ----
 		var curves = {};
+		// **WHICH CURVE NAMES A LINK HAS TAKEN OVER** (Task 582). A curve claimed as a pump's HEAD
+		// or a GPV's loss is REDRAWN by the exporter from the points the document holds, so its own
+		// text must not also be carried -- that would write the section twice, once fitted and once
+		// verbatim. Filled by the two loops below, read where the efficiency curves are gathered.
+		var claimedCurves = {};
 		rows = rawSections.CURVES || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
@@ -803,12 +820,16 @@
 			if (!curves[r[0]]) { curves[r[0]] = []; }
 			// File flow unit and file head unit, matching every other number here.
 			//
-			// NO TOKENS ON A CURVE POINT, and that is a decision rather than an omission. A pump
-			// curve does not survive as text in either direction: a curve of more than three points
-			// is sampled at its ends and middle on the way in, and js/lpn-epanet.js's [CURVES]
-			// writer re-samples our fitted curve at [0, 0.5, 0.9] q_max on the way out. There is no
-			// point at which the file's own text still describes what we would write, so keeping it
-			// would be keeping text for a number nobody will ever emit.
+			// NO TOKENS ON A PUMP CURVE POINT, and that is a decision rather than an omission. A
+			// pump curve does not survive as text in either direction: a curve of more than three
+			// points is sampled at its ends and middle on the way in, and js/lpn-epanet.js's
+			// [CURVES] writer re-samples our fitted curve at [0, 0.5, 0.9] q_max on the way out.
+			// There is no point at which the file's own text still describes what we would write.
+			//
+			// **AN EFFICIENCY CURVE IS THE OPPOSITE CASE AND SO IT KEEPS ITS LINE** (Task 582).
+			// Nothing here fits it, samples it or offers a control that edits it, so the file's own
+			// text is still exactly what we would write. `toks.raw` above is where it is kept and
+			// `efficCurveLines` below is what selects it.
 			curves[r[0]].push([num(r[1]), num(r[2])]);
 		}
 
@@ -827,6 +848,7 @@
 					// the user's own label, it is never arithmetic, and without it the writer invents
 					// `C_<pumpid>` and Net3's curves `1` and `2` come back as `C_10` and `C_335`.
 					pump.curveId = r[j + 1];
+					claimedCurves[r[j + 1]] = 1;
 					var pts = curves[r[j + 1]] || [];
 					if (!pts.length) { drop('pump-curve-missing', [r[0]], r[j + 1], 'link'); }
 					else if (pts.length <= 3) { pump.curvePoints = pts.slice(); }
@@ -933,6 +955,7 @@
 				// A GPV's sixth column is a curve NAME, so the points come out of [CURVES] under it
 				// and there is no numeric setting at all.
 				var gcurve = vtype === 'GPV' ? (curves[r[5]] || []) : null;
+				if (vtype === 'GPV' && r[5]) { claimedCurves[r[5]] = 1; }
 				vlink = Object.assign({}, vcommon, {
 					type: 'valve',
 					valveType: vtype || 'TCV',
@@ -1157,6 +1180,24 @@
 		rows = rawSections.TITLE || [];
 		if (rows.length) { title = rows[0].join(' '); }
 
+		// **THE EFFICIENCY CURVES, GATHERED AS TEXT** (Task 582). [ENERGY] is a carried section, so
+		// the pumps' `EFFIC` rows are read back out of it here rather than kept a second time.
+		var efficCurveLines = (function () {
+			var want = {}, out = [], rws, ii,
+				e = EngCalcs.lpnEnergyParse ? EngCalcs.lpnEnergyParse(carried.ENERGY || []) : null;
+			if (!e) { return out; }
+			Object.keys(e.effic).forEach(function (id) {
+				var nm = e.effic[id];
+				if (nm && !claimedCurves[nm]) { want[nm] = 1; }
+			});
+			if (!Object.keys(want).length) { return out; }
+			rws = rawSections.CURVES || [];
+			for (ii = 0; ii < rws.length; ii++) {
+				if (rws[ii][0] && want[rws[ii][0]] && rws[ii].raw) { out.push(rws[ii].raw); }
+			}
+			return out;
+		}());
+
 		return {
 			ok: true,
 			title: title,
@@ -1186,11 +1227,20 @@
 			// file's own lines. [RULES] is NOT in here: it has had its own field since Task 248.03
 			// and `EngCalcs.lpnRuleBlocks()` reads it, so one section in two places would be two
 			// answers to the same question. Empty object for a file with none.
+			// **PLUS ONE PARTIAL SECTION, AND IT IS THE ONLY ONE** (Task 582): the [CURVES] rows
+			// that belong to an EFFICIENCY curve. `PUMP <id> EFFIC <curve>` in [ENERGY] names one,
+			// and until this task its points were read into a local map, used for nothing and
+			// dropped, so the exporter wrote an [ENERGY] row naming a curve the file it wrote did
+			// not contain. That is an `.inp` EPANET REJECTS. Carried as the file's own lines, on
+			// the same terms as [RULES]: nothing here fits, samples or edits an efficiency curve,
+			// so its own text is the only form that can be right. Head and GPV curves are excluded,
+			// because the exporter redraws those from the document's own points.
 			inpSections: (function () {
 				var out = {}, k;
 				for (k in carried) {
 					if (k !== 'RULES' && carried[k].length) { out[k] = carried[k]; }
 				}
+				if (efficCurveLines.length) { out.CURVES = efficCurveLines; }
 				return out;
 			}()),
 			// The clock (ROADMAP Task 248). `times` is null only when js/lpn-patterns.js was not
@@ -1637,10 +1687,11 @@
 	// assembleModel().
 	//
 	// `Global Pattern` and a pump's own `PATTERN` name a price schedule: an id, not a number.
-	// `PUMP <id> EFFIC <curve>` names a [CURVES] entry. It is parsed and written back so a file
-	// that states one round-trips, and it has no control on this page, which keeps no general curve
-	// library (a pump's head curve lives on the pump). js/lpn-epanet.js does not write it into the
-	// engine input for that reason, and the run says which efficiency it used.
+	// `PUMP <id> EFFIC <curve>` names a [CURVES] entry, and Task 582 is what made that row mean
+	// something: the curve's own lines are carried on `doc.inpSections.CURVES`, written back into
+	// [CURVES] beside the head curves, and handed to the engine by EngCalcs.lpnEfficCurves() below.
+	// It still has no control on this page, which keeps no general curve library -- a pump's head
+	// curve lives on the pump -- so the curve is carried and never edited.
 	var LPN_ENERGY_GLOBALS = [['globalEfficiency', 'Global Efficiency'],
 		['globalPrice', 'Global Price'], ['globalPattern', 'Global Pattern'],
 		['demandCharge', 'Demand Charge']];
@@ -1677,6 +1728,31 @@
 				else if (k2 === 'PRICE') { reactSet(out.price, w[1], reactNum(w[3])); }
 				else if (k2 === 'PATTERN' && w[3]) { out.pattern[w[1]] = w[3]; }
 			}
+		});
+		return out;
+	};
+	/**
+	 * **THE EFFICIENCY CURVES A DOCUMENT CARRIES, AS NUMBERS** (Task 582). `sections` is
+	 * `doc.inpSections`; its `CURVES` entry holds only efficiency-curve lines, put there by
+	 * lpnInpParse() above. Returns `{ curveName: [[flow, percent], ...] }` in the file's own row
+	 * order, empty for a document that carries none, so no caller has to test for absence.
+	 *
+	 * **`flowToSI` IS THE WHOLE TRAP AND IT IS THE CALLER'S TO SUPPLY.** A curve's first column is a
+	 * FLOW in the unit the document is working in; the engine input js/lpn-epanet.js writes is L/s
+	 * always. Getting the factor wrong moves the money and nothing on screen looks wrong -- an
+	 * efficiency curve read a thousand times too wide simply pins at its last point. The second
+	 * column is a PERCENT and crosses untouched, which is why only one of the two is scaled.
+	 * `dev/lpn-spike/pump-effic-curve-harness.js` anchors it on a GPM file.
+	 */
+	EngCalcs.lpnEfficCurves = function (sections, flowToSI) {
+		var out = {}, k = (typeof flowToSI === 'number' && isFinite(flowToSI)) ? flowToSI : 1;
+		(((sections || {}).CURVES) || []).forEach(function (raw) {
+			var t = String(raw).split(';')[0].trim().split(/\s+/), x, y;
+			if (t.length < 3) { return; }
+			x = parseFloat(t[1]); y = parseFloat(t[2]);
+			if (!isFinite(x) || !isFinite(y)) { return; }
+			if (!out[t[0]]) { out[t[0]] = []; }
+			out[t[0]].push([x * k, y]);
 		});
 		return out;
 	};
@@ -2314,6 +2390,26 @@
 			// loud, because converting it would be inventing a number.
 			diff('roughness-method', [], headloss);
 		}
+		// **THE EFFICIENCY CURVES GO BACK INTO [CURVES], AFTER THE CURVES THIS PAGE DREW** (Task
+		// 582). Their own lines, character for character, because nothing here ever fitted or
+		// sampled them -- until this task the section was written without them and the [ENERGY] row
+		// naming one pointed at nothing, which is an input EPANET refuses.
+		//
+		// **UNLESS THE FLOW UNIT MOVED, AND THEN THE ABSCISSA MOVES WITH IT.** A curve's first
+		// column is a FLOW in the project's own unit, so a project exported under a flow keyword
+		// EPANET can name only after a conversion (`cFlow.same` false) must carry its efficiency
+		// curve across too -- the same trap the head curves already go through `curveNum()` for.
+		// The efficiency itself is a percent and crosses untouched, which is why its token is kept
+		// while the flow's is not. A converted line loses its trailing comment; a carried one keeps
+		// it, and the carried case is the one the byte-identity test holds.
+		(carriedOut.CURVES || []).forEach(function (ln) {
+			var t, x;
+			if (cFlow.same) { curves.push(ln); return; }
+			t = String(ln).split(';')[0].trim().split(/\s+/);
+			x = parseFloat(t[1]);
+			if (t.length < 3 || !isFinite(x)) { curves.push(ln); return; }
+			curves.push(row([t[0], String(x * cFlow.mul), t[2]]));
+		});
 		var title = opts.title !== undefined ? opts.title : ((doc.project && doc.project.name) || '');
 		var inp = '[TITLE]\n' + String(title).replace(/[\r\n]+/g, ' ') + '\n\n' +
 			// [JUNCTIONS] is written even when empty: it is one of the three sections lpnInpParse()
