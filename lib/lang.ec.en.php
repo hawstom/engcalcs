@@ -2206,6 +2206,12 @@ $ec_lang['lpn_pump_curve_note']='One, two, or three points. See "Pump curve" und
 //
 // {name} and {percent} are placeholders and not concatenation (Task 193): a language that puts the
 // curve name first, or wraps a percentage in its own punctuation, cannot express a prefix sandwich.
+// **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
+// page a Label is our own annotation and a Text is EPANET's label, and a third word in that
+// neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
+// word for this and a hydraulic engineer already knows it.
+$ec_lang['lpn_field_tag']='Tag';
+$ec_lang['lpn_field_tag_tip']='One word of your own on this part, carried into and out of the EPANET file. It changes no answer. Use it to match this part to the number it already has in your asset records, your maps or your work orders. EPANET stops reading a tag at the first space, so a space and everything after it is dropped as you type.';
 $ec_lang['lpn_pump_effic_curve']='Efficiency curve';
 $ec_lang['lpn_pump_effic_curve_tip']='The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.';
 $ec_lang['lpn_pump_effic_col']='Efficiency';

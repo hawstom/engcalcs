@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**33 still to read**, of 111 untranslated keys, of 1648 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**35 still to read**, of 113 untranslated keys, of 1650 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (111, 33 to read @@ NEEDS RULING)
+## lpn_  (113, 35 to read @@ NEEDS RULING)
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
@@ -131,6 +131,12 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_ff_col_static_tip`**
   > The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.
   _Ruled OK 2026-09-04._
+- **`lpn_field_tag`**
+  > Tag
+  @@ NEEDS RULING
+- **`lpn_field_tag_tip`**
+  > One word of your own on this part, carried into and out of the EPANET file. It changes no answer. Use it to match this part to the number it already has in your asset records, your maps or your work orders. EPANET stops reading a tag at the first space, so a space and everything after it is dropped as you type.
+  @@ NEEDS RULING
 - **`lpn_find_prop_demand_description`**
   > Demand category description
   _Ruled OK 2026-09-04._

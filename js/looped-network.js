@@ -14713,6 +14713,14 @@ var EngCalcs = EngCalcs || {};
 		if (!settings.sources && EngCalcs.lpnSourcesParse) {
 			readSourceMixingSections(saved.inpSections || {}, settings, saved.nodes || []);
 		}
+		// **ITS OWN GUARD, NOT A LINE INSIDE THE ONE ABOVE.** [TAGS] landed after [SOURCES], so a
+		// project saved in between already carries `settings.sources` and would have walked straight
+		// past a tags read nested under that test -- a once-only conversion that never runs for the
+		// documents it exists for. Every section this page learns to interpret earns its own record
+		// and its own guard, and they are deliberately not folded together.
+		if (!settings.tags && EngCalcs.lpnTagsParse) {
+			readTagsSection(saved.inpSections || {}, settings, saved.nodes || [], saved.links || []);
+		}
 		// **A PROJECT SAVED UNDER THE TWO-FIELD DESIGN KEEPS ITS NUMBERS.** That design froze the
 		// method's answer into a second field, `colorFrozenBreaks`, and was rejected (Task 448).
 		// Those numbers are the ones that project was drawn in, so
@@ -15716,6 +15724,8 @@ var EngCalcs = EngCalcs || {};
 				// **AND [SOURCES] AND [MIXING]** (Task 579): a booster dose arrives as a dose the
 				// engine is told about, and a tank that is not completely mixed arrives saying so.
 				readSourceMixingSections(parsed.inpSections, s, nodes);
+				// **AND [TAGS]** (Task 579), on the same terms and through the same two doors.
+				readTagsSection(parsed.inpSections, s, nodes, links);
 				return s;
 			}()),
 			// THE CLOCK, CARRIED WHOLE (Task 423). js/lpn-patterns.js has already turned every time
@@ -15814,6 +15824,31 @@ var EngCalcs = EngCalcs || {};
 	 * element. That record is what stops the exporter composing an empty section over lines the
 	 * source stated.
 	 */
+	/**
+	 * **`[TAGS]`, READ ONTO A DOCUMENT** (Task 579). `readSourceMixingSections()`'s smallest
+	 * sibling, and the only interpreted section that changes no answer: a tag reaches no engine,
+	 * because EPANET does not read one either. What it buys is the join to whatever system the
+	 * utility already keeps its assets in, and it is where Task 247's customer and account work
+	 * belongs.
+	 *
+	 * **TWO MAPS, BECAUSE AN EPANET ID IS UNIQUE ONLY WITHIN ITS OWN KIND** -- Net3 holds a junction
+	 * 123 and a pipe 123, and one map would give each the other's tag. The same reason `docFromInp`
+	 * keeps two maps of import notes.
+	 */
+	function readTagsSection(sections, settingsObj, nodeList, linkList) {
+		var t = EngCalcs.lpnTagsParse
+			? EngCalcs.lpnTagsParse((sections || {}).TAGS || []) : { node: {}, link: {} };
+		// PRESENT EVEN WHEN EMPTY, for the reason `settings.sources` is: its presence is what tells
+		// the exporter this document's [TAGS] has been read at all, so a project saved before this
+		// task keeps writing the text its file stated instead of an empty section composed over it.
+		settingsObj.tags = { read: true };
+		(nodeList || []).forEach(function (n) {
+			if (t.node[n.id] !== undefined) { n.tag = t.node[n.id]; }
+		});
+		(linkList || []).forEach(function (l) {
+			if (t.link[l.id] !== undefined) { l.tag = t.link[l.id]; }
+		});
+	}
 	function readSourceMixingSections(sections, settingsObj, nodeList) {
 		var src = EngCalcs.lpnSourcesParse
 				? EngCalcs.lpnSourcesParse((sections || {}).SOURCES || []) : {},
@@ -26602,6 +26637,7 @@ var EngCalcs = EngCalcs || {};
 			sourceFields(fields, n, cu);
 		}
 		qualityResultRow(fields, n);
+		tagField(fields, n);
 		activeField(fields, n);
 		pushHereButton(fields, n);
 		coordFields(fields, outwardX(n.x), outwardY(n.y));
@@ -26865,6 +26901,32 @@ var EngCalcs = EngCalcs || {};
 		curvePointTable(fields, l, (pc.lpn_result_head || 'Head'), 'lpn_u_elevhead',
 			pc.lpn_pump_curve_note
 				|| 'One, two, or three points. See "Pump curve" under Help, Notes on this page.');
+	}
+	/**
+	 * **THE ELEMENT'S TAG** (Task 579, `[TAGS]`). One free-text word on any node or link, the join
+	 * key to whatever system the utility already keeps its assets in.
+	 *
+	 * **A PLAIN WRITE, NOT `setProp()`, AND THAT IS A RULING RATHER THAN AN OVERSIGHT.** A scenario
+	 * asks what if this pipe were bigger, not what if this pipe were a different asset, so a tag
+	 * sits on the same limb as the element's own id and `mixingModel`. It is therefore not in
+	 * `LPN_OVERRIDABLE` and `setProp()` would write a `_tag` nothing reads.
+	 *
+	 * **ONE WORD, ENFORCED AS YOU TYPE.** EPANET's reader stops at whitespace, so a tag with a space
+	 * in it comes back truncated and everything after the first word is lost on the round trip.
+	 * Trimming at save time would let somebody type a sentence and watch it vanish later; trimming
+	 * here shows them the rule at the moment they break it. `lpnTagText()` is the one place it is
+	 * stated, shared with the exporter.
+	 */
+	function tagField(fields, el) {
+		var pc = EngCalcs.pageConfig || {};
+		textField(fields, pc.lpn_field_tag || 'Tag',
+			function () { return el.tag || ''; },
+			function (v) {
+				var t = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(v) : String(v || '').trim();
+				saveUndoSnapshot();
+				if (t) { el.tag = t; } else { delete el.tag; }   // base-write: a tag is an identity, not an overridable property -- see this function's own note
+				refreshPopupIfOpen();
+			}, pc.lpn_field_tag_tip);
 	}
 	/**
 	 * **WHAT EFFICIENCY THIS PUMP IS ACTUALLY RUNNING AT, ON THE PUMP** (Tom, 2026-09-05, having
@@ -27150,6 +27212,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		closedField(fields, l, linkId);
+		tagField(fields, l);
 		activeField(fields, l);
 		pushHereButton(fields, l);
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {

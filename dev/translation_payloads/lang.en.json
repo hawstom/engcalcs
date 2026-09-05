@@ -1112,6 +1112,8 @@
         "lpn_pump_curve_own": "Enter points below",
         "lpn_pump_curve_ref_note": "Using the curve entered for pump {id}.",
         "lpn_pump_curve_note": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page.",
+        "lpn_field_tag": "Tag",
+        "lpn_field_tag_tip": "One word of your own on this part, carried into and out of the EPANET file. It changes no answer. Use it to match this part to the number it already has in your asset records, your maps or your work orders. EPANET stops reading a tag at the first space, so a space and everything after it is dropped as you type.",
         "lpn_pump_effic_curve": "Efficiency curve",
         "lpn_pump_effic_curve_tip": "The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.",
         "lpn_pump_effic_col": "Efficiency",
@@ -1650,7 +1652,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1648,
+    "count": 1650,
     "active_prefixes": [
         "about",
         "bpn",

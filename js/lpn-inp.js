@@ -1789,6 +1789,72 @@
 	};
 
 	// ------------------------------------------------------------------------------------------
+	// **[TAGS], INTERPRETED** (ROADMAP Task 579).
+	//
+	// A free-text label on an element, and the ONE interpreted section that changes no answer: a tag
+	// reaches no engine and no solve, because EPANET does not read one either. That is what makes it
+	// the cheapest of the four and it is also why it earns its place -- **a tag is the join key to
+	// whatever system the utility already keeps its assets in**, which is the whole of what makes a
+	// model of somebody's real network somebody's real network. It is also the natural home for
+	// Task 247's customer and account work.
+	//
+	// **EPANET'S TAG IS ONE WORD AND OURS HAS TO BE TOO.** `[TAGS]` is `NODE|LINK  id  tag` and the
+	// reader stops at whitespace, so a tag containing a space would come back as a truncated one and
+	// the round trip would silently lose everything after the first word. `lpnTagText()` states that
+	// rule in one place; the popup applies it as you type rather than at save time, because a rule
+	// enforced where the damage happens is a rule nobody has to be told.
+	//
+	// **A TAG IS AN IDENTITY, SO IT IS BASE-OWNED AND NOT OVERRIDABLE.** A scenario asks what if
+	// this pipe were bigger, not what if this pipe were a different asset. Same limb `mixingModel`
+	// sits on and the same limb the element's own id sits on.
+	var LPN_TAG_KINDS = { NODE: 'node', LINK: 'link' };
+	/** `[TAGS]` -- `NODE|LINK  id  tag`, as two maps so a node 123 and a pipe 123 cannot collide. */
+	EngCalcs.lpnTagsParse = function (lines) {
+		var out = { node: {}, link: {} };
+		(lines || []).forEach(function (raw) {
+			var line = String(raw), semi = line.indexOf(';'), w, kind;
+			if (semi >= 0) { line = line.slice(0, semi); }
+			line = line.trim();
+			if (!line) { return; }
+			w = line.split(/\s+/);
+			kind = LPN_TAG_KINDS[String(w[0]).toUpperCase()];
+			// A row naming neither NODE nor LINK is not a tag row. Dropped from the MAP and NOT from
+			// the file: the carried text is still what the exporter writes back while it parses to
+			// what the document states, so an unrecognised row survives untouched.
+			if (!kind || !w[1] || w[2] === undefined || w[2] === '') { return; }
+			out[kind][w[1]] = w[2];
+		});
+		return out;
+	};
+	/** One word, because EPANET's reader stops at whitespace. Empty means the element has no tag. */
+	EngCalcs.lpnTagText = function (v) {
+		var t = (v === undefined || v === null) ? '' : String(v).trim();
+		return t ? t.split(/\s+/)[0] : '';
+	};
+	function tagMapSame(a, b) {
+		var i, k, ka, kb;
+		for (i = 0; i < 2; i++) {
+			k = i ? 'link' : 'node';
+			ka = Object.keys((a || {})[k] || {}); kb = Object.keys((b || {})[k] || {});
+			if (ka.length !== kb.length) { return false; }
+			if (ka.some(function (id) { return a[k][id] !== b[k][id]; })) { return false; }
+		}
+		return true;
+	}
+	/** The `[TAGS]` lines this document now states. `src` wins while it still parses to them. */
+	EngCalcs.lpnTagsText = function (live, src) {
+		var m = live || { node: {}, link: {} }, out = [];
+		if (src && src.length && tagMapSame(EngCalcs.lpnTagsParse(src), m)) { return src.slice(); }
+		['node', 'link'].forEach(function (k) {
+			Object.keys(m[k] || {}).forEach(function (id) {
+				var t = EngCalcs.lpnTagText(m[k][id]);
+				if (t) { out.push(reactRow([k === 'node' ? 'NODE' : 'LINK', id, t])); }
+			});
+		});
+		return out;
+	};
+
+	// ------------------------------------------------------------------------------------------
 	// **[ENERGY], INTERPRETED** (ROADMAP Task 566; dev/pump-energy.md).
 	//
 	// The one section on the carried list whose ANSWER IS MONEY. It was carried verbatim and never
@@ -2498,6 +2564,32 @@
 		// been READ. `settings.sources` and `settings.mixing` are that record, and they are what
 		// stops a document which has never met the interpreter composing an empty section over
 		// text the source stated: a project saved before this task is exactly that case.
+		function liveTags() {
+			var out = { node: {}, link: {} }, i, t;
+			for (i = 0; i < (doc.nodes || []).length; i++) {
+				if (omitted[doc.nodes[i].id]) { continue; }
+				t = EngCalcs.lpnTagText(doc.nodes[i].tag);
+				if (t) { out.node[doc.nodes[i].id] = t; }
+			}
+			for (i = 0; i < (doc.links || []).length; i++) {
+				if (omitted[doc.links[i].id]) { continue; }
+				t = EngCalcs.lpnTagText(doc.links[i].tag);
+				if (t) { out.link[doc.links[i].id] = t; }
+			}
+			return out;
+		}
+		function tagsSection() {
+			var live = liveTags(), lines;
+			// The same guard `sourcesSection()` uses, and for the same document: one saved before
+			// this task carries the file's own [TAGS] text and has no `tag` on any element, so
+			// composing from the elements would write an empty section over what the file said.
+			// `settings.tags` is the record that the section has been READ at all.
+			if (!settings.tags && !Object.keys(live.node).length && !Object.keys(live.link).length) {
+				return carriedSection('TAGS');
+			}
+			lines = EngCalcs.lpnTagsText(live, carriedOut.TAGS);
+			return lines.length ? '[TAGS]\n' + lines.join('\n') + '\n\n' : '';
+		}
 		function liveSources() {
 			var out = {}, i, nd4, q, t, p;
 			for (i = 0; i < (doc.nodes || []).length; i++) {
@@ -2586,8 +2678,8 @@
 			section('PIPES', pipes) +
 			section('PUMPS', pumps) +
 			section('VALVES', valves) +
-			// [TAGS], where EPANET's own writer puts it. Carried, never read.
-			carriedSection('TAGS') +
+			// [TAGS], where EPANET's own writer puts it. Read and composed since Task 579.
+			tagsSection() +
 			// After [JUNCTIONS], whose rows it replaces, and beside [EMITTERS], the other section
 			// that says something extra about a node this page draws once (Task 468).
 			section('DEMANDS', demandRows) +

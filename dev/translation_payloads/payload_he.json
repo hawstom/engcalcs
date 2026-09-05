@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 1648,
-        "delta_key_count": 111,
+        "expected_key_count": 1650,
+        "delta_key_count": 113,
         "exempt_key_count": 24,
         "exempt_keys": [
             "u_imgd",
@@ -516,6 +516,8 @@
         "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
+        "lpn_field_tag": "Tag",
+        "lpn_field_tag_tip": "One word of your own on this part, carried into and out of the EPANET file. It changes no answer. Use it to match this part to the number it already has in your asset records, your maps or your work orders. EPANET stops reading a tag at the first space, so a space and everything after it is dropped as you type.",
         "lpn_pump_effic_curve": "Efficiency curve",
         "lpn_pump_effic_curve_tip": "The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.",
         "lpn_pump_effic_col": "Efficiency",
@@ -629,6 +631,8 @@
         "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
+        "lpn_field_tag": "Tag",
+        "lpn_field_tag_tip": "One word of your own on this part, carried into and out of the EPANET file. It changes no answer. Use it to match this part to the number it already has in your asset records, your maps or your work orders. EPANET stops reading a tag at the first space, so a space and everything after it is dropped as you type.",
         "lpn_pump_effic_curve": "Efficiency curve",
         "lpn_pump_effic_curve_tip": "The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.",
         "lpn_pump_effic_col": "Efficiency",
@@ -859,6 +863,38 @@
                     "key": "lpn_inp_drop_backdrop",
                     "value": "קובץ זה קורא בשם תמונת רקע אך אינו מכיל את התמונה עצמה. הוסיפו אותה בעצמכם עם קובץ, תמונת רקע, הוסף תמונה.",
                     "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                }
+            }
+        },
+        "lpn_field_tag": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "נקודה אחת, שתיים, או שלוש — ראו \"עקומת משאבה\" בהערות למטה.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "נקודה 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_field_tag_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "נקודה אחת, שתיים, או שלוש — ראו \"עקומת משאבה\" בהערות למטה.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "נקודה 1",
+                    "english": "Point 1"
                 }
             }
         },

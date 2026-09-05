@@ -139,8 +139,10 @@ the block.
   `[QUALITY]`, `[REACTIONS]`, `[ENERGY]` (566) and now `[SOURCES]` and `[MIXING]` (579) are
   interpreted -- 579's own half is a booster dose on a node and a mixing model on a tank, in
   `dev/water-quality.md` and `dev/lpn-spike/source-mixing-harness.js`. What is left of this task:
-  - **`[TAGS]`** -- a free-text tag per element. Cheap, and the natural home for Task 247's
-    customer/account work.
+  - **`[TAGS]`** -- DONE 2026-09-05. One free-text word on any node or link, read through both
+    doors, editable on every popup, composed on export. **The one interpreted section that changes
+    no answer**, so its harness asserts the ABSENCE where the others assert an engine difference:
+    tagging two elements must not move a head. `dev/lpn-spike/tags-harness.js`.
   - **`[REPORT]`** -- formatting for a `.rpt` this page never requests. **Probably correct to leave
     carried for ever**; say so deliberately rather than leaving it on a list.
   - **`[RULES]`** -- no longer on this list. Task 248.03 closed 2026-09-05: `js/lpn-rules.js` parses
