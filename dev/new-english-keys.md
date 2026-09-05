@@ -12,23 +12,23 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**14 still to read**, of 79 untranslated keys, of 1616 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read**, of 79 untranslated keys, of 1616 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
-**Search for `OK.` to jump to every key that still needs you.** It sits
+**Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
 under each unread key, and on the heading of each group that still has one — so the first
 hit takes you to a section and the rest walk its keys. A key already ruled does not carry
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (79, 14 to read OK.)
+## lpn_  (79, all ruled)
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
   _Ruled OK 2026-09-04._
 - **`lpn_energy_col_avg_kw_tip`**
   > The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_energy_col_cost`**
   > Cost
   _Ruled OK 2026-09-04._
@@ -58,7 +58,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_energy_demand_charge`**
   > Peak demand charge
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_energy_demand_charge_tip`**
   > What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.
   _Ruled OK 2026-09-04._
@@ -76,10 +76,10 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_energy_menu`**
   > Pump energy
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_energy_menu_tip`**
   > How long each pump ran, what power it drew and what it cost over the last extended period simulation.
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_energy_needs_run`**
   > Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.
   _Ruled OK 2026-09-04._
@@ -90,11 +90,11 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > This network has no pumps, so there is nothing drawing power.
   _Ruled OK 2026-09-04._
 - **`lpn_energy_over`**
-  > Over an extended period simulation.
-  See note in my prompt.
+  > For extended period simulation of {time}
+  _Ruled OK 2026-09-04._
 - **`lpn_energy_peak_kw`**
   > Peak power usage
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_energy_price`**
   > Price of power
   _Ruled OK 2026-09-04._
@@ -103,10 +103,10 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_energy_price_pattern`**
   > Price pattern
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_energy_price_pattern_tip`**
-  > A pattern that multiplies the price hour by hour, which is how an off peak rate is written. Leave it empty for one price all day.
-  A pattern that multiplies the price hour by hour, which is how an off peak rate is specified. Leave it empty for one price all day.
+  > A pattern that multiplies the price hour by hour, which is how an off peak rate is specified. Leave it empty for one price all day.
+  _Ruled OK 2026-09-04._
 - **`lpn_energy_price_tip`**
   > What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.
   _Ruled OK 2026-09-04._
@@ -121,7 +121,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_energy_total_demand_charge`**
   > Peak demand charge
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_energy_total_energy_cost`**
   > Cost of energy
   _Ruled OK 2026-09-04._
@@ -133,7 +133,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_find_prop_demand_description`**
   > Demand category description
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_inp_drop_net_options`**
   > This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.
   _Ruled OK 2026-09-04._
@@ -145,7 +145,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_new_units_tip`**
   > A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_quality_chemical_name`**
   > Chemical and units
   _Ruled OK 2026-09-04._
@@ -199,13 +199,13 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_reports_epanet`**
   > EPANET run
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_reports_menu`**
   > Reports
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_reports_menu_tip`**
   > The finished answers this page produces once a network has been calculated: what the pumps cost, how the scenarios compare, and what the EPANET solver itself printed.
-  OK.
+  _Ruled OK 2026-09-04._
 - **`lpn_result_concentration`**
   > Concentration
   _Ruled OK 2026-09-04._

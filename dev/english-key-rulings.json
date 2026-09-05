@@ -54,7 +54,7 @@
    "ruled": "2026-09-04"
   },
   "lpn_energy_col_avg_kw_tip": {
-   "on": "The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.",
+   "on": "The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.",
    "ruled": "2026-09-04"
   },
   "lpn_energy_col_cost": {
@@ -93,6 +93,10 @@
    "on": "These pumps have an efficiency curve in the file they came from. This page has no place to hold one, so they ran at the efficiency set for the whole network: {ids}.",
    "ruled": "2026-09-04"
   },
+  "lpn_energy_demand_charge": {
+   "on": "Peak demand charge",
+   "ruled": "2026-09-04"
+  },
   "lpn_energy_demand_charge_tip": {
    "on": "What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.",
    "ruled": "2026-09-04"
@@ -114,7 +118,11 @@
    "ruled": "2026-09-04"
   },
   "lpn_energy_menu": {
-   "on": "Pump energy report",
+   "on": "Pump energy",
+   "ruled": "2026-09-04"
+  },
+  "lpn_energy_menu_tip": {
+   "on": "How long each pump ran, what power it drew and what it cost over the last extended period simulation.",
    "ruled": "2026-09-04"
   },
   "lpn_energy_needs_run": {
@@ -129,12 +137,28 @@
    "on": "This network has no pumps, so there is nothing drawing power.",
    "ruled": "2026-09-04"
   },
+  "lpn_energy_over": {
+   "on": "For extended period simulation of {time}",
+   "ruled": "2026-09-04"
+  },
+  "lpn_energy_peak_kw": {
+   "on": "Peak power usage",
+   "ruled": "2026-09-04"
+  },
   "lpn_energy_price": {
    "on": "Price of power",
    "ruled": "2026-09-04"
   },
   "lpn_energy_price_note": {
    "on": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
+   "ruled": "2026-09-04"
+  },
+  "lpn_energy_price_pattern": {
+   "on": "Price pattern",
+   "ruled": "2026-09-04"
+  },
+  "lpn_energy_price_pattern_tip": {
+   "on": "A pattern that multiplies the price hour by hour, which is how an off peak rate is specified. Leave it empty for one price all day.",
    "ruled": "2026-09-04"
   },
   "lpn_energy_price_tip": {
@@ -151,6 +175,10 @@
   },
   "lpn_energy_total_cost": {
    "on": "Total cost",
+   "ruled": "2026-09-04"
+  },
+  "lpn_energy_total_demand_charge": {
+   "on": "Peak demand charge",
    "ruled": "2026-09-04"
   },
   "lpn_energy_total_energy_cost": {
@@ -517,6 +545,10 @@
    "on": "Connection",
    "ruled": "2026-08-29"
   },
+  "lpn_find_prop_demand_description": {
+   "on": "Demand category description",
+   "ruled": "2026-09-04"
+  },
   "lpn_find_q_and": {
    "on": "AND",
    "ruled": "2026-08-29"
@@ -701,6 +733,10 @@
    "on": "New project",
    "ruled": "2026-08-29"
   },
+  "lpn_new_units_tip": {
+   "on": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
+   "ruled": "2026-09-04"
+  },
   "lpn_profile_delete": {
    "on": "Delete path",
    "ruled": "2026-08-29"
@@ -856,6 +892,18 @@
   "lpn_replace_source": {
    "on": "New value from",
    "ruled": "2026-08-29"
+  },
+  "lpn_reports_epanet": {
+   "on": "EPANET run",
+   "ruled": "2026-09-04"
+  },
+  "lpn_reports_menu": {
+   "on": "Reports",
+   "ruled": "2026-09-04"
+  },
+  "lpn_reports_menu_tip": {
+   "on": "The finished answers this page produces once a network has been calculated: what the pumps cost, how the scenarios compare, and what the EPANET solver itself printed.",
+   "ruled": "2026-09-04"
   },
   "lpn_result_concentration": {
    "on": "Concentration",

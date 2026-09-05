@@ -29581,27 +29581,17 @@ var EngCalcs = EngCalcs || {};
 			ffEl('p', 'lpn-ff-note', pc.lpn_energy_needs_run || '', host);
 			return;
 		}
-		// **THE SENTENCE AND THE DURATION ARE TWO LINES NOW, and that is Tom's ruling plus the
-		// property it would otherwise have taken with it** (2026-09-04). His marked-up wording of
-		// `lpn_energy_over` shortened it to *Over an extended period simulation.*, dropping the
-		// `of {time}` clause -- which left the kWh and the cost below with nothing on screen saying
-		// what span they are over. The audit row was about TERMINOLOGY, so his words stand exactly
-		// as written; the duration comes back beside them as its own labelled fact.
+		// **THE DURATION IS BACK INSIDE THE SENTENCE, WHICH IS WHERE TOM PUT IT** (2026-09-04).
+		// The audit's shortened wording had dropped `of {time}`, which left the kWh and the cost
+		// below with nothing on screen saying what span they are over; it was briefly restored as a
+		// second labelled line and he ruled against that shape: *"Why not put the duration as 'For
+		// extended period simulation of {total_run_time} hours'"*. One sentence, not two.
 		//
-		// **The label is `lpn_time_duration`, reused rather than written:** it is already the
-		// literal name of the control in Settings that sets this number, it is already translated
-		// into 26 languages, and Tom has ruled that control's own label correct. A new key here
-		// would have cost 26 retranslations to say the same thing in a second voice.
-		//
-		// The `.replace()` stays. It is a no-op against his text and it is the whole of what a
-		// restored `of {time}` would need, so putting the clause back is a one-string edit.
-		ffEl('p', 'lpn-ff-note', (pc.lpn_energy_over || 'Over an extended period simulation.')
-			.replace('{time}', EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(sum.duration)
-				: String(sum.duration)), host);
 		// H:MM through the one formatter, the way this page states every other time, rather than a
-		// bare number of hours that would have to choose a plural.
-		ffEl('p', 'lpn-ff-note', (pc.lpn_time_duration || 'Total run time') + ': '
-			+ (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(sum.duration)
+		// bare number of hours that would have to choose a plural -- which is also why the string
+		// says "of {time}" and not "of {time} hours": at 1:30 the trailing word would be wrong.
+		ffEl('p', 'lpn-ff-note', (pc.lpn_energy_over || 'For extended period simulation of {time}')
+			.replace('{time}', EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(sum.duration)
 				: String(sum.duration)), host);
 		body = ffTable(host, [
 			pc.lpn_energy_col_pump || 'Pump',
