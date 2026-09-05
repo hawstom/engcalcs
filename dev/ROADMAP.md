@@ -1188,29 +1188,23 @@ the block.
     small cluster) rather than one label at a time. `shedAlignedForConflicts()` places one label,
     then treats it as an obstacle for the next — which is why two labels can each be locally
     reasonable and jointly absurd. A gang move has to consider both placements together.
-  - **The pieces exist.** `js/lpn-collide.js` is pure weighted-box relaxation with no DOM;
-    `js/lpn-geom.js` has leader attachment and arc-length. Task 400 (parked) surveyed the
-    optimum-preserving reduction rules and bounded chain search in `dev/label-placement-algorithms.md`
-    — **read that before designing, because a crossing pair is exactly the conflict-graph case it
-    covers**, and Tom parked it only for lack of real-world feedback. This screenshot is that
-    feedback.
-  - **Two leaders crossing is a CHEAP thing to detect** — a segment-intersection test on the placed
-    pairs — so a first phase could simply find them and report a count, which would say how big the
-    problem actually is before anybody optimises anything.
-  - Tom, in the same breath: *"I don't want to be forever tweaking this."* So a phase that measures
-    before it tunes is the honest opening.
-  - **HIS OWN RULE, 2026-08-26, and it is small enough to build:** *"Maybe it's as simple as, if two
-    leaders cross or if a label crosses a leader, try stacking their labels."* Two triggers, one
-    remedy. **Note the second trigger is the one the first would miss** — a label lying across
-    somebody else's leader is just as ugly and is not a crossing of two leaders.
-  - **He marked FIVE gangs on one screenshot of Net3-World** (A–E, 2026-08-26), which is the sample
-    to build against and the count to beat. Four of the five are pairs of near neighbours whose
-    leaders splay apart; one (D) is a cluster near the reservoir where three labels compete for the
-    same open sector.
-  - So the honest phases are: **count the crossings** (a segment-intersection test, cheap), **try
-    the stack on each crossing pair**, and **measure whether the count went down** on that same
-    drawing. If it does not, the strategy is wrong and no amount of tuning saves it.
-
+  - **HIS OWN RULE, 2026-08-26:** *"Maybe it's as simple as, if two leaders cross or if a label
+    crosses a leader, try stacking their labels."* Two triggers, one remedy, and the second is the
+    one the first would miss.
+  - **He marked FIVE gangs on one screenshot of Net3-World** (A–E, 2026-08-26): four pairs of near
+    neighbours whose leaders splay apart, and one cluster near the reservoir where three labels
+    compete for the same open sector.
+  - **PHASE ONE IS BUILT AND THE NUMBERS ARE IN `dev/label-placement-algorithms.md` §8** —
+    `Collide.labelCrossings()` plus `dev/lpn-spike/label-crossing-harness.js`, measuring every
+    shipped example at four zooms. **Read §8 before designing phase two**, with the survey it sits
+    in: a crossing pair is the conflict-graph case §6 covers, and Task 400 parked that only for
+    lack of real-world feedback. The findings, one line each: Net3-World holds exactly five
+    node-label gangs at the fit zoom, four pairs and one triple, which is the shape Tom marked;
+    **9 leader-leader crossings against 76 label-on-leader across 28 measured drawings**, so the
+    cheap test alone would see a tenth of the problem; and the count is a fact about a VIEW, so
+    phase two is judged on one stated view before and after.
+  - Phase two is therefore a COMPARISON and needs no absolute target: stack a flagged gang,
+    re-measure the same view, and the count falls or the strategy is wrong.
 
 - 50|541| **Clicking a label: should it select the asset for editing?**
   Tom's question, 2026-08-26: *"Node insert and auto-edit mode: When you click on a label, should it

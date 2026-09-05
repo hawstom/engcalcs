@@ -279,6 +279,55 @@ position avoiding one.
 
 ---
 
+## 8. What our own conflict graph actually holds (Task 539, phase one)
+
+Everything above is what other people found. This section is what OUR drawings measure, because Task
+539's gang move is the first pass that would optimise a PAIR, and the one thing nobody had was the
+size of the problem. Tom, 2026-08-26: *"I don't want to be forever tweaking this."* So the count came
+before the remedy.
+
+**The two triggers are his**, same day: *"if two leaders cross or if a label crosses a leader, try
+stacking their labels."* `Collide.labelCrossings()` (`js/lpn-collide.js`) is exactly those two over
+the DRAWN labels, and `dev/lpn-spike/label-crossing-harness.js` runs it on every shipped example, one
+example per process because the aligned-shed pass converges across passes (Task 436).
+
+Flagged pairs at zoom-to-fit and at 2x / 4x / 8x in from it, every label field on, solved through
+EPANET:
+
+| example | labels drawn (fit → 8x) | pairs | gangs |
+|---|---|---|---|
+| Net3-Novato-CA-World | 56 → 175 | 8 / 18 / 10 / 3 | 7 / 15 / 10 / 3 |
+| Net3 (XY) | 73 → 188 | 13 / 7 / 5 / 1 | 10 / 5 / 5 / 1 |
+| Elm-Street-Center | 39 → 48 | 5 / 3 / 1 / 1 | 4 / 3 / 1 / 1 |
+| Net2 | 44 → 81 | 5 / 0 / 0 / 0 | 4 / 0 / 0 / 0 |
+| Net1 | 25 → 27 | 1 / 1 / 0 / 0 | 1 / 1 / 0 / 0 |
+| Basic example, either unit set | ~20 | 0 throughout | 0 |
+
+**Three findings, and the second is the one that changes the design:**
+
+1. **The size is right for Tom's own reading.** At the fit zoom Net3-World holds exactly five gangs
+   made only of node labels — four pairs and one triple — which is the shape he marked on his
+   screenshot (A–E, four pairs and one three-label cluster). It is suggestive rather than proof: the
+   zoom and label settings behind that screenshot are not recorded.
+2. **The second trigger does almost all the work.** Across the 28 measured drawings there are **9
+   leader-leader crossings against 76 label-on-leader**. The cheap segment-intersection test — the
+   obvious first phase, and the one the task originally proposed on its own — sees about a tenth of
+   what a reader sees. A gang move tuned against leader crossings alone would be tuning against the
+   rare half.
+3. **The count is a fact about a VIEW, not about a drawing.** Net3-World's node-only gangs run 5, 11,
+   9, 1 across the four zooms, and Net2 goes from 5 pairs at the fit zoom to none at every zoom in
+   from it — as labels spread out, fewer are near enough to conflict, and fewer of them are far
+   enough from their node to draw a leader at all. So phase two is judged on one stated view before
+   and after, never on "the drawing".
+
+**What phase two therefore knows that it did not:** the graph is small (single figures per view, in
+components of two and three), it is dominated by label-over-leader rather than by crossed leaders,
+and it is measurable per view — which is what makes "stack the gang and re-measure" a decidable
+experiment rather than a matter of taste. No absolute target is needed and none is asserted; the
+harness asserts the pure cases and prints the live numbers.
+
+---
+
 ## Sources
 
 - Imhof, *Positioning Names on Maps*, The American Cartographer 2 (1975) 128–144.
