@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 1615,
-        "delta_key_count": 80,
+        "expected_key_count": 1616,
+        "delta_key_count": 81,
         "exempt_key_count": 22,
         "exempt_keys": [
             "u_imgd",
@@ -512,6 +512,7 @@
         "lpn_find_prop_demand_description": "Demand category description",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
+        "lpn_new_units_tip": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
         "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
@@ -569,12 +570,12 @@
         "lpn_scncmp_at": "{value} at {id}",
         "lpn_scncmp_current": "(open now)",
         "lpn_scncmp_note": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
-        "lpn_energy_over": "Over an extended period simulation of {time}.",
+        "lpn_energy_over": "Over an extended period simulation.",
         "lpn_energy_col_pump": "Pump",
         "lpn_energy_col_running": "Running",
         "lpn_energy_col_effic": "Effic.",
         "lpn_energy_col_avg_kw": "Avg. kW",
-        "lpn_energy_col_avg_kw_tip": "The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.",
+        "lpn_energy_col_avg_kw_tip": "The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.",
         "lpn_energy_col_peak_kw": "Peak kW",
         "lpn_energy_col_kwh": "kWh",
         "lpn_energy_col_cost": "Cost",
@@ -594,6 +595,7 @@
         "lpn_find_prop_demand_description": "Demand category description",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
+        "lpn_new_units_tip": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
         "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
@@ -651,12 +653,12 @@
         "lpn_scncmp_at": "{value} at {id}",
         "lpn_scncmp_current": "(open now)",
         "lpn_scncmp_note": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
-        "lpn_energy_over": "Over an extended period simulation of {time}.",
+        "lpn_energy_over": "Over an extended period simulation.",
         "lpn_energy_col_pump": "Pump",
         "lpn_energy_col_running": "Running",
         "lpn_energy_col_effic": "Effic.",
         "lpn_energy_col_avg_kw": "Avg. kW",
-        "lpn_energy_col_avg_kw_tip": "The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.",
+        "lpn_energy_col_avg_kw_tip": "The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.",
         "lpn_energy_col_peak_kw": "Peak kW",
         "lpn_energy_col_kwh": "kWh",
         "lpn_energy_col_cost": "Cost",
@@ -763,6 +765,22 @@
                     "key": "lpn_find_q_aside",
                     "value": "کنٹرولز نیچے دی گئی کوئری کو ظاہر نہیں کر سکتے، اس لیے وہ چھپا دیے گئے ہیں۔",
                     "english": "The controls cannot express the query below, so they are hidden."
+                }
+            }
+        },
+        "lpn_new_units_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_place_tip",
+                    "value": "اختیاری۔ کوئی شہر، گلی یا معروف مقام لکھیں اور نیا نقشہ وہاں کھلے گا۔ آپ کے لکھے ہوئے الفاظ OpenStreetMap کی جگہ کے نام کی سروس کو بھیجے جاتے ہیں، جو پہلی بار آپ کی اجازت مانگتی ہے۔ اسے خالی چھوڑیں اور نقشہ پوری دنیا پر کھلے گا۔",
+                    "english": "Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap's place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world."
+                },
+                "next_translated": {
+                    "key": "lpn_new_place_hint",
+                    "value": "پیٹالوما، کیلیفورنیا",
+                    "english": "Petaluma, California"
                 }
             }
         },
