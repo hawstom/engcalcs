@@ -117,17 +117,17 @@ the block.
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
 
-- 75|583| **What this page calls the extended-period simulation, audited and costed.**
+- 75|583| **[H] Four EPS sentences left to rule on, and they are the teaching ones.**
   Tom, 2026-09-04, ruling on `lpn_energy_over`: *"Use 'extended period simulation' and audit the page
-  for this terminology standardization Time Simulation in all its real variants becomes EPS or
-  extended etc."* The string he ruled on is changed; the audit is `dev/eps-terminology-audit.md` and
-  the decision is his.
-  - **58 strings match and only 20 of them are the thing.** 21 are ordinary English ("run out of
-    room", "a search is already running") and 13 are FIRE FLOW's own runs, which are N steady-state
-    solves and would be made false by the rename.
-  - **The sweep is 442 retranslations and would lapse six of his own rulings from that morning**, a
-    ruling being keyed on the exact English it was made on. The audit recommends a RATCHET on new
-    writing plus two cheap front-door exceptions at 208 retranslations, and names them.
+  for this terminology standardization."* Audited, and then he read the audit and **closed the two
+  expensive groups himself**: of the 20 strings that name the analysis with a variant (*Total run
+  time*, *"through the run"*) and the 13 fire-flow ones, *"I think these probably are okay as is."*
+  So the sweep is not happening and its 442 retranslations are not being spent.
+  - **What is left is the eight strings that already reach for the words** -- *"I think some of these
+    need to be changed. Can you give me the full list to audit?"* The full list, in full text, with a
+    recommendation each, is `dev/eps-terminology-audit.md` §4. Four changes recommended, 104
+    retranslations, and three of the four are the sentences that TEACH the distinction: why one
+    moment, why the other engine, what is happening right now.
 
 - 100|584| **[H] One page-wide rule for where a setting lives, and how a new project gets one.**
   Tom, 2026-09-04, having ruled the divider's memory in: *"we need a page-wide convention for how a

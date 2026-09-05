@@ -18,50 +18,56 @@ are ordinary English and have nothing to do with naming the analysis.**
 |---|---|---|
 | Ordinary English "run" — nothing to standardise | 21 | *"this site has run out of room"*, *"A search is already running"*, *"Runs the EPANET solver"*, *"pumps run at a speed other than…"*, *"Run the model with the EPANET engine"* |
 | Names the EXTENDED-PERIOD ANALYSIS, using a variant | 20 | *Total run time*, *"the run finished"*, *"through the run"*, *"how long this network runs"*, *"from the start of the run to the end of it"* |
-[TGH: I think these probably are okay as is.]
-| Already says period or simulation | 4 | *"Working out the whole time period"*, *"a simulation that runs over a period of time"*, *"no time period"*, and `lpn_energy_over`, changed today |
-[TGH: I think some of these need to be changed. Can you give me the full list to audit?]
+| Says *period* or *simulation* already | 8 | listed in full in §4 |
 | Fire flow's own runs — a DIFFERENT thing | 13 | *"Fire flow run"*, *"This run solved the whole network {solves} times"*, *"Runs"* as a column heading |
-[TGH: I think these probably are okay as is.]
+
+**TOM RULED TWO OF THOSE FOUR GROUPS ON 2026-09-04, AND HIS RULING INVERTS WHAT THIS FILE FIRST
+RECOMMENDED.** Of the 20 that name the analysis with a variant — *Total run time*, *"through the
+run"* — he wrote *"I think these probably are okay as is."* Of the 13 fire-flow ones, the same. **So
+the two expensive groups are closed and the §3 recommendation below is spent**: there is no ratchet
+to argue for and no 442 retranslations to weigh, because the strings that would have paid for it are
+ruled correct. What is left open is the group that already reaches for the words — *"I think some of
+these need to be changed. Can you give me the full list to audit?"* — and it is §4.
 
 **The fire-flow group is the one that must not be swept**, and it is nearly a quarter of the hits. A
 fire-flow run is N steady-state solves, not an extended-period simulation; renaming it would say
 something false. Same for `lpn_ff_calculate` ("Run") and the `Runs` column.
 
-## The cost, stated before the decision rather than after
+## 3. What the closed groups cost, kept because it is the argument that won
 
-Of the 20 strings that genuinely name the analysis:
+Of the 20 strings that name the analysis with a variant, **17 are already translated into 26
+languages**, so rewriting them was 17 x 26 = **442 retranslations of text whose meaning does not
+move** — and six of them Tom had ruled OK the same morning, a ruling being keyed on the exact English
+it was made on, so each would have lapsed and come back to him unread. `lpn_time_duration` ("Total
+run time") is also quoted by five other strings that tell the reader to *"Set a Total run time under
+Time"*, so it could not have moved alone.
 
-- **17 are already translated into 26 languages.** Changing an English value there is 17 x 26 = **442
-  retranslations** of text whose meaning does not move.
-- **6 of them Tom ruled OK on 2026-09-04**, on the exact wording that would be changed —
-  `lpn_energy_needs_run`, `lpn_quality_needs_run`, `lpn_quality_initial_tip`,
-  `lpn_settings_quality_track_tip`, `lpn_settings_show_arrows_tip`, `lpn_inp_drop_quality_options`.
-  A ruling is keyed on the exact English, so each of those rulings would lapse and come back to him
-  unread.
-- **`lpn_time_duration` ("Total run time") is cited by five other strings**, which each tell the
-  reader to *"Set a Total run time under Time"*. It cannot move alone.
+That arithmetic is why the file recommended a ratchet rather than a sweep. **Tom reached the same
+place from the other direction and more cheaply — he simply read them and found them correct** — so
+the recommendation is spent and only the record of the cost is worth keeping. It is the same
+arithmetic that settled the em-dash question (60 x 26 = 1,560), and it is the number to reach for the
+next time a sweep is proposed.
 
-This is the same arithmetic that settled the em-dash question: 60 strings x 26 = 1,560
-retranslations was judged not worth paying for text whose meaning did not move, and the rule became a
-ratchet on NEW writing instead of a sweep.
+## 4. THE OPEN LIST: every shipped string that already says *period* or *simulation*
 
-## The recommendation
+Tom: *"I think some of these need to be changed. Can you give me the full list to audit?"* This is
+all eight, in full, in key order. **Two were changed on 2026-09-04 and are shown so the set is
+complete.** A recommendation is given for each so the audit is one pass rather than two; each is a
+suggestion and none is applied.
 
-**A ratchet, not a sweep.** Every NEW or EDITED visitor-facing string that names the analysis says
-*extended period simulation* — spelled out on first use in a given box, and thereafter as much of it
-as the space allows. Nothing already shipped and translated is rewritten for the name alone.
+| Key | Translated | The string today | Recommendation |
+|---|---|---|---|
+| `lpn_energy_col_avg_kw_tip` | no | *The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.* | **Leave.** "The whole period" here means the run's duration in contrast to the pump's on-time; it is doing arithmetic, not naming the analysis. |
+| `lpn_energy_menu_tip` | no | *How long each pump ran, what power it drew and what it cost over the last extended period simulation.* | **Changed 2026-09-04.** Already says it. |
+| `lpn_energy_over` | no | *Over an extended period simulation of {time}.* | **Changed 2026-09-04.** The string Tom ruled on. |
+| `lpn_inp_drop_eps` | 26 | *This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in.* | **Change.** It defines the thing rather than naming it, in a sentence a reader meets when a file's own EPS could not be honoured — the one place the name is most useful. Suggested: *This file describes an extended period simulation. The part of this page that runs a network through time did not load, so only the starting conditions came in.* Shorter as well as more exact. |
+| `lpn_time_no_engine` | 26 | *…Connect to the internet once to fetch the EPANET solver, which runs the whole period.* | **Change the last clause only**: *"…which runs an extended period simulation."* This is the sentence that explains why the built-in solver answers one instant, so it is teaching the distinction and should name what the other engine does. |
+| `lpn_time_no_period` | 26 | *This project has no time period, so there is only one moment to show. Set a Total run time in Settings to calculate the network over time.* | **Change the first clause**: *"This project has no extended period simulation set, so there is only one moment to show."* Keep *Total run time* verbatim in the second sentence — it is the literal name of the control the reader must find, and Tom has ruled that control's own label correct. |
+| `lpn_time_run_note` | 26 | *…This network takes so long to calculate over its whole time period that the results for the later times are not kept up to date while you work…* | **Leave.** "Its whole time period" is the network's duration, not the name of the analysis, and the sentence is already long. |
+| `lpn_time_running` | 26 | *Working out the whole time period with the EPANET solver.* | **Change.** This is the progress line — what the page says while it is doing the thing — so it is the single best place to say the thing's name. Suggested: *Working out the extended period simulation with the EPANET solver.* |
 
-Two exceptions worth making anyway, if Tom wants them, and they are cheap because they are the
-front door rather than the whole house:
+**Four changes recommended, all translated, so 4 x 26 = 104 retranslations.** Three of the four are
+the sentences that TEACH the distinction (why one moment, why the other engine, what is happening
+now), which is the same test §3 arrived at from the cost side.
 
-1. **`lpn_time_duration`, "Total run time" → "Total simulation time"** and the five strings that
-   quote it. 6 x 26 = 156 retranslations, and it is the single control every one of those sentences
-   points at.
-2. **`lpn_time_menu_tip` and `lpn_time_run_tip`**, which are the two sentences that TEACH the feature
-   and are where a reader first meets the name. 2 x 26 = 52.
-
-That is 208 retranslations for the strings that carry the teaching, against 442 for the sweep, and
-it leaves every one of his fresh rulings standing.
-
-**Not decided here. `lpn_energy_over` is changed; everything above waits on Tom.**
+**Not applied. Waiting on Tom.**

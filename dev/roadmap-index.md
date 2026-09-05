@@ -37,7 +37,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 579 — The four EPANET sections still carried and not understood, extracted from 566.
 - ! Task 581 — An empty box cannot say "this file states zero" apart from "nothing is set".
 - Task 582 — Pump efficiency curves: the one energy number we still take on faith.
-- Task 583 — What this page calls the extended-period simulation, audited and costed.
+- ! Task 583 — [H] · Four EPS sentences left to rule on, and they are the teaching ones.
 
 ## 50 — Someday (14)
 
@@ -94,5 +94,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-57 of 68 titles are within 4–12 words. `!` marks the rest;
+56 of 68 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
