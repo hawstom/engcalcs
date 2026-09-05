@@ -124,9 +124,17 @@ Built 2026-09-03 (Task 566). Against the six-item list this section used to carr
    so `replaceWrite()` takes its `prop` branch and goes through `setProp()`).
    A **TANK** carries its own the same way (`tankCoeff`), in the tank popup and the Tanks table.
 3. **`[QUALITY]` interpreted** — per-node initial quality, as node property `initQuality`, also
-   through `setProp()`. **`[SOURCES]` and `[MIXING]` are still carried and not read**, so a booster
-   dose and a tank mixing model are the next real gap. A reservoir's own initial quality is held for
-   the whole run by EPANET, which is why this alone is enough to state a plant residual and run.
+   through `setProp()`. A reservoir's own initial quality is held for the whole run by EPANET, which
+   is why this alone is enough to state a plant residual and run.
+3b. **`[SOURCES]` AND `[MIXING]` INTERPRETED TOO (Task 579, 2026-09-05).** A booster dose is three
+   node properties on the overridable whitelist — `sourceType`, `sourceQuality`, `sourcePattern`,
+   EPANET's own four types — written through `setProp()` because a dose is an operating question.
+   A tank's `mixingModel` and `mixingFraction` are NOT overridable: a mixing model describes how the
+   tank is plumbed, and it sits with the elevation, levels and diameter, all Base-owned. Both
+   sections are read BESIDE their carried text (never over it) by `readSourceMixingSections()`,
+   called from the two doors `readQualitySections()` is; both reach the engine through
+   `assembleModel()`, which is the leg Task 582 shipped without for a session.
+   `dev/lpn-spike/source-mixing-harness.js` runs the engine with the booster and without it.
 4. **The concentration unit: carried as a label, never converted.** See the engine section above.
    The dimensioned quantity turned out to be the WALL coefficient, not the concentration.
 5. **The coefficient disclosure.** Both global boxes open EMPTY, an empty box is EPANET's own zero,
@@ -141,8 +149,7 @@ Built 2026-09-03 (Task 566). Against the six-item list this section used to carr
    with the transport broken. Re-run at a 10 s quality step so the answer is the physics rather than
    one lucky discretisation.
 
-**Still not built, deliberately:** `[SOURCES]` and `[MIXING]`, and a link-level quality result --
-see the two sections below.
+**Still not built, deliberately:** a link-level quality result -- see the section below.
 
 ---
 

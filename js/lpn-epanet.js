@@ -192,6 +192,13 @@
 			// nobody asked for.
 			initQuality = [],
 			reactionRows = [],
+			// **[SOURCES] AND [MIXING]** (Task 579). A booster dose at a node and a tank's mixing
+			// model, both of which EPANET honours with no arithmetic of ours. The sources go out
+			// only for a chemical, like [QUALITY] and [REACTIONS] beside them; the mixing models go
+			// out for any water-quality analysis, because how long a parcel sits in a tank decides
+			// a water AGE as much as it decides a residual.
+			sourceRows = [],
+			mixingRows = [],
 			energyRows = [],
 			warnings = [],
 			i, n, k, link;
@@ -489,12 +496,12 @@
 			}
 		}
 
-		// **THE WATER-QUALITY ANALYSIS, AND ONLY THE TWO THIS PAGE ACTUALLY WORKS OUT.**
-		// `model.quality` is the document's interpreted setting (js/lpn-inp.js's lpnQualityParse);
-		// mode 'age' and mode 'trace' are written here and run, and mode 'chemical' is NOT --
-		// a reacting chemical needs [REACTIONS], [SOURCES] and [MIXING], which this bridge does not
-		// write, so stating `Quality Chlorine mg/L` would ask EPANET for an analysis whose inputs
-		// are all missing and get a plausible column of zeros back. Carried text stays carried text.
+		// **THE WATER-QUALITY ANALYSIS, ALL THREE OF WHICH THIS PAGE NOW WORKS OUT.**
+		// `model.quality` is the document's interpreted setting (js/lpn-inp.js's lpnQualityParse).
+		// Mode 'age' and mode 'trace' were the first two; mode 'chemical' joined them when
+		// [REACTIONS] and [QUALITY] started being written (Task 566), and [SOURCES] and [MIXING]
+		// followed (Task 579), so a booster dose and a tank that is not completely mixed now reach
+		// the engine as themselves rather than as carried text nothing acted on.
 		//
 		// A TRACE WITH NO SOURCE NAMED IS NOT WRITTEN either: EPANET rejects the file over an
 		// unknown trace node, and refusing the whole network is a far worse answer than leaving the
@@ -510,6 +517,21 @@
 			// A document that names nothing gets EPANET's own default, exactly as every other
 			// unstated option here does.
 			qualLine = String(qual.chemical || 'CHEMICAL');
+		}
+		// **[MIXING] -- HOW THE WATER IN EACH TANK MIXES**, for whichever analysis is running.
+		// `TankID Model [Fraction]`, EPANET's own four models. The fraction goes out only where the
+		// tank states one: it means something to 2COMP alone and EPANET's own default is 1, so a
+		// number we invented would state a split the user never made.
+		// Skipped entirely when no analysis is running -- a hydraulics-only file gets exactly the
+		// input it always got, and a mixing model means nothing without a quality run.
+		if (qualLine) {
+			for (i = 0; i < model.nodes.length; i++) {
+				n = model.nodes[i];
+				if (!n.mixing || !n.mixing.model) { continue; }
+				mixingRows.push(' ' + n.id + '  ' + n.mixing.model
+					+ (typeof n.mixing.fraction === 'number' && isFinite(n.mixing.fraction)
+						? '  ' + n.mixing.fraction : ''));
+			}
 		}
 		// **[QUALITY] -- WHAT EACH NODE STARTS THE RUN HOLDING, AND FOR A RESERVOIR WHAT IT HOLDS
 		// FOR EVER.** This is how a chemical gets into the network at all; the booster kind,
@@ -530,6 +552,16 @@
 			// writer emits an LPS-and-metres file always. That is the same defect `HeadError`
 			// had -- a coefficient stated in ft/day arriving as m/day is wrong by 3.28 in the one
 			// term that decides how much chlorine is left.
+			// **[SOURCES] -- WHERE MORE OF THE CHEMICAL IS ADDED.** `NodeID Type Strength [Pattern]`,
+			// EPANET's own four keywords. Not converted, for the reason the [QUALITY] note above
+			// gives: a concentration has no factor on either side of this boundary, and a MASS
+			// source's strength is a mass rate in the same mass unit.
+			for (i = 0; i < model.nodes.length; i++) {
+				n = model.nodes[i];
+				if (!n.source || typeof n.source.quality !== 'number' || !isFinite(n.source.quality)) { continue; }
+				sourceRows.push(' ' + n.id + '  ' + (n.source.type || 'CONCEN') + '  ' + n.source.quality
+					+ (n.source.pattern ? '  ' + n.source.pattern : ''));
+			}
 			var react = model.reactions || {};
 			[['orderBulk', 'Order Bulk'], ['orderTank', 'Order Tank'], ['orderWall', 'Order Wall'],
 				['globalBulk', 'Global Bulk'], ['globalWall', 'Global Wall'],
@@ -635,7 +667,12 @@
 			// EPANET's own section order puts [ENERGY] after the controls and before [QUALITY].
 			(energyRows.length ? '[ENERGY]\n' + energyRows.join('\n') + '\n\n' : '') +
 			(initQuality.length ? '[QUALITY]\n' + initQuality.join('\n') + '\n\n' : '') +
+			(sourceRows.length ? '[SOURCES]\n' + sourceRows.join('\n') + '\n\n' : '') +
 			(reactionRows.length ? '[REACTIONS]\n' + reactionRows.join('\n') + '\n\n' : '') +
+			// EPANET's own writer order puts [MIXING] after [REACTIONS]. Written for ANY quality
+			// analysis, not only a chemical: a tank running FIFO holds water for a different length
+			// of time than one running MIXED, so the mixing model moves a water age too.
+			(mixingRows.length ? '[MIXING]\n' + mixingRows.join('\n') + '\n\n' : '') +
 			(timeRows.length ? '[TIMES]\n' + timeRows.join('\n') + '\n\n' : '') +
 			'[OPTIONS]\n Units LPS\n Headloss ' + headloss +
 			'\n Emitter Exponent ' + emitterExp +

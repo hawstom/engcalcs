@@ -2355,9 +2355,23 @@ var EngCalcs = EngCalcs || {};
 	// It was carried on `settings.reactions.tank` while nothing could edit it; a value with a
 	// control on it belongs on the element the control is attached to, and going through this
 	// whitelist is what puts it behind setProp() like everything else a person can type.
+	// **THE BOOSTER DOSE IS OVERRIDABLE AND THE TANK'S MIXING MODEL IS NOT** (Task 579), and the
+	// split is the one this whitelist already draws everywhere else: what the network is ASKED to
+	// do varies by scenario, what it is BUILT as does not.
+	// `sourceType`, `sourceQuality` and `sourcePattern` are a booster station's dose -- the kind of
+	// dose, its strength and when it runs. "What if the booster holds 1.2 mg/L instead of 0.8, and
+	// only overnight" is an operating question and a scenario is where one is asked, which is
+	// exactly the argument `initQuality` above is here on. All three move together: a strength
+	// without its type is a different dose, so a scenario that overrides one must be able to
+	// override all three.
+	// A TANK'S MIXING MODEL IS NOT HERE, deliberately. It describes how the tank is plumbed and
+	// baffled, and it sits with `elev`, `minLevel`, `maxLevel` and `tankDiameter` -- every one of
+	// which is Base-owned for the same reason. `level` is the one tank property that varies,
+	// because it is a design variable in the way a reservoir's head is.
 	var LPN_OVERRIDABLE = {
 		node: { demand: true, emitter: true, head: true, level: true, active: true, fireFlow: true,
-			initQuality: true, tankCoeff: true },
+			initQuality: true, tankCoeff: true,
+			sourceType: true, sourceQuality: true, sourcePattern: true },
 		// `setting` is a VALVE's setting (Task 248 phase 2). It belongs here for the same reason
 		// demand does: "what if the pressure reducing valve is set to 50 psi" is an operating
 		// question, which is what a scenario asks, where the valve's diameter is what was built.
@@ -14693,6 +14707,12 @@ var EngCalcs = EngCalcs || {};
 		if (!settings.energy && EngCalcs.lpnEnergyParse) {
 			readEnergySection(saved.inpSections || {}, settings, saved.links || []);
 		}
+		// `[SOURCES]` and `[MIXING]` on the same terms as the three above (Task 579): a project
+		// saved while both were carried text gains its booster doses and its tank mixing models on
+		// open rather than never.
+		if (!settings.sources && EngCalcs.lpnSourcesParse) {
+			readSourceMixingSections(saved.inpSections || {}, settings, saved.nodes || []);
+		}
 		// **A PROJECT SAVED UNDER THE TWO-FIELD DESIGN KEEPS ITS NUMBERS.** That design froze the
 		// method's answer into a second field, `colorFrozenBreaks`, and was rejected (Task 448).
 		// Those numbers are the ones that project was drawn in, so
@@ -15693,6 +15713,9 @@ var EngCalcs = EngCalcs || {};
 				// arrives as 75 rather than as nothing, which is what lets the run say what the
 				// pumping cost.
 				readEnergySection(parsed.inpSections, s, links);
+				// **AND [SOURCES] AND [MIXING]** (Task 579): a booster dose arrives as a dose the
+				// engine is told about, and a tank that is not completely mixed arrives saying so.
+				readSourceMixingSections(parsed.inpSections, s, nodes);
 				return s;
 			}()),
 			// THE CLOCK, CARRIED WHOLE (Task 423). js/lpn-patterns.js has already turned every time
@@ -15773,6 +15796,45 @@ var EngCalcs = EngCalcs || {};
 		(nodeList || []).forEach(function (n) {
 			if (n.type !== 'tank') { return; }
 			if (map[n.id] !== undefined) { n._tankCoeff = map[n.id]; }   // base-write: an imported or reopened coefficient is Base's, and there is no scenario yet to hold it
+		});
+	}
+
+	/**
+	 * **`[SOURCES]` AND `[MIXING]`, READ ONTO A DOCUMENT** (Task 579). readQualitySections()'s
+	 * third sibling, called from the same two doors for the same reason -- an `.inp` import and
+	 * opening a project saved while both sections were carried text -- so a fresh import and a
+	 * reopened project can never disagree about what a file said.
+	 *
+	 * The three rules are the ones the other two follow. The carried text is not touched and stays
+	 * what the exporter writes back. A per-element value lands on the ELEMENT: a booster dose on
+	 * the node it is injected at, through the resolver and the `setProp()` seam like every other
+	 * overridable property; a mixing model on the tank, Base-owned like the tank's own geometry.
+	 * And what has no element to live on stays on the setting -- which here is only the RECORD
+	 * that the section has been read at all, since every number in both sections belongs to an
+	 * element. That record is what stops the exporter composing an empty section over lines the
+	 * source stated.
+	 */
+	function readSourceMixingSections(sections, settingsObj, nodeList) {
+		var src = EngCalcs.lpnSourcesParse
+				? EngCalcs.lpnSourcesParse((sections || {}).SOURCES || []) : {},
+			mix = EngCalcs.lpnMixingParse
+				? EngCalcs.lpnMixingParse((sections || {}).MIXING || []) : {};
+		// PRESENT EVEN WHEN EMPTY, for the reason `settings.reactions` is: its presence is what
+		// tells the exporter this document's two sections have been read.
+		settingsObj.sources = { read: true };
+		settingsObj.mixing = { read: true };
+		(nodeList || []).forEach(function (n) {
+			var s = src[n.id], m;
+			if (s) {
+				n._sourceType = s.type;                                   // base-write: reading a file onto a document being CONSTRUCTED, before any scenario exists
+				n._sourceQuality = s.quality;                             // base-write: same construction pass; the file states one network, which is Base
+				if (s.pattern) { n._sourcePattern = s.pattern; }          // base-write: same construction pass; an imported dose schedule is Base's
+			}
+			if (n.type !== 'tank') { return; }
+			m = mix[n.id];
+			if (!m) { return; }
+			n.mixingModel = m.model;
+			if (m.fraction !== undefined) { n.mixingFraction = m.fraction; }
 		});
 	}
 
@@ -26153,6 +26215,78 @@ var EngCalcs = EngCalcs || {};
 	 * numeric standard -- no Ten States-style bright line exists to check it against -- so there is
 	 * nothing honest for a ✓ or a ⚠ to mean here. The number is reported and the engineer judges it.
 	 */
+	/**
+	 * **THE BOOSTER DOSE, ON ANY KIND OF NODE** (ROADMAP Task 579, EPANET's `[SOURCES]`).
+	 *
+	 * `[QUALITY]` above states what a node HOLDS when the run starts; this states what is being
+	 * ADDED to the water as it passes, which is a chlorine booster station, a hypochlorite feed at
+	 * a well head, or a fluoride feed at a plant. It was carried text and nothing acted on it, so a
+	 * file with a booster in it ran here with no chlorine entering at that node at all.
+	 *
+	 * **EPANET'S OWN FOUR TYPES, IN EPANET'S OWN WORDS.** They are not interchangeable: a
+	 * concentration source treats the inflow as arriving at that concentration, a mass booster adds
+	 * a mass per minute whatever the flow, a setpoint booster raises the water leaving the node to
+	 * a fixed concentration and no further, and a flow paced booster adds a fixed concentration to
+	 * whatever is already there. An engineer choosing between them is choosing between four real
+	 * pieces of equipment, so nothing here is simplified into one.
+	 *
+	 * Blank strength means this node is not a source, which is why the strength is blank-capable:
+	 * a zero would be a booster that is switched on and dosing nothing, and EPANET writes those two
+	 * as a line and as no line. All three go through setProp(), being overridable -- see
+	 * LPN_OVERRIDABLE, where the reason is that a dose is an operating question.
+	 */
+	function sourceFields(fields, n, unitText) {
+		var pc = EngCalcs.pageConfig || {};
+		selectFieldPlain(fields, pc.lpn_source_type || 'Source type',
+			[['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
+				['MASS', pc.lpn_source_type_mass || 'Mass booster'],
+				['SETPOINT', pc.lpn_source_type_setpoint || 'Setpoint booster'],
+				['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow paced booster']],
+			effective(n, 'sourceType') || 'CONCEN',
+			function (v) { setProp(n, 'sourceType', v); refreshPopupIfOpen(); },
+			pc.lpn_source_type_tip);
+		numberFieldBlank(fields,
+			(pc.lpn_source_quality || 'Source quality') + (unitText ? ' (' + unitText + ')' : ''),
+			effective(n, 'sourceQuality'),
+			function (v) { setProp(n, 'sourceQuality', v); refreshPopupIfOpen(); },
+			pc.lpn_source_quality_tip, { el: n, prop: 'sourceQuality' });
+		patternField(fields, pc.lpn_source_pattern || 'Source pattern',
+			function () { return effective(n, 'sourcePattern'); },
+			function (v) { setProp(n, 'sourcePattern', v || null); refreshPopupIfOpen(); },
+			pc.lpn_source_pattern_tip);
+	}
+	/**
+	 * **HOW THE WATER IN THIS TANK MIXES** (ROADMAP Task 579, EPANET's `[MIXING]`).
+	 *
+	 * Every tank here was treated as completely mixed whatever its file said, and that is the
+	 * assumption that flatters a residual: a tank with a short-circuiting inlet holds a stagnant
+	 * volume that the completely mixed model averages away. The four models are EPANET's own and
+	 * are what an engineer reads on a report.
+	 *
+	 * **SHOWN ON EVERY TANK AND NOT ONLY DURING A CHEMICAL RUN**, unlike the reaction coefficient
+	 * above it: a mixing model moves a water AGE exactly as it moves a residual, and it is a fact
+	 * about how the tank is plumbed rather than about which analysis is being run today.
+	 *
+	 * **THE FRACTION APPEARS ONLY UNDER TWO-COMPARTMENT MIXING**, because that is the only model it
+	 * means anything to -- EPANET greys it out for the other three. Written straight onto the tank
+	 * rather than through setProp(): see LPN_OVERRIDABLE, where a tank's construction is Base's.
+	 */
+	function mixingFields(fields, n) {
+		var pc = EngCalcs.pageConfig || {}, model = n.mixingModel || 'MIXED';
+		selectFieldPlain(fields, pc.lpn_mixing_model || 'Mixing model',
+			[['MIXED', pc.lpn_mixing_mixed || 'Complete mixing'],
+				['2COMP', pc.lpn_mixing_2comp || 'Two compartment mixing'],
+				['FIFO', pc.lpn_mixing_fifo || 'FIFO plug flow'],
+				['LIFO', pc.lpn_mixing_lifo || 'LIFO plug flow']],
+			model,
+			function (v) { n.mixingModel = v; updateNode(n.id); refreshPopupIfOpen(); },
+			pc.lpn_mixing_model_tip);
+		if (model !== '2COMP') { return; }
+		numberFieldBlank(fields, pc.lpn_mixing_fraction || 'Mixing fraction',
+			n.mixingFraction,
+			function (v) { n.mixingFraction = v; updateNode(n.id); },
+			pc.lpn_mixing_fraction_tip);
+	}
 	function qualityResultRow(fields, n) {
 		var pc = EngCalcs.pageConfig || {}, v = nodeQualityValue(n),
 			mode = qualityMode(), u = qualityUnitText();
@@ -26220,6 +26354,7 @@ var EngCalcs = EngCalcs || {};
 				function (v) { setProp(n, 'tankCoeff', v); refreshPopupIfOpen(); },
 				pc.lpn_reaction_tank_tip, { el: n, prop: 'tankCoeff' });
 			}
+			mixingFields(fields, n);
 			readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'),
 				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip);
 		} else if (n.type === 'reservoir') {
@@ -26334,6 +26469,7 @@ var EngCalcs = EngCalcs || {};
 				effective(n, 'initQuality'),
 				function (v) { setProp(n, 'initQuality', v); refreshPopupIfOpen(); },
 				pc.lpn_quality_initial_tip, { el: n, prop: 'initQuality' });
+			sourceFields(fields, n, cu);
 		}
 		qualityResultRow(fields, n);
 		activeField(fields, n);
@@ -27655,6 +27791,39 @@ var EngCalcs = EngCalcs || {};
 		var v = effective(n, 'initQuality');
 		return (typeof v === 'number' && isFinite(v)) ? v : undefined;
 	}
+	/**
+	 * **THE BOOSTER DOSE THIS NODE APPLIES** (Task 579), through the resolver seam so a scenario's
+	 * own dose is the one the engine is handed. Undefined where no strength is typed, which is the
+	 * honest statement "this node is not a source" -- a zero would be a source dosing nothing, and
+	 * EPANET writes those two as a line and as no line.
+	 *
+	 * **NOT CONVERTED, AND THAT IS NOT AN OMISSION.** A CONCEN, SETPOINT or FLOWPACED strength is
+	 * a concentration and a MASS one is a mass rate in the same mass unit; EPANET converts neither,
+	 * so there is no factor on either side of this boundary -- the same reason `initQuality` above
+	 * crosses untouched.
+	 */
+	function nodeSource(n) {
+		var q = effective(n, 'sourceQuality'), t, p;
+		if (typeof q !== 'number' || !isFinite(q)) { return undefined; }
+		t = effective(n, 'sourceType');
+		p = effective(n, 'sourcePattern');
+		return { type: t || 'CONCEN', quality: q, pattern: p || null };
+	}
+	/**
+	 * **HOW THE WATER IN THIS TANK MIXES** (Task 579). Base-owned, so it is read off the tank
+	 * rather than through effective() -- see LPN_OVERRIDABLE, where the reason is that a mixing
+	 * model describes how a tank is plumbed and not what it is asked to do.
+	 *
+	 * The compartment fraction rides along only where the tank states one. It means something to
+	 * 2COMP alone, and EPANET's own default for it is 1, so writing one we invented would state a
+	 * two-compartment split the user never made.
+	 */
+	function nodeMixing(n) {
+		if (!n || n.type !== 'tank' || !n.mixingModel) { return undefined; }
+		return (typeof n.mixingFraction === 'number' && isFinite(n.mixingFraction))
+			? { model: n.mixingModel, fraction: n.mixingFraction }
+			: { model: n.mixingModel };
+	}
 	function engineHydraulics(hyd, scenarioDM) {
 		var out = {}, k;
 		for (k in hyd) { if (Object.prototype.hasOwnProperty.call(hyd, k)) { out[k] = hyd[k]; } }
@@ -27856,6 +28025,25 @@ var EngCalcs = EngCalcs || {};
 			});
 			nodes.forEach(function (m) {
 				if (q[m.id] !== undefined) { m.initQuality = q[m.id]; }
+			});
+		}());
+		// **THE BOOSTER DOSES AND THE TANK MIXING MODELS, ACROSS THE SAME BRIDGE** (Task 579).
+		// **THIS IS THE HALF TASK 582 SHIPPED WITHOUT AND IT IS WHY IT IS WRITTEN HERE, BESIDE THE
+		// LINE IT MIRRORS.** The document kept the data and the exporter wrote it back perfectly,
+		// and it reached the engine through nothing at all -- kept, round-tripped and inert. A
+		// section is not implemented until it crosses this boundary.
+		// Absent where the node states none, so js/lpn-epanet.js writes exactly the file it wrote
+		// before for every network that has neither.
+		(function () {
+			var src = {}, mix = {};
+			doc.nodes.forEach(function (n) {
+				var s = nodeSource(n), m = nodeMixing(n);
+				if (s !== undefined) { src[n.id] = s; }
+				if (m !== undefined) { mix[n.id] = m; }
+			});
+			nodes.forEach(function (m2) {
+				if (src[m2.id] !== undefined) { m2.source = src[m2.id]; }
+				if (mix[m2.id] !== undefined) { m2.mixing = mix[m2.id]; }
 			});
 		}());
 		var links = doc.links.filter(function (l) {

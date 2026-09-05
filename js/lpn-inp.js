@@ -460,8 +460,8 @@
 		// These three are kept and written back, and they are still a difference: nothing on this
 		// page acts on them, so a network whose chlorine decays is not being modelled here. The
 		// sentence says both halves, and it is a different sentence from the one about the
-		// water-quality SECTIONS -- [QUALITY], [REACTIONS], [SOURCES], [MIXING] -- which really are
-		// dropped.
+		// water-quality SECTIONS -- [QUALITY], [REACTIONS], [SOURCES], [MIXING] -- every one of
+		// which is now read and used (Tasks 566 and 579).
 		if (Object.keys(qualityOptions).length) {
 			drop('quality-options', [], Object.keys(qualityOptions).length);
 		}
@@ -1640,7 +1640,7 @@
 	 *
 	 * **AND FOR A RESERVOIR IT IS NOT AN INITIAL VALUE AT ALL**: EPANET holds a reservoir at its
 	 * own quality for the whole run, which is what makes this section the simplest way a chemical
-	 * enters a network. `[SOURCES]`, the booster kind, is still carried and not read.
+	 * enters a network. The BOOSTER kind is `[SOURCES]`, read below (Task 579).
 	 */
 	EngCalcs.lpnInitQualityParse = function (lines) {
 		var out = {};
@@ -1663,6 +1663,127 @@
 		Object.keys(m).forEach(function (id) {
 			if (m[id] === undefined || m[id] === null) { return; }
 			out.push(reactRow([id, String(m[id])]));
+		});
+		return out;
+	};
+
+	// ------------------------------------------------------------------------------------------
+	// **[SOURCES] AND [MIXING], INTERPRETED** (ROADMAP Task 579).
+	//
+	// A booster dose at a node, and how the water in a tank mixes. Both were carried verbatim and
+	// never read: a file stating `[SOURCES] N123 CONCEN 1.5 PAT1` ran here with no chlorine
+	// entering at that node at all, and every tank ran completely mixed whatever its file said.
+	// Tom, 2026-09-05: *"we are far beyond my own wish list that implementing 'all of EPANET'
+	// seems to be the only sensible thing to do right now."*
+	//
+	// Read on exactly the terms `[QUALITY]`, `[REACTIONS]` and `[ENERGY]` already use, and the
+	// first of those terms is the one that keeps a round trip byte-identical:
+	//
+	//   * **THE CARRIED TEXT IS NOT TOUCHED AND STAYS THE SOURCE OF TRUTH.** Neither section is on
+	//     `INP_SECTIONS_READ` and neither is joining it. That list is of the sections the reader
+	//     takes APART into tokens; a section on it loses its own characters, which is precisely
+	//     what the input-file-is-canonical rule forbids for a value we may hand straight back.
+	//     "Interpreted" here means what it means for `[QUALITY]`: parsed BESIDE the carried lines,
+	//     with the exporter writing those same lines back while they still parse to what the
+	//     document now states. `LPN_CARRIED_PLACED` therefore keeps both names, and keeps doing the
+	//     one job it did before -- stopping `carriedRest()` writing a SECOND `[SOURCES]` after the
+	//     options with the same lines in it.
+	//   * **NOTHING HERE CARRIES A UNIT.** A source strength is a concentration (CONCEN, SETPOINT,
+	//     FLOWPACED) or a mass rate stated in the same mass unit (MASS); a compartment fraction is
+	//     a fraction. EPANET converts a concentration nowhere either, so there is no factor
+	//     anybody could check ours against -- the unit is the label the document states beside the
+	//     chemical's name, shown and never converted (concentrationUnitText()).
+	//   * **EPANET'S OWN WORDS**, both for the four source types and for the four mixing models.
+	//     CLAUDE.md's vocabulary rule is about Label and Text and nothing else; CONCEN, MASS,
+	//     SETPOINT, FLOWPACED, MIXED, 2COMP, FIFO and LIFO are what an engineer reads on a report.
+	var LPN_SOURCE_TYPES = { CONCEN: 1, MASS: 1, SETPOINT: 1, FLOWPACED: 1 };
+	var LPN_MIXING_MODELS = { MIXED: 1, '2COMP': 1, FIFO: 1, LIFO: 1 };
+	/**
+	 * `[SOURCES]` -- `NodeID  [Type]  Strength  [Pattern]`, keyed by node id.
+	 *
+	 * **THE TYPE IS OPTIONAL IN THE FORMAT AND IS FILLED IN AS CONCEN**, which is EPANET's own
+	 * reader's rule: it takes the second token as a type only when it is one of the four keywords,
+	 * and treats the row as a concentration source otherwise. Filling it in here rather than
+	 * leaving it absent is what lets the popup always show a real type, and it costs no bytes: a
+	 * file whose row omitted the word is handed straight back while nothing about it has changed.
+	 *
+	 * The pattern is a NAME and is kept verbatim -- reading it as a number is how `P1` becomes NaN.
+	 */
+	EngCalcs.lpnSourcesParse = function (lines) {
+		var out = {};
+		(lines || []).forEach(function (raw) {
+			var line = String(raw), semi = line.indexOf(';'), w, type, n, q, pat;
+			if (semi >= 0) { line = line.slice(0, semi); }
+			line = line.trim();
+			if (!line) { return; }
+			w = line.split(/\s+/);
+			if (!w[0] || w[1] === undefined) { return; }
+			if (LPN_SOURCE_TYPES[String(w[1]).toUpperCase()]) { type = String(w[1]).toUpperCase(); n = 2; }
+			else { type = 'CONCEN'; n = 1; }
+			q = parseFloat(w[n]);
+			if (!isFinite(q)) { return; }
+			pat = w[n + 1];
+			out[w[0]] = pat ? { type: type, quality: q, pattern: pat } : { type: type, quality: q };
+		});
+		return out;
+	};
+	/** `[MIXING]` -- `TankID  Model  [Fraction]`, keyed by tank id. */
+	EngCalcs.lpnMixingParse = function (lines) {
+		var out = {};
+		(lines || []).forEach(function (raw) {
+			var line = String(raw), semi = line.indexOf(';'), w, model, f;
+			if (semi >= 0) { line = line.slice(0, semi); }
+			line = line.trim();
+			if (!line) { return; }
+			w = line.split(/\s+/);
+			if (!w[0] || w[1] === undefined) { return; }
+			model = String(w[1]).toUpperCase();
+			if (!LPN_MIXING_MODELS[model]) { return; }
+			f = parseFloat(w[2]);
+			out[w[0]] = isFinite(f) ? { model: model, fraction: f } : { model: model };
+		});
+		return out;
+	};
+	function sourceMapSame(a, b) {
+		var ka = Object.keys(a || {}), kb = Object.keys(b || {}), i, x, y;
+		if (ka.length !== kb.length) { return false; }
+		for (i = 0; i < ka.length; i++) {
+			x = a[ka[i]]; y = (b || {})[ka[i]];
+			if (!y || x.type !== y.type || x.quality !== y.quality || x.pattern !== y.pattern) { return false; }
+		}
+		return true;
+	}
+	function mixingMapSame(a, b) {
+		var ka = Object.keys(a || {}), kb = Object.keys(b || {}), i, x, y;
+		if (ka.length !== kb.length) { return false; }
+		for (i = 0; i < ka.length; i++) {
+			x = a[ka[i]]; y = (b || {})[ka[i]];
+			if (!y || x.model !== y.model || x.fraction !== y.fraction) { return false; }
+		}
+		return true;
+	}
+	/** The `[SOURCES]` lines this document now states. `src` wins while it still parses to them. */
+	EngCalcs.lpnSourcesText = function (live, src) {
+		var m = live || {}, out = [];
+		if (src && src.length && sourceMapSame(EngCalcs.lpnSourcesParse(src), m)) { return src.slice(); }
+		Object.keys(m).forEach(function (id) {
+			var s = m[id];
+			if (!s || typeof s.quality !== 'number' || !isFinite(s.quality)) { return; }
+			out.push(reactRow(s.pattern
+				? [id, s.type || 'CONCEN', String(s.quality), s.pattern]
+				: [id, s.type || 'CONCEN', String(s.quality)]));
+		});
+		return out;
+	};
+	/** The `[MIXING]` lines this document now states. `src` wins while it still parses to them. */
+	EngCalcs.lpnMixingText = function (live, src) {
+		var m = live || {}, out = [];
+		if (src && src.length && mixingMapSame(EngCalcs.lpnMixingParse(src), m)) { return src.slice(); }
+		Object.keys(m).forEach(function (id) {
+			var x = m[id];
+			if (!x || !x.model) { return; }
+			out.push(reactRow(typeof x.fraction === 'number' && isFinite(x.fraction)
+				? [id, x.model, String(x.fraction)] : [id, x.model]));
 		});
 		return out;
 	};
@@ -2371,6 +2492,51 @@
 			var lines = EngCalcs.lpnInitQualityText(live, carriedOut.QUALITY);
 			return lines.length ? '[QUALITY]\n' + lines.join('\n') + '\n\n' : '';
 		}
+		// **[SOURCES] AND [MIXING], ON THE SAME TERMS** (Task 579). Both live entirely on the
+		// ELEMENT -- a booster dose on the node it is injected at, a mixing model on the tank --
+		// so there is nothing of either on the setting except the record that says the section has
+		// been READ. `settings.sources` and `settings.mixing` are that record, and they are what
+		// stops a document which has never met the interpreter composing an empty section over
+		// text the source stated: a project saved before this task is exactly that case.
+		function liveSources() {
+			var out = {}, i, nd4, q, t, p;
+			for (i = 0; i < (doc.nodes || []).length; i++) {
+				nd4 = doc.nodes[i];
+				if (omitted[nd4.id]) { continue; }
+				q = eff(nd4, 'sourceQuality');
+				if (typeof q !== 'number' || !isFinite(q)) { continue; }
+				t = eff(nd4, 'sourceType');
+				p = eff(nd4, 'sourcePattern');
+				out[nd4.id] = p ? { type: t || 'CONCEN', quality: q, pattern: p }
+					: { type: t || 'CONCEN', quality: q };
+			}
+			return out;
+		}
+		function sourcesSection() {
+			var live = liveSources();
+			if (!settings.sources && !Object.keys(live).length) { return carriedSection('SOURCES'); }
+			var lines = EngCalcs.lpnSourcesText(live, carriedOut.SOURCES);
+			return lines.length ? '[SOURCES]\n' + lines.join('\n') + '\n\n' : '';
+		}
+		function liveMixing() {
+			var out = {}, i, nd5, mo, fr;
+			for (i = 0; i < (doc.nodes || []).length; i++) {
+				nd5 = doc.nodes[i];
+				if (nd5.type !== 'tank' || omitted[nd5.id]) { continue; }
+				mo = nd5.mixingModel;
+				if (!mo) { continue; }
+				fr = nd5.mixingFraction;
+				out[nd5.id] = (typeof fr === 'number' && isFinite(fr))
+					? { model: mo, fraction: fr } : { model: mo };
+			}
+			return out;
+		}
+		function mixingSection() {
+			var live = liveMixing();
+			if (!settings.mixing && !Object.keys(live).length) { return carriedSection('MIXING'); }
+			var lines = EngCalcs.lpnMixingText(live, carriedOut.MIXING);
+			return lines.length ? '[MIXING]\n' + lines.join('\n') + '\n\n' : '';
+		}
 		// Everything carried that EPANET's own writer has no place for -- a section some other
 		// program invented. Written last, before the drawing, in the order the source stated them.
 		function carriedRest() {
@@ -2443,9 +2609,9 @@
 			// to be written back untouched: a value we cannot use is still the user's.
 			energySection() +
 			initQualitySection() +
-			carriedSection('SOURCES') +
+			sourcesSection() +
 			reactionsSection() +
-			carriedSection('MIXING') +
+			mixingSection() +
 			section('TIMES', timeRows) +
 			// EPANET's own report settings. This page has its own way of showing answers and reads
 			// none of these; they go back out as they came in.
