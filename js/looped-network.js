@@ -2624,6 +2624,48 @@ var EngCalcs = EngCalcs || {};
 	 * Both doors read this one list -- the fly-out and the map's bottom status strip -- so the two
 	 * cannot drift.
 	 */
+	// THE REPORTS FLY-OUT (Tom, 2026-09-04). Three finished answers, each of which opens and is
+	// simply there -- no criteria to set, nothing to press.
+	//
+	// **THE PARENT CARRIES THE WORD SO NO ROW HAS TO.** Two of the three were called "... report"
+	// and the third was not, which is the non-parallelism Tom saw. Under a parent called Reports,
+	// the shortest true name of each thing is the right label, and "Reports > Pump energy report"
+	// would be the stammer. The BOX TITLES are unchanged -- "Pump energy report" and "EPANET run
+	// report" still name the objects themselves, which is Task 577's ruling and is not disturbed.
+	//
+	// **ENERGY SITS WITH THE RUN THAT PRODUCES IT** (Task 566): it is not a kind of run of its own,
+	// it is what the extended-period simulation already worked out on its way past. The scenario
+	// comparison is the widest question of the three -- the whole project, every case -- so it comes
+	// after the two single answers, which is the order a reader works down.
+	function reportMenuRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{
+				icon: 'pump', label: pc.lpn_energy_menu || 'Pump energy',
+				tip: pc.lpn_energy_menu_tip,
+				fn: function () { closeMenu(); openEnergyBox(); }
+			},
+			{
+				icon: 'scenarios', label: pc.lpn_scncmp_title || 'Scenario comparison',
+				tip: pc.lpn_scncmp_menu_tip,
+				fn: function () { closeMenu(); openScenarioCompareBox(); }
+			},
+			{
+				icon: 'info', label: pc.lpn_reports_epanet || 'EPANET run',
+				tip: pc.lpn_time_run_report_tip,
+				// **SHOWN, OR EXPLAINED -- never an empty box.** The row is always here rather than
+				// hidden when there is nothing to show: a row that disappears teaches nobody that
+				// the report exists, while a sentence saying why there is none teaches exactly that
+				// (the native solver prints nothing, so a network that has never reached EPANET has
+				// no report and never will until it does).
+				fn: function () {
+					if (EngCalcs.lpnTimeShowReport && EngCalcs.lpnTimeShowReport()) { return; }
+					setNotice(pc.lpn_time_no_report ||
+						'There is no run report yet. The report is EPANET\u2019s own text, so it appears once this network has been calculated with the EPANET solver.');
+				}
+			}
+		];
+	}
 	function scenarioMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
 		scenarios.forEach(function (s) {
@@ -9970,13 +10012,48 @@ var EngCalcs = EngCalcs || {};
 	// that does not place the box.
 	// Where the user last dragged it. A standing box keeps its place across openings -- being sent
 	// back to the menu's corner every time is what makes a reference box feel like a pull-down.
+	// ---- WHERE THE FIND BOX IS AND HOW BIG IT IS, REMEMBERED (Tom, 2026-09-04) ------------------
+	//
+	// *"I would strongly like it to persist somehow across reloads. Whether it saves for the page or
+	// by project remains to be decided. But maybe we are safe to go with page for now."* Page it is,
+	// which means PER BROWSER, exactly like `lpn_pane`, `lpn_rpane` and `lpn_setbox` -- and the
+	// argument for that is not convenience: where a box sits and how big it is is a fact about the
+	// SCREEN somebody is sitting at, and a colleague opening your project on a laptop must not
+	// inherit a 32-inch layout. serializeProject() must never learn about this. See ROADMAP Task 584
+	// for the page-wide rule this is one instance of.
+	//
+	// **NO NEW CONSENT AND NO EC_CONSENT_VERSION BUMP.** Same purpose and same category as the three
+	// keys it copies -- a panel layout the visitor set deliberately -- which the exemption test
+	// already answers yes for. It makes no sentence in consent_body false, so nothing has to be
+	// re-asked or re-translated; it needs a row in dev/cookie-storage-inventory.md and nothing more.
+	var LPN_FINDBOX_KEY = 'lpn_findbox';
+	// left/top/w/h, each null until the reader has moved or sized the box themselves. A null is not
+	// zero: it is "this has never been chosen", which is what keeps the anchored first-time
+	// placement a FIRST-TIME rule rather than one that fights the user afterwards.
 	var findUserPos = null;
-	// Where and how big the reader last put the Find box, for this page load. **In memory, not in
-	// storage, and deliberately the same as `findUserPos` beside it**: nothing about this box is
-	// written to the visitor's device today, and adding a size would be adding storage rather than
-	// matching what is already there. See wireFindPopup() for why it is observed rather than
-	// listened for, and toggleFindPopup() for why it has to be re-applied on every open.
 	var findUserSize = null;
+	function saveFindLayout() {
+		var v = {
+			left: findUserPos ? findUserPos.left : null,
+			top: findUserPos ? findUserPos.top : null,
+			w: findUserSize ? findUserSize.w : null,
+			h: findUserSize ? findUserSize.h : null
+		};
+		try { localStorage.setItem(LPN_FINDBOX_KEY, JSON.stringify(v)); } catch (e) {}
+	}
+	function loadFindLayout() {
+		var raw = null, v;
+		try { raw = localStorage.getItem(LPN_FINDBOX_KEY); } catch (e) { return; }
+		if (!raw) { return; }
+		try { v = JSON.parse(raw); } catch (e) { return; }
+		if (!v || typeof v !== 'object') { return; }
+		if (typeof v.left === 'number' && typeof v.top === 'number' && isFinite(v.left) && isFinite(v.top)) {
+			findUserPos = { left: v.left, top: v.top };
+		}
+		if (typeof v.w === 'number' && typeof v.h === 'number' && v.w > 0 && v.h > 0) {
+			findUserSize = { w: v.w, h: v.h };
+		}
+	}
 	function closeFindPopup() {
 		var popup = document.getElementById('lpn_find_popup');
 		hidePanel(popup);
@@ -10069,10 +10146,20 @@ var EngCalcs = EngCalcs || {};
 			x = document.getElementById('lpn_find_close');
 		if (!popup) { return; }
 		if (x) { x.addEventListener('click', closeFindPopup); }
-		makePanelDraggable(popup, function (pos) { findUserPos = pos; });
+		makePanelDraggable(popup, function (pos) {
+			// **A PHONE NEVER WRITES THE REMEMBERED CORNER**, the same ruling the Settings box
+			// follows: the box fills the window at that width and is not restored to a dragged
+			// corner there, so a number stored from a phone would only ever be felt on the desktop.
+			if (smallScreen()) { return; }
+			findUserPos = pos;
+			saveFindLayout();
+		});
 		// **THE TOUCH HALF OF `resize: both`** -- the browser's own grabber answers a mouse only.
 		// Same call, same reason, as the Settings and fire-flow boxes.
 		addPanelResizeGrip(popup);
+		// **BEFORE the observer below is armed**, or the first layout it sees would overwrite the
+		// stored numbers with the box's opening ones before anybody had touched it.
+		loadFindLayout();
 		// **THE SIZE IS OBSERVED, NOT LISTENED FOR**: `resize: both` is the browser's own widget and
 		// fires no event. The observer also catches a window that shrank past the cap, so what is
 		// remembered is the size on screen rather than a wish from a bigger window.
@@ -10087,6 +10174,7 @@ var EngCalcs = EngCalcs || {};
 				r = popup.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
 				findUserSize = { w: Math.round(r.width), h: Math.round(r.height) };
+				saveFindLayout();
 			}).observe(popup);
 		}
 	}
@@ -13950,9 +14038,10 @@ var EngCalcs = EngCalcs || {};
 		// are settings by any reading, and leaving them behind means the button's own sentence is
 		// false -- which is the whole thing this function exists to keep true.
 		// lpn_rpane and lpn_setbox are the same kind of thing and were being left behind, which made
-		// the confirm's "all settings" false for two keys nobody had noticed.
+		// the confirm's "all settings" false for two keys nobody had noticed. lpn_findbox joined
+		// them the day it was written, rather than a day later for the same reason.
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
-			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, PAGE_TITLES_KEY];
+			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, PAGE_TITLES_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -18662,53 +18751,23 @@ var EngCalcs = EngCalcs || {};
 				tip: pc.lpn_ff_menu_tip,
 				fn: function () { closeMenu(); openFireFlowBox(); }
 			},
-			// **A DIVIDER, AND THE THREE ROWS UNDER IT ARE REPORTS** (Tom, 2026-09-04: *"We can put
-			// a divider before the reports."*). Above it are the things you SET UP and start -- Run,
-			// and Fire flow, which asks for criteria first. Below it are three finished answers,
-			// each of which opens and is simply there.
-			{ separator: true },
-			// **ENERGY SITS WITH THE RUN THAT PRODUCES IT** (Task 566). It is not a kind of run of
-			// its own: it is what the extended-period run already worked out on its way past, which
-			// is why the row is here and not beside Settings.
+			// **A DIVIDER, AND ONE ROW UNDER IT THAT IS THE REPORTS** (Tom, 2026-09-04: *"We can
+			// put a divider before the reports"*, and then, having seen them: *"It's strange and
+			// non-parallel now, however, for 2/3 to have the word 'report'. Do we dare dive in and
+			// make all three into a Reports flyout now and drop the word 'report' from them?"*).
+			// Above the divider are the things you SET UP and start -- Run, and Fire flow, which
+			// asks for criteria first. Below it are the finished answers, and the parent now says
+			// once what two of the three rows were each saying for themselves.
 			//
-			// **AND IT IS NAMED A REPORT RATHER THAN MOVED TO THE TABLES PANE** (Task 577; Tom,
-			// 2026-09-04: *"Would it work to either call Pump Energy 'Pump Energy Report' ... or
-			// move it to our 'Tables' area?"*). Named, and it stays here. The planning-engineer seat
-			// answered from the work: a pump-energy figure is a DELIVERABLE -- it goes into a
-			// preliminary engineering report's operations section and a life-cycle cost, produced
-			// once the demand pattern and the tariff are settled -- not a column watched while
-			// drawing, which is what the Tables pane is for. EPANET's own Report > Energy is a
-			// standalone report for the same reason, and this menu's own two groups already say it:
-			// what you READ beside the map against what you RUN on it. The ellipsis went with the
-			// rename, because nothing opens asking for more input -- the row shows a finished
-			// report, exactly as "EPANET run report" below it does.
+			// **THIS IS NOT A RETREAT FROM TASK 577.** That task ruled Pump energy a REPORT rather
+			// than a table, and named it so. The flyout carries that ruling better than the row did:
+			// the word is said once, over all three, and each row is free to be the shortest true
+			// name of the thing it opens. "Reports > Pump energy report" would be the stammer.
+			{ separator: true },
 			{
-				icon: 'pump', label: pc.lpn_energy_menu || 'Pump energy report',
-				tip: pc.lpn_energy_menu_tip,
-				fn: function () { closeMenu(); openEnergyBox(); }
-			},
-			// **AND THE SCENARIO COMPARISON IS A RUN TOO**, for the same reason the two rows above
-			// it are: it solves the network once per scenario. Below them because it is the widest
-			// question of the three -- the whole project, every case -- and a reader working down
-			// this group meets the single answers first.
-			{
-				icon: 'scenarios', label: pc.lpn_scncmp_title || 'Scenario comparison',
-				tip: pc.lpn_scncmp_menu_tip,
-				fn: function () { closeMenu(); openScenarioCompareBox(); }
-			},
-			{
-				icon: 'info', label: pc.lpn_time_run_report || 'EPANET run report',
-				tip: pc.lpn_time_run_report_tip,
-				// **SHOWN, OR EXPLAINED -- never an empty box.** The row is always here rather than
-				// hidden when there is nothing to show: a row that disappears teaches nobody that the
-				// report exists, while a sentence saying why there is none teaches exactly that (the
-				// native solver prints nothing, so a network that has never reached EPANET has no
-				// report and never will until it does).
-				fn: function () {
-					if (EngCalcs.lpnTimeShowReport && EngCalcs.lpnTimeShowReport()) { return; }
-					setNotice(pc.lpn_time_no_report ||
-						'There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.');
-				}
+				icon: 'info', label: pc.lpn_reports_menu || 'Reports',
+				tip: pc.lpn_reports_menu_tip,
+				submenu: reportMenuRows
 			}
 		]);
 	}
@@ -23378,6 +23437,16 @@ var EngCalcs = EngCalcs || {};
 		}
 		d.addEventListener('pointerdown', function (e) {
 			start = { x: e.clientX, w: setboxIndexWidth() };
+			// **A CLICK LEAVES IT ARMED FOR THE KEYBOARD** (Tom, 2026-09-04: *"while tabbing and
+			// Home are very cool, it's an unrealistic path of discovery or even of arrival. Would
+			// it be possible to allow a click or a drag to leave it active for the Home key?"*).
+			// Nobody Tabs to a splitter; everybody grabs it. So the gesture that finds it is the
+			// gesture that gives it focus, and Home then works from where the hand already is.
+			//
+			// `:focus-visible` deliberately does NOT fire for a pointer, so this paints no ring --
+			// which is why the grip's own highlight is on `:focus` in the stylesheet instead: it is
+			// the only thing on screen saying the divider is listening.
+			if (d.focus) { d.focus(); }
 			// Captured, so a fast drag that outruns the 6px strip keeps arriving here rather than
 			// stopping dead over the pane it just left. Same rule as every other pointer drag on
 			// this page.

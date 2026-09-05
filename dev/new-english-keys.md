@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read**, of 75 untranslated keys, of 1612 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**12 still to read**, of 78 untranslated keys, of 1615 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (75, 8 to read @@ NEEDS RULING)
+## lpn_  (78, 12 to read @@ NEEDS RULING)
 
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
@@ -75,8 +75,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > kWh
   _Ruled OK 2026-09-04._
 - **`lpn_energy_menu`**
-  > Pump energy report
-  _Ruled OK 2026-09-04._
+  > Pump energy
+  @@ NEEDS RULING
 - **`lpn_energy_menu_tip`**
   > How long each pump ran, what power it drew and what it cost over the last extended period simulation.
   @@ NEEDS RULING
@@ -194,6 +194,15 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_reaction_wall_tip`**
   > Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.
   _Ruled OK 2026-09-04._
+- **`lpn_reports_epanet`**
+  > EPANET run
+  @@ NEEDS RULING
+- **`lpn_reports_menu`**
+  > Reports
+  @@ NEEDS RULING
+- **`lpn_reports_menu_tip`**
+  > The finished answers this page produces once a network has been calculated: what the pumps cost, how the scenarios compare, and what the EPANET solver itself printed.
+  @@ NEEDS RULING
 - **`lpn_result_concentration`**
   > Concentration
   _Ruled OK 2026-09-04._

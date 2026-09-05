@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 1612,
-        "delta_key_count": 75,
+        "expected_key_count": 1615,
+        "delta_key_count": 78,
         "exempt_key_count": 33,
         "exempt_keys": [
             "calc_units_us",
@@ -547,8 +547,11 @@
         "lpn_reaction_day": "day",
         "lpn_reaction_note": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.",
         "lpn_settings_energy": "Energy",
+        "lpn_reports_menu": "Reports",
+        "lpn_reports_menu_tip": "The finished answers this page produces once a network has been calculated: what the pumps cost, how the scenarios compare, and what the EPANET solver itself printed.",
+        "lpn_reports_epanet": "EPANET run",
         "lpn_energy_title": "Pump energy report",
-        "lpn_energy_menu": "Pump energy report",
+        "lpn_energy_menu": "Pump energy",
         "lpn_energy_menu_tip": "How long each pump ran, what power it drew and what it cost over the last extended period simulation.",
         "lpn_energy_efficiency": "Pump efficiency (percent)",
         "lpn_energy_efficiency_tip": "The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
@@ -624,8 +627,11 @@
         "lpn_reaction_day": "day",
         "lpn_reaction_note": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.",
         "lpn_settings_energy": "Energy",
+        "lpn_reports_menu": "Reports",
+        "lpn_reports_menu_tip": "The finished answers this page produces once a network has been calculated: what the pumps cost, how the scenarios compare, and what the EPANET solver itself printed.",
+        "lpn_reports_epanet": "EPANET run",
         "lpn_energy_title": "Pump energy report",
-        "lpn_energy_menu": "Pump energy report",
+        "lpn_energy_menu": "Pump energy",
         "lpn_energy_menu_tip": "How long each pump ran, what power it drew and what it cost over the last extended period simulation.",
         "lpn_energy_efficiency": "Pump efficiency (percent)",
         "lpn_energy_efficiency_tip": "The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
@@ -1136,6 +1142,54 @@
             }
         },
         "lpn_settings_energy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "La calidad del agua se transporta por las tuberías con el tiempo, así que necesita el solucionador de EPANET y un tiempo total de simulación. Configure un Tiempo total de simulación en Tiempo, y luego presione el botón Calcular.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_reports_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "La calidad del agua se transporta por las tuberías con el tiempo, así que necesita el solucionador de EPANET y un tiempo total de simulación. Configure un Tiempo total de simulación en Tiempo, y luego presione el botón Calcular.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_reports_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "La calidad del agua se transporta por las tuberías con el tiempo, así que necesita el solucionador de EPANET y un tiempo total de simulación. Configure un Tiempo total de simulación en Tiempo, y luego presione el botón Calcular.",
+                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_decimals_example",
+                    "value": "0,000",
+                    "english": "0.000"
+                }
+            }
+        },
+        "lpn_reports_epanet": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

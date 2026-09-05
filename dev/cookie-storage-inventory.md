@@ -89,6 +89,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_pane` | same | Whether the bottom pane is open, how tall it is, and which tab (Task 434) |
 | `lpn_rpane` | same | Whether the right panel is open and how wide it is (Task 441) |
 | `lpn_setbox` | same | Where the Settings box was left, how big it was made, and where its two panes are split (Tasks 441, 576) |
+| `lpn_findbox` | same | Where the Find box was left and how big it was made (Tom, 2026-09-04: *"I would strongly like it to persist somehow across reloads... maybe we are safe to go with page for now"*). Same purpose and category as the three rows above it |
 | `lpn_show_titles` | same | Whether the page-title row is shown |
 | `bpn_sketch_toggles` | `js/branched-network.js` | Which of the five data fields (length, diameter, flow, elevation, pressure) the Branched-Network topology sketch shows. The checkboxes live outside the form, so the page's own input cookie never captures them |
 

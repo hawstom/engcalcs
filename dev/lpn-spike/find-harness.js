@@ -75,6 +75,11 @@ const L = loadLoopedNetwork(
 	"\t\tsetPopupOpen: function (on) {\n" +
 	"\t\t\tdocument.getElementById('lpn_find_popup').style.display = on ? 'block' : 'none'; },\n" +
 	"\t\tsetQualityMode: function (m) { settings.quality = { mode: m, traceNode: '' }; },\n" +
+	// Task: the box's own corner and size, remembered per browser (Tom, 2026-09-04).
+	"\t\tsetLayout: function (pos, size) { findUserPos = pos; findUserSize = size; },\n" +
+	"\t\tgetLayout: function () { return { pos: findUserPos, size: findUserSize }; },\n" +
+	"\t\tsaveLayout: saveFindLayout, loadLayout: loadFindLayout,\n" +
+	"\t\tlayoutKey: function () { return LPN_FINDBOX_KEY; },\n" +
 	"\t\trebuildSettings: function () { rebuildSettingsBox(); },\n" +
 	// The options of the RENDERED property pull-down, read out of the markup the panel built --
 	// not out of findPropDefs(), which would answer correctly whether or not the box was repainted.
@@ -1109,6 +1114,55 @@ console.log('\n--- Find repaints when the project under it changes ---');
 	ok('a closed box is not repainted', L.renderedProps().indexOf('bulkCoeff') < 0,
 		String(L.renderedProps()));
 	L.setPopupOpen(false);
+}
+
+// ---- THE BOX'S OWN CORNER AND SIZE SURVIVE A RELOAD --------------------------------------------
+//
+// Tom, 2026-09-04, having used the resizeable box: *"I would strongly like it to persist somehow
+// across reloads. Whether it saves for the page or by project remains to be decided. But maybe we
+// are safe to go with page for now."* Page, meaning PER BROWSER -- the same answer `lpn_pane`,
+// `lpn_rpane` and `lpn_setbox` already give, and for a reason rather than for symmetry: where a box
+// sits and how big it is is a fact about the SCREEN somebody is sitting at, and a colleague opening
+// the project on a laptop must not inherit a 32-inch layout.
+//
+// **THE KEY IS WHAT IS BEING ASSERTED, not the numbers.** A new localStorage key is a question about
+// what is on a visitor's device; this one is exempt because it is the same purpose and category as
+// the three it copies. If this ever fails because the layout moved into the PROJECT file, that is a
+// change to what a colleague inherits and it needs Tom, not a harness fix.
+console.log('\n--- the Find box comes back where it was left ---');
+{
+	ok('it has a storage key of its own, beside the other panels\'',
+		L.layoutKey() === 'lpn_findbox', L.layoutKey());
+	L.setLayout({ left: 120, top: 64 }, { w: 480, h: 600 });
+	L.saveLayout();
+	const raw = JSON.parse(global.localStorage.getItem('lpn_findbox'));
+	ok('...and a corner and a size both reach it',
+		raw.left === 120 && raw.top === 64 && raw.w === 480 && raw.h === 600, JSON.stringify(raw));
+
+	L.setLayout(null, null);
+	L.loadLayout();
+	const back = L.getLayout();
+	ok('...and both come back on the next page load',
+		back.pos.left === 120 && back.pos.top === 64 && back.size.w === 480 && back.size.h === 600,
+		JSON.stringify(back));
+
+	// A null is "never chosen", which is what keeps the anchored first-time placement a FIRST-TIME
+	// rule. A stored zero size would be a box nobody could see.
+	L.setLayout(null, null);
+	L.saveLayout();
+	L.loadLayout();
+	ok('nothing chosen stays nothing chosen', L.getLayout().pos === null && L.getLayout().size === null,
+		JSON.stringify(L.getLayout()));
+	global.localStorage.setItem('lpn_findbox', JSON.stringify({ left: 1, top: 1, w: 0, h: 0 }));
+	L.loadLayout();
+	ok('...and a zero size is refused rather than restored', L.getLayout().size === null,
+		JSON.stringify(L.getLayout()));
+	global.localStorage.setItem('lpn_findbox', 'not json at all');
+	L.setLayout(null, null);
+	let threw = false;
+	try { L.loadLayout(); } catch (e) { threw = true; }
+	ok('...and unreadable storage is survived, not thrown on', !threw && L.getLayout().pos === null);
+	global.localStorage.removeItem('lpn_findbox');
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

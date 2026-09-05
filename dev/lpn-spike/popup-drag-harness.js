@@ -112,8 +112,15 @@ console.log('\n-- the wiring rules that keep a drag out of the controls --');
 		'the remembered position is written as it moves, not on release');
 	report(/makePanelDraggable\(popup, function \(at\) \{ popupUserPos = at; \}\);/.test(wire),
 		'...and the property popup remembers it in popupUserPos');
-	report(/makePanelDraggable\(popup, function \(pos\) \{ findUserPos = pos; \}\);/.test(extract('wireFindPopup')),
-		'...and the Find box in its own, so the two cannot move each other');
+	// The Find box's callback grew a body on 2026-09-04 -- it refuses a phone's corner and saves to
+	// localStorage -- so what is asserted is that it writes its OWN variable, not that it is a
+	// one-liner. `findUserPos` and `popupUserPos` being different names is the whole rule.
+	{
+		const findWire = extract('wireFindPopup');
+		const cb = findWire.slice(findWire.indexOf('makePanelDraggable(popup,'));
+		report(/findUserPos = pos;/.test(cb) && !/popupUserPos/.test(cb),
+			'...and the Find box in its own, so the two cannot move each other');
+	}
 	report(/popupUserPos = null;/.test(wire), 'double-clicking the chrome sends the box home');
 	report(/if \(popupUserPos\) \{ sx = popupUserPos\.left; sy = popupUserPos\.top; \}/.test(extract('openPopupAt')),
 		'and once moved, the next element opens the box where the user left it');

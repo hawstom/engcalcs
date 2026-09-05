@@ -2753,8 +2753,14 @@ $ec_lang['lpn_reaction_note']='This page offers no reaction coefficient of its o
 // wording has to be careful in two places: there is no default price and the note says why, and the
 // currency is a LABEL the user types, never a unit this page converts.
 $ec_lang['lpn_settings_energy']='Energy';
+// The Reports fly-out (Tom, 2026-09-04). The parent says "report" once, so no row under it has to;
+// the BOX titles still name the objects themselves, which is why lpn_energy_title and
+// lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
+$ec_lang['lpn_reports_menu']='Reports';
+$ec_lang['lpn_reports_menu_tip']='The finished answers this page produces once a network has been calculated: what the pumps cost, how the scenarios compare, and what the EPANET solver itself printed.';
+$ec_lang['lpn_reports_epanet']='EPANET run';
 $ec_lang['lpn_energy_title']='Pump energy report';
-$ec_lang['lpn_energy_menu']='Pump energy report';
+$ec_lang['lpn_energy_menu']='Pump energy';
 $ec_lang['lpn_energy_menu_tip']='How long each pump ran, what power it drew and what it cost over the last extended period simulation.';
 $ec_lang['lpn_energy_efficiency']='Pump efficiency (percent)';
 $ec_lang['lpn_energy_efficiency_tip']='The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.';
