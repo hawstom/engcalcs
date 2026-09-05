@@ -1304,6 +1304,13 @@ EngCalcs.pageConfig = {
 	lpn_library_control_ok: <?=json_encode($ec_lang['lpn_library_control_ok'])?>,
 	lpn_library_control_bad: <?=json_encode($ec_lang['lpn_library_control_bad'])?>,
 	lpn_library_control_missing: <?=json_encode($ec_lang['lpn_library_control_missing'])?>,
+	lpn_library_rules: <?=json_encode($ec_lang['lpn_library_rules'])?>,
+	lpn_library_rules_tip: <?=json_encode($ec_lang['lpn_library_rules_tip'])?>,
+	lpn_library_rule_add: <?=json_encode($ec_lang['lpn_library_rule_add'])?>,
+	lpn_library_rule_tip: <?=json_encode($ec_lang['lpn_library_rule_tip'])?>,
+	lpn_library_rule_ok: <?=json_encode($ec_lang['lpn_library_rule_ok'])?>,
+	lpn_library_rule_bad: <?=json_encode($ec_lang['lpn_library_rule_bad'])?>,
+	lpn_library_rule_missing: <?=json_encode($ec_lang['lpn_library_rule_missing'])?>,
 	lpn_field_base_demand: <?=json_encode($ec_lang['lpn_field_base_demand'])?>,
 	lpn_result_demand_tip: <?=json_encode($ec_lang['lpn_result_demand_tip'])?>,
 	lpn_field_demand_pattern: <?=json_encode($ec_lang['lpn_field_demand_pattern'])?>,
@@ -2072,6 +2079,8 @@ EngCalcs.pageConfig = {
 	lpn_engine_refused_fallback: <?=json_encode($ec_lang['lpn_engine_refused_fallback'])?>,
 	lpn_control_dangling_note: <?=json_encode($ec_lang['lpn_control_dangling_note'])?>,
 	lpn_control_unreadable_note: <?=json_encode($ec_lang['lpn_control_unreadable_note'])?>,
+	lpn_rule_dangling_note: <?=json_encode($ec_lang['lpn_rule_dangling_note'])?>,
+	lpn_rule_unreadable_note: <?=json_encode($ec_lang['lpn_rule_unreadable_note'])?>,
 	lpn_engine_minor_loss_note: <?=json_encode($ec_lang['lpn_engine_minor_loss_note'])?>,
 	lpn_unit_unknown: <?=json_encode($ec_lang['lpn_unit_unknown'])?>,
 	lpn_settings_text_size: <?=json_encode($ec_lang['lpn_settings_text_size'])?>,
@@ -2195,6 +2204,11 @@ EngCalcs.pageConfig = {
       // order wrong and the Time tab simply never appears, silently. ?>
 <script src="/engcalcs/js/lpn-time.js?v=<?=filemtime(__DIR__.'/js/lpn-time.js')?>"></script>
 <script src="/engcalcs/js/lpn-net.js?v=<?=filemtime(__DIR__.'/js/lpn-net.js')?>"></script>
+<?php // Rule-based controls, the language (ROADMAP Task 248.03). Pure grammar and unit kinds, no
+      // DOM. BEFORE looped-network.js, whose modelRules() parses and converts every rule on the
+      // way to the engine; without it no [RULES] section is written and a rule-driven network
+      // solves as though its rules were not there. ?>
+<script src="/engcalcs/js/lpn-rules.js?v=<?=filemtime(__DIR__.'/js/lpn-rules.js')?>"></script>
 <?php // The pure geometry/collision halves of the map editor (ROADMAP Task 293) -- must precede
       // looped-network.js, which reads EngCalcs.lpnGeom/lpnCollide as it defines itself. ?>
 <script src="/engcalcs/js/lpn-geom.js?v=<?=filemtime(__DIR__.'/js/lpn-geom.js')?>"></script>

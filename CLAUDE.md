@@ -98,6 +98,7 @@ anything else → false.
 | `js/lpn-solver.js` | Looped-network global gradient algorithm |
 | `js/lpn-epanet.js` | Bridge to the vendored EPANET engine |
 | `js/lpn-inp.js` | EPANET `.inp` import |
+| `js/lpn-rules.js` | `lpn_` EPANET `[RULES]` grammar: parse a rule, know each clause's quantity kind, convert. No DOM |
 | `js/looped-network.js` | `lpn_` map editor |
 | `css/engcalcs.css` | App-wide styles |
 
@@ -219,9 +220,11 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   Tanks fill and drain, demands follow patterns, the bottom pane scrubs the frames; checked against
   all 25 steps of EPA's own `Net3.rpt` to 0.005 ft over 2,425 head comparisons
   (`dev/lpn-spike/eps-net3-harness.js`). **The built-in solver has no time dimension and is not
-  getting one** — with EPANET unreachable the page solves one instant and says so. What is left of
-  Task 248 is rule-based `[RULES]` (248.03) alone: patterns on a reservoir head and on a pump speed
-  shipped 2026-08-24 (248.02). **EPANET's pump speed pattern REPLACES the SPEED setting rather than
+  getting one** — with EPANET unreachable the page solves one instant and says so. Patterns on a
+  reservoir head and on a pump speed shipped 2026-08-24 (248.02), and rule-based `[RULES]` closed
+  2026-09-05 (248.03): `js/lpn-rules.js` is EPANET's own grammar, parsing a rule so that every number
+  in it can be converted per clause into the engine's units. **EPANET checks its rule base BETWEEN
+  time steps, so a rule changes nothing on a single-instant solve** — the engine's behaviour, copied. **EPANET's pump speed pattern REPLACES the SPEED setting rather than
   scaling it** — measured against the engine, and the exporter writes SPEED or PATTERN, never both.
   **"No extended-period simulation yet" is FALSE.** It stood in this file and on the LibreWaterNet
   landing draft until 2026-08-21, three days after the run shipped, and Tom caught it, not a check.

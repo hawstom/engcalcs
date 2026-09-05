@@ -80,6 +80,7 @@ have something to generate; the wording is his call, not ours.
 - 248.01, 423, 410| Extended-period simulation: tanks fill and drain, demands follow their patterns, and a bar along the bottom plays the run or steps to any moment in it.
 - 248.02| Patterns on a reservoir head and on a pump's speed, beside the demand patterns.
 - 460| A Libraries box holding the patterns and curves a run needs.
+- 248.03| Rule-based controls, in EPANET's own words: read them, write them, and edit them in the Libraries box. Every level, pressure and flow in a rule is put into the units your project is showing.
 - 450| A Run button (optional, since answers can follow your edits instead) shows real progress, a completion report, and the engine's own report of the run.
 - 448| Colour limits hold still across a run, so a colour means the same thing at every step.
 

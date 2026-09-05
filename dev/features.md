@@ -8,7 +8,7 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-62 features, citing 95 of the 511 closed task IDs. The other 416 are
+63 features, citing 96 of the 512 closed task IDs. The other 416 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
 call a feature — and 134 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
@@ -60,6 +60,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - Extended-period simulation: tanks fill and drain, demands follow their patterns, and a bar along the bottom plays the run or steps to any moment in it. <!-- 248.01, 423, 410 -->
 - Patterns on a reservoir head and on a pump's speed, beside the demand patterns. <!-- 248.02 -->
 - A Libraries box holding the patterns and curves a run needs. <!-- 460 -->
+- Rule-based controls, in EPANET's own words: read them, write them, and edit them in the Libraries box. Every level, pressure and flow in a rule is put into the units your project is showing. <!-- 248.03 -->
 - A Run button (optional, since answers can follow your edits instead) shows real progress, a completion report, and the engine's own report of the run. <!-- 450 -->
 - Colour limits hold still across a run, so a colour means the same thing at every step. <!-- 448 -->
 

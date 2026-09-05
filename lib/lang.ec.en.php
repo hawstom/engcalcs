@@ -1878,7 +1878,7 @@ $ec_lang['lpn_inp_drop_head_pattern']='These reservoirs rise and fall through th
 $ec_lang['lpn_inp_drop_pump_speed']='These pumps run at a speed other than the one their curve was measured at, or change speed through the day. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_setting']='These pipes, pumps and valves carry a setting this page cannot hold. They came in open.';
 $ec_lang['lpn_inp_drop_controls']='These controls and rules were left out. The pipes, pumps and valves they name came in at the state written in the file and stay that way.';
-$ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. This page reads them and uses them. Run the model with the EPANET engine and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept as you wrote them, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_eps']='This file describes an extended period simulation. The part of this page that runs a network through time did not load, so only the starting conditions came in.';
 $ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose the chemical analysis under Settings, Calculation, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sources_mixing']='This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.';
@@ -2563,6 +2563,8 @@ $ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in
 // nothing to point at leaves the user reading every sentence they ever wrote.
 $ec_lang['lpn_control_dangling_note']='These controls name an element that is no longer in this project, so they were left out: {ids}';
 $ec_lang['lpn_control_unreadable_note']='These controls could not be read, so they were left out: {ids}';
+$ec_lang['lpn_rule_dangling_note']='These rules name an element that is no longer in this project, so they were left out: {ids}';
+$ec_lang['lpn_rule_unreadable_note']='These rules could not be read, so they were left out: {ids}';
 $ec_lang['lpn_engine_minor_loss_note']='Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity.';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
@@ -2934,6 +2936,13 @@ $ec_lang['lpn_library_control_tip']='One sentence, in the words EPANET uses. Fou
 $ec_lang['lpn_library_control_ok']='✓ Understood';
 $ec_lang['lpn_library_control_bad']='⚠ Not understood';
 $ec_lang['lpn_library_control_missing']='⚠ This network has nothing called {id}';
+$ec_lang['lpn_library_rules']='Rules';
+$ec_lang['lpn_library_rules_tip']='A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.';
+$ec_lang['lpn_library_rule_add']='Add a rule';
+$ec_lang['lpn_library_rule_tip']='One rule, in the words EPANET uses, one clause per line. A first line names it: RULE 1. Then a condition: IF TANK 2 LEVEL BELOW 17.1. Then what to do about it: THEN PUMP 9 STATUS IS OPEN. A last line may rank it: PRIORITY 1. Add AND or OR lines to test more than one thing, and ELSE lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Write the numbers in the units this project is showing; they are converted for you. Leave the keywords in English; they are what the page and EPANET read.';
+$ec_lang['lpn_library_rule_ok']='✓ Understood';
+$ec_lang['lpn_library_rule_bad']='⚠ Not understood';
+$ec_lang['lpn_library_rule_missing']='⚠ This network has nothing called {id}';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
