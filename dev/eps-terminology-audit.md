@@ -58,14 +58,21 @@ suggestion and none is applied.
 | Key | Translated | The string today | Recommendation |
 |---|---|---|---|
 | `lpn_energy_col_avg_kw_tip` | no | *The average power while this pump was running. It is not averaged over the whole period, so a pump that ran for half the day still reports the power it drew while it ran.* | **Leave.** "The whole period" here means the run's duration in contrast to the pump's on-time; it is doing arithmetic, not naming the analysis. |
+[TGH: *The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.*]
 | `lpn_energy_menu_tip` | no | *How long each pump ran, what power it drew and what it cost over the last extended period simulation.* | **Changed 2026-09-04.** Already says it. |
+[TGH: OK.]
 | `lpn_energy_over` | no | *Over an extended period simulation of {time}.* | **Changed 2026-09-04.** The string Tom ruled on. |
+[TGH: *Over an extended period simulation.*]
 | `lpn_inp_drop_eps` | 26 | *This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in.* | **Change.** It defines the thing rather than naming it, in a sentence a reader meets when a file's own EPS could not be honoured — the one place the name is most useful. Suggested: *This file describes an extended period simulation. The part of this page that runs a network through time did not load, so only the starting conditions came in.* Shorter as well as more exact. |
+[TGH: OK.]
 | `lpn_time_no_engine` | 26 | *…Connect to the internet once to fetch the EPANET solver, which runs the whole period.* | **Change the last clause only**: *"…which runs an extended period simulation."* This is the sentence that explains why the built-in solver answers one instant, so it is teaching the distinction and should name what the other engine does. |
+[TGH: OK.]
 | `lpn_time_no_period` | 26 | *This project has no time period, so there is only one moment to show. Set a Total run time in Settings to calculate the network over time.* | **Change the first clause**: *"This project has no extended period simulation set, so there is only one moment to show."* Keep *Total run time* verbatim in the second sentence — it is the literal name of the control the reader must find, and Tom has ruled that control's own label correct. |
+[TGH: OK.]
 | `lpn_time_run_note` | 26 | *…This network takes so long to calculate over its whole time period that the results for the later times are not kept up to date while you work…* | **Leave.** "Its whole time period" is the network's duration, not the name of the analysis, and the sentence is already long. |
+[TGH: I'm not exactly clear on our behavior here. Do we really in any circumstance calculate only a single time step of an EPS project? Without permission? I am having a hard time swallowing this note. And I need to know what's happening.]
 | `lpn_time_running` | 26 | *Working out the whole time period with the EPANET solver.* | **Change.** This is the progress line — what the page says while it is doing the thing — so it is the single best place to say the thing's name. Suggested: *Working out the extended period simulation with the EPANET solver.* |
-
+[TGH: ]
 **Four changes recommended, all translated, so 4 x 26 = 104 retranslations.** Three of the four are
 the sentences that TEACH the distinction (why one moment, why the other engine, what is happening
 now), which is the same test §3 arrived at from the cost side.
