@@ -203,7 +203,12 @@ console.log('\n--- and it really fills the window, inline caps and all ---');
 			}
 		};
 		const p = {
-			style: { maxWidth: '22rem' },   // #lpn_find_popup's inline cap, the one that must lose
+			// An inline size cap on the box, which is what must lose to the fill. Synthetic since
+			// 2026-09-04: Find's own 22rem moved out of the markup and into `.lpn-findbox` as a
+			// definite width when it was made resizeable, because a cap cannot be dragged past. The
+			// RULE under test did not move -- an inline value must be overridden and then handed
+			// back -- so the fixture keeps stating one.
+			style: { maxWidth: '22rem' },
 			querySelector: function (sel) { return sel === '.lpn-popover-body' ? bodyEl : null; },
 			body: bodyEl,
 			getBoundingClientRect: function () {
@@ -255,9 +260,9 @@ console.log('\n--- and it really fills the window, inline caps and all ---');
 		!tall.style.width && !tall.style.height &&
 		!tall.style.minWidth && !tall.style.minHeight,
 		JSON.stringify(tall.style));
-	// **AND THE MARKUP'S OWN CAP IS PUT BACK RATHER THAN DELETED.** #lpn_find_popup writes
-	// `max-width: 22rem` inline and nowhere else, so blanking it would not fall back to a
-	// stylesheet rule -- it would leave Find as wide as its longest result for the session.
+	// **AND THE MARKUP'S OWN CAP IS PUT BACK RATHER THAN DELETED.** Blanking an inline value does
+	// not fall back to whatever the markup said -- it deletes it. The box in this fixture states one,
+	// so the restore has something to be wrong about.
 	ok('...but the box\'s own inline width cap is restored, not deleted',
 		tall.style.maxWidth === '22rem', tall.style.maxWidth);
 

@@ -9971,6 +9971,12 @@ var EngCalcs = EngCalcs || {};
 	// Where the user last dragged it. A standing box keeps its place across openings -- being sent
 	// back to the menu's corner every time is what makes a reference box feel like a pull-down.
 	var findUserPos = null;
+	// Where and how big the reader last put the Find box, for this page load. **In memory, not in
+	// storage, and deliberately the same as `findUserPos` beside it**: nothing about this box is
+	// written to the visitor's device today, and adding a size would be adding storage rather than
+	// matching what is already there. See wireFindPopup() for why it is observed rather than
+	// listened for, and toggleFindPopup() for why it has to be re-applied on every open.
+	var findUserSize = null;
 	function closeFindPopup() {
 		var popup = document.getElementById('lpn_find_popup');
 		hidePanel(popup);
@@ -9989,8 +9995,18 @@ var EngCalcs = EngCalcs || {};
 		// boxes together -- on a phone they should occupy the whole page). placePanelForScreen()
 		// overrides the inline cap; nothing here reads findUserPos at that width, which is the
 		// price of opening in a known state that he named himself and accepted.
-		popup.style.display = 'block';
+		// `flex`, not `block`: the box is a column now -- title band, body, resize grip -- so the
+		// body can take the height a drag gave the box and scroll inside it.
+		popup.style.display = 'flex';
+		// **A REMEMBERED SIZE IS RE-APPLIED HERE AND NOWHERE ELSE**, because placePanelForScreen()
+		// hands every inline size the markup had back on the way in (resetPanelFill), which is what
+		// stops a phone's fill from ratcheting the desktop. So a box dragged bigger has to say so
+		// again on every open, exactly as the Settings box does through applySetboxSize().
 		placePanelForScreen(popup, function () {
+			if (findUserSize) {
+				popup.style.width = findUserSize.w + 'px';
+				popup.style.height = findUserSize.h + 'px';
+			}
 			if (findUserPos) {
 				// Re-clamped rather than restored blindly: the window may have been resized smaller
 				// since, and a box remembered off-screen is a box that never comes back.
@@ -10054,6 +10070,25 @@ var EngCalcs = EngCalcs || {};
 		if (!popup) { return; }
 		if (x) { x.addEventListener('click', closeFindPopup); }
 		makePanelDraggable(popup, function (pos) { findUserPos = pos; });
+		// **THE TOUCH HALF OF `resize: both`** -- the browser's own grabber answers a mouse only.
+		// Same call, same reason, as the Settings and fire-flow boxes.
+		addPanelResizeGrip(popup);
+		// **THE SIZE IS OBSERVED, NOT LISTENED FOR**: `resize: both` is the browser's own widget and
+		// fires no event. The observer also catches a window that shrank past the cap, so what is
+		// remembered is the size on screen rather than a wish from a bigger window.
+		//
+		// **AND NOTHING MEASURED ON A PHONE IS REMEMBERED**, the ruling the fill path already
+		// carries: at that width the box fills the window, so every number here is the window's and
+		// not the user's.
+		if (window.ResizeObserver) {
+			new window.ResizeObserver(function () {
+				var r;
+				if (popup.style.display === 'none' || smallScreen()) { return; }
+				r = popup.getBoundingClientRect();
+				if (!(r.width > 0) || !(r.height > 0)) { return; }
+				findUserSize = { w: Math.round(r.width), h: Math.round(r.height) };
+			}).observe(popup);
+		}
 	}
 	// ---- THE BOTTOM PANE (ROADMAP Task 434) --------------------------------------------------
 	//
@@ -22877,10 +22912,17 @@ var EngCalcs = EngCalcs || {};
 	// own rect rather than the window's, so it lines up with the drawing it configures rather than
 	// with whatever furniture happens to be above it.
 	var LPN_SETBOX_KEY = 'lpn_setbox';
-	// left/top/w/h, each null until the user has moved or sized the box themselves. A null is not
-	// zero and not a default: it is "this has never been chosen", which is what makes the
+	// left/top/w/h/ix, each null until the user has moved, sized or split the box themselves. A null
+	// is not zero and not a default: it is "this has never been chosen", which is what makes the
 	// right-edge placement a FIRST-TIME rule rather than a rule that fights the user afterwards.
-	var setboxLayout = { left: null, top: null, w: null, h: null };
+	//
+	// **`ix` IS THE INDEX PANE'S WIDTH** (Task 576, and Tom ruled it on 2026-09-04: *"Divider
+	// memory: Yes."*). It is a FIFTH NUMBER ON A RECORD THAT ALREADY EXISTS, which is the whole
+	// reason it needed no new consent: same key, same purpose, same category -- a panel layout the
+	// visitor set deliberately -- and dev/cookie-storage-inventory.md's row for `lpn_setbox` already
+	// covers it. No EC_CONSENT_VERSION bump, no banner rewrite, no sentence in consent_body made
+	// false. A SECOND key would have been a different question.
+	var setboxLayout = { left: null, top: null, w: null, h: null, ix: null };
 	function saveSetboxLayout() {
 		try { localStorage.setItem(LPN_SETBOX_KEY, JSON.stringify(setboxLayout)); } catch (e) {}
 	}
@@ -22901,6 +22943,11 @@ var EngCalcs = EngCalcs || {};
 	function applySetboxSize(box) {
 		if (setboxLayout.w) { box.style.width = setboxLayout.w + 'px'; }
 		if (setboxLayout.h) { box.style.height = setboxLayout.h + 'px'; }
+		// **THE SPLIT IS RE-APPLIED WITH THE SIZE, AND AFTER IT.** setSetboxIndexWidth() clamps
+		// against the panes row's present width, so applying a remembered index width before the box
+		// has its own width would clamp it against the wrong number -- and the ceiling is a fraction
+		// of that width. Same "a remembered size is a wish, not a promise" rule as the two above.
+		if (setboxLayout.ix) { setSetboxIndexWidth(setboxLayout.ix); }
 	}
 	// The first-time corner: the right edge of the DRAWING, at the drawing's top.
 	function setboxHomeCorner(w, h) {
@@ -23272,11 +23319,11 @@ var EngCalcs = EngCalcs || {};
 	// the pane after it take the rest, so there is one number to clamp and the other side follows by
 	// construction.
 	//
-	// **IT IS NOT REMEMBERED, AND THAT IS DELIBERATE FOR NOW.** A stored pane width is a per-visitor
-	// preference, and this page already stores one for this very box (`lpn_setbox`: left, top, w, h).
-	// Adding a fifth number to that record is the same purpose and the same category the inventory
-	// already declares -- but it is still Tom's call to make, not one to take on his behalf, so the
-	// drag ships and the memory waits. Everything here is one field away from having it.
+	// **AND IT IS REMEMBERED, ON TOM'S RULING** (2026-09-04: *"Divider memory: Yes."*). It shipped
+	// without memory for one day, because a stored pane width is a per-visitor preference and that
+	// was his call to make rather than one to take on his behalf. It is `setboxLayout.ix` -- a fifth
+	// number on the record this box already keeps, which is why it cost no new consent; see the note
+	// on that variable.
 	function setboxIsRtl() {
 		var el = document.documentElement;
 		return !!el && (el.dir === 'rtl' || (el.getAttribute && el.getAttribute('dir') === 'rtl'));
@@ -23286,6 +23333,16 @@ var EngCalcs = EngCalcs || {};
 	// the larger half -- past that the reader has hidden the thing the index is an index TO. Both
 	// are clamps on the ONE number written, so the two panes cannot disagree about the total.
 	var SETBOX_INDEX_MIN = 48, SETBOX_INDEX_MAX_FRAC = 0.6;
+	// Written on every gesture that changes the split -- a drag move, an arrow key, Home. Not
+	// debounced: it is one small JSON write against a key that is already written on every box drag.
+	function rememberSetboxIndexWidth(px) {
+		// A phone never writes the remembered layout, the same ruling the drag and the resize
+		// observer already follow: the box fills the window at that width, so the number is the
+		// window's rather than the user's.
+		if (smallScreen()) { return; }
+		setboxLayout.ix = (px === null) ? null : Math.round(px);
+		saveSetboxLayout();
+	}
 	function setSetboxIndexWidth(px) {
 		var index = document.getElementById('lpn_setbox_index'),
 			panes = document.getElementById('lpn_setbox_panes'), room, max;
@@ -23302,6 +23359,7 @@ var EngCalcs = EngCalcs || {};
 	function resetSetboxIndexWidth() {
 		var index = document.getElementById('lpn_setbox_index');
 		if (index) { index.style.flexBasis = ''; }
+		rememberSetboxIndexWidth(null);
 	}
 	function setboxIndexWidth() {
 		var index = document.getElementById('lpn_setbox_index');
@@ -23334,7 +23392,7 @@ var EngCalcs = EngCalcs || {};
 			// so dragging towards the window's right edge must NARROW it. The sign is the whole of
 			// the difference, which is why it is one negation and not a second code path.
 			var dx = e.clientX - start.x;
-			setSetboxIndexWidth(start.w + (setboxIsRtl() ? -dx : dx));
+			rememberSetboxIndexWidth(setSetboxIndexWidth(start.w + (setboxIsRtl() ? -dx : dx)));
 		});
 		d.addEventListener('pointerup', endDrag);
 		d.addEventListener('pointercancel', endDrag);
@@ -23348,7 +23406,7 @@ var EngCalcs = EngCalcs || {};
 				// The key names a DIRECTION ON SCREEN, so it flips with the writing direction for
 				// the same reason the drag does.
 				toward = (e.key === 'ArrowRight') ? 1 : -1;
-				setSetboxIndexWidth(w + step * (setboxIsRtl() ? -toward : toward));
+				rememberSetboxIndexWidth(setSetboxIndexWidth(w + step * (setboxIsRtl() ? -toward : toward)));
 			} else { return; }
 			if (e.preventDefault) { e.preventDefault(); }
 		});
@@ -25405,9 +25463,9 @@ var EngCalcs = EngCalcs || {};
 	// setboxLayout or findUserPos, and the writers that fill them are turned off at this width --
 	// a size measured on a phone must never ratchet the desktop's remembered one.
 	//
-	// **THE INLINE max-width IS THE HALF THAT IS EASY TO MISS.** #lpn_find_popup carries
-	// `max-width: 22rem` in the markup and .lpn-setbox carries min-width/max-width in the
-	// stylesheet, so writing a width alone loses to all three -- which is exactly the
+	// **THE STYLESHEET'S OWN WIDTHS ARE THE HALF THAT IS EASY TO MISS.** .lpn-setbox and
+	// .lpn-findbox each carry a width and a min-width of their own, so writing a width alone loses
+	// to them -- which is exactly the
 	// claustrophobic box Tom reported (*"their width is constrained so much that resize feels
 	// claustrophobic and pointless"*). Every one of them is overridden here and cleared by
 	// resetPanelFill() on the way back to a pointer machine.
@@ -25445,12 +25503,16 @@ var EngCalcs = EngCalcs || {};
 	// project opened on a phone and continued on a laptop, and the only moment either box is
 	// certain to be looked at again is the moment it opens.
 	//
-	// **RESTORED, NOT BLANKED, AND THE DIFFERENCE IS A DEFECT.** #lpn_find_popup states
-	// `max-width: 22rem` in its own markup, INLINE, which is the only place that box's real width
-	// is written down. Setting `style.maxWidth = ''` would not fall back to a stylesheet rule --
-	// there is none -- it would simply delete the cap, and Find would come back as wide as its
-	// longest result for the rest of the session. So the values the markup had are read once,
-	// before the first fill overwrites them, and handed back.
+	// **RESTORED, NOT BLANKED, AND THE DIFFERENCE IS A DEFECT.** The values the markup had are read
+	// once, before the first fill overwrites them, and handed back -- so a box that stated a size
+	// inline gets that size back rather than losing it to a phone that was never its own.
+	//
+	// *(Corrected 2026-09-04: this used to say #lpn_find_popup's `max-width: 22rem` was the only
+	// place that box's width was written, and that blanking it would leave Find as wide as its
+	// longest result. Making Find resizeable moved that number into `.lpn-findbox` as a definite
+	// `width`, because a max-width is a cap and a cap cannot be dragged past. The RULE below is
+	// unchanged and is why nothing may state a size inline on that box any more: this restore runs
+	// on every open, so an inline size would undo a drag the moment the box was reopened.)*
 	var LPN_FILL_PROPS = ['width', 'height', 'minWidth', 'minHeight', 'maxWidth'];
 	function resetPanelFill(box) {
 		var was = box.lpnFillWas, i, k;

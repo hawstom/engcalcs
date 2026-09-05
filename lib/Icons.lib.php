@@ -453,11 +453,25 @@ $ec_icons = array(
 	//     the bulb holds water rather than being a balloon, and it is drawn as a straight chord
 	//     because a second curve inside the first smudges into it at 17 px.
 	//
-	// **THE GAP BUDGET, MEASURED ON THIS DRAWING.** The clear-gap rule stated below -- that a gap
-	// under about 2.5 units closes at 17 px -- is what this drawing had to pass. The tightest gaps here are the waterline to the bulb's underside
-	// (9.5 to 13, so 3.5 units) and the riser at x = 12 against the legs where they leave the bulb
-	// at x = 7.5 and 16.5 (4.5 units, widening all the way to the ground). Both clear it -- which
-	// is what let the ellipse afford a chord the boxed tank could not afford a second horizontal.
+	// **THE RISER IS A PIPE AND IS DRAWN AS ONE** (Tom, 2026-09-04, after looking at the first
+	// elliptical draft: *"Try making the vertical visibly thicker/wider than the legs, and the legs
+	// splayed just a little less."*). It carries `stroke-width="3.2"` against the set's own 2, which
+	// is one of only two places in this file where a path overrides the wrapper's weight -- the
+	// hydrant's 1.6 ground line is the other. A riser the same weight as a leg reads as a third leg,
+	// which is precisely the shape the gap budget below is policing.
+	//
+	// **AND THE LEGS ARE NEARER VERTICAL, WHICH IS WHAT REAL TOWERS DO** -- his own observation, that
+	// many are built with plumb legs and the splay is a real-estate decision rather than a structural
+	// one. They ran to x = 5 and 19 and now run to 6 and 18: about 10 degrees off vertical instead of
+	// 17, which still reads as a splay and no longer as a tripod.
+	//
+	// **THE GAP BUDGET, RE-MEASURED AFTER BOTH CHANGES.** The clear-gap rule stated below -- that a
+	// gap under about 2.5 units closes at 17 px -- is what this drawing had to pass, and a thicker
+	// riser spends against it. Tightest gap on the icon is at the TOP of the legs, where they leave
+	// the bulb at x = 7.5 and 16.5 against a riser at 12: 4.5 units centre to centre, less 1.6 of
+	// riser and 1 of leg, leaves 1.9 units of daylight, and it only widens downward. The waterline to
+	// the bulb's underside is 3.5 units (9.5 to 13). Both clear, and 1.9 is the number to re-check
+	// before anything on this icon gets thicker again.
 	//
 	// The bulb is an ellipse about (12, 8.5) with rx 7.5 and ry 4.5, written as CUBICS and never an
 	// `A` arc for the reason given above, so the control offsets are Kappa*r = 4.14 in x and 2.49
@@ -485,8 +499,8 @@ $ec_icons = array(
 	'water'      => '<path d="M4.5 8.5C4.5 6.01 7.86 4 12 4C16.14 4 19.5 6.01 19.5 8.5'
 		. 'C19.5 10.99 16.14 13 12 13C7.86 13 4.5 10.99 4.5 8.5Z"/>'
 		. '<path d="M4.69 9.5H19.31"/>'
-		. '<path d="M12 13V20.5"/>'
-		. '<path d="M7.5 12.1L5 20.5"/><path d="M16.5 12.1L19 20.5"/>',
+		. '<path stroke-width="3.2" d="M12 13V20.5"/>'
+		. '<path d="M7.5 12.1L6 20.5"/><path d="M16.5 12.1L18 20.5"/>',
 
 	// FIRE HYDRANT -- drawn for Water > Fire flow at a hydrant (ROADMAP Task 530).
 	//

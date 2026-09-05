@@ -88,7 +88,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_identity` | same | The initials and the opaque token this browser sends to the file-lock broker |
 | `lpn_pane` | same | Whether the bottom pane is open, how tall it is, and which tab (Task 434) |
 | `lpn_rpane` | same | Whether the right panel is open and how wide it is (Task 441) |
-| `lpn_setbox` | same | Where the Settings box was left and how big it was made (Task 441) |
+| `lpn_setbox` | same | Where the Settings box was left, how big it was made, and where its two panes are split (Tasks 441, 576) |
 | `lpn_show_titles` | same | Whether the page-title row is shown |
 | `bpn_sketch_toggles` | `js/branched-network.js` | Which of the five data fields (length, diameter, flow, elevation, pressure) the Branched-Network topology sketch shows. The checkboxes live outside the form, so the page's own input cookie never captures them |
 

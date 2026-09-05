@@ -30,7 +30,15 @@ const { byId, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 const L = loadLoopedNetwork(
 	"\t\twireDivider: function () { wireSetboxDivider(); },\n" +
 	"\t\tsetIndexWidth: function (px) { return setSetboxIndexWidth(px); },\n" +
-	"\t\tresetIndexWidth: function () { resetSetboxIndexWidth(); },\n"
+	"\t\tresetIndexWidth: function () { resetSetboxIndexWidth(); },\n" +
+	// The remembered split (Task 576, Tom: *"Divider memory: Yes."*) -- the record itself, the
+	// saver, and the applier, so what is asserted is that the number survives the round trip through
+	// localStorage rather than merely being held in a variable.
+	"\t\tlayout: function () { return setboxLayout; },\n" +
+	"\t\tloadLayout: loadSetboxLayout,\n" +
+	"\t\tapplySize: function (box) { applySetboxSize(box); },\n" +
+	"\t\tsetLayout: function (v) { setboxLayout = v; },\n" +
+	"\t\tsmallScreen: smallScreen,\n"
 );
 
 let fails = 0;
@@ -151,6 +159,47 @@ console.log('\n--- the markup and the spacing ---');
 	ok('...and gives back exactly the second gap it costs',
 		Number(basis) + 2 * Number(gap) + 2 * Number(marg) === Number(gap),
 		'basis ' + basis + ', margin ' + marg + ', gap ' + gap);
+}
+
+console.log('\n--- the split is remembered, in the record this box already keeps ---');
+{
+	// **THE POINT OF THE ASSERTION IS THE KEY, NOT THE NUMBER.** A second localStorage key would
+	// have been a new question for the visitor -- a consent version bump, a rewritten banner and 26
+	// retranslations. A fifth field on `lpn_setbox`, which already holds this box's left, top, width
+	// and height for the same reason, is none of those things. If this ever fails because somebody
+	// moved the split to a key of its own, that is the thing to put back.
+	ok('the record is the Settings box\'s own, and it now carries the split',
+		'ix' in L.layout() && 'left' in L.layout() && 'w' in L.layout(), Object.keys(L.layout()).join(','));
+
+	ok('nothing is remembered until the reader splits it themselves', L.layout().ix === null,
+		String(L.layout().ix));
+	L.setIndexWidth(106);
+	press(200);
+	moveTo(250);
+	release();
+	ok('a drag writes the width it produced', L.layout().ix === 156, String(L.layout().ix));
+
+	// Round trip: what is on disk is what comes back.
+	const stored = JSON.parse(global.localStorage.getItem('lpn_setbox'));
+	ok('...and it reached storage under the key that was already there', stored.ix === 156, JSON.stringify(stored));
+	L.setLayout({ left: null, top: null, w: null, h: null, ix: null });
+	L.loadLayout();
+	ok('...and comes back out of it on the next page load', L.layout().ix === 156, String(L.layout().ix));
+
+	// Applying is what an OPEN does, and it goes through the same clamp, so a width remembered from
+	// a bigger window cannot re-open the box with an index wider than the box.
+	index.style.flexBasis = '';
+	L.applySize({ style: {} });
+	ok('opening the box puts the split back', widthNow() === 156, widthNow());
+	panes.clientWidth = 200;
+	index.style.flexBasis = '';
+	L.applySize({ style: {} });
+	ok('...but never wider than the box it is opening into', widthNow() === 120, widthNow());
+	panes.clientWidth = 400;
+
+	key('Home');
+	ok('Home forgets it rather than remembering a number of our own', L.layout().ix === null,
+		String(L.layout().ix));
 }
 
 console.log(fails === 0 ? '\nsetbox-divider: ALL PASS' : '\nsetbox-divider: ' + fails + ' FAILURE(S)');

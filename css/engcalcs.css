@@ -1077,6 +1077,28 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    `min-width: 0` is the load-bearing half: without it a flex item refuses to shrink below its
    content, and a long condition ("no open path to a source") would push the box wider than the
    phone instead of ellipsizing inside it. */
+/* **AND FIND RESIZES** (Tom, 2026-09-04: *"Make lpn Find box resizeable."*). Same shell mechanics
+   as the Settings box, for the reason that box's own note gives: one set of box mechanics on this
+   page rather than a second. `resize: both` needs a non-visible overflow to be drawn at all, and it
+   costs nothing here because the scrolling already lives on `.lpn-popover-body`.
+
+   **THE 22rem MOVED OUT OF THE MARKUP AND BECAME A `width`, WHICH IS THE LOAD-BEARING CHANGE.** It
+   was an INLINE `max-width`, and a cap cannot be dragged past. As a definite width it still opens at
+   22rem, still refuses to be stretched by a long result -- which is what the cap was really for --
+   and now gives way to a drag. resetPanelFill() hands the inline values back on every open, so
+   nothing inline may state a size any more or a dragged box would be reset by its own reopening;
+   toggleFindPopup() re-applies the remembered one instead, exactly as the Settings box does.
+
+   The floor is a width for the same reason the Settings box's is: this box's own pull-downs stop
+   fitting first, and everything below the floor is a sideways scrollbar. */
+.lpn-findbox {
+	width: min(22rem, calc(100vw - 8px));
+	min-width: min(16rem, 94vw);
+	flex-direction: column;
+	resize: both;
+	overflow: hidden;
+}
+.lpn-findbox .lpn-popover-body { flex: 1 1 auto; min-height: 0; max-height: none; }
 .lpn-find-pair { display: flex; gap: 8px; align-items: flex-end; }
 .lpn-find-pair > div { flex: 1 1 0; min-width: 0; }
 .lpn-find-pair select { max-width: 100%; }
@@ -1836,14 +1858,30 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    the browser claims the drag for scrolling before `pointermove` ever fires, and the divider
    answers a mouse and not a finger.
 
+   **A LINE AND A GRIP, NOT A DOUBLE LINE** (Tom, 2026-09-04, asked for the conventional depiction
+   and guessed a double line; researched, and it is not). The double line is the Windows-95 3D
+   groove -- a light rule beside a dark one -- and it belongs to a bevelled visual language nothing
+   else on this page speaks. What every current design system describes instead is a SEPARATOR LINE
+   plus a GRIP mark on the handle, emphasised on hover: Ant Design, Chakra, Telerik's Kendo, Nuxt,
+   ServiceNow's Horizon and Balsamiq's own control guidelines all say the same thing in the same
+   words. The separator line here is the index's own `border-right`, which was already drawn and is
+   shared with the Libraries box; this adds the grip, four dots high, centred on the strip.
+
    Focusable, so the keyboard can move it (wireSetboxDivider handles the arrows); the focus ring is
-   the browser's own, on a 6px-wide element, which is why it gets a background on :focus-visible --
-   an outline around a hairline is not a visible focus indicator. */
+   the browser's own, on a 6px-wide element, which is why the grip changes colour on :focus-visible
+   as well -- an outline around a hairline is not a visible focus indicator. */
 .lpn-setbox-divider {
 	flex: 0 0 6px; align-self: stretch; cursor: col-resize; margin: 0 -8px;
 	background: transparent; touch-action: none;
+	display: flex; align-items: center; justify-content: center;
 }
-.lpn-setbox-divider:hover, .lpn-setbox-divider:focus-visible { background: #eef4ff; }
+.lpn-setbox-divider::before {
+	content: ""; display: block; width: 2px; height: 22px;
+	background: repeating-linear-gradient(to bottom, #aaa 0 2px, transparent 2px 5px);
+}
+.lpn-setbox-divider:hover::before, .lpn-setbox-divider:focus-visible::before {
+	background: repeating-linear-gradient(to bottom, #0645ad 0 2px, transparent 2px 5px);
+}
 /* **THE LAST SECTION MUST BE ABLE TO REACH THE TOP** (Tom, 2026-09-04: *"We are being bit by the
    bottom of the page when we select the Water Quality bookmark. I believe that the standard answer
    for this is to put a page worth of blank space at the end of the settings."* -- and it is). An
