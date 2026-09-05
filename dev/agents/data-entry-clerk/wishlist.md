@@ -36,6 +36,28 @@ plan (OUT first, then IN on existing cells) rather than instead of it — the ex
 wrong, it is just not the whole of what I would ask for. Say so explicitly if 186 is picked up: the
 scalar-only version is real progress and should ship; it is not the finish line for volume entry.
 
+## RE-RANKED 2026-09-04, second invocation: item 2 drops below the market-researcher's CSV-import row
+
+Tom asked whether there is an industry standard for a keyboard door to new assets. There is one —
+EPANET's own Add button, cited below — but researching it wider surfaced something more important
+than the answer to that literal question: **every commercial tool I could source (Bentley
+WaterGEMS's ModelBuilder, importing Excel/Access/shapefile; QGIS's delimited-text-layer path)
+answers "I have hundreds of elements to enter" with a mapped FILE IMPORT, not a per-element keyboard
+door.** EPANET's Add button is real, but it reads as EPANET's answer to adding ONE object without
+reaching for the mouse, not as the industry's answer to volume. Full citations: journal, this
+session.
+
+That lines up with `dev/agents/market-researcher/wishlist.md` #1 (CSV/GPX import of surveyed
+points), which I did not know about when I first ranked item 2 and which was reached from a
+completely different angle (what a field survey actually produces, not what a keyboard seat wants).
+**I am moving that row above my own item 2 in my own ranking** — a mapped import of an
+id/x/y(/elevation) file is closer to what "400 pipes from a marked-up plan set" actually needs than
+a keyboard-only Add button would be, because it removes the per-row round trip entirely rather than
+shortening it by one click. I still think item 2 (below) is worth having eventually — a one-off
+added junction with no click is a genuine convenience — but it is now THIRD in my own order, behind
+both Task 186's widening (item 1) and the market-researcher's import row, and I am saying so against
+my own earlier ranking rather than defending it.
+
 ## 2. A "New junction" action that does not require a canvas click first — EPANET's Data-Browser-Add-button shape
 
 **Not found on the roadmap** under this framing (searched for "keyboard", "tab order", "surveyor",

@@ -119,3 +119,92 @@ then click the Add button to add new objects to your project... an appropriate e
 will appear."* That is a second, keyboard-reachable door to a new junction that does not require a
 map click first — EPANET has this and `lpn_` does not (confirmed above: `addNode()` has exactly one
 caller shape, a canvas pointer event).
+
+## Second invocation, 2026-09-04 — Tom's question: "is there a standard?"
+
+### The direct answer: yes, EPANET itself has a keyboard-only door, and coordinates are typed, not clicked
+
+**CITED** EPANET 2.2 documentation, section 6.2 "Adding Objects"
+(https://usepa.github.io/EPANET2.2/6_objects.html): the Data Browser's Add-button path is —
+"Select the type of node (junction, reservoir, or tank) from the Object list of the Data Browser.
+Click the Add button. Enter map coordinates with the Property Editor (optional)." The word
+"(optional)" is load-bearing: the manual states that if coordinates are left blank at creation,
+"the junction will not appear on the network map" — it still exists in the project (in the node
+list, editable, includable in a solve) but is simply not drawn. A second, separate sentence in the
+same chapter (its "Moving an Object" passage) makes the keyboard door explicit for coordinates
+themselves: **"Alternatively, new X and Y coordinates for the object can be typed in manually in
+the Property Editor."** So the full EPANET shape is: Add (no click) → type properties (no click) →
+optionally type X,Y (no click) → the object is real and computable throughout, and only its
+ON-MAP APPEARANCE depends on ever supplying a position. That is a materially different design from
+`lpn_`'s, where `addNode()` has no caller but a canvas pointer event and there is no field anywhere
+to type a coordinate into (confirmed again this session — see below).
+
+### `lpn_`'s gap restated against the EPANET shape specifically, not just "no keyboard door"
+
+**OBSERVED** The EPANET shape splits into two things `lpn_` conflates: (1) object EXISTENCE and
+(2) object POSITION-ON-MAP, and treats them as independently satisfiable — a junction can exist
+with no drawn position. `lpn_` cannot do this at all: `addNode(type, x, y)`
+(`js/looped-network.js:13240`) takes x,y as required arguments and is only ever called with a live
+canvas coordinate; there is no "create an unplaced junction" call shape in the file. Whether an
+unplaced-node concept is even coherent for `lpn_` is a real open design question, not obviously
+yes — CLAUDE.md's own `lpn_` section says a GEOGRAPHIC project stores real longitude/latitude and
+derives its drawing frame from the data's own extent (`dev/geographic-projects.md` §2b), so an
+unplaced node has nothing to derive a frame FROM until at least one node has a real position. An
+XY-grid (non-geographic) project has no such constraint and could plausibly support "create at
+(0,0), fix up later" the way EPANET does. I did not find anything in this file settling that
+question and I am not the seat to settle it — flagging it for whoever scopes this next.
+
+### Other tools, searched specifically for a non-pointer creation door — none found; import is the answer instead
+
+**CITED** Bentley's own WaterGEMS help page titled exactly "Adding Elements to Your Model"
+(https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/GUID-D7419A7469A14F598193356052E9EC8A.html)
+describes exactly two methods, both drawing-pane clicks: pick a symbol from the Layout Ribbon and
+click to place it, or right-click in the drawing pane and pick a type from the shortcut menu.
+Neither is a keyboard door in EPANET's sense. I looked specifically for a FlexTable "insert row to
+create a new element" action and did not find one described anywhere I could reach; I am not
+claiming it does not exist, only that I could not source it — treat that absence as a search gap,
+not a finding.
+
+**CITED** Bentley's own WaterGEMS documentation on ModelBuilder
+(https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/GUID-E7017889-7119-4A6E-98A6-CCA54E6E0607.html,
+found via a Bentley community KB article of the same claim): *"ModelBuilder lets you use your
+existing GIS asset to construct a new WaterGEMS CONNECT model or update an existing one, supporting
+a wide variety of data formats including simple databases (such as Access and DBase), spreadsheets
+(such as Excel), and GIS data (such as shape files)... you map the tables and fields contained
+within your data source to element types and attributes in your WaterGEMS CONNECT model."** This
+is the flagship commercial tool's actual answer to "I have hundreds of elements to enter": not a
+keyboard door in the editor, a mapped bulk IMPORT from a spreadsheet or GIS layer, run once, that
+creates every element with its position and attributes in one pass.
+
+**CITED** epanet-js's own "Introducing epanet-js" post (https://epanetjs.com/blog/2025/08/01/introducing-epanet-js/):
+*"You can draw your network visually, clicking to add nodes and pipes while the software handles
+details like auto-junctions and automatic elevations."* No keyboard-only creation door is
+mentioned. Its progress-report blog (searched, not separately fetched this session) mentions a
+Ctrl-while-drawing shortcut that inserts a junction mid-pipe-draw without a separate click — a
+pointer-drawing accelerator, not a keyboard door, and still requires the mouse to be drawing the
+pipe. Their "Pro model builder" is named in the same materials as adding "custom attributes and
+null values coming soon" alongside import capability, which reads as the same OUT/IN-table
+direction as Bentley's, not as a per-element keyboard door — I could not get a page to confirm the
+exact import formats this session and am not asserting them.
+
+**CITED** QGIS's own generic path for turning a coordinate spreadsheet into map points — "Add
+Delimited Text Layer" / "Add Layer > Add Delimited Text Layer", mapping named X and Y columns
+(https://www.qgistutorials.com/en/docs/3/importing_spreadsheets_csv.html) — is the same shape again
+one layer down the stack: a CSV of id/x/y becomes point geometry by an IMPORT dialog, never by
+typing rows into a table one at a time. I did not find an InfoWater-specific bulk-CSV-to-network
+path this session (the GIS Gateway page I found describes format/config, not a worked CSV-to-pipe
+example); treat InfoWater as unconfirmed rather than as a negative result.
+
+### Reading this against the market-researcher's own #1 wish-list row
+
+**OBSERVED** `dev/agents/market-researcher/wishlist.md` #1 independently proposes CSV/GPX import of
+surveyed points as junctions, cites the same shape (a flat id/lat/lon list from a field survey) and
+ranks it above everything else it found. **This agrees with everything found above and I did not
+expect it to; the two seats reached the same conclusion from different directions** — the
+market-researcher from what field-survey populations actually produce as their raw material, me
+from what the commercial incumbents actually built as the answer to volume entry. Between the two,
+the industry evidence favors IMPORT as the standard door for "I have hundreds of elements," not a
+keyboard-door-shaped Add button. EPANET has the Add-button shape too and it is real and it is a
+smaller, genuinely simpler thing to build than an importer — but it is not what the market treats
+as ITS answer to volume; it is what EPANET treats as its answer to occasional one-off objects added
+without reaching for the mouse.
