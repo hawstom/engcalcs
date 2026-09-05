@@ -449,9 +449,23 @@ $ec_icons = array(
 	//   - **A RISER** (same sketch): *"Most water tanks have a pipeline coming from the middle of
 	//     the tank vertically to the ground. Some are nothing but this and a bulbous tank at the
 	//     top."* It is what makes the silhouette a water tower rather than a hut.
-	//   - **A WATERLINE.** The chord at y = 9.5 is the water surface. It is the one detail saying
-	//     the bulb holds water rather than being a balloon, and it is drawn as a straight chord
-	//     because a second curve inside the first smudges into it at 17 px.
+	//   - **A CATWALK, WHICH IS WHAT THE CHORD AT y = 9.5 IS** (Tom, 2026-09-05, marking up a
+	//     render of the icon: *"This is a catwalk. so it should extend outside the ellipse because
+	//     it wraps around the outside of the tank."*). It was drawn as a WATERLINE, and that was
+	//     wrong for the same reason the riser below was: **this is an EXTERNAL elevation**, and a
+	//     water surface is a thing you can only see from inside. Read as a catwalk it is the same
+	//     one stroke doing the same job -- saying the bulb is a vessel somebody services rather
+	//     than a balloon -- and it is drawn as a straight chord because a second curve inside the
+	//     first smudges into it at 17 px. It runs x = 3.4 to 20.6 against the bulb's own 4.69 to
+	//     19.31 at that height: **the overhang is the whole point** and a chord ending on the
+	//     outline reads as a waterline again.
+	//
+	// **AND THE RISER STOPS AT THE BULB, BECAUSE THE VIEW IS EXTERNAL** (same markup: *"This is an
+	// external view. So the pipe should not extend into the tank."*). It ran to y = 13, which IS
+	// the bulb's underside -- but the set's shared `stroke-linecap="round"` put a 1.6-unit dome on
+	// top of it, and against an unfilled bulb that dome was a stub of pipe standing inside the
+	// vessel. It carries `stroke-linecap="butt"` now. The bottom moved 20.5 -> 21.4 in the same edit, because a butt end at
+	// 20.5 stopped a unit short of the ground the legs' round caps already reach.
 	//
 	// **THE RISER IS A PIPE AND IS DRAWN AS ONE** (Tom, 2026-09-04, after looking at the first
 	// elliptical draft: *"Try making the vertical visibly thicker/wider than the legs, and the legs
@@ -498,8 +512,8 @@ $ec_icons = array(
 	// redraw a faucet.
 	'water'      => '<path d="M4.5 8.5C4.5 6.01 7.86 4 12 4C16.14 4 19.5 6.01 19.5 8.5'
 		. 'C19.5 10.99 16.14 13 12 13C7.86 13 4.5 10.99 4.5 8.5Z"/>'
-		. '<path d="M4.69 9.5H19.31"/>'
-		. '<path stroke-width="3.2" d="M12 13V20.5"/>'
+		. '<path d="M3.4 9.5H20.6"/>'
+		. '<path stroke-width="3.2" stroke-linecap="butt" d="M12 13V21.4"/>'
 		. '<path d="M7.5 12.1L6 20.5"/><path d="M16.5 12.1L18 20.5"/>',
 
 	// FIRE HYDRANT -- drawn for Water > Fire flow at a hydrant (ROADMAP Task 530).
