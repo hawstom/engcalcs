@@ -241,11 +241,13 @@ function build(unitSet) {
 	ok('...including the inputs a colour ramp has no use for',
 		L.propKeys('pipe').indexOf('length') > 0 && L.propKeys('pipe').indexOf('km') > 0,
 		JSON.stringify(L.propKeys('pipe')));
-	// ID plus Connection, and nothing else. ID is the only property a junction, a pipe and a Text
-	// label all carry; Connection is the Task 540 exception, and it earns it by matching every NODE
-	// and saying so in each row rather than silently matching nothing.
-	ok('the all-elements scope offers ID and the connection report, and nothing else',
-		JSON.stringify(L.propKeys('all')) === JSON.stringify(['id', 'connection']),
+	// ID, Tag and Connection, and nothing else. ID is the only property a junction, a pipe and a
+	// Text label all carry; a Tag is carried by every node and every link (Tom, 2026-09-05), which
+	// is the same standing ID has here; Connection is the Task 540 exception, and it earns it by
+	// matching every NODE and saying so in each row rather than silently matching nothing.
+	// The tag's own coverage is dev/lpn-spike/find-tag-harness.js.
+	ok('the all-elements scope offers ID, Tag and the connection report, and nothing else',
+		JSON.stringify(L.propKeys('all')) === JSON.stringify(['id', 'tag', 'connection']),
 		JSON.stringify(L.propKeys('all')));
 	// **AND NO ID, SINCE 2026-08-29.** Tom: *"Text.ID 2 highest finds nothing. And I think maybe
 	// Text.ID is not searchable."* It never was — findValueOf() returns undefined for a label's id

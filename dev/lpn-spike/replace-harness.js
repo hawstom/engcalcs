@@ -250,13 +250,16 @@ function nodeOf(id) { return L.getDoc().nodes.filter(n => n.id === id)[0]; }
 {
 	console.log('\n--- the property list follows the scope ---');
 	const n = build();
+	// `tag` is last in both, and it is the one row that is not a number and not a starting value:
+	// it comes from replaceExtraSpecs() rather than pushSpecList(), and it is the only property a
+	// node and a link both carry. Its own coverage is dev/lpn-spike/find-tag-harness.js.
 	ok('a pipe scope offers the pipe inputs',
-		JSON.stringify(L.specFields('pipe')) === JSON.stringify(['diameter', 'roughness', 'km']),
+		JSON.stringify(L.specFields('pipe')) === JSON.stringify(['diameter', 'roughness', 'km', 'tag']),
 		JSON.stringify(L.specFields('pipe')));
 	ok('a junction scope offers the node inputs',
 		// `fireFlow` joined them with Task 530 -- a junction's own required fire flow is an INPUT
 		// this tool can set in bulk, which is the whole point of giving a district one number.
-		JSON.stringify(L.specFields('junction')) === JSON.stringify(['elev', 'demand', 'fireFlow']),
+		JSON.stringify(L.specFields('junction')) === JSON.stringify(['elev', 'demand', 'fireFlow', 'tag']),
 		JSON.stringify(L.specFields('junction')));
 	// **RESULTS ARE SEARCHABLE AND NOT WRITABLE.** Pressure is printed on the map, so it is a
 	// perfectly good thing to search on; nothing writes it, so it must never appear here.

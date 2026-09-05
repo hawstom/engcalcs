@@ -8314,6 +8314,21 @@ var EngCalcs = EngCalcs || {};
 			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier', 'Size multiplier']);
 			return out;
 		}
+		// **TAG IS BAND 1, BESIDE THE ID, AND IT IS OFFERED UNDER "Everything" TOO** (Tom,
+		// 2026-09-05: *"Tag needs to be added to Find."*). A tag is not a value you typed about the
+		// asset, it is what somebody ELSE'S records call this asset -- the join key to the utility's
+		// own inventory (Task 579). That is identity, so it sits with the ID rather than above
+		// Elevation with the design inputs, and "find the pipe our maps call MAIN-1962" is the same
+		// question as "find P2" asked in the other system's vocabulary.
+		//
+		// **IT IS THE ONE PROPERTY A NODE AND A LINK BOTH CARRY**, which is why it needs no gate
+		// here: every scope still running is a node scope, a link scope, or "Everything", and a tag
+		// can match under all of them. Under "Everything" it matches every node and every link and
+		// misses only a Text label, which is the standing of `id` there already -- so this is not
+		// the connection exception being widened, it is the same honesty the ID row has.
+		//
+		// The label is `lpn_field_tag`, the popup's own whole label, reused rather than re-keyed.
+		out.push(['tag', pc.lpn_field_tag || 'Tag', 'Tag']);
 		// **THE ORDER IS A RULE, AND THIS IS THE SECOND ATTEMPT AT IT** (Tom, 2026-09-04: *"I see
 		// results mixed with asset properties. So you didn't try the rules I gave you. And, for
 		// example, it seems that all the Demand options should be together, no?"*). He was right on
@@ -8552,7 +8567,17 @@ var EngCalcs = EngCalcs || {};
 		}
 		return '';
 	}
-	function findPropIsText(prop) { return prop === 'id' || prop === 'text' || prop === 'demandCategory'; }
+	// **A TAG IS TEXT AND GETS THE TEXT CONDITIONS, WHICH IS THE WHOLE OF THE ANSWER TO "WHAT DOES
+	// A MATCH MEAN".** `contains` is a case-insensitive substring and `equals` a case-insensitive
+	// whole-string match -- byte for byte what `id`, `text` and `demandCategory` have always meant
+	// here, and there is deliberately no third vocabulary: an asset tag is typed by people in a
+	// hurry and `MAIN-1962` and `main-1962` are one tag in every asset register anybody keeps.
+	// Wildcards and regular expressions were the alternative and are refused: the query line is
+	// already a language with words in it, and a second one inside the value box would be a
+	// punctuation dialect nobody can be taught from a pull-down.
+	function findPropIsText(prop) {
+		return prop === 'id' || prop === 'text' || prop === 'demandCategory' || prop === 'tag';
+	}
 	// Text gets contains/equals, a number gets equals/greater/less. Offering all four for both would
 	// mean "Pressure contains 2", which matches on the digits of a number and is never what anybody
 	// means.
@@ -8665,6 +8690,17 @@ var EngCalcs = EngCalcs || {};
 		if (prop === 'demandCategory') {
 			var cats = findCategoriesOf(cand);
 			return cats.length ? cats.join(', ') : undefined;
+		}
+		// **READ STRAIGHT OFF THE ELEMENT, NOT THROUGH effective()** -- a tag is base-owned on
+		// purpose (see tagField()): a scenario asks what if this pipe were bigger, not what if it
+		// were a different asset, so there is no override to resolve and asking for one would
+		// invent a `_tag` nothing writes.
+		//
+		// An empty or absent tag reads as undefined, like a fire flow nobody stated: that is what
+		// makes `contains` with an empty box list exactly the elements that CARRY a tag rather than
+		// every element in the drawing, which is how "what have we tagged so far" gets asked.
+		if (prop === 'tag') {
+			return cand.group === 'label' ? undefined : (cand.el.tag || undefined);
 		}
 		if (prop === 'text') { return effective(cand.el, 'text'); }
 		if (prop === 'sizeMult') { return cand.el.sizeMult || 1; }
@@ -9678,6 +9714,14 @@ var EngCalcs = EngCalcs || {};
 	// ids in bulk has to answer uniqueness, the override map's keys and every link's from/to at
 	// once, and none of that is a find-and-replace. A Text label's words are a one-at-a-time edit on
 	// a handful of notes. Both stay searchable above; neither is writable here.
+	//
+	// **THE TAG IS THE ONE PIECE OF TEXT THAT IS WRITABLE, and it is not an exception to that**
+	// (Task 579, and Tom on 2026-09-05). It answers none of the questions an id does: nothing
+	// references a tag, nothing has to be unique, and no other element changes when one is written.
+	// It is also the property a bulk write is most obviously FOR -- a run of mains is relined, or
+	// half a system is handed to a contractor, and the whole set gets one word. See
+	// replaceExtraSpecs() for why it is not in pushSpecList(), and replaceValueOf() for the
+	// one-word rule the value box goes through.
 	// `source` is 'value' or 'dem' (Task 542). It only ever means anything with Elevation chosen,
 	// and replaceNormalize() puts it back to 'value' the moment the property changes -- a hidden
 	// state that survives a property change is how a Replace writes something nobody asked for.
@@ -9718,18 +9762,77 @@ var EngCalcs = EngCalcs || {};
 	 * A query that does not PARSE still yields nothing, and that stays: there is no matched set to
 	 * derive anything from, and runReplacePreview() says so in its own words.
 	 */
+	/**
+	 * **WRITABLE HERE, AND NOWHERE ELSE** -- the Replace side's counterpart to
+	 * FIND_EXTRA_LINK_FIELDS, which is the same shape of answer on the search side.
+	 *
+	 * `pushSpecList()` stays the source of truth for everything that is a starting VALUE, and the
+	 * tag is not one: nothing seeds a tag from a default and nothing pushes one onto every scenario,
+	 * because a tag is what somebody else's records call this asset. It also cannot be written in
+	 * that list's shape, and the reason is the interesting one: every spec there belongs to ONE
+	 * group, and a tag is carried by nodes AND links. Two specs both named Tag would put the word
+	 * twice in one pull-down and `replaceSpec()` would write only whichever came first.
+	 *
+	 * So `group: 'any'` -- read by replaceSpecGroupOk() alone -- and a spec in the identical shape,
+	 * concatenated rather than kept as a rival list. `text: true` says the value box holds words
+	 * rather than a number; see replaceValueOf().
+	 *
+	 * **AND `set` IS A PLAIN WRITE ON PURPOSE.** A tag is base-owned (tagField()), not in
+	 * LPN_OVERRIDABLE, so it has no `prop` and replaceWrite() calls this directly -- inside a
+	 * scenario as well as in Base, which is the ruling and not an oversight: a scenario asks what if
+	 * this pipe were bigger, not what if it were a different asset. `lpnTagText()` is applied in
+	 * replaceValueOf(), so the ONE-WORD rule is stated in one place for both doors.
+	 */
+	function replaceExtraSpecs() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ key: 'tag', group: 'any', field: 'tag', text: true, label: pc.lpn_field_tag || 'Tag',
+				applies: function () { return true; },
+				get: function (el) { return el.tag || ''; },
+				set: function (el, v) {
+					if (v) { el.tag = v; } else { delete el.tag; }   // base-write: a tag is an identity, not an overridable property -- see tagField()
+				} }
+		];
+	}
+	// A spec's group against a candidate's. Only the tag answers 'any', and only to the two groups
+	// that can hold one: a Text label is not an asset and carries no tag, so "everything" here
+	// means every NODE and every LINK, exactly as it does in findPropDefs().
+	function replaceSpecGroupOk(spec, group) {
+		if (spec.group === 'any') { return group === 'node' || group === 'link'; }
+		return spec.group === group;
+	}
+	/**
+	 * **THE SET THE PANEL IS SHOWING, NOT A SECOND OPINION ABOUT IT** (found 2026-09-05 while
+	 * wiring the tag in, and it was wrong for every property, not for the tag).
+	 *
+	 * `findRunQuery()` is the one place that answers "what does this panel select" -- it walks the
+	 * typed query's AST when there is one and falls back to the pull-downs when there is not.
+	 * Every function below called `findMatches()` instead, which reads `findState` ALONE. For a
+	 * simple typed query the two agree, because the controls follow it. For a COMPOUND one they do
+	 * not: `A OR B` has no pull-down representation, `findState` still holds whatever the controls
+	 * last expressed, and findEvalNode() puts it back untouched afterwards.
+	 *
+	 * So `Junction.Tag equal to 'METER-4417' OR Pipe.Tag equal to 'MAIN-1962'` previewed and wrote
+	 * the *previous* query's junctions -- a bulk write to elements the panel never named, under a
+	 * count the user had read and approved. The doc block above already claimed a compound query
+	 * was fine here; this makes it true.
+	 */
+	function replaceFoundSet() {
+		var run = findRunQuery();
+		return run.ok ? run.list : [];
+	}
 	function replaceSpecs() {
 		var cands;
 		if (findQueryError) { return []; }
-		if (findQueryAst) { cands = findMatches(); }
+		if (findQueryAst) { cands = replaceFoundSet(); }
 		else {
 			var d = findScopeDef(findState.scope);
 			if (d.key === 'all' || d.group === 'label') { return []; }
 			cands = findCandidates();
 		}
 		if (!cands.length) { return []; }
-		return pushSpecList().filter(function (s) {
-			return cands.some(function (c) { return c.group === s.group && s.applies(c.el); });
+		return pushSpecList().concat(replaceExtraSpecs()).filter(function (s) {
+			return cands.some(function (c) { return replaceSpecGroupOk(s, c.group) && s.applies(c.el); });
 		});
 	}
 	function replaceSpec(field) {
@@ -9773,20 +9876,52 @@ var EngCalcs = EngCalcs || {};
 	function replaceDemTargets() {
 		var spec = replaceSpec(replaceState.prop), out = [];
 		if (!spec) { return out; }
-		findMatches().forEach(function (c) {
-			if (c.group !== spec.group || !spec.applies(c.el)) { return; }
+		replaceFoundSet().forEach(function (c) {
+			if (!replaceSpecGroupOk(spec, c.group) || !spec.applies(c.el)) { return; }
 			out.push({ group: c.group, id: c.el.id });
 		});
 		return out;
 	}
+	/**
+	 * **WHAT THE VALUE BOX ACTUALLY MEANS, ASKED OF THE PROPERTY RATHER THAN ASSUMED.** Until the
+	 * tag arrived every writable property was a number and this was a bare parseFloat(); a text
+	 * property makes "unusable" a different question, so it is asked in one place and both callers
+	 * -- the refusal message and the target list -- get the same answer.
+	 *
+	 * `undefined` means the box holds nothing this property can be set to. For a number that is a
+	 * blank or unreadable entry; for a tag it is an empty box, which STAYS a refusal rather than
+	 * quietly becoming "clear the tag on 400 pipes". Erasing tags in bulk is a real action, but it
+	 * is a destructive one that nobody asked for and it must not be spelled the same way as leaving
+	 * a box alone.
+	 *
+	 * **A TAG GOES THROUGH `lpnTagText()` HERE, WHICH IS THE POINT.** It is the one place the
+	 * one-word rule is stated (js/lpn-inp.js), shared with the popup and the exporter -- so typing
+	 * `MAIN 1962 south` here writes `MAIN`, the same as typing it on the popup, and Find and replace
+	 * cannot become a second door that writes a tag the exporter then silently truncates. The
+	 * preview counts what will actually be written, because it is measured against this value.
+	 */
+	function replaceValueOf(spec) {
+		var raw = String(replaceState.value).trim(), v;
+		if (spec && spec.text) {
+			v = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(raw) : raw.split(/\s+/)[0] || '';
+			return v === '' ? undefined : v;
+		}
+		v = parseFloat(raw);
+		return isFinite(v) ? v : undefined;
+	}
 	function replaceTargets() {
 		if (replaceIsDem()) { return replaceDemTargets(); }
-		var spec = replaceSpec(replaceState.prop), v = parseFloat(String(replaceState.value).trim()), out = [];
-		if (!spec || !isFinite(v)) { return out; }
-		findMatches().forEach(function (c) {
-			if (c.group !== spec.group || !spec.applies(c.el)) { return; }
+		var spec = replaceSpec(replaceState.prop), v, out = [];
+		if (!spec) { return out; }
+		v = replaceValueOf(spec);
+		if (v === undefined) { return out; }
+		replaceFoundSet().forEach(function (c) {
+			if (!replaceSpecGroupOk(spec, c.group) || !spec.applies(c.el)) { return; }
 			var now = spec.get(c.el);
-			if (typeof now === 'number' && findNumEq(now, v)) { return; }
+			if (typeof now === 'number' && typeof v === 'number' && findNumEq(now, v)) { return; }
+			// An element already carrying this exact tag is not a change, the same rule the number
+			// above obeys -- so the count in the preview stays a promise about the document.
+			if (typeof v === 'string' && String(now) === v) { return; }
 			out.push({ group: c.group, id: c.el.id });
 		});
 		return out;
@@ -9794,8 +9929,11 @@ var EngCalcs = EngCalcs || {};
 	// The one write. A spec with a `prop` is overridable, so it goes through setProp() -- in Base
 	// that writes the element, in a scenario it records an override, and a direct write here would
 	// edit Base from inside a scenario across every matched element at once
-	// (dev/scenario-seam-repair.md). A spec with NO `prop` is Base-owned survey data (elevation) and
-	// its own set() is where that base-write is already declared; this does not invent a second one.
+	// (dev/scenario-seam-repair.md). A spec with NO `prop` is Base-owned -- survey data (elevation)
+	// or identity (the tag) -- and its own set() is where that base-write is already declared; this
+	// does not invent a second one. **A tag therefore writes BASE from inside a scenario, on
+	// purpose**, which is the same ruling tagField() makes at the popup: a scenario asks what if
+	// this pipe were bigger, not what if it were a different asset.
 	function replaceWrite(el, spec, v) {
 		if (spec.prop) { setProp(el, spec.prop, v); return; }
 		spec.set(el, v);
@@ -9834,8 +9972,9 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		// **THE DEM PATH HAS NO TYPED VALUE TO CHECK**, which is the whole of what it is (Task 542).
-		if (!replaceIsDem() &&
-			(String(replaceState.value).trim() === '' || !isFinite(parseFloat(replaceState.value)))) {
+		// Asked of the property, because a tag's box holds a word and a diameter's holds a number;
+		// replaceValueOf() is the one place that difference is decided.
+		if (!replaceIsDem() && replaceValueOf(replaceSpec(replaceState.prop)) === undefined) {
 			replacePending = null;
 			renderReplace(pc.lpn_replace_no_value || 'Type the new value.');
 			return;
@@ -9843,7 +9982,7 @@ var EngCalcs = EngCalcs || {};
 		// The result list is re-run and redrawn beside the preview, so the rows on screen are the
 		// same query the count is about. A stale list beside a fresh count is two answers to one
 		// question, and the one on screen is the one that will be believed.
-		findResults = findMatches();
+		findResults = replaceFoundSet();
 		renderFindResults(null);
 		refs = replaceTargets();
 		if (!refs.length) {
@@ -9851,8 +9990,8 @@ var EngCalcs = EngCalcs || {};
 			renderReplace(pc.lpn_replace_none || 'Nothing would change.');
 			return;
 		}
-		replacePending = { prop: replaceState.prop, value: parseFloat(replaceState.value), refs: refs,
-			dem: replaceIsDem() };
+		replacePending = { prop: replaceState.prop, value: replaceValueOf(replaceSpec(replaceState.prop)),
+			refs: refs, dem: replaceIsDem() };
 		renderReplace(null);
 	}
 	function cancelReplace() { replacePending = null; renderReplace(null); }
@@ -9898,7 +10037,7 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 		// The query is re-run over the document it just changed, because the rows are the panel's
 		// claim about the map: after "diameter equal to 6, set to 8" that list is correctly empty.
-		findResults = findMatches();
+		findResults = replaceFoundSet();
 		renderFindResults(null);
 		renderReplace(String(pc.lpn_replace_done || '{n} changed.').replace('{n}', String(n)));
 		return n;
