@@ -14,6 +14,45 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-09-05 — "It seems we should implement all of EPANET": weighed the rule-based-controls case again, held it
+
+Tom's own words, offered as a reason to revisit `[RULES]`. Full ranking and reasoning is in the
+wishlist (2026-09-05 sections, top and bottom) — recorded here only what a later invocation should
+not have to re-derive.
+
+- **OBSERVED**, `dev/ROADMAP.md`: the premise Tom's sentence was built on is wrong. `[RULES]`
+  (Task 248.03) is not off the roadmap — it sits at priority 100, "Next," the highest band on the
+  list, above `[SOURCES]`/`[MIXING]`/`[TAGS]`/`[REPORT]` (579, priority 75) and pump efficiency
+  curves (582, priority 75). Only the rule LANGUAGE and its editor are parked; carriage already
+  survives a round trip.
+- **CITED**, web search 2026-09-05: real EPANET rule-based-control literature exists for booster
+  chlorination station siting/scheduling (a 2017 ResearchGate PSO+EPANET paper, an OSTI booster
+  optimization report, a South Central CT RWA case study) — a genuinely closer-to-planning use than
+  the tank-level pump-switching examples my 2026-08-24 answer cited. This is the strongest
+  opposing evidence I found, and I went looking for it deliberately rather than re-reading my own
+  prior paragraph.
+- **Held anyway, and this is the reasoning, not a shrug:** in every one of those studies the rule
+  TEXT is an optimizer's (PSO's) output, not a design engineer's hand-authored `IF...THEN`. The
+  planning deliverable is the siting decision and target residual, which this suite can already
+  state without a rule editor. My 2026-08-24 conclusion — operations/SCADA want, not a
+  design-and-planning want — stands. **This is the honest-hedge case from that entry actually
+  arriving, and it did not overturn the answer on inspection**, which is itself worth recording so
+  a later invocation does not treat "new evidence appeared" as automatically dispositive.
+- **SPECULATION**, mine, re-derive before relying on it: what I think Tom is actually reaching for
+  is not literal EPANET parity but discomfort at the "wait for a user who has one" bar being
+  invoked as a blanket brake rather than case by case — the same sentence, *"why aren't we
+  implementing this instead of shipping without it,"* has now fired on 582, 579 and this one. My
+  answer, stated as policy in the wishlist: drop the evidence bar for gaps EPANET has already fully
+  specified and that cost little to wire through (`[SOURCES]`, `[TAGS]`) — keep it for gaps that
+  need real new design work of our own (`[RULES]`'s language, `[MIXING]`'s model).
+- **CITED**, `dev/positioning.md:87` and its surrounding section (Tom, 2026-08-22, quoted there):
+  *"EPANET appears to me to be of 'infinite' depth"* — the ruling was about public claims, but the
+  same fact makes "implement all of EPANET" an unbounded, retrospective target rather than a
+  workable one: you only learn the boundary by tripping over it, which rewards whichever gap was
+  noticed most recently rather than the one that would change a master-plan or CIP decision.
+
+---
+
 ## 2026-09-04 — Task 577: Pump energy is a REPORT, not a table; keep it out of Tables, rename it, and it is already grouped right
 
 Tom found the Pump Energy box and asked whether to rename it "Pump Energy Report" (near the EPANET
