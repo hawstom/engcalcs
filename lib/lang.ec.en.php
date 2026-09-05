@@ -2211,7 +2211,7 @@ $ec_lang['lpn_pump_curve_note']='One, two, or three points. See "Pump curve" und
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
 // word for this and a hydraulic engineer already knows it.
 $ec_lang['lpn_field_tag']='Tag';
-$ec_lang['lpn_field_tag_tip']='One word of your own on this part, carried into and out of the EPANET file. It changes no answer. Use it to match this part to the number it already has in your asset records, your maps or your work orders. EPANET stops reading a tag at the first space, so a space and everything after it is dropped as you type.';
+$ec_lang['lpn_field_tag_tip']='A tag of your own, carried into and out of the EPANET file. A tag changes no answer. Use it to match this to the number it already has in your asset records, your maps or your work orders. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it.';
 $ec_lang['lpn_pump_effic_curve']='Efficiency curve';
 $ec_lang['lpn_pump_effic_curve_tip']='The name of the efficiency curve this pump uses, as its file states it. Its points are below, in flow and percent. Editing them is not built yet, so this is a reading of the file rather than a control.';
 $ec_lang['lpn_pump_effic_col']='Efficiency';

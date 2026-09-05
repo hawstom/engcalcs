@@ -135,7 +135,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Tag
   @@ NEEDS RULING
 - **`lpn_field_tag_tip`**
-  > One word of your own on this part, carried into and out of the EPANET file. It changes no answer. Use it to match this part to the number it already has in your asset records, your maps or your work orders. EPANET stops reading a tag at the first space, so a space and everything after it is dropped as you type.
+  > A tag of your own, carried into and out of the EPANET file. A tag changes no answer. Use it to match this to the number it already has in your asset records, your maps or your work orders. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it.
   @@ NEEDS RULING
 - **`lpn_find_prop_demand_description`**
   > Demand category description

@@ -14924,6 +14924,17 @@ var EngCalcs = EngCalcs || {};
 		// EVERY section, not two of them: a different project brings its own units, its own colour
 		// field and its own friction method, and all four sections carry one or more of those.
 		rebuildSettingsBox();
+		// **AND THE LIBRARIES BOX, FOR THE IDENTICAL REASON** (Tom, 2026-09-05: *"the Libraries
+		// don't automatically update on switching projects. I have to change tabs."*). Its patterns,
+		// curves, controls and rules are all document data, so a box left open across a project
+		// switch was showing the OUTGOING project's library over the incoming project's map -- and
+		// editing a row there would have written it into the project now on screen. Changing its
+		// section tab happened to rebuild it, which is why it looked like a refresh problem rather
+		// than a stale-document one.
+		//
+		// Safe when the box has never been opened: rebuildLibraryBox() returns at once if its
+		// content element is not in the page.
+		rebuildLibraryBox();
 		applyLegendPosition();
 		// **NO applyMapHeight() HERE. THE BOTTOM OF THE MAP DOES NOT DEPEND ON THE MODEL.** The canvas
 		// height is a fact about the WINDOW and the page's chrome, so re-deriving it on every open
@@ -22941,6 +22952,49 @@ var EngCalcs = EngCalcs || {};
 			row(compBody, labelText, input, tipText);
 		}
 		if (!settings.hydraulics) { settings.hydraulics = {}; }
+		// **THE TWO SWITCHES COME FIRST UNDER Hydraulics, and Tom put them there** (2026-09-05:
+		// *"Move 'Solve with EPANET solver' (2nd) and 'Recalculate automatically' (1st) to the top
+		// of the Hydraulics heading"*). They had been built last, after ten numeric rows and after
+		// the Energy and Quality hosts, which is build order rather than reading order.
+		//
+		// They belong at the top because they decide WHETHER and WITH WHAT the network is solved,
+		// and every row under them is a detail of a solve that these two have already settled.
+		// Recalculate first: a reader who has turned it off is not asking about accuracy at all.
+		// **AUTOMATIC RECALCULATION** (Task 467, Tom 2026-08-20). The switch this page had was a
+		// measurement nobody could see; this is the same decision made out loud. Turning it OFF puts
+		// the Calculate button back on the toolbar -- js/lpn-time.js reads this through the host's
+		// autoRun() and renders the strip accordingly, so there is nothing to keep in step here.
+		var autoInput = document.createElement('input');
+		autoInput.type = 'checkbox';
+		autoInput.checked = (settings.autoRun !== false);
+		autoInput.addEventListener('change', function () {
+			settings.autoRun = autoInput.checked;
+			// Re-render the strip immediately: the whole point of the checkbox is that the button
+			// appears or disappears, and a change you have to provoke a solve to see reads as broken.
+			if (EngCalcs.lpnTimeRenderPanel) { EngCalcs.lpnTimeRenderPanel(); }
+			// Turning it ON is a request for an up-to-date answer, so give one rather than waiting
+			// for the next edit. Turning it OFF asks for nothing, and costs nothing.
+			if (settings.autoRun) { scheduleSolve(); }
+			saveToStorage();
+		});
+		row(compBody, pc.lpn_settings_auto_run || 'Recalculate automatically', autoInput, pc.lpn_settings_auto_run_tip);
+		// ---- engine choice (ROADMAP Task 243) ----
+		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
+		// and a select would imply the two are peers when the native path is the one this page
+		// is built around.
+		var engInput = document.createElement('input');
+		engInput.type = 'checkbox';
+		engInput.checked = (settings.engine === 'epanet');
+		engInput.addEventListener('change', function () {
+			settings.engine = engInput.checked ? 'epanet' : 'native';
+			// A different engine makes the engine-difference notes new again (Task 525).
+			resetEngineNotes();
+			// Fetch it now rather than on the next solve: the user just asked for this engine, so
+			// this is the moment to spend the 664 KB and the moment they will understand the wait.
+			if (settings.engine === 'epanet') { warmEpanetEngine('engine'); }
+			scheduleSolve();
+		});
+		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET solver', engInput, pc.lpn_settings_engine_epanet_tip);
 		hydNumberRow('accuracy', 'lpn_settings_accuracy', 'Accuracy',
 			'lpn_settings_accuracy_tip', solveAccuracy());
 		// **THE ONE OPTION A SCENARIO MAY CARRY ITS OWN VALUE OF**, which is what makes average
@@ -22971,47 +23025,12 @@ var EngCalcs = EngCalcs || {};
 			'lpn_settings_flow_change_tip', 0, { allowZero: true, unitOf: 'lpn_u_flow' });
 		hydNumberRow('dampLimit', 'lpn_settings_damp_limit', 'Damping starts at',
 			'lpn_settings_damp_limit_tip', 0, { allowZero: true });
-		// ---- engine choice (ROADMAP Task 243) ----
-		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
-		// and a select would imply the two are peers when the native path is the one this page
-		// is built around.
-		var engInput = document.createElement('input');
-		engInput.type = 'checkbox';
-		engInput.checked = (settings.engine === 'epanet');
-		engInput.addEventListener('change', function () {
-			settings.engine = engInput.checked ? 'epanet' : 'native';
-			// A different engine makes the engine-difference notes new again (Task 525).
-			resetEngineNotes();
-			// Fetch it now rather than on the next solve: the user just asked for this engine, so
-			// this is the moment to spend the 664 KB and the moment they will understand the wait.
-			if (settings.engine === 'epanet') { warmEpanetEngine('engine'); }
-			scheduleSolve();
-		});
-		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET solver', engInput, pc.lpn_settings_engine_epanet_tip);
 		// Energy, then Quality LAST -- the reading order the markup sets, and the reasoning is in
 		// Looped-Network.php beside the sections themselves. Build order does not decide what a
 		// reader meets first (the hosts are already in the page), but keeping the two in step means
 		// nobody has to hold two orders in their head.
 		settingsEnergyRows(energyBody, row, note);
 		settingsQualityRows(qualBody, row, note);
-		// **AUTOMATIC RECALCULATION** (Task 467, Tom 2026-08-20). The switch this page had was a
-		// measurement nobody could see; this is the same decision made out loud. Turning it OFF puts
-		// the Calculate button back on the toolbar -- js/lpn-time.js reads this through the host's
-		// autoRun() and renders the strip accordingly, so there is nothing to keep in step here.
-		var autoInput = document.createElement('input');
-		autoInput.type = 'checkbox';
-		autoInput.checked = (settings.autoRun !== false);
-		autoInput.addEventListener('change', function () {
-			settings.autoRun = autoInput.checked;
-			// Re-render the strip immediately: the whole point of the checkbox is that the button
-			// appears or disappears, and a change you have to provoke a solve to see reads as broken.
-			if (EngCalcs.lpnTimeRenderPanel) { EngCalcs.lpnTimeRenderPanel(); }
-			// Turning it ON is a request for an up-to-date answer, so give one rather than waiting
-			// for the next edit. Turning it OFF asks for nothing, and costs nothing.
-			if (settings.autoRun) { scheduleSolve(); }
-			saveToStorage();
-		});
-		row(compBody, pc.lpn_settings_auto_run || 'Recalculate automatically', autoInput, pc.lpn_settings_auto_run_tip);
 		// ---- restore defaults (Tom, 2026-07-30) ----
 		// Resets settings/labelSettings only -- the network (nodes/links/labels) and backdrop are
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
@@ -26918,15 +26937,37 @@ var EngCalcs = EngCalcs || {};
 	 * stated, shared with the exporter.
 	 */
 	function tagField(fields, el) {
-		var pc = EngCalcs.pageConfig || {};
-		textField(fields, pc.lpn_field_tag || 'Tag',
-			function () { return el.tag || ''; },
-			function (v) {
-				var t = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(v) : String(v || '').trim();
-				saveUndoSnapshot();
-				if (t) { el.tag = t; } else { delete el.tag; }   // base-write: a tag is an identity, not an overridable property -- see this function's own note
-				refreshPopupIfOpen();
-			}, pc.lpn_field_tag_tip);
+		var pc = EngCalcs.pageConfig || {},
+			label = document.createElement('label'),
+			input = document.createElement('input');
+		input.type = 'text';
+		input.value = el.tag || '';
+		// **THE SPACE IS REFUSED AS IT IS TYPED, NOT SWALLOWED ON THE WAY OUT** (Tom, 2026-09-05:
+		// *"Tip says everything is dropped as I type. But it's dropped only when I leave the field.
+		// Why not as I type?"*). Fair, and the tip was describing behaviour the field did not have.
+		// Trimming on `change` lets somebody type a sentence, look at it, tab away and watch most of
+		// it vanish -- the rule applied at the moment it can no longer be seen. On `input` the space
+		// simply never lands, which teaches the rule at the moment it is broken.
+		//
+		// The caret is left alone deliberately: a space is the ONLY thing refused, so it is always
+		// the character just typed, and re-placing the caret would only matter for a paste. A paste
+		// of `MAIN 1962 south` keeps `MAIN` and puts the caret at the end of it, which is where a
+		// browser puts it anyway.
+		function commit() {
+			var t = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(input.value) : String(input.value || '').trim();
+			if (input.value !== t) { input.value = t; }
+			if (t === (el.tag || '')) { return; }
+			saveUndoSnapshot();
+			if (t) { el.tag = t; } else { delete el.tag; }   // base-write: a tag is an identity, not an overridable property -- see this function's own note
+		}
+		input.addEventListener('input', commit);
+		// `change` as well, because a field can lose focus without ever firing `input` -- a value
+		// restored by the browser, or an autofill.
+		input.addEventListener('change', function () { commit(); refreshPopupIfOpen(); });
+		setFieldLabel(label, pc.lpn_field_tag || 'Tag', pc.lpn_field_tag_tip);
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
 	}
 	/**
 	 * **WHAT EFFICIENCY THIS PUMP IS ACTUALLY RUNNING AT, ON THE PUMP** (Tom, 2026-09-05, having
