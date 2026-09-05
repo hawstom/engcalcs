@@ -120,20 +120,20 @@ the block.
 - 75|583| **Two EPS sentences left, and one states an unmeasured cause.**
   Tom read `dev/eps-terminology-audit.md` and marked all eight rows; his marks are committed verbatim
   (`9562285a`) and §4 records what came of each. **Five applied 2026-09-04** -- three translated, so
-  **78 retranslations are owed** (`lpn_inp_drop_eps`, `lpn_time_no_engine`, `lpn_time_no_period`) and
-  two untranslated and free, both in his own words rather than the recommendation.
-  - **`lpn_energy_over` lost its `{time}` on his edit, and that is content rather than wording**: the
-    energy report's kWh and cost no longer state the duration they are over. The call site still
-    calls `.replace('{time}', ...)`, so restoring the clause is a one-string edit if he wants it.
+  **78 retranslations are owed** (`lpn_inp_drop_eps`, `lpn_time_no_engine`, `lpn_time_no_period`).
+  - **`lpn_energy_over` is SETTLED**, in a second ruling the same day and in his own wording: *For
+    extended period simulation of {time}*. The first pass had dropped the duration, which
+    `energy-anchor-harness.js` caught as the guarded property it is; he rejected the two-line repair
+    and put the duration back inside the sentence. Untranslated, so free. §4 has the one place the
+    shipped string departs from his sketch and why (H:MM cannot carry a trailing "hours").
   - **`lpn_time_running` is the one row of eight he left blank.** Unruled, so unchanged, and the
     audit rated it the single best place to name the analysis: it is the progress line.
   - **[H] `lpn_time_run_note` was not a wording question, and answering it found a defect** (§5).
     The behaviour is sound -- the page computes one instant of an EPS project only when the user has
-    unchecked *Recalculate automatically* themselves, which `autoRunAllowed()` is the whole gate for,
-    and the page only advises it above `LPN_TIME_SLOW_MS`. **But the sentence asserts a speed the
-    code never tests**: `lpnTimeStatusNote()` reads no timing at all, so a user who unchecks the box
-    on a fast network is told their network is slow. The replacement states the setting instead, and
-    is in §5 awaiting his word. Translated: 26.
+    unchecked *Recalculate automatically* themselves, `autoRunAllowed()` being the whole gate, and
+    above `LPN_TIME_SLOW_MS` the page only advises it. **But the sentence asserts a speed the code
+    never tests**: `lpnTimeStatusNote()` reads no timing at all, so a user who unchecks the box on a
+    fast network is told their network is slow. Replacement in §5, awaiting his word. Translated: 26.
 
 - 75|582| **Pump efficiency curves: the one energy number we still take on faith.**
   Tom, 2026-09-04, reading `lpn_energy_curve_note`: *"Why aren't we implementing this instead of

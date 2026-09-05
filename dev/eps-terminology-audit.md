@@ -81,12 +81,19 @@ verbatim above (`9562285a`) and are the authority for what follows.
 - **Applied, untranslated, free:** `lpn_energy_col_avg_kw_tip` and `lpn_energy_over`, both in **his
   own words rather than the recommendation** -- he rewrote the first, which the audit had said to
   leave, and shortened the second.
-  - **`lpn_energy_over` LOST ITS `{time}`, deliberately, and that is a change of content and not of
-    wording.** The energy report's note read *Over an extended period simulation of 8:00*; it now
-    reads *Over an extended period simulation.* The kWh and the cost in the table beneath it are
-    therefore no longer anchored to a duration anywhere on screen. The `.replace('{time}', ...)`
-    call site is unchanged and harmless, so restoring the clause is a one-string edit if he wants
-    it back.
+  - **`lpn_energy_over` LOST ITS `{time}` AND TOM PUT IT BACK, in a second ruling the same day.**
+    The shortened wording left the kWh and the cost with nothing on screen saying what span they
+    were over, and `dev/lpn-spike/energy-anchor-harness.js` failed on exactly that -- the duration
+    being stated was already a guarded property. It was briefly restored as a second labelled line
+    reusing `lpn_time_duration`; he ruled against that shape and wrote the final wording himself:
+    *"Change 'Over an extended period simulation.' to 'For extended period simulation' (no period).
+    Why not put the duration as 'For extended period simulation of {total_run_time} hours'"*.
+    - **Shipped as `For extended period simulation of {time}`.** One sentence rather than two, his
+      opening preposition and his dropped full stop, and the duration inside it.
+    - **The trailing word "hours" is deliberately not there**, and it is the one place the shipped
+      string departs from his sketch. `{time}` is filled by `lpnFormatTime()` in H:MM, the way this
+      page states every other time, so a 90-minute run reads *of 1:30* -- and *of 1:30 hours* would
+      be wrong. Saying "hours" would mean printing a decimal number of hours here and nowhere else.
 - **`lpn_time_running` was left blank** -- the one row of eight carrying no mark. Unruled, so
   unchanged, and it is the row the audit rated the single best place to name the analysis.
 - **`lpn_time_run_note` is not a wording question and is answered in §5.**
