@@ -97,6 +97,16 @@ function ecParseRulingsMd(string $text): array
         if ($inVal && preg_match('/^  > ?(.*)$/', $line, $m)) { $val[] = $m[1]; continue; }
         $inVal = false;
         if (trim($line) === '') { continue; }
+        /* **AN ENTRY'S CONTENT IS INDENTED; ANYTHING AT COLUMN 0 IS DOCUMENT PROSE AND ENDS IT.**
+         * The generator indents every line it puts inside an entry by two spaces -- the value, the
+         * finding, the readings, the ask lines, the flag -- and Tom's marks are written on the
+         * flag's own indented line. So a line starting at column 0 is the next section heading or a
+         * closing sentence, and swallowing it makes it part of somebody's ruling.
+         * Found the second time this parser ate its own document: with every key translated the
+         * generator emits "None. Every English key is present in at least one other language." at
+         * column 0, and that sentence was reported as an unharvested mark on the entry above it.
+         * This is the general rule the per-line furniture list below is the specific case of. */
+        if ($line !== '' && $line[0] !== ' ' && $line[0] !== "\t") { $flush(); continue; }
         /* **GENERATED FURNITURE INSIDE THE MARK AREA. EVERY LINE THE GENERATOR CAN EMIT HERE MUST
          * BE LISTED, or the harvester reads its own output as somebody's handwriting.** That is not
          * hypothetical: `**What this asks for:**` and `*The proposal:*` were added to

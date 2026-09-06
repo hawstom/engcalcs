@@ -230,6 +230,21 @@
    ],
    "reason": "Effic. -- the pump-energy efficiency column heading. Italian abbreviates 'efficienza' the same way; its agent was forced to 'Rend.' (rendimento) purely to clear the gate. Listed for it alone, because only its agent reported the collision."
   },
+  "lpn_energy_col_kwh": {
+   "category": "symbol",
+   "languages": "*",
+   "reason": "kWh -- same, as a column heading, where the bare symbol is exactly what is wanted. Listed after sprint 584-wave1, where the Khmer agent reported all five rather than inventing a transliteration nobody would recognise -- which is the behaviour the brief now asks for."
+  },
+  "lpn_energy_kw": {
+   "category": "symbol",
+   "languages": "*",
+   "reason": "kW -- same as lpn_energy_kwh. Listed after sprint 584-wave1, where the Khmer agent reported all five rather than inventing a transliteration nobody would recognise -- which is the behaviour the brief now asks for."
+  },
+  "lpn_energy_kwh": {
+   "category": "symbol",
+   "languages": "*",
+   "reason": "kWh -- the SI-derived unit symbol. A unit symbol is the same in every language by definition; the words AROUND it are translated and the symbol is not. Listed after sprint 584-wave1, where the Khmer agent reported all five rather than inventing a transliteration nobody would recognise -- which is the behaviour the brief now asks for."
+  },
   "lpn_ex_elm_street_title": {
    "category": "brand",
    "languages": "*",
@@ -320,6 +335,16 @@
     "fr"
    ],
    "reason": "Description -- identical in French. Its agent wrote 'Note descriptive' to clear the gate."
+  },
+  "lpn_library_curve_x": {
+   "category": "symbol",
+   "languages": "*",
+   "reason": "X -- the curve grid's abscissa heading. A bare axis letter is a symbol, and CLAUDE.md's own rule is that a symbol keeps every letter as in English in every language, including RTL. Listed after sprint 584-wave1, where the Khmer agent reported all five rather than inventing a transliteration nobody would recognise -- which is the behaviour the brief now asks for."
+  },
+  "lpn_library_curve_y": {
+   "category": "symbol",
+   "languages": "*",
+   "reason": "Y -- same as lpn_library_curve_x. Listed after sprint 584-wave1, where the Khmer agent reported all five rather than inventing a transliteration nobody would recognise -- which is the behaviour the brief now asks for."
   },
   "lpn_menu_edit": {
    "category": "cognate",

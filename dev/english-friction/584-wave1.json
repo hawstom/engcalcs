@@ -352,6 +352,97 @@
    "disposition": "glossary",
    "answered": "2026-09-06",
    "resolution": "Same shape and same answer: an honest gap in glossary.json rather than a defect in the English, which is EPANET's own vocabulary and must stay so. Using one transparent word consistently across all three kinds is the right call -- the three differ only in HOW the dose is applied, which lpn_source_type_tip explains, so the shared root carries the family and the tip carries the difference. Recorded as the Amharic decision; 'booster' wants a glossary term with translations, next sprint."
+  },
+  {
+   "key": "lpn_reaction_order_tank_tip",
+   "source": "translator",
+   "lang": "km",
+   "complaint": "'The same power' is ambiguous: on a page that also has an energy section, 'power' reads as electrical power, but here it means the reaction-order exponent from the sibling bulk tip.",
+   "readings": [
+    "the mathematical exponent, matching the bulk tip's 'the power the concentration is raised to'",
+    "electrical power, ruled out by context"
+   ],
+   "disposition": "english",
+   "answered": "2026-09-06",
+   "resolution": "FIXED THE SAME DAY, and cheaply, which is the whole argument for filing early. The English now reads 'The same EXPONENT'. This string was written hours earlier in the same session (Task 593) and only ONE language had translated it, so the correction cost one retranslation instead of 26 -- against the two other 'agreed and queued' entries in this sprint, which were deferred precisely because fixing them would have stranded 26 fresh translations. The agent is right that 'power' collides with electrical power on a page carrying a pump-energy report."
+  },
+  {
+   "key": "lpn_find_query_hint",
+   "source": "translator",
+   "lang": "km",
+   "complaint": "The hint embeds the literal English 'AND, OR' inside the translated sentence, implying the parser wants English tokens, while the joiner dropdown shows the localized words.",
+   "readings": [
+    "translate the joiners, since the parser localizes them",
+    "keep literal AND/OR to match the parser token and this hint"
+   ],
+   "disposition": "english",
+   "answered": "2026-09-06",
+   "resolution": "CHECKED IN THE CODE, AND BOTH SPELLINGS WORK: findAlts() gives every joiner two words -- the localized label and the English one -- so a query typed as 'AND' or as the local word both parse, exactly as findScopeDefs() explains for the scope words ('a query pasted from a colleague or from our own documentation must not fail because the reader's interface is in Portuguese'). So the hint is TRUE in every language and nothing is broken. What it is not is HELPFUL: it names the English words while the dropdown beside it shows the local ones. The fix is to interpolate the two joiners into the hint, which costs 26 retranslations for one key -- deferred to the next sprint rather than stranding 26 translations that landed today. This entry is its evidence."
+  },
+  {
+   "key": "lpn_energy_kwh",
+   "source": "translator",
+   "lang": "km",
+   "complaint": "kWh is a unit symbol or axis letter with no Khmer form in engineering use; it is byte-identical to English and may trip the identical-to-english check even though it is correct.",
+   "readings": [
+    "keep the symbol",
+    "invent a transliteration nobody would recognise"
+   ],
+   "disposition": "dismissed",
+   "answered": "2026-09-06",
+   "resolution": "THE AGENT DID THE RIGHT THING AND THE LIST HAS CAUGHT UP: all five are now EXEMPT for every language in dev/scripts/translation_exempt_keys.json, category `symbol`. CLAUDE.md's own rule already said a symbol keeps every letter as in English in every language, including RTL; what was missing was the exemption that lets a translator obey it without tripping a gate. This is the same class as the cognate collision six other languages hit this sprint, and it is the reason the brief now says: write the natural form and FILE, never invent a worse word to dodge the check."
+  },
+  {
+   "key": "lpn_energy_kw",
+   "source": "translator",
+   "lang": "km",
+   "complaint": "kW is a unit symbol or axis letter with no Khmer form in engineering use; it is byte-identical to English and may trip the identical-to-english check even though it is correct.",
+   "readings": [
+    "keep the symbol",
+    "invent a transliteration nobody would recognise"
+   ],
+   "disposition": "dismissed",
+   "answered": "2026-09-06",
+   "resolution": "THE AGENT DID THE RIGHT THING AND THE LIST HAS CAUGHT UP: all five are now EXEMPT for every language in dev/scripts/translation_exempt_keys.json, category `symbol`. CLAUDE.md's own rule already said a symbol keeps every letter as in English in every language, including RTL; what was missing was the exemption that lets a translator obey it without tripping a gate. This is the same class as the cognate collision six other languages hit this sprint, and it is the reason the brief now says: write the natural form and FILE, never invent a worse word to dodge the check."
+  },
+  {
+   "key": "lpn_energy_col_kwh",
+   "source": "translator",
+   "lang": "km",
+   "complaint": "kWh is a unit symbol or axis letter with no Khmer form in engineering use; it is byte-identical to English and may trip the identical-to-english check even though it is correct.",
+   "readings": [
+    "keep the symbol",
+    "invent a transliteration nobody would recognise"
+   ],
+   "disposition": "dismissed",
+   "answered": "2026-09-06",
+   "resolution": "THE AGENT DID THE RIGHT THING AND THE LIST HAS CAUGHT UP: all five are now EXEMPT for every language in dev/scripts/translation_exempt_keys.json, category `symbol`. CLAUDE.md's own rule already said a symbol keeps every letter as in English in every language, including RTL; what was missing was the exemption that lets a translator obey it without tripping a gate. This is the same class as the cognate collision six other languages hit this sprint, and it is the reason the brief now says: write the natural form and FILE, never invent a worse word to dodge the check."
+  },
+  {
+   "key": "lpn_library_curve_x",
+   "source": "translator",
+   "lang": "km",
+   "complaint": "X is a unit symbol or axis letter with no Khmer form in engineering use; it is byte-identical to English and may trip the identical-to-english check even though it is correct.",
+   "readings": [
+    "keep the symbol",
+    "invent a transliteration nobody would recognise"
+   ],
+   "disposition": "dismissed",
+   "answered": "2026-09-06",
+   "resolution": "THE AGENT DID THE RIGHT THING AND THE LIST HAS CAUGHT UP: all five are now EXEMPT for every language in dev/scripts/translation_exempt_keys.json, category `symbol`. CLAUDE.md's own rule already said a symbol keeps every letter as in English in every language, including RTL; what was missing was the exemption that lets a translator obey it without tripping a gate. This is the same class as the cognate collision six other languages hit this sprint, and it is the reason the brief now says: write the natural form and FILE, never invent a worse word to dodge the check."
+  },
+  {
+   "key": "lpn_library_curve_y",
+   "source": "translator",
+   "lang": "km",
+   "complaint": "Y is a unit symbol or axis letter with no Khmer form in engineering use; it is byte-identical to English and may trip the identical-to-english check even though it is correct.",
+   "readings": [
+    "keep the symbol",
+    "invent a transliteration nobody would recognise"
+   ],
+   "disposition": "dismissed",
+   "answered": "2026-09-06",
+   "resolution": "THE AGENT DID THE RIGHT THING AND THE LIST HAS CAUGHT UP: all five are now EXEMPT for every language in dev/scripts/translation_exempt_keys.json, category `symbol`. CLAUDE.md's own rule already said a symbol keeps every letter as in English in every language, including RTL; what was missing was the exemption that lets a translator obey it without tripping a gate. This is the same class as the cognate collision six other languages hit this sprint, and it is the reason the brief now says: write the natural form and FILE, never invent a worse word to dodge the check."
   }
  ]
 }

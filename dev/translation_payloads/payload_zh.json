@@ -2,8 +2,8 @@
     "meta": {
         "language": "zh",
         "expected_key_count": 1688,
-        "delta_key_count": 15,
-        "exempt_key_count": 19,
+        "delta_key_count": 13,
+        "exempt_key_count": 21,
         "exempt_keys": [
             "calc_units_us",
             "calc_units_si",
@@ -23,7 +23,9 @@
             "lpn_field_x",
             "lpn_field_y",
             "lpn_field_id",
-            "lpn_labels_col_decimals_example"
+            "lpn_labels_col_decimals_example",
+            "lpn_library_curve_x",
+            "lpn_library_curve_y"
         ],
         "out_of_scope_key_count": 9,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
@@ -506,7 +508,7 @@
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
-        "lpn_reaction_order_tank_tip": "The same power, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
+        "lpn_reaction_order_tank_tip": "The same exponent, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
         "lpn_reaction_order_wall": "Wall reaction order",
         "lpn_reaction_order_wall_tip": "Whether the reaction at the pipe wall depends on how much chemical is in the water. First order means it does, and the wall coefficient is then a length per day. Zero order means it does not, and the coefficient becomes a mass per area per day instead. EPANET allows only these two, which is why this is a chooser and not a number. It also decides how this page converts the wall coefficient, so the row above it means something different depending on what you pick here.",
         "lpn_reaction_order_unstated": "Not stated",
@@ -515,15 +517,13 @@
         "lpn_reaction_limiting": "Limiting potential",
         "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. It is written in the same units as the chemical itself, and EPANET converts a concentration for nobody, so write it in the units named beside the chemical. Leave it empty and there is no limit.",
         "lpn_reaction_rough_corr": "Roughness correlation",
-        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all.",
-        "lpn_library_curve_x": "X",
-        "lpn_library_curve_y": "Y"
+        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
     },
     "keys": {
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
-        "lpn_reaction_order_tank_tip": "The same power, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
+        "lpn_reaction_order_tank_tip": "The same exponent, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
         "lpn_reaction_order_wall": "Wall reaction order",
         "lpn_reaction_order_wall_tip": "Whether the reaction at the pipe wall depends on how much chemical is in the water. First order means it does, and the wall coefficient is then a length per day. Zero order means it does not, and the coefficient becomes a mass per area per day instead. EPANET allows only these two, which is why this is a chooser and not a number. It also decides how this page converts the wall coefficient, so the row above it means something different depending on what you pick here.",
         "lpn_reaction_order_unstated": "Not stated",
@@ -532,9 +532,7 @@
         "lpn_reaction_limiting": "Limiting potential",
         "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. It is written in the same units as the chemical itself, and EPANET converts a concentration for nobody, so write it in the units named beside the chemical. Leave it empty and there is no limit.",
         "lpn_reaction_rough_corr": "Roughness correlation",
-        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all.",
-        "lpn_library_curve_x": "X",
-        "lpn_library_curve_y": "Y"
+        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
     },
     "key_context": {
         "lpn_reaction_order_bulk": {
@@ -742,38 +740,6 @@
                     "key": "lpn_reaction_note",
                     "value": "本页面不提供自己的反应系数。目前没有标准的测定方法，同类水质的已发表系数彼此可相差十倍之多，因此此处提供的任何数值都会被当作一种建议。请填入您自己测得的数值，或有据可查的数值；对于不发生反应的化学物质，可将输入框留空。",
                     "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
-                }
-            }
-        },
-        "lpn_library_curve_x": {
-            "reason": "equal_to_english",
-            "current_value": "X",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curve_in_use",
-                    "value": "此曲线正被 {count} 个元件使用：{ids}。请先将它们改为指向其他曲线，然后再删除此曲线。",
-                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "控制规则",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_y": {
-            "reason": "equal_to_english",
-            "current_value": "Y",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curve_in_use",
-                    "value": "此曲线正被 {count} 个元件使用：{ids}。请先将它们改为指向其他曲线，然后再删除此曲线。",
-                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "控制规则",
-                    "english": "Controls"
                 }
             }
         }

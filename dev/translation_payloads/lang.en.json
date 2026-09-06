@@ -1433,7 +1433,7 @@
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
-        "lpn_reaction_order_tank_tip": "The same power, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
+        "lpn_reaction_order_tank_tip": "The same exponent, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
         "lpn_reaction_order_wall": "Wall reaction order",
         "lpn_reaction_order_wall_tip": "Whether the reaction at the pipe wall depends on how much chemical is in the water. First order means it does, and the wall coefficient is then a length per day. Zero order means it does not, and the coefficient becomes a mass per area per day instead. EPANET allows only these two, which is why this is a chooser and not a number. It also decides how this page converts the wall coefficient, so the row above it means something different depending on what you pick here.",
         "lpn_reaction_order_unstated": "Not stated",

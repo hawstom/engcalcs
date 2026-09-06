@@ -2,8 +2,8 @@
     "meta": {
         "language": "hr",
         "expected_key_count": 1688,
-        "delta_key_count": 18,
-        "exempt_key_count": 27,
+        "delta_key_count": 13,
+        "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -31,7 +31,12 @@
             "lpn_new_coords_geo",
             "lpn_field_x",
             "lpn_field_y",
-            "lpn_field_id"
+            "lpn_field_id",
+            "lpn_energy_kwh",
+            "lpn_energy_kw",
+            "lpn_energy_col_kwh",
+            "lpn_library_curve_x",
+            "lpn_library_curve_y"
         ],
         "out_of_scope_key_count": 11,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
@@ -514,7 +519,7 @@
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
-        "lpn_reaction_order_tank_tip": "The same power, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
+        "lpn_reaction_order_tank_tip": "The same exponent, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
         "lpn_reaction_order_wall": "Wall reaction order",
         "lpn_reaction_order_wall_tip": "Whether the reaction at the pipe wall depends on how much chemical is in the water. First order means it does, and the wall coefficient is then a length per day. Zero order means it does not, and the coefficient becomes a mass per area per day instead. EPANET allows only these two, which is why this is a chooser and not a number. It also decides how this page converts the wall coefficient, so the row above it means something different depending on what you pick here.",
         "lpn_reaction_order_unstated": "Not stated",
@@ -523,18 +528,13 @@
         "lpn_reaction_limiting": "Limiting potential",
         "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. It is written in the same units as the chemical itself, and EPANET converts a concentration for nobody, so write it in the units named beside the chemical. Leave it empty and there is no limit.",
         "lpn_reaction_rough_corr": "Roughness correlation",
-        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all.",
-        "lpn_energy_kwh": "kWh",
-        "lpn_energy_kw": "kW",
-        "lpn_energy_col_kwh": "kWh",
-        "lpn_library_curve_x": "X",
-        "lpn_library_curve_y": "Y"
+        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
     },
     "keys": {
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
-        "lpn_reaction_order_tank_tip": "The same power, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
+        "lpn_reaction_order_tank_tip": "The same exponent, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
         "lpn_reaction_order_wall": "Wall reaction order",
         "lpn_reaction_order_wall_tip": "Whether the reaction at the pipe wall depends on how much chemical is in the water. First order means it does, and the wall coefficient is then a length per day. Zero order means it does not, and the coefficient becomes a mass per area per day instead. EPANET allows only these two, which is why this is a chooser and not a number. It also decides how this page converts the wall coefficient, so the row above it means something different depending on what you pick here.",
         "lpn_reaction_order_unstated": "Not stated",
@@ -543,12 +543,7 @@
         "lpn_reaction_limiting": "Limiting potential",
         "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. It is written in the same units as the chemical itself, and EPANET converts a concentration for nobody, so write it in the units named beside the chemical. Leave it empty and there is no limit.",
         "lpn_reaction_rough_corr": "Roughness correlation",
-        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all.",
-        "lpn_energy_kwh": "kWh",
-        "lpn_energy_kw": "kW",
-        "lpn_energy_col_kwh": "kWh",
-        "lpn_library_curve_x": "X",
-        "lpn_library_curve_y": "Y"
+        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
     },
     "key_context": {
         "lpn_reaction_order_bulk": {
@@ -756,86 +751,6 @@
                     "key": "lpn_reaction_note",
                     "value": "Ova stranica ne nudi vlastiti koeficijent reakcije. Ne postoji standardni test za njega, a objavljene vrijednosti s terena za istu vrstu vode razlikuju se i za faktor deset, pa bi broj ponuđen ovdje bio shvaćen kao preporuka. Unesite onaj koji ste izmjerili ili onaj koji možete navesti kao izvor, ili ostavite okvire praznima za kemikaliju koja ne reagira.",
                     "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
-                }
-            }
-        },
-        "lpn_energy_kwh": {
-            "reason": "equal_to_english",
-            "current_value": "kWh",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_energy_currency_tip",
-                    "value": "Što god ovdje upišete, ispisuje se uz svaki novčani iznos. Ovo je oznaka. Cijene i troškovi nikada se ne pretvaraju, pa cijene upišite u valuti koju ste ovdje naveli.",
-                    "english": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you have written here."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_price_note",
-                    "value": "Ova stranica ne nudi vlastitu cijenu energije. Cijena energije ovisi o komunalnom poduzeću, državi, dobu dana i godini, pa bi broj ponuđen ovdje bio shvaćen kao preporuka. Unesite cijenu iz svoje vlastite tarife.",
-                    "english": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff."
-                }
-            }
-        },
-        "lpn_energy_kw": {
-            "reason": "equal_to_english",
-            "current_value": "kW",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_energy_currency_tip",
-                    "value": "Što god ovdje upišete, ispisuje se uz svaki novčani iznos. Ovo je oznaka. Cijene i troškovi nikada se ne pretvaraju, pa cijene upišite u valuti koju ste ovdje naveli.",
-                    "english": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you have written here."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_price_note",
-                    "value": "Ova stranica ne nudi vlastitu cijenu energije. Cijena energije ovisi o komunalnom poduzeću, državi, dobu dana i godini, pa bi broj ponuđen ovdje bio shvaćen kao preporuka. Unesite cijenu iz svoje vlastite tarife.",
-                    "english": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff."
-                }
-            }
-        },
-        "lpn_energy_col_kwh": {
-            "reason": "equal_to_english",
-            "current_value": "kWh",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_energy_col_peak_kw",
-                    "value": "Vršni kW",
-                    "english": "Peak kW"
-                },
-                "next_translated": {
-                    "key": "lpn_energy_col_cost",
-                    "value": "Trošak",
-                    "english": "Cost"
-                }
-            }
-        },
-        "lpn_library_curve_x": {
-            "reason": "equal_to_english",
-            "current_value": "X",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curve_in_use",
-                    "value": "Ovu krivulju koristi {count} elemenata: {ids}. Najprije ih usmjerite na drugu krivulju, zatim izbrišite ovu.",
-                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Kontrole",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_y": {
-            "reason": "equal_to_english",
-            "current_value": "Y",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curve_in_use",
-                    "value": "Ovu krivulju koristi {count} elemenata: {ids}. Najprije ih usmjerite na drugu krivulju, zatim izbrišite ovu.",
-                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Kontrole",
-                    "english": "Controls"
                 }
             }
         }

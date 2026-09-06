@@ -232,10 +232,16 @@ the block.
     therefore available and is NOT free — it would decide a marginal conflict differently from the
     tape measure, and every refactor of this pass so far has been held to *every placement
     byte-identical*.
-  - **THE WAY IN, NAMED AND NOT BUILT: a per-label CALIBRATION.** One `getBBox` and one batch of
-    `getComputedTextLength` at full content, `k = box / sum`, then every rung's width is
-    `k x sum(rung)` — the bearings cancel to first order, and the cost falls from one forced layout
-    per RUNG to one per LABEL. That is the same shape of change Task 440 made to the other two shed
+  - **THE WAY IN, NAMED AND NOT BUILT: a per-label CALIBRATION — AND IT IS NOT EXACT, WHICH IS THE
+    WHOLE DECISION.** One `getBBox` and one batch of `getComputedTextLength` at full content,
+    `k = box / sum`, then every rung's width is `k x sum(rung)`, and the cost falls from one forced
+    layout per RUNG to one per LABEL. **But `k` is calibrated on the FULL label and a shed changes
+    which glyph is last**, so the side bearing it is correcting for is not the same one on the next
+    rung. The error is second-order rather than zero. **There is no arithmetic that is exact here:**
+    `getBBox` is the ink box and `getComputedTextLength` is the advance width, and the difference
+    depends on the glyphs at the two ends, which is exactly what shedding changes. So the choice is
+    a real one and it is Tom's — relax "every placement byte-identical" to a stated tolerance, or
+    keep paying the layouts. That is the same shape of change Task 440 made to the other two shed
     paths. It needs `composeRows()`'s existing `owners` out-parameter (segment → source line, `-1`
     for a separator), which already exists and is already what a keep-set would index. **The
     acceptance bar is the one this pass has always used**: `dev/lpn-spike/label-batch-harness.js`'s
