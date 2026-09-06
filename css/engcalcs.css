@@ -2618,6 +2618,19 @@ tr.lpn-ff-error { background: #f2f2f2; }
 .lpn-lib-head { display: flex; align-items: center; gap: 6px; }
 .lpn-lib-head .lpn-lib-id { width: 9em; }
 .lpn-lib-del { margin-left: auto; }
+/* THE CURVE EDITOR'S TWO HEADER LINES (Tom, 2026-09-05: "put pump ID (with new ID label above it)
+   and Description on row/line 1 and Type selector and Equation (for pump head) on row/line 2"),
+   which is the shape of EPANET's own Curve Editor. Every control carries its name ABOVE it rather
+   than beside it, so the two rows line up on their fields whatever the label's language does to its
+   width -- a beside-label row is the one that breaks in German and in Arabic. align-items: flex-end
+   so a one-line label and a two-line one still sit their boxes on the same baseline. */
+.lpn-lib-curve-row { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; }
+.lpn-lib-field { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.lpn-lib-field-grow { flex: 1 1 8em; }
+.lpn-lib-fieldname { font-size: .9em; opacity: .8; }
+/* The fitted equation is an ANSWER, not a box to type in: read-only, in the digits' own face so it
+   lines up with the table under it, and it wraps rather than widening the panel. */
+.lpn-lib-equation { font-family: monospace; font-size: .9em; padding: 2px 0; overflow-wrap: anywhere; }
 /* THE SENTENCE AND THE SERIES BOTH WANT THE WIDTH. A control is one line of text and a pattern's
    multipliers are one line of numbers, and in both cases the useful thing is to see the whole of it
    at once -- which is the opposite of the settings box's capped number box, and the reason these

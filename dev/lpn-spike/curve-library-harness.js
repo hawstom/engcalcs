@@ -442,9 +442,15 @@ const FIVE = [
 	// the DOCUMENT.
 	L.applyUnitSelections(L.inpUnitSelections(four));
 	L.applySaved(L.migrateSaved(L.docFromInp(EngCalcs.lpnInpParse(FOUR), 'four.inp')));
+	// **THE GRID CELLS ARE PICKED OUT BY inputmode, NOT BY type.** They were `type=number` until the
+	// keyboard work in section 7: a number input's Up and Down are its spinner, and `selectionStart`
+	// throws on one in Chrome and Firefox, so neither the arrow keys nor a caret-aware Left could be
+	// built on it. They are text fields with `inputmode="decimal"` now, which is what still brings up
+	// a phone's numeric keypad -- and inputmode is what tells them apart from the description field,
+	// which is the only other text input in a curve entry.
 	const inputsIn = (el, out) => {
 		(el.children || []).forEach((c) => {
-			if (c._tag === 'input' && c.type === 'number') { out.push(c); }
+			if (c._tag === 'input' && c.getAttribute('inputmode') === 'decimal') { out.push(c); }
 			inputsIn(c, out);
 		});
 		return out;
@@ -537,6 +543,215 @@ const FIVE = [
 		check(L.getLibSection() === 'curves',
 			`and it is real navigation: the box is put on its Curves section (${L.getLibSection()})`);
 	}
+
+	// =========================================================================================
+	head('7. THE HEADER EPANET\'S OWN SHAPE, AND THE EQUATION UNDER THE TYPE');
+	// =========================================================================================
+	// Tom, 2026-09-05: *"Just to be parallel with EPANET, put pump ID (with new ID label above it)
+	// and Description on row/line 1 and Type selector and Equation (for pump head) on row/line 2.
+	// (b) Also, what do you think about putting the curve plot/graph below all its inputs?"*
+	L.applyUnitSelections(L.inpUnitSelections(four));
+	L.applySaved(L.migrateSaved(L.docFromInp(EngCalcs.lpnInpParse(FOUR), 'four.inp')));
+	curveHost = document.createElement('div');
+	cRec = L.curveById('C1');
+	L.buildCurveEntry(curveHost, cRec);
+	let entryEl = curveHost.children[0];
+	const rowsOf = (el) => (el.children || []).filter((ch) => /lpn-lib-curve-row/.test(String(ch['class'] || '')));
+	const textIn = (el, out) => {
+		(el.children || []).forEach((ch) => {
+			if (ch._tag === 'input' || ch._tag === 'select' || ch._tag === 'output') { out.push(ch); }
+			textIn(ch, out);
+		});
+		return out;
+	};
+	const twoRows = rowsOf(entryEl);
+	check(twoRows.length === 2, `the header is two rows: ${twoRows.length}`);
+	const line1 = textIn(twoRows[0], []).map((e) => e._tag);
+	check(line1[0] === 'input' && line1[1] === 'input' && line1.indexOf('select') < 0,
+		`line 1 is the id and the description, and no type selector: ${line1.join(',')}`);
+	check(textIn(twoRows[0], [])[0].value === 'C1'
+			&& textIn(twoRows[0], [])[1].value === 'the duty curve',
+		'and they hold this curve\'s own id and description');
+	// The visible fieldNames above the fields, which the id field never had: it carried an aria-label and
+	// nothing a person could read.
+	const fieldNames = [];
+	(function walkNames(el) {
+		(el.children || []).forEach((ch) => {
+			if (/lpn-lib-fieldname/.test(String(ch['class'] || ''))) { fieldNames.push(ch._text); }
+			walkNames(ch);
+		});
+	}(entryEl));
+	check(fieldNames[0] === 'ID' && fieldNames[1] === 'Description',
+		`each field on line 1 is named above it: ${fieldNames.slice(0, 2).join(' | ')}`);
+	const line2 = textIn(twoRows[1], []);
+	check(line2[0]._tag === 'select', `line 2 leads with the type selector: ${line2[0]._tag}`);
+	check(fieldNames[2] === 'Curve type' && fieldNames[3] === 'Equation',
+		`and its two fields are named EPANET's way: ${fieldNames.slice(2, 4).join(' | ')}`);
+	// **THE EQUATION IS THE FIT THE RUN USES.** C1 in the four-kind file is 0/300 and 250/290, which
+	// fits h = 300 - a Q^2 with a = 10/62500 = 1.6e-4.
+	const eq = line2.filter((e) => e._tag === 'output')[0];
+	check(!!eq && /^Head = 300 - 0\.00016 Flow\^2$/.test(String(eq._text)),
+		`the equation is printed under the type, in the table's own units: ${eq && eq._text}`);
+	check(String(eq.title || '').length > 0 && /ec-help/.test(String(eq['class'] || '')),
+		'and it carries the tip that says it is worked out every time and never stored');
+	// **THE PLOT IS BELOW ALL THE INPUTS** (Tom's (b)). It was directly under the header, with the
+	// description, the table and the copy button between it and the numbers it draws.
+	const kidTags = (entryEl.children || []).map((ch) => ch._tag);
+	const svgAt = kidTags.indexOf('svg');
+	const tableAt = kidTags.indexOf('div', 2);   // the grid wrapper
+	check(svgAt > tableAt && tableAt > 0,
+		`the chart sits after the grid rather than above it: ${kidTags.join(',')}`);
+
+	// A kind with no equation shows NO field rather than a label over a blank.
+	L.getDoc().curves.filter((x) => x.id === 'VC1').forEach((x) => {
+		const h = document.createElement('div');
+		L.buildCurveEntry(h, x);
+		const outs = textIn(h.children[0], []).filter((e) => e._tag === 'output');
+		check(outs.length === 0, `a tank volume curve prints no equation at all: ${outs.length}`);
+	});
+	// And a head curve with no points yet keeps the field but empties it, so typing the first point
+	// makes an equation appear without the entry being rebuilt under the user.
+	const empty = { id: 'EMPTY', kind: 'head', points: [] };
+	L.getDoc().curves.push(empty);
+	const emptyHost = document.createElement('div');
+	L.buildCurveEntry(emptyHost, empty);
+	const emptyEq = textIn(emptyHost.children[0], []).filter((e) => e._tag === 'output')[0];
+	check(!!emptyEq && emptyEq._text === '' && emptyEq.parentNode.style.display === 'none',
+		'a head curve with no points has an equation field, hidden and empty');
+	L.getDoc().curves.pop();
+
+	// =========================================================================================
+	head('8. THE SPREADSHEET PARADIGM: TAB IS COLUMN FIRST, THEN ROW');
+	// =========================================================================================
+	// Tom, 2026-09-05: *"It would be amazing to be able to move among the kcells using tab and arrow
+	// keys like in the spreadsheet paradigm. I think column first, then row for tab would be best."*
+	const key = (el, k, shift) => {
+		let stopped = false;
+		fire(el, 'keydown', { key: k, shiftKey: !!shift, preventDefault: () => { stopped = true; } });
+		return stopped;
+	};
+	const where = (kcells) => {
+		const a = document.activeElement;
+		for (let r = 0; r < kcells.length; r++) {
+			for (let cc = 0; cc < 2; cc++) { if (kcells[r][cc] === a) { return r + ',' + cc; } }
+		}
+		return 'off the grid';
+	};
+	L.applyUnitSelections(L.inpUnitSelections(four));
+	L.applySaved(L.migrateSaved(L.docFromInp(EngCalcs.lpnInpParse(FOUR), 'four.inp')));
+	curveHost = document.createElement('div');
+	cRec = L.curveById('C1');
+	L.buildCurveEntry(curveHost, cRec);
+	entryEl = curveHost.children[0];
+	let kcells = entryEl._lpnCells;
+	check(kcells.length === 3 && kcells[0].length === 2,
+		`the two-point curve offers three rows of two cells: ${kcells.length}`);
+	// X to Y: the same row, the next COLUMN. This is the half a plain DOM tab order already got
+	// right, and it is asserted so that a future reordering of the row cannot quietly lose it.
+	check(key(kcells[0][0], 'Tab') && where(kcells) === '0,1',
+		`Tab from X lands on the same row's Y: ${where(kcells)}`);
+	// Y to the NEXT ROW'S X, stepping over the row's own remove button -- which is what a plain tab
+	// order does NOT do, and is the whole of "column first, then row".
+	check(key(kcells[0][1], 'Tab') && where(kcells) === '1,0',
+		`Tab from Y lands on the next row's X, not on the remove button: ${where(kcells)}`);
+	check(key(kcells[1][0], 'Tab', true) && where(kcells) === '0,1',
+		`Shift+Tab walks back along the same path: ${where(kcells)}`);
+	check(key(kcells[0][1], 'Tab', true) && where(kcells) === '0,0',
+		`and back across the columns: ${where(kcells)}`);
+	check(!key(kcells[0][0], 'Tab', true),
+		'Shift+Tab out of the very first cell is left to the browser, so the grid can be left');
+	// **TAB OUT OF THE BLANK LAST ROW LEAVES THE GRID.** Growing a row there would add an empty
+	// point every time somebody tabbed past the table.
+	check(!key(kcells[2][1], 'Tab'),
+		'Tab out of the blank row at the end is an ordinary Tab and adds nothing');
+	check(L.curveById('C1').points.length === 2,
+		`and the curve still has its two points: ${JSON.stringify(L.curveById('C1').points)}`);
+	// **TAB OUT OF A FILLED LAST ROW GROWS THE TABLE**, the way typing into it already did -- and
+	// the caret lands in the row it just made, in the entry that came back from the rebuild.
+	kcells[2][0].value = '500'; kcells[2][1].value = '255';
+	check(key(kcells[2][1], 'Tab'), 'Tab out of a filled last row is handled by the page');
+	check(JSON.stringify(L.curveById('C1').points) === JSON.stringify([[0, 300], [250, 290], [500, 255]]),
+		`the typed row reached the document: ${JSON.stringify(L.curveById('C1').points)}`);
+	entryEl = curveHost.children[0];
+	kcells = entryEl._lpnCells;
+	check(kcells.length === 4 && document.activeElement === kcells[3][0],
+		`a fresh blank row was added and the caret is in its X cell: ${where(kcells)}`);
+	// **AND THE EQUATION FOLLOWED THE THIRD POINT.** Three points fit h0, a and b directly, so the
+	// exponent is no longer the two-point parabola's.
+	const eq3 = textIn(entryEl, []).filter((e) => e._tag === 'output')[0];
+	check(!!eq3 && /^Head = 300 - /.test(String(eq3._text)) && !/\^2$/.test(String(eq3._text)),
+		`and the equation is the three-point fit now: ${eq3 && eq3._text}`);
+
+	// ---- the arrow keys, which are geometry ----
+	check(key(kcells[0][0], 'ArrowDown') && where(kcells) === '1,0',
+		`Down moves a row within the column: ${where(kcells)}`);
+	check(key(kcells[1][0], 'ArrowUp') && where(kcells) === '0,0',
+		`Up moves back: ${where(kcells)}`);
+	check(!key(kcells[0][0], 'ArrowUp'),
+		'Up out of the top row does nothing, rather than wrapping to the bottom');
+	check(key(kcells[0][0], 'ArrowRight') && where(kcells) === '0,1',
+		`Right crosses to the next column: ${where(kcells)}`);
+	check(key(kcells[0][1], 'ArrowLeft') && where(kcells) === '0,0',
+		`Left crosses back: ${where(kcells)}`);
+	check(!key(kcells[0][1], 'ArrowRight'),
+		'Right out of the last column stays put: the arrows are geometry, not a tab order');
+	// **A CARET IN THE MIDDLE OF A VALUE IS EDITING, AND KEEPS ITS ARROW KEYS.** This is why the
+	// kcells are text inputs: `selectionStart` cannot be read on a number one at all.
+	kcells[0][1].selectionStart = 1; kcells[0][1].selectionEnd = 1;
+	check(!key(kcells[0][1], 'ArrowLeft'),
+		'Left with the caret inside the value moves the caret, not the focus');
+	kcells[0][1].selectionStart = 0; kcells[0][1].selectionEnd = String(kcells[0][1].value).length;
+	check(!key(kcells[0][1], 'ArrowLeft'),
+		'and Left on a freshly tabbed-into cell collapses the selection first');
+	// Down out of a filled last row grows the table too, on the same one path.
+	kcells = curveHost.children[0]._lpnCells;
+	kcells[3][0].value = '750'; kcells[3][1].value = '200';
+	check(key(kcells[3][0], 'ArrowDown'), 'Down out of a filled last row is handled');
+	check(L.curveById('C1').points.length === 4,
+		`and it committed the row on the way: ${JSON.stringify(L.curveById('C1').points)}`);
+
+	// =========================================================================================
+	head('9. ONE COLUMN PASTED, THROUGH THE REAL TABLE');
+	// =========================================================================================
+	// The section's note says so in Tom's own words (`lpn_library_curve_values_tip`, edited by him
+	// 2026-09-05): *"Select one or two columns in a spreadsheet, copy them, and paste into the first
+	// cell you want them to land in."* Section 6 asserts that of libMergePaste(); this asserts it of
+	// the thing a person actually uses, because a promise on screen is about the widget.
+	L.applyUnitSelections(L.inpUnitSelections(four));
+	L.applySaved(L.migrateSaved(L.docFromInp(EngCalcs.lpnInpParse(FOUR), 'four.inp')));
+	curveHost = document.createElement('div');
+	cRec = L.curveById('C1');
+	L.buildCurveEntry(curveHost, cRec);
+	let gcells = curveHost.children[0]._lpnCells;
+	// A column of heads out of a spreadsheet, dropped on the Y cell of the first row. The flows
+	// beside them are untouched, and the curve grows past the two points it had.
+	fire(gcells[0][1], 'paste', {
+		clipboardData: { getData: () => '300\r\n290\r\n260\r\n200' },
+		preventDefault: () => {}
+	});
+	check(JSON.stringify(L.curveById('C1').points) === JSON.stringify([[0, 300], [250, 290]]),
+		`the two rows that have a flow become points, and the other two wait: ${JSON.stringify(L.curveById('C1').points)}`);
+	gcells = curveHost.children[0]._lpnCells;
+	check(gcells.length === 5 && gcells[2][0].value === '' && gcells[2][1].value === '260'
+			&& gcells[3][1].value === '200',
+		'the grid grew to hold every pasted value, each with an empty flow beside it');
+	// Now the flow column, pasted into the X cell of the same first row: the curve completes.
+	fire(gcells[0][0], 'paste', {
+		clipboardData: { getData: () => '0\r\n250\r\n500\r\n750' },
+		preventDefault: () => {}
+	});
+	check(JSON.stringify(L.curveById('C1').points)
+			=== JSON.stringify([[0, 300], [250, 290], [500, 260], [750, 200]]),
+		`the second column lands beside the first and the curve is whole: ${JSON.stringify(L.curveById('C1').points)}`);
+	// A single column dropped into the MIDDLE of the table replaces only that column, from there down.
+	gcells = curveHost.children[0]._lpnCells;
+	fire(gcells[2][1], 'paste', {
+		clipboardData: { getData: () => '255\n199' },
+		preventDefault: () => {}
+	});
+	check(JSON.stringify(L.curveById('C1').points)
+			=== JSON.stringify([[0, 300], [250, 290], [500, 255], [750, 199]]),
+		`a column pasted mid-table rewrites its own column from that row down: ${JSON.stringify(L.curveById('C1').points)}`);
 
 	console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All curve-library checks passed.'));
 	process.exit(failures ? 1 : 0);

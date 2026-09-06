@@ -2982,6 +2982,18 @@ $ec_lang['lpn_library_curves_tip']='A curve is a list of points that says how so
 $ec_lang['lpn_library_curves_note']='A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them.';
 $ec_lang['lpn_library_curve_add']='Add a curve';
 $ec_lang['lpn_library_curve_kind']='What this curve describes';
+// **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
+// EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
+// and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
+// what it is called here; `lpn_library_curve_kind` above stays as its tip, where the longer sentence
+// belongs.
+$ec_lang['lpn_library_curve_type']='Curve type';
+// **THE FIT, WRITTEN OUT, AND IT IS DERIVED AND STORED NOWHERE.** EPANET's curve editor prints the
+// fitted equation under the type; this one prints the same thing for a pump head curve and nothing
+// at all for a kind that has no equation, because a placeholder there would be a promise of an
+// answer that does not exist.
+$ec_lang['lpn_library_curve_equation']='Equation';
+$ec_lang['lpn_library_curve_equation_tip']='The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The built-in solver runs on this equation; the EPANET engine reads the points themselves.';
 // **NOW A GRID, SO THIS SENTENCE IS ABOUT PASTING INTO ONE** (Tom, 2026-09-05: *"The line given is
 // worse than EPANET, and it really can't take a spreadsheet paste."*). Shown once under the section
 // heading rather than once per curve, so it is a note and no longer a tip.

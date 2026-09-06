@@ -25231,9 +25231,13 @@ var EngCalcs = EngCalcs || {};
 		xs = pts.map(function (p) { return +p[0]; });
 		ys = pts.map(function (p) { return +p[1]; });
 		if (xs.concat(ys).some(function (v) { return !isFinite(v); })) { return el; }
-		fit = isPump && EngCalcs.lpnPumpFromCurve ? EngCalcs.lpnPumpFromCurve(pts.map(function (p) {
+		// **pumpFitPoints() FIRST, BECAUSE THAT IS WHAT THE SOLVER READS.** lpnPumpFromCurve() sorts
+		// and takes the first three pairs it is given, so handing it a five-point curve whole drew a
+		// fit through its three LOWEST flows while pumpFit() fits the first, the middle and the last.
+		// The line on the chart and the equation under the type selector are the same fit as the run.
+		fit = isPump && EngCalcs.lpnPumpFromCurve ? EngCalcs.lpnPumpFromCurve(pumpFitPoints(pts.map(function (p) {
 			return [+p[0], +p[1]];
-		})) : null;
+		}))) : null;
 		if (fit && !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b))) { fit = null; }
 		// **A PUMP CURVE IS FRAMED ON THE ORIGIN**, because shutoff head and runout flow are the two
 		// ends a person reads it by, and a frame that started at the first typed point would hide
@@ -25352,14 +25356,64 @@ var EngCalcs = EngCalcs || {};
 		['volume', 'lpn_curve_kind_volume', 'Tank volume'],
 		['headloss', 'lpn_curve_kind_headloss', 'Valve head loss']
 	];
+	/**
+	 * **THE FITTED EQUATION, IN WORDS, AND IT IS DERIVED AND STORED NOWHERE** (Tom, 2026-09-05:
+	 * *"Type selector and Equation (for pump head) on row/line 2"*). EPANET's own curve editor
+	 * prints the equation it fitted under the type selector, and this is the same thing said the
+	 * same way.
+	 *
+	 * **IT IS THE FIT THE RUN USES, NOT A SECOND ONE.** pumpFitPoints() picks the first, middle and
+	 * last of a longer curve exactly as pumpFit() does, so the printed equation, the line on the
+	 * chart and the head the built-in solver applies are one thing. The arithmetic runs on the
+	 * DISPLAY numbers and converts nothing, which is why the tip says the units are the table's:
+	 * pumpFit() is the one site that crosses to SI and this is deliberately not a second one.
+	 *
+	 * A kind with no equation gets the empty string, and the caller hides the field rather than
+	 * printing a label over a blank.
+	 */
+	function libCurveEquation(c, pts) {
+		var pc = EngCalcs.pageConfig || {}, fit;
+		if (!c || c.kind !== 'head' || !pts || !pts.length || !EngCalcs.lpnPumpFromCurve) { return ''; }
+		fit = EngCalcs.lpnPumpFromCurve(pumpFitPoints(pts.map(function (p) {
+			return [+p[0], +p[1]];
+		})));
+		if (!fit || !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b))) { return ''; }
+		// The bare quantity names rather than curveAxisLabels(), whose entries carry their unit in
+		// brackets: "Head (ft) = 300 - 0.000196 Flow (gpm)^2" reads as an exponent on the unit.
+		return (pc.lpn_result_head || 'Head') + ' = ' + libEqNum(fit.h0)
+			+ (fit.a < 0 ? ' + ' : ' - ') + libEqNum(Math.abs(fit.a)) + ' '
+			+ (pc.lpn_result_flow || 'Flow') + '^' + libEqNum(fit.b);
+	}
+	// Four significant figures, and `+x.toPrecision(4)` rather than toFixed() because the `a` of a
+	// large pump is 1.96e-7 while its h0 is 300: one of the two is always wrong at any fixed number
+	// of decimals. Not a number the user typed, so rounding it breaks no rule.
+	function libEqNum(v) { return String(+Number(v).toPrecision(4)); }
+	// Rewritten in place as a cell changes, beside the chart's own redraw. The FIELD is hidden when
+	// there is no equation, so a curve with no points shows no label over an empty box.
+	function libCurveEqRefresh(entry, c, pts) {
+		var out = entry && entry._lpnEqOut, text;
+		if (!out) { return; }
+		text = libCurveEquation(c, pts);
+		out.textContent = text;
+		if (entry._lpnEqField) { entry._lpnEqField.style.display = text ? '' : 'none'; }
+	}
 	function buildCurveEntry(host, c, pending) {
 		var pc = EngCalcs.pageConfig || {},
 			entry = libEl('div', 'lpn-lib-entry'),
-			headRow = libEl('div', 'lpn-lib-head'),
+			// **TWO LINES, EPANET'S OWN** (Tom, 2026-09-05: *"Just to be parallel with EPANET, put
+			// pump ID (with new ID label above it) and Description on row/line 1 and Type selector
+			// and Equation (for pump head) on row/line 2."*). Every field carries a visible label
+			// above it, which is what makes the two rows read as a form rather than as a strip of
+			// unexplained boxes -- the id field had only an aria-label before, so its name was
+			// readable by a screen reader and by nobody else.
+			headRow = libEl('div', 'lpn-lib-head lpn-lib-curve-row'),
+			typeRow = libEl('div', 'lpn-lib-curve-row'),
 			id = document.createElement('input'),
 			kindSel = document.createElement('select'),
 			desc = document.createElement('input'),
-			descRow = libEl('label', 'lpn-lib-note'),
+			idField = libEl('label', 'lpn-lib-field'),
+			descField = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
+			kindField = libEl('label', 'lpn-lib-field'),
 			// **THE GRID IS THE STATE THIS ENTRY IS BUILT FROM, AND IT IS STRINGS.** A half-filled
 			// row -- a flow typed with no head yet, or a single column pasted down -- is a real
 			// state of a table somebody is filling in, and it cannot be held in `c.points`, which
@@ -25370,7 +25424,11 @@ var EngCalcs = EngCalcs || {};
 			pts = libGridPoints(grid),
 			users = curveUsers(c.id),
 			labels = curveAxisLabels(c.kind),
-			del;
+			eqField, eqOut, del;
+		// The row inputs register themselves here as they are built, so the keyboard can move from
+		// one cell to the next without a selector: [row][0] is X and [row][1] is Y. It is rebuilt
+		// with the entry, which is what makes it correct after a paste or an added row.
+		entry._lpnCells = [];
 		id.type = 'text';
 		id.className = 'lpn-lib-id';
 		id.value = c.id;
@@ -25382,7 +25440,37 @@ var EngCalcs = EngCalcs || {};
 			rebuildLibraryBox();
 			refreshPopupIfOpen();
 		});
-		headRow.appendChild(id);
+		idField.appendChild(libEl('span', 'lpn-lib-fieldname', pc.lpn_field_id || 'ID'));
+		idField.appendChild(id);
+		headRow.appendChild(idField);
+		// **THE DESCRIPTION STANDS BESIDE THE ID, ON LINE 1** (EPANET's own pairing). It is its own
+		// labelled field (Tom, 2026-09-05: *"Curves editor is missing Description and a true table
+		// editor."*): EPANET states it in the comment above a curve's rows -- `;PUMP: Pump Curve for
+		// Pump 10 (Lake Source)` -- and this page has read it and written it back since Task 586
+		// without ever showing it, so a description could survive a round trip and still be
+		// unreadable by the person who wrote it.
+		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
+			pc.lpn_library_curve_note_label || 'Description'));
+		desc.type = 'text';
+		desc.className = 'lpn-lib-wide';
+		desc.value = c.note || '';
+		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
+		if (pc.lpn_library_curve_note_tip) { helpTip(desc, pc.lpn_library_curve_note_tip); }
+		desc.addEventListener('change', function () {
+			var t = String(desc.value || '').trim();
+			if (t === (c.note || '')) { return; }
+			saveUndoSnapshot();
+			if (t) { c.note = t; } else { delete c.note; }
+			// **`src` GOES AND `tok` STAYS, AND THE SPLIT IS THE WHOLE POINT.** `src` is the curve's
+			// own lines INCLUDING the type comment, and they no longer say what the document says,
+			// so handing them back would write the old description. `tok` is per coordinate and is
+			// still true: nobody touched a number. Composing from the tokens therefore writes the
+			// new comment above rows that are still character for character the file's own.
+			delete c.src;
+			libCommit();
+		});
+		descField.appendChild(desc);
+		headRow.appendChild(descField);
 		// **WHAT KIND OF CURVE THIS IS, AS A CONTROL, AND EPANET'S FOUR ARE THE WHOLE LIST** (Tom,
 		// 2026-09-05: *"there will be four kinds of curve, Pump (head), (Pump) Efficiency, (Tank)
 		// Volume, and Headloss. Right?"*). It decides the column headings, the units and the shape
@@ -25406,7 +25494,8 @@ var EngCalcs = EngCalcs || {};
 			gen.selected = true;
 			kindSel.appendChild(gen);
 		}
-		kindSel.setAttribute('aria-label', pc.lpn_library_curve_kind || 'What this curve describes');
+		kindSel.setAttribute('aria-label', pc.lpn_library_curve_type || 'Curve type');
+		if (pc.lpn_library_curve_kind) { helpTip(kindSel, pc.lpn_library_curve_kind); }
 		kindSel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			c.kind = kindSel.value;
@@ -25414,7 +25503,26 @@ var EngCalcs = EngCalcs || {};
 			rebuildLibraryBox();
 			refreshPopupIfOpen();
 		});
-		headRow.appendChild(kindSel);
+		kindField.appendChild(libEl('span', 'lpn-lib-fieldname', pc.lpn_library_curve_type || 'Curve type'));
+		kindField.appendChild(kindSel);
+		typeRow.appendChild(kindField);
+		// **THE EQUATION, BESIDE THE TYPE, AND ONLY WHERE THERE IS ONE.** EPANET's curve editor
+		// prints the fitted equation under the type selector, so this one does too. It is DERIVED
+		// and stored nowhere (CLAUDE.md, Task 586), read-only, and simply absent on a kind that has
+		// no equation -- a placeholder there would promise an answer this page does not have.
+		if (c.kind === 'head') {
+			eqField = libEl('div', 'lpn-lib-field lpn-lib-field-grow');
+			eqField.appendChild(libEl('span', 'lpn-lib-fieldname', pc.lpn_library_curve_equation || 'Equation'));
+			eqOut = libEl('output', 'lpn-lib-equation', '');
+			if (pc.lpn_library_curve_equation_tip) { helpTip(eqOut, pc.lpn_library_curve_equation_tip); }
+			eqField.appendChild(eqOut);
+			typeRow.appendChild(eqField);
+			// Held on the entry so a cell edit can rewrite it in place beside the chart, rather than
+			// rebuilding the row the user is typing in.
+			entry._lpnEqField = eqField;
+			entry._lpnEqOut = eqOut;
+			libCurveEqRefresh(entry, c, pts);
+		}
 		del = libButton(pc.lpn_tool_delete || 'Delete', function () {
 			var inUse = curveUsers(c.id);
 			if (inUse.length) {
@@ -25431,40 +25539,19 @@ var EngCalcs = EngCalcs || {};
 		del.className = 'lpn-lib-del';
 		headRow.appendChild(del);
 		entry.appendChild(headRow);
-		// Above the field, where the pattern section puts its sparkline: the shape first and the
-		// numbers under it, so the two sections are read the same way. A pump HEAD curve is drawn as
-		// the fitted curve the solver applies; every other kind is drawn as the straight segments
-		// EPANET interpolates.
-		entry.appendChild(libCurveChart(pts, c.kind === 'head'));
-		// **THE DESCRIPTION, AS ITS OWN LABELLED FIELD** (Tom, 2026-09-05: *"Curves editor is
-		// missing Description and a true table editor."*). EPANET states it in the comment above a
-		// curve's rows -- `;PUMP: Pump Curve for Pump 10 (Lake Source)` -- and this page has read it
-		// and written it back since Task 586 without ever showing it, so a description could survive
-		// a round trip and still be unreadable by the person who wrote it.
-		descRow.textContent = (pc.lpn_library_curve_note_label || 'Description') + ' ';
-		desc.type = 'text';
-		desc.className = 'lpn-lib-wide';
-		desc.value = c.note || '';
-		if (pc.lpn_library_curve_note_tip) { helpTip(desc, pc.lpn_library_curve_note_tip); }
-		desc.addEventListener('change', function () {
-			var t = String(desc.value || '').trim();
-			if (t === (c.note || '')) { return; }
-			saveUndoSnapshot();
-			if (t) { c.note = t; } else { delete c.note; }
-			// **`src` GOES AND `tok` STAYS, AND THE SPLIT IS THE WHOLE POINT.** `src` is the curve's
-			// own lines INCLUDING the type comment, and they no longer say what the document says,
-			// so handing them back would write the old description. `tok` is per coordinate and is
-			// still true: nobody touched a number. Composing from the tokens therefore writes the
-			// new comment above rows that are still character for character the file's own.
-			delete c.src;
-			libCommit();
-		});
-		descRow.appendChild(desc);
-		entry.appendChild(descRow);
+		entry.appendChild(typeRow);
 		entry.appendChild(libCurveGridTable(entry, c, grid, labels));
 		entry.appendChild(libButton(pc.lpn_library_curve_copy || 'Copy points', function () {
 			libCopyOut(libCurveTsv(libGridPoints(grid)));
 		}, pc.lpn_library_curve_copy_tip));
+		// **THE PLOT SITS UNDER ALL OF THE INPUTS** (Tom, 2026-09-05: *"what do you think about
+		// putting the curve plot/graph below all its inputs?"*). It was above them, where the pattern
+		// section puts its sparkline -- and a pattern is one field while a curve is a header, a
+		// growing table and a button, so the chart was separated from the numbers it draws by
+		// everything a person actually types into. Under them it is where the eye already is, and it
+		// redraws in place as a cell changes. A pump HEAD curve is drawn as the fitted curve the
+		// solver applies; every other kind is drawn as the straight segments EPANET interpolates.
+		entry.appendChild(libCurveChart(pts, c.kind === 'head'));
 		// **WHO USES IT, AS THE WAY TO GET TO THEM.** Clicking an id goes to that element on the map,
 		// exactly as a bottom-pane table's id does -- and it is also the answer to "why will this not
 		// delete", standing where the Delete button is.
@@ -25618,12 +25705,16 @@ var EngCalcs = EngCalcs || {};
 	// keep their state and the box does not scroll back to the top -- which matters here because a
 	// paste is aimed at one cell of one curve.
 	function libRebuildCurveEntry(entry, c, grid) {
-		var host = entry.parentNode, tmp;
-		if (!host) { return; }
+		var host = entry.parentNode, tmp, nw;
+		if (!host) { return null; }
 		tmp = libEl('div');
 		buildCurveEntry(tmp, c, libCurveGridTrim(grid));
-		host.replaceChild(tmp.children[0], entry);
+		nw = tmp.children[0];
+		host.replaceChild(nw, entry);
 		initTipsIn(host);
+		// Handed back so a keystroke that GREW the table can put the caret in the row it just made.
+		// Without it the entry the user was typing in has been replaced and focus is on nothing.
+		return nw;
 	}
 	function libCurveGridRow(tbody, entry, c, grid, idx) {
 		var pc = EngCalcs.pageConfig || {},
@@ -25633,12 +25724,25 @@ var EngCalcs = EngCalcs || {};
 			dCell = document.createElement('td'),
 			xIn = document.createElement('input'), yIn = document.createElement('input'),
 			del;
-		xIn.type = 'number'; xIn.step = 'any'; xIn.size = 6;
-		yIn.type = 'number'; yIn.step = 'any'; yIn.size = 6;
+		// **TEXT, NOT number, AND THE KEYBOARD IS THE REASON** (Tom, 2026-09-05: *"It would be
+		// amazing to be able to move among the cells using tab and arrow keys like in the spreadsheet
+		// paradigm."*). Two things a `number` input does made that impossible:
+		//   - Up and Down are its SPINNER. In a spreadsheet they move a row, and a grid where Down
+		//     silently adds 1 to a flow is worse than one with no keyboard at all.
+		//   - `selectionStart` THROWS on it in Chrome and Firefox, so there is no way to ask whether
+		//     the caret is at the edge of the value -- and without that, Left and Right either move
+		//     between cells always (and a person can never fix the middle of `1000`) or never.
+		// inputmode="decimal" keeps the numeric keypad on a phone, which was the only thing `number`
+		// was buying here: nothing validated against it, the grid is held as STRINGS, and
+		// libGridPoints() has always decided what is a number.
+		xIn.type = 'text'; yIn.type = 'text';
+		xIn.setAttribute('inputmode', 'decimal'); yIn.setAttribute('inputmode', 'decimal');
+		xIn.size = 6; yIn.size = 6;
 		xIn.value = grid[idx][0];
 		yIn.value = grid[idx][1];
 		xIn.setAttribute('aria-label', labels.x);
 		yIn.setAttribute('aria-label', labels.y);
+		entry._lpnCells[idx] = [xIn, yIn];
 		// **THE POINTS ARE WRITTEN TO BASE WHATEVER SCENARIO IS ACTIVE, DELIBERATELY.** A curve is
 		// shared, so what a scenario can change is WHICH curve an element names, never what the
 		// curve contains -- see the section comment above. There is no setProp() call to make here.
@@ -25654,9 +25758,12 @@ var EngCalcs = EngCalcs || {};
 			return true;
 		}
 		function redraw() {
-			var fresh = libCurveChart(libGridPoints(grid), c.kind === 'head'),
+			var pts = libGridPoints(grid),
+				fresh = libCurveChart(pts, c.kind === 'head'),
 				old = entry.querySelector('svg');
 			if (old) { entry.replaceChild(fresh, old); }
+			// The equation is the same fit the chart draws, so it is refreshed at the same moment.
+			libCurveEqRefresh(entry, c, pts);
 		}
 		function onEdit() {
 			grid[idx][0] = xIn.value; grid[idx][1] = yIn.value;
@@ -25665,16 +25772,101 @@ var EngCalcs = EngCalcs || {};
 		function onCommit() {
 			var wasLast = idx === grid.length - 1;
 			grid[idx][0] = xIn.value; grid[idx][1] = yIn.value;
+			// **A KEYSTROKE THAT IS MOVING THE CARET HAS ALREADY DONE THIS.** Focusing another cell
+			// blurs this one, and a blur fires `change` -- so without the flag every arrow press
+			// through a filled last row would commit twice and rebuild the entry a SECOND time,
+			// throwing away the element gridMove() had just focused. The grid is still updated here,
+			// because that costs nothing and keeps this function honest on its own.
+			if (entry._lpnMoving) { return; }
 			writePoints();
 			// The blank row at the end has become a real one, so the next blank has to be offered.
 			if (wasLast && (xIn.value !== '' || yIn.value !== '')) {
 				libRebuildCurveEntry(entry, c, grid);
 			}
 		}
+		/**
+		 * **THE SPREADSHEET PARADIGM, AND TAB IS COLUMN FIRST THEN ROW** (Tom, 2026-09-05: *"I think
+		 * column first, then row for tab would be best."*). X, then Y, then the next row's X;
+		 * Shift+Tab back along the same path. Up and Down move within a column, Left and Right
+		 * across, which is geometry and is what the arrow keys mean everywhere else.
+		 *
+		 * **MOVING COMMITS FIRST, IN ONE CONTROLLED ORDER**, because a commit out of the last row
+		 * REBUILDS the entry: write the value, write the points, grow the table if it needs growing,
+		 * and only then look up the cell to focus -- in the entry that came back, which is a
+		 * different element from the one this listener was registered on.
+		 *
+		 * **THE ROW'S REMOVE BUTTON IS STEPPED OVER, AND THAT IS THE POINT** -- "column first, then
+		 * row" is exactly the rule that a plain DOM tab order breaks, because the button sits between
+		 * the Y cell and the next row's X. The keyboard's own way to remove a point is the
+		 * spreadsheet's: empty both cells of the row, and libGridPoints() stops counting it as one.
+		 *
+		 * `wantSelect` is on for Tab alone. Tab into a text input selects its contents in every
+		 * browser, and that is also what makes Left and Right behave: a freshly tabbed-into cell has
+		 * a SELECTION rather than a caret at an edge, so the first Left press collapses it the way a
+		 * text field should and only the second one leaves the cell.
+		 */
+		function gridMove(r, col, wantSelect) {
+			var wasLast = idx === grid.length - 1, cells, target, nw = null;
+			if (r < 0 || col < 0 || col > 1) { return false; }
+			grid[idx][0] = xIn.value; grid[idx][1] = yIn.value;
+			entry._lpnMoving = true;
+			try {
+				writePoints();
+				if (wasLast && (xIn.value !== '' || yIn.value !== '')) {
+					nw = libRebuildCurveEntry(entry, c, grid);
+				}
+				cells = ((nw || entry)._lpnCells) || [];
+				target = cells[r] && cells[r][col];
+				if (!target) { return false; }
+				target.focus();
+				if (wantSelect && target.select) { target.select(); }
+				return true;
+			} finally { entry._lpnMoving = false; }
+		}
+		// **THE CARET HAS TO BE AT THE EDGE BEFORE LEFT OR RIGHT LEAVES THE CELL**, or a person
+		// cannot put the caret inside `1000` to make it `1500`. A collapsed caret at position 0 goes
+		// left; at the end of the value goes right; anything else is ordinary text editing and the
+		// browser keeps it. A field that refuses to answer is treated as an edge, which is the
+		// behaviour that at least still moves.
+		function caretEdge(input, atEnd) {
+			var st, en, len = String(input.value === undefined ? '' : input.value).length;
+			try {
+				st = input.selectionStart; en = input.selectionEnd;
+			} catch (e) { return true; }
+			if (st === null || st === undefined) { return true; }
+			if (st !== en) { return false; }
+			return atEnd ? st >= len : st <= 0;
+		}
+		function onKey(col, input) {
+			return function (e) {
+				var key = e && e.key, moved = false;
+				if (!key || (e.altKey || e.ctrlKey || e.metaKey)) { return; }
+				if (key === 'Tab') {
+					// One cell forward or back in column-first order. Past the LAST cell, Tab out of
+					// a row with something in it grows the table exactly as typing into it does, and
+					// out of the blank row at the end it is an ordinary Tab that leaves the grid --
+					// which is what keeps the table escapable by keyboard.
+					moved = e.shiftKey
+						? (col === 1 ? gridMove(idx, 0, true) : gridMove(idx - 1, 1, true))
+						: (col === 0 ? gridMove(idx, 1, true) : gridMove(idx + 1, 0, true));
+				} else if (key === 'ArrowDown' || key === 'Down') {
+					moved = gridMove(idx + 1, col, false);
+				} else if (key === 'ArrowUp' || key === 'Up') {
+					moved = gridMove(idx - 1, col, false);
+				} else if (key === 'ArrowRight' || key === 'Right') {
+					if (col === 0 && caretEdge(input, true)) { moved = gridMove(idx, 1, false); }
+				} else if (key === 'ArrowLeft' || key === 'Left') {
+					if (col === 1 && caretEdge(input, false)) { moved = gridMove(idx, 0, false); }
+				}
+				if (moved && e.preventDefault) { e.preventDefault(); }
+			};
+		}
 		xIn.addEventListener('input', onEdit);
 		yIn.addEventListener('input', onEdit);
 		xIn.addEventListener('change', onCommit);
 		yIn.addEventListener('change', onCommit);
+		xIn.addEventListener('keydown', onKey(0, xIn));
+		yIn.addEventListener('keydown', onKey(1, yIn));
 		function onPaste(col) {
 			return function (e) {
 				var text = (e && e.clipboardData && e.clipboardData.getData)
