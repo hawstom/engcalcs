@@ -474,8 +474,86 @@
 	EC.lpnTimeAttach = function (model) {
 		if (!host || !EC.lpnTimesDefaults) { return model; }
 		model.time = EC.lpnTimeModelBlock(host.doc(), host.toSI);
+		EC.lpnTankVolumeAttach(model, host.doc(), host.toSI);
 		return model;
 	};
+
+	/**
+	 * **THE VOLUME CURVE A TANK NAMES, PUT ON THE MODEL'S OWN TANK** (ROADMAP Task 587).
+	 *
+	 * A tank is a vessel of some shape, and its `[TANKS]` row states that shape twice: once as a
+	 * diameter, which is a cylinder, and once as the id of a `[CURVES]` entry giving volume against
+	 * level. Since Task 586 the curve is a document object, imported whole, editable in the Library
+	 * and exported byte for byte, and until this one it reached no engine at all, so every tank
+	 * filled on a cylinder's schedule whatever its file said.
+	 *
+	 * **THIS FILE IS WHERE IT BELONGS BECAUSE THE CURVE IS AN EXTENDED-PERIOD QUANTITY AND NOTHING
+	 * ELSE.** At one instant a tank is a fixed head at its water surface (EngCalcs.lpnIsFixedHead,
+	 * untouched here and still correct): the surface is the level the document states, and no shape
+	 * moves it. What the shape decides is dLevel/dt = Q / (dVolume/dLevel), which only a run has.
+	 * So the attachment rides beside the clock, on the same one line of assembleModel().
+	 *
+	 * **THE INTEGRATION ITSELF IS EPANET'S, AND WE HAVE NONE OF OUR OWN TO CORRECT.** Nothing in
+	 * this suite turns a volume step into a level step: the built-in solver has no time dimension,
+	 * and the run is the engine's. So the whole of the work is handing the engine the column and
+	 * the rows it already knows how to read, which js/lpn-epanet.js writes.
+	 *
+	 * **THE UNITS. A VOLUME CURVE'S ABSCISSA IS A LEVEL AND ITS ORDINATE IS A VOLUME**, both in the
+	 * file's own units, and the document keeps them as the file wrote them: js/looped-network.js
+	 * converts the abscissa of a FLOW-bearing curve on import and deliberately leaves this kind
+	 * alone. The level is a vertical distance on the same staff as every other one on a tank, so it
+	 * is the Elevation/Head unit. The volume has no selector on this page at all, and EPANET pairs
+	 * it with the length: cubic feet under US flow units, cubic metres under SI. So the ordinate's
+	 * factor is the abscissa's CUBED, taken from the one converter this file is handed rather than
+	 * from a second table, and the two axes therefore always reinterpret together, which is the only
+	 * self-consistent reading of a curve whose y is a length to the third power.
+	 *
+	 * **A CURVE EPANET WOULD REFUSE IS LEFT OFF RATHER THAN REPAIRED.** Two points at least, x
+	 * strictly increasing (EPANET rejects a curve whose x is not), y never falling and rising
+	 * overall, because a vessel whose volume shrinks as it fills is not a vessel. A curve failing
+	 * that is kept in the document untouched, exactly as the user wrote it, and the tank solves as
+	 * the cylinder it solved as before: repairing the points here would be rewriting a number that
+	 * came from a file.
+	 */
+	EC.lpnTankVolumeAttach = function (model, doc, toSI) {
+		if (!model || !model.nodes || !doc) { return model; }
+		var conv = typeof toSI === 'function' ? toSI : function (v) { return v; },
+			// toSI(1, id) IS the factor: see js/looped-network.js's toSI(). An unresolved unit
+			// selection can make it 0 or NaN, and a tank silently a thousand times its size is the
+			// failure every unit note on this path is about, so nothing is attached at all.
+			hf = conv(1, 'lpn_u_elevhead'),
+			vf = hf * hf * hf,
+			curveById = {}, named = {};
+		if (typeof hf !== 'number' || !isFinite(hf) || !(hf > 0)) { return model; }
+		(doc.curves || []).forEach(function (c) {
+			if (c && c.id !== undefined && c.id !== null) { curveById[String(c.id)] = c; }
+		});
+		(doc.nodes || []).forEach(function (n) {
+			if (n && n.type === 'tank' && n.volCurve) { named[String(n.id)] = String(n.volCurve); }
+		});
+		model.nodes.forEach(function (m) {
+			if (!m || m.type !== 'tank') { return; }
+			var name = named[String(m.id)], curve = name ? curveById[name] : null, pts;
+			if (!curve) { return; }
+			pts = EC.lpnCurvePoints ? EC.lpnCurvePoints(curve) : null;
+			if (!volumeCurveUsable(pts)) { return; }
+			m.volCurve = name;
+			m.volCurveSI = pts.map(function (pt) { return [pt[0] * hf, pt[1] * vf]; });
+		});
+		return model;
+	};
+
+	// The three things a level-to-volume curve has to be for EPANET to read it and for the answer to
+	// mean anything. Deliberately not a repair: see the note above.
+	function volumeCurveUsable(pts) {
+		var i;
+		if (!pts || pts.length < 2) { return false; }
+		for (i = 1; i < pts.length; i++) {
+			if (!(pts[i][0] > pts[i - 1][0])) { return false; }
+			if (pts[i][1] < pts[i - 1][1]) { return false; }
+		}
+		return pts[pts.length - 1][1] > pts[0][1];
+	}
 
 	/**
 	 * Take over the solve when the document describes a period rather than an instant, AND this
