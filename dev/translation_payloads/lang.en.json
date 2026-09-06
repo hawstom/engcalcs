@@ -1507,6 +1507,9 @@
         "lpn_library_curves_note": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them.",
         "lpn_library_curve_add": "Add a curve",
         "lpn_library_curve_kind": "What this curve describes",
+        "lpn_library_curve_type": "Curve type",
+        "lpn_library_curve_equation": "Equation",
+        "lpn_library_curve_equation_tip": "The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The built-in solver runs on this equation; the EPANET engine reads the points themselves.",
         "lpn_library_curve_values_tip": "Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.",
         "lpn_library_curve_note_label": "Description",
         "lpn_library_curve_note_tip": "What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.",
@@ -1680,7 +1683,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1678,
+    "count": 1681,
     "active_prefixes": [
         "about",
         "bpn",

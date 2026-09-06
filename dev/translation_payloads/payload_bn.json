@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1678,
-        "delta_key_count": 143,
+        "expected_key_count": 1681,
+        "delta_key_count": 146,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_imgd",
@@ -635,6 +635,9 @@
         "lpn_energy_curve_note": "These pumps call an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}.",
         "lpn_library_curve_add": "Add a curve",
         "lpn_library_curve_kind": "What this curve describes",
+        "lpn_library_curve_type": "Curve type",
+        "lpn_library_curve_equation": "Equation",
+        "lpn_library_curve_equation_tip": "The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The built-in solver runs on this equation; the EPANET engine reads the points themselves.",
         "lpn_library_curve_values_tip": "Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.",
         "lpn_library_curve_note_label": "Description",
         "lpn_library_curve_note_tip": "What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.",
@@ -780,6 +783,9 @@
         "lpn_energy_curve_note": "These pumps call an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}.",
         "lpn_library_curve_add": "Add a curve",
         "lpn_library_curve_kind": "What this curve describes",
+        "lpn_library_curve_type": "Curve type",
+        "lpn_library_curve_equation": "Equation",
+        "lpn_library_curve_equation_tip": "The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The built-in solver runs on this equation; the EPANET engine reads the points themselves.",
         "lpn_library_curve_values_tip": "Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.",
         "lpn_library_curve_note_label": "Description",
         "lpn_library_curve_note_tip": "What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.",
@@ -2755,6 +2761,54 @@
             }
         },
         "lpn_library_curve_kind": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "একটি কার্ভ সেই পাম্প বা ভালভের অংশ যা এটি ব্যবহার করে, তাই এখানে সবগুলো একসাথে পড়ার জন্য দেওয়া আছে। সেই উপাদানে গিয়ে এর বিন্দু পরিবর্তন করতে একটি ID-তে ক্লিক করুন। একটি পাম্পের জন্য আঁকা রেখাটি হলো সেই কার্ভ যা চালানোয় ব্যবহৃত হয়, বিন্দুগুলোর মধ্য দিয়ে মেলানো; একটি ভালভের জন্য এটি তাদের মধ্যকার সোজা ধাপ।",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "নিয়ন্ত্রণ",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_type": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "একটি কার্ভ সেই পাম্প বা ভালভের অংশ যা এটি ব্যবহার করে, তাই এখানে সবগুলো একসাথে পড়ার জন্য দেওয়া আছে। সেই উপাদানে গিয়ে এর বিন্দু পরিবর্তন করতে একটি ID-তে ক্লিক করুন। একটি পাম্পের জন্য আঁকা রেখাটি হলো সেই কার্ভ যা চালানোয় ব্যবহৃত হয়, বিন্দুগুলোর মধ্য দিয়ে মেলানো; একটি ভালভের জন্য এটি তাদের মধ্যকার সোজা ধাপ।",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "নিয়ন্ত্রণ",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_equation": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "একটি কার্ভ সেই পাম্প বা ভালভের অংশ যা এটি ব্যবহার করে, তাই এখানে সবগুলো একসাথে পড়ার জন্য দেওয়া আছে। সেই উপাদানে গিয়ে এর বিন্দু পরিবর্তন করতে একটি ID-তে ক্লিক করুন। একটি পাম্পের জন্য আঁকা রেখাটি হলো সেই কার্ভ যা চালানোয় ব্যবহৃত হয়, বিন্দুগুলোর মধ্য দিয়ে মেলানো; একটি ভালভের জন্য এটি তাদের মধ্যকার সোজা ধাপ।",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "নিয়ন্ত্রণ",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_equation_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

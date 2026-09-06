@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read**, of 143 untranslated keys, of 1678 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**6 still to read**, of 146 untranslated keys, of 1681 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (143, 3 to read @@ NEEDS RULING)
+## lpn_  (146, 6 to read @@ NEEDS RULING)
 
 - **`lpn_curve_kind_effic`**
   > Pump efficiency
@@ -197,6 +197,12 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_library_curve_copy_tip`**
   > Copies every point as two columns, ready to paste into a spreadsheet.
   _Ruled OK 2026-09-05._
+- **`lpn_library_curve_equation`**
+  > Equation
+  @@ NEEDS RULING
+- **`lpn_library_curve_equation_tip`**
+  > The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The built-in solver runs on this equation; the EPANET engine reads the points themselves.
+  @@ NEEDS RULING
 - **`lpn_library_curve_in_use`**
   > This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.
   _Ruled OK 2026-09-05._
@@ -212,6 +218,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_library_curve_remove_point`**
   > Remove this point
   _Ruled OK 2026-09-05._
+- **`lpn_library_curve_type`**
+  > Curve type
+  @@ NEEDS RULING
 - **`lpn_library_curve_unused`**
   > Nothing uses this curve.
   _Ruled OK 2026-09-05._
