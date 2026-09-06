@@ -1,0 +1,840 @@
+{
+ "sprint": "584-wave0",
+ "description": "Adversarial Wave 0 gating the next translation sprint. Scope: the 178 keys wave0_keyset.php --new-and-changed reported as NEW or CHANGED since the last sync (the brief said 182/183 with 1 pre-filtered; the script reports 178 with 0 pre-filtered and nothing under --skipped, so there was no skipped key to give a second look -- the discrepancy is noted rather than resolved). The set is dominated by the water quality family (lpn_quality_*, lpn_source_*, lpn_mixing_*, lpn_reaction_*), the pump energy report (lpn_energy_*), the Curves and Rules libraries (lpn_library_*), the curve-reference migration of Task 586 (lpn_*_curve_source*, lpn_curve_kind_*), the .inp import notices (lpn_inp_drop_*), scenario comparison (lpn_scncmp_*), plus four Manning Trap Channel roughness labels and one microhydropower note. The question asked of every string was NOT 'is this good?' but 'list every plausible reading; if there is more than one, file a finding.' Result: 64 findings -- 13 high, 35 medium, 16 low. Six were verified against the code rather than reasoned from the string, and three of those are factual defects an English reader also hits: two strings send the reader to a menu called Calculate that the menu bar does not have (the path is Water, Reports, Pump energy), one column heading reads Running over a column of percentages, and one settings label reaches the scenario button as 'No. of custom values: 3'. Every entry is open or refer-to-human: this pass proposes and does not write. lib/lang.ec.en.php was not touched (concurrent tracks are writing it), and $ec_lang_syn is off-limits to AI by standing rule, so every synonym or glossary route below is a proposal awaiting written permission.",
+ "entries": [
+  {
+   "key": "mtc_n_strickler",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: two problems, and mtc_n_blodgett, mtc_n_bathurst and mtc_n_pi carry both identically. (1) The string opens with a bare lower-case 'n', which is Manning's roughness coefficient, but nothing in the string says so. Read cold it is an English letter with no marker, no subscript and no possessive, so a translator will treat it as a word to translate, an abbreviation to expand, or a typo -- the exact shape that produced the 'Top n' finding in 438-wave0. (2) 'design rock size' is a three-word noun stack with two parses. All four keys carry an EMPTY $ec_lang_syn, so nothing anywhere tells a translator that n is a symbol.",
+   "readings": [
+    "Manning's n, computed from the design rock size, by the Strickler method (intended)",
+    "the letter n as an ordinary word or abbreviation to be rendered in the target language",
+    "the size of rock chosen for the design (intended) vs a rock of a size that is itself 'design' grade"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED, two parts, and only the second costs a retranslation. (a) $ec_lang_syn PROPOSAL (off-limits to AI, recorded for written permission) on all four keys: a 'symbol' flag, which is exactly the tag this repo already defines for 'contains a variable symbol; keep every letter and subscript exactly as in English'. That alone fixes the letter n in 26 languages with no English edit. (b) English rewrite, if (a) is judged not enough: \"Manning's n from design rock size (Strickler method)\" and the three siblings to match -- it names the quantity, keeps the symbol beside its name, and stays a results-row label rather than a column heading so the extra word costs no width. Cost of (b): 4 keys x 26 = 104 retranslations."
+  },
+  {
+   "key": "mhp_notes_3_def",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'assuming 2026 high-end electricity costs' has two readings and one of them inverts the advice. 'High-end' most commonly means premium or top-of-the-range as a product grade; here it means an expensive tariff. A translator picking the product-grade sense produces a sentence about premium electricity, which is not a thing. Separately the sentence carries a bare year that will be stale next year in 27 languages at once, and 'losses below 10% of gross head are generally economical' predicates economy of the LOSS rather than of the design that has it -- an English reader re-reads that too.",
+   "readings": [
+    "assuming an electricity price at the high end of the range seen in 2026 (intended)",
+    "assuming the cost of high-end (premium grade) electricity",
+    "assuming costs that are high, at the end of 2026"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English: '... often falls around 4-6% where electricity is expensive.' That fixes both readings and removes the year. REFERRED because dropping '2026' is a scope call, not a wording one: the number 4-6% depends on the price assumption, and whether the note should keep a dated anchor (and be re-dated annually in 27 languages) or state the assumption qualitatively is Tom's to decide. Cost of the rewrite: 26 retranslations."
+  },
+  {
+   "key": "lpn_wrong_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: the string contradicts itself two sentences apart. It says the report sends 'the message on the map if there is one', then says 'It sends no text'. A message on the map IS text, so a translator -- and an English reader -- must decide which sentence to believe, and a translator who resolves it the other way produces a privacy promise that is false. The intended sense of 'no text' is 'nothing you have typed'. Separately, 'One tap' is the phone gesture on a page whose authoritative layout is pointer-first; a pointer user does not tap, and the string offers no other word.",
+   "readings": [
+    "it sends nothing you typed; the map's own status message is not yours (intended)",
+    "it sends no text at all -- so the map message it just promised to send is not text?",
+    "one tap [out of several needed] tells us something is wrong"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: replace 'It sends no text, no address, and nothing at all out of your drawing' with 'It sends nothing you have typed, no address, and nothing at all out of your drawing.' and open with 'One press tells us that something on this page is wrong.' The privacy claim is unchanged and becomes checkable; 'press' matches the pointer-first design and the wording every other button tip on this page uses. Cost: 26 retranslations, and this is a privacy string, so getting it right in 26 languages is the reason to pay."
+  },
+  {
+   "key": "lpn_wrong_thanks",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'We got that' is a conversational English idiom for 'it arrived'. Its literal reading is 'we obtained that', and a second idiomatic reading is 'we understood that'. As a two-word confirmation with no surrounding sentence, a translator has nothing to choose between them, and 'we understood' would be a claim this page cannot make about a report nobody has read yet.",
+   "readings": [
+    "your report arrived here (intended)",
+    "we understood what you meant",
+    "we obtained/acquired that"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Thank you. That reached us.' or 'Thank you. Your report arrived.' Cost: 26 retranslations for a two-word string, which is why this is ranked low rather than medium."
+  },
+  {
+   "key": "lpn_result_water_age_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'a junction fed mostly by a short new main reads young' uses 'reads' intransitively with a predicate adjective -- an English writing idiom ('the gauge reads low') that has no equivalent in most target languages, and 'young' applied to a junction rather than to the water is a further step. A translator will most likely produce 'a junction is read as young' or 'a junction looks young', and the subject of the age silently moves from the water to the pipework.",
+   "readings": [
+    "the number shown at that junction is a low age (intended)",
+    "the junction itself is young, i.e. newly built",
+    "someone reads the junction while young"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'a junction fed mostly by a short new main shows a low age even if a long dead end also feeds it.' 'Low age' keeps the quantity and drops the personification. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_find_prop_demand_desc",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: three stacked nouns with no function words, standing alone as a Find property label. English lets a reader guess the right bracketing from context; a translator has to choose one, and the wrong bracketing produces a search field that appears to describe demand rather than to name a demand category. EPANET's own term for the thing is the category name written after a junction's demand line.",
+   "readings": [
+    "the description attached to a demand category (intended)",
+    "a description of the category of demand",
+    "demand, category and description as three separate properties"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Description of demand category' -- one function word breaks the stack and fixes the bracketing in every language. It is a Find property label rather than a narrow column heading, so the extra word is affordable. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_inp_drop_tank_curve",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'the tank still indicates it' has a transitive 'indicates' whose object is a pronoun, and 'indicate' in ordinary English means to point out or to show, not to hold a reference. Tom's own wording in lpn_library_curves_note ('a pump or a valve indicates the one it uses') carries a following noun phrase that steadies it; with a bare 'it' the verb reads as 'the tank displays it'. A translator will render 'shows', and the string then claims the tank draws the curve.",
+   "readings": [
+    "the tank still refers to that curve by id (intended)",
+    "the tank still displays/shows the curve",
+    "the tank still points at it on the map"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'the tank still refers to it' -- 'refer to' is on the sanctioned list in CLAUDE.md for exactly this verb, and it cannot be read as displaying. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_inp_drop_curve_missing",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'It came in with no curve, so it adds no head.' The sentence before it names two things, a pump and a curve, and 'It' can attach to either. The second 'it' must be the pump (a curve does not add head), so the reader has to work backwards from the physics to fix the first one. Languages with grammatical gender must commit to an antecedent before they can even write the pronoun, and pump/curve will not always share a gender.",
+   "readings": [
+    "the pump came in with no curve, so the pump adds no head (intended)",
+    "the curve came in empty, so the curve adds no head",
+    "the file came in with no curve"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'The pump came in with no curve, so it adds no head.' Naming the antecedent once removes the whole problem. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_inp_drop_rules",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'They are kept as you wrote them' appears in an IMPORT notice about rules that came out of somebody else's .inp file. The reader did not write them; that is the whole occasion for the message. An English reader stumbles on the false attribution, and a translator has no way to know it is loose idiom for 'unchanged' rather than a claim about authorship.",
+   "readings": [
+    "the rule text is preserved exactly, not rewritten by us (intended)",
+    "your own edits to the rules are preserved",
+    "the rules you wrote earlier are kept"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'They are kept exactly as the file states them, and they are written back if you save an EPANET file.' The sibling strings lpn_inp_drop_quality, lpn_inp_drop_energy, lpn_inp_drop_report and lpn_inp_drop_quality_options all use 'The lines are kept', which is already correct -- this one key is the outlier in a parallel set, and parallel siblings are a rule in this repo. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_inp_drop_sources_mixing",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: read alone, as a translator sees it, 'more of the substance' has no antecedent anywhere in the string -- no substance has been mentioned. The definite article promises a referent the string never supplies, so a translator must invent one, and the natural inventions ('the material', 'the matter', 'the water') are all wrong for a chlorine dose. Second defect in the same string: 'Both require the EPANET engine here.' 'Both' points back across a sentence boundary to a dose and a mixing model, which is recoverable in English only because the previous sentence has exactly two clauses; and the trailing 'here' has no object at all.",
+   "readings": [
+    "more of the water quality chemical is dosed into the network (intended)",
+    "more of some unnamed material",
+    "'Both' = the dose and the mixing model (intended) vs 'both' = the two things in the first sentence, i.e. the sources and the mixing"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.' Names the substance, names what 'both' are, and replaces the dangling 'here'. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_inp_drop_energy",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high, and this one is factually wrong rather than merely ambiguous. 'open Pump energy under Calculate' sends the reader to a menu called Calculate. Verified in js/looped-network.js: buildMenuBar() builds File, Edit, Map, Water and Help, and the Pump energy row lives in reportMenuRows(), which is the Reports flyout inside the Water menu. There is no Calculate menu at all -- 'Calculate' is the label of the RUN row and of the run button (lpn_time_run). So the path is Water, Reports, Pump energy, and a reader following this string looks for a menu that does not exist. It also violates the control-naming shape: a menu path in this repo is comma-separated labels, and this names one level of a three-level path.",
+   "readings": [
+    "Water, Reports, Pump energy (the actual location)",
+    "a menu called Calculate, which does not exist",
+    "the Calculate button, which does not open a report"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Run the model with the EPANET engine, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost.' Same fix is needed on lpn_energy_needs_run, which has the same stale path. Cost: 26 retranslations per key; worth paying, because a wrong menu path is wrong in all 27 languages including English."
+  },
+  {
+   "key": "lpn_energy_needs_run",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: same stale path as lpn_inp_drop_energy, verified the same way. 'then open Pump energy report under Calculate' names a menu the menu bar does not have; the row is in the Reports flyout under Water. Compounding it, the same sentence correctly says 'press the Calculate button' a few words earlier, so the string uses the word Calculate for two different things in one breath -- a button and a menu -- and only one of them exists.",
+   "readings": [
+    "Water, Reports, Pump energy (the actual location)",
+    "a menu called Calculate",
+    "the report appears somewhere after pressing the Calculate button just mentioned"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.' This also fixes the run-time path (see the lpn_time_no_period entry). Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_inp_drop_quality",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Choose the chemical analysis under Settings, Calculation' names two levels of a three-level path. The control is lpn_settings_quality_track, which sits in the Water quality subsection of the Calculation section, and the sibling strings lpn_result_concentration_tip, lpn_source_quality_tip, lpn_reaction_pipe_tip and lpn_reaction_tank_tip all say 'under Settings, Water quality'. One control, two different paths across five strings in the same family: a translator rendering both will produce two names for one place and no reader can tell they are the same.",
+   "readings": [
+    "Settings, Calculation, Water quality, Quality parameter (the actual location)",
+    "some control directly under the Calculation section",
+    "a different setting from the one the Water quality strings name"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Choose a chemical under Settings, Calculation, Water quality' -- three levels, matching the real tree, and consistent with the sibling family. A single path spelling across the whole quality family should be settled before the sprint, not after. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_time_no_period",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: this string says 'Set a Total run time in Settings'; lpn_quality_needs_run says 'Set a Total run time under Time'; lpn_energy_needs_run says 'Set a Total run time under Time'. Three strings, one control, and between them 'in Settings' and 'under Time' -- neither of which is the full path, which is Settings, Calculation, Time. A translator handed all three renders them as three different destinations, and a reader who tries 'Time' finds no such menu on the menu bar.",
+   "readings": [
+    "Settings, Calculation, Time (the actual location)",
+    "a Time menu on the menu bar",
+    "somewhere in Settings, unspecified"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English on all three keys: 'Set a Total run time in Settings, Calculation, Time'. Comma-separated labels is the shape this repo already declares for a menu path, and one spelling in three places is what makes it findable. Cost: 3 keys x 26 = 78 retranslations."
+  },
+  {
+   "key": "lpn_net_emergency",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: two idioms in one sentence. 'this page reads it by inspection' is engineering shorthand for 'we worked the format out by examining files', but 'by inspection' also has an ordinary reading of 'by simply looking', which flatters the result rather than qualifying it. 'treat it as a way in when you have no other rather than as a dependable route' packs a metaphor (way in / route) that a translator will render literally as a physical entrance.",
+   "readings": [
+    "we reverse-engineered the format, so this is a last resort (intended)",
+    "the page reads the file simply by looking at it, which is easy",
+    "a physical way in / an entrance"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '... it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route.' Keeps the honesty, drops the two idioms. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_notes_5_def",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: the string carries two em dashes in visitor-facing English ('Three points -- the head at zero flow, the normal working point, and the point of highest flow -- fit ...'). The em dash advisory is a ratchet on new and EDITED strings, and this key is in the changed set, so it is being paid for anyway.",
+   "readings": [
+    "an appositive list naming the three points (intended)",
+    "no ambiguity of meaning -- this is the reception advisory, not a reading defect"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: replace the dash pair with commas around the appositive, or with parentheses. No other change. Filed low precisely because meaning does not move; apply it only in the same edit as something else, per the ratchet's own rule."
+  },
+  {
+   "key": "lpn_inp_drop_gpv_curve",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'so it stands open until you give it one' -- 'stands open' is idiomatic English for 'remains fully open', and 'stand' translated literally puts the valve in an upright posture. The comma pair in 'The valve came in, with no curve, so it stands open' also parenthesises a clause that is not parenthetical, so an English reader pauses in the wrong place.",
+   "readings": [
+    "the valve remains fully open (intended)",
+    "the valve is standing/upright",
+    "the valve's status is left available/unresolved"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'The valve came in with no curve, so it stays fully open until you give it one.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_pump_curve_source",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: this set has two naming systems for one family and the labels cross them. The curve KIND labels are 'Pump head', 'Pump efficiency', 'Tank volume' and 'Valve head loss' -- always <owner> <quantity>. The reference labels on the elements are 'Head curve' (pump), 'Efficiency curve' (pump) and 'Head loss curve' (valve) -- <quantity> curve, no owner. A translator meeting 'Head curve' alone has no owner to agree with and, worse, cannot see it is the same thing as 'Pump head'. 'Head curve' also has a spatial reading in a drawing application, where 'head' names the top of something.",
+   "readings": [
+    "the pump head curve this pump refers to (intended)",
+    "the curve at the head/top of something",
+    "a different quantity from 'Pump head' in the Curves library, since it is worded differently"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Pump head curve' and, for lpn_gpv_curve_source, 'Valve head loss curve' -- each then contains its own kind label verbatim, so a translator who has rendered the kind reuses those words and the two screens agree by construction. lpn_pump_effic_curve ('Efficiency curve') would become 'Pump efficiency curve' for the same reason. These are property-popup labels, not narrow column headings, so width is not the constraint. Cost: 3 keys x 26 = 78 retranslations."
+  },
+  {
+   "key": "lpn_curve_library_link",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: this link is labelled 'Curves library'. Its own tip calls the destination 'the Libraries box ... its Curves section', and the three curve-reference tips call it 'Libraries, Curves'. So one destination has three names in four strings, and the link's own label reverses the order of the other two. A translator cannot tell whether 'Curves library' is the same place as 'Libraries, Curves' or a second, differently named box.",
+   "readings": [
+    "the Curves section of the Libraries box (intended)",
+    "a library named Curves, distinct from Libraries",
+    "a library of curves in general, e.g. a catalogue of manufacturers' curves"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Libraries, Curves' as the link label, matching the comma-path shape the repo declares and the three sibling tips exactly. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_field_tag",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: a bare 'Tag' as a property label, in a page that already distinguishes Label from Text as two named objects. 'Tag' is one of the most heavily overloaded nouns in software English -- markup tag, price tag, name tag, hashtag, asset tag -- and this instance is EPANET's own [TAGS] section, a single unspaced token attached to an asset. A translator with no context will very often pick the markup or the price sense, and in several languages the markup sense is a borrowed English word that will look deliberate.",
+   "readings": [
+    "EPANET's per-asset tag: one unspaced token of the user's own meaning (intended)",
+    "an HTML/XML markup tag",
+    "a price tag or a name tag",
+    "a label attached to the map, i.e. this page's own Label object"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED, and it is NOT an English rewrite: 'Tag' is EPANET's own term for its own section and CLAUDE.md says to use EPANET's terminology, so an English reader with the page in front of them does not stumble. Routing per the CLAUDE.md table: this belongs in glossary.json as a concept (it recurs -- lpn_field_tag, lpn_field_tag_tip, lpn_inp_drop_tags, and the Find property) with an avoid array naming the markup and price senses, plus a gloss: pointer from this key. REFERRED because writing to $ec_lang_syn needs Tom's written permission in the conversation, and because adding a glossary term also means checking that 'lpn' is wired in prefixToTermNames() before the sprint. No retranslation cost if routed this way."
+  },
+  {
+   "key": "lpn_field_tag_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'It is not used here or by EPANET' and 'It is carried into and out of the EPANET file' are three sentences apart and appear to contradict. EPANET plainly does something with a tag -- it reads and writes it -- so the intended sense of 'not used' is 'not used in any calculation'. An English reader re-reads; a translator who resolves it the strong way tells the reader EPANET ignores tags entirely, which would make the round-trip promise look like a mistake. Minor second point: 'such as pressure zone, work order, etc.' pairs 'such as' with 'etc.', which is redundant in English and duplicated in most target languages.",
+   "readings": [
+    "no calculation on this page or in EPANET reads a tag (intended)",
+    "EPANET has no tags and discards them",
+    "the tag is not used by this page, and separately EPANET does not use this page"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_curve_kind_generic",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: 'Not stated' is a bare past participle with no subject and no noun to agree with, standing as one option in a chooser whose other four options are noun phrases ('Pump head', 'Tank volume'). Every Romance and Slavic language must inflect that participle for the gender and number of a noun the translator cannot see, and the candidate nouns differ in gender across languages (curve/type/kind). Worse, 'Not stated' with no subject reads at least as readily as an instruction or a validation message ('this has not been filled in') as it does as a category name -- and it sits in a list where the reader is choosing, so the imperative reading is live.",
+   "readings": [
+    "the file did not state which of EPANET's four kinds this curve is (intended)",
+    "you have not yet stated the kind -- a validation complaint",
+    "a kind whose name is deliberately withheld"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Kind not stated' -- it supplies the noun the participle must agree with, keeps it a category name rather than a complaint, and stays parallel with the four sibling options by leading with the thing rather than the negation. Cost: 26 retranslations. Note the same shape is why the repo's own rule about 'High'/'Low' in a narrow cell exists."
+  },
+  {
+   "key": "lpn_pump_effic_unstated",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'This pump calls the undefined efficiency curve ID {name}' has four stacked modifiers before the placeholder and mixes 'ID' with a placeholder called {name}, so the string itself cannot tell the translator whether the thing shown is an identifier or a human-readable name. 'Undefined' attached attributively to 'curve ID' also reads as 'the ID is undefined' rather than 'no curve with that ID is defined', which is a different fact. Second point, shared with lpn_pump_effic_global: '{percent}' gives no way to know whether the substituted text already carries a % sign, so a translator cannot decide whether to write one after it.",
+   "readings": [
+    "the pump refers to an efficiency curve id that nothing defines (intended)",
+    "the pump refers to a curve whose ID field is empty",
+    "the pump calls a curve named 'undefined'",
+    "{percent} is a bare number needing a % sign, vs {percent} already reads '75%'"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the network efficiency of {percent}.' 'Refers to' is on the sanctioned verb list; the relative clause puts 'undefined' where it belongs. The {percent} half should be answered by an $ec_lang_syn commentary note on both keys saying the substitution carries its own sign (PROPOSAL, off-limits to AI). Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_pump_effic_global",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'the network efficiency of {percent}' -- 'network efficiency' is a compound this page has not otherwise defined, and it reads as a property of the network (how efficient the network is) rather than as 'the efficiency set for the whole network', which is how the sibling strings lpn_reaction_pipe_tip and lpn_energy_curve_note both phrase it. Plus the {percent} sign question above.",
+   "readings": [
+    "the default efficiency set for the whole network (intended)",
+    "an efficiency figure computed for the network as a whole",
+    "the efficiency of the network as a system"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'so it runs at the efficiency set for the whole network, {percent}.' -- the exact wording two sibling strings already use, which makes the three parallel. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_tip_select",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'This is the mode the page comes home to' is a personifying idiom with no literal reading available. Rendered word for word it says the page travels to a house. Every translator will have to invent something, and the inventions will not agree; several will produce 'the page returns to the beginning', which is not what happens (it returns to a MODE, not to a starting state, and a reader could reasonably fear their drawing resets).",
+   "readings": [
+    "this is the mode the page reverts to by default (intended)",
+    "the page returns to its starting state",
+    "the page's home screen"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'This is the mode the page returns to by default: it comes back here by itself after some actions, such as opening a project, and [Esc] brings you back here from any other mode.' The 'returns ... comes back' pair is already in the string, so only the idiom moves. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_scenario_overrides",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high, and verified in the code. 'No. of custom values' has two defects that compound. (1) 'No.' as an abbreviation for 'number' is invisible outside English typographic convention -- the full stop is the only thing separating it from the word 'no', and in a string about scenario overrides 'No custom values' is a completely plausible and completely wrong message. Several languages have no such abbreviation at all. (2) js/looped-network.js uses this one key in two places with two different shapes: at line 31751 it is a table column heading, and at line 2553 it is rendered as `label + ': ' + count`, producing 'No. of custom values: 3' on the scenario button. The second reading is a stammer in English and a near-certain negation in translation. The two call sites even carry different fallbacks ('Overrides' and 'Custom values'), which is the code telling us the one label is doing two jobs.",
+   "readings": [
+    "the number of properties overridden in this scenario (intended)",
+    "no custom values -- a negation, which is exactly the false state the button reports when the count is not zero",
+    "an item number or index"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED English: 'Custom values' for the shared key -- it reads correctly as a column heading AND as 'Custom values: 3' on the button, and it is already the fallback the code carries at line 31751. Spelling it 'Number of custom values' fixes the abbreviation but makes the button read 'Number of custom values: 3'. REFERRED because the Task 512 code comment records a deliberate decision that 'the count has to say what it is counting', so dropping the counting word is a reversal of a ruling rather than a wording fix, and because splitting the key in two (heading and button) is a code change outside this pass's territory. Either way the 'No.' abbreviation must go. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_rule_dangling_note",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: 'These rules name an element that is no longer in this project' uses 'name' as a transitive verb, which is precisely the usage Tom flagged on 2026-09-06 ('I am not liking the word name ... in some contexts name may mean use'). Here both senses are live and they are different facts: a rule that NAMES an element (mentions its id) and a rule that USES an element are the same thing only if you already know how rules work. A translator will get 'these rules give a name to an element', which reverses the direction entirely -- the rules would be creating the element rather than depending on it. Second defect: plural 'These rules' against singular 'an element', so a reader cannot tell whether one missing element broke them all or each rule lost its own. Third: '{ids}' is unrecoverable -- rule ids, element ids or both?",
+   "readings": [
+    "these rules refer to an element id that no longer exists (intended)",
+    "these rules assign a name to an element",
+    "these rules are named after an element",
+    "{ids} lists the missing elements vs {ids} lists the ignored rules"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}' -- 'refer to' is on the sanctioned list and carries only the intended direction. The {ids} ambiguity should be answered by an $ec_lang_syn commentary note saying which list it is (PROPOSAL, off-limits to AI). Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_time_run_note",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'This project is set not to recalculate automatically' paraphrases a control instead of naming it. The control is lpn_settings_auto_run, whose face reads 'Recalculate automatically', and lpn_run_menu_tip already names it correctly as 'the Recalculate automatically setting'. Rendered as free prose in 26 languages, this paraphrase stops matching the switch on the screen -- the exact defect that produced 20 of the 136 findings in the Task 573 Wave 0. Second point: 'the first reporting time' is a bare superlative-plus-noun with no unit or referent -- a clock time, a step number, or the earliest time the report covers are all readings.",
+   "readings": [
+    "the Recalculate automatically setting is off (intended)",
+    "the project has some other setting that prevents recalculation",
+    "'first reporting time' = the earliest time step the report covers (intended) vs the first time you asked for a report vs a clock reading"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'You are seeing the network at the first reporting step. The Recalculate automatically setting is off, so the results for the later steps are not kept up to date while you work. Press the Calculate button to bring them up to date.' Names the control in the declared shape and replaces 'time' with 'step', which is what the clock actually indexes. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_setbox_divider",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Settings index width' is a three-noun stack used as the aria-label of a drag handle (verified at Looped-Network.php:675), so it is read aloud by a screen reader with no visual context whatever. 'Index' is the worst of the three words: in a settings panel it can be the list of sections, a numeric position, or a database index. A translator choosing the numeric sense produces an aria-label about the width of a number.",
+   "readings": [
+    "the width of the section list down the side of the Settings box (intended)",
+    "the width of a numeric index",
+    "the width setting whose index is 'Settings'"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Width of the Settings section list' -- it is an aria-label, not a visible label, so length costs nothing and clarity is the entire point. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_source_type_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'the strength below' appears twice and 'below' is a spatial reference to a form field the translator cannot see. In RTL layouts and in any re-flowed narrow layout, 'below' may not even be true; and read cold, 'the strength below' can mean 'a strength lower than this one'. The field it means is Source quality, which has its own key and could simply be named.",
+   "readings": [
+    "the value in the Source quality box under this control (intended)",
+    "a strength lower than some threshold",
+    "the strength listed further down in this tip"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: replace both instances of 'the strength below' with 'the Source quality value' (or 'the strength in the Source quality box'), which is the declared control-naming shape and survives any layout. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_mixing_2comp",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Two compartment mixing' is unhyphenated, so it has two grammatical parses and English gives no signal: [two-compartment] mixing, or two instances of [compartment mixing]. As a standalone dropdown option with no article and no verb, the counting reading is fully available, and a translator who takes it produces a plural. Oxford is now this project's reference for mechanics and hyphenates an attributive compound like this. Same string appears inside lpn_mixing_model_tip and lpn_mixing_fraction_tip ('Only two compartment mixing uses it'), where the counting reading is even stronger because 'two ... uses' already looks like a number-verb disagreement the translator must fix.",
+   "readings": [
+    "mixing modelled as two compartments (intended)",
+    "two kinds of compartment mixing",
+    "mixing of two compartments"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Two-compartment mixing' on lpn_mixing_2comp, and the same hyphen in the two tips that contain the phrase. EPANET's own interface writes '2COMP'/'Two-Compartment'; this keeps EPANET's term and adds only the hyphen. Cost: 3 keys x 26 = 78 retranslations."
+  },
+  {
+   "key": "lpn_reaction_bulk_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: two problems. (1) 'a positive one grows it' uses 'grow' transitively, which is a recent and largely American English usage; the standard transitive verb is 'increase'. Translated literally it becomes 'cultivates it', which is close enough to plausible in a water-chemistry context to survive review. (2) 'First order unless the file says otherwise' refers to 'the file' in a string that will be read on a project that was never imported from any file -- the definite article promises a referent that often does not exist. lpn_reaction_wall_tip carries the identical clause.",
+   "readings": [
+    "a positive coefficient increases the chemical (intended)",
+    "a positive coefficient cultivates/grows the chemical",
+    "'the file' = the imported .inp file (intended) vs the project file vs some settings file"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'A negative number decays the chemical and a positive one increases it. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a rate in 1/day.' Same second fix on lpn_reaction_wall_tip. Cost: 2 keys x 26 = 52 retranslations."
+  },
+  {
+   "key": "lpn_energy_efficiency_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'The wire to water efficiency' is unhyphenated, so the noun phrase parses as 'the wire', then 'to water efficiency' -- and 'wire' followed by an infinitive-looking 'to' is a strong garden path even for an English reader. Wire-to-water efficiency is a genuine term of art in pumping (electrical input to hydraulic output) and must be kept; the hyphens are what make it a single unit a translator can look up.",
+   "readings": [
+    "wire-to-water efficiency: electrical power in to hydraulic power out (intended)",
+    "the wire, applied to water efficiency",
+    "the efficiency of a wire with respect to water"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'The wire-to-water efficiency used for every pump that does not carry an efficiency curve of its own.' Hyphens only; the term is unchanged. A glossary.json entry for wire-to-water efficiency would also be well earned, since it recurs in the energy family. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_energy_price_pattern_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'an off peak rate' is unhyphenated and parses as 'an off, peak rate' or 'off [the] peak rate'. Off-peak is a fixed compound in the electricity tariff vocabulary and the hyphen is what identifies it as one.",
+   "readings": [
+    "an off-peak tariff (intended)",
+    "a rate that is off the peak",
+    "a peak rate that is switched off"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'off-peak rate'. Cost: 26 retranslations, which is why it is low: an experienced energy translator will get there anyway."
+  },
+  {
+   "key": "lpn_energy_demand_charge_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: 'each kilowatt of the highest power every pump drew at one moment' is genuinely two different quantities and the string does not pick one. Distributive reading: for each pump, the highest power THAT pump drew -- summed or charged per pump. Collective reading: the highest power ALL pumps together drew at one instant, which is what the code actually computes (the comment at js/looped-network.js:31555 says 'the largest total power every pump drew at one moment ... added once and not per pump'). The last sentence tries to close it with 'added once and not per pump', but that arrives after the reader has already committed to a reading, and a translator who has committed will make the last sentence agree with the wrong one. This changes a money figure.",
+   "readings": [
+    "the highest combined power of all pumps at a single instant (intended)",
+    "for each pump, the highest power it drew, charged per pump",
+    "the highest power any single pump drew"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'What the utility bills for each kilowatt of the highest total power all the pumps together drew at any one moment. It is charged on that one moment, not on the energy used, so it is added once for the whole network and never per pump.' 'Total ... together' and 'for the whole network' close both halves. Cost: 26 retranslations, and worth it: a wrong reading produces a wrong bill."
+  },
+  {
+   "key": "lpn_energy_total_demand_charge",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: this key and lpn_energy_demand_charge have the IDENTICAL English value, 'Peak demand charge', and they are two different quantities. lpn_energy_demand_charge is the Settings input -- a RATE, money per kilowatt, which the user types. lpn_energy_total_demand_charge is a row in the report totals -- an AMOUNT OF MONEY, the rate times the peak. A translator handed both keys sees one string twice and will quite reasonably render them identically, at which point the report shows a currency total under a label that names a tariff rate. Nothing in either string distinguishes them, and the payload gives no call site.",
+   "readings": [
+    "the tariff rate in money per kW (lpn_energy_demand_charge's intent)",
+    "the money charged for the peak over this run (lpn_energy_total_demand_charge's intent)",
+    "one quantity appearing in two places"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: keep 'Peak demand charge' on the Settings input (it is the tariff's own name) and change the report total to 'Cost of peak demand' -- which also makes it parallel with the two report rows beside it, 'Cost of energy' and 'Total cost'. The parallel is the argument: the totals block already names its money rows 'Cost of X'. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_energy_col_running",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high, and verified in the code. The column heading is 'Running' and the cell under it is energyPercent(row.usage) (js/looped-network.js:31537) -- a PERCENTAGE of the run for which the pump was on. 'Running' reads first as a status (is it running?), second as a duration (how long it ran), and only third as a proportion, which is the one it means. lpn_energy_menu_tip reinforces the duration reading by promising 'How long each pump ran'. A translator will produce a status word or a duration word, and either heading over a column of percentages is wrong. EPANET's own energy report names this column 'Percent Utilized', which is the terminology to defer to.",
+   "readings": [
+    "the share of the run during which the pump was on, as a percent (intended)",
+    "whether the pump is running now -- a status",
+    "how long the pump ran -- a duration"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '% of run' or, deferring to EPANET, 'Utilized'. '% of run' is shorter, needs no gender agreement and carries the unit; a narrow column heading is exactly where the repo's own rule says abbreviation is fine. lpn_energy_menu_tip's 'How long each pump ran' should become 'What share of the run each pump was on' in the same edit, or the tip re-creates the defect. Cost: 2 keys x 26 = 52 retranslations."
+  },
+  {
+   "key": "lpn_energy_over",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'For extended period simulation of {time}' has no article and an 'of' whose object is a duration the string does not say is a duration. Read cold, 'of {time}' can name the simulation ('the simulation of 06:00', i.e. the one at six o'clock) as easily as give its length. The code substitutes a H:MM formatted duration (js/looped-network.js:31519), so the reader sees 'For extended period simulation of 24:00' and both readings survive. The key is named ..._over but the string says 'For', so even the key name disagrees with the preposition.",
+   "readings": [
+    "over an extended period simulation lasting {time} (intended)",
+    "for the extended period simulation identified by the time {time}",
+    "for extended period simulation as of {time}"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Over an extended period simulation lasting {time}'. The code comment explains why the string must not append a unit word ('at 1:30 the trailing word would be wrong'), and 'lasting' respects that -- it names the kind of quantity without naming a unit. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_scncmp_at",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: '{value} at {id}' is two placeholders and one preposition. A translator has no way to know that {value} is a pressure or a velocity with its unit already attached and that {id} is an element id, so 'at' could be temporal, spatial or attributive, and several languages need to know the noun's gender or case before they can choose the preposition at all. It is the shortest string in the set and the one that carries the least recoverable information.",
+   "readings": [
+    "the extreme value, and the element where it occurs (intended)",
+    "a value measured at a time",
+    "a value belonging to an identifier"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED, and it is not an English rewrite: the English is correct and idiomatic for its own reader; only the translator is stuck, which routes it to $ec_lang_syn by the CLAUDE.md table. PROPOSED entry (off-limits to AI, awaiting written permission): a commentary note saying {value} is a pressure or velocity with its unit already attached and {id} is the id of the junction or pipe where that extreme occurs. No retranslation cost."
+  },
+  {
+   "key": "lpn_scncmp_current",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: '(open now)' is the adjective-or-verb defect this repo has shipped before, in a page that contains genuine openers. Appended to a scenario name in a comparison table (js/looped-network.js:31760), it means 'this is the scenario you currently have open'. But 'open now' is also a perfectly formed imperative -- 'open [this] now' -- and a parenthesised imperative beside a row name reads exactly like an action link. A translator taking the imperative produces a table where every row appears to invite an action that the table does not offer. Third reading: 'open' as in unresolved or not yet finished, which is live in an engineering table.",
+   "readings": [
+    "this is the scenario currently open in the editor (intended)",
+    "open this one now -- an instruction or a link",
+    "this scenario is still open, i.e. unfinished"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '(you are working in this one)' or, shorter, '(currently open)'. 'Currently open' cannot be read as an imperative because the adverb precedes the participle; the longer form removes even the unfinished reading. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_energy_curve_note",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'so they ran at the efficiency set for the whole network: {ids}.' The colon and its list are attached to the end of the sentence, where the nearest noun is 'network'. Grammatically the list belongs to 'These pumps', six words earlier. An English reader recovers it because networks do not come in lists; a translator working on the clause will very often attach the colon to the last noun phrase, and in a language that inflects, the choice is forced before the sentence can be written.",
+   "readings": [
+    "the ids are the pumps that fell back to the network efficiency (intended)",
+    "the ids are the networks",
+    "the ids are the curves with no points"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'These pumps ran at the efficiency set for the whole network, because the efficiency curve they call has no points: {ids}.' Better still, put the list first: 'These pumps call an efficiency curve with no points: {ids}. They ran at the efficiency set for the whole network.' Two sentences remove the attachment question entirely. lpn_rule_dangling_note and lpn_rule_unreadable_note have the same trailing-colon shape but a nearer correct antecedent, so they are less exposed. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_library_curves_note",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Several can use the same curve' has a bare quantifier with no noun. English allows the elided head; most target languages cannot write the quantifier at all without knowing the gender and number of what is elided, and the candidates in the previous clause are 'a pump' and 'a valve', which differ in gender across languages and cannot both be right. The same sentence's 'in its own properties' can also attach to 'uses' or to 'indicates'.",
+   "readings": [
+    "several pumps or valves can use the same curve (intended)",
+    "several curves can use the same curve",
+    "several projects can use the same curve"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Several elements can use the same curve, and editing it here changes all of them.' Supplying the noun costs one word and removes an agreement decision from 26 translators. Note this string is Tom's own wording elsewhere in the sentence ('indicates'), which is deliberately left untouched. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_library_curve_kind",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: lpn_library_curve_kind is 'What this curve describes' and lpn_library_curve_type is 'Curve type'. Read as a pair with no page around them, they look like two different properties -- a free-text purpose field and a categorical type field. CLAUDE.md says EPANET has exactly four KINDS and that this is the axis; two labels in two grammatical shapes (a question-like clause and a noun phrase) is exactly the 'two faces of one control written in two moods' failure mode this pass is asked to look for. In several languages 'kind' and 'type' collapse to one word, so a translator will be unable to distinguish them and will guess whether they are the same field.",
+   "readings": [
+    "both label EPANET's four-way curve kind, in two places (probable intent)",
+    "one is a free-text purpose, the other a category",
+    "one is our word, the other EPANET's"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "REFERRED because resolving it needs a look at the two call sites (which this pass did not open) to confirm they really are the same axis, and because if they are, the right answer may be deleting one key rather than rewording it -- a code change outside this pass's territory. If they are the same axis, PROPOSED: use 'Curve type' in both places, since 'type' is the noun EPANET's own file format uses. If they are genuinely different, each needs a word the other does not have."
+  },
+  {
+   "key": "lpn_library_curve_values_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: two idioms in the last sentence. 'Lines out of an EPANET file paste too' uses 'paste' intransitively, which is software English of a very informal register and has no literal equivalent -- rendered word for word it says the lines perform a pasting. 'curve name and all' is an English tag construction meaning 'including the curve name'; translated literally it becomes 'the curve name and everything', which invites the reader to expect more than a name.",
+   "readings": [
+    "you can also paste lines copied from an EPANET file, and the curve name in them is handled (intended)",
+    "lines out of an EPANET file also perform pasting",
+    "the curve name and everything else in the file comes with it"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'You can also paste lines copied straight out of an EPANET file, including the curve name.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_library_curve_in_use",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: '{count} element(s)' uses the parenthesised-s plural hack. It is an English typographic convention that does not exist in most target languages, and it is unusable in the many languages with three or more plural classes selected by the numeral (Arabic, Russian, Ukrainian, Serbian, Croatian, Czech, Polish-family agreement) -- there is no single form the parenthesis can stand for. Every one of those translators must either invent a form, drop the marker, or reproduce a bracket that means nothing. Second, smaller point in the same string: 'Point them at another curve first, then delete it' -- 'it' is the curve and 'them' the elements, but the nearest singular noun to 'it' is 'another curve', so the sentence can be read as an instruction to delete the replacement.",
+   "readings": [
+    "N elements, with correct plural agreement (intended)",
+    "N element(s) with a literal bracket rendered into a language that has no such convention",
+    "'then delete it' = delete this curve (intended) vs delete the other curve you just pointed them at"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.' A plain plural with a numeral is what every language can inflect naturally, and it is what the rest of this file does; the (s) buys nothing even in English when {count} is 1 and the sentence is about a refusal. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_library_curve_used_by",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Used by' is a bare past participle plus a preposition, standing alone as a field label. Every gendered language must inflect the participle to agree with a noun the translator cannot see -- the curve, presumably, but the string does not say so, and 'used by' could equally be heading a list of the users of a section, a library or a project. A translator who guesses the wrong noun's gender ships an agreement error on a visible label.",
+   "readings": [
+    "the elements that use this curve (intended)",
+    "the people or projects that use this",
+    "an instruction: to be used by ..."
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Used by these elements' or 'Elements using this curve'. The second is better: a noun-headed phrase needs no agreement decision at all, and its sibling lpn_library_curve_unused ('Nothing uses this curve.') is already a full clause, so the pair becomes consistent. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_library_curve_copy",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'Copy points' (lpn_library_curve_copy) and 'Copy these points' (lpn_library_curve_copy_manual) are two labels for the same action, one with a demonstrative and one without, and lpn_time_run_report_copy is a third copy label reading just 'Copy'. Nothing in any of the three says which is the button and which is the fallback prompt, so a translator meeting them in a payload sees a set that looks inconsistent and may harmonise them into one -- destroying the distinction the code relies on.",
+   "readings": [
+    "a button that copies the curve's points (lpn_library_curve_copy's intent)",
+    "a manual-copy prompt over a pre-selected block (lpn_library_curve_copy_manual's intent)",
+    "two buttons that do different things"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED: no English change to the values, but the pair needs $ec_lang_syn commentary saying which is the button and which the manual fallback (PROPOSAL, off-limits to AI). Ranked low because the two strings are both correct in isolation and the risk is only that a translator flattens them. No retranslation cost if routed this way."
+  },
+  {
+   "key": "lpn_library_rule_ok",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: '✓ Understood' and '⚠ Not understood' are verdicts on a rule the page has just parsed, but 'Understood' standing alone is overwhelmingly the English acknowledgement a PERSON gives ('understood, will do'). A translator will very plausibly render the human acknowledgement, and the verdict then reads as the software agreeing to something. Second, it is a past participle with no subject, so gendered languages must agree it with an invisible noun (the rule).",
+   "readings": [
+    "this page could read and interpret the rule (intended)",
+    "acknowledged / understood, as a person replies",
+    "the rule was understood by the reader"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '✓ This rule was read' / '⚠ This rule could not be read', which supplies the subject, removes the agreement decision, and matches lpn_rule_unreadable_note's own wording ('These rules could not be read'). The glyph stays leading, per the verdict-string convention. Cost: 2 keys x 26 = 52 retranslations."
+  },
+  {
+   "key": "lpn_field_speed_pattern_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Each multiplier IS the relative speed' carries emphasis in ALL CAPS. Capitalisation as emphasis has no equivalent in Arabic, Hebrew, Persian, Urdu, Khmer, Burmese, Chinese, Amharic or Hindi -- nine of the 26 target languages have no case at all -- so the emphasis simply vanishes for them, and the point being emphasised is the load-bearing one in the whole string (that the pattern REPLACES the speed setting rather than scaling it, which CLAUDE.md records as measured engine behaviour). Second: 'takes the place of the speed above' uses a spatial reference to a form field, the same defect as lpn_source_type_tip.",
+   "readings": [
+    "the multiplier replaces the Speed setting rather than scaling it (intended)",
+    "the multiplier is applied to the relative speed",
+    "'the speed above' = the Speed field in this popup (intended) vs a speed mentioned earlier in the tip"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'How this pump's speed rises and falls through the run. Each multiplier is the relative speed for that part of the run, and it replaces the Speed setting rather than scaling it, so a multiplier of 0 stops the pump.' The emphasis moves from typography into the words ('replaces ... rather than scaling'), which survives translation, and the field is named in the declared shape. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_ff_col_static_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.' 'This name' is a cross-key reference to the column heading the tip hangs on, which lives in a different key and does not appear in this string. A translator working the payload sees a sentence asserting that two standards use a name that the sentence never states, and cannot check that their rendering of the heading matches what the standards actually call it. This is the one place in the string where the translator's choice of heading and the tip's claim have to agree, and nothing connects them.",
+   "readings": [
+    "'this name' = the words in the Static pressure column heading (intended)",
+    "'this name' = some name used earlier in the tip, which there is none",
+    "'this name' = the name of the reading in general"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '... both call this reading the static pressure, and it is where a fire flow test starts.' Stating the term inside the tip makes the claim checkable and gives the translator the anchor to match their heading against. Note this is also the string that carries the term of art 'static pressure', which plain_english_swap_check.php exists to protect -- it must be stated, not paraphrased. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_ff_required_node_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'from your fire code or your fire authority for the land use it serves' -- 'it' is the junction, four nouns back, and 'for the land use it serves' can attach to 'required', to 'fire authority' or to 'fire code'. An English reader parses it on the second pass; a translator must commit on the first.",
+   "readings": [
+    "the flow your code or authority requires for the land use this junction serves (intended)",
+    "the fire authority responsible for that land use",
+    "the fire code that covers that land use"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'The fire flow required at this particular junction for the land use it serves, from your fire code or your fire authority.' Moving the prepositional phrase next to what it modifies fixes the attachment with no new words. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_library_curves_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: this tip says a curve gives 'how much head a pump MAKES at each flow', while lpn_pump_curve_source_tip says 'how much head this pump ADDS at each flow' and lpn_notes_5_def says 'the head the pump adds'. Three strings, one quantity, two verbs. 'Makes' also has a manufacturing reading. Separately, the third item in the list, 'how much head a valve loses', drops the 'at each flow' the first two carry, so the parallel breaks where a translator would expect it to hold.",
+   "readings": [
+    "the head a pump adds at a given flow (intended)",
+    "the head a pump produces/manufactures",
+    "the valve item is not per-flow, unlike the two before it"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '... how much head a pump adds at each flow, how efficient it is at that flow, or how much head a valve loses at each flow.' One verb across the family and a complete parallel. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_library_rules_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'when a water level, a pressure, a flow or a time says so' gives four inanimate subjects a verb of speech. 'A time says so' is the hardest -- a translator will produce something like 'when the time speaks', or will silently drop the personification along with the meaning. The intended sense is 'when a condition on one of those is met'.",
+   "readings": [
+    "when a condition on a level, pressure, flow or time is met (intended)",
+    "when one of those things indicates/announces something",
+    "when a level or a time gives permission"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '... when a water level, a pressure, a flow or a time reaches a value you set.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_quality_chemical_name_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'for example Chlorine mg/L' is two things written as one token with no punctuation between them, and the label it explains is 'Chemical and units'. A translator cannot tell whether the box takes one string containing both, or whether the example is missing a comma that they should supply. Adding a comma, which is the natural editorial instinct in most languages, would teach the reader to type a value the field does not want. EPANET's own convention is the unpunctuated pair.",
+   "readings": [
+    "type one string, e.g. 'Chlorine mg/L' (intended, and EPANET's own convention)",
+    "type a chemical, then units, e.g. 'Chlorine, mg/L'",
+    "the example is missing punctuation and should be repaired"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'for example, write Chlorine mg/L as one entry.' -- it names the shape rather than leaving the reader to infer it from an unpunctuated example, and it stops a translator repairing the punctuation. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_time_no_engine",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'Connect to the internet once to fetch the EPANET solver' -- 'once' after a verb in English can mean 'a single time' (intended) or 'as soon as', and the second reading turns the sentence into a conditional with no consequent. Word order rescues it for a fluent reader; a translator who takes the temporal reading writes 'Once you connect to the internet, fetch the EPANET solver', which is an instruction the user cannot follow.",
+   "readings": [
+    "one connection is enough; after that it is cached (intended)",
+    "as soon as you connect to the internet, fetch the solver",
+    "connect at some earlier time"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_source_type_flowpaced",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'Flow paced booster' is unhyphenated, so 'flow' and 'paced' are two separate modifiers of 'booster' rather than one compound modifier. EPANET's own name is FLOWPACED and its interface writes 'Flow Paced Booster'; the hyphen is the Oxford mechanics answer and makes the compound visible as one unit to a translator who has not met the term.",
+   "readings": [
+    "a booster paced by the flow (intended)",
+    "a flow, and a paced booster",
+    "a booster for paced flow"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Flow-paced booster'. The EPANET term is unchanged; only the hyphen is added. Note lpn_source_type_tip contains the same phrase and would move with it. Cost: 2 keys x 26 = 52 retranslations, which is why it is low: the four source types are a set a chemistry translator is likely to know."
+  },
+  {
+   "key": "lpn_curve_none",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'No curve' as a chooser option is a determiner plus noun with no verb, so it can be a chosen state ('no curve is selected', intended) or an assertion the page is making ('there is no curve'). In a chooser sitting beside a curve list, both are live, and a translator rendering the assertion produces an option that reads like an error message. Several languages will also need to decide between 'none' and 'no curve', which changes whether the option agrees with a following noun.",
+   "readings": [
+    "select no curve for this element (intended)",
+    "there is no curve -- an assertion",
+    "the curve is absent/missing"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'No curve selected' -- unambiguously a state, and it matches lpn_pump_effic_global's own phrase 'has no efficiency curve selected'. Ranked low because a chooser context resolves it for most translators. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_inp_drop_quality_options",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: the string names three EPANET settings -- 'Quality', 'Relative diffusivity' and 'Quality tolerance' -- as bare capitalised words inside prose, with no widget word after any of them. The repo's declared shape for naming a control in prose is the label followed by the widget word ('the Quality tolerance setting'). Without it, a translator cannot tell which words are labels to be matched against another key's rendering and which are ordinary nouns to be translated freely, and the first one, 'Quality', is an ordinary English noun that appears twice in the same sentence in its ordinary sense ('water quality analysis'). Second point: 'All three are kept and all three are used' followed by a list of four things (water age, source trace, a chemical, and the two chemical settings) makes the arithmetic hard to follow.",
+   "readings": [
+    "Quality is the name of an EPANET option (intended)",
+    "quality as the ordinary noun, as used elsewhere in the same sentence",
+    "the three named settings map one-to-one onto the three analyses listed after them, which they do not"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: name each one in the declared shape -- 'the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance' -- and split the last sentence so the three settings and the three analyses are not read as a mapping. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_inp_drop_net_options",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'states these settings in places this page has no name for' -- 'places' is doing metaphorical work (sections of a file format) that a translator will render literally as physical locations, and 'this page has no name for' is a relative clause with a stranded preposition, which several target languages must restructure before they can even parse it. The result is a sentence about the page not knowing where things are, rather than about the page having no equivalent control.",
+   "readings": [
+    "the .net format puts these settings under headings this page has no equivalent for (intended)",
+    "the settings are in physical locations the page cannot name",
+    "the page cannot find the places"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_inp_drop_patterns",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'Demand patterns were left out' is an agentless passive whose agent matters -- the patterns were dropped BY THIS PAGE, not by the file or by the user. A translator rendering it as a plain passive leaves the reader unsure whether the file lacked them or the page discarded them, and only one of those is a thing the reader can act on. The sibling strings in this family say 'came in whole' with an explicit subject, so this is the outlier.",
+   "readings": [
+    "this page did not read the demand patterns, because a module failed to load (intended)",
+    "the file did not contain demand patterns",
+    "the patterns were excluded by the person who made the file"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'This page did not read the demand patterns, because the part of it that runs an extended period simulation did not load. Every demand is the number written in the file.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_energy_menu_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'How long each pump ran, what power it drew and what it cost over the last extended period simulation.' Two problems. (1) 'How long each pump ran' promises a duration; the report's column is a percentage of the run (verified: energyPercent(row.usage)), so the tip and the table disagree about what the reader will be shown -- see the lpn_energy_col_running entry. (2) 'over the last extended period simulation' can attach to 'what it cost' alone or to all three items; a translator must choose, and attaching it to the last item only would suggest the first two are current rather than historical.",
+   "readings": [
+    "all three figures, for the most recent run (intended)",
+    "how long, what power, and -- over the last run -- what it cost",
+    "'how long each pump ran' = a duration in hours, which is not what is shown"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'For the last extended period simulation: what share of the run each pump was on, what power it drew and what it cost.' Fronting the scope closes the attachment question and the first item now matches the column. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_reaction_tank_short",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: the short-label set is 'Bulk reaction', 'Wall reaction' and, for the tank, simply 'Reaction'. The first two name which reaction; the third names none, so read as a set a translator sees two specific labels and one generic one and cannot tell whether the third is a third kind, a total, or the tank's own case of the first. It is correct on the tank's own popup and unrecoverable anywhere else.",
+   "readings": [
+    "the reaction coefficient for the water held in this tank (intended)",
+    "a reaction in general, or a total of the two above",
+    "a third kind of reaction"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Tank reaction' -- parallel with its two siblings, still short, and correct on the tank popup where it renders. Ranked low because the popup supplies the context in practice. Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_quality_initial_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'Leave it empty for none.' -- 'none' is a bare quantifier with no noun, which in this string could be none of the chemical, no initial quality, or no value at all. The distinction matters because lpn_source_quality_tip goes to some trouble in the very next control to explain that empty and zero are different things; here the same distinction is compressed into one word that says neither.",
+   "readings": [
+    "leave it empty and this node starts with none of the chemical (intended)",
+    "leave it empty and no initial quality is set, which may not be the same as zero",
+    "leave it empty for no value"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Leave it empty and the node starts with none of the chemical.' Cost: 26 retranslations."
+  },
+  {
+   "key": "lpn_energy_currency_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'so write the prices in the currency you name' -- 'name' as a transitive verb, which is the usage Tom flagged on 2026-09-06 as sometimes meaning 'use'. Here it means 'the currency you typed into this box', and 'the currency you use' is a perfectly available and slightly different reading (the currency you work in, whether or not you typed it). The rest of the string is unusually clear, which is why this is low.",
+   "readings": [
+    "the currency whose label you typed in this box (intended)",
+    "the currency you work in",
+    "the currency you specify elsewhere"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'so write the prices in the currency you have written here.' Cost: 26 retranslations."
+  }
+ ]
+}
