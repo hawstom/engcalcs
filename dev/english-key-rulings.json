@@ -202,8 +202,8 @@
    "ruled": "2026-09-04"
   },
   "lpn_energy_price_pattern_tip": {
-   "on": "A pattern that multiplies the price hour by hour, which is how an off peak rate is specified. Leave it empty for one price all day.",
-   "ruled": "2026-09-04"
+   "on": "A pattern that multiplies the price at each pattern step, which is how an off peak rate is specified. Leave it empty for one price throughout the run.",
+   "ruled": "2026-09-05"
   },
   "lpn_energy_price_tip": {
    "on": "What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.",
@@ -742,8 +742,8 @@
    "ruled": "2026-09-01"
   },
   "lpn_inp_drop_sources_mixing": {
-   "on": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.",
-   "ruled": "2026-09-04"
+   "on": "This file says where more of the substance is added to the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both require the EPANET engine here.",
+   "ruled": "2026-09-05"
   },
   "lpn_inp_drop_tags": {
    "on": "This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
@@ -765,6 +765,14 @@
    "on": "Copies every point as two columns, ready to paste into a spreadsheet.",
    "ruled": "2026-09-05"
   },
+  "lpn_library_curve_equation": {
+   "on": "Equation",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_equation_tip": {
+   "on": "The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The built-in solver runs on this equation; the EPANET engine reads the points themselves.",
+   "ruled": "2026-09-05"
+  },
   "lpn_library_curve_in_use": {
    "on": "This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.",
    "ruled": "2026-09-05"
@@ -783,6 +791,10 @@
   },
   "lpn_library_curve_remove_point": {
    "on": "Remove this point",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_type": {
+   "on": "Curve type",
    "ruled": "2026-09-05"
   },
   "lpn_library_curve_unused": {
@@ -839,6 +851,10 @@
   },
   "lpn_mixing_2comp": {
    "on": "Two compartment mixing",
+   "ruled": "2026-09-05"
+  },
+  "lpn_mixing_fifo": {
+   "on": "FIFO plug flow",
    "ruled": "2026-09-05"
   },
   "lpn_mixing_fraction": {

@@ -228,13 +228,30 @@ console.log('\n4. The report no longer claims a loss for anything it keeps');
 	ok('the report does not say anything was left out or discarded',
 		!/left out|discard|thrown away(?! )/i.test(notes.replace(/nothing in your file is thrown away/i, '')),
 		JSON.stringify((/[^.]*(left out|discard)[^.]*\./i.exec(notes) || [])[0]));
-	// Each carried subject says the two things that are true of it: this page does not use it, and
-	// it is kept and written back.
-	['energy', 'quality', 'reactions', 'sources', 'mixing', 'tags', 'report', 'other-sections'].forEach((code) => {
+	// Every subject gets a sentence of its own and none of them may read as a loss. The
+	// REASSURANCE is a different rule and it splits, on Tom's own ruling (2026-09-05, of the
+	// sources-and-mixing sentence he rewrote): once a section is fully implemented, "kept and
+	// written back" is *"like saying about your grocery store, 'Now with checkout lanes!'... the
+	// safe journey becomes assumed."* So a section this page only CARRIES must still say it --
+	// that is the whole promise being made about it -- and an INTERPRETED one need not.
+	const CARRIED_ONLY = ['report', 'other-sections'];
+	const INTERPRETED = ['energy', 'quality', 'reactions', 'sources', 'mixing', 'tags'];
+	CARRIED_ONLY.concat(INTERPRETED).forEach((code) => {
 		const s = L.dropText(code);
 		ok(code + ' has a sentence of its own', s !== code && s.length > 40, s);
-		ok(code + ' says it is kept and written back', /\bkept\b/.test(s) && /written back/.test(s), s);
 		ok(code + ' does not claim a loss', !/left out|discard/i.test(s), s);
+	});
+	CARRIED_ONLY.forEach((code) => {
+		const s = L.dropText(code);
+		ok(code + ' is only carried, so it says it is kept and written back',
+			/\bkept\b/.test(s) && /written back/.test(s), s);
+	});
+	// The other half of the same ruling: an interpreted section must say what READS it, or the
+	// reader is left with a sentence that reassures and never answers "so what happens to it".
+	INTERPRETED.forEach((code) => {
+		const s = L.dropText(code);
+		ok(code + ' is interpreted, so it says what uses it',
+			/\buses?\b|\bused\b|\bengine\b|properties/i.test(s), s);
 	});
 	// Energy and water quality are unrelated subjects and shared one sentence, which is a large part
 	// of why the old one read as a list of casualties.
