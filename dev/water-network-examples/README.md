@@ -43,6 +43,23 @@ its own source `.inp` so the gap cannot reopen quietly.
 **Do NOT close that gap by regenerating from the `.inp`.** `Net2` and `Net3` carry a backdrop an
 `.inp` cannot hold at all, and `Net1` carries hand-placed label offsets; an import would drop both.
 
+**AND IT REOPENED, IN THE CURVE LIBRARY** (Tom, 2026-09-06, asking for exactly this audit;
+`dev/examples-audit.md` is the record). A stored project holds the pre-Task-586 shape, so
+`mintCurveLibrary()` rebuilt each pump curve out of `curvePoints` on open -- correctly, and out of
+numbers, which is all a list of numbers can give. What went was the curve's NAME (EPANET's
+`;PUMP: Pump Curve for Pump 10 (Lake Source)` comment, the one thing the Library shows a person) and
+EPA's own tokens: `Net3` exported `104.` as `104`. `Net1`, `Net3` and `Net3-Novato-CA-World` were
+topped up in place with the `curves` array a fresh import of their own `.inp` produces, and
+`Net3-Novato-CA-World` gained the `Quality Timestep 0:05` its source states and the 2026-08-29 pass
+had missed. The legacy `curvePoints`/`curveRef`/`curveId` stay on the pumps: the migration seeds from
+an existing `curves` list, matches kind and points, reuses what is there, and deletes the old homes
+at open.
+
+**`dev/lpn-spike/examples-audit-harness.js` is what stops it reopening a fourth time.** It compares a
+shipped example, OPENED, against a fresh import of its own source `.inp` -- whole document, field by
+field, with the exemptions declared one line at a time rather than a list of fields to check. Adding
+an example forces a line in its `SOURCE_OF`, an `.inp` name or `null` with the reason it has none.
+
 **`settings.hydraulics` was the last piece and it is in now** — all four EPA files (`Net1`, `Net2`,
 `Net3`, `Net3-Novato-CA-World`) state the eleven `[OPTIONS]` their own `.inp` states, added by hand
 in place. It does change what the gallery COMPUTES, because these files say `Accuracy 0.001` and
