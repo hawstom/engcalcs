@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 1675,
-        "delta_key_count": 143,
+        "expected_key_count": 1688,
+        "delta_key_count": 15,
         "exempt_key_count": 19,
         "exempt_keys": [
             "calc_units_us",
@@ -503,2432 +503,256 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_wrong_btn": "Something wrong here?",
-        "lpn_wrong_tip": "One press tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have typed, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
-        "lpn_wrong_thanks": "Thank you. That reached us.",
-        "lpn_find_prop_demand_desc": "Description of this demand category",
-        "lpn_new_units_tip": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
-        "lpn_inp_drop_sources_mixing": "This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.",
-        "lpn_inp_drop_net_options": "This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
-        "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
-        "lpn_gpv_curve_source": "Valve head loss curve",
-        "lpn_gpv_curve_source_tip": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.",
-        "lpn_pump_curve_source_tip": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
-        "lpn_field_tag": "Tag",
-        "lpn_field_tag_tip": "A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.",
-        "lpn_pump_effic_curve": "Pump efficiency curve",
-        "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
-        "lpn_curve_none": "No curve selected",
-        "lpn_curve_library_link": "Curves",
-        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.",
-        "lpn_curve_kind_head": "Pump head",
-        "lpn_curve_kind_effic": "Pump efficiency",
-        "lpn_curve_kind_volume": "Tank volume",
-        "lpn_curve_kind_headloss": "Valve head loss",
-        "lpn_curve_kind_generic": "Kind not stated",
-        "lpn_curve_volume_col": "Volume",
-        "lpn_pump_effic_col": "Efficiency",
-        "lpn_pump_effic_global": "This pump has no efficiency curve selected, so it runs at the efficiency set for the whole network, {percent}.",
-        "lpn_pump_effic_unstated": "This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the efficiency set for the whole network, {percent}.",
-        "lpn_rule_dangling_note": "These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}",
-        "lpn_rule_unreadable_note": "These rules could not be read, so they were ignored in this run: {ids}",
-        "lpn_time_run_report_copy": "Copy",
-        "lpn_time_run_report_copied": "Copied",
-        "lpn_setbox_divider": "Width of the Settings section list",
-        "lpn_quality_chemical_name": "Chemical and units",
-        "lpn_quality_chemical_name_tip": "The name of the chemical and the units its concentrations are written in: for example, write Chlorine mg\/L as one entry. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.",
-        "lpn_quality_initial": "Initial quality",
-        "lpn_quality_initial_tip": "How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty and the node starts with none of the chemical.",
-        "lpn_result_concentration": "Concentration",
-        "lpn_result_concentration_tip": "How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.",
-        "lpn_source_type": "Source type",
-        "lpn_source_type_tip": "What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the Source quality value. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the concentration leaving this node to the Source quality value and no further. Flow-paced booster adds the Source quality value to whatever is already in the water.",
-        "lpn_source_type_concen": "Concentration",
-        "lpn_source_type_mass": "Mass booster",
-        "lpn_source_type_setpoint": "Setpoint booster",
-        "lpn_source_type_flowpaced": "Flow-paced booster",
-        "lpn_source_quality": "Source quality",
-        "lpn_source_quality_tip": "How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.",
-        "lpn_source_pattern": "Source pattern",
-        "lpn_source_pattern_tip": "A time pattern that scales the dose through the run, for a feed that is not constant. No pattern means that the dose is the same at every step.",
-        "lpn_mixing_model": "Mixing model",
-        "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two-compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
-        "lpn_mixing_mixed": "Complete mixing",
-        "lpn_mixing_2comp": "Two-compartment mixing",
-        "lpn_mixing_fifo": "FIFO plug flow",
-        "lpn_mixing_lifo": "LIFO plug flow",
-        "lpn_mixing_fraction": "Mixing fraction",
-        "lpn_mixing_fraction_tip": "The share of the tank volume that the inlet zone takes up, between 0 and 1. Only two compartment mixing uses it. Leave it empty and the whole tank is the inlet zone, which is what EPANET assumes.",
-        "lpn_reaction_bulk": "Bulk reaction coefficient",
-        "lpn_reaction_bulk_tip": "Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one increases it. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a rate in 1\/day. An empty box means no bulk reaction.",
-        "lpn_reaction_wall": "Wall reaction coefficient",
-        "lpn_reaction_wall_tip": "Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.",
-        "lpn_reaction_pipe_tip": "This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.",
-        "lpn_reaction_tank": "Reaction coefficient",
-        "lpn_reaction_tank_tip": "Reaction in the water held in this tank, as a rate in 1\/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Leave it empty and the tank uses the bulk reaction coefficient set for the whole network under Settings, Water quality.",
-        "lpn_reaction_bulk_short": "Bulk reaction",
-        "lpn_reaction_wall_short": "Wall reaction",
-        "lpn_reaction_tank_short": "Reaction",
-        "lpn_reaction_per_day": "1\/day",
-        "lpn_reaction_day": "day",
-        "lpn_reaction_note": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.",
-        "lpn_settings_energy": "Energy",
-        "lpn_reports_menu": "Reports",
-        "lpn_reports_menu_tip": "The finished answers this page produces once a network has been calculated: what the pumps cost, how the scenarios compare, and what the EPANET solver itself printed.",
-        "lpn_reports_epanet": "EPANET run",
-        "lpn_energy_title": "Pump energy report",
-        "lpn_energy_menu": "Pump energy",
-        "lpn_energy_menu_tip": "What share of the run each pump was on, what power it drew and what it cost over the last extended period simulation.",
-        "lpn_energy_efficiency": "Pump efficiency (percent)",
-        "lpn_energy_efficiency_tip": "The wire-to-water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
-        "lpn_energy_price": "Price of power",
-        "lpn_energy_price_tip": "What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.",
-        "lpn_energy_pump_price_tip": "What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.",
-        "lpn_energy_price_pattern": "Price pattern",
-        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price at each pattern step, which is how an off-peak rate is specified. Leave it empty for one price throughout the run.",
-        "lpn_energy_demand_charge": "Peak demand charge",
-        "lpn_energy_demand_charge_tip": "What the utility charges per kW for the peak load demanded by the pumps in the system.",
-        "lpn_energy_currency": "Currency",
-        "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you have written here.",
-        "lpn_energy_kwh": "kWh",
-        "lpn_energy_kw": "kW",
-        "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
-        "lpn_energy_needs_run": "Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.",
-        "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
-        "lpn_scncmp_title": "Scenario comparison",
-        "lpn_scncmp_menu_tip": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
-        "lpn_scncmp_running": "Solving every scenario…",
-        "lpn_scncmp_empty": "Nothing has been drawn yet, so there is nothing to solve.",
-        "lpn_scncmp_col_minpressure": "Lowest pressure",
-        "lpn_scncmp_col_maxvelocity": "Highest velocity",
-        "lpn_scncmp_at": "{value} at {id}",
-        "lpn_scncmp_current": "(currently open)",
-        "lpn_scncmp_note": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
-        "lpn_energy_over": "For extended period simulation of {time}",
-        "lpn_energy_col_pump": "Pump",
-        "lpn_energy_col_running": "% of run",
-        "lpn_energy_col_effic": "Effic.",
-        "lpn_energy_col_avg_kw": "Avg. kW",
-        "lpn_energy_col_avg_kw_tip": "The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.",
-        "lpn_energy_col_peak_kw": "Peak kW",
-        "lpn_energy_col_kwh": "kWh",
-        "lpn_energy_col_cost": "Cost",
-        "lpn_energy_total_kwh": "Energy used",
-        "lpn_energy_total_energy_cost": "Cost of energy",
-        "lpn_energy_peak_kw": "Peak power usage",
-        "lpn_energy_total_demand_charge": "Cost of peak demand",
-        "lpn_energy_total_cost": "Total cost",
-        "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
-        "lpn_energy_price_zero": "This network states a price of zero, so every cost here is zero. Change it under Settings, Energy.",
-        "lpn_energy_curve_note": "These pumps call an efficiency curve with no points: {ids}. They ran at the efficiency set for the whole network.",
-        "lpn_library_curve_add": "Add a curve",
-        "lpn_library_curve_type_tip": "What this curve describes",
-        "lpn_library_curve_type": "Curve type",
-        "lpn_library_curve_equation": "Equation",
-        "lpn_library_curve_equation_tip": "The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The built-in solver runs on this equation; the EPANET engine reads the points themselves.",
-        "lpn_library_curve_values_tip": "Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. You can also paste lines copied straight out of an EPANET file, including the curve name.",
-        "lpn_library_curve_note_label": "Description",
-        "lpn_library_curve_note_tip": "What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.",
-        "lpn_library_curve_remove_point": "Remove this point",
-        "lpn_library_curve_copy": "Copy points",
-        "lpn_library_curve_copy_tip": "Copies every point as two columns, ready to paste into a spreadsheet.",
-        "lpn_library_curve_copy_manual": "Copy these points",
-        "lpn_library_curve_used_by": "Elements using this curve",
-        "lpn_library_curve_unused": "Nothing uses this curve.",
-        "lpn_library_curve_in_use": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.",
+        "lpn_reaction_order_bulk": "Bulk reaction order",
+        "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
+        "lpn_reaction_order_tank": "Tank reaction order",
+        "lpn_reaction_order_tank_tip": "The same power, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
+        "lpn_reaction_order_wall": "Wall reaction order",
+        "lpn_reaction_order_wall_tip": "Whether the reaction at the pipe wall depends on how much chemical is in the water. First order means it does, and the wall coefficient is then a length per day. Zero order means it does not, and the coefficient becomes a mass per area per day instead. EPANET allows only these two, which is why this is a chooser and not a number. It also decides how this page converts the wall coefficient, so the row above it means something different depending on what you pick here.",
+        "lpn_reaction_order_unstated": "Not stated",
+        "lpn_reaction_order_zero": "0, zero order",
+        "lpn_reaction_order_first": "1, first order",
+        "lpn_reaction_limiting": "Limiting potential",
+        "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. It is written in the same units as the chemical itself, and EPANET converts a concentration for nobody, so write it in the units named beside the chemical. Leave it empty and there is no limit.",
+        "lpn_reaction_rough_corr": "Roughness correlation",
+        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all.",
         "lpn_library_curve_x": "X",
-        "lpn_library_curve_y": "Y",
-        "lpn_library_rules": "Rules",
-        "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time reaches a value you set. Rules can test more than one thing at once, and they can say what to do when the test fails.",
-        "lpn_library_rule_add": "Add a rule",
-        "lpn_library_rule_tip": "One rule, in the words EPANET uses, one clause per line. A first line names it: RULE 1. Then a condition: IF TANK 2 LEVEL BELOW 17.1. Then what to do about it: THEN PUMP 9 STATUS IS OPEN. A last line may rank it: PRIORITY 1. Add AND or OR lines to test more than one thing, and ELSE lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Write the numbers in the units this project is showing; they are converted for you. Leave the keywords in English; they are what the page and EPANET read.",
-        "lpn_library_rule_ok": "✓ This rule was read",
-        "lpn_library_rule_bad": "⚠ This rule could not be read",
-        "lpn_library_rule_missing": "⚠ This network has nothing called {id}",
-        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both call this reading the static pressure, and it is where a fire flow test starts."
+        "lpn_library_curve_y": "Y"
     },
     "keys": {
-        "lpn_wrong_btn": "Something wrong here?",
-        "lpn_wrong_tip": "One press tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have typed, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
-        "lpn_wrong_thanks": "Thank you. That reached us.",
-        "lpn_find_prop_demand_desc": "Description of this demand category",
-        "lpn_new_units_tip": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
-        "lpn_inp_drop_sources_mixing": "This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.",
-        "lpn_inp_drop_net_options": "This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
-        "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
-        "lpn_gpv_curve_source": "Valve head loss curve",
-        "lpn_gpv_curve_source_tip": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.",
-        "lpn_pump_curve_source_tip": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
-        "lpn_field_tag": "Tag",
-        "lpn_field_tag_tip": "A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.",
-        "lpn_pump_effic_curve": "Pump efficiency curve",
-        "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
-        "lpn_curve_none": "No curve selected",
-        "lpn_curve_library_link": "Curves",
-        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.",
-        "lpn_curve_kind_head": "Pump head",
-        "lpn_curve_kind_effic": "Pump efficiency",
-        "lpn_curve_kind_volume": "Tank volume",
-        "lpn_curve_kind_headloss": "Valve head loss",
-        "lpn_curve_kind_generic": "Kind not stated",
-        "lpn_curve_volume_col": "Volume",
-        "lpn_pump_effic_col": "Efficiency",
-        "lpn_pump_effic_global": "This pump has no efficiency curve selected, so it runs at the efficiency set for the whole network, {percent}.",
-        "lpn_pump_effic_unstated": "This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the efficiency set for the whole network, {percent}.",
-        "lpn_rule_dangling_note": "These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}",
-        "lpn_rule_unreadable_note": "These rules could not be read, so they were ignored in this run: {ids}",
-        "lpn_time_run_report_copy": "Copy",
-        "lpn_time_run_report_copied": "Copied",
-        "lpn_setbox_divider": "Width of the Settings section list",
-        "lpn_quality_chemical_name": "Chemical and units",
-        "lpn_quality_chemical_name_tip": "The name of the chemical and the units its concentrations are written in: for example, write Chlorine mg\/L as one entry. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.",
-        "lpn_quality_initial": "Initial quality",
-        "lpn_quality_initial_tip": "How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty and the node starts with none of the chemical.",
-        "lpn_result_concentration": "Concentration",
-        "lpn_result_concentration_tip": "How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.",
-        "lpn_source_type": "Source type",
-        "lpn_source_type_tip": "What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the Source quality value. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the concentration leaving this node to the Source quality value and no further. Flow-paced booster adds the Source quality value to whatever is already in the water.",
-        "lpn_source_type_concen": "Concentration",
-        "lpn_source_type_mass": "Mass booster",
-        "lpn_source_type_setpoint": "Setpoint booster",
-        "lpn_source_type_flowpaced": "Flow-paced booster",
-        "lpn_source_quality": "Source quality",
-        "lpn_source_quality_tip": "How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.",
-        "lpn_source_pattern": "Source pattern",
-        "lpn_source_pattern_tip": "A time pattern that scales the dose through the run, for a feed that is not constant. No pattern means that the dose is the same at every step.",
-        "lpn_mixing_model": "Mixing model",
-        "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two-compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
-        "lpn_mixing_mixed": "Complete mixing",
-        "lpn_mixing_2comp": "Two-compartment mixing",
-        "lpn_mixing_fifo": "FIFO plug flow",
-        "lpn_mixing_lifo": "LIFO plug flow",
-        "lpn_mixing_fraction": "Mixing fraction",
-        "lpn_mixing_fraction_tip": "The share of the tank volume that the inlet zone takes up, between 0 and 1. Only two compartment mixing uses it. Leave it empty and the whole tank is the inlet zone, which is what EPANET assumes.",
-        "lpn_reaction_bulk": "Bulk reaction coefficient",
-        "lpn_reaction_bulk_tip": "Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one increases it. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a rate in 1\/day. An empty box means no bulk reaction.",
-        "lpn_reaction_wall": "Wall reaction coefficient",
-        "lpn_reaction_wall_tip": "Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.",
-        "lpn_reaction_pipe_tip": "This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.",
-        "lpn_reaction_tank": "Reaction coefficient",
-        "lpn_reaction_tank_tip": "Reaction in the water held in this tank, as a rate in 1\/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Leave it empty and the tank uses the bulk reaction coefficient set for the whole network under Settings, Water quality.",
-        "lpn_reaction_bulk_short": "Bulk reaction",
-        "lpn_reaction_wall_short": "Wall reaction",
-        "lpn_reaction_tank_short": "Reaction",
-        "lpn_reaction_per_day": "1\/day",
-        "lpn_reaction_day": "day",
-        "lpn_reaction_note": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.",
-        "lpn_settings_energy": "Energy",
-        "lpn_reports_menu": "Reports",
-        "lpn_reports_menu_tip": "The finished answers this page produces once a network has been calculated: what the pumps cost, how the scenarios compare, and what the EPANET solver itself printed.",
-        "lpn_reports_epanet": "EPANET run",
-        "lpn_energy_title": "Pump energy report",
-        "lpn_energy_menu": "Pump energy",
-        "lpn_energy_menu_tip": "What share of the run each pump was on, what power it drew and what it cost over the last extended period simulation.",
-        "lpn_energy_efficiency": "Pump efficiency (percent)",
-        "lpn_energy_efficiency_tip": "The wire-to-water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
-        "lpn_energy_price": "Price of power",
-        "lpn_energy_price_tip": "What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.",
-        "lpn_energy_pump_price_tip": "What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.",
-        "lpn_energy_price_pattern": "Price pattern",
-        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price at each pattern step, which is how an off-peak rate is specified. Leave it empty for one price throughout the run.",
-        "lpn_energy_demand_charge": "Peak demand charge",
-        "lpn_energy_demand_charge_tip": "What the utility charges per kW for the peak load demanded by the pumps in the system.",
-        "lpn_energy_currency": "Currency",
-        "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you have written here.",
-        "lpn_energy_kwh": "kWh",
-        "lpn_energy_kw": "kW",
-        "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
-        "lpn_energy_needs_run": "Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.",
-        "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
-        "lpn_scncmp_title": "Scenario comparison",
-        "lpn_scncmp_menu_tip": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
-        "lpn_scncmp_running": "Solving every scenario…",
-        "lpn_scncmp_empty": "Nothing has been drawn yet, so there is nothing to solve.",
-        "lpn_scncmp_col_minpressure": "Lowest pressure",
-        "lpn_scncmp_col_maxvelocity": "Highest velocity",
-        "lpn_scncmp_at": "{value} at {id}",
-        "lpn_scncmp_current": "(currently open)",
-        "lpn_scncmp_note": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
-        "lpn_energy_over": "For extended period simulation of {time}",
-        "lpn_energy_col_pump": "Pump",
-        "lpn_energy_col_running": "% of run",
-        "lpn_energy_col_effic": "Effic.",
-        "lpn_energy_col_avg_kw": "Avg. kW",
-        "lpn_energy_col_avg_kw_tip": "The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.",
-        "lpn_energy_col_peak_kw": "Peak kW",
-        "lpn_energy_col_kwh": "kWh",
-        "lpn_energy_col_cost": "Cost",
-        "lpn_energy_total_kwh": "Energy used",
-        "lpn_energy_total_energy_cost": "Cost of energy",
-        "lpn_energy_peak_kw": "Peak power usage",
-        "lpn_energy_total_demand_charge": "Cost of peak demand",
-        "lpn_energy_total_cost": "Total cost",
-        "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
-        "lpn_energy_price_zero": "This network states a price of zero, so every cost here is zero. Change it under Settings, Energy.",
-        "lpn_energy_curve_note": "These pumps call an efficiency curve with no points: {ids}. They ran at the efficiency set for the whole network.",
-        "lpn_library_curve_add": "Add a curve",
-        "lpn_library_curve_type_tip": "What this curve describes",
-        "lpn_library_curve_type": "Curve type",
-        "lpn_library_curve_equation": "Equation",
-        "lpn_library_curve_equation_tip": "The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The built-in solver runs on this equation; the EPANET engine reads the points themselves.",
-        "lpn_library_curve_values_tip": "Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. You can also paste lines copied straight out of an EPANET file, including the curve name.",
-        "lpn_library_curve_note_label": "Description",
-        "lpn_library_curve_note_tip": "What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.",
-        "lpn_library_curve_remove_point": "Remove this point",
-        "lpn_library_curve_copy": "Copy points",
-        "lpn_library_curve_copy_tip": "Copies every point as two columns, ready to paste into a spreadsheet.",
-        "lpn_library_curve_copy_manual": "Copy these points",
-        "lpn_library_curve_used_by": "Elements using this curve",
-        "lpn_library_curve_unused": "Nothing uses this curve.",
-        "lpn_library_curve_in_use": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.",
+        "lpn_reaction_order_bulk": "Bulk reaction order",
+        "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
+        "lpn_reaction_order_tank": "Tank reaction order",
+        "lpn_reaction_order_tank_tip": "The same power, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
+        "lpn_reaction_order_wall": "Wall reaction order",
+        "lpn_reaction_order_wall_tip": "Whether the reaction at the pipe wall depends on how much chemical is in the water. First order means it does, and the wall coefficient is then a length per day. Zero order means it does not, and the coefficient becomes a mass per area per day instead. EPANET allows only these two, which is why this is a chooser and not a number. It also decides how this page converts the wall coefficient, so the row above it means something different depending on what you pick here.",
+        "lpn_reaction_order_unstated": "Not stated",
+        "lpn_reaction_order_zero": "0, zero order",
+        "lpn_reaction_order_first": "1, first order",
+        "lpn_reaction_limiting": "Limiting potential",
+        "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. It is written in the same units as the chemical itself, and EPANET converts a concentration for nobody, so write it in the units named beside the chemical. Leave it empty and there is no limit.",
+        "lpn_reaction_rough_corr": "Roughness correlation",
+        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all.",
         "lpn_library_curve_x": "X",
-        "lpn_library_curve_y": "Y",
-        "lpn_library_rules": "Rules",
-        "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time reaches a value you set. Rules can test more than one thing at once, and they can say what to do when the test fails.",
-        "lpn_library_rule_add": "Add a rule",
-        "lpn_library_rule_tip": "One rule, in the words EPANET uses, one clause per line. A first line names it: RULE 1. Then a condition: IF TANK 2 LEVEL BELOW 17.1. Then what to do about it: THEN PUMP 9 STATUS IS OPEN. A last line may rank it: PRIORITY 1. Add AND or OR lines to test more than one thing, and ELSE lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Write the numbers in the units this project is showing; they are converted for you. Leave the keywords in English; they are what the page and EPANET read.",
-        "lpn_library_rule_ok": "✓ This rule was read",
-        "lpn_library_rule_bad": "⚠ This rule could not be read",
-        "lpn_library_rule_missing": "⚠ This network has nothing called {id}",
-        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both call this reading the static pressure, and it is where a fire flow test starts."
+        "lpn_library_curve_y": "Y"
     },
     "key_context": {
-        "lpn_wrong_btn": {
+        "lpn_reaction_order_bulk": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_help_notes",
-                    "value": "Заметки об этой странице",
-                    "english": "Notes on this page"
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_status_example_opened",
-                    "value": "Открыт пример «{name}». Это ваша копия: сохраните её через «Файл» → «Сохранить как».",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_wrong_tip": {
+        "lpn_reaction_order_bulk_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_help_notes",
-                    "value": "Заметки об этой странице",
-                    "english": "Notes on this page"
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_status_example_opened",
-                    "value": "Открыт пример «{name}». Это ваша копия: сохраните её через «Файл» → «Сохранить как».",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_wrong_thanks": {
+        "lpn_reaction_order_tank": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_help_notes",
-                    "value": "Заметки об этой странице",
-                    "english": "Notes on this page"
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_status_example_opened",
-                    "value": "Открыт пример «{name}». Это ваша копия: сохраните её через «Файл» → «Сохранить как».",
-                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_find_prop_demand_desc": {
+        "lpn_reaction_order_tank_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_find_prop_connection",
-                    "value": "Связность",
-                    "english": "Connectivity"
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_find_op_conn_unlinked",
-                    "value": "нет связей у узла",
-                    "english": "no links at node"
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_new_units_tip": {
+        "lpn_reaction_order_wall": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_new_place_tip",
-                    "value": "Необязательно. Введите название города, улицы или ориентира, и новая карта откроется там. Введённый текст отправляется в службу поиска мест OpenStreetMap, которая при первом обращении спросит ваше разрешение. Оставьте поле пустым, и карта откроется на весь мир.",
-                    "english": "Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap's place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world."
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_new_place_hint",
-                    "value": "Петалума, Калифорния",
-                    "english": "Petaluma, California"
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_inp_drop_sources_mixing": {
+        "lpn_reaction_order_wall_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_inp_drop_quality",
-                    "value": "Этот файл описывает, как меняется качество воды при её движении: что изначально содержится в воде, где в неё поступает больше этого вещества, как оно реагирует и как перемешивается в баках. Эта страница вычисляет возраст воды и трассировку источника, но не химию, поэтому здесь ничего из этого не используется. Эти строки сохраняются и записываются обратно, если вы сохраните файл EPANET.",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Water quality, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file."
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_inp_drop_energy",
-                    "value": "Этот файл EPANET содержит данные для расчёта стоимости перекачки. Эта страница не вычисляет энергию или стоимость, поэтому эти числа здесь не используются. Они сохраняются и записываются обратно, если вы сохраните файл EPANET.",
-                    "english": "This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file."
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_inp_drop_net_options": {
+        "lpn_reaction_order_unstated": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_inp_drop_other_options",
-                    "value": "В этом файле заданы параметры, которые эта страница не читает. Здесь они не используются. Они сохраняются и записываются обратно, если вы сохраните файл EPANET.",
-                    "english": "This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file."
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_inp_drop_backdrop",
-                    "value": "В этом файле указано фоновое изображение, но само изображение в нём не содержится. Добавьте его самостоятельно через «Фоновое изображение» → «Добавить изображение».",
-                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_net_emergency": {
+        "lpn_reaction_order_zero": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_inp_drop_other_options",
-                    "value": "В этом файле заданы параметры, которые эта страница не читает. Здесь они не используются. Они сохраняются и записываются обратно, если вы сохраните файл EPANET.",
-                    "english": "This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file."
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_inp_drop_backdrop",
-                    "value": "В этом файле указано фоновое изображение, но само изображение в нём не содержится. Добавьте его самостоятельно через «Фоновое изображение» → «Добавить изображение».",
-                    "english": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image."
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_gpv_curve_source": {
+        "lpn_reaction_order_first": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_inp_drop_gpv_curve",
-                    "value": "Этот клапан ссылается на кривую потерь напора, которой нет в файле. Клапан перенесён без кривой и остаётся полностью открытым, пока вы её не зададите.",
-                    "english": "This valve refers to a head loss curve that is not in the file. The valve came in with no curve, so it stays fully open until you give it one."
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_field_valve_setting_pressure",
-                    "value": "Уставка давления",
-                    "english": "Pressure setting"
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_gpv_curve_source_tip": {
+        "lpn_reaction_limiting": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_inp_drop_gpv_curve",
-                    "value": "Этот клапан ссылается на кривую потерь напора, которой нет в файле. Клапан перенесён без кривой и остаётся полностью открытым, пока вы её не зададите.",
-                    "english": "This valve refers to a head loss curve that is not in the file. The valve came in with no curve, so it stays fully open until you give it one."
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_field_valve_setting_pressure",
-                    "value": "Уставка давления",
-                    "english": "Pressure setting"
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_pump_curve_source_tip": {
+        "lpn_reaction_limiting_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_field_tag": {
+        "lpn_reaction_rough_corr": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
-        "lpn_field_tag_tip": {
+        "lpn_reaction_rough_corr_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
+                    "key": "lpn_reaction_day",
+                    "value": "сут",
+                    "english": "day"
                 },
                 "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_pump_effic_curve": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_pump_effic_curve_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_curve_none": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_curve_library_link": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_curve_library_link_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_curve_kind_head": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_curve_kind_effic": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_curve_kind_volume": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_curve_kind_headloss": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_curve_kind_generic": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_curve_volume_col": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_pump_effic_col": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_pump_effic_global": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_pump_effic_unstated": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_source",
-                    "value": "Источник кривой",
-                    "english": "Pump head curve"
-                },
-                "next_translated": {
-                    "key": "lpn_mode_select",
-                    "value": "Режим: Выбор. Щёлкните элемент или подпись, чтобы посмотреть или изменить его. Перетащите, чтобы переместить узел, вершину или подпись. Используйте инструмент «Вершины», чтобы добавить или убрать изгибы трубы.",
-                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
-                }
-            }
-        },
-        "lpn_rule_dangling_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_control_unreadable_note",
-                    "value": "Эти управления не удалось прочитать, поэтому они были пропущены: {ids}",
-                    "english": "These controls could not be read, so they were left out: {ids}"
-                },
-                "next_translated": {
-                    "key": "lpn_engine_minor_loss_note",
-                    "value": "Примечание: с расчётным ядром EPANET местные потери получаются чуть ниже, чем со встроенным решателем, потому что EPANET округляет используемое значение ускорения свободного падения.",
-                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
-                }
-            }
-        },
-        "lpn_rule_unreadable_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_control_unreadable_note",
-                    "value": "Эти управления не удалось прочитать, поэтому они были пропущены: {ids}",
-                    "english": "These controls could not be read, so they were left out: {ids}"
-                },
-                "next_translated": {
-                    "key": "lpn_engine_minor_loss_note",
-                    "value": "Примечание: с расчётным ядром EPANET местные потери получаются чуть ниже, чем со встроенным решателем, потому что EPANET округляет используемое значение ускорения свободного падения.",
-                    "english": "Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity."
-                }
-            }
-        },
-        "lpn_time_run_report_copy": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_run_report",
-                    "value": "Отчёт о расчёте EPANET",
-                    "english": "EPANET run report"
-                },
-                "next_translated": {
-                    "key": "lpn_time_run_report_tip",
-                    "value": "То, что само расчётное ядро EPANET вывело о последнем расчёте: как он сошёлся и о чём предупредило ядро. Это собственный текст ядра, а не наш.",
-                    "english": "What the EPANET solver itself printed about the last run: whether it converged, and anything it warned about. It is the solver’s own text, not ours."
-                }
-            }
-        },
-        "lpn_time_run_report_copied": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_time_run_report",
-                    "value": "Отчёт о расчёте EPANET",
-                    "english": "EPANET run report"
-                },
-                "next_translated": {
-                    "key": "lpn_time_run_report_tip",
-                    "value": "То, что само расчётное ядро EPANET вывело о последнем расчёте: как он сошёлся и о чём предупредило ядро. Это собственный текст ядра, а не наш.",
-                    "english": "What the EPANET solver itself printed about the last run: whether it converged, and anything it warned about. It is the solver’s own text, not ours."
-                }
-            }
-        },
-        "lpn_setbox_divider": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_settings_no_match",
-                    "value": "Ни одна настройка не содержит этого слова.",
-                    "english": "No setting mentions that word."
-                },
-                "next_translated": {
-                    "key": "lpn_rpane_empty",
-                    "value": "Здесь пока ничего не закреплено. Всё, что относится ко всему проекту, находится в настройках.",
-                    "english": "Nothing is docked here yet. Everything that belongs to the whole project is in Settings."
-                }
-            }
-        },
-        "lpn_quality_chemical_name": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_quality_chemical_name_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_quality_initial": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_quality_initial_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_result_concentration": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_result_concentration_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_source_type": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_source_type_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_source_type_concen": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_source_type_mass": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_source_type_setpoint": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_source_type_flowpaced": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_source_quality": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_source_quality_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_source_pattern": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_source_pattern_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_mixing_model": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_mixing_model_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_mixing_mixed": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_mixing_2comp": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_mixing_fifo": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_mixing_lifo": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_mixing_fraction": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_mixing_fraction_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_bulk": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_bulk_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_wall": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_wall_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_pipe_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_tank": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_tank_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_bulk_short": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_wall_short": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_tank_short": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_per_day": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_day": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reaction_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_settings_energy": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reports_menu": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reports_menu_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_reports_epanet": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_menu": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_menu_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_efficiency": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_efficiency_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_price": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_price_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_pump_price_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_price_pattern": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_price_pattern_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_demand_charge": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_demand_charge_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_currency": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_currency_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_kwh": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_kw": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_price_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_needs_run": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_no_pumps": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_scncmp_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_scncmp_menu_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_scncmp_running": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_scncmp_empty": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_scncmp_col_minpressure": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_scncmp_col_maxvelocity": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_scncmp_at": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_scncmp_current": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_scncmp_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_over": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_col_pump": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_col_running": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_col_effic": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_col_avg_kw": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_col_avg_kw_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_col_peak_kw": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_col_kwh": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_col_cost": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_total_kwh": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_total_energy_cost": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_peak_kw": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_total_demand_charge": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_total_cost": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_no_price": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_price_zero": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_energy_curve_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_quality_needs_run",
-                    "value": "Качество воды переносится по трубам во времени, поэтому для этого нужны расчётное ядро EPANET и общая продолжительность работы. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».",
-                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
-                },
-                "next_translated": {
-                    "key": "lpn_labels_col_decimals_example",
-                    "value": "0,000",
-                    "english": "0.000"
-                }
-            }
-        },
-        "lpn_library_curve_add": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_type_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_type": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_equation": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_equation_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_values_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_note_label": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_note_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_remove_point": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_copy": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_copy_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_copy_manual": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_used_by": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_unused": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
-                }
-            }
-        },
-        "lpn_library_curve_in_use": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
-                },
-                "next_translated": {
-                    "key": "lpn_library_controls",
-                    "value": "Управления",
-                    "english": "Controls"
+                    "key": "lpn_reaction_note",
+                    "value": "Эта страница не предлагает собственного коэффициента реакции. Стандартного метода его определения не существует, а опубликованные полевые значения для одной и той же воды различаются в десять раз, поэтому любое число, приведённое здесь, воспринималось бы как рекомендация. Введите значение, которое вы измерили сами или на которое можете сослаться, либо оставьте поля пустыми для вещества, которое не реагирует.",
+                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
         "lpn_library_curve_x": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "X",
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Эту кривую использует {count} элементов: {ids}. Сначала перенаправьте их на другую кривую, а затем удалите эту.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2938,13 +762,13 @@
             }
         },
         "lpn_library_curve_y": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "Y",
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_library_curves_note",
-                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Эту кривую использует {count} элементов: {ids}. Сначала перенаправьте их на другую кривую, а затем удалите эту.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2952,137 +776,7 @@
                     "english": "Controls"
                 }
             }
-        },
-        "lpn_library_rules": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_control_missing",
-                    "value": "⚠ В этой сети нет ничего с именем {id}",
-                    "english": "⚠ This network has nothing called {id}"
-                },
-                "next_translated": {
-                    "key": "lpn_field_base_demand",
-                    "value": "Базовый расход отбора",
-                    "english": "Base demand"
-                }
-            }
-        },
-        "lpn_library_rules_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_control_missing",
-                    "value": "⚠ В этой сети нет ничего с именем {id}",
-                    "english": "⚠ This network has nothing called {id}"
-                },
-                "next_translated": {
-                    "key": "lpn_field_base_demand",
-                    "value": "Базовый расход отбора",
-                    "english": "Base demand"
-                }
-            }
-        },
-        "lpn_library_rule_add": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_control_missing",
-                    "value": "⚠ В этой сети нет ничего с именем {id}",
-                    "english": "⚠ This network has nothing called {id}"
-                },
-                "next_translated": {
-                    "key": "lpn_field_base_demand",
-                    "value": "Базовый расход отбора",
-                    "english": "Base demand"
-                }
-            }
-        },
-        "lpn_library_rule_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_control_missing",
-                    "value": "⚠ В этой сети нет ничего с именем {id}",
-                    "english": "⚠ This network has nothing called {id}"
-                },
-                "next_translated": {
-                    "key": "lpn_field_base_demand",
-                    "value": "Базовый расход отбора",
-                    "english": "Base demand"
-                }
-            }
-        },
-        "lpn_library_rule_ok": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_control_missing",
-                    "value": "⚠ В этой сети нет ничего с именем {id}",
-                    "english": "⚠ This network has nothing called {id}"
-                },
-                "next_translated": {
-                    "key": "lpn_field_base_demand",
-                    "value": "Базовый расход отбора",
-                    "english": "Base demand"
-                }
-            }
-        },
-        "lpn_library_rule_bad": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_control_missing",
-                    "value": "⚠ В этой сети нет ничего с именем {id}",
-                    "english": "⚠ This network has nothing called {id}"
-                },
-                "next_translated": {
-                    "key": "lpn_field_base_demand",
-                    "value": "Базовый расход отбора",
-                    "english": "Base demand"
-                }
-            }
-        },
-        "lpn_library_rule_missing": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_library_control_missing",
-                    "value": "⚠ В этой сети нет ничего с именем {id}",
-                    "english": "⚠ This network has nothing called {id}"
-                },
-                "next_translated": {
-                    "key": "lpn_field_base_demand",
-                    "value": "Базовый расход отбора",
-                    "english": "Base demand"
-                }
-            }
-        },
-        "lpn_ff_col_static_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_col_static",
-                    "value": "Статическое давление",
-                    "english": "Static pressure"
-                },
-                "next_translated": {
-                    "key": "lpn_ff_col_available",
-                    "value": "Располагаемый расход",
-                    "english": "Available flow"
-                }
-            }
         }
     },
-    "key_syn": {
-        "lpn_field_tag": "User defined field, Asset tag, Grouping field"
-    }
+    "key_syn": []
 }

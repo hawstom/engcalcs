@@ -293,14 +293,30 @@ ok('the thank-you promises nothing', !/(reply|answer|respond|get back|soon|short
 ok('no em dash in any of the three, which is the one surviving advisory',
 	[tip, thanksEn, btnEn].every(function (v) { return v.indexOf('—') < 0; }));
 
-// AN ABSENT KEY IS THE CORRECT UNTRANSLATED STATE. A byte-identical copy in another language file
-// is a different thing and blocks the build; this catches it at the source.
-const strays = fs.readdirSync(path.join(ROOT, 'lib'))
+// **AN ABSENT KEY IS THE CORRECT UNTRANSLATED STATE, AND A TRANSLATED ONE IS THE CORRECT TRANSLATED
+// STATE.** This asserted the three keys were in `lang.ec.en.php` ALONE, which was true while they
+// were new and stopped being true the moment sprint 584-wave1 translated them -- so it failed on the
+// sprint doing its job, which is the worst kind of red. The comment above it always named the real
+// rule and the assertion did not: what blocks the build is a byte-IDENTICAL copy in another
+// language file, never a genuine translation. That is the rule now asserted.
+const wrongKeys = ["lpn_wrong_tip", "lpn_wrong_thanks", "lpn_wrong_btn"];
+const enVals = {};
+wrongKeys.forEach(function (k) {
+	const m = new RegExp("\\$ec_lang\\['" + k + "'\\]='((?:[^'\\\\]|\\\\.)*)';").exec(en);
+	if (m) { enVals[k] = m[1]; }
+});
+const strays = [];
+fs.readdirSync(path.join(ROOT, 'lib'))
 	.filter(function (f) { return /^lang\.ec\.[a-z]{2}\.php$/.test(f) && f !== 'lang.ec.en.php'; })
-	.filter(function (f) {
-		return fs.readFileSync(path.join(ROOT, 'lib', f), 'utf8').indexOf("['lpn_wrong_") >= 0;
+	.forEach(function (f) {
+		const txt = fs.readFileSync(path.join(ROOT, 'lib', f), 'utf8');
+		wrongKeys.forEach(function (k) {
+			if (enVals[k] === undefined) { return; }
+			const m = new RegExp("\\$ec_lang\\['" + k + "'\\]='((?:[^'\\\\]|\\\\.)*)';").exec(txt);
+			if (m && m[1] === enVals[k]) { strays.push(f + ':' + k); }
+		});
 	});
-ok('the three keys are in lib/lang.ec.en.php only', strays.length === 0, strays.join(','));
+ok('no language file carries a byte-identical copy of any of the three', strays.length === 0, strays.join(','));
 
 console.log('\n' + (fails ? fails + ' FAILURE(S)' : 'ALL PASS'));
 process.exit(fails ? 1 : 0);

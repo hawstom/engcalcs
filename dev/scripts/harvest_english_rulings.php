@@ -97,8 +97,15 @@ function ecParseRulingsMd(string $text): array
         if ($inVal && preg_match('/^  > ?(.*)$/', $line, $m)) { $val[] = $m[1]; continue; }
         $inVal = false;
         if (trim($line) === '') { continue; }
-        /* Generated furniture inside the mark area: the finding and its numbered readings. */
+        /* **GENERATED FURNITURE INSIDE THE MARK AREA. EVERY LINE THE GENERATOR CAN EMIT HERE MUST
+         * BE LISTED, or the harvester reads its own output as somebody's handwriting.** That is not
+         * hypothetical: `**What this asks for:**` and `*The proposal:*` were added to
+         * new_english_keys.php the same day this list was written and NOT added here, so the very
+         * next run reported a generated paragraph as an unharvested ruling and failed the build.
+         * A line added to ecAskLine() or ecFrictionSection() belongs in this list in the same edit. */
         if (preg_match('/^  \*The finding:\*/', $line)) { continue; }
+        if (preg_match('/^  \*\*What this asks for:\*\*/', $line)) { continue; }
+        if (preg_match('/^  \*The proposal:\*/', $line)) { continue; }
         if (preg_match('/^  \d+\. /', $line)) { continue; }
         $mark[] = trim($line);
     }

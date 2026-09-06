@@ -1,0 +1,357 @@
+{
+ "sprint": "584-wave1",
+ "description": "The translation wave for the key set Wave 0 (584-wave0) reviewed: 145 new keys plus 40 whose English had drifted since the last sync, 185 each into 26 languages. Scope is dominated by water quality (lpn_quality_*, lpn_source_*, lpn_mixing_*, lpn_reaction_*), pump energy (lpn_energy_*), the Curves and Rules libraries, scenario comparison, the .inp import notices, and the EPS wording Tom ruled on the same day. Entries below are the translators' own suggestion-box findings, verbatim from their reports.",
+ "entries": [
+  {
+   "key": "lpn_curve_volume_col",
+   "source": "translator",
+   "lang": "fr",
+   "complaint": "'Volume' is also the correct French word, so a literal translation collides with the identical-to-english build gate even though it is not a translation error.",
+   "readings": [
+    "abbreviate to 'Vol.' to satisfy the check while staying a natural French column heading",
+    "leave it as 'Volume' and let the build fail"
+   ],
+   "disposition": "dismissed",
+   "resolution": "THE CHECK WAS WRONG, NOT THE TRANSLATION, AND THIS ENTRY IS WHY WE KNOW. Three agents (fr, pt, it) plus id hit the identical collision on this one key and each invented a worse word to clear the gate. `lpn_curve_volume_col` is now EXEMPT for fr, id, it and pt in dev/scripts/translation_exempt_keys.json, so the natural word is permitted. Dismissed as an ENGLISH defect -- the English is fine; the tooling was writing the translation. Recorded in dev/translation-process.md so every future brief tells agents to write the natural word and file, rather than dodge.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_result_concentration",
+   "source": "translator",
+   "lang": "fr",
+   "complaint": "Same cognate collision: 'Concentration' is the same word in French chemistry usage.",
+   "readings": [
+    "use the synonym 'Teneur', common in French water-quality reporting",
+    "keep 'Concentration' and accept the build-blocking finding"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Same cause, same fix: exempt for fr. 'Teneur' is a real French water-quality term and is not wrong, so it stands rather than being reverted; what the exemption buys is that the next agent is not forced into a substitution.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_source_type_concen",
+   "source": "translator",
+   "lang": "fr",
+   "complaint": "Same cognate collision, on an enum option label naming EPANET's CONCEN source type.",
+   "readings": [
+    "expand to 'Concentration imposee'",
+    "keep bare 'Concentration'"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Same cause, same fix: exempt for fr. 'Concentration imposee' also disambiguates the option against the other three injection types, which is a gain rather than a workaround, so it stands.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_library_curve_note_label",
+   "source": "translator",
+   "lang": "fr",
+   "complaint": "'Description' is identical in French too.",
+   "readings": [
+    "use 'Note descriptive'",
+    "keep 'Description'"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Same cause, same fix: exempt for fr.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_energy_col_effic",
+   "source": "translator",
+   "lang": "it",
+   "complaint": "'Effic.' abbreviates the Italian 'efficienza' the same way, so the correct Italian is byte-identical to the English.",
+   "readings": [
+    "choose 'Rend.' from rendimento",
+    "keep 'Effic.'"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Same cause: exempt for it. 'Rend.' (rendimento) is a standard Italian engineering term for a pump's efficiency and is arguably better than the abbreviation it replaced, so it stands.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_energy_col_cost",
+   "source": "translator",
+   "lang": "ro",
+   "complaint": "'Cost' is a true Romanian cognate and the bare form is what a column heading wants.",
+   "readings": [
+    "articulated 'Costul' to clear the gate",
+    "keep 'Cost'"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Same cause: exempt for ro. A column heading is the one place the bare, unarticulated form is wanted, so a future agent may write 'Cost'.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_mixing_fifo",
+   "source": "translator",
+   "lang": "he",
+   "complaint": "FIFO is an untranslatable acronym; the correct Hebrew keeps it, which lands byte-identical.",
+   "readings": [
+    "Hebrew word order around the kept acronym",
+    "keep the English phrase"
+   ],
+   "disposition": "dismissed",
+   "resolution": "FIFO and LIFO are untranslatable acronyms and are now exempt for EVERY language. The Hebrew rendering that keeps the acronym and orders the words in Hebrew stands; it is a real translation, not a dodge.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_scenario_overrides",
+   "source": "translator",
+   "lang": "de",
+   "complaint": "English reads as a plain count ('No. of custom values') but the standing ruling insists on 'Individuelle' for the concept; there is tension between a short column heading and staying consistent with the sibling tip.",
+   "readings": [
+    "Anzahl individueller Werte",
+    "Individuelle Werte, count implied by context"
+   ],
+   "disposition": "dismissed",
+   "resolution": "FIVE languages independently filed on this one key this sprint -- de, tr, zh, he and (in its report rather than as an entry) es. That is the strongest signal in the sprint and it is NOT re-litigated here: Tom set 'No. of custom values' himself on 2026-09-04 and reaffirmed it on 2026-09-06 (\"We resolved this yesterday... You are wrong\"), and wave0_keyset.php now excludes it so no future Wave 0 re-raises it. His ruling stands. The count is recorded for HIM, as evidence, not as an argument. 'Anzahl individueller Werte' keeps the ruled 'Individuelle' sense and is correct.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_time_running",
+   "source": "translator",
+   "lang": "de",
+   "complaint": "The glossary's preferred translation for 'solver' is 'Loeser', but the file already used both 'Loeser' and the loanword 'Solver' across older and newer strings; standardised on 'EPANET-Solver'.",
+   "readings": [
+    "EPANET-Solver / eingebauter Solver, consistent loanword",
+    "EPANET-Loeser, the glossary's literal preferred translation"
+   ],
+   "disposition": "intent",
+   "resolution": "English kept. The agent is right that the file was inconsistent between 'Loeser' and the loanword 'Solver', and standardising on 'EPANET-Solver' inside one language file is a translator's call about German usage, not an English defect. Recorded rather than reversed; a German reviewer may revisit it.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_energy_price",
+   "source": "translator",
+   "lang": "tr",
+   "complaint": "'Price of power' is ambiguous between a per-kWh energy price and a per-kW demand charge, and the suite has a separate 'Peak demand charge' key beside it.",
+   "readings": [
+    "Enerji fiyati, price per kWh, matching the tip",
+    "Guc fiyati, a more literal but more ambiguous rendering"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The English is not ambiguous where it is read: lpn_energy_price_tip says 'What one kilowatt hour costs', and 'Peak demand charge' is a separately labelled row with its own tip saying it is charged per kW on one moment. The agent chose 'Enerji fiyati' on that evidence and chose correctly. No English change; the pair is already disambiguated by its own tips.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_scenario_overrides",
+   "source": "translator",
+   "lang": "tr",
+   "complaint": "English changed from a label to a count, but the glossary's guidance for 'override' is for the value-label sense, not a count noun, while an eigenvalue collision must still be avoided.",
+   "readings": [
+    "Kendi deger sayisi",
+    "Ozel deger sayisi"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Same as the German entry above: Tom's ruling stands and is not re-litigated. 'Kendi deger sayisi' keeps the safe non-eigenvalue root and adds the count, which is the right adaptation.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_quality_chemical",
+   "source": "translator",
+   "lang": "zh",
+   "complaint": "English changed from a parenthetical describing an import-only display state to a plain dropdown option label 'A chemical that reacts', with no page context confirming which control it belongs to.",
+   "readings": [
+    "a selectable water-quality-tracking mode, parallel to the other options",
+    "a leftover import-status description that should have kept its parenthetical"
+   ],
+   "disposition": "dismissed",
+   "resolution": "ANSWERED FROM THE CODE rather than reasoned from the string: it is an option in the Quality parameter selector built by settingsQualityRows(), parallel to Water age and Source trace -- settingsChemicalRows() runs only when that option is chosen. The agent's first reading is the correct one. The payload cannot show a call site, which is the honest limit here rather than an English defect.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_scenario_overrides",
+   "source": "translator",
+   "lang": "zh",
+   "complaint": "The glossary's preferred translation is a full label meaning 'values of its own', but this key is now a column-heading COUNT, so the bare glossary term reads as a label rather than a number.",
+   "readings": [
+    "append a count noun",
+    "use the bare glossary term and accept the awkward heading"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Same as the German and Turkish entries: Tom's ruling stands. Appending a count noun to the glossary term is the right adaptation and is what several other languages did independently.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_scenario_overrides",
+   "source": "translator",
+   "lang": "he",
+   "complaint": "'No.' has no natural one-word Hebrew equivalent as short, so the rendering is longer than the English and may not fit a narrow column.",
+   "readings": [
+    "the full, clear form",
+    "a shorter but vaguer form"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Same ruling. The column-width worry is real and is the honest cost of the English Tom chose; the layout rule says a mid-word wrap is acceptable and a column is never widened to expand an abbreviation, so the full clear form is correct here.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_curve_kind_generic",
+   "source": "translator",
+   "lang": "he",
+   "complaint": "'Kind not stated' is ambiguous between a curve the user has not categorised and EPANET's own untyped G_CURVE.",
+   "readings": [
+    "the general reading, kind is not stated",
+    "a kind name specific to EPANET's G_CURVE"
+   ],
+   "disposition": "english",
+   "resolution": "FILED AS A REAL FINDING AND ANSWERED WITH THE CODE, not a rewrite. Two agents (he, bg) read 'Kind not stated' two ways, which is the shape that earns an English change -- but the ambiguity they name is not in the string, it is in the ABSENCE of the call site. Both readings describe the same object: a curve whose EPANET ';PUMP:'-style type comment is missing, whether it arrived that way in a file or was made by the Library's Add button. Tom ruled the current wording OK on 2026-09-06. Kept, and the two readings are recorded here so a future Wave 0 finds this answer rather than re-deriving it.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_scncmp_current",
+   "source": "translator",
+   "lang": "bg",
+   "complaint": "'(currently open)' does not say open compared to what; it reads as a link or valve state at first glance rather than 'the scenario you have open right now'.",
+   "readings": [
+    "the scenario presently open in the editor",
+    "a link or valve currently in the open state"
+   ],
+   "disposition": "english",
+   "resolution": "AGREED AND QUEUED, NOT APPLIED IN THIS SPRINT. '(currently open)' really can read as a link or valve state on a page whose links have an OPEN status -- that is a collision with EPANET's own vocabulary on the same screen, which is exactly the kind of finding this channel is for. Not changed now, because changing it would strand 26 fresh translations the day they landed. Carried to the next sprint's Wave 0 with this entry as its evidence.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_curve_kind_generic",
+   "source": "translator",
+   "lang": "bg",
+   "complaint": "'Kind not stated' is ambiguous about who failed to state it: a file with no type comment, or a curve the user has not classified.",
+   "readings": [
+    "a generic, uncategorised curve kind",
+    "an error state meaning the user must pick a type"
+   ],
+   "disposition": "english",
+   "resolution": "Same finding as the Hebrew entry above, from a second language independently, and the same answer. Two languages hitting it is what makes it worth recording rather than dismissing.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_reaction_note",
+   "source": "translator",
+   "lang": "ro",
+   "complaint": "The shared note says 'a coefficient' generically while the two coefficients it covers carry different unit kinds (1/day for bulk, length/day for wall); a translator scanning quickly could insert a unit that is wrong for half the boxes.",
+   "readings": [
+    "keep generic, no unit stated, matching the English's restraint",
+    "insert 1/day, the more common of the two"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The note deliberately states no unit, and each coefficient's own row names its own unit on its own label -- 'Bulk reaction coefficient (1/day)' and 'Wall reaction coefficient (ft/day)'. The agent read the restraint correctly and translated it literally, which is right. Inserting a unit is the trap it names, and no English change would make that trap smaller.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_ff_col_static_tip",
+   "source": "translator",
+   "lang": "ro",
+   "complaint": "The tip says this reading is NOT a zero-flow pressure, while the ordinary hydraulic sense of 'static' IS zero flow, and the same page uses 'static head' elsewhere.",
+   "readings": [
+    "reuse the established suite term for consistency with the column heading",
+    "invent a disambiguating term at the cost of breaking the heading match"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The tip exists precisely to say that this is NOT the zero-flow reading, and it cites AWWA M31 and NFPA 291 for the term. The collision the agent names is real in the language and is answered by the tip rather than by the heading; reusing the established suite term is the right call and keeping the heading matched to lpn_ff_col_static matters more than disambiguating it twice.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_library_curve_type_tip",
+   "source": "translator",
+   "lang": "ur",
+   "complaint": "'What this curve describes' is ambiguous between the curve's CONTENT (pump head vs efficiency vs volume) and a prose description, which is a separate field.",
+   "readings": [
+    "a tip for the Curve type selector",
+    "a general prompt to describe the curve in prose"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Answered from the code: it is the tip on the Curve type selector, and the prose description is a separate field with its own label (lpn_library_curve_note_label). The agent's first reading is correct. Same honest limit as the Chinese entry -- the payload cannot show a call site.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "mhp_notes_3_def",
+   "source": "translator",
+   "lang": "ur",
+   "complaint": "Urdu hydropower literature has no settled native term for 'penstock' more recognisable than a transliteration plus the English gloss.",
+   "readings": [
+    "transliteration plus gloss, matching the English's own parenthetical",
+    "a fully native rendering, less recognisable to a working engineer"
+   ],
+   "disposition": "intent",
+   "resolution": "English kept. Transliteration plus the English gloss is a translator's judgement about Urdu hydropower usage, and the English already carries its own parenthetical '(supply pipe)' for exactly this reason. Recorded, not reversed.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_energy_efficiency_tip",
+   "source": "translator",
+   "lang": "sw",
+   "complaint": "'Wire-to-water efficiency' is jargon with no settled Swahili equivalent, and a literal calque on 'wire' would be nonsensical since no physical wire is described.",
+   "readings": [
+    "descriptive paraphrase naming electricity-to-water efficiency",
+    "a literal calque using the word for wire"
+   ],
+   "disposition": "intent",
+   "resolution": "English kept, and the agent's reasoning is right: 'wire-to-water' is an idiom about the boundaries of the measurement, not about a wire, so a descriptive paraphrase naming electricity-to-water is the accurate rendering and a calque on 'wire' would be false. This is the low-resource seat doing the job it was briefed to do.",
+   "answered": "2026-09-06"
+  },
+  {
+   "key": "lpn_field_speed_pattern_tip",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "The English uses a curly apostrophe (pump's) where most of the corpus does not; no ambiguity, but flagged in case it is unintended editor drift.",
+   "readings": [
+    "cosmetic inconsistency only",
+    "unintended curly-quote drift from an autocorrect"
+   ],
+   "disposition": "english",
+   "answered": "2026-09-06",
+   "resolution": "REAL AND MEASURED: the corpus has exactly this one curly apostrophe among otherwise straight ones, so the agent read it correctly. NOT changed in this sprint -- editing it would strand 26 translations the day they landed, and the character is invisible to a reader. Carried to the next Wave 0 with this entry as the evidence, where it costs nothing to fix alongside other edits to the same key."
+  },
+  {
+   "key": "lpn_scenario_overrides",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "'No. of custom values' does not say what is counted -- overridden properties within one scenario, or scenarios that have overrides.",
+   "readings": [
+    "count of overridden property values within one scenario",
+    "count of scenarios that have overrides"
+   ],
+   "disposition": "dismissed",
+   "answered": "2026-09-06",
+   "resolution": "The SIXTH language to file on this one key this sprint (de, tr, zh, he, my, plus es in prose). Tom set this English himself on 2026-09-04 and reaffirmed it on 2026-09-06; wave0_keyset.php now excludes it so no future Wave 0 re-raises it. HIS RULING STANDS and is not re-litigated here. The agent's first reading is the correct one. The count of filings is recorded for him as evidence, not as an argument."
+  },
+  {
+   "key": "lpn_settings_viscosity",
+   "source": "translator",
+   "lang": "ps",
+   "complaint": "Outside the delta, found while translating: the existing Pashto for 'Relative diffusivity' reuses the same word this sprint had to use for 'concentration', and the two appear together on the water-quality settings screen.",
+   "readings": [
+    "leave it alone, outside sprint scope, and file",
+    "retranslate it despite being outside the delta"
+   ],
+   "disposition": "refer-to-human",
+   "answered": "2026-09-06",
+   "resolution": "THE AGENT DID EXACTLY THE RIGHT THING -- it stayed inside its delta and filed rather than editing a key nobody asked it to touch. The collision is real and is INSIDE Pashto, not in the English: two distinct English terms landed on one Pashto word, and both are on the same screen. No English defect, so there is nothing to rewrite; what it needs is a Pashto speaker or a targeted single-key fix, which is a decision about scope rather than about wording. ESCALATED rather than closed: it is a live quality defect in a shipped language and the honest state is that nobody here can adjudicate Pashto usage."
+  },
+  {
+   "key": "lpn_field_tag",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "The glossary marks 'tag' as needing a sprint and gives no preferred_translation, and Amharic has no established term for an EPANET-style free-text tag distinct from this page's own Label.",
+   "readings": [
+    "a word meaning sticker/label, chosen to avoid colliding with the existing word for Label",
+    "a transliterated loanword, rejected as opaque to a non-technical reader"
+   ],
+   "disposition": "glossary",
+   "answered": "2026-09-06",
+   "resolution": "THE GLOSSARY IS THE RIGHT HOME AND THE AGENT FOUND THE GAP CORRECTLY. Tom gave written permission on 2026-09-06 for a $ec_lang_syn on this key and it was written that day; what is still empty is glossary.json's own `translations` for 'tag' in most languages, which is what an agent sees as preferred_translation. The agent's own reasoning -- avoid the word already used for this page's Label object -- is exactly the collision CLAUDE.md forbids for those two objects, so its choice is right and is recorded here as the Amharic decision. Filling the glossary's translations for 'tag' is a next-sprint job."
+  },
+  {
+   "key": "lpn_source_type_mass",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "The three EPANET booster-source kinds have no established Amharic hydraulic vocabulary and the glossary gives no preferred_translation for 'booster' in this sense.",
+   "readings": [
+    "a transparent word meaning adder, used consistently across all three",
+    "a transliteration, rejected as opaque"
+   ],
+   "disposition": "glossary",
+   "answered": "2026-09-06",
+   "resolution": "Same shape and same answer: an honest gap in glossary.json rather than a defect in the English, which is EPANET's own vocabulary and must stay so. Using one transparent word consistently across all three kinds is the right call -- the three differ only in HOW the dose is applied, which lpn_source_type_tip explains, so the shared root carries the family and the tip carries the difference. Recorded as the Amharic decision; 'booster' wants a glossary term with translations, next sprint."
+  }
+ ]
+}

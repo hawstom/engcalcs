@@ -76,9 +76,19 @@ console.log('\n-- every toolbar button goes through it --');
 	// business; which naming wrapper it is handed is this check's.
 	report(/lpnTimeMountToolbar\([A-Za-z0-9_()]+, setIconLabel\)/.test(bar),
 		'the time transport is mounted with this file\'s own setIconLabel, so it reaches the Help guide');
-	// Profile is a toolbar button as well as a View menu row (Tom, 2026-08-18: "I like that the
-	// command is under the View menu" -- two doors, one implementation).
-	report(/setIconLabel\([^)]*'profile'/.test(bar), 'the profile has a button, drawn with the profile icon');
+	// **PROFILE HAS ONE DOOR NOW, NOT TWO** (Tom, 2026-09-06: *"Remove 'Save as', Libraries,
+	// Profile, and Tables from the toolbar. Not valuable enough or accessible with the Pane
+	// button."*). This asserted the button's existence on the strength of his 2026-08-18 line, *"I
+	// like that the command is under the View menu"* -- which was about the MENU row, and the menu
+	// row is untouched. The toolbar half is gone.
+	//
+	// **THE ICON IS NOT**, and that is the thing worth keeping an assertion on: it is still drawn in
+	// lib/Icons.lib.php and still used by the Water menu row, so a Help > "What the toolbar icons
+	// mean" entry for it would now be describing an icon no toolbar button wears. Assert the
+	// absence, so putting the button back is a deliberate two-file change rather than a drift.
+	report(!/setIconLabel\([^)]*'profile'/.test(bar), 'the profile has NO toolbar button any more');
+	report(/lpn_profile_menu/.test(strip(fnBody(src, 'openProjectBarMenu'))),
+		'...and its Water menu row is untouched, because a command that leaves the toolbar must not leave the app');
 	// **THE LABELS BUTTON IS GONE** (Tom: "We can remove this button now ... all project settings
 	// are in (tada!) Settings"). Asserted so it is not reflexively restored: every other route to
 	// the label controls -- View > Labels, the colour legend, the Settings button -- still opens the

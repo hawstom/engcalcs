@@ -86,6 +86,23 @@ standing in the way is not code.
 
 ---
 
+## 3b. SPRINT 584-wave1 CLOSED 2026-09-06 — ALL 26 LANGUAGES, 185 keys each
+
+145 new keys plus 40 whose English had drifted, into every language. **Every language is at parity**
+(1666 keys, or 1675 for the four core ones, against 1688 English). The manifest is re-baselined, so
+`detect_english_drift.php` reports CHANGED: none.
+
+- **KHMER NEEDED A SECOND DISPATCH, and that is the reusable lesson.** Its first agent wrote NOTHING
+  to disk in a full run -- it composed in memory, which is exactly what the batching rule exists to
+  prevent, and a session limit or a stall then takes everything. The retry put the batching rule in
+  its OPENING PARAGRAPH, named the previous failure, and it worked. **If an agent's language file
+  has not grown after a while, it is not slow, it is not saving.** Check the file, not the clock.
+- **13 English keys are untranslated and unruled**: Task 593's five water-quality rows and their
+  option labels, written after the payloads were generated. Next sprint's delta, correctly.
+- **One friction entry is escalated and waiting on Tom**: `lpn_settings_viscosity` in Pashto, where
+  two distinct English terms landed on one Pashto word on the same screen. No English defect; it
+  needs a Pashto speaker. It is in `dev/new-english-keys.md` under the translators' section.
+
 ## 4. STATE — checked and pruned 2026-09-06
 
 **Everything §4 and §5 said to verify about the curves paradigm change (Task 586) was verified on

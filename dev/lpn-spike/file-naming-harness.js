@@ -172,18 +172,31 @@ console.log('\n-- the pickers: write one extension, read both --');
 		'and the upload fallback accepts both too', inp);
 }
 
-console.log('\n-- open / save / save as, in that order, on the toolbar (Task 246) --');
+console.log('\n-- open then save on the toolbar; SAVE AS came off it 2026-09-06 --');
 {
 	const bar = extract('wireToolbar');
 	// Where each button is NAMED, which is where it is built -- the icon name is the second
 	// argument to setIconLabel(), so a quoted `, 'open',` is that button and nothing else.
-	const order = ['open', 'save', 'saveas'].map(function (icon) {
+	//
+	// **SAVE AS IS GONE FROM THE STRIP AND THIS FILE ASSERTED THE OPPOSITE UNTIL 2026-09-06** (Tom:
+	// *"Remove 'Save as', Libraries, Profile, and Tables from the toolbar. Not valuable enough or
+	// accessible with the Pane button."*). Task 246 asked for the file group every document program
+	// puts first, and TWO of its four are now on the strip rather than three: New went in 2026-08-15
+	// and Save as in 2026-09-06, both by name, both because a toolbar slot is the most expensive
+	// space on the page. **The ORDER rule survives the removal** -- open before save is still the
+	// order every document program uses -- so it is still asserted, over the two that remain.
+	const order = ['open', 'save'].map(function (icon) {
 		return { icon: icon, at: bar.indexOf(", '" + icon + "',") };
 	});
 	order.forEach(function (o) { report(o.at >= 0, `the toolbar has a ${o.icon} button`); });
 	report(order.every(function (o, i) { return i === 0 || o.at > order[i - 1].at; }),
 		'and they are in the order every document program puts them in',
 		order.map(function (o) { return `${o.icon}@${o.at}`; }).join(' '));
+	// Asserted here as well as in toolbar-harness.js, for the reason the New-project note below
+	// gives: two files have to change together to put it back.
+	report(bar.indexOf(", 'saveas',") < 0, '...and Save as is NOT on the strip any more');
+	report(extract('openFileMenu').indexOf('lpn_file_saveas') >= 0,
+		'...while Save as is still on the File menu, because a command that leaves the toolbar must not leave the app');
 	// **NEW PROJECT IS THE ONE OF THE FOUR THAT IS NOT HERE**, and it is not an oversight. Task 246
 	// asks for all four; Tom removed New from the strip by name afterwards, on 2026-08-15, and
 	// dev/lpn-spike/toolbar-harness.js holds that instruction and asserts the absence. Both files
