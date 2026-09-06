@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read**, of 142 untranslated keys, of 1672 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read**, of 143 untranslated keys, of 1673 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -45,7 +45,7 @@ is the one you meant. "The first one" is a complete answer.
   3. energy at 100% of installed capacity, unspecified duration
   @@ NEEDS RULING
 
-## lpn_  (142, 1 to read @@ NEEDS RULING)
+## lpn_  (143, 2 to read @@ NEEDS RULING)
 
 - **`lpn_curve_kind_effic`**
   > Pump efficiency
@@ -161,6 +161,9 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_energy_price_tip`**
   > What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.
   _Ruled OK 2026-09-04._
+- **`lpn_energy_price_zero`**
+  > This network states a price of zero, so every cost here is zero. Change it under Settings, Energy.
+  @@ NEEDS RULING
 - **`lpn_energy_pump_price_tip`**
   > What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.
   _Ruled OK 2026-09-04._

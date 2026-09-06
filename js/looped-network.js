@@ -31487,6 +31487,40 @@ var EngCalcs = EngCalcs || {};
 	function energyPercent(fraction) {
 		return ffNum(fraction * 100) + '%';
 	}
+	/**
+	 * **WHAT THE DOCUMENT STATES ABOUT PRICE, WHICH IS NOT WHAT THE ANSWER CAME TO** (Task 581).
+	 *
+	 * An empty box and a typed zero are two different files -- the empty one exports no line and the
+	 * zero exports a line stating zero (Task 553) -- and every box on this page already shows the
+	 * difference, because a stated zero is the character `0` in it and nothing else ever is. The one
+	 * place the difference was LOST is a sentence: this report said "No price of power is stated"
+	 * whenever the money came to nothing, which is a claim about the document inferred from the
+	 * answer. All three EPA reference networks state `Global Price 0.0` and `Demand Charge 0.0`, so
+	 * the sentence was false on every one of them, and it was equally false for a priced network
+	 * whose pumps simply never ran.
+	 *
+	 * So the rule this closes on is general even though it has one caller today: **a sentence about
+	 * a setting is chosen by asking the document, never by inspecting the result.** Read through
+	 * `docEnergy()`, the one seam that already gathers the globals and the per-pump prices through
+	 * the resolver, so a scenario's own price is the one this answers about.
+	 *
+	 *   'none'   the document states no price anywhere, and EPANET's own zero applies
+	 *   'zero'   it states one or more, and every one of them is zero
+	 *   'priced' it states a price that is not zero, so zeros in the table are about the PUMPS
+	 */
+	function energyPriceStated() {
+		var e = docEnergy(), any = false, allZero = true;
+		['globalPrice', 'demandCharge'].forEach(function (k) {
+			if (e[k] === undefined) { return; }
+			any = true;
+			if (e[k] !== 0) { allZero = false; }
+		});
+		Object.keys(e.price || {}).forEach(function (id) {
+			any = true;
+			if (e.price[id] !== 0) { allZero = false; }
+		});
+		return !any ? 'none' : (allZero ? 'zero' : 'priced');
+	}
 	function rebuildEnergyReport() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_energy_report'),
@@ -31566,12 +31600,15 @@ var EngCalcs = EngCalcs || {};
 			ffEl('span', null, energyMoney(sum.demandCharge), null), '');
 		ffRow(host, pc.lpn_energy_total_cost || 'Total cost', null,
 			ffEl('span', null, energyMoney(sum.totalCost), null), '');
-		// **A PRICE OF NOTHING IS A REPORT OF NOTHING, AND IT SAYS SO.** All three EPA reference
-		// networks state a price of zero, so this is the state a first run lands in, and a column
-		// of zeros with no explanation reads as a defect in the arithmetic.
-		if (!sum.energyCost && !sum.demandCharge) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_energy_no_price ||
-				'No price of power is stated, so every cost here is zero. Set one under Settings, Energy.', host);
+		// **A PRICE OF NOTHING IS A REPORT OF NOTHING, AND IT SAYS SO** -- and WHICH nothing it is
+		// comes out of the document rather than out of the answer (Task 581).
+		var priced = energyPriceStated();
+		if (!sum.energyCost && !sum.demandCharge && priced !== 'priced') {
+			ffEl('p', 'lpn-ff-note', priced === 'zero'
+				? (pc.lpn_energy_price_zero ||
+					'This network states a price of zero, so every cost here is zero. Change it under Settings, Energy.')
+				: (pc.lpn_energy_no_price ||
+					'No price of power is stated, so every cost here is zero. Set one under Settings, Energy.'), host);
 		}
 		// **AN EFFICIENCY CURVE THE FILE STATED AND THIS PAGE CANNOT USE IS NAMED, NOT SWALLOWED.**
 		// The alternative is a report whose efficiency column quietly disagrees with EPANET's own.
