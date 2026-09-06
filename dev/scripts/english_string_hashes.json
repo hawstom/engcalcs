@@ -1472,8 +1472,8 @@
         "bpn_supply3_h": "94b8f0a2c572c4ebb58793d313ff910824e56dde",
         "bpn_supply3_q": "a86b34089cc058ab33080584a90e1773169686a5",
         "bpn_supply_pt_tip": "f2863821937b972936581886cd3ed5e50700c904",
-        "bpn_topology_warn": "c555e7c40e17bf482b36505a87181e1edd70d85d",
-        "bpn_topology_warn_short": "53ebc572b4a44802ba114729f07bdaaf5409a9d7",
+        "bpn_line_problem": "c555e7c40e17bf482b36505a87181e1edd70d85d",
+        "bpn_bad_id_short": "53ebc572b4a44802ba114729f07bdaaf5409a9d7",
         "bpn_upstream": "5dfa4f148055bb1658e767cdae29ea389d66adf1",
         "bpn_upstream_tip": "a274da3a41f65e38f2c1225b434527584f6e7e3c",
         "calc_copy_link": "2f84eea5d45da4f1ce1760b85db18a854f4e1b39",
@@ -3215,11 +3215,11 @@
             "words": 56,
             "ends_sentence": true
         },
-        "bpn_topology_warn": {
+        "bpn_line_problem": {
             "words": 33,
             "ends_sentence": true
         },
-        "bpn_topology_warn_short": {
+        "bpn_bad_id_short": {
             "words": 1,
             "ends_sentence": false
         },

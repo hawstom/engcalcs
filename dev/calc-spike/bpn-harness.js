@@ -122,7 +122,7 @@ function loadMain(overrides) {
 	});
 	MAIN.rows.forEach(function (row, i) {
 		const cells = {
-			bpn_id: row.id,
+			bpn_id: (o.id && o.id[i] !== undefined) ? o.id[i] : row.id,
 			bpn_l: (o.length && o.length[i] !== undefined) ? o.length[i] : row.L,
 			bpn_diameter: (o.dia && o.dia[i] !== undefined) ? o.dia[i] : row.d,
 			bpn_roughness: (o.rough && o.rough[i] !== undefined) ? o.rough[i] : row.c,
@@ -345,20 +345,59 @@ r.section('the same network in SI -- the display factors are a lens, not a secon
 }());
 
 // =========================================================================================
-r.section('topology problems are flagged, never solved quietly');
+r.section('topology problems are flagged on the offending row, never solved quietly');
+
+// The verdict moved OUT of a page-level banner and INTO the cell that owns the mistake
+// (Tom, 2026-09-06). So the assertion is not "the page complains" -- it is "row 2's
+// Upstream cell complains and row 0's does not", which a banner could never satisfy.
+function upFlag(page, row) { return rowFlag(page, row, 'bpn_up'); }
+function idFlag(page, row) { return rowFlag(page, row, 'bpn_id'); }
+function rowFlag(page, row, col) {
+	const trs = page.doc.getElementById('CalcsBody').getElementsByTagName('tr');
+	if (!trs[row]) { return ''; }
+	// THE ASSERTION IS "in the same cell as that column's own input", which is the whole
+	// point of the change -- addCalcRow() leaves an input's td unnamed, so a td-name lookup
+	// would find nothing and every one of these checks would pass on the empty string.
+	const input = trs[row].querySelector('input[name="' + col + '"]');
+	const td = input ? input.parentNode : trs[row].querySelector('td[name="' + col + '"]');
+	if (!td) { return ''; }
+	const span = td.querySelector('span.bpn-rowflag');
+	return span ? span.innerHTML : '';
+}
 
 const unknownUp = loadMain({ up: [undefined, '', 'nowhere'] });
-r.ok(/⚠/.test(unknownUp.html('bpn_topology_warn')),
-	'an upstream id that names no line raises the topology warning',
-	unknownUp.html('bpn_topology_warn').replace(/<[^>]*>/g, ''));
+r.ok(/⚠/.test(upFlag(unknownUp, 2)),
+	'an upstream id that names no line marks THAT line\'s Upstream cell',
+	upFlag(unknownUp, 2).replace(/<[^>]*>/g, ''));
+r.ok(!/⚠/.test(upFlag(unknownUp, 1)),
+	'and the sound line beside it is left unmarked',
+	upFlag(unknownUp, 1));
 r.ok(!/\d/.test(unknownUp.rowHtml('q_line', 2)),
 	'and that line reports no flow rather than a plausible-looking one',
 	unknownUp.rowHtml('q_line', 2));
-r.ok(!/⚠/.test(base.html('bpn_topology_warn')),
-	'a sound tree raises no topology warning');
+r.ok(!/⚠/.test(upFlag(base, 0) + upFlag(base, 1) + upFlag(base, 2)),
+	'a sound tree marks no row at all');
 
 const selfRef = loadMain({ up: [undefined, '2', ''] });
-r.ok(/⚠/.test(selfRef.html('bpn_topology_warn')),
-	'a line named as its own upstream raises the topology warning');
+r.ok(/⚠/.test(upFlag(selfRef, 1)),
+	'a line named as its own upstream marks its own Upstream cell',
+	upFlag(selfRef, 1).replace(/<[^>]*>/g, ''));
+r.ok(/⚠/.test(upFlag(selfRef, 2)),
+	'and the line series-fed from it is marked as not connected',
+	upFlag(selfRef, 2).replace(/<[^>]*>/g, ''));
+r.ok(upFlag(selfRef, 1) !== upFlag(selfRef, 2),
+	'the two say different things: the bad reference and the line cut off by it');
+
+// A repeated ID is a mistake in the ID column, so that is where it is reported.
+const dupId = loadMain({ id: ['1', '1', '3'] });
+r.ok(/⚠/.test(idFlag(dupId, 1)),
+	'a repeated ID marks the second line\'s ID cell',
+	idFlag(dupId, 1).replace(/<[^>]*>/g, ''));
+r.ok(!/⚠/.test(idFlag(dupId, 0)),
+	'and not the first line, which owns the ID');
+
+// The tip is one sentence shared by all three verdicts, so it has to be true of all three.
+r.ok(/title="[^"]+"/.test(upFlag(unknownUp, 2)) && /title="[^"]+"/.test(idFlag(dupId, 1)),
+	'every marker carries the shared explanation as its tip');
 
 r.finish();

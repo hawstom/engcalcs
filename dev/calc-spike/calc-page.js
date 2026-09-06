@@ -165,14 +165,23 @@ function collectByTag(root, tag) {
  * back as an empty row.
  */
 function collectBySelector(root, sel) {
-	const m = /^\s*([a-zA-Z]*)\s*(?:\[\s*([a-zA-Z_-]+)\s*=\s*"([^"]*)"\s*\])?\s*$/.exec(sel);
-	if (!m || (!m[1] && !m[2])) {
-		throw new Error(`calc-page.js: selector '${sel}' is beyond this stub (tag[attr="value"] only)`);
+	const m = /^\s*([a-zA-Z]*)\s*(?:\.([a-zA-Z][\w-]*))?\s*(?:\[\s*([a-zA-Z_-]+)\s*=\s*"([^"]*)"\s*\])?\s*$/.exec(sel);
+	if (!m || (!m[1] && !m[2] && !m[3])) {
+		throw new Error(`calc-page.js: selector '${sel}' is beyond this stub (tag.class[attr="value"] only)`);
 	}
 	const want = m[1] ? m[1].toUpperCase() : '';
+	// **className AND classList ARE ONE FACT.** A calculator sets a class either way -- the
+	// row-problem markers in branched-network.js use className, the status lines use classList --
+	// and a stub that matched only one of them would let a whole class of markers go unfindable
+	// while every assertion about them still passed on "no element".
+	function hasClass(c, name) {
+		if (c.classList && c.classList.contains(name)) { return true; }
+		return String(c.className || '').split(/\s+/).indexOf(name) >= 0;
+	}
 	return collectByTag(root, '*').filter(function (c) {
 		if (want && c.tagName !== want) { return false; }
-		if (m[2] && c.getAttribute(m[2]) !== m[3]) { return false; }
+		if (m[2] && !hasClass(c, m[2])) { return false; }
+		if (m[3] && c.getAttribute(m[3]) !== m[4]) { return false; }
 		return true;
 	});
 }
@@ -413,6 +422,14 @@ function loadCalculator(pageName, opts) {
 			EngCalcs.pageCalculator(form);
 			return api;
 		},
+
+		/**
+		 * The document stub itself, for the few assertions a named lookup cannot express --
+		 * a marker that lives INSIDE an input's cell rather than in a cell of its own, say.
+		 * Reach for a named accessor first; this one costs the harness a dependency on the
+		 * page's markup shape.
+		 */
+		doc: documentStub,
 
 		/** Raw innerHTML of a result cell -- for the verdict strings, which are not numbers. */
 		html(name) { return getElementById(name).innerHTML; },

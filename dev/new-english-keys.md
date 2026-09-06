@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read**, of 142 untranslated keys, of 1672 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**3 still to read**, of 144 untranslated keys, of 1674 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,28 +21,17 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (2 to read @@ NEEDS RULING)
+## Questions from the translators  (0, all answered)
 
-**These are SHIPPED strings, already translated into 26 languages.** A wave-0
-reading or a translator found each one readable two ways, and no sprint launches while one is
-unanswered. You are not being asked to approve wording here; you are being asked which reading
-is the one you meant. "The first one" is a complete answer.
+Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-### from sprint 239-wave0-calcs
+## bpn_  (2, 2 to read @@ NEEDS RULING)
 
-- **`bpn_topology_warn_short`**
-  > Network
-  *The finding:* medium: the short verdict cell says 'Network'. Its siblings in that role are verdict words -- 'Low' for pressure, 'OK'/'High' elsewhere -- so the slot's convention is a judgement, and 'Network' is a bare noun that judges nothing. It means 'the network topology is broken'. Every language will translate the noun and inherit the same emptiness.
-  1. there is a problem with the network topology (intended)
-  2. a heading naming the network
-  3. the network is fine
+- **`bpn_dup_id_short`**
+  > Duplicate ID
   @@ NEEDS RULING
-- **`mhp_annual_kwh`**
-  > Annual energy at 100% capacity
-  *The finding:* low: 'Annual energy at 100% capacity' -- capacity factor (running every hour of the year, which is what mhp_notes_7_def says) or rated capacity (running at full output whenever it runs). The two differ by the capacity factor itself, often a factor of two or more.
-  1. energy if the plant ran at full output all 8760 hours (intended)
-  2. energy at the plant's rated capacity, over however many hours it runs
-  3. energy at 100% of installed capacity, unspecified duration
+- **`bpn_not_connected_short`**
+  > Not connected
   @@ NEEDS RULING
 
 ## lpn_  (142, 1 to read @@ NEEDS RULING)

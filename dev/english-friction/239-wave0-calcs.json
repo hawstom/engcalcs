@@ -164,8 +164,8 @@
     "a heading naming the network",
     "the network is fine"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Referred: wording call. Candidates: 'Broken', 'Check IDs', 'Unconnected'. Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06: the banner itself was the defect. \"The alert 'Network' appears before the pipe table, pushing it downward... I agree that it's out of place and confusing. This particular message would indeed go better in the Upstream ID column as 'Broken network', 'Bad ID', 'Invalid ID', etc.\" The page-level banner is gone; the verdict is now written into the cell that owns the mistake. RENAMED: bpn_topology_warn -> bpn_line_problem (the shared tip), bpn_topology_warn_short -> bpn_bad_id_short ('Bad ID'), plus new bpn_not_connected_short and bpn_dup_id_short. He also asked which other messages are candidates for that spot: on this page it was the only one."
   },
   {
    "key": "ip_max_head",
@@ -267,7 +267,7 @@
     "a position: upper / lower"
    ],
    "disposition": "intent",
-   "resolution": "Tom, 2026-09-06: \"Add a _syn 'the velocity is high / low / acceptable'\". Written on mhp_vel_ok_short. ITS TWO SIBLINGS, mhp_vel_high_short and mhp_vel_low_short, still carry an empty entry: he named one key and $ec_lang_syn takes no AI writing beyond what he named."
+   "resolution": "Tom, 2026-09-06: \"Add a _syn 'the velocity is high / low / acceptable'\". Written on mhp_vel_ok_short. ITS TWO SIBLINGS were then authorised separately, 2026-09-06: \"Write the _syn keys for these in a parallel way such as '(velocity is) high' and '(velocity is) low'.\" Written in his own suggested shape on mhp_vel_high_short and mhp_vel_low_short."
   },
   {
    "key": "mhp_annual_kwh",
@@ -279,8 +279,8 @@
     "energy at the plant's rated capacity, over however many hours it runs",
     "energy at 100% of installed capacity, unspecified duration"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "$ec_lang_syn proposal for Tom: 'Energy produced in a year if the plant ran at full output every hour (8760 h) -- an upper bound, before any capacity factor.' Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06, choosing to rewrite rather than pick a reading: \"I want to go with my suggestion if you don't strongly disagree. 'P as annual energy'. That says explicitly what we are showing.\" The label is now 'P as annual energy', beside its sibling 'Power output, P', and the $ec_lang_syn payload he had already approved carries the 8760 h upper-bound meaning. 26 retranslations owed."
   },
   {
    "key": "mpf_solve_for_flow",

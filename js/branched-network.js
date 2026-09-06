@@ -122,7 +122,6 @@ EngCalcs.bpnReadRows = function (objForm) {
 		up,
 		elevRaw;
 
-	this.topologyProblem = false;
 
 	// Read each input by name within its own row: the first row deliberately has no
 	// "upstream" input (its upstream is always the source), so positional indexing
@@ -140,13 +139,15 @@ EngCalcs.bpnReadRows = function (objForm) {
 		// First occurrence of an id wins the lookup; a later duplicate is a topology
 		// problem (its own upstream references stay valid, but others pointing to the
 		// id are ambiguous).
+		var dupId = false;
 		if (id !== '' && !Object.prototype.hasOwnProperty.call(idToIndex, id)) {
 			idToIndex[id] = i;
 		} else if (id !== '') {
-			this.topologyProblem = true;
+			dupId = true;
 		}
 		lines.push({
 			id: id,
+			dupId: dupId,
 			upRaw: up,
 			length: +cellVal(row, 'bpn_l') / lengthu,
 			diameter: +cellVal(row, 'bpn_diameter') / diameteru,
@@ -162,14 +163,15 @@ EngCalcs.bpnReadRows = function (objForm) {
 	//   blank upstream  -> previous line (series default); blank on line 0 -> source (-1)
 	//   named upstream  -> that id's line; unknown id -> invalid (-2)
 	for (i = 0; i < lines.length; i += 1) {
+		lines[i].badUp = false;
 		if (lines[i].upRaw === '') {
 			lines[i].parent = (i === 0) ? -1 : i - 1;
 		} else if (Object.prototype.hasOwnProperty.call(idToIndex, lines[i].upRaw)) {
 			lines[i].parent = idToIndex[lines[i].upRaw];
-			if (lines[i].parent === i) { lines[i].parent = -2; this.topologyProblem = true; }
+			if (lines[i].parent === i) { lines[i].parent = -2; lines[i].badUp = true; }
 		} else {
 			lines[i].parent = -2; // unknown reference
-			this.topologyProblem = true;
+			lines[i].badUp = true;
 		}
 	}
 
@@ -197,7 +199,6 @@ EngCalcs.bpnReadRows = function (objForm) {
 		}
 	}
 	for (i = 0; i < lines.length; i += 1) {
-		if (!reachable[i]) { this.topologyProblem = true; }
 		lines[i].reachable = reachable[i];
 		lines[i].depth = depth[i];
 	}
@@ -346,7 +347,7 @@ EngCalcs.bpnPowerCurveHead = function (pts, q) {
 
 EngCalcs.pageCalculator = function (objForm) {
 	'use strict';
-	var hasUnits, warnEl = document.getElementById('bpn_topology_warn');
+	var hasUnits;
 	this.var = {};
 	this.readFormInput(objForm, 'elev_source', hasUnits = true);
 	this.readFormInput(objForm, 'visc', hasUnits = false);
@@ -386,10 +387,6 @@ EngCalcs.pageCalculator = function (objForm) {
 	this.writeFormResult(objForm, 'q_total', 4, hasUnits = true);
 	this.writeFormResult(objForm, 'h_supply', 3, hasUnits = true);
 	this.writeFormResult(objForm, 'p_min', 3, hasUnits = true);
-
-	warnEl.innerHTML = this.topologyProblem
-		? EngCalcs.writeCheckHTML(false, EngCalcs.pageConfig.bpn_topology_warn_short, EngCalcs.pageConfig.bpn_topology_warn)
-		: '';
 };
 
 // Show only the inputs the active friction method actually uses: kinematic
@@ -450,6 +447,50 @@ EngCalcs.bpnWriteRows = function (objForm) {
 			document.getElementsByName('hl')[i].innerHTML = dash;
 			document.getElementsByName('p_down')[i].innerHTML = dash;
 		}
+	}
+	this.bpnWriteRowProblems();
+};
+
+/**
+	* bpnWriteRowProblems() marks the OFFENDING ROW rather than the page. A topology
+	* fault used to raise one banner above the table, which pushed the table down and
+	* named no line (Tom, 2026-09-06: "The alert 'Network' appears before the pipe
+	* table, pushing it downward... it's out of place and confusing. This particular
+	* message would indeed go better in the Upstream ID column"). Three verdicts, each
+	* in the column that owns the mistake: a bad or self reference and a line cut off
+	* from the source go in Upstream; a repeated ID goes in ID. One shared tip
+	* (bpn_line_problem) names all four conditions, so it is true wherever it appears.
+	*/
+EngCalcs.bpnWriteRowProblems = function () {
+	'use strict';
+	var cfg = EngCalcs.pageConfig,
+		tip = cfg.bpn_line_problem,
+		trs = document.getElementById('CalcsBody').getElementsByTagName('tr'),
+		i,
+		line;
+	// The marker lives in its own span so it never disturbs the cell's input. addCalcRow()
+	// names the INPUT and leaves its td unnamed, and names the td only for a cell that has no
+	// input -- so the cell is found through the input where there is one (every row but the
+	// first) and by td name where there is not (row 0's Upstream, which reads "Source").
+	function flag(rowEl, colName, shortText) {
+		var input = rowEl.querySelector('input[name="' + colName + '"]'),
+			td = input ? input.parentNode : rowEl.querySelector('td[name="' + colName + '"]');
+		if (!td) { return; }
+		var span = td.querySelector('span.bpn-rowflag');
+		if (!span) {
+			span = document.createElement('span');
+			span.className = 'bpn-rowflag';
+			td.appendChild(span);
+		}
+		span.innerHTML = shortText ? EngCalcs.writeCheckHTML(false, shortText, tip) : '';
+	}
+	for (i = 0; i < this.lines.length; i += 1) {
+		line = this.lines[i];
+		if (!trs[i]) { continue; }
+		flag(trs[i], 'bpn_id', line.dupId ? cfg.bpn_dup_id_short : '');
+		flag(trs[i], 'bpn_up', line.badUp
+			? cfg.bpn_bad_id_short
+			: (line.reachable ? '' : cfg.bpn_not_connected_short));
 	}
 };
 

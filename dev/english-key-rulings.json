@@ -1460,6 +1460,10 @@
   "u_hr": {
    "on": "hr",
    "ruled": "2026-09-01"
+  },
+  "mhp_annual_kwh": {
+   "on": "P as annual energy",
+   "ruled": "2026-09-06"
   }
  }
 }

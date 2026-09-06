@@ -47,7 +47,6 @@ function echoCalculatorFormAppend() {
 			<option value="manning"><?=$ec_lang['bpn_method_manning']?></option>
 		</select>
 	</p>
-	<p id="bpn_topology_warn" class="ec-status-warn"></p>
 	<table id="CalcsTable" style="float: left;">
 		<thead>
 			<tr>
@@ -137,8 +136,10 @@ function echoCalculatorFormAppend() {
 </dl>
 <script>
 EngCalcs.pageConfig = {
-	bpn_topology_warn: <?=json_encode($ec_lang['bpn_topology_warn'])?>,
-	bpn_topology_warn_short: <?=json_encode($ec_lang['bpn_topology_warn_short'])?>,
+	bpn_line_problem: <?=json_encode($ec_lang['bpn_line_problem'])?>,
+	bpn_bad_id_short: <?=json_encode($ec_lang['bpn_bad_id_short'])?>,
+	bpn_not_connected_short: <?=json_encode($ec_lang['bpn_not_connected_short'])?>,
+	bpn_dup_id_short: <?=json_encode($ec_lang['bpn_dup_id_short'])?>,
 	bpn_pressure_warn: <?=json_encode($ec_lang['bpn_pressure_warn'])?>,
 	bpn_pressure_warn_short: <?=json_encode($ec_lang['bpn_pressure_warn_short'])?>,
 	ip_pressure_high: <?=json_encode($ec_lang['ip_pressure_high'])?>,
