@@ -8864,6 +8864,56 @@ var EngCalcs = EngCalcs || {};
 	function findPropIsText(prop) {
 		return prop === 'id' || prop === 'text' || prop === 'demandCategory' || prop === 'tag';
 	}
+	// ---- DICTIONARY ORDER, IN THE READER'S OWN LANGUAGE (ROADMAP Task 598) ----------------------
+	//
+	// Tom, 2026-09-06: *"ID, Tag, and Text should also allow Below and Above for a localized
+	// alphanumeric order (dictionary order) comparison."*
+	//
+	// **`<` ON TWO STRINGS IS UTF-16 CODE-UNIT ORDER, and that is wrong in most of the 27 languages
+	// before it is wrong in English.** It files every accented letter after `z`, so a Spanish reader
+	// asking for the ids above `N` gets `Ñ` and a French one asking below `e` loses `é`; Cyrillic
+	// and Arabic sort by codepoint block rather than by any alphabet anybody was taught. `Intl`
+	// knows all of that and we do not.
+	//
+	// **AND IT WANTS `numeric: true`, which is what somebody typing pipe ids actually means:** P2
+	// before P10. Without it the comparison is technically correct and useless, which is the failure
+	// a user reports as "the filter is broken".
+	//
+	// `sensitivity: 'accent'` is the collator spelling of what this page has always done by
+	// lowercasing both sides -- `Elm` and `elm` rank together, and `e` and `é` do not.
+	//
+	// **BUILT ONCE.** A collator is expensive to construct and free to reuse, and a table of a few
+	// thousand rows asks for one comparison per pair. Keyed on the page's own language, which is
+	// `<html lang>` -- the same answer js/Calculators.lib.js reads, so there is no second source of
+	// truth for what language this page is in.
+	var findCollatorCache = null, findCollatorLang = null;
+	function findCollator() {
+		var lang = (document.documentElement && document.documentElement.lang) || '';
+		if (findCollatorCache && findCollatorLang === lang) { return findCollatorCache; }
+		findCollatorLang = lang;
+		// An empty or unusable tag falls back to the environment's own locale rather than throwing:
+		// `new Intl.Collator('')` is a RangeError, and a search box is not the place to find out.
+		try {
+			findCollatorCache = new Intl.Collator(lang || undefined,
+				{ numeric: true, sensitivity: 'accent' });
+		} catch (e) {
+			findCollatorCache = new Intl.Collator(undefined, { numeric: true, sensitivity: 'accent' });
+		}
+		return findCollatorCache;
+	}
+	function findTextCompare(a, b) { return findCollator().compare(String(a), String(b)); }
+	// **ONE PREDICATE ANSWERS "DOES THIS TEXT MATCH?", for every text property and every text
+	// condition.** The demand-category branch of findMatches() asks it of each name on a junction
+	// in turn and the main branch asks it once; two copies would be two chances for `above` to mean
+	// something different depending on which property it was asked about.
+	function findTextOpMatches(op, s, v) {
+		var a = String(s), b = String(v);
+		if (op === 'contains') { return a.toLowerCase().indexOf(b.toLowerCase()) >= 0; }
+		if (op === 'equals') { return a.toLowerCase() === b.toLowerCase(); }
+		if (op === 'gt') { return findTextCompare(a, b) > 0; }
+		if (op === 'lt') { return findTextCompare(a, b) < 0; }
+		return false;
+	}
 	// Text gets contains/equals, a number gets equals/greater/less. Offering all four for both would
 	// mean "Pressure contains 2", which matches on the digits of a number and is never what anybody
 	// means.
@@ -8886,14 +8936,28 @@ var EngCalcs = EngCalcs || {};
 		//
 		// Connection is the one property that still does not offer them, and it is not an
 		// exception to the rule: its values are four conditions, not a value with an order.
+		//
+		// **AND SINCE TASK 598, above AND below ARE OFFERED ON TEXT TOO** (Tom, 2026-09-06: *"ID,
+		// Tag, and Text should also allow Below and Above for a localized alphanumeric order
+		// (dictionary order) comparison."*). "every pipe whose id is above P100" is a real question
+		// on a network somebody has renumbered, and it is the same question `greater than` asks of
+		// a diameter. findTextCompare() is what makes it mean dictionary order rather than code
+		// points; the comment on it carries the reasoning.
+		//
+		// The English slot carries the OLD spellings beside the current ones -- see findAlts(). The
+		// words moved to EPANET's on Tom's ruling the same day (*"EPANET uses Below, Equal to, and
+		// Above for filter comparisons. I like this."*), and a query already written down in the
+		// old words still reads.
 		if (findPropIsText(findState.prop)) {
 			return [['contains', pc.lpn_find_op_contains || 'contains', 'contains'],
 				['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'],
+				['gt', pc.lpn_find_op_gt || 'above', ['above', 'greater than']],
+				['lt', pc.lpn_find_op_lt || 'below', ['below', 'less than']],
 				findExtremeDef('top'), findExtremeDef('bottom')];
 		}
 		return [['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'],
-			['gt', pc.lpn_find_op_gt || 'greater than', 'greater than'],
-			['lt', pc.lpn_find_op_lt || 'less than', 'less than'],
+			['gt', pc.lpn_find_op_gt || 'above', ['above', 'greater than']],
+			['lt', pc.lpn_find_op_lt || 'below', ['below', 'less than']],
 			findExtremeDef('top'), findExtremeDef('bottom')];
 	}
 	// **ONE STRING SERVES THE PULL-DOWN, THE QUERY LINE AND THE PARSER** (Tom, 2026-08-27: *"the
@@ -9066,8 +9130,7 @@ var EngCalcs = EngCalcs || {};
 			findCandidates().forEach(function (c) {
 				var cats = findCategoriesOf(c), i;
 				for (i = 0; i < cats.length; i++) {
-					if (findState.op === 'contains' ? cats[i].toLowerCase().indexOf(lc) >= 0
-							: cats[i].toLowerCase() === lc) {
+					if (findTextOpMatches(findState.op, cats[i], v)) {
 						out.push(c);
 						return;
 					}
@@ -9076,21 +9139,23 @@ var EngCalcs = EngCalcs || {};
 			return findSortMatches(out);
 		}
 		findCandidates().forEach(function (c) {
-			var val = findValueOf(c, findState.prop), s;
+			var val = findValueOf(c, findState.prop);
 			if (val === undefined || val === null || val === '') { return; }
 			if (typeof val === 'number' && !isFinite(val)) { return; }
+			// **A NUMBER IS COMPARED AS A NUMBER AND TEXT AS TEXT, decided by the VALUE and not by
+			// the property name.** `equal to` on a solved number cannot be an === (findNumEq), and
+			// `above` on an id is dictionary order (findTextOpMatches) -- the two live in different
+			// branches because they are different questions, and the value in hand says which.
+			if (typeof val !== 'number') {
+				if (findTextOpMatches(findState.op, val, v)) { out.push(c); }
+				return;
+			}
 			if (findState.op === 'contains') {
-				s = String(val).toLowerCase();
-				if (s.indexOf(lc) >= 0) { out.push(c); }
+				if (String(val).toLowerCase().indexOf(lc) >= 0) { out.push(c); }
 				return;
 			}
-			if (findState.op === 'equals') {
-				if (typeof val === 'number') {
-					if (isFinite(num) && findNumEq(val, num)) { out.push(c); }
-				} else if (String(val).toLowerCase() === lc) { out.push(c); }
-				return;
-			}
-			if (typeof val !== 'number' || !isFinite(num)) { return; }
+			if (!isFinite(num)) { return; }
+			if (findState.op === 'equals' && findNumEq(val, num)) { out.push(c); }
 			if (findState.op === 'gt' && val > num) { out.push(c); }
 			if (findState.op === 'lt' && val < num) { out.push(c); }
 		});
@@ -9115,29 +9180,31 @@ var EngCalcs = EngCalcs || {};
 			// see at all -- so ordering by it would look like no order whatever.
 			text = findPropIsText(prop);
 		return list.sort(function (a, b) {
-			var va, vb;
+			var va, vb, cmp;
 			if (desc || asc) {
 				va = findValueOf(a, prop); vb = findValueOf(b, prop);
 				if (typeof va === 'number' && typeof vb === 'number' && va !== vb) {
 					return desc ? vb - va : va - vb;
 				}
-				// **ALPHABETICAL IS THE ORDER A TEXT PROPERTY HAS**, lowercased so `Elm` and `elm`
-				// rank together rather than by their code points. Plain `<`, like every other text
-				// comparison on this page: "J10 before J2" is that convention's known wart and
-				// inventing a natural sort here alone would make this one list obey a rule no
-				// other list on the page does.
+				// **ALPHABETICAL IS THE ORDER A TEXT PROPERTY HAS, and since Task 598 it is the
+				// reader's own alphabet.** findTextCompare() is `Intl.Collator` built once for the
+				// page's language with `numeric: true`, so `J2` comes before `J10` and an accented
+				// letter files where the language files it rather than after `z`. This used to be a
+				// lowercased `<`, which is UTF-16 code-unit order wearing an alphabet's name; the
+				// pane tables had already moved to `localeCompare` and the two lists disagreed.
 				if (typeof va === 'string' && typeof vb === 'string') {
-					va = va.toLowerCase(); vb = vb.toLowerCase();
-					if (va !== vb) { return desc ? (va < vb ? 1 : -1) : (va < vb ? -1 : 1); }
+					cmp = findTextCompare(va, vb);
+					if (cmp !== 0) { return desc ? -cmp : cmp; }
 				}
 			} else if (text) {
-				va = String(findValueOf(a, prop) === undefined ? '' : findValueOf(a, prop)).toLowerCase();
-				vb = String(findValueOf(b, prop) === undefined ? '' : findValueOf(b, prop)).toLowerCase();
-				if (va !== vb) { return va < vb ? -1 : 1; }
+				va = findValueOf(a, prop); vb = findValueOf(b, prop);
+				cmp = findTextCompare(va === undefined ? '' : va, vb === undefined ? '' : vb);
+				if (cmp !== 0) { return cmp; }
 			}
 			// Ties break on id so the order is TOTAL and stable: an unstable sort rearranges the
 			// list between two identical searches, which reads as the tool being unreliable.
-			return a.el.id < b.el.id ? -1 : (a.el.id > b.el.id ? 1 : 0);
+			return findTextCompare(a.el.id, b.el.id) ||
+				(a.el.id < b.el.id ? -1 : (a.el.id > b.el.id ? 1 : 0));
 		});
 	}
 	// Where the map has to go to show this element. A link has no point of its own, so it is the
@@ -9320,10 +9387,19 @@ var EngCalcs = EngCalcs || {};
 		return w.length;
 	}
 	// [key, localized, english] -> the spellings this key answers to, deduplicated.
+	//
+	// **THE ENGLISH SLOT MAY HOLD SEVERAL SPELLINGS, and that is how a RENAMED condition keeps its
+	// old queries readable** (Task 597). "greater than" became "above" on Tom's ruling that the
+	// comparison vocabulary is EPANET's, and a line somebody wrote down, pasted into a message or
+	// copied out of our own documentation must not stop parsing because we chose a better word for
+	// the pull-down. The FIRST entry is the current one; the rest are accepted and never printed.
 	function findAlts(defs) {
 		return defs.map(function (d) {
-			var words = [d[1]];
-			if (d[2] && !findFold(d[2], d[1])) { words.push(d[2]); }
+			var words = [d[1]], extra = (d[2] === undefined || d[2] === null) ? [] : [].concat(d[2]);
+			extra.forEach(function (w) {
+				if (!w) { return; }
+				if (!words.some(function (x) { return findFold(x, w); })) { words.push(w); }
+			});
 			return { key: d[0], label: d[1], words: words };
 		});
 	}
@@ -9611,7 +9687,8 @@ var EngCalcs = EngCalcs || {};
 			if (FIND_GROUP_ORDER[a.group] !== FIND_GROUP_ORDER[b.group]) {
 				return FIND_GROUP_ORDER[a.group] - FIND_GROUP_ORDER[b.group];
 			}
-			return a.el.id < b.el.id ? -1 : (a.el.id > b.el.id ? 1 : 0);
+			return findTextCompare(a.el.id, b.el.id) ||
+				(a.el.id < b.el.id ? -1 : (a.el.id > b.el.id ? 1 : 0));
 		});
 	}
 
@@ -9697,6 +9774,10 @@ var EngCalcs = EngCalcs || {};
 		}), findState.scope, function (v) {
 			findState.scope = v;
 			findNormalize();
+			// The filter's table follows the scope again -- see findFilterTarget(). A scope change
+			// already re-points the property and the condition; leaving the table pinned to the old
+			// scope's tab would be the one control that did not follow.
+			findFilterTable = null;
 			rebuildFindForm(); renderFindResults(null);
 		});
 		// **PROPERTY AND CONDITION SHARE ONE LINE** (Tom, 2026-08-27, of the box on a phone). They are
@@ -9805,6 +9886,10 @@ var EngCalcs = EngCalcs || {};
 		setLabel(btn, 'find', pc.lpn_find_btn || 'Find');
 		btn.addEventListener('click', runFind);
 		box.appendChild(btn);
+		// **NEXT TO THE FIND BUTTON, which on a 22rem box is the line under it** (Tom, 2026-09-06,
+		// Task 597). One select and one button: the whole of what filtering the tables costs the
+		// panel.
+		buildFilterRow(box);
 		// A rebuilt form is a CHANGED QUERY, so any pending preview is about a set that no longer
 		// exists. Dropped here rather than in each pull-down's handler, because this is the one
 		// place every scope and property change passes through.
@@ -9836,6 +9921,80 @@ var EngCalcs = EngCalcs || {};
 			return { ok: true, list: findSortCompound(findEvalNode(findQueryAst)) };
 		}
 		return { ok: true, list: findMatches() };
+	}
+	// **THE SAME QUESTION, ASKED OF A STORED LINE INSTEAD OF THE LIVE PANEL** (ROADMAP Task 597).
+	// The table filter keeps the query as TEXT and re-asks it whenever the table is drawn, so the
+	// answer follows the drawing: delete a pipe and it leaves the filtered table, widen one and it
+	// arrives. Everything after the parse is findEvalNode(), which is findMatches() with the set
+	// algebra on top -- so a filter and a search cannot disagree about which pipes are under 8
+	// inches, because there is only one function that knows.
+	//
+	// Returns { ok: false, msg } for a line that cannot be read, exactly as findRunQuery() does.
+	function findSelectByQuery(text) {
+		var r = findParse(String(text));
+		if (!r.ok) { return { ok: false, msg: r.msg }; }
+		findConnCache = null;
+		return { ok: true, list: findEvalNode(r.ast) };
+	}
+	// ---- THE FILTER BUTTON, BESIDE THE FIND BUTTON (ROADMAP Task 597) ---------------------------
+	//
+	// **WHICH TABLE IS DERIVED FROM THE SCOPE UNTIL THE USER SAYS OTHERWISE, and that is where the
+	// clicks are saved.** Somebody searching Pipes almost always wants the Pipes table, so the
+	// selector is already on it and the whole gesture is one press. Picking another one sticks;
+	// changing the scope hands the choice back to the derivation, because a scope change has already
+	// re-pointed the property and the condition for the same reason.
+	//
+	// `null` from the derivation means the scope names no single table -- Everything, and Text,
+	// which has no tab at all because nothing about a text label solves.
+	var findFilterTable = null;
+	function paneTableForScope(scope) {
+		var d = findScopeDef(scope), list = paneTables(), i;
+		if (d.key === 'all' || d.group === 'label') { return null; }
+		for (i = 0; i < list.length; i++) {
+			if (list[i].group === d.group && list[i].type === d.type) { return list[i].id; }
+		}
+		return null;
+	}
+	function findFilterTarget() {
+		return findFilterTable || paneTableForScope(findState.scope) || paneTables()[0].id;
+	}
+	// **THE LINE THAT RUNS IS THE ONE IN THE BOX**, exactly as it is for the Find button: the query
+	// input is the single expression of what this panel selects, whether the controls wrote it or
+	// the user typed it. That is also what makes the filter and the search provably the same
+	// question -- there is one string and one evaluator.
+	function applyTableFilter() {
+		var text = findQueryInput ? findQueryInput.value : findQueryString(),
+			id = findFilterTarget(), spec, run;
+		run = findSelectByQuery(text);
+		// An unreadable line filters NOTHING and says why. Hiding every row on a query we could not
+		// read would be a wrong answer wearing a confident face -- findRunQuery()'s own rule.
+		if (!run.ok) { renderFindResults(run.msg); return; }
+		paneSetFilter(id, String(text).trim());
+		openPane(id);
+		spec = paneTableById(id);
+		// The receipt is the table's own banner text, so the panel and the table cannot say two
+		// different things about one filter.
+		renderFindResults(paneFilterNoteText(spec, paneTableRowsInOrder(spec)));
+	}
+	function buildFilterRow(box) {
+		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'), btn;
+		row.className = 'lpn-find-filter';
+		findSelect(row, pc.lpn_find_filter_table || 'Table to filter',
+			paneTables().map(function (s) { return [s.id, pc[s.label] || s.id]; }),
+			findFilterTarget(), function (v) { findFilterTable = v; });
+		btn = document.createElement('button');
+		btn.type = 'button';
+		btn.id = 'lpn_find_filter_go';
+		// The tip goes on `.ec-help` wrapping the whole button label, which is CLAUDE.md's rule for
+		// a label with no link -- EngCalcs.initTips() wires `.ec-help[title]` and nothing else, so a
+		// title anywhere else is dead on touch.
+		btn.className = 'ec-help';
+		btn.title = pc.lpn_find_filter_tip ||
+			'Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
+		btn.textContent = pc.lpn_find_filter_btn || 'Filter in tables';
+		btn.addEventListener('click', applyTableFilter);
+		row.appendChild(btn);
+		box.appendChild(row);
 	}
 	function runFind() {
 		var pc = EngCalcs.pageConfig || {}, run;
@@ -12068,9 +12227,69 @@ var EngCalcs = EngCalcs || {};
 		return null;
 	}
 	function paneTableReset(spec) { spec.sig = ''; spec.orderIds = null; }
-	function paneTableElements(spec) {
+	// ---- FILTERING A TABLE, IN EPANET'S OWN WORDS (ROADMAP Task 597) ----------------------------
+	//
+	// Tom, 2026-09-06: *"EPANET allows table filters. Maybe Find could have next to the Find button
+	// a Filter in tables button ... with a selector for which table. I see this as not being the
+	// most click-efficient solution possible. But I think it's more click-efficient than EPANET."*
+	//
+	// **HIS OWN ESTIMATE IS THE ACCEPTANCE BAR AND IT IS A MODEST ONE: beat EPANET's click count,
+	// not some ideal.** EPANET's filter is a dialog of its own, opened per table, with its own
+	// property, comparison and value to fill in. Ours reuses the condition the user has very often
+	// already built in Find, and adds one select and one button to a panel that is already open.
+	// A cleverer design was not chased, because a shipped modest one beats an unshipped ideal and
+	// he said so himself.
+	//
+	// **THE FILTER IS A QUERY LINE AND NOTHING ELSE.** `paneFilters` holds the TEXT of the one-line
+	// query and paneFilterKeys() asks findSelectByQuery() who matches, so there is no second
+	// property, no second comparison and no second predicate. Two implementations of "which
+	// elements match" would disagree the first time one of them learned a new property type.
+	//
+	// **IT IS RE-ASKED ON EVERY DRAW, so the filter follows the drawing** -- widen a pipe past the
+	// threshold and it arrives, delete one and it leaves. A snapshot of ids would be a report about
+	// a network that has moved on.
+	//
+	// **IT IS STORED NOWHERE AND LIVES FOR AS LONG AS THE PAGE DOES.** It is not modelling data, so
+	// it is not the project's -- a colleague opening the file must not find half his pipes missing
+	// with no idea why -- and it is not window furniture either, because it is a question about
+	// THIS network rather than about the screen somebody is sitting at. And because a view that
+	// hides rows silently is the whole risk here, a filtered table SAYS what it is filtered by, in
+	// the query's own words, above the rows, with the way out beside it.
+	var paneFilters = {};
+	function paneFilterQuery(spec) {
+		return (spec && paneFilters[spec.id]) ? paneFilters[spec.id] : '';
+	}
+	function paneSetFilter(id, query) {
+		var spec = paneTableById(id);
+		if (!spec) { return false; }
+		if (query) { paneFilters[id] = String(query); } else { delete paneFilters[id]; }
+		// The rows and the banner both change, so the table is rebuilt rather than refilled -- and
+		// the remembered ORDER goes with it, because a filtered table is a different list.
+		paneTableReset(spec);
+		renderPaneTable(spec);
+		return true;
+	}
+	// A map of `group:id` for everything the filter admits, or null when this table has no filter.
+	// A line that has stopped parsing (nothing does that today, and a future grammar change could)
+	// admits everything rather than nothing: hiding every row is the one answer a reader cannot
+	// tell from a network that has none.
+	function paneFilterKeys(spec) {
+		var q = paneFilterQuery(spec), r, keys = {};
+		if (!q) { return null; }
+		r = findSelectByQuery(q);
+		if (!r.ok) { return null; }
+		r.list.forEach(function (c) { keys[c.group + ':' + c.el.id] = true; });
+		return keys;
+	}
+	// Every element of this type, filter or no filter -- the denominator the banner prints.
+	function paneTableAllElements(spec) {
 		var pool = spec.group === 'link' ? doc.links : doc.nodes;
 		return pool.filter(function (x) { return x.type === spec.type; });
+	}
+	function paneTableElements(spec) {
+		var rows = paneTableAllElements(spec), keys = paneFilterKeys(spec);
+		if (!keys) { return rows; }
+		return rows.filter(function (x) { return keys[spec.group + ':' + x.id] === true; });
 	}
 	// **A COLUMN MAY DECLARE WHEN IT EXISTS, and every reader of the list goes through here**
 	// (Task 566). The two reaction coefficients are inputs to an analysis the document may not be
@@ -12189,24 +12408,64 @@ var EngCalcs = EngCalcs || {};
 	// present, the order they are in, and the headings (which carry the units). A solve changes none
 	// of those, and a solve is what happens 300 ms after every keystroke -- so a rebuild on every one
 	// would take the cell the user is typing in out from under them.
+	// **THE FILTER AND ITS DENOMINATOR ARE PART OF THE SIGNATURE** (Task 597). The banner prints
+	// "showing 12 of 40", and adding a junction that the filter turns away changes the 40 while
+	// leaving every row in place -- so a signature made of the rows alone would leave a stale count
+	// on screen for as long as nothing else moved.
 	function paneTableSignature(spec, rows) {
 		return rows.map(function (el) { return el.id; }).join('|') + '||' +
-			paneCols(spec).map(paneHeadingText).join('|');
+			paneCols(spec).map(paneHeadingText).join('|') + '||' +
+			paneFilterQuery(spec) + '/' + paneTableAllElements(spec).length;
+	}
+	// The line above a filtered table: what it is filtered by, how much of the table is showing,
+	// and the way out. Null where there is no filter, so an unfiltered table gains nothing.
+	function paneFilterNoteText(spec, rows) {
+		var pc = EngCalcs.pageConfig || {};
+		return String(pc.lpn_pane_filter_note || 'Filtered by {q}. Showing {n} of {all}.')
+			.split('{q}').join(paneFilterQuery(spec))
+			.split('{n}').join(String(rows.length))
+			.split('{all}').join(String(paneTableAllElements(spec).length));
+	}
+	function paneFilterBanner(spec, rows, withClear) {
+		var pc = EngCalcs.pageConfig || {}, q = paneFilterQuery(spec), wrap, text, btn;
+		if (!q) { return null; }
+		wrap = document.createElement('div');
+		wrap.className = 'lpn-pane-filter';
+		text = document.createElement('span');
+		text.textContent = paneFilterNoteText(spec, rows);
+		wrap.appendChild(text);
+		if (withClear) {
+			btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'lpn-pane-filter-clear';
+			btn.textContent = pc.lpn_pane_filter_clear || 'Show all';
+			btn.addEventListener('click', function () { paneSetFilter(spec.id, ''); });
+			wrap.appendChild(btn);
+		}
+		return wrap;
 	}
 	function renderPaneTable(spec) {
 		var host = document.getElementById(spec.panel), pc = EngCalcs.pageConfig || {},
-			rows = paneTableRowsInOrder(spec), sig = paneTableSignature(spec, rows),
-			table, thead, tr, tbody, note;
+				rows = paneTableRowsInOrder(spec), sig = paneTableSignature(spec, rows),
+			table, thead, tr, tbody, note, filterNote;
 		if (!host) { return; }
 		if (sig === spec.sig && spec.cells) { refillPaneTable(spec, rows); return; }
 		spec.sig = sig;
 		spec.cells = {};
 		host.innerHTML = '';
+		// **A FILTERED TABLE SAYS SO BEFORE IT SAYS ANYTHING ELSE**, empty or not (Task 597). Hidden
+		// rows with no visible cause is the one way this feature can mislead somebody.
+		filterNote = paneFilterBanner(spec, rows, true);
+		if (filterNote) { host.appendChild(filterNote); }
 		if (!rows.length) {
 			note = document.createElement('p');
 			// One message for all six: "none of these yet" is true of every tab, and the tab the
-			// reader is standing on already says which these are.
-			note.textContent = pc.lpn_pane_none || 'This network has none of these yet.';
+			// reader is standing on already says which these are. **UNDER A FILTER IT WOULD BE
+			// FALSE**, and dangerously so -- the network may be full of pipes and none of them match
+			// -- so the filtered case has its own sentence.
+			note.textContent = filterNote
+				? (pc.lpn_pane_filter_none || 'Nothing in this table matches the filter.')
+				: (pc.lpn_pane_none || 'This network has none of these yet.');
 			host.appendChild(note);
 			return;
 		}
@@ -12341,7 +12600,7 @@ var EngCalcs = EngCalcs || {};
 	// the worst that can happen is the browser's own print dialog.
 	function paneBuildPrintable(spec) {
 		var pc = EngCalcs.pageConfig || {}, wrap = document.createElement('div'),
-			rows = paneTableRowsInOrder(spec), table, thead, tbody, tr, h;
+			rows = paneTableRowsInOrder(spec), table, thead, tbody, tr, h, banner;
 		wrap.id = 'lpn_print_area';
 		// **THE SHEET SAYS WHOSE NETWORK AND WHICH TABLE.** A page of numbers with no project name
 		// on it is a page nobody can file, and the tab strip that answered "which parts are these"
@@ -12352,9 +12611,16 @@ var EngCalcs = EngCalcs || {};
 		h = document.createElement('h2');
 		h.textContent = pc[spec.label] || spec.id;
 		wrap.appendChild(h);
+		// **A FILTERED SHEET SAYS WHAT IT IS A SHEET OF** (Task 597). A page of numbers that is
+		// silently a subset is worse than a page of numbers with no title on it: nobody reading it
+		// later can tell. No Show all button on paper, which is the second argument.
+		banner = paneFilterBanner(spec, rows, false);
+		if (banner) { wrap.appendChild(banner); }
 		if (!rows.length) {
 			h = document.createElement('p');
-			h.textContent = pc.lpn_pane_none || 'This network has none of these yet.';
+			h.textContent = banner
+				? (pc.lpn_pane_filter_none || 'Nothing in this table matches the filter.')
+				: (pc.lpn_pane_none || 'This network has none of these yet.');
 			wrap.appendChild(h);
 			return wrap;
 		}

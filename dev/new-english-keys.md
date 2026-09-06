@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read**, of 3 untranslated keys, of 1691 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**9 still to read**, of 9 untranslated keys, of 1697 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,13 +25,31 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (3, 3 to read @@ NEEDS RULING)
+## lpn_  (9, 9 to read @@ NEEDS RULING)
 
+- **`lpn_find_filter_btn`**
+  > Filter in tables
+  @@ NEEDS RULING
+- **`lpn_find_filter_table`**
+  > Table to filter
+  @@ NEEDS RULING
+- **`lpn_find_filter_tip`**
+  > Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.
+  @@ NEEDS RULING
 - **`lpn_help_not_epanet`**
   > Not EPANET
   @@ NEEDS RULING
 - **`lpn_help_screenshots`**
   > Pictures of this page in use
+  @@ NEEDS RULING
+- **`lpn_pane_filter_clear`**
+  > Show all
+  @@ NEEDS RULING
+- **`lpn_pane_filter_none`**
+  > Nothing in this table matches the filter.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_note`**
+  > Filtered by {q}. Showing {n} of {all}.
   @@ NEEDS RULING
 - **`lpn_tool_key_hint`**
   > Shortcut: press {key}.

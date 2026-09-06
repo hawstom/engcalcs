@@ -1167,6 +1167,12 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-find-pair { display: flex; gap: 8px; align-items: flex-end; }
 .lpn-find-pair > div { flex: 1 1 0; min-width: 0; }
 .lpn-find-pair select { max-width: 100%; }
+/* The table filter's own line, under the Find button (ROADMAP Task 597): a select saying which
+   table and the button that applies the query to it. `flex-end` so the button's baseline sits with
+   the select's box rather than with its label, which is the same alignment .lpn-find-pair uses. */
+.lpn-find-filter { display: flex; gap: 8px; align-items: flex-end; margin: 6px 0 0; }
+.lpn-find-filter > div { flex: 1 1 0; min-width: 0; margin: 0; }
+.lpn-find-filter select { max-width: 100%; }
 /* The Find panel's query line (ROADMAP Task 540): the three pull-downs written out as one
    sentence, directly above the Find button -- and, since phase 2, the input that writes them back.
    Monospaced, because it is a query and its brackets and quotes have to be countable. Full width of
@@ -1671,6 +1677,23 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* The tabular editors. Column width is king: headings stay narrow and cells stay tight. The
    heading row STICKS, because a table you scroll is a table whose headings you lose. */
 .lpn-pane-table { border-collapse: collapse; font-size: .9em; }
+/* **A FILTERED TABLE SAYS SO ABOVE ITS ROWS** (Task 597). Hidden rows with no visible cause is the
+   one way a filter can mislead, so this line is not decoration and never scrolls away with the
+   rows: it sits outside the table, in the panel, above the scrollport. The query is printed in the
+   same monospace the Find panel writes it in, because it is the same string. */
+.lpn-pane-filter {
+	display: flex;
+	gap: 8px;
+	align-items: baseline;
+	flex-wrap: wrap;
+	font-size: .85em;
+	margin: 0 0 6px;
+}
+.lpn-pane-filter span {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	overflow-wrap: anywhere;
+}
+.lpn-pane-filter-clear { font-size: 1em; }
 /* **THE FIRST COLUMN IS LEFT AND EVERY OTHER COLUMN IS CENTRED, HEADING AND CELL ALIKE** (Tom,
    2026-08-23: "Right is great justification for numbers. But in tables, center is safest for
    everything but the first column... Make the headings center and we will be back to where we

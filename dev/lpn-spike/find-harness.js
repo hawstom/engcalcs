@@ -258,8 +258,11 @@ function build(unitSet) {
 	ok('a Text scope offers its words and its size, and no ID it cannot search',
 		JSON.stringify(L.propKeys('text')) === JSON.stringify(['text', 'sizeMult']),
 		JSON.stringify(L.propKeys('text')));
-	ok('a text property gets contains/equals and no number comparisons',
-		JSON.stringify(L.opKeys('all', 'id')) === JSON.stringify(['contains', 'equals', 'top', 'bottom']),
+	// **AND SINCE TASK 598 A TEXT PROPERTY GETS above AND below TOO** (Tom, 2026-09-06: *"ID, Tag,
+	// and Text should also allow Below and Above for a localized alphanumeric order (dictionary
+	// order) comparison."*). `contains` stays first, because it is what an ID lookup means.
+	ok('a text property gets contains, equal to, and the dictionary comparisons',
+		JSON.stringify(L.opKeys('all', 'id')) === JSON.stringify(['contains', 'equals', 'gt', 'lt', 'top', 'bottom']),
 		JSON.stringify(L.opKeys('all', 'id')));
 	ok('a numeric property gets the number comparisons and no "contains"',
 		JSON.stringify(L.opKeys('pipe', 'diameter')) === JSON.stringify(['equals', 'gt', 'lt', 'top', 'bottom']),
@@ -282,9 +285,16 @@ function build(unitSet) {
 	// The normalization itself, which is what the pull-downs call. A property the new scope does not
 	// have, and an operator the new property does not have, both have to go.
 	ok('changing scope drops a property the new scope does not have',
-		L.normalize('pipe', 'pressure', 'gt') === 'id/contains', L.normalize('pipe', 'pressure', 'gt'));
-	ok('changing to a text property drops a number comparison',
-		L.normalize('all', 'id', 'lt') === 'id/contains', L.normalize('all', 'id', 'lt'));
+		L.normalize('pipe', 'pressure', 'gt') === 'id/gt', L.normalize('pipe', 'pressure', 'gt'));
+	// **AND THE CONDITION IS ONLY DROPPED WHERE THE NEW PROPERTY CANNOT ANSWER IT.** Since Task 598
+	// `above` and `below` are conditions on text as well as on a number, so falling back from
+	// Pressure to ID keeps them -- and what the user asked for still means something. `contains` is
+	// the one that has to go, because "Diameter contains 2" matches on the digits of a number.
+	ok('...and a text property keeps a comparison it can now answer',
+		L.normalize('all', 'id', 'lt') === 'id/lt', L.normalize('all', 'id', 'lt'));
+	ok('...while a number still drops "contains"',
+		L.normalize('pipe', 'diameter', 'contains') === 'diameter/equals',
+		L.normalize('pipe', 'diameter', 'contains'));
 	ok('a query the new scope CAN answer is left alone',
 		L.normalize('pipe', 'diameter', 'lt') === 'diameter/lt');
 }
@@ -630,7 +640,7 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	ok('an ID search reads as the scope, the property, the condition and the quoted text',
 		lineFor('all', 'id', 'contains', '223') === "Everything.ID contains '223'", JSON.stringify(L.queryText()));
 	ok('a numeric condition prints the number bare',
-		lineFor('pipe', 'diameter', 'gt', '8') === 'Pipe.Diameter greater than 8', JSON.stringify(L.queryText()));
+		lineFor('pipe', 'diameter', 'gt', '8') === 'Pipe.Diameter above 8', JSON.stringify(L.queryText()));
 	// **THE LINE AND THE PULL-DOWN ARE ONE STRING** (Tom, 2026-08-27: *"What needs to match are the
 	// selector and the string, both per the lang file."*). `lpn_find_op_top` is `{n} highest`; the
 	// menu prints the letter n in the slot because no count has been chosen, and the line prints the
@@ -689,7 +699,7 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	selects[2].value = 'lt';
 	fire(selects[2], 'change');
 	ok('changing the condition pull-down rewrites the query at once',
-		L.queryText() === 'Pipe.Diameter less than 8', JSON.stringify(L.queryText()));
+		L.queryText() === 'Pipe.Diameter below 8', JSON.stringify(L.queryText()));
 
 	// **AND IT IS NOW AN INPUT** (phase 2, Tom 2026-08-26). Asserted rather than intended: the
 	// element carrying the query has to be something a person can put a caret in.
@@ -888,7 +898,7 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	ok('a button offers the way back', !!back);
 	if (back) { (back._listeners.click || []).forEach(function (f) { f({}); }); }
 	ok('...and pressing it restores both the controls and the query they write',
-		L.controlsShown() && controlCount() === 3 && L.queryText() === 'Pipe.Diameter greater than 8',
+		L.controlsShown() && controlCount() === 3 && L.queryText() === 'Pipe.Diameter above 8',
 		L.queryText());
 
 	// An unreadable query gets the same treatment, for the same reason: three pull-downs standing
@@ -945,7 +955,7 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 		JSON.stringify(run('Pipe.Diameter equal to 6 O Pipe.Diameter equal to 12')));
 	Object.keys(was).forEach(function (k) { L.setWord(k, was[k]); });
 	L.buildPanel();
-	ok('the words go back', L.queryText() === 'Pipe.Diameter greater than 8', L.queryText());
+	ok('the words go back', L.queryText() === 'Pipe.Diameter above 8', L.queryText());
 }
 
 // ---- 12. EVERY LINE THE PANEL WRITES IS A LINE THE PANEL CAN READ ------------------------------
