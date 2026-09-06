@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 1671,
-        "delta_key_count": 136,
+        "expected_key_count": 1678,
+        "delta_key_count": 143,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_imgd",
@@ -528,7 +528,8 @@
         "lpn_pump_effic_curve": "Efficiency curve",
         "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.",
         "lpn_curve_none": "No curve",
-        "lpn_curve_new": "New curve...",
+        "lpn_curve_library_link": "Curves library",
+        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is made, described, edited and deleted. An element names a curve; it does not hold one.",
         "lpn_curve_shared_note": "These points belong to the curve {name}, which {ids} also use. Changing them here changes them there too.",
         "lpn_curve_long_note": "The curve {name} has {count} points, so it is shown here and edited under Libraries, Curves.",
         "lpn_curve_kind_head": "Pump head",
@@ -634,7 +635,13 @@
         "lpn_energy_curve_note": "These pumps name an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}. Open a pump to type its own points.",
         "lpn_library_curve_add": "Add a curve",
         "lpn_library_curve_kind": "What this curve describes",
-        "lpn_library_curve_values_tip": "The points, as pairs. Paste two columns from a spreadsheet or the lines out of an EPANET file if you have them. Every number is read in order and paired up, so spaces, commas and semicolons all work.",
+        "lpn_library_curve_values_tip": "Select two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.",
+        "lpn_library_curve_note_label": "Description",
+        "lpn_library_curve_note_tip": "What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.",
+        "lpn_library_curve_remove_point": "Remove this point",
+        "lpn_library_curve_copy": "Copy points",
+        "lpn_library_curve_copy_tip": "Copies every point as two columns, ready to paste into a spreadsheet.",
+        "lpn_library_curve_copy_manual": "Copy these points",
         "lpn_library_curve_used_by": "Used by",
         "lpn_library_curve_unused": "Nothing uses this curve.",
         "lpn_library_curve_in_use": "This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.",
@@ -666,7 +673,8 @@
         "lpn_pump_effic_curve": "Efficiency curve",
         "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.",
         "lpn_curve_none": "No curve",
-        "lpn_curve_new": "New curve...",
+        "lpn_curve_library_link": "Curves library",
+        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is made, described, edited and deleted. An element names a curve; it does not hold one.",
         "lpn_curve_shared_note": "These points belong to the curve {name}, which {ids} also use. Changing them here changes them there too.",
         "lpn_curve_long_note": "The curve {name} has {count} points, so it is shown here and edited under Libraries, Curves.",
         "lpn_curve_kind_head": "Pump head",
@@ -772,7 +780,13 @@
         "lpn_energy_curve_note": "These pumps name an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}. Open a pump to type its own points.",
         "lpn_library_curve_add": "Add a curve",
         "lpn_library_curve_kind": "What this curve describes",
-        "lpn_library_curve_values_tip": "The points, as pairs. Paste two columns from a spreadsheet or the lines out of an EPANET file if you have them. Every number is read in order and paired up, so spaces, commas and semicolons all work.",
+        "lpn_library_curve_values_tip": "Select two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.",
+        "lpn_library_curve_note_label": "Description",
+        "lpn_library_curve_note_tip": "What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.",
+        "lpn_library_curve_remove_point": "Remove this point",
+        "lpn_library_curve_copy": "Copy points",
+        "lpn_library_curve_copy_tip": "Copies every point as two columns, ready to paste into a spreadsheet.",
+        "lpn_library_curve_copy_manual": "Copy these points",
         "lpn_library_curve_used_by": "Used by",
         "lpn_library_curve_unused": "Nothing uses this curve.",
         "lpn_library_curve_in_use": "This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.",
@@ -1044,7 +1058,23 @@
                 }
             }
         },
-        "lpn_curve_new": {
+        "lpn_curve_library_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Kituo kimoja, viwili, au vitatu — angalia \"Mkondo wa pampu\" kwenye Maelezo hapa chini.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "Kituo cha 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_curve_library_link_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2741,6 +2771,102 @@
             }
         },
         "lpn_library_curve_values_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Mkondo unamilikiwa na pampu au vali inayoutumia, hivyo hii ni orodha nzima mahali pamoja pa kusoma. Bofya kitambulisho ili kwenda kwenye kipengele hicho na kubadilisha vituo vyake huko. Kwa pampu, mstari uliochorwa ndio mkondo unaotumika wakati wa uendeshaji, uliopatanishwa kupitia vituo hivyo; kwa vali ni ngazi zilizonyooka kati yao.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Vidhibiti",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_note_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Mkondo unamilikiwa na pampu au vali inayoutumia, hivyo hii ni orodha nzima mahali pamoja pa kusoma. Bofya kitambulisho ili kwenda kwenye kipengele hicho na kubadilisha vituo vyake huko. Kwa pampu, mstari uliochorwa ndio mkondo unaotumika wakati wa uendeshaji, uliopatanishwa kupitia vituo hivyo; kwa vali ni ngazi zilizonyooka kati yao.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Vidhibiti",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_note_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Mkondo unamilikiwa na pampu au vali inayoutumia, hivyo hii ni orodha nzima mahali pamoja pa kusoma. Bofya kitambulisho ili kwenda kwenye kipengele hicho na kubadilisha vituo vyake huko. Kwa pampu, mstari uliochorwa ndio mkondo unaotumika wakati wa uendeshaji, uliopatanishwa kupitia vituo hivyo; kwa vali ni ngazi zilizonyooka kati yao.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Vidhibiti",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_remove_point": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Mkondo unamilikiwa na pampu au vali inayoutumia, hivyo hii ni orodha nzima mahali pamoja pa kusoma. Bofya kitambulisho ili kwenda kwenye kipengele hicho na kubadilisha vituo vyake huko. Kwa pampu, mstari uliochorwa ndio mkondo unaotumika wakati wa uendeshaji, uliopatanishwa kupitia vituo hivyo; kwa vali ni ngazi zilizonyooka kati yao.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Vidhibiti",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_copy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Mkondo unamilikiwa na pampu au vali inayoutumia, hivyo hii ni orodha nzima mahali pamoja pa kusoma. Bofya kitambulisho ili kwenda kwenye kipengele hicho na kubadilisha vituo vyake huko. Kwa pampu, mstari uliochorwa ndio mkondo unaotumika wakati wa uendeshaji, uliopatanishwa kupitia vituo hivyo; kwa vali ni ngazi zilizonyooka kati yao.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Vidhibiti",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_copy_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Mkondo unamilikiwa na pampu au vali inayoutumia, hivyo hii ni orodha nzima mahali pamoja pa kusoma. Bofya kitambulisho ili kwenda kwenye kipengele hicho na kubadilisha vituo vyake huko. Kwa pampu, mstari uliochorwa ndio mkondo unaotumika wakati wa uendeshaji, uliopatanishwa kupitia vituo hivyo; kwa vali ni ngazi zilizonyooka kati yao.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Vidhibiti",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_copy_manual": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
