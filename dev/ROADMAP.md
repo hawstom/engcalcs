@@ -137,20 +137,6 @@ the block.
     never tests**: `lpnTimeStatusNote()` reads no timing at all, so a user who unchecks the box on a
     fast network is told their network is slow. Replacement in §5, awaiting his word. Translated: 26.
 
-- 100|579| **The EPANET sections still carried and not understood, extracted from 566.**
-  `[QUALITY]`, `[REACTIONS]`, `[ENERGY]` (566) and now `[SOURCES]` and `[MIXING]` (579) are
-  interpreted -- 579's own half is a booster dose on a node and a mixing model on a tank, in
-  `dev/water-quality.md` and `dev/lpn-spike/source-mixing-harness.js`. What is left of this task:
-  - **`[TAGS]`** -- DONE 2026-09-05. One free-text word on any node or link, read through both
-    doors, editable on every popup, composed on export. **The one interpreted section that changes
-    no answer**, so its harness asserts the ABSENCE where the others assert an engine difference:
-    tagging two elements must not move a head. `dev/lpn-spike/tags-harness.js`.
-  - **`[REPORT]`** -- formatting for a `.rpt` this page never requests. **Probably correct to leave
-    carried for ever**; say so deliberately rather than leaving it on a list.
-  - **`[RULES]`** -- no longer on this list. Task 248.03 closed 2026-09-05: `js/lpn-rules.js` parses
-    a rule, converts every number in it per clause, and the bridge writes the section. Kept here as
-    one line because "a rule's numbers are in the file's own units so no factor patches it" is the
-    argument the rest of this list still has to answer for itself.
 
 - 100|581| **An empty box cannot say "this file states zero" apart from "nothing is set".**
   Found 2026-09-04 while Tom read the refreshed gallery: Net2 states `Fluoride mg/L` with all-zero
