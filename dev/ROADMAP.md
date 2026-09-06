@@ -534,11 +534,17 @@ the block.
     to, as a curve is since Task 586 -- not a per-element blob.
 
 - 100|591| **The Not EPANET site: a gateway built on deep honesty and deep gratitude.**
-  Tom, 2026-09-06, having registered `note-epanet.org` and `notepanet.org` (and, the day before,
-  `NotEPANET.org` and `Not-EPANET.org` -- **four domains and he has named two different pairs, so
-  confirm which one is canonical before anything is deployed**): *"I want to add to our roadmap a
-  task to create this Not EPANET web site as a gateway to lwn and lpn. My vision is for it to be a
-  model/example/demonstration/leadership of deep honesty and deep gratitude."*
+  Tom, 2026-09-06: *"I want to add to our roadmap a task to create this Not EPANET web site as a
+  gateway to lwn and lpn. My vision is for it to be a model/example/demonstration/leadership of
+  deep honesty and deep gratitude."*
+  - **`not-epanet.org` IS THE CANONICAL NAME**, settled the same day by his own correction: *"When
+    I saw that notepanet.org had the word 'note' in it prominently, I felt that I had made a
+    mistake, and so I registered not-epanet.org as a correction."* The standing advice against
+    hyphenated domains does not reach this case -- it is about names whose unhyphenated form reads
+    correctly, and `notepanet` reads as "note panet" to everyone. A hyphen setting a word boundary
+    is the standard remedy for exactly that, and camel case cannot help because host names are
+    case-insensitive and display lowercased. The other five are defensive and redirect here.
+    The draft folder is `~/webdev/not-epanet.org`, named for it.
   - **THIS IS THE RULING TASK 544 WAS OPENED TO WAIT FOR, and it REVERSES a standing rule.**
     `dev/positioning.md` §1 says no competitor appears in a title, meta description, tagline, menu
     item or headline, and extends that to names we legally could use. A site called Not EPANET is
