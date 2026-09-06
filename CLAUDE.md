@@ -496,7 +496,7 @@ in `dev/language-strings.md`. Read it before editing any string value.** The non
 | Rule | What it requires | Enforced by |
 |---|---|---|
 | **A** | Never an HTML entity in any language string, anywhere — use the literal UTF-8 character (`—` not `&mdash;`). Absolute, because whether an entity survives depends on the call site, which is invisible from the string. | `lang_syntax_validate.php` |
-| **B** | Never an HTML tag in a plain-text-constrained string (`title` `placeholder` `alt` `aria-label` `data-*`). "Reaches plain text" is derived from the source by `plainTextBoundKeys()`, not from the key's name. | `lang_syntax_validate.php` |
+| **B** | Never an HTML tag in a plain-text-constrained string (`title` `placeholder` `alt` `aria-label` `data-*`, and a string handed to `alert()` / `confirm()` / `prompt()` — a browser dialog renders its argument as text, so a tag does not degrade there, it SHOWS). "Reaches plain text" is derived from the source by `plainTextBoundKeys()`, not from the key's name — 999 dialog values were bound by nothing until 2026-09-06 because that deriver did not model the sink. | `lang_syntax_validate.php` |
 | **C** | Advisory (`--rule-c`): where a key's name and its derivation disagree. 31 disagree on purpose. | `lang_syntax_validate.php` |
 | **D** | Single-quoted: `$ec_lang['k']='value';`. A double-quoted value **interpolates**, and one such key silently depended on another being assigned earlier in the same file. | `lang_syntax_validate.php` |
 

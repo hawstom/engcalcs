@@ -422,6 +422,28 @@ function plainTextBoundKeys(): array
                 $props[$mm[1]] = 'writeCheckHTML tip';
             }
         }
+        // JS path 2: a string handed to a BROWSER DIALOG -- alert(), confirm(), prompt().
+        //
+        // Found 2026-09-06 by Task 322's counting method rather than by re-reading the rules:
+        // js/*.js opens 71 dialogs, 37 of them carrying an $ec_lang key, and 999 values across the
+        // 27 language files reached them with rule B unable to see one. A dialog is the STRONGEST
+        // plain-text binding in the suite -- the browser renders the argument as text, with no
+        // markup and no escaping, so a tag does not degrade, it simply shows -- and it was the one
+        // sink the deriver did not model. Zero carried a tag on the day this was written, which is
+        // what makes it a ratchet rather than a repair.
+        //
+        // prompt()'s second argument is a DEFAULT VALUE and is bound exactly as tightly, so every
+        // top-level argument is scanned rather than only the first.
+        foreach (['alert', 'confirm', 'prompt'] as $dialogFn) {
+            foreach (callArguments($c, $dialogFn) as $parts) {
+                foreach ($parts as $arg) {
+                    if (preg_match_all('/(?:pageConfig|cfg|pc)\.([A-Za-z0-9_]+)/', $arg, $dm)) {
+                        foreach ($dm[1] as $p) { $props[$p] = 'browser dialog'; }
+                    }
+                }
+            }
+        }
+
         foreach ($props as $prop => $how) {
             // Resolve through the page's own pageConfig block; fall back to the bare property
             // name for the pages that do use an unprefixed key.
