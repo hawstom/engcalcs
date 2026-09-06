@@ -24,31 +24,6 @@
   "below even carry the tag. An explicit list is the honest mechanism."
  ],
  "exempt": {
-  "lpn_color_mode_manual": {
-   "category": "cognate",
-   "languages": [
-    "es",
-    "pt",
-    "ro",
-    "id"
-   ],
-   "reason": "Manual -- the colour-band mode where the reader sets the breaks. Four independent sprint-459 agents landed on the identical word; it is the ordinary term in each of these languages for this sense, not an untranslated string."
-  },
-  "mi_notes_3_term": {
-   "category": "cognate",
-   "languages": [
-    "es",
-    "pt"
-   ],
-   "reason": "Errata -- the Latin plural, borrowed unchanged. Not listed for fr, whose agent chose the singular Erratum on the ground that the note covers one erratum; that is a better rendering than an exemption, and the array form is what keeps it visible if another language ever lands here by accident."
-  },
-  "lpn_pane_tab_tanks": {
-   "category": "cognate",
-   "languages": [
-    "de"
-   ],
-   "reason": "Tanks -- German uses Tank/Tanks for this, and the same file already says Tank in lpn_mode_add_tank. Coincidental identity in the plural only."
-  },
   "bpn_id": {
    "category": "symbol",
    "languages": "*",
@@ -208,6 +183,26 @@
    ],
    "reason": "'Status' is the natural word in these languages; a synonym would read as worse."
   },
+  "lpn_color_mode_manual": {
+   "category": "cognate",
+   "languages": [
+    "es",
+    "pt",
+    "ro",
+    "id"
+   ],
+   "reason": "Manual -- the colour-band mode where the reader sets the breaks. Four independent sprint-459 agents landed on the identical word; it is the ordinary term in each of these languages for this sense, not an untranslated string."
+  },
+  "lpn_curve_volume_col": {
+   "category": "cognate",
+   "languages": [
+    "fr",
+    "id",
+    "it",
+    "pt"
+   ],
+   "reason": "Volume -- the curve-kind column heading. THREE independent sprint-584-wave1 agents (fr, pt, it) each landed on the identical word, each hit the identical-to-english gate, and each worked around it with the forced abbreviation 'Vol.'. That is the check making the translation WORSE: Volume is the ordinary word in all three languages and the abbreviation was chosen to satisfy a script, not a reader. Indonesian joined them in the same sprint, from an agent that had NOT been given the cognate paragraph and wrote the natural word anyway -- which is the behaviour the paragraph now asks for everywhere."
+  },
   "lpn_dialog_ok": {
    "category": "loanword",
    "languages": [
@@ -220,6 +215,20 @@
     "ro"
    ],
    "reason": "OK -- the dialog confirm button. Scoped, NOT global: these seven languages use bare \"OK\" as the conventional button label, but 19 others translate it (zh 确定, tr Tamam, es Aceptar, hr U redu, uk Гаразд, sw Sawa), so a global exemption would hide a genuinely untranslated string. Added 2026-08-13 after the wave-4 cs agent correctly found the key already present and correct."
+  },
+  "lpn_energy_col_cost": {
+   "category": "cognate",
+   "languages": [
+    "ro"
+   ],
+   "reason": "Cost -- a true Romanian cognate, reported by its own agent, which changed it to the articulated 'Costul' to clear the gate. A column heading is the one place the bare form is wanted."
+  },
+  "lpn_energy_col_effic": {
+   "category": "cognate",
+   "languages": [
+    "it"
+   ],
+   "reason": "Effic. -- the pump-energy efficiency column heading. Italian abbreviates 'efficienza' the same way; its agent was forced to 'Rend.' (rendimento) purely to clear the gate. Listed for it alone, because only its agent reported the collision."
   },
   "lpn_ex_elm_street_title": {
    "category": "brand",
@@ -240,6 +249,11 @@
    "category": "brand",
    "languages": "*",
    "reason": "EPANET Net3 -- the sample network's own name, as EPANET itself calls it."
+  },
+  "lpn_ex_net3_world_title": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "EPANET Net3 is the sample network's own name, and the rest of the title is the project-mode name. Where a language keeps 'lat/lon' literal the whole title is legitimately identical to English; where it translates the mode name (10 of 26 files do) the value differs on its own. Exempt means identical is permanently CORRECT here, not that it must be identical. Added 2026-08-19 after the gate pushed three agents into distorting a correct title to defeat it -- an invented phrase, an em dash for a comma, and a coinage inconsistent with the same file's other mode-name strings."
   },
   "lpn_field_auto": {
    "category": "cognate",
@@ -290,12 +304,44 @@
    "languages": "*",
    "reason": "Y -- map coordinate axis symbol."
   },
+  "lpn_geomap": {
+   "category": "symbol",
+   "languages": "*",
+   "reason": "lat/lon -- the geographic project mode, and the twin of lpn_xymap ('xy'), which has been exempt for every language all along. It is an abbreviation of the coordinate pair, and 16 of 26 languages keep it as it stands while the rest render it in their own script; exemption says identical is ALLOWED, never required, so both remain correct. Listed 2026-09-02 because every sprint had been re-proposing it as an untranslated key and mode_name_check.php had just taken 28 findings to zero on the same two keys: six languages had translated the anchor while their own sentences kept the Latin abbreviation."
+  },
+  "lpn_labels_col_decimals_example": {
+   "category": "number-format",
+   "languages": "*",
+   "reason": "0.000 -- an example of how many decimals a map label shows, so it is a NUMBER FORMAT rather than a phrase. The suite splits 14 to 14 between the decimal point and the decimal comma, and both are right for their own readers, so neither can be the single correct value and identical-to-English is correct wherever the point is used."
+  },
+  "lpn_library_curve_note_label": {
+   "category": "cognate",
+   "languages": [
+    "fr"
+   ],
+   "reason": "Description -- identical in French. Its agent wrote 'Note descriptive' to clear the gate."
+  },
   "lpn_menu_edit": {
    "category": "cognate",
    "languages": [
     "id"
    ],
    "reason": "Edit -- 'edit' is an absorbed Indonesian verb (KBBI, cf. mengedit) and the ordinary menu label. Kept where the sibling lpn_tool_file was changed to Berkas, because 'file' has a settled native alternative in Indonesian localization and 'edit' does not. Flag for native review."
+  },
+  "lpn_mixing_fifo": {
+   "category": "acronym",
+   "languages": "*",
+   "reason": "FIFO plug flow -- FIFO is an untranslatable acronym in every language here, and the Hebrew agent reported being forced off the bare form. The words around it may be translated; a language whose rendering is legitimately identical is finished, not neglected."
+  },
+  "lpn_mixing_lifo": {
+   "category": "acronym",
+   "languages": "*",
+   "reason": "LIFO plug flow -- same as lpn_mixing_fifo."
+  },
+  "lpn_new_coords_geo": {
+   "category": "symbol",
+   "languages": "*",
+   "reason": "lat/lon -- the same abbreviation as lpn_geomap, on the new-project coordinate choice, and it must READ the same as the mode name or mode_name_check.php fails the language. Exempt for the same reason and on the same terms: identical is allowed, not required."
   },
   "lpn_new_text": {
    "category": "cognate",
@@ -305,6 +351,13 @@
     "ro"
    ],
    "reason": "Text -- the default contents of a newly placed text label. Same word and same evidence as lpn_tool_add_text. Added ro, Task 251 wave 3, 2026-08-13: text is the ordinary Romanian noun and OK is universal; the ro agent kept them while translating every other Latin-script term, and its one genuine false cognate (Auto, which reads automotive in Romanian) was caught separately and changed to Automat."
+  },
+  "lpn_pane_tab_tanks": {
+   "category": "cognate",
+   "languages": [
+    "de"
+   ],
+   "reason": "Tanks -- German uses Tank/Tanks for this, and the same file already says Tank in lpn_mode_add_tank. Coincidental identity in the plural only."
   },
   "lpn_pump_point1": {
    "category": "cognate",
@@ -320,6 +373,13 @@
    "category": "cognate",
    "languages": "*",
    "reason": "'Point 3' -- see lpn_pump_point1."
+  },
+  "lpn_result_concentration": {
+   "category": "cognate",
+   "languages": [
+    "fr"
+   ],
+   "reason": "Concentration -- identical in French, and its agent substituted 'Teneur' only to clear the gate. Teneur is a real French water-quality word and is not wrong; it was not, however, a translation decision."
   },
   "lpn_scenario_base": {
    "category": "cognate",
@@ -354,10 +414,24 @@
    ],
    "reason": "'Scenario {n}' -- same word as lpn_scenario_label plus a number."
   },
+  "lpn_settings_elev_source_dem": {
+   "category": "product-name",
+   "languages": [
+    "bg"
+   ],
+   "reason": "Mapbox DEM -- a product name plus the standard acronym for a digital elevation model. Listed for bg, whose agent refused to dodge the checker and filed the gap instead, which was the right call. Exemption says identical is ALLOWED, never required: the languages that built a natural phrase around the two words (Amharic's genitive, Swahili's 'DEM ya Mapbox', Khmer's 'Mapbox DEM layer') keep it. What is not acceptable is a word order chosen only to differ from English in bytes, which is what five sprint-573 agents reached for before one of them named the real problem."
+  },
   "lpn_settings_page": {
    "category": "cognate",
    "languages": "*",
    "reason": "'Page' is identical in fr and several others."
+  },
+  "lpn_source_type_concen": {
+   "category": "cognate",
+   "languages": [
+    "fr"
+   ],
+   "reason": "Concentration -- EPANET's CONCEN source type. Same French collision as lpn_result_concentration, same forced substitution."
   },
   "lpn_time_pause": {
    "category": "cognate",
@@ -414,6 +488,11 @@
    ],
    "reason": "Indonesian pipework practice says 'katup throttle' -- 'throttle' is a standing loanword with no distinct native term, so the label keeps it. Sprint 316."
   },
+  "lpn_xymap": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "XY -- the flat-grid project mode's name, two letters rather than words. Marked exempt 2026-08-19 after the de agent renamed a correct 'XY' to 'XY-Ebene' purely to stop the identical-to-english check firing: a gate that forces a wrong translation is worse than no gate."
+  },
   "mhp_vel_ok_short": {
    "category": "cognate",
    "languages": [
@@ -434,6 +513,14 @@
     "fr"
    ],
    "reason": "'Segment' is the French word, spelled identically."
+  },
+  "mi_notes_3_term": {
+   "category": "cognate",
+   "languages": [
+    "es",
+    "pt"
+   ],
+   "reason": "Errata -- the Latin plural, borrowed unchanged. Not listed for fr, whose agent chose the singular Erratum on the ground that the note covers one erratum; that is a better rendering than an exemption, and the array form is what keeps it visible if another language ever lands here by accident."
   },
   "mtc_pi_ok_tip": {
    "category": "numeric",
@@ -472,38 +559,6 @@
    "category": "abbreviation",
    "languages": "*",
    "reason": "IMGD -- imperial million gallons per day. Sibling of u_mgd ('MGD'), which needs no entry because ecIsUniversalKey() auto-exempts a u_ key whose English has no run of four letters. IMGD has exactly four, so it falls off that heuristic by one character while meaning the same kind of thing. Several languages do render it (Mgal imp/dia, Mgal imp/j, Mgal imp/Tag) and exemption does not stop them -- it only says that keeping the Latin abbreviation, as many scripts do for unit symbols, is a legitimate answer rather than an untranslated string."
-  },
-  "lpn_xymap": {
-   "category": "brand",
-   "languages": "*",
-   "reason": "XY -- the flat-grid project mode's name, two letters rather than words. Marked exempt 2026-08-19 after the de agent renamed a correct 'XY' to 'XY-Ebene' purely to stop the identical-to-english check firing: a gate that forces a wrong translation is worse than no gate."
-  },
-  "lpn_ex_net3_world_title": {
-   "category": "brand",
-   "languages": "*",
-   "reason": "EPANET Net3 is the sample network's own name, and the rest of the title is the project-mode name. Where a language keeps 'lat/lon' literal the whole title is legitimately identical to English; where it translates the mode name (10 of 26 files do) the value differs on its own. Exempt means identical is permanently CORRECT here, not that it must be identical. Added 2026-08-19 after the gate pushed three agents into distorting a correct title to defeat it -- an invented phrase, an em dash for a comma, and a coinage inconsistent with the same file's other mode-name strings."
-  },
-  "lpn_settings_elev_source_dem": {
-   "category": "product-name",
-   "languages": [
-    "bg"
-   ],
-   "reason": "Mapbox DEM -- a product name plus the standard acronym for a digital elevation model. Listed for bg, whose agent refused to dodge the checker and filed the gap instead, which was the right call. Exemption says identical is ALLOWED, never required: the languages that built a natural phrase around the two words (Amharic's genitive, Swahili's 'DEM ya Mapbox', Khmer's 'Mapbox DEM layer') keep it. What is not acceptable is a word order chosen only to differ from English in bytes, which is what five sprint-573 agents reached for before one of them named the real problem."
-  },
-  "lpn_geomap": {
-   "category": "symbol",
-   "languages": "*",
-   "reason": "lat/lon -- the geographic project mode, and the twin of lpn_xymap ('xy'), which has been exempt for every language all along. It is an abbreviation of the coordinate pair, and 16 of 26 languages keep it as it stands while the rest render it in their own script; exemption says identical is ALLOWED, never required, so both remain correct. Listed 2026-09-02 because every sprint had been re-proposing it as an untranslated key and mode_name_check.php had just taken 28 findings to zero on the same two keys: six languages had translated the anchor while their own sentences kept the Latin abbreviation."
-  },
-  "lpn_new_coords_geo": {
-   "category": "symbol",
-   "languages": "*",
-   "reason": "lat/lon -- the same abbreviation as lpn_geomap, on the new-project coordinate choice, and it must READ the same as the mode name or mode_name_check.php fails the language. Exempt for the same reason and on the same terms: identical is allowed, not required."
-  },
-  "lpn_labels_col_decimals_example": {
-   "category": "number-format",
-   "languages": "*",
-   "reason": "0.000 -- an example of how many decimals a map label shows, so it is a NUMBER FORMAT rather than a phrase. The suite splits 14 to 14 between the decimal point and the decimal comma, and both are right for their own readers, so neither can be the single correct value and identical-to-English is correct wherever the point is used."
   }
  }
 }

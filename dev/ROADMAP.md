@@ -114,14 +114,39 @@ the block.
   - **CITED precedent for the door itself:** EPANET's Data Browser Add button creates a
     junction/pipe/etc. from the object list and opens its editor with no map click first. `lpn_` has
     exactly one door to a new node -- the canvas pointer click.
-  - **The unanswered half is WHICH KEYS, and it is research, not taste.** Seven objects need
-    bindings: junction, reservoir, tank, pipe, pump, valve and Text. Look at what EPANET, epanet-js,
-    QGIS and AutoCAD actually bind before inventing anything, and record the sources. **Whatever is
-    chosen must not collide with the browser's own or with what this page already binds** -- Escape
-    leaves any tool, Ctrl+Z is undo -- and a single unmodified letter is the cheapest thing to type
-    and the easiest thing to hit by accident in a text field, so say how that is handled.
-  - **It is `muffleable`, which is Tom's word and the clerk's standing constraint**: a binding
-    nobody presses must cost a person who never presses it exactly nothing.
+  - **THE RESEARCH IS DONE, 2026-09-06, and its headline finding is that THERE IS NO CONVENTION TO
+    ADOPT.** The `data-entry-clerk` looked at EPANET 2.2, epanet-js, QGIS, ArcGIS Pro and AutoCAD.
+    **None of the five binds a bare key to tool selection.** EPANET, QGIS and ArcGIS Pro document
+    none at all; epanet-js binds one letter and it is not a tool; AutoCAD's alias culture is real
+    and is the closest thing Tom already has in his hands, but it lives inside a dedicated
+    always-focused command line, which is a gating mechanism this page has not got. **So whatever
+    ships here is an INVENTED scheme, not an adopted one, and must be described that way** -- the
+    seat said so itself rather than dressing the proposal up as precedent. Full citations in
+    `dev/agents/data-entry-clerk/journal.md`.
+  - **Its proposal, and the one weak row is flagged by its own author:**
+
+    | Junction | Reservoir | Tank | Pipe | Pump | Valve | Text |
+    |---|---|---|---|---|---|---|
+    | `J` | `R` | `T` | `P` | `U` | `V` | `X` |
+
+    `U` because `P` is Pipe; **`X` is arbitrary and is the weak one** -- `T` is Tank, and `X` reads
+    suite-wide as close/remove, so it carries a mnemonic risk the seat named without being asked.
+  - **THE COLLISION SURVEY CAME BACK CLEAN, AND THE GUARD ALREADY EXISTS.** No existing binding uses
+    a bare letter. What is taken: `Escape` (four sites, ungated), `Delete`/`Backspace` (gated on
+    `keyboardIsTyping()`), `Ctrl+Z`/`Cmd+Z` (gated on `isTextEntry()`), `Enter` and the arrow /
+    `Home` / `End` set (each scoped to one widget). **The single-letter problem needs no new design:
+    reuse `isTextEntry()` before treating a bare key as a tool switch** -- the same one-line check
+    Ctrl+Z already uses, and for the same reason Tom gave here (*"It was scary when I entered an
+    unknown node"*).
+  - **Muffleable for free:** the key calls the same `setMode('add-junction')` the toolbar button
+    already calls, so a mouse-only user is unaffected and discoverability costs one `title` per
+    button.
+  - **THE SEAT RE-RANKED ITSELF THIRD AGAIN, AGAINST ITS OWN FEATURE, AND THE ARITHMETIC IS THE
+    REASON TO BELIEVE IT.** A tool-select key saves one click per TOOL SWITCH, not per element --
+    400 junctions under one held tool is a handful of clicks for the whole session. Task 186
+    (widened to allow row CREATION, not only editing) and Task 592 (CSV/GPX import) each remove a
+    per-ELEMENT round trip, 400 times over. *"Roughly two orders of magnitude smaller than either
+    of the tasks already ahead of it."* Worth having for the one-off; not the answer to volume.
 
 - 75|592| **[AI] Read a surveyed point list: junctions from a CSV or GPX file.**
   **Promoted from the market researcher's wish list, 2026-09-06, ranked first there** (its journal

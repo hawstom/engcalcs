@@ -119,3 +119,46 @@ here yet, and the plan set is the spreadsheet. Both are real, and OUT is probabl
 build first since it "cannot corrupt anything" (186's own words) — I am not asking to reorder that.
 I am asking that IN, when it is scoped, be scoped against MY case (create, not just edit) and not
 quietly narrowed to the safer half of the same problem.
+
+## 5. Task 595's build proposal: the seven bindings (this seat's own answer, not yet Tom's)
+
+Full research and the collision table are in the journal, third invocation, 2026-09-06. Summary of
+the finding before the table: **no comparable tool binds a bare letter to tool selection.** EPANET,
+QGIS and ArcGIS Pro document none; epanet-js binds exactly one letter (`Y`, scenario toggle, not a
+tool) and its one asset-creation shortcut is a modifier held during an active drag, not an idle-state
+key; AutoCAD's alias culture is real but lives inside a dedicated always-focused command line, a
+mechanism `lpn_` does not have. **So this is not "join a convention" — it is "invent one," honestly,
+and the proposal below is mine, not an industry standard's.**
+
+Given that, I would still build it — a one-off Add without a mouse trip is a real, if small,
+convenience — but I would pick letters by MNEMONIC clarity over any borrowed scheme, since there is
+no scheme to borrow faithfully:
+
+| Element | Key | Why this letter |
+|---|---|---|
+| Junction | `J` | Unambiguous initial, and the element a clerk places most |
+| Reservoir | `R` | Unambiguous initial, no collision with anything |
+| Tank | `T` | Unambiguous initial, no collision with anything |
+| Pipe | `P` | Unambiguous initial, and the second most common placement |
+| Pump | `U` | `P` is taken by Pipe; `U` is the second letter and reads as "pUmp" once shown on the tool's own tooltip — no perfect letter exists once Pipe has first claim, and this is the honest trade-off, not a discovery |
+| Valve | `V` | Unambiguous initial, no collision with anything |
+| Text | `X` | `T` is taken by Tank; `X` is arbitrary but is the character already used suite-wide for "close/remove," which risks the opposite mnemonic (Tom, if reviewing, may prefer a different arbitrary pick — I have no strong case for `X` over any other free letter here) |
+
+**The gate, restated as one line of code, not a new design:** every one of the seven listens through
+the SAME check the file already uses twice (`isTextEntry()` at `js/looped-network.js:29055`-ish,
+`keyboardIsTyping()` at `:8330`) — `if (isTextEntry(e.target)) { return; }` before the bare-letter
+branch fires. No new predicate is needed; reuse the existing one so the guard cannot drift from what
+Delete and Ctrl+Z already enforce.
+
+**Muffle:** the key calls the SAME `setMode('add-junction')` etc. the toolbar buttons already call
+(`js/looped-network.js:19074`-`19080`), so a person who never learns the key sees nothing new on the
+page. Discoverability costs one `title` attribute per existing toolbar button (`"Junction (J)"`-
+shaped) — no new UI surface, no tooltip nobody asked for, no dialog.
+
+**My ranking, restated once more:** third, behind item 1 (Task 186 widened to CREATE rows, not just
+edit them) and the market-researcher's CSV/GPX import (Task 592, now raised to priority 75 by Tom).
+The arithmetic: a tool-select key saves one click per TOOL SWITCH, not per element placed — for 400
+junctions placed with one tool held the whole session, this saves at most a handful of clicks total,
+while 186-widened and 592 each remove a per-ELEMENT round trip, 400 times. I would build 592, then
+186-widened, then this — in that order — and I said so before Task 595 existed and am saying it
+again now that it does.

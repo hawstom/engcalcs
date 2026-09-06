@@ -208,3 +208,124 @@ keyboard-door-shaped Add button. EPANET has the Add-button shape too and it is r
 smaller, genuinely simpler thing to build than an importer — but it is not what the market treats
 as ITS answer to volume; it is what EPANET treats as its answer to occasional one-off objects added
 without reaching for the mouse.
+
+## Third invocation, 2026-09-06 — Tom asked for Task 595 directly: WHICH KEYS for the seven add-tools
+
+Tom, relayed: *"Data entry clerk: They requested keys for adding assets. Did you lose that? I asked
+for it to be added to our roadmap. And research conventions for keys to bind to the 6 assets +
+text."* It was not lost — it was always in wishlist item 2, ranked THIRD by me — but it was never on
+`dev/ROADMAP.md`, which is now fixed as Task 595 and not my file to have fixed. This entry is the
+research Task 595 says is still open.
+
+### The research: five tools, and the finding is mostly a negative one
+
+**CITED** EPANET 2.2's own documentation (`4_EPANET_workspace.html`, `6_objects.html`, cited fully
+in this journal's first two sessions) never states a keyboard accelerator for the toolbar's
+node/link buttons. Its one keyboard door to a new object is the Data Browser's Add button — a
+click, not a key — and property navigation inside the resulting dialog is Up/Down arrows and Tab,
+already recorded above. Searched again this session for a toolbar accelerator table specifically
+and found none in the manual, the quickstart, or two independent course mirrors of the same
+material.
+
+**CITED** epanet-js: searched their own blog (`epanetjs.com/blog/2025/08/01/introducing-epanet-js/`
+and the Aug–Feb 2025–26 progress reports). The only two keyboard bindings documented anywhere are
+**Y**, which toggles between the current and previous SCENARIO (not a tool), and **Shift+Enter**,
+which runs a simulation. Their one asset-creation accelerator is **holding Ctrl while already
+dragging a pipe**, which drops a junction at the cursor without stopping the drag — a MODIFIER held
+during an in-progress pointer gesture, not a bare key that activates a tool from an idle state. No
+bare-letter tool-select binding is documented anywhere in their public material.
+
+**CITED** QGIS's digitizing toolbar: tool selection (point/line/polygon layer, add-feature button)
+is a toolbar click or the "Toggle Editing" state per docs.qgis.org's editing chapter; the specific
+single-key bindings I could source are **T** (toggle trace digitizing) and, inside an active sketch,
+letters for constraint entry (`x` for absolute X, `d`/`a`/`r` for distance/angle/radius in some
+versions) — none of them select WHICH GEOMETRY TYPE to draw. That choice is made by which vector
+layer is the active layer, not by a keystroke, because QGIS's whole editing model is
+one-layer-at-a-time.
+
+**CITED** ArcGIS Pro's own "Keyboard shortcuts for editing" page
+(`doc.esri.com/en/arcgis-pro/latest/help/editing/keyboard-shortcuts-for-editing.html`, redirected
+from `pro.arcgis.com`): construction-tool shortcuts (`A` direction, `D` distance, `R` radius, `F6`
+absolute X,Y,Z) are stated to apply **"when you create point features"** / **"when you create
+polyline and polygon features"** — i.e., they operate only INSIDE an already-active sketch, refining
+the geometry being drawn. Tool activation itself is `Ctrl+Shift+C` to open the Create Features pane,
+then a click on a feature template. No single bare key switches which template/tool is active.
+
+**CITED** AutoCAD's own command-alias culture (`acad.pgp`; Autodesk's own "Command Aliases" blog
+post, `blogs.autodesk.com/autocad/autocad-command-aliases`) is real and IS the closest thing Tom
+already has in his hands — `L` for LINE, `C` for CIRCLE, `PL` for PLINE, `E` for ERASE. But the
+gating mechanism is structurally different from a webpage's `keydown` listener: the letters are
+TYPED INTO THE COMMAND LINE, a dedicated always-focused text box, and only fire when terminated by
+Enter. AutoCAD has no analogue of "a property field elsewhere on screen has focus and swallows the
+keystroke" the way a web form does — the command line IS the one place keystrokes go by default.
+Importing the alias CULTURE without the command-line GATING MECHANISM is importing half a design.
+
+**Finding, stated plainly:** of five tools surveyed, three (EPANET, QGIS, ArcGIS Pro) document NO
+bare-key tool-activation binding at all; one (epanet-js) has exactly one letter bound, and it is not
+for tool selection; one (AutoCAD) has a rich single-letter culture but ships it inside a completely
+different input model (a command line) that a canvas-based web page does not have. **This is
+evidence that "bind a letter to each add-tool" is not an industry convention `lpn_` would be
+joining — it would be inventing one**, and the AutoCAD precedent Tom is fluent in does not transfer
+as cleanly as "he already knows this" suggests, because the safety net (a dedicated always-focused
+command line) is the part AutoCAD actually relies on and `lpn_` does not have.
+
+### The collision survey — what `js/looped-network.js` already binds, read this session
+
+| Key | Where | Gated on typing? |
+|---|---|---|
+| `Escape`/`Esc` | `js/looped-network.js:6605` (cancelActive, capture phase), `:8241`, `:13240`, `:18616` (new-project box close) | No target check at 6605/8241/13240/18616 — Escape is treated as always-safe, which is standard (Escape rarely types a character) |
+| `Delete`/`Backspace` | `js/looped-network.js:8333` deletes the current selection | **Yes** — `keyboardIsTyping()` (`:8330`) checks `INPUT`/`TEXTAREA`/`SELECT`/`contentEditable` and returns early |
+| `Ctrl+Z`/`Cmd+Z` | `js/looped-network.js:29065` undo | **Yes** — `isTextEntry(e.target)` (`:8241` area, function at `:29055`-ish), same four-tag check, added specifically because it was "scary" per Tom's own quote at `:29051` |
+| `Enter` | Several: find box (`:9570`), replace box (`:10281`), new-project box create (`:18852`), a Controls-library input (`:17139`) | N/A — these are `keydown` listeners on the SPECIFIC input, not global |
+| `ArrowUp`/`ArrowDown`/`ArrowLeft`/`ArrowRight`/`Home`/`End` | Setbox resize (`:24254`-`24260`), curve-point-table nav (`:25943`-`25970`), listbox picker (`:11209`-`11218`) | Scoped to specific elements, not global |
+| No bare letter is bound anywhere globally | grepped `e.key === '[a-zA-Z]'` across the whole file — zero hits | — |
+
+**So the field is genuinely open** — no bare letter collides with anything `js/looped-network.js`
+already does — but the ONE existing global bare-key-adjacent precedent (`Ctrl+Z`) is gated on
+`isTextEntry()`/`keyboardIsTyping()`, and Tom's own words about why (*"It was scary when I entered
+an unknown node"*) are exactly the single-letter problem Task 595 asks about, already answered once
+in this file for a different key.
+
+### The single-letter problem, answered concretely
+
+A bare letter fired on a raw `keydown` with no target check would switch tools while a user is
+mid-sentence in the Description field, mid-number in a diameter cell, or mid-search in the Find box
+— silently, because nothing about typing a letter looks like an error to the browser. Both
+`isTextEntry()` and `keyboardIsTyping()` already exist in this file, checking the identical four
+tags, so the guard is a ONE-LINE reuse, not new design. The gate a new tool-select binding needs is
+therefore already this file's own pattern: `if (isTextEntry(e.target)) { return; }` before treating
+any bare key as a tool switch — nothing in EPANET, QGIS or ArcGIS Pro needed to answer this because
+none of them binds a bare key to begin with; AutoCAD answers it structurally (the command line owns
+the keystroke by default) rather than by a focus check.
+
+### The arithmetic, against Tasks 592 and 186
+
+I ranked this THIRD in my own wishlist before Task 595 existed, behind (1) Task 186 widened to cover
+row CREATION and From/To/X/Y, and (2) the market-researcher's CSV/GPX import (now, I believe, folded
+into or adjacent to Task 592 — I have not re-read 592's current wording this session and should
+before citing its number again with confidence; SPECULATION that it is the same row).
+
+**Restating the arithmetic honestly:** a keyboard tool-switch binding saves exactly one pointer click
+per TOOL CHANGE, not per element. Today's flow already reuses one tool across many placements (place
+→ click same spot to open+select-mode → retool only when switching element TYPE). For "400 pipes
+from a marked-up plan set" — one element type, placed 400 times — the binding saves at most a
+HANDFUL of tool switches for the whole session (however many times the clerk alternates junction vs
+pipe vs valve), not 400 anything. Compare: Task 186 widened to allow row creation removes the
+per-row popup round trip ENTIRELY for every one of the 400 rows once the topology exists; a mapped
+import (592) removes the per-row round trip AND the per-node placement click, for every one of the
+400. **The seven-key binding is real and I would take it, but it is arithmetically the smallest of
+the three by roughly two orders of magnitude**, and Task 595 should not be read as competing with
+either — it is a much cheaper, much smaller thing that happens to be easy to scope precisely because
+it is small.
+
+### Muffleable, applied here
+
+A tool-select key nobody presses must cost nothing: no dialog, no highlight-flash, no status-bar
+text-on-every-press. The existing tool buttons already show the active mode by CSS state
+(`js/looped-network.js:20157`-`20163`'s toolbar array, rendered elsewhere with an active class,
+SPECULATION on the exact render call not re-checked this session) — a key press need only call the
+SAME `setMode('add-junction')` etc. those buttons already call, so a person who never learns the key
+sees literally nothing different about the page, and a person who learns it gets the existing visual
+feedback for free. No new UI surface is needed to make it discoverable beyond a tooltip addition on
+the existing toolbar buttons (`title="Junction (J)"`-shaped), which costs nothing to a mouse user
+and is exactly how AutoCAD's own ribbon states its aliases.

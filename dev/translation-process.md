@@ -548,6 +548,57 @@ the exact disagreement `mode_name_check.php` reports and which this sprint exist
 keys, ten-plus wasted cycles, one fix: the generator must not list a key the target file already
 holds.
 
+### `equal_to_english` means REPLACE IN PLACE, and a brief that says "missing" causes duplicates
+
+**Sprint 584-wave1, and it was the ORCHESTRATOR'S brief at fault, not the generator.** The brief told
+every agent that `keys_to_translate` held keys *"MISSING from your language file"*. That is true of
+the `missing` and `blank` deltas and FALSE of the `equal_to_english` ones, which are keys the file
+already holds with a value equal to the English. Two such keys (`lpn_find_q_and`, `lpn_find_q_or`)
+reached four payloads; three agents appended them a second time, and two of the three caught their
+own duplicate and removed it.
+
+- **The information was in the payload all along**: `key_context[<key>].reason` says
+  `equal_to_english` and `current_value` holds what the file already has. Nobody read it, because
+  the brief had already told them what the list meant.
+- **So a brief must say both shapes**: *most of these keys are missing and are appended; some
+  already exist with a value equal to the English and must be REPLACED IN PLACE — check
+  `key_context[key].reason` before you append.*
+- This is the same defect sprint 459 recorded ("a key that already exists must not arrive in
+  `keys_to_translate`") arriving by a different door. 459 blamed the generator; the generator is
+  behaving as designed, and what was missing is that an equal-to-English key is a REPLACEMENT
+  request. The fix is in the BRIEF.
+- **AND THESE TWO KEYS WERE NOT EXEMPT MATERIAL, WHICH IS RECORDED BECAUSE IT WAS NEARLY GOT
+  WRONG.** The orchestrator's first move was to exempt them as "EPANET keywords", on the strength of
+  every agent leaving `AND`/`OR` in English inside `lpn_library_rule_tip`. That is a DIFFERENT
+  string. `findJoinDefs()` returns `['and', <label>, 'AND']`: the LABEL is what the user reads and
+  types, and the third element is the canonical token the parser stores — so the label is
+  localizable and the token is not. The Czech agent translated the label and was right; the
+  exemption was withdrawn before it shipped. **A key whose VALUE looks like syntax may still be a
+  label. Read the call site, not the value.**
+
+### The cognate collision, measured in sprint 584-wave1 — tell the agents, or the check writes the translation
+
+**Six languages, on six different keys, were forced OFF the correct word by `identical-to-english`.**
+Not one of them was a translation error. `Volume` is the ordinary word in French, Portuguese and
+Italian; `Cost` is a true Romanian cognate; `Concentration` and `Description` are identical in
+French; `FIFO`/`LIFO` are untranslatable acronyms. Each agent, finding its correct answer blocked by
+a build gate, invented a worse one to get past it: `Vol.`, `Costul`, `Teneur`, `Note descriptive`,
+`Rend.`, a Hebrew paraphrase. **The check stopped being a check and started being a translator**,
+and every substitution it produced was chosen to satisfy a script rather than a reader.
+
+- **THE AGENTS BEHAVED WELL AND THE BRIEF WAS WRONG.** They were told the gate was a hard rule and
+  not told the exempt list exists, so working around it was the only move available. One of them
+  reasoned explicitly about not editing `translation_exempt_keys.json` because 25 other agents were
+  running — correct, and exactly why the orchestrator has to own that file.
+- **SO EVERY SPRINT BRIEF NOW CARRIES THIS PARAGRAPH:** *if the genuinely correct word in your
+  language IS the English word, write it and FILE A FRICTION ENTRY naming the key. Do not invent a
+  worse distinct word to dodge the check.* The orchestrator adds the exemption at close.
+- **The exemption is per key AND per language**, which is what makes it honest: `Volume` is exempt
+  for `fr`, `pt` and `it` and for nobody else, so the same key in Chinese is still checked.
+- **It is not a way to quiet a number.** The list's own rule stands — a key goes in only when
+  identical-to-English is *permanently correct*, and the evidence here is that an agent met the
+  collision, reported it, and named the natural word.
+
 ### Post-sprint QA (mandatory, in order)
 
 0. **`php dev/scripts/friction_check.php --sprint=<id>` must exit 0** — every translator complaint
