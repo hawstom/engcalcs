@@ -157,7 +157,31 @@ the block.
     answer back into the JSON's `human_answer`. Two lists was one list somebody forgets;
     `239-refer-to-human.md` is the superseded route and is kept only as the record of its sprint.
 
-- 75|479| **[H] The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.**
+- 75|479| **The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.**
+  - **DECIDED 2026-09-06, and the useful finding is that `/app` IS CHEAP.** Tom: *"I do think we
+    need to be at LWN/app. We better move that way. I trust your judgement about meta tags."*
+    - **The 210 absolute `/engcalcs/...` paths do not have to move.** `/app` is a rewrite to
+      `Looped-Network.php`; the assets keep resolving because the symlink makes `/engcalcs/` answer
+      on that host too. So `/app` is a pretty URL over a suite that still lives at `/engcalcs/`,
+      and Task 487's refactor stays unbought.
+    - **THE ONE THING THAT BREAKS, AND IT BREAKS SILENTLY: the service worker.**
+      `lib/HeadersFooters.lib.php:319` registers `/engcalcs/sw.php` with `scope: '/engcalcs/'`, and
+      a worker cannot control a page outside its own path -- so a visitor arriving at `/app` gets no
+      offline support and no error. Fix by sending `Service-Worker-Allowed: /` from `sw.php` and
+      widening the scope, or by serving a worker from the domain root. **Nothing else on the page
+      notices the path**, which is exactly why this one would ship unnoticed.
+    - **MY JUDGEMENT ON THE META TAGS, since he delegated it: consolidate ONTO LibreWaterNet, one
+      direction, no split.** `librewaternet.org/app` declares itself canonical; the pages still
+      served at `hawsedc.com/engcalcs/` declare `librewaternet.org` canonical and defer. That is the
+      standard site-move play and it is the only arrangement in which the two copies do not divide
+      each other's ranking signal. The rejected alternative is leaving both self-canonical, which is
+      the split `canonical_origin_check.php` exists to make visible rather than accidental.
+    - **The cost is real and worth stating once: consolidating hands the accumulated hawsedc.com
+      history to a new domain, and that transfer is slow and imperfectly reversible.** It is the
+      price of the brand decision he has already made, not a separate question -- but it is the
+      reason to do it deliberately and in one move rather than drifting into two canonical homes.
+    - Sequence: widen the worker scope, make the symlink, add the `/app` rewrite, then change the
+      whitelist. The canonical change is LAST, because it is the slow one to undo.
   **TOM'S ANSWER, 2026-09-05:** *"LibreWaterNet.org/app is what I think the url would be."* That
   settles the goal and MOVES the work, because the plan below assumed the path stayed `/engcalcs/`
   and one symlink would do it. **`/app` makes this Task 487's problem** -- 210 absolute
@@ -205,6 +229,11 @@ the block.
       testing `Options +FollowSymLinks` on that host, plus the canonical decision above.
 
 - 75|596| **Link the Not EPANET gateway from inside the suite.**
+  - **SETTLED 2026-09-06 (Tom: *"Not EPANET link: lpn-only row"*).** One row in the `lpn_` Help
+    menu, above the legal separator, beside Walkthroughs. **No `echoFooter()` link and no row on the
+    other fifteen calculators** -- the alternative was costed at the same 26 translations for
+    fifteen more pages and he declined it, so a later session proposing the footer is re-opening a
+    closed question. One new key, `ext()`, a new tab.
   Tom, 2026-09-06: *"Is there a good place, maybe in Help, where we can link it?"* The site is live
   (Task 591) and nothing in the suite points at it.
   - **THE SLOT IS THE `lpn_` HELP MENU, ABOVE THE LEGAL SEPARATOR**, beside Walkthroughs. That menu
@@ -291,7 +320,26 @@ the block.
   - Depends on nothing, but it is worth far more once Task 599 exists: a measured series and a
     computed series belong on one axis, and that axis is the time-series plot.
 
-- 50|602| **The engine checkbox reads as the whole story, and is a preference.**
+- 75|602| **The engine checkbox reads as the whole story, and is a preference.**
+  - **TOM CHOSE THE FRAMING AND ASKED FOR (a) OR (b), 2026-09-06:** *"This is really a choice about
+    the built-in solver. They don't get a choice about the EPANET solver."* That sentence settles it
+    on its own -- the box has never offered EPANET, because EPANET arrives whether or not it is
+    ticked. **TAKE (a): "Use the built-in solver when possible."** It is the only label that names
+    the thing the user is actually deciding, and (b) keeps describing the half they do not control.
+  - **AND (a) COSTS NO MIGRATION, WHICH IS WHY THE EARLIER WARNING AGAINST IT NO LONGER APPLIES.**
+    The objection was that inverting the checkbox reverses the meaning of every saved project.
+    It does -- if the STORED value flips. It need not: keep `settings.engine` as `epanet`/`native`
+    exactly as written, and invert only at the two lines that render and read the control
+    (`engInput.checked = (settings.engine !== 'epanet')`). Display polarity and storage polarity are
+    different things, and conflating them is what made this look expensive.
+  - **THE TIP MUST NAME THE TWO CASES THE BOX DOES NOT GOVERN**, which is the whole defect: an
+    extended-period run and an active PRV/PSV/FCV go to EPANET regardless. It already carries the
+    download size and the measured disagreement between the solvers; this is one sentence more.
+  - **HIS CLOSING OBSERVATION IS CORRECT AND IS NOT A REASON TO STOP** -- *"this becomes vanishingly
+    interesting as we call it what it is, doesn't it?"* Yes: named honestly, the setting governs
+    only the case where either engine would do, and it demotes itself. **That is the goal, not a
+    problem.** Whether it then deserves to exist at all is a SEPARATE question and his to ask; do
+    not delete a stored per-project setting as a side effect of relabelling it.
   Tom, 2026-09-06: *"I have Net3 up and running, but I don't have EPANET solver checked. Is that an
   omission? Should we check the box ourselves ... Should we reword or redefine this setting?"*
   **No omission and no defect** -- an extended-period run goes through EPANET always, and an active
@@ -310,7 +358,10 @@ the block.
   - The tip already carries the download size and the two solvers' measured disagreement; what it
     does not say is that some networks route regardless. That sentence belongs in it.
 
-- 50|487| **The suite only works when its URL path is `/engcalcs/`.**
+- 75|487| **The suite only works when its URL path is `/engcalcs/`.**
+  **UNPARKED 2026-09-06 (Tom: *"I do think we need to be at LWN/app. We better move that way."*).**
+  This is now the first half of Task 479 rather than a rejected refactor, but **the refactor is
+  still not what it needs** -- see 479 for why `/app` costs no code change.
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
   `sw.php` and `consent.php`, and three `Redirect 301` rules in `.htaccess` naming it absolutely.
   **210 counting the JS.**
@@ -343,6 +394,19 @@ the block.
   against it — one element, one placement function.
 
 - 75|465| **Reusable pipe and pump TYPES, so editing one edits 400.**
+  - **RULED 2026-09-06 (Tom: *"Yes. And we have to start showing an export alert."*).** A library
+    pipe MAY be something a `.inp` round trip loses. That is the trade accepted, and it comes with
+    an obligation: **the export must SAY what it is flattening, at the moment it flattens it.**
+    - This is not a new mechanism. `js/lpn-inp.js` already reports every difference on IMPORT
+      rather than dropping it silently, and five impossible round trips are reported rather than
+      faked (closed Task 281). An export alert is that same discipline pointed the other way, and
+      it is the first thing on the EXPORT side that has needed it.
+    - **The alert is about the TYPE, never about the numbers.** A typed pipe still exports every
+      value byte-identically; what does not survive is the indirection -- 400 pipes come back each
+      repeating what one definition used to say. Say that, and say how many elements it affects,
+      the way find-and-replace states its count before writing.
+    - **Scope it to what is genuinely lost, or it becomes noise.** Curves export fine, because
+      EPANET has curves. A warning that fires on every export teaches people to dismiss it.
   - **WHAT THE `[H]` WAS, AND WHY IT IS GONE (Tom, 2026-09-06: *"Why [H]? What do you need from
     me?"*).** It marked a genuine disagreement -- `utility-planning-engineer` researched this and
     recommended parking it; Tom then specified a shape that answers both of its objections. **That

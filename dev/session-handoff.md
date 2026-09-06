@@ -128,22 +128,20 @@ permission naming it, and has been put to him once, labelled.
 
 ## 5. THE NEXT THINGS, in the order I would take them
 
-**Four questions are with Tom and each blocks a specific thing. None blocks everything.**
+**HE ANSWERED THREE OF THE FOUR ON 2026-09-06 AND THEY ARE WRITTEN INTO THE BLOCKS. Do not re-ask.**
+596 is an lpn-only Help row and the footer link is DECLINED. 465 is *"Yes"* — a library pipe may be
+something a round trip loses — *"And we have to start showing an export alert."* 479 is *"we need to
+be at LWN/app. We better move that way"*, with the meta-tag call delegated and recorded there.
+602 he reframed rather than picked from: the box is a choice about the BUILT-IN solver, so take
+label (a) and invert the DISPLAY only, never the stored `settings.engine`.
 
-1. **Task 596 — lpn-only Help row, or a suite-wide `echoFooter()` link** for the Not EPANET site.
-   Same 26 translations either way; the footer reaches fifteen more pages. Do not write the string
-   before he answers, because the answer changes what the string may say.
-2. **Task 465 — is a library pipe allowed to be something a `.inp` round trip loses?** A typed pipe
-   flattens on export and cannot be rebuilt on import, so Task 281's byte-identical guarantee holds
-   for the file's numbers but not for the TYPE. Curves escaped this because EPANET has curves. The
-   first buildable slice (`effective()`, disabled-control rendering) can start before he answers.
-3. **Task 574 — he may be able to unblock it cheaply.** Indices 16-22, 39 and 40 have no second
-   source to match against, and guessing is what wrote `Duration 0.0` into a converted file the
-   first time. EPANET persists PROFILES and CALIBRATION files; if either lives in that range it
-   would explain the stray `1` and `First`. The test is one save-and-reimport by him.
-4. **Task 602 — the engine label.** Recommended wording is *"Always solve with the EPANET solver"*,
-   which keeps the checkbox polarity. **Do NOT invert it**: `settings.engine` is stored per project,
-   so flipping the sense silently reverses every saved file that states one.
+**One question is still with him, and it is cheap for him and impossible for us:**
+
+1. **Task 574 — the nine unnamed `.net` slots.** Indices 16-22, 39 and 40 have no second source to
+   match against, and guessing is what wrote `Duration 0.0` into a converted file the first time.
+   EPANET persists PROFILES and CALIBRATION files; if either lives in that range it would explain
+   the stray `1` and `First`. The test is one save-and-reimport by him. Until then it stays at 25,
+   costing nothing while the slots are reported rather than decoded.
 
 **Buildable now, needing nobody:**
 

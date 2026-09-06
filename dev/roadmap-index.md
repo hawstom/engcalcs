@@ -7,13 +7,13 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**56 open tasks.** Next (100): 1 · Soon (75): 17 · Someday (50): 15 · Maybe (25): 6 · Parked (5): 17
+**56 open tasks.** Next (100): 1 · Soon (75): 19 · Someday (50): 13 · Maybe (25): 6 · Parked (5): 17
 
 ## 100 — Next (1)
 
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 
-## 75 — Soon (17)
+## 75 — Soon (19)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -22,7 +22,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 465 — Reusable pipe and pump TYPES, so editing one edits 400.
-- Task 479 — [H] · The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.
+- Task 479 — The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.
+- Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
@@ -32,8 +33,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 597 — Filter the tables, in EPANET's own words: Below, Equal to, Above.
 - Task 598 — Below and Above on ID, Tag and Text, in dictionary order.
 - Task 599 — Graph a value against time across an extended-period run.
+- Task 602 — The engine checkbox reads as the whole story, and is a preference.
 
-## 50 — Someday (15)
+## 50 — Someday (13)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -45,11 +47,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 283 — Map label legibility: what remains is the AUTO-HIDE rule.
 - Task 285 — We do not know what devices anybody uses this on.
-- Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have now decided.
 - Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
 - Task 601 — Calibration files: measured field data, against the model that predicts it.
-- Task 602 — The engine checkbox reads as the whole story, and is a preference.
 
 ## 25 — Maybe (6)
 
