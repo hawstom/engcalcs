@@ -147,22 +147,31 @@ function inputsUnder(node, out) {
 	}
 
 	// =====================================================================================
-	head('3. THE TWO SWITCHES COME FIRST UNDER Hydraulics');
+	head('3. THE FIVE ROWS UNDER Hydraulics, IN TOM\'S OWN ORDER');
 	// =====================================================================================
 	L.rebuildSettings();
 	const comp = document.getElementById('lpn_set_hydraulics_fields');
 	ok('the stub has the Hydraulics field host, or this section is vacuous', !!comp);
 	const compText = textOf(comp);
-	const iAuto = compText.indexOf('Recalculate automatically');
-	const iEng = compText.indexOf('Solve with the EPANET solver');
-	const iAcc = compText.indexOf('Accuracy');
-	ok('all three rows are in the Calculation pane', iAuto >= 0 && iEng >= 0 && iAcc >= 0,
-		[iAuto, iEng, iAcc].join('|'));
+	// **ALL FIVE, BECAUSE HALF AN INSTRUCTION READS AS AN INSTRUCTION IGNORED.** The first pass held
+	// only the two switches Tom named first and left Friction method and Default demand pattern at
+	// the foot of the section, where build order had put them. He gave the whole order twice
+	// (2026-09-05: *"I think I said this before."*), so the whole order is what is asserted.
+	const WANT = ['Recalculate automatically', 'Solve with the EPANET solver', 'Friction method',
+		'Accuracy', 'Default demand pattern'];
+	const at = WANT.map(t => compText.indexOf(t));
+	ok('all five rows Tom ordered are in the Calculation pane', at.every(i => i >= 0),
+		WANT.map((t, i) => t + '=' + at[i]).join(' | '));
 	// **ORDER, NOT POSITION.** Asserting an index would break the next time a row is added; what
-	// Tom asked for is a relationship between three rows and that is what is held.
-	ok('Recalculate automatically comes first, as Tom ordered them', iAuto < iEng, iAuto + ' < ' + iEng);
-	ok('then Solve with the EPANET solver', iEng < iAcc, iEng + ' < ' + iAcc);
-	ok('and both are above every numeric row, Accuracy included', iAuto < iAcc);
+	// Tom gave is a relationship between five rows, and that is what is held.
+	for (let i = 1; i < WANT.length; i++) {
+		ok(`${WANT[i]} comes after ${WANT[i - 1]}`, at[i - 1] >= 0 && at[i] > at[i - 1],
+			at[i - 1] + ' < ' + at[i]);
+	}
+	// The tail: every remaining numeric row is a detail of a solve those five have settled, so one
+	// of them standing above the five would be the defect coming back by another door.
+	const iMult = compText.indexOf('Demand multiplier');
+	ok('and the tolerance rows are all below them', iMult > at[4], at[4] + ' < ' + iMult);
 
 	console.log('\n' + (fails ? fails + ' FAILURE(S)' : 'All checks passed.'));
 	process.exit(fails ? 1 : 0);

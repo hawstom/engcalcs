@@ -2731,7 +2731,20 @@ $ec_lang['lpn_time_level']='Water level';
 $ec_lang['lpn_time_run']='Calculate';
 $ec_lang_syn['lpn_time_run']='Simulate, calculate, execute, or compute';
 $ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step, from the start of the run to the end of it.';
-$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. This network takes so long to calculate over its whole time period that the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.';
+// **IT STATED A CAUSE IT NEVER MEASURED, AND TOM HAD TO SAY SO TWICE** (2026-09-05: *"Message is
+// wrong, I think. Automatic recalculation is turned off by the user. When else would this shown?
+// This is the second time I mentioned this."*). It read "This network takes so long to calculate
+// over its whole time period that ..." -- but `EC.lpnTimeStatusNote()` consults no timing at all.
+// Its whole gate is `!autoRunAllowed()`, which asks ONE question: did the user turn the checkbox
+// off. So a small fast network whose owner unchecked that box was told its network was slow.
+//
+// The page does measure speed elsewhere and says so honestly: `adviseIfSlow()` writes
+// `lpn_time_run_slow` when a completed run passes `LPN_TIME_SLOW_MS`. That is ADVICE about a
+// measurement. This note is a statement about a SETTING, and it now says which setting, because
+// that is both the true cause and the one the reader can act on.
+// Full record, including why the row could not be closed as a wording question:
+// `dev/eps-terminology-audit.md` section 5.
+$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. This project is set not to recalculate automatically, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.';
 // ---- The run box (ROADMAP Task 450) ----------------------------------------------------------
 // Three keys, and no more: 'lpn_time_running' is already the sentence for a run in progress and
 // 'lpn_close' is already the word on every other dismiss control on this page, so both are

@@ -1366,7 +1366,7 @@
         "lpn_time_level": "Water level",
         "lpn_time_run": "Calculate",
         "lpn_time_run_tip": "Solve this network at every hydraulic time step, from the start of the run to the end of it.",
-        "lpn_time_run_note": "You are seeing the network at the first reporting time. This network takes so long to calculate over its whole time period that the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.",
+        "lpn_time_run_note": "You are seeing the network at the first reporting time. This project is set not to recalculate automatically, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.",
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",

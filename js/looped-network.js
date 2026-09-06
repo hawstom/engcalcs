@@ -23138,58 +23138,6 @@ var EngCalcs = EngCalcs || {};
 		// It replaced "Computation", which was a fine name for the rows and a bad one inside a
 		// category called Calculation: a heading that restates its parent tells the reader nothing.
 
-		// ---- friction method (ROADMAP Task 271) ----
-		// FIRST row here, above tolerance and the engine toggle: it is the only one of the three
-		// that changes the ANSWER's physics rather than how precisely or by whose code it is
-		// reached. Every label is borrowed from bpn_, so the control costs no new keys.
-
-		var methodSelect = document.createElement('select');
-		[
-			['hw', pc.bpn_method_hw || 'Hazen-Williams'],
-			['dw', pc.bpn_method_dw || 'Darcy-Weisbach'],
-			['manning', pc.bpn_method_manning || 'Manning']
-		].forEach(function (o) {
-			var opt = document.createElement('option');
-			opt.value = o[0]; opt.textContent = o[1];
-			if (o[0] === frictionMethod()) { opt.selected = true; }
-			methodSelect.appendChild(opt);
-		});
-		methodSelect.addEventListener('change', function () {
-			var was = frictionMethod(), now = methodSelect.value;
-			if (was === now) { return; }
-			// SWITCHING METHOD DOES NOT CONVERT ANYTHING, and on a network that already has pipes
-			// that is worth saying out loud: C = 130 read as Manning n is nonsense by four orders of
-			// magnitude, and unlike a unit switch nothing on screen changes except one letter in a
-			// label. Same principle as the suite-wide ban on converting inputs when units switch --
-			// the stored number is what the user typed -- except that here we ASK first, because
-			// there is no unit strip to make the change self-evident afterwards.
-			if (doc.links.some(function (l) { return l.type !== 'pump'; })) {
-				if (!confirm(pc.lpn_method_switch_confirm
-					|| 'Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?')) {
-					methodSelect.value = was;
-					return;
-				}
-			}
-			settings.method = now;
-			// The DEFAULT follows the method -- future elements only, never existing ones, per the
-			// Default inputs section's own stated rule. Without this, a user who switches to Manning
-			// and draws a pipe gets C = 130 as an n.
-			settings.defaults.roughness = defaultRoughnessFor(now);
-			applyMethodUI();
-			saveToStorage();
-			// Rebuild rather than patch: the roughness row's LABEL and its unit both changed, and so
-			// did this select's own read of frictionMethod(). THE WHOLE BOX, not just this section
-			// -- roughnessLabel() also names a Labels checkbox and a Coloring field, and those two
-			// carried the old method's symbol until the box was next opened from scratch.
-			rebuildSettingsBox();
-			refreshPopupIfOpen();
-			refreshMapStatus();
-			scheduleSolve();
-		});
-		row(compBody, pc.bpn_method || 'Friction method', methodSelect, pc.bpn_roughness_tip);
-		// Second, and directly under the method: it is the other row here that is a statement about
-		// the SYSTEM rather than about how hard the arithmetic tries. See settingsDefaultPatternRow().
-		settingsDefaultPatternRow(compBody, row);
 		// ---- PAGE (Task 289, renamed by Tom 2026-08-18: "Change Calculator to Page and make it a
 		// heading") ----
 		// THE ONE SUB-HEADING IN THE BOX THAT IS NOT CARRIED IN THE PROJECT FILE, and the note says
@@ -23408,8 +23356,70 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 		});
 		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET solver', engInput, pc.lpn_settings_engine_epanet_tip);
+		// ---- friction method (ROADMAP Task 271) ----
+		// THIRD row here, and the order of the first five is TOM'S, given twice (2026-09-05:
+		// *"Settings.Hydraulics: First item needs to be recalculate. Second needs to be EPANET
+		// solver. Third, Friction method. Fourth, accuracy. Fifth, Default demand pattern. I think
+		// I said this before."* -- and he had). The first pass moved only the two switches he named
+		// first and left this row and the default pattern at the FOOT of the section, which is
+		// where build order had put them; half an instruction carried out reads as an instruction
+		// ignored.
+		//
+		// The reading it produces: what to solve at all (recalculate), with what (engine), under
+		// what physics (method), how hard to try (accuracy), and then the one demand assumption the
+		// whole network inherits. Every remaining row is a detail of a solve those five have
+		// settled. Every label here is borrowed from bpn_, so the control costs no new keys.
+
+		var methodSelect = document.createElement('select');
+		[
+			['hw', pc.bpn_method_hw || 'Hazen-Williams'],
+			['dw', pc.bpn_method_dw || 'Darcy-Weisbach'],
+			['manning', pc.bpn_method_manning || 'Manning']
+		].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			if (o[0] === frictionMethod()) { opt.selected = true; }
+			methodSelect.appendChild(opt);
+		});
+		methodSelect.addEventListener('change', function () {
+			var was = frictionMethod(), now = methodSelect.value;
+			if (was === now) { return; }
+			// SWITCHING METHOD DOES NOT CONVERT ANYTHING, and on a network that already has pipes
+			// that is worth saying out loud: C = 130 read as Manning n is nonsense by four orders of
+			// magnitude, and unlike a unit switch nothing on screen changes except one letter in a
+			// label. Same principle as the suite-wide ban on converting inputs when units switch --
+			// the stored number is what the user typed -- except that here we ASK first, because
+			// there is no unit strip to make the change self-evident afterwards.
+			if (doc.links.some(function (l) { return l.type !== 'pump'; })) {
+				if (!confirm(pc.lpn_method_switch_confirm
+					|| 'Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?')) {
+					methodSelect.value = was;
+					return;
+				}
+			}
+			settings.method = now;
+			// The DEFAULT follows the method -- future elements only, never existing ones, per the
+			// Default inputs section's own stated rule. Without this, a user who switches to Manning
+			// and draws a pipe gets C = 130 as an n.
+			settings.defaults.roughness = defaultRoughnessFor(now);
+			applyMethodUI();
+			saveToStorage();
+			// Rebuild rather than patch: the roughness row's LABEL and its unit both changed, and so
+			// did this select's own read of frictionMethod(). THE WHOLE BOX, not just this section
+			// -- roughnessLabel() also names a Labels checkbox and a Coloring field, and those two
+			// carried the old method's symbol until the box was next opened from scratch.
+			rebuildSettingsBox();
+			refreshPopupIfOpen();
+			refreshMapStatus();
+			scheduleSolve();
+		});
+		row(compBody, pc.bpn_method || 'Friction method', methodSelect, pc.bpn_roughness_tip);
 		hydNumberRow('accuracy', 'lpn_settings_accuracy', 'Accuracy',
 			'lpn_settings_accuracy_tip', solveAccuracy());
+		// FIFTH, and last of the five Tom ordered: it is a statement about the SYSTEM rather than
+		// about how hard the arithmetic tries, which is why it sits with the method above rather
+		// than among the tolerances below. See settingsDefaultPatternRow().
+		settingsDefaultPatternRow(compBody, row);
 		// **THE ONE OPTION A SCENARIO MAY CARRY ITS OWN VALUE OF**, which is what makes average
 		// day / maximum day / peak hour one number each instead of one edit per junction. The
 		// default quoted in the tip is what BLANK would inherit -- inside a scenario that is the
