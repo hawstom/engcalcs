@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1691,
-        "delta_key_count": 18,
+        "expected_key_count": 1697,
+        "delta_key_count": 24,
         "exempt_key_count": 37,
         "exempt_keys": [
             "calc_units_us",
@@ -522,8 +522,14 @@
     },
     "keys_to_translate": {
         "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
+        "lpn_pane_filter_clear": "Show all",
+        "lpn_pane_filter_none": "Nothing in this table matches the filter.",
         "lpn_help_not_epanet": "Not EPANET",
         "lpn_help_screenshots": "Pictures of this page in use",
+        "lpn_find_filter_btn": "Filter in tables",
+        "lpn_find_filter_table": "Table to filter",
+        "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_reaction_order_bulk": "Bulk reaction order",
@@ -542,8 +548,14 @@
     },
     "keys": {
         "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
+        "lpn_pane_filter_clear": "Show all",
+        "lpn_pane_filter_none": "Nothing in this table matches the filter.",
         "lpn_help_not_epanet": "Not EPANET",
         "lpn_help_screenshots": "Pictures of this page in use",
+        "lpn_find_filter_btn": "Filter in tables",
+        "lpn_find_filter_table": "Table to filter",
+        "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_reaction_order_bulk": "Bulk reaction order",
@@ -577,6 +589,54 @@
                 }
             }
         },
+        "lpn_pane_filter_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_none",
+                    "value": "Questa rete non ha ancora nessuno di questi elementi.",
+                    "english": "This network has none of these yet."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Ordina in base a questa colonna. Fai clic di nuovo per invertire l'ordine.",
+                    "english": "Sort by this column. Click again to reverse it."
+                }
+            }
+        },
+        "lpn_pane_filter_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_none",
+                    "value": "Questa rete non ha ancora nessuno di questi elementi.",
+                    "english": "This network has none of these yet."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Ordina in base a questa colonna. Fai clic di nuovo per invertire l'ordine.",
+                    "english": "Sort by this column. Click again to reverse it."
+                }
+            }
+        },
+        "lpn_pane_filter_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_none",
+                    "value": "Questa rete non ha ancora nessuno di questi elementi.",
+                    "english": "This network has none of these yet."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "Ordina in base a questa colonna. Fai clic di nuovo per invertire l'ordine.",
+                    "english": "Sort by this column. Click again to reverse it."
+                }
+            }
+        },
         "lpn_help_not_epanet": {
             "reason": "missing",
             "current_value": null,
@@ -606,6 +666,54 @@
                     "key": "lpn_help_walkthroughs",
                     "value": "Esercitazioni",
                     "english": "Walkthroughs"
+                }
+            }
+        },
+        "lpn_find_filter_btn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_btn",
+                    "value": "Trova",
+                    "english": "Find"
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "contiene",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_table": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_btn",
+                    "value": "Trova",
+                    "english": "Find"
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "contiene",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_btn",
+                    "value": "Trova",
+                    "english": "Find"
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "contiene",
+                    "english": "contains"
                 }
             }
         },

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 1691,
-        "delta_key_count": 3,
+        "expected_key_count": 1697,
+        "delta_key_count": 9,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -516,13 +516,25 @@
     },
     "keys_to_translate": {
         "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
+        "lpn_pane_filter_clear": "Show all",
+        "lpn_pane_filter_none": "Nothing in this table matches the filter.",
         "lpn_help_not_epanet": "Not EPANET",
-        "lpn_help_screenshots": "Pictures of this page in use"
+        "lpn_help_screenshots": "Pictures of this page in use",
+        "lpn_find_filter_btn": "Filter in tables",
+        "lpn_find_filter_table": "Table to filter",
+        "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted."
     },
     "keys": {
         "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
+        "lpn_pane_filter_clear": "Show all",
+        "lpn_pane_filter_none": "Nothing in this table matches the filter.",
         "lpn_help_not_epanet": "Not EPANET",
-        "lpn_help_screenshots": "Pictures of this page in use"
+        "lpn_help_screenshots": "Pictures of this page in use",
+        "lpn_find_filter_btn": "Filter in tables",
+        "lpn_find_filter_table": "Table to filter",
+        "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted."
     },
     "key_context": {
         "lpn_tool_key_hint": {
@@ -538,6 +550,54 @@
                     "key": "lpn_tool_add_junction_tip",
                     "value": "ចុចលើផែនទីដើម្បីបន្ថែមថ្នាំង៖ ចំណុចមួយកន្លែងបំពង់ជួបគ្នា ឬកន្លែងប្រើទឹក។",
                     "english": "Click the map to add a junction: a point where pipes meet or where water is used."
+                }
+            }
+        },
+        "lpn_pane_filter_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_none",
+                    "value": "បណ្ដាញនេះមិនទាន់មានធាតុទាំងនេះនៅឡើយទេ។",
+                    "english": "This network has none of these yet."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "តម្រៀបតាមជួរឈរនេះ។ ចុចម្ដងទៀតដើម្បីបញ្ច្រាស។",
+                    "english": "Sort by this column. Click again to reverse it."
+                }
+            }
+        },
+        "lpn_pane_filter_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_none",
+                    "value": "បណ្ដាញនេះមិនទាន់មានធាតុទាំងនេះនៅឡើយទេ។",
+                    "english": "This network has none of these yet."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "តម្រៀបតាមជួរឈរនេះ។ ចុចម្ដងទៀតដើម្បីបញ្ច្រាស។",
+                    "english": "Sort by this column. Click again to reverse it."
+                }
+            }
+        },
+        "lpn_pane_filter_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_none",
+                    "value": "បណ្ដាញនេះមិនទាន់មានធាតុទាំងនេះនៅឡើយទេ។",
+                    "english": "This network has none of these yet."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_sort_tip",
+                    "value": "តម្រៀបតាមជួរឈរនេះ។ ចុចម្ដងទៀតដើម្បីបញ្ច្រាស។",
+                    "english": "Sort by this column. Click again to reverse it."
                 }
             }
         },
@@ -570,6 +630,54 @@
                     "key": "lpn_help_walkthroughs",
                     "value": "មគ្គុទ្ទេសក៍",
                     "english": "Walkthroughs"
+                }
+            }
+        },
+        "lpn_find_filter_btn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_btn",
+                    "value": "រក",
+                    "english": "Find"
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "មាន",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_table": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_btn",
+                    "value": "រក",
+                    "english": "Find"
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "មាន",
+                    "english": "contains"
+                }
+            }
+        },
+        "lpn_find_filter_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_btn",
+                    "value": "រក",
+                    "english": "Find"
+                },
+                "next_translated": {
+                    "key": "lpn_find_op_contains",
+                    "value": "មាន",
+                    "english": "contains"
                 }
             }
         }
