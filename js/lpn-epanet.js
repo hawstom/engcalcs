@@ -200,6 +200,10 @@
 			sourceRows = [],
 			mixingRows = [],
 			energyRows = [],
+			// Which tank volume curves have already been written into `curves` (Task 587). Two
+			// tanks naming one curve is legal and ordinary, and EPANET rejects a `[CURVES]` id
+			// stated twice with different rows.
+			volCurvesWritten = {},
 			warnings = [],
 			i, n, k, link;
 
@@ -223,12 +227,38 @@
 				// up is the exact silent failure this file's header warns about: a 20 m tank
 				// written as 20000 still solves, it just holds a thousand times the water.
 				//
-				// MinVol is written as 0 and no VolCurve is written, because this page has neither.
-				// 0 means "no separate minimum volume", which is EPANET's own default, not a
-				// stand-in for missing data. A non-cylindrical tank imported from a file with a
-				// volume curve is reported as a difference rather than faked (js/lpn-inp.js).
+				// MinVol is written as 0, which means "no separate minimum volume" -- EPANET's own
+				// default, not a stand-in for missing data.
+				//
+				// **VOLCURVE IS WRITTEN WHEN THE TANK NAMES ONE** (Task 587). The eighth column
+				// turns the vessel from a cylinder of the stated diameter into the shape the file
+				// gave, and EPANET does the whole of the level-to-volume integration itself once it
+				// has the column and the rows: there is no arithmetic of ours on this path to get
+				// right, and none was written. It changes NOTHING at a single instant -- the water
+				// surface is still the level the document states -- and everything over a run,
+				// which is why js/lpn-time.js is where the curve is put on the node.
+				//
+				// The curve goes out under a `V_` name for the same reason a pump's goes out as
+				// `C_`: nothing reads this file but the engine, so a file curve called `1` cannot
+				// collide with a pump curve of the same name. Two tanks may share one curve, so it
+				// is written once.
+				var vname = '';
+				if (n.volCurve && n.volCurveSI && n.volCurveSI.length) {
+					vname = 'V_' + n.volCurve;
+					if (!volCurvesWritten[vname]) {
+						volCurvesWritten[vname] = 1;
+						var vrows = [], vi;
+						for (vi = 0; vi < n.volCurveSI.length; vi++) {
+							// Level in metres and volume in CUBIC metres, which is what LPS pairs
+							// with the length unit. js/lpn-time.js is where they were converted.
+							vrows.push(' ' + vname + '  ' + n.volCurveSI[vi][0] + '  ' + n.volCurveSI[vi][1]);
+						}
+						curves.push(vrows.join('\n'));
+					}
+				}
 				tanks.push(' ' + n.id + '  ' + (n.elev || 0) + '  ' + (n.level || 0) + '  ' +
-					(n.minLevel || 0) + '  ' + (n.maxLevel || 0) + '  ' + (n.diameter || 0) + '  0');
+					(n.minLevel || 0) + '  ' + (n.maxLevel || 0) + '  ' + (n.diameter || 0) + '  0' +
+					(vname ? '  ' + vname : ''));
 			} else {
 				// Demand m3/s -> L/s.
 				// **UNDER `eps` THE DEMAND IS THE BASE DEMAND AND THE PATTERN IS NAMED BESIDE IT**, so
@@ -981,7 +1011,17 @@
 		parts.push('r' + bagSignature(model.reactions));
 		for (i = 0; i < model.nodes.length; i++) {
 			n = model.nodes[i];
-			parts.push('n' + n.id + '\u0001' + n.type);
+			// **A TANK'S VOLUME CURVE IS IN THE SIGNATURE, AND IT HAS TO BE** (Task 587), for the
+			// same reason a GPV's is below: the curve is written into the `.inp` TEXT, and the warm
+			// path pushes a tank's numbers through setTankData without touching the rows of the
+			// curve it names. Left out, a user who edited the curve in the Library and pressed Run
+			// would get the previous curve's schedule back for as long as the network's SHAPE held,
+			// which is the silent stale answer this signature exists to make impossible.
+			parts.push('n' + n.id + '\u0001' + n.type +
+				'\u0001' + (n.type === 'tank' && n.volCurve ? n.volCurve : '') +
+				'\u0001' + (n.type === 'tank' && n.volCurveSI
+					? n.volCurveSI.map(function (q) { return q[0] + ',' + q[1]; }).join(';')
+					: ''));
 		}
 		for (i = 0; i < model.links.length; i++) {
 			l = model.links[i];
@@ -1097,8 +1137,15 @@
 				// One call, because the checks EPANET runs are on the SET: pushing these one at a
 				// time can transiently violate min <= level <= max and be rejected. All lengths in
 				// metres under LPS, the vessel diameter included (see the [TANKS] note above).
+				// **AND THE VOLUME CURVE'S NAME WITH THEM** (Task 587). The eighth argument is the
+				// `[TANKS]` eighth column, so a tank that names a curve keeps naming it across a
+				// warm solve; the curve's own ROWS are not pushed here, because a change to them
+				// reopens the Project through signatureOf() instead. `''` is a cylinder, and is set
+				// every time rather than skipped, for the same reason the emitter below is: a tank
+				// that HAD a curve and lost it must not go on filling on the old shape's schedule.
 				p.setTankData(idx, n.elev || 0, n.level || 0, n.minLevel || 0,
-					n.maxLevel || 0, n.diameter || 0, 0, '');
+					n.maxLevel || 0, n.diameter || 0, 0,
+					(n.volCurve && n.volCurveSI && n.volCurveSI.length) ? 'V_' + n.volCurve : '');
 			} else {
 				// Demand m3/s -> L/s. Empty pattern id = no time pattern, matching the [JUNCTIONS]
 				// rows (this page has no patterns).
