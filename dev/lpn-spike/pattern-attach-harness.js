@@ -115,6 +115,9 @@ console.log('\n1. the file\'s two attachments reach the document');
 // ---------------------------------------------------------------------------
 const R1 = doc.nodes.find((n) => n.id === 'R1'), R2 = doc.nodes.find((n) => n.id === 'R2');
 const PU1 = doc.links.find((l) => l.id === 'PU1');
+// The pump names its curve and the curve is the document's (Task 586); the fits below are taken
+// from the library, which is where the points now are.
+const PU1_PTS = ((doc.curves || []).find((c) => c.id === PU1._curveId) || { points: [] }).points;
 ok('the reservoir carries its head pattern', R1 && R1.headPattern === 'RHEAD', R1 && R1.headPattern);
 ok('a reservoir with a blank column carries none', R2 && !R2.headPattern, R2 && R2.headPattern);
 ok('the pump carries its relative speed', PU1 && PU1.speed === 1.2, PU1 && PU1.speed);
@@ -211,7 +214,7 @@ console.log('\n3. one instant: the multiplier reaches the model, and the documen
 
 	// The pump's fitted curve, scaled by the affinity laws: H = s^2 ( h0 - a (Q/s)^b ), which is
 	// H = (s^2 h0) - (a s^(2-b)) Q^b.
-	const fit = EngCalcs.lpnPumpFromCurve(PU1.curvePoints.map((p) => [p[0] * GPM, p[1] * FT]));
+	const fit = EngCalcs.lpnPumpFromCurve(PU1_PTS.map((p) => [p[0] * GPM, p[1] * FT]));
 	// The pattern is attached, so the multiplier IS the speed and the pump's own 1.2 stands aside.
 	const s0 = mult(pspd, 0);
 	ok('the pump\'s curve is handed over SCALED by the speed',
@@ -344,7 +347,7 @@ console.log('\n6. EPANET unreachable: one instant, the multipliers in it, and sa
 	// the built-in solver's own scaled curve is checked against the affinity law; get the exponent
 	// wrong (s^-b instead of s^(2-b)) and the network still solves, just at the wrong head.
 	{
-		const fit = EngCalcs.lpnPumpFromCurve(PU1.curvePoints.map((p) => [p[0] * GPM, p[1] * FT]));
+		const fit = EngCalcs.lpnPumpFromCurve(PU1_PTS.map((p) => [p[0] * GPM, p[1] * FT]));
 		const s = mult(pspd, 0), q = Math.abs(res.flows.PU1);
 		const want = s * s * (fit.h0 - fit.a * Math.pow(q / s, fit.b));
 		ok('...and the pump at that instant obeys the affinity law at the pattern\'s speed',
@@ -392,7 +395,7 @@ console.log('\n7. the run: EPANET\'s own numbers, against the two closed forms')
 			'worst ' + (worstJ / FT).toExponential(2) + ' ft');
 
 		// --- the pump: the affinity law at that hour's speed ---
-		const fit = EngCalcs.lpnPumpFromCurve(PU1.curvePoints.map((p) => [p[0] * GPM, p[1] * FT]));
+		const fit = EngCalcs.lpnPumpFromCurve(PU1_PTS.map((p) => [p[0] * GPM, p[1] * FT]));
 		let worstP = 0, atP = null, movedP = 0;
 		run.frames.forEach(function (f) {
 			const s = mult(pspd, f.t),
@@ -419,7 +422,7 @@ console.log('\n8. the measurement pumpSpeedNow() is built on: a pattern REPLACES
 // instead (s = 1.20 x P) is 87 ft of pump head out at P = 1.10 and solves without complaint, which
 // is exactly the class of wrong answer this whole task is exposed to.
 {
-	const fit = EngCalcs.lpnPumpFromCurve(PU1.curvePoints.map((p) => [p[0] * GPM, p[1] * FT]));
+	const fit = EngCalcs.lpnPumpFromCurve(PU1_PTS.map((p) => [p[0] * GPM, p[1] * FT]));
 	const headAt = (frames) => frames[0].heads.J2 - frames[0].heads.R2;
 	const law = (s, q) => s * s * (fit.h0 - fit.a * Math.pow(q / s, fit.b));
 

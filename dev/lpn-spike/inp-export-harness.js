@@ -226,7 +226,14 @@ REFERENCE.concat(['import-cases.inp']).forEach((f) => {
 
 	// A curveless pump becomes a pipe on the way out, by construction and reported, so the counts
 	// are compared per TYPE with that one substitution allowed for.
-	const noCurve = first.doc.links.filter((l) => l.type === 'pump' && !(l.curvePoints || []).length).length;
+	// A pump names a curve and the curve is the document's (Task 586), so "curveless" is a question
+	// about the LIBRARY, not about the pump.
+	const ptsOf = (d, id) => {
+		const c = (d.curves || []).find((x) => x.id === id);
+		return c ? EngCalcs.lpnCurvePoints(c) : [];
+	};
+	const noCurve = first.doc.links.filter((l) => l.type === 'pump'
+		&& !ptsOf(first.doc, l._curveId).length).length;
 	ok(f + ' every node returns', again.nodes.length === first.doc.nodes.length,
 		again.nodes.length + ' vs ' + first.doc.nodes.length);
 	ok(f + ' every link returns', again.links.length === first.doc.links.length,
@@ -263,7 +270,7 @@ REFERENCE.concat(['import-cases.inp']).forEach((f) => {
 		const b = now['l' + l.id];
 		ok(f + ' link ' + l.id + ' returns', !!b);
 		if (!b) { return; }
-		const substituted = l.type === 'pump' && !(l.curvePoints || []).length;
+		const substituted = l.type === 'pump' && !ptsOf(first.doc, l._curveId).length;
 		if (!substituted) { ok(f + ' link ' + l.id + ' type', b.type === l.type, b.type + ' vs ' + l.type); }
 		ok(f + ' link ' + l.id + ' ends', b.from === l.from && b.to === l.to);
 		if (l.type === 'pipe') {
@@ -282,13 +289,19 @@ REFERENCE.concat(['import-cases.inp']).forEach((f) => {
 			ok(f + ' valve ' + l.id + ' k', b._k === l._k, b._k + ' vs ' + l._k);
 		}
 		if (l.type === 'pump' && !substituted) {
-			// The VALUE of every curve point, though not its text -- see the header.
-			ok(f + ' pump ' + l.id + ' curve point count',
-				(b.curvePoints || []).length === l.curvePoints.length);
-			l.curvePoints.forEach((pt, i) => {
+			// **THE NAME, AND THEN EVERY POINT THE NAMED CURVE STATES** (Task 586). The name is the
+			// user's own text and must return unchanged; the points come back out of the library on
+			// both sides, so a curve two pumps share is compared once per pump and is the same
+			// object's numbers each time.
+			ok(f + ' pump ' + l.id + ' curve name', b._curveId === l._curveId,
+				b._curveId + ' vs ' + l._curveId);
+			const was = ptsOf(first.doc, l._curveId), got = ptsOf(again, b._curveId);
+			ok(f + ' pump ' + l.id + ' curve point count', got.length === was.length,
+				got.length + ' vs ' + was.length);
+			was.forEach((pt, i) => {
 				ok(f + ' pump ' + l.id + ' curve point ' + i,
-					b.curvePoints[i][0] === pt[0] && b.curvePoints[i][1] === pt[1],
-					JSON.stringify(b.curvePoints[i]) + ' vs ' + JSON.stringify(pt));
+					got[i] && got[i][0] === pt[0] && got[i][1] === pt[1],
+					JSON.stringify(got[i]) + ' vs ' + JSON.stringify(pt));
 			});
 		}
 	});

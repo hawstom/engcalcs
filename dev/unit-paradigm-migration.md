@@ -89,7 +89,9 @@ back as `710`.
 **Not done:**
 
 - **`elev` still holds both kinds of number** — a user's elevation and, for an imported reservoir,
-  EPANET's total head read a second way. Same confusion as `curvePoints`/`h0` was, one level down.
+  EPANET's total head read a second way. Same confusion as a pump's typed points and its fitted
+  `h0` were, one level down. (The points themselves moved to `doc.curves` in Task 586; the pump
+  holds a reference and the fit is still derived, so that pair stays separate by construction.)
 - **Task 281 (`.inp` export) has not been written**, so the acceptance criterion below is asserted
   against the parser and the document rather than against a written file. Everything it needs is in
   place: `EngCalcs.lpnNumText()` is its one entry point for a number's text.
@@ -100,8 +102,9 @@ back as `710`.
 > never occupy the same field.**
 
 Once they are separate there is no code path that writes to the user's field, so "preserve verbatim"
-stops being a discipline anyone has to remember. `elev` currently holds both; `curvePoints` and
-`h0/a/b` are the same confusion one level up.
+stops being a discipline anyone has to remember. `elev` currently holds both; a pump's typed curve
+points and its fitted `h0/a/b` were the same confusion one level up, and are now in two different
+places entirely -- the points in `doc.curves`, the fit derived at the solver handoff.
 
 ## Acceptance
 

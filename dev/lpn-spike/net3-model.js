@@ -4,6 +4,19 @@
 // js/looped-network.js's assembleModel() is the page's edge: display units in, SI out. Net3 is a
 // US file and this harness holds the document in the file's own units, so `toSI` here is the
 // parser's own scale table -- read, never retyped, for the same reason validate_inp.js reads it.
+// The points a named curve states, out of the parsed document's own library (Task 586).
+function curvePointsFor(parsed, id) {
+	if (!id) { return []; }
+	const c = (parsed.curves || []).find((x) => x.id === id);
+	return c ? EngCalcs.lpnCurvePoints(c) : [];
+}
+// At most three, sampled at the ends and the middle -- js/looped-network.js's pumpFitPoints().
+function fitPts(pts) {
+	if (pts.length <= 3) { return pts; }
+	const s = pts.slice().sort((u, v) => u[0] - v[0]);
+	return [s[0], s[Math.floor((s.length - 1) / 2)], s[s.length - 1]];
+}
+
 function buildModel(EngCalcs, parsed) {
 	const S = parsed.scale;
 	const unitFor = { lpn_u_elevhead: S.head, lpn_u_flow: S.flow, lpn_u_diameter: S.dia, lpn_u_length: S.len, lpn_u_pressure: S.press };
@@ -40,10 +53,18 @@ function buildModel(EngCalcs, parsed) {
 			out.setting = l.settingUnit ? l.setting * S[l.settingUnit] : l.setting;
 		}
 		if (l.type === 'pump') {
-			const fit = (l.curvePoints && l.curvePoints.length)
-				? EngCalcs.lpnPumpFromCurve(l.curvePoints.map((pt) => [pt[0] * S.flow, pt[1] * S.head]))
+			// The curve is the DOCUMENT'S (Task 586) and the pump names it. At most three points
+			// reach the fit, exactly as pumpFit() samples a longer one on the page.
+			const pts = curvePointsFor(parsed, l.curveId);
+			const fit = pts.length
+				? EngCalcs.lpnPumpFromCurve(fitPts(pts).map((pt) => [pt[0] * S.flow, pt[1] * S.head]))
 				: { h0: 0, a: 0, b: 2 };
 			out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
+			out.curveSI = pts.map((pt) => [pt[0] * S.flow, pt[1] * S.head]);
+		}
+		if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'GPV') {
+			out.curvePoints = curvePointsFor(parsed, l.curveId)
+				.map((pt) => [pt[0] * S.flow, pt[1] * S.head]);
 		}
 		return out;
 	});

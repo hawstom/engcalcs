@@ -89,8 +89,13 @@
 		// network settles at 52-63 psi (365-422 kPa) -- distribution pressures a reviewer reads as
 		// normal, rather than numbers that merely converge.
 
+		// **AND THE CURVE IS A LIBRARY CURVE THE PUMP NAMES** (Task 586), which is also what makes
+		// the example show the Libraries box holding something the moment it is opened.
 		var pump = addLink('pump', r.id, j1.id);
-		pump.curvePoints = [
+		var pumpCurve = { id: 'C1', kind: 'head', points: [] };
+		docCurves().push(pumpCurve);
+		pump._curveId = pumpCurve.id;   // base-write: the example is drawn into a fresh project, always Base
+		pumpCurve.points = [
 			[0, niceDefault('lpn_u_elevhead', 'fth2o', 165, 50)],
 			[niceDefault('lpn_u_flow', 'gpm', 250, 0.015), niceDefault('lpn_u_elevhead', 'fth2o', 140, 42)],
 			[niceDefault('lpn_u_flow', 'gpm', 500, 0.030), niceDefault('lpn_u_elevhead', 'fth2o', 60, 18)]

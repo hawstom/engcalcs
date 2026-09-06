@@ -231,10 +231,14 @@ console.log('\n--- the same shape, wherever else it lives ---');
 	// the next refactor.
 	const src = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
 	const assigning = (src.match(/return \(doc\.[a-zA-Z]+ = doc\.[a-zA-Z]+ \|\| \[\]\)/g) || []);
-	ok('there are exactly four assigning getters, and no more crept in',
-		assigning.length === 4, assigning.length + ': ' + assigning.join(' | '));
+	ok('there are exactly five assigning getters, and no more crept in',
+		assigning.length === 5, assigning.length + ': ' + assigning.join(' | '));
 	// Each one has a pure sibling. Named by convention so a reader can find it without asking.
-	['libPatternsRead', 'savedProfilesRead', 'libControlsRead', 'libRulesRead'].forEach(function (fn) {
+	// docCurves()/docCurvesRead() joined them 2026-09-05 with the curve library (Task 586), split
+	// from the start for exactly the reason libPatterns() had to be: the Curves section RENDERS on
+	// every open of the Libraries box, and a render must not write `curves: []` into a document
+	// that stated none.
+	['libPatternsRead', 'savedProfilesRead', 'libControlsRead', 'libRulesRead', 'docCurvesRead'].forEach(function (fn) {
 		ok(fn + '() exists as the pure half',
 			new RegExp('function\\s+' + fn + '\\s*\\(\\)\\s*\\{\\s*return doc\\.[a-zA-Z]+ \\|\\| \\[\\];').test(src));
 	});

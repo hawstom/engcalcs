@@ -284,10 +284,13 @@ console.log('\n--- model -> .inp -> model ---');
 	ok('a GPV comes in as a VALVE', !!g && g.type === 'valve', g && g.type);
 	ok('...of its own type', g && g.valveType === 'GPV', g && g.valveType);
 	ok('...carrying the fully-open minor loss', g && g.k === 2.5, g && g.k);
-	// The file names CURVE1 and does not contain it, so the valve arrives with no points and stands
-	// open -- reported, rather than silently becoming something else.
-	ok('...with no curve, since the file names one it does not contain',
-		g && Array.isArray(g.curvePoints) && g.curvePoints.length === 0, JSON.stringify(g && g.curvePoints));
+	// The file names CURVE1 and does not contain it, so the valve KEEPS THE NAME (that is a defect
+	// in the file, disclosed rather than papered over) and the document's library states no such
+	// curve -- so it stands open, reported, rather than silently becoming something else.
+	ok('...naming the curve the file named', g && g.curveId === 'CURVE1', g && g.curveId);
+	ok('...which the document\'s library does not state',
+		!(gpv.curves || []).some((c) => c.id === 'CURVE1'),
+		JSON.stringify((gpv.curves || []).map((c) => c.id)));
 	ok('...and the missing curve is reported',
 		gpv.dropped.filter((d) => d.code === 'gpv-curve-missing' && d.ids.indexOf('V9') >= 0).length === 1,
 		JSON.stringify(gpv.dropped.map((d) => d.code)));
@@ -305,11 +308,16 @@ console.log('\n--- model -> .inp -> model ---');
 		'[OPTIONS]', ' Units LPS', '', '[END]'
 	].join('\n'));
 	const g2 = gpv2.links.filter((l) => l.id === 'V9')[0];
-	ok('a GPV whose curve IS in the file gets its points',
-		g2 && g2.curvePoints.length === 3, JSON.stringify(g2 && g2.curvePoints));
+	// **THE CURVE IS THE DOCUMENT'S AND THE VALVE NAMES IT** (Task 586), so the points are asked of
+	// the library and the valve is asked only what it is pointing at.
+	const g2curve = (gpv2.curves || []).filter((c) => c.id === 'CURVE1')[0];
+	ok('a GPV whose curve IS in the file names it', g2 && g2.curveId === 'CURVE1', g2 && g2.curveId);
+	ok('...and the library states its points, typed as a head-loss curve',
+		!!g2curve && g2curve.kind === 'headloss' && g2curve.points.length === 3,
+		JSON.stringify(g2curve && [g2curve.kind, g2curve.points]));
 	ok('...flow first, head loss second, in the file\'s own units',
-		g2 && g2.curvePoints[2][0] === 20 && g2.curvePoints[2][1] === 6,
-		JSON.stringify(g2 && g2.curvePoints[2]));
+		g2curve && g2curve.points[2][0] === 20 && g2curve.points[2][1] === 6,
+		JSON.stringify(g2curve && g2curve.points[2]));
 
 	// A PBV: a fixed pressure DROP, which is a setting in the pressure unit like a PRV's.
 	const pbv = EngCalcs.lpnInpParse([

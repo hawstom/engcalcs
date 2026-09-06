@@ -324,10 +324,15 @@ const arrived = PENDING_KEYS.filter(k => k in EngCalcs.pageConfig);
 ok('every key still on the pending list is still pending', arrived.length === 0,
   arrived.length ? arrived.join(',') + ' -- delete these from PENDING_KEYS' : '');
 
-// --- 7. the {id} placeholder is not left unsubstituted ------------------
-ok('pump ref note carries {id}', EngCalcs.pageConfig.lpn_pump_curve_ref_note.indexOf('{id}') >= 0);
-ok('pump ref note is substituted at the call site',
-   /lpn_pump_curve_ref_note[\s\S]{0,180}\.replace\('\{id\}'/.test(jsSrc));
+// --- 7. a placeholder is not left unsubstituted ------------------------
+// `lpn_pump_curve_ref_note` went with `curveRef` (Task 586): a pump no longer borrows another
+// pump's points, it names the same library curve. The shared-curve note is the string that took
+// over the job of saying which OTHER elements an edit here will move.
+ok('the shared-curve note carries {name} and {ids}',
+  EngCalcs.pageConfig.lpn_curve_shared_note.indexOf('{name}') >= 0
+  && EngCalcs.pageConfig.lpn_curve_shared_note.indexOf('{ids}') >= 0);
+ok('the shared-curve note is substituted at the call site',
+   /lpn_curve_shared_note[\s\S]{0,220}\.replace\('\{name\}'/.test(jsSrc));
 
 // --- 8. solver still works through effective() --------------------------
 L.setDoc({

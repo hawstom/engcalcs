@@ -225,9 +225,13 @@ importText(usInp, 'import-cases.inp');
 		v1._setting === 12 && v1._k === 0, 'setting=' + v1._setting + ' k=' + v1._k);
 
 	const pu = links.find(l => l.id === 'PU1');
+	// **THE PUMP NAMES A CURVE AND THE CURVE IS THE DOCUMENT'S** (Task 586). The points are stored
+	// in the units on the strip, exactly as written, in the library.
+	const puCurve = (doc.curves || []).find(c => c.id === pu._curveId);
+	ok('the pump names the curve the file named', !!pu._curveId, pu._curveId);
 	ok('the pump curve is stored in the units on the strip, exactly as written',
-		pu.curvePoints.length === 3 && pu.curvePoints[0][1] === 220 && pu.curvePoints[2][0] === 1000,
-		JSON.stringify(pu.curvePoints));
+		!!puCurve && puCurve.points.length === 3 && puCurve.points[0][1] === 220 && puCurve.points[2][0] === 1000,
+		JSON.stringify(puCurve && puCurve.points));
 	// h0/a/b are SI and are what the solver reads. 220 ft of shutoff head is 67.06 m; a curve
 	// fitted from the DISPLAYED numbers instead would put 220 metres in here and be 3.3x wrong.
 	//

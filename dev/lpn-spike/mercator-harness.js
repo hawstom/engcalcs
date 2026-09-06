@@ -207,7 +207,9 @@ v9.v = 9;
 v9.view = { cx: -122.5, cy: 38.106067, s: 5000 };
 v9.backdrop = { href: 'x', iw: 10, ih: 10, x: 0, y: 0, width: 1, height: 1, tx: -122.5, ty: 38.2, s: 1 };
 const m9 = L.migrateSaved(v9);
-ok('it is stamped v10', m9.v === 10, m9.v);
+// Stamped to the CURRENT version: migrateSaved() runs the whole chain, and v10 -> v11 (the curve
+// library, Task 586) is a stamp with nothing to convert on a document with no pump.
+ok('it is stamped current', m9.v === L.storageVersion(), m9.v);
 ok('...its VIEW centre is converted once, from a latitude to a drawing y',
 	Math.abs(m9.view.cy - Geom.mercY(38.106067)) < 1e-12, m9.view.cy);
 ok('...and so is the background image\'s anchor',
@@ -219,8 +221,8 @@ v9grid.v = 9; delete v9grid.project.coords;
 v9grid.view = { cx: 100, cy: 200, s: 1 };
 const m9g = L.migrateSaved(v9grid);
 ok('a v9 GRID document is stamped and otherwise untouched',
-	m9g.v === 10 && m9g.view.cy === 200 && m9g.nodes.every((n, i) => n.y === LATS[i]));
-ok('the page writes v10', L.storageVersion() === 10, L.storageVersion());
+	m9g.v === L.storageVersion() && m9g.view.cy === 200 && m9g.nodes.every((n, i) => n.y === LATS[i]));
+ok('the page writes the current version', L.storageVersion() === 11, L.storageVersion());
 
 // ---- 5. an `.inp` in DEGREES, through the page and back out ------------------------------------
 // dev/lpn-spike/inp-export-harness.js reads a document straight out of docFromInp() and never opens

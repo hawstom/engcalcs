@@ -2381,8 +2381,19 @@ var EngCalcs = EngCalcs || {};
 		// `energyPrice` and `energyPattern` are what this pump pays for power and when (Task 566).
 		// Overridable for the reason demand is: "what does this station cost once the off-peak
 		// tariff ends" is an operating question, and a scenario is where one is asked.
+		// `curveId` and `efficCurveId` name a curve in the document's own library (Task 586). Tom,
+		// 2026-09-05, asked whether a pump's curve reference should be overridable: *"Scenario pump
+		// reference: Yes."* -- "what if we put a bigger impeller in this pump" is exactly the
+		// question a scenario asks, and it is answered by pointing the pump at a different curve.
+		// `efficCurveId` follows it on the same reading (AI's inference, not his word): "what if we
+		// rebuilt this pump to its rated efficiency" is the same kind of question, and one reference
+		// overridable while its twin is not is a distinction nobody could re-derive.
+		// **THE OVERRIDE IS ON WHICH CURVE, NEVER ON WHAT A CURVE CONTAINS.** A curve's points are
+		// the document's, shared by every element naming it; a scenario that edited them would
+		// change the answer in every other scenario at once, which is the opposite of an override.
 		link: { diameter: true, roughness: true, k: true, status: true, length: true, setting: true, active: true,
-			bulkCoeff: true, wallCoeff: true, energyPrice: true, energyPattern: true },
+			bulkCoeff: true, wallCoeff: true, energyPrice: true, energyPattern: true,
+			curveId: true, efficCurveId: true },
 		// A TEXT LABEL IS A THIRD GROUP (Task 407) with exactly two properties: `text` is what the
 		// note SAYS and `active` whether it is there at all, which together answer "this scenario has
 		// its own note" with no second mechanism.
@@ -3766,13 +3777,57 @@ var EngCalcs = EngCalcs || {};
 	}
 	function isFixedHeadNode(n) { return !!n && (n.type === 'reservoir' || n.type === 'tank'); }
 	function linkById(id) { return byId('link', id); }
-	// A pump's curvePoints are 1-3 [Q,H] pairs in the units on the strip; curveRef, if set, names
-	// another pump link to copy points from (one hop only -- this never chases a chain, so a
-	// ref-to-a-ref cannot create a cycle).
-	function resolveCurvePoints(l) {
-		var base = l;
-		if (l.curveRef) { var ref = linkById(l.curveRef); if (ref && ref.type === 'pump') { base = ref; } }
-		return (base.curvePoints || []).filter(function (p) { return p && p[0] !== undefined && p[1] !== undefined; });
+	// ---- THE CURVE LIBRARY (Task 586) ------------------------------------------------------------
+	//
+	// **A CURVE IS A DOCUMENT OBJECT AND AN ELEMENT HOLDS ONLY A REFERENCE.** `doc.curves` is a list
+	// of `{ id, kind, points, src, tok }` -- the same record js/lpn-inp.js reads out of `[CURVES]`
+	// and writes back -- and a pump, a GPV or a pump's efficiency names one by id.
+	//
+	// **THIS REPLACES THE ACCIDENT OF CHRONOLOGY IT GREW OUT OF** (Tom, 2026-09-05: *"In the first
+	// two days programming lpn at the end of July, we needed a pump curve, but we didn't have a
+	// Library... move all pump curve data to the Library under curves and leave only curve
+	// references in the pump properties."*). What went with it: `curvePoints` and `efficPoints` on
+	// the element, and `curveRef`, which named ANOTHER PUMP to copy points from -- a borrow
+	// mechanism that existed only because there was nothing to share. Two pumps on one curve now
+	// name one curve.
+	//
+	// **AND IT IS WHAT LETS A FILE'S OWN NUMBERS SURVIVE.** A pump head curve of more than three
+	// points used to be sampled at its ends and middle on import, and re-sampled off our fitted
+	// curve on export, so a five-point manufacturer's curve was rewritten twice. The library holds
+	// every point the file stated; the three-point FIT is derived at the solver handoff and stored
+	// nowhere.
+	//
+	// **READ THROUGH docCurvesRead(); WRITE THROUGH docCurves().** The same split, for the same
+	// reason, as libPatterns()/libPatternsRead(): the materialising getter writing `curves: []` into
+	// a document that stated none is a change to the document, and a render must not make one.
+	function docCurves() { return (doc.curves = doc.curves || []); }
+	function docCurvesRead() { return doc.curves || []; }
+	function curveById(id) {
+		if (id === undefined || id === null || id === '') { return null; }
+		var list = docCurvesRead(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].id === id) { return list[i]; } }
+		return null;
+	}
+	/** Every finite point of one curve. js/lpn-inp.js owns the filter, so there is one answer. */
+	function curvePointsOf(c) {
+		if (!c) { return []; }
+		return EngCalcs.lpnCurvePoints ? EngCalcs.lpnCurvePoints(c)
+			: (c.points || []).filter(function (p) { return p && isFinite(p[0]) && isFinite(p[1]); });
+	}
+	// **THE ONE PLACE AN ELEMENT'S CURVE IS RESOLVED, AND IT GOES THROUGH effective().** The
+	// reference is overridable, so a bare `l.curveId` read would show Base's curve inside a scenario
+	// that had chosen another -- and a resolver only SOME call sites went through would be worse
+	// than none, because the map, the popup, the report and the file would each answer differently.
+	function elementCurve(l, prop) { return curveById(effective(l, prop || 'curveId')); }
+	function resolveCurvePoints(l) { return curvePointsOf(elementCurve(l, 'curveId')); }
+	// **AT MOST THREE POINTS, FOR THE FIT ALONE.** EngCalcs.lpnPumpFromCurve reads 1 to 3 pairs, so
+	// a longer curve is sampled at its ends and its middle -- the fitted curve then spans the pump's
+	// real operating range rather than only its low-flow end. DERIVED, and nothing writes it back:
+	// the document keeps every point, which is the whole of what Task 586 bought.
+	function pumpFitPoints(pts) {
+		if (pts.length <= 3) { return pts; }
+		var sorted = pts.slice().sort(function (u, v) { return u[0] - v[0]; });
+		return [sorted[0], sorted[Math.floor((sorted.length - 1) / 2)], sorted[sorted.length - 1]];
 	}
 	// A PUMP'S FITTED CURVE IS DERIVED, SO IT IS NOT STORED (ROADMAP Task 390 step 5).
 	//
@@ -3787,7 +3842,7 @@ var EngCalcs = EngCalcs || {};
 	// field on a link that anything but the user writes. The cost is one three-point curve fit per
 	// pump per solve, at this suite's target scale of ~10-20 nodes.
 	function pumpFit(l) {
-		var pts = resolveCurvePoints(l);
+		var pts = pumpFitPoints(resolveCurvePoints(l));
 		if (pts.length === 0) {
 			// No curve entered yet: h0 = a = 0, so H = h0 - a Q^b is identically zero and the pump
 			// is simply a connection that neither adds nor loses head. The solver has its own
@@ -4212,32 +4267,32 @@ var EngCalcs = EngCalcs || {};
 			if (typeof e[k] === 'number' && isFinite(e[k])) { out[k] = e[k]; }
 		});
 		if (e.globalPattern) { out.globalPattern = e.globalPattern; }
-		// **THE CURVE IS THE PUMP'S OWN, AND ITS POINTS COME OFF THE PUMP** (Task 585). Until then
-		// `out.effic` was a map of pump id -> curve NAME read out of the file's carried [ENERGY],
-		// with the points behind that name in the carried [CURVES] text -- readable, honoured, and
-		// editable by nobody. They live on the link now, as `efficCurveId` and `efficPoints`, on
-		// exactly the limb the head curve's own points live on, and `lpnEfficCurveMap()` is the one
-		// place a pump's curve gets its name so this and the exporter cannot disagree about it.
+		// **THE PUMP NAMES ITS EFFICIENCY CURVE AND THE CURVE IS THE DOCUMENT'S** (Task 586). The
+		// name comes through `effective()` because the reference is overridable, and the points come
+		// out of the one library -- so a curve two pumps share is one curve here, as it is in the
+		// file and on screen.
 		//
 		// The abscissa is a FLOW in the project's own unit, like every other number on the document,
 		// and `lpnToInp` wants m3/s like every other flow on the model -- so this is the pump head
-		// curve's own crossing (see pumpCurveSI above) applied to the same axis, and not a third
+		// curve's own crossing (see pumpFit above) applied to the same axis, and not a third
 		// conversion site. Getting it wrong moves the money and nothing on screen looks wrong.
-		var efficPumps = [], qk = 1 / unitFactor('lpn_u_flow');
+		var qk = 1 / unitFactor('lpn_u_flow');
 		(doc.links || []).forEach(function (l) {
 			if (l.type !== 'pump' || !isActive(l)) { return; }
-			var pr = effective(l, 'energyPrice'), pat = effective(l, 'energyPattern');
+			var pr = effective(l, 'energyPrice'), pat = effective(l, 'energyPattern'),
+				nm = effective(l, 'efficCurveId');
 			if (typeof pr === 'number' && isFinite(pr)) { out.price[l.id] = pr; }
 			if (pat) { out.pattern[l.id] = pat; }
-			if (l.efficCurveId || (l.efficPoints && l.efficPoints.length)) {
-				efficPumps.push({ id: l.id, name: l.efficCurveId, points: l.efficPoints });
-			}
+			// A pump naming a curve the document does not state keeps the name and contributes no
+			// points: that is a defect in the FILE, disclosed rather than invented, and lpnToInp
+			// writes no [ENERGY] row for it because it would name a curve the file it writes has not
+			// got -- exactly the input EPANET refuses.
+			if (nm) { out.effic[l.id] = nm; }
 		});
-		var em = EngCalcs.lpnEfficCurveMap ? EngCalcs.lpnEfficCurveMap(efficPumps) : { effic: {}, curves: {} };
-		out.effic = em.effic;
 		out.efficCurves = {};
-		Object.keys(em.curves).forEach(function (nm) {
-			out.efficCurves[nm] = em.curves[nm].map(function (pt) { return [pt[0] * qk, pt[1]]; });
+		docCurvesRead().forEach(function (c) {
+			if (c.kind !== 'effic') { return; }
+			out.efficCurves[c.id] = curvePointsOf(c).map(function (pt) { return [pt[0] * qk, pt[1]]; });
 		});
 		return out;
 	}
@@ -13555,17 +13610,14 @@ var EngCalcs = EngCalcs || {};
 			l.valveType = 'TCV';
 			l._setting = defaultValveSetting('TCV');   // base-write: construction: a valve is born with its type default in Base
 		}
-		if (type === 'pump') {
-			// l.curvePoints holds 1-3 [Q,H] pairs, fitted to h0/a/b by EngCalcs.lpnPumpFromCurve.
-			// l.curveRef, when set, names another pump link whose curvePoints this one copies, so
-			// several identical pumps need the curve entered only once.
-			// A brand-new pump has NO curve at all. An invisible default design point makes a pump
-			// silently deliver head the user never entered, then behave strangely once demand runs
-			// past that unseen curve. With no curve it adds and loses nothing -- see pumpFit().
-
-			l.curvePoints = [];
-			l.curveRef = null;
-		}
+		// **A BRAND-NEW PUMP NAMES NO CURVE AT ALL** and gets no field for one (Task 586). An
+		// invisible default design point makes a pump silently deliver head the user never entered,
+		// then behave strangely once demand runs past that unseen curve. Naming nothing, it adds and
+		// loses nothing -- see pumpFit(). The curve chooser on its popup is where it gets one, and
+		// the curve itself is the document's.
+		// **AND NOTHING IS WRITTEN HERE**, deliberately: `_curveId` absent reads as "no curve"
+		// through effective() exactly as `null` would, and writing a key means writing it into every
+		// file this page saves for the sake of a state the absence already states.
 		bornInScenario(l);
 		doc.links.push(l);
 		incidentLinks[fromId].push(id); incidentLinks[toId].push(id);
@@ -13955,7 +14007,11 @@ var EngCalcs = EngCalcs || {};
 	// stored in longitude and latitude -- they are the user's numbers -- but `view.cy` and
 	// `backdrop.ty` are ours and are stored in the drawing frame, so a v9 geographic document has
 	// those two converted once on open.
-	var LPN_STORAGE_VERSION = 10;
+	// 11 (Task 586): a CURVE is a document object. `doc.curves` holds every curve the project has,
+	// and a pump, a GPV and a pump's efficiency name one by id -- so `curvePoints`, `efficPoints`
+	// and the `curveRef` borrow are gone from the elements. mintCurveLibrary() below does the move,
+	// and runs unconditionally rather than as a version step, for the reason renameLabelText() does.
+	var LPN_STORAGE_VERSION = 11;
 	// ---- ROADMAP Task 274, second half ----
 	//
 	// From v4 the FILE stores Cartesian Y (up is positive), matching what the user sees and what
@@ -14325,6 +14381,10 @@ var EngCalcs = EngCalcs || {};
 			// The clock (Task 423). Saved with the drawing because it is part of the model, not a
 			// preference: a project whose demands vary over the day means nothing without them.
 			patterns: doc.patterns || [], defaultPattern: doc.defaultPattern || null,
+			// **THE CURVE LIBRARY** (Task 586). Modelling data, and therefore the project's, exactly
+			// as the patterns beside it are: a pump's head curve means nothing without the curve, and
+			// two pumps sharing one is a fact about this network.
+			curves: doc.curves || [],
 			// Paths kept by name (Task 510). Document data, for the reason the saved-path note in
 			// the profile section gives: a path names THIS project's junctions.
 			profiles: doc.profiles || [],
@@ -14522,6 +14582,131 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
+	/**
+	 * **EVERY CURVE A STORED DOCUMENT HOLDS, MOVED INTO ITS LIBRARY** (Task 586). Called from
+	 * migrateSaved() on every document, at every version, and idempotent.
+	 *
+	 * Four sources, and each one is a place a curve used to live:
+	 *   - `link.curvePoints` on a pump  -- its head curve (from the very first days of this page);
+	 *   - `link.curvePoints` on a GPV   -- its head-loss curve (Task 248.04);
+	 *   - `link.efficPoints` on a pump  -- its efficiency curve (Task 585);
+	 *   - `inpSections.CURVES` text     -- an efficiency curve carried but never read (Task 582).
+	 * `link.curveRef` -- the borrow that named ANOTHER PUMP to copy points from -- is resolved to a
+	 * reference to the one curve, which is what a library makes it mean.
+	 *
+	 * **THE COLLISION RULE, AND IT IS THE ONE ALREADY ON THIS PAGE.** Two pumps can perfectly well
+	 * both call their curve `C1` while meaning different pumps -- an id was only ever unique per
+	 * element before this. So a name is CLAIMED: the first curve to ask for it keeps it; a later one
+	 * whose points are identical JOINS it, which is the sharing the library exists for and is where
+	 * a `curveRef` borrow lands; a later one whose points differ takes `<name>_<elementId>`, then
+	 * `_2`, `_3`. That is exactly the rule EngCalcs.lpnEfficCurveMap used for efficiency curves, so
+	 * the page has one collision rule and not two. The element is then pointed at the name it really
+	 * got, so no reference can dangle.
+	 */
+	function mintCurveLibrary(saved) {
+		if (!saved || typeof saved !== 'object') { return saved; }
+		var list = Array.isArray(saved.curves) ? saved.curves : [],
+			byId = {}, links = saved.links || [], mintedFor = {};
+		list.forEach(function (c) { if (c && c.id !== undefined) { byId[c.id] = c; } });
+		function ptsSame(a, b) {
+			return EngCalcs.lpnCurvePointsSame ? EngCalcs.lpnCurvePointsSame(a, b) : false;
+		}
+		function cleanPts(raw) {
+			return (raw || []).filter(function (q) {
+				return q && isFinite(q[0]) && isFinite(q[1]);
+			}).map(function (q) { return [+q[0], +q[1]]; });
+		}
+		// One name, claimed. Returns the name the curve really has.
+		function claim(base, kind, pts, ownerId) {
+			var nm = String(base), i = 2;
+			while (byId[nm] && !(byId[nm].kind === kind && ptsSame(curvePointsOf(byId[nm]), pts))) {
+				nm = base + '_' + ownerId + (i > 2 ? '_' + i : '');
+				i++;
+			}
+			if (!byId[nm]) {
+				byId[nm] = { id: nm, kind: kind, points: pts.map(function (q) { return [q[0], q[1]]; }) };
+				list.push(byId[nm]);
+			}
+			return nm;
+		}
+		// ---- 1. the efficiency curves a pre-Task-586 project carried as [ENERGY] + [CURVES] text --
+		// Read from the sections rather than from `settings.energy`, because a project saved before
+		// [ENERGY] was interpreted has the lines and no record at all -- and this runs before
+		// applySaved()'s own once-only reads, which is the ordering that made the settings unusable
+		// here. The lines are then DELETED: two homes for one curve is a disagreement waiting for
+		// the first edit, and the exporter composes [CURVES] from the library now.
+		var carriedNames = {};
+		if (saved.inpSections && saved.inpSections.CURVES && EngCalcs.lpnEnergyParse) {
+			var en = EngCalcs.lpnEnergyParse(saved.inpSections.ENERGY || []),
+				carriedPts = EngCalcs.lpnEfficCurves ? EngCalcs.lpnEfficCurves(saved.inpSections, 1) : {};
+			Object.keys(en.effic || {}).forEach(function (pumpId) {
+				var nm = en.effic[pumpId];
+				if (nm && carriedPts[nm] && carriedPts[nm].length) { carriedNames[pumpId] = nm; }
+			});
+			Object.keys(carriedPts).forEach(function (nm) {
+				if (byId[nm]) { return; }
+				byId[nm] = { id: nm, kind: 'effic', points: cleanPts(carriedPts[nm]) };
+				list.push(byId[nm]);
+			});
+			delete saved.inpSections.CURVES;
+		}
+		// ---- 2. a `curveRef` borrow resolves to the pump whose points it was copying -------------
+		var linkById2 = {};
+		links.forEach(function (l) { if (l && l.id !== undefined) { linkById2[l.id] = l; } });
+		function headSource(l) {
+			// ONE HOP ONLY, exactly as resolveCurvePoints() used to chase it, so a ref-to-a-ref
+			// cannot make a cycle here either.
+			if (!l.curveRef) { return l; }
+			var ref = linkById2[l.curveRef];
+			return (ref && ref.type === 'pump') ? ref : l;
+		}
+		function mintHead(src) {
+			var key = 'h:' + src.id, pts;
+			if (mintedFor[key] !== undefined) { return mintedFor[key]; }
+			pts = cleanPts(src.curvePoints);
+			mintedFor[key] = pts.length
+				? claim(src.curveId || ('C_' + src.id), 'head', pts, src.id)
+				// A pump that NAMES a curve its file did not state keeps the name and gets no curve:
+				// that is the file's own defect, disclosed rather than invented (the popup says so).
+				: (src.curveId || null);
+			return mintedFor[key];
+		}
+		links.forEach(function (l) {
+			if (!l) { return; }
+			var nm;
+			if (l.type === 'pump') {
+				nm = mintHead(headSource(l));
+				if (nm) { l._curveId = nm; }   // base-write: a migration builds the document; there is no scenario to write into, and every scenario reads Base until one overrides it
+				nm = cleanPts(l.efficPoints).length
+					? claim(l.efficCurveId || carriedNames[l.id] || ('E_' + l.id), 'effic', cleanPts(l.efficPoints), l.id)
+					: (l.efficCurveId || carriedNames[l.id] || null);
+				if (nm) { l._efficCurveId = nm; }   // base-write: same migration pass
+			} else if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'GPV') {
+				nm = cleanPts(l.curvePoints).length
+					? claim(l.curveId || ('G_' + l.id), 'headloss', cleanPts(l.curvePoints), l.id)
+					: (l.curveId || null);
+				if (nm) { l._curveId = nm; }   // base-write: same migration pass
+			}
+			// The old homes go, rather than riding along unread: settings is serialized whole, and a
+			// key that reads as live but is consulted by nothing gets "restored" by the first
+			// well-meaning edit.
+			delete l.curvePoints; delete l.efficPoints; delete l.curveRef;
+			delete l.curveId; delete l.efficCurveId;
+		});
+		// **AND THE STAGING MAP GOES WITH THEM.** A project saved while `settings.energy.effic` was
+		// where a pump's curve NAME lived has it there and on the pump now; two homes for one name
+		// is a disagreement waiting for the first edit, and the exporter composes the EFFIC rows
+		// from the pumps. Moved, not copied -- the same treatment `settings.reactions.tank` got.
+		if (saved.settings && saved.settings.energy && saved.settings.energy.effic) {
+			saved.settings.energy.effic = {};
+		}
+		// And Task 585's own record goes, rather than riding along unread: settings is serialized
+		// whole, so a key that reads as live but is consulted by nothing gets restored by the first
+		// well-meaning edit -- the same reason `colorFrozenBreaks` is deleted rather than ignored.
+		if (saved.settings) { delete saved.settings.efficCurves; }
+		if (list.length || saved.curves) { saved.curves = list; }
+		return saved;
+	}
 	function migrateSaved(saved) {
 		// RUN ON EVERY DOCUMENT, NOT ONLY AS THE v7 -> v8 STEP, and v2 is the whole reason. A v2
 		// document deliberately lags at v2 until the user answers its units question, so it reaches
@@ -14530,6 +14715,14 @@ var EngCalcs = EngCalcs || {};
 		// where the others are not, because it reinterprets nothing: it is a storage SPELLING, with
 		// no unit, coordinate or number question attached, and it is idempotent.
 		renameLabelText(saved);
+		// **AND THE CURVE LIBRARY IS MINTED ON EVERY DOCUMENT, FOR THE SAME REASON** (Task 586). A
+		// v2 document deliberately lags at v2 until its units question is answered, so it reaches no
+		// later step in this chain -- and it still holds curve points on its pumps, which every
+		// solve, every popup and every unit switch now reads out of the library. Safe to run
+		// unconditionally because it reinterprets nothing: it MOVES a number from one place to
+		// another and changes none of them, and it is idempotent (a document already holding its
+		// curves in the library has nothing left on any element for the loops below to find).
+		mintCurveLibrary(saved);
 		if (saved.v === 1) {
 			// The single autosaved network becomes the project's Base. Its name is left blank, not
 			// set to "Untitled": that word is UI, and the UI localizes it (see `project` above).
@@ -14662,6 +14855,16 @@ var EngCalcs = EngCalcs || {};
 			}
 			saved.v = 10;
 		}
+		// ---- v10 -> v11: A CURVE IS A DOCUMENT OBJECT (Task 586) -----------------------------------
+		//
+		// The move itself already ran at the top of this function, unconditionally, for the reason
+		// stated there. What the VERSION buys is the other direction: a v11 document opened by an
+		// older page would draw every pump curveless and solve a network of lossless connections,
+		// and prepareDocument() refuses a document newer than the page rather than half-reading it.
+		// So the stamp is the guard, not the move -- exactly the shape of the v7 -> v8 step.
+		if (saved.v === 10) {
+			saved.v = 11;
+		}
 		// **There is deliberately NO v2 -> v3 step here, and v2 is the ONLY version that lags.**
 		// Every other migration converts and stamps; this one cannot, because the conversion is the
 		// USER'S to authorise. The document stays at v2 until they answer, and THE MISSING STAMP IS
@@ -14743,6 +14946,16 @@ var EngCalcs = EngCalcs || {};
 		// The clock (Task 423). A file written before this existed has none and behaves exactly as
 		// it always did -- an empty pattern list resolves to a multiplier of 1 everywhere.
 		doc.patterns = saved.patterns || [];
+		// **THE CURVE LIBRARY, MINTED AT THIS DOOR TOO** (Task 586). migrateSaved() already did it
+		// for a document that came through the migration chain; this is the OTHER door, and it is
+		// the one that matters -- `applySaved()` is the single install seam, reached directly by an
+		// `.inp` import, by the boot path and by every harness that hands over a document it built
+		// itself. A guard nested inside a caller's is exactly what [TAGS] and the efficiency curve
+		// each walked past, so this one is its own call and the function is idempotent by
+		// construction: a document already holding its curves in the library has nothing left on any
+		// element for it to find.
+		mintCurveLibrary(saved);
+		doc.curves = saved.curves || [];
 		doc.defaultPattern = saved.defaultPattern || null;
 		doc.times = saved.times || null;
 		doc.controls = saved.controls || [];
@@ -14854,12 +15067,6 @@ var EngCalcs = EngCalcs || {};
 		// gains its pump prices and efficiencies on open rather than never.
 		if (!settings.energy && EngCalcs.lpnEnergyParse) {
 			readEnergySection(saved.inpSections || {}, settings, saved.links || []);
-		}
-		// **AND THE EFFICIENCY CURVES ONTO THE PUMPS, UNDER A GUARD OF THEIR OWN** (Task 585). A
-		// project saved between Task 582 and this one carries `settings.energy` already, so this
-		// test cannot be folded into the one above without missing every document it is for.
-		if (!settings.efficCurves && EngCalcs.lpnEfficCurves) {
-			readEfficCurves(saved.inpSections || {}, settings, saved.links || []);
 		}
 		// `[SOURCES]` and `[MIXING]` on the same terms as the three above (Task 579): a project
 		// saved while both were carried text gains its booster doses and its tank mixing models on
@@ -15176,11 +15383,22 @@ var EngCalcs = EngCalcs || {};
 			scale(l, '_diameter', df);
 			// _length was ALREADY declarative before this task (see linkLengthSI) -- scaling it here
 			// would break the one field that was never wrong. _roughness and _k are dimensionless.
-			(l.curvePoints || []).forEach(function (pt) {
+		});
+		// **AND THE CURVES, WHICH ARE THE DOCUMENT'S** (Task 586). A v2 document held its points on
+		// its pumps; migrateSaved() moved them into the library before this was ever offered, so the
+		// numbers to reinterpret are here. An efficiency curve's ordinate is a PERCENT and a volume
+		// curve is a quantity this page never computes with, so only the kinds that name a flow and
+		// a head are touched -- the same table the exporter writes each axis through.
+		docCurvesRead().forEach(function (c) {
+			var flowAxis = c.kind === 'head' || c.kind === 'effic' || c.kind === 'headloss',
+				headAxis = c.kind === 'head' || c.kind === 'headloss';
+			(c.points || []).forEach(function (pt) {
 				if (!pt) { return; }
-				if (typeof pt[0] === 'number') { pt[0] = pt[0] * qf; }
-				if (typeof pt[1] === 'number') { pt[1] = pt[1] * hf; }
+				if (flowAxis && typeof pt[0] === 'number') { pt[0] = pt[0] * qf; }
+				if (headAxis && typeof pt[1] === 'number') { pt[1] = pt[1] * hf; }
 			});
+			// The file's own text no longer states these numbers, so it must not be handed back.
+			delete c.src; delete c.tok;
 		});
 		// SCENARIO OVERRIDES ARE DELIBERATELY NOT TOUCHED, because no v2 document can contain one --
 		// v2 predates any UI that could create a scenario. Dead code in a one-time migration is worse
@@ -15697,6 +15915,10 @@ var EngCalcs = EngCalcs || {};
 					// because "what if the tank is drawn down to 2 m" is a scenario. The vessel's own
 					// geometry is not, sitting beside elev: a scenario changes operating state, not
 					// what was built.
+					// **THE VOLUME CURVE'S NAME, CARRIED** (Task 586). Nothing here uses it yet; the
+					// reference is the file's, and dropping it wrote a `[TANKS]` row a column short.
+					// Base-owned, on the same limb as the vessel's own geometry below.
+					volCurve: n.volCurve,
 					_level: n.level,
 					minLevel: n.minLevel,
 					maxLevel: n.maxLevel,
@@ -15760,16 +15982,18 @@ var EngCalcs = EngCalcs || {};
 				out._setting = (out.valveType === 'FCV')   // base-write: import builds Base: an .inp arrives as one network with no scenarios
 					? inpFlow(l.setting)
 					: (l.setting || 0);
+				// A GPV's behaviour IS its curve, and the curve is the document's (Task 586).
+				if (l.curveId) { out._curveId = l.curveId; }   // base-write: import builds Base, as the setting above does
 			}
 			if (l.type === 'pump') {
-				out.curvePoints = (l.curvePoints || []).map(function (pt) {
-					return [inpFlow(pt[0]), pt[1]];
-				});
-				out.curveRef = null;
-				// The curve's NAME, when the file gave one (Task 430). Kept beside the points for the
-				// same reason a number's token is kept beside it: it is the user's own text, and the
-				// exporter has no way to reconstruct it.
-				if (l.curveId) { out.curveId = l.curveId; }
+				// **THE PUMP KEEPS A REFERENCE AND THE CURVE GOES TO THE LIBRARY** (Task 586). The
+				// name is the file's own text, and it is now the whole of what the pump stores about
+				// its curve -- so a five-point curve arrives with five points, because nothing on
+				// this path samples one any more.
+				// Overridable, hence the leading underscore: an import builds ONE network, which is
+				// Base, and every scenario reads Base until one overrides it.
+				if (l.curveId) { out._curveId = l.curveId; }   // base-write: import builds Base: an .inp arrives as one network with no scenarios
+				if (l.efficCurveId) { out._efficCurveId = l.efficCurveId; }   // base-write: same construction pass
 				// **SPEED AND ITS PATTERN** (Task 248.02). A relative speed of 1 is EPANET's own
 				// default and is not written onto the pump, for the same reason the blank pattern
 				// column is not: the field must say what the file said.
@@ -15886,8 +16110,6 @@ var EngCalcs = EngCalcs || {};
 				// arrives as 75 rather than as nothing, which is what lets the run say what the
 				// pumping cost.
 				readEnergySection(parsed.inpSections, s, links);
-				// The other door for the same read (Task 585); see readEfficCurves()'s own note.
-				readEfficCurves(parsed.inpSections, s, links);
 				// **AND [SOURCES] AND [MIXING]** (Task 579): a booster dose arrives as a dose the
 				// engine is told about, and a tank that is not completely mixed arrives saying so.
 				readSourceMixingSections(parsed.inpSections, s, nodes);
@@ -15900,6 +16122,21 @@ var EngCalcs = EngCalcs || {};
 			// array and null are the states a file that states none produces, so no reader has to
 			// test for absence.
 			patterns: parsed.patterns || [],
+			// **THE CURVE LIBRARY, STRAIGHT OFF THE FILE** (Task 586). Every `[CURVES]` entry the
+			// file stated, with every point, its own lines and its per-coordinate tokens -- so a
+			// curve nobody edits goes back out as the characters it came in as. The abscissa of a
+			// flow-bearing curve crosses like every other flow: pass-through where the page has a
+			// selector for the file's keyword, converted where it has not.
+			curves: (parsed.curves || []).map(function (c) {
+				var flowAxis = c.kind === 'head' || c.kind === 'effic' || c.kind === 'headloss';
+				if (!flowAxis || flowPassThrough) { return c; }
+				// A CONVERTED CURVE LOSES ITS TOKENS AND ITS OWN LINES, and must: the text no longer
+				// states the number the document holds, which is the one test a token has to pass.
+				return {
+					id: c.id, kind: c.kind,
+					points: c.points.map(function (pt) { return [inpFlow(pt[0]), pt[1]]; })
+				};
+			}),
 			// [OPTIONS] Pattern -- the default demand pattern for every junction whose own column is
 			// blank. Net3 names `Pattern 1`, and ignoring this line leaves nearly every junction 34%
 			// low with every number on screen looking reasonable.
@@ -16057,52 +16294,25 @@ var EngCalcs = EngCalcs || {};
 		['globalEfficiency', 'globalPrice', 'globalPattern', 'demandCharge'].forEach(function (k) {
 			if (e[k] !== undefined) { kept[k] = e[k]; }
 		});
-		kept.effic = e.effic || {};
+		// **THE EFFIC MAP IS NOT KEPT ON THE SETTING** (Task 586). A pump names its efficiency curve
+		// through `_efficCurveId`, resolved into the document's curve library, and the exporter
+		// composes the `PUMP <id> EFFIC <curve>` rows from the pumps. The key stays present and
+		// empty so every shape that reads it is unchanged -- the same treatment
+		// `settings.reactions.tank` got when a tank gained its own coefficient.
+		kept.effic = {};
 		// PRESENT EVEN WHEN EMPTY, for the reason `settings.reactions` is: its presence is what
 		// tells the exporter this document's `[ENERGY]` has been read at all.
-		// **`kept.effic` IS A STAGING POST AND NOT A HOME** (Task 585). readEfficCurves() below
-		// moves it onto the pumps and empties it; it is filled here because that read needs the
-		// names the `[ENERGY]` section stated, and this is the one place they are parsed.
 		settingsObj.energy = kept;
+		(linkList || []).forEach(function (l) {
+			if (l.type !== 'pump' || !e.effic[l.id]) { return; }
+			l._efficCurveId = e.effic[l.id];   // base-write: reading a file onto a document being CONSTRUCTED, before any scenario exists
+		});
 		(linkList || []).forEach(function (l) {
 			if (l.type !== 'pump') { return; }
 			if (e.price[l.id] !== undefined) { l._energyPrice = e.price[l.id]; }   // base-write: reading a file onto a document being CONSTRUCTED, before any scenario exists
 			if (e.pattern[l.id] !== undefined) { l._energyPattern = e.pattern[l.id]; }   // base-write: same construction pass; the file states one network, which is Base
 		});
 	}
-	/**
-	 * **A PUMP'S EFFICIENCY CURVE, MOVED ONTO THE PUMP** (Task 585). `[ENERGY]` names it and
-	 * `[CURVES]` states its points; until this task the name sat on `settings.energy.effic` and
-	 * the points stayed in the carried text, which is why nothing could edit either.
-	 *
-	 * **THE POINTS ARE TAKEN AT FACTOR 1 AND STAY IN THE PROJECT'S OWN FLOW UNIT**, exactly as a
-	 * head curve's points do: a curve point is stored in the unit its column heading names, so
-	 * `951.0194` on the document is the `951.0194` the file wrote. Reading it through m3/s and back
-	 * is what printed `951.0194000000001` on the popup before phase one stopped doing it.
-	 *
-	 * **ITS OWN RECORD AND ITS OWN GUARD, NOT A LINE INSIDE THE `[ENERGY]` ONE.** A project saved
-	 * between Task 582 and this one already carries `settings.energy`, so a read nested under that
-	 * test would walk straight past exactly the documents it exists for -- the trap `[TAGS]` hit
-	 * the day it landed after `[SOURCES]`. `settings.efficCurves` is this read's own record.
-	 */
-	function readEfficCurves(sections, settingsObj, linkList) {
-		var names = ((settingsObj.energy || {}).effic) || {},
-			pts = EngCalcs.lpnEfficCurves ? EngCalcs.lpnEfficCurves(sections || {}, 1) : {};
-		(linkList || []).forEach(function (l) {
-			var nm = names[l.id], p;
-			if (l.type !== 'pump' || !nm) { return; }
-			l.efficCurveId = nm;   // base-write: reading a file onto a document being CONSTRUCTED, and a curve is not overridable
-			p = pts[nm];
-			if (p && p.length) {
-				l.efficPoints = p.map(function (q) { return [q[0], q[1]]; });   // base-write: same construction pass
-			}
-		});
-		// MOVED, NOT COPIED: two homes for one curve name is a disagreement waiting for the first
-		// edit, and the pump is the home from here on.
-		if (settingsObj.energy) { settingsObj.energy.effic = {}; }
-		settingsObj.efficCurves = 1;
-	}
-
 	// One sentence per thing an import could not keep. Written as whole sentences rather than
 	// composed from fragments (CLAUDE.md's key-reuse rule), and grouped so that closely related
 	// EPANET features share one message instead of each buying its own translated string.
@@ -20944,6 +21154,23 @@ var EngCalcs = EngCalcs || {};
 			obj[prop] = obj[prop] * k;
 			n++;
 		}
+		// **ONE AXIS OF EVERY CURVE OF THE NAMED KINDS** (Task 586). A curve is a DOCUMENT object, so
+		// this walks the library rather than the elements -- a curve two pumps share must be
+		// reinterpreted once, not twice, and a curve nothing references is still the user's numbers
+		// and still means what its column heading says.
+		function convCurveAxis(axis, kinds, factor) {
+			var moved = 0;
+			docCurvesRead().forEach(function (c) {
+				if (kinds.indexOf(c.kind) < 0) { return; }
+				(c.points || []).forEach(function (pt) {
+					if (pt && typeof pt[axis] === 'number') { pt[axis] = pt[axis] * factor; moved++; }
+				});
+				// The file's own text no longer states these numbers (CLAUDE.md's token rule: the
+				// text must still SAY the value), so neither the lines nor the tokens may go back out.
+				if (moved) { delete c.src; delete c.tok; }
+			});
+			return moved;
+		}
 		function convOverrides(prop) {
 			scenarios.forEach(function (sc) {
 				var key;
@@ -20975,12 +21202,9 @@ var EngCalcs = EngCalcs || {};
 				conv(nd, 'maxLevel'); conv(nd, 'tankDiameter'); conv(nd, '_head');
 			});
 			convOverrides('level'); convOverrides('head');
-			// A curve point is [flow, head]; this unit owns the second.
-			doc.links.forEach(function (l) {
-				(l.curvePoints || []).forEach(function (pt) {
-					if (pt && typeof pt[1] === 'number') { pt[1] = pt[1] * k; n++; }
-				});
-			});
+			// A curve point is [flow, value]; this unit owns the second, for the two kinds whose
+			// second column IS a head (Task 586). An efficiency curve's is a percent.
+			n += convCurveAxis(1, ['head', 'headloss'], k);
 		} else if (name === 'lpn_u_pressure') {
 			doc.links.forEach(function (l) {
 				if (l.type !== 'valve') { return; }
@@ -21002,10 +21226,8 @@ var EngCalcs = EngCalcs || {};
 			convOverrides('demand');
 			doc.links.forEach(function (l) {
 				if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'FCV') { conv(l, '_setting'); }
-				(l.curvePoints || []).forEach(function (pt) {
-					if (pt && typeof pt[0] === 'number') { pt[0] = pt[0] * k; n++; }
-				});
 			});
+			n += convCurveAxis(0, ['head', 'effic', 'headloss'], k);
 			scenarios.forEach(function (sc) {
 				doc.links.forEach(function (l) {
 					if (l.type !== 'valve' || String(l.valveType || '').toUpperCase() !== 'FCV') { return; }
@@ -24098,12 +24320,88 @@ var EngCalcs = EngCalcs || {};
 	// Same split, same reason -- see savedProfiles() above.
 	function libControls() { return (doc.controls = doc.controls || []); }
 	function libControlsRead() { return doc.controls || []; }
-	// Every curve on the page, WHEREVER IT LIVES. A pump's `curvePoints` and a GPV's are the same
-	// shape and are read by the same code (curvePointTable), so they are one list here.
-	function libCurves() {
-		return doc.links.filter(function (l) {
-			return (l.type === 'pump' || (l.type === 'valve' && (l.valveType || '').toUpperCase() === 'GPV'))
-				&& !l.curveRef;
+	// Every curve this document holds (Task 586). The same split as the patterns above and for the
+	// same reason: a RENDER must not write `curves: []` into a document that stated none.
+	function libCurves() { return docCurves(); }
+	function libCurvesRead() { return docCurvesRead(); }
+	// **WHICH ELEMENTS NAME THIS CURVE, IN EVERY SCENARIO.** The Library is a view of the DOCUMENT,
+	// not of the active scenario, so "is anything using this" has to be asked of Base and of every
+	// override -- a curve named only by a scenario is still in use, and deleting it would break that
+	// scenario silently from a box that was showing none of it.
+	function curveUsers(id) {
+		var out = [];
+		if (!id) { return out; }
+		(doc.links || []).forEach(function (l) {
+			var used = l._curveId === id || l._efficCurveId === id;
+			if (!used) {
+				used = scenarios.some(function (sc) {
+					var ov = sc.overrides[ovKey(l)];
+					return !!ov && (ov.curveId === id || ov.efficCurveId === id);
+				});
+			}
+			if (used) { out.push(l.id); }
+		});
+		return out;
+	}
+	// **A CURVE'S KIND DECIDES WHAT ITS SECOND COLUMN IS**, and therefore its heading and its unit.
+	// One table, so the Library, the popup and the exporter cannot disagree about what a curve of a
+	// given kind means. A `volume` or `other` curve is a quantity this page never computes with, so
+	// it names no unit at all rather than an invented one.
+	function curveAxisLabels(kind) {
+		var pc = EngCalcs.pageConfig || {};
+		if (kind === 'effic') {
+			return { x: (pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
+				y: (pc.lpn_pump_effic_col || 'Efficiency') + ' (%)' };
+		}
+		if (kind === 'head' || kind === 'headloss') {
+			return { x: (pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
+				y: (kind === 'head' ? (pc.lpn_result_head || 'Head') : (pc.lpn_result_headloss || 'Head loss'))
+					+ ' (' + unitLabel('lpn_u_elevhead') + ')' };
+		}
+		if (kind === 'volume') {
+			// A volume curve's axes are a LEVEL and a VOLUME. The level is in the elevation unit like
+			// every other vertical distance on a tank; the volume has no family on this page and is
+			// carried as the file's own number, so it names no unit rather than an invented one.
+			return { x: (pc.lpn_field_tank_level || 'Water level') + ' (' + unitLabel('lpn_u_elevhead') + ')',
+				y: pc.lpn_curve_volume_col || 'Volume' };
+		}
+		return { x: pc.lpn_library_curve_x || 'X', y: pc.lpn_library_curve_y || 'Y' };
+	}
+	/**
+	 * **RENAMING A CURVE, AND EVERY REFERENCE FOLLOWS IT.** A curve id is a namespace of its own
+	 * from Task 586, and a rename that left a pump pointing at the old name would empty its curve in
+	 * silence -- the exact failure `curveRef` used to have when a PUMP was renamed.
+	 *
+	 * Refuses a blank and refuses a clash, snapping the field back, which is the contract
+	 * libRenamePattern() and validateNewId() both give. A scenario's own override is rewritten too:
+	 * the reference is overridable, so the old name can be sitting in an override map as well as on
+	 * the element.
+	 */
+	function libRenameCurve(curve, want) {
+		var name = String(want || '').trim(), was = curve.id;
+		if (!name || name === was) { return false; }
+		if (libCurvesRead().some(function (c) { return c !== curve && c.id === name; })) { return false; }
+		curve.id = name;
+		libRepointCurve(was, name);
+		return true;
+	}
+	// One name swapped for another (or for null, on a delete) everywhere a reference can sit.
+	function libRepointCurve(was, now) {
+		(doc.links || []).forEach(function (l) {
+			if (l._curveId === was) {
+				if (now) { l._curveId = now; } else { delete l._curveId; }   // base-write: a rename is not an edit to this scenario's value -- the reference has not changed, only the name of the thing it names, so it must move in Base and in every override alike
+			}
+			if (l._efficCurveId === was) {
+				if (now) { l._efficCurveId = now; } else { delete l._efficCurveId; }   // base-write: see above
+			}
+			scenarios.forEach(function (sc) {
+				var ov = sc.overrides[ovKey(l)];
+				if (!ov) { return; }
+				['curveId', 'efficCurveId'].forEach(function (k) {
+					if (ov[k] !== was) { return; }
+					if (now) { ov[k] = now; } else { delete ov[k]; }
+				});
+			});
 		});
 	}
 	// An id nothing in the list is using yet. Same shape as the element ID minting, deliberately
@@ -24896,68 +25194,205 @@ var EngCalcs = EngCalcs || {};
 		});
 		return el;
 	}
-	// **CURVES IS A VIEWER, AND THE HONEST REASON IS THAT THERE IS NOTHING FOR IT TO OWN YET.**
-	// This document has no curve table: a pump's points live on the pump (`curvePoints`) and
-	// `curveRef` names ANOTHER PUMP whose points it copies, so there is no shared definition for a
-	// library to hold. Editing points here would be a SECOND editor of the same field as the pump
-	// popup's -- two places that write one value, which is the defect this page's one-write-seam
-	// rule exists to prevent.
-	//
-	// What it adds instead is real and is the thing the popup cannot do: every curve in the network
-	// side by side, so the one that is wrong is visible without opening eleven pumps. Clicking an ID
-	// goes to that element on the map, exactly as a bottom-pane table's ID does.
-	// Turning this into an editor means giving the document a curve table first -- see the note on
-	// Pumps/Pipes/Custom in ROADMAP Task 462.
+	/**
+	 * **CURVES IS AN EDITOR** (Task 586), on the shape the Patterns section above already worked
+	 * out: add, rename, edit, delete, and one place the whole list can be read side by side.
+	 *
+	 * **POINTS ARE ONE TEXT FIELD, NOT A GROWING TABLE OF BOXES,** which is the Patterns section's
+	 * own argument applied to a longer list: a manufacturer's curve arrives as two columns in a
+	 * spreadsheet or as `[CURVES]` lines in somebody's e-mail, and both paste straight into a text
+	 * field. Twenty boxes would be forty tab stops that survive no paste at all. The parser reads
+	 * every number in order and pairs them, so `0 100  500 90`, `0,100; 500,90` and a two-column
+	 * paste all mean the same curve.
+	 *
+	 * **DELETING A CURVE ELEMENTS USE IS REFUSED, BY NAME AND WITH THE COUNT.** The rejected
+	 * alternative is to delete it and clear the references, which is what a pattern does -- and it
+	 * is wrong here because the two are not the same loss. A junction with no pattern is a junction
+	 * with a steady demand, which is a network that still means something; a pump with no curve is a
+	 * lossless connection, so the same gesture would quietly turn a pumped system into an open one
+	 * and change every answer on the map. The element's own popup is one click from removing the
+	 * reference, and the button says which elements to go to.
+	 *
+	 * **AND IT IS NOT A BACK DOOR INTO A SCENARIO.** A curve's points belong to the document and are
+	 * written here in Base whatever scenario is active, deliberately: every element naming the curve
+	 * sees the edit, in every scenario, because that is what one shared definition means. What a
+	 * SCENARIO can change is which curve an element names, and that is on the element's popup.
+	 */
 	function buildCurveSection(host) {
-		var pc = EngCalcs.pageConfig || {}, list = libCurves();
+		var pc = EngCalcs.pageConfig || {}, list = libCurvesRead();
 		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curves_note || ''));
+		host.appendChild(libButton(pc.lpn_library_curve_add || 'Add a curve', function () {
+			saveUndoSnapshot();
+			// A NEW CURVE IS A PUMP HEAD CURVE WITH NO POINTS. `head` because that is what a person
+			// opening this box is nearly always here for, and it is the one kind whose column
+			// headings the popup's chooser can then match; empty because a curve with invented
+			// points would be a pump delivering head nobody typed, which is the same argument a
+			// freshly drawn pump's own emptiness rests on.
+			libCurves().push({ id: libFreeId(libCurves(), 'C'), kind: 'head', points: [] });
+			libCommit();
+			rebuildLibraryBox();
+		}));
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
 		}
-		list.forEach(function (l) {
-			var entry = libEl('div', 'lpn-lib-entry'),
-				headRow = libEl('div', 'lpn-lib-head'),
-				goTo = libButton(l.id, function () { findGoTo('link', l.id); }),
-				table = document.createElement('table'),
-				pts = (l.curvePoints || []).filter(function (p) { return p && p[0] !== undefined && p[1] !== undefined; }),
-				// A pump's second column is HEAD and a general purpose valve's is HEAD LOSS. Same
-				// table, different quantity, and saying so is the whole of what the heading is for.
-				valueLabel = l.type === 'pump' ? (pc.lpn_result_head || 'Head') : (pc.lpn_result_headloss || 'Head loss'),
-				thead = document.createElement('thead'), hrow = document.createElement('tr'),
-				tbody = document.createElement('tbody');
-			goTo.className = 'lpn-pane-goto';
-			headRow.appendChild(goTo);
-			entry.appendChild(headRow);
-			// Above the table, where the pattern section puts its sparkline: the shape first and the
-			// numbers under it, so the two sections are read the same way.
-			entry.appendChild(libCurveChart(pts, l.type === 'pump'));
-			table.className = 'lpn-pane-table';
-			[(pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
-				valueLabel + ' (' + unitLabel('lpn_u_elevhead') + ')'].forEach(function (t, i) {
-				var th = document.createElement('th');
-				// It is a .lpn-pane-table, so it takes the pane tables' rule as they take it: the
-				// first column left, the second centred, heading and cell alike.
-				th.className = 'lpn-pane-num' + (i === 0 ? ' lpn-pane-first' : '');
-				th.textContent = t;
-				hrow.appendChild(th);
-			});
-			thead.appendChild(hrow);
-			table.appendChild(thead);
-			pts.forEach(function (p) {
-				var tr = document.createElement('tr');
-				[p[0], p[1]].forEach(function (v, i) {
-					var td = document.createElement('td');
-					td.className = 'lpn-pane-num' + (i === 0 ? ' lpn-pane-first' : '');
-					td.textContent = String(+(+v).toFixed(6));
-					tr.appendChild(td);
-				});
-				tbody.appendChild(tr);
-			});
-			table.appendChild(tbody);
-			entry.appendChild(pts.length ? table : libEl('p', 'lpn-lib-note', pc.lpn_pane_none || ''));
-			host.appendChild(entry);
+		list.forEach(function (c) { buildCurveEntry(host, c); });
+	}
+	// EPANET's four, in EPANET's own order, as `[value, langKey, fallback]`. One table, read by the
+	// Library's kind select and by nothing else that could disagree with it.
+	var CURVE_KINDS = [
+		['head', 'lpn_curve_kind_head', 'Pump head'],
+		['effic', 'lpn_curve_kind_effic', 'Pump efficiency'],
+		['volume', 'lpn_curve_kind_volume', 'Tank volume'],
+		['headloss', 'lpn_curve_kind_headloss', 'Valve head loss']
+	];
+	function buildCurveEntry(host, c) {
+		var pc = EngCalcs.pageConfig || {},
+			entry = libEl('div', 'lpn-lib-entry'),
+			headRow = libEl('div', 'lpn-lib-head'),
+			id = document.createElement('input'),
+			kindSel = document.createElement('select'),
+			values = document.createElement('input'),
+			pts = curvePointsOf(c),
+			users = curveUsers(c.id),
+			labels = curveAxisLabels(c.kind),
+			note = libEl('div', 'lpn-lib-note', ''),
+			del;
+		id.type = 'text';
+		id.className = 'lpn-lib-id';
+		id.value = c.id;
+		id.setAttribute('aria-label', pc.lpn_field_id || 'ID');
+		id.addEventListener('change', function () {
+			saveUndoSnapshot();
+			if (!libRenameCurve(c, id.value)) { id.value = c.id; return; }
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
 		});
+		headRow.appendChild(id);
+		// **WHAT KIND OF CURVE THIS IS, AS A CONTROL, AND EPANET'S FOUR ARE THE WHOLE LIST** (Tom,
+		// 2026-09-05: *"there will be four kinds of curve, Pump (head), (Pump) Efficiency, (Tank)
+		// Volume, and Headloss. Right?"*). It decides the column headings, the units and the shape
+		// the chart draws, and a curve created here has to be able to become an efficiency curve
+		// without being deleted and re-imported.
+		//
+		// **`generic` IS NOT A FIFTH KIND AND IS NEVER OFFERED.** It is EPANET's own G_CURVE -- the
+		// state of a curve whose file states no `;TYPE:` comment and which nothing references -- and
+		// it appears here ONLY as the entry already selected on such a curve, so it can be seen and
+		// changed. Same treatment the water-quality trace node's missing source gets.
+		CURVE_KINDS.forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = pc[o[1]] || o[2];
+			if (o[0] === c.kind) { opt.selected = true; }
+			kindSel.appendChild(opt);
+		});
+		if (!CURVE_KINDS.some(function (o) { return o[0] === c.kind; })) {
+			var gen = document.createElement('option');
+			gen.value = c.kind || 'generic';
+			gen.textContent = pc.lpn_curve_kind_generic || 'Not stated';
+			gen.selected = true;
+			kindSel.appendChild(gen);
+		}
+		kindSel.setAttribute('aria-label', pc.lpn_library_curve_kind || 'What this curve describes');
+		kindSel.addEventListener('change', function () {
+			saveUndoSnapshot();
+			c.kind = kindSel.value;
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
+		});
+		headRow.appendChild(kindSel);
+		del = libButton(pc.lpn_tool_delete || 'Delete', function () {
+			var inUse = curveUsers(c.id);
+			if (inUse.length) {
+				alert((pc.lpn_library_curve_in_use
+					|| 'This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.')
+					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
+				return;
+			}
+			saveUndoSnapshot();
+			doc.curves = libCurves().filter(function (x) { return x !== c; });
+			libCommit();
+			rebuildLibraryBox();
+		});
+		del.className = 'lpn-lib-del';
+		headRow.appendChild(del);
+		entry.appendChild(headRow);
+		// Above the field, where the pattern section puts its sparkline: the shape first and the
+		// numbers under it, so the two sections are read the same way. A pump HEAD curve is drawn as
+		// the fitted curve the solver applies; every other kind is drawn as the straight segments
+		// EPANET interpolates.
+		entry.appendChild(libCurveChart(pts, c.kind === 'head'));
+		values.type = 'text';
+		values.className = 'lpn-lib-wide lpn-lib-values';
+		values.value = libFormatPoints(pts);
+		values.setAttribute('aria-label', labels.x + ' / ' + labels.y);
+		if (pc.lpn_library_curve_values_tip) { helpTip(values, pc.lpn_library_curve_values_tip); }
+		// `input` redraws the chart, `change` writes the document -- the pattern field's own split,
+		// so a half-typed list never reaches a solve.
+		values.addEventListener('input', function () {
+			var fresh = libCurveChart(libParsePoints(values.value), c.kind === 'head');
+			entry.replaceChild(fresh, entry.querySelector('.lpn-lib-spark'));
+		});
+		values.addEventListener('change', function () {
+			saveUndoSnapshot();
+			c.points = libParsePoints(values.value);
+			// **THE FILE'S OWN LINES AND TOKENS GO WITH THE EDIT.** They state the numbers that were
+			// there; handing them back now would write text that no longer says what the document
+			// holds, which is the one test CLAUDE.md's token rule sets.
+			delete c.src; delete c.tok;
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
+		});
+		entry.appendChild(values);
+		note.textContent = labels.x + '  /  ' + labels.y;
+		entry.appendChild(note);
+		// **WHO USES IT, AS THE WAY TO GET TO THEM.** Clicking an id goes to that element on the map,
+		// exactly as a bottom-pane table's id does -- and it is also the answer to "why will this not
+		// delete", standing where the Delete button is.
+		if (users.length) {
+			var used = libEl('div', 'lpn-lib-note', (pc.lpn_library_curve_used_by || 'Used by') + ' ');
+			users.forEach(function (lid) {
+				var b = libButton(lid, function () { findGoTo('link', lid); });
+				b.className = 'lpn-pane-goto';
+				used.appendChild(b);
+			});
+			entry.appendChild(used);
+		} else {
+			entry.appendChild(libEl('div', 'lpn-lib-note',
+				pc.lpn_library_curve_unused || 'Nothing uses this curve.'));
+		}
+		host.appendChild(entry);
+	}
+	/**
+	 * A curve's points as one line of text, and back.
+	 *
+	 * **EVERY NUMBER IN ORDER, PAIRED.** Deliberately loose, for the reason the pattern parser is:
+	 * the numbers arrive pasted from a spreadsheet (tab and newline separated), from an `.inp`
+	 * (`C1  0  100` per line, with the curve's own name in front of each pair), or typed with
+	 * commas. A parser that read a format would reject two of those three. A LEADING NAME is the one
+	 * shape that would break it, so a token that is not a number is skipped rather than counted --
+	 * which is exactly what makes a pasted `[CURVES]` block work.
+	 *
+	 * A trailing lone number is dropped: half a point is not a point, which is the rule the popup's
+	 * own tables already state.
+	 */
+	function libParsePoints(text) {
+		var nums = [], out = [], i;
+		String(text || '').split(/[\s,;]+/).forEach(function (t) {
+			if (t === '') { return; }
+			var v = Number(t);
+			if (isFinite(v) && /[0-9]/.test(t)) { nums.push(v); }
+		});
+		for (i = 0; i + 1 < nums.length; i += 2) { out.push([nums[i], nums[i + 1]]); }
+		return out;
+	}
+	// `String()` and never `toFixed()`: the points are the file's own numbers in the file's own
+	// unit, so `951.0194` must print as `951.0194`. Pairs separated by a semicolon and a space, so
+	// the field can be read back as pairs and still pastes into anything.
+	function libFormatPoints(pts) {
+		return (pts || []).map(function (p) { return String(p[0]) + ', ' + String(p[1]); }).join(';  ');
 	}
 	function buildControlSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libControlsRead();
@@ -26469,9 +26904,10 @@ var EngCalcs = EngCalcs || {};
 		l.id = newId;
 		invalidateIdMaps();   // as applyNodeRename() -- see byId()
 		renameOverrides('link', oldId, newId);
-		// Any OTHER pump referencing this one by curveRef must follow the rename, or its curve
-		// silently reverts to nothing (resolveCurvePoints() only matches an exact id).
-		doc.links.forEach(function (other) { if (other.curveRef === oldId) { other.curveRef = newId; } });
+		// **NOTHING FOLLOWS A LINK RENAME ANY MORE** (Task 586). It used to: `curveRef` named ANOTHER
+		// PUMP to copy points from, so renaming that pump silently emptied the borrower's curve. A
+		// curve is a document object now and both pumps name IT, so a link's name is nobody else's
+		// business. The rename that has references to follow is a CURVE's -- see renameCurve().
 		linkEls[newId] = linkEls[oldId]; delete linkEls[oldId];
 		labelsByLinkAnchor[newId] = labelsByLinkAnchor[oldId] || []; delete labelsByLinkAnchor[oldId];
 		doc.labels.forEach(function (lb) { if (lb.anchorLink === oldId) { lb.anchorLink = newId; } });
@@ -27069,49 +27505,92 @@ var EngCalcs = EngCalcs || {};
 		var at = popupAnchorFor(ne, n ? nodeLabelPos(n) : null, nodeRadius(n) * 2, sx, sy);
 		openPopupAt(at.x, at.y);
 	}
-	// Pump curve entry (Task 146, 2026-07-30): up to 3 [Q,H] points, or a reference to another
-	// pump's curve. Point 1 is required (a pump needs at least a design point); 2 and 3 are
-	// optional and refine the fit toward EPANET's 2- and 3-point forms -- see
-	// EngCalcs.lpnPumpFromCurve()'s own comment for exactly what each point count produces.
+	/**
+	 * **A PUMP NAMES A CURVE; THE CURVE IS THE DOCUMENT'S** (Task 586, Tom: *"leave only curve
+	 * references in the pump properties"*). One chooser, listing every head curve the Library holds,
+	 * plus "no curve" and plus one entry that MAKES one -- so a pump drawn on an empty document
+	 * still gets its curve in one gesture and never meets an empty list it cannot leave.
+	 *
+	 * **THE REFERENCE IS OVERRIDABLE AND THE CHOOSER IS ITS ONE WRITE SITE** (Tom, 2026-09-05:
+	 * *"Scenario pump reference: Yes."*). It therefore goes through `setProp()` and carries the same
+	 * override marker every other overridable row does: inside a scenario a direct `l._curveId = v`
+	 * would edit Base under every other scenario at once, which is the incident
+	 * `dev/scripts/scenario_seam_check.php` exists for. "What if this pump had a bigger impeller" is
+	 * answered by pointing it at a different curve.
+	 *
+	 * **THE POINTS BELOW ARE THE CURVE'S, NOT THE PUMP'S, AND THE TABLE SAYS SO.** Editing them here
+	 * moves every element naming that curve, in every scenario -- one definition, one editor's
+	 * worth of behaviour, whichever box it is typed in. A curve of more than three points is shown
+	 * READ-ONLY, because this table offers exactly three rows (the fit reads at most three) and
+	 * truncating a manufacturer's curve to fit a widget is precisely what Task 586 removed.
+	 */
 	function renderPumpCurveFields(fields, l, linkId) {
 		var pc = EngCalcs.pageConfig || {};
-		var refLabel = document.createElement('label'), refSelect = document.createElement('select');
-		refLabel.textContent = (pc.lpn_pump_curve_source || 'Curve') + ' ';
-		var ownOpt = document.createElement('option');
-		ownOpt.value = ''; ownOpt.textContent = pc.lpn_pump_curve_own || 'Enter points below';
-		refSelect.appendChild(ownOpt);
-		doc.links.forEach(function (other) {
-			if (other.type !== 'pump' || other.id === l.id) { return; }
-			var o = document.createElement('option');
-			o.value = other.id; o.textContent = other.id;
-			if (l.curveRef === other.id) { o.selected = true; }
-			refSelect.appendChild(o);
-		});
-		refSelect.addEventListener('change', function () {
-			saveUndoSnapshot();
-			l.curveRef = refSelect.value || null;
-			scheduleSolve();
-			renderLinkFields(linkId); // rebuild: show/hide point rows, refresh the read-only result
-		});
-		refLabel.appendChild(refSelect);
-		fields.appendChild(refLabel);
-		fields.appendChild(document.createElement('br'));
-
-		if (l.curveRef) {
-			var note = document.createElement('div');
-			// {id} placeholder, not concatenation (Task 193): a language that puts the pump ID
-			// before the verb, or wraps it in its own punctuation, cannot express that as a
-			// prefix + ID + '.' sandwich. Same convention as mpf_solver_no_solution's {qmax}.
-			note.textContent = (pc.lpn_pump_curve_ref_note || 'Using the curve entered for pump {id}.')
-				.replace('{id}', l.curveRef);
-			fields.appendChild(note);
-			return;
-		}
-
-		curvePointTable(fields, l, (pc.lpn_result_head || 'Head'), 'lpn_u_elevhead',
+		curveChooser(fields, l, 'curveId', 'head', pc.lpn_pump_curve_source || 'Curve',
+			pc.lpn_pump_curve_source_tip);
+		curvePointTable(fields, l, 'curveId', 'head', (pc.lpn_result_head || 'Head'), 'lpn_u_elevhead',
 			pc.lpn_pump_curve_note
 				|| 'One, two, or three points. See "Pump curve" under Help, Notes on this page.');
 	}
+	/**
+	 * The chooser itself, shared by the pump's head curve, the pump's efficiency curve and the GPV's
+	 * head-loss curve. Two copies of this would be two chances to disagree about what "no curve"
+	 * means, and about whether a name the document does not state is shown or silently dropped.
+	 *
+	 * **A CURVE THE DOCUMENT DOES NOT HOLD IS STILL SHOWN, SELECTED.** An `.inp` that says
+	 * `HEAD C7` and states no C7 is a defect in the file the reader can act on; retargeting the pump
+	 * at some other curve on their behalf is not acting on it. Same treatment the water-quality
+	 * trace node's missing source gets.
+	 */
+	function curveChooser(fields, l, prop, kind, labelText, tip) {
+		var pc = EngCalcs.pageConfig || {},
+			label = document.createElement('label'),
+			sel = document.createElement('select'),
+			cur = effective(l, prop) || '',
+			NEW = '\u0001new',
+			none = document.createElement('option');
+		none.value = '';
+		none.textContent = pc.lpn_curve_none || 'No curve';
+		sel.appendChild(none);
+		libCurvesRead().forEach(function (c) {
+			if (c.kind !== kind) { return; }
+			var o = document.createElement('option');
+			o.value = c.id; o.textContent = c.id;
+			if (c.id === cur) { o.selected = true; }
+			sel.appendChild(o);
+		});
+		if (cur && !curveById(cur)) {
+			var missing = document.createElement('option');
+			missing.value = cur;
+			missing.textContent = cur;
+			missing.selected = true;
+			sel.appendChild(missing);
+		}
+		// **THE ONE ENTRY THAT IS AN ACTION AND NOT A VALUE.** Its value cannot collide with a curve
+		// name because a curve name comes from a file or from a text field, and neither can contain
+		// U+0001 -- the same argument the engine signature's separator rests on.
+		var mk = document.createElement('option');
+		mk.value = NEW;
+		mk.textContent = pc.lpn_curve_new || 'New curve...';
+		sel.appendChild(mk);
+		sel.addEventListener('change', function () {
+			saveUndoSnapshot();
+			var v = sel.value;
+			// One place mints, so the chooser and the point tables cannot disagree about what a new
+			// curve is called. ALWAYS a fresh one here, even on an element that already names a
+			// curve -- "New curve..." is an action and the reader has asked for another.
+			if (v === NEW) { v = mintCurveFor(l, prop, kind).id; }
+			setProp(l, prop, v || null);
+			afterPropertyEdit(l);
+			refreshPopupIfOpen();
+		});
+		setFieldLabel(label, labelText, tip);
+		label.appendChild(sel);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, l, prop);
+	}
+
 	/**
 	 * **THE ELEMENT'S TAG** (Task 579, `[TAGS]`). One free-text word on any node or link, the join
 	 * key to whatever system the utility already keeps its assets in.
@@ -27161,33 +27640,28 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 	}
 	/**
-	 * **WHAT EFFICIENCY THIS PUMP IS ACTUALLY RUNNING AT, ON THE PUMP, AND EDITABLE HERE** (Tom,
-	 * 2026-09-05, having imported a file whose [ENERGY] states `PUMP P1 EFFIC E1`: *"The pump has
-	 * no efficiency of its own, and I don't see an interface for that."*). He was right twice over:
-	 * the number reached the engine and reached the energy report, and reached no pump.
+	 * **WHAT EFFICIENCY THIS PUMP IS ACTUALLY RUNNING AT** (Tom, 2026-09-05, having imported a file
+	 * whose [ENERGY] states `PUMP P1 EFFIC E1`: *"The pump has no efficiency of its own, and I don't
+	 * see an interface for that."* He was right twice over: the number reached the engine and
+	 * reached the energy report, and reached no pump.)
 	 *
-	 * **THE CURVE LIVES ON THE PUMP** (Task 585), as `efficPoints` in the project's own flow unit
-	 * and `efficCurveId` for what the file calls it. That is the head curve's own shape, and it is
-	 * chosen over a document-level curve library for the reason this page has never had one: a
-	 * library needs a name space, an editor, a rename rule and an answer to what happens to a curve
-	 * nothing references, and every one of those is a second paradigm beside `curvePoints`.
+	 * **THE CURVE IS THE DOCUMENT'S AND THE PUMP NAMES IT** (Task 586). This used to keep the points
+	 * on the pump as `efficPoints`, and the comment here used to argue for that over a document-level
+	 * curve library on the cost of a namespace, an editor, a rename rule and orphan curves. Tom
+	 * overruled it the same day: those costs are the work, not an argument against it, and the pump
+	 * head curve beside it was living in the same accident of chronology. One library, one editor,
+	 * and a curve two pumps share written once.
 	 *
-	 * **A CURVE NOBODY TOUCHED STILL GOES OUT AS THE FILE'S OWN CHARACTERS.** The carried
-	 * `[CURVES]` lines are still the exporter's source of truth while they parse to what the pumps
-	 * now state (`EngCalcs.lpnEfficCurveText`), which is the same rule `[SOURCES]`, `[MIXING]` and
-	 * `[TAGS]` are on and the reason editing could be added without the round trip moving.
+	 * **THE REFERENCE IS OVERRIDABLE** and is written through `setProp()` like the head curve's.
+	 * That follows Tom's ruling on the head reference rather than restating it: "what if we rebuilt
+	 * this pump to its rated efficiency" is the same kind of question as "what if it had a bigger
+	 * impeller", and one reference overridable while its twin is not is a distinction nobody could
+	 * re-derive.
 	 *
-	 * **BASE-OWNED, NOT `setProp()`, AND THAT IS A RULING.** Neither `efficPoints` nor
-	 * `efficCurveId` is in LPN_OVERRIDABLE and neither is joining it. A scenario asks what if this
-	 * pump ran at a different speed or paid a different tariff, not what if it were a different
-	 * machine: an efficiency curve is the pump's own characteristic, exactly as its head curve is,
-	 * and `curvePoints` is not overridable either. A `setProp()` here would write an `_efficPoints`
-	 * nothing reads.
-	 *
-	 * **THREE STATES, AND EVERY ONE OF THEM NOW GETS THE TABLE:**
+	 * **THREE STATES, AND EVERY ONE OF THEM STILL GETS THE TABLE:**
 	 *   - a curve that resolves: name it and show its points;
-	 *   - a curve NAMED but not STATED by the file: say so by name, because that is a defect in the
-	 *     file the reader can act on, and offer the points so they can act on it here;
+	 *   - a curve NAMED but not STATED: say so by name, because that is a defect in the file the
+	 *     reader can act on, and offer the points so they can act on it here;
 	 *   - no curve at all: say the network efficiency is what is used and state the number, because
 	 *     "nothing here" and "the global applies" look identical and are not.
 	 *
@@ -27197,11 +27671,8 @@ var EngCalcs = EngCalcs || {};
 	function renderPumpEfficiencyFields(fields, l) {
 		var pc = EngCalcs.pageConfig || {},
 			e = settings.energy || {},
-			pts = (l.efficPoints && l.efficPoints.length) ? l.efficPoints : null,
-			// The name the EXPORTER and the ENGINE will really use, from the one place that decides
-			// it, so the popup cannot print `E1` while the file says `E1_P2`. A pump switched out of
-			// the network is not in that answer at all, and falls back to its own stored name.
-			name = (docEnergy().effic || {})[l.id] || l.efficCurveId || ('E_' + l.id),
+			name = effective(l, 'efficCurveId') || '',
+			curve = name ? curveById(name) : null,
 			globalPct = (typeof e.globalEfficiency === 'number' && isFinite(e.globalEfficiency))
 				? e.globalEfficiency : null,
 			// The global's own default lives with the energy settings, not here; where the document
@@ -27209,14 +27680,13 @@ var EngCalcs = EngCalcs || {};
 			// number this page would then have to keep in step.
 			globalText = globalPct === null ? (pc.lpn_energy_efficiency || 'Pump efficiency (percent)')
 				: (globalPct + '%');
-		if (pts) {
-			readonlyField(fields, pc.lpn_pump_effic_curve || 'Efficiency curve', name || '',
-				pc.lpn_pump_effic_curve_tip);
-		} else if (l.efficCurveId) {
+		curveChooser(fields, l, 'efficCurveId', 'effic',
+			pc.lpn_pump_effic_curve || 'Efficiency curve', pc.lpn_pump_effic_curve_tip);
+		if (name && !curve) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_unstated
 				|| 'This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}. Type its points below.')
-				.replace('{name}', l.efficCurveId).replace('{percent}', globalText));
-		} else {
+				.replace('{name}', name).replace('{percent}', globalText));
+		} else if (!name) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_global
 				|| 'This pump has no efficiency curve, so it runs at the network efficiency of {percent}. Type points below to give it one.')
 				.replace('{percent}', globalText));
@@ -27230,29 +27700,29 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(d);
 	}
 	/**
-	 * The pump's efficiency curve, as an editable table of flow against percent.
+	 * The named efficiency curve, as an editable table of flow against percent.
 	 *
 	 * **GROWABLE, WHERE THE HEAD CURVE'S IS THREE FIXED ROWS, AND THE DIFFERENCE IS PHYSICAL.**
 	 * `curvePointTable()` offers exactly three because this page FITS h = h0 - a Q^b from at most
-	 * three points, so a fourth would be thrown away. EPANET reads an efficiency curve directly and
-	 * interpolates it, so a five-point curve is a five-point curve; truncating an imported one to
-	 * three would be rewriting numbers that are the user's. One blank row always sits at the end,
-	 * which is the demand table's own way of growing.
+	 * three points, so a fourth would not reach the native solver. EPANET reads an efficiency curve
+	 * directly and interpolates it, so a five-point curve is a five-point curve. One blank row
+	 * always sits at the end, which is the demand table's own way of growing.
 	 *
 	 * **THE FILE'S OWN TOKENS, UNCONVERTED.** The points are stored in the project's flow unit --
 	 * the file's own unit -- so `951.0194` is printed as `951.0194`. Reading them back out of
 	 * docEnergy()'s m3/s and converting for display is what printed `951.0194000000001` for a file
 	 * that says `951.0194`, which is this suite's oldest rule broken on a screen instead of in a
 	 * file. `String()` and not `toFixed()`, for the same reason.
+	 *
+	 * **A CURVE, NOT A PUMP.** Typing here edits the curve every element naming it shares -- see
+	 * curveNoteFor(), which says so on screen the moment a second element is on it.
 	 */
 	function efficPointTable(fields, l) {
 		var pc = EngCalcs.pageConfig || {},
+			curve = elementCurve(l, 'efficCurveId'),
 			table = document.createElement('table'), thead = document.createElement('thead'),
 			hrow = document.createElement('tr'), tbody = document.createElement('tbody'),
-			rows = (l.efficPoints || []).slice(), i;
-		// Two classes: the shared look, and a name of its own so this table can be told from the head
-		// curve's beside it -- by a reader, by a future stylesheet, and by the harness that asserts
-		// its cells are the file's own tokens.
+			rows = curve ? curvePointsOf(curve).slice() : [], i;
 		table.className = 'lpn-curve-table lpn-effic-table';
 		[(pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
 			(pc.lpn_pump_effic_col || 'Efficiency') + ' (%)', ''].forEach(function (t) {
@@ -27266,11 +27736,53 @@ var EngCalcs = EngCalcs || {};
 			efficPointRow(tbody, l, rows[i], i);
 		}
 		fields.appendChild(table);
+		curveNoteFor(fields, l, 'efficCurveId');
 		var note = document.createElement('div');
 		note.style.fontSize = '0.9em';
 		note.textContent = pc.lpn_pump_effic_note
 			|| 'Flow and the percent efficiency at that flow, in the order the pump works through them. With no points the pump runs at the network efficiency.';
 		fields.appendChild(note);
+	}
+	/**
+	 * **THE CURVE THIS BOX IS REALLY EDITING, SAID OUT LOUD WHEN IT IS SHARED.** A point table on an
+	 * element's popup reads as that element's own until the moment it is not, and the moment it is
+	 * not is exactly when an edit here changes another element's answer. Silent for a curve only
+	 * this element names, which is the ordinary case and needs no sentence.
+	 */
+	function curveNoteFor(fields, l, prop) {
+		var pc = EngCalcs.pageConfig || {}, name = effective(l, prop),
+			users = name ? curveUsers(name) : [], others;
+		if (!name || users.length < 2) { return; }
+		others = users.filter(function (id) { return id !== l.id; });
+		pumpEfficNote(fields, (pc.lpn_curve_shared_note
+			|| 'These points belong to the curve {name}, which {ids} also use. Changing them here changes them there too.')
+			.replace('{name}', name).replace('{ids}', others.join(', ')));
+	}
+	// **A NEW, EMPTY CURVE FOR THIS ELEMENT, AND THE ELEMENT POINTED AT IT.** Named after the
+	// ELEMENT, which is what an exported file would have called it anyway, and walked past anything
+	// already taken. The reference goes through setProp(), because it is overridable and this is a
+	// write site like any other.
+	function mintCurveFor(l, prop, kind) {
+		var stem = (kind === 'effic' ? 'E_' : kind === 'headloss' ? 'G_' : 'C_') + l.id,
+			name = curveById(stem) ? libFreeId(libCurves(), stem + '_') : stem,
+			c = { id: name, kind: kind, points: [] };
+		libCurves().push(c);
+		setProp(l, prop, name);
+		return c;
+	}
+	// **THE CURVE THIS ELEMENT NAMES, MINTED IF IT HAS TO BE.** Typing the first point into an empty
+	// table is how a person gives an element a curve without visiting the chooser.
+	//
+	// **A NAME THE DOCUMENT DOES NOT STATE KEEPS ITS NAME** -- that is the file that names a curve it
+	// never defined, and the popup discloses it. Typing a point there fills in the curve the file
+	// was missing, under the name the file used, which is what the reader is trying to do.
+	function curveForEdit(l, prop, kind) {
+		var name = effective(l, prop), c = name ? curveById(name) : null;
+		if (c) { return c; }
+		if (!name) { return mintCurveFor(l, prop, kind); }
+		c = { id: name, kind: kind, points: [] };
+		libCurves().push(c);
+		return c;
 	}
 	function efficPointRow(tbody, l, pt, idx) {
 		var pc = EngCalcs.pageConfig || {},
@@ -27285,16 +27797,18 @@ var EngCalcs = EngCalcs || {};
 		function commit() {
 			var qv = qInput.value === '' ? undefined : +qInput.value,
 				ev = eInput.value === '' ? undefined : +eInput.value,
-				list = (l.efficPoints || []).slice(), before = list.length;
+				c, list, before;
 			saveUndoSnapshot();
+			c = curveForEdit(l, 'efficCurveId', 'effic');
+			list = curvePointsOf(c).slice();
+			before = list.length;
 			// Both fields or neither: a lone flow or a lone percent is not a point any curve can use.
 			list[idx] = (qv !== undefined && ev !== undefined && isFinite(qv) && isFinite(ev))
 				? [qv, ev] : undefined;
 			list = list.filter(function (x) { return x; });
-			if (list.length) { l.efficPoints = list; } else { delete l.efficPoints; }   // base-write: a pump's curve is its own characteristic, not an overridable property -- see renderPumpEfficiencyFields()
-			// A pump that never had a curve gets the name the exporter would give it anyway, so the
-			// document says what it means the moment the first point is typed.
-			if (l.efficPoints && !l.efficCurveId) { l.efficCurveId = 'E_' + l.id; }   // base-write: the curve's own name, on the same limb as the element's id
+			c.points = list;
+			// The file's own text no longer states these numbers; see the Library editor's own note.
+			delete c.src; delete c.tok;
 			afterPropertyEdit(l);
 			// The blank row at the end has just become a real one, or a cleared row has gone: either
 			// way the row count moved and the table has to be rebuilt to offer the next blank.
@@ -27307,13 +27821,17 @@ var EngCalcs = EngCalcs || {};
 			del = document.createElement('button');
 			// The demand table's own remove control: a language-free glyph, its words in the tip,
 			// and the style already written for one. `lpn-demand-del` is where that style lives.
-			del.type = 'button'; del.className = 'lpn-demand-del'; del.textContent = '×';
+			del.type = 'button'; del.className = 'lpn-demand-del'; del.textContent = '\u00d7';
 			helpTip(del, pc.lpn_pump_effic_remove || 'Remove this point');
 			del.addEventListener('click', function () {
 				saveUndoSnapshot();
-				var list = (l.efficPoints || []).slice();
-				list.splice(idx, 1);
-				if (list.length) { l.efficPoints = list; } else { delete l.efficPoints; }   // base-write: see commit() above
+				var c = elementCurve(l, 'efficCurveId'), list;
+				if (c) {
+					list = curvePointsOf(c).slice();
+					list.splice(idx, 1);
+					c.points = list;
+					delete c.src; delete c.tok;
+				}
 				afterPropertyEdit(l);
 				refreshPopupIfOpen();
 			});
@@ -27382,25 +27900,38 @@ var EngCalcs = EngCalcs || {};
 			function (v) { setProp(l, 'energyPattern', v || null); refreshPopupIfOpen(); },
 			pc.lpn_energy_price_pattern_tip);
 	}
-	// THE THREE-POINT CURVE TABLE, shared by the pump and by the GPV (Task 248). Both hold a curve
-	// that belongs to the element -- a pump's is (flow, head), a general purpose valve's is (flow,
-	// head LOSS) -- so only the second column's heading and unit differ. Two copies of this markup
-	// would be two chances to disagree about what a curve point is.
-	//
-	// No factors since Task 263: a point is stored in the units its column heading names.
-	//
-	// A real <table> with real column HEADINGS: two unlabelled number boxes whose only clue lives in
-	// a title= tooltip are invisible on touch. Flow first, matching both the [Q, H] storage order and
-	// the way a manufacturer's curve is read (a head AT a flow).
-	function curvePointTable(fields, l, valueHeading, valueUnitId, note) {
-		var pc = EngCalcs.pageConfig || {};
-		if (!l.curvePoints || l.curvePoints.length === 0) { l.curvePoints = [[undefined, undefined]]; }
-		var pointLabels = [
-			pc.lpn_pump_point1 || 'Point 1 (required)',
-			pc.lpn_pump_point2 || 'Point 2 (optional)',
-			pc.lpn_pump_point3 || 'Point 3 (optional)'
-		];
-		var table = document.createElement('table'), thead = document.createElement('thead'),
+	/**
+	 * THE THREE-POINT CURVE TABLE, shared by the pump and by the GPV (Task 248). Both name a curve
+	 * whose second column differs -- a pump's is (flow, head), a general purpose valve's is (flow,
+	 * head LOSS) -- so only the heading and the unit change. Two copies of this markup would be two
+	 * chances to disagree about what a curve point is.
+	 *
+	 * No factors since Task 263: a point is stored in the units its column heading names.
+	 *
+	 * A real <table> with real column HEADINGS: two unlabelled number boxes whose only clue lives in
+	 * a title= tooltip are invisible on touch. Flow first, matching both the [Q, H] storage order and
+	 * the way a manufacturer's curve is read (a head AT a flow).
+	 *
+	 * **THE POINTS ARE THE CURVE'S** (Task 586). This box writes `doc.curves`, so an edit moves
+	 * every element naming that curve; curveNoteFor() says so on screen the moment a second one is.
+	 *
+	 * **A CURVE OF MORE THAN THREE POINTS IS SHOWN READ-ONLY, AND THE LIBRARY IS WHERE IT IS
+	 * EDITED.** Three rows is what the FIT can read, and a widget that only has three rows must not
+	 * be the thing that decides how many points a manufacturer's curve is allowed to have -- that
+	 * truncation is the defect this task removed. Saying which box to use beats silently dropping
+	 * points or growing a table the fit cannot consume.
+	 */
+	function curvePointTable(fields, l, prop, kind, valueHeading, valueUnitId, note) {
+		var pc = EngCalcs.pageConfig || {},
+			curve = elementCurve(l, prop),
+			pts = curve ? curvePointsOf(curve) : [],
+			readOnly = pts.length > 3,
+			pointLabels = [
+				pc.lpn_pump_point1 || 'Point 1 (required)',
+				pc.lpn_pump_point2 || 'Point 2 (optional)',
+				pc.lpn_pump_point3 || 'Point 3 (optional)'
+			],
+			table = document.createElement('table'), thead = document.createElement('thead'),
 			hrow = document.createElement('tr'), tbody = document.createElement('tbody');
 		table.className = 'lpn-curve-table';
 		[ '', (pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
@@ -27411,19 +27942,38 @@ var EngCalcs = EngCalcs || {};
 		});
 		thead.appendChild(hrow); table.appendChild(thead); table.appendChild(tbody);
 		fields.appendChild(table);
+		curveNoteFor(fields, l, prop);
 		// One line pointing at the Notes rather than the equation and its fitting cases inline: this
 		// popup floats over the map and has to stay readable on a phone (Tom, 2026-07-30, weighing
 		// the two placements). See lpn_notes_5_def.
-		if (note) {
+		if (note && !readOnly) {
 			var curveNote = document.createElement('div');
 			curveNote.style.fontSize = '0.9em';
 			curveNote.textContent = note;
 			fields.appendChild(curveNote);
 		}
+		if (readOnly) {
+			var longNote = document.createElement('div');
+			longNote.style.fontSize = '0.9em';
+			longNote.textContent = (pc.lpn_curve_long_note
+				|| 'The curve {name} has {count} points, so it is shown here and edited under Libraries, Curves.')
+				.replace('{name}', curve.id).replace('{count}', String(pts.length));
+			fields.appendChild(longNote);
+			pts.forEach(function (pt) {
+				var row = document.createElement('tr'), labCell = document.createElement('th'),
+					qCell = document.createElement('td'), hCell = document.createElement('td');
+				labCell.textContent = '';
+				qCell.textContent = String(pt[0]);
+				hCell.textContent = String(pt[1]);
+				row.appendChild(labCell); row.appendChild(qCell); row.appendChild(hCell);
+				tbody.appendChild(row);
+			});
+			return;
+		}
 		var pi;
 		for (pi = 0; pi < 3; pi++) {
 			(function (pi) {
-				var pt = l.curvePoints[pi] || [undefined, undefined];
+				var pt = pts[pi] || [undefined, undefined];
 				var row = document.createElement('tr'), labCell = document.createElement('th'),
 					qCell = document.createElement('td'), hCell = document.createElement('td'),
 					lab = document.createElement('span'),
@@ -27435,12 +27985,19 @@ var EngCalcs = EngCalcs || {};
 				hInput.value = pt[1] !== undefined ? String(+pt[1].toFixed(6)) : '';
 				function commit() {
 					var qv = qInput.value === '' ? undefined : +qInput.value,
-						hv = hInput.value === '' ? undefined : +hInput.value;
+						hv = hInput.value === '' ? undefined : +hInput.value,
+						c, list;
 					saveUndoSnapshot();
+					c = curveForEdit(l, prop, kind);
+					list = curvePointsOf(c).slice();
 					// Both fields or neither -- a lone Q or lone H is not a point any curve can use.
-					l.curvePoints[pi] = (qv !== undefined && hv !== undefined) ? [qv, hv] : undefined;
-					l.curvePoints = l.curvePoints.filter(function (x) { return x; });
-					scheduleSolve();
+					list[pi] = (qv !== undefined && hv !== undefined) ? [qv, hv] : undefined;
+					c.points = list.filter(function (x) { return x; });
+					delete c.src; delete c.tok;
+					// afterPropertyEdit, not scheduleSolve alone: curveForEdit() may have just
+					// written the reference through setProp(), and that has to be saved and marked
+					// exactly as any other property edit is.
+					afterPropertyEdit(l);
 				}
 				qInput.addEventListener('change', commit);
 				hInput.addEventListener('change', commit);
@@ -27455,7 +28012,10 @@ var EngCalcs = EngCalcs || {};
 	// points directly.
 	function renderGpvCurve(fields, l, linkId) {
 		var pc = EngCalcs.pageConfig || {};
-		curvePointTable(fields, l, (pc.lpn_result_headloss || 'Head loss'), 'lpn_u_elevhead',
+		curveChooser(fields, l, 'curveId', 'headloss', pc.lpn_gpv_curve_source || 'Head loss curve',
+			pc.lpn_gpv_curve_source_tip);
+		curvePointTable(fields, l, 'curveId', 'headloss', (pc.lpn_result_headloss || 'Head loss'),
+			'lpn_u_elevhead',
 			pc.lpn_gpv_curve_note || 'Up to three points of flow and the head loss at that flow. With no points the valve is simply open.');
 	}
 	function renderLinkFields(linkId) {
@@ -28585,6 +29145,16 @@ var EngCalcs = EngCalcs || {};
 				out.h0Base = fit.h0; out.aBase = fit.a;
 				out.speed = (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1;
 				out.speedPattern = l.speedPattern || null;
+				// **AND THE CURVE'S REAL POINTS RIDE ALONG, IN SI** (Task 586). The native solver has
+				// only the three-coefficient form and takes the fit; EPANET reads a curve of any
+				// length and interpolates it, so handing it three samples off our own fit was
+				// answering about a curve the user never entered. js/lpn-epanet.js writes these
+				// straight into [CURVES] when there are more than three of them, and falls back to
+				// the fit's own sampling when there are not -- see its [PUMPS] writer for why that
+				// line is drawn where it is.
+				out.curveSI = resolveCurvePoints(l).map(function (pt) {
+					return [toSI(pt[0], 'lpn_u_flow'), toSI(pt[1], 'lpn_u_elevhead')];
+				});
 			}
 			if (l.type === 'valve') {
 				// THE SETTING CROSSES THIS BOUNDARY IN THE UNIT ITS TYPE NAMES, which is why a valve
@@ -28595,6 +29165,17 @@ var EngCalcs = EngCalcs || {};
 				// convention; this half only has to get it into SI.
 				out.valveType = (l.valveType || 'TCV').toUpperCase();
 				out.length = 0;
+				// **A GPV'S BEHAVIOUR IS ITS CURVE, AND IT NEVER REACHED THE ENGINE BEFORE** (found
+				// while moving the curves into the library, Task 586). The model carried a valve's
+				// type and setting and nothing else, so a general purpose valve DRAWN on this page
+				// arrived at EPANET with no curve at all and was reported as an open throttle. Only
+				// an IMPORTED one worked, and only because lpnToInp was reading a field the export
+				// path filled. Flow in m3/s, head loss in metres, like every other number here.
+				if (out.valveType === 'GPV') {
+					out.curvePoints = resolveCurvePoints(l).map(function (pt) {
+						return [toSI(pt[0], 'lpn_u_flow'), toSI(pt[1], 'lpn_u_elevhead')];
+					});
+				}
 				if (out.valveType === 'PRV' || out.valveType === 'PSV') {
 					out.setting = toSI(effective(l, 'setting') || 0, 'lpn_u_pressure');
 				} else if (out.valveType === 'FCV') {

@@ -352,15 +352,12 @@
 					// 0.40 m and [.1, .5, .9] by 1.60 m. Anything whose first point has Q > 0 is
 					// wrong. dev/lpn-spike/validate_epanet.js carries a pump case so this cannot
 					// regress unnoticed.
-					var qMax = Math.pow(ph0 / pa, 1 / link.b),
-						pts = [0, 0.5, 0.9],
-						cname = 'C_' + link.id,
+					var cname = 'C_' + link.id,
+						samples = pumpCurveSamples(link, ph0, pa),
 						rows = [],
-						j, q, h;
-					for (j = 0; j < pts.length; j++) {
-						q = qMax * pts[j];
-						h = ph0 - pa * Math.pow(q, link.b);
-						rows.push(' ' + cname + '  ' + (q * 1000) + '  ' + h);
+						j;
+					for (j = 0; j < samples.x.length; j++) {
+						rows.push(' ' + cname + '  ' + samples.x[j] + '  ' + samples.y[j]);
 					}
 					curves.push(rows.join('\n'));
 					// SPEED then PATTERN, and each only when the pump states one: a speed of 1 is
@@ -371,10 +368,17 @@
 					// dev/lpn-spike/pattern-attach-harness.js). Writing both would state a number
 					// the engine throws away, which is the same rule as a TCV's minor-loss column
 					// above. Both are dimensionless and cross unconverted.
+					// **AND A CURVE WRITTEN AS ITSELF MUST STATE THE SPEED BESIDE IT** (Task 586).
+					// Outside an extended-period run the affinity scaling is baked into h0/a by
+					// assembleModel(), so the fit's own samples already carry it and no SPEED column
+					// is needed. The REAL points are the curve as measured, unscaled -- so a pump
+					// with more than three points and a speed of 0.9 would run at full speed unless
+					// the column is written. Same rule either way: SPEED, or PATTERN, never both.
+					var speedNamed = pumpEps || samples.real;
 					pumpsWritten[link.id] = 1;
 					pumps.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  HEAD ' + cname +
-						(pumpEps && link.speedPattern ? '  PATTERN ' + link.speedPattern :
-							(pumpEps && link.speed !== undefined && link.speed !== 1 ? '  SPEED ' + link.speed : '')));
+						(speedNamed && link.speedPattern ? '  PATTERN ' + link.speedPattern :
+							(speedNamed && link.speed !== undefined && link.speed !== 1 ? '  SPEED ' + link.speed : '')));
 					// **A PUMP HAS NO STATUS COLUMN EITHER**, exactly like a valve, so a closed one is
 					// stated in [STATUS] or it is written open. pushValues() writes EN_INITSTATUS over the
 					// top, which hid this for as long as every solve went through the warm path; an
@@ -873,6 +877,42 @@
 	// here as changed NUMBERS, and the value path is already right for it.
 	var session = null;
 
+	/**
+	 * **THE POINTS A PUMP'S CURVE STATES TO EPANET, IN SI** (Task 586). `[0, y]` first in every
+	 * branch, because EPANET fits a DIFFERENT curve through samples whose first point has Q > 0.
+	 *
+	 * **MORE THAN THREE POINTS GO OUT AS THEMSELVES; THREE OR FEWER GO OUT AS THE FIT'S OWN
+	 * SAMPLING, AND THAT LINE IS DELIBERATE.** EPANET reads a 3-point curve by fitting exactly our
+	 * own H = h0 - a Q^b, and a 1-point one by its shutoff-1.33H/runout-2Q rule, which is the rule
+	 * EngCalcs.lpnPumpFromCurve already copies -- so for those the sampled fit and the typed points
+	 * describe the same pump, and sampling keeps every answer this page has ever given unchanged. A
+	 * TWO-point curve is the one EPANET reads as a piecewise-linear custom curve where we read a
+	 * power law, so it stays on the fit too: changing it would move an answer without buying the
+	 * user's own numbers back, which is what this task is for.
+	 *
+	 * Past three the two really differ, and the file's own curve is the honest input: sampling it
+	 * at three places was rewriting a manufacturer's curve into a three-point approximation of
+	 * itself. It is also the only branch that can move an answer, and it moves it toward the pump
+	 * the user typed.
+	 */
+	function pumpCurveSamples(link, h0, a) {
+		var real = link.curveSI || [], pts = [0, 0.5, 0.9], xs = [], ys = [], j, q, qMax;
+		if (real.length > 3) {
+			return {
+				real: true,
+				x: real.map(function (pt) { return pt[0] * 1000; }),
+				y: real.map(function (pt) { return pt[1]; })
+			};
+		}
+		qMax = Math.pow(h0 / a, 1 / link.b);
+		for (j = 0; j < pts.length; j++) {
+			q = qMax * pts[j];
+			xs.push(q * 1000);
+			ys.push(h0 - a * Math.pow(q, link.b));
+		}
+		return { real: false, x: xs, y: ys };
+	}
+
 	function isCurvedPump(link) {
 		// Must stay identical to the test in lpnToInp's [PUMPS] writer: a pump with no curve is
 		// written there as a short fat pipe, so it is a PIPE to every setter below. The two are
@@ -881,26 +921,15 @@
 	}
 
 	/**
-	 * Three points off our own pump curve, in EPANET's LPS units, the first at shutoff.
+	 * The warm path's curve, and it is the SAME answer lpnToInp's [CURVES] writer states -- one
+	 * function now (Task 586), where it used to be two copies of the sampling held together by
+	 * session-harness.js. The risk that duplication carried was a pump answering one way on the
+	 * solve after a reopen and another way on the solve after a value edit.
 	 *
-	 * DUPLICATES the sampling in lpnToInp's [CURVES] writer, and the duplication is deliberate
-	 * rather than merely tolerated: lpnToInp is the exported, eyeball-able .inp writer and is not
-	 * the place to hang a setter helper. The risk -- the two drifting apart, so a pump answers one
-	 * way on the solve after a reopen and another way on the solve after a value edit -- is covered
-	 * by session-harness.js, which parses [CURVES] out of lpnToInp and asserts these numbers equal
-	 * it. The [0, 0.5, 0.9] sampling itself is load-bearing; see the long note in lpnToInp.
+	 * The SCALED coefficients, because the warm path is the single-instant one: an extended-period
+	 * run re-opens the session (h0Base/aBase and the SPEED column are the eps path's, in lpnToInp).
 	 */
-	function pumpCurvePoints(link) {
-		var qMax = Math.pow(link.h0 / link.a, 1 / link.b),
-			pts = [0, 0.5, 0.9],
-			xs = [], ys = [], j, q;
-		for (j = 0; j < pts.length; j++) {
-			q = qMax * pts[j];
-			xs.push(q * 1000);
-			ys.push(link.h0 - link.a * Math.pow(q, link.b));
-		}
-		return { x: xs, y: ys };
-	}
+	function pumpCurvePoints(link) { return pumpCurveSamples(link, link.h0, link.a); }
 
 	/**
 	 * Everything about a model that a setter cannot reach. Same string => the open Project is
@@ -966,6 +995,20 @@
 			// file is read.
 			parts.push('l' + l.id + '\u0001' + l.type + '\u0001' + l.from + '\u0001' + l.to +
 				'\u0001' + (isCurvedPump(l) ? 'c' : 'p') +
+				// **HOW MANY POINTS A PUMP'S CURVE HAS IS A TOPOLOGY FACT** (Task 586). EPANET
+				// decides what KIND of pump curve it is holding -- a fitted power law or a
+				// piecewise-linear custom curve -- when the file is read, and setCurve() on a
+				// different number of points cannot re-ask that question. The VALUES still ride the
+				// warm path through setCurve(); only the count re-opens.
+				// **AND THE SPEED JOINS IT FOR A CURVE WRITTEN AS ITSELF, AND ONLY THERE.** A fitted
+				// curve carries the affinity scaling in its own points, so setCurve() pushes a speed
+				// change with them; a real curve states the speed in its [PUMPS] row, which no setter
+				// on this path rewrites -- so without this a speed edit would silently be ignored,
+				// which is the stale answer this signature exists to make impossible.
+				'\u0001' + (l.type === 'pump'
+					? String((l.curveSI || []).length)
+						+ ((l.curveSI || []).length > 3 ? ':' + l.speed + ':' + l.speedPattern : '')
+					: '') +
 				'\u0001' + (l.type === 'valve' ? String(l.valveType || 'TCV').toUpperCase() : '') +
 				// **A GPV'S CURVE IS IN THE SIGNATURE, AND IT HAS TO BE.** Every other valve's behaviour
 				// is a SETTING, which the warm path pushes through setLinkValue on every solve. A GPV's

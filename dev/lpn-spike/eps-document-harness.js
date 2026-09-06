@@ -71,9 +71,14 @@ const { parseReport } = require('./net3-report.js');
 	L.setDoc(doc);
 	const pumps = doc.links.filter((l) => l.type === 'pump');
 	check(pumps.length === 2, `the document holds Net3's 2 pumps`, String(pumps.length));
-	check(pumps.every((p) => (p.curvePoints || []).length === 3),
+	// The curve is the DOCUMENT'S and the pump names it (Task 586), so this asks the library.
+	const ptsOf = (d, l) => {
+		const c = (d.curves || []).find((x) => x.id === l._curveId);
+		return c ? c.points : [];
+	};
+	check(pumps.every((p) => ptsOf(doc, p).length === 3),
 		'...each with its THREE curve points, not a fitted coefficient',
-		pumps.map((p) => (p.curvePoints || []).length).join('/'));
+		pumps.map((p) => ptsOf(doc, p).length).join('/'));
 	check((doc.patterns || []).length === parsed.patterns.length && doc.patterns.length >= 2,
 		`the document holds the file's ${parsed.patterns.length} patterns`,
 		String((doc.patterns || []).length));
@@ -87,8 +92,8 @@ const { parseReport } = require('./net3-report.js');
 	L.applySaved(JSON.parse(text));
 	const back = L.getDoc();
 	const bp = back.links.filter((l) => l.type === 'pump');
-	check(bp.every((p) => (p.curvePoints || []).length === 3),
-		'a save and an open keeps every curve point', bp.map((p) => (p.curvePoints || []).length).join('/'));
+	check(bp.every((p) => ptsOf(back, p).length === 3),
+		'a save and an open keeps every curve point', bp.map((p) => ptsOf(back, p).length).join('/'));
 	check((back.patterns || []).length === (doc.patterns || []).length, '...and every pattern');
 	check((back.controls || []).length === 6, '...and every control');
 	check(back.times && back.times.duration === 86400, '...and the clock');

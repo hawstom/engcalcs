@@ -619,13 +619,14 @@ console.log('\n--- heading and cells share one alignment ---');
 	report(pipeThs[5].classList.contains('lpn-pane-col-roughness'),
 		'...and every column names itself, which is what lets one column be narrowed',
 		pipeThs[5].className);
-	// The Libraries curve table is a .lpn-pane-table too, so it takes the same positional rule --
-	// read from the source, because that section is built inside the Libraries box and has no
-	// panel of its own here.
-	const curve = fnBody('buildCurveSection');
-	report(/th\.className = 'lpn-pane-num' \+ \(i === 0 \? ' lpn-pane-first' : ''\)/.test(curve) &&
-		/td\.className = 'lpn-pane-num' \+ \(i === 0 \? ' lpn-pane-first' : ''\)/.test(curve),
-		'the Libraries curve table marks its first column the same way');
+	// **THE LIBRARIES CURVE SECTION IS NOT A TABLE ANY MORE** (Task 586). It became an editor, and
+	// its points are ONE TEXT FIELD on the Patterns section's own argument -- a manufacturer's
+	// curve is pasted, not typed into forty boxes. So what is read from the source here is that it
+	// uses the shared wide-field class the Patterns section uses, rather than growing a second
+	// layout for the same job.
+	const curve = fnBody('buildCurveEntry');
+	report(/values\.className = 'lpn-lib-wide lpn-lib-values'/.test(curve),
+		'the Libraries curve editor types its points into the Patterns section\'s own wide field');
 }
 
 // ---- 12. the rules that alignment, the box widths and the sticky heading hang on --------------

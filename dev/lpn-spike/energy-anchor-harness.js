@@ -43,7 +43,8 @@ const L = loadLoopedNetwork(
 	"\t\taddNode: addNode, addLink: addLink, effective: effective, setProp: setProp,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tassembleModel: assembleModel, docEnergy: docEnergy,\n" +
-	"\t\treadEnergySection: readEnergySection, readEfficCurves: readEfficCurves,\n" +
+	"\t\treadEnergySection: readEnergySection, mintCurveLibrary: mintCurveLibrary,\n" +
+	"\t\tsetProp: setProp, effective: effective, docCurves: docCurvesRead,\n" +
 	"\t\trebuildSettingsFields: rebuildSettingsFields,\n" +
 	"\t\trebuildEnergyReport: rebuildEnergyReport, openEnergyBox: openEnergyBox,\n" +
 	"\t\tserializeProject: serializeProject,\n" +
@@ -369,18 +370,30 @@ const EngCalcs = global.EngCalcs;
 	check(s2.energy.globalEfficiency === 75, 'the global lands on the setting');
 	check(links2[0]._energyPrice === 0.04 && links2[1]._energyPattern === 'NIGHT',
 		'a per-pump price and schedule land on the pumps, in Base');
-	// **AND THE CURVE MOVES ONTO THE PUMP** (Task 585). `settings.energy.effic` is a staging post:
-	// the `[ENERGY]` reader fills it because that is where the names are parsed, and the second read
-	// -- under its OWN guard, `settings.efficCurves` -- puts the name and the points on the link and
-	// empties it. Two homes for one curve is a disagreement waiting for the first edit.
-	check(s2.energy.effic['10'] === 'E1', 'the [ENERGY] read parses the curve name');
-	L.readEfficCurves({ CURVES: [' E1  200  40', ' E1  500  70', ' E1  800  55'] }, s2, links2);
-	check(links2[0].efficCurveId === 'E1' && (links2[0].efficPoints || []).length === 3,
-		`and the curve lands on the pump, name and points: ${JSON.stringify(links2[0].efficPoints)}`);
-	check(links2[0].efficPoints[1][0] === 500,
+	// **THE NAME GOES ON THE PUMP AND THE POINTS GO IN THE LIBRARY** (Task 586). The `[ENERGY]`
+	// reader puts the reference on the link -- overridable, hence the leading underscore -- and
+	// `settings.energy.effic` is left empty, because two homes for one name is a disagreement
+	// waiting for the first edit.
+	check(links2[0]._efficCurveId === 'E1', 'the [ENERGY] read puts the curve name on the pump');
+	check(!s2.energy.effic['10'],
+		'and the staging map on the setting is empty, so there is one home for it');
+	// The v10 -> v11 mint is the other door: a project saved while the points were carried as text
+	// gains its library on open.
+	const legacyDoc = {
+		v: 10, links: [{ id: '10', type: 'pump' }],
+		settings: { energy: { effic: { '10': 'E1' } } },
+		inpSections: { ENERGY: [' PUMP 10 EFFIC E1'],
+			CURVES: [' E1  200  40', ' E1  500  70', ' E1  800  55'] }
+	};
+	L.mintCurveLibrary(legacyDoc);
+	const mintedE1 = (legacyDoc.curves || []).filter((c) => c.id === 'E1')[0];
+	check(!!mintedE1 && mintedE1.kind === 'effic' && mintedE1.points.length === 3,
+		`the curve lands in the library, typed and complete: ${JSON.stringify(mintedE1 && mintedE1.points)}`);
+	check(!!mintedE1 && mintedE1.points[1][0] === 500,
 		'in the project\'s own flow unit, unconverted, so the popup prints the file\'s own token');
-	check(!s2.energy.effic['10'] && s2.efficCurves === 1,
-		'the staging map is emptied and the read has its own record');
+	check(legacyDoc.links[0]._efficCurveId === 'E1'
+			&& !legacyDoc.inpSections.CURVES && !legacyDoc.settings.energy.effic['10'],
+		'and the pump names it, with neither of the two old homes left to disagree');
 	const empty = {};
 	L.readEnergySection({}, empty, []);
 	check(!!empty.energy, 'a file stating no [ENERGY] still gets the record, which is what tells the exporter the section has been read');
@@ -445,10 +458,9 @@ const EngCalcs = global.EngCalcs;
 	const docW = L.getDoc();
 	docW.inpSections = {};
 	L.getSettings().energy = { globalEfficiency: 75, effic: {} };
-	L.getSettings().efficCurves = 1;
 	const wPump = (docW.links || []).filter(function (l) { return l.type === 'pump'; })[0];
-	wPump.efficCurveId = 'E1';
-	wPump.efficPoints = [[200, 40], [500, 70], [800, 55]];
+	docW.curves = [{ id: 'E1', kind: 'effic', points: [[200, 40], [500, 70], [800, 55]] }];
+	L.setProp(wPump, 'efficCurveId', 'E1');
 
 	setUnitSet('us');
 	const wUs = L.docEnergy().efficCurves || {};

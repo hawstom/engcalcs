@@ -21,8 +21,8 @@ What this repo already does with one, all shipped under Task 248:
 
 | Direction | File | Behaviour |
 |---|---|---|
-| Import | `js/lpn-inp.js` | A `[VALVES]` GPV row arrives as a real valve with `curvePoints` read from `[CURVES]` under the name in its sixth column. A GPV naming a curve the file does not contain still arrives as a valve, with no points, and is reported (`gpv-curve-missing`) |
-| Export | `js/lpn-inp.js` | Writes the points back as `G_<id>` and names it in the setting column. A GPV with no points goes out as an open TCV and is reported (`gpv-no-curve-as-open`) |
+| Import | `js/lpn-inp.js` | A `[VALVES]` GPV row arrives as a real valve holding `curveId`, a reference into `doc.curves` (Task 586). A GPV naming a curve the file does not contain still arrives as a valve, keeping the name, and is reported (`gpv-curve-missing`) |
+| Export | `js/lpn-inp.js` | Names the curve in the setting column; `[CURVES]` is composed from the library, so a curve nobody edited goes back out as the file's own lines. A GPV whose curve has no points goes out as an open TCV and is reported (`gpv-no-curve-as-open`) |
 | Engine | `js/lpn-epanet.js` | Same two rules for the in-memory `.inp`. **A GPV's points are part of `signatureOf()`**, because EPANET refuses to be controlled through the API for one at all — error 207, *"attempt to control CV/GPV link"* — so `pushValues()` skips it and a changed curve forces a full rebuild rather than silently answering with the previous curve |
 | Our own solver | `js/lpn-solver.js` | **Cannot solve one.** `EngCalcs.lpnValveIsNative` returns false for everything but a TCV, so a GPV is an EPANET-only element and a network holding one routes to EPANET automatically |
 

@@ -1,9 +1,9 @@
 // A DERIVED NUMBER IS NOT STORED BESIDE THE USER'S (ROADMAP Task 390 step 5). Run:
 //   node dev/lpn-spike/pump-derived-harness.js
 //
-// A pump carries curvePoints -- 1 to 3 [Q, H] pairs the USER typed, in the units on the strip --
-// and the solver reads h0/a/b, the SI coefficients of H = h0 - a Q^b fitted to them. Those two are
-// different kinds of number, and they used to live on the same link.
+// A pump NAMES a curve in the document's library (Task 586) -- the [Q, H] pairs the USER typed, in
+// the units on the strip -- and the solver reads h0/a/b, the SI coefficients of H = h0 - a Q^b
+// fitted to them. Those two are different kinds of number, and they used to live on the same link.
 //
 // The symptom of that was a REPAIR MECHANISM: every unit switch had to re-run the fit across the
 // whole document, because the same three points mean a different pump under L/s than under gpm and
@@ -45,20 +45,19 @@ L.seedDefaultInputs();
 const doc = L.getDoc();
 doc.nodes.push({ id: 'R1', type: 'reservoir', x: 0, y: 0, elev: 0 });
 doc.nodes.push({ id: 'J1', type: 'junction', x: 100, y: 0, elev: 0, _demand: 100 });
-// One pump on a real curve, plus a second that copies it by reference, plus a third with no curve.
+// One curve in the library; one pump on it, a SECOND pump on the SAME curve (which is what the
+// retired `curveRef` borrow became), and a third naming none.
+doc.curves = [{ id: 'C1', kind: 'head', points: [[0, 220], [500, 180], [1000, 100]] }];
 doc.links.push({
-	id: 'P1', type: 'pump', from: 'R1', to: 'J1', verts: [],
-	curvePoints: [[0, 220], [500, 180], [1000, 100]], curveRef: null,
+	id: 'P1', type: 'pump', from: 'R1', to: 'J1', verts: [], _curveId: 'C1',
 	_diameter: 8, _roughness: 130, _length: 0, _k: 0, _status: 'open'
 });
 doc.links.push({
-	id: 'P2', type: 'pump', from: 'R1', to: 'J1', verts: [],
-	curvePoints: [], curveRef: 'P1',
+	id: 'P2', type: 'pump', from: 'R1', to: 'J1', verts: [], _curveId: 'C1',
 	_diameter: 8, _roughness: 130, _length: 0, _k: 0, _status: 'open'
 });
 doc.links.push({
 	id: 'P3', type: 'pump', from: 'R1', to: 'J1', verts: [],
-	curvePoints: [], curveRef: null,
 	_diameter: 8, _roughness: 130, _length: 0, _k: 0, _status: 'open'
 });
 doc.links.push({
@@ -82,8 +81,9 @@ let m = L.assembleModel();
 // which is 3.3x wrong and still solves.
 ok('P1 shutoff head is SI', near(byId(m, 'P1').h0, 220 * FT, 1e-9), byId(m, 'P1').h0 + ' m');
 ok('P1 has a real resistance term', byId(m, 'P1').a > 0, byId(m, 'P1').a);
-// curveRef is resolved by the derivation, so a borrowing pump is identical rather than similar.
-ok('P2 borrows P1\'s curve exactly',
+// Two pumps on ONE curve are identical rather than similar, which is the whole of what a library
+// buys over the retired borrow.
+ok('P2 shares P1\'s curve exactly',
 	byId(m, 'P2').h0 === byId(m, 'P1').h0 && byId(m, 'P2').a === byId(m, 'P1').a && byId(m, 'P2').b === byId(m, 'P1').b,
 	JSON.stringify([byId(m, 'P2').h0, byId(m, 'P2').a, byId(m, 'P2').b]));
 // A pump with no curve is a connection that neither adds nor loses head, never a NaN.
@@ -128,7 +128,7 @@ ok('the resistance term followed the flow unit', byId(after, 'P1').a !== beforeA
 // the same typed numbers, two units, two curves, each right for its own reading.
 function curveHitsTypedPoints(label, model, flowToSI, headToSI) {
 	const p = byId(model, 'P1');
-	doc.links[0].curvePoints.forEach(([q, h]) => {
+	doc.curves[0].points.forEach(([q, h]) => {
 		const qSI = q * flowToSI, want = h * headToSI;
 		const got = p.h0 - p.a * Math.pow(qSI, p.b);
 		ok(label + ': the curve passes through the typed point ' + q + ', ' + h,
@@ -137,8 +137,8 @@ function curveHitsTypedPoints(label, model, flowToSI, headToSI) {
 }
 curveHitsTypedPoints('under L/s', after, 0.001, FT);
 ok('the typed points were NOT rewritten by the switch',
-	JSON.stringify(doc.links[0].curvePoints) === JSON.stringify([[0, 220], [500, 180], [1000, 100]]),
-	JSON.stringify(doc.links[0].curvePoints));
+	JSON.stringify(doc.curves[0].points) === JSON.stringify([[0, 220], [500, 180], [1000, 100]]),
+	JSON.stringify(doc.curves[0].points));
 flow.selectedIndex = flow.options.map((o) => o.value).indexOf('gpm');
 ok('and switching back returns the original fit bit-for-bit',
 	byId(L.assembleModel(), 'P1').a === beforeA, byId(L.assembleModel(), 'P1').a + ' vs ' + beforeA);

@@ -86,43 +86,49 @@ happen instead of recommending a value.
 | Global efficiency, price, price pattern, demand charge | `settings.energy` | the Settings rows |
 | Currency label | `settings.energy.currency` | the Settings row (ours, not EPANET's) |
 | A pump's own price and price schedule | the pump, `energyPrice` / `energyPattern` | **`setProp()`**, and both are in `LPN_OVERRIDABLE.link` |
-| A pump's efficiency CURVE, points and name | the pump, `efficPoints` / `efficCurveId` | the **pump popup**, base-write; not `setProp()` |
+| Which efficiency curve a pump uses | the pump, `_efficCurveId` -- a REFERENCE | **`setProp()`**; it is in `LPN_OVERRIDABLE.link` |
+| The curve's own points | the DOCUMENT, `doc.curves` | the Libraries box, and the pump popup's table, which writes the same curve |
 
 A document-level option has no element to key on, which is why the globals are a setting and not an
 override -- the same split the reaction globals and the scenario demand multiplier already make.
 
-**The efficiency curve is HONOURED (Task 582) and EDITABLE (Task 585).** Tom, 2026-09-05, having
-imported a file whose `[ENERGY]` states `PUMP P1 EFFIC E1`: *"The pump has no efficiency of its own,
-and I don't see an interface for that."*
+**The efficiency curve is HONOURED (Task 582), EDITABLE (Task 585), and a LIBRARY CURVE (Task
+586).** Tom, 2026-09-05, having imported a file whose `[ENERGY]` states `PUMP P1 EFFIC E1`: *"The
+pump has no efficiency of its own, and I don't see an interface for that."*
 
-- **It lives ON THE PUMP**, as `efficPoints` in the project's own flow unit and `efficCurveId` for
-  what the file calls it. That is the head curve's own shape. **The rejected alternative was a
-  document-level curve library** keyed by name, which is what EPANET's own file format is: it needs
-  a name space, an editor, a rename rule and an answer to what becomes of a curve nothing
-  references, and every one of those is a second paradigm beside `curvePoints`. Per-pump storage
-  also makes a shared curve honest -- two pumps importing one `E1` each carry its points, and
-  editing one splits it rather than silently redefining the other's.
-- **`EngCalcs.lpnEfficCurveMap()` is the one place a curve gets its NAME**, shared by `docEnergy()`
-  (what the engine runs) and `lpnExportInp()` (what the file says). A pump whose curve is `E1` in
-  one and `E1_P1` in the other is a network that solves one way on screen and another in the file.
-  A curve typed onto a pump that never had one is named `E_<pumpid>`.
-- **A curve nobody touched still exports as the file's own characters.** The carried `[CURVES]`
-  lines stay the source of truth while they parse to exactly what the pumps state
-  (`EngCalcs.lpnEfficCurveText`), which is the `[SOURCES]` / `[MIXING]` / `[TAGS]` pattern and the
-  reason editing could be added without the byte-identical round trip moving. `CURVES` differs from
-  those three in being on `INP_SECTIONS_READ` as well -- the head curves are tokenised out of it --
-  so the efficiency lines keep their own text on `toks.raw` and are the ONE partial carry.
-- **The read onto the pumps has its own guard, `settings.efficCurves`, at BOTH doors.** A project
-  saved between Task 582 and Task 585 already carries `settings.energy`, so folding it into that
-  test would walk past exactly the documents it exists for -- the trap `[TAGS]` hit the day it
-  landed after `[SOURCES]`.
-- **Base-owned, not `setProp()`.** A scenario asks what if this pump ran at a different speed or
-  paid a different tariff, not what if it were a different machine. `curvePoints` is not
-  overridable either.
+- **The CURVE is the document's and the pump names it.** `doc.curves` holds
+  `{ id, kind: 'effic', points, src, tok }`; the pump holds `_efficCurveId` and nothing else.
+  Task 585 kept the points on the pump and this file argued for that against a document-level curve
+  library, on the cost of a namespace, an editor, a rename rule and orphan curves. **Tom overruled
+  it the same day** (*"move all pump curve data to the Library under curves and leave only curve
+  references in the pump properties"*): those costs are the work, not an argument against it, and
+  the pump HEAD curve beside it was in the same accident of chronology -- it was written in the
+  first two days of this page, before there was a Library to put it in.
+- **The reference is SCENARIO-OVERRIDABLE**, and that is Tom's ruling for the head-curve reference
+  (2026-09-05: *"Scenario pump reference: Yes."*) followed for its twin. "What if we put a bigger
+  impeller in this pump" and "what if we rebuilt it to its rated efficiency" are the same question,
+  and one reference overridable while the other is not is a distinction nobody could re-derive.
+  So both go through `setProp()` and both carry the override marker.
+- **The POINTS are not overridable and must not become so.** A curve is shared; a scenario that
+  edited its points would change every element naming it, in every scenario, which is the opposite
+  of what an override means. The Library editor writes Base always, deliberately.
+- **A shared name is now shared for real.** Two pumps importing one `E1` name one curve, and
+  editing it moves both -- which the popup says out loud (`lpn_curve_shared_note`) the moment a
+  second element is on it. Task 585's per-pump storage made the same file into two copies that
+  split on the first edit.
+- **A curve nobody touched still exports as the file's own characters.** Each curve carries `src`,
+  the file's own lines, and they win while they still parse to the points the document holds --
+  the `[SOURCES]` / `[MIXING]` / `[TAGS]` rule, now applied to every kind of curve rather than to
+  efficiency curves alone. `[CURVES]` is composed from the library and is no longer carried at all,
+  which retires the one PARTIAL carry the file had.
+- **The move onto the library has its own guard at BOTH doors** -- `mintCurveLibrary()` in
+  `migrateSaved()` and again in `applySaved()`. It is idempotent by construction (a document
+  already holding its curves has nothing left on any element to find), which is what makes two
+  calls free and a missed door impossible.
 - **The table is GROWABLE where the head curve's is three fixed rows**, and the difference is
   physical: this page FITS `h = h0 - a Q^b` from at most three points, while EPANET reads an
-  efficiency curve directly, so truncating an imported five-point curve would rewrite numbers that
-  are the user's. One blank row always waits at the end.
+  efficiency curve directly. A HEAD curve of more than three points is now shown read-only on the
+  popup and edited in the Library, rather than truncated.
 - The points are stored in the project's own flow unit, so the popup prints `951.0194` for a file
   that says `951.0194`. Reading them back out of `docEnergy()`'s m3/s and converting for display
   printed `951.0194000000001`.
