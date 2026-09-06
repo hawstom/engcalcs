@@ -282,44 +282,6 @@ the block.
   - Depends on nothing, but it is worth far more once Task 599 exists: a measured series and a
     computed series belong on one axis, and that axis is the time-series plot.
 
-- 75|602| **The engine checkbox reads as the whole story, and is a preference.**
-  - **TOM CHOSE THE FRAMING AND ASKED FOR (a) OR (b), 2026-09-06:** *"This is really a choice about
-    the built-in solver. They don't get a choice about the EPANET solver."* That sentence settles it
-    on its own -- the box has never offered EPANET, because EPANET arrives whether or not it is
-    ticked. **TAKE (a): "Use the built-in solver when possible."** It is the only label that names
-    the thing the user is actually deciding, and (b) keeps describing the half they do not control.
-  - **AND (a) COSTS NO MIGRATION, WHICH IS WHY THE EARLIER WARNING AGAINST IT NO LONGER APPLIES.**
-    The objection was that inverting the checkbox reverses the meaning of every saved project.
-    It does -- if the STORED value flips. It need not: keep `settings.engine` as `epanet`/`native`
-    exactly as written, and invert only at the two lines that render and read the control
-    (`engInput.checked = (settings.engine !== 'epanet')`). Display polarity and storage polarity are
-    different things, and conflating them is what made this look expensive.
-  - **THE TIP MUST NAME THE TWO CASES THE BOX DOES NOT GOVERN**, which is the whole defect: an
-    extended-period run and an active PRV/PSV/FCV go to EPANET regardless. It already carries the
-    download size and the measured disagreement between the solvers; this is one sentence more.
-  - **HIS CLOSING OBSERVATION IS CORRECT AND IS NOT A REASON TO STOP** -- *"this becomes vanishingly
-    interesting as we call it what it is, doesn't it?"* Yes: named honestly, the setting governs
-    only the case where either engine would do, and it demotes itself. **That is the goal, not a
-    problem.** Whether it then deserves to exist at all is a SEPARATE question and his to ask; do
-    not delete a stored per-project setting as a side effect of relabelling it.
-  Tom, 2026-09-06: *"I have Net3 up and running, but I don't have EPANET solver checked. Is that an
-  omission? Should we check the box ourselves ... Should we reword or redefine this setting?"*
-  **No omission and no defect** -- an extended-period run goes through EPANET always, and an active
-  PRV/PSV/FCV routes there whatever the box says, both deliberate. **And we must NOT tick it for
-  him:** the setting is a preference and the routing is a fact about this network, so writing one
-  from the other means deleting the duration leaves him on an engine he never chose.
-  - **WHAT IS ACTUALLY WRONG IS THE LABEL.** `lpn_settings_engine_epanet` reads "Solve with the
-    EPANET solver", so unchecked reads as "never EPANET", which is false on both paths above. His
-    own suggestion -- *"(Use the built-in solver when possible)"* -- states the truth exactly: EPANET
-    whenever it is needed, built-in as a preference in the cases where either would work.
-  - **BUT DO NOT INVERT THE CHECKBOX TO GET THERE.** `settings.engine` is stored per project as
-    `epanet`/`native`, so flipping the polarity silently reverses the meaning of every saved file
-    that already states one. The same truth keeps the polarity: **"Always solve with the EPANET
-    solver"**, whose unchecked state honestly means "only when needed". One key reworded, one
-    retranslation round, no migration, no stored value touched.
-  - The tip already carries the download size and the two solvers' measured disagreement; what it
-    does not say is that some networks route regardless. That sentence belongs in it.
-
 - 75|487| **The suite only works when its URL path is `/engcalcs/`.**
   **UNPARKED 2026-09-06 (Tom: *"I do think we need to be at LWN/app. We better move that way."*).**
   This is now the first half of Task 479 rather than a rejected refactor, but **the refactor is
