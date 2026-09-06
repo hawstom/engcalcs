@@ -196,34 +196,6 @@ the block.
     their points want one idiom, and a second plotting vocabulary on this page is the expensive
     mistake either way.
 
-- 75|597| **Filter the tables, in EPANET's own words: Below, Equal to, Above.**
-  Tom, 2026-09-06: *"EPANET allows table filters. Maybe Find could have next to the Find button a
-  Filter in tables button ... with a selector for which table. I see this as not being the most
-  click-efficient solution possible. But I think it's more click-efficient than EPANET."*
-  - **HIS OWN ESTIMATE IS THE ACCEPTANCE BAR AND IT IS A MODEST ONE** -- beat EPANET's click count,
-    not some ideal. Say so in the design rather than chasing the ideal and shipping nothing.
-  - **REUSE FIND'S PREDICATE, DO NOT WRITE A SECOND ONE.** Find already knows how to compare a
-    property against a value across every element; a filter is that same predicate pointed at a
-    table's row set instead of at the map's selection. Two implementations of "which elements
-    match" would disagree the first time one of them learned a new property type.
-  - **THE COMPARISON VOCABULARY IS EPANET'S, ON TOM'S RULING THE SAME DAY:** *"EPANET uses Below,
-    Equal to, and Above for filter comparisons. I like this."* That is CLAUDE.md's default-to-EPANET
-    rule doing its job, and it settles the words for Find as well as for the filter -- one
-    vocabulary, or the two boxes teach different language for one idea.
-
-- 75|598| **Below and Above on ID, Tag and Text, in dictionary order.**
-  Tom, 2026-09-06: *"ID, Tag, and Text should also allow Below and Above for a localized
-  alphanumeric order (dictionary order) comparison."*
-  - **THE WORD "LOCALIZED" IS THE WHOLE TASK, and `Intl.Collator` is the answer** -- `<` on two
-    strings is UTF-16 code-unit order, which puts every accented letter after `z`, sorts Cyrillic
-    and Arabic by codepoint block, and is wrong in most of the 27 languages before it is wrong in
-    English. A collator built once for the current language, reused for every comparison.
-  - **AND IT WANTS `numeric: true`, which is what a user typing pipe IDs actually means:** P2 comes
-    before P10. Without it a text comparison on an ID column is technically correct and useless,
-    which is the failure a user reports as "the filter is broken".
-  - Same predicate as Task 597, so build it there once; this row exists because a STRING comparison
-    is a different decision from a numeric one and would otherwise be made by accident.
-
 - 75|599| **Graph a value against time across an extended-period run.**
   Tom, 2026-09-06: *"We haven't added anything for time series reporting or graphing such as one or
   more nodes' pressure or head across an EPS."* Correct, and it is the gap that costs most: the run
