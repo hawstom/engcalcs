@@ -447,7 +447,61 @@ function ecFrictionSection(string $root, int $langCount): string
                 $out .= "  " . ($i + 1) . ". " . $r . "\n";
             }
         }
+        $out .= ecAskLine($e);
         $out .= "  " . EC_RULING_FLAG . "\n";
+    }
+    return $out;
+}
+
+/**
+ * **SAY WHAT KIND OF ANSWER THE QUESTION WANTS, BEFORE HE ANSWERS IT.**
+ *
+ * Tom, 2026-09-06, having read a whole batch: *"You added a batch of requests for me without
+ * explaining what they were, and now after I am done I learn that they were proposed _syn entries.
+ * Forgive me if I failed to read you right. Had I known earlier (had each entry said 'Add _syn key.
+ * Suggestions follow'), it would have saved me a lot of confusion and time."*
+ *
+ * He read them all as wording approvals, because that is what the rest of the file is. Several were
+ * not: they were requests for written permission to write a `$ec_lang_syn` entry, which is a
+ * different decision with a different cost -- an approval is free and a syn entry is a standing
+ * instruction to 26 translators. Two kinds of question under one flag is one kind of question
+ * nobody answers correctly.
+ *
+ * **DERIVED FROM THE FINDING'S OWN `resolution`, never typed per entry.** The wave-0 pass already
+ * states there what route it proposes, in a small vocabulary it uses consistently, so the label can
+ * be read out of the record rather than maintained beside it. An entry whose resolution says
+ * nothing recognisable gets the neutral line, which is the honest answer to "I cannot tell".
+ */
+function ecAskLine(array $e): string
+{
+    $r = isset($e['resolution']) ? (string) $e['resolution'] : '';
+    $wantsSyn = (bool) preg_match('/\$ec_lang_syn/', $r);
+    $wantsEnglish = (bool) preg_match('/PROPOSED English/i', $r);
+    $wantsGloss = (bool) preg_match('/glossary\.json|glossary term/i', $r);
+    $parts = array();
+    if ($wantsEnglish) {
+        $parts[] = 'a WORDING ruling -- is the English above right, or say what it should say';
+    }
+    if ($wantsSyn) {
+        /* Named in full, because the standing rule is that AI never writes one without written
+         * permission IN THE CONVERSATION, and "OK" on a line that does not say the words
+         * `$ec_lang_syn` is not that permission. */
+        $parts[] = 'WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key'
+            . ' (a note to the 26 translators; it changes no English and nothing a visitor reads)';
+    }
+    if ($wantsGloss) {
+        $parts[] = 'agreement to route the concept to `glossary.json`';
+    }
+    if (!$parts) {
+        $parts[] = 'which of the readings above you meant';
+    }
+    $out = "  **What this asks for:** " . implode('; and ', $parts) . ".\n";
+    /* The proposal itself, so a yes is answerable without opening another file. Trimmed, because a
+     * resolution can be a paragraph and the ASK is the part that has to be readable at a glance. */
+    if ($r !== '') {
+        $one = trim(preg_replace('/\s+/', ' ', $r));
+        if (strlen($one) > 400) { $one = substr($one, 0, 397) . '...'; }
+        $out .= "  *The proposal:* " . $one . "\n";
     }
     return $out;
 }

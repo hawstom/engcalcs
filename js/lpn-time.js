@@ -392,7 +392,7 @@
 			// away -- the step selector holds one step and that is the whole of what there is to say.
 			// (lpn_time_no_engine is a DIFFERENT thing and stays: "the engine is unreachable, so you
 			// are seeing one instant" is a fact about this session that the user acts on.)
-			running: pageConfig.lpn_time_running || 'Working out the whole time period with the EPANET solver.',
+			running: pageConfig.lpn_time_running || 'Working out the extended period simulation with the EPANET solver.',
 			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.',
 			slider: pageConfig.lpn_time_slider || 'Time',
 			noPeriod: pageConfig.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.',

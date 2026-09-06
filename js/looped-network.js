@@ -20109,9 +20109,13 @@ var EngCalcs = EngCalcs || {};
 		// per project and Background image never at all for the majority with no aerial; both belong
 		// in the menus. Saving is the thing you do every few minutes, forever.
 		//
-		// SAVE AS IS NOT A SECOND-CLASS TWIN: a browser project has no file yet and a read-only
-		// project cannot write back to one, so on this page Save As is frequently the ONLY thing Save
-		// can mean. Both buttons, always, so the one that will work is on screen.
+		// **SAVE AS CAME OFF THE STRIP 2026-09-06** (Tom: *"Remove 'Save as', Libraries, Profile, and
+		// Tables from the toolbar. Not valuable enough or accessible with the Pane button."*). The
+		// paragraph that used to stand here argued it was not a second-class twin -- a browser
+		// project has no file yet, a read-only one cannot write back, so Save As is often the only
+		// thing Save can mean. That argument is about whether Save As must EXIST, and it does: it is
+		// on the File menu and `saveCurrent()` still routes to it by itself when Save cannot write.
+		// It was never an argument that the command needed the most expensive space on the page.
 		//
 		// **OPEN JOINED THEM (Task 246); NEW DID NOT, AND THAT IS DELIBERATE.** Task 246 asks for
 		// "new/open/save/save-as icons on the toolbar", which is the file group every document
@@ -20139,11 +20143,6 @@ var EngCalcs = EngCalcs || {};
 		fileGroup.appendChild(saveBtn);
 		// The picker still needs its listener even though its button has gone -- see wireBackdropMenu().
 		wireBackdropMenu();
-		var saveAsBtn = document.createElement('button');
-		saveAsBtn.type = 'button';
-		setIconLabel(saveAsBtn, 'saveas', pc.lpn_file_saveas || 'Save as…', pc.lpn_file_saveas_tip);
-		saveAsBtn.addEventListener('click', function () { saveAs(); });
-		fileGroup.appendChild(saveAsBtn);
 
 		// `data-edits` is VESTIGIAL since Task 211 and nothing reads it: read-only now means only that
 		// you cannot save over somebody else's file, exactly as in Word. The attributes stay because
@@ -20238,47 +20237,36 @@ var EngCalcs = EngCalcs || {};
 		// each teaches the other. The groups carry the menu's separators: what the project IS, what
 		// you READ beside it, and what you RUN on it.
 		var netGroup = group();
-		// Settings first, matching the menu. **LIBRARIES IS THE MISSING IDEA, not a fourth way to
-		// the Settings box** (Tasks 462/460): the document has carried patterns, curves and controls
-		// since Task 423 and nothing on the page could see one; this button is that door. See the
-		// Libraries box further down for why it is a box of its own rather than a Settings section
-		// or three more pane tabs.
+		// Settings alone, since 2026-09-06. **LIBRARIES CAME OFF THE STRIP** with Save as, Profile
+		// and Tables (Tom: *"Not valuable enough or accessible with the Pane button."*). The box
+		// itself is untouched and is still the only door to patterns, curves and controls -- that
+		// argument, from Tasks 462/460, was about the BOX existing and is unaffected. What changed
+		// is that opening it is a menu command (Water > Libraries) rather than a permanent icon.
 		var settingsBtn = document.createElement('button');
 		settingsBtn.type = 'button';
 		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
 		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
 		netGroup.appendChild(settingsBtn);
-		var libBtn = document.createElement('button');
-		libBtn.type = 'button';
-		libBtn.id = 'lpn_library_btn';
-		setIconLabel(libBtn, 'library', pc.lpn_library_menu || 'Libraries', pc.lpn_library_menu_tip);
-		libBtn.addEventListener('click', function () { toggleLibraryBox(); });
-		netGroup.appendChild(libBtn);
 
-		// **WHAT YOU READ BESIDE THE PROJECT.** The profile is TWO DOORS TO ONE IMPLEMENTATION --
-		// this button and the Project > Profile menu row; both call openPane('profile') and nothing
-		// about the profile lives in either. Its icon is the one drawn for it: a jagged ground line
-		// closed down to a datum, so it reads as a body of earth rather than as a sparkline.
-		var readGroup = group();
-		var profileBtn = document.createElement('button');
-		profileBtn.type = 'button';
-		setIconLabel(profileBtn, 'profile', pc.lpn_profile_menu || 'Profile', pc.lpn_profile_tip);
-		profileBtn.addEventListener('click', function () { openPane('profile'); });
-		readGroup.appendChild(profileBtn);
-		// **TABLES OPENS THE FIRST TABLE, NEVER THE PROFILE TAB**, for the reason the menu row states.
-		// It is a COMMAND, not the pressed/unpressed pane toggle at the right end of the strip: that
-		// one reports whether the pane is open and can close it, this one names what you will find
-		// inside. Two controls, two questions -- and the tables were "a gap barely discoverable with
-		// the bottom pane button" (Tom, 2026-08-21) precisely because only the toggle existed.
-		var tablesBtn = document.createElement('button');
-		tablesBtn.type = 'button';
-		setIconLabel(tablesBtn, 'table', pc.lpn_tables_menu || 'Tables', pc.lpn_tables_menu_tip);
-		tablesBtn.addEventListener('click', function () {
-			var tables = paneTables();
-			if (tables.length) { openPane(tables[0].id); }
-		});
-		readGroup.appendChild(tablesBtn);
-
+		// **THERE IS NO 'WHAT YOU READ' GROUP ANY MORE** (Tom, 2026-09-06: *"Remove 'Save as',
+		// Libraries, Profile, and Tables from the toolbar. Not valuable enough or accessible with
+		// the Pane button."*). It held Profile and Tables, and both open a tab in the bottom pane,
+		// which the pane toggle at the right-hand end of this strip already reaches -- so they were
+		// two permanent icons for a place there is already a control for.
+		//
+		// **WHAT THAT COSTS, SAID PLAINLY, BECAUSE IT WAS ARGUED THE OTHER WAY ONCE.** The Tables
+		// button existed because the tables were *"a gap barely discoverable with the bottom pane
+		// button"* (Tom, 2026-08-21) -- the toggle reports whether the pane is open, it does not
+		// name what is inside. That is still true, and he has now weighed it against a toolbar slot
+		// and chosen the slot. The menu rows (Water > Profile, Water > Tables) are unchanged and are
+		// the discoverable door; nothing about either feature moved.
+		//
+		// **THE STRIP NO LONGER MIRRORS THE PROJECT MENU, and that is a deliberate loss.** The
+		// mirroring rule came from Tom, 2026-08-21 (*"Settings Libraries | Profile Tables | Run"*),
+		// on the argument that two orders make the user learn the interface twice. With four of
+		// those five gone there is no second order left to disagree -- the strip is now a SUBSET of
+		// the menu, which is the ordinary relationship between a toolbar and a menu bar, rather
+		// than a rival arrangement of the same commands.
 		// **WHAT YOU RUN ON IT.** Its own group, so Run and the transport sit after Profile and
 		// Tables exactly as they do in the menu. js/lpn-time.js owns everything in it, including
 		// whether the Calculate button is on the strip at all -- see EC.lpnTimeAutoRun().

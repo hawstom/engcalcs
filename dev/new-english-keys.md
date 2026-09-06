@@ -21,22 +21,9 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (1 to read @@ NEEDS RULING)
+## Questions from the translators  (0, all answered)
 
-**These are SHIPPED strings, already translated into 26 languages.** A wave-0
-reading or a translator found each one readable two ways, and no sprint launches while one is
-unanswered. You are not being asked to approve wording here; you are being asked which reading
-is the one you meant. "The first one" is a complete answer.
-
-### from sprint 584-wave0
-
-- **`lpn_scncmp_at`**
-  > {value} at {id}
-  *The finding:* medium: '{value} at {id}' is two placeholders and one preposition. A translator has no way to know that {value} is a pressure or a velocity with its unit already attached and that {id} is an element id, so 'at' could be temporal, spatial or attributive, and several languages need to know the noun's gender or case before they can choose the preposition at all. It is the shortest string in the set and the one that carries the least recoverable information.
-  1. the extreme value, and the element where it occurs (intended)
-  2. a value measured at a time
-  3. a value belonging to an identifier
-  @@ NEEDS RULING
+Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
 ## bpn_  (2, all ruled)
 

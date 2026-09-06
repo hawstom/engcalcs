@@ -99,7 +99,8 @@ the block.
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
 
-- 50|593| **[AI] Five water-quality settings a file can state and no control can show.**
+- 100|593| **[AI] Five water-quality settings a file can state and no control can show.**
+  **RAISED TO 100 by Tom, 2026-09-06:** *"Good catch."*
   Found 2026-09-06 while closing Task 581, by surveying rather than by testing. Net2 and Net3 both
   state `Order Bulk`, `Order Tank`, `Order Wall`, `Limiting Potential` and `Roughness Correlation`.
   **All five parse, all five round-trip byte for byte, and all five reach the EPANET engine** -- so
@@ -113,11 +114,38 @@ the block.
     each changes what a reaction coefficient MEANS rather than scaling it, so a row that shows the
     number without its tip would be worse than no row.
 
-- 50|592| **[AI] Read a surveyed point list: junctions from a CSV or GPX file.**
+- 75|595| **A keyboard door to a new asset, and the keys to bind to seven of them.**
+  Tom, 2026-09-06: *"Data entry clerk: They requested keys for adding assets. Did you lose that? I
+  asked for it to be added to our roadmap. And research conventions for keys to bind to the 6
+  assets + text."* It was not on the roadmap; it was only in
+  `dev/agents/data-entry-clerk/wishlist.md` §2, where the seat had itself ranked it THIRD. Being in
+  an agent's hopper is not being on the roadmap, and this row is the correction.
+  - **THE SEAT THAT ASKED FOR IT ALSO DEMOTED IT, AND SAID SO AGAINST ITS OWN EARLIER RANKING.**
+    Its finding: every commercial tool it could source -- Bentley WaterGEMS's ModelBuilder, QGIS's
+    delimited-text layer -- answers *"I have hundreds of elements to enter"* with a mapped FILE
+    IMPORT, not a per-element keyboard door. EPANET's Add button is real but is EPANET's answer to
+    adding ONE object without reaching for the mouse. So Task 592 outranks this for VOLUME, and this
+    is worth having for the one-off. Both, in that order.
+  - **CITED precedent for the door itself:** EPANET's Data Browser Add button creates a
+    junction/pipe/etc. from the object list and opens its editor with no map click first. `lpn_` has
+    exactly one door to a new node -- the canvas pointer click.
+  - **The unanswered half is WHICH KEYS, and it is research, not taste.** Seven objects need
+    bindings: junction, reservoir, tank, pipe, pump, valve and Text. Look at what EPANET, epanet-js,
+    QGIS and AutoCAD actually bind before inventing anything, and record the sources. **Whatever is
+    chosen must not collide with the browser's own or with what this page already binds** -- Escape
+    leaves any tool, Ctrl+Z is undo -- and a single unmodified letter is the cheapest thing to type
+    and the easiest thing to hit by accident in a text field, so say how that is handled.
+  - **It is `muffleable`, which is Tom's word and the clerk's standing constraint**: a binding
+    nobody presses must cost a person who never presses it exactly nothing.
+
+- 75|592| **[AI] Read a surveyed point list: junctions from a CSV or GPX file.**
   **Promoted from the market researcher's wish list, 2026-09-06, ranked first there** (its journal
-  and `dev/agents/market-researcher/wishlist.md` §1 hold the citation and the honest size). Placed
-  at 50 rather than 75 because nothing is waiting on it and Tom has not asked for it; the case for
-  moving it up is the researcher's, not this line's.
+  and `dev/agents/market-researcher/wishlist.md` §1 hold the citation and the honest size).
+  **RAISED TO 75 by Tom the same day**: *"I am excited about this contribution of Market
+  Researcher."* The line that said nobody had asked for it is superseded -- he has. It is also the
+  row the `data-entry-clerk` moved ABOVE its own item 2 against its earlier ranking, reached from a
+  different direction: a mapped file import removes the per-row round trip entirely rather than
+  shortening it, which is what "400 pipes from a marked-up plan set" actually needs.
   - **The evidence is a paper trail rather than an inference.** A field survey -- the actual input
     method for the EWB chapters and Peace Corps volunteers this suite most resembles -- produces a
     flat list of id, latitude and longitude, never an `.inp`. EPANET has no path for it either, and
@@ -410,7 +438,35 @@ the block.
     it is one run of the rebuilt `log/lang-log-stats.sh` over HW and the band pages, same window and
     same bucket, long enough that the denominator is not marked `~`.
 
-- 75|185| **Match/Copy properties tool (originated during Task 146).** Tom, 2026-07-30: "In the absence of the
+- 75|185| **Match/Copy properties tool (originated during Task 146).**
+  **GATE: 100 with Task 186, and only when all of the EPANET file is implemented** (Tom, 2026-09-06
+  -- the same sentence gates both).
+  - **THE PREMISE IT WAS CONCEIVED UNDER IS GONE, AND HE KEPT IT ANYWAY.** Tom, 2026-09-06: *"This
+    was conceived 'in the absence of the table editor'. But now we have a table editor.
+    Nevertheless, this could be a very cool visual feature if done right."* So it is no longer the
+    cheap stand-in for Task 186 -- the line below calling it "the cheap 80% of Task 186" is
+    superseded -- it is a POINTING tool that a table cannot replace, wanted for what it is.
+  - **HIS SPEC, VERBATIM AND IN HIS OWN NUMBERING** (2026-09-06):
+    1. Invoke it -- **under the Edit menu, and maybe on the toolbar with a nice icon**.
+    2. Get prompted to select the source asset to copy from.
+    3. **A specialised properties box for the source asset opens**, with recommended or previous
+       (remembered by the BROWSER) checkboxes ticked for the properties to copy.
+    4. Click Copy.
+    5. (a) Click other assets **of the same type** to receive the designated properties.
+       (b) Optional or future: click in space to start a **polygon window selection** of every asset
+       fully inside the drawn polygon, documented in the tip on the Copy button. While drawing,
+       **right-click to choose Finish as polygon or Finish as fence**.
+    6. The properties are copied to all indicated assets, **as a SINGLE undo operation**.
+  - **"Previous (by browser)" is the project/browser split doing its work, not an exception to it**:
+    which boxes were ticked last time is furniture -- a fact about the person, not the document --
+    so it is a `localStorage` sibling key and `serializeProject()` must never learn about it.
+    `lpn_furniture_check.php` will require it to be declared.
+  - **Same type only, in step 5a, and that is load-bearing**: a pump's properties are not a pipe's,
+    and a tool that silently skips non-matching clicks teaches nothing. Say why the click did
+    nothing.
+  - Two things a decision is owed on before building: **ID is never copyable** (IDs are unique) and
+    **geometry is never copyable** (that is a move, not a property copy).
+  - Original phrasing, kept because the good idea is in it. Tom, 2026-07-30: "In the absence of the
   table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
   labels) say what properties to copy, top shows (or initial click gives) the Source object then you
   click the Target objects." Same interaction as AutoCAD's MATCHPROP and every GIS attribute-copy
@@ -419,9 +475,7 @@ the block.
   the Labels panel already IS a per-property checkbox list, already knows which properties are
   interesting to this user right now, and is already on screen; reusing it as the property filter
   means the tool needs no property picker of its own, and what you see on the map is what gets
-  copied. Worth a deliberate decision on whether ID is ever copyable (it must not be — IDs are
-  unique) and whether geometry is (it must not be — that is a move, not a property copy). This is
-  the cheap 80% of Task 186 and should ship long before it.
+  copied.
 
   **Kept and still liked (Tom, 2026-08-13): "Very nice idea. I love it."** Keep it a click-source-
   then-click-targets tool: that is the right shape when you are drawing 15 pipes and want this one
@@ -527,29 +581,6 @@ the block.
     one symbol), and the attachment point is **user-draggable along its pipe** — a handle on the
     `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
     **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
-
-- 75|594| **Entry tables that behave like a spreadsheet: select, copy and paste a block.**
-  Tom, 2026-09-06: *"Add a roadmap task to make our entry tables more spreadsheet-like. Selection of
-  multiple cells, copying and pasting multiple cells."*
-  - **THE PASTE HALF IS BUILT, ONCE, AND ONLY IN THE CURVES GRID** (Task 586). `libPasteCells()`,
-    `libDropNameColumn()` and `libMergePaste()` take a tab-separated block, land it at the cell it
-    was pasted into, fill down and across and grow the grid; a line with no tab is split on
-    whitespace so an `[CURVES]` block out of an e-mail pastes too. They are pure and
-    `dev/lpn-spike/curve-library-harness.js` asserts them against real clipboard text. **So this
-    task is mostly about the two halves that do NOT exist -- a cell SELECTION, and COPY OUT -- and
-    about the tables that got neither.**
-  - **The tables that want it are the four row-table calculators** (`Branched-Network`,
-    `Irrigation-Pressure`, `Manning-Irregular`, `Weir-Flow-Irregular`), where a user types a
-    cross-section or a lateral schedule that already exists in a spreadsheet, plus the `lpn_`
-    Patterns and Rules sections. Those calculators build rows through `initRows()`/`addRow()`/`cell()`
-    and share no grid component with the Curves editor, so the first question is whether the
-    selection model is written once and reused or copied twice.
-  - **The clerk's seat owns this and has not been asked.** One extra gesture times four hundred rows
-    is the arithmetic the `data-entry-clerk` exists to do, and a selection model chosen without it
-    is the shape of decision that seat was hired to catch. Ask before designing, and put the answer
-    in its hopper.
-  - Not to be confused with Task 266, which selects ELEMENTS ON THE MAP. Same word, different
-    object, and neither is the foundation for the other.
 
 - 25|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
   for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
@@ -908,6 +939,22 @@ the block.
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
 
 - 75|186| **Make the Tables pane spreadsheet-interoperable.**
+  **GATE, Tom 2026-09-06: this and Task 185 go to 100 IF AND ONLY IF all of the EPANET file is
+  implemented.** *"Let's prioritize these two as 100 if and only if all of the EPANET file is
+  implemented."* Not a deadline and not a decay -- a CONDITION, so the priority stays 75 until the
+  `.inp` work is genuinely finished and then both move together. Whoever closes the last EPANET-file
+  row owes this promotion; Task 593 is the nearest open one.
+  - **HIS SPEC, VERBATIM AND IN HIS OWN NUMBERING** (2026-09-06), which is broader than the
+    out-then-in plan below and supersedes it as the definition of done:
+    1. **Cells abut each other like Google Sheets** -- appearance, not just behaviour.
+    2. **Keyboard navigation** by arrows, `Ctrl`+arrows, `Home`, `End`, `Ctrl`+`Home`,
+       `Ctrl`+`End`, and `Ctrl`+`Shift`+`PageUp` / `Ctrl`+`Shift`+`PageDn` for the next table
+       (*"lower priority, but very cool"* -- his words, so the table-switch pair may ship late).
+    3. **Blocks and ranges selectable for clipboard copy**, by mouse drag or by `Shift`+arrows and
+       `Ctrl`+`Shift`+arrows.
+  - **The `data-entry-clerk` owns the arithmetic here and has already ranked it**: one extra
+    keystroke times four hundred rows is an hour. Its wish list asks for this widened beyond the
+    scalar-only version and says so explicitly. Ask it before designing the selection model.
   Reworked by Tom 2026-08-25: *"186 reworked to make our Tables spreadsheet-interoperable."* The
   original asked for a whole table-paradigm EDITOR (*"For the future a table-paradigm editor with
   spreadsheet-like copy and paste would be very cool"*, 2026-07-30). **The rework is smaller and
