@@ -2888,6 +2888,72 @@
 		}
 	],
 	"defaultPattern": "1",
+	"curves": [
+		{
+			"id": "1",
+			"kind": "head",
+			"points": [
+				[
+					0,
+					104
+				],
+				[
+					2000,
+					92
+				],
+				[
+					4000,
+					63
+				]
+			],
+			"src": [
+				";PUMP: Pump Curve for Pump 10 (Lake Source)",
+				" 1               \t0           \t104.",
+				" 1               \t2000.       \t92.",
+				" 1               \t4000.       \t63."
+			],
+			"note": "Pump Curve for Pump 10 (Lake Source)",
+			"tok": {
+				"0y": "104.",
+				"1x": "2000.",
+				"1y": "92.",
+				"2x": "4000.",
+				"2y": "63."
+			}
+		},
+		{
+			"id": "2",
+			"kind": "head",
+			"points": [
+				[
+					0,
+					200
+				],
+				[
+					8000,
+					138
+				],
+				[
+					14000,
+					86
+				]
+			],
+			"src": [
+				";PUMP: Pump Curve for Pump 335 (River Source)",
+				" 2               \t0           \t200.",
+				" 2               \t8000.       \t138.",
+				" 2               \t14000.      \t86."
+			],
+			"note": "Pump Curve for Pump 335 (River Source)",
+			"tok": {
+				"0y": "200.",
+				"1x": "8000.",
+				"1y": "138.",
+				"2x": "14000.",
+				"2y": "86."
+			}
+		}
+	],
 	"profiles": [],
 	"times": {
 		"duration": 86400,
@@ -2904,8 +2970,10 @@
 			"patternStart": "0:00",
 			"reportStep": "1:00",
 			"reportStart": "0:00",
-			"startClock": "12 am"
-		}
+			"startClock": "12 am",
+			"qualityStep": "0:05"
+		},
+		"qualityStep": 300
 	},
 	"controls": [
 		{

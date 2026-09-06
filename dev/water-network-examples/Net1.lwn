@@ -558,6 +558,23 @@
 		}
 	],
 	"defaultPattern": "1",
+	"curves": [
+		{
+			"id": "1",
+			"kind": "head",
+			"points": [
+				[
+					1500,
+					250
+				]
+			],
+			"src": [
+				";PUMP: Pump Curve for Pump 9",
+				" 1               \t1500        \t250"
+			],
+			"note": "Pump Curve for Pump 9"
+		}
+	],
 	"times": {
 		"duration": 86400,
 		"hydraulicStep": 3600,
