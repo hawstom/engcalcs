@@ -719,6 +719,7 @@
         "lpn_georef_detach": "Pick it up again",
         "lpn_georef_size_prompt": "About how wide is the site, across the whole project?",
         "lpn_tip_join": "{name} — {tip}",
+        "lpn_tool_key_hint": "Shortcut: press {key}.",
         "lpn_tool_add_junction_tip": "Click the map to add a junction: a point where pipes meet or where water is used.",
         "lpn_tool_add_reservoir_tip": "Click the map to add a reservoir: an infinite source with a fixed water level.",
         "lpn_tool_add_tank_tip": "Click the map to add a tank: storage whose water level rises and falls as it fills and empties.",
@@ -1690,7 +1691,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1688,
+    "count": 1689,
     "active_prefixes": [
         "about",
         "bpn",

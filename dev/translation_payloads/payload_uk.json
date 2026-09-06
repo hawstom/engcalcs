@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 1688,
-        "delta_key_count": 13,
+        "expected_key_count": 1689,
+        "delta_key_count": 14,
         "exempt_key_count": 29,
         "exempt_keys": [
             "u_imgd",
@@ -513,6 +513,7 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_tool_key_hint": "Shortcut: press {key}.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -528,6 +529,7 @@
         "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
     },
     "keys": {
+        "lpn_tool_key_hint": "Shortcut: press {key}.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -543,6 +545,22 @@
         "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
     },
     "key_context": {
+        "lpn_tool_key_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_size_prompt",
+                    "value": "Якою є приблизна ширина ділянки через увесь проєкт?",
+                    "english": "About how wide is the site, across the whole project?"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_add_junction_tip",
+                    "value": "Клацніть на карті, щоб додати вузол: точку, де сходяться труби або де споживається вода.",
+                    "english": "Click the map to add a junction: a point where pipes meet or where water is used."
+                }
+            }
+        },
         "lpn_reaction_order_bulk": {
             "reason": "missing",
             "current_value": null,

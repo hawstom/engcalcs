@@ -343,7 +343,15 @@ console.log('\n--- the label that was in the way sheds too, not only the one tha
 	// grid below the gap is wider still -- 39 node labels drawn loser-only against 50 with the pair
 	// rule. The floors below sit between the two, so the loser-only cascade fails them by name, which
 	// is what a mutation test is for.
-	report(shed.length >= 30, 'far more labels shed than were ever dropped, which only the pair rule does',
+	//
+	// **THE FLOOR WAS 30 AND IS 24, LOWERED WHEN TASK 436 MADE THE COUNT FALL AND THE OUTCOME RISE
+	// AT THE SAME TIME.** Pricing a shed arithmetically instead of redrawing it lets the cascade
+	// stop at the first width that actually fits, so it no longer walks past the rung it needed:
+	// 41 shed -> 28 shed, and 96 of 97 drawn -> 97 of 97. A floor on the COUNT read that as a
+	// regression, which is the giveaway that the count was standing in for the property rather
+	// than being it. **The property is the GAP over loser-only** -- 28 against 17 here, 63 node
+	// labels against 39 on the grid below -- and the mutation still fails both by name.
+	report(shed.length >= 24, 'far more labels shed than were ever dropped, which only the pair rule does',
 		shed.length + ' shedding (loser-only measured 17)');
 	report(drawnNodes().length >= 94, '...and it puts more of them on the drawing',
 		drawnNodes().length + ' of ' + doc.nodes.length + ' drawn (loser-only measured 93)');

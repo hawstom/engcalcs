@@ -536,7 +536,21 @@ var EngCalcs = EngCalcs || {};
 	// write them all and then measure them all -- one layout for the batch instead of one each.
 	// renderLinkLabel() is the two halves back to back, for the callers that hold exactly one label.
 	function writeLabelGlyphs(le, l, lines, fsNow) {
-		var rows = composeRows(lines, labelIsDragged(l));
+		// **OWNERS: which LINE each tspan came from** (Task 436), with -1 for a separator.
+		// composeRows() has always been able to report this; nothing read it until the shed cascade
+		// needed to price a subset of the values without redrawing them.
+		var owners = [];
+		var rows = composeRows(lines, labelIsDragged(l), owners);
+		le.segOwners = owners;
+		// **AND WHICH ROW EACH SEGMENT IS IN.** A STACK IS AS WIDE AS ITS WIDEST ROW, not as wide as
+		// all of them end to end -- which is what getBBox() reports and what shedWidthFor() must
+		// reproduce. Derived by walking the rows composeRows() just built, in the same order it
+		// pushed the owners, so the two lists cannot describe different shapes.
+		var segRow = [], ri, ci;
+		for (ri = 0; ri < rows.length; ri++) {
+			for (ci = 0; ci < rows[ri].length; ci++) { segRow.push(ri); }
+		}
+		le.segRow = segRow;
 		setMultilineText(le.text, linkLabelBase(l).x, rows);
 		le.text.style.fontSize = fsNow;
 		(le.repeats || []).forEach(function (r) { r.text.style.fontSize = fsNow; });
@@ -552,6 +566,103 @@ var EngCalcs = EngCalcs || {};
 		try { noteMeasuredWidth(holder, holder.text.getBBox().width); }
 		catch (err) { /* pre-layout measurement can throw; the stale tw stands */ }
 		noteRowWidths(holder);
+	}
+	/**
+	 * **PRICE A KEEP-SET WITHOUT REDRAWING IT** (ROADMAP Task 436; Tom relaxed the byte-identical
+	 * bar 2026-09-06: *"Relax it."*).
+	 *
+	 * THE PROBLEM. The crowding cascade in shedAlignedForConflicts() drops one value, redraws the
+	 * label, measures it, and asks again. Every measurement is a getBBox(), which is a LAYOUT READ
+	 * taken between two DOM writes, so it forces a synchronous layout of the whole drawing. Measured
+	 * in Chromium on a 736-element geographic grid: 1,391 getBBox calls in one wheel notch,
+	 * 1,076-1,672 ms, 73-79% of the whole block, and a 1-in-7 stack sample put 198 of 198 samples in
+	 * this one loop.
+	 *
+	 * THE FIX. Measure each SEGMENT once at full content -- which noteRowWidths() now banks for free,
+	 * because it already reads every tspan -- and add the survivors up. Every rung after the first is
+	 * then arithmetic and the label is written and measured ONCE, at the content it settles on.
+	 *
+	 * **WHY THE CALIBRATION `k`, AND WHY IT IS NOT EXACT.** getBBox() returns the INK box;
+	 * getComputedTextLength() returns the ADVANCE width. They differ by the side bearings at the two
+	 * ends -- measured at 0.636% mean and 1.801% worst on that same grid -- so a raw sum is not the
+	 * number every other consumer of this label uses. `k = box / sum` at full content puts the sum
+	 * into the box's own units. It is second-order rather than zero, because shedding changes WHICH
+	 * GLYPH IS LAST and therefore which bearing k was correcting for. **There is no arithmetic that
+	 * is exact here**; that is the trade Tom accepted, and the tolerance is bounded by that 1.8%.
+	 *
+	 * **A SEPARATOR IS PRICED THE WAY IT IS COMPOSED, not counted.** composeRows() puts one before
+	 * every line after the first, so a keep-set of n survivors carries n-1 of them -- and this walks
+	 * the owner list rather than assuming, so a future change to how rows are composed cannot leave
+	 * a stale arithmetic rule behind it.
+	 *
+	 * Returns null when it cannot price the set -- no banked widths, a length mismatch, a zero sum --
+	 * and every caller falls back to redrawing. **Refusing to guess is the whole safety property:**
+	 * a wrong width here is a label that sheds a value it should have kept, silently.
+	 */
+	function shedWidthFor(le, keep, all) {
+		var segW = le.segW, owners = le.segOwners, rowOf = le.segRow, i, r;
+		if (!segW || !owners || !rowOf) { return null; }
+		if (segW.length !== owners.length || segW.length !== rowOf.length || !segW.length) { return null; }
+		/**
+		 * **THE OWNERS INDEX WHAT IS DRAWN; THE KEEP-SET INDEXES THE FULL LIST. THEY ARE NOT THE
+		 * SAME LIST, AND ASSUMING THEY WERE IS THE DEFECT THIS HARNESS CAUGHT.**
+		 *
+		 * A label reaching the crowding cascade has often already shed in the LENGTH cascade, so
+		 * `le.lines` is a subset of `le.allLines` and the banked segments describe that subset. The
+		 * first version priced `keep[owners[i]]` directly and so read a 9-line keep-set with
+		 * 2-line owners -- an 88.8% error that looked like a bearing problem and was a wiring one.
+		 *
+		 * The map is recoverable because keptLines() filters in order and never reorders: walking
+		 * `all` and `le.lines` together pairs each drawn line with its index in the full list.
+		 */
+		var lines = le.lines, at = [], ai = 0, j;
+		if (!lines || !lines.length) { return null; }
+		if (all && all.length) {
+			for (j = 0; j < lines.length; j++) {
+				while (ai < all.length && all[ai] !== lines[j]) { ai++; }
+				if (ai >= all.length) { return null; }   // not a subset in order: refuse
+				at.push(ai++);
+			}
+		} else {
+			for (j = 0; j < lines.length; j++) { at.push(j); }
+		}
+		function survives(owner) { return owner >= 0 && owner < at.length && !!keep[at[owner]]; }
+		// **A STACK IS AS WIDE AS ITS WIDEST ROW.** Summing every segment made a nine-row label nine
+		// times too wide, which is exactly the defect shed-pricing-harness.js caught on its first
+		// run -- an 88.9% error, which is 8/9 and not a bearing shift. Both the calibration and the
+		// priced subset are therefore per-row maxima, the same shape getBBox() reports.
+		function widest(useKeep) {
+			var byRow = {}, kept = {}, n, sepSeen = {};
+			for (n = 0; n < segW.length; n++) {
+				r = rowOf[n];
+				if (byRow[r] === undefined) { byRow[r] = 0; kept[r] = 0; }
+				if (owners[n] === -1) {
+					// A separator only earns its width when a value survives on BOTH sides of it,
+					// which is what composeRows() would produce; counted below.
+					if (sepSeen[r] === undefined) { sepSeen[r] = segW[n]; }
+					continue;
+				}
+				if (useKeep && !survives(owners[n])) { continue; }
+				byRow[r] += segW[n];
+				kept[r] += 1;
+			}
+			var best = 0, kk;
+			for (kk in byRow) {
+				if (!Object.prototype.hasOwnProperty.call(byRow, kk)) { continue; }
+				var w = byRow[kk];
+				if (kept[kk] > 1 && sepSeen[kk]) { w += (kept[kk] - 1) * sepSeen[kk]; }
+				if (w > best) { best = w; }
+			}
+			return best;
+		}
+		var full = widest(false);
+		if (!(full > 0)) { return null; }
+		// The box every other consumer uses, in the same pixel units the segments are in.
+		var boxPx = (typeof le.twPx === 'number' && isFinite(le.twPx)) ? le.twPx : null;
+		if (boxPx === null || !(boxPx > 0)) { return null; }
+		var sub = widest(true);
+		if (!(sub > 0)) { return null; }
+		return (boxPx / full) * sub;
 	}
 	function renderLinkLabel(le, l, lines, fsNow) {
 		var rows = writeLabelGlyphs(le, l, lines, fsNow);
@@ -624,6 +735,30 @@ var EngCalcs = EngCalcs || {};
 				return stationedLabelBox(l, le, le.alignedAlong === undefined ? 0.5 : le.alignedAlong,
 					labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), fs);
 			}
+			// **THE CASCADE IS ARITHMETIC NOW, AND IT WRITES ONCE** (Task 436). It used to redraw and
+			// re-measure at every rung, and that loop was 73-79% of a wheel notch on a 736-element
+			// grid -- 198 of 198 stack samples. shedWidthFor() prices a keep-set from segment widths
+			// banked at full content, so the decision costs no layout at all; only the content it
+			// SETTLES ON is written, and only then is the label measured.
+			//
+			// **THE FALLBACK IS THE OLD BEHAVIOUR, NOT AN APPROXIMATION.** If the widths are not
+			// banked -- a first pass, a label whose glyphs a caller wrote by another route -- pricing
+			// returns null and the rung redraws exactly as it always did. Slower and correct beats
+			// fast and guessing, and it means this optimisation can never make a label WRONG, only
+			// occasionally re-measured.
+			var priced = 0;
+			while (gone < order.length - 1) {
+				var wNext = shedWidthFor(le, shedKeepSet(all, order, gone), all);
+				if (wNext === null) { break; }                       // fall through to the old loop
+				var probe = stationedLabelBox(l, le, le.alignedAlong === undefined ? 0.5 : le.alignedAlong,
+					wNext / (state.s || 1), dataLabelBoxHeight(rowsForKeep(all, order, gone, l)), fs);
+				if (boxIsClear(probe, obs, pad)) { break; }
+				gone++; priced++;
+			}
+			// One write and one measurement, at the content the arithmetic chose.
+			if (priced) { renderLinkLabel(le, l, keptLines(all, shedKeepSet(all, order, gone)), fsNow); }
+			// Whatever the arithmetic could not price, the original loop still finishes exactly as
+			// it did -- including the case where nothing was priced at all.
 			while (gone < order.length - 1 && !boxIsClear(boxNow(), obs, pad)) {
 				gone++;
 				renderLinkLabel(le, l, keptLines(all, shedKeepSet(all, order, gone)), fsNow);
@@ -737,6 +872,19 @@ var EngCalcs = EngCalcs || {};
 		shedToSegmentBatch(work, fsNow);
 		work.forEach(function (rec) { rec.le.shedCount = rec.all.length - rec.le.lines.length; });
 		shedAlignedForConflicts(fsNow, fs);
+	}
+	/**
+	 * How many ROWS a keep-set would draw, without composing them. A stacked label draws one row per
+	 * surviving line; an unstacked one is a single row however many values it carries -- which is
+	 * composeRows()'s own rule, read here rather than restated, so the two cannot drift.
+	 * Needed because the height of the probe box is part of the conflict test, and the arithmetic
+	 * cascade never builds the rows it is pricing.
+	 */
+	function rowsForKeep(lines, order, gone, l) {
+		var keep = shedKeepSet(lines, order, gone), n = 0, i;
+		for (i = 0; i < lines.length; i++) { if (keep[i]) { n++; } }
+		if (!n) { return 1; }
+		return (labelIsDragged(l) || n < 2) ? n : 1;
 	}
 	// The keep-set after `gone` sheds: the first `gone` entries of the worst-first order are out.
 	function shedKeepSet(lines, order, gone) {
@@ -2162,18 +2310,23 @@ var EngCalcs = EngCalcs || {};
 	// in pixels does not change with the zoom, so re-measuring on every wheel notch is a forced
 	// synchronous layout per label per notch, and Net3 has ~220 of them.
 	function noteRowWidths(holder) {
-		var t = holder && holder.text, out = [], i, c, w, hasX;
-		if (!t || !t.childNodes) { holder.rowW = null; holder.rowWPx = null; return; }
+		var t = holder && holder.text, out = [], seg = [], i, c, w, hasX;
+		if (!t || !t.childNodes) { holder.rowW = null; holder.rowWPx = null; holder.segW = null; return; }
 		for (i = 0; i < t.childNodes.length; i++) {
 			c = t.childNodes[i];
 			if (c.nodeType !== 1 || !c.getAttribute) { continue; }
 			w = 0;
 			try { w = c.getComputedTextLength(); } catch (err) { w = 0; }
+			// **THE PER-SEGMENT WIDTHS RIDE ALONG FOR FREE** (Task 436). This loop already reads
+			// every tspan; keeping the individual figures as well as the row sums costs one array
+			// and no extra layout, and it is what lets the shed cascade below stop redrawing.
+			seg.push(w);
 			hasX = c.getAttribute('x') != null;
 			if (hasX || !out.length) { out.push(w); } else { out[out.length - 1] += w; }
 		}
 		holder.rowW = out;
 		holder.rowWPx = out.map(function (v) { return v * (state.s || 1); });
+		holder.segW = seg;
 	}
 	// null -- not an empty array -- when there is nothing to say, so a caller can hand it straight to
 	// js/lpn-collide.js, whose `lines` is optional and whose absence means "use the whole box".
@@ -20097,7 +20250,21 @@ var EngCalcs = EngCalcs || {};
 			// but it is no longer taking a slot on the one strip where width is scarce
 			// (dev/toolbar-icons.md). setIconLabel() also adds .ec-help, which is what makes the tip
 			// reachable by a tap-and-hold as well as a hover (EngCalcs.initTips(), re-run below).
-			setIconLabel(btn, t.icon, pc[t.key] || t.mode, t.tip);
+			// **THE KEY IS NAMED ON THE BUTTON'S OWN TIP** (Task 595). A binding nobody can find is a
+			// binding nobody uses, and the tip is where a person already looks to ask what a button
+			// is. Appended rather than written into each of the eight strings, so the mapping has
+			// ONE home (LPN_TOOL_KEYS) and no translator has to keep a digit in step with it.
+			// Nothing is appended for a button with no key, and nothing changes for a mouse user.
+			var keyForMode = null, kk;
+			for (kk in LPN_TOOL_KEYS) {
+				if (Object.prototype.hasOwnProperty.call(LPN_TOOL_KEYS, kk) && LPN_TOOL_KEYS[kk] === t.mode) { keyForMode = kk; }
+			}
+			var tipText = t.tip;
+			if (keyForMode) {
+				tipText = (tipText ? tipText + ' ' : '')
+					+ (pc.lpn_tool_key_hint || 'Shortcut: press {key}.').replace('{key}', keyForMode);
+			}
+			setIconLabel(btn, t.icon, pc[t.key] || t.mode, tipText);
 			btn.setAttribute('aria-pressed', t.mode === mode ? 'true' : 'false');
 			btn.addEventListener('click', function () {
 				// Clicking the already-active tool toggles back to Select (Tom) rather than
@@ -29079,6 +29246,47 @@ var EngCalcs = EngCalcs || {};
 	document.addEventListener('keydown', function (e) {
 		if (isTextEntry(e.target)) { return; }
 		if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+	});
+
+	/**
+	 * **A DIGIT PICKS A TOOL** (ROADMAP Task 595). One keystroke instead of a trip to the toolbar,
+	 * for the person adding a one-off asset without reaching for the mouse.
+	 *
+	 * **THE NUMBERS ARE epanet-js's, AND MATCHING THEM IS THE WHOLE POINT** (Tom, 2026-09-06, read
+	 * out of the running product): 1 Select, 2 Junction, 3 Reservoir, 4 Tank, 5 Pipe, 6 Pump,
+	 * 7 Valve, 8 Customer. Every object we share, we bind to the same digit they do, so an EPANET
+	 * user's fingers already know this page. **8 IS DELIBERATELY LEFT EMPTY** -- it is theirs for
+	 * Customer, which is our Task 247, and taking it for something else now would mean moving a
+	 * binding people had learned. Text is ours alone and takes 9.
+	 *
+	 * **DIGITS RATHER THAN INITIALS, and the first proposal was initials.** The `data-entry-clerk`
+	 * proposed J R T P U V X and named its own two collisions: `U` for pump because `P` was Pipe,
+	 * `X` for Text because `T` was Tank -- in a suite where `X` already reads as close/remove. A
+	 * digit has no mnemonic to collide with, cannot be mistaken for typing a word, and numbers the
+	 * tools in the toolbar's own order, so the key IS the position.
+	 *
+	 * **THE GUARD IS THE ONE Ctrl+Z ALREADY USES, and that is not laziness.** `isTextEntry()` is
+	 * proven on exactly this hazard, which is Tom's own (*"It was scary when I entered an unknown
+	 * node"*). A bare digit is the cheapest thing to type by accident, so a second, subtly
+	 * different predicate would be two answers to one question.
+	 *
+	 * **MODIFIED CHORDS ARE NOT OURS.** Ctrl/Alt/Meta+digit is the browser's tab switcher on every
+	 * desktop platform; taking it would be taking something the user needs more than this.
+	 *
+	 * MUFFLEABLE for free: this calls the same setMode() the toolbar buttons call, so a mouse-only
+	 * user is unaffected and nothing new is created, drawn or stored.
+	 */
+	var LPN_TOOL_KEYS = {
+		'1': 'select', '2': 'add-junction', '3': 'add-reservoir', '4': 'add-tank',
+		'5': 'add-pipe', '6': 'add-pump', '7': 'add-valve', '9': 'add-text'
+	};
+	document.addEventListener('keydown', function (e) {
+		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
+		if (isTextEntry(e.target)) { return; }
+		var m = LPN_TOOL_KEYS[e.key];
+		if (!m) { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		setMode(m);
 	});
 
 	// ---- solve: EngCalcs.lpnSolve() (js/lpn-solver.js), debounced on every edit ----

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1688,
-        "delta_key_count": 16,
+        "expected_key_count": 1689,
+        "delta_key_count": 17,
         "exempt_key_count": 34,
         "exempt_keys": [
             "u_imgd",
@@ -518,6 +518,7 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_tool_key_hint": "Shortcut: press {key}.",
         "lpn_field_tag": "Tag",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day",
@@ -536,6 +537,7 @@
         "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
     },
     "keys": {
+        "lpn_tool_key_hint": "Shortcut: press {key}.",
         "lpn_field_tag": "Tag",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day",
@@ -554,6 +556,22 @@
         "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
     },
     "key_context": {
+        "lpn_tool_key_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_size_prompt",
+                    "value": "ပရောဂျက်တစ်ခုလုံးတွင် နေရာသည် အကျယ်မည်မျှရှိသနည်း?",
+                    "english": "About how wide is the site, across the whole project?"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_add_junction_tip",
+                    "value": "ဆက်စပ်နေရာ ထည့်ရန် မြေပုံကို နှိပ်ပါ - ပိုက်လိုင်းများ ဆုံသည့်နေရာ (သို့) ရေသုံးစွဲသည့်နေရာ။",
+                    "english": "Click the map to add a junction: a point where pipes meet or where water is used."
+                }
+            }
+        },
         "lpn_field_tag": {
             "reason": "equal_to_english",
             "current_value": "Tag",

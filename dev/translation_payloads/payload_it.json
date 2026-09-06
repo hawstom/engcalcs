@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1688,
-        "delta_key_count": 15,
+        "expected_key_count": 1689,
+        "delta_key_count": 16,
         "exempt_key_count": 37,
         "exempt_keys": [
             "calc_units_us",
@@ -521,6 +521,7 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_tool_key_hint": "Shortcut: press {key}.",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_reaction_order_bulk": "Bulk reaction order",
@@ -538,6 +539,7 @@
         "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
     },
     "keys": {
+        "lpn_tool_key_hint": "Shortcut: press {key}.",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_reaction_order_bulk": "Bulk reaction order",
@@ -555,6 +557,22 @@
         "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
     },
     "key_context": {
+        "lpn_tool_key_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tip_join",
+                    "value": "{name}: {tip}",
+                    "english": "{name} — {tip}"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_add_junction_tip",
+                    "value": "Fai clic sulla mappa per aggiungere un nodo: un punto dove le tubazioni si incontrano o dove l'acqua viene utilizzata.",
+                    "english": "Click the map to add a junction: a point where pipes meet or where water is used."
+                }
+            }
+        },
         "lpn_find_q_and": {
             "reason": "equal_to_english",
             "current_value": "AND",

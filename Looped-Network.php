@@ -1728,6 +1728,7 @@ EngCalcs.pageConfig = {
 	lpn_georef_twopt_done: <?=json_encode($ec_lang['lpn_georef_twopt_done'])?>,
 	lpn_tip_join: <?=json_encode($ec_lang['lpn_tip_join'])?>,
 	lpn_tool_add_junction_tip: <?=json_encode($ec_lang['lpn_tool_add_junction_tip'])?>,
+	lpn_tool_key_hint: <?=json_encode($ec_lang['lpn_tool_key_hint'])?>,
 	lpn_tool_add_reservoir_tip: <?=json_encode($ec_lang['lpn_tool_add_reservoir_tip'])?>,
 	lpn_tool_add_tank_tip: <?=json_encode($ec_lang['lpn_tool_add_tank_tip'])?>,
 	lpn_tool_add_pipe_tip: <?=json_encode($ec_lang['lpn_tool_add_pipe_tip'])?>,

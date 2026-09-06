@@ -1418,6 +1418,10 @@ $ec_lang['lpn_georef_size_prompt']='About how wide is the site, across the whole
 // One separator string, one composition site: a language that wants a colon, another dash, or the
 // explanation first changes this and nothing else.
 $ec_lang['lpn_tip_join']='{name} — {tip}';
+// **ONE STRING FOR EIGHT BUTTONS** (Task 595). The digit is substituted at render time from
+// LPN_TOOL_KEYS, so the mapping has a single home and no translator has to keep a number in step
+// with a keyboard handler. It is appended to each tool's own tip rather than written into it.
+$ec_lang['lpn_tool_key_hint']='Shortcut: press {key}.';
 $ec_lang['lpn_tool_add_junction_tip']='Click the map to add a junction: a point where pipes meet or where water is used.';
 $ec_lang['lpn_tool_add_reservoir_tip']='Click the map to add a reservoir: an infinite source with a fixed water level.';
 $ec_lang['lpn_tool_add_tank_tip']='Click the map to add a tank: storage whose water level rises and falls as it fills and empties.';
@@ -2537,6 +2541,15 @@ $ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
 $ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';
+// **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
+// this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
+// collided with the word the same sprint used for lpn_result_concentration, on the same screen.
+// Tom approved a synonym on 2026-09-06. **HIS FIRST WORDING WAS 'Relative rate of diffusion' and it
+// is NOT what shipped**: that is diffusivity, and this key is viscosity. He was given a friction
+// entry that quoted a translator's mistaken description of the key without anyone checking it
+// against this file -- so the note below says what the number IS and what it is NOT, because two
+// separate readers have now reached for a transport coefficient on a fluid property.
+$ec_lang_syn['lpn_settings_viscosity']='Relative thickness of the fluid, Fluid viscosity compared with water | how thick the fluid is compared with water at 20 C. NOT a concentration and NOT a diffusivity; it changes the friction factor under Darcy-Weisbach and nothing else.';
 $ec_lang['lpn_settings_viscosity_tip']='The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.';
 $ec_lang['lpn_settings_trials']='Maximum trials';
 $ec_lang['lpn_settings_trials_tip']='How many trials are allowed before the solver gives up on a network that will not converge.';
