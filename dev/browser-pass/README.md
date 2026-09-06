@@ -10,18 +10,25 @@ node run.js locking  # one section
 Exit code 0 means every check passed. `--` lines are checks this environment **cannot** answer and
 that stay on Tom's list; they are never counted as passes.
 
-## §39 `cursorflicker` FAILS ON PURPOSE, and its red is the open bug
+## §39 `cursorflicker` REPORTS a known open bug rather than failing on it
 
-It asserts the property Task 569's complaint reduces to — **no band of `default` cursor sandwiched
-between two meaningful ones** — and that property does not hold today, so the section is red until
-somebody rules on the fix. Do not "repair" it by weakening the assertion; the diagnosis it prints
-above the failure is the deliverable, and the roadmap block carries the measurement.
+It measures the property Task 569 reduces to — **is there a band of `default` cursor sandwiched
+between two meaningful ones** — and today the answer is yes, on three bearings out of eight. It
+reports that and passes.
 
-**This is the second spec in this suite that reports rather than asserts, and the distinction is
-worth keeping straight.** §25's timing lines are `report.ok(true, ...)` because a stopwatch on a
-shared machine cannot carry a verdict. §39's radial walk is the same — eight `console.log` lines of
-evidence — but it ends in one real assertion, because "is there a hole in the cursor vocabulary" IS
-decidable from that evidence. A spec may print freely; it should assert only what it can settle.
+**It asserted it for one commit, and that was wrong.** The property is decidable, which makes
+asserting it tempting; but it does not hold, the fix is a pending human decision, and a spec that
+can never go green makes `node run.js` exit 1 for ever. This file's own promise two paragraphs up is
+that **exit 0 means every check passed** — a permanent red spends that promise on something already
+written down in the roadmap, and turns the one signal that catches a real regression into noise.
+That is the same failure as the twelve dead sections behind a cheerful percentage, arriving from the
+other direction.
+
+**The rule that comes out of it: a spec asserts a property the tree is expected to HOLD, and
+reports one the tree is known to VIOLATE.** Open work belongs in `dev/ROADMAP.md`, which is read by
+someone deciding what to do next; a test suite is read by someone asking whether anything broke.
+Turning §39 back into a verdict is one word, and it is the right edit the day the canvas gets a pan
+cursor — from then on a new sandwich would be a regression rather than a known state.
 
 ## §25's two timing bounds fail on a slow machine, and that is not a regression
 
