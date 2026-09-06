@@ -99,21 +99,6 @@ the block.
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
 
-- 100|593| **[AI] Five water-quality settings a file can state and no control can show.**
-  **RAISED TO 100 by Tom, 2026-09-06:** *"Good catch."*
-  Found 2026-09-06 while closing Task 581, by surveying rather than by testing. Net2 and Net3 both
-  state `Order Bulk`, `Order Tank`, `Order Wall`, `Limiting Potential` and `Roughness Correlation`.
-  **All five parse, all five round-trip byte for byte, and all five reach the EPANET engine** -- so
-  nothing is lost and nothing is wrong. What is missing is a reader: `settingsChemicalRows()` offers
-  only `globalBulk` and `globalWall`, so a person opening one of EPA's own networks cannot see five
-  numbers their file states and their answers depend on.
-  - **It is the same shape as Task 581 and the same answer applies:** the document already knows,
-    and the gap is delivery. Five rows in the Water quality section of Settings, sparse the way its
-    neighbours are, is the whole of it.
-  - **`Limiting Potential` and `Roughness Correlation` are the two worth reading EPANET on first** --
-    each changes what a reaction coefficient MEANS rather than scaling it, so a row that shows the
-    number without its tip would be worse than no row.
-
 - 75|595| **A keyboard door to a new asset, and the keys to bind to seven of them.**
   Tom, 2026-09-06: *"Data entry clerk: They requested keys for adding assets. Did you lose that? I
   asked for it to be added to our roadmap. And research conventions for keys to bind to the 6

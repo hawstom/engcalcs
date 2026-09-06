@@ -24998,6 +24998,60 @@ var EngCalcs = EngCalcs || {};
 		coeffRow('globalWall', (pc.lpn_reaction_wall || 'Wall reaction coefficient')
 			+ ' (' + unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day') + ')',
 		pc.lpn_reaction_wall_tip);
+		/**
+		 * **THE FIVE A FILE CAN STATE AND NOTHING COULD SHOW** (Task 593). Net2 and Net3 both state
+		 * all five; every one already parsed, round-tripped byte for byte and reached the engine, so
+		 * nothing was lost and nothing was wrong. What was missing was a READER -- a person opening
+		 * one of EPA's own networks could not see five numbers their own answers depend on. Same
+		 * shape as Task 581 and the same answer: the document already knows, the gap is delivery.
+		 *
+		 * **THEY GO THROUGH coeffRow(), so blank stays a STATE and not a zero** -- clearing the box
+		 * removes the key, the exporter writes no line, and EPANET's own default stands.
+		 *
+		 * **THESE ARE NOT COEFFICIENTS AND THAT IS WHY EACH TIP EARNS ITS PLACE.** An order and a
+		 * limiting potential change what a coefficient MEANS rather than scaling it, so a row
+		 * showing the bare number would be worse than no row at all.
+		 *
+		 * **NONE OF THEM IS CONVERTED, and engineQuality() is the reason it stays that way.** Only
+		 * `globalWall` is a length, and only at order 1; an order is a dimensionless exponent, a
+		 * limiting potential is a concentration (which EPANET converts for nobody), and the
+		 * roughness correlation is a ratio. Adding a unit to any of these would be the third
+		 * conversion site the unit paradigm forbids.
+		 */
+		coeffRow('orderBulk', pc.lpn_reaction_order_bulk || 'Bulk reaction order',
+			pc.lpn_reaction_order_bulk_tip);
+		coeffRow('orderTank', pc.lpn_reaction_order_tank || 'Tank reaction order',
+			pc.lpn_reaction_order_tank_tip);
+		// **ORDER WALL IS 0 OR 1 AND NOTHING ELSE**, which is EPANET's own restriction rather than
+		// ours, so it is a chooser and not a number box -- a spinner that accepts 2 would offer a
+		// value the engine refuses. Blank is still the third state and still means "not stated".
+		var wallOrder = document.createElement('select');
+		[['', pc.lpn_reaction_order_unstated || 'Not stated'],
+			['0', pc.lpn_reaction_order_zero || '0, zero order'],
+			['1', pc.lpn_reaction_order_first || '1, first order']].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			wallOrder.appendChild(opt);
+		});
+		var curWallOrder = (settings.reactions || {}).orderWall;
+		wallOrder.value = (curWallOrder === 0 || curWallOrder === 1) ? String(curWallOrder) : '';
+		wallOrder.addEventListener('change', function () {
+			if (!settings.reactions) { settings.reactions = { tank: {} }; }
+			if (wallOrder.value === '') { delete settings.reactions.orderWall; }
+			else { settings.reactions.orderWall = parseInt(wallOrder.value, 10); }
+			saveToStorage();
+			// **REBUILD, unlike the number rows.** The wall ORDER decides whether engineQuality()
+			// treats the wall coefficient as a length, so the row above it can mean something
+			// different the moment this changes and its label must be re-read.
+			rebuildSettingsBox();
+			scheduleSolve();
+		});
+		rowFn(host, pc.lpn_reaction_order_wall || 'Wall reaction order', wallOrder,
+			pc.lpn_reaction_order_wall_tip);
+		coeffRow('limitingPotential', pc.lpn_reaction_limiting || 'Limiting potential',
+			pc.lpn_reaction_limiting_tip);
+		coeffRow('roughnessCorrelation', pc.lpn_reaction_rough_corr || 'Roughness correlation',
+			pc.lpn_reaction_rough_corr_tip);
 		if (noteFn) { noteFn(host, pc.lpn_reaction_note || 'This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.'); }
 	}
 	/**
