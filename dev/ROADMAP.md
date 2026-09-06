@@ -612,8 +612,19 @@ the block.
       property and goes on proving it at zero.
   - **THE TRANSFERABLE METHOD, and the reason this stays open:** re-reading `CLAUDE.md` cannot find
     a rule nobody wrote down. Row 32 came from COUNTING a repeated construct in the source and
-    asking what writing it 892 times assumes. Next pass does that to `js/` and `lib/` as well as
-    re-reading the prose.
+    asking what writing it 892 times assumes.
+  - **THE METHOD RAN AGAIN ON 2026-09-06 AND PRODUCED FOUR MORE ROWS, 35-38, none of which came
+    from re-reading anything.** 35: 71 browser dialogs carry 37 keys and **999 values reached the
+    hardest plain-text sink in the suite** with rule B unable to see one -- a dialog does not
+    degrade a tag, it shows it. 36: the service worker's scope covered one of the two paths the
+    suite is now served at, and the failure has NO symptom in any browser. 37: six log writers all
+    obey a rule `CLAUDE.md` states and nothing held, where an unmarked row does not read as
+    unlabelled but JOINS the deduplicated people. 38: 25 new-tab links, 13 with `rel="noopener"`
+    and 12 without, **the tree having decided the same question twice in opposite directions**.
+  - **THREE OF THE FOUR ARE RATCHETS AT ZERO, AND THAT IS THE FINDING, NOT A DISAPPOINTMENT.** A
+    rule being FOLLOWED and enforced by nothing is invisible to every audit that looks for defects;
+    only counting the construct finds it. The one that was already violated (38) was violated
+    exactly half the time, which is what an unwritten rule looks like from the outside.
   - **Row 13's own worst offender was this block**, at 201 lines against a 15-line cap, until it
     was compressed on 2026-09-06.
 
