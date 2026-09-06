@@ -64,7 +64,7 @@ the block.
     with storage the UTILITY controls — *"the moment 'the link' is something we host, it has become
     the cloud-login proposal in a smaller costume."* Full record in both agents' journals.
 
-- 25|588| **Do Delete and Vertices want the same two ways out?**
+- 25|589| **Do Delete and Vertices want the same two ways out?**
   The two exits that shipped 2026-09-05 -- a link click and Escape -- cover the six add-* tools
   only, because that is what Tom named when he said entry mode. A link CLICK
   cannot join them -- deleting the pipe and bending it are what those two tools are for -- but

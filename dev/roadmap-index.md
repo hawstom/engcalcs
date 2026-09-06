@@ -68,7 +68,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 574 — What is left of the `.net` slot map: nine slots nothing identifies.
-- Task 588 — Do Delete and Vertices want the same two ways out?
+- Task 589 — Do Delete and Vertices want the same two ways out?
 
 ## 5 — Parked (17)
 
