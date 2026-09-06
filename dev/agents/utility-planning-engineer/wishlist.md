@@ -37,6 +37,78 @@ to decline or downrank.** Full correction: journal, 2026-08-25.
 
 ---
 
+## 2026-09-06 — Ranking Tasks 599, 600, 601, 603, 578 (Tom's own EPANET-menu reading, not a row I found)
+
+Not something I proposed — five roadmap rows Tom filed himself out of reading EPANET's plot and
+report menus, asked to rank against each other from this seat. Full citations: journal,
+2026-09-06 entry. My order, highest value to a design-and-planning engineer first:
+
+1. **599 (time series across an EPS run) and 603 (name the nodes on the profile axis) — tied at the
+   top, for different reasons.** 599 is net-new capability this suite genuinely lacks and every
+   published master-plan hydraulic chapter I have read (SBMWD, Squamish, Astoria) reports results
+   this way; 603 is cheap and closes a real deficiency in a feature ALREADY SHIPPED — a profile with
+   no node names answers "where is the low point" and cannot answer "which junction is it," which is
+   the one thing a profile is read aloud for. Both are readers over state the page already holds, so
+   both are cheap relative to what they unlock — the reason I will not force a strict order between
+   them.
+2. **The frequency-distribution and system-flow-balance thirds of Task 600.** Cheap (a sort/bucket
+   and a running sum, respectively, per the roadmap's own text), and a histogram of system-wide
+   pressure or velocity is a real master-plan exhibit ("what fraction of the system is below 40
+   psi") that this suite cannot produce today in any form, one node at a time or otherwise.
+3. **578 (fire flow's leftover EPS-frame and Run-concept phases).** Real, but this is the tail of an
+   already-shipped task (530), not a new capability — **and I ranked this exact phase LAST of five
+   in my own 2026-08-27 fire-flow phasing** (Promoted section below), for the same reason: it is the
+   phase furthest from the question a design engineer is actually asked most often. I am not
+   reversing that now just because Tom filed it as its own row.
+4. **The contour third of Task 600 — ranked below its own row-mates, and this is a place I think the
+   priority overstates the value relative to the risk.** It is the one Tom starred as "very cool,"
+   and it is also the most expensive of the three (real geometry, real interpolation, a genuine
+   unknown the roadmap itself names) and the one with the clearest failure mode if built carelessly.
+   Full reasoning on the unknown itself: journal, 2026-09-06.
+5. **601 (calibration files).** Real and, when it lands, the single thing that would most credibly
+   move this suite's output toward what a master-plan-cycle utility actually submits — but it is
+   also the least mature idea of the five (the roadmap's own text says "read EPANET's help first"),
+   the first time this suite would ingest ANY number from outside the model, and its own roadmap
+   block says it is "worth far more once Task 599 exists." Sequence it last for that reason, not
+   because the eventual feature is unimportant.
+
+**The one finding worth carrying forward on its own: the biggest absence in what I could hand a
+reviewer TODAY is Task 599, not contour and not calibration.** Full case: journal, 2026-09-06. This
+suite can already solve an average-day/max-day/peak-hour EPS run; it cannot hand over a chart of one
+node's pressure across that run without scrubbing the transport frame by frame and re-typing
+numbers — which is not something I would submit, and not something I would ask a reviewer to
+reconstruct either.
+
+**The contour unknown, answered as an engineer, not merely relayed:** never extrapolate a filled
+contour past the convex hull of the nodes carrying the value being contoured (Delaunay triangulation
+over node XY — `matplotlib`'s own `tricontourf` is the open-source example of the convention), and
+draw the node points on top of the fill always, so a reader can see how sparse the support actually
+is rather than trust a smooth surface implying more data than exists. **CITED**, the closest
+documented analog — groundwater contour mapping, the same sparse-point-over-an-area problem — says
+ordinary triangular-linear interpolation needs on the order of 200+ evenly distributed points to be
+reliable and produces "ghost holes" and spurious facets below ~20 sparse points (Sundaram, LinkedIn,
+search-surfaced, secondary). **I have not personally watched a contour mislead a reader or a
+council** — I have no field experience to draw that from, and I say so rather than borrowing the
+weight of witnessed evidence I do not have. **SPECULATION, mine, worth re-deriving before quoting:**
+that analog's own reliability threshold sits astride this suite's own target scale (~10-20 nodes,
+200 headroom), meaning a filled contour is closer to honest at the 2,000-node scale I actually work
+at than at the small end this suite mainly serves — the opposite of the usual direction a scale
+argument runs here.
+
+**On what a submitted report needs, asked directly, and this is where I would not oversell this
+suite:** a full calibrated, system-wide master-plan hydraulic model for a 2,000-node utility is
+EPANET/WaterCAD/InfoWater territory and I would say so to Tom without hedging — this suite is not
+built to compete there, on its own scope doc's own terms. What I would actually reach for it for,
+even at that scale, is a fast scenario comparison or a fire-flow spot-check on one proposed
+extension into a zone somebody else has already modeled and calibrated — the "new pipe submittal"
+case this suite has targeted from the start (journal, 2026-08-24). Ranked by absence, in the order I
+would notice them missing from a report: (1) a time-series chart across an EPS run — Task 599 — the
+single biggest gap today; (2) a system-wide fire-flow table/map — wishlist row 3 below, still
+unbuilt; (3) calibration against field data — Task 601 — the credibility step every real master-plan
+source I have read treats as load-bearing, and one this suite has never attempted in any form.
+
+---
+
 ## My order (2026-08-25 pass, re-ranked after Tom's reply)
 
 **Whether these were "really wanted," plainly, per Tom's question:** the four rows added in the

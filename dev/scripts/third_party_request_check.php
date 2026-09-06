@@ -124,6 +124,10 @@ const EC_NON_REQUEST_HOSTS = [
     'colorbrewer2.org'       => 'the ColorBrewer credit link in the colour-ramp catalogue.',
     'github.com'             => 'the BIDS/colormap credit link (viridis and its family).',
     'www.epa.gov'            => "the EPANET credit link. EPA's page about the engine we bridge to.",
+    'not-epanet.org'         => "the Help menu's Not EPANET row (Task 596). A window.open() the "
+                              . 'visitor chooses; nothing is fetched and no gate applies.',
+    'librewaternet.org'      => "the Help menu's screenshots row (Task 178). Same shape: a new "
+                              . 'tab the visitor asks for, not a request this page makes.',
 ];
 
 /**

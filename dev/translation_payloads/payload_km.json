@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 1689,
-        "delta_key_count": 1,
+        "expected_key_count": 1691,
+        "delta_key_count": 3,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -515,10 +515,14 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_tool_key_hint": "Shortcut: press {key}."
+        "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_help_not_epanet": "Not EPANET",
+        "lpn_help_screenshots": "Pictures of this page in use"
     },
     "keys": {
-        "lpn_tool_key_hint": "Shortcut: press {key}."
+        "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_help_not_epanet": "Not EPANET",
+        "lpn_help_screenshots": "Pictures of this page in use"
     },
     "key_context": {
         "lpn_tool_key_hint": {
@@ -534,6 +538,38 @@
                     "key": "lpn_tool_add_junction_tip",
                     "value": "ចុចលើផែនទីដើម្បីបន្ថែមថ្នាំង៖ ចំណុចមួយកន្លែងបំពង់ជួបគ្នា ឬកន្លែងប្រើទឹក។",
                     "english": "Click the map to add a junction: a point where pipes meet or where water is used."
+                }
+            }
+        },
+        "lpn_help_not_epanet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_help",
+                    "value": "ជំនួយ",
+                    "english": "Help"
+                },
+                "next_translated": {
+                    "key": "lpn_help_walkthroughs",
+                    "value": "មគ្គុទ្ទេសក៍",
+                    "english": "Walkthroughs"
+                }
+            }
+        },
+        "lpn_help_screenshots": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_help",
+                    "value": "ជំនួយ",
+                    "english": "Help"
+                },
+                "next_translated": {
+                    "key": "lpn_help_walkthroughs",
+                    "value": "មគ្គុទ្ទេសក៍",
+                    "english": "Walkthroughs"
                 }
             }
         }

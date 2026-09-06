@@ -19255,6 +19255,20 @@ var EngCalcs = EngCalcs || {};
 	// the blog is not ours to trust with a window handle. Plural is literal -- the one post contains
 	// three use-case walkthroughs -- so it links straight there rather than to a blog label page.
 	var LPN_WALKTHROUGHS_URL = 'https://tomsthird.blogspot.com/2026/08/hawsedc-free-unlimited-online-looped.html';
+	// The gateway site, and the SCOPED exception to dev/positioning.md §1's ban on naming a
+	// competitor in a menu item (Tom, 2026-09-06, ROADMAP Tasks 591 and 596). It covers EPANET, on
+	// that site, and the link to it from LibreWaterNet and this page -- nothing else, and no live
+	// commercial trademark anywhere. His argument for it: the name is *"deeply honest and quietly
+	// rebuking of name dropping while all the while invoking the EPANET name for SEO."* The row
+	// says where the link GOES and does not restate the site's argument, and nothing here may
+	// imply EPA affiliation, sponsorship or review.
+	var LPN_NOT_EPANET_URL = 'https://not-epanet.org/';
+	// The annotated screenshots, maintained in the LibreWaterNet repository (ROADMAP Task 178
+	// phase 1). Tom, 2026-08-25: *"What points at the live screenshots page? I expected Help, but
+	// that doesn't."* Nothing did -- the page was live, annotated and unreachable from the software
+	// it depicts. Phase 2, a filmstrip showing a GESTURE rather than a state, is a separate thing
+	// and this does not retire it.
+	var LPN_SCREENSHOTS_URL = 'https://librewaternet.org/screenshots.html';
 	// About and Contact are DELIBERATE REPEATS of the suite's own More menu: the navbar is for
 	// somebody choosing a calculator, this is for somebody already inside one. Both reuse the
 	// existing keys, so they cost no new translation and cannot drift from the navbar's wording.
@@ -19283,6 +19297,8 @@ var EngCalcs = EngCalcs || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
 		openMenu(anchor, [
 			{ icon: 'help', label: pc.lpn_help_walkthroughs || 'Walkthroughs', fn: ext(LPN_WALKTHROUGHS_URL) },
+			{ icon: 'help', label: pc.lpn_help_screenshots || 'Pictures of this page in use', fn: ext(LPN_SCREENSHOTS_URL) },
+			{ icon: 'help', label: pc.lpn_help_not_epanet || 'Not EPANET', fn: ext(LPN_NOT_EPANET_URL) },
 			// The page's own Notes, which used to sit below the map (Tom, 2026-08-14). This is the
 			// ONE row in this menu that does not open a new tab, because it does not leave the page
 			// at all -- the notes are still in this document, hidden, and this reveals them. See the

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1689,
-        "delta_key_count": 16,
+        "expected_key_count": 1691,
+        "delta_key_count": 18,
         "exempt_key_count": 37,
         "exempt_keys": [
             "calc_units_us",
@@ -522,6 +522,8 @@
     },
     "keys_to_translate": {
         "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_help_not_epanet": "Not EPANET",
+        "lpn_help_screenshots": "Pictures of this page in use",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_reaction_order_bulk": "Bulk reaction order",
@@ -540,6 +542,8 @@
     },
     "keys": {
         "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_help_not_epanet": "Not EPANET",
+        "lpn_help_screenshots": "Pictures of this page in use",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_reaction_order_bulk": "Bulk reaction order",
@@ -570,6 +574,38 @@
                     "key": "lpn_tool_add_junction_tip",
                     "value": "Fai clic sulla mappa per aggiungere un nodo: un punto dove le tubazioni si incontrano o dove l'acqua viene utilizzata.",
                     "english": "Click the map to add a junction: a point where pipes meet or where water is used."
+                }
+            }
+        },
+        "lpn_help_not_epanet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_help",
+                    "value": "Guida",
+                    "english": "Help"
+                },
+                "next_translated": {
+                    "key": "lpn_help_walkthroughs",
+                    "value": "Esercitazioni",
+                    "english": "Walkthroughs"
+                }
+            }
+        },
+        "lpn_help_screenshots": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_help",
+                    "value": "Guida",
+                    "english": "Help"
+                },
+                "next_translated": {
+                    "key": "lpn_help_walkthroughs",
+                    "value": "Esercitazioni",
+                    "english": "Walkthroughs"
                 }
             }
         },

@@ -807,6 +807,8 @@
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.",
         "lpn_menu_settings": "Settings",
         "lpn_menu_help": "Help",
+        "lpn_help_not_epanet": "Not EPANET",
+        "lpn_help_screenshots": "Pictures of this page in use",
         "lpn_help_walkthroughs": "Walkthroughs",
         "lpn_edit_delete_network": "Delete network",
         "lpn_confirm_delete_network": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.",
@@ -1691,7 +1693,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1689,
+    "count": 1691,
     "active_prefixes": [
         "about",
         "bpn",

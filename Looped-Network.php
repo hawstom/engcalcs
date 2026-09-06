@@ -1885,6 +1885,8 @@ EngCalcs.pageConfig = {
 	lpn_ff_err_not_junction: <?=json_encode($ec_lang['lpn_ff_err_not_junction'])?>,
 	lpn_ff_err_unknown: <?=json_encode($ec_lang['lpn_ff_err_unknown'])?>,
 	lpn_menu_help: <?=json_encode($ec_lang['lpn_menu_help'])?>,
+	lpn_help_not_epanet: <?=json_encode($ec_lang['lpn_help_not_epanet'])?>,
+	lpn_help_screenshots: <?=json_encode($ec_lang['lpn_help_screenshots'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
 	<?php // Reused verbatim from the suite navbar, not re-keyed: same words, same two pages, already
 	      // translated in all 27 languages. See the concept-level label reuse rule in CLAUDE.md. ?>

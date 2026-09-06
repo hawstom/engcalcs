@@ -14,6 +14,78 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-09-06 — Ranked Tasks 599/600/601/603/578; the contour unknown; what a submitted report needs
+
+Asked to rank five new rows Tom filed from his own EPANET plot/report-menu reading, answer Task
+600's contour unknown, and say what a submitted hydraulic report has to show. Full reasoning and
+citations: `dev/agents/utility-planning-engineer/wishlist.md`, "2026-09-06" section. Short form:
+
+- **My order: 599 ≈ 603 (top, roughly tied) > frequency-and-flow-balance half of 600 > 578 > contour
+  half of 600 > 601.** I split 600 rather than ranking it whole — frequency distribution and system
+  flow balance are cheap, load-bearing master-plan exhibits; contour is the flashy, expensive,
+  highest-misuse-risk third of that row and I would build it last, carefully, or not build the
+  filled version at all. I rank 578 (fire flow's leftover EPS-frame/Run phases) below the top two
+  because it is finishing the tail of an already-shipped task (530), not a new capability — **this
+  matches my own 2026-08-27 wishlist phasing**, where I ranked that exact phase last of five.
+- **CITED, EPANET's own manual does not document its contour interpolation method** — fetched
+  `epanet-manual.readthedocs.io/en/latest/9_viewing_results.html` directly: it says only that a
+  contour shows "regions of the map where values fall within specific intervals" for "All nodes at
+  a specific time," no algorithm named. **CITED, secondary** (a Delphi-forum characterization
+  surfaced by search, not independently confirmed against source): the contour is drawn by the GUI,
+  not the EPANET toolkit engine, which is consistent with the manual staying silent — the reference
+  implementation itself never had to answer the question the roadmap is asking.
+- **CITED, the closest documented analog is groundwater contour mapping, same math (sparse point
+  values interpolated over an area)**: Sundaram, "Quality Note: Minimizing Errors associated with
+  Groundwater Contour Maps" (LinkedIn, search-surfaced, not a peer-reviewed primary — flag
+  secondary): ordinary triangular-linear interpolation needs on the order of >200 evenly
+  distributed points to be reliable and produces "ghost holes" and spurious "triangular facets"
+  below ~20 sparse, randomly distributed points; most methods except kriging/polynomial mislead at
+  that density. **I have not personally watched a contour mislead a reader or a council — I have no
+  field experience to draw that from — and I say so rather than dressing this up as witnessed
+  evidence.** The finding I can stand behind is the structural one below.
+- **My answer, as an engineer, not a source I found stated outright:** never extrapolate a filled
+  contour beyond the convex hull (Delaunay triangulation) of the node locations that actually have
+  the value being contoured — matplotlib's own `tricontourf` is the open-source example of exactly
+  this convention (fetched, confirmed it exists as a named method) — and always draw the node points
+  on top of the fill so a reader can see how sparse the support actually is rather than trusting a
+  smooth-looking surface that implies more data than exists. A main crossing an undeveloped parcel
+  or a river with no node gets no fill there, not an interpolated guess.
+- **SPECULATION, mine, and it inverts this suite's usual scale direction:** the analog source's
+  threshold (>200 points reliable, <20 unreliable) sits almost exactly astride this suite's own
+  target scale (~10-20 nodes) and its headroom ceiling (200) — meaning a filled contour is closer to
+  honest at the 2,000-node master-plan scale I actually work at than at the small end this suite
+  mainly serves, the opposite of most features here. Re-derive before quoting; I have not tested it
+  against a real network.
+- **The submitted-report answer, and this is the one I'd stand behind most: the single biggest
+  missing piece for a report I could hand a reviewer today is Task 599, not contour and not
+  calibration.** Every published master-plan hydraulic-model chapter I have read across two research
+  passes (SBMWD Section 7, Squamish, Astoria, Nibley City — all cited earlier in this file) reports
+  results across the average-day/max-day/peak-hour triad and, when tanks are involved, a tank-level
+  or pressure trend across the design day. This suite can already SOLVE that (EPS shipped, scenario
+  demand multiplier shipped 2026-09-02) but cannot HAND IT OVER as a chart — today the only way to
+  read one node's pressure across a run is to scrub the transport frame by frame and re-type numbers
+  into a spreadsheet, which is not something I would submit as a deliverable and not something I
+  would ask a reviewer to do either.
+- **The second-biggest absence is system-wide fire flow (wishlist row 3, still unbuilt)** — a named
+  appendix in real master plans (Nibley City, cited earlier) — and the third is calibration (Task
+  601): **CITED**, AWWA's M32 handbook is the named authority for calibration procedure (Bentley
+  blog summary, secondary) and a UK-utility figure I found states an expected match of ±1 m pressure
+  and 5% flow over 24 hours (search-surfaced, secondary, not the primary UK standard text) — no
+  hydraulic model in the master-plan literature I read treats itself as credible without this step,
+  and this suite has never ingested a single number from outside the model. **I would tell Tom
+  plainly: a full calibrated, system-wide master-plan hydraulic model for a 2,000-node utility is
+  EPANET/WaterCAD/InfoWater territory, and this suite is not built to compete there — what I would
+  actually reach for it for, even at that scale, is a fast scenario comparison or fire-flow
+  spot-check on one proposed extension into an already-modeled zone**, the "new pipe submittal" case
+  this suite's own scope has always targeted (this journal, 2026-08-24).
+- **CITED**, EPANET's own Calibration Report is three tabs — Statistics, Correlation Plot, Mean
+  Comparisons (search-synthesis converging across two independent hits, not a primary-text fetch —
+  flag secondary) — confirming Task 601's own citation of "three tabbed pages" rather than adding new
+  information; CLAUDE.md's default-to-EPANET-vocabulary rule applies to those three names directly
+  if the task is ever built.
+
+---
+
 ## 2026-09-05 — "It seems we should implement all of EPANET": weighed the rule-based-controls case again, held it
 
 Tom's own words, offered as a reason to revisit `[RULES]`. Full ranking and reasoning is in the

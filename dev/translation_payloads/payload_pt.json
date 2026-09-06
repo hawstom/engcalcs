@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 1689,
-        "delta_key_count": 14,
+        "expected_key_count": 1691,
+        "delta_key_count": 16,
         "exempt_key_count": 44,
         "exempt_keys": [
             "u_imgd",
@@ -529,6 +529,8 @@
     },
     "keys_to_translate": {
         "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_help_not_epanet": "Not EPANET",
+        "lpn_help_screenshots": "Pictures of this page in use",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -545,6 +547,8 @@
     },
     "keys": {
         "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_help_not_epanet": "Not EPANET",
+        "lpn_help_screenshots": "Pictures of this page in use",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -573,6 +577,38 @@
                     "key": "lpn_tool_add_junction_tip",
                     "value": "Clique no mapa para adicionar uma junção: um ponto onde os tubos se encontram ou onde a água é usada.",
                     "english": "Click the map to add a junction: a point where pipes meet or where water is used."
+                }
+            }
+        },
+        "lpn_help_not_epanet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_help",
+                    "value": "Ajuda",
+                    "english": "Help"
+                },
+                "next_translated": {
+                    "key": "lpn_help_walkthroughs",
+                    "value": "Tutoriais",
+                    "english": "Walkthroughs"
+                }
+            }
+        },
+        "lpn_help_screenshots": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_help",
+                    "value": "Ajuda",
+                    "english": "Help"
+                },
+                "next_translated": {
+                    "key": "lpn_help_walkthroughs",
+                    "value": "Tutoriais",
+                    "english": "Walkthroughs"
                 }
             }
         },
