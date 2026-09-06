@@ -67,3 +67,30 @@ distinct places (bentley.com, virtuosity.com, cadjourney.com, capterra.com, soft
 co) and none carries a number. That absence is itself worth recording: a small system
 cannot even learn the cost of the market leader without a sales call, which this suite's
 free, no-account, no-quote model does not require of anyone.
+
+## 5. Do not default `k` to a nonzero value — but a fittings picker is a real, evidenced gap
+
+Tom asked 2026-09-04 whether a new `lpn_` pipe should be born with a nonzero minor-loss
+coefficient instead of the current empty (=0) box. Every tool I could examine agrees
+with the status quo: EPANET's own default is 0 (openepanet.org forum, corroborating
+EPANET docs); epanet-js's is 0, verified directly in their open-source repo
+(`libs/hydraulic-model/src/asset-types/link.ts:19`,
+`export const DEFAULT_MINOR_LOSS = 0;`); WaterGEMS/WaterCAD and KYPipe both use a
+per-pipe fittings list summed to a total (Bentley's "Minor Loss Collection", KYPipe's
+"ΣM"), which is zero absent any picked fitting. No source anywhere recommends a blanket
+nonzero k on a plain pipe; the closest thing to a real practice is entering a
+site-specific value at a PUMP STATION, where three independent named practitioners on
+the EPANET forum (openepanet.org/Topic/22383) describe measured minor losses of 2-7.5%
+of pump head — a number that is load- and configuration-dependent, not a constant.
+**Recommendation: leave the default at zero. Do not build a nonzero default.**
+
+**What IS a real, differently-shaped gap:** every commercial tool I found (WaterGEMS,
+KYPipe) gives the modeler a fittings picker (name a fitting, pick a quantity, the tool
+sums the K) rather than one bare number to guess. This suite's pipe has one plain k
+field and nothing else. That is a genuine feature gap relative to the market, but it is
+a UX/effort question for the planning-engineer seat or the roadmap to size — not
+something this seat can price, and not the same question as "what should the default
+be." I am recording it here so it is not lost, ranked below my existing CSV/GPX finding
+because I have no evidence anyone in this suite's actual population (small/rural
+utilities, EWB, Peace Corps — journal 2026-09-04) has ever hit this as a blocker, versus
+CSV/GPX import which has a documented forum trail of people stuck on it.

@@ -161,3 +161,115 @@ tracked. It is exactly the shape of need EWB chapters (row 4) and Peace Corps vo
 (row 5) would hit: they collect points with a handheld GPS or a phone, not with GIS
 software, and today's `lpn_` requires drawing nodes by hand or importing a full `.inp`
 someone else already built in EPANET.
+
+## 2026-09-05 — Tom's question: should a new `lpn_` pipe get a default nonzero k?
+
+Question as posed: today a new pipe is born with an empty (= zero) minor-loss box.
+EPANET's own default is 0. Should this page default to something nonzero instead?
+
+### What the tools do
+
+- **EPANET itself: 0.** Confirmed by the EPANET forum community and documentation
+  synthesis. CITED: openepanet.org (Open Water Analytics successor forum) threads
+  "Minor loss coefficients" (openepanet.org/Topic/22436) and "Minor losses"
+  (openepanet.org/Topic/22564) — Siamak Moussavian, a named forum contributor, states
+  plainly: *"EpaNet won't add ANY minor loss coefficients in your model automatically.
+  It's your responsibility to find the sum of all minor losses."*
+
+- **epanet-js: 0, and I read this straight out of their source, not a claim about their
+  UI.** epanet-js is open source; I cloned `github.com/epanet-js/epanet-js` (public repo,
+  fetched 2026-09-05) and grepped it directly. CITED (source code):
+  `libs/hydraulic-model/src/asset-types/link.ts:19` —
+  `export const DEFAULT_MINOR_LOSS = 0;`
+  — used consistently wherever a pipe or valve's minor loss is read
+  (`apps/app/src/simulation/build-inp.ts:970`, `apps/app/src/panels/multi-asset-panel/
+  asset-stats.ts:488`, etc.). Our one direct browser-based competitor, which
+  `dev/positioning.md` already tracks closely, makes the identical choice we make today.
+
+- **Bentley WaterGEMS/WaterCAD:** could not read a literal default value (their docs are
+  paywalled/portal-gated and my fetch of the "Adding Minor Losses to Pipes" wiki page
+  redirected to a login-gated ServiceNow KB article I could not read). But the DESIGN is
+  visible from the product's own community wiki title and search summaries: it offers a
+  **"Minor Loss Collection"** — a per-pipe library where a modeler picks named fittings
+  (elbow, tee, valve...) and quantities, and the software sums their K values, rather than
+  a single number the modeler guesses. CITED: communities.bentley.com wiki "Adding Minor
+  Losses to Pipes" (title and summary only, full text not retrievable this session).
+  A collection with nothing added sums to zero, so this is consistent with a zero
+  default even though I could not confirm the literal number.
+
+- **KYPipe:** same shape again — "a single data entry for each pipe section for ΣM (the
+  sum of minor loss coefficients)... representative values of M for common fittings are
+  provided in Appendix III." CITED: KYPipe Reference Manual, kypipe.com/new_stuff/
+  kypipe%20reference%20manual.pdf (fetched via search synopsis 2026-09-05). Fittings are
+  picked from a list and summed; there is no standing default other than zero absent any
+  picked fitting.
+
+**Every tool I could examine — EPANET, epanet-js (verified in source), WaterGEMS/WaterCAD
+and KYPipe (both by design pattern) — treats minor loss as SUMMED PER-FITTING and
+defaults to zero absent an explicit fitting choice. None ships a blanket nonzero k on a
+plain new pipe.** I could not find InfoWater's or H2ONET's specific default; I searched
+and found no source (a real result, not an oversight — noted rather than guessed).
+
+### What practitioners actually do, and the distinction that matters
+
+- **A blanket k on every pipe is not a recognised practice for distribution mains** — no
+  source I found recommends it, and several actively warn against double-counting: the
+  established alternative for a long pipe run with many but small, evenly distributed
+  fittings is to fold them into an EQUIVALENT LENGTH added to the pipe, or to lean on an
+  already-conservative/calibrated Hazen-Williams C-factor, not to also carry a nonzero k.
+  SPECULATION (general hydraulics knowledge, not a single named source for this exact
+  sentence): a modeler who both lowers C to account for age/roughness/fittings AND adds a
+  blanket k on every pipe risks counting the same friction twice. This needs a citable
+  source before being asserted as fact; I did not find one saying it explicitly for
+  distribution modeling, only the general principle that C-factor calibration already
+  absorbs unmodeled minor losses in a long pipe.
+
+- **Where minor loss is NOT negligible and DOES get modeled explicitly: pump stations
+  and plant piping**, and this is the sharpest, most directly on-point evidence found.
+  CITED: openepanet.org/Topic/22383 "Pumping station minor losses" — three named
+  contributors converge on the same point. Keith Woolley, citing a measured 95 MLD
+  booster station: *"losses at the site were 7.5% of the pump head"*, ~2.5% of which was
+  minor losses; a second, 60 MLD facility measured minor losses "in the order of 2% of
+  the pump head." Istvan Lippai: minor losses at a pump station "should not be ignored,"
+  and should be determined and modeled directly rather than compensated for by adjusting
+  friction elsewhere. Julian Smith: minor losses near pumps "cannot be ignored because
+  the pipe sizes in the vicinity of the pumps are often smaller than elsewhere on the
+  system and hence have significantly higher velocities."
+
+  **This is the distinction Tom's question anticipated, and the evidence confirms it
+  cleanly: short, fitting-dense pump-station/plant piping genuinely needs explicit,
+  SITE-SPECIFIC minor-loss values (2-7.5% of pump head, measured); long distribution
+  mains do not, by convention, carry a blanket one.** No source proposes a single number
+  that would serve both cases, and the pump-station numbers above are load-dependent and
+  configuration-dependent (elbow count, valve type, pipe size at the pump) — not a
+  constant that could be baked into a new-pipe default.
+
+### Straight answer
+
+**No, this page should not give a new pipe a nonzero default k, and every tool checked
+agrees with that (EPANET, epanet-js by source, and the fitting-collection design of
+WaterGEMS/WaterCAD and KYPipe).** The reasons converge:
+
+1. Every comparable tool defaults to zero. Changing that would make `lpn_` the outlier,
+   not the leader, and would silently diverge from `.inp` round-trip fidelity (a `.inp`
+   with no stated loss coefficient means 0 in EPANET's own format, so a nonzero UI
+   default would only apply to hand-drawn pipes and create an inconsistency between a
+   pipe drawn on the map and one imported from a file).
+2. There is no single number that would be right: distribution mains want zero (folded
+   into C-factor or equivalent length), and pump-station piping wants a case-specific
+   value practitioners calculate from the actual fittings, measured at 2-7.5% of pump
+   head in the two field cases found — nothing this suite could guess would serve both,
+   and guessing wrong in the distribution-main direction (the far more common pipe on
+   this suite's maps, per `dev/looped-network-calculator-scope.md`'s scope) would
+   silently double-count losses already in a calibrated C-factor.
+3. The unmet need, if there is one, is NOT a bare number field defaulting nonzero — it is
+   the fittings-picker-and-sum pattern every commercial tool converged on (WaterGEMS's
+   Minor Loss Collection, KYPipe's ΣM list). That is a real, evidenced gap (this suite's
+   pipe has one plain k field, no fitting library) but it is a UX/feature question for
+   the planning-engineer or the roadmap to weigh against effort, not a default-value
+   question, and it is out of my lane to size.
+
+SPECULATION, flagged for re-derivation: I did not find a citable source explicitly
+warning against double-counting C-factor and a blanket k together for a distribution
+main; I inferred it from the general Hazen-Williams calibration principle. A later
+invocation should not quote this as a proven fact.
