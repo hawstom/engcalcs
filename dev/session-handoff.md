@@ -1,4 +1,4 @@
-# Session handoff — written 2026-09-05
+# Session handoff — written 2026-09-05, state refreshed 2026-09-06
 
 **Read this, then `dev/ROADMAP.md`, then `dev/new-english-keys.md`.** It is a snapshot of one
 unusually dense day and it goes stale fast: everything below is either a RULING Tom made (permanent
@@ -103,62 +103,59 @@ standing in the way is not code.
   two distinct English terms landed on one Pashto word on the same screen. No English defect; it
   needs a Pashto speaker. It is in `dev/new-english-keys.md` under the translators' section.
 
-## 4. STATE — checked and pruned 2026-09-06, second pass
+## 4. STATE — rewritten 2026-09-06, third pass
 
-**Everything the curves paradigm change (Task 586) asked to be verified is verified and the
-checklist is gone rather than carried.** `doc.curves` is the store; `curvePoints`, `efficPoints` and
-`curveRef` survive only inside `mintCurveLibrary()` (the one-way migration) and in `curvePointsOf()`;
-all four EPANET kinds exist as library objects; a tank USES its volume curve. The harnesses assert
-all of it. Nothing here needs believing.
+**The curves paradigm change (Task 586) is verified and its checklist is gone rather than carried.**
+`doc.curves` is the store; all four EPANET kinds exist as library objects; a tank USES its volume
+curve. The harnesses assert it. Nothing here needs believing.
 
-**THE TRANSLATION BACKLOG IS ESSENTIALLY EMPTY, WHICH IS A CHANGE OF STATE AND NOT A GOOD NUMBER TO
-GUESS AT.** Sprint 584-wave1 closed at 26/26. Both friction logs PASS with every entry answered
-(wave0: 64 entries, wave1: 34). `detect_english_drift.php` reports **1** changed key and
-`new_english_keys.php` **1** untranslated — both of them `lpn_tool_key_hint`, written the same day.
-**So there is no sprint to propose.** An earlier version of this file said 39 drifted and 144
-untranslated; that debt was discharged, not deferred, and quoting it would size a sprint against
-work that is done.
+**THE TRANSLATION BACKLOG IS SMALL AND IS NOT ZERO ANY MORE.** `detect_english_drift.php` reports
+the keys changed by this session's builds and `new_english_keys.php` the ones written new. **Read
+both scripts rather than this line** — it is the number that goes stale fastest in this file, and an
+earlier version of it sized a sprint against work that was already done. There is no sprint worth
+26 agents until the count is worth it; accumulate, then propose once.
 
 **`lpn_scncmp_at` no longer gates anything.** Tom ruled in conversation on 2026-09-06 — the English
-stands as `{value} at {id}` — and his mark did not reach `dev/new-english-keys.md`, which is why the
-harvester exists. The `$ec_lang_syn` half was PROPOSED and is still unwritten: it needs written
-permission naming it, and has been put to him once, labelled.
+stands as `{value} at {id}`. The `$ec_lang_syn` half was PROPOSED and is still unwritten: it needs
+written permission naming it, and has been put to him once, labelled.
+
+**THE SERVER HALF OF TASK 479 IS WAITING ON TOM AND ON NOBODY ELSE.** The code half shipped
+2026-09-06: `ecSwMounts()` declares `/engcalcs/` and `/app/`, the worker's scope, its
+`Service-Worker-Allowed` header and its fetch routing all derive from that list, and
+`sw_scope_check.php` blocks on any of the four disagreeing. What remains is the symlink, the `/app`
+rewrite and the `CANONICAL_ORIGIN` line, in that order, with the canonical change LAST because it is
+the slow one to undo.
 
 ---
 
 ## 5. THE NEXT THINGS, in the order I would take them
 
-**HE ANSWERED THREE OF THE FOUR ON 2026-09-06 AND THEY ARE WRITTEN INTO THE BLOCKS. Do not re-ask.**
-596 is an lpn-only Help row and the footer link is DECLINED. 465 is *"Yes"* — a library pipe may be
-something a round trip loses — *"And we have to start showing an export alert."* 479 is *"we need to
-be at LWN/app. We better move that way"*, with the meta-tag call delegated and recorded there.
-602 he reframed rather than picked from: the box is a choice about the BUILT-IN solver, so take
-label (a) and invert the DISPLAY only, never the stored `settings.engine`.
-
-**One question is still with him, and it is cheap for him and impossible for us:**
-
-1. **Task 574 — the nine unnamed `.net` slots.** Indices 16-22, 39 and 40 have no second source to
-   match against, and guessing is what wrote `Duration 0.0` into a converted file the first time.
-   EPANET persists PROFILES and CALIBRATION files; if either lives in that range it would explain
-   the stray `1` and `First`. The test is one save-and-reimport by him. Until then it stays at 25,
-   costing nothing while the slots are reported rather than decoded.
+**FOUR RULINGS WERE SPENT ON 2026-09-06 AND ALL FOUR ARE NOW BUILT. Do not re-ask, and do not
+re-propose the alternatives they declined.** 596 shipped as an lpn-only Help row and **the
+suite-wide footer link stays DECLINED**. 602 shipped as label (a) with the DISPLAY inverted and
+`settings.engine` untouched in storage — a project stating `epanet` still selects EPANET and now
+shows the box unticked. 479's code half is above. 574 is CLOSED, and the answer is that a profile is
+in no `.net` at all: EPANET writes it to a separate `.PRO` file through an ordinary save dialog and
+records the path nowhere, so reading one is Task 604 and there is nothing to recover from a project
+file.
 
 **Buildable now, needing nobody:**
 
-5. **Task 599 — graph a value against time across an EPS.** The highest-value gap and the cheapest
-   of the plot family, because the data already exists: a run keeps every reporting step. Draw it
-   the way `lpn_profile_*` is drawn — no chart library, nothing vendored.
-6. **Task 597/598 — table filters and dictionary-order comparison.** Reuse Find's predicate rather
-   than writing a second one, and use EPANET's own words: Below, Equal to, Above (Tom's ruling).
-   `Intl.Collator` with `numeric: true` for the string half, or P10 sorts before P2.
-7. **Task 539 phase two — the gang move.** Phase one overturned the plan it was written against:
+1. **Task 599 — graph a value against time across an EPS.** The utility-planning-engineer ranked
+   this joint first of the five plot rows on 2026-09-06 and its reason is worth carrying: every
+   published master-plan hydraulic chapter it read reports results this way, and this suite can
+   solve the run today and cannot hand over the chart. The data already exists — a run keeps every
+   reporting step. Draw it the way `lpn_profile_*` is drawn: no chart library, nothing vendored.
+2. **Task 603 — name the nodes on the profile axis.** Tied first in the same ranking, and cheap: it
+   closes a real deficiency in a feature already shipped, because a profile with no names answers
+   *where* and cannot answer *which junction*, which is the whole reason a profile gets read aloud.
+3. **Task 600's cheap two thirds — frequency distribution and system flow balance.** A histogram is
+   a sort and a bucket count. **The engineer ranked CONTOUR fourth, below both**, against Tom
+   starring it: it is the only one with real geometry, and its own answer is that a filled contour
+   must never be extrapolated past the convex hull of the nodes carrying the value.
+4. **Task 539 phase two — the gang move.** Phase one overturned the plan it was written against:
    across 28 drawings there are **9 leader-leader crossings against 76 label-on-leader**, so the
-   segment-intersection test the roadmap proposed sees about a tenth of the problem. Build for the
-   second trigger.
-
-**Closed this session and named so they are not re-opened from habit:** 436 (arithmetic shed
-pricing, tolerance relaxed on Tom's word to a measured 1.111%), 595 (digit keys select a tool),
-591 (Not EPANET site deployed), 583, 593, 569.
+   segment-intersection test the roadmap proposed sees about a tenth of the problem.
 
 ---
 
@@ -168,6 +165,11 @@ pricing, tolerance relaxed on Tom's word to a measured 1.111%), 595 (digit keys 
 - Do not touch `$ec_lang_syn` without written permission in that conversation. No standing carve-outs.
 - Do not regenerate `dev/translation_payloads/` from a subagent. The orchestrator does it once,
   before the commit. A subagent's `payload freshness` failure is EXPECTED and is not its to fix.
+- Do not run two tracks in `js/looped-network.js` at once and call it parallelism. Measured again
+  2026-09-06: four of the session's five candidate tasks all wanted that one file, so they were
+  SEQUENCED and the only genuinely parallel track was the one that touched `js/lpn-net.js` and
+  `dev/`. A worktree is justified by concurrency, and there was less concurrency available than the
+  backlog made it look.
 - Do not put four agents in `js/looped-network.js` at once. Two with named seams worked; the merge
   conflicts that did happen were all in the GENERATED `dev/new-english-keys.md`, which regenerates.
 - Do not tell Tom a browser test that has not been run headlessly first. Three instructions this
