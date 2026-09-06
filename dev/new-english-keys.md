@@ -37,6 +37,6 @@ is the one you meant. "The first one" is a complete answer.
   2. retranslate it despite being outside the delta
   **What this asks for:** which of the readings above you meant.
   *The proposal:* THE AGENT DID EXACTLY THE RIGHT THING -- it stayed inside its delta and filed rather than editing a key nobody asked it to touch. The collision is real and is INSIDE Pashto, not in the English: two distinct English terms landed on one Pashto word, and both are on the same screen. No English defect, so there is nothing to rewrite; what it needs is a Pashto speaker or a targeted single-key fix, w...
-  @@ NEEDS RULING
+  The English needs a _syn "Relative rate of diffusion"
 
 None. Every English key is present in at least one other language.

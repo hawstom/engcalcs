@@ -338,7 +338,30 @@ html[lang="zh"] .ec-welcome {
    .lpn-link-symbol-backdrop below, ROADMAP Task 146.10 follow-up, 2026-08-09), so it must equal
    whatever the canvas itself is painted -- keep it in step with the inline `background` on
    #lpn_canvas in Looped-Network.php. */
-#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-map-bg: #fff; }
+/* **THE BARE MAP SAYS `grab`, NOT `default`** (ROADMAP Task 569, Tom 2026-09-06: *"Try a Pan
+   cursor."*). It was `default` and that was the whole of a bug he had reported and nobody had
+   diagnosed: *"it occasionally flickers from pan/drag cross to default pointer... almost (!)
+   reliably at 12px from the point of a node."*
+
+   **THERE WAS NEVER A RING AT 12 px. IT IS A GAP.** dev/browser-pass/specs/cursorflicker.js walks
+   outward from a junction one pixel at a time and reads the cursor the browser actually computes:
+   the node's own circle ends at ~3.5 px, its LABEL (`.lpn-draglbl`, `cursor: move` -- the
+   four-headed arrow he called the pan/drag cross) begins at 9-13 px depending on bearing, and in
+   between was bare canvas showing `default`. So a pointer crossing that strip read
+   **pointer, default, move**, and his 12 px is simply where the placement pass had put that
+   label -- which is why it was there on some bearings and absent on others.
+
+   `grab` rather than `move`: `move` is what a thing you have HOLD of says, and the map is not held
+   until the button is down. `grab` is the open hand every map on the web uses for "you may drag
+   this", so the strip between a node and its label now reads as more map rather than as nothing.
+   The fix is not that the gap closed -- it is that bare map stopped being indistinguishable from
+   dead space. */
+#lpn_canvas { touch-action: none; cursor: grab; --lpn-sym: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-map-bg: #fff; }
+/* **AND `grabbing` WHILE THE BUTTON IS DOWN**, which is the other half of the convention and the
+   thing that makes the open hand honest: an open hand that never closes is a promise the interface
+   does not keep. The class is written by the pan handler that already exists, so nothing new
+   decides when a pan is happening. */
+#lpn_canvas.lpn-panning, #lpn_canvas.lpn-panning * { cursor: grabbing; }
 /* Fading the BACKDROP is the counterpart of fading the symbols below: a busy, dark aerial or plan
    swallows a 0.5-wide pipe and a black flow arrow, and the standard answer everywhere else (AutoCAD
    image fade, QGIS layer transparency) is to knock the reference material back rather than thicken

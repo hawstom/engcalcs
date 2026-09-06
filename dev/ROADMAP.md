@@ -114,23 +114,38 @@ the block.
   - **CITED precedent for the door itself:** EPANET's Data Browser Add button creates a
     junction/pipe/etc. from the object list and opens its editor with no map click first. `lpn_` has
     exactly one door to a new node -- the canvas pointer click.
-  - **THE RESEARCH IS DONE, 2026-09-06, and its headline finding is that THERE IS NO CONVENTION TO
-    ADOPT.** The `data-entry-clerk` looked at EPANET 2.2, epanet-js, QGIS, ArcGIS Pro and AutoCAD.
-    **None of the five binds a bare key to tool selection.** EPANET, QGIS and ArcGIS Pro document
-    none at all; epanet-js binds one letter and it is not a tool; AutoCAD's alias culture is real
-    and is the closest thing Tom already has in his hands, but it lives inside a dedicated
-    always-focused command line, which is a gating mechanism this page has not got. **So whatever
-    ships here is an INVENTED scheme, not an adopted one, and must be described that way** -- the
-    seat said so itself rather than dressing the proposal up as precedent. Full citations in
-    `dev/agents/data-entry-clerk/journal.md`.
-  - **Its proposal, and the one weak row is flagged by its own author:**
+  - **THE FIRST RESEARCH PASS WAS WRONG, AND TOM CORRECTED IT FROM THE PRODUCT ITSELF (2026-09-06).**
+    The `data-entry-clerk` reported that *"none of the five tools binds a bare key to tool
+    selection"* and that epanet-js binds one letter which is not a tool. **That is false.** His own
+    reading of epanet-js:
 
-    | Junction | Reservoir | Tank | Pipe | Pump | Valve | Text |
-    |---|---|---|---|---|---|---|
-    | `J` | `R` | `T` | `P` | `U` | `V` | `X` |
+    | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | M | Ctrl+K |
+    |---|---|---|---|---|---|---|---|---|---|
+    | Select | Junction | Reservoir | Tank | Pipe | Pump | Valve | Customer (meter) | multi-select | search |
 
-    `U` because `P` is Pipe; **`X` is arbitrary and is the weak one** -- `T` is Tank, and `X` reads
-    suite-wide as close/remove, so it carries a mnemonic risk the seat named without being asked.
+    **So there IS a convention in the nearest comparable product, and it is DIGITS, not initials** --
+    which dissolves the seat's own biggest worry at a stroke: a digit cannot be mistaken for typing
+    in a text field the way a bare letter can, needs no mnemonic, and does not run out or collide
+    (its `X` for Text was the weak row precisely because initials collide). It also numbers the
+    tools in the toolbar's own order, so the key IS the position.
+  - **THE LESSON IS ABOUT THE METHOD, NOT THE SEAT.** A research brief that asks "what do these
+    tools bind" gets answered from documentation, and a web application's shortcuts are frequently
+    in the application and not in its docs. **Ask for the product to be exercised, or say plainly
+    that the source is documentation only.** Recorded here because the same brief will be written
+    again for a different question.
+  - **AND THERE IS A COST CEILING ON THIS KIND OF WORK.** Tom, same message: *"I am wary of spending
+    too much time as an epanetjs spy, though I suppose there is nothing shameful about that."* Right
+    on both halves -- looking at a competitor's shipped interface is ordinary practice, and it is
+    not where this project's value comes from. Take the digit convention, which is now known, and
+    stop; do not commission a survey.
+  - **THE PROPOSAL IS NOW THE DIGITS, and the seat's letter scheme is superseded.** Its
+    `J R T P U V X` is kept only as the record of why initials are worse: `U` for pump because `P`
+    was taken, and `X` for Text because `T` was -- two collisions in seven, in a suite where `X`
+    already reads as close/remove. **Ours has SEVEN objects where epanet-js has eight** (no Customer
+    yet -- that is Task 247), so the open question is whether Text takes `8`, or whether `8` is left
+    for Customer and Text goes elsewhere. **Matching their numbering where the objects match costs
+    nothing and buys every EPANET user's muscle memory**; diverging on the one object they do not
+    have is free.
   - **THE COLLISION SURVEY CAME BACK CLEAN, AND THE GUARD ALREADY EXISTS.** No existing binding uses
     a bare letter. What is taken: `Escape` (four sites, ungated), `Delete`/`Backspace` (gated on
     `keyboardIsTyping()`), `Ctrl+Z`/`Cmd+Z` (gated on `isTextEntry()`), `Enter` and the arrow /
@@ -625,47 +640,6 @@ the block.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 
 
-
-- 75|569| **The cursor flickers to the default pointer at ~12 px from a node, on a PC.**
-  Tom, 2026-09-01: *"As I wander the mouse around the map, it occasionally flickers from pan/drag
-  cross to default pointer. If I am painstakingly slow and precise, I can return the mouse to any
-  such flicker point and see it dwell as a default pointer. There is nothing at these points apparent
-  to me that explains the default pointer except that it almost (!) reliably happens at 12px from the
-  point of a node (the 24px diameter)."* Long-recognized, never diagnosed. He rates it *"slightly
-  mystifying and annoying"* rather than harmful — *"Did I see what I thought I saw? Why?"*
-  - **DIAGNOSED 2026-09-06, IN A REAL BROWSER, AND IT IS THE OPPOSITE OF WHAT WAS SUSPECTED.**
-    `dev/browser-pass/specs/cursorflicker.js` walks outward from a junction one pixel at a time on
-    eight bearings and records what `elementFromPoint()` hits and what cursor that element computes
-    to. The result reproduces his report to the pixel:
-
-    ```
-    E : 0-3px pointer <circle .lpn-node> | 4-8px  default <svg #lpn_canvas> | 9-40px  move <tspan>
-    SE: 0-3px pointer <circle .lpn-node> | 4-12px default <svg #lpn_canvas> | 13-27px move <tspan>
-    NE: 0-3px pointer <circle .lpn-node> | 4-12px default <svg #lpn_canvas> | 13-28px move <tspan>
-    N/S/W/SW/NW: 0-3px pointer | 4-40px default        (nothing out there to hover)
-    ```
-
-    **There is no mystery ring and nothing is drawing at 12 px. It is a GAP.** The node's own circle
-    ends at ~3.5 px and its LABEL -- a `<tspan>` inside `.lpn-draglbl`, which carries `cursor: move`
-    -- begins at 9-13 px depending on the bearing. Between them is bare canvas, and `#lpn_canvas`
-    is `cursor: default`. So the sequence a moving pointer sees is **pointer, default, move**: the
-    "flicker to default" is the strip of map between a node and its own label, and Tom's 12 px is
-    where the label's box starts on the diagonals. It "almost (!) reliably" happens because it
-    depends entirely on where the placement pass put that label -- which is why it is a ring on
-    some bearings and absent on others.
-  - **THE TWO STANDING SUSPECTS ARE BOTH RULED OUT, so do not re-derive them.** `POINTER_REACH_PX`
-    (14) and `TOUCH_REACH_PX` (24) draw nothing -- they are read by `nearestNodeNearScreen()` AFTER
-    a hit. And `.lpn-node-symbol-backdrop`, which has no `cursor` and no `pointer-events` rule and
-    looks exactly like the culprit, never answers a hit test at all: `pointer-events` is INHERITED
-    and its parent `.lpn-node-symbol` sets `none`.
-  - **SO THE FIX IS A DECISION ABOUT THE MAP'S CURSOR VOCABULARY, NOT A BUG FIX. [H]** The
-    behaviour is correct in the sense that each element says what it is; what is wrong is that
-    "bare map" and "nothing here" look the same, and the map is mostly bare. The cheap answer is to
-    give `#lpn_canvas` a cursor that means *you can pan here* rather than `default`, at which point
-    the sequence becomes pointer, pan, move and nothing flickers to an arrow. That is a
-    one-line change and a change to what every visitor sees, so it is Tom's call, not a script's.
-    The spec asserts the property rather than the fix: no band of `default` sandwiched between two
-    meaningful cursors. **It FAILS today, deliberately** -- that red is the open bug.
 
 - 50|590| **A fittings picker, so a pipe's `k` is summed rather than guessed.**
   Tom, 2026-09-05, on the market researcher's finding: *"Fittings library: Put it in our roadmap.

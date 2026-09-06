@@ -1217,6 +1217,9 @@
             "on": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
             "ruled": "2026-08-29"
         },
+        "lpn_scenario_overrides": {
+            "reply": "You are right and the finding was wrong: 'No. of custom values' is yours, set 2026-09-04 in commit fdde7943, and Wave 0 re-read it cold two days later. Fixed at the source rather than noted -- wave0_keyset.php now drops every key whose exact current English carries a ruling, which took 146 keys out of the next pass. On the $ec_lang_syn you remember giving: it is in no commit and not in the working tree, so it never reached a file. Paste it again and it goes in."
+        },
         "lpn_scenario_overrides_tip": {
             "on": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
             "ruled": "2026-08-29"
@@ -1522,9 +1525,6 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
-        },
-        "lpn_scenario_overrides": {
-            "reply": "You are right and the finding was wrong: 'No. of custom values' is yours, set 2026-09-04 in commit fdde7943, and Wave 0 re-read it cold two days later. Fixed at the source rather than noted -- wave0_keyset.php now drops every key whose exact current English carries a ruling, which took 146 keys out of the next pass. On the $ec_lang_syn you remember giving: it is in no commit and not in the working tree, so it never reached a file. Paste it again and it goes in."
         }
     }
 }

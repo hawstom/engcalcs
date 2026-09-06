@@ -329,3 +329,36 @@ sees literally nothing different about the page, and a person who learns it gets
 feedback for free. No new UI surface is needed to make it discoverable beyond a tooltip addition on
 the existing toolbar buttons (`title="Junction (J)"`-shaped), which costs nothing to a mouse user
 and is exactly how AutoCAD's own ribbon states its aliases.
+
+## CORRECTION, 2026-09-06 — my third invocation's headline finding was FALSE
+
+**CITED (Tom Haws, 2026-09-06, from the running product):** epanet-js binds
+`1` Select, `2` Junction, `3` Reservoir, `4` Tank, `5` Pipe, `6` Pump, `7` Valve,
+`8` Customer (meter), `M` multi-select, `Ctrl+K` search.
+
+I reported that *"none of the five tools I researched binds a bare key to tool selection"* and that
+epanet-js binds one letter which is not a tool. **Both halves are wrong**, and the whole of my
+seven-letter proposal rested on the first: I argued the scheme had to be invented because there was
+no convention to adopt. There was one, in the single most comparable product, and it is DIGITS.
+
+**WHAT I ACTUALLY DID WRONG, so I do not repeat it:** I researched shortcut DOCUMENTATION and
+treated its silence as absence. A web application's key bindings frequently live only in the running
+application — in a menu label, a tooltip, or nowhere but the keydown handler. Silence in the docs is
+evidence about the docs.
+
+**The rule I am writing for myself:** when a question is *"what does this product do"* and the
+product is reachable, say explicitly whether I exercised it or only read about it, and rank a
+documentation-only answer as weak. An unqualified "none of them do this" from a docs-only search is
+a claim I was not entitled to make.
+
+**What survives, and it is the part that matters:** the digit scheme dissolves my own strongest
+objection. I worried at length about a bare LETTER being typed accidentally into a text field and
+about mnemonic collisions — `U` for pump because `P` was taken, `X` for Text because `T` was. A
+digit has no mnemonic to collide, does not run out, and numbers the tools in the toolbar's own
+order. My collision survey and the `isTextEntry()` gating recommendation stand unchanged and apply
+to digits exactly as they did to letters.
+
+**My ranking is unchanged**: still third, behind Task 592 and a widened Task 186. Being wrong about
+the precedent does not change the arithmetic — a tool-select key saves a click per tool SWITCH, not
+per element.
+

@@ -6882,6 +6882,14 @@ var EngCalcs = EngCalcs || {};
 	function maxScale() { return isGeoProject() ? MAX_SCALE_GRID / DEG_PER_M : MAX_SCALE_GRID; }
 	var pointers = new Map();
 	var drag = null;
+	// **THE ONE PLACE THE PANNING CLASS IS WRITTEN** (Task 569). It exists so the cursor rule has a
+	// single switch rather than five, and so a future pan path cannot forget to open the hand again:
+	// every end-of-drag route already funnels through the pointerup/cancel handler that clears it.
+	// Guarded on `svg` because the georeferencing bar and the harnesses reach this file before the
+	// layers are built.
+	function setPanning(on) {
+		if (svg && svg.classList) { svg.classList.toggle('lpn-panning', !!on); }
+	}
 	var dragDirty = false;
 	function zoomAbout(sx, sy, factor) {
 		var r = svg.getBoundingClientRect(), lx = sx - r.left, ly = sy - r.top,
@@ -20565,8 +20573,8 @@ var EngCalcs = EngCalcs || {};
 			if (drag && drag.pointerId === e.pointerId && drag.type === 'node' && drag.snapped) {
 				markNodeMoved(drag.id);
 			}
-			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
-			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
+			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; setPanning(false); return; }
+			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; setPanning(false); }
 			if (wasPan && !drag) { relayoutLabels(); }
 		}
 		svg.addEventListener('pointerup', endPointer);
@@ -20984,6 +20992,13 @@ var EngCalcs = EngCalcs || {};
 				: (labelEls[drag.id] && labelEls[drag.id].text));
 		}
 		if (drag.type === 'pan') {
+			// **THE OPEN HAND CLOSES WHILE THE MAP IS ACTUALLY MOVING** (Task 569). `#lpn_canvas`
+			// wears `cursor: grab` at rest; this class swaps it for `grabbing`. Set HERE rather than
+			// at pointerdown, in the one place a pan actually translates the map, because five call
+			// sites create a `type: 'pan'` drag and only some of them become a pan -- a press that
+			// turns out to be a click would otherwise close the hand and open it again with nothing
+			// having moved.
+			setPanning(true);
 			state.tx = drag.tx0 + (p.x - drag.startX); state.ty = drag.ty0 + (p.y - drag.startY);
 			setTransform();
 		} else if (drag.type === 'node') {

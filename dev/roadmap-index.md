@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**53 open tasks.** Next (100): 3 · Soon (75): 14 · Someday (50): 12 · Maybe (25): 7 · Parked (5): 17
+**52 open tasks.** Next (100): 3 · Soon (75): 13 · Someday (50): 12 · Maybe (25): 7 · Parked (5): 17
 
 ## 100 — Next (3)
 
@@ -15,7 +15,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - ! Task 591 — The Not EPANET site: a gateway built on deep honesty and deep gratitude.
 
-## 75 — Soon (14)
+## 75 — Soon (13)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -27,7 +27,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 479 — [H] · The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
-- ! Task 569 — The cursor flickers to the default pointer at ~12 px from a node, on a PC.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
 - ! Task 595 — A keyboard door to a new asset, and the keys to bind to seven of them.
@@ -81,5 +80,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-47 of 53 titles are within 4–12 words. `!` marks the rest;
+47 of 52 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

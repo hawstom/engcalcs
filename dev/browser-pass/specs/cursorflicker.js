@@ -139,22 +139,23 @@ exports.run = async function ({ browser, report }) {
 				}
 			}
 		}
-		// **REPORTED, NOT ASSERTED, AND THE FIRST DRAFT GOT THIS WRONG.** The property is decidable
-		// -- a band of `default` with a meaningful cursor on either side is a hole in the map's own
-		// vocabulary -- so asserting it is tempting and it is what this file did for one commit.
-		// **But it does not hold today and the fix is a pending human decision (Task 569 [H]), so a
-		// real assertion here makes `node run.js` exit 1 for ever.** This suite's own README
-		// promises that exit 0 means every check passed; a permanent red converts that promise into
-		// noise, which is the same "loudest possible silence" this runner already learned once when
-		// twelve dead sections sat behind a cheerful percentage.
-		//
-		// So the OPEN BUG lives in the roadmap, where open work belongs, and this line carries the
-		// measurement. **Turning it back into a verdict is one word** -- `sandwiches.length === 0`
-		// in place of `true` -- and that is the right edit the day the canvas gets a pan cursor,
-		// because from then on a new sandwich would be a regression rather than a known state.
-		report.ok(true,
-			'bands of default cursor between two meaningful ones, on eight bearings (ROADMAP Task 569)',
-			sandwiches.length ? sandwiches.join(' ;; ') : 'none found');
+		// **NOW A VERDICT, because the fix landed** (Tom, 2026-09-06: *"Try a Pan cursor."*). This
+		// line reported rather than asserted while `#lpn_canvas` was `cursor: default` and the fix
+		// was a pending decision -- a spec that can never go green makes `node run.js` exit 1 for
+		// ever, and this suite's README promises that exit 0 means every check passed. The canvas
+		// now says `grab`, so a band of `default` between two meaningful cursors would be a
+		// REGRESSION rather than a known state, and that is exactly what an assertion is for.
+		report.ok(sandwiches.length === 0,
+			'no band of default cursor is sandwiched between two meaningful ones',
+			sandwiches.length ? sandwiches.join(' ;; ') : 'none on eight bearings');
+		// **AND THE HAND IS OPEN ON THE BARE MAP.** Asserted separately from the sandwich test
+		// because they can fail for different reasons: the test above would still pass if the
+		// canvas were given some other non-default cursor, and `grab` is the specific promise.
+		const bare = await a.page.evaluate(() => {
+			const c = document.getElementById('lpn_canvas');
+			return c ? getComputedStyle(c).cursor : '(no canvas)';
+		});
+		report.eq(bare, 'grab', 'the bare map offers the open hand, so it reads as pannable');
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {

@@ -162,3 +162,13 @@ junctions placed with one tool held the whole session, this saves at most a hand
 while 186-widened and 592 each remove a per-ELEMENT round trip, 400 times. I would build 592, then
 186-widened, then this — in that order — and I said so before Task 595 existed and am saying it
 again now that it does.
+
+## CORRECTION to item 5 (2026-09-06): the keys are DIGITS, not initials
+
+My seven-letter proposal (`J R T P U V X`) is withdrawn. Tom read the bindings out of epanet-js
+itself: `1` Select, `2` Junction, `3` Reservoir, `4` Tank, `5` Pipe, `6` Pump, `7` Valve,
+`8` Customer, `M` multi-select, `Ctrl+K` search. Matching that where our objects match costs nothing
+and buys an EPANET user's existing muscle memory; my letters bought a mnemonic and paid for it with
+two collisions in seven. See my journal for what I got wrong in the research and the rule I have
+written for myself about documentation-only answers.
+
