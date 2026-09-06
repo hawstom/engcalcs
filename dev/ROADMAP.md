@@ -190,26 +190,6 @@ the block.
     their points want one idiom, and a second plotting vocabulary on this page is the expensive
     mistake either way.
 
-- 75|596| **Link the Not EPANET gateway from inside the suite.**
-  - **SETTLED 2026-09-06 (Tom: *"Not EPANET link: lpn-only row"*).** One row in the `lpn_` Help
-    menu, above the legal separator, beside Walkthroughs. **No `echoFooter()` link and no row on the
-    other fifteen calculators** -- the alternative was costed at the same 26 translations for
-    fifteen more pages and he declined it, so a later session proposing the footer is re-opening a
-    closed question. One new key, `ext()`, a new tab.
-  Tom, 2026-09-06: *"Is there a good place, maybe in Help, where we can link it?"* The site is live
-  (Task 591) and nothing in the suite points at it.
-  - **THE SLOT IS THE `lpn_` HELP MENU, ABOVE THE LEGAL SEPARATOR**, beside Walkthroughs. That menu
-    already opens external tabs, already carries the rows a first-time reader goes looking for, and
-    is the only Help furniture this page has -- it has no footer, which is why the legal row lives
-    there too. One row, one new key, `ext()` and a new tab, as Walkthroughs does.
-  - **AND IT WANTS A SECOND HOME, because the Help menu is on ONE page.** The other 15 calculators
-    reach a visitor through `echoFooter()`, which is where a suite-wide link belongs if we want one.
-    Decide whether this is an lpn-only row or a suite-wide footer link BEFORE writing the string:
-    the second costs the same 26 translations and reaches fifteen more pages.
-  - **THE ROW IS THE ONE PLACE A COMPETITOR NAME IS NOW ALLOWED IN A MENU ITEM**, on Task 591's
-    scoped reversal. It says where the link GOES; it does not restate the site's argument, and it
-    must not imply EPA affiliation. Nothing else in `dev/positioning.md` §1 moves.
-
 - 75|597| **Filter the tables, in EPANET's own words: Below, Equal to, Above.**
   Tom, 2026-09-06: *"EPANET allows table filters. Maybe Find could have next to the Find button a
   Filter in tables button ... with a selector for which table. I see this as not being the most
@@ -844,9 +824,11 @@ the block.
   expected Help, but that doesn't."* **He is right and I checked: nothing does.** No `.php` in this
   suite contains the string `librewaternet` outside `lib/config.inc.php`'s canonical whitelist. The
   page is live, annotated and unreachable from the software it depicts.
-  - **Phase 1, and it is nearly free: a link from Help.** The pictures exist and are maintained in
-    another repository; Help carrying a link costs one string and goes stale only when the page
-    does. **[H] Where in Help, and the wording, are Tom's.**
+  - **PHASE 1 SHIPPED 2026-09-06.** One row in the `lpn_` Help menu beside Walkthroughs, the slot
+    Task 596 settled for the same menu the same day. `lpn_help_screenshots` reads *Pictures of this
+    page in use* and reaches Tom on `dev/new-english-keys.md`, which is where the wording ruling he
+    reserved actually happens. **The other fifteen calculators still do not link it** -- that is a
+    footer decision, costed at the same 26 translations, and 596 declined it for its own row.
   - **Phase 2 is the original task and is NOT the same thing:** a filmstrip GIF from
     `dev/filmstrip-gif-recipe.md` (the add-pipe / add-junction workflow). A 2026-07-30 proof of
     concept showed it is cheap once set up — the hard part is precise SVG click targeting, not GIF
