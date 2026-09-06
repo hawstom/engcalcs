@@ -157,7 +157,11 @@ function inputsUnder(node, out) {
 	// only the two switches Tom named first and left Friction method and Default demand pattern at
 	// the foot of the section, where build order had put them. He gave the whole order twice
 	// (2026-09-05: *"I think I said this before."*), so the whole order is what is asserted.
-	const WANT = ['Recalculate automatically', 'Solve with the EPANET solver', 'Friction method',
+	// The engine row was RELABELLED by Task 602 -- it reads "Use the built-in solver when possible"
+	// now, and the checkbox means the opposite of what it used to. Its POSITION in Tom's order is
+	// untouched, which is all this section asserts; the polarity is
+	// dev/lpn-spike/engine-checkbox-harness.js.
+	const WANT = ['Recalculate automatically', 'Use the built-in solver when possible', 'Friction method',
 		'Accuracy', 'Default demand pattern'];
 	const at = WANT.map(t => compText.indexOf(t));
 	ok('all five rows Tom ordered are in the Calculation pane', at.every(i => i >= 0),

@@ -82,7 +82,7 @@
                 "rc_notes_7_term",
                 "terms_link"
             ],
-            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED. Held back as still-stale: lpn_main_title, lpn_settings_engine_epanet, lpn_settings_engine_epanet_tip, lpn_engine_loading, lpn_engine_failed"
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED. Held back as still-stale: lpn_main_title, lpn_settings_engine_native, lpn_settings_engine_native_tip, lpn_engine_loading, lpn_engine_failed"
         },
         {
             "date": "2026-08-14",
@@ -116,15 +116,15 @@
             "keys": [
                 "lpn_engine_failed",
                 "lpn_engine_loading",
-                "lpn_settings_engine_epanet",
-                "lpn_settings_engine_epanet_tip"
+                "lpn_settings_engine_native",
+                "lpn_settings_engine_native_tip"
             ],
             "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         },
         {
             "date": "2026-08-14",
             "keys": [
-                "lpn_settings_engine_epanet_tip"
+                "lpn_settings_engine_native_tip"
             ],
             "reason": "Tom simplified 'EPANET's own solver' to 'the EPANET solver' (less idiomatic, and it removes the modifier that 16 languages had rendered as 'original'). All 16 resynced by targeted 1-key agents; the other 10 never carried a modifier."
         },
@@ -447,7 +447,7 @@
         {
             "date": "2026-08-17",
             "keys": [
-                "lpn_settings_engine_epanet_tip"
+                "lpn_settings_engine_native_tip"
             ],
             "reason": "Resynced in all 26 languages by sprint 397-labels-colour-units; every agent reported this key by name."
         },
@@ -552,7 +552,7 @@
         {
             "date": "2026-08-19",
             "keys": [
-                "lpn_settings_engine_epanet_tip"
+                "lpn_settings_engine_native_tip"
             ],
             "reason": "Sprint 438 resynced this key in all 26 languages"
         },
@@ -2741,8 +2741,8 @@
         "lpn_settings_emitter_exponent": "1d8660383db35f7b4b2754b1f2451fddc60c0a03",
         "lpn_settings_emitter_exponent_tip": "bca06e447b6920e2a5577cfc9f81fc1da9eff35c",
         "lpn_settings_energy": "437bcb15112715dc73cb38b85f0830f3ce457ded",
-        "lpn_settings_engine_epanet": "518a1af690a64303884cc20e84489abd5ef44ce3",
-        "lpn_settings_engine_epanet_tip": "5e74cee436c482289c85e8bf1802d3dc577f2688",
+        "lpn_settings_engine_native": "518a1af690a64303884cc20e84489abd5ef44ce3",
+        "lpn_settings_engine_native_tip": "5e74cee436c482289c85e8bf1802d3dc577f2688",
         "lpn_settings_flow_change": "0401663a50358abd4c9bca413e2fc3c63aa1d8a4",
         "lpn_settings_flow_change_tip": "c6b4618634755f6fd6498b7349fea614cb33892c",
         "lpn_settings_head_error": "8be0d6b0b1ce6b6b74e6172b44585dd09eed2afd",
@@ -7773,11 +7773,11 @@
             "words": 1,
             "ends_sentence": false
         },
-        "lpn_settings_engine_epanet": {
+        "lpn_settings_engine_native": {
             "words": 5,
             "ends_sentence": false
         },
-        "lpn_settings_engine_epanet_tip": {
+        "lpn_settings_engine_native_tip": {
             "words": 84,
             "ends_sentence": true
         },
