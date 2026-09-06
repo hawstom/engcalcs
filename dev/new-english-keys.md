@@ -25,37 +25,37 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 - **`lpn_curve_kind_effic`**
   > Pump efficiency
-  @@ NEEDS RULING
+  OK.
 - **`lpn_curve_kind_generic`**
   > Not stated
-  @@ NEEDS RULING
+  OK.
 - **`lpn_curve_kind_head`**
   > Pump head
-  @@ NEEDS RULING
+  OK.
 - **`lpn_curve_kind_headloss`**
   > Valve head loss
-  @@ NEEDS RULING
+  OK.
 - **`lpn_curve_kind_volume`**
   > Tank volume
-  @@ NEEDS RULING
+  OK.
 - **`lpn_curve_library_link`**
   > Curves library
-  @@ NEEDS RULING
+  OK.
 - **`lpn_curve_library_link_tip`**
   > Opens the Libraries box on its Curves section, where a curve is made, described, edited and deleted. An element names a curve; it does not hold one.
-  @@ NEEDS RULING
+  'a curve is added, '
 - **`lpn_curve_long_note`**
   > The curve {name} has {count} points, so it is shown here and edited under Libraries, Curves.
-  @@ NEEDS RULING
+  Curve ID {name} has {count} points; it is shown here and edited under Libraries, Curves.
 - **`lpn_curve_none`**
   > No curve
-  @@ NEEDS RULING
+  OK.
 - **`lpn_curve_shared_note`**
-  > These points belong to the curve {name}, which {ids} also use. Changing them here changes them there too.
-  @@ NEEDS RULING
+  > These points belong to curve {name}, which {ids} also use. Changing them here changes them there too.
+  belong to curve ID
 - **`lpn_curve_volume_col`**
   > Volume
-  @@ NEEDS RULING
+  OK.
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
   _Ruled OK 2026-09-04._
@@ -87,8 +87,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.
   _Ruled OK 2026-09-04._
 - **`lpn_energy_curve_note`**
-  > These pumps name an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}. Open a pump to type its own points.
-  @@ NEEDS RULING
+  > These pumps call an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}.
+  Edited.
 - **`lpn_energy_demand_charge`**
   > Peak demand charge
   _Ruled OK 2026-09-04._
@@ -166,112 +166,112 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_field_tag`**
   > Tag
-  @@ NEEDS RULING
+  OK.
 - **`lpn_field_tag_tip`**
-  > A tag of your own, carried into and out of the EPANET file. A tag changes no answer. Use it to match this to the number it already has in your asset records, your maps or your work orders. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it.
-  @@ NEEDS RULING
+  > A tag can have any meaning you require such as pressure zone, work order, etc. It is not used here or by EPANET. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.
+  Edited. Note that this is the second time I am changing this.
 - **`lpn_find_prop_demand_description`**
   > Demand category description
   _Ruled OK 2026-09-04._
 - **`lpn_gpv_curve_source`**
   > Head loss curve
-  @@ NEEDS RULING
+  OK.
 - **`lpn_gpv_curve_source_tip`**
   > The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can name the same curve, and editing it changes all of them.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_inp_drop_net_options`**
   > This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.
   _Ruled OK 2026-09-04._
 - **`lpn_inp_drop_sources_mixing`**
   > This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.
-  @@ NEEDS RULING
+  Is this message obsolete? I suppose it doesn't hurt. Would compaction help? Would 'This file includes chemical reaction modeling; use the EPANET solver' be enough now?
 - **`lpn_library_curve_add`**
   > Add a curve
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_copy`**
   > Copy points
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_copy_manual`**
   > Copy these points
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_copy_tip`**
   > Copies every point as two columns, ready to paste into a spreadsheet.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_in_use`**
   > This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_kind`**
   > What this curve describes
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_note_label`**
   > Description
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_note_tip`**
   > What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_remove_point`**
   > Remove this point
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_unused`**
   > Nothing uses this curve.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_used_by`**
   > Used by
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_values_tip`**
   > Select two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.
-  @@ NEEDS RULING
+  one or two columns
 - **`lpn_library_curve_x`**
   > X
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_curve_y`**
   > Y
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_rule_add`**
   > Add a rule
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_rule_bad`**
   > ⚠ Not understood
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_rule_missing`**
   > ⚠ This network has nothing called {id}
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_rule_ok`**
   > ✓ Understood
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_rule_tip`**
   > One rule, in the words EPANET uses, one clause per line. A first line names it: RULE 1. Then a condition: IF TANK 2 LEVEL BELOW 17.1. Then what to do about it: THEN PUMP 9 STATUS IS OPEN. A last line may rank it: PRIORITY 1. Add AND or OR lines to test more than one thing, and ELSE lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Write the numbers in the units this project is showing; they are converted for you. Leave the keywords in English; they are what the page and EPANET read.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_rules`**
   > Rules
-  @@ NEEDS RULING
+  OK.
 - **`lpn_library_rules_tip`**
   > A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_mixing_2comp`**
   > Two compartment mixing
-  @@ NEEDS RULING
+  OK.
 - **`lpn_mixing_fifo`**
   > FIFO plug flow
-  @@ NEEDS RULING
+  I think I already approved many of these. Did you lose my edits?
 - **`lpn_mixing_fraction`**
   > Mixing fraction
-  @@ NEEDS RULING
+  OK.
 - **`lpn_mixing_fraction_tip`**
   > The share of the tank volume that the inlet zone takes up, between 0 and 1. Only two compartment mixing uses it. Leave it empty and the whole tank is the inlet zone, which is what EPANET assumes.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_mixing_lifo`**
   > LIFO plug flow
-  @@ NEEDS RULING
+  OK.
 - **`lpn_mixing_mixed`**
   > Complete mixing
-  @@ NEEDS RULING
+  OK.
 - **`lpn_mixing_model`**
   > Mixing model
-  @@ NEEDS RULING
+  OK.
 - **`lpn_mixing_model_tip`**
   > How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_net_emergency`**
   > This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.
   _Ruled OK 2026-09-04._
@@ -279,29 +279,29 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.
   _Ruled OK 2026-09-04._
 - **`lpn_pump_curve_source_tip`**
-  > The curve in the Libraries box that says how much head this pump makes at each flow. Several pumps can name the same curve, and editing it changes all of them.
-  @@ NEEDS RULING
+  > The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can name the same curve, and editing it changes all of them.
+  Edited.
 - **`lpn_pump_effic_col`**
   > Efficiency
-  @@ NEEDS RULING
+  OK.
 - **`lpn_pump_effic_curve`**
   > Efficiency curve
-  @@ NEEDS RULING
+  OK.
 - **`lpn_pump_effic_curve_tip`**
   > The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_pump_effic_global`**
-  > This pump has no efficiency curve, so it runs at the network efficiency of {percent}. Type points below to give it one.
-  @@ NEEDS RULING
+  > This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.
+  Edited. I already edited this. I think you lost my work. We must be more careful.
 - **`lpn_pump_effic_note`**
-  > Flow and the percent efficiency at that flow, in the order the pump works through them. With no points the pump runs at the network efficiency.
-  @@ NEEDS RULING
+  > Flow vs percent efficiency. A pump with no efficiency curve selected runs at the network efficiency.
+  Edited. Is this key obsolete?
 - **`lpn_pump_effic_remove`**
   > Remove this point
-  @@ NEEDS RULING
+  OK.
 - **`lpn_pump_effic_unstated`**
-  > This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}. Type its points below.
-  @@ NEEDS RULING
+  > This pump calls the undefined efficiency curve ID {name}, so it runs at the network efficiency of {percent}.
+  Edited.
 - **`lpn_quality_chemical_name`**
   > Chemical and units
   _Ruled OK 2026-09-04._
@@ -370,10 +370,10 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_rule_dangling_note`**
   > These rules name an element that is no longer in this project, so they were left out: {ids}
-  @@ NEEDS RULING
+  'left out' isn't very explanatory. 'ignored'? 'not imported'?
 - **`lpn_rule_unreadable_note`**
   > These rules could not be read, so they were left out: {ids}
-  @@ NEEDS RULING
+  'left out' isn't very explanatory. 'ignored'? 'not imported'?
 - **`lpn_scncmp_at`**
   > {value} at {id}
   _Ruled OK 2026-09-04._
@@ -409,34 +409,34 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   _Ruled OK 2026-09-04._
 - **`lpn_source_pattern`**
   > Source pattern
-  @@ NEEDS RULING
+  OK.
 - **`lpn_source_pattern_tip`**
-  > A time pattern that scales the dose through the day, for a feed that does not run flat out around the clock. Leave it on No pattern and the dose is the same at every hour.
-  @@ NEEDS RULING
+  > A time pattern that scales the dose through the day, for a feed that does not run flat out around the clock. No pattern means that the dose is the same at every step.
+  Edited. And please audit the language for instances of 'day' that should be 'simulation' and of 'hour' that should be 'step'.
 - **`lpn_source_quality`**
   > Source quality
-  @@ NEEDS RULING
+  OK.
 - **`lpn_source_quality_tip`**
   > How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_source_type`**
   > Source type
-  @@ NEEDS RULING
+  OK.
 - **`lpn_source_type_concen`**
   > Concentration
-  @@ NEEDS RULING
+  OK.
 - **`lpn_source_type_flowpaced`**
   > Flow paced booster
-  @@ NEEDS RULING
+  OK.
 - **`lpn_source_type_mass`**
   > Mass booster
-  @@ NEEDS RULING
+  OK.
 - **`lpn_source_type_setpoint`**
   > Setpoint booster
-  @@ NEEDS RULING
+  OK.
 - **`lpn_source_type_tip`**
-  > What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the strength below. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the water leaving this node to the strength below and no further. Flow paced booster adds the strength below to whatever is already in the water.
-  @@ NEEDS RULING
+  > What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the strength below. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the concentration leaving this node to the strength below and no further. Flow paced booster adds the strength below to whatever is already in the water.
+  Edited.
 - **`lpn_time_run_report_copied`**
   > Copied
   _Ruled OK 2026-09-04._
