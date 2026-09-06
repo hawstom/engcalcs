@@ -98,6 +98,23 @@ console.log('\n-- the Help menu rows --');
 	const fn = src.slice(src.indexOf('function openHelpMenu'));
 	const body = fn.slice(0, fn.indexOf('\n\tfunction ', 10));
 	report(/pc\.lpn_help_walkthroughs/.test(body), 'Walkthroughs');
+	// Two OUTWARD rows added 2026-09-06 (Tasks 596 and 178 phase 1). Both are the same shape as
+	// Walkthroughs -- a key, an ext(), a new tab -- and both are asserted on their DESTINATION as
+	// well as their key, because the whole value of either row is the host it reaches. The
+	// screenshots page was live, annotated and reachable from nothing for weeks; the gateway site
+	// is the one place dev/positioning.md now permits a competitor name in a menu item, and that
+	// permission covers not-epanet.org and nowhere else.
+	report(/pc\.lpn_help_screenshots/.test(body), 'Pictures of this page in use');
+	report(/pc\.lpn_help_not_epanet/.test(body), 'Not EPANET');
+	report(/LPN_SCREENSHOTS_URL/.test(body) && /librewaternet\.org\/screenshots\.html/.test(src),
+		'and the screenshots row reaches the live page, not a repository path');
+	report(/LPN_NOT_EPANET_URL/.test(body) && /https:\/\/not-epanet\.org/.test(src),
+		'and the gateway row reaches not-epanet.org, the one host that permission covers');
+	// EVERY outward row opens a NEW TAB, and that is not stylistic: init()'s beforeunload guard
+	// prompts whenever a file project is dirty, so navigating this tab would meet a browser
+	// "Leave site?" dialog mid-edit.
+	report(/ext\(LPN_SCREENSHOTS_URL\)/.test(body) && /ext\(LPN_NOT_EPANET_URL\)/.test(body),
+		'both go through ext(), so neither can navigate this tab away from a dirty project');
 	report(/pc\.lpn_help_notes/.test(body), 'Notes');
 	report(/pc\.lpn_help_fix/.test(body), 'Fix something');
 	report(/pc\.about_main_menu/.test(body), 'About');
@@ -236,7 +253,7 @@ console.log('\n-- the map fits the window instead of guessing 72% of it --');
 }
 
 console.log('\n-- the strings exist --');
-['lpn_help_fix', 'lpn_help_notes', 'lpn_examples_blank'].forEach(function (k) {
+['lpn_help_fix', 'lpn_help_notes', 'lpn_examples_blank', 'lpn_help_screenshots', 'lpn_help_not_epanet'].forEach(function (k) {
 	report(en.indexOf(`$ec_lang['${k}']`) >= 0, `${k} is in lang.ec.en.php`);
 });
 {
