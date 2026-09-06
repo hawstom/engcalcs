@@ -132,17 +132,6 @@ the block.
   - **Retranslations owed: 4 x 26 = 104** -- `lpn_inp_drop_eps`, `lpn_time_no_engine`,
     `lpn_time_no_period`, `lpn_time_run_note`. Closes with the next sprint.
 
-
-- 100|581| **An empty box cannot say "this file states zero" apart from "nothing is set".**
-  Found 2026-09-04 while Tom read the refreshed gallery: Net2 states `Fluoride mg/L` with all-zero
-  reaction globals, and Net3 states price 0 and demand charge 0, so the examples are faithful and
-  the interface still reads as though the numbers were never filled in. **Sparseness is deliberate
-  and load-bearing** -- an empty box exports no line and a typed zero exports a line stating zero,
-  and those are two different files (Task 553) -- so the fix is not to fill the box. It is to show
-  the difference, and the honest question is whether a reader ever needs to see it or only an
-  exporter does.
-
-
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
   What that one pass costs, in Chromium on the 480-pipe grid `specs/perf.js` builds: 1.3–7.3 s in

@@ -2910,6 +2910,10 @@ $ec_lang['lpn_energy_peak_kw']='Peak power usage';
 $ec_lang['lpn_energy_total_demand_charge']='Cost of peak demand';
 $ec_lang['lpn_energy_total_cost']='Total cost';
 $ec_lang['lpn_energy_no_price']='No price of power is stated, so every cost here is zero. Set one under Settings, Energy.';
+// The sibling of the line above, and the difference between them is the whole of Task 581: a file
+// that states a price of zero is not a file that states no price, and the report must not say the
+// second when the document says the first. All three EPA reference networks state zero.
+$ec_lang['lpn_energy_price_zero']='This network states a price of zero, so every cost here is zero. Change it under Settings, Energy.';
 $ec_lang['lpn_energy_curve_note']='These pumps call an efficiency curve with no points: {ids}. They ran at the efficiency set for the whole network.';
 // The Labels lists' two narrowest column headings, which are a column three characters wide each.
 // The decimals column is headed by an EXAMPLE of what it does -- and the example is translatable

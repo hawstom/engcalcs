@@ -1679,6 +1679,7 @@ EngCalcs.pageConfig = {
 	lpn_energy_total_demand_charge: <?=json_encode($ec_lang['lpn_energy_total_demand_charge'])?>,
 	lpn_energy_total_cost: <?=json_encode($ec_lang['lpn_energy_total_cost'])?>,
 	lpn_energy_no_price: <?=json_encode($ec_lang['lpn_energy_no_price'])?>,
+	lpn_energy_price_zero: <?=json_encode($ec_lang['lpn_energy_price_zero'])?>,
 	lpn_energy_curve_note: <?=json_encode($ec_lang['lpn_energy_curve_note'])?>,
 	lpn_settings_restore_tip: <?=json_encode($ec_lang['lpn_settings_restore_tip'])?>,
 	lpn_reset_all_tip: <?=json_encode($ec_lang['lpn_reset_all_tip'])?>,

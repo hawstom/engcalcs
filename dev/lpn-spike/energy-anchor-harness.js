@@ -439,6 +439,108 @@ const EngCalcs = global.EngCalcs;
 	check(/200/.test(text), 'and the demand charge of 5 per kW on a 40 kW peak is 200');
 
 	// =========================================================================================
+	head('9b. A STATED ZERO IS NOT AN UNSTATED PRICE (Task 581)');
+	// =========================================================================================
+	//
+	// **THE REPORT USED TO INFER A FACT ABOUT THE DOCUMENT FROM THE ANSWER.** Its note fired on
+	// `!energyCost && !demandCharge` and said "No price of power is stated" -- so it was false on
+	// all three EPA reference networks, every one of which states `Global Price 0.0` and
+	// `Demand Charge 0.0`, and equally false for a priced network whose pumps never ran.
+	//
+	// Three documents, one at a time, because the three sentences are the whole of the fix and each
+	// of them is wrong in a different direction:
+	//
+	//   nothing stated  -> "No price of power is stated"  (the file is silent; EPANET's zero applies)
+	//   zero stated     -> "This network states a price of zero" (the file said it; do not offer to
+	//                      set what is already set)
+	//   priced, no cost -> NO NOTE AT ALL. The zeros are about the pumps, not about the price, and
+	//                      either sentence would be a false claim about the file.
+	//
+	// Driven through rebuildEnergyReport() rather than through energyPriceStated() directly: the
+	// defect was a SENTENCE, so what has to be asserted is the sentence a reader sees.
+	function reportTextWith(energy, perPumpPrice, summary) {
+		L.getSettings().energy = energy;
+		L.setProp(pu, 'energyPrice', perPumpPrice);
+		EngCalcs.lpnTimeRunEnergy = function () { return summary; };
+		L.rebuildEnergyReport();
+		return (document.getElementById('lpn_energy_report').textContent || '').replace(/\s+/g, ' ');
+	}
+	function freeSummary(price, charge, kw) {
+		return EngCalcs.lpnEnergySummary(
+			EngCalcs.lpnEnergyAccumulate(EngCalcs.lpnEnergyAccInit([pu.id]),
+				(function (o) { o[pu.id] = { kw: kw === undefined ? 40 : kw, effic: 0.7, price: price }; return o; }({})), 3600),
+			{ duration: 3600, demandCharge: charge });
+	}
+	const silent = reportTextWith({ globalEfficiency: 75, effic: {} }, undefined, freeSummary(0, 0));
+	check(/No price of power is stated/.test(silent),
+		'a document that states no price at all still says so');
+	check(!/states a price of zero/.test(silent), 'and does not claim a zero it has not got');
+
+	// Net3's own [ENERGY], to the character: Global Efficiency 75, Global Price 0.0,
+	// Demand Charge 0.0. Read out of the file rather than retyped, so the case cannot drift from
+	// the network it is about.
+	const n3energy = EngCalcs.lpnEnergyParse(
+		EngCalcs.lpnInpParse(fs.readFileSync(path.join(ROOT, 'dev/lpn-spike/reference/Net3.inp'), 'utf8'))
+			.inpSections.ENERGY || []);
+	check(n3energy.globalPrice === 0 && n3energy.demandCharge === 0,
+		'Net3 states both as zero, which is the case this section exists for');
+	const zero = reportTextWith(Object.assign({ effic: {} }, n3energy), undefined, freeSummary(0, 0));
+	check(/states a price of zero/.test(zero),
+		'a document stating zero says the file stated it');
+	check(!/No price of power is stated/.test(zero),
+		'and NEVER the sentence that was false on all three EPA networks');
+
+	// A demand charge stated as zero with no price at all is still a statement, and the same one.
+	const chargeOnly = reportTextWith({ globalEfficiency: 75, demandCharge: 0, effic: {} },
+		undefined, freeSummary(0, 0));
+	check(/states a price of zero/.test(chargeOnly),
+		'a peak demand charge of zero on its own is a stated zero too');
+
+	// **THE THIRD DOCUMENT IS THE ONE THAT CATCHES A LAZY FIX.** A priced network whose pumps drew
+	// no power at all still totals zero, so the note's own condition still fires -- and a patch that
+	// merely swapped the two sentences would print one here, and it would still be false.
+	const idle = reportTextWith({ globalEfficiency: 75, globalPrice: 0.2, effic: {} },
+		undefined, freeSummary(0.2, 0, 0));
+	check(/Cost of energy/.test(idle) && !/No price of power is stated/.test(idle)
+		&& !/states a price of zero/.test(idle),
+	`a priced network whose pumps drew nothing gets no claim about its price at all: ${idle.slice(-90)}`);
+	// And a per-pump price is a stated price, through the same resolver every other one goes through
+	// -- so it must lift a document out of 'none' on its own.
+	const pumpPriced = reportTextWith({ globalEfficiency: 75, effic: {} }, 0.2, freeSummary(0.2, 0, 0));
+	check(!/No price of power is stated/.test(pumpPriced),
+		'and a price stated on the pump alone is still a price this network states');
+	L.setProp(pu, 'energyPrice', undefined);
+
+	// **THE ROUND TRIP IS THE OTHER HALF, AND IT WAS ALREADY RIGHT.** Nothing above touches the
+	// document, so Net3's own [ENERGY] text must still come back character for character -- the
+	// property that makes the stated zero real rather than cosmetic.
+	const n3src = EngCalcs.lpnInpParse(
+		fs.readFileSync(path.join(ROOT, 'dev/lpn-spike/reference/Net3.inp'), 'utf8'));
+	check(EngCalcs.lpnEnergyText(EngCalcs.lpnEnergyParse(n3src.inpSections.ENERGY || []),
+		n3src.inpSections.ENERGY).join('\n') === (n3src.inpSections.ENERGY || []).join('\n'),
+	'Net3\'s [ENERGY] round-trips byte for byte, zeros and all');
+
+	// **AND THE CLAIM THE WHOLE FIX RESTS ON, ASSERTED RATHER THAN ASSUMED.** The reason the repair
+	// is one sentence and not a badge on every box is that a box already shows the difference: a
+	// stated zero is the character `0` in it and an unstated value is an empty string, and nothing
+	// else on this page ever puts a `0` there. If that ever stopped being true, the sentence would
+	// be the only place a reader could see it and this section would be guarding the wrong half.
+	function energyBoxValues() {
+		L.rebuildSettingsFields();
+		const out = [];
+		(function walk(n) {
+			(n.children || []).forEach(function (k) { if (k.tagName === 'INPUT') { out.push(k.value); } walk(k); });
+		}(document.getElementById('lpn_set_energy_fields')));
+		return out;
+	}
+	L.getSettings().energy = Object.assign({ effic: {} }, n3energy);
+	check(energyBoxValues().join('|') === '75|0|0|',
+		`Net3's stated zeros are visible AS zeros: ${energyBoxValues().join('|')}`);
+	L.getSettings().energy = { globalEfficiency: 75, effic: {} };
+	check(energyBoxValues().join('|') === '75|||',
+		`and a document stating none leaves those same boxes empty: ${energyBoxValues().join('|')}`);
+
+	// =========================================================================================
 	head('10. THE WIRING: the carried curve reaches the model, on the flow axis (Task 582)');
 	// =========================================================================================
 	// **THE ONE BRIDGE BETWEEN THE DOCUMENT AND THE ENGINE WRITER IS `docEnergy()`.** The points of
