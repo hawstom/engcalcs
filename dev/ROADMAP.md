@@ -170,20 +170,6 @@ the block.
   - **The one design question is the same one the `.inp` importer already answered:** a row that
     cannot be honoured is reported, never dropped and never guessed at.
 
-- 100|583| **One EPS sentence left, and it is Tom's to rule.**
-  `dev/eps-terminology-audit.md` §4 has all eight rows and his marks on seven of them.
-  - **`lpn_time_running` is the one row he left blank.** Unruled, so unchanged, and the audit rated
-    it the single best place to name the analysis: it is the progress line, what the page says while
-    it is doing the thing. Suggested: *Working out the extended period simulation with the EPANET
-    solver.* Translated: 26.
-  - **`lpn_time_run_note` shipped 2026-09-06**, in §5's wording, and the sentence that asserted an
-    unmeasured cause is gone. **Answering it found something bigger**: the correction had been
-    written into `lib/lang.ec.en.php` and not into the JS fallback literal beside it, and a measure
-    of all of them found **201 of 888 fallbacks across `js/*.js` disagreeing with the language
-    file**. `js/lpn-time.js`'s seven are synced; the rest and the check are Task 322's.
-  - **Retranslations owed: 4 x 26 = 104** -- `lpn_inp_drop_eps`, `lpn_time_no_engine`,
-    `lpn_time_no_period`, `lpn_time_run_note`. Closes with the next sprint.
-
 - 100|436| **What a wheel notch costs, and the placement leftovers.**
   **A notch never ran the relayout — it defers to `scheduleReshed()`, 120 ms after the LAST notch.**
   What that one pass costs, in Chromium on the 480-pipe grid `specs/perf.js` builds: 1.3–7.3 s in
