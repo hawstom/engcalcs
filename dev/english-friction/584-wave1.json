@@ -102,8 +102,8 @@
     "Anzahl individueller Werte",
     "Individuelle Werte, count implied by context"
    ],
-   "disposition": "dismissed",
-   "resolution": "FIVE languages independently filed on this one key this sprint -- de, tr, zh, he and (in its report rather than as an entry) es. That is the strongest signal in the sprint and it is NOT re-litigated here: Tom set 'No. of custom values' himself on 2026-09-04 and reaffirmed it on 2026-09-06 (\"We resolved this yesterday... You are wrong\"), and wave0_keyset.php now excludes it so no future Wave 0 re-raises it. His ruling stands. The count is recorded for HIM, as evidence, not as an argument. 'Anzahl individueller Werte' keeps the ruled 'Individuelle' sense and is correct.",
+   "disposition": "glossary",
+   "resolution": "FIVE languages independently filed on this one key this sprint -- de, tr, zh, he and (in its report rather than as an entry) es. That is the strongest signal in the sprint and it is NOT re-litigated here: Tom set 'No. of custom values' himself on 2026-09-04 and reaffirmed it on 2026-09-06 (\"We resolved this yesterday... You are wrong\"), and wave0_keyset.php now excludes it so no future Wave 0 re-raises it. His ruling stands. The count is recorded for HIM, as evidence, not as an argument. 'Anzahl individueller Werte' keeps the ruled 'Individuelle' sense and is correct. || RE-ANSWERED 2026-09-06 AS `glossary`, AND SIX OF YOU WERE RIGHT ABOUT THE SAME THING. Tom asked what the substance of these filings actually was; read together they are not a complaint about his English at all, they are one structural finding: the key became a COUNT and the glossary term stayed a LABEL, so every language had to invent a count construction the entry did not cover. Worse, the entry's own context still said the status strip calls them \"Own values\" -- the PRE-RENAME English -- so a translator following it was told the wrong label. FIXED IN glossary.json: the `override (scenario value)` context now states the count sense and both call sites (a column heading, and the scenario button's 'label: 3'), and the note records that six languages found it independently. The per-language translations are UNCHANGED -- they were right for the value sense, and building a count from them is the right move. The ENGLISH is untouched: Tom's ruling stands and was never in question.",
    "answered": "2026-09-06"
   },
   {
@@ -141,8 +141,8 @@
     "Kendi deger sayisi",
     "Ozel deger sayisi"
    ],
-   "disposition": "dismissed",
-   "resolution": "Same as the German entry above: Tom's ruling stands and is not re-litigated. 'Kendi deger sayisi' keeps the safe non-eigenvalue root and adds the count, which is the right adaptation.",
+   "disposition": "glossary",
+   "resolution": "Same as the German entry above: Tom's ruling stands and is not re-litigated. 'Kendi deger sayisi' keeps the safe non-eigenvalue root and adds the count, which is the right adaptation. || RE-ANSWERED 2026-09-06 AS `glossary`, AND SIX OF YOU WERE RIGHT ABOUT THE SAME THING. Tom asked what the substance of these filings actually was; read together they are not a complaint about his English at all, they are one structural finding: the key became a COUNT and the glossary term stayed a LABEL, so every language had to invent a count construction the entry did not cover. Worse, the entry's own context still said the status strip calls them \"Own values\" -- the PRE-RENAME English -- so a translator following it was told the wrong label. FIXED IN glossary.json: the `override (scenario value)` context now states the count sense and both call sites (a column heading, and the scenario button's 'label: 3'), and the note records that six languages found it independently. The per-language translations are UNCHANGED -- they were right for the value sense, and building a count from them is the right move. The ENGLISH is untouched: Tom's ruling stands and was never in question.",
    "answered": "2026-09-06"
   },
   {
@@ -167,8 +167,8 @@
     "append a count noun",
     "use the bare glossary term and accept the awkward heading"
    ],
-   "disposition": "dismissed",
-   "resolution": "Same as the German and Turkish entries: Tom's ruling stands. Appending a count noun to the glossary term is the right adaptation and is what several other languages did independently.",
+   "disposition": "glossary",
+   "resolution": "Same as the German and Turkish entries: Tom's ruling stands. Appending a count noun to the glossary term is the right adaptation and is what several other languages did independently. || RE-ANSWERED 2026-09-06 AS `glossary`, AND SIX OF YOU WERE RIGHT ABOUT THE SAME THING. Tom asked what the substance of these filings actually was; read together they are not a complaint about his English at all, they are one structural finding: the key became a COUNT and the glossary term stayed a LABEL, so every language had to invent a count construction the entry did not cover. Worse, the entry's own context still said the status strip calls them \"Own values\" -- the PRE-RENAME English -- so a translator following it was told the wrong label. FIXED IN glossary.json: the `override (scenario value)` context now states the count sense and both call sites (a column heading, and the scenario button's 'label: 3'), and the note records that six languages found it independently. The per-language translations are UNCHANGED -- they were right for the value sense, and building a count from them is the right move. The ENGLISH is untouched: Tom's ruling stands and was never in question.",
    "answered": "2026-09-06"
   },
   {
@@ -180,8 +180,8 @@
     "the full, clear form",
     "a shorter but vaguer form"
    ],
-   "disposition": "dismissed",
-   "resolution": "Same ruling. The column-width worry is real and is the honest cost of the English Tom chose; the layout rule says a mid-word wrap is acceptable and a column is never widened to expand an abbreviation, so the full clear form is correct here.",
+   "disposition": "glossary",
+   "resolution": "Same ruling. The column-width worry is real and is the honest cost of the English Tom chose; the layout rule says a mid-word wrap is acceptable and a column is never widened to expand an abbreviation, so the full clear form is correct here. || RE-ANSWERED 2026-09-06 AS `glossary`, AND SIX OF YOU WERE RIGHT ABOUT THE SAME THING. Tom asked what the substance of these filings actually was; read together they are not a complaint about his English at all, they are one structural finding: the key became a COUNT and the glossary term stayed a LABEL, so every language had to invent a count construction the entry did not cover. Worse, the entry's own context still said the status strip calls them \"Own values\" -- the PRE-RENAME English -- so a translator following it was told the wrong label. FIXED IN glossary.json: the `override (scenario value)` context now states the count sense and both call sites (a column heading, and the scenario button's 'label: 3'), and the note records that six languages found it independently. The per-language translations are UNCHANGED -- they were right for the value sense, and building a count from them is the right move. The ENGLISH is untouched: Tom's ruling stands and was never in question.",
    "answered": "2026-09-06"
   },
   {
@@ -310,9 +310,9 @@
     "count of overridden property values within one scenario",
     "count of scenarios that have overrides"
    ],
-   "disposition": "dismissed",
+   "disposition": "glossary",
    "answered": "2026-09-06",
-   "resolution": "The SIXTH language to file on this one key this sprint (de, tr, zh, he, my, plus es in prose). Tom set this English himself on 2026-09-04 and reaffirmed it on 2026-09-06; wave0_keyset.php now excludes it so no future Wave 0 re-raises it. HIS RULING STANDS and is not re-litigated here. The agent's first reading is the correct one. The count of filings is recorded for him as evidence, not as an argument."
+   "resolution": "The SIXTH language to file on this one key this sprint (de, tr, zh, he, my, plus es in prose). Tom set this English himself on 2026-09-04 and reaffirmed it on 2026-09-06; wave0_keyset.php now excludes it so no future Wave 0 re-raises it. HIS RULING STANDS and is not re-litigated here. The agent's first reading is the correct one. The count of filings is recorded for him as evidence, not as an argument. || RE-ANSWERED 2026-09-06 AS `glossary`, AND SIX OF YOU WERE RIGHT ABOUT THE SAME THING. Tom asked what the substance of these filings actually was; read together they are not a complaint about his English at all, they are one structural finding: the key became a COUNT and the glossary term stayed a LABEL, so every language had to invent a count construction the entry did not cover. Worse, the entry's own context still said the status strip calls them \"Own values\" -- the PRE-RENAME English -- so a translator following it was told the wrong label. FIXED IN glossary.json: the `override (scenario value)` context now states the count sense and both call sites (a column heading, and the scenario button's 'label: 3'), and the note records that six languages found it independently. The per-language translations are UNCHANGED -- they were right for the value sense, and building a count from them is the right move. The ENGLISH is untouched: Tom's ruling stands and was never in question."
   },
   {
    "key": "lpn_settings_viscosity",

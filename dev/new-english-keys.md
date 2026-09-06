@@ -35,8 +35,8 @@ is the one you meant. "The first one" is a complete answer.
   *The finding:* Outside the delta, found while translating: the existing Pashto for 'Relative diffusivity' reuses the same word this sprint had to use for 'concentration', and the two appear together on the water-quality settings screen.
   1. leave it alone, outside sprint scope, and file
   2. retranslate it despite being outside the delta
-  **What this asks for:** which of the readings above you meant.
+  **What this asks for:** WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key (a note to the 26 translators; it changes no English and nothing a visitor reads).
   *The proposal:* THE AGENT DID EXACTLY THE RIGHT THING -- it stayed inside its delta and filed rather than editing a key nobody asked it to touch. The collision is real and is INSIDE Pashto, not in the English: two distinct English terms landed on one Pashto word, and both are on the same screen. No English defect, so there is nothing to rewrite; what it needs is a Pashto speaker or a targeted single-key fix, w...
-  The English needs a _syn "Relative rate of diffusion"
+  @@ NEEDS RULING
 
 None. Every English key is present in at least one other language.
