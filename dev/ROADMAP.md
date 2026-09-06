@@ -182,10 +182,16 @@ the block.
     a profile ends in naming a node out loud, to a colleague or in a report.
   - **The distance axis already knows where each node lands**, so this is a reader over geometry
     that exists, not new arithmetic -- the same reason Task 599 ranks where it does.
-  - **THE HARD HALF IS CROWDING, AND IT IS ALREADY SOLVED HERE.** A profile through forty junctions
-    has forty labels on one axis. `js/lpn-collide.js` is exactly this problem as pure weighted-box
-    relaxation and `js/lpn-geom.js` owns label rects; reach for those rather than inventing a
-    second answer, and Task 283's auto-hide rule is the same question again.
+  - **THE HARD HALF IS CROWDING, AND THE ANSWER IS ALREADY WRITTEN IN THE RIGHT FILE.**
+    `labelStride(positions, minGap)` in `js/lpn-profile.js` takes coordinates along an axis and
+    returns the indices there is room to draw -- greedily from the left, **and the last one always,
+    because the end of a path is the one station a reader looks for by name**. That is this problem
+    exactly, in the module that already owns the axis. `js/lpn-collide.js` is the MAP's answer and is
+    the wrong reach: a row of labels on one axis is a one-dimensional stride, not weighted-box
+    relaxation in a plane.
+  - **The drawing lives in `js/looped-network.js`, not in `js/lpn-profile.js`**, which is pure and
+    holds the series and the axis arithmetic. Say so in the brief -- a track that assumes otherwise
+    will find its territory is the big file after all.
   - Do it with Task 599 if they land together: a time-series plot and a profile that both name
     their points want one idiom, and a second plotting vocabulary on this page is the expensive
     mistake either way.
