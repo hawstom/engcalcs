@@ -104,17 +104,27 @@ function buildNet(opts) {
 	[o.juncCount === undefined ? 2 : o.juncCount, 1, 0, 1, 1, 1, 1, 0, 1, 2].forEach((c) => w.i8(c));
 	w.ws('');                       // title
 	w.list([], w.str);              // notes
-	w.i8(45);                       // option count
-	const options = new Array(45).fill('');
+	// **46 SLOTS, NOT 45, AND ON PURPOSE.** EPA's own `Uglobals.pas` declares `MAXOPTIONS = 45`,
+	// so a current GUI writes indices 0..45 while every file in this repo's corpus stops at 44.
+	// The count is read from the file rather than assumed, and slot 45 is what proves it: it is
+	// `EMITTER_BACK_INDEX`, this reader does not carry it, and it must therefore be REPORTED.
+	w.i8(46);                       // option count
+	const options = new Array(46).fill('');
 	options[0] = 'GPM'; options[1] = 'H-W'; options[2] = '1'; options[3] = '1';
 	options[4] = '40'; options[5] = '0.001'; options[6] = 'Continue'; options[7] = '1';
 	options[8] = '1.0'; options[9] = '0.5'; options[10] = 'No'; options[11] = 'None';
 	options[12] = 'mg/L'; options[13] = '1'; options[15] = '0.01';
-	// **THE SLOTS THIS READER CANNOT NAME, POPULATED ON PURPOSE.** Without them the report path
-	// below would assert on an empty list and pass whatever the code did. Slot 17 holds `1` and so
-	// do BOTH `Order Bulk` and `Order Tank` in all three reference models, so nothing separates
-	// them; 39 and 40 hold `0` and EPANET's own export states no keyword carrying it.
-	options[17] = '1'; options[39] = '0'; options[40] = '0';
+	// **THE SLOTS THIS READER CANNOT CARRY, POPULATED ON PURPOSE.** Without them the report path
+	// below would assert on an empty list and pass whatever the code did. Every slot 0..44 now has
+	// a name (2026-09-06, out of EPA's own GUI source), so the two left are the two that are named
+	// and still cannot reach an `.inp`: 16 is `MAX_SEGS_INDEX`, which `Uexport.pas` never writes,
+	// and 45 is `EMITTER_BACK_INDEX`, past the end of every file in the corpus.
+	options[16] = '100'; options[45] = 'Yes';
+	// The bulk order, which EPANET writes twice -- `Order Bulk` and `Order Tank`, one slot.
+	options[17] = '1';
+	// Head error and flow change tolerances. EPANET writes each only when it is positive, so `0`
+	// produces no line and is still not a loss: the value is understood, not stranded.
+	options[39] = '0'; options[40] = '0';
 	// `[REACTIONS]`. The wall order is stored as a WORD and written as a number; the two
 	// coefficients carry Net1's own values, which are what made the slot numbers legible.
 	options[18] = 'First'; options[19] = '-.5'; options[20] = '-1';
@@ -211,11 +221,12 @@ const EXPECTED = [
 	'',
 	// **EVERY LINE HERE IS ONE EPANET ITSELF WROTE**, copied out of
 	// dev/net-import-study/All-three/2-EPANET-NET-back-to-INP/Net1.inp, whose `.net` states `-.5`
-	// at slot 19 and `-1` at slot 20. `Order Bulk 1` and `Order Tank 1` stand in that same file and
-	// are deliberately NOT here: slot 17 holds `1` and nothing in any of the three models
-	// distinguishes the two, so it is reported to the user rather than named.
+	// at slot 19 and `-1` at slot 20. `Order Bulk 1` and `Order Tank 1` stand in that same file
+	// and are here now: both come from slot 17, the single index `Uexport.pas` reads twice.
 	'[REACTIONS]',
 	';Global reaction settings',
+	' Order Bulk           1',
+	' Order Tank           1',
 	' Order Wall           1',
 	' Global Bulk          -.5',
 	' Global Wall          -1',
@@ -413,11 +424,18 @@ console.log('\n--- an option this reader cannot name is reported ---');
 	const conv = EngCalcs.lpnNetToInp(buildNet(), 'unnamed.net');
 	ok('the file still converts', conv.ok === true, conv.error);
 	const idx = (conv.unnamedOptions || []).map((u) => u.index);
-	ok('the populated slots with no name are handed back', idx.length >= 1, JSON.stringify(idx));
-	ok('...and slot 17 is among them, the one no evidence separates',
-		idx.indexOf(17) >= 0, JSON.stringify(conv.unnamedOptions));
-	ok('...as are 39 and 40, which EPANET\'s own export matches nowhere',
-		idx.indexOf(39) >= 0 && idx.indexOf(40) >= 0, JSON.stringify(idx));
+	ok('the populated slots this reader cannot carry are handed back', idx.length >= 1, JSON.stringify(idx));
+	ok('...and slot 16 is among them: named, and written to no `.inp` by EPANET either',
+		idx.indexOf(16) >= 0, JSON.stringify(conv.unnamedOptions));
+	ok('...as is slot 45, past the end of every file in the corpus',
+		idx.indexOf(45) >= 0, JSON.stringify(idx));
+	// **A SLOT THAT IS NAMED AND HELD AT ZERO IS NOT A LOSS.** 39 and 40 read `0`, EPANET writes
+	// no line for either, and this reader understands both -- reporting them would be crying about
+	// a setting that came across exactly as EPANET states it.
+	ok('...but 39 and 40 are not, being named and deliberately unwritten at 0',
+		idx.indexOf(39) < 0 && idx.indexOf(40) < 0, JSON.stringify(idx));
+	ok('...nor is 17, the bulk order, which is written twice',
+		idx.indexOf(17) < 0, JSON.stringify(idx));
 	// The other side of the same rule: a slot that IS now written must stop being reported, or the
 	// report cries about a setting that came across intact.
 	ok('the reaction slots that are written are no longer reported',
@@ -435,10 +453,9 @@ console.log('\n--- an option this reader cannot name is reported ---');
 		idx.indexOf(0) < 0 && idx.indexOf(8) < 0, JSON.stringify(idx));
 	ok('...nor is the pattern slot, which is written under its own name',
 		idx.indexOf(7) < 0, JSON.stringify(idx));
-	// An empty slot is not a loss either: 45 slots, most of them blank. Slot 16 is empty in the
-	// fixture and in all three reference models, and is the one slot that might or might not belong
-	// to `[REACTIONS]` -- the evidence cannot say, and an empty slot costs nothing either way.
-	ok('an empty slot is not reported', idx.indexOf(16) < 0, JSON.stringify(idx));
+	// An empty slot is not a loss either: 46 slots, most of them blank. Slot 34 is the energy
+	// globals' optional pattern, empty here and in every reference model.
+	ok('an empty slot is not reported', idx.indexOf(34) < 0, JSON.stringify(idx));
 	// And the text itself is unchanged by the collection -- this must observe, never edit.
 	ok('the converted file still states the options it can name',
 		conv.inp.indexOf('Demand Multiplier') >= 0 && conv.inp.indexOf('Emitter Exponent') >= 0);
@@ -463,11 +480,13 @@ console.log('\n--- the three reference models, against EPANET\'s own export ---'
 	const models = ['Net1', 'Net2', 'Net3-PDA'];
 	const REACTION_KEYWORDS = ['Order Bulk', 'Order Tank', 'Order Wall', 'Global Bulk',
 		'Global Wall', 'Limiting Potential', 'Roughness Correlation'];
-	// The two keywords EPANET writes that this reader will not: they share slot 17, both read `1`
-	// in all three models, and no value anywhere separates them.
-	const NOT_OURS = ['Order Bulk', 'Order Tank'];
-	// Slot 17 is the pair above; 39 and 40 are `0` in all three and match nothing EPANET states.
-	const STILL_UNNAMED = [17, 39, 40];
+	// **NOTHING IS LEFT ON EITHER SIDE, AND THAT IS THE POINT** (2026-09-06). Every `[REACTIONS]`
+	// keyword EPANET writes for these models this reader now writes too, and every populated option
+	// slot in all three has a name. `Order Bulk` and `Order Tank` were the last two missing; they
+	// share slot 17, which is why no model could ever separate them and why EPA's own source had to
+	// settle it. Both lists are empty ON PURPOSE -- if either grows, something regressed.
+	const NOT_OURS = [];
+	const STILL_UNNAMED = [];
 
 	// Every line of a named section, split into keyword and value against a known keyword list --
 	// splitting on whitespace would read `Start ClockTime 12 am` as a keyword of three words. A
@@ -517,7 +536,7 @@ console.log('\n--- the three reference models, against EPANET\'s own export ---'
 			JSON.stringify(missing));
 
 		const idx = (conv.unnamedOptions || []).map((u) => u.index);
-		ok(m + ': the slots this reader still cannot name are exactly ' + STILL_UNNAMED.join(', '),
+		ok(m + ': the slots this reader still cannot name are exactly [' + STILL_UNNAMED.join(', ') + ']',
 			idx.length === STILL_UNNAMED.length && STILL_UNNAMED.every((i) => idx.indexOf(i) >= 0),
 			JSON.stringify(conv.unnamedOptions));
 
@@ -534,6 +553,53 @@ console.log('\n--- the three reference models, against EPANET\'s own export ---'
 		ok(m + ': the browser reader and the PHP tool produce identical .inp', mine === php,
 			mine === php ? conv.inp.split('\n').length + ' lines' : 'differ');
 	});
+}
+
+// ---- TOM'S OWN Net3-mysteries PAIR, THE FILE THAT ANSWERED THE PROFILE QUESTION ---------------
+//
+// He built it in EPANET on 2026-09-06 by typing a distinguishable string into every field of two
+// dialogs -- `haws-demand-calibration-file-name` and friends, `Haws-J` through `Haws-C` -- so the
+// slots past the option array would identify themselves, and he exported the `.inp` beside it.
+// dev/epanet-net-format.md is what came of it, including the answer to his own question: a PROFILE
+// is in neither file and there is no pointer to one, because `Ufileio.pas` `SaveProject` has no
+// field for it and `Dgraph.pas` writes the node list to a separate `.PRO` nothing records.
+//
+// What is asserted here is the part this reader can be held to: a fourth answer-key pair, from a
+// model whose reaction settings and demand model both differ from the three in All-three/.
+console.log('\n--- Net3-mysteries, against EPANET\'s own export of it ---');
+{
+	const dir = path.join(ROOT, 'dev', 'net-import-study');
+	const netFile = path.join(dir, 'Net3-mysteries.net');
+	const refFile = path.join(dir, 'Net3-mysteries.inp');
+	if (!fs.existsSync(netFile) || !fs.existsSync(refFile)) {
+		console.log('  skip  the Net3-mysteries pair is not here');
+	} else {
+		const conv = EngCalcs.lpnNetToInp(new Uint8Array(fs.readFileSync(netFile)), 'Net3-mysteries.net');
+		ok('it converts', conv.ok === true, conv.ok ? '' : conv.error + ' ' + conv.detail);
+		if (conv.ok) {
+			// **EVERY POPULATED SLOT NOW HAS A NAME**, in a file nobody had when the map was measured.
+			ok('no option slot is left unnamed', (conv.unnamedOptions || []).length === 0,
+				JSON.stringify(conv.unnamedOptions));
+			// The whole of `[REACTIONS]` as EPANET itself wrote it for this `.net`. `Order Bulk` and
+			// `Order Tank` are the pair that used to be missing; both come from slot 17.
+			const want = ['Order Bulk 1', 'Order Tank 1', 'Order Wall 1', 'Global Bulk 0.0',
+				'Global Wall 0.0', 'Limiting Potential 0.0', 'Roughness Correlation 0.0'];
+			const valuesOf = (text) => text.split(/\r?\n/)
+				.filter((l) => /^\s+(Order (Bulk|Tank|Wall)|Global (Bulk|Wall)|Limiting Potential|Roughness Correlation)\s/.test(l))
+				.map((l) => l.trim().replace(/\s+/g, ' '))
+				.sort();
+			const theirs = valuesOf(fs.readFileSync(refFile, 'utf8'));
+			const ours = valuesOf(conv.inp);
+			ok('EPANET\'s own export states the seven reaction lines', 
+				JSON.stringify(theirs) === JSON.stringify(want.slice().sort()), JSON.stringify(theirs));
+			ok('...and this reader writes the same seven, value for value',
+				JSON.stringify(ours) === JSON.stringify(theirs), JSON.stringify(ours));
+			// **AND NEITHER FILE MENTIONS A PROFILE.** He defined one in EPANET; it is in neither.
+			ok('neither the .net nor EPANET\'s .inp carries anything profile-shaped',
+				!/\bPROFILE\b/i.test(fs.readFileSync(refFile, 'utf8')) &&
+				!/PROFILE/i.test(Buffer.from(fs.readFileSync(netFile)).toString('latin1')));
+		}
+	}
 }
 
 // ---- A RESERVOIR'S PATTERN IS ITS OWN SLOT, NOT A JUNCTION'S ---------------------------------

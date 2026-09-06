@@ -94,17 +94,31 @@
 	// nine `[TIMES]` lines in order. Two independent sources agreeing on both index and value is
 	// what "confirmed" means here; nothing below rests on a count.
 	//
-	// **SLOTS 16 TO 22, 39 AND 40 ARE STILL UNNAMED AND ARE STILL REPORTED.** `1`, `First` and a run
-	// of zeros that EPANET's own export does not state anywhere, so there is nothing to match them
-	// against. Naming one from a guess is what this comment exists to prevent.
+	// **AND THE LAST OF THEM WAS CLOSED 2026-09-06 BY EPA'S OWN SOURCE**, which is a better witness
+	// than either measurement: `Uglobals.pas` in the EPANET GUI (USEPA/EPANET-legacy-user-interface,
+	// mirrored at OpenWaterAnalytics/epanet-gui) declares this array's indices by name, and
+	// `Ufileio.pas` `SaveProject` is the procedure that writes the file we are reading. 16 is
+	// `MAX_SEGS_INDEX`, 17 `BULK_ORDER_INDEX`, 39 `HEAD_ERROR_INDEX`, 40 `FLOW_CHANGE_INDEX`, and 45
+	// `EMITTER_BACK_INDEX`. Every name measured above agrees with it, index for index, which is what
+	// makes it safe to take the four that measurement could not reach. See dev/epanet-net-format.md.
 	var OPTION_NAME = {
 		0: 'Units', 1: 'Headloss', 2: 'Specific Gravity', 3: 'Viscosity', 4: 'Trials',
 		5: 'Accuracy', 6: 'Unbalanced', 8: 'Demand Multiplier', 9: 'Emitter Exponent',
 		13: 'Diffusivity', 15: 'Tolerance',
 		36: 'CheckFreq', 37: 'MaxCheck', 38: 'DampLimit',
+		39: 'HEADERROR', 40: 'FLOWCHANGE',
 		41: 'Demand Model', 42: 'Minimum Pressure', 43: 'Required Pressure',
 		44: 'Pressure Exponent'
 	};
+	// **TWO OPTIONS EPANET WRITES ONLY WHEN THEY ARE POSITIVE**, and copying that is what keeps a
+	// converted file identical to EPANET's own: `Uexport.pas` guards each with `GetSingle(...) and
+	// (v > 0)`, so the `0` every reference model carries produces no line at all. That guard is also
+	// why measurement could never have named them -- EPANET's export of a file holding `0` states
+	// nothing to match against, which is exactly what the 2026-09-03 pass found and recorded.
+	// A named slot is NOT reported as a loss even when it goes unwritten: `0` here is a value this
+	// reader understands and EPANET declines to state, which is a different thing from a value
+	// nobody can place.
+	var OPTION_ONLY_IF_POSITIVE = { 39: true, 40: true };
 	var OPTION_PATTERN = 7;
 	// **THE WATER-QUALITY OPTION IS THREE SLOTS AND ONE LINE**, and its grammar changes with its own
 	// first token: `Quality Trace <node>` takes a node and no unit, `Quality Age` takes neither, a
@@ -154,19 +168,24 @@
 	// `Zero` is written as `0` by the same pairing but has NOT been observed in a file; anything
 	// else is reported as an unnamed slot rather than translated into a setting nobody made.
 	//
-	// **SLOT 17 IS DELIBERATELY UNNAMED, AND IT IS THE ONE THE EVIDENCE CANNOT SETTLE.** It holds
-	// `1` in all three models -- and so do BOTH `Order Bulk` and `Order Tank` in all three of
-	// EPANET's exports. Nothing distinguishes them, and slot 16, empty everywhere, may or may not
-	// be the other of the pair. Two candidates with no discriminating value is exactly the shape
-	// that wrote `Duration 0.0` into a converted file the first time this array was mapped by
-	// inference. One model whose bulk order differs from its tank order would settle it in a
-	// minute; until one exists, slot 17 is reported to the user and named by nobody.
+	// **SLOT 17 IS THE BULK ORDER, AND `Order Tank` IS THE SAME SLOT READ TWICE.** Measurement could
+	// not settle it: 17 holds `1` in all three models and so do BOTH of EPANET's keywords, so this
+	// reader wrote neither and reported the slot instead. The GUI's source settles it outright --
+	// `Uexport.pas` writes `Order Bulk` and `Order Tank` from `Data[BULK_ORDER_INDEX]`, the one
+	// index, on consecutive lines. The two values could never have differed, and no model where
+	// they do can exist, which is why waiting for one to arrive would have waited forever.
+	// **So this file writes BOTH lines from slot 17**, because reproducing EPANET's own export is
+	// the standard the harness holds us to, and EPANET writes two.
 	//
-	// **SLOTS 39 AND 40 STAY UNNAMED TOO.** `0` in all three, and EPANET's own export states no
-	// keyword anywhere carrying that value at that position, so there is nothing to match against.
+	// **SLOT 16 IS `MAX_SEGS_INDEX`, THE QUALITY SOLVER'S MAXIMUM PIPE SEGMENTS, AND IT IS STILL
+	// NOT WRITTEN.** Naming it is not the same as carrying it: `Uexport.pas` never states it in an
+	// `.inp` at all, and neither can we, so a populated slot 16 is still handed to the import
+	// report as something that did not come across. It is empty in every file seen so far, and the
+	// GUI reads it nowhere either -- the constant is declared and otherwise unused.
 	var REACTION_NAME = {
 		19: 'Global Bulk', 20: 'Global Wall', 21: 'Limiting Potential', 22: 'Roughness Correlation'
 	};
+	var OPT_BULK_ORDER = 17;
 	var OPT_WALL_ORDER = 18;
 	var WALL_ORDER_NUMBER = { FIRST: '1', ZERO: '0' };
 
@@ -527,8 +546,17 @@
 					? WALL_ORDER_NUMBER[wallOrder.toUpperCase()]
 					: (/^[-+]?(\d+\.?\d*|\.\d+)$/.test(wallOrder) ? wallOrder : '');
 		}
-		var reactions = wallOrderNumber === ''
-			? [] : [' ' + pad('Order Wall', 20) + ' ' + wallOrderNumber];
+		// `Order Bulk` and `Order Tank`, both from slot 17 -- EPANET writes the one value twice
+		// under two keywords, and a converted file that wrote one of them would differ from
+		// EPANET's own export of the same `.net`.
+		var bulkOrder = opt(OPT_BULK_ORDER);
+		var reactions = bulkOrder === '' ? [] : [
+			' ' + pad('Order Bulk', 20) + ' ' + bulkOrder,
+			' ' + pad('Order Tank', 20) + ' ' + bulkOrder
+		];
+		if (wallOrderNumber !== '') {
+			reactions.push(' ' + pad('Order Wall', 20) + ' ' + wallOrderNumber);
+		}
 		put('REACTIONS', reactions.concat(rows(REACTION_NAME)), 'Global reaction settings');
 		put('TIMES', rows(TIME_NAME), 'Clock and reporting');
 		put('REPORT', rows(REPORT_NAME), 'EPANET report settings');
@@ -543,6 +571,7 @@
 			// Slot 18 is reported unless it was actually WRITTEN -- a wall order this reader cannot
 			// turn into a number is a slot with no name, whatever the table says.
 			if (REACTION_NAME[i] !== undefined) { return; }
+			if (i === OPT_BULK_ORDER) { return; }
 			if (i === OPT_WALL_ORDER && wallOrderNumber !== '') { return; }
 			if (i === OPT_QUALITY || i === OPT_QUAL_UNITS || i === OPT_TRACE_NODE) { return; }
 			unnamed.push({ index: i, value: text });
@@ -550,7 +579,9 @@
 		if (out) { out.unnamedOptions = unnamed; }
 		Object.keys(OPTION_NAME).forEach(function (k) {
 			var i = +k, v = opt(i);
-			if (v !== '') { L.push(' ' + pad(OPTION_NAME[k], 20) + ' ' + v); }
+			if (v === '') { return; }
+			if (OPTION_ONLY_IF_POSITIVE[i] && !(parseFloat(v) > 0)) { return; }
+			L.push(' ' + pad(OPTION_NAME[k], 20) + ' ' + v);
 		});
 		var qual = opt(OPT_QUALITY), qualUnits = opt(OPT_QUAL_UNITS), traceNode = opt(OPT_TRACE_NODE);
 		if (qual !== '' && qual.toUpperCase() !== 'NONE') {
