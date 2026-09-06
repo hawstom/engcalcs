@@ -1319,6 +1319,11 @@ the block.
     exists in a spreadsheet is the case Tom named, and getting a report out is what a submittal
     needs — and it cannot corrupt anything.
   - Distinct from Task 146.04 (node/link report tables), which is read-only reporting.
+  - **The Library's Curves grid already does both directions, for curves alone** (Task 588): a
+    spreadsheet paste in, a Copy points button out, TSV either way. It is the worked example of the
+    paste rules above rather than a claim on this task -- `libPasteCells()`, `libDropNameColumn()`
+    and `libMergePaste()` in `js/looped-network.js` are pure and reusable, and the Tables pane's own
+    per-column units are the part they do not answer.
 
 - 5|191| **Junction emitters: surface the pressure-dependent demand already solved.**
   Originated during Task 146. Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"

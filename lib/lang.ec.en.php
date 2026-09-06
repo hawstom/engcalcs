@@ -2219,11 +2219,14 @@ $ec_lang['lpn_field_tag_tip']='A tag of your own, carried into and out of the EP
 $ec_lang['lpn_pump_effic_curve']='Efficiency curve';
 $ec_lang['lpn_pump_effic_curve_tip']='The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.';
 // **THE STRINGS EVERY CURVE CONTROL SHARES** (Task 586). One chooser serves a pump's head curve, a
-// pump's efficiency curve and a valve's head-loss curve, so its two fixed entries are keyed once.
-// "New curve..." is an ACTION sitting in a list of values, and the ellipsis is what says so, which
-// is the convention the menu rows already use for a row that opens something.
+// pump's efficiency curve and a valve's head-loss curve, so its fixed entries are keyed once.
 $ec_lang['lpn_curve_none']='No curve';
-$ec_lang['lpn_curve_new']='New curve...';
+// **THE CHOOSER OFFERS NO WAY TO MAKE A CURVE** (Tom, 2026-09-05: *"Pump properties has no 'New
+// curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
+// one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
+// and it opens the box rather than describing where it is.
+$ec_lang['lpn_curve_library_link']='Curves library';
+$ec_lang['lpn_curve_library_link_tip']='Opens the Libraries box on its Curves section, where a curve is made, described, edited and deleted. An element names a curve; it does not hold one.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2966,7 +2969,20 @@ $ec_lang['lpn_library_curves_tip']='A curve is a list of points that says how so
 $ec_lang['lpn_library_curves_note']='A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them.';
 $ec_lang['lpn_library_curve_add']='Add a curve';
 $ec_lang['lpn_library_curve_kind']='What this curve describes';
-$ec_lang['lpn_library_curve_values_tip']='The points, as pairs. Paste two columns from a spreadsheet or the lines out of an EPANET file if you have them. Every number is read in order and paired up, so spaces, commas and semicolons all work.';
+// **NOW A GRID, SO THIS SENTENCE IS ABOUT PASTING INTO ONE** (Tom, 2026-09-05: *"The line given is
+// worse than EPANET, and it really can't take a spreadsheet paste."*). Shown once under the section
+// heading rather than once per curve, so it is a note and no longer a tip.
+$ec_lang['lpn_library_curve_values_tip']='Select two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.';
+// EPANET states a curve's description in the comment above its rows, and this page has read it and
+// written it back since Task 586 without showing it to anybody.
+$ec_lang['lpn_library_curve_note_label']='Description';
+$ec_lang['lpn_library_curve_note_tip']='What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.';
+$ec_lang['lpn_library_curve_remove_point']='Remove this point';
+// The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
+// spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
+$ec_lang['lpn_library_curve_copy']='Copy points';
+$ec_lang['lpn_library_curve_copy_tip']='Copies every point as two columns, ready to paste into a spreadsheet.';
+$ec_lang['lpn_library_curve_copy_manual']='Copy these points';
 $ec_lang['lpn_library_curve_used_by']='Used by';
 $ec_lang['lpn_library_curve_unused']='Nothing uses this curve.';
 // **A CURVE IN USE IS NOT DELETED.** A junction with no pattern still has a steady demand, so

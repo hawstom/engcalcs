@@ -32,6 +32,11 @@ const L = loadLoopedNetwork(
 	"\t\tapplyUnitSelections: applyUnitSelections, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\tserializeProject: serializeProject, applySaved: applySaved, migrateSaved: migrateSaved,\n" +
 	"\t\tmintCurveLibrary: mintCurveLibrary, assembleModel: assembleModel,\n" +
+	"\t\tlibPasteCells: libPasteCells, libPasteIsGrid: libPasteIsGrid,\n" +
+	"\t\tlibMergePaste: libMergePaste, libGridPoints: libGridPoints,\n" +
+	"\t\tlibCurveGridOf: libCurveGridOf, libCurveTsv: libCurveTsv,\n" +
+	"\t\tbuildCurveEntry: buildCurveEntry, curveChooser: curveChooser,\n" +
+	"\t\tgetLibSection: function () { return libSection; },\n" +
 	"\t\tsetDoc: function (d) { doc = d; }, getDoc: function () { return doc; },\n" +
 	"\t\tlinkById: linkById, effective: effective, curveById: curveById,\n" +
 	"\t\tresolveCurvePoints: resolveCurvePoints, pumpFit: pumpFit,\n" +
@@ -366,6 +371,172 @@ const FIVE = [
 	const withNew = L.exportInp();
 	check(withNew.ok && /\n;HEADLOSS:\n NEW1\t0\t0/.test(withNew.inp),
 		`a curve made in the Library states its own type: ${(withNew.inp.match(/;HEADLOSS:[^\n]*\n NEW1[^\n]*/) || [])[0]}`);
+
+	// =========================================================================================
+	head('6. A TRUE TABLE EDITOR: THE SPREADSHEET PASTE, THE DESCRIPTION, AND NO MAKER');
+	// =========================================================================================
+	// Tom, 2026-09-05: *"Curves editor is missing Description and a true table editor. The line
+	// given is worse than EPANET, and it really can't take a spreadsheet paste. We need to fix
+	// that."* and *"Pump properties has no 'New curve...' button. And it shouldn't unless that's a
+	// link to the Curves library."*
+	//
+	// **THE PASTE TEXT IN THIS SECTION IS REAL CLIPBOARD TEXT AND NOT A CONVENIENT SHAPE.** Excel
+	// and LibreOffice both put a two-column selection on the clipboard as TAB between the cells and
+	// a newline between the rows -- CRLF from Windows -- so that is what is pasted here.
+
+	// ---- the parser, on its own ----
+	const TSV = '0\t300\n250\t290\n500\t260\n750\t200\n1000\t104';
+	let cells = L.libPasteCells(TSV);
+	check(cells.length === 5 && cells.every((r) => r.length === 2),
+		`a two-column spreadsheet paste reads as five rows of two: ${JSON.stringify(cells[0])}`);
+	check(L.libPasteIsGrid(cells), 'and it is a grid, so the page handles it rather than the browser');
+	const crlf = L.libPasteCells(TSV.replace(/\n/g, '\r\n'));
+	check(JSON.stringify(crlf) === JSON.stringify(cells),
+		'CRLF from Windows reads identically to LF');
+	check(!L.libPasteIsGrid(L.libPasteCells('300')),
+		'one cell is NOT a grid: ordinary typing is left to the browser\'s own paste');
+	// The `[CURVES]` block out of somebody's e-mail: space separated, with the curve's own name in
+	// front of every pair. It was the one thing the old single text field did well.
+	const INP_BLOCK = ' C1  0  300\n C1  250  290\n C1  500  260';
+	const inpCells = L.libPasteCells(INP_BLOCK);
+	check(inpCells.length === 3 && inpCells[0].length === 3,
+		`a space-separated .inp block reads as rows of three: ${JSON.stringify(inpCells[0])}`);
+
+	// ---- the merge, on its own ----
+	// **IT LANDS AT THE CELL IT WAS PASTED INTO AND GROWS THE GRID.** Three rows already there, a
+	// five-row paste aimed at the first cell, and the answer is five points in the pasted order.
+	let merged = L.libMergePaste([['0', '1'], ['1', '2'], ['2', '3']], 0, 0, cells);
+	check(JSON.stringify(L.libGridPoints(merged))
+			=== JSON.stringify([[0, 300], [250, 290], [500, 260], [750, 200], [1000, 104]]),
+		`the paste lands in order and the grid grows past three rows: ${JSON.stringify(L.libGridPoints(merged))}`);
+	// Aimed at row 2 instead: the two rows above it are untouched and the rest is appended.
+	merged = L.libMergePaste([['0', '1'], ['1', '2']], 1, 0, cells);
+	check(JSON.stringify(L.libGridPoints(merged)[0]) === JSON.stringify([0, 1])
+			&& L.libGridPoints(merged).length === 6,
+		`a paste aimed at row 2 leaves row 1 alone and grows to six: ${JSON.stringify(L.libGridPoints(merged))}`);
+	// **A SINGLE COLUMN FILLS THE COLUMN IT WAS PASTED INTO AND LEAVES ITS PARTNER ALONE**, which is
+	// what lets the two halves of a curve arrive in two gestures. Rows with no partner yet are not
+	// points and are not written to the document, but they stay on screen waiting for one.
+	const oneCol = L.libPasteCells('12\n14\n16');
+	const filled = L.libMergePaste([['0', '300'], ['250', '290'], ['500', '260']], 0, 1, oneCol);
+	check(JSON.stringify(L.libGridPoints(filled)) === JSON.stringify([[0, 12], [250, 14], [500, 16]]),
+		`a single column pasted into the second column replaces it, row for row: ${JSON.stringify(L.libGridPoints(filled))}`);
+	const grown = L.libMergePaste([['0', '300']], 0, 0, oneCol);
+	check(grown.length === 3 && grown[1][0] === '14' && grown[1][1] === ''
+			&& L.libGridPoints(grown).length === 1,
+		'a single column past the end of the list makes rows with a blank partner, and only the complete row is a point');
+	// The leading curve name is dropped, and ONLY where every row really has one.
+	check(JSON.stringify(L.libGridPoints(L.libMergePaste([], 0, 0, inpCells)))
+			=== JSON.stringify([[0, 300], [250, 290], [500, 260]]),
+		'the .inp block\'s leading curve name is dropped and the pairs land');
+	check(L.libGridPoints(L.libMergePaste([], 0, 0, L.libPasteCells('1 2 3\n4 5 6'))).length === 2
+			&& L.libGridPoints(L.libMergePaste([], 0, 0, L.libPasteCells('1 2 3\n4 5 6')))[0][0] === 1,
+		'while three columns of NUMBERS keep their first column and drop the third');
+	// The OUT direction (ROADMAP Task 186), which is the same shape going back.
+	check(L.libCurveTsv([[0, 300], [250, 290]]) === '0\t300\n250\t290',
+		`copy out is two tab-separated columns: ${JSON.stringify(L.libCurveTsv([[0, 300], [250, 290]]))}`);
+
+	// ---- the same paste, through the real table, on the real document ----
+	// **THE STUB DOES NOT SHORT-CIRCUIT THIS.** The entry is built by the shipped builder, the
+	// listener the shipped code registered is the one called, and what is asserted afterwards is
+	// the DOCUMENT.
+	L.applyUnitSelections(L.inpUnitSelections(four));
+	L.applySaved(L.migrateSaved(L.docFromInp(EngCalcs.lpnInpParse(FOUR), 'four.inp')));
+	const inputsIn = (el, out) => {
+		(el.children || []).forEach((c) => {
+			if (c._tag === 'input' && c.type === 'number') { out.push(c); }
+			inputsIn(c, out);
+		});
+		return out;
+	};
+	const buttonsIn = (el, out) => {
+		(el.children || []).forEach((c) => {
+			if (c._tag === 'button') { out.push(c); }
+			buttonsIn(c, out);
+		});
+		return out;
+	};
+	const fire = (el, type, ev) => (el._listeners[type] || []).forEach((f) => f(ev || {}));
+
+	let curveHost = document.createElement('div');
+	let cRec = L.curveById('C1');
+	L.buildCurveEntry(curveHost, cRec);
+	let boxes = inputsIn(curveHost, []);
+	check(boxes.length === 6,
+		`a two-point curve draws two rows and one blank, six cells: ${boxes.length}`);
+	check(boxes[0].value === '0' && boxes[1].value === '300',
+		`with the curve's own numbers in them: ${boxes[0].value}, ${boxes[1].value}`);
+	// The paste, into the first cell.
+	fire(boxes[0], 'paste', {
+		clipboardData: { getData: () => TSV.replace(/\n/g, '\r\n') },
+		preventDefault: () => {}
+	});
+	check(JSON.stringify(L.curveById('C1').points)
+			=== JSON.stringify([[0, 300], [250, 290], [500, 260], [750, 200], [1000, 104]]),
+		`a real CRLF two-column paste lands as five points in order: ${JSON.stringify(L.curveById('C1').points)}`);
+	boxes = inputsIn(curveHost, []);
+	check(boxes.length === 12, `and the table grew to five rows plus a blank: ${boxes.length / 2} rows`);
+	check(boxes[8].value === '1000' && boxes[9].value === '104',
+		`the fifth row holds the last pasted pair: ${boxes[8].value}, ${boxes[9].value}`);
+	// **A PASTE IS THE USER TYPING**, so the file's own lines and tokens go with it -- they state
+	// numbers the document no longer holds.
+	check(!L.curveById('C1').src && !L.curveById('C1').tok,
+		'and the file\'s own lines and tokens went with the edit');
+
+	// ---- the description: edited round-trips, unedited is byte-identical ----
+	L.applyUnitSelections(L.inpUnitSelections(four));
+	L.applySaved(L.migrateSaved(L.docFromInp(EngCalcs.lpnInpParse(FOUR), 'four.inp')));
+	curveHost = document.createElement('div');
+	cRec = L.curveById('C1');
+	check(cRec.note === 'the duty curve', `the description arrives from the file: ${cRec.note}`);
+	L.buildCurveEntry(curveHost, cRec);
+	const descBox = (function find(el) {
+		let hit = null;
+		(el.children || []).forEach((ch) => {
+			if (!hit && ch._tag === 'input' && ch.type === 'text' && ch.value === 'the duty curve') { hit = ch; }
+			if (!hit) { hit = find(ch); }
+		});
+		return hit;
+	}(curveHost));
+	check(!!descBox, 'and it is on screen in a field of its own, which it never was before');
+	descBox.value = 'Zone 3 booster, 2019 test';
+	fire(descBox, 'change');
+	check(L.curveById('C1').note === 'Zone 3 booster, 2019 test',
+		`an edited description reaches the document: ${L.curveById('C1').note}`);
+	const descOut = L.exportInp();
+	check(descOut.ok && descOut.inp.indexOf(';PUMP: Zone 3 booster, 2019 test') >= 0,
+		'and goes back out in EPANET\'s own type comment');
+	// **THE POINTS ARE STILL THE FILE'S OWN CHARACTERS.** Editing the description drops `src` --
+	// those lines carry the OLD comment -- but keeps `tok`, because nobody touched a number.
+	check(descOut.ok && /^ C1\t0\t300$/m.test(descOut.inp) && /^ C1\t250\t290$/m.test(descOut.inp),
+		'while the rows under it are unchanged, character for character');
+	check(descOut.ok && descOut.inp.indexOf(';PUMP: the duty curve') < 0,
+		'and the old description is gone rather than left standing beside the new one');
+	// The other three curves in the same file were not touched at all, and prove the unedited case.
+	check(descOut.ok && descOut.inp.indexOf(';EFFICIENCY: how well it does it') >= 0
+			&& descOut.inp.indexOf(';VOLUME: the tank is a cone') >= 0,
+		'a description nobody edited is still written back byte for byte');
+
+	// ---- the chooser makes nothing, and links to the Library instead ----
+	const fields = document.createElement('div');
+	L.curveChooser(fields, L.linkById('P1'), 'curveId', 'head', 'Curve', '');
+	const opts = [];
+	(function walk(el) {
+		(el.children || []).forEach((ch) => { if (ch._tag === 'option') { opts.push(ch); } walk(ch); });
+	}(fields));
+	check(!opts.some((o) => String(o.value).indexOf('') >= 0),
+		`the chooser no longer offers an entry that MAKES a curve: ${opts.map((o) => o.textContent).join(' | ')}`);
+	check(!opts.some((o) => /New curve/i.test(String(o.textContent))),
+		'by name as well as by value');
+	check(opts.some((o) => o.value === 'C1') && opts.some((o) => o.value === ''),
+		'and still offers every head curve the Library holds, plus "no curve"');
+	const link = buttonsIn(fields, []).filter((b) => /Curves library/i.test(String(b.textContent)))[0];
+	check(!!link, 'a link into the Library stands beside it');
+	if (link) {
+		fire(link, 'click');
+		check(L.getLibSection() === 'curves',
+			`and it is real navigation: the box is put on its Curves section (${L.getLibSection()})`);
+	}
 
 	console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All curve-library checks passed.'));
 	process.exit(failures ? 1 : 0);

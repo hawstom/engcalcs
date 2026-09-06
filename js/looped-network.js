@@ -25198,12 +25198,20 @@ var EngCalcs = EngCalcs || {};
 	 * **CURVES IS AN EDITOR** (Task 586), on the shape the Patterns section above already worked
 	 * out: add, rename, edit, delete, and one place the whole list can be read side by side.
 	 *
-	 * **POINTS ARE ONE TEXT FIELD, NOT A GROWING TABLE OF BOXES,** which is the Patterns section's
-	 * own argument applied to a longer list: a manufacturer's curve arrives as two columns in a
-	 * spreadsheet or as `[CURVES]` lines in somebody's e-mail, and both paste straight into a text
-	 * field. Twenty boxes would be forty tab stops that survive no paste at all. The parser reads
-	 * every number in order and pairs them, so `0 100  500 90`, `0,100; 500,90` and a two-column
-	 * paste all mean the same curve.
+	 * **POINTS ARE A TWO-COLUMN GRID, AND A DESCRIPTION IS A FIELD** (Tom, 2026-09-05: *"Curves
+	 * editor is missing Description and a true table editor. The line given is worse than EPANET,
+	 * and it really can't take a spreadsheet paste."*). Both were one text field of every number in
+	 * order, on the Patterns section's own argument -- and that argument does not carry, because a
+	 * pattern is ONE column and reads as a line while a curve is TWO and reads as a table. EPANET's
+	 * curve editor is a grid, and a person checking a manufacturer's curve reads down a column.
+	 *
+	 * **THE PASTE IS WHAT THE TEXT FIELD WAS DEFENDED FOR AND IS KEPT WHOLE.** A spreadsheet
+	 * selection arrives tab-separated with a newline between rows (CRLF from Windows) and lands at
+	 * the cell it was pasted into, filling down and across and growing the grid; a line with no tab
+	 * is split on whitespace, so a `[CURVES]` block out of somebody's e-mail still pastes, leading
+	 * curve name and all. libPasteCells(), libDropNameColumn() and libMergePaste() are the whole of
+	 * it and are pure, which is what `dev/lpn-spike/curve-library-harness.js` asserts against real
+	 * clipboard text.
 	 *
 	 * **DELETING A CURVE ELEMENTS USE IS REFUSED, BY NAME AND WITH THE COUNT.** The rejected
 	 * alternative is to delete it and clear the references, which is what a pattern does -- and it
@@ -25221,6 +25229,9 @@ var EngCalcs = EngCalcs || {};
 	function buildCurveSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libCurvesRead();
 		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curves_note || ''));
+		// **SAID ONCE FOR THE SECTION, NOT ONCE PER CURVE.** It is the same sentence for every
+		// curve in the list, and twenty copies of it is what makes a panel unreadable.
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curve_values_tip || ''));
 		host.appendChild(libButton(pc.lpn_library_curve_add || 'Add a curve', function () {
 			saveUndoSnapshot();
 			// A NEW CURVE IS A PUMP HEAD CURVE WITH NO POINTS. `head` because that is what a person
@@ -25246,17 +25257,24 @@ var EngCalcs = EngCalcs || {};
 		['volume', 'lpn_curve_kind_volume', 'Tank volume'],
 		['headloss', 'lpn_curve_kind_headloss', 'Valve head loss']
 	];
-	function buildCurveEntry(host, c) {
+	function buildCurveEntry(host, c, pending) {
 		var pc = EngCalcs.pageConfig || {},
 			entry = libEl('div', 'lpn-lib-entry'),
 			headRow = libEl('div', 'lpn-lib-head'),
 			id = document.createElement('input'),
 			kindSel = document.createElement('select'),
-			values = document.createElement('input'),
-			pts = curvePointsOf(c),
+			desc = document.createElement('input'),
+			descRow = libEl('label', 'lpn-lib-note'),
+			// **THE GRID IS THE STATE THIS ENTRY IS BUILT FROM, AND IT IS STRINGS.** A half-filled
+			// row -- a flow typed with no head yet, or a single column pasted down -- is a real
+			// state of a table somebody is filling in, and it cannot be held in `c.points`, which
+			// is pairs of numbers. So the table renders from `pending` when a paste or a delete has
+			// just rewritten it, and from the document otherwise; only COMPLETE rows are ever
+			// written back.
+			grid = libCurveGridTrim(pending || libCurveGridOf(c)),
+			pts = libGridPoints(grid),
 			users = curveUsers(c.id),
 			labels = curveAxisLabels(c.kind),
-			note = libEl('div', 'lpn-lib-note', ''),
 			del;
 		id.type = 'text';
 		id.className = 'lpn-lib-id';
@@ -25323,31 +25341,35 @@ var EngCalcs = EngCalcs || {};
 		// the fitted curve the solver applies; every other kind is drawn as the straight segments
 		// EPANET interpolates.
 		entry.appendChild(libCurveChart(pts, c.kind === 'head'));
-		values.type = 'text';
-		values.className = 'lpn-lib-wide lpn-lib-values';
-		values.value = libFormatPoints(pts);
-		values.setAttribute('aria-label', labels.x + ' / ' + labels.y);
-		if (pc.lpn_library_curve_values_tip) { helpTip(values, pc.lpn_library_curve_values_tip); }
-		// `input` redraws the chart, `change` writes the document -- the pattern field's own split,
-		// so a half-typed list never reaches a solve.
-		values.addEventListener('input', function () {
-			var fresh = libCurveChart(libParsePoints(values.value), c.kind === 'head');
-			entry.replaceChild(fresh, entry.querySelector('.lpn-lib-spark'));
-		});
-		values.addEventListener('change', function () {
+		// **THE DESCRIPTION, AS ITS OWN LABELLED FIELD** (Tom, 2026-09-05: *"Curves editor is
+		// missing Description and a true table editor."*). EPANET states it in the comment above a
+		// curve's rows -- `;PUMP: Pump Curve for Pump 10 (Lake Source)` -- and this page has read it
+		// and written it back since Task 586 without ever showing it, so a description could survive
+		// a round trip and still be unreadable by the person who wrote it.
+		descRow.textContent = (pc.lpn_library_curve_note_label || 'Description') + ' ';
+		desc.type = 'text';
+		desc.className = 'lpn-lib-wide';
+		desc.value = c.note || '';
+		if (pc.lpn_library_curve_note_tip) { helpTip(desc, pc.lpn_library_curve_note_tip); }
+		desc.addEventListener('change', function () {
+			var t = String(desc.value || '').trim();
+			if (t === (c.note || '')) { return; }
 			saveUndoSnapshot();
-			c.points = libParsePoints(values.value);
-			// **THE FILE'S OWN LINES AND TOKENS GO WITH THE EDIT.** They state the numbers that were
-			// there; handing them back now would write text that no longer says what the document
-			// holds, which is the one test CLAUDE.md's token rule sets.
-			delete c.src; delete c.tok;
+			if (t) { c.note = t; } else { delete c.note; }
+			// **`src` GOES AND `tok` STAYS, AND THE SPLIT IS THE WHOLE POINT.** `src` is the curve's
+			// own lines INCLUDING the type comment, and they no longer say what the document says,
+			// so handing them back would write the old description. `tok` is per coordinate and is
+			// still true: nobody touched a number. Composing from the tokens therefore writes the
+			// new comment above rows that are still character for character the file's own.
+			delete c.src;
 			libCommit();
-			rebuildLibraryBox();
-			refreshPopupIfOpen();
 		});
-		entry.appendChild(values);
-		note.textContent = labels.x + '  /  ' + labels.y;
-		entry.appendChild(note);
+		descRow.appendChild(desc);
+		entry.appendChild(descRow);
+		entry.appendChild(libCurveGridTable(entry, c, grid, labels));
+		entry.appendChild(libButton(pc.lpn_library_curve_copy || 'Copy points', function () {
+			libCopyOut(libCurveTsv(libGridPoints(grid)));
+		}, pc.lpn_library_curve_copy_tip));
 		// **WHO USES IT, AS THE WAY TO GET TO THEM.** Clicking an id goes to that element on the map,
 		// exactly as a bottom-pane table's id does -- and it is also the answer to "why will this not
 		// delete", standing where the Delete button is.
@@ -25366,33 +25388,231 @@ var EngCalcs = EngCalcs || {};
 		host.appendChild(entry);
 	}
 	/**
-	 * A curve's points as one line of text, and back.
+	 * **A CURVE IS EDITED AS A TWO-COLUMN GRID** (Tom, 2026-09-05: *"The line given is worse than
+	 * EPANET, and it really can't take a spreadsheet paste."*). It was one text field of every
+	 * number in order, which was the Patterns section's argument borrowed for a list that is not a
+	 * series: a pattern is one column and reads as a line, a curve is two and reads as a table.
+	 * EPANET's own curve editor is a two-column grid and it was simply better.
 	 *
-	 * **EVERY NUMBER IN ORDER, PAIRED.** Deliberately loose, for the reason the pattern parser is:
-	 * the numbers arrive pasted from a spreadsheet (tab and newline separated), from an `.inp`
-	 * (`C1  0  100` per line, with the curve's own name in front of each pair), or typed with
-	 * commas. A parser that read a format would reject two of those three. A LEADING NAME is the one
-	 * shape that would break it, so a token that is not a number is skipped rather than counted --
-	 * which is exactly what makes a pasted `[CURVES]` block work.
-	 *
-	 * A trailing lone number is dropped: half a point is not a point, which is the rule the popup's
-	 * own tables already state.
+	 * The grid is held as STRINGS, because a table being filled in has states a list of number
+	 * pairs cannot hold -- a flow with no head against it yet, a column pasted down before its
+	 * partner arrives. `libGridPoints()` is the one place a grid becomes the document's points, and
+	 * it keeps only complete rows.
 	 */
-	function libParsePoints(text) {
-		var nums = [], out = [], i;
-		String(text || '').split(/[\s,;]+/).forEach(function (t) {
-			if (t === '') { return; }
-			var v = Number(t);
-			if (isFinite(v) && /[0-9]/.test(t)) { nums.push(v); }
-		});
-		for (i = 0; i + 1 < nums.length; i += 2) { out.push([nums[i], nums[i + 1]]); }
+	function libCurveGridOf(c) {
+		return curvePointsOf(c).map(function (p) { return [String(p[0]), String(p[1])]; });
+	}
+	function libGridPoints(grid) {
+		return (grid || []).filter(function (g) {
+			return g[0] !== '' && g[1] !== ''
+				&& isFinite(Number(g[0])) && isFinite(Number(g[1]));
+		}).map(function (g) { return [Number(g[0]), Number(g[1])]; });
+	}
+	// Trailing blank rows are the widget's, not the curve's: exactly one is offered back below.
+	function libCurveGridTrim(grid) {
+		var out = (grid || []).map(function (g) { return [g[0], g[1]]; });
+		while (out.length && out[out.length - 1][0] === '' && out[out.length - 1][1] === '') { out.pop(); }
 		return out;
 	}
-	// `String()` and never `toFixed()`: the points are the file's own numbers in the file's own
-	// unit, so `951.0194` must print as `951.0194`. Pairs separated by a semicolon and a space, so
-	// the field can be read back as pairs and still pastes into anything.
-	function libFormatPoints(pts) {
-		return (pts || []).map(function (p) { return String(p[0]) + ', ' + String(p[1]); }).join(';  ');
+	/**
+	 * **WHAT A SPREADSHEET PUTS ON THE CLIPBOARD, READ AS CELLS.** Excel and LibreOffice both write
+	 * a selection as TAB between cells and a NEWLINE between rows, with CRLF on Windows -- so the
+	 * tab is the authority wherever there is one, empty cells included.
+	 *
+	 * **A LINE WITH NO TAB IS SPLIT ON WHITESPACE INSTEAD**, which is what makes a `[CURVES]` block
+	 * out of somebody's e-mail (`C1  0  100`) paste as well as a spreadsheet selection does. That
+	 * was the one thing the old single text field did well and it is not given up.
+	 */
+	function libPasteCells(text) {
+		var out = [];
+		String(text === null || text === undefined ? '' : text)
+			.replace(/\r\n?/g, '\n').split('\n').forEach(function (line) {
+				var t;
+				if (line.indexOf('\t') >= 0) { out.push(line.split('\t')); return; }
+				t = line.trim();
+				// A blank line is not a row. Keeping one would push every row under it down by one,
+				// which is a paste that quietly lands somewhere other than where it was aimed.
+				if (t !== '') { out.push(t.split(/[\s,;]+/)); }
+			});
+		return out;
+	}
+	// ONE cell is not a grid: it is ordinary typing, and the browser's own paste does it better
+	// than we would. Only a multi-cell paste is intercepted.
+	function libPasteIsGrid(cells) {
+		return cells.length > 1 || (cells.length === 1 && cells[0].length > 1);
+	}
+	// A pasted `[CURVES]` block carries the curve's own NAME in front of every pair. Dropped only
+	// when EVERY row has three or more cells and every leading cell is not a number, so a genuine
+	// three-column paste of numbers is never mistaken for one.
+	function libDropNameColumn(cells, col) {
+		if (col !== 0 || !cells.length) { return cells; }
+		var named = cells.every(function (r) {
+			return r.length >= 3 && !(String(r[0]).trim() !== '' && isFinite(Number(r[0])));
+		});
+		return named ? cells.map(function (r) { return r.slice(1); }) : cells;
+	}
+	/**
+	 * **THE PASTE LANDS AT THE CELL IT WAS PASTED INTO AND FILLS DOWN AND ACROSS**, growing the grid
+	 * as it goes -- a curve has as many points as the file states, and this page does not get to
+	 * decide how many points a manufacturer's curve may have.
+	 *
+	 * A third column and beyond has nowhere to go on a two-column grid and is dropped; a SINGLE
+	 * column fills the column it was pasted into and leaves its partner alone, so the two halves of
+	 * a curve can arrive in two gestures.
+	 */
+	function libMergePaste(grid, row, col, cells) {
+		var out = (grid || []).map(function (g) { return [g[0], g[1]]; }), i, j, r;
+		cells = libDropNameColumn(cells, col);
+		for (i = 0; i < cells.length; i++) {
+			r = row + i;
+			while (out.length <= r) { out.push(['', '']); }
+			for (j = 0; j < cells[i].length && col + j < 2; j++) {
+				out[r][col + j] = String(cells[i][j]).trim();
+			}
+		}
+		return out;
+	}
+	// Out to the spreadsheet in the shape it came in from: tab between the columns, newline between
+	// the rows. ROADMAP Task 186's OUT direction, which cannot corrupt anything.
+	function libCurveTsv(pts) {
+		return (pts || []).map(function (p) { return String(p[0]) + '\t' + String(p[1]); }).join('\n');
+	}
+	// **THE PROMPT IS NOT A FALLBACK NOBODY NEEDS.** navigator.clipboard is absent on a page served
+	// over plain http and refused where the gesture is not trusted, and a Copy button that silently
+	// does nothing is worse than no button. The prompt hands over the same text, selectable.
+	function libCopyOut(text) {
+		var pc = EngCalcs.pageConfig || {};
+		try {
+			if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(text);
+				return true;
+			}
+		} catch (e) { /* fall through to the prompt */ }
+		if (typeof window !== 'undefined' && window.prompt) {
+			window.prompt(pc.lpn_library_curve_copy_manual || 'Copy these points', text);
+		}
+		return false;
+	}
+	/**
+	 * The grid itself. One row per point, two columns, a remove control per row, and one blank row
+	 * at the end -- which is how every growable table on this page grows, and is therefore also how
+	 * a curve with no points at all is started.
+	 */
+	function libCurveGridTable(entry, c, grid, labels) {
+		var wrap = libEl('div', 'lpn-lib-grid'),
+			table = document.createElement('table'),
+			thead = document.createElement('thead'), hrow = document.createElement('tr'),
+			tbody = document.createElement('tbody'), i;
+		table.className = 'lpn-curve-table';
+		[labels.x, labels.y, ''].forEach(function (t) {
+			var th = document.createElement('th');
+			th.textContent = t;
+			hrow.appendChild(th);
+		});
+		thead.appendChild(hrow); table.appendChild(thead); table.appendChild(tbody);
+		grid.push(['', '']);
+		for (i = 0; i < grid.length; i++) { libCurveGridRow(tbody, entry, c, grid, i); }
+		// A long curve is a long table, and the Libraries box is one panel among four. Its own
+		// scroll rather than the box's, so the chart and the id stay in view while the points move.
+		wrap.style.maxHeight = '16em';
+		wrap.style.overflowY = 'auto';
+		wrap.appendChild(table);
+		return wrap;
+	}
+	// **THE WHOLE ENTRY IS REBUILT, IN PLACE, AND NOT THE WHOLE BOX.** Every other curve's fields
+	// keep their state and the box does not scroll back to the top -- which matters here because a
+	// paste is aimed at one cell of one curve.
+	function libRebuildCurveEntry(entry, c, grid) {
+		var host = entry.parentNode, tmp;
+		if (!host) { return; }
+		tmp = libEl('div');
+		buildCurveEntry(tmp, c, libCurveGridTrim(grid));
+		host.replaceChild(tmp.children[0], entry);
+		initTipsIn(host);
+	}
+	function libCurveGridRow(tbody, entry, c, grid, idx) {
+		var pc = EngCalcs.pageConfig || {},
+			labels = curveAxisLabels(c.kind),
+			tr = document.createElement('tr'),
+			xCell = document.createElement('td'), yCell = document.createElement('td'),
+			dCell = document.createElement('td'),
+			xIn = document.createElement('input'), yIn = document.createElement('input'),
+			del;
+		xIn.type = 'number'; xIn.step = 'any'; xIn.size = 6;
+		yIn.type = 'number'; yIn.step = 'any'; yIn.size = 6;
+		xIn.value = grid[idx][0];
+		yIn.value = grid[idx][1];
+		xIn.setAttribute('aria-label', labels.x);
+		yIn.setAttribute('aria-label', labels.y);
+		// **THE POINTS ARE WRITTEN TO BASE WHATEVER SCENARIO IS ACTIVE, DELIBERATELY.** A curve is
+		// shared, so what a scenario can change is WHICH curve an element names, never what the
+		// curve contains -- see the section comment above. There is no setProp() call to make here.
+		function writePoints() {
+			var next = libGridPoints(grid), before = JSON.stringify(curvePointsOf(c));
+			if (JSON.stringify(next) === before) { return false; }
+			saveUndoSnapshot();
+			c.points = next;
+			// The file's own lines and tokens state numbers the document no longer holds.
+			delete c.src; delete c.tok;
+			libCommit();
+			refreshPopupIfOpen();
+			return true;
+		}
+		function redraw() {
+			var fresh = libCurveChart(libGridPoints(grid), c.kind === 'head'),
+				old = entry.querySelector('svg');
+			if (old) { entry.replaceChild(fresh, old); }
+		}
+		function onEdit() {
+			grid[idx][0] = xIn.value; grid[idx][1] = yIn.value;
+			redraw();
+		}
+		function onCommit() {
+			var wasLast = idx === grid.length - 1;
+			grid[idx][0] = xIn.value; grid[idx][1] = yIn.value;
+			writePoints();
+			// The blank row at the end has become a real one, so the next blank has to be offered.
+			if (wasLast && (xIn.value !== '' || yIn.value !== '')) {
+				libRebuildCurveEntry(entry, c, grid);
+			}
+		}
+		xIn.addEventListener('input', onEdit);
+		yIn.addEventListener('input', onEdit);
+		xIn.addEventListener('change', onCommit);
+		yIn.addEventListener('change', onCommit);
+		function onPaste(col) {
+			return function (e) {
+				var text = (e && e.clipboardData && e.clipboardData.getData)
+						? e.clipboardData.getData('text/plain') : '',
+					cells = libPasteCells(text), merged;
+				if (!libPasteIsGrid(cells)) { return; }   // one cell: the browser's own paste
+				if (e.preventDefault) { e.preventDefault(); }
+				grid[idx][0] = xIn.value; grid[idx][1] = yIn.value;
+				merged = libMergePaste(grid, idx, col, cells);
+				grid.length = 0;
+				merged.forEach(function (g) { grid.push(g); });
+				writePoints();
+				libRebuildCurveEntry(entry, c, grid);
+			};
+		}
+		xIn.addEventListener('paste', onPaste(0));
+		yIn.addEventListener('paste', onPaste(1));
+		xCell.appendChild(xIn); yCell.appendChild(yIn);
+		if (grid[idx][0] !== '' || grid[idx][1] !== '') {
+			del = document.createElement('button');
+			// The demand table's own remove control, and its style: a language-free glyph with its
+			// words in the tip.
+			del.type = 'button'; del.className = 'lpn-demand-del'; del.textContent = '\u00d7';
+			helpTip(del, pc.lpn_library_curve_remove_point || 'Remove this point');
+			del.addEventListener('click', function () {
+				grid.splice(idx, 1);
+				writePoints();
+				libRebuildCurveEntry(entry, c, grid);
+			});
+			dCell.appendChild(del);
+		}
+		tr.appendChild(xCell); tr.appendChild(yCell); tr.appendChild(dCell);
+		tbody.appendChild(tr);
 	}
 	function buildControlSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libControlsRead();
@@ -27508,8 +27728,7 @@ var EngCalcs = EngCalcs || {};
 	/**
 	 * **A PUMP NAMES A CURVE; THE CURVE IS THE DOCUMENT'S** (Task 586, Tom: *"leave only curve
 	 * references in the pump properties"*). One chooser, listing every head curve the Library holds,
-	 * plus "no curve" and plus one entry that MAKES one -- so a pump drawn on an empty document
-	 * still gets its curve in one gesture and never meets an empty list it cannot leave.
+	 * plus "no curve", and beside it a link into the Library where a curve is made.
 	 *
 	 * **THE REFERENCE IS OVERRIDABLE AND THE CHOOSER IS ITS ONE WRITE SITE** (Tom, 2026-09-05:
 	 * *"Scenario pump reference: Yes."*). It therefore goes through `setProp()` and carries the same
@@ -27547,7 +27766,6 @@ var EngCalcs = EngCalcs || {};
 			label = document.createElement('label'),
 			sel = document.createElement('select'),
 			cur = effective(l, prop) || '',
-			NEW = '\u0001new',
 			none = document.createElement('option');
 		none.value = '';
 		none.textContent = pc.lpn_curve_none || 'No curve';
@@ -27566,29 +27784,44 @@ var EngCalcs = EngCalcs || {};
 			missing.selected = true;
 			sel.appendChild(missing);
 		}
-		// **THE ONE ENTRY THAT IS AN ACTION AND NOT A VALUE.** Its value cannot collide with a curve
-		// name because a curve name comes from a file or from a text field, and neither can contain
-		// U+0001 -- the same argument the engine signature's separator rests on.
-		var mk = document.createElement('option');
-		mk.value = NEW;
-		mk.textContent = pc.lpn_curve_new || 'New curve...';
-		sel.appendChild(mk);
+		// **THIS CHOOSER OFFERS NO WAY TO MAKE A CURVE, AND THAT IS THE RULING** (Tom, 2026-09-05:
+		// *"Pump properties has no 'New curve...' button. And it shouldn't unless that's a link to
+		// the Curves library."*). It had one, and it minted curve DATA from inside a pump's
+		// properties -- which is the confusion Task 586's whole paradigm change existed to remove:
+		// an element holds a reference and nothing else. What stands here instead is a link, and it
+		// is real navigation rather than a sentence about where to go: it opens the Libraries box
+		// on its Curves section, where a curve is made, described, edited and deleted.
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
-			var v = sel.value;
-			// One place mints, so the chooser and the point tables cannot disagree about what a new
-			// curve is called. ALWAYS a fresh one here, even on an element that already names a
-			// curve -- "New curve..." is an action and the reader has asked for another.
-			if (v === NEW) { v = mintCurveFor(l, prop, kind).id; }
-			setProp(l, prop, v || null);
+			setProp(l, prop, sel.value || null);
 			afterPropertyEdit(l);
 			refreshPopupIfOpen();
 		});
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(sel);
 		fields.appendChild(label);
+		fields.appendChild(curveLibraryLink());
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, l, prop);
+	}
+	// The link that replaces the maker, on all three choosers -- the pump's head curve, the pump's
+	// efficiency curve and the GPV's head-loss curve -- because there is one chooser.
+	function curveLibraryLink() {
+		var pc = EngCalcs.pageConfig || {},
+			b = libButton(pc.lpn_curve_library_link || 'Curves library', function () {
+				openLibrarySection('curves');
+			}, pc.lpn_curve_library_link_tip);
+		// APPENDED, not assigned: helpTip() put `ec-help` on this button, and that class is what
+		// makes the tip reachable by tap. Overwriting className would leave a title nobody on a
+		// touch screen can read, which is the defect link_title_check.php exists for.
+		b.className = (b.className ? b.className + ' ' : '') + 'lpn-pane-goto';
+		return b;
+	}
+	// Opening the box ON a section. openLibraryBox() rebuilds on its way in, so setting the section
+	// first is the whole of it; an already-open box only has to be rebuilt.
+	function openLibrarySection(id) {
+		libSection = id;
+		if (libBoxIsOpen()) { rebuildLibraryBox(); } else { openLibraryBox(); }
 	}
 
 	/**
