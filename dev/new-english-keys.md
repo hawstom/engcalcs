@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read**, of 146 untranslated keys, of 1681 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read**, of 146 untranslated keys, of 1681 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (146, all ruled)
+## lpn_  (146, 2 to read @@ NEEDS RULING)
 
 - **`lpn_curve_kind_effic`**
   > Pump efficiency
@@ -42,8 +42,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Curves library
   _Ruled OK 2026-09-05._
 - **`lpn_curve_library_link_tip`**
-  > Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element names a curve; it does not hold one.
-  _Ruled OK 2026-09-05._
+  > Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element states which curve it uses; it does not hold one.
+  @@ NEEDS RULING
 - **`lpn_curve_long_note`**
   > Curve ID {name} has {count} points; it is shown here and edited under Libraries, Curves.
   _Ruled OK 2026-09-05._
@@ -420,8 +420,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Source pattern
   _Ruled OK 2026-09-05._
 - **`lpn_source_pattern_tip`**
-  > A time pattern that scales the dose through the day, for a feed that does not run flat out around the clock. No pattern means that the dose is the same at every step.
-  _Ruled OK 2026-09-05._
+  > A time pattern that scales the dose through the run, for a feed that is not going flat out around the clock. No pattern means that the dose is the same at every step.
+  @@ NEEDS RULING
 - **`lpn_source_quality`**
   > Source quality
   _Ruled OK 2026-09-05._

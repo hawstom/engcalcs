@@ -2226,7 +2226,7 @@ $ec_lang['lpn_curve_none']='No curve';
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
 $ec_lang['lpn_curve_library_link']='Curves library';
-$ec_lang['lpn_curve_library_link_tip']='Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element names a curve; it does not hold one.';
+$ec_lang['lpn_curve_library_link_tip']='Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element states which curve it uses; it does not hold one.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2286,7 +2286,7 @@ $ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a Text. Cl
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. The page comes back to this mode by itself after some actions, such as opening a project. [Esc] returns to this mode from any insert mode.';
+$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. This is the mode the page comes home to: it returns here by itself after some actions, such as opening a project, and [Esc] brings you back here from any other mode.';
 $ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?';
@@ -2828,7 +2828,7 @@ $ec_lang['lpn_source_type_flowpaced']='Flow paced booster';
 $ec_lang['lpn_source_quality']='Source quality';
 $ec_lang['lpn_source_quality_tip']='How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.';
 $ec_lang['lpn_source_pattern']='Source pattern';
-$ec_lang['lpn_source_pattern_tip']='A time pattern that scales the dose through the day, for a feed that does not run flat out around the clock. No pattern means that the dose is the same at every step.';
+$ec_lang['lpn_source_pattern_tip']='A time pattern that scales the dose through the run, for a feed that is not going flat out around the clock. No pattern means that the dose is the same at every step.';
 $ec_lang['lpn_mixing_model']='Mixing model';
 $ec_lang['lpn_mixing_model_tip']='How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.';
 $ec_lang['lpn_mixing_mixed']='Complete mixing';
@@ -2979,7 +2979,7 @@ $ec_lang['lpn_library_curves_tip']='A curve is a list of points that says how so
 // **CURVES IS AN EDITOR** (Task 586). It was a read-only report about pumps until the curves became
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
-$ec_lang['lpn_library_curves_note']='A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them.';
+$ec_lang['lpn_library_curves_note']='A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.';
 $ec_lang['lpn_library_curve_add']='Add a curve';
 $ec_lang['lpn_library_curve_kind']='What this curve describes';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with

@@ -196,6 +196,18 @@ input.ec-spin[type=number] {
 	color: gray;
 }
 
+/* The engine-difference notes inside #lpn_status, which expire two minutes after they are said
+   (Tom, 2026-09-05: "Give it a timer, maybe 2 minutes and maybe fading if that's easy."). The
+   transition is the whole of the fade; the span keeps its place in the flow while it runs, or the
+   grievance button beside it would jump. `prefers-reduced-motion` gets the disappearance without
+   the animation, which is the same outcome a second later. */
+.lpn-status-notes {
+	transition: opacity 0.8s linear;
+}
+@media (prefers-reduced-motion: reduce) {
+	.lpn-status-notes { transition: none; }
+}
+
 /* The suite's one icon set (ROADMAP Task 231). Geometry lives once in lib/Icons.lib.php; this is
    the only place its size and alignment are decided.
 

@@ -238,12 +238,26 @@ console.log('\n--- the drawing gesture is untouched ---');
 // 4. ESCAPE ENDS AN ENTRY MODE.
 // ---------------------------------------------------------------------------
 console.log('\n--- Escape ends entry mode ---');
-ADD_MODES.forEach(function (m) {
+// **AND ESCAPE ENDS EVERY TOOL, NOT ONLY AN ENTRY ONE** (Task 589). Tom, 2026-09-05, asked
+// whether Delete and Vertices wanted both exits and answered his own question: *"The answer is no.
+// But they can have [Esc] as a way out. Select is the 'home' mode."* So the LINK CLICK stays the
+// six entry tools' alone -- section 3 above is what holds that line, and deleting a pipe and
+// bending it are what those two tools are FOR -- while Escape is every tool's, because it asks for
+// nothing and being in Delete without knowing it is the scariest of the three.
+ADD_MODES.concat(['delete', 'vertices']).forEach(function (m) {
 	build();
 	L.setMode(m);
 	esc();
 	ok(m + ': Escape puts the tool away', L.getMode() === 'select', L.getMode());
 });
+{
+	// Escape in Select costs nothing, which is the mutant: a handler that fired setMode() on every
+	// press would look identical from every assertion above.
+	build();
+	L.setMode('select');
+	esc();
+	ok('select: Escape in the home mode is a no-op', L.getMode() === 'select', L.getMode());
+}
 {
 	const n = build();
 	const doc = L.getDoc();

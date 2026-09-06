@@ -609,16 +609,36 @@ const FIVE = [
 		const outs = textIn(h.children[0], []).filter((e) => e._tag === 'output');
 		check(outs.length === 0, `a tank volume curve prints no equation at all: ${outs.length}`);
 	});
-	// And a head curve with no points yet keeps the field but empties it, so typing the first point
-	// makes an equation appear without the entry being rebuilt under the user.
-	const empty = { id: 'EMPTY', kind: 'head', points: [] };
-	L.getDoc().curves.push(empty);
-	const emptyHost = document.createElement('div');
-	L.buildCurveEntry(emptyHost, empty);
-	const emptyEq = textIn(emptyHost.children[0], []).filter((e) => e._tag === 'output')[0];
-	check(!!emptyEq && emptyEq._text === '' && emptyEq.parentNode.style.display === 'none',
-		'a head curve with no points has an equation field, hidden and empty');
-	L.getDoc().curves.pop();
+	// And a head curve with too few points keeps the field but empties it, so the equation appears
+	// on its own once there is one, without the entry being rebuilt under the user.
+	//
+	// **IT WAITS FOR THE SECOND POINT** (Tom, 2026-09-05, asked directly whether it should appear
+	// as the first point is typed: *"No. It waits for the second point."*). The one-point case is
+	// the assertion that matters, and it would pass for the wrong reason if the fit simply failed:
+	// EPANET's single-point convention invents the shut-off head and the runout, so a fit of one
+	// point returns a perfectly finite equation. That is what is being withheld.
+	[[], [[250, 290]]].forEach((points, i) => {
+		const empty = { id: 'EMPTY' + i, kind: 'head', points: points };
+		L.getDoc().curves.push(empty);
+		const emptyHost = document.createElement('div');
+		L.buildCurveEntry(emptyHost, empty);
+		const emptyEq = textIn(emptyHost.children[0], []).filter((e) => e._tag === 'output')[0];
+		check(!!emptyEq && emptyEq._text === '' && emptyEq.parentNode.style.display === 'none',
+			`a head curve with ${points.length} point(s) has an equation field, hidden and empty`);
+		L.getDoc().curves.pop();
+	});
+	// The other side of the same line: two points DO print one, so the guard above is a threshold
+	// and not a feature that stopped working.
+	{
+		const two = { id: 'TWO', kind: 'head', points: [[0, 300], [250, 290]] };
+		L.getDoc().curves.push(two);
+		const twoHost = document.createElement('div');
+		L.buildCurveEntry(twoHost, two);
+		const twoEq = textIn(twoHost.children[0], []).filter((e) => e._tag === 'output')[0];
+		check(!!twoEq && /^Head = /.test(String(twoEq._text)) && twoEq.parentNode.style.display !== 'none',
+			`the second point is what brings the equation: ${twoEq && twoEq._text}`);
+		L.getDoc().curves.pop();
+	}
 
 	// =========================================================================================
 	head('8. THE SPREADSHEET PARADIGM: TAB IS COLUMN FIRST, THEN ROW');

@@ -49,6 +49,33 @@ function status() { return statusEl.textContent || ''; }
 // edit does not fail this file -- and never on emptiness, which would pass for the wrong reason.
 function hasMinorNote() { return /gravity/i.test(status()); }
 
+// A FAKE CLOCK FOR THE NOTE'S OWN TWO TIMERS AND NOTHING ELSE (Tom, 2026-09-05: *"Give it a timer,
+// maybe 2 minutes and maybe fading if that's easy."*). This page runs on real timers -- the 300 ms
+// solve debounce, the WASM round trip -- so replacing setTimeout wholesale would stop the harness
+// dead. The note's two delays are intercepted BY VALUE, 120000 for its life and 800 for the fade,
+// which is also what makes this file fail loudly if either constant moves instead of passing by
+// never firing.
+const realSetTimeout = global.setTimeout, realClearTimeout = global.clearTimeout;
+const NOTE_DELAYS = [120000, 800];
+const noteTimers = [];
+global.setTimeout = function (fn, ms) {
+	if (NOTE_DELAYS.indexOf(ms) >= 0) { noteTimers.push(fn); return -noteTimers.length; }
+	return realSetTimeout.apply(this, arguments);
+};
+global.clearTimeout = function (id) {
+	if (typeof id === 'number' && id < 0) { noteTimers[-id - 1] = null; return; }
+	return realClearTimeout.apply(this, arguments);
+};
+// One tick runs whatever is due and then whatever THAT scheduled -- the life timer arms the fade
+// timer, so two rounds are needed and a loop is the honest way to say it.
+function tickNoteClock() {
+	for (let round = 0; round < 4 && noteTimers.length; round++) {
+		const due = noteTimers.splice(0, noteTimers.length);
+		due.forEach((f) => { if (f) { f(); } });
+	}
+}
+function noteTimerArmed() { return noteTimers.some((f) => !!f); }
+
 // A reservoir-pipe-junction line WITH A MINOR LOSS on the pipe. `_k` is the whole point: without it
 // EPANET raises no warning and every assertion below would pass by never being exercised.
 function lineWithMinorLoss() {
@@ -83,16 +110,32 @@ console.log('=== 1. the first solve says it ===');
 	ok('the minor-loss note appears on the first EPANET solve', hasMinorNote(), JSON.stringify(status()));
 }
 
-console.log('\n=== 2. and no solve after that says it again ===');
+console.log('\n=== 2. a solve neither repeats it nor cuts it short; the CLOCK ends it ===');
 {
-	// THREE, not one. The defect was a note re-raised by every solve, and a fix that merely
-	// alternated would pass a single re-check.
+	// THE NOTE NO LONGER DIES ON THE NEXT SOLVE, and that is the change rather than a regression.
+	// Task 525 stopped it being RE-SAID by every solve; what stayed broken is a model nobody is
+	// editing, where the note was a clause of the status STRING and so stood until some later solve
+	// rewrote the string -- on a network sitting still, until the page is closed. It is its own
+	// element with its own two minutes now, which also settles the mutant this file has always been
+	// aimed at from the other side: a solve landing while the user is still reading cannot end it.
+	//
+	// THREE solves, not one. The old defect was a note re-raised by every solve, and a fix that
+	// merely alternated would pass a single re-check.
 	await solved();
-	const after1 = status();
 	await solved();
 	await solved();
-	ok('a second solve is silent about it', !/gravity/i.test(after1), JSON.stringify(after1));
-	ok('...and so are the third and fourth', !hasMinorNote(), JSON.stringify(status()));
+	ok('three more solves leave the note standing, not cut short and not repeated',
+		hasMinorNote() && status().match(/gravity/gi).length === 1, JSON.stringify(status()));
+	ok('and the timer is still the thing holding it', noteTimerArmed());
+
+	// Two minutes, then the fade, then nothing.
+	tickNoteClock();
+	ok('when its two minutes are up the note goes', !hasMinorNote(), JSON.stringify(status()));
+
+	// And it does not come back. This is the assertion the old section 2 was making.
+	await solved();
+	await solved();
+	ok('and no later solve says it again', !hasMinorNote(), JSON.stringify(status()));
 }
 
 console.log('\n=== 3. changing the engine makes it new again ===');
@@ -103,8 +146,17 @@ console.log('\n=== 3. changing the engine makes it new again ===');
 	L.resetEngineNotes();
 	await solved();
 	ok('after an engine change the note is said once more', hasMinorNote(), JSON.stringify(status()));
+	tickNoteClock();
+	ok('...and then falls quiet again on its own clock', !hasMinorNote(), JSON.stringify(status()));
+
+	// resetEngineNotes() also TAKES DOWN a note still standing, which matters because the note is
+	// about an engine or a project that is no longer the one on screen.
+	L.resetEngineNotes();
 	await solved();
-	ok('...and then falls quiet again', !hasMinorNote(), JSON.stringify(status()));
+	ok('a reset says it again', hasMinorNote(), JSON.stringify(status()));
+	L.resetEngineNotes();
+	ok('and a reset while it is standing takes it down at once', !hasMinorNote(), JSON.stringify(status()));
+	ok('and disarms its timer, so nothing fires into an empty box later', !noteTimerArmed());
 }
 
 function codes() {

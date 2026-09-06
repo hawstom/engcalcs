@@ -262,6 +262,13 @@ echoHeader("EngCalcs", $html_title, "", false);
 			      // of this box. setStatus() used to write the <p>'s textContent, which would wipe
 			      // any sibling control on every solve; it writes #lpn_status_text instead, so the
 			      // grievance button beside it survives. setStatus() is still the ONE writer here. ?><span id="lpn_status_text"></span><?php
+			      // AND THE ENGINE-DIFFERENCE NOTES ARE THEIR OWN SPAN, because they are the only
+			      // part of this box that EXPIRES on a clock of its own (Tom, 2026-09-05, of the
+			      // gravity note: "Give it a timer, maybe 2 minutes and maybe fading if that's
+			      // easy."). Everything setStatus() writes is true until the model changes; these
+			      // two are facts about the engine that stop being news. Kept in reading order --
+			      // the diagnostic first, the remark about it second -- which is where the
+			      // concatenated version put them anyway. ?><span id="lpn_status_notes" class="lpn-status-notes"></span><?php
 			      // THE SECOND SITE OF THE ONE-TAP GRIEVANCE LINK (ROADMAP Task 207). The point of
 			      // NOTICING: a person reading a complaint about their network is the person best
 			      // placed to say the complaint itself is wrong. Rare -- the diagnostic box was met

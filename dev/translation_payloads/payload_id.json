@@ -537,7 +537,7 @@
         "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.",
         "lpn_curve_none": "No curve",
         "lpn_curve_library_link": "Curves library",
-        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element names a curve; it does not hold one.",
+        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element states which curve it uses; it does not hold one.",
         "lpn_curve_shared_note": "These points belong to curve ID {name}, which {ids} also use. Changing them here changes them there too.",
         "lpn_curve_long_note": "Curve ID {name} has {count} points; it is shown here and edited under Libraries, Curves.",
         "lpn_curve_kind_head": "Pump head",
@@ -571,7 +571,7 @@
         "lpn_source_quality": "Source quality",
         "lpn_source_quality_tip": "How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.",
         "lpn_source_pattern": "Source pattern",
-        "lpn_source_pattern_tip": "A time pattern that scales the dose through the day, for a feed that does not run flat out around the clock. No pattern means that the dose is the same at every step.",
+        "lpn_source_pattern_tip": "A time pattern that scales the dose through the run, for a feed that is not going flat out around the clock. No pattern means that the dose is the same at every step.",
         "lpn_mixing_model": "Mixing model",
         "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
         "lpn_mixing_mixed": "Complete mixing",
@@ -685,7 +685,7 @@
         "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.",
         "lpn_curve_none": "No curve",
         "lpn_curve_library_link": "Curves library",
-        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element names a curve; it does not hold one.",
+        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element states which curve it uses; it does not hold one.",
         "lpn_curve_shared_note": "These points belong to curve ID {name}, which {ids} also use. Changing them here changes them there too.",
         "lpn_curve_long_note": "Curve ID {name} has {count} points; it is shown here and edited under Libraries, Curves.",
         "lpn_curve_kind_head": "Pump head",
@@ -719,7 +719,7 @@
         "lpn_source_quality": "Source quality",
         "lpn_source_quality_tip": "How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.",
         "lpn_source_pattern": "Source pattern",
-        "lpn_source_pattern_tip": "A time pattern that scales the dose through the day, for a feed that does not run flat out around the clock. No pattern means that the dose is the same at every step.",
+        "lpn_source_pattern_tip": "A time pattern that scales the dose through the run, for a feed that is not going flat out around the clock. No pattern means that the dose is the same at every step.",
         "lpn_mixing_model": "Mixing model",
         "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
         "lpn_mixing_mixed": "Complete mixing",
@@ -2759,7 +2759,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2775,7 +2775,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2791,7 +2791,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2807,7 +2807,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2823,7 +2823,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2839,7 +2839,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2855,7 +2855,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2871,7 +2871,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2887,7 +2887,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2903,7 +2903,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2919,7 +2919,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2935,7 +2935,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2951,7 +2951,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2967,7 +2967,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2983,7 +2983,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2999,7 +2999,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -3015,7 +3015,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "Sebuah kurva dimiliki oleh pompa atau katup yang menggunakannya, sehingga ini adalah kumpulan lengkapnya di satu tempat untuk dibaca. Klik sebuah ID untuk membuka aset itu dan mengubah titik-titiknya di sana. Untuk pompa, garis yang digambar adalah kurva yang digunakan proses, dicocokkan melalui titik-titiknya; untuk katup, garis itu adalah anak tangga lurus di antara titik-titik tersebut.",
-                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",

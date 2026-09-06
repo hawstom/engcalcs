@@ -18614,7 +18614,13 @@ var EngCalcs = EngCalcs || {};
 		// never reaches this line at all -- its own capture-phase handler abandons the drawing and
 		// stops the key -- so a pipe in flight costs one Escape to abandon and a second to put the
 		// tool away, in that order.
-		if (!hadBox && mode.indexOf('add-') === 0) { setMode('select'); }
+		// **AND IT IS EVERY TOOL, NOT ONLY THE ENTRY ONES** (Task 589, Tom 2026-09-05, asked whether
+		// Delete and Vertices wanted the same two ways out: *"The answer is no. But they can have
+		// [Esc] as a way out. Select is the 'home' mode."*). The LINK-CLICK exit stays the six entry
+		// tools' alone -- deleting a pipe and bending it are what those two tools are FOR, so a link
+		// click cannot mean "leave" there -- but Escape asks for nothing and costs nothing, and
+		// being in Delete without knowing it is the scariest of the three.
+		if (!hadBox && mode !== 'select') { setMode('select'); }
 	});
 	// File > New project (Task 264). A second popup off the same anchor rather than a hover-out
 	// submenu: the menu machinery here is one flat popover, and hover submenus are a poor bargain on
@@ -25373,7 +25379,14 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function libCurveEquation(c, pts) {
 		var pc = EngCalcs.pageConfig || {}, fit;
-		if (!c || c.kind !== 'head' || !pts || !pts.length || !EngCalcs.lpnPumpFromCurve) { return ''; }
+		// **TWO POINTS BEFORE THERE IS AN EQUATION** (Tom, 2026-09-05, asked whether it should
+		// appear as the first point is typed: *"No. It waits for the second point."*). One point
+		// does fit: EPANET's own single-point convention invents the shut-off head and the runout,
+		// so `lpnPumpFromCurve` would return a perfectly finite h0, a and b. That is the reason to
+		// hold it back rather than a reason to show it -- a curve drawn through one typed number is
+		// three quarters our convention and none of it the user's, and printing it beside the
+		// number they just typed reads as though they had described it.
+		if (!c || c.kind !== 'head' || !pts || pts.length < 2 || !EngCalcs.lpnPumpFromCurve) { return ''; }
 		fit = EngCalcs.lpnPumpFromCurve(pumpFitPoints(pts.map(function (p) {
 			return [+p[0], +p[1]];
 		})));
@@ -29937,7 +29950,65 @@ var EngCalcs = EngCalcs || {};
 		statusWrongCode = next;
 		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
 		// overlay now, so this changes what is COVERED, never what is laid out.
-		el.style.display = text ? 'block' : 'none';
+		syncStatusBoxVisibility();
+	}
+
+	// ---- The engine-difference notes, which expire on a clock of their own ----
+	//
+	// **TWO MINUTES, THEN IT FADES AND GOES** (Tom, 2026-09-05, of the gravity note: *"Give it a
+	// timer, maybe 2 minutes and maybe fading if that's easy."*). Task 525 made these notes say
+	// themselves ONCE rather than on every solve, which stopped them being recreated forever by the
+	// act meant to clear them. What it did not fix is a network nobody is editing: the note was part
+	// of the status STRING, so it stood until the next solve rewrote the string, and on a model
+	// sitting still that is until the page is closed.
+	//
+	// **SO THE NOTE IS ITS OWN ELEMENT AND ITS OWN LIFETIME**, and that is the design decision here.
+	// Being a sibling of `#lpn_status_text` rather than a clause inside it means (a) a solve landing
+	// during those two minutes cannot cut the note short, which is the mutant Task 525's harness was
+	// already aimed at, and (b) the fade can be a CSS transition on one span instead of on a box
+	// that also holds a diagnostic the user still needs.
+	//
+	// The fade is opacity only. Removing the span from the flow mid-transition would move the
+	// grievance button beside it.
+	var LPN_ENGINE_NOTE_MS = 120000, LPN_ENGINE_NOTE_FADE_MS = 800;
+	var engineNoteTimer = 0, engineNoteFadeTimer = 0;
+	function clearEngineNoteTimers() {
+		if (engineNoteTimer) { clearTimeout(engineNoteTimer); engineNoteTimer = 0; }
+		if (engineNoteFadeTimer) { clearTimeout(engineNoteFadeTimer); engineNoteFadeTimer = 0; }
+	}
+	// The one writer of #lpn_status_notes, as setStatus() is the one writer of #lpn_status_text.
+	function setEngineNotes(text) {
+		var el = document.getElementById('lpn_status_notes');
+		if (!el) { return; }
+		clearEngineNoteTimers();
+		el.style.opacity = '';
+		// A leading space because this span abuts #lpn_status_text with no whitespace between the
+		// two tags -- the markup cannot carry one without it showing when the note is absent.
+		el.textContent = text ? ' ' + text : '';
+		if (text) {
+			engineNoteTimer = setTimeout(function () {
+				engineNoteTimer = 0;
+				el.style.opacity = '0';
+				engineNoteFadeTimer = setTimeout(function () {
+					engineNoteFadeTimer = 0;
+					el.textContent = '';
+					el.style.opacity = '';
+					syncStatusBoxVisibility();
+				}, LPN_ENGINE_NOTE_FADE_MS);
+			}, LPN_ENGINE_NOTE_MS);
+		}
+		syncStatusBoxVisibility();
+	}
+	// The box shows while EITHER half has something to say. Before the notes moved out this was one
+	// `text ? 'block' : 'none'`; with two writers, an empty diagnostic and a live note must still
+	// draw the box, and a note that has just faded out must let an empty box close.
+	function syncStatusBoxVisibility() {
+		var el = document.getElementById('lpn_status');
+		if (!el) { return; }
+		var textEl = document.getElementById('lpn_status_text');
+		var notesEl = document.getElementById('lpn_status_notes');
+		var any = !!((textEl || el).textContent || '') || !!(notesEl && notesEl.textContent);
+		el.style.display = any ? 'block' : 'none';
 		// It appears and disappears under a top corner, so the legends re-dodge around it. This is
 		// NOT applyMapHeight() -- see the note above; the map's own height still ignores the model.
 		placeLegends();
@@ -32146,10 +32217,17 @@ var EngCalcs = EngCalcs || {};
 			// known to read the numbers on screen. Here, that only the first reporting time is
 			// being kept up to date, because working the whole period out costs more than this
 			// page is willing to spend while you are still typing (js/lpn-time.js, LPN_TIME_AUTO).
-			EngCalcs.lpnTimeStatusNote ? EngCalcs.lpnTimeStatusNote() : '',
-			manningNote ? (pc.lpn_engine_manning_note || '') : '',
-			minorNote ? (pc.lpn_engine_minor_loss_note || '') : '']
+			EngCalcs.lpnTimeStatusNote ? EngCalcs.lpnTimeStatusNote() : '']
 			.filter(function (t) { return !!t; }).join(' '));
+		// The engine notes go to their OWN span, so their two-minute clock runs independently of
+		// this diagnostic. Written only when one of them was actually raised THIS solve --
+		// noteOnce() has already decided that -- so a later solve neither restarts a running clock
+		// nor wipes a note the user has not finished reading.
+		var engineNotes = [
+			manningNote ? (pc.lpn_engine_manning_note || '') : '',
+			minorNote ? (pc.lpn_engine_minor_loss_note || '') : ''
+		].filter(function (t) { return !!t; }).join(' ');
+		if (engineNotes) { setEngineNotes(engineNotes); }
 		refreshLabelText();
 		refreshValueColors();
 		// **WHERE THE LIVE PANE HANGS** (Tasks 409, 434). Every solve ends here and every edit
@@ -32173,7 +32251,9 @@ var EngCalcs = EngCalcs || {};
 	// Which engine-difference notes this project has already been told (Task 525). Reset by
 	// resetEngineNotes() on an engine change and on applySaved().
 	var shownEngineNotes = {};
-	function resetEngineNotes() { shownEngineNotes = {}; }
+	// A new engine or a new project makes the fact new again, so the note may be said again -- and
+	// any note still standing from the old one is about a network that is no longer here.
+	function resetEngineNotes() { shownEngineNotes = {}; setEngineNotes(''); }
 	var epanetToken = 0;
 	function runSolveEpanet(model) {
 		var pc = EngCalcs.pageConfig || {};

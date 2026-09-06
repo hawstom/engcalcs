@@ -333,7 +333,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // matters as much as the buttons: without it setStatus() falls back to the <p>, and the fallback
   // is the shape that deletes the button on every solve -- so a stub missing it would have made
   // the regression this feature can cause untestable.
-  'lpn_status_text', 'lpn_wrong_btn', 'lpn_wrong_status_btn',
+  'lpn_status_text', 'lpn_status_notes', 'lpn_wrong_btn', 'lpn_wrong_status_btn',
   // The tile attribution (ROADMAP Task 145). It was NOT here, so refreshBasemapCredit() returned at
   // its first line in every harness and the licence credit was the one piece of map chrome no test
   // could see -- which is how it shipped invisible on the boot path (Task 486).
@@ -445,6 +445,10 @@ byId.lpn_setbox_panes.appendChild(byId.lpn_setbox_content);
 // stubs put the text somewhere `lpn_status.textContent` could not see, which is exactly the
 // question every harness asking "what does the diagnostic box say" is asking.
 byId.lpn_status.appendChild(byId.lpn_status_text);
+// The engine-note span expires on its own clock, so it is a sibling of the text rather than part
+// of it -- and it must be PARENTED here for the same reason the text span is, or every harness
+// reading `lpn_status.textContent` would be blind to the half that fades.
+byId.lpn_status.appendChild(byId.lpn_status_notes);
 byId.lpn_status.appendChild(byId.lpn_wrong_status_btn);
 
 // **THE CREDIT'S TWO SOURCE SETS ARE MODELLED, NOT INVENTED.** refreshBasemapCredit() shows one

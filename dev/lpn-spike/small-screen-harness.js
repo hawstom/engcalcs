@@ -1219,12 +1219,31 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 		/function applyColorLegendPosition\(\) \{ placeLegends\(\); \}/.test(src));
 	// And the readouts themselves must re-trigger it: each of these changes how wide or how tall a
 	// denizen is, and a dodge computed against the previous text is stale.
+	//
+	// **FOLLOWED ONE HOP, because a writer is allowed to delegate.** setStatus() stopped calling
+	// placeLegends() directly when the engine-difference notes became a second writer of the same
+	// box (Task 589's sibling work, 2026-09-05): both writers now end at syncStatusBoxVisibility(),
+	// which is where the box's display and the dodge are decided together. The invariant is "the
+	// dodge is recomputed on this path", not "this identifier appears in this function", so the
+	// walk resolves a call to a locally-declared function once. One hop and no further: a
+	// transitive search would eventually reach placeLegends() from most of this file and would
+	// assert nothing.
+	const bodyOf = (decl) => {
+		const at = src.indexOf(decl);
+		return at > 0 ? src.substring(at, src.indexOf('\n\t}', at)) : '';
+	};
+	const placesLegends = (body) => {
+		if (!body) { return false; }
+		if (body.indexOf('placeLegends()') > 0) { return true; }
+		return (body.match(/\b([A-Za-z_$][\w$]*)\(\)/g) || []).some((call) => {
+			const name = call.slice(0, -2);
+			return name !== 'placeLegends' && bodyOf('function ' + name + '(').indexOf('placeLegends()') > 0;
+		});
+	};
 	['function updateModeHint', 'function setStatus', 'function refreshMapStatus',
 		'function refreshScenarioStatus', 'function applyMapOverlayInset'].forEach((fn) => {
-		const at = src.indexOf(fn);
-		const body = src.substring(at, src.indexOf('\n\t}', at));
 		ok(fn + '() re-places the legends after changing what they dodge',
-			at > 0 && body.indexOf('placeLegends()') > 0);
+			src.indexOf(fn) > 0 && placesLegends(bodyOf(fn)));
 	});
 }
 }
