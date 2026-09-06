@@ -476,12 +476,35 @@ var EngCalcs = EngCalcs || {};
 	// link label is one row: shedding a value reduces its WIDTH monotonically, which is exactly the
 	// quantity both the short-pipe rule and the conflict test already consume.
 	//
-	// **THE SHED IS MEASURED THE SAME WAY THE HIDE RULE IS: ONE MEASUREMENT, getBBox().** Do not
-	// reintroduce a banked per-tspan width (getComputedTextLength) summed to answer "how wide without
-	// these values". It measures correctly under the headless stub, produces NOTHING in a real
-	// browser, and fails SILENTLY: if those numbers come back zero every subset "fits", nothing is
-	// shed, and the terminal rung hides the label whole. Redrawing costs a forced layout per step,
-	// but only a label that does NOT fit pays it, at most one step per value.
+	// **THE SHED IS MEASURED THE SAME WAY THE HIDE RULE IS: ONE MEASUREMENT, getBBox().** Redrawing
+	// costs a forced layout per step, but only a label that does NOT fit pays it, at most one step
+	// per value.
+	//
+	// **THE OLD WARNING HERE WAS WRONG AND IS REPLACED BY THE MEASUREMENT (Task 436, 2026-09-06).**
+	// It said a banked per-tspan width (getComputedTextLength) summed to answer "how wide without
+	// these values" would "measure correctly under the headless stub and produce NOTHING in a real
+	// browser". It does not. Measured in Chromium on the 736-element geographic grid
+	// dev/browser-pass/specs/perf.js builds, comparing every label's summed per-row tspan widths
+	// against that same label's getBBox().width:
+	//
+	//     736 labels, 3,608 getComputedTextLength calls, ZERO of them zero
+	//
+	// so the call works and the stated reason to avoid it is false. Anything that read those numbers
+	// as zero was comparing SVG user units -- degrees, in a geographic project -- against a
+	// pixel-scale number, which is a likelier account of the original failure than the call failing.
+	//
+	// **THE REAL OBSTACLE IS A DIFFERENT ONE, AND IT IS SMALLER: THE TWO CALLS DO NOT MEASURE THE
+	// SAME THING.** getComputedTextLength is the sum of the glyphs' ADVANCE widths; getBBox is the
+	// INK box, which also carries the side bearings at each end. On that same grid the sum runs
+	// under the box by a mean of 0.636% and a worst of 1.801%. So the arithmetic fix is AVAILABLE
+	// and it is not free: it would decide a marginal conflict differently from the tape measure, and
+	// every refactor of this pass so far has been held to "every placement byte-identical".
+	//
+	// **DO NOT SWAP ONE FOR THE OTHER. The way in, if this is taken, is a per-label CALIBRATION**
+	// -- one getBBox and one batch of getComputedTextLength at full content, k = box / sum, then
+	// every rung's width is k x sum(rung), which cancels the bearings to first order and costs one
+	// forced layout per label instead of one per rung. Unbuilt, and named in ROADMAP Task 436 with
+	// the numbers above rather than left as a suspicion.
 	//
 	// Lowest rank first: the user's column is a DROP order and 1 is the first value to go (Task 445).
 	// A line with no field and one with no rank both sort first of all.

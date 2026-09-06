@@ -486,4 +486,12 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	console.log('');
 	if (fails) { console.log(fails + ' FAILED'); process.exit(1); }
 	console.log('all fire flow box checks passed');
+	// **EXIT ON THE SUCCESS PATH TOO, and it is not symmetry for its own sake.** The failure path
+	// above always exited; falling off the end here exits only when the event loop drains, and the
+	// page under test leaves debounce timers pending (measured 2026-09-06: two live Timeout handles
+	// after the last assertion). So this harness printed "all fire flow box checks passed" and then
+	// sat for ever at 0% CPU, `run_harnesses.sh` never started the next file, and `check_all.sh`
+	// never returned -- which reads as a slow machine, not as a fault.
+	// The net under this is the 300 s timeout in run_harnesses.sh; this is the cause.
+	process.exit(0);
 }()).catch(function (e) { console.error(e); process.exit(1); });

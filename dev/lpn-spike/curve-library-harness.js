@@ -536,10 +536,14 @@ const FIVE = [
 		'by name as well as by value');
 	check(opts.some((o) => o.value === 'C1') && opts.some((o) => o.value === ''),
 		'and still offers every head curve the Library holds, plus "no curve"');
-	// Found by the label `lpn_curve_library_link` carries TODAY. It read 'Curves library' until
-	// 2026-09-06, when Wave 0 moved it to 'Libraries, Curves' -- the comma-path shape the rest of
-	// this page uses for a place to go. What the check is ABOUT is the click below.
-	const link = buttonsIn(fields, []).filter((b) => /Libraries, Curves/i.test(String(b.textContent)))[0];
+	// **FOUND BY THE LABEL THE LANGUAGE FILE HOLDS, NOT BY ONE TYPED HERE.** The wording has moved
+	// three times in as many days -- 'Curves library', then Wave 0's 'Libraries, Curves', then Tom's
+	// own 'Curves' on 2026-09-06 -- and each move red-lighted this line for a reason that has
+	// nothing to do with what the check is about, which is the CLICK below. The stub already reads
+	// the real `lib/lang.ec.en.php` into pageConfig, so the label is available and a copy of it here
+	// is a second source of truth that can only ever go stale.
+	const linkLabel = (global.EngCalcs.pageConfig || {}).lpn_curve_library_link || 'Curves';
+	const link = buttonsIn(fields, []).filter((b) => String(b.textContent) === linkLabel)[0];
 	check(!!link, 'a link into the Library stands beside it');
 	if (link) {
 		fire(link, 'click');

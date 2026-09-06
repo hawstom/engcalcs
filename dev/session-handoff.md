@@ -96,8 +96,12 @@ objects; and a tank USES its volume curve (Task 587 closed the same day, `lpnTan
 `js/lpn-time.js`, anchored by `dev/lpn-spike/tank-volume-curve-harness.js`). Nothing here needs
 believing any more; the harnesses assert it.
 
-**`dev/new-english-keys.md` stood at 59 still to read when this file was written. Tom read them.**
-It stands at 3 on 2026-09-06, and the sprint is now gated on Wave 0 rather than on his reading.
+**`dev/new-english-keys.md` is at ZERO still to read, 2026-09-06.** Tom read the whole list again
+and wrote 50 marks on it, and all 50 are now in `dev/english-key-rulings.json` and
+`dev/english-friction/584-wave0.json` rather than in the working tree.
+`harvest_english_rulings.php --check` is blocking, so a mark can no longer sit only in the markdown.
+**The sprint is gated on ONE string:** `lpn_scncmp_at`, where he asked *"I need more context. Where
+is this used?"* — answered in the friction log, and waiting on his ruling. Nothing else blocks it.
 
 **The retranslation debt is the live number:** `detect_english_drift.php` reports 39 keys whose
 English moved after a translation was written, and `new_english_keys.php` reports 144 untranslated.
@@ -122,11 +126,12 @@ That is one sprint's worth and it is what a sprint should be sized against.
    drawings there are **9 leader-leader crossings against 76 label-on-leader**, so the cheap
    segment-intersection test the roadmap proposed as the opening sees about a tenth of the problem.
    Build for the second trigger.
-4. **Task 436's last piece is a MEASUREMENT, not a wording call** — an earlier version of this file
-   said "awaiting Tom's wording only" and that was wrong. The block is explicit: after both fixes,
-   a zoom notch still costs 2.5-3.3 s with labels on against 0.5-0.7 s with them off, forced layouts
-   are held at 9 and overlap tests at ~7 per label, so what is left is per-label work no index
-   removes. Text measurement is the suspect and is UNPROVEN.
+4. **Task 436's measurement is DONE, 2026-09-06, and it turned a suspicion into a decision.** Text
+   measurement was the suspect and is now proven: 70-79% of the block, `getBBox` at 0.8 ms a call,
+   ~100% of the calls from one caller. The standing warning against the arithmetic fix is FALSE
+   (0 of 3,608 `getComputedTextLength` calls returned zero) and the real obstacle is that advance
+   width runs 0.636% mean / 1.801% worst under the ink box. The fix is named and costed in the
+   roadmap block; what is left is Tom's call on whether "byte-identical placement" may be relaxed.
 
 ---
 

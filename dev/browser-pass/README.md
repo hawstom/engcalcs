@@ -10,6 +10,20 @@ node run.js locking  # one section
 Exit code 0 means every check passed. `--` lines are checks this environment **cannot** answer and
 that stay on Tom's list; they are never counted as passes.
 
+## §25's two timing bounds fail on a slow machine, and that is not a regression
+
+**Measured 2026-09-06 in this WSL2 checkout, with other work running beside it:** the 736-element
+grid took **53,193 ms** to open against the 2,081 ms the spec's own header records, a wheel notch
+680.8 ms against a 250 ms bound, and the Close 23,758 ms against an 18,000 ms one. Two reds, no
+change to any product file, and every counted check in the same section green — including the two
+that answer Task 436's question, because a COUNT does not care how fast the machine is.
+
+**Read the open time first.** It is reported and never asserted precisely so it can be used this
+way: if it is an order of magnitude off the number in the header, the two bounds below it are
+measuring the machine and mean nothing. Do not loosen them to make this box pass — the bounds exist
+to catch a quadratic coming back, which is an order of magnitude, and a bound loose enough for a
+loaded WSL2 would not catch one.
+
 ## A third of this pass was dead for two days, and the foot of the report said so
 
 **2026-08-29.** Twelve of the thirty-eight sections threw at their first line and never ran. The

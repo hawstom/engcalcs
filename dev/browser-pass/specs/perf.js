@@ -299,6 +299,62 @@ async function reshedBlockCost(a, notches, dir) {
 	}), [notches, dir]);
 }
 
+// **DOES THE ARITHMETIC AGREE WITH THE TAPE MEASURE?** (Task 436's remaining question.)
+//
+// The comment at the head of the fitting cascade in js/looped-network.js forbids a banked per-tspan
+// width summed to answer "how wide without these values", on the ground that it "measures correctly
+// under the headless stub, produces NOTHING in a real browser". If that is false, the shed cascade
+// in shedAlignedForConflicts() can become arithmetic and stop paying a forced layout per rung --
+// which the measurement above says is 73-79% of a wheel notch, ~100% of it from one caller.
+//
+// **THE PREVIOUS PASS ONLY DISPROVED HALF OF IT.** It showed getComputedTextLength returns non-zero
+// (0 of 7,729 calls returned zero). That says the call WORKS; it does not say the sum AGREES with
+// getBBox, and agreement is the property the fix actually rests on. So this compares them, per
+// label, on the real drawing:
+//
+//   A = text.getBBox().width                      -- what every consumer uses today
+//   B = max over rows of the row's summed getComputedTextLength()
+//
+// A row is a tspan carrying its own `x` plus every tspan after it that does not -- setMultilineText()'s
+// idiom, which noteRowWidths() already reads the same way. getBBox on a <text> whose rows share an
+// anchor is the union of the rows, so the widest row IS the box width, and A and B should agree to
+// rounding. Where they do not, the difference is what a shed decision would be wrong by.
+//
+// Reported, never asserted. It is a measurement that answers a design question, and a threshold on
+// it would be a threshold on a browser's text engine.
+async function tspanSumVsBBox(a) {
+	return await a.page.evaluate(() => {
+		var out = { n: 0, zeroCtl: 0, ctlCalls: 0, maxAbs: 0, maxRel: 0, worst: null, sumRel: 0 };
+		var texts = document.querySelectorAll('text.lpn-lbl');
+		for (var i = 0; i < texts.length; i++) {
+			var t = texts[i], bb;
+			try { bb = t.getBBox().width; } catch (e) { continue; }
+			if (!(bb > 0)) { continue; }
+			// Rows, exactly as noteRowWidths() cuts them.
+			var rows = [], j, c, w, hasX;
+			for (j = 0; j < t.childNodes.length; j++) {
+				c = t.childNodes[j];
+				if (c.nodeType !== 1 || !c.getAttribute) { continue; }
+				w = 0;
+				try { w = c.getComputedTextLength(); } catch (e) { w = 0; }
+				out.ctlCalls += 1;
+				if (!(w > 0)) { out.zeroCtl += 1; }
+				hasX = c.getAttribute('x') != null;
+				if (hasX || !rows.length) { rows.push(w); } else { rows[rows.length - 1] += w; }
+			}
+			if (!rows.length) { continue; }
+			var b = Math.max.apply(null, rows);
+			var abs = Math.abs(bb - b), rel = abs / bb;
+			out.n += 1;
+            out.sumRel += rel;
+			if (abs > out.maxAbs) { out.maxAbs = abs; }
+			if (rel > out.maxRel) { out.maxRel = rel; out.worst = { bb: bb, sum: b, text: (t.textContent || '').slice(0, 40) }; }
+		}
+		out.meanRel = out.n ? out.sumRel / out.n : 0;
+		return out;
+	});
+}
+
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
 	try {
@@ -357,6 +413,15 @@ exports.run = async function ({ browser, report }) {
 			+ cost.ctlN + ' x getComputedTextLength ' + cost.ctlMs.toFixed(0) + ' ms = '
 			+ textMs.toFixed(0) + ' ms of a ' + cost.block.toFixed(0) + ' ms block ('
 			+ share.toFixed(1) + '%)');
+
+		// ---- and whether the arithmetic fix is even available (Task 436's remaining question) -----
+		const agree = await tspanSumVsBBox(a);
+		report.ok(true, 'per-tspan widths summed, against the same labels\' getBBox',
+			agree.n + ' labels, ' + agree.ctlCalls + ' getComputedTextLength calls, '
+			+ agree.zeroCtl + ' of them zero; worst disagreement '
+			+ (100 * agree.maxRel).toFixed(3) + '% (' + agree.maxAbs.toExponential(3)
+			+ ' user units), mean ' + (100 * agree.meanRel).toFixed(4) + '%'
+			+ (agree.worst ? ' — worst on "' + agree.worst.text + '"' : ''));
 
 		// ---- and closing a project that lands on it ----------------------------------------------
 		// The tab strip lands on the neighbour that slides into the closed tab's spot, so closing the

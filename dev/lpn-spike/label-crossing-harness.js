@@ -339,7 +339,17 @@ async function main() {
 	const arg = process.argv[2];
 	if (arg === '--measure') {
 		const out = await measure(process.argv[3]);
-		process.stdout.write('@@JSON@@' + JSON.stringify(out) + '\n');
+		// **EXIT EXPLICITLY. RETURNING HANGS THE WHOLE SUITE, AND IT DID.** A child that returns
+		// from main() exits only when the event loop drains, and this one has loaded the vendored
+		// EPANET engine through a dynamic import -- which leaves a handle open, so the process sits
+		// at 0% CPU for ever with its work finished and its line written. The parent's spawnSync()
+		// then blocks with no timeout, `run_harnesses.sh` never reaches harness 91 of 160, and
+		// `check_all.sh` never returns at all. Measured 2026-09-06: reproduced on this tree and on
+		// the commit before it, so it is not new -- it is intermittent, which is worse, because a
+		// suite that hangs one run in three reads as a slow machine.
+		// The callback is load-bearing: stdout to a PIPE is asynchronous, so exiting on the next
+		// line would race the very line the parent is waiting to read.
+		process.stdout.write('@@JSON@@' + JSON.stringify(out) + '\n', function () { process.exit(0); });
 		return;
 	}
 	runFixtures();
@@ -354,11 +364,19 @@ async function main() {
 	report(files.length > 0, 'there are examples to measure', files.length + ' file(s)');
 	let measured = 0;
 	files.forEach(function (f) {
+		// **AND THE PARENT REFUSES TO WAIT FOR EVER, whatever the child does.** The explicit exit
+		// above fixes the cause; this makes the failure mode survivable if any future cause appears,
+		// because the two are not the same guarantee. A hang here is invisible -- no output, no
+		// failure, the runner simply stops -- while a timeout is one red line naming the file.
+		// Ninety seconds is far above the worst honest measurement (the largest example takes a few
+		// seconds even on a loaded machine) and far below "somebody gives up and kills it".
 		const run = spawnSync(process.execPath, [__filename, '--measure', f],
-			{ encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+			{ encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 90000, killSignal: 'SIGKILL' });
 		const line = (run.stdout || '').split('\n').find(function (l) { return l.indexOf('@@JSON@@') === 0; });
 		if (run.status !== 0 || !line) {
-			report(false, 'measured ' + f, (run.stderr || '').split('\n').slice(-6).join(' | '));
+			report(false, 'measured ' + f, run.error && run.error.code === 'ETIMEDOUT'
+				? 'TIMED OUT after 90 s -- the child did not exit'
+				: (run.stderr || '').split('\n').slice(-6).join(' | '));
 			return;
 		}
 		measured++;

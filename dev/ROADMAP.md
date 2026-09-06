@@ -187,14 +187,36 @@ the block.
     runs one label at a time and always will" is true of the OUTER loop**, where each placed label
     is an obstacle for the next; the per-rung redraw inside ONE label's own cascade is a different
     loop and nothing forces it to be sequential.
-  - **AND THE STANDING WARNING AGAINST THE ARITHMETIC FIX RESTS ON A FALSE PREMISE.** The comment at
-    the head of the fitting cascade (`js/looped-network.js`) forbids a banked per-tspan width because
-    it "measures correctly under the headless stub, produces NOTHING in a real browser". Measured:
-    **0 of 7,729 calls returned zero**, mean 8.280e-5 — real values in the SVG's user units, which in
-    a geographic project are DEGREES. Correct and tiny, so anything comparing them against a
-    pixel-scale number would read them as zero. **That is a likelier account of the original failure
-    than the call not working, and it must be checked before the warning is either obeyed or
-    struck.** The fix is not written; this row is now a specific piece of work rather than a suspicion.
+  - **THE WARNING WAS CHECKED, IT IS FALSE, AND THE REAL OBSTACLE IS A DIFFERENT AND SMALLER ONE.**
+    The comment at the head of the fitting cascade forbade a banked per-tspan width because it
+    "measures correctly under the headless stub, produces NOTHING in a real browser". Both halves
+    are now measured in Chromium on the 736-element geographic grid, in
+    `dev/browser-pass/specs/perf.js` §25, which compares every label's summed per-row
+    `getComputedTextLength()` against that same label's `getBBox().width`:
+
+    | | |
+    |---|---|
+    | labels compared | 736 |
+    | `getComputedTextLength` calls | 3,608, **zero** of them zero |
+    | sum against box, mean | **0.636%** under |
+    | sum against box, worst | **1.801%** under |
+
+    So the call works, and reading its results as zero was comparing SVG user units — DEGREES, in a
+    geographic project — against a pixel-scale number. **What actually stands in the way is that the
+    two calls measure different things:** `getComputedTextLength` is the glyphs' ADVANCE width and
+    `getBBox` is the INK box, which carries the side bearings at each end. The arithmetic fix is
+    therefore available and is NOT free — it would decide a marginal conflict differently from the
+    tape measure, and every refactor of this pass so far has been held to *every placement
+    byte-identical*.
+  - **THE WAY IN, NAMED AND NOT BUILT: a per-label CALIBRATION.** One `getBBox` and one batch of
+    `getComputedTextLength` at full content, `k = box / sum`, then every rung's width is
+    `k x sum(rung)` — the bearings cancel to first order, and the cost falls from one forced layout
+    per RUNG to one per LABEL. That is the same shape of change Task 440 made to the other two shed
+    paths. It needs `composeRows()`'s existing `owners` out-parameter (segment → source line, `-1`
+    for a separator), which already exists and is already what a keep-set would index. **The
+    acceptance bar is the one this pass has always used**: `dev/lpn-spike/label-batch-harness.js`'s
+    method — re-run every label's cascade the old way and require identical decisions — and it is
+    the bar this fix may not clear, which is why it is a decision and not a chore.
   - **AND THAT CONVERGENCE WAS HIDING A DEFECT, FIXED 2026-08-23.** Because the seed lags, a first
     layout sheds link labels for ground the node labels do not take, and the node then takes ground
     under a pipe label using `yields` — which granted the position and never made the holder leave.
@@ -239,13 +261,17 @@ the block.
   - **DONE — the suggestion box now ships inside every payload** as `suggestion_box`, extracted by
     the generator from the one canonical block in `dev/translation-process.md`. No longer retyped
     per sprint; the generator fails hard if that block goes missing.
-  - **[H] `friction_check.php` NOW EXITS 1 with 16 `refer-to-human` entries awaiting Tom's ruling.**
-    That is the escalation mechanism working, and it is not in `check_all.sh` so it blocks no commit —
-    **but it blocks the next sprint launch until he rules.** The 16, plus 9 wording proposals and 7
-    `$ec_lang_syn` proposals, are in `239-wave0-calcs.json`. **Tom answers in
-    `dev/english-friction/239-refer-to-human.md`** (2026-08-23: *"Give me a file or a page where I
-    can decide and comment"*) — one `**Tom:**` line per item, blank meaning not yet decided. Each
-    answer goes back into the JSON's `disposition` and `resolution`, which is what re-opens the gate.
+  - **[H] The escalation gate works, and it is down to ONE entry (2026-09-06).** `friction_check.php`
+    exits 1 on any `open` or `refer-to-human` finding; it is not in `check_all.sh`, so it blocks no
+    commit and blocks every sprint launch. `239-wave0-calcs.json`'s 16 are all dispositioned, and
+    what remains is **`lpn_scncmp_at` in `584-wave0.json`** — Tom asked *"I need more context. Where
+    is this used?"*, which is answered in that entry's `resolution` (one cell of Water, Scenario
+    comparison), so the gate is waiting on his ruling and on nothing else.
+  - **AND HE ANSWERS IN `dev/new-english-keys.md` NOW, not in a second file.** The open findings are
+    printed into that list's own "Questions from the translators" section, under the same
+    `@@ NEEDS RULING` flag as everything else, and `harvest_english_rulings.php --apply` carries his
+    answer back into the JSON's `human_answer`. Two lists was one list somebody forgets;
+    `239-refer-to-human.md` is the superseded route and is kept only as the record of its sprint.
 
 - 75|479| **[H] The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.**
   **TOM'S ANSWER, 2026-09-05:** *"LibreWaterNet.org/app is what I think the url would be."* That

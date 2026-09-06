@@ -170,3 +170,32 @@ telling them apart is the whole of the lesson.
 when a harness does hold a word, it is usually holding a LAYOUT rule, which is a real property and
 must not be relaxed to make a rewrite pass.** The cheapest way to tell which you are looking at:
 ask what a reader would lose. Losing *undefined* costs nothing; gaining *Tank* costs a column.
+
+## A HARNESS THAT FINISHES AND DOES NOT EXIT STOPS THE WHOLE SUITE (2026-09-06)
+
+**`check_all.sh` could not complete on this tree.** Five consecutive runs never returned, and the
+symptom was indistinguishable from a slow machine: no output, no failure, `run_harnesses.sh` simply
+never started the next file. Two harnesses were caught doing it, and one of them
+(`fireflow-box-harness.js`) had already printed *"all fire flow box checks passed"* before it stopped.
+
+**The cause is the page's own debounce timers, and it is not a bug in the page.** Measured with
+`process.getActiveResourcesInfo()`: two live `Timeout` handles after the last assertion. Node exits
+when the event loop drains, so a harness whose success path FALLS OFF THE END waits for those timers
+and then for whatever they schedule. The failure path in these harnesses always called
+`process.exit(1)`; only the success path relied on the loop draining, which is why a passing run
+hangs and a failing one does not.
+
+- **A harness must EXIT on the success path, explicitly**, exactly as it does on the failure path.
+- **Where the harness spawns a child** (`label-crossing-harness.js --measure`), the child must exit
+  too, and the write of its result line must complete first: stdout to a pipe is asynchronous, so
+  `process.exit(0)` on the next line races the very output the parent is waiting to read. Pass it as
+  the write callback.
+- **Do NOT fix this by unref()ing timers in `dev/lpn-spike/lpn-dom-stub.js`.** It was considered and
+  rejected: harnesses also `await` their own settles through `setTimeout`, and an unref'd timer that
+  is the only thing pending lets the process exit **mid-test, with status 0**. That trades a visible
+  hang for a silent truncation, which is the worse of the two and is the same shape as the
+  "cheerful percentage while coverage falls" failure this file already warns about.
+
+**The net under all of it is in `run_harnesses.sh`: each harness runs under `timeout 300`, and a
+timeout counts as FAILED and names the file.** The fix and the net are different guarantees — one
+stops today's hang, the other makes every future one a red line instead of a suite that stalls.
