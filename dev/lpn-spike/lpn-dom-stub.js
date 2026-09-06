@@ -56,6 +56,11 @@ function mkEl(tag, svgNS) {
     },
     className: '', id: '', title: '', type: '', value: '', _text: '', _innerHTML: '',
     checked: false, placeholder: '', step: '', min: '', _listeners: {},
+    // **A CARET, BECAUSE A GRID THAT MOVES ON ARROW KEYS ASKS WHERE IT IS.** null is what a real
+    // input answers before anybody has put a caret in it, and the page reads that as "at the edge"
+    // -- so a harness that sets neither is testing the ordinary case, and one that wants the caret
+    // in the middle of a value sets both.
+    selectionStart: null, selectionEnd: null,
     appendChild(c) { this.children.push(c); c.parentNode = this; return c; },
     insertBefore(c) { this.children.unshift(c); c.parentNode = this; return c; },
     // **A REAL SWAP, IN PLACE.** The Libraries box redraws a curve's chart and rebuilds one curve
@@ -230,7 +235,14 @@ function mkEl(tag, svgNS) {
     getComputedTextLength() { return this._textWidth(); },
     setPointerCapture() {}, releasePointerCapture() {},
     remove() { if (this.parentNode) { this.parentNode.removeChild(this); } },
-    focus() {}, select() {}, click() {}
+    // **FOCUS IS RECORDED, OR NOTHING THAT MOVES IT CAN BE TESTED AT ALL.** These were both empty
+    // until the curve grid learned to move between its cells on Tab and the arrow keys: the whole
+    // observable result of that keystroke is WHICH element is focused, and a stub that swallows it
+    // holds constant the one thing such a harness varies. select() is what Tab does to a text input
+    // in every browser, and the page's Left/Right rule reads that selection.
+    focus() { global.document.activeElement = this; },
+    select() { this.selectionStart = 0; this.selectionEnd = String(this.value || '').length; },
+    click() {}
   };
   Object.defineProperty(el, 'innerHTML', {
     get() { return this._innerHTML; },
@@ -594,6 +606,9 @@ global.document = {
   // "absent": the whole question of whether rejecting the top of the stack reaches the thing beneath
   // it was unaskable. setHitTarget() still takes one element and means a stack of one.
   elementsFromPoint: () => hitStack.slice(),
+  // Whatever focus() was called on last, exactly as a browser reports it. selection-harness.js
+  // assigns to this directly, which is still what it was doing before anything set it.
+  activeElement: null,
   body: mkEl('body'),
   documentElement: mkEl('html'),
   title: ''   // Task 265 writes here; a stub without it would let document.title = ... pass unseen
