@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**57 open tasks.** Next (100): 1 · Soon (75): 20 · Someday (50): 13 · Maybe (25): 6 · Parked (5): 17
+**57 open tasks.** Next (100): 1 · Soon (75): 20 · Someday (50): 14 · Maybe (25): 5 · Parked (5): 17
 
 ## 100 — Next (1)
 
@@ -36,7 +36,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 602 — The engine checkbox reads as the whole story, and is a preference.
 - Task 603 — Name the nodes along the profile plot's own axis, as EPANET does.
 
-## 50 — Someday (13)
+## 50 — Someday (14)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -51,15 +51,15 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have now decided.
 - Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
 - Task 601 — Calibration files: measured field data, against the model that predicts it.
+- Task 604 — Read an EPANET `.PRO` profile file.
 
-## 25 — Maybe (6)
+## 25 — Maybe (5)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
 - Task 303 — Usage logging: the remaining lower-value questions.
 - Task 348 — Sub-categories and paging in the examples gallery.
 - Task 416 — The tester control panel: move it, prune it, repurpose it.
-- Task 574 — What is left of the `.net` slot map: nine slots nothing identifies.
 
 ## 5 — Parked (17)
 

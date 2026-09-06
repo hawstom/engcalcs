@@ -65,29 +65,16 @@ the block.
     the cloud-login proposal in a smaller costume."* Full record in both agents' journals.
 
 
-- 25|574| **What is left of the `.net` slot map: nine slots nothing identifies.**
-  **MOSTLY CLOSED 2026-09-03.** The slots were MEASURED, not inferred: the import report prints
-  `index: value`, Tom imported his Net3 and read the indices back, and every name was then checked
-  against what EPANET itself wrote for the same model (`dev/net-import-study/`). Two independent
-  sources agreeing on both index and value is what confirmed it.
-  - **Named now:** `[TIMES]` 23-31 (all nine, in order), `[ENERGY]` 32-35 (34 is the optional
-    `Global Pattern`, which is what explains the gap), `[REPORT] Status` at 10, the water-quality
-    trio 11/12/14 as ONE line, `CheckFreq`/`MaxCheck`/`DampLimit` 36-38, and EPANET 2.2's PDA
-    quartet 41-44.
-  - **THE DEFECT THIS CLOSES: `[TIMES]` was never written**, so every `.net` ever imported arrived
-    with no duration and no timesteps, and an extended-period model silently became a single
-    instant. `[ENERGY]` and `[REPORT]` were lost the same way.
-  - **Still unnamed and still reported: 16-22, 39, 40** -- `1`, `First` and a run of zeros that
-    EPANET's own export of the same model does not state anywhere, so there is nothing to match
-    them against. They cost nothing while they are reported, and naming one from a guess is what
-    the first attempt did.
-  - **THE FIRST ATTEMPT IS WORTH KEEPING IN MIND, because it looked right.** The same values without
-    their indices decoded plausibly against EPANET's section order and were WRONG by one, which
-    wrote `Duration 0.0` and `HeadError 10` into a converted file. The values were right and the
-    offsets were not; a run of repeated zeros cannot be counted by eye. The repair was not more
-    care, it was making the file state its own indices.
-
-
+- 50|604| **Read an EPANET `.PRO` profile file.**
+  It is the only route a profile can arrive by, and it falls out of closing Task 574. **A profile is in NO `.net` and no `.inp`** -- EPANET's Graph
+  Selection dialog writes its node list to a separate `.PRO` text file through an ordinary save
+  dialog, and nothing anywhere records the path, not even an MRU entry. So a user who has built a
+  profile in EPANET cannot bring it here by opening their project, and never will be able to.
+  - The format is small: an identifier line, then one node ID per line. The work is the
+    reconciliation -- what happens when a listed ID is not in this network -- and that answer is
+    already written for the calibration files of Task 601.
+  - Worth far more once Task 603 lands: an imported profile that cannot name its own nodes is a
+    line on an axis.
 
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
