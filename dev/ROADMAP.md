@@ -556,42 +556,6 @@ the block.
     the rule and must survive into the guide: telling them apart is a judgement, so this is one for
     the human pile, not the checkable one.
 
-- 100|508| **Tom's screenshot drop: dozens of captures, indexed and reused.**
-  `dev/screenshots/` is gitignored and holds his captures under ordinal names (`0001.png`); the
-  convention is in its README. **He captures; AI describes.** One line per file in the tracked
-  `dev/screenshots/INDEX.md`, which says what each shows and whether it is publishable — the
-  pictures do not survive a clone, what we learned from them does.
-  - **Publishable and useful are separate axes.** Publishable is the README's privacy test and
-    nothing else; a frame full of defects can still be safe to publish. Use **Not as is** for
-    safe-but-stale, or the best phone frame in the drop gets retired as a flat No, which happened.
-  - **A row must name the task that superseded it**, or the next reader re-diagnoses a fixed defect
-    from a stale picture. Nine frames from one phone session were obsolete by that evening.
-  - **THE THREE STALE PLATES ARE RE-SHOT. Tom, 2026-09-01: *"I recently did 0028, 0043, and
-    0047"*** — so the Water-glyph and lat-before-lon findings that filled this block are spent, and
-    they are deleted rather than archived here. **He also said the icon alone was an insufficient
-    reason to re-shoot**, so the frames may still carry other faults.
-  - **DONE 2026-09-01, AND THE LESSON IS THE PROCESS, NOT THE PICTURES.** All three were read
-    FROM THE PIXELS by AI — `Read` opens a PNG, so nobody had to ask Tom what his own screenshots
-    showed. 0028: latitude first, colour keys top-right against the labels legend top-left, nothing
-    printing through. 0047: latitude first, and the `--` placeholder is CORRECT rather than a defect
-    (a phone has no hover and nothing has been pointed at — Task 550). 0043: the Task 549 fixes are
-    visible, and the cut-off result list that AI could not judge is, in Tom's words, *"all that
-    would fit"*. Swapped into `librewaternet.org` on his word, commit `10eda9e`.
-  - **A RE-SHOOT IS NOT PUBLISHED BY BEING TAKEN, AND THAT IS A CHECK NOW** (2026-09-04).
-    `dev/scripts/screenshot_publish_check.php` reads every INDEX row claiming a plate is PUBLISHED
-    and compares the md5 it names with the file actually in the sibling repository. All three claims
-    match today. **The gap was never Tom's camera; it was that copying the file across is a separate
-    act of memory**, and a sentence saying it happened is one nobody re-reads. Advisory by
-    construction: the sibling repo is outside this tree and absent on a fresh clone, so the check
-    prints that it compared nothing rather than passing in silence.
-  - **A THIRD WATER-GLYPH GENERATION LANDED 2026-09-04** — the tower's tank became an elliptical
-    bulb — so every frame in the drop, the three published plates included, is one generation
-    behind. Recorded in the INDEX header, and **not** a worklist: Tom already ruled that the glyph
-    alone does not earn a re-shoot.
-  - Feeds Task 504's features list, the LibreWaterNet landing page and its `graphics-plan.md`. The
-    sibling repo IS drivable from here (`~/webdev/librewaternet.org` — read its own `CLAUDE.md`
-    first).
-
 - 100|509| **Edit mode on the path itself: drag any point, click a waypoint off.**
   **BUILT 2026-08-25.** The Edit button puts the PATH in edit mode: every node the route passes
   through wears a grab handle, and one gesture carries both operations Tom named —
