@@ -10,6 +10,19 @@ node run.js locking  # one section
 Exit code 0 means every check passed. `--` lines are checks this environment **cannot** answer and
 that stay on Tom's list; they are never counted as passes.
 
+## §39 `cursorflicker` FAILS ON PURPOSE, and its red is the open bug
+
+It asserts the property Task 569's complaint reduces to — **no band of `default` cursor sandwiched
+between two meaningful ones** — and that property does not hold today, so the section is red until
+somebody rules on the fix. Do not "repair" it by weakening the assertion; the diagnosis it prints
+above the failure is the deliverable, and the roadmap block carries the measurement.
+
+**This is the second spec in this suite that reports rather than asserts, and the distinction is
+worth keeping straight.** §25's timing lines are `report.ok(true, ...)` because a stopwatch on a
+shared machine cannot carry a verdict. §39's radial walk is the same — eight `console.log` lines of
+evidence — but it ends in one real assertion, because "is there a hole in the cursor vocabulary" IS
+decidable from that evidence. A spec may print freely; it should assert only what it can settle.
+
 ## §25's two timing bounds fail on a slow machine, and that is not a regression
 
 **Measured 2026-09-06 in this WSL2 checkout, with other work running beside it:** the 736-element

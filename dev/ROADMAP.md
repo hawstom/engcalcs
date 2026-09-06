@@ -633,10 +633,39 @@ the block.
   to me that explains the default pointer except that it almost (!) reliably happens at 12px from the
   point of a node (the 24px diameter)."* Long-recognized, never diagnosed. He rates it *"slightly
   mystifying and annoying"* rather than harmful — *"Did I see what I thought I saw? Why?"*
-  - **12 px is not one of the touch numbers**, which is what makes it interesting: `POINTER_REACH_PX`
-    is 14 and `TOUCH_REACH_PX` is 24 (closed Task 562), and the default `settings.symbolSize` is 7.
-    Something is drawing or hit-testing a ring at a radius nobody declared. A DOM element with no
-    cursor rule of its own, sitting between the node and its rivals, is the shape to look for.
+  - **DIAGNOSED 2026-09-06, IN A REAL BROWSER, AND IT IS THE OPPOSITE OF WHAT WAS SUSPECTED.**
+    `dev/browser-pass/specs/cursorflicker.js` walks outward from a junction one pixel at a time on
+    eight bearings and records what `elementFromPoint()` hits and what cursor that element computes
+    to. The result reproduces his report to the pixel:
+
+    ```
+    E : 0-3px pointer <circle .lpn-node> | 4-8px  default <svg #lpn_canvas> | 9-40px  move <tspan>
+    SE: 0-3px pointer <circle .lpn-node> | 4-12px default <svg #lpn_canvas> | 13-27px move <tspan>
+    NE: 0-3px pointer <circle .lpn-node> | 4-12px default <svg #lpn_canvas> | 13-28px move <tspan>
+    N/S/W/SW/NW: 0-3px pointer | 4-40px default        (nothing out there to hover)
+    ```
+
+    **There is no mystery ring and nothing is drawing at 12 px. It is a GAP.** The node's own circle
+    ends at ~3.5 px and its LABEL -- a `<tspan>` inside `.lpn-draglbl`, which carries `cursor: move`
+    -- begins at 9-13 px depending on the bearing. Between them is bare canvas, and `#lpn_canvas`
+    is `cursor: default`. So the sequence a moving pointer sees is **pointer, default, move**: the
+    "flicker to default" is the strip of map between a node and its own label, and Tom's 12 px is
+    where the label's box starts on the diagonals. It "almost (!) reliably" happens because it
+    depends entirely on where the placement pass put that label -- which is why it is a ring on
+    some bearings and absent on others.
+  - **THE TWO STANDING SUSPECTS ARE BOTH RULED OUT, so do not re-derive them.** `POINTER_REACH_PX`
+    (14) and `TOUCH_REACH_PX` (24) draw nothing -- they are read by `nearestNodeNearScreen()` AFTER
+    a hit. And `.lpn-node-symbol-backdrop`, which has no `cursor` and no `pointer-events` rule and
+    looks exactly like the culprit, never answers a hit test at all: `pointer-events` is INHERITED
+    and its parent `.lpn-node-symbol` sets `none`.
+  - **SO THE FIX IS A DECISION ABOUT THE MAP'S CURSOR VOCABULARY, NOT A BUG FIX. [H]** The
+    behaviour is correct in the sense that each element says what it is; what is wrong is that
+    "bare map" and "nothing here" look the same, and the map is mostly bare. The cheap answer is to
+    give `#lpn_canvas` a cursor that means *you can pan here* rather than `default`, at which point
+    the sequence becomes pointer, pan, move and nothing flickers to an arrow. That is a
+    one-line change and a change to what every visitor sees, so it is Tom's call, not a script's.
+    The spec asserts the property rather than the fix: no band of `default` sandwiched between two
+    meaningful cursors. **It FAILS today, deliberately** -- that red is the open bug.
 
 - 50|590| **A fittings picker, so a pipe's `k` is summed rather than guessed.**
   Tom, 2026-09-05, on the market researcher's finding: *"Fittings library: Put it in our roadmap.
