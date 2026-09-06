@@ -597,7 +597,7 @@
    "on": "Connection",
    "ruled": "2026-08-29"
   },
-  "lpn_find_prop_demand_description": {
+  "lpn_find_prop_demand_desc": {
    "on": "Demand category description",
    "ruled": "2026-09-04"
   },

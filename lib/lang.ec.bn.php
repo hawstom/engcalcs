@@ -1086,7 +1086,7 @@ $ec_lang['lpn_find_property']='বৈশিষ্ট্য';
 
 $ec_lang['lpn_find_condition']='শর্ত';
 $ec_lang['lpn_find_value']='মান';
-$ec_lang['lpn_find_button']='খুঁজুন';
+$ec_lang['lpn_find_btn']='খুঁজুন';
 $ec_lang['lpn_find_op_contains']='ধারণ করে';
 $ec_lang['lpn_find_op_equals']='সমান';
 $ec_lang['lpn_find_op_gt']='বেশি';
@@ -1210,7 +1210,7 @@ $ec_lang['lpn_time_no_report']='এখনও কোনো চালানোর 
 $ec_lang['lpn_replace_title']='যা পাওয়া গেছে তা পরিবর্তন করুন';
 $ec_lang['lpn_replace_prop']='পরিবর্তনযোগ্য বৈশিষ্ট্য';
 $ec_lang['lpn_replace_value']='নতুন মান';
-$ec_lang['lpn_replace_button']='পরিবর্তন করুন';
+$ec_lang['lpn_replace_btn']='পরিবর্তন করুন';
 $ec_lang['lpn_replace_preview']='{n}টি উপাদান পরিবর্তন করবেন?';
 $ec_lang['lpn_replace_apply']='সেগুলো পরিবর্তন করুন';
 $ec_lang['lpn_replace_done']='{n}টি উপাদান পরিবর্তিত হয়েছে। আপনি এটি এক ধাপে পূর্বাবস্থায় ফেরাতে পারবেন।';

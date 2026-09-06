@@ -170,7 +170,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_field_tag_tip`**
   > A tag can have any meaning you require such as pressure zone, work order, etc. It is not used here or by EPANET. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.
   _Ruled OK 2026-09-05._
-- **`lpn_find_prop_demand_description`**
+- **`lpn_find_prop_demand_desc`**
   > Demand category description
   _Ruled OK 2026-09-04._
 - **`lpn_gpv_curve_source`**

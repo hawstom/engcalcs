@@ -1088,7 +1088,7 @@ $ec_lang['lpn_find_property']='गुण';
 
 $ec_lang['lpn_find_condition']='शर्त';
 $ec_lang['lpn_find_value']='मान';
-$ec_lang['lpn_find_button']='खोजें';
+$ec_lang['lpn_find_btn']='खोजें';
 $ec_lang['lpn_find_op_contains']='में शामिल है';
 $ec_lang['lpn_find_op_equals']='के बराबर';
 $ec_lang['lpn_find_op_gt']='से अधिक';
@@ -1211,7 +1211,7 @@ $ec_lang['lpn_time_no_report']='अभी तक कोई रन रिपो�
 $ec_lang['lpn_replace_title']='जो मिला उसे बदलें';
 $ec_lang['lpn_replace_prop']='बदलने के लिए गुण';
 $ec_lang['lpn_replace_value']='नया मान';
-$ec_lang['lpn_replace_button']='बदलें';
+$ec_lang['lpn_replace_btn']='बदलें';
 $ec_lang['lpn_replace_preview']='{n} तत्व बदलें?';
 $ec_lang['lpn_replace_apply']='उन्हें बदलें';
 $ec_lang['lpn_replace_done']='{n} तत्व बदले गए। आप इसे एक चरण में पूर्ववत कर सकते हैं।';

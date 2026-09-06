@@ -67,6 +67,12 @@ foreach (glob($libDir . '/*.php') as $f)         { if (!in_array($f, $targets, t
 $targets[] = __DIR__ . '/english_string_hashes.json';
 $targets[] = __DIR__ . '/translation_exempt_keys.json';
 $targets[] = __DIR__ . '/translation_coverage.json';
+// **AND THE RULINGS FILE, which was missing until 2026-09-05.** A ruling is remembered against the
+// EXACT English it was made on, under the key's NAME -- so a rename left the ruling behind under a
+// name nothing resolves, and the key came back to Tom as NEEDS RULING with its wording unchanged.
+// He is the scarcest resource here; asking him to re-read a string he has already approved because a
+// suffix was tidied is the one cost a rename must not have.
+$targets[] = dirname(__DIR__) . '/english-key-rulings.json';
 
 // Word-boundary match so renaming `lpn_file_new` cannot touch `lpn_file_newer`. Covers every shape
 // a key appears in across this codebase: $ec_lang['k'], $ec_lang_syn['k'], pc.k, "k": in JSON,

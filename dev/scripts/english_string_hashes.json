@@ -643,7 +643,7 @@
                 "lpn_file_export_inp",
                 "lpn_file_export_inp_tip",
                 "lpn_find_adjacent",
-                "lpn_find_button",
+                "lpn_find_btn",
                 "lpn_find_condition",
                 "lpn_find_count",
                 "lpn_find_menu",
@@ -1002,7 +1002,7 @@
                 "lpn_profile_tap_more",
                 "lpn_profile_tap_start",
                 "lpn_replace_apply",
-                "lpn_replace_button",
+                "lpn_replace_btn",
                 "lpn_replace_done",
                 "lpn_replace_no_value",
                 "lpn_replace_none",
@@ -1968,7 +1968,7 @@
         "lpn_file_upload_explain": "7ef942147ae13399f21e6bb3aefc115f91439103",
         "lpn_file_write_failed": "b708bb7732fdfad2150d432d53c22872d8666e87",
         "lpn_find_adjacent": "c2f9b7b4897f03f94abf92294c9ca46fea62360b",
-        "lpn_find_button": "df251b06eefdaa932e97b54fbe9a74d3e606fa61",
+        "lpn_find_btn": "df251b06eefdaa932e97b54fbe9a74d3e606fa61",
         "lpn_find_condition": "2f4979324e03e4571b1d7eba701226670c2ee2da",
         "lpn_find_conn_no_fixed": "9544451f23c64e0990f59ee3c369b8efa6a6d33e",
         "lpn_find_conn_nolinksource": "77500d0de75a4c07e2f0c7595e9410773f20b567",
@@ -2300,7 +2300,7 @@
         "lpn_recent_tip": "190a8d0b5ac5b675a2277e3b006a4c61ec102f34",
         "lpn_replace_apply": "06273f05b2d65f28de634c30d49a41ad5cd56897",
         "lpn_replace_asked": "59d12df6e09af71c36f38ef3e0262d61c4fce669",
-        "lpn_replace_button": "a7cf7b25a703b308887c7f1d100c4326ef20ac46",
+        "lpn_replace_btn": "a7cf7b25a703b308887c7f1d100c4326ef20ac46",
         "lpn_replace_done": "898d479c87d8fa85484ac6f5a73ba06d6c621646",
         "lpn_replace_no_value": "d3296e8db3322e49291bcf0ce270c4f4838776b1",
         "lpn_replace_none": "5602dea0220723c268c6e6e2c76c7b43bffe5aec",
@@ -5187,7 +5187,7 @@
             "words": 1,
             "ends_sentence": false
         },
-        "lpn_find_button": {
+        "lpn_find_btn": {
             "words": 1,
             "ends_sentence": false
         },
@@ -6499,7 +6499,7 @@
             "words": 11,
             "ends_sentence": true
         },
-        "lpn_replace_button": {
+        "lpn_replace_btn": {
             "words": 1,
             "ends_sentence": false
         },

@@ -1085,7 +1085,7 @@ $ec_lang['lpn_find_property']='ویژگی';
 $ec_lang['lpn_find_condition']='شرط';
 
 $ec_lang['lpn_find_value']='مقدار';
-$ec_lang['lpn_find_button']='یافتن';
+$ec_lang['lpn_find_btn']='یافتن';
 $ec_lang['lpn_find_op_contains']='شامل';
 $ec_lang['lpn_find_op_equals']='برابر با';
 $ec_lang['lpn_find_op_gt']='بزرگ‌تر از';
@@ -1209,7 +1209,7 @@ $ec_lang['lpn_time_no_report']='هنوز گزارش اجرایی وجود ندا
 $ec_lang['lpn_replace_title']='تغییر آنچه یافت شد';
 $ec_lang['lpn_replace_prop']='ویژگیِ مورد تغییر';
 $ec_lang['lpn_replace_value']='مقدار جدید';
-$ec_lang['lpn_replace_button']='جایگزینی';
+$ec_lang['lpn_replace_btn']='جایگزینی';
 $ec_lang['lpn_replace_preview']='{n} المان تغییر کند؟';
 $ec_lang['lpn_replace_apply']='تغییر آن‌ها';
 $ec_lang['lpn_replace_done']='{n} المان تغییر کرد. می‌توانید این کار را در یک مرحله واگرد کنید.';

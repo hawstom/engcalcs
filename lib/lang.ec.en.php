@@ -1594,7 +1594,7 @@ $ec_lang['lpn_find_scope_all']='Everything';
 $ec_lang['lpn_find_property']='Property';
 $ec_lang['lpn_find_condition']='Condition';
 $ec_lang['lpn_find_value']='Value';
-$ec_lang['lpn_find_button']='Find';
+$ec_lang['lpn_find_btn']='Find';
 // The four conditions read as the middle of a sentence: "ID contains 12", "Pressure less than 20".
 // Keep them lowercase, so the three pull-downs read left to right, and keep them COPULA-FREE
 // (Task 438 Wave 0): a finite verb has to agree with the property noun chosen in the select above
@@ -1629,7 +1629,7 @@ $ec_lang['lpn_find_no_value']='Type what to look for.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Connectivity';
-$ec_lang['lpn_find_prop_demand_description']='Demand category description';
+$ec_lang['lpn_find_prop_demand_desc']='Demand category description';
 // **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
 // points, sources and this node. And I see either no connection (missing link) or no open
 // connection."* Two points x two kinds of break, plus his original local question, is this menu.
@@ -1693,7 +1693,7 @@ $ec_lang['lpn_replace_prop']='Property to change';
 $ec_lang['lpn_replace_value']='New value';
 $ec_lang['lpn_replace_source']='New value source';
 $ec_lang['lpn_replace_asked']='Elevations requested for {n} nodes. The results are on their way.';
-$ec_lang['lpn_replace_button']='Replace';
+$ec_lang['lpn_replace_btn']='Replace';
 // The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
 // looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
 $ec_lang['lpn_replace_preview']='Change {n} assets?';

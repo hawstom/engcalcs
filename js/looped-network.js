@@ -8456,7 +8456,7 @@ var EngCalcs = EngCalcs || {};
 		var BAND_NODE = [
 			['elev', 'lpn_field_elev', 'Elevation'],
 			['demand', 'lpn_field_base_demand', 'Base demand'],
-			['demandCategory', 'lpn_find_prop_demand_description', 'Demand description'],
+			['demandCategory', 'lpn_find_prop_demand_desc', 'Demand description'],
 			['fireFlow', 'lpn_ff_required', 'Required fire flow']
 		];
 		var RESULT_NODE = [
@@ -9614,7 +9614,7 @@ var EngCalcs = EngCalcs || {};
 		// aside they leave a "use the controls instead" button above it, and "the first button in
 		// #lpn_find_form" then means the wrong one.
 		btn.id = 'lpn_find_go';
-		setLabel(btn, 'find', pc.lpn_find_button || 'Find');
+		setLabel(btn, 'find', pc.lpn_find_btn || 'Find');
 		btn.addEventListener('click', runFind);
 		box.appendChild(btn);
 		// A rebuilt form is a CHANGED QUERY, so any pending preview is about a set that no longer
@@ -10230,7 +10230,7 @@ var EngCalcs = EngCalcs || {};
 		if (replaceIsDem()) {
 			btn = document.createElement('button');
 			btn.type = 'button';
-			setLabel(btn, 'edit', pc.lpn_replace_button || 'Replace');
+			setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
 			btn.addEventListener('click', runReplacePreview);
 			box.appendChild(btn);
 			box.appendChild(msg);
@@ -10259,7 +10259,7 @@ var EngCalcs = EngCalcs || {};
 		box.appendChild(valWrap);
 		btn = document.createElement('button');
 		btn.type = 'button';
-		setLabel(btn, 'edit', pc.lpn_replace_button || 'Replace');
+		setLabel(btn, 'edit', pc.lpn_replace_btn || 'Replace');
 		btn.addEventListener('click', runReplacePreview);
 		box.appendChild(btn);
 		box.appendChild(msg);
