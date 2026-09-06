@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**59 still to read**, of 136 untranslated keys, of 1671 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**66 still to read**, of 143 untranslated keys, of 1678 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (136, 59 to read @@ NEEDS RULING)
+## lpn_  (143, 66 to read @@ NEEDS RULING)
 
 - **`lpn_curve_kind_effic`**
   > Pump efficiency
@@ -38,11 +38,14 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_curve_kind_volume`**
   > Tank volume
   @@ NEEDS RULING
+- **`lpn_curve_library_link`**
+  > Curves library
+  @@ NEEDS RULING
+- **`lpn_curve_library_link_tip`**
+  > Opens the Libraries box on its Curves section, where a curve is made, described, edited and deleted. An element names a curve; it does not hold one.
+  @@ NEEDS RULING
 - **`lpn_curve_long_note`**
   > The curve {name} has {count} points, so it is shown here and edited under Libraries, Curves.
-  @@ NEEDS RULING
-- **`lpn_curve_new`**
-  > New curve...
   @@ NEEDS RULING
 - **`lpn_curve_none`**
   > No curve
@@ -185,11 +188,29 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_library_curve_add`**
   > Add a curve
   @@ NEEDS RULING
+- **`lpn_library_curve_copy`**
+  > Copy points
+  @@ NEEDS RULING
+- **`lpn_library_curve_copy_manual`**
+  > Copy these points
+  @@ NEEDS RULING
+- **`lpn_library_curve_copy_tip`**
+  > Copies every point as two columns, ready to paste into a spreadsheet.
+  @@ NEEDS RULING
 - **`lpn_library_curve_in_use`**
   > This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.
   @@ NEEDS RULING
 - **`lpn_library_curve_kind`**
   > What this curve describes
+  @@ NEEDS RULING
+- **`lpn_library_curve_note_label`**
+  > Description
+  @@ NEEDS RULING
+- **`lpn_library_curve_note_tip`**
+  > What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.
+  @@ NEEDS RULING
+- **`lpn_library_curve_remove_point`**
+  > Remove this point
   @@ NEEDS RULING
 - **`lpn_library_curve_unused`**
   > Nothing uses this curve.
@@ -198,7 +219,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Used by
   @@ NEEDS RULING
 - **`lpn_library_curve_values_tip`**
-  > The points, as pairs. Paste two columns from a spreadsheet or the lines out of an EPANET file if you have them. Every number is read in order and paired up, so spaces, commas and semicolons all work.
+  > Select two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.
   @@ NEEDS RULING
 - **`lpn_library_curve_x`**
   > X

@@ -619,14 +619,19 @@ console.log('\n--- heading and cells share one alignment ---');
 	report(pipeThs[5].classList.contains('lpn-pane-col-roughness'),
 		'...and every column names itself, which is what lets one column be narrowed',
 		pipeThs[5].className);
-	// **THE LIBRARIES CURVE SECTION IS NOT A TABLE ANY MORE** (Task 586). It became an editor, and
-	// its points are ONE TEXT FIELD on the Patterns section's own argument -- a manufacturer's
-	// curve is pasted, not typed into forty boxes. So what is read from the source here is that it
-	// uses the shared wide-field class the Patterns section uses, rather than growing a second
-	// layout for the same job.
+	// **THE LIBRARIES CURVE SECTION IS A TWO-COLUMN GRID AGAIN** (Task 588, Tom: *"The line given is
+	// worse than EPANET"*). It was one text field of every number in order, borrowed from the
+	// Patterns section -- and that argument does not carry, because a pattern is ONE column and a
+	// curve is TWO. What is read from the source here is that the points are a table of the shared
+	// `lpn-curve-table` kind rather than a layout of this section's own, and that the DESCRIPTION
+	// beside them is still on the shared wide field the Patterns section uses.
 	const curve = fnBody('buildCurveEntry');
-	report(/values\.className = 'lpn-lib-wide lpn-lib-values'/.test(curve),
-		'the Libraries curve editor types its points into the Patterns section\'s own wide field');
+	report(/desc\.className = 'lpn-lib-wide'/.test(curve),
+		'the Libraries curve editor puts the description on the Patterns section\'s own wide field');
+	report(/libCurveGridTable\(entry, c, grid, labels\)/.test(curve),
+		'and the points are a grid, not a line of text');
+	report(/table\.className = 'lpn-curve-table'/.test(fnBody('libCurveGridTable')),
+		'built on the same table class the popup\'s own point tables use');
 }
 
 // ---- 12. the rules that alignment, the box widths and the sticky heading hang on --------------

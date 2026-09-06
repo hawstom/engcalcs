@@ -46,7 +46,7 @@ const L = loadLoopedNetwork(
 	// through -- all of them the functions the box's own controls call.
 	"\t\trenameCurve: libRenameCurve, curveUsers: curveUsers,\n" +
 	"\t\tresolveCurvePoints: resolveCurvePoints, effective: effective, setProp: setProp,\n" +
-	"\t\tparsePoints: libParsePoints, formatPoints: libFormatPoints,\n" +
+	"\t\tpasteCells: libPasteCells, mergePaste: libMergePaste, gridPoints: libGridPoints,\n" +
 	// The Rules section (Task 248.03), by the same seam and for the same reason: these ARE the
 	// functions the box's controls call, so a check here is a check on the code path a click takes.
 	"\t\treadRule: libReadRule, ruleChunks: libRuleChunks, rulesWith: libRulesWith,\n" +

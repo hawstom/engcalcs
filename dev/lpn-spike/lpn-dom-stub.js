@@ -58,6 +58,16 @@ function mkEl(tag, svgNS) {
     checked: false, placeholder: '', step: '', min: '', _listeners: {},
     appendChild(c) { this.children.push(c); c.parentNode = this; return c; },
     insertBefore(c) { this.children.unshift(c); c.parentNode = this; return c; },
+    // **A REAL SWAP, IN PLACE.** The Libraries box redraws a curve's chart and rebuilds one curve
+    // entry this way, so a stub that lacked it could not run either path at all -- and the paste
+    // handler's whole visible result is the entry that comes back.
+    replaceChild(nw, old) {
+      const i = this.children.indexOf(old);
+      if (i < 0) { this.appendChild(nw); return old; }
+      this.children[i] = nw; nw.parentNode = this;
+      if (old) { old.parentNode = null; }
+      return old;
+    },
     // Removing the TEXT NODE clears the text, which is the other half of firstChild seeing it: the
     // standard `while (firstChild) removeChild(firstChild)` teardown would otherwise hand back the
     // same synthetic node forever and never terminate.
