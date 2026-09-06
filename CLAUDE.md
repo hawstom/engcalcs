@@ -132,6 +132,7 @@ never edits the roadmap; promoting a row is Tom's call.
 | `dev/testing-notes.md` | What actually catches defects here |
 | `dev/english-key-rulings.json` | Tom's approvals of English strings, keyed on the EXACT text ruled on, so a ruling lapses by itself when the wording changes. `new_english_keys.php` prints them back and leads with the count still to read. **Never hand-edit `dev/new-english-keys.md` expecting it to survive** — `--write` refuses over a hand-edited file, which is the guard that exists because his first pass was lost |
 | `dev/enforceable-rules-survey.md` | Which of this file's rules a script COULD hold, ranked, with the count: 57 enforced, 4 left that no blocking check can hold, 41 permanently prose (Task 322) |
+| `dev/session-handoff.md` | What a cold session needs from the last one, sorted into RULINGS (permanent), TRAPS (permanent, measured here) and STATE (dated, perishable). Written 2026-09-05. **Delete a state line once you have checked it** |
 | `dev/cross-platform-planning.md` | Claude Code / Copilot collaboration conventions |
 | `dev/unit-families.md` | Unit-family design record and per-field rationale |
 | `dev/cookie-storage-inventory.md` | Everything stored on a visitor's device, and why |

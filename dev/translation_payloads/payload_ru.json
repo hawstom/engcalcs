@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 1652,
-        "delta_key_count": 115,
+        "expected_key_count": 1671,
+        "delta_key_count": 136,
         "exempt_key_count": 19,
         "exempt_keys": [
             "calc_units_us",
@@ -511,10 +511,23 @@
         "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
+        "lpn_gpv_curve_source": "Head loss curve",
+        "lpn_gpv_curve_source_tip": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can name the same curve, and editing it changes all of them.",
+        "lpn_pump_curve_source_tip": "The curve in the Libraries box that says how much head this pump makes at each flow. Several pumps can name the same curve, and editing it changes all of them.",
         "lpn_field_tag": "Tag",
         "lpn_field_tag_tip": "A tag of your own, carried into and out of the EPANET file. A tag changes no answer. Use it to match this to the number it already has in your asset records, your maps or your work orders. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it.",
         "lpn_pump_effic_curve": "Efficiency curve",
-        "lpn_pump_effic_curve_tip": "The name this pump's efficiency curve is written under in an EPANET file. Its points are below and you can edit them there. A pump you gave a curve to here is named after the pump.",
+        "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.",
+        "lpn_curve_none": "No curve",
+        "lpn_curve_new": "New curve...",
+        "lpn_curve_shared_note": "These points belong to the curve {name}, which {ids} also use. Changing them here changes them there too.",
+        "lpn_curve_long_note": "The curve {name} has {count} points, so it is shown here and edited under Libraries, Curves.",
+        "lpn_curve_kind_head": "Pump head",
+        "lpn_curve_kind_effic": "Pump efficiency",
+        "lpn_curve_kind_volume": "Tank volume",
+        "lpn_curve_kind_headloss": "Valve head loss",
+        "lpn_curve_kind_generic": "Not stated",
+        "lpn_curve_volume_col": "Volume",
         "lpn_pump_effic_col": "Efficiency",
         "lpn_pump_effic_note": "Flow and the percent efficiency at that flow, in the order the pump works through them. With no points the pump runs at the network efficiency.",
         "lpn_pump_effic_remove": "Remove this point",
@@ -610,6 +623,14 @@
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
         "lpn_energy_curve_note": "These pumps name an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}. Open a pump to type its own points.",
+        "lpn_library_curve_add": "Add a curve",
+        "lpn_library_curve_kind": "What this curve describes",
+        "lpn_library_curve_values_tip": "The points, as pairs. Paste two columns from a spreadsheet or the lines out of an EPANET file if you have them. Every number is read in order and paired up, so spaces, commas and semicolons all work.",
+        "lpn_library_curve_used_by": "Used by",
+        "lpn_library_curve_unused": "Nothing uses this curve.",
+        "lpn_library_curve_in_use": "This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.",
+        "lpn_library_curve_x": "X",
+        "lpn_library_curve_y": "Y",
         "lpn_library_rules": "Rules",
         "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.",
         "lpn_library_rule_add": "Add a rule",
@@ -628,10 +649,23 @@
         "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.",
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
+        "lpn_gpv_curve_source": "Head loss curve",
+        "lpn_gpv_curve_source_tip": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can name the same curve, and editing it changes all of them.",
+        "lpn_pump_curve_source_tip": "The curve in the Libraries box that says how much head this pump makes at each flow. Several pumps can name the same curve, and editing it changes all of them.",
         "lpn_field_tag": "Tag",
         "lpn_field_tag_tip": "A tag of your own, carried into and out of the EPANET file. A tag changes no answer. Use it to match this to the number it already has in your asset records, your maps or your work orders. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it.",
         "lpn_pump_effic_curve": "Efficiency curve",
-        "lpn_pump_effic_curve_tip": "The name this pump's efficiency curve is written under in an EPANET file. Its points are below and you can edit them there. A pump you gave a curve to here is named after the pump.",
+        "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.",
+        "lpn_curve_none": "No curve",
+        "lpn_curve_new": "New curve...",
+        "lpn_curve_shared_note": "These points belong to the curve {name}, which {ids} also use. Changing them here changes them there too.",
+        "lpn_curve_long_note": "The curve {name} has {count} points, so it is shown here and edited under Libraries, Curves.",
+        "lpn_curve_kind_head": "Pump head",
+        "lpn_curve_kind_effic": "Pump efficiency",
+        "lpn_curve_kind_volume": "Tank volume",
+        "lpn_curve_kind_headloss": "Valve head loss",
+        "lpn_curve_kind_generic": "Not stated",
+        "lpn_curve_volume_col": "Volume",
         "lpn_pump_effic_col": "Efficiency",
         "lpn_pump_effic_note": "Flow and the percent efficiency at that flow, in the order the pump works through them. With no points the pump runs at the network efficiency.",
         "lpn_pump_effic_remove": "Remove this point",
@@ -727,6 +761,14 @@
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
         "lpn_energy_curve_note": "These pumps name an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}. Open a pump to type its own points.",
+        "lpn_library_curve_add": "Add a curve",
+        "lpn_library_curve_kind": "What this curve describes",
+        "lpn_library_curve_values_tip": "The points, as pairs. Paste two columns from a spreadsheet or the lines out of an EPANET file if you have them. Every number is read in order and paired up, so spaces, commas and semicolons all work.",
+        "lpn_library_curve_used_by": "Used by",
+        "lpn_library_curve_unused": "Nothing uses this curve.",
+        "lpn_library_curve_in_use": "This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.",
+        "lpn_library_curve_x": "X",
+        "lpn_library_curve_y": "Y",
         "lpn_library_rules": "Rules",
         "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.",
         "lpn_library_rule_add": "Add a rule",
@@ -865,6 +907,54 @@
                 }
             }
         },
+        "lpn_gpv_curve_source": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_gpv_curve",
+                    "value": "Этот клапан ссылается на кривую потерь напора, которой нет в файле. Клапан перенесён без кривой и остаётся полностью открытым, пока вы её не зададите.",
+                    "english": "This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one."
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_curve_note",
+                    "value": "До трёх точек: расход и потери напора при этом расходе. Оставьте их пустыми, и клапан останется полностью открытым.",
+                    "english": "Up to three points of flow and the head loss at that flow. Leave them empty and the valve stays fully open."
+                }
+            }
+        },
+        "lpn_gpv_curve_source_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_gpv_curve",
+                    "value": "Этот клапан ссылается на кривую потерь напора, которой нет в файле. Клапан перенесён без кривой и остаётся полностью открытым, пока вы её не зададите.",
+                    "english": "This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one."
+                },
+                "next_translated": {
+                    "key": "lpn_gpv_curve_note",
+                    "value": "До трёх точек: расход и потери напора при этом расходе. Оставьте их пустыми, и клапан останется полностью открытым.",
+                    "english": "Up to three points of flow and the head loss at that flow. Leave them empty and the valve stays fully open."
+                }
+            }
+        },
+        "lpn_pump_curve_source_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_source",
+                    "value": "Источник кривой",
+                    "english": "Curve"
+                },
+                "next_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Одна, две или три точки — см. «Кривая насоса» в примечаниях ниже.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                }
+            }
+        },
         "lpn_field_tag": {
             "reason": "missing",
             "current_value": null,
@@ -914,6 +1004,166 @@
             }
         },
         "lpn_pump_effic_curve_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Одна, две или три точки — см. «Кривая насоса» в примечаниях ниже.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "Точка 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_curve_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Одна, две или три точки — см. «Кривая насоса» в примечаниях ниже.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "Точка 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_curve_new": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Одна, две или три точки — см. «Кривая насоса» в примечаниях ниже.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "Точка 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_curve_shared_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Одна, две или три точки — см. «Кривая насоса» в примечаниях ниже.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "Точка 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_curve_long_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Одна, две или три точки — см. «Кривая насоса» в примечаниях ниже.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "Точка 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_curve_kind_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Одна, две или три точки — см. «Кривая насоса» в примечаниях ниже.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "Точка 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_curve_kind_effic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Одна, две или три точки — см. «Кривая насоса» в примечаниях ниже.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "Точка 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_curve_kind_volume": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Одна, две или три точки — см. «Кривая насоса» в примечаниях ниже.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "Точка 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_curve_kind_headloss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Одна, две или три точки — см. «Кривая насоса» в примечаниях ниже.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "Точка 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_curve_kind_generic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_note",
+                    "value": "Одна, две или три точки — см. «Кривая насоса» в примечаниях ниже.",
+                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                },
+                "next_translated": {
+                    "key": "lpn_pump_point1",
+                    "value": "Точка 1",
+                    "english": "Point 1"
+                }
+            }
+        },
+        "lpn_curve_volume_col": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2446,6 +2696,134 @@
                     "key": "lpn_labels_col_decimals_example",
                     "value": "0,000",
                     "english": "0.000"
+                }
+            }
+        },
+        "lpn_library_curve_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Управления",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_kind": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Управления",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_values_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Управления",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_used_by": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Управления",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_unused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Управления",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_in_use": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Управления",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_x": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Управления",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_curve_y": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curves_note",
+                    "value": "Кривая принадлежит насосу или клапану, который её использует, поэтому здесь собран весь их набор в одном месте для просмотра. Щёлкните по идентификатору, чтобы перейти к этому элементу и изменить его точки там. Для насоса нарисованная линия — это кривая, подобранная по точкам, которую использует расчёт; для клапана — это прямые отрезки между ними.",
+                    "english": "A curve belongs to the project, and a pump or a valve names the one it uses in its own properties. Several can name the same curve, and editing it here changes all of them. For a pump head curve the line drawn is the curve the run uses, fitted through the points; for every other kind it is the straight steps between them."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Управления",
+                    "english": "Controls"
                 }
             }
         },

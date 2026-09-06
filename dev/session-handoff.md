@@ -13,7 +13,7 @@ you can tell). Delete a state line once you have checked it and it is no longer 
 Sep 17, that would be very cool."*** That is 12 days from the day this was written, and the thing
 standing in the way is not code.
 
-- `dev/new-english-keys.md` stood at **38 still to read, 115 untranslated** at the end of this
+- `dev/new-english-keys.md` stood at **59 still to read, 136 untranslated** at the end of this
   session, all `lpn_`. It was **0 still to read** that morning; one day of EPANET work added them all.
 - **A sprint before he has read them is paid work thrown away** — that is what sprint 459 recorded,
   when nine agents translated a payload that disagreed with the source. Do not launch one on a
@@ -92,10 +92,14 @@ conversion, an editor), `[SOURCES]`, `[MIXING]`, `[TAGS]`, pump efficiency curve
 editable), Tag in Find and replace, example tags (Task 531), the label-crossing detector (Task 539
 phase one), and four fixes from Tom's own browser passes.
 
-**IN FLIGHT when this was written: the CURVES PARADIGM CHANGE.** One agent, one worktree. Tom's
-instruction: *"move all pump curve data to the Library under curves and leave only curve references
-in the pump properties."* If it has landed, verify against §5 below. If it has not, the brief is
-reconstructable from this file plus `dev/ROADMAP.md`.
+**THE CURVES PARADIGM CHANGE LANDED THE SAME DAY (Task 586).** `doc.curves` is the store;
+`curvePoints`, `efficPoints` and `curveRef` are gone from the document format; storage version 10 ->
+11, minted at both doors and idempotent. All four EPANET kinds exist as library objects. §5 below is
+what to verify rather than believe. **Three defects fell out of moving the seam, and the first is the
+one to remember: a GPV drawn ON THIS PAGE never reached the engine with its curve at all** --
+`assembleModel()` passed a valve's type and setting and nothing else, so only an IMPORTED GPV ever
+worked. An unreferenced `[CURVES]` entry was also being dropped on export, and the `[0, 0.5, 0.9]`
+sampling existed in two copies that a harness was holding together.
 
 **Two defects found by surveying rather than by testing, both worth knowing even after they are
 fixed:**
@@ -137,6 +141,7 @@ Check these rather than believing a report:
 ## 6. THE NEXT THINGS, in the order I would take them
 
 1. **Tom's reading of `dev/new-english-keys.md`**, then the sprint. Everything else is behind it.
+   59 of them, and 20 arrived with the curve library in the last hour of the day.
 2. **A tank USES its volume curve** — the last piece of "all of EPANET" and the one that may not fit
    before Sep 17. It is arithmetic, not plumbing: it changes the level-to-volume relationship the
    extended-period run integrates. The import note `tank-volume-curve` currently reassures the
