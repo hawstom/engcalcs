@@ -7,65 +7,58 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**65 open tasks.** Next (100): 5 · Soon (75): 16 · Someday (50): 14 · Maybe (25): 13 · Parked (5): 17
+**58 open tasks.** Next (100): 7 · Soon (75): 12 · Someday (50): 14 · Maybe (25): 8 · Parked (5): 17
 
-## 100 — Next (5)
+## 100 — Next (7)
 
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
-- ! Task 509 — Edit mode on the path itself: drag any point, click a waypoint off.
-- ! Task 545 — The list is a file, the marks are data, and both survived a reading.
-- Task 553 — Demands and Hydraulics options: BUILT, and every option now has a control.
-
-## 75 — Soon (16)
-
-- Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
-- Task 185 — Match/Copy properties tool (originated during Task 146).
-- Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
-- Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
-- Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
-- Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
-- Task 479 — [H] · One question left: should the suite answer at librewaternet.org/engcalcs/ ?
-- ! Task 532 — An English style guide for label wording — Tom says he is writing one by intuition.
-- Task 539 — Gang the neighbour labels so their leaders stop crossing.
-- Task 568 — Standard hydraulic symbols: Tom's research, recorded, not yet a decision.
 - ! Task 570 — The EPANET report gets a box of its own: draggable, sizeable, and one of the family.
-- Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 579 — The EPANET sections still carried and not understood, extracted from 566.
 - ! Task 581 — An empty box cannot say "this file states zero" apart from "nothing is set".
 - Task 583 — Two EPS sentences left, and one states an unmeasured cause.
 - Task 587 — A tank with a volume curve fills on the wrong schedule.
 
+## 75 — Soon (12)
+
+- Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
+- Task 185 — Match/Copy properties tool (originated during Task 146).
+- Task 186 — Make the Tables pane spreadsheet-interoperable.
+- Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
+- Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
+- Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
+- Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
+- Task 479 — [H] · The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.
+- Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
+- Task 539 — Gang the neighbour labels so their leaders stop crossing.
+- ! Task 569 — The cursor flickers to the default pointer at ~12 px from a node, on a PC.
+- Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
+
 ## 50 — Someday (14)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
-- Task 186 — Make the Tables pane spreadsheet-interoperable.
 - Task 207 — The dilettante path: make replying cost one tap, not five steps.
+- Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
 - Task 218 — Find advisors and proteges: a standing, nagged commitment.
 - Task 221 — Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.
 - Task 234 — Canal Seepage must prove its worth or go.
 - Task 269 — Both EWB chapters answered, and Phoenix invited a talk.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
+- Task 283 — Map label legibility: what remains is the AUTO-HIDE rule.
 - Task 285 — We do not know what devices anybody uses this on.
-- Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
-- Task 541 — Clicking a label: should it select the asset for editing?
+- Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - ! Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have not decided what to do.
-- ! Task 569 — The cursor flickers to the default pointer at ~12 px from a node, on a PC.
 - Task 575 — The six element symbols, redrawn from Tom's sketch.
+- Task 590 — A fittings picker, so a pipe's `k` is summed rather than guessed.
 
-## 25 — Maybe (13)
+## 25 — Maybe (8)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
-- Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
 - Task 266 — Multi-select (lasso) plus edit-all-selected, as EPANET has.
-- Task 283 — Map label legibility: what remains is the AUTO-HIDE rule.
 - Task 303 — Usage logging: the remaining lower-value questions.
 - Task 348 — Sub-categories and paging in the examples gallery.
-- Task 390 — Finish the unit paradigm migration: a unit is a NAME.
 - Task 416 — The tester control panel: move it, prune it, repurpose it.
-- Task 484 — Log which unhandled EPANET features actually arrive in real imports.
-- Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 574 — What is left of the `.net` slot map: nine slots nothing identifies.
 - Task 589 — Do Delete and Vertices want the same two ways out?
 
@@ -91,5 +84,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-55 of 65 titles are within 4–12 words. `!` marks the rest;
+51 of 58 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
