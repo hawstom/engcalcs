@@ -18,7 +18,7 @@ echoCalculatorForm(
 		Array('name' => 'd', 'type' => 'number', 'default' => Array('us' => '6', 'si' => '150'), 'units' => 'distance_small', 'label' => $ec_lang['mpf_pipe_diameter']),
 		Array('name' => 'l', 'type' => 'number', 'default' => Array('us' => '1000', 'si' => '300'), 'units' => 'distance_medium', 'label' => $ec_lang['mphl_pipe_length']),
 		Array('name' => 'e', 'type' => 'number', 'default' => Array('us' => '0.0005', 'si' => '0.15'), 'units' => 'roughness', 'label' => ecLinkTipLabel(ecRefUrl('darcy_weisbach_e'), $ec_lang['dw_roughness'], $ec_lang['dw_roughness_tip'])),
-		Array('name' => 'v', 'type' => 'number', 'default' => '1e-6', 'units' => NULL, 'label' => '<a target="_blank" href="'.ecRefUrl('kinematic_viscosity').'">'.$ec_lang['dw_kinematic_viscosity'].'</a>'),
+		Array('name' => 'v', 'type' => 'number', 'default' => '1e-6', 'units' => NULL, 'label' => '<a target="_blank" rel="noopener" href="'.ecRefUrl('kinematic_viscosity').'">'.$ec_lang['dw_kinematic_viscosity'].'</a>'),
 		Array( 'name' => 'km', 'type' => 'number', 'default' => '2.0', 'units' => NULL, 'label' => ecLinkTipLabel(ecRefUrl('minor_loss_k'), $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])),
 		// Upstream-first, elevation separate from pressure -- the Task 167 form, borrowed
 		// whole from Hazen-Williams under the concept-level label reuse rule, so this

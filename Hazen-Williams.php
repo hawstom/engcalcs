@@ -17,7 +17,7 @@ echoCalculatorForm(
 		Array('name' => 'q', 'type' => 'number', 'default' => Array('us' => '400', 'si' => '25'), 'units' => 'flow_pipe', 'label' => $ec_lang['mpf_flow']),
 		Array('name' => 'd', 'type' => 'number', 'default' => Array('us' => '6', 'si' => '150'), 'units' => 'distance_small', 'label' => $ec_lang['mpf_pipe_diameter']),
 		Array('name' => 'l', 'type' => 'number', 'default' => Array('us' => '1000', 'si' => '300'), 'units' => 'distance_medium', 'label' => $ec_lang['mphl_pipe_length']),
-		Array('name' => 'c', 'type' => 'number', 'default' => '130', 'units' => NULL, 'label' => '<a target="_blank" href="'.ecRefUrl('hazen_williams_c').'">'.$ec_lang['hw_roughness'].'</a>'),
+		Array('name' => 'c', 'type' => 'number', 'default' => '130', 'units' => NULL, 'label' => '<a target="_blank" rel="noopener" href="'.ecRefUrl('hazen_williams_c').'">'.$ec_lang['hw_roughness'].'</a>'),
 		Array( 'name' => 'km', 'type' => 'number', 'default' => '2.0', 'units' => NULL, 'label' => ecLinkTipLabel(ecRefUrl('minor_loss_k'), $ec_lang['mphl_total_junction_k_short'], $ec_lang['mphl_total_junction_k_tip'])),
 		// Upstream is what a waterline engineer KNOWS (tank level, pump discharge, city
 		// main); the downstream residual is what they want (ROADMAP Task 167). Elevation

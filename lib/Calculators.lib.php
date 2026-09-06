@@ -108,7 +108,7 @@ function ecTipLabel($text, $tip)
  */
 function ecLinkTipLabel($href, $text, $tip)
 {
-    return '<a target="_blank" href="'.htmlspecialchars($href, ENT_QUOTES, 'UTF-8').'">'.$text.'</a>'
+    return '<a target="_blank" rel="noopener" href="'.htmlspecialchars($href, ENT_QUOTES, 'UTF-8').'">'.$text.'</a>'
          . '<span class="ec-help" title="'.htmlspecialchars(strip_tags($tip)).'">'
          . '<span class="ec-tip">?</span></span>';
 }

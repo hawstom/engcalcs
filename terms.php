@@ -36,7 +36,7 @@ work, and the alignment of its mission with yours.</p>
 <p>The software is licensed to the public under the terms of the <strong>GNU General Public
 License, version 3 or later</strong>. You may use, study, share, modify, and redistribute them. The
 source is published at
-<a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a>. You
+<a target="_blank" rel="noopener" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a>. You
 are invited to contribute to the software and to request more lenient terms as your situation
 requires.</p>
 

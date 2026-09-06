@@ -15,7 +15,7 @@ echoCalculatorForm(
 	//Inputs
 	Array(
 		Array('name' => 'd0', 'type' => 'number', 'default' => Array('us' => '18', 'si' => '450'), 'units' => 'distance_small', 'label' => $ec_lang['mpf_pipe_diameter']),
-		Array('name' => 'n', 'type' => 'number', 'default' => '0.013', 'units' => NULL, 'label' => '<a target="_blank" href="'.ecRefUrl('manning_n').'">'.$ec_lang['mpf_manningRoughness'].'</a>'),
+		Array('name' => 'n', 'type' => 'number', 'default' => '0.013', 'units' => NULL, 'label' => '<a target="_blank" rel="noopener" href="'.ecRefUrl('manning_n').'">'.$ec_lang['mpf_manningRoughness'].'</a>'),
 		Array('name' => 'sf', 'type' => 'number', 'default' => '0.005', 'units' => 'slope', 'label' => $ec_lang['mpf_friction_slope']),
 		Array('name' => 'dd0', 'type' => 'number', 'default' => '0.5', 'units' => 'fraction', 'label' => $ec_lang['mpf_depth_ratio'], 'control' => solverControlHtml('EngCalcs.solveForDd0();')),
 	),
@@ -31,7 +31,7 @@ echoCalculatorForm(
 		Array('name' => 'v', 'units' => 'velocity', 'label' => $ec_lang['mpf_velocity']),
 		Array('name' => 'hv', 'units' => 'velocity_head', 'label' => $ec_lang['mpf_velocity_head']),
 		Array('name' => 'vel_check', 'units' => NULL, 'label' => $ec_lang['mhp_vel_check']),
-		Array('name' => 'f', 'units' => NULL, 'label' => '<a target="_blank" href="https://www.engineeringtoolbox.com/froude-number-d_578.html">'.$ec_lang['mpf_froude_number'].'</a>'),
+		Array('name' => 'f', 'units' => NULL, 'label' => '<a target="_blank" rel="noopener" href="https://www.engineeringtoolbox.com/froude-number-d_578.html">'.$ec_lang['mpf_froude_number'].'</a>'),
 		Array('name' => 'tau', 'units' => 'stress', 'label' => $ec_lang['mpf_shear_stress']),
 		Array('name' => 'q', 'units' => 'flow_channel', 'label' => ecTipLabel('<strong>' . $ec_lang['mpf_flow'] . '</strong>', $ec_lang['mpf_flow_tip'])),
 		Array('name' => 'q0', 'units' => 'flow_channel', 'label' => $ec_lang['mpf_full_flow']),

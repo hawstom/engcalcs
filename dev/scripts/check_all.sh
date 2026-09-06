@@ -129,6 +129,8 @@ run_check "service worker scope"         blocking php dev/scripts/sw_scope_check
 run_check "sw scope selftest"            blocking php dev/scripts/sw_scope_selftest.php
 run_check "log bucket column"            blocking php dev/scripts/log_bucket_check.php
 run_check "log bucket selftest"          blocking php dev/scripts/log_bucket_selftest.php
+run_check "new-tab links"                blocking php dev/scripts/blank_target_check.php
+run_check "new-tab link selftest"        blocking php dev/scripts/blank_target_selftest.php
 # Can this suite stand up ALONE? dev.hawsedc.com's first deploy came up with no blue form
 # backgrounds and no table borders, because /hawsedc.css lives in the PARENT site and is not in this
 # repo -- present on every machine anyone looks at, absent exactly where nobody looks until a deploy.

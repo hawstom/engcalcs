@@ -63,7 +63,7 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'tauu', $units = 'stress', $indent_string); ?>
 				</th>
 				<th>
-					<a target="_blank" href="<?=ecRefUrl('manning_n')?>"><?=$ec_lang['mi_n']?></a>
+					<a target="_blank" rel="noopener" href="<?=ecRefUrl('manning_n')?>"><?=$ec_lang['mi_n']?></a>
 				</th>
 				<th>
 					<?=$ec_lang['mi_t']?>
